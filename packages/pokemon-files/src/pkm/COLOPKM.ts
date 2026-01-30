@@ -8,9 +8,9 @@ import {
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/index'
-import { NationalDex } from 'src/consts/NationalDex'
 import * as byteLogic from '../util/byteLogic'
 import { AllPKMFields } from '../util/pkmInterface'
 import {
@@ -23,7 +23,7 @@ import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { adjustMovePPBetweenFormats } from '../util/util'
 
-export class COLOPKM {
+export default class COLOPKM {
   static getName() {
     return 'COLOPKM'
   }
@@ -322,5 +322,3 @@ export class COLOPKM {
     return []
   }
 }
-
-export default COLOPKM

@@ -98,7 +98,7 @@ impl Stats8 {
 
             if (atk_dv & 0b11) == 0b01 {
                 atk_dv += 1
-            } else if atk_dv % 4 == 0 {
+            } else if atk_dv.is_multiple_of(4) {
                 atk_dv += 2
             }
             let hp_dv = (atk_dv & 1) << 3;
@@ -122,8 +122,8 @@ impl Stats8 {
     }
 }
 
-#[cfg(feature = "wasm")]
 #[wasm_bindgen]
+#[cfg(feature = "wasm")]
 impl Stats8 {
     #[wasm_bindgen(constructor)]
     #[allow(clippy::missing_const_for_fn)]
@@ -136,6 +136,12 @@ impl Stats8 {
             spd,
             spe,
         }
+    }
+
+    // ensure TypeScript doesn't allow Stats8 and Stats16Le to be confused
+    #[wasm_bindgen(getter = stats8)]
+    pub fn rust_type_name(&self) -> bool {
+        true
     }
 }
 
@@ -184,8 +190,8 @@ impl Stats16Le {
     }
 }
 
-#[cfg(feature = "wasm")]
 #[wasm_bindgen]
+#[cfg(feature = "wasm")]
 impl Stats16Le {
     #[wasm_bindgen(constructor)]
     #[allow(clippy::missing_const_for_fn)]
@@ -198,6 +204,12 @@ impl Stats16Le {
             spd,
             spe,
         }
+    }
+
+    // ensure TypeScript doesn't allow Stats8 and Stats16Le to be confused
+    #[wasm_bindgen(getter = stats16Le)]
+    pub fn rust_type_name(&self) -> bool {
+        true
     }
 }
 
@@ -234,8 +246,8 @@ impl HyperTraining {
     }
 }
 
-#[cfg(feature = "wasm")]
 #[wasm_bindgen]
+#[cfg(feature = "wasm")]
 impl HyperTraining {
     #[wasm_bindgen(constructor)]
     #[allow(clippy::missing_const_for_fn)]
@@ -262,15 +274,21 @@ pub struct StatsPreSplit {
 }
 
 impl StatsPreSplit {
-    // pub fn from_bytes_be(bytes: [u8; 10]) -> Self {
-    //     StatsPreSplit {
-    //         hp: u16::from_be_bytes(bytes[0..2].try_into().unwrap()),
-    //         atk: u16::from_be_bytes(bytes[2..4].try_into().unwrap()),
-    //         def: u16::from_be_bytes(bytes[4..6].try_into().unwrap()),
-    //         spe: u16::from_be_bytes(bytes[6..8].try_into().unwrap()),
-    //         spc: u16::from_be_bytes(bytes[8..10].try_into().unwrap()),
-    //     }
-    // }
+    pub fn from_bytes(bytes: [u8; 10]) -> Self {
+        Self {
+            hp: u16::from_le_bytes(bytes[0..2].try_into().unwrap()),
+            atk: u16::from_le_bytes(bytes[2..4].try_into().unwrap()),
+            def: u16::from_le_bytes(bytes[4..6].try_into().unwrap()),
+            spe: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
+            spc: u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
+        }
+    }
+
+    pub fn to_bytes(self) -> [u8; 10] {
+        u16_le_slice_to_u8([self.hp, self.atk, self.def, self.spe, self.spc])
+            .try_into()
+            .unwrap()
+    }
 
     pub const fn from_dv_bytes(bytes: &[u8; 2]) -> Self {
         let dv_bytes = u16::from_be_bytes([bytes[0], bytes[1]]);
@@ -293,6 +311,66 @@ impl StatsPreSplit {
         let dv_val_u16 = (dv_val_u16 << 4) | (self.spc & 0x0f);
 
         dv_val_u16.to_be_bytes()
+    }
+
+    pub const fn is_empty(&self) -> bool {
+        self.hp == 0 && self.atk == 0 && self.def == 0 && self.spc == 0 && self.spe == 0
+    }
+
+    pub const fn dvs_from_ivs_lossy(ivs: &Stats8) -> Self {
+        Self {
+            hp: dv_from_iv(ivs.hp),
+            atk: dv_from_iv(ivs.atk),
+            def: dv_from_iv(ivs.def),
+            spc: dv_from_iv((ivs.spa + ivs.spd) / 2),
+            spe: dv_from_iv(ivs.spe),
+        }
+    }
+
+    pub const fn shiny_dvs_from_ivs(ivs: &Stats8) -> Self {
+        let mut atk = (ivs.atk - 1).div_ceil(2) as u16;
+        if atk & 0b11 == 0b01 {
+            atk += 1;
+        } else if atk % 4 == 0 {
+            atk += 2
+        }
+
+        Self {
+            hp: (atk & 1) << 3,
+            atk,
+            def: 10,
+            spc: 10,
+            spe: 10,
+        }
+    }
+
+    pub const fn force_dvs_for_unown_letter(&mut self, letter_index: u16) -> Self {
+        let letter_bits = letter_index * 10;
+        self.atk = (self.atk & 0b1001) | (((letter_bits >> 6) & 0b11) << 1);
+        self.def = (self.def & 0b1001) | (((letter_bits >> 4) & 0b11) << 1);
+        self.spe = (self.spe & 0b1001) | (((letter_bits >> 2) & 0b11) << 1);
+        self.spc = (self.spc & 0b1001) | ((letter_bits & 0b11) << 1);
+        *self
+    }
+}
+
+const fn dv_from_iv(iv: u8) -> u16 {
+    ((iv - 1) / 2) as u16
+}
+
+#[wasm_bindgen]
+#[cfg(feature = "wasm")]
+impl StatsPreSplit {
+    #[wasm_bindgen(constructor)]
+    #[allow(clippy::missing_const_for_fn)]
+    pub fn new(hp: u16, atk: u16, def: u16, spc: u16, spe: u16) -> Self {
+        Self {
+            hp,
+            atk,
+            def,
+            spc,
+            spe,
+        }
     }
 }
 
@@ -331,9 +409,9 @@ impl ContestStats {
     }
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
+#[wasm_bindgen]
+#[cfg(feature = "wasm")]
 impl ContestStats {
     #[wasm_bindgen(constructor)]
     pub fn new(cool: u8, beauty: u8, cute: u8, smart: u8, tough: u8, sheen: u8) -> Self {

@@ -2,7 +2,6 @@ use pkm_rs::saves::SaveType;
 use serde::Serialize;
 
 use crate::error::Result;
-use crate::state::OpenSavesState;
 use crate::util::{self, PathData, parse_path_data};
 use std::collections::HashMap;
 use std::fs;

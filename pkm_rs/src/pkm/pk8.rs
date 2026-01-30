@@ -85,11 +85,9 @@ impl Pk8 {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < Self::BOX_SIZE {
-            return Err(Error::ByteLength {
-                expected: Self::BOX_SIZE,
-                received: size,
-            });
+            return Err(Error::buffer_size(Pk8::BOX_SIZE, size));
         }
+
         // try_into() will always succeed thanks to the length check
         let mon = Pk8 {
             encryption_constant: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),

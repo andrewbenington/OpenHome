@@ -1,39 +1,37 @@
 use std::path::{Path, PathBuf};
-
 use tauri::{App, Manager};
-use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
 use crate::{
     error::{Error, Result},
     pkm_storage::StoredBankData,
-    util, versioning,
+    util,
+    versioning::{self, UpdateFeatures},
 };
 
-pub fn run_app_startup(app: &App) -> Result<()> {
+#[cfg(target_os = "linux")]
+use dialog::DialogBox;
+#[cfg(not(target_os = "linux"))]
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
+
+pub fn run_app_startup(app: &App) -> Result<Vec<UpdateFeatures>> {
     let handle = app.handle();
 
-    if let Err(error) = versioning::handle_version_migration(handle, false) {
-        match error {
-            Error::OutdatedVersion { .. } => {
-                let should_quit = app
-                    .dialog()
-                    .message(error.to_string())
-                    .title("OpenHome Version Error")
-                    .kind(MessageDialogKind::Error)
-                    .buttons(MessageDialogButtons::OkCancelCustom(
-                        "Quit".to_owned(),
-                        "Launch App Anyways".to_owned(),
-                    ))
-                    .blocking_show();
+    let update_features: Vec<UpdateFeatures> =
+        match versioning::handle_updates_get_features(handle, false) {
+            Err(error) => match error {
+                Error::OutdatedVersion { .. } => {
+                    let should_launch = show_version_error_prompt(app, &error);
 
-                if should_quit {
-                    return Err(error);
+                    if should_launch {
+                        return Err(error);
+                    }
+
+                    versioning::handle_updates_get_features(handle, true)?
                 }
-                versioning::handle_version_migration(handle, true)?;
-            }
-            other => return Err(other),
-        }
-    }
+                other => return Err(other),
+            },
+            Ok(feature_messages) => feature_messages,
+        };
 
     versioning::update_version_last_used(handle)?;
 
@@ -42,10 +40,10 @@ pub fn run_app_startup(app: &App) -> Result<()> {
 
     let result = set_theme_from_settings(app);
     if let Err(error) = result {
-        eprintln!("{}", error)
+        eprintln!("{error}")
     }
 
-    Ok(())
+    Ok(update_features)
 }
 
 fn initialize_storage(app_handle: &tauri::AppHandle) -> Result<()> {
@@ -74,7 +72,7 @@ fn initialize_storage(app_handle: &tauri::AppHandle) -> Result<()> {
         util::write_storage_file_json(app_handle, "banks.json", StoredBankData::default())?;
     }
 
-    let mons_path = util::get_storage_path(app_handle)?.join("mons");
+    let mons_path = util::get_storage_path(app_handle)?.join("mons_v2");
     util::create_directory(&mons_path)
 }
 
@@ -112,4 +110,27 @@ fn set_theme_from_settings(app: &App) -> Result<()> {
         .ok_or(Error::WindowAccess { source: None })?
         .set_theme(theme_option)
         .map_err(|e| Error::other_with_source("Could not set theme", e))
+}
+
+pub fn show_version_error_prompt(_app: &tauri::App, error: &Error) -> bool {
+    #[cfg(not(target_os = "linux"))]
+    return !_app
+        .dialog()
+        .message(error.to_string())
+        .title("OpenHome Version Error")
+        .kind(MessageDialogKind::Error)
+        .buttons(MessageDialogButtons::OkCancelCustom(
+            "Quit".to_owned(),
+            "Launch App Anyways".to_owned(),
+        ))
+        .blocking_show();
+
+    #[cfg(target_os = "linux")]
+    dialog::Question::new(format!(
+        "{error}\nDo you want to accept the risk and launch anyways?"
+    ))
+    .title("OpenHome Version Error")
+    .show()
+    .expect("Could not display dialog box")
+    .eq(&dialog::Choice::Yes)
 }

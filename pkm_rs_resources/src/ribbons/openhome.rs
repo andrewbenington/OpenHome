@@ -4,6 +4,9 @@ use std::{error::Error, fmt::Display};
 
 use crate::ribbons::{ModernRibbon, ModernRibbonSet};
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
 #[derive(Default, Debug, Clone, Copy)]
 pub struct ObsoleteRibbonSet(FlagSet<6>);
 
@@ -32,11 +35,20 @@ impl ObsoleteRibbonSet {
         self.0.set_index(ribbon.get_index() as u8, true);
     }
 
+    pub fn add_ribbons(&mut self, ribbons: Vec<ObsoleteRibbon>) {
+        for ribbon in ribbons {
+            self.add_ribbon(ribbon);
+        }
+    }
+
+    pub fn with_ribbons(mut self, ribbons: Vec<ObsoleteRibbon>) -> Self {
+        self.add_ribbons(ribbons);
+        self
+    }
+
     pub fn set_ribbons(&mut self, ribbons: Vec<ObsoleteRibbon>) {
         self.clear_ribbons();
-        ribbons
-            .into_iter()
-            .for_each(|ribbon| self.add_ribbon(ribbon));
+        self.add_ribbons(ribbons);
     }
 }
 
@@ -49,6 +61,7 @@ impl Serialize for ObsoleteRibbonSet {
     }
 }
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Serialize, PartialEq, Eq, Clone, Copy)]
 #[repr(u8)]
 pub enum ObsoleteRibbon {
@@ -100,6 +113,21 @@ pub enum ObsoleteRibbon {
     ToughGreatSinnoh,
     ToughUltraSinnoh,
     ToughMasterSinnoh,
+}
+
+impl FromIterator<ObsoleteRibbon> for ObsoleteRibbonSet {
+    fn from_iter<T: IntoIterator<Item = ObsoleteRibbon>>(iter: T) -> Self {
+        Self::default().with_ribbons(iter.into_iter().collect())
+    }
+}
+
+impl IntoIterator for ObsoleteRibbonSet {
+    type Item = ObsoleteRibbon;
+    type IntoIter = std::iter::Map<std::vec::IntoIter<usize>, fn(usize) -> ObsoleteRibbon>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.get_indices().into_iter().map(ObsoleteRibbon::from)
+    }
 }
 
 impl ObsoleteRibbon {
@@ -156,6 +184,63 @@ impl ObsoleteRibbon {
         }
     }
 
+    pub fn from_name(name: &str) -> Option<Self> {
+        let mut full_name = name.to_owned();
+        if !full_name.ends_with("Ribbon") && !full_name.ends_with("Mark") {
+            full_name = format!("{name} Ribbon");
+        }
+        match full_name.as_str() {
+            "Winning Ribbon" => Some(Self::Winning),
+            "Victory Ribbon" => Some(Self::Victory),
+            "Ability Ribbon" => Some(Self::Ability),
+            "Great Ability Ribbon" => Some(Self::GreatAbility),
+            "Double Ability Ribbon" => Some(Self::DoubleAbility),
+            "Multi Ability Ribbon" => Some(Self::MultiAbility),
+            "Pair Ability Ribbon" => Some(Self::PairAbility),
+            "World Ability Ribbon" => Some(Self::WorldAbility),
+            "Cool (Hoenn) Ribbon" => Some(Self::CoolHoenn),
+            "Cool Super (Hoenn) Ribbon" => Some(Self::CoolSuperHoenn),
+            "Cool Hyper (Hoenn) Ribbon" => Some(Self::CoolHyperHoenn),
+            "Cool Master (Hoenn) Ribbon" => Some(Self::CoolMasterHoenn),
+            "Beauty (Hoenn) Ribbon" => Some(Self::BeautyHoenn),
+            "Beauty Super (Hoenn) Ribbon" => Some(Self::BeautySuperHoenn),
+            "Beauty Hyper (Hoenn) Ribbon" => Some(Self::BeautyHyperHoenn),
+            "Beauty Master (Hoenn) Ribbon" => Some(Self::BeautyMasterHoenn),
+            "Cute (Hoenn) Ribbon" => Some(Self::CuteHoenn),
+            "Cute Super (Hoenn) Ribbon" => Some(Self::CuteSuperHoenn),
+            "Cute Hyper (Hoenn) Ribbon" => Some(Self::CuteHyperHoenn),
+            "Cute Master (Hoenn) Ribbon" => Some(Self::CuteMasterHoenn),
+            "Smart (Hoenn) Ribbon" => Some(Self::SmartHoenn),
+            "Smart Super (Hoenn) Ribbon" => Some(Self::SmartSuperHoenn),
+            "Smart Hyper (Hoenn) Ribbon" => Some(Self::SmartHyperHoenn),
+            "Smart Master (Hoenn) Ribbon" => Some(Self::SmartMasterHoenn),
+            "Tough (Hoenn) Ribbon" => Some(Self::ToughHoenn),
+            "Tough Super (Hoenn) Ribbon" => Some(Self::ToughSuperHoenn),
+            "Tough Hyper (Hoenn) Ribbon" => Some(Self::ToughHyperHoenn),
+            "Tough Master (Hoenn) Ribbon" => Some(Self::ToughMasterHoenn),
+            "Cool (Sinnoh) Ribbon" => Some(Self::CoolSinnoh),
+            "Cool Great (Sinnoh) Ribbon" => Some(Self::CoolGreatSinnoh),
+            "Cool Ultra (Sinnoh) Ribbon" => Some(Self::CoolUltraSinnoh),
+            "Cool Master (Sinnoh) Ribbon" => Some(Self::CoolMasterSinnoh),
+            "Beauty (Sinnoh) Ribbon" => Some(Self::BeautySinnoh),
+            "Beauty Great (Sinnoh) Ribbon" => Some(Self::BeautyGreatSinnoh),
+            "Beauty Ultra (Sinnoh) Ribbon" => Some(Self::BeautyUltraSinnoh),
+            "Beauty Master (Sinnoh) Ribbon" => Some(Self::BeautyMasterSinnoh),
+            "Cute (Sinnoh) Ribbon" => Some(Self::CuteSinnoh),
+            "Cute Great (Sinnoh) Ribbon" => Some(Self::CuteGreatSinnoh),
+            "Cute Ultra (Sinnoh) Ribbon" => Some(Self::CuteUltraSinnoh),
+            "Cute Master (Sinnoh) Ribbon" => Some(Self::CuteMasterSinnoh),
+            "Smart (Sinnoh) Ribbon" => Some(Self::SmartSinnoh),
+            "Smart Great (Sinnoh) Ribbon" => Some(Self::SmartGreatSinnoh),
+            "Smart Ultra (Sinnoh) Ribbon" => Some(Self::SmartUltraSinnoh),
+            "Smart Master (Sinnoh) Ribbon" => Some(Self::SmartMasterSinnoh),
+            "Tough (Sinnoh) Ribbon" => Some(Self::ToughSinnoh),
+            "Tough Great (Sinnoh) Ribbon" => Some(Self::ToughGreatSinnoh),
+            "Tough Ultra (Sinnoh) Ribbon" => Some(Self::ToughUltraSinnoh),
+            "Tough Master (Sinnoh) Ribbon" => Some(Self::ToughMasterSinnoh),
+            _ => None,
+        }
+    }
     const fn get_index(self) -> usize {
         self as usize
     }
@@ -229,6 +314,21 @@ pub enum OpenHomeRibbon {
     Obs(ObsoleteRibbon),
 }
 
+impl OpenHomeRibbon {
+    pub const fn get_name(&self) -> &'static str {
+        match self {
+            Self::Mod(modern_ribbon) => modern_ribbon.get_name(),
+            Self::Obs(obsolete_ribbon) => obsolete_ribbon.get_name(),
+        }
+    }
+
+    pub fn from_name<S: AsRef<str>>(name: S) -> Option<Self> {
+        ObsoleteRibbon::from_name(name.as_ref())
+            .map(Self::Obs)
+            .or(ModernRibbon::from_name(name.as_ref()).map(Self::Mod))
+    }
+}
+
 impl Display for OpenHomeRibbon {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&match self {
@@ -269,6 +369,14 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
         })
     }
 
+    pub fn from_names(names: Vec<String>) -> Self {
+        names
+            .iter()
+            .map(|s| s.strip_suffix(" Ribbon").unwrap_or(s))
+            .filter_map(OpenHomeRibbon::from_name)
+            .collect()
+    }
+
     pub fn from_obsolete(obsolete: ObsoleteRibbonSet) -> Self {
         Self {
             modern: ModernRibbonSet::<MODERN_BYTE_COUNT>::default(),
@@ -283,7 +391,7 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
         }
     }
 
-    pub fn get_ribbons(&self) -> Vec<OpenHomeRibbon> {
+    pub fn to_vec(&self) -> Vec<OpenHomeRibbon> {
         self.get_obsolete()
             .into_iter()
             .map(OpenHomeRibbon::Obs)
@@ -349,12 +457,21 @@ impl<const N: usize> Serialize for OpenHomeRibbonSet<N> {
     where
         S: Serializer,
     {
-        self.get_ribbons().serialize(serializer)
+        self.to_vec().serialize(serializer)
     }
 }
 
 impl<const N: usize> FromIterator<OpenHomeRibbon> for OpenHomeRibbonSet<N> {
     fn from_iter<T: IntoIterator<Item = OpenHomeRibbon>>(iter: T) -> Self {
         Self::default().with_ribbons(iter.into_iter().collect())
+    }
+}
+
+impl<const N: usize> IntoIterator for OpenHomeRibbonSet<N> {
+    type Item = OpenHomeRibbon;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.to_vec().into_iter()
     }
 }

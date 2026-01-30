@@ -1,18 +1,17 @@
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Moves } from '@pokemon-resources/index'
 import Prando from 'prando'
-import { NationalDex } from 'src/consts/NationalDex'
 
 import { PKM } from '../pkm'
 
 import {
   Gender,
-  genderFromInt,
   Generation,
   MetadataLookup,
   NatureIndex,
   OriginGame,
   OriginGames,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
 import { AllPKMFields } from './pkmInterface'
 
 export function getGen3MiscFlags(pokemon: PKM): number {
@@ -55,12 +54,10 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
 
   let personalityValue = 0
   let otherNature: NatureIndex | undefined
-  let otherAbilityNum = 4
 
   if (mon.personalityValue !== undefined && mon.abilityNum !== undefined) {
     personalityValue = mon.personalityValue
     otherNature = mon.nature
-    otherAbilityNum = mon.abilityNum
   } else {
     personalityValue = prng.nextInt(0, 0xffffffff)
   }
@@ -77,10 +74,7 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
     return Number(newPersonalityValue)
   }
 
-  const otherGender: Gender =
-    mon.gender !== undefined
-      ? genderFromInt(mon.gender)
-      : metadata.genderFromPid(Number(newPersonalityValue))
+  const otherGender: Gender = mon.gender ?? metadata.genderFromPid(Number(newPersonalityValue))
 
   const shouldCheckUnown = mon.dexNum === NationalDex.Unown
 
@@ -89,16 +83,24 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
     const newGender = metadata.genderFromPid(Number(newPersonalityValue))
     const newNature = NatureIndex.newFromPid(Number(newPersonalityValue))
 
-    const newAbilityNum = Number(newPersonalityValue & BigInt(1)) + 1
-
-    if (
-      (!shouldCheckUnown || getUnownLetterGen3(Number(newPersonalityValue)) === mon.formeNum) &&
-      newGender === otherGender &&
-      (otherAbilityNum === 4 || shouldCheckUnown || newAbilityNum === otherAbilityNum) &&
-      (otherNature === undefined || newNature.equals(otherNature)) &&
-      getIsShinyPreGen6(mon.trainerID, mon.secretID ?? 0, Number(newPersonalityValue)) ===
+    function getInconsistancy(): string | null {
+      if (shouldCheckUnown && getUnownLetterGen3(Number(newPersonalityValue)) !== mon.formeNum) {
+        return 'wrong unown letter'
+      } else if (newGender !== otherGender) {
+        return `gender mismatch`
+      } else if (otherNature !== undefined && !newNature.equals(otherNature)) {
+        return 'nature mismatch'
+      } else if (
+        getIsShinyPreGen6(mon.trainerID, mon.secretID ?? 0, Number(newPersonalityValue)) !==
         mon.isShiny()
-    ) {
+      ) {
+        return 'shininess mismatch'
+      }
+
+      return null
+    }
+
+    if (getInconsistancy() === null) {
       return Number(newPersonalityValue)
     }
 
@@ -203,4 +205,20 @@ export const adjustMovePPBetweenFormats = (
 
     return adjustedMovePP > 0 ? adjustedMovePP : 0
   }) as [number, number, number, number]
+}
+
+export function getHeightCalculated(mon: AllPKMFields) {
+  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  if (!formeMetadata || mon.heightScalar === undefined || !mon.heightDeviation) return 0
+
+  const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
+  return formeMetadata.baseHeight * 100 * deviation
+}
+
+export function getWeightCalculated(mon: AllPKMFields) {
+  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  if (!formeMetadata || mon.weightScalar === undefined || !mon.weightDeviation) return 0
+
+  const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)
+  return formeMetadata.baseWeight * 10 * deviation
 }

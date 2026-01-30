@@ -1,5 +1,5 @@
 use crate::pkm::traits::{IsShiny, IsShiny8192};
-use crate::pkm::{Error, Ohpkm, Pkm, Result};
+use crate::pkm::{Error, OhpkmV2, Pkm, Result};
 use crate::strings::Gen5String;
 use crate::util;
 
@@ -63,10 +63,7 @@ impl Pk5 {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < Pk5::BOX_SIZE {
-            return Err(Error::ByteLength {
-                expected: Pk5::BOX_SIZE,
-                received: size,
-            });
+            return Err(Error::buffer_size(Pk5::BOX_SIZE, size));
         }
         // try_into() will always succeed thanks to the length check
         let mon = Pk5 {
@@ -265,106 +262,106 @@ impl Pkm for Pk5 {
     }
 }
 
-impl From<Pk5> for Ohpkm {
-    fn from(other: Pk5) -> Self {
-        Ohpkm {
-            // TODO: adjust to preserve shininess
-            encryption_constant: other.personality_value,
-            sanity: 0,
-            checksum: 0,
-            species_and_forme: other.species_and_forme,
-            held_item_index: other.held_item_index,
-            trainer_id: other.trainer_id,
-            secret_id: other.secret_id,
-            exp: other.exp,
-            ability_index: other.ability_index,
-            ability_num: 0,
-            markings: other.markings.into(),
-            personality_value: other.personality_value,
-            nature: other.nature,
-            stat_nature: other.nature,
-            is_fateful_encounter: other.is_fateful_encounter,
-            gender: other.gender,
-            evs: other.evs,
-            contest: other.contest,
-            pokerus_byte: other.pokerus_byte,
-            contest_memory_count: 0,
-            battle_memory_count: 0,
-            ribbons: other.ribbons.to_openhome(),
-            moves: other.moves,
-            move_pp: other.move_pp,
-            nickname: other.nickname.to_string().into(),
-            move_pp_ups: other.move_pp_ups,
-            relearn_moves: [MoveSlot::from(0); 4],
-            ivs: other.ivs,
-            is_egg: other.is_egg,
-            is_nicknamed: other.is_nicknamed,
-            gvs: other.ivs.gvs_from_ivs(),
-            dvs: other.ivs.dvs_from_ivs(other.is_shiny()),
-            poke_star_fame: other.poke_star_fame,
-            is_ns_pokemon: other.is_ns_pokemon,
-            game_of_origin: other.game_of_origin,
-            language_index: other.language_index,
-            encounter_type: other.encounter_type,
-            trainer_name: other.trainer_name.to_string().into(),
-            trainer_friendship: other.trainer_friendship,
-            egg_date: other.egg_date,
-            met_date: other.met_date,
-            ball: other.ball,
-            egg_location_index: other.egg_location_index,
-            met_location_index: other.met_location_index,
-            met_level: other.met_level,
-            trainer_gender: other.trainer_gender,
-            ..Default::default()
-        }
-    }
-}
+// impl From<Pk5> for OhpkmV2 {
+//     fn from(other: Pk5) -> Self {
+//         OhpkmV2 {
+//             // TODO: adjust to preserve shininess
+//             encryption_constant: other.personality_value,
+//             sanity: 0,
+//             checksum: 0,
+//             species_and_forme: other.species_and_forme,
+//             held_item_index: other.held_item_index,
+//             trainer_id: other.trainer_id,
+//             secret_id: other.secret_id,
+//             exp: other.exp,
+//             ability_index: other.ability_index,
+//             ability_num: 0,
+//             markings: other.markings.into(),
+//             personality_value: other.personality_value,
+//             nature: other.nature,
+//             stat_nature: other.nature,
+//             is_fateful_encounter: other.is_fateful_encounter,
+//             gender: other.gender,
+//             evs: other.evs,
+//             contest: other.contest,
+//             pokerus_byte: other.pokerus_byte,
+//             contest_memory_count: 0,
+//             battle_memory_count: 0,
+//             ribbons: other.ribbons.to_openhome(),
+//             moves: other.moves,
+//             move_pp: other.move_pp,
+//             nickname: other.nickname.to_string().into(),
+//             move_pp_ups: other.move_pp_ups,
+//             relearn_moves: [MoveSlot::from(0); 4],
+//             ivs: other.ivs,
+//             is_egg: other.is_egg,
+//             is_nicknamed: other.is_nicknamed,
+//             gvs: other.ivs.gvs_from_ivs(),
+//             dvs: other.ivs.dvs_from_ivs(other.is_shiny()),
+//             poke_star_fame: other.poke_star_fame,
+//             is_ns_pokemon: other.is_ns_pokemon,
+//             game_of_origin: other.game_of_origin,
+//             language_index: other.language_index,
+//             encounter_type: other.encounter_type,
+//             trainer_name: other.trainer_name.to_string().into(),
+//             trainer_friendship: other.trainer_friendship,
+//             egg_date: other.egg_date,
+//             met_date: other.met_date,
+//             ball: other.ball,
+//             egg_location_index: other.egg_location_index,
+//             met_location_index: other.met_location_index,
+//             met_level: other.met_level,
+//             trainer_gender: other.trainer_gender,
+//             ..Default::default()
+//         }
+//     }
+// }
 
-impl From<Ohpkm> for Pk5 {
-    fn from(other: Ohpkm) -> Self {
-        Self {
-            personality_value: other.personality_value,
-            species_and_forme: other.species_and_forme,
-            trainer_id: other.trainer_id,
-            stored_checksum: 0,
-            held_item_index: other.held_item_index,
-            secret_id: other.secret_id,
-            exp: other.exp,
-            trainer_friendship: other.trainer_friendship,
-            ability_index: other.ability_index,
-            markings: other.markings.into(),
-            language_index: other.language_index,
-            evs: other.evs,
-            contest: other.contest,
-            moves: other.moves,
-            move_pp: other.move_pp,
-            move_pp_ups: other.move_pp_ups,
-            ivs: other.ivs,
-            is_egg: other.is_egg,
-            is_nicknamed: other.is_nicknamed,
-            gender: other.gender,
-            nature: other.nature,
-            is_ns_pokemon: other.is_ns_pokemon,
-            ribbons: DsRibbonSet::from_openhome(other.ribbons),
-            game_of_origin: other.game_of_origin,
-            egg_date: other.egg_date,
-            met_date: other.met_date,
-            egg_location_index: other.egg_location_index,
-            met_location_index: other.met_location_index,
-            pokerus_byte: other.pokerus_byte,
-            ball: other.ball,
-            met_level: other.met_level,
-            encounter_type: other.encounter_type,
-            poke_star_fame: other.poke_star_fame,
-            is_fateful_encounter: other.is_fateful_encounter,
-            nickname: other.nickname.to_string().into(),
-            trainer_name: other.trainer_name.to_string().into(),
-            trainer_gender: other.trainer_gender,
-            current_hp: 0,
-            junk_byte: 0,
-            stat_level: other.calculate_level(),
-            stats: Stats16Le::default(),
-            status_condition: 0,
-        }
-    }
-}
+// impl From<OhpkmV2> for Pk5 {
+//     fn from(other: OhpkmV2) -> Self {
+//         Self {
+//             personality_value: other.personality_value,
+//             species_and_forme: other.species_and_forme,
+//             trainer_id: other.trainer_id,
+//             stored_checksum: 0,
+//             held_item_index: other.held_item_index,
+//             secret_id: other.secret_id,
+//             exp: other.exp,
+//             trainer_friendship: other.trainer_friendship,
+//             ability_index: other.ability_index,
+//             markings: other.markings.into(),
+//             language_index: other.language_index,
+//             evs: other.evs,
+//             contest: other.contest,
+//             moves: other.moves,
+//             move_pp: other.move_pp,
+//             move_pp_ups: other.move_pp_ups,
+//             ivs: other.ivs,
+//             is_egg: other.is_egg,
+//             is_nicknamed: other.is_nicknamed,
+//             gender: other.gender,
+//             nature: other.nature,
+//             is_ns_pokemon: other.is_ns_pokemon,
+//             ribbons: DsRibbonSet::from_openhome(other.ribbons),
+//             game_of_origin: other.game_of_origin,
+//             egg_date: other.egg_date,
+//             met_date: other.met_date,
+//             egg_location_index: other.egg_location_index,
+//             met_location_index: other.met_location_index,
+//             pokerus_byte: other.pokerus_byte,
+//             ball: other.ball,
+//             met_level: other.met_level,
+//             encounter_type: other.encounter_type,
+//             poke_star_fame: other.poke_star_fame,
+//             is_fateful_encounter: other.is_fateful_encounter,
+//             nickname: other.nickname.to_string().into(),
+//             trainer_name: other.trainer_name.to_string().into(),
+//             trainer_gender: other.trainer_gender,
+//             current_hp: 0,
+//             junk_byte: 0,
+//             stat_level: other.calculate_level(),
+//             stats: Stats16Le::default(),
+//             status_condition: 0,
+//         }
+//     }
+// }

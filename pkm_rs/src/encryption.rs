@@ -119,10 +119,7 @@ fn rearrange_blocks(
     let min_size = offset + block_size * 4;
     let length = bytes.len();
     if length < min_size {
-        return Err(Error::ByteLength {
-            expected: min_size,
-            received: length,
-        });
+        return Err(Error::buffer_size(min_size, length));
     }
 
     let block_order = orders[shift_value];
@@ -160,10 +157,7 @@ fn rearrange_blocks(
 pub fn shuffle_blocks_gen_6_7(bytes: &[u8]) -> Result<Vec<u8>> {
     let length = bytes.len();
     if length < GEN_67_MIN_SIZE {
-        return Err(Error::ByteLength {
-            expected: GEN_67_MIN_SIZE,
-            received: length,
-        });
+        return Err(Error::buffer_size(GEN_67_MIN_SIZE, length));
     }
 
     let encryption_constant = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
@@ -175,10 +169,7 @@ pub fn shuffle_blocks_gen_6_7(bytes: &[u8]) -> Result<Vec<u8>> {
 pub fn unshuffle_blocks_gen_6_7(bytes: &[u8]) -> Result<Vec<u8>> {
     let length = bytes.len();
     if length < GEN_67_MIN_SIZE {
-        return Err(Error::ByteLength {
-            expected: GEN_67_MIN_SIZE,
-            received: length,
-        });
+        return Err(Error::buffer_size(GEN_67_MIN_SIZE, length));
     }
 
     let encryption_constant = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
@@ -222,10 +213,7 @@ pub fn decrypt_pkm_bytes(bytes: &[u8], seed: u32, start: usize, end: usize) -> R
 pub fn decrypt_pkm_bytes_gen_6_7(bytes: &[u8]) -> Result<Vec<u8>> {
     let length = bytes.len();
     if length < GEN_67_MIN_SIZE {
-        return Err(Error::ByteLength {
-            expected: GEN_67_MIN_SIZE,
-            received: length,
-        });
+        return Err(Error::buffer_size(GEN_67_MIN_SIZE, length));
     }
     let encryption_constant = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
     decrypt_pkm_blocks(bytes, encryption_constant, GEN_67_BLOCK_SIZE)

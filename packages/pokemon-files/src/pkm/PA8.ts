@@ -9,9 +9,8 @@ import {
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
-import { getHeightCalculated, getWeightCalculated } from '../../../../src/types/pkm/util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -19,9 +18,9 @@ import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
-import { adjustMovePPBetweenFormats } from '../util/util'
+import { adjustMovePPBetweenFormats, getHeightCalculated, getWeightCalculated } from '../util/util'
 
-export class PA8 {
+export default class PA8 {
   static getName() {
     return 'PA8'
   }
@@ -206,10 +205,10 @@ export class PA8 {
       this.homeTracker = new Uint8Array(buffer).slice(0x14d, 0x155)
       this.tutorFlagsLA = new Uint8Array(buffer).slice(0x155, 0x15d)
       this.masterFlagsLA = new Uint8Array(buffer).slice(0x15d, 0x165)
-      this.favorite = byteLogic.getFlag(dataView, 0x16, 4)
-      this.canGigantamax = byteLogic.getFlag(dataView, 0x16, 5)
-      this.isAlpha = byteLogic.getFlag(dataView, 0x16, 6)
-      this.isNoble = byteLogic.getFlag(dataView, 0x16, 7)
+      this.favorite = byteLogic.getFlag(dataView, 0x16, 3)
+      this.canGigantamax = byteLogic.getFlag(dataView, 0x16, 4)
+      this.isAlpha = byteLogic.getFlag(dataView, 0x16, 5)
+      this.isNoble = byteLogic.getFlag(dataView, 0x16, 6)
       this.ribbons = byteLogic
         .getFlagIndexes(dataView, 0x34, 0, 64)
         .map((index) => ModernRibbons[index])
@@ -445,10 +444,10 @@ export class PA8 {
     new Uint8Array(buffer).set(new Uint8Array(this.homeTracker.slice(0, 8)), 0x14d)
     new Uint8Array(buffer).set(new Uint8Array(this.tutorFlagsLA.slice(0, 8)), 0x155)
     new Uint8Array(buffer).set(new Uint8Array(this.masterFlagsLA.slice(0, 8)), 0x15d)
-    byteLogic.setFlag(dataView, 0x16, 4, this.favorite)
-    byteLogic.setFlag(dataView, 0x16, 5, this.canGigantamax)
-    byteLogic.setFlag(dataView, 0x16, 6, this.isAlpha)
-    byteLogic.setFlag(dataView, 0x16, 7, this.isNoble)
+    byteLogic.setFlag(dataView, 0x16, 3, this.favorite)
+    byteLogic.setFlag(dataView, 0x16, 4, this.canGigantamax)
+    byteLogic.setFlag(dataView, 0x16, 5, this.isAlpha)
+    byteLogic.setFlag(dataView, 0x16, 6, this.isNoble)
     byteLogic.setFlagIndexes(
       dataView,
       0x34,
@@ -567,5 +566,3 @@ const LA_VALID_MOVES = [
   555, 556, 577, 583, 584, 585, 595, 605, 608, 667, 670, 710, 796, 827, 828, 829, 830, 831, 832,
   833, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850,
 ]
-
-export default PA8

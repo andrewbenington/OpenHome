@@ -1,5 +1,4 @@
-import { OriginGame } from '@pkm-rs-resources/pkg'
-
+import { OriginGame } from '@pkm-rs/pkg'
 import { COLOPKM, PA8, PB7, PB8, PK1, PK2, PK3, PK4, PK5, PK6, PK8, PK9, PKM, XDPKM } from '.'
 import Pk7Rust from './wasm/PK7'
 

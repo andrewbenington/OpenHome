@@ -8,7 +8,7 @@ import {
   MetadataLookup,
   OriginGames,
   SpeciesLookup,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
 
 import * as conversion from '../conversion'
 import * as byteLogic from '../util/byteLogic'
@@ -18,7 +18,7 @@ import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { adjustMovePPBetweenFormats } from '../util/util'
 
-export class PK1 {
+export default class PK1 {
   static getName() {
     return 'PK1'
   }
@@ -257,5 +257,3 @@ export class PK1 {
     return []
   }
 }
-
-export default PK1

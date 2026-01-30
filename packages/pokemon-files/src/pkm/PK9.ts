@@ -9,7 +9,7 @@ import {
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
 import * as conversion from '../conversion'
 import * as byteLogic from '../util/byteLogic'
@@ -21,7 +21,7 @@ import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { adjustMovePPBetweenFormats } from '../util/util'
 
-export class PK9 {
+export default class PK9 {
   static getName() {
     return 'PK9'
   }
@@ -501,5 +501,3 @@ export class PK9 {
     ]
   }
 }
-
-export default PK9

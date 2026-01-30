@@ -85,10 +85,7 @@ impl Pb7 {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < Pb7::BOX_SIZE {
-            return Err(Error::ByteLength {
-                expected: Pb7::BOX_SIZE,
-                received: size,
-            });
+            return Err(Error::buffer_size(Pb7::BOX_SIZE, size));
         }
         // try_into() will always succeed thanks to the length check
         let mon = Pb7 {

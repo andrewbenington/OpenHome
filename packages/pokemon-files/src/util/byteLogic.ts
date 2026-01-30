@@ -199,10 +199,6 @@ function setNumberAtBitOffset(
   return newValue
 }
 
-export const bytesToString = (value: number, numBytes: number) => {
-  return value.toString(16).padStart(numBytes * 2, '0')
-}
-
 export function getFlagsInRange(dataView: DataView, offset: number, size: number) {
   const flags: number[] = []
 

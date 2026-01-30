@@ -1,8 +1,8 @@
-import { NationalDex, NationalDexMax } from 'src/consts/NationalDex'
+import { NationalDex, NationalDexMax } from '@pokemon-resources/consts/NationalDex'
 
 import { PKM } from '../pkm'
 
-import { MetadataLookup, SpeciesLookup, Stat, Stats } from '@pkm-rs-resources/pkg'
+import { MetadataLookup, SpeciesLookup, Stat, Stats } from '@pkm-rs/pkg'
 import {
   AllPKMs,
   PKMWithDVs,
@@ -15,16 +15,10 @@ import {
 import { StatAbbr } from './types'
 
 export interface PKMWithStandardStats
-  extends AllPKMs,
-    PKMWithModernIVs,
-    PKMWithModernEVs,
-    PKMWithNature {}
+  extends AllPKMs, PKMWithModernIVs, PKMWithModernEVs, PKMWithNature {}
 
 export interface PKMWithStandardStatCalc
-  extends SpeciesData,
-    PKMWithModernIVs,
-    PKMWithModernEVs,
-    PKMWithNature {}
+  extends SpeciesData, PKMWithModernIVs, PKMWithModernEVs, PKMWithNature {}
 
 export interface PKMWithGameBoyStats extends AllPKMs, PKMWithDVs, PKMWithGameBoyEVs {}
 

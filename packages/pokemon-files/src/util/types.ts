@@ -41,6 +41,24 @@ export interface Stats {
   spe: number
 }
 
+export function isStandardStats(stats?: object): stats is Stats {
+  return (
+    stats !== undefined &&
+    'hp' in stats &&
+    typeof stats.hp === 'number' &&
+    'atk' in stats &&
+    typeof stats.atk === 'number' &&
+    'def' in stats &&
+    typeof stats.def === 'number' &&
+    'spa' in stats &&
+    typeof stats.spa === 'number' &&
+    'spd' in stats &&
+    typeof stats.spd === 'number' &&
+    'spe' in stats &&
+    typeof stats.spe === 'number'
+  )
+}
+
 export type StatAbbr = keyof Stats
 
 export interface StatsPreSplit {
@@ -49,6 +67,22 @@ export interface StatsPreSplit {
   def: number
   spc: number
   spe: number
+}
+
+export function isStatsPreSplit(stats?: object): stats is StatsPreSplit {
+  return (
+    stats !== undefined &&
+    'hp' in stats &&
+    typeof stats.hp === 'number' &&
+    'atk' in stats &&
+    typeof stats.atk === 'number' &&
+    'def' in stats &&
+    typeof stats.def === 'number' &&
+    'spc' in stats &&
+    typeof stats.spc === 'number' &&
+    'spe' in stats &&
+    typeof stats.spe === 'number'
+  )
 }
 
 export interface HyperTrainStats {
@@ -67,6 +101,24 @@ export interface ContestStats {
   smart: number
   tough: number
   sheen: number
+}
+
+export function isContestStats(stats?: object): stats is ContestStats {
+  return (
+    stats !== undefined &&
+    'cool' in stats &&
+    typeof stats.cool === 'number' &&
+    'beauty' in stats &&
+    typeof stats.beauty === 'number' &&
+    'cute' in stats &&
+    typeof stats.cute === 'number' &&
+    'smart' in stats &&
+    typeof stats.smart === 'number' &&
+    'tough' in stats &&
+    typeof stats.tough === 'number' &&
+    'sheen' in stats &&
+    typeof stats.sheen === 'number'
+  )
 }
 
 export function readStatsFromBytesU8(dataView: DataView, offset: number) {
@@ -184,36 +236,33 @@ export interface Geolocation {
   country: number
 }
 
-export type marking = 0 | 1 | 2
+export type MarkingShapePreGen6 = 'circle' | 'square' | 'triangle' | 'heart'
+export type MarkingShape = MarkingShapePreGen6 | 'star' | 'diamond'
 
-export type MarkingsFourShapes = {
-  circle: boolean
-  square: boolean
-  triangle: boolean
-  heart: boolean
-}
-
-export type MarkingsSixShapesNoColor = {
-  circle: boolean
-  triangle: boolean
-  square: boolean
-  heart: boolean
-  star: boolean
-  diamond: boolean
-}
+export type MarkingsFourShapes = Record<MarkingShapePreGen6, boolean>
+export type MarkingsSixShapesNoColor = Record<MarkingShape, boolean>
 
 export type MarkingColorValue = null | 'blue' | 'red'
-
-export type MarkingsSixShapesWithColor = {
-  circle: MarkingColorValue
-  triangle: MarkingColorValue
-  square: MarkingColorValue
-  heart: MarkingColorValue
-  star: MarkingColorValue
-  diamond: MarkingColorValue
-}
+export type MarkingsSixShapesWithColor = Record<MarkingShape, MarkingColorValue>
 
 export type Markings = MarkingsFourShapes | MarkingsSixShapesNoColor | MarkingsSixShapesWithColor
+
+export function markingDisplay(marking: MarkingShape) {
+  switch (marking) {
+    case 'circle':
+      return '●'
+    case 'square':
+      return '■'
+    case 'triangle':
+      return '▲'
+    case 'heart':
+      return '♥'
+    case 'star':
+      return '★'
+    case 'diamond':
+      return '◆'
+  }
+}
 
 export function markingsHaveColor(markings: Markings): markings is MarkingsSixShapesWithColor {
   return typeof markings.circle !== 'boolean'

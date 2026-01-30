@@ -28,10 +28,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
+      - name: Install PNPM
+        uses: pnpm/action-setup@v4
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -47,12 +45,8 @@ jobs:
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
-      - name: install frontend dependencies
-        run: npm install # change this to npm, pnpm or bun depending on which one you use.
-
-      - name: build version.json (unix)
-        if: matrix.platform != 'windows-latest'
-        run: ./buildVersionJSON.sh
+      - name: Install Frontend Dependencies
+        run: pnpm i --frozen-lockfile
 
       - uses: tauri-apps/tauri-action@v0.5.22
         env:

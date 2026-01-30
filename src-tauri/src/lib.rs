@@ -12,7 +12,6 @@ mod versioning;
 
 use std::env;
 use tauri::Manager;
-use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
 use crate::error::Error;
 
@@ -21,30 +20,35 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
-            if let Err(launch_error) = startup::run_app_startup(app) {
+            let update_features_r = startup::run_app_startup(app);
+            let Ok(update_features) = update_features_r else {
+                let launch_error = update_features_r.unwrap_err();
                 match launch_error {
                     Error::OutdatedVersion { .. } => app.handle().exit(1),
                     _ => {
-                        app.dialog()
-                            .message(launch_error.to_string())
-                            .title("OpenHome Failed to Launch")
-                            .kind(MessageDialogKind::Error)
-                            .blocking_show();
+                        util::show_error_dialog(
+                            app,
+                            launch_error.to_string(),
+                            "OpenHome Failed to Launch",
+                        );
+
                         app.handle().exit(1);
                     }
-                }
-            }
+                };
+                std::process::exit(1);
+            };
 
             let lookup_state = match state::LookupState::load_from_storage(app.handle()) {
                 Ok(lookup) => lookup,
                 Err(err) => {
-                    app.dialog()
-                        .message(err.to_string())
-                        .title("OpenHome Failed to Launch - Lookup File Error")
-                        .kind(MessageDialogKind::Error)
-                        .blocking_show();
+                    util::show_error_dialog(
+                        app,
+                        err.to_string(),
+                        "OpenHome Failed to Launch - Lookup File Error",
+                    );
+
                     app.handle().exit(1);
-                    unreachable!()
+                    std::process::exit(1);
                 }
             };
             app.manage(lookup_state);
@@ -52,19 +56,19 @@ pub fn run() {
             let pokedex_state = match state::PokedexState::load_from_storage(app.handle()) {
                 Ok(pokedex) => pokedex,
                 Err(err) => {
-                    app.dialog()
-                        .message(err.to_string())
-                        .title("OpenHome Failed to Launch - Pokedex File Error")
-                        .kind(MessageDialogKind::Error)
-                        .blocking_show();
+                    util::show_error_dialog(
+                        app,
+                        err.to_string(),
+                        "OpenHome Failed to Launch - Pokedex File Error",
+                    );
+
                     app.handle().exit(1);
-                    unreachable!()
+                    std::process::exit(1);
                 }
             };
             app.manage(pokedex_state);
 
-            app.manage(state::AppState::default());
-            app.manage(state::OpenSavesState::default());
+            app.manage(state::AppState::from_update_features(update_features));
 
             match menu::create_menu(app) {
                 Ok(menu) => {
@@ -94,9 +98,6 @@ pub fn run() {
             commands::write_storage_file_bytes,
             commands::get_ohpkm_files,
             commands::delete_storage_files,
-            commands::start_transaction,
-            commands::rollback_transaction,
-            commands::commit_transaction,
             commands::find_suggested_saves,
             commands::set_app_theme,
             commands::validate_recent_saves,
@@ -106,6 +107,7 @@ pub fn run() {
             commands::delete_plugin,
             commands::handle_windows_accellerator,
             commands::open_directory,
+            commands::open_file_location,
             pkm_storage::load_banks,
             pkm_storage::write_banks,
             saves::detect_save_type,
@@ -113,6 +115,9 @@ pub fn run() {
             state::update_lookups,
             state::get_pokedex,
             state::update_pokedex,
+            state::start_transaction,
+            state::rollback_transaction,
+            state::commit_transaction,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

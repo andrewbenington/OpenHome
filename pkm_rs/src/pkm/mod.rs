@@ -1,15 +1,14 @@
-mod ohpkm;
 mod pb7;
 mod pk5;
 mod pk6;
 mod pk7;
 mod pk8;
+mod plugins;
 mod result;
 mod universal;
 
-mod plugins;
-
 pub mod buffers;
+pub mod ohpkm;
 pub mod traits;
 
 use pkm_rs_resources::species::{FormeMetadata, SpeciesMetadata};
@@ -18,7 +17,7 @@ use serde::Serialize;
 pub use plugins::rr::pk3rr::Pk3rr;
 pub use plugins::ub::pk3ub::Pk3ub;
 
-pub use ohpkm::Ohpkm;
+pub use ohpkm::OhpkmV2;
 pub use pb7::Pb7;
 pub use pk5::Pk5;
 pub use pk6::Pk6;

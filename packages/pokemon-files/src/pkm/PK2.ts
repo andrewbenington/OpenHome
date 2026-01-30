@@ -8,8 +8,8 @@ import {
   MetadataLookup,
   OriginGames,
   SpeciesLookup,
-} from '@pkm-rs-resources/pkg'
-import { NationalDex } from 'src/consts/NationalDex'
+} from '@pkm-rs/pkg'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import * as byteLogic from '../util/byteLogic'
 import { AllPKMFields } from '../util/pkmInterface'
 import { getLevelGen12, getStats } from '../util/statCalc'
@@ -17,7 +17,7 @@ import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { adjustMovePPBetweenFormats } from '../util/util'
 
-export class PK2 {
+export default class PK2 {
   static getName() {
     return 'PK2'
   }
@@ -291,5 +291,3 @@ export class PK2 {
     return []
   }
 }
-
-export default PK2

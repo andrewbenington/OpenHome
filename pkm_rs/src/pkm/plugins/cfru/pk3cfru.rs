@@ -231,10 +231,7 @@ impl<M: CfruMapping> Pk3Cfru<M> {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < Self::BOX_SIZE {
-            return Err(Error::ByteLength {
-                expected: Self::BOX_SIZE,
-                received: size,
-            });
+            return Err(Error::buffer_size(Self::BOX_SIZE, size));
         }
 
         // 0x1C..0x1E: CFRU game species index
@@ -320,6 +317,15 @@ impl<M: CfruMapping> IsShiny for Pk3Cfru<M> {
 
         let xor = tid ^ sid ^ (pid & 0xFFFF) ^ ((pid >> 16) & 0xFFFF);
         xor < 8
+    }
+
+    fn is_square_shiny(&self) -> bool {
+        let tid = self.trainer_id as u32;
+        let sid = self.secret_id as u32;
+        let pid = self.personality_value;
+
+        let xor = tid ^ sid ^ (pid & 0xFFFF) ^ ((pid >> 16) & 0xFFFF);
+        xor == 0
     }
 }
 

@@ -16,13 +16,14 @@ impl NatureIndex {
             .expect("NatureIndex should never have an invalid index")
     }
 
-    pub const fn to_byte(self) -> u8 {
+    pub const fn to_byte(&self) -> u8 {
         self.0
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
+#[cfg(feature = "wasm")]
 impl NatureIndex {
     //! IMPORTANT: DO NOT ADD NON-BORROWING SELF METHODS
     //! (JavaScript will be copying this value and consuming
@@ -30,6 +31,7 @@ impl NatureIndex {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(constructor))]
     pub fn new_js(val: u8) -> Result<NatureIndex, JsValue> {
+        // log("creating new");
         if val > NATURE_MAX {
             Err(format!("Invalid nature index: {val}").into())
         } else {
@@ -44,6 +46,7 @@ impl NatureIndex {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn index(&self) -> u8 {
+        // log("getting index rust");
         self.0
     }
 

@@ -9,7 +9,7 @@ import {
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/other'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
@@ -20,7 +20,7 @@ import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { adjustMovePPBetweenFormats } from '../util/util'
 
-export class PB8 {
+export default class PB8 {
   static getName() {
     return 'PB8'
   }
@@ -533,5 +533,3 @@ export class PB8 {
     return []
   }
 }
-
-export default PB8

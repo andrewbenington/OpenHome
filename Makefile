@@ -1,4 +1,4 @@
-VERSION=1.7.0-rc-0
+VERSION=1.8.3
 
 .PHONY: help
 help: # Display this help.
@@ -13,9 +13,9 @@ build-mac-intel:
 	@npx tauri build --target x86_64-apple-darwin
 
 .PHONY: start
-start: wasm-deps
-	@npm i
-	@npm run tauri dev
+start: ensure-dependencies
+	@pnpm i
+	@pnpm run tauri dev
 
 .PHONY: build-appimage
 build-appimage:
@@ -27,11 +27,11 @@ bundle-appimage:
 
 .PHONY: preview
 preview:
-	@npm run start
+	@pnpm run start
 
 .PHONY: lint
 lint:
-	@npm run lint
+	@pnpm run lint
 
 .PHONY: clean
 clean:
@@ -39,22 +39,38 @@ clean:
 
 .PHONY: check
 check:
-	@npm run typecheck
-	@npm run lint
-	@npm run format
+	@pnpm run typecheck
+	@pnpm run lint
+	@pnpm run format
+
+.PHONY: test
+test: ensure-dependencies
+	@pnpm run test
+
+.PHONY: test-pkm-rs
+test-pkm-rs:
+	@cd pkm_rs && cargo test --package pkm_rs --lib -- tests::pkm::ohpkm --nocapture
 
 .PHONY: check-rs
 check-rs:
 	@cd src-tauri && cargo clippy -- -Aclippy::needless_return
 
-.PHONY: wasm-deps
-wasm-deps:
+.PHONY: ensure-pnpm
+ensure-pnpm:
+ifeq ($(shell which pnpm 2>/dev/null), )
+	@echo "pnpm not installed! installing..."
+	@curl -fsSL https://get.pnpm.io/install.sh | sh -
+endif
+
+.PHONY: ensure-wasm-pack
+ensure-wasm-pack:
 ifeq ($(shell which wasm-pack 2>/dev/null), )
 	@echo "wasm-pack not installed! installing..."
 	@cargo install wasm-pack
-else
-	@echo "wasm-pack already installed!"
 endif
+
+.PHONY: ensure-dependencies
+ensure-dependencies: ensure-pnpm ensure-wasm-pack
 
 .PHONY: set-version
 set-version:
@@ -62,7 +78,7 @@ set-version:
 	@npx prettier --write src-tauri/tauri.conf.json
 	@cargo install cargo-edit
 	@cd src-tauri && cargo set-version $(VERSION)
-	@npm version $(VERSION) --no-git-tag-version --allow-same-version 
+	@pnpm version $(VERSION) --no-git-tag-version --allow-same-version 
 
 .PHONY: release-mac
 release-mac:
@@ -82,9 +98,12 @@ generate: generate/out/generate.js
 gen-wasm:
 # 	@node generate/gen_ribbons.ts
 # 	@cd pkm_rs_resources && node generate/gen_abilities.ts
-	@cd pkm_rs_resources && ts-node generate/gen_items.ts
-	@cd pkm_rs_resources && ts-node generate/gen_moves.ts
-	@cd pkm_rs_resources && ts-node generate/gen_species_data.ts
+	@cd generate
+	@pnpm i
+# 	@cd pkm_rs_resources && ts-node generate/gen_abilities.ts
+	@ts-node generate/gen_items.ts
+	@ts-node generate/gen_moves.ts
+	@ts-node generate/gen_species_data.ts
 	@cd pkm_rs_resources && cargo fmt
 	
 generate/out/syncPKHexResources.js: generate/syncPKHexResources.ts
@@ -102,4 +121,4 @@ download-item-sprites:
 	@python3 generate/downloadAllItems.py
 
 %:
-	@npm run $@
+	@pnpm run $@

@@ -1,6 +1,7 @@
 use crate::error::{Error, Result};
+use crate::pkm_storage::FilenameToBytesMap;
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloaded_plugins};
-use crate::state::{AppState, AppStateSnapshot, PokedexState};
+use crate::state::{AppState, AppStateInner};
 use crate::util::ImageResponse;
 use crate::{menu, saves, util};
 use pkm_rs::saves::SaveData;
@@ -13,8 +14,8 @@ use std::time::SystemTime;
 use tauri::Manager;
 
 #[tauri::command]
-pub fn get_state(state: tauri::State<'_, AppState>) -> Result<AppStateSnapshot> {
-    Ok(state.lock()?.snapshot())
+pub fn get_state(state: tauri::State<'_, AppState>) -> Result<AppStateInner> {
+    Ok(state.lock()?.clone())
 }
 
 #[tauri::command]
@@ -24,9 +25,6 @@ pub fn get_file_bytes(absolute_path: PathBuf) -> Result<Vec<u8>> {
 
 #[tauri::command]
 pub fn get_file_created(absolute_path: PathBuf) -> Result<Option<u128>> {
-    // let full_path = prepend_appdata_to_path(&app_handle, path)?;
-
-    // Open the file, and return any error up the call stack
     let metadata =
         fs::metadata(&absolute_path).map_err(|e| Error::file_access(&absolute_path, e))?;
 
@@ -40,11 +38,9 @@ pub fn get_file_created(absolute_path: PathBuf) -> Result<Option<u128>> {
         .ok())
 }
 
-type FilenameToBytesMap = HashMap<String, Vec<u8>>;
-
 #[tauri::command]
 pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> Result<FilenameToBytesMap> {
-    let mons_path = util::prepend_appdata_storage_to_path(&app_handle, "mons")?;
+    let mons_path = util::prepend_appdata_storage_to_path(&app_handle, "mons_v2")?;
     let mon_files = fs::read_dir(&mons_path).map_err(|e| Error::file_access(&mons_path, e))?;
 
     let mut map = HashMap::new();
@@ -57,7 +53,7 @@ pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> Result<FilenameToBytesMa
             continue;
         }
 
-        if let Ok(mon_bytes) = get_file_bytes(path) {
+        if let Ok(mon_bytes) = util::read_file_bytes(path) {
             let mon_filename = mon_file_os_str.file_name().to_string_lossy().into_owned();
             map.insert(mon_filename, mon_bytes);
         }
@@ -84,35 +80,6 @@ pub fn delete_storage_files(
     }
 
     result
-}
-
-#[tauri::command]
-pub fn start_transaction(state: tauri::State<'_, AppState>) -> Result<()> {
-    state.lock()?.start_transaction()
-}
-
-#[tauri::command]
-pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> Result<()> {
-    state.lock()?.rollback_transaction()
-}
-
-#[tauri::command]
-pub fn commit_transaction(
-    app_handle: tauri::AppHandle,
-    app_state: tauri::State<'_, AppState>,
-    pokedex_state: tauri::State<'_, PokedexState>,
-) -> Result<()> {
-    app_state.lock()?.commit_transaction()?;
-    pokedex_state.lock()?.write_to_storage(&app_handle)
-}
-
-#[tauri::command]
-pub fn write_file_bytes(
-    state: tauri::State<'_, AppState>,
-    absolute_path: &Path,
-    bytes: Vec<u8>,
-) -> Result<()> {
-    state.lock()?.write_file_bytes_temped(absolute_path, bytes)
 }
 
 #[tauri::command]
@@ -207,6 +174,15 @@ pub fn find_suggested_saves(
 }
 
 #[tauri::command]
+pub fn write_file_bytes(
+    state: tauri::State<'_, AppState>,
+    absolute_path: &Path,
+    bytes: Vec<u8>,
+) -> Result<()> {
+    state.lock()?.write_file_bytes_temped(absolute_path, bytes)
+}
+
+#[tauri::command]
 pub fn set_app_theme(
     app_handle: tauri::AppHandle,
     app_theme: String,
@@ -245,7 +221,15 @@ pub fn get_image_data(absolute_path: String) -> Result<ImageResponse> {
 
 #[tauri::command]
 pub fn open_directory(absolute_path: String) -> Result<()> {
-    util::open_directory(&absolute_path)
+    util::open_directory(&PathBuf::from(absolute_path))
+}
+
+#[tauri::command]
+pub fn open_file_location(file_path: String) -> Result<()> {
+    let Some(parent_dir) = Path::new(&file_path).parent() else {
+        return Err(Error::other("File has no parent directory"));
+    };
+    util::open_directory(parent_dir)
 }
 
 #[tauri::command]

@@ -1,6 +1,7 @@
 # dependencies
 /node_modules
 /pkm_rs_resources/generate/node_modules
+/pkm_rs/generate/node_modules
 
 /.pnp
 .pnp.js
@@ -32,6 +33,8 @@ __pycache__/
 
 # js
 generate/out/
+# if npm is accidentally used, this will regenerate
+package-lock.json
 
 planning.md
 
@@ -49,3 +52,4 @@ target/
 *.sublime-workspace
 *.sublime-project
 *.wakatime-project
+.idea

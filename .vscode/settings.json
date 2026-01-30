@@ -5,7 +5,7 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit",
-      "source.fixAll": "explicit"
+      "source.fixAll": "never"
     }
   },
   "[javascript]": {
@@ -13,6 +13,9 @@
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[css]": {
     "editor.formatOnSave": true
   },
   "[json]": {
@@ -52,5 +55,7 @@
   ],
   "editor.inlayHints.enabled": "off",
   "editor.tabSize": 2,
-  "rust-analyzer.cargo.features": ["pkm_rs_resources/wasm", "pkm_rs_types/wasm", "pkm_rs/wasm"]
+  "rust-analyzer.cargo.features": ["pkm_rs_resources/wasm", "pkm_rs_types/wasm", "pkm_rs/wasm"],
+  "css.completion.completePropertyWithSemicolon": false,
+  "rust-analyzer.cargo.targetDir": true
 }

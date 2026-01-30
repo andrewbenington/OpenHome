@@ -24,6 +24,12 @@
       "util/*": [
         "./util/*"
       ],
+      "@openhome-ui/*": [
+        "./src/ui/*"
+      ],
+      "@openhome-core/*": [
+        "./src/core/*"
+      ],
       "@pokemon-files/*": [
         "./packages/pokemon-files/src/*"
       ],
@@ -33,8 +39,8 @@
       "@pokemon-resources/*": [
         "./packages/pokemon-resources/src/*"
       ],
-      "@pkm-rs-resources/*": [
-        "./pkm_rs_resources/*"
+      "@pkm-rs/*": [
+        "./pkm_rs/*"
       ]
     },
     /* Bundler mode */
@@ -55,6 +61,7 @@
     "packages",
     "generate/_rename.js",
     "generate/generateMoveMap.ts",
-    "src-tauri/pokemon-wasm"
+    "src-tauri/pokemon-wasm",
+    "generate/generate-cfru/generateMoveMap.ts"
   ]
 }

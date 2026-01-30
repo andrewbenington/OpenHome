@@ -5,8 +5,8 @@ use crate::encryption::crc16_ccitt_invert;
 use crate::encryption::decrypt_pkm_bytes_gen_6_7;
 use crate::encryption::unshuffle_blocks_gen_6_7;
 use crate::pkm::Pk7;
-use pkm_rs_types::Gender;
 use crate::util::get_flag;
+use pkm_rs_types::Gender;
 
 use super::SaveDataTrait;
 use crate::pkm::Pkm;
@@ -35,13 +35,13 @@ pub struct SunMoonSave {
     #[serde(skip_serializing)]
     bytes: Vec<u8>,
     size: usize,
-    pub trainer: TrainerData,
+    pub trainer: TrainerDataGen7Alola,
 }
 
 impl SunMoonSave {
     pub fn from_bytes(bytes: Vec<u8>) -> Result<Self, String> {
         let size = bytes.len();
-        let my_status = TrainerData::from_bytes(
+        let my_status = TrainerDataGen7Alola::from_bytes(
             &bytes[SM_TRAINER_DATA_OFFSET..SM_TRAINER_DATA_OFFSET + TRAINER_DATA_SIZE]
                 .try_into()
                 .unwrap(),
@@ -173,7 +173,7 @@ impl SunMoonSave {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Default, Debug, Serialize, Clone, Copy)]
-pub struct TrainerData {
+pub struct TrainerDataGen7Alola {
     pub trainer_id: u16,
     pub secret_id: u16,
     pub game_code: u8,
@@ -185,7 +185,7 @@ pub struct TrainerData {
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
-impl TrainerData {
+impl TrainerDataGen7Alola {
     #[wasm_bindgen]
     pub fn get_name_js(&self) -> String {
         self.trainer_name.to_string()
@@ -199,13 +199,13 @@ pub struct UltraSunMoonSave {
     #[serde(skip_serializing)]
     bytes: Vec<u8>,
     size: usize,
-    pub trainer: TrainerData,
+    pub trainer: TrainerDataGen7Alola,
 }
 
 impl UltraSunMoonSave {
     pub fn from_bytes(bytes: Vec<u8>) -> Result<Self, String> {
         let size = bytes.len();
-        let my_status = TrainerData::from_bytes(
+        let my_status = TrainerDataGen7Alola::from_bytes(
             &bytes[USUM_TRAINER_DATA_OFFSET..USUM_TRAINER_DATA_OFFSET + TRAINER_DATA_SIZE]
                 .try_into()
                 .unwrap(),
@@ -280,7 +280,7 @@ impl UltraSunMoonSave {
     }
 }
 
-impl TrainerData {
+impl TrainerDataGen7Alola {
     fn from_bytes(block_bytes: &[u8; TRAINER_DATA_SIZE]) -> Self {
         Self {
             trainer_id: u16::from_le_bytes(block_bytes[0..2].try_into().unwrap()),

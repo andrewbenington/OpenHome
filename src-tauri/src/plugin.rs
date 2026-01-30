@@ -75,12 +75,6 @@ pub fn list_downloaded_plugins(
     Ok(plugins)
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
-pub struct DownloadProgress {
-    pub plugin_id: String,
-    pub progress: usize,
-}
-
 fn emit_download_progress(app_handle: &tauri::AppHandle, plugin_id: String, progress: f64) {
     let result = app_handle.emit(
         format!("plugin:download-progress:{plugin_id}").as_str(),

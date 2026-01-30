@@ -3,10 +3,11 @@ use crate::items::ItemMetadata;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-pub const ITEM_MAX: usize = 2632;
+pub const ITEM_MAX: usize = 2684;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAllItems"))]
 #[allow(clippy::missing_const_for_fn)]
+#[wasm_bindgen(js_name = "getAllItems")]
+#[cfg(feature = "wasm")]
 pub fn get_all_items() -> Vec<ItemMetadata> {
     ALL_ITEMS.into_iter().copied().collect()
 }
@@ -10024,8 +10025,14 @@ pub static ALL_ITEMS: [&ItemMetadata; ITEM_MAX] = [
         id: 2566,
         name: "Froslassite",
     },
-    &ItemMetadata { id: 2567, name: "" },
-    &ItemMetadata { id: 2568, name: "" },
+    &ItemMetadata {
+        id: 2567,
+        name: "Heatranite",
+    },
+    &ItemMetadata {
+        id: 2568,
+        name: "Darkranite",
+    },
     &ItemMetadata {
         id: 2569,
         name: "Emboarite",
@@ -10094,7 +10101,10 @@ pub static ALL_ITEMS: [&ItemMetadata; ITEM_MAX] = [
         id: 2585,
         name: "Drampanite",
     },
-    &ItemMetadata { id: 2586, name: "" },
+    &ItemMetadata {
+        id: 2586,
+        name: "Zeraorite",
+    },
     &ItemMetadata {
         id: 2587,
         name: "Falinksite",
@@ -10119,8 +10129,14 @@ pub static ALL_ITEMS: [&ItemMetadata; ITEM_MAX] = [
         id: 2592,
         name: "Lab Key Card C",
     },
-    &ItemMetadata { id: 2593, name: "" },
-    &ItemMetadata { id: 2594, name: "" },
+    &ItemMetadata {
+        id: 2593,
+        name: "Lab Key Card M",
+    },
+    &ItemMetadata {
+        id: 2594,
+        name: "Lab Key Card X",
+    },
     &ItemMetadata {
         id: 2595,
         name: "Pebble",
@@ -10145,17 +10161,58 @@ pub static ALL_ITEMS: [&ItemMetadata; ITEM_MAX] = [
         id: 2600,
         name: "Lida’s Things",
     },
-    &ItemMetadata { id: 2601, name: "" },
-    &ItemMetadata { id: 2603, name: "" },
-    &ItemMetadata { id: 2605, name: "" },
-    &ItemMetadata { id: 2606, name: "" },
-    &ItemMetadata { id: 2607, name: "" },
-    &ItemMetadata { id: 2608, name: "" },
-    &ItemMetadata { id: 2609, name: "" },
-    &ItemMetadata { id: 2610, name: "" },
-    &ItemMetadata { id: 2611, name: "" },
-    &ItemMetadata { id: 2612, name: "" },
-    &ItemMetadata { id: 2613, name: "" },
+    &ItemMetadata {
+        id: 2601,
+        name: "Lumiosian Butter",
+    },
+    &ItemMetadata {
+        id: 2602,
+        name: "Nice Butter",
+    },
+    &ItemMetadata {
+        id: 2603,
+        name: "Great Butter",
+    },
+    &ItemMetadata {
+        id: 2604,
+        name: "Amazing Butter",
+    },
+    &ItemMetadata {
+        id: 2605,
+        name: "Supreme Butter",
+    },
+    &ItemMetadata {
+        id: 2606,
+        name: "Hyperspace Butter",
+    },
+    &ItemMetadata {
+        id: 2607,
+        name: "Hoennian Salt",
+    },
+    &ItemMetadata {
+        id: 2608,
+        name: "Épice Noire",
+    },
+    &ItemMetadata {
+        id: 2609,
+        name: "Arboliva Oil",
+    },
+    &ItemMetadata {
+        id: 2610,
+        name: "Popping Candy",
+    },
+    &ItemMetadata {
+        id: 2611,
+        name: "Important Letter",
+    },
+    &ItemMetadata {
+        id: 2612,
+        name: "Cherished Ring",
+    },
+    &ItemMetadata {
+        id: 2613,
+        name: "Dirty Scarf",
+    },
     &ItemMetadata { id: 2614, name: "" },
     &ItemMetadata { id: 2615, name: "" },
     &ItemMetadata { id: 2616, name: "" },
@@ -10227,5 +10284,205 @@ pub static ALL_ITEMS: [&ItemMetadata; ITEM_MAX] = [
     &ItemMetadata {
         id: 2634,
         name: "Blue Canari Plush",
+    },
+    &ItemMetadata {
+        id: 2635,
+        name: "Raichunite X",
+    },
+    &ItemMetadata {
+        id: 2636,
+        name: "Raichunite Y",
+    },
+    &ItemMetadata {
+        id: 2637,
+        name: "Chimechite",
+    },
+    &ItemMetadata {
+        id: 2638,
+        name: "Absolite Z",
+    },
+    &ItemMetadata {
+        id: 2639,
+        name: "Staraptite",
+    },
+    &ItemMetadata {
+        id: 2640,
+        name: "Garchompite Z",
+    },
+    &ItemMetadata {
+        id: 2641,
+        name: "Lucarionite Z",
+    },
+    &ItemMetadata {
+        id: 2642,
+        name: "Golurkite",
+    },
+    &ItemMetadata {
+        id: 2643,
+        name: "Meowsticite",
+    },
+    &ItemMetadata {
+        id: 2644,
+        name: "Crabominite",
+    },
+    &ItemMetadata {
+        id: 2645,
+        name: "Golisopite",
+    },
+    &ItemMetadata {
+        id: 2646,
+        name: "Magearnite",
+    },
+    &ItemMetadata {
+        id: 2647,
+        name: "Scovillainite",
+    },
+    &ItemMetadata {
+        id: 2648,
+        name: "Baxcalibrite",
+    },
+    &ItemMetadata {
+        id: 2649,
+        name: "Tatsugirinite",
+    },
+    &ItemMetadata {
+        id: 2650,
+        name: "Glimmoranite",
+    },
+    &ItemMetadata {
+        id: 2651,
+        name: "Hyper Cheri Berry",
+    },
+    &ItemMetadata {
+        id: 2652,
+        name: "Hyper Chesto Berry",
+    },
+    &ItemMetadata {
+        id: 2653,
+        name: "Hyper Pecha Berry",
+    },
+    &ItemMetadata {
+        id: 2654,
+        name: "Hyper Rawst Berry",
+    },
+    &ItemMetadata {
+        id: 2655,
+        name: "Hyper Aspear Berry",
+    },
+    &ItemMetadata {
+        id: 2656,
+        name: "Hyper Oran Berry",
+    },
+    &ItemMetadata {
+        id: 2657,
+        name: "Hyper Persim Berry",
+    },
+    &ItemMetadata {
+        id: 2658,
+        name: "Hyper Lum Berry",
+    },
+    &ItemMetadata {
+        id: 2659,
+        name: "Hyper Sitrus Berry",
+    },
+    &ItemMetadata {
+        id: 2660,
+        name: "Hyper Pomeg Berry",
+    },
+    &ItemMetadata {
+        id: 2661,
+        name: "Hyper Kelpsy Berry",
+    },
+    &ItemMetadata {
+        id: 2662,
+        name: "Hyper Qualot Berry",
+    },
+    &ItemMetadata {
+        id: 2663,
+        name: "Hyper Hondew Berry",
+    },
+    &ItemMetadata {
+        id: 2664,
+        name: "Hyper Grepa Berry",
+    },
+    &ItemMetadata {
+        id: 2665,
+        name: "Hyper Tamato Berry",
+    },
+    &ItemMetadata {
+        id: 2666,
+        name: "Hyper Occa Berry",
+    },
+    &ItemMetadata {
+        id: 2667,
+        name: "Hyper Passho Berry",
+    },
+    &ItemMetadata {
+        id: 2668,
+        name: "Hyper Wacan Berry",
+    },
+    &ItemMetadata {
+        id: 2669,
+        name: "Hyper Rindo Berry",
+    },
+    &ItemMetadata {
+        id: 2670,
+        name: "Hyper Yache Berry",
+    },
+    &ItemMetadata {
+        id: 2671,
+        name: "Hyper Chople Berry",
+    },
+    &ItemMetadata {
+        id: 2672,
+        name: "Hyper Kebia Berry",
+    },
+    &ItemMetadata {
+        id: 2673,
+        name: "Hyper Shuca Berry",
+    },
+    &ItemMetadata {
+        id: 2674,
+        name: "Hyper Coba Berry",
+    },
+    &ItemMetadata {
+        id: 2675,
+        name: "Hyper Payapa Berry",
+    },
+    &ItemMetadata {
+        id: 2676,
+        name: "Hyper Tanga Berry",
+    },
+    &ItemMetadata {
+        id: 2677,
+        name: "Hyper Charti Berry",
+    },
+    &ItemMetadata {
+        id: 2678,
+        name: "Hyper Kasib Berry",
+    },
+    &ItemMetadata {
+        id: 2679,
+        name: "Hyper Haban Berry",
+    },
+    &ItemMetadata {
+        id: 2680,
+        name: "Hyper Colbur Berry",
+    },
+    &ItemMetadata {
+        id: 2681,
+        name: "Hyper Babiri Berry",
+    },
+    &ItemMetadata {
+        id: 2682,
+        name: "Hyper Chilan Berry",
+    },
+    &ItemMetadata {
+        id: 2683,
+        name: "Hyper Roseli Berry",
+    },
+    &ItemMetadata {
+        id: 2684,
+        name: "Canari Bread",
     },
 ];

@@ -10,6 +10,15 @@ use crate::species::{NATIONAL_DEX_MAX, NatDexIndex};
 
 #[derive(Debug)]
 pub enum Error {
+    BufferSize {
+        requirement_source: String,
+        expected: usize,
+        received: usize,
+    },
+    CryptRange {
+        range: (usize, usize),
+        buffer_size: usize,
+    },
     NationalDex {
         national_dex: u16,
     },
@@ -38,6 +47,13 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
+            Error::BufferSize { requirement_source: field, expected, received } => {
+                format!("{field} requires buffer of length {expected}, but actual length is {received}").to_owned()
+            }
+            Error::CryptRange { range, buffer_size } => {
+                format!("Attempting to decrypt/encrypt range ({}, {}) over buffer of size {buffer_size}", range.0, range.1)
+                    .to_owned()
+            }
             Error::NationalDex { national_dex } => {
                 format!("Invalid National Dex number {national_dex} (must be between 1 and {NATIONAL_DEX_MAX}")
                     .to_owned()

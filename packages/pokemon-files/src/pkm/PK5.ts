@@ -5,13 +5,14 @@ import { Gen4Ribbons } from '@pokemon-resources/index'
 import {
   AbilityIndex,
   Ball,
+  Gender,
   Item,
   Language,
   Languages,
   MetadataLookup,
   NatureIndex,
   SpeciesLookup,
-} from '@pkm-rs-resources/pkg'
+} from '@pkm-rs/pkg'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { AllPKMFields } from '../util/pkmInterface'
@@ -24,7 +25,7 @@ import {
   generatePersonalityValuePreservingAttributes,
 } from '../util/util'
 
-export class PK5 {
+export default class PK5 {
   static getName() {
     return 'PK5'
   }
@@ -212,7 +213,8 @@ export class PK5 {
       }
       this.isEgg = other.isEgg ?? false
       this.isNicknamed = other.isNicknamed ?? false
-      this.gender = other.gender ?? 0
+      this.gender =
+        other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
       this.formeNum = other.formeNum
       this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
       this.isNsPokemon = other.isNsPokemon ?? false
@@ -414,5 +416,3 @@ export class PK5 {
     return []
   }
 }
-
-export default PK5

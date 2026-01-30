@@ -19,6 +19,9 @@ sha2 = "0.10.9"
 rand = "0.9.2"
 getrandom = { version = "0.3.3", features = ["wasm_js"] }
 phf = { version = "0.13.1", features = ["macros"] }
+strum = "0.27.2"
+strum_macros = "0.27.2"
+console_error_panic_hook = "0.1.7"
 
 [lib]
 name = "pkm_rs"
@@ -29,4 +32,4 @@ crate-type = ["cdylib", "rlib"]
 missing_const_for_fn = "warn"
 
 [features]
-wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js"]
+wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js", "pkm_rs_types/wasm", "pkm_rs_resources/wasm"]

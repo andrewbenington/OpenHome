@@ -1,8 +1,10 @@
+mod bytes;
 mod checksum;
 mod identifiers;
 mod pkm_base;
 mod stats;
 
+pub use bytes::*;
 pub use checksum::Checksum;
 pub use identifiers::*;
 pub use pkm_base::*;
@@ -15,6 +17,7 @@ pub trait TrainerWithSecret {
 
 pub trait IsShiny {
     fn is_shiny(&self) -> bool;
+    fn is_square_shiny(&self) -> bool;
 }
 
 pub use pkm_rs_derive::IsShiny4096;

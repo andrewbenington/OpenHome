@@ -2,8 +2,9 @@ use std::collections::HashSet;
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{Data, DeriveInput, Fields, parse_macro_input};
-
+use syn::{
+    Data, DeriveInput, Fields, FnArg, ItemImpl, PatType, parse_macro_input, spanned::Spanned,
+};
 #[proc_macro_derive(IsShiny4096)]
 pub fn derive_is_shiny_4096(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -59,6 +60,13 @@ pub fn derive_is_shiny_4096(input: TokenStream) -> TokenStream {
                 (((self.personality_value >> 16) & 0xffff) as u16) ^
                 self.trainer_id ^
                 self.secret_id) < 16
+            }
+
+            fn is_square_shiny(&self) -> bool {
+                (((self.personality_value & 0xffff) as u16) ^
+                (((self.personality_value >> 16) & 0xffff) as u16) ^
+                self.trainer_id ^
+                self.secret_id) == 0
             }
         }
     };
@@ -121,6 +129,13 @@ pub fn derive_is_shiny_8192(input: TokenStream) -> TokenStream {
                 (((self.personality_value >> 16) & 0xffff) as u16) ^
                 self.trainer_id ^
                 self.secret_id) < 8
+            }
+
+            fn is_square_shiny(&self) -> bool {
+                (((self.personality_value & 0xffff) as u16) ^
+                (((self.personality_value >> 16) & 0xffff) as u16) ^
+                self.trainer_id ^
+                self.secret_id) == 0
             }
         }
     };
@@ -268,4 +283,93 @@ pub fn derive_stats(input: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(expanded)
+}
+
+fn is_by_value_non_primitive(ty: &syn::Type) -> bool {
+    match ty {
+        syn::Type::Reference(_) => false, // references are always safe
+        syn::Type::Path(p) => {
+            // single identifier path
+            if let Some(ident) = p.path.get_ident() {
+                !matches!(
+                    ident.to_string().as_ref(),
+                    "u8" | "u16"
+                        | "u32"
+                        | "u64"
+                        | "i8"
+                        | "i16"
+                        | "i32"
+                        | "i64"
+                        | "f32"
+                        | "f64"
+                        | "bool"
+                        | "char"
+                        | "Language"
+                        | "Ball"
+                        | "OriginGame"
+                        | "String"
+                        | "Vec"
+                )
+            } else {
+                true // complex path (e.g., generic struct) → error
+            }
+        }
+        _ => false, // ignore other types (arrays, tuples) for now
+    }
+}
+
+/// Macro: #[safe_wasm_impl]
+/// - Automatically injects #[wasm_bindgen]
+/// - Enforces safe-by-default: any argument taken by value requires #[unsafe_own]
+#[proc_macro_attribute]
+pub fn safe_wasm_impl(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let impl_block = parse_macro_input!(item as ItemImpl);
+
+    let mut errors = Vec::new();
+    // Only enforce if unsafe_own is NOT present
+    // Iterate over all methods
+    for method in impl_block.items.iter() {
+        if let syn::ImplItem::Fn(method_fn) = method {
+            // Check for #[unsafe_own]
+            if method_fn
+                .attrs
+                .iter()
+                .any(|a| a.path().is_ident("unsafe_own"))
+            {
+                continue;
+            }
+
+            for arg in &method_fn.sig.inputs {
+                if let FnArg::Typed(PatType { ty, .. }) = arg
+                    && !ty.span().source_text().is_none_or(|s| {
+                        s.starts_with("#") || s.starts_with("Vec") || s.starts_with("Option")
+                    })
+                    && is_by_value_non_primitive(ty)
+                {
+                    errors.push(syn::Error::new_spanned(
+                        ty,
+                        format!(
+                            "Function argument is a by-value non-primitive. \
+                 Add #[unsafe_own] to opt into zero-copy ownership transfer 2, [{:?}]",
+                            ty.span().source_text()
+                        ),
+                    ));
+                }
+            }
+        }
+    }
+
+    // Combine all errors into one token stream
+    let compile_errors = errors
+        .into_iter()
+        .map(|e| e.to_compile_error())
+        .collect::<proc_macro2::TokenStream>();
+
+    // Return original impl block + all compile errors
+    let output = quote! {
+        #compile_errors
+        #impl_block
+    };
+
+    output.into()
 }

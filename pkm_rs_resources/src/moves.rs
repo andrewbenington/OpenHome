@@ -64,14 +64,14 @@ impl From<MoveSlot> for u16 {
 }
 
 pub struct MoveMetadata {
-    id: u16,
-    name: &'static str,
-    accuracy: Option<u8>,
-    class: MoveClass,
-    introduced: Generation,
-    power: Option<u8>,
-    pp: u8,
-    pkm_type: PkmType,
+    pub id: u16,
+    pub name: &'static str,
+    pub accuracy: Option<u8>,
+    pub class: MoveClass,
+    pub introduced: Generation,
+    pub power: Option<u8>,
+    pub pp: u8,
+    pub pkm_type: PkmType,
 }
 
 impl MoveMetadata {
