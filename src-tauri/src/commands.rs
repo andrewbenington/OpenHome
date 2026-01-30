@@ -101,8 +101,7 @@ pub fn write_storage_file_json(
     write_storage_file_text(app_handle, relative_path, data.to_string())
 }
 
-#[tauri::command]
-pub fn write_storage_file_text(
+fn write_storage_file_text(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
     text: String,

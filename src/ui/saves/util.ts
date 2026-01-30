@@ -1,5 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { HomeData } from '@openhome-core/save/HomeData'
+import { HomeBox, HomeData } from '@openhome-core/save/HomeData'
 import { Box, SAV } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
@@ -76,7 +76,7 @@ export function filterEmpty<T>(value: T | null | undefined): value is T {
  * first non-empty box slot
  */
 export function getFollowingMon(
-  currentBox: Box<PKMInterface>,
+  currentBox: Box<PKMInterface> | HomeBox,
   incrementFunction: (index: number) => number,
   index: number
 ) {
@@ -84,7 +84,7 @@ export function getFollowingMon(
 
   do {
     prevIndex = incrementFunction(prevIndex)
-  } while (prevIndex !== index && currentBox.pokemon[prevIndex] === undefined)
+  } while (prevIndex !== index && currentBox.boxSlots[prevIndex] === undefined)
 
   if (prevIndex !== index) {
     return prevIndex
@@ -101,7 +101,7 @@ export function buildNavigator(
   const currentBox =
     save.currentPCBox < save.boxes.length ? save.boxes[save.currentPCBox] : undefined
 
-  if (!currentBox || currentBox?.pokemon.filter(filterUndefined).length < 2) {
+  if (!currentBox || currentBox.boxSlots.filter(filterUndefined).length < 2) {
     return undefined
   }
 
@@ -122,12 +122,6 @@ export function buildForwardNavigator(
   callback?: (index?: number) => void
 ) {
   if (!save || currentIndex === undefined) return undefined
-  const currentBox =
-    save.currentPCBox < save.boxes.length ? save.boxes[save.currentPCBox] : undefined
-
-  if (!currentBox || currentBox?.pokemon.filter(filterUndefined).length < 2) {
-    return undefined
-  }
 
   const boxSize = save.boxColumns * save.boxRows
   const getNext = (index: number) => (index + 1) % boxSize

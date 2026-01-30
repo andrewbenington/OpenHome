@@ -33,7 +33,7 @@ describe('gen 7 save files', () => {
   })
 
   test('first mon is as expected', () => {
-    expect(ultraSunSave.boxes[0].pokemon[0]?.nickname === 'Bulbasaur')
+    expect(ultraSunSave.boxes[0].boxSlots[0]?.nickname === 'Bulbasaur')
   })
 })
 
@@ -62,6 +62,6 @@ describe('moon save file', () => {
   })
 
   test('first mon is as expected', () => {
-    expect(moonSav.boxes[0].pokemon[0]?.nickname === 'Bulbasaur')
+    expect(moonSav.boxes[0].boxSlots[0]?.nickname === 'Bulbasaur')
   })
 })

@@ -12,7 +12,7 @@ import {
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/index'
 import * as byteLogic from '../util/byteLogic'
-import { AllPKMFields } from '../util/pkmInterface'
+import { AllPKMFields, FourMoves } from '../util/pkmInterface'
 import {
   filterRibbons,
   gen3ContestRibbonsFromBytes,
@@ -21,7 +21,7 @@ import {
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
-import { adjustMovePPBetweenFormats } from '../util/util'
+import { MoveFilter } from '../util/util'
 
 export default class XDPKM {
   static getName() {
@@ -52,9 +52,9 @@ export default class XDPKM {
   language: Language
   trainerName: string
   nickname: string
-  moves: number[]
-  movePP: number[]
-  movePPUps: number[]
+  moves: FourMoves
+  movePP: FourMoves
+  movePPUps: FourMoves
   evs: types.Stats
   ivs: types.Stats
   contest: types.ContestStats
@@ -142,11 +142,12 @@ export default class XDPKM {
       this.language = other.language
       this.trainerName = other.trainerName
       this.nickname = other.nickname
-      this.moves = other.moves.filter((_, i) => other.moves[i] <= XDPKM.maxValidMove())
-      this.movePP = adjustMovePPBetweenFormats(this, other).filter(
-        (_, i) => other.moves[i] <= XDPKM.maxValidMove()
-      )
-      this.movePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= XDPKM.maxValidMove())
+
+      const moveFilter = MoveFilter.fromPkmClass(XDPKM)
+      this.moves = moveFilter.moves(other)
+      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePPUps = moveFilter.movePpUps(other)
+
       this.evs = other.evs ?? {
         hp: 0,
         atk: 0,

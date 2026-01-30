@@ -16,9 +16,10 @@ import { colorIsDark } from '@openhome-ui/util/color'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
 
-import { useContext, useMemo, useState } from 'react'
+import { useCallback, useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
+import { includeClass } from '../../util/style'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
@@ -30,7 +31,9 @@ interface OpenSaveDisplayProps {
 const ALLOW_DUPE_IMPORT = true
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
-  const savesAndBanks = useSaves()
+  const savesManager = useSaves()
+  const { allOpenSaves, saveFromIdentifier, importMonsToLocation } = savesManager
+
   const ohpkmStore = useOhpkmStore()
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
@@ -38,10 +41,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const { dragState } = useDragAndDrop()
 
-  const save = useMemo(
-    () => savesAndBanks.allOpenSaves[saveIndex],
-    [savesAndBanks.allOpenSaves, saveIndex]
-  )
+  const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
 
   const currentBox = useMemo(
     () => (save.currentPCBox < save.boxes.length ? save.boxes[save.currentPCBox] : undefined),
@@ -49,11 +49,12 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   )
 
   const selectedMon = useMemo(() => {
-    if (!currentBox || selectedIndex === undefined || selectedIndex >= currentBox.pokemon.length) {
+    if (!currentBox || selectedIndex === undefined || selectedIndex >= currentBox.boxSlots.length) {
       return undefined
     }
-    return currentBox.pokemon[selectedIndex]
-  }, [currentBox, selectedIndex])
+    const selectedSlot = currentBox.boxSlots[selectedIndex]
+    return selectedSlot ? ohpkmStore.monOrOhpkmIfTracked(selectedSlot) : undefined
+  }, [currentBox, ohpkmStore, selectedIndex])
 
   const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
     const unsupportedMons = mons.filter((mon) => !save.supportsMon(mon.dexNum, mon.formeNum))
@@ -78,11 +79,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
         if (!identifier) continue
 
-        const inCurrentBox = save.boxes[save.currentPCBox].pokemon.some(
-          (mon) => mon && getMonFileIdentifier(mon) === identifier
-        )
-
-        if (!ALLOW_DUPE_IMPORT && (ohpkmStore.monIsStored(identifier) || inCurrentBox)) {
+        if (!ALLOW_DUPE_IMPORT && ohpkmStore.monIsStored(identifier)) {
           const message =
             mons.length === 1
               ? 'This Pokémon has been moved into OpenHome before.'
@@ -101,24 +98,32 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         })
       }
     }
-    savesAndBanks.importMonsToLocation(mons, location)
+    importMonsToLocation(mons, location)
   }
 
-  const isDisabled = useMemo(() => {
-    const dragPayload = dragState?.payload
+  const isDisabled = useCallback(
+    (mon?: PKMInterface) => {
+      const dragPayload = dragState?.payload
 
-    if (!dragPayload) return false
+      if (!dragPayload) return false
 
-    if (dragPayload.kind === 'item') {
-      return !save.supportsItem(dragPayload.item.index)
-    }
+      if (dragPayload.kind === 'item') {
+        return !save.supportsItem(dragPayload.item.index)
+      }
 
-    const dragData = dragPayload.monData
+      const dragData = dragPayload.monData
 
-    if (!dragData || Object.entries(dragData).length === 0) return false
+      if (!dragData || Object.entries(dragData).length === 0) return false
 
-    return !save.supportsMon(dragData.mon.dexNum, dragData.mon.formeNum)
-  }, [save, dragState?.payload])
+      const sourceSave = dragData.isHome ? undefined : saveFromIdentifier(dragData.saveIdentifier)
+
+      return (
+        !save.supportsMon(dragData.mon.dexNum, dragData.mon.formeNum) ||
+        (mon && !sourceSave?.supportsMon(mon.dexNum, mon.formeNum))
+      )
+    },
+    [dragState?.payload, saveFromIdentifier, save]
+  )
 
   const navigateRight = useMemo(
     () => buildForwardNavigator(save, selectedIndex, setSelectedIndex),
@@ -132,15 +137,19 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
   const displayData = useMemo(() => save.getDisplayData?.() ?? {}, [save])
 
+  const allCellsDisabled = range(save.boxColumns * save.boxRows)
+    .map((index: number) => currentBox?.boxSlots?.[index])
+    .every(isDisabled)
+
   return save && save.currentPCBox !== undefined ? (
     <>
       <Flex direction="column" width="100%" gap="1">
         <SaveHeader save={save} setDetailsModal={setDetailsModal} />
-        <Card className="box-card" style={{ backgroundColor: isDisabled ? '#666' : undefined }}>
+        <Card className={includeClass('box-card').with('box-card-disabled').if(allCellsDisabled)}>
           <div className="box-navigation">
             <Flex align="center" justify="center" flexGrow="4">
               <ArrowButton
-                onClick={() => savesAndBanks.saveBoxNavigateLeft(save)}
+                onClick={() => savesManager.saveBoxNavigateLeft(save)}
                 dragID={`arrow_left_${save.tid}_${save.sid}`}
                 direction="left"
               />
@@ -148,7 +157,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
             <div className="box-name">{save.boxes[save.currentPCBox]?.name}</div>
             <Flex align="center" justify="center" flexGrow="4">
               <ArrowButton
-                onClick={() => savesAndBanks.saveBoxNavigateRight(save)}
+                onClick={() => savesManager.saveBoxNavigateRight(save)}
                 dragID={`arrow_right_${save.tid}_${save.sid}`}
                 direction="right"
               />
@@ -156,31 +165,31 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           </div>
           <Grid columns={save.boxColumns.toString()} gap="1" p="1">
             {range(save.boxColumns * save.boxRows)
-              .map((index: number) => currentBox?.pokemon?.[index])
+              .map((index: number) => currentBox?.boxSlots?.[index])
               .map((mon, index) => (
                 <BoxCell
                   onClick={() => setSelectedIndex(index)}
                   key={`${save.currentPCBox}-${index}`}
                   dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                   location={{
-                    is_home: false,
+                    isHome: false,
                     box: save.currentPCBox,
-                    box_slot: index,
-                    save,
+                    boxSlot: index,
+                    saveIdentifier: save.identifier,
                   }}
                   disabled={
-                    isDisabled || save.getSlotMetadata?.(save.currentPCBox, index)?.isDisabled
+                    isDisabled(mon) || save.getSlotMetadata?.(save.currentPCBox, index)?.isDisabled
                   }
                   disabledReason={save.getSlotMetadata?.(save.currentPCBox, index)?.disabledReason}
-                  mon={mon}
+                  mon={mon ? ohpkmStore.monOrOhpkmIfTracked(mon) : undefined}
                   zIndex={1}
                   onDrop={(importedMons) => {
                     if (importedMons) {
                       attemptImportMons(importedMons, {
-                        is_home: false,
-                        save,
+                        isHome: false,
                         box: save.currentPCBox,
-                        box_slot: index,
+                        boxSlot: index,
+                        saveIdentifier: save.identifier,
                       })
                     }
                   }}
@@ -248,7 +257,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   columns: save.boxColumns,
                   rows: save.boxRows,
                   emptyIndexes: range(save.boxColumns * save.boxRows).filter(
-                    (index) => !currentBox?.pokemon?.[index]
+                    (index) => !currentBox?.boxSlots?.[index]
                   ),
                 }
               : undefined
@@ -264,7 +273,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 type SaveHeaderProps = { save: SAV; setDetailsModal: (open: boolean) => void }
 
 function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
-  const savesAndBanks = useSaves()
+  const savesManager = useSaves()
   const backend = useContext(BackendContext)
 
   const contextElements = [
@@ -288,7 +297,7 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
             >
               <Button
                 className="save-close-button"
-                onClick={() => savesAndBanks.removeSave(save)}
+                onClick={() => savesManager.removeSave(save)}
                 disabled={!!save.updatedBoxSlots.length}
                 color="tomato"
                 style={{ padding: 1 }}

@@ -875,12 +875,12 @@ impl OhpkmV2 {
 
     // Plugins
 
-    #[wasm_bindgen(getter = pluginOrigin)]
+    #[wasm_bindgen(getter = pluginOriginWasm)]
     pub fn plugin_origin(&self) -> Option<String> {
         Some(self.plugin_data.clone()?.plugin_origin)
     }
 
-    #[wasm_bindgen(setter = pluginOrigin)]
+    #[wasm_bindgen(setter = pluginOriginWasm)]
     pub fn set_plugin_origin(&mut self, value: Option<String>) {
         match value {
             Some(plugin_origin) => {

@@ -1,38 +1,59 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { getSortFunctionNullable, SortType } from '@openhome-core/pkm/sort'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { AddBoxLocation, HomeData } from '@openhome-core/save/HomeData'
 import { SAV } from '@openhome-core/save/interfaces'
 import { StoredBankData } from '@openhome-core/save/util/storage'
-import { Item } from '@pkm-rs/pkg'
+import { Option } from '@openhome-core/util/functional'
+import { OriginGame } from '@pkm-rs/pkg'
 import { createContext, Dispatch, Reducer } from 'react'
-import { OhpkmLookup } from '../ohpkm/useOhpkmStore'
 
 export type OpenSave = {
   index: number
   save: SAV
 }
+const Delimiter = '$' as const
 
-function saveToStringIdentifier(save: SAV): string {
-  return `${save.origin}$${save.tid}$${save.sid ?? 0}`
+type Delim = typeof Delimiter
+
+type OfficialSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}`
+
+type PluginSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}${Delim}${string}`
+
+export type SaveIdentifier = OfficialSaveIdentifier | PluginSaveIdentifier
+
+export function saveToStringIdentifier(save: SAV): SaveIdentifier {
+  return save.pluginIdentifier
+    ? `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}${Delimiter}${save.pluginIdentifier}`
+    : `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}`
 }
 
 export type OpenSavesState = {
-  modifiedOHPKMs: { [key: string]: OHPKM }
-  monsToRelease: PKMInterface[]
-  openSaves: Record<string, OpenSave>
+  monsToRelease: (OhpkmIdentifier | PKMInterface)[]
+  openSaves: Record<SaveIdentifier, OpenSave>
   homeData?: HomeData
   error?: string
 }
 
-export type MonLocation = {
+export type HomeMonLocation = {
   box: number
-  box_slot: number
-} & (
-  | { is_home: false; bank?: undefined; save: SAV }
-  | { is_home: true; bank: number; save?: undefined }
-)
+  boxSlot: number
+  isHome: true
+  bank: number
+  save?: undefined
+}
+export type SaveMonLocation = {
+  box: number
+  boxSlot: number
+  isHome: false
+  bank?: undefined
+  saveIdentifier: SaveIdentifier
+}
+
+export type MonLocation = SaveMonLocation | HomeMonLocation
+
+export function isMonLocation(obj: object | undefined): obj is MonLocation {
+  return obj !== undefined && 'box' in obj && 'boxSlot' in obj
+}
 
 export type MonWithLocation = MonLocation & {
   mon: PKMInterface
@@ -44,7 +65,7 @@ export type OpenSavesAction =
    */
   | {
       type: 'load_home_banks'
-      payload: { banks: StoredBankData; getMonById: OhpkmLookup }
+      payload: { banks: StoredBankData }
     }
   | {
       type: 'add_home_bank'
@@ -53,12 +74,11 @@ export type OpenSavesAction =
         boxCount: number
         currentCount: number
         switchToBank: boolean
-        getMonById: OhpkmLookup
       }
     }
   | {
       type: 'set_current_home_bank'
-      payload: { bank: number; getMonById: (id: string) => OHPKM | undefined }
+      payload: { bank: number }
     }
   | {
       type: 'set_home_bank_name'
@@ -68,17 +88,21 @@ export type OpenSavesAction =
    *  HOME BOXES
    */
   | {
+      type: 'update_home_data'
+      payload: { homeData: HomeData }
+    }
+  | {
       type: 'set_home_box'
       payload: { boxIndex: number }
     }
-  | {
-      type: 'sort_home_box'
-      payload: { boxIndex: number; sortType: SortType; getMonById: OhpkmLookup }
-    }
-  | {
-      type: 'sort_all_home_boxes'
-      payload: { sortType: SortType; getMonById: OhpkmLookup }
-    }
+  // | {
+  //     type: 'sort_home_box'
+  //     payload: { boxIndex: number; sortType: SortType }
+  //   }
+  // | {
+  //     type: 'sort_all_home_boxes'
+  //     payload: { sortType: SortType }
+  //   }
   | {
       type: 'home_box_remove_dupes'
       payload: { boxIndex: number }
@@ -123,27 +147,11 @@ export type OpenSavesAction =
    */
   | {
       type: 'add_mon_to_release'
-      payload: MonLocation
+      payload: OhpkmIdentifier | PKMInterface
     }
   | {
       type: 'clear_mons_to_release'
       payload?: undefined
-    }
-  | {
-      type: 'import_mons'
-      payload: { mons: PKMInterface[]; dest: MonLocation }
-    }
-  | {
-      type: 'move_mon'
-      payload: { source: MonWithLocation; dest: MonLocation }
-    }
-  | {
-      type: 'set_mon_item'
-      payload: { item: Item | undefined; dest: MonLocation }
-    }
-  | {
-      type: 'update_home_mon'
-      payload: { location: MonLocation; updater: (mon: OHPKM) => OHPKM }
     }
   /*
    *  OTHER
@@ -156,34 +164,10 @@ export type OpenSavesAction =
       type: 'set_error'
       payload: string | undefined
     }
-
-const updateMonInSave = (
-  state: OpenSavesState,
-  mon: PKMInterface | undefined,
-  dest: MonLocation
-) => {
-  let replacedMon
-
-  if (dest.is_home) {
-    if (state.homeData && (mon === undefined || mon instanceof OHPKM)) {
-      replacedMon = state.homeData.boxes[dest.box].pokemon[dest.box_slot]
-      state.homeData.setPokemon(dest, mon)
+  | {
+      type: 'set_home_data'
+      payload: HomeData
     }
-    return replacedMon
-  }
-
-  const saveID = saveToStringIdentifier(dest.save)
-
-  if (saveID in state.openSaves) {
-    const tempSaves = { ...state.openSaves }
-
-    replacedMon = tempSaves[saveID].save.boxes[dest.box].pokemon[dest.box_slot]
-    tempSaves[saveID].save.boxes[dest.box].pokemon[dest.box_slot] = mon
-    tempSaves[saveID].save.updatedBoxSlots.push({ box: dest.box, index: dest.box_slot })
-    state.openSaves = tempSaves
-  }
-  return replacedMon
-}
 
 export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
   state: OpenSavesState,
@@ -191,20 +175,18 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 ) => {
   const { type, payload } = action
 
-  // console.log({ type, payload })
-
   switch (type) {
     /*
      *  BANKS
      */
     case 'load_home_banks': {
-      const { banks, getMonById } = payload
-      const newHomeData = new HomeData(banks, getMonById)
+      const { banks } = payload
+      const newHomeData = new HomeData(banks)
 
       return { ...state, homeData: newHomeData }
     }
     case 'add_home_bank': {
-      const { name, boxCount, currentCount, switchToBank, getMonById } = payload
+      const { name, boxCount, currentCount, switchToBank } = payload
 
       // handle duplicate event dispatches in strict mode
       if (!state.homeData || state.homeData?.banks.length !== currentCount) {
@@ -216,15 +198,15 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
       const newBank = updatedHomeData.addBank(name, boxCount)
 
       if (switchToBank) {
-        updatedHomeData.setAndLoadBank(newBank.index, getMonById)
+        updatedHomeData.setAndLoadBank(newBank.index)
       }
       return { ...state, homeData: updatedHomeData }
     }
     case 'set_current_home_bank': {
       if (!state.homeData) return state
-      const { bank, getMonById } = payload
+      const { bank } = payload
 
-      state.homeData.setAndLoadBank(bank, getMonById)
+      state.homeData.setAndLoadBank(bank)
       return { ...state, homeData: state.homeData }
     }
     case 'set_home_bank_name': {
@@ -237,6 +219,10 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     /*
      *  HOME BOXES
      */
+    case 'update_home_data': {
+      const { homeData } = payload
+      return { ...state, homeData: homeData.clone() }
+    }
     case 'set_home_box': {
       if (!state.homeData) return state
       const { boxIndex: box } = payload
@@ -249,35 +235,35 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       return newState
     }
-    case 'sort_home_box': {
-      if (!state.homeData) return state
+    // case 'sort_home_box': {
+    //   if (!state.homeData) return state
 
-      const boxMons = state.homeData.boxes[payload.boxIndex].pokemon.toSorted(
-        getSortFunctionNullable(payload.sortType)
-      )
+    //   const boxMons = state.homeData.boxes[payload.boxIndex].pokemon.toSorted(
+    //     getSortFunctionNullable(payload.sortType)
+    //   )
 
-      state.homeData.boxes[payload.boxIndex].pokemon = boxMons
-      state.homeData.syncBankToBoxes()
-      state.homeData = state.homeData.clone(payload.getMonById)
-      return { ...state }
-    }
-    case 'sort_all_home_boxes': {
-      if (!state.homeData) return { ...state }
+    //   state.homeData.boxes[payload.boxIndex].pokemon = boxMons
+    //   state.homeData.syncBankToBoxes()
+    //   state.homeData = state.homeData.clone()
+    //   return { ...state }
+    // }
+    // case 'sort_all_home_boxes': {
+    //   if (!state.homeData) return { ...state }
 
-      const allMons = state.homeData.boxes
-        .flatMap((box) => box.pokemon)
-        .toSorted(getSortFunctionNullable(payload.sortType))
-      const boxSize = HomeData.BOX_COLUMNS * HomeData.BOX_ROWS
+    //   const allMons = state.homeData.boxes
+    //     .flatMap((box) => box.pokemon)
+    //     .toSorted(getSortFunctionNullable(payload.sortType))
+    //   const boxSize = HomeData.BOX_COLUMNS * HomeData.BOX_ROWS
 
-      for (let i = 0; i < state.homeData.boxes.length; i++) {
-        state.homeData.boxes[i].pokemon = allMons.slice(i * boxSize, (i + 1) * boxSize)
-      }
+    //   for (let i = 0; i < state.homeData.boxes.length; i++) {
+    //     state.homeData.boxes[i].pokemon = allMons.slice(i * boxSize, (i + 1) * boxSize)
+    //   }
 
-      state.homeData.syncBankToBoxes()
-      state.homeData = state.homeData.clone(payload.getMonById)
+    //   state.homeData.syncBankToBoxes()
+    //   state.homeData = state.homeData.clone(payload.getMonById)
 
-      return { ...state }
-    }
+    //   return { ...state }
+    // }
     case 'home_box_remove_dupes': {
       if (!state.homeData) return state
 
@@ -365,199 +351,10 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       return newState
     }
-    case 'move_mon': {
-      if (!state.homeData) return state
-
-      const { source, dest } = payload
-      const sourceSave = source.is_home ? state.homeData : source.save
-      const destSave = dest.is_home ? state.homeData : dest.save
-
-      const sourceBox = source.is_home
-        ? state.homeData.boxes[source.box]
-        : source.save.boxes[source.box]
-      const destBox = dest.is_home ? state.homeData.boxes[dest.box] : dest.save.boxes[dest.box]
-
-      let sourceMon = sourceBox.pokemon[source.box_slot]
-      let destMon = destBox.pokemon[dest.box_slot]
-
-      if (sourceMon !== source.mon) return state // necessary in strict mode, otherwise the swap will happen twice and revert
-
-      if (sourceSave !== destSave) {
-        if (sourceMon) {
-          if (!(sourceMon instanceof OHPKM)) {
-            sourceMon = OHPKM.fromMonInSave(sourceMon, sourceSave as SAV)
-          } else if (!source.is_home) {
-            sourceMon.setRecentSave(sourceSave as SAV)
-          }
-
-          const identifier = getMonFileIdentifier(sourceMon)
-
-          if (identifier) {
-            state.modifiedOHPKMs[identifier] = sourceMon as OHPKM
-          }
-        }
-        if (destMon) {
-          if (!(destMon instanceof OHPKM)) {
-            destMon = OHPKM.fromMonInSave(destMon, destSave as SAV)
-          } else if (!dest.is_home) {
-            destMon.setRecentSave(destSave as SAV)
-          }
-
-          const identifier = getMonFileIdentifier(destMon)
-
-          if (identifier) {
-            state.modifiedOHPKMs[identifier] = destMon as OHPKM
-          }
-        }
-      }
-
-      updateMonInSave(state, destMon, source)
-      updateMonInSave(state, sourceMon, dest)
-
-      return { ...state }
-    }
-    case 'set_mon_item': {
-      const { item, dest } = payload
-
-      const targetMon = getMonAtLocation(state, dest)
-
-      if (!targetMon) {
-        return { ...state }
-      }
-
-      if (targetMon.heldItemIndex === item?.index) {
-        return { ...state }
-      }
-
-      let updatedMon: OHPKM
-
-      if (targetMon instanceof OHPKM) {
-        updatedMon = targetMon
-      } else {
-        updatedMon = new OHPKM(targetMon)
-      }
-
-      updatedMon.heldItemIndex = item?.index ?? 0
-
-      updateMonInSave(state, updatedMon, dest)
-
-      const identifier = getMonFileIdentifier(updatedMon)
-
-      if (identifier) {
-        state.modifiedOHPKMs[identifier] = updatedMon
-      }
-
-      return { ...state }
-    }
-    case 'update_home_mon': {
-      const { location, updater } = payload
-
-      const targetMon = getMonAtLocation(state, location)
-
-      if (!targetMon) {
-        return { ...state }
-      }
-
-      let updatedMon: OHPKM
-
-      if (targetMon instanceof OHPKM) {
-        updatedMon = targetMon
-      } else {
-        updatedMon = new OHPKM(targetMon)
-      }
-
-      updatedMon = updater(updatedMon)
-
-      updateMonInSave(state, updatedMon, location)
-
-      const identifier = getMonFileIdentifier(updatedMon)
-
-      if (identifier) {
-        state.modifiedOHPKMs[identifier] = updatedMon
-      }
-
-      return { ...state }
-    }
-    case 'import_mons': {
-      const addedMons: OHPKM[] = []
-      const { dest } = action.payload
-      const mons = action.payload.mons.filter(
-        (mon) => !((getMonFileIdentifier(new OHPKM(mon)) ?? '') in state.modifiedOHPKMs)
-      )
-
-      if (dest.is_home) {
-        let nextSlot = dest
-
-        mons.forEach((mon) => {
-          const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
-
-          if (!state.homeData) {
-            throw Error('Home Data not loaded')
-          }
-
-          while (
-            !state.homeData.slotIsEmpty(nextSlot) &&
-            nextSlot.box < state.homeData.getCurrentBank().boxes.length
-          ) {
-            nextSlot.box_slot++
-            if (nextSlot.box_slot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
-              nextSlot.box_slot = 0
-              nextSlot.box++
-            }
-          }
-
-          if (nextSlot.box < state.homeData.getCurrentBank().boxes.length) {
-            state.homeData.setPokemon(nextSlot, homeMon)
-            addedMons.push(homeMon)
-            nextSlot.box_slot++
-            if (nextSlot.box_slot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
-              nextSlot.box_slot = 0
-              nextSlot.box++
-            }
-          }
-        })
-      } else {
-        let nextIndex = dest.box_slot
-        const tempSave = dest.save
-
-        mons.forEach((mon) => {
-          const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
-
-          while (
-            tempSave.boxes[dest.box].pokemon[nextIndex] &&
-            nextIndex < tempSave.boxRows * tempSave.boxColumns
-          ) {
-            nextIndex++
-          }
-          if (nextIndex < tempSave.boxRows * tempSave.boxColumns) {
-            updateMonInSave(state, homeMon, {
-              ...dest,
-              box_slot: nextIndex,
-            })
-            addedMons.push(homeMon)
-            nextIndex++
-          }
-        })
-
-        state.openSaves[saveToStringIdentifier(tempSave)].save = tempSave
-      }
-
-      addedMons.forEach((mon) => (state.modifiedOHPKMs[getMonFileIdentifier(mon) ?? ''] = mon))
-      return { ...state }
-    }
     case 'add_mon_to_release': {
-      const replacedMon = updateMonInSave(state, undefined, action.payload)
-
-      if (!replacedMon) return { ...state }
-
-      if (replacedMon instanceof OHPKM) {
-        const identifier = getMonFileIdentifier(replacedMon)
-
-        if (identifier) {
-          delete state.modifiedOHPKMs[identifier]
-        }
+      if (!state.monsToRelease.includes(action.payload)) {
+        state.monsToRelease.push(action.payload)
       }
-      state.monsToRelease.push(replacedMon)
       return { ...state }
     }
     case 'clear_updated_box_slots': {
@@ -575,11 +372,13 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     case 'close_all_saves': {
       return { ...state, openSaves: {} }
     }
+    case 'set_home_data': {
+      return { ...state, homeData: payload.clone() }
+    }
   }
 }
 
 const initialState: OpenSavesState = {
-  modifiedOHPKMs: {},
   monsToRelease: [],
   openSaves: {},
 }
@@ -590,15 +389,18 @@ export const SavesContext = createContext<[OpenSavesState, Dispatch<OpenSavesAct
   [],
 ])
 
+export function saveFromIdentifier(state: OpenSavesState, identifier: SaveIdentifier): Option<SAV> {
+  return state.openSaves[identifier]?.save
+}
+
 export function getMonAtLocation(state: OpenSavesState, location: MonLocation) {
-  if (location.is_home) {
-    return state.homeData?.boxes[location.box].pokemon[location.box_slot]
+  if (location.isHome) {
+    return state.homeData?.boxes[location.box].boxSlots[location.boxSlot]
   }
 
-  const saveID = saveToStringIdentifier(location.save)
-
-  if (saveID in state.openSaves) {
-    return state.openSaves[saveID].save.boxes[location.box].pokemon[location.box_slot]
+  if (location.saveIdentifier in state.openSaves) {
+    const save = saveFromIdentifier(state, location.saveIdentifier)
+    return save?.boxes[location.box].boxSlots[location.boxSlot]
   }
   return undefined
 }

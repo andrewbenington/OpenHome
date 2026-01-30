@@ -66,6 +66,7 @@
     "react-data-grid": "7.0.0-beta.59",
     "react-error-boundary": "^6.0.3",
     "react-icons": "^5.5.0",
+    "react-router": "^7.13.0",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

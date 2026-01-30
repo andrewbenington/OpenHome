@@ -21,7 +21,7 @@ import {
   shuffleBlocksGen67,
   unshuffleBlocksGen67,
 } from '../../util/encryption'
-import { AllPKMFields } from '../../util/pkmInterface'
+import { AllPKMFields, FourMoves } from '../../util/pkmInterface'
 import {
   contestStatsToWasm,
   convertPokeDate,
@@ -409,30 +409,53 @@ export class Pk7Rust {
   }
 
   get moves() {
-    return Array.from(this.inner.move_indices)
+    const moves = Array.from(this.inner.move_indices)
+    if (moves.length !== 4) {
+      throw new Error(`PK7 WASM struct has move array length of ${moves.length} (expected 4)`)
+    }
+
+    return moves as FourMoves
   }
-  set moves(value: number[]) {
+  set moves(value: FourMoves) {
     this.inner.move_indices = new Uint16Array(value)
   }
 
   get movePP() {
-    return Array.from(this.inner.move_pp)
+    const movePP = Array.from(this.inner.move_pp)
+    if (movePP.length !== 4) {
+      throw new Error(`PK7 WASM struct has move PP array length of ${movePP.length} (expected 4)`)
+    }
+
+    return movePP as FourMoves
   }
-  set movePP(value: number[]) {
+  set movePP(value: FourMoves) {
     this.inner.move_pp = new Uint8Array(value)
   }
 
   get movePPUps() {
-    return Array.from(this.inner.move_pp_ups)
+    const movePPUps = Array.from(this.inner.move_pp_ups)
+    if (movePPUps.length !== 4) {
+      throw new Error(
+        `PK7 WASM struct has move PP up array length of ${movePPUps.length} (expected 4)`
+      )
+    }
+
+    return movePPUps as FourMoves
   }
-  set movePPUps(value: number[]) {
+  set movePPUps(value: FourMoves) {
     this.inner.move_pp_ups = new Uint8Array(value)
   }
 
   get relearnMoves() {
-    return Array.from(this.inner.relearn_move_indices)
+    const relearnMoves = Array.from(this.inner.move_pp_ups)
+    if (relearnMoves.length !== 4) {
+      throw new Error(
+        `PK7 WASM struct has relearn move array length of ${relearnMoves.length} (expected 4)`
+      )
+    }
+    return relearnMoves as FourMoves
   }
-  set relearnMoves(value: number[]) {
+  set relearnMoves(value: FourMoves) {
     this.inner.relearn_move_indices = new Uint16Array(value)
   }
 

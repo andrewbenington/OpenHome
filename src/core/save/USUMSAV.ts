@@ -15,8 +15,18 @@ export class USUMSAV extends G7SAV {
   boxNamesOffset: number = BOX_NAMES_OFFSET
   static saveTypeID = 'USUMSAV'
 
+  pcChecksumOffset: number = PC_CHECKSUM_OFFSET
+
   constructor(path: PathData, bytes: Uint8Array) {
-    super(path, bytes, PC_OFFSET, PC_CHECKSUM_OFFSET, BOX_NAMES_OFFSET)
+    super(path, bytes)
+  }
+
+  getBoxNamesOffset(): number {
+    return BOX_NAMES_OFFSET
+  }
+
+  getPcOffset(): number {
+    return PC_OFFSET
   }
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {

@@ -14,12 +14,12 @@ import { ModernRibbons } from '@pokemon-resources/index'
 import * as conversion from '../conversion'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields } from '../util/pkmInterface'
+import { AllPKMFields, FourMoves } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
-import { adjustMovePPBetweenFormats } from '../util/util'
+import { MoveFilter } from '../util/util'
 
 export default class PK9 {
   static getName() {
@@ -58,10 +58,10 @@ export default class PK9 {
   scale: number
   tmFlagsSVDLC: Uint8Array
   nickname: string
-  moves: number[]
-  movePP: number[]
-  movePPUps: number[]
-  relearnMoves: number[]
+  moves: FourMoves
+  movePP: FourMoves
+  movePPUps: FourMoves
+  relearnMoves: FourMoves
   currentHP: number
   ivs: types.Stats
   isEgg: boolean
@@ -249,14 +249,13 @@ export default class PK9 {
       this.scale = other.scale ?? 0
       this.tmFlagsSVDLC = other.tmFlagsSVDLC ?? new Uint8Array(13)
       this.nickname = other.nickname
-      this.moves = other.moves.filter((_, i) => other.moves[i] <= PK9.maxValidMove())
-      this.movePP = adjustMovePPBetweenFormats(this, other).filter(
-        (_, i) => other.moves[i] <= PK9.maxValidMove()
-      )
-      this.movePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= PK9.maxValidMove())
-      this.relearnMoves = other.relearnMoves?.filter(
-        (_, i) => other.moves[i] <= PK9.maxValidMove()
-      ) ?? [0, 0, 0, 0]
+
+      const moveFilter = MoveFilter.fromPkmClass(PK9)
+      this.moves = moveFilter.moves(other)
+      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePPUps = moveFilter.movePpUps(other)
+      this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
+
       this.currentHP = other.currentHP ?? 0
       this.ivs = other.ivs ?? {
         hp: 0,

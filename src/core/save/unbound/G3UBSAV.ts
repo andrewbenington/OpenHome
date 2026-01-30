@@ -1,6 +1,7 @@
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
 import { ItemUnbound } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { SlotMetadata } from '../interfaces'
 import { bytesToUint32LittleEndian } from '../util/byteLogic'
@@ -14,11 +15,15 @@ const UB_TRANSFER_RESTRICTIONS: TransferRestrictions = {
 export class G3UBSAV extends G3CFRUSAV<PK3UB> {
   static transferRestrictions: TransferRestrictions = UB_TRANSFER_RESTRICTIONS
 
-  pluginIdentifier = 'unbound'
+  pluginIdentifier = 'unbound' as const
 
   static saveTypeAbbreviation = 'Unbound'
   static saveTypeName = 'Pokémon Unbound'
   static saveTypeID = 'G3UBSAV'
+
+  convertOhpkm(ohpkm: OHPKM): PK3UB {
+    return new PK3UB(ohpkm)
+  }
 
   supportsMon(dexNumber: number, formeNumber: number) {
     return !isRestricted(UB_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
@@ -62,7 +67,7 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> {
   }
 
   getSlotMetadata = (boxNum: number, boxSlot: number): SlotMetadata => {
-    const mon = this.boxes[boxNum].pokemon[boxSlot]
+    const mon = this.boxes[boxNum].boxSlots[boxSlot]
 
     if (mon instanceof PK3UB && mon.isFakemon) {
       return {

@@ -13,7 +13,7 @@ mod versioning;
 use std::env;
 use tauri::Manager;
 
-use crate::error::Error;
+use crate::{error::Error, state::synced_state::AllSyncedState};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -38,6 +38,20 @@ pub fn run() {
                 std::process::exit(1);
             };
 
+            let ohpkm_store = match state::OhpkmBytesStore::load_from_mons_v2(app.handle()) {
+                Ok(state) => state,
+                Err(err) => {
+                    util::show_error_dialog(
+                        app,
+                        err.to_string(),
+                        "OpenHome Failed to Launch - OHPKM load error",
+                    );
+
+                    app.handle().exit(1);
+                    std::process::exit(1);
+                }
+            };
+
             let lookup_state = match state::LookupState::load_from_storage(app.handle()) {
                 Ok(lookup) => lookup,
                 Err(err) => {
@@ -51,7 +65,9 @@ pub fn run() {
                     std::process::exit(1);
                 }
             };
-            app.manage(lookup_state);
+
+            let synced_state = AllSyncedState::from_states(lookup_state, ohpkm_store);
+            app.manage(synced_state);
 
             let pokedex_state = match state::PokedexState::load_from_storage(app.handle()) {
                 Ok(pokedex) => pokedex,
@@ -110,14 +126,16 @@ pub fn run() {
             commands::open_file_location,
             pkm_storage::load_banks,
             pkm_storage::write_banks,
-            saves::detect_save_type,
             state::get_lookups,
-            state::update_lookups,
+            state::add_to_lookups,
+            state::get_ohpkm_store,
+            state::add_to_ohpkm_store,
             state::get_pokedex,
             state::update_pokedex,
             state::start_transaction,
             state::rollback_transaction,
             state::commit_transaction,
+            state::synced_state::save_synced_state,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

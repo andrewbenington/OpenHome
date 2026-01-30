@@ -1,17 +1,24 @@
+import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { getPluginIdentifier } from '@openhome-core/save/util'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
-import { filterUndefined, numericSorter, stringSorter } from '@openhome-core/util/sort'
+import { R } from '@openhome-core/util/functional'
+import {
+  filterUndefined,
+  numericSorter,
+  SortableColumn,
+  stringSorter,
+} from '@openhome-core/util/sort'
 import { SaveRef } from '@openhome-core/util/types'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
-import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
+import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
+import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useSaves } from '@openhome-ui/state/saves'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import SaveCard from './SaveCard'
 import { buildRecentSaveContextElements, formatTime, formatTimeSince, SaveViewMode } from './util'
@@ -37,11 +44,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
 
   const getRecentSaves = useCallback(() => {
     backend.getRecentSaves().then(
-      E.match(
-        (err) => {
-          displayError('Error Getting Recents', err)
-          setRecentSaves({})
-        },
+      R.match(
         (recents) => {
           const extraSaveIdentifiers = getEnabledSaveTypes()
             .map(getPluginIdentifier)
@@ -54,6 +57,10 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           )
 
           setRecentSaves(Object.fromEntries(filteredRecents))
+        },
+        (err) => {
+          displayError('Error Getting Recents', err)
+          setRecentSaves({})
         }
       )
     )
@@ -62,11 +69,11 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   const removeRecentSave = useCallback(
     (path: string) =>
       backend.removeRecentSave(path).then(
-        E.match(
+        R.match(
+          async () => getRecentSaves(),
           async (err) => {
             displayError('Could Not Remove Save', err)
-          },
-          () => getRecentSaves()
+          }
         )
       ),
     [backend, getRecentSaves, displayError]
@@ -78,132 +85,116 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
     }
   }, [getRecentSaves, recentSaves])
 
-  const columns: SortableColumn<SaveRef>[] = [
-    {
-      key: 'open',
-      name: '',
-      width: 80,
-      renderCell: (params) =>
-        params.row.valid ? (
-          <button
-            className="save-grid-open-button"
-            onClick={(e) => {
-              e.preventDefault()
-              onOpen(params.row.filePath)
-            }}
-            disabled={params.row.filePath.raw in openSavePaths}
-            title={params.row.filePath.raw in openSavePaths ? 'Save is already open' : undefined}
-          >
-            Open
-          </button>
-        ) : (
-          <button
-            className="save-grid-error-button"
-            onClick={() =>
-              displayError('Invalid Save', 'File is missing, renamed, or inaccessbile')
-            }
-          >
-            <ErrorIcon style={{ width: 20, height: 20 }} />
-          </button>
-        ),
-      cellClass: 'centered-cell',
-    },
-    {
-      key: 'game',
-      name: 'Game',
-      width: 130,
-      renderValue: (value) =>
-        value.game ? (
-          <img
-            alt="save logo"
-            height={40}
-            src={
-              value.pluginIdentifier
-                ? `logos/${value.pluginIdentifier}.png`
-                : OriginGames.logoPath(value.game)
-            }
-          />
-        ) : (
-          ''
-        ),
-      sortFunction: numericSorter((val) => val.game ?? -1),
-      cellClass: 'centered-cell',
-    },
-    {
-      key: 'game_origin',
-      name: 'Origin',
-      width: 130,
-      renderValue: (value) => value.game,
-      sortFunction: numericSorter((val) => val.game ?? -1),
-      cellClass: 'centered-cell',
-    },
-    {
-      key: 'pluginIdentifier',
-      name: 'Plugin',
-      width: 130,
-      sortFunction: stringSorter((val) => val.pluginIdentifier ?? ''),
-      cellClass: 'centered-cell',
-    },
-    {
-      key: 'trainerDetails',
-      name: 'Trainer',
-      width: 160,
-      renderValue: (save) => `${save.trainerName} (${save.trainerID})`,
-      sortFunction: stringSorter((save) => `${save.trainerName} (${save.trainerID})`),
-    },
-    {
-      key: 'lastOpened',
-      name: 'Last Opened',
-      width: 160,
-      renderValue: (save) => (save.lastOpened ? formatTimeSince(save.lastOpened) : ''),
-      sortFunction: numericSorter((val) => val.lastOpened ?? -1),
-    },
-    {
-      key: 'lastModified',
-      name: 'Last Modified',
-      width: 240,
-      renderValue: (save) => (save.lastModified ? formatTime(save.lastModified) : ''),
-      sortFunction: numericSorter((val) => val.lastModified ?? -1),
-    },
-    {
-      key: 'filePath',
-      name: 'Path',
-      minWidth: 300,
-      renderValue: (save) => (
-        <Flex wrap="wrap" direction="row" gap="1" title={save.filePath.raw} align="start" mt="1">
-          {splitPath(save.filePath).map((segment, i) => (
-            <div
-              key={`${save.filePath.raw}_${i}`}
-              style={{
-                borderRadius: 3,
-                fontSize: segment === save.filePath.name ? 12 : 10,
-                fontWeight: segment === save.filePath.name ? 'bold' : 'normal',
-                lineHeight: 1,
+  const columns: SortableColumn<SaveRef>[] = useMemo(
+    () => [
+      {
+        key: 'open',
+        name: '',
+        width: '5rem',
+        renderCell: (params) =>
+          params.row.valid ? (
+            <button
+              className="save-grid-open-button"
+              onClick={(e) => {
+                e.preventDefault()
+                onOpen(params.row.filePath)
               }}
+              disabled={params.row.filePath.raw in openSavePaths}
+              title={params.row.filePath.raw in openSavePaths ? 'Save is already open' : undefined}
             >
-              {segment}
-              {segment !== save.filePath.name && ' >'}
-            </div>
-          ))}
-        </Flex>
-      ),
-    },
-  ]
+              Open
+            </button>
+          ) : (
+            <button
+              className="save-grid-error-button"
+              onClick={() =>
+                displayError('Invalid Save', 'File is missing, renamed, or inaccessbile')
+              }
+            >
+              <ErrorIcon style={{ width: 20, height: 20 }} />
+            </button>
+          ),
+        cellClass: 'centered-cell',
+      },
+      {
+        key: 'game',
+        name: 'Game',
+        width: '10rem',
+        renderValue: (value) => (
+          <div className="flex-row-centered">
+            <OriginGameIndicator
+              originGame={value.game ?? undefined}
+              plugin={value.pluginIdentifier as PluginIdentifier}
+              withName
+              tooltip={value.filePath.raw}
+            />
+          </div>
+        ),
+        sortFunction: numericSorter((val) => val.game ?? -1),
+        getFilterValue: (val) => OriginGames.gameName(val.game ?? -1),
+        cellClass: 'centered-cell',
+      },
+      {
+        key: 'trainerDetails',
+        name: 'Trainer',
+        width: '10rem',
+        renderValue: (save) => `${save.trainerName} (${save.trainerID})`,
+        sortFunction: stringSorter((save) => `${save.trainerName} (${save.trainerID})`),
+      },
+      {
+        key: 'lastOpened',
+        name: 'Last Opened',
+        width: '10rem',
+        renderValue: (save) => (save.lastOpened ? formatTimeSince(save.lastOpened) : ''),
+        sortFunction: numericSorter((val) => val.lastOpened ?? -1),
+      },
+      {
+        key: 'lastModified',
+        name: 'Last Modified',
+        width: '15rem',
+        renderValue: (save) => (save.lastModified ? formatTime(save.lastModified) : ''),
+        sortFunction: numericSorter((val) => val.lastModified ?? -1),
+      },
+      {
+        key: 'filePath',
+        name: 'Path',
+        minWidth: 300,
+        renderValue: (save) => (
+          <Flex wrap="wrap" direction="row" gap="1" title={save.filePath.raw} align="start" mt="1">
+            {splitPath(save.filePath).map((segment, i) => (
+              <div
+                key={`${save.filePath.raw}_${i}`}
+                style={{
+                  borderRadius: 3,
+                  fontSize: segment === save.filePath.name ? 12 : 10,
+                  fontWeight: segment === save.filePath.name ? 'bold' : 'normal',
+                  lineHeight: 1,
+                }}
+              >
+                {segment}
+                {segment !== save.filePath.name && ' >'}
+              </div>
+            ))}
+          </Flex>
+        ),
+      },
+    ],
+    [displayError, onOpen, openSavePaths]
+  )
 
-  return view === 'grid' ? (
-    <OHDataGrid
-      rows={Object.values(recentSaves ?? {}).map((save, i) => ({
-        ...save,
-        index: i,
-      }))}
-      columns={columns.map((column) => {
+  const recentSaveContextElements = useCallback(
+    (saveRef: SaveRef) => buildRecentSaveContextElements(saveRef, backend, removeRecentSave),
+    [backend, removeRecentSave]
+  )
+
+  const modifiedColumns = useMemo(
+    () =>
+      columns.map((column) => {
         const newColumn = { ...column }
         if (newColumn.renderCell) {
           const renderCell = newColumn.renderCell
           newColumn.renderCell = (props) => (
-            <OpenHomeCtxMenu
-              elements={buildRecentSaveContextElements(props.row, backend, removeRecentSave)}
-            >
+            <OpenHomeCtxMenu elements={recentSaveContextElements(props.row)}>
               <Flex height="100%" align="center" justify="center" width="100%">
                 {renderCell(props)}
               </Flex>
@@ -216,7 +207,8 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
             const justify = typeof rendered === 'string' ? 'start' : 'center'
             return (
               <OpenHomeCtxMenu
-                elements={buildRecentSaveContextElements(value, backend, removeRecentSave)}
+                key={`save-row-${value.filePath}`}
+                elements={recentSaveContextElements(value)}
               >
                 <Flex height="100%" align="center" justify={justify} width="100%">
                   {rendered}
@@ -229,7 +221,8 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
             const justify = typeof value === 'string' ? 'start' : 'center'
             return (
               <OpenHomeCtxMenu
-                elements={buildRecentSaveContextElements(value, backend, removeRecentSave)}
+                key={`save-row-${value.filePath}`}
+                elements={recentSaveContextElements(value)}
               >
                 <Flex height="100%" align="center" justify={justify} width="100%">
                   {value[column.key] as string | number | null}
@@ -239,10 +232,21 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           }
         }
         return newColumn
-      })}
+      }),
+    [columns, recentSaveContextElements]
+  )
+
+  return view === 'grid' ? (
+    <SortableDataGrid
+      rows={Object.values(recentSaves ?? {}).map((save, i) => ({
+        ...save,
+        index: i,
+      }))}
+      columns={modifiedColumns}
       defaultSort="lastOpened"
-      defaultSortDir="DESC"
+      defaultSortOrder="DESC"
       rowClass={(row) => (row.valid ? undefined : 'datagrid-error-row')}
+      enableVirtualization={false}
     />
   ) : (
     <Flex wrap="wrap" direction="row" justify="center" m="4" gap="2">

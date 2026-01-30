@@ -260,19 +260,3 @@ pub fn detect_from_path(path: &Path) -> Result<SaveDetect> {
         2.. => SaveDetect::MultipleMatches(possible_save_types),
     })
 }
-
-#[tauri::command]
-pub fn detect_save_type(absolute_path: PathBuf) -> Result<SaveDetect> {
-    detect_from_path(&absolute_path)
-}
-
-// #[tauri::command]
-// pub fn open_save_file(
-//     state: tauri::State<'_, OpenSavesState>,
-//     absolute_path: PathBuf,
-//     save_type: SaveType,
-// ) -> Result<()> {
-//     let bytes = util::read_file_bytes(absolute_path)?;
-//     let save_data = save_type.build(&bytes)?;
-//     state.lock()?.add_save(absolute_path, save_data)
-// }

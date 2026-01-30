@@ -1,234 +1,236 @@
 import { PossibleSaves } from '@openhome-core/save/util/path'
-import { StoredBankData } from '@openhome-core/save/util/storage'
-import { Errorable } from '@openhome-core/util/functional'
-import { JSONArray, JSONObject, JSONValue, LookupMap, SaveRef } from '@openhome-core/util/types'
+import { Errorable, R } from '@openhome-core/util/functional'
+import { JSONArray, JSONObject, JSONValue, SaveRef } from '@openhome-core/util/types'
+import { AppTheme } from '@openhome-ui/state/appInfo'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { invoke } from '@tauri-apps/api/core'
-import * as E from 'fp-ts/lib/Either'
+import { invoke, InvokeArgs, InvokeOptions } from '@tauri-apps/api/core'
 import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
 
-function rustResultToEither<T, E>(result: RustResult<T, E>): E.Either<E, T> {
-  return 'Ok' in result ? E.right(result.Ok) : E.left(result.Err)
+export type StringToBytes = Record<string, Uint8Array>
+export type StringToB64 = Record<string, string>
+
+function invokeAndCatch<C extends OhCommand>(
+  cmd: C,
+  args?: InvokeArgs,
+  options?: InvokeOptions
+): Promise<Errorable<OhCommandResult<C>>> {
+  return R.tryPromise(invoke(cmd, args, options))
 }
 
-export const TauriInvoker = {
-  getState() {
-    const promise = invoke('get_state') as Promise<AppState>
+// remove this after node 25 is lts
+if (!('fromBase64' in Uint8Array)) {
+  // @ts-expect-error – intentionally adding this static constructor because it is relatively new to javascript
+  Uint8Array.fromBase64 = function (base64: string): Uint8Array {
+    const binary = atob(base64)
+    const len = binary.length
+    const bytes = new Uint8Array(len)
 
-    return promise.then(E.right).catch(E.left)
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary.charCodeAt(i)
+    }
+
+    return bytes
+  }
+}
+
+type OhTauriApi = {
+  get_state(): AppState
+  save_synced_state(): void
+  get_file_bytes(absolutePath: string): number[]
+  get_file_created(absolutePath: string): number
+  get_ohpkm_files(): Record<string, number[]>
+  delete_storage_files(relativePaths: string[]): Record<string, RustResult<null, string>>
+  write_storage_file_bytes(relativePath: string, bytes: Uint8Array): null
+  write_storage_file_json(relativePath: string, value: JSONValue): null
+  get_storage_file_json(relativePath: string): JSONObject | JSONArray
+  find_suggested_saves(saveFolders: string[]): PossibleSaves
+  write_file_bytes(absolutePath: string, bytes: Uint8Array): null
+  set_app_theme(appTheme: AppTheme): null
+  validate_recent_saves(): Record<string, SaveRef>
+  get_image_data(absolutePath: string): ImageResponse
+  open_directory(absolutePath: string): null
+  open_file_location(filePath: string): null
+  download_plugin(remoteUrl: string): string
+  list_installed_plugins(): PluginMetadataWithIcon[]
+  load_plugin_code(pluginId: string): string
+  delete_plugin(pluginId: string): string
+  handle_windows_accellerator(menuEventId: string): null
+
+  load_banks(): StoredBankDataSerialized
+  write_banks(bankData: StoredBankDataSerialized): null
+
+  get_lookups(): StoredLookups
+  add_to_lookups(newEntries: StoredLookups): null
+
+  get_ohpkm_store(): StringToB64
+  add_to_ohpkm_store(updates: StringToBytes): null
+
+  get_pokedex(): Pokedex
+  update_pokedex(updates: PokedexUpdate[]): null
+
+  start_transaction(): null
+  rollback_transaction(): null
+  commit_transaction(): null
+}
+
+type OhCommand = keyof OhTauriApi
+
+type OhCommandArgs<C extends OhCommand> = Parameters<OhTauriApi[C]>
+
+type OhCommandResult<C extends OhCommand> = ReturnType<OhTauriApi[C]>
+
+type OhTauriApiNoThrow = {
+  [C in OhCommand]: (...args: OhCommandArgs<C>) => Promise<Errorable<OhCommandResult<C>>>
+}
+
+export const Commands: OhTauriApiNoThrow = {
+  get_state() {
+    return invokeAndCatch('get_state')
   },
 
-  getFileBytes(absolutePath: string): Promise<Errorable<Uint8Array>> {
-    const promise: Promise<number[]> = invoke('get_file_bytes', {
-      absolutePath,
-    })
-
-    return promise.then((u8s) => E.right(new Uint8Array(u8s))).catch(E.left)
+  save_synced_state() {
+    return invokeAndCatch('save_synced_state')
   },
 
-  getFileCreated(absolutePath: string): Promise<Errorable<Date>> {
-    const promise: Promise<number> = invoke('get_file_created', {
-      absolutePath,
-    })
-
-    return promise.then((unixMillis) => E.right(new Date(unixMillis))).catch(E.left)
+  get_file_bytes(absolutePath: string) {
+    return invokeAndCatch('get_file_bytes', { absolutePath })
   },
 
-  detectSaveType(absolutePath: string): Promise<Errorable<any>> {
-    const promise: Promise<any> = invoke('detect_save_type', {
-      absolutePath,
-    })
-
-    return promise.then(E.right).catch(E.left)
+  get_file_created(absolutePath: string) {
+    return invokeAndCatch('get_file_created', { absolutePath })
   },
 
-  getLookups(): Promise<Errorable<StoredLookups>> {
-    const promise: Promise<StoredLookups> = invoke('get_lookups')
-
-    return promise.then(E.right).catch(E.left)
+  get_lookups() {
+    return invokeAndCatch('get_lookups')
   },
 
-  updateLookups(gen12: LookupMap, gen345: LookupMap): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('update_lookups', { gen12, gen345 })
-
-    return promise.then(E.right).catch(E.left)
+  add_to_lookups(newEntries: StoredLookups) {
+    return invokeAndCatch('add_to_lookups', { newEntries })
   },
 
-  getPokedex(): Promise<Errorable<Pokedex>> {
-    const promise: Promise<Pokedex> = invoke('get_pokedex')
-
-    return promise.then(E.right).catch(E.left)
+  get_ohpkm_store() {
+    return invokeAndCatch('get_ohpkm_store')
   },
 
-  registerInPokedex(updates: PokedexUpdate[]): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('update_pokedex', { updates })
-
-    return promise.then(E.right).catch(E.left)
+  add_to_ohpkm_store(updates: StringToBytes): Promise<Errorable<null>> {
+    return invokeAndCatch('add_to_ohpkm_store', { updates })
   },
 
-  getStorageFileJSON(relativePath: string): Promise<Errorable<JSONObject | JSONArray>> {
-    const promise: Promise<JSONObject | JSONArray> = invoke('get_storage_file_json', {
-      relativePath,
-    })
-
-    return promise.then(E.right).catch(E.left)
+  get_pokedex() {
+    return invokeAndCatch('get_pokedex')
   },
 
-  writeStorageFileJSON(relativePath: string, data: JSONValue): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('write_storage_file_json', {
-      relativePath,
-      data,
-    })
-
-    return promise.then(E.right).catch(E.left)
+  update_pokedex(updates: PokedexUpdate[]) {
+    return invokeAndCatch('update_pokedex', { updates })
   },
 
-  getBanks(): Promise<Errorable<StoredBankData>> {
-    const promise: Promise<StoredBankData> = invoke('load_banks')
-
-    return promise.then(E.right).catch(E.left)
+  get_storage_file_json(relativePath: string) {
+    return invokeAndCatch('get_storage_file_json', { relativePath })
   },
 
-  writeBanks(bankData: StoredBankData): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('write_banks', { bankData })
-
-    return promise.then(E.right).catch(E.left)
+  write_storage_file_json(relativePath: string, data: JSONValue) {
+    return invokeAndCatch('write_storage_file_json', { relativePath, data })
   },
 
-  writeFileBytes(absolutePath: string, bytes: Uint8Array): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('write_file_bytes', {
-      absolutePath,
-      bytes,
-    })
-
-    return promise.then(E.right).catch(E.left)
+  load_banks() {
+    return invokeAndCatch('load_banks')
   },
 
-  writeStorageFileBytes(relativePath: string, bytes: Uint8Array): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('write_storage_file_bytes', {
-      relativePath,
-      bytes,
-    })
-
-    return promise.then(E.right).catch(E.left)
+  write_banks(bankData: StoredBankDataSerialized) {
+    return invokeAndCatch('write_banks', { bankData })
   },
 
-  async getOHPKMFiles(): Promise<Errorable<Record<string, Uint8Array>>> {
-    const promise: Promise<Record<string, number[]>> = invoke('get_ohpkm_files')
-
-    return promise
-      .then((result) => {
-        return E.right(
-          Object.fromEntries(
-            Object.entries(result).map(([filename, bytes]) => [filename, new Uint8Array(bytes)])
-          )
-        )
-      })
-      .catch(E.left)
+  write_file_bytes(absolutePath: string, bytes: Uint8Array) {
+    return invokeAndCatch('write_file_bytes', { absolutePath, bytes })
   },
 
-  async deleteStorageFiles(
-    relativePaths: string[]
-  ): Promise<Errorable<Record<string, Errorable<null>>>> {
-    const promise: Promise<Record<string, RustResult<null, string>>> = invoke(
-      'delete_storage_files',
-      { relativePaths }
-    )
-
-    return promise
-      .then((result) => {
-        return E.right(
-          Object.fromEntries(
-            Object.entries(result).map(([file, result]) => [file, rustResultToEither(result)])
-          )
-        )
-      })
-      .catch(E.left)
+  write_storage_file_bytes(relativePath: string, bytes: Uint8Array) {
+    return invokeAndCatch('write_storage_file_bytes', { relativePath, bytes })
   },
 
-  startTransaction(): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('start_transaction')
-
-    return promise.then(E.right).catch(E.left)
+  async get_ohpkm_files() {
+    return invokeAndCatch('get_ohpkm_files')
   },
 
-  rollbackTransaction(): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('rollback_transaction')
-
-    return promise.then(E.right).catch(E.left)
+  async delete_storage_files(relativePaths: string[]) {
+    return invokeAndCatch('delete_storage_files', { relativePaths })
   },
 
-  commitTransaction(): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('commit_transaction')
-
-    return promise.then(E.right).catch(E.left)
+  start_transaction() {
+    return invokeAndCatch('start_transaction')
   },
 
-  findSuggestedSaves(saveFolders: string[]): Promise<Errorable<PossibleSaves>> {
-    const promise: Promise<PossibleSaves> = invoke('find_suggested_saves', { saveFolders })
-
-    return promise.then(E.right).catch(E.left)
+  rollback_transaction() {
+    return invokeAndCatch('rollback_transaction')
   },
 
-  setTheme(appTheme: 'light' | 'dark' | 'system'): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('set_app_theme', { appTheme })
-
-    return promise.then(E.right).catch(E.left)
+  commit_transaction() {
+    return invokeAndCatch('commit_transaction')
   },
 
-  getRecentSaves(): Promise<Errorable<Record<string, SaveRef>>> {
-    const promise: Promise<Record<string, SaveRef>> = invoke('validate_recent_saves')
-
-    return promise.then(E.right).catch(E.left)
+  find_suggested_saves(saveFolders: string[]) {
+    return invokeAndCatch('find_suggested_saves', { saveFolders })
   },
 
-  getImageData(absolutePath: string): Promise<Errorable<ImageResponse>> {
-    const promise: Promise<ImageResponse> = invoke('get_image_data', { absolutePath })
-
-    return promise.then(E.right).catch(E.left)
+  set_app_theme(appTheme: AppTheme) {
+    return invokeAndCatch('set_app_theme', { appTheme })
   },
 
-  downloadPlugin(remoteUrl: string): Promise<Errorable<string>> {
-    const promise: Promise<string> = invoke('download_plugin', { remoteUrl })
-
-    return promise.then(E.right).catch(E.left)
+  validate_recent_saves() {
+    return invokeAndCatch('validate_recent_saves')
   },
 
-  listInstalledPlugins(): Promise<Errorable<PluginMetadataWithIcon[]>> {
-    const promise: Promise<PluginMetadataWithIcon[]> = invoke('list_installed_plugins')
-
-    return promise.then(E.right).catch(E.left)
+  get_image_data(absolutePath: string) {
+    return invokeAndCatch('get_image_data', { absolutePath })
   },
 
-  loadPluginCode(pluginId: string): Promise<Errorable<string>> {
-    const promise: Promise<string> = invoke('load_plugin_code', { pluginId })
-
-    return promise.then(E.right).catch(E.left)
+  download_plugin(remoteUrl: string) {
+    return invokeAndCatch('download_plugin', { remoteUrl })
   },
 
-  deletePlugin(pluginId: string): Promise<Errorable<string>> {
-    const promise: Promise<string> = invoke('delete_plugin', { pluginId })
-
-    return promise.then(E.right).catch(E.left)
+  list_installed_plugins() {
+    return invokeAndCatch('list_installed_plugins')
   },
 
-  handleMenuAccelleratorWindows(menuEventId: string): Promise<null> {
-    const promise: Promise<null> = invoke('handle_windows_accellerator', { menuEventId })
-
-    return promise
+  load_plugin_code(pluginId: string) {
+    return invokeAndCatch('load_plugin_code', { pluginId })
   },
 
-  openDirectory(absolutePath: string): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('open_directory', { absolutePath })
-
-    return promise.then(E.right).catch(E.left)
+  delete_plugin(pluginId: string) {
+    return invokeAndCatch('delete_plugin', { pluginId })
   },
 
-  openFileLocation(filePath: string): Promise<Errorable<null>> {
-    const promise: Promise<null> = invoke('open_file_location', { filePath })
-
-    return promise.then(E.right).catch(E.left)
+  handle_windows_accellerator(menuEventId: string) {
+    return invokeAndCatch('handle_windows_accellerator', { menuEventId })
   },
+
+  open_directory(absolutePath: string) {
+    return invokeAndCatch('open_directory', { absolutePath })
+  },
+
+  open_file_location(filePath: string) {
+    return invokeAndCatch('open_file_location', { filePath })
+  },
+}
+
+export type StoredBankDataSerialized = {
+  banks: OpenHomeBankSerialized[]
+  current_bank: number
+}
+
+export type OpenHomeBankSerialized = {
+  id: string
+  index: number
+  name: string | undefined
+  boxes: OpenHomeBoxSerialized[]
+  current_box: number
+}
+
+export type OpenHomeBoxSerialized = {
+  id: string
+  index: number
+  name: string | null
+  identifiers: Record<number, string>
 }

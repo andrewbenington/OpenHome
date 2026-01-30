@@ -20,10 +20,11 @@ import { SAVClass } from '@openhome-core/save/util'
 import { XYSAV } from '@openhome-core/save/XYSAV'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { Dispatch, Reducer, createContext } from 'react'
+import { OfficialSAV } from '../../core/save/interfaces'
 import { SMSAV_WASM } from '../../core/save/SMSAV_WASM'
 import { MonDisplayState } from '../hooks/useMonDisplay'
 
-const OFFICIAL_SAVE_TYPES = [
+const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
   G2SAV,
   G3SAV,
@@ -60,13 +61,15 @@ export const defaultSettings: Settings = {
   appTheme: 'system',
 }
 
+export type AppTheme = 'light' | 'dark' | 'system'
+
 export type Settings = {
   enabledSaveTypes: Record<string, boolean>
   enabledPlugins: Record<string, boolean>
   saveCardSize: number
   saveViewMode: SaveViewMode
   monDisplayState: MonDisplayState
-  appTheme: 'light' | 'dark' | 'system'
+  appTheme: AppTheme
 }
 
 export type AppInfoState = {
@@ -106,7 +109,7 @@ export type AppInfoAction =
     }
   | {
       type: 'set_app_theme'
-      payload: 'light' | 'dark' | 'system'
+      payload: AppTheme
     }
   | { type: 'set_mon_display_state'; payload: MonDisplayState }
   | {

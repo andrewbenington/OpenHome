@@ -13,12 +13,12 @@ import {
 import { ModernRibbons } from '@pokemon-resources/index'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields } from '../util/pkmInterface'
+import { AllPKMFields, FourMoves } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
-import { adjustMovePPBetweenFormats } from '../util/util'
+import { MoveFilter } from '../util/util'
 
 export default class PK6 {
   static getName() {
@@ -55,10 +55,10 @@ export default class PK6 {
   superTrainingDistFlags: number
   formArgument: number
   nickname: string
-  moves: number[]
-  movePP: number[]
-  movePPUps: number[]
-  relearnMoves: number[]
+  moves: FourMoves
+  movePP: FourMoves
+  movePPUps: FourMoves
+  relearnMoves: FourMoves
   secretSuperTrainingUnlocked: boolean
   secretSuperTrainingComplete: boolean
   ivs: types.Stats
@@ -256,14 +256,13 @@ export default class PK6 {
       this.superTrainingDistFlags = other.superTrainingDistFlags ?? 0
       this.formArgument = other.formArgument ?? 0
       this.nickname = other.nickname
-      this.moves = other.moves.filter((_, i) => other.moves[i] <= PK6.maxValidMove())
-      this.movePP = adjustMovePPBetweenFormats(this, other).filter(
-        (_, i) => other.moves[i] <= PK6.maxValidMove()
-      )
-      this.movePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= PK6.maxValidMove())
-      this.relearnMoves = other.relearnMoves?.filter(
-        (_, i) => other.moves[i] <= PK6.maxValidMove()
-      ) ?? [0, 0, 0, 0]
+
+      const moveFilter = MoveFilter.fromPkmClass(PK6)
+      this.moves = moveFilter.moves(other)
+      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePPUps = moveFilter.movePpUps(other)
+      this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
+
       this.secretSuperTrainingUnlocked = other.secretSuperTrainingUnlocked ?? false
       this.secretSuperTrainingComplete = other.secretSuperTrainingComplete ?? false
       this.ivs = other.ivs ?? {

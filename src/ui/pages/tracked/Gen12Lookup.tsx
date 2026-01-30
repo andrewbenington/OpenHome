@@ -1,11 +1,11 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { numericSorter, stringSorter } from '@openhome-core/util/sort'
-import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
+import { PluginIdentifier } from '@openhome-core/save/interfaces'
+import { multiSorter, numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
+import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
-import { useLookups } from '@openhome-ui/state/lookups'
+import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
+import { useLookups } from '@openhome-ui/state/lookups/useLookups'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { OriginGames } from '@pkm-rs/pkg'
-import { Spinner } from '@radix-ui/themes'
 
 type G12LookupRow = {
   gen12ID: string
@@ -19,17 +19,13 @@ type Gen12LookupProps = {
 
 export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
   const ohpkmStore = useOhpkmStore()
-  const { lookups, loaded } = useLookups()
-
-  if (!loaded) {
-    return <Spinner />
-  }
+  const { lookups } = useLookups()
 
   const columns: SortableColumn<G12LookupRow>[] = [
     {
       key: 'Pokémon',
-      name: '',
-      width: 60,
+      name: 'Mon',
+      width: '5rem',
       renderValue: (value) =>
         value.homeMon && (
           <button
@@ -48,26 +44,28 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
     {
       key: 'game',
       name: 'Original Game',
-      width: 130,
-      renderValue: (value) =>
-        value.homeMon && (
-          <img
-            alt="save logo"
-            height={40}
-            src={
-              value.homeMon.pluginOrigin
-                ? `logos/${value.homeMon.pluginOrigin}.png`
-                : OriginGames.logoPath(value.homeMon.gameOfOrigin)
-            }
+      width: '10rem',
+      renderValue: (value) => (
+        <div
+          style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center' }}
+        >
+          <OriginGameIndicator
+            originGame={value.homeMon?.gameOfOrigin}
+            plugin={value.homeMon?.pluginOrigin as PluginIdentifier}
+            withName
           />
-        ),
-      sortFunction: numericSorter((val) => val.homeMon?.gameOfOrigin),
+        </div>
+      ),
+      sortFunction: multiSorter(
+        numericSorter((val) => val.homeMon?.gameOfOrigin),
+        stringSorter((val) => val.homeMon?.pluginOrigin ?? '.') // so official games come before plugins
+      ),
       cellClass: 'centered-cell',
     },
     {
       key: 'gen12ID',
       name: 'Gen 1/2',
-      minWidth: 180,
+      width: '14rem',
       sortFunction: stringSorter((val) => val.gen12ID),
       cellClass: 'mono-cell',
     },
@@ -81,13 +79,14 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
   ]
 
   return (
-    <OHDataGrid
+    <SortableDataGrid
       rows={Object.entries(lookups.gen12).map(([gen12ID, homeID]) => ({
         gen12ID,
         homeID,
         homeMon: ohpkmStore.getById(homeID),
       }))}
       columns={columns}
+      enableVirtualization={Object.entries(lookups.gen12).length > 2000} // maybe this should be user-togglable
     />
   )
 }

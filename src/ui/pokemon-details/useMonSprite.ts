@@ -1,4 +1,5 @@
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
+import { R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
@@ -6,7 +7,6 @@ import { getPokemonSpritePath } from '@openhome-ui/images/pokemon'
 import { CURRENT_PLUGIN_API_VERSION } from '@openhome-ui/pages/plugins/Plugins'
 import { MonSpriteData, OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin'
 import { MetadataLookup } from '@pkm-rs/pkg'
-import * as E from 'fp-ts/lib/Either'
 import { useContext, useEffect, useMemo, useState } from 'react'
 
 type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>
@@ -62,7 +62,12 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
           const absolutePath = `${pluginPath}/${spritePath}`
 
           backend.getImageData(absolutePath).then(
-            E.match(
+            R.match(
+              (imageData) =>
+                setSpriteResult({
+                  loading: false,
+                  path: `data:image/${imageData.extension};base64,${imageData.base64}`,
+                }),
               (err) => {
                 setLoadError(true)
                 console.warn(
@@ -75,12 +80,7 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
                   errorMessage: 'Failed to load plugin sprite: ' + err,
                   severity: 'error',
                 })
-              },
-              (imageData) =>
-                setSpriteResult({
-                  loading: false,
-                  path: `data:image/${imageData.extension};base64,${imageData.base64}`,
-                })
+              }
             )
           )
         })

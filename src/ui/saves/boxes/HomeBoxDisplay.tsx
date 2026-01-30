@@ -2,7 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
-import { range } from '@openhome-core/util/functional'
+import { matches, R, range } from '@openhome-core/util/functional'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ItemBuilder, SubmenuBuilder } from '@openhome-ui/components/context-menu/types'
 import {
@@ -217,8 +217,14 @@ export default function HomeBoxDisplay() {
 
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
-  const { importMonsToLocation, homeData, sortHomeBox, sortAllHomeBoxes, removeDupesFromHomeBox } =
-    useSaves()
+  const {
+    importMonsToLocation,
+    homeData,
+    sortHomeBox,
+    sortAllHomeBoxes,
+    removeDupesFromHomeBox,
+    saveFromIdentifier,
+  } = useSaves()
   const [, dispatchError] = useContext(ErrorContext)
   const [selectedIndex, setSelectedIndex] = useState<number>()
   const { dragState } = useDragAndDrop()
@@ -231,8 +237,8 @@ function SingleBoxMonDisplay() {
 
           if (!identifier) continue
 
-          const inCurrentBox = homeData.boxes[homeData.currentPCBox].pokemon.some(
-            (mon) => mon && getMonFileIdentifier(mon) === identifier
+          const inCurrentBox = homeData.boxes[homeData.currentPCBox].boxSlots.some(
+            matches(identifier)
           )
 
           if (!ALLOW_DUPE_IMPORT && (ohpkmStore.monIsStored(identifier) || inCurrentBox)) {
@@ -268,14 +274,25 @@ function SingleBoxMonDisplay() {
     return undefined
   }, [dragState.payload])
 
+  const sourceSupportsMon = useCallback(
+    (dexNum: number, formeNum: number) =>
+      !dragData || dragData?.isHome
+        ? true
+        : saveFromIdentifier(dragData.saveIdentifier).supportsMon(dexNum, formeNum),
+    [dragData, saveFromIdentifier]
+  )
+
   const currentBox = homeData.boxes[homeData.currentPCBox]
 
   const selectedMon = useMemo(() => {
-    if (!currentBox || selectedIndex === undefined || selectedIndex >= currentBox.pokemon.length) {
+    if (!currentBox || selectedIndex === undefined || selectedIndex >= currentBox.boxSlots.length) {
       return undefined
     }
-    return currentBox.pokemon[selectedIndex]
-  }, [currentBox, selectedIndex])
+    const selectedMonIdentifier = currentBox.boxSlots[selectedIndex]
+    if (!selectedMonIdentifier) return undefined
+
+    return ohpkmStore.getById(selectedMonIdentifier)
+  }, [currentBox, ohpkmStore, selectedIndex])
 
   const navigateRight = useMemo(
     () => buildForwardNavigator(homeData, selectedIndex, setSelectedIndex),
@@ -313,40 +330,49 @@ function SingleBoxMonDisplay() {
       <div>
         <Grid columns={COLUMN_COUNT.toString()} gap="1">
           {range(COLUMN_COUNT * ROW_COUNT)
-            .map((index: number) => currentBox.pokemon[index])
-            .map((mon, index) => (
-              <BoxCell
-                key={`${homeData.currentPCBox}-${index}`}
-                onClick={() => setSelectedIndex(index)}
-                dragID={`home_${homeData.currentPCBox}_${index}`}
-                location={{
-                  bank: homeData.currentBankIndex,
-                  box: homeData.currentPCBox,
-                  box_slot: index,
-                  is_home: true,
-                }}
-                mon={mon}
-                zIndex={0}
-                onDrop={(importedMons) => {
-                  if (importedMons) {
-                    attemptImportMons(importedMons, {
-                      bank: homeData.currentBankIndex,
-                      box: homeData.currentPCBox,
-                      box_slot: index,
-                      is_home: true,
-                    })
+            .map((index: number) => currentBox.boxSlots[index])
+            .map((identifier, index) => {
+              const result = identifier ? ohpkmStore.tryLoadFromId(identifier) : undefined
+
+              if (result && R.isErr(result)) {
+                return <div key={`${homeData.currentPCBox}-${index}`}>!</div>
+              }
+              const mon = result?.value
+
+              return (
+                <BoxCell
+                  key={`${homeData.currentPCBox}-${index}`}
+                  onClick={() => setSelectedIndex(index)}
+                  dragID={`home_${homeData.currentPCBox}_${index}`}
+                  location={{
+                    bank: homeData.currentBankIndex,
+                    box: homeData.currentPCBox,
+                    boxSlot: index,
+                    isHome: true,
+                  }}
+                  mon={mon}
+                  zIndex={0}
+                  onDrop={(importedMons) => {
+                    if (importedMons) {
+                      attemptImportMons(importedMons, {
+                        bank: homeData.currentBankIndex,
+                        box: homeData.currentPCBox,
+                        boxSlot: index,
+                        isHome: true,
+                      })
+                    }
+                  }}
+                  disabled={
+                    // don't allow a swap with a pokémon not supported by the source save
+                    mon &&
+                    dragData &&
+                    !dragData.isHome &&
+                    !sourceSupportsMon(mon.dexNum, mon.formeNum)
                   }
-                }}
-                disabled={
-                  // don't allow a swap with a pokémon not supported by the source save
-                  mon &&
-                  dragData &&
-                  !dragData.is_home &&
-                  !dragData.save.supportsMon(mon.dexNum, mon.formeNum)
-                }
-                ctxMenuBuilders={contextElements}
-              />
-            ))}
+                  ctxMenuBuilders={contextElements}
+                />
+              )
+            })}
         </Grid>
         <PokemonDetailsModal
           mon={selectedMon}
@@ -360,7 +386,7 @@ function SingleBoxMonDisplay() {
                   columns: homeData.boxColumns,
                   rows: homeData.boxRows,
                   emptyIndexes: range(homeData.boxColumns * homeData.boxRows).filter(
-                    (index) => !currentBox?.pokemon?.[index]
+                    (index) => !currentBox?.boxSlots?.[index]
                   ),
                 }
               : undefined
