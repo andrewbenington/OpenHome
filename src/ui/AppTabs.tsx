@@ -15,6 +15,8 @@ export default function AppTabs() {
   const tab = useLocation().pathname.split('/')[1] || 'home'
   const navigate = useNavigate()
 
+  const homeElement = <Home />
+
   return (
     <Tabs.Root
       value={tab}
@@ -28,7 +30,8 @@ export default function AppTabs() {
     >
       <Box height="0" flexGrow="1">
         <Routes>
-          <Route index path="/home" element={<Home />} />
+          <Route index path="/" element={homeElement} />
+          <Route path="/home" element={homeElement} />
           <Route path="/manage/*" element={<TrackedPokemon />} />
           <Route path="/sort" element={<SortPokemon />} />
           <Route path="/pokedex" element={<PokedexDisplay />} />
@@ -52,7 +55,7 @@ export default function AppTabs() {
           </>
         )}
       </Box>
-      <Tabs.List className="tab-row">
+      <Tabs.List className="tab-sidebar">
         <Tabs.Trigger value="home">Home</Tabs.Trigger>
         <Tabs.Trigger value="manage">Tracked Pokémon</Tabs.Trigger>
         <Tabs.Trigger value="sort">Sort Pokémon</Tabs.Trigger>
