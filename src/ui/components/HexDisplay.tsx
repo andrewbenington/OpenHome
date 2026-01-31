@@ -29,7 +29,7 @@ function HexDisplay({ data, format }: HexDisplayProps) {
   return (
     <Grid columns="1fr 4fr 2fr" className="hex-display-grid">
       <Flex direction="column">
-        {range(data.length / 16).map((index) => (
+        {range(Math.ceil(data.length / 16)).map((index) => (
           <div key={`row_index_${index}`}>
             <code
               className="byte-row-display"
