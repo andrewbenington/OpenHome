@@ -99,7 +99,15 @@ function componentFromElement(element: CtxMenuElement, index: number): ReactNode
   switch (element.__cm_type_tag) {
     case 'item':
       return (
-        <CtxMenuItem key={index} onClick={element.action} disabled={element.disabled}>
+        <CtxMenuItem
+          key={index}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            element.action?.()
+          }}
+          disabled={element.disabled}
+        >
           {renderContent(element.content)}
         </CtxMenuItem>
       )

@@ -11,6 +11,7 @@ import {
   MdCreateNewFolder,
   MdDataObject,
   MdError,
+  MdFilterListAlt,
   MdGrid4X4,
   MdMoreVert,
 } from 'react-icons/md'
@@ -31,6 +32,7 @@ export const ArrowLeftIcon = MdArrowBack
 export const ArrowRightIcon = MdArrowForward
 export const ArrowLeftRightIcon = MdCompareArrows
 export const DropdownArrowIcon = MdArrowDropDown
+export const FilterIcon = MdFilterListAlt
 
 export const ExpandArrowIcon = MdArrowForwardIos
 
