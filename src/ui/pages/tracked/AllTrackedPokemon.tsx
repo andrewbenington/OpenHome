@@ -1,6 +1,13 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
-import { multiSorter, numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
+import {
+  gameOrPluginSorter,
+  gameSorter,
+  multiSorter,
+  numericSorter,
+  SortableColumn,
+  stringSorter,
+} from '@openhome-core/util/sort'
 import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
@@ -9,11 +16,11 @@ import { useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import './style.css'
 
-export type OpenHomeMonListProps = {
+export type AllTrackedPokemonProps = {
   onSelectMon: (mon: OHPKM) => void
 }
 
-export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
+export default function AllTrackedPokemon({ onSelectMon }: AllTrackedPokemonProps) {
   const ohpkmStore = useOhpkmStore()
   const saves = useSaves()
 
@@ -49,13 +56,15 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
     {
       key: 'home_bank',
       name: 'Bank',
-      width: '4rem',
+      width: '6rem',
       renderValue: (value) => {
         const bankIndex = saves.homeData.findIfPresent(value.getHomeIdentifier())?.bank
         return typeof bankIndex === 'number' ? `Bank ${bankIndex + 1}` : undefined
       },
-      getFilterValue: (value) =>
-        saves.homeData.findIfPresent(value.getHomeIdentifier())?.bank?.toString(),
+      getFilterValue: (value) => {
+        const bankIndex = saves.homeData.findIfPresent(value.getHomeIdentifier())?.bank
+        return bankIndex !== undefined ? `Bank ${bankIndex + 1}` : 'Not in OpenHome Boxes'
+      },
       sortFunction: numericSorter(
         (mon) => saves.homeData.findIfPresent(mon.getHomeIdentifier())?.bank
       ),
@@ -95,6 +104,7 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
         </div>
       ),
       cellClass: 'centered-cell',
+      sortFunction: gameSorter((mon) => mon.mostRecentSaveWasm?.game),
     },
     {
       key: 'level',
@@ -115,9 +125,9 @@ export default function OpenHomeMonList({ onSelectMon }: OpenHomeMonListProps) {
           />
         </div>
       ),
-      sortFunction: multiSorter(
-        numericSorter((val) => val?.gameOfOrigin),
-        stringSorter((val) => val?.pluginOrigin ?? '.') // so official games come before plugins
+      sortFunction: gameOrPluginSorter(
+        (mon) => mon.gameOfOrigin,
+        (mon) => mon.pluginOrigin
       ),
       cellClass: 'centered-cell',
     },

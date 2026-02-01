@@ -28,7 +28,6 @@ import {
   SeparatorBuilder,
   SubmenuBuilder,
 } from './context-menu'
-import './context-menu.css'
 import { DropdownArrowIcon, FilterIcon } from './Icons'
 import './style.css'
 
@@ -303,11 +302,16 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
       ? SubmenuBuilder.fromLabel('Filter...')
           .withBuilder(
             ItemBuilder.fromLabel(
-              columnFilter?.length === filterValues.length ? 'Deselect All' : 'Select All'
+              columnFilter === undefined || columnFilter.length === filterValues.length
+                ? 'Deselect All'
+                : 'Select All'
             ).withAction(() =>
               setFilters({
                 ...filters,
-                [columnKey]: columnFilter?.length === filterValues.length ? [] : [...filterValues],
+                [columnKey]:
+                  columnFilter === undefined || columnFilter.length === filterValues.length
+                    ? []
+                    : undefined,
               })
             )
           )
@@ -365,7 +369,7 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
   return (
     <OpenHomeCtxMenu elements={headerCtxMenuBuilders}>
       <Flex align="center" gap="1" height="100%">
-        <Flex style={{ width: 0, flex: 1, overflow: 'hidden' }}>
+        <Flex gap="1" style={{ width: 0, flex: 1, overflow: 'hidden' }}>
           {typeof column.name === 'string' ? (
             <div style={{ height: '100%', display: 'grid', alignItems: 'center' }}>
               {column.name}
@@ -374,12 +378,12 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
             column.name
           )}
           {columnFilter !== undefined && (
-            <FilterIcon size="1rem" color="var(--focus-8)" style={{ minWidth: '1rem' }} />
+            <FilterIcon color="var(--focus-8)" style={{ minWidth: '1rem', height: '1rem' }} />
           )}
         </Flex>
         {sortDirection && (
           <DropdownArrowIcon
-            size="1rem"
+            size="1.2rem"
             style={{
               rotate: sortDirection === 'DESC' ? '180deg' : undefined,
               transition: 'rotate 0.15s',

@@ -1,3 +1,4 @@
+import { OriginGame, OriginGames } from '@pkm-rs/pkg'
 import dayjs, { Dayjs } from 'dayjs'
 import { ReactNode } from 'react'
 import type { Column } from 'react-data-grid'
@@ -50,6 +51,36 @@ export function numericSorter<T>(func: (val: T) => number | undefined) {
 
     return numA - numB
   }
+}
+
+function originGameOrderValue(origin?: OriginGame): number {
+  if (!origin) return Number.POSITIVE_INFINITY
+
+  // GameBoy games have origins between Gen 6 and 7, so this is necessary to make the order chronological
+  if (OriginGames.isGameboy(origin)) {
+    return origin
+  }
+
+  return origin + OriginGame.Crystal
+}
+
+export function gameSorter<T>(func: (val: T) => OriginGame | undefined) {
+  return (a: T, b: T) => {
+    const numA = originGameOrderValue(func(a)) ?? Number.POSITIVE_INFINITY
+    const numB = originGameOrderValue(func(b)) ?? Number.POSITIVE_INFINITY
+
+    return numA - numB
+  }
+}
+
+export function gameOrPluginSorter<T>(
+  getOrigin: (val: T) => OriginGame | undefined,
+  getPluginId: (val: T) => string | undefined
+) {
+  return multiSorter(
+    gameSorter(getOrigin),
+    stringSorter((val) => getPluginId(val) ?? '.') // so official games come before plugins
+  )
 }
 
 function boolToNumIfDefined(value: boolean | undefined): number | undefined {
