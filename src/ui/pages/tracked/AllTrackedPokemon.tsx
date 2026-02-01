@@ -164,6 +164,8 @@ function useColumns(
   onSelectMon: (mon: OHPKM) => void,
   homeData: HomeData
 ): SortableColumn<OHPKM>[] {
+  const saves = useSaves()
+
   // this is necessary because the renderer functions do not update correctly when dependencies change
   const trackedMonsRef = useRef(trackedMonsToRelease)
   trackedMonsRef.current = trackedMonsToRelease
@@ -210,10 +212,11 @@ function useColumns(
         const bankIndex = homeData.findIfPresent(mon.openhomeId)?.bank
         return typeof bankIndex === 'number' ? `Bank ${bankIndex + 1}` : undefined
       },
-      getFilterValue: (mon) =>
-        trackedMonsToRelease.includes(mon.openhomeId)
-          ? 'Release Area'
-          : homeData.findIfPresent(mon.openhomeId)?.bank?.toString(),
+      getFilterValue: (mon) => {
+        if (trackedMonsToRelease.includes(mon.openhomeId)) return 'Release Area'
+        const bankIndex = saves.homeData.findIfPresent(mon.openhomeId)?.bank
+        return bankIndex !== undefined ? `Bank ${bankIndex + 1}` : 'Not in OpenHome Boxes'
+      },
       sortFunction: numericSorter((mon) =>
         trackedMonsToRelease.includes(mon.openhomeId)
           ? Number.POSITIVE_INFINITY
