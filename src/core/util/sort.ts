@@ -1,8 +1,9 @@
+import { Option } from '@openhome-core/util/functional'
+import { CssRemSize } from '@openhome-ui/util/style'
 import { OriginGame, OriginGames } from '@pkm-rs/pkg'
 import dayjs, { Dayjs } from 'dayjs'
 import { ReactNode } from 'react'
 import type { Column } from 'react-data-grid'
-import { CssRemSize } from '../../ui/util/style'
 
 export type Sorter<T> = (a: T, b: T) => number
 
@@ -26,7 +27,8 @@ export type SortableColumn<T extends SortableValue> = Readonly<
     disableCopy?: boolean
     noFilter?: boolean
     width?: CssRemSize
-    getFilterValue?: (row: T) => string | undefined | null
+    getFilterValue?: (row: T) => Option<string> | null
+    getFilterValueDropdownPos?: (filterValue: Option<string> | null) => number
     renderValue?: (value: T) => ReactNode
   }
 >
