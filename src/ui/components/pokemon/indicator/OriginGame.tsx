@@ -6,7 +6,7 @@ import {
   PluginIdentifier,
   pluginOriginMarkPath,
 } from '../../../../core/save/interfaces'
-import { IndicatorBadge } from './IndicatorBadge'
+import { ImageIndicator } from './ImageIndicator'
 
 export type OriginGameIndicatorProps = {
   originGame?: Nullable<number>
@@ -29,9 +29,11 @@ export function OriginGameIndicator({
 
   if (!markIconPath) return null
 
+  const tooltipText = tooltip ?? (withName ? undefined : name)
+
   return (
-    <IndicatorBadge
-      description={tooltip ?? name}
+    <ImageIndicator
+      tooltip={tooltipText}
       src={markIconPath}
       backgroundColor={backgroundColor}
       text={withName ? name : undefined}

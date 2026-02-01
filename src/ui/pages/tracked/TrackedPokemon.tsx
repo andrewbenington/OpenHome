@@ -7,9 +7,9 @@ import { Route, Routes } from 'react-router'
 import MessageRibbon from 'src/ui/components/MessageRibbon'
 import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
 import { usePathSegment } from 'src/ui/hooks/routing'
+import AllTrackedPokemon from './AllTrackedPokemon'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
-import OpenHomeMonList from './OpenHomeMonList'
 import {
   FindingSaveForOneState,
   FindingSavesForAllState,
@@ -24,7 +24,7 @@ export default function TrackedPokemon() {
   const { currentSegment, setCurrentSegment } = usePathSegment('manage', 'all')
 
   const allTrackedElement = (
-    <OpenHomeMonList
+    <AllTrackedPokemon
       onSelectMon={setSelectedMon}
       findSaveForMon={findSaveForMon}
       findSavesForAllMons={findSavesForAllMons}

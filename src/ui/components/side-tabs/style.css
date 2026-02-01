@@ -9,10 +9,15 @@
 .side-tab-list {
   display: flex;
   flex-direction: column;
+  min-width: 8rem;
   width: fit-content;
   background-color: rgb(68, 102, 102);
   gap: 4px;
   padding: 8px;
+  box-shadow:
+    rgba(0, 0, 0, 0.3) 0px 3px 12px,
+    rgba(0, 0, 0, 0.23) 0px 3px 6px !important;
+  z-index: 1;
 }
 
 .side-tab-panel {
