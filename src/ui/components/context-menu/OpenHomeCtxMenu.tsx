@@ -2,6 +2,7 @@ import { Option } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { Inset, ContextMenu as RadixCtxMenu } from '@radix-ui/themes'
 import { ReactNode, useMemo } from 'react'
+import './style.css'
 import {
   CtxMenuElement,
   CtxMenuElementBuilder,
@@ -83,12 +84,7 @@ function CtxMenuSubmenuContent(props: RadixCtxMenu.SubContentProps) {
 }
 
 function CtxMenuCheckboxItem(props: RadixCtxMenu.CheckboxItemProps) {
-  return (
-    <RadixCtxMenu.CheckboxItem
-      {...props}
-      style={{ padding: '0 0.3rem 0 1rem', color: 'inherit', ...props.style }}
-    />
-  )
+  return <RadixCtxMenu.CheckboxItem {...props} style={{ color: 'inherit', ...props.style }} />
 }
 
 function buildComponent(builder: CtxMenuElementBuilder, index: number): ReactNode {
@@ -99,7 +95,15 @@ function componentFromElement(element: CtxMenuElement, index: number): ReactNode
   switch (element.__cm_type_tag) {
     case 'item':
       return (
-        <CtxMenuItem key={index} onClick={element.action} disabled={element.disabled}>
+        <CtxMenuItem
+          key={index}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            element.action?.()
+          }}
+          disabled={element.disabled}
+        >
           {renderContent(element.content)}
         </CtxMenuItem>
       )

@@ -4,15 +4,15 @@ import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { useState } from 'react'
 import { Route, Routes } from 'react-router'
 import { usePathSegment } from 'src/ui/hooks/routing'
+import AllTrackedPokemon from './AllTrackedPokemon'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
-import OpenHomeMonList from './OpenHomeMonList'
 
 export default function TrackedPokemon() {
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const { currentSegment, setCurrentSegment } = usePathSegment('manage', 'all')
 
-  const allTrackedElement = <OpenHomeMonList onSelectMon={setSelectedMon} />
+  const allTrackedElement = <AllTrackedPokemon onSelectMon={setSelectedMon} />
 
   return (
     <SideTabs.Root value={currentSegment} onValueChange={setCurrentSegment}>

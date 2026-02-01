@@ -28,8 +28,7 @@ import {
   SeparatorBuilder,
   SubmenuBuilder,
 } from './context-menu'
-import './context-menu.css'
-import { DropdownArrowIcon } from './Icons'
+import { DropdownArrowIcon, FilterIcon } from './Icons'
 import './style.css'
 
 const dataGridProps = {
@@ -296,18 +295,29 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
     [columns, hiddenColumns]
   )
 
+  const getFilterValueDropdownPos = column.getFilterValueDropdownPos
+
+  const filterDropdownSorter = getFilterValueDropdownPos
+    ? numericSorter((val: string) => getFilterValueDropdownPos(val))
+    : stringSorter((val: string) => val)
+
+  const activeFilter = columnFilter !== undefined && columnFilter.length !== filterValues.length
+
   const headerCtxMenuBuilders = [
     LabelBuilder.fromComponent(column.name),
     SeparatorBuilder,
     getFilterValue
       ? SubmenuBuilder.fromLabel('Filter...')
           .withBuilder(
-            ItemBuilder.fromLabel('Deselect All').withAction(() =>
-              setFilters({ ...filters, [columnKey]: [] })
+            ItemBuilder.fromLabel(activeFilter ? 'Select All' : 'Deselect All').withAction(() =>
+              setFilters({
+                ...filters,
+                [columnKey]: activeFilter ? undefined : [],
+              })
             )
           )
           .withBuilders(
-            filterValues.toSorted().map((filterValue) =>
+            filterValues.toSorted(filterDropdownSorter).map((filterValue) =>
               CheckboxBuilder.fromLabel(filterValue)
                 .handleValueChanged(() => {
                   if (columnFilter === undefined) {
@@ -359,8 +369,8 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
 
   return (
     <OpenHomeCtxMenu elements={headerCtxMenuBuilders}>
-      <Flex align="center" gap="1">
-        <div style={{ width: 0, flex: 1 }}>
+      <Flex align="center" height="100%" mr="-1">
+        <Flex style={{ width: 0, flex: 1, overflow: 'hidden' }}>
           {typeof column.name === 'string' ? (
             <div style={{ height: '100%', display: 'grid', alignItems: 'center' }}>
               {column.name}
@@ -368,12 +378,17 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
           ) : (
             column.name
           )}
-        </div>
+          {activeFilter && (
+            <FilterIcon color="var(--focus-8)" style={{ minWidth: '1rem', height: '1rem' }} />
+          )}
+        </Flex>
         {sortDirection && (
           <DropdownArrowIcon
+            size="1.2rem"
             style={{
               rotate: sortDirection === 'DESC' ? '180deg' : undefined,
               transition: 'rotate 0.15s',
+              minWidth: '1rem',
             }}
           />
         )}
