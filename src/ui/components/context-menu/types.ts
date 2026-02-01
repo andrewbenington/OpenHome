@@ -182,16 +182,18 @@ export class SubmenuBuilder implements CtxMenuElementBuilder {
 type Checkbox = {
   content: ElementContent
   onValueChanged: () => void
-  getIsChecked: () => boolean
+  getIsChecked: () => CheckedState
   disabled: boolean
   __cm_type_tag: 'checkbox'
 }
 
+type CheckedState = boolean | 'indeterminate'
+
 export class CheckboxBuilder implements CtxMenuElementBuilder {
-  content: ElementContent
-  onValueChanged: Option<() => void>
-  getIsChecked: Option<() => boolean>
-  disabled: boolean = true
+  content: Checkbox['content']
+  onValueChanged: Option<Checkbox['onValueChanged']>
+  getIsChecked: Option<Checkbox['getIsChecked']>
+  disabled: Checkbox['disabled'] = true
 
   private constructor(content: ElementContent) {
     this.content = content
@@ -205,12 +207,12 @@ export class CheckboxBuilder implements CtxMenuElementBuilder {
     return new CheckboxBuilder({ component })
   }
 
-  handleValueChanged(handler: () => void): CheckboxBuilder {
+  handleValueChanged(handler: CheckboxBuilder['onValueChanged']): CheckboxBuilder {
     this.onValueChanged = handler
     return this
   }
 
-  handleIsChecked(handler: () => boolean): CheckboxBuilder {
+  handleIsChecked(handler: CheckboxBuilder['getIsChecked']): CheckboxBuilder {
     this.getIsChecked = handler
     return this
   }

@@ -55,7 +55,7 @@ export default function AppTabs() {
           </>
         )}
       </Box>
-      <Tabs.List className="tab-row">
+      <Tabs.List className="tab-sidebar">
         <Tabs.Trigger value="home">Home</Tabs.Trigger>
         <Tabs.Trigger value="manage">Tracked Pokémon</Tabs.Trigger>
         <Tabs.Trigger value="sort">Sort Pokémon</Tabs.Trigger>

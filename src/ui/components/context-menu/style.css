@@ -1,3 +1,12 @@
+.radix-themes {
+  .rt-BaseMenuLabel {
+    gap: 0.25rem;
+  }
+
+  --base-menu-item-padding-left: 0.5rem;
+  --base-menu-item-padding-right: 0.5rem;
+}
+
 .ContextMenuTrigger {
   display: block;
   border: 2px white dashed;
@@ -52,7 +61,10 @@
 .ContextMenuCheckboxItem,
 .ContextMenuRadioItem,
 .ContextMenuSubTrigger {
-  padding: 0 0.3rem 0 1.25rem;
+  padding: 0 1rem;
+}
+.rt-ContextMenuItemIndicator {
+  padding: 0 0.5rem;
 }
 .ContextMenuSubTrigger[data-state='open'] {
   background-color: var(--accent-4);
