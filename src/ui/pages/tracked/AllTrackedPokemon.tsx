@@ -94,7 +94,9 @@ export default function AllTrackedPokemon({
       onOpenChange={(open) => {
         if (!open) setCtxMenuMonId(undefined)
       }}
+      style={{ overflow: 'hidden' }}
     >
+      {/* this div is necessary to give the context menu a target */}
       <div style={{ height: '100%', width: '100%' }}>
         <SortableDataGrid
           rows={ohpkmStore.getAllStored().toSorted(stringSorter((mon) => mon.openhomeId))}
