@@ -62,6 +62,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
   updateMonNotes(monId: string, notes: string | undefined): void
   updateMonMarkings(monId: string, markings: MarkingsSixShapesWithColor): void
   moveMon(source: MonWithLocation, dest: MonLocation): void
+  recoverMonToBox(id: OhpkmIdentifier, bankIndex: number): void
 
   releaseMonAtLocation(location: MonLocation): void
   releaseMonsById(...ids: OhpkmIdentifier[]): void
@@ -756,6 +757,28 @@ export function useSaves(): SavesAndBanksManager {
     [releaseMonById]
   )
 
+  const recoverMonToBox = useCallback(
+    (id: OhpkmIdentifier, boxIndex: number) => {
+      const box = loadedHomeData.boxes[boxIndex]
+      if (!box) {
+        console.error(`box does not exist (index ${boxIndex})`)
+        return
+      }
+
+      const firstEmptyIndex = box.firstEmptyIndex()
+      if (firstEmptyIndex === undefined) {
+        console.error(`box at index ${boxIndex} is full`)
+        return
+      }
+
+      const updatedHomeData = loadedHomeData.clone()
+      updatedHomeData.boxes[boxIndex].boxSlots[firstEmptyIndex] = id
+
+      openSavesDispatch({ type: 'update_home_data', payload: { homeData: updatedHomeData } })
+    },
+    [loadedHomeData, openSavesDispatch]
+  )
+
   function newBoxesWithIds(ids: OhpkmIdentifier[], boxName?: string): Option<number> {
     if (ids.length === 0) return undefined
 
@@ -811,6 +834,7 @@ export function useSaves(): SavesAndBanksManager {
     updateMonNotes,
     updateMonMarkings,
     moveMon,
+    recoverMonToBox,
 
     releaseMonAtLocation,
     releaseMonsById,

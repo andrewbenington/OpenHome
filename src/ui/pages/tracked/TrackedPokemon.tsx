@@ -1,8 +1,8 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
-import { Button, Dialog, Flex, Inset, Separator } from '@radix-ui/themes'
-import { ReactNode, useState } from 'react'
+import { Button, Dialog, DropdownMenu, Flex, Inset, Separator } from '@radix-ui/themes'
+import { PropsWithChildren, ReactNode, useState } from 'react'
 import { Route, Routes, useNavigate } from 'react-router'
 import { OhpkmIdentifier } from 'src/core/pkm/Lookup'
 import { SAV } from 'src/core/save/interfaces'
@@ -168,9 +168,21 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
   const { state, onClose } = props
   const saves = useSaves()
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
 
   function openSaveAndNavToHome(save: SAV) {
     saves.addSave(save)
+    navigate('/home')
+  }
+
+  function recoverToBox(boxIndex: number) {
+    // Radix UI is bugged when you have a dropdown and a dialog open at the same time.
+    // This is necessary to restore clickability for the whole app
+    document.body.style.pointerEvents = 'auto'
+
+    setLoading(true)
+    saves.recoverMonToBox(state.id, boxIndex)
+    saves.homeBoxSetCurrent(boxIndex)
     navigate('/home')
   }
 
@@ -205,14 +217,39 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
             <div className="fixed-width-label">File:</div>
             {state.save.filePath.raw}
           </Flex>
-          <Flex direction="column" justify="center" ml="auto" mt="4" width="6rem" gap="1">
+          <ButtonStack>
             <Button size="1" onClick={() => openSaveAndNavToHome(state.save)}>
               Open Save
             </Button>
             <Button size="1" color="gray" onClick={onClose}>
               Close
             </Button>
-          </Flex>
+          </ButtonStack>
+        </Flex>
+      )
+    case 'not_found':
+      return (
+        <Flex>
+          <ButtonStack>
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger>
+                <Button size="1" loading={loading}>
+                  Recover to Box...
+                </Button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content side="right" size="2">
+                {saves.homeData.boxes.map((homeBox) => (
+                  <DropdownMenu.Item key={homeBox.id} onClick={() => recoverToBox(homeBox.index)}>
+                    {homeBox.nameOrDefault()}
+                  </DropdownMenu.Item>
+                ))}
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+
+            <Button size="1" color="gray" onClick={onClose}>
+              Close
+            </Button>
+          </ButtonStack>
         </Flex>
       )
     default:
@@ -273,7 +310,7 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
               What would you like to do with the {state.missingMonIds.length} Pokémon not found?
             </p>
           )}
-          <Flex direction="column" ml="auto" flexGrow="1" minWidth="6rem" gap="2" height="100%">
+          <ButtonStack>
             {state.missingMonIds.length > 0 && (
               <Button size="1" onClick={() => recoverMons(state.missingMonIds)} loading={loading}>
                 Recover All to New Boxes
@@ -282,10 +319,18 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
             <Button size="1" color="gray" onClick={onClose}>
               Close
             </Button>
-          </Flex>
+          </ButtonStack>
         </Flex>
       )
     default:
       return null
   }
+}
+
+function ButtonStack(props: PropsWithChildren) {
+  return (
+    <Flex direction="column" ml="auto" minWidth="6rem" gap="1" height="100%">
+      {props.children}
+    </Flex>
+  )
 }

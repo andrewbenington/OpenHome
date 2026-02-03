@@ -50,11 +50,11 @@ export function useManageTracked() {
       if (!mon) {
         console.error('mon not tracked!')
 
-        setState({ type: 'error', error: `Pokémon not found: ${identifier}` })
+        setState({ type: 'error', id: identifier, error: `Pokémon not found: ${identifier}` })
         return
       }
 
-      setState({ type: 'getting_recent_saves' })
+      setState({ type: 'getting_recent_saves', id: identifier })
       const savePaths = await backend.getRecentSaves().then(
         R.map((saves) =>
           Object.values(saves)
@@ -71,6 +71,7 @@ export function useManageTracked() {
       for (const [i, savePath] of savePaths.value.entries()) {
         setState({
           type: 'finding',
+          id: identifier,
           currentSavePath: savePath.raw,
           currentIndex: i + 1,
           totalSaves: savePaths.value.length,
@@ -104,7 +105,7 @@ export function useManageTracked() {
         const { match, location } = searchResult
 
         if (match && saveFile.value) {
-          setState({ type: 'found', save: saveFile.value, location })
+          setState({ type: 'found', id: identifier, save: saveFile.value, location })
 
           mon.syncWithGameData(match, saveFile.value)
           ohpkmStore.insertOrUpdate(mon)
@@ -112,7 +113,7 @@ export function useManageTracked() {
         }
       }
 
-      setState({ type: 'not_found' })
+      setState({ type: 'not_found', id: identifier })
     },
     [backend, displayError, enabledSaveTypes, ohpkmStore]
   )
@@ -206,12 +207,13 @@ export type FindingSavesState =
   | { type: 'finding_one'; state: FindingSaveForOneState }
   | { type: 'finding_all'; state: FindingSavesForAllState }
 
-export type FindingSaveForOneState =
+export type FindingSaveForOneState = { id: OhpkmIdentifier } & (
   | { type: 'getting_recent_saves' }
   | { type: 'finding'; currentSavePath: string; currentIndex: number; totalSaves: number }
   | { type: 'found'; save: SAV; location: BoxAndSlot }
   | { type: 'not_found' }
   | { type: 'error'; error: string }
+)
 
 export type FindingSavesForAllState =
   | {
