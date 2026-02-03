@@ -1,7 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { SaveRef } from '@openhome-core/util/types'
 import { Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { SaveIdentifier, saveToStringIdentifier } from '../../ui/state/saves'
 import { OHPKM } from '../pkm/OHPKM'
 import { PathData } from './util/path'
 
@@ -222,4 +221,19 @@ export function pluginOriginMarkPath(identifier: PluginIdentifier): string | und
     case 'unbound':
       return '/icons/gba.png'
   }
+}
+export const Delimiter = '$' as const
+
+export type Delim = typeof Delimiter
+
+type OfficialSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}`
+
+type PluginSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}${Delim}${string}`
+
+export type SaveIdentifier = OfficialSaveIdentifier | PluginSaveIdentifier
+
+export function saveToStringIdentifier(save: SAV): SaveIdentifier {
+  return save.pluginIdentifier
+    ? `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}${Delimiter}${save.pluginIdentifier}`
+    : `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}`
 }

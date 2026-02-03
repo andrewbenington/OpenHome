@@ -4,28 +4,13 @@ import { AddBoxLocation, HomeData } from '@openhome-core/save/HomeData'
 import { SAV } from '@openhome-core/save/interfaces'
 import { BoxMonIdentifiers, StoredBankData } from '@openhome-core/save/util/storage'
 import { Option } from '@openhome-core/util/functional'
-import { OriginGame } from '@pkm-rs/pkg'
 import { createContext, Dispatch, Reducer } from 'react'
+import { SaveIdentifier, saveToStringIdentifier } from 'src/core/save/interfaces'
 import { SAVClass } from '../../../core/save/util'
 
 export type OpenSave = {
   index: number
   save: SAV
-}
-const Delimiter = '$' as const
-
-type Delim = typeof Delimiter
-
-type OfficialSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}`
-
-type PluginSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}${Delim}${string}`
-
-export type SaveIdentifier = OfficialSaveIdentifier | PluginSaveIdentifier
-
-export function saveToStringIdentifier(save: SAV): SaveIdentifier {
-  return save.pluginIdentifier
-    ? `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}${Delimiter}${save.pluginIdentifier}`
-    : `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}`
 }
 
 export type OpenSavesState = {

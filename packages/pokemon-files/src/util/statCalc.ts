@@ -1,6 +1,6 @@
 import { NationalDex, NationalDexMax } from '@pokemon-resources/consts/NationalDex'
 
-import { PKM } from '../pkm'
+import { PKM } from '@pokemon-files/pkm/PKM'
 
 import { MetadataLookup, SpeciesLookup, Stat, Stats } from '@pkm-rs/pkg'
 import {

@@ -1,5 +1,6 @@
 import { OriginGame } from '@pkm-rs/pkg'
-import { COLOPKM, PA8, PB7, PB8, PK1, PK2, PK3, PK4, PK5, PK6, PK7, PK8, PK9, PKM, XDPKM } from '.'
+import { COLOPKM, PA8, PB7, PB8, PK1, PK2, PK3, PK4, PK5, PK6, PK7, PK8, PK9, XDPKM } from '.'
+import { PKM } from './PKM'
 
 function fileTypeFromBuffer(buffer: ArrayBuffer): string | undefined {
   switch (buffer.byteLength) {
