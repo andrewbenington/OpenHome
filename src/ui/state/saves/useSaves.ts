@@ -7,7 +7,7 @@ import { Box, getSaveRef, SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
-import { OpenHomeBox } from '@openhome-core/save/util/storage'
+import { BoxMonIdentifiers, OpenHomeBox } from '@openhome-core/save/util/storage'
 import { Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { Item } from '@pkm-rs/pkg'
@@ -41,11 +41,13 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
   sortAllHomeBoxes(sortType: string): void
 
   reorderBoxesCurrentBank(idsInNewOrder: string[]): void
-  addBoxCurrentBank(position: AddBoxLocation): void
+  addBoxCurrentBank(position: AddBoxLocation, identifiers?: BoxMonIdentifiers): void
   deleteBoxCurrentBank(boxId: string, boxIndex: number): void
+  newBoxesWithIds(ids: OhpkmIdentifier[], boxName?: string): Option<number>
 
   homeBoxNavigateLeft(): void
   homeBoxNavigateRight(): void
+  homeBoxSetCurrent(index: number): void
 
   importMonsToLocation(mons: PKMInterface[], startingAt: MonLocation): void
 
@@ -371,6 +373,16 @@ export function useSaves(): SavesAndBanksManager {
     })
   }, [loadedHomeData.currentPCBox, loadedHomeData.boxes.length, openSavesDispatch])
 
+  const homeBoxSetCurrent = useCallback(
+    (index: number) => {
+      openSavesDispatch({
+        type: 'set_home_box',
+        payload: { boxIndex: index },
+      })
+    },
+    [openSavesDispatch]
+  )
+
   const deleteBoxCurrentBank = useCallback(
     (boxId: string, boxIndex: number) => {
       openSavesDispatch({
@@ -464,10 +476,10 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const addBoxCurrentBank = useCallback(
-    (location: AddBoxLocation = 'end') => {
+    (location: AddBoxLocation = 'end', identifiers: BoxMonIdentifiers) => {
       openSavesDispatch({
         type: 'add_home_box',
-        payload: { location, currentBoxCount: loadedHomeData.boxes.length },
+        payload: { location, currentBoxCount: loadedHomeData.boxes.length, identifiers },
       })
     },
     [openSavesDispatch, loadedHomeData.boxes.length]
@@ -670,13 +682,6 @@ export function useSaves(): SavesAndBanksManager {
     [homeData, findMon, ohpkmStore]
   )
 
-  // const moveMon1 = useCallback(
-  //   (source: MonWithLocation, dest: MonLocation) => {
-  //     openSavesDispatch({ type: 'move_mon', payload: { source, dest } })
-  //   },
-  //   [openSavesDispatch]
-  // )
-
   function moveMon(source: MonLocation, dest: MonLocation) {
     if (source.isHome) {
       const sourceMonId = getMonAtHomeLocation(source)
@@ -752,6 +757,25 @@ export function useSaves(): SavesAndBanksManager {
     [releaseMonById]
   )
 
+  function newBoxesWithIds(ids: OhpkmIdentifier[], boxName?: string): Option<number> {
+    if (ids.length === 0) return undefined
+
+    const updatedHomeData = loadedHomeData.clone()
+    const firstNewBoxIndex = updatedHomeData.boxes.length
+
+    for (let i = 0; i < ids.length; i += HomeData.SLOTS_PER_BOX) {
+      const identifiers: BoxMonIdentifiers = new Map()
+      for (let slot = 0; slot < HomeData.SLOTS_PER_BOX; slot++) {
+        identifiers.set(slot, ids[i + slot])
+      }
+      updatedHomeData.addBoxCurrentBank('end', boxName, identifiers)
+    }
+
+    openSavesDispatch({ type: 'update_home_data', payload: { homeData: updatedHomeData } })
+
+    return firstNewBoxIndex
+  }
+
   return {
     ...openSavesState,
     allOpenSaves,
@@ -770,9 +794,11 @@ export function useSaves(): SavesAndBanksManager {
     addBoxCurrentBank,
     deleteBoxCurrentBank,
     importMonsToLocation,
+    newBoxesWithIds,
 
     homeBoxNavigateLeft,
     homeBoxNavigateRight,
+    homeBoxSetCurrent,
 
     addSave,
     buildAndOpenSave,

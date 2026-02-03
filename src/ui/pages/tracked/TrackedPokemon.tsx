@@ -4,6 +4,8 @@ import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { Button, Dialog, Flex, Inset, Separator } from '@radix-ui/themes'
 import { ReactNode, useState } from 'react'
 import { Route, Routes, useNavigate } from 'react-router'
+import { OhpkmIdentifier } from 'src/core/pkm/Lookup'
+import { SAV } from 'src/core/save/interfaces'
 import MessageRibbon from 'src/ui/components/MessageRibbon'
 import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
 import { usePathSegment } from 'src/ui/hooks/routing'
@@ -75,23 +77,28 @@ function ToolsDialog(props: { onClose: () => void }) {
   )
 }
 
-function FindingSaveDialog(props: { state: FindingSavesState; onClose: () => void }) {
+interface FindingSaveDialogProps {
+  state: FindingSavesState
+  onClose: () => void
+}
+
+function FindingSaveDialog(props: FindingSaveDialogProps) {
   const { state, onClose } = props
   const summary = stateSummary(state)
   const summaryNode = typeof summary === 'string' ? <h3>{summary}</h3> : summary
   return (
     <Dialog.Root open={Boolean(state)} onOpenChange={(o) => !o && onClose()}>
-      <Dialog.Content minHeight="18rem">
-        <Flex direction="column">
+      <Dialog.Content>
+        <Flex direction="column" flexGrow="1" height="100%">
           <Dialog.Title>
             Searching Saves for Pokémon
             <Inset side="x" mt="2">
               <Separator />
             </Inset>
           </Dialog.Title>
-          <Flex direction="column" gap="3">
+          <Flex direction="column" gap="3" style={{ flex: 1 }}>
             {summaryNode}
-            <DialogBody state={state} />
+            <DialogBody state={state} onClose={onClose} />
           </Flex>
         </Flex>
       </Dialog.Content>
@@ -138,24 +145,39 @@ function forAllStateSummary(state: FindingSavesForAllState): ReactNode {
   }
 }
 
-function DialogBody(props: { state: FindingSavesState }) {
+interface DialogBodyProps {
+  state: FindingSavesState
+  onClose?: () => void
+}
+
+function DialogBody(props: DialogBodyProps) {
   switch (props.state.type) {
     case 'finding_one':
-      return <ForOneStateBody state={props.state.state} />
+      return <ForOneStateBody state={props.state.state} onClose={props.onClose} />
     case 'finding_all':
-      return <ForAllStateBody state={props.state.state} />
+      return <ForAllStateBody state={props.state.state} onClose={props.onClose} />
   }
 }
 
-function ForOneStateBody(props: { state: FindingSaveForOneState }) {
-  const { state } = props
+interface ForOneStateBodyProps {
+  state: FindingSaveForOneState
+  onClose?: () => void
+}
+
+function ForOneStateBody(props: ForOneStateBodyProps) {
+  const { state, onClose } = props
   const saves = useSaves()
   const navigate = useNavigate()
+
+  function openSaveAndNavToHome(save: SAV) {
+    saves.addSave(save)
+    navigate('/home')
+  }
 
   switch (state.type) {
     case 'finding':
       return (
-        <div>
+        <div style={{ minHeight: '12rem ' }}>
           <b>Checking:</b>
           <p>{state.currentSavePath}</p>
         </div>
@@ -164,7 +186,7 @@ function ForOneStateBody(props: { state: FindingSaveForOneState }) {
       return (
         <Flex direction="column" gap="2" ml="4">
           <Flex gap="1" align="center">
-            <b style={{ minWidth: '5rem' }}>Game:</b>
+            <div className="fixed-width-label">Game:</div>
             <OriginGameIndicator
               originGame={state.save.origin}
               plugin={state.save.pluginIdentifier}
@@ -172,28 +194,22 @@ function ForOneStateBody(props: { state: FindingSaveForOneState }) {
             />
           </Flex>
           <Flex gap="1" align="center">
-            <b style={{ minWidth: '5rem' }}>Player:</b>
+            <div className="fixed-width-label">Player:</div>
             {state.save.name} ({state.save.displayID})
           </Flex>
           <Flex gap="1" align="center">
-            <b style={{ minWidth: '5rem' }}>Location:</b>
+            <div className="fixed-width-label">Location:</div>
             Box {state.location.box + 1}, Slot {state.location.boxSlot + 1}
           </Flex>
           <Flex gap="1">
-            <b style={{ minWidth: '5rem' }}>File:</b>
+            <div className="fixed-width-label">File:</div>
             {state.save.filePath.raw}
           </Flex>
           <Flex direction="column" justify="center" ml="auto" mt="4" width="6rem" gap="1">
-            <Button
-              size="1"
-              onClick={() => {
-                saves.addSave(state.save)
-                navigate('/home')
-              }}
-            >
+            <Button size="1" onClick={() => openSaveAndNavToHome(state.save)}>
               Open Save
             </Button>
-            <Button size="1" color="gray">
+            <Button size="1" color="gray" onClick={onClose}>
               Close
             </Button>
           </Flex>
@@ -204,14 +220,33 @@ function ForOneStateBody(props: { state: FindingSaveForOneState }) {
   }
 }
 
-function ForAllStateBody(props: { state: FindingSavesForAllState }) {
-  const { state } = props
+interface ForAllStateBodyProps {
+  state: FindingSavesForAllState
+  onClose?: () => void
+}
+
+function ForAllStateBody(props: ForAllStateBodyProps) {
+  const { state, onClose } = props
+  const [loading, setLoading] = useState(false)
+  const saves = useSaves()
+  const navigate = useNavigate()
+
+  function recoverMons(ids: OhpkmIdentifier[]) {
+    setLoading(true)
+    const firstNewBoxIndex = saves.newBoxesWithIds(ids, 'Recovered Pokémon')
+    if (firstNewBoxIndex !== undefined) {
+      saves.homeBoxSetCurrent(firstNewBoxIndex)
+    }
+    navigate('/home')?.then(() => setLoading(false))
+  }
+
   switch (state.type) {
     case 'checking_save':
+      const foundPercent = Math.round((state.foundMons / state.totalMons) * 100)
       return (
-        <div>
+        <div style={{ minHeight: '15rem ' }}>
           <Flex gap="1" align="center">
-            <b>Checking:</b>
+            <p className="fixed-width-label">Checking:</p>
             <OriginGameIndicator
               originGame={state.currentSaveRef.game}
               plugin={state.currentSaveRef.pluginIdentifier}
@@ -219,22 +254,36 @@ function ForAllStateBody(props: { state: FindingSavesForAllState }) {
             />
           </Flex>
           <Flex gap="1" align="center">
-            <b>Player:</b>
+            <p className="fixed-width-label">Player:</p>
             {state.currentSaveRef.trainerName} ({state.currentSaveRef.trainerID})
           </Flex>
           <p>
-            {state.foundMons} Pokémon found in saves so far (
-            {Math.round((state.foundMons / state.totalSaves) * 100)}%)
+            {state.foundMons} Pokémon found in saves so far ({foundPercent}%)
           </p>
         </div>
       )
     case 'complete':
       return (
-        <div>
+        <Flex direction="column" flexGrow="1">
           <p>
             {state.foundMons} / {state.totalMons} processed Pokémon were found
           </p>
-        </div>
+          {state.missingMonIds.length > 0 && (
+            <p>
+              What would you like to do with the {state.missingMonIds.length} Pokémon not found?
+            </p>
+          )}
+          <Flex direction="column" ml="auto" flexGrow="1" minWidth="6rem" gap="2" height="100%">
+            {state.missingMonIds.length > 0 && (
+              <Button size="1" onClick={() => recoverMons(state.missingMonIds)} loading={loading}>
+                Recover All to New Boxes
+              </Button>
+            )}
+            <Button size="1" color="gray" onClick={onClose}>
+              Close
+            </Button>
+          </Flex>
+        </Flex>
       )
     default:
       return null

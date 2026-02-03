@@ -6,3 +6,8 @@
 .align-center {
   align-items: center;
 }
+
+.fixed-width-label {
+  min-width: 5rem;
+  font-weight: bold;
+}

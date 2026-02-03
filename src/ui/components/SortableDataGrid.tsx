@@ -415,7 +415,7 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
             column.name
           )}
           {activeFilter && (
-            <FilterIcon color="var(--focus-8)" style={{ minWidth: '1rem', height: '1rem' }} />
+            <FilterIcon color="var(--focus-11)" style={{ minWidth: '1rem', height: '1rem' }} />
           )}
         </Flex>
         {sortDirection && (

@@ -69,6 +69,7 @@ export class HomeBox {
 export class HomeData {
   static BOX_ROWS = BOX_ROWS
   static BOX_COLUMNS = BOX_COLUMNS
+  static SLOTS_PER_BOX = SLOTS_PER_BOX
 
   boxRows = HomeData.BOX_ROWS
   boxColumns = HomeData.BOX_COLUMNS
@@ -217,12 +218,16 @@ export class HomeData {
     return R.Ok(null)
   }
 
-  addBoxCurrentBank(location: AddBoxLocation): Result<null, string> {
+  addBoxCurrentBank(
+    location: AddBoxLocation,
+    boxName?: string,
+    identifiers?: BoxMonIdentifiers
+  ): Result<null, string> {
     const newBox = new HomeBox({
       id: UuidV4(),
-      name: null,
+      name: boxName ?? null,
       index: this.boxes.length,
-      identifiers: new Map(),
+      identifiers: identifiers ?? new Map(),
     })
 
     if (location === 'start') {

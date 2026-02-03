@@ -2,7 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { AddBoxLocation, HomeData } from '@openhome-core/save/HomeData'
 import { SAV } from '@openhome-core/save/interfaces'
-import { StoredBankData } from '@openhome-core/save/util/storage'
+import { BoxMonIdentifiers, StoredBankData } from '@openhome-core/save/util/storage'
 import { Option } from '@openhome-core/util/functional'
 import { OriginGame } from '@pkm-rs/pkg'
 import { createContext, Dispatch, Reducer } from 'react'
@@ -114,7 +114,12 @@ export type OpenSavesAction =
     }
   | {
       type: 'add_home_box'
-      payload: { location: AddBoxLocation; currentBoxCount: number }
+      payload: {
+        location: AddBoxLocation
+        currentBoxCount: number
+        boxName?: string
+        identifiers?: BoxMonIdentifiers
+      }
     }
   | {
       type: 'delete_home_box'
@@ -267,7 +272,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
         return { ...state }
       }
 
-      newState.homeData.addBoxCurrentBank(payload.location)
+      newState.homeData.addBoxCurrentBank(payload.location, payload.boxName, payload.identifiers)
 
       return newState
     }
@@ -367,7 +372,7 @@ export const SavesContext = createContext<SavesContextValue>({
   openSavesState: initialState,
   openSavesDispatch: () => {},
   allOpenSaves: [],
-  promptDisambiguation: async () => {},
+  promptDisambiguation: async () => undefined,
 })
 
 export function saveFromIdentifier(state: OpenSavesState, identifier: SaveIdentifier): Option<SAV> {

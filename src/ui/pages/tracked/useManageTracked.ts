@@ -28,9 +28,11 @@ import { BackendContext } from '../../backend/backendContext'
 import useDisplayError from '../../hooks/displayError'
 import { AppInfoContext } from '../../state/appInfo'
 import { useOhpkmStore } from '../../state/ohpkm'
+import { useSaves } from '../../state/saves'
 
 export function useManageTracked() {
   const ohpkmStore = useOhpkmStore()
+  const { homeData } = useSaves()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
@@ -128,7 +130,10 @@ export function useManageTracked() {
     }
 
     const allStoredById = ohpkmStore.byId
-    const totalMons = Object.keys(allStoredById).length
+    const allStoredIdsNotInBoxes = new Set(
+      Object.keys(allStoredById).filter((id) => homeData.findIfPresent(id) === undefined)
+    )
+    const totalMons = allStoredIdsNotInBoxes.size
     let foundMonIds = new Set<string>()
 
     const saveRefs = result.value
@@ -163,7 +168,12 @@ export function useManageTracked() {
       const save = result.value
       for (const saveMon of save.boxes.flatMap((b) => b.boxSlots).filter(filterUndefined)) {
         const saveMonId = getMonFileIdentifier(saveMon)
-        if (saveMonId === undefined || foundMonIds.has(saveMonId)) continue
+        if (
+          saveMonId === undefined ||
+          foundMonIds.has(saveMonId) ||
+          !allStoredIdsNotInBoxes.has(saveMonId)
+        )
+          continue
 
         const trackedMon = allStoredById[saveMonId]
         if (trackedMon) {
@@ -174,8 +184,15 @@ export function useManageTracked() {
       }
     }
 
-    setState({ type: 'complete', foundMons: foundMonIds.size, totalMons })
-  }, [backend, displayError, enabledSaveTypes, ohpkmStore])
+    const allMissingIdsNotInBoxes = Array.from(allStoredIdsNotInBoxes.difference(foundMonIds))
+
+    setState({
+      type: 'complete',
+      foundMons: foundMonIds.size,
+      totalMons,
+      missingMonIds: allMissingIdsNotInBoxes,
+    })
+  }, [backend, displayError, enabledSaveTypes, homeData, ohpkmStore])
 
   return {
     findSaveForMon,
@@ -205,7 +222,7 @@ export type FindingSavesForAllState =
       foundMons: number
       totalMons: number
     }
-  | { type: 'complete'; foundMons: number; totalMons: number }
+  | { type: 'complete'; foundMons: number; totalMons: number; missingMonIds: OhpkmIdentifier[] }
   | { type: 'error'; error: string }
 
 function monPossiblySupported(dexNumber: number, formeNumber: number, saveRef: SaveRef) {

@@ -77,7 +77,7 @@ export default function AllTrackedPokemon({
       actions.push(
         SeparatorBuilder,
         LabelBuilder.fromLabel(`For All Tracked`),
-        ItemBuilder.fromLabel('Find Recent Saves For All').withAction(findSavesForAllMons)
+        ItemBuilder.fromLabel('Recover Missing Pokémon...').withAction(findSavesForAllMons)
       )
       return actions
     },
