@@ -85,7 +85,7 @@ interface FindingSaveDialogProps {
 function FindingSaveDialog(props: FindingSaveDialogProps) {
   const { state, onClose } = props
   const summary = stateSummary(state)
-  const summaryNode = typeof summary === 'string' ? <h3>{summary}</h3> : summary
+  const summaryNode = typeof summary === 'string' ? <h4>{summary}</h4> : summary
   return (
     <Dialog.Root open={Boolean(state)} onOpenChange={(o) => !o && onClose()}>
       <Dialog.Content>
@@ -96,7 +96,7 @@ function FindingSaveDialog(props: FindingSaveDialogProps) {
               <Separator />
             </Inset>
           </Dialog.Title>
-          <Flex direction="column" gap="3" style={{ flex: 1 }}>
+          <Flex className="findind-save-dialog-body" direction="column" gap="3">
             {summaryNode}
             <DialogBody state={state} onClose={onClose} />
           </Flex>
@@ -244,9 +244,9 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
     case 'checking_save':
       const foundPercent = Math.round((state.foundMons / state.totalMons) * 100)
       return (
-        <div style={{ minHeight: '15rem ' }}>
+        <Flex direction="column" gap="2">
           <Flex gap="1" align="center">
-            <p className="fixed-width-label">Checking:</p>
+            <p className="fixed-width-label">Game:</p>
             <OriginGameIndicator
               originGame={state.currentSaveRef.game}
               plugin={state.currentSaveRef.pluginIdentifier}
@@ -260,11 +260,11 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
           <p>
             {state.foundMons} Pokémon found in saves so far ({foundPercent}%)
           </p>
-        </div>
+        </Flex>
       )
     case 'complete':
       return (
-        <Flex direction="column" flexGrow="1">
+        <Flex direction="column" flexGrow="1" gap="2">
           <p>
             {state.foundMons} / {state.totalMons} processed Pokémon were found
           </p>
