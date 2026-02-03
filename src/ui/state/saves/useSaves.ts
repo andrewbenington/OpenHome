@@ -3,7 +3,7 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getSortFunctionNullable } from '@openhome-core/pkm/sort'
 import { AddBoxLocation, HomeData } from '@openhome-core/save/HomeData'
-import { Box, getSaveRef, SAV } from '@openhome-core/save/interfaces'
+import { Box, getSaveRef, SAV, SaveIdentifier } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
@@ -23,7 +23,6 @@ import {
   MonLocation,
   MonWithLocation,
   OpenSavesState,
-  SaveIdentifier,
   SaveMonLocation,
   SavesContext,
 } from './reducer'
