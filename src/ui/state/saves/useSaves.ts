@@ -719,12 +719,14 @@ export function useSaves(): SavesAndBanksManager {
 
   const releaseMonById = useCallback(
     (id: OhpkmIdentifier) => {
-      openSavesDispatch({
-        type: 'add_mon_to_release',
-        payload: id,
-      })
+      openSavesDispatch({ type: 'release_mon_by_id', payload: id })
+      const location = loadedHomeData.findIfPresent(id)
+      if (location) {
+        loadedHomeData.setPokemon(location, undefined)
+        openSavesDispatch({ type: 'set_home_data', payload: loadedHomeData.clone() })
+      }
     },
-    [openSavesDispatch]
+    [loadedHomeData, openSavesDispatch]
   )
 
   const releaseMonAtLocation = useCallback(
@@ -734,7 +736,7 @@ export function useSaves(): SavesAndBanksManager {
         if (!identifier) return // slot is empty
 
         openSavesDispatch({
-          type: 'add_mon_to_release',
+          type: 'release_mon_by_id',
           payload: identifier,
         })
       } else {
@@ -742,7 +744,7 @@ export function useSaves(): SavesAndBanksManager {
         if (!releasedMon) return
 
         openSavesDispatch({
-          type: 'add_mon_to_release',
+          type: 'release_mon_by_id',
           payload: ohpkmStore.getIdIfTracked(releasedMon) ?? releasedMon,
         })
       }

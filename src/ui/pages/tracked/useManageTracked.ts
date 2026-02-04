@@ -15,7 +15,14 @@ import {
   USUM_TRANSFER_RESTRICTIONS,
 } from '../../../../packages/pokemon-resources/src/consts/TransferRestrictions'
 import { PKMInterface } from '../../../core/pkm/interfaces'
-import { getMonFileIdentifier, OhpkmIdentifier } from '../../../core/pkm/Lookup'
+import {
+  Gen12Identifier,
+  Gen345Identifier,
+  getMonFileIdentifier,
+  getMonGen12Identifier,
+  getMonGen345Identifier,
+  OhpkmIdentifier,
+} from '../../../core/pkm/Lookup'
 import { BoxAndSlot, SAV } from '../../../core/save/interfaces'
 import { RR_TRANSFER_RESTRICTIONS } from '../../../core/save/radicalred/G3RRSAV'
 import { UB_TRANSFER_RESTRICTIONS } from '../../../core/save/unbound/G3UBSAV'
@@ -27,6 +34,7 @@ import { SaveRef } from '../../../core/util/types'
 import { BackendContext } from '../../backend/backendContext'
 import useDisplayError from '../../hooks/displayError'
 import { AppInfoContext } from '../../state/appInfo'
+import { useLookups } from '../../state/lookups'
 import { useOhpkmStore } from '../../state/ohpkm'
 import { useSaves } from '../../state/saves'
 
@@ -34,6 +42,7 @@ export function useManageTracked() {
   const ohpkmStore = useOhpkmStore()
   const { homeData } = useSaves()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
+  const { lookups } = useLookups()
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
   const [findingSaveState, setFindingSaveState] = useState<FindingSavesState>()
@@ -97,7 +106,26 @@ export function useManageTracked() {
           continue
         }
 
-        const searchResult = searchSaveForMon(saveFile.value, identifier)
+        let searchResult: Option<SaveSearchResult>
+
+        switch (saveFile.value.lookupType) {
+          case 'gen12': {
+            const g12Identifier = reverseLookup(lookups.gen12, identifier)
+            if (!g12Identifier) continue
+            searchResult = searchSaveForMonGen12(saveFile.value, g12Identifier)
+            break
+          }
+          case 'gen345': {
+            const g345Identifier = reverseLookup(lookups.gen345, identifier)
+            if (!g345Identifier) continue
+            searchResult = searchSaveForMonGen345(saveFile.value, g345Identifier)
+            break
+          }
+          default: {
+            searchResult = searchSaveForMon(saveFile.value, identifier)
+          }
+        }
+
         if (!searchResult) {
           continue
         }
@@ -115,7 +143,7 @@ export function useManageTracked() {
 
       setState({ type: 'not_found', id: identifier })
     },
-    [backend, displayError, enabledSaveTypes, ohpkmStore]
+    [backend, displayError, enabledSaveTypes, lookups.gen12, lookups.gen345, ohpkmStore]
   )
 
   const findSavesForAllMons = useCallback(async () => {
@@ -168,13 +196,39 @@ export function useManageTracked() {
 
       const save = result.value
       for (const saveMon of save.boxes.flatMap((b) => b.boxSlots).filter(filterUndefined)) {
-        const saveMonId = getMonFileIdentifier(saveMon)
+        let saveMonId: Option<OhpkmIdentifier> = undefined
+
+        switch (save.lookupType) {
+          case 'gen12': {
+            const gen12Id = getMonGen12Identifier(saveMon)
+            if (gen12Id && lookups.gen12[gen12Id]) {
+              saveMonId = lookups.gen12[gen12Id]
+            } else {
+              saveMonId = getMonFileIdentifier(saveMon)
+            }
+            break
+          }
+          case 'gen345': {
+            const gen345Id = getMonGen345Identifier(saveMon)
+            if (gen345Id && lookups.gen345[gen345Id]) {
+              saveMonId = lookups.gen345[gen345Id]
+            } else {
+              saveMonId = getMonFileIdentifier(saveMon)
+            }
+            break
+          }
+          default: {
+            saveMonId = getMonFileIdentifier(saveMon)
+          }
+        }
+
         if (
           saveMonId === undefined ||
           foundMonIds.has(saveMonId) ||
           !allStoredIdsNotInBoxes.has(saveMonId)
-        )
+        ) {
           continue
+        }
 
         const trackedMon = allStoredById[saveMonId]
         if (trackedMon) {
@@ -193,7 +247,7 @@ export function useManageTracked() {
       totalMons,
       missingMonIds: allMissingIdsNotInBoxes,
     })
-  }, [backend, displayError, enabledSaveTypes, homeData, ohpkmStore])
+  }, [backend, displayError, enabledSaveTypes, homeData, lookups.gen12, lookups.gen345, ohpkmStore])
 
   return {
     findSaveForMon,
@@ -283,6 +337,40 @@ function searchSaveForMon(save: SAV, id: OhpkmIdentifier): Option<SaveSearchResu
       }
     }
   }
+}
+
+function searchSaveForMonGen12(save: SAV, id: Gen12Identifier): Option<SaveSearchResult> {
+  for (const boxIndex of range(save.boxes.length)) {
+    const box = save.boxes[boxIndex]
+    for (const boxSlot of range(box.boxSlots.length)) {
+      const mon = box.boxSlots[boxSlot]
+      if (mon && getMonGen12Identifier(mon) === id) {
+        return {
+          match: mon,
+          location: { box: boxIndex, boxSlot },
+        }
+      }
+    }
+  }
+}
+
+function searchSaveForMonGen345(save: SAV, id: Gen345Identifier): Option<SaveSearchResult> {
+  for (const boxIndex of range(save.boxes.length)) {
+    const box = save.boxes[boxIndex]
+    for (const boxSlot of range(box.boxSlots.length)) {
+      const mon = box.boxSlots[boxSlot]
+      if (mon && getMonGen345Identifier(mon) === id) {
+        return {
+          match: mon,
+          location: { box: boxIndex, boxSlot },
+        }
+      }
+    }
+  }
+}
+
+function reverseLookup(lookup: Record<string, string>, value: string): Option<string> {
+  return Object.entries(lookup).find(([_k, v]) => value === v)?.[0]
 }
 
 type SaveSearchResult = {

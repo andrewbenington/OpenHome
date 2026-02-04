@@ -1,7 +1,9 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import { Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
+import { LookupType, SAVClass } from './util'
 import { PathData } from './util/path'
 
 type SparseArray<T> = (T | undefined)[]
@@ -128,6 +130,10 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   get identifier(): SaveIdentifier {
     return saveToStringIdentifier(this)
   }
+
+  get lookupType(): Option<LookupType> {
+    return (this.constructor as SAVClass).lookupType
+  }
 }
 
 export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
@@ -189,6 +195,10 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   get identifier(): SaveIdentifier {
     return saveToStringIdentifier(this)
+  }
+
+  get lookupType(): Option<LookupType> {
+    return (this.constructor as SAVClass).lookupType
   }
 }
 

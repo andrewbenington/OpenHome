@@ -137,7 +137,7 @@ export type OpenSavesAction =
    *  POKEMON
    */
   | {
-      type: 'add_mon_to_release'
+      type: 'release_mon_by_id'
       payload: OhpkmIdentifier | PKMInterface
     }
   | {
@@ -314,7 +314,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       return newState
     }
-    case 'add_mon_to_release': {
+    case 'release_mon_by_id': {
       if (!state.monsToRelease.includes(action.payload)) {
         state.monsToRelease.push(action.payload)
       }
