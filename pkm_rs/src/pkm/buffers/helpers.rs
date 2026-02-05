@@ -1,12 +1,15 @@
-use std::ops::Deref;
+use std::ops::{Deref, DerefMut};
 
-use crate::util;
+use crate::{
+    pkm::fields::{InfallibleField, ValidatedField},
+    util,
+};
 
 pub struct PkmBuffer<'a, const N: usize>(&'a mut [u8]);
 
 impl<'a, const N: usize> PkmBuffer<'a, N> {
     pub const fn from_slice(slice: &'a mut [u8]) -> Option<Self> {
-        if slice.len() <= N {
+        if slice.len() < N {
             return None;
         }
 
@@ -48,12 +51,26 @@ impl<'a, const N: usize> PkmBuffer<'a, N> {
     pub fn get_flag(&self, byte_offset: usize, bit_offset: usize) -> bool {
         util::get_flag(self, byte_offset, bit_offset)
     }
+
+    pub fn read_field<F: InfallibleField>(&self, offset: usize) -> F::DataType {
+        F::from_bytes(self.0, offset)
+    }
+
+    pub fn try_read_field<F: ValidatedField>(&self, offset: usize) -> Result<F::DataType, F::Err> {
+        F::try_from_bytes(self.0, offset)
+    }
 }
 
 impl<'a, const N: usize> Deref for PkmBuffer<'a, N> {
     type Target = [u8];
 
     fn deref(&self) -> &Self::Target {
+        self.0
+    }
+}
+
+impl<'a, const N: usize> DerefMut for PkmBuffer<'a, N> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
         self.0
     }
 }

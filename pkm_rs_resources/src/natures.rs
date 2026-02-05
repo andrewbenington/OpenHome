@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -9,7 +11,37 @@ use crate::{Error, stats::Stat};
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
 pub struct NatureIndex(u8);
 
+pub struct InvalidNatureIndex(u8);
+
+impl InvalidNatureIndex {
+    pub const fn index(&self) -> u8 {
+        self.0
+    }
+}
+
+impl Display for InvalidNatureIndex {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "invalid nature index: {}", self.0)
+    }
+}
+
 impl NatureIndex {
+    pub const fn new_or_default(val: u8) -> NatureIndex {
+        if val > NATURE_MAX {
+            NatureIndex(SERIOUS_INDEX)
+        } else {
+            NatureIndex(val)
+        }
+    }
+
+    pub const fn try_from_byte(val: u8) -> Result<Self, InvalidNatureIndex> {
+        if val > NATURE_MAX {
+            Ok(Self(val))
+        } else {
+            Err(InvalidNatureIndex(val))
+        }
+    }
+
     pub fn get_metadata(&self) -> &'static NatureMetadata {
         ALL_NATURES
             .get(self.0 as usize)
@@ -33,11 +65,7 @@ impl NatureIndex {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(constructor))]
     pub fn new_js(val: u8) -> NatureIndex {
-        if val > NATURE_MAX {
-            NatureIndex(SERIOUS_INDEX)
-        } else {
-            NatureIndex(val)
-        }
+        Self::new_or_default(val)
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "newFromPid"))]

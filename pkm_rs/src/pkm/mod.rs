@@ -8,6 +8,7 @@ mod result;
 mod universal;
 
 pub mod buffers;
+pub mod fields;
 pub mod ohpkm;
 pub mod traits;
 

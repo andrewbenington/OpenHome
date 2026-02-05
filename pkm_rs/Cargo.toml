@@ -22,6 +22,7 @@ phf = { version = "0.13.1", features = ["macros"] }
 strum = "0.27.2"
 strum_macros = "0.27.2"
 console_error_panic_hook = "0.1.7"
+bytes = "1.11.1"
 
 [lib]
 name = "pkm_rs"

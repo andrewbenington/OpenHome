@@ -1,6 +1,10 @@
 use crate::{
-    encryption,
-    pkm::{Error, Result, buffers::helpers::PkmBuffer},
+    encryption, has_fields_at, has_infallible_fields_at,
+    pkm::{
+        Error, Result,
+        buffers::helpers::PkmBuffer,
+        fields::{self, BytesWrapper, Has, HasInfallible, InfallibleField, ValidatedField},
+    },
     strings::SizedUtf16String,
     util,
 };
@@ -16,8 +20,12 @@ pub struct Pk7BoxBuffer<'a> {
 }
 
 impl<'a> Pk7BoxBuffer<'a> {
-    fn get_encryption_constant(&self) -> u32 {
-        self.buffer.read_u32_le(0)
+    // fn get_encryption_constant(&self) -> u32 {
+    //     self.read<fields::EncryptionConstant()
+    // }
+
+    pub fn wrap(bytes: &'a mut [u8]) -> Option<Self> {
+        PkmBuffer::from_slice(bytes).map(|buffer| Self { buffer })
     }
 
     fn set_encryption_constant(&mut self, value: u32) {
@@ -161,5 +169,86 @@ impl<'a> Pk7BoxBuffer<'a> {
             self.buffer[100],
             self.buffer[101],
         ]
+    }
+
+    fn get_field<F: InfallibleField>(&self) -> F::DataType
+    where
+        Self: HasInfallible<F>,
+    {
+        HasInfallible::<F>::read(self)
+    }
+
+    fn try_get_field<F: ValidatedField>(&self) -> core::result::Result<F::DataType, F::Err>
+    where
+        Self: Has<F>,
+    {
+        Has::<F>::read(self)
+    }
+}
+
+impl<'a> BytesWrapper for Pk7BoxBuffer<'a> {
+    fn get_bytes(&self) -> &[u8] {
+        &self.buffer
+    }
+
+    fn get_bytes_mut(&mut self) -> &mut [u8] {
+        &mut self.buffer
+    }
+}
+
+has_infallible_fields_at!(Pk7BoxBuffer, {
+    fields::EncryptionConstant => 0,
+    fields::TrainerId => 12,
+    fields::SecretId => 14,
+    fields::NicknameUtf16 => 64,
+});
+
+#[cfg(test)]
+mod tests {
+    use std::fs::File;
+    use std::io::Read;
+
+    use crate::pkm::buffers::Pk7BoxBuffer;
+    use crate::pkm::fields::{EncryptionConstant, SecretId, TrainerId};
+
+    macro_rules! assert_validated_fields {
+        ($buffer:expr, { $($field:ty => $expected:expr),+ $(,)? }) => {
+            $(
+                assert_eq!(
+                    $buffer.try_get_field::<$field>().unwrap(),
+                    $expected,
+                    concat!("incorrect ", stringify!($field))
+                );
+            )+
+        };
+    }
+
+    macro_rules! assert_infallible_fields {
+        ($buffer:expr, { $($field:ty => $expected:expr),+ $(,)? }) => {
+            $(
+                assert_eq!(
+                    $buffer.get_field::<$field>(),
+                    $expected,
+                    concat!("incorrect ", stringify!($field))
+                );
+            )+
+        };
+    }
+
+    #[test]
+    fn test_seventh_byte_is_16() {
+        let mut file = File::open("pkm_files/pk7/slowpoke-shiny.pk7").expect("Failed to open file");
+        let mut buffer = Vec::new();
+        file.read_to_end(&mut buffer).expect("Failed to read file");
+
+        assert!(buffer.len() >= 232, "File too short");
+
+        let pk7_buffer = Pk7BoxBuffer::wrap(&mut buffer).expect("failed to wrap buffer");
+
+        assert_infallible_fields!(pk7_buffer, {
+            EncryptionConstant => 1494274589,
+            TrainerId => 11558,
+            SecretId => 27351,
+        });
     }
 }

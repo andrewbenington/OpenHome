@@ -2,7 +2,7 @@ use crate::pkm::ohpkm::sectioned_data;
 
 use std::fmt::{Display};
 use std::string::FromUtf8Error;
-use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
+use pkm_rs_resources::species::{InvalidSpeciesForme, NatDexIndex, SpeciesAndForme};
 use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, language::LANGUAGE_MAX, items::ITEM_MAX};
 use serde::{Serialize, Serializer};
 #[cfg(feature = "wasm")]
@@ -28,8 +28,7 @@ pub enum Error {
         buffer_size: usize,
     },
     NationalDex {
-        value: u16,
-        source: NdexConvertSource,
+        value: u16
     },
 
     /// Indicates that the given SpeciesAndForme does not exist
@@ -114,8 +113,8 @@ impl Display for Error {
                 format!("Attempting to decrypt/encrypt range ({}, {}) over buffer of size {buffer_size}", range.0, range.1)
                     .to_owned()
             }
-            Error::NationalDex { value: national_dex , source} => {
-                format!("Invalid National Dex number {national_dex} (source: {source}; must be between 1 and {MAX_NATIONAL_DEX}")
+            Error::NationalDex { value: national_dex } => {
+                format!("Invalid National Dex number {national_dex}; must be between 1 and {MAX_NATIONAL_DEX}")
                     .to_owned()
             }
 
@@ -188,7 +187,7 @@ impl From<pkm_rs_resources::Error> for Error {
         match value {
             pkm_rs_resources::Error::BufferSize { requirement_source, expected, received } => Self::BufferSize { requirement_source: Some(requirement_source), expected, received },
             pkm_rs_resources::Error::CryptRange { range, buffer_size } => Self::CryptRange { range, buffer_size },
-            pkm_rs_resources::Error::NationalDex { national_dex } => Self::NationalDex { value: national_dex, source: NdexConvertSource::Other },
+            pkm_rs_resources::Error::NationalDex { national_dex } => Self::NationalDex { value: national_dex },
             pkm_rs_resources::Error::FormeIndex { national_dex, forme_index } => Self::FormeIndex { national_dex, forme_index },
             pkm_rs_resources::Error::LanguageIndex { language_index } => Self::LanguageIndex { language_index },
             pkm_rs_resources::Error::NatureIndex { nature_index } => Self::NatureIndex { nature_index },
@@ -208,6 +207,15 @@ impl From<sectioned_data::Error> for Error {
                 expected: (offset+length) as usize, 
                 received: buffer_size 
             },
+        }
+    }
+}
+
+impl From<InvalidSpeciesForme> for Error {
+    fn from(value: InvalidSpeciesForme) -> Self {
+        match value {
+            InvalidSpeciesForme::NatDex(invalid) => Self::NationalDex { value: invalid.index() },
+            InvalidSpeciesForme::FormeIndex(national_dex, forme_index) => Self::FormeIndex { national_dex, forme_index },
         }
     }
 }

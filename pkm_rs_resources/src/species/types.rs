@@ -1,4 +1,4 @@
-use std::num::NonZeroU16;
+use std::{fmt::Display, num::NonZeroU16};
 use strum_macros::{Display, EnumString};
 
 use crate::{Error, Result, abilities::AbilityIndex, species::ALL_SPECIES};
@@ -20,18 +20,28 @@ pub const MAX_NATIONAL_DEX: usize = 1025;
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct NatDexIndex(NonZeroU16);
 
+pub struct InvalidNatDexIndex(u16);
+
+impl InvalidNatDexIndex {
+    pub const fn index(&self) -> u16 {
+        self.0
+    }
+}
+
+impl Display for InvalidNatDexIndex {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "invalid national dex index: {}", self.0)
+    }
+}
+
 impl NatDexIndex {
-    pub fn new(index: u16) -> Result<NatDexIndex> {
+    pub fn new(index: u16) -> core::result::Result<Self, InvalidNatDexIndex> {
         if (index as usize) > MAX_NATIONAL_DEX {
-            return Err(Error::NationalDex {
-                national_dex: index,
-            });
+            return Err(InvalidNatDexIndex(index));
         }
         NonZeroU16::new(index)
             .map(NatDexIndex)
-            .ok_or(Error::NationalDex {
-                national_dex: index,
-            })
+            .ok_or(InvalidNatDexIndex(index))
     }
 
     pub const fn get_species_metadata(&self) -> &'static SpeciesMetadata {
@@ -50,7 +60,7 @@ impl NatDexIndex {
         self.0.get()
     }
 
-    pub fn from_le_bytes(bytes: [u8; 2]) -> Result<NatDexIndex> {
+    pub fn from_le_bytes(bytes: [u8; 2]) -> core::result::Result<Self, InvalidNatDexIndex> {
         NatDexIndex::new(u16::from_le_bytes(bytes))
     }
 
@@ -620,6 +630,26 @@ impl SpeciesMetadata {
     }
 }
 
+pub enum InvalidSpeciesForme {
+    NatDex(InvalidNatDexIndex),
+    FormeIndex(NatDexIndex, u16),
+}
+
+impl Display for InvalidSpeciesForme {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::NatDex(err) => err.fmt(f),
+            Self::FormeIndex(nat_dex, invalid_forme_idx) => {
+                write!(
+                    f,
+                    "forme index {invalid_forme_idx} invalid for national dex index {}",
+                    nat_dex.0
+                )
+            }
+        }
+    }
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize)]
 pub struct SpeciesAndForme {
@@ -628,14 +658,14 @@ pub struct SpeciesAndForme {
 }
 
 impl SpeciesAndForme {
-    pub fn new(national_dex: u16, forme_index: u16) -> Result<SpeciesAndForme> {
-        let valid_ndex = NatDexIndex::new(national_dex)?;
+    pub fn new(
+        national_dex: u16,
+        forme_index: u16,
+    ) -> core::result::Result<Self, InvalidSpeciesForme> {
+        let valid_ndex = NatDexIndex::new(national_dex).map_err(InvalidSpeciesForme::NatDex)?;
 
         if valid_ndex.get_species_metadata().formes.len() <= forme_index as usize {
-            return Err(Error::FormeIndex {
-                national_dex: valid_ndex,
-                forme_index,
-            });
+            return Err(InvalidSpeciesForme::FormeIndex(valid_ndex, forme_index));
         }
 
         Ok(SpeciesAndForme {
