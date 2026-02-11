@@ -74,6 +74,9 @@ impl Gender {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub struct InvalidGender(u8);
+
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderToBool))]
 pub fn gender_to_bool(value: Gender) -> bool {
     value == Gender::Female

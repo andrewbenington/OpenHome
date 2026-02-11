@@ -171,14 +171,14 @@ impl<'a> Pk7BoxBuffer<'a> {
         ]
     }
 
-    fn get_field<F: InfallibleField>(&self) -> F::DataType
+    fn get_field<F: InfallibleField>(&self) -> F::Repr
     where
         Self: HasInfallible<F>,
     {
         HasInfallible::<F>::read(self)
     }
 
-    fn try_get_field<F: ValidatedField>(&self) -> core::result::Result<F::DataType, F::Err>
+    fn try_get_field<F: ValidatedField>(&self) -> core::result::Result<F::Repr, F::Err>
     where
         Self: Has<F>,
     {

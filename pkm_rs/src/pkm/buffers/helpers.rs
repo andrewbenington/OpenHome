@@ -52,11 +52,11 @@ impl<'a, const N: usize> PkmBuffer<'a, N> {
         util::get_flag(self, byte_offset, bit_offset)
     }
 
-    pub fn read_field<F: InfallibleField>(&self, offset: usize) -> F::DataType {
+    pub fn read_field<F: InfallibleField>(&self, offset: usize) -> F::Repr {
         F::from_bytes(self.0, offset)
     }
 
-    pub fn try_read_field<F: ValidatedField>(&self, offset: usize) -> Result<F::DataType, F::Err> {
+    pub fn try_read_field<F: ValidatedField>(&self, offset: usize) -> Result<F::Repr, F::Err> {
         F::try_from_bytes(self.0, offset)
     }
 }

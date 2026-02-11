@@ -6,7 +6,8 @@ use pkm_rs_resources::{
     natures::{InvalidNatureIndex, NatureIndex},
     species::{InvalidNatDexIndex, NatDexIndex},
 };
-use pkm_rs_types::strings::SizedUtf16String;
+use pkm_rs_types::{BitSet, Gender, strings::SizedUtf16String};
+use sha2::digest::typenum::Bit;
 
 pub trait ByteSerializable<E = Infallible>: Sized {
     fn try_from_bytes_at(bytes: &[u8], offset: usize) -> Result<Self, E>;
@@ -107,5 +108,91 @@ impl<const N: usize> ByteSerializableAlways for SizedUtf16String<N> {
 
     fn to_bytes_at(&self, bytes: &mut [u8], offset: usize) {
         bytes[offset..offset + N].copy_from_slice(self);
+    }
+}
+
+impl<const N: usize> ByteSerializableAlways for [u8; N] {
+    fn from_bytes_at(bytes: &[u8], offset: usize) -> Self {
+        bytes[offset..offset + N].try_into().unwrap()
+    }
+
+    fn to_bytes_at(&self, bytes: &mut [u8], offset: usize) {
+        bytes[offset..offset + N].copy_from_slice(self);
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub struct BitFlag<const POSITION: u8>(bool);
+
+impl<const POSITION: u8> BitFlag<POSITION> {
+    pub fn new(value: bool) -> Self {
+        assert!(POSITION < 8);
+        Self(value)
+    }
+
+    pub const fn is_set(&self) -> bool {
+        self.0
+    }
+}
+
+impl<const POSITION: u8> ByteSerializableAlways for BitFlag<POSITION> {
+    fn from_bytes_at(bytes: &[u8], offset: usize) -> Self {
+        Self(bytes[offset] & POSITION == 1)
+    }
+
+    fn to_bytes_at(&self, bytes: &mut [u8], offset: usize) {
+        bytes[offset].set_bit(POSITION, self.0);
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub struct TwoBits<const BIT_OFFSET: u8>(u8);
+
+impl<const BIT_OFFSET: u8> TwoBits<BIT_OFFSET> {
+    pub fn new(value: u8) -> Self {
+        assert!(BIT_OFFSET < 7);
+        Self((value >> BIT_OFFSET) & 0b11)
+    }
+
+    pub const fn value(&self) -> u8 {
+        self.0
+    }
+}
+
+impl<const BIT_OFFSET: u8> ByteSerializableAlways for TwoBits<BIT_OFFSET> {
+    fn from_bytes_at(bytes: &[u8], offset: usize) -> Self {
+        Self(((bytes[offset] & BIT_OFFSET) << 1) + (bytes[offset] & (BIT_OFFSET + 1)))
+    }
+
+    fn to_bytes_at(&self, bytes: &mut [u8], offset: usize) {
+        bytes[offset].set_bit(BIT_OFFSET, self.0 & 0b10 == 0b10);
+        bytes[offset].set_bit(BIT_OFFSET + 1, self.0 & 1 == 1);
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub struct GenderTwoBits<const BIT_OFFSET: u8>(TwoBits<BIT_OFFSET>);
+
+impl<const BIT_OFFSET: u8> ByteSerializable for GenderTwoBits<BIT_OFFSET> {
+    fn try_from_bytes_at(bytes: &[u8], offset: usize) -> Result<Self, Infallible> {
+        TwoBits::<BIT_OFFSET>::try_from_bytes_at(bytes, offset).map(Self)
+    }
+
+    fn to_bytes_at(&self, bytes: &mut [u8], offset: usize) {
+        ByteSerializableAlways::to_bytes_at(&self.0, bytes, offset);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::pkm::fields::byte_serializable::TwoBits;
+
+    #[test]
+    fn two_bits_read() {
+        let source = 0b01010101;
+        assert_eq!(TwoBits::<0>::new(source).value(), 0b01);
+        assert_eq!(TwoBits::<1>::new(source).value(), 0b10);
+        assert_eq!(TwoBits::<3>::new(source).value(), 0b10);
+        assert_eq!(TwoBits::<6>::new(source).value(), 0b01);
     }
 }

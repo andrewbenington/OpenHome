@@ -2,20 +2,20 @@ use crate::pkm::fields::byte_serializable::{ByteSerializable, ByteSerializableAl
 
 pub trait ValidatedField {
     type Err;
-    type DataType: ByteSerializable<Self::Err>;
+    type Repr: ByteSerializable<Self::Err>;
 
-    fn try_from_bytes(bytes: &[u8], offset: usize) -> Result<Self::DataType, Self::Err> {
-        Self::DataType::try_from_bytes_at(bytes, offset)
+    fn try_from_bytes(bytes: &[u8], offset: usize) -> Result<Self::Repr, Self::Err> {
+        Self::Repr::try_from_bytes_at(bytes, offset)
     }
 
     fn name() -> &'static str;
 }
 
 pub trait InfallibleField {
-    type DataType: ByteSerializableAlways;
+    type Repr: ByteSerializableAlways;
 
-    fn from_bytes(bytes: &[u8], offset: usize) -> Self::DataType {
-        Self::DataType::from_bytes_at(bytes, offset)
+    fn from_bytes(bytes: &[u8], offset: usize) -> Self::Repr {
+        Self::Repr::from_bytes_at(bytes, offset)
     }
 
     fn name() -> &'static str;
@@ -29,7 +29,7 @@ pub trait ByteReaderWriter {
 pub trait Has<F: ValidatedField>: ByteReaderWriter {
     const OFFSET: usize;
 
-    fn read(&self) -> Result<F::DataType, F::Err> {
+    fn read(&self) -> Result<F::Repr, F::Err> {
         F::try_from_bytes(self.get_bytes(), Self::OFFSET)
     }
 }
@@ -37,7 +37,7 @@ pub trait Has<F: ValidatedField>: ByteReaderWriter {
 pub trait HasInfallible<F: InfallibleField>: ByteReaderWriter {
     const OFFSET: usize;
 
-    fn read(&self) -> F::DataType {
+    fn read(&self) -> F::Repr {
         F::from_bytes(self.get_bytes(), Self::OFFSET)
     }
 }

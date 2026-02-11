@@ -118,7 +118,7 @@ impl From<MarkingsSixShapesColors> for MarkingsSixShapes {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Clone, Copy)]
 pub enum MarkingValue {
     #[default]
     Unset,
@@ -167,7 +167,7 @@ impl MarkingValue {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Clone, Copy)]
 pub struct MarkingsSixShapesColors {
     pub circle: MarkingValue,
     pub square: MarkingValue,
