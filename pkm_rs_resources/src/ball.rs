@@ -1,7 +1,24 @@
+use std::fmt::Display;
+
 use serde::Serialize;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+#[derive(Clone, Copy)]
+pub struct InvalidBallIndex(u8);
+
+impl InvalidBallIndex {
+    pub const fn index(&self) -> u8 {
+        self.0
+    }
+}
+
+impl Display for InvalidBallIndex {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "invalid poké ball index: {}", self.0)
+    }
+}
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -48,7 +65,19 @@ pub enum Ball {
     Origin,
 }
 
+impl Ball {
+    pub fn try_from_byte(val: u8) -> Result<Self, InvalidBallIndex> {
+        match val {
+            MIN_VALID_BALL..=MAX_VALID_BALL => Ok(Ball::from(val)),
+            _ => Err(InvalidBallIndex(val)),
+        }
+    }
+}
+
 pub const BALL_COUNT: usize = 38;
+
+const MIN_VALID_BALL: u8 = Ball::Master as u8;
+const MAX_VALID_BALL: u8 = Ball::Strange as u8;
 
 impl From<u8> for Ball {
     fn from(value: u8) -> Self {

@@ -11,6 +11,7 @@ use crate::{Error, stats::Stat};
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
 pub struct NatureIndex(u8);
 
+#[derive(Clone, Copy)]
 pub struct InvalidNatureIndex(u8);
 
 impl InvalidNatureIndex {

@@ -1,12 +1,12 @@
 use crate::{
-    encryption, has_fields_at, has_infallible_fields_at,
+    encryption, infallible_field_offsets,
     pkm::{
         Error, Result,
         buffers::helpers::PkmBuffer,
-        fields::{self, BytesWrapper, Has, HasInfallible, InfallibleField, ValidatedField},
+        fields::{self, ByteReaderWriter, Has, HasInfallible, InfallibleField, ValidatedField},
     },
     strings::SizedUtf16String,
-    util,
+    util, validated_field_offsets,
 };
 
 use pkm_rs_resources::{
@@ -186,7 +186,7 @@ impl<'a> Pk7BoxBuffer<'a> {
     }
 }
 
-impl<'a> BytesWrapper for Pk7BoxBuffer<'a> {
+impl<'a> ByteReaderWriter for Pk7BoxBuffer<'a> {
     fn get_bytes(&self) -> &[u8] {
         &self.buffer
     }
@@ -196,11 +196,20 @@ impl<'a> BytesWrapper for Pk7BoxBuffer<'a> {
     }
 }
 
-has_infallible_fields_at!(Pk7BoxBuffer, {
+infallible_field_offsets!(Pk7BoxBuffer, {
     fields::EncryptionConstant => 0,
+    fields::Checksum => 6,
+    fields::HeldItemIndex => 10,
     fields::TrainerId => 12,
     fields::SecretId => 14,
+    fields::Experience => 16,
+    fields::AbilityNumber => 21,
     fields::NicknameUtf16 => 64,
+});
+
+validated_field_offsets!(Pk7BoxBuffer, {
+    fields::NationalDex => 8,
+    fields::Ability => 20,
 });
 
 #[cfg(test)]
@@ -208,8 +217,11 @@ mod tests {
     use std::fs::File;
     use std::io::Read;
 
+    use pkm_rs_resources::abilities::AbilityIndex;
+    use pkm_rs_resources::species::NatDexIndex;
+
     use crate::pkm::buffers::Pk7BoxBuffer;
-    use crate::pkm::fields::{EncryptionConstant, SecretId, TrainerId};
+    use crate::pkm::fields::*;
 
     macro_rules! assert_validated_fields {
         ($buffer:expr, { $($field:ty => $expected:expr),+ $(,)? }) => {
@@ -236,7 +248,7 @@ mod tests {
     }
 
     #[test]
-    fn test_seventh_byte_is_16() {
+    fn slowpoke_fields_read_correctly() {
         let mut file = File::open("pkm_files/pk7/slowpoke-shiny.pk7").expect("Failed to open file");
         let mut buffer = Vec::new();
         file.read_to_end(&mut buffer).expect("Failed to read file");
@@ -247,8 +259,17 @@ mod tests {
 
         assert_infallible_fields!(pk7_buffer, {
             EncryptionConstant => 1494274589,
+            Checksum => 39311,
             TrainerId => 11558,
             SecretId => 27351,
+            HeldItemIndex => 0,
+            NicknameUtf16 => "Slowpoke".into(),
+            AbilityNumber => 0,
+        });
+
+        assert_validated_fields!(pk7_buffer, {
+            Ability => AbilityIndex::try_from_index(12).unwrap(),
+            NationalDex => NatDexIndex::new(79).unwrap(),
         });
     }
 }

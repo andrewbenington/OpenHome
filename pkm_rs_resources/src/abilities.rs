@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 use std::num::NonZeroU16;
 
 #[cfg(feature = "wasm")]
@@ -12,12 +12,29 @@ use crate::{Error, Result};
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct AbilityIndex(NonZeroU16);
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub struct InvalidAbilityIndex(u16);
+
+impl InvalidAbilityIndex {
+    pub const fn index(&self) -> u16 {
+        self.0
+    }
+}
+
+impl Display for InvalidAbilityIndex {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "invalid ability index: {}", self.0)
+    }
+}
+
 impl AbilityIndex {
-    pub fn new(index: u16) -> Option<AbilityIndex> {
+    pub fn try_from_index(index: u16) -> core::result::Result<AbilityIndex, InvalidAbilityIndex> {
         if (index as usize) > ALL_ABILITIES.len() {
-            return None;
+            return Err(InvalidAbilityIndex(index));
         }
-        NonZeroU16::new(index).map(AbilityIndex)
+        NonZeroU16::new(index)
+            .map(AbilityIndex)
+            .ok_or(InvalidAbilityIndex(index))
     }
 
     /// # Safety
@@ -45,7 +62,7 @@ impl AbilityIndex {
 impl AbilityIndex {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = fromIndex))]
     pub fn from_index(val: u16) -> Option<AbilityIndex> {
-        AbilityIndex::new(val)
+        AbilityIndex::try_from_index(val).ok()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]

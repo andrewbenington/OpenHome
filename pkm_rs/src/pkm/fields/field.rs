@@ -4,10 +4,7 @@ pub trait ValidatedField {
     type Err;
     type DataType: ByteSerializable<Self::Err>;
 
-    fn try_from_bytes(
-        bytes: &[u8],
-        offset: usize,
-    ) -> core::result::Result<Self::DataType, Self::Err> {
+    fn try_from_bytes(bytes: &[u8], offset: usize) -> Result<Self::DataType, Self::Err> {
         Self::DataType::try_from_bytes_at(bytes, offset)
     }
 
@@ -24,12 +21,12 @@ pub trait InfallibleField {
     fn name() -> &'static str;
 }
 
-pub trait BytesWrapper {
+pub trait ByteReaderWriter {
     fn get_bytes(&self) -> &[u8];
     fn get_bytes_mut(&mut self) -> &mut [u8];
 }
 
-pub trait Has<F: ValidatedField>: BytesWrapper {
+pub trait Has<F: ValidatedField>: ByteReaderWriter {
     const OFFSET: usize;
 
     fn read(&self) -> Result<F::DataType, F::Err> {
@@ -37,7 +34,7 @@ pub trait Has<F: ValidatedField>: BytesWrapper {
     }
 }
 
-pub trait HasInfallible<F: InfallibleField>: BytesWrapper {
+pub trait HasInfallible<F: InfallibleField>: ByteReaderWriter {
     const OFFSET: usize;
 
     fn read(&self) -> F::DataType {
@@ -46,7 +43,7 @@ pub trait HasInfallible<F: InfallibleField>: BytesWrapper {
 }
 
 #[macro_export]
-macro_rules! has_fields_at {
+macro_rules! validated_field_offsets {
     ($buffer_type:ident, { $($field:ty => $offset:expr),+ $(,)? }) => {
         $(
             impl<'a> Has<$field> for $buffer_type<'a> {
@@ -57,7 +54,7 @@ macro_rules! has_fields_at {
 }
 
 #[macro_export]
-macro_rules! has_infallible_fields_at {
+macro_rules! infallible_field_offsets {
     ($buffer_type:ident, { $($field:ty => $offset:expr),+ $(,)? }) => {
         $(
             impl<'a> HasInfallible<$field> for $buffer_type<'a> {

@@ -20,6 +20,7 @@ pub const MAX_NATIONAL_DEX: usize = 1025;
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct NatDexIndex(NonZeroU16);
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct InvalidNatDexIndex(u16);
 
 impl InvalidNatDexIndex {

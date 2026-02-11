@@ -1,18 +1,19 @@
 use std::convert::Infallible;
 
 use pkm_rs_resources::{
-    abilities::AbilityIndex,
+    abilities::{AbilityIndex, InvalidAbilityIndex},
+    ball::{Ball, InvalidBallIndex},
     natures::{InvalidNatureIndex, NatureIndex},
     species::{InvalidNatDexIndex, NatDexIndex},
 };
 use pkm_rs_types::strings::SizedUtf16String;
 
-pub trait ByteSerializable<E>: Sized {
+pub trait ByteSerializable<E = Infallible>: Sized {
     fn try_from_bytes_at(bytes: &[u8], offset: usize) -> Result<Self, E>;
     fn to_bytes_at(&self, bytes: &mut [u8], offset: usize);
 }
 
-impl<T: ByteSerializableAlways> ByteSerializable<Infallible> for T {
+impl<T: ByteSerializableAlways> ByteSerializable for T {
     fn try_from_bytes_at(bytes: &[u8], offset: usize) -> Result<Self, Infallible> {
         Ok(T::from_bytes_at(bytes, offset))
     }
@@ -57,18 +58,25 @@ impl ByteSerializableAlways for u32 {
     }
 }
 
-pub struct InvalidZeroValue;
-
-impl ByteSerializable<InvalidZeroValue> for AbilityIndex {
-    fn try_from_bytes_at(bytes: &[u8], offset: usize) -> Result<Self, InvalidZeroValue> {
-        AbilityIndex::from_index(u16::from_le_bytes(
+impl ByteSerializable<InvalidAbilityIndex> for AbilityIndex {
+    fn try_from_bytes_at(bytes: &[u8], offset: usize) -> Result<Self, InvalidAbilityIndex> {
+        AbilityIndex::try_from_index(u16::from_le_bytes(
             bytes[offset..offset + 2].try_into().unwrap(),
         ))
-        .ok_or(InvalidZeroValue)
     }
 
     fn to_bytes_at(&self, bytes: &mut [u8], offset: usize) {
         bytes[offset..offset + 2].copy_from_slice(&self.get().to_le_bytes());
+    }
+}
+
+impl ByteSerializable<InvalidBallIndex> for Ball {
+    fn try_from_bytes_at(bytes: &[u8], offset: usize) -> Result<Self, InvalidBallIndex> {
+        Ball::try_from_byte(bytes[offset])
+    }
+
+    fn to_bytes_at(&self, bytes: &mut [u8], offset: usize) {
+        bytes[offset] = *self as u8;
     }
 }
 
