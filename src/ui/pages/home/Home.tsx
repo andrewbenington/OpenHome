@@ -12,11 +12,11 @@ import OpenSaveDisplay from '@openhome-ui/saves/boxes/SaveBoxDisplay'
 import ItemBag from '@openhome-ui/saves/ItemBag'
 import SavesModal from '@openhome-ui/saves/SavesModal'
 import { useSaves } from '@openhome-ui/state/saves'
-import { bytesToPKMInterface } from '@pokemon-files/pkm'
 import { Badge, Button, Card, Flex, Tabs } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import FilterPanel from 'src/ui/pages/home/display/FilterPanel'
+import { bytesToPKM } from '../../../core/pkm/FileImport'
 import DisplayPanel from './display/DisplayPanel'
 import './Home.css'
 import ReleaseArea from './ReleaseArea'
@@ -53,7 +53,7 @@ const Home = () => {
           if (extension.toUpperCase() === 'OHPKM') {
             mon = new OHPKM(new Uint8Array(buffer))
           } else {
-            mon = bytesToPKMInterface(buffer, extension.toUpperCase())
+            mon = bytesToPKM(new Uint8Array(buffer), extension.toUpperCase())
           }
         } catch (e) {
           displayError('Import Error', `Could not read Pokémon file: ${e}`)
