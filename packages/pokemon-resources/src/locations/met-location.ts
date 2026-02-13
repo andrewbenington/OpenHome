@@ -11,7 +11,8 @@ import { Gen7KantoLocations } from './gen7-kanto'
 import { Gen8GalarLocations } from './gen8-galar'
 import { Gen8HisuiLocations } from './gen8-hisui'
 import { Gen8SinnohLocations } from './gen8-sinnoh'
-import { Gen9Locations } from './gen9'
+import { Gen9LumioseLocations } from './gen9-lumiose'
+import { Gen9PaldeaLocations } from './gen9-paldea'
 
 export const getLocationString = (game: number, index: number, format: string, egg = false) => {
   if (game <= OriginGame.White && index === 30001) {
@@ -73,7 +74,7 @@ export const getLocationString = (game: number, index: number, format: string, e
   } else if (OriginGames.isBdsp(game)) {
     locations = Gen8SinnohLocations
   } else if (generation === Generation.G9) {
-    locations = Gen9Locations
+    locations = Gen9PaldeaLocations
   }
   const locationBlock = locations[Math.floor(index / multiplier) * multiplier]
   if (locationBlock) {
@@ -148,7 +149,11 @@ export function getMetLocation(
   }
 
   if (OriginGames.isScarletViolet(origin) || fileFormat === 'PK9') {
-    return Gen9Locations[Math.floor(index / 10000) * 10000][index % 10000]
+    return Gen9PaldeaLocations[Math.floor(index / 10000) * 10000][index % 10000]
+  }
+
+  if (origin === OriginGame.LegendsZa || fileFormat === 'PA9') {
+    return Gen9LumioseLocations[Math.floor(index / 10000) * 10000][index % 10000]
   }
   return ''
 }

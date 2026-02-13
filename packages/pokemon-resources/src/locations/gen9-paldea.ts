@@ -1,4 +1,4 @@
-export const Gen9Locations: { [key: number]: string[] } = {
+export const Gen9PaldeaLocations: { [key: number]: string[] } = {
   0: [
     '——————',
     '',
