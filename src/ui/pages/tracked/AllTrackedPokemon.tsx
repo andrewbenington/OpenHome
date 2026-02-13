@@ -228,12 +228,16 @@ function useColumns(
           return 'Release Area'
         }
         const bankIndex = homeData.findIfPresent(mon.openhomeId)?.bank
-        return typeof bankIndex === 'number' ? `Bank ${bankIndex + 1}` : undefined
+        return typeof bankIndex === 'number'
+          ? saves.homeData.banks[bankIndex].nameOrDefault()
+          : undefined
       },
       getFilterValue: (mon) => {
         if (trackedMonsToRelease.includes(mon.openhomeId)) return 'Release Area'
         const bankIndex = saves.homeData.findIfPresent(mon.openhomeId)?.bank
-        return bankIndex !== undefined ? `Bank ${bankIndex + 1}` : 'Not in OpenHome Boxes'
+        return bankIndex !== undefined
+          ? saves.homeData.banks[bankIndex].nameOrDefault()
+          : 'Not in OpenHome Boxes'
       },
       sortFunction: numericSorter((mon) =>
         trackedMonsToRelease.includes(mon.openhomeId)
@@ -252,7 +256,8 @@ function useColumns(
         const location = homeData.findIfPresent(mon.openhomeId)
         return location ? (
           <span>
-            <b>Box {location.box + 1}</b> [{location.boxSlot + 1}]
+            <b>{homeData.banks[location.bank].getBox(location.box).nameOrDefault()}</b> [slot{' '}
+            {location.boxSlot + 1}]
           </span>
         ) : undefined
       },

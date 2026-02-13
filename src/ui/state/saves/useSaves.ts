@@ -757,7 +757,7 @@ export function useSaves(): SavesAndBanksManager {
 
   const recoverMonToBox = useCallback(
     (id: OhpkmIdentifier, boxIndex: number) => {
-      const box = loadedHomeData.getCurrentBank().getBoxes()[boxIndex]
+      const box = loadedHomeData.getCurrentBank().getBox(boxIndex)
       if (!box) {
         console.error(`box does not exist (index ${boxIndex})`)
         return

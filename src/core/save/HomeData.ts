@@ -94,37 +94,21 @@ export class OpenHomeBanks {
     this._currentBoxIndex = this._banks[bankIndex].currentBoxIndex
   }
 
-  getAtLocation(location: BankBoxCoordinates): Option<OhpkmIdentifier> {
-    if (location.bank >= this._banks.length) {
+  #assertBankIndex(bankIndex: number) {
+    if (bankIndex >= this._banks.length) {
       throw new Error(
-        `Cannot access bank at index ${location.bank} (${this._banks.length} banks total)`
+        `Cannot access bank at index ${bankIndex} (${this._banks.length} banks total)`
       )
     }
+  }
 
+  getAtLocation(location: BankBoxCoordinates): Option<OhpkmIdentifier> {
+    this.#assertBankIndex(location.bank)
     return this._banks[location.bank].getAtLocation(location.box, location.boxSlot)
   }
 
   setAtLocation(location: BankBoxCoordinates, identifier: OhpkmIdentifier | undefined) {
-    if (location.boxSlot >= OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS) {
-      throw new Error(
-        `Box slot ${location.boxSlot} exceeds box size (${OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS}))`
-      )
-    }
-
-    if (location.bank >= this._banks.length) {
-      throw new Error(
-        `Cannot access bank at index ${location.bank} (${this._banks.length} banks total)`
-      )
-    }
-
-    const bankToUpdate = this._banks[location.bank]
-
-    if (location.box >= bankToUpdate.boxCount()) {
-      throw new Error(
-        `Cannot access box at index ${location.box} (${bankToUpdate.name} has ${bankToUpdate.boxCount()} boxes total)`
-      )
-    }
-
+    this.#assertBankIndex(location.bank)
     this.updatedBoxSlots.push(location)
     this._banks[location.bank].setAtLocation(location.box, location.boxSlot, identifier)
   }
@@ -161,37 +145,16 @@ export class OpenHomeBanks {
     this.getCurrentBank().removeDupesFromBox(boxIndex)
   }
 
-  setBankName(bank_index: number, name: string | undefined): Result<null, string> {
-    if (this._banks.length <= bank_index) {
-      return R.Err(`Cannot access bank at index ${bank_index} (${this._banks.length} banks total)`)
-    }
-
-    this._banks[bank_index].name = name
+  setBankName(bankIndex: number, name: string | undefined): Result<null, string> {
+    this.#assertBankIndex(bankIndex)
+    this._banks[bankIndex].name = name
 
     return R.Ok(null)
   }
 
   slotIsEmpty(location: BankBoxCoordinates): boolean {
-    if (location.boxSlot >= OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS) {
-      throw new Error(
-        `Box slot ${location.boxSlot} exceeds box size (${OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS}))`
-      )
-    }
-
-    if (location.bank >= this._banks.length) {
-      throw new Error(
-        `Cannot access bank at index ${location.bank} (${this._banks.length} banks total)`
-      )
-    }
-
+    this.#assertBankIndex(location.bank)
     const bank = this._banks[location.bank]
-
-    if (location.box >= bank.boxCount()) {
-      throw new Error(
-        `Cannot access box at index ${location.box} (${bank.name} has ${bank.boxCount()} boxes total)`
-      )
-    }
-
     return !bank.getAtLocation(location.box, location.boxSlot)
   }
 
@@ -239,9 +202,7 @@ export class OpenHomeBanks {
   }
 
   public set currentBankIndex(index: number) {
-    if (index >= this._banks.length) {
-      throw new Error(`Cannot access bank at index ${index} (${this._banks.length} banks total)`)
-    }
+    this.#assertBankIndex(index)
     this._currentBankIndex = index
   }
 
@@ -321,22 +282,21 @@ export class OpenHomeBank {
     return this._boxes[this.currentBoxIndex]
   }
 
-  getAtLocation(box: number, boxSlot: number): Option<OhpkmIdentifier> {
-    if (box >= this.boxCount()) {
-      throw new Error(
-        `Cannot access box at index ${box} (${this.nameOrDefault()} has ${this.boxCount()} boxes total)`
-      )
-    }
-
-    return this._boxes[box].getSlot(boxSlot)
-  }
-
-  setAtLocation(boxIndex: number, boxSlot: number, contents: Option<OhpkmIdentifier>) {
+  #assertBoxIndex(boxIndex: number) {
     if (boxIndex >= this.boxCount()) {
       throw new Error(
         `Cannot access box at index ${boxIndex} (${this.nameOrDefault()} has ${this.boxCount()} boxes total)`
       )
     }
+  }
+
+  getAtLocation(boxIndex: number, boxSlot: number): Option<OhpkmIdentifier> {
+    this.#assertBoxIndex(boxIndex)
+    return this._boxes[boxIndex].getSlot(boxSlot)
+  }
+
+  setAtLocation(boxIndex: number, boxSlot: number, contents: Option<OhpkmIdentifier>) {
+    this.#assertBoxIndex(boxIndex)
     const box = this._boxes[boxIndex]
 
     const previousContents = box.getSlot(boxSlot)
@@ -369,12 +329,7 @@ export class OpenHomeBank {
   }
 
   deleteBox(boxIndex: number, boxId: string): Result<null, string> {
-    if (boxIndex >= this.boxCount()) {
-      return R.Err(
-        `Cannot access box at index ${boxIndex} (${this.name} has ${this.boxCount()} boxes total)`
-      )
-    }
-
+    this.#assertBoxIndex(boxIndex)
     const box = this._boxes[boxIndex]
 
     if (box.containsMons()) {
@@ -429,14 +384,9 @@ export class OpenHomeBank {
     this._boxes.forEach((box, newIndex) => (box.index = newIndex))
   }
 
-  setBoxName(box_index: number, name: Option<string>): Result<null, string> {
-    if (box_index >= this.boxCount()) {
-      return R.Err(
-        `Cannot access box at index ${box_index} (${this.name} has ${this.boxCount()} boxes total)`
-      )
-    }
-
-    this._boxes[box_index].name = name || undefined
+  setBoxName(boxIndex: number, name: Option<string>): Result<null, string> {
+    this.#assertBoxIndex(boxIndex)
+    this._boxes[boxIndex].name = name || undefined
 
     return R.Ok(null)
   }
@@ -462,6 +412,11 @@ export class OpenHomeBank {
     this._boxes = [...this._boxes]
   }
 
+  getBox(boxIndex: number): Readonly<OpenHomeBox> {
+    this.#assertBoxIndex(boxIndex)
+    return this._boxes[boxIndex]
+  }
+
   getBoxes(): ReadonlyArray<Readonly<OpenHomeBox>> {
     return [...this._boxes]
   }
@@ -482,12 +437,16 @@ export class OpenHomeBox {
   // This lookup saves a lot of computation and avoids slowdown when viewing all mons and their locations.
   private _reverseLookup: Map<OhpkmIdentifier, number> = new Map()
 
-  getSlot(boxSlot: number): Option<OhpkmIdentifier> {
+  #assertBoxSlot(boxSlot: number) {
     if (boxSlot > this._boxSlots.length) {
       throw new Error(
         `Cannot access box slot index ${boxSlot} (${this.nameOrDefault()} has ${this._boxSlots.length} slots total)`
       )
     }
+  }
+
+  getSlot(boxSlot: number): Option<OhpkmIdentifier> {
+    this.#assertBoxSlot(boxSlot)
 
     return this._boxSlots[boxSlot]
   }
