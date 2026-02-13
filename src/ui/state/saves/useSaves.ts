@@ -248,6 +248,12 @@ export function useSaves(): SavesAndBanksManager {
 
   const moveOhpkmToHome = useCallback(
     (identifier: OhpkmIdentifier | undefined, dest: HomeMonLocation) => {
+      // this is a bandaid fix for the issue of onDrop() being triggered multiple times for BoxCell. For
+      // some reason it only affects the OpenHome boxes.
+      if (identifier && loadedHomeData.findIfPresent(identifier)) {
+        return undefined
+      }
+
       const displacedMonId = getMonAtHomeLocation(dest)
       loadedHomeData.setAtLocation(dest, identifier)
       return displacedMonId
