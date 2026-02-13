@@ -8,8 +8,12 @@ import { MonSpriteData } from '@openhome-ui/state/plugin'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import { PKM, RomHackPKM } from '../../../packages/pokemon-files/src/pkm/PKM'
+import { OHPKM } from '../../core/pkm/OHPKM'
 
-export const fileToSpriteFolder: Record<string, string> = {
+type MonFormat = (PKM | RomHackPKM | OHPKM)['format']
+
+export const fileToSpriteFolder: Record<MonFormat, string> = {
   PK1: 'gen1',
   PK2: 'gen2',
   PK3: 'gen3',
@@ -26,8 +30,8 @@ export const fileToSpriteFolder: Record<string, string> = {
   PA8: 'home',
   PB8: 'home',
   PK9: 'gen9',
+  PA9: 'home',
   OHPKM: 'home',
-  OhpkmV1: 'home',
 }
 
 export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
@@ -52,7 +56,7 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
       formeMetadata?.formeName?.toLowerCase() ?? 'alcremie-vanilla-cream'
     }-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
   }
-  let spriteFolder = fileToSpriteFolder[monFormat]
+  let spriteFolder = fileToSpriteFolder[monFormat as MonFormat]
 
   if (monFormat === 'PK3RR') {
     if (mon.dexNum === NationalDex.Ursaluna && formeNum === BLOOD_MOON) {

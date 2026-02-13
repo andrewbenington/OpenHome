@@ -1,5 +1,6 @@
 import { OriginGame } from '@pkm-rs/pkg'
 import { COLOPKM, PA8, PB7, PB8, PK1, PK2, PK3, PK4, PK5, PK6, PK7, PK8, PK9, XDPKM } from '.'
+import PA9 from './PA9'
 import { PKM } from './PKM'
 
 function fileTypeFromBuffer(buffer: ArrayBuffer): string | undefined {
@@ -59,6 +60,8 @@ export function classFromFormat(format: string) {
       return PB8
     case 'PK9':
       return PK9
+    case 'PA9':
+      return PA9
     // case 'OHPKM':
     //   return OHPKM
     default:

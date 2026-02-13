@@ -134,6 +134,8 @@ export interface AllPKMFields {
   teraTypeOriginal?: number
   teraTypeOverride?: number
   tmFlagsBDSP?: Uint8Array
+  tmFlagsLza?: Uint8Array
+  tmFlagsLzaDlc?: Uint8Array
   tmFlagsSV?: Uint8Array
   tmFlagsSVDLC?: Uint8Array
   trFlagsSwSh?: Uint8Array
