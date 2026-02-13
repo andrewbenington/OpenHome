@@ -47,10 +47,6 @@ check:
 test: ensure-dependencies
 	@pnpm run test
 
-.PHONY: test-pkm-rs
-test-pkm-rs:
-	@cd pkm_rs && cargo test --package pkm_rs --lib -- tests::pkm::ohpkm --nocapture
-
 .PHONY: check-rs
 check-rs:
 	@cd src-tauri && cargo clippy -- -Aclippy::needless_return
