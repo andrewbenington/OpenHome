@@ -3,7 +3,6 @@ import { unique } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { PKMFormeRef } from '@openhome-core/util/types'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
-import { OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { useContext, useMemo } from 'react'
 
 const fileTypeColors: Record<string, string> = {
@@ -22,7 +21,7 @@ const fileTypeColors: Record<string, string> = {
   PB8: '#6bf',
   PA8: '#8cc',
   PK9: '#f52',
-  PA9: OriginGames.color(OriginGame.LegendsZa),
+  PA9: '#31CA56',
   OhpkmV1: 'fuschia',
 }
 
