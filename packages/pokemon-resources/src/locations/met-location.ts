@@ -25,6 +25,7 @@ export const getLocationString = (game: number, index: number, format: string, e
 
   const generation = OriginGames.generation(game)
   const gameSetting = OriginGames.region(game)
+  console.log(gameSetting)
 
   let multiplier = 10000
   let locations: { [key: number]: string[] } = {}
