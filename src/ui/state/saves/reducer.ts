@@ -1,10 +1,10 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { AddBoxLocation, HomeData } from '@openhome-core/save/HomeData'
 import { SAV } from '@openhome-core/save/interfaces'
 import { BoxMonIdentifiers, StoredBankData } from '@openhome-core/save/util/storage'
 import { Option } from '@openhome-core/util/functional'
 import { createContext, Dispatch, Reducer } from 'react'
+import { AddBoxLocation, OpenHomeBanks } from 'src/core/save/HomeData'
 import { SaveIdentifier, saveToStringIdentifier } from 'src/core/save/interfaces'
 import { SAVClass } from '../../../core/save/util'
 
@@ -16,7 +16,7 @@ export type OpenSave = {
 export type OpenSavesState = {
   monsToRelease: (OhpkmIdentifier | PKMInterface)[]
   openSaves: Record<SaveIdentifier, OpenSave>
-  homeData?: HomeData
+  homeData?: OpenHomeBanks
   error?: string
 }
 
@@ -75,7 +75,7 @@ export type OpenSavesAction =
    */
   | {
       type: 'update_home_data'
-      payload: { homeData: HomeData }
+      payload: { homeData: OpenHomeBanks }
     }
   | {
       type: 'set_home_box'
@@ -157,7 +157,7 @@ export type OpenSavesAction =
     }
   | {
       type: 'set_home_data'
-      payload: HomeData
+      payload: OpenHomeBanks
     }
 
 export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
@@ -172,7 +172,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
      */
     case 'load_home_banks': {
       const { banks } = payload
-      const newHomeData = new HomeData(banks)
+      const newHomeData = OpenHomeBanks.fromStored(banks)
 
       return { ...state, homeData: newHomeData }
     }
@@ -252,8 +252,12 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     case 'add_home_box': {
       const newState = { ...state }
 
-      if (!newState.homeData || newState.homeData.boxes.length !== payload.currentBoxCount) {
-        // currentBoxCount check is to prevent adding multiple boxes during rerender/strict mode
+      if (
+        !newState.homeData ||
+        newState.homeData.getCurrentBank().boxCount() !== payload.currentBoxCount
+      ) {
+        // box count check is to prevent adding multiple boxes during rerender/strict mode
+        // this is obviously code smell but i'm kicking the can down the line
         return { ...state }
       }
 
@@ -366,7 +370,7 @@ export function saveFromIdentifier(state: OpenSavesState, identifier: SaveIdenti
 
 export function getMonAtLocation(state: OpenSavesState, location: MonLocation) {
   if (location.isHome) {
-    return state.homeData?.boxes[location.box].boxSlots[location.boxSlot]
+    return state.homeData?.getAtLocation(location)
   }
 
   if (location.saveIdentifier in state.openSaves) {

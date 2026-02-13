@@ -1,6 +1,5 @@
 import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { HomeData } from '@openhome-core/save/HomeData'
 import { Option, R } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
@@ -10,6 +9,7 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import { Button, Callout, Dialog, Flex, Separator } from '@radix-ui/themes'
 import { ReactNode, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
+import { OpenHomeBanks } from 'src/core/save/HomeData'
 import { SAVClass } from 'src/core/save/util'
 import { Result } from 'src/core/util/functional'
 import { ItemBagContext } from '../items/reducer'
@@ -43,7 +43,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
   const allOpenSaves = Object.values(openSavesState.openSaves)
     .filter((data) => !!data)
-    .filter((data) => !(data.save instanceof HomeData))
+    .filter((data) => !(data.save instanceof OpenHomeBanks))
     .sort((a, b) => a.index - b.index)
     .map((data) => data.save)
 
@@ -86,7 +86,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     const promises = [
       backend.writeAllSaveFiles(saveWriters),
       backend.writeHomeBanks({
-        banks: openSavesState.homeData.banks,
+        banks: openSavesState.homeData.banks.map((bank) => bank.toSimple()),
         current_bank: openSavesState.homeData.currentBankIndex,
       }),
       backend.deleteHomeMons(
@@ -208,7 +208,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           openSavesDispatch,
           allOpenSaves: Object.values(openSavesState.openSaves)
             .filter((data) => !!data)
-            .filter((data) => !(data.save instanceof HomeData))
+            .filter((data) => !(data.save instanceof OpenHomeBanks))
             .sort((a, b) => a.index - b.index)
             .map((data) => data.save),
           promptDisambiguation,

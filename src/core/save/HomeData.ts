@@ -1,9 +1,8 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import {
   BoxMonIdentifiers,
-  getBankName,
-  OpenHomeBank,
-  OpenHomeBox,
+  SimpleOpenHomeBank,
+  SimpleOpenHomeBox,
   StoredBankData,
 } from '@openhome-core/save/util/storage'
 import { TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
@@ -12,73 +11,24 @@ import { filterUndefined, numericSorter } from '@openhome-core/util/sort'
 import { MonLocation } from '@openhome-ui/state/saves/reducer'
 import { v4 as UuidV4 } from 'uuid'
 import { R } from '../util/functional'
+import { BoxAndSlot } from './interfaces'
 
 const BOX_ROWS = 10
 const BOX_COLUMNS = 12
 const SLOTS_PER_BOX = BOX_ROWS * BOX_COLUMNS
 
-export class HomeBox {
-  id: string
-  name: string | undefined
-  index: number
-
-  boxSlots: Array<OhpkmIdentifier | undefined> = new Array(SLOTS_PER_BOX)
-
-  constructor(homeBox: OpenHomeBox) {
-    const { id, name, index } = homeBox
-
-    if (name !== `Box ${index + 1}`) {
-      this.name = name ?? undefined
-    }
-
-    this.id = id
-    this.index = index
-    for (const [index, identifier] of homeBox.identifiers) {
-      this.boxSlots[index] = identifier
-    }
-  }
-
-  getIdentifierMapping(): Map<number, OhpkmIdentifier> {
-    const entries = this.boxSlots
-      .map((identifier, i) => [i, identifier] as [number, OhpkmIdentifier | undefined])
-      .filter(([, identifier]) => !!identifier) as [number, OhpkmIdentifier][]
-
-    return new Map(entries)
-  }
-
-  loadSlots(boxIdentifers: BoxMonIdentifiers) {
-    this.boxSlots = new Array(SLOTS_PER_BOX)
-    for (const [index, identifier] of boxIdentifers) {
-      this.boxSlots[index] = identifier
-    }
-  }
-
-  firstEmptyIndex(): number | undefined {
-    return this.boxSlots.findIndex((value) => value === undefined)
-  }
-
-  containsMons() {
-    return this.boxSlots.filter(filterUndefined).length > 0
-  }
-
-  nameOrDefault() {
-    return this.name ?? `Box ${this.index + 1}`
-  }
-}
-
-export class HomeData {
+export class OpenHomeBanks {
   static BOX_ROWS = BOX_ROWS
   static BOX_COLUMNS = BOX_COLUMNS
   static SLOTS_PER_BOX = SLOTS_PER_BOX
 
-  boxRows = HomeData.BOX_ROWS
-  boxColumns = HomeData.BOX_COLUMNS
+  boxRows = OpenHomeBanks.BOX_ROWS
+  boxColumns = OpenHomeBanks.BOX_COLUMNS
 
   transferRestrictions: TransferRestrictions = {}
 
-  _currentBoxIndex: number = 0
-  boxes: Array<HomeBox> = []
-  _currentBankIndex: number = 0
+  private _currentBoxIndex: number = 0
+  private _currentBankIndex: number = 0
   private _banks: OpenHomeBank[]
 
   bytes: Uint8Array = new Uint8Array()
@@ -88,20 +38,25 @@ export class HomeData {
 
   updatedBoxSlots: BankBoxCoordinates[] = []
 
-  constructor(storedBankData: StoredBankData) {
-    this._banks = storedBankData.banks.map((bank) => ({
-      ...bank,
-      boxes: bank.boxes.map((box) => ({ ...box, last_saved_index: box.index })),
-    }))
-    this.setAndLoadBank(storedBankData.current_bank)
+  private constructor(banks: OpenHomeBank[], currentBankIndex: number) {
+    this._banks = banks
+    this.setAndLoadBank(currentBankIndex)
   }
+
+  static fromStored(storedBankData: StoredBankData) {
+    return new OpenHomeBanks(
+      storedBankData.banks.map(OpenHomeBank.fromSimpleBank),
+      storedBankData.current_bank
+    )
+  }
+
   pluginIdentifier?: string | undefined
   pcChecksumOffset?: number | undefined
   pcOffset?: number | undefined
   calculatePcChecksum?: (() => number) | undefined
 
   getCurrentBox() {
-    return this.boxes[this._currentBoxIndex]
+    return this.getCurrentBank().getCurrentBox()
   }
 
   getCurrentBank() {
@@ -109,7 +64,7 @@ export class HomeData {
   }
 
   getCurrentBankName() {
-    return getBankName(this._banks[this._currentBankIndex])
+    return this.getCurrentBank().nameOrDefault()
   }
 
   gameColor() {
@@ -117,7 +72,7 @@ export class HomeData {
   }
 
   addBank(name: string | undefined, box_count: number) {
-    const newBank: OpenHomeBank = {
+    const newBank: SimpleOpenHomeBank = {
       id: UuidV4(),
       name,
       index: this._banks.length,
@@ -130,26 +85,29 @@ export class HomeData {
       current_box: 0,
     }
 
-    this._banks.push(newBank)
+    this._banks.push(OpenHomeBank.fromSimpleBank(newBank))
     return newBank
   }
 
   setAndLoadBank(bankIndex: number) {
     this._currentBankIndex = bankIndex
-    this._currentBoxIndex = this._banks[bankIndex].current_box
-    // console.log(this._banks, this._banks[bank_index], this._banks[bank_index].boxes)
-    const bankBoxes = this._banks[bankIndex].boxes.sort((box_metadata) => box_metadata.index)
-
-    this.boxes = bankBoxes.map((box) => new HomeBox(box))
-    bankBoxes.forEach((boxMetadata) => {
-      this.boxes[boxMetadata.index].loadSlots(boxMetadata.identifiers)
-    })
+    this._currentBoxIndex = this._banks[bankIndex].currentBoxIndex
   }
 
-  setPokemon(location: BankBoxCoordinates, identifier: OhpkmIdentifier | undefined) {
-    if (location.boxSlot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
+  getAtLocation(location: BankBoxCoordinates): Option<OhpkmIdentifier> {
+    if (location.bank >= this._banks.length) {
       throw new Error(
-        `Box slot ${location.boxSlot} exceeds box size (${HomeData.BOX_COLUMNS * HomeData.BOX_ROWS}))`
+        `Cannot access bank at index ${location.bank} (${this._banks.length} banks total)`
+      )
+    }
+
+    return this._banks[location.bank].getAtLocation(location.box, location.boxSlot)
+  }
+
+  setAtLocation(location: BankBoxCoordinates, identifier: OhpkmIdentifier | undefined) {
+    if (location.boxSlot >= OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS) {
+      throw new Error(
+        `Box slot ${location.boxSlot} exceeds box size (${OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS}))`
       )
     }
 
@@ -161,61 +119,26 @@ export class HomeData {
 
     const bankToUpdate = this._banks[location.bank]
 
-    if (location.box >= bankToUpdate.boxes.length) {
+    if (location.box >= bankToUpdate.boxCount()) {
       throw new Error(
-        `Cannot access box at index ${location.box} (${bankToUpdate.name} has ${bankToUpdate.boxes.length} boxes total)`
+        `Cannot access box at index ${location.box} (${bankToUpdate.name} has ${bankToUpdate.boxCount()} boxes total)`
       )
     }
 
     this.updatedBoxSlots.push(location)
-    if (identifier) {
-      this._banks[location.bank].boxes[location.box].identifiers.set(location.boxSlot, identifier)
-      this.boxes[location.box].boxSlots[location.boxSlot] = identifier
-    } else {
-      this._banks[location.bank].boxes[location.box].identifiers.delete(location.boxSlot)
-      if (location.bank === this._currentBankIndex) {
-        this.boxes[location.box].boxSlots[location.boxSlot] = undefined
-      }
-    }
+    this._banks[location.bank].setAtLocation(location.box, location.boxSlot, identifier)
   }
 
-  setBoxNameCurrentBank(box_index: number, name: string | undefined): Result<null, string> {
-    const bank = this.getCurrentBank()
+  clearAtLocation(location: BankBoxCoordinates) {
+    this.setAtLocation(location, undefined)
+  }
 
-    if (box_index >= bank.boxes.length) {
-      return R.Err(
-        `Cannot access box at index ${box_index} (${bank.name} has ${bank.boxes.length} boxes total)`
-      )
-    }
-
-    this.boxes[box_index].name = name || undefined
-    this.boxes = [...this.boxes]
-    this.syncBankToBoxes()
-
-    return R.Ok(null)
+  setBoxNameCurrentBank(boxIndex: number, name: string | undefined): Result<null, string> {
+    return this.getCurrentBank().setBoxName(boxIndex, name)
   }
 
   deleteBoxCurrentBank(boxIndex: number, boxId: string): Result<null, string> {
-    const bank = this.getCurrentBank()
-
-    if (boxIndex >= bank.boxes.length) {
-      return R.Err(
-        `Cannot access box at index ${boxIndex} (${bank.name} has ${bank.boxes.length} boxes total)`
-      )
-    }
-
-    if (this.boxes[boxIndex].containsMons()) {
-      return R.Err('Cannot delete box; box is not empty')
-    }
-
-    if (this.boxes[boxIndex].id !== boxId) {
-      return R.Err(`Box id and index mismatch`)
-    }
-    this.boxes = [...this.boxes.filter((box) => box.id !== boxId)]
-    this.resetBoxIndices()
-    this.syncBankToBoxes()
-
-    return R.Ok(null)
+    return this.getCurrentBank().deleteBox(boxIndex, boxId)
   }
 
   addBoxCurrentBank(
@@ -223,70 +146,19 @@ export class HomeData {
     boxName?: string,
     identifiers?: BoxMonIdentifiers
   ): Result<null, string> {
-    const newBox = new HomeBox({
-      id: UuidV4(),
-      name: boxName ?? null,
-      index: this.boxes.length,
-      identifiers: identifiers ?? new Map(),
-    })
-
-    if (location === 'start') {
-      this.boxes = [newBox, ...this.boxes]
-    } else if (location === 'end') {
-      this.boxes = [...this.boxes, newBox]
-    } else {
-      const index = location[1]
-      if (index >= this.boxes.length) {
-        return R.Err(`index ${index} is greater than box cound (${this.boxes.length})`)
-      }
-      const pivot = location[0] === 'before' ? index : index + 1
-      this.boxes = [...this.boxes.slice(0, pivot), newBox, ...this.boxes.slice(pivot)]
-    }
-
-    this.resetBoxIndices()
-    this.syncBankToBoxes()
-
-    return R.Ok(null)
+    return this.getCurrentBank().addBox(location, boxName, identifiers)
   }
 
-  reorderBoxesCurrentBank(ids_in_new_order: string[]) {
-    this.boxes = this.boxes.toSorted(numericSorter((box) => ids_in_new_order.indexOf(box.id)))
-
-    this.boxes.forEach((box, newIndex) => (box.index = newIndex))
-
-    this.syncBankToBoxes()
+  reorderBoxesCurrentBank(idsInNewOrder: string[]) {
+    this.getCurrentBank().reorderBoxes(idsInNewOrder)
   }
 
   resetBoxIndices() {
-    this.boxes.forEach((box, newIndex) => (box.index = newIndex))
-    this.syncBankToBoxes()
+    this.getCurrentBank().resetBoxIndices()
   }
 
   removeDupesFromBox(boxIndex: number) {
-    const alreadyPresent: Set<string> = new Set()
-
-    for (let slot = 0; slot < HomeData.BOX_COLUMNS * HomeData.BOX_ROWS; slot++) {
-      const identifier = this.boxes[boxIndex].boxSlots[slot]
-
-      if (!identifier) continue
-      if (alreadyPresent.has(identifier)) {
-        this.boxes[boxIndex].boxSlots[slot] = undefined
-      } else {
-        alreadyPresent.add(identifier)
-      }
-    }
-
-    this.boxes = [...this.boxes]
-    this.syncBankToBoxes()
-  }
-
-  syncBankToBoxes() {
-    this._banks[this._currentBankIndex].boxes = this.boxes.map((box) => ({
-      id: box.id,
-      index: box.index,
-      name: box.name || null,
-      identifiers: box.getIdentifierMapping(),
-    }))
+    this.getCurrentBank().removeDupesFromBox(boxIndex)
   }
 
   setBankName(bank_index: number, name: string | undefined): Result<null, string> {
@@ -300,9 +172,9 @@ export class HomeData {
   }
 
   slotIsEmpty(location: BankBoxCoordinates): boolean {
-    if (location.boxSlot >= HomeData.BOX_COLUMNS * HomeData.BOX_ROWS) {
+    if (location.boxSlot >= OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS) {
       throw new Error(
-        `Box slot ${location.boxSlot} exceeds box size (${HomeData.BOX_COLUMNS * HomeData.BOX_ROWS}))`
+        `Box slot ${location.boxSlot} exceeds box size (${OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS}))`
       )
     }
 
@@ -314,13 +186,13 @@ export class HomeData {
 
     const bank = this._banks[location.bank]
 
-    if (location.box >= bank.boxes.length) {
+    if (location.box >= bank.boxCount()) {
       throw new Error(
-        `Cannot access box at index ${location.box} (${bank.name} has ${bank.boxes.length} boxes total)`
+        `Cannot access box at index ${location.box} (${bank.name} has ${bank.boxCount()} boxes total)`
       )
     }
 
-    return !bank.boxes[location.box].identifiers.has(location.boxSlot)
+    return !bank.getAtLocation(location.box, location.boxSlot)
   }
 
   displayState() {
@@ -329,12 +201,12 @@ export class HomeData {
       _currentBankIndex: this._currentBankIndex,
       updatedBoxSlots: this.updatedBoxSlots,
       currentBank: this.getCurrentBank(),
-      boxCount: this.boxes.length,
+      boxCount: this.getCurrentBank().boxCount(),
     }
   }
 
-  boxFirstEmptyLocation(boxIndex: number): MonLocation | undefined {
-    const firstOpenIndex = this.boxes[boxIndex].firstEmptyIndex()
+  firstEmptyBoxSlotCurrentBank(boxIndex: number): MonLocation | undefined {
+    const firstOpenIndex = this.getCurrentBank().firstEmptySlotInBox(boxIndex)
     if (firstOpenIndex === undefined) return undefined
     return {
       isHome: true,
@@ -353,13 +225,13 @@ export class HomeData {
   }
 
   public set currentBoxIndex(index: number) {
-    if (index >= this.getCurrentBank().boxes.length) {
+    if (index >= this.getCurrentBank().boxCount()) {
       throw new Error(
-        `Cannot access box at index ${index} (${this.getCurrentBankName()} has ${this.getCurrentBank().boxes.length} boxes total)`
+        `Cannot access box at index ${index} (${this.getCurrentBankName()} has ${this.getCurrentBank().boxCount()} boxes total)`
       )
     }
     this._currentBoxIndex = index
-    this._banks[this._currentBankIndex].current_box = index
+    this._banks[this._currentBankIndex].currentBoxIndex = index
   }
 
   public get currentBankIndex() {
@@ -373,16 +245,19 @@ export class HomeData {
     this._currentBankIndex = index
   }
 
+  getCurrentBankBoxes(): ReadonlyArray<Readonly<OpenHomeBox>> {
+    return this.getCurrentBank().getBoxes()
+  }
+
   public get currentPCBox() {
     return this._currentBoxIndex
   }
 
   clone() {
-    const newHomeData = new HomeData({ banks: this._banks, current_bank: 0 })
+    const newHomeData = new OpenHomeBanks(this._banks, this.currentBankIndex)
 
-    newHomeData._currentBankIndex = this._currentBankIndex
     newHomeData._currentBoxIndex = this._currentBoxIndex
-    newHomeData.boxes = [...this.boxes]
+    newHomeData._banks = [...this._banks]
     newHomeData.updatedBoxSlots = this.updatedBoxSlots
 
     return newHomeData
@@ -390,18 +265,325 @@ export class HomeData {
 
   findIfPresent(identifier: OhpkmIdentifier): Option<BankBoxCoordinates> {
     for (const bank of this.banks) {
-      for (const box of bank.boxes) {
-        for (const [boxSlot, idInSlot] of box.identifiers.entries()) {
-          if (idInSlot === identifier) {
-            return {
-              bank: bank.index,
-              box: box.index,
-              boxSlot,
-            }
-          }
-        }
+      const location = bank.locationOf(identifier)
+      if (location) {
+        return { ...location, bank: bank.index }
       }
     }
+  }
+}
+
+type BoxIndex = number
+
+export class OpenHomeBank {
+  id: string
+  index: number
+  name: Option<string>
+  private _boxes: OpenHomeBox[]
+  currentBoxIndex: number
+
+  // Maps a mon's identifier to its current box index. Modifications to this._boxes (via setAtLocation()) should always keep this up to date
+  private _reverseLookup: Map<OhpkmIdentifier, BoxIndex> = new Map()
+
+  private constructor(simpleBank: SimpleOpenHomeBank) {
+    this.id = simpleBank.id
+    this.index = simpleBank.index
+    this.name = simpleBank.name
+    this.currentBoxIndex = simpleBank.current_box
+    this._boxes = simpleBank.boxes
+      .toSorted(numericSorter((box) => box.index))
+      .map(OpenHomeBox.fromSimpleBox)
+  }
+
+  static fromSimpleBank(simpleBank: SimpleOpenHomeBank): OpenHomeBank {
+    return new OpenHomeBank(simpleBank)
+  }
+
+  nameOrDefault() {
+    return this.name ?? `Bank ${this.index + 1}`
+  }
+
+  toSimple(): SimpleOpenHomeBank {
+    return {
+      id: this.id,
+      index: this.index,
+      name: this.name,
+      boxes: this._boxes.map((box) => box.toSimple()),
+      current_box: this.currentBoxIndex,
+    }
+  }
+
+  getCurrentBox() {
+    return this._boxes[this.currentBoxIndex]
+  }
+
+  getAtLocation(box: number, boxSlot: number): Option<OhpkmIdentifier> {
+    if (box >= this.boxCount()) {
+      throw new Error(
+        `Cannot access box at index ${box} (${this.nameOrDefault()} has ${this.boxCount()} boxes total)`
+      )
+    }
+
+    return this._boxes[box].getSlot(boxSlot)
+  }
+
+  setAtLocation(boxIndex: number, boxSlot: number, contents: Option<OhpkmIdentifier>) {
+    if (boxIndex >= this.boxCount()) {
+      throw new Error(
+        `Cannot access box at index ${boxIndex} (${this.nameOrDefault()} has ${this.boxCount()} boxes total)`
+      )
+    }
+    const box = this._boxes[boxIndex]
+
+    const previousContents = box.getSlot(boxSlot)
+    if (previousContents) {
+      this._reverseLookup.delete(previousContents)
+    }
+
+    this._boxes[boxIndex].setSlot(boxSlot, contents)
+    if (contents) {
+      this._reverseLookup.set(contents, boxIndex)
+    }
+  }
+
+  allContainedMons(): OhpkmIdentifier[] {
+    return this._boxes.flatMap((box) => box.allContainedMons())
+  }
+
+  locationOf(identifier: OhpkmIdentifier): Option<BoxAndSlot> {
+    const boxIndex = this._reverseLookup.get(identifier)
+    if (boxIndex !== undefined) {
+      const boxSlot = this._boxes[boxIndex].locationOf(identifier)
+      if (boxSlot !== undefined) {
+        return { box: boxIndex, boxSlot }
+      }
+    }
+  }
+
+  boxCount() {
+    return this._boxes.length
+  }
+
+  deleteBox(boxIndex: number, boxId: string): Result<null, string> {
+    if (boxIndex >= this.boxCount()) {
+      return R.Err(
+        `Cannot access box at index ${boxIndex} (${this.name} has ${this.boxCount()} boxes total)`
+      )
+    }
+
+    const box = this._boxes[boxIndex]
+
+    if (box.containsMons()) {
+      return R.Err('Cannot delete box; box is not empty')
+    }
+
+    if (box.id !== boxId) {
+      return R.Err(`Box id and index mismatch`)
+    }
+
+    this._boxes = [...this._boxes.filter((box) => box.id !== boxId)]
+
+    return R.Ok(null)
+  }
+
+  addBox(
+    location: AddBoxLocation,
+    boxName?: string,
+    identifiers?: BoxMonIdentifiers
+  ): Result<null, string> {
+    const newBox = OpenHomeBox.fromSimpleBox({
+      id: UuidV4(),
+      name: boxName ?? null,
+      index: this.boxCount(),
+      identifiers: identifiers ?? new Map(),
+    })
+
+    if (location === 'start') {
+      this._boxes = [newBox, ...this._boxes]
+    } else if (location === 'end') {
+      this._boxes = [...this._boxes, newBox]
+    } else {
+      const index = location[1]
+      if (index >= this.boxCount()) {
+        return R.Err(`index ${index} is greater than box cound (${this.boxCount()})`)
+      }
+      const pivot = location[0] === 'before' ? index : index + 1
+      this._boxes = [...this._boxes.slice(0, pivot), newBox, ...this._boxes.slice(pivot)]
+    }
+
+    this.resetBoxIndices()
+
+    return R.Ok(null)
+  }
+
+  reorderBoxes(ids_in_new_order: string[]) {
+    this._boxes = this._boxes.toSorted(numericSorter((box) => ids_in_new_order.indexOf(box.id)))
+    this._boxes.forEach((box, newIndex) => (box.index = newIndex))
+  }
+
+  resetBoxIndices() {
+    this._boxes.forEach((box, newIndex) => (box.index = newIndex))
+  }
+
+  setBoxName(box_index: number, name: Option<string>): Result<null, string> {
+    if (box_index >= this.boxCount()) {
+      return R.Err(
+        `Cannot access box at index ${box_index} (${this.name} has ${this.boxCount()} boxes total)`
+      )
+    }
+
+    this._boxes[box_index].name = name || undefined
+
+    return R.Ok(null)
+  }
+
+  firstEmptySlotInBox(boxIndex: number): Option<number> {
+    return this._boxes[boxIndex].firstEmptyIndex()
+  }
+
+  removeDupesFromBox(boxIndex: number) {
+    const alreadyPresent: Set<string> = new Set()
+
+    for (let slot = 0; slot < OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS; slot++) {
+      const identifier = this._boxes[boxIndex].getSlot(slot)
+
+      if (!identifier) continue
+      if (alreadyPresent.has(identifier)) {
+        this._boxes[boxIndex].clearSlot(slot)
+      } else {
+        alreadyPresent.add(identifier)
+      }
+    }
+
+    this._boxes = [...this._boxes]
+  }
+
+  getBoxes(): ReadonlyArray<Readonly<OpenHomeBox>> {
+    return [...this._boxes]
+  }
+
+  indexOfBoxId(id: string): Option<number> {
+    return this._boxes.findIndex((box) => box.id === id)
+  }
+}
+
+export class OpenHomeBox {
+  id: string
+  name: Option<string>
+  index: number
+
+  private _boxSlots: Array<Option<OhpkmIdentifier>> = new Array(SLOTS_PER_BOX)
+
+  // Maps a mon's identifier to its slot index. Modifications to this._boxSlots should always keep this up to date.
+  // This lookup saves a lot of computation and avoids slowdown when viewing all mons and their locations.
+  private _reverseLookup: Map<OhpkmIdentifier, number> = new Map()
+
+  getSlot(boxSlot: number): Option<OhpkmIdentifier> {
+    if (boxSlot > this._boxSlots.length) {
+      throw new Error(
+        `Cannot access box slot index ${boxSlot} (${this.nameOrDefault()} has ${this._boxSlots.length} slots total)`
+      )
+    }
+
+    return this._boxSlots[boxSlot]
+  }
+
+  slotIsEmpty(boxSlot: number): boolean {
+    return this.getSlot(boxSlot) === undefined
+  }
+
+  setSlot(boxSlot: number, contents: Option<OhpkmIdentifier>) {
+    const previousContents = this.getSlot(boxSlot)
+    if (previousContents) {
+      this._reverseLookup.delete(previousContents)
+    }
+
+    this._boxSlots[boxSlot] = contents
+    if (contents) {
+      this._reverseLookup.set(contents, boxSlot)
+    }
+  }
+
+  clearSlot(index: number) {
+    this.setSlot(index, undefined)
+  }
+
+  private constructor(
+    name: Option<string>,
+    index: number,
+    identifiers?: BoxMonIdentifiers,
+    id?: string
+  ) {
+    this.id = id ?? UuidV4()
+    this.name = name
+    this.index = index
+
+    if (identifiers) {
+      for (const [index, identifier] of identifiers) {
+        this.setSlot(index, identifier)
+      }
+    }
+  }
+
+  static fromSimpleBox(homeBox: SimpleOpenHomeBox) {
+    let name = homeBox.name ?? undefined
+    if (name === `Box ${homeBox.index + 1}`) {
+      name = undefined
+    }
+
+    return new OpenHomeBox(name, homeBox.index, homeBox.identifiers)
+  }
+
+  static create(index: number, name?: string, identifiers?: BoxMonIdentifiers): OpenHomeBox {
+    return new OpenHomeBox(name, index, identifiers)
+  }
+
+  getIdentifierMapping(): Map<number, OhpkmIdentifier> {
+    const entries = this._boxSlots
+      .map((identifier, i) => [i, identifier] as [number, OhpkmIdentifier | undefined])
+      .filter(([, identifier]) => !!identifier) as [number, OhpkmIdentifier][]
+
+    return new Map(entries)
+  }
+
+  loadSlots(boxIdentifers: BoxMonIdentifiers) {
+    this._boxSlots = new Array(SLOTS_PER_BOX)
+    for (const [index, identifier] of boxIdentifers) {
+      this.setSlot(index, identifier)
+    }
+  }
+
+  slotCount() {
+    return this._boxSlots.length
+  }
+
+  firstEmptyIndex(): number | undefined {
+    return this._boxSlots.findIndex((value) => value === undefined)
+  }
+
+  containsMons() {
+    return this._boxSlots.some((contents) => contents !== undefined)
+  }
+
+  allContainedMons(): OhpkmIdentifier[] {
+    return this._boxSlots.filter(filterUndefined)
+  }
+
+  nameOrDefault() {
+    return this.name ?? `Box ${this.index + 1}`
+  }
+
+  toSimple(): SimpleOpenHomeBox {
+    return {
+      id: this.id,
+      index: this.index,
+      identifiers: this.getIdentifierMapping(),
+      name: this.name ?? null,
+    }
+  }
+
+  locationOf(identifier: OhpkmIdentifier): Option<number> {
+    return this._reverseLookup.get(identifier)
   }
 }
 

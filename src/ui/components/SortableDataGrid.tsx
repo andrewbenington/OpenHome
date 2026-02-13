@@ -420,7 +420,7 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
         </Flex>
         {sortDirection && (
           <DropdownArrowIcon
-            size="1.2rem"
+            size="18px"
             style={{
               rotate: sortDirection === 'DESC' ? '180deg' : undefined,
               transition: 'rotate 0.15s',

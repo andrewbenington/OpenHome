@@ -25,7 +25,8 @@ import { useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup, OriginGames } from '@pkm-rs/pkg'
 import { useCallback, useRef, useState } from 'react'
 import { SelectColumn } from 'react-data-grid'
-import { BankBoxCoordinates, HomeData } from 'src/core/save/HomeData'
+import { useNavigate } from 'react-router'
+import { BankBoxCoordinates, OpenHomeBanks } from 'src/core/save/HomeData'
 import './style.css'
 
 export type AllTrackedPokemonProps = {
@@ -49,14 +50,21 @@ export default function AllTrackedPokemon({
   const [ctxMenuMonId, setCtxMenuMonId] = useState<Option<OhpkmIdentifier>>()
   const { releaseMonsById, trackedMonsToRelease } = saves
   const columns = useColumns(trackedMonsToRelease, onSelectMon, saves.homeData)
+  const navigate = useNavigate()
 
   const buildContextElements = useCallback(
     (mon: OHPKM) => {
+      const homeLocation = saves.homeData.findIfPresent(mon.openhomeId)
       const actions: CtxMenuElementBuilder[] = [
         LabelBuilder.fromMon(mon),
-        ItemBuilder.fromLabel('Find Containing Save').withAction(() =>
-          findSaveForMon(mon.openhomeId)
-        ),
+        homeLocation
+          ? ItemBuilder.fromLabel('Jump to Box').withAction(() => {
+              saves.homeBoxSetCurrent(homeLocation.box)
+              navigate('/home')
+            })
+          : ItemBuilder.fromLabel('Find Containing Save').withAction(() =>
+              findSaveForMon(mon.openhomeId)
+            ),
         ItemBuilder.fromLabel(`Move To Release Area`).withAction(() => {
           releaseMonsById(mon.openhomeId)
           deselectIds(mon.openhomeId)
@@ -81,7 +89,15 @@ export default function AllTrackedPokemon({
       )
       return actions
     },
-    [deselectIds, findSaveForMon, findSavesForAllMons, releaseMonsById, selectedIds]
+    [
+      deselectIds,
+      findSaveForMon,
+      findSavesForAllMons,
+      navigate,
+      releaseMonsById,
+      saves,
+      selectedIds,
+    ]
   )
 
   const keyGetter = (row: NoInfer<OHPKM>): string => {
@@ -164,7 +180,7 @@ function locationToSortableString(location: Option<BankBoxCoordinates>): string 
 function useColumns(
   trackedMonsToRelease: OhpkmIdentifier[],
   onSelectMon: (mon: OHPKM) => void,
-  homeData: HomeData
+  homeData: OpenHomeBanks
 ): SortableColumn<OHPKM>[] {
   const saves = useSaves()
 

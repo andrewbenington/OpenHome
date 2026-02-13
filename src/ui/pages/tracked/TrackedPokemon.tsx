@@ -238,11 +238,14 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
                 </Button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Content side="right" size="2">
-                {saves.homeData.boxes.map((homeBox) => (
-                  <DropdownMenu.Item key={homeBox.id} onClick={() => recoverToBox(homeBox.index)}>
-                    {homeBox.nameOrDefault()}
-                  </DropdownMenu.Item>
-                ))}
+                {saves.homeData
+                  .getCurrentBank()
+                  .getBoxes()
+                  .map((homeBox) => (
+                    <DropdownMenu.Item key={homeBox.id} onClick={() => recoverToBox(homeBox.index)}>
+                      {homeBox.nameOrDefault()}
+                    </DropdownMenu.Item>
+                  ))}
               </DropdownMenu.Content>
             </DropdownMenu.Root>
 
