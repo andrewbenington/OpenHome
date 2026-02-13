@@ -47,7 +47,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@radix-ui/themes": "^3.3.0",
     "@tanstack/react-virtual": "^3.13.18",
-    "@tauri-apps/api": "2.9.1",
+    "@tauri-apps/api": "2.10.1",
     "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-fs": "^2.4.5",
     "@tauri-apps/plugin-os": "^2.3.2",
