@@ -1,4 +1,3 @@
-mod tests;
 mod util;
 
 pub mod pkm;
