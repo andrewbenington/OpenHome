@@ -1,6 +1,6 @@
+import { Nullable, Option } from '@openhome-core/util/functional'
+import { getOriginIconPath } from '@openhome-ui/images/game'
 import { getPluginColor, OriginGames } from '@pkm-rs/pkg'
-import { Option } from 'src/core/util/functional'
-import { getOriginIconPath } from 'src/ui/images/game'
 import {
   pluginGameName,
   PluginIdentifier,
@@ -9,8 +9,8 @@ import {
 import { ImageIndicator } from './ImageIndicator'
 
 export type OriginGameIndicatorProps = {
-  originGame: Option<number>
-  plugin?: PluginIdentifier
+  originGame?: Nullable<number>
+  plugin?: Nullable<PluginIdentifier>
   withName?: boolean
   tooltip?: string
 }
@@ -21,7 +21,7 @@ export function OriginGameIndicator({
   withName,
   tooltip,
 }: OriginGameIndicatorProps) {
-  if (originGame === undefined) return null
+  if (originGame === undefined || originGame === null) return null
 
   const { name, markIconPath, backgroundColor } = plugin
     ? getDetailsPluginSave(plugin)

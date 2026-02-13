@@ -66,7 +66,7 @@ export function useOhpkmStore(): OhpkmStore {
 
   const insertOrUpdate = useCallback(
     (mon: OHPKM) => {
-      updateStore({ [mon.getHomeIdentifier()]: mon })
+      updateStore({ [mon.openhomeId]: mon })
     },
     [updateStore]
   )
@@ -85,7 +85,7 @@ export function useOhpkmStore(): OhpkmStore {
   const trackAndConvertForSave = useCallback(
     <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => {
       const lookupType = (save.constructor as SAVClass).lookupType
-      const ohpkmIdentifier = ohpkm.getHomeIdentifier()
+      const ohpkmIdentifier = ohpkm.openhomeId
 
       if (lookupType === 'gen12') {
         const gen12Identifier = getMonGen12Identifier(ohpkm)
@@ -193,7 +193,7 @@ export function useOhpkmStore(): OhpkmStore {
 
   const getIdIfTracked = useCallback(
     (mon: PKMInterface): Option<OhpkmIdentifier> => {
-      return loadIfTracked(mon)?.getHomeIdentifier()
+      return loadIfTracked(mon)?.openhomeId
     },
     [loadIfTracked]
   )

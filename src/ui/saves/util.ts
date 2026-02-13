@@ -1,5 +1,4 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { HomeBox, HomeData } from '@openhome-core/save/HomeData'
 import { Box, SAV } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
@@ -8,6 +7,7 @@ import BackendInterface from '@openhome-ui/backend/backendInterface'
 import { CtxMenuElementBuilder, ItemBuilder } from '@openhome-ui/components/context-menu/types'
 import { OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
+import { OpenHomeBanks, OpenHomeBox } from 'src/core/save/HomeData'
 
 export type SaveViewMode = 'card' | 'grid'
 
@@ -76,15 +76,23 @@ export function filterEmpty<T>(value: T | null | undefined): value is T {
  * first non-empty box slot
  */
 export function getFollowingMon(
-  currentBox: Box<PKMInterface> | HomeBox,
+  currentBox: Box<PKMInterface> | OpenHomeBox,
   incrementFunction: (index: number) => number,
   index: number
 ) {
   let prevIndex = index
 
+  function slotIsEmpty(index: number) {
+    if (currentBox instanceof OpenHomeBox) {
+      return currentBox.slotIsEmpty(index)
+    } else {
+      return currentBox.boxSlots[prevIndex] === undefined
+    }
+  }
+
   do {
     prevIndex = incrementFunction(prevIndex)
-  } while (prevIndex !== index && currentBox.boxSlots[prevIndex] === undefined)
+  } while (prevIndex !== index && slotIsEmpty(prevIndex))
 
   if (prevIndex !== index) {
     return prevIndex
@@ -93,15 +101,24 @@ export function getFollowingMon(
 
 export function buildNavigator(
   incrementFunction: (index: number) => number,
-  save: SAV | HomeData,
+  save: SAV | OpenHomeBanks,
   currentIndex?: number,
   callback?: (index?: number) => void
 ) {
   if (currentIndex === undefined) return undefined
   const currentBox =
-    save.currentPCBox < save.boxes.length ? save.boxes[save.currentPCBox] : undefined
+    save instanceof OpenHomeBanks
+      ? save.getCurrentBox()
+      : save.currentPCBox < save.boxes.length
+        ? save.boxes[save.currentPCBox]
+        : undefined
 
-  if (!currentBox || currentBox.boxSlots.filter(filterUndefined).length < 2) {
+  const nonEmptySlots =
+    currentBox instanceof OpenHomeBox
+      ? currentBox.allContainedMons().length
+      : (currentBox?.boxSlots.filter(filterUndefined).length ?? 0)
+
+  if (currentBox === undefined || nonEmptySlots < 2) {
     return undefined
   }
 
@@ -117,7 +134,7 @@ export function buildNavigator(
  * Otherwise returns undefined
  */
 export function buildForwardNavigator(
-  save: SAV | HomeData,
+  save: SAV | OpenHomeBanks,
   currentIndex?: number,
   callback?: (index?: number) => void
 ) {
@@ -136,7 +153,7 @@ export function buildForwardNavigator(
  * Otherwise returns undefined
  */
 export function buildBackwardNavigator(
-  save: SAV | HomeData,
+  save: SAV | OpenHomeBanks,
   index?: number,
   callback?: (index?: number) => void
 ) {

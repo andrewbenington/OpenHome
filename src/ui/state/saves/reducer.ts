@@ -1,36 +1,22 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { AddBoxLocation, HomeData } from '@openhome-core/save/HomeData'
 import { SAV } from '@openhome-core/save/interfaces'
-import { StoredBankData } from '@openhome-core/save/util/storage'
+import { BoxMonIdentifiers, StoredBankData } from '@openhome-core/save/util/storage'
 import { Option } from '@openhome-core/util/functional'
-import { OriginGame } from '@pkm-rs/pkg'
 import { createContext, Dispatch, Reducer } from 'react'
+import { AddBoxLocation, OpenHomeBanks } from 'src/core/save/HomeData'
+import { SaveIdentifier, saveToStringIdentifier } from 'src/core/save/interfaces'
+import { SAVClass } from '../../../core/save/util'
 
 export type OpenSave = {
   index: number
   save: SAV
 }
-const Delimiter = '$' as const
-
-type Delim = typeof Delimiter
-
-type OfficialSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}`
-
-type PluginSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}${Delim}${string}`
-
-export type SaveIdentifier = OfficialSaveIdentifier | PluginSaveIdentifier
-
-export function saveToStringIdentifier(save: SAV): SaveIdentifier {
-  return save.pluginIdentifier
-    ? `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}${Delimiter}${save.pluginIdentifier}`
-    : `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}`
-}
 
 export type OpenSavesState = {
   monsToRelease: (OhpkmIdentifier | PKMInterface)[]
   openSaves: Record<SaveIdentifier, OpenSave>
-  homeData?: HomeData
+  homeData?: OpenHomeBanks
   error?: string
 }
 
@@ -89,7 +75,7 @@ export type OpenSavesAction =
    */
   | {
       type: 'update_home_data'
-      payload: { homeData: HomeData }
+      payload: { homeData: OpenHomeBanks }
     }
   | {
       type: 'set_home_box'
@@ -113,7 +99,12 @@ export type OpenSavesAction =
     }
   | {
       type: 'add_home_box'
-      payload: { location: AddBoxLocation; currentBoxCount: number }
+      payload: {
+        location: AddBoxLocation
+        currentBoxCount: number
+        boxName?: string
+        identifiers?: BoxMonIdentifiers
+      }
     }
   | {
       type: 'delete_home_box'
@@ -146,7 +137,7 @@ export type OpenSavesAction =
    *  POKEMON
    */
   | {
-      type: 'add_mon_to_release'
+      type: 'release_mon_by_id'
       payload: OhpkmIdentifier | PKMInterface
     }
   | {
@@ -166,7 +157,7 @@ export type OpenSavesAction =
     }
   | {
       type: 'set_home_data'
-      payload: HomeData
+      payload: OpenHomeBanks
     }
 
 export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
@@ -181,7 +172,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
      */
     case 'load_home_banks': {
       const { banks } = payload
-      const newHomeData = new HomeData(banks)
+      const newHomeData = OpenHomeBanks.fromStored(banks)
 
       return { ...state, homeData: newHomeData }
     }
@@ -235,35 +226,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       return newState
     }
-    // case 'sort_home_box': {
-    //   if (!state.homeData) return state
-
-    //   const boxMons = state.homeData.boxes[payload.boxIndex].pokemon.toSorted(
-    //     getSortFunctionNullable(payload.sortType)
-    //   )
-
-    //   state.homeData.boxes[payload.boxIndex].pokemon = boxMons
-    //   state.homeData.syncBankToBoxes()
-    //   state.homeData = state.homeData.clone()
-    //   return { ...state }
-    // }
-    // case 'sort_all_home_boxes': {
-    //   if (!state.homeData) return { ...state }
-
-    //   const allMons = state.homeData.boxes
-    //     .flatMap((box) => box.pokemon)
-    //     .toSorted(getSortFunctionNullable(payload.sortType))
-    //   const boxSize = HomeData.BOX_COLUMNS * HomeData.BOX_ROWS
-
-    //   for (let i = 0; i < state.homeData.boxes.length; i++) {
-    //     state.homeData.boxes[i].pokemon = allMons.slice(i * boxSize, (i + 1) * boxSize)
-    //   }
-
-    //   state.homeData.syncBankToBoxes()
-    //   state.homeData = state.homeData.clone(payload.getMonById)
-
-    //   return { ...state }
-    // }
     case 'home_box_remove_dupes': {
       if (!state.homeData) return state
 
@@ -290,12 +252,16 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     case 'add_home_box': {
       const newState = { ...state }
 
-      if (!newState.homeData || newState.homeData.boxes.length !== payload.currentBoxCount) {
-        // currentBoxCount check is to prevent adding multiple boxes during rerender/strict mode
+      if (
+        !newState.homeData ||
+        newState.homeData.getCurrentBank().boxCount() !== payload.currentBoxCount
+      ) {
+        // box count check is to prevent adding multiple boxes during rerender/strict mode
+        // this is obviously code smell but i'm kicking the can down the line
         return { ...state }
       }
 
-      newState.homeData.addBoxCurrentBank(payload.location)
+      newState.homeData.addBoxCurrentBank(payload.location, payload.boxName, payload.identifiers)
 
       return newState
     }
@@ -352,7 +318,7 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
 
       return newState
     }
-    case 'add_mon_to_release': {
+    case 'release_mon_by_id': {
       if (!state.monsToRelease.includes(action.payload)) {
         state.monsToRelease.push(action.payload)
       }
@@ -379,16 +345,24 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
   }
 }
 
+type SavesContextValue = {
+  openSavesState: OpenSavesState
+  openSavesDispatch: Dispatch<OpenSavesAction>
+  allOpenSaves: SAV[]
+  promptDisambiguation: (possibleSaveTypes: SAVClass<SAV>[]) => Promise<Option<SAVClass<SAV>>>
+}
+
 const initialState: OpenSavesState = {
   monsToRelease: [],
   openSaves: {},
 }
 
-export const SavesContext = createContext<[OpenSavesState, Dispatch<OpenSavesAction>, SAV[]]>([
-  initialState,
-  () => {},
-  [],
-])
+export const SavesContext = createContext<SavesContextValue>({
+  openSavesState: initialState,
+  openSavesDispatch: () => {},
+  allOpenSaves: [],
+  promptDisambiguation: async () => undefined,
+})
 
 export function saveFromIdentifier(state: OpenSavesState, identifier: SaveIdentifier): Option<SAV> {
   return state.openSaves[identifier]?.save
@@ -396,7 +370,7 @@ export function saveFromIdentifier(state: OpenSavesState, identifier: SaveIdenti
 
 export function getMonAtLocation(state: OpenSavesState, location: MonLocation) {
   if (location.isHome) {
-    return state.homeData?.boxes[location.box].boxSlots[location.boxSlot]
+    return state.homeData?.getAtLocation(location)
   }
 
   if (location.saveIdentifier in state.openSaves) {

@@ -41,7 +41,9 @@ export default function SortPokemon() {
           }))
       )
       .concat(
-        Object.values(savesAndBanks.homeData.boxes.flatMap((box) => box.boxSlots) ?? {})
+        savesAndBanks.homeData
+          .getCurrentBank()
+          .allContainedMons()
           .map((identifier) => (identifier ? ohpkmStore.getById(identifier) : undefined))
           .filter(filterUndefined)
           .map((mon) => ({

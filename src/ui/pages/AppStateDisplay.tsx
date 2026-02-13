@@ -63,7 +63,6 @@ function openSavesDisplay(state: OpenSavesState) {
     Banks: state.homeData?.banks.map((bank) => ({
       name: bank.name,
       index: bank.index,
-      boxes: bank.boxes,
     })),
     Error: state.error,
   }

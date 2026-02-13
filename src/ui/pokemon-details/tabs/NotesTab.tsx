@@ -18,7 +18,7 @@ export default function NotesDisplay(props: { mon: OHPKM }) {
         value={notesText}
         onChange={(e) => {
           setNotesText(e.target.value)
-          updateMonNotes(mon.getHomeIdentifier(), e.target.value ?? '')
+          updateMonNotes(mon.openhomeId, e.target.value ?? '')
         }}
         style={{ height: '100%' }}
       />

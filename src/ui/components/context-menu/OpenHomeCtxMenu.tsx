@@ -11,7 +11,7 @@ import {
   renderContent,
 } from './types'
 
-type ContextMenuProps = (
+type ContextMenuProps = { onOpenChange?: (open: boolean) => void } & (
   | {
       sections: Option<CtxMenuSectionBuilders>[]
       elements?: undefined
@@ -21,7 +21,7 @@ type ContextMenuProps = (
   RadixCtxMenu.TriggerProps
 
 export default function OpenHomeCtxMenu(props: ContextMenuProps) {
-  const { elements, sections, ...triggerProps } = props
+  const { elements, sections, onOpenChange, ...triggerProps } = props
 
   const allElements = useMemo(() => {
     const allBuilders =
@@ -36,7 +36,7 @@ export default function OpenHomeCtxMenu(props: ContextMenuProps) {
   }, [elements, sections])
 
   return (
-    <RadixCtxMenu.Root modal={false}>
+    <RadixCtxMenu.Root modal={false} onOpenChange={onOpenChange}>
       <RadixCtxMenu.Trigger
         {...triggerProps}
         onContextMenuCapture={(e) => {

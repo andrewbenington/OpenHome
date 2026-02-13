@@ -47,6 +47,21 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
           </button>
         ),
       cellClass: 'centered-cell',
+    },
+    {
+      key: 'game',
+      name: 'Original Game',
+      width: '10rem',
+      renderValue: (value) => (
+        <div className="flex-row-centered">
+          <OriginGameIndicator
+            originGame={value.homeMon?.gameOfOrigin}
+            plugin={value.homeMon?.pluginOrigin as PluginIdentifier}
+            withName
+          />
+        </div>
+      ),
+      cellClass: 'centered-cell',
       sortFunction: multiSorter(
         numericSorter((value) => value.homeMon?.dexNum),
         numericSorter((value) => value.homeMon?.formeNum)

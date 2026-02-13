@@ -1,14 +1,16 @@
 import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { HomeData } from '@openhome-core/save/HomeData'
-import { R } from '@openhome-core/util/functional'
+import { Option, R } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { Callout } from '@radix-ui/themes'
-import { ReactNode, useCallback, useContext, useEffect, useReducer } from 'react'
+import { Button, Callout, Dialog, Flex, Separator } from '@radix-ui/themes'
+import { ReactNode, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react'
+import { useNavigate } from 'react-router'
+import { OpenHomeBanks } from 'src/core/save/HomeData'
+import { SAVClass } from 'src/core/save/util'
 import { Result } from 'src/core/util/functional'
 import { ItemBagContext } from '../items/reducer'
 import { openSavesReducer, SavesContext } from './reducer'
@@ -16,6 +18,8 @@ import { openSavesReducer, SavesContext } from './reducer'
 export type SavesProviderProps = {
   children: ReactNode
 }
+
+type SaveTypeCallback = (saveType?: SAVClass | PromiseLike<SAVClass>) => void
 
 export default function SavesProvider({ children }: SavesProviderProps) {
   const backend = useContext(BackendContext)
@@ -25,10 +29,21 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     monsToRelease: [],
     openSaves: {},
   })
+  const disambiguationResolver = useRef<Option<SaveTypeCallback>>(undefined)
+  const [disambiguationSaveTypes, setDisambiguationSaveTypes] = useState<Option<SAVClass[]>>()
+  const navigate = useNavigate()
+
+  const promptDisambiguation = useCallback(async (possibleSaveTypes: SAVClass[]) => {
+    setDisambiguationSaveTypes(possibleSaveTypes)
+
+    return new Promise<Option<SAVClass>>((resolve) => {
+      disambiguationResolver.current = resolve
+    })
+  }, [])
 
   const allOpenSaves = Object.values(openSavesState.openSaves)
     .filter((data) => !!data)
-    .filter((data) => !(data.save instanceof HomeData))
+    .filter((data) => !(data.save instanceof OpenHomeBanks))
     .sort((a, b) => a.index - b.index)
     .map((data) => data.save)
 
@@ -71,7 +86,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     const promises = [
       backend.writeAllSaveFiles(saveWriters),
       backend.writeHomeBanks({
-        banks: openSavesState.homeData.banks,
+        banks: openSavesState.homeData.banks.map((bank) => bank.toSimple()),
         current_bank: openSavesState.homeData.currentBankIndex,
       }),
       backend.deleteHomeMons(
@@ -186,19 +201,31 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   }
 
   return (
-    <SavesContext.Provider
-      value={[
-        openSavesState,
-        openSavesDispatch,
-        Object.values(openSavesState.openSaves)
-          .filter((data) => !!data)
-          .filter((data) => !(data.save instanceof HomeData))
-          .sort((a, b) => a.index - b.index)
-          .map((data) => data.save),
-      ]}
-    >
-      {children}
-    </SavesContext.Provider>
+    <>
+      <SavesContext.Provider
+        value={{
+          openSavesState,
+          openSavesDispatch,
+          allOpenSaves: Object.values(openSavesState.openSaves)
+            .filter((data) => !!data)
+            .filter((data) => !(data.save instanceof OpenHomeBanks))
+            .sort((a, b) => a.index - b.index)
+            .map((data) => data.save),
+          promptDisambiguation,
+        }}
+      >
+        {children}
+      </SavesContext.Provider>
+      <SaveDisambiguationDialog
+        open={Boolean(disambiguationSaveTypes)}
+        saveTypes={disambiguationSaveTypes}
+        onSelect={(selected) => {
+          setDisambiguationSaveTypes(undefined)
+          disambiguationResolver.current?.(selected)
+          navigate('/home')
+        }}
+      />
+    </>
   )
 }
 
@@ -241,3 +268,47 @@ const BackendSaveError: (message: string) => SaveError = (message: string) => ({
   _SaveErrorType: 'BackendSaveError',
   message,
 })
+
+interface SaveDisambiguationDialogProps {
+  open: boolean
+  saveTypes?: SAVClass[]
+  onSelect?: SaveTypeCallback
+}
+
+function SaveDisambiguationDialog({ open, saveTypes, onSelect }: SaveDisambiguationDialogProps) {
+  return (
+    <Dialog.Root open={open} onOpenChange={(open) => !open && onSelect?.()}>
+      <Dialog.Content
+        width="300px"
+        style={{
+          padding: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+        }}
+      >
+        <Dialog.Title mt="2" mb="0">
+          Ambiguous Save Type
+        </Dialog.Title>
+        <Separator style={{ width: '100%' }} />
+        <Dialog.Description>Select a save type to proceed:</Dialog.Description>
+        <Flex gap="1" mt="1" direction="column">
+          {saveTypes?.map((saveType) => (
+            <Button
+              key={saveType.saveTypeID}
+              onClick={() => onSelect?.(saveType)}
+              style={{ width: '100%', minHeight: 36, height: 'fit-content' }}
+            >
+              {saveType.saveTypeName}
+            </Button>
+          ))}
+        </Flex>
+        <Dialog.Close>
+          <Button variant="outline" color="gray">
+            Cancel
+          </Button>
+        </Dialog.Close>
+      </Dialog.Content>
+    </Dialog.Root>
+  )
+}

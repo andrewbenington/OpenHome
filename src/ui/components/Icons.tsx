@@ -6,6 +6,7 @@ import {
   MdArrowDropDown,
   MdArrowForward,
   MdArrowForwardIos,
+  MdCheckCircle,
   MdClear,
   MdCompareArrows,
   MdCreateNewFolder,
@@ -13,6 +14,7 @@ import {
   MdError,
   MdFilterListAlt,
   MdGrid4X4,
+  MdInfo,
   MdMoreVert,
 } from 'react-icons/md'
 import { TiMinus, TiPlus } from 'react-icons/ti'
@@ -37,5 +39,7 @@ export const FilterIcon = MdFilterListAlt
 export const ExpandArrowIcon = MdArrowForwardIos
 
 export const ErrorIcon = MdError
+export const InfoIcon = MdInfo
+export const SuccessIcon = MdCheckCircle
 
 export const DevIcon = MdDataObject

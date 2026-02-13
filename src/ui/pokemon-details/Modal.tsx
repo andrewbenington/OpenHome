@@ -97,6 +97,8 @@ const PokemonDetailsModal = (props: {
           position: 'inherit',
           overflow: 'hidden',
           height: 'fit-content',
+          padding: 0,
+          borderRadius: 4,
         }}
       >
         <VisuallyHidden>

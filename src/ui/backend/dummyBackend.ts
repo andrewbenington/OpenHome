@@ -8,6 +8,7 @@ const DummyBackend: BackendInterface = {
   /* past gen identifier lookups */
   loadLookups: async () => R.Err('no backend in use'),
   addToLookups: async () => R.Err('no backend in use'),
+  removeDangling: async () => R.Err('no backend in use'),
 
   /* ohpkm store */
   loadOhpkmStore: async () => R.Err('no backend in use'),

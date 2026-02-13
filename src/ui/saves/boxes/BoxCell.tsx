@@ -7,9 +7,7 @@ import {
   ItemBuilder,
   LabelBuilder,
   OpenHomeCtxMenu,
-  SeparatorBuilder,
 } from '@openhome-ui/components/context-menu'
-import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { useItems } from '@openhome-ui/state/items'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
@@ -111,17 +109,7 @@ function BoxCell({
 
   const monCtxMenuItemBuilders = mon
     ? [
-        LabelBuilder.fromComponent(
-          <>
-            <PokemonIcon
-              dexNumber={mon?.dexNum ?? 0}
-              formeNumber={mon?.formeNum}
-              style={{ width: 16, height: 16 }}
-            />
-            {mon?.nickname}
-          </>
-        ),
-        SeparatorBuilder,
+        LabelBuilder.fromMon(mon),
         mon.heldItemIndex > 0
           ? ItemBuilder.fromLabel('Move Item to Bag').withAction(() => moveMonItemToBag(location))
           : undefined,
