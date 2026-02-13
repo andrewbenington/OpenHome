@@ -152,9 +152,17 @@ type SortableDataGridProps<R extends SortableValue> = {
   RefAttributes<DataGridHandle>
 
 export default function SortableDataGrid<R extends SortableValue>(props: SortableDataGridProps<R>) {
-  const { rows, columns, defaultSort, rowHeight, defaultColumnOptions, ...otherProps } = props
+  const {
+    rows,
+    columns,
+    defaultSort,
+    defaultSortOrder,
+    rowHeight,
+    defaultColumnOptions,
+    ...otherProps
+  } = props
   const [sortColumns, setSortColumns] = useState<SortColumn[]>(
-    defaultSort ? [{ columnKey: defaultSort, direction: 'ASC' }] : []
+    defaultSort ? [{ columnKey: defaultSort, direction: defaultSortOrder ?? 'ASC' }] : []
   )
   const [hiddenColumns, setHiddenColumns] = useState<string[]>(
     columns.filter((col) => col.hideByDefault).map((col) => col.key) ?? []
