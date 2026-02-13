@@ -293,6 +293,10 @@ export class OpenHomeBank {
     this._boxes = simpleBank.boxes
       .toSorted(numericSorter((box) => box.index))
       .map(OpenHomeBox.fromSimpleBox)
+
+    for (const box of this._boxes) {
+      box.allContainedMons().forEach((identifier) => this._reverseLookup.set(identifier, box.index))
+    }
   }
 
   static fromSimpleBank(simpleBank: SimpleOpenHomeBank): OpenHomeBank {
