@@ -1,5 +1,6 @@
 export { default as COLOPKM } from './COLOPKM'
 export { default as PA8 } from './PA8'
+export { default as PA9 } from './PA9'
 export { default as PB7 } from './PB7'
 export { default as PB8 } from './PB8'
 export { default as PK1 } from './PK1'

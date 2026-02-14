@@ -21,6 +21,7 @@ const fileTypeColors: Record<string, string> = {
   PB8: '#6bf',
   PA8: '#8cc',
   PK9: '#f52',
+  PA9: '#31CA56',
   OhpkmV1: 'fuschia',
 }
 

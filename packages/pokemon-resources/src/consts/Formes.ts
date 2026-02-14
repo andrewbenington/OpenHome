@@ -24,6 +24,8 @@ export const LGE_STARTER = 1
 export const BLOOD_MOON = 1
 export const ORIGINAL = 1
 
+export const GRENINJA_ASH = 2
+
 export const BASE = 0
 export const ALOLA = 1
 export const GALAR = 1

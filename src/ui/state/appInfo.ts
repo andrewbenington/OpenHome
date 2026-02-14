@@ -20,6 +20,7 @@ import { SAVClass } from '@openhome-core/save/util'
 import { XYSAV } from '@openhome-core/save/XYSAV'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { Dispatch, Reducer, createContext } from 'react'
+import { ZASAV } from '../../core/save/Gen89/ZASAV'
 import { OfficialSAV } from '../../core/save/interfaces'
 import { MonDisplayState } from '../hooks/useMonDisplay'
 
@@ -41,6 +42,7 @@ const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   BDSPSAV,
   LASAV,
   SVSAV,
+  ZASAV,
 ]
 const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV]
 

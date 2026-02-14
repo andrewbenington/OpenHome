@@ -19,6 +19,7 @@ import {
   PK9,
   XDPKM,
 } from '@pokemon-files/pkm'
+import PA9 from '../../../packages/pokemon-files/src/pkm/PA9'
 
 function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {
   switch (bytes.length) {
@@ -76,6 +77,8 @@ export function fileTypeFromString(type: string): AnyPkmClass | undefined {
       return PB8
     case 'PK9':
       return PK9
+    case 'PA9':
+      return PA9
     case 'OhpkmV2':
       return OHPKM
     default:

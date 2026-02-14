@@ -49,7 +49,6 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     /* Linting */
-    "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
