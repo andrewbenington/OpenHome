@@ -13,6 +13,7 @@ import { useSaves } from 'src/ui/state/saves'
 import AllTrackedPokemon from './AllTrackedPokemon'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
+import './style.css'
 import {
   FindingSaveForOneState,
   FindingSavesForAllState,
@@ -20,7 +21,7 @@ import {
   useManageTracked,
 } from './useManageTracked'
 
-export default function TrackedPokemon() {
+export default function TrackedPokemonPage() {
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const { findSaveForMon, findingSaveState, findSavesForAllMons, clearFindingState } =
     useManageTracked()
@@ -41,7 +42,7 @@ export default function TrackedPokemon() {
         <SideTabs.Tab value="gen12">Gen 1/2 IDs</SideTabs.Tab>
         <SideTabs.Tab value="gen345">Gen 3/4/5 IDs</SideTabs.Tab>
         <div style={{ flex: 1 }} />
-        <ToolsDialog onClose={clearFindingState} />
+        <ManageDialog onClose={clearFindingState} />
       </SideTabs.TabList>
       <Routes>
         <Route index path="" element={allTrackedElement} />
@@ -57,23 +58,49 @@ export default function TrackedPokemon() {
   )
 }
 
-function ToolsDialog(props: { onClose: () => void }) {
+function ManageDialog(props: { onClose: () => void }) {
   const { onClose } = props
+  const { findSavesForAllMons, findingSaveState, clearFindingState } = useManageTracked()
+  const [loading, setLoading] = useState(false)
+
+  async function runDetectRecover() {
+    setLoading(true)
+    await findSavesForAllMons()
+    setLoading(false)
+  }
+
   return (
-    <Dialog.Root onOpenChange={(o) => !o && onClose()}>
-      <Dialog.Trigger>
-        <Button size="1">Manage...</Button>
-      </Dialog.Trigger>
-      <Dialog.Content>
-        <Flex direction="column">
-          <Dialog.Title>Tracked Mon Management</Dialog.Title>
-          <Inset side="x" my="-1">
-            <Separator />
-          </Inset>
-          <p>Hello</p>
-        </Flex>
-      </Dialog.Content>
-    </Dialog.Root>
+    <>
+      <Dialog.Root onOpenChange={(o) => !o && onClose()}>
+        <Dialog.Trigger>
+          <Button size="1">Manage...</Button>
+        </Dialog.Trigger>
+        <Dialog.Content maxWidth="800px">
+          <Flex direction="column" className="find-save-dialog-body" gap="2">
+            <Dialog.Title mb="0">
+              Tracked Pokémon Management Actions
+              <Inset side="x" mt="2">
+                <Separator />
+              </Inset>
+            </Dialog.Title>
+            {findingSaveState ? (
+              <DialogBody state={findingSaveState} onClose={clearFindingState} />
+            ) : (
+              <Flex justify="between" gap="4">
+                <Button size="1" onClick={runDetectRecover} loading={loading}>
+                  Detect and Recover Missing
+                </Button>
+                <p>
+                  For all tracked Pokémon, find those that are not present in your OpenHome banks or
+                  in any of your tracked save files. You will be given the option to recover them
+                  all to a new box.
+                </p>
+              </Flex>
+            )}
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
+    </>
   )
 }
 
@@ -96,7 +123,7 @@ function FindingSaveDialog(props: FindingSaveDialogProps) {
               <Separator />
             </Inset>
           </Dialog.Title>
-          <Flex className="findind-save-dialog-body" direction="column" gap="3">
+          <Flex className="find-save-dialog-body" direction="column" gap="3">
             {summaryNode}
             <DialogBody state={state} onClose={onClose} />
           </Flex>
@@ -222,7 +249,7 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
               Open Save
             </Button>
             <Button size="1" color="gray" onClick={onClose}>
-              Close
+              Cancel
             </Button>
           </ButtonStack>
         </Flex>
@@ -250,7 +277,7 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
             </DropdownMenu.Root>
 
             <Button size="1" color="gray" onClick={onClose}>
-              Close
+              Cancel
             </Button>
           </ButtonStack>
         </Flex>
@@ -320,7 +347,7 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
               </Button>
             )}
             <Button size="1" color="gray" onClick={onClose}>
-              Close
+              Cancel
             </Button>
           </ButtonStack>
         </Flex>
