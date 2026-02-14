@@ -1,4 +1,3 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -10,8 +9,10 @@ import { Gender, ItemGen3, OriginGame } from '@pkm-rs/pkg'
 import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
-import { LOOKUP_TYPE } from './util'
+import { OHPKM } from '../pkm/OHPKM'
+import { filterUndefined } from '../util/sort'
+import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
+import { LookupType } from './util'
 import { emptyPathData, PathData } from './util/path'
 
 export const SAVE_SIZE_BYTES = 0x20000
@@ -164,9 +165,9 @@ export class G3SaveBackup {
         const box = this.boxes[Math.floor(i / 30)]
 
         if (mon.isValid()) {
-          box.pokemon[i % 30] = mon
+          box.boxSlots[i % 30] = mon
         } else {
-          box.pokemon[i % 30] = undefined
+          box.boxSlots[i % 30] = undefined
         }
       } catch (e) {
         throw Error(`File does not have valid Pokémon data: ${e}`)
@@ -184,7 +185,7 @@ export class G3SAV extends OfficialSAV<PK3> {
   static pkmType = PK3
 
   static transferRestrictions = GEN3_TRANSFER_RESTRICTIONS
-  static lookupType: LOOKUP_TYPE = 'gen345'
+  static lookupType: LookupType = 'gen345'
 
   static TRAINER_OFFSET = 0x0ff4 * 0
 
@@ -221,7 +222,7 @@ export class G3SAV extends OfficialSAV<PK3> {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
     super()
@@ -251,13 +252,11 @@ export class G3SAV extends OfficialSAV<PK3> {
     // hacky way to detect save version
     // TODO: make more robust
     const trainerMon = this.boxes
-      .flatMap((box) => box.pokemon)
+      .flatMap((box) => box.boxSlots)
+      .filter(filterUndefined)
       .find(
         (mon) =>
-          mon &&
-          mon.trainerID === this.tid &&
-          mon.secretID === this.sid &&
-          mon.trainerName === this.name
+          mon.trainerID === this.tid && mon.secretID === this.sid && mon.trainerName === this.name
       )
 
     if (trainerMon) {
@@ -286,33 +285,23 @@ export class G3SAV extends OfficialSAV<PK3> {
     }
   }
 
-  prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
-
-    this.updatedBoxSlots.forEach(({ box, index }) => {
+  prepareForSaving() {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const monOffset = 30 * box + index
       const pcBytes = new Uint8Array(80)
-      const changedMon = this.boxes[box].pokemon[index]
+      const mon = this.boxes[box].boxSlots[index]
 
-      // we don't want to save OHPKM files of mons that didn't leave the save
-      // (and would still be PK3s)
-      if (changedMon instanceof OHPKM) {
-        changedMonPKMs.push(changedMon)
-      }
-      // changedMon will be undefined if pokemon was moved from this slot
+      // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      const slotMon = this.boxes[box].pokemon[index]
 
-      if (changedMon && slotMon) {
+      if (mon) {
         try {
-          const mon = slotMon instanceof PK3 ? slotMon : new PK3(slotMon)
-
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
             pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
           }
         } catch (e) {
-          console.error(e)
+          console.error(`G3SAV: ${e}`)
         }
       }
       this.primarySave.pcDataContiguous.set(pcBytes, 4 + monOffset * 80)
@@ -329,7 +318,10 @@ export class G3SAV extends OfficialSAV<PK3> {
       sector.writeToBuffer(this.primarySave.bytes, i + 5, this.primarySave.firstSectorIndex)
     })
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
-    return changedMonPKMs
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PK3 {
+    return new PK3(ohpkm)
   }
 
   supportsMon(dexNumber: number, formeNumber: number) {

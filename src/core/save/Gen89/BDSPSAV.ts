@@ -1,12 +1,12 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { BDSP_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
-import { Box, BoxCoordinates, OfficialSAV } from '../interfaces'
+import { Box, BoxAndSlot, OfficialSAV } from '../interfaces'
 import { PathData } from '../util/path'
 
 const SAVE_SIZE_BYTES_MIN = 900000
@@ -51,7 +51,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
   myStatusBlock: MyStatusBlock
   boxes: Box<PB8>[] = []
 
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
     super()
@@ -87,7 +87,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
           const mon = this.buildPKM(monData, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].pokemon[monIndex] = mon
+            this.boxes[box].boxSlots[monIndex] = mon
           }
         } catch (e) {
           console.error(e)
@@ -132,27 +132,17 @@ export class BDSPSAV extends OfficialSAV<PB8> {
     return BDSPSAV.boxSizeBytes
   }
 
-  // TODO: implement
-  prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
+  prepareForSaving() {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: monIndex }) => {
+      const mon = this.boxes[box].boxSlots[monIndex]
 
-    this.updatedBoxSlots.forEach(({ box, index: monIndex }) => {
-      const changedMon = this.boxes[box].pokemon[monIndex]
-
-      // we don't want to save OHPKM files of mons that didn't leave the save
-      // (and would still be PB8s)
-      if (changedMon instanceof OHPKM) {
-        changedMonPKMs.push(changedMon)
-      }
       const writeIndex =
         BOX_MONS_OFFSET + this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * monIndex
 
-      // changedMon will be undefined if pokemon was moved from this slot
+      // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (changedMon) {
+      if (mon) {
         try {
-          const mon = changedMon instanceof OHPKM ? new PB8(changedMon) : changedMon
-
           if (mon?.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
             this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
@@ -167,7 +157,10 @@ export class BDSPSAV extends OfficialSAV<PB8> {
       }
     })
     this.bytes.set(this.calculateChecksumBytes(), HASH_OFFSET)
-    return changedMonPKMs
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PB8 {
+    return new PB8(ohpkm)
   }
 
   calculateChecksumBytes() {

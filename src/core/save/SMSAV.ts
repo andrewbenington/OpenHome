@@ -12,8 +12,18 @@ const BOX_NAMES_OFFSET: number = 0x04800
 const SAVE_SIZE_BYTES = 0x6be00
 
 export class SMSAV extends G7SAV {
+  pcChecksumOffset: number = PC_CHECKSUM_OFFSET
+
   constructor(path: PathData, bytes: Uint8Array) {
-    super(path, bytes, PC_OFFSET, PC_CHECKSUM_OFFSET, BOX_NAMES_OFFSET)
+    super(path, bytes)
+  }
+
+  getBoxNamesOffset(): number {
+    return BOX_NAMES_OFFSET
+  }
+
+  getPcOffset(): number {
+    return PC_OFFSET
   }
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {

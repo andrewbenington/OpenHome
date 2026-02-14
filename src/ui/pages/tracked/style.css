@@ -1,3 +1,24 @@
 .mon-icon-button {
   padding: 0;
+  background-color: transparent;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.fixed-width-label {
+  min-width: 5rem;
+  font-weight: bold;
+}
+
+.find-save-dialog-body {
+  flex: 1;
+
+  p,
+  h3,
+  h4 {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
 }

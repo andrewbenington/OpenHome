@@ -144,7 +144,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
             )}
           </div>
           {mon instanceof OHPKM ? (
-            <Markings markings={mon.markings} openHomeId={mon.getHomeIdentifier()} allowUpdate />
+            <Markings markings={mon.markings} openhomeId={mon.openhomeId} allowUpdate />
           ) : 'markings' in mon && mon.markings ? (
             <Markings markings={mon.markings} />
           ) : (

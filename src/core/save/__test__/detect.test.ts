@@ -1,4 +1,4 @@
-import * as E from 'fp-ts/lib/Either'
+import { R } from '@openhome-core/util/functional'
 import fs from 'fs'
 import path from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'
@@ -62,15 +62,14 @@ describe('Save file detection', () => {
       const result = buildUnknownSaveFile(
         emptyPathData,
         new Uint8Array(fs.readFileSync(path.join(__dirname, 'save-files', fileName))),
-        {},
         allSaveTypes
       )
 
-      if (E.isLeft(result)) {
-        throw new Error(result.left)
+      if (R.isErr(result)) {
+        throw new Error(result.err)
       }
 
-      const saveFile = result.right
+      const saveFile = result.value
 
       expect(saveFile?.gameName).toBe(gameName)
     })

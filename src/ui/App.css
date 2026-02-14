@@ -31,7 +31,7 @@ img {
     --byte-hover: #fffa;
     --attribute-row-label: rgb(179, 225, 206);
     --attribute-row-content: rgb(160, 218, 194);
-    --autocomplete-scrollbar: rgb(83, 180, 165);
+    --autocomplete-scrollbar: rgb(80, 158, 146);
     --autocomplete-background-color: #fff;
   }
 }
@@ -159,7 +159,7 @@ label {
   scrollbar-width: none; /* Firefox */
 }
 
-.tab-row {
+.tab-sidebar {
   box-shadow:
     rgba(0, 0, 0, 0.3) 0px 3px 12px,
     rgba(0, 0, 0, 0.23) 0px 3px 6px !important;
@@ -182,8 +182,7 @@ label {
 .radix-themes {
   --cursor-button: pointer;
   --card-border-width: 2px;
-  --base-menu-content-padding: 0px;
-  --base-menu-item-height: 20px;
+  --radius-4: 3px;
   .rt-BaseMenuSeparator {
     margin: 0px 0px;
   }
@@ -199,12 +198,39 @@ label {
     display: flex;
     flex-direction: row;
   }
-  .rt-BaseMenuItem:not(.rt-ContextMenuItem) {
-    border-radius: 0;
-  }
   .rt-Card {
     --base-card-border-radius: 5px;
   }
+  .rt-Separator {
+    width: 100%;
+  }
+}
+
+.rt-BaseMenuContent,
+.rt-BaseMenuViewport {
+  min-width: 13.75rem;
+  background-color: var(--color-panel-solid);
+  border-radius: 3px;
+  padding: 0.15rem;
+  gap: 0.2rem;
+}
+
+.rt-ContextMenuSubContent {
+  z-index: 10;
+}
+
+.rt-BaseMenuItem {
+  font-size: 0.8rem;
+  line-height: 1;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  height: 1.5rem;
+  position: relative;
+  user-select: none;
+  outline: none;
+  cursor: pointer;
+  padding: 0.5rem;
 }
 
 @media (prefers-color-scheme: light) {
@@ -235,7 +261,7 @@ label {
 }
 
 .rt-BaseDialogContent {
-  padding: 0px;
+  --dialog-content-padding: 0.75rem;
   &:where([data-state='open']) {
     animation: none !important;
   }
@@ -278,4 +304,15 @@ label {
 .flex-row {
   display: flex;
   flex-direction: row;
+}
+
+.flex-row-centered {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.rdg-cell * {
+  align-items: center;
 }

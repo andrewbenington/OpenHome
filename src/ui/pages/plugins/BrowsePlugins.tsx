@@ -1,3 +1,4 @@
+import { R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
@@ -6,7 +7,6 @@ import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { PluginContext } from '@openhome-ui/state/plugin'
 import { loadPlugin, PluginMetadata, PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Badge, Flex, Progress, Spinner, Switch } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { CURRENT_PLUGIN_API_VERSION } from './Plugins'
 import './style.css'
@@ -55,9 +55,9 @@ export default function BrowsePlugins() {
   const loadInstalled = useCallback(
     async () =>
       backend.listInstalledPlugins().then(
-        E.match(
-          (err) => displayError('Error Getting Installed Plugins', err),
-          (plugins) => setInstalledPlugins(plugins)
+        R.match(
+          (plugins) => setInstalledPlugins(plugins),
+          (err) => displayError('Error Getting Installed Plugins', err)
         )
       ),
     [backend, displayError]
@@ -168,8 +168,7 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
         backend
           .downloadPlugin(location)
           .then(
-            E.match(
-              (err) => displayError('Load Plugin Code', err),
+            R.match(
               (code) => {
                 try {
                   setProgressPercent(100)
@@ -182,7 +181,8 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
                 } catch (e) {
                   displayError('Error Installing Plugin', [name, `${e}`])
                 }
-              }
+              },
+              (err) => displayError('Load Plugin Code', err)
             )
           )
           .catch((e) => {

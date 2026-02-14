@@ -45,6 +45,10 @@
   flex-direction: column;
 }
 
+.box-card-disabled {
+  --card-background-color: #666;
+}
+
 .box-navigation {
   display: flex;
   flex-direction: row;

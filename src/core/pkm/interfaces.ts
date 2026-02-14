@@ -1,5 +1,6 @@
 import { FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
 import { AllPKMFields, Stats } from '@pokemon-files/util'
+import { PluginIdentifier } from '../save/interfaces'
 
 export interface OfficialPKMInterface extends PKMInterface {
   pluginIdentifier?: undefined
@@ -7,16 +8,16 @@ export interface OfficialPKMInterface extends PKMInterface {
 }
 
 export interface PluginPKMInterface extends PKMInterface {
-  pluginIdentifier: string
+  pluginIdentifier: PluginIdentifier
   selectColor: string
 }
 
 export type PKMInterface = AllPKMFields & {
   getStats(): Stats
   // Corresponding save's plugin_identifier
-  pluginIdentifier?: string
+  pluginIdentifier?: PluginIdentifier
   // If met in a plugin save, this will be the save's plugin_identifier. otherwise this is empty
-  pluginOrigin?: string
+  pluginOrigin?: PluginIdentifier // why are there two of these??
   isFakemon?: boolean
   originalBytes?: Uint8Array
   selectColor?: string

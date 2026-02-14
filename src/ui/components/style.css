@@ -117,14 +117,6 @@ summary::-webkit-details-marker {
   pointer-events: none;
 }
 
-.extra-indicator {
-  position: absolute;
-  min-width: 40%;
-  height: 40%;
-  right: 0;
-  top: 0;
-}
-
 .item-icon {
   position: absolute;
   width: 50%;

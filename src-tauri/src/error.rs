@@ -25,6 +25,7 @@ pub enum Error {
         path: PathBuf,
         source: Box<dyn std::error::Error>,
     },
+    FileWrites(Vec<(PathBuf, Box<dyn std::error::Error>)>),
     FileMissing {
         path: PathBuf,
     },
@@ -136,6 +137,18 @@ impl Display for Error {
                 "File could not be written: '{}' ({source})",
                 path.to_string_lossy()
             ),
+            Self::FileWrites(errors) => {
+                let mut msg = format!("{} file write errors:", errors.len());
+
+                errors.iter().for_each(|(path, source)| {
+                    msg.push_str(&format!(
+                        "\nFile could not be written: '{}' ({source})",
+                        path.to_string_lossy()
+                    ))
+                });
+
+                msg
+            }
             Self::FileMissing { path } => {
                 format!("File does not exist: '{}'", path.to_string_lossy())
             }

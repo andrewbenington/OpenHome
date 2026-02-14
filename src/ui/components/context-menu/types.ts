@@ -1,7 +1,9 @@
 import { Option } from '@openhome-core/util/functional'
-import { ReactNode } from 'react'
+import React, { ReactNode } from 'react'
+import { PKMInterface } from '../../../core/pkm/interfaces'
+import PokemonIcon from '../PokemonIcon'
 
-export type Element = Item | Separator | Label | Submenu
+export type Element = Item | Separator | Label | Submenu | Checkbox
 
 export interface CtxMenuElementBuilder {
   build: () => Element
@@ -66,6 +68,9 @@ export function contentIsLabel(content: ElementContent): content is { label: str
 }
 
 type ElementContent = { label: string } | { component: ReactNode }
+export function renderContent(content: ElementContent): ReactNode {
+  return contentIsLabel(content) ? content.label : content.component
+}
 
 //* LABEL *//
 
@@ -89,6 +94,21 @@ export class LabelBuilder implements CtxMenuElementBuilder {
     return new LabelBuilder({ component })
   }
 
+  static fromMon(mon: PKMInterface, size: number = 16): LabelBuilder {
+    return LabelBuilder.fromComponent(
+      React.createElement(
+        React.Fragment,
+        null,
+        React.createElement(PokemonIcon, {
+          dexNumber: mon.dexNum,
+          formeNumber: mon.formeNum,
+          style: { width: size, height: size, marginRight: 8 },
+        }),
+        mon.nickname
+      )
+    )
+  }
+
   build(): Label {
     return { ...this.data, __cm_type_tag: 'label' }
   }
@@ -106,7 +126,7 @@ export const SeparatorBuilder = Object.freeze({
   },
 })
 
-//* Submenu *//
+//* SUBMENU *//
 
 type Submenu = {
   content: ElementContent
@@ -153,6 +173,68 @@ export class SubmenuBuilder implements CtxMenuElementBuilder {
       items: this.builders.map(buildElement),
       disabled: this.disabled,
       __cm_type_tag: 'submenu',
+    }
+  }
+}
+
+//* CHECKBOX *//
+
+type Checkbox = {
+  content: ElementContent
+  onValueChanged: () => void
+  getIsChecked: () => CheckedState
+  disabled: boolean
+  __cm_type_tag: 'checkbox'
+}
+
+type CheckedState = boolean | 'indeterminate'
+
+export class CheckboxBuilder implements CtxMenuElementBuilder {
+  content: Checkbox['content']
+  onValueChanged: Option<Checkbox['onValueChanged']>
+  getIsChecked: Option<Checkbox['getIsChecked']>
+  disabled: Checkbox['disabled'] = true
+
+  private constructor(content: ElementContent) {
+    this.content = content
+  }
+
+  static fromLabel(label: string): CheckboxBuilder {
+    return new CheckboxBuilder({ label })
+  }
+
+  static fromComponent(component: ReactNode): CheckboxBuilder {
+    return new CheckboxBuilder({ component })
+  }
+
+  handleValueChanged(handler: CheckboxBuilder['onValueChanged']): CheckboxBuilder {
+    this.onValueChanged = handler
+    return this
+  }
+
+  handleIsChecked(handler: CheckboxBuilder['getIsChecked']): CheckboxBuilder {
+    this.getIsChecked = handler
+    return this
+  }
+
+  withDisabled(disabled: boolean): CheckboxBuilder {
+    this.disabled = disabled
+    return this
+  }
+
+  build(): Checkbox {
+    if (!this.onValueChanged) {
+      throw Error('CheckboxBuilder not provided onValueChanged() function')
+    }
+
+    const notChecked = () => false
+
+    return {
+      content: this.content,
+      onValueChanged: this.onValueChanged,
+      getIsChecked: this.getIsChecked ?? notChecked,
+      disabled: this.disabled,
+      __cm_type_tag: 'checkbox',
     }
   }
 }

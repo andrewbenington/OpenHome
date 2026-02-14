@@ -1,11 +1,18 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { numericSorter, stringSorter } from '@openhome-core/util/sort'
-import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
+import { PluginIdentifier } from '@openhome-core/save/interfaces'
+import {
+  gameOrPluginSorter,
+  multiSorter,
+  numericSorter,
+  SortableColumn,
+  stringSorter,
+} from '@openhome-core/util/sort'
+import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
-import { useLookups } from '@openhome-ui/state/lookups'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { OriginGames } from '@pkm-rs/pkg'
-import { Spinner } from '@radix-ui/themes'
+import { MetadataLookup, OriginGames } from '@pkm-rs/pkg'
+import SortableDataGrid from 'src/ui/components/SortableDataGrid'
+import { useLookups } from 'src/ui/state/lookups/useLookups'
 
 type G345LookupRow = {
   gen345ID: string
@@ -19,17 +26,13 @@ type Gen345LookupProps = {
 
 export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
   const ohpkmStore = useOhpkmStore()
-  const { lookups, loaded } = useLookups()
-
-  if (!loaded) {
-    return <Spinner />
-  }
+  const { lookups } = useLookups()
 
   const columns: SortableColumn<G345LookupRow>[] = [
     {
       key: 'Pokémon',
-      name: '',
-      width: 60,
+      name: 'Mon',
+      width: '5rem',
       renderValue: (value) =>
         value.homeMon && (
           <button
@@ -48,26 +51,49 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
     {
       key: 'game',
       name: 'Original Game',
-      width: 130,
-      renderValue: (value) =>
-        value.homeMon && (
-          <img
-            alt="save logo"
-            height={40}
-            src={
-              value.homeMon.pluginOrigin
-                ? `logos/${value.homeMon.pluginOrigin}.png`
-                : OriginGames.logoPath(value.homeMon.gameOfOrigin)
-            }
+      width: '10rem',
+      renderValue: (value) => (
+        <div className="flex-row-centered">
+          <OriginGameIndicator
+            originGame={value.homeMon?.gameOfOrigin}
+            plugin={value.homeMon?.pluginOrigin as PluginIdentifier}
+            withName
           />
-        ),
-      sortFunction: numericSorter((val) => val.homeMon?.gameOfOrigin),
+        </div>
+      ),
+      cellClass: 'centered-cell',
+      sortFunction: multiSorter(
+        numericSorter((value) => value.homeMon?.dexNum),
+        numericSorter((value) => value.homeMon?.formeNum)
+      ),
+      getFilterValue: (value) =>
+        (value.homeMon &&
+          MetadataLookup(value.homeMon.dexNum, value.homeMon.formeNum)?.speciesName) ||
+        'Unknown',
+    },
+    {
+      key: 'game',
+      name: 'Original Game',
+      width: '10rem',
+      renderValue: (value) => (
+        <OriginGameIndicator
+          originGame={value.homeMon?.gameOfOrigin}
+          plugin={value.homeMon?.pluginOrigin as PluginIdentifier}
+          withName
+        />
+      ),
+      getFilterValue: (val) =>
+        val.homeMon ? OriginGames.gameName(val.homeMon.gameOfOrigin) : '(Unknown)',
+      sortFunction: gameOrPluginSorter(
+        (val) => val.homeMon?.gameOfOrigin,
+        (val) => val.homeMon?.pluginOrigin
+      ),
       cellClass: 'centered-cell',
     },
     {
       key: 'gen345ID',
       name: 'Gen 3/4/5',
-      minWidth: 180,
+      width: '12rem',
       sortFunction: stringSorter((val) => val.gen345ID),
       cellClass: 'mono-cell',
     },
@@ -81,13 +107,15 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
   ]
 
   return (
-    <OHDataGrid
+    <SortableDataGrid
       rows={Object.entries(lookups.gen345).map(([gen345ID, homeID]) => ({
         gen345ID,
         homeID,
         homeMon: ohpkmStore.getById(homeID),
       }))}
       columns={columns}
+      enableVirtualization={Object.entries(lookups.gen345).length > 2000} // maybe this should be user-togglable
+      style={{ width: '100%', flexGrow: 1 }}
     />
   )
 }

@@ -1003,22 +1003,23 @@ export const Gen3CFRUMoves = [
   'One Blow',
 ]
 
+import { Option } from '@openhome-core/util/functional'
 import { Moves } from '@pokemon-resources/index'
 import { CFRUToNationalMap } from './CFRUToNationalMap'
 import { NationalToCFRUMap } from './NationalToCFRUMap'
 
 // const dne_moves = [89, 538, 526, 659]
 
-export function fromGen3CFRUMoveIndex(rrIndex: number): number {
-  if (rrIndex === 0) return 0
-  const key = Gen3CFRUMoves[rrIndex]
+export function fromGen3CFRUMoveIndex(cfruIndex: number): Option<number> {
+  if (cfruIndex === 0) return 0
+  const key = Gen3CFRUMoves[cfruIndex]
 
-  return key ? CFRUToNationalMap[key] : -1
+  return key ? CFRUToNationalMap[key] : undefined
 }
 
-export function toGen3CFRUMoveIndex(nationalMoveId: number): number {
+export function toGen3CFRUMoveIndex(nationalMoveId: number): Option<number> {
   if (nationalMoveId === 0) return 0
   const key = Moves[nationalMoveId]?.name
 
-  return key ? NationalToCFRUMap[key][0] : -1
+  return key ? NationalToCFRUMap[key] : undefined
 }

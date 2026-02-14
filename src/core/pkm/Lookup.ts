@@ -1,30 +1,45 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { dvsFromIVs, getBaseMon } from '@openhome-core/pkm/util'
+import { Option } from '@openhome-core/util/functional'
 import { PKMFormeRef } from '@openhome-core/util/types'
-import { MetadataLookup, OriginGames } from '@pkm-rs/pkg'
-import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
+import { MetadataLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { generatePersonalityValuePreservingAttributes } from '@pokemon-files/util'
 import { gen12StringToUTF, utf16StringToGen12 } from '../save/util/Strings'
 import { bytesToString } from '../save/util/byteLogic'
 
-export const getMonFileIdentifier = (mon: PKMInterface) => {
-  if (!('personalityValue' in mon)) {
-    return undefined
-  }
-  const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
+export type OhpkmIdentifier = string
 
-  if (baseMon) {
-    return getHomeIdentifier(new OHPKM(mon))
-  }
-  return undefined
+function hasPersonalityValue(
+  mon: PKMInterface
+): mon is PKMInterface & { personalityValue: number } {
+  return mon.personalityValue !== undefined
 }
 
-export function getHomeIdentifier(mon: OHPKM): string {
+export const getMonFileIdentifier = (mon: PKMInterface): OhpkmIdentifier | undefined => {
+  if (mon instanceof OHPKM) {
+    return getHomeIdentifier(mon)
+  }
+  if (!hasPersonalityValue(mon)) {
+    return undefined
+  }
+  return getHomeIdentifier(mon)
+}
+
+type HomeIdentifierDerivableMon = {
+  dexNum: number
+  formeNum: number
+  trainerID: number
+  secretID: number
+  personalityValue: number
+  gameOfOrigin: OriginGame
+}
+
+export function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentifier {
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
 
   if (!baseMon) {
-    throw Error('Invalid dex number')
+    throw Error(`Invalid dex/forme: ${mon.dexNum} / ${mon.formeNum}`)
   }
 
   return `${baseMon.nationalDex.toString().padStart(4, '0')}-${bytesToString(
@@ -35,7 +50,8 @@ export function getHomeIdentifier(mon: OHPKM): string {
   )}-${bytesToString(mon.personalityValue ?? 0, 4)}-${bytesToString(mon.gameOfOrigin ?? -1, 1)}`
 }
 
-export const getMonGen12Identifier = (mon: PKMInterface) => {
+export type Gen12Identifier = string
+export const getMonGen12Identifier = (mon: PKMInterface): Option<Gen12Identifier> => {
   let { dvs, ivs } = mon
   if (!dvs) {
     if (!ivs) return undefined
@@ -60,7 +76,8 @@ export const getMonGen12Identifier = (mon: PKMInterface) => {
   return undefined
 }
 
-export const getMonGen345Identifier = (mon: PK3 | PK4 | PK5 | OHPKM) => {
+export type Gen345Identifier = string
+export const getMonGen345Identifier = (mon: PKMInterface): Option<Gen345Identifier> => {
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
 
   try {
@@ -70,8 +87,10 @@ export const getMonGen345Identifier = (mon: PK3 | PK4 | PK5 | OHPKM) => {
     if (mon instanceof OHPKM) {
       // Get the personality value that will be generated
       pk3CompatiblePID = generatePersonalityValuePreservingAttributes(mon)
-    } else {
+    } else if (mon.personalityValue !== undefined) {
       pk3CompatiblePID = mon.personalityValue
+    } else {
+      return undefined
     }
 
     const trainerId = ohpkm.trainerID
@@ -84,7 +103,7 @@ export const getMonGen345Identifier = (mon: PK3 | PK4 | PK5 | OHPKM) => {
       ).concat(bytesToString(secretId, 2))}-${bytesToString(pk3CompatiblePID, 4)}`
     }
   } catch (error) {
-    console.error(error)
+    console.error(`getMonGen345Identifier: ${error}`)
   }
   return undefined
 }

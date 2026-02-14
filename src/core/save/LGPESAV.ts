@@ -1,4 +1,3 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PB7 } from '@pokemon-files/pkm'
@@ -7,8 +6,9 @@ import { LGE_STARTER, LGP_STARTER } from '@pokemon-resources/consts/Formes'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { LGPE_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { OHPKM } from '../pkm/OHPKM'
 import { CRC16_NoInvert } from './encryption/Encryption'
-import { Box, BoxCoordinates, OfficialSAV, SlotMetadata } from './interfaces'
+import { Box, BoxAndSlot, OfficialSAV, SlotMetadata } from './interfaces'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from './util/byteLogic'
 import { PathData } from './util/path'
 
@@ -65,7 +65,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   trainerDataOffset: number = 0x1000
 
@@ -108,7 +108,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
         const displayBoxSlot = monIndex % 30
 
         if (mon !== null) {
-          this.boxes[displayBoxNum].pokemon[displayBoxSlot] = mon
+          this.boxes[displayBoxNum].boxSlots[displayBoxSlot] = mon
         }
       } catch (e) {
         console.error(e)
@@ -116,26 +116,17 @@ export class LGPESAV extends OfficialSAV<PB7> {
     }
   }
 
-  prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
+  prepareForSaving() {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
+      const mon = this.boxes[box].boxSlots[index]
 
-    this.updatedBoxSlots.forEach(({ box, index }) => {
-      const changedMon = this.boxes[box].pokemon[index]
-
-      // we don't want to save OHPKM files of mons that didn't leave the save
-      // (and would still be PB7s)
-      if (changedMon instanceof OHPKM) {
-        changedMonPKMs.push(changedMon)
-      }
       const monIndex = 30 * box + index
 
-      // changedMon will be undefined if pokemon was moved from this slot
+      // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (changedMon) {
+      if (mon) {
         try {
-          const mon = changedMon instanceof OHPKM ? new PB7(changedMon) : changedMon
-
-          if (mon?.gameOfOrigin && mon?.dexNum) {
+          if (mon.gameOfOrigin && mon.dexNum) {
             this.writeMonAtIndex(mon, monIndex)
           }
         } catch (e) {
@@ -156,7 +147,6 @@ export class LGPESAV extends OfficialSAV<PB7> {
 
     dataView.setUint16(PC_CHECKSUM_OFFSET, newPcChecksum, true)
     dataView.setUint16(POKE_LIST_HEADER_CHECKSUM_OFFSET, newPokeHeaderChecksum, true)
-    return changedMonPKMs
   }
 
   compressStorage() {
@@ -186,6 +176,10 @@ export class LGPESAV extends OfficialSAV<PB7> {
     this.bytes.set(storageBufferCopy, PC_OFFSET)
 
     return nextEmptyIndex
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PB7 {
+    return new PB7(ohpkm)
   }
 
   getMonAtIndex(monIndex: number) {
@@ -255,7 +249,14 @@ export class LGPESAV extends OfficialSAV<PB7> {
       }
     }
 
-    const mon = this.boxes[boxNum].pokemon[boxSlot]
+    if (this.pokeListHeader.partyIndices.includes(monIndex)) {
+      return {
+        isDisabled: true,
+        disabledReason: 'This Pokémon is in your party and cannot be moved out of the box',
+      }
+    }
+
+    const mon = this.boxes[boxNum].boxSlots[boxSlot]
 
     if (
       (mon?.dexNum === NationalDex.Pikachu && mon.formeNum === LGP_STARTER) ||
@@ -264,13 +265,6 @@ export class LGPESAV extends OfficialSAV<PB7> {
       return {
         isDisabled: true,
         disabledReason: 'Partner Pokémon cannot be moved out of the box',
-      }
-    }
-
-    if (this.pokeListHeader.partyIndices.includes(monIndex)) {
-      return {
-        isDisabled: true,
-        disabledReason: 'This Pokémon is in your party and cannot be moved out of the box',
       }
     }
 

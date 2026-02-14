@@ -7,12 +7,10 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { useItems } from '@openhome-ui/state/items'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { MonLocation, useSaves } from '@openhome-ui/state/saves'
+import { isMonLocation, useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { ReactNode, useCallback, useState } from 'react'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/core/pkm/util'
@@ -23,7 +21,6 @@ import useDragAndDrop from './useDragAndDrop'
 export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { children } = props
   const savesAndBanks = useSaves()
-  const ohpkmStore = useOhpkmStore()
   const { moveMonItemToBag, giveItemToMon } = useItems()
   const { dragState, startDragging, endDragging } = useDragAndDrop()
   const [dragOverId, setDragOverId] = useState<UniqueIdentifier | null>(null)
@@ -87,18 +84,19 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
           moveMonItemToBag(payload.monData)
         } else if (
           isMonLocation(dest) &&
-          (dest.is_home || dest.save.supportsMon(mon.dexNum, mon.formeNum))
+          (dest.isHome ||
+            savesAndBanks
+              .saveFromIdentifier(dest.saveIdentifier)
+              .supportsMon(mon.dexNum, mon.formeNum))
         ) {
           const source = payload.monData
 
-          // If moving mon outside of its save, start persisting this mon's data in OpenHome
-          // (if it isnt already)
-          if (source.save !== dest.save) {
-            ohpkmStore.overwrite(new OHPKM(mon))
-          }
-
           // Move item to OpenHome bag if not supported by the save file
-          if (mon.heldItemIndex && !dest.is_home && !dest.save?.supportsItem(mon.heldItemIndex)) {
+          if (
+            mon.heldItemIndex &&
+            !dest.isHome &&
+            !savesAndBanks.saveFromIdentifier(dest.saveIdentifier).supportsItem(mon.heldItemIndex)
+          ) {
             moveMonItemToBag(source)
           }
 
@@ -142,8 +140,4 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
       {children}
     </DndContext>
   )
-}
-
-function isMonLocation(obj: object | undefined): obj is MonLocation {
-  return obj !== undefined && 'box' in obj && 'box_slot' in obj
 }

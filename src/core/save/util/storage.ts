@@ -1,30 +1,32 @@
+import { OhpkmIdentifier } from '../../pkm/Lookup'
+
 export type SaveFolder = {
   path: string
   label?: string
 }
 
 export type StoredBankData = {
-  banks: OpenHomeBank[]
+  banks: SimpleOpenHomeBank[]
   current_bank: number
 }
 
-export type OpenHomeBank = {
+export type SimpleOpenHomeBank = {
   id: string
   index: number
   name: string | undefined
-  boxes: OpenHomeBox[]
+  boxes: SimpleOpenHomeBox[]
   current_box: number
 }
 
-export type OpenHomeBox = {
+export type SimpleOpenHomeBox = {
   id: string
   index: number
   name: string | null
   identifiers: BoxMonIdentifiers
 }
 
-export type BoxMonIdentifiers = Record<number, string>
+export type BoxMonIdentifiers = Map<number, OhpkmIdentifier>
 
-export function getBankName(bank: OpenHomeBank): string {
+export function getBankName(bank: SimpleOpenHomeBank): string {
   return bank.name ?? `Bank ${bank.index + 1}`
 }

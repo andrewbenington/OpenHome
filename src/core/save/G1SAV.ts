@@ -1,4 +1,3 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
 import { range, unique } from '@openhome-core/util/functional'
@@ -7,8 +6,9 @@ import * as conversion from '@pokemon-files/conversion'
 import { PK1 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
-import { LOOKUP_TYPE } from './util'
+import { OHPKM } from '../pkm/OHPKM'
+import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
+import { LookupType } from './util'
 import { PathData } from './util/path'
 
 const SAVE_SIZE_BYTES = 0x8000
@@ -17,7 +17,7 @@ export class G1SAV extends OfficialSAV<PK1> {
   static pkmType = PK1
 
   static transferRestrictions = GEN1_TRANSFER_RESTRICTIONS
-  static lookupType: LOOKUP_TYPE = 'gen12'
+  static lookupType: LookupType = 'gen12'
 
   NUM_BOXES = 14
 
@@ -57,13 +57,12 @@ export class G1SAV extends OfficialSAV<PK1> {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
-  constructor(path: PathData, bytes: Uint8Array, fileCreated?: Date) {
+  constructor(path: PathData, bytes: Uint8Array) {
     super()
     this.bytes = bytes
     this.filePath = path
-    this.fileCreated = fileCreated
     this.tid = bytesToUint16BigEndian(this.bytes, 0x2605)
     this.displayID = this.tid.toString().padStart(5, '0')
     this.name = gen12StringToUTF(this.bytes, 0x2598, 11)
@@ -129,21 +128,17 @@ export class G1SAV extends OfficialSAV<PK1> {
             )
             mon.gameOfOrigin = this.origin
             mon.language = Language.English
-            this.boxes[boxNumber].pokemon[monIndex] = mon
+            this.boxes[boxNumber].boxSlots[monIndex] = mon
           } catch (e) {
-            console.error(e)
+            console.error(`G1SAV: ${e}`)
           }
         }
       }
     })
   }
   sid?: number | undefined
-  pcChecksumOffset?: number | undefined
-  pcOffset?: number | undefined
-  calculatePcChecksum?: (() => number) | undefined
 
-  prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
+  prepareForSaving() {
     const changedBoxes: number[] = unique(this.updatedBoxSlots.map((coords) => coords.box))
     const pokemonPerBox = this.boxRows * this.boxColumns
 
@@ -158,26 +153,21 @@ export class G1SAV extends OfficialSAV<PK1> {
       const box = this.boxes[boxNumber]
       let numMons = 0
 
-      box.pokemon.forEach((boxMon) => {
+      box.boxSlots.forEach((boxMon) => {
         if (boxMon) {
-          if (boxMon instanceof OHPKM) {
-            changedMonPKMs.push(boxMon)
-          }
-          const pk1Mon = boxMon instanceof PK1 ? boxMon : new PK1(boxMon)
-
           // set the mon's dex number in the box
-          this.bytes[boxByteOffset + 1 + numMons] = conversion.toGen1PokemonIndex(pk1Mon.dexNum)
+          this.bytes[boxByteOffset + 1 + numMons] = conversion.toGen1PokemonIndex(boxMon.dexNum)
           // set the mon's data in the box
           this.bytes.set(
-            new Uint8Array(pk1Mon.toBytes()),
+            new Uint8Array(boxMon.toBytes()),
             boxByteOffset + this.BOX_PKM_OFFSET + numMons * this.BOX_PKM_SIZE
           )
           // set the mon's OT name in the box
-          const trainerNameBuffer = utf16StringToGen12(pk1Mon.trainerName, 11, true)
+          const trainerNameBuffer = utf16StringToGen12(boxMon.trainerName, 11, true)
 
           this.bytes.set(trainerNameBuffer, boxByteOffset + this.BOX_OT_OFFSET + numMons * 11)
           // set the mon's nickname in the box
-          const nicknameBuffer = utf16StringToGen12(pk1Mon.nickname, 11, true)
+          const nicknameBuffer = utf16StringToGen12(boxMon.nickname, 11, true)
 
           this.bytes.set(nicknameBuffer, boxByteOffset + this.BOX_NICKNAME_OFFSET + numMons * 11)
           numMons++
@@ -233,7 +223,10 @@ export class G1SAV extends OfficialSAV<PK1> {
     const wholeSaveChecksum = get8BitChecksum(this.bytes, 0x2598, 0x3521) ^ 0xff
 
     this.bytes[0x3523] = wholeSaveChecksum
-    return changedMonPKMs
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PK1 {
+    return new PK1(ohpkm)
   }
 
   supportsMon(dexNumber: number, formeNumber: number) {

@@ -1,10 +1,13 @@
-import { partitionResults } from '@openhome-core/util/functional'
+import { partitionResults, R } from '@openhome-core/util/functional'
+import '@openhome-ui/App.css'
+import AppTabs from '@openhome-ui/AppTabs'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import BackendInterface from '@openhome-ui/backend/backendInterface'
 import { BackendProvider } from '@openhome-ui/backend/backendProvider'
 import { TauriBackend } from '@openhome-ui/backend/tauri/tauriBackend'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import useDisplayError from '@openhome-ui/hooks/displayError'
+import useDebounce from '@openhome-ui/hooks/useDebounce'
 import { AppStateProvider } from '@openhome-ui/state/app-state'
 import {
   AppInfoContext,
@@ -12,24 +15,20 @@ import {
   appInfoReducer,
   Settings,
 } from '@openhome-ui/state/appInfo'
+import { DragMonContext, DragMonState, emptyDragState } from '@openhome-ui/state/drag-and-drop'
+import PokemonDndContext from '@openhome-ui/state/drag-and-drop/PokemonDndContext'
 import { ErrorContext, errorReducer } from '@openhome-ui/state/error'
 import { ItemBagContext, itemBagReducer } from '@openhome-ui/state/items'
+import { LookupsProvider } from '@openhome-ui/state/lookups'
 import { MouseContext, mouseReducer } from '@openhome-ui/state/mouse'
 import { OhpkmStoreProvider } from '@openhome-ui/state/ohpkm'
 import { PluginContext, pluginReducer } from '@openhome-ui/state/plugin'
 import { SavesProvider } from '@openhome-ui/state/saves'
+import ErrorMessageModal from '@openhome-ui/top-level/ErrorMessageModal'
+import UpdateMessageModal from '@openhome-ui/top-level/UpdateMessageModal'
 import { loadPlugin } from '@openhome-ui/util/plugin'
 import { Flex, Text, Theme } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
-import { DragMonContext, emptyDragState } from 'src/ui/state/drag-and-drop'
-import './App.css'
-import AppTabs from './AppTabs'
-import useDebounce from './hooks/useDebounce'
-import { DragMonState } from './state/drag-and-drop'
-import PokemonDndContext from './state/drag-and-drop/PokemonDndContext'
-import ErrorMessageModal from './top-level/ErrorMessageModal'
-import UpdateMessageModal from './top-level/UpdateMessageModal'
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
@@ -38,8 +37,10 @@ export default function App() {
   return (
     <Theme
       accentColor="red"
+      grayColor="gray"
       appearance={isDarkMode ? 'dark' : 'light'}
       style={{ background: 'var(--background-gradient)' }}
+      radius="small"
     >
       <BackendProvider backend={TauriBackend}>
         <ErrorContext.Provider value={[errorState, errorDispatch]}>
@@ -106,9 +107,9 @@ function AppWithBackend() {
     backend
       .getSettings()
       .then(
-        E.match(
-          async (err) => displayError('Error loading settings', err),
-          async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings })
+        R.match(
+          async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings }),
+          async (err) => displayError('Error loading settings', err)
         )
       )
       .finally(() => setSettingsLoading(false))
@@ -139,11 +140,7 @@ function AppWithBackend() {
   useEffect(() => {
     if (pluginState.loaded || !appInfoState.settingsLoaded) return
     backend.listInstalledPlugins().then(
-      E.match(
-        (err) => {
-          pluginDispatch({ type: 'set_loaded', payload: true })
-          displayError('Error Getting Installed Plugins', err)
-        },
+      R.match(
         (plugins) => {
           const promises = plugins
             .filter((plugin) => appInfoState.settings.enabledPlugins[plugin.id])
@@ -161,6 +158,10 @@ function AppWithBackend() {
             pluginDispatch({ type: 'register_plugins', payload: plugins })
             pluginDispatch({ type: 'set_loaded', payload: true })
           })
+        },
+        (err) => {
+          pluginDispatch({ type: 'set_loaded', payload: true })
+          displayError('Error Getting Installed Plugins', err)
         }
       )
     )
@@ -177,27 +178,29 @@ function AppWithBackend() {
       <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
         <AppStateProvider>
           <MouseContext.Provider value={[mouseState, mouseDispatch]}>
-            <OhpkmStoreProvider>
-              <ItemBagContext.Provider value={[bagState, bagDispatch]}>
-                <SavesProvider>
-                  <DragMonContext.Provider value={[dragState, setDragState]}>
-                    <PokemonDndContext>
-                      {settingsLoading ? (
-                        <Flex width="100%" height="100vh" align="center" justify="center">
-                          <Text size="9" weight="bold">
-                            OpenHome
-                          </Text>
-                        </Flex>
-                      ) : (
-                        <AppTabs />
-                      )}
-                      <ErrorMessageModal />
-                      <UpdateMessageModal />
-                    </PokemonDndContext>
-                  </DragMonContext.Provider>
-                </SavesProvider>
-              </ItemBagContext.Provider>
-            </OhpkmStoreProvider>
+            <LookupsProvider>
+              <OhpkmStoreProvider>
+                <ItemBagContext.Provider value={[bagState, bagDispatch]}>
+                  <SavesProvider>
+                    <DragMonContext.Provider value={[dragState, setDragState]}>
+                      <PokemonDndContext>
+                        {settingsLoading ? (
+                          <Flex width="100%" height="100vh" align="center" justify="center">
+                            <Text size="9" weight="bold">
+                              OpenHome
+                            </Text>
+                          </Flex>
+                        ) : (
+                          <AppTabs />
+                        )}
+                        <ErrorMessageModal />
+                        <UpdateMessageModal />
+                      </PokemonDndContext>
+                    </DragMonContext.Provider>
+                  </SavesProvider>
+                </ItemBagContext.Provider>
+              </OhpkmStoreProvider>
+            </LookupsProvider>
           </MouseContext.Provider>
         </AppStateProvider>
       </AppInfoContext.Provider>

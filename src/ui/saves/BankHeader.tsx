@@ -1,4 +1,3 @@
-import { getBankName } from '@openhome-core/save/util/storage'
 import { EditIcon } from '@openhome-ui/components/Icons'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
 import { useSaves } from '@openhome-ui/state/saves'
@@ -83,7 +82,7 @@ function BankSelector(props: { disabled?: boolean }) {
             key={bank.index}
             onClick={() => savesAndBanks.switchToBank(bank.index)}
           >
-            {getBankName(bank)}
+            {bank.nameOrDefault()}
           </DropdownMenu.Item>
         ))}
 

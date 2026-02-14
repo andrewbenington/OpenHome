@@ -1,5 +1,5 @@
 import { BackendContext } from '@openhome-ui/backend/backendContext'
-import { AppInfoContext } from '@openhome-ui/state/appInfo'
+import { AppInfoContext, AppTheme } from '@openhome-ui/state/appInfo'
 import { Card, RadioGroup } from '@radix-ui/themes'
 import { useContext, useEffect } from 'react'
 
@@ -35,7 +35,7 @@ export default function Settings() {
 
         <b>App Theme</b>
         <RadioGroup.Root
-          onValueChange={(newValue: 'light' | 'dark' | 'system') => {
+          onValueChange={(newValue: AppTheme) => {
             if (!newValue) return
             backend.setTheme(newValue)
             dispatchAppInfoState({ type: 'set_app_theme', payload: newValue })

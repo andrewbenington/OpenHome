@@ -1,6 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { AbilityIndex, MetadataLookup, SpeciesAndForme } from '@pkm-rs/pkg'
-import { Stats, StatsPreSplit } from '@pokemon-files/util'
+import { FourMoves, Stats, StatsPreSplit } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import {
@@ -209,15 +209,15 @@ export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
 
 export const adjustMovePPBetweenFormats = (
   destFormatMon: {
-    moves: number[]
-    movePP: number[]
-    movePPUps: number[]
+    moves: FourMoves
+    movePP: FourMoves
+    movePPUps: FourMoves
     format: string
   },
   sourceFormatMon: {
-    moves: number[]
-    movePP: number[]
-    movePPUps: number[]
+    moves: FourMoves
+    movePP: FourMoves
+    movePPUps: FourMoves
     format: string
   }
 ) => {
@@ -227,7 +227,7 @@ export const adjustMovePPBetweenFormats = (
     const difference = otherMaxPP - thisMaxPP
 
     return sourceFormatMon.movePP[i] - difference
-  }) as [number, number, number, number]
+  }) as FourMoves
 }
 
 export function getCharacteristic(mon: PKMInterface) {

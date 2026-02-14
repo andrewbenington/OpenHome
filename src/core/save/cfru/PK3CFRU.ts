@@ -9,6 +9,7 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import {
+  FourMoves,
   generatePersonalityValuePreservingAttributes,
   getFlag,
   getMoveMaxPP,
@@ -17,6 +18,7 @@ import {
   markingsFourShapesFromBytes,
   markingsFourShapesFromOther,
   markingsFourShapesToBytes,
+  MoveFilter,
   read30BitIVsFromBytes,
   readGen3StringFromBytes,
   readStatsFromBytesU8,
@@ -28,6 +30,7 @@ import {
   writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
+import { PluginIdentifier } from '../interfaces'
 
 export interface CFRUToNationalDexEntry {
   NationalDexIndex: number
@@ -73,9 +76,9 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   //   return 'PK3RR'
   // }
   format: string = 'PK3CFRU'
-  abstract pluginIdentifier: string
+  abstract pluginIdentifier: PluginIdentifier
 
-  pluginOrigin?: string
+  pluginOrigin?: PluginIdentifier
   personalityValue: number
   trainerID: number
   secretID: number
@@ -86,10 +89,10 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   internalHeldItemIndex: number
   abstract heldItemIndex: number
   exp: number
-  movePPUps: number[]
-  movePP: number[] = [0, 0, 0, 0]
+  movePPUps: FourMoves
+  movePP: FourMoves = [0, 0, 0, 0]
   trainerFriendship: number
-  moves: number[]
+  moves: FourMoves
   evs: Stats
   pokerusByte: number
   internalMetLocationIndex: number
@@ -239,15 +242,13 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.formeNum = other.formeNum
       this.internalHeldItemIndex = this.internalItemIndexFromModern(other.heldItemIndex)
       this.exp = other.exp
-      this.movePPUps = other.movePPUps
       this.trainerFriendship = other.trainerFriendship ?? 0
-      this.moves = other.moves.map(this.moveToGameIndex).map(this.moveFromGameIndex)
 
-      for (let i = 0; i < 4; i++) {
-        const pp = getMoveMaxPP(this.moves[i], this.format, this.movePPUps[i])
+      const moveFilter = MoveFilter.fromMoveIndices(this.getValidMoveIndices())
+      this.moves = moveFilter.moves(other)
+      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePPUps = moveFilter.movePpUps(other)
 
-        if (pp) this.movePP[i] = pp
-      }
       this.evs = other.evs ?? {
         hp: 0,
         atk: 0,
@@ -318,6 +319,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
   abstract moveFromGameIndex(gameIndex: number): number
   abstract moveToGameIndex(nationalMoveId: number): number
+  abstract getValidMoveIndices(): number[]
 
   abstract monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry
   abstract monToGameIndex(nationalDexNumber: number, formIndex: number): number
@@ -483,7 +485,9 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     return []
   }
 
-  abstract getPluginIdentifier(): string
+  getPluginIdentifier(): PluginIdentifier {
+    return this.pluginIdentifier
+  }
 }
 
 export default PK3CFRU

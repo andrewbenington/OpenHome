@@ -3,6 +3,7 @@ import { Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { PA8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { LA_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { OHPKM } from '../../pkm/OHPKM'
 import { SCArrayBlock, SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { PathData } from '../util/path'
@@ -42,6 +43,10 @@ export class LASAV extends G89SAV<PA8> {
     this.tid = fullTrainerID % 1000000
     this.sid = this.myStatusBlock.getSID()
     this.displayID = this.tid.toString().padStart(6, '0')
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PA8 {
+    return new PA8(ohpkm)
   }
 
   getBoxCount(): number {

@@ -1,23 +1,25 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import { Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import { OHPKM } from '../pkm/OHPKM'
+import { LookupType, SAVClass } from './util'
 import { PathData } from './util/path'
 
 type SparseArray<T> = (T | undefined)[]
 export class Box<P extends PKMInterface> {
   name: string | undefined
-  pokemon: SparseArray<P | OHPKM>
+  boxSlots: SparseArray<P>
 
   constructor(name: string, boxSize: number) {
     this.name = name
-    this.pokemon = new Array(boxSize)
+    this.boxSlots = new Array(boxSize)
   }
 }
 
-export interface BoxCoordinates {
+export interface BoxAndSlot {
   box: number
-  index: number
+  boxSlot: number
 }
 
 export type SlotMetadata =
@@ -25,6 +27,11 @@ export type SlotMetadata =
   | { isDisabled: false; disabledReason?: undefined }
 
 export type SAV<P extends PKMInterface = PKMInterface> = OfficialSAV<P> | PluginSAV<P>
+
+export type SaveWriter = {
+  bytes: Uint8Array
+  filepath: string
+}
 
 export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   origin: OriginGame
@@ -44,12 +51,10 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   currentPCBox: number
   boxes: Array<Box<P>>
 
-  bytes: Uint8Array
-
   invalid: boolean
   tooEarlyToOpen: boolean
 
-  updatedBoxSlots: BoxCoordinates[]
+  updatedBoxSlots: BoxAndSlot[]
 
   isPlugin: boolean
 
@@ -59,9 +64,10 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
 
-  prepareBoxesAndGetModified: () => OHPKM[]
+  prepareWriter: () => SaveWriter
 
   getDisplayData(): Record<string, string | number | undefined> | undefined
+  convertOhpkm(ohpkm: OHPKM): P
 }
 
 export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
@@ -81,11 +87,20 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
-  abstract updatedBoxSlots: BoxCoordinates[]
+  abstract updatedBoxSlots: BoxAndSlot[]
   abstract getCurrentBox(): Box<P>
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
   abstract supportsItem(itemIndex: number): boolean
-  abstract prepareBoxesAndGetModified(): OHPKM[]
+  abstract prepareForSaving(): void
+  abstract convertOhpkm(ohpkm: OHPKM): P
+
+  prepareWriter(): SaveWriter {
+    this.prepareForSaving()
+    return {
+      bytes: new Uint8Array(this.bytes),
+      filepath: this.filePath.raw,
+    }
+  }
 
   getDisplayData(): Record<string, string | number | undefined> | undefined {
     return {
@@ -96,6 +111,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   }
 
   isPlugin: false = false
+  pluginIdentifier: undefined = undefined
 
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
 
@@ -109,6 +125,14 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
 
   get gameLogoPath(): string | undefined {
     return OriginGames.logoPath(this.origin)
+  }
+
+  get identifier(): SaveIdentifier {
+    return saveToStringIdentifier(this)
+  }
+
+  get lookupType(): Option<LookupType> {
+    return (this.constructor as SAVClass).lookupType
   }
 }
 
@@ -129,12 +153,21 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
-  abstract updatedBoxSlots: BoxCoordinates[]
+  abstract updatedBoxSlots: BoxAndSlot[]
   abstract getCurrentBox(): Box<P>
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
   abstract supportsItem(itemIndex: number): boolean
   abstract getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined
-  abstract prepareBoxesAndGetModified(): OHPKM[]
+  abstract prepareForSaving(): void
+  abstract convertOhpkm(ohpkm: OHPKM): P
+
+  prepareWriter(): SaveWriter {
+    this.prepareForSaving()
+    return {
+      bytes: new Uint8Array(this.bytes),
+      filepath: this.filePath.raw,
+    }
+  }
 
   getDisplayData(): Record<string, string | number | undefined> | undefined {
     return {
@@ -146,9 +179,11 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   isPlugin = true
 
-  abstract pluginIdentifier: string
+  abstract pluginIdentifier: PluginIdentifier
 
-  abstract get gameName(): string
+  get gameName(): string {
+    return pluginGameName(this.pluginIdentifier)
+  }
 
   get gameColor(): string {
     return getPluginColor(this.pluginIdentifier)
@@ -156,6 +191,14 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   get gameLogoPath(): string {
     return `logos/${this.pluginIdentifier}.png`
+  }
+
+  get identifier(): SaveIdentifier {
+    return saveToStringIdentifier(this)
+  }
+
+  get lookupType(): Option<LookupType> {
+    return (this.constructor as SAVClass).lookupType
   }
 }
 
@@ -170,4 +213,37 @@ export function getSaveRef(save: SAV): SaveRef {
     pluginIdentifier: save.isPlugin ? save.pluginIdentifier : null,
     valid: true,
   }
+}
+export type PluginIdentifier = 'radical_red' | 'unbound'
+
+export function pluginGameName(identifier: PluginIdentifier): string {
+  switch (identifier) {
+    case 'radical_red':
+      return 'Radical Red'
+    case 'unbound':
+      return 'Unbound'
+  }
+}
+
+export function pluginOriginMarkPath(identifier: PluginIdentifier): string | undefined {
+  switch (identifier) {
+    case 'radical_red':
+    case 'unbound':
+      return '/icons/gba.png'
+  }
+}
+export const Delimiter = '$' as const
+
+export type Delim = typeof Delimiter
+
+type OfficialSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}`
+
+type PluginSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}${Delim}${string}`
+
+export type SaveIdentifier = OfficialSaveIdentifier | PluginSaveIdentifier
+
+export function saveToStringIdentifier(save: SAV): SaveIdentifier {
+  return save.pluginIdentifier
+    ? `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}${Delimiter}${save.pluginIdentifier}`
+    : `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}`
 }

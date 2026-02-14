@@ -26,3 +26,5 @@ export function includeClass(className: string) {
     },
   }
 }
+
+export type CssRemSize = `${number}rem`

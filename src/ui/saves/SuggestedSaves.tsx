@@ -1,17 +1,20 @@
 import { getSaveRef, SAV } from '@openhome-core/save/interfaces'
 import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
-import { filterUndefined, numericSorter, stringSorter } from '@openhome-core/util/sort'
+import {
+  filterUndefined,
+  numericSorter,
+  SortableColumn,
+  stringSorter,
+} from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
-import OHDataGrid, { SortableColumn } from '@openhome-ui/components/OHDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
-import { useLookups } from '@openhome-ui/state/lookups'
-import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Flex } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { R } from 'src/core/util/functional'
+import SortableDataGrid from 'src/ui/components/SortableDataGrid'
 import SaveCard from './SaveCard'
 import { filterEmpty, SaveViewMode } from './util'
 
@@ -26,8 +29,6 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const backend = useContext(BackendContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
-  const ohpkmStore = useOhpkmStore()
-  const { getLookups } = useLookups()
   const savesAndBanks = useSaves()
   const [error, setError] = useState(false)
   const displayError = useDisplayError()
@@ -48,40 +49,21 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const loadSaveData = useCallback(
     async (savePath: PathData) => {
       const response = await backend.loadSaveFile(savePath)
-      const lookupsResponse = await getLookups()
 
-      if (E.isLeft(lookupsResponse)) {
-        console.error(lookupsResponse.left)
-        handleError('Error loading lookups', lookupsResponse.left)
-        return
-      }
+      if (R.isOk(response)) {
+        const { fileBytes } = response.value
 
-      const lookups = lookupsResponse.right
-
-      if (E.isRight(response)) {
-        const { fileBytes } = response.right
-
-        return buildUnknownSaveFile(
-          savePath,
-          fileBytes,
-          {
-            getOhpkmById: ohpkmStore.getById,
-            gen12LookupMap: lookups.gen12,
-            gen345LookupMap: lookups.gen345,
-          },
-          getEnabledSaveTypes()
-        )
+        return buildUnknownSaveFile(savePath, fileBytes, getEnabledSaveTypes())
       }
       return undefined
     },
-    [backend, getEnabledSaveTypes, getLookups, handleError, ohpkmStore.getById]
+    [backend, getEnabledSaveTypes]
   )
 
   useEffect(() => {
     if (error || suggestedSaves) return
     backend.findSuggestedSaves().then(
-      E.match(
-        (err) => handleError('Error getting suggested saves', err),
+      R.match(
         async (possibleSaves) => {
           const allPaths = (possibleSaves?.citra ?? [])
             .concat(possibleSaves?.open_emu ?? [])
@@ -92,16 +74,17 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
               filterEmpty
             )
 
-            saves.filter(E.isLeft).forEach((s) => console.warn(`Suggested save error: ${s.left}`))
+            saves.filter(R.isErr).forEach((s) => console.warn(`Suggested save error: ${s.err}`))
 
             setSuggestedSaves(
               saves
-                .filter(E.isRight)
-                .map((s) => s.right)
+                .filter(R.isOk)
+                .map((s) => s.value)
                 .filter(filterUndefined)
             )
           }
-        }
+        },
+        async (err) => handleError('Error getting suggested saves', err)
       )
     )
   }, [backend, error, handleError, loadSaveData, suggestedSaves])
@@ -110,7 +93,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     {
       key: 'open',
       name: 'Open',
-      width: 80,
+      width: '5rem',
 
       renderCell: (params) => (
         <button
@@ -128,7 +111,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     {
       key: 'game',
       name: 'Game',
-      width: 130,
+      width: '8rem',
       renderValue: (value) => {
         return value.gameLogoPath ? (
           <img alt="save logo" height={40} src={value.gameLogoPath} />
@@ -142,7 +125,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     {
       key: 'trainerDetails',
       name: 'Trainer',
-      width: 160,
+      width: '10rem',
       renderValue: (params) => `${params.name} (${params.tid})`,
       sortFunction: stringSorter((save) => `${save.name} (${save.tid})`),
     },
@@ -172,7 +155,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   ]
 
   return view === 'grid' ? (
-    <OHDataGrid rows={suggestedSaves ?? []} columns={columns} />
+    <SortableDataGrid rows={suggestedSaves ?? []} columns={columns} />
   ) : (
     <Flex wrap="wrap" direction="row" justify="center" m="4" gap="2">
       {suggestedSaves?.map((save) => (

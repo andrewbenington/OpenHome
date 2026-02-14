@@ -1,5 +1,6 @@
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
 import { ItemRadicalRed } from '@pkm-rs/pkg'
+import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { FRLG_SECURITY_COPY_OFFSET, FRLG_SECURITY_OFFSET } from '../G3SAV'
 import { SlotMetadata } from '../interfaces'
@@ -9,7 +10,7 @@ import { RRExcludedForms, RRTransferMon } from './conversion/RRTransferMons'
 import PK3RR from './PK3RR'
 
 // https://docs.google.com/spreadsheets/d/15mUFUcN8250hRL7iUOJPX0s1rMcgVuJPuHANioL4o2o/edit?gid=45654363#gid=962831839
-const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
+export const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   transferableDexNums: RRTransferMon,
   excludedForms: RRExcludedForms,
 }
@@ -17,10 +18,10 @@ const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
 export class G3RRSAV extends G3CFRUSAV<PK3RR> {
   static transferRestrictions: TransferRestrictions = RR_TRANSFER_RESTRICTIONS
 
-  pluginIdentifier = 'radical_red'
+  pluginIdentifier = 'radical_red' as const
 
-  get gameName() {
-    return 'Radical Red'
+  convertOhpkm(ohpkm: OHPKM): PK3RR {
+    return new PK3RR(ohpkm)
   }
 
   supportsMon(dexNumber: number, formeNumber: number) {
@@ -62,7 +63,7 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
   }
 
   getSlotMetadata = (boxNum: number, boxSlot: number): SlotMetadata => {
-    const mon = this.boxes[boxNum].pokemon[boxSlot]
+    const mon = this.boxes[boxNum].boxSlots[boxSlot]
 
     if (mon instanceof PK3RR && mon.isFakemon) {
       return {

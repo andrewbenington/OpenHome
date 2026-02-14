@@ -52,7 +52,7 @@ export const getOriginMark = (originMark: string) => {
 
 export function getOriginIconPath(origin: OriginGameWithData) {
   return origin.generation === Generation.G4 || origin.generation === Generation.G5
-    ? 'icons/ds.png'
+    ? '/icons/ds.png'
     : origin.game === OriginGame.ColosseumXd
       ? '/icons/gcn.png'
       : origin.generation === Generation.G3

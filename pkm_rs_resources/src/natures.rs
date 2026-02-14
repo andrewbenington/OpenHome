@@ -21,6 +21,8 @@ impl NatureIndex {
     }
 }
 
+const SERIOUS_INDEX: u8 = 12;
+
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 #[cfg(feature = "wasm")]
@@ -30,12 +32,11 @@ impl NatureIndex {
     //! methods could result in use-after-free)
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(constructor))]
-    pub fn new_js(val: u8) -> Result<NatureIndex, JsValue> {
-        // log("creating new");
+    pub fn new_js(val: u8) -> NatureIndex {
         if val > NATURE_MAX {
-            Err(format!("Invalid nature index: {val}").into())
+            NatureIndex(SERIOUS_INDEX)
         } else {
-            Ok(NatureIndex(val))
+            NatureIndex(val)
         }
     }
 
