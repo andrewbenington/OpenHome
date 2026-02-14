@@ -8,7 +8,7 @@ import { SCArrayBlock, SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { PathData } from '../util/path'
 import { BoxNamesBlock } from './BoxNamesBlock'
-import { G89BlockName, G89SAV } from './G8SAV'
+import { G89BlockName, G89SAV } from './G89SAV'
 
 export type LA_SAVE_REVISION = 'Base' | 'Daybreak'
 
@@ -90,6 +90,10 @@ export class LASAV extends G89SAV<PA8> {
 
   getBoxSizeBytes(): number {
     return LASAV.boxSizeBytes
+  }
+
+  getBoxSlotGapBytes(): number {
+    return 0
   }
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {

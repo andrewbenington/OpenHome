@@ -1,5 +1,6 @@
 import { FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
 import { AllPKMFields, Stats } from '@pokemon-files/util'
+import { PKM, RomHackPKM } from '../../../packages/pokemon-files/src/pkm/PKM'
 import { PluginIdentifier } from '../save/interfaces'
 
 export interface OfficialPKMInterface extends PKMInterface {
@@ -24,3 +25,5 @@ export type PKMInterface = AllPKMFields & {
   metadata?: FormeMetadata
   speciesMetadata?: SpeciesMetadata
 }
+
+export type MonFormat = (PKM | RomHackPKM)['format']

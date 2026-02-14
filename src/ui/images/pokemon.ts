@@ -8,12 +8,9 @@ import { MonSpriteData } from '@openhome-ui/state/plugin'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { PKM, RomHackPKM } from '../../../packages/pokemon-files/src/pkm/PKM'
-import { OHPKM } from '../../core/pkm/OHPKM'
+import { MonFormat } from '../../core/pkm/interfaces'
 
-type MonFormat = (PKM | RomHackPKM | OHPKM)['format']
-
-export const fileToSpriteFolder: Record<MonFormat, string> = {
+export const fileToSpriteFolder: Record<MonFormat | 'OHPKM', string> = {
   PK1: 'gen1',
   PK2: 'gen2',
   PK3: 'gen3',
