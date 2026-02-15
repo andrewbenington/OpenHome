@@ -1,78 +1,41 @@
 import json
 import os
 import re
+import sqlite3
 import threading
-import time
 import urllib.request
+import database
+from models import PokemonForm, SpeciesWithForms
 
 if not os.path.isdir('public'):
     print("current directory must be project source. exiting")
     exit(1)
 
-if not (pokemon_json_path := os.getenv("POKEMON_JSON_PATH")):
-    print("POKEMON_JSON_PATH must be present. exiting")
-    exit(1)
+POKEMON_DATA: list[SpeciesWithForms] = []
 
-with open(pokemon_json_path) as f:
-    POKEMON_DATA = json.load(f)
-
-def format_pokemon_db_forme(dex_num: int, form_num: int) -> str:
-    if dex_num < 1 or dex_num > len(POKEMON_DATA):
-        return ""
-    forme_name = (
-        POKEMON_DATA[str(dex_num)]["formes"][form_num]["sprite"]
-    )
-    if "-core" in forme_name:
-        pattern = r"^(.*)-core-(\w+)$"
-        match = re.match(pattern, forme_name)
-
-        if match:
-            forme_name = f"{match.group(1)}-{match.group(2)}-core"
-    forme_name = forme_name.replace("galar", "galarian")
-    if dex_num == 555 and "zen" not in forme_name:
-        forme_name += "-standard"
-    if forme_name.endswith("pokeball"):
-        forme_name = forme_name[:-4] + "-ball"
-    elif forme_name.endswith("-alola"):
-        forme_name = forme_name + "n"
-    elif "paldea" in forme_name:
-        forme_name = forme_name.replace("paldea", "paldean")
-    elif forme_name.endswith("-hisui"):
-        forme_name = forme_name + "an"
-    elif forme_name.endswith("-exclamation"):
-        forme_name = forme_name[:-11] + "em"
-    elif forme_name.endswith("-question"):
-        forme_name = forme_name[:-8] + "qm"
-    return forme_name
+with sqlite3.connect("generate/pkm.db") as conn:
+    POKEMON_DATA = database.get_species(conn)
 
 
-def get_pokemon_db_sprite(dex_num: int, form_num: int, is_shiny: bool, game: str, is_female=False, forme_name=None) -> str:
-    if forme_name is None:
-        forme_name = format_pokemon_db_forme(dex_num, form_num)
-    female_stats = ["indeedee-f", "meowstic-f",
-                    "oinkologne-f", "basculegion-f"]
-    if game == "home" and forme_name in female_stats:
-        forme_name += "emale"
-    elif game == "bank" and forme_name.endswith("-core"):
-        forme_name = forme_name[:-5]
-    elif forme_name == "pikachu-partner-cap":
-        forme_name = "pikachu-johto-cap"
-    elif game == "black-white/anim" and ("therian" in forme_name or "kyurem-" in forme_name or "resolute" in forme_name):
-        game = "black-white-2/anim"
-    elif game == "red-blue":
-        forme_name += "-color"
-    elif game == "black-white/anim" and "darmanitan" in forme_name:
-        forme_name += "-mode"
-    extension = ".gif" if "anim" in game else ".png"
-    shininess = 'normal' if not is_shiny or game == "scarlet-violet" else 'shiny'
-    female_tag = '-female' if is_female and forme_name in female_stats else ('-f' if is_female else '')
-    return f"https://img.pokemondb.net/sprites/{game}/{shininess}/{forme_name}{female_tag}{extension}"
-
-def get_pokencyclopedia_coloxd_sprite(dex_num, is_shiny, forme_name):
-    if dex_num == 201 and len(forme_name) > 1:
-        forme_name = "-" + forme_name
-    return f"https://www.pokencyclopedia.info/sprites/spin-off/ani_xd{'_shiny' if is_shiny else ''}/ani_xd{'-S' if is_shiny else ''}_{str(dex_num).zfill(3)}{'-' + forme_name if forme_name != None else ''}.gif"
-
+def download_all_sprites_all_mons():
+    os.makedirs("public/sprites/home/shiny", exist_ok=True)
+    os.makedirs("public/sprites/gen1", exist_ok=True)
+    os.makedirs("public/sprites/gen2/shiny", exist_ok=True)
+    os.makedirs("public/sprites/gen3/shiny", exist_ok=True)
+    os.makedirs("public/sprites/gen3gc/shiny", exist_ok=True)
+    os.makedirs("public/sprites/gen4/shiny", exist_ok=True)
+    # os.makedirs("public/sprites/gen5/shiny", exist_ok=True)
+    # os.makedirs("public/sprites/gen6/shiny", exist_ok=True)
+    # os.makedirs("public/sprites/gen7/shiny", exist_ok=True)
+    # os.makedirs("public/sprites/gen8/shiny", exist_ok=True)
+    # os.makedirs("public/sprites/gen8a/shiny", exist_ok=True)
+    os.makedirs("public/sprites/gen9/shiny", exist_ok=True)
+    os.makedirs("public/sprites/gen9za/shiny", exist_ok=True)
+    for mon in POKEMON_DATA[:37]:
+        for form in mon.forms:
+            if form.form_index >= len(mon.forms):
+                print(f"{form.name} INVALID INDEX: {len(mon.forms)} ({len(mon.forms)} present)")
+            thread_all_sprite_downloads(form)
 
 def download_png(url, directory, filename):
     # Check if the file already exists in the directory
@@ -212,7 +175,7 @@ RegionalForms = {
     52: [1, 2]
 }
 
-first_forme_only = [
+first_form_only = [
     383,
     382,
     484,
@@ -299,7 +262,7 @@ swsh_transferrable = [
     896,897,898
 ]
 
-legends_dex = [
+legends_arceus_dex = [
     25, 26, 35, 36, 37, 38, 41, 42, 46, 47, 54, 55, 58, 59, 63, 64, 65, 66, 67,
     68, 72, 73, 74, 75, 76, 77, 78, 81, 82, 92, 93, 94, 95, 100, 101, 108, 111,
     112, 113, 114, 122, 123, 125, 126, 129, 130, 133, 134, 135, 136, 137, 143,
@@ -366,6 +329,28 @@ sv_transferrable = [
     789, 790, 791, 792, 800, 868, 869, 884,
 ]
 
+legends_za_transferrable = [152, 153, 154, 498, 499, 500, 158, 159, 160, 661, 662, 663, 659, 660, 664, 665, 666, 13, 14, 15,
+    16, 17, 18, 179, 180, 181, 504, 505, 406, 315, 407, 129, 130, 688, 689, 120, 121, 669, 670, 671,
+    672, 673, 677, 678, 667, 668, 674, 675, 568, 569, 702, 172, 25, 26, 173, 35, 36, 167, 168, 23,
+    24, 63, 64, 65, 92, 93, 94, 543, 544, 545, 679, 680, 681, 69, 70, 71, 511, 512, 513, 514, 515,
+    516, 307, 308, 309, 310, 280, 281, 282, 475, 228, 229, 333, 334, 531, 682, 683, 684, 685, 133,
+    134, 135, 136, 196, 197, 470, 471, 700, 427, 428, 353, 354, 582, 583, 584, 322, 323, 449, 450,
+    529, 530, 551, 552, 553, 66, 67, 68, 443, 444, 445, 703, 302, 303, 359, 447, 448, 79, 80, 199,
+    318, 319, 602, 603, 604, 147, 148, 149, 1, 2, 3, 4, 5, 6, 7, 8, 9, 618, 676, 686, 687, 690, 691,
+    692, 693, 704, 705, 706, 225, 361, 362, 478, 459, 460, 712, 713, 123, 212, 127, 214, 587, 701,
+    708, 709, 559, 560, 714, 715, 707, 607, 608, 609, 142, 696, 697, 698, 699, 95, 208, 304, 305,
+    306, 694, 695, 710, 711, 246, 247, 248, 656, 657, 658, 870, 650, 651, 652, 227, 653, 654, 655,
+    371, 372, 373, 115, 780, 374, 375, 376, 716, 717, 718, 719, 150,56, 57, 979, 52, 53, 863, 83, 865, 104, 105, 137, 233, 474, 951, 952, 957, 958, 959, 967, 969,
+    970, 479, 971, 972, 769, 770, 352, 973, 615, 977, 978, 996, 997, 998, 999, 1000, 211, 904, 252,
+    253, 254, 255, 256, 257, 258, 259, 260, 349, 350, 433, 358, 876, 509, 510, 517, 518, 538, 539,
+    562, 563, 867, 767, 768, 827, 828, 852, 853, 778, 900, 877, 622, 623, 821, 822, 823, 174, 39,
+    40, 926, 927, 396, 397, 398, 325, 326, 931, 739, 740, 932, 933, 934, 316, 317, 41, 42, 169, 935,
+    936, 937, 942, 943, 848, 849, 944, 945, 335, 336, 439, 122, 866, 590, 591, 485, 721, 638, 639,
+    640, 647, 648, 649, 720, 802, 808, 809, 491, 380, 381, 382, 383, 384, 801, 807]
+
+z_megas = [359, 445, 448]
+mega_z_form_index = 2
+
 
 gender_differences = [
     3, 12, 19, 20, 25, 26, 41, 42, 44, 45, 64, 65, 84, 85, 97, 111, 112, 118,
@@ -377,175 +362,105 @@ gender_differences = [
     465, 473, 521, 592, 593, 668]
 
 
-def excludeFormeGen45(dex_number, forme):
-    if "-mega" in forme["sprite"] or "-Fairy" in forme["formeName"]:
+# def excludeFormGen45(form: PokemonForm):
+#     if "-mega" in form.sprite_name or "-Fairy" in form.name:
+#         return True
+#     return excludeFormGen456(dex_number, form)
+
+
+# def excludeFormGen456(form: PokemonForm):
+#     if (dex_number in RegionalForms and
+#             form.form_index in RegionalForms[dex_number]):
+#         return True
+#     return dex_number in first_form_only and form.form_index != 0
+
+
+# def excludeFormGen4(form: PokemonForm):
+#     return excludeFormGen45(dex_number, form)
+
+
+# def excludeFormGen5(form: PokemonForm):
+#     if form.name == "Pichu-Spiky-Eared":
+#         return True
+#     return excludeFormGen45(dex_number, form)
+
+# def exclude_form_gen8(form: PokemonForm):
+#     if dex_number > 493 and dex_number not in swsh_transferrable:
+#         return True
+#     if form.name == "Pichu-Spiky-Eared":
+#         return True
+#     if dex_number in HisuianForms and form.form_index in HisuianForms[dex_number]:
+#         return True
+#     if dex_number in PaldeanForms and form.form_index in PaldeanForms[dex_number]:
+#         return True
+#     if dex_number in AlolanForms and form.form_index in AlolanForms[dex_number] and dex_number not in swsh_transferrable:
+#         return True
+#     return "-Mega" in form.name or "-Primal" in form.name or (dex_number == 25 and form.form_index > 0)
+
+
+def exclude_form_home(form: PokemonForm):
+    if form.name == "Pichu-Spiky-Eared":
         return True
-    return excludeFormeGen456(dex_number, forme)
-
-
-def excludeFormeGen456(dex_number, forme):
-    if (dex_number in RegionalForms and
-            forme["formeNumber"] in RegionalForms[dex_number]):
+    if form.name == "Floette-Eternal":
         return True
-    return dex_number in first_forme_only and forme["formeNumber"] != 0
+    return form.regional == "Paldea"
+
+def thread_all_sprite_downloads(form: PokemonForm):
+    def executer():
+        download_all_sprites(form)
+    thread = threading.Thread(target=executer)
+    thread.start()
+    
 
 
-def excludeFormeGen4(dex_number, forme):
-    return excludeFormeGen45(dex_number, forme)
-
-
-def excludeFormeGen5(dex_number, forme):
-    if forme["formeName"] == "Pichu-Spiky-Eared":
-        return True
-    return excludeFormeGen45(dex_number, forme)
-
-
-def excludeFormeGen7(dex_number, forme):
-    if dex_number not in alola_dex:
-        return True
-    if dex_number == 25 and forme["formeNumber"] > 7:
-        return True
-    if forme["formeName"] == "Pichu-Spiky-Eared":
-        return True
-    return dex_number in Gen89RegionalForms and forme["formeNumber"] in Gen89RegionalForms[dex_number]
-
-
-def excludeFormeLA(dex_number, forme):
-    if dex_number not in legends_dex:
-        return True
-    if dex_number not in [37, 38, 215]:
-        if dex_number in HisuianForms:
-            if forme["formeNumber"] not in HisuianForms[dex_number]:
-                return True
-        elif dex_number in RegionalForms and forme["formeNumber"] != 0:
-            return True
-    if forme["formeName"] == "Pichu-Spiky-Eared":
-        return True
-    return "-Mega" in forme["formeName"] or (dex_number == 25 and forme["formeNumber"] > 0)
-
-def exclude_forme_gen8(dex_number, forme):
-    if dex_number > 493 and dex_number not in swsh_transferrable:
-        return True
-    if forme["formeName"] == "Pichu-Spiky-Eared":
-        return True
-    if dex_number in HisuianForms and forme["formeNumber"] in HisuianForms[dex_number]:
-        return True
-    if dex_number in PaldeanForms and forme["formeNumber"] in PaldeanForms[dex_number]:
-        return True
-    if dex_number in AlolanForms and forme["formeNumber"] in AlolanForms[dex_number] and dex_number not in swsh_transferrable:
-        return True
-    return "-Mega" in forme["formeName"] or "-Primal" in forme["formeName"] or (dex_number == 25 and forme["formeNumber"] > 0)
-
-def exclude_forme_gen9(dex_number, forme):
-    if dex_number not in sv_transferrable:
-        return True
-    if forme["formeName"] == "Pichu-Spiky-Eared":
-        return True
-    if forme["formeName"] == "Floette-Eternal":
-        return True
-    return "-Mega" in forme["formeName"] or "-Primal" in forme["formeName"] or (dex_number == 25 and forme["formeNumber"] > 0)
-
-
-def exclude_forme_home(dex_number, forme):
-    if forme["formeName"] == "Pichu-Spiky-Eared":
-        return True
-    if forme["formeName"] == "Floette-Eternal":
-        return True
-    return "regional" in forme and forme["regional"] == "Paldea"
-
-
-def download_all_sprites_all_mons():
-    os.makedirs("public/sprites/home/shiny", exist_ok=True)
-    os.makedirs("public/sprites/gen1", exist_ok=True)
-    os.makedirs("public/sprites/gen2/shiny", exist_ok=True)
-    os.makedirs("public/sprites/gen3/shiny", exist_ok=True)
-    os.makedirs("public/sprites/gen3gc/shiny", exist_ok=True)
-    os.makedirs("public/sprites/gen4/shiny", exist_ok=True)
-    # os.makedirs("public/sprites/gen5/shiny", exist_ok=True)
-    # os.makedirs("public/sprites/gen6/shiny", exist_ok=True)
-    # os.makedirs("public/sprites/gen7/shiny", exist_ok=True)
-    # os.makedirs("public/sprites/gen8/shiny", exist_ok=True)
-    # os.makedirs("public/sprites/gen8a/shiny", exist_ok=True)
-    os.makedirs("public/sprites/gen9/shiny", exist_ok=True)
-    for dex_num_str, mon in POKEMON_DATA.items():
-        dex_number = int(dex_num_str)
-        for forme_number, forme in enumerate(mon["formes"]):
-            thread_all_sprite_downloads(dex_number, forme, forme_number)
-
-def thread_all_sprite_downloads(dex_number, forme, forme_number):
-    if dex_number != 869:
-        if 'sprite' not in forme:
-            print(forme['name'], 'missing sprite')
-        thread = threading.Thread(target=download_all_sprites, args=(
-            dex_number, forme, forme_number, forme["sprite"]))
-        thread.start()
-    else:
-        for sweet in sweets:
-            thread = threading.Thread(target=download_all_sprites, args=(
-                dex_number, forme, forme_number, forme["sprite"] + "-" + sweet))
-            thread.start()
-
-
-def download_all_sprites(dex_number, forme, forme_number, forme_name):
-    if "Totem" in forme["formeName"]:
+def download_all_sprites(form: PokemonForm):
+    if "Totem" in form.name:
         return
-    if dex_number <= 151 and forme_number == 0:
-        download_sprite_variants_pokemon_db(
-            dex_number, forme_number, forme_name, "red-blue", "gen1", False)
-    if dex_number <= 251 and forme_number == 0 or dex_number == 201 and forme_number <= 25:
-        download_sprite_variants_pokemon_db(
-            dex_number, forme_number, forme_name, "crystal", "gen2", False)
-    if dex_number <= 386 and forme_number == 0 or dex_number == 201 or dex_number == 386:
-        download_sprite_variants_pokemon_db(
-            dex_number, forme_number, forme_name, "emerald", "gen3", False)
-        download_sprite_variants_pokencyclopedia_coloxd(dex_number, forme_number, forme_name)
-    if dex_number <= 493 and not excludeFormeGen4(dex_number, forme):
-        download_sprite_variants_pokemon_db(
-            dex_number, forme_number, forme_name,
-            "heartgold-soulsilver", "gen4", dex_number != 133 and dex_number != 419)
-    # if dex_number <= 649 and not excludeFormeGen5(dex_number, forme):
+    if form.national_dex <= 151 and form.form_index == 0:
+        download_sprite_variants_pokemon_db(form, "red-blue", "gen1", False)
+    if form.national_dex <= 251 and form.form_index == 0 or form.national_dex == 201 and form.form_index <= 25:
+        download_sprite_variants_pokemon_db(form, "crystal", "gen2", False)
+    if form.national_dex <= 386 and form.form_index == 0 or form.national_dex == 201 or form.national_dex == 386:
+        download_sprite_variants_pokemon_db(form, "emerald", "gen3", False)
+        download_sprite_variants_pokencyclopedia_coloxd(form)
+    if form.national_dex <= 493 and form.has_gen4_sprite():
+        download_sprite_variants_pokemon_db(form, "heartgold-soulsilver", "gen4", form.national_dex != 133 and form.national_dex != 419)
+    # if form.national_dex <= 649 and not excludeFormGen5(form):
+    #     download_sprite_variants_pokemon_db(form, "black-white/anim", "gen5", form.national_dex != 133)
+    # if form.national_dex <= 721 and not excludeFormGen456(form: PokemonForm):
+    #     download_sprite_variants_pokemon_db(form, "bank", "gen6", form.national_dex != 133)
+    # if form.national_dex == 774:
+    #     download_sprite_variants_pokemon_db(form, "sun-moon", "gen7")
+    # elif form.national_dex <= 809 and not excludeFormGen7(form: PokemonForm):
     #     download_sprite_variants_pokemon_db(
-    #         dex_number, forme_number, forme_name, "black-white/anim", "gen5", dex_number != 133)
-    # if dex_number <= 721 and not excludeFormeGen456(dex_number, forme):
+    #         form.national_dex, form.form_index, form_name, "ultra-sun-ultra-moon", "gen7", form.national_dex != 133)
+    if form.national_dex <= 1025 and form.has_home_sprite():
+        download_sprite_variants_pokemon_db(form, "home", "home")
+    # if dex_number <= 724 and not excludeFormLA(form: PokemonForm):
     #     download_sprite_variants_pokemon_db(
-    #         dex_number, forme_number, forme_name, "bank", "gen6", dex_number != 133)
-    # if dex_number == 774:
-    #     download_sprite_variants_pokemon_db(
-    #         dex_number, forme_number, forme_name, "sun-moon", "gen7")
-    # elif dex_number <= 809 and not excludeFormeGen7(dex_number, forme):
-    #     download_sprite_variants_pokemon_db(
-    #         dex_number, forme_number, forme_name, "ultra-sun-ultra-moon", "gen7", dex_number != 133)
-    if dex_number <= 1025 and not exclude_forme_home(dex_number, forme):
-        download_sprite_variants_pokemon_db(
-            dex_number, forme_number, forme_name, "home", "home")
-    # if dex_number <= 724 and not excludeFormeLA(dex_number, forme):
-    #     download_sprite_variants_pokemon_db(
-    #         dex_number, forme_number, forme_name, "legends-arceus", "gen8a")
-    if dex_number <= 1025 and not exclude_forme_gen9(dex_number, forme):
-        download_sprite_variants_pokemon_db(
-            dex_number, forme_number, forme_name, "scarlet-violet", "gen9")
+    #         dex_number, form.form_index, form_name, "legends-arceus", "gen8a")
+    if form.national_dex <= 1025 and form.has_scarlet_violet_sprite():
+        download_sprite_variants_pokemon_db(form,  "scarlet-violet", "gen9")
 
-def download_sprite_variants_pokemon_db(dex_number, forme_number, forme_name, game, folder, includeFemale=True):
-    if "-totem" in forme_name:
+def download_sprite_variants_pokemon_db(form: PokemonForm, game, folder, includeFemale=True):
+    if "-totem" in form.name:
         return
+    
     extension = ".gif" if "anim" in game else ".png"
-    download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                       game, False, forme_name), "public/sprites/" + folder, forme_name + extension)
-    if game == "red-blue" or game == 'scarlet-violet':
-        return
-    download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                                       game, False, forme_name), "public/sprites/" + folder + "/shiny", forme_name + extension)
-    if includeFemale and dex_number in gender_differences and forme_number == 0 and dex_number != 255 and dex_number != 418:
-        download_png(get_pokemon_db_sprite(dex_number, forme_number, False,
-                                           game, is_female=True), "public/sprites/" + folder, forme_name + "-f" + extension)
-        download_png(get_pokemon_db_sprite(dex_number, forme_number, True,
-                                           game, is_female=True), "public/sprites/" + folder + "/shiny", forme_name + "-f" + extension)
 
-def download_sprite_variants_pokencyclopedia_coloxd(dex_number, forme_number, forme_name):
-    gen3_forme = None
-    if forme_number > 0 or dex_number == 201:
-        gen3_forme = forme_name.split('-')[1]
-    download_png(get_pokencyclopedia_coloxd_sprite(dex_number, False, gen3_forme), "public/sprites/gen3gc", forme_name + ".gif")
-    download_png(get_pokencyclopedia_coloxd_sprite(dex_number, True, gen3_forme), "public/sprites/gen3gc/shiny", forme_name + ".gif")
+    for sprite_name in form.variant_sprite_names():
+        download_png(form.pokemon_db_sprite_url(False, game, False), "public/sprites/" + folder, sprite_name + extension)
+        
+        if game == "red-blue" or game == 'scarlet-violet':
+            continue
+
+        download_png(form.pokemon_db_sprite_url(True, game, False), "public/sprites/" + folder + "/shiny", sprite_name + extension)
+        if includeFemale and form.national_dex in gender_differences and form.form_index == 0 and form.national_dex != 255 and form.national_dex != 418:
+            download_png(form.pokemon_db_sprite_url(False, game, is_female=True), "public/sprites/" + folder, sprite_name + "-f" + extension)
+            download_png(form.pokemon_db_sprite_url(True, game, is_female=True), "public/sprites/" + folder + "/shiny", sprite_name + "-f" + extension)
+
+def download_sprite_variants_pokencyclopedia_coloxd(form: PokemonForm):
+    download_png(form.colo_xd_sprite_url(False), "public/sprites/gen3gc", form.name + ".gif")
+    download_png(form.colo_xd_sprite_url(True), "public/sprites/gen3gc/shiny", form.name + ".gif")
 
 download_all_sprites_all_mons()
