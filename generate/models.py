@@ -77,6 +77,7 @@ class NatDex(int, Enum):
     SNEASEL = 215
     PICHU = 172
     ALCREMIE = 869
+    OGERPON = 1017
 
 class PokemonForm(BaseModel):
     """Represents a Pokémon form in the database."""
@@ -182,7 +183,7 @@ class PokemonForm(BaseModel):
             form_name = self.pokemon_db_format()
         female_stats = ["indeedee-f", "meowstic-f",
                         "oinkologne-f", "basculegion-f"]
-        if game == "home" and form_name in female_stats:
+        if game == "home" or game == "scarlet-violet" and form_name in female_stats:
             form_name += "emale"
         elif game == "bank" and form_name.endswith("-core"):
             form_name = form_name[:-5]
@@ -194,6 +195,12 @@ class PokemonForm(BaseModel):
             form_name += "-color"
         elif game == "black-white/anim" and "darmanitan" in form_name:
             form_name += "-mode"
+        if self.national_dex == NatDex.OGERPON and game == "scarlet-violet":
+            form_name = form_name.removesuffix("-mask")
+        if form_name.endswith("-four") and game == "scarlet-violet":
+            form_name = form_name.replace("-four", "-family4")
+        if "-core-" in form_name and game == "scarlet-violet":
+            form_name = form_name.replace("core-", "") + "-core"
         extension = ".gif" if "anim" in game else ".png"
         shininess = 'normal' if not is_shiny or game == "scarlet-violet" else 'shiny'
         female_tag = '-female' if is_female and form_name in female_stats else ('-f' if is_female else '')
@@ -272,7 +279,16 @@ class PokemonForm(BaseModel):
             if self.form_index > WORLD_PIKACHU:
                 return False
             
+        if "Greninja" in self.name and self.form_index > 0:
+            return False
+            
         if self.is_mega:
+            return False
+        
+        if self.name in ["Floette-Eternal", "Necrozma-Ultra"]:
+            return False
+        
+        if "-Primal" in self.name:
             return False
 
         return self.national_dex in SV_TRANSFERRABLE
