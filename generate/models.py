@@ -203,19 +203,6 @@ class PokemonForm(BaseModel):
         if self.form_index > 0 or self.national_dex == 201:
             return self.name.split('-')[1]
     
-    def colo_xd_sprite_url(self, is_shiny: bool):
-        gen3_form_name = self.gen3_form()
-
-        if self.national_dex == 201 and len(form_suffix := self.name.split('-')[1]) > 1:
-            form_name = "-" + form_suffix
-
-        dir_suffix = '_shiny' if is_shiny else ''
-        sprite_suffix = '-S' if is_shiny else ''
-        nat_dex_padded = str(self.national_dex).zfill(3)
-        nat_dex_with_form = f"{nat_dex_padded}{'-' + (self.gen3_form() or '')}"
-            
-        return f"https://www.pokencyclopedia.info/sprites/spin-off/ani_xd{dir_suffix}/ani_xd{sprite_suffix}_{nat_dex_with_form}.gif"
-    
     # Game Presence
 
     def has_gen456_sprite(self):

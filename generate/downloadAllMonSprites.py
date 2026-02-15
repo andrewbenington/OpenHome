@@ -31,7 +31,7 @@ def download_all_sprites_all_mons():
     # os.makedirs("public/sprites/gen8a/shiny", exist_ok=True)
     os.makedirs("public/sprites/gen9/shiny", exist_ok=True)
     os.makedirs("public/sprites/gen9za/shiny", exist_ok=True)
-    for mon in POKEMON_DATA[:37]:
+    for mon in POKEMON_DATA:
         for form in mon.forms:
             if form.form_index >= len(mon.forms):
                 print(f"{form.name} INVALID INDEX: {len(mon.forms)} ({len(mon.forms)} present)")
@@ -422,7 +422,7 @@ def download_all_sprites(form: PokemonForm):
         download_sprite_variants_pokemon_db(form, "crystal", "gen2", False)
     if form.national_dex <= 386 and form.form_index == 0 or form.national_dex == 201 or form.national_dex == 386:
         download_sprite_variants_pokemon_db(form, "emerald", "gen3", False)
-        download_sprite_variants_pokencyclopedia_coloxd(form)
+        # download_sprite_variants_pokencyclopedia_coloxd(form)
     if form.national_dex <= 493 and form.has_gen4_sprite():
         download_sprite_variants_pokemon_db(form, "heartgold-soulsilver", "gen4", form.national_dex != 133 and form.national_dex != 419)
     # if form.national_dex <= 649 and not excludeFormGen5(form):
@@ -448,7 +448,7 @@ def download_sprite_variants_pokemon_db(form: PokemonForm, game, folder, include
     
     extension = ".gif" if "anim" in game else ".png"
 
-    for sprite_name in form.variant_sprite_names():
+    for sprite_name in [form.sprite_name]:
         download_png(form.pokemon_db_sprite_url(False, game, False), "public/sprites/" + folder, sprite_name + extension)
         
         if game == "red-blue" or game == 'scarlet-violet':
@@ -459,8 +459,8 @@ def download_sprite_variants_pokemon_db(form: PokemonForm, game, folder, include
             download_png(form.pokemon_db_sprite_url(False, game, is_female=True), "public/sprites/" + folder, sprite_name + "-f" + extension)
             download_png(form.pokemon_db_sprite_url(True, game, is_female=True), "public/sprites/" + folder + "/shiny", sprite_name + "-f" + extension)
 
-def download_sprite_variants_pokencyclopedia_coloxd(form: PokemonForm):
-    download_png(form.colo_xd_sprite_url(False), "public/sprites/gen3gc", form.name + ".gif")
-    download_png(form.colo_xd_sprite_url(True), "public/sprites/gen3gc/shiny", form.name + ".gif")
+# def download_sprite_variants_pokencyclopedia_coloxd(form: PokemonForm):
+#     download_png(form.colo_xd_sprite_url(False), "public/sprites/gen3gc", form.name + ".gif")
+#     download_png(form.colo_xd_sprite_url(True), "public/sprites/gen3gc/shiny", form.name + ".gif")
 
 download_all_sprites_all_mons()
