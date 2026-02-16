@@ -118,3 +118,7 @@ download-item-sprites:
 
 %:
 	@pnpm run $@
+
+.PHONY: schema
+schema:
+	@sqlite3 generate/pkm.db .schema > generate/schema.sql
