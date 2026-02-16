@@ -1,6 +1,6 @@
 import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Option, R } from '@openhome-core/util/functional'
+import { Option, R, range } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -13,6 +13,7 @@ import { OpenHomeBanks } from 'src/core/save/HomeData'
 import { SAVClass } from 'src/core/save/util'
 import { Result } from 'src/core/util/functional'
 import { ItemBagContext } from '../items/reducer'
+import { useOhpkmStore } from '../ohpkm'
 import { openSavesReducer, SavesContext } from './reducer'
 
 export type SavesProviderProps = {
@@ -32,6 +33,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   const disambiguationResolver = useRef<Option<SaveTypeCallback>>(undefined)
   const [disambiguationSaveTypes, setDisambiguationSaveTypes] = useState<Option<SAVClass[]>>()
   const navigate = useNavigate()
+  const ohpkmStore = useOhpkmStore()
 
   const promptDisambiguation = useCallback(async (possibleSaveTypes: SAVClass[]) => {
     setDisambiguationSaveTypes(possibleSaveTypes)
@@ -72,13 +74,18 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     // Write appropriate trainer data to handler fields
     for (const save of allOpenSaves) {
-      save.boxes.forEach((box) =>
-        box.boxSlots.forEach((mon) => {
-          if (mon instanceof OHPKM) {
-            mon.tradeToSave(save)
-          }
-        })
-      )
+      save.boxes.forEach((box) => {
+        for (const boxSlot of range(box.boxSlots.length)) {
+          const data = box.boxSlots[boxSlot]
+          if (!data) continue
+
+          const tracked = ohpkmStore.loadIfTracked(data)
+          if (!tracked) continue
+
+          tracked.tradeToSave(save)
+          box.boxSlots[boxSlot] = save.convertOhpkm(tracked)
+        }
+      })
     }
 
     const saveWriters = allOpenSaves.map((save) => save.prepareWriter())
@@ -134,6 +141,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     return R.Ok(null)
   }, [
+    ,
     openSavesState.homeData,
     openSavesState.monsToRelease,
     backend,
@@ -142,6 +150,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     itemBagState.itemCounts,
     loadAllHomeData,
     displayError,
+    ohpkmStore,
     bagDispatch,
   ])
 
