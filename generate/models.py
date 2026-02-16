@@ -76,6 +76,9 @@ class NatDex(int, Enum):
     NINETAILS = 38
     SNEASEL = 215
     PICHU = 172
+    ROTOM = 479
+    VIVILLON = 666
+    FURFROU = 676
     ALCREMIE = 869
     OGERPON = 1017
 
@@ -178,9 +181,8 @@ class PokemonForm(BaseModel):
         
         return formatted
     
-    def pokemon_db_sprite_url(self, is_shiny: bool, game: str, is_female=False, form_name=None) -> str:
-        if form_name is None:
-            form_name = self.pokemon_db_format()
+    def pokemon_db_sprite_url(self, is_shiny: bool, game: str, is_female=False) -> str:
+        form_name = self.pokemon_db_format()
         female_stats = ["indeedee-f", "meowstic-f",
                         "oinkologne-f", "basculegion-f"]
         if game == "home" or game == "scarlet-violet" and form_name in female_stats:
@@ -302,6 +304,8 @@ class PokemonForm(BaseModel):
         
         return self.regional == "Paldea"
 
+    def separate_female_sprite(self):
+        return self.national_dex in GENDER_DIFFERENCES
     
 
 
@@ -641,6 +645,17 @@ LEGENDS_ZA_TRANSFERRABLE = [152, 153, 154, 498, 499, 500, 158, 159, 160, 661, 66
 
 Z_MEGAS = [359, 445, 448]
 MEGA_Z_FORM = 2
+
+
+GENDER_DIFFERENCES = [
+    3, 12, 19, 20, 25, 26, 41, 42, 44, 45, 64, 65, 84, 85, 97, 111, 112, 118,
+    119, 123, 129, 130, 133, 154, 165, 166, 178, 185, 186, 190, 194, 195, 198,
+    202, 203, 207, 208, 212, 214, 215, 215, 217, 221, 224, 229, 232, 255, 256,
+    257, 267, 269, 272, 274, 275, 307, 308, 315, 316, 317, 322, 323, 332, 350,
+    369, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 407, 415, 417, 418,
+    419, 424, 443, 444, 445, 449, 450, 453, 454, 456, 457, 459, 460, 461, 464,
+    465, 473, 521, 592, 593, 668]
+
 
 FIRST_FORM_ONLY_456 = [
     383,
