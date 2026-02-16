@@ -117,9 +117,10 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
       const sourceSave = dragData.isHome ? undefined : saveFromIdentifier(dragData.saveIdentifier)
 
+      const sourceIsOpenHome = !sourceSave
       return (
         !save.supportsMon(dragData.mon.dexNum, dragData.mon.formeNum) ||
-        (mon && !sourceSave?.supportsMon(mon.dexNum, mon.formeNum))
+        (mon && !sourceIsOpenHome && !sourceSave.supportsMon(mon.dexNum, mon.formeNum))
       )
     },
     [dragState?.payload, saveFromIdentifier, save]
