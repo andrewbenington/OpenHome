@@ -74,7 +74,7 @@
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.55.0",
     "@typescript-eslint/parser": "^8.55.0",
-    "@typescript/native-preview": "7.0.0-dev.20260212.1",
+    "@typescript/native-preview": "7.0.0-dev.20260215.1",
     "@vitejs/plugin-react": "^5.1.4",
     "better-sqlite3": "^12.6.2",
     "camelcase-keys": "^10.0.2",
