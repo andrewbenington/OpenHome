@@ -6,6 +6,7 @@ import { AnyPkmClass, SavePkmClass } from '@openhome-core/save/util'
 import {
   COLOPKM,
   PA8,
+  PA9,
   PB7,
   PB8,
   PK1,
@@ -19,7 +20,6 @@ import {
   PK9,
   XDPKM,
 } from '@pokemon-files/pkm'
-import PA9 from '@pokemon-files/pkm/PA9'
 
 function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {
   switch (bytes.length) {
