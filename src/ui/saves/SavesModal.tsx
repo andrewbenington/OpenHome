@@ -177,17 +177,6 @@ const SavesModal = (props: SavesModalProps) => {
             <SaveFolders />
           </SideTabs.Panel>
         </SideTabs.Root>
-        {/* <SelectSaveType
-          open={!!tentativeSaveData}
-          saveTypes={tentativeSaveData?.possibleSaveTypes}
-          onSelect={async (selected) => {
-            setTentativeSaveData(undefined)
-            if (!tentativeSaveData || !selected) return
-            const data = tentativeSaveData
-
-            await buildAndOpenSave(selected, data.filePath, data.fileBytes)
-          }}
-        /> */}
       </Dialog.Content>
     </Dialog.Root>
   )

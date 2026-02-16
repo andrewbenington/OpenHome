@@ -17,6 +17,7 @@ import { displayIndexAdder, isBattleFormeItem } from '../../../core/pkm/util'
 import { BackendContext } from '../../backend/backendContext'
 import { PokedexUpdate } from '../../util/pokedex'
 import { AppInfoContext } from '../appInfo'
+import { OhpkmStoreData } from '../ohpkm'
 import { IdentifierNotPresentError, useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import {
   HomeMonLocation,
@@ -545,12 +546,16 @@ export function useSaves(): SavesAndBanksManager {
           ohpkmStore.insertOrUpdate(mon)
         }
       }
+      const toUpdate: OhpkmStoreData = {}
       for (const mon of save.boxes.flatMap((b) => b.boxSlots).filter(filterUndefined)) {
         const trackedData = ohpkmStore.loadIfTracked(mon)
         if (trackedData) {
           trackedData.syncWithGameData(mon, save)
+          toUpdate[trackedData.openhomeId] = trackedData
         }
       }
+
+      ohpkmStore.insertOrUpdateAll(toUpdate)
       openSavesDispatch({ type: 'add_save', payload: save })
     },
     [backend, openSavesDispatch, ohpkmStore]

@@ -35,7 +35,7 @@ import { BackendContext } from '../../backend/backendContext'
 import useDisplayError from '../../hooks/displayError'
 import { AppInfoContext } from '../../state/appInfo'
 import { useLookups } from '../../state/lookups'
-import { useOhpkmStore } from '../../state/ohpkm'
+import { OhpkmStoreData, useOhpkmStore } from '../../state/ohpkm'
 import { useSaves } from '../../state/saves'
 
 export function useManageTracked() {
@@ -167,6 +167,8 @@ export function useManageTracked() {
 
     const saveRefs = result.value
 
+    const toUpdate: OhpkmStoreData = {}
+
     for (const [i, saveRef] of saveRefs.entries()) {
       setState({
         type: 'checking_save',
@@ -233,11 +235,12 @@ export function useManageTracked() {
         const trackedMon = allStoredById[saveMonId]
         if (trackedMon) {
           trackedMon.syncWithGameData(saveMon, save)
-          ohpkmStore.insertOrUpdate(trackedMon)
+          toUpdate[trackedMon.openhomeId] = trackedMon
           foundMonIds.add(saveMonId)
         }
       }
     }
+    ohpkmStore.insertOrUpdateAll(toUpdate)
 
     const allMissingIdsNotInBoxes = Array.from(allStoredIdsNotInBoxes.difference(foundMonIds))
 
