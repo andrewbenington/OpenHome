@@ -104,7 +104,9 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9 | PA9> extends Offi
     this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const mon = this.boxes[box].boxSlots[index]
 
-      const writeIndex = this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * index
+      const writeIndex =
+        this.getBoxSizeBytes() * box +
+        (this.getMonBoxSizeBytes() + this.getBoxSlotGapBytes()) * index
       const blockBuffer = new Uint8Array(boxBlock.raw)
 
       // mon will be undefined if pokemon was moved from this slot
