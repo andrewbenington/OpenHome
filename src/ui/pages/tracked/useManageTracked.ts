@@ -315,7 +315,7 @@ function monPossiblySupported(dexNumber: number, formeNumber: number, saveRef: S
         OriginGames.isLetsGo(saveRef.game) ? LGPE_TRANSFER_RESTRICTIONS : USUM_TRANSFER_RESTRICTIONS
       )
     default:
-      if (OriginGames.region(saveRef.game) === GameSetting.Galar) {
+      if (OriginGames.gameSetting(saveRef.game) === GameSetting.Galar) {
         return isSupported(SWSH_TRANSFER_RESTRICTIONS_CT)
       } else if (saveRef.game === OriginGame.LegendsArceus) {
         return isSupported(LA_TRANSFER_RESTRICTIONS)

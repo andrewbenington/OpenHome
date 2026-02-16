@@ -172,7 +172,7 @@ impl OriginGame {
         }
     }
 
-    pub const fn region(&self) -> Option<GameSetting> {
+    pub const fn game_setting(&self) -> Option<GameSetting> {
         match *self {
             Self::Red
             | Self::BlueGreen
@@ -493,14 +493,16 @@ impl OriginGames {
         OriginGame::from(value).generation()
     }
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen)]
-    pub fn region(value: u8) -> Option<GameSetting> {
-        OriginGame::from(value).region()
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gameSetting"))]
+    pub fn game_setting(value: u8) -> Option<GameSetting> {
+        OriginGame::from(value).game_setting()
     }
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "regionName"))]
-    pub fn region_name(value: u8) -> Option<String> {
-        OriginGame::from(value).region().map(|r| r.to_string())
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gameSettingName"))]
+    pub fn game_setting_name(value: u8) -> Option<String> {
+        OriginGame::from(value)
+            .game_setting()
+            .map(|r| r.to_string())
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gamecubeIndex"))]

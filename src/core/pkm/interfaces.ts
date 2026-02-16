@@ -1,6 +1,6 @@
 import { FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
+import { PKM, RomHackPKM } from '@pokemon-files/pkm/PKM'
 import { AllPKMFields, Stats } from '@pokemon-files/util'
-import { PKM, RomHackPKM } from '../../../packages/pokemon-files/src/pkm/PKM'
 import { PluginIdentifier } from '../save/interfaces'
 
 export interface OfficialPKMInterface extends PKMInterface {

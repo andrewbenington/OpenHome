@@ -24,8 +24,7 @@ export const getLocationString = (game: number, index: number, format: string, e
   }
 
   const generation = OriginGames.generation(game)
-  const gameSetting = OriginGames.region(game)
-  console.log(gameSetting)
+  const gameSetting = OriginGames.gameSetting(game)
 
   let multiplier = 10000
   let locations: { [key: number]: string[] } = {}
@@ -35,21 +34,21 @@ export const getLocationString = (game: number, index: number, format: string, e
   } else if (format === 'PB7') {
     if (game < OriginGame.LetsGoPikachu || game > OriginGame.LetsGoEevee) {
       return game <= OriginGame.UltraMoon
-        ? `in the ${OriginGames.regionName(game)} region`
+        ? `in the ${OriginGames.gameSettingName(game)} region`
         : 'in a faraway place'
     }
     locations = Gen7KantoLocations
   } else if (format === 'PK8') {
     if (game !== OriginGame.Sword && game !== OriginGame.Sword) {
       return game <= OriginGame.LetsGoEevee
-        ? `in the ${OriginGames.regionName(game)} region`
+        ? `in the ${OriginGames.gameSettingName(game)} region`
         : 'in a faraway place'
     }
     locations = Gen8GalarLocations
   } else if (format === 'PB8') {
     if (game !== OriginGame.BrilliantDiamond && game !== OriginGame.ShiningPearl) {
       return game <= OriginGame.Shield
-        ? `in the ${OriginGames.regionName(game)} region`
+        ? `in the ${OriginGames.gameSettingName(game)} region`
         : 'in a faraway place'
     }
     locations = Gen8SinnohLocations

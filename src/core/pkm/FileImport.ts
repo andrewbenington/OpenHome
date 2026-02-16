@@ -19,7 +19,7 @@ import {
   PK9,
   XDPKM,
 } from '@pokemon-files/pkm'
-import PA9 from '../../../packages/pokemon-files/src/pkm/PA9'
+import PA9 from '@pokemon-files/pkm/PA9'
 
 function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {
   switch (bytes.length) {

@@ -1,3 +1,4 @@
+import * as PkmWasm from '@pkm-rs/pkg'
 import {
   ContestStats,
   Geolocation,
@@ -7,7 +8,6 @@ import {
   Stats,
   StatsPreSplit,
 } from '@pokemon-files/util'
-import * as PkmWasm from '../../../pkm_rs/pkg'
 
 export function convertPokeDate(date: PkmWasm.PokeDate): PKMDate {
   return {
