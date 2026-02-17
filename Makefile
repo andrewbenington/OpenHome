@@ -1,4 +1,4 @@
-VERSION=1.8.3
+VERSION=1.9.0-rc.3
 
 .PHONY: help
 help: # Display this help.
@@ -46,10 +46,6 @@ check:
 .PHONY: test
 test: ensure-dependencies
 	@pnpm run test
-
-.PHONY: test-pkm-rs
-test-pkm-rs:
-	@cd pkm_rs && cargo test --package pkm_rs --lib -- tests::pkm::ohpkm --nocapture
 
 .PHONY: check-rs
 check-rs:
@@ -122,3 +118,7 @@ download-item-sprites:
 
 %:
 	@pnpm run $@
+
+.PHONY: schema
+schema:
+	@sqlite3 generate/pkm.db .schema > generate/schema.sql

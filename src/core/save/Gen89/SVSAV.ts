@@ -12,7 +12,7 @@ import { OHPKM } from '../../pkm/OHPKM'
 import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { PathData } from '../util/path'
-import { G89BlockName, G89SAV } from './G8SAV'
+import { G89BlockName, G89SAV } from './G89SAV'
 
 const SAVE_SIZE_BYTES_MIN = 0x31626f
 const SAVE_SIZE_BYTES_MAX = 0x43c000
@@ -92,6 +92,10 @@ export class SVSAV extends G89SAV<PK9> {
 
   getBoxSizeBytes(): number {
     return SVSAV.boxSizeBytes
+  }
+
+  getBoxSlotGapBytes(): number {
+    return 0
   }
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {

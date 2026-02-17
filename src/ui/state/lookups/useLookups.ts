@@ -5,6 +5,7 @@ import { Errorable, R } from '@openhome-core/util/functional'
 
 export function useLookups() {
   const [lookups, updateLookups] = useContext(LookupsContext)
+
   return { lookups, updateLookups }
 }
 

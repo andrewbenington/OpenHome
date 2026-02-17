@@ -1,8 +1,9 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import { Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { SaveIdentifier, saveToStringIdentifier } from '../../ui/state/saves'
 import { OHPKM } from '../pkm/OHPKM'
+import { LookupType, SAVClass } from './util'
 import { PathData } from './util/path'
 
 type SparseArray<T> = (T | undefined)[]
@@ -129,6 +130,10 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   get identifier(): SaveIdentifier {
     return saveToStringIdentifier(this)
   }
+
+  get lookupType(): Option<LookupType> {
+    return (this.constructor as SAVClass).lookupType
+  }
 }
 
 export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
@@ -191,6 +196,10 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   get identifier(): SaveIdentifier {
     return saveToStringIdentifier(this)
   }
+
+  get lookupType(): Option<LookupType> {
+    return (this.constructor as SAVClass).lookupType
+  }
 }
 
 export function getSaveRef(save: SAV): SaveRef {
@@ -222,4 +231,19 @@ export function pluginOriginMarkPath(identifier: PluginIdentifier): string | und
     case 'unbound':
       return '/icons/gba.png'
   }
+}
+export const Delimiter = '$' as const
+
+export type Delim = typeof Delimiter
+
+type OfficialSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}`
+
+type PluginSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}${Delim}${string}`
+
+export type SaveIdentifier = OfficialSaveIdentifier | PluginSaveIdentifier
+
+export function saveToStringIdentifier(save: SAV): SaveIdentifier {
+  return save.pluginIdentifier
+    ? `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}${Delimiter}${save.pluginIdentifier}`
+    : `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}`
 }

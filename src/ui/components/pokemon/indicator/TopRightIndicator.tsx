@@ -1,12 +1,12 @@
 import { StatsPreSplit } from '@pokemon-files/util'
-import { Badge } from '@radix-ui/themes'
 import { OHPKM } from 'src/core/pkm/OHPKM'
 import { PKMInterface } from '../../../../core/pkm/interfaces'
 import { TopRightIndicatorType } from '../../../hooks/useMonDisplay'
 import { getPublicImageURL } from '../../../images/images'
 import { BallsImageList } from '../../../images/items'
 import GenderIcon from '../GenderIcon'
-import { IndicatorBadge } from './IndicatorBadge'
+import { ImageIndicator } from './ImageIndicator'
+import { Indicator } from './Indicator'
 import { OriginGameIndicator } from './OriginGame'
 import './style.css'
 
@@ -57,8 +57,8 @@ export function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps
     case 'Alpha':
       return (
         mon.isAlpha && (
-          <IndicatorBadge
-            description="Alpha"
+          <ImageIndicator
+            tooltip="Alpha"
             src={getPublicImageURL('icons/Alpha.png')}
             backgroundColor="#f2352d"
           />
@@ -67,8 +67,8 @@ export function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps
     case 'Gigantamax':
       return (
         mon.canGigantamax && (
-          <IndicatorBadge
-            description="Gigantamax"
+          <ImageIndicator
+            tooltip="Gigantamax"
             src={getPublicImageURL('icons/GMax.png')}
             backgroundColor="#e60040"
           />
@@ -92,10 +92,10 @@ function TopRightNumericalIndicator({ value, percent }: TopRightNumericalIndicat
   return (
     value !== undefined &&
     (percent || value > 0) && (
-      <Badge className="badge-shadow numerical-indicator" size="1" variant="solid">
+      <Indicator className="numerical-indicator" backgroundColor="#e60040">
         {value}
         {percent ? '%' : ''}
-      </Badge>
+      </Indicator>
     )
   )
 }

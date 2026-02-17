@@ -1,0 +1,41 @@
+.radix-themes {
+  .rt-BaseMenuLabel {
+    gap: 0.25rem;
+  }
+
+  --base-menu-item-padding-left: 0.5rem;
+  --base-menu-item-padding-right: 0.5rem;
+}
+
+.ContextMenuTrigger {
+  display: block;
+  border: 2px white dashed;
+  color: white;
+  border-radius: 4px;
+  font-size: 1rem;
+  user-select: none;
+  padding: 2.75rem 0;
+  width: 18.75rem;
+  text-align: center;
+}
+
+.ContextMenuLabel {
+  padding: 4px 8px;
+}
+
+.rt-ContextMenuSeparator {
+  margin: 0.5rem;
+}
+
+.ContextMenuCheckboxItem,
+.ContextMenuRadioItem,
+.ContextMenuSubTrigger {
+  padding: 0 1rem;
+}
+.rt-ContextMenuItemIndicator {
+  padding: 0 0.5rem;
+}
+.ContextMenuSubTrigger[data-state='open'] {
+  background-color: var(--accent-4);
+  color: var(--accent-11);
+}

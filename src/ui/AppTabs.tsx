@@ -7,13 +7,15 @@ import PluginsPage from './pages/plugins/Plugins'
 import PokedexDisplay from './pages/pokedex/PokedexDisplay'
 import Settings from './pages/Settings'
 import SortPokemon from './pages/sort/SortPokemon'
-import TrackedPokemon from './pages/tracked/TrackedPokemon'
+import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
 
 export default function AppTabs() {
   const isDev = useIsDev()
 
   const tab = useLocation().pathname.split('/')[1] || 'home'
   const navigate = useNavigate()
+
+  const homeElement = <Home />
 
   return (
     <Tabs.Root
@@ -28,8 +30,9 @@ export default function AppTabs() {
     >
       <Box height="0" flexGrow="1">
         <Routes>
-          <Route index path="/home" element={<Home />} />
-          <Route path="/manage/*" element={<TrackedPokemon />} />
+          <Route index path="/" element={homeElement} />
+          <Route path="/home" element={homeElement} />
+          <Route path="/manage/*" element={<TrackedPokemonPage />} />
           <Route path="/sort" element={<SortPokemon />} />
           <Route path="/pokedex" element={<PokedexDisplay />} />
           <Route path="/plugins/*" element={<PluginsPage />} />
@@ -52,7 +55,7 @@ export default function AppTabs() {
           </>
         )}
       </Box>
-      <Tabs.List className="tab-row">
+      <Tabs.List className="tab-sidebar">
         <Tabs.Trigger value="home">Home</Tabs.Trigger>
         <Tabs.Trigger value="manage">Tracked Pokémon</Tabs.Trigger>
         <Tabs.Trigger value="sort">Sort Pokémon</Tabs.Trigger>

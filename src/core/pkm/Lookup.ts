@@ -1,6 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { dvsFromIVs, getBaseMon } from '@openhome-core/pkm/util'
+import { Option } from '@openhome-core/util/functional'
 import { PKMFormeRef } from '@openhome-core/util/types'
 import { MetadataLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { generatePersonalityValuePreservingAttributes } from '@pokemon-files/util'
@@ -49,7 +50,8 @@ export function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentif
   )}-${bytesToString(mon.personalityValue ?? 0, 4)}-${bytesToString(mon.gameOfOrigin ?? -1, 1)}`
 }
 
-export const getMonGen12Identifier = (mon: PKMInterface) => {
+export type Gen12Identifier = string
+export const getMonGen12Identifier = (mon: PKMInterface): Option<Gen12Identifier> => {
   let { dvs, ivs } = mon
   if (!dvs) {
     if (!ivs) return undefined
@@ -74,7 +76,8 @@ export const getMonGen12Identifier = (mon: PKMInterface) => {
   return undefined
 }
 
-export const getMonGen345Identifier = (mon: PKMInterface) => {
+export type Gen345Identifier = string
+export const getMonGen345Identifier = (mon: PKMInterface): Option<Gen345Identifier> => {
   const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
 
   try {

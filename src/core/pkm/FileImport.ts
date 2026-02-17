@@ -6,6 +6,7 @@ import { AnyPkmClass, SavePkmClass } from '@openhome-core/save/util'
 import {
   COLOPKM,
   PA8,
+  PA9,
   PB7,
   PB8,
   PK1,
@@ -76,6 +77,8 @@ export function fileTypeFromString(type: string): AnyPkmClass | undefined {
       return PB8
     case 'PK9':
       return PK9
+    case 'PA9':
+      return PA9
     case 'OhpkmV2':
       return OHPKM
     default:

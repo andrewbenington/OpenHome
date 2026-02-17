@@ -2,7 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
-import { matches, R, range } from '@openhome-core/util/functional'
+import { R, range } from '@openhome-core/util/functional'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ItemBuilder, SubmenuBuilder } from '@openhome-ui/components/context-menu/types'
 import {
@@ -61,7 +61,7 @@ export default function HomeBoxDisplay() {
 
   const homeData = savesAndBanks.homeData
 
-  const currentBox = homeData.boxes[homeData.currentPCBox]
+  const currentBox = homeData.getCurrentBox()
 
   return (
     <Card variant="surface" className="home-box-header">
@@ -237,11 +237,7 @@ function SingleBoxMonDisplay() {
 
           if (!identifier) continue
 
-          const inCurrentBox = homeData.boxes[homeData.currentPCBox].boxSlots.some(
-            matches(identifier)
-          )
-
-          if (!ALLOW_DUPE_IMPORT && (ohpkmStore.monIsStored(identifier) || inCurrentBox)) {
+          if (!ALLOW_DUPE_IMPORT && ohpkmStore.monIsStored(identifier)) {
             const message =
               mons.length === 1
                 ? 'This Pokémon has been moved into OpenHome before.'
@@ -262,7 +258,7 @@ function SingleBoxMonDisplay() {
       }
       importMonsToLocation(mons, location)
     },
-    [dispatchError, homeData.boxes, homeData.currentPCBox, importMonsToLocation, ohpkmStore]
+    [dispatchError, importMonsToLocation, ohpkmStore]
   )
 
   const dragData: MonWithLocation | undefined = useMemo(() => {
@@ -282,13 +278,13 @@ function SingleBoxMonDisplay() {
     [dragData, saveFromIdentifier]
   )
 
-  const currentBox = homeData.boxes[homeData.currentPCBox]
+  const currentBox = homeData.getCurrentBox()
 
   const selectedMon = useMemo(() => {
-    if (!currentBox || selectedIndex === undefined || selectedIndex >= currentBox.boxSlots.length) {
+    if (!currentBox || selectedIndex === undefined || selectedIndex >= currentBox.slotCount()) {
       return undefined
     }
-    const selectedMonIdentifier = currentBox.boxSlots[selectedIndex]
+    const selectedMonIdentifier = currentBox.getSlot(selectedIndex)
     if (!selectedMonIdentifier) return undefined
 
     return ohpkmStore.getById(selectedMonIdentifier)
@@ -330,7 +326,7 @@ function SingleBoxMonDisplay() {
       <div>
         <Grid columns={COLUMN_COUNT.toString()} gap="1">
           {range(COLUMN_COUNT * ROW_COUNT)
-            .map((index: number) => currentBox.boxSlots[index])
+            .map((index: number) => currentBox.getSlot(index))
             .map((identifier, index) => {
               const result = identifier ? ohpkmStore.tryLoadFromId(identifier) : undefined
 
@@ -385,8 +381,8 @@ function SingleBoxMonDisplay() {
                   currentIndex: selectedIndex,
                   columns: homeData.boxColumns,
                   rows: homeData.boxRows,
-                  emptyIndexes: range(homeData.boxColumns * homeData.boxRows).filter(
-                    (index) => !currentBox?.boxSlots?.[index]
+                  emptyIndexes: range(homeData.boxColumns * homeData.boxRows).filter((boxSlot) =>
+                    currentBox.slotIsEmpty(boxSlot)
                   ),
                 }
               : undefined
@@ -405,10 +401,13 @@ type ViewToggleProps = {
 
 const DRAG_OVER_COOLDOWN_MS = 500
 
+// necessary for incompatibility between Node and web api
+type TimeoutType = ReturnType<typeof setTimeout>
+
 function ViewToggle(props: ViewToggleProps) {
   const { viewMode, setViewMode, disabled } = props
   const { dragState } = useDragAndDrop()
-  const [timer, setTimer] = useState<NodeJS.Timeout>()
+  const [timer, setTimer] = useState<TimeoutType>()
   const setViewModeRef = useRef(setViewMode)
 
   useEffect(() => {

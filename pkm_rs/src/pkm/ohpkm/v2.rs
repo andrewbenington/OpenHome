@@ -221,6 +221,11 @@ impl OhpkmV2 {
         }
     }
 
+    #[wasm_bindgen(getter = openhomeId)]
+    pub fn openhome_id(&self) -> String {
+        self.main_data.openhome_id()
+    }
+
     #[wasm_bindgen(getter = personalityValue)]
     pub fn personality_value(&self) -> u32 {
         self.main_data.personality_value

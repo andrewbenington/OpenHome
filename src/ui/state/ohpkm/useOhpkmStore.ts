@@ -2,7 +2,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
 import { createContext, useCallback, useContext } from 'react'
 import { OhpkmStoreData } from '.'
-import { PKMInterface } from '../../../core/pkm/interfaces'
+import { MonFormat, PKMInterface } from '../../../core/pkm/interfaces'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -66,7 +66,7 @@ export function useOhpkmStore(): OhpkmStore {
 
   const insertOrUpdate = useCallback(
     (mon: OHPKM) => {
-      updateStore({ [mon.getHomeIdentifier()]: mon })
+      updateStore({ [mon.openhomeId]: mon })
     },
     [updateStore]
   )
@@ -85,7 +85,7 @@ export function useOhpkmStore(): OhpkmStore {
   const trackAndConvertForSave = useCallback(
     <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => {
       const lookupType = (save.constructor as SAVClass).lookupType
-      const ohpkmIdentifier = ohpkm.getHomeIdentifier()
+      const ohpkmIdentifier = ohpkm.openhomeId
 
       if (lookupType === 'gen12') {
         const gen12Identifier = getMonGen12Identifier(ohpkm)
@@ -127,7 +127,8 @@ export function useOhpkmStore(): OhpkmStore {
 
   const loadIfTracked = useCallback(
     (mon: PKMInterface): Option<OHPKM> => {
-      switch (mon.format) {
+      const format: MonFormat = mon.format as MonFormat
+      switch (format) {
         case 'PK1':
         case 'PK2': {
           const gen12Identifier = getMonGen12Identifier(mon)
@@ -167,7 +168,8 @@ export function useOhpkmStore(): OhpkmStore {
         case 'PK8':
         case 'PA8':
         case 'PB8':
-        case 'PK9': {
+        case 'PK9':
+        case 'PA9': {
           const homeIdentifier = getMonFileIdentifier(mon)
           if (!homeIdentifier) {
             throw Error(
@@ -178,6 +180,8 @@ export function useOhpkmStore(): OhpkmStore {
           return ohpkmStore[homeIdentifier]
         }
         default:
+          // use type system to enforce exhaustiveness
+          const _exhaustiveCheck: never = format
           throw Error(`unrecognized pkm format: ${mon.format}`)
       }
     },
@@ -193,7 +197,7 @@ export function useOhpkmStore(): OhpkmStore {
 
   const getIdIfTracked = useCallback(
     (mon: PKMInterface): Option<OhpkmIdentifier> => {
-      return loadIfTracked(mon)?.getHomeIdentifier()
+      return loadIfTracked(mon)?.openhomeId
     },
     [loadIfTracked]
   )

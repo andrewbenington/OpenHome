@@ -4,6 +4,7 @@ import { ReactNode, useMemo, useRef, useState, type RefAttributes } from 'react'
 import {
   DataGrid,
   RenderCellProps,
+  SELECT_COLUMN_KEY,
   type DataGridHandle,
   type DataGridProps,
   type RenderHeaderCellProps,
@@ -28,8 +29,7 @@ import {
   SeparatorBuilder,
   SubmenuBuilder,
 } from './context-menu'
-import './context-menu.css'
-import { DropdownArrowIcon } from './Icons'
+import { DropdownArrowIcon, FilterIcon } from './Icons'
 import './style.css'
 
 const dataGridProps = {
@@ -153,9 +153,17 @@ type SortableDataGridProps<R extends SortableValue> = {
   RefAttributes<DataGridHandle>
 
 export default function SortableDataGrid<R extends SortableValue>(props: SortableDataGridProps<R>) {
-  const { rows, columns, defaultSort, rowHeight, defaultColumnOptions, ...otherProps } = props
+  const {
+    rows,
+    columns,
+    defaultSort,
+    defaultSortOrder,
+    rowHeight,
+    defaultColumnOptions,
+    ...otherProps
+  } = props
   const [sortColumns, setSortColumns] = useState<SortColumn[]>(
-    defaultSort ? [{ columnKey: defaultSort, direction: 'ASC' }] : []
+    defaultSort ? [{ columnKey: defaultSort, direction: defaultSortOrder ?? 'ASC' }] : []
   )
   const [hiddenColumns, setHiddenColumns] = useState<string[]>(
     columns.filter((col) => col.hideByDefault).map((col) => col.key) ?? []
@@ -185,6 +193,38 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
       ? scaling * baseRowHeight
       : (row: NoInfer<R>) => scaling * baseRowHeight(row)
 
+  const modifiedColumns = useMemo(
+    () =>
+      reorderedColumns
+        .filter((col) => !hiddenColumns.includes(col.key))
+        .map((col) =>
+          col.key === SELECT_COLUMN_KEY
+            ? col
+            : {
+                ...col,
+                resizable: true,
+                sortable: !!(col.sortType ?? col.sortFunction),
+                draggable: true,
+                renderCell: hasRenderValueMethod(col)
+                  ? (value: RenderCellProps<R>) => col.renderValue(value.row)
+                  : col.renderCell,
+                renderHeaderCell: (props: RenderHeaderCellProps<R>) => (
+                  <HeaderWithContextMenu
+                    column={props.column}
+                    columns={columns}
+                    sortColumns={sortColumns}
+                    rows={sortedRows}
+                    filters={filters}
+                    setFilters={setFilters}
+                    hiddenColumns={hiddenColumns}
+                    setHiddenColumns={setHiddenColumns}
+                  />
+                ),
+              }
+        ),
+    [columns, filters, hiddenColumns, reorderedColumns, sortColumns, sortedRows]
+  )
+
   return (
     <div style={{ height: '100%', overflow: 'hidden ', flex: 1 }}>
       <DataGrid
@@ -194,29 +234,7 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
         {...otherProps}
         rowHeight={scaledRowHeight}
         rows={filteredRows}
-        columns={reorderedColumns
-          .filter((col) => !hiddenColumns.includes(col.key))
-          .map((col) => ({
-            ...col,
-            resizable: true,
-            sortable: !!(col.sortType ?? col.sortFunction),
-            draggable: true,
-            renderCell: hasRenderValueMethod(col)
-              ? (value: RenderCellProps<R>) => col.renderValue(value.row)
-              : col.renderCell,
-            renderHeaderCell: (props: RenderHeaderCellProps<R>) => (
-              <HeaderWithContextMenu
-                column={props.column}
-                columns={columns}
-                sortColumns={sortColumns}
-                rows={sortedRows}
-                filters={filters}
-                setFilters={setFilters}
-                hiddenColumns={hiddenColumns}
-                setHiddenColumns={setHiddenColumns}
-              />
-            ),
-          }))}
+        columns={modifiedColumns}
         sortColumns={sortColumns}
         onSortColumnsChange={(params) => setSortColumns(params)}
         onColumnsReorder={(col1, col2) => {
@@ -281,13 +299,17 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
 
   const columnFilter = filters[columnKey]
 
-  const getFilterValue = buildFilterValueGetter(rows, column)
+  const getFilterValue = useMemo(() => buildFilterValueGetter(rows, column), [rows, column])
 
-  const filterValues = getFilterValue
-    ? Array.from(new Set(rows.map(getFilterValue))).filter(
-        (val) => val !== null && val !== undefined
-      )
-    : []
+  const filterValues = useMemo(
+    () =>
+      getFilterValue
+        ? Array.from(new Set(rows.map(getFilterValue))).filter(
+            (val) => val !== null && val !== undefined
+          )
+        : [],
+    [getFilterValue, rows]
+  )
 
   const sortDirection = sortColumns.find((s) => s.columnKey === column.key)?.direction
 
@@ -296,71 +318,103 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
     [columns, hiddenColumns]
   )
 
-  const headerCtxMenuBuilders = [
-    LabelBuilder.fromComponent(column.name),
-    SeparatorBuilder,
-    getFilterValue
-      ? SubmenuBuilder.fromLabel('Filter...')
-          .withBuilder(
-            ItemBuilder.fromLabel('Deselect All').withAction(() =>
-              setFilters({ ...filters, [columnKey]: [] })
-            )
-          )
-          .withBuilders(
-            filterValues.toSorted().map((filterValue) =>
-              CheckboxBuilder.fromLabel(filterValue)
-                .handleValueChanged(() => {
-                  if (columnFilter === undefined) {
-                    setFilters({
-                      ...filters,
-                      [columnKey]: filterValues.filter((otherValue) => filterValue !== otherValue),
-                    })
-                  } else if (columnFilter.includes(filterValue)) {
-                    setFilters({
-                      ...filters,
-                      [columnKey]: columnFilter.filter((otherValue) => filterValue !== otherValue),
-                    })
-                  } else {
-                    setFilters({
-                      ...filters,
-                      [columnKey]: [...columnFilter, filterValue],
-                    })
-                  }
+  const getFilterValueDropdownPos = column.getFilterValueDropdownPos
+
+  const filterDropdownSorter = getFilterValueDropdownPos
+    ? numericSorter((val: string) => getFilterValueDropdownPos(val))
+    : stringSorter((val: string) => val)
+
+  const activeFilter = columnFilter !== undefined && columnFilter.length !== filterValues.length
+
+  const headerCtxMenuBuilders = useMemo(
+    () => [
+      LabelBuilder.fromComponent(column.name),
+      SeparatorBuilder,
+      getFilterValue
+        ? SubmenuBuilder.fromLabel('Filter...')
+            .withBuilder(
+              ItemBuilder.fromLabel(activeFilter ? 'Select All' : 'Deselect All').withAction(() =>
+                setFilters({
+                  ...filters,
+                  [columnKey]: activeFilter ? undefined : [],
                 })
-                .handleIsChecked(() => !columnFilter || columnFilter.includes(filterValue))
+              )
             )
-          )
-      : undefined,
-    getFilterValue
-      ? ItemBuilder.fromLabel('Clear Filters').withAction(() => setFilters({}))
-      : undefined,
-    getFilterValue ? SeparatorBuilder : undefined,
-    SubmenuBuilder.fromLabel('Show/Hide Columns').withBuilders(
-      columns
-        .filter((col) => !!col.name)
-        .map((col) =>
-          CheckboxBuilder.fromComponent(col.name)
-            .handleValueChanged(() => {
-              if (visibleColumnKeys.has(col.key)) {
-                if (visibleColumnKeys.size > 1) {
-                  setHiddenColumns([...hiddenColumns, col.key])
+            .withBuilders(
+              filterValues.toSorted(filterDropdownSorter).map((filterValue) =>
+                CheckboxBuilder.fromLabel(filterValue)
+                  .handleValueChanged(() => {
+                    if (columnFilter === undefined) {
+                      setFilters({
+                        ...filters,
+                        [columnKey]: filterValues.filter(
+                          (otherValue) => filterValue !== otherValue
+                        ),
+                      })
+                    } else if (columnFilter.includes(filterValue)) {
+                      setFilters({
+                        ...filters,
+                        [columnKey]: columnFilter.filter(
+                          (otherValue) => filterValue !== otherValue
+                        ),
+                      })
+                    } else {
+                      setFilters({
+                        ...filters,
+                        [columnKey]: [...columnFilter, filterValue],
+                      })
+                    }
+                  })
+                  .handleIsChecked(() => !columnFilter || columnFilter.includes(filterValue))
+              )
+            )
+        : undefined,
+      getFilterValue
+        ? ItemBuilder.fromLabel('Clear Filters').withAction(() => setFilters({}))
+        : undefined,
+      getFilterValue ? SeparatorBuilder : undefined,
+      SubmenuBuilder.fromLabel('Show/Hide Columns').withBuilders(
+        columns
+          .filter((col) => !!col.name)
+          .map((col) =>
+            CheckboxBuilder.fromComponent(col.name)
+              .handleValueChanged(() => {
+                if (visibleColumnKeys.has(col.key)) {
+                  if (visibleColumnKeys.size > 1) {
+                    setHiddenColumns([...hiddenColumns, col.key])
+                  }
+                } else {
+                  setHiddenColumns([...hiddenColumns.filter((k) => k !== col.key)])
                 }
-              } else {
-                setHiddenColumns([...hiddenColumns.filter((k) => k !== col.key)])
-              }
-            })
-            .handleIsChecked(() => visibleColumnKeys.has(col.key))
-        )
-    ),
-    ItemBuilder.fromLabel('Reset to Default').withAction(() =>
-      setHiddenColumns(columns.filter((c) => c.hideByDefault).map((c) => c.key))
-    ),
-  ]
+              })
+              .handleIsChecked(() => visibleColumnKeys.has(col.key))
+          )
+      ),
+      ItemBuilder.fromLabel('Reset to Default').withAction(() =>
+        setHiddenColumns(columns.filter((c) => c.hideByDefault).map((c) => c.key))
+      ),
+    ],
+    [
+      activeFilter,
+      column.name,
+      columnFilter,
+      columnKey,
+      columns,
+      filterDropdownSorter,
+      filterValues,
+      filters,
+      getFilterValue,
+      hiddenColumns,
+      setFilters,
+      setHiddenColumns,
+      visibleColumnKeys,
+    ]
+  )
 
   return (
     <OpenHomeCtxMenu elements={headerCtxMenuBuilders}>
-      <Flex align="center" gap="1">
-        <div style={{ width: 0, flex: 1 }}>
+      <Flex align="center" height="100%" mr="-1">
+        <Flex style={{ width: 0, flex: 1, overflow: 'hidden' }}>
           {typeof column.name === 'string' ? (
             <div style={{ height: '100%', display: 'grid', alignItems: 'center' }}>
               {column.name}
@@ -368,12 +422,17 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
           ) : (
             column.name
           )}
-        </div>
+          {activeFilter && (
+            <FilterIcon color="var(--focus-11)" style={{ minWidth: '1rem', height: '1rem' }} />
+          )}
+        </Flex>
         {sortDirection && (
           <DropdownArrowIcon
+            size="18px"
             style={{
               rotate: sortDirection === 'DESC' ? '180deg' : undefined,
               transition: 'rotate 0.15s',
+              minWidth: '1rem',
             }}
           />
         )}

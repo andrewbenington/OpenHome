@@ -1,7 +1,6 @@
 mod conversion;
 mod encryption;
 mod strings;
-mod tests;
 mod util;
 
 pub mod pkm;

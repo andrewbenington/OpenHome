@@ -24,7 +24,7 @@ export interface SAVClass<S extends SAV = SAV> {
   pkmType: SavePkmClass
   fileIsSave: (bytes: Uint8Array) => boolean
   includesOrigin: (origin: OriginGame) => boolean
-  lookupType?: 'gen12' | 'gen345'
+  lookupType?: LookupType
   saveTypeName: string
   saveTypeID: string
   saveTypeAbbreviation: string

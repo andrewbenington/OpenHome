@@ -2,7 +2,7 @@ import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Moves } from '@pokemon-resources/index'
 import Prando from 'prando'
 
-import { PKM, PkmClass } from '../pkm'
+import { PKM, PkmClass } from '@pokemon-files/pkm/PKM'
 
 import {
   Gender,
