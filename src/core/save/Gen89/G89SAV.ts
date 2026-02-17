@@ -1,5 +1,5 @@
 import { OriginGame } from '@pkm-rs/pkg'
-import { PA8, PB8, PK8, PK9 } from '@pokemon-files/pkm'
+import { PA8, PA9, PB8, PK8, PK9 } from '@pokemon-files/pkm'
 import { AllPKMFields } from '@pokemon-files/util'
 import {
   SCArrayBlock,
@@ -12,7 +12,7 @@ import { Box, BoxAndSlot, OfficialSAV } from '../interfaces'
 import { PathData } from '../util/path'
 import { BoxNamesBlock } from './BoxNamesBlock'
 
-export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSAV<P> {
+export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9 | PA9> extends OfficialSAV<P> {
   isPlugin: false = false
   abstract origin: OriginGame
 
@@ -66,7 +66,9 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
     for (let box = 0; box < this.getBoxCount(); box++) {
       for (let monIndex = 0; monIndex < 30; monIndex++) {
         try {
-          const startByte = this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * monIndex
+          const startByte =
+            this.getBoxSizeBytes() * box +
+            (this.getMonBoxSizeBytes() + this.getBoxSlotGapBytes()) * monIndex
           const endByte = startByte + this.getMonBoxSizeBytes()
           const monData = boxBlock.raw.slice(startByte, endByte)
           const mon = this.monConstructor(monData, true)
@@ -83,6 +85,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
 
   abstract getMonBoxSizeBytes(): number
   abstract getBoxSizeBytes(): number
+  abstract getBoxSlotGapBytes(): number
 
   abstract getBlockMust<T extends SCBlock = SCBlock>(
     blockName: G89BlockName,
@@ -101,7 +104,9 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9> extends OfficialSA
     this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const mon = this.boxes[box].boxSlots[index]
 
-      const writeIndex = this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * index
+      const writeIndex =
+        this.getBoxSizeBytes() * box +
+        (this.getMonBoxSizeBytes() + this.getBoxSlotGapBytes()) * index
       const blockBuffer = new Uint8Array(boxBlock.raw)
 
       // mon will be undefined if pokemon was moved from this slot

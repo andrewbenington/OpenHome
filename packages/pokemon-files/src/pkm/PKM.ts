@@ -1,7 +1,10 @@
-import { PKMInterface } from '../../../../src/core/pkm/interfaces'
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import PK3RR from '@openhome-core/save/radicalred/PK3RR'
+import PK3UB from '@openhome-core/save/unbound/PK3UB'
 import { AllPKMFields } from '../util'
 import COLOPKM from './COLOPKM'
 import PA8 from './PA8'
+import PA9 from './PA9'
 import PB7 from './PB7'
 import PB8 from './PB8'
 import PK1 from './PK1'
@@ -30,6 +33,9 @@ export type PKM =
   | PA8
   | PB8
   | PK9
+  | PA9
+
+export type RomHackPKM = PK3RR | PK3UB
 
 export type PkmClass = new (
   arg: ArrayBuffer | AllPKMFields,

@@ -51,9 +51,7 @@
   "rust-analyzer.check.command": "clippy",
   "editor.inlayHints.enabled": "off",
   "editor.tabSize": 2,
-  "rust-analyzer.cargo.features": [
-    "pkm_rs/wasm"
-  ],
+  "rust-analyzer.cargo.features": ["pkm_rs/wasm"],
   "css.completion.completePropertyWithSemicolon": false,
   "rust-analyzer.cargo.targetDir": true,
   "python.defaultInterpreterPath": "generate/.venv/bin/python",

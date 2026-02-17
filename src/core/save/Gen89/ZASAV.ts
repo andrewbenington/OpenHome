@@ -1,27 +1,25 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Gender, Languages, OriginGame } from '@pkm-rs/pkg'
-import { PK9 } from '@pokemon-files/pkm'
+import { PA9 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import {
-  SV_TRANSFER_RESTRICTIONS_BASE,
-  SV_TRANSFER_RESTRICTIONS_ID,
-  SV_TRANSFER_RESTRICTIONS_TM,
+  ZA_TRANSFER_RESTRICTIONS_BASE,
+  ZA_TRANSFER_RESTRICTIONS_MD,
 } from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../../pkm/OHPKM'
 import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
-import { PathData } from '../util/path'
+import { emptyPathData, PathData } from '../util/path'
 import { G89BlockName, G89SAV } from './G89SAV'
 
-const SAVE_SIZE_BYTES_MIN = 0x31626f
-const SAVE_SIZE_BYTES_MAX = 0x43c000
+export type ZA_SAVE_REVISION = 'Base Game' | 'Mega Dimension'
 
-export type SV_SAVE_REVISION = 'Base Game' | 'Teal Mask' | 'Indigo Disk'
+const BOX_SLOT_GAP_BYTES = 0x40
 
-export class SVSAV extends G89SAV<PK9> {
-  static boxSizeBytes = PK9.getBoxSize() * 30
-  static pkmType = PK9
+export class ZASAV extends G89SAV<PA9> {
+  static boxSizeBytes = (PA9.getBoxSize() + BOX_SLOT_GAP_BYTES) * 30
+  static pkmType = PA9
   static saveTypeAbbreviation = 'SV'
   static saveTypeName = 'Pokémon Scarlet/Violet'
   static saveTypeID = 'SVSAV'
@@ -49,16 +47,16 @@ export class SVSAV extends G89SAV<PK9> {
     this.origin = this.trainerBlock.getGame()
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK9 {
-    return new PK9(ohpkm)
+  convertOhpkm(ohpkm: OHPKM): PA9 {
+    return new PA9(ohpkm)
   }
 
   getBoxCount(): number {
     return 32
   }
 
-  monConstructor(bytes: ArrayBuffer, encrypted: boolean): PK9 {
-    return new PK9(bytes, encrypted)
+  monConstructor(bytes: ArrayBuffer, encrypted: boolean): PA9 {
+    return new PA9(bytes, encrypted)
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {
@@ -87,38 +85,34 @@ export class SVSAV extends G89SAV<PK9> {
   }
 
   getMonBoxSizeBytes(): number {
-    return PK9.getBoxSize()
+    return PA9.getBoxSize()
   }
 
   getBoxSizeBytes(): number {
-    return SVSAV.boxSizeBytes
+    return ZASAV.boxSizeBytes
   }
 
   getBoxSlotGapBytes(): number {
-    return 0
+    return BOX_SLOT_GAP_BYTES
   }
 
   supportsMon(dexNumber: number, formeNumber: number): boolean {
-    const revision = this.scBlocks ? this.getSaveRevision() : 'Indigo Disk'
+    const revision = this.scBlocks ? this.getSaveRevision() : 'Mega Dimension'
     switch (revision) {
       case 'Base Game':
-        return !isRestricted(SV_TRANSFER_RESTRICTIONS_BASE, dexNumber, formeNumber)
-      case 'Teal Mask':
-        return !isRestricted(SV_TRANSFER_RESTRICTIONS_TM, dexNumber, formeNumber)
-      case 'Indigo Disk':
-        return !isRestricted(SV_TRANSFER_RESTRICTIONS_ID, dexNumber, formeNumber)
+        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_BASE, dexNumber, formeNumber)
+      case 'Mega Dimension':
+        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_MD, dexNumber, formeNumber)
     }
   }
 
   supportsItem(itemIndex: number) {
-    const revision = this.scBlocks ? this.getSaveRevision() : 'Indigo Disk'
+    const revision = this.scBlocks ? this.getSaveRevision() : 'Mega Dimension'
     switch (revision) {
       case 'Base Game':
-        return itemIndex <= Item.YellowDish
-      case 'Teal Mask':
-        return itemIndex <= Item.GlimmeringCharm
-      case 'Indigo Disk':
-        return itemIndex <= Item.BriarsBook
+        return itemIndex <= Item.Falinksite
+      case 'Mega Dimension':
+        return itemIndex <= Item.Glimmoranite
     }
   }
 
@@ -126,29 +120,31 @@ export class SVSAV extends G89SAV<PK9> {
     return this.boxes[this.currentPCBox]
   }
 
-  getSaveRevision(): SV_SAVE_REVISION {
-    return this.getBlock('BlueberryPoints')
-      ? 'Indigo Disk'
-      : this.getBlock('TeraRaidDLC')
-        ? 'Teal Mask'
-        : 'Base Game'
+  getSaveRevision(): ZA_SAVE_REVISION {
+    return this.getBlock('Donuts') ? 'Mega Dimension' : 'Base Game'
   }
 
   getDisplayData() {
     const trainerBlock = this.trainerBlock
 
     return {
-      'Player Character': trainerBlock.getGender() ? 'Juliana' : 'Florian',
+      'Player Character': trainerBlock.getGender() ? 'Harmony' : 'Paxton',
       'Save Version': this.getSaveRevision(),
       Language: Languages.stringFromByte(trainerBlock.getLanguage()),
     }
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {
-    if (bytes.length < SAVE_SIZE_BYTES_MIN || bytes.length > SAVE_SIZE_BYTES_MAX) {
+    try {
+      if (!SwishCrypto.getIsHashValid(bytes)) {
+        return false
+      }
+
+      const maybeSave = new ZASAV(emptyPathData, bytes)
+      return maybeSave.getBlock('InfiniteRoyale') !== undefined
+    } catch {
       return false
     }
-    return SwishCrypto.getIsHashValid(bytes)
   }
 
   static includesOrigin(origin: OriginGame) {
@@ -161,22 +157,20 @@ export class SVSAV extends G89SAV<PK9> {
 }
 
 const BlockKeys = {
-  TeamNames: 0x1920c1e4,
   TeamIndexes: 0x33f39467,
   BoxLayout: 0x19722c89,
   BoxWallpapers: 0x2eb1b190,
 
   Box: 0x0d66012c,
   Party: 0x3aa1a9ad,
-  Zukan: 0x0deaaebd,
-  ZukanT1: 0xf5d7c0e2,
+  Zukan: 0x2d87be5c,
   MyStatus: 0xe3e89bd1,
   PlayTime: 0xedaff794,
 
   CurrentBox: 0x017c3cbb,
 
-  TeraRaidDLC: 0x100b93da,
-  BlueberryPoints: 0x66a33824,
+  InfiniteRoyale: 0x8929bfb6,
+  Donuts: 0xbe007476,
 }
 
 class MyStatus {

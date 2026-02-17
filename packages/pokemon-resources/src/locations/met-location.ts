@@ -11,7 +11,8 @@ import { Gen7KantoLocations } from './gen7-kanto'
 import { Gen8GalarLocations } from './gen8-galar'
 import { Gen8HisuiLocations } from './gen8-hisui'
 import { Gen8SinnohLocations } from './gen8-sinnoh'
-import { Gen9Locations } from './gen9'
+import { Gen9LumioseLocations } from './gen9-lumiose'
+import { Gen9PaldeaLocations } from './gen9-paldea'
 
 export const getLocationString = (game: number, index: number, format: string, egg = false) => {
   if (game <= OriginGame.White && index === 30001) {
@@ -23,7 +24,7 @@ export const getLocationString = (game: number, index: number, format: string, e
   }
 
   const generation = OriginGames.generation(game)
-  const region = OriginGames.region(game)
+  const gameSetting = OriginGames.gameSetting(game)
 
   let multiplier = 10000
   let locations: { [key: number]: string[] } = {}
@@ -33,21 +34,21 @@ export const getLocationString = (game: number, index: number, format: string, e
   } else if (format === 'PB7') {
     if (game < OriginGame.LetsGoPikachu || game > OriginGame.LetsGoEevee) {
       return game <= OriginGame.UltraMoon
-        ? `in the ${OriginGames.regionName(game)} region`
+        ? `in the ${OriginGames.gameSettingName(game)} region`
         : 'in a faraway place'
     }
     locations = Gen7KantoLocations
   } else if (format === 'PK8') {
     if (game !== OriginGame.Sword && game !== OriginGame.Sword) {
       return game <= OriginGame.LetsGoEevee
-        ? `in the ${OriginGames.regionName(game)} region`
+        ? `in the ${OriginGames.gameSettingName(game)} region`
         : 'in a faraway place'
     }
     locations = Gen8GalarLocations
   } else if (format === 'PB8') {
     if (game !== OriginGame.BrilliantDiamond && game !== OriginGame.ShiningPearl) {
       return game <= OriginGame.Shield
-        ? `in the ${OriginGames.regionName(game)} region`
+        ? `in the ${OriginGames.gameSettingName(game)} region`
         : 'in a faraway place'
     }
     locations = Gen8SinnohLocations
@@ -62,18 +63,20 @@ export const getLocationString = (game: number, index: number, format: string, e
     locations = Gen5Locations
   } else if (generation === Generation.G6) {
     locations = Gen6Locations
-  } else if (region === GameSetting.Alola) {
+  } else if (gameSetting === GameSetting.Alola) {
     locations = Gen7AlolaLocations
   } else if (OriginGames.isLetsGo(game)) {
     locations = Gen7KantoLocations
-  } else if (region === GameSetting.Galar) {
+  } else if (gameSetting === GameSetting.Galar) {
     locations = Gen8GalarLocations
   } else if (game === OriginGame.LegendsArceus) {
     locations = Gen8HisuiLocations
   } else if (OriginGames.isBdsp(game)) {
     locations = Gen8SinnohLocations
-  } else if (generation === Generation.G9) {
-    locations = Gen9Locations
+  } else if (gameSetting === GameSetting.Paldea) {
+    locations = Gen9PaldeaLocations
+  } else if (gameSetting === GameSetting.Lumiose) {
+    locations = Gen9LumioseLocations
   }
   const locationBlock = locations[Math.floor(index / multiplier) * multiplier]
   if (locationBlock) {
@@ -90,65 +93,4 @@ export const getLocationString = (game: number, index: number, format: string, e
     return `in ${location}`
   }
   return index.toString()
-}
-
-export function getMetLocation(
-  index: number,
-  source: { origin?: OriginGame; fileFormat?: string }
-): string {
-  const { origin, fileFormat } = source
-
-  if (!origin) return ''
-
-  const generation = OriginGames.generation(origin)
-  const gameSetting = OriginGames.region(origin)
-
-  if (generation === Generation.G2 || fileFormat === 'PK2') {
-    return Gen2Locations[0][index]
-  }
-
-  if (OriginGames.isGba(origin) || fileFormat === 'PK3') {
-    return Gen3GBALocations[0][index]
-  }
-
-  if (origin === OriginGame.ColosseumXd || fileFormat === 'COLOPKM' || fileFormat === 'XDPKM') {
-    return Gen3GCNLocations[0][index]
-  }
-
-  if (generation === Generation.G4 || fileFormat === 'PK4') {
-    return Gen4Locations[Math.floor(index / 1000) * 1000][index % 1000]
-  }
-
-  if (generation === Generation.G5 || fileFormat === 'PK5') {
-    return Gen5Locations[Math.floor(index / 10000) * 10000][index % 10000]
-  }
-
-  if (generation === Generation.G6 || fileFormat === 'PK6') {
-    return Gen6Locations[Math.floor(index / 10000) * 10000][index % 10000]
-  }
-
-  if (gameSetting === GameSetting.Alola || fileFormat === 'PK7') {
-    return Gen7AlolaLocations[Math.floor(index / 10000) * 10000][index % 10000]
-  }
-
-  if (OriginGames.isLetsGo(origin) || fileFormat === 'PB7') {
-    return Gen7KantoLocations[Math.floor(index / 10000) * 10000][index % 10000]
-  }
-
-  if (gameSetting === GameSetting.Galar || fileFormat === 'PK8') {
-    return Gen8GalarLocations[Math.floor(index / 10000) * 10000][index % 10000]
-  }
-
-  if (OriginGames.isBdsp(origin) || fileFormat === 'PB8') {
-    return Gen8SinnohLocations[Math.floor(index / 10000) * 10000][index % 10000]
-  }
-
-  if (origin === OriginGame.LegendsArceus || fileFormat === 'PA8') {
-    return Gen8HisuiLocations[Math.floor(index / 10000) * 10000][index % 10000]
-  }
-
-  if (OriginGames.isScarletViolet(origin) || fileFormat === 'PK9') {
-    return Gen9Locations[Math.floor(index / 10000) * 10000][index % 10000]
-  }
-  return ''
 }
