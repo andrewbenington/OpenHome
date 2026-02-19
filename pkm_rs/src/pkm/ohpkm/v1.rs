@@ -22,9 +22,13 @@ use crate::pkm::ohpkm::JsResult;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 const MIN_SIZE: usize = 420;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct OhpkmV1 {
     pub encryption_constant: u32,

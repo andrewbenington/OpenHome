@@ -5,6 +5,10 @@ use std::fmt::Display;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Default, Debug, Clone, Copy)]
 pub struct ModernRibbonSet<const N: usize>(FlagSet<N>);
 
@@ -70,6 +74,7 @@ impl<const N: usize> Serialize for ModernRibbonSet<N> {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Serialize, PartialEq, Eq, Clone, Copy)]
 pub enum ModernRibbon {
     KalosChampion,

@@ -1,6 +1,13 @@
+use serde::Serialize;
 use std::fmt::Display;
 
-use serde::Serialize;
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::{
+    RngExt,
+    distr::{Alphanumeric, SampleString},
+};
 
 const TERMINATOR: u16 = 0xffff;
 
@@ -60,11 +67,20 @@ impl<const N: usize> Serialize for Gen5String<N> {
 }
 
 impl<const N: usize> Gen5String<N> {
-    pub fn from_bytes(bytes: [u8; N]) -> Self {
+    pub const fn from_bytes(bytes: [u8; N]) -> Self {
         Gen5String { raw_be: bytes }
     }
 
-    pub fn bytes(&self) -> [u8; N] {
+    pub const fn bytes(&self) -> [u8; N] {
         self.raw_be
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl<const N: usize> Randomize for Gen5String<N> {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let length: usize = rng.random_range(0..N);
+        let utf8: String = Alphanumeric.sample_string(rng, length);
+        Self::from(utf8)
     }
 }

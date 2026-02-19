@@ -1,6 +1,13 @@
+use serde::Serialize;
 use std::{fmt::Display, ops::Deref};
 
-use serde::Serialize;
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::{
+    RngExt,
+    distr::{Alphanumeric, SampleString},
+};
 
 const TERMINATOR: u16 = 0x0000;
 
@@ -78,4 +85,13 @@ fn u8_slice_to_u16_le(slice: &[u8]) -> Vec<u16> {
         .map(|chunk| u16::from_le_bytes([chunk[0], chunk[1]]))
         .take_while(|val| *val != TERMINATOR)
         .collect()
+}
+
+#[cfg(feature = "randomize")]
+impl<const N: usize> Randomize for SizedUtf16String<N> {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let length: usize = rng.random_range(0..N);
+        let utf8: String = Alphanumeric.sample_string(rng, length);
+        Self::from(utf8)
+    }
 }

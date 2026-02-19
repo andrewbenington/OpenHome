@@ -80,7 +80,7 @@ impl SaveData {
         }
     }
 
-    fn get_trainer_name(&self) -> String {
+    pub fn get_trainer_name(&self) -> String {
         match self {
             SaveData::SM(save) => save.trainer.trainer_name.to_string(),
             SaveData::USUM(save) => save.trainer.trainer_name.to_string(),

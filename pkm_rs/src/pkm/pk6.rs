@@ -10,15 +10,19 @@ use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::ModernRibbonSet;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
-use pkm_rs_types::{ContestStats, MarkingsSixShapes, OriginGame, Stats8, Stats16Le};
+use pkm_rs_types::{BinaryGender, ContestStats, MarkingsSixShapes, OriginGame, Stats8, Stats16Le};
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
-use serde::Serialize;
 
+use serde::Serialize;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Serialize, Clone, Copy, IsShiny4096)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct Pk6 {
     pub encryption_constant: u32,
     pub sanity: u16,
@@ -89,7 +93,7 @@ pub struct Pk6 {
     pub console_region: u8,
     pub language_index: u8,
     pub is_fateful_encounter: bool,
-    pub trainer_gender: Gender,
+    pub trainer_gender: BinaryGender,
     pub status_condition: u32,
     pub stat_level: u8,
     pub form_argument_remain: u8,
@@ -334,7 +338,7 @@ impl Pkm for Pk6 {
 
         bytes[220] = self.ball as u8;
         bytes[221] = self.met_level;
-        util::set_flag(bytes, 221, 7, self.trainer_gender.into());
+        util::set_flag(bytes, 221, 7, self.trainer_gender);
         bytes[222] = self.encounter_type;
         bytes[223] = self.game_of_origin as u8;
         bytes[224] = self.country;

@@ -13,6 +13,9 @@ use pkm_rs_types::Gender;
 use pkm_rs_types::{MarkingsFourShapes, OriginGame, Stats8};
 use serde::Serialize;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 pub const CFRU_BALLS: [Ball; 27] = [
     Ball::Master,
     Ball::Ultra,
@@ -97,6 +100,7 @@ impl CfruMapping for BaseCfruMapping {
 }
 
 /// PK3CFRU (58 bytes)
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone)]
 pub struct Pk3Cfru<M: CfruMapping = BaseCfruMapping> {
     _marker: std::marker::PhantomData<M>,

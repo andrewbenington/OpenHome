@@ -15,6 +15,7 @@ serde-wasm-bindgen = { version = "0.6.5", optional = true }
 static_assertions = "1.1.0"
 strum = "0.27.2"
 strum_macros = "0.27.2"
+rand = { version = "0.10.0", optional = true }
 
 [lib]
 name = "pkm_rs_resources"
@@ -26,3 +27,4 @@ missing_const_for_fn = "warn"
 
 [features]
 wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js", "pkm_rs_types/wasm"]
+randomize = ["rand", "pkm_rs_types/randomize"]

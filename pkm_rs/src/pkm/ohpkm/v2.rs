@@ -36,6 +36,9 @@ use pkm_rs_types::{
     TrainerMemory, strings::SizedUtf16String,
 };
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 const MAGIC_NUMBER: u32 = 0x57575757;
 const CURRENT_VERSION: u16 = 2;
 
@@ -108,6 +111,7 @@ impl SectionTag for SectionTagV2 {
 }
 
 #[derive(Default, Debug, Clone, Serialize)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OhpkmV2 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]

@@ -1,8 +1,12 @@
 use crate::util::bit_is_set;
 use pkm_rs_derive::Stats;
 use serde::Serialize;
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
 
 pub trait Stats: Sized {
     fn get_hp(&self) -> u16;
@@ -14,6 +18,7 @@ pub trait Stats: Sized {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, Stats)]
 pub struct Stats8 {
     pub hp: u8,
@@ -140,12 +145,14 @@ impl Stats8 {
 
     // ensure TypeScript doesn't allow Stats8 and Stats16Le to be confused
     #[wasm_bindgen(getter = stats8)]
+    #[allow(clippy::missing_const_for_fn)]
     pub fn rust_type_name(&self) -> bool {
         true
     }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, Stats)]
 pub struct Stats16Le {
     pub hp: u16,
@@ -208,12 +215,14 @@ impl Stats16Le {
 
     // ensure TypeScript doesn't allow Stats8 and Stats16Le to be confused
     #[wasm_bindgen(getter = stats16Le)]
+    #[allow(clippy::missing_const_for_fn)]
     pub fn rust_type_name(&self) -> bool {
         true
     }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct HyperTraining {
     pub hp: bool,
@@ -264,6 +273,7 @@ impl HyperTraining {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct StatsPreSplit {
     pub hp: u16,
@@ -331,7 +341,7 @@ impl StatsPreSplit {
         let mut atk = (ivs.atk - 1).div_ceil(2) as u16;
         if atk & 0b11 == 0b01 {
             atk += 1;
-        } else if atk % 4 == 0 {
+        } else if atk.is_multiple_of(4) {
             atk += 2
         }
 
@@ -375,6 +385,7 @@ impl StatsPreSplit {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct ContestStats {
     pub cool: u8,

@@ -9,11 +9,15 @@ use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::DsRibbonSet;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
-use pkm_rs_types::{ContestStats, MarkingsSixShapes, OriginGame, Stats8, Stats16Le};
+use pkm_rs_types::{BinaryGender, ContestStats, MarkingsSixShapes, OriginGame, Stats8, Stats16Le};
 use pkm_rs_types::{Gender, PokeDate};
 use serde::Serialize;
 
-#[derive(Debug, Serialize, Clone, Copy, IsShiny8192)]
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Default, Serialize, Clone, Copy, IsShiny8192)]
 pub struct Pk5 {
     pub personality_value: u32,
     pub species_and_forme: SpeciesAndForme,
@@ -51,7 +55,7 @@ pub struct Pk5 {
     pub is_fateful_encounter: bool,
     pub nickname: Gen5String<24>,
     pub trainer_name: Gen5String<16>,
-    pub trainer_gender: Gender,
+    pub trainer_gender: BinaryGender,
     pub status_condition: u32,
     pub stat_level: u8,
     pub junk_byte: u8,
@@ -209,7 +213,7 @@ impl Pkm for Pk5 {
         util::set_flag(bytes, 64, 0, self.is_fateful_encounter);
         bytes[72..96].copy_from_slice(self.nickname.bytes().as_ref());
         bytes[104..120].copy_from_slice(self.trainer_name.bytes().as_ref());
-        util::set_flag(bytes, 132, 7, self.trainer_gender.into());
+        util::set_flag(bytes, 132, 7, self.trainer_gender);
 
         Ok(())
     }

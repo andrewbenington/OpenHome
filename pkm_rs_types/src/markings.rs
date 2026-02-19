@@ -1,10 +1,14 @@
 use serde::Serialize;
 
+use crate::BitSet;
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use crate::BitSet;
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
 
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct MarkingsFourShapes {
     pub circle: bool,
@@ -56,6 +60,7 @@ impl From<MarkingsSixShapesColors> for MarkingsFourShapes {
     }
 }
 
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct MarkingsSixShapes {
@@ -118,6 +123,7 @@ impl From<MarkingsSixShapesColors> for MarkingsSixShapes {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub enum MarkingValue {
     #[default]
@@ -167,6 +173,7 @@ impl MarkingValue {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct MarkingsSixShapesColors {
     pub circle: MarkingValue,

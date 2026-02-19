@@ -1,3 +1,4 @@
+use arbitrary_int::u3;
 use serde::{Serialize, Serializer};
 
 use strum_macros::{Display, EnumString};
@@ -5,6 +6,11 @@ use strum_macros::{Display, EnumString};
 use wasm_bindgen::prelude::*;
 
 use crate::{OriginGame, strings::SizedUtf16String, util};
+
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
 
 const MASK_BITS_1_2: u8 = 0b00000110;
 const MASK_BITS_1_2_INVERTED: u8 = 0b11111001;
@@ -111,6 +117,38 @@ impl From<Gender> for bool {
     }
 }
 
+#[cfg(feature = "randomize")]
+impl Randomize for Gender {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        Gender::from_u8(rng.random_range(0..=2))
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, EnumString, Display, Default, Serialize, Clone, Copy, Eq, PartialEq)]
+pub enum BinaryGender {
+    #[default]
+    Male,
+    Female,
+}
+
+impl From<bool> for BinaryGender {
+    fn from(value: bool) -> Self {
+        match value {
+            true => Self::Female,
+            false => Self::Male,
+        }
+    }
+}
+
+impl From<BinaryGender> for bool {
+    fn from(value: BinaryGender) -> Self {
+        value == BinaryGender::Female
+    }
+}
+
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy)]
 pub struct FlagSet<const N: usize> {
     raw: [u8; N],
@@ -231,6 +269,28 @@ impl PokeDate {
     }
 }
 
+#[cfg(feature = "randomize")]
+impl Randomize for PokeDate {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let month: u8 = rng.random_range(1..=12);
+        let year_minus_2000: u8 = rng.random_range(0..=255);
+        let day = rng.random_range(
+            1..=time::util::days_in_month(
+                month
+                    .try_into()
+                    .expect("random month range must be hardcoded from 1-12"),
+                (year_minus_2000 as i32) + 2000,
+            ),
+        );
+
+        PokeDate {
+            year_minus_2000,
+            month,
+            day,
+        }
+    }
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
 impl PokeDate {
@@ -322,6 +382,7 @@ impl TrainerData {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct TrainerMemory {
     pub intensity: u8,
@@ -352,6 +413,46 @@ impl TrainerMemory {
 
         bytes
     }
+
+    pub fn from_bytes_switch_trainer(bytes: &[u8; 6]) -> Self {
+        Self {
+            intensity: bytes[0],
+            memory: bytes[1],
+            text_variable: u16::from_le_bytes(bytes[3..=4].try_into().unwrap()),
+            feeling: bytes[5],
+        }
+    }
+
+    pub fn to_bytes_switch_trainer(&self) -> [u8; 6] {
+        let mut bytes = [0u8; 6];
+
+        bytes[0] = self.intensity;
+        bytes[1] = self.memory;
+        bytes[3..=4].copy_from_slice(&self.text_variable.to_le_bytes());
+        bytes[5] = self.feeling;
+
+        bytes
+    }
+
+    pub fn from_bytes_switch_handler(bytes: &[u8; 5]) -> Self {
+        Self {
+            intensity: bytes[0],
+            memory: bytes[1],
+            feeling: bytes[2],
+            text_variable: u16::from_le_bytes(bytes[3..=4].try_into().unwrap()),
+        }
+    }
+
+    pub fn to_bytes_switch_handler(&self) -> [u8; 5] {
+        let mut bytes = [0u8; 5];
+
+        bytes[0] = self.intensity;
+        bytes[1] = self.memory;
+        bytes[2] = self.feeling;
+        bytes[3..=4].copy_from_slice(&self.text_variable.to_le_bytes());
+
+        bytes
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -369,6 +470,7 @@ impl TrainerMemory {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct Geolocation {
     pub region: u8,
@@ -399,6 +501,7 @@ impl Geolocation {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct Geolocations(
     pub Geolocation,
@@ -478,6 +581,10 @@ impl ShinyLeaves {
 
     pub const fn is_empty(&self) -> bool {
         self.0 == 0
+    }
+
+    pub const fn new_crown() -> Self {
+        Self(0b100000)
     }
 }
 
@@ -575,6 +682,73 @@ impl ShinyLeaves {
         Self::from_byte(self.0)
     }
 }
+
+#[cfg(feature = "randomize")]
+impl Randomize for ShinyLeaves {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        match rng.random_range(0..=1) {
+            0 => Self::new_crown(),
+            _ => Self::from_byte(rng.random_range(0..=0b11111)),
+        }
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Display, Serialize)]
+pub enum AbilityNumber {
+    #[default]
+    First,
+    Second,
+    Hidden,
+}
+
+impl AbilityNumber {
+    pub const fn from_u8_first_three_bits(
+        byte: u8,
+    ) -> core::result::Result<Self, InvalidAbilityNumber> {
+        match byte & 0b111 {
+            1 => Ok(Self::First),
+            2 => Ok(Self::Second),
+            4 => Ok(Self::Hidden),
+            invalid => Err(InvalidAbilityNumber(u3::new(invalid))),
+        }
+    }
+
+    pub const fn to_byte(self) -> u8 {
+        match self {
+            Self::First => 1,
+            Self::Second => 2,
+            Self::Hidden => 4,
+        }
+    }
+}
+
+impl TryFrom<u3> for AbilityNumber {
+    type Error = InvalidAbilityNumber;
+
+    fn try_from(value: u3) -> Result<Self, InvalidAbilityNumber> {
+        match value.value() {
+            1 => Ok(Self::First),
+            2 => Ok(Self::Second),
+            4 => Ok(Self::Hidden),
+            _ => Err(InvalidAbilityNumber(value)),
+        }
+    }
+}
+
+impl From<AbilityNumber> for u8 {
+    fn from(value: AbilityNumber) -> Self {
+        match value {
+            AbilityNumber::First => 1,
+            AbilityNumber::Second => 2,
+            AbilityNumber::Hidden => 4,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct InvalidAbilityNumber(pub u3);
 
 #[cfg(test)]
 mod tests {

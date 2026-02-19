@@ -3,6 +3,9 @@ use strum_macros::{Display, EnumString};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 pub enum ColosseumOrXd {
     Colosseum,
     XD,
@@ -10,6 +13,7 @@ pub enum ColosseumOrXd {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize)]
 #[repr(u8)]
 pub enum OriginGame {

@@ -4,6 +4,10 @@ use std::fmt::Display;
 
 use crate::ribbons::{ModernRibbon, ObsoleteRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Default, Debug, Clone, Copy)]
 pub struct Gen3RibbonSet(FlagSet<4>);
 
@@ -277,6 +281,7 @@ impl FromIterator<Gen3Ribbon> for Gen3RibbonSet {
     }
 }
 
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Default, Debug, Clone, Copy)]
 pub struct Gen4StandardRibbonSet(FlagSet<4>);
 
@@ -530,6 +535,7 @@ impl Display for Gen4StandardRibbon {
     }
 }
 
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Default, Debug, Clone, Copy)]
 pub struct Gen4ContestRibbonSet(FlagSet<4>);
 
@@ -740,6 +746,7 @@ impl DsRibbon {
     }
 }
 
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Default, Debug, Clone, Copy)]
 pub struct DsRibbonSet {
     gen3: Gen3RibbonSet,

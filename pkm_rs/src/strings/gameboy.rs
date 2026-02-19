@@ -1,8 +1,15 @@
+use serde::Serialize;
 use std::fmt::Display;
 
-use serde::Serialize;
-
 use crate::conversion::gameboy_string_encoding;
+
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::{
+    RngExt,
+    distr::{Alphanumeric, SampleString},
+};
 
 #[derive(Debug)]
 pub struct GbString<const N: usize> {
@@ -67,5 +74,14 @@ impl<const N: usize> GbString<N> {
 
     pub fn bytes(&self) -> [u8; N] {
         self.raw
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl<const N: usize> Randomize for GbString<N> {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let length: usize = rng.random_range(0..N);
+        let utf8: String = Alphanumeric.sample_string(rng, length);
+        Self::from(utf8)
     }
 }

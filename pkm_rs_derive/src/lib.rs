@@ -5,6 +5,10 @@ use quote::quote;
 use syn::{
     Data, DeriveInput, Fields, FnArg, ItemImpl, PatType, parse_macro_input, spanned::Spanned,
 };
+
+#[cfg(debug_assertions)]
+mod randomize;
+
 #[proc_macro_derive(IsShiny4096)]
 pub fn derive_is_shiny_4096(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -372,4 +376,30 @@ pub fn safe_wasm_impl(_attr: TokenStream, item: TokenStream) -> TokenStream {
     };
 
     output.into()
+}
+
+#[cfg(debug_assertions)]
+#[proc_macro_derive(Randomize)]
+pub fn derive_randomize(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    let name = &input.ident;
+    let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
+
+    let randomized_body = match &input.data {
+        Data::Struct(data) => randomize::gen_struct_sample(name, &data.fields),
+        Data::Enum(data) => {
+            randomize::gen_enum_sample(name, &data.variants.iter().collect::<Vec<_>>())
+        }
+        Data::Union(_) => panic!("Randomize cannot be derived for unions"),
+    };
+
+    quote! {
+        impl #impl_generics Randomize for #name #ty_generics #where_clause
+        {
+            fn randomized<R: rand::Rng>(rng: &mut R) -> #name #ty_generics {
+                #randomized_body
+            }
+        }
+    }
+    .into()
 }

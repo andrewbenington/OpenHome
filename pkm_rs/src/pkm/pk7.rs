@@ -3,6 +3,7 @@ use crate::pkm::{Error, Pkm, Result};
 use crate::strings::SizedUtf16String;
 use crate::{read_u16_le, read_u32_le, util};
 
+use arbitrary_int::{u3, u7};
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::helpers;
@@ -12,7 +13,8 @@ use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::{
-    ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
+    AbilityNumber, BinaryGender, ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame,
+    Stats8, Stats16Le,
 };
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
@@ -20,8 +22,12 @@ use serde::Serialize;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Serialize, Clone, Copy, IsShiny4096)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct Pk7 {
     pub encryption_constant: u32,
     pub sanity: u16,
@@ -32,7 +38,7 @@ pub struct Pk7 {
     pub secret_id: u16,
     pub exp: u32,
     pub ability_index: AbilityIndex,
-    pub ability_num: u8,
+    pub ability_num: AbilityNumber,
     pub markings: MarkingsSixShapesColors,
     pub personality_value: u32,
     pub nature: NatureIndex,
@@ -66,7 +72,7 @@ pub struct Pk7 {
     pub is_nicknamed: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub handler_name: SizedUtf16String<24>,
-    pub handler_gender: bool,
+    pub handler_gender: BinaryGender,
     pub is_current_handler: bool,
     pub geolocations: Geolocations,
     pub handler_friendship: u8,
@@ -86,13 +92,13 @@ pub struct Pk7 {
     pub met_location_index: u16,
     pub ball: Ball,
     pub met_level: u8,
+    pub trainer_gender: BinaryGender,
     pub hyper_training: HyperTraining,
     pub game_of_origin: OriginGame,
     pub country: u8,
     pub region: u8,
     pub console_region: u8,
     pub language_index: u8,
-    pub trainer_gender: Gender,
     pub status_condition: u32,
     pub stat_level: u8,
     pub form_argument_remain: u8,
@@ -108,6 +114,8 @@ impl Pk7 {
             return Err(Error::buffer_size(Pk7::BOX_SIZE, size));
         }
         // try_into() will always succeed thanks to the length check
+
+        println!("ability index: {}", AbilityIndex::try_from(bytes[20])?);
         let mon = Pk7 {
             encryption_constant: read_u32_le!(bytes, 0),
             sanity: read_u16_le!(bytes, 4),
@@ -121,7 +129,7 @@ impl Pk7 {
             secret_id: read_u16_le!(bytes, 14),
             exp: read_u32_le!(bytes, 16),
             ability_index: AbilityIndex::try_from(bytes[20])?,
-            ability_num: bytes[21],
+            ability_num: u3::extract_u8(bytes[21], 0).try_into()?,
             markings: MarkingsSixShapesColors::from_bytes(bytes[22..24].try_into().unwrap()),
             personality_value: read_u32_le!(bytes, 24),
             nature: NatureIndex::try_from(bytes[28])?,
@@ -158,7 +166,7 @@ impl Pk7 {
             is_egg: util::get_flag(bytes, 116, 30),
             is_nicknamed: util::get_flag(bytes, 116, 31),
             handler_name: SizedUtf16String::<24>::from_bytes(bytes[120..144].try_into().unwrap()),
-            handler_gender: util::get_flag(bytes, 146, 0),
+            handler_gender: util::get_flag(bytes, 146, 0).into(),
             is_current_handler: util::get_flag(bytes, 147, 0),
             geolocations: Geolocations::from_bytes(bytes[148..158].try_into().unwrap()),
             handler_friendship: bytes[162],
@@ -185,14 +193,14 @@ impl Pk7 {
             egg_location_index: read_u16_le!(bytes, 216),
             met_location_index: read_u16_le!(bytes, 218),
             ball: Ball::from(bytes[220]),
-            met_level: bytes[221],
+            met_level: u7::extract_u8(bytes[221], 0).into(),
+            trainer_gender: util::get_flag(bytes, 221, 7).into(),
             hyper_training: HyperTraining::from_byte(bytes[222]),
             game_of_origin: OriginGame::from(bytes[223]),
             country: bytes[224],
             region: bytes[225],
             console_region: bytes[226],
             language_index: bytes[227],
-            trainer_gender: util::get_flag(bytes, 221, 7).into(),
             status_condition: if bytes.len() > Self::BOX_SIZE {
                 read_u32_le!(bytes, 232)
             } else {
@@ -237,6 +245,10 @@ impl Pkm for Pk7 {
     }
 
     fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+        println!(
+            "before writing ability index: {}",
+            u8::from(self.ability_index)
+        );
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[4..6].copy_from_slice(&self.sanity.to_le_bytes());
         bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
@@ -245,8 +257,9 @@ impl Pkm for Pk7 {
         bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
         bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
         bytes[16..20].copy_from_slice(&self.exp.to_le_bytes());
+        println!("writing ability index: {}", u8::from(self.ability_index));
         bytes[20] = u8::from(self.ability_index);
-        bytes[21] = self.ability_num;
+        bytes[21] |= self.ability_num as u8;
         bytes[22..24].copy_from_slice(&self.markings.to_bytes());
         bytes[24..28].copy_from_slice(&self.personality_value.to_le_bytes());
         bytes[28] = self.nature.to_byte();
@@ -333,7 +346,8 @@ impl Pkm for Pk7 {
         bytes[218..220].copy_from_slice(&self.met_location_index.to_le_bytes());
 
         bytes[220] = self.ball as u8;
-        bytes[221] = self.met_level;
+        bytes[221] |= self.met_level & 0x7F;
+        util::set_flag(bytes, 221, 7, self.trainer_gender);
         bytes[222] = self.hyper_training.to_byte();
         bytes[223] = self.game_of_origin as u8;
         bytes[224] = self.country;

@@ -3,6 +3,11 @@ use serde::Serialize;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(u8)]
@@ -153,6 +158,13 @@ impl Ball {
             index: *self as u8,
             name: self.name().to_owned(),
         }
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for Ball {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        Ball::from(rng.random_range(0..BALL_COUNT) as u8)
     }
 }
 

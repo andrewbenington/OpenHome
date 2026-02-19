@@ -5,12 +5,20 @@ use crate::util;
 use crate::{read_u16_le, read_u32_le};
 
 use pkm_rs_derive::IsShiny4096;
+use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
-use pkm_rs_types::{ContestStats, HyperTraining, MarkingsSixShapesColors, Stats8, Stats16Le};
+use pkm_rs_types::{
+    AbilityNumber, BinaryGender, ContestStats, HyperTraining, MarkingsSixShapesColors, PokeDate,
+    Stats8, Stats16Le, TrainerMemory,
+};
 use pkm_rs_types::{FlagSet, Gender};
 use serde::Serialize;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct Pk8 {
     pub encryption_constant: u32,
@@ -21,8 +29,8 @@ pub struct Pk8 {
     pub trainer_id: u16,
     pub secret_id: u16,
     pub exp: u32,
-    pub ability_index: u16,
-    pub ability_num: u8,
+    pub ability_index: AbilityIndex,
+    pub ability_num: AbilityNumber,
     pub favorite: bool,
     pub can_gigantamax: bool,
     pub markings: MarkingsSixShapesColors,
@@ -54,7 +62,7 @@ pub struct Pk8 {
     pub status_condition: u32,
     pub palma: u32,
     pub handler_name: SizedUtf16String<24>,
-    pub handler_gender: Gender,
+    pub handler_gender: BinaryGender,
     pub handler_language: u8,
     pub handler_id: u16,
     pub handler_friendship: u8,
@@ -67,8 +75,11 @@ pub struct Pk8 {
     pub language_index: u8,
     pub form_argument: u32,
     pub affixed_ribbon: u8,
+    pub egg_date: Option<PokeDate>,
+    pub met_date: PokeDate,
     pub trainer_name: SizedUtf16String<24>,
     pub trainer_friendship: u8,
+    pub trainer_memory: TrainerMemory,
     pub egg_location_index: u16,
     pub met_location_index: u16,
     pub ball: u8,
@@ -77,7 +88,7 @@ pub struct Pk8 {
     pub home_tracker: [u8; 8],
     pub is_current_handler: bool,
     pub hyper_training: HyperTraining,
-    pub trainer_gender: Gender,
+    pub trainer_gender: BinaryGender,
     pub level: u8,
     pub stats: Stats16Le,
 }
@@ -102,8 +113,12 @@ impl Pk8 {
             trainer_id: read_u16_le!(bytes, 12),
             secret_id: read_u16_le!(bytes, 14),
             exp: read_u32_le!(bytes, 16),
-            ability_index: read_u16_le!(bytes, 20),
-            ability_num: bytes[22] & 0b111,
+            ability_index: AbilityIndex::from_index(read_u16_le!(bytes, 20)).ok_or(
+                Error::AbilityIndex {
+                    ability_index: read_u16_le!(bytes, 20),
+                },
+            )?,
+            ability_num: AbilityNumber::from_u8_first_three_bits(bytes[22])?,
             favorite: util::get_flag(bytes, 22, 3),
             can_gigantamax: util::get_flag(bytes, 22, 4),
             markings: MarkingsSixShapesColors::from_bytes(bytes[24..26].try_into().unwrap()),
@@ -145,7 +160,7 @@ impl Pk8 {
             status_condition: read_u32_le!(bytes, 148),
             palma: read_u32_le!(bytes, 152),
             handler_name: SizedUtf16String::<24>::from_bytes(bytes[168..192].try_into().unwrap()),
-            handler_gender: Gender::from(util::get_flag(bytes, 194, 0)),
+            handler_gender: util::get_flag(bytes, 194, 0).into(),
             handler_language: bytes[195],
             is_current_handler: util::get_flag(bytes, 196, 0),
             handler_id: read_u16_le!(bytes, 198),
@@ -161,22 +176,23 @@ impl Pk8 {
             affixed_ribbon: bytes[232],
             trainer_name: SizedUtf16String::<24>::from_bytes(bytes[248..272].try_into().unwrap()),
             trainer_friendship: bytes[274],
+            trainer_memory: TrainerMemory::from_bytes_switch_trainer(
+                bytes[275..=280].try_into().unwrap(),
+            ),
+            egg_date: PokeDate::from_bytes_optional(bytes[281..284].try_into().unwrap()),
+            met_date: PokeDate::from_bytes(bytes[284..287].try_into().unwrap()),
             egg_location_index: read_u16_le!(bytes, 288),
             met_location_index: read_u16_le!(bytes, 290),
             ball: bytes[292],
-            met_level: util::int_from_buffer_bits_le::<u8>(bytes, 293, 0, 7).map_err(|e| {
-                Error::FieldError {
-                    field: "met_level",
-                    source: e,
-                }
-            })?,
+            met_level: bytes[293] & 0b01111111,
+            trainer_gender: util::get_flag(bytes, 293, 7).into(),
             tr_flags_sw_sh: bytes[295..309].try_into().unwrap(),
             home_tracker: bytes[309..317].try_into().unwrap(),
             hyper_training: HyperTraining::from_byte(bytes[294]),
-            trainer_gender: util::get_flag(bytes, 293, 7).into(),
             level: bytes[328],
             stats: Stats16Le::from_bytes(bytes[330..342].try_into().unwrap()),
         };
+        println!("trainer gender: {}", mon.trainer_gender);
         Ok(mon)
     }
 }
@@ -199,7 +215,10 @@ impl Pkm for Pk8 {
         bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
         bytes[16..20].copy_from_slice(&self.exp.to_le_bytes());
         bytes[20..22].copy_from_slice(&self.ability_index.to_le_bytes());
-        bytes[22] = self.ability_num;
+        bytes[22] = self.ability_num.to_byte() & 0b111;
+        util::set_flag(bytes, 22, 3, self.favorite);
+        util::set_flag(bytes, 22, 4, self.can_gigantamax);
+        bytes[24..26].copy_from_slice(&self.markings.to_bytes());
 
         bytes[28..32].copy_from_slice(&self.personality_value.to_le_bytes());
         bytes[32] = self.nature;
@@ -228,7 +247,26 @@ impl Pkm for Pk8 {
         bytes[118..120].copy_from_slice(&self.moves[2].to_le_bytes());
         bytes[120..122].copy_from_slice(&self.moves[3].to_le_bytes());
 
+        bytes[122] = self.move_pp[0];
+        bytes[123] = self.move_pp[1];
+        bytes[124] = self.move_pp[2];
+        bytes[125] = self.move_pp[3];
+
+        bytes[126] = self.move_pp_ups[0];
+        bytes[127] = self.move_pp_ups[1];
+        bytes[128] = self.move_pp_ups[2];
+        bytes[129] = self.move_pp_ups[3];
+
+        bytes[130..132].copy_from_slice(&self.relearn_moves[0].to_le_bytes());
+        bytes[132..134].copy_from_slice(&self.relearn_moves[1].to_le_bytes());
+        bytes[134..136].copy_from_slice(&self.relearn_moves[2].to_le_bytes());
+        bytes[136..138].copy_from_slice(&self.relearn_moves[3].to_le_bytes());
+
         bytes[138..140].copy_from_slice(&self.current_hp.to_le_bytes());
+
+        self.ivs.write_30_bits(bytes, 140);
+        util::set_flag(bytes, 140, 30, self.is_egg);
+        util::set_flag(bytes, 140, 31, self.is_nicknamed);
 
         bytes[144] = self.dynamax_level;
         bytes[148..152].copy_from_slice(&self.status_condition.to_le_bytes());
@@ -236,6 +274,7 @@ impl Pkm for Pk8 {
         bytes[168..192].copy_from_slice(&self.handler_name);
 
         bytes[195] = self.handler_language;
+        util::set_flag(bytes, 196, 0, self.is_current_handler);
         bytes[198..200].copy_from_slice(&self.handler_id.to_le_bytes());
         bytes[200] = self.handler_friendship;
         bytes[220] = self.fullness;
@@ -246,15 +285,23 @@ impl Pkm for Pk8 {
         bytes[224] = self.console_region;
         bytes[226] = self.language_index;
         bytes[228..232].copy_from_slice(&self.form_argument.to_le_bytes());
-
+        bytes[232] = self.affixed_ribbon;
         bytes[248..272].copy_from_slice(&self.trainer_name);
         bytes[274] = self.trainer_friendship;
+        bytes[275..281].copy_from_slice(&self.trainer_memory.to_bytes_switch_trainer());
+
+        bytes[281..284].copy_from_slice(&self.egg_date.unwrap_or_default().to_bytes());
+        bytes[284..287].copy_from_slice(&self.met_date.to_bytes());
+
         bytes[288..290].copy_from_slice(&self.egg_location_index.to_le_bytes());
         bytes[290..292].copy_from_slice(&self.met_location_index.to_le_bytes());
         bytes[292] = self.ball;
-        bytes[293] = self.met_level;
-
-        bytes[294] = self.hyper_training.to_byte();
+        println!("met_level: {}", self.met_level);
+        bytes[293] |= self.met_level & 0x7F;
+        util::set_flag(bytes, 293, 7, self.trainer_gender);
+        bytes[294] = self.hyper_training.to_byte() & 0b111111;
+        println!("bytes[293]: {}", bytes[293]);
+        bytes[295..309].copy_from_slice(&self.tr_flags_sw_sh);
 
         bytes[328] = self.level;
         bytes[330..342].copy_from_slice(&self.stats.to_bytes());

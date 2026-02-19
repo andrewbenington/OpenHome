@@ -11,6 +11,10 @@ use pkm_rs_types::{Gender, PokeDate};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors, Stats8, Stats16Le};
 use serde::Serialize;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct Pb7 {
     pub encryption_constant: u32,

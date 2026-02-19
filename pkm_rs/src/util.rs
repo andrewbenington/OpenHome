@@ -107,7 +107,7 @@ pub fn get_flag(bytes: &[u8], byte_offset: usize, bit_index: usize) -> bool {
     bit_is_set(bytes[byte_index], bit_index)
 }
 
-pub fn set_flag(bytes: &mut [u8], byte_offset: usize, bit_index: usize, value: bool) {
+pub fn set_flag(bytes: &mut [u8], byte_offset: usize, bit_index: usize, value: impl Into<bool>) {
     let byte_index = byte_offset + (bit_index / 8);
     if byte_index >= bytes.len() {
         panic!(
@@ -117,7 +117,7 @@ pub fn set_flag(bytes: &mut [u8], byte_offset: usize, bit_index: usize, value: b
         );
     }
     let bit_index: u8 = (bit_index % 8).try_into().unwrap();
-    bytes[byte_index].set_bit(bit_index, value);
+    bytes[byte_index].set_bit(bit_index, value.into());
 }
 
 pub const fn bit_is_set(byte: u8, bit_index: u8) -> bool {

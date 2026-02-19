@@ -5,7 +5,11 @@ use wasm_bindgen::prelude::*;
 
 use crate::Generation;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, EnumString, Display, Serialize, PartialEq, Eq, Clone, Copy)]
 #[repr(u8)]
 pub enum PkmType {
@@ -77,6 +81,7 @@ impl PkmType {
 const TERA_TYPE_NO_OVERRIDE: u8 = 0x13;
 const TERA_TYPE_STELLAR: u8 = 0x63;
 
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Serialize, Clone, Copy, PartialEq, Eq)]
 pub enum TeraType {
     Standard(PkmType),
@@ -134,6 +139,7 @@ pub enum TeraTypeWasm {
 }
 
 #[cfg(feature = "wasm")]
+#[allow(clippy::missing_const_for_fn)]
 impl TeraTypeWasm {
     pub fn from_byte(byte: u8) -> Option<Self> {
         match byte {

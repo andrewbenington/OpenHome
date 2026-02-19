@@ -4,6 +4,7 @@ use std::fmt::{Display};
 use std::string::FromUtf8Error;
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
 use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, language::LANGUAGE_MAX, items::ITEM_MAX};
+use pkm_rs_types::InvalidAbilityNumber;
 use serde::{Serialize, Serializer};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::JsValue;
@@ -60,6 +61,7 @@ pub enum Error {
     AbilityIndex {
         ability_index: u16,
     },
+    AbilityNumber(InvalidAbilityNumber),
     ItemIndex {
         item_index: u16,
     },
@@ -82,7 +84,7 @@ pub enum Error {
 }
 
 impl Error {
-    pub fn buffer_size(expected: usize, received: usize) -> Self {
+    pub const fn buffer_size(expected: usize, received: usize) -> Self {
         Self::BufferSize { requirement_source: None, expected, received }
     }
 
@@ -153,6 +155,9 @@ impl Display for Error {
                 format!("Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}")
                     .to_owned()
             }
+            Error::AbilityNumber(InvalidAbilityNumber(num)) => {
+                format!("Invalid ability number {num} (must be between 1 and 3)")
+            }
             Error::ItemIndex { item_index } => {
                 format!("Invalid item index {item_index} (must be between 1 and {ITEM_MAX}")
                     .to_owned()
@@ -199,6 +204,16 @@ impl From<pkm_rs_resources::Error> for Error {
     }
 }
 
+impl From<pkm_rs_types::Error> for Error {
+    fn from(value: pkm_rs_types::Error) -> Self {
+        match value {
+            pkm_rs_types::Error::BufferSize { field, offset, buffer_size } => Self::BufferSize { requirement_source: Some(field), expected: offset, received: buffer_size },
+            pkm_rs_types::Error::ByteLength { expected, received } => Self::BufferSize { requirement_source: None, expected, received },
+            pkm_rs_types::Error::AbilityNumber(invalid_ability_number) => Self::AbilityNumber(invalid_ability_number),
+        }
+    }
+}
+
 impl From<sectioned_data::Error> for Error {
     fn from(value: sectioned_data::Error) -> Self {
         match value {
@@ -209,6 +224,12 @@ impl From<sectioned_data::Error> for Error {
                 received: buffer_size 
             },
         }
+    }
+}
+
+impl From<pkm_rs_types::InvalidAbilityNumber> for Error {
+    fn from(value: InvalidAbilityNumber) -> Self {
+        Self::AbilityNumber(value)
     }
 }
 

@@ -15,4 +15,8 @@ pub use structures::*;
 pub use util::*;
 
 extern crate self as pkm_rs_types;
+
 pub mod strings;
+
+#[cfg(feature = "randomize")]
+pub mod randomize;

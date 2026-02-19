@@ -36,8 +36,6 @@ base64 = "0.22.1"
 zip = "7.2.0"
 static_assertions = "1.1.0"
 sha2 = "0.10.9"
-getrandom = "0.3.3"
-rand = "*"
 num = "0.4.3"
 toml = "*"
 pkm_rs_derive = {path = "../pkm_rs_derive"}

@@ -1,6 +1,13 @@
+use serde::Serialize;
 use std::{fmt::Display, ops::Deref};
 
-use serde::Serialize;
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::{
+    RngExt,
+    distr::{Alphanumeric, SampleString},
+};
 
 const TERMINATOR: u16 = 0x0000;
 
@@ -28,6 +35,15 @@ impl<const N: usize> From<String> for SizedUtf16String<N> {
     }
 }
 
+#[cfg(feature = "randomize")]
+impl<const N: usize> Randomize for SizedUtf16String<N> {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let length: usize = rng.random_range(0..N);
+        let utf8: String = Alphanumeric.sample_string(rng, length);
+        Self::from(utf8)
+    }
+}
+
 impl<const N: usize> Display for SizedUtf16String<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let u16_values = u8_slice_to_u16_le(&self.raw_le);
@@ -51,11 +67,11 @@ impl<const N: usize> Serialize for SizedUtf16String<N> {
 }
 
 impl<const N: usize> SizedUtf16String<N> {
-    pub fn from_bytes(bytes: [u8; N]) -> Self {
+    pub const fn from_bytes(bytes: [u8; N]) -> Self {
         SizedUtf16String { raw_le: bytes }
     }
 
-    pub fn bytes(&self) -> [u8; N] {
+    pub const fn bytes(&self) -> [u8; N] {
         self.raw_le
     }
 }

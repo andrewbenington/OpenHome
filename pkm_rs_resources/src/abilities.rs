@@ -1,10 +1,14 @@
+use serde::{Serialize, Serializer};
 use std::fmt::Debug;
 use std::num::NonZeroU16;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use serde::{Serialize, Serializer};
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
 
 use crate::{Error, Result};
 
@@ -70,6 +74,12 @@ impl Default for AbilityIndex {
     }
 }
 
+impl std::fmt::Display for AbilityIndex {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} ({})", self.get_metadata().name, self.get())
+    }
+}
+
 impl Serialize for AbilityIndex {
     fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
@@ -124,6 +134,16 @@ impl TryFrom<u16> for AbilityIndex {
 impl From<AbilityIndex> for u16 {
     fn from(val: AbilityIndex) -> Self {
         val.get()
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for AbilityIndex {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        AbilityIndex(
+            NonZeroU16::new(rng.random_range(1..ABILITY_MAX) as u16)
+                .expect("should never be zero; range starts at 1"),
+        )
     }
 }
 

@@ -5,9 +5,13 @@ use wasm_bindgen::prelude::*;
 
 use crate::{Error, Result};
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 pub const LANGUAGE_MAX: u8 = Language::ChineseTraditional as u8;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum Language {

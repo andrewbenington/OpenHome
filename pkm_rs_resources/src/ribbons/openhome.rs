@@ -4,9 +4,14 @@ use std::{error::Error, fmt::Display};
 
 use crate::ribbons::{ModernRibbon, ModernRibbonSet};
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Default, Debug, Clone, Copy)]
 pub struct ObsoleteRibbonSet(FlagSet<6>);
 
@@ -340,6 +345,7 @@ impl Display for OpenHomeRibbon {
 
 const OBSOLETE_RIBBON_BYTES: usize = 6;
 
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Default, Debug, Clone, Copy)]
 pub struct OpenHomeRibbonSet<const MODERN_BYTE_COUNT: usize> {
     obsolete: ObsoleteRibbonSet,

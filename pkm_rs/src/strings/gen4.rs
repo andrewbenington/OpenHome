@@ -1,8 +1,15 @@
+use serde::Serialize;
 use std::fmt::Display;
 
-use serde::Serialize;
-
 use crate::conversion::gen4_string_encoding;
+
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::{
+    RngExt,
+    distr::{Alphanumeric, SampleString},
+};
 
 #[derive(Debug)]
 pub struct Gen4String<const N: usize> {
@@ -60,11 +67,20 @@ impl<const N: usize> Serialize for Gen4String<N> {
 }
 
 impl<const N: usize> Gen4String<N> {
-    pub fn from_bytes(bytes: [u8; N]) -> Self {
+    pub const fn from_bytes(bytes: [u8; N]) -> Self {
         Gen4String { raw_be: bytes }
     }
 
-    pub fn bytes(&self) -> [u8; N] {
+    pub const fn bytes(&self) -> [u8; N] {
         self.raw_be
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl<const N: usize> Randomize for Gen4String<N> {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let length: usize = rng.random_range(0..N);
+        let utf8: String = Alphanumeric.sample_string(rng, length);
+        Self::from(utf8)
     }
 }

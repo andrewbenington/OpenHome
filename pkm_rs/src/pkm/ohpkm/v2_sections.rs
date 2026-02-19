@@ -11,6 +11,12 @@ use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesAndForme;
+use pkm_rs_types::strings::SizedUtf16String;
+use pkm_rs_types::{ContestStats, Stats8, Stats16Le, StatsPreSplit, TrainerData};
+use pkm_rs_types::{FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, TeraType};
+use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
+use serde::Serialize;
+use std::num::NonZeroU16;
 
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::species::NatDexIndex;
@@ -18,13 +24,8 @@ use pkm_rs_resources::species::NatDexIndex;
 #[cfg(feature = "wasm")]
 use crate::pkm::traits::IsShiny;
 
-use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{ContestStats, Stats8, Stats16Le, StatsPreSplit, TrainerData};
-use pkm_rs_types::{FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, TeraType};
-use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
-
-use serde::Serialize;
-use std::num::NonZeroU16;
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -38,6 +39,7 @@ fn bytes_are_empty(bytes: &[u8]) -> bool {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct MainDataV2 {
     pub personality_value: u32,
@@ -482,6 +484,7 @@ impl DataSection for MainDataV2 {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct GameboyData {
     pub dvs: StatsPreSplit,
@@ -561,6 +564,7 @@ impl DataSection for GameboyData {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct Gen45Data {
     pub encounter_type: u8,
@@ -631,6 +635,7 @@ impl DataSection for Gen45Data {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct Gen67Data {
     pub training_bag_hits: u8,
@@ -738,6 +743,7 @@ impl DataSection for Gen67Data {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct SwordShieldData {
     pub can_gigantamax: bool,
@@ -805,6 +811,7 @@ impl DataSection for SwordShieldData {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct BdspData {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -852,6 +859,7 @@ impl DataSection for BdspData {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct LegendsArceusData {
     pub gvs: Stats8,
@@ -946,6 +954,7 @@ impl DataSection for LegendsArceusData {
     }
 }
 
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct ScarletVioletData {
     pub tera_type_original: TeraType,
@@ -1028,6 +1037,7 @@ impl DataSection for ScarletVioletData {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone)]
 pub struct PastHandlerData {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -1224,6 +1234,7 @@ impl DataSection for PastHandlerData {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Clone, Serialize)]
 pub struct MostRecentSave {
     pub trainer_id: u16,
@@ -1291,6 +1302,7 @@ impl DataSection for MostRecentSave {
     }
 }
 
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Clone, Serialize)]
 pub struct PluginData {
     pub plugin_origin: String,
@@ -1337,6 +1349,7 @@ impl DataSection for PluginData {
     }
 }
 
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Clone, Serialize)]
 pub struct Notes(pub String);
 

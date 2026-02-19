@@ -6,7 +6,11 @@ use wasm_bindgen::prelude::*;
 use pkm_rs_types::{Generation, PkmType};
 use serde::{Serialize, Serializer};
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
 pub struct MoveSlot(Option<NonZeroU16>);
 

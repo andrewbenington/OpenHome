@@ -1,9 +1,13 @@
-use std::num::NonZeroU16;
-use strum_macros::{Display, EnumString};
-
 use crate::{Error, Result, abilities::AbilityIndex, species::ALL_SPECIES};
 use pkm_rs_types::{GameSetting, Generation, PkmType, Stats16Le, TeraType};
 use serde::{Serialize, Serializer};
+use std::num::NonZeroU16;
+use strum_macros::{Display, EnumString};
+
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
 
 #[cfg(feature = "wasm")]
 use crate::stats::Stat;
@@ -71,6 +75,15 @@ impl NatDexIndex {
     #[wasm_bindgen(constructor)]
     pub fn new_js(val: u16) -> core::result::Result<NatDexIndex, JsValue> {
         NatDexIndex::new(val).map_err(|e| JsValue::from_str(&e.to_string()))
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for NatDexIndex {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let index: NonZeroU16 =
+            NonZeroU16::new(rng.random_range(1..=MAX_NATIONAL_DEX) as u16).unwrap();
+        NatDexIndex(index)
     }
 }
 
@@ -734,5 +747,19 @@ impl SpeciesAndForme {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = tryNew))]
     pub fn try_new(national_dex: u16, forme_index: u16) -> Option<Self> {
         Self::new(national_dex, forme_index).ok()
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for SpeciesAndForme {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let national_dex = NatDexIndex::randomized(rng);
+        let forme_count = national_dex.get_species_metadata().formes().len();
+        let forme_index = rng.random_range(0..forme_count) as u16;
+
+        Self {
+            national_dex,
+            forme_index,
+        }
     }
 }
