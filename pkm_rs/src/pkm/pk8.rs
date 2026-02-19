@@ -183,18 +183,10 @@ impl Pk8 {
 
 impl Pkm for Pk8 {
     const BOX_SIZE: usize = 344;
-    const PARTY_SIZE: usize = 344;
+    const PARTY_SIZE: usize = Self::BOX_SIZE;
 
-    fn box_size() -> usize {
-        Self::BOX_SIZE
-    }
-
-    fn party_size() -> usize {
-        Self::PARTY_SIZE
-    }
-
-    fn from_bytes(bytes: &[u8]) -> Result<Box<Self>> {
-        Self::from_bytes(bytes).map(Box::new)
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::from_bytes(bytes)
     }
 
     fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {

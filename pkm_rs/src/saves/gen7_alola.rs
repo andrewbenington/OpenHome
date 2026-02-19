@@ -110,9 +110,9 @@ impl SaveDataTrait for SunMoonSave {
 
 impl SunMoonSave {
     fn get_mon_bytes(&self, box_num: usize, offset: usize) -> Vec<u8> {
-        let box_offset = SM_BOX_DATA_OFFSET + BOX_SLOTS * Pk7::box_size() * box_num;
-        let mon_offset = box_offset + offset * Pk7::box_size();
-        self.bytes[mon_offset..mon_offset + Pk7::box_size()].to_vec()
+        let box_offset = SM_BOX_DATA_OFFSET + BOX_SLOTS * Pk7::BOX_SIZE * box_num;
+        let mon_offset = box_offset + offset * Pk7::BOX_SIZE;
+        self.bytes[mon_offset..mon_offset + Pk7::BOX_SIZE].to_vec()
     }
 }
 
@@ -274,9 +274,9 @@ impl SaveDataTrait for UltraSunMoonSave {
 
 impl UltraSunMoonSave {
     fn get_mon_bytes(&self, box_num: usize, offset: usize) -> Vec<u8> {
-        let box_offset = SM_BOX_DATA_OFFSET + BOX_SLOTS * Pk7::box_size() * box_num;
-        let mon_offset = box_offset + offset * Pk7::box_size();
-        self.bytes[mon_offset..mon_offset + Pk7::box_size()].to_vec()
+        let box_offset = SM_BOX_DATA_OFFSET + BOX_SLOTS * Pk7::BOX_SIZE * box_num;
+        let mon_offset = box_offset + offset * Pk7::BOX_SIZE;
+        self.bytes[mon_offset..mon_offset + Pk7::BOX_SIZE].to_vec()
     }
 }
 

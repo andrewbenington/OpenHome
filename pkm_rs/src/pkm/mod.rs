@@ -11,6 +11,9 @@ pub mod buffers;
 pub mod ohpkm;
 pub mod traits;
 
+#[cfg(test)]
+mod tests;
+
 use pkm_rs_resources::species::{FormeMetadata, SpeciesMetadata};
 use serde::Serialize;
 
@@ -29,18 +32,24 @@ pub use universal::UniversalPkm;
 
 use crate::pkm::traits::IsShiny;
 
-pub trait Pkm: Serialize + IsShiny {
+pub trait Pkm: Serialize + IsShiny + Sized {
     const BOX_SIZE: usize;
     const PARTY_SIZE: usize;
 
-    fn box_size() -> usize;
-    fn party_size() -> usize;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Box<Self>>;
+    fn from_bytes(bytes: &[u8]) -> Result<Self>;
     fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()>;
     fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()>;
-    fn to_box_bytes(&self) -> Result<Vec<u8>>;
-    fn to_party_bytes(&self) -> Result<Vec<u8>>;
+
+    fn to_box_bytes(&self) -> Result<Vec<u8>> {
+        let mut bytes = Vec::with_capacity(Self::BOX_SIZE);
+        self.write_box_bytes(&mut bytes)?;
+        Ok(bytes)
+    }
+    fn to_party_bytes(&self) -> Result<Vec<u8>> {
+        let mut bytes = Vec::with_capacity(Self::PARTY_SIZE);
+        self.write_party_bytes(&mut bytes)?;
+        Ok(bytes)
+    }
 
     fn get_species_metadata(&self) -> &'static SpeciesMetadata;
     fn get_forme_metadata(&self) -> &'static FormeMetadata;

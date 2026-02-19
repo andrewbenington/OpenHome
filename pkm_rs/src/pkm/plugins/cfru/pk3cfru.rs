@@ -333,16 +333,8 @@ impl<M: CfruMapping> Pkm for Pk3Cfru<M> {
     const BOX_SIZE: usize = Pk3Cfru::<M>::BOX_SIZE;
     const PARTY_SIZE: usize = Pk3Cfru::<M>::PARTY_SIZE;
 
-    fn box_size() -> usize {
-        Self::BOX_SIZE
-    }
-
-    fn party_size() -> usize {
-        Self::PARTY_SIZE
-    }
-
-    fn from_bytes(bytes: &[u8]) -> Result<Box<Self>> {
-        Self::from_bytes(bytes).map(Box::new)
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::from_bytes(bytes)
     }
 
     fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {

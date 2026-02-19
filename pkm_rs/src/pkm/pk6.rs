@@ -231,16 +231,8 @@ impl Pkm for Pk6 {
     const BOX_SIZE: usize = 232;
     const PARTY_SIZE: usize = 260;
 
-    fn box_size() -> usize {
-        Self::BOX_SIZE
-    }
-
-    fn party_size() -> usize {
-        Self::PARTY_SIZE
-    }
-
-    fn from_bytes(bytes: &[u8]) -> Result<Box<Self>> {
-        Self::from_bytes(bytes).map(Box::new)
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::from_bytes(bytes)
     }
 
     fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {

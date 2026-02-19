@@ -99,8 +99,8 @@ impl SaveDataTrait for LetsGoSave {
 
 impl LetsGoSave {
     fn get_mon_bytes(&self, offset: usize) -> Vec<u8> {
-        let mon_offset = BOX_DATA_OFFSET + offset * Pb7::box_size();
-        self.bytes[mon_offset..mon_offset + Pb7::box_size()].to_vec()
+        let mon_offset = BOX_DATA_OFFSET + offset * Pb7::BOX_SIZE;
+        self.bytes[mon_offset..mon_offset + Pb7::BOX_SIZE].to_vec()
     }
 }
 

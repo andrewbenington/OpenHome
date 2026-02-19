@@ -1224,7 +1224,7 @@ impl DataSection for PastHandlerData {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Serialize)]
 pub struct MostRecentSave {
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -1291,7 +1291,7 @@ impl DataSection for MostRecentSave {
     }
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Serialize)]
 pub struct PluginData {
     pub plugin_origin: String,
 }
@@ -1337,7 +1337,7 @@ impl DataSection for PluginData {
     }
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Serialize)]
 pub struct Notes(pub String);
 
 impl DataSection for Notes {

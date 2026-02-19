@@ -4,17 +4,19 @@ use crate::pkm::ohpkm::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
     Notes, PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
 };
-use crate::pkm::{Error, Result};
+use crate::pkm::traits::IsShiny;
+use crate::pkm::{Error, Pkm, Result};
 
 #[cfg(feature = "wasm")]
 use pkm_rs_types::TrainerData;
+use serde::Serialize;
 use strum_macros::Display;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wasm")]
-use crate::pkm::{ohpkm::JsResult, traits::IsShiny};
+use crate::pkm::ohpkm::JsResult;
 
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::{
@@ -105,7 +107,7 @@ impl SectionTag for SectionTagV2 {
     }
 }
 
-#[derive(Default, Debug, Clone)]
+#[derive(Default, Debug, Clone, Serialize)]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OhpkmV2 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -1783,4 +1785,59 @@ fn add_section_bytes_to_js_object<T: DataSection<ErrorType = Error>>(
         )?;
     }
     Ok(())
+}
+
+impl Pkm for OhpkmV2 {
+    const BOX_SIZE: usize = 0;
+
+    const PARTY_SIZE: usize = 0;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        match Self::from_bytes(bytes) {
+            Ok(ohpkm) => Ok(ohpkm),
+            Err(err) => Err(Error::other(&err.to_string())),
+        }
+    }
+
+    fn write_box_bytes(&self, dest: &mut [u8]) -> Result<()> {
+        let bytes = self.to_box_bytes()?;
+        dest.copy_from_slice(&bytes);
+        Ok(())
+    }
+
+    fn write_party_bytes(&self, dest: &mut [u8]) -> Result<()> {
+        self.write_box_bytes(dest)
+    }
+
+    fn to_box_bytes(&self) -> Result<Vec<u8>> {
+        self.to_bytes().map_err(|e| Error::other(&e.to_string()))
+    }
+
+    fn to_party_bytes(&self) -> Result<Vec<u8>> {
+        self.to_box_bytes()
+    }
+
+    fn get_species_metadata(&self) -> &'static pkm_rs_resources::species::SpeciesMetadata {
+        self.main_data.species_and_forme.get_species_metadata()
+    }
+
+    fn get_forme_metadata(&self) -> &'static pkm_rs_resources::species::FormeMetadata {
+        self.main_data.species_and_forme.get_forme_metadata()
+    }
+
+    fn calculate_level(&self) -> u8 {
+        self.get_species_metadata()
+            .level_up_type
+            .calculate_level(self.main_data.exp)
+    }
+}
+
+impl IsShiny for OhpkmV2 {
+    fn is_shiny(&self) -> bool {
+        self.main_data.is_shiny()
+    }
+
+    fn is_square_shiny(&self) -> bool {
+        self.main_data.is_square_shiny()
+    }
 }
