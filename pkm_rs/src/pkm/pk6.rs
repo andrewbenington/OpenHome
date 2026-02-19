@@ -2,7 +2,7 @@
 use crate::pkm::traits::IsShiny4096;
 use crate::pkm::{Error, Pkm, Result};
 use crate::strings::SizedUtf16String;
-use crate::util;
+use crate::{read_move_slot, read_u16_le, read_u32_le, util};
 
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
@@ -107,48 +107,48 @@ impl Pk6 {
 
         // try_into() will always succeed thanks to the length check
         let mon = Pk6 {
-            encryption_constant: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
-            sanity: u16::from_le_bytes(bytes[4..6].try_into().unwrap()),
-            checksum: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
+            encryption_constant: read_u32_le!(bytes, 0),
+            sanity: read_u16_le!(bytes, 4),
+            checksum: read_u16_le!(bytes, 6),
             species_and_forme: SpeciesAndForme::new(
-                u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
+                read_u16_le!(bytes, 8),
                 util::read_uint5_from_bits(bytes[29], 3).into(),
             )?,
-            held_item_index: u16::from_le_bytes(bytes[10..12].try_into().unwrap()),
-            trainer_id: u16::from_le_bytes(bytes[12..14].try_into().unwrap()),
-            secret_id: u16::from_le_bytes(bytes[14..16].try_into().unwrap()),
-            exp: u32::from_le_bytes(bytes[16..20].try_into().unwrap()),
+            held_item_index: read_u16_le!(bytes, 10),
+            trainer_id: read_u16_le!(bytes, 12),
+            secret_id: read_u16_le!(bytes, 14),
+            exp: read_u32_le!(bytes, 16),
             ability_index: AbilityIndex::try_from(bytes[20])?,
             ability_num: bytes[21],
             training_bag_hits: bytes[22],
             training_bag: bytes[23],
-            personality_value: u32::from_le_bytes(bytes[24..28].try_into().unwrap()),
+            personality_value: read_u32_le!(bytes, 24),
             nature: NatureIndex::try_from(bytes[28])?,
             gender: Gender::from_bits_1_2(bytes[29]),
             evs: Stats8::from_bytes(bytes[30..36].try_into().unwrap()),
             contest: ContestStats::from_bytes(bytes[36..42].try_into().unwrap()),
             markings: MarkingsSixShapes::from_byte(bytes[42]),
             pokerus_byte: bytes[43],
-            super_training_flags: u32::from_le_bytes(bytes[44..48].try_into().unwrap()),
+            super_training_flags: read_u32_le!(bytes, 44),
             ribbons: ModernRibbonSet::from_bytes(bytes[48..54].try_into().unwrap()),
             contest_memory_count: bytes[56],
             battle_memory_count: bytes[57],
             super_training_dist_flags: bytes[58],
-            form_argument: u32::from_le_bytes(bytes[60..64].try_into().unwrap()),
+            form_argument: read_u32_le!(bytes, 60),
             nickname: SizedUtf16String::<24>::from_bytes(bytes[64..88].try_into().unwrap()),
             moves: [
-                MoveSlot::from_le_bytes(bytes[90..92].try_into().unwrap()),
-                MoveSlot::from_le_bytes(bytes[92..94].try_into().unwrap()),
-                MoveSlot::from_le_bytes(bytes[94..96].try_into().unwrap()),
-                MoveSlot::from_le_bytes(bytes[96..98].try_into().unwrap()),
+                read_move_slot!(bytes, 90),
+                read_move_slot!(bytes, 92),
+                read_move_slot!(bytes, 94),
+                read_move_slot!(bytes, 96),
             ],
             move_pp: [bytes[98], bytes[99], bytes[100], bytes[101]],
             move_pp_ups: [bytes[102], bytes[103], bytes[104], bytes[105]],
             relearn_moves: [
-                MoveSlot::from_le_bytes(bytes[106..108].try_into().unwrap()),
-                MoveSlot::from_le_bytes(bytes[108..110].try_into().unwrap()),
-                MoveSlot::from_le_bytes(bytes[110..112].try_into().unwrap()),
-                MoveSlot::from_le_bytes(bytes[112..114].try_into().unwrap()),
+                read_move_slot!(bytes, 106),
+                read_move_slot!(bytes, 108),
+                read_move_slot!(bytes, 110),
+                read_move_slot!(bytes, 112),
             ],
             secret_super_training_unlocked: util::get_flag(bytes, 114, 1),
             secret_super_training_complete: util::get_flag(bytes, 114, 2),
@@ -165,7 +165,7 @@ impl Pk6 {
                 intensity: bytes[164],
                 memory: bytes[165],
                 feeling: bytes[166],
-                text_variable: u16::from_le_bytes(bytes[168..170].try_into().unwrap()),
+                text_variable: read_u16_le!(bytes, 168),
             },
             fullness: bytes[174],
             enjoyment: bytes[175],
@@ -175,13 +175,13 @@ impl Pk6 {
             trainer_memory: TrainerMemory {
                 intensity: bytes[204],
                 memory: bytes[205],
-                text_variable: u16::from_le_bytes(bytes[206..208].try_into().unwrap()),
+                text_variable: read_u16_le!(bytes, 206),
                 feeling: bytes[208],
             },
             egg_date: PokeDate::from_bytes_optional(bytes[209..212].try_into().unwrap()),
             met_date: PokeDate::from_bytes(bytes[212..215].try_into().unwrap()),
-            egg_location_index: u16::from_le_bytes(bytes[216..218].try_into().unwrap()),
-            met_location_index: u16::from_le_bytes(bytes[218..220].try_into().unwrap()),
+            egg_location_index: read_u16_le!(bytes, 216),
+            met_location_index: read_u16_le!(bytes, 218),
             ball: Ball::from(bytes[220]),
             met_level: bytes[221],
             encounter_type: bytes[222],
@@ -193,7 +193,7 @@ impl Pk6 {
             is_fateful_encounter: util::get_flag(bytes, 29, 0),
             trainer_gender: util::get_flag(bytes, 221, 7).into(),
             status_condition: if bytes.len() > Self::BOX_SIZE {
-                u32::from_le_bytes(bytes[232..236].try_into().unwrap())
+                read_u32_le!(bytes, 232)
             } else {
                 0
             },
@@ -213,7 +213,7 @@ impl Pk6 {
                 0
             },
             current_hp: if bytes.len() > Self::BOX_SIZE {
-                u16::from_le_bytes(bytes[240..242].try_into().unwrap())
+                read_u16_le!(bytes, 240)
             } else {
                 0
             },

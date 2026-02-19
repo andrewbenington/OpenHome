@@ -1,40 +1,31 @@
-use std::num::NonZeroU16;
-
-use pkm_rs_types::OriginGame;
-
-pub trait OhpkmBytes<const N: usize> {
-    fn to_ohpkm_bytes(&self) -> [u8; N];
-    fn from_ohpkm_bytes(bytes: [u8; N]) -> Self;
+#[macro_export]
+macro_rules! read_u32_le {
+    ($bytes:expr, $start:expr) => {
+        u32::from_le_bytes([
+            $bytes[$start],
+            $bytes[$start + 1],
+            $bytes[$start + 2],
+            $bytes[$start + 3],
+        ])
+    };
 }
 
-impl OhpkmBytes<2> for Option<NonZeroU16> {
-    fn to_ohpkm_bytes(&self) -> [u8; 2] {
-        self.map(NonZeroU16::get).unwrap_or(0).to_le_bytes()
-    }
-
-    fn from_ohpkm_bytes(bytes: [u8; 2]) -> Self {
-        NonZeroU16::new(u16::from_le_bytes(bytes))
-    }
+// find and replace
+// u16::from_le_bytes\(bytes\[(\d+)\.\.\d+\]\.try_into\(\).unwrap\(\)\)
+// read_u16_le!(bytes, $1)
+#[macro_export]
+macro_rules! read_u16_le {
+    ($bytes:expr, $start:expr) => {
+        u16::from_le_bytes([$bytes[$start], $bytes[$start + 1]])
+    };
 }
 
-pub trait OhpkmByte {
-    fn to_ohpkm_byte(&self) -> u8;
-    fn from_ohpkm_byte(byte: u8) -> Self;
-}
-
-impl OhpkmByte for Option<OriginGame> {
-    fn to_ohpkm_byte(&self) -> u8 {
-        match self {
-            Some(origin) => *origin as u8,
-            None => 0,
-        }
-    }
-
-    fn from_ohpkm_byte(byte: u8) -> Self {
-        if byte != 0 {
-            Some(OriginGame::from(byte))
-        } else {
-            None
-        }
-    }
+// find and replace
+// MoveSlot::from_le_bytes\(bytes\[(\d+)\.\.\d+\]\.try_into\(\).unwrap\(\)\)
+// read_move_slot!(bytes, $1)
+#[macro_export]
+macro_rules! read_move_slot {
+    ($bytes:expr, $start:expr) => {
+        MoveSlot::from_le_bytes([$bytes[$start], $bytes[$start + 1]])
+    };
 }

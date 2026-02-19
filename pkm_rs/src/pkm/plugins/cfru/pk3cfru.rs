@@ -4,7 +4,7 @@ use crate::pkm::plugins::cfru::conversion::moves::{
 use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, Pkm, Result};
 use crate::strings::Gen3String;
-use crate::util;
+use crate::{read_u16_le, read_u32_le, util};
 
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::MoveSlot;
@@ -262,9 +262,9 @@ impl<M: CfruMapping> Pk3Cfru<M> {
         let mon = Pk3Cfru {
             _marker: std::marker::PhantomData,
 
-            personality_value: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
-            trainer_id: u16::from_le_bytes(bytes[4..6].try_into().unwrap()),
-            secret_id: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
+            personality_value: read_u32_le!(bytes, 0),
+            trainer_id: read_u16_le!(bytes, 4),
+            secret_id: read_u16_le!(bytes, 6),
             nickname: Gen3String::from_bytes(bytes[8..18].try_into().unwrap()),
 
             // Sanity 19
@@ -282,10 +282,10 @@ impl<M: CfruMapping> Pk3Cfru<M> {
             species_and_forme: saf,
 
             // Species 28:30
-            cfru_species_index: u16::from_le_bytes(bytes[28..30].try_into().unwrap()),
+            cfru_species_index: read_u16_le!(bytes, 28),
 
-            held_item_index: u16::from_le_bytes(bytes[30..32].try_into().unwrap()),
-            exp: u32::from_le_bytes(bytes[32..36].try_into().unwrap()),
+            held_item_index: read_u16_le!(bytes, 30),
+            exp: read_u32_le!(bytes, 32),
             move_pp_ups,
             trainer_friendship: bytes[37],
             ball: cfru_ball_from_index(bytes[38]),

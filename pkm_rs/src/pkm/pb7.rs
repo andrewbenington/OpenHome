@@ -2,6 +2,7 @@ use crate::pkm::traits::{IsShiny4096, ModernEvs};
 use crate::pkm::{Error, Pkm, Result};
 use crate::strings::SizedUtf16String;
 use crate::util;
+use crate::{read_u16_le, read_u32_le};
 
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::moves::MoveSlot;
@@ -89,21 +90,21 @@ impl Pb7 {
         }
         // try_into() will always succeed thanks to the length check
         let mon = Pb7 {
-            encryption_constant: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
-            checksum: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
+            encryption_constant: read_u32_le!(bytes, 0),
+            checksum: read_u16_le!(bytes, 6),
             species_and_forme: SpeciesAndForme::new(
-                u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
+                read_u16_le!(bytes, 8),
                 util::read_uint5_from_bits(bytes[29], 3).into(),
             )?,
-            held_item_index: u16::from_le_bytes(bytes[10..12].try_into().unwrap()),
-            trainer_id: u16::from_le_bytes(bytes[12..14].try_into().unwrap()),
-            secret_id: u16::from_le_bytes(bytes[14..16].try_into().unwrap()),
-            exp: u32::from_le_bytes(bytes[16..20].try_into().unwrap()),
+            held_item_index: read_u16_le!(bytes, 10),
+            trainer_id: read_u16_le!(bytes, 12),
+            secret_id: read_u16_le!(bytes, 14),
+            exp: read_u32_le!(bytes, 16),
             ability_index: AbilityIndex::try_from(bytes[20])?,
             ability_num: bytes[21],
             markings: MarkingsSixShapesColors::from_bytes(bytes[22..24].try_into().unwrap()),
             favorite: util::get_flag(bytes, 21, 3),
-            personality_value: u32::from_le_bytes(bytes[24..28].try_into().unwrap()),
+            personality_value: read_u32_le!(bytes, 24),
             nature: bytes[28],
             is_fateful_encounter: util::get_flag(bytes, 29, 0),
             gender: Gender::from_bits_1_2(bytes[29]),
@@ -114,21 +115,21 @@ impl Pb7 {
             height_absolute_bytes: bytes[44..48].try_into().unwrap(),
             height: bytes[58],
             weight: bytes[59],
-            form_argument: u32::from_le_bytes(bytes[60..64].try_into().unwrap()),
+            form_argument: read_u32_le!(bytes, 60),
             nickname: SizedUtf16String::<26>::from_bytes(bytes[64..90].try_into().unwrap()),
             moves: [
-                MoveSlot::from(u16::from_le_bytes(bytes[90..92].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[92..94].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[94..96].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[96..98].try_into().unwrap())),
+                MoveSlot::from(read_u16_le!(bytes, 90)),
+                MoveSlot::from(read_u16_le!(bytes, 92)),
+                MoveSlot::from(read_u16_le!(bytes, 94)),
+                MoveSlot::from(read_u16_le!(bytes, 96)),
             ],
             move_pp: [bytes[98], bytes[99], bytes[100], bytes[101]],
             move_pp_ups: [bytes[102], bytes[103], bytes[104], bytes[105]],
             relearn_moves: [
-                MoveSlot::from(u16::from_le_bytes(bytes[106..108].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[108..110].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[110..112].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[112..114].try_into().unwrap())),
+                MoveSlot::from(read_u16_le!(bytes, 106)),
+                MoveSlot::from(read_u16_le!(bytes, 108)),
+                MoveSlot::from(read_u16_le!(bytes, 110)),
+                MoveSlot::from(read_u16_le!(bytes, 112)),
             ],
             ivs: Stats8::from_30_bits(bytes[116..120].try_into().unwrap()),
             is_egg: util::get_flag(bytes, 116, 30),
@@ -151,8 +152,8 @@ impl Pb7 {
             received_second: bytes[208],
             egg_date: PokeDate::from_bytes(bytes[209..212].try_into().unwrap()),
             met_date: PokeDate::from_bytes(bytes[212..215].try_into().unwrap()),
-            egg_location_index: u16::from_le_bytes(bytes[216..218].try_into().unwrap()),
-            met_location_index: u16::from_le_bytes(bytes[218..220].try_into().unwrap()),
+            egg_location_index: read_u16_le!(bytes, 216),
+            met_location_index: read_u16_le!(bytes, 218),
             ball: bytes[220],
             met_level: bytes[221],
             trainer_gender: util::get_flag(bytes, 221, 7).into(),
@@ -160,13 +161,13 @@ impl Pb7 {
             game_of_origin: bytes[223],
             language_index: bytes[227],
             weight_absolute_bytes: bytes[228..232].try_into().unwrap(),
-            status_condition: u32::from_le_bytes(bytes[232..236].try_into().unwrap()),
+            status_condition: read_u32_le!(bytes, 232),
             level: bytes[236],
             dirt_type: bytes[237],
             dirt_location: bytes[238],
-            current_hp: u16::from_le_bytes(bytes[240..242].try_into().unwrap()),
+            current_hp: read_u16_le!(bytes, 240),
             stats: Stats16Le::from_bytes(bytes[242..254].try_into().unwrap()),
-            cp: u16::from_le_bytes(bytes[254..256].try_into().unwrap()),
+            cp: read_u16_le!(bytes, 254),
             is_mega: bytes[256],
             mega_forme: bytes[257],
         };

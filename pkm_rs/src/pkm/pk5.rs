@@ -1,7 +1,7 @@
-use crate::pkm::traits::{IsShiny, IsShiny8192};
-use crate::pkm::{Error, OhpkmV2, Pkm, Result};
+use crate::pkm::traits::IsShiny8192;
+use crate::pkm::{Error, Pkm, Result};
 use crate::strings::Gen5String;
-use crate::util;
+use crate::{read_u16_le, read_u32_le, util};
 
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
@@ -67,16 +67,16 @@ impl Pk5 {
         }
         // try_into() will always succeed thanks to the length check
         let mon = Pk5 {
-            personality_value: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
-            stored_checksum: u16::from_le_bytes(bytes[6..8].try_into().unwrap()),
+            personality_value: read_u32_le!(bytes, 0),
+            stored_checksum: read_u16_le!(bytes, 6),
             species_and_forme: SpeciesAndForme::new(
-                u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
+                read_u16_le!(bytes, 8),
                 util::read_uint5_from_bits(bytes[64], 3).into(),
             )?,
-            held_item_index: u16::from_le_bytes(bytes[10..12].try_into().unwrap()),
-            trainer_id: u16::from_le_bytes(bytes[12..14].try_into().unwrap()),
-            secret_id: u16::from_le_bytes(bytes[14..16].try_into().unwrap()),
-            exp: u32::from_le_bytes(bytes[16..20].try_into().unwrap()),
+            held_item_index: read_u16_le!(bytes, 10),
+            trainer_id: read_u16_le!(bytes, 12),
+            secret_id: read_u16_le!(bytes, 14),
+            exp: read_u32_le!(bytes, 16),
             trainer_friendship: bytes[20],
             ability_index: AbilityIndex::try_from(bytes[21])?,
             markings: MarkingsSixShapes::from_byte(bytes[22]),
@@ -84,10 +84,10 @@ impl Pk5 {
             evs: Stats8::from_bytes(bytes[24..30].try_into().unwrap()),
             contest: ContestStats::from_bytes(bytes[30..36].try_into().unwrap()),
             moves: [
-                MoveSlot::from(u16::from_le_bytes(bytes[40..42].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[42..44].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[44..46].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[46..48].try_into().unwrap())),
+                MoveSlot::from(read_u16_le!(bytes, 40)),
+                MoveSlot::from(read_u16_le!(bytes, 42)),
+                MoveSlot::from(read_u16_le!(bytes, 44)),
+                MoveSlot::from(read_u16_le!(bytes, 46)),
             ],
             move_pp: [bytes[48], bytes[49], bytes[50], bytes[51]],
             move_pp_ups: [bytes[52], bytes[53], bytes[54], bytes[55]],
@@ -105,8 +105,8 @@ impl Pk5 {
             game_of_origin: OriginGame::from(bytes[95]),
             egg_date: PokeDate::from_bytes_optional(bytes[120..123].try_into().unwrap()),
             met_date: PokeDate::from_bytes(bytes[123..126].try_into().unwrap()),
-            egg_location_index: u16::from_le_bytes(bytes[126..128].try_into().unwrap()),
-            met_location_index: u16::from_le_bytes(bytes[128..130].try_into().unwrap()),
+            egg_location_index: read_u16_le!(bytes, 126),
+            met_location_index: read_u16_le!(bytes, 128),
             pokerus_byte: bytes[130],
             ball: Ball::from(bytes[131]),
             met_level: bytes[132],
@@ -117,7 +117,7 @@ impl Pk5 {
             trainer_name: Gen5String::from_bytes(bytes[104..120].try_into().unwrap()),
             trainer_gender: util::get_flag(bytes, 132, 7).into(),
             status_condition: if bytes.len() > Self::BOX_SIZE {
-                u32::from_le_bytes(bytes[136..140].try_into().unwrap())
+                read_u32_le!(bytes, 136)
             } else {
                 0
             },
