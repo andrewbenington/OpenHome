@@ -19,7 +19,7 @@ macro_rules! define_validated_field {
             type Repr = $type;
 
             fn name() -> &'static str {
-                "$name"
+                stringify!($name)
             }
         }
     };
@@ -32,7 +32,7 @@ macro_rules! define_infallible_field {
             type Repr = $type;
 
             fn name() -> &'static str {
-                "$name"
+                stringify!($name)
             }
         }
     };
@@ -44,7 +44,7 @@ impl ValidatedField for Ability {
     type Err = InvalidAbilityIndex;
     type Repr = AbilityIndex;
     fn name() -> &'static str {
-        "$name"
+        "Ability"
     }
 
     fn try_from_bytes(bytes: &[u8], offset: usize) -> core::result::Result<Self::Repr, Self::Err> {
@@ -71,3 +71,13 @@ define_infallible_field!(TrainerId, u16);
 define_infallible_field!(PokerusByte, u8);
 
 // seems like the error type should always be derivable from the Repr/Datatype? e.g. NatureIndex will always yield an error of InvalidNatureIndex, etc
+
+#[cfg(test)]
+mod tests {
+    use crate::pkm::fields::{PokeBall, ValidatedField};
+
+    #[test]
+    fn name_is_correct() {
+        assert_eq!(PokeBall::name(), "PokeBall");
+    }
+}
