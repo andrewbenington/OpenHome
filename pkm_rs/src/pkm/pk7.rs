@@ -115,7 +115,6 @@ impl Pk7 {
         }
         // try_into() will always succeed thanks to the length check
 
-        println!("ability index: {}", AbilityIndex::try_from(bytes[20])?);
         let mon = Pk7 {
             encryption_constant: read_u32_le!(bytes, 0),
             sanity: read_u16_le!(bytes, 4),
@@ -245,10 +244,6 @@ impl Pkm for Pk7 {
     }
 
     fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
-        println!(
-            "before writing ability index: {}",
-            u8::from(self.ability_index)
-        );
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[4..6].copy_from_slice(&self.sanity.to_le_bytes());
         bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
@@ -257,9 +252,8 @@ impl Pkm for Pk7 {
         bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
         bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
         bytes[16..20].copy_from_slice(&self.exp.to_le_bytes());
-        println!("writing ability index: {}", u8::from(self.ability_index));
         bytes[20] = u8::from(self.ability_index);
-        bytes[21] |= self.ability_num as u8;
+        bytes[21] |= self.ability_num.to_byte();
         bytes[22..24].copy_from_slice(&self.markings.to_bytes());
         bytes[24..28].copy_from_slice(&self.personality_value.to_le_bytes());
         bytes[28] = self.nature.to_byte();

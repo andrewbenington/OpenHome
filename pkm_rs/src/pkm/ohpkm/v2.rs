@@ -201,7 +201,7 @@ impl OhpkmV2 {
             .add_if_some(self.swsh_data)?
             .add_if_some(self.bdsp_data)?
             .add_if_some(self.la_data)?
-            .add_if_some(self.sv_data.clone())?
+            .add_if_some(self.sv_data)?
             .add_all(self.handler_data.clone())?
             .add_if_some(self.plugin_data.clone())?
             .add_if_some(self.notes.clone())?

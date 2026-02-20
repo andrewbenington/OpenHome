@@ -127,7 +127,6 @@ pub mod pk8 {
 
     #[cfg(feature = "randomize")]
     fn to_from_bytes_with_seed(seed: u64) -> Result<()> {
-        println!("seed: {seed}");
         let mut seed_bytes = [0; 32];
         seed_bytes[0..8].copy_from_slice(&seed.to_le_bytes());
         let mon = Pk8::randomized(&mut StdRng::from_seed(seed_bytes));
@@ -259,7 +258,6 @@ fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> Result<()> {
     use crate::pkm::Error;
 
     let expected = mon.to_party_bytes()?;
-    println!("recreating mon");
     let actual = PKM::from_bytes(&expected)?.to_party_bytes()?;
 
     let differences = find_differing_ranges(&actual, &expected);

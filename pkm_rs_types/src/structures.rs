@@ -737,30 +737,12 @@ impl TryFrom<u3> for AbilityNumber {
     }
 }
 
-impl From<AbilityNumber> for u8 {
-    fn from(value: AbilityNumber) -> Self {
-        match value {
-            AbilityNumber::First => 1,
-            AbilityNumber::Second => 2,
-            AbilityNumber::Hidden => 4,
-        }
-    }
-}
-
 #[derive(Debug)]
 pub struct InvalidAbilityNumber(pub u3);
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn flagset_indices() {
-        let flagset = FlagSet {
-            raw: [0b10010100, 0b10110010],
-        };
-        println!("{:?}", flagset.get_indices());
-    }
 
     #[test]
     fn gender_get() {

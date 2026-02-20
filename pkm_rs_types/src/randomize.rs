@@ -84,7 +84,6 @@ impl<T> Randomize for PhantomData<T> {
 impl Randomize for NonZeroU16 {
     fn randomized<R: Rng>(rng: &mut R) -> Self {
         let val: u16 = rng.random_range(1..=u16::MAX);
-        println!("randomizing nonzerou16 to {val}");
         NonZeroU16::new(val).expect("range starts with 1; should never be 0")
     }
 }

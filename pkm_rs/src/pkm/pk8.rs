@@ -192,7 +192,6 @@ impl Pk8 {
             level: bytes[328],
             stats: Stats16Le::from_bytes(bytes[330..342].try_into().unwrap()),
         };
-        println!("trainer gender: {}", mon.trainer_gender);
         Ok(mon)
     }
 }
@@ -296,11 +295,9 @@ impl Pkm for Pk8 {
         bytes[288..290].copy_from_slice(&self.egg_location_index.to_le_bytes());
         bytes[290..292].copy_from_slice(&self.met_location_index.to_le_bytes());
         bytes[292] = self.ball;
-        println!("met_level: {}", self.met_level);
         bytes[293] |= self.met_level & 0x7F;
         util::set_flag(bytes, 293, 7, self.trainer_gender);
         bytes[294] = self.hyper_training.to_byte() & 0b111111;
-        println!("bytes[293]: {}", bytes[293]);
         bytes[295..309].copy_from_slice(&self.tr_flags_sw_sh);
 
         bytes[328] = self.level;
