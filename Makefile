@@ -1,4 +1,4 @@
-VERSION=1.8.3
+VERSION=1.9.0
 
 .PHONY: help
 help: # Display this help.
@@ -118,3 +118,7 @@ download-item-sprites:
 
 %:
 	@pnpm run $@
+
+.PHONY: schema
+schema:
+	@sqlite3 generate/pkm.db .schema > generate/schema.sql

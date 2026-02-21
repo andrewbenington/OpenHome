@@ -1,45 +1,49 @@
 import useIsDev from '@openhome-ui/hooks/isDev'
 import { Box, Tabs, ThemePanel } from '@radix-ui/themes'
+import { Route, Routes, useLocation, useNavigate } from 'react-router'
 import AppStateDisplay from './pages/AppStateDisplay'
 import Home from './pages/home/Home'
 import PluginsPage from './pages/plugins/Plugins'
 import PokedexDisplay from './pages/pokedex/PokedexDisplay'
 import Settings from './pages/Settings'
 import SortPokemon from './pages/sort/SortPokemon'
-import TrackedPokemon from './pages/tracked/TrackedPokemon'
+import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
 
 export default function AppTabs() {
   const isDev = useIsDev()
 
+  const tab = useLocation().pathname.split('/')[1] || 'home'
+  const navigate = useNavigate()
+
+  const homeElement = <Home />
+
   return (
     <Tabs.Root
-      defaultValue="home"
+      value={tab}
       style={{
         height: '100vh',
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
       }}
+      onValueChange={(tab) => navigate(tab)}
     >
       <Box height="0" flexGrow="1">
-        <Tabs.Content value="home">
-          <Home />
-        </Tabs.Content>
-        <Tabs.Content value="manage">
-          <TrackedPokemon />
-        </Tabs.Content>
-        <Tabs.Content value="sort">
-          <SortPokemon />
-        </Tabs.Content>
-        <Tabs.Content value="pokedex">
-          <PokedexDisplay />
-        </Tabs.Content>
-        <Tabs.Content value="plugins">
-          <PluginsPage />
-        </Tabs.Content>
-        <Tabs.Content value="settings">
-          <Settings />
-        </Tabs.Content>
+        <Routes>
+          <Route index path="/" element={homeElement} />
+          <Route path="/home" element={homeElement} />
+          <Route path="/manage/*" element={<TrackedPokemonPage />} />
+          <Route path="/sort" element={<SortPokemon />} />
+          <Route path="/pokedex" element={<PokedexDisplay />} />
+          <Route path="/plugins/*" element={<PluginsPage />} />
+          <Route path="/settings" element={<Settings />} />
+          {isDev && (
+            <>
+              <Route path="/state" element={<AppStateDisplay />} />
+              <Route path="/theme" element={<ThemePanel />} />
+            </>
+          )}
+        </Routes>
         {isDev && (
           <>
             <Tabs.Content value="state">
@@ -51,7 +55,7 @@ export default function AppTabs() {
           </>
         )}
       </Box>
-      <Tabs.List className="tab-row">
+      <Tabs.List className="tab-sidebar">
         <Tabs.Trigger value="home">Home</Tabs.Trigger>
         <Tabs.Trigger value="manage">Tracked Pokémon</Tabs.Trigger>
         <Tabs.Trigger value="sort">Sort Pokémon</Tabs.Trigger>

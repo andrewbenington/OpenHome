@@ -14,7 +14,7 @@ export default function NotesDisplay(props: { mon: OHPKM }) {
   }, [mon])
 
   const debouncedNotesUpdate = useDebounce((notes: string) => {
-    updateMonNotes(mon.getHomeIdentifier(), notes)
+    updateMonNotes(mon.openhomeId, notes)
   }, 500)
 
   return (
@@ -25,7 +25,6 @@ export default function NotesDisplay(props: { mon: OHPKM }) {
           setNotesText(e.target.value)
           debouncedNotesUpdate(e.target.value)
         }}
-        onBlur={() => updateMonNotes(mon.getHomeIdentifier(), notesText ?? '')}
         style={{ height: '100%' }}
       />
     </div>

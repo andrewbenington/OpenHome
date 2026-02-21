@@ -3,10 +3,10 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { PluginContext } from '@openhome-ui/state/plugin'
 import { loadPlugin, PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
-import { Badge } from '@radix-ui/themes'
-import * as E from 'fp-ts/lib/Either'
+import { Badge, Flex } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDelete } from 'react-icons/md'
+import { R } from 'src/core/util/functional'
 import { CURRENT_PLUGIN_API_VERSION } from './Plugins'
 import './style.css'
 
@@ -26,12 +26,12 @@ export default function InstalledPlugins() {
       backend
         .listInstalledPlugins()
         .then(
-          E.match(
+          R.match(
+            (plugins) => setInstalledPlugins(plugins),
             (err) => {
               dispatchPluginState({ type: 'set_loaded', payload: true })
               displayError('Error Getting Installed Plugins', err)
-            },
-            (plugins) => setInstalledPlugins(plugins)
+            }
           )
         )
         .finally(() => dispatchPluginState({ type: 'set_loaded', payload: true })),
@@ -51,7 +51,7 @@ export default function InstalledPlugins() {
   }
 
   return (
-    <div style={{ gap: 8, display: 'flex', flexWrap: 'wrap', padding: 16 }}>
+    <Flex gap="2" wrap="wrap" p="4" align="start" justify="start" style={{ alignContent: 'start' }}>
       {installedPlugins &&
         Object.entries(installedPlugins).map(([, metadata]) => (
           <InstalledPluginCard
@@ -60,7 +60,7 @@ export default function InstalledPlugins() {
             onDelete={handleDeletePlugin}
           />
         ))}
-    </div>
+    </Flex>
   )
 }
 
@@ -82,8 +82,7 @@ function InstalledPluginCard(props: {
 
   const enablePlugin = useCallback(() => {
     backend.loadPluginCode(metadata.id).then(
-      E.match(
-        (err) => displayError('Load Plugin Code', err),
+      R.match(
         (code) => {
           try {
             dispatchPluginState({ type: 'register_plugin', payload: loadPlugin(code) })
@@ -94,7 +93,8 @@ function InstalledPluginCard(props: {
           } catch (e) {
             displayError('Error Loading Plugin', `${e}`)
           }
-        }
+        },
+        (err) => displayError('Load Plugin Code', err)
       )
     )
   }, [backend, dispatchAppInfoState, dispatchPluginState, displayError, metadata.id])

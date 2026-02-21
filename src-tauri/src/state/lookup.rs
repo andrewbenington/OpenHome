@@ -1,81 +1,85 @@
-use std::{collections::HashMap, ops::Deref, sync::Mutex};
+use std::collections::HashMap;
 
-use serde::Serialize;
-use tauri::Emitter;
+use serde::{Deserialize, Serialize};
 
-use crate::error::{Error, Result};
+use crate::error::Result;
+use crate::state::synced_state::{self, AllSyncedState};
 use crate::util;
 
-// type OhpkmBytesLookup = HashMap<String, Vec<u8>>;
 type IdentifierLookup = HashMap<String, String>;
 
-#[derive(Default, Serialize)]
-pub struct LookupState(pub Mutex<LookupStateInner>);
-
-impl Deref for LookupState {
-    type Target = Mutex<LookupStateInner>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl LookupState {
-    pub fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
-        let inner = LookupStateInner::load_from_storage(app_handle)?;
-        Ok(Self(Mutex::new(inner)))
-    }
-}
-
-#[derive(Default, Serialize, Clone)]
+#[derive(Default, Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct LookupStateInner {
-    // pub openhome: OhpkmBytesLookup,
+pub struct LookupState {
     gen_12: IdentifierLookup,
     gen_345: IdentifierLookup,
 }
 
-impl LookupStateInner {
-    fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
+impl LookupState {
+    pub fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
         Ok(Self {
             gen_12: util::get_storage_file_json(app_handle, "gen12_lookup.json")?,
             gen_345: util::get_storage_file_json(app_handle, "gen345_lookup.json")?,
         })
     }
 
-    fn update_lookups(
-        &mut self,
-        app_handle: &tauri::AppHandle,
-        gen_12: IdentifierLookup,
-        gen_345: IdentifierLookup,
-    ) -> Result<()> {
-        self.gen_12.extend(gen_12);
-        self.gen_345.extend(gen_345);
-
+    pub fn write_to_files(&self, app_handle: &tauri::AppHandle) -> Result<()> {
         util::write_storage_file_json(app_handle, "gen12_lookup.json", &self.gen_12)?;
-        util::write_storage_file_json(app_handle, "gen345_lookup.json", &self.gen_345)?;
+        util::write_storage_file_json(app_handle, "gen345_lookup.json", &self.gen_345)
+    }
+}
 
-        app_handle
-            .emit("lookups_update", self.clone())
-            .map_err(|err| {
-                Error::other_with_source("Could not emit 'lookups_update' to frontend", err)
-            })
+impl synced_state::SyncedState for LookupState {
+    const ID: &'static str = "lookups";
+
+    fn union_with(&mut self, other: Self) {
+        other.gen_12.into_iter().for_each(|(k, v)| {
+            self.gen_12.insert(k, v);
+        });
+        other.gen_345.into_iter().for_each(|(k, v)| {
+            self.gen_345.insert(k, v);
+        });
     }
 }
 
 #[tauri::command]
-pub fn get_lookups(lookup_state: tauri::State<'_, LookupState>) -> Result<LookupStateInner> {
-    Ok(lookup_state.lock()?.clone())
+pub fn get_lookups(synced_state: tauri::State<'_, AllSyncedState>) -> Result<LookupState> {
+    synced_state.clone_lookups()
 }
 
 #[tauri::command]
-pub fn update_lookups(
+pub fn add_to_lookups(
     app_handle: tauri::AppHandle,
-    lookup_state: tauri::State<'_, LookupState>,
-    gen_12: IdentifierLookup,
-    gen_345: IdentifierLookup,
+    synced_state: tauri::State<'_, AllSyncedState>,
+    new_entries: LookupState,
 ) -> Result<()> {
-    lookup_state
+    synced_state
         .lock()?
-        .update_lookups(&app_handle, gen_12, gen_345)
+        .lookups
+        .union_with(&app_handle, new_entries)
+}
+
+#[tauri::command]
+pub fn remove_dangling(
+    app_handle: tauri::AppHandle,
+    synced_state: tauri::State<'_, AllSyncedState>,
+) -> Result<()> {
+    // definitely unnecessary clones here
+    let mut synced_state = synced_state.lock()?;
+    let ohpkm_store = synced_state.ohpkm_store.read().clone();
+
+    synced_state.lookups.replace(&app_handle, |l| LookupState {
+        gen_12: l
+            .gen_12
+            .clone()
+            .into_iter()
+            .filter(|(_, openhome_id)| ohpkm_store.includes(openhome_id))
+            .collect(),
+        gen_345: l
+            .gen_345
+            .clone()
+            .into_iter()
+            .filter(|(_, openhome_id)| ohpkm_store.includes(openhome_id))
+            .collect(),
+    })
 }

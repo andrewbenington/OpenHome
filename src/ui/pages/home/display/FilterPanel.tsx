@@ -7,13 +7,11 @@ import { HeldItemCategory } from '@openhome-ui/util/filter'
 import {
   all_species_data,
   Gender,
-  Generation,
   getAllAbilities,
   getAllBalls,
   getAllItems,
   Item,
   ItemMetadata,
-  OriginGame,
   OriginGames,
   OriginGameWithData,
   SpeciesLookup,
@@ -23,6 +21,7 @@ import { Types } from '@pokemon-resources/index'
 import { Button, Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { useMonDisplay } from 'src/ui/hooks/useMonDisplay'
+import { getOriginIconPath } from 'src/ui/images/game'
 import Autocomplete from '../../../components/Autocomplete'
 import GenderIcon from '../../../components/pokemon/GenderIcon'
 import TypeIcon from '../../../components/pokemon/TypeIcon'
@@ -44,16 +43,7 @@ type ItemOption =
     }
 
 function getOriginIcon(origin: OriginGameWithData) {
-  const path =
-    origin.generation === Generation.G4 || origin.generation === Generation.G5
-      ? 'icons/ds.png'
-      : origin.game === OriginGame.ColosseumXd
-        ? '/icons/gcn.png'
-        : origin.generation === Generation.G3
-          ? '/icons/gba.png'
-          : origin.mark
-            ? `/origin_marks/${origin.mark}.png`
-            : undefined
+  const path = getOriginIconPath(origin)
 
   return path ? (
     <img className="filter-icon white-filter" draggable={false} alt="origin mark" src={path} />

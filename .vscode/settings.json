@@ -53,5 +53,7 @@
   "editor.tabSize": 2,
   "rust-analyzer.cargo.features": ["pkm_rs/wasm"],
   "css.completion.completePropertyWithSemicolon": false,
-  "rust-analyzer.cargo.targetDir": true
+  "rust-analyzer.cargo.targetDir": true,
+  "python.defaultInterpreterPath": "generate/.venv/bin/python",
+  "python.terminal.activateEnvironment": true
 }

@@ -1,4 +1,3 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
 import {
   bytesToUint16LittleEndian,
@@ -9,8 +8,9 @@ import { gen5StringToUTF } from '@openhome-core/save/util/Strings/StringConverte
 import { unique } from '@openhome-core/util/functional'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK5 } from '@pokemon-files/pkm'
-import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
-import { hasDesamumeFooter, LOOKUP_TYPE } from './util'
+import { OHPKM } from '../pkm/OHPKM'
+import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
+import { hasDesamumeFooter, LookupType } from './util'
 import { PathData } from './util/path'
 
 const PC_OFFSET = 0x400
@@ -22,7 +22,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
   static BOX_COUNT = 24
   static pkmType = PK5
   static SAVE_SIZE_BYTES = 0x80000
-  static lookupType: LOOKUP_TYPE = 'gen345'
+  static lookupType: LookupType = 'gen345'
 
   static saveTypeAbbreviation = 'BW/BW2'
   static saveTypeID = 'G5SAV'
@@ -51,7 +51,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
   invalid: boolean = false
   tooEarlyToOpen: boolean = false
 
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   trainerDataOffset: number = 0x19400
   static originOffset = 0x1941f
@@ -101,7 +101,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
           const mon = new PK5(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].pokemon[monIndex] = mon
+            this.boxes[box].boxSlots[monIndex] = mon
           }
         } catch (e) {
           console.error(e)
@@ -141,26 +141,17 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     this.bytes.set(uint16ToBytesLittleEndian(newChecksum), this.checksumMirrorsChecksumOffset)
   }
 
-  prepareBoxesAndGetModified() {
-    const changedMonPKMs: OHPKM[] = []
+  prepareForSaving() {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
+      const mon = this.boxes[box].boxSlots[index]
 
-    this.updatedBoxSlots.forEach(({ box, index }) => {
-      const changedMon = this.boxes[box].pokemon[index]
-
-      // we don't want to save OHPKM files of mons that didn't leave the save
-      // (and would still be PK4s)
-      if (changedMon instanceof OHPKM) {
-        changedMonPKMs.push(changedMon)
-      }
       const writeIndex = PC_OFFSET + BOX_SIZE * box + 136 * index
 
-      // changedMon will be undefined if pokemon was moved from this slot
+      // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
-      if (changedMon) {
+      if (mon) {
         try {
-          const mon = changedMon instanceof OHPKM ? new PK5(changedMon) : changedMon
-
-          if (mon?.gameOfOrigin && mon?.dexNum) {
+          if (mon.gameOfOrigin && mon?.dexNum) {
             mon.refreshChecksum()
             this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
           }
@@ -175,7 +166,10 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
       this.updateBoxChecksum(boxIndex)
     )
     this.updateMirrorsChecksum()
-    return changedMonPKMs
+  }
+
+  convertOhpkm(ohpkm: OHPKM): PK5 {
+    return new PK5(ohpkm)
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean

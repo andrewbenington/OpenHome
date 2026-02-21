@@ -15,7 +15,6 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { SortTypes } from '@openhome-core/pkm/sort'
-import { HomeBox, HomeData } from '@openhome-core/save/HomeData'
 import { range } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import {
@@ -28,6 +27,7 @@ import { RemoveIcon } from '@openhome-ui/components/Icons'
 import { SavesAndBanksManager, useSaves } from '@openhome-ui/state/saves'
 import { Button, Flex, Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
+import { OpenHomeBanks, OpenHomeBox } from 'src/core/save/HomeData'
 import DroppableSpace from './DroppableSpace'
 
 export default function AllHomeBoxes(props: {
@@ -55,12 +55,20 @@ export default function AllHomeBoxes(props: {
     const activeId = active.id.toString()
     const overId = over.id.toString()
 
-    const activeIndex = homeData.boxes.findIndex((box) => box.id === activeId)
-    const overIndex = homeData.boxes.findIndex((box) => box.id === overId)
+    const activeIndex = homeData.getCurrentBank().indexOfBoxId(activeId)
+    const overIndex = homeData.getCurrentBank().indexOfBoxId(overId)
 
-    const newOrderIndices = calculateNewBoxOrder(activeIndex, overIndex, homeData.boxes.length)
+    if (activeIndex === undefined || overIndex === undefined) {
+      return
+    }
+
+    const newOrderIndices = calculateNewBoxOrder(
+      activeIndex,
+      overIndex,
+      homeData.getCurrentBank().boxCount()
+    )
     const newOrderIds = newOrderIndices
-      .map((index) => homeData.boxes.find((box) => box.index === index)?.id)
+      .map((index) => homeData.getCurrentBankBoxes().find((box) => box.index === index)?.id)
       .filter(filterUndefined)
 
     savesAndBanks.reorderBoxesCurrentBank(newOrderIds)
@@ -76,10 +84,10 @@ export default function AllHomeBoxes(props: {
             modifiers={[restrictToParentElement]}
           >
             <SortableContext
-              items={homeData.boxes.map((box) => box.id) ?? []}
+              items={homeData.getCurrentBankBoxes().map((box) => box.id) ?? []}
               strategy={rectSortingStrategy}
             >
-              {homeData.boxes.map((box, boxIndex) => (
+              {homeData.getCurrentBankBoxes().map((box, boxIndex) => (
                 <DraggableBoxOverview
                   key={box.id}
                   box={box}
@@ -90,15 +98,17 @@ export default function AllHomeBoxes(props: {
             </SortableContext>
           </DndContext>
         ) : (
-          homeData.boxes.map((box, boxIndex) => (
-            <ClickableBoxOverview
-              key={box.id}
-              box={box}
-              onBoxSelect={() => onBoxSelect(boxIndex)}
-              debugMode={debugMode}
-              deleting={deleting}
-            />
-          ))
+          homeData
+            .getCurrentBankBoxes()
+            .map((box, boxIndex) => (
+              <ClickableBoxOverview
+                key={box.id}
+                box={box}
+                onBoxSelect={() => onBoxSelect(boxIndex)}
+                debugMode={debugMode}
+                deleting={deleting}
+              />
+            ))
         )}
       </Grid>
     </OpenHomeCtxMenu>
@@ -106,7 +116,7 @@ export default function AllHomeBoxes(props: {
 }
 
 type BoxOverviewProps = {
-  box: HomeBox
+  box: Readonly<OpenHomeBox>
   onBoxSelect: () => void
   debugMode?: boolean
   deleting?: boolean
@@ -121,7 +131,7 @@ function ClickableBoxOverview({ box, onBoxSelect, debugMode, deleting }: BoxOver
     <DroppableSpace
       dropID={`box-${box.id}`}
       key={box.nameOrDefault()}
-      dropData={savesAndBanks.homeData.boxFirstEmptyLocation(box.index)}
+      dropData={savesAndBanks.homeData.firstEmptyBoxSlotCurrentBank(box.index)}
       disabled={firstOpenIndex === undefined}
       style={{ justifyContent: undefined }}
     >
@@ -191,7 +201,7 @@ function DraggableBoxOverview({ box, debugMode }: BoxOverviewProps) {
 }
 
 type BoxMonIconsProps = {
-  box: HomeBox
+  box: Readonly<OpenHomeBox>
   debugMode?: boolean
 }
 
@@ -199,11 +209,11 @@ function BoxWithMons({ box, debugMode }: BoxMonIconsProps) {
   return (
     <Flex direction="column" width="100%" height="100%">
       <div className="box-icon-mon-container">
-        {range(HomeData.BOX_COLUMNS).map((i) => (
+        {range(OpenHomeBanks.BOX_COLUMNS).map((i) => (
           <div className="box-icon-mon-col" key={`pos-display-col-${i}`}>
-            {range(HomeData.BOX_ROWS).map((j) => (
+            {range(OpenHomeBanks.BOX_ROWS).map((j) => (
               <div
-                className={`box-icon-mon-indicator ${!box?.pokemon?.[j * HomeData.BOX_COLUMNS + i] ? 'box-icon-mon-empty' : ''}`}
+                className={`box-icon-mon-indicator ${box.slotIsEmpty(j * OpenHomeBanks.BOX_COLUMNS + i) ? 'box-icon-mon-empty' : ''}`}
                 key={`pos-display-cell-${i}-${j}`}
               />
             ))}
@@ -268,7 +278,7 @@ function getBankContextActions(savesAndBanks: SavesAndBanksManager) {
 
 function getBoxContextActions(
   savesAndBanks: SavesAndBanksManager,
-  box: HomeBox
+  box: Readonly<OpenHomeBox>
 ): CtxMenuElementBuilder[][] {
   const boxActions = [
     ItemBuilder.fromLabel('Remove duplicates from this box')

@@ -221,6 +221,11 @@ impl OhpkmV2 {
         }
     }
 
+    #[wasm_bindgen(getter = openhomeId)]
+    pub fn openhome_id(&self) -> String {
+        self.main_data.openhome_id()
+    }
+
     #[wasm_bindgen(getter = personalityValue)]
     pub fn personality_value(&self) -> u32 {
         self.main_data.personality_value
@@ -875,12 +880,12 @@ impl OhpkmV2 {
 
     // Plugins
 
-    #[wasm_bindgen(getter = pluginOrigin)]
+    #[wasm_bindgen(getter = pluginOriginWasm)]
     pub fn plugin_origin(&self) -> Option<String> {
         Some(self.plugin_data.clone()?.plugin_origin)
     }
 
-    #[wasm_bindgen(setter = pluginOrigin)]
+    #[wasm_bindgen(setter = pluginOriginWasm)]
     pub fn set_plugin_origin(&mut self, value: Option<String>) {
         match value {
             Some(plugin_origin) => {

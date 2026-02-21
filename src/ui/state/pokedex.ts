@@ -1,9 +1,8 @@
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { useCallback, useContext, useEffect, useState } from 'react'
 
-import { Errorable } from '@openhome-core/util/functional'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { Pokedex } from '@openhome-ui/util/pokedex'
-import * as E from 'fp-ts/lib/Either'
 
 export type PokedexManager = { getPokedex: () => Promise<Errorable<Pokedex>> } & (
   | { loaded: true; pokedex: Pokedex }
@@ -21,13 +20,13 @@ export function usePokedex(): PokedexManager {
 
   const loadAndCachePokedex = useCallback(async () => {
     if (pokedexCache) {
-      return E.right(pokedexCache)
+      return R.Ok<Pokedex, string>(pokedexCache)
     }
 
     const result = await backend.loadPokedex()
 
-    if (E.isRight(result)) {
-      setPokedexCache(result.right)
+    if (R.isOk(result)) {
+      setPokedexCache(result.value)
     }
 
     return result
