@@ -209,6 +209,14 @@ impl<const N: usize> FlagSet<N> {
     }
 }
 
+impl FlagSet<2> {
+    pub const fn from_u16_le(value: u16) -> Self {
+        Self {
+            raw: value.to_le_bytes(),
+        }
+    }
+}
+
 impl<const N: usize> Serialize for FlagSet<N> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -227,6 +235,90 @@ impl<const N: usize> Default for FlagSet<N> {
 impl<const N: usize> FromIterator<u8> for FlagSet<N> {
     fn from_iter<T: IntoIterator<Item = u8>>(iter: T) -> Self {
         Self::from_indices(iter.into_iter().collect())
+    }
+}
+
+#[derive(Debug)]
+pub struct FlagReader<'a> {
+    bytes: &'a [u8],
+    length: usize,
+}
+
+impl<'a> FlagReader<'a> {
+    pub fn at_offset(bytes: &'a [u8], offset: usize, length: usize) -> Self {
+        if bytes.len() < offset + length {
+            panic!("buffer too small for FlagReader at offset {offset} with length {length}");
+        }
+
+        Self {
+            bytes: &bytes[offset..offset + length],
+            length,
+        }
+    }
+
+    pub fn get(&self, index: usize) -> bool {
+        let byte_index = index / 8;
+        let bit_index = index % 8;
+
+        if byte_index >= self.length {
+            panic!(
+                "index {index} out of bounds for FlagReader of length {}",
+                self.length
+            );
+        }
+
+        (self.bytes[byte_index] & (1 << bit_index)) != 0
+    }
+}
+
+#[derive(Debug)]
+pub struct FlagWriter<'a> {
+    bytes: &'a mut [u8],
+    length: usize,
+}
+
+impl<'a> FlagWriter<'a> {
+    pub fn at_offset(bytes: &'a mut [u8], offset: usize, length: usize) -> Self {
+        if bytes.len() < offset + length {
+            panic!("buffer too small for FlagWriter at offset {offset} with length {length}");
+        }
+
+        Self {
+            bytes: &mut bytes[offset..offset + length],
+            length,
+        }
+    }
+
+    pub fn get(&self, index: usize) -> bool {
+        let byte_index = index / 8;
+        let bit_index = index % 8;
+
+        if byte_index >= self.length {
+            panic!(
+                "index {index} out of bounds for FlagWriter of length {}",
+                self.length
+            );
+        }
+
+        (self.bytes[byte_index] & (1 << bit_index)) != 0
+    }
+
+    pub fn set(&mut self, index: usize, value: bool) {
+        let byte_index = index / 8;
+        let bit_index = index % 8;
+
+        if byte_index >= self.length {
+            panic!(
+                "index {index} out of bounds for FlagWriter of length {}",
+                self.length
+            );
+        }
+
+        if value {
+            self.bytes[byte_index] |= 1 << bit_index;
+        } else {
+            self.bytes[byte_index] &= !(1 << bit_index);
+        }
     }
 }
 

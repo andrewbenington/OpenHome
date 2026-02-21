@@ -657,6 +657,13 @@ impl SpeciesAndForme {
         })
     }
 
+    pub const fn base_form(national_dex: NatDexIndex) -> SpeciesAndForme {
+        SpeciesAndForme {
+            national_dex,
+            forme_index: 0,
+        }
+    }
+
     pub const fn new_valid_ndex(
         national_dex: NatDexIndex,
         forme_index: u16,

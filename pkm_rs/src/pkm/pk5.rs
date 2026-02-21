@@ -5,6 +5,7 @@ use crate::{read_u16_le, read_u32_le, util};
 
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::DsRibbonSet;
@@ -29,7 +30,7 @@ pub struct Pk5 {
     pub trainer_friendship: u8,
     pub ability_index: AbilityIndex,
     pub markings: MarkingsSixShapes,
-    pub language_index: u8,
+    pub language_index: Language,
     pub evs: Stats8,
     pub contest: ContestStats,
     pub moves: [MoveSlot; 4],
@@ -84,7 +85,7 @@ impl Pk5 {
             trainer_friendship: bytes[20],
             ability_index: AbilityIndex::try_from(bytes[21])?,
             markings: MarkingsSixShapes::from_byte(bytes[22]),
-            language_index: bytes[23],
+            language_index: Language::try_from(bytes[23])?,
             evs: Stats8::from_bytes(bytes[24..30].try_into().unwrap()),
             contest: ContestStats::from_bytes(bytes[30..36].try_into().unwrap()),
             moves: [
@@ -168,7 +169,7 @@ impl Pkm for Pk5 {
         bytes[20] = self.trainer_friendship;
         bytes[21] = self.ability_index.into();
         bytes[22] = self.markings.to_byte();
-        bytes[23] = self.language_index;
+        bytes[23] = self.language_index as u8;
         bytes[24..30].copy_from_slice(&self.evs.to_bytes());
         bytes[30..36].copy_from_slice(&self.contest.to_bytes());
 

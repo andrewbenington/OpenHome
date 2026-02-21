@@ -57,6 +57,55 @@ pub mod pb7 {
 }
 
 #[cfg(test)]
+pub mod pk3 {
+    use std::path::PathBuf;
+
+    use crate::pkm::{Pk3, traits::IsShiny};
+    use crate::pkm::{result::Result, tests::pkm_from_file};
+
+    #[test]
+    fn unown_letters() -> Result<()> {
+        let unown_e = pkm_from_file::<Pk3>(
+            &PathBuf::from("pkm_files")
+                .join("pk3")
+                .join("unown-e.pk3")
+                .to_string_lossy(),
+        )?;
+        assert_eq!(unown_e.0.get_species_and_forme().get_forme_index(), 4);
+
+        let unown_exclamation = pkm_from_file::<Pk3>(
+            &PathBuf::from("pkm_files")
+                .join("pk3")
+                .join("unown-exclamation.pk3")
+                .to_string_lossy(),
+        )?;
+        assert_eq!(
+            unown_exclamation
+                .0
+                .get_species_and_forme()
+                .get_forme_index(),
+            26
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn is_shiny() -> Result<()> {
+        let mon = pkm_from_file::<Pk3>(
+            &PathBuf::from("pkm_files")
+                .join("pk3")
+                .join("unown-exclamation.pk3")
+                .to_string_lossy(),
+        )?
+        .0;
+        assert!(mon.is_shiny());
+
+        Ok(())
+    }
+}
+
+#[cfg(test)]
 pub mod pk7 {
     use std::path::PathBuf;
 

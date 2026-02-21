@@ -480,6 +480,13 @@ impl From<u8> for OriginGame {
         }
     }
 }
+
+impl From<arbitrary_int::u4> for OriginGame {
+    fn from(value: arbitrary_int::u4) -> Self {
+        OriginGame::from(value.value())
+    }
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OriginGames;
 

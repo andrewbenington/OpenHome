@@ -1,4 +1,4 @@
-pub fn decode(key: u8) -> Option<u8> {
+pub const fn decode(key: u8) -> Option<u8> {
     match key {
         0 => Some(0),
         1 => Some(112),

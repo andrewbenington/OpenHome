@@ -101,6 +101,12 @@ impl From<u8> for Ball {
     }
 }
 
+impl From<arbitrary_int::u4> for Ball {
+    fn from(value: arbitrary_int::u4) -> Self {
+        Ball::from(value.value())
+    }
+}
+
 impl Ball {
     pub fn poke_if_newer_than(self, other: Ball) -> Ball {
         if self > other { Ball::Poke } else { self }

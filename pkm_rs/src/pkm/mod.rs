@@ -1,4 +1,5 @@
 mod pb7;
+mod pk3;
 mod pk5;
 mod pk6;
 mod pk7;
@@ -21,6 +22,7 @@ pub use plugins::ub::pk3ub::Pk3ub;
 
 pub use ohpkm::OhpkmV2;
 pub use pb7::Pb7;
+pub use pk3::Pk3;
 pub use pk5::Pk5;
 pub use pk6::Pk6;
 pub use pk7::Pk7;

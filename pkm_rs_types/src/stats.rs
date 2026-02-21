@@ -57,6 +57,18 @@ impl Stats8 {
         }
     }
 
+    pub fn from_u30(ivs_u30: arbitrary_int::u30) -> Self {
+        let ivs_u32 = ivs_u30.value();
+        Stats8 {
+            hp: (ivs_u32 & 0x1f).try_into().unwrap(),
+            atk: ((ivs_u32 >> 5) & 0x1f).try_into().unwrap(),
+            def: ((ivs_u32 >> 10) & 0x1f).try_into().unwrap(),
+            spe: ((ivs_u32 >> 15) & 0x1f).try_into().unwrap(),
+            spa: ((ivs_u32 >> 20) & 0x1f).try_into().unwrap(),
+            spd: ((ivs_u32 >> 25) & 0x1f).try_into().unwrap(),
+        }
+    }
+
     pub fn write_30_bits(&self, bytes: &mut [u8], byte_offset: usize) {
         let current_val =
             u32::from_le_bytes(bytes[byte_offset..byte_offset + 4].try_into().unwrap());
@@ -435,4 +447,14 @@ impl ContestStats {
             sheen,
         }
     }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum ContestStat {
+    Cool,
+    Beauty,
+    Cute,
+    Smart,
+    Tough,
 }

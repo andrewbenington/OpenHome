@@ -2939,6 +2939,7 @@ dependencies = [
 name = "pkm_rs_resources"
 version = "0.1.0"
 dependencies = [
+ "arbitrary-int",
  "getrandom 0.3.3",
  "js-sys",
  "num",

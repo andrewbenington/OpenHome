@@ -67,6 +67,12 @@ impl From<MoveSlot> for u16 {
     }
 }
 
+impl From<arbitrary_int::u2> for MoveSlot {
+    fn from(value: arbitrary_int::u2) -> Self {
+        Self(NonZeroU16::try_from(value.value() as u16).ok())
+    }
+}
+
 pub struct MoveMetadata {
     pub id: u16,
     pub name: &'static str,

@@ -47,7 +47,6 @@ pub enum Error {
         value: u16,
         game: NdexConvertSource,
     },
-
     FormeIndex {
         national_dex: NatDexIndex,
         forme_index: u16,
