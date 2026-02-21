@@ -114,7 +114,7 @@ fn set_theme_from_settings(app: &App) -> Result<()> {
 
 pub fn show_version_error_prompt(_app: &tauri::App, error: &Error) -> bool {
     #[cfg(not(target_os = "linux"))]
-    return !_app
+    return _app
         .dialog()
         .message(error.to_string())
         .title("OpenHome Version Error")
