@@ -1,4 +1,4 @@
-pub fn decode(key: u16) -> Option<u16> {
+pub const fn decode(key: u16) -> Option<u16> {
     match key {
         917 => Some(982),
         918 => Some(917),
@@ -110,7 +110,7 @@ pub fn decode(key: u16) -> Option<u16> {
     }
 }
 
-pub fn encode(value: u16) -> Option<u16> {
+pub const fn encode(value: u16) -> Option<u16> {
     match value {
         982 => Some(917),
         917 => Some(918),

@@ -219,8 +219,7 @@ impl Pkm for Pk3 {
         bytes[56..62].copy_from_slice(self.evs.to_bytes().as_ref());
         bytes[62..68].copy_from_slice(self.contest.to_bytes().as_ref());
         bytes[68] = self.pokerus_byte;
-        bytes[69..71].copy_from_slice(&self.met_location_index.to_le_bytes());
-        bytes[71] = self.met_location_index;
+        bytes[69] = self.met_location_index;
         let met_info = (self.met_level as u16 & 0b1111111)
             | ((self.game_of_origin as u16 & 0b1111) << 7)
             | ((self.ball as u16 & 0b1111) << 11);

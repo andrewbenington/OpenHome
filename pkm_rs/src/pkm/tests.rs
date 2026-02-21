@@ -91,6 +91,11 @@ pub mod pk3 {
     }
 
     #[test]
+    fn to_from_bytes() -> Result<()> {
+        super::to_from_bytes_all_in_dir::<Pk3>(&PathBuf::from("pkm_files").join("pk3"))
+    }
+
+    #[test]
     fn is_shiny() -> Result<()> {
         let mon = pkm_from_file::<Pk3>(
             &PathBuf::from("pkm_files")

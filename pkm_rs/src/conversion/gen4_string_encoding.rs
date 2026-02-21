@@ -2879,7 +2879,7 @@ pub const fn decode(key: u16) -> Option<u16> {
     }
 }
 
-pub fn encode(value: u16) -> Option<u16> {
+pub const fn encode(value: u16) -> Option<u16> {
     match value {
         0 => Some(0),
         12288 => Some(1),

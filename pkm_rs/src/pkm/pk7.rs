@@ -7,10 +7,9 @@ use arbitrary_int::{u3, u7};
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::helpers;
-use pkm_rs_resources::language::Languages;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
+use pkm_rs_resources::ribbons::ModernRibbonSet;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame,
@@ -19,6 +18,10 @@ use pkm_rs_types::{
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
 
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::language::Languages;
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::ribbons::ModernRibbon;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 

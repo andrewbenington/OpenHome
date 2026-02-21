@@ -156,7 +156,7 @@ pub const fn decode(key: u8) -> Option<u8> {
     }
 }
 
-pub fn encode(value: u8) -> Option<u8> {
+pub const fn encode(value: u8) -> Option<u8> {
     match value {
         0 => Some(0),
         112 => Some(1),
