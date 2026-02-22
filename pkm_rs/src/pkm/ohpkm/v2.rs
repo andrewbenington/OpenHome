@@ -1,4 +1,5 @@
 use crate::pkm::ohpkm::OhpkmV1;
+use crate::pkm::ohpkm::convert::OhpkmConvert;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::pkm::ohpkm::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
@@ -9,6 +10,7 @@ use crate::pkm::{Error, Pkm, Result};
 
 #[cfg(feature = "wasm")]
 use pkm_rs_types::TrainerData;
+use pkm_rs_types::{AbilityNumber, BinaryGender};
 use serde::Serialize;
 use strum_macros::Display;
 
@@ -214,6 +216,16 @@ impl OhpkmV2 {
     }
 }
 
+impl<T: OhpkmConvert> From<&T> for OhpkmV2 {
+    fn from(value: &T) -> Self {
+        Self {
+            main_data: value.to_main_data(),
+            gen67_data: value.to_gen_67_data(),
+            ..Default::default()
+        }
+    }
+}
+
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
@@ -306,11 +318,12 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(getter = abilityNum)]
     pub fn ability_num(&self) -> u8 {
-        self.main_data.ability_num
+        self.main_data.ability_num.to_byte()
     }
     #[wasm_bindgen(setter = abilityNum)]
-    pub fn set_ability_num(&mut self, v: u8) {
-        self.main_data.ability_num = v;
+    pub fn set_ability_num(&mut self, v: u8) -> Result<()> {
+        self.main_data.ability_num = AbilityNumber::from_u8_first_three_bits(v)?;
+        Ok(())
     }
 
     #[wasm_bindgen(getter = favorite)]
@@ -562,11 +575,11 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(getter = handlerGender)]
     pub fn handler_gender(&self) -> bool {
-        self.main_data.handler_gender
+        self.main_data.handler_gender.into()
     }
     #[wasm_bindgen(setter = handlerGender)]
     pub fn set_handler_gender(&mut self, v: bool) {
-        self.main_data.handler_gender = v;
+        self.main_data.handler_gender = BinaryGender::from(v);
     }
 
     #[wasm_bindgen(getter = fullness)]
@@ -737,7 +750,7 @@ impl OhpkmV2 {
     }
     #[wasm_bindgen(setter = trainerGender)]
     pub fn set_trainer_gender(&mut self, v: bool) {
-        self.main_data.trainer_gender = Gender::from(v);
+        self.main_data.trainer_gender = BinaryGender::from(v);
     }
 
     #[wasm_bindgen(getter = obedienceLevel)]
@@ -857,7 +870,7 @@ impl OhpkmV2 {
     pub fn add_modern_ribbons(&mut self, ribbon_indices: Vec<usize>) {
         ribbon_indices
             .into_iter()
-            .map(ModernRibbon::from)
+            .filter_map(ModernRibbon::from_index)
             .map(OpenHomeRibbon::Mod)
             .for_each(|r| self.main_data.ribbons.add_ribbon(r));
     }

@@ -12,7 +12,9 @@ use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesAndForme;
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{ContestStats, Stats8, Stats16Le, StatsPreSplit, TrainerData};
+use pkm_rs_types::{
+    AbilityNumber, BinaryGender, ContestStats, Stats8, Stats16Le, StatsPreSplit, TrainerData,
+};
 use pkm_rs_types::{FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, TeraType};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 use serde::Serialize;
@@ -50,7 +52,7 @@ pub struct MainDataV2 {
     pub secret_id: u16,
     pub exp: u32,
     pub ability_index: AbilityIndex,
-    pub ability_num: u8,
+    pub ability_num: AbilityNumber,
     pub favorite: bool,
     pub is_shadow: bool,
     pub markings: MarkingsSixShapesColors,
@@ -90,7 +92,7 @@ pub struct MainDataV2 {
     pub handler_friendship: u8,
     pub handler_memory: TrainerMemory,
     pub handler_affection: u8,
-    pub handler_gender: bool,
+    pub handler_gender: BinaryGender,
     pub fullness: u8,
     pub enjoyment: u8,
     pub game_of_origin: OriginGame,
@@ -111,7 +113,7 @@ pub struct MainDataV2 {
     pub met_location_index: u16,
     pub met_level: u8,
     pub hyper_training: HyperTraining,
-    pub trainer_gender: Gender,
+    pub trainer_gender: BinaryGender,
     pub obedience_level: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub home_tracker: [u8; 8],
@@ -133,7 +135,8 @@ impl MainDataV2 {
             secret_id: old.secret_id,
             exp: old.exp,
             ability_index: old.ability_index,
-            ability_num: old.ability_num,
+            ability_num: AbilityNumber::from_u8_first_three_bits(old.ability_num)
+                .unwrap_or_default(),
             favorite: old.favorite,
             is_shadow: old.is_shadow,
             markings: old.markings,
@@ -171,7 +174,7 @@ impl MainDataV2 {
             is_egg: old.is_egg,
             is_nicknamed: old.is_nicknamed,
             hyper_training: old.hyper_training,
-            trainer_gender: old.trainer_gender,
+            trainer_gender: bool::from(old.trainer_gender).into(),
             handler_name: old.handler_name,
             handler_language: old.handler_language,
             is_current_handler: old.is_current_handler,
@@ -179,7 +182,7 @@ impl MainDataV2 {
             handler_friendship: old.handler_friendship,
             handler_memory: old.handler_memory,
             handler_affection: old.handler_affection,
-            handler_gender: old.handler_gender,
+            handler_gender: old.handler_gender.into(),
             fullness: old.fullness,
             enjoyment: old.enjoyment,
             game_of_origin: old.game_of_origin,
@@ -236,11 +239,11 @@ impl DataSection for MainDataV2 {
                 bytes[20..22].try_into().unwrap(),
             ))?,
 
-            ability_num: util::read_uint3_from_bits(bytes[22], 0),
+            ability_num: AbilityNumber::from_u8_first_three_bits(bytes[22])?,
             favorite: util::get_flag(bytes, 22, 3),
             is_shadow: util::get_flag(bytes, 22, 4),
             is_fateful_encounter: util::get_flag(bytes, 22, 5),
-            trainer_gender: Gender::from(util::get_flag(bytes, 22, 6)),
+            trainer_gender: BinaryGender::from(util::get_flag(bytes, 22, 6)),
 
             game_of_origin: OriginGame::from(bytes[24]),
             game_of_origin_battle: match bytes[25] {
@@ -325,7 +328,7 @@ impl DataSection for MainDataV2 {
             // poke_star_fame: bytes[232],
             obedience_level: bytes[233],
             // shiny_leaves: bytes[234] & 0x3f,
-            handler_gender: util::get_flag(bytes, 234, 7),
+            handler_gender: util::get_flag(bytes, 234, 7).into(),
             // is_ns_pokemon: util::get_flag(bytes, 234, 6),
             fullness: bytes[235],
             enjoyment: bytes[236],
@@ -363,7 +366,7 @@ impl DataSection for MainDataV2 {
         bytes[16..20].copy_from_slice(&self.exp.to_le_bytes());
         bytes[20..22].copy_from_slice(&self.ability_index.to_le_bytes());
 
-        util::write_uint3_to_bits(self.ability_num, &mut bytes[22], 0);
+        util::write_uint3_to_bits(self.ability_num.to_byte(), &mut bytes[22], 0);
         util::set_flag(&mut bytes, 22, 3, self.favorite);
         util::set_flag(&mut bytes, 22, 4, self.is_shadow);
         util::set_flag(&mut bytes, 22, 5, self.is_fateful_encounter);

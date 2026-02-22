@@ -17,6 +17,7 @@ import PK7 from './PK7'
 import PK8 from './PK8'
 import PK9 from './PK9'
 import XDPKM from './XDPKM'
+import Pk7Rust from './wasm/PK7'
 
 export type PKM =
   | PK1
@@ -34,6 +35,7 @@ export type PKM =
   | PB8
   | PK9
   | PA9
+  | Pk7Rust
 
 export type RomHackPKM = PK3RR | PK3UB
 

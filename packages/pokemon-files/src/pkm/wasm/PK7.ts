@@ -1,8 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   AbilityIndex,
-  genderFromBool,
-  genderToBool,
   HyperTraining,
   Item,
   Languages,
@@ -23,6 +21,8 @@ import {
 } from '../../util/encryption'
 import { AllPKMFields, FourMoves } from '../../util/pkmInterface'
 import {
+  binaryGenderFromBool,
+  binaryGenderToBool,
   contestStatsToWasm,
   convertPokeDate,
   convertPokeDateOptional,
@@ -502,10 +502,10 @@ export class Pk7Rust {
   }
 
   get handlerGender() {
-    return this.inner.handler_gender
+    return binaryGenderToBool(this.inner.handler_gender)
   }
   set handlerGender(value: boolean) {
-    this.inner.handler_gender = value
+    this.inner.handler_gender = binaryGenderFromBool(value)
   }
 
   get isCurrentHandler() {
@@ -707,10 +707,10 @@ export class Pk7Rust {
   }
 
   get trainerGender() {
-    return genderToBool(this.inner.trainer_gender)
+    return binaryGenderToBool(this.inner.trainer_gender)
   }
   set trainerGender(value: boolean) {
-    this.inner.trainer_gender = genderFromBool(value)
+    this.inner.trainer_gender = binaryGenderFromBool(value)
   }
 
   static fromBytes(buffer: ArrayBuffer): Pk7Rust {

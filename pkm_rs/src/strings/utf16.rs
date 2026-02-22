@@ -1,6 +1,13 @@
 use serde::Serialize;
 use std::{fmt::Display, ops::Deref};
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::JsValue;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::convert::*;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::describe::*;
+
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
@@ -81,6 +88,32 @@ impl<const N: usize> Deref for SizedUtf16String<N> {
 
     fn deref(&self) -> &[u8] {
         &self.raw_le
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl<const N: usize> WasmDescribe for SizedUtf16String<N> {
+    fn describe() {
+        js_sys::JsString::describe()
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl<const N: usize> IntoWasmAbi for SizedUtf16String<N> {
+    type Abi = <js_sys::JsString as IntoWasmAbi>::Abi;
+
+    fn into_abi(self) -> Self::Abi {
+        JsValue::from_str(&self.to_string()).into_abi()
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl<const N: usize> FromWasmAbi for SizedUtf16String<N> {
+    type Abi = <js_sys::JsString as IntoWasmAbi>::Abi;
+
+    unsafe fn from_abi(js: Self::Abi) -> Self {
+        let val = unsafe { JsValue::from_abi(js) };
+        Self::from(val.as_string().unwrap_or_default())
     }
 }
 

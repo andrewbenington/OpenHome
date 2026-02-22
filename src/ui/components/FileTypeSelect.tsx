@@ -16,6 +16,7 @@ const fileTypeColors: Record<string, string> = {
   PK5: '#484',
   PK6: 'blue',
   PK7: 'orange',
+  PK7Wasm: 'orange',
   PB7: '#a75',
   PK8: '#6bf',
   PB8: '#6bf',

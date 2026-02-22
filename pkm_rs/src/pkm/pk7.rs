@@ -1,5 +1,7 @@
+use crate::pkm::ohpkm::v2_sections::Gen67Data;
+use crate::pkm::ohpkm::{self, OhpkmConvert};
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
-use crate::pkm::{Error, Pkm, Result};
+use crate::pkm::{Error, OhpkmV2, Pkm, Result};
 use crate::strings::SizedUtf16String;
 use crate::{read_u16_le, read_u32_le, util};
 
@@ -9,7 +11,7 @@ use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::helpers;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::ModernRibbonSet;
+use pkm_rs_resources::ribbons::{ModernRibbonSet, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame,
@@ -58,7 +60,6 @@ pub struct Pk7 {
     pub battle_memory_count: u8,
     pub super_training_dist_flags: u8,
     pub form_argument: u32,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub nickname: SizedUtf16String<26>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: [MoveSlot; 4],
@@ -73,7 +74,6 @@ pub struct Pk7 {
     pub ivs: Stats8,
     pub is_egg: bool,
     pub is_nicknamed: bool,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub handler_name: SizedUtf16String<24>,
     pub handler_gender: BinaryGender,
     pub is_current_handler: bool,
@@ -83,12 +83,10 @@ pub struct Pk7 {
     pub handler_memory: TrainerMemory,
     pub fullness: u8,
     pub enjoyment: u8,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<24>,
     pub trainer_friendship: u8,
     pub trainer_affection: u8,
     pub trainer_memory: TrainerMemory,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub egg_date: Option<PokeDate>,
     pub met_date: PokeDate,
     pub egg_location_index: u16,
@@ -432,36 +430,6 @@ impl Pk7 {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn nickname(&self) -> String {
-        self.nickname.to_string()
-    }
-
-    #[wasm_bindgen(setter)]
-    pub fn set_nickname(&mut self, value: String) {
-        self.nickname = SizedUtf16String::<26>::from(value);
-    }
-
-    #[wasm_bindgen(getter)]
-    pub fn trainer_name(&self) -> String {
-        self.trainer_name.to_string()
-    }
-
-    #[wasm_bindgen(setter)]
-    pub fn set_trainer_name(&mut self, value: String) {
-        self.trainer_name = SizedUtf16String::<24>::from(value);
-    }
-
-    #[wasm_bindgen(getter)]
-    pub fn handler_name(&self) -> String {
-        self.handler_name.to_string()
-    }
-
-    #[wasm_bindgen(setter)]
-    pub fn set_handler_name(&mut self, value: String) {
-        self.handler_name = SizedUtf16String::<24>::from(value);
-    }
-
-    #[wasm_bindgen(getter)]
     pub fn move_indices(&self) -> Vec<u16> {
         self.moves.into_iter().map(u16::from).collect()
     }
@@ -511,11 +479,6 @@ impl Pk7 {
         ]
     }
 
-    #[wasm_bindgen(setter)]
-    pub fn set_egg_date(&mut self, value: Option<PokeDate>) {
-        self.egg_date = value
-    }
-
     #[wasm_bindgen(getter)]
     pub fn ribbons(&self) -> Vec<String> {
         self.ribbons
@@ -532,8 +495,12 @@ impl Pk7 {
 
     #[wasm_bindgen(setter)]
     pub fn set_ribbon_indices(&mut self, indices: Vec<usize>) {
-        self.ribbons
-            .set_ribbons(indices.into_iter().map(ModernRibbon::from).collect());
+        self.ribbons.set_ribbons(
+            indices
+                .into_iter()
+                .filter_map(ModernRibbon::from_index)
+                .collect(),
+        );
     }
 
     #[wasm_bindgen]
@@ -555,6 +522,11 @@ impl Pk7 {
     pub fn language_string(&self) -> String {
         Languages::string_from_byte(self.language_index)
     }
+
+    #[wasm_bindgen(js_name = toOhpkm)]
+    pub fn to_ohpkm(&self) -> OhpkmV2 {
+        OhpkmV2::from(self)
+    }
 }
 
 impl ModernEvs for Pk7 {
@@ -563,219 +535,75 @@ impl ModernEvs for Pk7 {
     }
 }
 
-// impl From<Pk7> for Ohpkm {
-//     fn from(other: Pk7) -> Ohpkm {
-//         Ohpkm {
-//             encryption_constant: other.encryption_constant,
-//             sanity: other.sanity,
-//             checksum: other.checksum,
-//             species_and_forme: other.species_and_forme,
-//             held_item_index: other.held_item_index,
-//             trainer_id: other.trainer_id,
-//             secret_id: other.secret_id,
-//             exp: other.exp,
-//             ability_index: other.ability_index,
-//             ability_num: other.ability_num,
-//             favorite: false,
-//             can_gigantamax: false,
-//             is_alpha: false,
-//             is_noble: false,
-//             is_shadow: false,
-//             markings: other.markings,
-//             alpha_move: 0,
-//             personality_value: other.personality_value,
-//             nature: other.nature,
-//             stat_nature: other.nature,
-//             is_fateful_encounter: other.is_fateful_encounter,
-//             flag2_la: false,
-//             gender: other.gender,
-//             evs: other.evs,
-//             contest: other.contest,
-//             pokerus_byte: other.pokerus_byte,
-//             contest_memory_count: other.contest_memory_count,
-//             battle_memory_count: other.battle_memory_count,
-//             ribbons: OpenHomeRibbonSet::from_modern(other.ribbons),
-//             sociability: 0,
-//             height_scalar: 0,
-//             weight_scalar: 0,
-//             scale: 0,
-//             moves: other.moves,
-//             move_pp: other.move_pp,
-//             nickname: other.nickname,
-//             avs: Stats16Le::default(),
-//             move_pp_ups: other.move_pp_ups,
-//             relearn_moves: other.relearn_moves,
-//             ivs: other.ivs,
-//             is_egg: other.is_egg,
-//             is_nicknamed: other.is_nicknamed,
-//             dynamax_level: 0,
-//             tera_type_original: 0,
-//             tera_type_override: 0,
-//             unknown_a0: 0,
-//             gvs: Stats8::default(),
-//             dvs: StatsPreSplit::default(),
-//             handler_name: other.handler_name,
-//             handler_language: 0,
-//             resort_event_status: other.resort_event_status,
-//             handler_id: 0,
-//             handler_friendship: other.handler_friendship,
-//             handler_memory: other.handler_memory,
-//             handler_affection: other.handler_affection,
-//             super_training_flags: other.super_training_flags,
-//             super_training_dist_flags: other.super_training_dist_flags,
-//             secret_super_training_unlocked: other.secret_super_training_unlocked,
-//             secret_super_training_complete: other.secret_super_training_complete,
-//             training_bag_hits: 0,
-//             training_bag: 0,
-//             palma: 0,
-//             poke_star_fame: 0,
-//             met_time_of_day: 0,
-//             handler_gender: other.handler_gender,
-//             is_ns_pokemon: false,
-//             shiny_leaves: 0,
-//             fullness: other.fullness,
-//             enjoyment: other.enjoyment,
-//             game_of_origin: other.game_of_origin,
-//             game_of_origin_battle: None,
-//             country: other.country,
-//             region: other.region,
-//             console_region: other.console_region,
-//             language_index: other.language_index,
-//             unknown_f3: 0,
-//             form_argument: other.form_argument,
-//             affixed_ribbon: None,
-//             encounter_type: 0,
-//             performance: 0,
-//             trainer_name: other.trainer_name,
-//             trainer_friendship: other.trainer_friendship,
-//             trainer_memory: other.trainer_memory,
-//             trainer_affection: other.trainer_affection,
-//             egg_date: other.egg_date,
-//             met_date: other.met_date,
-//             ball: other.ball,
-//             egg_location_index: other.egg_location_index,
-//             met_location_index: other.met_location_index,
-//             met_level: other.met_level,
-//             hyper_training: other.hyper_training,
-//             trainer_gender: other.trainer_gender,
-//             obedience_level: 0,
-//             home_tracker: [0; 8],
-//             tr_flags_swsh: [0; 14],
-//             tm_flags_bdsp: [0; 14],
-//             move_flags_la: [0; 14],
-//             tutor_flags_la: [0; 8],
-//             master_flags_la: [0; 8],
-//             tm_flags_sv: [0; 22],
-//             tm_flags_sv_dlc: [0; 13],
-//         }
-//     }
-// }
+impl OhpkmConvert for Pk7 {
+    fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
+        ohpkm::v2_sections::MainDataV2 {
+            personality_value: self.personality_value,
+            encryption_constant: self.encryption_constant,
+            species_and_forme: self.species_and_forme,
+            held_item_index: self.held_item_index,
+            trainer_id: self.trainer_id,
+            secret_id: self.secret_id,
+            exp: self.exp,
+            ability_index: self.ability_index,
+            ability_num: self.ability_num,
+            markings: self.markings,
+            nature: self.nature,
+            is_fateful_encounter: self.is_fateful_encounter,
+            gender: self.gender,
+            evs: self.evs,
+            contest: self.contest,
+            pokerus_byte: self.pokerus_byte,
+            contest_memory_count: self.contest_memory_count,
+            battle_memory_count: self.battle_memory_count,
+            ribbons: OpenHomeRibbonSet::from_modern(self.ribbons),
+            moves: self.moves,
+            move_pp: self.move_pp,
+            nickname: self.nickname.to_string().into(),
+            move_pp_ups: self.move_pp_ups,
+            relearn_moves: self.relearn_moves,
+            ivs: self.ivs,
+            is_egg: self.is_egg,
+            is_nicknamed: self.is_nicknamed,
+            handler_name: self.handler_name.to_string().into(),
+            is_current_handler: self.is_current_handler,
+            handler_friendship: self.handler_friendship,
+            handler_memory: self.handler_memory,
+            handler_affection: self.handler_affection,
+            handler_gender: self.handler_gender,
+            fullness: self.fullness,
+            enjoyment: self.enjoyment,
+            game_of_origin: self.game_of_origin,
+            console_region: self.console_region,
+            language: self.language_index.try_into().unwrap_or_default(),
+            form_argument: self.form_argument,
+            trainer_name: self.trainer_name.to_string().into(),
+            trainer_friendship: self.trainer_friendship,
+            trainer_memory: self.trainer_memory,
+            trainer_affection: self.trainer_affection,
+            egg_date: self.egg_date,
+            met_date: self.met_date,
+            ball: self.ball,
+            egg_location_index: if self.egg_location_index == 0 {
+                None
+            } else {
+                Some(self.egg_location_index)
+            },
+            met_location_index: self.met_location_index,
+            met_level: self.met_level,
+            hyper_training: self.hyper_training,
+            trainer_gender: self.trainer_gender,
+            ..Default::default()
+        }
+    }
 
-// impl From<Ohpkm> for Pk7 {
-//     fn from(other: Ohpkm) -> Self {
-//         Self {
-//             encryption_constant: other.encryption_constant,
-//             sanity: other.sanity,
-//             checksum: other.checksum,
-//             species_and_forme: other.species_and_forme,
-//             held_item_index: other.held_item_index,
-//             trainer_id: other.trainer_id,
-//             secret_id: other.secret_id,
-//             exp: other.exp,
-//             ability_index: other.ability_index,
-//             ability_num: other.ability_num,
-//             markings: other.markings,
-//             personality_value: other.personality_value,
-//             nature: other.nature,
-//             is_fateful_encounter: other.is_fateful_encounter,
-//             gender: other.gender,
-//             evs: other.evs,
-//             contest: other.contest,
-//             resort_event_status: other.resort_event_status,
-//             pokerus_byte: other.pokerus_byte,
-//             super_training_flags: other.super_training_flags,
-//             ribbons: ModernRibbonSet::from_ribbons(
-//                 other
-//                     .ribbons
-//                     .get_modern_not_past(ModernRibbon::BattleTreeMaster),
-//             ),
-//             contest_memory_count: other.contest_memory_count,
-//             battle_memory_count: other.battle_memory_count,
-//             super_training_dist_flags: other.super_training_dist_flags,
-//             form_argument: other.form_argument,
-//             nickname: other.nickname,
-//             moves: other.moves,
-//             move_pp: other.move_pp,
-//             move_pp_ups: other.move_pp_ups,
-//             relearn_moves: other.relearn_moves,
-//             secret_super_training_unlocked: other.secret_super_training_unlocked,
-//             secret_super_training_complete: other.secret_super_training_complete,
-//             ivs: other.ivs,
-//             is_egg: other.is_egg,
-//             is_nicknamed: other.is_nicknamed,
-//             handler_name: other.handler_name,
-//             handler_gender: other.handler_gender,
-//             is_current_handler: false,
-//             geolocations: Geolocations::default(),
-//             handler_friendship: other.handler_friendship,
-//             handler_affection: other.handler_affection,
-//             handler_memory: other.handler_memory,
-//             fullness: other.fullness,
-//             enjoyment: other.enjoyment,
-//             trainer_name: other.trainer_name,
-//             trainer_friendship: other.trainer_friendship,
-//             trainer_affection: other.trainer_affection,
-//             trainer_memory: other.trainer_memory,
-//             egg_date: other.egg_date,
-//             met_date: other.met_date,
-//             egg_location_index: other.egg_location_index,
-//             met_location_index: other.met_location_index,
-//             ball: other.ball.poke_if_newer_than(Ball::Beast),
-//             met_level: other.met_level,
-//             hyper_training: other.hyper_training,
-//             game_of_origin: other.game_of_origin,
-//             country: other.country,
-//             region: other.region,
-//             console_region: other.console_region,
-//             language_index: other.language_index,
-//             trainer_gender: other.trainer_gender,
-//             status_condition: 0,
-//             current_hp: 0,
-//             stat_level: 0,
-//             form_argument_remain: 0,
-//             form_argument_elapsed: 0,
-//             stats: helpers::calculate_stats_modern(
-//                 other.species_and_forme,
-//                 &other.ivs,
-//                 &other.evs,
-//                 other.calculate_level(),
-//                 other.nature.get_metadata(),
-//             ),
-//         }
-//     }
-// }
-
-// impl From<AnyPkm> for Pk7 {
-//     fn from(other: AnyPkm) -> Self {
-//         let rand = other.get_seeded_rng();
-//         let Ok(forme_metadata) = other.get_forme_metadata() else {
-//             panic!("Cannot convert to Pk7: invalid forme number");
-//         };
-
-//         Pk7 {
-//             encryption_constant: other
-//                 .get_encryption_constant()
-//                 .unwrap_or(other.get_personality_value().unwrap_or(rand.next_u32())),
-//             sanity: 0,
-//             checksum: 0,
-//             national_dex: other.get_national_dex(),
-//             held_item_index: other.get_held_item_index().unwrap_or_default(),
-//             trainer_id: other.get_trainer_id(),
-//             secret_id: other.get_secret_id().unwrap_or_default(),
-//             exp: other.get_exp().unwrap_or_default(),
-//             ability_num: other.get_ability_num().unwrap_or_default(),
-//             ability_index: forme_metadata.get_ability(other.get_ability_num().unwrap_or_default()),
-//             markings: other.get_markings().unwrap_or_default(),
-//         }
-//     }
-// }
+    fn to_gen_67_data(&self) -> Option<ohpkm::v2_sections::Gen67Data> {
+        Some(ohpkm::v2_sections::Gen67Data {
+            country: self.country,
+            region: self.region,
+            geolocations: self.geolocations,
+            resort_event_status: self.resort_event_status,
+            ..Default::default()
+        })
+    }
+}

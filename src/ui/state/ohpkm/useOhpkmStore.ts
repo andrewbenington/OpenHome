@@ -164,6 +164,7 @@ export function useOhpkmStore(): OhpkmStore {
         }
         case 'PK6':
         case 'PK7':
+        case 'PK7Wasm':
         case 'PB7':
         case 'PK8':
         case 'PA8':

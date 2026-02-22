@@ -136,3 +136,11 @@ export function markingsSixShapesColorsToWasm(
     value.diamond
   )
 }
+
+export function binaryGenderFromBool(value: boolean): PkmWasm.BinaryGender {
+  return value ? PkmWasm.BinaryGender.Female : PkmWasm.BinaryGender.Male
+}
+
+export function binaryGenderToBool(value: PkmWasm.BinaryGender): boolean {
+  return value === PkmWasm.BinaryGender.Female
+}
