@@ -150,30 +150,34 @@ impl From<BinaryGender> for bool {
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy)]
-pub struct FlagSet<const N: usize> {
+pub struct FlagSet<const N: usize, FLAG: Copy + Into<usize> = usize> {
+    _marker: core::marker::PhantomData<FLAG>,
     raw: [u8; N],
 }
 
-impl<const N: usize> FlagSet<N> {
+impl<const N: usize, FLAG: Copy + Into<usize> + From<usize>> FlagSet<N, FLAG> {
     pub const fn from_bytes(bytes: [u8; N]) -> Self {
-        FlagSet { raw: bytes }
+        FlagSet {
+            _marker: core::marker::PhantomData,
+            raw: bytes,
+        }
     }
 
-    pub fn get_indices(&self) -> Vec<usize> {
+    pub fn get_flags(&self) -> Vec<FLAG> {
         self.raw
             .iter()
             .enumerate()
             .flat_map(|(i, &byte)| {
-                let mut indices = vec![];
+                let mut flags = vec![];
                 let mut remaining = byte;
                 let base = i * 8;
 
                 while remaining != 0 {
                     let bit_pos = remaining.trailing_zeros() as usize;
-                    indices.push(base + bit_pos);
+                    flags.push(FLAG::from(base + bit_pos));
                     remaining &= remaining - 1;
                 }
-                indices
+                flags
             })
             .collect()
     }
@@ -182,26 +186,34 @@ impl<const N: usize> FlagSet<N> {
         self.raw
     }
 
-    pub fn set_index(&mut self, index: u8, value: bool) {
-        util::set_flag(&mut self.raw, 0, index as usize, value);
+    pub fn set_flag(&mut self, flag: FLAG, value: bool) {
+        util::set_flag(&mut self.raw, 0, flag.into(), value);
     }
 
-    pub const fn clear_all(&mut self) {
+    pub const fn clear(&mut self) {
         self.raw = [0; N]
     }
 
-    pub fn add_index(&mut self, index: u8) {
-        self.set_index(index, true);
+    pub fn add_flag(&mut self, flag: FLAG) {
+        self.set_flag(flag, true);
     }
 
-    pub fn add_indices(&mut self, indices: Vec<u8>) {
-        indices.into_iter().for_each(|index| self.add_index(index));
+    pub fn add_flags<I: IntoIterator<Item = FLAG>>(&mut self, flags: I) {
+        flags.into_iter().for_each(|flag| self.add_flag(flag));
     }
 
-    pub fn from_indices(indices: Vec<u8>) -> Self {
-        let mut set = Self::default();
-        set.add_indices(indices);
-        set
+    pub fn set_flags<I: IntoIterator<Item = FLAG>>(&mut self, flags: I) {
+        self.clear();
+        flags.into_iter().for_each(|flag| self.add_flag(flag));
+    }
+
+    pub fn from_flags<I: IntoIterator<Item = FLAG>>(flags: I) -> Self {
+        Self::default().with_flags(flags)
+    }
+
+    pub fn with_flags<I: IntoIterator<Item = FLAG>>(mut self, flags: I) -> Self {
+        self.add_flags(flags);
+        self
     }
 
     pub fn is_empty(&self) -> bool {
@@ -212,12 +224,16 @@ impl<const N: usize> FlagSet<N> {
 impl FlagSet<2> {
     pub const fn from_u16_le(value: u16) -> Self {
         Self {
+            _marker: core::marker::PhantomData,
             raw: value.to_le_bytes(),
         }
     }
 }
 
-impl<const N: usize> Serialize for FlagSet<N> {
+impl<const N: usize, FLAG: Copy + Into<usize>> Serialize for FlagSet<N, FLAG>
+where
+    FLAG: Serialize,
+{
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -226,15 +242,18 @@ impl<const N: usize> Serialize for FlagSet<N> {
     }
 }
 
-impl<const N: usize> Default for FlagSet<N> {
+impl<const N: usize, FLAG: Copy + Into<usize>> Default for FlagSet<N, FLAG> {
     fn default() -> Self {
-        Self { raw: [0; N] }
+        Self {
+            _marker: core::marker::PhantomData::<FLAG>,
+            raw: [0; N],
+        }
     }
 }
 
-impl<const N: usize> FromIterator<u8> for FlagSet<N> {
-    fn from_iter<T: IntoIterator<Item = u8>>(iter: T) -> Self {
-        Self::from_indices(iter.into_iter().collect())
+impl<const N: usize, T: Into<usize>> FromIterator<T> for FlagSet<N> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        Self::from_flags(iter.into_iter().map(|x| x.into()))
     }
 }
 
@@ -256,13 +275,13 @@ impl<'a> FlagReader<'a> {
         }
     }
 
-    pub fn get(&self, index: usize) -> bool {
-        let byte_index = index / 8;
-        let bit_index = index % 8;
+    pub fn get(&self, flag: usize) -> bool {
+        let byte_index = flag / 8;
+        let bit_index = flag % 8;
 
         if byte_index >= self.length {
             panic!(
-                "index {index} out of bounds for FlagReader of length {}",
+                "index {flag} out of bounds for FlagReader of length {}",
                 self.length
             );
         }

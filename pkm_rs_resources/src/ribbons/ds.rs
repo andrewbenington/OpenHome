@@ -20,7 +20,7 @@ impl DsGen3RibbonSet {
 
     pub fn get_ribbons(&self) -> Vec<Gen3Ribbon> {
         self.0
-            .get_indices()
+            .get_flags()
             .into_iter()
             .map(Gen3Ribbon::from_index)
             .collect()
@@ -31,11 +31,11 @@ impl DsGen3RibbonSet {
     }
 
     pub const fn clear_ribbons(&mut self) {
-        self.0.clear_all();
+        self.0.clear();
     }
 
     pub fn add_ribbon(&mut self, ribbon: Gen3Ribbon) {
-        self.0.set_index(ribbon.get_index(), true);
+        self.0.set_flag(ribbon.get_index(), true);
     }
 
     pub fn add_ribbons(&mut self, ribbons: Vec<Gen3Ribbon>) {
@@ -81,7 +81,7 @@ impl Gen4StandardRibbonSet {
 
     pub fn get_ribbons(&self) -> Vec<Gen4StandardRibbon> {
         self.0
-            .get_indices()
+            .get_flags()
             .into_iter()
             .map(Gen4StandardRibbon::from_index)
             .collect()
@@ -92,11 +92,11 @@ impl Gen4StandardRibbonSet {
     }
 
     pub const fn clear_ribbons(&mut self) {
-        self.0.clear_all();
+        self.0.clear();
     }
 
     pub fn add_ribbon(&mut self, ribbon: Gen4StandardRibbon) {
-        self.0.add_index(ribbon.get_index());
+        self.0.add_flag(ribbon.get_index());
     }
 
     pub fn add_ribbons(&mut self, ribbons: Vec<Gen4StandardRibbon>) {
@@ -165,8 +165,8 @@ pub enum Gen4StandardRibbon {
 }
 
 impl Gen4StandardRibbon {
-    pub const fn get_index(self) -> u8 {
-        self as u8
+    pub const fn get_index(self) -> usize {
+        self as usize
     }
 
     pub fn from_index(index: usize) -> Gen4StandardRibbon {
@@ -335,7 +335,7 @@ impl Gen4ContestRibbonSet {
 
     pub fn get_ribbons(&self) -> Vec<Gen4ContestRibbon> {
         self.0
-            .get_indices()
+            .get_flags()
             .into_iter()
             .map(Gen4ContestRibbon::from_index)
             .collect()
@@ -346,11 +346,11 @@ impl Gen4ContestRibbonSet {
     }
 
     pub const fn clear_ribbons(&mut self) {
-        self.0.clear_all();
+        self.0.clear();
     }
 
     pub fn add_ribbon(&mut self, ribbon: Gen4ContestRibbon) {
-        self.0.set_index(ribbon.get_index(), true);
+        self.0.set_flag(ribbon.get_index(), true);
     }
 
     pub fn add_ribbons(&mut self, ribbons: Vec<Gen4ContestRibbon>) {
@@ -413,8 +413,8 @@ pub enum Gen4ContestRibbon {
 }
 
 impl Gen4ContestRibbon {
-    pub const fn get_index(self) -> u8 {
-        self as u8
+    pub const fn get_index(self) -> usize {
+        self as usize
     }
 
     pub fn from_index(index: usize) -> Gen4ContestRibbon {

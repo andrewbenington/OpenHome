@@ -53,7 +53,7 @@ impl Gen3RibbonSet {
         all_ribbons.extend(self.tough.get_ribbons(ContestStat::Tough));
         let other_ribbons: Vec<_> = self
             .non_contest
-            .get_indices()
+            .get_flags()
             .into_iter()
             .map(|index| Gen3Ribbon::Champion + index)
             .collect();
@@ -172,8 +172,8 @@ pub enum Gen3Ribbon {
 }
 
 impl Gen3Ribbon {
-    pub const fn get_index(self) -> u8 {
-        self as u8
+    pub const fn get_index(self) -> usize {
+        self as usize
     }
 
     pub fn from_index(index: usize) -> Gen3Ribbon {
@@ -185,11 +185,7 @@ impl Gen3Ribbon {
     }
 
     pub fn from_u8(index: u8) -> Gen3Ribbon {
-        if index > Gen3Ribbon::World as u8 {
-            panic!("Attempting to get Gen3Ribbon from index > 31")
-        }
-
-        unsafe { std::mem::transmute(index) }
+        Self::from_index(index as usize)
     }
 
     const fn contest_stat_base(stat: ContestStat) -> Gen3Ribbon {

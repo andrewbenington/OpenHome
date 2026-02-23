@@ -8,7 +8,7 @@ use crate::{Error, Result};
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
-pub const LANGUAGE_MAX: u8 = Language::ChineseTraditional as u8;
+pub const LANGUAGE_MAX: u8 = Language::SpanishLatinAmerica as u8;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
@@ -80,6 +80,7 @@ impl TryFrom<u8> for Language {
             8 => Ok(Language::Korean),
             9 => Ok(Language::ChineseSimplified),
             10 => Ok(Language::ChineseTraditional),
+            11 => Ok(Language::SpanishLatinAmerica),
             _ => Err(Error::LanguageIndex {
                 language_index: value,
             }),

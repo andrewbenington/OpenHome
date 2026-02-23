@@ -7,12 +7,13 @@ use crate::{read_u16_le, read_u32_le};
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_types::Gender;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, HyperTraining, MarkingsSixShapesColors, PokeDate,
     Stats8, Stats16Le, TrainerMemory,
 };
-use pkm_rs_types::{FlagSet, Gender};
 use serde::Serialize;
 
 #[cfg(feature = "randomize")]
@@ -43,7 +44,7 @@ pub struct Pk8 {
     pub evs: Stats8,
     pub contest: ContestStats,
     pub pokerus_byte: u8,
-    pub ribbon_bytes: FlagSet<8>,
+    pub ribbon_bytes: ModernRibbonSet<16, { ModernRibbon::SlumpMark as usize }>,
     pub contest_memory_count: u8,
     pub battle_memory_count: u8,
     pub sociability: u32,
@@ -131,7 +132,7 @@ impl Pk8 {
             evs: Stats8::from_bytes(bytes[38..44].try_into().unwrap()),
             contest: ContestStats::from_bytes(bytes[44..50].try_into().unwrap()),
             pokerus_byte: bytes[50],
-            ribbon_bytes: FlagSet::from_bytes(bytes[52..60].try_into().unwrap()),
+            ribbon_bytes: ModernRibbonSet::from_spans(&[&bytes[52..=59], &bytes[64..=71]]),
             contest_memory_count: bytes[60],
             battle_memory_count: bytes[61],
             sociability: read_u32_le!(bytes, 72),
@@ -205,6 +206,7 @@ impl Pkm for Pk8 {
     }
 
     fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+        let ribbon_bytes = self.ribbon_bytes.to_bytes();
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[4..6].copy_from_slice(&self.sanity.to_le_bytes());
         bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
@@ -230,9 +232,11 @@ impl Pkm for Pk8 {
         bytes[38..44].copy_from_slice(&self.evs.to_bytes());
         bytes[44..50].copy_from_slice(&self.contest.to_bytes());
         bytes[50] = self.pokerus_byte;
+        bytes[52..=59].copy_from_slice(&ribbon_bytes[0..8]);
 
         bytes[60] = self.contest_memory_count;
         bytes[61] = self.battle_memory_count;
+        bytes[64..=71].copy_from_slice(&ribbon_bytes[8..16]);
         bytes[72..76].copy_from_slice(&self.sociability.to_le_bytes());
 
         // 76..79 unused

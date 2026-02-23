@@ -1,6 +1,6 @@
 use crate::pkm::ohpkm::sectioned_data::DataSection;
 use crate::pkm::ohpkm::{OhpkmV1, SectionTagV2};
-use crate::pkm::traits::{IsShiny4096, OhpkmByte, OhpkmBytes};
+use crate::pkm::traits::{IsShiny, IsShiny4096, OhpkmByte, OhpkmBytes};
 use crate::pkm::{Error, Result, StringErrorSource};
 use crate::util;
 
@@ -10,6 +10,7 @@ use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
+use pkm_rs_resources::species::NatDexIndex;
 use pkm_rs_resources::species::SpeciesAndForme;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
@@ -19,12 +20,6 @@ use pkm_rs_types::{FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors
 use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 use serde::Serialize;
 use std::num::NonZeroU16;
-
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::species::NatDexIndex;
-
-#[cfg(feature = "wasm")]
-use crate::pkm::traits::IsShiny;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -495,7 +490,6 @@ pub struct GameboyData {
     pub evs_g12: StatsPreSplit,
 }
 
-#[cfg(feature = "wasm")]
 const UNOWN: NatDexIndex = unsafe { NatDexIndex::new_unchecked(201) };
 
 impl GameboyData {
@@ -511,7 +505,6 @@ impl GameboyData {
         }
     }
 
-    #[cfg(feature = "wasm")]
     pub fn from_main_data(main_data: &MainDataV2) -> Self {
         if main_data.species_and_forme.get_ndex() == UNOWN {
             let letter_index = main_data.species_and_forme.get_forme_index();
@@ -987,7 +980,6 @@ impl ScarletVioletData {
         }
     }
 
-    #[cfg(feature = "wasm")]
     pub fn default_generated_tera_type(species_and_forme: SpeciesAndForme) -> Self {
         Self {
             tera_type_original: species_and_forme
@@ -1077,7 +1069,6 @@ impl PastHandlerData {
         }
     }
 
-    #[cfg(feature = "wasm")]
     pub fn known_trainer_data_matches(
         &self,
         tid: u16,
@@ -1091,7 +1082,6 @@ impl PastHandlerData {
             && self.origin_plugin == *plugin
     }
 
-    #[cfg(feature = "wasm")]
     pub fn unknown_trainer_data_matches(
         &self,
         name: &SizedUtf16String<26>,
@@ -1100,7 +1090,6 @@ impl PastHandlerData {
         self.gender == gender && self.name == *name && self.origin_game.is_none()
     }
 
-    #[cfg(feature = "wasm")]
     pub fn update_from(&mut self, other: &TrainerData, plugin: Option<String>) {
         self.id = NonZeroU16::new(other.id);
         self.secret_id = NonZeroU16::new(other.secret_id);

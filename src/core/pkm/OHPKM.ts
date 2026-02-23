@@ -404,39 +404,39 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   get moves() {
-    const values = Array.from(this.move_indices)
+    const values = Array.from(this.movesWasm)
     if (values.length !== 4) throw Error('move array length != 4')
     return values as FourMoves
   }
   set moves(value: FourMoves) {
-    this.move_indices = new Uint16Array(value)
+    this.movesWasm = new Uint16Array(value)
   }
 
   get movePP() {
-    const values = Array.from(this.move_pp)
+    const values = Array.from(this.movePpWasm)
     if (values.length !== 4) throw Error('move pp array length != 4')
     return values as FourMoves
   }
   set movePP(value: FourMoves) {
-    this.move_pp = new Uint8Array(value)
+    this.movePpWasm = new Uint8Array(value)
   }
 
   get movePPUps() {
-    const values = Array.from(this.move_pp_ups)
+    const values = Array.from(this.movePpUpsWasm)
     if (values.length !== 4) throw Error('move pp up array length != 4')
     return values as FourMoves
   }
   set movePPUps(value: FourMoves) {
-    this.move_pp_ups = new Uint8Array(value)
+    this.movePpUpsWasm = new Uint8Array(value)
   }
 
   get relearnMoves() {
-    const values = Array.from(this.relearn_move_indices)
+    const values = Array.from(this.relearnMovesWasm)
     if (values.length !== 4) throw Error('relearn move array length != 4')
     return values as FourMoves
   }
   set relearnMoves(value: FourMoves) {
-    this.relearn_move_indices = new Uint16Array(value)
+    this.relearnMovesWasm = new Uint16Array(value)
   }
 
   get trainerMemory() {

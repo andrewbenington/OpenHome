@@ -1,17 +1,17 @@
-use crate::pkm::ohpkm::v2_sections::Gen67Data;
 use crate::pkm::ohpkm::{self, OhpkmConvert};
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
 use crate::pkm::{Error, OhpkmV2, Pkm, Result};
 use crate::strings::SizedUtf16String;
-use crate::{read_u16_le, read_u32_le, util};
+use crate::{log, read_u16_le, read_u32_le, util};
 
 use arbitrary_int::{u3, u7};
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::helpers;
+use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::{ModernRibbonSet, OpenHomeRibbonSet};
+use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame,
@@ -20,10 +20,6 @@ use pkm_rs_types::{
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
 
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::language::Languages;
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::ribbons::ModernRibbon;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -55,7 +51,7 @@ pub struct Pk7 {
     pub pokerus_byte: u8,
     pub super_training_flags: u32,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ribbons: ModernRibbonSet<6>,
+    pub ribbons: ModernRibbonSet<7, MAX_RIBBON_ALOLA>,
     pub contest_memory_count: u8,
     pub battle_memory_count: u8,
     pub super_training_dist_flags: u8,
@@ -99,7 +95,7 @@ pub struct Pk7 {
     pub country: u8,
     pub region: u8,
     pub console_region: u8,
-    pub language_index: u8,
+    pub language: Language,
     pub status_condition: u32,
     pub stat_level: u8,
     pub form_argument_remain: u8,
@@ -107,6 +103,8 @@ pub struct Pk7 {
     pub current_hp: u16,
     pub stats: Stats16Le,
 }
+
+const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
 
 impl Pk7 {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -140,7 +138,7 @@ impl Pk7 {
             resort_event_status: bytes[42],
             pokerus_byte: bytes[43],
             super_training_flags: read_u32_le!(bytes, 44),
-            ribbons: ModernRibbonSet::from_bytes(bytes[48..54].try_into().unwrap()),
+            ribbons: ModernRibbonSet::from_bytes(bytes[48..55].try_into().unwrap()),
             contest_memory_count: bytes[56],
             battle_memory_count: bytes[57],
             super_training_dist_flags: bytes[58],
@@ -200,7 +198,7 @@ impl Pk7 {
             country: bytes[224],
             region: bytes[225],
             console_region: bytes[226],
-            language_index: bytes[227],
+            language: Language::try_from(bytes[227])?,
             status_condition: if bytes.len() > Self::BOX_SIZE {
                 read_u32_le!(bytes, 232)
             } else {
@@ -272,7 +270,7 @@ impl Pkm for Pk7 {
         bytes[42] = self.resort_event_status;
         bytes[43] = self.pokerus_byte;
         bytes[44..48].copy_from_slice(&self.super_training_flags.to_le_bytes());
-        bytes[48..54].copy_from_slice(&self.ribbons.to_bytes());
+        bytes[48..55].copy_from_slice(&self.ribbons.to_bytes());
 
         // 55 unused
 
@@ -348,7 +346,7 @@ impl Pkm for Pk7 {
         bytes[224] = self.country;
         bytes[225] = self.region;
         bytes[226] = self.console_region;
-        bytes[227] = self.language_index;
+        bytes[227] = self.language as u8;
 
         Ok(())
     }
@@ -411,11 +409,9 @@ impl Pk7 {
 #[allow(clippy::missing_const_for_fn)]
 impl Pk7 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
-    pub fn from_ohpkm_bytes(_bytes: Vec<u8>) -> core::result::Result<Pk7, JsValue> {
-        Err("NOT IMPLEMENTED".into())
-
-        // let ohpkm = Ohpkm::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
-        // Ok(Pk7::from(ohpkm))
+    pub fn from_ohpkm_bytes(bytes: Vec<u8>) -> core::result::Result<Pk7, JsValue> {
+        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
+        Ok(Pk7::from_ohpkm(&ohpkm))
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
@@ -495,12 +491,8 @@ impl Pk7 {
 
     #[wasm_bindgen(setter)]
     pub fn set_ribbon_indices(&mut self, indices: Vec<usize>) {
-        self.ribbons.set_ribbons(
-            indices
-                .into_iter()
-                .filter_map(ModernRibbon::from_index)
-                .collect(),
-        );
+        self.ribbons
+            .set_ribbons(indices.into_iter().filter_map(ModernRibbon::from_index));
     }
 
     #[wasm_bindgen]
@@ -520,7 +512,7 @@ impl Pk7 {
 
     #[wasm_bindgen(getter = languageString)]
     pub fn language_string(&self) -> String {
-        Languages::string_from_byte(self.language_index)
+        self.language.as_str().to_owned()
     }
 
     #[wasm_bindgen(js_name = toOhpkm)]
@@ -575,7 +567,7 @@ impl OhpkmConvert for Pk7 {
             enjoyment: self.enjoyment,
             game_of_origin: self.game_of_origin,
             console_region: self.console_region,
-            language: self.language_index.try_into().unwrap_or_default(),
+            language: self.language,
             form_argument: self.form_argument,
             trainer_name: self.trainer_name.to_string().into(),
             trainer_friendship: self.trainer_friendship,
@@ -603,7 +595,91 @@ impl OhpkmConvert for Pk7 {
             region: self.region,
             geolocations: self.geolocations,
             resort_event_status: self.resort_event_status,
+            super_training_flags: self.super_training_flags,
+            super_training_dist_flags: self.super_training_dist_flags,
+            secret_super_training_unlocked: self.secret_super_training_unlocked,
+            secret_super_training_complete: self.secret_super_training_complete,
             ..Default::default()
         })
+    }
+
+    fn from_ohpkm(ohpkm: &OhpkmV2) -> Self {
+        println!("super training flags: {:#?}", ohpkm.super_training_flags());
+        let me = Self {
+            encryption_constant: ohpkm.encryption_constant(),
+            sanity: 0,
+            checksum: 0,
+            species_and_forme: ohpkm.species_and_forme(),
+            held_item_index: ohpkm.held_item_index(),
+            trainer_id: ohpkm.trainer_id(),
+            secret_id: ohpkm.secret_id(),
+            exp: ohpkm.exp(),
+            ability_index: ohpkm.ability_index(),
+            ability_num: ohpkm.ability_num(),
+            markings: ohpkm.markings(),
+            personality_value: ohpkm.personality_value(),
+            nature: ohpkm.nature(),
+            is_fateful_encounter: ohpkm.is_fateful_encounter(),
+            gender: ohpkm.gender(),
+            evs: ohpkm.evs(),
+            contest: ohpkm.contest(),
+            resort_event_status: ohpkm.resort_event_status().unwrap_or_default(),
+            pokerus_byte: ohpkm.pokerus_byte(),
+            super_training_flags: ohpkm.super_training_flags().unwrap_or_default(),
+            ribbons: ohpkm.ribbons().get_modern().into_iter().collect(),
+            contest_memory_count: ohpkm.contest_memory_count(),
+            battle_memory_count: ohpkm.battle_memory_count(),
+            super_training_dist_flags: ohpkm.super_training_dist_flags().unwrap_or_default(),
+            form_argument: ohpkm.form_argument(),
+            nickname: ohpkm.nickname().to_string().into(),
+            moves: ohpkm.moves(),
+            move_pp: ohpkm.move_pp(),
+            move_pp_ups: ohpkm.move_pp_ups(),
+            relearn_moves: ohpkm.relearn_moves(),
+            secret_super_training_unlocked: ohpkm
+                .secret_super_training_unlocked()
+                .unwrap_or_default(),
+            secret_super_training_complete: ohpkm
+                .secret_super_training_complete()
+                .unwrap_or_default(),
+            ivs: ohpkm.ivs(),
+            is_egg: ohpkm.is_egg(),
+            is_nicknamed: ohpkm.is_nicknamed(),
+            handler_name: ohpkm.handler_name().to_string().into(),
+            handler_gender: ohpkm.handler_gender(),
+            is_current_handler: ohpkm.is_current_handler(),
+            geolocations: ohpkm.geolocations().unwrap_or_default(),
+            handler_friendship: ohpkm.handler_friendship(),
+            handler_affection: ohpkm.handler_affection(),
+            handler_memory: ohpkm.handler_memory(),
+            fullness: ohpkm.fullness(),
+            enjoyment: ohpkm.enjoyment(),
+            trainer_name: ohpkm.trainer_name().to_string().into(),
+            trainer_friendship: ohpkm.trainer_friendship(),
+            trainer_affection: ohpkm.trainer_affection(),
+            trainer_memory: ohpkm.trainer_memory(),
+            egg_date: ohpkm.egg_date(),
+            met_date: ohpkm.met_date(),
+            egg_location_index: ohpkm.egg_location_index().unwrap_or(0),
+            met_location_index: ohpkm.met_location_index(),
+            ball: ohpkm.ball(),
+            met_level: ohpkm.met_level(),
+            trainer_gender: ohpkm.trainer_gender(),
+            hyper_training: ohpkm.hyper_training(),
+            game_of_origin: ohpkm.game_of_origin(),
+            country: ohpkm.country().unwrap_or_default(),
+            region: ohpkm.region().unwrap_or_default(),
+            console_region: ohpkm.console_region(),
+            language: ohpkm.language(),
+            status_condition: 0,
+            stat_level: 0,
+            form_argument_remain: 0,
+            form_argument_elapsed: 0,
+            current_hp: 0,
+            stats: Stats16Le::default(),
+        };
+        println!("hyper training flags after: {:#?}", me.super_training_flags);
+
+        me
     }
 }

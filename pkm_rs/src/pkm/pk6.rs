@@ -8,7 +8,7 @@ use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::ModernRibbonSet;
+use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::{BinaryGender, ContestStats, MarkingsSixShapes, OriginGame, Stats8, Stats16Le};
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
@@ -45,7 +45,7 @@ pub struct Pk6 {
     pub pokerus_byte: u8,
     pub super_training_flags: u32,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ribbons: ModernRibbonSet<6>,
+    pub ribbons: ModernRibbonSet<6, MAX_RIBBON_GEN6>,
     pub contest_memory_count: u8,
     pub battle_memory_count: u8,
     pub super_training_dist_flags: u8,
@@ -101,6 +101,8 @@ pub struct Pk6 {
     pub current_hp: u16,
     pub stats: Stats16Le,
 }
+
+const MAX_RIBBON_GEN6: usize = ModernRibbon::ToughnessMaster as usize;
 
 impl Pk6 {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {

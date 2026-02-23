@@ -661,10 +661,10 @@ export class Pk7Rust {
   }
 
   get language() {
-    return this.inner.language_index
+    return this.inner.language
   }
   set language(value: number) {
-    this.inner.language_index = value
+    this.inner.language = value
   }
 
   get statusCondition() {

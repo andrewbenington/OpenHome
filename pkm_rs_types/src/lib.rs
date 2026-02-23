@@ -1,3 +1,4 @@
+mod capped;
 mod games;
 mod markings;
 mod pkm_types;
@@ -7,6 +8,7 @@ mod structures;
 mod traits;
 mod util;
 
+pub use capped::*;
 pub use games::*;
 pub use markings::*;
 pub use pkm_types::*;
