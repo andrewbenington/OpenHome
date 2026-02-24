@@ -98,13 +98,12 @@ except for the Japanese versions of Pokémon Red/Green/Blue/Yellow and the Japan
 - PK6
 - PK7
 - PA8
-- COLOPKM
-- XDPKM
 - PB7
 - PK8
 - PA8
 - PB8
 - PK9
+- PA9
 
 ### Supported save file formats
 
@@ -128,6 +127,7 @@ except for the Japanese versions of Pokémon Red/Green/Blue/Yellow and the Japan
 - Pokémon Brilliant Diamond/Shining Pearl
 - Pokémon Legends Arceus
 - Pokémon Scarlet/Violet
+- Pokémon Legends: Z-A
 
 ### Supported ROM Hack formats
 
