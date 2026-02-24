@@ -45,7 +45,6 @@ export class Pk7Rust {
     return 232
   }
   inner: Pk7Wasm
-  finalizationRegistry: FinalizationRegistry<string>
 
   constructor(arg: ArrayBuffer | AllPKMFields | Pk7Wasm, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
@@ -57,20 +56,6 @@ export class Pk7Rust {
       }
 
       this.inner = Pk7.fromBytes(new Uint8Array(buffer))
-      // console.log('registering ' + this.inner.nickname)
-      this.finalizationRegistry = new FinalizationRegistry((message) => {
-        // console.log('registry message: ' + message)
-        this.inner.free()
-      })
-      this.finalizationRegistry.register(this, this.nickname)
-    } else if (arg instanceof Pk7) {
-      this.inner = arg
-      // console.log('registering ' + this.inner.nickname)
-      this.finalizationRegistry = new FinalizationRegistry((message) => {
-        // console.log('registry message: ' + message)
-        this.inner.free()
-      })
-      this.finalizationRegistry.register(this, this.nickname)
     } else {
       const other = arg
       if (!(other instanceof OHPKM)) {
@@ -78,157 +63,8 @@ export class Pk7Rust {
       }
 
       this.inner = Pk7.fromOhpkmBytes(new Uint8Array(other.toBytes()))
-      // console.log('registering ' + this.inner.nickname)
-      this.finalizationRegistry = new FinalizationRegistry((message) => {
-        console.log('registry message: ' + message)
-        this.inner.free()
-      })
-      this.finalizationRegistry.register(this, this.nickname)
 
       return
-
-      // this.inner.set_species_and_forme(other.dexNum, other.formNum ?? 0)
-
-      // this.encryptionConstant = other.encryptionConstant ?? 0
-      // this.sanity = other.sanity ?? 0
-      // this.checksum = other.checksum ?? 0
-      // this.heldItemIndex = ItemFromString(other.heldItemName)
-      // this.trainerID = other.trainerID
-      // this.secretID = other.secretID
-      // this.exp = other.exp
-      // this.abilityIndex = other.abilityIndex ?? 0
-      // this.abilityNum = other.abilityNum ?? 0
-      // this.markings = types.markingsSixShapesWithColorFromOther(other.markings) ?? {
-      //   circle: false,
-      //   triangle: false,
-      //   square: false,
-      //   heart: false,
-      //   star: false,
-      //   diamond: false,
-      // }
-      // this.personalityValue = other.personalityValue ?? 0
-      // this.nature = other.nature ?? 0
-      // this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      // this.gender = other.gender ?? 0
-      // this.evs = other.evs ?? {
-      //   hp: 0,
-      //   atk: 0,
-      //   def: 0,
-      //   spe: 0,
-      //   spa: 0,
-      //   spd: 0,
-      // }
-      // this.contest = other.contest ?? {
-      //   cool: 0,
-      //   beauty: 0,
-      //   cute: 0,
-      //   smart: 0,
-      //   tough: 0,
-      //   sheen: 0,
-      // }
-      // this.resortEventStatus = other.resortEventStatus ?? 0
-      // this.pokerusByte = other.pokerusByte ?? 0
-      // this.superTrainingFlags = other.superTrainingFlags ?? 0
-      // this.contestMemoryCount = other.contestMemoryCount ?? 0
-      // this.battleMemoryCount = other.battleMemoryCount ?? 0
-      // this.superTrainingDistFlags = other.superTrainingDistFlags ?? 0
-      // this.formArgument = other.formArgument ?? 0
-      // this.nickname = other.nickname
-      // this.moves = other.moves.filter((_, i) => other.moves[i] <= Pk7Rust.maxValidMove())
-      // this.movePP = adjustMovePPBetweenFormats(this, other).filter(
-      //   (_, i) => other.moves[i] <= Pk7Rust.maxValidMove()
-      // )
-      // this.movePPUps = other.movePPUps.filter((_, i) => other.moves[i] <= Pk7Rust.maxValidMove())
-      // this.relearnMoves = other.relearnMoves?.filter(
-      //   (_, i) => other.moves[i] <= Pk7Rust.maxValidMove()
-      // ) ?? [0, 0, 0, 0]
-      // this.secretSuperTrainingUnlocked = other.secretSuperTrainingUnlocked ?? false
-      // this.secretSuperTrainingComplete = other.secretSuperTrainingComplete ?? false
-      // this.ivs = other.ivs ?? {
-      //   hp: 0,
-      //   atk: 0,
-      //   def: 0,
-      //   spe: 0,
-      //   spa: 0,
-      //   spd: 0,
-      // }
-      // this.isEgg = other.isEgg ?? false
-      // this.isNicknamed = other.isNicknamed ?? false
-      // this.handlerName = other.handlerName ?? ''
-      // this.handlerGender = other.handlerGender ?? false
-      // this.isCurrentHandler = other.isCurrentHandler ?? false
-      // this.geolocations = other.geolocations ?? [
-      //   {
-      //     region: 0,
-      //     country: 0,
-      //   },
-      //   {
-      //     region: 0,
-      //     country: 0,
-      //   },
-      //   {
-      //     region: 0,
-      //     country: 0,
-      //   },
-      //   {
-      //     region: 0,
-      //     country: 0,
-      //   },
-      //   {
-      //     region: 0,
-      //     country: 0,
-      //   },
-      // ]
-      // this.handlerFriendship = other.handlerFriendship ?? 0
-      // this.handlerAffection = other.handlerAffection ?? 0
-      // this.fullness = other.fullness ?? 0
-      // this.enjoyment = other.enjoyment ?? 0
-      // this.trainerName = other.trainerName
-      // this.trainerFriendship = other.trainerFriendship ?? 0
-      // this.trainerAffection = other.trainerAffection ?? 0
-      // this.eggDate = other.eggDate ?? undefined
-      // this.metDate = other.metDate ?? {
-      //   month: new Date().getMonth(),
-      //   day: new Date().getDate(),
-      //   year: new Date().getFullYear(),
-      // }
-      // this.eggLocationIndex = other.eggLocationIndex ?? 0
-      // this.metLocationIndex = other.metLocationIndex ?? 0
-      // if (other.ball && Pk7Rust.maxValidBall() >= other.ball) {
-      //   this.ball = other.ball
-      // } else {
-      //   this.ball = Ball.Poke
-      // }
-      // this.metLevel = other.metLevel ?? 0
-      // this.hyperTraining = other.hyperTraining ?? {
-      //   hp: false,
-      //   atk: false,
-      //   def: false,
-      //   spa: false,
-      //   spd: false,
-      //   spe: false,
-      // }
-      // this.gameOfOrigin = other.gameOfOrigin
-      // this.country = other.country ?? 0
-      // this.region = other.region ?? 0
-      // this.consoleRegion = other.consoleRegion ?? 0
-      // this.languageIndex = other.languageIndex
-      // this.statusCondition = other.statusCondition ?? 0
-      // this.currentHP = other.currentHP ?? 0
-      // this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], 'Battle Tree Master') ?? []
-      // this.handlerMemory = other.handlerMemory ?? {
-      //   intensity: 0,
-      //   memory: 0,
-      //   feeling: 0,
-      //   textVariables: 0,
-      // }
-      // this.trainerMemory = other.trainerMemory ?? {
-      //   intensity: 0,
-      //   memory: 0,
-      //   feeling: 0,
-      //   textVariables: 0,
-      // }
-      // this.trainerGender = other.trainerGender
     }
   }
 

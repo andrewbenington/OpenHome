@@ -1,14 +1,14 @@
-import * as fs from "fs";
+import * as fs from 'fs'
 
 interface Move {
-  id: number;
-  name: string;
-  accuracy: number | null;
-  class: string;
-  generation: string;
-  power: number | null;
-  pp: number;
-  type: string;
+  id: number
+  name: string
+  accuracy: number | null
+  class: string
+  generation: string
+  power: number | null
+  pp: number
+  type: string
 }
 
 function isZMoveWithVariants(move: Move) {
@@ -18,9 +18,9 @@ function isZMoveWithVariants(move: Move) {
 function rustConstName(move: Move): string {
   let constName = move.name
     .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "_")
-    .replace(/_+/g, "_")
-    .replace("10_000_000", "TEN_MILLION");
+    .replace(/[^A-Z0-9]/g, '_')
+    .replace(/_+/g, '_')
+    .replace('10_000_000', 'TEN_MILLION')
   if (isZMoveWithVariants(move)) {
     constName += `_${move.class.toUpperCase()}`
   }
@@ -29,42 +29,42 @@ function rustConstName(move: Move): string {
 }
 
 function capitalize(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
 }
 
 function convertMove(id: string, move: Move): string {
-  const constName = rustConstName(move);
-  const moveClass = `MoveClass::${capitalize(move.class)}`;
+  const constName = rustConstName(move)
+  const moveClass = `MoveClass::${capitalize(move.class)}`
   const gen = {
-    "generation-i": "G1",
-    "generation-ii": "G2",
-    "generation-iii": "G3",
-    "generation-iv": "G4",
-    "generation-v": "G5",
-    "generation-vi": "G6",
-    "generation-vii": "G7",
-    "generation-viii": "G8",
-    "generation-ix": "G9",
-  }[move.generation];
+    'generation-i': 'G1',
+    'generation-ii': 'G2',
+    'generation-iii': 'G3',
+    'generation-iv': 'G4',
+    'generation-v': 'G5',
+    'generation-vi': 'G6',
+    'generation-vii': 'G7',
+    'generation-viii': 'G8',
+    'generation-ix': 'G9',
+  }[move.generation]
 
   if (!gen) {
-    throw new Error(`Unknown generation: ${move.generation}`);
+    throw new Error(`Unknown generation: ${move.generation}`)
   }
 
   return `const ${constName}: MoveMetadata = MoveMetadata {
     id: ${move.id},
     name: "${move.name}",
-    accuracy: ${move.accuracy !== null ? `Some(${move.accuracy})` : "None"},
+    accuracy: ${move.accuracy !== null ? `Some(${move.accuracy})` : 'None'},
     class: ${moveClass},
     introduced: Generation::${gen},
-    power: ${move.power !== null ? `Some(${move.power})` : "None"},
+    power: ${move.power !== null ? `Some(${move.power})` : 'None'},
     pp: ${move.pp},
     pkm_type: PkmType::${capitalize(move.type)},
-};`;
+};`
 }
 
 function main() {
-  const input: Record<string, Move> = JSON.parse(fs.readFileSync("text_source/moves.json", "utf-8"));
+  const input: Record<string, Move> = JSON.parse(fs.readFileSync('text_source/moves.json', 'utf-8'))
 
   let output = `use std::num::NonZeroU16;
 use wasm_bindgen::prelude::*;
@@ -145,14 +145,17 @@ pub enum MoveClass {
 
   output += Object.entries(input)
     .map(([id, move]) => convertMove(id, move))
-    .join("\n\n");
+    .join('\n\n')
 
-  output += `const ALL_MOVES: [&MoveMetadata; ${Object.keys(input).length}] = [\n` + Object.entries(input)
-    .map(([, move]) => "&" + rustConstName(move))
-    .join(",\n") + "];";
+  output +=
+    `const ALL_MOVES: [&MoveMetadata; ${Object.keys(input).length}] = [\n` +
+    Object.entries(input)
+      .map(([, move]) => '&' + rustConstName(move))
+      .join(',\n') +
+    '];'
 
-  fs.writeFileSync("src/resources/moves.rs", output);
-  console.log("Rust code written to src/resources/moves.rs");
+  fs.writeFileSync('src/resources/moves.rs', output)
+  console.log('Rust code written to src/resources/moves.rs')
 }
 
-main();
+main()

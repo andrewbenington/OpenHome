@@ -51,11 +51,18 @@
   "rust-analyzer.check.command": "clippy",
   "rust-analyzer.linkedProjects": [
     "${workspaceFolder}/Cargo.toml",
-    "${workspaceFolder}/pkm_rs/Cargo.toml",
+    "${workspaceFolder}/pkm_rs/Cargo.toml"
   ],
   "editor.inlayHints.enabled": "off",
   "editor.tabSize": 2,
-  "rust-analyzer.cargo.features": ["pkm_rs_resources/wasm", "pkm_rs_types/wasm", "pkm_rs/wasm", "pkm_rs_types/randomize", "pkm_rs_resources/randomize", "pkm_rs/randomize"],
+  "rust-analyzer.cargo.features": [
+    "pkm_rs_resources/wasm",
+    "pkm_rs_types/wasm",
+    "pkm_rs/wasm",
+    "pkm_rs_types/randomize",
+    "pkm_rs_resources/randomize",
+    "pkm_rs/randomize"
+  ],
   "css.completion.completePropertyWithSemicolon": false,
   "rust-analyzer.cargo.targetDir": true,
   "python.defaultInterpreterPath": "generate/.venv/bin/python",

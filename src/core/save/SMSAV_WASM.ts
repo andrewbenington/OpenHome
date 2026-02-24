@@ -2,13 +2,14 @@ import { OriginGame, SunMoonSave } from '@pkm-rs/pkg'
 import Pk7Rust from '../../../packages/pokemon-files/src/pkm/wasm/PK7'
 import { Item } from '../../../packages/pokemon-resources/src/consts/Items'
 import { SM_TRANSFER_RESTRICTIONS } from '../../../packages/pokemon-resources/src/consts/TransferRestrictions'
-import { Box, BoxCoordinates, OfficialSAV } from './interfaces'
+import { OHPKM } from '../pkm/OHPKM'
+import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
 import { isRestricted } from './util/TransferRestrictions'
 
 const SAVE_SIZE_BYTES = 0x6be00
 
-export class SMSAV_WASM extends OfficialSAV<Pk7Rust> {
+export class SunMoonSaveWasm extends OfficialSAV<Pk7Rust> {
   static pkmType = Pk7Rust
   static saveTypeAbbreviation = 'SM/USUM WASM'
   static saveTypeID = 'G7SAV WASM'
@@ -32,7 +33,7 @@ export class SMSAV_WASM extends OfficialSAV<Pk7Rust> {
   invalid = false
   tooEarlyToOpen = false
 
-  updatedBoxSlots: BoxCoordinates[] = []
+  updatedBoxSlots: BoxAndSlot[] = []
 
   constructor(path: PathData, bytes: Uint8Array) {
     super()
@@ -54,7 +55,7 @@ export class SMSAV_WASM extends OfficialSAV<Pk7Rust> {
             const mon = this.inner.get_mon_at(box, monIndex)
 
             if (mon.game_of_origin !== 0 && mon.species_and_forme.nationalDex !== 0) {
-              this.boxes[box].pokemon[monIndex] = new Pk7Rust(mon)
+              this.boxes[box].boxSlots[monIndex] = new Pk7Rust(mon)
             }
           } catch (e) {
             console.error(`Error loading mon in box ${box + 1}, slot ${monIndex + 1}:`, e)
@@ -96,6 +97,10 @@ export class SMSAV_WASM extends OfficialSAV<Pk7Rust> {
     return this.inner.trainer.trainer_gender
   }
 
+  convertOhpkm(ohpkm: OHPKM): Pk7Rust {
+    return new Pk7Rust(ohpkm)
+  }
+
   supportsMon(dexNumber: number, formeNumber: number): boolean {
     return !isRestricted(SM_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
@@ -108,7 +113,7 @@ export class SMSAV_WASM extends OfficialSAV<Pk7Rust> {
     return this.boxes[this.currentPCBox]
   }
 
-  prepareBoxesAndGetModified() {
+  prepareForSaving() {
     return []
   }
 }

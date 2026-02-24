@@ -1,12 +1,6 @@
-#[cfg(feature = "wasm")]
-use js_sys::Set;
 use serde::Serialize;
 use std::fmt::Display;
 
-#[cfg(feature = "wasm")]
-use wasm_bindgen::convert::*;
-#[cfg(feature = "wasm")]
-use wasm_bindgen::describe::*;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -22,25 +16,6 @@ use crate::ribbons::ribbon_set::RibbonSet;
 
 pub type ModernRibbonSet<const N: usize, const MAX: usize = { ModernRibbon::Partner as usize }> =
     RibbonSet<N, ModernRibbon, MAX>;
-
-impl<const N: usize, const MAX: usize> WasmDescribe for ModernRibbonSet<N, MAX> {
-    fn describe() {
-        js_sys::Set::describe()
-    }
-}
-
-#[cfg(feature = "wasm")]
-impl<const N: usize, const MAX: usize> IntoWasmAbi for ModernRibbonSet<N, MAX> {
-    type Abi = <Set as IntoWasmAbi>::Abi;
-
-    fn into_abi(self) -> Self::Abi {
-        let set = Set::new(&JsValue::UNDEFINED);
-        for ribbon in self.get_ribbons() {
-            set.add(&JsValue::from(ribbon as u32));
-        }
-        set.into_abi()
-    }
-}
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
