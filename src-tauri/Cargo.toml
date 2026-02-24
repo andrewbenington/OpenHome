@@ -21,25 +21,25 @@ opt-level = "s" # Optimize for binary size
 strip = true # Remove debug symbols
 
 [build-dependencies]
-tauri-build = { version = "2.5.1", features = [] }
+tauri-build = { version = "2.5.5", features = [] }
 
 [dependencies]
 pkm_rs = {path = "../pkm_rs"}
-tauri = { version = "2.9.5", features = [] }
-tauri-plugin-shell = "2.3.4"
+tauri = { version = "2.10.2", features = [] }
+tauri-plugin-shell = "2.3.5"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 tauri-plugin-os = "2.3.2"
 tauri-plugin-dialog = "2.6.0"
-tauri-plugin-fs = "2.4.2"
-reqwest = { version = "0.13.1" }
+tauri-plugin-fs = "2.4.5"
+reqwest = { version = "0.13.2" }
 base64 = "0.22.1"
-zip = "7.2.0"
+zip = "8.1.0"
 static_assertions = "1.1.0"
-bytes = "1.11.0"
+bytes = "1.11.1"
 semver = "1.0.27"
-strum = { version = "0.27.2", features = ["derive"] }
-uuid = { version = "1.20.0", features = ["v4"] }
+strum = { version = "0.28.0", features = ["derive"] }
+uuid = { version = "1.21.0", features = ["v4"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 dialog = "0.3.0"
