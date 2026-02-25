@@ -690,7 +690,7 @@ impl std::fmt::Display for OriginMark {
             Self::Bdsp => "Bdsp",
             Self::Tera => "Tera",
             Self::Mega => "Mega",
-            Self::Go => "Go",
+            Self::Go => "GO",
         };
         write!(f, "{s}")
     }
