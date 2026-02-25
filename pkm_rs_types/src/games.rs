@@ -267,7 +267,7 @@ impl OriginGame {
             Self::Y => Some("Y".to_owned()),
             Self::OmegaRuby => Some("OmegaRuby".to_owned()),
             Self::AlphaSapphire => Some("AlphaSapphire".to_owned()),
-            Self::Go => Some("Go".to_owned()),
+            Self::Go => Some("GO".to_owned()),
             Self::Sun => Some("Sun".to_owned()),
             Self::Moon => Some("Moon".to_owned()),
             Self::UltraSun => Some("UltraSun".to_owned()),
