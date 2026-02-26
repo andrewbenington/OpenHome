@@ -1,6 +1,6 @@
 use crate::conversion::gen3_pokemon_index::Gen3PokemonIndex;
 use crate::pkm::traits::IsShiny8192;
-use crate::pkm::{Error, Pkm, Result};
+use crate::pkm::{Error, HasSpeciesAndForme, PkmBytes, Result};
 use crate::strings::Gen3String;
 use crate::{read_move_slot, read_u16_le, read_u32_le, util};
 
@@ -174,7 +174,7 @@ impl UnownForm {
     }
 }
 
-impl Pkm for Pk3 {
+impl PkmBytes for Pk3 {
     const BOX_SIZE: usize = 80;
     const PARTY_SIZE: usize = 100;
 
@@ -182,7 +182,7 @@ impl Pkm for Pk3 {
         Self::from_bytes(bytes)
     }
 
-    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+    fn write_box_bytes(&self, bytes: &mut [u8]) {
         bytes[0..4].copy_from_slice(&self.personality_value.to_le_bytes());
         bytes[4..6].copy_from_slice(&self.trainer_id.to_le_bytes());
         bytes[6..8].copy_from_slice(&self.secret_id.to_le_bytes());
@@ -229,39 +229,33 @@ impl Pkm for Pk3 {
         util::set_flag(bytes, 72, 31, self.has_second_ability);
         bytes[76..80].copy_from_slice(&self.ribbons.to_u32().to_le_bytes());
         util::set_flag(bytes, 76, 31, self.is_fateful_encounter);
-
-        Ok(())
     }
 
-    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()> {
-        if bytes.len() < Pk3::PARTY_SIZE {
-            return Err(Error::buffer_size(Pk3::PARTY_SIZE, bytes.len()));
-        }
-
-        self.write_box_bytes(bytes)?;
+    fn write_party_bytes(&self, bytes: &mut [u8]) {
+        self.write_box_bytes(bytes);
         bytes[80..84].copy_from_slice(&self.status_condition.to_le_bytes());
         bytes[84] = self.stat_level;
         bytes[85] = self.mail_id;
         bytes[86..88].copy_from_slice(&self.current_hp.to_le_bytes());
         bytes[88..100].copy_from_slice(self.stats.to_bytes().as_ref());
-
-        Ok(())
     }
 
-    fn to_box_bytes(&self) -> Result<Vec<u8>> {
+    fn to_box_bytes(&self) -> Vec<u8> {
         let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes)?;
+        self.write_box_bytes(&mut bytes);
 
-        Ok(Vec::from(bytes))
+        Vec::from(bytes)
     }
 
-    fn to_party_bytes(&self) -> Result<Vec<u8>> {
+    fn to_party_bytes(&self) -> Vec<u8> {
         let mut bytes = [0; Self::PARTY_SIZE];
-        self.write_party_bytes(&mut bytes)?;
+        self.write_party_bytes(&mut bytes);
 
-        Ok(Vec::from(bytes))
+        Vec::from(bytes)
     }
+}
 
+impl HasSpeciesAndForme for Pk3 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
         self.get_species_and_forme().get_species_metadata()
     }
@@ -283,8 +277,24 @@ mod tests {
 
     #[test]
     fn test_unown_form_calculation() {
-        let personality_value_e = 0x68631271;
-        let unown_e = UnownForm::from_pid(personality_value_e);
-        assert_eq!(unown_e, UnownForm::new(4));
+        let letter_to_pid: std::collections::HashMap<char, u32> = [
+            ('E', 0x7A12C368),
+            ('Q', 0x7A1DC364),
+            ('T', 0xF29D4BE7),
+            ('Z', 0x1135A84D),
+        ]
+        .into_iter()
+        .collect();
+
+        for (letter, &pid) in &letter_to_pid {
+            let expected_index = *letter as u8 - b'A';
+            let unown = UnownForm::from_pid(pid);
+            assert_eq!(
+                unown,
+                UnownForm::new(expected_index),
+                "Expected Unown letter {letter}; but calculated {}.",
+                (unown.0 + b'A') as char
+            );
+        }
     }
 }

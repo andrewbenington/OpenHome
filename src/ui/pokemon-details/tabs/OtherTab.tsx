@@ -467,19 +467,19 @@ function u32Display(val: number) {
 }
 
 function hexStr(val: number, digits: number) {
-  return '0x' + changeEndianness(val.toString(16).toUpperCase().padStart(digits, '0'))
+  return '0x' + val.toString(16).toUpperCase().padStart(digits, '0')
 }
 
-const changeEndianness = (hex: string) => {
-  const result = []
-  let len = hex.length - 2
+// const changeEndianness = (hex: string) => {
+//   const result = []
+//   let len = hex.length - 2
 
-  while (len >= 0) {
-    result.push(hex.substr(len, 2))
-    len -= 2
-  }
-  return result.join('')
-}
+//   while (len >= 0) {
+//     result.push(hex.substr(len, 2))
+//     len -= 2
+//   }
+//   return result.join('')
+// }
 
 function getFlagsInArrayRange(bytes: Uint8Array, offset: number, size: number) {
   return getFlagsInRange(new DataView(bytes.buffer), offset, size)

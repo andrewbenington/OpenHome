@@ -58,10 +58,10 @@
   "rust-analyzer.cargo.features": [
     "pkm_rs_resources/wasm",
     "pkm_rs_types/wasm",
-    "pkm_rs/wasm",
-    "pkm_rs_types/randomize",
-    "pkm_rs_resources/randomize",
-    "pkm_rs/randomize"
+    "pkm_rs/wasm"
+    // "pkm_rs_types/randomize",
+    // "pkm_rs_resources/randomize",
+    // "pkm_rs/randomize"
   ],
   "css.completion.completePropertyWithSemicolon": false,
   "rust-analyzer.cargo.targetDir": true,

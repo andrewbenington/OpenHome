@@ -2,13 +2,13 @@ use crate::pkm::plugins::cfru::conversion::moves::{
     from_gen3_cfru_move_index, to_gen3_cfru_move_index,
 };
 use crate::pkm::traits::IsShiny;
-use crate::pkm::{Error, Pkm, Result};
+use crate::pkm::{Error, PkmBytes, Result};
 use crate::strings::Gen3String;
 use crate::{read_u16_le, read_u32_le, util};
 
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::MoveSlot;
-use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_resources::species::SpeciesAndForme;
 use pkm_rs_types::Gender;
 use pkm_rs_types::{MarkingsFourShapes, OriginGame, Stats8};
 use serde::Serialize;
@@ -69,42 +69,22 @@ fn cfru_ball_index(ball: Ball) -> u8 {
     }
 }
 
-pub trait CfruMapping {
-    fn mon_from_game_index(idx: u16) -> Result<SpeciesAndForme>;
-    fn mon_to_game_index(species: &SpeciesAndForme) -> Result<u16>;
+pub trait CfruSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy {
+    fn try_to_species_and_forme(self) -> Result<SpeciesAndForme>;
+    fn try_from_species_and_forme(species: &SpeciesAndForme) -> Result<Self>;
 
     // fn move_from_game_index(gameIndex: u16) -> Result<u16>;
 
     // fn move_to_game_index(nationalMoveId: u16) -> Result<u16>;
 
-    fn is_fakemon(species_idx: u16) -> bool {
-        let _ = species_idx;
-        false
-    }
+    fn is_fakemon(&self) -> bool;
     fn plugin_identifier() -> &'static str;
-}
-
-pub struct BaseCfruMapping;
-
-impl CfruMapping for BaseCfruMapping {
-    fn mon_from_game_index(_idx: u16) -> Result<SpeciesAndForme> {
-        Err(Error::Other("CFRU is an abstract class.".into()))
-    }
-    fn mon_to_game_index(_species: &SpeciesAndForme) -> Result<u16> {
-        Err(Error::Other("CFRU is an abstract class.".into()))
-    }
-
-    fn plugin_identifier() -> &'static str {
-        "cfru"
-    }
 }
 
 /// PK3CFRU (58 bytes)
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone)]
-pub struct Pk3Cfru<M: CfruMapping = BaseCfruMapping> {
-    _marker: std::marker::PhantomData<M>,
-
+pub struct Pk3Cfru<I: CfruSpeciesIndex> {
     // Personality 0:4
     pub personality_value: u32,
 
@@ -128,8 +108,7 @@ pub struct Pk3Cfru<M: CfruMapping = BaseCfruMapping> {
     pub markings: MarkingsFourShapes,
 
     // Species 28:30
-    pub species_and_forme: SpeciesAndForme,
-    cfru_species_index: u16, // raw CFRU game index
+    pub cfru_species_index: I, // raw CFRU game index
 
     // Held Item 30:32
     pub held_item_index: u16,
@@ -175,7 +154,7 @@ pub struct Pk3Cfru<M: CfruMapping = BaseCfruMapping> {
     pub current_hp: u16,
 }
 
-impl<M: CfruMapping> Pk3Cfru<M> {
+impl<I: CfruSpeciesIndex> Pk3Cfru<I> {
     pub const BOX_SIZE: usize = 58;
     pub const PARTY_SIZE: usize = 100;
 
@@ -231,16 +210,17 @@ impl<M: CfruMapping> Pk3Cfru<M> {
         bytes[base + 3] = ((v >> 24) & 0xFF) as u8;
         bytes[base + 4] = ((v >> 32) & 0xFF) as u8;
     }
+}
 
-    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
+impl<I: CfruSpeciesIndex> PkmBytes for Pk3Cfru<I> {
+    const BOX_SIZE: usize = Pk3Cfru::<I>::BOX_SIZE;
+    const PARTY_SIZE: usize = Pk3Cfru::<I>::PARTY_SIZE;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < Self::BOX_SIZE {
             return Err(Error::buffer_size(Self::BOX_SIZE, size));
         }
-
-        // 0x1C..0x1E: CFRU game species index
-        let cfru_species_index = u16::from_le_bytes(bytes[0x1C..0x1E].try_into().unwrap());
-        let saf = M::mon_from_game_index(cfru_species_index)?;
 
         // 0x34..0x36: met info & flags
         let meta = u16::from_le_bytes(bytes[0x34..0x36].try_into().unwrap());
@@ -264,8 +244,6 @@ impl<M: CfruMapping> Pk3Cfru<M> {
         ];
 
         let mon = Pk3Cfru {
-            _marker: std::marker::PhantomData,
-
             personality_value: read_u32_le!(bytes, 0),
             trainer_id: read_u16_le!(bytes, 4),
             secret_id: read_u16_le!(bytes, 6),
@@ -283,10 +261,8 @@ impl<M: CfruMapping> Pk3Cfru<M> {
             // Markings 27
             markings: MarkingsFourShapes::from_byte(bytes[27]),
 
-            species_and_forme: saf,
-
             // Species 28:30
-            cfru_species_index: read_u16_le!(bytes, 28),
+            cfru_species_index: I::from(read_u16_le!(bytes, 28)),
 
             held_item_index: read_u16_le!(bytes, 30),
             exp: read_u32_le!(bytes, 32),
@@ -311,37 +287,8 @@ impl<M: CfruMapping> Pk3Cfru<M> {
 
         Ok(mon)
     }
-}
 
-impl<M: CfruMapping> IsShiny for Pk3Cfru<M> {
-    fn is_shiny(&self) -> bool {
-        let tid = self.trainer_id as u32;
-        let sid = self.secret_id as u32;
-        let pid = self.personality_value;
-
-        let xor = tid ^ sid ^ (pid & 0xFFFF) ^ ((pid >> 16) & 0xFFFF);
-        xor < 8
-    }
-
-    fn is_square_shiny(&self) -> bool {
-        let tid = self.trainer_id as u32;
-        let sid = self.secret_id as u32;
-        let pid = self.personality_value;
-
-        let xor = tid ^ sid ^ (pid & 0xFFFF) ^ ((pid >> 16) & 0xFFFF);
-        xor == 0
-    }
-}
-
-impl<M: CfruMapping> Pkm for Pk3Cfru<M> {
-    const BOX_SIZE: usize = Pk3Cfru::<M>::BOX_SIZE;
-    const PARTY_SIZE: usize = Pk3Cfru::<M>::PARTY_SIZE;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::from_bytes(bytes)
-    }
-
-    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+    fn write_box_bytes(&self, bytes: &mut [u8]) {
         // Zero buffer then fill
         for b in bytes.iter_mut().take(Self::BOX_SIZE) {
             *b = 0;
@@ -370,8 +317,7 @@ impl<M: CfruMapping> Pkm for Pk3Cfru<M> {
         bytes[27] = self.markings.to_byte();
 
         // 28:30 Species (DexNum / CFRU game index)
-        bytes[28..30]
-            .copy_from_slice(&M::mon_to_game_index(&self.species_and_forme)?.to_le_bytes());
+        bytes[28..30].copy_from_slice(&self.cfru_species_index.into().to_le_bytes());
 
         // 30:32 Held Item
         bytes[30..32].copy_from_slice(&self.held_item_index.to_le_bytes());
@@ -415,38 +361,96 @@ impl<M: CfruMapping> Pkm for Pk3Cfru<M> {
         self.ivs.write_30_bits(bytes, 54);
         util::set_flag(bytes, 54, 30, self.is_egg);
         util::set_flag(bytes, 54, 31, self.has_hidden_ability);
-
-        Ok(())
     }
 
-    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+    fn write_party_bytes(&self, bytes: &mut [u8]) {
         // CFRU uses the same 58 bytes; no extra party-only block provided.
-        self.write_box_bytes(bytes)
+        self.write_box_bytes(bytes);
     }
 
-    fn to_box_bytes(&self) -> Result<Vec<u8>> {
+    fn to_box_bytes(&self) -> Vec<u8> {
         let mut bytes = vec![0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes)?;
-        Ok(bytes)
+        self.write_box_bytes(&mut bytes);
+        bytes
     }
 
-    fn to_party_bytes(&self) -> Result<Vec<u8>> {
+    fn to_party_bytes(&self) -> Vec<u8> {
         let mut bytes = vec![0; Self::PARTY_SIZE];
-        self.write_party_bytes(&mut bytes)?;
-        Ok(bytes)
-    }
-
-    fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.species_and_forme.get_species_metadata()
-    }
-
-    fn get_forme_metadata(&self) -> &'static FormeMetadata {
-        self.species_and_forme.get_forme_metadata()
-    }
-
-    fn calculate_level(&self) -> u8 {
-        self.get_species_metadata()
-            .level_up_type
-            .calculate_level(self.exp)
+        self.write_party_bytes(&mut bytes);
+        bytes
     }
 }
+
+impl<I: CfruSpeciesIndex> IsShiny for Pk3Cfru<I> {
+    fn is_shiny(&self) -> bool {
+        let tid = self.trainer_id as u32;
+        let sid = self.secret_id as u32;
+        let pid = self.personality_value;
+
+        let xor = tid ^ sid ^ (pid & 0xFFFF) ^ ((pid >> 16) & 0xFFFF);
+        xor < 8
+    }
+
+    fn is_square_shiny(&self) -> bool {
+        let tid = self.trainer_id as u32;
+        let sid = self.secret_id as u32;
+        let pid = self.personality_value;
+
+        let xor = tid ^ sid ^ (pid & 0xFFFF) ^ ((pid >> 16) & 0xFFFF);
+        xor == 0
+    }
+}
+
+// pub struct Pk3CfruNonFakemon<I: CfruSpeciesIndex>(pub(super) Pk3Cfru<I>);
+
+// impl<I: CfruSpeciesIndex> IsShiny for Pk3CfruNonFakemon<I> {
+//     fn is_shiny(&self) -> bool {
+//         self.0.is_shiny()
+//     }
+
+//     fn is_square_shiny(&self) -> bool {
+//         self.0.is_square_shiny()
+//     }
+// }
+
+// impl<I: CfruSpeciesIndex> Serialize for Pk3CfruNonFakemon<I> {
+//     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+//     where
+//         S: serde::Serializer,
+//     {
+//         self.0.serialize(serializer)
+//     }
+// }
+
+// impl<I: CfruSpeciesIndex> PkmBytes for Pk3CfruNonFakemon<I> {
+//     const BOX_SIZE: usize = Pk3Cfru::BOX_SIZE;
+//     const PARTY_SIZE: usize = Pk3Cfru::PARTY_SIZE;
+
+//     fn from_bytes(bytes: &[u8]) -> Result<Self> {
+//         Pk3Cfru::<I>::from_bytes(bytes).map(Self)
+//     }
+
+//     fn write_box_bytes(&self, bytes: &mut [u8]) {
+//         self.0.write_box_bytes(bytes);
+//     }
+
+//     fn write_party_bytes(&self, bytes: &mut [u8]) {
+//         self.0.write_party_bytes(bytes);
+//     }
+// }
+
+// impl<I: CfruSpeciesIndex> HasSpeciesAndForme for Pk3CfruNonFakemon<I> {
+//     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
+//         self.try_get_species_and_forme().get_species_metadata()
+//     }
+
+//     fn get_forme_metadata(&self) -> &'static FormeMetadata {
+//         self.species_and_forme.get_forme_metadata()
+//     }
+
+//     fn calculate_level(&self) -> u8 {
+//         self.get_species_metadata()
+//             .level_up_type
+//             .calculate_level(self.exp)
+//     }
+// }

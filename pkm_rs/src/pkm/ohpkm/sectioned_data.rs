@@ -11,7 +11,7 @@ pub trait DataSection: Sized {
     const TAG: Self::TagType;
 
     fn from_bytes(bytes: &[u8]) -> CoreResult<Self, Self::ErrorType>;
-    fn to_bytes(&self) -> CoreResult<Vec<u8>, Self::ErrorType>;
+    fn to_bytes(&self) -> Vec<u8>;
     fn is_empty(&self) -> bool;
 
     fn extract_from(
@@ -31,25 +31,15 @@ pub trait DataSection: Sized {
             .collect()
     }
 
-    fn ensure_buffer_size(bytes: &[u8]) -> Result<()> {
-        if bytes.len() < Self::TAG.min_size() {
-            Err(Error::BufferTooShort {
-                field: Self::TAG.to_string(),
-                expected: Self::TAG.min_size(),
-                received: bytes.len(),
-            })
-        } else {
-            Ok(())
-        }
+    fn ensure_buffer_size(bytes: &[u8]) {
+        debug_assert!(bytes.len() >= Self::TAG.min_size())
     }
 
-    fn to_tagged_buffer(&self) -> CoreResult<TaggedBuffer<Self::TagType>, Self::ErrorType> {
-        let bytes = self.to_bytes()?;
-
-        Ok(TaggedBuffer {
-            bytes,
+    fn to_tagged_buffer(&self) -> TaggedBuffer<Self::TagType> {
+        TaggedBuffer {
+            bytes: self.to_bytes(),
             tag: Self::TAG,
-        })
+        }
     }
 }
 
@@ -156,13 +146,10 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         }
     }
 
-    pub fn add<T: DataSection<TagType = Tag>>(
-        &mut self,
-        section: T,
-    ) -> CoreResult<&mut Self, T::ErrorType> {
-        self.tagged_buffers.push(section.to_tagged_buffer()?);
+    pub fn add<T: DataSection<TagType = Tag>>(&mut self, section: T) -> &mut Self {
+        self.tagged_buffers.push(section.to_tagged_buffer());
 
-        Ok(self)
+        self
     }
 
     pub fn add_if_not_empty<T: DataSection<TagType = Tag>>(
@@ -170,33 +157,27 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         section: T,
     ) -> CoreResult<&mut Self, T::ErrorType> {
         if !section.is_empty() {
-            self.tagged_buffers.push(section.to_tagged_buffer()?);
+            self.tagged_buffers.push(section.to_tagged_buffer());
         }
 
         Ok(self)
     }
 
-    pub fn add_if_some<T: DataSection<TagType = Tag>>(
-        &mut self,
-        section: Option<T>,
-    ) -> CoreResult<&mut Self, T::ErrorType> {
+    pub fn add_if_some<T: DataSection<TagType = Tag>>(&mut self, section: Option<T>) -> &mut Self {
         if let Some(section) = section {
-            self.tagged_buffers.push(section.to_tagged_buffer()?);
+            self.tagged_buffers.push(section.to_tagged_buffer());
         }
 
-        Ok(self)
+        self
     }
 
-    pub fn add_all<T: DataSection<TagType = Tag>>(
-        &mut self,
-        sections: Vec<T>,
-    ) -> CoreResult<&mut Self, T::ErrorType> {
+    pub fn add_all<T: DataSection<TagType = Tag>>(&mut self, sections: Vec<T>) -> &mut Self {
         for section in sections.into_iter() {
             self.tagged_buffers
-                .push(DataSection::to_tagged_buffer(&section)?);
+                .push(DataSection::to_tagged_buffer(&section));
         }
 
-        Ok(self)
+        self
     }
 
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -261,7 +242,7 @@ impl<Tag: SectionTag> SectionedData<Tag> {
         })
     }
 
-    pub fn to_bytes(self) -> Result<Vec<u8>> {
+    pub fn to_bytes(self) -> Vec<u8> {
         let mut buffer = Vec::<u8>::new();
 
         buffer.extend_from_slice(&self.magic_number.to_le_bytes());
@@ -286,7 +267,7 @@ impl<Tag: SectionTag> SectionedData<Tag> {
             buffer.extend_from_slice(&section_bytes);
         }
 
-        Ok(buffer)
+        buffer
     }
 }
 

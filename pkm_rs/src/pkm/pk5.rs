@@ -1,5 +1,5 @@
 use crate::pkm::traits::IsShiny8192;
-use crate::pkm::{Error, Pkm, Result};
+use crate::pkm::{Error, HasSpeciesAndForme, PkmBytes, Result};
 use crate::strings::Gen5String;
 use crate::{read_u16_le, read_u32_le, util};
 
@@ -151,7 +151,7 @@ impl Pk5 {
     }
 }
 
-impl Pkm for Pk5 {
+impl PkmBytes for Pk5 {
     const BOX_SIZE: usize = 136;
     const PARTY_SIZE: usize = 236;
 
@@ -159,7 +159,7 @@ impl Pkm for Pk5 {
         Self::from_bytes(bytes)
     }
 
-    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+    fn write_box_bytes(&self, bytes: &mut [u8]) {
         bytes[0..4].copy_from_slice(&self.personality_value.to_le_bytes());
         bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
         bytes[10..12].copy_from_slice(&self.held_item_index.to_le_bytes());
@@ -215,35 +215,33 @@ impl Pkm for Pk5 {
         bytes[72..96].copy_from_slice(self.nickname.bytes().as_ref());
         bytes[104..120].copy_from_slice(self.trainer_name.bytes().as_ref());
         util::set_flag(bytes, 132, 7, self.trainer_gender);
-
-        Ok(())
     }
 
-    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()> {
-        self.write_box_bytes(bytes)?;
+    fn write_party_bytes(&self, bytes: &mut [u8]) {
+        self.write_box_bytes(bytes);
         bytes[136..140].copy_from_slice(&self.status_condition.to_le_bytes());
         bytes[140] = self.stat_level;
         bytes[141] = self.junk_byte;
         bytes[142] = self.current_hp;
         bytes[142..154].copy_from_slice(&self.stats.to_bytes());
-
-        Ok(())
     }
 
-    fn to_box_bytes(&self) -> Result<Vec<u8>> {
+    fn to_box_bytes(&self) -> Vec<u8> {
         let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes)?;
+        self.write_box_bytes(&mut bytes);
 
-        Ok(Vec::from(bytes))
+        Vec::from(bytes)
     }
 
-    fn to_party_bytes(&self) -> Result<Vec<u8>> {
+    fn to_party_bytes(&self) -> Vec<u8> {
         let mut bytes = [0; Self::PARTY_SIZE];
-        self.write_party_bytes(&mut bytes)?;
+        self.write_party_bytes(&mut bytes);
 
-        Ok(Vec::from(bytes))
+        Vec::from(bytes)
     }
+}
 
+impl HasSpeciesAndForme for Pk5 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
         self.species_and_forme.get_species_metadata()
     }

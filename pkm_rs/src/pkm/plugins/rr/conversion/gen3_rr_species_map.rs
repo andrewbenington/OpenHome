@@ -127,7 +127,7 @@ pub static RR_TO_NATIONAL_DEX_MAP: phf::Map<u16, SpeciesAndForme> = phf_map! {
   119u16 => unsafe { SpeciesAndForme::new_unchecked(119, 0) },
   120u16 => unsafe { SpeciesAndForme::new_unchecked(120, 0) },
   121u16 => unsafe { SpeciesAndForme::new_unchecked(121, 0) },
-  122u16 => unsafe { SpeciesAndForme::new_unchecked(122, 122) },
+  122u16 => unsafe { SpeciesAndForme::new_unchecked(122, 0) },
   123u16 => unsafe { SpeciesAndForme::new_unchecked(123, 0) },
   124u16 => unsafe { SpeciesAndForme::new_unchecked(124, 0) },
   125u16 => unsafe { SpeciesAndForme::new_unchecked(125, 0) },
@@ -255,7 +255,7 @@ pub static RR_TO_NATIONAL_DEX_MAP: phf::Map<u16, SpeciesAndForme> = phf_map! {
   247u16 => unsafe { SpeciesAndForme::new_unchecked(247, 0) },
   248u16 => unsafe { SpeciesAndForme::new_unchecked(248, 0) },
   249u16 => unsafe { SpeciesAndForme::new_unchecked(249, 0) },
-  250u16 => unsafe { SpeciesAndForme::new_unchecked(250, 250) },
+  250u16 => unsafe { SpeciesAndForme::new_unchecked(250, 0) },
   251u16 => unsafe { SpeciesAndForme::new_unchecked(251, 0) },
   // 252-276: not present
   277u16 => unsafe { SpeciesAndForme::new_unchecked(252, 0) },

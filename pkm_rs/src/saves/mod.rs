@@ -2,7 +2,7 @@ use pkm_rs_types::OriginGame;
 use serde::Serialize;
 
 use crate::{
-    pkm::Pkm,
+    pkm::PkmBytes,
     saves::{
         gen7_alola::{SunMoonSave, UltraSunMoonSave},
         lets_go::LetsGoSave,
@@ -14,7 +14,7 @@ pub mod lets_go;
 pub mod gen7_alola;
 
 pub trait SaveDataTrait: Send + Sync {
-    type PkmType: Pkm;
+    type PkmType: PkmBytes;
 
     // fn from_bytes(bytes: Vec<u8>) -> Result<Box<Self>, String>;
     fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Self::PkmType, String>;

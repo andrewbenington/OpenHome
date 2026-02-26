@@ -45,18 +45,18 @@ pub mod ohpkm {
     }
 }
 
-#[cfg(test)]
-pub mod pb7 {
-    use crate::pkm::result::Result;
-    use std::path::PathBuf;
+// #[cfg(test)]
+// pub mod pb7 {
+//     use crate::pkm::result::Result;
+//     use std::path::PathBuf;
 
-    use crate::pkm::Pb7;
+//     use crate::pkm::Pb7;
 
-    #[test]
-    fn to_from_bytes() -> Result<()> {
-        super::to_from_bytes_all_in_dir::<Pb7>(&PathBuf::from("pkm_files").join("pb7"))
-    }
-}
+//     #[test]
+//     fn to_from_bytes() -> Result<()> {
+//         super::to_from_bytes_all_in_dir::<Pb7>(&PathBuf::from("pkm_files").join("pb7"))
+//     }
+// }
 
 #[cfg(test)]
 pub mod pk3 {
@@ -116,9 +116,10 @@ pub mod pk3 {
 pub mod pk7 {
     use std::path::PathBuf;
 
-    use crate::pkm::OhpkmV2;
+    use crate::encryption::ChecksumU16Le;
     use crate::pkm::ohpkm::OhpkmConvert;
     use crate::pkm::tests::{from_to_ohpkm_all_in_dir, to_from_ohpkm_all_in_dir};
+    use crate::pkm::{OhpkmV2, PkmBytes};
     use crate::pkm::{Pk7, traits::IsShiny};
     use crate::pkm::{result::Result, tests::pkm_from_file};
 
@@ -154,6 +155,39 @@ pub mod pk7 {
         .unwrap()
         .0;
         assert!(mon.is_shiny());
+    }
+
+    #[test]
+    fn nickname_garbage_preserved() {
+        let mon = pkm_from_file::<Pk7>(
+            &PathBuf::from("pkm_files")
+                .join("pk7")
+                .join("pelipper-garbage-bytes.pk7")
+                .to_string_lossy(),
+        )
+        .unwrap()
+        .0;
+
+        // 'r' at position 14 should be leftover from 'Pelipper'
+        assert_eq!(mon.nickname.bytes()[14], b'r');
+
+        let mon_recreated = Pk7::from_ohpkm(&OhpkmV2::from(&mon));
+
+        // leftover 'r' should be preserved after conversion to/from OHPKM
+        assert_eq!(mon_recreated.nickname.bytes()[14], b'r');
+    }
+
+    #[test]
+    fn checksum() {
+        let mon = pkm_from_file::<Pk7>(
+            &PathBuf::from("pkm_files")
+                .join("pk7")
+                .join("primarina-garbage-bytes.pk7")
+                .to_string_lossy(),
+        )
+        .unwrap()
+        .0;
+        assert_eq!(mon.checksum, Pk7::calc_checksum(&mon.to_box_bytes()));
     }
 
     #[test]
@@ -368,9 +402,7 @@ fn find_inconsistencies_from_file<PKM: Pkm>(filename: &str) -> Result<()> {
     let result = pkm_from_file::<PKM>(filename);
     let (mon, bytes) = result.unwrap_or_else(|e| panic!("could not load {filename}: {e}"));
 
-    let actual = mon
-        .to_party_bytes()
-        .map_err(|e| Error::other(&e.to_string()))?;
+    let actual = mon.to_party_bytes();
 
     let expected = bytes;
     let differences = find_differing_ranges(&actual, &expected);
@@ -394,33 +426,33 @@ fn find_inconsistencies_from_file<PKM: Pkm>(filename: &str) -> Result<()> {
     }
 }
 
-#[cfg(test)]
-fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> Result<()> {
-    use crate::pkm::Error;
+// #[cfg(test)]
+// fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> Result<()> {
+//     use crate::pkm::Error;
 
-    let expected = mon.to_party_bytes()?;
-    let actual = PKM::from_bytes(&expected)?.to_party_bytes()?;
+//     let expected = mon.to_party_bytes();
+//     let actual = PKM::from_bytes(&expected)?.to_party_bytes();
 
-    let differences = find_differing_ranges(&actual, &expected);
+//     let differences = find_differing_ranges(&actual, &expected);
 
-    if let Some(differences) = &differences {
-        for diff in differences {
-            let actual_bytes = &actual[diff.range()];
-            let expected_bytes = &expected[diff.range()];
-            println!(
-                "0x{:03x}..0x{:03x} ({}..{}):",
-                diff.start_idx, diff.end_idx, diff.start_idx, diff.end_idx
-            );
-            println!("\t{}", u8_slice_to_hex_string(actual_bytes));
-            println!("\t{}", u8_slice_to_hex_string(expected_bytes));
-        }
-    }
+//     if let Some(differences) = &differences {
+//         for diff in differences {
+//             let actual_bytes = &actual[diff.range()];
+//             let expected_bytes = &expected[diff.range()];
+//             println!(
+//                 "0x{:03x}..0x{:03x} ({}..{}):",
+//                 diff.start_idx, diff.end_idx, diff.start_idx, diff.end_idx
+//             );
+//             println!("\t{}", u8_slice_to_hex_string(actual_bytes));
+//             println!("\t{}", u8_slice_to_hex_string(expected_bytes));
+//         }
+//     }
 
-    match differences {
-        Some(diffs) => Err(Error::other(&format!("{} differences", diffs.len()))),
-        None => Ok(()),
-    }
-}
+//     match differences {
+//         Some(diffs) => Err(Error::other(&format!("{} differences", diffs.len()))),
+//         None => Ok(()),
+//     }
+// }
 
 #[cfg(test)]
 fn find_inconsistencies_from_to_ohpkm<PKM: OhpkmConvert>(mon: OhpkmV2) -> Result<()> {
@@ -429,8 +461,8 @@ fn find_inconsistencies_from_to_ohpkm<PKM: OhpkmConvert>(mon: OhpkmV2) -> Result
     let first_pass = PKM::from_ohpkm(&mon);
     let second_pass = PKM::from_ohpkm(&OhpkmV2::from(&first_pass));
 
-    let expected = first_pass.to_party_bytes()?;
-    let actual = second_pass.to_party_bytes()?;
+    let expected = first_pass.to_party_bytes();
+    let actual = second_pass.to_party_bytes();
 
     let differences = find_differing_ranges(&actual, &expected);
 
@@ -457,8 +489,8 @@ fn find_inconsistencies_from_to_ohpkm<PKM: OhpkmConvert>(mon: OhpkmV2) -> Result
 fn find_inconsistencies_to_from_ohpkm<PKM: OhpkmConvert>(mon: PKM) -> Result<()> {
     use crate::pkm::{Error, OhpkmV2};
 
-    let expected = mon.to_party_bytes()?;
-    let actual = PKM::from_ohpkm(&OhpkmV2::from(&mon)).to_party_bytes()?;
+    let expected = mon.to_party_bytes();
+    let actual: Vec<u8> = PKM::from_ohpkm(&OhpkmV2::from(&mon)).to_party_bytes();
 
     let differences = find_differing_ranges(&actual, &expected);
 

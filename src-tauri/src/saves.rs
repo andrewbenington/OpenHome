@@ -1,7 +1,3 @@
-use pkm_rs::saves::SaveType;
-use serde::Serialize;
-
-use crate::error::Result;
 use crate::util::{self, PathData, parse_path_data};
 use std::collections::HashMap;
 use std::fs;
@@ -243,20 +239,20 @@ fn get_inner_files_with_extensions(dir_path: &Path, extensions: &[&str]) -> Vec<
         .collect()
 }
 
-#[derive(Serialize)]
-pub enum SaveDetect {
-    NotRecognized,
-    OneMatch(SaveType),
-    MultipleMatches(Vec<SaveType>),
-}
+// #[derive(Serialize)]
+// pub enum SaveDetect {
+//     NotRecognized,
+//     OneMatch(SaveType),
+//     MultipleMatches(Vec<SaveType>),
+// }
 
-pub fn detect_from_path(path: &Path) -> Result<SaveDetect> {
-    let bytes = util::read_file_bytes(path)?;
-    let possible_save_types = SaveType::detect_from_bytes(&bytes);
+// pub fn detect_from_path(path: &Path) -> Result<SaveDetect> {
+//     let bytes = util::read_file_bytes(path)?;
+//     let possible_save_types = SaveType::detect_from_bytes(&bytes);
 
-    Ok(match possible_save_types.len() {
-        0 => SaveDetect::NotRecognized,
-        1 => SaveDetect::OneMatch(possible_save_types[0]),
-        2.. => SaveDetect::MultipleMatches(possible_save_types),
-    })
-}
+//     Ok(match possible_save_types.len() {
+//         0 => SaveDetect::NotRecognized,
+//         1 => SaveDetect::OneMatch(possible_save_types[0]),
+//         2.. => SaveDetect::MultipleMatches(possible_save_types),
+//     })
+// }

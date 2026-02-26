@@ -13,14 +13,3 @@ pub fn from_gen3_ub_pokemon_index(species_index: u16) -> Result<SpeciesAndForme>
         })
         .copied()
 }
-
-/// Convert National Dex + Form index to game index
-pub fn to_gen3_ub_pokemon_index(saf: &SpeciesAndForme) -> Result<u16> {
-    NATIONAL_DEX_TO_UB_MAP
-        .get(&saf.to_tuple())
-        .ok_or(Error::GenDex {
-            saf: *saf,
-            generation: NdexConvertSource::Gen3UB,
-        })
-        .copied()
-}

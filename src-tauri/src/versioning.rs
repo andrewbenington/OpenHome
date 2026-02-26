@@ -282,9 +282,7 @@ pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
 
         let ohpkm_v2 = OhpkmV2::from_v1(ohpkm_v1);
         let bytes_v2 = ohpkm_v2.to_bytes();
-        if let Ok(bytes_v2) = bytes_v2
-            && let Some(filename) = PathBuf::from(&path).file_name()
-        {
+        if let Some(filename) = PathBuf::from(&path).file_name() {
             let v2_path = Path::join(
                 &util::prepend_appdata_storage_to_path(app_handle, "mons_v2")?,
                 filename,

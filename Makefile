@@ -46,6 +46,7 @@ check:
 .PHONY: test
 test: ensure-dependencies
 	@pnpm run test
+	@cargo test
 
 .PHONY: check-rs
 check-rs:

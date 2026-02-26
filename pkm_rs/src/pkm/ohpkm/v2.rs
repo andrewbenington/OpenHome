@@ -5,7 +5,7 @@ use crate::pkm::ohpkm::v2_sections::{
 };
 use crate::pkm::ohpkm::{OhpkmConvert, OhpkmV1};
 use crate::pkm::traits::IsShiny;
-use crate::pkm::{Error, Pkm, Result};
+use crate::pkm::{Error, HasSpeciesAndForme, PkmBytes, Result};
 
 use pkm_rs_types::TrainerData;
 use pkm_rs_types::{AbilityNumber, BinaryGender};
@@ -583,28 +583,28 @@ impl OhpkmV2 {
         self.main_data.obedience_level = v;
     }
 
-    pub fn nickname(&self) -> String {
-        self.main_data.nickname.to_string()
+    pub const fn nickname(&self) -> SizedUtf16String<26> {
+        self.main_data.nickname
     }
 
-    pub fn set_nickname(&mut self, value: String) {
-        self.main_data.nickname = SizedUtf16String::<26>::from(value);
+    pub const fn set_nickname(&mut self, value: SizedUtf16String<26>) {
+        self.main_data.nickname = value;
     }
 
-    pub fn trainer_name(&self) -> String {
-        self.main_data.trainer_name.to_string()
+    pub const fn trainer_name(&self) -> SizedUtf16String<26> {
+        self.main_data.trainer_name
     }
 
-    pub fn set_trainer_name(&mut self, value: String) {
-        self.main_data.trainer_name = SizedUtf16String::<26>::from(value);
+    pub const fn set_trainer_name(&mut self, value: SizedUtf16String<26>) {
+        self.main_data.trainer_name = value;
     }
 
-    pub fn handler_name(&self) -> String {
-        self.main_data.handler_name.to_string()
+    pub const fn handler_name(&self) -> SizedUtf16String<26> {
+        self.main_data.handler_name
     }
 
-    pub fn set_handler_name(&mut self, value: String) {
-        self.main_data.handler_name = SizedUtf16String::<26>::from(value);
+    pub const fn set_handler_name(&mut self, value: SizedUtf16String<26>) {
+        self.main_data.handler_name = value;
     }
 
     pub const fn moves(&self) -> [MoveSlot; 4] {
@@ -1451,13 +1451,12 @@ impl OhpkmV2 {
         })
     }
 
-    pub fn get_present_sections(&self) -> Result<Vec<String>> {
-        Ok(self
-            .to_sectioned_data()?
+    pub fn get_present_sections(&self) -> Vec<String> {
+        self.to_sectioned_data()
             .all_section_tags()
             .iter()
             .map(|t| t.to_string())
-            .collect())
+            .collect()
     }
 }
 
@@ -1521,26 +1520,26 @@ impl OhpkmV2 {
         }
     }
 
-    pub fn to_sectioned_data(&self) -> Result<SectionedData<SectionTagV2>> {
+    pub fn to_sectioned_data(&self) -> SectionedData<SectionTagV2> {
         let mut sectioned_data = SectionedData::new(MAGIC_NUMBER, CURRENT_VERSION);
         sectioned_data
-            .add(self.main_data)?
-            .add_if_some(self.gameboy_data)?
-            .add_if_some(self.gen45_data)?
-            .add_if_some(self.gen67_data)?
-            .add_if_some(self.swsh_data)?
-            .add_if_some(self.bdsp_data)?
-            .add_if_some(self.la_data)?
-            .add_if_some(self.sv_data)?
-            .add_all(self.handler_data.clone())?
-            .add_if_some(self.plugin_data.clone())?
-            .add_if_some(self.notes.clone())?
-            .add_if_some(self.most_recent_save.clone())?;
-        Ok(sectioned_data)
+            .add(self.main_data)
+            .add_if_some(self.gameboy_data)
+            .add_if_some(self.gen45_data)
+            .add_if_some(self.gen67_data)
+            .add_if_some(self.swsh_data)
+            .add_if_some(self.bdsp_data)
+            .add_if_some(self.la_data)
+            .add_if_some(self.sv_data)
+            .add_all(self.handler_data.clone())
+            .add_if_some(self.plugin_data.clone())
+            .add_if_some(self.notes.clone())
+            .add_if_some(self.most_recent_save.clone());
+        sectioned_data
     }
 
-    pub fn to_bytes(&self) -> Result<Vec<u8>> {
-        Ok(self.to_sectioned_data()?.to_bytes()?)
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.to_sectioned_data().to_bytes()
     }
 }
 
@@ -1557,8 +1556,8 @@ impl OhpkmV2 {
         }
     }
 
-    pub fn to_bytes_js(&self) -> JsResult<Vec<u8>> {
-        Ok(self.to_bytes()?)
+    pub fn to_bytes_js(&self) -> Vec<u8> {
+        self.to_bytes()
     }
 
     pub fn from_v1_bytes(bytes: Vec<u8>) -> JsResult<Self> {
@@ -1571,7 +1570,7 @@ impl OhpkmV2 {
         js_sys::Reflect::set(
             &obj,
             &JsValue::from("MainData"),
-            &JsValue::from(self.main_data.to_bytes()?),
+            &JsValue::from(self.main_data.to_bytes()),
         )?;
         add_section_bytes_to_js_object(&obj, &self.gameboy_data)?;
         add_section_bytes_to_js_object(&obj, &self.gen45_data)?;
@@ -2979,8 +2978,8 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(js_name = toByteArray)]
-    pub fn to_bytes_js_js(&self) -> JsResult<Vec<u8>> {
-        Ok(self.to_bytes()?)
+    pub fn to_bytes_js_js(&self) -> Vec<u8> {
+        self.to_bytes()
     }
 
     #[wasm_bindgen(js_name = fromV1Bytes)]
@@ -2995,7 +2994,7 @@ impl OhpkmV2 {
         js_sys::Reflect::set(
             &obj,
             &JsValue::from("MainData"),
-            &JsValue::from(self.main_data.to_bytes()?),
+            &JsValue::from(self.main_data.to_bytes()),
         )?;
         add_section_bytes_to_js_object(&obj, &self.gameboy_data)?;
         add_section_bytes_to_js_object(&obj, &self.gen45_data)?;
@@ -3121,13 +3120,12 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(js_name = getPresentSections)]
-    pub fn get_present_sections_js(&self) -> Result<Vec<String>> {
-        Ok(self
-            .to_sectioned_data()?
+    pub fn get_present_sections_js(&self) -> Vec<String> {
+        self.to_sectioned_data()
             .all_section_tags()
             .iter()
             .map(|t| t.to_string())
-            .collect())
+            .collect()
     }
 }
 
@@ -3142,13 +3140,13 @@ fn add_section_bytes_to_js_object<T: DataSection<ErrorType = Error>>(
         js_sys::Reflect::set(
             obj,
             &JsValue::from(T::TAG.to_string()),
-            &JsValue::from(section.to_bytes()?),
+            &JsValue::from(section.to_bytes()),
         )?;
     }
     Ok(())
 }
 
-impl Pkm for OhpkmV2 {
+impl PkmBytes for OhpkmV2 {
     const BOX_SIZE: usize = 0;
 
     const PARTY_SIZE: usize = 0;
@@ -3160,24 +3158,25 @@ impl Pkm for OhpkmV2 {
         }
     }
 
-    fn write_box_bytes(&self, dest: &mut [u8]) -> Result<()> {
-        let bytes = self.to_box_bytes()?;
+    fn write_box_bytes(&self, dest: &mut [u8]) {
+        let bytes = self.to_box_bytes();
         dest.copy_from_slice(&bytes);
-        Ok(())
     }
 
-    fn write_party_bytes(&self, dest: &mut [u8]) -> Result<()> {
+    fn write_party_bytes(&self, dest: &mut [u8]) {
         self.write_box_bytes(dest)
     }
 
-    fn to_box_bytes(&self) -> Result<Vec<u8>> {
-        self.to_bytes().map_err(|e| Error::other(&e.to_string()))
+    fn to_box_bytes(&self) -> Vec<u8> {
+        self.to_bytes()
     }
 
-    fn to_party_bytes(&self) -> Result<Vec<u8>> {
+    fn to_party_bytes(&self) -> Vec<u8> {
         self.to_box_bytes()
     }
+}
 
+impl HasSpeciesAndForme for OhpkmV2 {
     fn get_species_metadata(&self) -> &'static pkm_rs_resources::species::SpeciesMetadata {
         self.main_data.species_and_forme.get_species_metadata()
     }

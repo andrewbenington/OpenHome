@@ -4,9 +4,7 @@ use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloade
 use crate::state::{AppState, AppStateInner};
 use crate::util::ImageResponse;
 use crate::{menu, saves, util};
-use pkm_rs::saves::SaveData;
 use serde_json::Value;
-use std::any::Any;
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};

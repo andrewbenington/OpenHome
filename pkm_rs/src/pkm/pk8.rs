@@ -1,6 +1,5 @@
 use crate::pkm::traits::ModernEvs;
-use crate::pkm::{Error, Pkm, Result};
-use crate::strings::SizedUtf16String;
+use crate::pkm::{Error, HasSpeciesAndForme, PkmBytes, Result};
 use crate::util;
 use crate::{read_u16_le, read_u32_le};
 
@@ -10,6 +9,7 @@ use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::Gender;
+use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, HyperTraining, MarkingsSixShapesColors, PokeDate,
     Stats8, Stats16Le, TrainerMemory,
@@ -197,7 +197,7 @@ impl Pk8 {
     }
 }
 
-impl Pkm for Pk8 {
+impl PkmBytes for Pk8 {
     const BOX_SIZE: usize = 344;
     const PARTY_SIZE: usize = Self::BOX_SIZE;
 
@@ -205,7 +205,7 @@ impl Pkm for Pk8 {
         Self::from_bytes(bytes)
     }
 
-    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+    fn write_box_bytes(&self, bytes: &mut [u8]) {
         let ribbon_bytes = self.ribbon_bytes.to_bytes();
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[4..6].copy_from_slice(&self.sanity.to_le_bytes());
@@ -306,25 +306,25 @@ impl Pkm for Pk8 {
 
         bytes[328] = self.level;
         bytes[330..342].copy_from_slice(&self.stats.to_bytes());
-
-        Ok(())
     }
 
-    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()> {
-        self.write_box_bytes(bytes)
+    fn write_party_bytes(&self, bytes: &mut [u8]) {
+        self.write_box_bytes(bytes);
     }
 
-    fn to_box_bytes(&self) -> Result<Vec<u8>> {
+    fn to_box_bytes(&self) -> Vec<u8> {
         let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes)?;
+        self.write_box_bytes(&mut bytes);
 
-        Ok(Vec::from(bytes))
+        Vec::from(bytes)
     }
 
-    fn to_party_bytes(&self) -> Result<Vec<u8>> {
+    fn to_party_bytes(&self) -> Vec<u8> {
         self.to_box_bytes()
     }
+}
 
+impl HasSpeciesAndForme for Pk8 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
         self.species_and_forme.get_species_metadata()
     }

@@ -216,7 +216,7 @@ impl DataSection for MainDataV2 {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
+        Self::ensure_buffer_size(bytes);
 
         // try_into() will always succeed if the buffer range size is correct.
         // if incorrect, it is a fatal coding flaw and will always panic.
@@ -349,7 +349,7 @@ impl DataSection for MainDataV2 {
         Ok(data)
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
+    fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = [0u8; 305];
 
         bytes[0..4].copy_from_slice(&self.personality_value.to_le_bytes());
@@ -473,7 +473,7 @@ impl DataSection for MainDataV2 {
 
         bytes[304] = self.trainer_affection;
 
-        Ok(bytes.to_vec())
+        bytes.to_vec()
     }
 
     fn is_empty(&self) -> bool {
@@ -534,7 +534,7 @@ impl DataSection for GameboyData {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
+        Self::ensure_buffer_size(bytes);
 
         // try_into() will always succeed thanks to the buffer size check
         Ok(Self {
@@ -544,14 +544,14 @@ impl DataSection for GameboyData {
         })
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
+    fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = [0u8; 13];
 
         bytes[0..2].copy_from_slice(&self.dvs.to_dv_bytes());
         bytes[2] = self.met_time_of_day;
         bytes[3..13].copy_from_slice(&self.evs_g12.to_bytes());
 
-        Ok(bytes.to_vec())
+        bytes.to_vec()
     }
 
     fn is_empty(&self) -> bool {
@@ -598,7 +598,7 @@ impl DataSection for Gen45Data {
 
     type ErrorType = Error;
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
+        Self::ensure_buffer_size(bytes);
 
         Ok(Self {
             encounter_type: bytes[0],
@@ -609,7 +609,7 @@ impl DataSection for Gen45Data {
         })
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
+    fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = [0u8; 33];
 
         bytes[0] = self.encounter_type;
@@ -618,7 +618,7 @@ impl DataSection for Gen45Data {
         bytes[3] = self.poke_star_fame;
         util::set_flag(&mut bytes, 4, 0, self.is_ns_pokemon);
 
-        Ok(bytes.to_vec())
+        bytes.to_vec()
     }
 
     fn is_empty(&self) -> bool {
@@ -688,7 +688,7 @@ impl DataSection for Gen67Data {
 
     type ErrorType = Error;
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
+        Self::ensure_buffer_size(bytes);
 
         Ok(Self {
             training_bag_hits: bytes[0],
@@ -705,7 +705,7 @@ impl DataSection for Gen67Data {
         })
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
+    fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = [0u8; 33];
 
         bytes[0] = self.training_bag_hits;
@@ -720,7 +720,7 @@ impl DataSection for Gen67Data {
         bytes[20] = self.resort_event_status;
         bytes[21..33].copy_from_slice(&self.avs.to_bytes());
 
-        Ok(bytes.to_vec())
+        bytes.to_vec()
     }
 
     fn is_empty(&self) -> bool {
@@ -776,7 +776,7 @@ impl DataSection for SwordShieldData {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
+        Self::ensure_buffer_size(bytes);
 
         // try_into() will always succeed thanks to the buffer size check
         Ok(Self {
@@ -787,7 +787,7 @@ impl DataSection for SwordShieldData {
         })
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
+    fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = [0u8; 20];
 
         util::set_flag(&mut bytes, 0, 0, self.can_gigantamax);
@@ -795,7 +795,7 @@ impl DataSection for SwordShieldData {
         bytes[2..6].copy_from_slice(&self.palma.to_le_bytes());
         bytes[6..20].copy_from_slice(&self.tr_flags);
 
-        Ok(bytes.to_vec())
+        bytes.to_vec()
     }
 
     fn is_empty(&self) -> bool {
@@ -833,7 +833,7 @@ impl DataSection for BdspData {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
+        Self::ensure_buffer_size(bytes);
 
         // try_into() will always succeed thanks to the buffer size check
         Ok(Self {
@@ -841,12 +841,12 @@ impl DataSection for BdspData {
         })
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
+    fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = [0u8; 14];
 
         bytes.copy_from_slice(&self.tm_flags.to_bytes());
 
-        Ok(bytes.to_vec())
+        bytes.to_vec()
     }
 
     fn is_empty(&self) -> bool {
@@ -907,7 +907,7 @@ impl DataSection for LegendsArceusData {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
+        Self::ensure_buffer_size(bytes);
 
         // try_into() will always succeed thanks to the buffer size check
         Ok(Self {
@@ -924,7 +924,7 @@ impl DataSection for LegendsArceusData {
         })
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
+    fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = [0u8; 44];
 
         bytes[0..6].copy_from_slice(&self.gvs.to_bytes());
@@ -938,7 +938,7 @@ impl DataSection for LegendsArceusData {
         bytes[39] = self.unknown_f3;
         bytes[40..44].copy_from_slice(&self.unknown_a0.to_le_bytes());
 
-        Ok(bytes.to_vec())
+        bytes.to_vec()
     }
 
     fn is_empty(&self) -> bool {
@@ -997,7 +997,7 @@ impl DataSection for ScarletVioletData {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
+        Self::ensure_buffer_size(bytes);
 
         // try_into() will always succeed thanks to the buffer size check
         let tera_type_original = TeraType::from_byte(bytes[0]).ok_or(Error::Other(format!(
@@ -1013,7 +1013,7 @@ impl DataSection for ScarletVioletData {
         })
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
+    fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = [0u8; 37];
 
         bytes[0] = self.tera_type_original.to_byte();
@@ -1021,7 +1021,7 @@ impl DataSection for ScarletVioletData {
         bytes[2..24].copy_from_slice(&self.tm_flags.to_bytes());
         bytes[24..37].copy_from_slice(&self.tm_flags_dlc.to_bytes());
 
-        Ok(bytes.to_vec())
+        bytes.to_vec()
     }
 
     fn is_empty(&self) -> bool {
@@ -1199,7 +1199,7 @@ impl DataSection for PastHandlerData {
         })
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
+    fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = [0u8; 39];
 
         bytes[0..=1].copy_from_slice(&self.id.to_ohpkm_bytes());
@@ -1217,7 +1217,7 @@ impl DataSection for PastHandlerData {
             vec.extend_from_slice(origin_plugin.as_bytes());
         }
 
-        Ok(vec)
+        vec
     }
 
     fn is_empty(&self) -> bool {
@@ -1256,7 +1256,7 @@ impl DataSection for MostRecentSave {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
+        Self::ensure_buffer_size(bytes);
 
         let trainer_id = u16::from_le_bytes(bytes[0..=1].try_into().unwrap());
         let secret_id = u16::from_le_bytes(bytes[2..=3].try_into().unwrap());
@@ -1277,7 +1277,7 @@ impl DataSection for MostRecentSave {
         })
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
+    fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::new();
 
         bytes.extend_from_slice(&self.trainer_id.to_le_bytes());
@@ -1286,7 +1286,7 @@ impl DataSection for MostRecentSave {
         bytes.extend_from_slice(&self.trainer_name.bytes());
         bytes.extend_from_slice(self.file_path.as_bytes());
 
-        Ok(bytes)
+        bytes
     }
 
     fn is_empty(&self) -> bool {
@@ -1327,7 +1327,7 @@ impl DataSection for PluginData {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
+        Self::ensure_buffer_size(bytes);
 
         Self::try_from_origin_utf8(bytes)
     }
@@ -1336,8 +1336,8 @@ impl DataSection for PluginData {
         false
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        Ok(self.plugin_origin.clone().into_bytes())
+    fn to_bytes(&self) -> Vec<u8> {
+        self.plugin_origin.clone().into_bytes()
     }
 }
 
@@ -1352,7 +1352,7 @@ impl DataSection for Notes {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
+        Self::ensure_buffer_size(bytes);
 
         String::from_utf8(bytes.to_vec())
             .map(Notes)
@@ -1361,8 +1361,8 @@ impl DataSection for Notes {
             })
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        Ok(self.0.clone().into_bytes())
+    fn to_bytes(&self) -> Vec<u8> {
+        self.0.clone().into_bytes()
     }
 
     fn is_empty(&self) -> bool {

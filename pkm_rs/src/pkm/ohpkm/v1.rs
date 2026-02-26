@@ -1,5 +1,5 @@
 use crate::pkm::traits::IsShiny4096;
-use crate::pkm::{Error, Pkm, Result};
+use crate::pkm::{Error, HasSpeciesAndForme, PkmBytes, Result};
 use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndex;
@@ -17,8 +17,6 @@ use pkm_rs_types::{Geolocations, HyperTraining, MarkingsSixShapesColors};
 
 use serde::Serialize;
 
-#[cfg(feature = "wasm")]
-use crate::pkm::ohpkm::JsResult;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -319,7 +317,7 @@ impl OhpkmV1 {
     }
 }
 
-impl Pkm for OhpkmV1 {
+impl PkmBytes for OhpkmV1 {
     const BOX_SIZE: usize = 433;
     const PARTY_SIZE: usize = 433;
 
@@ -327,7 +325,7 @@ impl Pkm for OhpkmV1 {
         Self::from_bytes(bytes)
     }
 
-    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+    fn write_box_bytes(&self, bytes: &mut [u8]) {
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[4..6].copy_from_slice(&0u16.to_le_bytes());
         bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
@@ -481,25 +479,25 @@ impl Pkm for OhpkmV1 {
         if bytes.len() >= 465 {
             bytes[433..465].copy_from_slice(&self.plugin_origin.to_ascii_lowercase());
         }
-
-        Ok(())
     }
 
-    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+    fn write_party_bytes(&self, bytes: &mut [u8]) {
         self.write_box_bytes(bytes)
     }
 
-    fn to_box_bytes(&self) -> Result<Vec<u8>> {
+    fn to_box_bytes(&self) -> Vec<u8> {
         let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes)?;
+        self.write_box_bytes(&mut bytes);
 
-        Ok(Vec::from(bytes))
+        Vec::from(bytes)
     }
 
-    fn to_party_bytes(&self) -> Result<Vec<u8>> {
+    fn to_party_bytes(&self) -> Vec<u8> {
         self.to_box_bytes()
     }
+}
 
+impl HasSpeciesAndForme for OhpkmV1 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
         self.species_and_forme.get_species_metadata()
     }
@@ -520,11 +518,7 @@ impl Pkm for OhpkmV1 {
 #[allow(clippy::missing_const_for_fn)]
 impl OhpkmV1 {
     #[wasm_bindgen(js_name = "toBytes")]
-    pub fn to_bytes_wasm(&self) -> JsResult<Vec<u8>> {
-        use wasm_bindgen::JsValue;
-
+    pub fn to_bytes_wasm(&self) -> Vec<u8> {
         self.to_box_bytes()
-            .map_err(|e| Error::to_string(&e))
-            .map_err(JsValue::from)
     }
 }

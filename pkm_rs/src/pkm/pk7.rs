@@ -1,8 +1,8 @@
+use crate::encryption::ChecksumU16Le;
 use crate::pkm::ohpkm::{self, OhpkmConvert};
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
-use crate::pkm::{Error, OhpkmV2, Pkm, Result};
-use crate::strings::SizedUtf16String;
-use crate::{log, read_u16_le, read_u32_le, util};
+use crate::pkm::{Error, HasSpeciesAndForme, OhpkmV2, PkmBytes, Result};
+use crate::{encryption, read_u16_le, read_u32_le, util};
 
 use arbitrary_int::{u3, u7};
 use pkm_rs_resources::abilities::AbilityIndex;
@@ -13,6 +13,7 @@ use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame,
     Stats8, Stats16Le,
@@ -70,7 +71,7 @@ pub struct Pk7 {
     pub ivs: Stats8,
     pub is_egg: bool,
     pub is_nicknamed: bool,
-    pub handler_name: SizedUtf16String<24>,
+    pub handler_name: SizedUtf16String<26>,
     pub handler_gender: BinaryGender,
     pub is_current_handler: bool,
     pub geolocations: Geolocations,
@@ -79,7 +80,7 @@ pub struct Pk7 {
     pub handler_memory: TrainerMemory,
     pub fullness: u8,
     pub enjoyment: u8,
-    pub trainer_name: SizedUtf16String<24>,
+    pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
     pub trainer_affection: u8,
     pub trainer_memory: TrainerMemory,
@@ -163,7 +164,7 @@ impl Pk7 {
             ivs: Stats8::from_30_bits(bytes[116..120].try_into().unwrap()),
             is_egg: util::get_flag(bytes, 116, 30),
             is_nicknamed: util::get_flag(bytes, 116, 31),
-            handler_name: SizedUtf16String::<24>::from_bytes(bytes[120..144].try_into().unwrap()),
+            handler_name: SizedUtf16String::<26>::from_bytes(bytes[120..146].try_into().unwrap()),
             handler_gender: util::get_flag(bytes, 146, 0).into(),
             is_current_handler: util::get_flag(bytes, 147, 0),
             geolocations: Geolocations::from_bytes(bytes[148..158].try_into().unwrap()),
@@ -177,7 +178,7 @@ impl Pk7 {
             },
             fullness: bytes[174],
             enjoyment: bytes[175],
-            trainer_name: SizedUtf16String::<24>::from_bytes(bytes[176..200].try_into().unwrap()),
+            trainer_name: SizedUtf16String::<26>::from_bytes(bytes[176..202].try_into().unwrap()),
             trainer_friendship: bytes[202],
             trainer_affection: bytes[203],
             trainer_memory: TrainerMemory {
@@ -232,9 +233,20 @@ impl Pk7 {
         };
         Ok(mon)
     }
+
+    pub fn from_encryped_bytes(bytes: &[u8]) -> Result<Self> {
+        let decrypted = encryption::decrypt_pkm_bytes_gen_6_7(bytes)?;
+        let unshuffled = encryption::unshuffle_blocks_gen_6_7(&decrypted)?;
+        Self::from_bytes(&unshuffled)
+    }
+
+    pub fn to_box_bytes_encrypted(self) -> Result<Vec<u8>> {
+        let shuffled = encryption::shuffle_blocks_gen_6_7(&self.to_box_bytes())?;
+        encryption::decrypt_pkm_bytes_gen_6_7(&shuffled)
+    }
 }
 
-impl Pkm for Pk7 {
+impl PkmBytes for Pk7 {
     const BOX_SIZE: usize = 232;
     const PARTY_SIZE: usize = 260;
 
@@ -242,10 +254,9 @@ impl Pkm for Pk7 {
         Self::from_bytes(bytes)
     }
 
-    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+    fn write_box_bytes(&self, bytes: &mut [u8]) {
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[4..6].copy_from_slice(&self.sanity.to_le_bytes());
-        bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
         bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
         bytes[10..12].copy_from_slice(&self.held_item_index.to_le_bytes());
         bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
@@ -307,7 +318,7 @@ impl Pkm for Pk7 {
         util::set_flag(bytes, 116, 30, self.is_egg);
         util::set_flag(bytes, 116, 31, self.is_nicknamed);
 
-        bytes[120..144].copy_from_slice(&self.handler_name);
+        bytes[120..146].copy_from_slice(&self.handler_name);
         util::set_flag(bytes, 146, 0, self.handler_gender);
         util::set_flag(bytes, 147, 0, self.is_current_handler);
         bytes[148..158].copy_from_slice(&self.geolocations.to_bytes());
@@ -325,7 +336,7 @@ impl Pkm for Pk7 {
 
         bytes[174] = self.fullness;
         bytes[175] = self.enjoyment;
-        bytes[176..200].copy_from_slice(&self.trainer_name);
+        bytes[176..202].copy_from_slice(&self.trainer_name);
         bytes[202] = self.trainer_friendship;
         bytes[203] = self.trainer_affection;
         bytes[204] = self.trainer_memory.intensity;
@@ -348,35 +359,35 @@ impl Pkm for Pk7 {
         bytes[226] = self.console_region;
         bytes[227] = self.language as u8;
 
-        Ok(())
+        Pk7::calc_and_write_checksum(bytes);
     }
 
-    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()> {
-        self.write_box_bytes(bytes)?;
+    fn write_party_bytes(&self, bytes: &mut [u8]) {
+        self.write_box_bytes(bytes);
         bytes[232..236].copy_from_slice(&self.status_condition.to_le_bytes());
         bytes[237] = self.stat_level;
         bytes[238] = self.form_argument_remain;
         bytes[239] = self.form_argument_elapsed;
         bytes[240..242].copy_from_slice(&self.current_hp.to_le_bytes());
         bytes[242..254].copy_from_slice(&self.stats.to_bytes());
-
-        Ok(())
     }
 
-    fn to_box_bytes(&self) -> Result<Vec<u8>> {
+    fn to_box_bytes(&self) -> Vec<u8> {
         let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes)?;
+        self.write_box_bytes(&mut bytes);
 
-        Ok(Vec::from(bytes))
+        Vec::from(bytes)
     }
 
-    fn to_party_bytes(&self) -> Result<Vec<u8>> {
+    fn to_party_bytes(&self) -> Vec<u8> {
         let mut bytes = [0; Self::PARTY_SIZE];
-        self.write_party_bytes(&mut bytes)?;
+        self.write_party_bytes(&mut bytes);
 
-        Ok(Vec::from(bytes))
+        Vec::from(bytes)
     }
+}
 
+impl HasSpeciesAndForme for Pk7 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
         self.species_and_forme.get_species_metadata()
     }
@@ -420,9 +431,8 @@ impl Pk7 {
     }
 
     #[wasm_bindgen(js_name = toBytes)]
-    pub fn get_bytes_wasm(&self) -> core::result::Result<Vec<u8>, JsValue> {
+    pub fn get_bytes_wasm(&self) -> Vec<u8> {
         self.to_box_bytes()
-            .map_err(|e| JsValue::from_str(&e.to_string()))
     }
 
     #[wasm_bindgen(getter)]
@@ -551,13 +561,13 @@ impl OhpkmConvert for Pk7 {
             ribbons: OpenHomeRibbonSet::from_modern(self.ribbons),
             moves: self.moves,
             move_pp: self.move_pp,
-            nickname: self.nickname.to_string().into(),
+            nickname: self.nickname,
             move_pp_ups: self.move_pp_ups,
             relearn_moves: self.relearn_moves,
             ivs: self.ivs,
             is_egg: self.is_egg,
             is_nicknamed: self.is_nicknamed,
-            handler_name: self.handler_name.to_string().into(),
+            handler_name: self.handler_name,
             is_current_handler: self.is_current_handler,
             handler_friendship: self.handler_friendship,
             handler_memory: self.handler_memory,
@@ -569,7 +579,7 @@ impl OhpkmConvert for Pk7 {
             console_region: self.console_region,
             language: self.language,
             form_argument: self.form_argument,
-            trainer_name: self.trainer_name.to_string().into(),
+            trainer_name: self.trainer_name,
             trainer_friendship: self.trainer_friendship,
             trainer_memory: self.trainer_memory,
             trainer_affection: self.trainer_affection,
@@ -604,8 +614,7 @@ impl OhpkmConvert for Pk7 {
     }
 
     fn from_ohpkm(ohpkm: &OhpkmV2) -> Self {
-        println!("super training flags: {:#?}", ohpkm.super_training_flags());
-        let me = Self {
+        let mut mon = Self {
             encryption_constant: ohpkm.encryption_constant(),
             sanity: 0,
             checksum: 0,
@@ -631,7 +640,7 @@ impl OhpkmConvert for Pk7 {
             battle_memory_count: ohpkm.battle_memory_count(),
             super_training_dist_flags: ohpkm.super_training_dist_flags().unwrap_or_default(),
             form_argument: ohpkm.form_argument(),
-            nickname: ohpkm.nickname().to_string().into(),
+            nickname: ohpkm.nickname(),
             moves: ohpkm.moves(),
             move_pp: ohpkm.move_pp(),
             move_pp_ups: ohpkm.move_pp_ups(),
@@ -645,7 +654,7 @@ impl OhpkmConvert for Pk7 {
             ivs: ohpkm.ivs(),
             is_egg: ohpkm.is_egg(),
             is_nicknamed: ohpkm.is_nicknamed(),
-            handler_name: ohpkm.handler_name().to_string().into(),
+            handler_name: ohpkm.handler_name(),
             handler_gender: ohpkm.handler_gender(),
             is_current_handler: ohpkm.is_current_handler(),
             geolocations: ohpkm.geolocations().unwrap_or_default(),
@@ -654,7 +663,7 @@ impl OhpkmConvert for Pk7 {
             handler_memory: ohpkm.handler_memory(),
             fullness: ohpkm.fullness(),
             enjoyment: ohpkm.enjoyment(),
-            trainer_name: ohpkm.trainer_name().to_string().into(),
+            trainer_name: ohpkm.trainer_name(),
             trainer_friendship: ohpkm.trainer_friendship(),
             trainer_affection: ohpkm.trainer_affection(),
             trainer_memory: ohpkm.trainer_memory(),
@@ -678,8 +687,17 @@ impl OhpkmConvert for Pk7 {
             current_hp: 0,
             stats: Stats16Le::default(),
         };
-        println!("hyper training flags after: {:#?}", me.super_training_flags);
 
-        me
+        mon.checksum = Pk7::calc_checksum(&mon.to_box_bytes());
+
+        mon
     }
+}
+
+impl ChecksumU16Le for Pk7 {
+    const CHECKSUMMED_SPAN_START: usize = 8;
+
+    const CHECKSUMMED_SPAN_END: usize = Pk7::BOX_SIZE;
+
+    const CHECKSUM_OFFSET: usize = 6;
 }

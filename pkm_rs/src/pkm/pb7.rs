@@ -1,12 +1,12 @@
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
-use crate::pkm::{Error, Pkm, Result};
-use crate::strings::SizedUtf16String;
+use crate::pkm::{Error, HasSpeciesAndForme, PkmBytes, Result};
 use crate::util;
 use crate::{read_u16_le, read_u32_le};
 
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{Gender, PokeDate};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors, Stats8, Stats16Le};
 use serde::Serialize;
@@ -179,7 +179,7 @@ impl Pb7 {
     }
 }
 
-impl Pkm for Pb7 {
+impl PkmBytes for Pb7 {
     const BOX_SIZE: usize = 260;
     const PARTY_SIZE: usize = 260;
 
@@ -187,7 +187,7 @@ impl Pkm for Pb7 {
         Self::from_bytes(bytes)
     }
 
-    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()> {
+    fn write_box_bytes(&self, bytes: &mut [u8]) {
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
         bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
@@ -282,25 +282,25 @@ impl Pkm for Pb7 {
         bytes[254..256].copy_from_slice(&self.cp.to_le_bytes());
         bytes[256] = self.is_mega;
         bytes[257] = self.mega_forme;
-
-        Ok(())
     }
 
-    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()> {
-        self.write_box_bytes(bytes)
+    fn write_party_bytes(&self, bytes: &mut [u8]) {
+        self.write_box_bytes(bytes);
     }
 
-    fn to_box_bytes(&self) -> Result<Vec<u8>> {
+    fn to_box_bytes(&self) -> Vec<u8> {
         let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes)?;
+        self.write_box_bytes(&mut bytes);
 
-        Ok(Vec::from(bytes))
+        Vec::from(bytes)
     }
 
-    fn to_party_bytes(&self) -> Result<Vec<u8>> {
+    fn to_party_bytes(&self) -> Vec<u8> {
         self.to_box_bytes()
     }
+}
 
+impl HasSpeciesAndForme for Pb7 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
         self.species_and_forme.get_species_metadata()
     }

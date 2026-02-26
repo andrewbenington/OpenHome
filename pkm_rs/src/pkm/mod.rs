@@ -35,53 +35,50 @@ use crate::pkm::traits::IsShiny;
 use pkm_rs_types::randomize::Randomize;
 
 #[cfg(not(feature = "randomize"))]
-pub trait Pkm: Serialize + IsShiny + Sized {
-    const BOX_SIZE: usize;
-    const PARTY_SIZE: usize;
+pub trait Pkm: PkmBytes + Serialize + IsShiny + Sized {}
+#[cfg(feature = "randomize")]
+trait PkmPrereqs: PkmBytes + Serialize + IsShiny + Sized + Randomize {}
 
-    fn from_bytes(bytes: &[u8]) -> Result<Self>;
-    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()>;
-    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()>;
+#[cfg(not(feature = "randomize"))]
+impl<T: PkmBytes + Serialize + IsShiny + Sized> Pkm for T {}
+#[cfg(feature = "randomize")]
+impl<T: PkmBytes + Serialize + IsShiny + Sized + Randomize> Pkm for T {}
 
-    fn to_box_bytes(&self) -> Result<Vec<u8>> {
-        let mut bytes = Vec::with_capacity(Self::BOX_SIZE);
-        self.write_box_bytes(&mut bytes)?;
-        Ok(bytes)
-    }
-    fn to_party_bytes(&self) -> Result<Vec<u8>> {
-        let mut bytes = Vec::with_capacity(Self::PARTY_SIZE);
-        self.write_party_bytes(&mut bytes)?;
-        Ok(bytes)
-    }
-
+pub trait HasSpeciesAndForme: Pkm {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata;
     fn get_forme_metadata(&self) -> &'static FormeMetadata;
 
     fn calculate_level(&self) -> u8;
 }
 
-#[cfg(feature = "randomize")]
-pub trait Pkm: Serialize + IsShiny + Sized + Randomize {
+pub trait MaybeHasSpeciesAndForme: Pkm {
+    fn try_get_species_metadata(&self) -> Option<&'static SpeciesMetadata>;
+    fn get_forme_metadata(&self) -> Option<&'static FormeMetadata>;
+
+    fn calculate_level(&self) -> Option<u8>;
+}
+
+pub trait PkmBytes: Sized {
     const BOX_SIZE: usize;
-    const PARTY_SIZE: usize;
+    // if not specified, assume box/party representation is the same (as is the case for gen 8+)
+    const PARTY_SIZE: usize = Self::BOX_SIZE;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self>;
-    fn write_box_bytes(&self, bytes: &mut [u8]) -> Result<()>;
-    fn write_party_bytes(&self, bytes: &mut [u8]) -> Result<()>;
+    fn write_box_bytes(&self, bytes: &mut [u8]);
 
-    fn to_box_bytes(&self) -> Result<Vec<u8>> {
+    // if not specified, assume box/party representation is the same (as is the case for gen 8+)
+    fn write_party_bytes(&self, bytes: &mut [u8]) {
+        self.write_box_bytes(bytes);
+    }
+
+    fn to_box_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(Self::BOX_SIZE);
-        self.write_box_bytes(&mut bytes)?;
-        Ok(bytes)
+        self.write_box_bytes(&mut bytes);
+        bytes
     }
-    fn to_party_bytes(&self) -> Result<Vec<u8>> {
+    fn to_party_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(Self::PARTY_SIZE);
-        self.write_party_bytes(&mut bytes)?;
-        Ok(bytes)
+        self.write_party_bytes(&mut bytes);
+        bytes
     }
-
-    fn get_species_metadata(&self) -> &'static SpeciesMetadata;
-    fn get_forme_metadata(&self) -> &'static FormeMetadata;
-
-    fn calculate_level(&self) -> u8;
 }
