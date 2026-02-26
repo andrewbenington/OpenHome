@@ -115,7 +115,7 @@ impl Pk7 {
         }
         // try_into() will always succeed thanks to the length check
 
-        let mon = Pk7 {
+        let mut mon = Pk7 {
             encryption_constant: read_u32_le!(bytes, 0),
             sanity: read_u16_le!(bytes, 4),
             checksum: read_u16_le!(bytes, 6),
@@ -200,37 +200,18 @@ impl Pk7 {
             region: bytes[225],
             console_region: bytes[226],
             language: Language::try_from(bytes[227])?,
-            status_condition: if bytes.len() > Self::BOX_SIZE {
-                read_u32_le!(bytes, 232)
-            } else {
-                0
-            },
-            stat_level: if bytes.len() > Self::BOX_SIZE {
-                bytes[237]
-            } else {
-                0
-            },
-            form_argument_remain: if bytes.len() > Self::BOX_SIZE {
-                bytes[238]
-            } else {
-                0
-            },
-            form_argument_elapsed: if bytes.len() > Self::BOX_SIZE {
-                bytes[239]
-            } else {
-                0
-            },
-            current_hp: if bytes.len() > Self::BOX_SIZE {
-                read_u16_le!(bytes, 240)
-            } else {
-                0
-            },
-            stats: if bytes.len() > Self::BOX_SIZE {
-                Stats16Le::from_bytes(bytes[242..254].try_into().unwrap())
-            } else {
-                Stats16Le::default()
-            },
+            ..Default::default()
         };
+
+        if bytes.len() > Self::BOX_SIZE {
+            mon.status_condition = read_u32_le!(bytes, 232);
+            mon.stat_level = bytes[237];
+            mon.form_argument_remain = bytes[238];
+            mon.form_argument_elapsed = bytes[239];
+            mon.current_hp = read_u16_le!(bytes, 240);
+            mon.stats = Stats16Le::from_bytes(bytes[242..254].try_into().unwrap());
+        }
+
         Ok(mon)
     }
 

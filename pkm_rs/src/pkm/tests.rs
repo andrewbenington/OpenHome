@@ -426,33 +426,34 @@ fn find_inconsistencies_from_file<PKM: Pkm>(filename: &str) -> Result<()> {
     }
 }
 
-// #[cfg(test)]
-// fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> Result<()> {
-//     use crate::pkm::Error;
+#[cfg(feature = "randomize")]
+#[cfg(test)]
+fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> Result<()> {
+    use crate::pkm::Error;
 
-//     let expected = mon.to_party_bytes();
-//     let actual = PKM::from_bytes(&expected)?.to_party_bytes();
+    let expected = mon.to_party_bytes();
+    let actual = PKM::from_bytes(&expected)?.to_party_bytes();
 
-//     let differences = find_differing_ranges(&actual, &expected);
+    let differences = find_differing_ranges(&actual, &expected);
 
-//     if let Some(differences) = &differences {
-//         for diff in differences {
-//             let actual_bytes = &actual[diff.range()];
-//             let expected_bytes = &expected[diff.range()];
-//             println!(
-//                 "0x{:03x}..0x{:03x} ({}..{}):",
-//                 diff.start_idx, diff.end_idx, diff.start_idx, diff.end_idx
-//             );
-//             println!("\t{}", u8_slice_to_hex_string(actual_bytes));
-//             println!("\t{}", u8_slice_to_hex_string(expected_bytes));
-//         }
-//     }
+    if let Some(differences) = &differences {
+        for diff in differences {
+            let actual_bytes = &actual[diff.range()];
+            let expected_bytes = &expected[diff.range()];
+            println!(
+                "0x{:03x}..0x{:03x} ({}..{}):",
+                diff.start_idx, diff.end_idx, diff.start_idx, diff.end_idx
+            );
+            println!("\t{}", u8_slice_to_hex_string(actual_bytes));
+            println!("\t{}", u8_slice_to_hex_string(expected_bytes));
+        }
+    }
 
-//     match differences {
-//         Some(diffs) => Err(Error::other(&format!("{} differences", diffs.len()))),
-//         None => Ok(()),
-//     }
-// }
+    match differences {
+        Some(diffs) => Err(Error::other(&format!("{} differences", diffs.len()))),
+        None => Ok(()),
+    }
+}
 
 #[cfg(test)]
 fn find_inconsistencies_from_to_ohpkm<PKM: OhpkmConvert>(mon: OhpkmV2) -> Result<()> {

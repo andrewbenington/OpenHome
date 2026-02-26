@@ -6,6 +6,9 @@ use crate::pkm::plugins::ub::conversion::{NATIONAL_DEX_TO_UB_MAP, UB_TO_NATIONAL
 use crate::pkm::{Error, NdexConvertSource};
 use crate::pkm::{Result, plugins::cfru::pk3cfru::CfruSpeciesIndex};
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 #[derive(Clone, Copy, Serialize)]
 pub struct UnboundSpeciesIndex(u16);
 
@@ -52,4 +55,16 @@ impl From<UnboundSpeciesIndex> for u16 {
     }
 }
 
+#[cfg(feature = "randomize")]
+impl Randomize for UnboundSpeciesIndex {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        use rand::RngExt;
+
+        let valid_ub_indices: Vec<_> = UB_TO_NATIONAL_DEX_MAP.keys().collect();
+
+        let randomized_valid_index = *valid_ub_indices[rng.random_range(0..valid_ub_indices.len())];
+
+        Self(randomized_valid_index)
+    }
+}
 pub type Pk3ub = Pk3Cfru<UnboundSpeciesIndex>;

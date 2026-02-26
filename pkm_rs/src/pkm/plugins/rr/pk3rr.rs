@@ -1,4 +1,7 @@
+#[cfg(feature = "randomize")]
 use pkm_rs_resources::species::SpeciesAndForme;
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
 use serde::Serialize;
 
 use crate::pkm::plugins::cfru::pk3cfru::Pk3Cfru;
@@ -54,6 +57,22 @@ impl From<u16> for RadicalRedSpeciesIndex {
 impl From<RadicalRedSpeciesIndex> for u16 {
     fn from(value: RadicalRedSpeciesIndex) -> Self {
         value.0
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for RadicalRedSpeciesIndex {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        use rand::RngExt;
+
+        let valid_rr_indices: Vec<_> = RR_TO_NATIONAL_DEX_MAP
+            .keys()
+            .chain(FAKEMON_INDEXES.iter())
+            .collect();
+
+        let randomized_valid_index = *valid_rr_indices[rng.random_range(0..valid_rr_indices.len())];
+
+        Self(randomized_valid_index)
     }
 }
 

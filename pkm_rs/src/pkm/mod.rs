@@ -37,7 +37,7 @@ use pkm_rs_types::randomize::Randomize;
 #[cfg(not(feature = "randomize"))]
 pub trait Pkm: PkmBytes + Serialize + IsShiny + Sized {}
 #[cfg(feature = "randomize")]
-trait PkmPrereqs: PkmBytes + Serialize + IsShiny + Sized + Randomize {}
+pub trait Pkm: PkmBytes + Serialize + IsShiny + Sized + Randomize {}
 
 #[cfg(not(feature = "randomize"))]
 impl<T: PkmBytes + Serialize + IsShiny + Sized> Pkm for T {}

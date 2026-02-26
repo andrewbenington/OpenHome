@@ -69,13 +69,19 @@ fn cfru_ball_index(ball: Ball) -> u8 {
     }
 }
 
+#[cfg(not(feature = "randomize"))]
 pub trait CfruSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy {
     fn try_to_species_and_forme(self) -> Result<SpeciesAndForme>;
     fn try_from_species_and_forme(species: &SpeciesAndForme) -> Result<Self>;
 
-    // fn move_from_game_index(gameIndex: u16) -> Result<u16>;
+    fn is_fakemon(&self) -> bool;
+    fn plugin_identifier() -> &'static str;
+}
 
-    // fn move_to_game_index(nationalMoveId: u16) -> Result<u16>;
+#[cfg(feature = "randomize")]
+pub trait CfruSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy + Randomize {
+    fn try_to_species_and_forme(self) -> Result<SpeciesAndForme>;
+    fn try_from_species_and_forme(species: &SpeciesAndForme) -> Result<Self>;
 
     fn is_fakemon(&self) -> bool;
     fn plugin_identifier() -> &'static str;
