@@ -54,7 +54,7 @@ pub struct Pk5 {
     pub encounter_type: u8,
     pub poke_star_fame: u8,
     pub is_fateful_encounter: bool,
-    pub nickname: Gen5String<24>,
+    pub nickname: Gen5String<22>,
     pub trainer_name: Gen5String<16>,
     pub trainer_gender: BinaryGender,
     pub status_condition: u32,
@@ -118,7 +118,7 @@ impl Pk5 {
             encounter_type: bytes[133],
             poke_star_fame: bytes[135],
             is_fateful_encounter: util::get_flag(bytes, 64, 0),
-            nickname: Gen5String::from_bytes(bytes[72..96].try_into().unwrap()),
+            nickname: Gen5String::from_bytes(bytes[72..94].try_into().unwrap()),
             trainer_name: Gen5String::from_bytes(bytes[104..120].try_into().unwrap()),
             trainer_gender: util::get_flag(bytes, 132, 7).into(),
             status_condition: if bytes.len() > Self::BOX_SIZE {
@@ -212,7 +212,7 @@ impl PkmBytes for Pk5 {
         bytes[135] = self.poke_star_fame;
 
         util::set_flag(bytes, 64, 0, self.is_fateful_encounter);
-        bytes[72..96].copy_from_slice(self.nickname.bytes().as_ref());
+        bytes[72..94].copy_from_slice(self.nickname.bytes().as_ref());
         bytes[104..120].copy_from_slice(self.trainer_name.bytes().as_ref());
         util::set_flag(bytes, 132, 7, self.trainer_gender);
     }

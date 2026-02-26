@@ -62,7 +62,7 @@ pub struct Pk8 {
     pub dynamax_level: u8,
     pub status_condition: u32,
     pub palma: u32,
-    pub handler_name: SizedUtf16String<24>,
+    pub handler_name: SizedUtf16String<26>,
     pub handler_gender: BinaryGender,
     pub handler_language: u8,
     pub handler_id: u16,
@@ -78,7 +78,7 @@ pub struct Pk8 {
     pub affixed_ribbon: u8,
     pub egg_date: Option<PokeDate>,
     pub met_date: PokeDate,
-    pub trainer_name: SizedUtf16String<24>,
+    pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
     pub trainer_memory: TrainerMemory,
     pub egg_location_index: u16,
@@ -160,7 +160,7 @@ impl Pk8 {
             dynamax_level: bytes[144],
             status_condition: read_u32_le!(bytes, 148),
             palma: read_u32_le!(bytes, 152),
-            handler_name: SizedUtf16String::<24>::from_bytes(bytes[168..192].try_into().unwrap()),
+            handler_name: SizedUtf16String::<26>::from_bytes(bytes[168..194].try_into().unwrap()),
             handler_gender: util::get_flag(bytes, 194, 0).into(),
             handler_language: bytes[195],
             is_current_handler: util::get_flag(bytes, 196, 0),
@@ -175,7 +175,7 @@ impl Pk8 {
             language_index: bytes[226],
             form_argument: read_u32_le!(bytes, 228),
             affixed_ribbon: bytes[232],
-            trainer_name: SizedUtf16String::<24>::from_bytes(bytes[248..272].try_into().unwrap()),
+            trainer_name: SizedUtf16String::<26>::from_bytes(bytes[248..274].try_into().unwrap()),
             trainer_friendship: bytes[274],
             trainer_memory: TrainerMemory::from_bytes_switch_trainer(
                 bytes[275..=280].try_into().unwrap(),
@@ -274,7 +274,7 @@ impl PkmBytes for Pk8 {
         bytes[144] = self.dynamax_level;
         bytes[148..152].copy_from_slice(&self.status_condition.to_le_bytes());
         bytes[152..156].copy_from_slice(&self.palma.to_le_bytes());
-        bytes[168..192].copy_from_slice(&self.handler_name);
+        bytes[168..194].copy_from_slice(&self.handler_name);
 
         bytes[195] = self.handler_language;
         util::set_flag(bytes, 196, 0, self.is_current_handler);
@@ -289,7 +289,7 @@ impl PkmBytes for Pk8 {
         bytes[226] = self.language_index;
         bytes[228..232].copy_from_slice(&self.form_argument.to_le_bytes());
         bytes[232] = self.affixed_ribbon;
-        bytes[248..272].copy_from_slice(&self.trainer_name);
+        bytes[248..274].copy_from_slice(&self.trainer_name);
         bytes[274] = self.trainer_friendship;
         bytes[275..281].copy_from_slice(&self.trainer_memory.to_bytes_switch_trainer());
 

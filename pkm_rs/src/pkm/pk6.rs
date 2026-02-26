@@ -50,7 +50,7 @@ pub struct Pk6 {
     pub super_training_dist_flags: u8,
     pub form_argument: u32,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub nickname: SizedUtf16String<24>,
+    pub nickname: SizedUtf16String<26>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: [MoveSlot; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -65,7 +65,7 @@ pub struct Pk6 {
     pub is_egg: bool,
     pub is_nicknamed: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub handler_name: SizedUtf16String<24>,
+    pub handler_name: SizedUtf16String<26>,
     pub handler_gender: bool,
     pub is_current_handler: bool,
     pub geolocations: Geolocations,
@@ -76,7 +76,7 @@ pub struct Pk6 {
     pub fullness: u8,
     pub enjoyment: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub trainer_name: SizedUtf16String<24>,
+    pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
     pub trainer_affection: u8,
     pub egg_date: Option<PokeDate>,
@@ -140,7 +140,7 @@ impl Pk6 {
             battle_memory_count: bytes[57],
             super_training_dist_flags: bytes[58],
             form_argument: read_u32_le!(bytes, 60),
-            nickname: SizedUtf16String::<24>::from_bytes(bytes[64..88].try_into().unwrap()),
+            nickname: SizedUtf16String::<26>::from_bytes(bytes[64..90].try_into().unwrap()),
             moves: [
                 read_move_slot!(bytes, 90),
                 read_move_slot!(bytes, 92),
@@ -160,7 +160,7 @@ impl Pk6 {
             ivs: Stats8::from_30_bits(bytes[116..120].try_into().unwrap()),
             is_egg: util::get_flag(bytes, 116, 30),
             is_nicknamed: util::get_flag(bytes, 116, 31),
-            handler_name: SizedUtf16String::<24>::from_bytes(bytes[120..144].try_into().unwrap()),
+            handler_name: SizedUtf16String::<26>::from_bytes(bytes[120..146].try_into().unwrap()),
             handler_gender: util::get_flag(bytes, 146, 0),
             is_current_handler: util::get_flag(bytes, 147, 0),
             geolocations: Geolocations::from_bytes(bytes[148..158].try_into().unwrap()),
@@ -174,7 +174,7 @@ impl Pk6 {
             },
             fullness: bytes[174],
             enjoyment: bytes[175],
-            trainer_name: SizedUtf16String::<24>::from_bytes(bytes[176..200].try_into().unwrap()),
+            trainer_name: SizedUtf16String::<26>::from_bytes(bytes[176..202].try_into().unwrap()),
             trainer_friendship: bytes[202],
             trainer_affection: bytes[203],
             trainer_memory: TrainerMemory {
@@ -277,7 +277,7 @@ impl PkmBytes for Pk6 {
         bytes[57] = self.battle_memory_count;
         bytes[58] = self.super_training_dist_flags;
         bytes[60..64].copy_from_slice(&self.form_argument.to_le_bytes());
-        bytes[64..88].copy_from_slice(&self.nickname);
+        bytes[64..90].copy_from_slice(&self.nickname);
 
         bytes[90..92].copy_from_slice(&self.moves[0].to_le_bytes());
         bytes[92..94].copy_from_slice(&self.moves[1].to_le_bytes());
@@ -306,7 +306,7 @@ impl PkmBytes for Pk6 {
         util::set_flag(bytes, 116, 30, self.is_egg);
         util::set_flag(bytes, 116, 31, self.is_nicknamed);
 
-        bytes[120..132].copy_from_slice(&self.handler_name);
+        bytes[120..146].copy_from_slice(&self.handler_name);
         util::set_flag(bytes, 146, 0, self.handler_gender);
         util::set_flag(bytes, 147, 0, self.is_current_handler);
         bytes[148..158].copy_from_slice(&self.geolocations.to_bytes());
@@ -324,7 +324,7 @@ impl PkmBytes for Pk6 {
 
         bytes[174] = self.fullness;
         bytes[175] = self.enjoyment;
-        bytes[176..200].copy_from_slice(&self.trainer_name);
+        bytes[176..202].copy_from_slice(&self.trainer_name);
         bytes[202] = self.trainer_friendship;
         bytes[203] = self.trainer_affection;
         bytes[204] = self.trainer_memory.intensity;
