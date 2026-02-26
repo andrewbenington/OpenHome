@@ -81,7 +81,7 @@ pub struct MainDataV2 {
     pub is_nicknamed: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub handler_name: SizedUtf16String<26>,
-    pub handler_language: u8,
+    pub handler_language: Option<Language>,
     pub is_current_handler: bool,
     pub handler_id: u16,
     pub handler_friendship: u8,
@@ -171,7 +171,7 @@ impl MainDataV2 {
             hyper_training: old.hyper_training,
             trainer_gender: bool::from(old.trainer_gender).into(),
             handler_name: old.handler_name,
-            handler_language: old.handler_language,
+            handler_language: Language::try_from(old.handler_language).ok(),
             is_current_handler: old.is_current_handler,
             handler_id: old.handler_id,
             handler_friendship: old.handler_friendship,
@@ -301,7 +301,7 @@ impl DataSection for MainDataV2 {
             hyper_training: HyperTraining::from_byte(bytes[153]),
             home_tracker: bytes[172..180].try_into().unwrap(),
             handler_name: SizedUtf16String::<26>::from_bytes(bytes[184..210].try_into().unwrap()),
-            handler_language: bytes[211],
+            handler_language: bytes[211].try_into().ok(),
             is_current_handler: util::get_flag(bytes, 212, 0),
             // resort_event_status: bytes[213],
             handler_id: u16::from_le_bytes(bytes[214..216].try_into().unwrap()),
@@ -427,7 +427,7 @@ impl DataSection for MainDataV2 {
         bytes[172..180].copy_from_slice(&self.home_tracker);
 
         bytes[184..210].copy_from_slice(&self.handler_name);
-        bytes[211] = self.handler_language;
+        bytes[211] = self.handler_language.map(|l| l as u8).unwrap_or_default();
         util::set_flag(&mut bytes, 212, 0, self.is_current_handler);
         // bytes[213] = self.resort_event_status;
         bytes[214..216].copy_from_slice(&self.handler_id.to_le_bytes());

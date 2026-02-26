@@ -367,11 +367,11 @@ impl OhpkmV2 {
         self.main_data.is_nicknamed = v;
     }
 
-    pub const fn handler_language(&self) -> u8 {
+    pub const fn handler_language(&self) -> Option<Language> {
         self.main_data.handler_language
     }
 
-    pub const fn set_handler_language(&mut self, v: u8) {
+    pub const fn set_handler_language(&mut self, v: Option<Language>) {
         self.main_data.handler_language = v;
     }
 
@@ -1863,12 +1863,12 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = handlerLanguage)]
-    pub fn handler_language_js(&self) -> u8 {
+    pub fn handler_language_js(&self) -> Option<Language> {
         self.handler_language()
     }
     #[wasm_bindgen(setter = handlerLanguage)]
-    pub fn set_handler_language_js(&mut self, v: u8) {
-        self.set_handler_language(v);
+    pub fn set_handler_language_js(&mut self, v: Option<Language>) {
+        self.set_handler_language(v)
     }
 
     #[wasm_bindgen(getter = isCurrentHandler)]

@@ -1,13 +1,13 @@
-#[cfg(feature = "randomize")]
 use pkm_rs_resources::species::SpeciesAndForme;
-#[cfg(feature = "randomize")]
-use pkm_rs_types::randomize::Randomize;
 use serde::Serialize;
 
 use crate::pkm::plugins::cfru::pk3cfru::Pk3Cfru;
 use crate::pkm::plugins::rr::species_convert::{NATIONAL_DEX_TO_RR_MAP, RR_TO_NATIONAL_DEX_MAP};
 use crate::pkm::{Error, NdexConvertSource};
 use crate::pkm::{Result, plugins::cfru::pk3cfru::CfruSpeciesIndex};
+
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
 
 const FAKEMON_INDEXES: [u16; 22] = [
     1186, 1200, 1274, 1275, 1276, 1277, 1278, 1279, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289,
