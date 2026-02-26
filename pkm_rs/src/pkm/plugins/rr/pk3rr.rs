@@ -5,7 +5,7 @@ use pkm_rs_types::randomize::Randomize;
 use serde::Serialize;
 
 use crate::pkm::plugins::cfru::pk3cfru::Pk3Cfru;
-use crate::pkm::plugins::rr::conversion::{NATIONAL_DEX_TO_RR_MAP, RR_TO_NATIONAL_DEX_MAP};
+use crate::pkm::plugins::rr::species_convert::{NATIONAL_DEX_TO_RR_MAP, RR_TO_NATIONAL_DEX_MAP};
 use crate::pkm::{Error, NdexConvertSource};
 use crate::pkm::{Result, plugins::cfru::pk3cfru::CfruSpeciesIndex};
 

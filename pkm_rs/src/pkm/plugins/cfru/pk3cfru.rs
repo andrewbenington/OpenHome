@@ -176,17 +176,17 @@ impl<I: CfruSpeciesIndex> Pk3Cfru<I> {
 
         let mut moves = [MoveSlot::from(0u16); 4];
 
-        for i in 0..4 {
+        for (i, move_slot) in moves.iter_mut().enumerate() {
             let cfru_index = ((v >> (i * 10)) & 0x3FF) as usize;
 
             if cfru_index == 0 {
-                moves[i] = MoveSlot::empty();
+                *move_slot = MoveSlot::empty();
                 continue;
             }
 
-            let nat_id = from_gen3_cfru_move_index(cfru_index).unwrap_or(0); // fallback to 0 if unknown
+            let official_move_id = from_gen3_cfru_move_index(cfru_index).unwrap_or(0); // fallback to 0 if unknown
 
-            moves[i] = MoveSlot::from(nat_id as u16);
+            *move_slot = MoveSlot::from(official_move_id as u16);
         }
 
         moves
@@ -198,12 +198,12 @@ impl<I: CfruSpeciesIndex> Pk3Cfru<I> {
         let base = 0x27;
 
         let mut v: u64 = 0;
-        for i in 0..4 {
-            let cfru_index = if moves[i].is_empty() {
+        for (i, move_slot) in moves.iter().enumerate() {
+            let cfru_index = if move_slot.is_empty() {
                 // if the slot is empty, force CFRU index 0
                 0
             } else {
-                let nat_id = u16::from(moves[i]) as usize;
+                let nat_id = u16::from(*move_slot) as usize;
                 to_gen3_cfru_move_index(nat_id).unwrap_or(0) as usize
             };
 

@@ -2,7 +2,7 @@ use pkm_rs_resources::species::SpeciesAndForme;
 use serde::Serialize;
 
 use crate::pkm::plugins::cfru::pk3cfru::Pk3Cfru;
-use crate::pkm::plugins::ub::conversion::{NATIONAL_DEX_TO_UB_MAP, UB_TO_NATIONAL_DEX_MAP};
+use crate::pkm::plugins::ub::species_convert::{NATIONAL_DEX_TO_UB_MAP, UB_TO_NATIONAL_DEX_MAP};
 use crate::pkm::{Error, NdexConvertSource};
 use crate::pkm::{Result, plugins::cfru::pk3cfru::CfruSpeciesIndex};
 
