@@ -669,6 +669,10 @@ impl OhpkmConvert for Pk7 {
             stats: Stats16Le::default(),
         };
 
+        mon.stat_level = mon.calculate_level();
+        mon.stats = mon.calculate_stats();
+        mon.current_hp = mon.stats.hp;
+
         mon.checksum = Pk7::calc_checksum(&mon.to_box_bytes());
 
         mon
