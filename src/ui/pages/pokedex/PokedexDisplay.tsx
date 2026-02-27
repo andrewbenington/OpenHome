@@ -193,7 +193,6 @@ function PokedexDetails({
           </Flex>
         </Flex>
       </Flex>
-
       <Separator orientation="vertical" style={{ height: '100%' }} />
       <Flex direction="column" height="700px" maxHeight="100%" width="60%" gap="2" p="1">
         <Flex width="100%" height="50%">
