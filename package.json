@@ -35,7 +35,7 @@
     "test": "vitest run",
     "wasm-resources": "wasm-pack build ./pkm_rs_resources --target web -- --features wasm",
     "wasm-pkm-rs": "wasm-pack build ./pkm_rs --target web -- --features wasm",
-    "wasm": "pnpm run wasm-resources && pnpm run wasm-pkm-rs",
+    "wasm": "pnpm run wasm-pkm-rs",
     "precommit": "prettier --write . && eslint src --report-unused-disable-directives -c eslint.config.mjs --fix"
   },
   "dependencies": {

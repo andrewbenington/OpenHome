@@ -1,7 +1,11 @@
 [package]
 name = "pkm_rs_derive"
-version = "0.1.0"
+version = "1.9.0"
+authors = ["Andrew Benington"]
 edition = "2024"
+description = "Macros for the pkm_rs crate"
+repository = "https://github.com/andrewbenington/OpenHome"
+license = "GPL-3.0+"
 
 [lib]
 proc-macro = true
