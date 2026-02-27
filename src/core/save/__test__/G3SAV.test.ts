@@ -1,9 +1,9 @@
 import { R } from '@openhome-core/util/functional'
+import { SpeciesLookup } from '@pkm-rs/pkg'
 import { fail } from 'assert'
 import fs from 'fs'
 import path from 'path'
 import { describe, expect, test } from 'vitest'
-import { SpeciesLookup } from '../../../../pkm_rs_resources/pkg/pkm_rs_resources'
 import { G3SAV } from '../G3SAV'
 import { buildUnknownSaveFile } from '../util/load'
 import { emptyPathData } from '../util/path'
@@ -19,11 +19,18 @@ describe('G3SAV - Gen 3 Save File Read Test', async () => {
     [G3SAV]
   )
 
-  if (R.isErr(result)) {
+  if (!R.isOk(result)) {
     fail(`Failed to build save file: ${result.err}`)
+    return
   }
 
-  const emeraldSaveFile = result.value as G3SAV
+  const emeraldSaveFile = result.value
+
+  if (emeraldSaveFile === undefined) {
+    fail(`Failed to build save file: got undefined`)
+    return
+  }
+
   test('should load initial save data correctly', () => {
     expect(emeraldSaveFile.name).toBe('RoC')
   })
