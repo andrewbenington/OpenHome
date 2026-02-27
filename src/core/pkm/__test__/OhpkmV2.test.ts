@@ -1,8 +1,9 @@
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
-import { PK3 } from '@pokemon-files/pkm'
+import { PA8, PK3, PK8 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import path from 'path'
-import { assert, beforeAll, describe, test } from 'vitest'
+import { assert, beforeAll, describe, expect, test } from 'vitest'
+import { NationalDex } from '../../../../packages/pokemon-resources/src/consts/NationalDex'
 import { OHPKM } from '../OHPKM'
 import { initializeWasm } from './init'
 
@@ -52,6 +53,50 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
       }
     })
   }
+})
+
+describe('evolution and form change update ohpkm', async () => {
+  test(`dialga form change updates OHPKM form`, () => {
+    const dialgaBytes = new Uint8Array(
+      fs.readFileSync(path.join(__dirname, 'PKMFiles', 'LA', 'dialga.pa8'))
+    )
+
+    const dialgaPa8 = new PA8(dialgaBytes.buffer)
+    expect(dialgaPa8.dexNum).toEqual(NationalDex.Dialga)
+
+    const dialgaOhpkm = new OHPKM(dialgaPa8)
+
+    expect(dialgaOhpkm.formeNum).toEqual(0)
+
+    dialgaPa8.formeNum = 1 // origin forme
+
+    dialgaOhpkm.syncWithGameData(dialgaPa8)
+    expect(dialgaOhpkm.formeNum).toEqual(1)
+  })
+
+  test(`galar mr mime evolution updates OHPKM species/form`, () => {
+    const mrMimeBytes = new Uint8Array(
+      fs.readFileSync(path.join(__dirname, 'PKMFiles', 'Gen8', 'mr-mime-galar.pk8'))
+    )
+
+    const mrMimeGalarPk8 = new PK8(mrMimeBytes.buffer)
+    expect(mrMimeGalarPk8.dexNum).toEqual(NationalDex.MrMime)
+    expect(mrMimeGalarPk8.formeNum).toEqual(1)
+
+    const mrMimeOhpkm = new OHPKM(mrMimeGalarPk8)
+
+    expect(mrMimeOhpkm.dexNum).toEqual(NationalDex.MrMime)
+    expect(mrMimeOhpkm.formeNum).toEqual(1)
+
+    // simulate evolution
+    const mrRime = mrMimeGalarPk8
+    mrRime.dexNum = NationalDex.MrRime
+    mrRime.formeNum = 0
+
+    mrMimeOhpkm.syncWithGameData(mrRime)
+    expect(mrMimeOhpkm.dexNum).toEqual(NationalDex.MrRime)
+    expect(mrMimeOhpkm.formeNum).toEqual(0)
+  })
 })
 
 function diffSpans(

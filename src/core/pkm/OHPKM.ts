@@ -55,7 +55,6 @@ import {
   statsPreSplitToWasm,
   trainerMemoryToWasm,
 } from './convert'
-import { isEvolution } from './Lookup'
 import { adjustMovePPBetweenFormats, generateIVs, getAbilityFromNumber, ivsFromDVs } from './util'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
@@ -697,13 +696,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.movePP = adjustMovePPBetweenFormats(this, other)
     this.movePPUps = other.movePPUps as FourMoves
 
-    if (this.dexNum !== other.dexNum && isEvolution(this, other)) {
-      this.speciesAndForme = new SpeciesAndForme(other.dexNum, this.formeNum)
-    }
-
-    if (this.dexNum === other.dexNum || isEvolution(this, other)) {
-      this.speciesAndForme = new SpeciesAndForme(this.dexNum, this.formeNum)
-    }
+    this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
 
     this.heldItemIndex = other.heldItemIndex
     if (other.ability && !FORMATS_WITHOUT_ABILITIES.includes(other.format)) {
