@@ -201,7 +201,7 @@ label {
   .rt-Card {
     --base-card-border-radius: 5px;
   }
-  .rt-Separator {
+  .rt-Separator:where(.rt-r-orientation-horizontal) {
     width: 100%;
   }
 }
