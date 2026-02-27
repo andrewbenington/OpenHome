@@ -10,6 +10,8 @@ use crate::encryption::decrypt_pkm_bytes_gen_6_7;
 use crate::encryption::unshuffle_blocks_gen_6_7;
 use crate::pkm::Pk7;
 use crate::pkm::PkmBytes;
+use crate::pkm::Result;
+use crate::read_u16_le;
 use crate::util::get_flag;
 
 #[cfg(feature = "wasm")]
@@ -39,7 +41,7 @@ pub struct SunMoonSave {
 }
 
 impl SunMoonSave {
-    pub fn from_bytes(bytes: Vec<u8>) -> Result<Self, String> {
+    pub fn from_bytes(bytes: Vec<u8>) -> Result<Self> {
         let size = bytes.len();
         let my_status = TrainerDataGen7Alola::from_bytes(
             &bytes[SM_TRAINER_DATA_OFFSET..SM_TRAINER_DATA_OFFSET + TRAINER_DATA_SIZE]
@@ -57,14 +59,13 @@ impl SunMoonSave {
 impl SaveDataTrait for SunMoonSave {
     type PkmType = Pk7;
 
-    fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> Result<Vec<u8>, String> {
-        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))
-            .map_err(|err| err.to_string())?;
-        unshuffle_blocks_gen_6_7(&decrypted_bytes).map_err(|err| err.to_string())
+    fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> Result<Vec<u8>> {
+        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))?;
+        unshuffle_blocks_gen_6_7(&decrypted_bytes)
     }
 
-    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Pk7, String> {
-        Pk7::from_bytes(&self.get_mon_bytes_at(box_num, offset)?).map_err(|err| err.to_string())
+    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Pk7> {
+        Pk7::from_bytes(&self.get_mon_bytes_at(box_num, offset)?)
     }
 
     fn box_rows() -> usize {
@@ -121,8 +122,8 @@ impl SunMoonSave {
 #[allow(clippy::missing_const_for_fn)]
 impl SunMoonSave {
     #[wasm_bindgen]
-    pub fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Pk7, String> {
-        Pk7::from_bytes(&self.get_mon_bytes_at(box_num, offset)?).map_err(|err| err.to_string())
+    pub fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Pk7> {
+        Pk7::from_bytes(&self.get_mon_bytes_at(box_num, offset)?)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
@@ -203,7 +204,7 @@ pub struct UltraSunMoonSave {
 }
 
 impl UltraSunMoonSave {
-    pub fn from_bytes(bytes: Vec<u8>) -> Result<Self, String> {
+    pub fn from_bytes(bytes: Vec<u8>) -> Result<Self> {
         let size = bytes.len();
         let my_status = TrainerDataGen7Alola::from_bytes(
             &bytes[USUM_TRAINER_DATA_OFFSET..USUM_TRAINER_DATA_OFFSET + TRAINER_DATA_SIZE]
@@ -221,14 +222,13 @@ impl UltraSunMoonSave {
 impl SaveDataTrait for UltraSunMoonSave {
     type PkmType = Pk7;
 
-    fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> Result<Vec<u8>, String> {
-        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))
-            .map_err(|err| err.to_string())?;
-        unshuffle_blocks_gen_6_7(&decrypted_bytes).map_err(|err| err.to_string())
+    fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> Result<Vec<u8>> {
+        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))?;
+        unshuffle_blocks_gen_6_7(&decrypted_bytes)
     }
 
-    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Pk7, String> {
-        Pk7::from_bytes(&self.get_mon_bytes_at(box_num, offset)?).map_err(|err| err.to_string())
+    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Pk7> {
+        Pk7::from_bytes(&self.get_mon_bytes_at(box_num, offset)?)
     }
 
     fn box_rows() -> usize {
@@ -283,8 +283,8 @@ impl UltraSunMoonSave {
 impl TrainerDataGen7Alola {
     fn from_bytes(block_bytes: &[u8; TRAINER_DATA_SIZE]) -> Self {
         Self {
-            trainer_id: u16::from_le_bytes(block_bytes[0..2].try_into().unwrap()),
-            secret_id: u16::from_le_bytes(block_bytes[2..4].try_into().unwrap()),
+            trainer_id: read_u16_le!(block_bytes, 0),
+            secret_id: read_u16_le!(block_bytes, 2),
             game_code: block_bytes[4],
             trainer_gender: Gender::from(get_flag(block_bytes, 5, 0)),
             trainer_name: SizedUtf16String::from_bytes(block_bytes[56..80].try_into().unwrap()),

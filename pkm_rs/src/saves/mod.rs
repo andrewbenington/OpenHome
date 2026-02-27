@@ -2,7 +2,7 @@ use pkm_rs_types::OriginGame;
 use serde::Serialize;
 
 use crate::{
-    pkm::PkmBytes,
+    pkm::{PkmBytes, Result},
     saves::{
         gen7_alola::{SunMoonSave, UltraSunMoonSave},
         lets_go::LetsGoSave,
@@ -17,8 +17,8 @@ pub trait SaveDataTrait: Send + Sync {
     type PkmType: PkmBytes;
 
     // fn from_bytes(bytes: Vec<u8>) -> Result<Box<Self>, String>;
-    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Self::PkmType, String>;
-    fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> Result<Vec<u8>, String>;
+    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Self::PkmType>;
+    fn get_mon_bytes_at(&self, box_num: usize, offset: usize) -> Result<Vec<u8>>;
 
     fn box_rows() -> usize;
     fn box_cols() -> usize;
@@ -42,7 +42,7 @@ pub enum SaveType {
 }
 
 impl SaveType {
-    pub fn build(&self, bytes: &[u8]) -> Result<SaveData, String> {
+    pub fn build(&self, bytes: &[u8]) -> Result<SaveData> {
         match self {
             Self::SunMoon => SunMoonSave::from_bytes(bytes.to_vec()).map(SaveData::SM),
             Self::UltraSunMoon => UltraSunMoonSave::from_bytes(bytes.to_vec()).map(SaveData::USUM),

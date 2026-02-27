@@ -3,6 +3,7 @@ use crate::encryption::decrypt_pkm_bytes_gen_6_7;
 use crate::encryption::unshuffle_blocks_gen_6_7;
 use crate::pkm::Pb7;
 use crate::pkm::PkmBytes;
+use crate::pkm::Result;
 use crate::util::get_flag;
 
 use pkm_rs_types::Gender;
@@ -29,7 +30,7 @@ pub struct LetsGoSave {
 }
 
 impl LetsGoSave {
-    pub fn from_bytes(bytes: Vec<u8>) -> Result<Self, String> {
+    pub fn from_bytes(bytes: Vec<u8>) -> Result<Self> {
         let size = bytes.len();
         let my_status = TrainerData::from_bytes(&bytes);
         let poke_list_header = PokeListHeader::from_bytes(&bytes);
@@ -65,19 +66,13 @@ impl SaveDataTrait for LetsGoSave {
         0
     }
 
-    fn get_mon_bytes_at(&self, _: usize, offset: usize) -> Result<Vec<u8>, String> {
-        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(offset))
-            .map_err(|err| err.to_string())?;
-        unshuffle_blocks_gen_6_7(&decrypted_bytes).map_err(|err| err.to_string())
+    fn get_mon_bytes_at(&self, _: usize, offset: usize) -> Result<Vec<u8>> {
+        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(offset))?;
+        unshuffle_blocks_gen_6_7(&decrypted_bytes)
     }
 
-    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Pb7, String> {
-        Pb7::from_bytes(
-            &self
-                .get_mon_bytes_at(box_num, offset)
-                .map_err(|err| err.to_string())?,
-        )
-        .map_err(|err| err.to_string())
+    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Pb7> {
+        Pb7::from_bytes(&self.get_mon_bytes_at(box_num, offset)?)
     }
 
     fn calc_checksum(&self) -> u16 {
