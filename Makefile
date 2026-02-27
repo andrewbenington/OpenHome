@@ -75,6 +75,10 @@ set-version:
 	@npx prettier --write src-tauri/tauri.conf.json
 	@cargo install cargo-edit
 	@cd src-tauri && cargo set-version $(VERSION)
+	@cd pkm_rs && cargo set-version $(VERSION)
+	@cd pkm_rs_derive && cargo set-version $(VERSION)
+	@cd pkm_rs_resources && cargo set-version $(VERSION)
+	@cd pkm_rs_types && cargo set-version $(VERSION)
 	@pnpm version $(VERSION) --no-git-tag-version --allow-same-version 
 
 .PHONY: release-mac

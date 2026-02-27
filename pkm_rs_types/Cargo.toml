@@ -1,14 +1,17 @@
 [package]
 name = "pkm_rs_types"
-version = "0.1.0"
+version = "1.9.0"
 edition = "2024"
+description = "Types and helper code for the pkm_rs crate"
+repository = "https://github.com/andrewbenington/OpenHome"
+license = "GPL-3.0+"
 
 [dependencies]
 pkm_rs_derive = {path = "../pkm_rs_derive"}
 serde = { version = "1.0.228", features = ["derive"] }
 static_assertions = "1.1.0"
-wasm-bindgen = { version = "0.2.111", optional = true }
-js-sys = { version = "0.3.88", optional = true }
+wasm-bindgen = { version = "0.2.113", optional = true }
+js-sys = { version = "0.3.90", optional = true }
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
 getrandom = { version = "0.4.1", features = ["wasm_js"] }
 strum = "0.28.0"
