@@ -179,10 +179,11 @@ export function useSaves(): SavesAndBanksManager {
 
       let ohpkm: Option<OHPKM>
       if (mon) {
-        ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTracking(mon, sourceSave)
+        ohpkm =
+          ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, sourceSave, destSave)
       }
 
-      const destSaveMon = ohpkm ? ohpkmStore.trackAndConvertForSave(ohpkm, destSave) : undefined
+      const destSaveMon = ohpkm ? ohpkmStore.updateAndConvertForSave(ohpkm, destSave) : undefined
       const displacedMon = destSave.boxes[dest.box].boxSlots[dest.boxSlot]
       destSave.boxes[dest.box].boxSlots[dest.boxSlot] = destSaveMon
       destSave.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
@@ -211,10 +212,10 @@ export function useSaves(): SavesAndBanksManager {
         return monResult
       }
 
-      const mon = monResult.value
-      const tracked = ohpkmStore.trackAndConvertForSave(mon, save)
+      const ohpkm = monResult.value
+      const saveFormatMon = ohpkmStore.updateAndConvertForSave(ohpkm, save)
       const displacedMon = save.boxes[dest.box].boxSlots[dest.boxSlot]
-      save.boxes[dest.box].boxSlots[dest.boxSlot] = tracked
+      save.boxes[dest.box].boxSlots[dest.boxSlot] = saveFormatMon
       save.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
 
       return R.Ok(displacedMon)
@@ -233,11 +234,13 @@ export function useSaves(): SavesAndBanksManager {
 
       let ohpkm: Option<OHPKM>
       if (mon) {
-        ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTracking(mon, sourceSave)
+        ohpkm =
+          ohpkmStore.loadIfTracked(mon) ??
+          ohpkmStore.startTrackingNewMon(mon, sourceSave, undefined)
       }
 
       if (!mon) {
-        loadedHomeData.setAtLocation(location, undefined)
+        loadedHomeData.clearAtLocation(location)
       } else if (ohpkm) {
         loadedHomeData.setAtLocation(location, ohpkm.openhomeId)
       }
@@ -313,7 +316,7 @@ export function useSaves(): SavesAndBanksManager {
 
             moveMonBetweenSaves(
               undefined,
-              ohpkmStore.trackAndConvertForSave(homeMon, tempSave),
+              ohpkmStore.updateAndConvertForSave(homeMon, tempSave),
               dest
             )
             addedMons.push(homeMon)
@@ -649,7 +652,7 @@ export function useSaves(): SavesAndBanksManager {
         if (!mon) return
 
         const save = saveFromIdentifier(location.saveIdentifier)
-        ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTracking(mon, save)
+        ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, save)
 
         save.boxes[location.box].boxSlots[location.boxSlot] = save.convertOhpkm(ohpkm)
         save.updatedBoxSlots.push({ box: location.box, boxSlot: location.boxSlot })
