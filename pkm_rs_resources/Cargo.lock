@@ -219,7 +219,7 @@ checksum = "42f5e15c9953c5e4ccceeb2e7382a716482c34515315f7b03532b8b4e8393d2d"
 
 [[package]]
 name = "pkm_rs_derive"
-version = "1.9.0"
+version = "1.9.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -228,7 +228,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_resources"
-version = "1.9.0"
+version = "1.9.1"
 dependencies = [
  "getrandom",
  "js-sys",

@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "OpenHome"
-version = "1.9.0"
+version = "1.9.1"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -2827,7 +2827,7 @@ checksum = "7edddbd0b52d732b21ad9a5fab5c704c14cd949e5e9a1ec5929a24fded1b904c"
 
 [[package]]
 name = "pkm_rs"
-version = "1.9.0"
+version = "1.9.1"
 dependencies = [
  "console_error_panic_hook",
  "getrandom 0.4.1",
@@ -2847,7 +2847,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_derive"
-version = "1.9.0"
+version = "1.9.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2856,7 +2856,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_resources"
-version = "1.9.0"
+version = "1.9.1"
 dependencies = [
  "getrandom 0.4.1",
  "js-sys",
@@ -2873,7 +2873,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_types"
-version = "1.9.0"
+version = "1.9.1"
 dependencies = [
  "getrandom 0.4.1",
  "js-sys",
