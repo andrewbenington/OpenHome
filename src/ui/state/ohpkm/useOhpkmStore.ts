@@ -25,8 +25,12 @@ export type OhpkmStore = {
   getIdIfTracked: (mon: PKMInterface) => Option<OhpkmIdentifier>
   loadIfTracked: <P extends PKMInterface>(mon: P) => Option<OHPKM>
   monOrOhpkmIfTracked: <P extends PKMInterface>(mon: P) => OHPKM | P
-  trackAndConvertForSave: <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => P
-  startTracking: <P extends PKMInterface>(mon: P, sourceSave: Option<SAV<P>>) => OHPKM
+  updateAndConvertForSave: <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => P
+  startTrackingNewMon: <P extends PKMInterface>(
+    mon: P,
+    sourceSave: Option<SAV<P>>,
+    destSave: Option<SAV>
+  ) => OHPKM
 }
 
 export type OhpkmLookup = (id: string) => OHPKM | undefined
@@ -82,8 +86,8 @@ export function useOhpkmStore(): OhpkmStore {
     return Object.values(ohpkmStore)
   }, [ohpkmStore])
 
-  const trackAndConvertForSave = useCallback(
-    <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => {
+  const handleLookupsUpdate = useCallback(
+    (ohpkm: OHPKM, save: SAV) => {
       const lookupType = (save.constructor as SAVClass).lookupType
       const ohpkmIdentifier = ohpkm.openhomeId
 
@@ -108,21 +112,32 @@ export function useOhpkmStore(): OhpkmStore {
           gen345: { ...lookups.gen345, [gen345Identifier]: ohpkmIdentifier },
         })
       }
+    },
+    [lookups, updateLookups]
+  )
 
+  const updateAndConvertForSave = useCallback(
+    <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => {
+      handleLookupsUpdate(ohpkm, save)
       insertOrUpdate(ohpkm)
 
       return save.convertOhpkm(ohpkm)
     },
-    [lookups, insertOrUpdate, updateLookups]
+    [handleLookupsUpdate, insertOrUpdate]
   )
 
-  const startTracking = useCallback(
-    <P extends PKMInterface>(mon: P, sourceSave: Option<SAV<P>>) => {
+  const startTrackingNewMon = useCallback(
+    <P extends PKMInterface>(mon: P, sourceSave: Option<SAV<P>>, destSave: Option<SAV>) => {
       const ohpkm = sourceSave ? OHPKM.fromMonInSave(mon, sourceSave) : new OHPKM(mon)
+      if (destSave) {
+        handleLookupsUpdate(ohpkm, destSave)
+      }
+
       insertOrUpdate(ohpkm)
+
       return ohpkm
     },
-    [insertOrUpdate]
+    [handleLookupsUpdate, insertOrUpdate]
   )
 
   const loadIfTracked = useCallback(
@@ -211,8 +226,8 @@ export function useOhpkmStore(): OhpkmStore {
     insertOrUpdate,
     insertOrUpdateAll,
     getAllStored,
-    trackAndConvertForSave,
-    startTracking,
+    updateAndConvertForSave,
+    startTrackingNewMon,
     getIdIfTracked,
     loadIfTracked,
     monOrOhpkmIfTracked,

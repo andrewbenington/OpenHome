@@ -12,7 +12,6 @@ export function useItems() {
     (monLocation: MonLocation) => {
       const destMon = getMonAtLocation(monLocation)
       if (!destMon?.heldItemIndex) return
-      setMonHeldItem(undefined, monLocation)
       bagDispatch({ type: 'add_item', payload: { index: destMon.heldItemIndex, qty: 1 } })
       setMonHeldItem(undefined, monLocation)
     },
