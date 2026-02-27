@@ -149,6 +149,8 @@ pub enum SignificantUpdate {
     V1_8_0AlphaFeatureMessages,
     V1_8_1,
     V1_8_2,
+    V1_9_0,
+    V1_9_1,
 }
 
 impl SignificantUpdate {
@@ -161,6 +163,8 @@ impl SignificantUpdate {
             }
             Self::V1_8_1 => Version::parse("1.8.1").unwrap(),
             Self::V1_8_2 => Version::parse("1.8.2").unwrap(),
+            Self::V1_9_0 => Version::parse("1.9.0").unwrap(),
+            Self::V1_9_1 => Version::parse("1.9.1").unwrap(),
         }
     }
 
@@ -170,7 +174,7 @@ impl SignificantUpdate {
             Self::V1_8_0AlphaOhpkmV2 => do_migration_1_8_0(app_handle),
             Self::V1_8_0AlphaFeatureMessages => Ok(()),
             Self::V1_8_1 => handle_old_mons_directories_for_ohpkm_v2(app_handle),
-            Self::V1_8_2 => Ok(()),
+            _ => Ok(()),
         }
     }
 
@@ -192,12 +196,21 @@ impl SignificantUpdate {
             )]),
             Self::V1_8_2 => Some(vec![
                 String::from(
-                    "Pokémon can optionally display extra information on the top-right of box view icons. This can be changed using the \"Display\" tab on the right panel of the home screen.",
+                    "Pokémon can optionally display extra information on the top-right of box view icons. This can be changed using the \"Display\" tab on the right panel of the home screen",
                 ),
                 String::from(
                     "A bug preventing new users from launching v1.8.0 or v1.8.1 has been fixed",
                 ),
             ]),
+            Self::V1_9_0 => Some(vec![
+                String::from("Save files and Pokémon from Pokémon Legends: Z-A are now supported"),
+                String::from(
+                    "Tools for finding and recovering tracked Pokémon have been added to the \"Tracked Pokémon\" tab",
+                ),
+            ]),
+            Self::V1_9_1 => Some(vec![String::from(
+                "Bugs related to form updates, the item bag, and Pokédex display have been fixed",
+            )]),
             _ => None,
         }
     }

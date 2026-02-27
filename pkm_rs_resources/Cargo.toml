@@ -1,6 +1,6 @@
 [package]
 name = "pkm_rs_resources"
-version = "1.9.0"
+version = "1.9.1"
 edition = "2024"
 description = "Resource data and associated types for the pkm_rs crate"
 repository = "https://github.com/andrewbenington/OpenHome"
