@@ -29,6 +29,7 @@ import UpdateMessageModal from '@openhome-ui/top-level/UpdateMessageModal'
 import { loadPlugin } from '@openhome-ui/util/plugin'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
+import BanksAndBoxesProvider from './state-zustand/banks-and-boxes/Provider'
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
@@ -174,36 +175,38 @@ function AppWithBackend() {
   ])
 
   return (
-    <PluginContext.Provider value={[pluginState, pluginDispatch]}>
-      <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
-        <TransactionStateProvider>
-          <MouseContext.Provider value={[mouseState, mouseDispatch]}>
-            <LookupsProvider>
-              <OhpkmStoreProvider>
-                <ItemBagContext.Provider value={[bagState, bagDispatch]}>
-                  <SavesProvider>
-                    <DragMonContext.Provider value={[dragState, setDragState]}>
-                      <PokemonDndContext>
-                        {settingsLoading ? (
-                          <Flex width="100%" height="100vh" align="center" justify="center">
-                            <Text size="9" weight="bold">
-                              OpenHome
-                            </Text>
-                          </Flex>
-                        ) : (
-                          <AppTabs />
-                        )}
-                        <ErrorMessageModal />
-                        <UpdateMessageModal />
-                      </PokemonDndContext>
-                    </DragMonContext.Provider>
-                  </SavesProvider>
-                </ItemBagContext.Provider>
-              </OhpkmStoreProvider>
-            </LookupsProvider>
-          </MouseContext.Provider>
-        </TransactionStateProvider>
-      </AppInfoContext.Provider>
-    </PluginContext.Provider>
+    <BanksAndBoxesProvider>
+      <PluginContext.Provider value={[pluginState, pluginDispatch]}>
+        <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
+          <TransactionStateProvider>
+            <MouseContext.Provider value={[mouseState, mouseDispatch]}>
+              <LookupsProvider>
+                <OhpkmStoreProvider>
+                  <ItemBagContext.Provider value={[bagState, bagDispatch]}>
+                    <SavesProvider>
+                      <DragMonContext.Provider value={[dragState, setDragState]}>
+                        <PokemonDndContext>
+                          {settingsLoading ? (
+                            <Flex width="100%" height="100vh" align="center" justify="center">
+                              <Text size="9" weight="bold">
+                                OpenHome
+                              </Text>
+                            </Flex>
+                          ) : (
+                            <AppTabs />
+                          )}
+                          <ErrorMessageModal />
+                          <UpdateMessageModal />
+                        </PokemonDndContext>
+                      </DragMonContext.Provider>
+                    </SavesProvider>
+                  </ItemBagContext.Provider>
+                </OhpkmStoreProvider>
+              </LookupsProvider>
+            </MouseContext.Provider>
+          </TransactionStateProvider>
+        </AppInfoContext.Provider>
+      </PluginContext.Provider>
+    </BanksAndBoxesProvider>
   )
 }
