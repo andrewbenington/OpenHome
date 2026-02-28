@@ -1,6 +1,7 @@
 import { Option } from '@openhome-core/util/functional'
 import { createContext, useContext } from 'react'
-import { create, useStore } from 'zustand'
+import { create, StateCreator, useStore } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 import { OhpkmIdentifier } from '../../../core/pkm/Lookup'
 import { BankBoxCoordinates } from '../../../core/save/HomeData'
 import { SimpleOpenHomeBank, StoredBankData } from '../../../core/save/util/storage'
@@ -10,15 +11,28 @@ interface BanksAndBoxesState {
   currentBankIndex: number
   currentBoxIndex: number
   updatedBoxSlots: BankBoxCoordinates[]
+  setAtLocation: (boxIndex: number, boxSlot: number, contents: Option<OhpkmIdentifier>) => void
 }
 
 export const createBanksAndBoxesStore = (stored: StoredBankData) =>
-  create<BanksAndBoxesState>()((set) => ({
-    banks: stored.banks,
-    currentBankIndex: stored.current_bank,
-    currentBoxIndex: stored.banks[stored.current_bank].current_box,
-    updatedBoxSlots: [],
-  }))
+  create<BanksAndBoxesState>()(
+    immer<BanksAndBoxesState>((set) => ({
+      banks: stored.banks,
+      currentBankIndex: stored.current_bank,
+      currentBoxIndex: stored.banks[stored.current_bank].current_box,
+      updatedBoxSlots: [],
+      setAtLocation: (boxIndex: number, boxSlot: number, contents: Option<OhpkmIdentifier>) =>
+        set((state) => {
+          const box = state.banks[state.currentBankIndex].boxes[boxIndex]
+          if (contents) {
+            box.identifiers.set(boxSlot, contents)
+          } else {
+            box.identifiers.delete(boxSlot)
+          }
+          state.updatedBoxSlots.push({ bank: state.currentBankIndex, box: boxIndex, boxSlot })
+        }),
+    })) as StateCreator<BanksAndBoxesState, [], []>
+  )
 
 type BanksAndBoxesStore = ReturnType<typeof createBanksAndBoxesStore>
 
