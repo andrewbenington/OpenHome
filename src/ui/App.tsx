@@ -8,7 +8,7 @@ import { TauriBackend } from '@openhome-ui/backend/tauri/tauriBackend'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import useDebounce from '@openhome-ui/hooks/useDebounce'
-import { AppStateProvider } from '@openhome-ui/state/app-state'
+import { TransactionStateProvider } from '@openhome-ui/state/app-state'
 import {
   AppInfoContext,
   appInfoInitialState,
@@ -176,7 +176,7 @@ function AppWithBackend() {
   return (
     <PluginContext.Provider value={[pluginState, pluginDispatch]}>
       <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
-        <AppStateProvider>
+        <TransactionStateProvider>
           <MouseContext.Provider value={[mouseState, mouseDispatch]}>
             <LookupsProvider>
               <OhpkmStoreProvider>
@@ -202,7 +202,7 @@ function AppWithBackend() {
               </OhpkmStoreProvider>
             </LookupsProvider>
           </MouseContext.Provider>
-        </AppStateProvider>
+        </TransactionStateProvider>
       </AppInfoContext.Provider>
     </PluginContext.Provider>
   )

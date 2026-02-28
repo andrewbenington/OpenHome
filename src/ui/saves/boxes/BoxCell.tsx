@@ -9,7 +9,6 @@ import {
   OpenHomeCtxMenu,
 } from '@openhome-ui/components/context-menu'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { useItems } from '@openhome-ui/state/items'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
@@ -47,9 +46,7 @@ function BoxCell({
   const { filter, topRightIndicator, showItem, showShiny } = useMonDisplay()
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
-  const { releaseMonAtLocation } = useSaves()
-  const { moveMonItemToBag } = useItems()
-
+  const { releaseMonAtLocation, moveMonItemToBag } = useSaves()
   const isFilteredOut = useMemo(() => {
     return (
       Object.values(filter).some((val) => val !== undefined) &&

@@ -1,7 +1,7 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { DevDataDisplay } from '@openhome-ui/components/DevDataDisplay'
 import { InfoGrid } from '@openhome-ui/components/InfoGrid'
-import { useAppState } from '@openhome-ui/state/app-state'
+import { useTransactionState } from '@openhome-ui/state/app-state'
 import { AppInfoContext, AppInfoState } from '@openhome-ui/state/appInfo'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { ItemBagContext, ItemBagState } from '@openhome-ui/state/items'
@@ -13,7 +13,7 @@ import { OHPKM } from 'src/core/pkm/OHPKM'
 import { useOhpkmStore } from '../state/ohpkm'
 
 export default function AppStateDisplay() {
-  const appState = useAppState()
+  const transactionState = useTransactionState()
   const [appInfoState] = useContext(AppInfoContext)
   const savesAndBanks = useSaves()
   const [errorState, dispatchErrorState] = useContext(ErrorContext)
@@ -24,9 +24,9 @@ export default function AppStateDisplay() {
     <Flex direction="column">
       <Card style={{ margin: 8 }}>
         <Flex direction="column" gap="2">
-          <Heading size="4">Backend App State</Heading>
+          <Heading size="4">Backend Transaction State</Heading>
           <Separator style={{ width: '100%', color: 'inherit' }} />
-          <InfoGrid data={appState ?? {}} />
+          <InfoGrid data={transactionState ?? {}} />
         </Flex>
       </Card>
       <Card className="flex-row" style={{ margin: 8, gap: 8 }}>

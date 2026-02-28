@@ -17,6 +17,7 @@ import { displayIndexAdder, isBattleFormeItem } from '../../../core/pkm/util'
 import { BackendContext } from '../../backend/backendContext'
 import { PokedexUpdate } from '../../util/pokedex'
 import { AppInfoContext } from '../appInfo'
+import { ItemBagContext } from '../items'
 import { OhpkmStoreData } from '../ohpkm'
 import { IdentifierNotPresentError, useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import {
@@ -68,6 +69,9 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
   releaseMonAtLocation(location: MonLocation): void
   releaseMonsById(...ids: OhpkmIdentifier[]): void
   trackedMonsToRelease: OhpkmIdentifier[]
+
+  moveMonItemToBag: (monLocation: MonLocation) => void
+  giveItemToMon: (monLocation: MonLocation, item: Item) => void
 }
 
 export function useSaves(): SavesAndBanksManager {
@@ -76,6 +80,7 @@ export function useSaves(): SavesAndBanksManager {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { openSavesState, openSavesDispatch, allOpenSaves, promptDisambiguation } =
     useContext(SavesContext)
+  const [, bagDispatch] = useContext(ItemBagContext)
   const filePickerOpen = useRef(false)
 
   if (openSavesState.error) {
@@ -817,6 +822,32 @@ export function useSaves(): SavesAndBanksManager {
     return firstNewBoxIndex
   }
 
+  const moveMonItemToBag = useCallback(
+    (monLocation: MonLocation) => {
+      const destMon = getMonAtLocation(monLocation)
+      if (!destMon?.heldItemIndex) return
+      bagDispatch({ type: 'add_item', payload: { index: destMon.heldItemIndex, qty: 1 } })
+      setMonHeldItem(undefined, monLocation)
+    },
+    [setMonHeldItem, getMonAtLocation, bagDispatch]
+  )
+
+  const giveItemToMon = useCallback(
+    (monLocation: MonLocation, item: Item) => {
+      const destMon = getMonAtLocation(monLocation)
+      if (!destMon) return
+
+      bagDispatch({ type: 'remove_item', payload: { index: item.index, qty: 1 } })
+
+      // If already holding an item, move it to the bag
+      if (destMon?.heldItemIndex !== undefined) {
+        bagDispatch({ type: 'add_item', payload: { index: destMon.heldItemIndex, qty: 1 } })
+      }
+      setMonHeldItem(item, monLocation)
+    },
+    [setMonHeldItem, getMonAtLocation, bagDispatch]
+  )
+
   return {
     ...openSavesState,
     allOpenSaves,
@@ -860,6 +891,9 @@ export function useSaves(): SavesAndBanksManager {
     trackedMonsToRelease: openSavesState.monsToRelease.filter(
       (toRelease) => typeof toRelease === 'string'
     ),
+
+    moveMonItemToBag,
+    giveItemToMon,
   }
 }
 
