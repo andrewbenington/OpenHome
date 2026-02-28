@@ -1,6 +1,6 @@
 [package]
 name = "pkm_rs"
-version = "1.9.1"
+version = "1.9.2"
 authors = ["Andrew Benington"]
 edition = "2024"
 description = "Read/write Pokémon save files and .pkm files"
