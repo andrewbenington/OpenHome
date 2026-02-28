@@ -20,11 +20,11 @@ jobs:
       - name: Install PNPM
         uses: pnpm/action-setup@v4
 
-      - name: Install Dependencies
-        run: pnpm i --frozen-lockfile
-
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Install Dependencies
+        run: pnpm i --frozen-lockfile
 
       - name: Build WASM
         run: pnpm run wasm
