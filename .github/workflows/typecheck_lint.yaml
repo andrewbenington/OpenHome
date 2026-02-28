@@ -27,7 +27,7 @@ jobs:
         run: pnpm i --frozen-lockfile
 
       - name: Build WASM
-        run: pnpm run wasm
+        run: pnpm run wasm-compile
 
       - name: Type Check
         run: pnpm run typecheck
