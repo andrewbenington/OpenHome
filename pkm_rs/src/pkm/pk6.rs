@@ -1,15 +1,18 @@
 use crate::pkm::traits::IsShiny4096;
 use crate::pkm::{Error, HasSpeciesAndForme, PkmBytes, Result};
-use crate::{read_move_slot, read_u16_le, read_u32_le, util};
+use crate::{read_move_index, util};
 
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{BinaryGender, ContestStats, MarkingsSixShapes, OriginGame, Stats8, Stats16Le};
+use pkm_rs_types::{
+    BinaryGender, ContestStats, MarkingsSixShapes, OriginGame, Stats8, Stats16Le, read_u16_le,
+    read_u32_le,
+};
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 
 use serde::Serialize;
@@ -52,13 +55,13 @@ pub struct Pk6 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub nickname: SizedUtf16String<26>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub moves: [MoveSlot; 4],
+    pub moves: [MoveIndex; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_pp: [u8; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_pp_ups: [u8; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub relearn_moves: [MoveSlot; 4],
+    pub relearn_moves: [MoveIndex; 4],
     pub secret_super_training_unlocked: bool,
     pub secret_super_training_complete: bool,
     pub ivs: Stats8,
@@ -142,18 +145,18 @@ impl Pk6 {
             form_argument: read_u32_le!(bytes, 60),
             nickname: SizedUtf16String::<26>::from_bytes(bytes[64..90].try_into().unwrap()),
             moves: [
-                read_move_slot!(bytes, 90),
-                read_move_slot!(bytes, 92),
-                read_move_slot!(bytes, 94),
-                read_move_slot!(bytes, 96),
+                read_move_index!(bytes, 90),
+                read_move_index!(bytes, 92),
+                read_move_index!(bytes, 94),
+                read_move_index!(bytes, 96),
             ],
             move_pp: [bytes[98], bytes[99], bytes[100], bytes[101]],
             move_pp_ups: [bytes[102], bytes[103], bytes[104], bytes[105]],
             relearn_moves: [
-                read_move_slot!(bytes, 106),
-                read_move_slot!(bytes, 108),
-                read_move_slot!(bytes, 110),
-                read_move_slot!(bytes, 112),
+                read_move_index!(bytes, 106),
+                read_move_index!(bytes, 108),
+                read_move_index!(bytes, 110),
+                read_move_index!(bytes, 112),
             ],
             secret_super_training_unlocked: util::get_flag(bytes, 114, 1),
             secret_super_training_complete: util::get_flag(bytes, 114, 2),

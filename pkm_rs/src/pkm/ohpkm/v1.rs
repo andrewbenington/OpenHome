@@ -5,7 +5,7 @@ use crate::util;
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
-use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
@@ -62,7 +62,7 @@ pub struct OhpkmV1 {
     pub weight_scalar: u8,
     pub scale: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub moves: [MoveSlot; 4],
+    pub moves: [MoveIndex; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_pp: [u8; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -71,7 +71,7 @@ pub struct OhpkmV1 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_pp_ups: [u8; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub relearn_moves: [MoveSlot; 4],
+    pub relearn_moves: [MoveIndex; 4],
     pub ivs: Stats8,
     pub is_egg: bool,
     pub is_nicknamed: bool,
@@ -210,20 +210,20 @@ impl OhpkmV1 {
             weight_scalar: bytes[81],
             scale: bytes[82],
             moves: [
-                MoveSlot::from(u16::from_le_bytes(bytes[84..86].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[86..88].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[88..90].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[90..92].try_into().unwrap())),
+                MoveIndex::from(u16::from_le_bytes(bytes[84..86].try_into().unwrap())),
+                MoveIndex::from(u16::from_le_bytes(bytes[86..88].try_into().unwrap())),
+                MoveIndex::from(u16::from_le_bytes(bytes[88..90].try_into().unwrap())),
+                MoveIndex::from(u16::from_le_bytes(bytes[90..92].try_into().unwrap())),
             ],
             move_pp: [bytes[92], bytes[93], bytes[94], bytes[95]],
             nickname: SizedUtf16String::<26>::from_bytes(bytes[96..122].try_into().unwrap()),
             avs: Stats16Le::from_bytes(bytes[122..134].try_into().unwrap()),
             move_pp_ups: [bytes[134], bytes[135], bytes[136], bytes[137]],
             relearn_moves: [
-                MoveSlot::from(u16::from_le_bytes(bytes[138..140].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[140..142].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[142..144].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[144..146].try_into().unwrap())),
+                MoveIndex::from(u16::from_le_bytes(bytes[138..140].try_into().unwrap())),
+                MoveIndex::from(u16::from_le_bytes(bytes[140..142].try_into().unwrap())),
+                MoveIndex::from(u16::from_le_bytes(bytes[142..144].try_into().unwrap())),
+                MoveIndex::from(u16::from_le_bytes(bytes[144..146].try_into().unwrap())),
             ],
             ivs: Stats8::from_30_bits(bytes[148..152].try_into().unwrap()),
             is_egg: util::get_flag(bytes, 148, 30),

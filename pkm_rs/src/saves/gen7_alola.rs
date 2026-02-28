@@ -1,5 +1,6 @@
 use pkm_rs_types::Gender;
 use pkm_rs_types::OriginGame;
+use pkm_rs_types::read_u16_le;
 use pkm_rs_types::strings::SizedUtf16String;
 
 use serde::Serialize;
@@ -11,7 +12,6 @@ use crate::encryption::unshuffle_blocks_gen_6_7;
 use crate::pkm::Pk7;
 use crate::pkm::PkmBytes;
 use crate::pkm::Result;
-use crate::read_u16_le;
 use crate::util::get_flag;
 
 #[cfg(feature = "wasm")]

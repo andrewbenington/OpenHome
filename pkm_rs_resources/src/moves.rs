@@ -3,7 +3,7 @@ use std::num::NonZeroU16;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use pkm_rs_types::{Generation, PkmType};
+use pkm_rs_types::{Generation, PkmType, read_u16_le};
 use serde::{Serialize, Serializer};
 
 #[cfg(feature = "randomize")]
@@ -11,10 +11,164 @@ use pkm_rs_types::randomize::Randomize;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
-pub struct MoveSlot(Option<NonZeroU16>);
+#[derive(Debug, Default, Clone, Copy, Serialize)]
+pub struct MoveSlot {
+    pub move_index: MoveIndex,
+    pub pp: u8,
+    pub pp_ups: u8,
+}
 
 impl MoveSlot {
+    pub const fn new(move_index: MoveIndex, pp: u8, pp_ups: u8) -> Self {
+        Self {
+            move_index,
+            pp,
+            pp_ups,
+        }
+    }
+
+    pub fn from_bytes(bytes: &[u8], offsets: MoveDataOffsets, index: usize) -> Self {
+        let move_offset = offsets.moves + (2 * index);
+        let pp_offset = offsets.pp + index;
+        let pp_ups_offset = offsets.pp_ups + index;
+
+        Self {
+            move_index: MoveIndex::from_u16(read_u16_le!(bytes, move_offset)),
+            pp: bytes[pp_offset],
+            pp_ups: bytes[pp_ups_offset],
+        }
+    }
+
+    pub fn write_to_offsets(&self, bytes: &mut [u8], offsets: MoveDataOffsets, index: usize) {
+        let move_offset = offsets.moves + (2 * index);
+        let pp_offset = offsets.pp + index;
+        let pp_ups_offset = offsets.pp_ups + index;
+
+        bytes[move_offset..move_offset + 2].copy_from_slice(&self.move_index.to_le_bytes());
+        bytes[pp_offset] = self.pp;
+        bytes[pp_ups_offset] = self.pp_ups;
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Default, Clone, Copy, Serialize)]
+pub struct MoveSlots([MoveSlot; 4]);
+
+impl MoveSlots {
+    pub fn from_bytes(bytes: &[u8], offsets: MoveDataOffsets) -> Self {
+        Self([
+            MoveSlot::from_bytes(bytes, offsets, 0),
+            MoveSlot::from_bytes(bytes, offsets, 1),
+            MoveSlot::from_bytes(bytes, offsets, 2),
+            MoveSlot::from_bytes(bytes, offsets, 3),
+        ])
+    }
+
+    pub const fn from_arrays(moves: [MoveIndex; 4], pp: [u8; 4], pp_ups: [u8; 4]) -> Self {
+        Self([
+            MoveSlot::new(moves[0], pp[0], pp_ups[0]),
+            MoveSlot::new(moves[1], pp[1], pp_ups[1]),
+            MoveSlot::new(moves[2], pp[2], pp_ups[2]),
+            MoveSlot::new(moves[3], pp[3], pp_ups[3]),
+        ])
+    }
+
+    pub fn write_spans(&self, bytes: &mut [u8], offsets: MoveDataOffsets) {
+        self.0
+            .iter()
+            .enumerate()
+            .for_each(|(i, slot)| slot.write_to_offsets(bytes, offsets, i));
+    }
+
+    pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, MoveSlot> {
+        self.0.iter_mut()
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl MoveSlots {
+    #[wasm_bindgen(getter)]
+    pub fn indices(&self) -> Vec<u16> {
+        self.into_iter()
+            .map(|slot| u16::from(slot.move_index))
+            .collect()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_indices(&mut self, value: &[u16]) {
+        self.iter_mut()
+            .enumerate()
+            .for_each(|(i, slot)| slot.move_index = MoveIndex::from_u16(value[i]));
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn pp(&self) -> Vec<u8> {
+        self.into_iter().map(|slot| slot.pp).collect()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_pp(&mut self, value: &[u8]) {
+        self.iter_mut()
+            .enumerate()
+            .for_each(|(i, slot)| slot.pp = value[i]);
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn pp_ups(&self) -> Vec<u8> {
+        self.into_iter().map(|slot| slot.pp_ups).collect()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_pp_ups(&mut self, value: &[u8]) {
+        self.iter_mut()
+            .enumerate()
+            .for_each(|(i, slot)| slot.pp_ups = value[i]);
+    }
+}
+
+impl IntoIterator for MoveSlots {
+    type Item = MoveSlot;
+    type IntoIter = std::array::IntoIter<MoveSlot, 4>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
+impl<'a> IntoIterator for &'a MoveSlots {
+    type Item = &'a MoveSlot;
+    type IntoIter = std::slice::Iter<'a, MoveSlot>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.iter()
+    }
+}
+
+impl<'a> IntoIterator for &'a mut MoveSlots {
+    type Item = &'a mut MoveSlot;
+    type IntoIter = std::slice::IterMut<'a, MoveSlot>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.iter_mut()
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct MoveDataOffsets {
+    pub moves: usize,
+    pub pp: usize,
+    pub pp_ups: usize,
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
+pub struct MoveIndex(Option<NonZeroU16>);
+
+impl MoveIndex {
     pub fn get_metadata(&self) -> Option<&'static MoveMetadata> {
         self.0.map(|idx| ALL_MOVES[(idx.get() - 1) as usize])
     }
@@ -40,7 +194,7 @@ impl MoveSlot {
     }
 }
 
-impl Serialize for MoveSlot {
+impl Serialize for MoveIndex {
     fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -52,14 +206,14 @@ impl Serialize for MoveSlot {
     }
 }
 
-impl From<u16> for MoveSlot {
+impl From<u16> for MoveIndex {
     fn from(value: u16) -> Self {
         Self(NonZeroU16::try_from(value).ok())
     }
 }
 
-impl From<MoveSlot> for u16 {
-    fn from(val: MoveSlot) -> Self {
+impl From<MoveIndex> for u16 {
+    fn from(val: MoveIndex) -> Self {
         match val.0 {
             None => 0,
             Some(idx) => idx.get(),
@@ -67,7 +221,7 @@ impl From<MoveSlot> for u16 {
     }
 }
 
-impl From<arbitrary_int::u2> for MoveSlot {
+impl From<arbitrary_int::u2> for MoveIndex {
     fn from(value: arbitrary_int::u2) -> Self {
         Self(NonZeroU16::try_from(value.value() as u16).ok())
     }

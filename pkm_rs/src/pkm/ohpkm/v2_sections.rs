@@ -7,7 +7,7 @@ use crate::util;
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
-use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::NatDexIndex;
@@ -34,6 +34,12 @@ const fn none_if_zero_u16(value: u16) -> Option<u16> {
 fn bytes_are_empty(bytes: &[u8]) -> bool {
     bytes.iter().all(|b| *b == 0)
 }
+
+const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
+    moves: 84,
+    pp: 92,
+    pp_ups: 134,
+};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
@@ -67,15 +73,11 @@ pub struct MainDataV2 {
     pub weight_scalar: u8,
     pub scale: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub moves: [MoveSlot; 4],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub move_pp: [u8; 4],
+    pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub nickname: SizedUtf16String<26>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub move_pp_ups: [u8; 4],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub relearn_moves: [MoveSlot; 4],
+    pub relearn_moves: [MoveIndex; 4],
     pub ivs: Stats8,
     pub is_egg: bool,
     pub is_nicknamed: bool,
@@ -155,15 +157,13 @@ impl MainDataV2 {
             height_scalar: old.height_scalar,
             weight_scalar: old.weight_scalar,
             scale: old.scale,
-            moves: old.moves,
-            move_pp: old.move_pp,
+            moves: MoveSlots::from_arrays(old.moves, old.move_pp, old.move_pp_ups),
             nickname: old.nickname,
             egg_date: old.egg_date,
             met_date: old.met_date,
             egg_location_index: none_if_zero_u16(old.egg_location_index),
             met_location_index: old.met_location_index,
             met_level: old.met_level,
-            move_pp_ups: old.move_pp_ups,
             relearn_moves: old.relearn_moves,
             ivs: old.ivs,
             is_egg: old.is_egg,
@@ -272,13 +272,7 @@ impl DataSection for MainDataV2 {
             height_scalar: bytes[80],
             weight_scalar: bytes[81],
             scale: bytes[82],
-            moves: [
-                MoveSlot::from(u16::from_le_bytes(bytes[84..86].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[86..88].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[88..90].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[90..92].try_into().unwrap())),
-            ],
-            move_pp: [bytes[92], bytes[93], bytes[94], bytes[95]],
+            moves: MoveSlots::from_bytes(bytes, MOVE_DATA_OFFSETS),
             nickname: SizedUtf16String::<26>::from_bytes(bytes[96..122].try_into().unwrap()),
             egg_date: PokeDate::from_bytes_optional(bytes[122..125].try_into().unwrap()),
             met_date: PokeDate::from_bytes(bytes[125..128].try_into().unwrap()),
@@ -287,12 +281,11 @@ impl DataSection for MainDataV2 {
                 bytes[129..131].try_into().unwrap(),
             )),
             met_location_index: u16::from_le_bytes(bytes[131..133].try_into().unwrap()),
-            move_pp_ups: [bytes[134], bytes[135], bytes[136], bytes[137]],
             relearn_moves: [
-                MoveSlot::from(u16::from_le_bytes(bytes[138..140].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[140..142].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[142..144].try_into().unwrap())),
-                MoveSlot::from(u16::from_le_bytes(bytes[144..146].try_into().unwrap())),
+                MoveIndex::from(u16::from_le_bytes(bytes[138..140].try_into().unwrap())),
+                MoveIndex::from(u16::from_le_bytes(bytes[140..142].try_into().unwrap())),
+                MoveIndex::from(u16::from_le_bytes(bytes[142..144].try_into().unwrap())),
+                MoveIndex::from(u16::from_le_bytes(bytes[144..146].try_into().unwrap())),
             ],
             ivs: Stats8::from_30_bits(bytes[148..152].try_into().unwrap()),
             is_egg: util::get_flag(bytes, 148, 30),
@@ -388,15 +381,7 @@ impl DataSection for MainDataV2 {
         bytes[81] = self.weight_scalar;
         bytes[82] = self.scale;
 
-        bytes[84..86].copy_from_slice(&self.moves[0].to_le_bytes());
-        bytes[86..88].copy_from_slice(&self.moves[1].to_le_bytes());
-        bytes[88..90].copy_from_slice(&self.moves[2].to_le_bytes());
-        bytes[90..92].copy_from_slice(&self.moves[3].to_le_bytes());
-
-        bytes[92] = self.move_pp[0];
-        bytes[93] = self.move_pp[1];
-        bytes[94] = self.move_pp[2];
-        bytes[95] = self.move_pp[3];
+        self.moves.write_spans(&mut bytes, MOVE_DATA_OFFSETS);
 
         bytes[96..122].copy_from_slice(&self.nickname);
 
@@ -405,11 +390,6 @@ impl DataSection for MainDataV2 {
         bytes[128] = self.met_level;
         bytes[129..131].copy_from_slice(&self.egg_location_index.unwrap_or(0).to_le_bytes());
         bytes[131..133].copy_from_slice(&self.met_location_index.to_le_bytes());
-
-        bytes[134] = self.move_pp_ups[0];
-        bytes[135] = self.move_pp_ups[1];
-        bytes[136] = self.move_pp_ups[2];
-        bytes[137] = self.move_pp_ups[3];
 
         bytes[138..140].copy_from_slice(&self.relearn_moves[0].to_le_bytes());
         bytes[140..142].copy_from_slice(&self.relearn_moves[1].to_le_bytes());

@@ -1,14 +1,14 @@
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
 use crate::pkm::{Error, HasSpeciesAndForme, PkmBytes, Result};
 use crate::util;
-use crate::{read_u16_le, read_u32_le};
 
 use pkm_rs_resources::abilities::AbilityIndex;
-use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{Gender, PokeDate};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors, Stats8, Stats16Le};
+use pkm_rs_types::{read_u16_le, read_u32_le};
 use serde::Serialize;
 
 #[cfg(feature = "randomize")]
@@ -41,10 +41,10 @@ pub struct Pb7 {
     pub weight: u8,
     pub form_argument: u32,
     pub nickname: SizedUtf16String<26>,
-    pub moves: [MoveSlot; 4],
+    pub moves: [MoveIndex; 4],
     pub move_pp: [u8; 4],
     pub move_pp_ups: [u8; 4],
-    pub relearn_moves: [MoveSlot; 4],
+    pub relearn_moves: [MoveIndex; 4],
     pub ivs: Stats8,
     pub is_egg: bool,
     pub is_nicknamed: bool,
@@ -122,18 +122,18 @@ impl Pb7 {
             form_argument: read_u32_le!(bytes, 60),
             nickname: SizedUtf16String::<26>::from_bytes(bytes[64..90].try_into().unwrap()),
             moves: [
-                MoveSlot::from(read_u16_le!(bytes, 90)),
-                MoveSlot::from(read_u16_le!(bytes, 92)),
-                MoveSlot::from(read_u16_le!(bytes, 94)),
-                MoveSlot::from(read_u16_le!(bytes, 96)),
+                MoveIndex::from(read_u16_le!(bytes, 90)),
+                MoveIndex::from(read_u16_le!(bytes, 92)),
+                MoveIndex::from(read_u16_le!(bytes, 94)),
+                MoveIndex::from(read_u16_le!(bytes, 96)),
             ],
             move_pp: [bytes[98], bytes[99], bytes[100], bytes[101]],
             move_pp_ups: [bytes[102], bytes[103], bytes[104], bytes[105]],
             relearn_moves: [
-                MoveSlot::from(read_u16_le!(bytes, 106)),
-                MoveSlot::from(read_u16_le!(bytes, 108)),
-                MoveSlot::from(read_u16_le!(bytes, 110)),
-                MoveSlot::from(read_u16_le!(bytes, 112)),
+                MoveIndex::from(read_u16_le!(bytes, 106)),
+                MoveIndex::from(read_u16_le!(bytes, 108)),
+                MoveIndex::from(read_u16_le!(bytes, 110)),
+                MoveIndex::from(read_u16_le!(bytes, 112)),
             ],
             ivs: Stats8::from_30_bits(bytes[116..120].try_into().unwrap()),
             is_egg: util::get_flag(bytes, 116, 30),

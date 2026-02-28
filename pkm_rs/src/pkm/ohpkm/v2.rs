@@ -7,6 +7,7 @@ use crate::pkm::ohpkm::{OhpkmConvert, OhpkmV1};
 use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, HasSpeciesAndForme, PkmBytes, Result};
 
+use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_types::TrainerData;
 use pkm_rs_types::{AbilityNumber, BinaryGender};
 use serde::Serialize;
@@ -22,7 +23,7 @@ use pkm_rs_resources::{
     abilities::AbilityIndex,
     ball::Ball,
     language::Language,
-    moves::MoveSlot,
+    moves::MoveIndex,
     natures::NatureIndex,
     ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet},
     species::SpeciesAndForme,
@@ -607,35 +608,19 @@ impl OhpkmV2 {
         self.main_data.handler_name = value;
     }
 
-    pub const fn moves(&self) -> [MoveSlot; 4] {
+    pub const fn moves(&self) -> MoveSlots {
         self.main_data.moves
     }
 
-    pub const fn set_moves(&mut self, value: [MoveSlot; 4]) {
+    pub const fn set_moves(&mut self, value: MoveSlots) {
         self.main_data.moves = value;
     }
 
-    pub const fn move_pp(&self) -> [u8; 4] {
-        self.main_data.move_pp
-    }
-
-    pub const fn set_move_pp(&mut self, value: [u8; 4]) {
-        self.main_data.move_pp = value;
-    }
-
-    pub const fn move_pp_ups(&self) -> [u8; 4] {
-        self.main_data.move_pp_ups
-    }
-
-    pub const fn set_move_pp_ups(&mut self, value: [u8; 4]) {
-        self.main_data.move_pp_ups = value;
-    }
-
-    pub const fn relearn_moves(&self) -> [MoveSlot; 4] {
+    pub const fn relearn_moves(&self) -> [MoveIndex; 4] {
         self.main_data.relearn_moves
     }
 
-    pub const fn set_relearn_moves(&mut self, value: [MoveSlot; 4]) {
+    pub const fn set_relearn_moves(&mut self, value: [MoveIndex; 4]) {
         self.main_data.relearn_moves = value;
     }
 
@@ -2137,37 +2122,32 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(getter = movesWasm)]
     pub fn move_indices_js(&self) -> Vec<u16> {
-        self.main_data.moves.into_iter().map(u16::from).collect()
+        self.main_data.moves.indices()
     }
 
     #[wasm_bindgen(setter = movesWasm)]
     pub fn set_move_indices_js(&mut self, value: &[u16]) {
-        self.main_data.moves = [
-            MoveSlot::from(value[0]),
-            MoveSlot::from(value[1]),
-            MoveSlot::from(value[2]),
-            MoveSlot::from(value[3]),
-        ]
+        self.main_data.moves.set_indices(value);
     }
 
     #[wasm_bindgen(getter = movePpWasm)]
     pub fn move_pp_js(&self) -> Vec<u8> {
-        self.main_data.move_pp.into_iter().collect()
+        self.main_data.moves.pp()
     }
 
     #[wasm_bindgen(setter = movePpWasm)]
     pub fn set_move_pp_js(&mut self, value: &[u8]) {
-        self.main_data.move_pp = [value[0], value[1], value[2], value[3]]
+        self.main_data.moves.set_pp(value);
     }
 
     #[wasm_bindgen(getter = movePpUpsWasm)]
     pub fn move_pp_ups_js(&self) -> Vec<u8> {
-        self.main_data.move_pp_ups.into_iter().collect()
+        self.main_data.moves.pp_ups()
     }
 
     #[wasm_bindgen(setter = movePpUpsWasm)]
     pub fn set_move_pp_ups_js(&mut self, value: &[u8]) {
-        self.main_data.move_pp_ups = [value[0], value[1], value[2], value[3]]
+        self.main_data.moves.set_pp_ups(value);
     }
 
     #[wasm_bindgen(getter = relearnMovesWasm)]
@@ -2182,10 +2162,10 @@ impl OhpkmV2 {
     #[wasm_bindgen(setter = relearnMovesWasm)]
     pub fn set_relearn_move_indices_js(&mut self, value: &[u16]) {
         self.main_data.relearn_moves = [
-            MoveSlot::from(value[0]),
-            MoveSlot::from(value[1]),
-            MoveSlot::from(value[2]),
-            MoveSlot::from(value[3]),
+            MoveIndex::from(value[0]),
+            MoveIndex::from(value[1]),
+            MoveIndex::from(value[2]),
+            MoveIndex::from(value[3]),
         ]
     }
 

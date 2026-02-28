@@ -1,11 +1,10 @@
 use crate::pkm::traits::ModernEvs;
 use crate::pkm::{Error, HasSpeciesAndForme, PkmBytes, Result};
 use crate::util;
-use crate::{read_u16_le, read_u32_le};
 
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::abilities::AbilityIndex;
-use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::Gender;
@@ -14,6 +13,7 @@ use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, HyperTraining, MarkingsSixShapesColors, PokeDate,
     Stats8, Stats16Le, TrainerMemory,
 };
+use pkm_rs_types::{read_u16_le, read_u32_le};
 use serde::Serialize;
 
 #[cfg(feature = "randomize")]
@@ -51,7 +51,7 @@ pub struct Pk8 {
     pub height: u8,
     pub weight: u8,
     pub nickname: SizedUtf16String<26>,
-    pub moves: [MoveSlot; 4],
+    pub moves: [MoveIndex; 4],
     pub move_pp: [u8; 4],
     pub move_pp_ups: [u8; 4],
     pub relearn_moves: [u16; 4],
@@ -140,10 +140,10 @@ impl Pk8 {
             weight: bytes[81],
             nickname: SizedUtf16String::<26>::from_bytes(bytes[88..114].try_into().unwrap()),
             moves: [
-                MoveSlot::from(read_u16_le!(bytes, 114)),
-                MoveSlot::from(read_u16_le!(bytes, 116)),
-                MoveSlot::from(read_u16_le!(bytes, 118)),
-                MoveSlot::from(read_u16_le!(bytes, 120)),
+                MoveIndex::from(read_u16_le!(bytes, 114)),
+                MoveIndex::from(read_u16_le!(bytes, 116)),
+                MoveIndex::from(read_u16_le!(bytes, 118)),
+                MoveIndex::from(read_u16_le!(bytes, 120)),
             ],
             move_pp: [bytes[122], bytes[123], bytes[124], bytes[125]],
             move_pp_ups: [bytes[126], bytes[127], bytes[128], bytes[129]],

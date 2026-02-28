@@ -2,16 +2,17 @@ use crate::conversion::gen3_pokemon_index::Gen3PokemonIndex;
 use crate::pkm::traits::IsShiny8192;
 use crate::pkm::{Error, HasSpeciesAndForme, PkmBytes, Result};
 use crate::strings::Gen3String;
-use crate::{read_move_slot, read_u16_le, read_u32_le, util};
+use crate::{read_move_index, util};
 
 use arbitrary_int::{u2, u4, u7, u30};
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
-use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
 use pkm_rs_resources::species::{FormeMetadata, NatDexIndex, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::{
     BinaryGender, ContestStats, FlagReader, MarkingsFourShapes, OriginGame, Stats8, Stats16Le,
+    read_u16_le, read_u32_le,
 };
 use serde::Serialize;
 
@@ -40,7 +41,7 @@ pub struct Pk3 {
     pub move_pp_ups: [u8; 4],
     pub trainer_friendship: u8,
     growth_block_unused_u16: u16,
-    pub moves: [MoveSlot; 4],
+    pub moves: [MoveIndex; 4],
     pub move_pp: [u8; 4],
     pub evs: Stats8,
     pub contest: ContestStats,
@@ -100,10 +101,10 @@ impl Pk3 {
             trainer_friendship: bytes[41],
             growth_block_unused_u16: read_u16_le!(bytes, 42),
             moves: [
-                read_move_slot!(bytes, 44),
-                read_move_slot!(bytes, 46),
-                read_move_slot!(bytes, 48),
-                read_move_slot!(bytes, 50),
+                read_move_index!(bytes, 44),
+                read_move_index!(bytes, 46),
+                read_move_index!(bytes, 48),
+                read_move_index!(bytes, 50),
             ],
             move_pp: [bytes[52], bytes[53], bytes[54], bytes[55]],
             evs: Stats8::from_bytes(bytes[56..62].try_into().unwrap()),

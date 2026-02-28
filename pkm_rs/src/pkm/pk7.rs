@@ -2,21 +2,21 @@ use crate::encryption::ChecksumU16Le;
 use crate::pkm::ohpkm::{self, OhpkmConvert};
 use crate::pkm::traits::{IsShiny4096, ModernEvs};
 use crate::pkm::{Error, HasSpeciesAndForme, OhpkmV2, PkmBytes, Result};
-use crate::{encryption, read_u16_le, read_u32_le, util};
+use crate::{encryption, util};
 
 use arbitrary_int::{u3, u7};
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::helpers;
 use pkm_rs_resources::language::Language;
-use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame,
-    Stats8, Stats16Le,
+    Stats8, Stats16Le, read_u16_le, read_u32_le,
 };
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
@@ -59,13 +59,9 @@ pub struct Pk7 {
     pub form_argument: u32,
     pub nickname: SizedUtf16String<26>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub moves: [MoveSlot; 4],
+    pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub move_pp: [u8; 4],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub move_pp_ups: [u8; 4],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub relearn_moves: [MoveSlot; 4],
+    pub relearn_moves: [MoveIndex; 4],
     pub secret_super_training_unlocked: bool,
     pub secret_super_training_complete: bool,
     pub ivs: Stats8,
@@ -107,6 +103,12 @@ pub struct Pk7 {
 
 const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
 
+const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
+    moves: 90,
+    pp: 98,
+    pp_ups: 102,
+};
+
 impl Pk7 {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
@@ -145,19 +147,12 @@ impl Pk7 {
             super_training_dist_flags: bytes[58],
             form_argument: read_u32_le!(bytes, 60),
             nickname: SizedUtf16String::<26>::from_bytes(bytes[64..90].try_into().unwrap()),
-            moves: [
-                MoveSlot::from_le_bytes(bytes[90..92].try_into().unwrap()),
-                MoveSlot::from_le_bytes(bytes[92..94].try_into().unwrap()),
-                MoveSlot::from_le_bytes(bytes[94..96].try_into().unwrap()),
-                MoveSlot::from_le_bytes(bytes[96..98].try_into().unwrap()),
-            ],
-            move_pp: [bytes[98], bytes[99], bytes[100], bytes[101]],
-            move_pp_ups: [bytes[102], bytes[103], bytes[104], bytes[105]],
+            moves: MoveSlots::from_bytes(bytes, MOVE_DATA_OFFSETS),
             relearn_moves: [
-                MoveSlot::from_le_bytes(bytes[106..108].try_into().unwrap()),
-                MoveSlot::from_le_bytes(bytes[108..110].try_into().unwrap()),
-                MoveSlot::from_le_bytes(bytes[110..112].try_into().unwrap()),
-                MoveSlot::from_le_bytes(bytes[112..114].try_into().unwrap()),
+                MoveIndex::from_le_bytes(bytes[106..108].try_into().unwrap()),
+                MoveIndex::from_le_bytes(bytes[108..110].try_into().unwrap()),
+                MoveIndex::from_le_bytes(bytes[110..112].try_into().unwrap()),
+                MoveIndex::from_le_bytes(bytes[112..114].try_into().unwrap()),
             ],
             secret_super_training_unlocked: util::get_flag(bytes, 114, 0),
             secret_super_training_complete: util::get_flag(bytes, 114, 1),
@@ -225,6 +220,24 @@ impl Pk7 {
         let shuffled = encryption::shuffle_blocks_gen_6_7(&self.to_box_bytes())?;
         encryption::decrypt_pkm_bytes_gen_6_7(&shuffled)
     }
+
+    pub fn calculate_stats(&self) -> Stats16Le {
+        helpers::calculate_stats_modern(
+            self.species_and_forme,
+            &self.ivs,
+            &self.evs,
+            self.calculate_level(),
+            self.nature.get_metadata(),
+        )
+    }
+
+    pub const fn move_data_offsets() -> MoveDataOffsets {
+        MoveDataOffsets {
+            moves: 90,
+            pp: 98,
+            pp_ups: 102,
+        }
+    }
 }
 
 impl PkmBytes for Pk7 {
@@ -272,20 +285,7 @@ impl PkmBytes for Pk7 {
         bytes[60..64].copy_from_slice(&self.form_argument.to_le_bytes());
         bytes[64..90].copy_from_slice(&self.nickname);
 
-        bytes[90..92].copy_from_slice(&self.moves[0].to_le_bytes());
-        bytes[92..94].copy_from_slice(&self.moves[1].to_le_bytes());
-        bytes[94..96].copy_from_slice(&self.moves[2].to_le_bytes());
-        bytes[96..98].copy_from_slice(&self.moves[3].to_le_bytes());
-
-        bytes[98] = self.move_pp[0];
-        bytes[99] = self.move_pp[1];
-        bytes[100] = self.move_pp[2];
-        bytes[101] = self.move_pp[3];
-
-        bytes[102] = self.move_pp_ups[0];
-        bytes[103] = self.move_pp_ups[1];
-        bytes[104] = self.move_pp_ups[2];
-        bytes[105] = self.move_pp_ups[3];
+        self.moves.write_spans(bytes, MOVE_DATA_OFFSETS);
 
         bytes[106..108].copy_from_slice(&self.relearn_moves[0].to_le_bytes());
         bytes[108..110].copy_from_slice(&self.relearn_moves[1].to_le_bytes());
@@ -384,18 +384,6 @@ impl HasSpeciesAndForme for Pk7 {
     }
 }
 
-impl Pk7 {
-    pub fn calculate_stats(&self) -> Stats16Le {
-        helpers::calculate_stats_modern(
-            self.species_and_forme,
-            &self.ivs,
-            &self.evs,
-            self.calculate_level(),
-            self.nature.get_metadata(),
-        )
-    }
-}
-
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
@@ -418,37 +406,32 @@ impl Pk7 {
 
     #[wasm_bindgen(getter)]
     pub fn move_indices(&self) -> Vec<u16> {
-        self.moves.into_iter().map(u16::from).collect()
+        self.moves.indices()
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_move_indices(&mut self, value: Vec<u16>) {
-        self.moves = [
-            MoveSlot::from(value[0]),
-            MoveSlot::from(value[1]),
-            MoveSlot::from(value[2]),
-            MoveSlot::from(value[3]),
-        ]
+    pub fn set_move_indices(&mut self, value: &[u16]) {
+        self.moves.set_indices(value);
     }
 
     #[wasm_bindgen(getter)]
     pub fn move_pp(&self) -> Vec<u8> {
-        self.move_pp.into_iter().collect()
+        self.moves.pp()
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_move_pp(&mut self, value: Vec<u8>) {
-        self.move_pp = [value[0], value[1], value[2], value[3]]
+    pub fn set_move_pp(&mut self, value: &[u8]) {
+        self.moves.set_pp(value);
     }
 
     #[wasm_bindgen(getter)]
     pub fn move_pp_ups(&self) -> Vec<u8> {
-        self.move_pp_ups.into_iter().collect()
+        self.moves.pp_ups()
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_move_pp_ups(&mut self, value: Vec<u8>) {
-        self.move_pp_ups = [value[0], value[1], value[2], value[3]]
+    pub fn set_move_pp_ups(&mut self, value: &[u8]) {
+        self.moves.set_pp_ups(value);
     }
 
     #[wasm_bindgen(getter)]
@@ -459,10 +442,10 @@ impl Pk7 {
     #[wasm_bindgen(setter)]
     pub fn set_relearn_move_indices(&mut self, value: Vec<u16>) {
         self.relearn_moves = [
-            MoveSlot::from(value[0]),
-            MoveSlot::from(value[1]),
-            MoveSlot::from(value[2]),
-            MoveSlot::from(value[3]),
+            MoveIndex::from(value[0]),
+            MoveIndex::from(value[1]),
+            MoveIndex::from(value[2]),
+            MoveIndex::from(value[3]),
         ]
     }
 
@@ -541,9 +524,7 @@ impl OhpkmConvert for Pk7 {
             battle_memory_count: self.battle_memory_count,
             ribbons: OpenHomeRibbonSet::from_modern(self.ribbons),
             moves: self.moves,
-            move_pp: self.move_pp,
             nickname: self.nickname,
-            move_pp_ups: self.move_pp_ups,
             relearn_moves: self.relearn_moves,
             ivs: self.ivs,
             is_egg: self.is_egg,
@@ -623,8 +604,6 @@ impl OhpkmConvert for Pk7 {
             form_argument: ohpkm.form_argument(),
             nickname: ohpkm.nickname(),
             moves: ohpkm.moves(),
-            move_pp: ohpkm.move_pp(),
-            move_pp_ups: ohpkm.move_pp_ups(),
             relearn_moves: ohpkm.relearn_moves(),
             secret_super_training_unlocked: ohpkm
                 .secret_super_training_unlocked()

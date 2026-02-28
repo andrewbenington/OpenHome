@@ -4,13 +4,14 @@ use crate::pkm::plugins::cfru::conversion::moves::{
 use crate::pkm::traits::IsShiny;
 use crate::pkm::{Error, PkmBytes, Result};
 use crate::strings::Gen3String;
-use crate::{read_u16_le, read_u32_le, util};
+use crate::util;
 
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::species::SpeciesAndForme;
 use pkm_rs_types::Gender;
 use pkm_rs_types::{MarkingsFourShapes, OriginGame, Stats8};
+use pkm_rs_types::{read_u16_le, read_u32_le};
 use serde::Serialize;
 
 #[cfg(feature = "randomize")]
@@ -132,7 +133,7 @@ pub struct Pk3Cfru<I: CfruSpeciesIndex> {
     pub ball: Ball,
 
     // Moves 38:43 (5 bytes total for 4 moves with 10 bits each)
-    pub moves: [MoveSlot; 4],
+    pub moves: [MoveIndex; 4],
     pub move_pp: [u8; 4], // computed; not stored in CFRU bytes
 
     // EVs 43:49
@@ -166,7 +167,7 @@ impl<I: CfruSpeciesIndex> Pk3Cfru<I> {
 
     /// Unpack 4×10-bit move IDs from 5 bytes at 0x27..0x2B
     #[inline]
-    fn read_moves_10bit(bytes: &[u8]) -> [MoveSlot; 4] {
+    fn read_moves_10bit(bytes: &[u8]) -> [MoveIndex; 4] {
         let base = 0x27;
         let v = (bytes[base] as u64)
             | ((bytes[base + 1] as u64) << 8)
@@ -174,19 +175,19 @@ impl<I: CfruSpeciesIndex> Pk3Cfru<I> {
             | ((bytes[base + 3] as u64) << 24)
             | ((bytes[base + 4] as u64) << 32);
 
-        let mut moves = [MoveSlot::from(0u16); 4];
+        let mut moves = [MoveIndex::from(0u16); 4];
 
         for (i, move_slot) in moves.iter_mut().enumerate() {
             let cfru_index = ((v >> (i * 10)) & 0x3FF) as usize;
 
             if cfru_index == 0 {
-                *move_slot = MoveSlot::empty();
+                *move_slot = MoveIndex::empty();
                 continue;
             }
 
             let official_move_id = from_gen3_cfru_move_index(cfru_index).unwrap_or(0); // fallback to 0 if unknown
 
-            *move_slot = MoveSlot::from(official_move_id as u16);
+            *move_slot = MoveIndex::from(official_move_id as u16);
         }
 
         moves
@@ -194,7 +195,7 @@ impl<I: CfruSpeciesIndex> Pk3Cfru<I> {
 
     /// Pack 4×10-bit move IDs into 5 bytes at 0x27..0x2B
     #[inline]
-    fn write_moves_10bit(moves: &[MoveSlot; 4], bytes: &mut [u8]) {
+    fn write_moves_10bit(moves: &[MoveIndex; 4], bytes: &mut [u8]) {
         let base = 0x27;
 
         let mut v: u64 = 0;

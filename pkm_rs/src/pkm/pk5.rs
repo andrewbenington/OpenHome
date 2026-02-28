@@ -1,17 +1,19 @@
 use crate::pkm::traits::IsShiny8192;
 use crate::pkm::{Error, HasSpeciesAndForme, PkmBytes, Result};
 use crate::strings::Gen5String;
-use crate::{read_u16_le, read_u32_le, util};
+use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
-use pkm_rs_resources::moves::MoveSlot;
+use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::DsRibbonSet;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
-use pkm_rs_types::{BinaryGender, ContestStats, MarkingsSixShapes, OriginGame, Stats8, Stats16Le};
-use pkm_rs_types::{Gender, PokeDate};
+use pkm_rs_types::{
+    BinaryGender, ContestStats, Gender, MarkingsSixShapes, OriginGame, PokeDate, Stats8, Stats16Le,
+    read_u16_le, read_u32_le,
+};
 use serde::Serialize;
 
 #[cfg(feature = "randomize")]
@@ -33,7 +35,7 @@ pub struct Pk5 {
     pub language_index: Language,
     pub evs: Stats8,
     pub contest: ContestStats,
-    pub moves: [MoveSlot; 4],
+    pub moves: [MoveIndex; 4],
     pub move_pp: [u8; 4],
     pub move_pp_ups: [u8; 4],
     pub ivs: Stats8,
@@ -89,10 +91,10 @@ impl Pk5 {
             evs: Stats8::from_bytes(bytes[24..30].try_into().unwrap()),
             contest: ContestStats::from_bytes(bytes[30..36].try_into().unwrap()),
             moves: [
-                MoveSlot::from(read_u16_le!(bytes, 40)),
-                MoveSlot::from(read_u16_le!(bytes, 42)),
-                MoveSlot::from(read_u16_le!(bytes, 44)),
-                MoveSlot::from(read_u16_le!(bytes, 46)),
+                MoveIndex::from(read_u16_le!(bytes, 40)),
+                MoveIndex::from(read_u16_le!(bytes, 42)),
+                MoveIndex::from(read_u16_le!(bytes, 44)),
+                MoveIndex::from(read_u16_le!(bytes, 46)),
             ],
             move_pp: [bytes[48], bytes[49], bytes[50], bytes[51]],
             move_pp_ups: [bytes[52], bytes[53], bytes[54], bytes[55]],
