@@ -5,7 +5,6 @@ import {
   SimpleOpenHomeBox,
   StoredBankData,
 } from '@openhome-core/save/util/storage'
-import { TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
 import { Option, range, Result } from '@openhome-core/util/functional'
 import { filterUndefined, numericSorter } from '@openhome-core/util/sort'
 import { MonLocation } from '@openhome-ui/state/saves/reducer'
@@ -25,16 +24,9 @@ export class OpenHomeBanks {
   boxRows = OpenHomeBanks.BOX_ROWS
   boxColumns = OpenHomeBanks.BOX_COLUMNS
 
-  transferRestrictions: TransferRestrictions = {}
-
   private _currentBoxIndex: number = 0
   private _currentBankIndex: number = 0
   private _banks: OpenHomeBank[]
-
-  bytes: Uint8Array = new Uint8Array()
-
-  invalid: boolean = false
-  tooEarlyToOpen: boolean = false
 
   updatedBoxSlots: BankBoxCoordinates[] = []
 
@@ -49,11 +41,6 @@ export class OpenHomeBanks {
       storedBankData.current_bank
     )
   }
-
-  pluginIdentifier?: string | undefined
-  pcChecksumOffset?: number | undefined
-  pcOffset?: number | undefined
-  calculatePcChecksum?: (() => number) | undefined
 
   getCurrentBox() {
     return this.getCurrentBank().getCurrentBox()
@@ -135,10 +122,6 @@ export class OpenHomeBanks {
 
   reorderBoxesCurrentBank(idsInNewOrder: string[]) {
     this.getCurrentBank().reorderBoxes(idsInNewOrder)
-  }
-
-  resetBoxIndices() {
-    this.getCurrentBank().resetBoxIndices()
   }
 
   removeDupesFromBox(boxIndex: number) {
@@ -234,7 +217,7 @@ export class OpenHomeBanks {
   }
 }
 
-type BoxIndex = number
+export type BoxIndex = number
 
 export class OpenHomeBank {
   id: string
