@@ -31,7 +31,6 @@ export default function SyncedStateProvider<State>(props: SyncedStateProviderPro
   }
 
   if (!stateManager.loaded || !state) {
-    console.log(stateDescription, { stateManager, state })
     return <LoadingIndicator message={`Loading ${stateDescription}`} />
   }
 

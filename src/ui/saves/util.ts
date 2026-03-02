@@ -110,7 +110,6 @@ export function useOpenHomeBoxNavigator() {
   const [currentIndex, setCurrentIndex] = useState<number>()
 
   function navigateNext() {
-    console.log({ currentIndex, cb: getCurrentBox() })
     if (currentIndex === undefined) return
     const currentBox = getCurrentBox()
     for (
