@@ -11,7 +11,6 @@ import { useContext } from 'react'
 import { OHPKM } from 'src/core/pkm/OHPKM'
 import { useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '../state/ohpkm'
-import ZustandTest from './ZustandTest'
 
 export default function AppStateDisplay() {
   const transactionState = useTransactionState()
@@ -29,7 +28,6 @@ export default function AppStateDisplay() {
           <InfoGrid data={transactionState ?? {}} />
         </Flex>
       </Card>
-      <ZustandTest />
       <Card className="flex-row" style={{ margin: 8, gap: 8 }}>
         <DevDataDisplay data={appInfoDisplay(appInfoState)} label="App Info State" />
         <DevDataDisplay data={useBanksAndBoxesDisplay()} label="Saves/Mons State" />

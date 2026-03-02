@@ -10,6 +10,7 @@ import MessageRibbon from 'src/ui/components/MessageRibbon'
 import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
 import { usePathSegment } from 'src/ui/hooks/routing'
 import { useSaves } from 'src/ui/state/saves'
+import { numericSorter } from '../../../core/util/sort'
 import { boxNameOrDefault, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import AllTrackedPokemon from './AllTrackedPokemon'
 import Gen12Lookup from './Gen12Lookup'
@@ -268,11 +269,13 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
                 </Button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Content side="right" size="2">
-                {getCurrentBank().boxes.map((homeBox) => (
-                  <DropdownMenu.Item key={homeBox.id} onClick={() => recoverToBox(homeBox.index)}>
-                    {boxNameOrDefault(homeBox)}
-                  </DropdownMenu.Item>
-                ))}
+                {Array.from(getCurrentBank().boxes.values())
+                  .toSorted(numericSorter((box) => box.index))
+                  .map((homeBox) => (
+                    <DropdownMenu.Item key={homeBox.id} onClick={() => recoverToBox(homeBox.index)}>
+                      {boxNameOrDefault(homeBox)}
+                    </DropdownMenu.Item>
+                  ))}
               </DropdownMenu.Content>
             </DropdownMenu.Root>
 

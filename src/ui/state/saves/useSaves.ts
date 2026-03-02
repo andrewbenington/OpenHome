@@ -231,7 +231,7 @@ export function useSaves(): SavesAndBanksManager {
       if (dest.isHome) {
         let nextSlot = dest
 
-        const currentBankBoxCount = getCurrentBank().boxes.length
+        const currentBankBoxCount = getCurrentBank().boxes.size
         mons.forEach((mon) => {
           while (!homeLocationIsEmpty(nextSlot) && nextSlot.box < currentBankBoxCount) {
             nextSlot.boxSlot++
@@ -561,7 +561,7 @@ export function useSaves(): SavesAndBanksManager {
 
   const recoverMonToBox = useCallback(
     (id: OhpkmIdentifier, boxIndex: number) => {
-      const box = getCurrentBank().boxes[boxIndex]
+      const box = getCurrentBank().boxes.get(boxIndex)
       if (!box) {
         console.error(`box does not exist (index ${boxIndex})`)
         return

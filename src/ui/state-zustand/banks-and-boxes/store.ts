@@ -65,152 +65,172 @@ export const createBanksAndBoxesStore = (
   reloadStored: () => Promise<void>
 ) =>
   create<BanksAndBoxesState>()(
-    immer<BanksAndBoxesState>((set, readonlyState) => ({
-      reloadStore: reloadStored,
-      banks: stored.banks,
-      currentBankIndex: stored.current_bank,
-      currentBoxIndex: stored.banks[stored.current_bank].current_box,
-      updatedBoxSlots: [],
-      reverseLookup: buildReverseLookup(stored),
-      getCurrentBank: (): SimpleOpenHomeBank => {
-        const state = readonlyState()
-        return state.banks[state.currentBankIndex]
-      },
-      getCurrentBankName: (): string => {
-        return bankNameOrDefault(readonlyState().getCurrentBank())
-      },
-      setCurrentBankName: (name: Option<string>) =>
-        set((state) => {
-          currentBankMutable(state).name = name
-        }),
-      getBankName: (bankIndex: number): string => {
-        return bankNameOrDefault(readonlyState().banks[bankIndex])
-      },
-      getCurrentBox: (): SimpleOpenHomeBox => {
-        const state = readonlyState()
-        return state.getCurrentBank().boxes[state.currentBoxIndex]
-      },
-      setCurrentBox: (boxIndex: number) =>
-        set((state) => {
-          state.currentBoxIndex = boxIndex
-          currentBankMutable(state).current_box = boxIndex
-        }),
-      getBoxName: (bankIndex: number, boxIndex: number): string => {
-        return boxNameOrDefault(readonlyState().banks[bankIndex].boxes[boxIndex])
-      },
-      addBank: (name: Option<string>, boxCount: number) =>
-        set((state) => {
-          state.banks.push(buildNewBank(state, name, boxCount))
-        }),
-      switchToBank: (bankIndex: number) =>
-        set((state) => {
-          state.currentBankIndex = bankIndex
-          state.currentBoxIndex = state.banks[bankIndex].current_box
-          state.banks = [...state.banks] // force immer to recognize the update
-        }),
-      getAtLocation: (location: BankBoxCoordinates): Option<OhpkmIdentifier> => {
-        return boxAtLocationMutable(readonlyState(), location).identifiers.get(location.boxSlot)
-      },
-      locationIsEmpty: (location: BankBoxCoordinates): boolean => {
-        return readonlyState().getAtLocation(location) === undefined
-      },
-      setAtLocation: (location: BankBoxCoordinates, identifier: OhpkmIdentifier) =>
-        set((state) => {
-          boxAtLocationMutable(state, location).identifiers.set(location.boxSlot, identifier)
-          state.reverseLookup.set(identifier, location)
-          state.updatedBoxSlots.push(location)
-        }),
-      clearAtLocation: (location: BankBoxCoordinates) =>
-        set((state) => {
-          const box = boxAtLocationMutable(state, location)
-          const clearedIdentifier = box.identifiers.get(location.boxSlot)
-          box.identifiers.delete(location.boxSlot)
+    immer<BanksAndBoxesState>((set, readonlyState) => {
+      const requireBank = <T extends BanksAndBoxesState>(state: T, bankIndex: number) => {
+        const bank = state.banks[bankIndex]
+        if (!bank) {
+          throw new Error(`no bank with index ${bankIndex}`)
+        }
+        return bank
+      }
 
-          if (clearedIdentifier) {
-            state.reverseLookup.delete(clearedIdentifier)
-          }
-          state.updatedBoxSlots.push(location)
-        }),
-      setBoxNameCurrentBank: (boxIndex: number, boxName: Option<string>) =>
-        set((state) => {
-          currentBankMutable(state).boxes[boxIndex].name = boxName ?? null
-        }),
-      deleteBoxCurrentBank: (boxId: string) =>
-        set((state) => {
-          const currentBank = currentBankMutable(state)
-          currentBank.boxes = currentBank.boxes.filter((box) => box.id !== boxId)
-        }),
-      addBoxCurrentBank: (
-        location: AddBoxLocation,
-        boxName?: string,
-        identifiers?: BoxMonIdentifiers
-      ) =>
-        set((state) => {
-          const currentBank = currentBankMutable(state)
-          const newBox = buildNewBox(currentBank, boxName, identifiers)
+      const requireBox = <T extends BanksAndBoxesState>(
+        state: T,
+        location: Omit<BankBoxCoordinates, 'boxSlot'>
+      ) => {
+        const box = state.banks[location.bank].boxes.get(location.box)
+        if (!box) {
+          throw new Error(`no box with index ${location.bank}`)
+        }
+        return box
+      }
 
-          if (location === 'start') {
-            currentBank.boxes = [newBox, ...currentBank.boxes]
-          } else if (location === 'end') {
-            currentBank.boxes.push(newBox)
-          } else {
-            const index = location[1]
-            const boxCount = currentBank.boxes.length
-            if (index >= boxCount) {
-              return R.Err(`index ${index} is greater than box count (${boxCount})`)
+      const requireBoxCurrentBank = <T extends BanksAndBoxesState>(state: T, boxIndex: number) => {
+        const box = state.getCurrentBank().boxes.get(boxIndex)
+        if (!box) {
+          throw new Error(`no box with index ${boxIndex}`)
+        }
+        return box
+      }
+
+      return {
+        reloadStore: reloadStored,
+        banks: stored.banks,
+        currentBankIndex: stored.current_bank,
+        currentBoxIndex: stored.banks[stored.current_bank].current_box,
+        updatedBoxSlots: [],
+        reverseLookup: buildReverseLookup(stored),
+        getCurrentBank: (): SimpleOpenHomeBank => {
+          const state = readonlyState()
+          return state.banks[state.currentBankIndex]
+        },
+        getCurrentBankName: (): string => {
+          return bankNameOrDefault(readonlyState().getCurrentBank())
+        },
+        setCurrentBankName: (name: Option<string>) =>
+          set((state) => {
+            currentBankMutable(state).name = name
+          }),
+        getBankName: (bankIndex: number): string => {
+          return bankNameOrDefault(readonlyState().banks[bankIndex])
+        },
+        getCurrentBox: (): SimpleOpenHomeBox => {
+          const state = readonlyState()
+          return requireBoxCurrentBank(state, state.currentBoxIndex)
+        },
+        setCurrentBox: (boxIndex: number) =>
+          set((state) => {
+            state.currentBoxIndex = boxIndex
+            currentBankMutable(state).current_box = boxIndex
+          }),
+        getBoxName: (bank: number, box: number): string => {
+          return boxNameOrDefault(requireBox(readonlyState(), { bank, box }))
+        },
+        addBank: (name: Option<string>, boxCount: number) =>
+          set((state) => {
+            state.banks.push(buildNewBank(state, name, boxCount))
+          }),
+        switchToBank: (bankIndex: number) =>
+          set((state) => {
+            state.currentBankIndex = bankIndex
+            state.currentBoxIndex = state.banks[bankIndex].current_box
+            state.banks = [...state.banks] // force immer to recognize the update
+          }),
+        getAtLocation: (location: BankBoxCoordinates): Option<OhpkmIdentifier> => {
+          return requireBox(readonlyState(), location).identifiers.get(location.boxSlot)
+        },
+        locationIsEmpty: (location: BankBoxCoordinates): boolean => {
+          return readonlyState().getAtLocation(location) === undefined
+        },
+        setAtLocation: (location: BankBoxCoordinates, identifier: OhpkmIdentifier) =>
+          set((state) => {
+            requireBox(state, location).identifiers.set(location.boxSlot, identifier)
+            state.reverseLookup.set(identifier, location)
+            state.updatedBoxSlots.push(location)
+          }),
+        clearAtLocation: (location: BankBoxCoordinates) =>
+          set((state) => {
+            const box = requireBox(state, location)
+            const clearedIdentifier = box.identifiers.get(location.boxSlot)
+            box.identifiers.delete(location.boxSlot)
+
+            if (clearedIdentifier) {
+              state.reverseLookup.delete(clearedIdentifier)
             }
-            const pivot = location[0] === 'before' ? index : index + 1
-            currentBank.boxes = [
-              ...currentBank.boxes.slice(0, pivot),
-              newBox,
-              ...currentBank.boxes.slice(pivot),
-            ]
-          }
+            state.updatedBoxSlots.push(location)
+          }),
+        setBoxNameCurrentBank: (boxIndex: number, boxName: Option<string>) =>
+          set((state) => {
+            requireBoxCurrentBank(state, boxIndex).name = boxName ?? null
+          }),
+        deleteBoxCurrentBank: (boxId: string) =>
+          set((state) => {
+            const currentBank = requireBank(state, state.currentBankIndex)
+            const boxWithId = Array.from(currentBank.boxes.values()).find((b) => b.id === boxId)
+            if (!boxWithId) {
+              throw new Error(`no box with id ${boxId}`)
+            }
+            currentBank.boxes.delete(boxWithId.index)
+            currentBank.boxes = rebuildBoxMapUsingIndices(currentBank.boxes)
+          }),
+        addBoxCurrentBank: (
+          location: AddBoxLocation,
+          boxName?: string,
+          identifiers?: BoxMonIdentifiers
+        ) =>
+          set((state) => {
+            const currentBank = currentBankMutable(state)
+            let newBox = buildNewBox(currentBank, boxName, identifiers)
+            currentBank.boxes = rebuildMapWithNewBox(currentBank.boxes, newBox, location)
+          }),
+        reorderBoxesCurrentBank: (idsInNewOrder: string[]) =>
+          set((state) => {
+            const currentBank = requireBank(state, state.currentBankIndex)
+            currentBank.boxes.forEach((box) => {
+              box.index = idsInNewOrder.indexOf(box.id)
+            })
+            currentBank.boxes = rebuildBoxMapUsingIndices(currentBank.boxes)
 
-          resetBoxIndices(currentBank)
+            const remappedBoxIndices = new Map(
+              Array.from(currentBank.boxes.values()).map(
+                (box, index) => [index, { ...box, index }] as const
+              )
+            )
 
-          return R.Ok(null)
-        }),
-      reorderBoxesCurrentBank: (idsInNewOrder: string[]) =>
-        set((state) => {
-          const currentBank = currentBankMutable(state)
-          currentBank.boxes = currentBank.boxes.toSorted(
-            numericSorter((box) => idsInNewOrder.indexOf(box.id))
+            // reverse lookup now has outdated box indexes, so they need to be updated
+            Array.from(state.reverseLookup).forEach(([, location]) => {
+              location.box = remappedBoxIndices.get(location.box)?.index ?? location.box
+            })
+          }),
+        firstEmptySlotInBox: (boxIndex: number): Option<number> => {
+          return firstEmptyBoxSlot(requireBoxCurrentBank(readonlyState(), boxIndex))
+        },
+        removeDupesFromBox: (boxIndex: number) =>
+          set((state) => {
+            removeDupes(requireBoxCurrentBank(state, boxIndex))
+          }),
+        allMonsCurrentBank: (): OhpkmIdentifier[] => {
+          return Array.from(readonlyState().getCurrentBank().boxes.values()).flatMap((box) =>
+            Array.from(box.identifiers.values())
           )
-
-          const remappedBoxIndices: Map<number, number> = new Map()
-          currentBank.boxes.forEach((box, newIndex) => {
-            remappedBoxIndices.set(box.index, newIndex)
-            box.index = newIndex
-          })
-
-          // reverse lookup now has outdated box indexes, so they need to be updated
-          state.reverseLookup.entries().forEach(([, location]) => {
-            location.box = remappedBoxIndices.get(location.box) ?? location.box
-          })
-        }),
-      firstEmptySlotInBox: (boxIndex: number): Option<number> => {
-        return firstEmptyBoxSlot(readonlyState().getCurrentBank().boxes[boxIndex])
-      },
-      removeDupesFromBox: (boxIndex: number) =>
-        set((state) => removeDupes(currentBankMutable(state).boxes[boxIndex])),
-      allMonsCurrentBank: (): OhpkmIdentifier[] => {
-        return readonlyState()
-          .getCurrentBank()
-          .boxes.flatMap((box) => Array.from(box.identifiers.values()))
-      },
-      allMonsInBoxCurrentBank: (boxIndex: number): OhpkmIdentifier[] => {
-        return Array.from(readonlyState().getCurrentBank().boxes[boxIndex].identifiers.values())
-      },
-      findHomeLocation: (identifier: OhpkmIdentifier): Option<BankBoxCoordinates> => {
-        return readonlyState().reverseLookup.get(identifier)
-      },
-      indexOfBoxId: (id: string): Option<number> => {
-        return readonlyState()
-          .getCurrentBank()
-          .boxes.findIndex((box) => box.id === id)
-      },
-    })) as StateCreator<BanksAndBoxesState, [], []>
+        },
+        allMonsInBoxCurrentBank: (boxIndex: number): OhpkmIdentifier[] => {
+          const box = readonlyState().getCurrentBank().boxes.get(boxIndex)
+          if (!box) {
+            throw new Error(`no box with index ${boxIndex}`)
+          }
+          return Array.from(box.identifiers.values())
+        },
+        findHomeLocation: (identifier: OhpkmIdentifier): Option<BankBoxCoordinates> => {
+          return readonlyState().reverseLookup.get(identifier)
+        },
+        indexOfBoxId: (id: string): Option<number> => {
+          return Array.from(readonlyState().getCurrentBank().boxes).find(
+            ([, box]) => box.id === id
+          )?.[0]
+        },
+      }
+    }) as StateCreator<BanksAndBoxesState, [], []>
   )
 
 // when called using a mutable state (via immer), mutations to the returned value
@@ -219,11 +239,37 @@ function currentBankMutable<T extends BanksAndBoxesState>(state: T): T['banks'][
   return state.banks[state.currentBankIndex]
 }
 
-function boxAtLocationMutable<T extends BanksAndBoxesState>(
-  state: T,
-  location: BankBoxCoordinates
-): T['banks'][number]['boxes'][number] {
-  return state.banks[location.bank].boxes[location.box]
+type BoxMap = Map<number, SimpleOpenHomeBox>
+
+function rebuildMapWithNewBox(
+  existingBoxes: BoxMap,
+  newBox: SimpleOpenHomeBox,
+  insertLocation: AddBoxLocation
+): BoxMap {
+  const boxesInOrder = Array.from(existingBoxes.values()).toSorted(numericSorter((b) => b.index))
+  const pivot =
+    insertLocation === 'start'
+      ? 0
+      : insertLocation === 'end'
+        ? boxesInOrder.length
+        : insertLocation[0] === 'before'
+          ? insertLocation[1]
+          : insertLocation[1] + 1
+  const boxesInNewOrder = [...boxesInOrder.slice(0, pivot), newBox, ...boxesInOrder.slice(pivot)]
+
+  return boxMapFromOrdered(boxesInNewOrder)
+}
+
+function rebuildBoxMapUsingIndices(boxes: BoxMap): BoxMap {
+  return new Map(
+    Array.from(boxes.values())
+      .sort(numericSorter((box) => box.index))
+      .map((box, index) => [index, { ...box, index }] as const)
+  )
+}
+
+function boxMapFromOrdered(boxesInOrder: SimpleOpenHomeBox[]): BoxMap {
+  return new Map(boxesInOrder.map((box, index) => [index, { ...box, index }] as const))
 }
 
 function buildNewBank(
@@ -235,12 +281,14 @@ function buildNewBank(
     id: UuidV4(),
     name,
     index: state.banks.length,
-    boxes: range(boxCount).map((_, index) => ({
-      id: UuidV4(),
-      name: null,
-      index,
-      identifiers: new Map(),
-    })),
+    boxes: boxMapFromOrdered(
+      range(boxCount).map((_, index) => ({
+        id: UuidV4(),
+        name: null,
+        index,
+        identifiers: new Map(),
+      }))
+    ),
     current_box: 0,
   }
 }
@@ -253,18 +301,14 @@ function buildNewBox(
   return {
     id: UuidV4(),
     name: boxName ?? null,
-    index: bank.boxes.length,
+    index: bank.boxes.size,
     identifiers: identifiers ?? new Map(),
   }
 }
 
-function resetBoxIndices(bank: SimpleOpenHomeBank) {
-  bank.boxes.forEach((box, newIndex) => (box.index = newIndex))
-}
-
 function firstEmptyBoxSlot(box: SimpleOpenHomeBox): Option<number> {
   let firstEmptyIndex: Option<number> = undefined
-  for (const [index, contents] of box.identifiers.entries()) {
+  for (const [index, contents] of box.identifiers) {
     if (!contents && (firstEmptyIndex === undefined || firstEmptyIndex > index)) {
       firstEmptyIndex = index
     }
@@ -276,9 +320,9 @@ function firstEmptyBoxSlot(box: SimpleOpenHomeBox): Option<number> {
 function buildReverseLookup(stored: StoredBankData): ReverseLookup {
   const reverseLookup: ReverseLookup = new Map()
   for (const bank of stored.banks) {
-    for (const box of bank.boxes) {
-      for (const [boxSlot, identifier] of box.identifiers.entries()) {
-        reverseLookup.set(identifier, { bank: bank.index, box: box.index, boxSlot })
+    for (const [boxIndex, box] of bank.boxes) {
+      for (const [boxSlot, identifier] of box.identifiers) {
+        reverseLookup.set(identifier, { bank: bank.index, box: boxIndex, boxSlot })
       }
     }
   }
@@ -372,14 +416,14 @@ export function useBanksAndBoxes() {
   const firstHomeBoxEmptySlot = withSelectors.use.firstEmptySlotInBox()
 
   function switchToPreviousBox() {
-    const currentBankBoxCount = getCurrentBank().boxes.length
+    const currentBankBoxCount = getCurrentBank().boxes.size
     switchBoxCurrentBank(
       getCurrentBank().current_box > 0 ? getCurrentBank().current_box - 1 : currentBankBoxCount - 1
     )
   }
 
   function switchToNextBox() {
-    const currentBankBoxCount = getCurrentBank().boxes.length
+    const currentBankBoxCount = getCurrentBank().boxes.size
     switchBoxCurrentBank((getCurrentBank().current_box + 1) % currentBankBoxCount)
   }
 
@@ -394,7 +438,10 @@ export function useBanksAndBoxes() {
     }
 
     const sorted = mons.toSorted(getSortFunctionNullable(sortType))
-    const box = getCurrentBank().boxes[boxIndex]
+    const box = getCurrentBank().boxes.get(boxIndex)
+    if (!box) {
+      return R.Ok(null)
+    }
 
     for (const i of range(box.identifiers.size)) {
       const location: BankBoxCoordinates = {
@@ -423,7 +470,7 @@ export function useBanksAndBoxes() {
     const boxSize = OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS
 
     const currentBankIndex = getCurrentBank().index
-    const currentBankBoxCount = getCurrentBank().boxes.length
+    const currentBankBoxCount = getCurrentBank().boxes.size
 
     for (const box of range(currentBankBoxCount)) {
       for (const slot of range(boxSize)) {
@@ -448,7 +495,7 @@ export function useBanksAndBoxes() {
   function addBoxesWithIds(ids: OhpkmIdentifier[], boxName?: string): Option<number> {
     if (ids.length === 0) return undefined
 
-    const firstNewBoxIndex = getCurrentBank().boxes.length
+    const firstNewBoxIndex = getCurrentBank().boxes.size
 
     for (let i = 0; i < ids.length; i += OpenHomeBanks.SLOTS_PER_BOX) {
       const identifiers: BoxMonIdentifiers = new Map()

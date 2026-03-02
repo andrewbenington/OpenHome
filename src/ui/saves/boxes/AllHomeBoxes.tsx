@@ -16,7 +16,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { Option, range } from '@openhome-core/util/functional'
-import { filterUndefined } from '@openhome-core/util/sort'
+import { filterUndefined, numericSorter } from '@openhome-core/util/sort'
 import {
   CtxMenuElementBuilder,
   ItemBuilder,
@@ -65,14 +65,18 @@ export default function AllHomeBoxes(props: {
     const newOrderIndices = calculateNewBoxOrder(
       activeIndex,
       overIndex,
-      getCurrentBank().boxes.length
+      getCurrentBank().boxes.size
     )
     const newOrderIds = newOrderIndices
-      .map((index) => getCurrentBank().boxes.find((box) => box.index === index)?.id)
+      .map((index) => getCurrentBank().boxes.get(index)?.id)
       .filter(filterUndefined)
 
     reorderBoxesCurrentBank(newOrderIds)
   }
+
+  const currentBoxesOrdered = Array.from(getCurrentBank().boxes.values()).toSorted(
+    numericSorter((box) => box.index)
+  )
 
   return (
     <OpenHomeCtxMenu elements={useSaveContextActions()}>
@@ -84,13 +88,13 @@ export default function AllHomeBoxes(props: {
             modifiers={[restrictToParentElement]}
           >
             <SortableContext
-              items={getCurrentBank().boxes.map((box) => box.id) ?? []}
+              items={currentBoxesOrdered.map((box) => box.id) ?? []}
               strategy={rectSortingStrategy}
             >
-              {getCurrentBank().boxes.map((box) => (
+              {currentBoxesOrdered.map((box) => (
                 <DraggableBoxOverview
                   key={box.id}
-                  boxIndex={box.index}
+                  box={box}
                   onBoxSelect={() => onBoxSelect(box.index)}
                   debugMode={debugMode}
                 />
@@ -98,10 +102,10 @@ export default function AllHomeBoxes(props: {
             </SortableContext>
           </DndContext>
         ) : (
-          getCurrentBank().boxes.map((box) => (
+          currentBoxesOrdered.map((box) => (
             <ClickableBoxOverview
               key={box.id}
-              boxIndex={box.index}
+              box={box}
               onBoxSelect={() => onBoxSelect(box.index)}
               debugMode={debugMode}
               deleting={deleting}
@@ -114,24 +118,24 @@ export default function AllHomeBoxes(props: {
 }
 
 type BoxOverviewProps = {
-  boxIndex: number
+  box: SimpleOpenHomeBox
   onBoxSelect: () => void
   debugMode?: boolean
   deleting?: boolean
 }
 
-function ClickableBoxOverview({ boxIndex, onBoxSelect, debugMode, deleting }: BoxOverviewProps) {
+function ClickableBoxOverview({ box, onBoxSelect, debugMode, deleting }: BoxOverviewProps) {
   const { getCurrentBank, firstHomeBoxEmptySlot, deleteBoxCurrentBank } = useBanksAndBoxes()
 
-  const firstOpenIndex = firstHomeBoxEmptySlot(boxIndex)
-  const box = getCurrentBank().boxes[boxIndex]
+  const firstOpenIndex = firstHomeBoxEmptySlot(box.index)
+
   const boxHasMons = box.identifiers.size > 0
 
   const firstOpenLocation: Option<MonLocation> =
     firstOpenIndex !== undefined
       ? {
           bank: getCurrentBank().index,
-          box: boxIndex,
+          box: box.index,
           boxSlot: firstOpenIndex,
           isHome: true,
         }
@@ -176,9 +180,7 @@ function ClickableBoxOverview({ boxIndex, onBoxSelect, debugMode, deleting }: Bo
   )
 }
 
-function DraggableBoxOverview({ boxIndex, debugMode }: BoxOverviewProps) {
-  const { getCurrentBank } = useBanksAndBoxes()
-  const box = getCurrentBank().boxes[boxIndex]
+function DraggableBoxOverview({ box, debugMode }: BoxOverviewProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging, active } =
     useSortable({ id: box.id })
 
@@ -298,7 +300,7 @@ function useBoxContextActions(box: SimpleOpenHomeBox): CtxMenuElementBuilder[][]
   const boxActions = [
     ItemBuilder.fromLabel('Remove duplicates from this box')
       .withAction(() => removeDupesFromHomeBox(box.index))
-      .withDisabled(boxIsEmpty),
+      .withDisabled(!boxIsEmpty),
     SubmenuBuilder.fromLabel('Sort this box...')
       .withBuilders(
         SortTypes.map((sortType) =>

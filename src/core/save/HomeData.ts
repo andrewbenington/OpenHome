@@ -5,7 +5,7 @@ import {
   SimpleOpenHomeBox,
   StoredBankData,
 } from '@openhome-core/save/util/storage'
-import { Option, range, Result } from '@openhome-core/util/functional'
+import { Option, Result } from '@openhome-core/util/functional'
 import { filterUndefined, numericSorter } from '@openhome-core/util/sort'
 import { MonLocation } from '@openhome-ui/state/saves/reducer'
 import { v4 as UuidV4 } from 'uuid'
@@ -56,24 +56,6 @@ export class OpenHomeBanks {
 
   gameColor() {
     return '#7DCEAB'
-  }
-
-  addBank(name: string | undefined, box_count: number) {
-    const newBank: SimpleOpenHomeBank = {
-      id: UuidV4(),
-      name,
-      index: this._banks.length,
-      boxes: range(box_count).map((_, index) => ({
-        id: UuidV4(),
-        name: null,
-        index,
-        identifiers: new Map(),
-      })),
-      current_box: 0,
-    }
-
-    this._banks.push(OpenHomeBank.fromSimpleBank(newBank))
-    return newBank
   }
 
   setAndLoadBank(bankIndex: number) {
@@ -223,7 +205,7 @@ export class OpenHomeBank {
   id: string
   index: number
   name: Option<string>
-  private _boxes: OpenHomeBox[]
+  private _boxes: OpenHomeBox[] = []
   currentBoxIndex: number
 
   // Maps a mon's identifier to its current box index. Modifications to this._boxes (via setAtLocation()) should always keep this up to date
@@ -234,10 +216,6 @@ export class OpenHomeBank {
     this.index = simpleBank.index
     this.name = simpleBank.name
     this.currentBoxIndex = simpleBank.current_box
-    this._boxes = simpleBank.boxes
-      .toSorted(numericSorter((box) => box.index))
-      .map(OpenHomeBox.fromSimpleBox)
-
     for (const box of this._boxes) {
       box.allContainedMons().forEach((identifier) => this._reverseLookup.set(identifier, box.index))
     }
@@ -249,16 +227,6 @@ export class OpenHomeBank {
 
   nameOrDefault() {
     return this.name ?? `Bank ${this.index + 1}`
-  }
-
-  toSimple(): SimpleOpenHomeBank {
-    return {
-      id: this.id,
-      index: this.index,
-      name: this.name,
-      boxes: this._boxes.map((box) => box.toSimple()),
-      current_box: this.currentBoxIndex,
-    }
   }
 
   getCurrentBox() {
