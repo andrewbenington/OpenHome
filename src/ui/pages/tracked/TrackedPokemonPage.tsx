@@ -10,6 +10,7 @@ import MessageRibbon from 'src/ui/components/MessageRibbon'
 import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
 import { usePathSegment } from 'src/ui/hooks/routing'
 import { useSaves } from 'src/ui/state/saves'
+import { boxNameOrDefault, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import AllTrackedPokemon from './AllTrackedPokemon'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
@@ -194,8 +195,10 @@ interface ForOneStateBodyProps {
 function ForOneStateBody(props: ForOneStateBodyProps) {
   const { state, onClose } = props
   const saves = useSaves()
+  const { switchBoxCurrentBank } = useBanksAndBoxes()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const { getCurrentBank } = useBanksAndBoxes()
 
   function openSaveAndNavToHome(save: SAV) {
     saves.addSave(save)
@@ -209,7 +212,7 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
 
     setLoading(true)
     saves.recoverMonToBox(state.id, boxIndex)
-    saves.homeBoxSetCurrent(boxIndex)
+    switchBoxCurrentBank(boxIndex)
     navigate('/home')
   }
 
@@ -265,14 +268,11 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
                 </Button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Content side="right" size="2">
-                {saves.homeData
-                  .getCurrentBank()
-                  .getBoxes()
-                  .map((homeBox) => (
-                    <DropdownMenu.Item key={homeBox.id} onClick={() => recoverToBox(homeBox.index)}>
-                      {homeBox.nameOrDefault()}
-                    </DropdownMenu.Item>
-                  ))}
+                {getCurrentBank().boxes.map((homeBox) => (
+                  <DropdownMenu.Item key={homeBox.id} onClick={() => recoverToBox(homeBox.index)}>
+                    {boxNameOrDefault(homeBox)}
+                  </DropdownMenu.Item>
+                ))}
               </DropdownMenu.Content>
             </DropdownMenu.Root>
 
@@ -295,14 +295,14 @@ interface ForAllStateBodyProps {
 function ForAllStateBody(props: ForAllStateBodyProps) {
   const { state, onClose } = props
   const [loading, setLoading] = useState(false)
-  const saves = useSaves()
+  const { addBoxesWithIds, switchBoxCurrentBank } = useBanksAndBoxes()
   const navigate = useNavigate()
 
   function recoverMons(ids: OhpkmIdentifier[]) {
     setLoading(true)
-    const firstNewBoxIndex = saves.newBoxesWithIds(ids, 'Recovered Pokémon')
+    const firstNewBoxIndex = addBoxesWithIds(ids, 'Recovered Pokémon')
     if (firstNewBoxIndex !== undefined) {
-      saves.homeBoxSetCurrent(firstNewBoxIndex)
+      switchBoxCurrentBank(firstNewBoxIndex)
     }
     navigate('/home')?.then(() => setLoading(false))
   }

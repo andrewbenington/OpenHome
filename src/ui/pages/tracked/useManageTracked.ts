@@ -33,14 +33,14 @@ import { filterUndefined } from '../../../core/util/sort'
 import { SaveRef } from '../../../core/util/types'
 import { BackendContext } from '../../backend/backendContext'
 import useDisplayError from '../../hooks/displayError'
+import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { AppInfoContext } from '../../state/appInfo'
 import { useLookups } from '../../state/lookups'
 import { OhpkmStoreData, useOhpkmStore } from '../../state/ohpkm'
-import { useSaves } from '../../state/saves'
 
 export function useManageTracked() {
   const ohpkmStore = useOhpkmStore()
-  const { homeData } = useSaves()
+  const { findHomeLocation } = useBanksAndBoxes()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { lookups } = useLookups()
   const backend = useContext(BackendContext)
@@ -160,7 +160,7 @@ export function useManageTracked() {
 
     const allStoredById = ohpkmStore.byId
     const allStoredIdsNotInBoxes = new Set(
-      Object.keys(allStoredById).filter((id) => homeData.findIfPresent(id) === undefined)
+      Object.keys(allStoredById).filter((id) => findHomeLocation(id) === undefined)
     )
     const totalMons = allStoredIdsNotInBoxes.size
     let foundMonIds = new Set<string>()
@@ -250,7 +250,15 @@ export function useManageTracked() {
       totalMons,
       missingMonIds: allMissingIdsNotInBoxes,
     })
-  }, [backend, displayError, enabledSaveTypes, homeData, lookups.gen12, lookups.gen345, ohpkmStore])
+  }, [
+    backend,
+    displayError,
+    enabledSaveTypes,
+    findHomeLocation,
+    lookups.gen12,
+    lookups.gen345,
+    ohpkmStore,
+  ])
 
   return {
     findSaveForMon,

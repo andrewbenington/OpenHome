@@ -2,6 +2,7 @@ import { R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { AppState as TransactionState } from '@openhome-ui/backend/backendInterface'
 import { createContext, useContext, useState } from 'react'
+import useValueChanged from '../../hooks/useValueChanged'
 
 type PossiblyLoadedTransactionState =
   | {
@@ -34,10 +35,14 @@ export function usePossiblyLoadedTxState(): PossiblyLoadedTransactionState {
   const [error, setError] = useState<string>()
   const backend = useContext(BackendContext)
 
+  useValueChanged(transactionState, 'Tx state')
+
   if (!loading && !error && !transactionState) {
+    console.log('loading tx state')
     backend.getState().then(
       R.match(
         (state) => {
+          console.log('got state', state)
           setTransactionState(state)
           setLoading(false)
           setError(undefined)

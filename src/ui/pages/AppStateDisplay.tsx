@@ -5,18 +5,17 @@ import { useTransactionState } from '@openhome-ui/state/app-state'
 import { AppInfoContext, AppInfoState } from '@openhome-ui/state/appInfo'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { ItemBagContext, ItemBagState } from '@openhome-ui/state/items'
-import { OpenSavesState, useSaves } from '@openhome-ui/state/saves'
 import { Item, OriginGames, SpeciesLookup } from '@pkm-rs/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import { useContext } from 'react'
 import { OHPKM } from 'src/core/pkm/OHPKM'
+import { useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '../state/ohpkm'
 import ZustandTest from './ZustandTest'
 
 export default function AppStateDisplay() {
   const transactionState = useTransactionState()
   const [appInfoState] = useContext(AppInfoContext)
-  const savesAndBanks = useSaves()
   const [errorState, dispatchErrorState] = useContext(ErrorContext)
   const [bagState] = useContext(ItemBagContext)
   const ohpkmStore = useOhpkmStore()
@@ -33,7 +32,7 @@ export default function AppStateDisplay() {
       <ZustandTest />
       <Card className="flex-row" style={{ margin: 8, gap: 8 }}>
         <DevDataDisplay data={appInfoDisplay(appInfoState)} label="App Info State" />
-        <DevDataDisplay data={openSavesDisplay(savesAndBanks)} label="Saves/Mons State" />
+        <DevDataDisplay data={useBanksAndBoxesDisplay()} label="Saves/Mons State" />
         <DevDataDisplay data={ohpkmStoreDisplay(ohpkmStore.byId)} label="OHPKM Store" />
         <DevDataDisplay data={bagDisplay(bagState)} label="Bag State" />
         <DevDataDisplay data={errorState} label="Error State" />
@@ -59,14 +58,13 @@ function appInfoDisplay(state: AppInfoState) {
   }
 }
 
-function openSavesDisplay(state: OpenSavesState) {
+function useBanksAndBoxesDisplay() {
+  const { banks } = useBanksAndBoxes()
   return {
-    'Home Data': state.homeData?.displayState(),
-    Banks: state.homeData?.banks.map((bank) => ({
+    Banks: banks.map((bank) => ({
       name: bank.name,
       index: bank.index,
     })),
-    Error: state.error,
   }
 }
 

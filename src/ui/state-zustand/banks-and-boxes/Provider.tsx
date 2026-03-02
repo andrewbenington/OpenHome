@@ -9,6 +9,7 @@ import { BanksAndBoxesStoreContext, createBanksAndBoxesStore } from './store'
 
 type InnerProviderProps = {
   storedBanksAndBoxes: StoredBankData
+  loadAllHomeData: () => Promise<void>
 } & PropsWithChildren
 
 export default function BanksAndBoxesProvider(props: PropsWithChildren) {
@@ -51,10 +52,14 @@ export default function BanksAndBoxesProvider(props: PropsWithChildren) {
     return <LoadingIndicator message="Loading OpenHome boxes..." />
   }
 
-  function InnerProvider({ storedBanksAndBoxes, children }: InnerProviderProps) {
-    const [store] = useState(() => createBanksAndBoxesStore(storedBanksAndBoxes))
-    return <BanksAndBoxesStoreContext value={store}>{children}</BanksAndBoxesStoreContext>
-  }
+  return (
+    <InnerProvider storedBanksAndBoxes={storedBanksAndBoxes} loadAllHomeData={loadAllHomeData}>
+      {props.children}
+    </InnerProvider>
+  )
+}
 
-  return <InnerProvider storedBanksAndBoxes={storedBanksAndBoxes}>{props.children}</InnerProvider>
+function InnerProvider({ storedBanksAndBoxes, loadAllHomeData, children }: InnerProviderProps) {
+  const [store] = useState(() => createBanksAndBoxesStore(storedBanksAndBoxes, loadAllHomeData))
+  return <BanksAndBoxesStoreContext value={store}>{children}</BanksAndBoxesStoreContext>
 }

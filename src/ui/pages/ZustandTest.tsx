@@ -2,7 +2,7 @@ import { Card } from '@radix-ui/themes'
 import { useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
 
 export default function ZustandTest() {
-  const { banks } = useBanksAndBoxes()
+  const banks = useBanksAndBoxes().banks
 
   return (
     <div>

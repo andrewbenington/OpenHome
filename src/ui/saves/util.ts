@@ -7,7 +7,9 @@ import BackendInterface from '@openhome-ui/backend/backendInterface'
 import { CtxMenuElementBuilder, ItemBuilder } from '@openhome-ui/components/context-menu/types'
 import { OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
+import { useState } from 'react'
 import { OpenHomeBanks, OpenHomeBox } from 'src/core/save/HomeData'
+import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
 
 export type SaveViewMode = 'card' | 'grid'
 
@@ -96,6 +98,53 @@ export function getFollowingMon(
 
   if (prevIndex !== index) {
     return prevIndex
+  }
+}
+
+function moduloUnderflowWrap(a: number, b: number): number {
+  return ((a % b) + b) % b
+}
+
+export function useOpenHomeBoxNavigator() {
+  const { getCurrentBox } = useBanksAndBoxes()
+  const [currentIndex, setCurrentIndex] = useState<number>()
+
+  function navigateNext() {
+    console.log({ currentIndex, cb: getCurrentBox() })
+    if (currentIndex === undefined) return
+    const currentBox = getCurrentBox()
+    for (
+      let i = (currentIndex + 1) % OPENHOME_BOX_SLOTS;
+      i !== currentIndex;
+      i = (i + 1) % OPENHOME_BOX_SLOTS
+    ) {
+      if (currentBox.identifiers.has(i)) {
+        setCurrentIndex(i)
+        break
+      }
+    }
+  }
+
+  function navigatePrev() {
+    if (currentIndex === undefined) return
+    const currentBox = getCurrentBox()
+    for (
+      let i = moduloUnderflowWrap(currentIndex - 1, OPENHOME_BOX_SLOTS);
+      i !== currentIndex;
+      i = moduloUnderflowWrap(i - 1, OPENHOME_BOX_SLOTS)
+    ) {
+      if (currentBox.identifiers.has(i)) {
+        setCurrentIndex(i)
+        break
+      }
+    }
+  }
+
+  return {
+    currentIndex,
+    setCurrentIndex,
+    navigatePrev,
+    navigateNext,
   }
 }
 

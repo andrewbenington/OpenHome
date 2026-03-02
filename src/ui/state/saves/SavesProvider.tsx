@@ -4,7 +4,6 @@ import { Option, R, range } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
-import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { Button, Callout, Dialog, Flex, Separator } from '@radix-ui/themes'
 import { ReactNode, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react'
@@ -12,6 +11,7 @@ import { useNavigate } from 'react-router'
 import { OpenHomeBanks } from 'src/core/save/HomeData'
 import { SAVClass } from 'src/core/save/util'
 import { Result } from 'src/core/util/functional'
+import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { ItemBagContext } from '../items/reducer'
 import { useOhpkmStore } from '../ohpkm'
 import { openSavesReducer, SavesContext } from './reducer'
@@ -34,6 +34,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   const [disambiguationSaveTypes, setDisambiguationSaveTypes] = useState<Option<SAVClass[]>>()
   const navigate = useNavigate()
   const ohpkmStore = useOhpkmStore()
+  const { reloadBankStore } = useBanksAndBoxes()
 
   const promptDisambiguation = useCallback(async (possibleSaveTypes: SAVClass[]) => {
     setDisambiguationSaveTypes(possibleSaveTypes)
@@ -49,22 +50,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     .sort((a, b) => a.index - b.index)
     .map((data) => data.save)
 
-  const loadAllHomeData = useCallback(async () => {
-    if (openSavesState.error) return
-    await backend.loadHomeBanks().then(
-      R.match(
-        (banks) => openSavesDispatch({ type: 'load_home_banks', payload: { banks } }),
-        (err) => {
-          displayError('Error Loading OpenHome Data', err)
-          openSavesDispatch({ type: 'set_error', payload: err })
-        }
-      )
-    )
-  }, [backend, displayError, openSavesDispatch, openSavesState.error])
-
   const saveChanges = useCallback(async (): Promise<Result<null, SaveError[]>> => {
-    if (!openSavesState.homeData) return R.Err([HomeDataNotLoaded])
-
     const result = await backend.startTransaction()
 
     if (R.isErr(result)) {
@@ -92,10 +78,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     const promises = [
       backend.writeAllSaveFiles(saveWriters),
-      backend.writeHomeBanks({
-        banks: openSavesState.homeData.banks.map((bank) => bank.toSimple()),
-        current_bank: openSavesState.homeData.currentBankIndex,
-      }),
       backend.deleteHomeMons(
         openSavesState.monsToRelease
           .filter((mon) => mon instanceof OHPKM)
@@ -137,18 +119,13 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     openSavesDispatch({ type: 'clear_updated_box_slots' })
     openSavesDispatch({ type: 'clear_mons_to_release' })
 
-    await loadAllHomeData()
-
     return R.Ok(null)
   }, [
-    ,
-    openSavesState.homeData,
     openSavesState.monsToRelease,
     backend,
     allOpenSaves,
     itemBagState.modified,
     itemBagState.itemCounts,
-    loadAllHomeData,
     displayError,
     ohpkmStore,
     bagDispatch,
@@ -176,7 +153,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       onSave: saveChanges,
       onReset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
-        loadAllHomeData()
+        reloadBankStore()
         openSavesDispatch({ type: 'close_all_saves' })
       },
     })
@@ -186,13 +163,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     return () => {
       stopListening()
     }
-  }, [backend, saveChanges, openSavesDispatch, loadAllHomeData, bagDispatch])
-
-  useEffect(() => {
-    if (!openSavesState.homeData) {
-      loadAllHomeData()
-    }
-  }, [loadAllHomeData, openSavesState.homeData])
+  }, [backend, saveChanges, openSavesDispatch, bagDispatch, reloadBankStore])
 
   if (openSavesState.error) {
     return (
@@ -203,10 +174,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
         <Callout.Text>{openSavesState.error}</Callout.Text>
       </Callout.Root>
     )
-  }
-
-  if (!openSavesState.homeData) {
-    return <LoadingIndicator message="Loading OpenHome boxes..." />
   }
 
   return (
@@ -238,10 +205,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   )
 }
 
-const HomeDataNotLoaded = Object.freeze({ _SaveErrorType: 'HomeDataNotLoaded' })
-
 type SaveError =
-  | { _SaveErrorType: 'HomeDataNotLoaded' }
   | { _SaveErrorType: 'TransactionStart'; message: string }
   | { _SaveErrorType: 'TransactionCommit'; message: string }
   | { _SaveErrorType: 'IdentifierNotTracked'; identifier: OhpkmIdentifier }

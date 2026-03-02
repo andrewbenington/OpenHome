@@ -54,6 +54,8 @@ function useSyncedOhpkmState(): SyncedStateController<OhpkmStoreData, StringToB6
         pokedexUpdates.push(...getPokedexUpdates(mon))
       }
 
+      console.log({ data })
+
       backend.registerInPokedex(pokedexUpdates)
     },
     [backend]
