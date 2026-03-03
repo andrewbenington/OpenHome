@@ -35,6 +35,8 @@ interface BanksAndBoxesState {
   getCurrentBankName: () => string
   getBankName: (bankIndex: number) => string
   setCurrentBankName: (name: Option<string>) => void
+  overwriteBoxSlotsCurrentBank: (boxIndex: number, boxSlots: BoxMonIdentifiers) => void
+  overwriteAllBoxSlotsCurrentBank: (boxSlotsByBoxIndex: Map<number, BoxMonIdentifiers>) => void
   getCurrentBox: () => SimpleOpenHomeBox
   setCurrentBox: (boxIndex: number) => void
   getBoxName: (bankIndex: number, boxIndex: number) => string
@@ -66,7 +68,10 @@ export const createBanksAndBoxesStore = (
 ) =>
   create<BanksAndBoxesState>()(
     immer<BanksAndBoxesState>((set, readonlyState) => {
-      const requireBank = <T extends BanksAndBoxesState>(state: T, bankIndex: number) => {
+      const requireBank = <T extends BanksAndBoxesState>(
+        state: T,
+        bankIndex: number
+      ): T['banks'][number] => {
         const bank = state.banks[bankIndex]
         if (!bank) {
           throw new Error(`no bank with index ${bankIndex}`)
@@ -86,11 +91,7 @@ export const createBanksAndBoxesStore = (
       }
 
       const requireBoxCurrentBank = <T extends BanksAndBoxesState>(state: T, boxIndex: number) => {
-        const box = state.getCurrentBank().boxes.get(boxIndex)
-        if (!box) {
-          throw new Error(`no box with index ${boxIndex}`)
-        }
-        return box
+        return requireBox(state, { bank: state.currentBankIndex, box: boxIndex })
       }
 
       return {
@@ -110,6 +111,18 @@ export const createBanksAndBoxesStore = (
         setCurrentBankName: (name: Option<string>) =>
           set((state) => {
             currentBankMutable(state).name = name
+          }),
+        overwriteBoxSlotsCurrentBank: (boxIndex: number, boxSlots: BoxMonIdentifiers) =>
+          set((state) => {
+            requireBoxCurrentBank(state, boxIndex).identifiers = boxSlots
+          }),
+        overwriteAllBoxSlotsCurrentBank: (boxSlotsByBoxIndex: Map<number, BoxMonIdentifiers>) =>
+          set((state) => {
+            for (const box of requireBank(state, state.currentBankIndex).boxes.values()) {
+              // if an identifiers map is present for this box, overwrite the current with that.
+              // otherwise clear the box
+              box.identifiers = boxSlotsByBoxIndex.get(box.index) ?? new Map()
+            }
           }),
         getBankName: (bankIndex: number): string => {
           return bankNameOrDefault(readonlyState().banks[bankIndex])
@@ -404,6 +417,8 @@ export function useBanksAndBoxes() {
   const getCurrentBox = withSelectors.use.getCurrentBox()
   const switchBoxCurrentBank = withSelectors.use.setCurrentBox()
   const removeDupesFromHomeBox = withSelectors.use.removeDupesFromBox()
+  const overwriteBoxSlotsCurrentBank = withSelectors.use.overwriteBoxSlotsCurrentBank()
+  const overwriteAllBoxSlotsCurrentBank = withSelectors.use.overwriteAllBoxSlotsCurrentBank()
 
   const getMonAtHomeLocation = withSelectors.use.getAtLocation()
   const homeLocationIsEmpty = withSelectors.use.locationIsEmpty()
@@ -443,18 +458,15 @@ export function useBanksAndBoxes() {
       return R.Ok(null)
     }
 
-    for (const i of range(box.identifiers.size)) {
-      const location: BankBoxCoordinates = {
-        bank: getCurrentBank().index,
-        box: boxIndex,
-        boxSlot: i,
-      }
-      if (i < sorted.length) {
-        setAtHomeLocation(location, sorted[i].openhomeId)
-      } else {
-        clearAtHomeLocation(location)
+    const newSlots: BoxMonIdentifiers = new Map()
+
+    for (const slot of range(box.identifiers.size)) {
+      if (slot < sorted.length) {
+        newSlots.set(slot, sorted[slot].openhomeId)
       }
     }
+
+    overwriteBoxSlotsCurrentBank(boxIndex, newSlots)
 
     return R.Ok(null)
   }
@@ -467,26 +479,25 @@ export function useBanksAndBoxes() {
     }
 
     const sorted = allMons.toSorted(getSortFunctionNullable(sortType))
-    const boxSize = OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS
 
-    const currentBankIndex = getCurrentBank().index
     const currentBankBoxCount = getCurrentBank().boxes.size
 
+    const newBoxSlotsByIndex: Map<number, BoxMonIdentifiers> = new Map()
+
     for (const box of range(currentBankBoxCount)) {
-      for (const slot of range(boxSize)) {
-        const location = {
-          bank: currentBankIndex,
-          box,
-          boxSlot: slot,
-        }
-        const monIndex = box * boxSize + slot
+      const newSlots: BoxMonIdentifiers = new Map()
+      for (const slot of range(OPENHOME_BOX_SLOTS)) {
+        const monIndex = box * OPENHOME_BOX_SLOTS + slot
         if (monIndex < sorted.length) {
-          setAtHomeLocation(location, sorted[monIndex].openhomeId)
-        } else {
-          clearAtHomeLocation(location)
+          newSlots.set(slot, sorted[monIndex].openhomeId)
         }
       }
+      if (newSlots.size) {
+        newBoxSlotsByIndex.set(box, newSlots)
+      }
     }
+
+    overwriteAllBoxSlotsCurrentBank(newBoxSlotsByIndex)
 
     return R.Ok(null)
   }
