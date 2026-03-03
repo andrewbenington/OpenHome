@@ -1,5 +1,5 @@
 import { Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
-import { createContext, useContext } from 'react'
+import { createContext, useCallback, useContext, useEffect } from 'react'
 import { v4 as UuidV4 } from 'uuid'
 import { create, StateCreator, StoreApi, UseBoundStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
@@ -519,13 +519,26 @@ export function useBanksAndBoxes() {
     return firstNewBoxIndex
   }
 
-  async function saveChanges() {
+  const saveChanges = useCallback(async () => {
     await backend.writeHomeBanks({
       banks,
       current_bank: getCurrentBank().index,
     })
     await reloadBankStore()
-  }
+  }, [backend, banks, getCurrentBank, reloadBankStore])
+
+  useEffect(() => {
+    // returns a function to stop listening
+    const stopListening = backend.registerListeners({
+      onSave: saveChanges,
+    })
+
+    // the "stop listening" function should be called when the effect returns,
+    // otherwise duplicate listeners will exist
+    return () => {
+      stopListening()
+    }
+  }, [backend, saveChanges, reloadBankStore])
 
   return {
     saveChanges,
