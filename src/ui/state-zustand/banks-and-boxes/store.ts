@@ -22,7 +22,7 @@ export const OPENHOME_BOX_SLOTS = OPENHOME_BOX_COLUMNS * OPENHOME_BOX_ROWS
 
 type ReverseLookup = Map<OhpkmIdentifier, BankBoxCoordinates>
 
-interface BanksAndBoxesState {
+export interface BanksAndBoxesState {
   reloadStore: () => Promise<void>
 
   banks: SimpleOpenHomeBank[]
@@ -252,7 +252,7 @@ function currentBankMutable<T extends BanksAndBoxesState>(state: T): T['banks'][
   return state.banks[state.currentBankIndex]
 }
 
-type BoxMap = Map<number, SimpleOpenHomeBox>
+export type BoxMap = Map<number, SimpleOpenHomeBox>
 
 function rebuildMapWithNewBox(
   existingBoxes: BoxMap,
@@ -281,7 +281,7 @@ function rebuildBoxMapUsingIndices(boxes: BoxMap): BoxMap {
   )
 }
 
-function boxMapFromOrdered(boxesInOrder: SimpleOpenHomeBox[]): BoxMap {
+export function boxMapFromOrdered(boxesInOrder: SimpleOpenHomeBox[]): BoxMap {
   return new Map(boxesInOrder.map((box, index) => [index, { ...box, index }] as const))
 }
 
