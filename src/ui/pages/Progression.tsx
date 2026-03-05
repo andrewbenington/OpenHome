@@ -10,6 +10,7 @@ import { useSaves } from "@openhome-ui/state/saves/useSaves"
 import { milestones, rewards } from "../progression/milestones"
 import { apply_newly_completed, compute_dex_snapshot, evaluate_milestones } from "../progression/progressionService"
 import { load_progression_state, write_progression_state } from "../progression/progressionStore"
+import { REGION_DEX_DATA, getRegionalDexCount } from "../progression/dexTracker"
 import type { MilestoneDefinition, ProgressionState, RewardDefinition } from "../progression/types"
 
 const DEFAULT_PROGRESSION_STATE: ProgressionState = {
@@ -17,80 +18,6 @@ const DEFAULT_PROGRESSION_STATE: ProgressionState = {
   completed_milestones: {},
   granted_rewards: {},
   reward_history: [],
-}
-
-type MilestoneTierPreview = {
-  id: string
-  label: string
-  progressLabel: string
-  status: "locked" | "in_progress" | "ready"
-}
-
-type MilestoneCategoryPreview = {
-  id: string
-  title: string
-  subtitle: string
-  tiers: MilestoneTierPreview[]
-}
-
-const milestoneCategoryPreviewData: MilestoneCategoryPreview[] = [
-  {
-    id: "regional_dex_100",
-    title: "Regional Dex Completion 100%",
-    subtitle: "Complete each region-specific dex to full completion",
-    tiers: [
-      { id: "kanto", label: "Kanto 100%", progressLabel: "0 / target", status: "in_progress" },
-      { id: "johto", label: "Johto 100%", progressLabel: "0 / target", status: "locked" },
-      { id: "hoenn", label: "Hoenn 100%", progressLabel: "0 / target", status: "locked" },
-    ],
-  },
-  {
-    id: "national_dex_100",
-    title: "National Dex Completion 100%",
-    subtitle: "Progress toward full National Dex ownership",
-    tiers: [
-      { id: "natdex_phase_1", label: "National 25%", progressLabel: "0 / target", status: "in_progress" },
-      { id: "natdex_phase_2", label: "National 50%", progressLabel: "0 / target", status: "locked" },
-      { id: "natdex_phase_3", label: "National 100%", progressLabel: "0 / target", status: "locked" },
-    ],
-  },
-  {
-    id: "type_caught_count",
-    title: "Type Caught Count",
-    subtitle: "Register catches by type (duplicates allowed)",
-    tiers: [
-      {
-        id: "psychic_100",
-        label: "Psychic: 100 Registered",
-        progressLabel: "0 / 100",
-        status: "in_progress",
-      },
-      { id: "dragon_100", label: "Dragon: 100 Registered", progressLabel: "0 / 100", status: "locked" },
-      { id: "ghost_100", label: "Ghost: 100 Registered", progressLabel: "0 / 100", status: "locked" },
-    ],
-  },
-  {
-    id: "shiny_caught_registered",
-    title: "Shiny Count Caught/Registered",
-    subtitle: "Track total shiny entries across your bank",
-    tiers: [
-      { id: "shiny_25", label: "25 Shinies Registered", progressLabel: "0 / 25", status: "in_progress" },
-      { id: "shiny_100", label: "100 Shinies Registered", progressLabel: "0 / 100", status: "locked" },
-      { id: "shiny_250", label: "250 Shinies Registered", progressLabel: "0 / 250", status: "locked" },
-    ],
-  },
-]
-
-function tierStatusColor(status: MilestoneTierPreview["status"]): string {
-  if (status === "ready") return "#14532d"
-  if (status === "in_progress") return "#1e3a8a"
-  return "#374151"
-}
-
-function tierStatusText(status: MilestoneTierPreview["status"]): string {
-  if (status === "ready") return "Ready"
-  if (status === "in_progress") return "In Progress"
-  return "Locked"
 }
 
 async function create_reward_ohpkm_from_template(
@@ -162,16 +89,35 @@ export default function Progression() {
   const [state, setState] = useState<ProgressionState | null>(null)
   const [lastGrants, setLastGrants] = useState<RewardDefinition[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [activeCategoryId, setActiveCategoryId] = useState<string>(milestoneCategoryPreviewData[0]?.id ?? "")
+  const [activeCategoryId, setActiveCategoryId] = useState<string>("national_dex")
   const [collectingMilestoneIds, setCollectingMilestoneIds] = useState<Record<string, true>>({})
 
   const grantedThisSessionRef = useRef<Set<string>>(new Set())
   const isEvaluatingRef = useRef(false)
 
+  // Group milestones by kind
+  const groupedMilestones = useMemo(() => {
+    const groups: Record<string, MilestoneDefinition[]> = {}
+    for (const m of milestones) {
+      if (!groups[m.kind]) groups[m.kind] = []
+      groups[m.kind].push(m)
+    }
+    return groups
+  }, [])
+
+  // Test milestones are those with "test" or "smoke" in the ID or name
   const testMilestones = useMemo(
     () => milestones.filter((m) => m.id.includes("test") || m.id.includes("smoke") || m.name.toLowerCase().includes("test")),
     [],
   )
+
+  // Milestone categories for tabs
+  const categories = [
+    { id: "national_dex", title: "National Dex", subtitle: "Progress toward National Dex completion" },
+    { id: "regional_dex", title: "Regional Dex", subtitle: "Complete region-specific pokedexes" },
+    { id: "type_count", title: "Type Mastery", subtitle: "Collect Pokémon by type" },
+    { id: "shiny_hunt", title: "Shiny Collection", subtitle: "Build your shiny collection" },
+  ]
 
   useEffect(() => {
     let alive = true
@@ -327,18 +273,66 @@ export default function Progression() {
 
   if (!state) return <div style={{ padding: 24 }}>Loading progression</div>
 
+  const nationalDexMilestones = groupedMilestones["national_dex_threshold"] ?? []
+  const regionalMilestones = groupedMilestones["regional_dex_100"] ?? []
+
   return (
     <div style={{ padding: 24 }}>
       <h1>Progression</h1>
 
-      {error ? <div style={{ marginTop: 12 }}>Error {error}</div> : null}
+      {error ? <div style={{ marginTop: 12, color: "#ef4444" }}>Error: {error}</div> : null}
 
-      <div style={{ marginTop: 12 }}>
-        <div>National unique species in vault {snapshot.national_unique_species}</div>
-        <div>Milestones completed {Object.keys(state.completed_milestones).length}</div>
-        <div>Rewards granted {Object.keys(state.granted_rewards).length}</div>
+      {/* Summary Stats */}
+      <div
+        style={{
+          marginTop: 12,
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: 12,
+        }}
+      >
+        <div
+          style={{
+            background: "#0f172a",
+            border: "1px solid #1f2937",
+            borderRadius: 8,
+            padding: 12,
+          }}
+        >
+          <div style={{ fontSize: 12, color: "#9ca3af" }}>National Unique Species</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "#f9fafb", marginTop: 4 }}>
+            {snapshot.national_unique_species}
+          </div>
+        </div>
+        <div
+          style={{
+            background: "#0f172a",
+            border: "1px solid #1f2937",
+            borderRadius: 8,
+            padding: 12,
+          }}
+        >
+          <div style={{ fontSize: 12, color: "#9ca3af" }}>Milestones Completed</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "#f9fafb", marginTop: 4 }}>
+            {Object.keys(state.completed_milestones).length}
+          </div>
+        </div>
+        <div
+          style={{
+            background: "#0f172a",
+            border: "1px solid #1f2937",
+            borderRadius: 8,
+            padding: 12,
+          }}
+        >
+          <div style={{ fontSize: 12, color: "#9ca3af" }}>Rewards Granted</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "#f9fafb", marginTop: 4 }}>
+            {Object.keys(state.granted_rewards).length}
+          </div>
+        </div>
       </div>
 
+      {/* Milestone Tracks */}
       <div
         style={{
           marginTop: 20,
@@ -349,20 +343,21 @@ export default function Progression() {
         }}
       >
         <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: "#f9fafb" }}>Milestone Tracks</div>
-        <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 8 }}>
-          Foundation layout for upcoming progression categories and tier rewards
+        <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 12 }}>
+          Complete challenges to unlock exclusive event Pokémon rewards
         </div>
 
+        {/* Category Tabs */}
         <div
           style={{
             display: "flex",
             gap: 8,
             overflowX: "auto",
             paddingBottom: 8,
-            marginBottom: 8,
+            marginBottom: 12,
           }}
         >
-          {milestoneCategoryPreviewData.map((category) => {
+          {categories.map((category) => {
             const isActive = activeCategoryId === category.id
             return (
               <button
@@ -373,9 +368,10 @@ export default function Progression() {
                   background: isActive ? "#1e3a8a" : "#111827",
                   color: "#e5e7eb",
                   borderRadius: 999,
-                  padding: "6px 10px",
+                  padding: "6px 12px",
                   cursor: "pointer",
                   whiteSpace: "nowrap",
+                  fontSize: 13,
                 }}
               >
                 {category.title}
@@ -384,141 +380,378 @@ export default function Progression() {
           })}
         </div>
 
-        {milestoneCategoryPreviewData
-          .filter((category) => category.id === activeCategoryId)
-          .map((category) => (
+        {/* National Dex Category */}
+        {activeCategoryId === "national_dex" && (
+          <div
+            style={{
+              border: "1px solid #374151",
+              borderRadius: 8,
+              background: "#111827",
+              overflow: "hidden",
+            }}
+          >
             <div
-              key={category.id}
               style={{
-                border: "1px solid #374151",
-                borderRadius: 8,
-                background: "#111827",
-                marginBottom: 10,
-                overflow: "hidden",
+                padding: "10px 12px",
+                borderBottom: "1px solid #1f2937",
               }}
             >
-              <div
-                style={{
-                  padding: "10px 12px",
-                  borderBottom: "1px solid #1f2937",
-                  color: "#f3f4f6",
-                }}
-              >
-                <div style={{ fontWeight: 700 }}>{category.title}</div>
-                <div style={{ fontSize: 12, marginTop: 2, color: "#9ca3af" }}>{category.subtitle}</div>
-              </div>
-
-              <div style={{ padding: 10, maxHeight: 220, overflowY: "auto" }}>
-                {category.tiers.map((tier) => (
-                  <div
-                    key={tier.id}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: 12,
-                      background: "#0b1220",
-                      border: "1px solid #1f2937",
-                      borderRadius: 8,
-                      padding: "8px 10px",
-                      marginBottom: 8,
-                    }}
-                  >
-                    <div>
-                      <div style={{ color: "#f9fafb", fontWeight: 600 }}>{tier.label}</div>
-                      <div style={{ color: "#9ca3af", fontSize: 12 }}>{tier.progressLabel}</div>
-                    </div>
-                    <div
-                      style={{
-                        background: tierStatusColor(tier.status),
-                        color: "#e5e7eb",
-                        borderRadius: 999,
-                        fontSize: 11,
-                        padding: "3px 8px",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {tierStatusText(tier.status)}
-                    </div>
-                  </div>
-                ))}
+              <div style={{ fontWeight: 700, color: "#f9fafb" }}>National Dex Completion</div>
+              <div style={{ fontSize: 12, marginTop: 2, color: "#9ca3af" }}>
+                Progress toward full National Dex ownership (1025 species)
               </div>
             </div>
-          ))}
 
-        <div
-          style={{
-            marginTop: 10,
-            borderTop: "1px solid #1f2937",
-            paddingTop: 10,
-          }}
-        >
-          <div style={{ fontSize: 14, fontWeight: 700, color: "#f9fafb", marginBottom: 6 }}>Test Milestones</div>
-          <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 8 }}>
-            Temporary QA milestones for validating reward output without full progression grind
-          </div>
-
-          {testMilestones.length === 0 ? (
-            <div style={{ color: "#9ca3af", fontSize: 12 }}>No test milestones configured</div>
-          ) : (
-            <div style={{ maxHeight: 260, overflowY: "auto", paddingRight: 2 }}>
-              {testMilestones.map((m) => {
+            <div style={{ padding: 10, maxHeight: 320, overflowY: "auto" }}>
+              {nationalDexMilestones.map((m) => {
                 const uiState = getMilestoneUiState(m)
                 const granted = uiState === "granted"
                 const ready = uiState === "ready"
                 const isCollecting = Boolean(collectingMilestoneIds[m.id])
+                const current = snapshot.national_unique_species
+                const target = m.national_threshold ?? 0
+                const progress = Math.min(100, Math.round((current / target) * 100))
 
                 return (
                   <div
                     key={m.id}
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: 12,
                       background: "#0b1220",
                       border: "1px solid #1f2937",
                       borderRadius: 8,
-                      padding: "8px 10px",
+                      padding: "10px 12px",
                       marginBottom: 8,
                     }}
                   >
-                    <div>
-                      <div style={{ color: "#f9fafb", fontWeight: 600 }}>{m.name}</div>
-                      <div style={{ color: "#9ca3af", fontSize: 12 }}>Reward: {rewards[m.reward_id]?.name ?? m.reward_id}</div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <div>
+                        <div style={{ color: "#f9fafb", fontWeight: 600 }}>{m.name}</div>
+                        <div style={{ color: "#9ca3af", fontSize: 12 }}>
+                          {current} / {target} ({progress}%)
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => void collectMilestone(m)}
+                        disabled={uiState !== "ready" || isCollecting}
+                        style={{
+                          border:
+                            granted
+                              ? "1px solid #14532d"
+                              : ready
+                                ? "1px solid #22c55e"
+                                : "1px solid #374151",
+                          background: granted ? "#14532d" : ready ? "#0f5c2e" : "#374151",
+                          color: "#e5e7eb",
+                          borderRadius: 999,
+                          fontSize: 11,
+                          padding: "6px 10px",
+                          cursor: ready && !isCollecting ? "pointer" : "default",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {granted ? "✓ Collected" : isCollecting ? "..." : ready ? "Collect" : "Locked"}
+                      </button>
                     </div>
-                    <button
-                      onClick={() => void collectMilestone(m)}
-                      disabled={granted || !ready || isCollecting || isEvaluatingRef.current}
+
+                    {/* Progress bar */}
+                    <div
                       style={{
-                        border: granted ? "1px solid #14532d" : ready ? "1px solid #3b82f6" : "1px solid #374151",
-                        background: granted ? "#14532d" : ready ? "#1e3a8a" : "#374151",
-                        color: "#e5e7eb",
-                        borderRadius: 999,
-                        fontSize: 11,
-                        padding: "6px 10px",
-                        cursor: granted || !ready || isCollecting ? "default" : "pointer",
-                        whiteSpace: "nowrap",
+                        background: "#0f172a",
+                        borderRadius: 4,
+                        height: 6,
+                        overflow: "hidden",
+                        marginBottom: 6,
                       }}
                     >
-                      {granted ? "Collected" : isCollecting ? "Collecting..." : ready ? "Collect" : "Pending"}
-                    </button>
+                      <div
+                        style={{
+                          background: ready ? "#22c55e" : "#3b82f6",
+                          height: "100%",
+                          width: `${progress}%`,
+                          transition: "width 0.3s ease",
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ fontSize: 11, color: "#6b7280" }}>
+                      Reward: {rewards[m.reward_id]?.name ?? "Unknown"}
+                    </div>
                   </div>
                 )
               })}
             </div>
-          )}
+          </div>
+        )}
+
+        {/* Regional Dex Category - Note for future move to Pokedex page */}
+        {activeCategoryId === "regional_dex" && (
+          <div
+            style={{
+              border: "1px solid #374151",
+              borderRadius: 8,
+              background: "#111827",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                padding: "10px 12px",
+                borderBottom: "1px solid #1f2937",
+              }}
+            >
+              <div style={{ fontWeight: 700, color: "#f9fafb" }}>Regional Dex Completion</div>
+              <div style={{ fontSize: 12, marginTop: 2, color: "#9ca3af" }}>
+                Complete region-specific pokedexes for mythical rewards
+              </div>
+            </div>
+
+            <div style={{ padding: 10, maxHeight: 320, overflowY: "auto" }}>
+              {regionalMilestones.map((m) => {
+                const uiState = getMilestoneUiState(m)
+                const granted = uiState === "granted"
+                const ready = uiState === "ready"
+                const isCollecting = Boolean(collectingMilestoneIds[m.id])
+                const regionId = m.region_id!
+                const current = getRegionalDexCount(snapshot.national_species_present, regionId as any)
+                const target = REGION_DEX_DATA.find((r) => r.id === regionId)?.totalSpecies ?? 0
+                const progress = Math.min(100, Math.round((current / target) * 100))
+
+                return (
+                  <div
+                    key={m.id}
+                    style={{
+                      background: "#0b1220",
+                      border: "1px solid #1f2937",
+                      borderRadius: 8,
+                      padding: "10px 12px",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <div>
+                        <div style={{ color: "#f9fafb", fontWeight: 600 }}>{m.name}</div>
+                        <div style={{ color: "#9ca3af", fontSize: 12 }}>
+                          {current} / {target} ({progress}%)
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => void collectMilestone(m)}
+                        disabled={uiState !== "ready" || isCollecting}
+                        style={{
+                          border:
+                            granted
+                              ? "1px solid #14532d"
+                              : ready
+                                ? "1px solid #22c55e"
+                                : "1px solid #374151",
+                          background: granted ? "#14532d" : ready ? "#0f5c2e" : "#374151",
+                          color: "#e5e7eb",
+                          borderRadius: 999,
+                          fontSize: 11,
+                          padding: "6px 10px",
+                          cursor: ready && !isCollecting ? "pointer" : "default",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {granted ? "✓ Collected" : isCollecting ? "..." : ready ? "Collect" : "Locked"}
+                      </button>
+                    </div>
+
+                    {/* Progress bar */}
+                    <div
+                      style={{
+                        background: "#0f172a",
+                        borderRadius: 4,
+                        height: 6,
+                        overflow: "hidden",
+                        marginBottom: 6,
+                      }}
+                    >
+                      <div
+                        style={{
+                          background: ready ? "#22c55e" : "#3b82f6",
+                          height: "100%",
+                          width: `${progress}%`,
+                          transition: "width 0.3s ease",
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ fontSize: 11, color: "#6b7280" }}>
+                      Reward: {rewards[m.reward_id]?.name ?? "Unknown"}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Type Count Category - Placeholder */}
+        {activeCategoryId === "type_count" && (
+          <div
+            style={{
+              border: "1px solid #374151",
+              borderRadius: 8,
+              background: "#111827",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                padding: "10px 12px",
+                borderBottom: "1px solid #1f2937",
+              }}
+            >
+              <div style={{ fontWeight: 700, color: "#f9fafb" }}>Type Mastery Challenges</div>
+              <div style={{ fontSize: 12, marginTop: 2, color: "#9ca3af" }}>
+                Collect specific numbers of Pokémon by type
+              </div>
+            </div>
+
+            <div style={{ padding: 20, textAlign: "center" }}>
+              <div style={{ fontSize: 13, color: "#9ca3af" }}>Coming soon</div>
+            </div>
+          </div>
+        )}
+
+        {/* Shiny Hunt Category - Placeholder */}
+        {activeCategoryId === "shiny_hunt" && (
+          <div
+            style={{
+              border: "1px solid #374151",
+              borderRadius: 8,
+              background: "#111827",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                padding: "10px 12px",
+                borderBottom: "1px solid #1f2937",
+              }}
+            >
+              <div style={{ fontWeight: 700, color: "#f9fafb" }}>Shiny Collection Milestones</div>
+              <div style={{ fontSize: 12, marginTop: 2, color: "#9ca3af" }}>
+                Build your shiny collection and earn rewards
+              </div>
+            </div>
+
+            <div style={{ padding: 20, textAlign: "center" }}>
+              <div style={{ fontSize: 13, color: "#9ca3af" }}>Coming soon</div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Test Milestones */}
+      {testMilestones.length > 0 && (
+        <div
+          style={{
+            marginTop: 20,
+            border: "1px solid #1f2937",
+            borderRadius: 10,
+            background: "linear-gradient(180deg, #0f172a 0%, #111827 100%)",
+            padding: 12,
+          }}
+        >
+          <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: "#f9fafb" }}>Test Milestones</div>
+          <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 12 }}>
+            QA milestones for validating reward output and progression mechanics
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
+            {testMilestones.map((m) => {
+              const uiState = getMilestoneUiState(m)
+              const granted = uiState === "granted"
+              const ready = uiState === "ready"
+              const isCollecting = Boolean(collectingMilestoneIds[m.id])
+
+              return (
+                <div
+                  key={m.id}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 12,
+                    background: "#0b1220",
+                    border: "1px solid #1f2937",
+                    borderRadius: 8,
+                    padding: "10px 12px",
+                  }}
+                >
+                  <div>
+                    <div style={{ color: "#f9fafb", fontWeight: 600, fontSize: 14 }}>{m.name}</div>
+                    <div style={{ color: "#9ca3af", fontSize: 12, marginTop: 2 }}>
+                      Reward: {rewards[m.reward_id]?.name ?? m.reward_id}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => void collectMilestone(m)}
+                    disabled={granted || !ready || isCollecting}
+                    style={{
+                      border: granted ? "1px solid #14532d" : ready ? "1px solid #3b82f6" : "1px solid #374151",
+                      background: granted ? "#14532d" : ready ? "#1e3a8a" : "#374151",
+                      color: "#e5e7eb",
+                      borderRadius: 999,
+                      fontSize: 11,
+                      padding: "6px 10px",
+                      cursor: granted || !ready || isCollecting ? "default" : "pointer",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {granted ? "✓ Collected" : isCollecting ? "..." : ready ? "Collect" : "Pending"}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
         </div>
+      )}
+
+      {/* Actions */}
+      <div style={{ marginTop: 20, display: "flex", gap: 8 }}>
+        <button
+          onClick={resetProgression}
+          style={{
+            border: "1px solid #ef4444",
+            background: "#dc2626",
+            color: "#e5e7eb",
+            borderRadius: 6,
+            padding: "8px 12px",
+            cursor: "pointer",
+            fontSize: 14,
+          }}
+        >
+          Reset Progression
+        </button>
       </div>
 
-      <div style={{ marginTop: 16 }}>
-        <button onClick={resetProgression}>Reset Progression</button>
-      </div>
-
-      <div style={{ marginTop: 16 }}>
-        <div>Most recent grants</div>
-        {lastGrants.length === 0 ? <div>None</div> : lastGrants.map((r) => <div key={r.id}>{r.name}</div>)}
-      </div>
+      {/* Recent Grants */}
+      {lastGrants.length > 0 && (
+        <div style={{ marginTop: 20 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#f9fafb", marginBottom: 8 }}>Recently Granted</div>
+          {lastGrants.map((r) => (
+            <div
+              key={r.id}
+              style={{
+                color: "#9ca3af",
+                fontSize: 12,
+                padding: "4px 0",
+              }}
+            >
+              • {r.name}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

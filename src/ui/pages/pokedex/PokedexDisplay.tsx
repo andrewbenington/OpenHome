@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react'
 import BaseStatsChart from './BaseStatsChart'
 import EvolutionFamily from './EvolutionFamily'
 import PokedexSidebar from './PokedexSidebar'
+import RegionalDexTracker from './RegionalDexTracker'
 import './style.css'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
 import { getFormeStatus, getPokedexSummary } from './util'
@@ -52,7 +53,10 @@ export default function PokedexDisplay() {
         />
       </div>
       <Flex style={{ height: 'calc(100% - 34px)' }}>
-        <Flex className="pokedex-body" direction="column" width="calc(100% - 300px)">
+        <div style={{ width: '300px', height: '100%' }}>
+          <RegionalDexTracker />
+        </div>
+        <Flex className="pokedex-body" direction="column" width="calc(100% - 600px)">
           {selectedSpecies && selectedForme && (
             <PokedexDetails
               pokedex={pokedex}

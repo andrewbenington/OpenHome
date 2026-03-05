@@ -4,14 +4,19 @@ export type RewardId = string
 export type DexSnapshot = {
   national_unique_species: number
   national_species_present: Set<number>
+  regional_completion: Record<string, number> // regionId -> completion percentage
 }
 
 export type MilestoneDefinition = {
   id: MilestoneId
   name: string
   description: string
-  kind: "national_living_dex"
-  required_species: number[]
+  kind: "national_living_dex" | "regional_dex_100" | "national_dex_threshold" | "type_count" | "shiny_count"
+  required_species?: number[] // for national living dex
+  region_id?: string // for regional dex 100
+  national_threshold?: number // for national dex threshold milestones
+  target_type?: string // for type count
+  target_count?: number // for count-based milestones
   reward_id: RewardId
 }
 

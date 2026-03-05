@@ -1,4 +1,5 @@
 import type { MilestoneDefinition, RewardDefinition } from "./types"
+import { getRegionDex, NATIONAL_DEX_THRESHOLDS } from "./dexTracker"
 
 export const rewards: Record<string, RewardDefinition> = {
   reward_arceus_event: {
@@ -163,15 +164,132 @@ export const rewards: Record<string, RewardDefinition> = {
   },
 }
 
-const kanto_151_species: number[] = [926]
-
+// Regional dex completion milestones
+// These are triggered when a region's pokedex reaches 100% completion
 export const milestones: MilestoneDefinition[] = [
+  // Regional Dex 100% milestones
+  {
+    id: "milestone_regional_kanto_100",
+    name: "Kanto Pokedex 100%",
+    description: `Complete the Kanto regional pokedex (${getRegionDex("kanto").totalSpecies} species)`,
+    kind: "regional_dex_100",
+    region_id: "kanto",
+    reward_id: "reward_mew_event",
+  },
+  {
+    id: "milestone_regional_johto_100",
+    name: "Johto Pokedex 100%",
+    description: `Complete the Johto regional pokedex (${getRegionDex("johto").totalSpecies} species)`,
+    kind: "regional_dex_100",
+    region_id: "johto",
+    reward_id: "reward_celebi_event",
+  },
+  {
+    id: "milestone_regional_hoenn_100",
+    name: "Hoenn Pokedex 100%",
+    description: `Complete the Hoenn regional pokedex (${getRegionDex("hoenn").totalSpecies} species)`,
+    kind: "regional_dex_100",
+    region_id: "hoenn",
+    reward_id: "reward_jirachi_event",
+  },
+  {
+    id: "milestone_regional_sinnoh_100",
+    name: "Sinnoh Pokedex 100%",
+    description: `Complete the Sinnoh regional pokedex (${getRegionDex("sinnoh").totalSpecies} species)`,
+    kind: "regional_dex_100",
+    region_id: "sinnoh",
+    reward_id: "reward_arceus_event",
+  },
+  {
+    id: "milestone_regional_unova_100",
+    name: "Unova Pokedex 100%",
+    description: `Complete the Unova regional pokedex (${getRegionDex("unova").totalSpecies} species)`,
+    kind: "regional_dex_100",
+    region_id: "unova",
+    reward_id: "reward_victini_event",
+  },
+  {
+    id: "milestone_regional_kalos_100",
+    name: "Kalos Pokedex 100%",
+    description: `Complete the Kalos regional pokedex (${getRegionDex("kalos").totalSpecies} species)`,
+    kind: "regional_dex_100",
+    region_id: "kalos",
+    reward_id: "reward_diancie_event",
+  },
+  {
+    id: "milestone_regional_alola_100",
+    name: "Alola Pokedex 100%",
+    description: `Complete the Alola regional pokedex (${getRegionDex("alola").totalSpecies} species)`,
+    kind: "regional_dex_100",
+    region_id: "alola",
+    reward_id: "reward_magearna_event",
+  },
+  {
+    id: "milestone_regional_galar_100",
+    name: "Galar Pokedex 100%",
+    description: `Complete the Galar regional pokedex (${getRegionDex("galar").totalSpecies} species)`,
+    kind: "regional_dex_100",
+    region_id: "galar",
+    reward_id: "reward_zarude_event",
+  },
+  {
+    id: "milestone_regional_hisui_100",
+    name: "Hisui Pokedex 100%",
+    description: `Complete the Hisui regional pokedex (${getRegionDex("hisui").totalSpecies} species)`,
+    kind: "regional_dex_100",
+    region_id: "hisui",
+    reward_id: "reward_darkrai_event",
+  },
+  {
+    id: "milestone_regional_paldea_100",
+    name: "Paldea Pokedex 100%",
+    description: `Complete the Paldea regional pokedex (${getRegionDex("paldea").totalSpecies} species)`,
+    kind: "regional_dex_100",
+    region_id: "paldea",
+    reward_id: "reward_pecharunt_event",
+  },
+
+  // National Dex progression milestones
+  {
+    id: "milestone_national_dex_25",
+    name: "National Dex 25%",
+    description: `Collect ${NATIONAL_DEX_THRESHOLDS.phase_1} unique species`,
+    kind: "national_dex_threshold",
+    national_threshold: NATIONAL_DEX_THRESHOLDS.phase_1,
+    reward_id: "reward_phione_event",
+  },
+  {
+    id: "milestone_national_dex_50",
+    name: "National Dex 50%",
+    description: `Collect ${NATIONAL_DEX_THRESHOLDS.phase_2} unique species`,
+    kind: "national_dex_threshold",
+    national_threshold: NATIONAL_DEX_THRESHOLDS.phase_2,
+    reward_id: "reward_manaphy_event",
+  },
+  {
+    id: "milestone_national_dex_75",
+    name: "National Dex 75%",
+    description: `Collect ${NATIONAL_DEX_THRESHOLDS.phase_3} unique species`,
+    kind: "national_dex_threshold",
+    national_threshold: NATIONAL_DEX_THRESHOLDS.phase_3,
+    reward_id: "reward_shaymin_event",
+  },
+  {
+    id: "milestone_national_dex_100",
+    name: "National Dex 100%",
+    description: "Complete the full National Pokedex with all 1025 unique species",
+    kind: "national_dex_threshold",
+    national_threshold: NATIONAL_DEX_THRESHOLDS.complete,
+    reward_id: "reward_arceus_event",
+  },
+
+  // National Living Dex milestones (for testing)
   {
     id: "milestone_national_living_151",
     name: "Living Dex 151",
     description: "Have species 1 through 151 present in the vault at the same time",
     kind: "national_living_dex",
-    required_species: kanto_151_species,
+    required_species: Array.from({ length: 151 }, (_, i) => i + 1),
     reward_id: "reward_victini_event",
   },
   {
@@ -179,7 +297,7 @@ export const milestones: MilestoneDefinition[] = [
     name: "Living Dex 493 (Test)",
     description: "Test milestone for Arceus reward output",
     kind: "national_living_dex",
-    required_species: kanto_151_species,
+    required_species: [1], // Just require Bulbasaur for easier testing
     reward_id: "reward_arceus_event",
   },
   {
@@ -187,7 +305,7 @@ export const milestones: MilestoneDefinition[] = [
     name: "System Smoke Test",
     description: "Quick milestone to validate progression evaluation and reward grant pipeline",
     kind: "national_living_dex",
-    required_species: kanto_151_species,
+    required_species: [1], // Just require Bulbasaur for easier testing
     reward_id: "reward_celebi_event",
   },
 ]

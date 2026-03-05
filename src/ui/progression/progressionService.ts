@@ -1,5 +1,6 @@
 import { OHPKM } from "@openhome-core/pkm/OHPKM"
 import type { DexSnapshot, MilestoneDefinition, ProgressionState, RewardDefinition } from "./types"
+import { REGION_DEX_DATA, calculateRegionalDexCompletion, isRegionalDexComplete, isNationalDexThresholdMet } from "./dexTracker"
 
 export function compute_dex_snapshot(all_stored: OHPKM[]): DexSnapshot {
   const present = new Set<number>()
@@ -8,9 +9,16 @@ export function compute_dex_snapshot(all_stored: OHPKM[]): DexSnapshot {
     present.add(mon.dexNum)
   }
 
+  // Calculate regional completion percentages
+  const regional_completion: Record<string, number> = {}
+  for (const region of REGION_DEX_DATA) {
+    regional_completion[region.id] = calculateRegionalDexCompletion(present, region.id)
+  }
+
   return {
     national_unique_species: present.size,
     national_species_present: present,
+    regional_completion,
   }
 }
 
@@ -32,7 +40,17 @@ export function evaluate_milestones(
     if (state.completed_milestones[m.id]) continue
 
     if (m.kind === "national_living_dex") {
-      if (is_requirement_met(snapshot, m.required_species)) newly_completed.push(m)
+      if (m.required_species && is_requirement_met(snapshot, m.required_species)) {
+        newly_completed.push(m)
+      }
+    } else if (m.kind === "regional_dex_100") {
+      if (m.region_id && isRegionalDexComplete(snapshot.national_species_present, m.region_id as any)) {
+        newly_completed.push(m)
+      }
+    } else if (m.kind === "national_dex_threshold") {
+      if (m.national_threshold && isNationalDexThresholdMet(snapshot.national_species_present, m.national_threshold)) {
+        newly_completed.push(m)
+      }
     }
   }
 
