@@ -11,6 +11,7 @@
     ],
     "module": "ESNext",
     "skipLibCheck": true,
+    "types": ["node"],
     "paths": {
       "src/*": [
         "./src/*"

@@ -151,6 +151,7 @@ pub enum SignificantUpdate {
     V1_8_2,
     V1_9_0,
     V1_9_1,
+    V1_9_2,
 }
 
 impl SignificantUpdate {
@@ -165,6 +166,7 @@ impl SignificantUpdate {
             Self::V1_8_2 => Version::parse("1.8.2").unwrap(),
             Self::V1_9_0 => Version::parse("1.9.0").unwrap(),
             Self::V1_9_1 => Version::parse("1.9.1").unwrap(),
+            Self::V1_9_2 => Version::parse("1.9.2").unwrap(),
         }
     }
 
@@ -210,6 +212,9 @@ impl SignificantUpdate {
             ]),
             Self::V1_9_1 => Some(vec![String::from(
                 "Bugs related to form updates, the item bag, and Pokédex display have been fixed",
+            )]),
+            Self::V1_9_2 => Some(vec![String::from(
+                "Fixed a regression causing some Pokémon to 'devolve'",
             )]),
             _ => None,
         }
