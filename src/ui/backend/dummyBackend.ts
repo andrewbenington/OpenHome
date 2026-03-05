@@ -13,6 +13,9 @@ const DummyBackend: BackendInterface = {
   /* ohpkm store */
   loadOhpkmStore: async () => R.Err('no backend in use'),
   addToOhpkmStore: async () => R.Err('no backend in use'),
+  getRewardTemplateBytes: async () => R.Err('no backend in use'),
+  loadProgression: async () => R.Err('no backend in use'),
+  writeProgression: async () => R.Err('no backend in use'),
   deleteHomeMons: async () => R.Err('no backend in use'),
 
   /* pokedex */

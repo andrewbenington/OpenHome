@@ -42,6 +42,9 @@ export default interface BackendInterface {
   /* ohpkm bytes store by identifier */
   loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>
   addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
+  getRewardTemplateBytes: (rewardId: string) => Promise<Errorable<Uint8Array>>
+  loadProgression: (profileId: string) => Promise<Errorable<string | null>>
+  writeProgression: (profileId: string, json: string) => Promise<Errorable<void>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
   /* write synced state to disk during save */

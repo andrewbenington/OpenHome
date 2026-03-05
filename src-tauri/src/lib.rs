@@ -9,6 +9,8 @@ mod startup;
 mod state;
 mod util;
 mod versioning;
+mod progression_rewards;
+mod progression_storage;
 
 use std::env;
 use tauri::Manager;
@@ -124,8 +126,12 @@ pub fn run() {
             commands::handle_windows_accellerator,
             commands::open_directory,
             commands::open_file_location,
+            commands::compute_openhome_id_from_ohpkm_bytes,
             pkm_storage::load_banks,
             pkm_storage::write_banks,
+            progression_storage::load_progression,
+            progression_storage::write_progression,
+            progression_rewards::get_reward_template_bytes,
             state::get_lookups,
             state::add_to_lookups,
             state::get_ohpkm_store,

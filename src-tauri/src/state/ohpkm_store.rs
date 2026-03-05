@@ -74,6 +74,16 @@ impl OhpkmBytesStore {
     pub fn includes(&self, identifier: &str) -> bool {
         self.0.contains_key(identifier)
     }
+
+    fn union_with_preserve_keys(&mut self, other: Self) -> Vec<String> {
+        let mut stored_keys = Vec::new();
+        for (incoming_key, bytes) in other.0.into_iter() {
+            let stored_key = incoming_key.clone();
+            self.0.insert(stored_key.clone(), bytes);
+            stored_keys.push(stored_key.clone());
+        }
+        stored_keys
+    }
 }
 
 impl synced_state::SyncedState for OhpkmBytesStore {
@@ -84,9 +94,7 @@ impl synced_state::SyncedState for OhpkmBytesStore {
     }
 
     fn union_with(&mut self, other: Self) {
-        other.0.into_iter().for_each(|(k, v)| {
-            self.0.insert(k, v);
-        });
+        let _ = self.union_with_preserve_keys(other);
     }
 }
 
@@ -102,9 +110,13 @@ pub fn add_to_ohpkm_store(
     app_handle: tauri::AppHandle,
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
     updates: OhpkmBytesStore,
-) -> Result<()> {
+) -> Result<Vec<String>> {
+    let stored_keys: Vec<String> = updates.0.keys().cloned().collect();
+
     synced_state
         .lock()?
         .ohpkm_store
-        .union_with(&app_handle, updates)
+        .union_with(&app_handle, updates)?;
+
+    Ok(stored_keys)
 }
