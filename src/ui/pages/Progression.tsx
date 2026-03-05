@@ -8,7 +8,7 @@ import { useOhpkmStore } from "@openhome-ui/state/ohpkm/useOhpkmStore"
 import { useSaves } from "@openhome-ui/state/saves/useSaves"
 
 import { milestones, rewards } from "../progression/milestones"
-import { apply_newly_completed, compute_dex_snapshot, evaluate_milestones } from "../progression/progressionService"
+import { apply_newly_completed, compute_dex_snapshot, evaluate_milestones, update_types_ever_deposited } from "../progression/progressionService"
 import { load_progression_state, write_progression_state } from "../progression/progressionStore"
 import { REGION_DEX_DATA, getRegionalDexCount } from "../progression/dexTracker"
 import type { MilestoneDefinition, ProgressionState, RewardDefinition } from "../progression/types"
@@ -18,6 +18,8 @@ const DEFAULT_PROGRESSION_STATE: ProgressionState = {
   completed_milestones: {},
   granted_rewards: {},
   reward_history: [],
+  types_ever_deposited: {},
+  progressive_milestone_levels: {},
 }
 
 async function create_reward_ohpkm_from_template(
@@ -83,8 +85,16 @@ export default function Progression() {
   const saves = useSaves()
   const backend = useContext(BackendContext)
 
-  const allStored = useMemo(() => ohpkmStore.getAllStored() as OHPKM[], [ohpkmStore])
-  const snapshot = useMemo(() => compute_dex_snapshot(allStored), [allStored])
+  const allStored = useMemo(() => {
+    const stored = ohpkmStore.getAllStored() as OHPKM[]
+    console.log('Loaded stored Pokemon:', stored.length)
+    return stored
+  }, [ohpkmStore])
+  const snapshot = useMemo(() => {
+    const snap = compute_dex_snapshot(allStored)
+    console.log('Computed snapshot:', snap)
+    return snap
+  }, [allStored])
 
   const [state, setState] = useState<ProgressionState | null>(null)
   const [lastGrants, setLastGrants] = useState<RewardDefinition[]>([])
@@ -135,6 +145,25 @@ export default function Progression() {
     }
   }, [backend])
 
+  /**
+   * Keep types_ever_deposited in sync with current vault.
+   * This ensures the historical record captures all types that have been in the vault,
+   * even types that were later withdrawn.
+   */
+  useEffect(() => {
+    if (!state) return
+
+    const { types_ever_deposited: updated_types } = update_types_ever_deposited(state, snapshot)
+
+    // Only update state if types actually changed
+    if (JSON.stringify(updated_types) !== JSON.stringify(state.types_ever_deposited)) {
+      setState((prev) => {
+        if (!prev) return prev
+        return { ...prev, types_ever_deposited: updated_types }
+      })
+    }
+  }, [snapshot, state])
+
   async function deposit_reward_with_template(rewardMon: OHPKM): Promise<void> {
     // Double-check one more time right before placement
     const needle = rewardMon.fileIdentifier
@@ -183,7 +212,18 @@ export default function Progression() {
   }
 
   function getMilestoneUiState(m: MilestoneDefinition): "pending" | "ready" | "granted" {
-    if (!state) return "pending"
+    if (!state || !snapshot) return "pending"
+    
+    // For progressive milestones, check if all levels have been completed
+    if (m.kind === "type_count_progressive" && m.levels) {
+      const currentLevel = state.progressive_milestone_levels?.[m.id] ?? 0
+      // If we've completed all levels, show granted
+      if (currentLevel >= m.levels.length) return "granted"
+      // Otherwise evaluate if the next level is ready
+      const newlyCompleted = evaluate_milestones(state, snapshot, [m])
+      return newlyCompleted.length > 0 ? "ready" : "pending"
+    }
+    
     if (state.granted_rewards?.[m.reward_id]) return "granted"
     if (state.completed_milestones?.[m.id]) return "ready"
     const newlyCompleted = evaluate_milestones(state, snapshot, [m])
@@ -206,7 +246,7 @@ export default function Progression() {
         ? [milestone]
         : evaluate_milestones(state, snapshot, [milestone])
 
-      const { next_state, newly_granted_rewards } = apply_newly_completed(state, milestonesToApply, rewards)
+      const { next_state, newly_granted_rewards } = apply_newly_completed(state, milestonesToApply, rewards, snapshot)
 
       if (newly_granted_rewards.length === 0) {
         setLastGrants([])
@@ -275,6 +315,10 @@ export default function Progression() {
 
   const nationalDexMilestones = groupedMilestones["national_dex_threshold"] ?? []
   const regionalMilestones = groupedMilestones["regional_dex_100"] ?? []
+  const typeMasteryMilestones = [
+    ...(groupedMilestones["type_count"] ?? []),
+    ...(groupedMilestones["type_count_progressive"] ?? []),
+  ]
 
   return (
     <div style={{ padding: 24 }}>
@@ -609,13 +653,194 @@ export default function Progression() {
               </div>
             </div>
 
-            <div style={{ padding: 20, textAlign: "center" }}>
-              <div style={{ fontSize: 13, color: "#9ca3af" }}>Coming soon</div>
+            <div style={{ padding: 10, maxHeight: 320, overflowY: "auto" }}>
+              {!snapshot || !snapshot.type_counts ? (
+                <div style={{ color: "#ef4444", fontSize: 12, padding: "20px", textAlign: "center" }}>
+                  Error: Unable to load type data
+                </div>
+              ) : typeMasteryMilestones.length === 0 ? (
+                <div style={{ color: "#9ca3af", fontSize: 12, padding: "20px", textAlign: "center" }}>
+                  No type mastery milestones available
+                </div>
+              ) : (
+                typeMasteryMilestones.map((m) => {
+                  try {
+                    // Validate inputs
+                    if (!m || !m.id) {
+                      throw new Error("Invalid milestone data structure")
+                    }
+                    if (!rewards || typeof rewards !== 'object') {
+                      throw new Error("Rewards data not loaded")
+                    }
+                    
+                    // Step 1: Get UI state
+                    let uiState: "pending" | "ready" | "granted" = "pending"
+                    try {
+                      uiState = getMilestoneUiState(m)
+                    } catch(e) {
+                      throw new Error(`Failed to get UI state: ${String(e)}`)
+                    }
+
+                    const granted = uiState === "granted"
+                    const ready = uiState === "ready"
+                    const isCollecting = Boolean(collectingMilestoneIds[m.id])
+                    
+                    // Step 2: Get current count with safe access
+                    let current = 0
+                    try {
+                      if (snapshot && snapshot.type_counts && m.target_type) {
+                        current = snapshot.type_counts[m.target_type] ?? 0
+                      }
+                    } catch(e) {
+                      console.warn(`Failed to get current count for ${m.target_type}:`, e)
+                      current = 0
+                    }
+                    
+                    // Step 3: Determine target and reward
+                    let target = 1 // Default to 1 to avoid division by zero
+                    let rewardId = m.reward_id
+                    let rewardName = "Unknown"
+                    
+                    try {
+                      rewardName = rewards[rewardId]?.name ?? "Unknown"
+                    } catch(e) {
+                      console.warn(`Failed to get reward name for ${rewardId}:`, e)
+                    }
+                    
+                    // Step 4: Handle progressive vs regular milestones
+                    try {
+                      if (m.kind === "type_count_progressive") {
+                        if (!Array.isArray(m.levels) || m.levels.length === 0) {
+                          throw new Error("Progressive milestone missing or invalid levels data")
+                        }
+                        const currentLevel = (state && state.progressive_milestone_levels) ? (state.progressive_milestone_levels[m.id] ?? 0) : 0
+                        if (currentLevel < m.levels.length) {
+                          const levelDef = m.levels[currentLevel]
+                          if (!levelDef || typeof levelDef !== 'object') {
+                            throw new Error(`Level ${currentLevel} invalid: ${String(levelDef)}`)
+                          }
+                          if (!('target_count' in levelDef) || !('reward_id' in levelDef)) {
+                            throw new Error(`Level ${currentLevel} missing required properties`)
+                          }
+                          target = (levelDef as any).target_count ?? 1
+                          rewardId = (levelDef as any).reward_id
+                          rewardName = rewards[rewardId]?.name ?? "Unknown"
+                        } else {
+                          // All levels completed, show last level's info
+                          const lastLevel = m.levels[m.levels.length - 1]
+                          if (lastLevel && typeof lastLevel === 'object' && 'target_count' in lastLevel) {
+                            target = (lastLevel as any).target_count ?? 1
+                            rewardName = "All Levels Complete!"
+                          }
+                        }
+                      } else if (m.kind === "type_count" && m.target_count) {
+                        target = m.target_count
+                      }
+                    } catch(e) {
+                      throw new Error(`Failed to handle progressive milestone: ${String(e)}`)
+                    }
+                    
+                    const progress = Math.min(100, Math.round((current / target) * 100))
+
+                    console.log(`Rendering milestone ${m.id}:`, { 
+                      name: m.name, 
+                      kind: m.kind, 
+                      current, 
+                      target, 
+                      progress,
+                      rewardId,
+                      rewardName 
+                    })
+
+                    return (
+                      <div
+                        key={m.id}
+                        style={{
+                          background: "#0b1220",
+                          border: "1px solid #1f2937",
+                          borderRadius: 8,
+                          padding: "10px 12px",
+                          marginBottom: 8,
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                          <div>
+                            <div style={{ color: "#f9fafb", fontWeight: 600 }}>{m.name}</div>
+                            <div style={{ color: "#9ca3af", fontSize: 12 }}>
+                              {current} / {target} ({progress}%)
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => void collectMilestone(m)}
+                            disabled={uiState !== "ready" || isCollecting}
+                            style={{
+                              border:
+                                granted
+                                  ? "1px solid #14532d"
+                                  : ready
+                                    ? "1px solid #22c55e"
+                                    : "1px solid #374151",
+                              background: granted ? "#14532d" : ready ? "#0f5c2e" : "#374151",
+                              color: "#e5e7eb",
+                              borderRadius: 999,
+                              fontSize: 11,
+                              padding: "6px 10px",
+                              cursor: ready && !isCollecting ? "pointer" : "default",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {granted ? "✓ Completed" : isCollecting ? "..." : ready ? "Collect" : "Locked"}
+                          </button>
+                        </div>
+
+                        {/* Progress bar */}
+                        <div
+                          style={{
+                            background: "#0f172a",
+                            borderRadius: 4,
+                            height: 6,
+                            overflow: "hidden",
+                            marginBottom: 6,
+                          }}
+                        >
+                          <div
+                            style={{
+                              background: ready ? "#22c55e" : "#3b82f6",
+                              height: "100%",
+                              width: `${progress}%`,
+                              transition: "width 0.3s ease",
+                            }}
+                          />
+                        </div>
+
+                        <div style={{ fontSize: 11, color: "#6b7280" }}>
+                          Reward: {rewardName}
+                        </div>
+                      </div>
+                    )
+                  } catch (e) {
+                    const errorMsg = e instanceof Error ? e.message : String(e)
+                    console.error('Error rendering type mastery milestone:', {
+                      milestoneId: m?.id,
+                      milestoneName: m?.name,
+                      kind: m?.kind,
+                      error: errorMsg,
+                      fullError: e,
+                    })
+                    return (
+                      <div key={m?.id ?? 'unknown'} style={{ color: '#ef4444', padding: '10px', fontSize: '12px', border: '1px solid #ef4444', borderRadius: '4px' }}>
+                        <div style={{ fontWeight: 600 }}>Error: {m?.name ?? 'Unknown Milestone'}</div>
+                        <div style={{ fontSize: '11px', marginTop: '4px' }}>{errorMsg}</div>
+                      </div>
+                    )
+                  }
+                })
+              )}
+
             </div>
           </div>
         )}
 
-        {/* Shiny Hunt Category - Placeholder */}
         {activeCategoryId === "shiny_hunt" && (
           <div
             style={{

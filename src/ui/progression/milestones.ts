@@ -308,5 +308,32 @@ export const milestones: MilestoneDefinition[] = [
     required_species: [1], // Just require Bulbasaur for easier testing
     reward_id: "reward_celebi_event",
   },
+  // Type Mastery test milestones (progressive)
+  {
+    id: "milestone_type_normal_progressive",
+    name: "Normal Type Mastery",
+    description: "Progressive milestones for collecting Normal-type Pokémon",
+    kind: "type_count_progressive",
+    target_type: "Normal",
+    levels: [
+      { target_count: 1, reward_id: "reward_victini_event" },
+      { target_count: 5, reward_id: "reward_mew_event" },
+      { target_count: 10, reward_id: "reward_celebi_event" },
+    ],
+    reward_id: "reward_victini_event",
+  },
+  {
+    id: "milestone_type_psychic_progressive",
+    name: "Psychic Type Mastery",
+    description: "Progressive milestones for collecting Psychic-type Pokémon",
+    kind: "type_count_progressive",
+    target_type: "Psychic",
+    levels: [
+      { target_count: 1, reward_id: "reward_celebi_event" },
+      { target_count: 5, reward_id: "reward_mew_event" },
+      { target_count: 10, reward_id: "reward_jirachi_event" },
+    ],
+    reward_id: "reward_celebi_event",
+  },
 ]
 
