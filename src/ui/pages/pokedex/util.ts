@@ -37,6 +37,11 @@ export const StatusIndices: Record<PokedexStatus, number> = {
   ShinyCaught: 2,
 }
 
+export function isMissing(pokedex: Pokedex, species: SpeciesMetadata): boolean {
+  const [, status] = getHighestFormeStatus(pokedex, species)
+  return status === undefined
+}
+
 export function getPokedexSummary(species: SpeciesMetadata, forme: FormeMetadata) {
   const types = forme.type2 ? `${forme.type1}- and ${forme.type2}-type` : `${forme.type1}-type`
   const name = forme.formeIndex === 0 ? species.name : forme.formeName

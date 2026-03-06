@@ -48,6 +48,9 @@ target/
 # IDE files
 *.code-workspace
 *.sublime-workspace
+
+# executables
+OpenHome.exe
 *.sublime-project
 *.wakatime-project
 .idea

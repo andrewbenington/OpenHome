@@ -45,4 +45,5 @@ uuid = { version = "1.21.0", features = ["v4"] }
 dialog = "0.3.0"
 
 [features]
+custom-protocol = ["tauri/custom-protocol"]
 wasm = []

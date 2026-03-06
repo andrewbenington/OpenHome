@@ -32,6 +32,8 @@
     "build": "pnpm run wasm-compile && pnpm vite build",
     "dev": "pnpm run wasm-compile && pnpm vite",
     "tauri": "tauri",
+    "build:windows": "tauri build --bundles nsis",
+    "build:windows:exe": "pnpm run build && cd src-tauri && cargo build --release --features custom-protocol",
     "test-cargo": "cd pkm_rs_types && cargo test; cd ../pkm_rs_resources && cargo test; cd ../pkm_rs && cargo test; cd ../src-tauri && cargo test",
     "test-vite": "vitest run",
     "test": "pnpm run test-cargo && pnpm run test-vite",
