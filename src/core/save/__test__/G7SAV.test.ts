@@ -5,6 +5,7 @@ import { SMSAV } from '../SMSAV'
 import { USUMSAV } from '../USUMSAV'
 import { PathData } from '../util/path'
 import { initializeWasm } from './init'
+import { fail } from 'assert'
 
 beforeAll(initializeWasm)
 
@@ -35,6 +36,10 @@ describe('gen 7 save files', () => {
   test('first mon is as expected', () => {
     expect(ultraSunSave.boxes[0].boxSlots[0]?.nickname === 'Bulbasaur')
   })
+
+  test('checksum is expected', () => {
+    expect(ultraSunSave.calculatePcChecksum()).toBe(0x4d97)
+  })
 })
 
 describe('moon save file', () => {
@@ -63,5 +68,9 @@ describe('moon save file', () => {
 
   test('first mon is as expected', () => {
     expect(moonSav.boxes[0].boxSlots[0]?.nickname === 'Bulbasaur')
+  })
+
+  test('checksum is expected', () => {
+    expect(moonSav.calculatePcChecksum()).toBe(0xb28d)
   })
 })

@@ -1,9 +1,14 @@
 mod conversion;
 mod encryption;
+mod save;
 mod strings;
 mod util;
 
-pub mod pkm;
-pub mod saves;
+pub mod gen7_alola;
+pub mod gen7_lgpe;
+pub mod ohpkm;
+pub mod result;
+pub mod rom_hacks;
+pub mod traits;
 
 extern crate static_assertions;

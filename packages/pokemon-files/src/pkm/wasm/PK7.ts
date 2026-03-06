@@ -56,6 +56,8 @@ export class Pk7Rust {
       }
 
       this.inner = Pk7.fromBytes(new Uint8Array(buffer))
+    } else if (arg instanceof Pk7) {
+      this.inner = arg
     } else {
       const other = arg
       if (!(other instanceof OHPKM)) {

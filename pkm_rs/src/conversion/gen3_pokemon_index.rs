@@ -5,7 +5,7 @@ use pkm_rs_resources::species::NatDexIndex;
 use pkm_rs_types::randomize::Randomize;
 use serde::Serialize;
 
-use crate::pkm::{Error, NdexConvertSource};
+use crate::result::{Error, NdexConvertSource};
 
 const fn gen3_to_national_dex(key: u16) -> Option<u16> {
     match key {

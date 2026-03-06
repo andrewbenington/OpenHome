@@ -1,6 +1,6 @@
 use std::{num::Wrapping, ops::Range};
 
-use crate::pkm::{Error, Result};
+use crate::result::{Error, Result};
 
 const ENCRYPTION_OFFSET: usize = 8;
 const STARTING_SEED: u32 = 0x41c64e6d;
@@ -269,8 +269,8 @@ const CRC16_SEED_TABLE_INVERT: [u16; 256] = [
     0x4100, 0x81c1, 0x8081, 0x4040,
 ];
 
-pub fn crc16_ccitt(bytes: &[u8], start: usize, size: usize) -> u16 {
-    let mut checksum = 0xffffu16;
+pub fn crc16_ccitt(bytes: &[u8], start: usize, size: usize, initial: u16) -> u16 {
+    let mut checksum = initial;
 
     for byte in bytes.iter().skip(start).take(size) {
         let seed_index = ((*byte as u16) ^ (checksum >> 8)) as usize;
@@ -291,6 +291,21 @@ pub fn crc16_ccitt_invert(bytes: &[u8], start: usize, size: usize) -> u16 {
     }
 
     !checksum
+}
+
+pub fn crc16_ccitt_no_invert(bytes: &[u8], start: usize, size: usize) -> u16 {
+    crc16_ccitt(bytes, start, size, 0)
+}
+
+pub trait Crc16CcittInvertChecksum {
+    const RANGE_START: usize;
+    const RANGE_SIZE: usize;
+
+    fn get_bytes<'a>(&'a self) -> &'a [u8];
+
+    fn calc_checksum(&self) -> u16 {
+        crc16_ccitt_invert(self.get_bytes(), Self::RANGE_START, Self::RANGE_SIZE)
+    }
 }
 
 pub fn checksum_u16_le(bytes: &[u8]) -> u16 {

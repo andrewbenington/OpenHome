@@ -51,17 +51,12 @@ export class SunMoonSaveWasm extends OfficialSAV<Pk7Rust> {
     for (let box = 0; box < SunMoonSave.box_count(); box++) {
       for (let monIndex = 0; monIndex < SunMoonSave.box_size(); monIndex++) {
         try {
-          try {
-            const mon = this.inner.get_mon_at(box, monIndex)
-
-            if (mon.game_of_origin !== 0 && mon.species_and_forme.nationalDex !== 0) {
-              this.boxes[box].boxSlots[monIndex] = new Pk7Rust(mon)
-            }
-          } catch (e) {
-            console.error(`Error loading mon in box ${box + 1}, slot ${monIndex + 1}:`, e)
+          const mon = this.inner.getMonAt(box, monIndex)
+          if (mon) {
+            this.boxes[box].boxSlots[monIndex] = new Pk7Rust(mon)
           }
         } catch (e) {
-          console.error(e)
+          console.error(`Error loading mon in box ${box + 1}, slot ${monIndex + 1}:`, e)
         }
       }
     }

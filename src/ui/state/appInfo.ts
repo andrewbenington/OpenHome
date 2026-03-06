@@ -13,7 +13,6 @@ import { LGPESAV } from '@openhome-core/save/LGPESAV'
 import { ORASSAV } from '@openhome-core/save/ORASSAV'
 import { PtSAV } from '@openhome-core/save/PtSAV'
 import { G3RRSAV } from '@openhome-core/save/radicalred/G3RRSAV'
-import { SMSAV } from '@openhome-core/save/SMSAV'
 import { G3UBSAV } from '@openhome-core/save/unbound/G3UBSAV'
 import { USUMSAV } from '@openhome-core/save/USUMSAV'
 import { SAVClass } from '@openhome-core/save/util'
@@ -36,7 +35,7 @@ const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   BW2SAV,
   XYSAV,
   ORASSAV,
-  SMSAV,
+  // SMSAV,
   SunMoonSaveWasm,
   USUMSAV,
   LGPESAV,

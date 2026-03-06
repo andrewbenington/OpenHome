@@ -80,6 +80,12 @@ pub fn read_uint5_from_bits(byte: u8, bit_offset: u8) -> u8 {
     (byte & bit_mask) >> bit_offset
 }
 
+pub fn six_digit_trainer_display(trainer_id: u16, secret_id: u16) -> String {
+    let full_id: u32 = (secret_id as u32) << 16 | (trainer_id as u32);
+
+    format!("{:0>6}", full_id)
+}
+
 mod test {
 
     #[test]
