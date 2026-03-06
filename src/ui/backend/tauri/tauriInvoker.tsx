@@ -71,9 +71,11 @@ type OhTauriApi = {
   get_reward_template_bytes(rewardId: string): number[]
   load_progression(): JSONObject | null
   write_progression(progression: JSONObject): null
+  reset_progression(): null
 
   get_pokedex(): Pokedex
   update_pokedex(updates: PokedexUpdate[]): null
+  reset_pokedex(): null
 
   start_transaction(): null
   rollback_transaction(): null
@@ -143,12 +145,20 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('write_progression', { progression })
   },
 
+  reset_progression() {
+    return invokeAndCatch('reset_progression')
+  },
+
   get_pokedex() {
     return invokeAndCatch('get_pokedex')
   },
 
   update_pokedex(updates: PokedexUpdate[]) {
     return invokeAndCatch('update_pokedex', { updates })
+  },
+
+  reset_pokedex() {
+    return invokeAndCatch('reset_pokedex')
   },
 
   get_storage_file_json(relativePath: string) {

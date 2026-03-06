@@ -48,3 +48,9 @@ pub fn write_progression(
 ) -> Result<()> {
     util::write_storage_file_json(&app_handle, "progression.json", &progression)
 }
+
+#[tauri::command]
+pub fn reset_progression(app_handle: tauri::AppHandle) -> Result<()> {
+    let progression = ProgressionState::default_v1();
+    util::write_storage_file_json(&app_handle, "progression.json", &progression)
+}

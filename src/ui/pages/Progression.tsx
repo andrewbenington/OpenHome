@@ -13,28 +13,14 @@ import { load_progression_state, write_progression_state } from "../progression/
 import { REGION_DEX_DATA, getRegionalDexCount } from "../progression/dexTracker"
 import type { MilestoneDefinition, ProgressionState, RewardDefinition } from "../progression/types"
 
-const DEFAULT_PROGRESSION_STATE: ProgressionState = {
-  version: 1,
-  completed_milestones: {},
-  granted_rewards: {},
-  reward_history: [],
-  types_ever_deposited: {},
-  progressive_milestone_levels: {},
-}
-
 async function create_reward_ohpkm_from_template(
   backend: BackendInterface,
   reward_id: string,
 ): Promise<OHPKM> {
   const res = await backend.getRewardTemplateBytes(reward_id)
 
-  if (res.isErr) {
-    const details =
-      res && res.error
-        ? typeof res.error === "string"
-          ? res.error
-          : JSON.stringify(res.error, null, 2)
-        : "unknown backend error"
+  if (R.isErr(res)) {
+    const details = typeof res.err === "string" ? res.err : JSON.stringify(res.err, null, 2)
     throw new Error("Failed to load reward template bytes: " + details)
   }
 
@@ -114,12 +100,6 @@ export default function Progression() {
     }
     return groups
   }, [])
-
-  // Test milestones are those with "test" or "smoke" in the ID or name
-  const testMilestones = useMemo(
-    () => milestones.filter((m) => m.id.includes("test") || m.id.includes("smoke") || m.name.toLowerCase().includes("test")),
-    [],
-  )
 
   // Milestone categories for tabs
   const categories = [
@@ -300,17 +280,6 @@ export default function Progression() {
     }
   }
 
-  async function resetProgression(): Promise<void> {
-    try {
-      await write_progression_state(backend, DEFAULT_PROGRESSION_STATE)
-      setState(DEFAULT_PROGRESSION_STATE)
-      setLastGrants([])
-      setError(null)
-    } catch (e) {
-      setError(String(e))
-    }
-  }
-
   if (!state) return <div style={{ padding: 24 }}>Loading progression</div>
 
   const nationalDexMilestones = groupedMilestones["national_dex_threshold"] ?? []
@@ -332,21 +301,6 @@ export default function Progression() {
         }}
       >
         <h1 style={{ margin: 0 }}>Progression</h1>
-        <button
-          onClick={resetProgression}
-          style={{
-            border: "1px solid #ef4444",
-            background: "#dc2626",
-            color: "#e5e7eb",
-            borderRadius: 6,
-            padding: "8px 12px",
-            cursor: "pointer",
-            fontSize: 13,
-            whiteSpace: "nowrap",
-          }}
-        >
-          Reset Progression
-        </button>
       </div>
 
       {error ? <div style={{ marginTop: 12, color: "#ef4444" }}>Error: {error}</div> : null}
@@ -980,95 +934,6 @@ export default function Progression() {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Test Milestones */}
-      {testMilestones.length > 0 && (
-        <div
-          style={{
-            marginTop: 20,
-            border: "1px solid #1f2937",
-            borderRadius: 10,
-            background: "linear-gradient(180deg, #0f172a 0%, #111827 100%)",
-            padding: 12,
-          }}
-        >
-          <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: "#f9fafb" }}>Test Milestones</div>
-          <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 12 }}>
-            QA milestones for validating reward output and progression mechanics ({testMilestones.length} total)
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: 8,
-            }}
-          >
-            {testMilestones.map((m) => {
-              const uiState = getMilestoneUiState(m)
-              const granted = uiState === "granted"
-              const ready = uiState === "ready"
-              const isCollecting = Boolean(collectingMilestoneIds[m.id])
-
-              return (
-                <div
-                  key={m.id}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 8,
-                    background: "#0b1220",
-                    border: "1px solid #1f2937",
-                    borderRadius: 8,
-                    padding: "10px 12px",
-                  }}
-                >
-                  <div>
-                    <div style={{ color: "#f9fafb", fontWeight: 600, fontSize: 14 }}>{m.name}</div>
-                    <div style={{ color: "#9ca3af", fontSize: 12, marginTop: 2 }}>
-                      Reward: {rewards[m.reward_id]?.name ?? m.reward_id}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => void collectMilestone(m)}
-                    disabled={granted || !ready || isCollecting}
-                    style={{
-                      border: granted ? "1px solid #14532d" : ready ? "1px solid #3b82f6" : "1px solid #374151",
-                      background: granted ? "#14532d" : ready ? "#1e3a8a" : "#374151",
-                      color: "#e5e7eb",
-                      borderRadius: 6,
-                      fontSize: 12,
-                      padding: "8px 12px",
-                      cursor: granted || !ready || isCollecting ? "default" : "pointer",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {granted ? "✓ Collected" : isCollecting ? "..." : ready ? "Collect" : "Pending"}
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Actions */}
-      <div style={{ marginTop: 20, display: "flex", gap: 8 }}>
-        <button
-          onClick={resetProgression}
-          style={{
-            border: "1px solid #ef4444",
-            background: "#dc2626",
-            color: "#e5e7eb",
-            borderRadius: 6,
-            padding: "8px 12px",
-            cursor: "pointer",
-            fontSize: 14,
-          }}
-        >
-          Reset Progression
-        </button>
       </div>
 
       {/* Recent Grants */}

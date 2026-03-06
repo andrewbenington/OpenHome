@@ -45,6 +45,9 @@ export default interface BackendInterface {
   getRewardTemplateBytes: (rewardId: string) => Promise<Errorable<Uint8Array>>
   loadProgression: (profileId: string) => Promise<Errorable<string | null>>
   writeProgression: (profileId: string, json: string) => Promise<Errorable<void>>
+  resetProgression: () => Promise<Errorable<null>>
+  resetPokedex: () => Promise<Errorable<null>>
+  deleteStorageFiles: (relativePaths: string[]) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
   /* write synced state to disk during save */

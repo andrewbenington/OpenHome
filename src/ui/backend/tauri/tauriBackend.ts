@@ -95,6 +95,25 @@ export const TauriBackend: BackendInterface & {
 
     return Commands.write_progression(progression).then(R.map(() => undefined))
   },
+  resetProgression: async function (): Promise<Errorable<null>> {
+    return Commands.reset_progression().then(R.map(() => null))
+  },
+  resetPokedex: async function (): Promise<Errorable<null>> {
+    return Commands.reset_pokedex().then(R.map(() => null))
+  },
+  deleteStorageFiles: async function (relativePaths: string[]): Promise<Errorable<null>> {
+    return Commands.delete_storage_files(relativePaths).then(
+      R.flatMap((deletionResults) => {
+        for (const [file, result] of Object.entries(deletionResults)) {
+          if (isRustErr(result)) {
+            return R.Err(`Could not delete ${file}: ${result.Err}`)
+          }
+        }
+
+        return R.Ok(null)
+      })
+    )
+  },
   deleteHomeMons: async function (identifiers: string[]): Promise<Errorable<null>> {
     const monFilePaths = identifiers.map((identifier) => `mons/${identifier}.ohpkm`)
     return Commands.delete_storage_files(monFilePaths).then(

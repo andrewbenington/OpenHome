@@ -82,6 +82,7 @@ function buildKeyboardHandler(backend: BackendInterface) {
 }
 
 function AppWithBackend() {
+  const PROD_INIT_KEY = 'openhome-prod-initialized-v1'
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
   const [dragState, setDragState] = useState<DragMonState>(emptyDragState())
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
@@ -131,6 +132,46 @@ function AppWithBackend() {
     if (!appInfoState.settingsLoaded) return
     debouncedUpdateSettings(backend, appInfoState.settings)
   }, [backend, appInfoState.settings, appInfoState.settingsLoaded, debouncedUpdateSettings])
+
+  // One-time production-only bootstrap: clear progression + pokedex for a clean release slate.
+  useEffect(() => {
+    let cancelled = false
+
+    backend
+      .getState()
+      .then(
+        R.asyncFlatMap(async (state) => {
+          if (state.is_dev) return R.Ok(false)
+          if (localStorage.getItem(PROD_INIT_KEY) === '1') return R.Ok(false)
+
+          const resetProgressionResult = await backend.resetProgression()
+          if (R.isErr(resetProgressionResult)) return R.Err(resetProgressionResult.err)
+
+          const resetPokedexResult = await backend.resetPokedex()
+          if (R.isErr(resetPokedexResult)) return R.Err(resetPokedexResult.err)
+
+          return R.Ok(true)
+        })
+      )
+      .then(
+        R.match(
+          (didInitialize) => {
+            if (cancelled) return
+            if (didInitialize) {
+              localStorage.setItem(PROD_INIT_KEY, '1')
+            }
+          },
+          (err) => {
+            if (cancelled) return
+            displayError('Production initialization failed', err)
+          }
+        )
+      )
+
+    return () => {
+      cancelled = true
+    }
+  }, [backend, displayError])
 
   const getEnabledSaveTypes = useCallback(() => {
     return appInfoState.extraSaveTypes
