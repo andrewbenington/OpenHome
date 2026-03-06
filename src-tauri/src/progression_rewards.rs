@@ -24,6 +24,14 @@ pub fn get_reward_template_bytes(reward_id: String) -> Result<Vec<u8>> {
         "reward_volcanion_event" => Ok(include_bytes!("rewards/volcanion_event.ohpkm").to_vec()),
         "reward_zarude_event" => Ok(include_bytes!("rewards/zarude_event.ohpkm").to_vec()),
         "reward_zeraora_event" => Ok(include_bytes!("rewards/zeraora_event.ohpkm").to_vec()),
+        "reward_bulbasaur_event" => Ok(include_bytes!("rewards/bulbasaur_event.ohpkm").to_vec()),
+        "reward_charmander_event" => Ok(include_bytes!("rewards/charmander_event.ohpkm").to_vec()),
+        "reward_eevee_event" => Ok(include_bytes!("rewards/eevee_event.ohpkm").to_vec()),
+        "reward_gastly_event" => Ok(include_bytes!("rewards/gastly_event.ohpkm").to_vec()),
+        "reward_lunala_event" => Ok(include_bytes!("rewards/lunala_event.ohpkm").to_vec()),
+        "reward_onix_event" => Ok(include_bytes!("rewards/onix_event.ohpkm").to_vec()),
+        "reward_porygon_event" => Ok(include_bytes!("rewards/porygon_event.ohpkm").to_vec()),
+        "reward_zacian_event" => Ok(include_bytes!("rewards/zacian_event.ohpkm").to_vec()),
         _ => {
             let e = io::Error::new(io::ErrorKind::InvalidInput, format!("Unknown reward_id {}", reward_id));
             Err(Error::appdata(e))
