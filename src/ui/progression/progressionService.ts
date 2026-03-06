@@ -6,6 +6,7 @@ import { REGION_DEX_DATA, calculateRegionalDexCompletion, isRegionalDexComplete,
 export function compute_dex_snapshot(all_stored: OHPKM[]): DexSnapshot {
   const present = new Set<number>()
   const type_counts: Record<string, number> = {}
+  let shiny_count = 0
 
   try {
     for (const mon of all_stored) {
@@ -16,6 +17,11 @@ export function compute_dex_snapshot(all_stored: OHPKM[]): DexSnapshot {
         }
 
         present.add(mon.dexNum)
+
+        // Count shinies
+        if (mon.isShiny()) {
+          shiny_count++
+        }
 
         // Get type information from metadata
         const metadata = MetadataLookup(mon.dexNum, mon.formeNum)
@@ -45,6 +51,7 @@ export function compute_dex_snapshot(all_stored: OHPKM[]): DexSnapshot {
       national_species_present: present,
       regional_completion,
       type_counts,
+      shiny_count,
     }
   } catch (e) {
     console.error('Error computing dex snapshot:', e)
@@ -54,6 +61,7 @@ export function compute_dex_snapshot(all_stored: OHPKM[]): DexSnapshot {
       national_species_present: new Set(),
       regional_completion: {},
       type_counts: {},
+      shiny_count: 0,
     }
   }
 }
@@ -142,6 +150,11 @@ export function evaluate_milestones(
             }
           }
         }
+      }
+    } else if (m.kind === "shiny_count") {
+      // Shiny collection milestone: check if we have enough shinies in the bank
+      if (m.target_count && snapshot.shiny_count >= m.target_count) {
+        newly_completed.push(m)
       }
     }
   }

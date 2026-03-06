@@ -7,6 +7,8 @@ export type DexSnapshot = {
   regional_completion: Record<string, number> // regionId -> completion percentage
   /** Count of Pokémon currently in vault grouped by type. */
   type_counts: Record<string, number>
+  /** Count of shiny Pokémon currently in vault. */
+  shiny_count: number
 }
 
 /** Level definition for progressive milestones (e.g., catch 5, then 10, then 20) */

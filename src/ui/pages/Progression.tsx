@@ -319,10 +319,35 @@ export default function Progression() {
     ...(groupedMilestones["type_count"] ?? []),
     ...(groupedMilestones["type_count_progressive"] ?? []),
   ]
+  const shinyCollectionMilestones = groupedMilestones["shiny_count"] ?? []
 
   return (
-    <div style={{ padding: 24 }}>
-      <h1>Progression</h1>
+    <div style={{ padding: 24, height: "100vh", overflowY: "auto" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        <h1 style={{ margin: 0 }}>Progression</h1>
+        <button
+          onClick={resetProgression}
+          style={{
+            border: "1px solid #ef4444",
+            background: "#dc2626",
+            color: "#e5e7eb",
+            borderRadius: 6,
+            padding: "8px 12px",
+            cursor: "pointer",
+            fontSize: 13,
+            whiteSpace: "nowrap",
+          }}
+        >
+          Reset Progression
+        </button>
+      </div>
 
       {error ? <div style={{ marginTop: 12, color: "#ef4444" }}>Error: {error}</div> : null}
 
@@ -331,7 +356,7 @@ export default function Progression() {
         style={{
           marginTop: 12,
           display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
+          gridTemplateColumns: "repeat(4, 1fr)",
           gap: 12,
         }}
       >
@@ -346,6 +371,19 @@ export default function Progression() {
           <div style={{ fontSize: 12, color: "#9ca3af" }}>National Unique Species</div>
           <div style={{ fontSize: 24, fontWeight: 700, color: "#f9fafb", marginTop: 4 }}>
             {snapshot.national_unique_species}
+          </div>
+        </div>
+        <div
+          style={{
+            background: "#0f172a",
+            border: "1px solid #1f2937",
+            borderRadius: 8,
+            padding: 12,
+          }}
+        >
+          <div style={{ fontSize: 12, color: "#9ca3af" }}>Shiny Pokémon</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "#fbbf24", marginTop: 4 }}>
+            {snapshot.shiny_count ?? 0}
           </div>
         </div>
         <div
@@ -858,12 +896,87 @@ export default function Progression() {
             >
               <div style={{ fontWeight: 700, color: "#f9fafb" }}>Shiny Collection Milestones</div>
               <div style={{ fontSize: 12, marginTop: 2, color: "#9ca3af" }}>
-                Build your shiny collection and earn rewards
+                Build your shiny collection and earn exclusive event Pokémon
               </div>
             </div>
 
-            <div style={{ padding: 20, textAlign: "center" }}>
-              <div style={{ fontSize: 13, color: "#9ca3af" }}>Coming soon</div>
+            <div style={{ padding: 10, maxHeight: 320, overflowY: "auto" }}>
+              {shinyCollectionMilestones.map((m) => {
+                const uiState = getMilestoneUiState(m)
+                const granted = uiState === "granted"
+                const ready = uiState === "ready"
+                const isCollecting = Boolean(collectingMilestoneIds[m.id])
+                const current = snapshot.shiny_count ?? 0
+                const target = m.target_count ?? 0
+                const progress = Math.min(100, Math.round((current / target) * 100))
+
+                return (
+                  <div
+                    key={m.id}
+                    style={{
+                      background: "#0b1220",
+                      border: "1px solid #1f2937",
+                      borderRadius: 8,
+                      padding: "10px 12px",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <div>
+                        <div style={{ color: "#f9fafb", fontWeight: 600 }}>{m.name}</div>
+                        <div style={{ color: "#9ca3af", fontSize: 12 }}>
+                          {current} / {target} ({progress}%)
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => void collectMilestone(m)}
+                        disabled={uiState !== "ready" || isCollecting}
+                        style={{
+                          border:
+                            granted
+                              ? "1px solid #14532d"
+                              : ready
+                                ? "1px solid #22c55e"
+                                : "1px solid #374151",
+                          background: granted ? "#14532d" : ready ? "#0f5c2e" : "#374151",
+                          color: "#e5e7eb",
+                          borderRadius: 999,
+                          fontSize: 11,
+                          padding: "6px 10px",
+                          cursor: ready && !isCollecting ? "pointer" : "default",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {granted ? "✓ Collected" : isCollecting ? "..." : ready ? "Collect" : "Locked"}
+                      </button>
+                    </div>
+
+                    {/* Progress bar */}
+                    <div
+                      style={{
+                        background: "#0f172a",
+                        borderRadius: 4,
+                        height: 6,
+                        overflow: "hidden",
+                        marginBottom: 6,
+                      }}
+                    >
+                      <div
+                        style={{
+                          background: ready ? "#22c55e" : "#fbbf24",
+                          height: "100%",
+                          width: `${progress}%`,
+                          transition: "width 0.3s ease",
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ fontSize: 11, color: "#6b7280" }}>
+                      Reward: {rewards[m.reward_id]?.name ?? "Unknown"}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}
@@ -882,13 +995,13 @@ export default function Progression() {
         >
           <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: "#f9fafb" }}>Test Milestones</div>
           <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 12 }}>
-            QA milestones for validating reward output and progression mechanics
+            QA milestones for validating reward output and progression mechanics ({testMilestones.length} total)
           </div>
 
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
               gap: 8,
             }}
           >
@@ -903,9 +1016,8 @@ export default function Progression() {
                   key={m.id}
                   style={{
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    gap: 12,
+                    flexDirection: "column",
+                    gap: 8,
                     background: "#0b1220",
                     border: "1px solid #1f2937",
                     borderRadius: 8,
@@ -925,9 +1037,9 @@ export default function Progression() {
                       border: granted ? "1px solid #14532d" : ready ? "1px solid #3b82f6" : "1px solid #374151",
                       background: granted ? "#14532d" : ready ? "#1e3a8a" : "#374151",
                       color: "#e5e7eb",
-                      borderRadius: 999,
-                      fontSize: 11,
-                      padding: "6px 10px",
+                      borderRadius: 6,
+                      fontSize: 12,
+                      padding: "8px 12px",
                       cursor: granted || !ready || isCollecting ? "default" : "pointer",
                       whiteSpace: "nowrap",
                     }}
