@@ -106,3 +106,17 @@ pub fn update_pokedex(
         .emit("pokedex_update", pokedex.clone())
         .map_err(|err| Error::other_with_source("Could not emit 'pokedex_update' to frontend", err))
 }
+
+#[tauri::command]
+pub fn reset_pokedex(
+    app_handle: tauri::AppHandle,
+    pokedex_state: tauri::State<'_, PokedexState>,
+) -> Result<()> {
+    let mut pokedex = pokedex_state.lock()?;
+    *pokedex = Pokedex::default();
+    pokedex.write_to_storage(&app_handle)?;
+
+    app_handle
+        .emit("pokedex_update", pokedex.clone())
+        .map_err(|err| Error::other_with_source("Could not emit 'pokedex_update' to frontend", err))
+}

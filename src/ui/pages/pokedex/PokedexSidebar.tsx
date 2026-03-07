@@ -5,10 +5,11 @@ import { all_species_data, FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { CSSProperties, useEffect, useMemo, useRef } from 'react'
 import './style.css'
-import { getHighestFormeStatus, StatusIndices } from './util'
+import { getHighestFormeStatus, StatusIndices, isMissing } from './util'
 
 export type PokedexSidebarProps = {
   filter?: string
+  showMissing?: boolean
   pokedex: Pokedex
   selectedSpecies?: SpeciesMetadata
   setSelectedSpecies: (species: SpeciesMetadata) => void
@@ -16,7 +17,7 @@ export type PokedexSidebarProps = {
 }
 
 export default function PokedexSidebar(props: PokedexSidebarProps) {
-  const { filter, selectedSpecies, setSelectedSpecies, setSelectedForme, pokedex } = props
+  const { filter, showMissing, selectedSpecies, setSelectedSpecies, setSelectedForme, pokedex } = props
 
   const ALL_SPECIES_DATA = useMemo(() => all_species_data(), [])
 
@@ -24,10 +25,18 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
 
   const filteredSpecies = useMemo(
     () =>
-      Object.values(ALL_SPECIES_DATA).filter(
-        (mon) => !filter || mon.name.toUpperCase().startsWith(filter?.trim().toUpperCase())
-      ),
-    [ALL_SPECIES_DATA, filter]
+      Object.values(ALL_SPECIES_DATA).filter((mon) => {
+        // Filter by name
+        if (filter && !mon.name.toUpperCase().startsWith(filter?.trim().toUpperCase())) {
+          return false
+        }
+        // Filter by missing status (only filter if toggle is ON)
+        if (showMissing && !isMissing(pokedex, mon)) {
+          return false
+        }
+        return true
+      }),
+    [ALL_SPECIES_DATA, filter, showMissing, pokedex]
   )
 
   const virtualizer = useVirtualizer({

@@ -8,6 +8,7 @@ import PokedexDisplay from './pages/pokedex/PokedexDisplay'
 import Settings from './pages/Settings'
 import SortPokemon from './pages/sort/SortPokemon'
 import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
+import Progression from "./pages/Progression"
 
 export default function AppTabs() {
   const isDev = useIsDev()
@@ -35,6 +36,7 @@ export default function AppTabs() {
           <Route path="/manage/*" element={<TrackedPokemonPage />} />
           <Route path="/sort" element={<SortPokemon />} />
           <Route path="/pokedex" element={<PokedexDisplay />} />
+          <Route path="/progression" element={<Progression />} />
           <Route path="/plugins/*" element={<PluginsPage />} />
           <Route path="/settings" element={<Settings />} />
           {isDev && (
@@ -60,6 +62,7 @@ export default function AppTabs() {
         <Tabs.Trigger value="manage">Tracked Pokémon</Tabs.Trigger>
         <Tabs.Trigger value="sort">Sort Pokémon</Tabs.Trigger>
         <Tabs.Trigger value="pokedex">Pokédex</Tabs.Trigger>
+        <Tabs.Trigger value="progression">Progression</Tabs.Trigger>
         <Tabs.Trigger value="plugins">Plugins</Tabs.Trigger>
         <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
         {isDev && (
