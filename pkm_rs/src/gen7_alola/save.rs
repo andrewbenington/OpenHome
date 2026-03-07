@@ -128,7 +128,7 @@ impl Crc16CcittInvertChecksum for SunMoonSave {
     const RANGE_START: usize = SM_BOX_DATA_OFFSET;
     const RANGE_SIZE: usize = BOX_DATA_SIZE;
 
-    fn get_bytes<'a>(&'a self) -> &'a [u8] {
+    fn get_bytes(&self) -> &[u8] {
         &self.bytes
     }
 }
@@ -301,7 +301,7 @@ impl SaveData for UltraSunMoonSave {
 
 impl UltraSunMoonSave {
     fn get_mon_bytes(&self, box_num: usize, offset: usize) -> Vec<u8> {
-        let box_offset = SM_BOX_DATA_OFFSET + BOX_SLOTS * Pk7::BOX_SIZE * box_num;
+        let box_offset = USUM_BOX_DATA_OFFSET + BOX_SLOTS * Pk7::BOX_SIZE * box_num;
         let mon_offset = box_offset + offset * Pk7::BOX_SIZE;
         self.bytes[mon_offset..mon_offset + Pk7::BOX_SIZE].to_vec()
     }
@@ -311,7 +311,7 @@ impl Crc16CcittInvertChecksum for UltraSunMoonSave {
     const RANGE_START: usize = USUM_BOX_DATA_OFFSET;
     const RANGE_SIZE: usize = BOX_DATA_SIZE;
 
-    fn get_bytes<'a>(&'a self) -> &'a [u8] {
+    fn get_bytes(&self) -> &[u8] {
         &self.bytes
     }
 }

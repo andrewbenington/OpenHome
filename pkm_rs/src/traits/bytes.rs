@@ -7,3 +7,8 @@ macro_rules! read_move_index {
         MoveIndex::from_le_bytes([$bytes[$start], $bytes[$start + 1]])
     };
 }
+
+pub trait MutableBytes {
+    fn get_bytes(&self) -> &[u8];
+    fn get_bytes_mut(&mut self) -> &mut [u8];
+}

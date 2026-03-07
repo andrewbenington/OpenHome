@@ -2,6 +2,8 @@ mod pk7;
 mod pk7_buffer;
 mod save;
 
+use pk7_buffer::Pk7Buffer;
+
 pub use pk7::*;
 use pkm_rs_resources::{moves::MoveDataOffsets, ribbons::ModernRibbon};
 pub use save::{SunMoonSave, UltraSunMoonSave};

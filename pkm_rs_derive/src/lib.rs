@@ -403,3 +403,33 @@ pub fn derive_randomize(input: TokenStream) -> TokenStream {
     }
     .into()
 }
+
+#[proc_macro_derive(ChecksumU16Le)]
+pub fn derive_checksum_u16_le(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    let name = &input.ident;
+    let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
+
+    let expanded = quote! {
+        impl #impl_generics crate::encryption::ChecksumU16Le for #name #ty_generics
+            #where_clause
+        {
+            fn calculate_checksum(&self) -> u16 {
+                crate::encryption::checksum_u16_le(
+                    &self.get_bytes()[Self::SPAN_START..Self::SPAN_END]
+                )
+            }
+            fn refresh_checksum(&mut self) {
+                let checksum = {
+                    let bytes = self.get_bytes();
+                    crate::encryption::checksum_u16_le(&bytes[Self::SPAN_START..Self::SPAN_END])
+                };
+                let bytes_mut = self.get_bytes_mut();
+                bytes_mut[Self::STORED_OFFSET..Self::STORED_OFFSET + 2]
+                    .copy_from_slice(&checksum.to_le_bytes());
+            }
+        }
+    };
+
+    TokenStream::from(expanded)
+}

@@ -2,10 +2,7 @@ use pkm_rs_resources::ribbons::OpenHomeRibbonSet;
 use pkm_rs_types::Stats16Le;
 
 use crate::{
-    encryption::ChecksumU16Le,
-    gen7_alola::Pk7,
-    ohpkm::OhpkmV2,
-    traits::{HasSpeciesAndForme, PkmBytes},
+    encryption::ChecksumU16Le, gen7_alola::Pk7, ohpkm::OhpkmV2, traits::HasSpeciesAndForme,
 };
 
 use super::OhpkmConvert;
@@ -162,7 +159,7 @@ impl OhpkmConvert for Pk7 {
         mon.stats = mon.calculate_stats();
         mon.current_hp = mon.stats.hp;
 
-        mon.checksum = Pk7::calc_checksum(&mon.to_box_bytes());
+        mon.refresh_checksum();
 
         mon
     }

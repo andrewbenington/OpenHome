@@ -1,3 +1,4 @@
+use super::Pk7Buffer;
 use crate::encryption::ChecksumU16Le;
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 use crate::result::{Error, Result};
@@ -112,6 +113,91 @@ const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
 };
 
 impl Pk7 {
+    // ------------------------------------------------------------------
+    // Deserialise from a Pk7Buffer (the single source of all byte offsets)
+    // ------------------------------------------------------------------
+
+    pub fn from_buffer(buf: &Pk7Buffer) -> Result<Self> {
+        let mut mon = Pk7 {
+            encryption_constant: buf.encryption_constant(),
+            sanity: buf.sanity(),
+            checksum: buf.checksum(),
+            species_and_forme: buf.species_and_forme()?,
+            held_item_index: buf.held_item_index(),
+            trainer_id: buf.trainer_id(),
+            secret_id: buf.secret_id(),
+            exp: buf.exp(),
+            ability_index: buf.ability_index()?,
+            ability_num: buf.ability_num()?,
+            markings: buf.markings(),
+            personality_value: buf.personality_value(),
+            nature: buf.nature()?,
+            is_fateful_encounter: buf.is_fateful_encounter(),
+            gender: buf.gender(),
+            evs: buf.evs(),
+            contest: buf.contest(),
+            resort_event_status: buf.resort_event_status(),
+            pokerus_byte: buf.pokerus_byte(),
+            super_training_flags: buf.super_training_flags(),
+            ribbons: buf.ribbons(),
+            contest_memory_count: buf.contest_memory_count(),
+            battle_memory_count: buf.battle_memory_count(),
+            super_training_dist_flags: buf.super_training_dist_flags(),
+            form_argument: buf.form_argument(),
+            nickname: buf.nickname(),
+            moves: buf.move_slots(),
+            relearn_moves: [
+                buf.relearn_move(0),
+                buf.relearn_move(1),
+                buf.relearn_move(2),
+                buf.relearn_move(3),
+            ],
+            secret_super_training_unlocked: buf.secret_super_training_unlocked(),
+            secret_super_training_complete: buf.secret_super_training_complete(),
+            ivs: buf.ivs(),
+            is_egg: buf.is_egg(),
+            is_nicknamed: buf.is_nicknamed(),
+            handler_name: buf.handler_name(),
+            handler_gender: buf.handler_gender(),
+            is_current_handler: buf.is_current_handler(),
+            geolocations: buf.geolocations(),
+            handler_friendship: buf.handler_friendship(),
+            handler_affection: buf.handler_affection(),
+            handler_memory: buf.handler_memory(),
+            fullness: buf.fullness(),
+            enjoyment: buf.enjoyment(),
+            trainer_name: buf.trainer_name(),
+            trainer_friendship: buf.trainer_friendship(),
+            trainer_affection: buf.trainer_affection(),
+            trainer_memory: buf.trainer_memory(),
+            egg_date: buf.egg_date(),
+            met_date: buf.met_date(),
+            egg_location_index: buf.egg_location_index(),
+            met_location_index: buf.met_location_index(),
+            ball: buf.ball(),
+            met_level: buf.met_level(),
+            trainer_gender: buf.trainer_gender(),
+            hyper_training: buf.hyper_training(),
+            game_of_origin: buf.game_of_origin(),
+            country: buf.country(),
+            region: buf.region(),
+            console_region: buf.console_region(),
+            language: buf.language()?,
+            ..Default::default()
+        };
+
+        if buf.is_party() {
+            mon.status_condition = buf.status_condition();
+            mon.stat_level = buf.stat_level();
+            mon.form_argument_remain = buf.form_argument_remain();
+            mon.form_argument_elapsed = buf.form_argument_elapsed();
+            mon.current_hp = buf.current_hp();
+            mon.stats = buf.stats();
+        }
+
+        Ok(mon)
+    }
+
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         if size < Self::BOX_SIZE {
@@ -212,6 +298,94 @@ impl Pk7 {
         Ok(mon)
     }
 
+    pub fn write_to_box_buffer(&self, buf: &mut Pk7Buffer<'_>) {
+        buf.set_encryption_constant(self.encryption_constant);
+        buf.set_sanity(self.sanity);
+        buf.set_species_and_forme(self.species_and_forme);
+        buf.set_held_item_index(self.held_item_index);
+        buf.set_trainer_id(self.trainer_id);
+        buf.set_secret_id(self.secret_id);
+        buf.set_exp(self.exp);
+        buf.set_ability_index(self.ability_index);
+        buf.set_ability_num(self.ability_num);
+        buf.set_markings(self.markings);
+        buf.set_personality_value(self.personality_value);
+        buf.set_nature(self.nature);
+        buf.set_gender(self.gender);
+        buf.set_is_fateful_encounter(self.is_fateful_encounter);
+        buf.set_evs(self.evs);
+        buf.set_contest(self.contest);
+        buf.set_resort_event_status(self.resort_event_status);
+        buf.set_pokerus_byte(self.pokerus_byte);
+        buf.set_super_training_flags(self.super_training_flags);
+        buf.set_ribbons(self.ribbons);
+        buf.set_contest_memory_count(self.contest_memory_count);
+        buf.set_battle_memory_count(self.battle_memory_count);
+        buf.set_super_training_dist_flags(self.super_training_dist_flags);
+        buf.set_form_argument(self.form_argument);
+        buf.set_nickname(&self.nickname);
+        buf.set_move_slots(&self.moves);
+        buf.set_relearn_move(0, self.relearn_moves[0]);
+        buf.set_relearn_move(1, self.relearn_moves[1]);
+        buf.set_relearn_move(2, self.relearn_moves[2]);
+        buf.set_relearn_move(3, self.relearn_moves[3]);
+        buf.set_secret_super_training_unlocked(self.secret_super_training_unlocked);
+        buf.set_secret_super_training_complete(self.secret_super_training_complete);
+        buf.set_ivs(&self.ivs);
+        buf.set_is_egg(self.is_egg);
+        buf.set_is_nicknamed(self.is_nicknamed);
+        buf.set_handler_name(&self.handler_name);
+        buf.set_handler_gender(self.handler_gender);
+        buf.set_is_current_handler(self.is_current_handler);
+        buf.set_geolocations(self.geolocations);
+        buf.set_handler_friendship(self.handler_friendship);
+        buf.set_handler_affection(self.handler_affection);
+        buf.set_handler_memory(self.handler_memory);
+        buf.set_fullness(self.fullness);
+        buf.set_enjoyment(self.enjoyment);
+        buf.set_trainer_name(&self.trainer_name);
+        buf.set_trainer_friendship(self.trainer_friendship);
+        buf.set_trainer_affection(self.trainer_affection);
+        buf.set_trainer_memory(self.trainer_memory);
+        buf.set_egg_date(self.egg_date);
+        buf.set_met_date(self.met_date);
+        buf.set_egg_location_index(self.egg_location_index);
+        buf.set_met_location_index(self.met_location_index);
+        buf.set_ball(self.ball);
+        buf.set_met_level(self.met_level);
+        buf.set_trainer_gender(self.trainer_gender);
+        buf.set_hyper_training(self.hyper_training);
+        buf.set_game_of_origin(self.game_of_origin);
+        buf.set_country(self.country);
+        buf.set_region(self.region);
+        buf.set_console_region(self.console_region);
+        buf.set_language(self.language);
+
+        buf.refresh_checksum();
+    }
+
+    pub fn write_to_party_buffer(&self, buf: &mut Pk7Buffer<'_>) {
+        self.write_to_box_buffer(buf);
+        buf.set_status_condition(self.status_condition);
+        buf.set_stat_level(self.stat_level);
+        buf.set_form_argument_remain(self.form_argument_remain);
+        buf.set_form_argument_elapsed(self.form_argument_elapsed);
+        buf.set_current_hp(self.current_hp);
+        buf.set_stats(self.stats);
+    }
+
+    // ------------------------------------------------------------------
+    // Legacy byte-slice API (delegates to Pk7Buffer internally)
+    // ------------------------------------------------------------------
+
+    pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
+        let size = bytes.len();
+        match size {
+            Self::BOX_SIZE | Self::PARTY_SIZE => Self::from_bytes(bytes),
+            _ => Err(Error::buffer_size(Self::BOX_SIZE, size)),
+        }
+    }
+
     pub fn from_encryped_bytes(bytes: &[u8]) -> Result<Self> {
         let decrypted = encryption::decrypt_pkm_bytes_gen_6_7(bytes)?;
         let unshuffled = encryption::unshuffle_blocks_gen_6_7(&decrypted)?;
@@ -247,112 +421,17 @@ impl PkmBytes for Pk7 {
     const PARTY_SIZE: usize = 260;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::from_bytes(bytes)
+        Self::try_from_bytes(bytes)
     }
 
     fn write_box_bytes(&self, bytes: &mut [u8]) {
-        bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
-        bytes[4..6].copy_from_slice(&self.sanity.to_le_bytes());
-        bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
-        bytes[10..12].copy_from_slice(&self.held_item_index.to_le_bytes());
-        bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
-        bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
-        bytes[16..20].copy_from_slice(&self.exp.to_le_bytes());
-        bytes[20] = u8::from(self.ability_index);
-        bytes[21] |= self.ability_num.to_byte();
-        bytes[22..24].copy_from_slice(&self.markings.to_bytes());
-        bytes[24..28].copy_from_slice(&self.personality_value.to_le_bytes());
-        bytes[28] = self.nature.to_byte();
-
-        self.gender.set_bits_1_2(&mut bytes[29]);
-        util::set_flag(bytes, 29, 0, self.is_fateful_encounter);
-        util::write_uint5_to_bits(
-            self.species_and_forme.get_forme_index() as u8,
-            &mut bytes[29],
-            3,
-        );
-
-        bytes[30..36].copy_from_slice(&self.evs.to_bytes());
-        bytes[36..42].copy_from_slice(&self.contest.to_bytes());
-        bytes[42] = self.resort_event_status;
-        bytes[43] = self.pokerus_byte;
-        bytes[44..48].copy_from_slice(&self.super_training_flags.to_le_bytes());
-        bytes[48..55].copy_from_slice(&self.ribbons.to_bytes());
-
-        // 55 unused
-
-        bytes[56] = self.contest_memory_count;
-        bytes[57] = self.battle_memory_count;
-        bytes[58] = self.super_training_dist_flags;
-        bytes[60..64].copy_from_slice(&self.form_argument.to_le_bytes());
-        bytes[64..90].copy_from_slice(&self.nickname);
-
-        self.moves.write_spans(bytes, MOVE_DATA_OFFSETS);
-
-        bytes[106..108].copy_from_slice(&self.relearn_moves[0].to_le_bytes());
-        bytes[108..110].copy_from_slice(&self.relearn_moves[1].to_le_bytes());
-        bytes[110..112].copy_from_slice(&self.relearn_moves[2].to_le_bytes());
-        bytes[112..114].copy_from_slice(&self.relearn_moves[3].to_le_bytes());
-
-        util::set_flag(bytes, 114, 0, self.secret_super_training_unlocked);
-        util::set_flag(bytes, 114, 1, self.secret_super_training_complete);
-
-        self.ivs.write_30_bits(bytes, 116);
-        util::set_flag(bytes, 116, 30, self.is_egg);
-        util::set_flag(bytes, 116, 31, self.is_nicknamed);
-
-        bytes[120..146].copy_from_slice(&self.handler_name);
-        util::set_flag(bytes, 146, 0, self.handler_gender);
-        util::set_flag(bytes, 147, 0, self.is_current_handler);
-        bytes[148..158].copy_from_slice(&self.geolocations.to_bytes());
-
-        // 157..161 unused
-
-        bytes[162] = self.handler_friendship;
-        bytes[163] = self.handler_affection;
-        bytes[164] = self.handler_memory.intensity;
-        bytes[165] = self.handler_memory.memory;
-        bytes[166] = self.handler_memory.feeling;
-        bytes[168..170].copy_from_slice(&self.handler_memory.text_variable.to_le_bytes());
-
-        // 170..173 unused
-
-        bytes[174] = self.fullness;
-        bytes[175] = self.enjoyment;
-        bytes[176..202].copy_from_slice(&self.trainer_name);
-        bytes[202] = self.trainer_friendship;
-        bytes[203] = self.trainer_affection;
-        bytes[204] = self.trainer_memory.intensity;
-        bytes[205] = self.trainer_memory.memory;
-        bytes[206..208].copy_from_slice(&self.trainer_memory.text_variable.to_le_bytes());
-        bytes[208] = self.trainer_memory.feeling;
-
-        bytes[209..212].copy_from_slice(&PokeDate::to_bytes_optional(self.egg_date));
-        bytes[212..215].copy_from_slice(&self.met_date.to_bytes());
-        bytes[216..218].copy_from_slice(&self.egg_location_index.to_le_bytes());
-        bytes[218..220].copy_from_slice(&self.met_location_index.to_le_bytes());
-
-        bytes[220] = self.ball as u8;
-        bytes[221] |= self.met_level & 0x7F;
-        util::set_flag(bytes, 221, 7, self.trainer_gender);
-        bytes[222] = self.hyper_training.to_byte();
-        bytes[223] = self.game_of_origin as u8;
-        bytes[224] = self.country;
-        bytes[225] = self.region;
-        bytes[226] = self.console_region;
-        bytes[227] = self.language as u8;
-
-        Pk7::calc_and_write_checksum(bytes);
+        self.write_to_box_buffer(&mut Pk7Buffer::box_span(bytes))
     }
 
     fn write_party_bytes(&self, bytes: &mut [u8]) {
-        self.write_box_bytes(bytes);
-        bytes[232..236].copy_from_slice(&self.status_condition.to_le_bytes());
-        bytes[237] = self.stat_level;
-        bytes[238] = self.form_argument_remain;
-        bytes[239] = self.form_argument_elapsed;
-        bytes[240..242].copy_from_slice(&self.current_hp.to_le_bytes());
-        bytes[242..254].copy_from_slice(&self.stats.to_bytes());
+        let mut buffer = Pk7Buffer::party_span(bytes);
+        self.write_to_box_buffer(&mut buffer);
+        self.write_to_party_buffer(&mut buffer);
     }
 
     fn to_box_bytes(&self) -> Vec<u8> {
@@ -504,9 +583,114 @@ impl ModernEvs for Pk7 {
 }
 
 impl ChecksumU16Le for Pk7 {
-    const CHECKSUMMED_SPAN_START: usize = 8;
+    fn calculate_checksum(&self) -> u16 {
+        let mut span = [0u8; super::BOX_SIZE];
+        let mut buffer = Pk7Buffer::box_span(&mut span);
+        self.write_to_box_buffer(&mut buffer);
+        buffer.calculate_checksum()
+    }
 
-    const CHECKSUMMED_SPAN_END: usize = super::BOX_SIZE;
+    fn refresh_checksum(&mut self) {
+        self.checksum = self.calculate_checksum();
+    }
+}
 
-    const CHECKSUM_OFFSET: usize = 6;
+#[cfg(test)]
+mod test {
+    use std::path::PathBuf;
+
+    use crate::encryption::ChecksumU16Le;
+    use crate::ohpkm::OhpkmV2;
+    use crate::result::Result;
+    use crate::tests;
+    use crate::traits::IsShiny;
+    use crate::{gen7_alola::Pk7, ohpkm::OhpkmConvert};
+
+    #[cfg(feature = "randomize")]
+    use pkm_rs_types::randomize::Randomize;
+    #[cfg(feature = "randomize")]
+    use rand::{SeedableRng, rngs::StdRng};
+
+    #[test]
+    fn to_from_bytes() -> Result<()> {
+        tests::to_from_bytes_all_in_dir::<Pk7>(&PathBuf::from("pkm_files").join("pk7"))
+    }
+
+    #[cfg(feature = "randomize")]
+    #[test]
+    fn to_from_bytes_random() -> Result<()> {
+        for i in 0..255 {
+            let mon = Pk7::randomized(&mut StdRng::from_seed([i; 32]));
+            tests::find_inconsistencies_to_from_bytes(mon)?;
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn is_shiny() {
+        let mon = tests::pkm_from_file::<Pk7>(
+            &PathBuf::from("pkm_files")
+                .join("pk7")
+                .join("slowpoke-shiny.pk7")
+                .to_string_lossy(),
+        )
+        .unwrap()
+        .0;
+        assert!(mon.is_shiny());
+    }
+
+    #[test]
+    fn nickname_garbage_preserved() {
+        let mon = tests::pkm_from_file::<Pk7>(
+            &PathBuf::from("pkm_files")
+                .join("pk7")
+                .join("pelipper-garbage-bytes.pk7")
+                .to_string_lossy(),
+        )
+        .unwrap()
+        .0;
+
+        // 'r' at position 14 should be leftover from 'Pelipper'
+        assert_eq!(mon.nickname.bytes()[14], b'r');
+
+        let mon_recreated = Pk7::from_ohpkm(&OhpkmV2::from(&mon));
+
+        // leftover 'r' should be preserved after conversion to/from OHPKM
+        assert_eq!(mon_recreated.nickname.bytes()[14], b'r');
+    }
+
+    #[test]
+    fn checksum() {
+        let mon = tests::pkm_from_file::<Pk7>(
+            &PathBuf::from("pkm_files")
+                .join("pk7")
+                .join("primarina-garbage-bytes.pk7")
+                .to_string_lossy(),
+        )
+        .unwrap()
+        .0;
+        assert_eq!(mon.checksum, mon.calculate_checksum());
+    }
+
+    #[test]
+    fn from_ohpkm() -> Result<()> {
+        let mon = tests::pkm_from_file::<OhpkmV2>(
+            &PathBuf::from("pkm_files")
+                .join("ohpkm")
+                .join("Machamp.ohpkm")
+                .to_string_lossy(),
+        )
+        .unwrap()
+        .0;
+
+        let _ = Pk7::from_ohpkm(&mon);
+
+        Ok(())
+    }
+
+    #[test]
+    fn to_from_ohpkm() -> Result<()> {
+        tests::to_from_ohpkm_all_in_dir::<Pk7>(&PathBuf::from("pkm_files").join("pk7"))
+    }
 }

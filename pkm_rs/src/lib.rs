@@ -11,4 +11,7 @@ pub mod result;
 pub mod rom_hacks;
 pub mod traits;
 
+#[cfg(test)]
+pub mod tests;
+
 extern crate static_assertions;
