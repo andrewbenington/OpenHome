@@ -1,12 +1,12 @@
 use super::Pk7Buffer;
-use crate::encryption::ChecksumU16Le;
+use crate::checksum::{Checksum, RefreshChecksum};
+use crate::encryption;
+use crate::gen7_alola::pk7_buffer::{Pk7BufferMut, Pk7BufferRef};
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForme, PkmBytes};
-use crate::{encryption, util};
 
-use arbitrary_int::{u3, u7};
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
@@ -19,7 +19,7 @@ use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata}
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame,
-    Stats8, Stats16Le, read_u16_le, read_u32_le,
+    Stats8, Stats16Le,
 };
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
@@ -106,18 +106,12 @@ pub struct Pk7 {
 
 const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
 
-const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
-    moves: 90,
-    pp: 98,
-    pp_ups: 102,
-};
-
 impl Pk7 {
     // ------------------------------------------------------------------
     // Deserialise from a Pk7Buffer (the single source of all byte offsets)
     // ------------------------------------------------------------------
 
-    pub fn from_buffer(buf: &Pk7Buffer) -> Result<Self> {
+    pub fn from_buffer(buf: &Pk7BufferRef) -> Result<Self> {
         let mut mon = Pk7 {
             encryption_constant: buf.encryption_constant(),
             sanity: buf.sanity(),
@@ -186,121 +180,22 @@ impl Pk7 {
             ..Default::default()
         };
 
+        mon.stat_level = mon.calculate_level();
+        mon.stats = mon.calculate_stats();
+        mon.current_hp = mon.stats.hp;
+
         if buf.is_party() {
             mon.status_condition = buf.status_condition();
-            mon.stat_level = buf.stat_level();
             mon.form_argument_remain = buf.form_argument_remain();
             mon.form_argument_elapsed = buf.form_argument_elapsed();
-            mon.current_hp = buf.current_hp();
-            mon.stats = buf.stats();
         }
 
         Ok(mon)
     }
 
-    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        let size = bytes.len();
-        if size < Self::BOX_SIZE {
-            return Err(Error::buffer_size(Pk7::BOX_SIZE, size));
-        }
-        // try_into() will always succeed thanks to the length check
-
-        let mut mon = Pk7 {
-            encryption_constant: read_u32_le!(bytes, 0),
-            sanity: read_u16_le!(bytes, 4),
-            checksum: read_u16_le!(bytes, 6),
-            species_and_forme: SpeciesAndForme::new(
-                read_u16_le!(bytes, 8),
-                util::read_uint5_from_bits(bytes[29], 3).into(),
-            )?,
-            held_item_index: read_u16_le!(bytes, 10),
-            trainer_id: read_u16_le!(bytes, 12),
-            secret_id: read_u16_le!(bytes, 14),
-            exp: read_u32_le!(bytes, 16),
-            ability_index: AbilityIndex::try_from(bytes[20])?,
-            ability_num: u3::extract_u8(bytes[21], 0).try_into()?,
-            markings: MarkingsSixShapesColors::from_bytes(bytes[22..24].try_into().unwrap()),
-            personality_value: read_u32_le!(bytes, 24),
-            nature: NatureIndex::try_from(bytes[28])?,
-            is_fateful_encounter: util::get_flag(bytes, 29, 0),
-            gender: Gender::from_bits_1_2(bytes[29]),
-            evs: Stats8::from_bytes(bytes[30..36].try_into().unwrap()),
-            contest: ContestStats::from_bytes(bytes[36..42].try_into().unwrap()),
-            resort_event_status: bytes[42],
-            pokerus_byte: bytes[43],
-            super_training_flags: read_u32_le!(bytes, 44),
-            ribbons: ModernRibbonSet::from_bytes(bytes[48..55].try_into().unwrap()),
-            contest_memory_count: bytes[56],
-            battle_memory_count: bytes[57],
-            super_training_dist_flags: bytes[58],
-            form_argument: read_u32_le!(bytes, 60),
-            nickname: SizedUtf16String::<26>::from_bytes(bytes[64..90].try_into().unwrap()),
-            moves: MoveSlots::from_bytes(bytes, MOVE_DATA_OFFSETS),
-            relearn_moves: [
-                MoveIndex::from_le_bytes(bytes[106..108].try_into().unwrap()),
-                MoveIndex::from_le_bytes(bytes[108..110].try_into().unwrap()),
-                MoveIndex::from_le_bytes(bytes[110..112].try_into().unwrap()),
-                MoveIndex::from_le_bytes(bytes[112..114].try_into().unwrap()),
-            ],
-            secret_super_training_unlocked: util::get_flag(bytes, 114, 0),
-            secret_super_training_complete: util::get_flag(bytes, 114, 1),
-            ivs: Stats8::from_30_bits(bytes[116..120].try_into().unwrap()),
-            is_egg: util::get_flag(bytes, 116, 30),
-            is_nicknamed: util::get_flag(bytes, 116, 31),
-            handler_name: SizedUtf16String::<26>::from_bytes(bytes[120..146].try_into().unwrap()),
-            handler_gender: util::get_flag(bytes, 146, 0).into(),
-            is_current_handler: util::get_flag(bytes, 147, 0),
-            geolocations: Geolocations::from_bytes(bytes[148..158].try_into().unwrap()),
-            handler_friendship: bytes[162],
-            handler_affection: bytes[163],
-            handler_memory: TrainerMemory {
-                intensity: bytes[164],
-                memory: bytes[165],
-                feeling: bytes[166],
-                text_variable: read_u16_le!(bytes, 168),
-            },
-            fullness: bytes[174],
-            enjoyment: bytes[175],
-            trainer_name: SizedUtf16String::<26>::from_bytes(bytes[176..202].try_into().unwrap()),
-            trainer_friendship: bytes[202],
-            trainer_affection: bytes[203],
-            trainer_memory: TrainerMemory {
-                intensity: bytes[204],
-                memory: bytes[205],
-                text_variable: read_u16_le!(bytes, 206),
-                feeling: bytes[208],
-            },
-            egg_date: PokeDate::from_bytes_optional(bytes[209..212].try_into().unwrap()),
-            met_date: PokeDate::from_bytes(bytes[212..215].try_into().unwrap()),
-            egg_location_index: read_u16_le!(bytes, 216),
-            met_location_index: read_u16_le!(bytes, 218),
-            ball: Ball::from(bytes[220]),
-            met_level: u7::extract_u8(bytes[221], 0).into(),
-            trainer_gender: util::get_flag(bytes, 221, 7).into(),
-            hyper_training: HyperTraining::from_byte(bytes[222]),
-            game_of_origin: OriginGame::from(bytes[223]),
-            country: bytes[224],
-            region: bytes[225],
-            console_region: bytes[226],
-            language: Language::try_from(bytes[227])?,
-            ..Default::default()
-        };
-
-        if bytes.len() > Self::BOX_SIZE {
-            mon.status_condition = read_u32_le!(bytes, 232);
-            mon.stat_level = bytes[237];
-            mon.form_argument_remain = bytes[238];
-            mon.form_argument_elapsed = bytes[239];
-            mon.current_hp = read_u16_le!(bytes, 240);
-            mon.stats = Stats16Le::from_bytes(bytes[242..254].try_into().unwrap());
-        }
-
-        Ok(mon)
-    }
-
-    pub fn write_to_box_buffer(&self, buf: &mut Pk7Buffer<'_>) {
+    pub fn write_to_box_buffer(&self, buf: &mut Pk7BufferMut) {
         buf.set_encryption_constant(self.encryption_constant);
-        buf.set_sanity(self.sanity);
+        buf.reset_sanity();
         buf.set_species_and_forme(self.species_and_forme);
         buf.set_held_item_index(self.held_item_index);
         buf.set_trainer_id(self.trainer_id);
@@ -364,7 +259,7 @@ impl Pk7 {
         buf.refresh_checksum();
     }
 
-    pub fn write_to_party_buffer(&self, buf: &mut Pk7Buffer<'_>) {
+    pub fn write_to_party_buffer(&self, buf: &mut Pk7BufferMut) {
         self.write_to_box_buffer(buf);
         buf.set_status_condition(self.status_condition);
         buf.set_stat_level(self.stat_level);
@@ -381,7 +276,8 @@ impl Pk7 {
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         match size {
-            Self::BOX_SIZE | Self::PARTY_SIZE => Self::from_bytes(bytes),
+            Self::BOX_SIZE => Self::from_buffer(&Pk7Buffer::box_span(bytes)),
+            Self::PARTY_SIZE => Self::from_buffer(&Pk7Buffer::party_span(bytes)),
             _ => Err(Error::buffer_size(Self::BOX_SIZE, size)),
         }
     }
@@ -395,6 +291,16 @@ impl Pk7 {
     pub fn to_box_bytes_encrypted(self) -> Result<Vec<u8>> {
         let shuffled = encryption::shuffle_blocks_gen_6_7(&self.to_box_bytes())?;
         encryption::decrypt_pkm_bytes_gen_6_7(&shuffled)
+    }
+
+    pub fn calculate_checksum(&self) -> u16 {
+        let mut bytes = [0u8; Self::BOX_SIZE];
+        self.write_box_bytes(&mut bytes);
+        Pk7BufferRef::box_span(&bytes).calculate_checksum()
+    }
+
+    pub fn refresh_checksum(&mut self) {
+        self.checksum = self.calculate_checksum();
     }
 
     pub fn calculate_stats(&self) -> Stats16Le {
@@ -425,11 +331,11 @@ impl PkmBytes for Pk7 {
     }
 
     fn write_box_bytes(&self, bytes: &mut [u8]) {
-        self.write_to_box_buffer(&mut Pk7Buffer::box_span(bytes))
+        self.write_to_box_buffer(&mut Pk7BufferMut::box_span_mut(bytes))
     }
 
     fn write_party_bytes(&self, bytes: &mut [u8]) {
-        let mut buffer = Pk7Buffer::party_span(bytes);
+        let mut buffer = Pk7BufferMut::party_span_mut(bytes);
         self.write_to_box_buffer(&mut buffer);
         self.write_to_party_buffer(&mut buffer);
     }
@@ -582,29 +488,15 @@ impl ModernEvs for Pk7 {
     }
 }
 
-impl ChecksumU16Le for Pk7 {
-    fn calculate_checksum(&self) -> u16 {
-        let mut span = [0u8; super::BOX_SIZE];
-        let mut buffer = Pk7Buffer::box_span(&mut span);
-        self.write_to_box_buffer(&mut buffer);
-        buffer.calculate_checksum()
-    }
-
-    fn refresh_checksum(&mut self) {
-        self.checksum = self.calculate_checksum();
-    }
-}
-
 #[cfg(test)]
 mod test {
     use std::path::PathBuf;
 
-    use crate::encryption::ChecksumU16Le;
-    use crate::ohpkm::OhpkmV2;
+    use crate::gen7_alola::Pk7;
+    use crate::ohpkm::{OhpkmConvert, OhpkmV2};
     use crate::result::Result;
     use crate::tests;
     use crate::traits::IsShiny;
-    use crate::{gen7_alola::Pk7, ohpkm::OhpkmConvert};
 
     #[cfg(feature = "randomize")]
     use pkm_rs_types::randomize::Randomize;

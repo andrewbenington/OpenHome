@@ -1,4 +1,4 @@
-pub mod pk7;
+mod pk7;
 
 use crate::traits::Pkm;
 

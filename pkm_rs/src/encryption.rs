@@ -1,9 +1,6 @@
-use std::{num::Wrapping, ops::Range};
+use std::ops::Range;
 
-use crate::{
-    result::{Error, Result},
-    traits::bytes::MutableBytes,
-};
+use crate::result::{Error, Result};
 
 const ENCRYPTION_OFFSET: usize = 8;
 const STARTING_SEED: u32 = 0x41c64e6d;
@@ -309,28 +306,6 @@ pub trait Crc16CcittInvertChecksum {
     fn calc_checksum(&self) -> u16 {
         crc16_ccitt_invert(self.get_bytes(), Self::RANGE_START, Self::RANGE_SIZE)
     }
-}
-
-pub fn checksum_u16_le(bytes: &[u8]) -> u16 {
-    let wrapped_sum: Wrapping<u16> = bytes
-        .chunks_exact(2)
-        .map(|chunk| u16::from_le_bytes([chunk[0], chunk[1]]))
-        .map(Wrapping)
-        .sum();
-
-    wrapped_sum.0
-}
-
-pub trait SpanWithChecksum {
-    const SPAN_START: usize;
-    const SPAN_END: usize;
-    const STORED_OFFSET: usize;
-}
-
-pub trait ChecksumU16Le {
-    fn calculate_checksum(&self) -> u16;
-
-    fn refresh_checksum(&mut self);
 }
 
 pub enum MemeCryptoVariant {
