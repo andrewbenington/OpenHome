@@ -2,13 +2,12 @@ use super::Pk7Buffer;
 use crate::checksum::{Checksum, RefreshChecksum};
 use crate::encryption;
 use crate::gen7_alola::pk7_buffer::{Pk7BufferMut, Pk7BufferRef};
-use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForme, PkmBytes};
 
 use pkm_rs_derive::IsShiny4096;
-use pkm_rs_resources::abilities::{AbilityIndexBounded, AbilityIndexWasm};
+use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::helpers;
 use pkm_rs_resources::language::Language;
@@ -26,6 +25,11 @@ use serde::Serialize;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "wasm")]
+use crate::ohpkm::{OhpkmConvert, OhpkmV2};
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::abilities::AbilityIndexWasm;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -400,6 +404,18 @@ impl Pk7 {
         self.to_box_bytes()
     }
 
+    #[wasm_bindgen(getter = abilityIndex)]
+    pub fn ability_index(&self) -> AbilityIndexWasm {
+        AbilityIndexWasm::try_from(self.ability_index.get())
+            .expect("AbilityIndexWasm should accept any valid ability index")
+    }
+
+    #[wasm_bindgen(setter = abilityIndex)]
+    pub fn set_ability_index(&mut self, value: AbilityIndexWasm) -> Result<()> {
+        self.ability_index = AbilityIndexBounded::try_from(value.get())?;
+        Ok(())
+    }
+
     #[wasm_bindgen(getter)]
     pub fn move_indices(&self) -> Vec<u16> {
         self.moves.indices()
@@ -535,8 +551,7 @@ mod test {
         let mon = tests::pkm_from_file::<Pk7>(
             &PathBuf::from("pkm_files")
                 .join("pk7")
-                .join("slowpoke-shiny.pk7")
-                .to_string_lossy(),
+                .join("slowpoke-shiny.pk7"),
         )
         .unwrap()
         .0;
@@ -548,8 +563,7 @@ mod test {
         let mon = tests::pkm_from_file::<Pk7>(
             &PathBuf::from("pkm_files")
                 .join("pk7")
-                .join("pelipper-garbage-bytes.pk7")
-                .to_string_lossy(),
+                .join("pelipper-garbage-bytes.pk7"),
         )
         .unwrap()
         .0;
@@ -568,8 +582,7 @@ mod test {
         let mon = tests::pkm_from_file::<Pk7>(
             &PathBuf::from("pkm_files")
                 .join("pk7")
-                .join("primarina-garbage-bytes.pk7")
-                .to_string_lossy(),
+                .join("primarina-garbage-bytes.pk7"),
         )
         .unwrap()
         .0;
@@ -581,13 +594,35 @@ mod test {
         let mon = tests::pkm_from_file::<OhpkmV2>(
             &PathBuf::from("pkm_files")
                 .join("ohpkm")
-                .join("Machamp.ohpkm")
-                .to_string_lossy(),
+                .join("Machamp.ohpkm"),
         )
         .unwrap()
         .0;
 
         let _ = Pk7::from_ohpkm(&mon);
+
+        Ok(())
+    }
+
+    const STEADFAST: u16 = 80;
+    const SHARPNESS: u16 = 292;
+
+    #[test]
+    fn from_ohpkm_ability_change() -> TestResult<()> {
+        let mon = tests::pkm_from_file::<OhpkmV2>(
+            &PathBuf::from("pkm_files")
+                .join("ohpkm")
+                .join("gallade-sharpness-alpha.ohpkm"),
+        )
+        .unwrap()
+        .0;
+
+        assert_eq!(mon.ability_index().get(), SHARPNESS);
+
+        let converted_pk7 = Pk7::from_ohpkm(&mon);
+
+        // Gallade's Sharpness should be converted to Steadfast when converting to Pk7, since Sharpness is Gen 8+ and Pk7 can only represent Gen 7 abilities
+        assert_eq!(converted_pk7.ability_index.get(), STEADFAST);
 
         Ok(())
     }

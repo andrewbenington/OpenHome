@@ -129,7 +129,7 @@ impl<const MAX: u16> From<AbilityIndexBounded<MAX>> for u16 {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = AbilityIndex))]
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub struct AbilityIndexWasm(NonZeroU16);
 
@@ -161,7 +161,7 @@ impl AbilityIndexWasm {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = AbilityIndex))]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
 impl AbilityIndexWasm {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = fromIndex))]

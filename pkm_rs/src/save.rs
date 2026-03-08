@@ -1,12 +1,17 @@
+#[cfg(feature = "wasm")]
 use serde::Serialize;
 
+#[cfg(feature = "wasm")]
 use crate::result::Result;
+#[cfg(feature = "wasm")]
 use crate::traits::SaveData;
+#[cfg(feature = "wasm")]
 use crate::{
     gen7_alola::{SunMoonSave, UltraSunMoonSave},
     gen7_lgpe::LetsGoSave,
 };
 
+#[cfg(feature = "wasm")]
 #[derive(Serialize, Clone, Copy)]
 pub enum SaveType {
     SunMoon,
@@ -14,6 +19,7 @@ pub enum SaveType {
     LetsGoPikachuEevee,
 }
 
+#[cfg(feature = "wasm")]
 impl SaveType {
     pub fn build(&self, bytes: &[u8]) -> Result<AnySave> {
         match self {
@@ -37,6 +43,7 @@ impl SaveType {
     }
 }
 
+#[cfg(feature = "wasm")]
 #[derive(Serialize)]
 pub enum AnySave {
     SM(SunMoonSave),
@@ -44,6 +51,7 @@ pub enum AnySave {
     LGPE(LetsGoSave),
 }
 
+#[cfg(feature = "wasm")]
 impl AnySave {
     pub const fn get_type(&self) -> SaveType {
         match self {
@@ -84,6 +92,7 @@ impl AnySave {
     // }
 }
 
+#[cfg(feature = "wasm")]
 pub enum TrainerIdType {
     FiveDigit,
     SixDigit,

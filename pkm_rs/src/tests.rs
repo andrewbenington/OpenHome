@@ -14,7 +14,7 @@ use std::ops::RangeInclusive;
 #[cfg(test)]
 use std::path::Path;
 #[cfg(test)]
-pub fn pkm_from_file<PKM: Pkm>(filename: &str) -> crate::result::Result<(PKM, Vec<u8>)> {
+pub fn pkm_from_file<PKM: Pkm>(filename: &Path) -> crate::result::Result<(PKM, Vec<u8>)> {
     let mut file = File::open(filename).map_err(|e| Error::other(&e.to_string()))?;
 
     let mut contents = Vec::new();
@@ -45,8 +45,7 @@ pub fn to_from_bytes_all_in_dir<PKM: Pkm>(dir: &Path) -> TestResult<()> {
                     continue;
                 }
                 let path = dir.join(dir_entry.file_name());
-                let filename = path.to_string_lossy();
-                find_inconsistencies_from_file::<PKM>(&filename)?;
+                find_inconsistencies_from_file::<PKM>(&path)?;
             }
         }
     }
@@ -69,9 +68,7 @@ pub fn from_to_ohpkm_all_in_dir<PKM: OhpkmConvert>() -> TestResult<()> {
                     continue;
                 }
                 let path = ohpkm_dir.join(dir_entry.file_name());
-                let filename = path.to_string_lossy();
-                println!("filename: {filename:#?}");
-                find_inconsistencies_from_to_ohpkm::<PKM>(pkm_from_file(&filename)?.0)?;
+                find_inconsistencies_from_to_ohpkm::<PKM>(pkm_from_file(&path)?.0)?;
             }
         }
     }
@@ -93,9 +90,7 @@ pub fn to_from_ohpkm_all_in_dir<PKM: OhpkmConvert>(dir: &Path) -> TestResult<()>
                     continue;
                 }
                 let path = dir.join(dir_entry.file_name());
-                let filename = path.to_string_lossy();
-                println!("filename: {filename:#?}");
-                find_inconsistencies_to_from_ohpkm::<PKM>(pkm_from_file(&filename)?.0)?;
+                find_inconsistencies_to_from_ohpkm::<PKM>(pkm_from_file(&path)?.0)?;
             }
         }
     }
@@ -169,10 +164,9 @@ fn u8_slice_to_hex_string(slice: &[u8]) -> String {
 }
 
 #[cfg(test)]
-fn find_inconsistencies_from_file<PKM: Pkm>(filename: &str) -> TestResult<()> {
-    println!("filename: {filename}");
-    let result = pkm_from_file::<PKM>(filename);
-    let (mon, file_bytes) = result.unwrap_or_else(|e| panic!("could not load {filename}: {e}"));
+fn find_inconsistencies_from_file<PKM: Pkm>(path: &Path) -> TestResult<()> {
+    let result = pkm_from_file::<PKM>(path);
+    let (mon, file_bytes) = result.unwrap_or_else(|e| panic!("could not load {path:?}: {e}"));
 
     let actual = mon.to_party_bytes();
 
@@ -274,7 +268,7 @@ pub struct DiffError {
 }
 
 impl DiffError {
-    pub fn new(differences: Vec<ByteRange>, actual: Vec<u8>, expected: Vec<u8>) -> Self {
+    fn new(differences: Vec<ByteRange>, actual: Vec<u8>, expected: Vec<u8>) -> Self {
         Self {
             differences,
             actual,

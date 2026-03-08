@@ -26,6 +26,7 @@ impl NatureIndex {
     }
 }
 
+#[cfg(feature = "wasm")]
 const SERIOUS_INDEX: u8 = 12;
 
 #[wasm_bindgen]

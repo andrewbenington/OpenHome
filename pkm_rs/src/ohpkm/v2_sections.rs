@@ -4,7 +4,7 @@ use crate::result::{Error, Result, StringErrorSource};
 use crate::traits::{IsShiny, IsShiny4096, OhpkmByte, OhpkmBytes};
 use crate::util;
 
-use pkm_rs_resources::abilities::{AbilityIndexBounded, AbilityIndexWasm};
+use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
@@ -26,6 +26,9 @@ use pkm_rs_types::randomize::Randomize;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::abilities::AbilityIndexWasm;
 
 const fn none_if_zero_u16(value: u16) -> Option<u16> {
     if value != 0 { Some(value) } else { None }

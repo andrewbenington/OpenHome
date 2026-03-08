@@ -35,8 +35,8 @@ pub struct LetsGoSave {
 impl LetsGoSave {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
-        let my_status = TrainerData::from_bytes(&bytes);
-        let poke_list_header = PokeListHeader::from_bytes(&bytes);
+        let my_status = TrainerData::from_bytes(bytes);
+        let poke_list_header = PokeListHeader::from_bytes(bytes);
         Ok(Self {
             bytes: bytes.to_vec(),
             size,

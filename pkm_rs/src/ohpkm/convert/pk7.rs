@@ -1,5 +1,5 @@
 use pkm_rs_resources::ribbons::OpenHomeRibbonSet;
-use pkm_rs_types::Stats16Le;
+use pkm_rs_types::{AbilityNumber, Stats16Le};
 
 use crate::{gen7_alola::Pk7, ohpkm::OhpkmV2, traits::HasSpeciesAndForme};
 
@@ -84,6 +84,7 @@ impl OhpkmConvert for Pk7 {
     }
 
     fn from_ohpkm(ohpkm: &OhpkmV2) -> Self {
+        let form_metadata = ohpkm.get_forme_metadata();
         let mut mon = Self {
             encryption_constant: ohpkm.encryption_constant(),
             sanity: 0,
@@ -94,11 +95,17 @@ impl OhpkmConvert for Pk7 {
             secret_id: ohpkm.secret_id(),
             exp: ohpkm.exp(),
             ability_index: ohpkm.ability_index().change_bound().unwrap_or(
-                ohpkm
-                    .get_forme_metadata()
+                form_metadata
                     .get_ability(ohpkm.ability_num())
                     .try_into()
-                    .unwrap_or_default(),
+                    .unwrap_or(
+                        form_metadata
+                            .get_ability(AbilityNumber::First)
+                            .try_into()
+                            .expect(
+                                "All Pk7-compatible Pokémon should have a compatible first ability",
+                            ),
+                    ),
             ),
             ability_num: ohpkm.ability_num(),
             markings: ohpkm.markings(),

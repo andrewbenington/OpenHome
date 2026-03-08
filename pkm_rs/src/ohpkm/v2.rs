@@ -15,14 +15,7 @@ use pkm_rs_types::{AbilityNumber, BinaryGender};
 use serde::Serialize;
 use strum_macros::Display;
 
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
-
-#[cfg(feature = "wasm")]
-use super::JsResult;
-
 use pkm_rs_resources::{
-    abilities::AbilityIndexWasm,
     ball::Ball,
     language::Language,
     moves::MoveIndex,
@@ -39,6 +32,13 @@ use pkm_rs_types::{
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
+
+#[cfg(feature = "wasm")]
+use super::JsResult;
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::abilities::AbilityIndexWasm;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
 
 const MAGIC_NUMBER: u32 = 0x57575757;
 const CURRENT_VERSION: u16 = 2;
@@ -194,11 +194,11 @@ impl OhpkmV2 {
         self.main_data.exp = v;
     }
 
-    pub fn ability_index(&self) -> AbilityIndexBounded {
+    pub const fn ability_index(&self) -> AbilityIndexBounded {
         self.main_data.ability_index
     }
 
-    pub fn set_ability_index(&mut self, v: &AbilityIndexBounded) -> Result<()> {
+    pub const fn set_ability_index(&mut self, v: &AbilityIndexBounded) -> Result<()> {
         self.main_data.ability_index = *v;
         Ok(())
     }

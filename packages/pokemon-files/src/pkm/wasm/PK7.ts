@@ -124,10 +124,10 @@ export class Pk7Rust {
   }
 
   get ability() {
-    return this.inner.ability_index
+    return this.inner.abilityIndex
   }
   set ability(value: AbilityIndex) {
-    this.inner.ability_index = AbilityIndex.fromIndex(value.index) || value
+    this.inner.abilityIndex = AbilityIndex.fromIndex(value.index) || value
   }
 
   get abilityNum() {
@@ -560,7 +560,7 @@ export class Pk7Rust {
   }
 
   public get abilityName() {
-    return this.inner.ability_index.name
+    return this.inner.abilityIndex.name
   }
 
   public get heldItemName() {

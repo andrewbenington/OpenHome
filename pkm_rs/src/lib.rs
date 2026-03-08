@@ -9,7 +9,7 @@ pub mod gen7_alola;
 pub mod gen7_lgpe;
 pub mod ohpkm;
 pub mod result;
-pub mod rom_hacks;
+// pub mod rom_hacks;
 pub mod traits;
 
 #[cfg(test)]

@@ -6,10 +6,7 @@ use pkm_rs_types::strings::SizedUtf16String;
 use serde::Serialize;
 
 use super::Pk7;
-use crate::encryption::{
-    Crc16CcittInvertChecksum, crc16_ccitt_invert, decrypt_pkm_bytes_gen_6_7,
-    unshuffle_blocks_gen_6_7,
-};
+use crate::encryption;
 use crate::result::Result;
 use crate::traits::PkmBytes;
 use crate::traits::SaveData;
@@ -21,6 +18,8 @@ use wasm_bindgen::prelude::*;
 const SM_TRAINER_DATA_OFFSET: usize = 0x1200;
 const TRAINER_DATA_SIZE: usize = 0xc0;
 const SM_BOX_DATA_OFFSET: usize = 0x04e00;
+
+#[cfg(feature = "wasm")]
 const BOX_DATA_SIZE: usize = 0x36600;
 
 const BOX_COUNT: usize = 32;
@@ -63,8 +62,9 @@ impl SaveData for SunMoonSave {
     }
 
     fn get_decrypted_mon_bytes(&self, box_num: usize, offset: usize) -> Result<Vec<u8>> {
-        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))?;
-        unshuffle_blocks_gen_6_7(&decrypted_bytes)
+        let decrypted_bytes =
+            encryption::decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))?;
+        encryption::unshuffle_blocks_gen_6_7(&decrypted_bytes)
     }
 
     fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Option<Pk7>> {
@@ -123,7 +123,8 @@ impl SunMoonSave {
     }
 }
 
-impl Crc16CcittInvertChecksum for SunMoonSave {
+#[cfg(feature = "wasm")]
+impl encryption::Crc16CcittInvertChecksum for SunMoonSave {
     const RANGE_START: usize = SM_BOX_DATA_OFFSET;
     const RANGE_SIZE: usize = BOX_DATA_SIZE;
 
@@ -148,7 +149,7 @@ impl SunMoonSave {
 
     #[wasm_bindgen]
     pub fn calc_checksum(&self) -> u16 {
-        crc16_ccitt_invert(&self.bytes, SM_BOX_DATA_OFFSET, BOX_DATA_SIZE)
+        encryption::crc16_ccitt_invert(&self.bytes, SM_BOX_DATA_OFFSET, BOX_DATA_SIZE)
     }
 
     #[wasm_bindgen]
@@ -244,8 +245,9 @@ impl SaveData for UltraSunMoonSave {
     }
 
     fn get_decrypted_mon_bytes(&self, box_num: usize, offset: usize) -> Result<Vec<u8>> {
-        let decrypted_bytes = decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))?;
-        unshuffle_blocks_gen_6_7(&decrypted_bytes)
+        let decrypted_bytes =
+            encryption::decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))?;
+        encryption::unshuffle_blocks_gen_6_7(&decrypted_bytes)
     }
 
     fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Option<Pk7>> {
@@ -306,7 +308,8 @@ impl UltraSunMoonSave {
     }
 }
 
-impl Crc16CcittInvertChecksum for UltraSunMoonSave {
+#[cfg(feature = "wasm")]
+impl encryption::Crc16CcittInvertChecksum for UltraSunMoonSave {
     const RANGE_START: usize = USUM_BOX_DATA_OFFSET;
     const RANGE_SIZE: usize = BOX_DATA_SIZE;
 
