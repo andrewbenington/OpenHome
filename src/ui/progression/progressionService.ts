@@ -1,7 +1,12 @@
-import { OHPKM } from "@openhome-core/pkm/OHPKM"
-import { MetadataLookup } from "@pkm-rs/pkg"
-import type { DexSnapshot, MilestoneDefinition, ProgressionState, RewardDefinition } from "./types"
-import { REGION_DEX_DATA, calculateRegionalDexCompletion, isRegionalDexComplete, isNationalDexThresholdMet } from "./dexTracker"
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { MetadataLookup } from '@pkm-rs/pkg'
+import type { DexSnapshot, MilestoneDefinition, ProgressionState, RewardDefinition } from './types'
+import {
+  REGION_DEX_DATA,
+  calculateRegionalDexCompletion,
+  isRegionalDexComplete,
+  isNationalDexThresholdMet,
+} from './dexTracker'
 
 export function compute_dex_snapshot(all_stored: OHPKM[]): DexSnapshot {
   const present = new Set<number>()
@@ -83,8 +88,8 @@ function is_requirement_met(snapshot: DexSnapshot, required_species: number[]): 
  */
 export function update_types_ever_deposited(
   state: ProgressionState,
-  snapshot: DexSnapshot,
-): Pick<ProgressionState, "types_ever_deposited"> {
+  snapshot: DexSnapshot
+): Pick<ProgressionState, 'types_ever_deposited'> {
   const updated = { ...state.types_ever_deposited }
 
   // Add any newly encountered types
@@ -100,7 +105,7 @@ export function update_types_ever_deposited(
 export function evaluate_milestones(
   state: ProgressionState,
   snapshot: DexSnapshot,
-  defs: MilestoneDefinition[],
+  defs: MilestoneDefinition[]
 ): MilestoneDefinition[] {
   const newly_completed: MilestoneDefinition[] = []
 
@@ -112,21 +117,27 @@ export function evaluate_milestones(
 
   for (const m of defs) {
     // For non-progressive milestones, skip if already completed
-    if (m.kind !== "type_count_progressive" && state.completed_milestones[m.id]) continue
+    if (m.kind !== 'type_count_progressive' && state.completed_milestones[m.id]) continue
 
-    if (m.kind === "national_living_dex") {
+    if (m.kind === 'national_living_dex') {
       if (m.required_species && is_requirement_met(snapshot, m.required_species)) {
         newly_completed.push(m)
       }
-    } else if (m.kind === "regional_dex_100") {
-      if (m.region_id && isRegionalDexComplete(snapshot.national_species_present, m.region_id as any)) {
+    } else if (m.kind === 'regional_dex_100') {
+      if (
+        m.region_id &&
+        isRegionalDexComplete(snapshot.national_species_present, m.region_id as any)
+      ) {
         newly_completed.push(m)
       }
-    } else if (m.kind === "national_dex_threshold") {
-      if (m.national_threshold && isNationalDexThresholdMet(snapshot.national_species_present, m.national_threshold)) {
+    } else if (m.kind === 'national_dex_threshold') {
+      if (
+        m.national_threshold &&
+        isNationalDexThresholdMet(snapshot.national_species_present, m.national_threshold)
+      ) {
         newly_completed.push(m)
       }
-    } else if (m.kind === "type_count") {
+    } else if (m.kind === 'type_count') {
       // Type mastery milestone: check if we've seen enough of a specific type
       if (m.target_type && m.target_count && snapshot.type_counts) {
         const currentCount = snapshot.type_counts[m.target_type] ?? 0
@@ -134,24 +145,31 @@ export function evaluate_milestones(
           newly_completed.push(m)
         }
       }
-    } else if (m.kind === "type_count_progressive") {
+    } else if (m.kind === 'type_count_progressive') {
       // Progressive type mastery: each completion unlocks next level
-      if (m.target_type && m.levels && Array.isArray(m.levels) && m.levels.length > 0 && snapshot.type_counts) {
-        const currentLevel = (state.progressive_milestone_levels && state.progressive_milestone_levels[m.id]) ?? 0
-        
+      if (
+        m.target_type &&
+        m.levels &&
+        Array.isArray(m.levels) &&
+        m.levels.length > 0 &&
+        snapshot.type_counts
+      ) {
+        const currentLevel =
+          (state.progressive_milestone_levels && state.progressive_milestone_levels[m.id]) ?? 0
+
         // Check if we've met the current level's target
         if (currentLevel < m.levels.length) {
           const levelDef = m.levels[currentLevel]
           if (levelDef && typeof levelDef === 'object' && 'target_count' in levelDef) {
             const currentCount = snapshot.type_counts[m.target_type] ?? 0
-            
+
             if (currentCount >= levelDef.target_count) {
               newly_completed.push(m)
             }
           }
         }
       }
-    } else if (m.kind === "shiny_count") {
+    } else if (m.kind === 'shiny_count') {
       // Shiny collection milestone: check if we have enough shinies in the bank
       if (m.target_count && snapshot.shiny_count >= m.target_count) {
         newly_completed.push(m)
@@ -166,7 +184,7 @@ export function apply_newly_completed(
   state: ProgressionState,
   newly_completed: MilestoneDefinition[],
   reward_defs: Record<string, RewardDefinition>,
-  snapshot: DexSnapshot,
+  snapshot: DexSnapshot
 ): { next_state: ProgressionState; newly_granted_rewards: RewardDefinition[] } {
   const next: ProgressionState = {
     ...state,
@@ -185,9 +203,10 @@ export function apply_newly_completed(
 
   for (const m of newly_completed) {
     // Handle progressive milestones differently
-    if (m.kind === "type_count_progressive" && Array.isArray(m.levels) && m.levels.length > 0) {
-      const currentLevel = (next.progressive_milestone_levels && next.progressive_milestone_levels[m.id]) ?? 0
-      
+    if (m.kind === 'type_count_progressive' && Array.isArray(m.levels) && m.levels.length > 0) {
+      const currentLevel =
+        (next.progressive_milestone_levels && next.progressive_milestone_levels[m.id]) ?? 0
+
       if (currentLevel < m.levels.length) {
         // Get the current level's reward
         const levelDef = m.levels[currentLevel]
@@ -196,7 +215,7 @@ export function apply_newly_completed(
           continue
         }
         const reward = reward_defs[levelDef.reward_id]
-        
+
         if (reward && !next.granted_rewards[reward.id]) {
           next.granted_rewards[reward.id] = true
           next.reward_history.push({
@@ -206,7 +225,7 @@ export function apply_newly_completed(
           })
           newly_granted_rewards.push(reward)
         }
-        
+
         // Increment to next level
         next.progressive_milestone_levels[m.id] = currentLevel + 1
       }

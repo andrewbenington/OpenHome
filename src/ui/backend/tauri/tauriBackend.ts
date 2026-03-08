@@ -81,10 +81,7 @@ export const TauriBackend: BackendInterface & {
     )
   },
 
-  writeProgression: async function (
-    _profileId: string,
-    json: string
-  ): Promise<Errorable<void>> {
+  writeProgression: async function (_profileId: string, json: string): Promise<Errorable<void>> {
     let progression: JSONObject
 
     try {

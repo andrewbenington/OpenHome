@@ -8,7 +8,7 @@ import PokedexDisplay from './pages/pokedex/PokedexDisplay'
 import Settings from './pages/Settings'
 import SortPokemon from './pages/sort/SortPokemon'
 import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
-import Progression from "./pages/Progression"
+import Progression from './pages/Progression'
 
 export default function AppTabs() {
   const isDev = useIsDev()

@@ -3,7 +3,9 @@
 ## Conflict Prevention Strategies
 
 ### 1. Regular Syncing (Recommended: Weekly)
+
 Merge upstream changes frequently to avoid large divergences:
+
 ```bash
 # Test merge first (safe)
 .\sync-upstream.ps1 -DryRun
@@ -20,6 +22,7 @@ Merge upstream changes frequently to avoid large divergences:
 ✓ New Rust modules (`progression_rewards.rs`, `progression_storage.rs`)
 
 **To maintain this:**
+
 - Keep custom features in dedicated files/folders when possible
 - Use conditional imports/exports for your additions
 - Comment your changes in shared files with `// CUSTOM:` prefix
@@ -29,15 +32,18 @@ Merge upstream changes frequently to avoid large divergences:
 These files you modified are likely to change upstream:
 
 **Core UI (High Risk):**
+
 - `src/ui/App.tsx` - App structure
 - `src/ui/AppTabs.tsx` - Tab routing
 - `src/ui/backend/*` - Backend interface
 
 **Dependencies (Medium Risk):**
+
 - `package.json` - npm dependencies
 - `src-tauri/Cargo.toml` - Rust dependencies
 
 **Your Changes (Low Risk):**
+
 - Pokedex components - Less frequently changed
 - New progression files - No conflicts possible
 
@@ -46,12 +52,14 @@ These files you modified are likely to change upstream:
 When conflicts occur:
 
 1. **Review the conflict:**
+
    ```bash
    git status  # See conflicting files
    git diff    # See conflict markers
    ```
 
 2. **With diff3 enabled, you'll see:**
+
    ```
    <<<<<<< HEAD (your changes)
    your code
@@ -70,10 +78,12 @@ When conflicts occur:
 ### 5. Branch Strategy
 
 **Current setup (good):**
+
 - `main` - tracks upstream
 - `my-features` - your working branch
 
 **Consider adding:**
+
 - `stable` - your last known working state
 - Create before risky merges: `git branch stable my-features`
 
@@ -90,6 +100,7 @@ When conflicts occur:
 ### 7. Emergency Recovery
 
 If a merge goes badly:
+
 ```bash
 # Abort ongoing merge
 git merge --abort
@@ -101,6 +112,7 @@ git reset --hard backup-2026-03-06
 ## Automation Helper
 
 Use the provided `sync-upstream.ps1` script:
+
 - **Dry run mode:** Tests merge without changing files
 - **Real mode:** Performs actual merge
 - Automatically shows conflicts and affected files

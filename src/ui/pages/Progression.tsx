@@ -1,27 +1,32 @@
-﻿import React, { useContext, useEffect, useMemo, useRef, useState } from "react"
+﻿import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 
-import type BackendInterface from "@openhome-ui/backend/backendInterface"
-import { BackendContext } from "@openhome-ui/backend/backendContext"
-import { OHPKM } from "@openhome-core/pkm/OHPKM"
-import { R } from "@openhome-core/util/functional"
-import { useOhpkmStore } from "@openhome-ui/state/ohpkm/useOhpkmStore"
-import { useSaves } from "@openhome-ui/state/saves/useSaves"
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { R } from '@openhome-core/util/functional'
+import { BackendContext } from '@openhome-ui/backend/backendContext'
+import type BackendInterface from '@openhome-ui/backend/backendInterface'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm/useOhpkmStore'
+import { useSaves } from '@openhome-ui/state/saves/useSaves'
 
-import { milestones, rewards } from "../progression/milestones"
-import { apply_newly_completed, compute_dex_snapshot, evaluate_milestones, update_types_ever_deposited } from "../progression/progressionService"
-import { load_progression_state, write_progression_state } from "../progression/progressionStore"
-import { REGION_DEX_DATA, getRegionalDexCount } from "../progression/dexTracker"
-import type { MilestoneDefinition, ProgressionState, RewardDefinition } from "../progression/types"
+import { REGION_DEX_DATA, getRegionalDexCount } from '../progression/dexTracker'
+import { milestones, rewards } from '../progression/milestones'
+import {
+  apply_newly_completed,
+  compute_dex_snapshot,
+  evaluate_milestones,
+  update_types_ever_deposited,
+} from '../progression/progressionService'
+import { load_progression_state, write_progression_state } from '../progression/progressionStore'
+import type { MilestoneDefinition, ProgressionState, RewardDefinition } from '../progression/types'
 
 async function create_reward_ohpkm_from_template(
   backend: BackendInterface,
-  reward_id: string,
+  reward_id: string
 ): Promise<OHPKM> {
   const res = await backend.getRewardTemplateBytes(reward_id)
 
   if (R.isErr(res)) {
-    const details = typeof res.err === "string" ? res.err : JSON.stringify(res.err, null, 2)
-    throw new Error("Failed to load reward template bytes: " + details)
+    const details = typeof res.err === 'string' ? res.err : JSON.stringify(res.err, null, 2)
+    throw new Error('Failed to load reward template bytes: ' + details)
   }
 
   const raw = res.value as any
@@ -36,12 +41,12 @@ async function create_reward_ohpkm_from_template(
           : null
 
   if (!bytes) {
-    console.error("template bytes not in expected format", raw)
-    throw new Error("Failed to load reward template bytes")
+    console.error('template bytes not in expected format', raw)
+    throw new Error('Failed to load reward template bytes')
   }
 
   const openhomeIdRes = await (backend as any).computeOpenhomeIdFromBytes(bytes)
-  if (R.isErr(openhomeIdRes)) throw new Error("Failed to compute canonical openhome id")
+  if (R.isErr(openhomeIdRes)) throw new Error('Failed to compute canonical openhome id')
   const openhomeId = openhomeIdRes.value
 
   const rewardMon = OHPKM.fromBytes(bytes.buffer as ArrayBuffer)
@@ -73,19 +78,17 @@ export default function Progression() {
 
   const allStored = useMemo(() => {
     const stored = ohpkmStore.getAllStored() as OHPKM[]
-    console.log('Loaded stored Pokemon:', stored.length)
     return stored
   }, [ohpkmStore])
   const snapshot = useMemo(() => {
     const snap = compute_dex_snapshot(allStored)
-    console.log('Computed snapshot:', snap)
     return snap
   }, [allStored])
 
   const [state, setState] = useState<ProgressionState | null>(null)
   const [lastGrants, setLastGrants] = useState<RewardDefinition[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [activeCategoryId, setActiveCategoryId] = useState<string>("national_dex")
+  const [activeCategoryId, setActiveCategoryId] = useState<string>('national_dex')
   const [collectingMilestoneIds, setCollectingMilestoneIds] = useState<Record<string, true>>({})
 
   const grantedThisSessionRef = useRef<Set<string>>(new Set())
@@ -103,10 +106,14 @@ export default function Progression() {
 
   // Milestone categories for tabs
   const categories = [
-    { id: "national_dex", title: "National Dex", subtitle: "Progress toward National Dex completion" },
-    { id: "regional_dex", title: "Regional Dex", subtitle: "Complete region-specific pokedexes" },
-    { id: "type_count", title: "Type Mastery", subtitle: "Collect Pokémon by type" },
-    { id: "shiny_hunt", title: "Shiny Collection", subtitle: "Build your shiny collection" },
+    {
+      id: 'national_dex',
+      title: 'National Dex',
+      subtitle: 'Progress toward National Dex completion',
+    },
+    { id: 'regional_dex', title: 'Regional Dex', subtitle: 'Complete region-specific pokedexes' },
+    { id: 'type_count', title: 'Type Mastery', subtitle: 'Collect Pokémon by type' },
+    { id: 'shiny_hunt', title: 'Shiny Collection', subtitle: 'Build your shiny collection' },
   ]
 
   useEffect(() => {
@@ -148,16 +155,15 @@ export default function Progression() {
     // Double-check one more time right before placement
     const needle = rewardMon.fileIdentifier
     if (homeHasIdentifier(saves.homeData, needle)) {
-      console.log("Skipping duplicate reward already in Home (final check)", needle)
       return
     }
 
     if (!rewardMon.bytes || !(rewardMon.bytes instanceof Uint8Array)) {
-      throw new Error("Reward mon bytes are invalid")
+      throw new Error('Reward mon bytes are invalid')
     }
 
     const addRes = await backend.addToOhpkmStore({ [rewardMon.fileIdentifier]: rewardMon })
-    if (R.isErr(addRes)) throw new Error("Failed to add reward to store")
+    if (R.isErr(addRes)) throw new Error('Failed to add reward to store')
 
     let placedOk = false
 
@@ -180,7 +186,7 @@ export default function Progression() {
       if (placedOk) break
     }
 
-    if (!placedOk) throw new Error("No empty Home slot found in current bank")
+    if (!placedOk) throw new Error('No empty Home slot found in current bank')
 
     const banksPayload = {
       banks: saves.homeData.banks.map((b: any) => b.toSimple()),
@@ -188,26 +194,26 @@ export default function Progression() {
     }
 
     const writeRes = await backend.writeHomeBanks(banksPayload as any)
-    if (R.isErr(writeRes)) throw new Error("Failed to persist Home bank changes")
+    if (R.isErr(writeRes)) throw new Error('Failed to persist Home bank changes')
   }
 
-  function getMilestoneUiState(m: MilestoneDefinition): "pending" | "ready" | "granted" {
-    if (!state || !snapshot) return "pending"
-    
+  function getMilestoneUiState(m: MilestoneDefinition): 'pending' | 'ready' | 'granted' {
+    if (!state || !snapshot) return 'pending'
+
     // For progressive milestones, check if all levels have been completed
-    if (m.kind === "type_count_progressive" && m.levels) {
+    if (m.kind === 'type_count_progressive' && m.levels) {
       const currentLevel = state.progressive_milestone_levels?.[m.id] ?? 0
       // If we've completed all levels, show granted
-      if (currentLevel >= m.levels.length) return "granted"
+      if (currentLevel >= m.levels.length) return 'granted'
       // Otherwise evaluate if the next level is ready
       const newlyCompleted = evaluate_milestones(state, snapshot, [m])
-      return newlyCompleted.length > 0 ? "ready" : "pending"
+      return newlyCompleted.length > 0 ? 'ready' : 'pending'
     }
-    
-    if (state.granted_rewards?.[m.reward_id]) return "granted"
-    if (state.completed_milestones?.[m.id]) return "ready"
+
+    if (state.granted_rewards?.[m.reward_id]) return 'granted'
+    if (state.completed_milestones?.[m.id]) return 'ready'
     const newlyCompleted = evaluate_milestones(state, snapshot, [m])
-    return newlyCompleted.length > 0 ? "ready" : "pending"
+    return newlyCompleted.length > 0 ? 'ready' : 'pending'
   }
 
   async function collectMilestone(milestone: MilestoneDefinition): Promise<void> {
@@ -216,7 +222,7 @@ export default function Progression() {
     if (state.granted_rewards?.[milestone.reward_id]) return
 
     const uiState = getMilestoneUiState(milestone)
-    if (uiState !== "ready") return
+    if (uiState !== 'ready') return
 
     setCollectingMilestoneIds((prev) => ({ ...prev, [milestone.id]: true }))
     isEvaluatingRef.current = true
@@ -226,14 +232,21 @@ export default function Progression() {
         ? [milestone]
         : evaluate_milestones(state, snapshot, [milestone])
 
-      const { next_state, newly_granted_rewards } = apply_newly_completed(state, milestonesToApply, rewards, snapshot)
+      const { next_state, newly_granted_rewards } = apply_newly_completed(
+        state,
+        milestonesToApply,
+        rewards,
+        snapshot
+      )
 
       if (newly_granted_rewards.length === 0) {
         setLastGrants([])
         return
       }
 
-      const uniqueRewards = Array.from(new Map(newly_granted_rewards.map((r) => [r.id, r])).values())
+      const uniqueRewards = Array.from(
+        new Map(newly_granted_rewards.map((r) => [r.id, r])).values()
+      )
 
       const toGrant = uniqueRewards.filter((r) => {
         if (state.granted_rewards?.[r.id]) return false
@@ -259,9 +272,8 @@ export default function Progression() {
         next_state.granted_rewards[reward.id] = true
       }
 
-      for (const { reward, template } of toGrantWithTemplates) {
+      for (const { template } of toGrantWithTemplates) {
         await deposit_reward_with_template(template)
-        console.log("Reward granted", reward.id)
       }
 
       await write_progression_state(backend, next_state)
@@ -282,87 +294,87 @@ export default function Progression() {
 
   if (!state) return <div style={{ padding: 24 }}>Loading progression</div>
 
-  const nationalDexMilestones = groupedMilestones["national_dex_threshold"] ?? []
-  const regionalMilestones = groupedMilestones["regional_dex_100"] ?? []
+  const nationalDexMilestones = groupedMilestones['national_dex_threshold'] ?? []
+  const regionalMilestones = groupedMilestones['regional_dex_100'] ?? []
   const typeMasteryMilestones = [
-    ...(groupedMilestones["type_count"] ?? []),
-    ...(groupedMilestones["type_count_progressive"] ?? []),
+    ...(groupedMilestones['type_count'] ?? []),
+    ...(groupedMilestones['type_count_progressive'] ?? []),
   ]
-  const shinyCollectionMilestones = groupedMilestones["shiny_count"] ?? []
+  const shinyCollectionMilestones = groupedMilestones['shiny_count'] ?? []
 
   return (
-    <div style={{ padding: 24, height: "100vh", overflowY: "auto" }}>
+    <div style={{ padding: 24, height: '100vh', overflowY: 'auto' }}>
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           gap: 12,
         }}
       >
         <h1 style={{ margin: 0 }}>Progression</h1>
       </div>
 
-      {error ? <div style={{ marginTop: 12, color: "#ef4444" }}>Error: {error}</div> : null}
+      {error ? <div style={{ marginTop: 12, color: '#ef4444' }}>Error: {error}</div> : null}
 
       {/* Summary Stats */}
       <div
         style={{
           marginTop: 12,
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
           gap: 12,
         }}
       >
         <div
           style={{
-            background: "#0f172a",
-            border: "1px solid #1f2937",
+            background: '#0f172a',
+            border: '1px solid #1f2937',
             borderRadius: 8,
             padding: 12,
           }}
         >
-          <div style={{ fontSize: 12, color: "#9ca3af" }}>National Unique Species</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#f9fafb", marginTop: 4 }}>
+          <div style={{ fontSize: 12, color: '#9ca3af' }}>National Unique Species</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: '#f9fafb', marginTop: 4 }}>
             {snapshot.national_unique_species}
           </div>
         </div>
         <div
           style={{
-            background: "#0f172a",
-            border: "1px solid #1f2937",
+            background: '#0f172a',
+            border: '1px solid #1f2937',
             borderRadius: 8,
             padding: 12,
           }}
         >
-          <div style={{ fontSize: 12, color: "#9ca3af" }}>Shiny Pokémon</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#fbbf24", marginTop: 4 }}>
+          <div style={{ fontSize: 12, color: '#9ca3af' }}>Shiny Pokémon</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: '#fbbf24', marginTop: 4 }}>
             {snapshot.shiny_count ?? 0}
           </div>
         </div>
         <div
           style={{
-            background: "#0f172a",
-            border: "1px solid #1f2937",
+            background: '#0f172a',
+            border: '1px solid #1f2937',
             borderRadius: 8,
             padding: 12,
           }}
         >
-          <div style={{ fontSize: 12, color: "#9ca3af" }}>Milestones Completed</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#f9fafb", marginTop: 4 }}>
+          <div style={{ fontSize: 12, color: '#9ca3af' }}>Milestones Completed</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: '#f9fafb', marginTop: 4 }}>
             {Object.keys(state.completed_milestones).length}
           </div>
         </div>
         <div
           style={{
-            background: "#0f172a",
-            border: "1px solid #1f2937",
+            background: '#0f172a',
+            border: '1px solid #1f2937',
             borderRadius: 8,
             padding: 12,
           }}
         >
-          <div style={{ fontSize: 12, color: "#9ca3af" }}>Rewards Granted</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#f9fafb", marginTop: 4 }}>
+          <div style={{ fontSize: 12, color: '#9ca3af' }}>Rewards Granted</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: '#f9fafb', marginTop: 4 }}>
             {Object.keys(state.granted_rewards).length}
           </div>
         </div>
@@ -372,23 +384,25 @@ export default function Progression() {
       <div
         style={{
           marginTop: 20,
-          border: "1px solid #1f2937",
+          border: '1px solid #1f2937',
           borderRadius: 10,
-          background: "linear-gradient(180deg, #0f172a 0%, #111827 100%)",
+          background: 'linear-gradient(180deg, #0f172a 0%, #111827 100%)',
           padding: 12,
         }}
       >
-        <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: "#f9fafb" }}>Milestone Tracks</div>
-        <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 12 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: '#f9fafb' }}>
+          Milestone Tracks
+        </div>
+        <div style={{ fontSize: 13, color: '#9ca3af', marginBottom: 12 }}>
           Complete challenges to unlock exclusive event Pokémon rewards
         </div>
 
         {/* Category Tabs */}
         <div
           style={{
-            display: "flex",
+            display: 'flex',
             gap: 8,
-            overflowX: "auto",
+            overflowX: 'auto',
             paddingBottom: 8,
             marginBottom: 12,
           }}
@@ -400,13 +414,13 @@ export default function Progression() {
                 key={category.id}
                 onClick={() => setActiveCategoryId(category.id)}
                 style={{
-                  border: isActive ? "1px solid #3b82f6" : "1px solid #374151",
-                  background: isActive ? "#1e3a8a" : "#111827",
-                  color: "#e5e7eb",
+                  border: isActive ? '1px solid #3b82f6' : '1px solid #374151',
+                  background: isActive ? '#1e3a8a' : '#111827',
+                  color: '#e5e7eb',
                   borderRadius: 999,
-                  padding: "6px 12px",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
+                  padding: '6px 12px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
                   fontSize: 13,
                 }}
               >
@@ -417,32 +431,32 @@ export default function Progression() {
         </div>
 
         {/* National Dex Category */}
-        {activeCategoryId === "national_dex" && (
+        {activeCategoryId === 'national_dex' && (
           <div
             style={{
-              border: "1px solid #374151",
+              border: '1px solid #374151',
               borderRadius: 8,
-              background: "#111827",
-              overflow: "hidden",
+              background: '#111827',
+              overflow: 'hidden',
             }}
           >
             <div
               style={{
-                padding: "10px 12px",
-                borderBottom: "1px solid #1f2937",
+                padding: '10px 12px',
+                borderBottom: '1px solid #1f2937',
               }}
             >
-              <div style={{ fontWeight: 700, color: "#f9fafb" }}>National Dex Completion</div>
-              <div style={{ fontSize: 12, marginTop: 2, color: "#9ca3af" }}>
+              <div style={{ fontWeight: 700, color: '#f9fafb' }}>National Dex Completion</div>
+              <div style={{ fontSize: 12, marginTop: 2, color: '#9ca3af' }}>
                 Progress toward full National Dex ownership (1025 species)
               </div>
             </div>
 
-            <div style={{ padding: 10, maxHeight: 320, overflowY: "auto" }}>
+            <div style={{ padding: 10, maxHeight: 320, overflowY: 'auto' }}>
               {nationalDexMilestones.map((m) => {
                 const uiState = getMilestoneUiState(m)
-                const granted = uiState === "granted"
-                const ready = uiState === "ready"
+                const granted = uiState === 'granted'
+                const ready = uiState === 'ready'
                 const isCollecting = Boolean(collectingMilestoneIds[m.id])
                 const current = snapshot.national_unique_species
                 const target = m.national_threshold ?? 0
@@ -452,65 +466,77 @@ export default function Progression() {
                   <div
                     key={m.id}
                     style={{
-                      background: "#0b1220",
-                      border: "1px solid #1f2937",
+                      background: '#0b1220',
+                      border: '1px solid #1f2937',
                       borderRadius: 8,
-                      padding: "10px 12px",
+                      padding: '10px 12px',
                       marginBottom: 8,
                     }}
                   >
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: 8,
+                      }}
+                    >
                       <div>
-                        <div style={{ color: "#f9fafb", fontWeight: 600 }}>{m.name}</div>
-                        <div style={{ color: "#9ca3af", fontSize: 12 }}>
+                        <div style={{ color: '#f9fafb', fontWeight: 600 }}>{m.name}</div>
+                        <div style={{ color: '#9ca3af', fontSize: 12 }}>
                           {current} / {target} ({progress}%)
                         </div>
                       </div>
                       <button
                         onClick={() => void collectMilestone(m)}
-                        disabled={uiState !== "ready" || isCollecting}
+                        disabled={uiState !== 'ready' || isCollecting}
                         style={{
-                          border:
-                            granted
-                              ? "1px solid #14532d"
-                              : ready
-                                ? "1px solid #22c55e"
-                                : "1px solid #374151",
-                          background: granted ? "#14532d" : ready ? "#0f5c2e" : "#374151",
-                          color: "#e5e7eb",
+                          border: granted
+                            ? '1px solid #14532d'
+                            : ready
+                              ? '1px solid #22c55e'
+                              : '1px solid #374151',
+                          background: granted ? '#14532d' : ready ? '#0f5c2e' : '#374151',
+                          color: '#e5e7eb',
                           borderRadius: 999,
                           fontSize: 11,
-                          padding: "6px 10px",
-                          cursor: ready && !isCollecting ? "pointer" : "default",
-                          whiteSpace: "nowrap",
+                          padding: '6px 10px',
+                          cursor: ready && !isCollecting ? 'pointer' : 'default',
+                          whiteSpace: 'nowrap',
                         }}
                       >
-                        {granted ? "✓ Collected" : isCollecting ? "..." : ready ? "Collect" : "Locked"}
+                        {granted
+                          ? '✓ Collected'
+                          : isCollecting
+                            ? '...'
+                            : ready
+                              ? 'Collect'
+                              : 'Locked'}
                       </button>
                     </div>
 
                     {/* Progress bar */}
                     <div
                       style={{
-                        background: "#0f172a",
+                        background: '#0f172a',
                         borderRadius: 4,
                         height: 6,
-                        overflow: "hidden",
+                        overflow: 'hidden',
                         marginBottom: 6,
                       }}
                     >
                       <div
                         style={{
-                          background: ready ? "#22c55e" : "#3b82f6",
-                          height: "100%",
+                          background: ready ? '#22c55e' : '#3b82f6',
+                          height: '100%',
                           width: `${progress}%`,
-                          transition: "width 0.3s ease",
+                          transition: 'width 0.3s ease',
                         }}
                       />
                     </div>
 
-                    <div style={{ fontSize: 11, color: "#6b7280" }}>
-                      Reward: {rewards[m.reward_id]?.name ?? "Unknown"}
+                    <div style={{ fontSize: 11, color: '#6b7280' }}>
+                      Reward: {rewards[m.reward_id]?.name ?? 'Unknown'}
                     </div>
                   </div>
                 )
@@ -520,35 +546,38 @@ export default function Progression() {
         )}
 
         {/* Regional Dex Category - Note for future move to Pokedex page */}
-        {activeCategoryId === "regional_dex" && (
+        {activeCategoryId === 'regional_dex' && (
           <div
             style={{
-              border: "1px solid #374151",
+              border: '1px solid #374151',
               borderRadius: 8,
-              background: "#111827",
-              overflow: "hidden",
+              background: '#111827',
+              overflow: 'hidden',
             }}
           >
             <div
               style={{
-                padding: "10px 12px",
-                borderBottom: "1px solid #1f2937",
+                padding: '10px 12px',
+                borderBottom: '1px solid #1f2937',
               }}
             >
-              <div style={{ fontWeight: 700, color: "#f9fafb" }}>Regional Dex Completion</div>
-              <div style={{ fontSize: 12, marginTop: 2, color: "#9ca3af" }}>
+              <div style={{ fontWeight: 700, color: '#f9fafb' }}>Regional Dex Completion</div>
+              <div style={{ fontSize: 12, marginTop: 2, color: '#9ca3af' }}>
                 Complete region-specific pokedexes for mythical rewards
               </div>
             </div>
 
-            <div style={{ padding: 10, maxHeight: 320, overflowY: "auto" }}>
+            <div style={{ padding: 10, maxHeight: 320, overflowY: 'auto' }}>
               {regionalMilestones.map((m) => {
                 const uiState = getMilestoneUiState(m)
-                const granted = uiState === "granted"
-                const ready = uiState === "ready"
+                const granted = uiState === 'granted'
+                const ready = uiState === 'ready'
                 const isCollecting = Boolean(collectingMilestoneIds[m.id])
-                const regionId = m.region_id!
-                const current = getRegionalDexCount(snapshot.national_species_present, regionId as any)
+                const regionId = m.region_id
+                const current = getRegionalDexCount(
+                  snapshot.national_species_present,
+                  regionId as any
+                )
                 const target = REGION_DEX_DATA.find((r) => r.id === regionId)?.totalSpecies ?? 0
                 const progress = Math.min(100, Math.round((current / target) * 100))
 
@@ -556,65 +585,77 @@ export default function Progression() {
                   <div
                     key={m.id}
                     style={{
-                      background: "#0b1220",
-                      border: "1px solid #1f2937",
+                      background: '#0b1220',
+                      border: '1px solid #1f2937',
                       borderRadius: 8,
-                      padding: "10px 12px",
+                      padding: '10px 12px',
                       marginBottom: 8,
                     }}
                   >
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: 8,
+                      }}
+                    >
                       <div>
-                        <div style={{ color: "#f9fafb", fontWeight: 600 }}>{m.name}</div>
-                        <div style={{ color: "#9ca3af", fontSize: 12 }}>
+                        <div style={{ color: '#f9fafb', fontWeight: 600 }}>{m.name}</div>
+                        <div style={{ color: '#9ca3af', fontSize: 12 }}>
                           {current} / {target} ({progress}%)
                         </div>
                       </div>
                       <button
                         onClick={() => void collectMilestone(m)}
-                        disabled={uiState !== "ready" || isCollecting}
+                        disabled={uiState !== 'ready' || isCollecting}
                         style={{
-                          border:
-                            granted
-                              ? "1px solid #14532d"
-                              : ready
-                                ? "1px solid #22c55e"
-                                : "1px solid #374151",
-                          background: granted ? "#14532d" : ready ? "#0f5c2e" : "#374151",
-                          color: "#e5e7eb",
+                          border: granted
+                            ? '1px solid #14532d'
+                            : ready
+                              ? '1px solid #22c55e'
+                              : '1px solid #374151',
+                          background: granted ? '#14532d' : ready ? '#0f5c2e' : '#374151',
+                          color: '#e5e7eb',
                           borderRadius: 999,
                           fontSize: 11,
-                          padding: "6px 10px",
-                          cursor: ready && !isCollecting ? "pointer" : "default",
-                          whiteSpace: "nowrap",
+                          padding: '6px 10px',
+                          cursor: ready && !isCollecting ? 'pointer' : 'default',
+                          whiteSpace: 'nowrap',
                         }}
                       >
-                        {granted ? "✓ Collected" : isCollecting ? "..." : ready ? "Collect" : "Locked"}
+                        {granted
+                          ? '✓ Collected'
+                          : isCollecting
+                            ? '...'
+                            : ready
+                              ? 'Collect'
+                              : 'Locked'}
                       </button>
                     </div>
 
                     {/* Progress bar */}
                     <div
                       style={{
-                        background: "#0f172a",
+                        background: '#0f172a',
                         borderRadius: 4,
                         height: 6,
-                        overflow: "hidden",
+                        overflow: 'hidden',
                         marginBottom: 6,
                       }}
                     >
                       <div
                         style={{
-                          background: ready ? "#22c55e" : "#3b82f6",
-                          height: "100%",
+                          background: ready ? '#22c55e' : '#3b82f6',
+                          height: '100%',
                           width: `${progress}%`,
-                          transition: "width 0.3s ease",
+                          transition: 'width 0.3s ease',
                         }}
                       />
                     </div>
 
-                    <div style={{ fontSize: 11, color: "#6b7280" }}>
-                      Reward: {rewards[m.reward_id]?.name ?? "Unknown"}
+                    <div style={{ fontSize: 11, color: '#6b7280' }}>
+                      Reward: {rewards[m.reward_id]?.name ?? 'Unknown'}
                     </div>
                   </div>
                 )
@@ -624,34 +665,38 @@ export default function Progression() {
         )}
 
         {/* Type Count Category - Placeholder */}
-        {activeCategoryId === "type_count" && (
+        {activeCategoryId === 'type_count' && (
           <div
             style={{
-              border: "1px solid #374151",
+              border: '1px solid #374151',
               borderRadius: 8,
-              background: "#111827",
-              overflow: "hidden",
+              background: '#111827',
+              overflow: 'hidden',
             }}
           >
             <div
               style={{
-                padding: "10px 12px",
-                borderBottom: "1px solid #1f2937",
+                padding: '10px 12px',
+                borderBottom: '1px solid #1f2937',
               }}
             >
-              <div style={{ fontWeight: 700, color: "#f9fafb" }}>Type Mastery Challenges</div>
-              <div style={{ fontSize: 12, marginTop: 2, color: "#9ca3af" }}>
+              <div style={{ fontWeight: 700, color: '#f9fafb' }}>Type Mastery Challenges</div>
+              <div style={{ fontSize: 12, marginTop: 2, color: '#9ca3af' }}>
                 Collect specific numbers of Pokémon by type
               </div>
             </div>
 
-            <div style={{ padding: 10, maxHeight: 320, overflowY: "auto" }}>
+            <div style={{ padding: 10, maxHeight: 320, overflowY: 'auto' }}>
               {!snapshot || !snapshot.type_counts ? (
-                <div style={{ color: "#ef4444", fontSize: 12, padding: "20px", textAlign: "center" }}>
+                <div
+                  style={{ color: '#ef4444', fontSize: 12, padding: '20px', textAlign: 'center' }}
+                >
                   Error: Unable to load type data
                 </div>
               ) : typeMasteryMilestones.length === 0 ? (
-                <div style={{ color: "#9ca3af", fontSize: 12, padding: "20px", textAlign: "center" }}>
+                <div
+                  style={{ color: '#9ca3af', fontSize: 12, padding: '20px', textAlign: 'center' }}
+                >
                   No type mastery milestones available
                 </div>
               ) : (
@@ -659,53 +704,56 @@ export default function Progression() {
                   try {
                     // Validate inputs
                     if (!m || !m.id) {
-                      throw new Error("Invalid milestone data structure")
+                      throw new Error('Invalid milestone data structure')
                     }
                     if (!rewards || typeof rewards !== 'object') {
-                      throw new Error("Rewards data not loaded")
+                      throw new Error('Rewards data not loaded')
                     }
-                    
+
                     // Step 1: Get UI state
-                    let uiState: "pending" | "ready" | "granted" = "pending"
+                    let uiState: 'pending' | 'ready' | 'granted' = 'pending'
                     try {
                       uiState = getMilestoneUiState(m)
-                    } catch(e) {
+                    } catch (e) {
                       throw new Error(`Failed to get UI state: ${String(e)}`)
                     }
 
-                    const granted = uiState === "granted"
-                    const ready = uiState === "ready"
+                    const granted = uiState === 'granted'
+                    const ready = uiState === 'ready'
                     const isCollecting = Boolean(collectingMilestoneIds[m.id])
-                    
+
                     // Step 2: Get current count with safe access
                     let current = 0
                     try {
                       if (snapshot && snapshot.type_counts && m.target_type) {
                         current = snapshot.type_counts[m.target_type] ?? 0
                       }
-                    } catch(e) {
+                    } catch (e) {
                       console.warn(`Failed to get current count for ${m.target_type}:`, e)
                       current = 0
                     }
-                    
+
                     // Step 3: Determine target and reward
                     let target = 1 // Default to 1 to avoid division by zero
                     let rewardId = m.reward_id
-                    let rewardName = "Unknown"
-                    
+                    let rewardName = 'Unknown'
+
                     try {
-                      rewardName = rewards[rewardId]?.name ?? "Unknown"
-                    } catch(e) {
+                      rewardName = rewards[rewardId]?.name ?? 'Unknown'
+                    } catch (e) {
                       console.warn(`Failed to get reward name for ${rewardId}:`, e)
                     }
-                    
+
                     // Step 4: Handle progressive vs regular milestones
                     try {
-                      if (m.kind === "type_count_progressive") {
+                      if (m.kind === 'type_count_progressive') {
                         if (!Array.isArray(m.levels) || m.levels.length === 0) {
-                          throw new Error("Progressive milestone missing or invalid levels data")
+                          throw new Error('Progressive milestone missing or invalid levels data')
                         }
-                        const currentLevel = (state && state.progressive_milestone_levels) ? (state.progressive_milestone_levels[m.id] ?? 0) : 0
+                        const currentLevel =
+                          state && state.progressive_milestone_levels
+                            ? (state.progressive_milestone_levels[m.id] ?? 0)
+                            : 0
                         if (currentLevel < m.levels.length) {
                           const levelDef = m.levels[currentLevel]
                           if (!levelDef || typeof levelDef !== 'object') {
@@ -716,98 +764,102 @@ export default function Progression() {
                           }
                           target = (levelDef as any).target_count ?? 1
                           rewardId = (levelDef as any).reward_id
-                          rewardName = rewards[rewardId]?.name ?? "Unknown"
+                          rewardName = rewards[rewardId]?.name ?? 'Unknown'
                         } else {
                           // All levels completed, show last level's info
                           const lastLevel = m.levels[m.levels.length - 1]
-                          if (lastLevel && typeof lastLevel === 'object' && 'target_count' in lastLevel) {
+                          if (
+                            lastLevel &&
+                            typeof lastLevel === 'object' &&
+                            'target_count' in lastLevel
+                          ) {
                             target = (lastLevel as any).target_count ?? 1
-                            rewardName = "All Levels Complete!"
+                            rewardName = 'All Levels Complete!'
                           }
                         }
-                      } else if (m.kind === "type_count" && m.target_count) {
+                      } else if (m.kind === 'type_count' && m.target_count) {
                         target = m.target_count
                       }
-                    } catch(e) {
+                    } catch (e) {
                       throw new Error(`Failed to handle progressive milestone: ${String(e)}`)
                     }
-                    
-                    const progress = Math.min(100, Math.round((current / target) * 100))
 
-                    console.log(`Rendering milestone ${m.id}:`, { 
-                      name: m.name, 
-                      kind: m.kind, 
-                      current, 
-                      target, 
-                      progress,
-                      rewardId,
-                      rewardName 
-                    })
+                    const progress = Math.min(100, Math.round((current / target) * 100))
 
                     return (
                       <div
                         key={m.id}
                         style={{
-                          background: "#0b1220",
-                          border: "1px solid #1f2937",
+                          background: '#0b1220',
+                          border: '1px solid #1f2937',
                           borderRadius: 8,
-                          padding: "10px 12px",
+                          padding: '10px 12px',
                           marginBottom: 8,
                         }}
                       >
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: 8,
+                          }}
+                        >
                           <div>
-                            <div style={{ color: "#f9fafb", fontWeight: 600 }}>{m.name}</div>
-                            <div style={{ color: "#9ca3af", fontSize: 12 }}>
+                            <div style={{ color: '#f9fafb', fontWeight: 600 }}>{m.name}</div>
+                            <div style={{ color: '#9ca3af', fontSize: 12 }}>
                               {current} / {target} ({progress}%)
                             </div>
                           </div>
                           <button
                             onClick={() => void collectMilestone(m)}
-                            disabled={uiState !== "ready" || isCollecting}
+                            disabled={uiState !== 'ready' || isCollecting}
                             style={{
-                              border:
-                                granted
-                                  ? "1px solid #14532d"
-                                  : ready
-                                    ? "1px solid #22c55e"
-                                    : "1px solid #374151",
-                              background: granted ? "#14532d" : ready ? "#0f5c2e" : "#374151",
-                              color: "#e5e7eb",
+                              border: granted
+                                ? '1px solid #14532d'
+                                : ready
+                                  ? '1px solid #22c55e'
+                                  : '1px solid #374151',
+                              background: granted ? '#14532d' : ready ? '#0f5c2e' : '#374151',
+                              color: '#e5e7eb',
                               borderRadius: 999,
                               fontSize: 11,
-                              padding: "6px 10px",
-                              cursor: ready && !isCollecting ? "pointer" : "default",
-                              whiteSpace: "nowrap",
+                              padding: '6px 10px',
+                              cursor: ready && !isCollecting ? 'pointer' : 'default',
+                              whiteSpace: 'nowrap',
                             }}
                           >
-                            {granted ? "✓ Completed" : isCollecting ? "..." : ready ? "Collect" : "Locked"}
+                            {granted
+                              ? '✓ Completed'
+                              : isCollecting
+                                ? '...'
+                                : ready
+                                  ? 'Collect'
+                                  : 'Locked'}
                           </button>
                         </div>
 
                         {/* Progress bar */}
                         <div
                           style={{
-                            background: "#0f172a",
+                            background: '#0f172a',
                             borderRadius: 4,
                             height: 6,
-                            overflow: "hidden",
+                            overflow: 'hidden',
                             marginBottom: 6,
                           }}
                         >
                           <div
                             style={{
-                              background: ready ? "#22c55e" : "#3b82f6",
-                              height: "100%",
+                              background: ready ? '#22c55e' : '#3b82f6',
+                              height: '100%',
                               width: `${progress}%`,
-                              transition: "width 0.3s ease",
+                              transition: 'width 0.3s ease',
                             }}
                           />
                         </div>
 
-                        <div style={{ fontSize: 11, color: "#6b7280" }}>
-                          Reward: {rewardName}
-                        </div>
+                        <div style={{ fontSize: 11, color: '#6b7280' }}>Reward: {rewardName}</div>
                       </div>
                     )
                   } catch (e) {
@@ -820,45 +872,55 @@ export default function Progression() {
                       fullError: e,
                     })
                     return (
-                      <div key={m?.id ?? 'unknown'} style={{ color: '#ef4444', padding: '10px', fontSize: '12px', border: '1px solid #ef4444', borderRadius: '4px' }}>
-                        <div style={{ fontWeight: 600 }}>Error: {m?.name ?? 'Unknown Milestone'}</div>
+                      <div
+                        key={m?.id ?? 'unknown'}
+                        style={{
+                          color: '#ef4444',
+                          padding: '10px',
+                          fontSize: '12px',
+                          border: '1px solid #ef4444',
+                          borderRadius: '4px',
+                        }}
+                      >
+                        <div style={{ fontWeight: 600 }}>
+                          Error: {m?.name ?? 'Unknown Milestone'}
+                        </div>
                         <div style={{ fontSize: '11px', marginTop: '4px' }}>{errorMsg}</div>
                       </div>
                     )
                   }
                 })
               )}
-
             </div>
           </div>
         )}
 
-        {activeCategoryId === "shiny_hunt" && (
+        {activeCategoryId === 'shiny_hunt' && (
           <div
             style={{
-              border: "1px solid #374151",
+              border: '1px solid #374151',
               borderRadius: 8,
-              background: "#111827",
-              overflow: "hidden",
+              background: '#111827',
+              overflow: 'hidden',
             }}
           >
             <div
               style={{
-                padding: "10px 12px",
-                borderBottom: "1px solid #1f2937",
+                padding: '10px 12px',
+                borderBottom: '1px solid #1f2937',
               }}
             >
-              <div style={{ fontWeight: 700, color: "#f9fafb" }}>Shiny Collection Milestones</div>
-              <div style={{ fontSize: 12, marginTop: 2, color: "#9ca3af" }}>
+              <div style={{ fontWeight: 700, color: '#f9fafb' }}>Shiny Collection Milestones</div>
+              <div style={{ fontSize: 12, marginTop: 2, color: '#9ca3af' }}>
                 Build your shiny collection and earn exclusive event Pokémon
               </div>
             </div>
 
-            <div style={{ padding: 10, maxHeight: 320, overflowY: "auto" }}>
+            <div style={{ padding: 10, maxHeight: 320, overflowY: 'auto' }}>
               {shinyCollectionMilestones.map((m) => {
                 const uiState = getMilestoneUiState(m)
-                const granted = uiState === "granted"
-                const ready = uiState === "ready"
+                const granted = uiState === 'granted'
+                const ready = uiState === 'ready'
                 const isCollecting = Boolean(collectingMilestoneIds[m.id])
                 const current = snapshot.shiny_count ?? 0
                 const target = m.target_count ?? 0
@@ -868,65 +930,77 @@ export default function Progression() {
                   <div
                     key={m.id}
                     style={{
-                      background: "#0b1220",
-                      border: "1px solid #1f2937",
+                      background: '#0b1220',
+                      border: '1px solid #1f2937',
                       borderRadius: 8,
-                      padding: "10px 12px",
+                      padding: '10px 12px',
                       marginBottom: 8,
                     }}
                   >
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: 8,
+                      }}
+                    >
                       <div>
-                        <div style={{ color: "#f9fafb", fontWeight: 600 }}>{m.name}</div>
-                        <div style={{ color: "#9ca3af", fontSize: 12 }}>
+                        <div style={{ color: '#f9fafb', fontWeight: 600 }}>{m.name}</div>
+                        <div style={{ color: '#9ca3af', fontSize: 12 }}>
                           {current} / {target} ({progress}%)
                         </div>
                       </div>
                       <button
                         onClick={() => void collectMilestone(m)}
-                        disabled={uiState !== "ready" || isCollecting}
+                        disabled={uiState !== 'ready' || isCollecting}
                         style={{
-                          border:
-                            granted
-                              ? "1px solid #14532d"
-                              : ready
-                                ? "1px solid #22c55e"
-                                : "1px solid #374151",
-                          background: granted ? "#14532d" : ready ? "#0f5c2e" : "#374151",
-                          color: "#e5e7eb",
+                          border: granted
+                            ? '1px solid #14532d'
+                            : ready
+                              ? '1px solid #22c55e'
+                              : '1px solid #374151',
+                          background: granted ? '#14532d' : ready ? '#0f5c2e' : '#374151',
+                          color: '#e5e7eb',
                           borderRadius: 999,
                           fontSize: 11,
-                          padding: "6px 10px",
-                          cursor: ready && !isCollecting ? "pointer" : "default",
-                          whiteSpace: "nowrap",
+                          padding: '6px 10px',
+                          cursor: ready && !isCollecting ? 'pointer' : 'default',
+                          whiteSpace: 'nowrap',
                         }}
                       >
-                        {granted ? "✓ Collected" : isCollecting ? "..." : ready ? "Collect" : "Locked"}
+                        {granted
+                          ? '✓ Collected'
+                          : isCollecting
+                            ? '...'
+                            : ready
+                              ? 'Collect'
+                              : 'Locked'}
                       </button>
                     </div>
 
                     {/* Progress bar */}
                     <div
                       style={{
-                        background: "#0f172a",
+                        background: '#0f172a',
                         borderRadius: 4,
                         height: 6,
-                        overflow: "hidden",
+                        overflow: 'hidden',
                         marginBottom: 6,
                       }}
                     >
                       <div
                         style={{
-                          background: ready ? "#22c55e" : "#fbbf24",
-                          height: "100%",
+                          background: ready ? '#22c55e' : '#fbbf24',
+                          height: '100%',
                           width: `${progress}%`,
-                          transition: "width 0.3s ease",
+                          transition: 'width 0.3s ease',
                         }}
                       />
                     </div>
 
-                    <div style={{ fontSize: 11, color: "#6b7280" }}>
-                      Reward: {rewards[m.reward_id]?.name ?? "Unknown"}
+                    <div style={{ fontSize: 11, color: '#6b7280' }}>
+                      Reward: {rewards[m.reward_id]?.name ?? 'Unknown'}
                     </div>
                   </div>
                 )
@@ -939,14 +1013,16 @@ export default function Progression() {
       {/* Recent Grants */}
       {lastGrants.length > 0 && (
         <div style={{ marginTop: 20 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "#f9fafb", marginBottom: 8 }}>Recently Granted</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#f9fafb', marginBottom: 8 }}>
+            Recently Granted
+          </div>
           {lastGrants.map((r) => (
             <div
               key={r.id}
               style={{
-                color: "#9ca3af",
+                color: '#9ca3af',
                 fontSize: 12,
-                padding: "4px 0",
+                padding: '4px 0',
               }}
             >
               • {r.name}

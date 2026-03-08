@@ -21,7 +21,13 @@ export type MilestoneDefinition = {
   id: MilestoneId
   name: string
   description: string
-  kind: "national_living_dex" | "regional_dex_100" | "national_dex_threshold" | "type_count" | "type_count_progressive" | "shiny_count"
+  kind:
+    | 'national_living_dex'
+    | 'regional_dex_100'
+    | 'national_dex_threshold'
+    | 'type_count'
+    | 'type_count_progressive'
+    | 'shiny_count'
   required_species?: number[] // for national living dex
   region_id?: string // for regional dex 100
   national_threshold?: number // for national dex threshold milestones
