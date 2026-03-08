@@ -27,9 +27,6 @@ use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::abilities::AbilityIndexWasm;
-
 const fn none_if_zero_u16(value: u16) -> Option<u16> {
     if value != 0 { Some(value) } else { None }
 }
