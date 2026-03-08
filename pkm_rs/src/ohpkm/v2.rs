@@ -8,6 +8,7 @@ use crate::ohpkm::v1::OhpkmV1;
 use crate::result::{Error, Result};
 use crate::traits::{HasSpeciesAndForme, IsShiny, PkmBytes};
 
+use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_types::TrainerData;
 use pkm_rs_types::{AbilityNumber, BinaryGender};
@@ -21,7 +22,7 @@ use wasm_bindgen::prelude::*;
 use super::JsResult;
 
 use pkm_rs_resources::{
-    abilities::AbilityIndex,
+    abilities::AbilityIndexWasm,
     ball::Ball,
     language::Language,
     moves::MoveIndex,
@@ -193,12 +194,13 @@ impl OhpkmV2 {
         self.main_data.exp = v;
     }
 
-    pub const fn ability_index(&self) -> AbilityIndex {
+    pub fn ability_index(&self) -> AbilityIndexBounded {
         self.main_data.ability_index
     }
 
-    pub const fn set_ability_index(&mut self, v: &AbilityIndex) {
+    pub fn set_ability_index(&mut self, v: &AbilityIndexBounded) -> Result<()> {
         self.main_data.ability_index = *v;
+        Ok(())
     }
 
     pub const fn ability_num(&self) -> AbilityNumber {
@@ -1639,12 +1641,12 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = abilityIndex)]
-    pub fn ability_index_js(&self) -> AbilityIndex {
-        self.ability_index()
+    pub fn ability_index_js(&self) -> AbilityIndexWasm {
+        AbilityIndexWasm::from(self.ability_index())
     }
     #[wasm_bindgen(setter = abilityIndex)]
-    pub fn set_ability_index_js(&mut self, v: &AbilityIndex) {
-        self.set_ability_index(v);
+    pub fn set_ability_index_js(&mut self, v: &AbilityIndexWasm) -> Result<()> {
+        self.set_ability_index(&AbilityIndexBounded::try_from(*v)?)
     }
 
     #[wasm_bindgen(getter = abilityNum)]

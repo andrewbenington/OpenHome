@@ -2,7 +2,6 @@ use crate::result::{Error, Result};
 use crate::traits::{HasSpeciesAndForme, IsShiny4096, PkmBytes};
 use crate::util;
 
-use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveIndex;
@@ -35,7 +34,7 @@ pub struct OhpkmV1 {
     pub trainer_id: u16,
     pub secret_id: u16,
     pub exp: u32,
-    pub ability_index: AbilityIndex,
+    pub ability_index: u16,
     pub ability_num: u8,
     pub favorite: bool,
     pub can_gigantamax: bool,
@@ -168,9 +167,7 @@ impl OhpkmV1 {
             trainer_id: u16::from_le_bytes(bytes[12..14].try_into().unwrap()),
             secret_id: u16::from_le_bytes(bytes[14..16].try_into().unwrap()),
             exp: u32::from_le_bytes(bytes[16..20].try_into().unwrap()),
-            ability_index: AbilityIndex::try_from(u16::from_le_bytes(
-                bytes[20..22].try_into().unwrap(),
-            ))?,
+            ability_index: u16::from_le_bytes(bytes[20..22].try_into().unwrap()),
             ability_num: util::read_uint3_from_bits(bytes[22], 0),
             favorite: util::get_flag(bytes, 22, 3),
             can_gigantamax: util::get_flag(bytes, 22, 4),

@@ -379,7 +379,7 @@ pub fn safe_wasm_impl(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 #[cfg(debug_assertions)]
-#[proc_macro_derive(Randomize)]
+#[proc_macro_derive(Randomize, attributes(randomize))]
 pub fn derive_randomize(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let name = &input.ident;

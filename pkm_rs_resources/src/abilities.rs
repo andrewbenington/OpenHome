@@ -12,23 +12,140 @@ use rand::RngExt;
 
 use crate::{Error, Result};
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-pub struct AbilityIndex(NonZeroU16);
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+pub struct AbilityIndexBounded<const MAX: u16 = { ABILITY_MAX as u16 }>(NonZeroU16);
 
-impl AbilityIndex {
-    pub fn new(index: u16) -> Option<AbilityIndex> {
-        if (index as usize) > ALL_ABILITIES.len() {
+impl<const MAX: u16> AbilityIndexBounded<MAX> {
+    pub fn new(index: u16) -> Option<AbilityIndexBounded<MAX>> {
+        if index > MAX {
             return None;
         }
-        NonZeroU16::new(index).map(AbilityIndex)
+        NonZeroU16::new(index).map(AbilityIndexBounded)
     }
 
     /// # Safety
     ///
     /// - `index` must be greater than zero and at most the maximum ability index supported by this version of the library.
-    pub const unsafe fn new_unchecked(index: u16) -> AbilityIndex {
-        unsafe { AbilityIndex(NonZeroU16::new_unchecked(index)) }
+    pub const unsafe fn new_unchecked(index: u16) -> AbilityIndexWasm {
+        unsafe { AbilityIndexWasm(NonZeroU16::new_unchecked(index)) }
+    }
+
+    pub const fn get(&self) -> u16 {
+        self.0.get()
+    }
+
+    pub const fn get_metadata(&self) -> &AbilityMetadata {
+        ALL_ABILITIES[(self.get() - 1) as usize]
+    }
+
+    pub const fn to_le_bytes(self) -> [u8; 2] {
+        self.get().to_le_bytes()
+    }
+
+    pub const fn change_bound<const NEW_MAX: u16>(self) -> Option<AbilityIndexBounded<NEW_MAX>> {
+        if self.get() > NEW_MAX {
+            return None;
+        }
+        Some(AbilityIndexBounded(NonZeroU16::new(self.get()).unwrap()))
+    }
+}
+
+impl<const MAX: u16> Default for AbilityIndexBounded<MAX> {
+    fn default() -> Self {
+        Self(unsafe { NonZeroU16::new_unchecked(1) })
+    }
+}
+
+impl<const MAX: u16> std::fmt::Display for AbilityIndexBounded<MAX> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} ({})", self.get_metadata().name, self.get())
+    }
+}
+
+impl<const MAX: u16> Serialize for AbilityIndexBounded<MAX> {
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(self.get_metadata().name)
+    }
+}
+
+impl<const MAX: u16> TryFrom<u8> for AbilityIndexBounded<MAX> {
+    type Error = Error;
+
+    fn try_from(value: u8) -> core::result::Result<Self, Self::Error> {
+        if value as u16 > MAX {
+            return Err(Error::AbilityIndex {
+                ability_index: value as u16,
+            });
+        }
+
+        NonZeroU16::new(value as u16)
+            .map(AbilityIndexBounded)
+            .ok_or(Error::AbilityIndex {
+                ability_index: value as u16,
+            })
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl<const MAX: u16> Randomize for AbilityIndexBounded<MAX> {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let index = rng.random_range(1..=MAX);
+        AbilityIndexBounded(
+            NonZeroU16::new(index).expect("should never be zero; range starts at 1"),
+        )
+    }
+}
+
+impl<const MAX: u16> From<AbilityIndexBounded<MAX>> for u8 {
+    fn from(val: AbilityIndexBounded<MAX>) -> Self {
+        val.get() as u8
+    }
+}
+
+impl<const MAX: u16> TryFrom<u16> for AbilityIndexBounded<MAX> {
+    type Error = Error;
+
+    fn try_from(value: u16) -> Result<Self> {
+        if value > MAX {
+            return Err(Error::AbilityIndex {
+                ability_index: value,
+            });
+        }
+
+        NonZeroU16::new(value)
+            .map(AbilityIndexBounded)
+            .ok_or(Error::AbilityIndex {
+                ability_index: value,
+            })
+    }
+}
+
+impl<const MAX: u16> From<AbilityIndexBounded<MAX>> for u16 {
+    fn from(val: AbilityIndexBounded<MAX>) -> Self {
+        val.get()
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+pub struct AbilityIndexWasm(NonZeroU16);
+
+impl AbilityIndexWasm {
+    pub fn new(index: u16) -> Option<AbilityIndexWasm> {
+        if (index) > ABILITY_MAX as u16 {
+            return None;
+        }
+        NonZeroU16::new(index).map(AbilityIndexWasm)
+    }
+
+    /// # Safety
+    ///
+    /// - `index` must be greater than zero and at most the maximum ability index supported by this version of the library.
+    pub const unsafe fn new_unchecked(index: u16) -> AbilityIndexWasm {
+        unsafe { AbilityIndexWasm(NonZeroU16::new_unchecked(index)) }
     }
 
     pub const fn get(&self) -> u16 {
@@ -44,12 +161,12 @@ impl AbilityIndex {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = AbilityIndex))]
 #[allow(clippy::missing_const_for_fn)]
-impl AbilityIndex {
+impl AbilityIndexWasm {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = fromIndex))]
-    pub fn from_index(val: u16) -> Option<AbilityIndex> {
-        AbilityIndex::new(val)
+    pub fn from_index(val: u16) -> Option<AbilityIndexWasm> {
+        AbilityIndexWasm::new(val)
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
@@ -63,24 +180,24 @@ impl AbilityIndex {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen)]
-    pub fn equals(&self, other: &AbilityIndex) -> bool {
+    pub fn equals(&self, other: &AbilityIndexWasm) -> bool {
         self.0 == other.0
     }
 }
 
-impl Default for AbilityIndex {
+impl Default for AbilityIndexWasm {
     fn default() -> Self {
         Self(unsafe { NonZeroU16::new_unchecked(1) })
     }
 }
 
-impl std::fmt::Display for AbilityIndex {
+impl std::fmt::Display for AbilityIndexWasm {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} ({})", self.get_metadata().name, self.get())
     }
 }
 
-impl Serialize for AbilityIndex {
+impl Serialize for AbilityIndexWasm {
     fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -89,7 +206,7 @@ impl Serialize for AbilityIndex {
     }
 }
 
-impl TryFrom<u8> for AbilityIndex {
+impl TryFrom<u8> for AbilityIndexWasm {
     type Error = Error;
 
     fn try_from(value: u8) -> core::result::Result<Self, Self::Error> {
@@ -100,20 +217,20 @@ impl TryFrom<u8> for AbilityIndex {
         }
 
         NonZeroU16::new(value as u16)
-            .map(AbilityIndex)
+            .map(AbilityIndexWasm)
             .ok_or(Error::AbilityIndex {
                 ability_index: value as u16,
             })
     }
 }
 
-impl From<AbilityIndex> for u8 {
-    fn from(val: AbilityIndex) -> Self {
+impl From<AbilityIndexWasm> for u8 {
+    fn from(val: AbilityIndexWasm) -> Self {
         val.get() as u8
     }
 }
 
-impl TryFrom<u16> for AbilityIndex {
+impl TryFrom<u16> for AbilityIndexWasm {
     type Error = Error;
 
     fn try_from(value: u16) -> Result<Self> {
@@ -124,26 +241,39 @@ impl TryFrom<u16> for AbilityIndex {
         }
 
         NonZeroU16::new(value)
-            .map(AbilityIndex)
+            .map(AbilityIndexWasm)
             .ok_or(Error::AbilityIndex {
                 ability_index: value,
             })
     }
 }
 
-impl From<AbilityIndex> for u16 {
-    fn from(val: AbilityIndex) -> Self {
+impl From<AbilityIndexBounded> for AbilityIndexWasm {
+    fn from(val: AbilityIndexBounded) -> Self {
+        AbilityIndexWasm(val.0)
+    }
+}
+
+impl<const MAX: u16> TryFrom<AbilityIndexWasm> for AbilityIndexBounded<MAX> {
+    type Error = Error;
+
+    fn try_from(value: AbilityIndexWasm) -> Result<Self> {
+        AbilityIndexBounded::try_from(value.get())
+    }
+}
+
+impl From<AbilityIndexWasm> for u16 {
+    fn from(val: AbilityIndexWasm) -> Self {
         val.get()
     }
 }
 
 #[cfg(feature = "randomize")]
-impl Randomize for AbilityIndex {
+impl Randomize for AbilityIndexWasm {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
-        AbilityIndex(
-            NonZeroU16::new(rng.random_range(1..ABILITY_MAX) as u16)
-                .expect("should never be zero; range starts at 1"),
-        )
+        let index = rng.random_range(1..ABILITY_MAX) as u16;
+        println!("Randomizing AbilityIndex: {index}");
+        AbilityIndexWasm(NonZeroU16::new(index).expect("should never be zero; range starts at 1"))
     }
 }
 

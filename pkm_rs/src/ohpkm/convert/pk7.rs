@@ -16,7 +16,10 @@ impl OhpkmConvert for Pk7 {
             trainer_id: self.trainer_id,
             secret_id: self.secret_id,
             exp: self.exp,
-            ability_index: self.ability_index,
+            ability_index: self
+                .ability_index
+                .change_bound()
+                .expect("Pk7 max ability <= overall max ability"),
             ability_num: self.ability_num,
             markings: self.markings,
             nature: self.nature,
@@ -90,7 +93,13 @@ impl OhpkmConvert for Pk7 {
             trainer_id: ohpkm.trainer_id(),
             secret_id: ohpkm.secret_id(),
             exp: ohpkm.exp(),
-            ability_index: ohpkm.ability_index(),
+            ability_index: ohpkm.ability_index().change_bound().unwrap_or(
+                ohpkm
+                    .get_forme_metadata()
+                    .get_ability(ohpkm.ability_num())
+                    .try_into()
+                    .unwrap_or_default(),
+            ),
             ability_num: ohpkm.ability_num(),
             markings: ohpkm.markings(),
             personality_value: ohpkm.personality_value(),
@@ -154,7 +163,6 @@ impl OhpkmConvert for Pk7 {
         };
 
         mon.stat_level = mon.calculate_level();
-        println!("stat level: {}", mon.stat_level);
         mon.stats = mon.calculate_stats();
         mon.current_hp = mon.stats.hp;
 

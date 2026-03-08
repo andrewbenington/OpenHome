@@ -4,7 +4,7 @@ use crate::result::{Error, Result, StringErrorSource};
 use crate::traits::{IsShiny, IsShiny4096, OhpkmByte, OhpkmBytes};
 use crate::util;
 
-use pkm_rs_resources::abilities::AbilityIndex;
+use pkm_rs_resources::abilities::{AbilityIndexBounded, AbilityIndexWasm};
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
@@ -52,7 +52,8 @@ pub struct MainDataV2 {
     pub trainer_id: u16,
     pub secret_id: u16,
     pub exp: u32,
-    pub ability_index: AbilityIndex,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub ability_index: AbilityIndexBounded,
     pub ability_num: AbilityNumber,
     pub favorite: bool,
     pub is_shadow: bool,
@@ -131,7 +132,9 @@ impl MainDataV2 {
             trainer_id: old.trainer_id,
             secret_id: old.secret_id,
             exp: old.exp,
-            ability_index: old.ability_index,
+            ability_index: old.ability_index.try_into().unwrap_or(
+                AbilityIndexBounded::new(1).expect("1 is a valid ability index (Stench)"),
+            ),
             ability_num: AbilityNumber::from_u8_first_three_bits(old.ability_num)
                 .unwrap_or_default(),
             favorite: old.favorite,
@@ -230,10 +233,9 @@ impl DataSection for MainDataV2 {
             trainer_id: u16::from_le_bytes(bytes[12..14].try_into().unwrap()),
             secret_id: u16::from_le_bytes(bytes[14..16].try_into().unwrap()),
             exp: u32::from_le_bytes(bytes[16..20].try_into().unwrap()),
-            ability_index: AbilityIndex::try_from(u16::from_le_bytes(
+            ability_index: AbilityIndexBounded::try_from(u16::from_le_bytes(
                 bytes[20..22].try_into().unwrap(),
             ))?,
-
             ability_num: AbilityNumber::from_u8_first_three_bits(bytes[22])?,
             favorite: util::get_flag(bytes, 22, 3),
             is_shadow: util::get_flag(bytes, 22, 4),

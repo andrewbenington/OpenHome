@@ -2,7 +2,7 @@ use crate::result::{Error, Result};
 use crate::traits::{HasSpeciesAndForme, IsShiny4096, ModernEvs, PkmBytes};
 use crate::util;
 
-use pkm_rs_resources::abilities::AbilityIndex;
+use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
@@ -24,7 +24,7 @@ pub struct Pb7 {
     pub trainer_id: u16,
     pub secret_id: u16,
     pub exp: u32,
-    pub ability_index: AbilityIndex,
+    pub ability_index: AbilityIndexWasm,
     pub ability_num: u8,
     pub favorite: bool,
     pub markings: MarkingsSixShapesColors,
@@ -104,7 +104,7 @@ impl Pb7 {
             trainer_id: read_u16_le!(bytes, 12),
             secret_id: read_u16_le!(bytes, 14),
             exp: read_u32_le!(bytes, 16),
-            ability_index: AbilityIndex::try_from(bytes[20])?,
+            ability_index: AbilityIndexWasm::try_from(bytes[20])?,
             ability_num: bytes[21],
             markings: MarkingsSixShapesColors::from_bytes(bytes[22..24].try_into().unwrap()),
             favorite: util::get_flag(bytes, 21, 3),

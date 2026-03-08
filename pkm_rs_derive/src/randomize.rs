@@ -6,7 +6,11 @@ pub fn gen_struct_sample(name: &syn::Ident, fields: &Fields) -> proc_macro2::Tok
         Fields::Named(fields) => {
             let inits = fields.named.iter().map(|f| {
                 let fname = &f.ident;
-                quote! { #fname: Randomize::randomized(rng) }
+                if should_ignore(f) {
+                    quote! { #fname: Default::default() }
+                } else {
+                    quote! { #fname: Randomize::randomized(rng) }
+                }
             });
             quote! { #name { #(#inits),* } }
         }
@@ -19,6 +23,16 @@ pub fn gen_struct_sample(name: &syn::Ident, fields: &Fields) -> proc_macro2::Tok
         }
         Fields::Unit => quote! { #name },
     }
+}
+
+fn should_ignore(field: &syn::Field) -> bool {
+    field.attrs.iter().any(|attr| {
+        attr.path().is_ident("randomize")
+            && attr
+                .parse_args::<syn::Ident>()
+                .map(|i| i == "skip")
+                .unwrap_or(false)
+    })
 }
 
 pub fn gen_enum_sample(name: &syn::Ident, variants: &[&syn::Variant]) -> proc_macro2::TokenStream {

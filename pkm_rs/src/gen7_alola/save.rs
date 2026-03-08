@@ -22,7 +22,6 @@ const SM_TRAINER_DATA_OFFSET: usize = 0x1200;
 const TRAINER_DATA_SIZE: usize = 0xc0;
 const SM_BOX_DATA_OFFSET: usize = 0x04e00;
 const BOX_DATA_SIZE: usize = 0x36600;
-// const BOX_CHECKSUM_OFFSET: usize = 0x75fda;
 
 const BOX_COUNT: usize = 32;
 const BOX_ROWS: usize = 6;

@@ -1,4 +1,4 @@
-use pkm_rs::pkm::ohpkm::{OhpkmV1, OhpkmV2};
+use pkm_rs::ohpkm::{OhpkmV2, v1::OhpkmV1};
 use semver::Version;
 use serde::Serialize;
 use std::{

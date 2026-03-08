@@ -8,7 +8,7 @@ use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForme, PkmBytes};
 
 use pkm_rs_derive::IsShiny4096;
-use pkm_rs_resources::abilities::AbilityIndex;
+use pkm_rs_resources::abilities::{AbilityIndexBounded, AbilityIndexWasm};
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::helpers;
 use pkm_rs_resources::language::Language;
@@ -30,6 +30,9 @@ use wasm_bindgen::prelude::*;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
+const NEUROFORCE: u16 = 233;
+type Pk7AbilityIndex = AbilityIndexBounded<NEUROFORCE>;
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
@@ -42,7 +45,8 @@ pub struct Pk7 {
     pub trainer_id: u16,
     pub secret_id: u16,
     pub exp: u32,
-    pub ability_index: AbilityIndex,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub ability_index: Pk7AbilityIndex,
     pub ability_num: AbilityNumber,
     pub markings: MarkingsSixShapesColors,
     pub personality_value: u32,
@@ -97,10 +101,15 @@ pub struct Pk7 {
     pub console_region: u8,
     pub language: Language,
     pub status_condition: u32,
+    #[cfg_attr(feature = "randomize", randomize(skip))]
     pub stat_level: u8,
+    #[cfg_attr(feature = "randomize", randomize(skip))]
     pub form_argument_remain: u8,
+    #[cfg_attr(feature = "randomize", randomize(skip))]
     pub form_argument_elapsed: u8,
+    #[cfg_attr(feature = "randomize", randomize(skip))]
     pub current_hp: u16,
+    #[cfg_attr(feature = "randomize", randomize(skip))]
     pub stats: Stats16Le,
 }
 
@@ -121,7 +130,7 @@ impl Pk7 {
             trainer_id: buf.trainer_id(),
             secret_id: buf.secret_id(),
             exp: buf.exp(),
-            ability_index: buf.ability_index()?,
+            ability_index: AbilityIndexBounded::try_from(buf.ability_index_raw())?,
             ability_num: buf.ability_num()?,
             markings: buf.markings(),
             personality_value: buf.personality_value(),
@@ -201,7 +210,7 @@ impl Pk7 {
         buf.set_trainer_id(self.trainer_id);
         buf.set_secret_id(self.secret_id);
         buf.set_exp(self.exp);
-        buf.set_ability_index(self.ability_index);
+        buf.set_ability_index_raw(self.ability_index.get() as u8);
         buf.set_ability_num(self.ability_num);
         buf.set_markings(self.markings);
         buf.set_personality_value(self.personality_value);
@@ -494,8 +503,9 @@ mod test {
 
     use crate::gen7_alola::Pk7;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
-    use crate::result::Result;
-    use crate::tests;
+    #[cfg(feature = "randomize")]
+    use crate::tests::TestErrorWithSeed;
+    use crate::tests::{self, TestResult};
     use crate::traits::IsShiny;
 
     #[cfg(feature = "randomize")]
@@ -504,16 +514,17 @@ mod test {
     use rand::{SeedableRng, rngs::StdRng};
 
     #[test]
-    fn to_from_bytes() -> Result<()> {
+    fn to_from_bytes() -> TestResult<()> {
         tests::to_from_bytes_all_in_dir::<Pk7>(&PathBuf::from("pkm_files").join("pk7"))
     }
 
     #[cfg(feature = "randomize")]
     #[test]
-    fn to_from_bytes_random() -> Result<()> {
-        for i in 0..255 {
-            let mon = Pk7::randomized(&mut StdRng::from_seed([i; 32]));
-            tests::find_inconsistencies_to_from_bytes(mon)?;
+    fn to_from_bytes_random() -> std::result::Result<(), TestErrorWithSeed> {
+        for seed in 0..=1000 {
+            let mon = Pk7::randomized(&mut StdRng::seed_from_u64(seed));
+            tests::find_inconsistencies_to_from_bytes(mon)
+                .map_err(|error| TestErrorWithSeed { seed, error })?;
         }
 
         Ok(())
@@ -566,7 +577,7 @@ mod test {
     }
 
     #[test]
-    fn from_ohpkm() -> Result<()> {
+    fn from_ohpkm() -> TestResult<()> {
         let mon = tests::pkm_from_file::<OhpkmV2>(
             &PathBuf::from("pkm_files")
                 .join("ohpkm")
@@ -582,7 +593,7 @@ mod test {
     }
 
     #[test]
-    fn to_from_ohpkm() -> Result<()> {
+    fn to_from_ohpkm() -> TestResult<()> {
         tests::to_from_ohpkm_all_in_dir::<Pk7>(&PathBuf::from("pkm_files").join("pk7"))
     }
 }

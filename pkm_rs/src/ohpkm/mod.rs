@@ -1,8 +1,8 @@
 mod convert;
-mod v1;
 mod v2;
 mod v2_sections;
 
+pub mod v1;
 pub use v2::OhpkmV2;
 pub mod sectioned_data;
 pub use convert::OhpkmConvert;

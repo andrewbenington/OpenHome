@@ -2,9 +2,9 @@
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 #[cfg(test)]
 use crate::result::Error;
-use crate::result::Result;
 #[cfg(test)]
 use crate::traits::Pkm;
+use std::fmt::{Debug, Display};
 #[cfg(test)]
 use std::fs::File;
 #[cfg(test)]
@@ -14,7 +14,7 @@ use std::ops::RangeInclusive;
 #[cfg(test)]
 use std::path::Path;
 #[cfg(test)]
-pub fn pkm_from_file<PKM: Pkm>(filename: &str) -> Result<(PKM, Vec<u8>)> {
+pub fn pkm_from_file<PKM: Pkm>(filename: &str) -> crate::result::Result<(PKM, Vec<u8>)> {
     let mut file = File::open(filename).map_err(|e| Error::other(&e.to_string()))?;
 
     let mut contents = Vec::new();
@@ -32,7 +32,7 @@ pub fn pkm_from_file<PKM: Pkm>(filename: &str) -> Result<(PKM, Vec<u8>)> {
 }
 
 #[cfg(test)]
-pub fn to_from_bytes_all_in_dir<PKM: Pkm>(dir: &Path) -> Result<()> {
+pub fn to_from_bytes_all_in_dir<PKM: Pkm>(dir: &Path) -> TestResult<()> {
     use std::fs;
 
     let pkm_files =
@@ -46,9 +46,7 @@ pub fn to_from_bytes_all_in_dir<PKM: Pkm>(dir: &Path) -> Result<()> {
                 }
                 let path = dir.join(dir_entry.file_name());
                 let filename = path.to_string_lossy();
-                if let Err(e) = find_inconsistencies_from_file::<PKM>(&filename) {
-                    return Err(Error::other(&format!("read {filename}: {e}")));
-                }
+                find_inconsistencies_from_file::<PKM>(&filename)?;
             }
         }
     }
@@ -57,7 +55,7 @@ pub fn to_from_bytes_all_in_dir<PKM: Pkm>(dir: &Path) -> Result<()> {
 }
 
 #[cfg(test)]
-pub fn from_to_ohpkm_all_in_dir<PKM: OhpkmConvert>() -> Result<()> {
+pub fn from_to_ohpkm_all_in_dir<PKM: OhpkmConvert>() -> TestResult<()> {
     use std::{fs, path::PathBuf};
 
     let ohpkm_dir = &PathBuf::from("pkm_files").join("ohpkm");
@@ -73,11 +71,7 @@ pub fn from_to_ohpkm_all_in_dir<PKM: OhpkmConvert>() -> Result<()> {
                 let path = ohpkm_dir.join(dir_entry.file_name());
                 let filename = path.to_string_lossy();
                 println!("filename: {filename:#?}");
-                if let Err(e) =
-                    find_inconsistencies_from_to_ohpkm::<PKM>(pkm_from_file(&filename)?.0)
-                {
-                    return Err(Error::other(&format!("read {filename}: {e}")));
-                }
+                find_inconsistencies_from_to_ohpkm::<PKM>(pkm_from_file(&filename)?.0)?;
             }
         }
     }
@@ -86,7 +80,7 @@ pub fn from_to_ohpkm_all_in_dir<PKM: OhpkmConvert>() -> Result<()> {
 }
 
 #[cfg(test)]
-pub fn to_from_ohpkm_all_in_dir<PKM: OhpkmConvert>(dir: &Path) -> Result<()> {
+pub fn to_from_ohpkm_all_in_dir<PKM: OhpkmConvert>(dir: &Path) -> TestResult<()> {
     use std::fs;
 
     let pkm_files =
@@ -101,17 +95,24 @@ pub fn to_from_ohpkm_all_in_dir<PKM: OhpkmConvert>(dir: &Path) -> Result<()> {
                 let path = dir.join(dir_entry.file_name());
                 let filename = path.to_string_lossy();
                 println!("filename: {filename:#?}");
-                if let Err(e) =
-                    find_inconsistencies_to_from_ohpkm::<PKM>(pkm_from_file(&filename)?.0)
-                {
-                    return Err(Error::other(&format!("read {filename}: {e}")));
-                }
+                find_inconsistencies_to_from_ohpkm::<PKM>(pkm_from_file(&filename)?.0)?;
             }
         }
     }
 
     Ok(())
 }
+
+#[cfg(test)]
+fn ensure_ranges_match(actual: &[u8], expected: &[u8]) -> TestResult<()> {
+    let differences = find_differing_ranges(actual, expected);
+
+    match differences {
+        Some(diffs) => Err(DiffError::new(diffs, actual.to_vec(), expected.to_vec()).into()),
+        None => Ok(()),
+    }
+}
+
 #[cfg(test)]
 fn find_differing_ranges(actual: &[u8], expected: &[u8]) -> Option<Vec<ByteRange>> {
     let mut differences: Vec<ByteRange> = Vec::new();
@@ -137,6 +138,7 @@ fn find_differing_ranges(actual: &[u8], expected: &[u8]) -> Option<Vec<ByteRange
 }
 
 #[cfg(test)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct ByteRange {
     start_idx: usize,
     end_idx: usize,
@@ -167,121 +169,155 @@ fn u8_slice_to_hex_string(slice: &[u8]) -> String {
 }
 
 #[cfg(test)]
-fn find_inconsistencies_from_file<PKM: Pkm>(filename: &str) -> Result<()> {
-    use crate::result::Error;
-
+fn find_inconsistencies_from_file<PKM: Pkm>(filename: &str) -> TestResult<()> {
     println!("filename: {filename}");
     let result = pkm_from_file::<PKM>(filename);
-    let (mon, bytes) = result.unwrap_or_else(|e| panic!("could not load {filename}: {e}"));
+    let (mon, file_bytes) = result.unwrap_or_else(|e| panic!("could not load {filename}: {e}"));
 
     let actual = mon.to_party_bytes();
 
-    let expected = bytes;
-    let differences = find_differing_ranges(&actual, &expected);
-
-    if let Some(differences) = &differences {
-        for diff in differences {
-            let actual_bytes = &actual[diff.range()];
-            let expected_bytes = &expected[diff.range()];
-            println!(
-                "0x{:03x}..0x{:03x} ({}..{}):",
-                diff.start_idx, diff.end_idx, diff.start_idx, diff.end_idx
-            );
-            println!("   actual:     {}", u8_slice_to_hex_string(actual_bytes));
-            println!("   expected:   {}", u8_slice_to_hex_string(expected_bytes));
-        }
-    }
+    let differences = find_differing_ranges(&actual, &file_bytes);
 
     match differences {
-        Some(diffs) => Err(Error::other(&format!("{} differences", diffs.len()))),
+        Some(diffs) => Err(TestError::Diff(DiffError::new(
+            diffs,
+            actual.to_vec(),
+            file_bytes.to_vec(),
+        ))),
         None => Ok(()),
     }
 }
 
 #[cfg(feature = "randomize")]
 #[cfg(test)]
-pub fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> Result<()> {
-    use crate::result::Error;
-
-    let expected = mon.to_party_bytes();
-    let actual = PKM::from_bytes(&expected)?.to_party_bytes();
+pub fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> TestResult<()> {
+    let expected = mon.to_box_bytes();
+    let actual = PKM::from_bytes(&expected)?.to_box_bytes();
 
     let differences = find_differing_ranges(&actual, &expected);
 
-    if let Some(differences) = &differences {
-        for diff in differences {
-            let actual_bytes = &actual[diff.range()];
-            let expected_bytes = &expected[diff.range()];
-            println!(
-                "0x{:03x}..0x{:03x} ({}..{}):",
-                diff.start_idx, diff.end_idx, diff.start_idx, diff.end_idx
-            );
-            println!("\t{}", u8_slice_to_hex_string(actual_bytes));
-            println!("\t{}", u8_slice_to_hex_string(expected_bytes));
-        }
-    }
-
     match differences {
-        Some(diffs) => Err(Error::other(&format!("{} differences", diffs.len()))),
+        Some(diffs) => Err(TestError::Diff(DiffError::new(
+            diffs,
+            actual.to_vec(),
+            expected.to_vec(),
+        ))),
         None => Ok(()),
     }
 }
 
 #[cfg(test)]
-fn find_inconsistencies_from_to_ohpkm<PKM: OhpkmConvert>(mon: OhpkmV2) -> Result<()> {
-    use crate::result::Error;
-
+fn find_inconsistencies_from_to_ohpkm<PKM: OhpkmConvert>(mon: OhpkmV2) -> TestResult<()> {
     let first_pass = PKM::from_ohpkm(&mon);
     let second_pass = PKM::from_ohpkm(&OhpkmV2::from(&first_pass));
 
     let expected = first_pass.to_party_bytes();
     let actual = second_pass.to_party_bytes();
 
-    let differences = find_differing_ranges(&actual, &expected);
+    ensure_ranges_match(&actual, &expected)
+}
 
-    if let Some(differences) = &differences {
-        for diff in differences {
-            let actual_bytes = &actual[diff.range()];
-            let expected_bytes = &expected[diff.range()];
-            println!(
-                "0x{:03x}..0x{:03x} ({}..{}):",
-                diff.start_idx, diff.end_idx, diff.start_idx, diff.end_idx
-            );
-            println!("\t{}", u8_slice_to_hex_string(actual_bytes));
-            println!("\t{}\n", u8_slice_to_hex_string(expected_bytes));
-        }
-    }
+#[cfg(test)]
+fn find_inconsistencies_to_from_ohpkm<PKM: OhpkmConvert>(mon: PKM) -> TestResult<()> {
+    let expected = mon.to_party_bytes();
+    let actual: Vec<u8> = PKM::from_ohpkm(&OhpkmV2::from(&mon)).to_party_bytes();
 
-    match differences {
-        Some(diffs) => Err(Error::other(&format!("{} differences", diffs.len()))),
-        None => Ok(()),
+    ensure_ranges_match(&actual, &expected)
+}
+
+#[cfg(test)]
+pub struct TestErrorWithSeed {
+    pub seed: u64,
+    pub error: TestError,
+}
+
+impl Debug for TestErrorWithSeed {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Failing Seed: {}\n{:?}", self.seed, self.error)
     }
 }
 
 #[cfg(test)]
-fn find_inconsistencies_to_from_ohpkm<PKM: OhpkmConvert>(mon: PKM) -> Result<()> {
-    use crate::result::Error;
+pub enum TestError {
+    PkmRs(crate::result::Error),
+    Diff(DiffError),
+}
 
-    let expected = mon.to_party_bytes();
-    let actual: Vec<u8> = PKM::from_ohpkm(&OhpkmV2::from(&mon)).to_party_bytes();
-
-    let differences = find_differing_ranges(&actual, &expected);
-
-    if let Some(differences) = &differences {
-        for diff in differences {
-            let actual_bytes = &actual[diff.range()];
-            let expected_bytes = &expected[diff.range()];
-            println!(
-                "0x{:03x}..0x{:03x} ({}..{}):",
-                diff.start_idx, diff.end_idx, diff.start_idx, diff.end_idx
-            );
-            println!("\t{}", u8_slice_to_hex_string(actual_bytes));
-            println!("\t{}", u8_slice_to_hex_string(expected_bytes));
+impl Debug for TestError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TestError::PkmRs(e) => write!(f, "PkmRs error: {e}"),
+            TestError::Diff(e) => write!(f, "{e:?}"),
         }
     }
+}
 
-    match differences {
-        Some(diffs) => Err(Error::other(&format!("{} differences", diffs.len()))),
-        None => Ok(()),
+impl From<crate::result::Error> for TestError {
+    fn from(value: crate::result::Error) -> Self {
+        Self::PkmRs(value)
     }
+}
+
+impl From<DiffError> for TestError {
+    fn from(value: DiffError) -> Self {
+        Self::Diff(value)
+    }
+}
+
+pub type TestResult<T> = std::result::Result<T, TestError>;
+
+#[cfg(test)]
+pub struct DiffError {
+    differences: Vec<ByteRange>,
+    actual: Vec<u8>,
+    expected: Vec<u8>,
+}
+
+impl DiffError {
+    pub fn new(differences: Vec<ByteRange>, actual: Vec<u8>, expected: Vec<u8>) -> Self {
+        Self {
+            differences,
+            actual,
+            expected,
+        }
+    }
+}
+
+impl Display for DiffError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            format_byte_range_differences(&self.differences, &self.actual, &self.expected)
+        )
+    }
+}
+
+impl Debug for DiffError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            format_byte_range_differences(&self.differences, &self.actual, &self.expected)
+        )
+    }
+}
+
+#[cfg(test)]
+fn format_byte_range_differences(diffs: &[ByteRange], actual: &[u8], expected: &[u8]) -> String {
+    let mut output = String::new();
+    for diff in diffs {
+        let actual_bytes = &actual[diff.range()];
+        let expected_bytes = &expected[diff.range()];
+        output.push_str(&format!(
+            "0x{:03x}..0x{:03x} ({}..{}):\n",
+            diff.start_idx, diff.end_idx, diff.start_idx, diff.end_idx
+        ));
+
+        let actual_hex = u8_slice_to_hex_string(actual_bytes);
+        let expected_hex = u8_slice_to_hex_string(expected_bytes);
+        output.push_str(&format!("  expected:  {expected_hex}\n"));
+        output.push_str(&format!("  actual:    {actual_hex}\n"));
+    }
+    output
 }

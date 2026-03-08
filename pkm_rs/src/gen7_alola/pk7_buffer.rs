@@ -4,7 +4,7 @@ use crate::traits::bytes::{AsBytes, AsBytesMut};
 use crate::util;
 use arbitrary_int::u3;
 use arbitrary_int::u7;
-use pkm_rs_resources::abilities::AbilityIndex;
+use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
@@ -133,8 +133,8 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
         self.bytes()[20]
     }
 
-    pub fn ability_index(&self) -> Result<AbilityIndex> {
-        Ok(AbilityIndex::try_from(self.ability_index_raw())?)
+    pub fn ability_index(&self) -> Result<AbilityIndexWasm> {
+        Ok(AbilityIndexWasm::try_from(self.ability_index_raw())?)
     }
 
     pub fn ability_num_raw(&self) -> u8 {
@@ -224,10 +224,6 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     pub fn form_argument(&self) -> u32 {
         read_u32_le!(self.bytes(), 60)
     }
-
-    // ------------------------------------------------------------------
-    // Block B  (offsets 64 – 127)
-    // ------------------------------------------------------------------
 
     pub fn nickname_raw(&self) -> &[u8; 26] {
         self.bytes()[64..90].try_into().unwrap()
@@ -346,10 +342,6 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     pub fn enjoyment(&self) -> u8 {
         self.bytes()[175]
     }
-
-    // ------------------------------------------------------------------
-    // Block D  (offsets 176 – 231)
-    // ------------------------------------------------------------------
 
     pub fn trainer_name_raw(&self) -> &[u8; 26] {
         self.bytes()[176..202].try_into().unwrap()
@@ -567,7 +559,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
         self.bytes_mut()[20] = v;
     }
 
-    pub fn set_ability_index(&mut self, v: AbilityIndex) {
+    pub fn set_ability_index(&mut self, v: AbilityIndexWasm) {
         self.set_ability_index_raw(u8::from(v));
     }
 
@@ -659,10 +651,6 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
     pub fn set_form_argument(&mut self, v: u32) {
         self.bytes_mut()[60..64].copy_from_slice(&v.to_le_bytes());
     }
-
-    // ------------------------------------------------------------------
-    // Block B  (offsets 64 – 127)
-    // ------------------------------------------------------------------
 
     pub fn set_nickname_raw(&mut self, v: &[u8; 26]) {
         self.bytes_mut()[64..90].copy_from_slice(v);

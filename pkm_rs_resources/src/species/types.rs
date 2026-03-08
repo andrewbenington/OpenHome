@@ -1,5 +1,5 @@
-use crate::{Error, Result, abilities::AbilityIndex, species::ALL_SPECIES};
-use pkm_rs_types::{GameSetting, Generation, PkmType, Stats16Le, TeraType};
+use crate::{Error, Result, abilities::AbilityIndexWasm, species::ALL_SPECIES};
+use pkm_rs_types::{AbilityNumber, GameSetting, Generation, PkmType, Stats16Le, TeraType};
 use serde::{Serialize, Serializer};
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
@@ -341,10 +341,10 @@ pub struct FormeMetadata {
     pub base_stats: Stats16Le,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub abilities: (AbilityIndex, AbilityIndex),
+    pub abilities: (AbilityIndexWasm, AbilityIndexWasm),
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = hiddenAbility))]
-    pub hidden_ability: Option<AbilityIndex>,
+    pub hidden_ability: Option<AbilityIndexWasm>,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseHeight))]
     pub base_height: u32,
@@ -398,10 +398,11 @@ impl FormeMetadata {
         self.forme_ref().get_species_metadata()
     }
 
-    pub const fn get_ability(&self, ability_num: u8) -> AbilityIndex {
+    pub fn get_ability(&self, ability_num: AbilityNumber) -> AbilityIndexWasm {
         match ability_num {
-            1 => self.abilities.0,
-            _ => self.abilities.1,
+            AbilityNumber::First => self.abilities.0,
+            AbilityNumber::Second => self.abilities.1,
+            AbilityNumber::Hidden => self.hidden_ability.unwrap_or(self.abilities.0),
         }
     }
 
@@ -466,12 +467,12 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn abilities(&self) -> Vec<AbilityIndex> {
+    pub fn abilities(&self) -> Vec<AbilityIndexWasm> {
         vec![self.abilities.0, self.abilities.1]
     }
 
     #[wasm_bindgen(js_name = abilityByNum)]
-    pub fn ability_by_num(&self, num: u8) -> AbilityIndex {
+    pub fn ability_by_num(&self, num: u8) -> AbilityIndexWasm {
         match num {
             4 => self.hidden_ability.unwrap_or(self.abilities.0),
             2 => self.abilities.1,
@@ -480,7 +481,7 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(js_name = abilityByNumGen3)]
-    pub fn ability_by_num_gen_3(&self, num: u8) -> AbilityIndex {
+    pub fn ability_by_num_gen_3(&self, num: u8) -> AbilityIndexWasm {
         if num == 2 && self.abilities.1.get() <= 77 {
             self.abilities.1
         } else {
