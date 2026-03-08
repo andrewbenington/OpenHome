@@ -133,6 +133,7 @@ except for the Japanese versions of Pokémon Red/Green/Blue/Yellow and the Japan
 
 - Pokémon Radical Red
 - Pokémon Unbound
+- Pokémon Luminescent Platinum
 
 ## Alterations to transferred Pokémon
 
@@ -154,3 +155,5 @@ those games.
 This application would not have been possible without the research done at https://projectpokemon.org/, the work done by the [PKHeX](https://github.com/kwsch/PKHeX) developers, and the sprites archived by https://pokemondb.net/ and https://www.bulbagarden.net/.
 
 Credit to the [Radical Red Team](https://www.pokecommunity.com/threads/pok%C3%A9mon-radical-red-version-4-1-released-gen-9-dlc-pokemon-character-customization-now-available.437688/) for the Radical Red logo, as well as the Pokémon sprites.
+
+Credit to Team Luminescent (https://luminescent.team/docs/features) for the PKLumiHeX program, which provided critical information about the save file structure, and for the Luminescent Platinum logo.

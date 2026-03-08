@@ -20,6 +20,7 @@ import { SAVClass } from '@openhome-core/save/util'
 import { XYSAV } from '@openhome-core/save/XYSAV'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { Dispatch, Reducer, createContext } from 'react'
+import { G8LumiSAV } from 'src/core/save/luminescentplatinum/G8LUMISAV'
 import { ZASAV } from '../../core/save/Gen89/ZASAV'
 import { OfficialSAV } from '../../core/save/interfaces'
 import { MonDisplayState } from '../hooks/useMonDisplay'
@@ -44,7 +45,11 @@ const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   SVSAV,
   ZASAV,
 ]
-const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV]
+const EXTRA_SAVE_TYPES: SAVClass[] = [
+  G3RRSAV as unknown as SAVClass,
+  G3UBSAV as unknown as SAVClass,
+  G8LumiSAV as unknown as SAVClass,
+]
 
 export function initialMonDisplayState() {
   return { filter: {}, topRightIndicator: null, showShiny: true, showItem: true }
@@ -152,13 +157,15 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
         )
       )
 
+      
       state.officialSaveTypes.forEach((st) => {
         if (!(st.saveTypeID in enabled)) {
           enabled[st.saveTypeID] = true
         }
       })
 
-      state.officialSaveTypes.forEach((st) => {
+      
+      state.extraSaveTypes.forEach((st) => {
         if (!(st.saveTypeID in enabled)) {
           enabled[st.saveTypeID] = true
         }

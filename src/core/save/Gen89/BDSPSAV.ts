@@ -194,11 +194,16 @@ export class BDSPSAV extends OfficialSAV<PB8> {
     }
   }
 
-  // TODO: make file size flexible
   static fileIsSave(bytes: Uint8Array): boolean {
     if (bytes.length < SAVE_SIZE_BYTES_MIN || bytes.length > SAVE_SIZE_BYTES_MAX) {
       return false
     }
+
+    // REJECT Luminescent Platinum saves
+    if (bytes.length > 940000 && bytes.length < 1150000) {
+      return false
+    }
+
     const dataView = new DataView(bytes.buffer)
     const versionIdentifier = dataView.getUint8(0)
 

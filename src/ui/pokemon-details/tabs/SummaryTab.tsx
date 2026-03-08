@@ -97,6 +97,15 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           <div>{mon.heldItemName}</div>
         </AttributeRow>
         <div>
+          {/* Luminescent Platinum Custom Form Badge */}
+          {'lumiFormeName' in mon && (mon as any).lumiFormeName && (
+            <AttributeTag
+              label={String((mon as any).lumiFormeName).toUpperCase()}
+              backgroundColor="#877f2a"
+              color="white"
+            />
+          )}
+
           {mon.isShiny() && (
             <AttributeTag
               icon={getPublicImageURL('icons/Shiny.png')}
