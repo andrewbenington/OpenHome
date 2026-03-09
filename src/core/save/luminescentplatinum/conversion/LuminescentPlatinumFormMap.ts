@@ -12,7 +12,7 @@ export type CustomFormInfo = {
 
 /**
  * Luminescent Platinum introduces additional forms that do not exist
- * in the standard Pokémon form tables used by OpenHome.
+ * in the official games. These forms are represented by unique formIndex
  *
  * These entries map:
  *   Pokédex number → form index → custom form metadata
