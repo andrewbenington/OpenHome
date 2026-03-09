@@ -1291,8 +1291,6 @@ impl DataSection for MostRecentSave {
     }
 }
 
-
-
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Clone)]
 pub struct PluginData {
@@ -1329,26 +1327,26 @@ impl PluginData {
         if bytes.len() < 2 {
             return Self::try_from_origin_utf8(bytes);
         }
-        
+
         if bytes[0].is_ascii_alphabetic() && bytes[1].is_ascii_alphabetic() {
             return Self::try_from_origin_utf8(bytes);
         }
 
         let form_raw = u16::from_le_bytes([bytes[0], bytes[1]]);
         let plugin_form = if form_raw == 0 { None } else { Some(form_raw) };
-        
-        let origin = String::from_utf8(bytes[2..].to_vec())
-            .map_err(Error::plugin_origin)?;
 
-        Ok(Self { 
-            plugin_origin: origin, 
-            plugin_form 
+        let origin = String::from_utf8(bytes[2..].to_vec()).map_err(Error::plugin_origin)?;
+
+        Ok(Self {
+            plugin_origin: origin,
+            plugin_form,
         })
     }
 }
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
 impl PluginData {
     #[wasm_bindgen(getter = pluginOrigin)]
     pub fn plugin_origin(&self) -> String {
