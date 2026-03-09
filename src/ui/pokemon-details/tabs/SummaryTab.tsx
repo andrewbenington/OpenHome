@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getTypes } from '@openhome-core/pkm/util'
+import { getLumiCustomForm } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import AttributeTag from '@openhome-ui/components/AttributeTag'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -98,13 +99,30 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
         </AttributeRow>
         <div>
           {/* Luminescent Platinum Custom Form Badge */}
-          {'lumiFormeName' in mon && (mon as any).lumiFormeName && (
-            <AttributeTag
-              label={String((mon as any).lumiFormeName).toUpperCase()}
-              backgroundColor="#877f2a"
-              color="white"
-            />
-          )}
+          {(() => {
+            if ('lumiFormeName' in mon && (mon as any).lumiFormeName) {
+              return (
+                <AttributeTag
+                  label={String((mon as any).lumiFormeName).toUpperCase()}
+                  backgroundColor="#877f2a"
+                  color="white"
+                />
+              )
+            }
+            if (mon.pluginOrigin === 'luminescent_platinum' && mon.pluginForm !== undefined) {
+              const customForm = getLumiCustomForm(mon.dexNum, mon.pluginForm)
+              if (customForm) {
+                return (
+                  <AttributeTag
+                    label={customForm.name.toUpperCase()}
+                    backgroundColor="#877f2a"
+                    color="white"
+                  />
+                )
+              }
+            }
+            return null
+          })()}
 
           {mon.isShiny() && (
             <AttributeTag

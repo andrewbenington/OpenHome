@@ -26,6 +26,7 @@ export const fileToSpriteFolder: Record<MonFormat | 'OHPKM', string> = {
   PK8: 'home',
   PA8: 'home',
   PB8: 'home',
+  PB8LUMI: 'home',
   PK9: 'gen9',
   PA9: 'home',
   OHPKM: 'home',

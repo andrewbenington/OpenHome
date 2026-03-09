@@ -1,4 +1,5 @@
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
+import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import { PA8, PK3, PK8 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import path from 'path'
@@ -96,6 +97,31 @@ describe('evolution and form change update ohpkm', async () => {
     mrMimeOhpkm.syncWithGameData(mrRime)
     expect(mrMimeOhpkm.dexNum).toEqual(NationalDex.MrRime)
     expect(mrMimeOhpkm.formeNum).toEqual(0)
+  })
+})
+
+describe('plugin form persistence', () => {
+  test('pluginForm survives OHPKM serialization', () => {
+    const starter = new OHPKM(new Uint8Array())
+    starter.pluginForm = 0x42
+
+    const bytes = starter.toBytes()
+    const again = OHPKM.fromBytes(bytes)
+    expect(again.pluginForm).toEqual(0x42)
+  })
+
+  test('PB8LUMI → OHPKM → bytes → OHPKM → PB8LUMI roundtrip', () => {
+    const starter = new OHPKM(new Uint8Array())
+    const lumi = new PB8LUMI(starter as any)
+    lumi.pluginForm = 0x99
+
+    const ohFromLumi = new OHPKM(lumi as any)
+    const roundBytes = ohFromLumi.toBytes()
+    const ohAgain = OHPKM.fromBytes(roundBytes)
+    expect(ohAgain.pluginForm).toEqual(0x99)
+
+    const lumi2 = new PB8LUMI(ohAgain as any)
+    expect(lumi2.pluginForm).toEqual(0x99)
   })
 })
 

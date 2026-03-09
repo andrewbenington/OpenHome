@@ -157,14 +157,12 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
         )
       )
 
-      
       state.officialSaveTypes.forEach((st) => {
         if (!(st.saveTypeID in enabled)) {
           enabled[st.saveTypeID] = true
         }
       })
 
-      
       state.extraSaveTypes.forEach((st) => {
         if (!(st.saveTypeID in enabled)) {
           enabled[st.saveTypeID] = true

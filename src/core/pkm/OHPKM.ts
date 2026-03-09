@@ -127,6 +127,9 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.gameOfOrigin = other.gameOfOrigin
       this.gameOfOriginBattle = other.gameOfOriginBattle
       this.pluginOrigin = other.pluginOrigin as PluginIdentifier | undefined
+      if (other.pluginForm !== undefined) {
+        this.pluginForm = other.pluginForm
+      }
 
       this.isEgg = other.isEgg ?? false
       this.pokerusByte = other.pokerusByte ?? 0
@@ -521,6 +524,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.pluginOriginWasm = value
   }
 
+  get pluginForm(): number | undefined {
+    return this.pluginFormWasm as number | undefined
+  }
+
+  set pluginForm(value: number | undefined) {
+    this.pluginFormWasm = value === undefined ? null : value
+  }
   // derived fields
 
   public get heightAbsolute(): number {
@@ -691,11 +701,20 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public syncWithGameData(other: PKMInterface, save?: SAV) {
+    // copy simple fields first
     this.exp = other.exp
 
     this.moves = other.moves as FourMoves
     this.movePP = adjustMovePPBetweenFormats(this, other)
     this.movePPUps = other.movePPUps as FourMoves
+
+    // preserve plugin metadata if present
+    if (other.pluginOrigin !== undefined) {
+      this.pluginOrigin = other.pluginOrigin as PluginIdentifier | undefined
+    }
+    if (other.pluginForm !== undefined) {
+      this.pluginForm = other.pluginForm
+    }
 
     if (this.dexNum !== other.dexNum && isEvolution(this, other)) {
       this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)

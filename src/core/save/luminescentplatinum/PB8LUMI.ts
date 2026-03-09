@@ -23,7 +23,8 @@ import {
 
 export default class PB8LUMI extends PB8 implements PluginPKMInterface {
   // Core plugin metadata
-  public format: 'PB8' = 'PB8'
+  //@ts-ignore
+  public format: 'PB8LUMI' = 'PB8LUMI'
   public pluginIdentifier = 'luminescent_platinum' as PluginIdentifier
   public selectColor = '#213d68'
 
@@ -36,24 +37,32 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
   public lumiFormeName?: string
 
   public pluginOrigin?: PluginIdentifier
+  public pluginForm?: number
 
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     super(arg, encrypted)
 
-    // When loading from raw save data, convert Luminescent indices to OpenHome indices
     if (arg instanceof ArrayBuffer) {
-      // Translate held item index
       this.heldItemIndex = fromLumiItemIndex(this.heldItemIndex) ?? 0
 
-      // Detect and preserve custom Luminescent forms
       const customForm = getLumiCustomForm(this.dexNum, this.formeNum)
       if (customForm) {
-        // Store the original form so it can be restored when saving
         this.lumiFormeNum = this.formeNum
         this.lumiFormeName = customForm.name
 
-        // Fallback to a base form so OpenHome processing does not break
+        this.pluginForm = this.formeNum
+
         this.formeNum = customForm.fallbackForm
+      }
+    } else {
+      if (arg.pluginForm !== undefined) {
+        this.lumiFormeNum = arg.pluginForm
+        this.pluginForm = arg.pluginForm
+
+        const customForm = getLumiCustomForm(this.dexNum, arg.pluginForm)
+        if (customForm) {
+          this.lumiFormeName = customForm.name
+        }
       }
     }
   }
