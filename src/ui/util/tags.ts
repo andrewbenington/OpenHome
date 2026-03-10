@@ -6,6 +6,8 @@
  *
  * This allows tags to persist through WASM serialization without
  * requiring new fields on the Rust struct.
+ *
+ * Eventually more robust solution may be implemented?
  */
 
 export const TAG_PRESETS = [
@@ -14,7 +16,7 @@ export const TAG_PRESETS = [
   { label: 'Trade', color: '#3b82f6' },
   { label: 'Breeding', color: '#a855f7' },
   { label: 'Favorite', color: '#ec4899' },
-  { label: 'For Sale', color: '#22c55e' },
+  { label: 'Event', color: '#06b6d4' },
 ]
 
 export const DISPLAY_COLOR_PRESETS = [
