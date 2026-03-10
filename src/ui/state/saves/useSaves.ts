@@ -68,6 +68,11 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
   releaseMonAtLocation(location: MonLocation): void
   releaseMonsById(...ids: OhpkmIdentifier[]): void
   trackedMonsToRelease: OhpkmIdentifier[]
+
+  // Bulk operations
+  moveBoxToBank(save: SAV): number
+  moveSaveToBank(save: SAV): number
+  updateMonDisplayColor(monId: string, color: string | undefined): void
 }
 
 export function useSaves(): SavesAndBanksManager {
@@ -798,6 +803,186 @@ export function useSaves(): SavesAndBanksManager {
     [loadedHomeData, openSavesDispatch]
   )
 
+  /**
+   * Moves all Pokemon from the save's current box to the bank.
+   * Returns the number of Pokemon moved.
+   */
+  const moveBoxToBank = useCallback(
+    (save: SAV): number => {
+      const currentBox = save.boxes[save.currentPCBox]
+      if (!currentBox) return 0
+
+      let movedCount = 0
+      const updatedHomeData = loadedHomeData.clone()
+      const boxSize = OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS
+      let currentBankBox = updatedHomeData.currentPCBox
+      let currentSlot = 0
+
+      // Find the first empty slot in the bank
+      while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
+        const box = updatedHomeData.getCurrentBank().getBox(currentBankBox)
+        if (!box) break
+        const emptyIndex = box.firstEmptyIndex()
+        if (emptyIndex !== undefined) {
+          currentSlot = emptyIndex
+          break
+        }
+        currentBankBox++
+      }
+
+      for (let i = 0; i < currentBox.boxSlots.length; i++) {
+        const mon = currentBox.boxSlots[i]
+        if (!mon) continue
+
+        // Find next empty slot in bank
+        while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
+          if (currentSlot < boxSize) {
+            const bankSlotEmpty = updatedHomeData.slotIsEmpty({
+              bank: updatedHomeData.currentBankIndex,
+              box: currentBankBox,
+              boxSlot: currentSlot,
+            })
+            if (bankSlotEmpty) break
+            currentSlot++
+          } else {
+            currentSlot = 0
+            currentBankBox++
+          }
+        }
+
+        // Add new box if necessary
+        if (currentBankBox >= updatedHomeData.getCurrentBankBoxes().length) {
+          updatedHomeData.addBoxCurrentBank('end')
+        }
+
+        // Convert to OHPKM and move to bank
+        const ohpkm =
+          ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, undefined)
+
+        updatedHomeData.setAtLocation(
+          {
+            bank: updatedHomeData.currentBankIndex,
+            box: currentBankBox,
+            boxSlot: currentSlot,
+          },
+          ohpkm.openhomeId
+        )
+
+        // Clear original slot in save
+        currentBox.boxSlots[i] = undefined
+        save.updatedBoxSlots.push({ box: save.currentPCBox, boxSlot: i })
+
+        movedCount++
+        currentSlot++
+      }
+
+      openSavesDispatch({ type: 'update_home_data', payload: { homeData: updatedHomeData } })
+      return movedCount
+    },
+    [loadedHomeData, ohpkmStore, openSavesDispatch]
+  )
+
+  /**
+   * Moves all Pokemon from the entire save to the bank.
+   * Returns the number of Pokemon moved.
+   */
+  const moveSaveToBank = useCallback(
+    (save: SAV): number => {
+      let totalMoved = 0
+      const updatedHomeData = loadedHomeData.clone()
+      const boxSize = OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS
+      let currentBankBox = updatedHomeData.currentPCBox
+      let currentSlot = 0
+
+      // Find the first empty slot in the bank
+      while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
+        const box = updatedHomeData.getCurrentBank().getBox(currentBankBox)
+        if (!box) break
+        const emptyIndex = box.firstEmptyIndex()
+        if (emptyIndex !== undefined) {
+          currentSlot = emptyIndex
+          break
+        }
+        currentBankBox++
+      }
+
+      for (let boxIdx = 0; boxIdx < save.boxes.length; boxIdx++) {
+        const saveBox = save.boxes[boxIdx]
+        if (!saveBox) continue
+
+        for (let slotIdx = 0; slotIdx < saveBox.boxSlots.length; slotIdx++) {
+          const mon = saveBox.boxSlots[slotIdx]
+          if (!mon) continue
+
+          // Find next empty slot in bank
+          while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
+            if (currentSlot < boxSize) {
+              const bankSlotEmpty = updatedHomeData.slotIsEmpty({
+                bank: updatedHomeData.currentBankIndex,
+                box: currentBankBox,
+                boxSlot: currentSlot,
+              })
+              if (bankSlotEmpty) break
+              currentSlot++
+            } else {
+              currentSlot = 0
+              currentBankBox++
+            }
+          }
+
+          // Add new box if necessary
+          if (currentBankBox >= updatedHomeData.getCurrentBankBoxes().length) {
+            updatedHomeData.addBoxCurrentBank('end')
+          }
+
+          // Convert to OHPKM and move to bank
+          const ohpkm =
+            ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, undefined)
+
+          updatedHomeData.setAtLocation(
+            {
+              bank: updatedHomeData.currentBankIndex,
+              box: currentBankBox,
+              boxSlot: currentSlot,
+            },
+            ohpkm.openhomeId
+          )
+
+          // Clear original slot in save
+          saveBox.boxSlots[slotIdx] = undefined
+          save.updatedBoxSlots.push({ box: boxIdx, boxSlot: slotIdx })
+
+          totalMoved++
+          currentSlot++
+        }
+      }
+
+      openSavesDispatch({ type: 'update_home_data', payload: { homeData: updatedHomeData } })
+      return totalMoved
+    },
+    [loadedHomeData, ohpkmStore, openSavesDispatch]
+  )
+
+  /**
+   * Updates the display color for a Pokemon.
+   * @param monId The OHPKM ID
+   * @param color CSS color string (e.g., '#ff0000') or undefined to clear
+   */
+  const updateMonDisplayColor = useCallback(
+    (monId: string, color: string | undefined) => {
+      if (!homeData) return
+
+      const result = ohpkmStore.tryLoadFromId(monId)
+      if (R.isErr(result)) return result
+
+      const mon = result.value
+      mon.displayColor = color
+
+      ohpkmStore.insertOrUpdate(mon)
+    },
+    [homeData, ohpkmStore]
+  )
+
   function newBoxesWithIds(ids: OhpkmIdentifier[], boxName?: string): Option<number> {
     if (ids.length === 0) return undefined
 
@@ -860,6 +1045,11 @@ export function useSaves(): SavesAndBanksManager {
     trackedMonsToRelease: openSavesState.monsToRelease.filter(
       (toRelease) => typeof toRelease === 'string'
     ),
+
+    // Bulk operations
+    moveBoxToBank,
+    moveSaveToBank,
+    updateMonDisplayColor,
   }
 }
 

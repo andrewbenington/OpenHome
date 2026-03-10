@@ -41,6 +41,34 @@
   </head>
 
   <body style="height: 100vh; overflow: hidden; margin: 0">
+    <!-- DEBUG: catch all errors and show on screen -->
+    <script>
+      ;(function () {
+        var errBox = null
+        function showErr(msg) {
+          if (!errBox) {
+            errBox = document.createElement('div')
+            errBox.style.cssText =
+              'position:fixed;top:0;left:0;right:0;z-index:99999;background:red;color:white;padding:12px;font-family:monospace;font-size:13px;white-space:pre-wrap;max-height:50vh;overflow:auto;'
+            document.body.appendChild(errBox)
+          }
+          errBox.textContent += msg + '\n'
+        }
+        window.addEventListener('error', function (e) {
+          showErr('ERROR: ' + e.message + '\n  at ' + e.filename + ':' + e.lineno + ':' + e.colno)
+        })
+        window.addEventListener('unhandledrejection', function (e) {
+          showErr(
+            'UNHANDLED REJECTION: ' + (e.reason && e.reason.stack ? e.reason.stack : e.reason)
+          )
+        })
+        window.__debugLog = function (msg) {
+          showErr('LOG: ' + msg)
+        }
+        window.__debugLog('Error trap installed')
+      })()
+    </script>
+
     <div id="root">
       <div class="loading-logo-container">
         <img src="logos/logo-full.png" style="width: 128px; height: 128px; position: absolute" />

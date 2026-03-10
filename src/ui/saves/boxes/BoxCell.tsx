@@ -30,6 +30,9 @@ interface BoxCellProps {
   dragID: string
   location: MonLocation
   ctxMenuBuilders?: CtxMenuElementBuilder[]
+  isSelected?: boolean
+  onToggleSelect?: () => void
+  multiSelectEnabled?: boolean
 }
 
 function BoxCell({
@@ -43,6 +46,9 @@ function BoxCell({
   dragID,
   location,
   ctxMenuBuilders,
+  isSelected,
+  onToggleSelect,
+  multiSelectEnabled,
 }: BoxCellProps) {
   const { filter, topRightIndicator, showItem, showShiny } = useMonDisplay()
   const backend = useContext(BackendContext)
@@ -124,6 +130,23 @@ function BoxCell({
     [location, mon]
   )
 
+  const cellBackgroundColor = useMemo(() => {
+    if (disabled || isFilteredOut) return '#555'
+    // Show selection highlight when multi-select is enabled and this cell is selected
+    if (isSelected) return '#4ade8080' // Green highlight for selected
+    // Use the Pokemon's custom display color if set
+    if (mon?.displayColor) return mon.displayColor
+    return '#6662'
+  }, [disabled, isFilteredOut, isSelected, mon?.displayColor])
+
+  const handleClick = useCallback(() => {
+    if (multiSelectEnabled && mon && onToggleSelect) {
+      onToggleSelect()
+    } else {
+      onClick()
+    }
+  }, [multiSelectEnabled, mon, onClick, onToggleSelect])
+
   return (
     <OpenHomeCtxMenu sections={[monCtxMenuItemBuilders, ctxMenuBuilders]}>
       <div
@@ -133,8 +156,8 @@ function BoxCell({
           aspectRatio: 1,
           borderRadius: 3,
           borderWidth: 1,
-          backgroundColor: disabled || isFilteredOut ? '#555' : '#6662',
-          borderColor: borderColor,
+          backgroundColor: cellBackgroundColor,
+          borderColor: isSelected ? '#4ade80' : borderColor,
           zIndex,
         }}
         onDrop={(e) => {
@@ -147,7 +170,7 @@ function BoxCell({
         {mon ? (
           <DroppableSpace dropID={dragID} dropData={location} disabled={disabled}>
             <DraggableMon
-              onClick={onClick}
+              onClick={handleClick}
               mon={mon}
               style={{
                 width: '100%',

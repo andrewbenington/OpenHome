@@ -35,16 +35,28 @@ export function usePossiblyLoadedAppState(): PossiblyLoadedAppState {
   const backend = useContext(BackendContext)
 
   if (!loading && !error && !appState) {
-    backend.getState().then(
-      R.match(
-        (state) => {
-          setAppState(state)
-          setLoading(false)
-          setError(undefined)
-        },
-        (err) => setError(err)
+    console.log('[APP_STATE] Calling backend.getState()...')
+    setLoading(true)
+    backend
+      .getState()
+      .then(
+        R.match(
+          (state) => {
+            console.log('[APP_STATE] getState() succeeded:', state)
+            setAppState(state)
+            setLoading(false)
+            setError(undefined)
+          },
+          (err) => {
+            console.error('[APP_STATE] getState() error:', err)
+            setError(err)
+          }
+        )
       )
-    )
+      .catch((e) => {
+        console.error('[APP_STATE] getState() unhandled rejection:', e)
+        setError(String(e))
+      })
   }
 
   if (!appState) {

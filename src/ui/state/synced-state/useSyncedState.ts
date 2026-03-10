@@ -61,23 +61,37 @@ export function useSyncedState<State, RustState = State>(
   }, [backend, convertRustState, identifier])
 
   const loadAndCacheState = useCallback(async () => {
-    stateGetter().then(
-      R.match(
-        (data) => {
-          onLoaded?.(data)
-          setStateCache(data)
-        },
-        (err) => setError(err)
+    console.log(`[SYNCED_STATE:${identifier}] Calling stateGetter()...`)
+    stateGetter()
+      .then(
+        R.match(
+          (data) => {
+            console.log(`[SYNCED_STATE:${identifier}] stateGetter() succeeded`)
+            onLoaded?.(data)
+            setStateCache(data)
+          },
+          (err) => {
+            console.error(`[SYNCED_STATE:${identifier}] stateGetter() error:`, err)
+            setError(err)
+          }
+        )
       )
-    )
-  }, [stateGetter, onLoaded])
+      .catch((e) => {
+        console.error(`[SYNCED_STATE:${identifier}] stateGetter() unhandled rejection:`, e)
+        setError(String(e))
+      })
+  }, [stateGetter, onLoaded, identifier])
 
   useEffect(() => {
     if (!stateCache && !loading) {
+      console.log(`[SYNCED_STATE:${identifier}] Starting load...`)
       setLoading(true)
-      loadAndCacheState().finally(() => setLoading(false))
+      loadAndCacheState().finally(() => {
+        console.log(`[SYNCED_STATE:${identifier}] loadAndCacheState finally block`)
+        setLoading(false)
+      })
     }
-  }, [loadAndCacheState, loading, stateCache])
+  }, [loadAndCacheState, loading, stateCache, identifier])
 
   if (stateCache && error === undefined) {
     return { updateState, state: stateCache, loaded: true, error }

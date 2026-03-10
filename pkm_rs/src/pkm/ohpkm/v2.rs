@@ -1,8 +1,8 @@
 use crate::pkm::ohpkm::OhpkmV1;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::pkm::ohpkm::v2_sections::{
-    BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
-    Notes, PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
+    BdspData, DisplayColor, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2,
+    MostRecentSave, Notes, PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
 };
 use crate::pkm::{Error, Result};
 
@@ -52,6 +52,7 @@ pub enum SectionTagV2 {
     PluginData,
     Notes,
     MostRecentSave,
+    DisplayColor,
 }
 
 impl SectionTagV2 {
@@ -69,7 +70,8 @@ impl SectionTagV2 {
             9 => Some(Self::PluginData),
             10 => Some(Self::Notes),
             11 => Some(Self::MostRecentSave),
-            12.. => None,
+            12 => Some(Self::DisplayColor),
+            13.. => None,
         }
     }
 
@@ -87,6 +89,7 @@ impl SectionTagV2 {
             Self::PluginData => 0,
             Self::Notes => 0,
             Self::MostRecentSave => 31,
+            Self::DisplayColor => 0,
         }
     }
 }
@@ -123,6 +126,7 @@ pub struct OhpkmV2 {
     plugin_data: Option<PluginData>,
     notes: Option<Notes>,
     most_recent_save: Option<MostRecentSave>,
+    display_color: Option<DisplayColor>,
 }
 
 impl OhpkmV2 {
@@ -140,6 +144,7 @@ impl OhpkmV2 {
             plugin_data: None,
             notes: None,
             most_recent_save: None,
+            display_color: None,
         })
     }
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -165,6 +170,7 @@ impl OhpkmV2 {
             plugin_data: PluginData::extract_from(&sectioned_data)?,
             notes: Notes::extract_from(&sectioned_data)?,
             most_recent_save: MostRecentSave::extract_from(&sectioned_data)?,
+            display_color: DisplayColor::extract_from(&sectioned_data)?,
         })
     }
 
@@ -182,6 +188,7 @@ impl OhpkmV2 {
             plugin_data: PluginData::from_v1(old),
             notes: None,
             most_recent_save: None,
+            display_color: None,
         }
     }
 
@@ -199,7 +206,8 @@ impl OhpkmV2 {
             .add_all(self.handler_data.clone())?
             .add_if_some(self.plugin_data.clone())?
             .add_if_some(self.notes.clone())?
-            .add_if_some(self.most_recent_save.clone())?;
+            .add_if_some(self.most_recent_save.clone())?
+            .add_if_some(self.display_color.clone())?;
         Ok(sectioned_data)
     }
 
@@ -1719,6 +1727,20 @@ impl OhpkmV2 {
         match value {
             Some(notes) => self.notes = Some(Notes(notes)),
             None => self.notes = None,
+        }
+    }
+
+    // Display Color (CSS color string like '#ff0000' or 'rgba(255, 0, 0, 0.5)')
+    #[wasm_bindgen(getter = displayColor)]
+    pub fn display_color(&self) -> Option<String> {
+        Some(self.display_color.clone()?.0)
+    }
+
+    #[wasm_bindgen(setter = displayColor)]
+    pub fn set_display_color(&mut self, value: Option<String>) {
+        match value {
+            Some(color) => self.display_color = Some(DisplayColor(color)),
+            None => self.display_color = None,
         }
     }
 

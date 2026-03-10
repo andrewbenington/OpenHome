@@ -20,6 +20,7 @@ export const SortTypes = [
   'Held Item',
   'Is Egg',
   'Shiny Leaves',
+  'Display Color',
 ]
 
 export type SortType = (typeof SortTypes)[number]
@@ -133,6 +134,8 @@ export function getSortFunction(
         (a.shinyLeaves?.hasCrown() ? 6 : (a.shinyLeaves?.count() ?? 0))
     case 'Held Item':
       return sortByHeldItem
+    case 'Display Color':
+      return (a, b) => ((a as any).displayColor ?? '').localeCompare((b as any).displayColor ?? '')
     default:
       return () => {
         console.error('unrecognized sort term:', sortStr)
