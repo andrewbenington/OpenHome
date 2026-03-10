@@ -519,6 +519,7 @@ mod test {
 
     use crate::gen7_alola::Pk7;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
+
     #[cfg(feature = "randomize")]
     use crate::tests::TestErrorWithSeed;
     use crate::tests::{self, TestResult};
@@ -531,7 +532,9 @@ mod test {
 
     #[test]
     fn to_from_bytes() -> TestResult<()> {
-        tests::to_from_bytes_all_in_dir::<Pk7>(&PathBuf::from("pkm_files").join("pk7"))
+        tests::to_from_bytes_all_in_dir::<Pk7>(
+            &PathBuf::from("test-files").join("pkm-files").join("pk7"),
+        )
     }
 
     #[cfg(feature = "randomize")]
@@ -547,26 +550,24 @@ mod test {
     }
 
     #[test]
-    fn is_shiny() {
-        let mon = tests::pkm_from_file::<Pk7>(
-            &PathBuf::from("pkm_files")
-                .join("pk7")
-                .join("slowpoke-shiny.pk7"),
-        )
-        .unwrap()
-        .0;
+    fn is_shiny() -> TestResult<()> {
+        let path = PathBuf::from("pk7").join("slowpoke-shiny.pk7");
+        let mon = tests::pkm_from_file::<Pk7>(&path)?.0;
         assert!(mon.is_shiny());
+
+        Ok(())
     }
 
     #[test]
-    fn nickname_garbage_preserved() {
-        let mon = tests::pkm_from_file::<Pk7>(
-            &PathBuf::from("pkm_files")
-                .join("pk7")
-                .join("pelipper-garbage-bytes.pk7"),
-        )
-        .unwrap()
-        .0;
+    fn compare_pkhex_json() -> TestResult<()> {
+        tests::compare_pkhex_json_all_in_dir::<Pk7>(&PathBuf::from("pk7"))
+    }
+
+    #[test]
+    fn nickname_garbage_preserved() -> TestResult<()> {
+        let mon =
+            tests::pkm_from_file::<Pk7>(&PathBuf::from("pk7").join("pelipper-garbage-bytes.pk7"))?
+                .0;
 
         // 'r' at position 14 should be leftover from 'Pelipper'
         assert_eq!(mon.nickname.bytes()[14], b'r');
@@ -575,29 +576,23 @@ mod test {
 
         // leftover 'r' should be preserved after conversion to/from OHPKM
         assert_eq!(mon_recreated.nickname.bytes()[14], b'r');
+
+        Ok(())
     }
 
     #[test]
-    fn checksum() {
-        let mon = tests::pkm_from_file::<Pk7>(
-            &PathBuf::from("pkm_files")
-                .join("pk7")
-                .join("primarina-garbage-bytes.pk7"),
-        )
-        .unwrap()
-        .0;
+    fn checksum() -> TestResult<()> {
+        let mon =
+            tests::pkm_from_file::<Pk7>(&PathBuf::from("pk7").join("primarina-garbage-bytes.pk7"))?
+                .0;
         assert_eq!(mon.checksum, mon.calculate_checksum());
+
+        Ok(())
     }
 
     #[test]
     fn from_ohpkm() -> TestResult<()> {
-        let mon = tests::pkm_from_file::<OhpkmV2>(
-            &PathBuf::from("pkm_files")
-                .join("ohpkm")
-                .join("Machamp.ohpkm"),
-        )
-        .unwrap()
-        .0;
+        let mon = tests::pkm_from_file::<OhpkmV2>(&PathBuf::from("ohpkm").join("Machamp.ohpkm"))?.0;
 
         let _ = Pk7::from_ohpkm(&mon);
 
@@ -610,11 +605,8 @@ mod test {
     #[test]
     fn from_ohpkm_ability_change() -> TestResult<()> {
         let mon = tests::pkm_from_file::<OhpkmV2>(
-            &PathBuf::from("pkm_files")
-                .join("ohpkm")
-                .join("gallade-sharpness-alpha.ohpkm"),
-        )
-        .unwrap()
+            &PathBuf::from("ohpkm").join("gallade-sharpness-alpha.ohpkm"),
+        )?
         .0;
 
         assert_eq!(mon.ability_index().get(), SHARPNESS);
@@ -629,6 +621,8 @@ mod test {
 
     #[test]
     fn to_from_ohpkm() -> TestResult<()> {
-        tests::to_from_ohpkm_all_in_dir::<Pk7>(&PathBuf::from("pkm_files").join("pk7"))
+        tests::to_from_ohpkm_all_in_dir::<Pk7>(
+            &PathBuf::from("test-files").join("pkm-files").join("pk7"),
+        )
     }
 }

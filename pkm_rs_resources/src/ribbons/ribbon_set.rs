@@ -114,13 +114,12 @@ where
     where
         S: serde::Serializer,
     {
-        let strings: Vec<_> = self
+        let ribbon_strings: Vec<_> = self
             .get_ribbons()
             .into_iter()
             .map(|r| r.to_string())
             .collect();
-        let comma_separated = strings.join(", ");
-        serializer.serialize_str(&format!("[{comma_separated}]"))
+        ribbon_strings.serialize(serializer)
     }
 }
 

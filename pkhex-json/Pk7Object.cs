@@ -1,0 +1,80 @@
+using PKHeX.Core;
+
+public static class Pk7Object
+{
+
+  public static object Build(PK7 pk)
+  {
+    pk.ResetPartyStats();
+    var languageCode = Language.GetLanguageCode((LanguageID)pk.Language);
+    var strings = GameInfo.GetStrings(languageCode);
+    return new
+    {
+      encryption_constant = pk.EncryptionConstant,
+      sanity = 0,
+      checksum = pk.Checksum,
+      species_and_forme = Util.SpeciesAndForme(pk),
+      held_item_index = pk.HeldItem,
+      trainer_id = pk.TID16,
+      secret_id = pk.SID16,
+      exp = pk.EXP,
+      ability_index = strings.abilitylist.GetValue(pk.Ability),
+      ability_num = Util.FormatAbilityNum(pk.AbilityNumber),
+      markings = Util.MarkingsSixShapesColors(pk),
+      personality_value = pk.PID,
+      nature = pk.Nature.ToString(),
+      is_fateful_encounter = pk.FatefulEncounter,
+      gender = Util.FormatGender(pk.Gender),
+      evs = Util.EVs(pk),
+      contest = Util.ContestStats(pk),
+      resort_event_status = pk.ResortEventStatus,
+      pokerus_byte = pk.PokerusState,
+      super_training_flags = pk.SuperTrainBitFlags,
+      ribbons = Util.GetRibbons(pk),
+      contest_memory_count = pk.RibbonCountMemoryContest,
+      battle_memory_count = pk.RibbonCountMemoryBattle,
+      super_training_dist_flags = pk.Data[0x72],
+      form_argument = pk.FormArgument,
+      nickname = pk.Nickname,
+      moves = Util.AllMoveData(pk, strings),
+      relearn_moves = Util.RelearnMoves(pk, strings),
+      secret_super_training_unlocked = pk.SecretSuperTrainingUnlocked,
+      secret_super_training_complete = pk.SuperTrainSupremelyTrained,
+      ivs = Util.IVs(pk),
+      is_egg = pk.IsEgg,
+      is_nicknamed = pk.IsNicknamed,
+      handler_name = pk.HandlingTrainerName,
+      handler_gender = Util.FormatGender(pk.HandlingTrainerGender),
+      is_current_handler = pk.CurrentHandler == 1,
+      geolocations = Util.Geolocations(pk),
+      handler_friendship = pk.HandlingTrainerFriendship,
+      handler_affection = pk.HandlingTrainerAffection,
+      handler_memory = Util.HandlerMemoryData(pk),
+      fullness = pk.Fullness,
+      enjoyment = pk.Enjoyment,
+      trainer_name = pk.OriginalTrainerName,
+      trainer_friendship = pk.OriginalTrainerFriendship,
+      trainer_affection = pk.OriginalTrainerAffection,
+      trainer_memory = Util.TrainerMemoryData(pk),
+      egg_date = pk.EggMetDate,
+      met_date = pk.MetDate.ToString(),
+      egg_location_index = pk.EggLocation,
+      met_location_index = pk.MetLocation,
+      ball = Util.FormatBall(pk, strings),
+      met_level = pk.MetLevel,
+      trainer_gender = Util.FormatGender(pk.OriginalTrainerGender),
+      hyper_training = Util.HyperTrainingData(pk),
+      game_of_origin = strings.gamelist.GetValue((int)pk.Version),
+      country = pk.Country,
+      region = pk.Region,
+      console_region = pk.ConsoleRegion,
+      language = Util.FormatLanguageName(pk.Language),
+      status_condition = pk.Status_Condition,
+      stat_level = pk.Stat_Level,
+      form_argument_remain = pk.FormArgumentRemain,
+      form_argument_elapsed = pk.FormArgumentElapsed,
+      current_hp = pk.Stat_HPCurrent,
+      stats = Util.Stats(pk),
+    };
+  }
+}
