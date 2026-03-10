@@ -149,7 +149,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
 
               if (customFormName) {
                 return (
-                  <span style={{ fontWeight: 'bold', color: '#D4AF37' }}>
+                  <span className="rom-hack-form-name" style={{ color: '#FFC300' }}>
                     {baseFormName} - {customFormName}
                   </span>
                 )
