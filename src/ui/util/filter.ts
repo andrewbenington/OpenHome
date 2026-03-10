@@ -2,6 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { isMegaStone, isZCrystal } from '@openhome-core/pkm/util'
 import { Gender, MetadataLookup, OriginGame } from '@pkm-rs/pkg'
 import { Type } from '@pokemon-resources/index'
+import { parseTag } from './tags'
 
 export interface Filter {
   dexNumber?: number
@@ -17,6 +18,8 @@ export interface Filter {
   ball?: number
   isEgg?: boolean
   shinyLeaves?: number
+  tag?: string
+  displayColor?: string
 }
 
 export type HeldItemFilter = number | HeldItemCategory
@@ -70,6 +73,29 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
         return 'isSquareShiny' in mon && mon.isSquareShiny()
       case 'Star Shiny':
         return 'isSquareShiny' in mon && mon.isShiny() && !mon.isSquareShiny()
+    }
+  }
+
+  if (filter.tag !== undefined) {
+    if (filter.tag === 'Any Tag') {
+      const tag = 'notes' in mon ? parseTag(mon.notes as string) : undefined
+      if (!tag) return false
+    } else if (filter.tag === 'No Tag') {
+      const tag = 'notes' in mon ? parseTag(mon.notes as string) : undefined
+      if (tag) return false
+    } else {
+      const tag = 'notes' in mon ? parseTag(mon.notes as string) : undefined
+      if (!tag || tag.label !== filter.tag) return false
+    }
+  }
+
+  if (filter.displayColor !== undefined) {
+    if (filter.displayColor === 'Any Color') {
+      if (!('displayColor' in mon) || !mon.displayColor) return false
+    } else if (filter.displayColor === 'No Color') {
+      if ('displayColor' in mon && mon.displayColor) return false
+    } else {
+      if (!('displayColor' in mon) || mon.displayColor !== filter.displayColor) return false
     }
   }
 

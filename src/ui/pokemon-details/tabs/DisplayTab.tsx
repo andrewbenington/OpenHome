@@ -1,32 +1,10 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { useSaves } from '@openhome-ui/state/saves'
-import { parseTag } from '@openhome-ui/util/tags'
+import { DISPLAY_COLOR_PRESETS, TAG_PRESETS, parseTag } from '@openhome-ui/util/tags'
 import { Badge, Button, Flex, TextField } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
 import useDebounce from 'src/ui/hooks/useDebounce'
-
-// Predefined color options for quick selection
-const PRESET_COLORS = [
-  { name: 'Red', color: '#ef444480' },
-  { name: 'Orange', color: '#f9731680' },
-  { name: 'Yellow', color: '#eab30880' },
-  { name: 'Green', color: '#22c55e80' },
-  { name: 'Blue', color: '#3b82f680' },
-  { name: 'Purple', color: '#a855f780' },
-  { name: 'Pink', color: '#ec489980' },
-  { name: 'Cyan', color: '#06b6d480' },
-]
-
-// Predefined tag presets
-const TAG_PRESETS = [
-  { label: 'Competitive', color: '#ef4444' },
-  { label: 'Shiny Hunt', color: '#eab308' },
-  { label: 'Trade', color: '#3b82f6' },
-  { label: 'Breeding', color: '#a855f7' },
-  { label: 'Favorite', color: '#ec4899' },
-  { label: 'For Sale', color: '#22c55e' },
-]
 
 interface DisplayTabProps {
   mon: OHPKM
@@ -111,7 +89,7 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
         <div>
           <div style={{ marginBottom: 8, fontSize: 14, color: '#aaa' }}>Quick Colors</div>
           <Flex wrap="wrap" gap="2">
-            {PRESET_COLORS.map(({ name, color }) => (
+            {DISPLAY_COLOR_PRESETS.map(({ name, color }) => (
               <button
                 key={name}
                 onClick={() => handlePresetClick(color)}

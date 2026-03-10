@@ -21,6 +21,7 @@ export const SortTypes = [
   'Is Egg',
   'Shiny Leaves',
   'Display Color',
+  'Tag',
 ]
 
 export type SortType = (typeof SortTypes)[number]
@@ -134,6 +135,15 @@ export function getSortFunction(
         (a.shinyLeaves?.hasCrown() ? 6 : (a.shinyLeaves?.count() ?? 0))
     case 'Held Item':
       return sortByHeldItem
+    case 'Tag':
+      return (a, b) => {
+        const getTag = (mon: PKMInterface) => {
+          if (!('notes' in mon) || !mon.notes) return ''
+          const match = (mon.notes as string).match(/^<!--tag:(.+?):(.+?)-->\n?/)
+          return match ? match[1] : ''
+        }
+        return getTag(a).localeCompare(getTag(b))
+      }
     case 'Display Color':
       return (a, b) => ((a as any).displayColor ?? '').localeCompare((b as any).displayColor ?? '')
     default:

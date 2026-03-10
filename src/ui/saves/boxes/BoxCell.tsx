@@ -14,21 +14,13 @@ import { useItems } from '@openhome-ui/state/items'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
+import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Button, Dialog, Flex, TextField, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { useMonDisplay } from 'src/ui/hooks/useMonDisplay'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
-
-const TAG_PRESETS = [
-  { label: 'Competitive', color: '#ef4444' },
-  { label: 'Shiny Hunt', color: '#eab308' },
-  { label: 'Trade', color: '#3b82f6' },
-  { label: 'Breeding', color: '#a855f7' },
-  { label: 'Favorite', color: '#ec4899' },
-  { label: 'For Sale', color: '#22c55e' },
-]
 
 interface BoxCellProps {
   onClick: () => void
@@ -64,7 +56,7 @@ function BoxCell({
   const { filter, topRightIndicator, showItem, showShiny } = useMonDisplay()
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
-  const { releaseMonAtLocation, setMonNickname, updateMonTag } = useSaves()
+  const { releaseMonAtLocation, setMonNickname, updateMonTag, updateMonDisplayColor } = useSaves()
   const { moveMonItemToBag } = useItems()
   const [renameOpen, setRenameOpen] = useState(false)
   const [renameValue, setRenameValue] = useState('')
@@ -143,7 +135,7 @@ function BoxCell({
     if (!mon || !('openhomeId' in mon)) return undefined
     const monId = (mon as any).openhomeId as string
 
-    const builder = SubmenuBuilder.fromLabel('Add Tag')
+    const builder = SubmenuBuilder.fromLabel('Set Tag')
     for (const preset of TAG_PRESETS) {
       builder.withBuilder(
         ItemBuilder.fromLabel(preset.label).withAction(() =>
@@ -157,11 +149,32 @@ function BoxCell({
     return builder
   }, [mon, updateMonTag])
 
+  const displayColorSubmenu = useMemo(() => {
+    if (!mon || !('openhomeId' in mon)) return undefined
+    const monId = (mon as any).openhomeId as string
+
+    const builder = SubmenuBuilder.fromLabel('Set Display Color')
+    for (const preset of DISPLAY_COLOR_PRESETS) {
+      builder.withBuilder(
+        ItemBuilder.fromLabel(preset.name).withAction(() =>
+          updateMonDisplayColor(monId, preset.color)
+        )
+      )
+    }
+    builder.withBuilder(
+      ItemBuilder.fromLabel('Clear Display Color').withAction(() =>
+        updateMonDisplayColor(monId, undefined)
+      )
+    )
+    return builder
+  }, [mon, updateMonDisplayColor])
+
   const monCtxMenuItemBuilders = mon
     ? [
         LabelBuilder.fromMon(mon),
         ItemBuilder.fromLabel('Rename').withAction(openRenameDialog),
         tagSubmenu,
+        displayColorSubmenu,
         mon.heldItemIndex > 0
           ? ItemBuilder.fromLabel('Move Item to Bag').withAction(() => moveMonItemToBag(location))
           : undefined,
