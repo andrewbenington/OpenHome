@@ -21,6 +21,18 @@ start: ensure-dependencies
 build-appimage:
 	@npx tauri build -b appimage
 
+.PHONY: build-windows
+build-windows: # Build Windows installer (.exe setup)
+	@npx tauri build --bundles nsis
+
+.PHONY: install
+install: # Alias: build Windows installer (.exe setup)
+	@$(MAKE) build-windows
+
+.PHONY: build-windows-exe
+build-windows-exe: # Build standalone Windows app (.exe only)
+	@cd src-tauri && cargo build --release
+
 .PHONY: bundle-appimage
 bundle-appimage:
 	@npx tauri bundle -b appimage

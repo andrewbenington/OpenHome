@@ -66,10 +66,16 @@ type OhTauriApi = {
   remove_dangling(): null
 
   get_ohpkm_store(): StringToB64
-  add_to_ohpkm_store(updates: StringToBytes): null
+  add_to_ohpkm_store(updates: StringToBytes): string[]
+  compute_openhome_id_from_ohpkm_bytes(bytes: Uint8Array): string
+  get_reward_template_bytes(rewardId: string): number[]
+  load_progression(): JSONObject | null
+  write_progression(progression: JSONObject): null
+  reset_progression(): null
 
   get_pokedex(): Pokedex
   update_pokedex(updates: PokedexUpdate[]): null
+  reset_pokedex(): null
 
   start_transaction(): null
   rollback_transaction(): null
@@ -119,8 +125,28 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('get_ohpkm_store')
   },
 
-  add_to_ohpkm_store(updates: StringToBytes): Promise<Errorable<null>> {
+  add_to_ohpkm_store(updates: StringToBytes): Promise<Errorable<string[]>> {
     return invokeAndCatch('add_to_ohpkm_store', { updates })
+  },
+
+  compute_openhome_id_from_ohpkm_bytes(bytes: Uint8Array): Promise<Errorable<string>> {
+    return invokeAndCatch('compute_openhome_id_from_ohpkm_bytes', { bytes })
+  },
+
+  get_reward_template_bytes(rewardId: string) {
+    return invokeAndCatch('get_reward_template_bytes', { rewardId })
+  },
+
+  load_progression() {
+    return invokeAndCatch('load_progression')
+  },
+
+  write_progression(progression: JSONObject) {
+    return invokeAndCatch('write_progression', { progression })
+  },
+
+  reset_progression() {
+    return invokeAndCatch('reset_progression')
   },
 
   get_pokedex() {
@@ -129,6 +155,10 @@ export const Commands: OhTauriApiNoThrow = {
 
   update_pokedex(updates: PokedexUpdate[]) {
     return invokeAndCatch('update_pokedex', { updates })
+  },
+
+  reset_pokedex() {
+    return invokeAndCatch('reset_pokedex')
   },
 
   get_storage_file_json(relativePath: string) {

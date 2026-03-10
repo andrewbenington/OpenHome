@@ -38,7 +38,9 @@ async function pathDataFromRaw(raw: string): Promise<PathData> {
 
 type OnDropEvent = Event<{ position: { x: number; y: number }; paths: string[] }>
 
-export const TauriBackend: BackendInterface = {
+export const TauriBackend: BackendInterface & {
+  computeOpenhomeIdFromBytes: (bytes: Uint8Array) => Promise<Errorable<string>>
+} = {
   /* past gen identifier lookups */
   loadLookups: Commands.get_lookups,
   addToLookups: Commands.add_to_lookups,
@@ -62,6 +64,51 @@ export const TauriBackend: BackendInterface = {
       Object.fromEntries(
         Object.entries(updates).map(([identifier, ohpkm]) => [identifier, ohpkm.toByteArray()])
       )
+    ) as Promise<Errorable<null>>
+  },
+  computeOpenhomeIdFromBytes: function (bytes: Uint8Array): Promise<Errorable<string>> {
+    return Commands.compute_openhome_id_from_ohpkm_bytes(bytes)
+  },
+  getRewardTemplateBytes: function (rewardId: string): Promise<Errorable<Uint8Array>> {
+    return Commands.get_reward_template_bytes(rewardId).then(
+      R.map((bytes) => new Uint8Array(bytes))
+    )
+  },
+
+  loadProgression: function (_profileId: string): Promise<Errorable<string | null>> {
+    return Commands.load_progression().then(
+      R.map((progression) => (progression ? JSON.stringify(progression) : null))
+    )
+  },
+
+  writeProgression: async function (_profileId: string, json: string): Promise<Errorable<void>> {
+    let progression: JSONObject
+
+    try {
+      progression = JSON.parse(json) as JSONObject
+    } catch {
+      return R.Err('progression json is malformed')
+    }
+
+    return Commands.write_progression(progression).then(R.map(() => undefined))
+  },
+  resetProgression: async function (): Promise<Errorable<null>> {
+    return Commands.reset_progression().then(R.map(() => null))
+  },
+  resetPokedex: async function (): Promise<Errorable<null>> {
+    return Commands.reset_pokedex().then(R.map(() => null))
+  },
+  deleteStorageFiles: async function (relativePaths: string[]): Promise<Errorable<null>> {
+    return Commands.delete_storage_files(relativePaths).then(
+      R.flatMap((deletionResults) => {
+        for (const [file, result] of Object.entries(deletionResults)) {
+          if (isRustErr(result)) {
+            return R.Err(`Could not delete ${file}: ${result.Err}`)
+          }
+        }
+
+        return R.Ok(null)
+      })
     )
   },
   deleteHomeMons: async function (identifiers: string[]): Promise<Errorable<null>> {
