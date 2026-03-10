@@ -7,17 +7,28 @@ import {
   ItemBuilder,
   LabelBuilder,
   OpenHomeCtxMenu,
+  SubmenuBuilder,
 } from '@openhome-ui/components/context-menu'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { useItems } from '@openhome-ui/state/items'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { useCallback, useContext, useMemo } from 'react'
+import { Button, Dialog, Flex, TextField, VisuallyHidden } from '@radix-ui/themes'
+import { useCallback, useContext, useMemo, useState } from 'react'
 import { useMonDisplay } from 'src/ui/hooks/useMonDisplay'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
+
+const TAG_PRESETS = [
+  { label: 'Competitive', color: '#ef4444' },
+  { label: 'Shiny Hunt', color: '#eab308' },
+  { label: 'Trade', color: '#3b82f6' },
+  { label: 'Breeding', color: '#a855f7' },
+  { label: 'Favorite', color: '#ec4899' },
+  { label: 'For Sale', color: '#22c55e' },
+]
 
 interface BoxCellProps {
   onClick: () => void
@@ -53,8 +64,10 @@ function BoxCell({
   const { filter, topRightIndicator, showItem, showShiny } = useMonDisplay()
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
-  const { releaseMonAtLocation } = useSaves()
+  const { releaseMonAtLocation, setMonNickname, updateMonTag } = useSaves()
   const { moveMonItemToBag } = useItems()
+  const [renameOpen, setRenameOpen] = useState(false)
+  const [renameValue, setRenameValue] = useState('')
 
   const isFilteredOut = useMemo(() => {
     return (
@@ -113,9 +126,42 @@ function BoxCell({
     }
   }
 
+  const openRenameDialog = useCallback(() => {
+    if (!mon) return
+    setRenameValue(mon.nickname)
+    setRenameOpen(true)
+  }, [mon])
+
+  const confirmRename = useCallback(() => {
+    if (renameValue.trim()) {
+      setMonNickname(renameValue.trim(), location)
+    }
+    setRenameOpen(false)
+  }, [renameValue, location, setMonNickname])
+
+  const tagSubmenu = useMemo(() => {
+    if (!mon || !('openhomeId' in mon)) return undefined
+    const monId = (mon as any).openhomeId as string
+
+    const builder = SubmenuBuilder.fromLabel('Add Tag')
+    for (const preset of TAG_PRESETS) {
+      builder.withBuilder(
+        ItemBuilder.fromLabel(preset.label).withAction(() =>
+          updateMonTag(monId, preset.label, preset.color)
+        )
+      )
+    }
+    builder.withBuilder(
+      ItemBuilder.fromLabel('Clear Tag').withAction(() => updateMonTag(monId, undefined, undefined))
+    )
+    return builder
+  }, [mon, updateMonTag])
+
   const monCtxMenuItemBuilders = mon
     ? [
         LabelBuilder.fromMon(mon),
+        ItemBuilder.fromLabel('Rename').withAction(openRenameDialog),
+        tagSubmenu,
         mon.heldItemIndex > 0
           ? ItemBuilder.fromLabel('Move Item to Bag').withAction(() => moveMonItemToBag(location))
           : undefined,
@@ -147,49 +193,87 @@ function BoxCell({
     }
   }, [multiSelectEnabled, mon, onClick, onToggleSelect])
 
+  const handleMouseEnter = useCallback(
+    (e: React.MouseEvent) => {
+      if (multiSelectEnabled && e.buttons === 1 && mon && onToggleSelect && !isSelected) {
+        onToggleSelect()
+      }
+    },
+    [multiSelectEnabled, mon, onToggleSelect, isSelected]
+  )
+
   return (
-    <OpenHomeCtxMenu sections={[monCtxMenuItemBuilders, ctxMenuBuilders]}>
-      <div
-        style={{
-          padding: 0,
-          width: '100%',
-          aspectRatio: 1,
-          borderRadius: 3,
-          borderWidth: 1,
-          backgroundColor: cellBackgroundColor,
-          borderColor: isSelected ? '#4ade80' : borderColor,
-          zIndex,
-        }}
-        onDrop={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-          onDropFromFiles(e.dataTransfer.files)
-        }}
-        title={disabledReason}
-      >
-        {mon ? (
-          <DroppableSpace dropID={dragID} dropData={location} disabled={disabled}>
-            <DraggableMon
-              onClick={handleClick}
-              mon={mon}
-              style={{
-                width: '100%',
-                height: '100%',
-                ...getBackgroundDetails(),
+    <>
+      <OpenHomeCtxMenu sections={[monCtxMenuItemBuilders, ctxMenuBuilders]}>
+        <div
+          style={{
+            padding: 0,
+            width: '100%',
+            aspectRatio: 1,
+            borderRadius: 3,
+            borderWidth: 1,
+            backgroundColor: cellBackgroundColor,
+            borderColor: isSelected ? '#4ade80' : borderColor,
+            zIndex,
+          }}
+          onDrop={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            onDropFromFiles(e.dataTransfer.files)
+          }}
+          onMouseEnter={handleMouseEnter}
+          title={disabledReason}
+        >
+          {mon ? (
+            <DroppableSpace dropID={dragID} dropData={location} disabled={disabled}>
+              <DraggableMon
+                onClick={handleClick}
+                mon={mon}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  ...getBackgroundDetails(),
+                }}
+                dragData={dragData}
+                dragID={dragID}
+                disabled={disabled || isFilteredOut}
+                topRightIndicator={topRightIndicator}
+                showItem={showItem}
+                showShiny={showShiny}
+              />
+            </DroppableSpace>
+          ) : (
+            <DroppableSpace dropID={dragID} dropData={location} disabled={disabled} />
+          )}
+        </div>
+      </OpenHomeCtxMenu>
+      <Dialog.Root open={renameOpen} onOpenChange={setRenameOpen}>
+        <Dialog.Content maxWidth="360px" style={{ padding: 16, borderRadius: 8 }}>
+          <VisuallyHidden>
+            <Dialog.Title>Rename Pokémon</Dialog.Title>
+            <Dialog.Description>Enter a new nickname for this Pokémon</Dialog.Description>
+          </VisuallyHidden>
+          <Flex direction="column" gap="3">
+            <TextField.Root
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              placeholder="Nickname"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') confirmRename()
+                if (e.key === 'Escape') setRenameOpen(false)
               }}
-              dragData={dragData}
-              dragID={dragID}
-              disabled={disabled || isFilteredOut}
-              topRightIndicator={topRightIndicator}
-              showItem={showItem}
-              showShiny={showShiny}
             />
-          </DroppableSpace>
-        ) : (
-          <DroppableSpace dropID={dragID} dropData={location} disabled={disabled} />
-        )}
-      </div>
-    </OpenHomeCtxMenu>
+            <Flex gap="2" justify="end">
+              <Button variant="soft" color="gray" onClick={() => setRenameOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={confirmRename}>Save</Button>
+            </Flex>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
+    </>
   )
 }
 

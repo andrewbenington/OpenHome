@@ -1,20 +1,23 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { useSaves } from '@openhome-ui/state/saves'
+import { encodeTagInNotes, parseTag, stripTagFromNotes } from '@openhome-ui/util/tags'
 import { TextArea } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
 import useDebounce from 'src/ui/hooks/useDebounce'
 
 export default function NotesDisplay(props: { mon: OHPKM }) {
   const { mon } = props
-  const [notesText, setNotesText] = useState(mon.notes ?? '')
+  const [notesText, setNotesText] = useState(stripTagFromNotes(mon.notes))
   const { updateMonNotes } = useSaves()
 
   useEffect(() => {
-    setNotesText(mon.notes ?? '')
+    setNotesText(stripTagFromNotes(mon.notes))
   }, [mon])
 
   const debouncedNotesUpdate = useDebounce((notes: string) => {
-    updateMonNotes(mon.openhomeId, notes)
+    // Preserve any existing tag prefix when saving user notes
+    const existingTag = parseTag(mon.notes)
+    updateMonNotes(mon.openhomeId, encodeTagInNotes(existingTag, notes))
   }, 500)
 
   return (

@@ -60,8 +60,7 @@ export default function HomeBoxDisplay() {
   const [editingBoxName, setEditingBoxName] = useState('')
   const isDev = useIsDev()
   const [debugMode, setDebugMode] = useState(false)
-  const { dragState, toggleMultiSelect, toggleSelection, isSelected, clearSelections } =
-    useDragAndDrop()
+  const { dragState, toggleMultiSelect } = useDragAndDrop()
 
   const homeData = savesAndBanks.homeData
 

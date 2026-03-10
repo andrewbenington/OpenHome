@@ -9,6 +9,7 @@ import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { colorForType, colorIsDark } from '@openhome-ui/util/color'
+import { parseTag } from '@openhome-ui/util/tags'
 import { genderFromBool, getPluginColor, MetadataLookup } from '@pkm-rs/pkg'
 import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
@@ -18,6 +19,7 @@ import useMonSprite from '../useMonSprite'
 
 const SummaryDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
+  const tag = useMemo(() => parseTag('notes' in mon ? (mon as any).notes : undefined), [mon])
   const spriteResult = useMonSprite({
     dexNum: mon.dexNum,
     formeNum: mon.formeNum,
@@ -87,6 +89,19 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           <Badge variant="solid" color="gray" ml="2" size="1">
             {mon.languageString}
           </Badge>
+          {tag && (
+            <Badge
+              variant="solid"
+              ml="2"
+              size="1"
+              style={{
+                backgroundColor: tag.color ?? '#888',
+                color: '#fff',
+              }}
+            >
+              {tag.label}
+            </Badge>
+          )}
         </div>
         <AttributeRow label="Item" justifyEnd>
           {mon.heldItemName !== 'None' && (

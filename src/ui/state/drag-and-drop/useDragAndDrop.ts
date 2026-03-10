@@ -75,6 +75,30 @@ export default function useDragAndDrop() {
     [setDragState]
   )
 
+  const setSelection = useCallback(
+    (location: MonLocation, select: boolean) => {
+      setDragState((prev) => {
+        const isSelected = prev.selectedLocations.some((loc) => locationsEqual(loc, location))
+        if (isSelected === select) return prev
+
+        if (!select) {
+          return {
+            ...prev,
+            selectedLocations: prev.selectedLocations.filter(
+              (loc) => !locationsEqual(loc, location)
+            ),
+          }
+        } else {
+          return {
+            ...prev,
+            selectedLocations: [...prev.selectedLocations, location],
+          }
+        }
+      })
+    },
+    [setDragState]
+  )
+
   const clearSelections = useCallback(() => {
     setDragState((prev) => {
       return { ...prev, selectedLocations: [] }
@@ -97,6 +121,7 @@ export default function useDragAndDrop() {
     toggleMultiSelect,
     setMultiSelectEnabled,
     toggleSelection,
+    setSelection,
     clearSelections,
     isSelected,
   }

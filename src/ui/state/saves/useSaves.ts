@@ -16,6 +16,7 @@ import { AddBoxLocation, BankBoxCoordinates, OpenHomeBanks } from 'src/core/save
 import { displayIndexAdder, isBattleFormeItem } from '../../../core/pkm/util'
 import { BackendContext } from '../../backend/backendContext'
 import { PokedexUpdate } from '../../util/pokedex'
+import { encodeTagInNotes, stripTagFromNotes } from '../../util/tags'
 import { AppInfoContext } from '../appInfo'
 import { OhpkmStoreData } from '../ohpkm'
 import { IdentifierNotPresentError, useOhpkmStore } from '../ohpkm/useOhpkmStore'
@@ -60,6 +61,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
 
   getMonAtLocation(location: MonLocation): PKMInterface | OHPKM | undefined
   setMonHeldItem(item: Item | undefined, location: MonLocation): void
+  setMonNickname(nickname: string, location: MonLocation): void
   updateMonNotes(monId: string, notes: string | undefined): void
   updateMonMarkings(monId: string, markings: MarkingsSixShapesWithColor): void
   moveMon(source: MonWithLocation, dest: MonLocation): void
@@ -73,6 +75,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
   moveBoxToBank(save: SAV): number
   moveSaveToBank(save: SAV): number
   updateMonDisplayColor(monId: string, color: string | undefined): void
+  updateMonTag(monId: string, tag: string | undefined, tagColor: string | undefined): void
 }
 
 export function useSaves(): SavesAndBanksManager {
@@ -671,6 +674,34 @@ export function useSaves(): SavesAndBanksManager {
     [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore, saveFromIdentifier]
   )
 
+  const setMonNickname = useCallback(
+    (nickname: string, location: MonLocation) => {
+      let ohpkm: OHPKM
+      if (location.isHome) {
+        const identifier = getMonAtHomeLocation(location)
+        if (!identifier) return
+
+        const result = ohpkmStore.tryLoadFromId(identifier)
+        if (R.isErr(result)) return
+
+        ohpkm = result.value
+      } else {
+        const mon = getMonAtSaveLocation(location)
+        if (!mon) return
+
+        const save = saveFromIdentifier(location.saveIdentifier)
+        ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, save)
+
+        save.boxes[location.box].boxSlots[location.boxSlot] = save.convertOhpkm(ohpkm)
+        save.updatedBoxSlots.push({ box: location.box, boxSlot: location.boxSlot })
+      }
+
+      ohpkm.nickname = nickname
+      ohpkmStore.insertOrUpdate(ohpkm)
+    },
+    [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore, saveFromIdentifier]
+  )
+
   const updateMonNotes = useCallback(
     (monId: string, notes: string | undefined) => {
       if (!homeData) return
@@ -983,6 +1014,30 @@ export function useSaves(): SavesAndBanksManager {
     [homeData, ohpkmStore]
   )
 
+  /**
+   * Updates the custom tag for a Pokemon.
+   * Tags are encoded as a prefix in the notes field so they survive WASM serialization.
+   * @param monId The OHPKM ID
+   * @param tag Tag label string (e.g., 'Competitive') or undefined to clear
+   * @param tagColor CSS color string for the tag badge
+   */
+  const updateMonTag = useCallback(
+    (monId: string, tag: string | undefined, tagColor: string | undefined) => {
+      if (!homeData) return
+
+      const result = ohpkmStore.tryLoadFromId(monId)
+      if (R.isErr(result)) return result
+
+      const mon = result.value
+      const userNotes = stripTagFromNotes(mon.notes)
+      const newTag = tag && tagColor ? { label: tag, color: tagColor } : undefined
+      mon.notes = encodeTagInNotes(newTag, userNotes)
+
+      ohpkmStore.insertOrUpdate(mon)
+    },
+    [homeData, ohpkmStore]
+  )
+
   function newBoxesWithIds(ids: OhpkmIdentifier[], boxName?: string): Option<number> {
     if (ids.length === 0) return undefined
 
@@ -1035,6 +1090,7 @@ export function useSaves(): SavesAndBanksManager {
 
     getMonAtLocation,
     setMonHeldItem,
+    setMonNickname,
     updateMonNotes,
     updateMonMarkings,
     moveMon,
@@ -1050,6 +1106,7 @@ export function useSaves(): SavesAndBanksManager {
     moveBoxToBank,
     moveSaveToBank,
     updateMonDisplayColor,
+    updateMonTag,
   }
 }
 
