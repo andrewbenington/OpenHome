@@ -83,8 +83,7 @@ export default function AutoScanToast() {
       for (const [dir, label] of Array.from(dirMap.entries())) {
         await backend.upsertSaveFolder(dir, label)
       }
-      // Instruct App to refresh just in case, though savesState auto updates are usually handled implicitly or manually?
-      // Since it's global, we trigger a fetch if needed, but since we are modifying via backend we can rely on standard refresh.
+      // Instruct App to refresh just in case
       backend.getSaveFolders().then(
         R.match(
           (_folders) => {
