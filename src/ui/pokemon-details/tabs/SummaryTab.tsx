@@ -98,32 +98,6 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           <div>{mon.heldItemName}</div>
         </AttributeRow>
         <div>
-          {/* Luminescent Platinum Custom Form Badge */}
-          {(() => {
-            if ('lumiFormeName' in mon && (mon as any).lumiFormeName) {
-              return (
-                <AttributeTag
-                  label={String((mon as any).lumiFormeName).toUpperCase()}
-                  backgroundColor="#877f2a"
-                  color="white"
-                />
-              )
-            }
-            if (mon.pluginOrigin === 'luminescent_platinum' && mon.pluginForm !== undefined) {
-              const customForm = getLumiCustomForm(mon.dexNum, mon.pluginForm)
-              if (customForm) {
-                return (
-                  <AttributeTag
-                    label={customForm.name.toUpperCase()}
-                    backgroundColor="#877f2a"
-                    color="white"
-                  />
-                )
-              }
-            }
-            return null
-          })()}
-
           {mon.isShiny() && (
             <AttributeTag
               icon={getPublicImageURL('icons/Shiny.png')}
@@ -158,7 +132,30 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow label="Species">
           <Flex gap="1">
-            {MetadataLookup(mon.dexNum, mon.formeNum)?.formeName}
+            {(() => {
+              const baseFormName = MetadataLookup(mon.dexNum, mon.formeNum)?.formeName
+              let customFormName = ''
+              if ('lumiFormeName' in mon && (mon as any).lumiFormeName) {
+                customFormName = String((mon as any).lumiFormeName)
+              } else if (
+                mon.pluginOrigin === 'luminescent_platinum' &&
+                mon.pluginForm !== undefined
+              ) {
+                const customForm = getLumiCustomForm(mon.dexNum, mon.pluginForm)
+                if (customForm) {
+                  customFormName = customForm.name
+                }
+              }
+
+              if (customFormName) {
+                return (
+                  <span style={{ fontWeight: 'bold', color: '#D4AF37' }}>
+                    {baseFormName} - {customFormName}
+                  </span>
+                )
+              }
+              return baseFormName
+            })()}
             <GenderIcon gender={mon.gender} />
           </Flex>
         </AttributeRow>

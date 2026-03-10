@@ -30,7 +30,7 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
 
   static boxSizeBytes = 344
 
-  // Preserves custom Luminescent forms (e.g. Stitched Gengar) during the OpenHome session
+  // Preserves custom Luminescent forms (e.g. Stitched Gengar)
   public lumiFormeNum?: number
 
   // Custom form name used for UI display

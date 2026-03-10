@@ -200,7 +200,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
     }
 
     // REJECT Luminescent Platinum saves
-    if (bytes.length > 940000 && bytes.length < 1150000) {
+    if (bytes.length > 940000) {
       return false
     }
 
