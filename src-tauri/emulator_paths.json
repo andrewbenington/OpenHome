@@ -1,0 +1,171 @@
+{
+  "extensions": [".sav", ".dsv", ".raw", ".gci", "main"],
+
+  "emulators": [
+    {
+      "name": "Citra",
+      "paths": {
+        "windows": ["%APPDATA%/Citra/sdmc/Nintendo 3DS/*/*/*/title/*/data/00000001/main"],
+        "linux": [
+          "~/.config/citra-emu/sdmc/Nintendo 3DS/*/*/*/title/*/data/00000001/main",
+          "~/.local/share/citra-emu/sdmc/Nintendo 3DS/*/*/*/title/*/data/00000001/main",
+          "~/.var/app/org.citra_emu.citra/data/citra-emu/sdmc/Nintendo 3DS/*/*/*/title/*/data/00000001/main"
+        ],
+        "macos": [
+          "~/Library/Application Support/Citra/sdmc/Nintendo 3DS/*/*/*/title/*/data/00000001/main",
+          "~/Library/Application Support/Citra Software/Citra/sdmc/Nintendo 3DS/*/*/*/title/*/data/00000001/main"
+        ]
+      }
+    },
+    {
+      "name": "Azahar",
+      "paths": {
+        "windows": ["%APPDATA%/Azahar/sdmc/Nintendo 3DS/*/*/*/title/*/data/00000001/main"],
+        "linux": ["~/.config/azahar-emu/sdmc/Nintendo 3DS/*/*/*/title/*/data/00000001/main"],
+        "macos": [
+          "~/Library/Application Support/Azahar/sdmc/Nintendo 3DS/*/*/*/title/*/data/00000001/main"
+        ]
+      }
+    },
+    {
+      "name": "DeSmuME",
+      "paths": {
+        "windows": [
+          "%USERPROFILE%/Documents/DeSmuME/Battery/**/*.dsv",
+          "%APPDATA%/DeSmuME/Battery/**/*.dsv"
+        ],
+        "linux": ["~/.config/desmume/**/*.dsv"],
+        "macos": ["~/Library/Application Support/DeSmuME/**/*.dsv"]
+      }
+    },
+    {
+      "name": "Yuzu",
+      "paths": {
+        "windows": [
+          "%APPDATA%/yuzu/nand/user/save/0000000000000000/*/*/main",
+          "%APPDATA%/yuzu/bis/user/save/*/*/main"
+        ],
+        "linux": [
+          "~/.local/share/yuzu/nand/user/save/0000000000000000/*/*/main",
+          "~/.var/app/org.yuzu_emu.yuzu/data/yuzu/nand/user/save/0000000000000000/*/*/main",
+          "~/.config/yuzu/bis/user/save/*/*/main"
+        ],
+        "macos": [
+          "~/Library/Application Support/yuzu/nand/user/save/0000000000000000/*/*/main",
+          "~/Library/Application Support/yuzu/bis/user/save/*/*/main"
+        ]
+      }
+    },
+    {
+      "name": "Sudachi",
+      "paths": {
+        "windows": [
+          "%APPDATA%/sudachi/nand/user/save/0000000000000000/*/*/main",
+          "%APPDATA%/sudachi/bis/user/save/*/*/main"
+        ],
+        "linux": [
+          "~/.local/share/sudachi/nand/user/save/0000000000000000/*/*/main",
+          "~/.var/app/org.sudachi_emu.sudachi/data/sudachi/nand/user/save/0000000000000000/*/*/main",
+          "~/.config/sudachi/bis/user/save/*/*/main"
+        ],
+        "macos": [
+          "~/Library/Application Support/sudachi/nand/user/save/0000000000000000/*/*/main",
+          "~/Library/Application Support/sudachi/bis/user/save/*/*/main"
+        ]
+      }
+    },
+    {
+      "name": "Ryujinx",
+      "paths": {
+        "windows": [
+          "%APPDATA%/Ryujinx/bis/user/save/*/*/main",
+          "%APPDATA%/Ryujinx/nand/user/save/0000000000000000/*/*/main"
+        ],
+        "linux": [
+          "~/.config/Ryujinx/bis/user/save/*/*/main",
+          "~/.var/app/org.ryujinx.Ryujinx/config/Ryujinx/bis/user/save/*/*/main",
+          "~/.local/share/Ryujinx/nand/user/save/0000000000000000/*/*/main"
+        ],
+        "macos": [
+          "~/Library/Application Support/Ryujinx/bis/user/save/*/*/main",
+          "~/Library/Application Support/Ryujinx/nand/user/save/0000000000000000/*/*/main"
+        ]
+      }
+    },
+    {
+      "name": "Ryubing",
+      "paths": {
+        "windows": [
+          "%APPDATA%/Ryubing/bis/user/save/*/*/main",
+          "%APPDATA%/Ryubing/nand/user/save/0000000000000000/*/*/main"
+        ],
+        "linux": [
+          "~/.config/Ryubing/bis/user/save/*/*/main",
+          "~/.local/share/Ryubing/nand/user/save/0000000000000000/*/*/main"
+        ],
+        "macos": [
+          "~/Library/Application Support/Ryubing/bis/user/save/*/*/main",
+          "~/Library/Application Support/Ryubing/nand/user/save/0000000000000000/*/*/main"
+        ]
+      }
+    },
+    {
+      "name": "Citron",
+      "paths": {
+        "windows": [
+          "%APPDATA%/citron/nand/user/save/0000000000000000/*/*/main",
+          "%APPDATA%/citron/bis/user/save/*/*/main"
+        ],
+        "linux": [
+          "~/.local/share/citron/nand/user/save/0000000000000000/*/*/main",
+          "~/.config/citron/bis/user/save/*/*/main"
+        ],
+        "macos": [
+          "~/Library/Application Support/citron/nand/user/save/0000000000000000/*/*/main",
+          "~/Library/Application Support/citron/bis/user/save/*/*/main"
+        ]
+      }
+    },
+    {
+      "name": "Eden",
+      "paths": {
+        "windows": [
+          "%APPDATA%/eden/bis/user/save/*/*/main",
+          "%APPDATA%/eden/nand/user/save/0000000000000000/*/*/main"
+        ],
+        "linux": [
+          "~/.config/eden/bis/user/save/*/*/main",
+          "~/.local/share/eden/nand/user/save/0000000000000000/*/*/main"
+        ],
+        "macos": [
+          "~/Library/Application Support/eden/bis/user/save/*/*/main",
+          "~/Library/Application Support/eden/nand/user/save/0000000000000000/*/*/main"
+        ]
+      }
+    },
+    {
+      "name": "Dolphin",
+      "paths": {
+        "windows": [
+          "%APPDATA%/Dolphin Emulator/GC/**/*.raw",
+          "%APPDATA%/Dolphin Emulator/GC/**/*.gci",
+          "%APPDATA%/Dolphin Emulator/Wii/title/*/*/data/*",
+          "%USERPROFILE%/Documents/Dolphin Emulator/GC/**/*.raw",
+          "%USERPROFILE%/Documents/Dolphin Emulator/GC/**/*.gci",
+          "%USERPROFILE%/Documents/Dolphin Emulator/Wii/title/*/*/data/*"
+        ],
+        "linux": [
+          "~/.local/share/dolphin-emu/GC/**/*.raw",
+          "~/.local/share/dolphin-emu/GC/**/*.gci",
+          "~/.local/share/dolphin-emu/Wii/title/*/*/data/*",
+          "~/.var/app/org.DolphinEmu.dolphin-emu/data/dolphin-emu/GC/**/*.raw"
+        ],
+        "macos": [
+          "~/Library/Application Support/Dolphin/GC/**/*.raw",
+          "~/Library/Application Support/Dolphin/GC/**/*.gci",
+          "~/Library/Application Support/Dolphin/Wii/title/*/*/data/*"
+        ]
+      }
+    }
+  ]
+}

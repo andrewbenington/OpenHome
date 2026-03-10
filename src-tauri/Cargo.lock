@@ -9,6 +9,8 @@ dependencies = [
  "base64 0.22.1",
  "bytes",
  "dialog",
+ "dirs 6.0.0",
+ "glob",
  "pkm_rs",
  "reqwest",
  "semver",

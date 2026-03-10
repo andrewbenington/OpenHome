@@ -1,3 +1,4 @@
+mod auto_detect;
 mod commands;
 mod deprecated;
 mod error;
@@ -137,6 +138,7 @@ pub fn run() {
             state::rollback_transaction,
             state::commit_transaction,
             state::synced_state::save_synced_state,
+            auto_detect::scan_emulators,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
