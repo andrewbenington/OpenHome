@@ -1,4 +1,4 @@
-name: Rust
+name: Run Cargo Tests
 
 on:
   workflow_dispatch:
