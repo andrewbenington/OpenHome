@@ -26,43 +26,28 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
   //@ts-ignore
   public format: 'PB8LUMI' = 'PB8LUMI'
   public pluginIdentifier = 'luminescent_platinum' as PluginIdentifier
-  public selectColor = '#213d68'
+  public selectColor = '#25c2a0'
 
   static boxSizeBytes = 344
-
-  // Preserves custom Luminescent forms (e.g. Stitched Gengar)
-  public lumiFormeNum?: number
-
-  // Custom form name used for UI display
-  public lumiFormeName?: string
 
   public pluginOrigin?: PluginIdentifier
   public pluginForm?: number
 
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     super(arg, encrypted)
+    this.pluginOrigin = 'luminescent_platinum'
 
     if (arg instanceof ArrayBuffer) {
       this.heldItemIndex = fromLumiItemIndex(this.heldItemIndex) ?? 0
 
       const customForm = getLumiCustomForm(this.dexNum, this.formeNum)
       if (customForm) {
-        this.lumiFormeNum = this.formeNum
-        this.lumiFormeName = customForm.name
-
         this.pluginForm = this.formeNum
-
         this.formeNum = customForm.fallbackForm
       }
     } else {
-      if (arg.pluginForm !== undefined) {
-        this.lumiFormeNum = arg.pluginForm
+      if (arg.pluginOrigin === 'luminescent_platinum') {
         this.pluginForm = arg.pluginForm
-
-        const customForm = getLumiCustomForm(this.dexNum, arg.pluginForm)
-        if (customForm) {
-          this.lumiFormeName = customForm.name
-        }
       }
     }
   }
@@ -75,11 +60,9 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
     // Temporarily convert indices back to Luminescent values before serialization
     const standardItemIndex = this.heldItemIndex
     this.heldItemIndex = toLumiItemIndex(standardItemIndex) ?? 0
+    this.formeNum = this.pluginForm ?? this.formeNum
 
     const standardFormeNum = this.formeNum
-    if (this.lumiFormeNum !== undefined) {
-      this.formeNum = this.lumiFormeNum
-    }
 
     const buffer = super.toBytes()
 

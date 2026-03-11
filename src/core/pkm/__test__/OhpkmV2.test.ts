@@ -111,17 +111,28 @@ describe('plugin form persistence', () => {
   })
 
   test('PB8LUMI → OHPKM → bytes → OHPKM → PB8LUMI roundtrip', () => {
-    const starter = new OHPKM(new Uint8Array())
-    const lumi = new PB8LUMI(starter as any)
-    lumi.pluginForm = 0x99
+    const stitchedGengarBytes = new Uint8Array(
+      fs.readFileSync(
+        path.join(__dirname, 'PKMFiles', 'rom-hack', 'luminescent', 'stitched-gengar.pb8lumi')
+      )
+    )
 
-    const ohFromLumi = new OHPKM(lumi as any)
+    const original = new PB8LUMI(stitchedGengarBytes.buffer)
+
+    expect(original.dexNum).toEqual(NationalDex.Gengar)
+    expect(original.pluginForm).toEqual(3)
+
+    const ohpkm = new OHPKM(original)
+    const lumi = new PB8LUMI(ohpkm)
+    expect(lumi.pluginForm).toEqual(3)
+
+    const ohFromLumi = new OHPKM(lumi)
     const roundBytes = ohFromLumi.toBytes()
     const ohAgain = OHPKM.fromBytes(roundBytes)
-    expect(ohAgain.pluginForm).toEqual(0x99)
+    expect(ohAgain.pluginForm).toEqual(3)
 
-    const lumi2 = new PB8LUMI(ohAgain as any)
-    expect(lumi2.pluginForm).toEqual(0x99)
+    const lumi2 = new PB8LUMI(ohAgain)
+    expect(lumi2.pluginForm).toEqual(3)
   })
 })
 
