@@ -21,10 +21,7 @@ jobs:
     - name: Install Linux dependencies
       run: |
         sudo apt update
-        sudo apt install -y libgtk-3-dev libwebkit2gtk-4.1-dev pkg-config build-essential
-
-    - name: Build
-      run: cargo build --verbose
+        sudo apt install -y pkg-config build-essential
 
     - name: Run tests
       run: cargo test --package pkm_rs --lib -- gen7_alola::pk7::test::compare_golden_json --exact --nocapture
