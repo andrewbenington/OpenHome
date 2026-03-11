@@ -100,9 +100,6 @@ importers:
       '@tauri-apps/cli':
         specifier: ^2.10.1
         version: 2.10.1
-      '@testing-library/dom':
-        specifier: ^10.4.1
-        version: 10.4.1
       '@testing-library/jest-dom':
         specifier: ^6.9.1
         version: 6.9.1
@@ -159,7 +156,10 @@ importers:
         version: 7.0.1(eslint@10.0.3)
       eslint-plugin-react-refresh:
         specifier: ^0.5.2
-        version: 0.5.2(eslint@10.0.2)
+        version: 0.5.2(eslint@10.0.3)
+      jsdom:
+        specifier: ^28.1.0
+        version: 28.1.0
       madge:
         specifier: ^8.0.0
         version: 8.0.0(typescript@5.9.3)
@@ -177,7 +177,7 @@ importers:
         version: 7.3.1(@types/node@25.3.5)
       vitest:
         specifier: ^4.0.18
-        version: 4.0.18(@types/node@25.3.2)
+        version: 4.0.18(@types/node@25.3.5)(jsdom@28.1.0)
 
 packages:
 
@@ -1852,6 +1852,10 @@ packages:
 
   aria-query@5.3.0:
     resolution: {integrity: sha512-b0P0sZPKtyu8HkeRAfCq0IfURZK+SuwMjY1UXGBU27wpAiTwQAIlq56IbIO+ytk/JjS1fMR14ee5WBBfKi5J6A==}
+
+  aria-query@5.3.2:
+    resolution: {integrity: sha512-COROpnaoap1E2F000S62r6A60uHZnmlvomhfyT2DlTcrY1OrBKn2UhH7qn5wTC9zMvD0AY7csdPSNwKP+7WiQw==}
+    engines: {node: '>= 0.4'}
 
   array-buffer-byte-length@1.0.2:
     resolution: {integrity: sha512-LHE+8BuR7RYGDKvnrmcuSq3tDcKv9OFEXQt/HpbZhY7V6h0zlUXutnAD82GiFx9rdieCMjkvtcsPqBwgUl1Iiw==}
@@ -4947,7 +4951,7 @@ snapshots:
   '@testing-library/jest-dom@6.9.1':
     dependencies:
       '@adobe/css-tools': 4.4.4
-      aria-query: 5.3.0
+      aria-query: 5.3.2
       css.escape: 1.5.1
       dom-accessibility-api: 0.6.3
       picocolors: 1.1.1
@@ -5269,6 +5273,8 @@ snapshots:
   aria-query@5.3.0:
     dependencies:
       dequal: 2.0.3
+
+  aria-query@5.3.2: {}
 
   array-buffer-byte-length@1.0.2:
     dependencies:
@@ -7176,7 +7182,7 @@ snapshots:
       '@types/node': 25.3.5
       fsevents: 2.3.3
 
-  vitest@4.0.18(@types/node@25.3.2):
+  vitest@4.0.18(@types/node@25.3.5)(jsdom@28.1.0):
     dependencies:
       '@vitest/expect': 4.0.18
       '@vitest/mocker': 4.0.18(vite@7.3.1(@types/node@25.3.5))
@@ -7199,7 +7205,8 @@ snapshots:
       vite: 7.3.1(@types/node@25.3.5)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 25.3.2
+      '@types/node': 25.3.5
+      jsdom: 28.1.0
     transitivePeerDependencies:
       - jiti
       - less
