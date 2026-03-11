@@ -86,7 +86,12 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
     return message
   }, [mon])
 
-  const markImage = mon.gameOfOrigin ? OriginGames.markPath(mon.gameOfOrigin) : undefined
+  const markImage =
+    mon.pluginOrigin === 'luminescent_platinum'
+      ? `origin_marks/BDSP.png`
+      : mon.gameOfOrigin
+        ? OriginGames.markPath(mon.gameOfOrigin)
+        : undefined
 
   return (
     <Flex direction="column" ml="4" mr="4" mt="2" height="calc(100% - 24px)">

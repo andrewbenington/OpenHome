@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getTypes } from '@openhome-core/pkm/util'
+import { getLumiCustomForm } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import AttributeTag from '@openhome-ui/components/AttributeTag'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -131,7 +132,30 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow label="Species">
           <Flex gap="1">
-            {MetadataLookup(mon.dexNum, mon.formeNum)?.formeName}
+            {(() => {
+              const baseFormName = MetadataLookup(mon.dexNum, mon.formeNum)?.formeName
+              let customFormName = ''
+              if ('lumiFormeName' in mon && (mon as any).lumiFormeName) {
+                customFormName = String((mon as any).lumiFormeName)
+              } else if (
+                mon.pluginOrigin === 'luminescent_platinum' &&
+                mon.pluginForm !== undefined
+              ) {
+                const customForm = getLumiCustomForm(mon.dexNum, mon.pluginForm)
+                if (customForm) {
+                  customFormName = customForm.name
+                }
+              }
+
+              if (customFormName) {
+                return (
+                  <span className="rom-hack-form-name" style={{ color: '#FFC300' }}>
+                    {baseFormName} - {customFormName}
+                  </span>
+                )
+              }
+              return baseFormName
+            })()}
             <GenderIcon gender={mon.gender} />
           </Flex>
         </AttributeRow>

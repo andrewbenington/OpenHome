@@ -895,6 +895,20 @@ impl OhpkmV2 {
         }
     }
 
+    #[wasm_bindgen(getter = pluginFormWasm)]
+    pub fn plugin_form(&self) -> Option<u16> {
+        self.plugin_data.as_ref().and_then(|x| x.plugin_form)
+    }
+
+    #[wasm_bindgen(setter = pluginFormWasm)]
+    pub fn set_plugin_form(&mut self, value: Option<u16>) {
+        if value.is_some() {
+            self.plugin_data.get_or_insert_default().plugin_form = value;
+        } else if let Some(plugin_data) = &mut self.plugin_data {
+            plugin_data.plugin_form = None;
+        }
+    }
+
     // Game Boy
 
     #[wasm_bindgen(getter = dvsWasm)]

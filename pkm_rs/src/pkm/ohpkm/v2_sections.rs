@@ -1291,9 +1291,14 @@ impl DataSection for MostRecentSave {
     }
 }
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Clone)]
 pub struct PluginData {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub plugin_origin: String,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub plugin_form: Option<u16>,
 }
 
 impl PluginData {
@@ -1312,7 +1317,55 @@ impl PluginData {
     }
 
     const fn from_origin(plugin_origin: String) -> Self {
-        Self { plugin_origin }
+        Self {
+            plugin_origin,
+            plugin_form: None,
+        }
+    }
+
+    fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
+        if bytes.len() < 2 {
+            return Self::try_from_origin_utf8(bytes);
+        }
+
+        if bytes[0].is_ascii_alphabetic() && bytes[1].is_ascii_alphabetic() {
+            return Self::try_from_origin_utf8(bytes);
+        }
+
+        let form_raw = u16::from_le_bytes([bytes[0], bytes[1]]);
+        let plugin_form = if form_raw == 0 { None } else { Some(form_raw) };
+
+        let origin = String::from_utf8(bytes[2..].to_vec()).map_err(Error::plugin_origin)?;
+
+        Ok(Self {
+            plugin_origin: origin,
+            plugin_form,
+        })
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl PluginData {
+    #[wasm_bindgen(getter = pluginOrigin)]
+    pub fn plugin_origin(&self) -> String {
+        self.plugin_origin.clone()
+    }
+
+    #[wasm_bindgen(setter = pluginOrigin)]
+    pub fn set_plugin_origin(&mut self, value: String) {
+        self.plugin_origin = value;
+    }
+
+    #[wasm_bindgen(getter = pluginFormDataWasm)]
+    pub fn plugin_form(&self) -> Option<u16> {
+        self.plugin_form
+    }
+
+    #[wasm_bindgen(setter = pluginFormDataWasm)]
+    pub fn set_plugin_form(&mut self, value: Option<u16>) {
+        self.plugin_form = value;
     }
 }
 
@@ -1324,8 +1377,7 @@ impl DataSection for PluginData {
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::ensure_buffer_size(bytes)?;
-
-        Self::try_from_origin_utf8(bytes)
+        Self::try_from_bytes(bytes)
     }
 
     fn is_empty(&self) -> bool {
@@ -1333,7 +1385,12 @@ impl DataSection for PluginData {
     }
 
     fn to_bytes(&self) -> Result<Vec<u8>> {
-        Ok(self.plugin_origin.clone().into_bytes())
+        let mut bytes = Vec::new();
+        // Write form as little-endian u16
+        bytes.extend_from_slice(&self.plugin_form.unwrap_or(0).to_le_bytes());
+        // Append origin string
+        bytes.extend_from_slice(self.plugin_origin.as_bytes());
+        Ok(bytes)
     }
 }
 

@@ -573,6 +573,7 @@ pub fn plugin_color(plugin_identifier: &str) -> &'static str {
     match plugin_identifier {
         "unbound" => "#C127FE",
         "radical_red" => "#660000",
+        "luminescent_platinum" => "#D4AF37",
         _ => "#666666",
     }
 }
