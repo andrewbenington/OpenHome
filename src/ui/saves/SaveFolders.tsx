@@ -3,12 +3,14 @@ import { R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { AddFolderIcon, RemoveIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { Button, Card, Dialog, Flex } from '@radix-ui/themes'
+import { Button, Card, Dialog, Flex, Progress } from '@radix-ui/themes'
+import { invoke } from '@tauri-apps/api/core'
 import { useCallback, useContext, useEffect, useState } from 'react'
 
 export default function SaveFolders() {
   const [saveFolders, setSaveFolders] = useState<SaveFolder[]>()
   const [pendingDirPath, setPendingDirPath] = useState<string>()
+  const [isScanning, setIsScanning] = useState(false)
   const backend = useContext(BackendContext)
   const [error, setError] = useState(false)
   const displayError = useDisplayError()
@@ -76,16 +78,55 @@ export default function SaveFolders() {
     [backend, refreshFolders, handleError]
   )
 
+  const autoScanFolders = useCallback(async () => {
+    setIsScanning(true)
+    try {
+      type DetectedSave = { emulator: string; path: string; matched_pattern: string }
+      const saves = await invoke<DetectedSave[]>('scan_emulators')
+
+      const isWin = navigator.userAgent.includes('Win')
+      const sep = isWin ? '\\' : '/'
+
+      const dirMap = new Map<string, string>()
+      saves.forEach((save) => {
+        const lastIndex = save.path.lastIndexOf(sep)
+        if (lastIndex !== -1) {
+          const dir = save.path.substring(0, lastIndex)
+          if (!dirMap.has(dir)) {
+            dirMap.set(dir, `${save.emulator} Saves`)
+          }
+        }
+      })
+
+      for (const [dir, label] of Array.from(dirMap.entries())) {
+        await backend.upsertSaveFolder(dir, label)
+      }
+
+      refreshFolders()
+    } catch (err) {
+      handleError('Error scanning for saves', [String(err)])
+    } finally {
+      setIsScanning(false)
+    }
+  }, [backend, refreshFolders, handleError])
+
   return (
     <div style={{ padding: 8 }}>
       <div
         style={{
           width: '100%',
-          display: 'grid',
-          justifyContent: 'right',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           marginBottom: 8,
         }}
       >
+        <Flex gap="3" align="center" style={{ flexGrow: 1 }}>
+          <Button onClick={autoScanFolders} variant="solid" disabled={isScanning}>
+            Auto-Scan Folders
+          </Button>
+          {isScanning && <Progress size="1" style={{ width: '40%' }} />}
+        </Flex>
         <Button onClick={addFolder} variant="solid">
           <AddFolderIcon />
           Add Folder

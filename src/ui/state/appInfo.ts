@@ -59,6 +59,7 @@ export const defaultSettings: Settings = {
   saveViewMode: 'card',
   monDisplayState: initialMonDisplayState(),
   appTheme: 'system',
+  autoScanOnStartup: true,
 }
 
 export type AppTheme = 'light' | 'dark' | 'system'
@@ -70,6 +71,7 @@ export type Settings = {
   saveViewMode: SaveViewMode
   monDisplayState: MonDisplayState
   appTheme: AppTheme
+  autoScanOnStartup: boolean
 }
 
 export type AppInfoState = {
@@ -110,6 +112,10 @@ export type AppInfoAction =
   | {
       type: 'set_app_theme'
       payload: AppTheme
+    }
+  | {
+      type: 'set_auto_scan'
+      payload: boolean
     }
   | { type: 'set_mon_display_state'; payload: MonDisplayState }
   | {
@@ -183,6 +189,9 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
     }
     case 'set_mon_display_state': {
       return { ...state, settings: { ...state.settings, monDisplayState: payload } }
+    }
+    case 'set_auto_scan': {
+      return { ...state, settings: { ...state.settings, autoScanOnStartup: payload } }
     }
     case 'set_error': {
       return { ...state, error: payload }

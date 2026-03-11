@@ -47,6 +47,23 @@ export default function Settings() {
           <RadioGroup.Item value="light">Light</RadioGroup.Item>
           <RadioGroup.Item value="dark">Dark</RadioGroup.Item>
         </RadioGroup.Root>
+
+        <b style={{ display: 'block', marginTop: 16 }}>Scanning</b>
+        <div style={{ margin: 8 }}>
+          <label className="flex-row">
+            <input
+              type="checkbox"
+              onChange={(e) =>
+                dispatchAppInfoState({
+                  type: 'set_auto_scan',
+                  payload: e.target.checked,
+                })
+              }
+              checked={appInfoState.settings.autoScanOnStartup ?? true}
+            />
+            Auto-Scan for Saves on Startup
+          </label>
+        </div>
       </Card>
     </div>
   )

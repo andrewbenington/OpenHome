@@ -24,6 +24,7 @@ import { MouseContext, mouseReducer } from '@openhome-ui/state/mouse'
 import { OhpkmStoreProvider } from '@openhome-ui/state/ohpkm'
 import { PluginContext, pluginReducer } from '@openhome-ui/state/plugin'
 import { SavesProvider } from '@openhome-ui/state/saves'
+import AutoScanToast from '@openhome-ui/top-level/AutoScanToast'
 import ErrorMessageModal from '@openhome-ui/top-level/ErrorMessageModal'
 import UpdateMessageModal from '@openhome-ui/top-level/UpdateMessageModal'
 import { loadPlugin } from '@openhome-ui/util/plugin'
@@ -195,6 +196,7 @@ function AppWithBackend() {
                         )}
                         <ErrorMessageModal />
                         <UpdateMessageModal />
+                        <AutoScanToast />
                       </PokemonDndContext>
                     </DragMonContext.Provider>
                   </SavesProvider>
