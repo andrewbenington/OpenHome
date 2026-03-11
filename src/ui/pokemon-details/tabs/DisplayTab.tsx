@@ -48,7 +48,14 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
   }
 
   return (
-    <div style={{ padding: 8, height: 'calc(100% - 16px)', overflowY: 'auto' }}>
+    <div
+      style={{
+        padding: 8,
+        height: 'calc(100% - 16px)',
+        overflowY: 'auto',
+        color: 'var(--gray-12)',
+      }}
+    >
       <Flex direction="column" gap="3">
         <AttributeRow label="Box Background">
           <Flex direction="column" gap="2" style={{ flex: 1 }}>
@@ -75,10 +82,13 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                 value={customColor}
                 onChange={(e) => handleColorChange(e.target.value)}
                 style={{ flex: 1 }}
-              />
+              >
+                <TextField.Slot />
+              </TextField.Root>
               <Button
-                variant="soft"
+                variant="surface"
                 color="gray"
+                highContrast
                 onClick={handleClearColor}
                 disabled={!customColor}
               >
@@ -89,7 +99,11 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
         </AttributeRow>
 
         <div>
-          <div style={{ marginBottom: 8, fontSize: 14, color: '#aaa' }}>Quick Colors</div>
+          <div
+            style={{ marginBottom: 8, fontSize: 14, fontWeight: 'bold', color: 'var(--gray-a11)' }}
+          >
+            Quick Colors
+          </div>
           <Flex wrap="wrap" gap="2">
             {DISPLAY_COLOR_PRESETS.map(({ name, color }) => (
               <button
@@ -126,16 +140,21 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            border: '1px solid var(--gray-a5)',
           }}
         >
-          <div style={{ fontSize: 14, textAlign: 'center' }}>
-            <div style={{ marginBottom: 4 }}>Preview</div>
-            <div style={{ fontSize: 12, opacity: 0.7 }}>This is how the box cell will look</div>
+          <div style={{ fontSize: 14, textAlign: 'center', color: 'var(--gray-12)' }}>
+            <div style={{ marginBottom: 4, fontWeight: 'bold' }}>Preview</div>
+            <div style={{ fontSize: 12, opacity: 0.8 }}>This is how the box cell will look</div>
           </div>
         </div>
 
         <div style={{ marginTop: 16 }}>
-          <div style={{ marginBottom: 8, fontSize: 14, color: '#aaa' }}>Custom Tag</div>
+          <div
+            style={{ marginBottom: 8, fontSize: 14, fontWeight: 'bold', color: 'var(--gray-a11)' }}
+          >
+            Custom Tag
+          </div>
           <Flex direction="column" gap="2">
             <Flex gap="2" wrap="wrap">
               {TAG_PRESETS.map(({ label, color }) => (
@@ -168,7 +187,9 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                 value={tagLabel}
                 onChange={(e) => setTagLabel(e.target.value)}
                 style={{ flex: 1 }}
-              />
+              >
+                <TextField.Slot />
+              </TextField.Root>
               <input
                 type="color"
                 value={tagColor || '#888888'}
@@ -183,7 +204,8 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                 }}
               />
               <Button
-                variant="soft"
+                variant="surface"
+                highContrast
                 onClick={() =>
                   updateMonTag(mon.openhomeId, tagLabel || undefined, tagColor || undefined)
                 }
@@ -192,8 +214,9 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                 Apply
               </Button>
               <Button
-                variant="soft"
+                variant="surface"
                 color="gray"
+                highContrast
                 onClick={() => {
                   setTagLabel('')
                   setTagColor('')
@@ -206,7 +229,7 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
             </Flex>
             {tagLabel && (
               <Flex align="center" gap="2">
-                <span style={{ fontSize: 12, color: '#aaa' }}>Preview:</span>
+                <span style={{ fontSize: 12, color: 'var(--gray-11)' }}>Preview:</span>
                 <Badge
                   variant="solid"
                   size="1"
@@ -218,7 +241,7 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                   {tagLabel}
                 </Badge>
               </Flex>
-            )}
+            )}{' '}
           </Flex>
         </div>
       </Flex>

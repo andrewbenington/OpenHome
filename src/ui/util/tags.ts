@@ -1,6 +1,6 @@
 export const TAG_PRESETS = [
   { label: 'Competitive', color: '#ef4444' },
-  { label: 'Shiny Hunt', color: '#eab308' },
+  { label: 'Rare', color: '#eab308' },
   { label: 'Trade', color: '#3b82f6' },
   { label: 'Breeding', color: '#a855f7' },
   { label: 'Favorite', color: '#ec4899' },
