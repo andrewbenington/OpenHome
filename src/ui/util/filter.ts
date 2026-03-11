@@ -19,6 +19,7 @@ export interface Filter {
   shinyLeaves?: number
   tag?: string
   displayColor?: string
+  hasNotes?: boolean
 }
 
 export type HeldItemFilter = number | HeldItemCategory
@@ -95,6 +96,12 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
     } else {
       if (!('displayColor' in mon) || mon.displayColor !== filter.displayColor) return false
     }
+  }
+
+  if (filter.hasNotes !== undefined) {
+    const notes = (mon as any).notes
+    const monHasNotes = typeof notes === 'string' && notes.trim().length > 0
+    if (filter.hasNotes !== monHasNotes) return false
   }
 
   const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)

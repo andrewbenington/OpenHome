@@ -341,6 +341,18 @@ export default function FilterPanel() {
             )
           }}
         />
+        <Autocomplete
+          options={['Has Notes', 'No Notes']}
+          getOptionString={(opt) => opt}
+          getOptionUniqueID={(opt) => opt}
+          value={
+            filter.hasNotes === undefined ? undefined : filter.hasNotes ? 'Has Notes' : 'No Notes'
+          }
+          label="Notes"
+          onChange={(option) =>
+            setFilter({ hasNotes: option === undefined ? undefined : option === 'Has Notes' })
+          }
+        />
         <Button
           variant="outline"
           disabled={Object.values(filter).length === 0}

@@ -189,9 +189,7 @@ function BoxCell({
 
   const cellBackgroundColor = useMemo(() => {
     if (disabled || isFilteredOut) return '#555'
-    // Show selection highlight when multi-select is enabled and this cell is selected
-    if (isSelected) return '#4ade8080' // Green highlight for selected
-    // Use the Pokemon's custom display color if set
+    if (isSelected) return '#4ade8080'
     if (mon?.displayColor) return mon.displayColor
     return '#6662'
   }, [disabled, isFilteredOut, isSelected, mon?.displayColor])

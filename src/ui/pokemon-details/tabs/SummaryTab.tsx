@@ -18,10 +18,10 @@ import useMonSprite from '../useMonSprite'
 
 const SummaryDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
-  const tag = useMemo(() => {
-    const label = (mon as any).tagLabel as string | undefined
-    const color = (mon as any).tagColor as string | undefined
-    return label ? { label, color: color ?? '#888' } : undefined
+  const tags = useMemo(() => {
+    return (
+      ((mon as any).tags as { label: string; color?: string; icon?: string }[] | undefined) ?? []
+    )
   }, [mon])
   const spriteResult = useMonSprite({
     dexNum: mon.dexNum,
@@ -92,19 +92,21 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           <Badge variant="solid" color="gray" ml="2" size="1">
             {mon.languageString}
           </Badge>
-          {tag && (
-            <Badge
-              variant="solid"
-              ml="2"
-              size="1"
-              style={{
-                backgroundColor: tag.color ?? '#888',
-                color: '#fff',
-              }}
-            >
-              {tag.label}
-            </Badge>
-          )}
+          {tags.length > 0 &&
+            tags.map((tag, i) => (
+              <Badge
+                key={i}
+                variant="solid"
+                ml="2"
+                size="1"
+                style={{
+                  backgroundColor: tag.color ?? '#888',
+                  color: '#fff',
+                }}
+              >
+                {tag.label}
+              </Badge>
+            ))}
         </div>
         <AttributeRow label="Item" justifyEnd>
           {mon.heldItemName !== 'None' && (

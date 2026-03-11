@@ -23,6 +23,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   pluginForm?: number
   pluginOrigin?: string
   tags?: any[]
+  hasNotes?: boolean
 }
 
 function getBackgroundPosition(formeMetadata?: FormeMetadata, isEgg?: boolean) {
@@ -48,6 +49,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
     isEgg,
     topRightIndicator,
     tags,
+    hasNotes,
     style,
     onClick,
     pluginForm,
@@ -96,7 +98,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
         <div
           style={{
             position: 'absolute',
-            top: isShiny ? 14 : -2,
+            top: -2,
             left: -4,
             display: 'flex',
             flexDirection: 'column',
@@ -125,6 +127,22 @@ export default function PokemonIcon(props: PokemonIconProps) {
         </div>
       )}
       {topRightIndicator && <div className="extra-indicator">{topRightIndicator}</div>}
+      {hasNotes && (
+        <div
+          title="Has notes"
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            backgroundColor: '#facc15',
+            boxShadow: '0 0 2px rgba(0,0,0,0.6)',
+            zIndex: 3,
+          }}
+        />
+      )}
       {heldItemIndex ? (
         <img
           alt="item icon"
