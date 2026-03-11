@@ -1,0 +1,25 @@
+name: Rust
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main", "wasm" ]
+  pull_request:
+    branches: [ "main", "wasm" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build
+      run: cargo build --verbose
+
+    - name: Run tests
+      run: cargo test --package pkm_rs --lib -- gen7_alola::pk7::test::compare_golden_json --exact --nocapture
