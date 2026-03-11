@@ -18,6 +18,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Install Linux dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y libgtk-3-dev libwebkit2gtk-4.1-dev pkg-config build-essential
+
     - name: Build
       run: cargo build --verbose
 
