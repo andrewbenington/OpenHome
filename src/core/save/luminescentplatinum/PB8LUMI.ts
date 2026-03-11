@@ -59,10 +59,10 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
   toBytes(): ArrayBuffer {
     // Temporarily convert indices back to Luminescent values before serialization
     const standardItemIndex = this.heldItemIndex
+    const standardFormeNum = this.formeNum
+
     this.heldItemIndex = toLumiItemIndex(standardItemIndex) ?? 0
     this.formeNum = this.pluginForm ?? this.formeNum
-
-    const standardFormeNum = this.formeNum
 
     const buffer = super.toBytes()
 
