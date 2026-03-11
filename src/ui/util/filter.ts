@@ -2,7 +2,6 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { isMegaStone, isZCrystal } from '@openhome-core/pkm/util'
 import { Gender, MetadataLookup, OriginGame } from '@pkm-rs/pkg'
 import { Type } from '@pokemon-resources/index'
-import { parseTag } from './tags'
 
 export interface Filter {
   dexNumber?: number
@@ -78,14 +77,11 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
 
   if (filter.tag !== undefined) {
     if (filter.tag === 'Any Tag') {
-      const tag = 'notes' in mon ? parseTag(mon.notes as string) : undefined
-      if (!tag) return false
+      if (!('tagLabel' in mon) || !mon.tagLabel) return false
     } else if (filter.tag === 'No Tag') {
-      const tag = 'notes' in mon ? parseTag(mon.notes as string) : undefined
-      if (tag) return false
+      if ('tagLabel' in mon && mon.tagLabel) return false
     } else {
-      const tag = 'notes' in mon ? parseTag(mon.notes as string) : undefined
-      if (!tag || tag.label !== filter.tag) return false
+      if (!('tagLabel' in mon) || mon.tagLabel !== filter.tag) return false
     }
   }
 

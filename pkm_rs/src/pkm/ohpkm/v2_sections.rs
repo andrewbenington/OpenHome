@@ -1420,6 +1420,56 @@ impl DataSection for Notes {
     }
 }
 
+/// Custom tag for a Pokemon (label + CSS color string)
+/// Stored as: 2-byte LE label length, label UTF-8 bytes, color UTF-8 bytes
+#[derive(Debug, Default, Clone)]
+pub struct MonTag {
+    pub label: String,
+    pub color: String,
+}
+
+impl DataSection for MonTag {
+    type TagType = SectionTagV2;
+    const TAG: Self::TagType = SectionTagV2::Tag;
+
+    type ErrorType = Error;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::ensure_buffer_size(bytes)?;
+        if bytes.len() < 2 {
+            return Err(Error::other("MonTag section too short"));
+        }
+        let label_len = u16::from_le_bytes([bytes[0], bytes[1]]) as usize;
+        if bytes.len() < 2 + label_len {
+            return Err(Error::other("MonTag label length out of bounds"));
+        }
+        let label = String::from_utf8(bytes[2..2 + label_len].to_vec()).map_err(|e| {
+            Error::StringDecode {
+                source: StringErrorSource::Notes(e),
+            }
+        })?;
+        let color = String::from_utf8(bytes[2 + label_len..].to_vec()).map_err(|e| {
+            Error::StringDecode {
+                source: StringErrorSource::Notes(e),
+            }
+        })?;
+        Ok(Self { label, color })
+    }
+
+    fn to_bytes(&self) -> Result<Vec<u8>> {
+        let label_bytes = self.label.as_bytes();
+        let label_len = label_bytes.len() as u16;
+        let mut buf = Vec::with_capacity(2 + label_bytes.len() + self.color.len());
+        buf.extend_from_slice(&label_len.to_le_bytes());
+        buf.extend_from_slice(label_bytes);
+        buf.extend_from_slice(self.color.as_bytes());
+        Ok(buf)
+    }
+
+    fn is_empty(&self) -> bool {
+        self.label.is_empty()
+    }
+}
 /// Display color for the Pokemon in boxes (CSS color string like '#ff0000')
 #[derive(Debug, Default, Clone)]
 pub struct DisplayColor(pub String);

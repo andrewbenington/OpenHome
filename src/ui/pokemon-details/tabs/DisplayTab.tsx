@@ -1,7 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { useSaves } from '@openhome-ui/state/saves'
-import { DISPLAY_COLOR_PRESETS, TAG_PRESETS, parseTag } from '@openhome-ui/util/tags'
+import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Badge, Button, Flex, TextField } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
 import useDebounce from 'src/ui/hooks/useDebounce'
@@ -11,20 +11,22 @@ interface DisplayTabProps {
 }
 
 export default function DisplayTab({ mon }: DisplayTabProps) {
-  // Use type assertion since displayColor comes from WASM and may not be in TS types yet
-  const monWithDisplay = mon as OHPKM & { displayColor?: string }
-  const existingTag = parseTag(mon.notes)
+  // Use type assertion since displayColor/tagLabel/tagColor come from WASM and may not be in TS types yet
+  const monWithDisplay = mon as OHPKM & {
+    displayColor?: string
+    tagLabel?: string
+    tagColor?: string
+  }
   const [customColor, setCustomColor] = useState(monWithDisplay.displayColor ?? '')
-  const [tagLabel, setTagLabel] = useState(existingTag?.label ?? '')
-  const [tagColor, setTagColor] = useState(existingTag?.color ?? '')
+  const [tagLabel, setTagLabel] = useState(monWithDisplay.tagLabel ?? '')
+  const [tagColor, setTagColor] = useState(monWithDisplay.tagColor ?? '')
   const { updateMonDisplayColor, updateMonTag } = useSaves()
 
   useEffect(() => {
     setCustomColor(monWithDisplay.displayColor ?? '')
-    const tag = parseTag(mon.notes)
-    setTagLabel(tag?.label ?? '')
-    setTagColor(tag?.color ?? '')
-  }, [mon, monWithDisplay.displayColor, mon.notes])
+    setTagLabel(monWithDisplay.tagLabel ?? '')
+    setTagColor(monWithDisplay.tagColor ?? '')
+  }, [mon, monWithDisplay.displayColor, monWithDisplay.tagLabel, monWithDisplay.tagColor])
 
   const debouncedColorUpdate = useDebounce((color: string) => {
     updateMonDisplayColor(mon.openhomeId, color || undefined)

@@ -16,7 +16,6 @@ import { AddBoxLocation, BankBoxCoordinates, OpenHomeBanks } from 'src/core/save
 import { displayIndexAdder, isBattleFormeItem } from '../../../core/pkm/util'
 import { BackendContext } from '../../backend/backendContext'
 import { PokedexUpdate } from '../../util/pokedex'
-import { encodeTagInNotes, stripTagFromNotes } from '../../util/tags'
 import { AppInfoContext } from '../appInfo'
 import { OhpkmStoreData } from '../ohpkm'
 import { IdentifierNotPresentError, useOhpkmStore } from '../ohpkm/useOhpkmStore'
@@ -1016,7 +1015,7 @@ export function useSaves(): SavesAndBanksManager {
 
   /**
    * Updates the custom tag for a Pokemon.
-   * Tags are encoded as a prefix in the notes field so they survive WASM serialization.
+   * Tags are stored as dedicated fields on the OHPKM (tagLabel + tagColor).
    * @param monId The OHPKM ID
    * @param tag Tag label string (e.g., 'Competitive') or undefined to clear
    * @param tagColor CSS color string for the tag badge
@@ -1029,9 +1028,7 @@ export function useSaves(): SavesAndBanksManager {
       if (R.isErr(result)) return result
 
       const mon = result.value
-      const userNotes = stripTagFromNotes(mon.notes)
-      const newTag = tag && tagColor ? { label: tag, color: tagColor } : undefined
-      mon.notes = encodeTagInNotes(newTag, userNotes)
+      mon.setTag(tag ?? null, tagColor ?? null)
 
       ohpkmStore.insertOrUpdate(mon)
     },
