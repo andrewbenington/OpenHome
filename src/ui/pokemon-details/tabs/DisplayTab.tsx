@@ -153,7 +153,7 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
           <div
             style={{ marginBottom: 8, fontSize: 14, fontWeight: 'bold', color: 'var(--gray-a11)' }}
           >
-            Tags (Max 4)
+            Tags (Max 3)
           </div>
 
           {tags.length > 0 && (
@@ -191,20 +191,20 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                 <button
                   key={preset.label}
                   onClick={() => handleAddTag(preset)}
-                  disabled={tags.length >= 4}
+                  disabled={tags.length >= 3}
                   style={{
                     padding: '4px 10px',
                     backgroundColor: preset.color,
                     border: '2px solid transparent',
                     borderRadius: 6,
-                    cursor: tags.length >= 4 ? 'not-allowed' : 'pointer',
+                    cursor: tags.length >= 3 ? 'not-allowed' : 'pointer',
                     fontSize: 12,
                     color: '#fff',
                     textShadow: '0 0 2px #000',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 4,
-                    opacity: tags.length >= 4 ? 0.5 : 1,
+                    opacity: tags.length >= 3 ? 0.5 : 1,
                   }}
                   title={preset.label}
                 >
@@ -262,7 +262,7 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                   handleAddTag({ label: newTagLabel, color: newTagColor, icon: newTagIcon })
                   setNewTagLabel('')
                 }}
-                disabled={!newTagLabel || tags.length >= 4}
+                disabled={!newTagLabel || tags.length >= 3}
               >
                 Add
               </Button>
