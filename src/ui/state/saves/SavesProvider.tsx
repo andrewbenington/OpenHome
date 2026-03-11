@@ -51,13 +51,11 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
   const loadAllHomeData = useCallback(async () => {
     if (openSavesState.error) return
-    console.log('[SAVES] Calling backend.loadHomeBanks()...')
     await backend
       .loadHomeBanks()
       .then(
         R.match(
           (banks) => {
-            console.log('[SAVES] loadHomeBanks() succeeded')
             openSavesDispatch({ type: 'load_home_banks', payload: { banks } })
           },
           (err) => {
@@ -201,7 +199,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
   useEffect(() => {
     if (!openSavesState.homeData) {
-      console.log('[SAVES] homeData not loaded, triggering loadAllHomeData()')
       loadAllHomeData()
     }
   }, [loadAllHomeData, openSavesState.homeData])

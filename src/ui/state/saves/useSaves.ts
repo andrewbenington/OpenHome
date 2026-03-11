@@ -74,7 +74,10 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
   moveBoxToBank(save: SAV): number
   moveSaveToBank(save: SAV): number
   updateMonDisplayColor(monId: string, color: string | undefined): void
-  updateMonTag(monId: string, tag: string | undefined, tagColor: string | undefined): void
+  updateMonTags(
+    monId: string,
+    tags: { label: string; color: string; icon?: string }[] | undefined
+  ): void
 }
 
 export function useSaves(): SavesAndBanksManager {
@@ -1014,21 +1017,20 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   /**
-   * Updates the custom tag for a Pokemon.
-   * Tags are stored as dedicated fields on the OHPKM (tagLabel + tagColor).
+   * Updates the custom tags for a Pokemon.
+   * Tags are stored as dedicated fields on the OHPKM (label + color + icon).
    * @param monId The OHPKM ID
-   * @param tag Tag label string (e.g., 'Competitive') or undefined to clear
-   * @param tagColor CSS color string for the tag badge
+   * @param tags Array of tags or undefined to clear
    */
-  const updateMonTag = useCallback(
-    (monId: string, tag: string | undefined, tagColor: string | undefined) => {
+  const updateMonTags = useCallback(
+    (monId: string, tags: { label: string; color: string; icon?: string }[] | undefined) => {
       if (!homeData) return
 
       const result = ohpkmStore.tryLoadFromId(monId)
       if (R.isErr(result)) return result
 
       const mon = result.value
-      mon.setTag(tag ?? null, tagColor ?? null)
+      mon.setTags(tags ?? null)
 
       ohpkmStore.insertOrUpdate(mon)
     },
@@ -1103,7 +1105,7 @@ export function useSaves(): SavesAndBanksManager {
     moveBoxToBank,
     moveSaveToBank,
     updateMonDisplayColor,
-    updateMonTag,
+    updateMonTags,
   }
 }
 

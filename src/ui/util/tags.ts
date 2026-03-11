@@ -1,10 +1,10 @@
 export const TAG_PRESETS = [
-  { label: 'Competitive', color: '#ef4444' },
-  { label: 'Rare', color: '#eab308' },
-  { label: 'Trade', color: '#3b82f6' },
-  { label: 'Breeding', color: '#a855f7' },
-  { label: 'Favorite', color: '#ec4899' },
-  { label: 'Event', color: '#06b6d4' },
+  { label: 'Competitive', color: '#ef4444', icon: 'FaCrosshairs' },
+  { label: 'Rare', color: '#eab308', icon: 'FaStar' },
+  { label: 'Trade', color: '#3b82f6', icon: 'FaExchangeAlt' },
+  { label: 'Breeding', color: '#a855f7', icon: 'FaHeart' },
+  { label: 'Favorite', color: '#ec4899', icon: 'FaThumbsUp' },
+  { label: 'Event', color: '#06b6d4', icon: 'FaCalendarAlt' },
 ]
 
 export const DISPLAY_COLOR_PRESETS = [
@@ -21,4 +21,5 @@ export const DISPLAY_COLOR_PRESETS = [
 export interface MonTag {
   label: string
   color: string
+  icon?: string
 }

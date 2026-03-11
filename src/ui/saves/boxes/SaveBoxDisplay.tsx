@@ -296,14 +296,12 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
     SubmenuBuilder.fromLabel('Move to Bank...')
       .withBuilder(
         ItemBuilder.fromLabel(`This Box (${currentBoxMonCount})`).withAction(() => {
-          const moved = savesManager.moveBoxToBank(save)
-          console.log(`Moved ${moved} Pokémon from box to bank`)
+          savesManager.moveBoxToBank(save)
         })
       )
       .withBuilder(
         ItemBuilder.fromLabel(`Entire Save (${totalMonCount})`).withAction(() => {
-          const moved = savesManager.moveSaveToBank(save)
-          console.log(`Moved ${moved} Pokémon from save to bank`)
+          savesManager.moveSaveToBank(save)
         })
       ),
   ]

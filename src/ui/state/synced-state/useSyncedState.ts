@@ -61,12 +61,10 @@ export function useSyncedState<State, RustState = State>(
   }, [backend, convertRustState, identifier])
 
   const loadAndCacheState = useCallback(async () => {
-    console.log(`[SYNCED_STATE:${identifier}] Calling stateGetter()...`)
     stateGetter()
       .then(
         R.match(
           (data) => {
-            console.log(`[SYNCED_STATE:${identifier}] stateGetter() succeeded`)
             onLoaded?.(data)
             setStateCache(data)
           },
@@ -84,10 +82,8 @@ export function useSyncedState<State, RustState = State>(
 
   useEffect(() => {
     if (!stateCache && !loading) {
-      console.log(`[SYNCED_STATE:${identifier}] Starting load...`)
       setLoading(true)
       loadAndCacheState().finally(() => {
-        console.log(`[SYNCED_STATE:${identifier}] loadAndCacheState finally block`)
         setLoading(false)
       })
     }

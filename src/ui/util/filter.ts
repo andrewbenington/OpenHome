@@ -76,12 +76,14 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
   }
 
   if (filter.tag !== undefined) {
+    const tags: { label: string }[] =
+      'tags' in mon && Array.isArray((mon as any).tags) ? (mon as any).tags : []
     if (filter.tag === 'Any Tag') {
-      if (!('tagLabel' in mon) || !mon.tagLabel) return false
+      if (tags.length === 0) return false
     } else if (filter.tag === 'No Tag') {
-      if ('tagLabel' in mon && mon.tagLabel) return false
+      if (tags.length > 0) return false
     } else {
-      if (!('tagLabel' in mon) || mon.tagLabel !== filter.tag) return false
+      if (!tags.some((t) => t.label === filter.tag)) return false
     }
   }
 

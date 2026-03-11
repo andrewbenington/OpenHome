@@ -56,7 +56,7 @@ function BoxCell({
   const { filter, topRightIndicator, showItem, showShiny } = useMonDisplay()
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
-  const { releaseMonAtLocation, setMonNickname, updateMonTag, updateMonDisplayColor } = useSaves()
+  const { releaseMonAtLocation, setMonNickname, updateMonTags, updateMonDisplayColor } = useSaves()
   const { moveMonItemToBag } = useItems()
   const [renameOpen, setRenameOpen] = useState(false)
   const [renameValue, setRenameValue] = useState('')
@@ -138,16 +138,14 @@ function BoxCell({
     const builder = SubmenuBuilder.fromLabel('Set Tag')
     for (const preset of TAG_PRESETS) {
       builder.withBuilder(
-        ItemBuilder.fromLabel(preset.label).withAction(() =>
-          updateMonTag(monId, preset.label, preset.color)
-        )
+        ItemBuilder.fromLabel(preset.label).withAction(() => updateMonTags(monId, [preset]))
       )
     }
     builder.withBuilder(
-      ItemBuilder.fromLabel('Clear Tag').withAction(() => updateMonTag(monId, undefined, undefined))
+      ItemBuilder.fromLabel('Clear Tag').withAction(() => updateMonTags(monId, undefined))
     )
     return builder
-  }, [mon, updateMonTag])
+  }, [mon, updateMonTags])
 
   const displayColorSubmenu = useMemo(() => {
     if (!mon || !('openhomeId' in mon)) return undefined

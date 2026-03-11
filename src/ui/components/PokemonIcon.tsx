@@ -7,6 +7,7 @@ import useMonSprite from '@openhome-ui/pokemon-details//useMonSprite'
 import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs/pkg'
 import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
 import { classNames, grayscaleIf } from '../util/style'
+import { TagIcon } from './TagIcon'
 import './components.css'
 
 export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
@@ -21,6 +22,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   topRightIndicator?: ReactNode
   pluginForm?: number
   pluginOrigin?: string
+  tags?: any[]
 }
 
 function getBackgroundPosition(formeMetadata?: FormeMetadata, isEgg?: boolean) {
@@ -45,6 +47,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
     silhouette,
     isEgg,
     topRightIndicator,
+    tags,
     style,
     onClick,
     pluginForm,
@@ -88,6 +91,38 @@ export default function PokemonIcon(props: PokemonIconProps) {
           draggable={false}
           src={getPublicImageURL('icons/Shiny.png')}
         />
+      )}
+      {tags && tags.length > 0 && (
+        <div
+          style={{
+            position: 'absolute',
+            top: isShiny ? 14 : -2,
+            left: -4,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            zIndex: 3,
+          }}
+        >
+          {tags.map((tag, i) => (
+            <div
+              key={i}
+              style={{
+                width: 14,
+                height: 14,
+                borderRadius: '50%',
+                backgroundColor: tag.color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 0 2px rgba(0,0,0,0.5)',
+                color: 'white',
+              }}
+            >
+              <TagIcon iconName={tag.icon} size={8} />
+            </div>
+          ))}
+        </div>
       )}
       {topRightIndicator && <div className="extra-indicator">{topRightIndicator}</div>}
       {heldItemIndex ? (

@@ -1,7 +1,8 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
+import { TagIcon } from '@openhome-ui/components/TagIcon'
 import { useSaves } from '@openhome-ui/state/saves'
-import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
+import { DISPLAY_COLOR_PRESETS, MonTag, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Badge, Button, Flex, TextField } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
 import useDebounce from 'src/ui/hooks/useDebounce'
@@ -11,22 +12,23 @@ interface DisplayTabProps {
 }
 
 export default function DisplayTab({ mon }: DisplayTabProps) {
-  // Use type assertion since displayColor/tagLabel/tagColor come from WASM and may not be in TS types yet
   const monWithDisplay = mon as OHPKM & {
     displayColor?: string
-    tagLabel?: string
-    tagColor?: string
+    tags?: any[]
   }
   const [customColor, setCustomColor] = useState(monWithDisplay.displayColor ?? '')
-  const [tagLabel, setTagLabel] = useState(monWithDisplay.tagLabel ?? '')
-  const [tagColor, setTagColor] = useState(monWithDisplay.tagColor ?? '')
-  const { updateMonDisplayColor, updateMonTag } = useSaves()
+  const [tags, setTags] = useState<MonTag[]>(monWithDisplay.tags ?? [])
+
+  const [newTagLabel, setNewTagLabel] = useState('')
+  const [newTagColor, setNewTagColor] = useState('#888888')
+  const [newTagIcon, setNewTagIcon] = useState('FaCircle')
+
+  const { updateMonDisplayColor, updateMonTags } = useSaves()
 
   useEffect(() => {
     setCustomColor(monWithDisplay.displayColor ?? '')
-    setTagLabel(monWithDisplay.tagLabel ?? '')
-    setTagColor(monWithDisplay.tagColor ?? '')
-  }, [mon, monWithDisplay.displayColor, monWithDisplay.tagLabel, monWithDisplay.tagColor])
+    setTags(monWithDisplay.tags ?? [])
+  }, [mon, monWithDisplay.displayColor, monWithDisplay.tags])
 
   const debouncedColorUpdate = useDebounce((color: string) => {
     updateMonDisplayColor(mon.openhomeId, color || undefined)
@@ -47,6 +49,23 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
     updateMonDisplayColor(mon.openhomeId, undefined)
   }
 
+  const handleAddTag = (tag: MonTag) => {
+    const newTags = [...tags, tag]
+    setTags(newTags)
+    updateMonTags(mon.openhomeId, newTags)
+  }
+
+  const handleRemoveTag = (index: number) => {
+    const newTags = tags.filter((_, i) => i !== index)
+    setTags(newTags)
+    updateMonTags(mon.openhomeId, newTags.length ? newTags : undefined)
+  }
+
+  const clearAllTags = () => {
+    setTags([])
+    updateMonTags(mon.openhomeId, undefined)
+  }
+
   return (
     <div
       style={{
@@ -64,7 +83,6 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                 type="color"
                 value={customColor.slice(0, 7) || '#666666'}
                 onChange={(e) => {
-                  // Add alpha channel for transparency
                   const colorWithAlpha = e.target.value + '80'
                   handleColorChange(colorWithAlpha)
                 }}
@@ -131,69 +149,103 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
           </Flex>
         </div>
 
-        <div
-          style={{
-            marginTop: 16,
-            padding: 16,
-            backgroundColor: customColor || '#6662',
-            borderRadius: 8,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '1px solid var(--gray-a5)',
-          }}
-        >
-          <div style={{ fontSize: 14, textAlign: 'center', color: 'var(--gray-12)' }}>
-            <div style={{ marginBottom: 4, fontWeight: 'bold' }}>Preview</div>
-            <div style={{ fontSize: 12, opacity: 0.8 }}>This is how the box cell will look</div>
-          </div>
-        </div>
-
-        <div style={{ marginTop: 16 }}>
+        <div style={{ marginTop: 8 }}>
           <div
             style={{ marginBottom: 8, fontSize: 14, fontWeight: 'bold', color: 'var(--gray-a11)' }}
           >
-            Custom Tag
+            Tags (Max 4)
           </div>
+
+          {tags.length > 0 && (
+            <Flex gap="2" wrap="wrap" style={{ marginBottom: 10 }}>
+              {tags.map((tag, i) => (
+                <Badge
+                  key={i}
+                  variant="solid"
+                  size="2"
+                  style={{
+                    backgroundColor: tag.color,
+                    color: '#fff',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                  onClick={() => handleRemoveTag(i)}
+                  title="Click to remove"
+                >
+                  <TagIcon iconName={tag.icon} />
+                  {tag.label}
+                  <span style={{ opacity: 0.7 }}>×</span>
+                </Badge>
+              ))}
+              <Button variant="surface" color="red" highContrast size="1" onClick={clearAllTags}>
+                Clear all
+              </Button>
+            </Flex>
+          )}
+
           <Flex direction="column" gap="2">
             <Flex gap="2" wrap="wrap">
-              {TAG_PRESETS.map(({ label, color }) => (
+              {TAG_PRESETS.map((preset) => (
                 <button
-                  key={label}
-                  onClick={() => {
-                    setTagLabel(label)
-                    setTagColor(color)
-                    updateMonTag(mon.openhomeId, label, color)
-                  }}
+                  key={preset.label}
+                  onClick={() => handleAddTag(preset)}
+                  disabled={tags.length >= 4}
                   style={{
                     padding: '4px 10px',
-                    backgroundColor: color,
-                    border: tagLabel === label ? '2px solid white' : '2px solid transparent',
+                    backgroundColor: preset.color,
+                    border: '2px solid transparent',
                     borderRadius: 6,
-                    cursor: 'pointer',
+                    cursor: tags.length >= 4 ? 'not-allowed' : 'pointer',
                     fontSize: 12,
                     color: '#fff',
                     textShadow: '0 0 2px #000',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    opacity: tags.length >= 4 ? 0.5 : 1,
                   }}
-                  title={label}
+                  title={preset.label}
                 >
-                  {label}
+                  <TagIcon iconName={preset.icon} size={10} />
+                  {preset.label}
                 </button>
               ))}
             </Flex>
+
             <Flex gap="2" align="center">
               <TextField.Root
                 placeholder="Custom tag name"
-                value={tagLabel}
-                onChange={(e) => setTagLabel(e.target.value)}
+                value={newTagLabel}
+                onChange={(e) => setNewTagLabel(e.target.value)}
                 style={{ flex: 1 }}
               >
                 <TextField.Slot />
               </TextField.Root>
+              <select
+                value={newTagIcon}
+                onChange={(e) => setNewTagIcon(e.target.value)}
+                style={{
+                  padding: '4px',
+                  borderRadius: 4,
+                  background: 'var(--color-surface)',
+                  color: 'var(--gray-12)',
+                  border: '1px solid var(--gray-a6)',
+                }}
+              >
+                <option value="FaCircle">Circle</option>
+                <option value="FaStar">Star</option>
+                <option value="FaCrosshairs">Crosshairs</option>
+                <option value="FaHeart">Heart</option>
+                <option value="FaThumbsUp">Thumbs Up</option>
+                <option value="FaExchangeAlt">Trade</option>
+                <option value="FaCalendarAlt">Calendar</option>
+              </select>
               <input
                 type="color"
-                value={tagColor || '#888888'}
-                onChange={(e) => setTagColor(e.target.value)}
+                value={newTagColor}
+                onChange={(e) => setNewTagColor(e.target.value)}
                 style={{
                   width: 32,
                   height: 32,
@@ -206,42 +258,15 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
               <Button
                 variant="surface"
                 highContrast
-                onClick={() =>
-                  updateMonTag(mon.openhomeId, tagLabel || undefined, tagColor || undefined)
-                }
-                disabled={!tagLabel}
-              >
-                Apply
-              </Button>
-              <Button
-                variant="surface"
-                color="gray"
-                highContrast
                 onClick={() => {
-                  setTagLabel('')
-                  setTagColor('')
-                  updateMonTag(mon.openhomeId, undefined, undefined)
+                  handleAddTag({ label: newTagLabel, color: newTagColor, icon: newTagIcon })
+                  setNewTagLabel('')
                 }}
-                disabled={!tagLabel && !tagColor}
+                disabled={!newTagLabel || tags.length >= 4}
               >
-                Clear
+                Add
               </Button>
             </Flex>
-            {tagLabel && (
-              <Flex align="center" gap="2">
-                <span style={{ fontSize: 12, color: 'var(--gray-11)' }}>Preview:</span>
-                <Badge
-                  variant="solid"
-                  size="1"
-                  style={{
-                    backgroundColor: tagColor || '#888',
-                    color: '#fff',
-                  }}
-                >
-                  {tagLabel}
-                </Badge>
-              </Flex>
-            )}{' '}
           </Flex>
         </div>
       </Flex>

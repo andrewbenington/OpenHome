@@ -1,8 +1,11 @@
 use crate::pkm::ohpkm::OhpkmV1;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
+#[cfg(feature = "wasm")]
+use crate::pkm::ohpkm::v2_sections::MonTag;
 use crate::pkm::ohpkm::v2_sections::{
     BdspData, DisplayColor, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2,
-    MonTag, MostRecentSave, Notes, PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
+    MonTags, MostRecentSave, Notes, PastHandlerData, PluginData, ScarletVioletData,
+    SwordShieldData,
 };
 use crate::pkm::{Error, Result};
 
@@ -130,7 +133,7 @@ pub struct OhpkmV2 {
     notes: Option<Notes>,
     most_recent_save: Option<MostRecentSave>,
     display_color: Option<DisplayColor>,
-    tag: Option<MonTag>,
+    tags: Option<MonTags>,
 }
 
 impl OhpkmV2 {
@@ -149,7 +152,7 @@ impl OhpkmV2 {
             notes: None,
             most_recent_save: None,
             display_color: None,
-            tag: None,
+            tags: None,
         })
     }
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -161,7 +164,7 @@ impl OhpkmV2 {
             return Err(Error::other("Bad version number"));
         }
 
-        let mut result = Self {
+        let result = Self {
             main_data: MainDataV2::extract_from(&sectioned_data)?
                 .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
             gameboy_data: GameboyData::extract_from(&sectioned_data)?,
@@ -176,7 +179,7 @@ impl OhpkmV2 {
             notes: Notes::extract_from(&sectioned_data)?,
             most_recent_save: MostRecentSave::extract_from(&sectioned_data)?,
             display_color: DisplayColor::extract_from(&sectioned_data)?,
-            tag: MonTag::extract_from(&sectioned_data)?,
+            tags: MonTags::extract_from(&sectioned_data)?,
         };
 
         Ok(result)
@@ -197,7 +200,7 @@ impl OhpkmV2 {
             notes: None,
             most_recent_save: None,
             display_color: None,
-            tag: None,
+            tags: None,
         }
     }
 
@@ -217,7 +220,7 @@ impl OhpkmV2 {
             .add_if_some(self.notes.clone())?
             .add_if_some(self.most_recent_save.clone())?
             .add_if_some(self.display_color.clone())?
-            .add_if_some(self.tag.clone())?;
+            .add_if_some(self.tags.clone())?;
         Ok(sectioned_data)
     }
 
@@ -1754,23 +1757,21 @@ impl OhpkmV2 {
         }
     }
 
-    // Tag (label + CSS color)
-    #[wasm_bindgen(getter = tagLabel)]
-    pub fn tag_label(&self) -> Option<String> {
-        Some(self.tag.clone()?.label)
+    // Tags (Vec of label, color, icon)
+    #[wasm_bindgen(getter = tags)]
+    pub fn tags(&self) -> JsValue {
+        serde_wasm_bindgen::to_value(&self.tags.clone().unwrap_or_default().0).unwrap()
     }
 
-    #[wasm_bindgen(getter = tagColor)]
-    pub fn tag_color(&self) -> Option<String> {
-        Some(self.tag.clone()?.color)
-    }
-
-    /// Set or clear the tag. Pass None for both to clear.
-    #[wasm_bindgen(js_name = setTag)]
-    pub fn set_tag(&mut self, label: Option<String>, color: Option<String>) {
-        match (label, color) {
-            (Some(l), Some(c)) => self.tag = Some(MonTag { label: l, color: c }),
-            _ => self.tag = None,
+    /// Set or clear the tags by passing a serialized JSON string or an empty array.
+    #[wasm_bindgen(js_name = setTags)]
+    pub fn set_tags(&mut self, tags_js: JsValue) {
+        if let Ok(vec) = serde_wasm_bindgen::from_value::<Vec<MonTag>>(tags_js) {
+            if vec.is_empty() {
+                self.tags = None;
+            } else {
+                self.tags = Some(MonTags(vec));
+            }
         }
     }
 
