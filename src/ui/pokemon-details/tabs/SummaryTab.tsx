@@ -1,6 +1,7 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getTypes } from '@openhome-core/pkm/util'
 import { getLumiCustomForm } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
+import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import AttributeTag from '@openhome-ui/components/AttributeTag'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -135,8 +136,8 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             {(() => {
               const baseFormName = MetadataLookup(mon.dexNum, mon.formeNum)?.formeName
               let customFormName = ''
-              if ('lumiFormeName' in mon && (mon as any).lumiFormeName) {
-                customFormName = String((mon as any).lumiFormeName)
+              if (mon instanceof PB8LUMI && mon.lumiFormeName) {
+                customFormName = mon.lumiFormeName
               } else if (
                 mon.pluginOrigin === 'luminescent_platinum' &&
                 mon.pluginForm !== undefined

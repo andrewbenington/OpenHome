@@ -88,7 +88,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
 
   const markImage =
     mon.pluginOrigin === 'luminescent_platinum'
-      ? `origin_marks/BDSP.png`
+      ? `/origin_marks/BDSP.png`
       : mon.gameOfOrigin
         ? OriginGames.markPath(mon.gameOfOrigin)
         : undefined

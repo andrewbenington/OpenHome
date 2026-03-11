@@ -115,6 +115,11 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
     return G8LumiSAV.saveTypeID
   }
 
+  // Determines which in-game origin marks belong to this save type
+  static includesOrigin(origin: OriginGame): boolean {
+    return origin === OriginGame.BrilliantDiamond || origin === OriginGame.ShiningPearl
+  }
+
   // Determines whether a file matches Luminescent Platinum save structure
   static fileIsSave(bytes: Uint8Array): boolean {
     const isLumiSize = bytes.length >= 900000 && bytes.length <= 1200000
