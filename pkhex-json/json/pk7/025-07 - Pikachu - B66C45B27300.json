@@ -43,9 +43,7 @@
   "resort_event_status": 0,
   "pokerus_byte": 0,
   "super_training_flags": 0,
-  "ribbons": [
-    "Wishing Ribbon"
-  ],
+  "ribbons": ["Wishing Ribbon"],
   "contest_memory_count": 0,
   "battle_memory_count": 0,
   "super_training_dist_flags": 0,
@@ -73,12 +71,7 @@
       "pp_ups": 0
     }
   ],
-  "relearn_moves": [
-    "Thunderbolt",
-    "Quick Attack",
-    "Thunder",
-    "Iron Tail"
-  ],
+  "relearn_moves": ["Thunderbolt", "Quick Attack", "Thunder", "Iron Tail"],
   "secret_super_training_unlocked": false,
   "secret_super_training_complete": false,
   "ivs": {

@@ -5,7 +5,6 @@ import { SMSAV } from '../SMSAV'
 import { USUMSAV } from '../USUMSAV'
 import { PathData } from '../util/path'
 import { initializeWasm } from './init'
-import { fail } from 'assert'
 
 beforeAll(initializeWasm)
 
