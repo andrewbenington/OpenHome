@@ -16,8 +16,6 @@ import {
 } from './conversion/LuminescentPlatinumMovesIndex'
 import {
   fromLumiPokemonIndex,
-  LumiToNationalDexMap,
-  NationalDexToLumiMap,
   toLumiPokemonIndex,
 } from './conversion/LuminescentPlatinumSpeciesMap'
 
@@ -90,11 +88,11 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
   }
 
   monFromGameIndex(gameIndex: number) {
-    return fromLumiPokemonIndex(gameIndex, LumiToNationalDexMap, 'Luminescent Platinum')
+    return fromLumiPokemonIndex(gameIndex)
   }
 
-  monToGameIndex(nationalDexNumber: number, formIndex: number): number {
-    return toLumiPokemonIndex(nationalDexNumber, formIndex, NationalDexToLumiMap)
+  monToGameIndex(nationalDexNumber: number): number {
+    return toLumiPokemonIndex(nationalDexNumber)
   }
 
   indexIsFakemon(_speciesIndex: number): boolean {
