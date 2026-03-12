@@ -126,9 +126,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
       this.gameOfOriginBattle = other.gameOfOriginBattle
-      this.pluginOrigin = other.pluginOrigin as PluginIdentifier | undefined
-      if (other.pluginForm !== undefined) {
-        this.pluginForm = other.pluginForm
+      if (other.pluginOrigin) {
+        this.setPluginData(other.pluginOrigin as PluginIdentifier, other.pluginForm)
       }
 
       this.isEgg = other.isEgg ?? false
@@ -520,16 +519,16 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return this.pluginOriginWasm as PluginIdentifier | undefined
   }
 
-  set pluginOrigin(value: PluginIdentifier | undefined) {
-    this.pluginOriginWasm = value
-  }
-
   get pluginForm(): number | undefined {
     return this.pluginFormWasm as number | undefined
   }
 
-  set pluginForm(value: number | undefined) {
-    this.pluginFormWasm = value === undefined ? null : value
+  setPluginData(origin: PluginIdentifier, form?: number) {
+    this.setPluginDataWasm(origin, form ?? null)
+  }
+
+  clearPluginData() {
+    this.clearPluginDataWasm()
   }
   // derived fields
 
@@ -707,9 +706,9 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.movePP = adjustMovePPBetweenFormats(this, other)
     this.movePPUps = other.movePPUps as FourMoves
 
-    if (other.pluginOrigin !== undefined) {
-      this.pluginOrigin = other.pluginOrigin as PluginIdentifier | undefined
-      this.pluginForm = other.pluginForm
+    // preserve plugin metadata if present
+    if (other.pluginOrigin) {
+      this.setPluginData(other.pluginOrigin as PluginIdentifier, other.pluginForm)
     }
 
     if (this.dexNum !== other.dexNum && isEvolution(this, other)) {
