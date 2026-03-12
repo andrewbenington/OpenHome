@@ -1386,7 +1386,6 @@ impl DataSection for PluginData {
 
     fn to_bytes(&self) -> Result<Vec<u8>> {
         let mut bytes = Vec::new();
-        // Write form as little-endian u16
         bytes.extend_from_slice(&self.plugin_form.unwrap_or(0).to_le_bytes());
         // Append origin string
         bytes.extend_from_slice(self.plugin_origin.as_bytes());
