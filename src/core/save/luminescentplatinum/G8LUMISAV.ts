@@ -8,16 +8,16 @@ import { TransferLockedForms, TransferRestrictions } from '../util/TransferRestr
 import { PathData } from '../util/path'
 import PB8LUMI from './PB8LUMI'
 
-// File sizes used to identify Luminescent Platinum save revisions
-const SAVE_SIZE_BYTES_V1_1 = 950000 // 1.1 revision
-const SAVE_SIZE_BYTES_V1_3 = 1100000 // 1.3 revision
-
 // PC layout constants
 const BOX_COUNT = 40
 const BOX_NAME_LENGTH = 0x22
 const BOX_MONS_OFFSET = 0x14ef4
 
-export type LUMI_SAVE_REVISION = '1.1' | '1.3' | '1.3rv1' | 'Unknown'
+export const LUMI_1_1_VERSION_IDENTIFIER = 0x0000
+export const LUMI_1_3_VERSION_IDENTIFIER = 0x0103
+export const LUMI_1_3RV1_VERSION_IDENTIFIER = 0x0134
+
+export type LUMI_SAVE_REVISION = '1.1' | '1.3' | '1.3rv1'
 
 // Transfer rules used by OpenHome when importing/exporting Pokémon
 export const LP_TRANSFER_RESTRICTIONS: TransferRestrictions = {
@@ -126,9 +126,13 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
     if (!isLumiSize) return false
 
     const dataView = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
-    const versionIdentifier = dataView.getUint8(0)
+    const versionIdentifier = dataView.getUint16(0, true)
 
-    return versionIdentifier === 0x34 || versionIdentifier === 0x32
+    return (
+      versionIdentifier === LUMI_1_1_VERSION_IDENTIFIER ||
+      versionIdentifier === LUMI_1_3_VERSION_IDENTIFIER ||
+      versionIdentifier === LUMI_1_3RV1_VERSION_IDENTIFIER
+    )
   }
 
   get trainerGender(): Gender {
@@ -160,16 +164,18 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
     const dataView = new DataView(this.bytes.buffer)
     const versionIdentifier = dataView.getUint16(0, true)
 
-    if (versionIdentifier === 0x0000 && this.bytes.length === SAVE_SIZE_BYTES_V1_1) {
-      return '1.1'
+    switch (versionIdentifier) {
+      case LUMI_1_1_VERSION_IDENTIFIER:
+        return '1.1'
+      case LUMI_1_3_VERSION_IDENTIFIER:
+        return '1.3'
+      case LUMI_1_3RV1_VERSION_IDENTIFIER:
+        return '1.3rv1'
+      default:
+        throw new Error(
+          `Luminescent Platinum save has invalid version identifier: ${versionIdentifier}`
+        )
     }
-    if (
-      (versionIdentifier === 0x0000 || versionIdentifier === 0x0103) &&
-      this.bytes.length === SAVE_SIZE_BYTES_V1_3
-    ) {
-      return '1.3'
-    }
-    return '1.3rv1'
   }
 
   // Metadata displayed in the UI
