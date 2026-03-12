@@ -103,14 +103,15 @@ describe('evolution and form change update ohpkm', async () => {
 describe('plugin form persistence', () => {
   test('pluginForm survives OHPKM serialization', () => {
     const starter = new OHPKM(new Uint8Array())
-    starter.pluginForm = 0x42
+    starter.setPluginData('luminescent_platinum', 0x42)
 
     const bytes = starter.toBytes()
     const again = OHPKM.fromBytes(bytes)
+    expect(again.pluginOrigin).toEqual('luminescent_platinum')
     expect(again.pluginForm).toEqual(0x42)
   })
 
-  test('PB8LUMI → OHPKM → bytes → OHPKM → PB8LUMI roundtrip', () => {
+  test('PB8LUMI → OHPKM → bytes → OHPKM → PB8LUMI roundtrip (ANDREW)', () => {
     const stitchedGengarBytes = new Uint8Array(
       fs.readFileSync(
         path.join(__dirname, 'PKMFiles', 'rom-hack', 'luminescent', 'stitched-gengar.pb8lumi')
@@ -133,6 +134,22 @@ describe('plugin form persistence', () => {
 
     const lumi2 = new PB8LUMI(ohAgain)
     expect(lumi2.pluginForm).toEqual(3)
+  })
+
+  test('PB8LUMI → OHPKM → bytes → OHPKM → PB8LUMI roundtrip', () => {
+    const starter = new OHPKM(new Uint8Array())
+    const lumi = new PB8LUMI(starter)
+    lumi.pluginOrigin = 'luminescent_platinum'
+    lumi.pluginForm = 0x99
+
+    const ohFromLumi = new OHPKM(lumi)
+    const roundBytes = ohFromLumi.toBytes()
+    const ohAgain = OHPKM.fromBytes(roundBytes)
+    expect(ohAgain.pluginOrigin).toEqual('luminescent_platinum')
+    expect(ohAgain.pluginForm).toEqual(0x99)
+
+    const lumi2 = new PB8LUMI(ohAgain)
+    expect(lumi2.pluginForm).toEqual(0x99)
   })
 })
 

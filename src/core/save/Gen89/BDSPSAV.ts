@@ -199,8 +199,9 @@ export class BDSPSAV extends OfficialSAV<PB8> {
       return false
     }
 
-    // REJECT Luminescent Platinum saves
-    if (bytes.length > 940000) {
+    // Reject Luminescent Platinum saves (which overlap the BDSP size range
+    // but use sizes > 940 000 bytes)
+    if (bytes.length > 940_000) {
       return false
     }
 

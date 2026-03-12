@@ -235,7 +235,7 @@ export function pluginOriginMarkPath(identifier: PluginIdentifier): string | und
     case 'unbound':
       return '/icons/gba.png'
     case 'luminescent_platinum':
-      return '/icons/ns.png'
+      return '/origin_marks/BDSP.png'
     default:
       return undefined
   }

@@ -156,4 +156,4 @@ This application would not have been possible without the research done at https
 
 Credit to the [Radical Red Team](https://www.pokecommunity.com/threads/pok%C3%A9mon-radical-red-version-4-1-released-gen-9-dlc-pokemon-character-customization-now-available.437688/) for the Radical Red logo, as well as the Pokémon sprites.
 
-Credit to Team Luminescent (https://luminescent.team/docs/features) for the PKLumiHeX program, which provided critical information about the save file structure, and for the Luminescent Platinum logo.
+Credit to [Team Luminescent](https://luminescent.team/) for the PKLumiHeX program, which provided critical information about the save file structure, and for the Luminescent Platinum logo.

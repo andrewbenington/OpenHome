@@ -23,9 +23,9 @@ import {
 
 export default class PB8LUMI extends PB8 implements PluginPKMInterface {
   // Core plugin metadata
-  //@ts-ignore
+  // @ts-expect-error PB8 declares format as literal 'PB8'; plugin subclass intentionally widens to 'PB8LUMI'
   public format: 'PB8LUMI' = 'PB8LUMI'
-  public pluginIdentifier = 'luminescent_platinum' as PluginIdentifier
+  public pluginIdentifier: PluginIdentifier = 'luminescent_platinum'
   public selectColor = '#25c2a0'
 
   static boxSizeBytes = 344
