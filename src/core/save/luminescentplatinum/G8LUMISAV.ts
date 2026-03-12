@@ -4,7 +4,11 @@ import { utf16BytesToString } from '@pokemon-files/util'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, BoxAndSlot, PluginSAV, SlotMetadata } from '../interfaces'
-import { TransferLockedForms, TransferRestrictions } from '../util/TransferRestrictions'
+import {
+  isRestricted,
+  TransferLockedForms,
+  TransferRestrictions,
+} from '../util/TransferRestrictions'
 import { PathData } from '../util/path'
 import PB8LUMI from './PB8LUMI'
 
@@ -240,8 +244,8 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
     return uint8ArrayToBase64(this.calculateChecksumBytes())
   }
 
-  supportsMon(dexNumber: number, _formeNumber: number): boolean {
-    return dexNumber <= 1025
+  supportsMon(dexNumber: number, formeNumber: number): boolean {
+    return !isRestricted(LP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 
   supportsItem(itemIndex: number) {
