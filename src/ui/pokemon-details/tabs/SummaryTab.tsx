@@ -1,7 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getTypes } from '@openhome-core/pkm/util'
-import { getLumiCustomForm } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
-import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import AttributeTag from '@openhome-ui/components/AttributeTag'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -10,11 +8,12 @@ import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
-import { colorForType } from '@openhome-ui/util/color'
-import { genderFromBool, MetadataLookup } from '@pkm-rs/pkg'
+import { colorForType, colorIsDark } from '@openhome-ui/util/color'
+import { genderFromBool, getPluginColor, MetadataLookup } from '@pkm-rs/pkg'
 import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
+import { getRomHackFormName } from 'src/core/save/rom-hack/forms'
 import useMonSprite from '../useMonSprite'
 
 const SummaryDisplay = (props: { mon: PKMInterface }) => {
@@ -133,30 +132,19 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow label="Species">
           <Flex gap="1">
-            {(() => {
-              const baseFormName = MetadataLookup(mon.dexNum, mon.formeNum)?.formeName
-              let customFormName = ''
-              if (mon instanceof PB8LUMI && mon.lumiFormeName) {
-                customFormName = mon.lumiFormeName
-              } else if (
-                mon.pluginOrigin === 'luminescent_platinum' &&
-                mon.pluginForm !== undefined
-              ) {
-                const customForm = getLumiCustomForm(mon.dexNum, mon.pluginForm)
-                if (customForm) {
-                  customFormName = customForm.name
-                }
-              }
-
-              if (customFormName) {
-                return (
-                  <span className="rom-hack-form-name" style={{ color: '#FFC300' }}>
-                    {baseFormName} - {customFormName}
-                  </span>
-                )
-              }
-              return baseFormName
-            })()}
+            {mon.pluginOrigin && mon.pluginForm !== undefined ? (
+              <span
+                className="rom-hack-form-name"
+                style={{
+                  color: colorIsDark(getPluginColor(mon.pluginOrigin)) ? '#fff' : '#000',
+                  backgroundColor: getPluginColor(mon.pluginOrigin),
+                }}
+              >
+                {getRomHackFormName(mon.pluginOrigin, mon.dexNum, mon.pluginForm)}
+              </span>
+            ) : (
+              MetadataLookup(mon.dexNum, mon.formeNum)?.formeName
+            )}
             <GenderIcon gender={mon.gender} />
           </Flex>
         </AttributeRow>
