@@ -25,6 +25,9 @@ export type LUMI_SAVE_REVISION = '1.1' | '1.3' | '1.3rv1'
 
 // Transfer rules used by OpenHome when importing/exporting Pokémon
 export const LP_TRANSFER_RESTRICTIONS: TransferRestrictions = {
+  // While only a few post-Gen 4 Pokémon have models in Luminescent Platinum (falling back to Ditto sprites),
+  // they can still be generated and transferred. Their data structure, including stats, is fully supported.
+  // We allow up to 1025 so users who add  Pokémon via tools like PKLumiHex can move them back and forth freely.
   maxDexNum: 1025,
   excludedForms: {
     ...TransferLockedForms,
