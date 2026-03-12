@@ -28,7 +28,7 @@ export const LP_TRANSFER_RESTRICTIONS: TransferRestrictions = {
 }
 
 export class G8LumiSAV extends PluginSAV<PB8LUMI> {
-  // Static metadata used by the plugin system
+  // Static metadata
   static saveTypeAbbreviation = 'LUMI'
   static saveTypeName = 'Pokémon Luminescent Platinum'
   static saveTypeID = 'luminescent_platinum'
