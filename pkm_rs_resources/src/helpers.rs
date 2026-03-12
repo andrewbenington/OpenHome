@@ -79,5 +79,5 @@ pub fn calculate_stat_modern(
     let numerator = level_factor * level;
     let nature_multiplier = nature.multiplier_for(stat);
 
-    (((numerator / 100) + 5) as f32 * nature_multiplier).ceil() as u16
+    (((numerator / 100) + 5) as f32 * nature_multiplier).floor() as u16
 }

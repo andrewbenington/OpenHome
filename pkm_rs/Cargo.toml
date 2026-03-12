@@ -38,3 +38,6 @@ missing_const_for_fn = "warn"
 [features]
 wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js", "pkm_rs_types/wasm", "pkm_rs_resources/wasm"]
 randomize = ["rand", "pkm_rs_types/randomize", "pkm_rs_resources/randomize"]
+
+[dev-dependencies]
+assert-json-diff = "2.0.2"

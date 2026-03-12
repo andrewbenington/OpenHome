@@ -1,4 +1,7 @@
 #[cfg(test)]
+use assert_json_diff::{CompareMode, Config, assert_json_matches_no_panic};
+
+#[cfg(test)]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 #[cfg(test)]
 use crate::result::Error;
@@ -15,6 +18,12 @@ use std::ops::RangeInclusive;
 use std::path::Path;
 #[cfg(test)]
 pub fn pkm_from_file<PKM: Pkm>(filename: &Path) -> crate::result::Result<(PKM, Vec<u8>)> {
+    let mut filename = filename.to_path_buf();
+
+    if !filename.starts_with(Path::new("test-files").join("pkm-files")) {
+        filename = Path::new("test-files").join("pkm-files").join(&filename);
+    }
+
     let mut file = File::open(filename).map_err(|e| Error::other(&e.to_string()))?;
 
     let mut contents = Vec::new();
@@ -55,9 +64,9 @@ pub fn to_from_bytes_all_in_dir<PKM: Pkm>(dir: &Path) -> TestResult<()> {
 
 #[cfg(test)]
 pub fn from_to_ohpkm_all_in_dir<PKM: OhpkmConvert>() -> TestResult<()> {
-    use std::{fs, path::PathBuf};
+    use std::fs;
 
-    let ohpkm_dir = &PathBuf::from("pkm_files").join("ohpkm");
+    let ohpkm_dir = &Path::new("test-files").join("pkm-files").join("ohpkm");
     let ohpkm_files =
         fs::read_dir(ohpkm_dir).map_err(|e| Error::other(&format!("directory read error: {e}")))?;
     for dir_entry in ohpkm_files {
@@ -218,6 +227,68 @@ fn find_inconsistencies_to_from_ohpkm<PKM: OhpkmConvert>(mon: PKM) -> TestResult
 
     ensure_ranges_match(&actual, &expected)
 }
+
+#[cfg(test)]
+pub fn compare_pkhex_json_all_in_dir<PKM: Pkm>(dir: &Path) -> TestResult<()> {
+    use std::fs;
+
+    let full_dir = Path::new("test-files").join("pkm-files").join(dir);
+
+    let pkm_files =
+        fs::read_dir(&full_dir).map_err(|e| Error::other(&format!("directory read error: {e}")))?;
+    for dir_entry in pkm_files {
+        match dir_entry {
+            Err(e) => println!("directory entry error: {e}"),
+            Ok(dir_entry) => {
+                if dir_entry.file_name().to_string_lossy().starts_with(".") {
+                    continue;
+                }
+                let pkm_path = dir.join(dir_entry.file_name());
+                compare_pkhex_json::<PKM>(&pkm_path)?;
+            }
+        }
+    }
+
+    Ok(())
+}
+
+#[cfg(test)]
+pub fn compare_pkhex_json<PKM: Pkm>(pkm_path: &Path) -> TestResult<()> {
+    let mon = pkm_from_file::<PKM>(pkm_path)?.0;
+
+    let pkm_rs_json = serde_json::to_string_pretty(&mon)
+        .map_err(|e| TestError::PkmRs(Error::other(&e.to_string())))?;
+
+    // println!("pkm_rs JSON:\n{pkm_rs_json}");
+
+    let mut json_path = Path::new("pkhex-json").join(pkm_path);
+    json_path.set_extension("json");
+    let mut file = File::open(json_path)
+        .map_err(|e| Error::other(&format!("Failed to open JSON file: {e}")))?;
+
+    let pkm_rs_value: serde_json::Value = serde_json::from_str(&pkm_rs_json).unwrap();
+    let mut pkhex_json = String::new();
+    file.read_to_string(&mut pkhex_json)
+        .map_err(|e| Error::other(&e.to_string()))?;
+    let pkhex_value: serde_json::Value = serde_json::from_str(&pkhex_json).unwrap();
+
+    if let Err(e) = assert_json_matches_no_panic(
+        &pkm_rs_value,
+        &pkhex_value,
+        Config::new(CompareMode::Strict),
+    ) {
+        println!("Full pkhex JSON:\n{pkhex_json}");
+        println!("Full pkm_rs JSON:\n{pkm_rs_json}");
+        // assert_json_include!(actual: pkm_rs_value, expected: pkhex_value);
+        return Err(Error::other(&format!("JSON mismatch: {e}")).into());
+    }
+
+    // println!("Golden JSON:\n{file_json}");
+
+    Ok(())
+}
+
+// test command: cargo test --package pkm_rs --lib -- gen7_alola::pk7::test::compare_golden_json --exact --nocapture
 
 #[cfg(test)]
 pub struct TestErrorWithSeed {

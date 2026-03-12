@@ -14,7 +14,7 @@ pub enum ColosseumOrXd {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize)]
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 #[repr(u8)]
 pub enum OriginGame {
     #[default]
@@ -417,6 +417,15 @@ impl OriginGame {
 
     pub fn is_scarlet_violet(self) -> bool {
         self == Self::Scarlet || self == Self::Violet
+    }
+}
+
+impl Serialize for OriginGame {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        self.game_name().serialize(serializer)
     }
 }
 

@@ -1,0 +1,169 @@
+{
+  "encryption_constant": 455521606,
+  "sanity": 0,
+  "checksum": 21812,
+  "species_and_forme": {
+    "national_dex": "745 (Lycanroc)",
+    "forme_index": 1
+  },
+  "held_item_index": 218,
+  "trainer_id": 50394,
+  "secret_id": 7689,
+  "exp": 1000000,
+  "ability_index": "Keen Eye",
+  "ability_num": "First",
+  "markings": {
+    "circle": "Unset",
+    "square": "Unset",
+    "triangle": "Unset",
+    "heart": "Unset",
+    "star": "Unset",
+    "diamond": "Unset"
+  },
+  "personality_value": 995719567,
+  "nature": "Bold",
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 6,
+    "atk": 252,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 252
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "resort_event_status": 0,
+  "pokerus_byte": 0,
+  "super_training_flags": 0,
+  "ribbons": ["Alola Champion Ribbon"],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "super_training_dist_flags": 0,
+  "form_argument": 0,
+  "nickname": "Remus",
+  "moves": [
+    {
+      "move_index": "Crunch",
+      "pp": 24,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Sand Attack",
+      "pp": 24,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Stone Edge",
+      "pp": 8,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Double Team",
+      "pp": 24,
+      "pp_ups": 3
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "secret_super_training_unlocked": false,
+  "secret_super_training_complete": false,
+  "ivs": {
+    "hp": 22,
+    "atk": 30,
+    "def": 3,
+    "spa": 25,
+    "spd": 23,
+    "spe": 26
+  },
+  "is_egg": false,
+  "is_nicknamed": true,
+  "handler_name": "",
+  "handler_gender": "Male",
+  "is_current_handler": false,
+  "geolocations": [
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    }
+  ],
+  "handler_friendship": 0,
+  "handler_affection": 0,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "text_variable": 0
+  },
+  "fullness": 252,
+  "enjoyment": 0,
+  "trainer_name": "RoC",
+  "trainer_friendship": 255,
+  "trainer_affection": 255,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "text_variable": 0
+  },
+  "egg_date": null,
+  "met_date": "11/9/2016",
+  "egg_location_index": 0,
+  "met_location_index": 36,
+  "ball": "Ultra",
+  "met_level": 12,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": false,
+    "atk": false,
+    "def": false,
+    "spa": false,
+    "spd": false,
+    "spe": false
+  },
+  "game_of_origin": "Moon",
+  "country": 49,
+  "region": 0,
+  "console_region": 1,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 100,
+  "form_argument_remain": 0,
+  "form_argument_elapsed": 0,
+  "current_hp": 303,
+  "stats": {
+    "hp": 303,
+    "atk": 295,
+    "def": 173,
+    "spa": 140,
+    "spd": 178,
+    "spe": 258
+  }
+}
