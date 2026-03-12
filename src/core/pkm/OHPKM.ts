@@ -711,8 +711,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     // preserve plugin metadata if present
     if (other.pluginOrigin !== undefined) {
       this.pluginOrigin = other.pluginOrigin as PluginIdentifier | undefined
-    }
-    if (other.pluginForm !== undefined) {
       this.pluginForm = other.pluginForm
     }
 
