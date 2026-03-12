@@ -707,7 +707,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.movePP = adjustMovePPBetweenFormats(this, other)
     this.movePPUps = other.movePPUps as FourMoves
 
-    // preserve plugin metadata if present
     if (other.pluginOrigin !== undefined) {
       this.pluginOrigin = other.pluginOrigin as PluginIdentifier | undefined
       this.pluginForm = other.pluginForm
