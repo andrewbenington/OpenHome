@@ -701,7 +701,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public syncWithGameData(other: PKMInterface, save?: SAV) {
-    // copy simple fields first
     this.exp = other.exp
 
     this.moves = other.moves as FourMoves
