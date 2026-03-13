@@ -1,4 +1,4 @@
-use pkm_rs_types::Gender;
+use pkm_rs_types::BinaryGender;
 use pkm_rs_types::OriginGame;
 use pkm_rs_types::read_u16_le;
 use pkm_rs_types::strings::SizedUtf16String;
@@ -51,6 +51,14 @@ impl SunMoonSave {
             size,
             trainer: my_status,
         })
+    }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut bytes = self.bytes.clone();
+        let trainer_bytes = self.trainer.to_bytes();
+        bytes[SM_TRAINER_DATA_OFFSET..SM_TRAINER_DATA_OFFSET + TRAINER_DATA_SIZE]
+            .copy_from_slice(&trainer_bytes);
+        bytes
     }
 }
 
@@ -194,9 +202,31 @@ pub struct TrainerDataGen7Alola {
     pub trainer_id: u16,
     pub secret_id: u16,
     pub game_code: u8,
-    pub trainer_gender: Gender,
+    pub trainer_gender: BinaryGender,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<24>,
+}
+
+impl TrainerDataGen7Alola {
+    fn from_bytes(block_bytes: &[u8; TRAINER_DATA_SIZE]) -> Self {
+        Self {
+            trainer_id: read_u16_le!(block_bytes, 0),
+            secret_id: read_u16_le!(block_bytes, 2),
+            game_code: block_bytes[4],
+            trainer_gender: BinaryGender::from(util::get_flag(block_bytes, 5, 0)),
+            trainer_name: SizedUtf16String::from_bytes(block_bytes[56..80].try_into().unwrap()),
+        }
+    }
+
+    fn to_bytes(self) -> [u8; TRAINER_DATA_SIZE] {
+        let mut bytes = [0u8; TRAINER_DATA_SIZE];
+        bytes[0..2].copy_from_slice(&self.trainer_id.to_le_bytes());
+        bytes[2..4].copy_from_slice(&self.secret_id.to_le_bytes());
+        bytes[4] = self.game_code;
+        util::set_flag(&mut bytes, 5, 0, self.trainer_gender);
+        bytes[56..80].copy_from_slice(&self.trainer_name.bytes());
+        bytes
+    }
 }
 
 #[cfg(feature = "wasm")]
@@ -315,17 +345,5 @@ impl encryption::Crc16CcittInvertChecksum for UltraSunMoonSave {
 
     fn get_bytes(&self) -> &[u8] {
         &self.bytes
-    }
-}
-
-impl TrainerDataGen7Alola {
-    fn from_bytes(block_bytes: &[u8; TRAINER_DATA_SIZE]) -> Self {
-        Self {
-            trainer_id: read_u16_le!(block_bytes, 0),
-            secret_id: read_u16_le!(block_bytes, 2),
-            game_code: block_bytes[4],
-            trainer_gender: Gender::from(util::get_flag(block_bytes, 5, 0)),
-            trainer_name: SizedUtf16String::from_bytes(block_bytes[56..80].try_into().unwrap()),
-        }
     }
 }
