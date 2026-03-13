@@ -1334,22 +1334,24 @@ impl PluginData {
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 impl PluginData {
-    #[wasm_bindgen(getter = pluginFormWasm)]
+    #[wasm_bindgen(getter = pluginOrigin)]
+    pub fn plugin_origin(&self) -> String {
+        self.plugin_origin.clone()
+    }
+
+    #[wasm_bindgen(setter = pluginOrigin)]
+    pub fn set_plugin_origin(&mut self, value: String) {
+        self.plugin_origin = value;
+    }
+
+    #[wasm_bindgen(getter = pluginFormDataWasm)]
     pub fn plugin_form(&self) -> Option<u16> {
-        self.plugin_data.as_ref().and_then(|x| x.plugin_form)
+        self.plugin_form
     }
 
-    #[wasm_bindgen(js_name = setPluginDataWasm)]
-    pub fn set_plugin_data(&mut self, origin: String, form: Option<u16>) {
-        self.plugin_data = Some(PluginData {
-            plugin_origin: origin,
-            plugin_form: form,
-        });
-    }
-
-    #[wasm_bindgen(js_name = clearPluginDataWasm)]
-    pub fn clear_plugin_data(&mut self) {
-        self.plugin_data = None;
+    #[wasm_bindgen(setter = pluginFormDataWasm)]
+    pub fn set_plugin_form(&mut self, value: Option<u16>) {
+        self.plugin_form = value;
     }
 }
 
@@ -1360,7 +1362,7 @@ impl DataSection for PluginData {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
+        Self::ensure_buffer_size(bytes);
 
         Self::try_from_origin_utf8(bytes)
     }
@@ -1369,8 +1371,8 @@ impl DataSection for PluginData {
         false
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        Ok(self.plugin_origin.clone().into_bytes())
+    fn to_bytes(&self) -> Vec<u8> {
+        self.plugin_origin.clone().into_bytes()
     }
 }
 
