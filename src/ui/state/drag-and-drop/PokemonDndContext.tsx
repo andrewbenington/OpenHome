@@ -7,6 +7,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
+import { monSupportedBySave } from '@openhome-core/save/util'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { useItems } from '@openhome-ui/state/items'
@@ -85,9 +86,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
         } else if (
           isMonLocation(dest) &&
           (dest.isHome ||
-            savesAndBanks
-              .saveFromIdentifier(dest.saveIdentifier)
-              .supportsMon(mon.dexNum, mon.formeNum))
+            monSupportedBySave(savesAndBanks.saveFromIdentifier(dest.saveIdentifier), mon))
         ) {
           const source = payload.monData
 

@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import PK3RR from '@openhome-core/save/radicalred/PK3RR'
 import PK3UB from '@openhome-core/save/unbound/PK3UB'
 import { AnyPkmClass, SavePkmClass } from '@openhome-core/save/util'
@@ -75,6 +76,8 @@ export function fileTypeFromString(type: string): AnyPkmClass | undefined {
       return PA8
     case 'PB8':
       return PB8
+    case 'PB8LUMI':
+      return PB8LUMI
     case 'PK9':
       return PK9
     case 'PA9':

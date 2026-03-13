@@ -1277,9 +1277,14 @@ impl DataSection for MostRecentSave {
 }
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Clone, Serialize)]
 pub struct PluginData {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub plugin_origin: String,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub plugin_form: Option<u16>,
 }
 
 impl PluginData {
@@ -1298,7 +1303,53 @@ impl PluginData {
     }
 
     const fn from_origin(plugin_origin: String) -> Self {
-        Self { plugin_origin }
+        Self {
+            plugin_origin,
+            plugin_form: None,
+        }
+    }
+
+    fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
+        if bytes.len() < 2 {
+            return Self::try_from_origin_utf8(bytes);
+        }
+
+        if bytes[0].is_ascii_alphabetic() && bytes[1].is_ascii_alphabetic() {
+            return Self::try_from_origin_utf8(bytes);
+        }
+
+        let form_raw = u16::from_le_bytes([bytes[0], bytes[1]]);
+        let plugin_form = if form_raw == 0 { None } else { Some(form_raw) };
+
+        let origin = String::from_utf8(bytes[2..].to_vec()).map_err(Error::plugin_origin)?;
+
+        Ok(Self {
+            plugin_origin: origin,
+            plugin_form,
+        })
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl PluginData {
+    #[wasm_bindgen(getter = pluginFormWasm)]
+    pub fn plugin_form(&self) -> Option<u16> {
+        self.plugin_data.as_ref().and_then(|x| x.plugin_form)
+    }
+
+    #[wasm_bindgen(js_name = setPluginDataWasm)]
+    pub fn set_plugin_data(&mut self, origin: String, form: Option<u16>) {
+        self.plugin_data = Some(PluginData {
+            plugin_origin: origin,
+            plugin_form: form,
+        });
+    }
+
+    #[wasm_bindgen(js_name = clearPluginDataWasm)]
+    pub fn clear_plugin_data(&mut self) {
+        self.plugin_data = None;
     }
 }
 
@@ -1309,7 +1360,7 @@ impl DataSection for PluginData {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes);
+        Self::ensure_buffer_size(bytes)?;
 
         Self::try_from_origin_utf8(bytes)
     }
@@ -1318,8 +1369,8 @@ impl DataSection for PluginData {
         false
     }
 
-    fn to_bytes(&self) -> Vec<u8> {
-        self.plugin_origin.clone().into_bytes()
+    fn to_bytes(&self) -> Result<Vec<u8>> {
+        Ok(self.plugin_origin.clone().into_bytes())
     }
 }
 

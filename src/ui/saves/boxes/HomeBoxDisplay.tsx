@@ -2,6 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
+import { monSupportedBySave } from '@openhome-core/save/util'
 import { R, range } from '@openhome-core/util/functional'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ItemBuilder, SubmenuBuilder } from '@openhome-ui/components/context-menu/types'
@@ -271,10 +272,10 @@ function SingleBoxMonDisplay() {
   }, [dragState.payload])
 
   const sourceSupportsMon = useCallback(
-    (dexNum: number, formeNum: number) =>
+    (mon: PKMInterface) =>
       !dragData || dragData?.isHome
         ? true
-        : saveFromIdentifier(dragData.saveIdentifier).supportsMon(dexNum, formeNum),
+        : monSupportedBySave(saveFromIdentifier(dragData.saveIdentifier), mon),
     [dragData, saveFromIdentifier]
   )
 
@@ -360,10 +361,7 @@ function SingleBoxMonDisplay() {
                   }}
                   disabled={
                     // don't allow a swap with a pokémon not supported by the source save
-                    mon &&
-                    dragData &&
-                    !dragData.isHome &&
-                    !sourceSupportsMon(mon.dexNum, mon.formeNum)
+                    mon && dragData && !dragData.isHome && !sourceSupportsMon(mon)
                   }
                   ctxMenuBuilders={contextElements}
                 />

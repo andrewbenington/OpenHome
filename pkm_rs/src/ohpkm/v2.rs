@@ -2224,20 +2224,22 @@ impl OhpkmV2 {
     // }
 
     // Plugins
-
-    #[wasm_bindgen(getter = pluginOriginWasm)]
-    pub fn plugin_origin_js(&self) -> Option<String> {
-        Some(self.plugin_data.clone()?.plugin_origin)
+    #[wasm_bindgen(getter = pluginFormWasm)]
+    pub fn plugin_form(&self) -> Option<u16> {
+        self.plugin_data.as_ref().and_then(|x| x.plugin_form)
     }
 
-    #[wasm_bindgen(setter = pluginOriginWasm)]
-    pub fn set_plugin_origin_js(&mut self, value: Option<String>) {
-        match value {
-            Some(plugin_origin) => {
-                self.plugin_data.get_or_insert_default().plugin_origin = plugin_origin
-            }
-            None => self.plugin_data = None,
-        }
+    #[wasm_bindgen(js_name = setPluginDataWasm)]
+    pub fn set_plugin_data(&mut self, origin: String, form: Option<u16>) {
+        self.plugin_data = Some(PluginData {
+            plugin_origin: origin,
+            plugin_form: form,
+        });
+    }
+
+    #[wasm_bindgen(js_name = clearPluginDataWasm)]
+    pub fn clear_plugin_data(&mut self) {
+        self.plugin_data = None;
     }
 
     // Game Boy
