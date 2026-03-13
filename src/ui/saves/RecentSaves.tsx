@@ -46,15 +46,15 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
     backend.getRecentSaves().then(
       R.match(
         (recents) => {
-          const enabledTypes = getEnabledSaveTypes()
-          const extraSaveIdentifiers = enabledTypes.map(getPluginIdentifier).filter(filterUndefined)
+          const extraSaveIdentifiers = getEnabledSaveTypes()
+            .map(getPluginIdentifier)
+            .filter(filterUndefined)
 
           // filter out saves from plugins that aren't enabled
-          const filteredRecents = Object.entries(recents).filter(([, ref]) => {
-            return (
+          const filteredRecents = Object.entries(recents).filter(
+            ([, ref]) =>
               ref.pluginIdentifier === null || extraSaveIdentifiers.includes(ref.pluginIdentifier)
-            )
-          })
+          )
 
           setRecentSaves(Object.fromEntries(filteredRecents))
         },
