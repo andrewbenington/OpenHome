@@ -9,6 +9,8 @@ import {
   OriginGame,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { ConversionStrategy, DefaultConversionStrategy } from '@pokemon-files/conversion/settings'
+import { DefaultConstructorOptions, PkmConstructorOptions } from '@pokemon-files/pkm/PKM'
 import {
   FourMoves,
   generatePersonalityValuePreservingAttributes,
@@ -118,7 +120,10 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
   abstract selectColor: string
 
-  constructor(arg: ArrayBuffer | OHPKM) {
+  constructor(
+    arg: ArrayBuffer | OHPKM,
+    _options: PkmConstructorOptions = DefaultConstructorOptions
+  ) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       const dataView = new DataView(buffer)
@@ -264,7 +269,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       }
       this.pokerusByte = other.pokerusByte ?? 0
       this.metLocationIndex = other.metLocationIndex ?? 0
-      this.metLevel = other.metLevel ?? 0
+      this.metLevel = other.metLevel
 
       const fromRadicalRed = other.pluginOrigin === 'radical_red'
 
@@ -319,10 +324,19 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   static fromBytes<T extends PK3CFRU>(
-    this: new (buffer: ArrayBuffer) => T,
-    buffer: ArrayBuffer
+    this: new (buffer: ArrayBuffer, options: PkmConstructorOptions) => T,
+    buffer: ArrayBuffer,
+    encrypted?: boolean
   ): T {
-    return new this(buffer)
+    return new this(buffer, { encrypted })
+  }
+
+  static fromOhpkm<T extends PK3CFRU>(
+    this: new (ohpkm: OHPKM, options: PkmConstructorOptions) => T,
+    ohpkm: OHPKM,
+    strategy: ConversionStrategy = DefaultConversionStrategy
+  ): T {
+    return new this(ohpkm, { strategy })
   }
 
   abstract internalItemIndexFromModern(modernIndex: number): number

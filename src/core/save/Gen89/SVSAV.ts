@@ -58,7 +58,7 @@ export class SVSAV extends G89SAV<PK9> {
   }
 
   monConstructor(bytes: ArrayBuffer, encrypted: boolean): PK9 {
-    return new PK9(bytes, encrypted)
+    return new PK9(bytes, { encrypted })
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {

@@ -162,6 +162,16 @@ impl GenderRatio {
             }
         }
     }
+
+    #[cfg(feature = "wasm")]
+    pub fn gender_is_allowed(&self, gender: Gender) -> bool {
+        match *self {
+            Self::Genderless => gender == Gender::Genderless,
+            Self::AllMale => gender == Gender::Male,
+            Self::AllFemale => gender == Gender::Female,
+            _ => true,
+        }
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]

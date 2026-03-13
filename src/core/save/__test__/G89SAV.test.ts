@@ -203,7 +203,7 @@ describe('gen 8 save files', () => {
 
     const modifiedMagmortar = modified.boxes[2].boxSlots[8]
 
-    expect(modifiedMagmortar?.nickname).toBe('MAGMORTAR')
+    expect(modifiedMagmortar?.nickname).toBe('Magmortar')
   })
 })
 

@@ -98,7 +98,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
           const startByte = PC_OFFSET + BOX_SIZE * box + 136 * monIndex
           const endByte = PC_OFFSET + BOX_SIZE * box + 136 * (monIndex + 1)
           const monData = bytes.slice(startByte, endByte)
-          const mon = new PK5(monData.buffer, true)
+          const mon = PK5.fromBytes(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
             this.boxes[box].boxSlots[monIndex] = mon

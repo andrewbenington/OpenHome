@@ -2276,12 +2276,12 @@
     "levelUpType": "Medium Fast"
   },
   "29": {
-    "name": "Nidoran-F",
+    "name": "Nidoran♀",
     "nationalDex": 29,
     "formes": [
       {
-        "name": "Nidoran-F",
-        "formeName": "Nidoran-F",
+        "name": "Nidoran♀",
+        "formeName": "Nidoran♀",
         "formeNumber": 0,
         "isBaseForme": true,
         "isMega": false,
@@ -2432,12 +2432,12 @@
     "levelUpType": "Medium Slow"
   },
   "32": {
-    "name": "Nidoran-M",
+    "name": "Nidoran♂",
     "nationalDex": 32,
     "formes": [
       {
-        "name": "Nidoran-M",
-        "formeName": "Nidoran-M",
+        "name": "Nidoran♂",
+        "formeName": "Nidoran♂",
         "formeNumber": 0,
         "isBaseForme": true,
         "isMega": false,

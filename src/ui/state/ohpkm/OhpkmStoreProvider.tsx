@@ -45,12 +45,7 @@ function useSyncedOhpkmState(): SyncedStateController<OhpkmStoreData, StringToB6
     async (data: OhpkmStoreData) => {
       const pokedexUpdates: PokedexUpdate[] = []
 
-      for (const [identifier, mon] of Object.entries(data)) {
-        const hadErrors = mon.fixErrors()
-        if (hadErrors) {
-          console.warn(`mon had errors: ${mon.nickname} (${identifier})`)
-        }
-
+      for (const [, mon] of Object.entries(data)) {
         pokedexUpdates.push(...getPokedexUpdates(mon))
       }
 

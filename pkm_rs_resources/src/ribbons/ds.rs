@@ -96,8 +96,8 @@ pub enum Gen3Ribbon {
 }
 
 impl Gen3Ribbon {
-    pub const fn get_index(self) -> u8 {
-        self as u8
+    pub const fn get_index(self) -> usize {
+        self as usize
     }
 
     pub fn from_index(index: usize) -> Gen3Ribbon {
@@ -371,8 +371,8 @@ pub enum Gen4StandardRibbon {
 }
 
 impl Gen4StandardRibbon {
-    pub const fn get_index(self) -> u8 {
-        self as u8
+    pub const fn get_index(self) -> usize {
+        self as usize
     }
 
     pub fn from_index(index: usize) -> Gen4StandardRibbon {
@@ -618,8 +618,8 @@ pub enum Gen4ContestRibbon {
 }
 
 impl Gen4ContestRibbon {
-    pub const fn get_index(self) -> u8 {
-        self as u8
+    pub const fn get_index(self) -> usize {
+        self as usize
     }
 
     pub fn from_index(index: usize) -> Gen4ContestRibbon {

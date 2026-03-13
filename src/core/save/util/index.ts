@@ -1,6 +1,7 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
+import { PkmConstructorOptions } from '../../../../packages/pokemon-files/src/pkm/PKM'
 import { SAV } from '../interfaces'
 import { PathData } from './path'
 
@@ -12,8 +13,9 @@ export const DESAMUME_FOOTER_START =
   '|<--Snip above here to create a raw sav by excluding this DeSmuME savedata footer:'
 
 export interface SavePkmClass {
-  new (arg: ArrayBuffer | OHPKM, encrypted?: boolean): PKMInterface
+  new (arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions): PKMInterface
   fromBytes(bytes: ArrayBuffer): PKMInterface
+  fromOhpkm(ohpkm: OHPKM): PKMInterface
   getName(): string
 }
 

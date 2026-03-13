@@ -196,14 +196,12 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
 
   // Builds a Luminescent Platinum Pokémon instance from raw bytes
   buildPKM(bytes: ArrayBuffer, encrypted: boolean): PB8LUMI {
-    const mon = new PB8LUMI(bytes, encrypted)
-    return mon
+    return PB8LUMI.fromBytes(bytes, encrypted)
   }
 
   // Converts an OpenHome Pokémon into the Luminescent format
   convertOhpkm(ohpkm: OHPKM): PB8LUMI {
-    const mon = new PB8LUMI(ohpkm)
-    return mon
+    return PB8LUMI.fromOhpkm(ohpkm)
   }
 
   // Writes modified Pokémon back into the save buffer

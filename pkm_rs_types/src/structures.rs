@@ -144,23 +144,27 @@ impl<const N: usize> FlagSet<N> {
         self.raw
     }
 
-    pub fn set_index(&mut self, index: u8, value: bool) {
-        util::set_flag(&mut self.raw, 0, index as usize, value);
+    pub fn set_index(&mut self, index: usize, value: bool) {
+        util::set_flag(&mut self.raw, 0, index, value);
+    }
+
+    pub fn get_index(&self, index: usize) -> bool {
+        util::get_flag(&self.raw, 0, index)
     }
 
     pub const fn clear_all(&mut self) {
         self.raw = [0; N]
     }
 
-    pub fn add_index(&mut self, index: u8) {
+    pub fn add_index(&mut self, index: usize) {
         self.set_index(index, true);
     }
 
-    pub fn add_indices(&mut self, indices: Vec<u8>) {
+    pub fn add_indices(&mut self, indices: Vec<usize>) {
         indices.into_iter().for_each(|index| self.add_index(index));
     }
 
-    pub fn from_indices(indices: Vec<u8>) -> Self {
+    pub fn from_indices(indices: Vec<usize>) -> Self {
         let mut set = Self::default();
         set.add_indices(indices);
         set
@@ -186,8 +190,8 @@ impl<const N: usize> Default for FlagSet<N> {
     }
 }
 
-impl<const N: usize> FromIterator<u8> for FlagSet<N> {
-    fn from_iter<T: IntoIterator<Item = u8>>(iter: T) -> Self {
+impl<const N: usize> FromIterator<usize> for FlagSet<N> {
+    fn from_iter<T: IntoIterator<Item = usize>>(iter: T) -> Self {
         Self::from_indices(iter.into_iter().collect())
     }
 }

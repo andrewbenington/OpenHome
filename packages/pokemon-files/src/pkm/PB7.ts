@@ -1,4 +1,3 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   AbilityIndex,
   Ball,
@@ -9,6 +8,8 @@ import {
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { ConversionStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import { FourMoves } from '../util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
@@ -16,10 +17,11 @@ import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { getHeightCalculated, getWeightCalculated, MoveFilter } from '../util/util'
+import { DefaultConstructorOptions, PkmConstructorOptions } from './PKM'
 
 export default class PB7 {
   static getName() {
-    return 'PB7'
+    return 'PB7' as const
   }
   format: 'PB7' = 'PB7'
   static getBoxSize() {
@@ -91,7 +93,13 @@ export default class PB7 {
   isMega: number
   megaForme: number
   trainerGender: boolean
-  constructor(arg: ArrayBuffer | PKMInterface, encrypted?: boolean) {
+
+  constructor(
+    arg: ArrayBuffer | OHPKM,
+    options: PkmConstructorOptions = DefaultConstructorOptions
+  ) {
+    const { encrypted, strategy } = options
+
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       if (encrypted) {
@@ -189,7 +197,6 @@ export default class PB7 {
     } else {
       const other = arg
       this.encryptionConstant = other.encryptionConstant ?? 0
-      this.checksum = other.checksum ?? 0
       this.dexNum = other.dexNum
       this.heldItemIndex = 0
       this.trainerID = other.trainerID
@@ -207,7 +214,7 @@ export default class PB7 {
         diamond: false,
       }
       this.personalityValue = other.personalityValue ?? 0
-      this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
+      this.nature = other.nature
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
       this.gender = other.gender ?? 0
       this.formeNum = other.formeNum
@@ -254,18 +261,18 @@ export default class PB7 {
       this.handlerGender = false
       this.isCurrentHandler = false
       this.handlerFriendship = 0
-      this.fieldEventFatigue1 = other.fieldEventFatigue1 ?? 0
-      this.fieldEventFatigue2 = other.fieldEventFatigue2 ?? 0
+      this.fieldEventFatigue1 = 0
+      this.fieldEventFatigue2 = 0
       this.fullness = other.fullness ?? 0
       this.enjoyment = other.enjoyment ?? 0
       this.trainerName = other.trainerName
       this.trainerFriendship = other.trainerFriendship ?? 0
-      this.receivedYear = other.receivedYear ?? 0
-      this.receivedMonth = other.receivedMonth ?? 0
-      this.receivedDay = other.receivedDay ?? 0
-      this.receivedHour = other.receivedHour ?? 0
-      this.receivedMinute = other.receivedMinute ?? 0
-      this.receivedSecond = other.receivedSecond ?? 0
+      this.receivedYear = 0
+      this.receivedMonth = 0
+      this.receivedDay = 0
+      this.receivedHour = 0
+      this.receivedMinute = 0
+      this.receivedSecond = 0
       this.eggDate = other.eggDate ?? undefined
       this.metDate = other.metDate ?? {
         month: new Date().getMonth(),
@@ -279,21 +286,14 @@ export default class PB7 {
       } else {
         this.ball = Ball.Poke
       }
-      this.metLevel = other.metLevel ?? 0
-      this.hyperTraining = other.hyperTraining ?? {
-        hp: false,
-        atk: false,
-        def: false,
-        spa: false,
-        spd: false,
-        spe: false,
-      }
+      this.metLevel = other.metLevel
+      this.hyperTraining = other.hyperTraining
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
-      this.statusCondition = other.statusCondition ?? 0
-      this.level = other.level ?? 0
-      this.dirtType = other.dirtType ?? 0
-      this.dirtLocation = other.dirtLocation ?? 0
+      this.statusCondition = 0
+      this.level = 0
+      this.dirtType = 0
+      this.dirtLocation = 0
       this.currentHP = other.currentHP ?? 0
       this.stats = other.stats ?? {
         hp: 0,
@@ -303,15 +303,20 @@ export default class PB7 {
         spa: 0,
         spd: 0,
       }
-      this.cp = other.cp ?? 0
-      this.isMega = other.isMega ?? 0
-      this.megaForme = other.megaForme ?? 0
+      this.cp = 0
+      this.isMega = 0
+      this.megaForme = 0
       this.trainerGender = other.trainerGender
     }
+    this.checksum = this.calculcateChecksum()
   }
 
-  static fromBytes(buffer: ArrayBuffer): PB7 {
-    return new PB7(buffer)
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PB7 {
+    return new PB7(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConversionStrategy = DefaultConversionStrategy): PB7 {
+    return new PB7(ohpkm, { strategy })
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {
@@ -428,7 +433,7 @@ export default class PB7 {
     return 0.4
   }
 
-  public calcChecksum() {
+  public calculcateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0xe8)
   }
 
