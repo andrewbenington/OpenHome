@@ -1,14 +1,4 @@
-/**
- * Custom form definitions for Luminescent Platinum.
- * Data derived from:
- * https://github.com/TalonSabre/PKLumiHex
- * (see FormConverter.cs GetFormsLumi and GetFormsPikachu).
- */
-
-export type CustomFormInfo = {
-  name: string
-  fallbackForm: number // Standard form used by OpenHome for rendering compatibility
-}
+import { CustomFormInfo } from '../../rom-hack/forms'
 
 /**
  * Luminescent Platinum introduces additional forms that do not exist

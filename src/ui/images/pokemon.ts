@@ -78,8 +78,15 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
     if (mon.dexNum === NationalDex.Ursaluna && formeNum === BLOOD_MOON) {
       return 'sprites/home/ursaluna-bloodmoon.png'
     }
+    console.log(
+      mon,
+      mon.pluginForm,
+      toGen3CRFUPokemonIndex(mon.dexNum, formeNum, NationalDexToUnboundMap)
+    )
     let gen3UBname =
-      UBSprites[toGen3CRFUPokemonIndex(mon.dexNum, formeNum, NationalDexToUnboundMap)]
+      UBSprites[
+        mon.pluginForm ?? toGen3CRFUPokemonIndex(mon.dexNum, formeNum, NationalDexToUnboundMap)
+      ]
 
     if (!gen3UBname) {
       console.error(`missing Unbound sprite for ${spriteName}`)

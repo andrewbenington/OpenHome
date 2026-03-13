@@ -31,11 +31,7 @@ import {
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
 import { PluginIdentifier } from '../interfaces'
-
-export interface CFRUToNationalDexEntry {
-  NationalDexIndex: number
-  FormIndex: number
-}
+import { CfruSpeciesAndForm } from './conversion/util'
 
 const INTERNAL_ORIGIN_NON_RR = OriginGame.Invalid6
 const INTERNAL_ORIGIN_FROM_CFRU = OriginGame.FireRed
@@ -113,6 +109,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   isFakemon: boolean = false
   originalBytes?: Uint8Array
 
+  pluginForm?: number
+
   abstract selectColor: string
 
   constructor(arg: ArrayBuffer | PKMInterface) {
@@ -157,6 +155,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       } else {
         this.dexNum = speciesData.NationalDexIndex
         this.formeNum = speciesData.FormIndex
+        this.pluginForm = speciesData.FakemonIndex
       }
 
       this.isFakemon = this.indexIsFakemon(speciesIndex)
@@ -240,6 +239,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       }
       this.dexNum = other.dexNum
       this.formeNum = other.formeNum
+      this.pluginOrigin = other.pluginOrigin
+      this.pluginForm = other.pluginForm
       this.internalHeldItemIndex = this.internalItemIndexFromModern(other.heldItemIndex)
       this.exp = other.exp
       this.trainerFriendship = other.trainerFriendship ?? 0
@@ -321,7 +322,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   abstract moveToGameIndex(nationalMoveId: number): number
   abstract getValidMoveIndices(): number[]
 
-  abstract monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry
+  abstract monFromGameIndex(gameIndex: number): CfruSpeciesAndForm
   abstract monToGameIndex(nationalDexNumber: number, formIndex: number): number
 
   abstract indexIsFakemon(speciesIndex: number): boolean
@@ -354,7 +355,11 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
     // Growth Substructure (starts at 0x1C)
     // 28:30 Species (DexNum)
-    dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, this.formeNum), true)
+    if (this.pluginForm) {
+      dataView.setUint16(0x1c, this.pluginForm, true)
+    } else {
+      dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, this.formeNum), true)
+    }
 
     // 30:32 Held Item
     dataView.setUint16(0x1e, this.internalHeldItemIndex, true)

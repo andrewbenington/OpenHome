@@ -1,6 +1,6 @@
-import { GameToNationalDexEntry, makeNationalDexToGameMap } from '../../cfru/conversion/util'
+import { CfruSpeciesAndForm, makeNationalDexToGameMap } from '../../cfru/conversion/util'
 
-export const RadicalRedToNationalDexMap: Record<string, GameToNationalDexEntry | null> = {
+export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   '0': {
     NationalDexIndex: 0,
     FormIndex: 0,

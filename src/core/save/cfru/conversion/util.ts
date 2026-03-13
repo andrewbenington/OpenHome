@@ -1,10 +1,11 @@
-export interface GameToNationalDexEntry {
+export interface CfruSpeciesAndForm {
   NationalDexIndex: number
   FormIndex: number
+  FakemonIndex?: number
 }
 
 export function makeNationalDexToGameMap(
-  GameToNationalDexMap: Record<string, GameToNationalDexEntry | null>
+  GameToNationalDexMap: Record<string, CfruSpeciesAndForm | null>
 ) {
   const NationalDexToGameMap: Record<string, string> = {}
 
@@ -26,16 +27,13 @@ export function makeNationalDexToGameMap(
 
 export function fromGen3CRFUPokemonIndex(
   index: number,
-  GameToNationalDexMap: Record<string, GameToNationalDexEntry | null>,
+  GameToNationalDexMap: Record<string, CfruSpeciesAndForm | null>,
   gameName: string
-): GameToNationalDexEntry {
+): CfruSpeciesAndForm {
   const entry = GameToNationalDexMap[String(index)]
 
   if (entry) {
-    return {
-      NationalDexIndex: entry.NationalDexIndex,
-      FormIndex: entry.FormIndex,
-    }
+    return entry
   } else {
     throw new Error(`${gameName} index ${index} not found.`)
   }
