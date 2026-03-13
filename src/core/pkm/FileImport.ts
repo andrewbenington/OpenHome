@@ -20,7 +20,7 @@ import {
   PK9,
   XDPKM,
 } from '@pokemon-files/pkm'
-import Pk7Rust from '../../../packages/pokemon-files/src/pkm/wasm/PK7'
+import Pk7Rust from '../../../packages/pokemon-files/src/pkm/PK7'
 
 function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {
   switch (bytes.length) {

@@ -1,5 +1,5 @@
 import { OriginGame, SunMoonSave } from '@pkm-rs/pkg'
-import Pk7Rust from '../../../packages/pokemon-files/src/pkm/wasm/PK7'
+import Pk7Rust from '../../../packages/pokemon-files/src/pkm/PK7'
 import { Item } from '../../../packages/pokemon-resources/src/consts/Items'
 import { SM_TRANSFER_RESTRICTIONS } from '../../../packages/pokemon-resources/src/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
