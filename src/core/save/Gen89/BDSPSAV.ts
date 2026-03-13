@@ -7,6 +7,11 @@ import { BDSP_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRe
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, BoxAndSlot, OfficialSAV } from '../interfaces'
+import {
+  LUMI_1_1_VERSION_IDENTIFIER,
+  LUMI_1_3_VERSION_IDENTIFIER,
+  LUMI_1_3RV1_VERSION_IDENTIFIER,
+} from '../luminescentplatinum/G8LUMISAV'
 import { PathData } from '../util/path'
 
 const SAVE_SIZE_BYTES_MIN = 900000
@@ -16,6 +21,11 @@ const BOX_NAME_LENGTH = 0x22
 const BOX_MONS_OFFSET = 0x14ef4
 
 const HASH_OFFSET = 0xe9818
+
+const BDSP_1_0_VERSION_IDENTIFIER = 0x25
+const BDSP_1_1_VERSION_IDENTIFIER = 0x2c
+const BDSP_1_2_VERSION_IDENTIFIER = 0x32
+const BDSP_1_3_VERSION_IDENTIFIER = 0x34
 
 export type BDSP_SAVE_REVISION = '1.0' | '1.1' | '1.2' | '1.3'
 
@@ -101,13 +111,13 @@ export class BDSPSAV extends OfficialSAV<PB8> {
     const versionIdentifier = dataView.getUint8(0)
 
     switch (versionIdentifier) {
-      case 0x25:
+      case BDSP_1_0_VERSION_IDENTIFIER:
         return '1.0'
-      case 0x2c:
+      case BDSP_1_1_VERSION_IDENTIFIER:
         return '1.1'
-      case 0x32:
+      case BDSP_1_2_VERSION_IDENTIFIER:
         return '1.2'
-      case 0x34:
+      case BDSP_1_3_VERSION_IDENTIFIER:
         return '1.3'
       default:
         throw new Error(`BDSP save has invalid version identifier: ${versionIdentifier}`)
@@ -194,19 +204,29 @@ export class BDSPSAV extends OfficialSAV<PB8> {
     }
   }
 
-  // TODO: make file size flexible
   static fileIsSave(bytes: Uint8Array): boolean {
     if (bytes.length < SAVE_SIZE_BYTES_MIN || bytes.length > SAVE_SIZE_BYTES_MAX) {
       return false
     }
+
     const dataView = new DataView(bytes.buffer)
+
+    const luminescentPlatinumVersion = dataView.getUint16(0, true)
+    if (
+      luminescentPlatinumVersion === LUMI_1_1_VERSION_IDENTIFIER ||
+      luminescentPlatinumVersion === LUMI_1_3_VERSION_IDENTIFIER ||
+      luminescentPlatinumVersion === LUMI_1_3RV1_VERSION_IDENTIFIER
+    ) {
+      return false
+    }
+
     const versionIdentifier = dataView.getUint8(0)
 
     return (
-      versionIdentifier === 0x25 ||
-      versionIdentifier === 0x2c ||
-      versionIdentifier === 0x32 ||
-      versionIdentifier === 0x34
+      versionIdentifier === BDSP_1_0_VERSION_IDENTIFIER ||
+      versionIdentifier === BDSP_1_1_VERSION_IDENTIFIER ||
+      versionIdentifier === BDSP_1_2_VERSION_IDENTIFIER ||
+      versionIdentifier === BDSP_1_3_VERSION_IDENTIFIER
     )
   }
 

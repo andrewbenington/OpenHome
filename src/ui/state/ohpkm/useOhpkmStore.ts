@@ -183,6 +183,7 @@ export function useOhpkmStore(): OhpkmStore {
         case 'PK8':
         case 'PA8':
         case 'PB8':
+        case 'PB8LUMI':
         case 'PK9':
         case 'PA9': {
           const homeIdentifier = getMonFileIdentifier(mon)

@@ -81,7 +81,7 @@
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
     "@typescript/native-preview": "7.0.0-dev.20260308.1",
-    "@vitejs/plugin-react": "^5.1.4",
+    "@vitejs/plugin-react": "^6.0.0",
     "better-sqlite3": "^12.6.2",
     "camelcase-keys": "^10.0.2",
     "eslint": "^10.0.3",
@@ -95,7 +95,15 @@
     "prettier": "^3.8.1",
     "react-dom": "^19.2.4",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1",
+    "vite": "^8.0.0",
     "vitest": "^4.0.18"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "eslint-plugin-react>eslint": "10",
+        "eslint-plugin-react-hooks>eslint": "10"
+      }
+    }
   }
 }

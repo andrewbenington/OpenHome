@@ -23,24 +23,12 @@ export interface PKMWithStandardStatCalc
 export interface PKMWithGameBoyStats extends AllPKMs, PKMWithDVs, PKMWithGameBoyEVs {}
 
 export function getStats(mon: PKM) {
-  switch (mon.format) {
-    case 'PK1':
-    case 'PK2':
-      return getGameBoyPKMStats(mon)
-    case 'PK3':
-    case 'COLOPKM':
-    case 'XDPKM':
-    case 'PK4':
-    case 'PK5':
-    case 'PK6':
-    case 'PK7':
-    case 'PK8':
-    case 'PA8':
-    case 'PK9':
-      return getStandardPKMStats(mon)
-    default:
-      return { hp: 0, atk: 0, def: 0, spe: 0, spa: 0, spd: 0 }
+  if (mon.format === 'PK1' || mon.format === 'PK2') {
+    return getGameBoyPKMStats(mon)
   }
+
+  // Fallback for PB8, PA9, custom plugins, etc.
+  return getStandardPKMStats(mon)
 }
 
 export const getStandardPKMStats = (mon: PKMWithStandardStats) => {

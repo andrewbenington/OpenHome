@@ -24,6 +24,7 @@ import {
   OhpkmIdentifier,
 } from '../../../core/pkm/Lookup'
 import { BoxAndSlot, SAV } from '../../../core/save/interfaces'
+import { LP_TRANSFER_RESTRICTIONS } from '../../../core/save/luminescentplatinum/G8LUMISAV'
 import { RR_TRANSFER_RESTRICTIONS } from '../../../core/save/radicalred/G3RRSAV'
 import { UB_TRANSFER_RESTRICTIONS } from '../../../core/save/unbound/G3UBSAV'
 import { buildUnknownSaveFile } from '../../../core/save/util/load'
@@ -303,6 +304,8 @@ function monPossiblySupported(dexNumber: number, formeNumber: number, saveRef: S
     return isSupported(RR_TRANSFER_RESTRICTIONS)
   } else if (saveRef.pluginIdentifier === 'unbound') {
     return isSupported(UB_TRANSFER_RESTRICTIONS)
+  } else if (saveRef.pluginIdentifier === 'luminescent_platinum') {
+    return isSupported(LP_TRANSFER_RESTRICTIONS)
   }
 
   switch (OriginGames.generation(saveRef.game)) {

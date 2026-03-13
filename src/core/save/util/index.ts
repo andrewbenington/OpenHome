@@ -37,6 +37,25 @@ export function supportsMon(saveType: SAVClass, dexNumber: number, formeNumber: 
   return saveType.prototype.supportsMon(dexNumber, formeNumber)
 }
 
+export function monSupportedBySaveType(
+  saveType: SAVClass | undefined,
+  mon?: PKMInterface
+): boolean {
+  if (!saveType || !mon) return false
+  if (mon.pluginForm !== undefined && saveType.getPluginIdentifier?.() !== mon.pluginOrigin) {
+    return false
+  }
+  return supportsMon(saveType, mon.dexNum, mon.formeNum)
+}
+
+export function monSupportedBySave(save?: SAV, mon?: PKMInterface): boolean {
+  if (!save || !mon) return false
+  if (mon.pluginForm !== undefined && save.pluginIdentifier !== mon.pluginOrigin) {
+    return false
+  }
+  return save.supportsMon(mon.dexNum, mon.formeNum)
+}
+
 export function getPluginIdentifier(saveType: SAVClass | undefined): string | undefined {
   return saveType?.getPluginIdentifier?.()
 }

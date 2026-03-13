@@ -214,7 +214,7 @@ export function getSaveRef(save: SAV): SaveRef {
     valid: true,
   }
 }
-export type PluginIdentifier = 'radical_red' | 'unbound'
+export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum'
 
 export function pluginGameName(identifier: PluginIdentifier): string {
   switch (identifier) {
@@ -222,6 +222,10 @@ export function pluginGameName(identifier: PluginIdentifier): string {
       return 'Radical Red'
     case 'unbound':
       return 'Unbound'
+    case 'luminescent_platinum':
+      return 'Luminescent Platinum'
+    default:
+      return 'Unknown Plugin'
   }
 }
 
@@ -230,6 +234,10 @@ export function pluginOriginMarkPath(identifier: PluginIdentifier): string | und
     case 'radical_red':
     case 'unbound':
       return '/icons/gba.png'
+    case 'luminescent_platinum':
+      return '/origin_marks/Bdsp.png'
+    default:
+      return undefined
   }
 }
 export const Delimiter = '$' as const

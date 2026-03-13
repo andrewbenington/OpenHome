@@ -2,7 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getSaveRef, SAV, SaveIdentifier } from '@openhome-core/save/interfaces'
-import { SAVClass } from '@openhome-core/save/util'
+import { monSupportedBySave, SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
 import { Option, R, Result } from '@openhome-core/util/functional'
@@ -327,7 +327,7 @@ export function useSaves(): SavesAndBanksManager {
       if (save.trainerGender !== undefined) {
         const allOhpkms = ohpkmStore.getAllStored()
         for (const mon of allOhpkms) {
-          if (!save.supportsMon(mon.dexNum, mon.formeNum)) continue
+          if (!monSupportedBySave(save, mon)) continue
 
           const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
           if (!matchingHandler) continue
