@@ -8,6 +8,7 @@ export interface MonSpriteData {
   heldItemIndex?: number
   isFemale?: boolean
   isShiny?: boolean
+  pluginForm?: number
 }
 
 export interface OpenHomePlugin {
