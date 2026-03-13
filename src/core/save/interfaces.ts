@@ -60,6 +60,7 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
 
   getCurrentBox: () => Box<P>
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata
+  getMonAt(boxNum: number, boxSlot: number): Option<P>
 
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
@@ -114,6 +115,11 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   pluginIdentifier: undefined = undefined
 
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
+  getMonAt(boxNum: number, boxSlot: number): Option<P> {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
 
   get gameName(): string {
     return OriginGames.gameName(this.origin)
@@ -199,6 +205,12 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   get lookupType(): Option<LookupType> {
     return (this.constructor as SAVClass).lookupType
+  }
+
+  getMonAt(boxNum: number, boxSlot: number): Option<P> {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
   }
 }
 
