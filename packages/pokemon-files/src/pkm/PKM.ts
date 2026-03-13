@@ -38,10 +38,10 @@ export type PKM =
 
 export type RomHackPKM = PK3RR | PK3UB | PB8LUMI
 
-export type PkmClass = new (
-  arg: ArrayBuffer | AllPKMFields,
-  encrypted?: boolean | undefined
-) => PKMInterface
+export type PkmClass = {
+  new (arg: ArrayBuffer | AllPKMFields, encrypted?: boolean | undefined): PKMInterface
+  getName(): string
+}
 
 export function isRomHackFormat(format: string): format is 'PK3RR' | 'PK3UB' | 'PB8LUMI' {
   return format === 'PK3RR' || format === 'PK3UB' || format === 'PB8LUMI'

@@ -94,6 +94,7 @@ export default class PK9 {
   tmFlagsSV: Uint8Array
   ribbons: string[]
   trainerGender: boolean
+
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
