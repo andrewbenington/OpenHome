@@ -80,7 +80,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
           const startByte = this.getPcOffset() + BOX_SIZE * box + 232 * monIndex
           const endByte = this.getPcOffset() + BOX_SIZE * box + 232 * (monIndex + 1)
           const monData = bytes.slice(startByte, endByte)
-          const mon = new PK6(monData.buffer, true)
+          const mon = PK6.fromBytes(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
             this.boxes[box].boxSlots[monIndex] = mon

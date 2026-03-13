@@ -196,7 +196,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
 
   // Builds a Luminescent Platinum Pokémon instance from raw bytes
   buildPKM(bytes: ArrayBuffer, encrypted: boolean): PB8LUMI {
-    const mon = new PB8LUMI(bytes, encrypted)
+    const mon = PB8LUMI.fromBytes(bytes, encrypted)
     mon.pluginOrigin = this.pluginIdentifier
     return mon
   }

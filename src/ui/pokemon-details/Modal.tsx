@@ -1,4 +1,4 @@
-import { fileTypeFromString } from '@openhome-core/pkm/FileImport'
+import { fileTypeFromStringNonOhpkm } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
@@ -123,15 +123,15 @@ const PokemonDetailsModal = (props: {
                       setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon))
                       return
                     }
-                    const P = fileTypeFromString(newFormat)
+                    const P = fileTypeFromStringNonOhpkm(newFormat)
 
                     if (!P) {
                       throw `Invalid filetype: ${P}`
                     }
                     if (mon instanceof OHPKM) {
-                      setDisplayMon(new P(mon as any))
+                      setDisplayMon(P.fromOhpkm(mon))
                     } else {
-                      setDisplayMon(new P(new OHPKM(mon) as any))
+                      setDisplayMon(P.fromOhpkm(new OHPKM(mon)))
                     }
                   }}
                 />

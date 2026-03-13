@@ -24,12 +24,14 @@ import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
 
-const files = {
+const saveTypesByFilename = {
   'crystal.sav': 'Crystal',
   'ruby.sav': 'Ruby',
   'sapphire.sav': 'Sapphire',
   'emerald.sav': 'Emerald',
+  'firered.sav': 'FireRed',
   'radicalred.sav': 'Radical Red',
+  'unbound.sav': 'Unbound',
   'black.sav': 'Black',
   'white.sav': 'White',
   ultrasun: 'Ultra Sun',
@@ -56,8 +58,8 @@ const allSaveTypes = [
   LASAV,
 ]
 
-describe('Save file detection', () => {
-  for (const [fileName, gameName] of Object.entries(files)) {
+describe('Save file detection - single possibility', () => {
+  for (const [fileName, gameName] of Object.entries(saveTypesByFilename)) {
     test(`${fileName} should be Pokémon ${gameName}`, () => {
       const result = buildUnknownSaveFile(
         emptyPathData,
@@ -75,3 +77,24 @@ describe('Save file detection', () => {
     })
   }
 })
+
+// describe('Save file detection - multiple possibilities', () => {
+//   for (const [fileName, gameNames] of Object.entries(possibleSaveTypesByFilename)) {
+//     test(`${fileName} should be one of Pokémon ${gameNames.join(', ')}`, () => {
+//       const possibilities = getPossibleSaveTypes(
+//         new Uint8Array(fs.readFileSync(path.join(__dirname, 'save-files', fileName))),
+//         allSaveTypes
+//       )
+//       expect(
+//         possibilities
+//           .map((p) => p.saveTypeName)
+//           .map(removePokemonPrefix)
+//           .toSorted()
+//       ).toEqual(gameNames.toSorted())
+//     })
+//   }
+// })
+
+// function removePokemonPrefix(str: string) {
+//   return str.replace(/Pokémon\s/i, '')
+// }

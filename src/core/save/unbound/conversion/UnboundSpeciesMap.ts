@@ -30,10 +30,10 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
   '26': { NationalDexIndex: 26, FormIndex: 0 }, // Raichu
   '27': { NationalDexIndex: 27, FormIndex: 0 }, // Sandshrew
   '28': { NationalDexIndex: 28, FormIndex: 0 }, // Sandslash
-  '29': { NationalDexIndex: 29, FormIndex: 0 }, // Nidoran-F
+  '29': { NationalDexIndex: 29, FormIndex: 0 }, // Nidoran♀
   '30': { NationalDexIndex: 30, FormIndex: 0 }, // Nidorina
   '31': { NationalDexIndex: 31, FormIndex: 0 }, // Nidoqueen
-  '32': { NationalDexIndex: 32, FormIndex: 0 }, // Nidoran-M
+  '32': { NationalDexIndex: 32, FormIndex: 0 }, // Nidoran♂
   '33': { NationalDexIndex: 33, FormIndex: 0 }, // Nidorino
   '34': { NationalDexIndex: 34, FormIndex: 0 }, // Nidoking
   '35': { NationalDexIndex: 35, FormIndex: 0 }, // Clefairy

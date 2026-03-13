@@ -131,7 +131,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
   getBoxCount = () => BOX_COUNT
 
   buildPKM(bytes: ArrayBuffer, encrypted: boolean): PB8 {
-    return new PB8(bytes, encrypted)
+    return new PB8(bytes, { encrypted })
   }
 
   getMonBoxSizeBytes(): number {

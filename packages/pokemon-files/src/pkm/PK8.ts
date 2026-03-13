@@ -9,25 +9,27 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { ConversionStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
+import { DefaultConstructorOptions, PkmConstructorOptions } from './PKM'
 
 export default class PK8 {
   static getName() {
-    return 'PK8'
+    return 'PK8' as const
   }
   format: 'PK8' = 'PK8'
   static getBoxSize() {
     return 344
   }
   encryptionConstant: number
-  sanity: number
   checksum: number
   dexNum: number
   heldItemIndex: number
@@ -48,7 +50,6 @@ export default class PK8 {
   evs: types.Stats
   contest: types.ContestStats
   pokerusByte: number
-  ribbonBytes: Uint8Array
   contestMemoryCount: number
   battleMemoryCount: number
   sociability: number
@@ -98,7 +99,11 @@ export default class PK8 {
   trainerGender: boolean
   level: number
   stats: types.Stats
-  constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
+  constructor(
+    arg: ArrayBuffer | OHPKM,
+    options: PkmConstructorOptions = DefaultConstructorOptions
+  ) {
+    const { encrypted } = options
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       if (encrypted) {
@@ -108,7 +113,6 @@ export default class PK8 {
       }
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
-      this.sanity = dataView.getUint16(0x4, true)
       this.checksum = dataView.getUint16(0x6, true)
       this.dexNum = dataView.getUint16(0x8, true)
       this.heldItemIndex = dataView.getUint16(0xa, true)
@@ -129,7 +133,6 @@ export default class PK8 {
       this.evs = types.readStatsFromBytesU8(dataView, 0x26)
       this.contest = types.readContestStatsFromBytes(dataView, 0x2c)
       this.pokerusByte = dataView.getUint8(0x32)
-      this.ribbonBytes = new Uint8Array(buffer).slice(0x34, 0x3c)
       this.contestMemoryCount = dataView.getUint8(0x3c)
       this.battleMemoryCount = dataView.getUint8(0x3d)
       this.sociability = dataView.getUint32(0x48, true)
@@ -207,8 +210,6 @@ export default class PK8 {
     } else {
       const other = arg
       this.encryptionConstant = other.encryptionConstant ?? 0
-      this.sanity = other.sanity ?? 0
-      this.checksum = other.checksum ?? 0
       this.dexNum = other.dexNum
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
@@ -227,34 +228,19 @@ export default class PK8 {
         diamond: false,
       }
       this.personalityValue = other.personalityValue ?? 0
-      this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
+      this.nature = other.nature
       this.statNature = other.statNature ?? NatureIndex.newFromPid(this.personalityValue)
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
       this.gender = other.gender ?? 0
       this.formeNum = other.formeNum
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.contest = other.contest ?? {
-        cool: 0,
-        beauty: 0,
-        cute: 0,
-        smart: 0,
-        tough: 0,
-        sheen: 0,
-      }
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(8)
-      this.contestMemoryCount = other.contestMemoryCount ?? 0
-      this.battleMemoryCount = other.battleMemoryCount ?? 0
-      this.sociability = other.sociability ?? 0
-      this.heightScalar = other.heightScalar ?? 127
-      this.weightScalar = other.weightScalar ?? 127
+      this.evs = other.evs
+      this.contest = other.contest
+      this.pokerusByte = other.pokerusByte
+      this.contestMemoryCount = other.contestMemoryCount
+      this.battleMemoryCount = other.battleMemoryCount
+      this.sociability = other.sociability
+      this.heightScalar = other.heightScalar
+      this.weightScalar = other.weightScalar
       this.nickname = other.nickname
 
       const moveFilter = MoveFilter.fromPkmClass(PK8)
@@ -275,12 +261,12 @@ export default class PK8 {
       this.isEgg = other.isEgg ?? false
       this.isNicknamed = other.isNicknamed ?? false
       this.dynamaxLevel = other.dynamaxLevel ?? 0
-      this.statusCondition = other.statusCondition ?? 0
+      this.statusCondition = 0
       this.palma = other.palma ?? 0
       this.handlerName = other.handlerName ?? ''
       this.handlerGender = other.handlerGender ?? false
       this.handlerLanguage = other.handlerLanguage ?? 0
-      this.handlerID = other.handlerID ?? 0
+      this.handlerID = other.handlerId ?? 0
       this.handlerFriendship = other.handlerFriendship ?? 0
       this.fullness = other.fullness ?? 0
       this.enjoyment = other.enjoyment ?? 0
@@ -306,7 +292,7 @@ export default class PK8 {
       } else {
         this.ball = Ball.Poke
       }
-      this.metLevel = other.metLevel ?? 0
+      this.metLevel = other.metLevel
       this.trFlagsSwSh = other.trFlagsSwSh ?? new Uint8Array(14)
       this.homeTracker = other.homeTracker ?? new Uint8Array(8)
       this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], 'Slump Mark') ?? []
@@ -323,16 +309,8 @@ export default class PK8 {
         feeling: 0,
         textVariables: 0,
       }
-      this.hyperTraining = other.hyperTraining ?? {
-        hp: false,
-        atk: false,
-        def: false,
-        spa: false,
-        spd: false,
-        spe: false,
-      }
+      this.hyperTraining = other.hyperTraining
       this.trainerGender = other.trainerGender
-      this.level = other.level ?? 0
       this.stats = other.stats ?? {
         hp: 0,
         atk: 0,
@@ -341,11 +319,17 @@ export default class PK8 {
         spa: 0,
         spd: 0,
       }
+      this.level = this.speciesMetadata?.calculateLevel(this.exp) ?? 1
+      this.checksum = this.calculcateChecksum()
     }
   }
 
-  static fromBytes(buffer: ArrayBuffer): PK8 {
-    return new PK8(buffer)
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK8 {
+    return new PK8(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConversionStrategy = DefaultConversionStrategy): PK8 {
+    return new PK8(ohpkm, { strategy })
   }
 
   toBytes(): ArrayBuffer {
@@ -353,7 +337,7 @@ export default class PK8 {
     const dataView = new DataView(buffer)
 
     dataView.setUint32(0x0, this.encryptionConstant, true)
-    dataView.setUint16(0x4, this.sanity, true)
+    dataView.setUint16(0x4, 0, true) // sanity bytes
     dataView.setUint16(0x6, this.checksum, true)
     dataView.setUint16(0x8, this.dexNum, true)
     dataView.setUint16(0xa, this.heldItemIndex, true)
@@ -374,7 +358,6 @@ export default class PK8 {
     types.writeStatsToBytesU8(dataView, 0x26, this.evs)
     types.writeContestStatsToBytes(dataView, 0x2c, this.contest)
     dataView.setUint8(0x32, this.pokerusByte)
-    new Uint8Array(buffer).set(new Uint8Array(this.ribbonBytes.slice(0, 8)), 0x34)
     dataView.setUint8(0x3c, this.contestMemoryCount)
     dataView.setUint8(0x3d, this.battleMemoryCount)
     dataView.setUint32(0x48, this.sociability, true)
@@ -465,7 +448,7 @@ export default class PK8 {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
-  public calcChecksum() {
+  public calculcateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x148)
   }
 

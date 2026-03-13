@@ -1,6 +1,7 @@
 use crate::error::{Error, Result};
 use crate::{state::synced_state, util};
 use base64::prelude::*;
+use pkm_rs::pkm::ohpkm::OhpkmV2;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use std::{collections::HashMap, fs};
@@ -32,7 +33,31 @@ impl OhpkmBytesStore {
             }
         }
 
-        Ok(Self(map))
+        let mut store = Self(map);
+
+        store.fix_errors();
+
+        Ok(store)
+    }
+
+    fn fix_errors(&mut self) {
+        for (identifier, bytes) in self.0.iter_mut() {
+            if let Ok(mut mon) = OhpkmV2::from_bytes(bytes) {
+                let had_errors = mon.fix_errors();
+                if had_errors {
+                    println!(
+                        "Fixed errors Ohpkm {} with id {identifier}",
+                        mon.get_nickname()
+                    );
+                    match mon.to_bytes() {
+                        Ok(new_bytes) => *bytes = new_bytes,
+                        Err(err) => println!(
+                            "Failed to reserialize fixed Ohpkm with id {identifier}: {err}"
+                        ),
+                    };
+                }
+            }
+        }
     }
 
     fn write_to_directory(data: &Self, path: &Path) -> Result<()> {

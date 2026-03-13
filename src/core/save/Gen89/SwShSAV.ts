@@ -51,7 +51,7 @@ export class SwShSAV extends G89SAV<PK8> {
   }
 
   monConstructor(bytes: ArrayBuffer, encrypted: boolean): PK8 {
-    return new PK8(bytes, encrypted)
+    return new PK8(bytes, { encrypted })
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {

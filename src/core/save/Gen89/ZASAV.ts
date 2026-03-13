@@ -56,7 +56,7 @@ export class ZASAV extends G89SAV<PA9> {
   }
 
   monConstructor(bytes: ArrayBuffer, encrypted: boolean): PA9 {
-    return new PA9(bytes, encrypted)
+    return new PA9(bytes, { encrypted })
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {

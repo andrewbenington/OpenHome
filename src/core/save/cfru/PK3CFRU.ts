@@ -1,4 +1,4 @@
-import { PKMInterface, PluginPKMInterface } from '@openhome-core/pkm/interfaces'
+import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   Ball,
   Language,
@@ -30,6 +30,15 @@ import {
   writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
+import {
+  ConversionStrategy,
+  DefaultConversionStrategy,
+} from '../../../../packages/pokemon-files/src/conversion/settings'
+import {
+  DefaultConstructorOptions,
+  PkmConstructorOptions,
+} from '../../../../packages/pokemon-files/src/pkm/PKM'
+import { OHPKM } from '../../pkm/OHPKM'
 import { PluginIdentifier } from '../interfaces'
 
 export interface CFRUToNationalDexEntry {
@@ -115,7 +124,10 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
   abstract selectColor: string
 
-  constructor(arg: ArrayBuffer | PKMInterface) {
+  constructor(
+    arg: ArrayBuffer | OHPKM,
+    _options: PkmConstructorOptions = DefaultConstructorOptions
+  ) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       const dataView = new DataView(buffer)
@@ -259,7 +271,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       }
       this.pokerusByte = other.pokerusByte ?? 0
       this.metLocationIndex = other.metLocationIndex ?? 0
-      this.metLevel = other.metLevel ?? 0
+      this.metLevel = other.metLevel
 
       const fromRadicalRed = other.pluginOrigin === 'radical_red'
 
@@ -308,10 +320,19 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   static fromBytes<T extends PK3CFRU>(
-    this: new (buffer: ArrayBuffer) => T,
-    buffer: ArrayBuffer
+    this: new (buffer: ArrayBuffer, options: PkmConstructorOptions) => T,
+    buffer: ArrayBuffer,
+    encrypted?: boolean
   ): T {
-    return new this(buffer)
+    return new this(buffer, { encrypted })
+  }
+
+  static fromOhpkm<T extends PK3CFRU>(
+    this: new (ohpkm: OHPKM, options: PkmConstructorOptions) => T,
+    ohpkm: OHPKM,
+    strategy: ConversionStrategy = DefaultConversionStrategy
+  ): T {
+    return new this(ohpkm, { strategy })
   }
 
   abstract internalItemIndexFromModern(modernIndex: number): number

@@ -93,5 +93,32 @@ test('inserting mon works', () => {
 
   expect(modifiedSaveFile2.boxes[7].boxSlots[0]?.nickname).toEqual('KABUTOPS')
   expect(modifiedSaveFile2.boxes[7].boxSlots[10]?.nickname).toEqual('MEW')
+  expect(modifiedSaveFile2.boxes[7].boxSlots[11]?.nickname).toEqual('SLOWBRO')
+})
+
+test('inserting mon with game capitalization gives correct nickname', () => {
+  const result1 = buildUnknownSaveFile(emptyPathData, new Uint8Array(blueSaveFile.bytes), [G1SAV])
+
+  if (R.isErr(result1)) {
+    fail(result1.err)
+  }
+  const modifiedSaveFile1 = result1.value as G1SAV
+
+  modifiedSaveFile1.boxes[7].boxSlots[11] = PK1.fromOhpkm(slowbroOH, {
+    'nickname.capitalization': 'modern',
+  })
+  modifiedSaveFile1.updatedBoxSlots.push({ box: 7, boxSlot: 0 })
+  modifiedSaveFile1.prepareForSaving()
+
+  const result2 = buildUnknownSaveFile(emptyPathData, new Uint8Array(modifiedSaveFile1.bytes), [
+    G1SAV,
+  ])
+
+  if (R.isErr(result2)) {
+    fail(result2.err)
+  }
+
+  const modifiedSaveFile2 = result2.value as G1SAV
+
   expect(modifiedSaveFile2.boxes[7].boxSlots[11]?.nickname).toEqual('Slowbro')
 })

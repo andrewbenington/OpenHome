@@ -12,6 +12,7 @@ import {
   OriginGame,
   OriginGames,
 } from '@pkm-rs/pkg'
+import { PKMInterface } from '../../../../src/core/pkm/interfaces'
 import { AllPKMFields, FourMoves } from './pkmInterface'
 
 export function getGen3MiscFlags(pokemon: PKM): number {
@@ -211,12 +212,12 @@ export function adjustPpForFormat(
 }
 
 type AllowedMoveIndices = number[]
-type PkmClassWithMoveLimit = PkmClass & { maxValidMove: () => number }
+type PkmClassWithMoveLimit<P extends PKMInterface> = PkmClass<P> & { maxValidMove: () => number }
 
-export class MoveFilter {
-  filter: AllowedMoveIndices | PkmClassWithMoveLimit
+export class MoveFilter<P extends PKMInterface> {
+  filter: AllowedMoveIndices | PkmClassWithMoveLimit<P>
 
-  private constructor(filter: AllowedMoveIndices | PkmClassWithMoveLimit) {
+  private constructor(filter: AllowedMoveIndices | PkmClassWithMoveLimit<P>) {
     this.filter = filter
   }
 
@@ -224,7 +225,7 @@ export class MoveFilter {
     return new MoveFilter(filter)
   }
 
-  static fromPkmClass(filter: PkmClassWithMoveLimit) {
+  static fromPkmClass<P extends PKMInterface>(filter: PkmClassWithMoveLimit<P>) {
     return new MoveFilter(filter)
   }
 

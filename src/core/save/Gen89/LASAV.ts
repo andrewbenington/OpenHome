@@ -54,7 +54,7 @@ export class LASAV extends G89SAV<PA8> {
   }
 
   monConstructor(bytes: ArrayBuffer, encrypted: boolean): PA8 {
-    return new PA8(bytes, encrypted)
+    return new PA8(bytes, { encrypted })
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {
