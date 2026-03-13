@@ -1,7 +1,7 @@
-import { supportsMon } from '@openhome-core/save/util'
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { monSupportedBySaveType } from '@openhome-core/save/util'
 import { unique } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
-import { PKMFormeRef } from '@openhome-core/util/types'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useContext, useMemo } from 'react'
 
@@ -29,7 +29,7 @@ interface FileTypeSelectProps {
   baseFormat: string
   currentFormat: string
   color?: string
-  formData: PKMFormeRef
+  formData: PKMInterface
   onChange: (selectedFormat: string) => void
 }
 
@@ -40,9 +40,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
   const supportedFormats = useMemo(() => {
     const supportedFormats = unique(
       getEnabledSaveTypes().map((saveType) =>
-        supportsMon(saveType, formData.dexNum, formData.formeNum)
-          ? saveType.pkmType.getName()
-          : undefined
+        monSupportedBySaveType(saveType, formData) ? saveType.pkmType.getName() : undefined
       )
     ).filter(filterUndefined)
 
