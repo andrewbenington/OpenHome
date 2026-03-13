@@ -37,7 +37,7 @@
     "dev": "pnpm run wasm-compile && pnpm vite",
     "tauri": "tauri",
     "test-cargo": "cd pkm_rs_types && cargo test; cd ../pkm_rs_resources && cargo test; cd ../pkm_rs && cargo test; cd ../src-tauri && cargo test",
-    "test-vite": "vitest run",
+    "test-vite": "pnpm run wasm-compile && vitest run",
     "test": "pnpm run test-cargo && pnpm run test-vite",
     "wasm-compile": "wasm-pack build ./pkm_rs --target web -- --features wasm",
     "precommit": "pnpm run typecheck && pnpm run format && pnpm run lint",
