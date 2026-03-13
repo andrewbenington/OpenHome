@@ -14,7 +14,7 @@ export type SimpleOpenHomeBank = {
   id: string
   index: number
   name: string | undefined
-  boxes: SimpleOpenHomeBox[]
+  boxes: Map<number, SimpleOpenHomeBox>
   current_box: number
 }
 
