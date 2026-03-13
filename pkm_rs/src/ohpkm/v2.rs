@@ -2224,6 +2224,12 @@ impl OhpkmV2 {
     // }
 
     // Plugins
+
+    #[wasm_bindgen(getter = pluginOriginWasm)]
+    pub fn plugin_origin_js(&self) -> Option<String> {
+        Some(self.plugin_data.clone()?.plugin_origin)
+    }
+
     #[wasm_bindgen(getter = pluginFormWasm)]
     pub fn plugin_form(&self) -> Option<u16> {
         self.plugin_data.as_ref().and_then(|x| x.plugin_form)
