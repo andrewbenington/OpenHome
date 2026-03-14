@@ -51,15 +51,24 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
   const loadAllHomeData = useCallback(async () => {
     if (openSavesState.error) return
-    await backend.loadHomeBanks().then(
-      R.match(
-        (banks) => openSavesDispatch({ type: 'load_home_banks', payload: { banks } }),
-        (err) => {
-          displayError('Error Loading OpenHome Data', err)
-          openSavesDispatch({ type: 'set_error', payload: err })
-        }
+    await backend
+      .loadHomeBanks()
+      .then(
+        R.match(
+          (banks) => {
+            openSavesDispatch({ type: 'load_home_banks', payload: { banks } })
+          },
+          (err) => {
+            console.error('[SAVES] loadHomeBanks() error:', err)
+            displayError('Error Loading OpenHome Data', err)
+            openSavesDispatch({ type: 'set_error', payload: err })
+          }
+        )
       )
-    )
+      .catch((e) => {
+        console.error('[SAVES] loadHomeBanks() unhandled rejection:', e)
+        openSavesDispatch({ type: 'set_error', payload: String(e) })
+      })
   }, [backend, displayError, openSavesDispatch, openSavesState.error])
 
   const saveChanges = useCallback(async (): Promise<Result<null, SaveError[]>> => {

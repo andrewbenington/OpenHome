@@ -11,25 +11,27 @@ import { monSupportedBySave } from '@openhome-core/save/util'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { useItems } from '@openhome-ui/state/items'
-import { isMonLocation, useSaves } from '@openhome-ui/state/saves'
+import { isMonLocation, MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { ReactNode, useCallback, useState } from 'react'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/core/pkm/util'
+import { OpenHomeBanks } from 'src/core/save/HomeData'
 import PokemonIcon from 'src/ui/components/PokemonIcon'
-import { DragPayload } from '.'
+import { DragPayload, locationsEqual } from '.'
 import useDragAndDrop from './useDragAndDrop'
 
 export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { children } = props
   const savesAndBanks = useSaves()
   const { moveMonItemToBag, giveItemToMon } = useItems()
-  const { dragState, startDragging, endDragging } = useDragAndDrop()
+  const { dragState, startDragging, endDragging, clearSelections } = useDragAndDrop()
   const [dragOverId, setDragOverId] = useState<UniqueIdentifier | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 },
-      delay: { value: 200, tolerance: 10 },
+      activationConstraint: dragState.multiSelectEnabled
+        ? { delay: 250, tolerance: 8 }
+        : { distance: 10 },
     })
   )
 
@@ -80,26 +82,99 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
         const { mon } = payload.monData
 
         if (dropElementId === 'to_release') {
-          savesAndBanks.releaseMonAtLocation(payload.monData)
+          if (
+            dragState.multiSelectEnabled &&
+            dragState.selectedLocations.some((l) => locationsEqual(l, payload.monData))
+          ) {
+            dragState.selectedLocations.forEach((loc) => {
+              const m = savesAndBanks.getMonAtLocation(loc)
+              if (m) savesAndBanks.releaseMonAtLocation(loc)
+            })
+            clearSelections()
+          } else {
+            savesAndBanks.releaseMonAtLocation(payload.monData)
+          }
         } else if (dropElementId === 'item-bag') {
-          moveMonItemToBag(payload.monData)
+          if (
+            dragState.multiSelectEnabled &&
+            dragState.selectedLocations.some((l) => locationsEqual(l, payload.monData))
+          ) {
+            dragState.selectedLocations.forEach((loc) => {
+              const m = savesAndBanks.getMonAtLocation(loc)
+              if (m) moveMonItemToBag(loc)
+            })
+            clearSelections()
+          } else {
+            moveMonItemToBag(payload.monData)
+          }
         } else if (
           isMonLocation(dest) &&
           (dest.isHome ||
             monSupportedBySave(savesAndBanks.saveFromIdentifier(dest.saveIdentifier), mon))
         ) {
-          const source = payload.monData
-
-          // Move item to OpenHome bag if not supported by the save file
           if (
-            mon.heldItemIndex &&
-            !dest.isHome &&
-            !savesAndBanks.saveFromIdentifier(dest.saveIdentifier).supportsItem(mon.heldItemIndex)
+            dragState.multiSelectEnabled &&
+            dragState.selectedLocations.some((l) => locationsEqual(l, payload.monData))
           ) {
-            moveMonItemToBag(source)
-          }
+            const locationsToMove = [
+              payload.monData,
+              ...dragState.selectedLocations.filter((l) => !locationsEqual(l, payload.monData)),
+            ]
+            let currentDestSlot = dest.boxSlot
+            let currentDestBox = dest.box
 
-          savesAndBanks.moveMon(source, dest)
+            const maxSlots = dest.isHome ? OpenHomeBanks.BOX_ROWS * OpenHomeBanks.BOX_COLUMNS : 30
+
+            for (const sourceLoc of locationsToMove) {
+              const currMon = savesAndBanks.getMonAtLocation(sourceLoc)
+              if (!currMon) continue
+
+              if (
+                !dest.isHome &&
+                !savesAndBanks
+                  .saveFromIdentifier(dest.saveIdentifier)
+                  .supportsMon(currMon.dexNum, currMon.formeNum)
+              ) {
+                continue
+              }
+
+              if (
+                currMon.heldItemIndex &&
+                !dest.isHome &&
+                !savesAndBanks
+                  .saveFromIdentifier(dest.saveIdentifier)
+                  .supportsItem(currMon.heldItemIndex)
+              ) {
+                moveMonItemToBag(sourceLoc)
+              }
+
+              const nextDest: MonLocation = {
+                ...dest,
+                box: currentDestBox,
+                boxSlot: currentDestSlot,
+              }
+              savesAndBanks.moveMon({ ...sourceLoc, mon: currMon }, nextDest)
+
+              currentDestSlot++
+              if (currentDestSlot >= maxSlots) {
+                currentDestSlot = 0
+                currentDestBox++
+              }
+            }
+            clearSelections()
+          } else {
+            const source = payload.monData
+
+            if (
+              mon.heldItemIndex &&
+              !dest.isHome &&
+              !savesAndBanks.saveFromIdentifier(dest.saveIdentifier).supportsItem(mon.heldItemIndex)
+            ) {
+              moveMonItemToBag(source)
+            }
+
+            savesAndBanks.moveMon(source, dest)
+          }
         }
 
         endDragging()

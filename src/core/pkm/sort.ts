@@ -20,6 +20,10 @@ export const SortTypes = [
   'Held Item',
   'Is Egg',
   'Shiny Leaves',
+  'Display Color',
+  'Tag',
+  'Tag Count',
+  'Has Notes',
 ]
 
 export type SortType = (typeof SortTypes)[number]
@@ -133,6 +137,32 @@ export function getSortFunction(
         (a.shinyLeaves?.hasCrown() ? 6 : (a.shinyLeaves?.count() ?? 0))
     case 'Held Item':
       return sortByHeldItem
+    case 'Tag':
+      return (a, b) => {
+        const getFirstTag = (mon: PKMInterface) => {
+          const tags = (mon as any).tags as { label: string }[] | undefined
+          return tags?.[0]?.label ?? ''
+        }
+        return getFirstTag(a).localeCompare(getFirstTag(b))
+      }
+    case 'Tag Count':
+      return (a, b) => {
+        const getTagCount = (mon: PKMInterface) => {
+          const tags = (mon as any).tags as any[] | undefined
+          return tags?.length ?? 0
+        }
+        return getTagCount(b) - getTagCount(a)
+      }
+    case 'Has Notes':
+      return (a, b) => {
+        const hasNotes = (mon: PKMInterface) => {
+          const notes = (mon as any).notes
+          return typeof notes === 'string' && notes.trim().length > 0
+        }
+        return Number(hasNotes(b)) - Number(hasNotes(a))
+      }
+    case 'Display Color':
+      return (a, b) => ((a as any).displayColor ?? '').localeCompare((b as any).displayColor ?? '')
     default:
       return () => {
         console.error('unrecognized sort term:', sortStr)

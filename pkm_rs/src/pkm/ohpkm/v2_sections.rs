@@ -23,7 +23,7 @@ use pkm_rs_types::{ContestStats, Stats8, Stats16Le, StatsPreSplit, TrainerData};
 use pkm_rs_types::{FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, TeraType};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::num::NonZeroU16;
 
 #[cfg(feature = "wasm")]
@@ -1408,6 +1408,67 @@ impl DataSection for Notes {
             .map(Notes)
             .map_err(|e| Error::StringDecode {
                 source: StringErrorSource::Notes(e),
+            })
+    }
+
+    fn to_bytes(&self) -> Result<Vec<u8>> {
+        Ok(self.0.clone().into_bytes())
+    }
+
+    fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
+
+/// Custom tags for a Pokemon (label + CSS color string + optional icon)
+/// Stored as JSON string
+#[derive(Debug, Default, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct MonTag {
+    pub label: String,
+    pub color: String,
+    pub icon: Option<String>,
+}
+
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+pub struct MonTags(pub Vec<MonTag>);
+
+impl DataSection for MonTags {
+    type TagType = SectionTagV2;
+    const TAG: Self::TagType = SectionTagV2::Tag;
+
+    type ErrorType = Error;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::ensure_buffer_size(bytes)?;
+        let tags: Vec<MonTag> = serde_json::from_slice(bytes).unwrap_or_default();
+        Ok(Self(tags))
+    }
+
+    fn to_bytes(&self) -> Result<Vec<u8>> {
+        Ok(serde_json::to_vec(&self.0).unwrap_or_default())
+    }
+
+    fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
+/// Display color for the Pokemon in boxes (CSS color string like '#ff0000')
+#[derive(Debug, Default, Clone)]
+pub struct DisplayColor(pub String);
+
+impl DataSection for DisplayColor {
+    type TagType = SectionTagV2;
+    const TAG: Self::TagType = SectionTagV2::DisplayColor;
+
+    type ErrorType = Error;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::ensure_buffer_size(bytes)?;
+
+        String::from_utf8(bytes.to_vec())
+            .map(DisplayColor)
+            .map_err(|e| Error::StringDecode {
+                source: StringErrorSource::Notes(e), // Reuse Notes error for simplicity
             })
     }
 

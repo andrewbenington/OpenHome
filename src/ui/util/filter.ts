@@ -17,6 +17,9 @@ export interface Filter {
   ball?: number
   isEgg?: boolean
   shinyLeaves?: number
+  tag?: string
+  displayColor?: string
+  hasNotes?: boolean
 }
 
 export type HeldItemFilter = number | HeldItemCategory
@@ -71,6 +74,34 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
       case 'Star Shiny':
         return 'isSquareShiny' in mon && mon.isShiny() && !mon.isSquareShiny()
     }
+  }
+
+  if (filter.tag !== undefined) {
+    const tags: { label: string }[] =
+      'tags' in mon && Array.isArray((mon as any).tags) ? (mon as any).tags : []
+    if (filter.tag === 'Any Tag') {
+      if (tags.length === 0) return false
+    } else if (filter.tag === 'No Tag') {
+      if (tags.length > 0) return false
+    } else {
+      if (!tags.some((t) => t.label === filter.tag)) return false
+    }
+  }
+
+  if (filter.displayColor !== undefined) {
+    if (filter.displayColor === 'Any Color') {
+      if (!('displayColor' in mon) || !mon.displayColor) return false
+    } else if (filter.displayColor === 'No Color') {
+      if ('displayColor' in mon && mon.displayColor) return false
+    } else {
+      if (!('displayColor' in mon) || mon.displayColor !== filter.displayColor) return false
+    }
+  }
+
+  if (filter.hasNotes !== undefined) {
+    const notes = (mon as any).notes
+    const monHasNotes = typeof notes === 'string' && notes.trim().length > 0
+    if (filter.hasNotes !== monHasNotes) return false
   }
 
   const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)

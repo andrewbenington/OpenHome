@@ -98,6 +98,8 @@ const DraggableMon = (props: DraggableMonProps) => {
         topRightIndicator={topRightIndicatorComponent}
         pluginForm={mon.pluginForm}
         pluginOrigin={mon.pluginOrigin}
+        tags={(mon as any).tags}
+        hasNotes={typeof (mon as any).notes === 'string' && (mon as any).notes.trim().length > 0}
       />
     </div>
   )

@@ -60,6 +60,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
 
   getMonAtLocation(location: MonLocation): PKMInterface | OHPKM | undefined
   setMonHeldItem(item: Item | undefined, location: MonLocation): void
+  setMonNickname(nickname: string, location: MonLocation): void
   updateMonNotes(monId: string, notes: string | undefined): void
   updateMonMarkings(monId: string, markings: MarkingsSixShapesWithColor): void
   moveMon(source: MonWithLocation, dest: MonLocation): void
@@ -68,6 +69,15 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
   releaseMonAtLocation(location: MonLocation): void
   releaseMonsById(...ids: OhpkmIdentifier[]): void
   trackedMonsToRelease: OhpkmIdentifier[]
+
+  // Bulk operations
+  moveBoxToBank(save: SAV): number
+  moveSaveToBank(save: SAV): number
+  updateMonDisplayColor(monId: string, color: string | undefined): void
+  updateMonTags(
+    monId: string,
+    tags: { label: string; color: string; icon?: string }[] | undefined
+  ): void
 }
 
 export function useSaves(): SavesAndBanksManager {
@@ -666,6 +676,34 @@ export function useSaves(): SavesAndBanksManager {
     [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore, saveFromIdentifier]
   )
 
+  const setMonNickname = useCallback(
+    (nickname: string, location: MonLocation) => {
+      let ohpkm: OHPKM
+      if (location.isHome) {
+        const identifier = getMonAtHomeLocation(location)
+        if (!identifier) return
+
+        const result = ohpkmStore.tryLoadFromId(identifier)
+        if (R.isErr(result)) return
+
+        ohpkm = result.value
+      } else {
+        const mon = getMonAtSaveLocation(location)
+        if (!mon) return
+
+        const save = saveFromIdentifier(location.saveIdentifier)
+        ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, save)
+
+        save.boxes[location.box].boxSlots[location.boxSlot] = save.convertOhpkm(ohpkm)
+        save.updatedBoxSlots.push({ box: location.box, boxSlot: location.boxSlot })
+      }
+
+      ohpkm.nickname = nickname
+      ohpkmStore.insertOrUpdate(ohpkm)
+    },
+    [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore, saveFromIdentifier]
+  )
+
   const updateMonNotes = useCallback(
     (monId: string, notes: string | undefined) => {
       if (!homeData) return
@@ -798,6 +836,178 @@ export function useSaves(): SavesAndBanksManager {
     [loadedHomeData, openSavesDispatch]
   )
 
+  const moveBoxToBank = useCallback(
+    (save: SAV): number => {
+      const currentBox = save.boxes[save.currentPCBox]
+      if (!currentBox) return 0
+
+      let movedCount = 0
+      const updatedHomeData = loadedHomeData.clone()
+      const boxSize = OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS
+      let currentBankBox = updatedHomeData.currentPCBox
+      let currentSlot = 0
+
+      while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
+        const box = updatedHomeData.getCurrentBank().getBox(currentBankBox)
+        if (!box) break
+        const emptyIndex = box.firstEmptyIndex()
+        if (emptyIndex !== undefined) {
+          currentSlot = emptyIndex
+          break
+        }
+        currentBankBox++
+      }
+
+      for (let i = 0; i < currentBox.boxSlots.length; i++) {
+        const mon = currentBox.boxSlots[i]
+        if (!mon) continue
+
+        while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
+          if (currentSlot < boxSize) {
+            const bankSlotEmpty = updatedHomeData.slotIsEmpty({
+              bank: updatedHomeData.currentBankIndex,
+              box: currentBankBox,
+              boxSlot: currentSlot,
+            })
+            if (bankSlotEmpty) break
+            currentSlot++
+          } else {
+            currentSlot = 0
+            currentBankBox++
+          }
+        }
+
+        if (currentBankBox >= updatedHomeData.getCurrentBankBoxes().length) {
+          updatedHomeData.addBoxCurrentBank('end')
+        }
+
+        const ohpkm =
+          ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, undefined)
+
+        updatedHomeData.setAtLocation(
+          {
+            bank: updatedHomeData.currentBankIndex,
+            box: currentBankBox,
+            boxSlot: currentSlot,
+          },
+          ohpkm.openhomeId
+        )
+
+        currentBox.boxSlots[i] = undefined
+        save.updatedBoxSlots.push({ box: save.currentPCBox, boxSlot: i })
+
+        movedCount++
+        currentSlot++
+      }
+
+      openSavesDispatch({ type: 'update_home_data', payload: { homeData: updatedHomeData } })
+      return movedCount
+    },
+    [loadedHomeData, ohpkmStore, openSavesDispatch]
+  )
+
+  const moveSaveToBank = useCallback(
+    (save: SAV): number => {
+      let totalMoved = 0
+      const updatedHomeData = loadedHomeData.clone()
+      const boxSize = OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS
+      let currentBankBox = updatedHomeData.currentPCBox
+      let currentSlot = 0
+
+      while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
+        const box = updatedHomeData.getCurrentBank().getBox(currentBankBox)
+        if (!box) break
+        const emptyIndex = box.firstEmptyIndex()
+        if (emptyIndex !== undefined) {
+          currentSlot = emptyIndex
+          break
+        }
+        currentBankBox++
+      }
+
+      for (let boxIdx = 0; boxIdx < save.boxes.length; boxIdx++) {
+        const saveBox = save.boxes[boxIdx]
+        if (!saveBox) continue
+
+        for (let slotIdx = 0; slotIdx < saveBox.boxSlots.length; slotIdx++) {
+          const mon = saveBox.boxSlots[slotIdx]
+          if (!mon) continue
+
+          while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
+            if (currentSlot < boxSize) {
+              const bankSlotEmpty = updatedHomeData.slotIsEmpty({
+                bank: updatedHomeData.currentBankIndex,
+                box: currentBankBox,
+                boxSlot: currentSlot,
+              })
+              if (bankSlotEmpty) break
+              currentSlot++
+            } else {
+              currentSlot = 0
+              currentBankBox++
+            }
+          }
+
+          if (currentBankBox >= updatedHomeData.getCurrentBankBoxes().length) {
+            updatedHomeData.addBoxCurrentBank('end')
+          }
+
+          const ohpkm =
+            ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, undefined)
+
+          updatedHomeData.setAtLocation(
+            {
+              bank: updatedHomeData.currentBankIndex,
+              box: currentBankBox,
+              boxSlot: currentSlot,
+            },
+            ohpkm.openhomeId
+          )
+
+          saveBox.boxSlots[slotIdx] = undefined
+          save.updatedBoxSlots.push({ box: boxIdx, boxSlot: slotIdx })
+
+          totalMoved++
+          currentSlot++
+        }
+      }
+
+      openSavesDispatch({ type: 'update_home_data', payload: { homeData: updatedHomeData } })
+      return totalMoved
+    },
+    [loadedHomeData, ohpkmStore, openSavesDispatch]
+  )
+
+  const updateMonDisplayColor = useCallback(
+    (monId: string, color: string | undefined) => {
+      if (!homeData) return
+
+      const result = ohpkmStore.tryLoadFromId(monId)
+      if (R.isErr(result)) return result
+
+      const mon = result.value
+      mon.displayColor = color
+
+      ohpkmStore.insertOrUpdate(mon)
+    },
+    [homeData, ohpkmStore]
+  )
+
+  const updateMonTags = useCallback(
+    (monId: string, tags: { label: string; color: string; icon?: string }[] | undefined) => {
+      if (!homeData) return
+
+      const result = ohpkmStore.tryLoadFromId(monId)
+      if (R.isErr(result)) return result
+
+      const mon = result.value
+      mon.setTags(tags ?? [])
+
+      ohpkmStore.insertOrUpdate(mon)
+    },
+    [homeData, ohpkmStore]
+  )
+
   function newBoxesWithIds(ids: OhpkmIdentifier[], boxName?: string): Option<number> {
     if (ids.length === 0) return undefined
 
@@ -850,6 +1060,7 @@ export function useSaves(): SavesAndBanksManager {
 
     getMonAtLocation,
     setMonHeldItem,
+    setMonNickname,
     updateMonNotes,
     updateMonMarkings,
     moveMon,
@@ -860,6 +1071,12 @@ export function useSaves(): SavesAndBanksManager {
     trackedMonsToRelease: openSavesState.monsToRelease.filter(
       (toRelease) => typeof toRelease === 'string'
     ),
+
+    // Bulk operations
+    moveBoxToBank,
+    moveSaveToBank,
+    updateMonDisplayColor,
+    updateMonTags,
   }
 }
 
