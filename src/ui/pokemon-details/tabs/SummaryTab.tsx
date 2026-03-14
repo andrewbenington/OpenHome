@@ -25,6 +25,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
     isShiny: mon.isShiny(),
     isFemale: mon.gender === 1,
     format: mon.format,
+    pluginOrigin: mon.pluginOrigin,
     pluginForm: mon.pluginForm,
   })
 
@@ -150,6 +151,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           </Flex>
         </AttributeRow>
         <AttributeRow label="Dex No." value={`${mon.dexNum}`} />
+        {mon.pluginForm && <AttributeRow label="ROM Hack Form" value={`${mon.pluginForm}`} />}
         <AttributeRow label="Type">
           {getTypes(mon)?.map((type) => (
             <TypeIcon type={type} key={`${type}_type_icon`} />

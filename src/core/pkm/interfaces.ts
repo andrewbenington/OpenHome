@@ -26,4 +26,10 @@ export type PKMInterface = AllPKMFields & {
   speciesMetadata?: SpeciesMetadata
 }
 
-export type MonFormat = (PKM | RomHackPKM)['format']
+export type OfficialFormat = PKM['format']
+export type RomHackFormat = RomHackPKM['format']
+export type MonFormat = OfficialFormat | RomHackFormat
+
+export function isRomHackFormat(format: string): format is RomHackFormat {
+  return format === 'PK3RR' || format === 'PK3UB' || format === 'PB8LUMI'
+}

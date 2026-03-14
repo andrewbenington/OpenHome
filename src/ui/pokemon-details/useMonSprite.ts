@@ -84,6 +84,7 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
             )
           )
         })
+        return
       }
     }
 

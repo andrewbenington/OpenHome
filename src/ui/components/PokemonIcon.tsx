@@ -5,6 +5,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import useMonSprite from '@openhome-ui/pokemon-details//useMonSprite'
 import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs/pkg'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
 import { classNames, grayscaleIf } from '../util/style'
 import './components.css'
@@ -58,25 +59,26 @@ export default function PokemonIcon(props: PokemonIconProps) {
     pluginOrigin === 'luminescent_platinum' &&
     pluginForm !== undefined &&
     !!getLumiCustomForm(dexNumber, pluginForm)
+  const shouldUseImage =
+    isGen9Mega || isLumiCustomForm || (dexNumber === NationalDex.Eevee && formeNumber === 1)
 
-  const monImage =
-    isGen9Mega || isLumiCustomForm ? (
-      <PokemonIconUsingImage
-        dexNumber={dexNumber}
-        formeNumber={formeNumber}
-        pluginForm={pluginForm}
-        pluginOrigin={pluginOrigin}
-        silhouette={silhouette}
-        onClick={onClick}
-      />
-    ) : formeMetadata ? (
-      <PokemonIconUsingSheet
-        formeMetadata={formeMetadata}
-        isEgg={isEgg}
-        silhouette={silhouette}
-        onClick={onClick}
-      />
-    ) : null
+  const monImage = shouldUseImage ? (
+    <PokemonIconUsingImage
+      dexNumber={dexNumber}
+      formeNumber={formeNumber}
+      pluginForm={pluginForm}
+      pluginOrigin={pluginOrigin}
+      silhouette={silhouette}
+      onClick={onClick}
+    />
+  ) : formeMetadata ? (
+    <PokemonIconUsingSheet
+      formeMetadata={formeMetadata}
+      isEgg={isEgg}
+      silhouette={silhouette}
+      onClick={onClick}
+    />
+  ) : null
 
   return (
     <div className={classNames('pokemon-icon-container', grayscaleIf(grayedOut))} style={style}>

@@ -107,7 +107,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
         const displayBoxNum = Math.floor(monIndex / 30)
         const displayBoxSlot = monIndex % 30
 
-        if (mon !== null) {
+        if (mon !== null && mon.dexNum !== 0) {
           this.boxes[displayBoxNum].boxSlots[displayBoxSlot] = mon
         }
       } catch (e) {
