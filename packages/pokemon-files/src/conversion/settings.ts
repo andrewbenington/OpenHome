@@ -11,7 +11,7 @@ interface SettingDescriptor<T> {
   deprecated?: string // deprecation message
 }
 
-type SettingsCategory = 'nickname'
+type SettingsCategory = 'nickname' | 'metLocation'
 export type SettingsSubcategory = `${SettingsCategory}.${string}`
 
 export function displaySettingsCategory(category: SettingsCategory): string {
@@ -36,8 +36,15 @@ export const SETTINGS_SCHEMA = {
     description:
       'Decides how unnicknamed Pokémon are capitalized when converted. "gameDefault" uses the capitalization from the original game, while "modern" capitalizes all nicknames in the modern style.',
     display: 'Capitalization',
-  } as const,
-} satisfies Record<SettingsSubcategory, SettingDescriptor<unknown>>
+  },
+  'metLocation.useRegion': {
+    type: 'boolean',
+    default: true,
+    description:
+      'If true, the met location will be converted to a region-based location when possible. If false, the original met location will be preserved.',
+    display: 'Use Region for Met Location (when possible)',
+  },
+} as const satisfies Record<SettingsSubcategory, SettingDescriptor<unknown>>
 
 type Schema = typeof SETTINGS_SCHEMA
 type SettingValue<T extends SettingDescriptor<unknown>> = T extends { enum: ReadonlyArray<infer U> }
@@ -52,4 +59,5 @@ export type ConversionStrategy = Partial<FullConversionStrategy>
 
 export const DefaultConversionStrategy: FullConversionStrategy = {
   'nickname.capitalization': SETTINGS_SCHEMA['nickname.capitalization'].default,
+  'metLocation.useRegion': SETTINGS_SCHEMA['metLocation.useRegion'].default,
 }
