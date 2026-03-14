@@ -25,6 +25,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
     isShiny: mon.isShiny(),
     isFemale: mon.gender === 1,
     format: mon.format,
+    pluginForm: mon.pluginForm,
   })
 
   const itemAltText = useMemo(() => {
