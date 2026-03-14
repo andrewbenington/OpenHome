@@ -94,13 +94,31 @@ function PKMConversion({ conversionSettings }: PKMConversionProps) {
           <div key={key} style={{ marginBottom: 16 }}>
             <span style={{ display: 'inline-flex' }}>
               <p style={{ margin: 0, color: 'var(--gray-11)' }}>
-                {displaySettingsCategory(getSettingsCategory(key as SettingsSubcategory))}
+                {displaySettingsCategory(getSettingsCategory(key as SettingsSubcategory))}:
               </p>
-              <b>{`: ${setting.display}`}</b>
+              <b style={{ paddingLeft: 8 }}>{setting.display}</b>
+              {setting.type === 'boolean' && (
+                <input
+                  type="checkbox"
+                  onChange={
+                    (e) => console.log(`New value for ${key}:`, e.target.checked) /* TODO */
+                  }
+                  checked={
+                    (conversionSettings[key as keyof ConversionStrategy] as boolean | undefined) ??
+                    setting.default
+                  }
+                  style={{ marginLeft: 8 }}
+                />
+              )}
             </span>
             <p style={{ marginTop: 4, color: 'var(--gray-11)' }}>{setting.description}</p>
-            {setting.enum && (
-              <Select.Root value={conversionSettings[key as keyof ConversionStrategy]} size="1">
+            {setting.type === 'string' && setting.enum && (
+              <Select.Root
+                value={
+                  conversionSettings[key as keyof ConversionStrategy] as (typeof setting)['default']
+                }
+                size="1"
+              >
                 <Select.Trigger style={{ display: 'flex' }} />
                 <Select.Content side="right">
                   {setting.enum.map((option) => (
