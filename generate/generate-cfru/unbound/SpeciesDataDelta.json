@@ -1,0 +1,1769 @@
+{
+  "10_0": {
+    "abilityH": "technician"
+  },
+  "13_0": {
+    "abilityH": "technician"
+  },
+  "15_0": {
+    "ability2": "sniper",
+    "abilityH": "technician"
+  },
+  "16_0": {
+    "abilityH": "galewings"
+  },
+  "17_0": {
+    "abilityH": "galewings"
+  },
+  "18_0": {
+    "abilityH": "galewings"
+  },
+  "19_0": {
+    "ability1": "strongjaw"
+  },
+  "20_0": {
+    "ability1": "strongjaw"
+  },
+  "21_0": {
+    "ability2": "sniper",
+    "abilityH": "drillbeak"
+  },
+  "22_0": {
+    "ability2": "sniper",
+    "abilityH": "drillbeak"
+  },
+  "23_0": {
+    "abilityH": "merciless"
+  },
+  "24_0": {
+    "abilityH": "merciless"
+  },
+  "31_0": {
+    "ability2": "queenlymajesty"
+  },
+  "39_0": {
+    "abilityH": "hugepower"
+  },
+  "40_0": {
+    "abilityH": "hugepower"
+  },
+  "46_0": {
+    "abilityH": "toxicboost"
+  },
+  "47_0": {
+    "abilityH": "toxicboost"
+  },
+  "49_0": {
+    "abilityH": "levitate"
+  },
+  "52_0": {
+    "abilityH": "ninelives"
+  },
+  "53_0": {
+    "abilityH": "ninelives"
+  },
+  "54_0": {
+    "ability1": "swiftswim",
+    "abilityH": "damp"
+  },
+  "55_0": {
+    "ability1": "swiftswim",
+    "abilityH": "neuroforce"
+  },
+  "67_0": {
+    "abilityH": "focusbelt"
+  },
+  "68_0": {
+    "hp": 55,
+    "atk": 65,
+    "def": 45,
+    "spa": 50,
+    "spd": 45,
+    "spe": 50,
+    "types": [
+      "Water"
+    ],
+    "ability1": "torrent",
+    "abilityH": "moxie",
+    "genderRatio": {
+      "M": 0.875,
+      "F": 0.125
+    }
+  },
+  "69_0": {
+    "ability2": "gluttony",
+    "abilityH": "unnerve"
+  },
+  "70_0": {
+    "ability2": "gluttony",
+    "abilityH": "unnerve"
+  },
+  "71_0": {
+    "ability2": "gluttony",
+    "abilityH": "corrosion"
+  },
+  "74_0": {
+    "abilityH": "sandspit"
+  },
+  "75_0": {
+    "abilityH": "sandspit"
+  },
+  "76_0": {
+    "abilityH": "sandspit"
+  },
+  "77_0": {
+    "ability1": "flamebody",
+    "abilityH": "fieryneigh"
+  },
+  "78_0": {
+    "ability1": "flamebody",
+    "abilityH": "fieryneigh"
+  },
+  "81_0": {},
+  "82_0": {},
+  "84_0": {
+    "ability1": "tangledfeet",
+    "abilityH": "reckless"
+  },
+  "85_0": {
+    "ability1": "tangledfeet",
+    "abilityH": "reckless"
+  },
+  "86_0": {
+    "ability2": "icebody",
+    "abilityH": "icescales"
+  },
+  "87_0": {
+    "ability2": "icebody",
+    "abilityH": "icescales"
+  },
+  "88_0": {
+    "ability1": "gooey"
+  },
+  "89_0": {
+    "ability1": "gooey"
+  },
+  "94_0": {
+    "ability1": "levitate"
+  },
+  "96_0": {
+    "ability2": "innerfocus",
+    "abilityH": "forewarn"
+  },
+  "97_0": {
+    "ability2": "innerfocus",
+    "abilityH": "psychicsurge"
+  },
+  "100_0": {},
+  "101_0": {},
+  "104_0": {
+    "ability2": "battlearmor",
+    "abilityH": "skilllink"
+  },
+  "105_0": {
+    "ability2": "battlearmor",
+    "abilityH": "skilllink"
+  },
+  "107_0": {
+    "ability1": "innerfocus",
+    "abilityH": "unseenfist"
+  },
+  "108_0": {
+    "ability1": "thickfat"
+  },
+  "120_0": {
+    "ability1": "victorystar"
+  },
+  "121_0": {
+    "ability1": "victorystar"
+  },
+  "124_0": {
+    "ability2": "dryskin",
+    "abilityH": "icyskin"
+  },
+  "132_0": {},
+  "137_0": {},
+  "144_0": {
+    "ability2": "snowcloak",
+    "abilityH": "competitive"
+  },
+  "145_0": {
+    "ability2": "static",
+    "abilityH": "defiant"
+  },
+  "146_0": {
+    "ability2": "flamebody",
+    "abilityH": "berserk"
+  },
+  "150_0": {},
+  "151_0": {
+    "abilityH": "magicguard"
+  },
+  "154_0": {
+    "abilityH": "grassysurge"
+  },
+  "157_0": {
+    "abilityH": "drought"
+  },
+  "161_0": {
+    "ability1": "frisk",
+    "abilityH": "hustle"
+  },
+  "162_0": {
+    "ability1": "frisk",
+    "abilityH": "hustle"
+  },
+  "165_0": {
+    "ability2": "rattled",
+    "abilityH": "hugepower"
+  },
+  "166_0": {
+    "abilityH": "hugepower"
+  },
+  "167_0": {
+    "ability1": "sniper",
+    "abilityH": "merciless"
+  },
+  "168_0": {
+    "ability1": "sniper",
+    "abilityH": "merciless"
+  },
+  "170_0": {
+    "ability2": "waterabsorb",
+    "abilityH": "lightningrod"
+  },
+  "171_0": {
+    "ability2": "waterabsorb",
+    "abilityH": "lightningrod"
+  },
+  "179_0": {
+    "abilityH": "tanglingwool"
+  },
+  "180_0": {
+    "abilityH": "tanglingwool"
+  },
+  "181_0": {
+    "abilityH": "tanglingwool"
+  },
+  "182_0": {
+    "abilityH": "triage"
+  },
+  "185_0": {
+    "abilityH": "sapsipper"
+  },
+  "187_0": {
+    "ability2": "infiltrator",
+    "abilityH": "simple"
+  },
+  "188_0": {
+    "ability2": "infiltrator",
+    "abilityH": "simple"
+  },
+  "189_0": {
+    "ability2": "infiltrator",
+    "abilityH": "simple"
+  },
+  "192_0": {
+    "abilityH": "grassdash"
+  },
+  "200_0": {
+    "abilityH": "magician"
+  },
+  "201_0": {},
+  "203_0": {
+    "ability2": "sapsipper",
+    "abilityH": "brainbond"
+  },
+  "209_0": {
+    "abilityH": "strongjaw"
+  },
+  "210_0": {
+    "abilityH": "strongjaw"
+  },
+  "217_0": {
+    "abilityH": "toughclaws"
+  },
+  "219_0": {
+    "ability1": "evaporate"
+  },
+  "223_0": {
+    "ability2": "skilllink"
+  },
+  "224_0": {
+    "ability2": "skilllink"
+  },
+  "225_0": {
+    "abilityH": "prankster"
+  },
+  "233_0": {},
+  "234_0": {
+    "ability2": "sapsipper",
+    "abilityH": "scrappy"
+  },
+  "235_0": {
+    "ability2": "trace"
+  },
+  "238_0": {
+    "ability2": "hydration",
+    "abilityH": "icyskin"
+  },
+  "243_0": {
+    "ability2": "innerfocus",
+    "abilityH": "voltabsorb"
+  },
+  "244_0": {
+    "ability2": "innerfocus",
+    "abilityH": "flashfire"
+  },
+  "245_0": {
+    "ability2": "innerfocus",
+    "abilityH": "waterabsorb"
+  },
+  "246_0": {
+    "levelUpType": "Medium Slow"
+  },
+  "247_0": {
+    "levelUpType": "Medium Slow"
+  },
+  "248_0": {
+    "levelUpType": "Medium Slow"
+  },
+  "249_0": {},
+  "250_0": {},
+  "251_0": {
+    "abilityH": "regenerator"
+  },
+  "261_0": {
+    "ability2": "strongjaw",
+    "abilityH": "quickfeet"
+  },
+  "262_0": {
+    "ability2": "strongjaw"
+  },
+  "265_0": {
+    "abilityH": "technician"
+  },
+  "267_0": {
+    "abilityH": "serenegrace"
+  },
+  "269_0": {
+    "abilityH": "dustyscales"
+  },
+  "292_0": {},
+  "327_0": {
+    "ability2": "hugepower"
+  },
+  "284_0": {
+    "ability2": "compoundeyes"
+  },
+  "320_0": {
+    "abilityH": "regenerator"
+  },
+  "321_0": {
+    "abilityH": "regenerator"
+  },
+  "343_0": {
+    "abilityH": "multieye"
+  },
+  "344_0": {
+    "abilityH": "multieye"
+  },
+  "339_0": {
+    "abilityH": "adaptability"
+  },
+  "340_0": {
+    "abilityH": "adaptability"
+  },
+  "370_0": {
+    "ability2": "hydration",
+    "abilityH": "drizzle"
+  },
+  "350_0": {
+    "abilityH": "multiscale"
+  },
+  "329_0": {
+    "abilityH": "soundwaves"
+  },
+  "330_0": {
+    "abilityH": "soundwaves"
+  },
+  "309_0": {
+    "abilityH": "flareboost"
+  },
+  "310_0": {
+    "abilityH": "flareboost"
+  },
+  "365_0": {
+    "abilityH": "regenerator"
+  },
+  "331_0": {
+    "ability2": "overcoat"
+  },
+  "332_0": {
+    "ability2": "prankster"
+  },
+  "337_0": {},
+  "338_0": {},
+  "298_0": {
+    "genderRatio": {
+      "M": 0.5,
+      "F": 0.5
+    }
+  },
+  "325_0": {
+    "abilityH": "magicbounce"
+  },
+  "326_0": {
+    "abilityH": "magicbounce"
+  },
+  "311_0": {
+    "ability2": "lightningrod",
+    "abilityH": "electricsurge"
+  },
+  "312_0": {
+    "ability2": "voltabsorb",
+    "abilityH": "electricsurge"
+  },
+  "333_0": {
+    "ability2": "cloudnine",
+    "abilityH": "cottoncloud"
+  },
+  "334_0": {
+    "ability2": "cloudnine",
+    "abilityH": "cottoncloud"
+  },
+  "316_0": {
+    "ability1": "gooey"
+  },
+  "317_0": {
+    "ability1": "gooey"
+  },
+  "357_0": {
+    "ability2": "ripen"
+  },
+  "293_0": {
+    "ability2": "bellow"
+  },
+  "294_0": {
+    "ability2": "bellow"
+  },
+  "295_0": {
+    "ability2": "bellow"
+  },
+  "336_0": {
+    "ability2": "infiltrator",
+    "abilityH": "slipperytail"
+  },
+  "335_0": {
+    "ability2": "toxicboost",
+    "abilityH": "toughclaws"
+  },
+  "345_0": {
+    "ability2": "simple"
+  },
+  "346_0": {
+    "ability2": "simple"
+  },
+  "347_0": {
+    "ability2": "toughclaws"
+  },
+  "348_0": {
+    "ability2": "toughclaws"
+  },
+  "374_0": {
+    "levelUpType": "Medium Slow"
+  },
+  "375_0": {
+    "levelUpType": "Medium Slow"
+  },
+  "376_0": {
+    "levelUpType": "Medium Slow"
+  },
+  "377_0": {},
+  "378_0": {
+    "abilityH": "filter"
+  },
+  "379_0": {
+    "abilityH": "filter"
+  },
+  "382_0": {
+    "abilityH": "hydration"
+  },
+  "383_0": {
+    "abilityH": "heatproof"
+  },
+  "384_0": {
+    "abilityH": "shedskin"
+  },
+  "380_0": {
+    "abilityH": "serenegrace"
+  },
+  "381_0": {
+    "abilityH": "serenegrace"
+  },
+  "385_0": {
+    "abilityH": "superluck"
+  },
+  "386_0": {
+    "abilityH": "limber"
+  },
+  "358_0": {
+    "abilityH": "prankster"
+  },
+  "201_1": {},
+  "201_2": {},
+  "201_3": {},
+  "201_4": {},
+  "201_6": {},
+  "201_7": {},
+  "201_8": {},
+  "201_9": {},
+  "201_10": {},
+  "201_11": {},
+  "201_13": {},
+  "201_14": {},
+  "201_15": {},
+  "201_16": {},
+  "201_17": {},
+  "201_18": {},
+  "201_19": {},
+  "201_20": {},
+  "201_21": {},
+  "201_22": {},
+  "201_23": {},
+  "201_24": {},
+  "393_0": {
+    "abilityH": "competitive"
+  },
+  "394_0": {
+    "abilityH": "competitive"
+  },
+  "395_0": {
+    "abilityH": "competitive"
+  },
+  "401_0": {
+    "abilityH": "technician"
+  },
+  "405_0": {
+    "ability1": "strongjaw"
+  },
+  "408_0": {
+    "ability2": "reckless"
+  },
+  "409_0": {
+    "ability2": "reckless"
+  },
+  "410_0": {
+    "ability2": "soundproof",
+    "abilityH": "faceshield"
+  },
+  "411_0": {
+    "ability2": "soundproof",
+    "abilityH": "faceshield"
+  },
+  "413_0": {
+    "ability1": "technician"
+  },
+  "414_0": {
+    "ability1": "adaptability",
+    "ability2": "compoundeyes",
+    "abilityH": "subterfuge",
+    "genderRatio": {
+      "M": 1,
+      "F": 0
+    }
+  },
+  "416_0": {
+    "ability2": "queenlymajesty",
+    "abilityH": "honeyarmor"
+  },
+  "417_0": {
+    "ability1": "serenegrace"
+  },
+  "418_0": {
+    "ability2": "waterveil",
+    "abilityH": "technician"
+  },
+  "419_0": {
+    "ability2": "waterveil",
+    "abilityH": "technician"
+  },
+  "429_0": {
+    "abilityH": "magicbounce"
+  },
+  "433_0": {
+    "abilityH": "forewarn"
+  },
+  "435_0": {
+    "abilityH": "poisontouch"
+  },
+  "436_0": {},
+  "437_0": {},
+  "438_0": {
+    "abilityH": "sapsipper"
+  },
+  "441_0": {
+    "abilityH": "punkrock",
+    "levelUpType": "Medium Fast"
+  },
+  "442_0": {
+    "ability2": "infiltrator",
+    "abilityH": "baddreams"
+  },
+  "443_0": {
+    "levelUpType": "Medium Slow"
+  },
+  "444_0": {
+    "levelUpType": "Medium Slow"
+  },
+  "445_0": {
+    "levelUpType": "Medium Slow"
+  },
+  "452_0": {
+    "abilityH": "superluck"
+  },
+  "455_0": {
+    "abilityH": "grassysurge"
+  },
+  "456_0": {
+    "abilityH": "waterbubble"
+  },
+  "457_0": {
+    "abilityH": "waterbubble"
+  },
+  "462_0": {},
+  "463_0": {
+    "ability1": "thickfat"
+  },
+  "467_0": {
+    "abilityH": "sheerforce"
+  },
+  "470_0": {
+    "ability1": "sapsipper",
+    "ability2": "sapsipper"
+  },
+  "471_0": {
+    "abilityH": "icyskin"
+  },
+  "474_0": {},
+  "475_0": {
+    "genderRatio": {
+      "M": 1,
+      "F": 0
+    }
+  },
+  "476_0": {
+    "abilityH": "analytic"
+  },
+  "477_0": {
+    "abilityH": "ironfist"
+  },
+  "478_0": {
+    "ability2": "cursedbody",
+    "abilityH": "perishbody"
+  },
+  "479_0": {
+    "abilityH": "motordrive"
+  },
+  "480_0": {
+    "abilityH": "comatose"
+  },
+  "481_0": {
+    "abilityH": "magicbounce"
+  },
+  "482_0": {
+    "abilityH": "infiltrator"
+  },
+  "483_0": {},
+  "484_0": {},
+  "486_0": {
+    "abilityH": "stall"
+  },
+  "487_0": {},
+  "488_0": {
+    "abilityH": "magician"
+  },
+  "489_0": {
+    "abilityH": "drizzle"
+  },
+  "490_0": {
+    "abilityH": "soulheart"
+  },
+  "491_0": {
+    "abilityH": "infiltrator"
+  },
+  "492_0": {
+    "abilityH": "flowerveil"
+  },
+  "493_0": {},
+  "494_0": {
+    "abilityH": "synchronize"
+  },
+  "504_0": {
+    "ability1": "stakeout"
+  },
+  "505_0": {
+    "ability1": "stakeout"
+  },
+  "511_0": {
+    "abilityH": "adaptability"
+  },
+  "512_0": {
+    "abilityH": "adaptability"
+  },
+  "513_0": {
+    "abilityH": "adaptability"
+  },
+  "514_0": {
+    "abilityH": "adaptability"
+  },
+  "515_0": {
+    "abilityH": "adaptability"
+  },
+  "516_0": {
+    "abilityH": "adaptability"
+  },
+  "518_0": {
+    "ability1": "magicguard"
+  },
+  "519_0": {
+    "ability1": "rivalry",
+    "abilityH": "pride"
+  },
+  "520_0": {
+    "ability1": "rivalry",
+    "abilityH": "pride"
+  },
+  "521_0": {
+    "abilityH": "pride",
+    "genderRatio": {
+      "M": 0,
+      "F": 1
+    }
+  },
+  "522_0": {
+    "ability1": "shockingneigh"
+  },
+  "523_0": {
+    "ability1": "shockingneigh"
+  },
+  "546_0": {
+    "abilityH": "cottondown"
+  },
+  "547_0": {
+    "abilityH": "cottondown"
+  },
+  "548_0": {
+    "abilityH": "dancer"
+  },
+  "549_0": {
+    "abilityH": "dancer"
+  },
+  "550_1": {
+    "ability1": "reckless",
+    "abilityH": "speedboost"
+  },
+  "566_0": {
+    "abilityH": "klutz"
+  },
+  "567_0": {
+    "abilityH": "klutz"
+  },
+  "580_0": {
+    "ability2": "hydration",
+    "abilityH": "competitive"
+  },
+  "581_0": {
+    "ability2": "hydration",
+    "abilityH": "competitive"
+  },
+  "587_0": {
+    "ability2": "motordrive",
+    "abilityH": "electricsurge"
+  },
+  "592_0": {
+    "ability1": "cursedbody",
+    "ability2": "waterabsorb",
+    "genderRatio": {
+      "M": 0,
+      "F": 1
+    }
+  },
+  "599_0": {
+    "ability2": "clearbody",
+    "abilityH": "motordrive"
+  },
+  "600_0": {
+    "ability2": "clearbody",
+    "abilityH": "motordrive"
+  },
+  "601_0": {
+    "ability2": "clearbody",
+    "abilityH": "motordrive"
+  },
+  "605_0": {
+    "ability2": "analytic",
+    "abilityH": "synchronize"
+  },
+  "606_0": {
+    "ability2": "analytic",
+    "abilityH": "psychicsurge"
+  },
+  "607_0": {
+    "abilityH": "shadowtag"
+  },
+  "608_0": {
+    "abilityH": "shadowtag"
+  },
+  "609_0": {
+    "abilityH": "shadowtag"
+  },
+  "615_0": {
+    "abilityH": "filter"
+  },
+  "618_0": {
+    "ability2": "waterabsorb"
+  },
+  "622_0": {
+    "ability2": "powerspot"
+  },
+  "623_0": {
+    "ability2": "powerspot"
+  },
+  "626_0": {
+    "abilityH": "stamina"
+  },
+  "631_0": {
+    "abilityH": "berserk"
+  },
+  "638_0": {
+    "abilityH": "noguard"
+  },
+  "639_0": {
+    "abilityH": "steadfast"
+  },
+  "640_0": {
+    "abilityH": "noguard"
+  },
+  "643_0": {
+    "abilityH": "flashfire"
+  },
+  "644_0": {
+    "abilityH": "lightningrod"
+  },
+  "646_0": {
+    "abilityH": "refrigerate"
+  },
+  "647_0": {
+    "abilityH": "intrepidsword"
+  },
+  "648_0": {
+    "abilityH": "competitive"
+  },
+  "649_0": {
+    "abilityH": "analytic"
+  },
+  "593_0": {
+    "ability1": "cursedbody",
+    "ability2": "waterabsorb",
+    "genderRatio": {
+      "M": 0,
+      "F": 1
+    }
+  },
+  "413_1": {
+    "ability1": "technician"
+  },
+  "413_2": {
+    "ability1": "technician"
+  },
+  "479_1": {
+    "abilityH": "motordrive"
+  },
+  "479_2": {
+    "abilityH": "motordrive"
+  },
+  "479_3": {
+    "abilityH": "motordrive"
+  },
+  "479_4": {
+    "abilityH": "motordrive"
+  },
+  "479_5": {
+    "abilityH": "motordrive"
+  },
+  "487_1": {},
+  "492_1": {
+    "abilityH": "flowerveil"
+  },
+  "493_1": {},
+  "493_2": {},
+  "493_3": {
+    "types": [
+      "Poison"
+    ]
+  },
+  "493_4": {},
+  "493_5": {},
+  "493_6": {},
+  "493_7": {},
+  "493_8": {},
+  "493_9": {},
+  "493_10": {},
+  "493_11": {},
+  "493_12": {},
+  "493_13": {},
+  "493_14": {},
+  "493_15": {},
+  "493_16": {},
+  "550_0": {
+    "ability1": "rockhead",
+    "abilityH": "speedboost"
+  },
+  "449_0": {
+    "genderRatio": {
+      "M": 0,
+      "F": 1
+    }
+  },
+  "450_0": {
+    "genderRatio": {
+      "M": 0,
+      "F": 1
+    }
+  },
+  "648_1": {
+    "abilityH": "defiant"
+  },
+  "649_2": {
+    "abilityH": "analytic"
+  },
+  "649_3": {
+    "abilityH": "analytic"
+  },
+  "649_4": {
+    "abilityH": "analytic"
+  },
+  "649_1": {
+    "abilityH": "analytic"
+  },
+  "646_2": {
+    "atk": 170,
+    "def": 100,
+    "spa": 120,
+    "spd": 90,
+    "ability1": "teravolt"
+  },
+  "646_1": {
+    "atk": 120,
+    "def": 90,
+    "spa": 170,
+    "spd": 100,
+    "ability1": "turboblaze"
+  },
+  "647_1": {
+    "abilityH": "intrepidsword"
+  },
+  "655_0": {
+    "abilityH": "magicguard"
+  },
+  "658_0": {
+    "ability2": "battlebond"
+  },
+  "667_0": {
+    "abilityH": "adaptability"
+  },
+  "668_0": {
+    "ability1": "royalroar",
+    "abilityH": "adaptability",
+    "genderRatio": {
+      "M": 0,
+      "F": 1
+    }
+  },
+  "669_0": {
+    "ability2": "aromaveil"
+  },
+  "670_0": {
+    "ability2": "aromaveil"
+  },
+  "671_0": {
+    "ability2": "aromaveil"
+  },
+  "672_0": {
+    "ability2": "grasspelt",
+    "abilityH": "runaway"
+  },
+  "673_0": {
+    "ability2": "grasspelt",
+    "abilityH": "grassysurge"
+  },
+  "678_0": {
+    "genderRatio": {
+      "M": 1,
+      "F": 0
+    }
+  },
+  "681_0": {
+    "def": 150,
+    "spd": 150
+  },
+  "682_0": {
+    "ability2": "aromaveil",
+    "abilityH": "regenerator"
+  },
+  "683_0": {
+    "ability2": "aromaveil",
+    "abilityH": "regenerator"
+  },
+  "684_0": {
+    "ability2": "competitive"
+  },
+  "685_0": {
+    "ability2": "competitive"
+  },
+  "702_0": {
+    "abilityH": "mistysurge"
+  },
+  "703_0": {
+    "ability2": "sturdy",
+    "abilityH": "mistysurge"
+  },
+  "710_0": {
+    "abilityH": "heatproof"
+  },
+  "711_0": {
+    "abilityH": "heatproof"
+  },
+  "714_0": {
+    "abilityH": "punkrock"
+  },
+  "715_0": {
+    "abilityH": "punkrock"
+  },
+  "716_0": {},
+  "717_0": {
+    "abilityH": "aerilate"
+  },
+  "718_0": {
+    "abilityH": "powerconstruct"
+  },
+  "719_0": {
+    "abilityH": "analytic"
+  },
+  "720_0": {
+    "abilityH": "prankster"
+  },
+  "720_1": {
+    "abilityH": "portalpower"
+  },
+  "721_0": {
+    "abilityH": "steamengine"
+  },
+  "678_1": {
+    "ability1": "competitive",
+    "abilityH": "psychicsurge",
+    "genderRatio": {
+      "M": 0,
+      "F": 1
+    }
+  },
+  "681_1": {
+    "atk": 150,
+    "spa": 150
+  },
+  "493_17": {},
+  "718_1": {
+    "abilityH": "powerconstruct"
+  },
+  "718_4": {},
+  "658_2": {
+    "atk": 145,
+    "spa": 153,
+    "spe": 132
+  },
+  "669_3": {
+    "ability2": "aromaveil"
+  },
+  "669_2": {
+    "ability2": "aromaveil"
+  },
+  "669_1": {
+    "ability2": "aromaveil"
+  },
+  "669_4": {
+    "ability2": "aromaveil"
+  },
+  "670_3": {
+    "ability2": "aromaveil"
+  },
+  "670_2": {
+    "ability2": "aromaveil"
+  },
+  "670_1": {
+    "ability2": "aromaveil"
+  },
+  "670_4": {
+    "ability2": "aromaveil"
+  },
+  "670_5": {
+    "ability2": "aromaveil",
+    "abilityH": "symbiosis"
+  },
+  "671_3": {
+    "ability2": "aromaveil"
+  },
+  "671_2": {
+    "ability2": "aromaveil"
+  },
+  "671_1": {
+    "ability2": "aromaveil"
+  },
+  "671_4": {
+    "ability2": "aromaveil"
+  },
+  "483_1": {},
+  "484_1": {},
+  "738_0": {
+    "abilityH": "compoundeyes"
+  },
+  "740_0": {
+    "abilityH": "crabbytactics"
+  },
+  "741_0": {
+    "abilityH": "serenegrace"
+  },
+  "745_0": {
+    "ability1": "toughclaws"
+  },
+  "753_0": {
+    "ability2": "chlorophyll"
+  },
+  "754_0": {
+    "ability2": "chlorophyll"
+  },
+  "755_0": {
+    "ability1": "raindish",
+    "abilityH": "magicbounce"
+  },
+  "756_0": {
+    "ability1": "raindish",
+    "abilityH": "magicbounce"
+  },
+  "768_0": {
+    "abilityH": "shellarmor"
+  },
+  "771_0": {
+    "genderRatio": {
+      "M": 0.25,
+      "F": 0.75
+    }
+  },
+  "772_0": {},
+  "773_0": {
+    "ability1": "rks_system"
+  },
+  "774_0": {
+    "atk": 100,
+    "def": 60,
+    "spa": 100,
+    "spd": 60,
+    "spe": 120
+  },
+  "775_0": {
+    "abilityH": "scrappy"
+  },
+  "776_0": {
+    "abilityH": "angershell"
+  },
+  "777_0": {
+    "levelUpType": "Fast"
+  },
+  "779_0": {
+    "levelUpType": "Medium Slow"
+  },
+  "781_0": {
+    "abilityH": "aftermath"
+  },
+  "785_0": {},
+  "786_0": {},
+  "787_0": {},
+  "788_0": {},
+  "789_0": {},
+  "790_0": {},
+  "791_0": {
+    "abilityH": "battlearmor"
+  },
+  "792_0": {
+    "abilityH": "levitate"
+  },
+  "793_0": {},
+  "794_0": {},
+  "795_0": {},
+  "796_0": {},
+  "797_0": {},
+  "798_0": {},
+  "799_0": {},
+  "800_0": {
+    "abilityH": "mirrorarmor"
+  },
+  "801_0": {
+    "ability1": "soulheart",
+    "abilityH": "analytic"
+  },
+  "802_0": {
+    "abilityH": "longreach"
+  },
+  "50_1": {
+    "ability1": "sandforce",
+    "abilityH": "steelyspirit"
+  },
+  "51_1": {
+    "ability1": "sandforce",
+    "abilityH": "steelyspirit"
+  },
+  "386_1": {
+    "abilityH": "limber"
+  },
+  "386_2": {
+    "abilityH": "limber"
+  },
+  "386_3": {
+    "abilityH": "limber"
+  },
+  "741_1": {
+    "abilityH": "serenegrace"
+  },
+  "741_2": {
+    "abilityH": "serenegrace"
+  },
+  "741_3": {
+    "abilityH": "serenegrace"
+  },
+  "745_1": {
+    "ability1": "toughclaws"
+  },
+  "773_1": {
+    "types": [
+      "Fighting"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_2": {
+    "types": [
+      "Flying"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_3": {
+    "types": [
+      "Poison"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_4": {
+    "types": [
+      "Ground"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_5": {
+    "types": [
+      "Rock"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_6": {
+    "types": [
+      "Bug"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_7": {
+    "types": [
+      "Ghost"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_8": {
+    "types": [
+      "Steel"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_9": {
+    "types": [
+      "Fire"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_10": {
+    "types": [
+      "Water"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_11": {
+    "types": [
+      "Grass"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_12": {
+    "types": [
+      "Electric"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_13": {
+    "types": [
+      "Psychic"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_14": {
+    "types": [
+      "Ice"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_15": {
+    "types": [
+      "Dragon"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_16": {
+    "types": [
+      "Dark"
+    ],
+    "ability1": "rks_system"
+  },
+  "773_17": {
+    "types": [
+      "Fairy"
+    ],
+    "ability1": "rks_system"
+  },
+  "801_1": {
+    "ability1": "soulheart",
+    "abilityH": "analytic"
+  },
+  "803_0": {},
+  "804_0": {},
+  "805_0": {},
+  "806_0": {},
+  "807_0": {
+    "abilityH": "anticipation"
+  },
+  "800_1": {},
+  "800_2": {},
+  "800_3": {},
+  "808_0": {
+    "abilityH": "clearbody"
+  },
+  "809_0": {
+    "abilityH": "clearbody"
+  },
+  "25_0": {
+    "ability1": "lightningrod",
+    "genderRatio": {
+      "M": 0,
+      "F": 1
+    }
+  },
+  "25_1": {
+    "genderRatio": {
+      "M": 1,
+      "F": 0
+    }
+  },
+  "25_2": {
+    "genderRatio": {
+      "M": 1,
+      "F": 0
+    }
+  },
+  "25_3": {
+    "genderRatio": {
+      "M": 1,
+      "F": 0
+    }
+  },
+  "25_4": {
+    "genderRatio": {
+      "M": 1,
+      "F": 0
+    }
+  },
+  "25_5": {
+    "genderRatio": {
+      "M": 1,
+      "F": 0
+    }
+  },
+  "25_6": {
+    "genderRatio": {
+      "M": 1,
+      "F": 0
+    }
+  },
+  "25_7": {
+    "genderRatio": {
+      "M": 1,
+      "F": 0
+    }
+  },
+  "172_1": {
+    "abilityH": "lightningrod",
+    "genderRatio": {
+      "M": 0,
+      "F": 1
+    }
+  },
+  "827_0": {
+    "ability1": "technician"
+  },
+  "828_0": {
+    "ability1": "technician"
+  },
+  "854_0": {},
+  "855_0": {},
+  "866_0": {
+    "ability1": "screencleaner",
+    "ability2": "tangledfeet"
+  },
+  "870_0": {},
+  "874_0": {
+    "abilityH": "solidrock"
+  },
+  "876_0": {
+    "genderRatio": {
+      "M": 1,
+      "F": 0
+    }
+  },
+  "880_0": {},
+  "881_0": {},
+  "882_0": {},
+  "883_0": {},
+  "888_0": {},
+  "889_0": {},
+  "890_0": {},
+  "891_0": {
+    "abilityH": "noguard"
+  },
+  "893_0": {},
+  "894_0": {},
+  "895_0": {
+    "ability1": "dragonsmaw"
+  },
+  "896_0": {},
+  "897_0": {},
+  "898_0": {},
+  "888_1": {},
+  "889_1": {},
+  "890_1": {},
+  "893_1": {},
+  "898_1": {
+    "ability1": "asone_chilling"
+  },
+  "898_2": {
+    "ability1": "asone_grim"
+  },
+  "122_1": {
+    "ability1": "screencleaner",
+    "ability2": "vitalspirit"
+  },
+  "144_1": {},
+  "145_1": {},
+  "146_1": {},
+  "100_1": {},
+  "101_1": {},
+  "157_1": {
+    "abilityH": "frisk"
+  },
+  "503_1": {
+    "abilityH": "sharpness"
+  },
+  "705_1": {
+    "types": [
+      "Dragon",
+      "Steel"
+    ]
+  },
+  "706_1": {
+    "types": [
+      "Dragon",
+      "Steel"
+    ]
+  },
+  "724_1": {
+    "abilityH": "scrappy"
+  },
+  "899_0": {
+    "ability2": "sapsipper",
+    "abilityH": "scrappy"
+  },
+  "902_0": {
+    "genderRatio": {
+      "M": 1,
+      "F": 0
+    }
+  },
+  "902_1": {
+    "genderRatio": {
+      "M": 0,
+      "F": 1
+    }
+  },
+  "12_0": {
+    "hp": 67,
+    "def": 59,
+    "spa": 63,
+    "spd": 40,
+    "spe": 36,
+    "types": [
+      "Fire"
+    ],
+    "ability1": "blaze",
+    "abilityH": "unaware",
+    "genderRatio": {
+      "M": 0.875,
+      "F": 0.125
+    },
+    "levelUpType": "Medium Slow"
+  },
+  "99_0": {
+    "hp": 85,
+    "atk": 120,
+    "def": 80,
+    "spa": 85,
+    "spd": 75,
+    "spe": 85,
+    "types": [
+      "Water",
+      "Fighting"
+    ],
+    "ability1": "torrent",
+    "abilityH": "moxie",
+    "genderRatio": {
+      "M": 0.875,
+      "F": 0.125
+    },
+    "levelUpType": "Medium Slow"
+  },
+  "131_0": {
+    "hp": 54,
+    "atk": 45,
+    "def": 40,
+    "spa": 35,
+    "spd": 45,
+    "spe": 35,
+    "types": [
+      "Normal"
+    ],
+    "ability1": "aromaveil",
+    "ability2": "gluttony",
+    "abilityH": "thickfat",
+    "levelUpType": "Medium Fast"
+  },
+  "143_0": {
+    "hp": 115,
+    "atk": 90,
+    "def": 70,
+    "spa": 59,
+    "spd": 90,
+    "spe": 65,
+    "ability1": "aromaveil",
+    "ability2": "gluttony",
+    "abilityH": "thickfat",
+    "genderRatio": {
+      "M": 0,
+      "F": 1
+    },
+    "levelUpType": "Medium Fast"
+  },
+  "569_0": {
+    "hp": 35,
+    "atk": 41,
+    "def": 45,
+    "spa": 29,
+    "spd": 40,
+    "spe": 20,
+    "types": [
+      "Bug"
+    ],
+    "ability1": "insomnia",
+    "abilityH": "stakeout",
+    "levelUpType": "Erratic"
+  },
+  "826_0": {
+    "hp": 70,
+    "atk": 115,
+    "def": 70,
+    "spa": 70,
+    "spd": 60,
+    "spe": 105,
+    "types": [
+      "Electric",
+      "Fighting"
+    ],
+    "ability1": "voltabsorb",
+    "ability2": "naturalcure",
+    "abilityH": "ironfist"
+  },
+  "834_0": {
+    "hp": 50,
+    "atk": 50,
+    "def": 45,
+    "spa": 40,
+    "spd": 45,
+    "spe": 75,
+    "types": [
+      "Normal"
+    ],
+    "ability1": "runaway",
+    "ability2": "pickup",
+    "abilityH": "owntempo",
+    "levelUpType": "Fast"
+  },
+  "839_0": {
+    "hp": 74,
+    "atk": 75,
+    "def": 70,
+    "spa": 65,
+    "spd": 75,
+    "spe": 111,
+    "types": [
+      "Normal"
+    ],
+    "ability1": "friendguard",
+    "ability2": "cheekpouch",
+    "abilityH": "technician",
+    "levelUpType": "Fast"
+  },
+  "841_0": {
+    "hp": 74,
+    "atk": 75,
+    "def": 70,
+    "spa": 65,
+    "spd": 75,
+    "spe": 111,
+    "types": [
+      "Normal"
+    ],
+    "ability1": "friendguard",
+    "ability2": "cheekpouch",
+    "abilityH": "technician",
+    "levelUpType": "Fast"
+  },
+  "842_0": {
+    "hp": 37,
+    "atk": 55,
+    "def": 70,
+    "spa": 30,
+    "spd": 55,
+    "spe": 65,
+    "types": [
+      "Fairy"
+    ],
+    "ability1": "owntempo",
+    "abilityH": "klutz",
+    "levelUpType": "Medium Slow"
+  },
+  "844_0": {
+    "hp": 57,
+    "atk": 80,
+    "def": 115,
+    "spa": 50,
+    "spd": 80,
+    "spe": 95,
+    "types": [
+      "Fairy"
+    ],
+    "ability1": "wellbakedbody",
+    "abilityH": "aromaveil",
+    "levelUpType": "Medium Slow"
+  },
+  "849_0": {
+    "hp": 41,
+    "atk": 35,
+    "def": 45,
+    "spa": 58,
+    "spd": 51,
+    "spe": 30,
+    "types": [
+      "Grass",
+      "Normal"
+    ],
+    "ability1": "earlybird",
+    "abilityH": "harvest"
+  },
+  "851_0": {
+    "hp": 78,
+    "atk": 69,
+    "def": 90,
+    "spa": 125,
+    "spd": 109,
+    "spe": 39,
+    "types": [
+      "Grass",
+      "Normal"
+    ],
+    "ability1": "seedsower",
+    "abilityH": "harvest",
+    "levelUpType": "Medium Slow"
+  },
+  "869_0": {
+    "hp": 82,
+    "atk": 96,
+    "def": 51,
+    "spa": 45,
+    "spd": 51,
+    "spe": 92,
+    "types": [
+      "Normal",
+      "Flying"
+    ],
+    "ability1": "intimidate",
+    "ability2": "hustle",
+    "abilityH": "sheerforce",
+    "genderRatio": {
+      "M": 0.5,
+      "F": 0.5
+    },
+    "levelUpType": "Erratic"
+  },
+  "879_0": {
+    "hp": 82,
+    "atk": 96,
+    "def": 51,
+    "spa": 45,
+    "spd": 51,
+    "spe": 92,
+    "types": [
+      "Normal",
+      "Flying"
+    ],
+    "ability1": "intimidate",
+    "ability2": "hustle",
+    "abilityH": "sheerforce",
+    "levelUpType": "Erratic"
+  },
+  "884_0": {
+    "hp": 55,
+    "atk": 55,
+    "def": 75,
+    "spa": 35,
+    "spd": 35,
+    "spe": 25,
+    "types": [
+      "Rock"
+    ],
+    "ability1": "purifyingsalt",
+    "ability2": "sturdy",
+    "abilityH": "clearbody",
+    "levelUpType": "Medium Slow"
+  }
+}
