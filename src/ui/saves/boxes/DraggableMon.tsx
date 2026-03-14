@@ -96,6 +96,8 @@ const DraggableMon = (props: DraggableMonProps) => {
         style={style}
         grayedOut={disabled}
         topRightIndicator={topRightIndicatorComponent}
+        pluginForm={mon.pluginForm}
+        pluginOrigin={mon.pluginOrigin}
       />
     </div>
   )

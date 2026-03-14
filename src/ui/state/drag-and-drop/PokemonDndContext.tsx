@@ -131,6 +131,8 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               onlyItem={
                 dragOverId === 'item-bag' && Boolean(dragState.payload?.monData.mon.heldItemIndex)
               }
+              pluginForm={dragState.payload?.monData.mon.pluginForm}
+              pluginOrigin={dragState.payload?.monData.mon.pluginOrigin}
               style={{ width: '100%', height: '100%' }}
             />
           )
