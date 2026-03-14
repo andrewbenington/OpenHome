@@ -23,9 +23,6 @@ export class PkmConverter {
     const capitalizationSetting = this.strategy['nickname.capitalization']
     if (capitalizationSetting === 'modern') {
       return speciesName
-        .split(' ')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
     } else {
       switch (this.format) {
         case 'PK1':
