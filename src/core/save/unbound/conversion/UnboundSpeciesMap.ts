@@ -1302,7 +1302,7 @@ export const UnboundToNationalDexMap: Record<string, CfruSpeciesAndForm | null> 
 export const NationalDexToUnboundMap = makeNationalDexToGameMap(UnboundToNationalDexMap)
 
 /**
- * Returns custom form metadata for a Luminescent Platinum Pokémon.
+ * Returns custom form metadata for an Unbound Pokémon.
  */
 export function getUnboundCustomForm(unboundIndex: number): CustomFormInfo | undefined {
   const name = Gen3UBSpecies[unboundIndex]

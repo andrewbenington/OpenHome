@@ -1384,10 +1384,7 @@ export function fromGen3RRPokemonIndex(radicalRedIndex: number): CfruSpeciesAndF
   const entry = RadicalRedToNationalDexMap[String(radicalRedIndex)]
 
   if (entry) {
-    return {
-      NationalDexIndex: entry.NationalDexIndex,
-      FormIndex: entry.FormIndex,
-    }
+    return entry
   } else {
     console.warn(`Radical Red index ${radicalRedIndex} not found.`)
     return {
