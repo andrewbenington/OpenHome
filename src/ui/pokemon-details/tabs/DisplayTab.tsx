@@ -25,10 +25,13 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
 
   const { updateMonDisplayColor, updateMonTags } = useSaves()
 
+  const tagsString = JSON.stringify(monWithDisplay.tags)
+
   useEffect(() => {
     setCustomColor(monWithDisplay.displayColor ?? '')
     setTags(monWithDisplay.tags ?? [])
-  }, [mon, monWithDisplay.displayColor, monWithDisplay.tags])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mon.openhomeId, monWithDisplay.displayColor, tagsString])
 
   const debouncedColorUpdate = useDebounce((color: string) => {
     updateMonDisplayColor(mon.openhomeId, color || undefined)
@@ -50,6 +53,7 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
   }
 
   const handleAddTag = (tag: MonTag) => {
+    if (tags.some((t) => t.label === tag.label) || tags.length >= 3) return
     const newTags = [...tags, tag]
     setTags(newTags)
     updateMonTags(mon.openhomeId, newTags)
@@ -95,14 +99,6 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                   cursor: 'pointer',
                 }}
               />
-              <TextField.Root
-                placeholder="Custom color (e.g., #ff000080)"
-                value={customColor}
-                onChange={(e) => handleColorChange(e.target.value)}
-                style={{ flex: 1 }}
-              >
-                <TextField.Slot />
-              </TextField.Root>
               <Button
                 variant="surface"
                 color="gray"
@@ -193,14 +189,18 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                     backgroundColor: preset.color,
                     border: '2px solid transparent',
                     borderRadius: 6,
-                    cursor: tags.length >= 3 ? 'not-allowed' : 'pointer',
+                    cursor:
+                      tags.length >= 3 || tags.some((t) => t.label === preset.label)
+                        ? 'not-allowed'
+                        : 'pointer',
+                    opacity:
+                      tags.length >= 3 || tags.some((t) => t.label === preset.label) ? 0.5 : 1,
                     fontSize: 12,
                     color: '#fff',
                     textShadow: '0 0 2px #000',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 4,
-                    opacity: tags.length >= 3 ? 0.5 : 1,
                   }}
                   title={preset.label}
                 >

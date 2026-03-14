@@ -30,7 +30,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: dragState.multiSelectEnabled
-        ? { delay: 250, tolerance: 8 }
+        ? { delay: 100, tolerance: 8 }
         : { distance: 10 },
     })
   )
