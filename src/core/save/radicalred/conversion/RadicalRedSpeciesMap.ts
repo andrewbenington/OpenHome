@@ -1,6 +1,8 @@
-import { GameToNationalDexEntry, makeNationalDexToGameMap } from '../../cfru/conversion/util'
+import { CfruSpeciesAndForm, makeNationalDexToGameMap } from '../../cfru/conversion/util'
+import { CustomFormInfo } from '../../rom-hack/forms'
+import { Gen3RRSpecies } from './Gen3RRPokemonIndex'
 
-export const RadicalRedToNationalDexMap: Record<string, GameToNationalDexEntry | null> = {
+export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   '0': {
     NationalDexIndex: 0,
     FormIndex: 0,
@@ -3469,10 +3471,12 @@ export const RadicalRedToNationalDexMap: Record<string, GameToNationalDexEntry |
   '866': {
     NationalDexIndex: 714,
     FormIndex: 0,
+    FakemonIndex: 866,
   },
   '867': {
     NationalDexIndex: 715,
     FormIndex: 0,
+    FakemonIndex: 867,
   },
   '868': {
     NationalDexIndex: 981,
@@ -4345,10 +4349,12 @@ export const RadicalRedToNationalDexMap: Record<string, GameToNationalDexEntry |
   '1085': {
     NationalDexIndex: 25,
     FormIndex: 0,
+    FakemonIndex: 1085,
   },
   '1086': {
     NationalDexIndex: 25,
     FormIndex: 0,
+    FakemonIndex: 1086,
   },
   '1087': {
     NationalDexIndex: 25,
@@ -4749,6 +4755,7 @@ export const RadicalRedToNationalDexMap: Record<string, GameToNationalDexEntry |
   '1186': {
     NationalDexIndex: 920,
     FormIndex: 0,
+    FakemonIndex: 1186,
   },
   '1187': {
     NationalDexIndex: 898,
@@ -5142,10 +5149,12 @@ export const RadicalRedToNationalDexMap: Record<string, GameToNationalDexEntry |
   '1283': {
     NationalDexIndex: 458,
     FormIndex: 0,
+    FakemonIndex: 1283,
   },
   '1284': {
     NationalDexIndex: 226,
     FormIndex: 0,
+    FakemonIndex: 1084,
   },
   '1285': {
     NationalDexIndex: 349,
@@ -5514,3 +5523,11 @@ export const RadicalRedToNationalDexMap: Record<string, GameToNationalDexEntry |
 }
 
 export const NationalDexToRadicalRedMap = makeNationalDexToGameMap(RadicalRedToNationalDexMap)
+/**
+ * Returns custom form metadata for a Radical Red Pokémon.
+ */
+export function getRadicalRedCustomForm(radicalRedIndex: number): CustomFormInfo | undefined {
+  const name = Gen3RRSpecies[radicalRedIndex]
+  const fallbackForm = RadicalRedToNationalDexMap[radicalRedIndex]?.FormIndex ?? 0
+  return { name, fallbackForm }
+}

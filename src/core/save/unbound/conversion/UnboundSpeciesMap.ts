@@ -1,6 +1,8 @@
-import { GameToNationalDexEntry, makeNationalDexToGameMap } from '../../cfru/conversion/util'
+import { CfruSpeciesAndForm, makeNationalDexToGameMap } from '../../cfru/conversion/util'
+import { CustomFormInfo } from '../../rom-hack/forms'
+import { Gen3UBSpecies } from './UBPokemonIndex'
 
-export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | null> = {
+export const UnboundToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   '0': null, // Egg (not found)
   '1': { NationalDexIndex: 1, FormIndex: 0 }, // Bulbasaur
   '2': { NationalDexIndex: 2, FormIndex: 0 }, // Ivysaur
@@ -1086,8 +1088,8 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
   '1082': { NationalDexIndex: 745, FormIndex: 2 }, // Lycanroc-Dusk
   '1083': { NationalDexIndex: 808, FormIndex: 0 }, // Meltan
   '1084': { NationalDexIndex: 809, FormIndex: 0 }, // Melmetal
-  '1085': { NationalDexIndex: 25, FormIndex: 0 }, // Pikachu-Surfing
-  '1086': { NationalDexIndex: 25, FormIndex: 0 }, // Pikachu-Flying
+  '1085': { NationalDexIndex: 25, FormIndex: 0, FakemonIndex: 1085 }, // Pikachu-Surfing
+  '1086': { NationalDexIndex: 25, FormIndex: 0, FakemonIndex: 1086 }, // Pikachu-Flying
   '1087': { NationalDexIndex: 25, FormIndex: 0 }, // Pikachu-Cosplay
   '1088': { NationalDexIndex: 25, FormIndex: 0 }, // Pikachu-Libre
   '1089': { NationalDexIndex: 25, FormIndex: 0 }, // Pikachu-Pop-Star
@@ -1298,3 +1300,12 @@ export const UnboundToNationalDexMap: Record<string, GameToNationalDexEntry | nu
 }
 
 export const NationalDexToUnboundMap = makeNationalDexToGameMap(UnboundToNationalDexMap)
+
+/**
+ * Returns custom form metadata for an Unbound Pokémon.
+ */
+export function getUnboundCustomForm(unboundIndex: number): CustomFormInfo | undefined {
+  const name = Gen3UBSpecies[unboundIndex]
+  const fallbackForm = UnboundToNationalDexMap[unboundIndex.toString()]?.FormIndex ?? 0
+  return { name, fallbackForm }
+}

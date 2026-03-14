@@ -1,8 +1,12 @@
 import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import { ItemRadicalRed } from '@pkm-rs/pkg'
-import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
+import PK3CFRU from '../cfru/PK3CFRU'
 
-import { fromGen3CRFUPokemonIndex, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
+import {
+  CfruSpeciesAndForm,
+  fromGen3CRFUPokemonIndex,
+  toGen3CRFUPokemonIndex,
+} from '../cfru/conversion/util'
 import { PluginIdentifier } from '../interfaces'
 import { fromGen3RRMoveIndex, toGen3RRMoveIndex } from './conversion/Gen3RRMovesIndex'
 import { RRToNationalMap } from './conversion/Gen3RRMovesIndex/RRToNationalMap'
@@ -52,7 +56,7 @@ export default class PK3RR extends PK3CFRU implements PluginPKMInterface {
     return VALID_MOVE_INDICES_RR
   }
 
-  monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry {
+  monFromGameIndex(gameIndex: number): CfruSpeciesAndForm {
     return fromGen3CRFUPokemonIndex(gameIndex, RadicalRedToNationalDexMap, 'Pokemon Radical Red')
   }
 

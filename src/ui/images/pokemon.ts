@@ -102,7 +102,9 @@ export function getRomHackSpritePath(mon: MonSpriteData) {
       return 'sprites/home/ursaluna-bloodmoon.png'
     }
     let gen3UBname =
-      UBSprites[toGen3CRFUPokemonIndex(mon.dexNum, mon.formeNum, NationalDexToUnboundMap)]
+      UBSprites[
+        mon.pluginForm ?? toGen3CRFUPokemonIndex(mon.dexNum, mon.formeNum, NationalDexToUnboundMap)
+      ]
 
     if (!gen3UBname) {
       console.error(`missing Unbound sprite for ${spriteName}`)
