@@ -14,5 +14,5 @@
   },
   "include": [
     "./*.ts"
-, "generate-cfru/generateDeltaJson.ts"  ],
+  ],
 }
