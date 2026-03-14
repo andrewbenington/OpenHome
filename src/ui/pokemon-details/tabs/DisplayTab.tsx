@@ -3,7 +3,7 @@ import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { TagIcon } from '@openhome-ui/components/TagIcon'
 import { useSaves } from '@openhome-ui/state/saves'
 import { DISPLAY_COLOR_PRESETS, MonTag, TAG_PRESETS } from '@openhome-ui/util/tags'
-import { Badge, Button, Flex, TextField } from '@radix-ui/themes'
+import { Badge, Button, Flex, Text, TextField } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
 import useDebounce from 'src/ui/hooks/useDebounce'
 
@@ -117,11 +117,9 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
         </AttributeRow>
 
         <div>
-          <div
-            style={{ marginBottom: 8, fontSize: 14, fontWeight: 'bold', color: 'var(--gray-a11)' }}
-          >
+          <Text as="div" size="2" weight="bold" color="gray" mb="1">
             Quick Colors
-          </div>
+          </Text>
           <Flex wrap="wrap" gap="2">
             {DISPLAY_COLOR_PRESETS.map(({ name, color }) => (
               <button
@@ -149,12 +147,10 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
           </Flex>
         </div>
 
-        <div style={{ marginTop: 8 }}>
-          <div
-            style={{ marginBottom: 8, fontSize: 14, fontWeight: 'bold', color: 'var(--gray-a11)' }}
-          >
+        <div>
+          <Text as="div" size="2" weight="bold" color="gray" mb="1">
             Tags (Max 3)
-          </div>
+          </Text>
 
           {tags.length > 0 && (
             <Flex gap="2" wrap="wrap" style={{ marginBottom: 10 }}>
@@ -226,13 +222,8 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
               <select
                 value={newTagIcon}
                 onChange={(e) => setNewTagIcon(e.target.value)}
-                style={{
-                  padding: '4px',
-                  borderRadius: 4,
-                  background: 'var(--color-surface)',
-                  color: 'var(--gray-12)',
-                  border: '1px solid var(--gray-a6)',
-                }}
+                className="rt-reset rt-SelectTrigger rt-r-size-1 rt-variant-surface"
+                style={{ minWidth: 100 }}
               >
                 <option value="FaCircle">Circle</option>
                 <option value="FaStar">Star</option>

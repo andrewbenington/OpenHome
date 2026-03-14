@@ -34,7 +34,7 @@ export default function useDragAndDrop() {
       return {
         ...prev,
         multiSelectEnabled: !prev.multiSelectEnabled,
-        selectedLocations: [], // Clear selections when toggling
+        selectedLocations: [],
       }
     })
   }, [setDragState])

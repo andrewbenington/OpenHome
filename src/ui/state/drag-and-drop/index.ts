@@ -9,7 +9,6 @@ export type DragMonState = {
   onEnterListeners: ListenerMap
   onExitListeners: ListenerMap
   overId: UniqueIdentifier | null
-  // Multi-select state
   multiSelectEnabled: boolean
   selectedLocations: MonLocation[]
 }

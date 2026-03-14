@@ -29,8 +29,9 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 },
-      delay: { value: 200, tolerance: 10 },
+      activationConstraint: dragState.multiSelectEnabled
+        ? { delay: 250, tolerance: 8 }
+        : { distance: 10 },
     })
   )
 
@@ -115,7 +116,6 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             dragState.multiSelectEnabled &&
             dragState.selectedLocations.some((l) => locationsEqual(l, payload.monData))
           ) {
-            // Multi-move
             const locationsToMove = [
               payload.monData,
               ...dragState.selectedLocations.filter((l) => !locationsEqual(l, payload.monData)),
@@ -123,13 +123,12 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             let currentDestSlot = dest.boxSlot
             let currentDestBox = dest.box
 
-            const maxSlots = dest.isHome ? OpenHomeBanks.BOX_ROWS * OpenHomeBanks.BOX_COLUMNS : 30 // Approx max slots
+            const maxSlots = dest.isHome ? OpenHomeBanks.BOX_ROWS * OpenHomeBanks.BOX_COLUMNS : 30
 
             for (const sourceLoc of locationsToMove) {
               const currMon = savesAndBanks.getMonAtLocation(sourceLoc)
               if (!currMon) continue
 
-              // Skip if destination save doesn't support this mon
               if (
                 !dest.isHome &&
                 !savesAndBanks
@@ -149,7 +148,6 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
                 moveMonItemToBag(sourceLoc)
               }
 
-              // Find next target slot (starting with currentDestSlot)
               const nextDest: MonLocation = {
                 ...dest,
                 box: currentDestBox,
@@ -157,7 +155,6 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               }
               savesAndBanks.moveMon({ ...sourceLoc, mon: currMon }, nextDest)
 
-              // Advance to next slot - very simplistic advancement, assuming we just go right
               currentDestSlot++
               if (currentDestSlot >= maxSlots) {
                 currentDestSlot = 0
@@ -166,10 +163,8 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             }
             clearSelections()
           } else {
-            // Unchanged Single-move
             const source = payload.monData
 
-            // Move item to OpenHome bag if not supported by the save file
             if (
               mon.heldItemIndex &&
               !dest.isHome &&

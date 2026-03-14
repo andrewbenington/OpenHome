@@ -836,10 +836,6 @@ export function useSaves(): SavesAndBanksManager {
     [loadedHomeData, openSavesDispatch]
   )
 
-  /**
-   * Moves all Pokemon from the save's current box to the bank.
-   * Returns the number of Pokemon moved.
-   */
   const moveBoxToBank = useCallback(
     (save: SAV): number => {
       const currentBox = save.boxes[save.currentPCBox]
@@ -851,7 +847,6 @@ export function useSaves(): SavesAndBanksManager {
       let currentBankBox = updatedHomeData.currentPCBox
       let currentSlot = 0
 
-      // Find the first empty slot in the bank
       while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
         const box = updatedHomeData.getCurrentBank().getBox(currentBankBox)
         if (!box) break
@@ -867,7 +862,6 @@ export function useSaves(): SavesAndBanksManager {
         const mon = currentBox.boxSlots[i]
         if (!mon) continue
 
-        // Find next empty slot in bank
         while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
           if (currentSlot < boxSize) {
             const bankSlotEmpty = updatedHomeData.slotIsEmpty({
@@ -883,12 +877,10 @@ export function useSaves(): SavesAndBanksManager {
           }
         }
 
-        // Add new box if necessary
         if (currentBankBox >= updatedHomeData.getCurrentBankBoxes().length) {
           updatedHomeData.addBoxCurrentBank('end')
         }
 
-        // Convert to OHPKM and move to bank
         const ohpkm =
           ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, undefined)
 
@@ -901,7 +893,6 @@ export function useSaves(): SavesAndBanksManager {
           ohpkm.openhomeId
         )
 
-        // Clear original slot in save
         currentBox.boxSlots[i] = undefined
         save.updatedBoxSlots.push({ box: save.currentPCBox, boxSlot: i })
 
@@ -915,10 +906,6 @@ export function useSaves(): SavesAndBanksManager {
     [loadedHomeData, ohpkmStore, openSavesDispatch]
   )
 
-  /**
-   * Moves all Pokemon from the entire save to the bank.
-   * Returns the number of Pokemon moved.
-   */
   const moveSaveToBank = useCallback(
     (save: SAV): number => {
       let totalMoved = 0
@@ -927,7 +914,6 @@ export function useSaves(): SavesAndBanksManager {
       let currentBankBox = updatedHomeData.currentPCBox
       let currentSlot = 0
 
-      // Find the first empty slot in the bank
       while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
         const box = updatedHomeData.getCurrentBank().getBox(currentBankBox)
         if (!box) break
@@ -947,7 +933,6 @@ export function useSaves(): SavesAndBanksManager {
           const mon = saveBox.boxSlots[slotIdx]
           if (!mon) continue
 
-          // Find next empty slot in bank
           while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
             if (currentSlot < boxSize) {
               const bankSlotEmpty = updatedHomeData.slotIsEmpty({
@@ -963,12 +948,10 @@ export function useSaves(): SavesAndBanksManager {
             }
           }
 
-          // Add new box if necessary
           if (currentBankBox >= updatedHomeData.getCurrentBankBoxes().length) {
             updatedHomeData.addBoxCurrentBank('end')
           }
 
-          // Convert to OHPKM and move to bank
           const ohpkm =
             ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, undefined)
 
@@ -981,7 +964,6 @@ export function useSaves(): SavesAndBanksManager {
             ohpkm.openhomeId
           )
 
-          // Clear original slot in save
           saveBox.boxSlots[slotIdx] = undefined
           save.updatedBoxSlots.push({ box: boxIdx, boxSlot: slotIdx })
 
@@ -996,11 +978,6 @@ export function useSaves(): SavesAndBanksManager {
     [loadedHomeData, ohpkmStore, openSavesDispatch]
   )
 
-  /**
-   * Updates the display color for a Pokemon.
-   * @param monId The OHPKM ID
-   * @param color CSS color string (e.g., '#ff0000') or undefined to clear
-   */
   const updateMonDisplayColor = useCallback(
     (monId: string, color: string | undefined) => {
       if (!homeData) return
@@ -1016,12 +993,6 @@ export function useSaves(): SavesAndBanksManager {
     [homeData, ohpkmStore]
   )
 
-  /**
-   * Updates the custom tags for a Pokemon.
-   * Tags are stored as dedicated fields on the OHPKM (label + color + icon).
-   * @param monId The OHPKM ID
-   * @param tags Array of tags or undefined to clear
-   */
   const updateMonTags = useCallback(
     (monId: string, tags: { label: string; color: string; icon?: string }[] | undefined) => {
       if (!homeData) return
@@ -1030,7 +1001,7 @@ export function useSaves(): SavesAndBanksManager {
       if (R.isErr(result)) return result
 
       const mon = result.value
-      mon.setTags(tags ?? null)
+      mon.setTags(tags ?? [])
 
       ohpkmStore.insertOrUpdate(mon)
     },
