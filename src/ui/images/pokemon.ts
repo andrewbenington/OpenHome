@@ -7,7 +7,7 @@ import { NationalDexToUnboundMap } from '@openhome-core/save/unbound/conversion/
 import { UBSprites } from '@openhome-core/save/unbound/conversion/UnboundSprites'
 import { MonSpriteData } from '@openhome-ui/state/plugin'
 import { MetadataLookup } from '@pkm-rs/pkg'
-import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Formes'
+import { BLOOD_MOON, SPIKY_EAR, SWEETS } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { isRomHackFormat, MonFormat } from '../../core/pkm/interfaces'
 
@@ -63,7 +63,7 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
   }${spriteName}.${spriteFolder === 'gen3gc' ? 'gif' : 'png'}`
 }
 
-function getSpriteName(mon: MonSpriteData): string {
+export function getSpriteName(mon: MonSpriteData): string {
   const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
   let spriteName = formeMetadata?.sprite ?? ''
 
@@ -118,6 +118,9 @@ export function getRomHackSpritePath(mon: MonSpriteData) {
     monFormat === 'PB8LUMI' ||
     (mon.pluginOrigin === 'luminescent_platinum' && mon.pluginForm !== undefined)
   ) {
+    if (mon.dexNum === NationalDex.Pichu && mon.formeNum === SPIKY_EAR) {
+      return 'sprites/home/pichu-spiky-eared.png'
+    }
     const lumiForm = mon.pluginForm ?? mon.formeNum
     if (getLumiCustomForm(mon.dexNum, lumiForm)) {
       return `sprites/lumi/${mon.dexNum}-${lumiForm}.webp`
