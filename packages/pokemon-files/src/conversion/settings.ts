@@ -1,15 +1,32 @@
 type SettingType = 'string' | 'number' | 'boolean' | 'array' | 'object'
 
-interface SettingDescriptor<T> {
-  display: string
-  type: SettingType
-  default: T
-  description: string
-  enum?: T[] // allowed values
-  minimum?: number // for numbers
-  maximum?: number
-  deprecated?: string // deprecation message
-}
+type SettingDescriptor =
+  | {
+      display: string
+      type: 'string'
+      default: string
+      description: string
+      enum?: string[] // allowed values
+      deprecated?: string // deprecation message
+    }
+  | {
+      display: string
+      type: 'boolean'
+      default: boolean
+      description: string
+      maximum?: number
+      deprecated?: string // deprecation message
+    }
+  | {
+      display: string
+      type: 'number'
+      default: number
+      description: string
+      enum?: number[] // allowed values
+      minimum?: number // for numbers
+      maximum?: number
+      deprecated?: string // deprecation message
+    }
 
 type SettingsCategory = 'nickname' | 'metLocation'
 export type SettingsSubcategory = `${SettingsCategory}.${string}`
@@ -18,6 +35,8 @@ export function displaySettingsCategory(category: SettingsCategory): string {
   switch (category) {
     case 'nickname':
       return 'Nicknames'
+    case 'metLocation':
+      return 'Met Location'
     default:
       return category
   }
@@ -36,18 +55,18 @@ export const SETTINGS_SCHEMA = {
     description:
       'Decides how unnicknamed Pokémon are capitalized when converted. "gameDefault" uses the capitalization from the original game, while "modern" capitalizes all nicknames in the modern style.',
     display: 'Capitalization',
-  },
+  } as const,
   'metLocation.useRegion': {
     type: 'boolean',
     default: true,
     description:
-      'If true, the met location will be converted to a region-based location when possible. If false, the original met location will be preserved.',
+      'If true, the met location in-game will show the region name when possible. If false, it will show either "a faraway place" or "an in-game trade".',
     display: 'Use Region for Met Location (when possible)',
-  },
-} as const satisfies Record<SettingsSubcategory, SettingDescriptor<unknown>>
+  } as const,
+} satisfies Record<SettingsSubcategory, SettingDescriptor>
 
 type Schema = typeof SETTINGS_SCHEMA
-type SettingValue<T extends SettingDescriptor<unknown>> = T extends { enum: ReadonlyArray<infer U> }
+type SettingValue<T extends SettingDescriptor> = T extends { enum: ReadonlyArray<infer U> }
   ? U
   : T['default']
 
