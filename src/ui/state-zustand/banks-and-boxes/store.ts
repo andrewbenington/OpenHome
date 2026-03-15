@@ -5,7 +5,6 @@ import { create, StateCreator, StoreApi, UseBoundStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { OhpkmIdentifier } from '../../../core/pkm/Lookup'
 import { getSortFunctionNullable } from '../../../core/pkm/sort'
-import { AddBoxLocation, BankBoxCoordinates, OpenHomeBanks } from '../../../core/save/HomeData'
 import {
   BoxMonIdentifiers,
   SimpleOpenHomeBank,
@@ -19,6 +18,18 @@ import { IdentifierNotPresentError, useOhpkmStore } from '../../state/ohpkm'
 export const OPENHOME_BOX_ROWS = 10
 export const OPENHOME_BOX_COLUMNS = 12
 export const OPENHOME_BOX_SLOTS = OPENHOME_BOX_COLUMNS * OPENHOME_BOX_ROWS
+
+export interface BankBoxCoordinates {
+  bank: number
+  box: number
+  boxSlot: number
+}
+
+export function bankBoxCoordinates(bank: number, box: number, boxSlot: number): BankBoxCoordinates {
+  return { bank, box, boxSlot }
+}
+
+export type AddBoxLocation = 'start' | 'end' | ['before', number] | ['after', number]
 
 type ReverseLookup = Map<OhpkmIdentifier, BankBoxCoordinates>
 
@@ -355,7 +366,7 @@ export function boxNameOrDefault(box: SimpleOpenHomeBox) {
 function removeDupes<T extends SimpleOpenHomeBox>(box: T) {
   const alreadyPresent: Set<string> = new Set()
 
-  for (let slot = 0; slot < OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS; slot++) {
+  for (let slot = 0; slot < OPENHOME_BOX_SLOTS; slot++) {
     const identifier = box.identifiers.get(slot)
 
     if (!identifier) continue
@@ -508,9 +519,9 @@ export function useBanksAndBoxes() {
 
     const firstNewBoxIndex = getCurrentBank().boxes.size
 
-    for (let i = 0; i < ids.length; i += OpenHomeBanks.SLOTS_PER_BOX) {
+    for (let i = 0; i < ids.length; i += OPENHOME_BOX_SLOTS) {
       const identifiers: BoxMonIdentifiers = new Map()
-      for (let slot = 0; slot < OpenHomeBanks.SLOTS_PER_BOX; slot++) {
+      for (let slot = 0; slot < OPENHOME_BOX_SLOTS; slot++) {
         identifiers.set(slot, ids[i + slot])
       }
       addBoxCurrentBank('end', boxName, identifiers)

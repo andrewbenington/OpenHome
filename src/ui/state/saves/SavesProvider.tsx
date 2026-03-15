@@ -8,7 +8,6 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import { Button, Callout, Dialog, Flex, Separator } from '@radix-ui/themes'
 import { ReactNode, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { OpenHomeBanks } from 'src/core/save/HomeData'
 import { SAVClass } from 'src/core/save/util'
 import { Result } from 'src/core/util/functional'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
@@ -46,7 +45,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
   const allOpenSaves = Object.values(openSavesState.openSaves)
     .filter((data) => !!data)
-    .filter((data) => !(data.save instanceof OpenHomeBanks))
     .sort((a, b) => a.index - b.index)
     .map((data) => data.save)
 
@@ -184,7 +182,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           openSavesDispatch,
           allOpenSaves: Object.values(openSavesState.openSaves)
             .filter((data) => !!data)
-            .filter((data) => !(data.save instanceof OpenHomeBanks))
             .sort((a, b) => a.index - b.index)
             .map((data) => data.save),
           promptDisambiguation,

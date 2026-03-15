@@ -3,7 +3,6 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SAV } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { createContext, Dispatch, Reducer } from 'react'
-import { OpenHomeBanks } from 'src/core/save/HomeData'
 import { SaveIdentifier, saveToStringIdentifier } from 'src/core/save/interfaces'
 import { SAVClass } from '../../../core/save/util'
 
@@ -85,10 +84,6 @@ export type OpenSavesAction =
       type: 'set_error'
       payload: string | undefined
     }
-  | {
-      type: 'set_home_data'
-      payload: OpenHomeBanks
-    }
 
 export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
   state: OpenSavesState,
@@ -161,9 +156,6 @@ export const openSavesReducer: Reducer<OpenSavesState, OpenSavesAction> = (
     }
     case 'close_all_saves': {
       return { ...state, openSaves: {} }
-    }
-    case 'set_home_data': {
-      return { ...state, homeData: payload.clone() }
     }
   }
 }

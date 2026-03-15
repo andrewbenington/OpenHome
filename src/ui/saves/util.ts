@@ -8,7 +8,6 @@ import { CtxMenuElementBuilder, ItemBuilder } from '@openhome-ui/components/cont
 import { OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import { OpenHomeBanks, OpenHomeBox } from 'src/core/save/HomeData'
 import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
 
 export type SaveViewMode = 'card' | 'grid'
@@ -78,18 +77,14 @@ export function filterEmpty<T>(value: T | null | undefined): value is T {
  * first non-empty box slot
  */
 export function getFollowingMon(
-  currentBox: Box<PKMInterface> | OpenHomeBox,
+  currentBox: Box<PKMInterface>,
   incrementFunction: (index: number) => number,
   index: number
 ) {
   let prevIndex = index
 
   function slotIsEmpty(index: number) {
-    if (currentBox instanceof OpenHomeBox) {
-      return currentBox.slotIsEmpty(index)
-    } else {
-      return currentBox.boxSlots[prevIndex] === undefined
-    }
+    return currentBox.boxSlots[index] === undefined
   }
 
   do {
@@ -149,22 +144,15 @@ export function useOpenHomeBoxNavigator() {
 
 export function buildNavigator(
   incrementFunction: (index: number) => number,
-  save: SAV | OpenHomeBanks,
+  save: SAV,
   currentIndex?: number,
   callback?: (index?: number) => void
 ) {
   if (currentIndex === undefined) return undefined
   const currentBox =
-    save instanceof OpenHomeBanks
-      ? save.getCurrentBox()
-      : save.currentPCBox < save.boxes.length
-        ? save.boxes[save.currentPCBox]
-        : undefined
+    save.currentPCBox < save.boxes.length ? save.boxes[save.currentPCBox] : undefined
 
-  const nonEmptySlots =
-    currentBox instanceof OpenHomeBox
-      ? currentBox.allContainedMons().length
-      : (currentBox?.boxSlots.filter(filterUndefined).length ?? 0)
+  const nonEmptySlots = currentBox?.boxSlots.filter(filterUndefined).length ?? 0
 
   if (currentBox === undefined || nonEmptySlots < 2) {
     return undefined
@@ -182,7 +170,7 @@ export function buildNavigator(
  * Otherwise returns undefined
  */
 export function buildForwardNavigator(
-  save: SAV | OpenHomeBanks,
+  save: SAV,
   currentIndex?: number,
   callback?: (index?: number) => void
 ) {
@@ -201,7 +189,7 @@ export function buildForwardNavigator(
  * Otherwise returns undefined
  */
 export function buildBackwardNavigator(
-  save: SAV | OpenHomeBanks,
+  save: SAV,
   index?: number,
   callback?: (index?: number) => void
 ) {

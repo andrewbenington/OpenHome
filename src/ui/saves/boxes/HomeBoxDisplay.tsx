@@ -49,10 +49,7 @@ import BoxCell from './BoxCell'
 import DroppableSpace from './DroppableSpace'
 import './style.css'
 
-const COLUMN_COUNT = 12
-const ROW_COUNT = 10
-
-type BoxViewMode = 'one' | 'all'
+export type BoxViewMode = 'one' | 'all'
 
 const ALLOW_DUPE_IMPORT = true
 
@@ -322,8 +319,8 @@ function SingleBoxMonDisplay() {
   return (
     <OpenHomeCtxMenu elements={contextElements}>
       <div>
-        <Grid columns={COLUMN_COUNT.toString()} gap="1">
-          {range(COLUMN_COUNT * ROW_COUNT)
+        <Grid columns={OPENHOME_BOX_COLUMNS.toString()} gap="1">
+          {range(OPENHOME_BOX_SLOTS)
             .map((index: number) => currentBox.identifiers.get(index))
             .map((identifier, index) => {
               const result = identifier ? ohpkmStore.tryLoadFromId(identifier) : undefined

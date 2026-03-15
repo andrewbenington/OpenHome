@@ -10,10 +10,9 @@ import { filterUndefined } from '@openhome-core/util/sort'
 import { Item } from '@pkm-rs/pkg'
 import { MarkingsSixShapesWithColor } from '@pokemon-files/util'
 import { useCallback, useContext, useRef } from 'react'
-import { OpenHomeBanks } from 'src/core/save/HomeData'
 import { displayIndexAdder, isBattleFormeItem } from '../../../core/pkm/util'
 import { BackendContext } from '../../backend/backendContext'
-import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
+import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { PokedexUpdate } from '../../util/pokedex'
 import { AppInfoContext } from '../appInfo'
 import { ItemBagContext } from '../items'
@@ -235,7 +234,7 @@ export function useSaves(): SavesAndBanksManager {
         mons.forEach((mon) => {
           while (!homeLocationIsEmpty(nextSlot) && nextSlot.box < currentBankBoxCount) {
             nextSlot.boxSlot++
-            if (nextSlot.boxSlot >= OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS) {
+            if (nextSlot.boxSlot >= OPENHOME_BOX_SLOTS) {
               nextSlot.boxSlot = 0
               nextSlot.box++
             }
@@ -248,7 +247,7 @@ export function useSaves(): SavesAndBanksManager {
             moveOhpkmToHome(homeMon.openhomeId, nextSlot, true)
             addedMons.push(homeMon)
             nextSlot.boxSlot++
-            if (nextSlot.boxSlot >= OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS) {
+            if (nextSlot.boxSlot >= OPENHOME_BOX_SLOTS) {
               nextSlot.boxSlot = 0
               nextSlot.box++
             }

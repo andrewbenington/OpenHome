@@ -20,14 +20,16 @@ import {
 import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
+import {
+  BankBoxCoordinates,
+  useBanksAndBoxes,
+} from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup, OriginGames } from '@pkm-rs/pkg'
 import { useCallback, useRef, useState } from 'react'
 import { SelectColumn } from 'react-data-grid'
 import { useNavigate } from 'react-router'
-import { BankBoxCoordinates } from 'src/core/save/HomeData'
-import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import './style.css'
 
 export type AllTrackedPokemonProps = {

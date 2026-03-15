@@ -8,8 +8,8 @@ import {
 } from '@dnd-kit/core'
 import { restrictToParentElement } from '@dnd-kit/modifiers'
 import {
-  SortableContext,
   rectSortingStrategy,
+  SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
 } from '@dnd-kit/sortable'
@@ -27,9 +27,13 @@ import { RemoveIcon } from '@openhome-ui/components/Icons'
 import { MonLocation } from '@openhome-ui/state/saves'
 import { Button, Flex, Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
-import { OpenHomeBanks } from 'src/core/save/HomeData'
 import { SimpleOpenHomeBox } from '../../../core/save/util/storage'
-import { boxNameOrDefault, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
+import {
+  boxNameOrDefault,
+  OPENHOME_BOX_COLUMNS,
+  OPENHOME_BOX_ROWS,
+  useBanksAndBoxes,
+} from '../../state-zustand/banks-and-boxes/store'
 import DroppableSpace from './DroppableSpace'
 
 export default function AllHomeBoxes(props: {
@@ -225,11 +229,11 @@ function BoxWithMons({ box, debugMode }: BoxMonIconsProps) {
   return (
     <Flex direction="column" width="100%" height="100%">
       <div className="box-icon-mon-container">
-        {range(OpenHomeBanks.BOX_COLUMNS).map((i) => (
+        {range(OPENHOME_BOX_COLUMNS).map((i) => (
           <div className="box-icon-mon-col" key={`pos-display-col-${i}`}>
-            {range(OpenHomeBanks.BOX_ROWS).map((j) => (
+            {range(OPENHOME_BOX_ROWS).map((j) => (
               <div
-                className={`box-icon-mon-indicator ${!box.identifiers.has(j * OpenHomeBanks.BOX_COLUMNS + i) ? 'box-icon-mon-empty' : ''}`}
+                className={`box-icon-mon-indicator ${!box.identifiers.has(j * OPENHOME_BOX_COLUMNS + i) ? 'box-icon-mon-empty' : ''}`}
                 key={`pos-display-cell-${i}-${j}`}
               />
             ))}
