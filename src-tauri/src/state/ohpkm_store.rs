@@ -1,4 +1,5 @@
 use crate::error::{Error, Result};
+use crate::storage;
 use crate::{state::synced_state, util};
 use base64::prelude::*;
 use pkm_rs::pkm::ohpkm::OhpkmV2;
@@ -78,12 +79,12 @@ impl OhpkmBytesStore {
     }
 
     pub fn load_from_mons_v2(app_handle: &tauri::AppHandle) -> Result<Self> {
-        let mons_v2_dir = util::prepend_appdata_storage_to_path(app_handle, "mons_v2")?;
+        let mons_v2_dir = storage::get_path(app_handle, "mons_v2")?;
         Self::load_from_directory(&mons_v2_dir)
     }
 
     pub fn write_to_mons_v2(&self, app_handle: &tauri::AppHandle) -> Result<()> {
-        let mons_v2_dir = util::prepend_appdata_storage_to_path(app_handle, "mons_v2")?;
+        let mons_v2_dir = storage::get_path(app_handle, "mons_v2")?;
         Self::write_to_directory(self, &mons_v2_dir)
     }
 

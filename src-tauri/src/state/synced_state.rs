@@ -6,7 +6,7 @@ use serde::Serialize;
 use tauri::Emitter;
 
 use crate::error::{Error, Result};
-use crate::state::{LookupState, OhpkmBytesStore};
+use crate::state::{ConversionSettings, LookupState, OhpkmBytesStore};
 
 pub trait SyncedState: Clone + Serialize + tauri::ipc::IpcResponse {
     const ID: &'static str;
@@ -55,15 +55,21 @@ impl<State: SyncedState> SyncedStateWrapper<State> {
 pub struct AllSyncedStateInner {
     pub lookups: SyncedStateWrapper<LookupState>,
     pub ohpkm_store: SyncedStateWrapper<OhpkmBytesStore>,
+    pub conversion_settings: SyncedStateWrapper<ConversionSettings>,
 }
 
 pub struct AllSyncedState(pub Mutex<AllSyncedStateInner>);
 
 impl AllSyncedState {
-    pub fn from_states(lookups: LookupState, ohpkm_store: OhpkmBytesStore) -> Self {
+    pub fn from_states(
+        lookups: LookupState,
+        ohpkm_store: OhpkmBytesStore,
+        conversion_settings: ConversionSettings,
+    ) -> Self {
         Self(Mutex::new(AllSyncedStateInner {
             lookups: SyncedStateWrapper(lookups),
             ohpkm_store: SyncedStateWrapper(ohpkm_store),
+            conversion_settings: SyncedStateWrapper(conversion_settings),
         }))
     }
 

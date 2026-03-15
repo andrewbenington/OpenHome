@@ -1,14 +1,17 @@
-use crate::util::{self, PathData, parse_path_data};
+use crate::storage;
+use crate::util;
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
 
+const RECENT_SAVES_FILENAME: &str = "recent_saves.json";
+
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct PossibleSaves {
-    pub citra: Vec<PathData>,
-    pub desamume: Vec<PathData>,
-    pub open_emu: Vec<PathData>,
+    pub citra: Vec<util::PathData>,
+    pub desamume: Vec<util::PathData>,
+    pub open_emu: Vec<util::PathData>,
 }
 
 const MAX_SEARCH_DEPTH: usize = 2;
@@ -16,7 +19,7 @@ const MAX_SEARCH_DEPTH: usize = 2;
 pub fn recursively_find_desamume_saves(
     current_path: &Path,
     depth: usize,
-) -> core::result::Result<Vec<PathData>, String> {
+) -> core::result::Result<Vec<util::PathData>, String> {
     if depth >= MAX_SEARCH_DEPTH {
         return Ok(Vec::new());
     }
@@ -29,7 +32,7 @@ pub fn recursively_find_desamume_saves(
             found_saves.extend(
                 get_inner_files_with_extension(&path, "dsv")
                     .into_iter()
-                    .map(|path| parse_path_data(&path)),
+                    .map(|path| util::parse_path_data(&path)),
             );
         } else {
             found_saves.extend(recursively_find_desamume_saves(&path, depth + 1)?);
@@ -42,7 +45,7 @@ pub fn recursively_find_desamume_saves(
 pub fn recursively_find_gambatte_saves(
     current_path: &Path,
     depth: usize,
-) -> core::result::Result<Vec<PathData>, String> {
+) -> core::result::Result<Vec<util::PathData>, String> {
     if depth >= MAX_SEARCH_DEPTH {
         return Ok(vec![]);
     }
@@ -55,7 +58,7 @@ pub fn recursively_find_gambatte_saves(
             found_saves.extend(
                 get_inner_files_with_extensions(&path, &["sav", "rtc"])
                     .into_iter()
-                    .map(|path| parse_path_data(&path)),
+                    .map(|path| util::parse_path_data(&path)),
             );
         } else {
             found_saves.extend(recursively_find_gambatte_saves(&path, depth + 1)?);
@@ -65,7 +68,10 @@ pub fn recursively_find_gambatte_saves(
     Ok(found_saves)
 }
 
-pub fn recursively_find_mgba_saves(current_path: &Path, depth: usize) -> Option<Vec<PathData>> {
+pub fn recursively_find_mgba_saves(
+    current_path: &Path,
+    depth: usize,
+) -> Option<Vec<util::PathData>> {
     if depth >= MAX_SEARCH_DEPTH {
         return None;
     }
@@ -78,7 +84,7 @@ pub fn recursively_find_mgba_saves(current_path: &Path, depth: usize) -> Option<
             found_saves.extend(
                 get_inner_files_with_extension(&path, "sav")
                     .into_iter()
-                    .map(|path| parse_path_data(&path)),
+                    .map(|path| util::parse_path_data(&path)),
             );
         } else {
             found_saves.extend(recursively_find_mgba_saves(&path, depth + 1)?);
@@ -91,7 +97,7 @@ pub fn recursively_find_mgba_saves(current_path: &Path, depth: usize) -> Option<
 pub fn recursively_find_citra_saves(
     path: &PathBuf,
     depth: usize,
-) -> core::result::Result<Vec<PathData>, String> {
+) -> core::result::Result<Vec<util::PathData>, String> {
     if depth >= MAX_SEARCH_DEPTH {
         return Ok(vec![]);
     }
@@ -106,7 +112,7 @@ pub fn recursively_find_citra_saves(
             if entry_path.is_dir() {
                 found_saves.extend(recursively_find_citra_saves(&entry_path, depth + 1)?);
             } else if entry_path.ends_with("main") {
-                found_saves.push(parse_path_data(&entry_path));
+                found_saves.push(util::parse_path_data(&entry_path));
             }
         }
     }
@@ -117,7 +123,7 @@ pub fn recursively_find_citra_saves(
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct SaveRef {
-    pub file_path: PathData,
+    pub file_path: util::PathData,
     pub game: u32,
     pub trainer_name: String,
     #[serde(rename = "trainerID")]
@@ -138,7 +144,7 @@ pub enum StringOrU32 {
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct StoredSaveRef {
-    pub file_path: PathData,
+    pub file_path: util::PathData,
     pub game: Option<StringOrU32>,
     pub trainer_name: Option<String>,
     #[serde(rename = "trainerID")]
@@ -150,9 +156,8 @@ pub struct StoredSaveRef {
 pub fn get_recent_saves(
     app_handle: tauri::AppHandle,
 ) -> core::result::Result<HashMap<String, SaveRef>, String> {
-    let file_path: PathBuf = "recent_saves.json".to_string().into();
     let recent_saves: HashMap<String, StoredSaveRef> =
-        util::get_storage_file_json(&app_handle, &file_path)
+        storage::read_or_create_default_json(&app_handle, RECENT_SAVES_FILENAME)
             .map_err(|e| format!("Error getting settings: {}", e))?;
 
     let mut validated_recents: HashMap<String, SaveRef> = HashMap::new();
