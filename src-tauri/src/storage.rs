@@ -74,9 +74,9 @@ where
     P: AsRef<Path>,
     T: serde::de::DeserializeOwned + serde::ser::Serialize + Default,
 {
-    if !get_path(app_handle, &relative_path)?.exists() {
+    if !get_path(app_handle, relative_path)?.exists() {
         let default = T::default();
-        write_file_json(app_handle, &relative_path, &default)?;
+        write_file_json(app_handle, relative_path, &default)?;
         Ok(true)
     } else {
         Ok(false)
