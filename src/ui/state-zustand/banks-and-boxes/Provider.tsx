@@ -43,12 +43,10 @@ export default function BanksAndBoxesProvider(props: PropsWithChildren) {
     )
   }
 
-  if (loading) {
-    return <LoadingIndicator message="Loading OpenHome boxes..." />
-  }
-
   if (!storedBanksAndBoxes) {
-    loadAllHomeData()
+    if (!loading) {
+      loadAllHomeData()
+    }
     return <LoadingIndicator message="Loading OpenHome boxes..." />
   }
 
