@@ -22,6 +22,8 @@ function getInnerSortFunction(
 
 type MonWithColors = { mon: PKMInterface; color: string }
 
+const OPENHOME_COLOR = '#7DCEAB'
+
 export default function SortPokemon() {
   const savesAndBanks = useSaves()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
@@ -41,17 +43,13 @@ export default function SortPokemon() {
           }))
       )
       .concat(
-        savesAndBanks.homeData
-          .getCurrentBank()
-          .allContainedMons()
+        savesAndBanks
+          .allMonsInCurrentBank()
           .map((identifier) => (identifier ? ohpkmStore.getById(identifier) : undefined))
           .filter(filterUndefined)
-          .map((mon) => ({
-            mon,
-            color: savesAndBanks.homeData.gameColor(),
-          }))
+          .map((mon) => ({ mon, color: OPENHOME_COLOR }))
       )
-  }, [ohpkmStore, savesAndBanks.allOpenSaves, savesAndBanks.homeData])
+  }, [ohpkmStore, savesAndBanks])
 
   const sortedMonsWithColors = useMemo(() => {
     return sort
@@ -92,11 +90,7 @@ export default function SortPokemon() {
     <Flex direction="row" wrap="wrap" overflow="hidden" height="calc(100% - 16px)" m="2" gap="2">
       <Card style={{ height: '100%' }}>
         <Flex direction="column" gap="1" style={{ width: 180, flex: 0 }}>
-          <Badge
-            color="gray"
-            size="3"
-            style={{ border: `2px solid ${savesAndBanks.homeData.gameColor()}` }}
-          >
+          <Badge color="gray" size="3" style={{ border: `2px solid ${OPENHOME_COLOR}` }}>
             OpenHome
           </Badge>
           {savesAndBanks.allOpenSaves.map((save) => (

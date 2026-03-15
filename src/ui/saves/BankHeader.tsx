@@ -1,15 +1,13 @@
 import { EditIcon } from '@openhome-ui/components/Icons'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
-import { useSaves } from '@openhome-ui/state/saves'
 import { Button, Card, DataList, DropdownMenu, Flex, Heading, TextField } from '@radix-ui/themes'
 import { useState } from 'react'
+import { bankNameOrDefault, useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
 
 export default function BankHeader() {
-  const savesAndBanks = useSaves()
   const [editing, setEditing] = useState(false)
   const [bankNameEditValue, setBankNameEditValue] = useState('')
-
-  const homeData = savesAndBanks.homeData
+  const { getCurrentBankName, setCurrentBankName } = useBanksAndBoxes()
 
   return (
     <Card className="bank-ribbon">
@@ -25,11 +23,11 @@ export default function BankHeader() {
             fontFamily: 'var(--default-font-family)',
             fontWeight: 'bold',
           }}
-          placeholder={homeData.getCurrentBankName()}
+          placeholder={getCurrentBankName()}
           onChange={(e) => setBankNameEditValue(e.target.value ?? undefined)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              savesAndBanks.setCurrentBankName(bankNameEditValue)
+              setCurrentBankName(bankNameEditValue)
               setEditing(false)
             } else if (e.key === 'Escape') {
               setEditing(false)
@@ -38,15 +36,15 @@ export default function BankHeader() {
           autoFocus
         />
       ) : (
-        <Heading size="5">{homeData.getCurrentBankName()}</Heading>
+        <Heading size="5">{getCurrentBankName()}</Heading>
       )}
 
       <Flex direction="row-reverse" flexGrow="1" width="0" gap="1">
         <ToggleButton
           state={editing}
           setState={setEditing}
-          onSet={() => setBankNameEditValue(homeData.getCurrentBankName())}
-          onUnset={() => savesAndBanks.setCurrentBankName(bankNameEditValue)}
+          onSet={() => setBankNameEditValue(getCurrentBankName())}
+          onUnset={() => setCurrentBankName(bankNameEditValue)}
           icon={EditIcon}
           hint="Change bank name"
         />
@@ -63,10 +61,10 @@ function removeNonDigits(input: string): string {
 
 function BankSelector(props: { disabled?: boolean }) {
   const { disabled } = props
-  const savesAndBanks = useSaves()
   const [newBankName, setNewBankName] = useState<string>()
   const [newBankBoxCount, setNewBankBoxCount] = useState('30')
   const [isOpen, setIsOpen] = useState(false)
+  const { banks, switchToBank, addBank } = useBanksAndBoxes()
 
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -77,12 +75,9 @@ function BankSelector(props: { disabled?: boolean }) {
         </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
-        {savesAndBanks.homeData.banks.map((bank) => (
-          <DropdownMenu.Item
-            key={bank.index}
-            onClick={() => savesAndBanks.switchToBank(bank.index)}
-          >
-            {bank.nameOrDefault()}
+        {banks.map((bank) => (
+          <DropdownMenu.Item key={bank.index} onClick={() => switchToBank(bank.index)}>
+            {bankNameOrDefault(bank)}
           </DropdownMenu.Item>
         ))}
 
@@ -95,7 +90,7 @@ function BankSelector(props: { disabled?: boolean }) {
                 <DataList.Value>
                   <TextField.Root
                     size="1"
-                    placeholder={`Bank ${savesAndBanks.homeData.banks.length + 1}`}
+                    placeholder={`Bank ${banks.length + 1}`}
                     onChange={(e) => setNewBankName(e.target.value || undefined)}
                   />
                 </DataList.Value>
@@ -115,7 +110,7 @@ function BankSelector(props: { disabled?: boolean }) {
             <Button
               size="1"
               onClick={() => {
-                savesAndBanks.addBank(newBankName, parseInt(newBankBoxCount))
+                addBank(newBankName, parseInt(newBankBoxCount))
                 setIsOpen(false)
               }}
             >

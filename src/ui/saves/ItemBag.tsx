@@ -1,12 +1,12 @@
 import { stringSorter } from '@openhome-core/util/sort'
-import { useItems } from '@openhome-ui/state/items'
+import { useItemBag } from '@openhome-ui/state/items'
 import { Item } from '@pkm-rs/pkg'
 import { Flex, Grid } from '@radix-ui/themes'
 import DroppableSpace from './boxes/DroppableSpace'
 import DraggableItem from './DraggableItem'
 
 export default function ItemBag() {
-  const { itemCounts } = useItems()
+  const itemCounts = useItemBag()
 
   return (
     <Flex direction="column" p="1" gap="2" style={{ marginLeft: 5 }}>

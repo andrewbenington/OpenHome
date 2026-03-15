@@ -2,14 +2,14 @@ import { ErrorIcon } from '@openhome-ui/components/Icons'
 import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import { Callout, Flex } from '@radix-ui/themes'
 import { ReactNode } from 'react'
-import { AppStateContext, usePossiblyLoadedAppState } from './appState'
+import { TransactionStateContext, usePossiblyLoadedTxState } from './transactionState'
 
-type AppStateProviderProps = {
+type TransactionStateProviderProps = {
   children: ReactNode
 }
 
-export default function AppStateProvider({ children }: AppStateProviderProps) {
-  const { state, loaded, error } = usePossiblyLoadedAppState()
+export default function TransactionStateProvider({ children }: TransactionStateProviderProps) {
+  const { state, loaded, error } = usePossiblyLoadedTxState()
 
   if (error) {
     return (
@@ -28,5 +28,7 @@ export default function AppStateProvider({ children }: AppStateProviderProps) {
     return <LoadingIndicator message="Loading app state..." />
   }
 
-  return <AppStateContext.Provider value={state}> {children}</AppStateContext.Provider>
+  return (
+    <TransactionStateContext.Provider value={state}> {children}</TransactionStateContext.Provider>
+  )
 }
