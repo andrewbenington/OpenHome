@@ -95,7 +95,8 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
       return `sprites/lumi/${mon.dexNum}-${lumiForm}.webp`
     }
   }
+  const extension = spriteFolder === 'gen3gc' ? 'gif' : spriteFolder === 'home' ? 'webp' : 'png'
   return `sprites/${spriteFolder}${
     mon.isShiny && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
-  }${spriteName}.${spriteFolder === 'gen3gc' ? 'gif' : 'png'}`
+  }${spriteName}.${extension}`
 }
