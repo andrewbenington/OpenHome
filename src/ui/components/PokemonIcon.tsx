@@ -1,6 +1,6 @@
 import { getLumiCustomForm } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
-import BoxIcons from '@openhome-ui/images/BoxIcons.png'
+import BoxIcons from '@openhome-ui/images/BoxIcons.webp'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import useMonSprite from '@openhome-ui/pokemon-details//useMonSprite'
