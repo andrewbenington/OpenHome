@@ -31,7 +31,7 @@ import {
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
 import {
-  ConversionStrategy,
+  ConvertStrategy,
   DefaultConversionStrategy,
 } from '../../../../packages/pokemon-files/src/conversion/settings'
 import {
@@ -330,7 +330,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   static fromOhpkm<T extends PK3CFRU>(
     this: new (ohpkm: OHPKM, options: PkmConstructorOptions) => T,
     ohpkm: OHPKM,
-    strategy: ConversionStrategy = DefaultConversionStrategy
+    strategy: ConvertStrategy = DefaultConversionStrategy
   ): T {
     return new this(ohpkm, { strategy })
   }

@@ -13,7 +13,7 @@ import {
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import { PkmConverter } from '../conversion/converter'
-import { ConversionStrategy, DefaultConversionStrategy } from '../conversion/settings'
+import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { FourMoves } from '../util/pkmInterface'
@@ -259,7 +259,7 @@ export default class PK5 {
     return new PK5(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConversionStrategy = DefaultConversionStrategy): PK5 {
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): PK5 {
     return new PK5(ohpkm, { strategy })
   }
 

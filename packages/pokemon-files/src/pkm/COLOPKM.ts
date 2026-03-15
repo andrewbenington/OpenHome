@@ -11,7 +11,7 @@ import {
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/index'
 import { PkmConverter } from '../conversion/converter'
-import { ConversionStrategy, DefaultConversionStrategy } from '../conversion/settings'
+import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
 import { FourMoves } from '../util/pkmInterface'
 import {
@@ -162,10 +162,7 @@ export default class COLOPKM {
     return new COLOPKM(buffer)
   }
 
-  static fromOhpkm(
-    ohpkm: OHPKM,
-    strategy: ConversionStrategy = DefaultConversionStrategy
-  ): COLOPKM {
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): COLOPKM {
     return new COLOPKM(ohpkm, { strategy })
   }
 

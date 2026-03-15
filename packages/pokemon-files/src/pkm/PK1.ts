@@ -11,7 +11,7 @@ import {
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import * as conversion from '../conversion'
 import { PkmConverter } from '../conversion/converter'
-import { ConversionStrategy, DefaultConversionStrategy } from '../conversion/settings'
+import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
 import { FourMoves } from '../util/pkmInterface'
 import { getLevelGen12, getStats } from '../util/statCalc'
@@ -150,7 +150,7 @@ export default class PK1 {
     return new PK1(buffer)
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConversionStrategy = DefaultConversionStrategy): PK1 {
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): PK1 {
     return new PK1(ohpkm, { strategy })
   }
 

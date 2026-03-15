@@ -8,6 +8,7 @@ import {
   SV_TRANSFER_RESTRICTIONS_ID,
   SV_TRANSFER_RESTRICTIONS_TM,
 } from '@pokemon-resources/consts/TransferRestrictions'
+import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../../pkm/OHPKM'
 import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
@@ -49,8 +50,8 @@ export class SVSAV extends G89SAV<PK9> {
     this.origin = this.trainerBlock.getGame()
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK9 {
-    return new PK9(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK9 {
+    return PK9.fromOhpkm(ohpkm, strategy)
   }
 
   getBoxCount(): number {

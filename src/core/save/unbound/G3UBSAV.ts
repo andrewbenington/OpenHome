@@ -1,6 +1,7 @@
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
 import { ItemUnbound } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { GEN3_SIGNATURE_OFFSET } from '../G3SAV'
@@ -22,8 +23,8 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> {
   static saveTypeName = 'Pokémon Unbound'
   static saveTypeID = 'G3UBSAV'
 
-  convertOhpkm(ohpkm: OHPKM): PK3UB {
-    return new PK3UB(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3UB {
+    return PK3UB.fromOhpkm(ohpkm, strategy)
   }
 
   supportsMon(dexNumber: number, formeNumber: number) {

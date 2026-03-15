@@ -1,6 +1,7 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
 import { PkmConstructorOptions } from '../../../../packages/pokemon-files/src/pkm/PKM'
 import { SAV } from '../interfaces'
 import { PathData } from './path'
@@ -15,7 +16,7 @@ export const DESAMUME_FOOTER_START =
 export interface SavePkmClass {
   new (arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions): PKMInterface
   fromBytes(bytes: ArrayBuffer): PKMInterface
-  fromOhpkm(ohpkm: OHPKM): PKMInterface
+  fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PKMInterface
   getName(): string
 }
 

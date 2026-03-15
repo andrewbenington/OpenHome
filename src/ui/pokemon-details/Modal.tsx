@@ -12,6 +12,7 @@ import { FileSchemas } from '@pokemon-files/schema'
 import { Dialog, Flex, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
+import { useConvertStrategies } from '../state/convert-strategies'
 import './style.css'
 import MetDataMovesTab from './tabs/MetDataMovesTab'
 import NotesDisplay from './tabs/NotesTab'
@@ -39,6 +40,7 @@ const PokemonDetailsModal = (props: {
   const [displayMon, setDisplayMon] = useState(mon)
   const [boxIndicatorVisible, setBoxIndicatorVisible] = useState(false)
   const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
+  const { defaultConvertStrategy } = useConvertStrategies()
   const backend = useContext(BackendContext)
 
   useEffect(() => setDisplayMon(mon), [mon])
@@ -129,9 +131,9 @@ const PokemonDetailsModal = (props: {
                       throw `Invalid filetype: ${P}`
                     }
                     if (mon instanceof OHPKM) {
-                      setDisplayMon(P.fromOhpkm(mon))
+                      setDisplayMon(P.fromOhpkm(mon, defaultConvertStrategy))
                     } else {
-                      setDisplayMon(P.fromOhpkm(new OHPKM(mon)))
+                      setDisplayMon(P.fromOhpkm(new OHPKM(mon), defaultConvertStrategy))
                     }
                   }}
                 />

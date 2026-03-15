@@ -74,7 +74,7 @@ export type FullConversionStrategy = {
   [K in keyof Schema]: SettingValue<Schema[K]>
 }
 
-export type ConversionStrategy = Partial<FullConversionStrategy>
+export type ConvertStrategy = Partial<FullConversionStrategy>
 
 export const DefaultConversionStrategy: FullConversionStrategy = {
   'nickname.capitalization': SETTINGS_SCHEMA['nickname.capitalization'].default,

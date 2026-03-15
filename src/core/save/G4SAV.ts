@@ -7,6 +7,7 @@ import {
 import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
+import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
@@ -152,8 +153,8 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     this.updateStorageChecksum()
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK4 {
-    return new PK4(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK4 {
+    return PK4.fromOhpkm(ohpkm, strategy)
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean

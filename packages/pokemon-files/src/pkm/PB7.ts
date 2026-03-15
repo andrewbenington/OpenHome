@@ -9,7 +9,7 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
-import { ConversionStrategy, DefaultConversionStrategy } from '../conversion/settings'
+import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import { FourMoves } from '../util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
@@ -315,7 +315,7 @@ export default class PB7 {
     return new PB7(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConversionStrategy = DefaultConversionStrategy): PB7 {
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): PB7 {
     return new PB7(ohpkm, { strategy })
   }
 

@@ -7,6 +7,7 @@ import {
 import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConverter'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK7 } from '@pokemon-files/pkm'
+import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { SIZE_USUM } from './util'
@@ -123,8 +124,8 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
     this.bytes = SignWithMemeCrypto(this.bytes)
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK7 {
-    return new PK7(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK7 {
+    return PK7.fromOhpkm(ohpkm, strategy)
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean

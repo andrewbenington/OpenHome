@@ -17,7 +17,7 @@ import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
 import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs from 'dayjs'
-import { Commands, StoredBankDataSerialized } from './tauriInvoker'
+import { Commands, StoredBankDataSerialized } from './tauriCommands'
 import { isRustErr } from './types'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
@@ -112,7 +112,7 @@ export const TauriBackend: BackendInterface = {
     return filePath ? Commands.write_file_bytes(filePath, bytes) : R.Ok(null)
   },
 
-  // /* game save management */
+  /* game save management */
   getRecentSaves: Commands.validate_recent_saves,
   addRecentSave: (saveRef: SaveRef): Promise<Errorable<null>> =>
     Commands.get_storage_file_json('recent_saves.json').then(
@@ -232,6 +232,8 @@ export const TauriBackend: BackendInterface = {
     ),
   updateSettings: async (settings: Settings) =>
     Commands.write_storage_file_json('settings.json', settings as unknown as JSONObject),
+  getConvertStrategies: Commands.get_convert_strategies,
+  updateConvertStrategies: Commands.update_convert_strategies,
   setTheme: Commands.set_app_theme,
   emitMenuEvent: Commands.handle_windows_accellerator,
 

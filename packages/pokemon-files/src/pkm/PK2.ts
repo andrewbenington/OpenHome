@@ -10,7 +10,7 @@ import {
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import { PkmConverter } from '../conversion/converter'
-import { ConversionStrategy, DefaultConversionStrategy } from '../conversion/settings'
+import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
 import { FourMoves } from '../util/pkmInterface'
 import { getLevelGen12, getStats } from '../util/statCalc'
@@ -175,7 +175,7 @@ export default class PK2 {
     return new PK2(buffer)
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConversionStrategy = DefaultConversionStrategy): PK2 {
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): PK2 {
     return new PK2(ohpkm, { strategy })
   }
 

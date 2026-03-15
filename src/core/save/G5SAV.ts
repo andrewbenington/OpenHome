@@ -8,6 +8,7 @@ import { gen5StringToUTF } from '@openhome-core/save/util/Strings/StringConverte
 import { unique } from '@openhome-core/util/functional'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK5 } from '@pokemon-files/pkm'
+import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { hasDesamumeFooter, LookupType } from './util'
@@ -168,8 +169,8 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     this.updateMirrorsChecksum()
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK5 {
-    return new PK5(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK5 {
+    return PK5.fromOhpkm(ohpkm, strategy)
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean

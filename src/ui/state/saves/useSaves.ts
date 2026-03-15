@@ -17,6 +17,7 @@ import { displayIndexAdder, isBattleFormeItem } from '../../../core/pkm/util'
 import { BackendContext } from '../../backend/backendContext'
 import { PokedexUpdate } from '../../util/pokedex'
 import { AppInfoContext } from '../appInfo'
+import { useConvertStrategies } from '../convert-strategies'
 import { OhpkmStoreData } from '../ohpkm'
 import { IdentifierNotPresentError, useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import {
@@ -76,6 +77,7 @@ export function useSaves(): SavesAndBanksManager {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { openSavesState, openSavesDispatch, allOpenSaves, promptDisambiguation } =
     useContext(SavesContext)
+  const { defaultConvertStrategy } = useConvertStrategies()
   const filePickerOpen = useRef(false)
 
   if (openSavesState.error) {
@@ -654,7 +656,10 @@ export function useSaves(): SavesAndBanksManager {
         const save = saveFromIdentifier(location.saveIdentifier)
         ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, save)
 
-        save.boxes[location.box].boxSlots[location.boxSlot] = save.convertOhpkm(ohpkm)
+        save.boxes[location.box].boxSlots[location.boxSlot] = save.convertOhpkm(
+          ohpkm,
+          defaultConvertStrategy
+        )
         save.updatedBoxSlots.push({ box: location.box, boxSlot: location.boxSlot })
       }
 
@@ -663,7 +668,13 @@ export function useSaves(): SavesAndBanksManager {
 
       return R.Ok(null)
     },
-    [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore, saveFromIdentifier]
+    [
+      getMonAtHomeLocation,
+      getMonAtSaveLocation,
+      ohpkmStore,
+      saveFromIdentifier,
+      defaultConvertStrategy,
+    ]
   )
 
   const updateMonNotes = useCallback(

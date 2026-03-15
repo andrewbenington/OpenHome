@@ -11,7 +11,7 @@ import {
 import { ModernRibbons } from '@pokemon-resources/index'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import * as conversion from '../conversion'
-import { ConversionStrategy, DefaultConversionStrategy } from '../conversion/settings'
+import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { FourMoves } from '../util/pkmInterface'
@@ -325,7 +325,7 @@ export default class PK9 {
     return new PK9(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConversionStrategy = DefaultConversionStrategy): PK9 {
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): PK9 {
     return new PK9(ohpkm, { strategy })
   }
 

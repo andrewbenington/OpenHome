@@ -6,6 +6,7 @@ import * as conversion from '@pokemon-files/conversion'
 import { PK1 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
@@ -225,8 +226,8 @@ export class G1SAV extends OfficialSAV<PK1> {
     this.bytes[0x3523] = wholeSaveChecksum
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK1 {
-    return new PK1(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK1 {
+    return PK1.fromOhpkm(ohpkm, strategy)
   }
 
   supportsMon(dexNumber: number, formeNumber: number) {
