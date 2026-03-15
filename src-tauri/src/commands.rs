@@ -2,8 +2,9 @@ use crate::error::{Error, Result};
 use crate::pkm_storage::FilenameToBytesMap;
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloaded_plugins};
 use crate::state::{AppState, AppStateInner};
+use crate::storage::MONS_V2_DIR;
 use crate::util::ImageResponse;
-use crate::{menu, saves, util};
+use crate::{menu, saves, storage, util};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::fs;
@@ -38,7 +39,7 @@ pub fn get_file_created(absolute_path: PathBuf) -> Result<Option<u128>> {
 
 #[tauri::command]
 pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> Result<FilenameToBytesMap> {
-    let mons_path = util::prepend_appdata_storage_to_path(&app_handle, "mons_v2")?;
+    let mons_path = storage::get_path(&app_handle, MONS_V2_DIR)?;
     let mon_files = fs::read_dir(&mons_path).map_err(|e| Error::file_access(&mons_path, e))?;
 
     let mut map = HashMap::new();
@@ -67,13 +68,13 @@ pub fn delete_storage_files(
 ) -> HashMap<PathBuf, Result<()>> {
     let mut result = HashMap::new();
     for relative_path in relative_paths {
-        let full_path_r = util::prepend_appdata_storage_to_path(&app_handle, &relative_path);
+        let Ok(full_path) = storage::get_path(&app_handle, &relative_path) else {
+            continue;
+        };
 
         result.insert(
             relative_path.clone(),
-            full_path_r.and_then(|fp| {
-                fs::remove_file(fp).map_err(|e| Error::file_access(&relative_path, e))
-            }),
+            fs::remove_file(full_path).map_err(|e| Error::file_access(&relative_path, e)),
         );
     }
 
@@ -86,7 +87,7 @@ pub fn write_storage_file_bytes(
     relative_path: PathBuf,
     bytes: Vec<u8>,
 ) -> Result<()> {
-    let full_path = util::prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
+    let full_path = storage::get_path(&app_handle, relative_path)?;
     util::write_file_contents(full_path, bytes)
 }
 
@@ -104,7 +105,7 @@ fn write_storage_file_text(
     relative_path: PathBuf,
     text: String,
 ) -> Result<()> {
-    let full_path = util::prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
+    let full_path = storage::get_path(&app_handle, relative_path)?;
     util::write_file_contents(full_path, text)
 }
 
@@ -113,7 +114,7 @@ pub fn get_storage_file_json(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
 ) -> Result<Value> {
-    util::get_storage_file_json(&app_handle, &relative_path)
+    storage::read_file_json(&app_handle, &relative_path)
 }
 
 #[tauri::command]
