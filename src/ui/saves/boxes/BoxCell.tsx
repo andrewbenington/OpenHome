@@ -15,7 +15,7 @@ import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
-import { Button, Dialog, Flex, TextField, VisuallyHidden } from '@radix-ui/themes'
+import { Button, Dialog, Flex, TextField } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { useMonDisplay } from 'src/ui/hooks/useMonDisplay'
 import '../style.css'
@@ -170,7 +170,7 @@ function BoxCell({
   const monCtxMenuItemBuilders = mon
     ? [
         LabelBuilder.fromMon(mon),
-        ItemBuilder.fromLabel('Rename').withAction(openRenameDialog),
+        ItemBuilder.fromLabel('Change Nickname').withAction(openRenameDialog),
         tagSubmenu,
         displayColorSubmenu,
         mon.heldItemIndex > 0
@@ -258,21 +258,18 @@ function BoxCell({
       </OpenHomeCtxMenu>
       <Dialog.Root open={renameOpen} onOpenChange={setRenameOpen}>
         <Dialog.Content maxWidth="360px" style={{ padding: 16, borderRadius: 8 }}>
-          <VisuallyHidden>
-            <Dialog.Title>Rename Pokémon</Dialog.Title>
-            <Dialog.Description>Enter a new nickname for this Pokémon</Dialog.Description>
-          </VisuallyHidden>
-          <Flex direction="column" gap="3">
+          <Flex direction="column" gap="1">
+            <Dialog.Title>Rename {mon?.speciesMetadata?.name ?? 'Pokémon'}</Dialog.Title>
+            <Dialog.Description>Enter a nickname for this Pokémon</Dialog.Description>
+          </Flex>
+
+          <Flex direction="column" gap="3" mt="3">
             <TextField.Root
               value={renameValue}
               onChange={(e) => setRenameValue(e.target.value)}
-              placeholder="Nickname"
-              autoFocus
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') confirmRename()
-                if (e.key === 'Escape') setRenameOpen(false)
-              }}
+              placeholder={mon?.nickname}
             />
+
             <Flex gap="2" justify="end">
               <Button variant="soft" color="gray" onClick={() => setRenameOpen(false)}>
                 Cancel
