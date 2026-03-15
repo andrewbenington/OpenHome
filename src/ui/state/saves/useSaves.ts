@@ -65,6 +65,7 @@ export function useSaves(): SavesAndBanksManager {
     useContext(SavesContext)
   const { defaultConvertStrategy } = useConvertStrategies()
   const [, bagDispatch] = useContext(ItemBagContext)
+  const { defaultConvertStrategy } = useConvertStrategies()
   const filePickerOpen = useRef(false)
   const banksAndBoxes = useBanksAndBoxes()
 
