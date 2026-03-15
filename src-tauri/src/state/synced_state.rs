@@ -84,7 +84,8 @@ impl AllSyncedState {
     pub fn save_to_files(&self, app_handle: &tauri::AppHandle) -> Result<()> {
         let locked = self.lock()?;
         locked.ohpkm_store.0.write_to_mons_v2(app_handle)?;
-        locked.lookups.0.write_to_files(app_handle)
+        locked.lookups.0.write_to_files(app_handle)?;
+        locked.conversion_settings.0.write_to_files(app_handle)
     }
 }
 
