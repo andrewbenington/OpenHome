@@ -189,7 +189,10 @@ export class LGPESAV extends OfficialSAV<PB7> {
     const monBytes = this.bytes.slice(startByte, endByte)
     const mon = PB7.fromBytes(monBytes.buffer, true)
 
-    if (mon.checksum === EMPTY_SLOT_CHECKSUM && mon.encryptionConstant === 0) {
+    if (
+      mon.dexNum === 0 ||
+      (mon.checksum === EMPTY_SLOT_CHECKSUM && mon.encryptionConstant === 0)
+    ) {
       return null
     }
 
