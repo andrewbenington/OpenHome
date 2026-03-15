@@ -68,7 +68,7 @@ pub fn run() {
             };
 
             let conversion_settings =
-                match state::ConversionSettings::load_from_storage(app.handle()) {
+                match state::ConvertStrategies::load_from_storage(app.handle()) {
                     Ok(settings) => settings,
                     Err(err) => {
                         util::show_error_dialog(
@@ -150,6 +150,8 @@ pub fn run() {
             state::add_to_ohpkm_store,
             state::get_pokedex,
             state::update_pokedex,
+            state::get_convert_strategies,
+            state::update_convert_strategies,
             state::start_transaction,
             state::rollback_transaction,
             state::commit_transaction,

@@ -4,8 +4,7 @@ import { Card, RadioGroup, Select, Separator } from '@radix-ui/themes'
 import { useContext, useEffect } from 'react'
 import { Route, Routes } from 'react-router'
 import {
-  ConversionStrategy,
-  DefaultConversionStrategy,
+  ConvertStrategy,
   displaySettingsCategory,
   getSettingsCategory,
   SETTINGS_SCHEMA,
@@ -13,6 +12,7 @@ import {
 } from '../../../packages/pokemon-files/src/conversion/settings'
 import SideTabs from '../components/side-tabs/SideTabs'
 import { usePathSegment } from '../hooks/routing'
+import { useConvertStrategies } from '../state/convert-strategies'
 
 export default function Settings() {
   const [appInfoState, dispatchAppInfoState] = useContext(AppInfoContext)
@@ -71,20 +71,14 @@ export default function Settings() {
       <Routes>
         <Route index path="" element={generalElement} />
         <Route path="general" element={generalElement} />
-        <Route
-          path="conversion"
-          element={<PKMConversion conversionSettings={DefaultConversionStrategy} />}
-        />
+        <Route path="conversion" element={<PKMConversion />} />
       </Routes>
     </SideTabs.Root>
   )
 }
 
-interface PKMConversionProps {
-  conversionSettings: ConversionStrategy
-}
-
-function PKMConversion({ conversionSettings }: PKMConversionProps) {
+function PKMConversion() {
+  const { defaultConvertStrategy, updateDefaultConvertStrategy } = useConvertStrategies()
   return (
     <Card style={{ margin: 8, width: '100%' }}>
       <b>PKM Conversion Settings</b>
@@ -100,11 +94,14 @@ function PKMConversion({ conversionSettings }: PKMConversionProps) {
               {setting.type === 'boolean' && (
                 <input
                   type="checkbox"
-                  onChange={
-                    (e) => console.log(`New value for ${key}:`, e.target.checked) /* TODO */
+                  onChange={(e) =>
+                    updateDefaultConvertStrategy({
+                      ...defaultConvertStrategy,
+                      [key]: e.target.checked,
+                    })
                   }
                   checked={
-                    (conversionSettings[key as keyof ConversionStrategy] as boolean | undefined) ??
+                    (defaultConvertStrategy[key as keyof ConvertStrategy] as boolean | undefined) ??
                     setting.default
                   }
                   style={{ marginLeft: 8 }}
@@ -115,7 +112,15 @@ function PKMConversion({ conversionSettings }: PKMConversionProps) {
             {setting.type === 'string' && setting.enum && (
               <Select.Root
                 value={
-                  conversionSettings[key as keyof ConversionStrategy] as (typeof setting)['default']
+                  defaultConvertStrategy[
+                    key as keyof ConvertStrategy
+                  ] as (typeof setting)['default']
+                }
+                onValueChange={(newValue) =>
+                  updateDefaultConvertStrategy({
+                    ...defaultConvertStrategy,
+                    [key]: newValue,
+                  })
                 }
                 size="1"
               >

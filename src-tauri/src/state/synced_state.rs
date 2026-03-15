@@ -6,7 +6,7 @@ use serde::Serialize;
 use tauri::Emitter;
 
 use crate::error::{Error, Result};
-use crate::state::{ConversionSettings, LookupState, OhpkmBytesStore};
+use crate::state::{ConvertStrategies, LookupState, OhpkmBytesStore};
 
 pub trait SyncedState: Clone + Serialize + tauri::ipc::IpcResponse {
     const ID: &'static str;
@@ -55,7 +55,7 @@ impl<State: SyncedState> SyncedStateWrapper<State> {
 pub struct AllSyncedStateInner {
     pub lookups: SyncedStateWrapper<LookupState>,
     pub ohpkm_store: SyncedStateWrapper<OhpkmBytesStore>,
-    pub conversion_settings: SyncedStateWrapper<ConversionSettings>,
+    pub convert_strategies: SyncedStateWrapper<ConvertStrategies>,
 }
 
 pub struct AllSyncedState(pub Mutex<AllSyncedStateInner>);
@@ -64,12 +64,12 @@ impl AllSyncedState {
     pub fn from_states(
         lookups: LookupState,
         ohpkm_store: OhpkmBytesStore,
-        conversion_settings: ConversionSettings,
+        convert_strategies: ConvertStrategies,
     ) -> Self {
         Self(Mutex::new(AllSyncedStateInner {
             lookups: SyncedStateWrapper(lookups),
             ohpkm_store: SyncedStateWrapper(ohpkm_store),
-            conversion_settings: SyncedStateWrapper(conversion_settings),
+            convert_strategies: SyncedStateWrapper(convert_strategies),
         }))
     }
 
@@ -81,11 +81,15 @@ impl AllSyncedState {
         Ok(self.lock()?.ohpkm_store.0.to_b64_map())
     }
 
+    pub fn get_convert_strategies(&self) -> Result<ConvertStrategies> {
+        Ok(self.lock()?.convert_strategies.0.clone())
+    }
+
     pub fn save_to_files(&self, app_handle: &tauri::AppHandle) -> Result<()> {
         let locked = self.lock()?;
         locked.ohpkm_store.0.write_to_mons_v2(app_handle)?;
         locked.lookups.0.write_to_files(app_handle)?;
-        locked.conversion_settings.0.write_to_files(app_handle)
+        locked.convert_strategies.0.write_to_files(app_handle)
     }
 }
 

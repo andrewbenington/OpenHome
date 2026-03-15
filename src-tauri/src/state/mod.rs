@@ -1,11 +1,11 @@
 mod app_state;
-mod conversion_settings;
+mod convert_strategies;
 mod lookup;
 mod ohpkm_store;
 mod pokedex;
 
 pub use app_state::*;
-pub use conversion_settings::*;
+pub use convert_strategies::*;
 pub use lookup::*;
 pub use ohpkm_store::*;
 pub use pokedex::*;

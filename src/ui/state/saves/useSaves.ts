@@ -15,6 +15,7 @@ import { BackendContext } from '../../backend/backendContext'
 import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { PokedexUpdate } from '../../util/pokedex'
 import { AppInfoContext } from '../appInfo'
+import { useConvertStrategies } from '../convert-strategies'
 import { ItemBagContext } from '../items'
 import { OhpkmStoreData } from '../ohpkm'
 import { IdentifierNotPresentError, useOhpkmStore } from '../ohpkm/useOhpkmStore'
@@ -72,6 +73,7 @@ export function useSaves(): SavesAndBanksManager {
   const { openSavesState, openSavesDispatch, allOpenSaves, promptDisambiguation } =
     useContext(SavesContext)
   const [, bagDispatch] = useContext(ItemBagContext)
+  const { defaultConvertStrategy } = useConvertStrategies()
   const filePickerOpen = useRef(false)
   const banksAndBoxes = useBanksAndBoxes()
 
@@ -455,7 +457,10 @@ export function useSaves(): SavesAndBanksManager {
         const save = saveFromIdentifier(location.saveIdentifier)
         ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, save)
 
-        save.boxes[location.box].boxSlots[location.boxSlot] = save.convertOhpkm(ohpkm)
+        save.boxes[location.box].boxSlots[location.boxSlot] = save.convertOhpkm(
+          ohpkm,
+          defaultConvertStrategy
+        )
         save.updatedBoxSlots.push({ box: location.box, boxSlot: location.boxSlot })
       }
 
@@ -464,7 +469,13 @@ export function useSaves(): SavesAndBanksManager {
 
       return R.Ok(null)
     },
-    [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore, saveFromIdentifier]
+    [
+      getMonAtHomeLocation,
+      getMonAtSaveLocation,
+      ohpkmStore,
+      saveFromIdentifier,
+      defaultConvertStrategy,
+    ]
   )
 
   const setMonNickname = useCallback(
@@ -485,14 +496,23 @@ export function useSaves(): SavesAndBanksManager {
         const save = saveFromIdentifier(location.saveIdentifier)
         ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, save)
 
-        save.boxes[location.box].boxSlots[location.boxSlot] = save.convertOhpkm(ohpkm)
+        save.boxes[location.box].boxSlots[location.boxSlot] = save.convertOhpkm(
+          ohpkm,
+          defaultConvertStrategy
+        )
         save.updatedBoxSlots.push({ box: location.box, boxSlot: location.boxSlot })
       }
 
       ohpkm.nickname = nickname
       ohpkmStore.insertOrUpdate(ohpkm)
     },
-    [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore, saveFromIdentifier]
+    [
+      getMonAtHomeLocation,
+      getMonAtSaveLocation,
+      ohpkmStore,
+      saveFromIdentifier,
+      defaultConvertStrategy,
+    ]
   )
 
   const updateMonNotes = useCallback(

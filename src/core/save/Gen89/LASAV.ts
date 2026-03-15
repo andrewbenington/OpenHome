@@ -3,6 +3,7 @@ import { ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { PA8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { LA_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../../pkm/OHPKM'
 import { SCArrayBlock, SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
@@ -45,8 +46,8 @@ export class LASAV extends G89SAV<PA8> {
     this.displayID = this.tid.toString().padStart(6, '0')
   }
 
-  convertOhpkm(ohpkm: OHPKM): PA8 {
-    return new PA8(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PA8 {
+    return PA8.fromOhpkm(ohpkm, strategy)
   }
 
   getBoxCount(): number {

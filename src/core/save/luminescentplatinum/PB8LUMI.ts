@@ -5,7 +5,7 @@ import { PluginIdentifier } from '../interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { ExtraFormIndex, luminescentSupportsExtraForm } from '@pkm-rs/pkg'
 import {
-  ConversionStrategy,
+  ConvertStrategy,
   DefaultConversionStrategy,
 } from '../../../../packages/pokemon-files/src/conversion/settings'
 import {
@@ -73,10 +73,7 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
     return new PB8LUMI(buffer, { encrypted })
   }
 
-  static fromOhpkm(
-    ohpkm: OHPKM,
-    strategy: ConversionStrategy = DefaultConversionStrategy
-  ): PB8LUMI {
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): PB8LUMI {
     return new PB8LUMI(ohpkm, { strategy })
   }
 

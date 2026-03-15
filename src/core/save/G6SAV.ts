@@ -6,6 +6,7 @@ import {
 import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConverter'
 import { ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK6 } from '@pokemon-files/pkm'
+import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
@@ -117,8 +118,8 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
     this.bytes.set(uint16ToBytesLittleEndian(this.calculatePcChecksum()), this.pcChecksumOffset)
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK6 {
-    return new PK6(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK6 {
+    return PK6.fromOhpkm(ohpkm, strategy)
   }
 
   abstract supportsMon(

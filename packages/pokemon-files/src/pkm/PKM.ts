@@ -3,7 +3,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import PK3RR from '@openhome-core/save/radicalred/PK3RR'
 import PK3UB from '@openhome-core/save/unbound/PK3UB'
-import { ConversionStrategy, DefaultConversionStrategy } from '../conversion/settings'
+import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import COLOPKM from './COLOPKM'
 import PA8 from './PA8'
 import PA9 from './PA9'
@@ -42,7 +42,7 @@ export type RomHackPKM = PK3RR | PK3UB | PB8LUMI
 export type PkmClass<P extends PKMInterface> = {
   new (arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions): P
   fromBytes(bytes: ArrayBuffer, encrypted?: boolean): P
-  fromOhpkm(ohpkm: OHPKM, strategy: ConversionStrategy): P
+  fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
   getName(): MonFormat
 }
 
@@ -53,7 +53,7 @@ export type PkmConstructorOptions =
     }
   | {
       encrypted?: never
-      strategy: ConversionStrategy
+      strategy: ConvertStrategy
     }
 
 export const DefaultConstructorOptions: PkmConstructorOptions = {

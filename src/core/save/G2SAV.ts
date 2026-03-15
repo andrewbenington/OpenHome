@@ -6,6 +6,7 @@ import { PK2 } from '@pokemon-files/pkm'
 import { EXCLAMATION } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
@@ -202,8 +203,8 @@ export class G2SAV extends OfficialSAV<PK2> {
     }
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK2 {
-    return new PK2(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK2 {
+    return PK2.fromOhpkm(ohpkm, strategy)
   }
 
   areGoldSilverChecksumsValid() {

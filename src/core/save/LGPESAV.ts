@@ -6,6 +6,7 @@ import { LGE_STARTER, LGP_STARTER } from '@pokemon-resources/consts/Formes'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { LGPE_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { CRC16_NoInvert } from './encryption/Encryption'
 import { Box, BoxAndSlot, OfficialSAV, SlotMetadata } from './interfaces'
@@ -178,8 +179,8 @@ export class LGPESAV extends OfficialSAV<PB7> {
     return nextEmptyIndex
   }
 
-  convertOhpkm(ohpkm: OHPKM): PB7 {
-    return new PB7(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB7 {
+    return PB7.fromOhpkm(ohpkm, strategy)
   }
 
   getMonAtIndex(monIndex: number) {

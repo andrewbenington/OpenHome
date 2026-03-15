@@ -1,6 +1,7 @@
 import { ExtraFormIndex, Gender, luminescentSupportsExtraForm, OriginGame } from '@pkm-rs/pkg'
 import { utf16BytesToString } from '@pokemon-files/util'
 
+import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, BoxAndSlot, PluginSAV, SlotMetadata } from '../interfaces'
@@ -200,8 +201,8 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   }
 
   // Converts an OpenHome Pokémon into the Luminescent format
-  convertOhpkm(ohpkm: OHPKM): PB8LUMI {
-    return PB8LUMI.fromOhpkm(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB8LUMI {
+    return PB8LUMI.fromOhpkm(ohpkm, strategy)
   }
 
   // Writes modified Pokémon back into the save buffer

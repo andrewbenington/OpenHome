@@ -1,13 +1,13 @@
 import { Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { MonFormat } from '../../../../src/core/pkm/interfaces'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
-import { ConversionStrategy, DefaultConversionStrategy, FullConversionStrategy } from './settings'
+import { ConvertStrategy, DefaultConversionStrategy, FullConversionStrategy } from './settings'
 
 export class PkmConverter {
   format: MonFormat
   strategy: FullConversionStrategy
 
-  constructor(format: MonFormat, strategy?: ConversionStrategy) {
+  constructor(format: MonFormat, strategy?: ConvertStrategy) {
     this.format = format
     this.strategy = { ...DefaultConversionStrategy, ...strategy }
   }

@@ -9,7 +9,7 @@ import {
   OriginGame,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { ConversionStrategy, DefaultConversionStrategy } from '@pokemon-files/conversion/settings'
+import { ConvertStrategy, DefaultConversionStrategy } from '@pokemon-files/conversion/settings'
 import { DefaultConstructorOptions, PkmConstructorOptions } from '@pokemon-files/pkm/PKM'
 import {
   FourMoves,
@@ -334,7 +334,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   static fromOhpkm<T extends PK3CFRU>(
     this: new (ohpkm: OHPKM, options: PkmConstructorOptions) => T,
     ohpkm: OHPKM,
-    strategy: ConversionStrategy = DefaultConversionStrategy
+    strategy: ConvertStrategy = DefaultConversionStrategy
   ): T {
     return new this(ohpkm, { strategy })
   }
