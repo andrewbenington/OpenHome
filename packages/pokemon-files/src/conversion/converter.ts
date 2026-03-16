@@ -14,9 +14,6 @@ export class PkmConverter {
   nickname(ohpkm: OHPKM): string {
     const speciesName = ohpkm.speciesMetadata?.name
     if (!speciesName || ohpkm.nickname.toUpperCase() !== speciesName.toUpperCase()) {
-      console.log(
-        `Nickname "${ohpkm.nickname}" does not match species name "${speciesName}", so it will be preserved as-is.`
-      )
       return ohpkm.nickname
     }
 

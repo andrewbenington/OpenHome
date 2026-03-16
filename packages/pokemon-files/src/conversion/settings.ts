@@ -6,8 +6,8 @@ type SettingDescriptor =
       type: 'string'
       default: string
       description: string
-      enum?: string[] // allowed values
-      deprecated?: string // deprecation message
+      allowed_values?: string[]
+      deprecated?: string
     }
   | {
       display: string
@@ -15,17 +15,16 @@ type SettingDescriptor =
       default: boolean
       description: string
       maximum?: number
-      deprecated?: string // deprecation message
+      deprecated?: string
     }
   | {
       display: string
       type: 'number'
       default: number
       description: string
-      enum?: number[] // allowed values
-      minimum?: number // for numbers
+      minimum?: number
       maximum?: number
-      deprecated?: string // deprecation message
+      deprecated?: string
     }
 
 type SettingsCategory = 'nickname' | 'metLocation'
@@ -51,7 +50,7 @@ export const SETTINGS_SCHEMA = {
   'nickname.capitalization': {
     type: 'string',
     default: 'gameDefault',
-    enum: ['gameDefault', 'modern'],
+    allowed_values: ['gameDefault', 'modern'],
     description:
       'Decides how unnicknamed Pokémon are capitalized when converted. "gameDefault" uses the capitalization from the original game, while "modern" capitalizes all nicknames in the modern style.',
     display: 'Capitalization',
@@ -66,7 +65,9 @@ export const SETTINGS_SCHEMA = {
 } satisfies Record<SettingsSubcategory, SettingDescriptor>
 
 type Schema = typeof SETTINGS_SCHEMA
-type SettingValue<T extends SettingDescriptor> = T extends { enum: ReadonlyArray<infer U> }
+type SettingValue<T extends SettingDescriptor> = T extends {
+  allowed_values: ReadonlyArray<infer U>
+}
   ? U
   : T['default']
 
