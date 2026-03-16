@@ -1,11 +1,11 @@
 import { R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
-import { AppState } from '@openhome-ui/backend/backendInterface'
+import { AppState as TransactionState } from '@openhome-ui/backend/backendInterface'
 import { createContext, useContext, useState } from 'react'
 
-type PossiblyLoadedAppState =
+type PossiblyLoadedTransactionState =
   | {
-      state: AppState
+      state: TransactionState
       loaded: true
       error?: undefined
     }
@@ -15,33 +15,33 @@ type PossiblyLoadedAppState =
       error?: string
     }
 
-export const AppStateContext = createContext<AppState | null>(null)
+export const TransactionStateContext = createContext<TransactionState | null>(null)
 
-export function useAppState(): AppState {
-  const appState = useContext(AppStateContext)
+export function useTransactionState(): TransactionState {
+  const appState = useContext(TransactionStateContext)
 
-  // AppStateProvider should only render children once state is loaded. If state is not loaded, this was called outside AppStateProvider.
+  // TransactionStateProvider should only render children once state is loaded. If state is not loaded, this was called outside TransactionStateProvider.
   if (!appState) {
-    throw new Error('useAppState() called outside of AppStateProvider')
+    throw new Error('useTransactionState() called outside of TransactionStateProvider')
   }
 
   return appState
 }
 
-export function usePossiblyLoadedAppState(): PossiblyLoadedAppState {
-  const [appState, setAppState] = useState<AppState>()
+export function usePossiblyLoadedTxState(): PossiblyLoadedTransactionState {
+  const [transactionState, setTransactionState] = useState<TransactionState>()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
   const backend = useContext(BackendContext)
 
-  if (!loading && !error && !appState) {
+  if (!loading && !error && !transactionState) {
     setLoading(true)
     backend
       .getState()
       .then(
         R.match(
           (state) => {
-            setAppState(state)
+            setTransactionState(state)
             setLoading(false)
             setError(undefined)
           },
@@ -56,10 +56,9 @@ export function usePossiblyLoadedAppState(): PossiblyLoadedAppState {
         setError(String(e))
       })
   }
-
-  if (!appState) {
+  if (!transactionState) {
     return { error, loaded: false }
   } else {
-    return { state: appState, loaded: true }
+    return { state: transactionState, loaded: true }
   }
 }

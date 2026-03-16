@@ -1,22 +1,21 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { getSortFunctionNullable } from '@openhome-core/pkm/sort'
 import { getSaveRef, SAV, SaveIdentifier } from '@openhome-core/save/interfaces'
 import { monSupportedBySave, SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
-import { BoxMonIdentifiers } from '@openhome-core/save/util/storage'
-import { Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
+import { Option, R, Result } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { Item } from '@pkm-rs/pkg'
 import { MarkingsSixShapesWithColor } from '@pokemon-files/util'
 import { useCallback, useContext, useRef } from 'react'
-import { AddBoxLocation, BankBoxCoordinates, OpenHomeBanks } from 'src/core/save/HomeData'
 import { displayIndexAdder, isBattleFormeItem } from '../../../core/pkm/util'
 import { BackendContext } from '../../backend/backendContext'
+import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { PokedexUpdate } from '../../util/pokedex'
 import { AppInfoContext } from '../appInfo'
+import { ItemBagContext } from '../items'
 import { OhpkmStoreData } from '../ohpkm'
 import { IdentifierNotPresentError, useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import {
@@ -28,26 +27,8 @@ import {
   SavesContext,
 } from './reducer'
 
-export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
+export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'homeData'>> & {
   allOpenSaves: readonly SAV[]
-
-  switchToBank(bankIndex: number): void
-  setCurrentBankName(newName: string | undefined): void
-  addBank(name: string | undefined, boxCount: number): void
-  setBoxNameCurrentBank(boxIndex: number, newName: string | undefined): void
-
-  removeDupesFromHomeBox(boxIndex: number): void
-  sortHomeBox(boxIndex: number, sortType: string): void
-  sortAllHomeBoxes(sortType: string): void
-
-  reorderBoxesCurrentBank(idsInNewOrder: string[]): void
-  addBoxCurrentBank(position: AddBoxLocation, identifiers?: BoxMonIdentifiers): void
-  deleteBoxCurrentBank(boxId: string, boxIndex: number): void
-  newBoxesWithIds(ids: OhpkmIdentifier[], boxName?: string): Option<number>
-
-  homeBoxNavigateLeft(): void
-  homeBoxNavigateRight(): void
-  homeBoxSetCurrent(index: number): void
 
   importMonsToLocation(mons: PKMInterface[], startingAt: MonLocation): void
 
@@ -78,6 +59,10 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error'>> & {
     monId: string,
     tags: { label: string; color: string; icon?: string }[] | undefined
   ): void
+  moveMonItemToBag: (monLocation: MonLocation) => void
+  giveItemToMon: (monLocation: MonLocation, item: Item) => void
+
+  allMonsInCurrentBank: () => string[]
 }
 
 export function useSaves(): SavesAndBanksManager {
@@ -86,66 +71,29 @@ export function useSaves(): SavesAndBanksManager {
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { openSavesState, openSavesDispatch, allOpenSaves, promptDisambiguation } =
     useContext(SavesContext)
+  const [, bagDispatch] = useContext(ItemBagContext)
   const filePickerOpen = useRef(false)
+  const banksAndBoxes = useBanksAndBoxes()
 
   if (openSavesState.error) {
     throw new Error(`Error loading saves state: ${openSavesState.error}`)
   }
+  const {
+    getCurrentBank,
 
-  const homeData = openSavesState.homeData
-  if (!homeData) {
-    throw new Error(
-      `Home Data not present. useSaves() must not be called in a component that is not descended from a SavesProvider.`
-    )
-  }
+    getMonAtHomeLocation,
+    homeLocationIsEmpty,
+    clearAtHomeLocation,
+    setAtHomeLocation,
+    findHomeLocation,
 
-  const loadedHomeData = homeData
+    allMonsInCurrentBank,
+    firstHomeBoxEmptySlot,
+  } = banksAndBoxes
 
   const saveFromIdentifier = useCallback(
     (identifier: SaveIdentifier) => openSavesState.openSaves[identifier].save,
     [openSavesState.openSaves]
-  )
-
-  const switchToBank = useCallback(
-    (bankIndex: number) => {
-      openSavesDispatch({
-        type: 'set_current_home_bank',
-        payload: { bank: bankIndex },
-      })
-    },
-    [openSavesDispatch]
-  )
-
-  const setCurrentBankName = useCallback(
-    (newName: string | undefined) => {
-      openSavesDispatch({
-        type: 'set_home_bank_name',
-        payload: { bank: loadedHomeData.currentBankIndex, name: newName },
-      })
-    },
-    [loadedHomeData.currentBankIndex, openSavesDispatch]
-  )
-
-  const addBank = useCallback(
-    (name: string | undefined, boxCount: number) => {
-      openSavesDispatch({
-        type: 'add_home_bank',
-        payload: {
-          name,
-          boxCount: boxCount,
-          currentCount: loadedHomeData.banks.length ?? 0,
-          switchToBank: true,
-        },
-      })
-    },
-    [loadedHomeData.banks.length, openSavesDispatch]
-  )
-
-  const getMonAtHomeLocation = useCallback(
-    (location: HomeMonLocation) => {
-      return loadedHomeData.getAtLocation(location)
-    },
-    [loadedHomeData]
   )
 
   const getMonAtSaveLocation = useCallback(
@@ -250,14 +198,14 @@ export function useSaves(): SavesAndBanksManager {
       }
 
       if (!mon) {
-        loadedHomeData.clearAtLocation(location)
+        clearAtHomeLocation(location)
       } else if (ohpkm) {
-        loadedHomeData.setAtLocation(location, ohpkm.openhomeId)
+        setAtHomeLocation(location, ohpkm.openhomeId)
       }
 
       return displacedMonId
     },
-    [getMonAtHomeLocation, loadedHomeData, ohpkmStore, saveFromIdentifier]
+    [clearAtHomeLocation, getMonAtHomeLocation, ohpkmStore, saveFromIdentifier, setAtHomeLocation]
   )
 
   const moveOhpkmToHome = useCallback(
@@ -268,15 +216,19 @@ export function useSaves(): SavesAndBanksManager {
     ) => {
       // this is a bandaid fix for the issue of onDrop() being triggered multiple times for BoxCell. For
       // some reason it only affects the OpenHome boxes.
-      if (skipIfPresent && identifier && loadedHomeData.findIfPresent(identifier)) {
+      if (skipIfPresent && identifier && findHomeLocation(identifier)) {
         return undefined
       }
 
       const displacedMonId = getMonAtHomeLocation(dest)
-      loadedHomeData.setAtLocation(dest, identifier)
+      if (identifier) {
+        setAtHomeLocation(dest, identifier)
+      } else {
+        clearAtHomeLocation(dest)
+      }
       return displacedMonId
     },
-    [getMonAtHomeLocation, loadedHomeData]
+    [clearAtHomeLocation, findHomeLocation, getMonAtHomeLocation, setAtHomeLocation]
   )
 
   const importMonsToLocation = useCallback(
@@ -287,11 +239,11 @@ export function useSaves(): SavesAndBanksManager {
       if (dest.isHome) {
         let nextSlot = dest
 
-        const currentBankBoxCount = loadedHomeData.getCurrentBankBoxes().length
+        const currentBankBoxCount = getCurrentBank().boxes.size
         mons.forEach((mon) => {
-          while (!loadedHomeData.slotIsEmpty(nextSlot) && nextSlot.box < currentBankBoxCount) {
+          while (!homeLocationIsEmpty(nextSlot) && nextSlot.box < currentBankBoxCount) {
             nextSlot.boxSlot++
-            if (nextSlot.boxSlot >= OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS) {
+            if (nextSlot.boxSlot >= OPENHOME_BOX_SLOTS) {
               nextSlot.boxSlot = 0
               nextSlot.box++
             }
@@ -304,7 +256,7 @@ export function useSaves(): SavesAndBanksManager {
             moveOhpkmToHome(homeMon.openhomeId, nextSlot, true)
             addedMons.push(homeMon)
             nextSlot.boxSlot++
-            if (nextSlot.boxSlot >= OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS) {
+            if (nextSlot.boxSlot >= OPENHOME_BOX_SLOTS) {
               nextSlot.boxSlot = 0
               nextSlot.box++
             }
@@ -340,175 +292,14 @@ export function useSaves(): SavesAndBanksManager {
       return { ...openSavesState, openSaves: { ...openSavesState.openSaves } }
     },
     [
-      loadedHomeData,
+      getCurrentBank,
+      homeLocationIsEmpty,
       moveMonBetweenSaves,
       moveOhpkmToHome,
       ohpkmStore,
       openSavesState,
       saveFromIdentifier,
     ]
-  )
-
-  const reorderBoxesCurrentBank = useCallback(
-    (idsInNewOrder: string[]) => {
-      openSavesDispatch({
-        type: 'reorder_home_boxes',
-        payload: { idsInNewOrder },
-      })
-    },
-    [openSavesDispatch]
-  )
-
-  const homeBoxNavigateLeft = useCallback(() => {
-    const currentBankBoxCount = loadedHomeData.getCurrentBankBoxes().length
-    openSavesDispatch({
-      type: 'set_home_box',
-      payload: {
-        boxIndex:
-          loadedHomeData.currentPCBox > 0
-            ? loadedHomeData.currentPCBox - 1
-            : currentBankBoxCount - 1,
-      },
-    })
-  }, [loadedHomeData, openSavesDispatch])
-
-  const homeBoxNavigateRight = useCallback(() => {
-    const currentBankBoxCount = loadedHomeData.getCurrentBankBoxes().length
-    openSavesDispatch({
-      type: 'set_home_box',
-      payload: {
-        boxIndex: (loadedHomeData.currentPCBox + 1) % currentBankBoxCount,
-      },
-    })
-  }, [loadedHomeData, openSavesDispatch])
-
-  const homeBoxSetCurrent = useCallback(
-    (index: number) => {
-      openSavesDispatch({
-        type: 'set_home_box',
-        payload: { boxIndex: index },
-      })
-    },
-    [openSavesDispatch]
-  )
-
-  const deleteBoxCurrentBank = useCallback(
-    (boxId: string, boxIndex: number) => {
-      openSavesDispatch({
-        type: 'delete_home_box',
-        payload: { index: boxIndex, id: boxId },
-      })
-    },
-    [openSavesDispatch]
-  )
-
-  const setBoxNameCurrentBank = useCallback(
-    (boxIndex: number, newName: string | undefined) => {
-      openSavesDispatch({
-        type: 'set_home_box_name',
-        payload: { name: newName, index: boxIndex },
-      })
-    },
-    [openSavesDispatch]
-  )
-
-  const removeDupesFromHomeBox = useCallback(
-    (boxIndex: number) => {
-      openSavesDispatch({ type: 'home_box_remove_dupes', payload: { boxIndex } })
-    },
-    [openSavesDispatch]
-  )
-
-  const sortHomeBox = useCallback(
-    (boxIndex: number, sortType: string): Result<null, IdentifierNotPresentError[]> => {
-      const loadResults = ohpkmStore.tryLoadFromIds(
-        loadedHomeData.getCurrentBox().allContainedMons()
-      )
-      const { successes: mons, failures } = partitionResults(loadResults)
-      if (failures.length) {
-        return R.Err(failures)
-      }
-
-      const sorted = mons.toSorted(getSortFunctionNullable(sortType))
-      const box = loadedHomeData.getCurrentBankBoxes()[boxIndex]
-
-      for (const i of range(box.slotCount())) {
-        const location: BankBoxCoordinates = {
-          bank: loadedHomeData.currentBankIndex,
-          box: boxIndex,
-          boxSlot: i,
-        }
-        if (i < sorted.length) {
-          loadedHomeData.setAtLocation(location, sorted[i].openhomeId)
-        } else {
-          loadedHomeData.clearAtLocation(location)
-        }
-      }
-
-      openSavesDispatch({
-        type: 'update_home_data',
-        payload: { homeData: loadedHomeData },
-      })
-
-      return R.Ok(null)
-    },
-    [loadedHomeData, ohpkmStore, openSavesDispatch]
-  )
-
-  const sortAllHomeBoxes = useCallback(
-    (sortType: string): Result<null, IdentifierNotPresentError[]> => {
-      const loadResults = ohpkmStore.tryLoadFromIds(
-        loadedHomeData.getCurrentBank().allContainedMons()
-      )
-      const { successes: allMons, failures } = partitionResults(loadResults)
-      if (failures.length) {
-        return R.Err(failures)
-      }
-
-      const sorted = allMons.toSorted(getSortFunctionNullable(sortType))
-      const boxSize = OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS
-
-      const currentBankIndex = loadedHomeData.currentBankIndex
-      const currentBankBoxCount = loadedHomeData.getCurrentBankBoxes().length
-
-      for (const box of range(currentBankBoxCount)) {
-        for (const slot of range(boxSize)) {
-          const location = {
-            bank: currentBankIndex,
-            box,
-            boxSlot: slot,
-          }
-          const monIndex = box * boxSize + slot
-          if (monIndex < sorted.length) {
-            loadedHomeData.setAtLocation(location, sorted[monIndex].openhomeId)
-          } else {
-            loadedHomeData.clearAtLocation(location)
-          }
-        }
-      }
-
-      openSavesDispatch({
-        type: 'update_home_data',
-        payload: { homeData: loadedHomeData },
-      })
-
-      return R.Ok(null)
-    },
-    [loadedHomeData, ohpkmStore, openSavesDispatch]
-  )
-
-  const addBoxCurrentBank = useCallback(
-    (location: AddBoxLocation = 'end', identifiers: BoxMonIdentifiers) => {
-      openSavesDispatch({
-        type: 'add_home_box',
-        payload: {
-          location,
-          currentBoxCount: loadedHomeData.getCurrentBankBoxes().length,
-          identifiers,
-        },
-      })
-    },
-    [openSavesDispatch, loadedHomeData]
   )
 
   const saveBoxNavigateLeft = useCallback(
@@ -706,8 +497,6 @@ export function useSaves(): SavesAndBanksManager {
 
   const updateMonNotes = useCallback(
     (monId: string, notes: string | undefined) => {
-      if (!homeData) return
-
       const result = ohpkmStore.tryLoadFromId(monId)
       if (R.isErr(result)) return result
 
@@ -716,13 +505,11 @@ export function useSaves(): SavesAndBanksManager {
 
       ohpkmStore.insertOrUpdate(mon)
     },
-    [homeData, ohpkmStore]
+    [ohpkmStore]
   )
 
   const updateMonMarkings = useCallback(
     (monId: string, markings: MarkingsSixShapesWithColor) => {
-      if (!homeData) return
-
       const result = ohpkmStore.tryLoadFromId(monId)
       if (R.isErr(result)) return result
 
@@ -731,7 +518,7 @@ export function useSaves(): SavesAndBanksManager {
 
       ohpkmStore.insertOrUpdate(mon)
     },
-    [homeData, ohpkmStore]
+    [ohpkmStore]
   )
 
   function moveMon(source: MonLocation, dest: MonLocation) {
@@ -765,20 +552,17 @@ export function useSaves(): SavesAndBanksManager {
         moveMonBetweenSaves(dest.saveIdentifier, displacedMon, source)
       }
     }
-
-    openSavesDispatch({ type: 'set_home_data', payload: loadedHomeData })
   }
 
   const releaseMonById = useCallback(
     (id: OhpkmIdentifier) => {
       openSavesDispatch({ type: 'release_mon_by_id', payload: id })
-      const location = loadedHomeData.findIfPresent(id)
+      const location = findHomeLocation(id)
       if (location) {
-        loadedHomeData.setAtLocation(location, undefined)
-        openSavesDispatch({ type: 'set_home_data', payload: loadedHomeData.clone() })
+        clearAtHomeLocation(location)
       }
     },
-    [loadedHomeData, openSavesDispatch]
+    [clearAtHomeLocation, findHomeLocation, openSavesDispatch]
   )
 
   const releaseMonAtLocation = useCallback(
@@ -813,27 +597,24 @@ export function useSaves(): SavesAndBanksManager {
 
   const recoverMonToBox = useCallback(
     (id: OhpkmIdentifier, boxIndex: number) => {
-      const box = loadedHomeData.getCurrentBank().getBox(boxIndex)
+      const box = getCurrentBank().boxes.get(boxIndex)
       if (!box) {
         console.error(`box does not exist (index ${boxIndex})`)
         return
       }
 
-      const firstEmptyIndex = box.firstEmptyIndex()
+      const firstEmptyIndex = firstHomeBoxEmptySlot(boxIndex)
       if (firstEmptyIndex === undefined) {
         console.error(`box at index ${boxIndex} is full`)
         return
       }
 
-      const updatedHomeData = loadedHomeData.clone()
-      updatedHomeData.setAtLocation(
-        { bank: updatedHomeData.currentBankIndex, box: boxIndex, boxSlot: firstEmptyIndex },
+      setAtHomeLocation(
+        { bank: getCurrentBank().index, box: boxIndex, boxSlot: firstEmptyIndex },
         id
       )
-
-      openSavesDispatch({ type: 'update_home_data', payload: { homeData: updatedHomeData } })
     },
-    [loadedHomeData, openSavesDispatch]
+    [firstHomeBoxEmptySlot, getCurrentBank, setAtHomeLocation]
   )
 
   const moveBoxToBank = useCallback(
@@ -842,15 +623,12 @@ export function useSaves(): SavesAndBanksManager {
       if (!currentBox) return 0
 
       let movedCount = 0
-      const updatedHomeData = loadedHomeData.clone()
-      const boxSize = OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS
-      let currentBankBox = updatedHomeData.currentPCBox
+      const boxSize = OPENHOME_BOX_SLOTS
+      let currentBankBox = banksAndBoxes.getCurrentBox().index
       let currentSlot = 0
 
-      while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
-        const box = updatedHomeData.getCurrentBank().getBox(currentBankBox)
-        if (!box) break
-        const emptyIndex = box.firstEmptyIndex()
+      while (currentBankBox < banksAndBoxes.getCurrentBank().boxes.size) {
+        const emptyIndex = banksAndBoxes.firstHomeBoxEmptySlot(currentBankBox)
         if (emptyIndex !== undefined) {
           currentSlot = emptyIndex
           break
@@ -862,10 +640,10 @@ export function useSaves(): SavesAndBanksManager {
         const mon = currentBox.boxSlots[i]
         if (!mon) continue
 
-        while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
+        while (currentBankBox < banksAndBoxes.getCurrentBank().boxes.size) {
           if (currentSlot < boxSize) {
-            const bankSlotEmpty = updatedHomeData.slotIsEmpty({
-              bank: updatedHomeData.currentBankIndex,
+            const bankSlotEmpty = banksAndBoxes.homeLocationIsEmpty({
+              bank: banksAndBoxes.getCurrentBank().index,
               box: currentBankBox,
               boxSlot: currentSlot,
             })
@@ -877,16 +655,16 @@ export function useSaves(): SavesAndBanksManager {
           }
         }
 
-        if (currentBankBox >= updatedHomeData.getCurrentBankBoxes().length) {
-          updatedHomeData.addBoxCurrentBank('end')
+        if (currentBankBox >= banksAndBoxes.getCurrentBank().boxes.size) {
+          banksAndBoxes.addBoxCurrentBank('end')
         }
 
         const ohpkm =
           ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, undefined)
 
-        updatedHomeData.setAtLocation(
+        banksAndBoxes.setAtHomeLocation(
           {
-            bank: updatedHomeData.currentBankIndex,
+            bank: banksAndBoxes.getCurrentBank().index,
             box: currentBankBox,
             boxSlot: currentSlot,
           },
@@ -900,24 +678,19 @@ export function useSaves(): SavesAndBanksManager {
         currentSlot++
       }
 
-      openSavesDispatch({ type: 'update_home_data', payload: { homeData: updatedHomeData } })
       return movedCount
     },
-    [loadedHomeData, ohpkmStore, openSavesDispatch]
+    [banksAndBoxes, ohpkmStore]
   )
 
   const moveSaveToBank = useCallback(
     (save: SAV): number => {
       let totalMoved = 0
-      const updatedHomeData = loadedHomeData.clone()
-      const boxSize = OpenHomeBanks.BOX_COLUMNS * OpenHomeBanks.BOX_ROWS
-      let currentBankBox = updatedHomeData.currentPCBox
+      let currentBankBox = banksAndBoxes.getCurrentBox().index
       let currentSlot = 0
 
-      while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
-        const box = updatedHomeData.getCurrentBank().getBox(currentBankBox)
-        if (!box) break
-        const emptyIndex = box.firstEmptyIndex()
+      while (currentBankBox < banksAndBoxes.getCurrentBank().boxes.size) {
+        const emptyIndex = banksAndBoxes.firstHomeBoxEmptySlot(currentBankBox)
         if (emptyIndex !== undefined) {
           currentSlot = emptyIndex
           break
@@ -933,10 +706,10 @@ export function useSaves(): SavesAndBanksManager {
           const mon = saveBox.boxSlots[slotIdx]
           if (!mon) continue
 
-          while (currentBankBox < updatedHomeData.getCurrentBankBoxes().length) {
-            if (currentSlot < boxSize) {
-              const bankSlotEmpty = updatedHomeData.slotIsEmpty({
-                bank: updatedHomeData.currentBankIndex,
+          while (currentBankBox < banksAndBoxes.getCurrentBank().boxes.size) {
+            if (currentSlot < OPENHOME_BOX_SLOTS) {
+              const bankSlotEmpty = banksAndBoxes.homeLocationIsEmpty({
+                bank: banksAndBoxes.getCurrentBank().index,
                 box: currentBankBox,
                 boxSlot: currentSlot,
               })
@@ -948,16 +721,16 @@ export function useSaves(): SavesAndBanksManager {
             }
           }
 
-          if (currentBankBox >= updatedHomeData.getCurrentBankBoxes().length) {
-            updatedHomeData.addBoxCurrentBank('end')
+          if (currentBankBox >= banksAndBoxes.getCurrentBank().boxes.size) {
+            banksAndBoxes.addBoxCurrentBank('end')
           }
 
           const ohpkm =
             ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, undefined)
 
-          updatedHomeData.setAtLocation(
+          banksAndBoxes.setAtHomeLocation(
             {
-              bank: updatedHomeData.currentBankIndex,
+              bank: banksAndBoxes.getCurrentBank().index,
               box: currentBankBox,
               boxSlot: currentSlot,
             },
@@ -972,16 +745,13 @@ export function useSaves(): SavesAndBanksManager {
         }
       }
 
-      openSavesDispatch({ type: 'update_home_data', payload: { homeData: updatedHomeData } })
       return totalMoved
     },
-    [loadedHomeData, ohpkmStore, openSavesDispatch]
+    [banksAndBoxes, ohpkmStore]
   )
 
   const updateMonDisplayColor = useCallback(
     (monId: string, color: string | undefined) => {
-      if (!homeData) return
-
       const result = ohpkmStore.tryLoadFromId(monId)
       if (R.isErr(result)) return result
 
@@ -990,13 +760,11 @@ export function useSaves(): SavesAndBanksManager {
 
       ohpkmStore.insertOrUpdate(mon)
     },
-    [homeData, ohpkmStore]
+    [ohpkmStore]
   )
 
   const updateMonTags = useCallback(
     (monId: string, tags: { label: string; color: string; icon?: string }[] | undefined) => {
-      if (!homeData) return
-
       const result = ohpkmStore.tryLoadFromId(monId)
       if (R.isErr(result)) return result
 
@@ -1005,51 +773,39 @@ export function useSaves(): SavesAndBanksManager {
 
       ohpkmStore.insertOrUpdate(mon)
     },
-    [homeData, ohpkmStore]
+    [ohpkmStore]
   )
 
-  function newBoxesWithIds(ids: OhpkmIdentifier[], boxName?: string): Option<number> {
-    if (ids.length === 0) return undefined
+  const moveMonItemToBag = useCallback(
+    (monLocation: MonLocation) => {
+      const destMon = getMonAtLocation(monLocation)
+      if (!destMon?.heldItemIndex) return
+      bagDispatch({ type: 'add_item', payload: { index: destMon.heldItemIndex, qty: 1 } })
+      setMonHeldItem(undefined, monLocation)
+    },
+    [setMonHeldItem, getMonAtLocation, bagDispatch]
+  )
 
-    const updatedHomeData = loadedHomeData.clone()
-    const firstNewBoxIndex = updatedHomeData.getCurrentBankBoxes().length
+  const giveItemToMon = useCallback(
+    (monLocation: MonLocation, item: Item) => {
+      const destMon = getMonAtLocation(monLocation)
+      if (!destMon) return
 
-    for (let i = 0; i < ids.length; i += OpenHomeBanks.SLOTS_PER_BOX) {
-      const identifiers: BoxMonIdentifiers = new Map()
-      for (let slot = 0; slot < OpenHomeBanks.SLOTS_PER_BOX; slot++) {
-        identifiers.set(slot, ids[i + slot])
+      bagDispatch({ type: 'remove_item', payload: { index: item.index, qty: 1 } })
+
+      // If already holding an item, move it to the bag
+      if (destMon?.heldItemIndex !== undefined) {
+        bagDispatch({ type: 'add_item', payload: { index: destMon.heldItemIndex, qty: 1 } })
       }
-      updatedHomeData.addBoxCurrentBank('end', boxName, identifiers)
-    }
-
-    openSavesDispatch({ type: 'update_home_data', payload: { homeData: updatedHomeData } })
-
-    return firstNewBoxIndex
-  }
+      setMonHeldItem(item, monLocation)
+    },
+    [setMonHeldItem, getMonAtLocation, bagDispatch]
+  )
 
   return {
     ...openSavesState,
     allOpenSaves,
-    homeData: loadedHomeData,
-
-    switchToBank,
-    setCurrentBankName,
-    addBank,
-    setBoxNameCurrentBank,
-    reorderBoxesCurrentBank,
-
-    removeDupesFromHomeBox,
-    sortHomeBox,
-    sortAllHomeBoxes,
-
-    addBoxCurrentBank,
-    deleteBoxCurrentBank,
     importMonsToLocation,
-    newBoxesWithIds,
-
-    homeBoxNavigateLeft,
-    homeBoxNavigateRight,
-    homeBoxSetCurrent,
 
     addSave,
     buildAndOpenSave,
@@ -1077,6 +833,10 @@ export function useSaves(): SavesAndBanksManager {
     moveSaveToBank,
     updateMonDisplayColor,
     updateMonTags,
+    moveMonItemToBag,
+    giveItemToMon,
+
+    allMonsInCurrentBank,
   }
 }
 

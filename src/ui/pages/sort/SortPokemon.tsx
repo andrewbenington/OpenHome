@@ -14,6 +14,7 @@ import { OriginGames } from '@pkm-rs/pkg'
 import { Badge, Button, Callout, Card, Dialog, Flex, Separator } from '@radix-ui/themes'
 import { useCallback, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
+import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '../../state/ohpkm'
 
 function getInnerSortFunction(
@@ -26,6 +27,8 @@ function getInnerSortFunction(
 
 type MonWithColors = { mon: PKMInterface; color: string; isHome: boolean }
 
+const OPENHOME_COLOR = '#7DCEAB'
+
 export default function SortPokemon() {
   const savesAndBanks = useSaves()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
@@ -33,6 +36,7 @@ export default function SortPokemon() {
   const [detailsMonIndex, setDetailsMonIndex] = useState<number>()
   const [sort, setSort] = useState<SortType>('')
   const ohpkmStore = useOhpkmStore()
+  const banksAndBoxes = useBanksAndBoxes()
 
   const allMonsWithColors: MonWithColors[] = useMemo(() => {
     return savesAndBanks.allOpenSaves
@@ -47,18 +51,13 @@ export default function SortPokemon() {
           }))
       )
       .concat(
-        savesAndBanks.homeData
-          .getCurrentBank()
-          .allContainedMons()
+        savesAndBanks
+          .allMonsInCurrentBank()
           .map((identifier) => (identifier ? ohpkmStore.getById(identifier) : undefined))
           .filter(filterUndefined)
-          .map((mon) => ({
-            mon,
-            color: savesAndBanks.homeData.gameColor(),
-            isHome: true,
-          }))
+          .map((mon) => ({ mon, color: OPENHOME_COLOR, isHome: true }))
       )
-  }, [ohpkmStore, savesAndBanks.allOpenSaves, savesAndBanks.homeData])
+  }, [ohpkmStore, savesAndBanks])
 
   const sortedMonsWithColors = useMemo(() => {
     return sort
@@ -111,7 +110,7 @@ export default function SortPokemon() {
           continue
         }
 
-        const coords = savesAndBanks.homeData.findIfPresent(mon.openhomeId)
+        const coords = banksAndBoxes.findHomeLocation(mon.openhomeId)
         if (!coords) {
           currentFailures.push(
             `${mon.nickname || 'Pokémon'}: Could not find coordinates in OpenHome`
@@ -162,7 +161,7 @@ export default function SortPokemon() {
       setSelectedIndices(new Set())
       setTransferDialogOpen(false)
     },
-    [selectedHomeMons, savesAndBanks]
+    [selectedHomeMons, banksAndBoxes, savesAndBanks]
   )
 
   const detailsMon = useMemo(
@@ -203,11 +202,7 @@ export default function SortPokemon() {
     <Flex direction="row" wrap="wrap" overflow="hidden" height="calc(100% - 16px)" m="2" gap="2">
       <Card style={{ height: '100%' }}>
         <Flex direction="column" gap="1" style={{ width: 180, flex: 0 }}>
-          <Badge
-            color="gray"
-            size="3"
-            style={{ border: `2px solid ${savesAndBanks.homeData.gameColor()}` }}
-          >
+          <Badge color="gray" size="3" style={{ border: `2px solid ${OPENHOME_COLOR}` }}>
             OpenHome
           </Badge>
           {savesAndBanks.allOpenSaves.map((save) => (

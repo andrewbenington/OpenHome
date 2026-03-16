@@ -10,20 +10,18 @@ import {
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
-import { useItems } from '@openhome-ui/state/items'
 import { isMonLocation, MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { ReactNode, useCallback, useState } from 'react'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/core/pkm/util'
-import { OpenHomeBanks } from 'src/core/save/HomeData'
 import PokemonIcon from 'src/ui/components/PokemonIcon'
 import { DragPayload, locationsEqual } from '.'
+import { OPENHOME_BOX_SLOTS } from '../../state-zustand/banks-and-boxes/store'
 import useDragAndDrop from './useDragAndDrop'
 
 export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { children } = props
   const savesAndBanks = useSaves()
-  const { moveMonItemToBag, giveItemToMon } = useItems()
   const { dragState, startDragging, endDragging, clearSelections } = useDragAndDrop()
   const [dragOverId, setDragOverId] = useState<UniqueIdentifier | null>(null)
 
@@ -73,7 +71,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
 
         if (payload.kind === 'item') {
           if (isMonLocation(dest) && target) {
-            giveItemToMon(dest, payload.item)
+            savesAndBanks.giveItemToMon(dest, payload.item)
           }
           endDragging()
           return
@@ -101,11 +99,11 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
           ) {
             dragState.selectedLocations.forEach((loc) => {
               const m = savesAndBanks.getMonAtLocation(loc)
-              if (m) moveMonItemToBag(loc)
+              if (m) savesAndBanks.moveMonItemToBag(loc)
             })
             clearSelections()
           } else {
-            moveMonItemToBag(payload.monData)
+            savesAndBanks.moveMonItemToBag(payload.monData)
           }
         } else if (
           isMonLocation(dest) &&
@@ -123,7 +121,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             let currentDestSlot = dest.boxSlot
             let currentDestBox = dest.box
 
-            const maxSlots = dest.isHome ? OpenHomeBanks.BOX_ROWS * OpenHomeBanks.BOX_COLUMNS : 30
+            const maxSlots = dest.isHome ? OPENHOME_BOX_SLOTS : 30
 
             for (const sourceLoc of locationsToMove) {
               const currMon = savesAndBanks.getMonAtLocation(sourceLoc)
@@ -145,7 +143,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
                   .saveFromIdentifier(dest.saveIdentifier)
                   .supportsItem(currMon.heldItemIndex)
               ) {
-                moveMonItemToBag(sourceLoc)
+                savesAndBanks.moveMonItemToBag(sourceLoc)
               }
 
               const nextDest: MonLocation = {
@@ -170,7 +168,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               !dest.isHome &&
               !savesAndBanks.saveFromIdentifier(dest.saveIdentifier).supportsItem(mon.heldItemIndex)
             ) {
-              moveMonItemToBag(source)
+              savesAndBanks.moveMonItemToBag(source)
             }
 
             savesAndBanks.moveMon(source, dest)

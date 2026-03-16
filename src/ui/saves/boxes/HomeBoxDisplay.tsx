@@ -20,7 +20,7 @@ import useIsDev from '@openhome-ui/hooks/isDev'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { MonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
+import { HomeMonLocation, MonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
 import {
   Button,
   Card,
@@ -36,23 +36,25 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'r
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
 import { includeClass } from 'src/ui/util/style'
+import {
+  OPENHOME_BOX_COLUMNS,
+  OPENHOME_BOX_ROWS,
+  OPENHOME_BOX_SLOTS,
+  useBanksAndBoxes,
+} from '../../state-zustand/banks-and-boxes/store'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
-import { buildBackwardNavigator, buildForwardNavigator } from '../util'
+import { useOpenHomeBoxNavigator } from '../util'
 import AllHomeBoxes from './AllHomeBoxes'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 import DroppableSpace from './DroppableSpace'
 import './style.css'
 
-const COLUMN_COUNT = 12
-const ROW_COUNT = 10
-
-type BoxViewMode = 'one' | 'all'
+export type BoxViewMode = 'one' | 'all'
 
 const ALLOW_DUPE_IMPORT = true
 
 export default function HomeBoxDisplay() {
-  const savesAndBanks = useSaves()
   const [editing, setEditing] = useState(false)
   const [moving, setMoving] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -61,10 +63,19 @@ export default function HomeBoxDisplay() {
   const isDev = useIsDev()
   const [debugMode, setDebugMode] = useState(false)
   const { dragState, toggleMultiSelect } = useDragAndDrop()
+  const {
+    addBoxCurrentBank,
+    getCurrentBox,
+    removeDupesFromHomeBox,
+    setBoxNameCurrentBank,
+    sortAllHomeBoxes,
+    sortHomeBox,
+    switchBoxCurrentBank,
+    switchToNextBox,
+    switchToPreviousBox,
+  } = useBanksAndBoxes()
 
-  const homeData = savesAndBanks.homeData
-
-  const currentBox = homeData.getCurrentBox()
+  const currentBox = getCurrentBox()
 
   return (
     <Card variant="surface" className="home-box-header">
@@ -73,7 +84,7 @@ export default function HomeBoxDisplay() {
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} disabled={editing || moving} />
           <ArrowButton
             className={includeClass('horiz-collapse').if(viewMode !== 'one')}
-            onClick={savesAndBanks.homeBoxNavigateLeft}
+            onClick={switchToPreviousBox}
             dragID="home-arrow-left"
             direction="left"
             disabled={editing}
@@ -93,7 +104,7 @@ export default function HomeBoxDisplay() {
               onChange={(e) => setEditingBoxName(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  savesAndBanks.setBoxNameCurrentBank(currentBox.index, editingBoxName)
+                  setBoxNameCurrentBank(currentBox.index, editingBoxName)
                   setEditing(false)
                 } else if (e.key === 'Escape') {
                   setEditing(false)
@@ -110,7 +121,7 @@ export default function HomeBoxDisplay() {
         <Flex align="center" flexGrow="3" width="0" justify="between">
           <ArrowButton
             className={includeClass('horiz-collapse').if(viewMode !== 'one')}
-            onClick={savesAndBanks.homeBoxNavigateRight}
+            onClick={switchToNextBox}
             dragID="home-arrow-right"
             direction="right"
             disabled={editing}
@@ -121,10 +132,8 @@ export default function HomeBoxDisplay() {
                 <ToggleButton
                   state={editing}
                   setState={setEditing}
-                  onSet={() => setEditingBoxName(homeData.getCurrentBox().name ?? '')}
-                  onUnset={() =>
-                    savesAndBanks.setBoxNameCurrentBank(currentBox.index, editingBoxName)
-                  }
+                  onSet={() => setEditingBoxName(getCurrentBox().name ?? '')}
+                  onUnset={() => setBoxNameCurrentBank(currentBox.index, editingBoxName)}
                   icon={EditIcon}
                   hint="Change box name"
                   disabled={dragState.multiSelectEnabled}
@@ -145,7 +154,7 @@ export default function HomeBoxDisplay() {
                     className="mini-button"
                     variant="outline"
                     color="gray"
-                    onClick={() => savesAndBanks.addBoxCurrentBank('end')}
+                    onClick={() => addBoxCurrentBank('end')}
                   >
                     <AddIcon />
                   </Button>
@@ -180,7 +189,7 @@ export default function HomeBoxDisplay() {
                       {SortTypes.filter((st) => st !== '').map((sortType) => (
                         <DropdownMenu.Item
                           key={sortType}
-                          onClick={() => savesAndBanks.sortHomeBox(homeData.currentPCBox, sortType)}
+                          onClick={() => sortHomeBox(getCurrentBox().index, sortType)}
                         >
                           By {sortType}
                         </DropdownMenu.Item>
@@ -192,18 +201,13 @@ export default function HomeBoxDisplay() {
                   <DropdownMenu.SubTrigger>Sort all boxes...</DropdownMenu.SubTrigger>
                   <DropdownMenu.SubContent>
                     {SortTypes.filter((st) => st !== '').map((sortType) => (
-                      <DropdownMenu.Item
-                        key={sortType}
-                        onClick={() => savesAndBanks.sortAllHomeBoxes(sortType)}
-                      >
+                      <DropdownMenu.Item key={sortType} onClick={() => sortAllHomeBoxes(sortType)}>
                         By {sortType}
                       </DropdownMenu.Item>
                     ))}
                   </DropdownMenu.SubContent>
                 </DropdownMenu.Sub>
-                <DropdownMenu.Item
-                  onClick={() => savesAndBanks.removeDupesFromHomeBox(homeData.currentPCBox)}
-                >
+                <DropdownMenu.Item onClick={() => removeDupesFromHomeBox(getCurrentBox().index)}>
                   Remove duplicates from this box
                 </DropdownMenu.Item>
               </DropdownMenu.Content>
@@ -216,7 +220,7 @@ export default function HomeBoxDisplay() {
       ) : (
         <AllHomeBoxes
           onBoxSelect={(boxIndex) => {
-            homeData.currentBoxIndex = boxIndex
+            switchBoxCurrentBank(boxIndex)
             setViewMode('one')
           }}
           moving={moving}
@@ -230,17 +234,17 @@ export default function HomeBoxDisplay() {
 
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
-  const {
-    importMonsToLocation,
-    homeData,
-    sortHomeBox,
-    sortAllHomeBoxes,
-    removeDupesFromHomeBox,
-    saveFromIdentifier,
-  } = useSaves()
+  const { importMonsToLocation, saveFromIdentifier } = useSaves()
+  const { getCurrentBox, getCurrentBank } = useBanksAndBoxes()
   const [, dispatchError] = useContext(ErrorContext)
-  const [selectedIndex, setSelectedIndex] = useState<number>()
   const { dragState, isSelected, toggleSelection } = useDragAndDrop()
+  const { sortHomeBox, sortAllHomeBoxes, removeDupesFromHomeBox } = useBanksAndBoxes()
+  const {
+    currentIndex: selectedIndex,
+    setCurrentIndex: setSelectedIndex,
+    navigateNext: navigateRight,
+    navigatePrev: navigateLeft,
+  } = useOpenHomeBoxNavigator()
 
   const attemptImportMons = useCallback(
     (mons: PKMInterface[], location: MonLocation) => {
@@ -291,37 +295,27 @@ function SingleBoxMonDisplay() {
     [dragData, saveFromIdentifier]
   )
 
-  const currentBox = homeData.getCurrentBox()
+  const currentBox = getCurrentBox()
 
   const selectedMon = useMemo(() => {
-    if (!currentBox || selectedIndex === undefined || selectedIndex >= currentBox.slotCount()) {
+    if (!currentBox || selectedIndex === undefined || selectedIndex >= OPENHOME_BOX_SLOTS) {
       return undefined
     }
-    const selectedMonIdentifier = currentBox.getSlot(selectedIndex)
+    const selectedMonIdentifier = currentBox.identifiers.get(selectedIndex)
     if (!selectedMonIdentifier) return undefined
 
     return ohpkmStore.getById(selectedMonIdentifier)
   }, [currentBox, ohpkmStore, selectedIndex])
 
-  const navigateRight = useMemo(
-    () => buildForwardNavigator(homeData, selectedIndex, setSelectedIndex),
-    [homeData, selectedIndex]
-  )
-
-  const navigateLeft = useMemo(
-    () => buildBackwardNavigator(homeData, selectedIndex, setSelectedIndex),
-    [homeData, selectedIndex]
-  )
-
   const contextElements = useMemo(
     () => [
       ItemBuilder.fromLabel('Remove duplicates from this box').withAction(() =>
-        removeDupesFromHomeBox(homeData.currentPCBox)
+        removeDupesFromHomeBox(getCurrentBox().index)
       ),
       SubmenuBuilder.fromLabel('Sort this box...').withBuilders(
         SortTypes.map((sortType) =>
           ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
-            sortHomeBox(homeData.currentPCBox, sortType)
+            sortHomeBox(getCurrentBox().index, sortType)
           )
         )
       ),
@@ -331,41 +325,44 @@ function SingleBoxMonDisplay() {
         )
       ),
     ],
-    [homeData.currentPCBox, removeDupesFromHomeBox, sortAllHomeBoxes, sortHomeBox]
+    [getCurrentBox, removeDupesFromHomeBox, sortAllHomeBoxes, sortHomeBox]
   )
 
   return (
     <OpenHomeCtxMenu elements={contextElements}>
       <div>
-        <Grid columns={COLUMN_COUNT.toString()} gap="1">
-          {range(COLUMN_COUNT * ROW_COUNT)
-            .map((index: number) => currentBox.getSlot(index))
+        <Grid columns={OPENHOME_BOX_COLUMNS.toString()} gap="1">
+          {range(OPENHOME_BOX_SLOTS)
+            .map((index: number) => currentBox.identifiers.get(index))
             .map((identifier, index) => {
               const result = identifier ? ohpkmStore.tryLoadFromId(identifier) : undefined
+              const currentBankIndex = getCurrentBank().index
+              const currentBoxIndex = getCurrentBox().index
 
               if (result && R.isErr(result)) {
-                return <div key={`${homeData.currentPCBox}-${index}`}>!</div>
+                return <div key={`${currentBoxIndex}-${index}`}>!</div>
               }
+
               const mon = result?.value
 
-              const location: MonLocation = {
-                bank: homeData.currentBankIndex,
-                box: homeData.currentPCBox,
+              const thisLocation: HomeMonLocation = {
+                bank: currentBankIndex,
+                box: currentBoxIndex,
                 boxSlot: index,
                 isHome: true,
               }
 
               return (
                 <BoxCell
-                  key={`${homeData.currentPCBox}-${index}`}
+                  key={`${currentBoxIndex}-${index}`}
                   onClick={() => setSelectedIndex(index)}
-                  dragID={`home_${homeData.currentPCBox}_${index}`}
-                  location={location}
+                  dragID={`home_${currentBoxIndex}_${index}`}
+                  location={thisLocation}
                   mon={mon}
                   zIndex={0}
                   onDrop={(importedMons) => {
                     if (importedMons) {
-                      attemptImportMons(importedMons, location)
+                      attemptImportMons(importedMons, thisLocation)
                     }
                   }}
                   disabled={
@@ -374,8 +371,8 @@ function SingleBoxMonDisplay() {
                   }
                   ctxMenuBuilders={contextElements}
                   multiSelectEnabled={dragState.multiSelectEnabled}
-                  isSelected={isSelected(location)}
-                  onToggleSelect={() => toggleSelection(location)}
+                  isSelected={isSelected(thisLocation)}
+                  onToggleSelect={() => toggleSelection(thisLocation)}
                 />
               )
             })}
@@ -389,10 +386,10 @@ function SingleBoxMonDisplay() {
             selectedIndex !== undefined
               ? {
                   currentIndex: selectedIndex,
-                  columns: homeData.boxColumns,
-                  rows: homeData.boxRows,
-                  emptyIndexes: range(homeData.boxColumns * homeData.boxRows).filter((boxSlot) =>
-                    currentBox.slotIsEmpty(boxSlot)
+                  columns: OPENHOME_BOX_COLUMNS,
+                  rows: OPENHOME_BOX_ROWS,
+                  emptyIndexes: range(OPENHOME_BOX_SLOTS).filter(
+                    (boxSlot) => !currentBox.identifiers.has(boxSlot)
                   ),
                 }
               : undefined
