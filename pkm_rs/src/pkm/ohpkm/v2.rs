@@ -1,4 +1,5 @@
 use crate::pkm::ohpkm::OhpkmV1;
+use crate::pkm::ohpkm::extra_form::ExtraForm;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::pkm::ohpkm::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
@@ -635,6 +636,16 @@ impl OhpkmV2 {
         self.main_data.affixed_ribbon = v;
     }
 
+    #[wasm_bindgen(getter = extraForm)]
+    pub fn extra_form(&self) -> Option<ExtraForm> {
+        self.main_data.extra_form
+    }
+
+    #[wasm_bindgen(setter = extraForm)]
+    pub fn set_extra_form(&mut self, v: Option<ExtraForm>) {
+        self.main_data.extra_form = v;
+    }
+
     #[wasm_bindgen(getter = trainerFriendship)]
     pub fn trainer_friendship(&self) -> u8 {
         self.main_data.trainer_friendship
@@ -885,22 +896,9 @@ impl OhpkmV2 {
         Some(self.plugin_data.clone()?.plugin_origin)
     }
 
-    #[wasm_bindgen(getter = pluginFormWasm)]
-    pub fn plugin_form(&self) -> Option<u16> {
-        self.plugin_data.as_ref().and_then(|x| x.plugin_form)
-    }
-
     #[wasm_bindgen(js_name = setPluginDataWasm)]
-    pub fn set_plugin_data(&mut self, origin: String, form: Option<u16>) {
-        self.plugin_data = Some(PluginData {
-            plugin_origin: origin,
-            plugin_form: form,
-        });
-    }
-
-    #[wasm_bindgen(js_name = clearPluginDataWasm)]
-    pub fn clear_plugin_data(&mut self) {
-        self.plugin_data = None;
+    pub fn set_plugin_origin(&mut self, plugin_origin: String) {
+        self.plugin_data = Some(PluginData { plugin_origin });
     }
 
     // Game Boy

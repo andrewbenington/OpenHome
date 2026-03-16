@@ -1,3 +1,4 @@
+use crate::pkm::ohpkm::extra_form::ExtraForm;
 use crate::pkm::ohpkm::sectioned_data::DataSection;
 use crate::pkm::ohpkm::{OhpkmV1, SectionTagV2};
 use crate::pkm::traits::{IsShiny4096, OhpkmByte, OhpkmBytes};
@@ -12,12 +13,6 @@ use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesAndForme;
 
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::species::NatDexIndex;
-
-#[cfg(feature = "wasm")]
-use crate::pkm::traits::IsShiny;
-
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{ContestStats, Stats8, Stats16Le, StatsPreSplit, TrainerData};
 use pkm_rs_types::{FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, TeraType};
@@ -25,6 +20,12 @@ use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 
 use serde::Serialize;
 use std::num::NonZeroU16;
+
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::species::NatDexIndex;
+
+#[cfg(feature = "wasm")]
+use crate::pkm::traits::IsShiny;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -97,6 +98,7 @@ pub struct MainDataV2 {
     pub language: Language,
     pub form_argument: u32,
     pub affixed_ribbon: Option<ModernRibbon>,
+    pub extra_form: Option<ExtraForm>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
@@ -186,6 +188,7 @@ impl MainDataV2 {
             language: old.language,
             form_argument: old.form_argument,
             affixed_ribbon: old.affixed_ribbon,
+            extra_form: None,
             trainer_name: old.trainer_name,
             trainer_friendship: old.trainer_friendship,
             trainer_memory: old.trainer_memory,
@@ -333,9 +336,12 @@ impl DataSection for MainDataV2 {
             language: Language::try_from(bytes[242])?,
             form_argument: u32::from_le_bytes(bytes[244..248].try_into().unwrap()),
             affixed_ribbon: ModernRibbon::from_affixed_byte(bytes[248]),
-            // geolocations: Geolocations::from_bytes(bytes[249..259].try_into().unwrap()),
-            // encounter_type: bytes[270],
-            // performance: bytes[271],
+            // gap: 249-263
+
+            // TODO: handle invalid values
+            extra_form: u64::from_le_bytes(bytes[264..272].try_into().unwrap())
+                .try_into()
+                .ok(),
             trainer_name: SizedUtf16String::<26>::from_bytes(bytes[272..298].try_into().unwrap()),
             trainer_friendship: bytes[298],
             trainer_memory: TrainerMemory {
@@ -460,9 +466,8 @@ impl DataSection for MainDataV2 {
 
         bytes[244..248].copy_from_slice(&self.form_argument.to_le_bytes());
         bytes[248] = ModernRibbon::to_affixed_byte(self.affixed_ribbon);
-        // bytes[249..259].copy_from_slice(&self.geolocations.to_bytes());
-        // bytes[270] = self.encounter_type;
-        // bytes[271] = self.performance;
+        // gap: 249-263
+        bytes[264..272].copy_from_slice(&self.extra_form.map_or(0, |f| f as u64).to_le_bytes());
         bytes[272..298].copy_from_slice(&self.trainer_name);
         bytes[298] = self.trainer_friendship;
 
@@ -1296,9 +1301,6 @@ impl DataSection for MostRecentSave {
 pub struct PluginData {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub plugin_origin: String,
-
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub plugin_form: Option<u16>,
 }
 
 impl PluginData {
@@ -1317,10 +1319,7 @@ impl PluginData {
     }
 
     const fn from_origin(plugin_origin: String) -> Self {
-        Self {
-            plugin_origin,
-            plugin_form: None,
-        }
+        Self { plugin_origin }
     }
 
     fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -1332,14 +1331,10 @@ impl PluginData {
             return Self::try_from_origin_utf8(bytes);
         }
 
-        let form_raw = u16::from_le_bytes([bytes[0], bytes[1]]);
-        let plugin_form = if form_raw == 0 { None } else { Some(form_raw) };
-
         let origin = String::from_utf8(bytes[2..].to_vec()).map_err(Error::plugin_origin)?;
 
         Ok(Self {
             plugin_origin: origin,
-            plugin_form,
         })
     }
 }
@@ -1356,16 +1351,6 @@ impl PluginData {
     #[wasm_bindgen(setter = pluginOrigin)]
     pub fn set_plugin_origin(&mut self, value: String) {
         self.plugin_origin = value;
-    }
-
-    #[wasm_bindgen(getter = pluginFormDataWasm)]
-    pub fn plugin_form(&self) -> Option<u16> {
-        self.plugin_form
-    }
-
-    #[wasm_bindgen(setter = pluginFormDataWasm)]
-    pub fn set_plugin_form(&mut self, value: Option<u16>) {
-        self.plugin_form = value;
     }
 }
 
@@ -1385,10 +1370,7 @@ impl DataSection for PluginData {
     }
 
     fn to_bytes(&self) -> Result<Vec<u8>> {
-        let mut bytes = Vec::new();
-        bytes.extend_from_slice(&self.plugin_form.unwrap_or(0).to_le_bytes());
-        bytes.extend_from_slice(self.plugin_origin.as_bytes());
-        Ok(bytes)
+        Ok(self.plugin_origin.as_bytes().to_vec())
     }
 }
 
