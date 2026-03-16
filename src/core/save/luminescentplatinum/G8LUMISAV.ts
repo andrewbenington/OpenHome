@@ -1,4 +1,4 @@
-import { Gender, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, luminescentSupportsExtraForm, OriginGame } from '@pkm-rs/pkg'
 import { utf16BytesToString } from '@pokemon-files/util'
 
 import { OHPKM } from '../../pkm/OHPKM'
@@ -197,14 +197,12 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   // Builds a Luminescent Platinum Pokémon instance from raw bytes
   buildPKM(bytes: ArrayBuffer, encrypted: boolean): PB8LUMI {
     const mon = new PB8LUMI(bytes, encrypted)
-    mon.pluginOrigin = this.pluginIdentifier
     return mon
   }
 
   // Converts an OpenHome Pokémon into the Luminescent format
   convertOhpkm(ohpkm: OHPKM): PB8LUMI {
     const mon = new PB8LUMI(ohpkm)
-    mon.pluginOrigin = this.pluginIdentifier
     return mon
   }
 
@@ -247,7 +245,8 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
     return uint8ArrayToBase64(this.calculateChecksumBytes())
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return luminescentSupportsExtraForm(extraFormIndex)
     return !isRestricted(LP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 

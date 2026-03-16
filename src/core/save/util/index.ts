@@ -1,6 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
 import { SAV } from '../interfaces'
 import { PathData } from './path'
 
@@ -12,7 +12,7 @@ export const DESAMUME_FOOTER_START =
   '|<--Snip above here to create a raw sav by excluding this DeSmuME savedata footer:'
 
 export interface SavePkmClass {
-  new (arg: ArrayBuffer | PKMInterface, encrypted?: boolean): PKMInterface
+  new (arg: ArrayBuffer | OHPKM, encrypted?: boolean): PKMInterface
   fromBytes(bytes: ArrayBuffer): PKMInterface
   getName(): string
 }
@@ -33,8 +33,13 @@ export interface SAVClass<S extends SAV = SAV> {
 
 export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never
 
-export function supportsMon(saveType: SAVClass, dexNumber: number, formeNumber: number): boolean {
-  return saveType.prototype.supportsMon(dexNumber, formeNumber)
+export function supportsMon(
+  saveType: SAVClass,
+  dexNumber: number,
+  formeNumber: number,
+  extraFormIndex?: ExtraFormIndex
+): boolean {
+  return saveType.prototype.supportsMon(dexNumber, formeNumber, extraFormIndex)
 }
 
 export function monSupportedBySaveType(
@@ -42,18 +47,18 @@ export function monSupportedBySaveType(
   mon?: PKMInterface
 ): boolean {
   if (!saveType || !mon) return false
-  if (mon.pluginForm !== undefined && saveType.getPluginIdentifier?.() !== mon.pluginOrigin) {
+  if (mon.pluginForm !== undefined && saveType.getPluginIdentifier?.() !== mon.pluginIdentifier) {
     return false
   }
-  return supportsMon(saveType, mon.dexNum, mon.formeNum)
+  return supportsMon(saveType, mon.dexNum, mon.formeNum, mon.extraFormIndex)
 }
 
 export function monSupportedBySave(save?: SAV, mon?: PKMInterface): boolean {
   if (!save || !mon) return false
-  if (mon.pluginForm !== undefined && save.pluginIdentifier !== mon.pluginOrigin) {
+  if (mon.pluginForm !== undefined && save.pluginIdentifier !== mon.pluginIdentifier) {
     return false
   }
-  return save.supportsMon(mon.dexNum, mon.formeNum)
+  return save.supportsMon(mon.dexNum, mon.formeNum, mon.extraFormIndex)
 }
 
 export function getPluginIdentifier(saveType: SAVClass | undefined): string | undefined {

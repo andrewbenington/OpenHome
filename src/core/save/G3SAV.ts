@@ -5,7 +5,7 @@ import {
   uint32ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { gen3StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
-import { Gender, ItemGen3, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, ItemGen3, OriginGame } from '@pkm-rs/pkg'
 import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
@@ -324,7 +324,8 @@ export class G3SAV extends OfficialSAV<PK3> {
     return new PK3(ohpkm)
   }
 
-  supportsMon(dexNumber: number, formeNumber: number) {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     return dexNumber <= NationalDex.Deoxys && (formeNumber === 0 || dexNumber === NationalDex.Unown)
   }
 

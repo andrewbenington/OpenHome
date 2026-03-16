@@ -1,7 +1,7 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
-import { Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { LookupType, SAVClass } from './util'
 import { PathData } from './util/path'
@@ -155,7 +155,11 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract tooEarlyToOpen: boolean
   abstract updatedBoxSlots: BoxAndSlot[]
   abstract getCurrentBox(): Box<P>
-  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract supportsMon(
+    dexNumber: number,
+    formeNumber: number,
+    extraFormIndex?: ExtraFormIndex
+  ): boolean
   abstract supportsItem(itemIndex: number): boolean
   abstract getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined
   abstract prepareForSaving(): void

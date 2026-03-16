@@ -1,10 +1,14 @@
 import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import { ItemUnbound } from '@pkm-rs/pkg'
-import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
+import PK3CFRU from '../cfru/PK3CFRU'
 
 import { fromGen3CFRUMoveIndex, toGen3CFRUMoveIndex } from '../cfru/conversion/Gen3CFRUMovesIndex'
 import { CFRUToNationalMap } from '../cfru/conversion/Gen3CFRUMovesIndex/CFRUToNationalMap'
-import { fromGen3CRFUPokemonIndex, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
+import {
+  CfruToNationalDexEntry,
+  fromGen3CRFUPokemonIndex,
+  toGen3CRFUPokemonIndex,
+} from '../cfru/conversion/util'
 import { PluginIdentifier } from '../interfaces'
 import { NationalDexToUnboundMap, UnboundToNationalDexMap } from './conversion/UnboundSpeciesMap'
 
@@ -50,7 +54,7 @@ export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
     return VALID_MOVE_INDICES_UB
   }
 
-  monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry {
+  monFromGameIndex(gameIndex: number): CfruToNationalDexEntry {
     return fromGen3CRFUPokemonIndex(gameIndex, UnboundToNationalDexMap, 'Pokémon Unbound')
   }
 

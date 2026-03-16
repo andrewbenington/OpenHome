@@ -1,4 +1,4 @@
-import { OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
 import { PA8, PA9, PB8, PK8, PK9 } from '@pokemon-files/pkm'
 import { AllPKMFields } from '@pokemon-files/util'
 import {
@@ -92,7 +92,11 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9 | PA9> extends Offi
     type?: T['blockType']
   ): T
 
-  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract supportsMon(
+    dexNumber: number,
+    formeNumber: number,
+    extraFormIndex?: ExtraFormIndex
+  ): boolean
 
   abstract getCurrentBox(): Box<P>
 

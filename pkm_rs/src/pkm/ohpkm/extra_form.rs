@@ -184,9 +184,6 @@ impl ExtraFormIndex {
                 self,
                 Self::PikachuSurfing
                     | Self::PikachuFlying
-                    | Self::EeveeBandana
-                    | Self::GengarStitched
-                    | Self::OnixCrystal
                     | Self::CharizardGiga
                     | Self::ButterfreeGiga
                     | Self::PikachuGiga
@@ -324,37 +321,36 @@ impl ExtraFormIndex {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "orasSupportsExtraForm"))]
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "orasSupportsExtraForm")]
 #[allow(clippy::missing_const_for_fn)]
 pub fn oras_supports_extra_form(form: ExtraFormIndex) -> bool {
     form.in_oras()
 }
 
-#[cfg_attr(
-    feature = "wasm",
-    wasm_bindgen(js_name = "radicalRedSupportsExtraForm")
-)]
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "radicalRedSupportsExtraForm")]
 #[allow(clippy::missing_const_for_fn)]
 pub fn radical_red_supports_extra_form(form: ExtraFormIndex) -> bool {
     form.in_radical_red()
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "unboundSupportsExtraForm"))]
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "unboundSupportsExtraForm")]
 #[allow(clippy::missing_const_for_fn)]
 pub fn unbound_supports_extra_form(form: ExtraFormIndex) -> bool {
     form.in_unbound()
 }
 
-#[cfg_attr(
-    feature = "wasm",
-    wasm_bindgen(js_name = "luminescentSupportsExtraForm")
-)]
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "luminescentSupportsExtraForm")]
 #[allow(clippy::missing_const_for_fn)]
 pub fn luminescent_supports_extra_form(form: ExtraFormIndex) -> bool {
     form.in_luminescent()
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "extraFormDisplayName"))]
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "extraFormDisplayName")]
 pub fn extra_form_display_name(form: ExtraFormIndex) -> String {
     form.display_name()
 }

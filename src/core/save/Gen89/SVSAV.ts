@@ -1,5 +1,5 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Gender, Languages, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { PK9 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
@@ -98,7 +98,8 @@ export class SVSAV extends G89SAV<PK9> {
     return 0
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     const revision = this.scBlocks ? this.getSaveRevision() : 'Indigo Disk'
     switch (revision) {
       case 'Base Game':

@@ -1,6 +1,7 @@
-import { PKMInterface, PluginPKMInterface } from '@openhome-core/pkm/interfaces'
+import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   Ball,
+  ExtraFormIndex,
   Language,
   Languages,
   MetadataLookup,
@@ -30,12 +31,10 @@ import {
   writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
+import { OHPKM } from '../../pkm/OHPKM'
+import { Option } from '../../util/functional'
 import { PluginIdentifier } from '../interfaces'
-
-export interface CFRUToNationalDexEntry {
-  NationalDexIndex: number
-  FormIndex: number
-}
+import { CfruToNationalDexEntry } from './conversion/util'
 
 const INTERNAL_ORIGIN_NON_RR = OriginGame.Invalid6
 const INTERNAL_ORIGIN_FROM_CFRU = OriginGame.FireRed
@@ -76,16 +75,18 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   //   return 'PK3RR'
   // }
   format: string = 'PK3CFRU'
-  abstract pluginIdentifier: PluginIdentifier
 
+  abstract pluginIdentifier: PluginIdentifier
   pluginOrigin?: PluginIdentifier
   personalityValue: number
   trainerID: number
   secretID: number
   language: Language
   markings: MarkingsFourShapes
+  internalSpeciesIndex: number
   dexNum: number
   formeNum: number
+  extraFormIndex: Option<ExtraFormIndex>
   internalHeldItemIndex: number
   abstract heldItemIndex: number
   exp: number
@@ -115,7 +116,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
   abstract selectColor: string
 
-  constructor(arg: ArrayBuffer | PKMInterface) {
+  constructor(arg: ArrayBuffer | OHPKM) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       const dataView = new DataView(buffer)
@@ -148,18 +149,19 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.markings = markingsFourShapesFromBytes(dataView, 0x1b)
 
       // Species 28:30
-      const speciesIndex: number = dataView.getUint16(0x1c, true)
-      const speciesData = this.monFromGameIndex(speciesIndex)
+      this.internalSpeciesIndex = dataView.getUint16(0x1c, true)
+      const speciesData = this.monFromGameIndex(this.internalSpeciesIndex)
+      this.extraFormIndex = speciesData.extraFormIndex
 
-      if (speciesData.NationalDexIndex < 0) {
+      if (speciesData.nationalDex < 0) {
         this.dexNum = 0
         this.formeNum = 0
       } else {
-        this.dexNum = speciesData.NationalDexIndex
-        this.formeNum = speciesData.FormIndex
+        this.dexNum = speciesData.nationalDex
+        this.formeNum = speciesData.formIndex
       }
 
-      this.isFakemon = this.indexIsFakemon(speciesIndex)
+      this.isFakemon = this.indexIsFakemon(this.internalSpeciesIndex)
 
       // Held Item 30:32
       this.internalHeldItemIndex = dataView.getUint16(0x1e, true)
@@ -240,6 +242,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       }
       this.dexNum = other.dexNum
       this.formeNum = other.formeNum
+      this.extraFormIndex = other.extraFormIndex
       this.internalHeldItemIndex = this.internalItemIndexFromModern(other.heldItemIndex)
       this.exp = other.exp
       this.trainerFriendship = other.trainerFriendship ?? 0
@@ -275,6 +278,12 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
         this.metLocationIndex = other.metLocationIndex ?? FIRERED_IN_GAME_TRADE
         this.internalMetLocationIndex = FIRERED_IN_GAME_TRADE
+      }
+
+      this.internalSpeciesIndex = this.monToGameIndex(other.dexNum, other.formeNum)
+
+      if (other.pluginOrigin === this.getPluginIdentifier()) {
+        this.pluginOrigin = other.pluginOrigin
       }
 
       if (other.ball) {
@@ -321,7 +330,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   abstract moveToGameIndex(nationalMoveId: number): number
   abstract getValidMoveIndices(): number[]
 
-  abstract monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry
+  abstract monFromGameIndex(gameIndex: number): CfruToNationalDexEntry
   abstract monToGameIndex(nationalDexNumber: number, formIndex: number): number
 
   abstract indexIsFakemon(speciesIndex: number): boolean
@@ -487,6 +496,12 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
   getPluginIdentifier(): PluginIdentifier {
     return this.pluginIdentifier
+  }
+
+  extraDisplayFields() {
+    return {
+      'Internal Species Index': this.internalSpeciesIndex,
+    }
   }
 }
 
