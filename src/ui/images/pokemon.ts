@@ -1,5 +1,6 @@
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { toGen3CRFUPokemonIndex } from '@openhome-core/save/cfru/conversion/util'
+import { getLumiCustomForm } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import { toGen3RRPokemonIndex } from '@openhome-core/save/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from '@openhome-core/save/radicalred/conversion/RadicalRedSprites'
 import { NationalDexToUnboundMap } from '@openhome-core/save/unbound/conversion/UnboundSpeciesMap'
@@ -26,7 +27,7 @@ export const fileToSpriteFolder: Record<MonFormat | 'OHPKM', string> = {
   PK8: 'home',
   PA8: 'home',
   PB8: 'home',
-  PB8LUMI: 'home',
+  PB8LUMI: 'gen9',
   PK9: 'gen9',
   PA9: 'home',
   OHPKM: 'home',
@@ -88,8 +89,14 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
     if (gen3UBname.length === 0) return gen3UBname
     gen3UBname = gen3UBname[0].toUpperCase() + gen3UBname.slice(1).toLowerCase()
     return `sprites/${spriteFolder}/${gen3UBname}`
+  } else if (monFormat === 'PB8LUMI') {
+    const lumiForm = mon.pluginForm ?? formeNum
+    if (getLumiCustomForm(mon.dexNum, lumiForm)) {
+      return `sprites/lumi/${mon.dexNum}-${lumiForm}.webp`
+    }
   }
+  const extension = spriteFolder === 'gen3gc' ? 'gif' : spriteFolder === 'home' ? 'webp' : 'png'
   return `sprites/${spriteFolder}${
     mon.isShiny && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
-  }${spriteName}.${spriteFolder === 'gen3gc' ? 'gif' : 'png'}`
+  }${spriteName}.${extension}`
 }

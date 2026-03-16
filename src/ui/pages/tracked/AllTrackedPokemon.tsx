@@ -20,13 +20,16 @@ import {
 import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
+import {
+  BankBoxCoordinates,
+  useBanksAndBoxes,
+} from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup, OriginGames } from '@pkm-rs/pkg'
 import { useCallback, useRef, useState } from 'react'
 import { SelectColumn } from 'react-data-grid'
 import { useNavigate } from 'react-router'
-import { BankBoxCoordinates, OpenHomeBanks } from 'src/core/save/HomeData'
 import './style.css'
 
 export type AllTrackedPokemonProps = {
@@ -42,6 +45,7 @@ export default function AllTrackedPokemon({
 }: AllTrackedPokemonProps) {
   const ohpkmStore = useOhpkmStore()
   const saves = useSaves()
+  const { findHomeLocation } = useBanksAndBoxes()
   const selectionController = useSelectedMons()
   const { selectedIds, deselectIds } = selectionController
   const [contextMenuBuilders, setContextMenuBuilders] = useState<Option<CtxMenuElementBuilder>[]>(
@@ -49,17 +53,18 @@ export default function AllTrackedPokemon({
   )
   const [ctxMenuMonId, setCtxMenuMonId] = useState<Option<OhpkmIdentifier>>()
   const { releaseMonsById, trackedMonsToRelease } = saves
-  const columns = useColumns(trackedMonsToRelease, onSelectMon, saves.homeData)
+  const columns = useColumns(trackedMonsToRelease, onSelectMon)
   const navigate = useNavigate()
+  const { switchBoxCurrentBank } = useBanksAndBoxes()
 
   const buildContextElements = useCallback(
     (mon: OHPKM) => {
-      const homeLocation = saves.homeData.findIfPresent(mon.openhomeId)
+      const homeLocation = findHomeLocation(mon.openhomeId)
       const actions: CtxMenuElementBuilder[] = [
         LabelBuilder.fromMon(mon),
         homeLocation
           ? ItemBuilder.fromLabel('Jump to Box').withAction(() => {
-              saves.homeBoxSetCurrent(homeLocation.box)
+              switchBoxCurrentBank(homeLocation.box)
               navigate('/home')
             })
           : ItemBuilder.fromLabel('Find Containing Save').withAction(() =>
@@ -91,12 +96,13 @@ export default function AllTrackedPokemon({
     },
     [
       deselectIds,
+      findHomeLocation,
       findSaveForMon,
       findSavesForAllMons,
       navigate,
       releaseMonsById,
-      saves,
       selectedIds,
+      switchBoxCurrentBank,
     ]
   )
 
@@ -179,10 +185,9 @@ function locationToSortableString(location: Option<BankBoxCoordinates>): string 
 
 function useColumns(
   trackedMonsToRelease: OhpkmIdentifier[],
-  onSelectMon: (mon: OHPKM) => void,
-  homeData: OpenHomeBanks
+  onSelectMon: (mon: OHPKM) => void
 ): SortableColumn<OHPKM>[] {
-  const saves = useSaves()
+  const { getBankName, getBoxName, findHomeLocation } = useBanksAndBoxes()
 
   // this is necessary because the renderer functions do not update correctly when dependencies change
   const trackedMonsRef = useRef(trackedMonsToRelease)
@@ -227,22 +232,18 @@ function useColumns(
         if (trackedMonsRef.current.includes(mon.openhomeId)) {
           return 'Release Area'
         }
-        const bankIndex = homeData.findIfPresent(mon.openhomeId)?.bank
-        return typeof bankIndex === 'number'
-          ? saves.homeData.banks[bankIndex].nameOrDefault()
-          : undefined
+        const bankIndex = findHomeLocation(mon.openhomeId)?.bank
+        return typeof bankIndex === 'number' ? getBankName(bankIndex) : undefined
       },
       getFilterValue: (mon) => {
         if (trackedMonsToRelease.includes(mon.openhomeId)) return 'Release Area'
-        const bankIndex = saves.homeData.findIfPresent(mon.openhomeId)?.bank
-        return bankIndex !== undefined
-          ? saves.homeData.banks[bankIndex].nameOrDefault()
-          : 'Not in OpenHome Boxes'
+        const bankIndex = findHomeLocation(mon.openhomeId)?.bank
+        return bankIndex !== undefined ? getBankName(bankIndex) : 'Not in OpenHome Boxes'
       },
       sortFunction: numericSorter((mon) =>
         trackedMonsToRelease.includes(mon.openhomeId)
           ? Number.POSITIVE_INFINITY
-          : homeData.findIfPresent(mon.openhomeId)?.bank
+          : findHomeLocation(mon.openhomeId)?.bank
       ),
     },
     {
@@ -253,11 +254,10 @@ function useColumns(
         if (trackedMonsRef.current.includes(mon.openhomeId)) {
           return 'Release Area'
         }
-        const location = homeData.findIfPresent(mon.openhomeId)
+        const location = findHomeLocation(mon.openhomeId)
         return location ? (
           <span>
-            <b>{homeData.banks[location.bank].getBox(location.box).nameOrDefault()}</b> [slot{' '}
-            {location.boxSlot + 1}]
+            <b>{getBoxName(location.bank, location.box)}</b> [slot {location.boxSlot + 1}]
           </span>
         ) : undefined
       },
@@ -265,14 +265,14 @@ function useColumns(
         if (trackedMonsToRelease.includes(mon.openhomeId)) {
           return 'Release Area'
         }
-        const location = homeData.findIfPresent(mon.openhomeId)
+        const location = findHomeLocation(mon.openhomeId)
         return location ? `Box ${location.box + 1}` : 'Not in OpenHome Boxes'
       },
       sortFunction: stringSorter((mon) => {
         if (trackedMonsToRelease.includes(mon.openhomeId)) {
           return '$RELEASE'
         }
-        const location = homeData.findIfPresent(mon.openhomeId)
+        const location = findHomeLocation(mon.openhomeId)
         return locationToSortableString(location)
       }),
     },

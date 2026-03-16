@@ -11,7 +11,9 @@
     ],
     "module": "ESNext",
     "skipLibCheck": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "paths": {
       "src/*": [
         "./src/*"
@@ -62,6 +64,7 @@
     "generate/_rename.js",
     "generate/generateMoveMap.ts",
     "src-tauri/pokemon-wasm",
-    "generate/generate-cfru/generateMoveMap.ts"
+    "generate/generate-cfru/generateMoveMap.ts",
+    "__mocks__"
   ]
 }
