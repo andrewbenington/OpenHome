@@ -1,15 +1,14 @@
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
-import { toGen3CRFUPokemonIndex } from '@openhome-core/save/cfru/conversion/util'
 import { getLumiCustomForm } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import { toGen3RRPokemonIndex } from '@openhome-core/save/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from '@openhome-core/save/radicalred/conversion/RadicalRedSprites'
-import { NationalDexToUnboundMap } from '@openhome-core/save/unbound/conversion/UnboundSpeciesMap'
 import { UBSprites } from '@openhome-core/save/unbound/conversion/UnboundSprites'
 import { MonSpriteData } from '@openhome-ui/state/plugin'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { MonFormat } from '../../core/pkm/interfaces'
+import { toGen3UBPokemonIndex } from '../../core/save/unbound/conversion/Gen3UBPokemonIndex'
 
 export const fileToSpriteFolder: Record<MonFormat | 'OHPKM', string> = {
   PK1: 'gen1',
@@ -64,7 +63,7 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
     if (mon.dexNum === NationalDex.Terapagos) {
       return 'sprites/home/terapagos-terastal.png'
     }
-    let gen3RRname = RRSprites[toGen3RRPokemonIndex(mon.dexNum, formeNum)]
+    let gen3RRname = RRSprites[toGen3RRPokemonIndex(mon.dexNum, formeNum, mon.extraFormIndex)]
 
     if (!gen3RRname) {
       console.error(`missing Radical Red sprite for ${spriteName}`)
@@ -78,8 +77,7 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
     if (mon.dexNum === NationalDex.Ursaluna && formeNum === BLOOD_MOON) {
       return 'sprites/home/ursaluna-bloodmoon.png'
     }
-    let gen3UBname =
-      UBSprites[toGen3CRFUPokemonIndex(mon.dexNum, formeNum, NationalDexToUnboundMap)]
+    let gen3UBname = UBSprites[toGen3UBPokemonIndex(mon.dexNum, formeNum, mon.extraFormIndex)]
 
     if (!gen3UBname) {
       console.error(`missing Unbound sprite for ${spriteName}`)
@@ -90,7 +88,7 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
     gen3UBname = gen3UBname[0].toUpperCase() + gen3UBname.slice(1).toLowerCase()
     return `sprites/${spriteFolder}/${gen3UBname}`
   } else if (monFormat === 'PB8LUMI') {
-    const lumiForm = mon.pluginForm ?? formeNum
+    const lumiForm = mon.extraFormIndex ?? formeNum
     if (getLumiCustomForm(mon.dexNum, lumiForm)) {
       return `sprites/lumi/${mon.dexNum}-${lumiForm}.webp`
     }

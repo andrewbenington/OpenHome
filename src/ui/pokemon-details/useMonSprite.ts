@@ -39,7 +39,15 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
 
   useEffect(() => {
     setSpriteResult({ loading: true })
-  }, [mon.format, mon.dexNum, mon.formeNum, mon.formArgument, mon.isFemale, mon.isShiny])
+  }, [
+    mon.format,
+    mon.dexNum,
+    mon.formeNum,
+    mon.formArgument,
+    mon.isFemale,
+    mon.isShiny,
+    mon.extraFormIndex,
+  ])
 
   useEffect(() => {
     if (spriteResult.errorMessage || spriteResult.path) return

@@ -1,3 +1,4 @@
+import { ExtraFormIndex } from '@pkm-rs/pkg'
 import { Dispatch, Reducer, createContext } from 'react'
 
 export interface MonSpriteData {
@@ -8,7 +9,7 @@ export interface MonSpriteData {
   heldItemIndex?: number
   isFemale?: boolean
   isShiny?: boolean
-  pluginForm?: number
+  extraFormIndex?: ExtraFormIndex
 }
 
 export interface OpenHomePlugin {

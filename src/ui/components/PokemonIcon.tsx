@@ -152,7 +152,7 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
     dexNum: dexNumber,
     formeNum: formeNumber ?? 0,
     format: pluginOrigin === 'luminescent_platinum' ? 'PB8LUMI' : 'OHPKM',
-    pluginForm,
+    extraFormIndex: pluginForm,
   })
 
   return (

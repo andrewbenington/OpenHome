@@ -1,4 +1,4 @@
-use crate::pkm::ohpkm::extra_form::ExtraForm;
+use crate::pkm::ohpkm::extra_form::ExtraFormIndex;
 use crate::pkm::ohpkm::sectioned_data::DataSection;
 use crate::pkm::ohpkm::{OhpkmV1, SectionTagV2};
 use crate::pkm::traits::{IsShiny4096, OhpkmByte, OhpkmBytes};
@@ -98,7 +98,7 @@ pub struct MainDataV2 {
     pub language: Language,
     pub form_argument: u32,
     pub affixed_ribbon: Option<ModernRibbon>,
-    pub extra_form: Option<ExtraForm>,
+    pub extra_form: Option<ExtraFormIndex>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,

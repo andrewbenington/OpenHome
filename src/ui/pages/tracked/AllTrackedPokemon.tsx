@@ -1,6 +1,6 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { PluginIdentifier, SAV } from '@openhome-core/save/interfaces'
+import { SAV } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import {
   gameOrPluginSorter,
@@ -311,11 +311,7 @@ function useColumns(
       name: 'Original Game',
       width: '10rem',
       renderValue: (value) => (
-        <OriginGameIndicator
-          originGame={value.gameOfOrigin}
-          plugin={value.pluginOrigin as PluginIdentifier}
-          withName
-        />
+        <OriginGameIndicator originGame={value.gameOfOrigin} plugin={value.pluginOrigin} withName />
       ),
       getFilterValue: (mon) => OriginGames.gameName(mon.gameOfOrigin),
       sortFunction: gameOrPluginSorter(

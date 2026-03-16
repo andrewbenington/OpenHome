@@ -1,11 +1,13 @@
 import {
   AbilityIndex,
+  ExtraFormIndex,
   FormeMetadata,
   Gender,
   Language,
   NatureIndex,
   ShinyLeaves,
 } from '@pkm-rs/pkg'
+import { PluginIdentifier } from '../../../../src/core/save/interfaces'
 import * as types from './types'
 
 export type FourMoves = [number, number, number, number]
@@ -44,6 +46,7 @@ export interface AllPKMFields {
   evs?: types.Stats
   evsG12?: types.StatsPreSplit
   exp: number
+  extraFormIndex?: ExtraFormIndex
   favorite?: boolean
   fieldEventFatigue1?: number
   fieldEventFatigue2?: number
@@ -101,7 +104,10 @@ export interface AllPKMFields {
   palma?: number
   performance?: number
   personalityValue?: number
-  pluginOrigin?: string
+  // pluginIdentifier is the plugin identifier corresponding to the PKM format, regardless of if the Pokémon was originally from that game
+  pluginIdentifier?: PluginIdentifier
+  // pluginOrigin is the plugin identifier of the game the Pokémon originally came from, which will be different than pluginIdentifier if the mon was transferred from a different game
+  pluginOrigin?: PluginIdentifier
   pluginForm?: number
   pokeStarFame?: number
   pokerusByte?: number
@@ -168,4 +174,5 @@ export interface AllPKMFields {
   metadata?: FormeMetadata
 
   toBytes: ((_options?: types.ToBytesOptions) => ArrayBuffer) | (() => ArrayBuffer)
+  extraDisplayFields?: () => Record<string, string | number | boolean>
 }

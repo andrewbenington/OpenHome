@@ -1377,30 +1377,46 @@ export const Gen3RRSpecies = [
   'Chillet',
 ]
 
-import { GameToNationalDexEntry } from '../../cfru/conversion/util'
-import { NationalDexToRadicalRedMap, RadicalRedToNationalDexMap } from './RadicalRedSpeciesMap'
+import { ExtraFormIndex } from '@pkm-rs/pkg'
+import { CfruToNationalDexEntry } from '../../cfru/conversion/util'
+import {
+  ExtraFormToRadicalRedMap,
+  NationalDexToRadicalRedMap,
+  RadicalRedToNationalDexMap,
+} from './RadicalRedSpeciesMap'
 
-export function fromGen3RRPokemonIndex(radicalRedIndex: number): GameToNationalDexEntry | null {
+export function fromGen3RRPokemonIndex(radicalRedIndex: number): CfruToNationalDexEntry | null {
   const entry = RadicalRedToNationalDexMap[String(radicalRedIndex)]
 
   if (entry) {
     return {
-      NationalDexIndex: entry.NationalDexIndex,
-      FormIndex: entry.FormIndex,
+      nationalDex: entry.nationalDex,
+      formIndex: entry.formIndex,
     }
   } else {
     console.warn(`Radical Red index ${radicalRedIndex} not found.`)
     return {
-      NationalDexIndex: 0,
-      FormIndex: 0,
+      nationalDex: 0,
+      formIndex: 0,
     }
     // throw new Error(`Radical Red index ${radicalRedIndex} not found.`)
   }
 }
 
-export function toGen3RRPokemonIndex(nationalDexNumber: number, formIndex: number): number {
+export function toGen3RRPokemonIndex(
+  nationalDexNumber: number,
+  formIndex: number,
+  extraFormIndex?: ExtraFormIndex
+): number {
+  if (extraFormIndex !== undefined) {
+    const radicalRedIndex = ExtraFormToRadicalRedMap.get(extraFormIndex)
+    if (radicalRedIndex !== undefined) {
+      return radicalRedIndex
+    }
+  }
+
   const key = `${nationalDexNumber}_${formIndex}`
-  const radicalRedIndex = globalThis.Number(NationalDexToRadicalRedMap[key])
+  const radicalRedIndex = parseInt(NationalDexToRadicalRedMap[key])
 
   if (radicalRedIndex !== undefined) {
     return radicalRedIndex

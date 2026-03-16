@@ -25,7 +25,7 @@ import { ZASAV } from '../../core/save/Gen89/ZASAV'
 import { OfficialSAV } from '../../core/save/interfaces'
 import { MonDisplayState } from '../hooks/useMonDisplay'
 
-const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
+export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
   G2SAV,
   G3SAV,

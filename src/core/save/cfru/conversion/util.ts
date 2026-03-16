@@ -1,10 +1,13 @@
-export interface GameToNationalDexEntry {
-  NationalDexIndex: number
-  FormIndex: number
+import { ExtraFormIndex } from '@pkm-rs/pkg'
+
+export interface CfruToNationalDexEntry {
+  nationalDex: number
+  formIndex: number
+  extraFormIndex?: ExtraFormIndex
 }
 
 export function makeNationalDexToGameMap(
-  GameToNationalDexMap: Record<string, GameToNationalDexEntry | null>
+  GameToNationalDexMap: Record<string, CfruToNationalDexEntry | null>
 ) {
   const NationalDexToGameMap: Record<string, string> = {}
 
@@ -12,9 +15,9 @@ export function makeNationalDexToGameMap(
     const entry = GameToNationalDexMap[key]
 
     if (entry) {
-      const newKey = `${entry.NationalDexIndex}_${entry.FormIndex}`
+      const newKey = `${entry.nationalDex}_${entry.formIndex}`
 
-      if (entry.NationalDexIndex === -1) continue
+      if (entry.nationalDex === -1) continue
 
       if (!(newKey in NationalDexToGameMap)) {
         NationalDexToGameMap[newKey] = key
@@ -24,21 +27,33 @@ export function makeNationalDexToGameMap(
   return NationalDexToGameMap
 }
 
+export function makeExtraFormToGameMap(
+  GameToNationalDexMap: Record<string, CfruToNationalDexEntry | null>
+) {
+  const ExtraFormToGameMap: Map<ExtraFormIndex, number> = new Map()
+
+  for (const key in GameToNationalDexMap) {
+    const entry = GameToNationalDexMap[key]
+
+    if (entry?.extraFormIndex) {
+      ExtraFormToGameMap.set(entry.extraFormIndex, parseInt(key))
+    }
+  }
+  return ExtraFormToGameMap
+}
+
 export function fromGen3CRFUPokemonIndex(
   index: number,
-  GameToNationalDexMap: Record<string, GameToNationalDexEntry | null>,
+  GameToNationalDexMap: Record<string, CfruToNationalDexEntry | null>,
   gameName: string
-): GameToNationalDexEntry {
+): CfruToNationalDexEntry {
   const entry = GameToNationalDexMap[String(index)]
 
-  if (entry) {
-    return {
-      NationalDexIndex: entry.NationalDexIndex,
-      FormIndex: entry.FormIndex,
-    }
-  } else {
+  if (!entry) {
     throw new Error(`${gameName} index ${index} not found.`)
   }
+
+  return entry
 }
 
 export function toGen3CRFUPokemonIndex(

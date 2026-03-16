@@ -12,6 +12,7 @@ import { FileSchemas } from '@pokemon-files/schema'
 import { Dialog, Flex, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
+import { isRomHackFormat } from '../../../packages/pokemon-files/src/pkm/PKM'
 import './style.css'
 import MetDataMovesTab from './tabs/MetDataMovesTab'
 import NotesDisplay from './tabs/NotesTab'
@@ -201,7 +202,7 @@ const PokemonDetailsModal = (props: {
                       //   : new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))
                     }
                     format={
-                      displayMon.pluginIdentifier
+                      isRomHackFormat(displayMon.format)
                         ? undefined
                         : (displayMon.format as keyof typeof FileSchemas | 'OHPKM')
                     }
