@@ -183,6 +183,7 @@ export function useOhpkmStore(): OhpkmStore {
         case 'PK8':
         case 'PA8':
         case 'PB8':
+        case 'PB8LUMI':
         case 'PK9':
         case 'PA9': {
           const homeIdentifier = getMonFileIdentifier(mon)
@@ -235,7 +236,7 @@ export function useOhpkmStore(): OhpkmStore {
 
 export type IdentifierNotPresentError = { identifier: OhpkmIdentifier }
 
-function IdentifierNotPresent(identifier: OhpkmIdentifier): IdentifierNotPresentError {
+export function IdentifierNotPresent(identifier: OhpkmIdentifier): IdentifierNotPresentError {
   return { identifier }
 }
 export const OhpkmStoreContext = createContext<

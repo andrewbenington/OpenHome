@@ -8,11 +8,12 @@ import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
-import { colorForType } from '@openhome-ui/util/color'
-import { genderFromBool, MetadataLookup } from '@pkm-rs/pkg'
+import { colorForType, colorIsDark } from '@openhome-ui/util/color'
+import { genderFromBool, getPluginColor, MetadataLookup } from '@pkm-rs/pkg'
 import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
+import { getRomHackFormName } from 'src/core/save/rom-hack/forms'
 import useMonSprite from '../useMonSprite'
 
 const SummaryDisplay = (props: { mon: PKMInterface }) => {
@@ -24,6 +25,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
     isShiny: mon.isShiny(),
     isFemale: mon.gender === 1,
     format: mon.format,
+    pluginForm: mon.pluginForm,
   })
 
   const itemAltText = useMemo(() => {
@@ -131,7 +133,19 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow label="Species">
           <Flex gap="1">
-            {MetadataLookup(mon.dexNum, mon.formeNum)?.formeName}
+            {mon.pluginOrigin && mon.pluginForm !== undefined ? (
+              <span
+                className="rom-hack-form-name"
+                style={{
+                  color: colorIsDark(getPluginColor(mon.pluginOrigin)) ? '#fff' : '#000',
+                  backgroundColor: getPluginColor(mon.pluginOrigin),
+                }}
+              >
+                {getRomHackFormName(mon.pluginOrigin, mon.dexNum, mon.pluginForm)}
+              </span>
+            ) : (
+              MetadataLookup(mon.dexNum, mon.formeNum)?.formeName
+            )}
             <GenderIcon gender={mon.gender} />
           </Flex>
         </AttributeRow>

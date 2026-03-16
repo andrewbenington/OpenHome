@@ -34,7 +34,26 @@ export function unique<T>(items: T[] | undefined): T[] {
   return Array.from(new Set(items))
 }
 
-// remove this after node 22 is lts
+// remove this after ES2025 is lts
+if (!Set.prototype.union) {
+  Set.prototype.union = function (other) {
+    const r = new Set(this)
+    const it = other.keys()
+    let next = it.next()
+    while (!next.done) {
+      r.add(next.value)
+      next = it.next()
+    }
+    return r
+  }
+}
+export function union<T>(first: T[] | undefined, second: T[]): T[] {
+  const set1 = new Set(first)
+  const set2 = new Set(second)
+  return Array.from(set1.union(set2))
+}
+
+// remove this after ES2025 is lts
 if (!Set.prototype.intersection) {
   Set.prototype.intersection = function (other) {
     const r = new Set()
@@ -49,7 +68,7 @@ export function intersection<T>(first: T[] | undefined, second: T[]): T[] {
   return Array.from(set1.intersection(set2))
 }
 
-// remove this after node 22 is lts
+// remove this after ES2025 is lts
 if (!Set.prototype.difference) {
   Set.prototype.difference = function (other) {
     const r = new Set()

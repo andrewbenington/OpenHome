@@ -1,5 +1,6 @@
+import { getLumiCustomForm } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
-import BoxIcons from '@openhome-ui/images/BoxIcons.png'
+import BoxIcons from '@openhome-ui/images/BoxIcons.webp'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import useMonSprite from '@openhome-ui/pokemon-details//useMonSprite'
@@ -18,6 +19,8 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   grayedOut?: boolean
   silhouette?: boolean
   topRightIndicator?: ReactNode
+  pluginForm?: number
+  pluginOrigin?: string
 }
 
 function getBackgroundPosition(formeMetadata?: FormeMetadata, isEgg?: boolean) {
@@ -44,27 +47,36 @@ export default function PokemonIcon(props: PokemonIconProps) {
     topRightIndicator,
     style,
     onClick,
+    pluginForm,
+    pluginOrigin,
   } = props
 
   const formeMetadata = MetadataLookup(dexNumber, formeNumber ?? 0)
 
   const isGen9Mega = formeMetadata?.isMega && formeMetadata.introducedGen === Generation.G9
+  const isLumiCustomForm =
+    pluginOrigin === 'luminescent_platinum' &&
+    pluginForm !== undefined &&
+    !!getLumiCustomForm(dexNumber, pluginForm)
 
-  const monImage = isGen9Mega ? (
-    <PokemonIconUsingImage
-      dexNumber={dexNumber}
-      formeNumber={formeNumber}
-      silhouette={silhouette}
-      onClick={onClick}
-    />
-  ) : formeMetadata ? (
-    <PokemonIconUsingSheet
-      formeMetadata={formeMetadata}
-      isEgg={isEgg}
-      silhouette={silhouette}
-      onClick={onClick}
-    />
-  ) : null
+  const monImage =
+    isGen9Mega || isLumiCustomForm ? (
+      <PokemonIconUsingImage
+        dexNumber={dexNumber}
+        formeNumber={formeNumber}
+        pluginForm={pluginForm}
+        pluginOrigin={pluginOrigin}
+        silhouette={silhouette}
+        onClick={onClick}
+      />
+    ) : formeMetadata ? (
+      <PokemonIconUsingSheet
+        formeMetadata={formeMetadata}
+        isEgg={isEgg}
+        silhouette={silhouette}
+        onClick={onClick}
+      />
+    ) : null
 
   return (
     <div className={classNames('pokemon-icon-container', grayscaleIf(grayedOut))} style={style}>
@@ -125,19 +137,22 @@ function PokemonIconUsingSheet(props: PokemonIconUsingSheetProps) {
 interface PokemonIconUsingImageProps {
   dexNumber: number
   formeNumber?: number
+  pluginForm?: number
+  pluginOrigin?: string
   silhouette?: boolean
   onClick?: MouseEventHandler
 }
 
 function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
-  const { dexNumber, formeNumber, silhouette, onClick } = props
+  const { dexNumber, formeNumber, pluginForm, pluginOrigin, silhouette, onClick } = props
 
   const isDarkMode = useIsDarkMode()
 
   const spriteResult = useMonSprite({
     dexNum: dexNumber,
     formeNum: formeNumber ?? 0,
-    format: 'OHPKM',
+    format: pluginOrigin === 'luminescent_platinum' ? 'PB8LUMI' : 'OHPKM',
+    pluginForm,
   })
 
   return (

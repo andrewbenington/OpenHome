@@ -102,6 +102,7 @@ export interface AllPKMFields {
   performance?: number
   personalityValue?: number
   pluginOrigin?: string
+  pluginForm?: number
   pokeStarFame?: number
   pokerusByte?: number
   receivedDay?: number

@@ -7,9 +7,9 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
+import { monSupportedBySave } from '@openhome-core/save/util'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
-import { useItems } from '@openhome-ui/state/items'
 import { isMonLocation, useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
 import { ReactNode, useCallback, useState } from 'react'
@@ -21,7 +21,6 @@ import useDragAndDrop from './useDragAndDrop'
 export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { children } = props
   const savesAndBanks = useSaves()
-  const { moveMonItemToBag, giveItemToMon } = useItems()
   const { dragState, startDragging, endDragging } = useDragAndDrop()
   const [dragOverId, setDragOverId] = useState<UniqueIdentifier | null>(null)
 
@@ -70,7 +69,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
 
         if (payload.kind === 'item') {
           if (isMonLocation(dest) && target) {
-            giveItemToMon(dest, payload.item)
+            savesAndBanks.giveItemToMon(dest, payload.item)
           }
           endDragging()
           return
@@ -81,13 +80,11 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
         if (dropElementId === 'to_release') {
           savesAndBanks.releaseMonAtLocation(payload.monData)
         } else if (dropElementId === 'item-bag') {
-          moveMonItemToBag(payload.monData)
+          savesAndBanks.moveMonItemToBag(payload.monData)
         } else if (
           isMonLocation(dest) &&
           (dest.isHome ||
-            savesAndBanks
-              .saveFromIdentifier(dest.saveIdentifier)
-              .supportsMon(mon.dexNum, mon.formeNum))
+            monSupportedBySave(savesAndBanks.saveFromIdentifier(dest.saveIdentifier), mon))
         ) {
           const source = payload.monData
 
@@ -97,7 +94,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             !dest.isHome &&
             !savesAndBanks.saveFromIdentifier(dest.saveIdentifier).supportsItem(mon.heldItemIndex)
           ) {
-            moveMonItemToBag(source)
+            savesAndBanks.moveMonItemToBag(source)
           }
 
           savesAndBanks.moveMon(source, dest)
@@ -132,6 +129,8 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               onlyItem={
                 dragOverId === 'item-bag' && Boolean(dragState.payload?.monData.mon.heldItemIndex)
               }
+              pluginForm={dragState.payload?.monData.mon.pluginForm}
+              pluginOrigin={dragState.payload?.monData.mon.pluginOrigin}
               style={{ width: '100%', height: '100%' }}
             />
           )

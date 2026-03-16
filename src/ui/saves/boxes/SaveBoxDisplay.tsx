@@ -2,6 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
+import { monSupportedBySave } from '@openhome-core/save/util'
 import { range } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
@@ -57,7 +58,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   }, [currentBox, ohpkmStore, selectedIndex])
 
   const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
-    const unsupportedMons = mons.filter((mon) => !save.supportsMon(mon.dexNum, mon.formeNum))
+    const unsupportedMons = mons.filter((mon) => !monSupportedBySave(save, mon))
 
     if (unsupportedMons.length) {
       dispatchError({
@@ -119,8 +120,8 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
       const sourceIsOpenHome = !sourceSave
       return (
-        !save.supportsMon(dragData.mon.dexNum, dragData.mon.formeNum) ||
-        (mon && !sourceIsOpenHome && !sourceSave.supportsMon(mon.dexNum, mon.formeNum))
+        !monSupportedBySave(save, dragData.mon) ||
+        (mon && !sourceIsOpenHome && !monSupportedBySave(sourceSave, mon))
       )
     },
     [dragState?.payload, saveFromIdentifier, save]
