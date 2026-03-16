@@ -109,7 +109,7 @@ function PKMConversion() {
               )}
             </span>
             <p style={{ marginTop: 4, color: 'var(--gray-11)' }}>{setting.description}</p>
-            {setting.type === 'string' && setting.enum && (
+            {setting.type === 'string' && setting.allowed_values && (
               <Select.Root
                 value={
                   defaultConvertStrategy[
@@ -126,7 +126,7 @@ function PKMConversion() {
               >
                 <Select.Trigger style={{ display: 'flex' }} />
                 <Select.Content side="right">
-                  {setting.enum.map((option) => (
+                  {setting.allowed_values.map((option) => (
                     <Select.Item key={option} value={option}>
                       {option}
                     </Select.Item>
