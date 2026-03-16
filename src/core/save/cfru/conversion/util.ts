@@ -1,13 +1,13 @@
 import { ExtraFormIndex } from '@pkm-rs/pkg'
 
-export interface CfruToNationalDexEntry {
+export interface CfruSpeciesAndForm {
   nationalDex: number
   formIndex: number
   extraFormIndex?: ExtraFormIndex
 }
 
 export function makeNationalDexToGameMap(
-  GameToNationalDexMap: Record<string, CfruToNationalDexEntry | null>
+  GameToNationalDexMap: Record<string, CfruSpeciesAndForm | null>
 ) {
   const NationalDexToGameMap: Record<string, string> = {}
 
@@ -28,7 +28,7 @@ export function makeNationalDexToGameMap(
 }
 
 export function makeExtraFormToGameMap(
-  GameToNationalDexMap: Record<string, CfruToNationalDexEntry | null>
+  GameToNationalDexMap: Record<string, CfruSpeciesAndForm | null>
 ) {
   const ExtraFormToGameMap: Map<ExtraFormIndex, number> = new Map()
 
@@ -44,16 +44,16 @@ export function makeExtraFormToGameMap(
 
 export function fromGen3CRFUPokemonIndex(
   index: number,
-  GameToNationalDexMap: Record<string, CfruToNationalDexEntry | null>,
+  GameToNationalDexMap: Record<string, CfruSpeciesAndForm | null>,
   gameName: string
-): CfruToNationalDexEntry {
+): CfruSpeciesAndForm {
   const entry = GameToNationalDexMap[String(index)]
 
-  if (!entry) {
+  if (entry) {
+    return entry
+  } else {
     throw new Error(`${gameName} index ${index} not found.`)
   }
-
-  return entry
 }
 
 export function toGen3CRFUPokemonIndex(

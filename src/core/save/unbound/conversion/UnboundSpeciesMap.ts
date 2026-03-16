@@ -1,11 +1,11 @@
 import { ExtraFormIndex } from '@pkm-rs/pkg'
 import {
-  CfruToNationalDexEntry,
+  CfruSpeciesAndForm,
   makeExtraFormToGameMap,
   makeNationalDexToGameMap,
 } from '../../cfru/conversion/util'
 
-export const UnboundToNationalDexMap: Record<string, CfruToNationalDexEntry | null> = {
+export const UnboundToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   '0': null, // Egg (not found)
   '1': { nationalDex: 1, formIndex: 0 }, // Bulbasaur
   '2': { nationalDex: 2, formIndex: 0 }, // Ivysaur

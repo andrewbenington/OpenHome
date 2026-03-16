@@ -1378,21 +1378,18 @@ export const Gen3RRSpecies = [
 ]
 
 import { ExtraFormIndex } from '@pkm-rs/pkg'
-import { CfruToNationalDexEntry } from '../../cfru/conversion/util'
+import { CfruSpeciesAndForm } from '../../cfru/conversion/util'
 import {
   ExtraFormToRadicalRedMap,
   NationalDexToRadicalRedMap,
   RadicalRedToNationalDexMap,
 } from './RadicalRedSpeciesMap'
 
-export function fromGen3RRPokemonIndex(radicalRedIndex: number): CfruToNationalDexEntry | null {
+export function fromGen3RRPokemonIndex(radicalRedIndex: number): CfruSpeciesAndForm | null {
   const entry = RadicalRedToNationalDexMap[String(radicalRedIndex)]
 
   if (entry) {
-    return {
-      nationalDex: entry.nationalDex,
-      formIndex: entry.formIndex,
-    }
+    return entry
   } else {
     console.warn(`Radical Red index ${radicalRedIndex} not found.`)
     return {

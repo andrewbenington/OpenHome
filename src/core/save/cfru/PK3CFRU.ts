@@ -34,7 +34,7 @@ import {
 import { OHPKM } from '../../pkm/OHPKM'
 import { Option } from '../../util/functional'
 import { PluginIdentifier } from '../interfaces'
-import { CfruToNationalDexEntry } from './conversion/util'
+import { CfruSpeciesAndForm } from './conversion/util'
 
 const INTERNAL_ORIGIN_NON_RR = OriginGame.Invalid6
 const INTERNAL_ORIGIN_FROM_CFRU = OriginGame.FireRed
@@ -113,6 +113,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   trainerGender: boolean
   isFakemon: boolean = false
   originalBytes?: Uint8Array
+
+  pluginForm?: number
 
   abstract selectColor: string
 
@@ -330,7 +332,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   abstract moveToGameIndex(nationalMoveId: number): number
   abstract getValidMoveIndices(): number[]
 
-  abstract monFromGameIndex(gameIndex: number): CfruToNationalDexEntry
+  abstract monFromGameIndex(gameIndex: number): CfruSpeciesAndForm
   abstract monToGameIndex(nationalDexNumber: number, formIndex: number): number
 
   abstract indexIsFakemon(speciesIndex: number): boolean
@@ -363,7 +365,11 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
     // Growth Substructure (starts at 0x1C)
     // 28:30 Species (DexNum)
-    dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, this.formeNum), true)
+    if (this.pluginForm) {
+      dataView.setUint16(0x1c, this.pluginForm, true)
+    } else {
+      dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, this.formeNum), true)
+    }
 
     // 30:32 Held Item
     dataView.setUint16(0x1e, this.internalHeldItemIndex, true)

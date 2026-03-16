@@ -1,11 +1,11 @@
 import { ExtraFormIndex } from '@pkm-rs/pkg'
 import {
-  CfruToNationalDexEntry,
+  CfruSpeciesAndForm,
   makeExtraFormToGameMap,
   makeNationalDexToGameMap,
 } from '../../cfru/conversion/util'
 
-export const RadicalRedToNationalDexMap: Record<string, CfruToNationalDexEntry | null> = {
+export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   '0': {
     nationalDex: 0,
     formIndex: 0,
@@ -3474,10 +3474,12 @@ export const RadicalRedToNationalDexMap: Record<string, CfruToNationalDexEntry |
   '866': {
     nationalDex: 714,
     formIndex: 0,
+    extraFormIndex: ExtraFormIndex.NoibatSevii,
   },
   '867': {
     nationalDex: 715,
     formIndex: 0,
+    extraFormIndex: ExtraFormIndex.NoivernSevii,
   },
   '868': {
     nationalDex: 981,
@@ -4351,10 +4353,12 @@ export const RadicalRedToNationalDexMap: Record<string, CfruToNationalDexEntry |
   '1085': {
     nationalDex: 25,
     formIndex: 0,
+    extraFormIndex: ExtraFormIndex.PikachuSurfing,
   },
   '1086': {
     nationalDex: 25,
     formIndex: 0,
+    extraFormIndex: ExtraFormIndex.PikachuFlying,
   },
   '1087': {
     nationalDex: 25,
