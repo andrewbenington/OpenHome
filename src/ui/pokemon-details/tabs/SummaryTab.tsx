@@ -10,18 +10,22 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { colorForType, colorIsDark } from '@openhome-ui/util/color'
 import { genderFromBool, getPluginColor, MetadataLookup } from '@pkm-rs/pkg'
+import { PKM } from '@pokemon-files/pkm/PKM'
 import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { getRomHackFormName } from 'src/core/save/rom-hack/forms'
+import { MonTag } from 'src/ui/util/tags'
 import useMonSprite from '../useMonSprite'
+
+type MonWithManagementData = PKMInterface & {
+  tags?: MonTag[]
+}
 
 const SummaryDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
   const tags = useMemo(() => {
-    return (
-      ((mon as any).tags as { label: string; color?: string; icon?: string }[] | undefined) ?? []
-    )
+    return (mon as MonWithManagementData).tags ?? []
   }, [mon])
   const spriteResult = useMonSprite({
     dexNum: mon.dexNum,
@@ -181,7 +185,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             <GenderIcon gender={genderFromBool(mon.trainerGender)} />
           </Flex>
         </AttributeRow>
-        <AttributeRow label="Trainer ID" value={getDisplayID(mon as any)} />
+        <AttributeRow label="Trainer ID" value={getDisplayID(mon as PKM)} />
         {mon.ability !== undefined && (
           <AttributeRow
             label="Ability"

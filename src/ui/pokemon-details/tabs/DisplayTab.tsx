@@ -14,7 +14,7 @@ interface DisplayTabProps {
 export default function DisplayTab({ mon }: DisplayTabProps) {
   const monWithDisplay = mon as OHPKM & {
     displayColor?: string
-    tags?: any[]
+    tags?: MonTag[]
   }
   const [customColor, setCustomColor] = useState(monWithDisplay.displayColor ?? '')
   const [tags, setTags] = useState<MonTag[]>(monWithDisplay.tags ?? [])

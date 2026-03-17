@@ -7,6 +7,7 @@ import useMonSprite from '@openhome-ui/pokemon-details//useMonSprite'
 import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs/pkg'
 import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
 import { classNames, grayscaleIf } from '../util/style'
+import { MonTag } from '../util/tags'
 import { TagIcon } from './TagIcon'
 import './components.css'
 
@@ -22,7 +23,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   topRightIndicator?: ReactNode
   pluginForm?: number
   pluginOrigin?: string
-  tags?: any[]
+  tags?: MonTag[]
   hasNotes?: boolean
 }
 

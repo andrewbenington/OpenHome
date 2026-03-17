@@ -1,9 +1,13 @@
-import { useCallback, useContext } from 'react'
-import { DragMode, DragMonContext, DragPayload, locationsEqual } from '.'
+import { useCallback, useContext, useMemo } from 'react'
+import { DragMode, DragMonContext, DragPayload, locationKey } from '.'
 import { MonLocation } from '../saves'
 
 export default function useDragAndDrop() {
   const [dragState, setDragState] = useContext(DragMonContext)
+  const selectedLocationKeys = useMemo(
+    () => new Set(dragState.selectedLocations.map(locationKey)),
+    [dragState.selectedLocations]
+  )
 
   const startDragging = useCallback(
     (payload: DragPayload) => {
@@ -55,14 +59,13 @@ export default function useDragAndDrop() {
   const toggleSelection = useCallback(
     (location: MonLocation) => {
       setDragState((prev) => {
-        const isSelected = prev.selectedLocations.some((loc) => locationsEqual(loc, location))
+        const key = locationKey(location)
+        const isSelected = prev.selectedLocations.some((loc) => locationKey(loc) === key)
 
         if (isSelected) {
           return {
             ...prev,
-            selectedLocations: prev.selectedLocations.filter(
-              (loc) => !locationsEqual(loc, location)
-            ),
+            selectedLocations: prev.selectedLocations.filter((loc) => locationKey(loc) !== key),
           }
         } else {
           return {
@@ -78,15 +81,14 @@ export default function useDragAndDrop() {
   const setSelection = useCallback(
     (location: MonLocation, select: boolean) => {
       setDragState((prev) => {
-        const isSelected = prev.selectedLocations.some((loc) => locationsEqual(loc, location))
+        const key = locationKey(location)
+        const isSelected = prev.selectedLocations.some((loc) => locationKey(loc) === key)
         if (isSelected === select) return prev
 
         if (!select) {
           return {
             ...prev,
-            selectedLocations: prev.selectedLocations.filter(
-              (loc) => !locationsEqual(loc, location)
-            ),
+            selectedLocations: prev.selectedLocations.filter((loc) => locationKey(loc) !== key),
           }
         } else {
           return {
@@ -107,9 +109,9 @@ export default function useDragAndDrop() {
 
   const isSelected = useCallback(
     (location: MonLocation) => {
-      return dragState.selectedLocations.some((loc) => locationsEqual(loc, location))
+      return selectedLocationKeys.has(locationKey(location))
     },
-    [dragState.selectedLocations]
+    [selectedLocationKeys]
   )
 
   return {

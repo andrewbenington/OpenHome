@@ -15,13 +15,30 @@ import { MetadataLookup } from '@pkm-rs/pkg'
 import { ReactNode, useCallback, useState } from 'react'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/core/pkm/util'
 import PokemonIcon from 'src/ui/components/PokemonIcon'
-import { DragPayload, locationsEqual } from '.'
-import { OPENHOME_BOX_SLOTS } from '../../state-zustand/banks-and-boxes/store'
+import { DragPayload, locationKey } from '.'
+import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import useDragAndDrop from './useDragAndDrop'
+
+function isDragPayload(value: unknown): value is DragPayload {
+  if (!value || typeof value !== 'object') return false
+
+  if (!('kind' in value)) return false
+
+  if (value.kind === 'item') {
+    return 'item' in value
+  }
+
+  if (value.kind === 'mon') {
+    return 'monData' in value
+  }
+
+  return false
+}
 
 export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { children } = props
   const savesAndBanks = useSaves()
+  const { homeLocationIsEmpty, getCurrentBank } = useBanksAndBoxes()
   const { dragState, startDragging, endDragging, clearSelections } = useDragAndDrop()
   const [dragOverId, setDragOverId] = useState<UniqueIdentifier | null>(null)
 
@@ -59,8 +76,8 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
       onDragEnd={(e) => {
         setDragOverId(null)
 
-        const target = e.active.data.current as DragPayload | undefined
-        if (!target) return
+        const target = e.active.data.current
+        if (!isDragPayload(target)) return
 
         const dest = e.over?.data.current
         const payload = dragState.payload
@@ -77,14 +94,21 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
           return
         }
 
+        const selectedLocationKeys = new Set(dragState.selectedLocations.map(locationKey))
+        const sourceLocationKey = locationKey(payload.monData)
+        const isSourceSelected = selectedLocationKeys.has(sourceLocationKey)
+        const selectedLocations = isSourceSelected
+          ? [
+              payload.monData,
+              ...dragState.selectedLocations.filter((l) => locationKey(l) !== sourceLocationKey),
+            ]
+          : [payload.monData]
+
         const { mon } = payload.monData
 
         if (dropElementId === 'to_release') {
-          if (
-            dragState.multiSelectEnabled &&
-            dragState.selectedLocations.some((l) => locationsEqual(l, payload.monData))
-          ) {
-            dragState.selectedLocations.forEach((loc) => {
+          if (dragState.multiSelectEnabled && isSourceSelected) {
+            selectedLocations.forEach((loc) => {
               const m = savesAndBanks.getMonAtLocation(loc)
               if (m) savesAndBanks.releaseMonAtLocation(loc)
             })
@@ -93,11 +117,8 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             savesAndBanks.releaseMonAtLocation(payload.monData)
           }
         } else if (dropElementId === 'item-bag') {
-          if (
-            dragState.multiSelectEnabled &&
-            dragState.selectedLocations.some((l) => locationsEqual(l, payload.monData))
-          ) {
-            dragState.selectedLocations.forEach((loc) => {
+          if (dragState.multiSelectEnabled && isSourceSelected) {
+            selectedLocations.forEach((loc) => {
               const m = savesAndBanks.getMonAtLocation(loc)
               if (m) savesAndBanks.moveMonItemToBag(loc)
             })
@@ -110,28 +131,72 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
           (dest.isHome ||
             monSupportedBySave(savesAndBanks.saveFromIdentifier(dest.saveIdentifier), mon))
         ) {
-          if (
-            dragState.multiSelectEnabled &&
-            dragState.selectedLocations.some((l) => locationsEqual(l, payload.monData))
-          ) {
-            const locationsToMove = [
-              payload.monData,
-              ...dragState.selectedLocations.filter((l) => !locationsEqual(l, payload.monData)),
-            ]
-            let currentDestSlot = dest.boxSlot
-            let currentDestBox = dest.box
+          if (dragState.multiSelectEnabled && isSourceSelected) {
+            const targetSave = dest.isHome
+              ? undefined
+              : savesAndBanks.saveFromIdentifier(dest.saveIdentifier)
 
-            const maxSlots = dest.isHome ? OPENHOME_BOX_SLOTS : 30
+            const nextSaveDestination = (
+              startBox: number,
+              startSlot: number
+            ): MonLocation | null => {
+              if (!targetSave) return null
 
-            for (const sourceLoc of locationsToMove) {
+              for (let box = startBox; box < targetSave.boxes.length; box++) {
+                const boxSlots = targetSave.boxes[box]?.boxSlots
+                if (!boxSlots) continue
+                const slotStart = box === startBox ? startSlot : 0
+
+                for (let boxSlot = slotStart; boxSlot < boxSlots.length; boxSlot++) {
+                  if (!boxSlots[boxSlot]) {
+                    return {
+                      isHome: false,
+                      saveIdentifier: targetSave.identifier,
+                      box,
+                      boxSlot,
+                    }
+                  }
+                }
+              }
+
+              return null
+            }
+
+            const nextHomeDestination = (
+              startBox: number,
+              startSlot: number
+            ): MonLocation | null => {
+              if (!dest.isHome) return null
+
+              const currentBank = getCurrentBank()
+              const bank = dest.bank
+
+              for (let box = startBox; box < currentBank.boxes.size; box++) {
+                const slotStart = box === startBox ? startSlot : 0
+
+                for (let boxSlot = slotStart; boxSlot < OPENHOME_BOX_SLOTS; boxSlot++) {
+                  const location = { bank, box, boxSlot }
+                  if (homeLocationIsEmpty(location)) return { isHome: true, ...location }
+                }
+              }
+
+              return null
+            }
+
+            let nextDestination: MonLocation | null = dest.isHome
+              ? nextHomeDestination(dest.box, dest.boxSlot)
+              : nextSaveDestination(dest.box, dest.boxSlot)
+
+            for (const sourceLoc of selectedLocations) {
+              if (!nextDestination) break
+
               const currMon = savesAndBanks.getMonAtLocation(sourceLoc)
               if (!currMon) continue
 
               if (
                 !dest.isHome &&
-                !savesAndBanks
-                  .saveFromIdentifier(dest.saveIdentifier)
-                  .supportsMon(currMon.dexNum, currMon.formeNum)
+                targetSave &&
+                !targetSave.supportsMon(currMon.dexNum, currMon.formeNum)
               ) {
                 continue
               }
@@ -139,25 +204,17 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               if (
                 currMon.heldItemIndex &&
                 !dest.isHome &&
-                !savesAndBanks
-                  .saveFromIdentifier(dest.saveIdentifier)
-                  .supportsItem(currMon.heldItemIndex)
+                targetSave &&
+                !targetSave.supportsItem(currMon.heldItemIndex)
               ) {
                 savesAndBanks.moveMonItemToBag(sourceLoc)
               }
 
-              const nextDest: MonLocation = {
-                ...dest,
-                box: currentDestBox,
-                boxSlot: currentDestSlot,
-              }
-              savesAndBanks.moveMon({ ...sourceLoc, mon: currMon }, nextDest)
+              savesAndBanks.moveMon({ ...sourceLoc, mon: currMon }, nextDestination)
 
-              currentDestSlot++
-              if (currentDestSlot >= maxSlots) {
-                currentDestSlot = 0
-                currentDestBox++
-              }
+              nextDestination = nextDestination.isHome
+                ? nextHomeDestination(nextDestination.box, nextDestination.boxSlot + 1)
+                : nextSaveDestination(nextDestination.box, nextDestination.boxSlot + 1)
             }
             clearSelections()
           } else {
@@ -178,9 +235,9 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
         endDragging()
       }}
       onDragStart={(e) => {
-        if (e.active.data?.current) {
-          startDragging(e.active.data.current as DragPayload)
-        }
+        const payload = e.active.data?.current
+        if (!isDragPayload(payload)) return
+        startDragging(payload)
       }}
       onDragOver={onDragOver}
       onDragCancel={endDragging}

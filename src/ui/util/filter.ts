@@ -24,7 +24,15 @@ export interface Filter {
 
 export type HeldItemFilter = number | HeldItemCategory
 
+type MonWithManagementData = PKMInterface & {
+  tags?: { label: string }[]
+  displayColor?: string
+  notes?: string
+}
+
 export function filterApplies(filter: Filter, mon: PKMInterface) {
+  const monWithManagement = mon as MonWithManagementData
+
   if (filter.dexNumber && mon.dexNum !== filter.dexNumber) {
     return false
   }
@@ -77,8 +85,7 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
   }
 
   if (filter.tag !== undefined) {
-    const tags: { label: string }[] =
-      'tags' in mon && Array.isArray((mon as any).tags) ? (mon as any).tags : []
+    const tags = monWithManagement.tags ?? []
     if (filter.tag === 'Any Tag') {
       if (tags.length === 0) return false
     } else if (filter.tag === 'No Tag') {
@@ -90,16 +97,16 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
 
   if (filter.displayColor !== undefined) {
     if (filter.displayColor === 'Any Color') {
-      if (!('displayColor' in mon) || !mon.displayColor) return false
+      if (!monWithManagement.displayColor) return false
     } else if (filter.displayColor === 'No Color') {
-      if ('displayColor' in mon && mon.displayColor) return false
+      if (monWithManagement.displayColor) return false
     } else {
-      if (!('displayColor' in mon) || mon.displayColor !== filter.displayColor) return false
+      if (monWithManagement.displayColor !== filter.displayColor) return false
     }
   }
 
   if (filter.hasNotes !== undefined) {
-    const notes = (mon as any).notes
+    const notes = monWithManagement.notes
     const monHasNotes = typeof notes === 'string' && notes.trim().length > 0
     if (filter.hasNotes !== monHasNotes) return false
   }

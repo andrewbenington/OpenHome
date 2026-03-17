@@ -21,6 +21,12 @@ import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
 
+type MonWithOpenHomeId = PKMInterface & { openhomeId: string }
+
+function hasOpenHomeId(mon: PKMInterface): mon is MonWithOpenHomeId {
+  return typeof (mon as { openhomeId?: unknown }).openhomeId === 'string'
+}
+
 interface BoxCellProps {
   onClick: () => void
   onDrop: (_: PKMInterface[]) => void
@@ -136,8 +142,8 @@ function BoxCell({
   }, [renameValue, location, setMonNickname])
 
   const tagSubmenu = useMemo(() => {
-    if (!mon || !('openhomeId' in mon)) return undefined
-    const monId = (mon as any).openhomeId as string
+    if (!mon || !hasOpenHomeId(mon)) return undefined
+    const monId = mon.openhomeId
 
     const builder = SubmenuBuilder.fromLabel('Set Tag')
     for (const preset of TAG_PRESETS) {
@@ -152,8 +158,8 @@ function BoxCell({
   }, [mon, updateMonTags])
 
   const displayColorSubmenu = useMemo(() => {
-    if (!mon || !('openhomeId' in mon)) return undefined
-    const monId = (mon as any).openhomeId as string
+    if (!mon || !hasOpenHomeId(mon)) return undefined
+    const monId = mon.openhomeId
 
     const builder = SubmenuBuilder.fromLabel('Set Display Color')
     for (const preset of DISPLAY_COLOR_PRESETS) {
