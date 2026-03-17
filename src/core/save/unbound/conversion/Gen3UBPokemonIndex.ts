@@ -1,12 +1,12 @@
 import { ExtraFormIndex } from '@pkm-rs/pkg'
-import { CfruToNationalDexEntry } from '../../cfru/conversion/util'
+import { CfruSpeciesAndForm } from '../../cfru/conversion/util'
 import {
   ExtraFormToUnboundMap,
   NationalDexToUnboundMap,
   UnboundToNationalDexMap,
 } from '../../unbound/conversion/UnboundSpeciesMap'
 
-export function fromGen3UBPokemonIndex(unboundIndex: number): CfruToNationalDexEntry | null {
+export function fromGen3UBPokemonIndex(unboundIndex: number): CfruSpeciesAndForm | null {
   const entry = UnboundToNationalDexMap[String(unboundIndex)]
 
   if (entry) {

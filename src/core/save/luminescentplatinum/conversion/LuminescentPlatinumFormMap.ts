@@ -105,3 +105,20 @@ export const LUMI_CUSTOM_FORMS: Record<number, Record<number, CustomFormInfo>> =
 export function getLumiCustomForm(dexNum: number, formeNum: number): CustomFormInfo | undefined {
   return LUMI_CUSTOM_FORMS[dexNum]?.[formeNum]
 }
+
+/**
+ * Gets the custom form metadata for a given extra form id, if present in Luminescent Platinum.
+ */
+export function getLumiFormIndexByExtraFormIndex(
+  dexNum: number,
+  extraFormIndex: ExtraFormIndex
+): Option<number> {
+  const customFormsForMon = LUMI_CUSTOM_FORMS[dexNum]
+  if (!customFormsForMon) return undefined
+  for (const formIndex in customFormsForMon) {
+    if (customFormsForMon[formIndex].extraFormIndex === extraFormIndex) {
+      return parseInt(formIndex)
+    }
+  }
+  return undefined
+}

@@ -109,7 +109,6 @@ export interface AllPKMFields {
   pluginIdentifier?: PluginIdentifier
   // pluginOrigin is the plugin identifier of the game the Pokémon originally came from, which will be different than pluginIdentifier if the mon was transferred from a different game
   pluginOrigin?: PluginIdentifier
-  pluginForm?: number
   pokeStarFame?: number
   pokerusByte?: number
   receivedDay?: number

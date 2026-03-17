@@ -319,6 +319,91 @@ impl ExtraFormIndex {
         }
         .to_owned()
     }
+
+    pub fn sprite_name(&self) -> Option<String> {
+        Some(
+            match self {
+                Self::PikachuRockStar => "pikachu-rock-star",
+                Self::PikachuBelle => "pikachu-belle",
+                // Self::PikachuPopStar => "pikachu-pop-star",
+                // Self::PikachuPhD => "pikachu-phd",
+                // Self::PikachuLibre => "pikachu-libre",
+                Self::PikachuCosplay => "pikachu-cosplay",
+                // Self::PikachuSurfing => "pikachu-surfing",
+                // Self::PikachuFlying => "pikachu-flying",
+                // Self::CharizardGiga => "charizard-gigantamax",
+                // Self::ButterfreeGiga => "butterfree-gigantamax",
+                // Self::PikachuGiga => "pikachu-gigantamax",
+                // Self::MeowthGiga => "meowth-gigantamax",
+                // Self::MachampGiga => "machamp-gigantamax",
+                // Self::GengarGiga => "gengar-gigantamax",
+                // Self::KinglerGiga => "kingler-gigantamax",
+                // Self::LaprasGiga => "lapras-gigantamax",
+                // Self::EeveeGiga => "eevee-gigantamax",
+                // Self::SnorlaxGiga => "snorlax-gigantamax",
+                // Self::GarbodorGiga => "garbodor-gigantamax",
+                // Self::MelmetalGiga => "melmetal-gigantamax",
+                // Self::CorviknightGiga => "corviknight-gigantamax",
+                // Self::OrbeetleGiga => "orbeetle-gigantamax",
+                // Self::DrednawGiga => "drednaw-gigantamax",
+                // Self::CoalossalGiga => "coalossal-gigantamax",
+                // Self::FlappleGiga => "flapple-gigantamax",
+                // Self::AppletunGiga => "appletun-gigantamax",
+                // Self::SandacondaGiga => "sandaconda-gigantamax",
+                // Self::ToxtricityGiga => "toxtricity-gigantamax",
+                // Self::ToxtricityLowKeyGiga => "toxtricity-low-key-gigantamax",
+                // Self::CentiskorchGiga => "centiskorch-gigantamax",
+                // Self::HattereneGiga => "hatterene-gigantamax",
+                // Self::GrimmsnarlGiga => "grimmsnarl-gigantamax",
+                // Self::AlcremieGiga => "alcremie-gigantamax",
+                // Self::CopperajahGiga => "copperajah-gigantamax",
+                // Self::DuraludonGiga => "duraludon-gigantamax",
+                // Self::VenusaurGiga => "venusaur-gigantamax",
+                // Self::BlastoiseGiga => "blastoise-gigantamax",
+                // Self::RillaboomGiga => "rillaboom-gigantamax",
+                // Self::CinderaceGiga => "cinderace-gigantamax",
+                // Self::InteleonGiga => "inteleon-gigantamax",
+                // Self::UrsifuSingleGiga => "urshifu-single-strike-gigantamax",
+                // Self::UrsifuRapidGiga => "urshifu-rapid-strike-gigantamax",
+                // Self::EternatusEternamax => "eternatus-eternamax",
+                Self::VenusaurClone => "venusaur-clone",
+                Self::CharizardClone => "charizard-clone",
+                Self::BlastoiseClone => "blastoise-clone",
+                Self::PikachuClone => "pikachu-clone",
+                Self::EeveeBandana => "eevee-bandana",
+                Self::GengarStitched => "gengar-stitched",
+                Self::OnixCrystal => "onix-crystal",
+                Self::MewtwoArmorMk1 => "mewtwo-armor-mk1",
+                Self::MewtwoArmorMk2 => "mewtwo-armor-mk2",
+                // Self::DoduoSevii => "doduo-sevii",
+                // Self::DodrioSevii => "dodrio-sevii",
+                // Self::TeddiursaSevii => "teddiursa-sevii",
+                // Self::UrsaringSevii => "ursaring-sevii",
+                // Self::MantykeSevii => "mantyke-sevii",
+                // Self::MantineSevii => "mantine-sevii",
+                // Self::FeebasSevii => "feebas-sevii",
+                // Self::MiloticSevii => "milotic-sevii",
+                // Self::CarnivineSevii => "carnivine-sevii",
+                // Self::BlitzleSevii => "blitzle-sevii",
+                // Self::ZebstrikaSevii => "zebstrika-sevii",
+                // Self::ClauncherSevii => "clauncher-sevii",
+                // Self::ClawitzerSevii => "clawitzer-sevii",
+                // Self::NoibatSevii => "noibat-sevii",
+                // Self::NoivernSevii => "noivern-sevii",
+                // Self::WishiwashiSevii => "wishiwashi-sevii",
+                // Self::WishiwashiSeviiSchool => "wishiwashi-sevii-school",
+                // Self::DhelmiseSevii => "dhelmise-sevii",
+                // Self::SizzlipedeSevii => "sizzlipede-sevii",
+                // Self::CentiskorchSevii => "centiskorch-sevii",
+                // Self::CentiskorchSeviiGiga => "centiskorch-sevii-gigantamax",
+                // Self::NymbleSevii => "nymble-sevii",
+                // Self::LokixSevii => "lokix-sevii",
+                // Self::DialgaPrimal => "dialga-primal",
+                _ => return None,
+            }
+            .to_owned(),
+        )
+    }
 }
 
 #[cfg(feature = "wasm")]
@@ -353,6 +438,12 @@ pub fn luminescent_supports_extra_form(form: ExtraFormIndex) -> bool {
 #[wasm_bindgen(js_name = "extraFormDisplayName")]
 pub fn extra_form_display_name(form: ExtraFormIndex) -> String {
     form.display_name()
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "extraFormSpriteName")]
+pub fn extra_form_sprite_name(form: ExtraFormIndex) -> Option<String> {
+    form.sprite_name()
 }
 
 pub struct InvalidExtraFormIndex;

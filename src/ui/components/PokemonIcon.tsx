@@ -1,10 +1,15 @@
-import { getLumiCustomForm } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import BoxIcons from '@openhome-ui/images/BoxIcons.webp'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { FormsUsingImages } from '@openhome-ui/pokemon-details/useBoxIconImage'
-import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs/pkg'
+import {
+  ExtraFormIndex,
+  extraFormSpriteName,
+  FormeMetadata,
+  Generation,
+  MetadataLookup,
+} from '@pkm-rs/pkg'
 import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
 import useBoxIconImage from '../pokemon-details/useBoxIconImage'
 import { classNames, grayscaleIf } from '../util/style'
@@ -20,8 +25,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   grayedOut?: boolean
   silhouette?: boolean
   topRightIndicator?: ReactNode
-  pluginForm?: number
-  pluginOrigin?: string
+  extraFormIndex?: ExtraFormIndex
 }
 
 function getBackgroundPosition(formeMetadata?: FormeMetadata, isEgg?: boolean) {
@@ -48,26 +52,22 @@ export default function PokemonIcon(props: PokemonIconProps) {
     topRightIndicator,
     style,
     onClick,
-    pluginForm,
-    pluginOrigin,
+    extraFormIndex,
   } = props
 
   const formeMetadata = MetadataLookup(dexNumber, formeNumber ?? 0)
 
   const isGen9Mega = formeMetadata?.isMega && formeMetadata.introducedGen === Generation.G9
-  const isLumiCustomForm =
-    pluginOrigin === 'luminescent_platinum' &&
-    pluginForm !== undefined &&
-    !!getLumiCustomForm(dexNumber, pluginForm)
+  const extraFormWithSprite = Boolean(extraFormIndex && extraFormSpriteName(extraFormIndex))
+
   const shouldUseImage =
-    isGen9Mega || isLumiCustomForm || FormsUsingImages.get(dexNumber)?.includes(formeNumber ?? 0)
+    isGen9Mega || extraFormWithSprite || FormsUsingImages.get(dexNumber)?.includes(formeNumber ?? 0)
 
   const monImage = shouldUseImage ? (
     <PokemonIconUsingImage
       dexNumber={dexNumber}
       formeNumber={formeNumber}
-      extraFormIndex={pluginForm}
-      pluginOrigin={pluginOrigin}
+      extraFormIndex={extraFormIndex}
       silhouette={silhouette}
       onClick={onClick}
     />
@@ -140,20 +140,19 @@ interface PokemonIconUsingImageProps {
   dexNumber: number
   formeNumber?: number
   extraFormIndex?: number
-  pluginOrigin?: string
   silhouette?: boolean
   onClick?: MouseEventHandler
 }
 
 function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
-  const { dexNumber, formeNumber, extraFormIndex, pluginOrigin, silhouette, onClick } = props
+  const { dexNumber, formeNumber, extraFormIndex, silhouette, onClick } = props
 
   const isDarkMode = useIsDarkMode()
 
   const spriteResult = useBoxIconImage({
     dexNum: dexNumber,
     formeNum: formeNumber ?? 0,
-    format: pluginOrigin === 'luminescent_platinum' ? 'PB8LUMI' : 'OHPKM',
+    format: 'OHPKM',
     extraFormIndex,
   })
 

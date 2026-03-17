@@ -1,13 +1,13 @@
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
-import { getLumiCustomForm } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import { toGen3RRPokemonIndex } from '@openhome-core/save/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from '@openhome-core/save/radicalred/conversion/RadicalRedSprites'
 import { UBSprites } from '@openhome-core/save/unbound/conversion/UnboundSprites'
 import { MonSpriteData } from '@openhome-ui/state/plugin'
-import { MetadataLookup } from '@pkm-rs/pkg'
+import { extraFormSpriteName, MetadataLookup } from '@pkm-rs/pkg'
 import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { isRomHackFormat, MonFormat } from '../../core/pkm/interfaces'
+import { getLumiFormIndexByExtraFormIndex } from '../../core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import { toGen3UBPokemonIndex } from '../../core/save/unbound/conversion/Gen3UBPokemonIndex'
 
 export const fileToSpriteFolder: Record<MonFormat | 'OHPKM', string> = {
@@ -55,11 +55,24 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
   const alwaysUsedSprite = getAlwaysUsedSpritePath(mon.dexNum, mon.formeNum)
   if (alwaysUsedSprite) return alwaysUsedSprite
 
-  const spriteName = getSpriteName(mon)
+  const extraFormSprite = mon.extraFormIndex ? extraFormSpriteName(mon.extraFormIndex) : undefined
+
+  const spriteName = extraFormSprite ?? getSpriteName(mon)
+
+  if (extraFormSprite) {
+    spriteFolder = 'extra'
+  }
+
+  const extension =
+    spriteFolder === 'gen3gc'
+      ? 'gif'
+      : spriteFolder === 'home' || spriteFolder === 'extra'
+        ? 'webp'
+        : 'png'
 
   return `sprites/${spriteFolder}${
     mon.isShiny && spriteFolder !== 'gen1' && spriteFolder !== 'gen9' ? '/shiny/' : '/'
-  }${spriteName}.${spriteFolder === 'gen3gc' ? 'gif' : 'png'}`
+  }${spriteName}.${extension}`
 }
 
 export function getSpriteName(mon: MonSpriteData): string {
@@ -111,10 +124,10 @@ export function getRomHackSpritePath(mon: MonSpriteData) {
     gen3UBname = gen3UBname[0].toUpperCase() + gen3UBname.slice(1).toLowerCase()
     return `sprites/${spriteFolder}/${gen3UBname}`
   } else if (monFormat === 'PB8LUMI') {
-    const lumiForm = mon.extraFormIndex ?? mon.formeNum
-    if (getLumiCustomForm(mon.dexNum, lumiForm)) {
-      return `sprites/lumi/${mon.dexNum}-${lumiForm}.webp`
-    }
+    const lumiForm = mon.extraFormIndex
+      ? getLumiFormIndexByExtraFormIndex(mon.dexNum, mon.extraFormIndex)
+      : mon.formeNum
+    return `sprites/lumi/${mon.dexNum}-${lumiForm}.webp`
   }
   const extension = spriteFolder === 'gen3gc' ? 'gif' : spriteFolder === 'home' ? 'webp' : 'png'
   return `sprites/${spriteFolder}${

@@ -47,17 +47,11 @@ export function monSupportedBySaveType(
   mon?: PKMInterface
 ): boolean {
   if (!saveType || !mon) return false
-  if (mon.pluginForm !== undefined && saveType.getPluginIdentifier?.() !== mon.pluginIdentifier) {
-    return false
-  }
   return supportsMon(saveType, mon.dexNum, mon.formeNum, mon.extraFormIndex)
 }
 
 export function monSupportedBySave(save?: SAV, mon?: PKMInterface): boolean {
   if (!save || !mon) return false
-  if (mon.pluginForm !== undefined && save.pluginIdentifier !== mon.pluginIdentifier) {
-    return false
-  }
   return save.supportsMon(mon.dexNum, mon.formeNum, mon.extraFormIndex)
 }
 

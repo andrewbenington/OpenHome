@@ -1,6 +1,7 @@
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getSpriteName } from '@openhome-ui/images/pokemon'
 import { MonSpriteData } from '@openhome-ui/state/plugin'
+import { ExtraFormIndex, extraFormSpriteName } from '@pkm-rs/pkg'
 import { LGE_STARTER, SPIKY_EAR } from '../../../packages/pokemon-resources/src/consts/Formes'
 import { NationalDex } from '../../../packages/pokemon-resources/src/consts/NationalDex'
 import useMonSprite from './useMonSprite'
@@ -10,6 +11,12 @@ export const FormsUsingImages: Map<number, number[]> = new Map([
   [NationalDex.Pichu, [SPIKY_EAR]], // Spiky-eared Pichu
 ])
 
+const ExtraFormsUsingImages: Set<ExtraFormIndex> = new Set([
+  ExtraFormIndex.PikachuRockStar,
+  ExtraFormIndex.PikachuBelle,
+  ExtraFormIndex.PikachuCosplay,
+])
+
 type MonSpriteResult =
   | { loading: true; path?: undefined; errorMessage?: undefined; severity?: undefined }
   | { loading: false; path?: undefined; errorMessage: string; severity: 'error' | 'warning' }
@@ -17,6 +24,14 @@ type MonSpriteResult =
 
 export default function useBoxIconImage(mon: MonSpriteData): MonSpriteResult {
   const monSprite = useMonSprite(mon)
+  if (mon.extraFormIndex && ExtraFormsUsingImages.has(mon.extraFormIndex)) {
+    const extraFormSprite = extraFormSpriteName(mon.extraFormIndex)
+    return {
+      loading: false,
+      path: getPublicImageURL(`icons/box/${extraFormSprite}.webp`),
+    }
+  }
+
   const boxIconOverride = FormsUsingImages.get(mon.dexNum)?.includes(mon.formeNum)
   if (boxIconOverride) {
     return {

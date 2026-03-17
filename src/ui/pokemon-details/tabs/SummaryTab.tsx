@@ -163,7 +163,6 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           </Flex>
         </AttributeRow>
         <AttributeRow label="Dex No." value={`${mon.dexNum}`} />
-        {mon.pluginForm && <AttributeRow label="ROM Hack Form" value={`${mon.pluginForm}`} />}
         <AttributeRow label="Type">
           {getTypes(mon)?.map((type) => (
             <TypeIcon type={type} key={`${type}_type_icon`} />
