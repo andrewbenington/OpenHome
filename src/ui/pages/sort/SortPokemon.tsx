@@ -28,7 +28,7 @@ export default function SortPokemon() {
   const savesAndBanks = useSaves()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<number>()
-  const [sort, setSort] = useState<SortType>('')
+  const [sort, setSort] = useState<SortType>()
   const ohpkmStore = useOhpkmStore()
 
   const allMonsWithColors: MonWithColors[] = useMemo(() => {
@@ -114,9 +114,9 @@ export default function SortPokemon() {
       <Flex direction="column" gap="2" style={{ flex: 1, height: '100%' }}>
         <Card style={{ contain: 'none' }}>
           <Autocomplete
-            value={sort ?? null}
+            value={sort}
             options={SortTypes}
-            onChange={(value) => setSort(value ?? '')}
+            onChange={(value) => setSort(value)}
             label="Sort"
             getOptionString={(opt) => opt}
             getOptionUniqueID={(opt) => opt}
