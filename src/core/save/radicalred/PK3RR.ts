@@ -15,10 +15,7 @@ import {
   RadicalRedToNationalDexMap,
 } from './conversion/RadicalRedSpeciesMap'
 
-const FAKEMON_INDEXES = [
-  1186, 1200, 1274, 1275, 1276, 1277, 1278, 1279, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289,
-  1290, 1291, 1292, 1293, 1294, 1375,
-]
+const CHILLET_INDEX = 1375
 
 const VALID_MOVE_INDICES_RR = Object.values(RRToNationalMap).filter((index) => index > 0)
 
@@ -65,7 +62,7 @@ export default class PK3RR extends PK3CFRU implements PluginPKMInterface {
   }
 
   indexIsFakemon(speciesIndex: number): boolean {
-    return FAKEMON_INDEXES.includes(speciesIndex)
+    return speciesIndex === CHILLET_INDEX
   }
 
   getPluginIdentifier(): PluginIdentifier {

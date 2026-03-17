@@ -143,14 +143,14 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
                 className="extra-form-name"
                 style={{
                   color: colorIsDark(
-                    mon.pluginIdentifier
-                      ? getPluginColor(mon.pluginIdentifier)
+                    mon.pluginOrigin
+                      ? getPluginColor(mon.pluginOrigin)
                       : OriginGames.color(mon.gameOfOrigin)
                   )
                     ? '#fff'
                     : '#000',
-                  backgroundColor: mon.pluginIdentifier
-                    ? getPluginColor(mon.pluginIdentifier)
+                  backgroundColor: mon.pluginOrigin
+                    ? getPluginColor(mon.pluginOrigin)
                     : OriginGames.color(mon.gameOfOrigin),
                 }}
               >
