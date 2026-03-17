@@ -23,7 +23,7 @@ export function useMonDisplay() {
   }
 
   function setFilter(newFilter: Partial<Filter>) {
-    updateState({ ...monDisplayState, filter: newFilter })
+    updateState({ ...monDisplayState, filter: { ...monDisplayState.filter, ...newFilter } })
   }
 
   function clearFilter() {

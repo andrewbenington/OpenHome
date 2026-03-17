@@ -34,7 +34,7 @@ export default function SortPokemon() {
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set())
   const [detailsMonIndex, setDetailsMonIndex] = useState<number>()
-  const [sort, setSort] = useState<SortType>('')
+  const [sort, setSort] = useState<SortType>()
   const ohpkmStore = useOhpkmStore()
   const banksAndBoxes = useBanksAndBoxes()
 
@@ -229,7 +229,7 @@ export default function SortPokemon() {
             <Autocomplete
               value={sort ?? null}
               options={SortTypes}
-              onChange={(value) => setSort(value ?? '')}
+              onChange={(value) => setSort(value)}
               label="Sort"
               getOptionString={(opt) => opt}
               getOptionUniqueID={(opt) => opt}
