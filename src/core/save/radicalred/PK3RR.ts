@@ -1,4 +1,4 @@
-import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
+import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
 import { ItemRadicalRed } from '@pkm-rs/pkg'
 import PK3CFRU from '../cfru/PK3CFRU'
 
@@ -67,5 +67,9 @@ export default class PK3RR extends PK3CFRU implements PluginPKMInterface {
 
   getPluginIdentifier(): PluginIdentifier {
     return 'radical_red'
+  }
+
+  getFormat(): RomHackFormat {
+    return 'PK3RR'
   }
 }

@@ -1,4 +1,4 @@
-import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
+import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
 import { ItemUnbound } from '@pkm-rs/pkg'
 import PK3CFRU from '../cfru/PK3CFRU'
 
@@ -68,5 +68,9 @@ export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
 
   getPluginIdentifier(): PluginIdentifier {
     return 'unbound'
+  }
+
+  getFormat(): RomHackFormat {
+    return 'PK3UB'
   }
 }
