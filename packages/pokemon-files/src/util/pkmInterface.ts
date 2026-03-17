@@ -7,13 +7,14 @@ import {
   NatureIndex,
   ShinyLeaves,
 } from '@pkm-rs/pkg'
+import { MonFormat } from '../../../../src/core/pkm/interfaces'
 import { PluginIdentifier } from '../../../../src/core/save/interfaces'
 import * as types from './types'
 
 export type FourMoves = [number, number, number, number]
 
 export interface AllPKMFields {
-  format: string
+  format: MonFormat | 'OHPKM'
   ability?: AbilityIndex
   abilityNum?: number
   affixedRibbon?: number | undefined

@@ -1,10 +1,11 @@
 import { ExtraFormIndex } from '@pkm-rs/pkg'
 import { Dispatch, Reducer, createContext } from 'react'
+import { MonFormat } from '../../core/pkm/interfaces'
 
 export interface MonSpriteData {
   dexNum: number
   formeNum: number
-  format: string
+  format: MonFormat | 'OHPKM'
   formArgument?: number
   heldItemIndex?: number
   isFemale?: boolean

@@ -1,4 +1,4 @@
-import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
+import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
 import {
   Ball,
   ExtraFormIndex,
@@ -74,7 +74,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   // static getName() {
   //   return 'PK3RR'
   // }
-  format: string = 'PK3CFRU'
+  abstract format: RomHackFormat
 
   abstract pluginIdentifier: PluginIdentifier
   pluginOrigin?: PluginIdentifier
@@ -196,7 +196,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       ]
 
       for (let i = 0; i < 4; i++) {
-        const pp = getMoveMaxPP(this.moves[i], this.format, this.movePPUps[i])
+        const pp = getMoveMaxPP(this.moves[i], this.getFormat(), this.movePPUps[i])
 
         if (pp) this.movePP[i] = pp
       }
@@ -251,7 +251,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
       const moveFilter = MoveFilter.fromMoveIndices(this.getValidMoveIndices())
       this.moves = moveFilter.moves(other)
-      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePP = moveFilter.movePp(other, this.getFormat())
       this.movePPUps = moveFilter.movePpUps(other)
 
       this.evs = other.evs ?? {
@@ -509,6 +509,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       'Internal Species Index': this.internalSpeciesIndex,
     }
   }
+
+  abstract getFormat(): RomHackFormat
 }
 
 export default PK3CFRU

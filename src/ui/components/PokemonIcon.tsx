@@ -3,9 +3,10 @@ import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import BoxIcons from '@openhome-ui/images/BoxIcons.webp'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
-import useMonSprite from '@openhome-ui/pokemon-details//useMonSprite'
+import { FormsUsingImages } from '@openhome-ui/pokemon-details/useBoxIconImage'
 import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs/pkg'
 import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
+import useBoxIconImage from '../pokemon-details/useBoxIconImage'
 import { classNames, grayscaleIf } from '../util/style'
 import './components.css'
 
@@ -58,25 +59,26 @@ export default function PokemonIcon(props: PokemonIconProps) {
     pluginOrigin === 'luminescent_platinum' &&
     pluginForm !== undefined &&
     !!getLumiCustomForm(dexNumber, pluginForm)
+  const shouldUseImage =
+    isGen9Mega || isLumiCustomForm || FormsUsingImages.get(dexNumber)?.includes(formeNumber ?? 0)
 
-  const monImage =
-    isGen9Mega || isLumiCustomForm ? (
-      <PokemonIconUsingImage
-        dexNumber={dexNumber}
-        formeNumber={formeNumber}
-        pluginForm={pluginForm}
-        pluginOrigin={pluginOrigin}
-        silhouette={silhouette}
-        onClick={onClick}
-      />
-    ) : formeMetadata ? (
-      <PokemonIconUsingSheet
-        formeMetadata={formeMetadata}
-        isEgg={isEgg}
-        silhouette={silhouette}
-        onClick={onClick}
-      />
-    ) : null
+  const monImage = shouldUseImage ? (
+    <PokemonIconUsingImage
+      dexNumber={dexNumber}
+      formeNumber={formeNumber}
+      extraFormIndex={pluginForm}
+      pluginOrigin={pluginOrigin}
+      silhouette={silhouette}
+      onClick={onClick}
+    />
+  ) : formeMetadata ? (
+    <PokemonIconUsingSheet
+      formeMetadata={formeMetadata}
+      isEgg={isEgg}
+      silhouette={silhouette}
+      onClick={onClick}
+    />
+  ) : null
 
   return (
     <div className={classNames('pokemon-icon-container', grayscaleIf(grayedOut))} style={style}>
@@ -137,22 +139,22 @@ function PokemonIconUsingSheet(props: PokemonIconUsingSheetProps) {
 interface PokemonIconUsingImageProps {
   dexNumber: number
   formeNumber?: number
-  pluginForm?: number
+  extraFormIndex?: number
   pluginOrigin?: string
   silhouette?: boolean
   onClick?: MouseEventHandler
 }
 
 function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
-  const { dexNumber, formeNumber, pluginForm, pluginOrigin, silhouette, onClick } = props
+  const { dexNumber, formeNumber, extraFormIndex, pluginOrigin, silhouette, onClick } = props
 
   const isDarkMode = useIsDarkMode()
 
-  const spriteResult = useMonSprite({
+  const spriteResult = useBoxIconImage({
     dexNum: dexNumber,
     formeNum: formeNumber ?? 0,
     format: pluginOrigin === 'luminescent_platinum' ? 'PB8LUMI' : 'OHPKM',
-    extraFormIndex: pluginForm,
+    extraFormIndex,
   })
 
   return (
