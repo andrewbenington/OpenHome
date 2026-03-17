@@ -135,11 +135,15 @@ function BoxCell({
   }, [mon])
 
   const confirmRename = useCallback(() => {
-    if (renameValue.trim()) {
-      setMonNickname(renameValue.trim(), location)
-    }
+    setMonNickname(renameValue.trim(), location)
     setRenameOpen(false)
   }, [renameValue, location, setMonNickname])
+
+  const clearNickname = useCallback(() => {
+    setMonNickname('', location)
+    setRenameValue('')
+    setRenameOpen(false)
+  }, [location, setMonNickname])
 
   const tagSubmenu = useMemo(() => {
     if (!mon || !hasOpenHomeId(mon)) return undefined
@@ -283,6 +287,9 @@ function BoxCell({
             <Flex gap="2" justify="end">
               <Button variant="soft" color="gray" onClick={() => setRenameOpen(false)}>
                 Cancel
+              </Button>
+              <Button variant="soft" color="gray" onClick={clearNickname}>
+                Clear
               </Button>
               <Button onClick={confirmRename}>Save</Button>
             </Flex>
