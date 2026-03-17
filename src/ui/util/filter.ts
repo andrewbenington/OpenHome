@@ -1,6 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { isMegaStone, isZCrystal } from '@openhome-core/pkm/util'
-import { Gender, MetadataLookup, OriginGame } from '@pkm-rs/pkg'
+import { getTypes, isMegaStone, isZCrystal } from '@openhome-core/pkm/util'
+import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { Type } from '@pokemon-resources/index'
 
 export interface Filter {
@@ -73,24 +73,16 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
     }
   }
 
-  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
-  if (!formeMetadata) {
+  const types = getTypes(mon)
+  if (!types) {
     return false
   }
 
-  if (
-    filter.type1 !== undefined &&
-    formeMetadata.type1 !== filter.type1 &&
-    formeMetadata.type2 !== filter.type1
-  ) {
+  if (filter.type1 !== undefined && !types.includes(filter.type1)) {
     return false
   }
 
-  if (
-    filter.type2 !== undefined &&
-    formeMetadata.type1 !== filter.type2 &&
-    formeMetadata.type2 !== filter.type2
-  ) {
+  if (filter.type2 !== undefined && !types.includes(filter.type2)) {
     return false
   }
   return true

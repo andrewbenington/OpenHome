@@ -1,6 +1,7 @@
+import { MonFormat } from '@openhome-core/pkm/interfaces'
+import { Option } from '@openhome-core/util/functional'
 import { ExtraFormIndex } from '@pkm-rs/pkg'
 import { Dispatch, Reducer, createContext } from 'react'
-import { MonFormat } from '../../core/pkm/interfaces'
 
 export interface MonSpriteData {
   dexNum: number
@@ -10,7 +11,7 @@ export interface MonSpriteData {
   heldItemIndex?: number
   isFemale?: boolean
   isShiny?: boolean
-  extraFormIndex?: ExtraFormIndex
+  extraFormIndex: Option<ExtraFormIndex>
 }
 
 export interface OpenHomePlugin {

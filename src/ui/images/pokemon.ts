@@ -3,7 +3,7 @@ import { toGen3RRPokemonIndex } from '@openhome-core/save/radicalred/conversion/
 import { RRSprites } from '@openhome-core/save/radicalred/conversion/RadicalRedSprites'
 import { UBSprites } from '@openhome-core/save/unbound/conversion/UnboundSprites'
 import { MonSpriteData } from '@openhome-ui/state/plugin'
-import { extraFormSpriteName, MetadataLookup } from '@pkm-rs/pkg'
+import { ExtraFormIndex, extraFormSpriteName, isSeviiForm, MetadataLookup } from '@pkm-rs/pkg'
 import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { isRomHackFormat, MonFormat } from '../../core/pkm/interfaces'
@@ -52,7 +52,10 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
     if (romHackSprite) return romHackSprite
   }
 
-  const alwaysUsedSprite = getAlwaysUsedSpritePath(mon.dexNum, mon.formeNum)
+  console.log('sprite folder', spriteFolder, 'format', monFormat, 'mon', mon)
+
+  const alwaysUsedSprite = getAlwaysUsedSpritePath(mon.dexNum, mon.formeNum, mon.extraFormIndex)
+  console.log(alwaysUsedSprite ? `always use sprite ${alwaysUsedSprite}` : 'no always used sprite')
   if (alwaysUsedSprite) return alwaysUsedSprite
 
   const extraFormSprite = mon.extraFormIndex ? extraFormSpriteName(mon.extraFormIndex) : undefined
@@ -135,7 +138,20 @@ export function getRomHackSpritePath(mon: MonSpriteData) {
   }${spriteName}.${extension}`
 }
 
-export const getAlwaysUsedSpritePath = (dexNum: number, formeNum?: number) => {
+export const getAlwaysUsedSpritePath = (
+  dexNum: number,
+  formeNum?: number,
+  extraFormIndex?: ExtraFormIndex
+) => {
+  if (
+    extraFormIndex &&
+    isSeviiForm(extraFormIndex) &&
+    extraFormIndex !== ExtraFormIndex.MantykeSevii
+  ) {
+    let gen3RRname = RRSprites[toGen3RRPokemonIndex(dexNum, formeNum ?? 0, extraFormIndex)]
+    gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
+    return `sprites/rr/${gen3RRname}`
+  }
   if (dexNum === NationalDex.Eevee && formeNum === 1) {
     return 'sprites/home/eevee-starter.png'
   }

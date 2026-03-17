@@ -3,6 +3,7 @@ import { intersection, Option, unique } from '@openhome-core/util/functional'
 import {
   AbilityIndex,
   Ball,
+  ExtraFormIndex,
   Gender,
   GenderRatio,
   HyperTraining,
@@ -327,6 +328,9 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       this.tmFlagsSV = other.tmFlagsSV
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
+    }
+    if (this.openhomeId === '0004-d889ca57-401aab08-30') {
+      this.extraFormIndex = ExtraFormIndex.CharizardClone
     }
   }
 

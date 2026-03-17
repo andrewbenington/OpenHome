@@ -12,9 +12,14 @@ export const FormsUsingImages: Map<number, number[]> = new Map([
 ])
 
 const ExtraFormsUsingImages: Set<ExtraFormIndex> = new Set([
+  ExtraFormIndex.VenusaurClone,
+  ExtraFormIndex.CharizardClone,
+  ExtraFormIndex.BlastoiseClone,
+  ExtraFormIndex.PikachuClone,
   ExtraFormIndex.PikachuRockStar,
   ExtraFormIndex.PikachuBelle,
   ExtraFormIndex.PikachuCosplay,
+  ExtraFormIndex.GengarStitched,
 ])
 
 type MonSpriteResult =

@@ -1,3 +1,4 @@
+use pkm_rs_types::PkmType;
 use serde::Serialize;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -325,12 +326,12 @@ impl ExtraFormIndex {
             match self {
                 Self::PikachuRockStar => "pikachu-rock-star",
                 Self::PikachuBelle => "pikachu-belle",
-                // Self::PikachuPopStar => "pikachu-pop-star",
+                Self::PikachuPopStar => "pikachu-pop-star",
                 // Self::PikachuPhD => "pikachu-phd",
-                // Self::PikachuLibre => "pikachu-libre",
+                Self::PikachuLibre => "pikachu-libre",
                 Self::PikachuCosplay => "pikachu-cosplay",
                 // Self::PikachuSurfing => "pikachu-surfing",
-                // Self::PikachuFlying => "pikachu-flying",
+                Self::PikachuFlying => "pikachu-flying",
                 // Self::CharizardGiga => "charizard-gigantamax",
                 // Self::ButterfreeGiga => "butterfree-gigantamax",
                 // Self::PikachuGiga => "pikachu-gigantamax",
@@ -375,34 +376,46 @@ impl ExtraFormIndex {
                 Self::OnixCrystal => "onix-crystal",
                 Self::MewtwoArmorMk1 => "mewtwo-armor-mk1",
                 Self::MewtwoArmorMk2 => "mewtwo-armor-mk2",
-                // Self::DoduoSevii => "doduo-sevii",
-                // Self::DodrioSevii => "dodrio-sevii",
-                // Self::TeddiursaSevii => "teddiursa-sevii",
-                // Self::UrsaringSevii => "ursaring-sevii",
-                // Self::MantykeSevii => "mantyke-sevii",
-                // Self::MantineSevii => "mantine-sevii",
-                // Self::FeebasSevii => "feebas-sevii",
-                // Self::MiloticSevii => "milotic-sevii",
-                // Self::CarnivineSevii => "carnivine-sevii",
-                // Self::BlitzleSevii => "blitzle-sevii",
-                // Self::ZebstrikaSevii => "zebstrika-sevii",
-                // Self::ClauncherSevii => "clauncher-sevii",
-                // Self::ClawitzerSevii => "clawitzer-sevii",
-                // Self::NoibatSevii => "noibat-sevii",
-                // Self::NoivernSevii => "noivern-sevii",
-                // Self::WishiwashiSevii => "wishiwashi-sevii",
-                // Self::WishiwashiSeviiSchool => "wishiwashi-sevii-school",
-                // Self::DhelmiseSevii => "dhelmise-sevii",
-                // Self::SizzlipedeSevii => "sizzlipede-sevii",
-                // Self::CentiskorchSevii => "centiskorch-sevii",
-                // Self::CentiskorchSeviiGiga => "centiskorch-sevii-gigantamax",
-                // Self::NymbleSevii => "nymble-sevii",
-                // Self::LokixSevii => "lokix-sevii",
+
+                Self::DoduoSevii => "doduo-sevii",
+                Self::DodrioSevii => "dodrio-sevii",
+                Self::TeddiursaSevii => "teddiursa-sevii",
+                Self::UrsaringSevii => "ursaring-sevii",
+                Self::MantykeSevii => "mantyke-sevii",
+                Self::MantineSevii => "mantine-sevii",
+                Self::FeebasSevii => "feebas-sevii",
+                Self::MiloticSevii => "milotic-sevii",
+                Self::CarnivineSevii => "carnivine-sevii",
+                Self::BlitzleSevii => "blitzle-sevii",
+                Self::ZebstrikaSevii => "zebstrika-sevii",
+                Self::ClauncherSevii => "clauncher-sevii",
+                Self::ClawitzerSevii => "clawitzer-sevii",
+                Self::NoibatSevii => "noibat-sevii",
+                Self::NoivernSevii => "noivern-sevii",
+                Self::WishiwashiSevii => "wishiwashi-sevii",
+                Self::WishiwashiSeviiSchool => "wishiwashi-sevii-school",
+                Self::DhelmiseSevii => "dhelmise-sevii",
+                Self::SizzlipedeSevii => "sizzlipede-sevii",
+                Self::CentiskorchSevii => "centiskorch-sevii",
+                Self::CentiskorchSeviiGiga => "centiskorch-sevii-gigantamax",
+                Self::NymbleSevii => "nymble-sevii",
+                Self::LokixSevii => "lokix-sevii",
+
                 // Self::DialgaPrimal => "dialga-primal",
                 _ => return None,
             }
             .to_owned(),
         )
+    }
+
+    pub const fn type_overrides(&self) -> Option<(PkmType, Option<PkmType>)> {
+        match self {
+            Self::MantykeSevii | Self::MantineSevii => {
+                Some((PkmType::Electric, Some(PkmType::Poison)))
+            }
+            Self::NymbleSevii | Self::LokixSevii => Some((PkmType::Bug, Some(PkmType::Dragon))),
+            _ => None,
+        }
     }
 }
 
@@ -418,6 +431,13 @@ pub fn oras_supports_extra_form(form: ExtraFormIndex) -> bool {
 #[allow(clippy::missing_const_for_fn)]
 pub fn radical_red_supports_extra_form(form: ExtraFormIndex) -> bool {
     form.in_radical_red()
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "isSeviiForm")]
+#[allow(clippy::missing_const_for_fn)]
+pub fn is_sevii_form(form: ExtraFormIndex) -> bool {
+    form.is_sevii_form()
 }
 
 #[cfg(feature = "wasm")]
@@ -444,6 +464,16 @@ pub fn extra_form_display_name(form: ExtraFormIndex) -> String {
 #[wasm_bindgen(js_name = "extraFormSpriteName")]
 pub fn extra_form_sprite_name(form: ExtraFormIndex) -> Option<String> {
     form.sprite_name()
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "extraFormTypeOverride")]
+pub fn extra_form_type_override(form: ExtraFormIndex) -> Option<Vec<PkmType>> {
+    match form.type_overrides() {
+        Some((t1, Some(t2))) => Some(vec![t1, t2]),
+        Some((t1, None)) => Some(vec![t1]),
+        None => None,
+    }
 }
 
 pub struct InvalidExtraFormIndex;
