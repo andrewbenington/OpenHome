@@ -8,14 +8,14 @@ export const TAG_PRESETS = [
 ]
 
 export const DISPLAY_COLOR_PRESETS = [
-  { name: 'Red', color: '#ef444480' },
-  { name: 'Orange', color: '#f9731680' },
-  { name: 'Yellow', color: '#eab30880' },
-  { name: 'Green', color: '#22c55e80' },
-  { name: 'Blue', color: '#3b82f680' },
-  { name: 'Purple', color: '#a855f780' },
-  { name: 'Pink', color: '#ec489980' },
-  { name: 'Cyan', color: '#06b6d480' },
+  { name: 'Red', color: '#ef4444' },
+  { name: 'Orange', color: '#f97316' },
+  { name: 'Yellow', color: '#eab308' },
+  { name: 'Green', color: '#22c55e' },
+  { name: 'Blue', color: '#3b82f6' },
+  { name: 'Purple', color: '#a855f7' },
+  { name: 'Pink', color: '#ec4899' },
+  { name: 'Cyan', color: '#06b6d4' },
 ]
 
 export interface MonTag {

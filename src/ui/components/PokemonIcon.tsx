@@ -96,54 +96,16 @@ export default function PokemonIcon(props: PokemonIconProps) {
         />
       )}
       {tags && tags.length > 0 && (
-        <div
-          style={{
-            position: 'absolute',
-            top: -2,
-            left: -4,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
-            zIndex: 3,
-          }}
-        >
+        <div className="pokemon-icon-tags">
           {tags.map((tag, i) => (
-            <div
-              key={i}
-              style={{
-                width: 14,
-                height: 14,
-                borderRadius: '50%',
-                backgroundColor: tag.color,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 0 2px rgba(0,0,0,0.5)',
-                color: 'white',
-              }}
-            >
+            <div key={i} className="pokemon-icon-tag" style={{ backgroundColor: tag.color }}>
               <TagIcon iconName={tag.icon} size={8} />
             </div>
           ))}
         </div>
       )}
       {topRightIndicator && <div className="extra-indicator">{topRightIndicator}</div>}
-      {hasNotes && (
-        <div
-          title="Has notes"
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            right: 0,
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            backgroundColor: '#facc15',
-            boxShadow: '0 0 2px rgba(0,0,0,0.6)',
-            zIndex: 3,
-          }}
-        />
-      )}
+      {hasNotes && <div title="Has notes" className="pokemon-icon-notes-dot" />}
       {heldItemIndex ? (
         <img
           alt="item icon"

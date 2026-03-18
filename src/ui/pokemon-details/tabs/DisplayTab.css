@@ -1,0 +1,75 @@
+.display-tab-root {
+  padding: 8px;
+  height: calc(100% - 16px);
+  overflow-y: auto;
+  color: var(--gray-12);
+}
+
+.display-tab-flex-fill {
+  flex: 1;
+}
+
+.display-tab-color-input {
+  width: 40px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.display-tab-quick-colors-card {
+  background-color: var(--gray-5);
+}
+
+.display-tab-color-preset {
+  width: 48px;
+  height: 48px;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #fff;
+  text-shadow: 0 0 2px #000;
+}
+
+.display-tab-tags-selected {
+  margin-bottom: 10px;
+}
+
+.display-tab-tag-badge {
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.display-tab-tag-remove {
+  opacity: 0.7;
+}
+
+.display-tab-tag-preset {
+  padding: 4px 10px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #fff;
+  text-shadow: 0 0 2px #000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.display-tab-tag-color-input {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

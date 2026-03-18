@@ -3,35 +3,27 @@ import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { TagIcon } from '@openhome-ui/components/TagIcon'
 import { useSaves } from '@openhome-ui/state/saves'
 import { DISPLAY_COLOR_PRESETS, MonTag, TAG_PRESETS } from '@openhome-ui/util/tags'
-import { Badge, Button, Flex, Text, TextField } from '@radix-ui/themes'
-import { useEffect, useState } from 'react'
+import { Badge, Button, Card, Flex, Text, TextField } from '@radix-ui/themes'
+import { useState } from 'react'
 import useDebounce from 'src/ui/hooks/useDebounce'
+import './DisplayTab.css'
 
 interface DisplayTabProps {
-  mon: OHPKM
-}
-
-export default function DisplayTab({ mon }: DisplayTabProps) {
-  const monWithDisplay = mon as OHPKM & {
+  mon: OHPKM & {
     displayColor?: string
     tags?: MonTag[]
   }
-  const [customColor, setCustomColor] = useState(monWithDisplay.displayColor ?? '')
-  const [tags, setTags] = useState<MonTag[]>(monWithDisplay.tags ?? [])
+}
+
+export default function DisplayTab({ mon }: DisplayTabProps) {
+  const [customColor, setCustomColor] = useState(mon.displayColor ?? '')
+  const [tags, setTags] = useState<MonTag[]>(mon.tags ?? [])
 
   const [newTagLabel, setNewTagLabel] = useState('')
   const [newTagColor, setNewTagColor] = useState('#888888')
   const [newTagIcon, setNewTagIcon] = useState('FaCircle')
 
   const { updateMonDisplayColor, updateMonTags } = useSaves()
-
-  const tagsString = JSON.stringify(monWithDisplay.tags)
-
-  useEffect(() => {
-    setCustomColor(monWithDisplay.displayColor ?? '')
-    setTags(monWithDisplay.tags ?? [])
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mon.openhomeId, monWithDisplay.displayColor, tagsString])
 
   const debouncedColorUpdate = useDebounce((color: string) => {
     updateMonDisplayColor(mon.openhomeId, color || undefined)
@@ -59,8 +51,8 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
     updateMonTags(mon.openhomeId, newTags)
   }
 
-  const handleRemoveTag = (index: number) => {
-    const newTags = tags.filter((_, i) => i !== index)
+  const handleRemoveTag = (label: string) => {
+    const newTags = tags.filter((tag) => tag.label !== label)
     setTags(newTags)
     updateMonTags(mon.openhomeId, newTags.length ? newTags : undefined)
   }
@@ -71,33 +63,18 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
   }
 
   return (
-    <div
-      style={{
-        padding: 8,
-        height: 'calc(100% - 16px)',
-        overflowY: 'auto',
-        color: 'var(--gray-12)',
-      }}
-    >
+    <div className="display-tab-root">
       <Flex direction="column" gap="3">
         <AttributeRow label="Box Background">
-          <Flex direction="column" gap="2" style={{ flex: 1 }}>
+          <Flex direction="column" gap="2" className="display-tab-flex-fill">
             <Flex gap="2" align="center">
               <input
                 type="color"
                 value={customColor.slice(0, 7) || '#666666'}
                 onChange={(e) => {
-                  const colorWithAlpha = e.target.value + '80'
-                  handleColorChange(colorWithAlpha)
+                  handleColorChange(e.target.value)
                 }}
-                style={{
-                  width: 40,
-                  height: 32,
-                  padding: 0,
-                  border: 'none',
-                  borderRadius: 4,
-                  cursor: 'pointer',
-                }}
+                className="display-tab-color-input"
               />
               <Button
                 variant="surface"
@@ -116,31 +93,24 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
           <Text as="div" size="2" weight="bold" color="gray" mb="1">
             Quick Colors
           </Text>
-          <Flex wrap="wrap" gap="2">
-            {DISPLAY_COLOR_PRESETS.map(({ name, color }) => (
-              <button
-                key={name}
-                onClick={() => handlePresetClick(color)}
-                style={{
-                  width: 48,
-                  height: 48,
-                  backgroundColor: color,
-                  border: customColor === color ? '2px solid white' : '2px solid transparent',
-                  borderRadius: 6,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 10,
-                  color: '#fff',
-                  textShadow: '0 0 2px #000',
-                }}
-                title={name}
-              >
-                {name}
-              </button>
-            ))}
-          </Flex>
+          <Card className="display-tab-quick-colors-card">
+            <Flex wrap="wrap" gap="2">
+              {DISPLAY_COLOR_PRESETS.map(({ name, color }) => (
+                <button
+                  key={name}
+                  onClick={() => handlePresetClick(color)}
+                  className="display-tab-color-preset"
+                  style={{
+                    backgroundColor: color,
+                    borderColor: customColor === color ? 'white' : 'transparent',
+                  }}
+                  title={name}
+                >
+                  {name}
+                </button>
+              ))}
+            </Flex>
+          </Card>
         </div>
 
         <div>
@@ -149,26 +119,20 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
           </Text>
 
           {tags.length > 0 && (
-            <Flex gap="2" wrap="wrap" style={{ marginBottom: 10 }}>
-              {tags.map((tag, i) => (
+            <Flex gap="2" wrap="wrap" className="display-tab-tags-selected">
+              {tags.map((tag) => (
                 <Badge
-                  key={i}
+                  key={tag.label}
                   variant="solid"
                   size="2"
-                  style={{
-                    backgroundColor: tag.color,
-                    color: '#fff',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 4,
-                  }}
-                  onClick={() => handleRemoveTag(i)}
+                  className="display-tab-tag-badge"
+                  style={{ backgroundColor: tag.color }}
+                  onClick={() => handleRemoveTag(tag.label)}
                   title="Click to remove"
                 >
                   <TagIcon iconName={tag.icon} />
                   {tag.label}
-                  <span style={{ opacity: 0.7 }}>×</span>
+                  <span className="display-tab-tag-remove">×</span>
                 </Badge>
               ))}
               <Button variant="surface" color="red" highContrast size="1" onClick={clearAllTags}>
@@ -184,23 +148,15 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                   key={preset.label}
                   onClick={() => handleAddTag(preset)}
                   disabled={tags.length >= 3}
+                  className="display-tab-tag-preset"
                   style={{
-                    padding: '4px 10px',
                     backgroundColor: preset.color,
-                    border: '2px solid transparent',
-                    borderRadius: 6,
                     cursor:
                       tags.length >= 3 || tags.some((t) => t.label === preset.label)
                         ? 'not-allowed'
                         : 'pointer',
                     opacity:
                       tags.length >= 3 || tags.some((t) => t.label === preset.label) ? 0.5 : 1,
-                    fontSize: 12,
-                    color: '#fff',
-                    textShadow: '0 0 2px #000',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 4,
                   }}
                   title={preset.label}
                 >
@@ -237,14 +193,7 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                 type="color"
                 value={newTagColor}
                 onChange={(e) => setNewTagColor(e.target.value)}
-                style={{
-                  width: 32,
-                  height: 32,
-                  padding: 0,
-                  border: 'none',
-                  borderRadius: 4,
-                  cursor: 'pointer',
-                }}
+                className="display-tab-tag-color-input"
               />
               <Button
                 variant="surface"

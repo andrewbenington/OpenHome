@@ -21,7 +21,7 @@ export const SortTypes = [
   'Is Egg',
   'Shiny Leaves',
   'Display Color',
-  'Tag',
+  'First Tag',
   'Tag Count',
   'Has Notes',
 ]
@@ -157,7 +157,7 @@ export function getSortFunction(
         (a.shinyLeaves?.hasCrown() ? 6 : (a.shinyLeaves?.count() ?? 0))
     case 'Held Item':
       return sortByHeldItem
-    case 'Tag':
+    case 'First Tag':
       return (a, b) => {
         const getFirstTag = (mon: PKMInterface) => {
           return monTags(mon)[0]?.label ?? ''

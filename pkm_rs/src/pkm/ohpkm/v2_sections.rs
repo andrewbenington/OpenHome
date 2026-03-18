@@ -113,6 +113,8 @@ pub struct MainDataV2 {
     pub obedience_level: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub home_tracker: [u8; 8],
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub display_color_rgb: Option<[u8; 3]>,
 }
 
 impl MainDataV2 {
@@ -192,6 +194,7 @@ impl MainDataV2 {
             trainer_affection: old.trainer_affection,
             obedience_level: old.obedience_level,
             home_tracker: old.home_tracker,
+            display_color_rgb: None,
         }
     }
 
@@ -299,6 +302,11 @@ impl DataSection for MainDataV2 {
             is_nicknamed: util::get_flag(bytes, 148, 31),
             // bytes[152],
             hyper_training: HyperTraining::from_byte(bytes[153]),
+            display_color_rgb: if bytes[160] != 0 {
+                Some(bytes[161..164].try_into().unwrap())
+            } else {
+                None
+            },
             home_tracker: bytes[172..180].try_into().unwrap(),
             handler_name: SizedUtf16String::<26>::from_bytes(bytes[184..210].try_into().unwrap()),
             handler_language: bytes[211],
@@ -421,6 +429,11 @@ impl DataSection for MainDataV2 {
         util::set_flag(&mut bytes, 148, 31, self.is_nicknamed);
 
         bytes[153] = self.hyper_training.to_byte();
+
+        if let Some(rgb) = self.display_color_rgb {
+            bytes[160] = 1;
+            bytes[161..164].copy_from_slice(&rgb);
+        }
 
         // gap: 160..172
 
@@ -1446,34 +1459,6 @@ impl DataSection for MonTags {
 
     fn to_bytes(&self) -> Result<Vec<u8>> {
         Ok(serde_json::to_vec(&self.0).unwrap_or_default())
-    }
-
-    fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-}
-/// Display color for the Pokemon in boxes (CSS color string like '#ff0000')
-#[derive(Debug, Default, Clone)]
-pub struct DisplayColor(pub String);
-
-impl DataSection for DisplayColor {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::DisplayColor;
-
-    type ErrorType = Error;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
-
-        String::from_utf8(bytes.to_vec())
-            .map(DisplayColor)
-            .map_err(|e| Error::StringDecode {
-                source: StringErrorSource::Notes(e), // Reuse Notes error for simplicity
-            })
-    }
-
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        Ok(self.0.clone().into_bytes())
     }
 
     fn is_empty(&self) -> bool {

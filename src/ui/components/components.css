@@ -3,6 +3,39 @@
   transform: translate(0, 0);
 }
 
+.pokemon-icon-tags {
+  position: absolute;
+  top: -2px;
+  left: -4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 3;
+}
+
+.pokemon-icon-tag {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.pokemon-icon-notes-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #facc15;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+  z-index: 3;
+}
+
 .pokemon-icon-image {
   background-size: 3600%;
   background-repeat: no-repeat;

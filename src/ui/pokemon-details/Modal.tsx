@@ -189,7 +189,7 @@ const PokemonDetailsModal = (props: {
                     <NotesDisplay mon={mon} />
                   </SideTabs.Panel>
                   <SideTabs.Panel value="display">
-                    <DisplayTab mon={mon} />
+                    <DisplayTab mon={mon} key={mon.openhomeId} />
                   </SideTabs.Panel>
                   <SideTabs.Panel value="recent-save">
                     <RecentSaveTab mon={mon} />

@@ -16,6 +16,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '../../state/ohpkm'
+import './SortPokemon.css'
 
 function getInnerSortFunction(
   sortStr: SortType | undefined
@@ -173,17 +174,22 @@ export default function SortPokemon() {
     return sortedMonsWithColors.map((monWithSave, i) => {
       const isSelected = selectedIndices.has(i)
       return (
-        <div style={{ width: 36, height: 36, margin: 4 }} key={`mon_${i}`}>
+        <div
+          className="sort-mon-cell"
+          style={{
+            borderColor: monWithSave.color,
+            backgroundColor: isSelected ? '#4ade8080' : undefined,
+          }}
+          key={`mon_${i}`}
+        >
           <button
-            onClick={() => toggleSelection(i)}
-            onDoubleClick={() => setDetailsMonIndex(i)}
-            className="mon-icon-button"
-            style={{
-              borderColor: isSelected ? '#4ade80' : monWithSave.color,
-              borderWidth: isSelected ? 3 : 2,
-              borderStyle: 'solid',
-              boxShadow: isSelected ? '0 0 6px #4ade8066' : undefined,
+            onClick={(event) => {
+              if (event.detail === 1) {
+                toggleSelection(i)
+              }
             }}
+            onDoubleClick={() => setDetailsMonIndex(i)}
+            className="sort-mon-button"
           >
             <PokemonIcon
               dexNumber={monWithSave.mon.dexNum}
@@ -235,7 +241,7 @@ export default function SortPokemon() {
               getOptionUniqueID={(opt) => opt}
             />
             {selectedIndices.size > 0 && (
-              <Flex gap="2" align="center">
+              <Flex gap="3" align="center">
                 <span style={{ fontSize: 12, color: '#aaa' }}>{selectedIndices.size} selected</span>
                 {selectedIndices.size === 1 && (
                   <Button
