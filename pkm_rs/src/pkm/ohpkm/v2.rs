@@ -39,6 +39,7 @@ use pkm_rs_types::{
 const MAGIC_NUMBER: u32 = 0x57575757;
 const CURRENT_VERSION: u16 = 2;
 
+#[cfg(feature = "wasm")]
 fn parse_display_color_to_rgb(value: &str) -> Option<[u8; 3]> {
     let trimmed = value.trim();
 

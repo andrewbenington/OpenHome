@@ -184,11 +184,14 @@ export default function SortPokemon() {
         >
           <button
             onClick={(event) => {
-              if (event.detail === 1) {
+              if (event.altKey) {
+                // If Alt is held, show details and skip selection
+                setDetailsMonIndex(i)
+              } else if (event.detail === 1) {
+                // Regular click (no Alt) toggles selection
                 toggleSelection(i)
               }
             }}
-            onDoubleClick={() => setDetailsMonIndex(i)}
             className="sort-mon-button"
           >
             <PokemonIcon
