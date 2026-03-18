@@ -13,6 +13,7 @@ import {
   MenuIcon,
   MoveIcon,
   RemoveIcon,
+  SelectIcon,
 } from '@openhome-ui/components/Icons'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
 import useIsDev from '@openhome-ui/hooks/isDev'
@@ -61,6 +62,7 @@ export default function HomeBoxDisplay() {
   const [editingBoxName, setEditingBoxName] = useState('')
   const isDev = useIsDev()
   const [debugMode, setDebugMode] = useState(false)
+  const { dragState, toggleMultiSelect } = useDragAndDrop()
   const {
     addBoxCurrentBank,
     getCurrentBox,
@@ -126,14 +128,24 @@ export default function HomeBoxDisplay() {
           />
           <Flex gap="1">
             {viewMode === 'one' ? (
-              <ToggleButton
-                state={editing}
-                setState={setEditing}
-                onSet={() => setEditingBoxName(getCurrentBox().name ?? '')}
-                onUnset={() => setBoxNameCurrentBank(currentBox.index, editingBoxName)}
-                icon={EditIcon}
-                hint="Change box name"
-              />
+              <>
+                <ToggleButton
+                  state={editing}
+                  setState={setEditing}
+                  onSet={() => setEditingBoxName(getCurrentBox().name ?? '')}
+                  onUnset={() => setBoxNameCurrentBank(currentBox.index, editingBoxName)}
+                  icon={EditIcon}
+                  hint="Change box name"
+                  disabled={dragState.multiSelectEnabled}
+                />
+                <ToggleButton
+                  state={dragState.multiSelectEnabled}
+                  setState={toggleMultiSelect}
+                  icon={SelectIcon}
+                  hint={`Multi-select${dragState.selectedLocations.length > 0 ? ` (${dragState.selectedLocations.length})` : ''}`}
+                  disabled={editing}
+                />
+              </>
             ) : (
               <>
                 {isDev && <ToggleButton state={debugMode} setState={setDebugMode} icon={DevIcon} />}
@@ -225,7 +237,7 @@ function SingleBoxMonDisplay() {
   const { importMonsToLocation, saveFromIdentifier } = useSaves()
   const { getCurrentBox, getCurrentBank } = useBanksAndBoxes()
   const [, dispatchError] = useContext(ErrorContext)
-  const { dragState } = useDragAndDrop()
+  const { dragState, isSelected, toggleSelection } = useDragAndDrop()
   const { sortHomeBox, sortAllHomeBoxes, removeDupesFromHomeBox } = useBanksAndBoxes()
   const {
     currentIndex: selectedIndex,
@@ -358,6 +370,9 @@ function SingleBoxMonDisplay() {
                     mon && dragData && !dragData.isHome && !sourceSupportsMon(mon)
                   }
                   ctxMenuBuilders={contextElements}
+                  multiSelectEnabled={dragState.multiSelectEnabled}
+                  isSelected={isSelected(thisLocation)}
+                  onToggleSelect={() => toggleSelection(thisLocation)}
                 />
               )
             })}

@@ -671,10 +671,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (!this.abilityNumMatchesIndex()) {
       const fixedAbilityNum = this.abilityNumByIndex()
       if (fixedAbilityNum) {
-        // This ability is a valid one for the species! Set the appropriate ability number
+        // ability is valid for this species, just fix the ability num
         this.abilityNum = fixedAbilityNum
       } else {
-        // Hm, this ability is invalid for the species. Let's reset it using the ability number
+        // ability doesn't match species at all, fall back to ability num
         this.ability =
           getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum) ?? this.ability
       }

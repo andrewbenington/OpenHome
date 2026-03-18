@@ -22,6 +22,8 @@ export type PKMInterface = AllPKMFields & {
   isFakemon?: boolean
   originalBytes?: Uint8Array
   selectColor?: string
+  // User-defined display color for this Pokemon in boxes (CSS color string)
+  displayColor?: string
   metadata?: FormeMetadata
   speciesMetadata?: SpeciesMetadata
 }

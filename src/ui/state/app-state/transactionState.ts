@@ -1,7 +1,7 @@
 import { R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { AppState as TransactionState } from '@openhome-ui/backend/backendInterface'
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 type PossiblyLoadedTransactionState =
   | {
@@ -34,18 +34,32 @@ export function usePossiblyLoadedTxState(): PossiblyLoadedTransactionState {
   const [error, setError] = useState<string>()
   const backend = useContext(BackendContext)
 
-  if (!loading && !error && !transactionState) {
-    backend.getState().then(
-      R.match(
-        (state) => {
-          setTransactionState(state)
-          setLoading(false)
-          setError(undefined)
-        },
-        (err) => setError(err)
+  useEffect(() => {
+    if (loading || error || transactionState) return
+
+    setLoading(true)
+    backend
+      .getState()
+      .then(
+        R.match(
+          (state) => {
+            setTransactionState(state)
+            setError(undefined)
+          },
+          (err) => {
+            console.error('[APP_STATE] getState() error:', err)
+            setError(err)
+          }
+        )
       )
-    )
-  }
+      .catch((e) => {
+        console.error('[APP_STATE] getState() unhandled rejection:', e)
+        setError(String(e))
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [backend, error, loading, transactionState])
 
   if (!transactionState) {
     return { error, loaded: false }

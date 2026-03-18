@@ -10,14 +10,23 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { colorForType, colorIsDark } from '@openhome-ui/util/color'
 import { genderFromBool, getPluginColor, MetadataLookup } from '@pkm-rs/pkg'
+import { PKM } from '@pokemon-files/pkm/PKM'
 import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { getRomHackFormName } from 'src/core/save/rom-hack/forms'
+import { MonTag } from 'src/ui/util/tags'
 import useMonSprite from '../useMonSprite'
+
+type MonWithManagementData = PKMInterface & {
+  tags?: MonTag[]
+}
 
 const SummaryDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
+  const tags = useMemo(() => {
+    return (mon as MonWithManagementData).tags ?? []
+  }, [mon])
   const spriteResult = useMonSprite({
     dexNum: mon.dexNum,
     formeNum: mon.formeNum,
@@ -87,6 +96,21 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           <Badge variant="solid" color="gray" ml="2" size="1">
             {mon.languageString}
           </Badge>
+          {tags.length > 0 &&
+            tags.map((tag, i) => (
+              <Badge
+                key={i}
+                variant="solid"
+                ml="2"
+                size="1"
+                style={{
+                  backgroundColor: tag.color ?? '#888',
+                  color: '#fff',
+                }}
+              >
+                {tag.label}
+              </Badge>
+            ))}
         </div>
         <AttributeRow label="Item" justifyEnd>
           {mon.heldItemName !== 'None' && (
@@ -161,7 +185,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             <GenderIcon gender={genderFromBool(mon.trainerGender)} />
           </Flex>
         </AttributeRow>
-        <AttributeRow label="Trainer ID" value={getDisplayID(mon as any)} />
+        <AttributeRow label="Trainer ID" value={getDisplayID(mon as PKM)} />
         {mon.ability !== undefined && (
           <AttributeRow
             label="Ability"

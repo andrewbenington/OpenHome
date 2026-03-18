@@ -7,6 +7,8 @@ import useMonSprite from '@openhome-ui/pokemon-details//useMonSprite'
 import { FormeMetadata, Generation, MetadataLookup } from '@pkm-rs/pkg'
 import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
 import { classNames, grayscaleIf } from '../util/style'
+import { MonTag } from '../util/tags'
+import { TagIcon } from './TagIcon'
 import './components.css'
 
 export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
@@ -21,6 +23,8 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   topRightIndicator?: ReactNode
   pluginForm?: number
   pluginOrigin?: string
+  tags?: MonTag[]
+  hasNotes?: boolean
 }
 
 function getBackgroundPosition(formeMetadata?: FormeMetadata, isEgg?: boolean) {
@@ -45,6 +49,8 @@ export default function PokemonIcon(props: PokemonIconProps) {
     silhouette,
     isEgg,
     topRightIndicator,
+    tags,
+    hasNotes,
     style,
     onClick,
     pluginForm,
@@ -89,7 +95,17 @@ export default function PokemonIcon(props: PokemonIconProps) {
           src={getPublicImageURL('icons/Shiny.png')}
         />
       )}
+      {tags && tags.length > 0 && (
+        <div className="pokemon-icon-tags">
+          {tags.map((tag, i) => (
+            <div key={i} className="pokemon-icon-tag" style={{ backgroundColor: tag.color }}>
+              <TagIcon iconName={tag.icon} size={8} />
+            </div>
+          ))}
+        </div>
+      )}
       {topRightIndicator && <div className="extra-indicator">{topRightIndicator}</div>}
+      {hasNotes && <div title="Has notes" className="pokemon-icon-notes-dot" />}
       {heldItemIndex ? (
         <img
           alt="item icon"

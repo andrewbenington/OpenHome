@@ -4,6 +4,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { getRibbonSpritePath } from '@openhome-ui/images/ribbons'
 import { HeldItemCategory } from '@openhome-ui/util/filter'
+import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
 import {
   all_species_data,
   Gender,
@@ -290,6 +291,66 @@ export default function FilterPanel() {
                 className="filter-icon invert-light"
               />
             ) : undefined
+          }
+        />
+        <Autocomplete
+          options={['Any Tag', 'No Tag', ...TAG_PRESETS.map((t) => t.label)]}
+          getOptionString={(opt) => opt}
+          getOptionUniqueID={(opt) => opt}
+          value={filter.tag}
+          label="Tag"
+          onChange={(option) => setFilter({ tag: option })}
+          getIconComponent={(label) => {
+            const preset = TAG_PRESETS.find((t) => t.label === label)
+            if (!preset) return undefined
+            return (
+              <div
+                style={{
+                  width: 16,
+                  height: 16,
+                  borderRadius: '50%',
+                  backgroundColor: preset.color,
+                  display: 'inline-block',
+                }}
+              />
+            )
+          }}
+        />
+        <Autocomplete
+          options={['Any Color', 'No Color', ...DISPLAY_COLOR_PRESETS.map((c) => c.color)]}
+          getOptionString={(opt) => {
+            const preset = DISPLAY_COLOR_PRESETS.find((c) => c.color === opt)
+            return preset ? preset.name : opt
+          }}
+          getOptionUniqueID={(opt) => opt}
+          value={filter.displayColor}
+          label="Background Color"
+          onChange={(option) => setFilter({ displayColor: option })}
+          getIconComponent={(color) => {
+            if (color === 'Any Color' || color === 'No Color') return undefined
+            return (
+              <div
+                style={{
+                  width: 16,
+                  height: 16,
+                  borderRadius: '50%',
+                  backgroundColor: color,
+                  display: 'inline-block',
+                }}
+              />
+            )
+          }}
+        />
+        <Autocomplete
+          options={['Has Notes', 'No Notes']}
+          getOptionString={(opt) => opt}
+          getOptionUniqueID={(opt) => opt}
+          value={
+            filter.hasNotes === undefined ? undefined : filter.hasNotes ? 'Has Notes' : 'No Notes'
+          }
+          label="Notes"
+          onChange={(option) =>
+            setFilter({ hasNotes: option === undefined ? undefined : option === 'Has Notes' })
           }
         />
         <Button
