@@ -124,38 +124,21 @@ export default function FilterPanel() {
     [filter.dexNumber]
   )
 
+  const BlankIconSpacer = <div className="filter-icon" />
+
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-        height: '100%',
-      }}
-    >
+    <div className="filter-panel">
       <Button
+        className="clear-filters-button"
         variant="surface"
         disabled={Object.values(filter).length === 0}
         color="red"
         onClick={clearFilter}
         size="1"
-        style={{ margin: '8px 8px 0px 8px' }}
       >
         Clear All
       </Button>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 4,
-          padding: 8,
-          boxSizing: 'border-box',
-          flexShrink: 1,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-        }}
-      >
+      <div className="filter-fields-scroller">
         <Typeahead
           uniqueFieldId="species"
           options={Object.values(ALL_SPECIES_DATA)}
@@ -221,7 +204,7 @@ export default function FilterPanel() {
             })
           }
           getIconComponent={(currentItem) =>
-            currentItem.type === 'specific_item' && (
+            currentItem.type === 'specific_item' ? (
               <img
                 alt="item icon"
                 src={getPublicImageURL(getItemIconPath(currentItem.id))}
@@ -230,6 +213,8 @@ export default function FilterPanel() {
                   ;(e.target as HTMLImageElement).src = getPublicImageURL(`items/index/0000.png`)
                 }}
               />
+            ) : (
+              BlankIconSpacer
             )
           }
         />
@@ -322,7 +307,9 @@ export default function FilterPanel() {
                 style={{ width: ICON_SIZE, height: ICON_SIZE }}
                 src={getPublicImageURL(getRibbonSpritePath(ribbon))}
               />
-            ) : undefined
+            ) : (
+              BlankIconSpacer
+            )
           }
         />
         <Typeahead
@@ -336,13 +323,14 @@ export default function FilterPanel() {
           getIconComponent={(value) =>
             value !== 'Not Shiny' ? (
               <img
+                className="filter-icon invert-light"
                 alt="shiny icon"
                 draggable={false}
                 src={getPublicImageURL('icons/Shiny.png')}
-                className="filter-icon invert-light"
-                style={{ width: ICON_SIZE, height: ICON_SIZE }}
               />
-            ) : undefined
+            ) : (
+              BlankIconSpacer
+            )
           }
         />
         <Typeahead
@@ -355,17 +343,9 @@ export default function FilterPanel() {
           onChange={(option) => setFilter({ tag: option })}
           getIconComponent={(label) => {
             const preset = TAG_PRESETS.find((t) => t.label === label)
-            if (!preset) return undefined
+            if (!preset) return BlankIconSpacer
             return (
-              <div
-                style={{
-                  width: 16,
-                  height: 16,
-                  borderRadius: '50%',
-                  backgroundColor: preset.color,
-                  display: 'inline-block',
-                }}
-              />
+              <div className="filter-icon color-circle" style={{ backgroundColor: preset.color }} />
             )
           }}
         />
@@ -381,18 +361,8 @@ export default function FilterPanel() {
           placeholder="Background Color"
           onChange={(option) => setFilter({ displayColor: option })}
           getIconComponent={(color) => {
-            if (color === 'Any Color' || color === 'No Color') return undefined
-            return (
-              <div
-                style={{
-                  width: 16,
-                  height: 16,
-                  borderRadius: '50%',
-                  backgroundColor: color,
-                  display: 'inline-block',
-                }}
-              />
-            )
+            if (color === 'Any Color' || color === 'No Color') return BlankIconSpacer
+            return <div className="filter-icon color-circle" style={{ backgroundColor: color }} />
           }}
         />
         <Typeahead
@@ -407,17 +377,8 @@ export default function FilterPanel() {
           onChange={(option) =>
             setFilter({ hasNotes: option === undefined ? undefined : option === 'Has Notes' })
           }
+          getIconComponent={() => BlankIconSpacer}
         />
-        {/* <div
-          style={{
-            position: 'sticky',
-            bottom: 0,
-            paddingBottom: 8,
-            opacity: 1,
-            backgroundColor: 'var(--card-background-color)',
-          }}
-        > */}
-        {/* </div> */}
       </div>
     </div>
   )
