@@ -158,6 +158,8 @@ Credit to the [Radical Red Team](https://www.pokecommunity.com/threads/pok%C3%A9
 
 Credit to [Team Luminescent](https://luminescent.team/) for the PKLumiHeX program, which provided critical information about the save file structure, and for the Luminescent Platinum logo.
 
+Pokémon Home extra form photoshops were created by [PkmnHomeIcons](https://github.com/nileplumb/PkmnHomeIcons). This includes Stitched Gengar, the Clone Pokémon, and the extra Pikachu forms.
+
 ## Star History
 
 <a href="https://www.star-history.com/?repos=andrewbenington%2FOpenHome&type=date&legend=top-left">
