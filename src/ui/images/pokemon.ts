@@ -52,10 +52,7 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
     if (romHackSprite) return romHackSprite
   }
 
-  console.log('sprite folder', spriteFolder, 'format', monFormat, 'mon', mon)
-
   const alwaysUsedSprite = getAlwaysUsedSpritePath(mon.dexNum, mon.formeNum, mon.extraFormIndex)
-  console.log(alwaysUsedSprite ? `always use sprite ${alwaysUsedSprite}` : 'no always used sprite')
   if (alwaysUsedSprite) return alwaysUsedSprite
 
   const extraFormSprite = mon.extraFormIndex ? extraFormSpriteName(mon.extraFormIndex) : undefined
