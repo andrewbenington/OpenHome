@@ -14,6 +14,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
 import { isRomHackFormat } from '../../../packages/pokemon-files/src/pkm/PKM'
 import './style.css'
+import DisplayTab from './tabs/DisplayTab'
 import MetDataMovesTab from './tabs/MetDataMovesTab'
 import NotesDisplay from './tabs/NotesTab'
 import OtherDisplay from './tabs/OtherTab'
@@ -158,6 +159,7 @@ const PokemonDetailsModal = (props: {
                 <>
                   <SideTabs.Tab value="trainers">Trainers</SideTabs.Tab>
                   <SideTabs.Tab value="notes">Notes</SideTabs.Tab>
+                  <SideTabs.Tab value="display">Display</SideTabs.Tab>
                   <SideTabs.Tab value="recent-save">Recent Save</SideTabs.Tab>
                 </>
               )}
@@ -186,6 +188,9 @@ const PokemonDetailsModal = (props: {
                   </SideTabs.Panel>
                   <SideTabs.Panel value="notes">
                     <NotesDisplay mon={mon} />
+                  </SideTabs.Panel>
+                  <SideTabs.Panel value="display">
+                    <DisplayTab mon={mon} key={mon.openhomeId} />
                   </SideTabs.Panel>
                   <SideTabs.Panel value="recent-save">
                     <RecentSaveTab mon={mon} />

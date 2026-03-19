@@ -17,11 +17,22 @@ export interface Filter {
   ball?: number
   isEgg?: boolean
   shinyLeaves?: number
+  tag?: string
+  displayColor?: string
+  hasNotes?: boolean
 }
 
 export type HeldItemFilter = number | HeldItemCategory
 
+type MonWithManagementData = PKMInterface & {
+  tags?: { label: string }[]
+  displayColor?: string
+  notes?: string
+}
+
 export function filterApplies(filter: Filter, mon: PKMInterface) {
+  const monWithManagement = mon as MonWithManagementData
+
   if (filter.dexNumber && mon.dexNum !== filter.dexNumber) {
     return false
   }
@@ -85,6 +96,34 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
   if (filter.type2 !== undefined && !types.includes(filter.type2)) {
     return false
   }
+
+  if (filter.tag !== undefined) {
+    const tags = monWithManagement.tags ?? []
+    if (filter.tag === 'Any Tag') {
+      if (tags.length === 0) return false
+    } else if (filter.tag === 'No Tag') {
+      if (tags.length > 0) return false
+    } else {
+      if (!tags.some((t) => t.label === filter.tag)) return false
+    }
+  }
+
+  if (filter.displayColor !== undefined) {
+    if (filter.displayColor === 'Any Color') {
+      if (!monWithManagement.displayColor) return false
+    } else if (filter.displayColor === 'No Color') {
+      if (monWithManagement.displayColor) return false
+    } else {
+      if (monWithManagement.displayColor !== filter.displayColor) return false
+    }
+  }
+
+  if (filter.hasNotes !== undefined) {
+    const notes = monWithManagement.notes
+    const monHasNotes = typeof notes === 'string' && notes.trim().length > 0
+    if (filter.hasNotes !== monHasNotes) return false
+  }
+
   return true
 }
 
