@@ -1,7 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { range } from '@openhome-core/util/functional'
-import { CSSWithVariables } from '@openhome-core/util/types'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import useDisplayError from '@openhome-ui/hooks/displayError'
@@ -68,12 +67,6 @@ const Home = () => {
     [displayError]
   )
 
-  const tabStyle: CSSWithVariables = {
-    '--tab-padding-x': '6px',
-    '--tab-inner-padding-y': '2px',
-    '--tab-height': '32px',
-  }
-
   return (
     <Flex direction="row" style={{ height: '100%' }}>
       <Flex className="save-file-column" gap="3">
@@ -99,27 +92,9 @@ const Home = () => {
         </Flex>
       </div>
       <Flex gap="2" className="right-column" direction="column">
-        <Card
-          style={{
-            minHeight: '50%',
-            maxHeight: '60%',
-            padding: 0,
-            contain: 'none',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <Tabs.Root
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              flex: 1,
-              minHeight: 0,
-              overflow: 'hidden',
-            }}
-            defaultValue="filter"
-          >
-            <Tabs.List size="2" style={tabStyle}>
+        <Card className="right-column-card">
+          <Tabs.Root className="right-column-tabs" defaultValue="filter">
+            <Tabs.List size="1" className="right-column-tab-list">
               <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
               <Tabs.Trigger value="display">Display</Tabs.Trigger>
               <Tabs.Trigger value="bag">Item Bag</Tabs.Trigger>
