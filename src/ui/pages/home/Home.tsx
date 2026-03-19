@@ -12,7 +12,7 @@ import OpenSaveDisplay from '@openhome-ui/saves/boxes/SaveBoxDisplay'
 import ItemBag from '@openhome-ui/saves/ItemBag'
 import SavesModal from '@openhome-ui/saves/SavesModal'
 import { useSaves } from '@openhome-ui/state/saves'
-import { Badge, Button, Card, Flex, Tabs } from '@radix-ui/themes'
+import { Button, Card, Flex, Tabs } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import FilterPanel from 'src/ui/pages/home/display/FilterPanel'
@@ -99,16 +99,32 @@ const Home = () => {
         </Flex>
       </div>
       <Flex gap="2" className="right-column" direction="column">
-        <Card style={{ minHeight: '50%', maxHeight: '60%', padding: 0, contain: 'none' }}>
-          <Tabs.Root style={{ flex: 1, height: '100%' }} defaultValue="filter">
+        <Card
+          style={{
+            minHeight: '50%',
+            maxHeight: '60%',
+            padding: 0,
+            contain: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <Tabs.Root
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              minHeight: 0,
+              overflow: 'hidden',
+            }}
+            defaultValue="filter"
+          >
             <Tabs.List size="2" style={tabStyle}>
               <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
               <Tabs.Trigger value="display">Display</Tabs.Trigger>
-              <Tabs.Trigger value="bag">
-                Item Bag <Badge style={{ marginLeft: 4, marginRight: -4 }}>BETA</Badge>
-              </Tabs.Trigger>
+              <Tabs.Trigger value="bag">Item Bag</Tabs.Trigger>
             </Tabs.List>
-            <Tabs.Content value="filter" style={{ flexGrow: 1 }}>
+            <Tabs.Content value="filter">
               <FilterPanel />
             </Tabs.Content>
             <Tabs.Content value="display" style={{ flexGrow: 1 }}>
