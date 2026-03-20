@@ -26,7 +26,7 @@ export const fileToSpriteFolder: Record<MonFormat | 'OHPKM', string> = {
   PK8: 'home',
   PA8: 'home',
   PB8: 'home',
-  PB8LUMI: 'gen9',
+  PB8LUMI: 'home',
   PK9: 'gen9',
   PA9: 'home',
   OHPKM: 'home',
@@ -124,9 +124,15 @@ export function getRomHackSpritePath(mon: MonSpriteData) {
     gen3UBname = gen3UBname[0].toUpperCase() + gen3UBname.slice(1).toLowerCase()
     return `sprites/${spriteFolder}/${gen3UBname}`
   } else if (monFormat === 'PB8LUMI') {
-    const lumiForm = mon.extraFormIndex
-      ? getLumiFormIndexByExtraFormIndex(mon.dexNum, mon.extraFormIndex)
-      : mon.formeNum
+    if (!mon.extraFormIndex) {
+      return
+    }
+
+    const lumiForm = getLumiFormIndexByExtraFormIndex(mon.dexNum, mon.extraFormIndex)
+    if (lumiForm === undefined) {
+      return
+    }
+
     return `sprites/lumi/${mon.dexNum}-${lumiForm}.webp`
   }
   const extension = spriteFolder === 'gen3gc' ? 'gif' : spriteFolder === 'home' ? 'webp' : 'png'
