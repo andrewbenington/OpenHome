@@ -36,6 +36,8 @@ export const MAROWAK_ALOLA_TOTEM = 2
 
 export const MEGA_Z = 2
 
+export const WORLD_CAP = 9
+
 export enum SWEETS {
   'Strawberry' = 0,
   'Berry' = 1,

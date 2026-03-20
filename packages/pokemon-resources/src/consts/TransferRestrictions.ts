@@ -1,8 +1,10 @@
 import {
+  CapAndStarterPikachus,
   CapPikachus,
   Gen89RegionalForms,
   HisuianForms,
   LegendsArceusExcludedForms,
+  LgpeStarters,
   PaldeanForms,
   RegionalForms,
   TransferRestrictions,
@@ -22,6 +24,8 @@ import {
   GALAR,
   GRENINJA_ASH,
   HEAT,
+  LGE_STARTER,
+  LGP_STARTER,
   MOW,
   ORIGIN,
   QUESTION,
@@ -34,6 +38,7 @@ import {
   ULTRA,
   UNBOUND,
   WASH,
+  WORLD_CAP,
 } from './Formes'
 
 export const GEN1_TRANSFER_RESTRICTIONS: TransferRestrictions = {
@@ -118,7 +123,8 @@ export const BW2_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Genesect,
   excludedForms: {
     ...RegionalForms,
-    ...CapPikachus,
+    ...CapAndStarterPikachus,
+    [NationalDex.Eevee]: [LGE_STARTER],
     [NationalDex.Pichu]: [SPIKY_EAR],
     [NationalDex.Dialga]: [ORIGIN],
     [NationalDex.Palkia]: [ORIGIN],
@@ -130,7 +136,8 @@ export const XY_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Volcanion,
   excludedForms: {
     ...RegionalForms,
-    ...CapPikachus,
+    ...CapAndStarterPikachus,
+    [NationalDex.Eevee]: [LGE_STARTER],
     [NationalDex.Pichu]: [SPIKY_EAR],
     [NationalDex.Dialga]: [ORIGIN],
     [NationalDex.Palkia]: [ORIGIN],
@@ -143,7 +150,8 @@ export const ORAS_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Volcanion,
   excludedForms: {
     ...RegionalForms,
-    ...CapPikachus,
+    ...CapAndStarterPikachus,
+    [NationalDex.Eevee]: [LGE_STARTER],
     [NationalDex.Pichu]: [SPIKY_EAR],
     [NationalDex.Dialga]: [ORIGIN],
     [NationalDex.Palkia]: [ORIGIN],
@@ -155,6 +163,7 @@ export const SM_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Marshadow,
   excludedForms: {
     ...Gen89RegionalForms,
+    [NationalDex.Pikachu]: [LGP_STARTER, WORLD_CAP],
     [NationalDex.Pichu]: [SPIKY_EAR],
     [NationalDex.Dialga]: [ORIGIN],
     [NationalDex.Palkia]: [ORIGIN],
@@ -166,6 +175,7 @@ export const USUM_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Zeraora,
   excludedForms: {
     ...Gen89RegionalForms,
+    [NationalDex.Pikachu]: [LGP_STARTER, WORLD_CAP],
     [NationalDex.Pichu]: [SPIKY_EAR],
     [NationalDex.Dialga]: [ORIGIN],
     [NationalDex.Palkia]: [ORIGIN],
@@ -178,7 +188,7 @@ export const LGPE_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     NationalDex.Meltan,
     NationalDex.Melmetal,
   ],
-  excludedForms: Gen89RegionalForms,
+  excludedForms: { ...Gen89RegionalForms, ...CapPikachus },
 }
 
 export const SWSH_TRANSFER_RESTRICTIONS_BASE: TransferRestrictions = {
@@ -210,6 +220,7 @@ export const SWSH_TRANSFER_RESTRICTIONS_BASE: TransferRestrictions = {
   excludedForms: {
     ...HisuianForms,
     ...PaldeanForms,
+    ...LgpeStarters,
     [NationalDex.Slowpoke]: [GALAR],
     [NationalDex.Slowbro]: [GALAR],
     [NationalDex.Slowking]: [GALAR],
@@ -256,6 +267,7 @@ export const SWSH_TRANSFER_RESTRICTIONS_IOA: TransferRestrictions = {
   excludedForms: {
     ...HisuianForms,
     ...PaldeanForms,
+    ...LgpeStarters,
     [NationalDex.Slowking]: [GALAR],
     [NationalDex.Articuno]: [GALAR],
     [NationalDex.Zapdos]: [GALAR],
@@ -307,6 +319,7 @@ export const SWSH_TRANSFER_RESTRICTIONS_CT: TransferRestrictions = {
   excludedForms: {
     ...HisuianForms,
     ...PaldeanForms,
+    ...LgpeStarters,
     [NationalDex.Pichu]: [SPIKY_EAR],
     [NationalDex.Dialga]: [ORIGIN],
     [NationalDex.Palkia]: [ORIGIN],
@@ -317,6 +330,8 @@ export const BDSP_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   ...HGSS_TRANSFER_RESTRICTIONS,
   excludedForms: {
     ...HGSS_TRANSFER_RESTRICTIONS.excludedForms,
+    ...CapAndStarterPikachus,
+    [NationalDex.Eevee]: [LGE_STARTER],
     [NationalDex.Pichu]: [SPIKY_EAR],
     [NationalDex.Arceus]: undefined,
     [NationalDex.Dialga]: [ORIGIN],
@@ -372,6 +387,7 @@ export const SV_TRANSFER_RESTRICTIONS_BASE: TransferRestrictions = {
     891, 892, 893, 894, 895, 896, 897, 898, 899, 900, 901, 902, 903, 904, 905, 1011, 1012, 1013,
   ],
   excludedForms: {
+    ...LgpeStarters,
     [NationalDex.Pichu]: [SPIKY_EAR],
     [NationalDex.Greninja]: [GRENINJA_ASH],
     [NationalDex.Floette]: [ETERNAL_FLOWER],
@@ -389,6 +405,7 @@ export const SV_TRANSFER_RESTRICTIONS_TM: TransferRestrictions = {
     783, 784, 845, 877, 1014, 1015, 1016, 1017,
   ]),
   excludedForms: {
+    ...LgpeStarters,
     [NationalDex.Pichu]: [SPIKY_EAR],
     [NationalDex.Greninja]: [GRENINJA_ASH],
     [NationalDex.Floette]: [ETERNAL_FLOWER],
@@ -407,6 +424,7 @@ export const SV_TRANSFER_RESTRICTIONS_ID: TransferRestrictions = {
     884, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025,
   ]),
   excludedForms: {
+    ...LgpeStarters,
     [NationalDex.Pichu]: [SPIKY_EAR],
     [NationalDex.Greninja]: [GRENINJA_ASH],
     [NationalDex.Floette]: [ETERNAL_FLOWER],
@@ -429,6 +447,7 @@ export const ZA_TRANSFER_RESTRICTIONS_BASE: TransferRestrictions = {
     371, 372, 373, 115, 780, 374, 375, 376, 716, 717, 718, 719, 150,
   ],
   excludedForms: {
+    ...CapAndStarterPikachus,
     [NationalDex.Pichu]: [SPIKY_EAR],
   },
 }
@@ -444,6 +463,7 @@ export const ZA_TRANSFER_RESTRICTIONS_MD: TransferRestrictions = {
     640, 647, 648, 649, 720, 802, 808, 809, 491, 380, 381, 382, 383, 384, 801, 807,
   ]),
   excludedForms: {
+    ...CapAndStarterPikachus,
     [NationalDex.Pichu]: [SPIKY_EAR],
   },
 }

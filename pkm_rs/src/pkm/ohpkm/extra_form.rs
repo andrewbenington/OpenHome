@@ -420,10 +420,33 @@ impl ExtraFormIndex {
 }
 
 #[cfg(feature = "wasm")]
-#[wasm_bindgen(js_name = "orasSupportsExtraForm")]
+#[wasm_bindgen(js_name = "orasFormIndexIfSupported")]
 #[allow(clippy::missing_const_for_fn)]
-pub fn oras_supports_extra_form(form: ExtraFormIndex) -> bool {
-    form.in_oras()
+pub fn oras_form_index_if_supported(form: ExtraFormIndex) -> Option<u16> {
+    match form {
+        ExtraFormIndex::PikachuRockStar => Some(1),
+        ExtraFormIndex::PikachuBelle => Some(2),
+        ExtraFormIndex::PikachuPopStar => Some(3),
+        ExtraFormIndex::PikachuPhD => Some(4),
+        ExtraFormIndex::PikachuLibre => Some(5),
+        ExtraFormIndex::PikachuCosplay => Some(6),
+        _ => None,
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "extraFormIndexFromOrasPikachu")]
+#[allow(clippy::missing_const_for_fn)]
+pub fn extra_form_index_from_oras_pikachu(oras_index: u16) -> Option<ExtraFormIndex> {
+    match oras_index {
+        1 => Some(ExtraFormIndex::PikachuRockStar),
+        2 => Some(ExtraFormIndex::PikachuBelle),
+        3 => Some(ExtraFormIndex::PikachuPopStar),
+        4 => Some(ExtraFormIndex::PikachuPhD),
+        5 => Some(ExtraFormIndex::PikachuLibre),
+        6 => Some(ExtraFormIndex::PikachuCosplay),
+        _ => None,
+    }
 }
 
 #[cfg(feature = "wasm")]
