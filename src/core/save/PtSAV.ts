@@ -1,7 +1,4 @@
-import {
-  bytesToUint16LittleEndian,
-  bytesToUint32LittleEndian,
-} from '@openhome-core/save/util/byteLogic'
+import { bytesToUint16LittleEndian } from '@openhome-core/save/util/byteLogic'
 import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
@@ -55,9 +52,17 @@ export class PtSAV extends G4SAV {
     super(path, bytes)
     // current storage block could be either the first or second one,
     // depending on save count
+    const firstBlockSaveCount = this.getCurrentSaveCount(
+      PtSAV.STORAGE_BLOCK_OFFSET,
+      PtSAV.STORAGE_BLOCK_SIZE
+    )
+    const secondBlockSaveCount = this.getCurrentSaveCount(
+      PtSAV.STORAGE_BLOCK_OFFSET + 0x40000,
+      PtSAV.STORAGE_BLOCK_SIZE
+    )
     if (
-      this.getCurrentSaveCount(PtSAV.STORAGE_BLOCK_OFFSET, PtSAV.STORAGE_BLOCK_SIZE) <
-      this.getCurrentSaveCount(PtSAV.STORAGE_BLOCK_OFFSET + 0x40000, PtSAV.STORAGE_BLOCK_SIZE)
+      secondBlockSaveCount !== undefined &&
+      (firstBlockSaveCount === undefined || secondBlockSaveCount > firstBlockSaveCount)
     ) {
       this.currentSaveStorageBlockOffset += 0x40000
     }
@@ -69,10 +74,6 @@ export class PtSAV extends G4SAV {
     this.displayID = this.tid.toString().padStart(5, '0')
     this.trainerGender = bytes[PtSAV.TRAINER_ID_OFFSET + 8]
     this.buildBoxes()
-  }
-
-  getCurrentSaveCount(blockOffset: number, blockSize: number) {
-    return bytesToUint32LittleEndian(this.bytes, blockOffset + blockSize - this.footerSize)
   }
 
   supportsMon(dexNumber: number, formeNumber: number) {
