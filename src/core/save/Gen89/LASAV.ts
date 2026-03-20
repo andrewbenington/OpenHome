@@ -1,5 +1,5 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Gender, Languages, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { PA8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { LA_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
@@ -97,7 +97,8 @@ export class LASAV extends G89SAV<PA8> {
     return 0
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     return !isRestricted(LA_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 

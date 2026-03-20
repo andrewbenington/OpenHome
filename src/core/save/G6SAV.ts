@@ -4,7 +4,7 @@ import {
   uint16ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConverter'
-import { Gender, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK6 } from '@pokemon-files/pkm'
 import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
@@ -122,7 +122,11 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
     return PK6.fromOhpkm(ohpkm, strategy)
   }
 
-  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract supportsMon(
+    dexNumber: number,
+    formeNumber: number,
+    extraFormIndex?: ExtraFormIndex
+  ): boolean
 
   calculatePcChecksum(): number {
     return CRC16_CCITT(this.bytes, this.getPcOffset(), this.pcDataSize)

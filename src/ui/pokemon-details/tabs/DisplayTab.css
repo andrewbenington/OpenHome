@@ -1,0 +1,83 @@
+.display-tab-root {
+  padding: 8px;
+  height: calc(100% - 16px);
+  overflow-y: auto;
+  color: var(--gray-12);
+}
+
+.display-tab-flex-fill {
+  flex: 1;
+}
+
+.display-tab-color-input-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.display-tab-color-input {
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.display-tab-color-preset {
+  height: 40px;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-shadow: 0 0 2px #000;
+}
+
+.color-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 66px);
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+}
+
+.display-tab-tag-badge {
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.display-tab-tag-remove {
+  opacity: 0.7;
+}
+
+.display-tab-tag-preset {
+  padding: 4px 10px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #fff;
+  text-shadow: 0 0 2px #000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.display-tab-tag-color-input {
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.clear-button {
+  padding: 0px 8px;
+  height: 18px;
+}

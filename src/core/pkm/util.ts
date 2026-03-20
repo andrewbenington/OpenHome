@@ -1,5 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { AbilityIndex, MetadataLookup, SpeciesAndForme } from '@pkm-rs/pkg'
+import { AbilityIndex, extraFormTypeOverride, MetadataLookup, SpeciesAndForme } from '@pkm-rs/pkg'
 import { FourMoves, Stats, StatsPreSplit } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
@@ -13,6 +13,7 @@ import {
   SpecialDefCharacteristics,
   SpeedCharacteristics,
   Type,
+  Types,
 } from '@pokemon-resources/index'
 import Prando from 'prando'
 
@@ -125,6 +126,13 @@ export const getBaseMon = (dexNum: number, forme?: number) => {
 }
 
 export const getTypes = (mon: PKMInterface): Type[] => {
+  if (mon.extraFormIndex !== undefined) {
+    const extraFormTypeIndices: number[] | undefined = extraFormTypeOverride(mon.extraFormIndex)
+    if (extraFormTypeIndices) {
+      return extraFormTypeIndices.map((idx) => Types[idx])
+    }
+  }
+
   const metadata = mon.metadata
   if (!metadata) {
     return ['Normal']

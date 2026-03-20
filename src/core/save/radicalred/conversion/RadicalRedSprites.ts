@@ -894,7 +894,7 @@ const _RRSprites: Record<string, string> = {
   '917': 'AudinoMega.png',
   '918': 'DiancieMega.png',
   '919': 'DialgaPrimal.png',
-  '920': 'PalkiaPrimal.png',
+  // '920': 'PalkiaPrimal.png',
   '921': 'Sprigatito.png',
   '922': 'Floragato.png',
   '923': 'Meowscarada.png',

@@ -1,5 +1,5 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Gender, Languages, OriginGame, SpeciesLookup } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, Languages, OriginGame, SpeciesLookup } from '@pkm-rs/pkg'
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
@@ -92,7 +92,8 @@ export class SwShSAV extends G89SAV<PK8> {
     return 0
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     const revision = this.scBlocks ? this.getSaveRevision() : 'Crown Tundra'
     switch (revision) {
       case 'Base Game':

@@ -1,5 +1,6 @@
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
+import { ExtraFormIndex } from '@pkm-rs/pkg'
 import { PA8, PK3, PK8 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import path from 'path'
@@ -103,12 +104,13 @@ describe('evolution and form change update ohpkm', async () => {
 describe('plugin form persistence', () => {
   test('pluginForm survives OHPKM serialization', () => {
     const starter = new OHPKM(new Uint8Array())
-    starter.setPluginData('luminescent_platinum', 0x42)
+    starter.pluginOrigin = 'luminescent_platinum'
+    starter.extraFormIndex = ExtraFormIndex.GengarStitched
 
     const bytes = starter.toBytes()
     const again = OHPKM.fromBytes(bytes)
     expect(again.pluginOrigin).toEqual('luminescent_platinum')
-    expect(again.pluginForm).toEqual(0x42)
+    expect(again.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
   })
 
   test('PB8LUMI → OHPKM → bytes → OHPKM → PB8LUMI roundtrip', () => {
@@ -120,21 +122,25 @@ describe('plugin form persistence', () => {
 
     const original = new PB8LUMI(stitchedGengarBytes.buffer)
 
+    expect(original.pluginOrigin).toEqual('luminescent_platinum')
     expect(original.dexNum).toEqual(NationalDex.Gengar)
-    expect(original.pluginForm).toEqual(3)
+    expect(original.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
 
     const ohpkm = new OHPKM(original)
+    expect(ohpkm.pluginOrigin).toEqual('luminescent_platinum')
+
     const lumi = new PB8LUMI(ohpkm)
-    expect(lumi.pluginForm).toEqual(3)
+    expect(lumi.pluginOrigin).toEqual('luminescent_platinum')
+    expect(lumi.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
 
     const ohFromLumi = new OHPKM(lumi)
     const roundBytes = ohFromLumi.toBytes()
     const ohAgain = OHPKM.fromBytes(roundBytes)
     expect(ohAgain.pluginOrigin).toEqual('luminescent_platinum')
-    expect(ohAgain.pluginForm).toEqual(3)
+    expect(ohAgain.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
 
     const lumi2 = new PB8LUMI(ohAgain)
-    expect(lumi2.pluginForm).toEqual(3)
+    expect(lumi2.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
   })
 })
 

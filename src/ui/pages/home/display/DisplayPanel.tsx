@@ -46,6 +46,30 @@ export default function DisplayPanel() {
           />
           Show Items
         </Flex>
+        <Flex align="center" gap="2">
+          <Switch
+            size="1"
+            checked={displayState.showNotesIndicator}
+            onCheckedChange={displayState.setShowNotesIndicator}
+          />
+          Show Notes Indicator
+        </Flex>
+        <Flex align="center" gap="2">
+          <Switch
+            size="1"
+            checked={displayState.showTags}
+            onCheckedChange={displayState.setShowTags}
+          />
+          Show Tags
+        </Flex>
+        <Flex align="center" gap="2">
+          <Switch
+            size="1"
+            checked={displayState.showBackgroundColor}
+            onCheckedChange={displayState.setShowBackgroundColor}
+          />
+          Show Background Color
+        </Flex>
       </Flex>
     </div>
   )

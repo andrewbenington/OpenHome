@@ -1,6 +1,6 @@
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
-import { ItemRadicalRed } from '@pkm-rs/pkg'
-import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
+import { ExtraFormIndex, ItemRadicalRed, radicalRedSupportsExtraForm } from '@pkm-rs/pkg'
+import { ConvertStrategy } from '@pokemon-files/conversion/settings'
 import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import {
@@ -30,7 +30,8 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
     return PK3RR.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(dexNumber: number, formeNumber: number) {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return radicalRedSupportsExtraForm(extraFormIndex)
     return !isRestricted(RR_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 

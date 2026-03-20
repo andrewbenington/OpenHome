@@ -368,11 +368,16 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         )}
         {mon.eggDate && <AttributeRow label="Hatch Date" value={mon.eggDate} />}
         <AttributeRow label="Egg Location Index" value={mon.eggLocationIndex} />
-        <AttributeRow label="Gender" value={mon.gender} />
+        <AttributeRow label="Plugin Origin" value={mon.pluginOrigin} />
+        <AttributeRow label="Extra Form Index" value={mon.extraFormIndex} />
         <AttributeRow label="Is Egg" value={String(Boolean(mon.isEgg))} />
         <AttributeRow label="Is Nicknamed" value={String(Boolean(mon.isNicknamed))} />
         <AttributeRow label="Is Favorite" value={String(Boolean(mon.favorite))} />
         <AttributeRow label="Is Shadow" value={String(Boolean(mon.isShadow))} />
+        {mon.extraDisplayFields &&
+          Object.entries(mon.extraDisplayFields()).map(([label, value]) => (
+            <AttributeRow key={`extra_field_${label}`} label={label} value={String(value)} />
+          ))}
       </Flex>
     </div>
   )

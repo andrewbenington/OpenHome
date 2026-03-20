@@ -1,5 +1,5 @@
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
-import { ItemUnbound } from '@pkm-rs/pkg'
+import { ExtraFormIndex, ItemUnbound, unboundSupportsExtraForm } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../../pkm/OHPKM'
@@ -27,7 +27,8 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> {
     return PK3UB.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(dexNumber: number, formeNumber: number) {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return unboundSupportsExtraForm(extraFormIndex)
     return !isRestricted(UB_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 

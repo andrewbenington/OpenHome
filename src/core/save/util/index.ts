@@ -1,6 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
 import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
 import { PkmConstructorOptions } from '../../../../packages/pokemon-files/src/pkm/PKM'
 import { SAV } from '../interfaces'
@@ -36,8 +36,13 @@ export interface SAVClass<S extends SAV = SAV> {
 
 export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never
 
-export function supportsMon(saveType: SAVClass, dexNumber: number, formeNumber: number): boolean {
-  return saveType.prototype.supportsMon(dexNumber, formeNumber)
+export function supportsMon(
+  saveType: SAVClass,
+  dexNumber: number,
+  formeNumber: number,
+  extraFormIndex?: ExtraFormIndex
+): boolean {
+  return saveType.prototype.supportsMon(dexNumber, formeNumber, extraFormIndex)
 }
 
 export function monSupportedBySaveType(
@@ -45,18 +50,12 @@ export function monSupportedBySaveType(
   mon?: PKMInterface
 ): boolean {
   if (!saveType || !mon) return false
-  if (mon.pluginForm !== undefined && saveType.getPluginIdentifier?.() !== mon.pluginOrigin) {
-    return false
-  }
-  return supportsMon(saveType, mon.dexNum, mon.formeNum)
+  return supportsMon(saveType, mon.dexNum, mon.formeNum, mon.extraFormIndex)
 }
 
 export function monSupportedBySave(save?: SAV, mon?: PKMInterface): boolean {
   if (!save || !mon) return false
-  if (mon.pluginForm !== undefined && save.pluginIdentifier !== mon.pluginOrigin) {
-    return false
-  }
-  return save.supportsMon(mon.dexNum, mon.formeNum)
+  return save.supportsMon(mon.dexNum, mon.formeNum, mon.extraFormIndex)
 }
 
 export function getPluginIdentifier(saveType: SAVClass | undefined): string | undefined {

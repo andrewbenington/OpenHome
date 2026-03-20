@@ -4,6 +4,7 @@ import {
   LGE_STARTER,
   LGP_STARTER,
   MAROWAK_ALOLA_TOTEM,
+  SPIKY_EAR,
 } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 
@@ -108,6 +109,7 @@ export const LegendsArceusExcludedForms: FormRestrictions = {
   [NationalDex.Voltorb]: [BASE],
   [NationalDex.Electrode]: [BASE],
   [NationalDex.Typhlosion]: [BASE],
+  [NationalDex.Pichu]: [SPIKY_EAR],
   [NationalDex.Qwilfish]: [BASE],
   [NationalDex.Sneasel]: undefined,
   [NationalDex.Samurott]: [BASE],

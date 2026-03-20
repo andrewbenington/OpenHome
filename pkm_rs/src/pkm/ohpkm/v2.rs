@@ -1,8 +1,10 @@
 use crate::pkm::ohpkm::OhpkmV1;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
+#[cfg(feature = "wasm")]
+use crate::pkm::ohpkm::v2_sections::MonTag;
 use crate::pkm::ohpkm::v2_sections::{
-    BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
-    Notes, PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
+    BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MonTags,
+    MostRecentSave, Notes, PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
 };
 use crate::pkm::{Error, Result};
 
@@ -13,6 +15,8 @@ use strum_macros::Display;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "wasm")]
+use crate::pkm::ohpkm::extra_form::ExtraFormIndex;
 #[cfg(feature = "wasm")]
 use crate::pkm::{ohpkm::JsResult, traits::IsShiny};
 
@@ -37,6 +41,63 @@ use pkm_rs_types::{
 const MAGIC_NUMBER: u32 = 0x57575757;
 const CURRENT_VERSION: u16 = 2;
 
+#[cfg(feature = "wasm")]
+fn parse_display_color_to_rgb(value: &str) -> Option<[u8; 3]> {
+    let trimmed = value.trim();
+
+    if let Some(hex) = trimmed.strip_prefix('#') {
+        let parse_hex = |s: &str| u8::from_str_radix(s, 16).ok();
+
+        return match hex.len() {
+            3 => {
+                let mut chars = hex.chars();
+                let r = chars.next()?;
+                let g = chars.next()?;
+                let b = chars.next()?;
+                let rr = parse_hex(&format!("{r}{r}"))?;
+                let gg = parse_hex(&format!("{g}{g}"))?;
+                let bb = parse_hex(&format!("{b}{b}"))?;
+                Some([rr, gg, bb])
+            }
+            6 | 8 => {
+                let r = parse_hex(&hex[0..2])?;
+                let g = parse_hex(&hex[2..4])?;
+                let b = parse_hex(&hex[4..6])?;
+                Some([r, g, b])
+            }
+            _ => None,
+        };
+    }
+
+    if (trimmed.starts_with("rgb(") || trimmed.starts_with("rgba(")) && trimmed.ends_with(')') {
+        let body = trimmed.split_once('(')?.1.strip_suffix(')')?;
+        let parts: Vec<&str> = body.split(',').map(str::trim).collect();
+        if parts.len() < 3 {
+            return None;
+        }
+
+        let parse_component = |part: &str| {
+            let component = part.parse::<f32>().ok()?;
+            if !(0.0..=255.0).contains(&component) {
+                return None;
+            }
+            Some(component.round() as u8)
+        };
+
+        let r = parse_component(parts[0])?;
+        let g = parse_component(parts[1])?;
+        let b = parse_component(parts[2])?;
+        return Some([r, g, b]);
+    }
+
+    None
+}
+
+#[cfg(feature = "wasm")]
+fn rgb_to_display_color(rgb: [u8; 3]) -> String {
+    format!("#{:02x}{:02x}{:02x}", rgb[0], rgb[1], rgb[2])
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Display)]
 #[repr(u16)]
 pub enum SectionTagV2 {
@@ -52,6 +113,7 @@ pub enum SectionTagV2 {
     PluginData,
     Notes,
     MostRecentSave,
+    Tag,
 }
 
 impl SectionTagV2 {
@@ -69,7 +131,8 @@ impl SectionTagV2 {
             9 => Some(Self::PluginData),
             10 => Some(Self::Notes),
             11 => Some(Self::MostRecentSave),
-            12.. => None,
+            12 => Some(Self::Tag),
+            13.. => None,
         }
     }
 
@@ -87,6 +150,7 @@ impl SectionTagV2 {
             Self::PluginData => 0,
             Self::Notes => 0,
             Self::MostRecentSave => 31,
+            Self::Tag => 0,
         }
     }
 }
@@ -123,6 +187,7 @@ pub struct OhpkmV2 {
     plugin_data: Option<PluginData>,
     notes: Option<Notes>,
     most_recent_save: Option<MostRecentSave>,
+    tags: Option<MonTags>,
 }
 
 impl OhpkmV2 {
@@ -140,6 +205,7 @@ impl OhpkmV2 {
             plugin_data: None,
             notes: None,
             most_recent_save: None,
+            tags: None,
         })
     }
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -151,7 +217,7 @@ impl OhpkmV2 {
             return Err(Error::other("Bad version number"));
         }
 
-        Ok(Self {
+        let result = Self {
             main_data: MainDataV2::extract_from(&sectioned_data)?
                 .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
             gameboy_data: GameboyData::extract_from(&sectioned_data)?,
@@ -165,7 +231,10 @@ impl OhpkmV2 {
             plugin_data: PluginData::extract_from(&sectioned_data)?,
             notes: Notes::extract_from(&sectioned_data)?,
             most_recent_save: MostRecentSave::extract_from(&sectioned_data)?,
-        })
+            tags: MonTags::extract_from(&sectioned_data)?,
+        };
+
+        Ok(result)
     }
 
     pub fn from_v1(old: OhpkmV1) -> Self {
@@ -182,6 +251,7 @@ impl OhpkmV2 {
             plugin_data: PluginData::from_v1(old),
             notes: None,
             most_recent_save: None,
+            tags: None,
         }
     }
 
@@ -199,7 +269,8 @@ impl OhpkmV2 {
             .add_all(self.handler_data.clone())?
             .add_if_some(self.plugin_data.clone())?
             .add_if_some(self.notes.clone())?
-            .add_if_some(self.most_recent_save.clone())?;
+            .add_if_some(self.most_recent_save.clone())?
+            .add_if_some(self.tags.clone())?;
         Ok(sectioned_data)
     }
 
@@ -651,6 +722,16 @@ impl OhpkmV2 {
         self.main_data.affixed_ribbon = v;
     }
 
+    #[wasm_bindgen(getter = extraFormIndex)]
+    pub fn extra_form_index(&self) -> Option<ExtraFormIndex> {
+        self.main_data.extra_form
+    }
+
+    #[wasm_bindgen(setter = extraFormIndex)]
+    pub fn set_extra_form_index(&mut self, v: Option<ExtraFormIndex>) {
+        self.main_data.extra_form = v;
+    }
+
     #[wasm_bindgen(getter = trainerFriendship)]
     pub fn trainer_friendship(&self) -> u8 {
         self.main_data.trainer_friendship
@@ -900,23 +981,14 @@ impl OhpkmV2 {
     pub fn plugin_origin(&self) -> Option<String> {
         Some(self.plugin_data.clone()?.plugin_origin)
     }
-
-    #[wasm_bindgen(getter = pluginFormWasm)]
-    pub fn plugin_form(&self) -> Option<u16> {
-        self.plugin_data.as_ref().and_then(|x| x.plugin_form)
-    }
-
-    #[wasm_bindgen(js_name = setPluginDataWasm)]
-    pub fn set_plugin_data(&mut self, origin: String, form: Option<u16>) {
-        self.plugin_data = Some(PluginData {
-            plugin_origin: origin,
-            plugin_form: form,
-        });
-    }
-
-    #[wasm_bindgen(js_name = clearPluginDataWasm)]
-    pub fn clear_plugin_data(&mut self) {
-        self.plugin_data = None;
+    #[wasm_bindgen(setter = pluginOriginWasm)]
+    pub fn set_plugin_origin(&mut self, value: Option<String>) {
+        match value {
+            Some(plugin_origin) => {
+                self.plugin_data.get_or_insert_default().plugin_origin = plugin_origin
+            }
+            None => self.plugin_data = None,
+        }
     }
 
     // Game Boy
@@ -1735,6 +1807,36 @@ impl OhpkmV2 {
         match value {
             Some(notes) => self.notes = Some(Notes(notes)),
             None => self.notes = None,
+        }
+    }
+
+    // Display Color (CSS color string like '#ff0000' or 'rgba(255, 0, 0, 0.5)')
+    #[wasm_bindgen(getter = displayColor)]
+    pub fn display_color(&self) -> Option<String> {
+        Some(rgb_to_display_color(self.main_data.display_color_rgb?))
+    }
+
+    #[wasm_bindgen(setter = displayColor)]
+    pub fn set_display_color(&mut self, value: Option<String>) {
+        self.main_data.display_color_rgb =
+            value.and_then(|color| parse_display_color_to_rgb(&color));
+    }
+
+    // Tags (Vec of label, color, icon)
+    #[wasm_bindgen(getter = tags)]
+    pub fn tags(&self) -> JsValue {
+        serde_wasm_bindgen::to_value(&self.tags.clone().unwrap_or_default().0).unwrap()
+    }
+
+    /// Set or clear the tags by passing a serialized JSON string or an empty array.
+    #[wasm_bindgen(js_name = setTags)]
+    pub fn set_tags(&mut self, tags_js: JsValue) {
+        if let Ok(vec) = serde_wasm_bindgen::from_value::<Vec<MonTag>>(tags_js) {
+            if vec.is_empty() {
+                self.tags = None;
+            } else {
+                self.tags = Some(MonTags(vec));
+            }
         }
     }
 

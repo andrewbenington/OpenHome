@@ -1,4 +1,4 @@
-import { Gender, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, luminescentSupportsExtraForm, OriginGame } from '@pkm-rs/pkg'
 import { utf16BytesToString } from '@pokemon-files/util'
 
 import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
@@ -248,7 +248,8 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
     return uint8ArrayToBase64(this.calculateChecksumBytes())
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return luminescentSupportsExtraForm(extraFormIndex)
     return !isRestricted(LP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 

@@ -1,4 +1,12 @@
+![GitHub Release](https://img.shields.io/github/v/release/andrewbenington/OpenHome)
+![GitHub Release Date](https://img.shields.io/github/release-date/andrewbenington/OpenHome)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/andrewbenington/OpenHome/total)
+![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/andrewbenington/OpenHome/latest/total)
+
 [![Enforce Types + Linting](https://github.com/andrewbenington/OpenHome/actions/workflows/typecheck_lint.yaml/badge.svg)](https://github.com/andrewbenington/OpenHome/actions/workflows/typecheck_lint.yaml)
+![GitHub top language](https://img.shields.io/github/languages/top/andrewbenington/OpenHome)
+![GitHub language count](https://img.shields.io/github/languages/count/andrewbenington/OpenHome)
+![GitHub contributors](https://img.shields.io/github/contributors/andrewbenington/OpenHome)
 
 <p>
   OpenHome uses <a href="https://tauri.app/">Tauri</a>, <a href="https://facebook.github.io/react/">React</a>, and <a href="https://vite.dev/">Vite</a>.
@@ -150,13 +158,15 @@ A Pokémon transferred into Generation I or II will have it's Original Trainer's
 changed to a "tracking number" of sorts due to the lack of a Personality Value in
 those games.
 
-## Credits
+## Code/Research Credits
 
 This application would not have been possible without the research done at https://projectpokemon.org/, the work done by the [PKHeX](https://github.com/kwsch/PKHeX) developers, and the sprites archived by https://pokemondb.net/ and https://www.bulbagarden.net/.
 
 Credit to the [Radical Red Team](https://www.pokecommunity.com/threads/pok%C3%A9mon-radical-red-version-4-1-released-gen-9-dlc-pokemon-character-customization-now-available.437688/) for the Radical Red logo, as well as the Pokémon sprites.
 
 Credit to [Team Luminescent](https://luminescent.team/) for the PKLumiHeX program, which provided critical information about the save file structure, and for the Luminescent Platinum logo.
+
+Pokémon Home extra form photoshops were created by [PkmnHomeIcons](https://github.com/nileplumb/PkmnHomeIcons). This includes Stitched Gengar, the Clone Pokémon, and the extra Pikachu forms.
 
 ## Star History
 

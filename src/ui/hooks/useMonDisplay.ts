@@ -7,6 +7,9 @@ export type MonDisplayState = {
   topRightIndicator: TopRightIndicatorType | null
   showShiny: boolean
   showItem: boolean
+  showNotesIndicator: boolean
+  showTags: boolean
+  showBackgroundColor: boolean
 }
 
 export const MonDisplayContext = createContext<[MonDisplayState, (state: MonDisplayState) => void]>(
@@ -23,7 +26,7 @@ export function useMonDisplay() {
   }
 
   function setFilter(newFilter: Partial<Filter>) {
-    updateState({ ...monDisplayState, filter: newFilter })
+    updateState({ ...monDisplayState, filter: { ...monDisplayState.filter, ...newFilter } })
   }
 
   function clearFilter() {
@@ -42,6 +45,18 @@ export function useMonDisplay() {
     updateState({ ...monDisplayState, showItem })
   }
 
+  function setShowNotesIndicator(showNotesIndicator: boolean) {
+    updateState({ ...monDisplayState, showNotesIndicator })
+  }
+
+  function setShowTags(showTags: boolean) {
+    updateState({ ...monDisplayState, showTags })
+  }
+
+  function setShowBackgroundColor(showBackgroundColor: boolean) {
+    updateState({ ...monDisplayState, showBackgroundColor })
+  }
+
   return {
     ...monDisplayState,
     setFilter,
@@ -49,6 +64,9 @@ export function useMonDisplay() {
     setTopRightIndicatorType,
     setShowShiny,
     setShowItem,
+    setShowNotesIndicator,
+    setShowTags,
+    setShowBackgroundColor,
   }
 }
 

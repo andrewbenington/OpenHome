@@ -2,6 +2,8 @@ import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import { PB8 } from '@pokemon-files/pkm'
 import { PluginIdentifier } from '../interfaces'
 
+import { Option } from '@openhome-core/util/functional'
+import { ExtraFormIndex, luminescentSupportsExtraForm } from '@pkm-rs/pkg'
 import {
   ConvertStrategy,
   DefaultConversionStrategy,
@@ -11,7 +13,7 @@ import {
   PkmConstructorOptions,
 } from '../../../../packages/pokemon-files/src/pkm/PKM'
 import { OHPKM } from '../../pkm/OHPKM'
-import { getLumiCustomForm } from './conversion/LuminescentPlatinumFormMap'
+import { getLumiCustomForm as getLumiExtraFormIndex } from './conversion/LuminescentPlatinumFormMap'
 import {
   fromLumiItemIndex,
   LUMI_ITEM_NAMES,
@@ -31,32 +33,38 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
   // Core plugin metadata
   // @ts-expect-error PB8 declares format as literal 'PB8'; plugin subclass intentionally widens to 'PB8LUMI'
   public format: 'PB8LUMI' = 'PB8LUMI'
+  public pluginOrigin?: PluginIdentifier
   public pluginIdentifier: PluginIdentifier = 'luminescent_platinum'
   public selectColor = '#25c2a0'
 
+  public lumiFormIndex: number
+
   static boxSizeBytes = 344
 
-  public pluginOrigin?: PluginIdentifier
-  public pluginForm?: number
+  public extraFormIndex: Option<ExtraFormIndex>
 
   constructor(
     arg: ArrayBuffer | OHPKM,
     options: PkmConstructorOptions = DefaultConstructorOptions
   ) {
     super(arg, options)
-    this.pluginOrigin = 'luminescent_platinum'
+    this.lumiFormIndex = this.formeNum
 
     if (arg instanceof ArrayBuffer) {
+      this.pluginOrigin = 'luminescent_platinum'
       this.heldItemIndex = fromLumiItemIndex(this.heldItemIndex) ?? 0
 
-      const customForm = getLumiCustomForm(this.dexNum, this.formeNum)
-      if (customForm) {
-        this.pluginForm = this.formeNum
-        this.formeNum = customForm.fallbackForm
+      const extraFormIndex = getLumiExtraFormIndex(this.dexNum, this.formeNum)
+      if (extraFormIndex) {
+        this.extraFormIndex = extraFormIndex.extraFormIndex
+        this.formeNum = extraFormIndex.fallbackForm
       }
     } else {
       if (arg.pluginOrigin === 'luminescent_platinum') {
-        this.pluginForm = arg.pluginForm
+        this.pluginOrigin = 'luminescent_platinum'
+      }
+      if (arg.extraFormIndex && luminescentSupportsExtraForm(arg.extraFormIndex)) {
+        this.extraFormIndex = arg.extraFormIndex
       }
     }
   }
@@ -74,18 +82,10 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
   }
 
   toBytes(): ArrayBuffer {
-    // Temporarily convert indices back to Luminescent values before serialization
-    const standardItemIndex = this.heldItemIndex
-    const standardFormeNum = this.formeNum
-
-    this.heldItemIndex = toLumiItemIndex(standardItemIndex) ?? 0
-    this.formeNum = this.pluginForm ?? this.formeNum
-
     const buffer = super.toBytes()
-
-    // Restore OpenHome indices after serialization
-    this.heldItemIndex = standardItemIndex
-    this.formeNum = standardFormeNum
+    const dataView = new DataView(buffer)
+    dataView.setUint16(0x24, this.lumiFormIndex, true)
+    dataView.setUint16(0xa, toLumiItemIndex(this.heldItemIndex), true)
 
     return buffer
   }
