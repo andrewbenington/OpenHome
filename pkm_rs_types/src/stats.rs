@@ -14,7 +14,7 @@ pub trait Stats: Sized {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy, Stats)]
+#[derive(Debug, Default, Serialize, Clone, Copy, Stats, PartialEq, Eq)]
 pub struct Stats8 {
     pub hp: u8,
     pub atk: u8,

@@ -11,13 +11,13 @@ pub enum LearnsetCondition {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LearnsetMove {
-    move_id: MoveSlot,
-    condition: LearnsetCondition,
+    pub(crate) move_id: MoveSlot,
+    pub(crate) condition: LearnsetCondition,
 }
 
 #[derive(Debug, Clone, Default)]
 pub struct Learnset {
-    moves: Vec<LearnsetMove>,
+    pub(crate) moves: Vec<LearnsetMove>,
 }
 
 impl Learnset {
@@ -62,6 +62,11 @@ impl Learnset {
 
         all_learnsets
     }
+}
+
+pub fn get_sv_learnsets() -> Vec<Learnset> {
+    let file_data = PklFileData::from_bytes(SV_LEVELUP_BYTES);
+    Learnset::all_from_pkl_bytes(&file_data)
 }
 
 fn u8_slice_to_u16_le(slice: &[u8]) -> Vec<u16> {
