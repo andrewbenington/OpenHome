@@ -1,11 +1,12 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { TagIcon } from '@openhome-ui/components/TagIcon'
 import { useSaves } from '@openhome-ui/state/saves'
 import { DISPLAY_COLOR_PRESETS, MonTag, TAG_PRESETS } from '@openhome-ui/util/tags'
-import { Badge, Button, Card, Flex, Text, TextField } from '@radix-ui/themes'
+import { Badge, Button, Card, Flex, Grid, Text, TextField } from '@radix-ui/themes'
 import { useState } from 'react'
 import useDebounce from 'src/ui/hooks/useDebounce'
+import { Typeahead } from '../../components/typeahead'
+import { colorIsDark } from '../../util/color'
 import './DisplayTab.css'
 
 interface DisplayTabProps {
@@ -15,13 +16,23 @@ interface DisplayTabProps {
   }
 }
 
+const PRESET_TAG_ICONS = [
+  'Circle',
+  'Star',
+  'Crosshairs',
+  'Heart',
+  'Thumbs Up',
+  'Arrows',
+  'Calendar',
+] as const
+
 export default function DisplayTab({ mon }: DisplayTabProps) {
   const [customColor, setCustomColor] = useState(mon.displayColor ?? '')
   const [tags, setTags] = useState<MonTag[]>(mon.tags ?? [])
 
   const [newTagLabel, setNewTagLabel] = useState('')
   const [newTagColor, setNewTagColor] = useState('#888888')
-  const [newTagIcon, setNewTagIcon] = useState('FaCircle')
+  const [newTagIcon, setNewTagIcon] = useState<string>()
 
   const { updateMonDisplayColor, updateMonTags } = useSaves()
 
@@ -64,38 +75,27 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
 
   return (
     <div className="display-tab-root">
-      <Flex direction="column" gap="3">
-        <AttributeRow label="Box Background">
-          <Flex direction="column" gap="2" className="display-tab-flex-fill">
-            <Flex gap="2" align="center">
-              <input
-                type="color"
-                value={customColor.slice(0, 7) || '#666666'}
-                onChange={(e) => {
-                  handleColorChange(e.target.value)
-                }}
-                className="display-tab-color-input"
-              />
+      <Flex direction="column" gap="2">
+        <Card style={{ padding: 6 }}>
+          <Flex gap="1" direction="column" align="start">
+            <Flex direction="row" gap="2" align="center">
+              <Text as="div" size="2" weight="bold" color="gray" style={{ height: '100%' }}>
+                Box Background
+              </Text>
               <Button
+                className="clear-button"
+                size="1"
+                highContrast
                 variant="surface"
                 color="gray"
-                highContrast
                 onClick={handleClearColor}
                 disabled={!customColor}
               >
                 Clear
               </Button>
             </Flex>
-          </Flex>
-        </AttributeRow>
-
-        <div>
-          <Text as="div" size="2" weight="bold" color="gray" mb="1">
-            Quick Colors
-          </Text>
-          <Card className="display-tab-quick-colors-card">
-            <Flex wrap="wrap" gap="2">
-              {DISPLAY_COLOR_PRESETS.map(({ name, color }) => (
+            <Grid className="color-preset-grid" gap="1" align="center">
+              {DISPLAY_COLOR_PRESETS.slice(0, 4).map(({ name, color }) => (
                 <button
                   key={name}
                   onClick={() => handlePresetClick(color)}
@@ -109,106 +109,144 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
                   {name}
                 </button>
               ))}
-            </Flex>
-          </Card>
-        </div>
-
-        <div>
-          <Text as="div" size="2" weight="bold" color="gray" mb="1">
-            Tags (Max 3)
-          </Text>
-
-          {tags.length > 0 && (
-            <Flex gap="2" wrap="wrap" className="display-tab-tags-selected">
-              {tags.map((tag) => (
-                <Badge
-                  key={tag.label}
-                  variant="solid"
-                  size="2"
-                  className="display-tab-tag-badge"
-                  style={{ backgroundColor: tag.color }}
-                  onClick={() => handleRemoveTag(tag.label)}
-                  title="Click to remove"
+              <div className="display-tab-color-input-wrapper">
+                Custom
+                <input
+                  type="color"
+                  value={customColor.slice(0, 7) || '#666666'}
+                  onChange={(e) => {
+                    handleColorChange(e.target.value)
+                  }}
+                  className="display-tab-color-input"
+                />
+              </div>
+              {DISPLAY_COLOR_PRESETS.slice(4).map(({ name, color }) => (
+                <button
+                  key={name}
+                  onClick={() => handlePresetClick(color)}
+                  className="display-tab-color-preset"
+                  style={{
+                    backgroundColor: color,
+                    borderColor: customColor === color ? 'white' : 'transparent',
+                  }}
+                  title={name}
                 >
-                  <TagIcon iconName={tag.icon} />
-                  {tag.label}
-                  <span className="display-tab-tag-remove">×</span>
-                </Badge>
+                  {name}
+                </button>
               ))}
-              <Button variant="surface" color="red" highContrast size="1" onClick={clearAllTags}>
+            </Grid>
+          </Flex>
+        </Card>
+        <Card style={{ padding: 8 }}>
+          <Flex gap="2" direction="column">
+            <Text as="div" size="2" weight="bold" color="gray">
+              Add Tags (Max 3)
+            </Text>
+            <Flex direction="column" gap="3">
+              <Flex gap="2" wrap="wrap">
+                {TAG_PRESETS.map((preset) => (
+                  <button
+                    key={preset.label}
+                    onClick={() => handleAddTag(preset)}
+                    disabled={tags.length >= 3}
+                    className="display-tab-tag-preset"
+                    style={{
+                      backgroundColor: preset.color,
+                      cursor:
+                        tags.length >= 3 || tags.some((t) => t.label === preset.label)
+                          ? 'not-allowed'
+                          : 'pointer',
+                      opacity:
+                        tags.length >= 3 || tags.some((t) => t.label === preset.label) ? 0.5 : 1,
+                    }}
+                    title={preset.label}
+                  >
+                    <TagIcon iconName={preset.icon} size={10} />
+                    {preset.label}
+                  </button>
+                ))}
+              </Flex>
+              <Flex gap="2" align="center">
+                <TextField.Root
+                  size="1"
+                  placeholder="Custom tag name"
+                  value={newTagLabel}
+                  onChange={(e) => setNewTagLabel(e.target.value)}
+                  style={{ width: 240 }}
+                >
+                  <TextField.Slot />
+                </TextField.Root>
+                <Typeahead
+                  uniqueFieldId="icon"
+                  placeholder="Icon"
+                  options={PRESET_TAG_ICONS}
+                  getOptionString={(option) => option}
+                  getOptionUniqueID={(option) => option}
+                  value={newTagIcon}
+                  onChange={(value) => setNewTagIcon(value)}
+                  getIconComponent={(icon) => <TagIcon iconName={icon} />}
+                  style={{ width: 150 }}
+                />
+                <input
+                  type="color"
+                  value={newTagColor}
+                  onChange={(e) => setNewTagColor(e.target.value)}
+                  className="display-tab-tag-color-input"
+                />
+                <Button
+                  variant="surface"
+                  highContrast
+                  color="gray"
+                  onClick={() => {
+                    handleAddTag({ label: newTagLabel, color: newTagColor, icon: newTagIcon })
+                    setNewTagLabel('')
+                  }}
+                  disabled={!newTagLabel || tags.length >= 3}
+                  size="1"
+                >
+                  Add
+                </Button>
+              </Flex>
+            </Flex>
+            <Flex direction="row" gap="2" align="center">
+              <Text as="div" size="2" weight="bold" color="gray">
+                Current Tags:
+              </Text>
+              <Button
+                className="clear-button"
+                variant="surface"
+                color="gray"
+                highContrast
+                size="1"
+                onClick={clearAllTags}
+              >
                 Clear all
               </Button>
             </Flex>
-          )}
-
-          <Flex direction="column" gap="2">
-            <Flex gap="2" wrap="wrap">
-              {TAG_PRESETS.map((preset) => (
-                <button
-                  key={preset.label}
-                  onClick={() => handleAddTag(preset)}
-                  disabled={tags.length >= 3}
-                  className="display-tab-tag-preset"
-                  style={{
-                    backgroundColor: preset.color,
-                    cursor:
-                      tags.length >= 3 || tags.some((t) => t.label === preset.label)
-                        ? 'not-allowed'
-                        : 'pointer',
-                    opacity:
-                      tags.length >= 3 || tags.some((t) => t.label === preset.label) ? 0.5 : 1,
-                  }}
-                  title={preset.label}
-                >
-                  <TagIcon iconName={preset.icon} size={10} />
-                  {preset.label}
-                </button>
-              ))}
-            </Flex>
-
-            <Flex gap="2" align="center">
-              <TextField.Root
-                placeholder="Custom tag name"
-                value={newTagLabel}
-                onChange={(e) => setNewTagLabel(e.target.value)}
-                style={{ flex: 1 }}
-              >
-                <TextField.Slot />
-              </TextField.Root>
-              <select
-                value={newTagIcon}
-                onChange={(e) => setNewTagIcon(e.target.value)}
-                className="rt-reset rt-SelectTrigger rt-r-size-1 rt-variant-surface"
-                style={{ minWidth: 100 }}
-              >
-                <option value="FaCircle">Circle</option>
-                <option value="FaStar">Star</option>
-                <option value="FaCrosshairs">Crosshairs</option>
-                <option value="FaHeart">Heart</option>
-                <option value="FaThumbsUp">Thumbs Up</option>
-                <option value="FaExchangeAlt">Trade</option>
-                <option value="FaCalendarAlt">Calendar</option>
-              </select>
-              <input
-                type="color"
-                value={newTagColor}
-                onChange={(e) => setNewTagColor(e.target.value)}
-                className="display-tab-tag-color-input"
-              />
-              <Button
-                variant="surface"
-                highContrast
-                onClick={() => {
-                  handleAddTag({ label: newTagLabel, color: newTagColor, icon: newTagIcon })
-                  setNewTagLabel('')
-                }}
-                disabled={!newTagLabel || tags.length >= 3}
-              >
-                Add
-              </Button>
-            </Flex>
+            {tags.length > 0 && (
+              <Flex gap="2" wrap="wrap">
+                {tags.map((tag) => (
+                  <Badge
+                    key={tag.label}
+                    variant="solid"
+                    size="2"
+                    className="display-tab-tag-badge"
+                    style={{
+                      backgroundColor: tag.color,
+                      color: colorIsDark(tag.color) ? 'white' : 'black',
+                    }}
+                    onClick={() => handleRemoveTag(tag.label)}
+                    title="Click to remove"
+                  >
+                    <TagIcon iconName={tag.icon} />
+                    {tag.label}
+                    <span className="display-tab-tag-remove">×</span>
+                  </Badge>
+                ))}
+              </Flex>
+            )}
           </Flex>
-        </div>
+        </Card>
       </Flex>
     </div>
   )

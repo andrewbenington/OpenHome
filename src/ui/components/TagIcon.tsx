@@ -1,3 +1,4 @@
+import { IconType } from 'react-icons'
 import {
   FaCalendarAlt,
   FaCircle,
@@ -8,21 +9,19 @@ import {
   FaThumbsUp,
 } from 'react-icons/fa'
 
+const TAG_ICONS: Record<string, IconType> = {
+  Circle: FaCircle,
+  Star: FaStar,
+  Crosshairs: FaCrosshairs,
+  Heart: FaHeart,
+  'Thumbs Up': FaThumbsUp,
+  Arrows: FaExchangeAlt,
+  Calendar: FaCalendarAlt,
+}
+
 export function TagIcon({ iconName, size = 12 }: { iconName?: string; size?: number }) {
-  switch (iconName) {
-    case 'FaCrosshairs':
-      return <FaCrosshairs size={size} />
-    case 'FaStar':
-      return <FaStar size={size} />
-    case 'FaExchangeAlt':
-      return <FaExchangeAlt size={size} />
-    case 'FaHeart':
-      return <FaHeart size={size} />
-    case 'FaThumbsUp':
-      return <FaThumbsUp size={size} />
-    case 'FaCalendarAlt':
-      return <FaCalendarAlt size={size} />
-    default:
-      return <FaCircle size={size} />
+  const IconComponent = TAG_ICONS[iconName as keyof typeof TAG_ICONS]
+  if (IconComponent) {
+    return <IconComponent style={{ width: size, height: size }} />
   }
 }

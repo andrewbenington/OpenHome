@@ -1,10 +1,10 @@
 export const TAG_PRESETS = [
-  { label: 'Competitive', color: '#ef4444', icon: 'FaCrosshairs' },
-  { label: 'Rare', color: '#eab308', icon: 'FaStar' },
-  { label: 'Trade', color: '#3b82f6', icon: 'FaExchangeAlt' },
-  { label: 'Breeding', color: '#a855f7', icon: 'FaHeart' },
-  { label: 'Favorite', color: '#ec4899', icon: 'FaThumbsUp' },
-  { label: 'Event', color: '#06b6d4', icon: 'FaCalendarAlt' },
+  { label: 'Competitive', color: '#ef4444', icon: 'Crosshairs' },
+  { label: 'Rare', color: '#eab308', icon: 'Star' },
+  { label: 'Trade', color: '#3b82f6', icon: 'Arrows' },
+  { label: 'Breeding', color: '#a855f7', icon: 'Heart' },
+  { label: 'Favorite', color: '#ec4899', icon: 'Thumbs Up' },
+  { label: 'Event', color: '#06b6d4', icon: 'Calendar' },
 ]
 
 export const DISPLAY_COLOR_PRESETS = [
