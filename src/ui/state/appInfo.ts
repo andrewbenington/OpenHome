@@ -48,7 +48,13 @@ export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
 const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV]
 
 export function initialMonDisplayState() {
-  return { filter: {}, topRightIndicator: null, showShiny: true, showItem: true }
+  return {
+    filter: {},
+    topRightIndicator: null,
+    showShiny: true,
+    showItem: true,
+    showNotesIndicator: true,
+  }
 }
 
 export const defaultSettings: Settings = {

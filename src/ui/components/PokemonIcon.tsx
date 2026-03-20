@@ -11,6 +11,7 @@ import {
   MetadataLookup,
 } from '@pkm-rs/pkg'
 import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
+import { useMonDisplay } from '../hooks/useMonDisplay'
 import useBoxIconImage from '../pokemon-details/useBoxIconImage'
 import { classNames, grayscaleIf } from '../util/style'
 import { MonTag } from '../util/tags'
@@ -60,6 +61,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
     onClick,
     extraFormIndex,
   } = props
+  const { showNotesIndicator } = useMonDisplay()
 
   const formeMetadata = MetadataLookup(dexNumber, formeNumber ?? 0)
 
@@ -107,7 +109,9 @@ export default function PokemonIcon(props: PokemonIconProps) {
         </div>
       )}
       {topRightIndicator && <div className="extra-indicator">{topRightIndicator}</div>}
-      {hasNotes && <div title="Has notes" className="pokemon-icon-notes-dot" />}
+      {hasNotes && showNotesIndicator && (
+        <div title="Has notes" className="pokemon-icon-notes-dot" />
+      )}
       {heldItemIndex ? (
         <img
           alt="item icon"

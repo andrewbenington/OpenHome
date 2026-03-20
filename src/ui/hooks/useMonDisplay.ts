@@ -7,6 +7,7 @@ export type MonDisplayState = {
   topRightIndicator: TopRightIndicatorType | null
   showShiny: boolean
   showItem: boolean
+  showNotesIndicator: boolean
 }
 
 export const MonDisplayContext = createContext<[MonDisplayState, (state: MonDisplayState) => void]>(
@@ -42,6 +43,10 @@ export function useMonDisplay() {
     updateState({ ...monDisplayState, showItem })
   }
 
+  function setShowNotesIndicator(showNotesIndicator: boolean) {
+    updateState({ ...monDisplayState, showNotesIndicator })
+  }
+
   return {
     ...monDisplayState,
     setFilter,
@@ -49,6 +54,7 @@ export function useMonDisplay() {
     setTopRightIndicatorType,
     setShowShiny,
     setShowItem,
+    setShowNotesIndicator,
   }
 }
 

@@ -46,6 +46,14 @@ export default function DisplayPanel() {
           />
           Show Items
         </Flex>
+        <Flex align="center" gap="2">
+          <Switch
+            size="1"
+            checked={displayState.showNotesIndicator}
+            onCheckedChange={displayState.setShowNotesIndicator}
+          />
+          Show Notes Indicator
+        </Flex>
       </Flex>
     </div>
   )
