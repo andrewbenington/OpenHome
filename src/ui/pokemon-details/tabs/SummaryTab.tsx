@@ -9,12 +9,17 @@ import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { colorForType, colorIsDark } from '@openhome-ui/util/color'
-import { genderFromBool, getPluginColor, MetadataLookup } from '@pkm-rs/pkg'
+import {
+  extraFormDisplayName,
+  genderFromBool,
+  getPluginColor,
+  MetadataLookup,
+  OriginGames,
+} from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm/PKM'
 import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import { getRomHackFormName } from 'src/core/save/rom-hack/forms'
 import { MonTag } from 'src/ui/util/tags'
 import useMonSprite from '../useMonSprite'
 
@@ -34,7 +39,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
     isShiny: mon.isShiny(),
     isFemale: mon.gender === 1,
     format: mon.format,
-    pluginForm: mon.pluginForm,
+    extraFormIndex: mon.extraFormIndex,
   })
 
   const itemAltText = useMemo(() => {
@@ -157,15 +162,23 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow label="Species">
           <Flex gap="1">
-            {mon.pluginOrigin && mon.pluginForm !== undefined ? (
+            {mon.extraFormIndex ? (
               <span
-                className="rom-hack-form-name"
+                className="extra-form-name"
                 style={{
-                  color: colorIsDark(getPluginColor(mon.pluginOrigin)) ? '#fff' : '#000',
-                  backgroundColor: getPluginColor(mon.pluginOrigin),
+                  color: colorIsDark(
+                    mon.pluginOrigin
+                      ? getPluginColor(mon.pluginOrigin)
+                      : OriginGames.color(mon.gameOfOrigin)
+                  )
+                    ? '#fff'
+                    : '#000',
+                  backgroundColor: mon.pluginOrigin
+                    ? getPluginColor(mon.pluginOrigin)
+                    : OriginGames.color(mon.gameOfOrigin),
                 }}
               >
-                {getRomHackFormName(mon.pluginOrigin, mon.dexNum, mon.pluginForm)}
+                {extraFormDisplayName(mon.extraFormIndex)}
               </span>
             ) : (
               MetadataLookup(mon.dexNum, mon.formeNum)?.formeName

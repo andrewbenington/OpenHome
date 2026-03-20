@@ -2,7 +2,6 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { range } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
-import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
 import BankHeader from '@openhome-ui/saves/BankHeader'
@@ -120,8 +119,6 @@ const Home = () => {
         <ReleaseArea />
       </Flex>
       <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
-      {/* force icons sprite sheet to stay loaded */}
-      <PokemonIcon dexNumber={0} />
       <SavesModal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)} />
     </Flex>
   )

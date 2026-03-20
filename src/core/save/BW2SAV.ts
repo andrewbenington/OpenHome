@@ -1,6 +1,6 @@
 import { G5SAV } from '@openhome-core/save/G5SAV'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
 import { Item } from '@pokemon-resources/consts/Items'
 import { BW2_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { hasDesamumeFooter } from './util'
@@ -9,7 +9,8 @@ export class BW2SAV extends G5SAV {
   static transferRestrictions = BW2_TRANSFER_RESTRICTIONS
   static saveTypeID = 'BW2SAV'
 
-  supportsMon(dexNumber: number, formeNumber: number) {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     return !isRestricted(BW2_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 

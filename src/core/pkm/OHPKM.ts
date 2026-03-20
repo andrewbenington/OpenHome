@@ -1,8 +1,9 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { intersection, unique } from '@openhome-core/util/functional'
+import { intersection, Option, unique } from '@openhome-core/util/functional'
 import {
   AbilityIndex,
   Ball,
+  ExtraFormIndex,
   Gender,
   GenderRatio,
   HyperTraining,
@@ -22,13 +23,13 @@ import {
 import {
   AllPKMFields,
   FourMoves,
-  MarkingShape,
-  Stats,
   generatePersonalityValuePreservingAttributes,
   getHeightCalculated,
   getStandardPKMStats,
   getWeightCalculated,
+  MarkingShape,
   markingsHaveColor,
+  Stats,
 } from '@pokemon-files/util'
 import * as jsTypes from '@pokemon-files/util/types'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
@@ -105,6 +106,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       }
 
       this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
+      this.extraFormIndex = other.extraFormIndex
 
       if (other.personalityValue === undefined) {
         this.encryptionConstant = 0
@@ -126,10 +128,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
       this.gameOfOriginBattle = other.gameOfOriginBattle
-      if (other.pluginOrigin) {
-        this.setPluginData(other.pluginOrigin as PluginIdentifier, other.pluginForm)
-      }
-
+      this.pluginOrigin = other.pluginOrigin
       this.isEgg = other.isEgg ?? false
       this.pokerusByte = other.pokerusByte ?? 0
       this.trainerFriendship = other.trainerFriendship ?? 40
@@ -330,6 +329,9 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.tmFlagsSV = other.tmFlagsSV
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
     }
+    if (this.openhomeId === '0004-d889ca57-401aab08-30') {
+      this.extraFormIndex = ExtraFormIndex.CharizardClone
+    }
   }
 
   // static constructors
@@ -516,20 +518,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   get pluginOrigin() {
-    return this.pluginOriginWasm as PluginIdentifier | undefined
+    return this.pluginOriginWasm as Option<PluginIdentifier>
   }
 
-  get pluginForm(): number | undefined {
-    return this.pluginFormWasm as number | undefined
+  set pluginOrigin(origin: Option<PluginIdentifier>) {
+    this.pluginOriginWasm = origin
   }
 
-  setPluginData(origin: PluginIdentifier, form?: number) {
-    this.setPluginDataWasm(origin, form ?? null)
-  }
-
-  clearPluginData() {
-    this.clearPluginDataWasm()
-  }
   // derived fields
 
   public get heightAbsolute(): number {
@@ -706,17 +701,14 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.movePP = adjustMovePPBetweenFormats(this, other)
     this.movePPUps = other.movePPUps as FourMoves
 
-    // preserve plugin metadata if present
-    if (other.pluginOrigin) {
-      this.setPluginData(other.pluginOrigin as PluginIdentifier, other.pluginForm)
-    }
-
     if (this.dexNum !== other.dexNum && isEvolution(this, other)) {
       this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
+      this.extraFormIndex = other.extraFormIndex
     }
 
     if (this.dexNum === other.dexNum || isEvolution(this, other)) {
       this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
+      this.extraFormIndex = other.extraFormIndex
     }
 
     this.heldItemIndex = other.heldItemIndex

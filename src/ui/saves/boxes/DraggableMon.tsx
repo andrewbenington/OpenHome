@@ -103,8 +103,7 @@ const DraggableMon = (props: DraggableMonProps) => {
         style={style}
         grayedOut={disabled}
         topRightIndicator={topRightIndicatorComponent}
-        pluginForm={mon.pluginForm}
-        pluginOrigin={mon.pluginOrigin}
+        extraFormIndex={mon.extraFormIndex}
         tags={monWithManagement.tags}
         hasNotes={
           typeof monWithManagement.notes === 'string' && monWithManagement.notes.trim().length > 0

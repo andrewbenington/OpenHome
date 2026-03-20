@@ -1,10 +1,10 @@
-import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
+import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
 import { ItemUnbound } from '@pkm-rs/pkg'
-import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
+import PK3CFRU from '../cfru/PK3CFRU'
 
 import { fromGen3CFRUMoveIndex, toGen3CFRUMoveIndex } from '../cfru/conversion/Gen3CFRUMovesIndex'
 import { CFRUToNationalMap } from '../cfru/conversion/Gen3CFRUMovesIndex/CFRUToNationalMap'
-import { fromGen3CRFUPokemonIndex, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
+import { CfruSpeciesAndForm, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
 import { PluginIdentifier } from '../interfaces'
 import { NationalDexToUnboundMap, UnboundToNationalDexMap } from './conversion/UnboundSpeciesMap'
 
@@ -50,8 +50,12 @@ export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
     return VALID_MOVE_INDICES_UB
   }
 
-  monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry {
-    return fromGen3CRFUPokemonIndex(gameIndex, UnboundToNationalDexMap, 'Pokémon Unbound')
+  monFromGameIndex(gameIndex: number): CfruSpeciesAndForm {
+    const data = UnboundToNationalDexMap[String(gameIndex)]
+    if (!data) {
+      throw new Error(`Unbound index ${gameIndex} not found.`)
+    }
+    return data
   }
 
   monToGameIndex(nationalDexNumber: number, formIndex: number): number {
@@ -64,5 +68,9 @@ export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
 
   getPluginIdentifier(): PluginIdentifier {
     return 'unbound'
+  }
+
+  getFormat(): RomHackFormat {
+    return 'PK3UB'
   }
 }

@@ -1,5 +1,5 @@
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
-import { ItemRadicalRed } from '@pkm-rs/pkg'
+import { ExtraFormIndex, ItemRadicalRed, radicalRedSupportsExtraForm } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { FRLG_SECURITY_COPY_OFFSET, FRLG_SECURITY_OFFSET } from '../G3SAV'
@@ -24,7 +24,8 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
     return new PK3RR(ohpkm)
   }
 
-  supportsMon(dexNumber: number, formeNumber: number) {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return radicalRedSupportsExtraForm(extraFormIndex)
     return !isRestricted(RR_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 

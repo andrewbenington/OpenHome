@@ -16,6 +16,8 @@ use strum_macros::Display;
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wasm")]
+use crate::pkm::ohpkm::extra_form::ExtraFormIndex;
+#[cfg(feature = "wasm")]
 use crate::pkm::{ohpkm::JsResult, traits::IsShiny};
 
 #[cfg(feature = "wasm")]
@@ -704,6 +706,16 @@ impl OhpkmV2 {
         self.main_data.affixed_ribbon = v;
     }
 
+    #[wasm_bindgen(getter = extraFormIndex)]
+    pub fn extra_form_index(&self) -> Option<ExtraFormIndex> {
+        self.main_data.extra_form
+    }
+
+    #[wasm_bindgen(setter = extraFormIndex)]
+    pub fn set_extra_form_index(&mut self, v: Option<ExtraFormIndex>) {
+        self.main_data.extra_form = v;
+    }
+
     #[wasm_bindgen(getter = trainerFriendship)]
     pub fn trainer_friendship(&self) -> u8 {
         self.main_data.trainer_friendship
@@ -953,23 +965,14 @@ impl OhpkmV2 {
     pub fn plugin_origin(&self) -> Option<String> {
         Some(self.plugin_data.clone()?.plugin_origin)
     }
-
-    #[wasm_bindgen(getter = pluginFormWasm)]
-    pub fn plugin_form(&self) -> Option<u16> {
-        self.plugin_data.as_ref().and_then(|x| x.plugin_form)
-    }
-
-    #[wasm_bindgen(js_name = setPluginDataWasm)]
-    pub fn set_plugin_data(&mut self, origin: String, form: Option<u16>) {
-        self.plugin_data = Some(PluginData {
-            plugin_origin: origin,
-            plugin_form: form,
-        });
-    }
-
-    #[wasm_bindgen(js_name = clearPluginDataWasm)]
-    pub fn clear_plugin_data(&mut self) {
-        self.plugin_data = None;
+    #[wasm_bindgen(setter = pluginOriginWasm)]
+    pub fn set_plugin_origin(&mut self, value: Option<String>) {
+        match value {
+            Some(plugin_origin) => {
+                self.plugin_data.get_or_insert_default().plugin_origin = plugin_origin
+            }
+            None => self.plugin_data = None,
+        }
     }
 
     // Game Boy

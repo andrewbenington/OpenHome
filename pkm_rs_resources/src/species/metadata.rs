@@ -7285,7 +7285,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "eevee",
+                sprite: "eevee-starter",
                 sprite_index: (6, 5),
             },
         ],

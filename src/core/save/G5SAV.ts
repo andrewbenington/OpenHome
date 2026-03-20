@@ -6,7 +6,7 @@ import {
 } from '@openhome-core/save/util/byteLogic'
 import { gen5StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { unique } from '@openhome-core/util/functional'
-import { Gender, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK5 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
@@ -172,7 +172,11 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     return new PK5(ohpkm)
   }
 
-  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract supportsMon(
+    dexNumber: number,
+    formeNumber: number,
+    extraFormIndex?: ExtraFormIndex
+  ): boolean
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
