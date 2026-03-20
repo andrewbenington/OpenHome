@@ -1,6 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { isMegaStone, isZCrystal } from '@openhome-core/pkm/util'
-import { Gender, MetadataLookup, OriginGame } from '@pkm-rs/pkg'
+import { getTypes, isMegaStone, isZCrystal } from '@openhome-core/pkm/util'
+import { Gender, OriginGame } from '@pkm-rs/pkg'
 import { Type } from '@pokemon-resources/index'
 
 export interface Filter {
@@ -17,11 +17,20 @@ export interface Filter {
   ball?: number
   isEgg?: boolean
   shinyLeaves?: number
+  tag?: string
+  displayColor?: string
+  hasNotes?: boolean
 }
 
 export type HeldItemFilter = number | HeldItemCategory
 
-export function filterApplies(filter: Filter, mon: PKMInterface) {
+type monData = PKMInterface & {
+  tags?: { label: string }[]
+  displayColor?: string
+  notes?: string
+}
+
+export function filterApplies(filter: Filter, mon: monData) {
   if (filter.dexNumber && mon.dexNum !== filter.dexNumber) {
     return false
   }
@@ -73,26 +82,45 @@ export function filterApplies(filter: Filter, mon: PKMInterface) {
     }
   }
 
-  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
-  if (!formeMetadata) {
+  const types = getTypes(mon)
+  if (!types) {
     return false
   }
 
-  if (
-    filter.type1 !== undefined &&
-    formeMetadata.type1 !== filter.type1 &&
-    formeMetadata.type2 !== filter.type1
-  ) {
+  if (filter.type1 !== undefined && !types.includes(filter.type1)) {
     return false
   }
 
-  if (
-    filter.type2 !== undefined &&
-    formeMetadata.type1 !== filter.type2 &&
-    formeMetadata.type2 !== filter.type2
-  ) {
+  if (filter.type2 !== undefined && !types.includes(filter.type2)) {
     return false
   }
+
+  if (filter.tag !== undefined) {
+    const tags = mon.tags ?? []
+    if (filter.tag === 'Any Tag') {
+      if (tags.length === 0) return false
+    } else if (filter.tag === 'No Tag') {
+      if (tags.length > 0) return false
+    } else {
+      if (!tags.some((t) => t.label === filter.tag)) return false
+    }
+  }
+
+  if (filter.displayColor !== undefined) {
+    if (filter.displayColor === 'Any Color') {
+      if (!mon.displayColor) return false
+    } else if (filter.displayColor === 'No Color') {
+      if (mon.displayColor) return false
+    } else {
+      if (mon.displayColor !== filter.displayColor) return false
+    }
+  }
+
+  if (filter.hasNotes !== undefined) {
+    const monHasNotes = mon.notes && mon.notes.trim().length > 0
+    if (filter.hasNotes !== monHasNotes) return false
+  }
+
   return true
 }
 

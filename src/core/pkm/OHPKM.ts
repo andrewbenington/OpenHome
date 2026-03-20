@@ -1,8 +1,9 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { intersection, unique } from '@openhome-core/util/functional'
+import { intersection, Option, unique } from '@openhome-core/util/functional'
 import {
   AbilityIndex,
   Ball,
+  ExtraFormIndex,
   Gender,
   GenderRatio,
   HyperTraining,
@@ -22,13 +23,13 @@ import {
 import {
   AllPKMFields,
   FourMoves,
-  MarkingShape,
-  Stats,
   generatePersonalityValuePreservingAttributes,
   getHeightCalculated,
   getStandardPKMStats,
   getWeightCalculated,
+  MarkingShape,
   markingsHaveColor,
+  Stats,
 } from '@pokemon-files/util'
 import * as jsTypes from '@pokemon-files/util/types'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
@@ -105,6 +106,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       }
 
       this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
+      this.extraFormIndex = other.extraFormIndex
 
       if (other.personalityValue === undefined) {
         this.encryptionConstant = 0
@@ -126,8 +128,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
       this.gameOfOriginBattle = other.gameOfOriginBattle
-      this.pluginOrigin = other.pluginOrigin as PluginIdentifier | undefined
-
+      this.pluginOrigin = other.pluginOrigin
       this.isEgg = other.isEgg ?? false
       this.pokerusByte = other.pokerusByte ?? 0
       this.trainerFriendship = other.trainerFriendship ?? 40
@@ -328,6 +329,9 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.tmFlagsSV = other.tmFlagsSV
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
     }
+    if (this.openhomeId === '0004-d889ca57-401aab08-30') {
+      this.extraFormIndex = ExtraFormIndex.CharizardClone
+    }
   }
 
   // static constructors
@@ -514,11 +518,11 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   get pluginOrigin() {
-    return this.pluginOriginWasm as PluginIdentifier | undefined
+    return this.pluginOriginWasm as Option<PluginIdentifier>
   }
 
-  set pluginOrigin(value: PluginIdentifier | undefined) {
-    this.pluginOriginWasm = value
+  set pluginOrigin(origin: Option<PluginIdentifier>) {
+    this.pluginOriginWasm = origin
   }
 
   // derived fields
@@ -662,10 +666,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (!this.abilityNumMatchesIndex()) {
       const fixedAbilityNum = this.abilityNumByIndex()
       if (fixedAbilityNum) {
-        // This ability is a valid one for the species! Set the appropriate ability number
+        // ability is valid for this species, just fix the ability num
         this.abilityNum = fixedAbilityNum
       } else {
-        // Hm, this ability is invalid for the species. Let's reset it using the ability number
+        // ability doesn't match species at all, fall back to ability num
         this.ability =
           getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum) ?? this.ability
       }
@@ -699,10 +703,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
     if (this.dexNum !== other.dexNum && isEvolution(this, other)) {
       this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
+      this.extraFormIndex = other.extraFormIndex
     }
 
     if (this.dexNum === other.dexNum || isEvolution(this, other)) {
       this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
+      this.extraFormIndex = other.extraFormIndex
     }
 
     this.heldItemIndex = other.heldItemIndex

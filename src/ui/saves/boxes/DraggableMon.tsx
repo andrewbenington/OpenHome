@@ -8,6 +8,7 @@ import { TopRightIndicator } from 'src/ui/components/pokemon/indicator/TopRightI
 import PokemonIcon from '../../components/PokemonIcon'
 import { TopRightIndicatorType } from '../../hooks/useMonDisplay'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
+import { MonTag } from '../../util/tags'
 
 const getBackgroundDetails = (disabled?: boolean) => {
   if (disabled) {
@@ -25,12 +26,17 @@ export interface DraggableMonProps {
   onClick: () => void
   disabled?: boolean
   mon: PKMInterface
-  style: any
+  style: CSSProperties
   dragID?: string
   dragData?: MonWithLocation
   topRightIndicator?: TopRightIndicatorType | null
   showShiny?: boolean
   showItem?: boolean
+}
+
+type MonWithManagementData = PKMInterface & {
+  tags?: MonTag[]
+  notes?: string
 }
 
 const DraggableMon = (props: DraggableMonProps) => {
@@ -41,6 +47,7 @@ const DraggableMon = (props: DraggableMonProps) => {
     disabled: disabled || !dragID,
   })
   const { dragState } = useDragAndDrop()
+  const monWithManagement = mon as MonWithManagementData
 
   const formeNumber = useMemo(() => {
     let formeNumber = mon.formeNum
@@ -96,6 +103,11 @@ const DraggableMon = (props: DraggableMonProps) => {
         style={style}
         grayedOut={disabled}
         topRightIndicator={topRightIndicatorComponent}
+        extraFormIndex={mon.extraFormIndex}
+        tags={monWithManagement.tags}
+        hasNotes={
+          typeof monWithManagement.notes === 'string' && monWithManagement.notes.trim().length > 0
+        }
       />
     </div>
   )

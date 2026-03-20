@@ -86,6 +86,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
     return message
   }, [mon])
 
+  // rom hack origin mons will all have an "official origin game" that corresponds to the rom hack's base game. The origin mark will use that base game.
   const markImage = mon.gameOfOrigin ? OriginGames.markPath(mon.gameOfOrigin) : undefined
 
   return (

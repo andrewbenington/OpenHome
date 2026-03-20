@@ -10,6 +10,7 @@ import { SVSAV } from '@openhome-core/save/Gen89/SVSAV'
 import { SwShSAV } from '@openhome-core/save/Gen89/SwShSAV'
 import { HGSSSAV } from '@openhome-core/save/HGSSSAV'
 import { LGPESAV } from '@openhome-core/save/LGPESAV'
+import { G8LumiSAV } from '@openhome-core/save/luminescentplatinum/G8LUMISAV'
 import { ORASSAV } from '@openhome-core/save/ORASSAV'
 import { PtSAV } from '@openhome-core/save/PtSAV'
 import { G3RRSAV } from '@openhome-core/save/radicalred/G3RRSAV'
@@ -24,7 +25,7 @@ import { ZASAV } from '../../core/save/Gen89/ZASAV'
 import { OfficialSAV } from '../../core/save/interfaces'
 import { MonDisplayState } from '../hooks/useMonDisplay'
 
-const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
+export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
   G2SAV,
   G3SAV,
@@ -44,10 +45,18 @@ const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   SVSAV,
   ZASAV,
 ]
-const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV]
+const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV]
 
 export function initialMonDisplayState() {
-  return { filter: {}, topRightIndicator: null, showShiny: true, showItem: true }
+  return {
+    filter: {},
+    topRightIndicator: null,
+    showShiny: true,
+    showItem: true,
+    showNotesIndicator: true,
+    showTags: true,
+    showBackgroundColor: true,
+  }
 }
 
 export const defaultSettings: Settings = {
@@ -158,7 +167,7 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
         }
       })
 
-      state.officialSaveTypes.forEach((st) => {
+      state.extraSaveTypes.forEach((st) => {
         if (!(st.saveTypeID in enabled)) {
           enabled[st.saveTypeID] = true
         }

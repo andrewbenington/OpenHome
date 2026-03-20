@@ -237,7 +237,7 @@ export default function SLJAutocomplete<Option>(props: SLJAutocompleteProps<Opti
 
   return (
     <div ref={outerElement}>
-      <Box style={{ position: 'relative', marginTop: 4 }}>
+      <Box style={{ position: 'relative' }}>
         <TextField.Root
           ref={inputElement}
           className="autocomplete"
