@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react'
 import BaseStatsChart from './BaseStatsChart'
 import EvolutionFamily from './EvolutionFamily'
 import PokedexSidebar from './PokedexSidebar'
+import RegionalDexTracker from './RegionalDexTracker'
 import './style.css'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
 import { getFormeStatus, getPokedexSummary } from './util'
@@ -21,6 +22,7 @@ export default function PokedexDisplay() {
   const [filter, setFilter] = useState('')
   const [selectedSpecies, setSelectedSpecies] = useState<SpeciesMetadata>()
   const [selectedForme, setSelectedForme] = useState<FormeMetadata>()
+  const [showMissing, setShowMissing] = useState(false)
 
   if (!pokedexState.loaded) {
     return <Spinner />
@@ -44,6 +46,26 @@ export default function PokedexDisplay() {
         <Text>
           <b>Seen:</b> {seenCount}
         </Text>
+        <button
+          style={{
+            width: 30,
+            height: 30,
+            padding: 0,
+            backgroundColor: showMissing ? 'var(--accent-9)' : 'var(--gray-9)',
+            borderRadius: 4,
+            boxShadow: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 16,
+            border: 'none',
+          }}
+          onClick={() => setShowMissing(!showMissing)}
+          title="Show missing Pokémon"
+        >
+          ❌
+        </button>
         <TextField.Root
           size="1"
           placeholder="Filter..."
@@ -52,7 +74,10 @@ export default function PokedexDisplay() {
         />
       </div>
       <Flex style={{ height: 'calc(100% - 34px)' }}>
-        <Flex className="pokedex-body" direction="column" width="calc(100% - 300px)">
+        <div style={{ width: '300px', height: '100%' }}>
+          <RegionalDexTracker />
+        </div>
+        <Flex className="pokedex-body" direction="column" width="calc(100% - 600px)">
           {selectedSpecies && selectedForme && (
             <PokedexDetails
               pokedex={pokedex}
@@ -65,6 +90,7 @@ export default function PokedexDisplay() {
         </Flex>
         <PokedexSidebar
           filter={filter}
+          showMissing={showMissing}
           selectedSpecies={selectedSpecies}
           setSelectedSpecies={setSelectedSpecies}
           setSelectedForme={setSelectedForme}
