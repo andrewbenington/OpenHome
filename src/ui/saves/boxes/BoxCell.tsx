@@ -70,6 +70,7 @@ function BoxCell({
   } = useSaves()
   const [renameOpen, setRenameOpen] = useState(false)
   const [renameValue, setRenameValue] = useState('')
+  const { showBackgroundColor } = useMonDisplay()
 
   const isFilteredOut = useMemo(() => {
     return (
@@ -204,9 +205,9 @@ function BoxCell({
   const cellBackgroundColor = useMemo(() => {
     if (disabled || isFilteredOut) return '#555'
     if (isSelected) return '#4ade8080'
-    if (mon?.displayColor) return mon.displayColor
+    if (mon?.displayColor && showBackgroundColor) return mon.displayColor
     return '#6662'
-  }, [disabled, isFilteredOut, isSelected, mon?.displayColor])
+  }, [disabled, isFilteredOut, isSelected, mon?.displayColor, showBackgroundColor])
 
   const handleClick = useCallback(() => {
     if (multiSelectEnabled && mon && onToggleSelect) {

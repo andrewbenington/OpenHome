@@ -61,7 +61,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
     onClick,
     extraFormIndex,
   } = props
-  const { showNotesIndicator } = useMonDisplay()
+  const { showNotesIndicator, showTags } = useMonDisplay()
 
   const formeMetadata = MetadataLookup(dexNumber, formeNumber ?? 0)
 
@@ -99,7 +99,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
           src={getPublicImageURL('icons/Shiny.png')}
         />
       )}
-      {tags && tags.length > 0 && (
+      {showTags && tags && tags.length > 0 && (
         <div className="pokemon-icon-tags">
           {tags.map((tag, i) => (
             <div key={i} className="pokemon-icon-tag" style={{ backgroundColor: tag.color }}>

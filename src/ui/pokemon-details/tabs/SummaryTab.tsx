@@ -21,6 +21,7 @@ import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { MonTag } from 'src/ui/util/tags'
+import { TagIcon } from '../../components/TagIcon'
 import useMonSprite from '../useMonSprite'
 
 type MonWithManagementData = PKMInterface & {
@@ -51,8 +52,8 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
 
   return (
     <Grid columns="2" width="100%" p="3" gap="2">
-      <div>
-        <div className="summary-column">
+      <Flex direction="column" gap="2">
+        <div className="mon-image-container">
           {spriteResult.loading ? (
             <Spinner style={{ margin: 'auto', height: 32 }} />
           ) : spriteResult.path ? (
@@ -101,21 +102,6 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           <Badge variant="solid" color="gray" ml="2" size="1">
             {mon.languageString}
           </Badge>
-          {tags.length > 0 &&
-            tags.map((tag, i) => (
-              <Badge
-                key={i}
-                variant="solid"
-                ml="2"
-                size="1"
-                style={{
-                  backgroundColor: tag.color ?? '#888',
-                  color: '#fff',
-                }}
-              >
-                {tag.label}
-              </Badge>
-            ))}
         </div>
         <AttributeRow label="Item" justifyEnd>
           {mon.heldItemName !== 'None' && (
@@ -127,6 +113,23 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           )}
           <div>{mon.heldItemName}</div>
         </AttributeRow>
+        <Flex direction="row" gap="1" align="center" wrap="wrap">
+          {tags.length > 0 &&
+            tags.map((tag, i) => (
+              <Badge
+                key={i}
+                variant="solid"
+                size="1"
+                style={{
+                  backgroundColor: tag.color ?? '#888',
+                  color: colorIsDark(tag.color ?? '#888') ? '#fff' : '#000',
+                }}
+              >
+                <TagIcon iconName={tag.icon} size={10} />
+                {tag.label}
+              </Badge>
+            ))}
+        </Flex>
         <div>
           {mon.isShiny() && (
             <AttributeTag
@@ -157,7 +160,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />
           )}
         </div>
-      </div>
+      </Flex>
       <Flex direction="column" gap="2px">
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow label="Species">

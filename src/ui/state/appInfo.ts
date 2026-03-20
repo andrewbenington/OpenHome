@@ -54,6 +54,8 @@ export function initialMonDisplayState() {
     showShiny: true,
     showItem: true,
     showNotesIndicator: true,
+    showTags: true,
+    showBackgroundColor: true,
   }
 }
 
