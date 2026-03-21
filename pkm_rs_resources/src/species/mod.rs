@@ -1,4 +1,5 @@
 mod metadata;
+mod personal;
 mod types;
 
 pub use metadata::*;
