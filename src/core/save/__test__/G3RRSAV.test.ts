@@ -126,7 +126,7 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
       const newMon = new OHPKM(firstMon)
 
       newMon.nickname = 'ModTest'
-      radicalRedSave.boxes[0].boxSlots[0] = new PK3RR(newMon)
+      radicalRedSave.boxes[0].boxSlots[0] = PK3RR.fromOhpkm(newMon)
       // radicalRedSave.boxes[0].pokemon[0].heldItemIndex = 123;
       // radicalRedSave.boxes[0].pokemon[0].moves[0] = 101;
 

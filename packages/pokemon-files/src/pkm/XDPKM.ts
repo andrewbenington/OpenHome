@@ -9,8 +9,11 @@ import {
 } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/index'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { PkmConverter } from '../conversion/converter'
+import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import {
   filterRibbons,
   gen3ContestRibbonsFromBytes,
@@ -20,10 +23,11 @@ import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
+import { DefaultConstructorOptions, PkmConstructorOptions } from './PKM'
 
 export default class XDPKM {
   static getName() {
-    return 'XDPKM'
+    return 'XDPKM' as const
   }
   format: 'XDPKM' = 'XDPKM'
   static getBoxSize() {
@@ -58,7 +62,10 @@ export default class XDPKM {
   contest: types.ContestStats
   shadowID: number
   ribbons: string[]
-  constructor(arg: ArrayBuffer | AllPKMFields) {
+  constructor(
+    arg: ArrayBuffer | OHPKM,
+    options: PkmConstructorOptions = DefaultConstructorOptions
+  ) {
     if (arg instanceof ArrayBuffer) {
       const buffer = arg
       const dataView = new DataView(buffer)
@@ -109,20 +116,21 @@ export default class XDPKM {
         byteLogic.getFlagIndexes(dataView, 0x7c, 15, 12).map((index) => Gen3StandardRibbons[index])
       )
     } else {
+      const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
+
       this.dexNum = other.dexNum
       this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
       this.currentHP = other.currentHP ?? 0
       this.trainerFriendship = other.trainerFriendship ?? 0
       this.metLocationIndex = other.metLocationIndex ?? 0
-      this.metLevel = other.metLevel ?? 0
+      this.metLevel = other.metLevel
       if (other.ball && XDPKM.maxValidBall() >= other.ball) {
         this.ball = other.ball
       } else {
         this.ball = Ball.Poke
       }
       this.trainerGender = other.trainerGender
-      this.statLevel = other.statLevel ?? 0
       this.pokerusByte = other.pokerusByte ?? 0
       this.markings = types.markingsFourShapesFromOther(other.markings) ?? {
         circle: false,
@@ -139,45 +147,29 @@ export default class XDPKM {
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
       this.trainerName = other.trainerName
-      this.nickname = other.nickname
+      this.nickname = converter.nickname(other)
 
       const moveFilter = MoveFilter.fromPkmClass(XDPKM)
       this.moves = moveFilter.moves(other)
       this.movePP = moveFilter.movePp(other, this.format)
       this.movePPUps = moveFilter.movePpUps(other)
 
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.contest = other.contest ?? {
-        cool: 0,
-        beauty: 0,
-        cute: 0,
-        smart: 0,
-        tough: 0,
-        sheen: 0,
-      }
-      this.shadowID = other.shadowID ?? 0
+      this.evs = other.evs
+      this.ivs = other.ivs
+      this.contest = other.contest
+      this.shadowID = 0
       this.ribbons =
         filterRibbons(other.ribbons ?? [], [Gen3ContestRibbons, Gen3StandardRibbons]) ?? []
+      this.statLevel = this.speciesMetadata?.calculateLevel(this.exp) ?? 1
     }
   }
 
   static fromBytes(buffer: ArrayBuffer): XDPKM {
     return new XDPKM(buffer)
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): XDPKM {
+    return new XDPKM(ohpkm, { strategy })
   }
 
   toBytes(): ArrayBuffer {

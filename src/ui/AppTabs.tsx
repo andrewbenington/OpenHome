@@ -36,7 +36,7 @@ export default function AppTabs() {
           <Route path="/sort" element={<SortPokemon />} />
           <Route path="/pokedex" element={<PokedexDisplay />} />
           <Route path="/plugins/*" element={<PluginsPage />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/settings/*" element={<Settings />} />
           {isDev && (
             <>
               <Route path="/state" element={<AppStateDisplay />} />

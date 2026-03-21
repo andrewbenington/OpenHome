@@ -265,7 +265,7 @@ impl OhpkmV2 {
             .add_if_some(self.swsh_data)?
             .add_if_some(self.bdsp_data)?
             .add_if_some(self.la_data)?
-            .add_if_some(self.clone().sv_data)?
+            .add_if_some(self.sv_data)?
             .add_all(self.handler_data.clone())?
             .add_if_some(self.plugin_data.clone())?
             .add_if_some(self.notes.clone())?
@@ -276,6 +276,22 @@ impl OhpkmV2 {
 
     pub fn to_bytes(&self) -> Result<Vec<u8>> {
         Ok(self.to_sectioned_data()?.to_bytes()?)
+    }
+
+    pub fn nickname_matches_species_eng(&self) -> bool {
+        self.main_data.nickname_matches_species_eng()
+    }
+
+    pub fn nickname_matches_species_eng_ignore_case(&self) -> bool {
+        self.main_data.nickname_matches_species_eng_ignore_case()
+    }
+
+    pub fn fix_errors(&mut self) -> bool {
+        self.main_data.fix_errors()
+    }
+
+    pub fn get_nickname(&self) -> String {
+        self.main_data.nickname.to_string()
     }
 }
 
@@ -1875,6 +1891,21 @@ impl OhpkmV2 {
             .iter()
             .map(|t| t.to_string())
             .collect())
+    }
+
+    #[wasm_bindgen(js_name = nicknameMatchesSpeciesEnglish)]
+    pub fn nickname_matches_species_eng_js(&self) -> bool {
+        self.nickname_matches_species_eng()
+    }
+
+    #[wasm_bindgen(js_name = nicknameMatchesSpeciesEnglishIgnoreCase)]
+    pub fn nickname_matches_species_eng_ignore_case_js(&self) -> bool {
+        self.nickname_matches_species_eng_ignore_case()
+    }
+
+    #[wasm_bindgen(js_name = resetNicknameToSpecies)]
+    pub fn reset_nickname_to_species_js(&mut self) {
+        self.main_data.reset_nickname_to_species();
     }
 }
 

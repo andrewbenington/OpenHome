@@ -6,6 +6,7 @@ import { LGE_STARTER, LGP_STARTER } from '@pokemon-resources/consts/Formes'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { LGPE_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { CRC16_NoInvert } from './encryption/Encryption'
 import { Box, BoxAndSlot, OfficialSAV, SlotMetadata } from './interfaces'
@@ -178,15 +179,15 @@ export class LGPESAV extends OfficialSAV<PB7> {
     return nextEmptyIndex
   }
 
-  convertOhpkm(ohpkm: OHPKM): PB7 {
-    return new PB7(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB7 {
+    return PB7.fromOhpkm(ohpkm, strategy)
   }
 
   getMonAtIndex(monIndex: number) {
     const startByte = PC_OFFSET + MON_BYTE_SIZE * monIndex
     const endByte = PC_OFFSET + MON_BYTE_SIZE * (monIndex + 1)
     const monBytes = this.bytes.slice(startByte, endByte)
-    const mon = new PB7(monBytes.buffer, true)
+    const mon = PB7.fromBytes(monBytes.buffer, true)
 
     if (
       mon.dexNum === 0 ||

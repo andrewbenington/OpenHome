@@ -11,18 +11,22 @@ import {
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { PkmConverter } from '../conversion/converter'
+import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { generatePersonalityValuePreservingAttributes, MoveFilter } from '../util/util'
+import { DefaultConstructorOptions, PkmConstructorOptions } from './PKM'
 
 export default class PK5 {
   static getName() {
-    return 'PK5'
+    return 'PK5' as const
   }
   format: 'PK5' = 'PK5'
   static getBoxSize() {
@@ -50,7 +54,6 @@ export default class PK5 {
   formeNum: number
   nature: NatureIndex
   isNsPokemon: boolean
-  ribbonBytes: Uint8Array
   gameOfOrigin: number
   eggDate: types.PKMDate | undefined
   metDate: types.PKMDate | undefined
@@ -69,7 +72,11 @@ export default class PK5 {
   trainerName: string
   trainerGender: boolean
   checksum: number
-  constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
+  constructor(
+    arg: ArrayBuffer | OHPKM,
+    options: PkmConstructorOptions = DefaultConstructorOptions
+  ) {
+    const { encrypted } = options
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
 
@@ -119,7 +126,6 @@ export default class PK5 {
       this.formeNum = byteLogic.uIntFromBufferBits(dataView, 0x40, 3, 5, true)
       this.nature = new NatureIndex(dataView.getUint8(0x41))
       this.isNsPokemon = byteLogic.getFlag(dataView, 0x42, 1)
-      this.ribbonBytes = new Uint8Array(buffer).slice(0x4c, 0x50)
       this.gameOfOrigin = dataView.getUint8(0x5f)
       this.eggDate = types.pkmDateFromBytes(dataView, 0x78)
       this.metDate = types.pkmDateFromBytes(dataView, 0x7b)
@@ -157,6 +163,7 @@ export default class PK5 {
       this.trainerGender = byteLogic.getFlag(dataView, 0x84, 7)
       this.checksum = dataView.getUint16(0x6, true)
     } else {
+      const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
 
       this.personalityValue = this.personalityValue =
@@ -212,9 +219,8 @@ export default class PK5 {
       this.gender =
         other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
       this.formeNum = other.formeNum
-      this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
+      this.nature = other.nature
       this.isNsPokemon = other.isNsPokemon ?? false
-      this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(4)
       this.gameOfOrigin = other.gameOfOrigin
       this.eggDate = other.eggDate ?? {
         month: new Date().getMonth(),
@@ -235,22 +241,26 @@ export default class PK5 {
         this.ball = Ball.Poke
       }
 
-      this.metLevel = other.metLevel ?? 0
+      this.metLevel = other.metLevel
       this.encounterType = other.encounterType ?? 0
       this.pokeStarFame = other.pokeStarFame ?? 0
-      this.statusCondition = other.statusCondition ?? 0
+      this.statusCondition = 0
       this.currentHP = other.currentHP ?? 0
       this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '') ?? []
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.nickname = other.nickname
+      this.nickname = converter.nickname(other)
       this.trainerName = other.trainerName
       this.trainerGender = other.trainerGender
-      this.checksum = other.checksum ?? 0
+      this.checksum = this.calculcateChecksum()
     }
   }
 
-  static fromBytes(buffer: ArrayBuffer): PK5 {
-    return new PK5(buffer)
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK5 {
+    return new PK5(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): PK5 {
+    return new PK5(ohpkm, { strategy })
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {
@@ -258,6 +268,7 @@ export default class PK5 {
     const dataView = new DataView(buffer)
 
     dataView.setUint32(0x0, this.personalityValue, true)
+    dataView.setUint16(0x4, 0, true) // sanity bytes
     dataView.setUint16(0x8, this.dexNum, true)
     dataView.setUint16(0xa, this.heldItemIndex, true)
     dataView.setUint16(0xc, this.trainerID, true)
@@ -288,7 +299,6 @@ export default class PK5 {
     byteLogic.uIntToBufferBits(dataView, this.formeNum, 64, 3, 5, true)
     dataView.setUint8(0x41, this.nature.index)
     byteLogic.setFlag(dataView, 0x42, 1, this.isNsPokemon)
-    new Uint8Array(buffer).set(new Uint8Array(this.ribbonBytes.slice(0, 4)), 0x4c)
     dataView.setUint8(0x5f, this.gameOfOrigin)
     types.writePKMDateToBytes(dataView, 0x78, this.eggDate)
     types.writePKMDateToBytes(dataView, 0x7b, this.metDate)
@@ -355,7 +365,7 @@ export default class PK5 {
     return ((this.personalityValue >> 16) & 1) + 1
   }
 
-  public calcChecksum() {
+  public calculcateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x87)
   }
 

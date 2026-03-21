@@ -1,3 +1,4 @@
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   Ball,
   ItemGen3,
@@ -9,8 +10,10 @@ import {
 } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/index'
+import { PkmConverter } from '../conversion/converter'
+import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import {
   filterRibbons,
   gen3ContestRibbonsFromBytes,
@@ -20,10 +23,11 @@ import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
+import { DefaultConstructorOptions, PkmConstructorOptions } from './PKM'
 
 export default class COLOPKM {
   static getName() {
-    return 'COLOPKM'
+    return 'COLOPKM' as const
   }
   format: 'COLOPKM' = 'COLOPKM'
   static getBoxSize() {
@@ -41,7 +45,6 @@ export default class COLOPKM {
   secretID: number
   trainerName: string
   nickname: string
-  ribbonBytes: Uint8Array
   exp: number
   statLevel: number
   moves: FourMoves
@@ -59,7 +62,10 @@ export default class COLOPKM {
   shadowID: number
   shadowGauge: number
   ribbons: string[]
-  constructor(arg: ArrayBuffer | AllPKMFields) {
+  constructor(
+    arg: ArrayBuffer | OHPKM,
+    options: PkmConstructorOptions = DefaultConstructorOptions
+  ) {
     if (arg instanceof ArrayBuffer) {
       const buffer = arg
       const dataView = new DataView(buffer)
@@ -75,7 +81,6 @@ export default class COLOPKM {
       this.secretID = dataView.getUint16(0x16, false)
       this.trainerName = stringLogic.utf16BytesToString(buffer, 0x18, 11)
       this.nickname = stringLogic.utf16BytesToString(buffer, 0x2e, 11)
-      this.ribbonBytes = new Uint8Array(buffer).slice(0x4c, 0x50)
       this.exp = dataView.getUint32(0x5c, false)
       this.statLevel = dataView.getUint8(0x60)
       this.moves = [
@@ -111,13 +116,15 @@ export default class COLOPKM {
         byteLogic.getByteIndexes(dataView, 0xbd, 11).map((index) => Gen3StandardRibbons[index])
       )
     } else {
+      const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
+
       this.dexNum = other.dexNum
       this.personalityValue = other.personalityValue ?? 0
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
       this.metLocationIndex = other.metLocationIndex ?? 0
-      this.metLevel = other.metLevel ?? 0
+      this.metLevel = other.metLevel
       if (other.ball && COLOPKM.maxValidBall() >= other.ball) {
         this.ball = other.ball
       } else {
@@ -127,10 +134,9 @@ export default class COLOPKM {
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.trainerName = other.trainerName
-      this.nickname = other.nickname
-      this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(4)
+      this.nickname = converter.nickname(other)
       this.exp = other.exp
-      this.statLevel = other.statLevel ?? 0
+      this.statLevel = 0
 
       const moveFilter = MoveFilter.fromPkmClass(COLOPKM)
       this.moves = moveFilter.moves(other)
@@ -139,48 +145,25 @@ export default class COLOPKM {
 
       this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
       this.currentHP = other.currentHP ?? 0
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.contest = other.contest ?? {
-        cool: 0,
-        beauty: 0,
-        cute: 0,
-        smart: 0,
-        tough: 0,
-        sheen: 0,
-      }
+      this.evs = other.evs
+      this.ivs = other.ivs
+      this.contest = other.contest
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
       this.pokerusByte = other.pokerusByte ?? 0
-      this.markings = types.markingsFourShapesFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-      }
+      this.markings = types.markingsFourShapesFromOther(other.markings)
       this.trainerFriendship = other.trainerFriendship ?? 0
-      this.shadowID = other.shadowID ?? 0
-      this.shadowGauge = other.shadowGauge ?? 0
-      this.ribbons =
-        filterRibbons(other.ribbons ?? [], [Gen3ContestRibbons, Gen3StandardRibbons]) ?? []
+      this.shadowID = 0
+      this.shadowGauge = 0
+      this.ribbons = filterRibbons(other.ribbons, [Gen3ContestRibbons, Gen3StandardRibbons]) ?? []
     }
   }
 
   static fromBytes(buffer: ArrayBuffer): COLOPKM {
     return new COLOPKM(buffer)
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): COLOPKM {
+    return new COLOPKM(ohpkm, { strategy })
   }
 
   toBytes(): ArrayBuffer {
@@ -199,7 +182,6 @@ export default class COLOPKM {
     dataView.setUint16(0x16, this.secretID, false)
     stringLogic.writeUTF16StringToBytes(dataView, this.trainerName, 0x18, 11)
     stringLogic.writeUTF16StringToBytes(dataView, this.nickname, 0x2e, 11)
-    new Uint8Array(buffer).set(new Uint8Array(this.ribbonBytes.slice(0, 4)), 0x4c)
     dataView.setUint32(0x5c, this.exp, false)
     dataView.setUint8(0x60, this.statLevel)
     for (let i = 0; i < 4; i++) {

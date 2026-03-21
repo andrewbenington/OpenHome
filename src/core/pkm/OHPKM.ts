@@ -5,9 +5,9 @@ import {
   Ball,
   ExtraFormIndex,
   Gender,
-  GenderRatio,
   HyperTraining,
   Item,
+  Language,
   Languages,
   MetadataLookup,
   NatureIndex,
@@ -33,7 +33,7 @@ import {
 } from '@pokemon-files/util'
 import * as jsTypes from '@pokemon-files/util/types'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { Gen34ContestRibbons, Gen34TowerRibbons, ModernRibbons } from '@pokemon-resources/index'
+import { Gen34ContestRibbons, Gen34TowerRibbons } from '@pokemon-resources/index'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { PluginIdentifier, SAV } from '../save/interfaces'
@@ -124,7 +124,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.moves = other.moves as FourMoves
       this.movePP = adjustMovePPBetweenFormats(this, other)
       this.movePPUps = other.movePPUps as FourMoves
+
       this.nickname = other.nickname
+      if (other.language === Language.English && this.nicknameMatchesSpeciesEnglishIgnoreCase()) {
+        this.resetNicknameToSpecies()
+      }
+
       this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
       this.gameOfOriginBattle = other.gameOfOriginBattle
@@ -202,6 +207,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       // Gen 4+
       this.isNicknamed = other.isNicknamed ?? true
+      if (this.language === Language.English && this.nicknameMatchesSpeciesEnglishIgnoreCase()) {
+        this.isNicknamed = false
+      }
+
       this.eggDate = other.eggDate
       this.eggLocationIndex = other.eggLocationIndex
 
@@ -638,60 +647,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
   public get speciesMetadata() {
     return SpeciesLookup(this.dexNum)
-  }
-
-  public fixErrors(): boolean {
-    let errorsFound = false
-    const metadata = this.metadata
-
-    // PLA mons cannot have been hatched
-    if (this.gameOfOrigin === OriginGame.LegendsArceus && (this.eggDate || this.eggLocationIndex)) {
-      this.eggDate = undefined
-      this.eggLocationIndex = undefined
-      errorsFound = true
-    }
-
-    // Affixed ribbon must be in the mon's possession
-    if (
-      this.affixedRibbon !== undefined &&
-      this.ribbons.includes(ModernRibbons[this.affixedRibbon])
-    ) {
-      this.affixedRibbon = undefined
-      errorsFound = true
-    }
-
-    // Fix ability bug from pre-1.5.0 (affected Mind's Eye and Dragon's Maw)
-    // Fix ability bug from pre-1.7.1 (abilities not updated after evolution/capsule/patch)
-    // Fix ability num bug from some point in the past (set to 0 instead of 1)
-    if (!this.abilityNumMatchesIndex()) {
-      const fixedAbilityNum = this.abilityNumByIndex()
-      if (fixedAbilityNum) {
-        // ability is valid for this species, just fix the ability num
-        this.abilityNum = fixedAbilityNum
-      } else {
-        // ability doesn't match species at all, fall back to ability num
-        this.ability =
-          getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum) ?? this.ability
-      }
-      errorsFound = true
-    }
-
-    const genderRatio = this.metadata?.genderRatio
-    if (metadata && genderRatio !== undefined) {
-      if (
-        (this.gender === Gender.Genderless && genderRatio !== GenderRatio.Genderless) ||
-        (this.gender !== Gender.Genderless && genderRatio === GenderRatio.Genderless) ||
-        (this.gender === Gender.Male && genderRatio === GenderRatio.AllFemale) ||
-        (this.gender === Gender.Female && genderRatio === GenderRatio.AllMale)
-      ) {
-        this.gender = metadata.genderFromPid(this.personalityValue)
-        errorsFound = true
-      }
-    }
-
-    errorsFound = false
-
-    return errorsFound
   }
 
   public syncWithGameData(other: PKMInterface, save?: SAV) {

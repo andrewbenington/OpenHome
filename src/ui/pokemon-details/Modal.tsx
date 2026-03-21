@@ -1,4 +1,4 @@
-import { fileTypeFromString } from '@openhome-core/pkm/FileImport'
+import { fileTypeFromStringNonOhpkm } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
@@ -13,6 +13,7 @@ import { Dialog, Flex, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
 import { isRomHackFormat } from '../../../packages/pokemon-files/src/pkm/PKM'
+import { useConvertStrategies } from '../state/convert-strategies'
 import './style.css'
 import DisplayTab from './tabs/DisplayTab'
 import MetDataMovesTab from './tabs/MetDataMovesTab'
@@ -41,6 +42,7 @@ const PokemonDetailsModal = (props: {
   const [displayMon, setDisplayMon] = useState(mon)
   const [boxIndicatorVisible, setBoxIndicatorVisible] = useState(false)
   const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
+  const { defaultConvertStrategy } = useConvertStrategies()
   const backend = useContext(BackendContext)
 
   useEffect(() => setDisplayMon(mon), [mon])
@@ -125,15 +127,15 @@ const PokemonDetailsModal = (props: {
                       setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon))
                       return
                     }
-                    const P = fileTypeFromString(newFormat)
+                    const P = fileTypeFromStringNonOhpkm(newFormat)
 
                     if (!P) {
                       throw `Invalid filetype: ${P}`
                     }
                     if (mon instanceof OHPKM) {
-                      setDisplayMon(new P(mon as any))
+                      setDisplayMon(P.fromOhpkm(mon, defaultConvertStrategy))
                     } else {
-                      setDisplayMon(new P(new OHPKM(mon) as any))
+                      setDisplayMon(P.fromOhpkm(new OHPKM(mon), defaultConvertStrategy))
                     }
                   }}
                 />

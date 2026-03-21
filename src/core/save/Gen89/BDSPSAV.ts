@@ -4,6 +4,7 @@ import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { BDSP_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, BoxAndSlot, OfficialSAV } from '../interfaces'
@@ -131,7 +132,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
   getBoxCount = () => BOX_COUNT
 
   buildPKM(bytes: ArrayBuffer, encrypted: boolean): PB8 {
-    return new PB8(bytes, encrypted)
+    return new PB8(bytes, { encrypted })
   }
 
   getMonBoxSizeBytes(): number {
@@ -169,8 +170,8 @@ export class BDSPSAV extends OfficialSAV<PB8> {
     this.bytes.set(this.calculateChecksumBytes(), HASH_OFFSET)
   }
 
-  convertOhpkm(ohpkm: OHPKM): PB8 {
-    return new PB8(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB8 {
+    return PB8.fromOhpkm(ohpkm, strategy)
   }
 
   calculateChecksumBytes() {

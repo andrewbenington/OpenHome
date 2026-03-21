@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router'
 import { SAVClass } from 'src/core/save/util'
 import { Result } from 'src/core/util/functional'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
+import { useConvertStrategies } from '../convert-strategies'
 import { ItemBagContext } from '../items/reducer'
 import { useOhpkmStore } from '../ohpkm'
 import { openSavesReducer, SavesContext } from './reducer'
@@ -29,6 +30,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     monsToRelease: [],
     openSaves: {},
   })
+  const { defaultConvertStrategy } = useConvertStrategies()
   const disambiguationResolver = useRef<Option<SaveTypeCallback>>(undefined)
   const [disambiguationSaveTypes, setDisambiguationSaveTypes] = useState<Option<SAVClass[]>>()
   const navigate = useNavigate()
@@ -67,7 +69,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           if (!tracked) continue
 
           tracked.tradeToSave(save)
-          box.boxSlots[boxSlot] = save.convertOhpkm(tracked)
+          box.boxSlots[boxSlot] = save.convertOhpkm(tracked, defaultConvertStrategy)
         }
       })
     }
@@ -119,13 +121,14 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     return R.Ok(null)
   }, [
-    openSavesState.monsToRelease,
     backend,
     allOpenSaves,
+    openSavesState.monsToRelease,
     itemBagState.modified,
     itemBagState.itemCounts,
     displayError,
     ohpkmStore,
+    defaultConvertStrategy,
     bagDispatch,
   ])
 

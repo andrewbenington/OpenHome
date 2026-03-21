@@ -9,6 +9,7 @@ import { ExtraFormIndex, Gender, ItemGen3, OriginGame } from '@pkm-rs/pkg'
 import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { filterUndefined } from '../util/sort'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
@@ -20,6 +21,8 @@ export const EMERALD_SECURITY_OFFSET = 0xac
 export const EMERALD_SECURITY_COPY_OFFSET = 0x01f4
 export const FRLG_SECURITY_OFFSET = 0x0af8
 export const FRLG_SECURITY_COPY_OFFSET = 0x0f20
+export const GEN3_SIGNATURE_OFFSET = 0x0ff8
+export const GEN3_SIGNATURE = 0x08012025
 
 const MAX_ADDITIONAL_BYTES = 0x100
 
@@ -86,6 +89,7 @@ export class G3SaveBackup {
   gameCode: number = 0
   securityKey: number = 0
   securityKeyCopy?: number
+  signature: number
 
   money: number = -1
 
@@ -115,9 +119,12 @@ export class G3SaveBackup {
       this.sectors.push(new G3Sector(bytes, i))
       this.firstSectorIndex = this.sectors[0].sectionID
     }
+
     this.sectors.sort((sector1, sector2) => sector1.sectionID - sector2.sectionID)
 
     this.gameCode = bytesToUint32LittleEndian(this.sectors[0].data, 0xac)
+    this.signature = this.sectors[0].signature
+
     switch (this.gameCode) {
       case 0:
         this.origin = OriginGame.Ruby
@@ -160,7 +167,8 @@ export class G3SaveBackup {
     }
     for (let i = 0; i < 420; i++) {
       try {
-        const mon = new PK3(this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80).buffer, true)
+        const buffer = this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80).buffer
+        const mon = PK3.fromBytes(buffer, true)
 
         const box = this.boxes[Math.floor(i / 30)]
 
@@ -320,8 +328,8 @@ export class G3SAV extends OfficialSAV<PK3> {
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK3 {
-    return new PK3(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3 {
+    return PK3.fromOhpkm(ohpkm, strategy)
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
@@ -351,7 +359,7 @@ export class G3SAV extends OfficialSAV<PK3> {
       if (save.primarySave.gameCode === 0) {
         return true
       }
-      return save.primarySave.securityKey > 0
+      return save.primarySave.securityKey > 0 && save.primarySave.signature === GEN3_SIGNATURE
     } catch {
       return false
     }

@@ -1,6 +1,7 @@
 import { ExtraFormIndex, Gender, luminescentSupportsExtraForm, OriginGame } from '@pkm-rs/pkg'
 import { utf16BytesToString } from '@pokemon-files/util'
 
+import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, BoxAndSlot, PluginSAV, SlotMetadata } from '../interfaces'
@@ -196,13 +197,15 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
 
   // Builds a Luminescent Platinum Pokémon instance from raw bytes
   buildPKM(bytes: ArrayBuffer, encrypted: boolean): PB8LUMI {
-    const mon = new PB8LUMI(bytes, encrypted)
+    const mon = PB8LUMI.fromBytes(bytes, encrypted)
+    mon.pluginOrigin = this.pluginIdentifier
     return mon
   }
 
   // Converts an OpenHome Pokémon into the Luminescent format
-  convertOhpkm(ohpkm: OHPKM): PB8LUMI {
-    const mon = new PB8LUMI(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB8LUMI {
+    const mon = PB8LUMI.fromOhpkm(ohpkm, strategy)
+    mon.pluginOrigin = this.pluginIdentifier
     return mon
   }
 

@@ -13,7 +13,7 @@ beforeAll(initializeWasm)
 
 var blazikenOhpkm: OHPKM
 var blazikenPk3: PK3
-var slowpokeOhpkm: OHPKM
+var slowbroOhpkm: OHPKM
 
 beforeAll(() => {
   blazikenOhpkm = bytesToPKM(
@@ -26,7 +26,7 @@ beforeAll(() => {
     'PK3'
   ) as PK3
 
-  slowpokeOhpkm = bytesToPKM(
+  slowbroOhpkm = bytesToPKM(
     new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'slowbro.ohpkm'))),
     'OhpkmV2'
   ) as OHPKM
@@ -127,23 +127,26 @@ test('pk3 and ohpkm have the same gen345Lookup key', () => {
   expect(getMonGen345Identifier(ohPKM)).toEqual(getMonGen345Identifier(blazikenPk3))
 })
 
-test('gen 6+ nickname accuracy', () => {
-  const converted = new PK3(slowpokeOhpkm)
+test('gen 3 nickname converted', () => {
+  const converted = PK3.fromOhpkm(slowbroOhpkm)
 
-  expect(converted.nickname).toBe(slowpokeOhpkm.nickname)
+  expect(converted.nickname).toBe('SLOWBRO')
 })
 
-test('gen 6+ shiny accuracy', () => {
-  const converted = new PK3(slowpokeOhpkm)
+test('gen 3 nickname capitalization override', () => {
+  const converted = PK3.fromOhpkm(slowbroOhpkm, { 'nickname.capitalization': 'modern' })
 
-  if (!slowpokeOhpkm.personalityValue) {
-    throw Error('mon has no personality value')
-  }
-  expect(converted.isShiny()).toBe(slowpokeOhpkm.isShiny())
+  expect(converted.nickname).toBe('Slowbro')
+})
+
+test('gen 3 shiny accuracy', () => {
+  const converted = new PK3(slowbroOhpkm)
+
+  expect(converted.isShiny()).toBe(slowbroOhpkm.isShiny())
 })
 
 test('gen 6+ nature accuracy', () => {
-  const converted = new PK3(slowpokeOhpkm)
+  const converted = new PK3(slowbroOhpkm)
 
-  expect(converted.nature.index).toEqual(slowpokeOhpkm.nature.index)
+  expect(converted.nature.index).toEqual(slowbroOhpkm.nature.index)
 })

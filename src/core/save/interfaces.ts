@@ -2,6 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import { ExtraFormIndex, Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { LookupType, SAVClass } from './util'
 import { PathData } from './util/path'
@@ -60,6 +61,7 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
 
   getCurrentBox: () => Box<P>
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata
+  getMonAt(boxNum: number, boxSlot: number): Option<P>
 
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
@@ -67,7 +69,7 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   prepareWriter: () => SaveWriter
 
   getDisplayData(): Record<string, string | number | undefined> | undefined
-  convertOhpkm(ohpkm: OHPKM): P
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
 }
 
 export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
@@ -92,7 +94,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
   abstract supportsItem(itemIndex: number): boolean
   abstract prepareForSaving(): void
-  abstract convertOhpkm(ohpkm: OHPKM): P
+  abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -114,6 +116,11 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   pluginIdentifier: undefined = undefined
 
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
+  getMonAt(boxNum: number, boxSlot: number): Option<P> {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
 
   get gameName(): string {
     return OriginGames.gameName(this.origin)
@@ -163,7 +170,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract supportsItem(itemIndex: number): boolean
   abstract getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined
   abstract prepareForSaving(): void
-  abstract convertOhpkm(ohpkm: OHPKM): P
+  abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -203,6 +210,12 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   get lookupType(): Option<LookupType> {
     return (this.constructor as SAVClass).lookupType
+  }
+
+  getMonAt(boxNum: number, boxSlot: number): Option<P> {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
   }
 }
 

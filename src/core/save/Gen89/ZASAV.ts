@@ -7,6 +7,7 @@ import {
   ZA_TRANSFER_RESTRICTIONS_BASE,
   ZA_TRANSFER_RESTRICTIONS_MD,
 } from '@pokemon-resources/consts/TransferRestrictions'
+import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../../pkm/OHPKM'
 import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
@@ -51,8 +52,8 @@ export class ZASAV extends G89SAV<PA9> {
     this.origin = this.trainerBlock.getGame()
   }
 
-  convertOhpkm(ohpkm: OHPKM): PA9 {
-    return new PA9(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PA9 {
+    return PA9.fromOhpkm(ohpkm, strategy)
   }
 
   getBoxCount(): number {
@@ -60,7 +61,7 @@ export class ZASAV extends G89SAV<PA9> {
   }
 
   monConstructor(bytes: ArrayBuffer, encrypted: boolean): PA9 {
-    return new PA9(bytes, encrypted)
+    return new PA9(bytes, { encrypted })
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {

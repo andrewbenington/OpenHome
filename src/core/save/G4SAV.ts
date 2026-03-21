@@ -7,6 +7,7 @@ import {
 import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
+import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
@@ -103,7 +104,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
           const startByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * monIndex
           const endByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * (monIndex + 1)
           const monData = this.bytes.slice(startByte, endByte)
-          const mon = new PK4(monData.buffer, true)
+          const mon = PK4.fromBytes(monData.buffer, true)
 
           if (mon.dexNum !== 0 && mon.gameOfOrigin !== 0) {
             // set game origin if origin missing and matching mon is found; necessary for diamond/pearl
@@ -174,8 +175,8 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     this.updateStorageChecksum()
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK4 {
-    return new PK4(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK4 {
+    return PK4.fromOhpkm(ohpkm, strategy)
   }
 
   abstract supportsMon(

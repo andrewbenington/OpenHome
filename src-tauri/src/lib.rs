@@ -7,6 +7,7 @@ mod plugin;
 mod saves;
 mod startup;
 mod state;
+mod storage;
 mod util;
 mod versioning;
 
@@ -66,7 +67,23 @@ pub fn run() {
                 }
             };
 
-            let synced_state = AllSyncedState::from_states(lookup_state, ohpkm_store);
+            let conversion_settings =
+                match state::ConvertStrategies::load_from_storage(app.handle()) {
+                    Ok(settings) => settings,
+                    Err(err) => {
+                        util::show_error_dialog(
+                            app,
+                            err.to_string(),
+                            "OpenHome Failed to Launch - Cannot Open Conversion Settings",
+                        );
+
+                        app.handle().exit(1);
+                        std::process::exit(1);
+                    }
+                };
+
+            let synced_state =
+                AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
             app.manage(synced_state);
 
             let pokedex_state = match state::PokedexState::load_from_storage(app.handle()) {
@@ -133,6 +150,8 @@ pub fn run() {
             state::add_to_ohpkm_store,
             state::get_pokedex,
             state::update_pokedex,
+            state::get_convert_strategies,
+            state::update_convert_strategies,
             state::start_transaction,
             state::rollback_transaction,
             state::commit_transaction,
