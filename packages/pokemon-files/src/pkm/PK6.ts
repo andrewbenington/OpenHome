@@ -1,15 +1,19 @@
 import {
   AbilityIndex,
   Ball,
+  ExtraFormIndex,
+  extraFormIndexFromOrasPikachu,
   Item,
   Language,
   Languages,
   MetadataLookup,
   NatureIndex,
+  orasFormIndexIfSupported,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { NationalDex } from '../../../pokemon-resources/src/consts/NationalDex'
 import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
@@ -43,6 +47,7 @@ export default class PK6 {
   personalityValue: number
   nature: NatureIndex
   formeNum: number
+  extraFormIndex?: ExtraFormIndex
   gender: number
   evs: types.Stats
   contest: types.ContestStats
@@ -121,6 +126,16 @@ export default class PK6 {
       this.personalityValue = dataView.getUint32(0x18, true)
       this.nature = new NatureIndex(dataView.getUint8(0x1c))
       this.formeNum = byteLogic.uIntFromBufferBits(dataView, 0x1d, 3, 5, true)
+
+      // formeNum should always be the modern form index. Cosplay Pikachu needs to be stored in extraFormIndex.
+      if (this.dexNum === NationalDex.Pikachu) {
+        const extraFormIndex = extraFormIndexFromOrasPikachu(this.formeNum)
+        if (extraFormIndex !== undefined) {
+          this.extraFormIndex = extraFormIndex
+          this.formeNum = 0
+        }
+      }
+
       this.gender = byteLogic.uIntFromBufferBits(dataView, 0x1d, 1, 2, true)
       this.evs = types.readStatsFromBytesU8(dataView, 0x1e)
       this.contest = types.readContestStatsFromBytes(dataView, 0x24)
@@ -222,7 +237,19 @@ export default class PK6 {
       this.trainingBag = other.trainingBag ?? 0
       this.personalityValue = other.personalityValue ?? 0
       this.nature = other.nature
-      this.formeNum = other.formeNum
+
+      if (other.extraFormIndex !== undefined) {
+        const orasIndex = orasFormIndexIfSupported(other.extraFormIndex)
+        if (orasIndex !== undefined) {
+          this.formeNum = orasIndex
+          this.extraFormIndex = other.extraFormIndex
+        } else {
+          this.formeNum = 0
+        }
+      } else {
+        this.formeNum = other.formeNum
+      }
+
       this.gender = other.gender ?? 0
       this.evs = other.evs ?? {
         hp: 0,
@@ -352,7 +379,12 @@ export default class PK6 {
     dataView.setUint8(0x17, this.trainingBag)
     dataView.setUint32(0x18, this.personalityValue, true)
     dataView.setUint8(0x1c, this.nature.index)
-    byteLogic.uIntToBufferBits(dataView, this.formeNum, 29, 3, 5, true)
+
+    const orasFormIndex =
+      (this.extraFormIndex ? orasFormIndexIfSupported(this.extraFormIndex) : undefined) ??
+      this.formeNum
+
+    byteLogic.uIntToBufferBits(dataView, orasFormIndex, 29, 3, 5, true)
     byteLogic.uIntToBufferBits(dataView, this.gender, 29, 1, 2, true)
     types.writeStatsToBytesU8(dataView, 0x1e, this.evs)
     types.writeContestStatsToBytes(dataView, 0x24, this.contest)

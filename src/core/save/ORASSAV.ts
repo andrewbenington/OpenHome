@@ -1,5 +1,5 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { ExtraFormIndex, orasSupportsExtraForm, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, orasFormIndexIfSupported, OriginGame } from '@pkm-rs/pkg'
 import { Item } from '@pokemon-resources/consts/Items'
 import { ORAS_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { G6SAV } from './G6SAV'
@@ -25,7 +25,7 @@ export class ORASSAV extends G6SAV {
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return orasSupportsExtraForm(extraFormIndex)
+    if (extraFormIndex !== undefined) return orasFormIndexIfSupported(extraFormIndex) !== undefined
 
     return !isRestricted(ORAS_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
