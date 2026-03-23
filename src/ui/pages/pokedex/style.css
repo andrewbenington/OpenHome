@@ -159,3 +159,8 @@
   flex-direction: column;
   gap: 4px;
 }
+
+.pokedex-view-select {
+  min-width: 10rem;
+  margin-left: auto;
+}

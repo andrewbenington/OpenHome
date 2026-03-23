@@ -7,11 +7,11 @@ import useMonSprite from '@openhome-ui/pokemon-details/useMonSprite'
 import { usePokedex } from '@openhome-ui/state/pokedex'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import {
-  allLevelupLearnsetSources,
+  allMetadataSources,
   FormeMetadata,
-  LevelupLearnsetSource,
-  LevelupLearnsetSources,
   MetadataLookup,
+  MetadataSource,
+  MetadataSources,
   SpeciesLookup,
   SpeciesMetadata,
 } from '@pkm-rs/pkg'
@@ -218,15 +218,7 @@ function PokedexDetails({
         </Flex>
       </Flex>
       <Separator orientation="vertical" style={{ height: '100%' }} />
-      <Flex
-        direction="column"
-        height="700px"
-        maxHeight="100%"
-        width="60%"
-        gap="2"
-        p="1"
-        overflow="auto"
-      >
+      <Flex direction="column" height="700px" maxHeight="100%" width="60%" gap="2" overflow="auto">
         <RadioCards.Root
           size="1"
           defaultValue="main"
@@ -320,46 +312,42 @@ function PokedexMain(props: PokedexDetailsProps) {
 }
 
 function PokedexLearnset(props: PokedexDetailsProps) {
-  const { pokedex, species, selectedForme, setSelectedForme, setSelectedSpecies } = props
-  const [currentView, setCurrentView] = useState<LevelupLearnsetSource>(
-    LevelupLearnsetSource.ScarletViolet
-  )
+  const { selectedForme } = props
+  const [currentView, setCurrentView] = useState<MetadataSource>(MetadataSource.ScarletViolet)
 
   const levelUpLearnset = selectedForme.levelUpLearnset(currentView)
 
-  if (!levelUpLearnset) {
-    return (
-      <Flex width="100%" height="50%" align="center" justify="center">
-        <Text>No level-up learnset data available for this forme.</Text>
-      </Flex>
-    )
-  }
-
   return (
-    <>
-      <Flex direction="column" gap="1" mt="0.2rem" mx="1rem">
-        <Select.Root
-          onValueChange={(value) => setCurrentView(parseInt(value) as LevelupLearnsetSource)}
-          defaultValue="main"
-        >
-          <Select.Trigger className="pokedex-view-select">Leveliup</Select.Trigger>
-          <Select.Content>
-            {allLevelupLearnsetSources().map((source) => (
-              <Select.Item key={source} value={source}>
-                {LevelupLearnsetSources.display(source)}
-              </Select.Item>
-            ))}
-          </Select.Content>
-        </Select.Root>
-        {levelUpLearnset.map((learnsetMove) => (
-          <Flex key={`${learnsetMove.move_id}-${learnsetMove.level}`} align="center" gap="2">
-            <Text size="3" style={{ width: '7rem' }}>
-              {learnsetMove.level ? `Level ${learnsetMove.level}: ` : 'On Evolution: '}
-            </Text>
-            <MoveCard move={learnsetMove.move_id} noPP />
+    <Flex direction="column" overflow="hidden" p="1">
+      <Select.Root
+        onValueChange={(value) => setCurrentView(parseInt(value) as MetadataSource)}
+        defaultValue="main"
+      >
+        <Select.Trigger className="pokedex-view-select" />
+        <Select.Content>
+          {allMetadataSources().map((source) => (
+            <Select.Item key={source} value={source}>
+              {MetadataSources.display(source)}
+            </Select.Item>
+          ))}
+        </Select.Content>
+      </Select.Root>
+      <Flex direction="column" gap="1" mt="0.2rem" mx="1rem" overflow="auto">
+        {levelUpLearnset ? (
+          levelUpLearnset.map((learnsetMove) => (
+            <Flex key={`${learnsetMove.move_id}-${learnsetMove.level}`} align="center" gap="2">
+              <Text size="3" style={{ width: '7rem' }}>
+                {learnsetMove.level ? `Level ${learnsetMove.level}: ` : 'On Evolution: '}
+              </Text>
+              <MoveCard move={learnsetMove.move_id} noPP />
+            </Flex>
+          ))
+        ) : (
+          <Flex width="100%" height="50%" align="center" justify="center">
+            <Text>No level-up learnset data available for this forme.</Text>
           </Flex>
-        ))}
+        )}
       </Flex>
-    </>
+    </Flex>
   )
 }

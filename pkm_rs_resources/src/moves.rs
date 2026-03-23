@@ -1,7 +1,5 @@
 use std::num::NonZeroU16;
 
-pub mod levelup;
-
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 

@@ -1,45 +1,43 @@
 use pkm_rs_types::{PkmType, Stats8};
 use std::sync::LazyLock;
 
-use crate::{
-    moves::levelup::{Learnset, SV_LEVELUP_LEARNSETS},
-    species::{SpeciesAndForme, form_metadata::gen9::PersonalInfoGen9},
-};
+use crate::moves::levelup::SV_LEVELUP_LEARNSETS;
+
+use crate::species::form_metadata::Learnset;
+use crate::species::form_metadata::{PersonalTable, gen9::PersonalInfoGen9};
 
 #[cfg(test)]
 use crate::result::Result;
+#[cfg(test)]
+use crate::species::SpeciesAndForme;
 
 // from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
-static SV_PERSONAL_BYTES: &'static [u8] = include_bytes!("pkhex_bin/personal_sv");
+static SV_PERSONAL_BYTES: &[u8] = include_bytes!("pkhex_bin/personal_sv");
 pub static SV_PERSONAL_TABLE: LazyLock<PersonalTableSv> =
     LazyLock::new(|| PersonalTableSv::from_pkl_bytes(SV_PERSONAL_BYTES));
 
-pub struct PersonalInfoSv(PersonalInfoGen9, Vec<u8>);
+pub struct PersonalInfoSv(PersonalInfoGen9);
 
 const ENTRY_SIZE: usize = 0x50;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct SvFormIndex(u16);
-
 impl PersonalInfoSv {
     fn from_pkl_bytes(bytes: &[u8]) -> Self {
-        let (gen9_bytes, sv_bytes) = bytes.split_at(42);
-        Self(
-            PersonalInfoGen9::from_pkl_bytes(gen9_bytes.try_into().unwrap()),
-            sv_bytes.to_vec(),
-        )
+        let (gen9_bytes, _) = bytes.split_at(42);
+        Self(PersonalInfoGen9::from_pkl_bytes(
+            gen9_bytes.try_into().unwrap(),
+        ))
     }
 
     pub fn stats(&self) -> Stats8 {
         self.0.stats()
     }
 
-    pub const fn types(&self) -> (PkmType, PkmType) {
+    pub fn types(&self) -> (PkmType, PkmType) {
         self.0.types()
     }
 
-    pub fn form_index(&self, national_dex: u16, form_index: u16) -> SvFormIndex {
-        SvFormIndex(self.0.form_index(national_dex, form_index))
+    pub fn form_index(&self, national_dex: u16, form_index: u16) -> u16 {
+        self.0.form_index(national_dex, form_index)
     }
 }
 
@@ -58,44 +56,66 @@ impl PersonalTableSv {
         Self(entries)
     }
 
-    pub fn get_form_index(&self, national_dex: u16, forme_index: u16) -> Option<SvFormIndex> {
+    pub fn get_personal_info(
+        &self,
+        national_dex: u16,
+        forme_index: u16,
+    ) -> Option<&PersonalInfoSv> {
+        self.get_form_index(national_dex, forme_index)
+            .and_then(|form_index| self.0.get(form_index as usize))
+    }
+
+    pub fn get_form_index(&self, national_dex: u16, forme_index: u16) -> Option<u16> {
         self.0
             .get(national_dex as usize)
             .map(|info| info.form_index(national_dex, forme_index))
     }
 
     pub fn get_form_stats(&self, national_dex: u16, forme_index: u16) -> Option<Stats8> {
-        self.get_form_index(national_dex, forme_index)
-            .and_then(|form_index| self.0.get(form_index.0 as usize))
-            .map(|info| info.stats())
+        self.get_personal_info(national_dex, forme_index)
+            .map(PersonalInfoSv::stats)
+    }
+}
+
+impl PersonalTable for PersonalTableSv {
+    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, PkmType)> {
+        self.get_personal_info(national_dex, forme_index)
+            .map(PersonalInfoSv::types)
     }
 
-    pub fn get_levelup_learnset(
+    fn get_levelup_learnset(
         &self,
         national_dex: u16,
         forme_index: u16,
     ) -> Option<&'static Learnset> {
+        SV_LEVELUP_LEARNSETS.get(self.get_form_index(national_dex, forme_index)? as usize)
+    }
+
+    fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16> {
         self.get_form_index(national_dex, forme_index)
-            .and_then(|form_index| {
-                crate::moves::levelup::learnset_by_sv_index(form_index.0 as usize)
-            })
+    }
+
+    fn get_levelup_learnsets() -> &'static Vec<Learnset> {
+        todo!()
     }
 }
 
+#[cfg(test)]
 pub struct FormMetadataSv(SpeciesAndForme);
 
+#[cfg(test)]
 impl FormMetadataSv {
     pub const fn new(species_and_forme: SpeciesAndForme) -> Self {
         Self(species_and_forme)
     }
 
-    pub fn game_index(&self) -> Option<SvFormIndex> {
+    pub fn game_index(&self) -> Option<u16> {
         SV_PERSONAL_TABLE.get_form_index(self.0.get_ndex().get(), self.0.get_forme_index())
     }
 
     fn table_entry(&self) -> Option<&PersonalInfoSv> {
         self.game_index()
-            .and_then(|form_index| SV_PERSONAL_TABLE.0.get(form_index.0 as usize))
+            .and_then(|form_index| SV_PERSONAL_TABLE.0.get(form_index as usize))
     }
 
     pub fn get_stats(&self) -> Option<Stats8> {
@@ -104,16 +124,13 @@ impl FormMetadataSv {
 
     pub fn get_levelup_learnset(&self) -> Option<&'static Learnset> {
         self.game_index()
-            .and_then(|form_index| SV_LEVELUP_LEARNSETS.get(form_index.0 as usize))
+            .and_then(|form_index| SV_LEVELUP_LEARNSETS.get(form_index as usize))
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        moves::levelup::{LearnsetCondition, SV_LEVELUP_LEARNSETS},
-        species::form_metadata,
-    };
+    use crate::moves::levelup::LearnsetCondition;
 
     use super::*;
 
@@ -121,7 +138,7 @@ mod tests {
     fn valid_stats() -> Result<()> {
         let table = &SV_PERSONAL_TABLE;
         let form_index = table.get_form_index(1, 0);
-        assert_eq!(form_index.map(|i| i.0), Some(1));
+        assert_eq!(form_index, Some(1));
 
         // Bulbasaur
         let bulbasaur_metadata = FormMetadataSv::new(SpeciesAndForme::new(1, 0)?);

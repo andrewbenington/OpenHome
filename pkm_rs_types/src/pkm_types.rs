@@ -72,6 +72,29 @@ impl PkmType {
             _ => None,
         }
     }
+
+    pub const fn from_byte_gen1(byte: u8) -> Option<Self> {
+        match byte {
+            0 => Some(Self::Normal),
+            1 => Some(Self::Fighting),
+            2 => Some(Self::Flying),
+            3 => Some(Self::Poison),
+            4 => Some(Self::Ground),
+            5 => Some(Self::Rock),
+            // 6: Unused bird type
+            7 => Some(Self::Bug),
+            8 => Some(Self::Ghost),
+            // 9-19: Dummy 'normal' types
+            20 => Some(Self::Fire),
+            21 => Some(Self::Water),
+            22 => Some(Self::Grass),
+            23 => Some(Self::Electric),
+            24 => Some(Self::Psychic),
+            25 => Some(Self::Ice),
+            26 => Some(Self::Dragon),
+            _ => None,
+        }
+    }
 }
 
 const TERA_TYPE_NO_OVERRIDE: u8 = 0x13;
@@ -134,6 +157,7 @@ pub enum TeraTypeWasm {
 }
 
 #[cfg(feature = "wasm")]
+#[allow(clippy::missing_const_for_fn)]
 impl TeraTypeWasm {
     pub fn from_byte(byte: u8) -> Option<Self> {
         match byte {

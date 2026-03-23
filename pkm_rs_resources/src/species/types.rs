@@ -4,20 +4,26 @@ use strum_macros::{Display, EnumString};
 use crate::{
     Error, Result,
     abilities::AbilityIndex,
-    moves::levelup::{Learnset, LevelupLearnsetSource, SV_LEVELUP_LEARNSETS, ZA_LEVELUP_LEARNSETS},
-    species::ALL_SPECIES,
+    levelup::Learnset,
+    species::{
+        ALL_SPECIES,
+        form_metadata::{
+            MetadataSource, base_stats_pre_split_lookup, levelup_learnset_lookup, types_lookup,
+            types_lookup_with_source,
+        },
+    },
 };
-use pkm_rs_types::{GameSetting, Generation, PkmType, TeraType};
+use pkm_rs_types::{GameSetting, Generation, PkmType, StatsPreSplit, TeraType};
 use serde::{Serialize, Serializer};
 
 #[cfg(feature = "wasm")]
-use crate::{
-    moves::levelup::LearnsetMoveJs, species::form_metadata::za::ZA_PERSONAL_TABLE, stats::Stat,
-};
-
+use crate::species::form_metadata::base_stats_lookup;
 #[cfg(feature = "wasm")]
-use pkm_rs_types::{Gender, OriginGame, Stats8};
-
+use crate::stats::Stat;
+#[cfg(feature = "wasm")]
+use crate::{levelup::LearnsetMoveJs, species::form_metadata::current_base_stats};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{Gender, Stats8};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -325,9 +331,6 @@ pub struct FormeMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isCosmetic))]
     pub is_cosmetic: bool,
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub types: (PkmType, Option<PkmType>),
-
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = genderRatio))]
     pub gender_ratio: GenderRatio,
 
@@ -417,10 +420,20 @@ impl FormeMetadata {
             .any(|mega| mega.mega_forme.forme_index == self.forme_index)
     }
 
+    fn types(&self) -> (PkmType, Option<PkmType>) {
+        types_lookup(self.national_dex.get(), self.forme_index)
+            .expect("all FormeMetadata instances should have types")
+    }
+
+    fn types_with_source(&self, source: MetadataSource) -> (PkmType, Option<PkmType>) {
+        types_lookup_with_source(self.national_dex.get(), self.forme_index, source)
+            .expect("all FormeMetadata instances should have types")
+    }
+
     /// Tera Type assigned by Pokémon HOME for the species when not originally
     /// from Scarlet/Violet
-    pub const fn transferred_tera_type(&self) -> TeraType {
-        TeraType::Standard(match self.types {
+    pub fn transferred_tera_type(&self) -> TeraType {
+        TeraType::Standard(match self.types() {
             (PkmType::Normal, Some(type2)) => type2,
             (type1, _) => type1,
         })
@@ -438,22 +451,32 @@ impl FormeMetadata {
 
     #[wasm_bindgen(getter = type1)]
     pub fn type_1(&self) -> String {
-        self.types.0.to_string()
+        self.types().0.to_string()
+    }
+
+    #[wasm_bindgen(js_name = type1WithSource)]
+    pub fn type_1_with_source(&self, source: MetadataSource) -> String {
+        self.types_with_source(source).0.to_string()
     }
 
     #[wasm_bindgen(getter = type1Index)]
     pub fn type_1_index(&self) -> u8 {
-        self.types.0 as u8
+        self.types().0 as u8
     }
 
     #[wasm_bindgen(getter = type2)]
     pub fn type_2(&self) -> Option<String> {
-        self.types.1.map(|t| t.to_string())
+        self.types().1.map(|t| t.to_string())
+    }
+
+    #[wasm_bindgen(js_name = type2WithSource)]
+    pub fn type_2_with_source(&self, source: MetadataSource) -> Option<String> {
+        self.types_with_source(source).1.map(|t| t.to_string())
     }
 
     #[wasm_bindgen(getter = type2Index)]
     pub fn type_2_index(&self) -> Option<u8> {
-        self.types.1.map(|t| t as u8)
+        self.types().1.map(|t| t as u8)
     }
 
     #[wasm_bindgen(getter)]
@@ -539,9 +562,17 @@ impl FormeMetadata {
 
     #[wasm_bindgen(getter = baseStats)]
     pub fn get_base_stats(&self) -> Stats8 {
-        ZA_PERSONAL_TABLE
-            .get_form_stats(self.national_dex.get(), self.forme_index)
-            .unwrap_or_default()
+        current_base_stats(self.national_dex.get(), self.forme_index).unwrap_or_default()
+    }
+
+    #[wasm_bindgen(js_name = baseStatsFrom)]
+    pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<Stats8> {
+        base_stats_lookup(self.national_dex.get(), self.forme_index, source)
+    }
+
+    #[wasm_bindgen(js_name = baseStatsPreSplitFrom)]
+    pub fn get_base_stats_pre_split_from(&self, source: MetadataSource) -> Option<StatsPreSplit> {
+        base_stats_pre_split_lookup(self.national_dex.get(), self.forme_index, source)
     }
 
     #[wasm_bindgen(js_name = getBaseStat)]
@@ -571,7 +602,7 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(js_name = levelUpLearnset)]
-    pub fn level_up_learnset(&self, source: LevelupLearnsetSource) -> Option<Vec<LearnsetMoveJs>> {
+    pub fn level_up_learnset(&self, source: MetadataSource) -> Option<Vec<LearnsetMoveJs>> {
         let learnset_moves_js = self
             .forme_ref()
             .get_levelup_learnset(source)?
@@ -711,17 +742,8 @@ impl SpeciesAndForme {
         self.forme_index
     }
 
-    pub fn get_sv_levelup_learnset(&self) -> Option<&'static Learnset> {
-        SV_LEVELUP_LEARNSETS.get(self.national_dex.get() as usize)
-    }
-
-    pub fn get_levelup_learnset(&self, source: LevelupLearnsetSource) -> Option<&'static Learnset> {
-        let ndex = self.national_dex.get() as usize;
-        match source {
-            LevelupLearnsetSource::ScarletViolet => SV_LEVELUP_LEARNSETS.get(ndex),
-            LevelupLearnsetSource::LegendsZa => ZA_LEVELUP_LEARNSETS.get(ndex),
-            _ => todo!("learnsets for other games"),
-        }
+    pub fn get_levelup_learnset(&self, source: MetadataSource) -> Option<&'static Learnset> {
+        levelup_learnset_lookup(self.national_dex.get(), self.forme_index, source)
     }
 }
 

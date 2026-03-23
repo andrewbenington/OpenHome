@@ -124,6 +124,7 @@ impl Stats8 {
 
 #[wasm_bindgen]
 #[cfg(feature = "wasm")]
+#[allow(clippy::missing_const_for_fn)]
 impl Stats8 {
     #[wasm_bindgen(constructor)]
     #[allow(clippy::missing_const_for_fn)]
@@ -192,6 +193,7 @@ impl Stats16Le {
 
 #[wasm_bindgen]
 #[cfg(feature = "wasm")]
+#[allow(clippy::missing_const_for_fn)]
 impl Stats16Le {
     #[wasm_bindgen(constructor)]
     #[allow(clippy::missing_const_for_fn)]
@@ -274,7 +276,17 @@ pub struct StatsPreSplit {
 }
 
 impl StatsPreSplit {
-    pub fn from_bytes(bytes: [u8; 10]) -> Self {
+    pub const fn from_bytes_u8(bytes: [u8; 10]) -> Self {
+        Self {
+            hp: bytes[0] as u16,
+            atk: bytes[1] as u16,
+            def: bytes[2] as u16,
+            spe: bytes[3] as u16,
+            spc: bytes[4] as u16,
+        }
+    }
+
+    pub fn from_bytes_u16_le(bytes: [u8; 10]) -> Self {
         Self {
             hp: u16::from_le_bytes(bytes[0..2].try_into().unwrap()),
             atk: u16::from_le_bytes(bytes[2..4].try_into().unwrap()),
@@ -331,7 +343,7 @@ impl StatsPreSplit {
         let mut atk = (ivs.atk - 1).div_ceil(2) as u16;
         if atk & 0b11 == 0b01 {
             atk += 1;
-        } else if atk % 4 == 0 {
+        } else if atk.is_multiple_of(4) {
             atk += 2
         }
 

@@ -1,5 +1,11 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { AbilityIndex, extraFormTypeOverride, MetadataLookup, SpeciesAndForme } from '@pkm-rs/pkg'
+import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
+import {
+  AbilityIndex,
+  extraFormTypeOverride,
+  MetadataLookup,
+  MetadataSource,
+  SpeciesAndForme,
+} from '@pkm-rs/pkg'
 import { FourMoves, Stats, StatsPreSplit } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
@@ -138,22 +144,53 @@ export const getTypes = (mon: PKMInterface): Type[] => {
     return ['Normal']
   }
 
-  const type1 = metadata.type1 as Type
-  const type2 = metadata.type2 as Type | undefined
+  const metadataSource = MetadataSourceByFormat(mon.format)
 
-  if (
-    mon.format === 'PK1' &&
-    (mon.dexNum === NationalDex.Magnemite || mon.dexNum === NationalDex.Magneton)
-  ) {
-    return ['Electric']
-  } else if (['PK1', 'PK2', 'PK3', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(mon.format)) {
-    if (type2 === 'Fairy') {
-      return [type1]
-    } else if (type1 === 'Fairy') {
-      return type2 ? ['Normal', type2] : ['Normal']
-    }
-  }
+  const type1 = metadata.type1WithSource(metadataSource) as Type
+  const type2 = metadata.type2WithSource(metadataSource) as Type | undefined
+
   return type2 ? [type1, type2] : [type1]
+}
+
+function MetadataSourceByFormat(format: MonFormat | 'OHPKM'): MetadataSource {
+  switch (format) {
+    case 'PK1':
+      return MetadataSource.Yellow
+    case 'PK2':
+      return MetadataSource.Crystal
+    case 'PK3':
+    case 'COLOPKM':
+    case 'XDPKM':
+      return MetadataSource.Emerald
+    case 'PK4':
+      return MetadataSource.HeartGoldSoulSilver
+    case 'PK5':
+      return MetadataSource.Black2White2
+    case 'PK6':
+      return MetadataSource.OmegaRubyAlphaSapphire
+    case 'PK7':
+      return MetadataSource.UltraSunUltraMoon
+    case 'PB7':
+      return MetadataSource.LetsGoPikachuEevee
+    case 'PK8':
+      return MetadataSource.SwordShield
+    case 'PB8':
+    case 'PB8LUMI':
+      return MetadataSource.BrilliantDiamondShiningPearl
+    case 'PA8':
+      return MetadataSource.LegendsArceus
+    case 'PK9':
+    case 'PK3RR':
+    case 'PK3UB':
+      return MetadataSource.ScarletViolet
+    case 'PA9':
+      return MetadataSource.LegendsZa
+    case 'OHPKM':
+      return MetadataSource.ScarletViolet
+    default:
+      console.warn(`Unknown format ${format}, defaulting to Scarlet/Violet metadata source`)
+      return MetadataSource.ScarletViolet
+  }
 }
 
 export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
