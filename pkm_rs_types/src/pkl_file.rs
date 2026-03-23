@@ -25,8 +25,6 @@ impl PklFileData {
         let start = start_end & 0xFFFF;
         let end = start_end >> 16;
 
-        println!("both: {start_end}; start: {start}; end: {end}");
-
         &self.data[start..end]
     }
 

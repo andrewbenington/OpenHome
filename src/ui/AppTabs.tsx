@@ -2,6 +2,7 @@ import useIsDev from '@openhome-ui/hooks/isDev'
 import { Box, Tabs, ThemePanel } from '@radix-ui/themes'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
 import AppStateDisplay from './pages/AppStateDisplay'
+import ComponentDebugDisplay from './pages/ComponentDebugDisplay'
 import Home from './pages/home/Home'
 import PluginsPage from './pages/plugins/Plugins'
 import PokedexDisplay from './pages/pokedex/PokedexDisplay'
@@ -40,7 +41,7 @@ export default function AppTabs() {
           {isDev && (
             <>
               <Route path="/state" element={<AppStateDisplay />} />
-              <Route path="/theme" element={<ThemePanel />} />
+              <Route path="/component-debug" element={<ComponentDebugDisplay />} />
             </>
           )}
         </Routes>
@@ -65,7 +66,7 @@ export default function AppTabs() {
         {isDev && (
           <>
             <Tabs.Trigger value="state">App State</Tabs.Trigger>
-            <Tabs.Trigger value="theme">Themes Display</Tabs.Trigger>
+            <Tabs.Trigger value="component-debug">Component Debug</Tabs.Trigger>
           </>
         )}
       </Tabs.List>

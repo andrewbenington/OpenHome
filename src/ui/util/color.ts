@@ -62,3 +62,12 @@ export const colorForType = (type: string) => {
       return '#555'
   }
 }
+
+export const contrastColorForType = (type: string) => {
+  switch (type) {
+    case 'electric':
+      return 'black'
+    default:
+      return 'white'
+  }
+}

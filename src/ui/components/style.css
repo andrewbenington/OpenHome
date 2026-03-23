@@ -1,7 +1,5 @@
 .move-card {
-  height: 44px;
   flex: 1;
-  margin: 4px;
   display: flex;
   border-radius: 3px;
   flex-direction: column;
@@ -10,15 +8,35 @@
   flex-direction: row;
 }
 
+.move-card-full {
+  height: 44px;
+}
+
+.move-card-small {
+  height: 28px;
+  font-size: 0.8em;
+  max-width: 10rem;
+}
+
 .move-card-vert {
   flex: 1;
+  gap: 0;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .move-name {
   font-size: 1.2em;
   font-weight: bold;
-  margin-bottom: -6px;
   color: white;
+  min-height: 0;
+  margin: 0;
+}
+
+.move-pp-display {
+  margin-top: -5px;
 }
 
 .unknown-move-name {

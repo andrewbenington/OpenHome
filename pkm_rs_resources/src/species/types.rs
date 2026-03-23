@@ -1,15 +1,22 @@
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
 
-use crate::{Error, Result, abilities::AbilityIndex, species::ALL_SPECIES};
-use pkm_rs_types::{GameSetting, Generation, PkmType, Stats16Le, TeraType};
+use crate::{
+    Error, Result,
+    abilities::AbilityIndex,
+    moves::levelup::{Learnset, LevelupLearnsetSource, SV_LEVELUP_LEARNSETS, ZA_LEVELUP_LEARNSETS},
+    species::ALL_SPECIES,
+};
+use pkm_rs_types::{GameSetting, Generation, PkmType, TeraType};
 use serde::{Serialize, Serializer};
 
 #[cfg(feature = "wasm")]
-use crate::stats::Stat;
+use crate::{
+    moves::levelup::LearnsetMoveJs, species::form_metadata::za::ZA_PERSONAL_TABLE, stats::Stat,
+};
 
 #[cfg(feature = "wasm")]
-use pkm_rs_types::Gender;
+use pkm_rs_types::{Gender, OriginGame, Stats8};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -324,9 +331,6 @@ pub struct FormeMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = genderRatio))]
     pub gender_ratio: GenderRatio,
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseStats))]
-    pub base_stats: Stats16Le,
-
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub abilities: (AbilityIndex, AbilityIndex),
 
@@ -533,15 +537,23 @@ impl FormeMetadata {
         self.is_evolution_of(other)
     }
 
+    #[wasm_bindgen(getter = baseStats)]
+    pub fn get_base_stats(&self) -> Stats8 {
+        ZA_PERSONAL_TABLE
+            .get_form_stats(self.national_dex.get(), self.forme_index)
+            .unwrap_or_default()
+    }
+
     #[wasm_bindgen(js_name = getBaseStat)]
-    pub fn get_base_stat(&self, stat: Stat) -> u16 {
+    pub fn get_base_stat(&self, stat: Stat) -> u8 {
+        let base_stats = self.get_base_stats();
         match stat {
-            Stat::HP => self.base_stats.hp,
-            Stat::Attack => self.base_stats.atk,
-            Stat::Defense => self.base_stats.def,
-            Stat::SpecialAttack => self.base_stats.spa,
-            Stat::SpecialDefense => self.base_stats.spd,
-            Stat::Speed => self.base_stats.spe,
+            Stat::HP => base_stats.hp,
+            Stat::Attack => base_stats.atk,
+            Stat::Defense => base_stats.def,
+            Stat::SpecialAttack => base_stats.spa,
+            Stat::SpecialDefense => base_stats.spd,
+            Stat::Speed => base_stats.spe,
         }
     }
 
@@ -556,6 +568,18 @@ impl FormeMetadata {
             .iter()
             .find(|other| self.is_mega_forme_of(other))
             .cloned()
+    }
+
+    #[wasm_bindgen(js_name = levelUpLearnset)]
+    pub fn level_up_learnset(&self, source: LevelupLearnsetSource) -> Option<Vec<LearnsetMoveJs>> {
+        let learnset_moves_js = self
+            .forme_ref()
+            .get_levelup_learnset(source)?
+            .moves
+            .iter()
+            .map(|learnset_move| LearnsetMoveJs::from(*learnset_move))
+            .collect();
+        Some(learnset_moves_js)
     }
 }
 
@@ -685,6 +709,19 @@ impl SpeciesAndForme {
 
     pub const fn get_forme_index(&self) -> u16 {
         self.forme_index
+    }
+
+    pub fn get_sv_levelup_learnset(&self) -> Option<&'static Learnset> {
+        SV_LEVELUP_LEARNSETS.get(self.national_dex.get() as usize)
+    }
+
+    pub fn get_levelup_learnset(&self, source: LevelupLearnsetSource) -> Option<&'static Learnset> {
+        let ndex = self.national_dex.get() as usize;
+        match source {
+            LevelupLearnsetSource::ScarletViolet => SV_LEVELUP_LEARNSETS.get(ndex),
+            LevelupLearnsetSource::LegendsZa => ZA_LEVELUP_LEARNSETS.get(ndex),
+            _ => todo!("learnsets for other games"),
+        }
     }
 }
 
