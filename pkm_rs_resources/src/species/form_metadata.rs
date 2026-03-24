@@ -2,6 +2,7 @@ pub mod gen1;
 pub mod gen2;
 pub mod gen3;
 pub mod gen9;
+mod sv;
 
 use pkm_rs_types::{OriginGame, OriginMark, PkmType, Stats8, StatsPreSplit};
 #[cfg(feature = "wasm")]
@@ -9,6 +10,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{
     levelup::Learnset,
+    log,
     species::form_metadata::{
         gen1::{METADATA_TABLE_RED_BLUE, METADATA_TABLE_YELLOW},
         gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GOLD_SILVER},
@@ -195,19 +197,19 @@ pub fn base_stats_lookup(
         MetadataSource::FireRedLeafGreen => {
             METADATA_TABLE_FIRERED_LEAFGREEN.get_base_stats(national_dex, forme_index)
         }
-        MetadataSource::SwordShield => {
-            METADATA_TABLE_SWSH.get_base_stats(national_dex, forme_index)
-        }
-        MetadataSource::BrilliantDiamondShiningPearl => {
-            METADATA_TABLE_BDSP.get_base_stats(national_dex, forme_index)
-        }
-        MetadataSource::LegendsArceus => {
-            METADATA_TABLE_LA.get_base_stats(national_dex, forme_index)
-        }
+        // MetadataSource::SwordShield => {
+        //     METADATA_TABLE_SWSH.get_base_stats(national_dex, forme_index)
+        // }
+        // MetadataSource::BrilliantDiamondShiningPearl => {
+        //     METADATA_TABLE_BDSP.get_base_stats(national_dex, forme_index)
+        // }
+        // MetadataSource::LegendsArceus => {
+        //     METADATA_TABLE_LA.get_base_stats(national_dex, forme_index)
+        // }
         MetadataSource::ScarletViolet => {
             METADATA_TABLE_SV.get_base_stats(national_dex, forme_index)
         }
-        MetadataSource::LegendsZa => METADATA_TABLE_ZA.get_base_stats(national_dex, forme_index),
+        // MetadataSource::LegendsZa => METADATA_TABLE_ZA.get_base_stats(national_dex, forme_index),
         _ => current_metadata_table().get_base_stats(national_dex, forme_index),
     }
 }
@@ -243,7 +245,13 @@ fn deduplicate_types(type1: PkmType, type2: PkmType) -> (PkmType, Option<PkmType
 }
 
 pub fn types_lookup(national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
+    log!(
+        "looking up types for national dex {} forme {}",
+        national_dex,
+        forme_index
+    );
     let (type1, type2) = current_metadata_table().get_types(national_dex, forme_index)?;
+    log!("got types: {} and {}", type1, type2);
 
     Some(deduplicate_types(type1, type2))
 }
@@ -298,27 +306,43 @@ pub fn levelup_learnset_lookup(
         MetadataSource::Crystal => {
             METADATA_TABLE_CRYSTAL.get_levelup_learnset(national_dex, forme_index)
         }
-        // MetadataSource::RubySapphire => {
-        //     RUBY_SAPPHIRE_PERSONAL_TABLE.get_levelup_learnset(national_dex, forme_index)
-        // }
-        // MetadataSource::Emerald => {
-        //     EMERALD_PERSONAL_TABLE.get_levelup_learnset(national_dex, forme_index)
-        // }
-        // MetadataSource::FireRedLeafGreen => {
-        //     FIRERED_LEAFGREEN_PERSONAL_TABLE.get_levelup_learnset(national_dex, forme_index)
-        // }
-        // MetadataSource::SwordShield => {
-        //     SWSH_PERSONAL_TABLE.get_levelup_learnset(national_dex, forme_index)
-        // }
-        // MetadataSource::LegendsArceus => {
-        //     LA_PERSONAL_TABLE.get_levelup_learnset(national_dex, forme_index)
-        // }
-        // MetadataSource::ScarletViolet => {
-        //     SV_PERSONAL_TABLE.get_levelup_learnset(national_dex, forme_index)
-        // }
-        // MetadataSource::LegendsZa => {
-        //     ZA_PERSONAL_TABLE.get_levelup_learnset(national_dex, forme_index)
-        // }
+        MetadataSource::RubySapphire => {
+            METADATA_TABLE_RUBY_SAPPHIRE.get_levelup_learnset(national_dex, forme_index)
+        }
+        MetadataSource::Emerald => {
+            METADATA_TABLE_EMERALD.get_levelup_learnset(national_dex, forme_index)
+        }
+        MetadataSource::FireRedLeafGreen => {
+            METADATA_TABLE_FIRERED_LEAFGREEN.get_levelup_learnset(national_dex, forme_index)
+        }
+        MetadataSource::SwordShield => {
+            METADATA_TABLE_SWSH.get_levelup_learnset(national_dex, forme_index)
+        }
+        MetadataSource::BrilliantDiamondShiningPearl => {
+            METADATA_TABLE_BDSP.get_levelup_learnset(national_dex, forme_index)
+        }
+        MetadataSource::LegendsArceus => {
+            METADATA_TABLE_LA.get_levelup_learnset(national_dex, forme_index)
+        }
+        MetadataSource::ScarletViolet => {
+            METADATA_TABLE_SV.get_levelup_learnset(national_dex, forme_index)
+        }
+        MetadataSource::LegendsZa => {
+            METADATA_TABLE_ZA.get_levelup_learnset(national_dex, forme_index)
+        }
         _ => None,
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use pkm_rs_types::NationalDex;
+
+    #[test]
+    fn test_get_types() {
+        assert_eq!(
+            super::current_base_stats(NationalDex::Pikachu as u16, 0),
+            Some(pkm_rs_types::Stats8::new(35, 55, 40, 50, 50, 90))
+        );
     }
 }

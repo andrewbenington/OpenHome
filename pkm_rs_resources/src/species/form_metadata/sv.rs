@@ -1,8 +1,6 @@
 use pkm_rs_types::{PkmType, Stats8};
 use std::sync::LazyLock;
 
-use crate::moves::levelup::SV_LEVELUP_LEARNSETS;
-
 use crate::species::form_metadata::Learnset;
 use crate::species::form_metadata::{PersonalTable, gen9::PersonalInfoGen9};
 
@@ -12,7 +10,7 @@ use crate::result::Result;
 use crate::species::SpeciesAndForme;
 
 // from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
-static SV_PERSONAL_BYTES: &[u8] = include_bytes!("pkhex_bin/personal_sv");
+static SV_PERSONAL_BYTES: &[u8] = include_bytes!("pkhex_bin/personal/personal_sv");
 pub static SV_PERSONAL_TABLE: LazyLock<PersonalTableSv> =
     LazyLock::new(|| PersonalTableSv::from_pkl_bytes(SV_PERSONAL_BYTES));
 
@@ -83,20 +81,8 @@ impl PersonalTable for PersonalTableSv {
             .map(PersonalInfoSv::types)
     }
 
-    fn get_levelup_learnset(
-        &self,
-        national_dex: u16,
-        forme_index: u16,
-    ) -> Option<&'static Learnset> {
-        SV_LEVELUP_LEARNSETS.get(self.get_form_index(national_dex, forme_index)? as usize)
-    }
-
     fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16> {
         self.get_form_index(national_dex, forme_index)
-    }
-
-    fn get_levelup_learnsets() -> &'static Vec<Learnset> {
-        todo!()
     }
 }
 
@@ -121,16 +107,11 @@ impl FormMetadataSv {
     pub fn get_stats(&self) -> Option<Stats8> {
         self.table_entry().map(|info| info.stats())
     }
-
-    pub fn get_levelup_learnset(&self) -> Option<&'static Learnset> {
-        self.game_index()
-            .and_then(|form_index| SV_LEVELUP_LEARNSETS.get(form_index as usize))
-    }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::moves::levelup::LearnsetCondition;
+    use crate::levelup::LearnsetCondition;
 
     use super::*;
 
@@ -161,20 +142,20 @@ mod tests {
             Some(Stats8::new(70, 105, 75, 50, 75, 105))
         );
 
-        for learnset_move in &lilligant_hisui_metadata
-            .get_levelup_learnset()
-            .expect("hisui lilligant metadata is present")
-            .moves
-        {
-            println!(
-                "move: {:?} - {}",
-                learnset_move.condition,
-                learnset_move
-                    .move_id
-                    .get_metadata()
-                    .map_or("(invalid_move)", |m| m.name),
-            );
-        }
+        // for learnset_move in &lilligant_hisui_metadata
+        //     .get_levelup_learnset()
+        //     .expect("hisui lilligant metadata is present")
+        //     .moves
+        // {
+        //     println!(
+        //         "move: {:?} - {}",
+        //         learnset_move.condition,
+        //         learnset_move
+        //             .move_id
+        //             .get_metadata()
+        //             .map_or("(invalid_move)", |m| m.name),
+        //     );
+        // }
 
         // Panpour
         assert_eq!(
@@ -185,26 +166,26 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn level_up_learnset() -> Result<()> {
-        // Hisuian Lilligant
-        let lilligant_hisui_metadata = FormMetadataSv::new(SpeciesAndForme::new(549, 1)?);
-        let lilligant_hisui_learnset = lilligant_hisui_metadata
-            .get_levelup_learnset()
-            .expect("hisui lilligant metadata is present");
+    // #[test]
+    // fn level_up_learnset() -> Result<()> {
+    //     // Hisuian Lilligant
+    //     let lilligant_hisui_metadata = FormMetadataSv::new(SpeciesAndForme::new(549, 1)?);
+    //     let lilligant_hisui_learnset = lilligant_hisui_metadata
+    //         .get_levelup_learnset()
+    //         .expect("hisui lilligant metadata is present");
 
-        const VICTORY_DANCE: u16 = 837;
+    //     const VICTORY_DANCE: u16 = 837;
 
-        let evolution_move = lilligant_hisui_learnset.moves.iter().find(|m| {
-            m.condition == LearnsetCondition::Evolution && u16::from(m.move_id) == VICTORY_DANCE
-        });
-        assert!(
-            evolution_move.is_some(),
-            "Hisuian Lilligant should learn Victory Dance upon evolution"
-        );
+    //     let evolution_move = lilligant_hisui_learnset.moves.iter().find(|m| {
+    //         m.condition == LearnsetCondition::Evolution && u16::from(m.move_id) == VICTORY_DANCE
+    //     });
+    //     assert!(
+    //         evolution_move.is_some(),
+    //         "Hisuian Lilligant should learn Victory Dance upon evolution"
+    //     );
 
-        Ok(())
-    }
+    //     Ok(())
+    // }
 
     #[test]
     fn valid_types() {

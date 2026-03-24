@@ -55,8 +55,9 @@ const ENTRY_SIZE: usize = 0x50;
 pub struct PersonalInfoGen9([u8; 42]);
 
 impl PersonalInfoGen9 {
-    pub const fn from_pkl_bytes(bytes: [u8; 42]) -> Self {
-        Self(bytes)
+    pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
+        let (gen9_bytes, _) = bytes.split_at(42);
+        Self(gen9_bytes.try_into().unwrap())
     }
 
     pub fn stats(&self) -> Stats8 {

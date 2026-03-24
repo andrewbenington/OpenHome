@@ -5,6 +5,7 @@ use crate::{
     Error, Result,
     abilities::AbilityIndex,
     levelup::Learnset,
+    log,
     species::{
         ALL_SPECIES,
         form_metadata::{
@@ -451,6 +452,11 @@ impl FormeMetadata {
 
     #[wasm_bindgen(getter = type1)]
     pub fn type_1(&self) -> String {
+        log!(
+            "getting types for {} forme {}",
+            self.species_name,
+            self.forme_name
+        );
         self.types().0.to_string()
     }
 
