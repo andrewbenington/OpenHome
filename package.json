@@ -63,7 +63,7 @@
     "react-data-grid": "7.0.0-beta.59",
     "react-error-boundary": "^6.1.1",
     "react-icons": "^5.6.0",
-    "react-router": "^7.13.1",
+    "react-router": "^7.13.2",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
@@ -74,13 +74,13 @@
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.57.0",
-    "@typescript-eslint/parser": "^8.57.0",
-    "@typescript/native-preview": "7.0.0-dev.20260315.1",
+    "@typescript-eslint/eslint-plugin": "^8.57.2",
+    "@typescript-eslint/parser": "^8.57.2",
+    "@typescript/native-preview": "7.0.0-dev.20260323.1",
     "@vitejs/plugin-react": "^6.0.1",
     "better-sqlite3": "^12.8.0",
     "camelcase-keys": "^10.0.2",
-    "eslint": "^10.0.3",
+    "eslint": "^10.1.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react": "^7.37.5",
@@ -89,8 +89,16 @@
     "madge": "^8.0.0",
     "prettier": "^3.8.1",
     "react-dom": "^19.2.4",
-    "typescript": "^5.9.3",
-    "vite": "^8.0.0",
-    "vitest": "^4.1.0"
+    "typescript": "^6.0.2",
+    "vite": "^8.0.2",
+    "vitest": "^4.1.1"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "eslint-plugin-react>eslint": "10",
+        "eslint-plugin-react-hooks>eslint": "10"
+      }
+    }
   }
 }
