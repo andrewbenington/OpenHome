@@ -219,11 +219,18 @@ function BoxCell({
 
   const handleMouseEnter = useCallback(
     (e: React.MouseEvent) => {
-      if (multiSelectEnabled && e.buttons === 1 && mon && onToggleSelect && !isSelected) {
+      if (
+        !dragData &&
+        multiSelectEnabled &&
+        e.buttons === 1 &&
+        mon &&
+        onToggleSelect &&
+        !isSelected
+      ) {
         onToggleSelect()
       }
     },
-    [multiSelectEnabled, mon, onToggleSelect, isSelected]
+    [dragData, multiSelectEnabled, mon, onToggleSelect, isSelected]
   )
 
   return (
@@ -260,6 +267,7 @@ function BoxCell({
                 }}
                 dragData={dragData}
                 dragID={dragID}
+                isSelected={isSelected}
                 disabled={disabled || isFilteredOut}
                 topRightIndicator={topRightIndicator}
                 showItem={showItem}

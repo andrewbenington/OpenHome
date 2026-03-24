@@ -12,6 +12,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { isMonLocation, MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { MetadataLookup } from '@pkm-rs/pkg'
+import { Badge } from '@radix-ui/themes'
 import { ReactNode, useCallback, useState } from 'react'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/core/pkm/util'
 import PokemonIcon from 'src/ui/components/PokemonIcon'
@@ -253,17 +254,24 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
           />
         ) : (
           dragState.payload?.kind === 'mon' && (
-            <PokemonIcon
-              dexNumber={dragState.payload?.monData.mon.dexNum ?? 0}
-              formeNumber={formeNumber}
-              isShiny={dragState.payload?.monData.mon.isShiny()}
-              heldItemIndex={dragState.payload?.monData.mon.heldItemIndex}
-              onlyItem={
-                dragOverId === 'item-bag' && Boolean(dragState.payload?.monData.mon.heldItemIndex)
-              }
-              extraFormIndex={dragState.payload?.monData.mon.extraFormIndex}
-              style={{ width: '100%', height: '100%' }}
-            />
+            <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+              <PokemonIcon
+                dexNumber={dragState.payload?.monData.mon.dexNum ?? 0}
+                formeNumber={formeNumber}
+                isShiny={dragState.payload?.monData.mon.isShiny()}
+                heldItemIndex={dragState.payload?.monData.mon.heldItemIndex}
+                onlyItem={
+                  dragOverId === 'item-bag' && Boolean(dragState.payload?.monData.mon.heldItemIndex)
+                }
+                extraFormIndex={dragState.payload?.monData.mon.extraFormIndex}
+                style={{ width: '100%', height: '100%' }}
+              />
+              {dragState.selectedLocations.length > 1 && (
+                <Badge variant="solid" style={{ position: 'absolute', top: 0, left: 0 }}>
+                  {dragState.selectedLocations.length}
+                </Badge>
+              )}
+            </div>
           )
         )}
       </DragOverlay>
