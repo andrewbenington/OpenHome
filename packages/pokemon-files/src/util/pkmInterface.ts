@@ -173,6 +173,8 @@ export interface AllPKMFields {
 
   metadata?: FormeMetadata
 
+  originalBytes?: ArrayBuffer
+
   toBytes: ((_options?: types.ToBytesOptions) => ArrayBuffer) | (() => ArrayBuffer)
   extraDisplayFields?: () => Record<string, string | number | boolean>
 }

@@ -16,6 +16,7 @@ import {
   ShinyLeaves,
   SpeciesAndForme,
   SpeciesLookup,
+  Tag,
   TrainerData,
   TrainerMemory,
   updatePidIfWouldBecomeShinyGen345,
@@ -334,6 +335,17 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       this.tmFlagsSV = other.tmFlagsSV
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
+
+      if (other.originalBytes) {
+        const tag = monFormatToOriginalDataTag(other.format)
+        if (tag) {
+          try {
+            this.trySetOriginalData(tag, new Uint8Array(other.originalBytes))
+          } catch (e) {
+            console.error('Failed to set original data from bytes', e)
+          }
+        }
+      }
     }
     if (this.openhomeId === '0004-d889ca57-401aab08-30') {
       this.extraFormIndex = ExtraFormIndex.CharizardClone
@@ -968,6 +980,38 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.ability !== undefined &&
       this.ability.index === hiddenOrFirst.index
     )
+  }
+}
+function monFormatToOriginalDataTag(format: string): Option<Tag> {
+  switch (format) {
+    case 'PK1':
+      return Tag.Pk1
+    case 'PK2':
+      return Tag.Pk2
+    case 'PK3':
+      return Tag.Pk3
+    case 'PK4':
+      return Tag.Pk4
+    case 'PK5':
+      return Tag.Pk5
+    case 'PK6':
+      return Tag.Pk6
+    case 'PK7':
+      return Tag.Pk7
+    case 'PB7':
+      return Tag.Pb7
+    case 'PK8':
+      return Tag.Pk8
+    case 'PA8':
+      return Tag.Pa8
+    case 'PB8':
+      return Tag.Pb8
+    case 'PK9':
+      return Tag.Pk9
+    case 'PA9':
+      return Tag.Pa9
+    default:
+      return undefined
   }
 }
 
