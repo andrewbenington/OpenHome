@@ -44462,7 +44462,10 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 forme_index: 0,
                 is_base_forme: true,
                 is_mega: false,
-                mega_evolution_data: &[],
+                mega_evolution_data: &[MegaEvolutionMetadata {
+                    mega_forme: unsafe { SpeciesAndForme::new_unchecked(807, 1) },
+                    required_item_id: Some(2586),
+                }],
                 is_gmax: false,
                 is_battle_only: false,
                 is_cosmetic: false,
