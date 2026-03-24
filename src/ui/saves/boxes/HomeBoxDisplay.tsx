@@ -1,6 +1,4 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { R, range } from '@openhome-core/util/functional'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
@@ -41,6 +39,7 @@ import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 import DroppableSpace from './DroppableSpace'
 import './style.css'
+import { importMonsIfNotPresent } from 'src/ui/saves/boxes/ImportUtil.tsx'
 
 const COLUMN_COUNT = 12
 const ROW_COUNT = 10
@@ -231,32 +230,14 @@ function SingleBoxMonDisplay() {
 
   const attemptImportMons = useCallback(
     (mons: PKMInterface[], location: MonLocation) => {
-      for (const mon of mons) {
-        try {
-          const identifier = getMonFileIdentifier(new OHPKM(mon))
-
-          if (!identifier) continue
-
-          if (!ALLOW_DUPE_IMPORT && ohpkmStore.monIsStored(identifier)) {
-            const message =
-              mons.length === 1
-                ? 'This Pokémon has been moved into OpenHome before.'
-                : 'One or more of these Pokémon has been moved into OpenHome before.'
-
-            dispatchError({
-              type: 'set_message',
-              payload: { title: 'Import Failed', messages: [message] },
-            })
-            return
-          }
-        } catch (e) {
-          dispatchError({
-            type: 'set_message',
-            payload: { title: 'Import Failed', messages: [`${e}`] },
-          })
-        }
-      }
-      importMonsToLocation(mons, location)
+      importMonsIfNotPresent(
+        mons,
+        ohpkmStore,
+        dispatchError,
+        importMonsToLocation,
+        location,
+        ALLOW_DUPE_IMPORT
+      )
     },
     [dispatchError, importMonsToLocation, ohpkmStore]
   )

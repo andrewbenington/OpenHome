@@ -23,6 +23,7 @@ import { includeClass } from '../../util/style'
 import { buildBackwardNavigator, buildForwardNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
+import { importMonsIfNotPresent } from 'src/ui/saves/boxes/ImportUtil.tsx'
 
 interface OpenSaveDisplayProps {
   saveIndex: number
@@ -73,32 +74,14 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       return
     }
 
-    for (const mon of mons) {
-      try {
-        const identifier = getMonFileIdentifier(new OHPKM(mon))
-
-        if (!identifier) continue
-
-        if (!ALLOW_DUPE_IMPORT && ohpkmStore.monIsStored(identifier)) {
-          const message =
-            mons.length === 1
-              ? 'This Pokémon has been moved into OpenHome before.'
-              : 'One or more of these Pokémon has been moved into OpenHome before.'
-
-          dispatchError({
-            type: 'set_message',
-            payload: { title: 'Import Failed', messages: [message] },
-          })
-          return
-        }
-      } catch (e) {
-        dispatchError({
-          type: 'set_message',
-          payload: { title: 'Import Failed', messages: [`${e}`] },
-        })
-      }
-    }
-    importMonsToLocation(mons, location)
+    importMonsIfNotPresent(
+      mons,
+      ohpkmStore,
+      dispatchError,
+      importMonsToLocation,
+      location,
+      ALLOW_DUPE_IMPORT
+    )
   }
 
   const isDisabled = useCallback(
