@@ -152,6 +152,7 @@ pub enum SignificantUpdate {
     V1_9_0,
     V1_9_1,
     V1_9_2,
+    V1_10_0,
 }
 
 impl SignificantUpdate {
@@ -167,6 +168,7 @@ impl SignificantUpdate {
             Self::V1_9_0 => Version::parse("1.9.0").unwrap(),
             Self::V1_9_1 => Version::parse("1.9.1").unwrap(),
             Self::V1_9_2 => Version::parse("1.9.2").unwrap(),
+            Self::V1_10_0 => Version::parse("1.10.0").unwrap(),
         }
     }
 
@@ -216,6 +218,21 @@ impl SignificantUpdate {
             Self::V1_9_2 => Some(vec![String::from(
                 "Fixed a regression causing some Pokémon to 'devolve'",
             )]),
+            Self::V1_10_0 => Some(vec![
+                String::from(
+                    "Multi-select/drag is now supported in OpenHome boxes. Use the button in the Home boxes to the top right (next to the name edit button) to toggle multi-select",
+                ),
+                String::from("Support for Pokémon Luminescent Platinum has been added"),
+                String::from(
+                    "Cosplay Pikachu and Pokémon with forms exclusive to ROM hacks can now be moved into OpenHome and to supported save files",
+                ),
+                String::from(
+                    "Using the Display tab in the Pokémon details modal, you can assign tags and background colors to your Pokémon",
+                ),
+                String::from(
+                    "Image resources have been replaced to reduce bundle size and loading times",
+                ),
+            ]),
             _ => None,
         }
     }
