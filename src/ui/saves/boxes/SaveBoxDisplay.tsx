@@ -2,10 +2,11 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
+import { monSupportedBySave } from '@openhome-core/save/util'
 import { range } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
-import { ItemBuilder, OpenHomeCtxMenu } from '@openhome-ui/components/context-menu'
+import { ItemBuilder, OpenHomeCtxMenu, SubmenuBuilder } from '@openhome-ui/components/context-menu'
 import Fallback from '@openhome-ui/components/Fallback'
 import { MenuIcon } from '@openhome-ui/components/Icons'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
@@ -39,7 +40,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
   const [selectedIndex, setSelectedIndex] = useState<number>()
-  const { dragState } = useDragAndDrop()
+  const { dragState, toggleSelection, isSelected } = useDragAndDrop()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
 
@@ -57,7 +58,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   }, [currentBox, ohpkmStore, selectedIndex])
 
   const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
-    const unsupportedMons = mons.filter((mon) => !save.supportsMon(mon.dexNum, mon.formeNum))
+    const unsupportedMons = mons.filter((mon) => !monSupportedBySave(save, mon))
 
     if (unsupportedMons.length) {
       dispatchError({
@@ -111,17 +112,26 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         return !save.supportsItem(dragPayload.item.index)
       }
 
-      const dragData = dragPayload.monData
+      const draggingMons = Array.isArray(dragPayload.monData)
+        ? dragPayload.monData
+        : [dragPayload.monData]
 
-      if (!dragData || Object.entries(dragData).length === 0) return false
+      for (const monWithLocation of draggingMons) {
+        if (!monWithLocation || Object.entries(monWithLocation).length === 0) return false // Handles a glitch that occurs when navigating between boxes and the payload becomes an empty object
 
-      const sourceSave = dragData.isHome ? undefined : saveFromIdentifier(dragData.saveIdentifier)
+        const sourceSave = monWithLocation.isHome
+          ? undefined
+          : saveFromIdentifier(monWithLocation.saveIdentifier)
 
-      const sourceIsOpenHome = !sourceSave
-      return (
-        !save.supportsMon(dragData.mon.dexNum, dragData.mon.formeNum) ||
-        (mon && !sourceIsOpenHome && !sourceSave.supportsMon(mon.dexNum, mon.formeNum))
-      )
+        const sourceIsOpenHome = !sourceSave
+        const monIsIncompatible =
+          !monSupportedBySave(save, monWithLocation.mon) ||
+          (mon && !sourceIsOpenHome && !monSupportedBySave(sourceSave, mon))
+
+        if (monIsIncompatible) return true
+      }
+
+      return false
     },
     [dragState?.payload, saveFromIdentifier, save]
   )
@@ -167,35 +177,39 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           <Grid columns={save.boxColumns.toString()} gap="1" p="1">
             {range(save.boxColumns * save.boxRows)
               .map((index: number) => currentBox?.boxSlots?.[index])
-              .map((mon, index) => (
-                <BoxCell
-                  onClick={() => setSelectedIndex(index)}
-                  key={`${save.currentPCBox}-${index}`}
-                  dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
-                  location={{
-                    isHome: false,
-                    box: save.currentPCBox,
-                    boxSlot: index,
-                    saveIdentifier: save.identifier,
-                  }}
-                  disabled={
-                    isDisabled(mon) || save.getSlotMetadata?.(save.currentPCBox, index)?.isDisabled
-                  }
-                  disabledReason={save.getSlotMetadata?.(save.currentPCBox, index)?.disabledReason}
-                  mon={mon ? ohpkmStore.monOrOhpkmIfTracked(mon) : undefined}
-                  zIndex={1}
-                  onDrop={(importedMons) => {
-                    if (importedMons) {
-                      attemptImportMons(importedMons, {
-                        isHome: false,
-                        box: save.currentPCBox,
-                        boxSlot: index,
-                        saveIdentifier: save.identifier,
-                      })
+              .map((mon, index) => {
+                const location: MonLocation = {
+                  isHome: false,
+                  box: save.currentPCBox,
+                  boxSlot: index,
+                  saveIdentifier: save.identifier,
+                }
+                return (
+                  <BoxCell
+                    onClick={() => setSelectedIndex(index)}
+                    key={`${save.currentPCBox}-${index}`}
+                    dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
+                    location={location}
+                    disabled={
+                      isDisabled(mon) ||
+                      save.getSlotMetadata?.(save.currentPCBox, index)?.isDisabled
                     }
-                  }}
-                />
-              ))}
+                    disabledReason={
+                      save.getSlotMetadata?.(save.currentPCBox, index)?.disabledReason
+                    }
+                    mon={mon ? ohpkmStore.monOrOhpkmIfTracked(mon) : undefined}
+                    zIndex={1}
+                    onDrop={(importedMons) => {
+                      if (importedMons) {
+                        attemptImportMons(importedMons, location)
+                      }
+                    }}
+                    multiSelectEnabled={dragState.multiSelectEnabled}
+                    isSelected={isSelected(location)}
+                    onToggleSelect={() => toggleSelection(location)}
+                  />
+                )
+              })}
           </Grid>
         </Card>
         <Dialog.Root open={detailsModal} onOpenChange={setDetailsModal}>
@@ -277,11 +291,28 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
   const savesManager = useSaves()
   const backend = useContext(BackendContext)
 
+  const currentBoxMonCount = save.boxes[save.currentPCBox]?.boxSlots.filter(Boolean).length ?? 0
+  const totalMonCount = save.boxes.reduce(
+    (sum, box) => sum + (box?.boxSlots.filter(Boolean).length ?? 0),
+    0
+  )
+
   const contextElements = [
     ItemBuilder.fromLabel('Details...').withAction(() => setDetailsModal(true)),
     ItemBuilder.fromLabel('Open file location').withAction(() =>
       backend.openDirectory(save.filePath.dir)
     ),
+    SubmenuBuilder.fromLabel('Move to Bank...')
+      .withBuilder(
+        ItemBuilder.fromLabel(`This Box (${currentBoxMonCount})`).withAction(() => {
+          savesManager.moveBoxToBank(save)
+        })
+      )
+      .withBuilder(
+        ItemBuilder.fromLabel(`Entire Save (${totalMonCount})`).withAction(() => {
+          savesManager.moveSaveToBank(save)
+        })
+      ),
   ]
 
   return (

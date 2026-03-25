@@ -1,4 +1,4 @@
-VERSION=1.9.2
+VERSION=1.10.0
 
 .PHONY: help
 help: # Display this help.
@@ -79,6 +79,7 @@ set-version:
 	@cd pkm_rs_resources && cargo set-version $(VERSION)
 	@cd pkm_rs_types && cargo set-version $(VERSION)
 	@pnpm version $(VERSION) --no-git-tag-version --allow-same-version 
+	@pnpm i
 
 .PHONY: release-mac
 release-mac:

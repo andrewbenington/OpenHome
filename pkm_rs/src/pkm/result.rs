@@ -46,10 +46,13 @@ pub enum Error {
         value: u16,
         game: NdexConvertSource,
     },
-
     FormeIndex {
         national_dex: NatDexIndex,
         forme_index: u16,
+    },
+    ExtraFormIndex {
+        national_dex: NatDexIndex,
+        extra_form_index: u64,
     },
     LanguageIndex {
         language_index: u8,
@@ -88,6 +91,10 @@ impl Error {
 
     pub const fn plugin_origin(error: FromUtf8Error) -> Self {
         Self::StringDecode { source: StringErrorSource::PluginOrigin(error) }
+    }
+
+    pub const fn extra_form_index(national_dex: NatDexIndex, extra_form_index: u64) -> Self {
+        Self::ExtraFormIndex { national_dex, extra_form_index }
     }
 }
 
@@ -128,6 +135,17 @@ impl Display for Error {
                     "Invalid forme index {forme_index} for Pokémon {} (must be <= {})",
                     species_metadata.name,
                     species_metadata.formes.len()
+                )
+                .to_owned()
+            }
+            Error::ExtraFormIndex {
+                national_dex,
+                extra_form_index,
+            } => {
+                let species_metadata = national_dex.get_species_metadata();
+                format!(
+                    "Invalid extra form index {extra_form_index} (Pokémon species {})",
+                    species_metadata.name
                 )
                 .to_owned()
             }

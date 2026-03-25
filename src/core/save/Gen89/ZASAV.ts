@@ -1,5 +1,5 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Gender, Languages, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { PA9 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
@@ -16,6 +16,10 @@ import { G89BlockName, G89SAV } from './G89SAV'
 export type ZA_SAVE_REVISION = 'Base Game' | 'Mega Dimension'
 
 const BOX_SLOT_GAP_BYTES = 0x40
+const SAVE_SIZE_1_0_0 = 0x2f3284
+const SAVE_SIZE_1_0_2 = 0x2f3289
+const SAVE_SIZE_2_0_0 = 0x309fa6
+const SAVE_SIZE_2_0_1 = 0x309fb3
 
 export class ZASAV extends G89SAV<PA9> {
   static boxSizeBytes = (PA9.getBoxSize() + BOX_SLOT_GAP_BYTES) * 30
@@ -96,7 +100,8 @@ export class ZASAV extends G89SAV<PA9> {
     return BOX_SLOT_GAP_BYTES
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     const revision = this.scBlocks ? this.getSaveRevision() : 'Mega Dimension'
     switch (revision) {
       case 'Base Game':
@@ -135,6 +140,13 @@ export class ZASAV extends G89SAV<PA9> {
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {
+    if (
+      ![SAVE_SIZE_1_0_0, SAVE_SIZE_1_0_2, SAVE_SIZE_2_0_0, SAVE_SIZE_2_0_1].includes(
+        bytes.byteLength
+      )
+    ) {
+      return false
+    }
     try {
       if (!SwishCrypto.getIsHashValid(bytes)) {
         return false

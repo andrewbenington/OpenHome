@@ -1,4 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import PK3RR from '@openhome-core/save/radicalred/PK3RR'
 import PK3UB from '@openhome-core/save/unbound/PK3UB'
 import { AllPKMFields } from '../util'
@@ -35,9 +36,13 @@ export type PKM =
   | PK9
   | PA9
 
-export type RomHackPKM = PK3RR | PK3UB
+export type RomHackPKM = PK3RR | PK3UB | PB8LUMI
 
 export type PkmClass = new (
   arg: ArrayBuffer | AllPKMFields,
   encrypted?: boolean | undefined
 ) => PKMInterface
+
+export function isRomHackFormat(format: string): format is 'PK3RR' | 'PK3UB' | 'PB8LUMI' {
+  return format === 'PK3RR' || format === 'PK3UB' || format === 'PB8LUMI'
+}

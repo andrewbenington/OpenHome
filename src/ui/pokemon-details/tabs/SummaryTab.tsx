@@ -8,15 +8,31 @@ import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
-import { colorForType } from '@openhome-ui/util/color'
-import { genderFromBool, MetadataLookup } from '@pkm-rs/pkg'
+import { colorForType, colorIsDark } from '@openhome-ui/util/color'
+import {
+  extraFormDisplayName,
+  genderFromBool,
+  getPluginColor,
+  MetadataLookup,
+  OriginGames,
+} from '@pkm-rs/pkg'
+import { PKM } from '@pokemon-files/pkm/PKM'
 import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
+import { MonTag } from 'src/ui/util/tags'
+import { TagIcon } from '../../components/TagIcon'
 import useMonSprite from '../useMonSprite'
+
+type MonWithManagementData = PKMInterface & {
+  tags?: MonTag[]
+}
 
 const SummaryDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
+  const tags = useMemo(() => {
+    return (mon as MonWithManagementData).tags ?? []
+  }, [mon])
   const spriteResult = useMonSprite({
     dexNum: mon.dexNum,
     formeNum: mon.formeNum,
@@ -24,6 +40,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
     isShiny: mon.isShiny(),
     isFemale: mon.gender === 1,
     format: mon.format,
+    extraFormIndex: mon.extraFormIndex,
   })
 
   const itemAltText = useMemo(() => {
@@ -35,8 +52,8 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
 
   return (
     <Grid columns="2" width="100%" p="3" gap="2">
-      <div>
-        <div className="summary-column">
+      <Flex direction="column" gap="2">
+        <div className="mon-image-container">
           {spriteResult.loading ? (
             <Spinner style={{ margin: 'auto', height: 32 }} />
           ) : spriteResult.path ? (
@@ -96,6 +113,23 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           )}
           <div>{mon.heldItemName}</div>
         </AttributeRow>
+        <Flex direction="row" gap="1" align="center" wrap="wrap">
+          {tags.length > 0 &&
+            tags.map((tag, i) => (
+              <Badge
+                key={i}
+                variant="solid"
+                size="1"
+                style={{
+                  backgroundColor: tag.color ?? '#888',
+                  color: colorIsDark(tag.color ?? '#888') ? '#fff' : '#000',
+                }}
+              >
+                <TagIcon iconName={tag.icon} size={10} />
+                {tag.label}
+              </Badge>
+            ))}
+        </Flex>
         <div>
           {mon.isShiny() && (
             <AttributeTag
@@ -126,12 +160,32 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />
           )}
         </div>
-      </div>
+      </Flex>
       <Flex direction="column" gap="2px">
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow label="Species">
           <Flex gap="1">
-            {MetadataLookup(mon.dexNum, mon.formeNum)?.formeName}
+            {mon.extraFormIndex ? (
+              <span
+                className="extra-form-name"
+                style={{
+                  color: colorIsDark(
+                    mon.pluginOrigin
+                      ? getPluginColor(mon.pluginOrigin)
+                      : OriginGames.color(mon.gameOfOrigin)
+                  )
+                    ? '#fff'
+                    : '#000',
+                  backgroundColor: mon.pluginOrigin
+                    ? getPluginColor(mon.pluginOrigin)
+                    : OriginGames.color(mon.gameOfOrigin),
+                }}
+              >
+                {extraFormDisplayName(mon.extraFormIndex)}
+              </span>
+            ) : (
+              MetadataLookup(mon.dexNum, mon.formeNum)?.formeName
+            )}
             <GenderIcon gender={mon.gender} />
           </Flex>
         </AttributeRow>
@@ -147,7 +201,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             <GenderIcon gender={genderFromBool(mon.trainerGender)} />
           </Flex>
         </AttributeRow>
-        <AttributeRow label="Trainer ID" value={getDisplayID(mon as any)} />
+        <AttributeRow label="Trainer ID" value={getDisplayID(mon as PKM)} />
         {mon.ability !== undefined && (
           <AttributeRow
             label="Ability"

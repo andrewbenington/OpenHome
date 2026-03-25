@@ -5,7 +5,7 @@ import {
   uint16ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
-import { OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'
@@ -178,7 +178,11 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     return new PK4(ohpkm)
   }
 
-  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract supportsMon(
+    dexNumber: number,
+    formeNumber: number,
+    extraFormIndex?: ExtraFormIndex
+  ): boolean
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]

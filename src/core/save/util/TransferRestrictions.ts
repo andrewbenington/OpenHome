@@ -4,6 +4,7 @@ import {
   LGE_STARTER,
   LGP_STARTER,
   MAROWAK_ALOLA_TOTEM,
+  SPIKY_EAR,
 } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 
@@ -19,8 +20,18 @@ export interface TransferRestrictions {
   // e.g. Alolan forms in BDSP
   excludedForms?: FormRestrictions
 }
+
 export const CapPikachus: FormRestrictions = {
   [NationalDex.Pikachu]: [1, 2, 3, 4, 5, 6, 7, 9],
+}
+
+export const CapAndStarterPikachus: FormRestrictions = {
+  [NationalDex.Pikachu]: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+}
+
+export const LgpeStarters: FormRestrictions = {
+  [NationalDex.Pikachu]: [LGP_STARTER],
+  [NationalDex.Eevee]: [LGE_STARTER],
 }
 
 export const AlolanForms: FormRestrictions = {
@@ -101,13 +112,16 @@ export const TransferLockedForms: FormRestrictions = {
 export const LegendsArceusExcludedForms: FormRestrictions = {
   ...AlolanForms,
   ...GalarianForms,
+  ...CapAndStarterPikachus,
   [NationalDex.Vulpix]: undefined,
   [NationalDex.Ninetales]: undefined,
   [NationalDex.Growlithe]: [BASE],
   [NationalDex.Arcanine]: [BASE],
   [NationalDex.Voltorb]: [BASE],
   [NationalDex.Electrode]: [BASE],
+  [NationalDex.Eevee]: [LGE_STARTER],
   [NationalDex.Typhlosion]: [BASE],
+  [NationalDex.Pichu]: [SPIKY_EAR],
   [NationalDex.Qwilfish]: [BASE],
   [NationalDex.Sneasel]: undefined,
   [NationalDex.Samurott]: [BASE],

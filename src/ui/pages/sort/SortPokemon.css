@@ -1,0 +1,19 @@
+.sort-mon-cell {
+  width: 36px;
+  height: 36px;
+  margin: 4px;
+  border-radius: 4px;
+  border-width: 2px;
+  border-style: solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sort-mon-button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  width: 30px;
+  height: 30px;
+}

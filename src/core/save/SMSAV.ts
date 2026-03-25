@@ -1,5 +1,5 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
 import { Item } from '@pokemon-resources/consts/Items'
 import { SM_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { G7SAV } from './G7SAV'
@@ -26,7 +26,8 @@ export class SMSAV extends G7SAV {
     return PC_OFFSET
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     return !isRestricted(SM_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 

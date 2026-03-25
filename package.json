@@ -1,7 +1,7 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "1.9.2",
+  "version": "1.10.0",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "pokemon",
@@ -56,6 +56,7 @@
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.20",
     "fp-ts": "^2.16.11",
+    "immer": "^11.1.4",
     "prando": "^6.0.1",
     "radix-ui": "^1.4.3",
     "react": "^19.2.4",
@@ -64,11 +65,14 @@
     "react-error-boundary": "^6.1.1",
     "react-icons": "^5.6.0",
     "react-router": "^7.13.2",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
     "@tauri-apps/cli": "^2.10.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/crypto-js": "^4.2.2",
     "@types/lodash": "^4.17.24",
     "@types/node": "^25.5.0",
@@ -86,10 +90,11 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
+    "jsdom": "^28.1.0",
     "madge": "^8.0.0",
     "prettier": "^3.8.1",
     "react-dom": "^19.2.4",
-    "typescript": "^6.0.2",
+    "typescript": "^5.9.3",
     "vite": "^8.0.2",
     "vitest": "^4.1.1"
   },

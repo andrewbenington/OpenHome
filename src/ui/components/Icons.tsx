@@ -16,6 +16,7 @@ import {
   MdGrid4X4,
   MdInfo,
   MdMoreVert,
+  MdSelectAll,
 } from 'react-icons/md'
 import { TiMinus, TiPlus } from 'react-icons/ti'
 
@@ -43,3 +44,5 @@ export const InfoIcon = MdInfo
 export const SuccessIcon = MdCheckCircle
 
 export const DevIcon = MdDataObject
+
+export const SelectIcon = MdSelectAll

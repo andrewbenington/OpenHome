@@ -24,6 +24,7 @@ import {
   OhpkmIdentifier,
 } from '../../../core/pkm/Lookup'
 import { BoxAndSlot, SAV } from '../../../core/save/interfaces'
+import { LP_TRANSFER_RESTRICTIONS } from '../../../core/save/luminescentplatinum/G8LUMISAV'
 import { RR_TRANSFER_RESTRICTIONS } from '../../../core/save/radicalred/G3RRSAV'
 import { UB_TRANSFER_RESTRICTIONS } from '../../../core/save/unbound/G3UBSAV'
 import { buildUnknownSaveFile } from '../../../core/save/util/load'
@@ -33,14 +34,14 @@ import { filterUndefined } from '../../../core/util/sort'
 import { SaveRef } from '../../../core/util/types'
 import { BackendContext } from '../../backend/backendContext'
 import useDisplayError from '../../hooks/displayError'
+import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { AppInfoContext } from '../../state/appInfo'
 import { useLookups } from '../../state/lookups'
 import { OhpkmStoreData, useOhpkmStore } from '../../state/ohpkm'
-import { useSaves } from '../../state/saves'
 
 export function useManageTracked() {
   const ohpkmStore = useOhpkmStore()
-  const { homeData } = useSaves()
+  const { findHomeLocation } = useBanksAndBoxes()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { lookups } = useLookups()
   const backend = useContext(BackendContext)
@@ -160,7 +161,7 @@ export function useManageTracked() {
 
     const allStoredById = ohpkmStore.byId
     const allStoredIdsNotInBoxes = new Set(
-      Object.keys(allStoredById).filter((id) => homeData.findIfPresent(id) === undefined)
+      Object.keys(allStoredById).filter((id) => findHomeLocation(id) === undefined)
     )
     const totalMons = allStoredIdsNotInBoxes.size
     let foundMonIds = new Set<string>()
@@ -250,7 +251,15 @@ export function useManageTracked() {
       totalMons,
       missingMonIds: allMissingIdsNotInBoxes,
     })
-  }, [backend, displayError, enabledSaveTypes, homeData, lookups.gen12, lookups.gen345, ohpkmStore])
+  }, [
+    backend,
+    displayError,
+    enabledSaveTypes,
+    findHomeLocation,
+    lookups.gen12,
+    lookups.gen345,
+    ohpkmStore,
+  ])
 
   return {
     findSaveForMon,
@@ -295,6 +304,8 @@ function monPossiblySupported(dexNumber: number, formeNumber: number, saveRef: S
     return isSupported(RR_TRANSFER_RESTRICTIONS)
   } else if (saveRef.pluginIdentifier === 'unbound') {
     return isSupported(UB_TRANSFER_RESTRICTIONS)
+  } else if (saveRef.pluginIdentifier === 'luminescent_platinum') {
+    return isSupported(LP_TRANSFER_RESTRICTIONS)
   }
 
   switch (OriginGames.generation(saveRef.game)) {

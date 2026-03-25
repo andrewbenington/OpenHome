@@ -1,6 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
-import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
+import { SaveFolder, SimpleOpenHomeBox, StoredBankData } from '@openhome-core/save/util/storage'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { JSONObject, LoadSaveResponse, SaveRef } from '@openhome-core/util/types'
 import BackendInterface, {
@@ -345,14 +345,19 @@ function deserializeBankData(data: StoredBankDataSerialized): StoredBankData {
     ...data,
     banks: data.banks.map((bank) => ({
       ...bank,
-      boxes: bank.boxes.map((box) => ({
-        ...box,
-        identifiers: new Map(
-          Object.entries(box.identifiers).map(
-            ([indexStr, identifier]) => [parseInt(indexStr), identifier] as const
-          )
-        ),
-      })),
+      boxes: new Map(
+        bank.boxes.map((box) => {
+          const simpleBox: SimpleOpenHomeBox = {
+            ...box,
+            identifiers: new Map(
+              Object.entries(box.identifiers).map(
+                ([indexStr, identifier]) => [parseInt(indexStr), identifier] as const
+              )
+            ),
+          }
+          return [box.index, simpleBox] as const
+        })
+      ),
     })),
   }
 }
@@ -362,7 +367,7 @@ function serializeBankData(data: StoredBankData): StoredBankDataSerialized {
     ...data,
     banks: data.banks.map((bank) => ({
       ...bank,
-      boxes: bank.boxes.map((box) => ({
+      boxes: Array.from(bank.boxes.values()).map((box) => ({
         ...box,
         identifiers: Object.fromEntries(box.identifiers.entries()),
       })),

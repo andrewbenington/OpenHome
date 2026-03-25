@@ -1,4 +1,4 @@
-import { useAppState } from '@openhome-ui/state/app-state'
+import { useTransactionState } from '@openhome-ui/state/app-state'
 import { Button, Dialog, Flex, Heading, ScrollArea, Separator } from '@radix-ui/themes'
 import { useState } from 'react'
 
@@ -8,7 +8,7 @@ export type UpdateMessageModalProps = {
 
 export default function UpdateMessageModal() {
   const [acknowledged, setAcknowledged] = useState(false)
-  const appState = useAppState()
+  const appState = useTransactionState()
 
   return (
     <Dialog.Root

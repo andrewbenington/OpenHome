@@ -1,7 +1,7 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
-import { Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { LookupType, SAVClass } from './util'
 import { PathData } from './util/path'
@@ -155,7 +155,11 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract tooEarlyToOpen: boolean
   abstract updatedBoxSlots: BoxAndSlot[]
   abstract getCurrentBox(): Box<P>
-  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract supportsMon(
+    dexNumber: number,
+    formeNumber: number,
+    extraFormIndex?: ExtraFormIndex
+  ): boolean
   abstract supportsItem(itemIndex: number): boolean
   abstract getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined
   abstract prepareForSaving(): void
@@ -214,7 +218,7 @@ export function getSaveRef(save: SAV): SaveRef {
     valid: true,
   }
 }
-export type PluginIdentifier = 'radical_red' | 'unbound'
+export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum'
 
 export function pluginGameName(identifier: PluginIdentifier): string {
   switch (identifier) {
@@ -222,6 +226,10 @@ export function pluginGameName(identifier: PluginIdentifier): string {
       return 'Radical Red'
     case 'unbound':
       return 'Unbound'
+    case 'luminescent_platinum':
+      return 'Luminescent Platinum'
+    default:
+      return 'Unknown Plugin'
   }
 }
 
@@ -230,6 +238,10 @@ export function pluginOriginMarkPath(identifier: PluginIdentifier): string | und
     case 'radical_red':
     case 'unbound':
       return '/icons/gba.png'
+    case 'luminescent_platinum':
+      return '/origin_marks/Bdsp.png'
+    default:
+      return undefined
   }
 }
 export const Delimiter = '$' as const

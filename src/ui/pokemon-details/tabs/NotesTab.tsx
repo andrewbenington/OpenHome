@@ -14,7 +14,7 @@ export default function NotesDisplay(props: { mon: OHPKM }) {
   }, [mon])
 
   const debouncedNotesUpdate = useDebounce((notes: string) => {
-    updateMonNotes(mon.openhomeId, notes)
+    updateMonNotes(mon.openhomeId, notes || undefined)
   }, 500)
 
   return (

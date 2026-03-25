@@ -8,6 +8,7 @@ import { TopRightIndicator } from 'src/ui/components/pokemon/indicator/TopRightI
 import PokemonIcon from '../../components/PokemonIcon'
 import { TopRightIndicatorType } from '../../hooks/useMonDisplay'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
+import { MonTag } from '../../util/tags'
 
 const getBackgroundDetails = (disabled?: boolean) => {
   if (disabled) {
@@ -25,22 +26,39 @@ export interface DraggableMonProps {
   onClick: () => void
   disabled?: boolean
   mon: PKMInterface
-  style: any
+  style: CSSProperties
   dragID?: string
   dragData?: MonWithLocation
+  isSelected?: boolean
   topRightIndicator?: TopRightIndicatorType | null
   showShiny?: boolean
   showItem?: boolean
 }
 
+type MonWithManagementData = PKMInterface & {
+  tags?: MonTag[]
+  notes?: string
+}
+
 const DraggableMon = (props: DraggableMonProps) => {
-  const { onClick, disabled, mon, dragID, dragData, topRightIndicator, showItem, showShiny } = props
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+  const {
+    onClick,
+    disabled,
+    mon,
+    dragID,
+    dragData,
+    isSelected,
+    topRightIndicator,
+    showItem,
+    showShiny,
+  } = props
+  const { attributes, listeners, setNodeRef, isDragging, active } = useDraggable({
     id: (dragID ?? '') + mon.personalityValue?.toString(),
     data: dragData ? { kind: 'mon', monData: dragData } : undefined,
     disabled: disabled || !dragID,
   })
   const { dragState } = useDragAndDrop()
+  const monWithManagement = mon as MonWithManagementData
 
   const formeNumber = useMemo(() => {
     let formeNumber = mon.formeNum
@@ -64,14 +82,13 @@ const DraggableMon = (props: DraggableMonProps) => {
     [mon, topRightIndicator]
   )
 
-  const style: CSSProperties = useMemo(
-    () => ({
-      width: '100%',
-      height: '100%',
-      visibility: isDragging && dragState.mode === 'mon' ? 'hidden' : undefined,
-    }),
-    [dragState.mode, isDragging]
-  )
+  const shouldHide = isDragging || (active && isSelected)
+
+  const style: CSSProperties = {
+    width: '100%',
+    height: '100%',
+    visibility: shouldHide && dragState.mode === 'mon' ? 'hidden' : undefined,
+  }
 
   return (
     <div
@@ -96,6 +113,11 @@ const DraggableMon = (props: DraggableMonProps) => {
         style={style}
         grayedOut={disabled}
         topRightIndicator={topRightIndicatorComponent}
+        extraFormIndex={mon.extraFormIndex}
+        tags={monWithManagement.tags}
+        hasNotes={
+          typeof monWithManagement.notes === 'string' && monWithManagement.notes.trim().length > 0
+        }
       />
     </div>
   )

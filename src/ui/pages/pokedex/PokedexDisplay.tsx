@@ -99,6 +99,7 @@ function PokedexDetails({
     formeNum: selectedForme.formeIndex,
     format: 'OHPKM',
     isShiny: selectedFormeStatus === 'ShinyCaught' && showShiny,
+    extraFormIndex: undefined,
   })
 
   useEffect(() => {

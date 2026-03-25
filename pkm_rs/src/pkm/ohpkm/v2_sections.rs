@@ -1,3 +1,4 @@
+use crate::pkm::ohpkm::extra_form::ExtraFormIndex;
 use crate::pkm::ohpkm::sectioned_data::DataSection;
 use crate::pkm::ohpkm::{OhpkmV1, SectionTagV2};
 use crate::pkm::traits::{IsShiny4096, OhpkmByte, OhpkmBytes};
@@ -12,19 +13,19 @@ use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesAndForme;
 
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::species::NatDexIndex;
-
-#[cfg(feature = "wasm")]
-use crate::pkm::traits::IsShiny;
-
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{ContestStats, Stats8, Stats16Le, StatsPreSplit, TrainerData};
 use pkm_rs_types::{FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, TeraType};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::num::NonZeroU16;
+
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::species::NatDexIndex;
+
+#[cfg(feature = "wasm")]
+use crate::pkm::traits::IsShiny;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -97,6 +98,7 @@ pub struct MainDataV2 {
     pub language: Language,
     pub form_argument: u32,
     pub affixed_ribbon: Option<ModernRibbon>,
+    pub extra_form: Option<ExtraFormIndex>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
@@ -113,6 +115,8 @@ pub struct MainDataV2 {
     pub obedience_level: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub home_tracker: [u8; 8],
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub display_color_rgb: Option<[u8; 3]>,
 }
 
 impl MainDataV2 {
@@ -186,12 +190,14 @@ impl MainDataV2 {
             language: old.language,
             form_argument: old.form_argument,
             affixed_ribbon: old.affixed_ribbon,
+            extra_form: None,
             trainer_name: old.trainer_name,
             trainer_friendship: old.trainer_friendship,
             trainer_memory: old.trainer_memory,
             trainer_affection: old.trainer_affection,
             obedience_level: old.obedience_level,
             home_tracker: old.home_tracker,
+            display_color_rgb: None,
         }
     }
 
@@ -299,6 +305,11 @@ impl DataSection for MainDataV2 {
             is_nicknamed: util::get_flag(bytes, 148, 31),
             // bytes[152],
             hyper_training: HyperTraining::from_byte(bytes[153]),
+            display_color_rgb: if bytes[160] != 0 {
+                Some(bytes[161..164].try_into().unwrap())
+            } else {
+                None
+            },
             home_tracker: bytes[172..180].try_into().unwrap(),
             handler_name: SizedUtf16String::<26>::from_bytes(bytes[184..210].try_into().unwrap()),
             handler_language: bytes[211],
@@ -333,9 +344,12 @@ impl DataSection for MainDataV2 {
             language: Language::try_from(bytes[242])?,
             form_argument: u32::from_le_bytes(bytes[244..248].try_into().unwrap()),
             affixed_ribbon: ModernRibbon::from_affixed_byte(bytes[248]),
-            // geolocations: Geolocations::from_bytes(bytes[249..259].try_into().unwrap()),
-            // encounter_type: bytes[270],
-            // performance: bytes[271],
+            // gap: 249-263
+
+            // TODO: handle invalid values
+            extra_form: u64::from_le_bytes(bytes[264..272].try_into().unwrap())
+                .try_into()
+                .ok(),
             trainer_name: SizedUtf16String::<26>::from_bytes(bytes[272..298].try_into().unwrap()),
             trainer_friendship: bytes[298],
             trainer_memory: TrainerMemory {
@@ -422,6 +436,11 @@ impl DataSection for MainDataV2 {
 
         bytes[153] = self.hyper_training.to_byte();
 
+        if let Some(rgb) = self.display_color_rgb {
+            bytes[160] = 1;
+            bytes[161..164].copy_from_slice(&rgb);
+        }
+
         // gap: 160..172
 
         bytes[172..180].copy_from_slice(&self.home_tracker);
@@ -460,9 +479,8 @@ impl DataSection for MainDataV2 {
 
         bytes[244..248].copy_from_slice(&self.form_argument.to_le_bytes());
         bytes[248] = ModernRibbon::to_affixed_byte(self.affixed_ribbon);
-        // bytes[249..259].copy_from_slice(&self.geolocations.to_bytes());
-        // bytes[270] = self.encounter_type;
-        // bytes[271] = self.performance;
+        // gap: 249-263
+        bytes[264..272].copy_from_slice(&self.extra_form.map_or(0, |f| f as u64).to_le_bytes());
         bytes[272..298].copy_from_slice(&self.trainer_name);
         bytes[298] = self.trainer_friendship;
 
@@ -1291,8 +1309,10 @@ impl DataSection for MostRecentSave {
     }
 }
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Clone)]
 pub struct PluginData {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub plugin_origin: String,
 }
 
@@ -1314,6 +1334,37 @@ impl PluginData {
     const fn from_origin(plugin_origin: String) -> Self {
         Self { plugin_origin }
     }
+
+    fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
+        if bytes.len() < 2 {
+            return Self::try_from_origin_utf8(bytes);
+        }
+
+        if bytes[0].is_ascii_alphabetic() && bytes[1].is_ascii_alphabetic() {
+            return Self::try_from_origin_utf8(bytes);
+        }
+
+        let origin = String::from_utf8(bytes[2..].to_vec()).map_err(Error::plugin_origin)?;
+
+        Ok(Self {
+            plugin_origin: origin,
+        })
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl PluginData {
+    #[wasm_bindgen(getter = pluginOrigin)]
+    pub fn plugin_origin(&self) -> String {
+        self.plugin_origin.clone()
+    }
+
+    #[wasm_bindgen(setter = pluginOrigin)]
+    pub fn set_plugin_origin(&mut self, value: String) {
+        self.plugin_origin = value;
+    }
 }
 
 impl DataSection for PluginData {
@@ -1324,8 +1375,7 @@ impl DataSection for PluginData {
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::ensure_buffer_size(bytes)?;
-
-        Self::try_from_origin_utf8(bytes)
+        Self::try_from_bytes(bytes)
     }
 
     fn is_empty(&self) -> bool {
@@ -1333,7 +1383,7 @@ impl DataSection for PluginData {
     }
 
     fn to_bytes(&self) -> Result<Vec<u8>> {
-        Ok(self.plugin_origin.clone().into_bytes())
+        Ok(self.plugin_origin.as_bytes().to_vec())
     }
 }
 
@@ -1358,6 +1408,39 @@ impl DataSection for Notes {
 
     fn to_bytes(&self) -> Result<Vec<u8>> {
         Ok(self.0.clone().into_bytes())
+    }
+
+    fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
+
+/// Custom tags for a Pokemon (label + CSS color string + optional icon)
+/// Stored as JSON string
+#[derive(Debug, Default, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct MonTag {
+    pub label: String,
+    pub color: String,
+    pub icon: Option<String>,
+}
+
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+pub struct MonTags(pub Vec<MonTag>);
+
+impl DataSection for MonTags {
+    type TagType = SectionTagV2;
+    const TAG: Self::TagType = SectionTagV2::Tag;
+
+    type ErrorType = Error;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::ensure_buffer_size(bytes)?;
+        let tags: Vec<MonTag> = serde_json::from_slice(bytes).unwrap_or_default();
+        Ok(Self(tags))
+    }
+
+    fn to_bytes(&self) -> Result<Vec<u8>> {
+        Ok(serde_json::to_vec(&self.0).unwrap_or_default())
     }
 
     fn is_empty(&self) -> bool {

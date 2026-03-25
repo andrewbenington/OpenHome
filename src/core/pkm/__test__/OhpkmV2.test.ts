@@ -1,4 +1,6 @@
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
+import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
+import { ExtraFormIndex } from '@pkm-rs/pkg'
 import { PA8, PK3, PK8 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import path from 'path'
@@ -96,6 +98,49 @@ describe('evolution and form change update ohpkm', async () => {
     mrMimeOhpkm.syncWithGameData(mrRime)
     expect(mrMimeOhpkm.dexNum).toEqual(NationalDex.MrRime)
     expect(mrMimeOhpkm.formeNum).toEqual(0)
+  })
+})
+
+describe('plugin form persistence', () => {
+  test('pluginForm survives OHPKM serialization', () => {
+    const starter = new OHPKM(new Uint8Array())
+    starter.pluginOrigin = 'luminescent_platinum'
+    starter.extraFormIndex = ExtraFormIndex.GengarStitched
+
+    const bytes = starter.toBytes()
+    const again = OHPKM.fromBytes(bytes)
+    expect(again.pluginOrigin).toEqual('luminescent_platinum')
+    expect(again.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
+  })
+
+  test('PB8LUMI → OHPKM → bytes → OHPKM → PB8LUMI roundtrip', () => {
+    const stitchedGengarBytes = new Uint8Array(
+      fs.readFileSync(
+        path.join(__dirname, 'PKMFiles', 'rom-hack', 'luminescent', 'stitched-gengar.pb8lumi')
+      )
+    )
+
+    const original = new PB8LUMI(stitchedGengarBytes.buffer)
+
+    expect(original.pluginOrigin).toEqual('luminescent_platinum')
+    expect(original.dexNum).toEqual(NationalDex.Gengar)
+    expect(original.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
+
+    const ohpkm = new OHPKM(original)
+    expect(ohpkm.pluginOrigin).toEqual('luminescent_platinum')
+
+    const lumi = new PB8LUMI(ohpkm)
+    expect(lumi.pluginOrigin).toEqual('luminescent_platinum')
+    expect(lumi.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
+
+    const ohFromLumi = new OHPKM(lumi)
+    const roundBytes = ohFromLumi.toBytes()
+    const ohAgain = OHPKM.fromBytes(roundBytes)
+    expect(ohAgain.pluginOrigin).toEqual('luminescent_platinum')
+    expect(ohAgain.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
+
+    const lumi2 = new PB8LUMI(ohAgain)
+    expect(lumi2.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
   })
 })
 
