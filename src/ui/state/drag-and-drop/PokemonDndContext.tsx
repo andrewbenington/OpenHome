@@ -81,7 +81,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
         if (!isDragPayload(target)) return
 
         const dest = e.over?.data.current
-        const payload = dragState.payload
+        let payload = dragState.payload
 
         const dropElementId = e.over?.id
 
@@ -93,6 +93,9 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
           }
           endDragging()
           return
+        } else if (payload.kind === 'multi-mon') {
+          // TODO: not this
+          payload = { kind: 'mon', monData: payload.monData[0] }
         }
 
         const selectedLocationKeys = new Set(dragState.selectedLocations.map(locationKey))
