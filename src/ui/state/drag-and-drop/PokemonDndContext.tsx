@@ -77,9 +77,6 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
       onDragEnd={(e) => {
         setDragOverId(null)
 
-        const target = e.active.data.current
-        if (!isDragPayload(target)) return
-
         const dest = e.over?.data.current
         let payload = dragState.payload
 
@@ -88,27 +85,28 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
         if (!payload) return
 
         if (payload.kind === 'item') {
-          if (isMonLocation(dest) && target) {
+          if (isMonLocation(dest)) {
             savesAndBanks.giveItemToMon(dest, payload.item)
           }
           endDragging()
           return
-        } else if (payload.kind === 'multi-mon') {
-          // TODO: not this
-          payload = { kind: 'mon', monData: payload.monData[0] }
         }
 
+        const allMonsWithLocations = payload.kind === 'mon' ? [payload.monData] : payload.monData
+        if (allMonsWithLocations.length === 0) return
+        const firstMonWithLocation = allMonsWithLocations[0]
+
         const selectedLocationKeys = new Set(dragState.selectedLocations.map(locationKey))
-        const sourceLocationKey = locationKey(payload.monData)
+        const sourceLocationKey = locationKey(firstMonWithLocation)
         const isSourceSelected = selectedLocationKeys.has(sourceLocationKey)
         const selectedLocations = isSourceSelected
           ? [
-              payload.monData,
+              firstMonWithLocation,
               ...dragState.selectedLocations.filter((l) => locationKey(l) !== sourceLocationKey),
             ]
-          : [payload.monData]
+          : [firstMonWithLocation]
 
-        const { mon } = payload.monData
+        const { mon } = firstMonWithLocation
 
         if (dropElementId === 'to_release') {
           if (dragState.multiSelectEnabled && isSourceSelected) {
@@ -118,7 +116,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             })
             clearSelections()
           } else {
-            savesAndBanks.releaseMonAtLocation(payload.monData)
+            savesAndBanks.releaseMonAtLocation(firstMonWithLocation)
           }
         } else if (dropElementId === 'item-bag') {
           if (dragState.multiSelectEnabled && isSourceSelected) {
@@ -128,7 +126,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             })
             clearSelections()
           } else {
-            savesAndBanks.moveMonItemToBag(payload.monData)
+            savesAndBanks.moveMonItemToBag(firstMonWithLocation)
           }
         } else if (
           isMonLocation(dest) &&
@@ -222,7 +220,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             }
             clearSelections()
           } else {
-            const source = payload.monData
+            const source = firstMonWithLocation
 
             if (
               mon.heldItemIndex &&
