@@ -1,22 +1,43 @@
 import { useCallback, useContext, useMemo } from 'react'
 import { DragMode, DragMonContext, DragPayload, locationKey } from '.'
-import { MonLocation } from '../saves'
+import { Option } from '../../../core/util/functional'
+import { filterUndefined } from '../../../core/util/sort'
+import { MonLocation, MonWithLocation, useSaves } from '../saves'
 
 export default function useDragAndDrop() {
+  const savesAndBanks = useSaves()
   const [dragState, setDragState] = useContext(DragMonContext)
   const selectedLocationKeys = useMemo(
     () => new Set(dragState.selectedLocations.map(locationKey)),
     [dragState.selectedLocations]
   )
 
-  const startDragging = useCallback(
-    (payload: DragPayload) => {
+  const startDragging = (payload: DragPayload) => {
+    if (
+      dragState.payload?.kind === 'mon' &&
+      dragState.multiSelectEnabled &&
+      dragState.selectedLocations.length > 0
+    ) {
+      // If we start dragging a mon and multi-select is enabled, we want to switch to dragging multiple mons
+      const monsWithLocation: MonWithLocation[] = dragState.selectedLocations
+        .map((location) => {
+          const mon = savesAndBanks.getMonAtLocation(location)
+          const monWithLocation: Option<MonWithLocation> = mon ? { ...location, mon } : undefined
+          return monWithLocation
+        })
+        .filter(filterUndefined)
+      setDragState((prev) => {
+        return {
+          ...prev,
+          payload: { kind: 'multi-mon', monData: monsWithLocation },
+        }
+      })
+    } else {
       setDragState((prev) => {
         return { ...prev, payload }
       })
-    },
-    [setDragState]
-  )
+    }
+  }
 
   const endDragging = useCallback(() => {
     setDragState((prev) => {

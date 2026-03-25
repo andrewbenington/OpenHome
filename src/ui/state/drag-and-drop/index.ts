@@ -28,7 +28,11 @@ export const DragMonContext = createContext<[DragMonState, Dispatch<SetStateActi
   [emptyDragState(), () => null]
 )
 
-export type DragPayload = { kind: 'mon'; monData: MonWithLocation } | { kind: 'item'; item: Item }
+export type DragPayload =
+  | { kind: 'mon'; monData: MonWithLocation }
+  | { kind: 'item'; item: Item }
+  | { kind: 'multi-mon'; monData: MonWithLocation[] }
+
 export type DragMode = 'mon' | 'item'
 
 type ListenerMap = Map<UniqueIdentifier, Listener>

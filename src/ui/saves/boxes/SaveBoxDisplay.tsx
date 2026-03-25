@@ -112,17 +112,26 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         return !save.supportsItem(dragPayload.item.index)
       }
 
-      const dragData = dragPayload.monData
+      const draggingMons = Array.isArray(dragPayload.monData)
+        ? dragPayload.monData
+        : [dragPayload.monData]
 
-      if (!dragData || Object.entries(dragData).length === 0) return false
+      for (const monWithLocation of draggingMons) {
+        if (!monWithLocation || Object.entries(monWithLocation).length === 0) return false // Handles a glitch that occurs when navigating between boxes and the payload becomes an empty object
 
-      const sourceSave = dragData.isHome ? undefined : saveFromIdentifier(dragData.saveIdentifier)
+        const sourceSave = monWithLocation.isHome
+          ? undefined
+          : saveFromIdentifier(monWithLocation.saveIdentifier)
 
-      const sourceIsOpenHome = !sourceSave
-      return (
-        !monSupportedBySave(save, dragData.mon) ||
-        (mon && !sourceIsOpenHome && !monSupportedBySave(sourceSave, mon))
-      )
+        const sourceIsOpenHome = !sourceSave
+        const monIsIncompatible =
+          !monSupportedBySave(save, monWithLocation.mon) ||
+          (mon && !sourceIsOpenHome && !monSupportedBySave(sourceSave, mon))
+
+        if (monIsIncompatible) return true
+      }
+
+      return false
     },
     [dragState?.payload, saveFromIdentifier, save]
   )
