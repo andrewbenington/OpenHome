@@ -103,9 +103,11 @@ export default class PA8 {
   isNoble: boolean
   ribbons: string[]
   trainerGender: boolean
+  originalBytes?: ArrayBuffer
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
+      this.originalBytes = buffer
       if (encrypted) {
         const unencryptedBytes = encryption.decryptByteArrayGen8A(buffer)
         const unshuffledBytes = encryption.unshuffleBlocksGen8A(unencryptedBytes)
