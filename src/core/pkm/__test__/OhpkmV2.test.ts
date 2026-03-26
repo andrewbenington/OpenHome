@@ -1,6 +1,6 @@
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
-import { ExtraFormIndex } from '@pkm-rs/pkg'
+import { ConvertStrategies, ExtraFormIndex } from '@pkm-rs/pkg'
 import { PA8, PK3, PK8 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import path from 'path'
@@ -27,7 +27,7 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
       assert(original.gender === v2.gender)
     })
 
-    const roundTrip = new PK3(v2)
+    const roundTrip = PK3.fromOhpkm(v2, ConvertStrategies.getDefault())
     roundTrip.refreshChecksum()
 
     test(`ability nums match - ${file}`, () => {
@@ -63,7 +63,7 @@ describe('evolution and form change update ohpkm', async () => {
       fs.readFileSync(path.join(__dirname, 'PKMFiles', 'LA', 'dialga.pa8'))
     )
 
-    const dialgaPa8 = new PA8(dialgaBytes.buffer)
+    const dialgaPa8 = PA8.fromBytes(dialgaBytes.buffer)
     expect(dialgaPa8.dexNum).toEqual(NationalDex.Dialga)
 
     const dialgaOhpkm = new OHPKM(dialgaPa8)
@@ -81,7 +81,7 @@ describe('evolution and form change update ohpkm', async () => {
       fs.readFileSync(path.join(__dirname, 'PKMFiles', 'Gen8', 'mr-mime-galar.pk8'))
     )
 
-    const mrMimeGalarPk8 = new PK8(mrMimeBytes.buffer)
+    const mrMimeGalarPk8 = PK8.fromBytes(mrMimeBytes.buffer)
     expect(mrMimeGalarPk8.dexNum).toEqual(NationalDex.MrMime)
     expect(mrMimeGalarPk8.formeNum).toEqual(1)
 
@@ -120,7 +120,7 @@ describe('plugin form persistence', () => {
       )
     )
 
-    const original = new PB8LUMI(stitchedGengarBytes.buffer)
+    const original = PB8LUMI.fromBytes(stitchedGengarBytes.buffer)
 
     expect(original.pluginOrigin).toEqual('luminescent_platinum')
     expect(original.dexNum).toEqual(NationalDex.Gengar)
@@ -129,7 +129,7 @@ describe('plugin form persistence', () => {
     const ohpkm = new OHPKM(original)
     expect(ohpkm.pluginOrigin).toEqual('luminescent_platinum')
 
-    const lumi = new PB8LUMI(ohpkm)
+    const lumi = PB8LUMI.fromOhpkm(ohpkm, ConvertStrategies.getDefault())
     expect(lumi.pluginOrigin).toEqual('luminescent_platinum')
     expect(lumi.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
 
@@ -139,7 +139,7 @@ describe('plugin form persistence', () => {
     expect(ohAgain.pluginOrigin).toEqual('luminescent_platinum')
     expect(ohAgain.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
 
-    const lumi2 = new PB8LUMI(ohAgain)
+    const lumi2 = PB8LUMI.fromOhpkm(ohAgain, ConvertStrategies.getDefault())
     expect(lumi2.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
   })
 })

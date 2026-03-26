@@ -1,6 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   Ball,
+  ConvertStrategy,
   ItemGen3,
   Language,
   Languages,
@@ -11,7 +12,6 @@ import {
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/index'
 import { PkmConverter } from '../conversion/converter'
-import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
 import { FourMoves } from '../util/pkmInterface'
 import {
@@ -23,7 +23,7 @@ import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
-import { DefaultConstructorOptions, PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './PKM'
 
 export default class COLOPKM {
   static getName() {
@@ -62,10 +62,7 @@ export default class COLOPKM {
   shadowID: number
   shadowGauge: number
   ribbons: string[]
-  constructor(
-    arg: ArrayBuffer | OHPKM,
-    options: PkmConstructorOptions = DefaultConstructorOptions
-  ) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
       const buffer = arg
       const dataView = new DataView(buffer)
@@ -159,10 +156,10 @@ export default class COLOPKM {
   }
 
   static fromBytes(buffer: ArrayBuffer): COLOPKM {
-    return new COLOPKM(buffer)
+    return new COLOPKM(buffer, { encrypted: false })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): COLOPKM {
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): COLOPKM {
     return new COLOPKM(ohpkm, { strategy })
   }
 

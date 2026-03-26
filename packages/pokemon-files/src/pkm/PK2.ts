@@ -1,4 +1,5 @@
 import {
+  ConvertStrategy,
   Generation,
   ItemGen2,
   Language,
@@ -10,14 +11,13 @@ import {
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import { PkmConverter } from '../conversion/converter'
-import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
 import { FourMoves } from '../util/pkmInterface'
 import { getLevelGen12, getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
-import { DefaultConstructorOptions, PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PK2 {
   static getName() {
@@ -49,10 +49,7 @@ export default class PK2 {
   trainerName: string
   nickname: string
   trainerGender: boolean
-  constructor(
-    arg: ArrayBuffer | OHPKM,
-    options: PkmConstructorOptions = DefaultConstructorOptions
-  ) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
       const buffer = new Uint8Array(arg)[2] === 0xff ? arg.slice(3) : arg
       const dataView = new DataView(buffer)
@@ -172,10 +169,10 @@ export default class PK2 {
   }
 
   static fromBytes(buffer: ArrayBuffer): PK2 {
-    return new PK2(buffer)
+    return new PK2(buffer, { encrypted: false })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): PK2 {
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK2 {
     return new PK2(ohpkm, { strategy })
   }
 

@@ -1,6 +1,7 @@
 import {
   AbilityIndex,
   Ball,
+  ConvertStrategy,
   Item,
   Language,
   Languages,
@@ -9,7 +10,6 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
-import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import { FourMoves } from '../util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
@@ -17,7 +17,7 @@ import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { getHeightCalculated, getWeightCalculated, MoveFilter } from '../util/util'
-import { DefaultConstructorOptions, PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PB7 {
   static getName() {
@@ -94,10 +94,7 @@ export default class PB7 {
   megaForme: number
   trainerGender: boolean
 
-  constructor(
-    arg: ArrayBuffer | OHPKM,
-    options: PkmConstructorOptions = DefaultConstructorOptions
-  ) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     const { encrypted, strategy } = options
 
     if (arg instanceof ArrayBuffer) {
@@ -315,7 +312,7 @@ export default class PB7 {
     return new PB7(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): PB7 {
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB7 {
     return new PB7(ohpkm, { strategy })
   }
 

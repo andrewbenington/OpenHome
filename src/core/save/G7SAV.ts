@@ -5,9 +5,8 @@ import {
   uint16ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConverter'
-import { ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK7 } from '@pokemon-files/pkm'
-import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { SIZE_USUM } from './util'
@@ -164,7 +163,7 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
 }
 
 function emptyBoxSlotBytes() {
-  const mon = new PK7(new Uint8Array(232).buffer)
+  const mon = PK7.fromBytes(new Uint8Array(232).buffer)
   mon.checksum = 0x0204
   return new Uint8Array(mon.toPCBytes())
 }

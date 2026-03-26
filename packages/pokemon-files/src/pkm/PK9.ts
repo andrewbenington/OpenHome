@@ -1,6 +1,7 @@
 import {
   AbilityIndex,
   Ball,
+  ConvertStrategy,
   Item,
   Language,
   Languages,
@@ -11,7 +12,6 @@ import {
 import { ModernRibbons } from '@pokemon-resources/index'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import * as conversion from '../conversion'
-import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { FourMoves } from '../util/pkmInterface'
@@ -20,7 +20,7 @@ import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
-import { DefaultConstructorOptions, PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PK9 {
   static getName() {
@@ -97,10 +97,7 @@ export default class PK9 {
   ribbons: string[]
   trainerGender: boolean
 
-  constructor(
-    arg: ArrayBuffer | OHPKM,
-    options: PkmConstructorOptions = DefaultConstructorOptions
-  ) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     const { encrypted } = options
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
@@ -325,7 +322,7 @@ export default class PK9 {
     return new PK9(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): PK9 {
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK9 {
     return new PK9(ohpkm, { strategy })
   }
 

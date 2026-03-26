@@ -1,14 +1,14 @@
-import { MonFormat } from '../../../../src/core/pkm/interfaces'
-import { OHPKM } from '../../../../src/core/pkm/OHPKM'
-import { ConvertStrategy, DefaultConversionStrategy, FullConversionStrategy } from './settings'
+import { MonFormat } from '@openhome-core/pkm/interfaces'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { ConvertStrategies, ConvertStrategy } from '@pkm-rs/pkg'
 
 export class PkmConverter {
   format: MonFormat
-  strategy: FullConversionStrategy
+  strategy: ConvertStrategy
 
   constructor(format: MonFormat, strategy?: ConvertStrategy) {
     this.format = format
-    this.strategy = { ...DefaultConversionStrategy, ...strategy }
+    this.strategy = { ...ConvertStrategies.getDefault(), ...strategy }
   }
 
   nickname(ohpkm: OHPKM): string {
@@ -18,7 +18,7 @@ export class PkmConverter {
     }
 
     const capitalizationSetting = this.strategy['nickname.capitalization']
-    if (capitalizationSetting === 'modern') {
+    if (capitalizationSetting === 'Modern') {
       return speciesName
     } else {
       switch (this.format) {

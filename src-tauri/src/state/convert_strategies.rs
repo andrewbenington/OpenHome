@@ -2,21 +2,22 @@ use std::collections::HashMap;
 
 use crate::error::Result;
 use crate::storage;
+use pkm_rs::pkm::convert_strategy::ConvertStrategy;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::state::synced_state::{self, SyncedState};
 
-type StrategyJson = serde_json::Map<String, serde_json::Value>;
-
+#[cfg_attr(feature = "wasm", derive(Tsify))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct NamedStrategy {
     name: String,
-    strategy: StrategyJson,
+    strategy: ConvertStrategy,
 }
 
 type StrategiesById = HashMap<Uuid, NamedStrategy>;
 
+#[cfg_attr(feature = "wasm", derive(Tsify))]
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct ConvertStrategies {
     strategies_by_id: StrategiesById,
@@ -45,7 +46,6 @@ impl ConvertStrategies {
     }
 
     pub fn write_to_files(&self, app_handle: &tauri::AppHandle) -> Result<()> {
-        println!("Writing ConvertStrategies to {JSON_FILENAME}: {:?}", self);
         storage::write_file_json(app_handle, JSON_FILENAME, self)
     }
 }
@@ -63,10 +63,6 @@ pub fn update_convert_strategies(
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
     updates: ConvertStrategies,
 ) -> Result<()> {
-    println!(
-        "Received request to update convert strategies: {:?}",
-        updates
-    );
     synced_state
         .lock()?
         .convert_strategies

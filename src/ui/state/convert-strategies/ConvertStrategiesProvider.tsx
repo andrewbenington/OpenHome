@@ -1,8 +1,8 @@
 import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { ConvertStrategy } from '@pkm-rs/pkg'
 import { PropsWithChildren, useContext } from 'react'
 import { SyncedStateController, useSyncedState } from 'src/ui/state/synced-state'
 import { ConversionSettingsContext } from '.'
-import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
 import SyncedStateProvider from '../synced-state/SyncedStateProvider'
 
 export type NamedStrategy = {

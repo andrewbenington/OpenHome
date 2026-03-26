@@ -1,5 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Ball, OriginGame } from '@pkm-rs/pkg'
+import { Ball, ConvertStrategies, OriginGame } from '@pkm-rs/pkg'
 import { PA8, PK4, PK8 } from '@pokemon-files/pkm'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
@@ -52,7 +52,7 @@ describe('gen 8 save files', () => {
     const monPath = resolve('src/core/pkm/__test__/PKMFiles/Gen4/magmortar.pkm')
     const monBytes = new Uint8Array(readFileSync(monPath))
 
-    magmortar = new PK4(monBytes.buffer)
+    magmortar = PK4.fromBytes(monBytes.buffer)
   })
 
   test('sword/shield hash matches', () => {
@@ -216,9 +216,13 @@ function toHexString(byteArray: Uint8Array) {
 }
 
 function convertToPk8(mon: PKMInterface) {
-  return mon instanceof OHPKM ? new PK8(mon) : new PK8(new OHPKM(mon))
+  return mon instanceof OHPKM
+    ? PK8.fromOhpkm(mon, ConvertStrategies.getDefault())
+    : PK8.fromOhpkm(new OHPKM(mon), ConvertStrategies.getDefault())
 }
 
 function convertToPa8(mon: PKMInterface) {
-  return mon instanceof OHPKM ? new PA8(mon) : new PA8(new OHPKM(mon))
+  return mon instanceof OHPKM
+    ? PA8.fromOhpkm(mon, ConvertStrategies.getDefault())
+    : PA8.fromOhpkm(new OHPKM(mon), ConvertStrategies.getDefault())
 }

@@ -1,8 +1,14 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
-import { ExtraFormIndex, Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
+import {
+  ConvertStrategy,
+  ExtraFormIndex,
+  Gender,
+  getPluginColor,
+  OriginGame,
+  OriginGames,
+} from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { LookupType, SAVClass } from './util'
 import { PathData } from './util/path'

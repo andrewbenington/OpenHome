@@ -1,7 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
-import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
+import { ConvertStrategy, ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from '../../../../packages/pokemon-files/src/pkm/PKM'
 import { SAV } from '../interfaces'
 import { PathData } from './path'

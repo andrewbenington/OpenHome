@@ -1,5 +1,5 @@
 import { Errorable, R } from '@openhome-core/util/functional'
-import { ConvertStrategy, DefaultConversionStrategy } from '@pokemon-files/conversion/settings'
+import { ConvertStrategy } from '@pkm-rs/pkg'
 import { createContext, useContext } from 'react'
 import { ConvertStrategies } from './ConvertStrategiesProvider'
 
@@ -47,8 +47,15 @@ export const ConversionSettingsContext = createContext<
   [ConvertStrategies, (updated: ConvertStrategies) => Promise<Errorable<null>>]
 >([
   {
-    strategies_by_id: { [ZERO_UUID]: { name: 'Default', strategy: DefaultConversionStrategy } },
+    strategies_by_id: {},
     default_strategy_id: ZERO_UUID,
   },
   async () => R.Err('Uninitialized'),
 ])
+
+export const DEFAULT_CONVERT_STRATEGY: ConvertStrategy = {
+  'nickname.capitalization': 'GameDefault',
+  'metLocation.useRegion': true,
+}
+
+export type ConvertStrategyKey = keyof ConvertStrategy

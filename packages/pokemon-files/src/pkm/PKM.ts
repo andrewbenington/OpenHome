@@ -3,7 +3,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import PK3RR from '@openhome-core/save/radicalred/PK3RR'
 import PK3UB from '@openhome-core/save/unbound/PK3UB'
-import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
+import { ConvertStrategy } from '@pkm-rs/pkg'
 import COLOPKM from './COLOPKM'
 import PA8 from './PA8'
 import PA9 from './PA9'
@@ -55,10 +55,6 @@ export type PkmConstructorOptions =
       encrypted?: never
       strategy: ConvertStrategy
     }
-
-export const DefaultConstructorOptions: PkmConstructorOptions = {
-  strategy: DefaultConversionStrategy,
-}
 
 export function isRomHackFormat(format: string): format is 'PK3RR' | 'PK3UB' | 'PB8LUMI' {
   return format === 'PK3RR' || format === 'PK3UB' || format === 'PB8LUMI'

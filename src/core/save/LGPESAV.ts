@@ -1,12 +1,11 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PB7 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { LGE_STARTER, LGP_STARTER } from '@pokemon-resources/consts/Formes'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { LGPE_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { CRC16_NoInvert } from './encryption/Encryption'
 import { Box, BoxAndSlot, OfficialSAV, SlotMetadata } from './interfaces'
@@ -202,7 +201,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
   writeMonAtIndex(mon: PB7 | null, monIndex: number) {
     if (mon === null) {
       // empty slot representation
-      mon = new PB7(new Uint8Array(MON_BYTE_SIZE).buffer)
+      mon = PB7.fromBytes(new Uint8Array(MON_BYTE_SIZE).buffer)
     }
 
     mon.refreshChecksum()
@@ -215,7 +214,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
   static writeMonToStorageBytesAtIndex(bytes: Uint8Array, mon: PB7 | null, monIndex: number) {
     if (mon === null) {
       // empty slot representation
-      mon = new PB7(new Uint8Array(MON_BYTE_SIZE).buffer)
+      mon = PB7.fromBytes(new Uint8Array(MON_BYTE_SIZE).buffer)
     }
 
     mon.refreshChecksum()

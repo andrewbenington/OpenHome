@@ -1,12 +1,18 @@
 import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
 import { range, unique } from '@openhome-core/util/functional'
-import { ExtraFormIndex, Gender, ItemGen1, Language, OriginGame } from '@pkm-rs/pkg'
+import {
+  ConvertStrategy,
+  ExtraFormIndex,
+  Gender,
+  ItemGen1,
+  Language,
+  OriginGame,
+} from '@pkm-rs/pkg'
 import * as conversion from '@pokemon-files/conversion'
 import { PK1 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
@@ -110,7 +116,7 @@ export class G1SAV extends OfficialSAV<PK1> {
       for (let monIndex = 0; monIndex < pokemonPerBox; monIndex++) {
         if (this.bytes[boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE]) {
           try {
-            const mon = new PK1(
+            const mon = PK1.fromBytes(
               this.bytes.slice(
                 boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE,
                 boxByteOffset + this.BOX_PKM_OFFSET + (monIndex + 1) * this.BOX_PKM_SIZE

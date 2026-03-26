@@ -1,6 +1,7 @@
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
 import {
   Ball,
+  ConvertStrategy,
   ExtraFormIndex,
   Language,
   Languages,
@@ -9,8 +10,7 @@ import {
   OriginGame,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { ConvertStrategy, DefaultConversionStrategy } from '@pokemon-files/conversion/settings'
-import { DefaultConstructorOptions, PkmConstructorOptions } from '@pokemon-files/pkm/PKM'
+import { PkmConstructorOptions } from '@pokemon-files/pkm/PKM'
 import {
   FourMoves,
   generatePersonalityValuePreservingAttributes,
@@ -120,10 +120,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
   abstract selectColor: string
 
-  constructor(
-    arg: ArrayBuffer | OHPKM,
-    _options: PkmConstructorOptions = DefaultConstructorOptions
-  ) {
+  constructor(arg: ArrayBuffer | OHPKM, _options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       const dataView = new DataView(buffer)
@@ -334,7 +331,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   static fromOhpkm<T extends PK3CFRU>(
     this: new (ohpkm: OHPKM, options: PkmConstructorOptions) => T,
     ohpkm: OHPKM,
-    strategy: ConvertStrategy = DefaultConversionStrategy
+    strategy: ConvertStrategy
   ): T {
     return new this(ohpkm, { strategy })
   }

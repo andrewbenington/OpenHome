@@ -1,6 +1,10 @@
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
-import { ExtraFormIndex, ItemRadicalRed, radicalRedSupportsExtraForm } from '@pkm-rs/pkg'
-import { ConvertStrategy } from '@pokemon-files/conversion/settings'
+import {
+  ConvertStrategy,
+  ExtraFormIndex,
+  ItemRadicalRed,
+  radicalRedSupportsExtraForm,
+} from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import {

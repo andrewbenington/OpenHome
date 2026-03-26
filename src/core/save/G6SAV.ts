@@ -4,9 +4,8 @@ import {
   uint16ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConverter'
-import { ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK6 } from '@pokemon-files/pkm'
-import { ConvertStrategy } from '../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
@@ -110,7 +109,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
           console.error(e)
         }
       } else {
-        const mon = new PK6(new Uint8Array(232).buffer)
+        const mon = PK6.fromBytes(new Uint8Array(232).buffer)
 
         this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
       }

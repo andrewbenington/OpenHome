@@ -1,7 +1,12 @@
-import { ExtraFormIndex, Gender, luminescentSupportsExtraForm, OriginGame } from '@pkm-rs/pkg'
+import {
+  ConvertStrategy,
+  ExtraFormIndex,
+  Gender,
+  luminescentSupportsExtraForm,
+  OriginGame,
+} from '@pkm-rs/pkg'
 import { utf16BytesToString } from '@pokemon-files/util'
 
-import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, BoxAndSlot, PluginSAV, SlotMetadata } from '../interfaces'
@@ -225,7 +230,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
           )
         }
       } else {
-        const emptyMon = new PB8LUMI(new Uint8Array(PB8LUMI.getBoxSize()).buffer)
+        const emptyMon = PB8LUMI.fromBytes(new Uint8Array(PB8LUMI.getBoxSize()).buffer)
         this.bytes.set(new Uint8Array(emptyMon.toPCBytes()), writeIndex)
       }
     })

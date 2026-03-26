@@ -1,10 +1,22 @@
+// #[cfg(feature = "wasm")]
+// pub mod wasm;
+
+mod setting;
+
+use std::fmt::Display;
+
+use serde::{Deserialize, Serialize};
 #[cfg(feature = "wasm")]
-pub mod wasm;
-
-// AI SLOP (generated from artisinal non-AI TypeScript)
-
 use std::collections::HashMap;
+#[cfg(feature = "wasm")]
+use tsify::Tsify;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
 
+use crate::pkm::convert_strategy::setting::{BoolSetting, SettingType, StringSetting};
+
+#[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Clone, PartialEq)]
 pub enum SettingValue {
     String(String),
@@ -12,38 +24,7 @@ pub enum SettingValue {
     Number(f64),
 }
 
-#[derive(Debug, Clone)]
-pub struct StringDescriptor {
-    pub display: &'static str,
-    pub default: &'static str,
-    pub description: &'static str,
-    pub allowed_values: Option<&'static [&'static str]>,
-}
-
-#[derive(Debug, Clone)]
-pub struct BoolDescriptor {
-    pub display: &'static str,
-    pub default: bool,
-    pub description: &'static str,
-}
-
-#[derive(Debug, Clone)]
-pub struct NumberDescriptor {
-    pub display: &'static str,
-    pub default: f64,
-    pub description: &'static str,
-    pub minimum: Option<f64>,
-    pub maximum: Option<f64>,
-}
-
-#[derive(Debug, Clone)]
-pub enum SettingDescriptor {
-    String(StringDescriptor),
-    Bool(BoolDescriptor),
-    Number(NumberDescriptor),
-}
-
-impl SettingDescriptor {
+impl SettingType {
     pub const fn display(&self) -> &'static str {
         match self {
             Self::String(d) => d.display,
@@ -101,25 +82,43 @@ impl SettingDescriptor {
 
 // Subcategory keys are just &'static str at runtime; the "category.key"
 // convention is enforced by construction rather than the type system.
-pub type SettingsSubcategory = &'static str;
+#[cfg_attr(feature = "wasm", derive(Tsify))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum SettingIdentifier {
+    #[serde(rename = "nickname.capitalization")]
+    NicknameCapitalization,
+    #[serde(rename = "metLocation.useRegion")]
+    MetLocationUseRegion,
+}
 
-pub const fn settings_schema() -> &'static [(&'static str, SettingDescriptor)] {
-    use SettingDescriptor::*;
+impl Display for SettingIdentifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            Self::NicknameCapitalization => "nickname.capitalization",
+            Self::MetLocationUseRegion => "metLocation.useRegion",
+        };
+        write!(f, "{}", s)
+    }
+}
+
+pub const fn settings_schema() -> &'static [(SettingIdentifier, SettingType)] {
+    use SettingType::*;
     &[
         (
-            "nickname.capitalization",
-            String(StringDescriptor {
+            SettingIdentifier::NicknameCapitalization,
+            String(StringSetting {
                 display: "Capitalization",
                 default: "gameDefault",
-                allowed_values: Some(&["gameDefault", "modern"]),
+                allowed_values: Some(&["GameDefault", "Modern"]),
                 description: "Decides how unnicknamed Pokémon are capitalized. \
-                    \"gameDefault\" uses the original game's capitalization, \
-                    \"modern\" capitalizes all in the modern style.",
+                    \"GameDefault\" uses the original game's capitalization, \
+                    \"Modern\" capitalizes all in the modern style.",
             }),
         ),
         (
-            "metLocation.useRegion",
-            Bool(BoolDescriptor {
+            SettingIdentifier::MetLocationUseRegion,
+            Bool(BoolSetting {
                 display: "Use Region for Met Location (when possible)",
                 default: true,
                 description: "If true, the met location will show the region name when possible. \
@@ -129,7 +128,27 @@ pub const fn settings_schema() -> &'static [(&'static str, SettingDescriptor)] {
     ]
 }
 
-pub fn get_schema_entry(key: &str) -> Option<&'static SettingDescriptor> {
+#[cfg(feature = "wasm")]
+#[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
+#[derive(Debug, Clone)]
+pub struct SettingsSchemaWrapper {
+    settings_schema: HashMap<SettingIdentifier, SettingType>,
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "getConvertSettingsSchema")]
+pub fn settings_schema_js() -> SettingsSchemaWrapper {
+    let settings: HashMap<SettingIdentifier, SettingType> = settings_schema()
+        .iter()
+        .map(|(k, v)| (*k, v.clone()))
+        .collect();
+    SettingsSchemaWrapper {
+        settings_schema: settings,
+    }
+}
+
+pub fn get_schema_entry(key: SettingIdentifier) -> Option<&'static SettingType> {
     settings_schema()
         .iter()
         .find(|(k, _)| *k == key)
@@ -152,56 +171,57 @@ pub fn get_settings_category(subcategory: &str) -> &str {
 
 // ── ConvertStrategy ────────────────────────────────────────────────────────────
 
-#[derive(Debug, Clone)]
-pub struct ConvertStrategy(HashMap<&'static str, SettingValue>);
+#[cfg_attr(feature = "wasm", derive(Tsify))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ConvertStrategy {
+    #[serde(rename = "nickname.capitalization")]
+    pub nickname_capitalization: NicknameCapitalization,
+    #[serde(rename = "metLocation.useRegion")]
+    pub met_location_use_region: bool,
+}
 
-impl ConvertStrategy {
-    /// Build the default strategy from the schema.
-    pub fn default_strategy() -> Self {
-        let map = settings_schema()
-            .iter()
-            .map(|(key, descriptor)| (*key, descriptor.default_value()))
-            .collect();
-        Self(map)
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getDefaultConvertStrategy"))]
+pub fn default_convert_strategy() -> ConvertStrategy {
+    ConvertStrategy::default()
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+pub struct ConvertStrategies;
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl ConvertStrategies {
+    #[wasm_bindgen(js_name = "getDefault")]
+    pub fn default_strategy() -> ConvertStrategy {
+        default_convert_strategy()
     }
 
-    pub fn get(&self, key: &str) -> Option<&SettingValue> {
-        self.0.get(key)
-    }
-
-    /// Set a value, validating it against the schema first.
-    pub fn set(&mut self, key: &'static str, value: SettingValue) -> Result<(), String> {
-        let descriptor =
-            get_schema_entry(key).ok_or_else(|| format!("Unknown setting key: '{}'", key))?;
-        descriptor.validate(&value)?;
-        self.0.insert(key, value);
-        Ok(())
-    }
-
-    /// Merge a partial strategy (override) into this one.
-    pub fn merge(&self, partial: &PartialConvertStrategy) -> Self {
-        let mut merged = self.clone();
-        for (key, value) in &partial.0 {
-            merged.0.insert(key, value.clone());
+    #[wasm_bindgen(js_name = "getCategoryName")]
+    pub fn get_category_name(identifier: SettingIdentifier) -> String {
+        match identifier {
+            SettingIdentifier::NicknameCapitalization => String::from("Nickname"),
+            SettingIdentifier::MetLocationUseRegion => String::from("Met Location"),
         }
-        merged
+    }
+
+    #[wasm_bindgen(js_name = "getSettingName")]
+    pub fn get_setting_name(identifier: SettingIdentifier) -> String {
+        match identifier {
+            SettingIdentifier::NicknameCapitalization => String::from("Capitalization"),
+            SettingIdentifier::MetLocationUseRegion => String::from("Use Region"),
+        }
     }
 }
 
-/// A partial strategy — any subset of keys.
-#[derive(Debug, Clone, Default)]
-pub struct PartialConvertStrategy(HashMap<&'static str, SettingValue>);
+// ── Enums ─────────────────────────────────────────────────────────────────────
 
-impl PartialConvertStrategy {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn set(&mut self, key: &'static str, value: SettingValue) -> Result<(), String> {
-        let descriptor =
-            get_schema_entry(key).ok_or_else(|| format!("Unknown setting key: '{}'", key))?;
-        descriptor.validate(&value)?;
-        self.0.insert(key, value);
-        Ok(())
-    }
+#[cfg_attr(feature = "wasm", derive(Tsify))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
+#[derive(Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub enum NicknameCapitalization {
+    #[default]
+    GameDefault,
+    Modern,
 }

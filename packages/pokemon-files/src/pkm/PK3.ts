@@ -3,6 +3,7 @@ import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/othe
 
 import {
   Ball,
+  ConvertStrategy,
   ItemGen3,
   Language,
   Languages,
@@ -13,7 +14,6 @@ import {
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import * as conversion from '../conversion'
 import { PkmConverter } from '../conversion/converter'
-import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { FourMoves } from '../util/pkmInterface'
@@ -30,7 +30,7 @@ import {
   getGen3MiscFlags,
   MoveFilter,
 } from '../util/util'
-import { DefaultConstructorOptions, PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PK3 {
   static getName() {
@@ -68,10 +68,7 @@ export default class PK3 {
   trainerGender: boolean
   checksum: number
 
-  constructor(
-    arg: ArrayBuffer | OHPKM,
-    options: PkmConstructorOptions = DefaultConstructorOptions
-  ) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     const { encrypted } = options
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
@@ -228,7 +225,7 @@ export default class PK3 {
     return new PK3(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): PK3 {
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3 {
     return new PK3(ohpkm, { strategy })
   }
 

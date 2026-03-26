@@ -245,7 +245,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_types"
-version = "1.10.0-beta.2"
+version = "1.10.0"
 dependencies = [
  "getrandom",
  "js-sys",

@@ -1,10 +1,9 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { BDSP_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { ConvertStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, BoxAndSlot, OfficialSAV } from '../interfaces'
@@ -132,7 +131,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
   getBoxCount = () => BOX_COUNT
 
   buildPKM(bytes: ArrayBuffer, encrypted: boolean): PB8 {
-    return new PB8(bytes, { encrypted })
+    return PB8.fromBytes(bytes, encrypted)
   }
 
   getMonBoxSizeBytes(): number {
@@ -162,7 +161,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
           console.error(e)
         }
       } else {
-        const mon = new PB8(new Uint8Array(PB8.getBoxSize()).buffer)
+        const mon = PB8.fromBytes(new Uint8Array(PB8.getBoxSize()).buffer)
 
         this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
       }

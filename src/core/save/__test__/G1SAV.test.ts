@@ -1,6 +1,7 @@
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { R } from '@openhome-core/util/functional'
+import { ConvertStrategies, ConvertStrategy } from '@pkm-rs/pkg'
 import { PK1 } from '@pokemon-files/pkm'
 import assert, { fail } from 'assert'
 import fs from 'fs'
@@ -77,7 +78,7 @@ test('inserting mon works', () => {
   }
   const modifiedSaveFile1 = result1.value as G1SAV
 
-  modifiedSaveFile1.boxes[7].boxSlots[11] = new PK1(slowbroOH)
+  modifiedSaveFile1.boxes[7].boxSlots[11] = PK1.fromOhpkm(slowbroOH, ConvertStrategies.getDefault())
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, boxSlot: 0 })
   modifiedSaveFile1.prepareForSaving()
 
@@ -104,9 +105,11 @@ test('inserting mon with game capitalization gives correct nickname', () => {
   }
   const modifiedSaveFile1 = result1.value as G1SAV
 
-  modifiedSaveFile1.boxes[7].boxSlots[11] = PK1.fromOhpkm(slowbroOH, {
-    'nickname.capitalization': 'modern',
-  })
+  const modernStrategy: ConvertStrategy = {
+    ...ConvertStrategies.getDefault(),
+    'nickname.capitalization': 'Modern',
+  }
+  modifiedSaveFile1.boxes[7].boxSlots[11] = PK1.fromOhpkm(slowbroOH, modernStrategy)
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, boxSlot: 0 })
   modifiedSaveFile1.prepareForSaving()
 

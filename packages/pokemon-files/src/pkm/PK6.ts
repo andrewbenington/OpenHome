@@ -1,6 +1,7 @@
 import {
   AbilityIndex,
   Ball,
+  ConvertStrategy,
   ExtraFormIndex,
   extraFormIndexFromOrasPikachu,
   Item,
@@ -14,7 +15,6 @@ import {
 import { ModernRibbons } from '@pokemon-resources/index'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import { NationalDex } from '../../../pokemon-resources/src/consts/NationalDex'
-import { ConvertStrategy, DefaultConversionStrategy } from '../conversion/settings'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { FourMoves } from '../util/pkmInterface'
@@ -23,7 +23,7 @@ import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
-import { DefaultConstructorOptions, PkmConstructorOptions } from './PKM'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PK6 {
   static getName() {
@@ -98,10 +98,7 @@ export default class PK6 {
   isFatefulEncounter: boolean
   ribbons: string[]
   trainerGender: boolean
-  constructor(
-    arg: ArrayBuffer | OHPKM,
-    options: PkmConstructorOptions = DefaultConstructorOptions
-  ) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     const { encrypted, strategy } = options
 
     if (arg instanceof ArrayBuffer) {
@@ -357,7 +354,7 @@ export default class PK6 {
     return new PK6(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy = DefaultConversionStrategy): PK6 {
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK6 {
     return new PK6(ohpkm, { strategy })
   }
 

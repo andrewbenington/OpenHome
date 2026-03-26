@@ -75,6 +75,7 @@ export function useSaves(): SavesAndBanksManager {
   const [, bagDispatch] = useContext(ItemBagContext)
   const filePickerOpen = useRef(false)
   const banksAndBoxes = useBanksAndBoxes()
+  const { defaultConvertStrategy } = useConvertStrategies()
 
   if (openSavesState.error) {
     throw new Error(`Error loading saves state: ${openSavesState.error}`)

@@ -6,7 +6,7 @@ import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { invoke, InvokeArgs, InvokeOptions } from '@tauri-apps/api/core'
 import { ConvertStrategies } from 'src/ui/state/convert-strategies/ConvertStrategiesProvider'
-import { DefaultConversionStrategy } from '../../../../packages/pokemon-files/src/conversion/settings'
+import { DEFAULT_CONVERT_STRATEGY } from 'src/ui/state/convert-strategies/useConvertStrategies'
 import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
 
@@ -147,7 +147,7 @@ export const Commands: OhTauriApiNoThrow = {
               ...strategies,
               strategies_by_id: {
                 ...strategies.strategies_by_id,
-                [ZERO_UUID]: { name: 'Default', strategy: DefaultConversionStrategy },
+                [ZERO_UUID]: { name: 'Default', strategy: DEFAULT_CONVERT_STRATEGY },
               },
               default_strategy_id: ZERO_UUID,
             }
