@@ -8,6 +8,7 @@ use crate::pkm::ohpkm::v2_sections::{
 };
 use crate::pkm::{Error, Result};
 
+use pkm_rs_resources::species::SpeciesMetadata;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::TrainerData;
 use strum_macros::Display;
@@ -284,6 +285,10 @@ impl OhpkmV2 {
 
     pub fn nickname_matches_species_eng_ignore_case(&self) -> bool {
         self.main_data.nickname_matches_species_eng_ignore_case()
+    }
+
+    pub const fn species_metadata(&self) -> &'static SpeciesMetadata {
+        self.main_data.species_and_forme.get_species_metadata()
     }
 
     pub fn fix_errors(&mut self) -> bool {

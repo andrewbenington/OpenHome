@@ -1,32 +1,47 @@
-import { MonFormat } from '@openhome-core/pkm/interfaces'
-
 export type NotableLocationKey =
+  /* General */
   | 'LinkTrade'
-  | 'KantoFrLg'
-  | 'JohtoHgSs'
-  | 'HoennRse'
-  | 'SinnohDPPt'
+  | 'CantTell'
+  | 'PalPark'
+  | 'PokeTransferLab'
+  | 'GoPark'
   | 'DistantLand'
+  | 'FarawayPlace'
+  | 'FatefulEncounter'
+  /* Regions */
+  | 'KantoFrLg'
+  | 'KantoVirtualConsole'
+  | 'KantoLetsGo'
+  | 'JohtoHgSs'
+  | 'JohtoVirtualConsole'
+  | 'HoennRse'
+  | 'HoennORAS'
+  | 'SinnohDPPt'
+  | 'SinnohBDSP'
   | 'Unova'
   | 'Kalos'
-  | 'PokemonGo'
-  | 'KantoVirtualConsole'
-  | 'HoennORAS'
+  | 'Lumiose'
   | 'Alola'
-  | 'JohtoVirtualConsole'
-  | 'PokemonHome'
-  | 'KantoLetsGo'
   | 'Galar'
   | 'Hisui'
-  | 'SinnohBDSP'
-  | 'FarawayPlace'
   | 'Paldea'
-  | 'Lumiose'
+  /* Games */
+  | 'PokemonGo'
+  | 'PokemonHome'
 
 type FormatNotableLocations = Partial<Record<NotableLocationKey, number>> & { LinkTrade: number }
 
-export const NotableLocations: Partial<Record<MonFormat, FormatNotableLocations>> = {
+export const NotableLocations = {
+  PK2: {
+    CantTell: 126,
+    LinkTrade: 126,
+  },
+  PK3: {
+    LinkTrade: 254,
+    FatefulEncounter: 255,
+  },
   PK4: {
+    PalPark: 55,
     LinkTrade: 2001,
     // Link Trade 2002,
     KantoFrLg: 2003,
@@ -37,6 +52,7 @@ export const NotableLocations: Partial<Record<MonFormat, FormatNotableLocations>
     DistantLand: 2008,
   },
   PK5: {
+    PokeTransferLab: 60,
     // －－－－－－－－－－: 30001
     LinkTrade: 30002,
     // Link Trade 30003,
@@ -80,6 +96,7 @@ export const NotableLocations: Partial<Record<MonFormat, FormatNotableLocations>
     JohtoVirtualConsole: 30017,
   },
   PB7: {
+    GoPark: 50,
     LinkTrade: 30001,
     // Link Trade 30002,
     KantoFrLg: 30003,
@@ -224,4 +241,4 @@ export const NotableLocations: Partial<Record<MonFormat, FormatNotableLocations>
     Lumiose: 30026,
     FarawayPlace: 40002,
   },
-}
+} as const satisfies Partial<Record<string, FormatNotableLocations>>

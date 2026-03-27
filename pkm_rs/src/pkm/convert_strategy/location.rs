@@ -1,0 +1,583 @@
+use pkm_rs_types::{Generation, OriginGame};
+
+use crate::pkm::{PkmFormat, ohpkm::OhpkmV2};
+
+pub enum Location {
+    // General
+    LinkTrade,
+    CantTell,
+    PalPark,
+    PokeTransferLab,
+    GoPark,
+    FarawayPlace,
+    FatefulEncounter,
+
+    // Game Settings
+    KantoGen3,
+    KantoVirtualConsole,
+    KantoLetsGo,
+
+    JohtoGen4,
+    JohtoVirtualConsole,
+
+    HoennGen3,
+    HoennGen6,
+
+    OrreDistantLand,
+
+    SinnohGen4,
+    SinnohGen8,
+    Hisui,
+
+    Unova,
+
+    Kalos,
+    Lumiose,
+
+    Alola,
+    Galar,
+    Paldea,
+
+    // Games
+    PokemonGo,
+    PokemonHome,
+}
+
+const PAL_PARK_GEN_4: u16 = 55;
+const POKE_TRANSFER_LAB_GEN_5: u16 = 60;
+const GO_PARK_LETS_GO: u16 = 50;
+
+impl Location {
+    pub fn cant_tell_gen2() -> u16 {
+        PkmFormat::PK2
+            .index_for(Self::CantTell)
+            .expect("Cant tell index present for PK2")
+    }
+
+    pub const fn game_setting_best_match(origin: OriginGame) -> Self {
+        use OriginGame::*;
+        match origin {
+            FireRed | LeafGreen => Self::KantoGen3,
+            Red | BlueGreen | BlueJpn | Yellow => Self::KantoVirtualConsole,
+            LetsGoPikachu | LetsGoEevee => Self::KantoLetsGo,
+
+            Sapphire | Ruby | Emerald => Self::HoennGen3,
+            AlphaSapphire | OmegaRuby => Self::HoennGen6,
+
+            HeartGold | SoulSilver => Self::JohtoGen4,
+            Gold | Silver | Crystal => Self::JohtoVirtualConsole,
+
+            Diamond | Pearl | Platinum => Self::SinnohGen4,
+            BrilliantDiamond | ShiningPearl => Self::SinnohGen8,
+            LegendsArceus => Self::Hisui,
+
+            ColosseumXd => Self::OrreDistantLand,
+
+            White | Black | White2 | Black2 => Self::Unova,
+
+            X | Y => Self::Kalos,
+            LegendsZa => Self::Lumiose,
+
+            Sun | Moon | UltraSun | UltraMoon => Self::Alola,
+
+            Go => Self::PokemonGo,
+
+            Sword | Shield => Self::Galar,
+
+            Home => Self::PokemonHome,
+
+            Scarlet | Violet => Self::Paldea,
+
+            // LEAVE THESE HERE EXPLICITLY!
+            // We want a compiler error when a new OriginGame is introduced and not handled here, so we don't want to have a catch-all case
+            Invalid0 | Invalid6 | Invalid9 | Invalid13 | Invalid14 | BattleRevolution
+            | Invalid17 | Invalid18 | Invalid19 | Invalid28 | Invalid29 => Self::LinkTrade,
+        }
+    }
+
+    // Return the game setting met location present in most games.
+    // For example, KantoGen3 is present in Gen 4 and up, while KantoVirtualConsole is only present in Gen 7 and up, so the Gen 3 origin is used.
+    pub const fn game_setting_most_compatible(origin: OriginGame) -> Self {
+        use OriginGame::*;
+        match origin {
+            FireRed | LeafGreen | Red | BlueGreen | BlueJpn | Yellow | LetsGoPikachu
+            | LetsGoEevee => Self::KantoGen3,
+
+            Sapphire | Ruby | Emerald | AlphaSapphire | OmegaRuby => Self::HoennGen3,
+
+            HeartGold | SoulSilver | Gold | Silver | Crystal => Self::JohtoGen4,
+
+            Diamond | Pearl | Platinum | BrilliantDiamond | ShiningPearl | LegendsArceus => {
+                Self::SinnohGen4
+            }
+
+            ColosseumXd => Self::OrreDistantLand,
+
+            White | Black | White2 | Black2 => Self::Unova,
+
+            X | Y | LegendsZa => Self::Kalos,
+
+            Sun | Moon | UltraSun | UltraMoon => Self::Alola,
+
+            Go => Self::PokemonGo,
+
+            Sword | Shield => Self::Galar,
+
+            Home => Self::PokemonHome,
+
+            Scarlet | Violet => Self::Paldea,
+
+            // LEAVE THESE HERE EXPLICITLY!
+            // We want a compiler error when a new OriginGame is introduced and not handled here, so we don't want to have a catch-all case
+            Invalid0 | Invalid6 | Invalid9 | Invalid13 | Invalid14 | BattleRevolution
+            | Invalid17 | Invalid18 | Invalid19 | Invalid28 | Invalid29 => Self::LinkTrade,
+        }
+    }
+}
+
+impl PkmFormat {
+    pub fn origin_is_legal(&self, origin: OriginGame) -> bool {
+        match self {
+            Self::PK1 | Self::PK2 => false,
+            Self::PK3 | Self::COLOPKM | Self::XDPKM => origin.generation() == Generation::G3,
+            Self::PK4 => {
+                origin.generation() == Generation::G3 || origin.generation() == Generation::G4
+            }
+            Self::PK5 => {
+                origin.generation() >= Generation::G3 || origin.generation() <= Generation::G5
+            }
+            Self::PK6 => {
+                origin.generation() >= Generation::G3 || origin.generation() <= Generation::G6
+            }
+            Self::PK7 => origin <= OriginGame::Crystal,
+            Self::PB7 => origin.is_lets_go() || origin == OriginGame::Go,
+            Self::PK8 => origin <= OriginGame::Shield,
+            Self::PA8 | Self::PB8 => origin <= OriginGame::LegendsArceus,
+            Self::PK9 => origin <= OriginGame::Violet,
+            Self::PA9 => origin <= OriginGame::LegendsZa,
+            Self::PK3RR => origin.generation() == Generation::G3,
+            Self::PK3UB => origin.generation() == Generation::G3,
+            Self::PB8LUMI => origin <= OriginGame::LegendsArceus,
+        }
+    }
+
+    pub fn origin_if_legal(&self, origin: OriginGame) -> Option<OriginGame> {
+        if self.origin_is_legal(origin) {
+            Some(origin)
+        } else {
+            None
+        }
+    }
+
+    pub fn legalize_origin(&self, origin: OriginGame) -> OriginGame {
+        use OriginGame::*;
+        if self.origin_is_legal(origin) {
+            return origin;
+        }
+
+        match self {
+            Self::PK1 | Self::PK2 => origin, // doesn't matter; these games don't store origin
+            Self::PK3 | Self::COLOPKM | Self::XDPKM => match origin {
+                Red | Yellow | LetsGoPikachu => FireRed,
+                BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
+
+                AlphaSapphire => Sapphire,
+                OmegaRuby => Ruby,
+
+                _ => Emerald,
+            },
+            Self::PK4 => match origin {
+                Red | Yellow | LetsGoPikachu => FireRed,
+                BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
+
+                AlphaSapphire => Sapphire,
+                OmegaRuby => Ruby,
+
+                BrilliantDiamond => Diamond,
+                ShiningPearl => Pearl,
+                LegendsArceus => Platinum,
+
+                Gold | Crystal => HeartGold,
+                Silver => SoulSilver,
+
+                _ => SoulSilver,
+            },
+            Self::PK5 => match origin {
+                Red | Yellow | LetsGoPikachu => FireRed,
+                BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
+
+                AlphaSapphire => Sapphire,
+                OmegaRuby => Ruby,
+
+                BrilliantDiamond => Diamond,
+                ShiningPearl => Pearl,
+                LegendsArceus => Platinum,
+
+                Gold | Crystal => HeartGold,
+                Silver => SoulSilver,
+
+                _ => White2,
+            },
+            Self::PK6 => match origin {
+                Red | Yellow | LetsGoPikachu => FireRed,
+                BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
+
+                BrilliantDiamond => Diamond,
+                ShiningPearl => Pearl,
+                LegendsArceus => Platinum,
+
+                Gold | Crystal => HeartGold,
+                Silver => SoulSilver,
+
+                LegendsZa => X,
+
+                _ => Y,
+            },
+            Self::PK7 => match origin {
+                LetsGoPikachu => FireRed,
+                LetsGoEevee => LeafGreen,
+
+                BrilliantDiamond => Diamond,
+                ShiningPearl => Pearl,
+                LegendsArceus => Platinum,
+
+                LegendsZa => X,
+
+                _ => UltraMoon,
+            },
+            Self::PB7 => match origin {
+                FireRed | Red | Yellow => LetsGoPikachu,
+
+                _ => LetsGoEevee,
+            },
+            Self::PK8 => Sword, // Pokémon HOME does this for all post-SwSh Pokémon transferred in
+            Self::PA8 => LegendsArceus,
+            Self::PB8 => ShiningPearl,
+            Self::PK9 => match origin {
+                LegendsZa => X,
+                _ => Violet,
+            },
+            Self::PA9 => LegendsZa,
+            Self::PK3RR => FireRed,
+            Self::PK3UB => FireRed,
+            Self::PB8LUMI => ShiningPearl,
+        }
+    }
+
+    pub fn index_for(&self, notable_location: Location) -> Option<u16> {
+        match self {
+            Self::PK1 => None,
+            Self::PK2 => match notable_location {
+                Location::CantTell => Some(126),
+                _ => None,
+            },
+            Self::PK3 => match notable_location {
+                Location::LinkTrade => Some(254),
+                Location::FatefulEncounter => Some(255),
+                _ => None,
+            },
+            Self::COLOPKM | Self::XDPKM => match notable_location {
+                Location::LinkTrade => Some(254),
+                _ => None,
+            },
+            Self::PK4 => match notable_location {
+                Location::PalPark => Some(PAL_PARK_GEN_4),
+                Location::LinkTrade => Some(2001),
+                Location::KantoGen3 => Some(2003),
+                Location::JohtoGen4 => Some(2004),
+                Location::HoennGen3 => Some(2005),
+                Location::SinnohGen4 => Some(2006),
+                Location::OrreDistantLand => Some(2008),
+                _ => None,
+            },
+            Self::PK5 => match notable_location {
+                Location::PokeTransferLab => Some(POKE_TRANSFER_LAB_GEN_5),
+                Location::LinkTrade => Some(30002),
+                Location::KantoGen3 => Some(30004),
+                Location::JohtoGen4 => Some(30005),
+                Location::HoennGen3 => Some(30006),
+                Location::SinnohGen4 => Some(30007),
+                Location::OrreDistantLand => Some(30008),
+                Location::FarawayPlace => Some(40002),
+                _ => None,
+            },
+            Self::PK6 => match notable_location {
+                Location::LinkTrade => Some(30001),
+                Location::KantoGen3 => Some(30003),
+                Location::JohtoGen4 => Some(30004),
+                Location::HoennGen3 => Some(30005),
+                Location::SinnohGen4 => Some(30006),
+                Location::OrreDistantLand => Some(30007),
+                Location::Unova => Some(30009),
+                Location::Kalos => Some(30010),
+                Location::FarawayPlace => Some(40002),
+                _ => None,
+            },
+            Self::PK7 => match notable_location {
+                Location::LinkTrade => Some(30001),
+                Location::KantoGen3 => Some(30003),
+                Location::JohtoGen4 => Some(30004),
+                Location::HoennGen3 => Some(30005),
+                Location::SinnohGen4 => Some(30006),
+                Location::OrreDistantLand => Some(30007),
+                Location::Unova => Some(30009),
+                Location::Kalos => Some(30010),
+                Location::PokemonGo => Some(30012),
+                Location::KantoVirtualConsole => Some(30013),
+                Location::HoennGen6 => Some(30014),
+                Location::Alola => Some(30015),
+                Location::JohtoVirtualConsole => Some(30017),
+                Location::FarawayPlace => Some(40002),
+                _ => None,
+            },
+            Self::PB7 => match notable_location {
+                Location::GoPark => Some(50),
+                Location::LinkTrade => Some(30001),
+                Location::KantoGen3 => Some(30003),
+                Location::JohtoGen4 => Some(30004),
+                Location::HoennGen3 => Some(30005),
+                Location::SinnohGen4 => Some(30006),
+                Location::OrreDistantLand => Some(30007),
+                Location::Unova => Some(30009),
+                Location::Kalos => Some(30010),
+                Location::PokemonGo => Some(30012),
+                Location::KantoVirtualConsole => Some(30013),
+                Location::HoennGen6 => Some(30014),
+                Location::Alola => Some(30015),
+                Location::JohtoVirtualConsole => Some(30017),
+                Location::FarawayPlace => Some(40002),
+                _ => None,
+            },
+            Self::PK8 => match notable_location {
+                Location::LinkTrade => Some(30001),
+                Location::KantoGen3 => Some(30003),
+                Location::JohtoGen4 => Some(30004),
+                Location::HoennGen3 => Some(30005),
+                Location::SinnohGen4 => Some(30006),
+                Location::OrreDistantLand => Some(30007),
+                Location::Unova => Some(30009),
+                Location::Kalos => Some(30010),
+                Location::PokemonGo => Some(30012),
+                Location::KantoVirtualConsole => Some(30013),
+                Location::HoennGen6 => Some(30014),
+                Location::Alola => Some(30015),
+                Location::JohtoVirtualConsole => Some(30017),
+                Location::PokemonHome => Some(30018),
+                Location::KantoLetsGo => Some(30019),
+                Location::FarawayPlace => Some(40002),
+                _ => None,
+            },
+            Self::PA8 => match notable_location {
+                Location::LinkTrade => Some(30001),
+                Location::KantoGen3 => Some(30003),
+                Location::JohtoGen4 => Some(30004),
+                Location::HoennGen3 => Some(30005),
+                Location::SinnohGen4 => Some(30006),
+                Location::OrreDistantLand => Some(30007),
+                Location::Unova => Some(30009),
+                Location::Kalos => Some(30010),
+                Location::PokemonGo => Some(30012),
+                Location::KantoVirtualConsole => Some(30013),
+                Location::HoennGen6 => Some(30014),
+                Location::Alola => Some(30015),
+                Location::JohtoVirtualConsole => Some(30017),
+                Location::PokemonHome => Some(30018),
+                Location::KantoLetsGo => Some(30019),
+                Location::Galar => Some(30020),
+                Location::Hisui => Some(30021),
+                Location::SinnohGen8 => Some(30022),
+                Location::FarawayPlace => Some(40002),
+                _ => None,
+            },
+            Self::PB8 => match notable_location {
+                Location::LinkTrade => Some(30001),
+                Location::KantoGen3 => Some(30003),
+                Location::JohtoGen4 => Some(30004),
+                Location::HoennGen3 => Some(30005),
+                Location::SinnohGen4 => Some(30006),
+                Location::OrreDistantLand => Some(30007),
+                Location::Unova => Some(30009),
+                Location::Kalos => Some(30010),
+                Location::PokemonGo => Some(30012),
+                Location::KantoVirtualConsole => Some(30013),
+                Location::HoennGen6 => Some(30014),
+                Location::Alola => Some(30015),
+                Location::JohtoVirtualConsole => Some(30017),
+                Location::PokemonHome => Some(30018),
+                Location::KantoLetsGo => Some(30019),
+                Location::Galar => Some(30020),
+                Location::SinnohGen8 => Some(30022),
+                Location::FarawayPlace => Some(40002),
+                _ => None,
+            },
+            Self::PK9 => match notable_location {
+                Location::LinkTrade => Some(30001),
+                Location::KantoGen3 => Some(30003),
+                Location::JohtoGen4 => Some(30004),
+                Location::HoennGen3 => Some(30005),
+                Location::SinnohGen4 => Some(30006),
+                Location::OrreDistantLand => Some(30007),
+                Location::Unova => Some(30009),
+                Location::Kalos => Some(30010),
+                Location::PokemonGo => Some(30012),
+                Location::KantoVirtualConsole => Some(30013),
+                Location::HoennGen6 => Some(30014),
+                Location::Alola => Some(30015),
+                Location::JohtoVirtualConsole => Some(30017),
+                Location::PokemonHome => Some(30018),
+                Location::KantoLetsGo => Some(30019),
+                Location::Galar => Some(30020),
+                Location::Hisui => Some(30021),
+                Location::SinnohGen8 => Some(30022),
+                Location::FarawayPlace => Some(40002),
+                _ => None,
+            },
+            Self::PA9 => match notable_location {
+                Location::LinkTrade => Some(30001),
+                Location::KantoGen3 => Some(30003),
+                Location::JohtoGen4 => Some(30004),
+                Location::HoennGen3 => Some(30005),
+                Location::SinnohGen4 => Some(30006),
+                Location::OrreDistantLand => Some(30007),
+                Location::Unova => Some(30009),
+                Location::Kalos => Some(30010),
+                Location::PokemonGo => Some(30012),
+                Location::KantoVirtualConsole => Some(30013),
+                Location::HoennGen6 => Some(30014),
+                Location::Alola => Some(30015),
+                Location::JohtoVirtualConsole => Some(30017),
+                Location::PokemonHome => Some(30018),
+                Location::KantoLetsGo => Some(30019),
+                Location::Galar => Some(30020),
+                Location::Hisui => Some(30021),
+                Location::SinnohGen8 => Some(30022),
+                Location::Paldea => Some(30025),
+                Location::Lumiose => Some(30026),
+                Location::FarawayPlace => Some(40002),
+                _ => None,
+            },
+            Self::PK3RR => todo!(),
+            Self::PK3UB => todo!(),
+            Self::PB8LUMI => todo!(),
+        }
+    }
+
+    // Defaults to 0 if not present. Probably a better way to handle that
+    pub fn link_trade_location_index(&self) -> u16 {
+        self.index_for(Location::LinkTrade).unwrap_or(0)
+    }
+
+    pub fn met_data_maximizing_legality(&self, ohpkm: OhpkmV2) -> MetData {
+        let source_origin = ohpkm.game_of_origin();
+        let source_met_location = ohpkm.met_location_index();
+        if self.matches_origin(ohpkm.game_of_origin()) {
+            // this format matches the origin game, so the met location index should be valid in the new format
+            return MetData::new(source_origin, source_met_location);
+        }
+
+        match self {
+            PkmFormat::PK1 | PkmFormat::PK2 => {
+                MetData::new(source_origin, Location::cant_tell_gen2())
+            }
+            PkmFormat::PK3 => {
+                let location = match ohpkm.is_fateful_encounter() {
+                    true => Location::FatefulEncounter,
+                    false => Location::LinkTrade,
+                };
+
+                let origin = self.legalize_origin(source_origin);
+                let location_index = self
+                    .index_for(location)
+                    .expect("Link trade and fateful encounter should be present for PK3");
+
+                MetData::new(origin, location_index)
+            }
+            PkmFormat::COLOPKM | PkmFormat::XDPKM => {
+                let origin = self.legalize_origin(source_origin);
+                let location_index = self
+                    .index_for(Location::LinkTrade)
+                    .expect("Link trade and fateful encounter should be present for PK3");
+
+                MetData::new(origin, location_index)
+            }
+            PkmFormat::PK4 => {
+                let origin = self.legalize_origin(source_origin);
+                let location_index = if origin.generation() == Generation::G3 {
+                    PAL_PARK_GEN_4
+                } else {
+                    self.index_for(Location::LinkTrade)
+                        .expect("Link trade should be present for PK4")
+                };
+
+                MetData::new(origin, location_index)
+            }
+            PkmFormat::PK5 => {
+                let origin = self.legalize_origin(source_origin);
+                let location_index = if origin.generation() <= Generation::G4 {
+                    POKE_TRANSFER_LAB_GEN_5
+                } else {
+                    self.index_for(Location::LinkTrade)
+                        .expect("Link trade should be present for PK5")
+                };
+
+                MetData::new(origin, location_index)
+            }
+            PkmFormat::PK6 => {
+                let origin = self.legalize_origin(source_origin);
+                let location_index = if origin.generation() <= Generation::G4 {
+                    POKE_TRANSFER_LAB_GEN_5
+                } else {
+                    self.index_for(Location::LinkTrade)
+                        .expect("Link trade should be present for PK6")
+                };
+
+                MetData::new(origin, location_index)
+            }
+            PkmFormat::PK7 => {
+                let origin = self.legalize_origin(source_origin);
+                let location_index = if origin.generation() <= Generation::G4 {
+                    POKE_TRANSFER_LAB_GEN_5
+                } else {
+                    self.index_for(Location::LinkTrade)
+                        .expect("Link trade should be present for PK7")
+                };
+
+                MetData::new(origin, location_index)
+            }
+            PkmFormat::PB7 => {
+                let origin = self.legalize_origin(source_origin);
+                let location_index =
+                    if !source_origin.is_lets_go() && source_origin != OriginGame::Go {
+                        GO_PARK_LETS_GO
+                    } else {
+                        self.index_for(Location::LinkTrade)
+                            .expect("Link trade should be present for PB7")
+                    };
+
+                MetData::new(origin, location_index)
+            }
+            PkmFormat::PK8 => todo!(),
+            PkmFormat::PA8 => todo!(),
+            PkmFormat::PB8 => todo!(),
+            PkmFormat::PK9 => todo!(),
+            PkmFormat::PA9 => todo!(),
+            PkmFormat::PK3RR => todo!(),
+            PkmFormat::PK3UB => todo!(),
+            PkmFormat::PB8LUMI => todo!(),
+        }
+    }
+}
+
+pub struct MetData {
+    pub origin: OriginGame,
+    pub location_index: u16,
+}
+
+impl MetData {
+    pub const fn new(origin: OriginGame, location_index: u16) -> Self {
+        Self {
+            origin,
+            location_index,
+        }
+    }
+}
