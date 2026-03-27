@@ -15,6 +15,7 @@ import {
 import { ModernRibbons } from '@pokemon-resources/index'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import { NationalDex } from '../../../pokemon-resources/src/consts/NationalDex'
+import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { FourMoves } from '../util/pkmInterface'
@@ -221,7 +222,9 @@ export default class PK6 {
         .map((index) => ModernRibbons[index])
       this.trainerGender = byteLogic.getFlag(dataView, 0xdd, 7)
     } else {
+      const converter = new PkmConverter('PK6', strategy)
       const other = arg
+
       this.encryptionConstant = other.encryptionConstant ?? 0
       this.dexNum = other.dexNum
       this.heldItemIndex = other.heldItemIndex
@@ -328,7 +331,7 @@ export default class PK6 {
       this.eggDate = other.eggDate ?? undefined
       this.metDate = other.metDate
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      this.metLocationIndex = converter.metLocationIndex(other)
       if (other.ball && PK6.maxValidBall() >= other.ball) {
         this.ball = other.ball
       } else {

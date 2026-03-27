@@ -288,17 +288,9 @@ export default class PK4 {
         this.eggLocationIndexPtHGSS = 0
       }
 
-      if (other.metLocationIndex) {
-        this.metLocationIndexDP = validDPLocation(other.metLocationIndex)
-          ? other.metLocationIndex
-          : DP_FARAWAY_PLACE
-        this.metLocationIndexPtHGSS = other.metLocationIndex
-        this.metLocationIndex = other.metLocationIndex
-      } else {
-        this.metLocationIndex = 0
-        this.metLocationIndexDP = 0
-        this.metLocationIndexPtHGSS = 0
-      }
+      this.metLocationIndexDP = converter.metLocationIndexDpPk4(other)
+      this.metLocationIndexPtHGSS = converter.metLocationIndex(other)
+      this.metLocationIndex = converter.metLocationIndex(other)
 
       this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '') ?? []
       this.nickname = converter.nickname(other)

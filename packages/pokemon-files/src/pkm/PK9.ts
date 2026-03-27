@@ -12,6 +12,7 @@ import {
 import { ModernRibbons } from '@pokemon-resources/index'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import * as conversion from '../conversion'
+import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
 import { FourMoves } from '../util/pkmInterface'
@@ -200,6 +201,8 @@ export default class PK9 {
       this.trainerGender = byteLogic.getFlag(dataView, 0x125, 7)
     } else {
       const other = arg
+      const converter = new PkmConverter('PK9', options.strategy)
+
       this.encryptionConstant = other.encryptionConstant ?? 0
       this.dexNum = other.dexNum
       this.heldItemIndex = other.heldItemIndex
@@ -302,7 +305,7 @@ export default class PK9 {
       }
       this.obedienceLevel = other.obedienceLevel ?? 0
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      this.metLocationIndex = converter.metLocationIndex(other)
       if (other.ball && PK9.allowedBalls().includes(other.ball)) {
         this.ball = other.ball
       } else {

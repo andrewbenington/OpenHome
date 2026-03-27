@@ -1,6 +1,31 @@
 import { MonFormat } from '@openhome-core/pkm/interfaces'
 
-export const NotableLocations: Partial<Record<MonFormat, Record<string, number>>> = {
+export type NotableLocationKey =
+  | 'LinkTrade'
+  | 'KantoFrLg'
+  | 'JohtoHgSs'
+  | 'HoennRse'
+  | 'SinnohDPPt'
+  | 'DistantLand'
+  | 'Unova'
+  | 'Kalos'
+  | 'PokemonGo'
+  | 'KantoVirtualConsole'
+  | 'HoennORAS'
+  | 'Alola'
+  | 'JohtoVirtualConsole'
+  | 'PokemonHome'
+  | 'KantoLetsGo'
+  | 'Galar'
+  | 'Hisui'
+  | 'SinnohBDSP'
+  | 'FarawayPlace'
+  | 'Paldea'
+  | 'Lumiose'
+
+type FormatNotableLocations = Partial<Record<NotableLocationKey, number>> & { LinkTrade: number }
+
+export const NotableLocations: Partial<Record<MonFormat, FormatNotableLocations>> = {
   PK4: {
     LinkTrade: 2001,
     // Link Trade 2002,
@@ -12,13 +37,14 @@ export const NotableLocations: Partial<Record<MonFormat, Record<string, number>>
     DistantLand: 2008,
   },
   PK5: {
+    // －－－－－－－－－－: 30001
     LinkTrade: 30002,
-    // Link Trade 30002,
-    KantoFrLg: 30003,
-    JohtoHgSs: 30004,
-    HoennRse: 30005,
-    SinnohDPPt: 30006,
-    DistantLand: 30007,
+    // Link Trade 30003,
+    KantoFrLg: 30004,
+    JohtoHgSs: 30005,
+    HoennRse: 30006,
+    SinnohDPPt: 30007,
+    DistantLand: 30008,
     FarawayPlace: 40002,
   },
   PK6: {

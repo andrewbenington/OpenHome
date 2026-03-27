@@ -113,14 +113,14 @@ export default class XDPKM {
         byteLogic.getFlagIndexes(dataView, 0x7c, 15, 12).map((index) => Gen3StandardRibbons[index])
       )
     } else {
-      const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
+      const converter = new PkmConverter('XDPKM', options.strategy)
 
       this.dexNum = other.dexNum
       this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
-      this.currentHP = other.currentHP ?? 0
-      this.trainerFriendship = other.trainerFriendship ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      this.currentHP = other.currentHP
+      this.trainerFriendship = other.trainerFriendship
+      this.metLocationIndex = converter.metLocationIndex(other)
       this.metLevel = other.metLevel
       if (other.ball && XDPKM.maxValidBall() >= other.ball) {
         this.ball = other.ball
@@ -128,19 +128,14 @@ export default class XDPKM {
         this.ball = Ball.Poke
       }
       this.trainerGender = other.trainerGender
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.markings = types.markingsFourShapesFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-      }
-      this.isEgg = other.isEgg ?? false
+      this.pokerusByte = other.pokerusByte
+      this.markings = types.markingsFourShapesFromOther(other.markings)
+      this.isEgg = other.isEgg
       this.exp = other.exp
       this.secretID = other.secretID
       this.trainerID = other.trainerID
-      this.personalityValue = other.personalityValue ?? 0
-      this.isFatefulEncounter = other.isFatefulEncounter ?? false
+      this.personalityValue = other.personalityValue
+      this.isFatefulEncounter = other.isFatefulEncounter
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
       this.trainerName = other.trainerName

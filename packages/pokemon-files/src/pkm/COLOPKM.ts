@@ -113,14 +113,14 @@ export default class COLOPKM {
         byteLogic.getByteIndexes(dataView, 0xbd, 11).map((index) => Gen3StandardRibbons[index])
       )
     } else {
-      const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
+      const converter = new PkmConverter('COLOPKM', options.strategy)
 
       this.dexNum = other.dexNum
-      this.personalityValue = other.personalityValue ?? 0
+      this.personalityValue = other.personalityValue
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      this.metLocationIndex = converter.metLocationIndex(other)
       this.metLevel = other.metLevel
       if (other.ball && COLOPKM.maxValidBall() >= other.ball) {
         this.ball = other.ball
@@ -141,14 +141,14 @@ export default class COLOPKM {
       this.movePPUps = moveFilter.movePpUps(other)
 
       this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
-      this.currentHP = other.currentHP ?? 0
+      this.currentHP = other.currentHP
       this.evs = other.evs
       this.ivs = other.ivs
       this.contest = other.contest
-      this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.pokerusByte = other.pokerusByte ?? 0
+      this.isFatefulEncounter = other.isFatefulEncounter
+      this.pokerusByte = other.pokerusByte
       this.markings = types.markingsFourShapesFromOther(other.markings)
-      this.trainerFriendship = other.trainerFriendship ?? 0
+      this.trainerFriendship = other.trainerFriendship
       this.shadowID = 0
       this.shadowGauge = 0
       this.ribbons = filterRibbons(other.ribbons, [Gen3ContestRibbons, Gen3StandardRibbons]) ?? []

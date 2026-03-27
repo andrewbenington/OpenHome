@@ -116,8 +116,9 @@ export default class PK2 {
       }
       this.trainerGender = byteLogic.getFlag(dataView, 0x1e, 7)
     } else {
-      const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
+      const converter = new PkmConverter('PK2', options.strategy)
+
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
       this.dexNum = other.dexNum

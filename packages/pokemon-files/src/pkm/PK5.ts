@@ -230,7 +230,7 @@ export default class PK5 {
         year: new Date().getFullYear(),
       }
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      this.metLocationIndex = converter.metLocationIndex(other)
       this.pokerusByte = other.pokerusByte ?? 0
       if (other.ball && PK5.maxValidBall() >= other.ball) {
         this.ball = other.ball

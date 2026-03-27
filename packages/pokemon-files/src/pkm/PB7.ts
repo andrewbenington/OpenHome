@@ -10,6 +10,7 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { PkmConverter } from '../conversion/converter'
 import { FourMoves } from '../util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
@@ -193,6 +194,8 @@ export default class PB7 {
       this.trainerGender = byteLogic.getFlag(dataView, 0xdd, 7)
     } else {
       const other = arg
+      const converter = new PkmConverter('PB7', strategy)
+
       this.encryptionConstant = other.encryptionConstant ?? 0
       this.dexNum = other.dexNum
       this.heldItemIndex = 0
@@ -277,7 +280,7 @@ export default class PB7 {
         year: new Date().getFullYear(),
       }
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      this.metLocationIndex = converter.metLocationIndex(other)
       if (other.ball && PB7.allowedBalls().includes(other.ball)) {
         this.ball = other.ball
       } else {

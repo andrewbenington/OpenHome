@@ -182,7 +182,7 @@ export default class PK3 {
         sheen: 0,
       }
       this.pokerusByte = other.pokerusByte ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      this.metLocationIndex = converter.metLocationIndex(other)
       this.metLevel = other.metLevel
       this.gameOfOrigin = other.gameOfOrigin
       if (other.ball && PK3.maxValidBall() >= other.ball) {

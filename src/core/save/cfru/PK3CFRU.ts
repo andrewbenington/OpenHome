@@ -33,6 +33,7 @@ import {
   writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
+import { PkmConverter } from '../../../../packages/pokemon-files/src/conversion/converter'
 import { OHPKM } from '../../pkm/OHPKM'
 import { Option } from '../../util/functional'
 import { PluginIdentifier } from '../interfaces'
@@ -120,7 +121,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
   abstract selectColor: string
 
-  constructor(arg: ArrayBuffer | OHPKM, _options: PkmConstructorOptions) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       const dataView = new DataView(buffer)
@@ -233,17 +234,13 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.hasHiddenAbility = getFlag(dataView, 0x36, 31)
     } else {
       const other = arg
+      const converter = new PkmConverter(this.getFormat(), options.strategy)
 
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.language = other.language
-      this.markings = markingsFourShapesFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-      }
+      this.markings = markingsFourShapesFromOther(other.markings)
       this.dexNum = other.dexNum
       this.formeNum = other.formeNum
       this.extraFormIndex = other.extraFormIndex
@@ -256,16 +253,9 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.movePP = moveFilter.movePp(other, this.getFormat())
       this.movePPUps = moveFilter.movePpUps(other)
 
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      this.evs = other.evs
+      this.pokerusByte = other.pokerusByte
+      this.metLocationIndex = converter.metLocationIndex(other)
       this.metLevel = other.metLevel
 
       const fromRadicalRed = other.pluginOrigin === 'radical_red'
