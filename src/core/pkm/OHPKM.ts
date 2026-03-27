@@ -64,6 +64,11 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return 'OHPKM'
   }
   format: 'OHPKM' = 'OHPKM'
+  fileIdentifier: string = crypto.randomUUID()
+
+  get bytes(): Uint8Array {
+    return this.toByteArray()
+  }
 
   constructor(arg: Uint8Array | AllPKMFields) {
     if (arg instanceof Uint8Array) {

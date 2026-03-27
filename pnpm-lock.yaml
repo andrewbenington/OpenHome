@@ -179,6 +179,25 @@ importers:
         specifier: ^4.1.1
         version: 4.1.1(@types/node@25.5.0)(jsdom@28.1.0)(vite@8.0.2(@types/node@25.5.0)(esbuild@0.27.3))
 
+  generate:
+    dependencies:
+      better-sqlite3:
+        specifier: ^12.4.1
+        version: 12.6.2
+      camelcase-keys:
+        specifier: ^10.0.0
+        version: 10.0.2
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.14
+        version: 24.12.0
+
+  pkm_rs/pkg: {}
+
+  pkm_rs_resources/pkg: {}
+
+  pkm_rs_types/pkg: {}
+
 packages:
 
   '@acemir/cssom@0.9.31':
@@ -1607,6 +1626,11 @@ packages:
   '@types/lodash@4.17.24':
     resolution: {integrity: sha512-gIW7lQLZbue7lRSWEFql49QJJWThrTFFeIMJdp3eH4tKoxm1OvEPg02rm4wCCSHS0cL3/Fizimb35b7k8atwsQ==}
 
+  '@types/node@24.12.0':
+    resolution: {integrity: sha512-GYDxsZi3ChgmckRT9HPU0WEhKLP08ev/Yfcq2AstjrDASOYCSXeyjDsHg4v5t4jOj7cyDX3vmprafKlWIG9MXQ==}
+
+  '@types/node@25.3.2':
+    resolution: {integrity: sha512-RpV6r/ij22zRRdyBPcxDeKAzH43phWVKEjL2iksqo1Vz3CuBUrgmPpPhALKiRfU7OMCmeeO9vECBMsV0hMTG8Q==}
   '@types/node@25.5.0':
     resolution: {integrity: sha512-jp2P3tQMSxWugkCUKLRPVUpGaL5MVFwF8RDuSRztfwgN1wmqJeMSbKlnEtQqU8UrhTmzEmZdu2I6v2dpp7XIxw==}
 
@@ -3428,6 +3452,9 @@ packages:
     resolution: {integrity: sha512-nWJ91DjeOkej/TA8pXQ3myruKpKEYgqvpw9lz4OPHj/NWFNluYrjbz9j01CJ8yKQd2g4jFoOkINCTW2I5LEEyw==}
     engines: {node: '>= 0.4'}
 
+  undici-types@7.16.0:
+    resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
+
   undici-types@7.18.2:
     resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
 
@@ -5031,6 +5058,11 @@ snapshots:
 
   '@types/lodash@4.17.24': {}
 
+  '@types/node@24.12.0':
+    dependencies:
+      undici-types: 7.16.0
+
+  '@types/node@25.3.2':
   '@types/node@25.5.0':
     dependencies:
       undici-types: 7.18.2
@@ -7175,6 +7207,8 @@ snapshots:
       has-bigints: 1.1.0
       has-symbols: 1.1.0
       which-boxed-primitive: 1.1.1
+
+  undici-types@7.16.0: {}
 
   undici-types@7.18.2: {}
 

@@ -34,6 +34,12 @@
         "isDefault": true
       },
       "detail": "Cleans the dist folder and performs a cargo clean."
+    },
+    {
+      "label": "run-makefile",
+      "type": "shell",
+      "command": "make",
+      "isBackground": false
     }
   ]
 }

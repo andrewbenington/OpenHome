@@ -2,6 +2,7 @@
 /node_modules
 /pkm_rs_resources/generate/node_modules
 /pkm_rs/generate/node_modules
+/generate/node_modules
 
 /.pnp
 .pnp.js
@@ -48,6 +49,9 @@ target/
 # IDE files
 *.code-workspace
 *.sublime-workspace
+
+# executables
+OpenHome.exe
 *.sublime-project
 *.wakatime-project
 .idea

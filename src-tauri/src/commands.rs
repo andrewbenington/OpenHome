@@ -4,12 +4,71 @@ use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloade
 use crate::state::{AppState, AppStateInner};
 use crate::util::ImageResponse;
 use crate::{menu, saves, util};
+use pkm_rs::pkm::ohpkm::{
+    SectionTagV2,
+    sectioned_data::{Error as SectionedDataError, SectionedData},
+};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 use tauri::Manager;
+
+fn sectioned_data_error_message(e: SectionedDataError) -> String {
+    match e {
+        SectionedDataError::BufferTooShort {
+            field,
+            expected,
+            received,
+        } => {
+            format!(
+                "buffer too short in sectioned data (field: {}, expected: {}, received: {})",
+                field, expected, received
+            )
+        }
+        SectionedDataError::SectionOutOfBounds {
+            section_name,
+            offset,
+            length,
+            buffer_size,
+        } => {
+            format!(
+                "section out of bounds in sectioned data (section: {}, offset: {}, length: {}, buffer_size: {})",
+                section_name, offset, length, buffer_size
+            )
+        }
+    }
+}
+
+#[tauri::command]
+pub fn compute_openhome_id_from_ohpkm_bytes(bytes: Vec<u8>) -> Result<String> {
+    let sectioned_data = SectionedData::<SectionTagV2>::from_bytes(&bytes).map_err(|e| {
+        Error::other(&format!(
+            "Could not parse OHPKM bytes as sectioned data: {}",
+            sectioned_data_error_message(e)
+        ))
+    })?;
+
+    let main_data = sectioned_data
+        .find_section_data(SectionTagV2::MainData)
+        .ok_or(Error::other("Main data section not present in OHPKM bytes"))?;
+
+    if main_data.bytes.len() < 25 {
+        return Err(Error::other("Main data section too short to compute openhome_id"));
+    }
+
+    let personality_value = u32::from_le_bytes(main_data.bytes[0..4].try_into().unwrap());
+    let species_index = u16::from_le_bytes(main_data.bytes[8..10].try_into().unwrap());
+    let trainer_id = u16::from_le_bytes(main_data.bytes[12..14].try_into().unwrap());
+    let secret_id = u16::from_le_bytes(main_data.bytes[14..16].try_into().unwrap());
+    let game_of_origin = main_data.bytes[24];
+
+    Ok(format!(
+        "{:04}-{:04x}{:04x}-{:08x}-{:02x}",
+        species_index, trainer_id, secret_id, personality_value, game_of_origin
+    ))
+}
 
 #[tauri::command]
 pub fn get_state(state: tauri::State<'_, AppState>) -> Result<AppStateInner> {
