@@ -55,7 +55,7 @@ export const ConversionSettingsContext = createContext<
 
 export const DEFAULT_CONVERT_STRATEGY: ConvertStrategy = {
   'nickname.capitalization': 'GameDefault',
-  'metLocation.useRegion': true,
+  'metData.useRegion': true,
 }
 
 export type ConvertStrategyKey = keyof ConvertStrategy

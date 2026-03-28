@@ -3,7 +3,7 @@
 
 mod converter;
 mod location;
-mod setting;
+mod option;
 
 use std::fmt::Display;
 
@@ -15,7 +15,7 @@ use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use crate::pkm::convert_strategy::setting::{BoolSetting, SettingType, StringSetting};
+use crate::pkm::convert_strategy::option::{BoolOption, SettingType, StringOption};
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
@@ -43,43 +43,43 @@ impl SettingType {
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub enum SettingIdentifier {
+pub enum ConvertOption {
     #[serde(rename = "nickname.capitalization")]
     NicknameCapitalization,
-    #[serde(rename = "metLocation.useRegion")]
-    MetLocationUseRegion,
+    #[serde(rename = "metData.useRegion")]
+    MetDataUseRegion,
     #[serde(rename = "ivs.maxIfHyperTrained")]
     MaxIvIfHyperTrained,
 }
 
-impl Display for SettingIdentifier {
+impl Display for ConvertOption {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
             Self::NicknameCapitalization => "nickname.capitalization",
-            Self::MetLocationUseRegion => "metLocation.useRegion",
+            Self::MetDataUseRegion => "metData.useRegion",
             Self::MaxIvIfHyperTrained => "ivs.maxIfHyperTrained",
         };
         write!(f, "{}", s)
     }
 }
 
-pub const fn settings_schema() -> &'static [(SettingIdentifier, SettingType)] {
+pub const fn settings_schema() -> &'static [(ConvertOption, SettingType)] {
     use SettingType::*;
     &[
         (
-            SettingIdentifier::NicknameCapitalization,
-            String(StringSetting {
+            ConvertOption::NicknameCapitalization,
+            String(StringOption {
                 default: "gameDefault",
                 allowed_values: Some(&["GameDefault", "Modern"]),
             }),
         ),
         (
-            SettingIdentifier::MetLocationUseRegion,
-            Bool(BoolSetting { default: true }),
+            ConvertOption::MetDataUseRegion,
+            Bool(BoolOption { default: true }),
         ),
         (
-            SettingIdentifier::MaxIvIfHyperTrained,
-            Bool(BoolSetting { default: true }),
+            ConvertOption::MaxIvIfHyperTrained,
+            Bool(BoolOption { default: true }),
         ),
     ]
 }
@@ -89,13 +89,13 @@ pub const fn settings_schema() -> &'static [(SettingIdentifier, SettingType)] {
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Clone)]
 pub struct SettingsSchemaWrapper {
-    settings_schema: HashMap<SettingIdentifier, SettingType>,
+    settings_schema: HashMap<ConvertOption, SettingType>,
 }
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = "getConvertSettingsSchema")]
 pub fn settings_schema_js() -> SettingsSchemaWrapper {
-    let settings: HashMap<SettingIdentifier, SettingType> = settings_schema()
+    let settings: HashMap<ConvertOption, SettingType> = settings_schema()
         .iter()
         .map(|(k, v)| (*k, v.clone()))
         .collect();
@@ -104,7 +104,7 @@ pub fn settings_schema_js() -> SettingsSchemaWrapper {
     }
 }
 
-pub fn get_schema_entry(key: SettingIdentifier) -> Option<&'static SettingType> {
+pub fn get_schema_entry(key: ConvertOption) -> Option<&'static SettingType> {
     settings_schema()
         .iter()
         .find(|(k, _)| *k == key)
@@ -134,7 +134,7 @@ pub fn get_settings_category(subcategory: &str) -> &str {
 pub struct ConvertStrategy {
     #[serde(rename = "nickname.capitalization")]
     pub nickname_capitalization: NicknameCapitalization,
-    #[serde(rename = "metLocation.useRegion")]
+    #[serde(rename = "metData.useRegion")]
     pub met_location_use_region: bool,
     #[serde(rename = "ivs.maxIfHyperTrained")]
     pub max_iv_if_hyper_trained: bool,
@@ -158,40 +158,40 @@ impl ConvertStrategies {
     }
 
     #[wasm_bindgen(js_name = "getCategoryName")]
-    pub fn get_category_name(identifier: SettingIdentifier) -> String {
+    pub fn get_category_name(identifier: ConvertOption) -> String {
         match identifier {
-            SettingIdentifier::NicknameCapitalization => String::from("Nickname"),
-            SettingIdentifier::MetLocationUseRegion => String::from("Met Location"),
-            SettingIdentifier::MaxIvIfHyperTrained => String::from("IVs"),
+            ConvertOption::NicknameCapitalization => String::from("Nickname"),
+            ConvertOption::MetDataUseRegion => String::from("Met Location"),
+            ConvertOption::MaxIvIfHyperTrained => String::from("IVs"),
         }
     }
 
     #[wasm_bindgen(js_name = "getSettingName")]
-    pub fn get_setting_name(identifier: SettingIdentifier) -> String {
+    pub fn get_setting_name(identifier: ConvertOption) -> String {
         match identifier {
-            SettingIdentifier::NicknameCapitalization => String::from("Capitalization"),
-            SettingIdentifier::MetLocationUseRegion => {
+            ConvertOption::NicknameCapitalization => String::from("Capitalization"),
+            ConvertOption::MetDataUseRegion => {
                 String::from("Use Region for Met Location (when possible)")
             }
-            SettingIdentifier::MaxIvIfHyperTrained => {
+            ConvertOption::MaxIvIfHyperTrained => {
                 String::from("Hyper-Trained IVs are Maxed (pre-gen 7)")
             }
         }
     }
 
     #[wasm_bindgen(js_name = "getDescription")]
-    pub fn get_description(identifier: SettingIdentifier) -> String {
+    pub fn get_description(identifier: ConvertOption) -> String {
         match identifier {
-            SettingIdentifier::NicknameCapitalization => String::from(
+            ConvertOption::NicknameCapitalization => String::from(
                 "Decides how unnicknamed Pokémon are capitalized. \
                     \"GameDefault\" uses the original game's capitalization, \
                     \"Modern\" capitalizes all in the modern style.",
             ),
-            SettingIdentifier::MetLocationUseRegion => String::from(
+            ConvertOption::MetDataUseRegion => String::from(
                 "If true, the met location will show the region name when possible. \
                     If false, it shows \"a faraway place\" or \"an in-game trade\".",
             ),
-            SettingIdentifier::MaxIvIfHyperTrained => String::from(
+            ConvertOption::MaxIvIfHyperTrained => String::from(
                 "If true, any hyper-trained IVs will be set to 31 when transferred to a game without hyper training.",
             ),
         }

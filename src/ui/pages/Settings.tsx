@@ -1,14 +1,14 @@
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { AppInfoContext, AppTheme } from '@openhome-ui/state/appInfo'
 import {
-  BoolSetting,
+  BoolOption,
   ConvertStrategies,
   ConvertStrategy,
   getConvertSettingsSchema,
   getDefaultConvertStrategy,
-  NumberSetting,
+  NumberOption,
   SettingType,
-  StringSetting,
+  StringOption,
 } from '@pkm-rs/pkg'
 import { Card, RadioGroup, Select, Separator } from '@radix-ui/themes'
 import { ReactNode, useContext, useEffect } from 'react'
@@ -103,16 +103,16 @@ function PKMConversion2() {
 }
 
 type ConvertSettingControlRenderer = (
-  ifString: (descriptor: StringSetting) => ReactNode,
-  ifNumber: (descriptor: NumberSetting) => ReactNode,
-  ifBool: (descriptor: BoolSetting) => ReactNode
+  ifString: (descriptor: StringOption) => ReactNode,
+  ifNumber: (descriptor: NumberOption) => ReactNode,
+  ifBool: (descriptor: BoolOption) => ReactNode
 ) => ReactNode
 
 function convertSettingControlRenderer(descriptor: SettingType): ConvertSettingControlRenderer {
   return (
-    ifString: (descriptor: StringSetting) => ReactNode,
-    ifNumber: (descriptor: NumberSetting) => ReactNode,
-    ifBool: (descriptor: BoolSetting) => ReactNode
+    ifString: (descriptor: StringOption) => ReactNode,
+    ifNumber: (descriptor: NumberOption) => ReactNode,
+    ifBool: (descriptor: BoolOption) => ReactNode
   ) => {
     if ('Bool' in descriptor) {
       return ifBool(descriptor.Bool)
@@ -162,7 +162,7 @@ function PKMConversionSettingControl({ identifier, descriptor }: PKMConversionSe
 
 interface PKMBoolConversionSettingControlProps {
   identifier: ConvertStrategyKey
-  descriptor: BoolSetting
+  descriptor: BoolOption
   currentSettings: ConvertStrategy
 }
 
@@ -202,7 +202,7 @@ function PKMBoolConversionSettingControl({
 
 interface PKMStringConversionSettingControlProps {
   identifier: ConvertStrategyKey
-  descriptor: StringSetting
+  descriptor: StringOption
   currentSettings: ConvertStrategy
 }
 
