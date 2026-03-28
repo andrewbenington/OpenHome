@@ -7,12 +7,16 @@ use crate::pkm::{
     ohpkm::OhpkmV2,
 };
 
-pub struct Converter {
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+pub struct PkmConverter {
     dest_pkm_format: PkmFormat,
     strategy: ConvertStrategy,
 }
 
-impl Converter {
+impl PkmConverter {
     pub const fn new(dest_pkm_format: PkmFormat, strategy: ConvertStrategy) -> Self {
         Self {
             dest_pkm_format,
@@ -20,7 +24,7 @@ impl Converter {
         }
     }
 
-    pub fn nickname(&self, ohpkm: OhpkmV2) -> String {
+    pub fn nickname(&self, ohpkm: &OhpkmV2) -> String {
         if !ohpkm.nickname_matches_species_eng() {
             return ohpkm.get_nickname().to_owned();
         }
@@ -37,7 +41,7 @@ impl Converter {
         }
     }
 
-    pub fn met_location_index(&self, ohpkm: OhpkmV2) -> u16 {
+    pub fn met_location_index(&self, ohpkm: &OhpkmV2) -> u16 {
         let ohpkm_origin = ohpkm.get_game_of_origin();
         let ohpkm_met_location = ohpkm.get_met_location_index();
 
@@ -64,7 +68,32 @@ impl Converter {
         self.dest_pkm_format.fallback_location_index()
     }
 
-    pub fn met_data_legalized(&self, ohpkm: OhpkmV2) -> MetData {
+    pub fn met_data_legalized(&self, ohpkm: &OhpkmV2) -> MetData {
         self.dest_pkm_format.met_data_maximizing_legality(ohpkm)
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl PkmConverter {
+    #[wasm_bindgen(constructor)]
+    pub fn new_wasm(dest_pkm_format: PkmFormat, strategy: ConvertStrategy) -> Self {
+        Self::new(dest_pkm_format, strategy)
+    }
+
+    #[wasm_bindgen(js_name = "nickname")]
+    pub fn nickname_js(&self, ohpkm: &OhpkmV2) -> String {
+        self.nickname(ohpkm)
+    }
+
+    #[wasm_bindgen(js_name = "metLocationIndex")]
+    pub fn met_location_index_js(&self, ohpkm: &OhpkmV2) -> u16 {
+        self.met_location_index(ohpkm)
+    }
+
+    #[wasm_bindgen(js_name = "metDataLegalized")]
+    pub fn met_data_legalized_js(&self, ohpkm: &OhpkmV2) -> MetData {
+        self.met_data_legalized(ohpkm)
     }
 }

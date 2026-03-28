@@ -2,6 +2,9 @@ use pkm_rs_types::{Generation, OriginGame};
 
 use crate::pkm::{PkmFormat, ohpkm::OhpkmV2};
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
 pub enum Location {
     // General
     LinkTrade,
@@ -133,16 +136,16 @@ impl Location {
 }
 
 impl PkmFormat {
-    pub fn fallback_location_index(self) -> u16 {
-        if self == Self::PK8 {
+    pub fn fallback_location_index(&self) -> u16 {
+        if *self == Self::PK8 {
             FARAWAY_PLACE_SWSH
         } else {
             self.link_trade_location_index()
         }
     }
 
-    const fn link_trade_location_index(self) -> u16 {
-        match self {
+    const fn link_trade_location_index(&self) -> u16 {
+        match *self {
             Self::PK1 | Self::PK2 => CANT_TELL_GEN2,
             Self::PK3 | Self::COLOPKM | Self::XDPKM => LinkTradeIndex::PkmGen3 as u16,
             Self::PK4 => LinkTradeIndex::Pk4 as u16,
@@ -529,7 +532,7 @@ impl PkmFormat {
         }
     }
 
-    pub fn met_data_maximizing_legality(&self, ohpkm: OhpkmV2) -> MetData {
+    pub fn met_data_maximizing_legality(&self, ohpkm: &OhpkmV2) -> MetData {
         let source_origin = ohpkm.get_game_of_origin();
         let source_met_location = ohpkm.get_met_location_index();
         if self.matches_origin(source_origin) {
@@ -582,6 +585,7 @@ impl PkmFormat {
     }
 }
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct MetData {
     pub origin: OriginGame,
     pub location_index: u16,
@@ -623,7 +627,7 @@ mod tests {
         #[test]
         fn to_alola_from_ruby() -> Result<()> {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Ruby, 200);
-            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(&ohpkm);
 
             // Gen 3 games use the poké transfer lab
             assert_eq!(met_data.origin, OriginGame::Ruby);
@@ -635,7 +639,7 @@ mod tests {
         #[test]
         fn to_alola_from_diamond() -> Result<()> {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Diamond, 2000);
-            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(&ohpkm);
 
             // Gen 4 games use the poké transfer lab
             assert_eq!(met_data.origin, OriginGame::Diamond);
@@ -647,7 +651,7 @@ mod tests {
         #[test]
         fn to_alola_from_white() -> Result<()> {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::White, 20000);
-            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(&ohpkm);
 
             // Gen 5+ games keep their location
             assert_eq!(met_data.origin, OriginGame::White);
@@ -663,7 +667,7 @@ mod tests {
         #[test]
         fn to_lets_go_from_ruby() -> Result<()> {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Ruby, 200);
-            let met_data = PkmFormat::PB7.met_data_maximizing_legality(ohpkm);
+            let met_data = PkmFormat::PB7.met_data_maximizing_legality(&ohpkm);
 
             // Gen 3 games use the poké transfer lab
             assert_eq!(met_data.origin, OriginGame::LetsGoEevee);
@@ -675,7 +679,7 @@ mod tests {
         #[test]
         fn to_lets_go_from_go_via_home() -> Result<()> {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Go, POKEMON_GO_HOME_TRANSFER);
-            let met_data = PkmFormat::PB7.met_data_maximizing_legality(ohpkm);
+            let met_data = PkmFormat::PB7.met_data_maximizing_legality(&ohpkm);
 
             // Even Go mons transferred through Home get the Go Park location, since that's the only way to get them into Let's Go
             assert_eq!(met_data.origin, OriginGame::Go);
@@ -687,7 +691,7 @@ mod tests {
         #[test]
         fn to_lets_go_from_scarlet() -> Result<()> {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Scarlet, 20000);
-            let met_data = PkmFormat::PB7.met_data_maximizing_legality(ohpkm);
+            let met_data = PkmFormat::PB7.met_data_maximizing_legality(&ohpkm);
 
             // Future games get an origin of Sword and the faraway place met location
             assert_eq!(met_data.origin, OriginGame::LetsGoEevee);
@@ -703,7 +707,7 @@ mod tests {
         #[test]
         fn to_swsh_from_scarlet() -> Result<()> {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Scarlet, 20000);
-            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(&ohpkm);
 
             // Future games get an origin of Sword and the faraway place met location
             assert_eq!(met_data.origin, OriginGame::Sword);
@@ -715,7 +719,7 @@ mod tests {
         #[test]
         fn to_swsh_from_ruby() -> Result<()> {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Ruby, 200);
-            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(&ohpkm);
 
             // Gen 3 games use the poké transfer lab
             assert_eq!(met_data.origin, OriginGame::Ruby);
@@ -727,7 +731,7 @@ mod tests {
         #[test]
         fn to_swsh_from_diamond() -> Result<()> {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Diamond, 2000);
-            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(&ohpkm);
 
             // Gen 4 games use the poké transfer lab
             assert_eq!(met_data.origin, OriginGame::Diamond);
@@ -739,7 +743,7 @@ mod tests {
         #[test]
         fn to_swsh_from_moon() -> Result<()> {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Moon, 20000);
-            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(&ohpkm);
 
             // Gen 5+ games keep their location
             assert_eq!(met_data.origin, OriginGame::Moon);

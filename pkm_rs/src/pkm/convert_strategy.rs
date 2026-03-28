@@ -174,7 +174,7 @@ pub fn get_settings_category(subcategory: &str) -> &str {
 // ── ConvertStrategy ────────────────────────────────────────────────────────────
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ConvertStrategy {
     #[serde(rename = "nickname.capitalization")]

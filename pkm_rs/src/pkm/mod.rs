@@ -86,7 +86,7 @@ impl PkmFormat {
         }
     }
 
-    pub const fn generation(self) -> Generation {
+    pub const fn generation(&self) -> Generation {
         match self {
             Self::PK1 => Generation::G1,
             Self::PK2 => Generation::G2,
