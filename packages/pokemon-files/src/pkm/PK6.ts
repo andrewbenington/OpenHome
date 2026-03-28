@@ -291,7 +291,7 @@ export default class PK6 {
 
       this.secretSuperTrainingUnlocked = other.secretSuperTrainingUnlocked ?? false
       this.secretSuperTrainingComplete = other.secretSuperTrainingComplete ?? false
-      this.ivs = other.ivs
+      this.ivs = converter.ivs(other)
       this.isEgg = other.isEgg ?? false
       this.isNicknamed = other.isNicknamed ?? false
       this.handlerName = other.handlerName ?? ''

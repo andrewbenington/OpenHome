@@ -266,7 +266,7 @@ export default class PA8 {
       this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
 
       this.currentHP = other.currentHP
-      this.ivs = other.ivs
+      this.ivs = converter.ivs(other)
       this.isEgg = other.isEgg
       this.isNicknamed = other.isNicknamed
       this.dynamaxLevel = other.dynamaxLevel ?? 0

@@ -246,15 +246,7 @@ export default class PB7 {
       this.movePP = moveFilter.movePp(other, this.format)
       this.movePPUps = moveFilter.movePpUps(other)
       this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
-
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
+      this.ivs = converter.ivs(other)
       this.isEgg = other.isEgg ?? false
       this.isNicknamed = other.isNicknamed ?? false
       this.handlerName = ''

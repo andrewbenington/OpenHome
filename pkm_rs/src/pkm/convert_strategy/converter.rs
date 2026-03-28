@@ -7,6 +7,7 @@ use crate::pkm::{
     ohpkm::OhpkmV2,
 };
 
+use pkm_rs_types::Stats8;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -71,6 +72,21 @@ impl PkmConverter {
     pub fn met_data_legalized(&self, ohpkm: &OhpkmV2) -> MetData {
         self.dest_pkm_format.met_data_maximizing_legality(ohpkm)
     }
+
+    pub fn ivs(&self, ohpkm: &OhpkmV2) -> Stats8 {
+        if !self.dest_pkm_format.supports_hyper_training() && self.strategy.max_iv_if_hyper_trained
+        {
+            let mut ivs = ohpkm.get_ivs();
+            for (stat, is_hyper_trained) in ohpkm.get_hyper_training() {
+                if is_hyper_trained {
+                    ivs.set(stat, 31);
+                }
+            }
+            ivs
+        } else {
+            ohpkm.get_ivs()
+        }
+    }
 }
 
 #[cfg(feature = "wasm")]
@@ -95,5 +111,10 @@ impl PkmConverter {
     #[wasm_bindgen(js_name = "metDataLegalized")]
     pub fn met_data_legalized_js(&self, ohpkm: &OhpkmV2) -> MetData {
         self.met_data_legalized(ohpkm)
+    }
+
+    #[wasm_bindgen(js_name = "ivs")]
+    pub fn ivs_js(&self, ohpkm: &OhpkmV2) -> Stats8 {
+        self.ivs(ohpkm)
     }
 }

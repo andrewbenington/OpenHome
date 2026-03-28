@@ -143,7 +143,7 @@ export default class COLOPKM {
       this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
       this.currentHP = other.currentHP
       this.evs = other.evs
-      this.ivs = other.ivs
+      this.ivs = converter.ivs(other)
       this.contest = other.contest
       this.isFatefulEncounter = other.isFatefulEncounter
       this.pokerusByte = other.pokerusByte

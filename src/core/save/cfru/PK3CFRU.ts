@@ -292,14 +292,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       }
 
       this.canGigantamax = !!other.canGigantamax
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
+      this.ivs = converter.ivs(other)
       this.isEgg = other.isEgg ?? false
       this.hasHiddenAbility = other.abilityNum === 4
       this.isNicknamed = other.isNicknamed ?? false

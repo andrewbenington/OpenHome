@@ -92,6 +92,8 @@ pub enum SettingIdentifier {
     NicknameCapitalization,
     #[serde(rename = "metLocation.useRegion")]
     MetLocationUseRegion,
+    #[serde(rename = "ivs.maxIfHyperTrained")]
+    MaxIvIfHyperTrained,
 }
 
 impl Display for SettingIdentifier {
@@ -99,6 +101,7 @@ impl Display for SettingIdentifier {
         let s = match self {
             Self::NicknameCapitalization => "nickname.capitalization",
             Self::MetLocationUseRegion => "metLocation.useRegion",
+            Self::MaxIvIfHyperTrained => "ivs.maxIfHyperTrained",
         };
         write!(f, "{}", s)
     }
@@ -125,6 +128,14 @@ pub const fn settings_schema() -> &'static [(SettingIdentifier, SettingType)] {
                 default: true,
                 description: "If true, the met location will show the region name when possible. \
                     If false, it shows \"a faraway place\" or \"an in-game trade\".",
+            }),
+        ),
+        (
+            SettingIdentifier::MaxIvIfHyperTrained,
+            Bool(BoolSetting {
+                display: "Hyper-Trained IVs are Maxed (pre-gen 7)",
+                default: true,
+                description: "If true, any hyper-trained IVs will be set to 31 when transferred to a game without hyper training.",
             }),
         ),
     ]
@@ -176,11 +187,14 @@ pub fn get_settings_category(subcategory: &str) -> &str {
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
 pub struct ConvertStrategy {
     #[serde(rename = "nickname.capitalization")]
     pub nickname_capitalization: NicknameCapitalization,
     #[serde(rename = "metLocation.useRegion")]
     pub met_location_use_region: bool,
+    #[serde(rename = "ivs.maxIfHyperTrained")]
+    pub max_iv_if_hyper_trained: bool,
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getDefaultConvertStrategy"))]
@@ -205,6 +219,7 @@ impl ConvertStrategies {
         match identifier {
             SettingIdentifier::NicknameCapitalization => String::from("Nickname"),
             SettingIdentifier::MetLocationUseRegion => String::from("Met Location"),
+            SettingIdentifier::MaxIvIfHyperTrained => String::from("IVs"),
         }
     }
 
@@ -213,6 +228,7 @@ impl ConvertStrategies {
         match identifier {
             SettingIdentifier::NicknameCapitalization => String::from("Capitalization"),
             SettingIdentifier::MetLocationUseRegion => String::from("Use Region"),
+            SettingIdentifier::MaxIvIfHyperTrained => String::from("Hyper-Trained IVs are Maxed"),
         }
     }
 }

@@ -147,7 +147,7 @@ export default class XDPKM {
       this.movePPUps = moveFilter.movePpUps(other)
 
       this.evs = other.evs
-      this.ivs = other.ivs
+      this.ivs = converter.ivs(other)
       this.contest = other.contest
       this.shadowID = 0
       this.ribbons =

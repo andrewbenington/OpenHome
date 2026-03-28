@@ -101,4 +101,27 @@ impl PkmFormat {
             Self::PB8LUMI => Generation::G8,
         }
     }
+
+    pub const fn supports_hyper_training(&self) -> bool {
+        match self {
+            Self::PK7
+            | Self::PK8
+            | Self::PA8
+            | Self::PB8
+            | Self::PB8LUMI
+            | Self::PK9
+            | Self::PA9 => true,
+            Self::PK1
+            | Self::PK2
+            | Self::PK3
+            | Self::PK3RR
+            | Self::PK3UB
+            | Self::COLOPKM
+            | Self::XDPKM
+            | Self::PK4
+            | Self::PK5
+            | Self::PK6
+            | Self::PB7 => false,
+        }
+    }
 }

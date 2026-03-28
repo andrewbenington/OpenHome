@@ -265,14 +265,7 @@ export default class PB8 {
       this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
 
       this.currentHP = other.currentHP ?? 0
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
+      this.ivs = converter.ivs(other)
       this.isEgg = other.isEgg ?? false
       this.isNicknamed = other.isNicknamed ?? false
       this.dynamaxLevel = other.dynamaxLevel ?? 0

@@ -9,9 +9,9 @@ use crate::pkm::ohpkm::v2_sections::{
 use crate::pkm::{Error, Result};
 
 use pkm_rs_resources::species::SpeciesMetadata;
-use pkm_rs_types::OriginGame;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::TrainerData;
+use pkm_rs_types::{HyperTraining, OriginGame, Stats8};
 use strum_macros::Display;
 
 #[cfg(feature = "wasm")]
@@ -35,9 +35,8 @@ use pkm_rs_resources::{
 
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{
-    ContestStats, FlagSet, Gender, Geolocations, HyperTraining, MarkingsSixShapesColors, PokeDate,
-    ShinyLeaves, Stats8, Stats16Le, StatsPreSplit, TeraType, TeraTypeWasm, TrainerMemory,
-    strings::SizedUtf16String,
+    ContestStats, FlagSet, Gender, Geolocations, MarkingsSixShapesColors, PokeDate, ShinyLeaves,
+    Stats16Le, StatsPreSplit, TeraType, TeraTypeWasm, TrainerMemory, strings::SizedUtf16String,
 };
 
 const MAGIC_NUMBER: u32 = 0x57575757;
@@ -310,6 +309,14 @@ impl OhpkmV2 {
 
     pub const fn get_is_fateful_encounter(&self) -> bool {
         self.main_data.is_fateful_encounter
+    }
+
+    pub const fn get_ivs(&self) -> Stats8 {
+        self.main_data.ivs
+    }
+
+    pub const fn get_hyper_training(&self) -> HyperTraining {
+        self.main_data.hyper_training
     }
 }
 

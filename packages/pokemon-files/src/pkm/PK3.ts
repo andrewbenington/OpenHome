@@ -191,14 +191,7 @@ export default class PK3 {
         this.ball = Ball.Poke
       }
 
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
+      this.ivs = converter.ivs(other)
       this.isEgg = other.isEgg ?? false
       this.abilityNum = other.abilityNum ?? 1
       if (
