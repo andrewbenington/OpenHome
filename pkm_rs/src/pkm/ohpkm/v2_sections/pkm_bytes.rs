@@ -109,7 +109,7 @@ impl Tag {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Display, Debug)]
-pub enum OriginalBackup {
+pub enum PkmBytes {
     Pk1([u8; PK1_PARTY_SIZE]),
     Pk2([u8; PK2_PARTY_SIZE]),
     Pk3([u8; PK3_PARTY_SIZE]),
@@ -131,7 +131,7 @@ pub enum OriginalBackup {
 
 const LENGTH_CHECKED_MESSAGE: &str = "data length checked above";
 
-impl OriginalBackup {
+impl PkmBytes {
     const fn data_as_bytes(&self) -> &[u8] {
         let bytes: &[u8] = match self {
             Self::Pk1(bytes) => bytes,
@@ -209,21 +209,6 @@ impl OriginalBackup {
         }
     }
 
-    #[cfg(feature = "wasm")]
-    pub fn to_byte_vector(self) -> Vec<u8> {
-        let mut bytes = Vec::with_capacity(2 + self.tag().data_size());
-        bytes.extend_from_slice(&self.tag().to_le_bytes());
-        bytes.extend_from_slice(self.data_as_bytes());
-        bytes
-    }
-}
-
-impl DataSection for OriginalBackup {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::OriginalBackup;
-
-    type ErrorType = Error;
-
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         if bytes.len() < 2 {
             return Err(Error::BufferSize {
@@ -244,11 +229,65 @@ impl DataSection for OriginalBackup {
         Self::new(tag, &bytes[2..])
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
+    pub fn to_bytes(self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(2 + self.tag().data_size());
         bytes.extend_from_slice(&self.tag().to_le_bytes());
         bytes.extend_from_slice(self.data_as_bytes());
-        Ok(bytes)
+        bytes
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct OriginalBackup(PkmBytes);
+
+impl OriginalBackup {
+    pub const fn new(pkm_bytes: PkmBytes) -> Self {
+        Self(pkm_bytes)
+    }
+}
+
+impl DataSection for OriginalBackup {
+    type TagType = SectionTagV2;
+    const TAG: Self::TagType = SectionTagV2::OriginalBackup;
+
+    type ErrorType = Error;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Ok(Self(PkmBytes::from_bytes(bytes)?))
+    }
+
+    fn to_bytes(&self) -> Result<Vec<u8>> {
+        Ok(self.0.to_bytes())
+    }
+
+    fn is_empty(&self) -> bool {
+        // if this section exists, it should always have data, so it is never empty
+        false
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct UnconvertedPkm(PkmBytes);
+
+#[cfg(feature = "wasm")]
+impl UnconvertedPkm {
+    pub const fn new(pkm_bytes: PkmBytes) -> Self {
+        Self(pkm_bytes)
+    }
+}
+
+impl DataSection for UnconvertedPkm {
+    type TagType = SectionTagV2;
+    const TAG: Self::TagType = SectionTagV2::UnconvertedPkm;
+
+    type ErrorType = Error;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Ok(Self(PkmBytes::from_bytes(bytes)?))
+    }
+
+    fn to_bytes(&self) -> Result<Vec<u8>> {
+        Ok(self.0.to_bytes())
     }
 
     fn is_empty(&self) -> bool {

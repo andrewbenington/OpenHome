@@ -21,7 +21,7 @@ use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 use serde::{Deserialize, Serialize};
 use std::num::NonZeroU16;
 
-pub mod original_backup;
+pub mod pkm_bytes;
 
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::species::NatDexIndex;
