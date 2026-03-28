@@ -9,6 +9,7 @@ use crate::pkm::ohpkm::v2_sections::{
 use crate::pkm::{Error, Result};
 
 use pkm_rs_resources::species::SpeciesMetadata;
+use pkm_rs_types::OriginGame;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::TrainerData;
 use strum_macros::Display;
@@ -34,9 +35,9 @@ use pkm_rs_resources::{
 
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{
-    ContestStats, FlagSet, Gender, Geolocations, HyperTraining, MarkingsSixShapesColors,
-    OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le, StatsPreSplit, TeraType, TeraTypeWasm,
-    TrainerMemory, strings::SizedUtf16String,
+    ContestStats, FlagSet, Gender, Geolocations, HyperTraining, MarkingsSixShapesColors, PokeDate,
+    ShinyLeaves, Stats8, Stats16Le, StatsPreSplit, TeraType, TeraTypeWasm, TrainerMemory,
+    strings::SizedUtf16String,
 };
 
 const MAGIC_NUMBER: u32 = 0x57575757;
@@ -297,6 +298,25 @@ impl OhpkmV2 {
 
     pub fn get_nickname(&self) -> String {
         self.main_data.nickname.to_string()
+    }
+
+    pub const fn get_game_of_origin(&self) -> OriginGame {
+        self.main_data.game_of_origin
+    }
+
+    pub const fn get_met_location_index(&self) -> u16 {
+        self.main_data.met_location_index
+    }
+
+    pub const fn get_is_fateful_encounter(&self) -> bool {
+        self.main_data.is_fateful_encounter
+    }
+}
+
+#[cfg(test)]
+impl OhpkmV2 {
+    pub fn get_main_data(&self) -> &MainDataV2 {
+        &self.main_data
     }
 }
 

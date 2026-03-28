@@ -5,7 +5,6 @@ pub mod ohpkm;
 pub mod traits;
 
 use pkm_rs_resources::species::{FormeMetadata, SpeciesMetadata};
-#[cfg(feature = "wasm")]
 use pkm_rs_types::{Generation, OriginGame};
 use serde::{Deserialize, Serialize};
 
@@ -34,7 +33,6 @@ pub trait Pkm: Serialize + IsShiny {
     fn calculate_level(&self) -> u8;
 }
 
-#[cfg(feature = "wasm")]
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -60,7 +58,6 @@ pub enum PkmFormat {
     PB8LUMI,
 }
 
-#[cfg(feature = "wasm")]
 impl PkmFormat {
     pub const fn species_nickname_all_caps(&self) -> bool {
         matches!(
@@ -86,6 +83,22 @@ impl PkmFormat {
             Self::PK9 => origin.is_scarlet_violet(),
             Self::PA9 => origin == OriginGame::LegendsZa,
             Self::PK3RR | Self::PK3UB | Self::PB8LUMI => false,
+        }
+    }
+
+    pub const fn generation(self) -> Generation {
+        match self {
+            Self::PK1 => Generation::G1,
+            Self::PK2 => Generation::G2,
+            Self::PK3 | Self::COLOPKM | Self::XDPKM => Generation::G3,
+            Self::PK4 => Generation::G4,
+            Self::PK5 => Generation::G5,
+            Self::PK6 => Generation::G6,
+            Self::PK7 | Self::PB7 => Generation::G7,
+            Self::PK8 | Self::PA8 | Self::PB8 => Generation::G8,
+            Self::PK9 | Self::PA9 => Generation::G9,
+            Self::PK3RR | Self::PK3UB => Generation::G3,
+            Self::PB8LUMI => Generation::G8,
         }
     }
 }

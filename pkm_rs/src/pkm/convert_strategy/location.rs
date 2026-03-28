@@ -43,17 +43,14 @@ pub enum Location {
     PokemonHome,
 }
 
+const CANT_TELL_GEN2: u16 = 126;
+const FATEFUL_ENCOUNTER_GEN_3: u16 = 255;
 const PAL_PARK_GEN_4: u16 = 55;
 const POKE_TRANSFER_LAB_GEN_5: u16 = 60;
 const GO_PARK_LETS_GO: u16 = 50;
+const FARAWAY_PLACE_SWSH: u16 = 40002;
 
 impl Location {
-    pub fn cant_tell_gen2() -> u16 {
-        PkmFormat::PK2
-            .index_for(Self::CantTell)
-            .expect("Cant tell index present for PK2")
-    }
-
     pub const fn game_setting_best_match(origin: OriginGame) -> Self {
         use OriginGame::*;
         match origin {
@@ -136,6 +133,34 @@ impl Location {
 }
 
 impl PkmFormat {
+    pub fn fallback_location_index(self) -> u16 {
+        if self == Self::PK8 {
+            FARAWAY_PLACE_SWSH
+        } else {
+            self.link_trade_location_index()
+        }
+    }
+
+    const fn link_trade_location_index(self) -> u16 {
+        match self {
+            Self::PK1 | Self::PK2 => CANT_TELL_GEN2,
+            Self::PK3 | Self::COLOPKM | Self::XDPKM => LinkTradeIndex::PkmGen3 as u16,
+            Self::PK4 => LinkTradeIndex::Pk4 as u16,
+            Self::PK5 => LinkTradeIndex::Pk5 as u16,
+            Self::PK6
+            | Self::PK7
+            | Self::PB7
+            | Self::PK8
+            | Self::PA8
+            | Self::PB8
+            | Self::PK9
+            | Self::PA9 => LinkTradeIndex::Pkm3dsSwitch as u16,
+
+            Self::PK3RR | Self::PK3UB => LinkTradeIndex::PkmGen3 as u16,
+            Self::PB8LUMI => LinkTradeIndex::Pkm3dsSwitch as u16,
+        }
+    }
+
     pub fn origin_is_legal(&self, origin: OriginGame) -> bool {
         match self {
             Self::PK1 | Self::PK2 => false,
@@ -262,6 +287,48 @@ impl PkmFormat {
             Self::PK3UB => FireRed,
             Self::PB8LUMI => ShiningPearl,
         }
+    }
+
+    pub fn legalize_met_location(
+        self,
+        original_origin: OriginGame,
+        legalized_origin: OriginGame,
+        met_location_index: u16,
+    ) -> u16 {
+        if self == Self::PB7 {
+            return if self.matches_origin(original_origin) {
+                met_location_index
+            } else if legalized_origin == OriginGame::Go {
+                // Pokémon transferred from Pokémon Go to Let's Go must go through the Go Park
+                GO_PARK_LETS_GO
+            } else {
+                LinkTradeIndex::Pkm3dsSwitch as u16
+            };
+        }
+
+        if self == Self::PK4 && legalized_origin.generation() == Generation::G3 {
+            // Gen 3 Pokémon transferred through Gen 4 must be obtained through the pal park
+            return PAL_PARK_GEN_4;
+        }
+
+        if self.generation() >= Generation::G5 && legalized_origin.generation() <= Generation::G4 {
+            // Pokémon transferred up through Gen 5 have their location reset to the Poké Transfer Lab
+            return POKE_TRANSFER_LAB_GEN_5;
+        }
+
+        let origin_was_changed = original_origin != legalized_origin;
+        if !origin_was_changed {
+            return met_location_index;
+        }
+
+        if self.matches_origin(legalized_origin) {
+            // the illegal origin was simply set to a game of this format, so the met location should be the default.
+            // for most games, this will be a link trade, but for sword/shield it's "the Faraway place"
+            return self.fallback_location_index();
+        }
+
+        // default to link trade if we can't find a better option
+        self.link_trade_location_index()
     }
 
     pub fn index_for(&self, notable_location: Location) -> Option<u16> {
@@ -462,105 +529,52 @@ impl PkmFormat {
         }
     }
 
-    // Defaults to 0 if not present. Probably a better way to handle that
-    pub fn link_trade_location_index(&self) -> u16 {
-        self.index_for(Location::LinkTrade).unwrap_or(0)
-    }
-
     pub fn met_data_maximizing_legality(&self, ohpkm: OhpkmV2) -> MetData {
-        let source_origin = ohpkm.game_of_origin();
-        let source_met_location = ohpkm.met_location_index();
-        if self.matches_origin(ohpkm.game_of_origin()) {
+        let source_origin = ohpkm.get_game_of_origin();
+        let source_met_location = ohpkm.get_met_location_index();
+        if self.matches_origin(source_origin) {
             // this format matches the origin game, so the met location index should be valid in the new format
             return MetData::new(source_origin, source_met_location);
         }
 
         match self {
-            PkmFormat::PK1 | PkmFormat::PK2 => {
-                MetData::new(source_origin, Location::cant_tell_gen2())
-            }
+            PkmFormat::PK1 | PkmFormat::PK2 => MetData::new(source_origin, CANT_TELL_GEN2),
             PkmFormat::PK3 => {
-                let location = match ohpkm.is_fateful_encounter() {
-                    true => Location::FatefulEncounter,
-                    false => Location::LinkTrade,
-                };
-
-                let origin = self.legalize_origin(source_origin);
-                let location_index = self
-                    .index_for(location)
-                    .expect("Link trade and fateful encounter should be present for PK3");
-
-                MetData::new(origin, location_index)
-            }
-            PkmFormat::COLOPKM | PkmFormat::XDPKM => {
-                let origin = self.legalize_origin(source_origin);
-                let location_index = self
-                    .index_for(Location::LinkTrade)
-                    .expect("Link trade and fateful encounter should be present for PK3");
-
-                MetData::new(origin, location_index)
-            }
-            PkmFormat::PK4 => {
-                let origin = self.legalize_origin(source_origin);
-                let location_index = if origin.generation() == Generation::G3 {
-                    PAL_PARK_GEN_4
+                let legalized_origin = self.legalize_origin(source_origin);
+                let location_index = if legalized_origin == OriginGame::ColosseumXd
+                    && ohpkm.get_is_fateful_encounter()
+                {
+                    // Pokémon caught in XD are given the Fateful Encounter location index, which sets the
+                    // fateful encounter flag when transferred to Gen 4 or converted to OHPKM. Since the flag is set,
+                    // the mon must be from XD and would have the fateful encounter location in the GBA games
+                    FATEFUL_ENCOUNTER_GEN_3
                 } else {
-                    self.index_for(Location::LinkTrade)
-                        .expect("Link trade should be present for PK4")
+                    self.legalize_met_location(source_origin, legalized_origin, source_met_location)
                 };
 
-                MetData::new(origin, location_index)
+                MetData::new(legalized_origin, location_index)
             }
-            PkmFormat::PK5 => {
-                let origin = self.legalize_origin(source_origin);
-                let location_index = if origin.generation() <= Generation::G4 {
-                    POKE_TRANSFER_LAB_GEN_5
-                } else {
-                    self.index_for(Location::LinkTrade)
-                        .expect("Link trade should be present for PK5")
-                };
+            PkmFormat::COLOPKM
+            | PkmFormat::XDPKM
+            | PkmFormat::PK4
+            | PkmFormat::PK5
+            | PkmFormat::PK6
+            | PkmFormat::PK7
+            | PkmFormat::PB7
+            | PkmFormat::PK8
+            | PkmFormat::PA8
+            | PkmFormat::PB8
+            | PkmFormat::PK9
+            | PkmFormat::PA9 => {
+                let legalized_origin = self.legalize_origin(source_origin);
+                let location_index = self.legalize_met_location(
+                    source_origin,
+                    legalized_origin,
+                    source_met_location,
+                );
 
-                MetData::new(origin, location_index)
+                MetData::new(legalized_origin, location_index)
             }
-            PkmFormat::PK6 => {
-                let origin = self.legalize_origin(source_origin);
-                let location_index = if origin.generation() <= Generation::G4 {
-                    POKE_TRANSFER_LAB_GEN_5
-                } else {
-                    self.index_for(Location::LinkTrade)
-                        .expect("Link trade should be present for PK6")
-                };
-
-                MetData::new(origin, location_index)
-            }
-            PkmFormat::PK7 => {
-                let origin = self.legalize_origin(source_origin);
-                let location_index = if origin.generation() <= Generation::G4 {
-                    POKE_TRANSFER_LAB_GEN_5
-                } else {
-                    self.index_for(Location::LinkTrade)
-                        .expect("Link trade should be present for PK7")
-                };
-
-                MetData::new(origin, location_index)
-            }
-            PkmFormat::PB7 => {
-                let origin = self.legalize_origin(source_origin);
-                let location_index =
-                    if !source_origin.is_lets_go() && source_origin != OriginGame::Go {
-                        GO_PARK_LETS_GO
-                    } else {
-                        self.index_for(Location::LinkTrade)
-                            .expect("Link trade should be present for PB7")
-                    };
-
-                MetData::new(origin, location_index)
-            }
-            PkmFormat::PK8 => todo!(),
-            PkmFormat::PA8 => todo!(),
-            PkmFormat::PB8 => todo!(),
-            PkmFormat::PK9 => todo!(),
-            PkmFormat::PA9 => todo!(),
             PkmFormat::PK3RR => todo!(),
             PkmFormat::PK3UB => todo!(),
             PkmFormat::PB8LUMI => todo!(),
@@ -578,6 +592,160 @@ impl MetData {
         Self {
             origin,
             location_index,
+        }
+    }
+}
+
+pub enum LinkTradeIndex {
+    PkmGen3 = 254,
+    Pk4 = 2001,
+    Pk5 = 30002,
+    Pkm3dsSwitch = 30001,
+}
+
+#[cfg(all(test, feature = "wasm"))]
+mod tests {
+    use super::*;
+    use crate::pkm::Result;
+
+    const POKEMON_GO_HOME_TRANSFER: u16 = 30012;
+
+    fn ohpkm_with_origin_and_location(origin: OriginGame, location_index: u16) -> OhpkmV2 {
+        let mut ohpkm = OhpkmV2::new(25, 0).expect("Failed to create OHPKM");
+        ohpkm.set_game_of_origin(origin);
+        ohpkm.set_met_location_index(location_index);
+        ohpkm
+    }
+
+    mod pk7 {
+        use super::*;
+
+        #[test]
+        fn to_alola_from_ruby() -> Result<()> {
+            let ohpkm = ohpkm_with_origin_and_location(OriginGame::Ruby, 200);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+
+            // Gen 3 games use the poké transfer lab
+            assert_eq!(met_data.origin, OriginGame::Ruby);
+            assert_eq!(met_data.location_index, POKE_TRANSFER_LAB_GEN_5);
+
+            Ok(())
+        }
+
+        #[test]
+        fn to_alola_from_diamond() -> Result<()> {
+            let ohpkm = ohpkm_with_origin_and_location(OriginGame::Diamond, 2000);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+
+            // Gen 4 games use the poké transfer lab
+            assert_eq!(met_data.origin, OriginGame::Diamond);
+            assert_eq!(met_data.location_index, POKE_TRANSFER_LAB_GEN_5);
+
+            Ok(())
+        }
+
+        #[test]
+        fn to_alola_from_white() -> Result<()> {
+            let ohpkm = ohpkm_with_origin_and_location(OriginGame::White, 20000);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+
+            // Gen 5+ games keep their location
+            assert_eq!(met_data.origin, OriginGame::White);
+            assert_eq!(met_data.location_index, 20000);
+
+            Ok(())
+        }
+    }
+
+    mod pb7 {
+        use super::*;
+
+        #[test]
+        fn to_lets_go_from_ruby() -> Result<()> {
+            let ohpkm = ohpkm_with_origin_and_location(OriginGame::Ruby, 200);
+            let met_data = PkmFormat::PB7.met_data_maximizing_legality(ohpkm);
+
+            // Gen 3 games use the poké transfer lab
+            assert_eq!(met_data.origin, OriginGame::LetsGoEevee);
+            assert_eq!(met_data.location_index, LinkTradeIndex::Pkm3dsSwitch as u16);
+
+            Ok(())
+        }
+
+        #[test]
+        fn to_lets_go_from_go_via_home() -> Result<()> {
+            let ohpkm = ohpkm_with_origin_and_location(OriginGame::Go, POKEMON_GO_HOME_TRANSFER);
+            let met_data = PkmFormat::PB7.met_data_maximizing_legality(ohpkm);
+
+            // Even Go mons transferred through Home get the Go Park location, since that's the only way to get them into Let's Go
+            assert_eq!(met_data.origin, OriginGame::Go);
+            assert_eq!(met_data.location_index, GO_PARK_LETS_GO);
+
+            Ok(())
+        }
+
+        #[test]
+        fn to_lets_go_from_scarlet() -> Result<()> {
+            let ohpkm = ohpkm_with_origin_and_location(OriginGame::Scarlet, 20000);
+            let met_data = PkmFormat::PB7.met_data_maximizing_legality(ohpkm);
+
+            // Future games get an origin of Sword and the faraway place met location
+            assert_eq!(met_data.origin, OriginGame::LetsGoEevee);
+            assert_eq!(met_data.location_index, LinkTradeIndex::Pkm3dsSwitch as u16);
+
+            Ok(())
+        }
+    }
+
+    mod pk8 {
+        use super::*;
+
+        #[test]
+        fn to_swsh_from_scarlet() -> Result<()> {
+            let ohpkm = ohpkm_with_origin_and_location(OriginGame::Scarlet, 20000);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+
+            // Future games get an origin of Sword and the faraway place met location
+            assert_eq!(met_data.origin, OriginGame::Sword);
+            assert_eq!(met_data.location_index, FARAWAY_PLACE_SWSH);
+
+            Ok(())
+        }
+
+        #[test]
+        fn to_swsh_from_ruby() -> Result<()> {
+            let ohpkm = ohpkm_with_origin_and_location(OriginGame::Ruby, 200);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+
+            // Gen 3 games use the poké transfer lab
+            assert_eq!(met_data.origin, OriginGame::Ruby);
+            assert_eq!(met_data.location_index, POKE_TRANSFER_LAB_GEN_5);
+
+            Ok(())
+        }
+
+        #[test]
+        fn to_swsh_from_diamond() -> Result<()> {
+            let ohpkm = ohpkm_with_origin_and_location(OriginGame::Diamond, 2000);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+
+            // Gen 4 games use the poké transfer lab
+            assert_eq!(met_data.origin, OriginGame::Diamond);
+            assert_eq!(met_data.location_index, POKE_TRANSFER_LAB_GEN_5);
+
+            Ok(())
+        }
+
+        #[test]
+        fn to_swsh_from_moon() -> Result<()> {
+            let ohpkm = ohpkm_with_origin_and_location(OriginGame::Moon, 20000);
+            let met_data = PkmFormat::PK8.met_data_maximizing_legality(ohpkm);
+
+            // Gen 5+ games keep their location
+            assert_eq!(met_data.origin, OriginGame::Moon);
+            assert_eq!(met_data.location_index, 20000);
+
+            Ok(())
         }
     }
 }

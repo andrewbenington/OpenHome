@@ -1,6 +1,9 @@
 use crate::pkm::{
     PkmFormat,
-    convert_strategy::{ConvertStrategy, location::Location},
+    convert_strategy::{
+        ConvertStrategy,
+        location::{Location, MetData},
+    },
     ohpkm::OhpkmV2,
 };
 
@@ -19,7 +22,7 @@ impl Converter {
 
     pub fn nickname(&self, ohpkm: OhpkmV2) -> String {
         if !ohpkm.nickname_matches_species_eng() {
-            return ohpkm.nickname().to_owned();
+            return ohpkm.get_nickname().to_owned();
         }
 
         match self.strategy.nickname_capitalization {
@@ -35,8 +38,8 @@ impl Converter {
     }
 
     pub fn met_location_index(&self, ohpkm: OhpkmV2) -> u16 {
-        let ohpkm_origin = ohpkm.game_of_origin();
-        let ohpkm_met_location = ohpkm.met_location_index();
+        let ohpkm_origin = ohpkm.get_game_of_origin();
+        let ohpkm_met_location = ohpkm.get_met_location_index();
 
         if !self.strategy.met_location_use_region {
             // don't use region, just plop whatever met index is present into the new format
@@ -58,6 +61,10 @@ impl Converter {
             return game_setting;
         }
 
-        self.dest_pkm_format.link_trade_location_index()
+        self.dest_pkm_format.fallback_location_index()
+    }
+
+    pub fn met_data_legalized(&self, ohpkm: OhpkmV2) -> MetData {
+        self.dest_pkm_format.met_data_maximizing_legality(ohpkm)
     }
 }
