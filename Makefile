@@ -38,7 +38,7 @@ clean:
 	@rm -rf src-tauri/target
 
 .PHONY: check
-check:
+check: wasm-compile
 	@pnpm run typecheck
 	@pnpm run lint
 	@pnpm run format

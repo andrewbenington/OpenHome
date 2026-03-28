@@ -1921,12 +1921,6 @@ impl OhpkmV2 {
         Ok(())
     }
 
-    #[wasm_bindgen(getter = unconvertedPkm)]
-    pub fn unconverted_pkm(&self) -> Option<Vec<u8>> {
-        self.unconverted_pkm?.to_bytes().ok()
-    }
-
-
     // Calculated
     #[wasm_bindgen(js_name = isShinyWasm)]
     pub fn is_shiny(&self) -> bool {
