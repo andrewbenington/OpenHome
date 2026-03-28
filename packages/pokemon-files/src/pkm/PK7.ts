@@ -208,25 +208,26 @@ export default class PK7 {
     } else {
       const other = arg
       const converter = new PkmConverter('PK7', strategy)
+      const metData = converter.metData(other)
 
-      this.encryptionConstant = other.encryptionConstant ?? 0
+      this.encryptionConstant = other.encryptionConstant
       this.dexNum = other.dexNum
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
       this.ability = other.ability
-      this.abilityNum = other.abilityNum ?? 0
+      this.abilityNum = other.abilityNum
       this.markings = types.markingsSixShapesWithColorFromOther(other.markings)
-      this.personalityValue = other.personalityValue ?? 0
+      this.personalityValue = other.personalityValue
       this.nature = other.nature
-      this.isFatefulEncounter = other.isFatefulEncounter ?? false
+      this.isFatefulEncounter = other.isFatefulEncounter
       this.gender = other.gender
       this.formeNum = other.formeNum
       this.evs = other.evs
       this.contest = other.contest
       this.resortEventStatus = other.resortEventStatus ?? 0
-      this.pokerusByte = other.pokerusByte ?? 0
+      this.pokerusByte = other.pokerusByte
       this.superTrainingFlags = other.superTrainingFlags ?? 0
 
       this.contestMemoryCount = other.contestMemoryCount
@@ -243,11 +244,11 @@ export default class PK7 {
       this.secretSuperTrainingUnlocked = other.secretSuperTrainingUnlocked ?? false
       this.secretSuperTrainingComplete = other.secretSuperTrainingComplete ?? false
       this.ivs = converter.ivs(other)
-      this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? false
-      this.handlerName = other.handlerName ?? ''
-      this.handlerGender = other.handlerGender ?? false
-      this.isCurrentHandler = other.isCurrentHandler ?? false
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
+      this.handlerName = other.handlerName
+      this.handlerGender = other.handlerGender
+      this.isCurrentHandler = other.isCurrentHandler
       this.geolocations = other.geolocations ?? [
         {
           region: 0,
@@ -277,10 +278,11 @@ export default class PK7 {
       this.trainerName = other.trainerName
       this.trainerFriendship = other.trainerFriendship
       this.trainerAffection = other.trainerAffection
-      this.eggDate = other.eggDate ?? undefined
+      this.eggDate = other.eggDate
       this.metDate = other.metDate
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = converter.metLocationIndex(other)
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
       if (other.ball && PK7.maxValidBall() >= other.ball) {
         this.ball = other.ball
       } else {
@@ -288,14 +290,13 @@ export default class PK7 {
       }
       this.metLevel = other.metLevel
       this.hyperTraining = other.hyperTraining
-      this.gameOfOrigin = other.gameOfOrigin
       this.country = other.country ?? 0
       this.region = other.region ?? 0
-      this.consoleRegion = other.consoleRegion ?? 0
+      this.consoleRegion = other.consoleRegion
       this.language = other.language
       this.statusCondition = 0
       this.currentHP = other.currentHP ?? 0
-      this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], 'Battle Tree Master') ?? []
+      this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], 'Battle Tree Master')
       this.handlerMemory = other.handlerMemory
       this.trainerMemory = other.trainerMemory
       this.trainerGender = other.trainerGender

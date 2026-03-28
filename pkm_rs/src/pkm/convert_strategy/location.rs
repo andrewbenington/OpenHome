@@ -172,10 +172,10 @@ impl PkmFormat {
                 origin.generation() == Generation::G3 || origin.generation() == Generation::G4
             }
             Self::PK5 => {
-                origin.generation() >= Generation::G3 || origin.generation() <= Generation::G5
+                origin.generation() >= Generation::G3 && origin.generation() <= Generation::G5
             }
             Self::PK6 => {
-                origin.generation() >= Generation::G3 || origin.generation() <= Generation::G6
+                origin.generation() >= Generation::G3 && origin.generation() <= Generation::G6
             }
             Self::PK7 => origin <= OriginGame::Crystal,
             Self::PB7 => origin.is_lets_go() || origin == OriginGame::Go,
@@ -200,6 +200,10 @@ impl PkmFormat {
     pub fn legalize_origin(&self, origin: OriginGame) -> OriginGame {
         use OriginGame::*;
         if self.origin_is_legal(origin) {
+            println!(
+                "Origin game {:?} is legal in format {:?}, no need to legalize",
+                origin, self
+            );
             return origin;
         }
 
@@ -334,7 +338,7 @@ impl PkmFormat {
         self.link_trade_location_index()
     }
 
-    pub fn index_for(&self, notable_location: Location) -> Option<u16> {
+    pub const fn index_for(&self, notable_location: Location) -> Option<u16> {
         match self {
             Self::PK1 => None,
             Self::PK2 => match notable_location {
@@ -459,7 +463,7 @@ impl PkmFormat {
                 Location::FarawayPlace => Some(40002),
                 _ => None,
             },
-            Self::PB8 => match notable_location {
+            Self::PB8 | Self::PB8LUMI => match notable_location {
                 Location::LinkTrade => Some(30001),
                 Location::KantoGen3 => Some(30003),
                 Location::JohtoGen4 => Some(30004),
@@ -526,9 +530,11 @@ impl PkmFormat {
                 Location::FarawayPlace => Some(40002),
                 _ => None,
             },
-            Self::PK3RR => todo!(),
-            Self::PK3UB => todo!(),
-            Self::PB8LUMI => todo!(),
+            Self::PK3RR | Self::PK3UB => match notable_location {
+                Location::LinkTrade => Some(254),
+                Location::FatefulEncounter => Some(255),
+                _ => None,
+            },
         }
     }
 
@@ -539,6 +545,11 @@ impl PkmFormat {
             // this format matches the origin game, so the met location index should be valid in the new format
             return MetData::new(source_origin, source_met_location);
         }
+
+        println!(
+            "Origin game {:?} is not legal in format {:?}, legalizing origin and met location",
+            source_origin, self
+        );
 
         match self {
             PkmFormat::PK1 | PkmFormat::PK2 => MetData::new(source_origin, CANT_TELL_GEN2),
@@ -578,16 +589,25 @@ impl PkmFormat {
 
                 MetData::new(legalized_origin, location_index)
             }
-            PkmFormat::PK3RR => todo!(),
-            PkmFormat::PK3UB => todo!(),
-            PkmFormat::PB8LUMI => todo!(),
+            PkmFormat::PK3RR | PkmFormat::PK3UB | PkmFormat::PB8LUMI => {
+                let legalized_origin = self.legalize_origin(source_origin);
+                let location_index = self.legalize_met_location(
+                    source_origin,
+                    legalized_origin,
+                    source_met_location,
+                );
+
+                MetData::new(legalized_origin, location_index)
+            }
         }
     }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct MetData {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gameOfOrigin"))]
     pub origin: OriginGame,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "locationIndex"))]
     pub location_index: u16,
 }
 
@@ -619,6 +639,22 @@ mod tests {
         ohpkm.set_game_of_origin(origin);
         ohpkm.set_met_location_index(location_index);
         ohpkm
+    }
+
+    mod pk5 {
+        use super::*;
+
+        #[test]
+        fn to_black_from_omega_ruby() -> Result<()> {
+            let ohpkm = ohpkm_with_origin_and_location(OriginGame::OmegaRuby, 20000);
+            let met_data = PkmFormat::PK5.met_data_maximizing_legality(&ohpkm);
+
+            // Omega Ruby treated as Ruby
+            assert_eq!(met_data.origin, OriginGame::Ruby);
+            assert_eq!(met_data.location_index, POKE_TRANSFER_LAB_GEN_5);
+
+            Ok(())
+        }
     }
 
     mod pk7 {

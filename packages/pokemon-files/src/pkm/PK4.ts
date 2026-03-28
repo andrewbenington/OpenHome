@@ -188,6 +188,7 @@ export default class PK4 {
     } else {
       const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
+      const metData = converter.metData(other)
 
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
       this.dexNum = other.dexNum
@@ -281,9 +282,12 @@ export default class PK4 {
         this.eggLocationIndexPtHGSS = 0
       }
 
-      this.metLocationIndexDP = converter.metLocationIndexDpPk4(other)
-      this.metLocationIndexPtHGSS = converter.metLocationIndex(other)
-      this.metLocationIndex = converter.metLocationIndex(other)
+      this.metLocationIndexDP = converter.metLocationIndexDiamondPearl(other)
+      this.metLocationIndexPtHGSS = converter.metLocationIndexPlatinumHgss(other)
+      this.metLocationIndex = metData.locationIndex
+
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLevel = other.metLevel
 
       this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '') ?? []
       this.nickname = converter.nickname(other)

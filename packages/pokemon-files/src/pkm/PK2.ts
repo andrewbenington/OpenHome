@@ -118,6 +118,7 @@ export default class PK2 {
     } else {
       const other = arg
       const converter = new PkmConverter('PK2', options.strategy)
+      const metData = converter.metData(other)
 
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
@@ -159,7 +160,7 @@ export default class PK2 {
       this.pokerusByte = other.pokerusByte ?? 0
       this.metTimeOfDay = other.metTimeOfDay ?? 0
       this.metLevel = other.metLevel
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      this.metLocationIndex = metData.locationIndex
       this.statusCondition = 0
       this.currentHP = other.currentHP ?? 0
       this.trainerName = other.trainerName

@@ -46,8 +46,8 @@ impl SettingType {
 pub enum ConvertOption {
     #[serde(rename = "nickname.capitalization")]
     NicknameCapitalization,
-    #[serde(rename = "metData.useRegion")]
-    MetDataUseRegion,
+    #[serde(rename = "metData.originAndLocation")]
+    MetDataOriginAndLocation,
     #[serde(rename = "ivs.maxIfHyperTrained")]
     MaxIvIfHyperTrained,
 }
@@ -56,7 +56,7 @@ impl Display for ConvertOption {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
             Self::NicknameCapitalization => "nickname.capitalization",
-            Self::MetDataUseRegion => "metData.useRegion",
+            Self::MetDataOriginAndLocation => "metData.originAndLocation",
             Self::MaxIvIfHyperTrained => "ivs.maxIfHyperTrained",
         };
         write!(f, "{}", s)
@@ -69,13 +69,16 @@ pub const fn settings_schema() -> &'static [(ConvertOption, SettingType)] {
         (
             ConvertOption::NicknameCapitalization,
             String(StringOption {
-                default: "gameDefault",
+                default: "GameDefault",
                 allowed_values: Some(&["GameDefault", "Modern"]),
             }),
         ),
         (
-            ConvertOption::MetDataUseRegion,
-            Bool(BoolOption { default: true }),
+            ConvertOption::MetDataOriginAndLocation,
+            String(StringOption {
+                default: "UseRegion",
+                allowed_values: Some(&["UseRegion", "MaximizeLegality"]),
+            }),
         ),
         (
             ConvertOption::MaxIvIfHyperTrained,
@@ -134,8 +137,8 @@ pub fn get_settings_category(subcategory: &str) -> &str {
 pub struct ConvertStrategy {
     #[serde(rename = "nickname.capitalization")]
     pub nickname_capitalization: NicknameCapitalization,
-    #[serde(rename = "metData.useRegion")]
-    pub met_location_use_region: bool,
+    #[serde(rename = "metData.originAndLocation")]
+    pub met_data_origin_location: MetDataStrategy,
     #[serde(rename = "ivs.maxIfHyperTrained")]
     pub max_iv_if_hyper_trained: bool,
 }
@@ -161,7 +164,7 @@ impl ConvertStrategies {
     pub fn get_category_name(identifier: ConvertOption) -> String {
         match identifier {
             ConvertOption::NicknameCapitalization => String::from("Nickname"),
-            ConvertOption::MetDataUseRegion => String::from("Met Location"),
+            ConvertOption::MetDataOriginAndLocation => String::from("Met Location"),
             ConvertOption::MaxIvIfHyperTrained => String::from("IVs"),
         }
     }
@@ -170,7 +173,7 @@ impl ConvertStrategies {
     pub fn get_setting_name(identifier: ConvertOption) -> String {
         match identifier {
             ConvertOption::NicknameCapitalization => String::from("Capitalization"),
-            ConvertOption::MetDataUseRegion => {
+            ConvertOption::MetDataOriginAndLocation => {
                 String::from("Use Region for Met Location (when possible)")
             }
             ConvertOption::MaxIvIfHyperTrained => {
@@ -187,9 +190,15 @@ impl ConvertStrategies {
                     \"GameDefault\" uses the original game's capitalization, \
                     \"Modern\" capitalizes all in the modern style.",
             ),
-            ConvertOption::MetDataUseRegion => String::from(
-                "If true, the met location will show the region name when possible. \
-                    If false, it shows \"a faraway place\" or \"an in-game trade\".",
+            ConvertOption::MetDataOriginAndLocation => String::from(
+                "Decides how the origin game and met location are converted.\n\
+                    \"UseRegion\" sets the location to the origin game's region, which is more \
+                    immersive and accurate but not legitimately available in the official games.\n\
+                    \"MaximizeLegality\" attempts to convert the Pokémon to one that would be legal \
+                    in the target game, if possible.\n\
+                    For example, a Pokémon from Alpha Sapphire being moved to Black would have its met location \
+                 set to the Poké Transfer Lab if \"MaximizeLegality\" is chosen, but would be set to Hoenn if \"UseRegion\" \
+                 is chosen. In both cases the origin game would be set to Sapphire.",
             ),
             ConvertOption::MaxIvIfHyperTrained => String::from(
                 "If true, any hyper-trained IVs will be set to 31 when transferred to a game without hyper training.",
@@ -207,4 +216,13 @@ pub enum NicknameCapitalization {
     #[default]
     GameDefault,
     Modern,
+}
+
+#[cfg_attr(feature = "wasm", derive(Tsify))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
+#[derive(Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub enum MetDataStrategy {
+    #[default]
+    UseRegion,
+    MaximizeLegality,
 }

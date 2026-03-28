@@ -43,6 +43,7 @@ import {
 } from '@pokemon-resources/consts/TransferRestrictions'
 import {
   BDSPTMMoveIndexes,
+  getLocationStringOrOrigin,
   LATutorMoveIndexes,
   Moves,
   SVTMMoveIndexes,
@@ -82,6 +83,15 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <code>{u32Display(mon.encryptionConstant)}</code>
           </AttributeRow>
         )}
+        <AttributeRow label="Origin Game" value={OriginGames.gameName(mon.gameOfOrigin)} />
+        <AttributeRow
+          label="Met Location"
+          value={
+            mon.metLocationIndex === undefined
+              ? '(not present)'
+              : `${getLocationStringOrOrigin(mon.gameOfOrigin, mon.metLocationIndex, mon.format)} (${mon.metLocationIndex})`
+          }
+        />
         {mon.encryptionConstant !== undefined && (
           <AttributeRow label="Shift Value">
             <code>{(mon.encryptionConstant & 0x3e000) >> (0xd % 24)}</code>

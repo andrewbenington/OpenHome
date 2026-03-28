@@ -4,7 +4,6 @@ import {
   AbilityIndex,
   Ball,
   ConvertStrategy,
-  Gender,
   Item,
   Language,
   Languages,
@@ -162,41 +161,21 @@ export default class PK5 {
     } else {
       const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
+      const metData = converter.metData(other)
 
       this.personalityValue = this.personalityValue =
-        generatePersonalityValuePreservingAttributes(other) ?? 0
+        generatePersonalityValuePreservingAttributes(other)
       this.dexNum = other.dexNum
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
-      this.trainerFriendship = other.trainerFriendship ?? 0
+      this.trainerFriendship = other.trainerFriendship
       this.ability = other.ability
-      this.markings = types.markingsSixShapesNoColorFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-        star: false,
-        diamond: false,
-      }
+      this.markings = types.markingsSixShapesNoColorFromOther(other.markings)
       this.language = other.language
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.contest = other.contest ?? {
-        cool: 0,
-        beauty: 0,
-        cute: 0,
-        smart: 0,
-        tough: 0,
-        sheen: 0,
-      }
+      this.evs = other.evs
+      this.contest = other.contest
 
       const moveFilter = MoveFilter.fromPkmClass(PK5)
       this.moves = moveFilter.moves(other)
@@ -204,27 +183,19 @@ export default class PK5 {
       this.movePPUps = moveFilter.movePpUps(other)
 
       this.ivs = converter.ivs(other)
-      this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? false
-      this.gender =
-        other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
+      this.gender = other.gender
       this.formeNum = other.formeNum
       this.nature = other.nature
       this.isNsPokemon = other.isNsPokemon ?? false
-      this.gameOfOrigin = other.gameOfOrigin
-      this.eggDate = other.eggDate ?? {
-        month: new Date().getMonth(),
-        day: new Date().getDate(),
-        year: new Date().getFullYear(),
-      }
-      this.metDate = other.metDate ?? {
-        month: new Date().getMonth(),
-        day: new Date().getDate(),
-        year: new Date().getFullYear(),
-      }
+      this.eggDate = other.eggDate
+      this.metDate = other.metDate
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = converter.metLocationIndex(other)
-      this.pokerusByte = other.pokerusByte ?? 0
+
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
+      this.pokerusByte = other.pokerusByte
       if (other.ball && PK5.maxValidBall() >= other.ball) {
         this.ball = other.ball
       } else {
@@ -236,7 +207,7 @@ export default class PK5 {
       this.pokeStarFame = other.pokeStarFame ?? 0
       this.statusCondition = 0
       this.currentHP = other.currentHP ?? 0
-      this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '') ?? []
+      this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '')
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
       this.nickname = converter.nickname(other)
       this.trainerName = other.trainerName

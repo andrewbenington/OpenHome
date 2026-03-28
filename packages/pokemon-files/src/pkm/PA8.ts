@@ -222,6 +222,7 @@ export default class PA8 {
     } else {
       const other = arg
       const converter = new PkmConverter('PA8', strategy)
+      const metData = converter.metData(other)
 
       this.encryptionConstant = other.encryptionConstant
       this.dexNum = other.dexNum
@@ -280,37 +281,33 @@ export default class PA8 {
         spa: 0,
         spd: 0,
       }
-      this.handlerName = other.handlerName ?? ''
-      this.handlerGender = other.handlerGender ?? false
-      this.handlerLanguage = other.handlerLanguage ?? 0
-      this.isCurrentHandler = other.isCurrentHandler ?? false
-      this.handlerID = other.handlerId ?? 0
-      this.handlerFriendship = other.handlerFriendship ?? 0
-      this.fullness = other.fullness ?? 0
-      this.enjoyment = other.enjoyment ?? 0
-      this.gameOfOrigin = other.gameOfOrigin
+      this.handlerName = other.handlerName
+      this.handlerGender = other.handlerGender
+      this.handlerLanguage = other.handlerLanguage
+      this.isCurrentHandler = other.isCurrentHandler
+      this.handlerID = other.handlerId
+      this.handlerFriendship = other.handlerFriendship
+      this.fullness = other.fullness
+      this.enjoyment = other.enjoyment
       this.gameOfOriginBattle = other.gameOfOriginBattle ?? 0
       this.region = other.region ?? 0
       this.consoleRegion = other.consoleRegion ?? 0
       this.language = other.language
       this.unknownF3 = other.unknownF3 ?? 0
       this.formArgument = other.formArgument ?? 0
-      this.affixedRibbon = other.affixedRibbon ?? undefined
+      this.affixedRibbon = other.affixedRibbon
       this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship ?? 0
-      this.eggDate = other.eggDate ?? undefined
-      this.metDate = other.metDate ?? {
-        month: new Date().getMonth(),
-        day: new Date().getDate(),
-        year: new Date().getFullYear(),
-      }
+      this.trainerFriendship = other.trainerFriendship
+      this.eggDate = other.eggDate
+      this.metDate = other.metDate
       if (other.ball && PA8.allowedBalls().includes(other.ball)) {
         this.ball = other.ball
       } else {
         this.ball = Ball.Strange
       }
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = converter.metLocationIndex(other)
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
       this.metLevel = other.metLevel
       this.hyperTraining = other.hyperTraining
       this.moveFlagsLA = other.moveFlagsLA ?? new Uint8Array(14)
@@ -321,7 +318,7 @@ export default class PA8 {
       this.canGigantamax = other.canGigantamax ?? false
       this.isAlpha = other.isAlpha ?? false
       this.isNoble = other.isNoble ?? false
-      this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], 'Hisui') ?? []
+      this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], 'Hisui')
       this.trainerGender = other.trainerGender
     }
     this.checksum = this.calculcateChecksum()

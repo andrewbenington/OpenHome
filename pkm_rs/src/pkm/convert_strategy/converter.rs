@@ -1,13 +1,13 @@
 use crate::pkm::{
     PkmFormat,
     convert_strategy::{
-        ConvertStrategy,
+        ConvertStrategy, MetDataStrategy,
         location::{Location, MetData},
     },
     ohpkm::OhpkmV2,
 };
 
-use pkm_rs_types::Stats8;
+use pkm_rs_types::{OriginGame, Stats8};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -42,14 +42,46 @@ impl PkmConverter {
         }
     }
 
-    pub fn met_location_index(&self, ohpkm: &OhpkmV2) -> u16 {
+    pub fn met_data(&self, ohpkm: &OhpkmV2) -> MetData {
+        match self.strategy.met_data_origin_location {
+            MetDataStrategy::MaximizeLegality => {
+                self.dest_pkm_format.met_data_maximizing_legality(ohpkm)
+            }
+            MetDataStrategy::UseRegion => {
+                MetData::new(ohpkm.get_game_of_origin(), self.met_location_index(ohpkm))
+            }
+        }
+    }
+
+    pub fn met_location_index_diamond_pearl(&self, ohpkm: &OhpkmV2) -> u16 {
+        let location_index = self.met_data(ohpkm).location_index;
+
+        if !valid_dp_location_index(location_index) {
+            DP_FARAWAY_PLACE
+        } else {
+            location_index
+        }
+    }
+
+    pub fn met_location_index_platinum_hgss(&self, ohpkm: &OhpkmV2) -> u16 {
+        let met_data = self.met_data(ohpkm);
+
+        let pt_or_hgss_origin = matches!(
+            met_data.origin,
+            OriginGame::Platinum | OriginGame::HeartGold | OriginGame::SoulSilver
+        );
+        let location_not_in_dp = !valid_dp_location_index(met_data.location_index);
+
+        if pt_or_hgss_origin || location_not_in_dp {
+            met_data.location_index
+        } else {
+            0
+        }
+    }
+
+    fn met_location_index(&self, ohpkm: &OhpkmV2) -> u16 {
         let ohpkm_origin = ohpkm.get_game_of_origin();
         let ohpkm_met_location = ohpkm.get_met_location_index();
-
-        if !self.strategy.met_location_use_region {
-            // don't use region, just plop whatever met index is present into the new format
-            return ohpkm_met_location;
-        }
 
         if self.dest_pkm_format.matches_origin(ohpkm_origin) {
             // this format matches the origin game, so the met location index should be valid in the new format
@@ -67,10 +99,6 @@ impl PkmConverter {
         }
 
         self.dest_pkm_format.fallback_location_index()
-    }
-
-    pub fn met_data_legalized(&self, ohpkm: &OhpkmV2) -> MetData {
-        self.dest_pkm_format.met_data_maximizing_legality(ohpkm)
     }
 
     pub fn ivs(&self, ohpkm: &OhpkmV2) -> Stats8 {
@@ -103,18 +131,29 @@ impl PkmConverter {
         self.nickname(ohpkm)
     }
 
-    #[wasm_bindgen(js_name = "metLocationIndex")]
-    pub fn met_location_index_js(&self, ohpkm: &OhpkmV2) -> u16 {
-        self.met_location_index(ohpkm)
+    #[wasm_bindgen(js_name = "metData")]
+    pub fn met_data_js(&self, ohpkm: &OhpkmV2) -> MetData {
+        self.met_data(ohpkm)
     }
 
-    #[wasm_bindgen(js_name = "metDataLegalized")]
-    pub fn met_data_legalized_js(&self, ohpkm: &OhpkmV2) -> MetData {
-        self.met_data_legalized(ohpkm)
+    #[wasm_bindgen(js_name = "metLocationIndexDiamondPearl")]
+    pub fn met_location_index_diamond_pearl_js(&self, ohpkm: &OhpkmV2) -> u16 {
+        self.met_location_index_diamond_pearl(ohpkm)
+    }
+
+    #[wasm_bindgen(js_name = "metLocationIndexPlatinumHgss")]
+    pub fn met_location_index_platinum_hgss_js(&self, ohpkm: &OhpkmV2) -> u16 {
+        self.met_location_index_platinum_hgss(ohpkm)
     }
 
     #[wasm_bindgen(js_name = "ivs")]
     pub fn ivs_js(&self, ohpkm: &OhpkmV2) -> Stats8 {
         self.ivs(ohpkm)
     }
+}
+
+const DP_FARAWAY_PLACE: u16 = 0xbba;
+
+const fn valid_dp_location_index(location_index: u16) -> bool {
+    location_index >= 0x70 && location_index < 2000
 }

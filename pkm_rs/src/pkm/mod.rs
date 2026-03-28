@@ -14,6 +14,9 @@ use tsify::Tsify;
 
 use crate::pkm::traits::IsShiny;
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
 pub trait Pkm: Serialize + IsShiny {
     const BOX_SIZE: usize;
     const PARTY_SIZE: usize;
@@ -124,4 +127,10 @@ impl PkmFormat {
             | Self::PB7 => false,
         }
     }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "formatMatchesOrigin")]
+pub fn format_matches_origin(format: PkmFormat, origin: OriginGame) -> bool {
+    format.matches_origin(origin)
 }

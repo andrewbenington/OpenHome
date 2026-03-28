@@ -3,6 +3,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   ConvertStrategies,
   ConvertStrategy,
+  MetData,
   PkmConverter as PkmConverterWasm,
   Stats8,
 } from '@pkm-rs/pkg'
@@ -26,24 +27,16 @@ export class PkmConverter {
     return this._inner.ivs(ohpkm)
   }
 
-  metLocationIndex(ohpkm: OHPKM): number {
-    return this._inner.metLocationIndex(ohpkm)
+  metData(ohpkm: OHPKM): MetData {
+    return this._inner.metData(ohpkm)
   }
 
-  metLocationIndexDpPk4(ohpkm: OHPKM): number {
-    if (ohpkm.metLocationIndex) {
-      return validDPLocation(ohpkm.metLocationIndex) ? ohpkm.metLocationIndex : DP_FARAWAY_PLACE
-    } else {
-      return 0
-    }
+  metLocationIndexDiamondPearl(ohpkm: OHPKM): number {
+    return this._inner.metLocationIndexDiamondPearl(ohpkm)
   }
 
-  metLocationIndexPtHGSS(ohpkm: OHPKM): number {
-    if (ohpkm.metLocationIndex && validDPLocation(ohpkm.metLocationIndex)) {
-      return ohpkm.metLocationIndex
-    } else {
-      return DP_FARAWAY_PLACE
-    }
+  metLocationIndexPlatinumHgss(ohpkm: OHPKM): number {
+    return this._inner.metLocationIndexPlatinumHgss(ohpkm)
   }
 }
 

@@ -8,7 +8,11 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getBallIconPath } from '@openhome-ui/images/items'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { OriginGames } from '@pkm-rs/pkg'
-import { getFormatLocationString, getLocationString, RibbonTitles } from '@pokemon-resources/index'
+import {
+  getLocationString,
+  getLocationStringOrOrigin,
+  RibbonTitles,
+} from '@pokemon-resources/index'
 import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import './style.css'
@@ -55,10 +59,11 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
     }
     if (mon.gameOfOrigin && mon.metLocationIndex) {
       try {
-        const location =
-          mon.format === 'OHPKM'
-            ? getLocationString(mon.gameOfOrigin, mon.metLocationIndex, mon.format)
-            : getFormatLocationString(mon.metLocationIndex, mon.format)
+        const location = getLocationStringOrOrigin(
+          mon.gameOfOrigin,
+          mon.metLocationIndex,
+          mon.format
+        )
 
         message += ` ${location}`
       } catch (e) {

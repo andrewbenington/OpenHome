@@ -208,54 +208,34 @@ export default class PB8 {
       this.stats = types.readStatsFromBytesU16(dataView, 0x14a)
     } else {
       const other = arg
-      const converter = new PkmConverter('PB8', strategy)
+      const converter = new PkmConverter(this.format, strategy)
+      const metData = converter.metData(other)
 
-      this.encryptionConstant = other.encryptionConstant ?? 0
+      this.encryptionConstant = other.encryptionConstant
       this.dexNum = other.dexNum
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
       this.ability = other.ability
-      this.abilityNum = other.abilityNum ?? 0
-      this.favorite = other.favorite ?? false
+      this.abilityNum = other.abilityNum
+      this.favorite = other.favorite
       this.canGigantamax = other.canGigantamax ?? false
-      this.markings = types.markingsSixShapesWithColorFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-        star: false,
-        diamond: false,
-      }
-      this.personalityValue = other.personalityValue ?? 0
+      this.markings = types.markingsSixShapesWithColorFromOther(other.markings)
+      this.personalityValue = other.personalityValue
       this.nature = other.nature
-      this.statNature = other.statNature ?? NatureIndex.newFromPid(this.personalityValue)
-      this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.gender = other.gender ?? 0
+      this.statNature = other.statNature
+      this.isFatefulEncounter = other.isFatefulEncounter
+      this.gender = other.gender
       this.formeNum = other.formeNum
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.contest = other.contest ?? {
-        cool: 0,
-        beauty: 0,
-        cute: 0,
-        smart: 0,
-        tough: 0,
-        sheen: 0,
-      }
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.contestMemoryCount = other.contestMemoryCount ?? 0
-      this.battleMemoryCount = other.battleMemoryCount ?? 0
-      this.sociability = other.sociability ?? 0
-      this.heightScalar = other.heightScalar ?? 127
-      this.weightScalar = other.weightScalar ?? 127
+      this.evs = other.evs
+      this.contest = other.contest
+      this.pokerusByte = other.pokerusByte
+      this.contestMemoryCount = other.contestMemoryCount
+      this.battleMemoryCount = other.battleMemoryCount
+      this.sociability = other.sociability
+      this.heightScalar = other.heightScalar
+      this.weightScalar = other.weightScalar
       this.nickname = other.nickname
 
       const moveFilter = MoveFilter.fromPkmClass(PB8)
@@ -266,35 +246,31 @@ export default class PB8 {
 
       this.currentHP = other.currentHP ?? 0
       this.ivs = converter.ivs(other)
-      this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? false
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
       this.dynamaxLevel = other.dynamaxLevel ?? 0
       this.statusCondition = 0
       this.palma = other.palma ?? 0
-      this.handlerName = other.handlerName ?? ''
-      this.handlerGender = other.handlerGender ?? false
-      this.handlerLanguage = other.handlerLanguage ?? 0
-      this.handlerID = other.handlerId ?? 0
-      this.handlerFriendship = other.handlerFriendship ?? 0
-      this.fullness = other.fullness ?? 0
-      this.enjoyment = other.enjoyment ?? 0
-      this.gameOfOrigin = other.gameOfOrigin
+      this.handlerName = other.handlerName
+      this.handlerGender = other.handlerGender
+      this.handlerLanguage = other.handlerLanguage
+      this.handlerID = other.handlerId
+      this.handlerFriendship = other.handlerFriendship
+      this.fullness = other.fullness
+      this.enjoyment = other.enjoyment
       this.gameOfOriginBattle = other.gameOfOriginBattle ?? 0
       this.region = other.region ?? 0
-      this.consoleRegion = other.consoleRegion ?? 0
+      this.consoleRegion = other.consoleRegion
       this.language = other.language
-      this.formArgument = other.formArgument ?? 0
-      this.affixedRibbon = other.affixedRibbon ?? undefined
+      this.formArgument = other.formArgument
+      this.affixedRibbon = other.affixedRibbon
       this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship ?? 0
-      this.eggDate = other.eggDate ?? undefined
-      this.metDate = other.metDate ?? {
-        month: new Date().getMonth(),
-        day: new Date().getDate(),
-        year: new Date().getFullYear(),
-      }
+      this.trainerFriendship = other.trainerFriendship
+      this.eggDate = other.eggDate
+      this.metDate = other.metDate
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = converter.metLocationIndex(other)
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
 
       if (other.ball && PB8.maxValidBall() >= other.ball) {
         this.ball = other.ball
@@ -304,31 +280,14 @@ export default class PB8 {
       this.metLevel = other.metLevel
       this.tmFlagsBDSP = other.tmFlagsBDSP ?? new Uint8Array(14)
       this.homeTracker = other.homeTracker ?? new Uint8Array(8)
-      this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], 'Twinkling Star') ?? []
+      this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], 'Twinkling Star')
       this.isCurrentHandler = other.isCurrentHandler ?? false
-      this.handlerMemory = other.handlerMemory ?? {
-        intensity: 0,
-        memory: 0,
-        feeling: 0,
-        textVariables: 0,
-      }
-      this.trainerMemory = other.trainerMemory ?? {
-        intensity: 0,
-        memory: 0,
-        feeling: 0,
-        textVariables: 0,
-      }
+      this.handlerMemory = other.handlerMemory
+      this.trainerMemory = other.trainerMemory
       this.hyperTraining = other.hyperTraining
       this.trainerGender = other.trainerGender
       this.level = 0
-      this.stats = other.stats ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
+      this.stats = other.stats
     }
     this.checksum = this.calculcateChecksum()
   }

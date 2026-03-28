@@ -235,6 +235,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     } else {
       const other = arg
       const converter = new PkmConverter(this.getFormat(), options.strategy)
+      const metData = converter.metData(other)
 
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
       this.trainerID = other.trainerID
@@ -255,7 +256,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
       this.evs = other.evs
       this.pokerusByte = other.pokerusByte
-      this.metLocationIndex = converter.metLocationIndex(other)
+      this.metLocationIndex = metData.locationIndex
       this.metLevel = other.metLevel
 
       const fromRadicalRed = other.pluginOrigin === 'radical_red'

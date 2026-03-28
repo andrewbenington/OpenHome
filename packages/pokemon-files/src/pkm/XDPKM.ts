@@ -115,12 +115,14 @@ export default class XDPKM {
     } else {
       const other = arg
       const converter = new PkmConverter('XDPKM', options.strategy)
+      const metData = converter.metData(other)
 
       this.dexNum = other.dexNum
       this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
       this.currentHP = other.currentHP
       this.trainerFriendship = other.trainerFriendship
-      this.metLocationIndex = converter.metLocationIndex(other)
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
       this.metLevel = other.metLevel
       if (other.ball && XDPKM.maxValidBall() >= other.ball) {
         this.ball = other.ball
@@ -136,7 +138,6 @@ export default class XDPKM {
       this.trainerID = other.trainerID
       this.personalityValue = other.personalityValue
       this.isFatefulEncounter = other.isFatefulEncounter
-      this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
       this.trainerName = other.trainerName
       this.nickname = converter.nickname(other)
@@ -150,8 +151,7 @@ export default class XDPKM {
       this.ivs = converter.ivs(other)
       this.contest = other.contest
       this.shadowID = 0
-      this.ribbons =
-        filterRibbons(other.ribbons ?? [], [Gen3ContestRibbons, Gen3StandardRibbons]) ?? []
+      this.ribbons = filterRibbons(other.ribbons, [Gen3ContestRibbons, Gen3StandardRibbons])
       this.statLevel = this.speciesMetadata?.calculateLevel(this.exp) ?? 1
     }
   }

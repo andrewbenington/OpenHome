@@ -144,17 +144,13 @@ export default class PK3 {
     } else {
       const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
+      const metData = converter.metData(other)
 
-      this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
+      this.personalityValue = generatePersonalityValuePreservingAttributes(other)
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.language = other.language
-      this.markings = types.markingsFourShapesFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-      }
+      this.markings = types.markingsFourShapesFromOther(other.markings)
       this.dexNum = other.dexNum
       this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
       this.exp = other.exp
@@ -165,26 +161,12 @@ export default class PK3 {
       this.movePP = moveFilter.movePp(other, this.format)
       this.movePPUps = moveFilter.movePpUps(other)
 
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.contest = other.contest ?? {
-        cool: 0,
-        beauty: 0,
-        cute: 0,
-        smart: 0,
-        tough: 0,
-        sheen: 0,
-      }
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.metLocationIndex = converter.metLocationIndex(other)
+      this.evs = other.evs
+      this.contest = other.contest
+      this.pokerusByte = other.pokerusByte
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
       this.metLevel = other.metLevel
-      this.gameOfOrigin = other.gameOfOrigin
       if (other.ball && PK3.maxValidBall() >= other.ball) {
         this.ball = other.ball
       } else {
@@ -192,8 +174,8 @@ export default class PK3 {
       }
 
       this.ivs = converter.ivs(other)
-      this.isEgg = other.isEgg ?? false
-      this.abilityNum = other.abilityNum ?? 1
+      this.isEgg = other.isEgg
+      this.abilityNum = other.abilityNum
       if (
         this.abilityNum === 2 &&
         this.metadata
@@ -202,13 +184,12 @@ export default class PK3 {
       ) {
         this.abilityNum = 1
       }
-      this.isFatefulEncounter = other.isFatefulEncounter ?? false
+      this.isFatefulEncounter = other.isFatefulEncounter
       this.statusCondition = 0
-      this.currentHP = other.currentHP ?? 0
+      this.currentHP = other.currentHP
       this.nickname = converter.nickname(other)
       this.trainerName = other.trainerName
-      this.ribbons =
-        filterRibbons(other.ribbons ?? [], [Gen3ContestRibbons, Gen3StandardRibbons]) ?? []
+      this.ribbons = filterRibbons(other.ribbons, [Gen3ContestRibbons, Gen3StandardRibbons])
       this.trainerGender = other.trainerGender
       this.checksum = this.calculcateChecksum()
     }

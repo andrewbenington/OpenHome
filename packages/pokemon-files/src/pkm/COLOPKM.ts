@@ -115,12 +115,13 @@ export default class COLOPKM {
     } else {
       const other = arg
       const converter = new PkmConverter('COLOPKM', options.strategy)
+      const metData = converter.metData(other)
 
       this.dexNum = other.dexNum
       this.personalityValue = other.personalityValue
-      this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
-      this.metLocationIndex = converter.metLocationIndex(other)
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
       this.metLevel = other.metLevel
       if (other.ball && COLOPKM.maxValidBall() >= other.ball) {
         this.ball = other.ball

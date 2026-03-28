@@ -200,6 +200,7 @@ export default class PA9 {
     } else {
       const other = arg
       const converter = new PkmConverter('PA9', strategy)
+      const metData = converter.metData(other)
 
       this.encryptionConstant = other.encryptionConstant ?? 0
       this.dexNum = other.dexNum
@@ -259,43 +260,29 @@ export default class PA9 {
 
       this.currentHP = other.currentHP ?? 0
       this.ivs = converter.ivs(other)
-      this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? false
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
       this.statusCondition = 0
-      this.handlerName = other.handlerName ?? ''
-      this.handlerGender = other.handlerGender ?? false
-      this.handlerLanguage = other.handlerLanguage ?? 0
-      this.isCurrentHandler = other.isCurrentHandler ?? false
-      this.handlerID = other.handlerId ?? 0
-      this.handlerFriendship = other.handlerFriendship ?? 0
-      this.handlerMemory = other.handlerMemory ?? {
-        intensity: 0,
-        memory: 0,
-        feeling: 0,
-        textVariables: 0,
-      }
-      this.gameOfOrigin = other.gameOfOrigin
+      this.handlerName = other.handlerName
+      this.handlerGender = other.handlerGender
+      this.handlerLanguage = other.handlerLanguage
+      this.isCurrentHandler = other.isCurrentHandler
+      this.handlerID = other.handlerId
+      this.handlerFriendship = other.handlerFriendship
+      this.handlerMemory = other.handlerMemory
       this.gameOfOriginBattle = other.gameOfOriginBattle ?? 0
-      this.formArgument = other.formArgument ?? 0
-      this.affixedRibbon = other.affixedRibbon ?? undefined
+      this.formArgument = other.formArgument
+      this.affixedRibbon = other.affixedRibbon
       this.language = other.language
       this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship ?? 0
-      this.trainerMemory = other.trainerMemory ?? {
-        intensity: 0,
-        memory: 0,
-        feeling: 0,
-        textVariables: 0,
-      }
-      this.eggDate = other.eggDate ?? undefined
-      this.metDate = other.metDate ?? {
-        month: new Date().getMonth(),
-        day: new Date().getDate(),
-        year: new Date().getFullYear(),
-      }
+      this.trainerFriendship = other.trainerFriendship
+      this.trainerMemory = other.trainerMemory
+      this.eggDate = other.eggDate
+      this.metDate = other.metDate
       this.obedienceLevel = other.obedienceLevel ?? 0
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = converter.metLocationIndex(other)
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
       if (other.ball && PA9.allowedBalls().includes(other.ball)) {
         this.ball = other.ball
       } else {
@@ -305,7 +292,7 @@ export default class PA9 {
       this.hyperTraining = other.hyperTraining
       this.homeTracker = other.homeTracker ?? new Uint8Array(8)
       this.tmFlagsLza = other.tmFlagsSV ?? new Uint8Array(22)
-      this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], '') ?? []
+      this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], '')
       this.trainerGender = other.trainerGender
     }
     this.checksum = this.calculcateChecksum()

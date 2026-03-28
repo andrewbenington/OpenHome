@@ -1,4 +1,11 @@
-import { GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import {
+  formatMatchesOrigin,
+  GameSetting,
+  Generation,
+  OriginGame,
+  OriginGames,
+  PkmFormat,
+} from '@pkm-rs/pkg'
 
 import { MonFormat } from '../../../../src/core/pkm/interfaces'
 import { Gen2Locations } from './gen2'
@@ -14,6 +21,18 @@ import { Gen8HisuiLocations } from './gen8-hisui'
 import { Gen8SinnohLocations } from './gen8-sinnoh'
 import { Gen9LumioseLocations } from './gen9-lumiose'
 import { Gen9PaldeaLocations } from './gen9-paldea'
+
+export function getLocationStringOrOrigin(
+  game: OriginGame,
+  index: number,
+  format: PkmFormat | 'OHPKM',
+  egg = false
+) {
+  if (format === 'OHPKM' || formatMatchesOrigin(format, game)) {
+    return getLocationString(game, index, format, egg)
+  }
+  return `in the ${OriginGames.gameSettingName(game)} region`
+}
 
 export const getLocationString = (game: number, index: number, format: string, egg = false) => {
   console.log('getLocationString', { game, index, format, egg })

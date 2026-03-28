@@ -224,6 +224,7 @@ export default class PK6 {
     } else {
       const converter = new PkmConverter('PK6', strategy)
       const other = arg
+      const metData = converter.metData(other)
 
       this.encryptionConstant = other.encryptionConstant ?? 0
       this.dexNum = other.dexNum
@@ -292,11 +293,11 @@ export default class PK6 {
       this.secretSuperTrainingUnlocked = other.secretSuperTrainingUnlocked ?? false
       this.secretSuperTrainingComplete = other.secretSuperTrainingComplete ?? false
       this.ivs = converter.ivs(other)
-      this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? false
-      this.handlerName = other.handlerName ?? ''
-      this.handlerGender = other.handlerGender ?? false
-      this.isCurrentHandler = other.isCurrentHandler ?? false
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
+      this.handlerName = other.handlerName
+      this.handlerGender = other.handlerGender
+      this.isCurrentHandler = other.isCurrentHandler
       this.geolocations = other.geolocations ?? [
         {
           region: 0,
@@ -319,19 +320,20 @@ export default class PK6 {
           country: 0,
         },
       ]
-      this.handlerFriendship = other.handlerFriendship ?? 0
-      this.handlerAffection = other.handlerAffection ?? 0
+      this.handlerFriendship = other.handlerFriendship
+      this.handlerAffection = other.handlerAffection
       this.handlerMemory = other.handlerMemory
       this.trainerMemory = other.trainerMemory
       this.fullness = other.fullness ?? 0
       this.enjoyment = other.enjoyment ?? 0
       this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship ?? 0
-      this.trainerAffection = other.trainerAffection ?? 0
+      this.trainerFriendship = other.trainerFriendship
+      this.trainerAffection = other.trainerAffection
       this.eggDate = other.eggDate ?? undefined
       this.metDate = other.metDate
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = converter.metLocationIndex(other)
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
       if (other.ball && PK6.maxValidBall() >= other.ball) {
         this.ball = other.ball
       } else {
@@ -339,15 +341,14 @@ export default class PK6 {
       }
       this.metLevel = other.metLevel
       this.encounterType = other.encounterType ?? 0
-      this.gameOfOrigin = other.gameOfOrigin
       this.country = other.country ?? 0
       this.region = other.region ?? 0
-      this.consoleRegion = other.consoleRegion ?? 0
+      this.consoleRegion = other.consoleRegion
       this.language = other.language
       this.statusCondition = 0
       this.currentHP = other.currentHP ?? 0
-      this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], 'Toughness Master') ?? []
+      this.isFatefulEncounter = other.isFatefulEncounter
+      this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], 'Toughness Master')
       this.trainerGender = other.trainerGender
     }
     this.checksum = this.calculcateChecksum()

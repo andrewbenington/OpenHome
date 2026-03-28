@@ -195,6 +195,7 @@ export default class PB7 {
     } else {
       const other = arg
       const converter = new PkmConverter('PB7', strategy)
+      const metData = converter.metData(other)
 
       this.encryptionConstant = other.encryptionConstant ?? 0
       this.dexNum = other.dexNum
@@ -203,20 +204,13 @@ export default class PB7 {
       this.secretID = other.secretID
       this.exp = other.exp
       this.ability = other.ability
-      this.abilityNum = other.abilityNum ?? 0
-      this.favorite = other.favorite ?? false
-      this.markings = types.markingsSixShapesWithColorFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-        star: false,
-        diamond: false,
-      }
-      this.personalityValue = other.personalityValue ?? 0
+      this.abilityNum = other.abilityNum
+      this.favorite = other.favorite
+      this.markings = types.markingsSixShapesWithColorFromOther(other.markings)
+      this.personalityValue = other.personalityValue
       this.nature = other.nature
-      this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.gender = other.gender ?? 0
+      this.isFatefulEncounter = other.isFatefulEncounter
+      this.gender = other.gender
       this.formeNum = other.formeNum
       this.evs = {
         hp: 0,
@@ -235,10 +229,10 @@ export default class PB7 {
         spd: 0,
       }
       this.resortEventStatus = other.resortEventStatus ?? 0
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.heightScalar = other.heightScalar ?? 127
-      this.weightScalar = other.weightScalar ?? 127
-      this.formArgument = other.formArgument ?? 0
+      this.pokerusByte = other.pokerusByte
+      this.heightScalar = other.heightScalar
+      this.weightScalar = other.weightScalar
+      this.formArgument = other.formArgument
       this.nickname = other.nickname
 
       const moveFilter = MoveFilter.fromMoveIndices(LGPE_VALID_MOVES)
@@ -247,32 +241,29 @@ export default class PB7 {
       this.movePPUps = moveFilter.movePpUps(other)
       this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
       this.ivs = converter.ivs(other)
-      this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? false
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
       this.handlerName = ''
       this.handlerGender = false
       this.isCurrentHandler = false
       this.handlerFriendship = 0
       this.fieldEventFatigue1 = 0
       this.fieldEventFatigue2 = 0
-      this.fullness = other.fullness ?? 0
-      this.enjoyment = other.enjoyment ?? 0
+      this.fullness = other.fullness
+      this.enjoyment = other.enjoyment
       this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship ?? 0
+      this.trainerFriendship = other.trainerFriendship
       this.receivedYear = 0
       this.receivedMonth = 0
       this.receivedDay = 0
       this.receivedHour = 0
       this.receivedMinute = 0
       this.receivedSecond = 0
-      this.eggDate = other.eggDate ?? undefined
-      this.metDate = other.metDate ?? {
-        month: new Date().getMonth(),
-        day: new Date().getDate(),
-        year: new Date().getFullYear(),
-      }
+      this.eggDate = other.eggDate
+      this.metDate = other.metDate
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = converter.metLocationIndex(other)
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
       if (other.ball && PB7.allowedBalls().includes(other.ball)) {
         this.ball = other.ball
       } else {
@@ -280,21 +271,13 @@ export default class PB7 {
       }
       this.metLevel = other.metLevel
       this.hyperTraining = other.hyperTraining
-      this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
       this.statusCondition = 0
       this.level = 0
       this.dirtType = 0
       this.dirtLocation = 0
       this.currentHP = other.currentHP ?? 0
-      this.stats = other.stats ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
+      this.stats = other.stats
       this.cp = 0
       this.isMega = 0
       this.megaForme = 0
