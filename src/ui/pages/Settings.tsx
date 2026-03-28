@@ -193,7 +193,9 @@ function PKMBoolConversionSettingControl({
           style={{ marginLeft: 8 }}
         />
       </span>
-      <p style={{ marginTop: 4, color: 'var(--gray-11)' }}>{descriptor.description}</p>
+      <p style={{ marginTop: 4, color: 'var(--gray-11)' }}>
+        {ConvertStrategies.getDescription(identifier)}
+      </p>
     </div>
   )
 }
@@ -218,7 +220,9 @@ function PKMStringConversionSettingControl({
         </p>
         <b style={{ paddingLeft: 8 }}>{ConvertStrategies.getSettingName(identifier)}</b>
       </span>
-      <p style={{ marginTop: 4, color: 'var(--gray-11)' }}>{descriptor.description}</p>
+      <p style={{ marginTop: 4, color: 'var(--gray-11)' }}>
+        {ConvertStrategies.getDescription(identifier)}
+      </p>
       <Select.Root
         value={value}
         onValueChange={(newValue) =>

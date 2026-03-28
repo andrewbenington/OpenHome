@@ -27,55 +27,11 @@ pub enum SettingValue {
 }
 
 impl SettingType {
-    pub const fn display(&self) -> &'static str {
-        match self {
-            Self::String(d) => d.display,
-            Self::Bool(d) => d.display,
-            Self::Number(d) => d.display,
-        }
-    }
-
     pub fn default_value(&self) -> SettingValue {
         match self {
             Self::String(d) => SettingValue::String(d.default.to_string()),
             Self::Bool(d) => SettingValue::Bool(d.default),
             Self::Number(d) => SettingValue::Number(d.default),
-        }
-    }
-
-    /// Returns an error string if the value is invalid for this descriptor.
-    pub fn validate(&self, value: &SettingValue) -> Result<(), String> {
-        match (self, value) {
-            (Self::String(d), SettingValue::String(s)) => {
-                if let Some(allowed) = d.allowed_values
-                    && !allowed.contains(&s.as_str())
-                {
-                    return Err(format!(
-                        "'{}' is not an allowed value for '{}'. Allowed: {:?}",
-                        s, d.display, allowed
-                    ));
-                }
-                Ok(())
-            }
-            (Self::Bool(_), SettingValue::Bool(_)) => Ok(()),
-            (Self::Number(d), SettingValue::Number(n)) => {
-                if let Some(min) = d.minimum
-                    && *n < min
-                {
-                    return Err(format!("{} is below minimum {}", n, min));
-                }
-                if let Some(max) = d.maximum
-                    && *n > max
-                {
-                    return Err(format!("{} is above maximum {}", n, max));
-                }
-                Ok(())
-            }
-            _ => Err(format!(
-                "Type mismatch: expected {:?}, got {:?}",
-                self.display(),
-                value
-            )),
         }
     }
 }
@@ -113,30 +69,17 @@ pub const fn settings_schema() -> &'static [(SettingIdentifier, SettingType)] {
         (
             SettingIdentifier::NicknameCapitalization,
             String(StringSetting {
-                display: "Capitalization",
                 default: "gameDefault",
                 allowed_values: Some(&["GameDefault", "Modern"]),
-                description: "Decides how unnicknamed Pokémon are capitalized. \
-                    \"GameDefault\" uses the original game's capitalization, \
-                    \"Modern\" capitalizes all in the modern style.",
             }),
         ),
         (
             SettingIdentifier::MetLocationUseRegion,
-            Bool(BoolSetting {
-                display: "Use Region for Met Location (when possible)",
-                default: true,
-                description: "If true, the met location will show the region name when possible. \
-                    If false, it shows \"a faraway place\" or \"an in-game trade\".",
-            }),
+            Bool(BoolSetting { default: true }),
         ),
         (
             SettingIdentifier::MaxIvIfHyperTrained,
-            Bool(BoolSetting {
-                display: "Hyper-Trained IVs are Maxed (pre-gen 7)",
-                default: true,
-                description: "If true, any hyper-trained IVs will be set to 31 when transferred to a game without hyper training.",
-            }),
+            Bool(BoolSetting { default: true }),
         ),
     ]
 }
@@ -227,8 +170,30 @@ impl ConvertStrategies {
     pub fn get_setting_name(identifier: SettingIdentifier) -> String {
         match identifier {
             SettingIdentifier::NicknameCapitalization => String::from("Capitalization"),
-            SettingIdentifier::MetLocationUseRegion => String::from("Use Region"),
-            SettingIdentifier::MaxIvIfHyperTrained => String::from("Hyper-Trained IVs are Maxed"),
+            SettingIdentifier::MetLocationUseRegion => {
+                String::from("Use Region for Met Location (when possible)")
+            }
+            SettingIdentifier::MaxIvIfHyperTrained => {
+                String::from("Hyper-Trained IVs are Maxed (pre-gen 7)")
+            }
+        }
+    }
+
+    #[wasm_bindgen(js_name = "getDescription")]
+    pub fn get_description(identifier: SettingIdentifier) -> String {
+        match identifier {
+            SettingIdentifier::NicknameCapitalization => String::from(
+                "Decides how unnicknamed Pokémon are capitalized. \
+                    \"GameDefault\" uses the original game's capitalization, \
+                    \"Modern\" capitalizes all in the modern style.",
+            ),
+            SettingIdentifier::MetLocationUseRegion => String::from(
+                "If true, the met location will show the region name when possible. \
+                    If false, it shows \"a faraway place\" or \"an in-game trade\".",
+            ),
+            SettingIdentifier::MaxIvIfHyperTrained => String::from(
+                "If true, any hyper-trained IVs will be set to 31 when transferred to a game without hyper training.",
+            ),
         }
     }
 }
