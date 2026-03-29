@@ -115,6 +115,7 @@ function PokedexDetails({
   const [imageError, setImageError] = useState(false)
   const [showShiny, setShowShiny] = useState(false)
   const [currentView, setCurrentView] = useState<PokedexView>('main')
+  const [metadataSource, setMetadataSource] = useState<MetadataSource>(MetadataSource.ScarletViolet)
 
   const selectedFormeStatus = getFormeStatus(pokedex, species.nationalDex, selectedForme.formeIndex)
   const spriteResult = useMonSprite({
@@ -132,7 +133,7 @@ function PokedexDetails({
   const selectedFormeCaught = selectedFormeStatus?.includes('Caught')
 
   return (
-    <Flex direction="row" height="100%" align="center" width="100%">
+    <Flex direction="row" height="100%" align="center" width="100%" overflow="hidden">
       <Flex
         direction="column"
         align="center"
@@ -143,28 +144,12 @@ function PokedexDetails({
         gap="2"
       >
         <Flex direction="column" height="100%" width="100%" align="center" justify="center" gap="2">
-          <div
-            className="pokedex-image-frame"
-            style={{
-              minWidth: 140,
-              width: 340,
-              maxWidth: '80%',
-              aspectRatio: 1,
-              position: 'relative',
-            }}
-          >
+          <div className="pokedex-image-frame">
             {selectedFormeStatus === 'ShinyCaught' && (
               <button
+                className="pokedex-shiny-toggle"
                 style={{
-                  position: 'absolute',
-                  width: 30,
-                  height: 30,
-                  right: 5,
-                  top: 5,
-                  zIndex: 20,
                   backgroundColor: showShiny ? 'var(--accent-9)' : 'var(--gray-9)',
-                  borderRadius: 15,
-                  boxShadow: 'none',
                 }}
                 onClick={() => setShowShiny(!showShiny)}
               >
@@ -210,6 +195,7 @@ function PokedexDetails({
           <Flex justify="center" gap="2" width="100%" wrap="wrap">
             {species.formes.map((forme) => (
               <Button
+                className="pokedex-raised-button"
                 key={forme.formeIndex}
                 variant={forme.formeIndex === selectedForme.formeIndex ? 'solid' : 'soft'}
                 onClick={() => setSelectedForme(forme)}
@@ -232,7 +218,7 @@ function PokedexDetails({
         </Flex>
       </Flex>
       <Separator orientation="vertical" style={{ height: '100%' }} />
-      <Flex direction="column" height="700px" maxHeight="100%" width="60%" gap="2" overflow="auto">
+      <Flex direction="column" height="100%" maxHeight="100%" width="60%" gap="2" overflow="auto">
         <Flex className="openhome-tab-row">
           <Button
             className={includeClass('openhome-tab')
@@ -250,6 +236,20 @@ function PokedexDetails({
           >
             Levelup Learnset
           </Button>
+          <div style={{ flex: 1 }} />
+          <Select.Root
+            value={metadataSource.toString()}
+            onValueChange={(value) => setMetadataSource(parseInt(value) as MetadataSource)}
+          >
+            <Select.Trigger className="pokedex-view-select" />
+            <Select.Content>
+              {allMetadataSources().map((source) => (
+                <Select.Item key={source} value={source.toString()}>
+                  {MetadataSources.display(source)}
+                </Select.Item>
+              ))}
+            </Select.Content>
+          </Select.Root>
         </Flex>
         {currentView === 'main' ? (
           <PokedexMain
@@ -266,11 +266,21 @@ function PokedexDetails({
             selectedForme={selectedForme}
             setSelectedForme={setSelectedForme}
             setSelectedSpecies={setSelectedSpecies}
+            metadataSource={metadataSource}
           />
         )}
       </Flex>
     </Flex>
   )
+}
+
+type PokedexMetadataProps = {
+  pokedex: Pokedex
+  species: SpeciesMetadata
+  selectedForme: FormeMetadata
+  setSelectedForme: (forme?: FormeMetadata) => void
+  setSelectedSpecies: (species?: SpeciesMetadata) => void
+  metadataSource: MetadataSource
 }
 
 function PokedexMain(props: PokedexDetailsProps) {
@@ -334,27 +344,13 @@ function PokedexMain(props: PokedexDetailsProps) {
   )
 }
 
-function PokedexLearnset(props: PokedexDetailsProps) {
-  const { selectedForme } = props
-  const [currentView, setCurrentView] = useState<MetadataSource>(MetadataSource.ScarletViolet)
+function PokedexLearnset(props: PokedexMetadataProps) {
+  const { selectedForme, metadataSource } = props
 
-  const levelUpLearnset = selectedForme.levelUpLearnset(currentView)
+  const levelUpLearnset = selectedForme.levelUpLearnset(metadataSource)
 
   return (
     <Flex direction="column" overflow="hidden" p="1">
-      <Select.Root
-        onValueChange={(value) => setCurrentView(parseInt(value) as MetadataSource)}
-        defaultValue="main"
-      >
-        <Select.Trigger className="pokedex-view-select" />
-        <Select.Content>
-          {allMetadataSources().map((source) => (
-            <Select.Item key={source} value={source}>
-              {MetadataSources.display(source)}
-            </Select.Item>
-          ))}
-        </Select.Content>
-      </Select.Root>
       <Flex direction="column" gap="1" mt="0.2rem" mx="1rem" overflow="auto">
         {levelUpLearnset ? (
           levelUpLearnset.map((learnsetMove) => (
