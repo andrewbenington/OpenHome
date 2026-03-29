@@ -3,9 +3,12 @@ use crate::pkm::format::PkmFormat;
 use crate::pkm::location::{Location, MetData};
 use crate::pkm::ohpkm::OhpkmV2;
 
-use pkm_rs_types::{OriginGame, Stats8};
+use pkm_rs_types::Stats8;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "wasm")]
+use pkm_rs_types::OriginGame;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct PkmConverter {
@@ -50,6 +53,7 @@ impl PkmConverter {
         }
     }
 
+    #[cfg(feature = "wasm")]
     pub fn met_location_index_diamond_pearl(&self, ohpkm: &OhpkmV2) -> u16 {
         let location_index = self.met_data(ohpkm).location_index;
 
@@ -60,6 +64,7 @@ impl PkmConverter {
         }
     }
 
+    #[cfg(feature = "wasm")]
     pub fn met_location_index_platinum_hgss(&self, ohpkm: &OhpkmV2) -> u16 {
         let met_data = self.met_data(ohpkm);
 
@@ -149,8 +154,10 @@ impl PkmConverter {
     }
 }
 
+#[cfg(feature = "wasm")]
 const DP_FARAWAY_PLACE: u16 = 0xbba;
 
+#[cfg(feature = "wasm")]
 const fn valid_dp_location_index(location_index: u16) -> bool {
     location_index >= 0x70 && location_index < 2000
 }

@@ -3,9 +3,11 @@ use crate::pkm::ohpkm::OhpkmV2;
 
 use super::location::{LinkTradeIndex, Location};
 use pkm_rs_types::{Generation, OriginGame};
-use serde::{Deserialize, Serialize};
-use tsify::Tsify;
 
+#[cfg(feature = "wasm")]
+use serde::{Deserialize, Serialize};
+#[cfg(feature = "wasm")]
+use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -16,9 +18,9 @@ pub enum PkmFormat {
     PK1,
     PK2,
     PK3,
-    #[serde(rename = "COLOPKM")]
+    #[cfg_attr(feature = "wasm", serde(rename = "COLOPKM"))]
     ColoPkm,
-    #[serde(rename = "XDPKM")]
+    #[cfg_attr(feature = "wasm", serde(rename = "XDPKM"))]
     XdPkm,
     PK4,
     PK5,

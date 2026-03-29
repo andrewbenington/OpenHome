@@ -1,7 +1,9 @@
 // #[cfg(feature = "wasm")]
 // pub mod wasm;
 
+#[cfg(feature = "wasm")]
 mod converter;
+
 mod option;
 
 use std::fmt::Display;
