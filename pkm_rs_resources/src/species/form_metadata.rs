@@ -2,7 +2,6 @@ pub mod gen1;
 pub mod gen2;
 pub mod gen3;
 pub mod gen9;
-mod sv;
 
 use pkm_rs_types::{OriginGame, OriginMark, PkmType, Stats8, StatsPreSplit};
 #[cfg(feature = "wasm")]
