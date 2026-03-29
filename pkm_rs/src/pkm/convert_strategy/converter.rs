@@ -1,11 +1,7 @@
-use crate::pkm::{
-    PkmFormat,
-    convert_strategy::{
-        ConvertStrategy, MetDataStrategy,
-        location::{Location, MetData},
-    },
-    ohpkm::OhpkmV2,
-};
+use super::{ConvertStrategy, MetDataStrategy};
+use crate::pkm::format::PkmFormat;
+use crate::pkm::location::{Location, MetData};
+use crate::pkm::ohpkm::OhpkmV2;
 
 use pkm_rs_types::{OriginGame, Stats8};
 #[cfg(feature = "wasm")]
@@ -47,9 +43,10 @@ impl PkmConverter {
             MetDataStrategy::MaximizeLegality => {
                 self.dest_pkm_format.met_data_maximizing_legality(ohpkm)
             }
-            MetDataStrategy::UseRegion => {
-                MetData::new(ohpkm.get_game_of_origin(), self.met_location_index(ohpkm))
-            }
+            MetDataStrategy::UseLocationNameMatch => MetData::new(
+                self.dest_pkm_format.default_origin(),
+                self.met_location_index(ohpkm),
+            ),
         }
     }
 

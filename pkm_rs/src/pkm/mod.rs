@@ -1,21 +1,18 @@
 mod result;
 
 pub mod convert_strategy;
+pub mod format;
+pub mod location;
 pub mod ohpkm;
 pub mod traits;
 
 use pkm_rs_resources::species::{FormeMetadata, SpeciesMetadata};
-use pkm_rs_types::{Generation, OriginGame};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 pub use pkm_rs_resources::{abilities::ABILITY_MAX, species::NATIONAL_DEX_MAX};
 pub use result::*;
-use tsify::Tsify;
 
 use crate::pkm::traits::IsShiny;
-
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
 
 pub trait Pkm: Serialize + IsShiny {
     const BOX_SIZE: usize;
@@ -34,103 +31,4 @@ pub trait Pkm: Serialize + IsShiny {
     fn get_forme_metadata(&self) -> &'static FormeMetadata;
 
     fn calculate_level(&self) -> u8;
-}
-
-#[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PkmFormat {
-    PK1,
-    PK2,
-    PK3,
-    COLOPKM,
-    XDPKM,
-    PK4,
-    PK5,
-    PK6,
-    PK7,
-    PB7,
-    PK8,
-    PA8,
-    PB8,
-    PK9,
-    PA9,
-
-    PK3RR,
-    PK3UB,
-    PB8LUMI,
-}
-
-impl PkmFormat {
-    pub const fn species_nickname_all_caps(&self) -> bool {
-        matches!(
-            self,
-            Self::PK1 | Self::PK2 | Self::PK3 | Self::COLOPKM | Self::XDPKM | Self::PK4
-        )
-    }
-
-    pub fn matches_origin(&self, origin: OriginGame) -> bool {
-        match self {
-            Self::PK1 => origin.generation() == Generation::G1,
-            Self::PK2 => origin.generation() == Generation::G2,
-            Self::PK3 => origin.is_gba(),
-            Self::COLOPKM | Self::XDPKM => origin == OriginGame::ColosseumXd,
-            Self::PK4 => origin.generation() == Generation::G4,
-            Self::PK5 => origin.generation() == Generation::G5,
-            Self::PK6 => origin.generation() == Generation::G6,
-            Self::PK7 => origin.is_sm_usum(),
-            Self::PB7 => origin.is_lets_go(),
-            Self::PK8 => origin.is_swsh(),
-            Self::PA8 => origin == OriginGame::LegendsArceus,
-            Self::PB8 => origin.is_bdsp(),
-            Self::PK9 => origin.is_scarlet_violet(),
-            Self::PA9 => origin == OriginGame::LegendsZa,
-            Self::PK3RR | Self::PK3UB | Self::PB8LUMI => false,
-        }
-    }
-
-    pub const fn generation(&self) -> Generation {
-        match self {
-            Self::PK1 => Generation::G1,
-            Self::PK2 => Generation::G2,
-            Self::PK3 | Self::COLOPKM | Self::XDPKM => Generation::G3,
-            Self::PK4 => Generation::G4,
-            Self::PK5 => Generation::G5,
-            Self::PK6 => Generation::G6,
-            Self::PK7 | Self::PB7 => Generation::G7,
-            Self::PK8 | Self::PA8 | Self::PB8 => Generation::G8,
-            Self::PK9 | Self::PA9 => Generation::G9,
-            Self::PK3RR | Self::PK3UB => Generation::G3,
-            Self::PB8LUMI => Generation::G8,
-        }
-    }
-
-    pub const fn supports_hyper_training(&self) -> bool {
-        match self {
-            Self::PK7
-            | Self::PK8
-            | Self::PA8
-            | Self::PB8
-            | Self::PB8LUMI
-            | Self::PK9
-            | Self::PA9 => true,
-            Self::PK1
-            | Self::PK2
-            | Self::PK3
-            | Self::PK3RR
-            | Self::PK3UB
-            | Self::COLOPKM
-            | Self::XDPKM
-            | Self::PK4
-            | Self::PK5
-            | Self::PK6
-            | Self::PB7 => false,
-        }
-    }
-}
-
-#[cfg(feature = "wasm")]
-#[wasm_bindgen(js_name = "formatMatchesOrigin")]
-pub fn format_matches_origin(format: PkmFormat, origin: OriginGame) -> bool {
-    format.matches_origin(origin)
 }

@@ -2,7 +2,6 @@
 // pub mod wasm;
 
 mod converter;
-mod location;
 mod option;
 
 use std::fmt::Display;
@@ -76,8 +75,8 @@ pub const fn settings_schema() -> &'static [(ConvertOption, SettingType)] {
         (
             ConvertOption::MetDataOriginAndLocation,
             String(StringOption {
-                default: "UseRegion",
-                allowed_values: Some(&["UseRegion", "MaximizeLegality"]),
+                default: "UseLocationNameMatch",
+                allowed_values: Some(&["UseLocationNameMatch", "MaximizeLegality"]),
             }),
         ),
         (
@@ -186,19 +185,15 @@ impl ConvertStrategies {
     pub fn get_description(identifier: ConvertOption) -> String {
         match identifier {
             ConvertOption::NicknameCapitalization => String::from(
-                "Decides how unnicknamed Pokémon are capitalized. \
-                    \"GameDefault\" uses the original game's capitalization, \
+                "Decides how unnicknamed Pokémon are capitalized.
+                    \"GameDefault\" uses the original game's capitalization,
                     \"Modern\" capitalizes all in the modern style.",
             ),
             ConvertOption::MetDataOriginAndLocation => String::from(
-                "Decides how the origin game and met location are converted.\n\
-                    \"UseRegion\" sets the location to the origin game's region, which is more \
-                    immersive and accurate but not legitimately available in the official games.\n\
-                    \"MaximizeLegality\" attempts to convert the Pokémon to one that would be legal \
-                    in the target game, if possible.\n\
-                    For example, a Pokémon from Alpha Sapphire being moved to Black would have its met location \
-                 set to the Poké Transfer Lab if \"MaximizeLegality\" is chosen, but would be set to Hoenn if \"UseRegion\" \
-                 is chosen. In both cases the origin game would be set to Sapphire.",
+                "Decides how the origin game and met location are converted.
+                \"UseLocationNameMatch\" attempts to match the location from the origin game with one of a similar location (or lore equivalent) in the target game.
+                    \"MaximizeLegality\" attempts to convert the Pokémon to one that would be legal in the target game, if possible.\n\
+                    For example, a Pokémon caught in Victory Road in Alpha Sapphire being moved to Black would have its met location set to the Poké Transfer Lab if \"MaximizeLegality\" is chosen, but would be set to Victory Road if \"UseLocationNameMatch\" is chosen. In both cases the origin game would be set to Sapphire, because the Alpha Sapphire origin is not compatible with Black.",
             ),
             ConvertOption::MaxIvIfHyperTrained => String::from(
                 "If true, any hyper-trained IVs will be set to 31 when transferred to a game without hyper training.",
@@ -223,6 +218,6 @@ pub enum NicknameCapitalization {
 #[derive(Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum MetDataStrategy {
     #[default]
-    UseRegion,
+    UseLocationNameMatch,
     MaximizeLegality,
 }
