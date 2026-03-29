@@ -16,7 +16,9 @@ pub enum PkmFormat {
     PK1,
     PK2,
     PK3,
+    #[serde(rename = "COLOPKM")]
     ColoPkm,
+    #[serde(rename = "XDPKM")]
     XdPkm,
     PK4,
     PK5,
