@@ -11,7 +11,6 @@ use crate::{
 
 const LA_PERSONAL_BYTES: &[u8] = include_bytes!("pkhex_bin/personal/personal_la");
 const LA_LEVELUP_BYTES: &[u8] = include_bytes!("pkhex_bin/levelup/lvlmove_la.pkl");
-const LA_FORM_OFFSET: usize = 0x1E;
 const LA_ENTRY_SIZE: usize = 0xB0;
 
 pub static METADATA_TABLE_LA: LazyLock<MetadataTableLegendsArceus> =
@@ -40,11 +39,7 @@ impl PersonalInfoLegendsArceus {
     }
 
     pub fn form_stats_index(&self) -> Option<u16> {
-        let stored_index = i16::from_le_bytes(
-            self.0[LA_FORM_OFFSET..LA_FORM_OFFSET + 2]
-                .try_into()
-                .unwrap(),
-        );
+        let stored_index = i16::from_le_bytes(self.0[0x1E..0x20].try_into().unwrap());
         if stored_index == -1 {
             None
         } else {

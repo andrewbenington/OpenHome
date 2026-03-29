@@ -4,7 +4,6 @@ pub mod gen3;
 pub mod gen8_bdsp;
 pub mod gen8_la;
 pub mod gen8_swsh;
-pub mod gen9;
 pub mod gen9_sv;
 pub mod gen9_za;
 
