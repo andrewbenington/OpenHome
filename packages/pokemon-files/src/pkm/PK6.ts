@@ -6,7 +6,7 @@ import {
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   orasFormIndexIfSupported,
   SpeciesLookup,
@@ -528,7 +528,7 @@ export default class PK6 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

@@ -6,7 +6,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getPokemonSpritePath } from '@openhome-ui/images/pokemon'
 import { CURRENT_PLUGIN_API_VERSION } from '@openhome-ui/pages/plugins/Plugins'
 import { MonSpriteData, OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin'
-import { MetadataLookup } from '@pkm-rs/pkg'
+import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { useContext, useEffect, useMemo, useState } from 'react'
 
 type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>
@@ -53,7 +53,7 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
     if (spriteResult.errorMessage || spriteResult.path) return
 
     if (isMegaStone(mon.heldItemIndex)) {
-      const megaForStone = MetadataLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
+      const megaForStone = MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
         (mega) => mega.requiredItemId === mon.heldItemIndex
       )
 

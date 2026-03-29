@@ -8,7 +8,7 @@ pub use types::*;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = MetadataLookup))]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = MetadataSummaryLookup))]
 pub fn metadata_lookup(national_dex: u16, forme_index: u16) -> Option<FormeMetadata> {
     ALL_SPECIES
         .get(national_dex as usize - 1)

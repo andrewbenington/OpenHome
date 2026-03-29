@@ -9,9 +9,9 @@ import { Pokedex } from '@openhome-ui/util/pokedex'
 import {
   allMetadataSources,
   FormeMetadata,
-  MetadataLookup,
   MetadataSource,
   MetadataSources,
+  MetadataSummaryLookup,
   SpeciesLookup,
   SpeciesMetadata,
 } from '@pkm-rs/pkg'
@@ -334,7 +334,7 @@ function PokedexMain(props: PokedexDetailsProps) {
               pokedex={pokedex}
               onClick={(nationalDex, formeIndex) => {
                 setSelectedSpecies(SpeciesLookup(nationalDex))
-                setSelectedForme(MetadataLookup(nationalDex, formeIndex))
+                setSelectedForme(MetadataSummaryLookup(nationalDex, formeIndex))
               }}
             />
           </div>{' '}

@@ -1,7 +1,7 @@
 import { getBaseMon } from '@openhome-core/pkm/util'
 import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import { Pokedex } from '@openhome-ui/util/pokedex'
-import { MetadataLookup, SpeciesAndForme } from '@pkm-rs/pkg'
+import { MetadataSummaryLookup, SpeciesAndForme } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
@@ -75,7 +75,7 @@ export default function EvolutionFamily({
 }
 
 function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: EvolutionFamilyProps) {
-  const formeMetadata = MetadataLookup(nationalDex, formeNumber)
+  const formeMetadata = MetadataSummaryLookup(nationalDex, formeNumber)
   const evolutions = formeMetadata?.evolutions ?? []
   const megaFormes = formeMetadata?.megaEvolutions ?? []
 
@@ -138,7 +138,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
         silhouette={!getFormeStatus(pokedex, nationalDex, formeNumber)?.includes('Caught')}
         onClick={() => onClick?.(nationalDex, formeNumber)}
       />
-      {!MetadataLookup(nationalDex, formeNumber)?.regional && megaFormes.length > 0 && (
+      {!MetadataSummaryLookup(nationalDex, formeNumber)?.regional && megaFormes.length > 0 && (
         <Flex direction="column" gap="2">
           {megaFormes.map((mega, i) => (
             <Flex key={`${nationalDex}-${mega.megaForme.formeIndex}`} align="center" gap="2">

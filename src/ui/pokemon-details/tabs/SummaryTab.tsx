@@ -13,7 +13,7 @@ import {
   extraFormDisplayName,
   genderFromBool,
   getPluginColor,
-  MetadataLookup,
+  MetadataSummaryLookup,
   OriginGames,
 } from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm/PKM'
@@ -44,7 +44,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
   })
 
   const itemAltText = useMemo(() => {
-    const monData = MetadataLookup(mon.dexNum, mon.formeNum)
+    const monData = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
 
     if (!monData) return 'pokemon sprite'
     return `${monData.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
@@ -184,7 +184,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
                 {extraFormDisplayName(mon.extraFormIndex)}
               </span>
             ) : (
-              MetadataLookup(mon.dexNum, mon.formeNum)?.formeName
+              MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.formeName
             )}
             <GenderIcon gender={mon.gender} />
           </Flex>

@@ -2,8 +2,8 @@ import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   AbilityIndex,
   extraFormTypeOverride,
-  MetadataLookup,
   MetadataSource,
+  MetadataSummaryLookup,
   SpeciesAndForme,
 } from '@pkm-rs/pkg'
 import { FourMoves, Stats, StatsPreSplit } from '@pokemon-files/util'
@@ -28,7 +28,7 @@ export const getAbilityFromNumber = (
   formeNum: number,
   abilityNum: number
 ): AbilityIndex | undefined => {
-  return MetadataLookup(dexNum, formeNum)?.abilityByNum(abilityNum)
+  return MetadataSummaryLookup(dexNum, formeNum)?.abilityByNum(abilityNum)
 }
 
 export const ivsFromDVs = (dvs: StatsPreSplit) => {

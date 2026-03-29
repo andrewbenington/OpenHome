@@ -1,10 +1,10 @@
 import { ImageResponse } from '@openhome-ui/backend/backendInterface'
 import { OpenHomePlugin } from '@openhome-ui/state/plugin'
-import { MetadataLookup, SpeciesLookup } from '@pkm-rs/pkg'
+import { MetadataSummaryLookup, SpeciesLookup } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 
 type PluginBuilder = (
-  metadataLookup: typeof MetadataLookup,
+  metadataLookup: typeof MetadataSummaryLookup,
   speciesLookup: typeof SpeciesLookup,
   ndex: typeof NationalDex
 ) => { plugin: OpenHomePlugin }
@@ -29,7 +29,7 @@ export function loadPlugin(pluginCode: string): OpenHomePlugin {
     pluginCode + '; return buildPlugin;'
   ) as PluginBuilder
 
-  const { plugin } = buildPlugin(MetadataLookup, SpeciesLookup, NationalDex)
+  const { plugin } = buildPlugin(MetadataSummaryLookup, SpeciesLookup, NationalDex)
   return plugin
 }
 

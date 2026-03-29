@@ -7,7 +7,7 @@ import {
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   ShinyLeaves,
   SpeciesLookup,
@@ -459,7 +459,7 @@ export default class PK4 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {
