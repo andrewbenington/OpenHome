@@ -422,23 +422,18 @@ impl FormeMetadata {
     }
 
     fn has_data_for_source(&self, source: MetadataSource) -> bool {
+        log!(
+            "checking if {} forme {} has data for source {:?}",
+            self.species_name,
+            self.forme_name,
+            source
+        );
         source_has_form_metadata(source, self.national_dex.get(), self.forme_index)
     }
 
     fn types(&self) -> (PkmType, Option<PkmType>) {
-        let types = types_lookup(self.national_dex.get(), self.forme_index);
-        let Some(types) = types else {
-            log!(
-                "types not found for {} forme {}",
-                self.species_name,
-                self.forme_name
-            );
-            panic!(
-                "types not found for {} forme {}",
-                self.species_name, self.forme_name
-            );
-        };
-        types
+        types_lookup(self.national_dex.get(), self.forme_index)
+            .expect("All forms should have a valid type")
     }
 
     fn types_with_source(&self, source: MetadataSource) -> Option<(PkmType, Option<PkmType>)> {

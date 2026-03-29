@@ -1,7 +1,12 @@
 pub mod gen1;
 pub mod gen2;
 pub mod gen3;
+pub mod gen8_bdsp;
+pub mod gen8_la;
+pub mod gen8_swsh;
 pub mod gen9;
+pub mod gen9_sv;
+pub mod gen9_za;
 
 use std::sync::LazyLock;
 
@@ -17,10 +22,11 @@ use crate::{
         gen3::{
             METADATA_TABLE_EMERALD, METADATA_TABLE_FIRERED_LEAFGREEN, METADATA_TABLE_RUBY_SAPPHIRE,
         },
-        gen9::{
-            METADATA_TABLE_BDSP, METADATA_TABLE_LA, METADATA_TABLE_SV, METADATA_TABLE_SWSH,
-            METADATA_TABLE_ZA, MetadataTableGen9,
-        },
+        gen8_bdsp::METADATA_TABLE_BDSP,
+        gen8_la::METADATA_TABLE_LA,
+        gen8_swsh::METADATA_TABLE_SWSH,
+        gen9_sv::{METADATA_TABLE_SV, MetadataTableScarletViolet},
+        gen9_za::METADATA_TABLE_ZA,
     },
 };
 
@@ -178,6 +184,10 @@ pub trait MetadataTable {
     fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16>;
 
     fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&Learnset>;
+
+    fn form_is_present(&self, national_dex: u16, forme_index: u16) -> bool {
+        self.get_game_index(national_dex, forme_index).is_some()
+    }
 }
 
 impl<T: MetadataTable> MetadataTable for LazyLock<T> {
@@ -194,7 +204,7 @@ impl<T: MetadataTable> MetadataTable for LazyLock<T> {
     }
 }
 
-fn current_metadata_table() -> &'static MetadataTableGen9 {
+fn current_metadata_table() -> &'static MetadataTableScarletViolet {
     &METADATA_TABLE_SV
 }
 
@@ -263,9 +273,7 @@ pub fn source_has_form_metadata(
     national_dex: u16,
     forme_index: u16,
 ) -> bool {
-    metadata_table_by_source(source)
-        .get_types(national_dex, forme_index)
-        .is_some()
+    metadata_table_by_source(source).form_is_present(national_dex, forme_index)
 }
 
 pub fn types_lookup(national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
