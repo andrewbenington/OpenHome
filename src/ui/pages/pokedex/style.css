@@ -164,3 +164,21 @@
   min-width: 10rem;
   margin-left: auto;
 }
+
+.openhome-tab {
+  border: none;
+  border-radius: 0px 0px 4px 4px;
+  background-color: var(--gray-7);
+  color: var(--accent-contrast);
+  padding: 4px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  height: 2rem;
+}
+
+.openhome-tab-selected {
+  background-color: var(--accent-9);
+  color: var(--accent-contrast);
+  height: 2.75rem;
+}

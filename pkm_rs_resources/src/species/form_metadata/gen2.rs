@@ -71,11 +71,8 @@ impl PersonalTableGen2 {
         national_dex: u16,
         forme_index: u16,
     ) -> Option<&PersonalInfoGen2> {
-        if forme_index == 0 {
-            self.0.get(national_dex as usize)
-        } else {
-            None
-        }
+        self.get_game_index(national_dex, forme_index)
+            .and_then(|game_index| self.0.get(game_index as usize))
     }
 
     pub fn get_form_stats(&self, national_dex: u16, forme_index: u16) -> Option<StatsPreSplit> {

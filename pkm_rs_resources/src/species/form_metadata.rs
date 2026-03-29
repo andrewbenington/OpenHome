@@ -10,7 +10,6 @@ use wasm_bindgen::prelude::*;
 
 use crate::{
     levelup::Learnset,
-    log,
     species::form_metadata::{
         gen1::{METADATA_TABLE_RED_BLUE, METADATA_TABLE_YELLOW},
         gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GOLD_SILVER},
@@ -245,13 +244,7 @@ fn deduplicate_types(type1: PkmType, type2: PkmType) -> (PkmType, Option<PkmType
 }
 
 pub fn types_lookup(national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-    log!(
-        "looking up types for national dex {} forme {}",
-        national_dex,
-        forme_index
-    );
     let (type1, type2) = current_metadata_table().get_types(national_dex, forme_index)?;
-    log!("got types: {} and {}", type1, type2);
 
     Some(deduplicate_types(type1, type2))
 }
@@ -336,13 +329,92 @@ pub fn levelup_learnset_lookup(
 
 #[cfg(test)]
 mod test {
-    use pkm_rs_types::NationalDex;
+    use pkm_rs_types::{NationalDex, PkmType, Stats8};
+
+    use crate::species::{NatDexIndex, form_metadata::MetadataSource};
+
+    #[test]
+    fn test_get_stats() {
+        assert_eq!(
+            super::current_base_stats(NationalDex::Pikachu as u16, 0),
+            Some(Stats8::new(35, 55, 40, 50, 50, 90))
+        );
+    }
 
     #[test]
     fn test_get_types() {
         assert_eq!(
-            super::current_base_stats(NationalDex::Pikachu as u16, 0),
-            Some(pkm_rs_types::Stats8::new(35, 55, 40, 50, 50, 90))
+            super::types_lookup(NationalDex::Pikachu as u16, 0),
+            Some((PkmType::Electric, None))
         );
+    }
+
+    #[test]
+    fn all_forms_have_types() -> Result<(), String> {
+        for national_dex in NationalDex::Bulbasaur as u16..=NationalDex::Pecharunt as u16 {
+            let species_metadata = NatDexIndex::new(national_dex)
+                .expect("1-1025 are valid national dex indices")
+                .get_species_metadata();
+            for form in species_metadata.formes {
+                super::types_lookup(national_dex, form.forme_index)
+                    .ok_or(format!("Missing types for {}", form.forme_name))?;
+            }
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn no_form_duplicates_type() -> Result<(), String> {
+        for national_dex in NationalDex::Bulbasaur as u16..=NationalDex::Pecharunt as u16 {
+            let species_metadata = NatDexIndex::new(national_dex)
+                .expect("1-1025 are valid national dex indices")
+                .get_species_metadata();
+            for form in species_metadata.formes {
+                let (type1, type2) = super::types_lookup(national_dex, form.forme_index)
+                    .ok_or(format!("Missing types for {}", form.forme_name))?;
+                if let Some(type2) = type2
+                    && type1 == type2
+                {
+                    return Err(format!(
+                        "Form {} has duplicate types: {:?} and {:?}",
+                        form.forme_name, type1, type2
+                    ));
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn no_zero_stats() -> Result<(), String> {
+        for national_dex in NationalDex::Bulbasaur as u16..=NationalDex::Pecharunt as u16 {
+            let species_metadata = NatDexIndex::new(national_dex)
+                .expect("1-1025 are valid national dex indices")
+                .get_species_metadata();
+            for form in species_metadata.formes {
+                let stats = super::base_stats_lookup(
+                    national_dex,
+                    form.forme_index,
+                    MetadataSource::ScarletViolet,
+                )
+                .ok_or(format!("Missing stats for {}", form.forme_name))?;
+                if stats.hp == 0
+                    || stats.atk == 0
+                    || stats.def == 0
+                    || stats.spa == 0
+                    || stats.spd == 0
+                    || stats.spe == 0
+                {
+                    return Err(format!(
+                        "Form {} has one or more zero base stats: {:?}",
+                        form.forme_name, stats
+                    ));
+                }
+            }
+        }
+
+        Ok(())
     }
 }

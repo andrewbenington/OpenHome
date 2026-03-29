@@ -20,7 +20,6 @@ import {
   Card,
   Flex,
   Heading,
-  RadioCards,
   Select,
   Separator,
   Spinner,
@@ -29,6 +28,7 @@ import {
 } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
 import MoveCard from 'src/ui/components/pokemon/MoveCard'
+import { includeClass } from 'src/ui/util/style'
 import BaseStatsChart from './BaseStatsChart'
 import EvolutionFamily from './EvolutionFamily'
 import PokedexSidebar from './PokedexSidebar'
@@ -133,11 +133,25 @@ function PokedexDetails({
 
   return (
     <Flex direction="row" height="100%" align="center" width="100%">
-      <Flex direction="column" align="center" justify="center" height="100%" width="40%" gap="2">
+      <Flex
+        direction="column"
+        align="center"
+        justify="center"
+        height="100%"
+        width="40%"
+        maxWidth="30rem"
+        gap="2"
+      >
         <Flex direction="column" height="100%" width="100%" align="center" justify="center" gap="2">
           <div
             className="pokedex-image-frame"
-            style={{ minWidth: 140, width: 240, aspectRatio: 1, position: 'relative' }}
+            style={{
+              minWidth: 140,
+              width: 340,
+              maxWidth: '80%',
+              aspectRatio: 1,
+              position: 'relative',
+            }}
           >
             {selectedFormeStatus === 'ShinyCaught' && (
               <button
@@ -219,15 +233,24 @@ function PokedexDetails({
       </Flex>
       <Separator orientation="vertical" style={{ height: '100%' }} />
       <Flex direction="column" height="700px" maxHeight="100%" width="60%" gap="2" overflow="auto">
-        <RadioCards.Root
-          size="1"
-          defaultValue="main"
-          columns={{ initial: '1', sm: '3' }}
-          onValueChange={(value) => setCurrentView(value as PokedexView)}
-        >
-          <RadioCards.Item value="main">Main</RadioCards.Item>
-          <RadioCards.Item value="levelup">Levelup Learnset</RadioCards.Item>
-        </RadioCards.Root>
+        <Flex className="openhome-tab-row">
+          <Button
+            className={includeClass('openhome-tab')
+              .with('openhome-tab-selected')
+              .if(currentView === 'main')}
+            onClick={() => setCurrentView('main')}
+          >
+            Summary
+          </Button>
+          <Button
+            className={includeClass('openhome-tab')
+              .with('openhome-tab-selected')
+              .if(currentView === 'levelup')}
+            onClick={() => setCurrentView('levelup')}
+          >
+            Levelup Learnset
+          </Button>
+        </Flex>
         {currentView === 'main' ? (
           <PokedexMain
             pokedex={pokedex}
