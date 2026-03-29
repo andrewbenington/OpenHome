@@ -3,6 +3,8 @@ pub mod gen2;
 pub mod gen3;
 pub mod gen9;
 
+use std::sync::LazyLock;
+
 use pkm_rs_types::{OriginGame, OriginMark, PkmType, Stats8, StatsPreSplit};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -178,6 +180,20 @@ pub trait MetadataTable {
     fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&Learnset>;
 }
 
+impl<T: MetadataTable> MetadataTable for LazyLock<T> {
+    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, PkmType)> {
+        (**self).get_types(national_dex, forme_index)
+    }
+
+    fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16> {
+        (**self).get_game_index(national_dex, forme_index)
+    }
+
+    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&Learnset> {
+        (**self).get_levelup_learnset(national_dex, forme_index)
+    }
+}
+
 fn current_metadata_table() -> &'static MetadataTableGen9 {
     &METADATA_TABLE_SV
 }
@@ -242,10 +258,47 @@ fn deduplicate_types(type1: PkmType, type2: PkmType) -> (PkmType, Option<PkmType
     }
 }
 
+pub fn source_has_form_metadata(
+    source: MetadataSource,
+    national_dex: u16,
+    forme_index: u16,
+) -> bool {
+    metadata_table_by_source(source)
+        .get_types(national_dex, forme_index)
+        .is_some()
+}
+
 pub fn types_lookup(national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
     let (type1, type2) = current_metadata_table().get_types(national_dex, forme_index)?;
 
     Some(deduplicate_types(type1, type2))
+}
+
+fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTable {
+    match source {
+        MetadataSource::RedBlue => &METADATA_TABLE_RED_BLUE,
+        MetadataSource::Yellow => &METADATA_TABLE_YELLOW,
+        MetadataSource::GoldSilver => &METADATA_TABLE_GOLD_SILVER,
+        MetadataSource::Crystal => &METADATA_TABLE_CRYSTAL,
+        MetadataSource::RubySapphire => &METADATA_TABLE_RUBY_SAPPHIRE,
+        MetadataSource::Emerald => &METADATA_TABLE_EMERALD,
+        MetadataSource::FireRedLeafGreen => &METADATA_TABLE_FIRERED_LEAFGREEN,
+        MetadataSource::SwordShield => &METADATA_TABLE_SWSH,
+        MetadataSource::BrilliantDiamondShiningPearl => &METADATA_TABLE_BDSP,
+        MetadataSource::LegendsArceus => &METADATA_TABLE_LA,
+        MetadataSource::ScarletViolet => &METADATA_TABLE_SV,
+        MetadataSource::LegendsZa => &METADATA_TABLE_ZA,
+        MetadataSource::DiamondPearl => todo!(),
+        MetadataSource::Platinum => todo!(),
+        MetadataSource::HeartGoldSoulSilver => todo!(),
+        MetadataSource::BlackWhite => todo!(),
+        MetadataSource::Black2White2 => todo!(),
+        MetadataSource::XY => todo!(),
+        MetadataSource::OmegaRubyAlphaSapphire => todo!(),
+        MetadataSource::SunMoon => todo!(),
+        MetadataSource::UltraSunUltraMoon => todo!(),
+        MetadataSource::LetsGoPikachuEevee => todo!(),
+    }
 }
 
 pub fn types_lookup_with_source(
@@ -253,29 +306,7 @@ pub fn types_lookup_with_source(
     forme_index: u16,
     source: MetadataSource,
 ) -> Option<(PkmType, Option<PkmType>)> {
-    let (type1, type2) = match source {
-        MetadataSource::RedBlue => METADATA_TABLE_RED_BLUE.get_types(national_dex, forme_index),
-        MetadataSource::Yellow => METADATA_TABLE_YELLOW.get_types(national_dex, forme_index),
-        MetadataSource::GoldSilver => {
-            METADATA_TABLE_GOLD_SILVER.get_types(national_dex, forme_index)
-        }
-        MetadataSource::Crystal => METADATA_TABLE_CRYSTAL.get_types(national_dex, forme_index),
-        MetadataSource::RubySapphire => {
-            METADATA_TABLE_RUBY_SAPPHIRE.get_types(national_dex, forme_index)
-        }
-        MetadataSource::Emerald => METADATA_TABLE_EMERALD.get_types(national_dex, forme_index),
-        MetadataSource::FireRedLeafGreen => {
-            METADATA_TABLE_FIRERED_LEAFGREEN.get_types(national_dex, forme_index)
-        }
-        MetadataSource::SwordShield => METADATA_TABLE_SWSH.get_types(national_dex, forme_index),
-        MetadataSource::BrilliantDiamondShiningPearl => {
-            METADATA_TABLE_BDSP.get_types(national_dex, forme_index)
-        }
-        MetadataSource::LegendsArceus => METADATA_TABLE_LA.get_types(national_dex, forme_index),
-        MetadataSource::ScarletViolet => METADATA_TABLE_SV.get_types(national_dex, forme_index),
-        MetadataSource::LegendsZa => METADATA_TABLE_ZA.get_types(national_dex, forme_index),
-        _ => current_metadata_table().get_types(national_dex, forme_index),
-    }?;
+    let (type1, type2) = metadata_table_by_source(source).get_types(national_dex, forme_index)?;
 
     Some(deduplicate_types(type1, type2))
 }
@@ -285,45 +316,7 @@ pub fn levelup_learnset_lookup(
     forme_index: u16,
     source: MetadataSource,
 ) -> Option<&'static Learnset> {
-    match source {
-        MetadataSource::RedBlue => {
-            METADATA_TABLE_RED_BLUE.get_levelup_learnset(national_dex, forme_index)
-        }
-        MetadataSource::Yellow => {
-            METADATA_TABLE_YELLOW.get_levelup_learnset(national_dex, forme_index)
-        }
-        MetadataSource::GoldSilver => {
-            METADATA_TABLE_GOLD_SILVER.get_levelup_learnset(national_dex, forme_index)
-        }
-        MetadataSource::Crystal => {
-            METADATA_TABLE_CRYSTAL.get_levelup_learnset(national_dex, forme_index)
-        }
-        MetadataSource::RubySapphire => {
-            METADATA_TABLE_RUBY_SAPPHIRE.get_levelup_learnset(national_dex, forme_index)
-        }
-        MetadataSource::Emerald => {
-            METADATA_TABLE_EMERALD.get_levelup_learnset(national_dex, forme_index)
-        }
-        MetadataSource::FireRedLeafGreen => {
-            METADATA_TABLE_FIRERED_LEAFGREEN.get_levelup_learnset(national_dex, forme_index)
-        }
-        MetadataSource::SwordShield => {
-            METADATA_TABLE_SWSH.get_levelup_learnset(national_dex, forme_index)
-        }
-        MetadataSource::BrilliantDiamondShiningPearl => {
-            METADATA_TABLE_BDSP.get_levelup_learnset(national_dex, forme_index)
-        }
-        MetadataSource::LegendsArceus => {
-            METADATA_TABLE_LA.get_levelup_learnset(national_dex, forme_index)
-        }
-        MetadataSource::ScarletViolet => {
-            METADATA_TABLE_SV.get_levelup_learnset(national_dex, forme_index)
-        }
-        MetadataSource::LegendsZa => {
-            METADATA_TABLE_ZA.get_levelup_learnset(national_dex, forme_index)
-        }
-        _ => None,
-    }
+    metadata_table_by_source(source).get_levelup_learnset(national_dex, forme_index)
 }
 
 #[cfg(test)]

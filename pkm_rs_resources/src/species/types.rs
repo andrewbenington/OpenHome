@@ -9,8 +9,8 @@ use crate::{
     species::{
         ALL_SPECIES,
         form_metadata::{
-            MetadataSource, base_stats_pre_split_lookup, levelup_learnset_lookup, types_lookup,
-            types_lookup_with_source,
+            MetadataSource, base_stats_pre_split_lookup, levelup_learnset_lookup,
+            source_has_form_metadata, types_lookup, types_lookup_with_source,
         },
     },
 };
@@ -421,14 +421,34 @@ impl FormeMetadata {
             .any(|mega| mega.mega_forme.forme_index == self.forme_index)
     }
 
-    fn types(&self) -> (PkmType, Option<PkmType>) {
-        types_lookup(self.national_dex.get(), self.forme_index)
-            .expect("all FormeMetadata instances should have types")
+    fn has_data_for_source(&self, source: MetadataSource) -> bool {
+        source_has_form_metadata(source, self.national_dex.get(), self.forme_index)
     }
 
-    fn types_with_source(&self, source: MetadataSource) -> (PkmType, Option<PkmType>) {
+    fn types(&self) -> (PkmType, Option<PkmType>) {
+        let types = types_lookup(self.national_dex.get(), self.forme_index);
+        let Some(types) = types else {
+            log!(
+                "types not found for {} forme {}",
+                self.species_name,
+                self.forme_name
+            );
+            panic!(
+                "types not found for {} forme {}",
+                self.species_name, self.forme_name
+            );
+        };
+        types
+    }
+
+    fn types_with_source(&self, source: MetadataSource) -> Option<(PkmType, Option<PkmType>)> {
+        log!(
+            "looking up types for {} forme {} with source {:?}",
+            self.species_name,
+            self.forme_name,
+            source
+        );
         types_lookup_with_source(self.national_dex.get(), self.forme_index, source)
-            .expect("all FormeMetadata instances should have types")
     }
 
     /// Tera Type assigned by Pokémon HOME for the species when not originally
@@ -445,6 +465,11 @@ impl FormeMetadata {
 #[allow(clippy::missing_const_for_fn)]
 #[cfg(feature = "wasm")]
 impl FormeMetadata {
+    #[wasm_bindgen(js_name = hasDataForSource)]
+    pub fn has_data_for_source_js(&self, source: MetadataSource) -> bool {
+        self.has_data_for_source(source)
+    }
+
     #[wasm_bindgen(getter = megaEvolutions)]
     pub fn mega_evolutions(&self) -> Vec<MegaEvolutionMetadata> {
         self.mega_evolution_data.to_vec()
@@ -461,8 +486,8 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(js_name = type1WithSource)]
-    pub fn type_1_with_source(&self, source: MetadataSource) -> String {
-        self.types_with_source(source).0.to_string()
+    pub fn type_1_with_source(&self, source: MetadataSource) -> Option<String> {
+        Some(self.types_with_source(source)?.0.to_string())
     }
 
     #[wasm_bindgen(getter = type1Index)]
@@ -477,7 +502,7 @@ impl FormeMetadata {
 
     #[wasm_bindgen(js_name = type2WithSource)]
     pub fn type_2_with_source(&self, source: MetadataSource) -> Option<String> {
-        self.types_with_source(source).1.map(|t| t.to_string())
+        Some(self.types_with_source(source)?.1?.to_string())
     }
 
     #[wasm_bindgen(getter = type2Index)]

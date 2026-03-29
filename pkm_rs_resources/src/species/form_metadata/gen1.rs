@@ -21,8 +21,8 @@ impl PersonalInfoGen1 {
 
     pub const fn types(&self) -> (PkmType, PkmType) {
         (
-            PkmType::from_byte_gen1(self.0[6]).expect("Gen 1 type 1 should be valid"),
-            PkmType::from_byte_gen1(self.0[7]).expect("Gen 1 type 2 should be valid"),
+            PkmType::from_byte_gen12(self.0[6]).expect("Gen 1 type 1 should be valid"),
+            PkmType::from_byte_gen12(self.0[7]).expect("Gen 1 type 2 should be valid"),
         )
     }
 }

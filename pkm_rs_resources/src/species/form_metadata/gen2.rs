@@ -4,6 +4,7 @@ use pkm_rs_types::{NationalDex, PkmType, StatsPreSplit};
 
 use crate::{
     levelup::Learnset,
+    log,
     species::form_metadata::{MetadataTable, PersonalTable},
 };
 
@@ -27,13 +28,13 @@ pub static METADATA_TABLE_CRYSTAL: LazyLock<MetadataTableGen2> =
         learnsets: Learnset::all_from_pkl_bytes(CRYSTAL_LEVELUP_BYTES),
     });
 
-const ENTRY_SIZE: usize = 0x1c;
+const ENTRY_SIZE: usize = 0x20;
 
 #[derive(Debug, Clone, Copy)]
-pub struct PersonalInfoGen2([u8; 28]);
+pub struct PersonalInfoGen2([u8; ENTRY_SIZE]);
 
 impl PersonalInfoGen2 {
-    pub const fn from_pkl_bytes(bytes: [u8; 28]) -> Self {
+    pub const fn from_pkl_bytes(bytes: [u8; ENTRY_SIZE]) -> Self {
         Self(bytes)
     }
 
@@ -41,10 +42,16 @@ impl PersonalInfoGen2 {
         StatsPreSplit::from_bytes_u8(self.0[0..5].try_into().unwrap())
     }
 
-    pub const fn types(&self) -> (PkmType, PkmType) {
+    pub fn types(&self) -> (PkmType, PkmType) {
+        log!(
+            "getting types for gen 2 personal info with bytes: {:?}, type 1 byte: {}, type 2 byte: {}",
+            self.0,
+            self.0[7],
+            self.0[8]
+        );
         (
-            PkmType::from_byte(self.0[6]).expect("Gen 2 type 1 should be valid"),
-            PkmType::from_byte(self.0[7]).expect("Gen 2 type 2 should be valid"),
+            PkmType::from_byte_gen12(self.0[7]).expect("Gen 2 type 1 should be valid"),
+            PkmType::from_byte_gen12(self.0[8]).expect("Gen 2 type 2 should be valid"),
         )
     }
 }
@@ -90,6 +97,11 @@ impl PersonalTable for PersonalTableGen2 {
     }
 
     fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16> {
+        log!(
+            "looking up game index for national dex {} forme index {} in gen 2 personal table",
+            national_dex,
+            forme_index
+        );
         if forme_index == 0 || (national_dex == NationalDex::Unown && forme_index <= UNOWN_Z) {
             Some(national_dex)
         } else {

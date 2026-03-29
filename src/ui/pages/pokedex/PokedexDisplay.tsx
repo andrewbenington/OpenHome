@@ -27,6 +27,7 @@ import {
   TextField,
 } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
+import { Option } from 'src/core/util/functional'
 import MoveCard from 'src/ui/components/pokemon/MoveCard'
 import { includeClass } from 'src/ui/util/style'
 import BaseStatsChart from './BaseStatsChart'
@@ -258,6 +259,7 @@ function PokedexDetails({
             selectedForme={selectedForme}
             setSelectedForme={setSelectedForme}
             setSelectedSpecies={setSelectedSpecies}
+            metadataSource={metadataSource}
           />
         ) : (
           <PokedexLearnset
@@ -283,8 +285,18 @@ type PokedexMetadataProps = {
   metadataSource: MetadataSource
 }
 
-function PokedexMain(props: PokedexDetailsProps) {
-  const { pokedex, species, selectedForme, setSelectedForme, setSelectedSpecies } = props
+function PokedexMain(props: PokedexMetadataProps) {
+  const { pokedex, species, selectedForme, setSelectedForme, setSelectedSpecies, metadataSource } =
+    props
+
+  const hasDataForSource = selectedForme.hasDataForSource(metadataSource)
+  const type1 = (
+    hasDataForSource ? selectedForme.type1WithSource(metadataSource) : selectedForme.type1
+  ) as Type
+
+  const type2 = (
+    hasDataForSource ? selectedForme.type2WithSource(metadataSource) : selectedForme.type2
+  ) as Option<Type>
 
   return (
     <>
@@ -300,8 +312,8 @@ function PokedexMain(props: PokedexDetailsProps) {
         >
           <AttributeRow label="Level-Up">{species.levelUpType}</AttributeRow>
           <AttributeRow label="Type">
-            <TypeIcon type={selectedForme.type1 as Type} />
-            {selectedForme.type2 && <TypeIcon type={selectedForme.type2 as Type} />}
+            <TypeIcon type={type1} />
+            {type2 && <TypeIcon type={type2} />}
           </AttributeRow>
           <AttributeRow label="Ability 1">{selectedForme.abilities[0].name}</AttributeRow>
           {selectedForme.abilities[1] !== selectedForme.abilities[0] && (
