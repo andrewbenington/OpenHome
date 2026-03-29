@@ -86,12 +86,12 @@ impl PkmConverter {
         }
 
         let best_match = Location::game_setting_best_match(ohpkm_origin);
-        if let Some(game_setting) = self.dest_pkm_format.index_for(best_match) {
+        if let Some(game_setting) = self.dest_pkm_format.location_index_of(best_match) {
             return game_setting;
         }
 
         let most_compatible = Location::game_setting_most_compatible(ohpkm_origin);
-        if let Some(game_setting) = self.dest_pkm_format.index_for(most_compatible) {
+        if let Some(game_setting) = self.dest_pkm_format.location_index_of(most_compatible) {
             return game_setting;
         }
 
