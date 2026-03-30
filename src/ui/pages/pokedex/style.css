@@ -212,5 +212,5 @@
 .openhome-tab-selected {
   background-color: var(--accent-9);
   color: var(--accent-contrast);
-  height: 2.75rem;
+  height: 2.5rem;
 }

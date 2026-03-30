@@ -1,10 +1,10 @@
 import { getPublicImageURL, getTypeIconPath } from '@openhome-ui/images/images'
 import { PkmType } from '@pkm-rs/pkg'
-import { teraTypeFromIndex, Type } from '@pokemon-resources/index'
+import { teraTypeFromIndex } from '@pokemon-resources/index'
 import './style.css'
 
 interface TypeIconProps {
-  type?: Type
+  type?: PkmType
   typeIndex?: number | PkmType
   border?: boolean
   size?: number

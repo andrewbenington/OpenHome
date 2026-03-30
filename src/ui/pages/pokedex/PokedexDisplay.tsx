@@ -1,4 +1,3 @@
-import { Type } from '@openhome-core/util/types'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
@@ -9,6 +8,7 @@ import { Pokedex } from '@openhome-ui/util/pokedex'
 import {
   allMetadataSources,
   FormeMetadata,
+  metadataReaderFor,
   MetadataSource,
   MetadataSources,
   MetadataSummaryLookup,
@@ -27,7 +27,6 @@ import {
   TextField,
 } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
-import { Option } from 'src/core/util/functional'
 import MoveCard from 'src/ui/components/pokemon/MoveCard'
 import { includeClass } from 'src/ui/util/style'
 import BaseStatsChart from './BaseStatsChart'
@@ -289,20 +288,24 @@ function PokedexMain(props: PokedexMetadataProps) {
   const { pokedex, species, selectedForme, setSelectedForme, setSelectedSpecies, metadataSource } =
     props
 
-  const hasDataForSource = selectedForme.hasDataForSource(metadataSource)
-  const type1 = (
-    hasDataForSource ? selectedForme.type1WithSource(metadataSource) : selectedForme.type1
-  ) as Type
+  const reader = metadataReaderFor(metadataSource, species.nationalDex, selectedForme.formeIndex)
+  if (!reader) {
+    return (
+      <Flex width="100%" height="100%" align="center" justify="center">
+        <Text>No metadata available for this Pokémon.</Text>
+      </Flex>
+    )
+  }
 
-  const type2 = (
-    hasDataForSource ? selectedForme.type2WithSource(metadataSource) : selectedForme.type2
-  ) as Option<Type>
+  const type1 = reader.type1()
+  const type2 = reader.type2()
+  const stats = reader.baseStats()
 
   return (
     <>
       <Flex width="100%" height="50%">
         <div id="base-stats-and-attributes" style={{ width: '50%' }}>
-          <BaseStatsChart forme={selectedForme} />
+          <BaseStatsChart stats={stats} />
         </div>
 
         <Flex

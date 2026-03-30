@@ -1,44 +1,26 @@
-export type Type =
-  | 'Fire'
-  | 'Grass'
-  | 'Electric'
-  | 'Ghost'
-  | 'Fairy'
-  | 'Water'
-  | 'Ice'
-  | 'Rock'
-  | 'Ground'
-  | 'Flying'
-  | 'Fighting'
-  | 'Psychic'
-  | 'Dark'
-  | 'Bug'
-  | 'Steel'
-  | 'Poison'
-  | 'Dragon'
-  | 'Normal'
+import { PkmType } from '@pkm-rs/pkg'
 
-export type TeraType = Type | 'Stellar'
+export type TeraType = PkmType | 'Stellar'
 
-export const Types: Type[] = [
-  'Normal',
-  'Fighting',
-  'Flying',
-  'Poison',
-  'Ground',
-  'Rock',
-  'Bug',
-  'Ghost',
-  'Steel',
-  'Fire',
-  'Water',
-  'Grass',
-  'Electric',
-  'Psychic',
-  'Ice',
-  'Dragon',
-  'Dark',
-  'Fairy',
+export const Types: PkmType[] = [
+  PkmType.Normal,
+  PkmType.Fighting,
+  PkmType.Flying,
+  PkmType.Poison,
+  PkmType.Ground,
+  PkmType.Rock,
+  PkmType.Bug,
+  PkmType.Ghost,
+  PkmType.Steel,
+  PkmType.Fire,
+  PkmType.Water,
+  PkmType.Grass,
+  PkmType.Electric,
+  PkmType.Psychic,
+  PkmType.Ice,
+  PkmType.Dragon,
+  PkmType.Dark,
+  PkmType.Fairy,
 ]
 
 export function teraTypeFromIndex(index: number) {

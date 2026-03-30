@@ -4,6 +4,7 @@ import {
   extraFormTypeOverride,
   MetadataSource,
   MetadataSummaryLookup,
+  PkmType,
   SpeciesAndForme,
 } from '@pkm-rs/pkg'
 import { FourMoves, Stats, StatsPreSplit } from '@pokemon-files/util'
@@ -18,7 +19,6 @@ import {
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
   SpeedCharacteristics,
-  Type,
   Types,
 } from '@pokemon-resources/index'
 import Prando from 'prando'
@@ -131,7 +131,7 @@ export const getBaseMon = (dexNum: number, forme?: number) => {
   return mon
 }
 
-export const getTypes = (mon: PKMInterface): Type[] => {
+export const getTypes = (mon: PKMInterface): PkmType[] => {
   if (mon.extraFormIndex !== undefined) {
     const extraFormTypeIndices: number[] | undefined = extraFormTypeOverride(mon.extraFormIndex)
     if (extraFormTypeIndices) {
@@ -141,13 +141,17 @@ export const getTypes = (mon: PKMInterface): Type[] => {
 
   const metadata = mon.metadata
   if (!metadata) {
-    return ['Normal']
+    return [PkmType.Normal]
   }
 
   const metadataSource = MetadataSourceByFormat(mon.format)
 
-  const type1 = metadata.type1WithSource(metadataSource) as Type
-  const type2 = metadata.type2WithSource(metadataSource) as Type | undefined
+  console.assert(
+    metadata.type1WithSource(metadataSource) !== undefined,
+    `Missing type 1 for ${metadata.formeName} from source ${metadataSource}`
+  )
+  const type1 = metadata.type1WithSource(metadataSource) ?? metadata.type1
+  const type2 = metadata.type2WithSource(metadataSource)
 
   return type2 ? [type1, type2] : [type1]
 }
@@ -314,27 +318,27 @@ export function getCharacteristic(mon: PKMInterface) {
   }
 }
 
-const hpTypes: Type[] = [
-  'Fighting',
-  'Flying',
-  'Poison',
-  'Ground',
-  'Rock',
-  'Bug',
-  'Ghost',
-  'Steel',
-  'Fire',
-  'Water',
-  'Grass',
-  'Electric',
-  'Psychic',
-  'Ice',
-  'Dragon',
-  'Dark',
+const HIDDEN_POWER_TYPES: PkmType[] = [
+  PkmType.Fighting,
+  PkmType.Flying,
+  PkmType.Poison,
+  PkmType.Ground,
+  PkmType.Rock,
+  PkmType.Bug,
+  PkmType.Ghost,
+  PkmType.Steel,
+  PkmType.Fire,
+  PkmType.Water,
+  PkmType.Grass,
+  PkmType.Electric,
+  PkmType.Psychic,
+  PkmType.Ice,
+  PkmType.Dragon,
+  PkmType.Dark,
 ]
 
 export type HiddenPowerWithBP = {
-  type: Type
+  type: PkmType
   power: number
 }
 
@@ -350,7 +354,7 @@ export function getHiddenPowerGen2(dvs: StatsPreSplit): HiddenPowerWithBP {
   const basePower = Math.floor(numerator / 2) + 31
 
   return {
-    type: hpTypes[typeIndex],
+    type: HIDDEN_POWER_TYPES[typeIndex],
     power: basePower,
   }
 }
@@ -359,13 +363,13 @@ function mostSignificantBit(value: number) {
   return value & 0b1000 ? 1 : 0
 }
 
-export function getHiddenPowerType(ivs: Stats): Type {
+export function getHiddenPowerType(ivs: Stats): PkmType {
   const numerator =
     [0, ivs.spd, ivs.spa, ivs.spe, ivs.def, ivs.atk, ivs.hp].reduce(
       (prev, value) => (prev << 1) + (value & 1)
     ) * 15
 
-  return hpTypes[Math.floor(numerator / 63)]
+  return HIDDEN_POWER_TYPES[Math.floor(numerator / 63)]
 }
 
 export function getHiddenPowerPower(ivs: Stats): number {

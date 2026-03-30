@@ -7,14 +7,18 @@ pub mod gen8_swsh;
 pub mod gen9_sv;
 pub mod gen9_za;
 
-use std::sync::LazyLock;
-
 use pkm_rs_types::{OriginGame, OriginMark, PkmType, Stats8, StatsPreSplit};
+use serde::{Deserialize, Serialize};
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "wasm")]
+use tsify::Tsify;
+
 use crate::{
     levelup::Learnset,
+    log,
     species::form_metadata::{
         gen1::{METADATA_TABLE_RED_BLUE, METADATA_TABLE_YELLOW},
         gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GOLD_SILVER},
@@ -184,12 +188,20 @@ pub trait MetadataTable {
 
     fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&Learnset>;
 
+    fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats>;
+
     fn form_is_present(&self, national_dex: u16, forme_index: u16) -> bool {
         self.get_game_index(national_dex, forme_index).is_some()
     }
+
+    fn get_source_name(&self) -> &'static str;
 }
 
-impl<T: MetadataTable> MetadataTable for LazyLock<T> {
+impl<T, U> MetadataTable for T
+where
+    T: std::ops::Deref<Target = U>,
+    U: MetadataTable + ?Sized + 'static,
+{
     fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, PkmType)> {
         (**self).get_types(national_dex, forme_index)
     }
@@ -201,6 +213,138 @@ impl<T: MetadataTable> MetadataTable for LazyLock<T> {
     fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&Learnset> {
         (**self).get_levelup_learnset(national_dex, forme_index)
     }
+
+    fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {
+        (**self).get_base_stats(national_dex, forme_index)
+    }
+
+    fn form_is_present(&self, national_dex: u16, forme_index: u16) -> bool {
+        (**self).form_is_present(national_dex, forme_index)
+    }
+
+    fn get_source_name(&self) -> &'static str {
+        (**self).get_source_name()
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+pub struct MetadataTableReader {
+    inner: Box<dyn MetadataTable>,
+    national_dex: u16,
+    forme_index: u16,
+}
+
+const READER_SHOULD_BE_VALID: &str =
+    "MetadataTableReader should only be constructed if the form is present in the table";
+
+impl MetadataTableReader {
+    pub fn new(inner: Box<dyn MetadataTable>, national_dex: u16, forme_index: u16) -> Option<Self> {
+        if inner.form_is_present(national_dex, forme_index) {
+            Some(Self {
+                inner,
+                national_dex,
+                forme_index,
+            })
+        } else {
+            None
+        }
+    }
+
+    pub fn get_types(&self) -> (PkmType, PkmType) {
+        self.inner
+            .get_types(self.national_dex, self.forme_index)
+            .expect(READER_SHOULD_BE_VALID)
+    }
+
+    pub fn get_game_index(&self) -> u16 {
+        self.inner
+            .get_game_index(self.national_dex, self.forme_index)
+            .expect(READER_SHOULD_BE_VALID)
+    }
+
+    pub fn get_levelup_learnset(&self) -> &Learnset {
+        self.inner
+            .get_levelup_learnset(self.national_dex, self.forme_index)
+            .expect(READER_SHOULD_BE_VALID)
+    }
+
+    pub fn get_base_stats(&self) -> BaseStats {
+        log!(
+            "{}: Looking up base stats for national dex {} forme index {}",
+            self.inner.get_source_name(),
+            self.national_dex,
+            self.forme_index
+        );
+        self.inner
+            .get_base_stats(self.national_dex, self.forme_index)
+            .expect(READER_SHOULD_BE_VALID)
+    }
+
+    pub fn types(&self) -> (PkmType, Option<PkmType>) {
+        let (type1, type2) = self
+            .inner
+            .get_types(self.national_dex, self.forme_index)
+            .expect(READER_SHOULD_BE_VALID);
+
+        deduplicate_types(type1, type2)
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+impl MetadataTableReader {
+    #[cfg_attr(feature = "wasm", wasm_bindgen)]
+    pub fn type1(&self) -> PkmType {
+        self.types().0
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen)]
+    pub fn type2(&self) -> Option<PkmType> {
+        self.types().1
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "baseStats"))]
+    pub fn base_stats(&self) -> BaseStats {
+        self.get_base_stats()
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "metadataReaderFor"))]
+pub fn metadata_reader_for(
+    source: MetadataSource,
+    national_dex: u16,
+    forme_index: u16,
+) -> Option<MetadataTableReader> {
+    MetadataTableReader::new(
+        Box::new(metadata_table_by_source(source)),
+        national_dex,
+        forme_index,
+    )
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "currentMetadataReader"))]
+pub fn current_metadata_reader(national_dex: u16, forme_index: u16) -> Option<MetadataTableReader> {
+    MetadataTableReader::new(
+        Box::new(current_metadata_table()),
+        national_dex,
+        forme_index,
+    )
+}
+
+#[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
+#[tsify(into_wasm_abi, from_wasm_abi)]
+pub enum BaseStats {
+    PreSplit(StatsPreSplit),
+    Modern(Stats8),
+}
+
+impl BaseStats {
+    const fn pre_split(stat: StatsPreSplit) -> Self {
+        Self::PreSplit(stat)
+    }
+
+    const fn modern(stat: Stats8) -> Self {
+        Self::Modern(stat)
+    }
 }
 
 fn current_metadata_table() -> &'static MetadataTableScarletViolet {
@@ -211,51 +355,16 @@ pub fn base_stats_lookup(
     national_dex: u16,
     forme_index: u16,
     source: MetadataSource,
-) -> Option<Stats8> {
-    match source {
-        MetadataSource::RubySapphire => {
-            METADATA_TABLE_RUBY_SAPPHIRE.get_base_stats(national_dex, forme_index)
-        }
-        MetadataSource::Emerald => METADATA_TABLE_EMERALD.get_base_stats(national_dex, forme_index),
-        MetadataSource::FireRedLeafGreen => {
-            METADATA_TABLE_FIRERED_LEAFGREEN.get_base_stats(national_dex, forme_index)
-        }
-        // MetadataSource::SwordShield => {
-        //     METADATA_TABLE_SWSH.get_base_stats(national_dex, forme_index)
-        // }
-        // MetadataSource::BrilliantDiamondShiningPearl => {
-        //     METADATA_TABLE_BDSP.get_base_stats(national_dex, forme_index)
-        // }
-        // MetadataSource::LegendsArceus => {
-        //     METADATA_TABLE_LA.get_base_stats(national_dex, forme_index)
-        // }
-        MetadataSource::ScarletViolet => {
-            METADATA_TABLE_SV.get_base_stats(national_dex, forme_index)
-        }
-        // MetadataSource::LegendsZa => METADATA_TABLE_ZA.get_base_stats(national_dex, forme_index),
-        _ => current_metadata_table().get_base_stats(national_dex, forme_index),
-    }
-}
-
-pub fn base_stats_pre_split_lookup(
-    national_dex: u16,
-    forme_index: u16,
-    source: MetadataSource,
-) -> Option<StatsPreSplit> {
-    match source {
-        MetadataSource::RedBlue => {
-            METADATA_TABLE_RED_BLUE.get_base_stats(national_dex, forme_index)
-        }
-        MetadataSource::Yellow => METADATA_TABLE_YELLOW.get_base_stats(national_dex, forme_index),
-        MetadataSource::GoldSilver => {
-            METADATA_TABLE_GOLD_SILVER.get_base_stats(national_dex, forme_index)
-        }
-        MetadataSource::Crystal => METADATA_TABLE_CRYSTAL.get_base_stats(national_dex, forme_index),
-        _ => None,
-    }
+) -> Option<BaseStats> {
+    metadata_table_by_source(source).get_base_stats(national_dex, forme_index)
 }
 
 pub fn current_base_stats(national_dex: u16, forme_index: u16) -> Option<Stats8> {
+    log!(
+        "Looking up base stats for national dex {} forme index {} in current metadata table",
+        national_dex,
+        forme_index
+    );
     current_metadata_table().get_base_stats(national_dex, forme_index)
 }
 
@@ -330,7 +439,10 @@ pub fn levelup_learnset_lookup(
 mod test {
     use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-    use crate::species::{NatDexIndex, form_metadata::MetadataSource};
+    use crate::species::{
+        NatDexIndex,
+        form_metadata::{BaseStats, MetadataSource},
+    };
 
     #[test]
     fn test_get_stats() {
@@ -399,18 +511,35 @@ mod test {
                     MetadataSource::ScarletViolet,
                 )
                 .ok_or(format!("Missing stats for {}", form.forme_name))?;
-                if stats.hp == 0
-                    || stats.atk == 0
-                    || stats.def == 0
-                    || stats.spa == 0
-                    || stats.spd == 0
-                    || stats.spe == 0
-                {
-                    return Err(format!(
-                        "Form {} has one or more zero base stats: {:?}",
-                        form.forme_name, stats
-                    ));
-                }
+                match stats {
+                    BaseStats::PreSplit(stats) => {
+                        if stats.hp == 0
+                            || stats.atk == 0
+                            || stats.def == 0
+                            || stats.spc == 0
+                            || stats.spe == 0
+                        {
+                            return Err(format!(
+                                "Form {} has one or more zero base stats: {:?}",
+                                form.forme_name, stats
+                            ));
+                        }
+                    }
+                    BaseStats::Modern(stats) => {
+                        if stats.hp == 0
+                            || stats.atk == 0
+                            || stats.def == 0
+                            || stats.spa == 0
+                            || stats.spd == 0
+                            || stats.spe == 0
+                        {
+                            return Err(format!(
+                                "Form {} has one or more zero base stats: {:?}",
+                                form.forme_name, stats
+                            ));
+                        }
+                    }
+                };
             }
         }
 

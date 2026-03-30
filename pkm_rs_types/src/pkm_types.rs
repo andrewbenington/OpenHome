@@ -97,6 +97,38 @@ impl PkmType {
     }
 }
 
+#[cfg(feature = "wasm")]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+pub struct PkmTypes;
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+impl PkmTypes {
+    #[wasm_bindgen(js_name = "tryFromString")]
+    pub fn try_from_string(s: &str) -> Option<PkmType> {
+        match s {
+            "normal" => Some(PkmType::Normal),
+            "fighting" => Some(PkmType::Fighting),
+            "flying" => Some(PkmType::Flying),
+            "poison" => Some(PkmType::Poison),
+            "ground" => Some(PkmType::Ground),
+            "rock" => Some(PkmType::Rock),
+            "bug" => Some(PkmType::Bug),
+            "ghost" => Some(PkmType::Ghost),
+            "steel" => Some(PkmType::Steel),
+            "fire" => Some(PkmType::Fire),
+            "water" => Some(PkmType::Water),
+            "grass" => Some(PkmType::Grass),
+            "electric" => Some(PkmType::Electric),
+            "psychic" => Some(PkmType::Psychic),
+            "ice" => Some(PkmType::Ice),
+            "dragon" => Some(PkmType::Dragon),
+            "dark" => Some(PkmType::Dark),
+            "fairy" => Some(PkmType::Fairy),
+            _ => None,
+        }
+    }
+}
+
 const TERA_TYPE_NO_OVERRIDE: u8 = 0x13;
 const TERA_TYPE_STELLAR: u8 = 0x63;
 

@@ -1,6 +1,6 @@
 use crate::util::bit_is_set;
 use pkm_rs_derive::Stats;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -14,7 +14,7 @@ pub trait Stats: Sized {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy, Stats, PartialEq, Eq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Copy, Stats, PartialEq, Eq)]
 pub struct Stats8 {
     pub hp: u8,
     pub atk: u8,
@@ -266,7 +266,7 @@ impl HyperTraining {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Copy)]
 pub struct StatsPreSplit {
     pub hp: u16,
     pub atk: u16,

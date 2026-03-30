@@ -8,7 +8,7 @@ import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
-import { colorForType, colorIsDark } from '@openhome-ui/util/color'
+import { colorIsDark, SHADOW_TYPE_COLOR } from '@openhome-ui/util/color'
 import {
   extraFormDisplayName,
   genderFromBool,
@@ -154,7 +154,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           )}
           {mon.isNoble && <AttributeTag label="NOBLE" backgroundColor="#cccc00" color="white" />}
           {'isShadow' in mon && (mon.isShadow as boolean) && (
-            <AttributeTag label="SHADOW" backgroundColor={colorForType('shadow')} color="white" />
+            <AttributeTag label="SHADOW" backgroundColor={SHADOW_TYPE_COLOR} color="white" />
           )}
           {mon.isNsPokemon && (
             <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />

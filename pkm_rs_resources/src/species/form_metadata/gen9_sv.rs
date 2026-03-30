@@ -4,7 +4,7 @@ use pkm_rs_types::{PkmType, Stats8};
 
 use crate::{
     levelup::Learnset,
-    species::form_metadata::{MetadataTable, PersonalTable},
+    species::form_metadata::{BaseStats, MetadataTable, PersonalTable},
 };
 
 // binary files are from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
@@ -19,7 +19,7 @@ pub static METADATA_TABLE_SV: LazyLock<MetadataTableScarletViolet> =
         learnsets: Learnset::all_from_pkl_bytes(SV_LEVELUP_BYTES),
     });
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct PersonalInfoScarletViolet([u8; SV_ENTRY_SIZE]);
 
 impl PersonalInfoScarletViolet {
@@ -150,5 +150,15 @@ impl MetadataTable for MetadataTableScarletViolet {
     fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&Learnset> {
         self.learnsets
             .get(self.get_game_index(national_dex, forme_index)? as usize)
+    }
+
+    fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {
+        self.personal
+            .get_form_stats(national_dex, forme_index)
+            .map(BaseStats::modern)
+    }
+
+    fn get_source_name(&self) -> &'static str {
+        "Scarlet/Violet"
     }
 }

@@ -4,7 +4,7 @@ use pkm_rs_types::{PkmType, StatsPreSplit};
 
 use crate::{
     levelup::Learnset,
-    species::form_metadata::{MetadataTable, PersonalTable},
+    species::form_metadata::{BaseStats, MetadataTable, PersonalTable},
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -29,6 +29,7 @@ impl PersonalInfoGen1 {
 
 const ENTRY_SIZE: usize = 0x1c;
 
+#[derive(Debug)]
 pub struct PersonalTableGen1(Vec<PersonalInfoGen1>);
 
 impl PersonalTableGen1 {
@@ -79,15 +80,10 @@ impl PersonalTable for PersonalTableGen1 {
     }
 }
 
+#[derive(Debug)]
 pub struct MetadataTableGen1 {
     personal: PersonalTableGen1,
     learnsets: Vec<Learnset>,
-}
-
-impl MetadataTableGen1 {
-    pub fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<StatsPreSplit> {
-        self.personal.get_form_stats(national_dex, forme_index)
-    }
 }
 
 impl MetadataTable for MetadataTableGen1 {
@@ -102,6 +98,16 @@ impl MetadataTable for MetadataTableGen1 {
     fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&Learnset> {
         self.learnsets
             .get(self.get_game_index(national_dex, forme_index)? as usize)
+    }
+
+    fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<super::BaseStats> {
+        self.personal
+            .get_form_stats(national_dex, forme_index)
+            .map(BaseStats::pre_split)
+    }
+
+    fn get_source_name(&self) -> &'static str {
+        "Red/Blue/Green/Yellow"
     }
 }
 

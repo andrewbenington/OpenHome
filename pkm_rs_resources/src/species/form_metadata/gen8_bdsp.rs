@@ -4,7 +4,7 @@ use pkm_rs_types::{PkmType, Stats8};
 
 use crate::{
     levelup::Learnset,
-    species::form_metadata::{MetadataTable, PersonalTable},
+    species::form_metadata::{BaseStats, MetadataTable, PersonalTable},
 };
 
 // binary files are from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
@@ -12,8 +12,6 @@ use crate::{
 const BDSP_PERSONAL_BYTES: &[u8] = include_bytes!("pkhex_bin/personal/personal_bdsp");
 const BDSP_LEVELUP_BYTES: &[u8] = include_bytes!("pkhex_bin/levelup/lvlmove_bdsp.pkl");
 const BDSP_ENTRY_SIZE: usize = 0x44;
-
-const DEFAULT_FORM_OFFSET: usize = 0x18;
 
 pub static METADATA_TABLE_BDSP: LazyLock<MetadataTableBdsp> = LazyLock::new(|| MetadataTableBdsp {
     personal: PersonalTableBdsp::from_pkl_bytes(BDSP_PERSONAL_BYTES),
@@ -83,6 +81,7 @@ impl PersonalInfoBdsp {
     }
 }
 
+#[derive(Debug)]
 pub struct PersonalTableBdsp(Vec<PersonalInfoBdsp>);
 
 impl PersonalTableBdsp {
@@ -128,15 +127,10 @@ impl PersonalTable for PersonalTableBdsp {
     }
 }
 
+#[derive(Debug)]
 pub struct MetadataTableBdsp {
     personal: PersonalTableBdsp,
     learnsets: Vec<Learnset>,
-}
-
-impl MetadataTableBdsp {
-    pub fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<Stats8> {
-        self.personal.get_form_stats(national_dex, forme_index)
-    }
 }
 
 impl MetadataTable for MetadataTableBdsp {
@@ -151,5 +145,15 @@ impl MetadataTable for MetadataTableBdsp {
     fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&Learnset> {
         self.learnsets
             .get(self.get_game_index(national_dex, forme_index)? as usize)
+    }
+
+    fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {
+        self.personal
+            .get_form_stats(national_dex, forme_index)
+            .map(BaseStats::modern)
+    }
+
+    fn get_source_name(&self) -> &'static str {
+        "Brilliant Diamond/Shining Pearl"
     }
 }

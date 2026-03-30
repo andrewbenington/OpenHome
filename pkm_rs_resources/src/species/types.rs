@@ -9,16 +9,16 @@ use crate::{
     species::{
         ALL_SPECIES,
         form_metadata::{
-            MetadataSource, base_stats_pre_split_lookup, levelup_learnset_lookup,
-            source_has_form_metadata, types_lookup, types_lookup_with_source,
+            MetadataSource, levelup_learnset_lookup, source_has_form_metadata, types_lookup,
+            types_lookup_with_source,
         },
     },
 };
-use pkm_rs_types::{GameSetting, Generation, PkmType, StatsPreSplit, TeraType};
+use pkm_rs_types::{GameSetting, Generation, PkmType, TeraType};
 use serde::{Serialize, Serializer};
 
 #[cfg(feature = "wasm")]
-use crate::species::form_metadata::base_stats_lookup;
+use crate::species::form_metadata::{BaseStats, base_stats_lookup};
 #[cfg(feature = "wasm")]
 use crate::stats::Stat;
 #[cfg(feature = "wasm")]
@@ -471,18 +471,13 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(getter = type1)]
-    pub fn type_1(&self) -> String {
-        log!(
-            "getting types for {} forme {}",
-            self.species_name,
-            self.forme_name
-        );
-        self.types().0.to_string()
+    pub fn type_1(&self) -> PkmType {
+        self.types().0
     }
 
     #[wasm_bindgen(js_name = type1WithSource)]
-    pub fn type_1_with_source(&self, source: MetadataSource) -> Option<String> {
-        Some(self.types_with_source(source)?.0.to_string())
+    pub fn type_1_with_source(&self, source: MetadataSource) -> Option<PkmType> {
+        Some(self.types_with_source(source)?.0)
     }
 
     #[wasm_bindgen(getter = type1Index)]
@@ -491,13 +486,13 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(getter = type2)]
-    pub fn type_2(&self) -> Option<String> {
-        self.types().1.map(|t| t.to_string())
+    pub fn type_2(&self) -> Option<PkmType> {
+        self.types().1
     }
 
     #[wasm_bindgen(js_name = type2WithSource)]
-    pub fn type_2_with_source(&self, source: MetadataSource) -> Option<String> {
-        Some(self.types_with_source(source)?.1?.to_string())
+    pub fn type_2_with_source(&self, source: MetadataSource) -> Option<PkmType> {
+        self.types_with_source(source)?.1
     }
 
     #[wasm_bindgen(getter = type2Index)]
@@ -592,13 +587,8 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(js_name = baseStatsFrom)]
-    pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<Stats8> {
+    pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<BaseStats> {
         base_stats_lookup(self.national_dex.get(), self.forme_index, source)
-    }
-
-    #[wasm_bindgen(js_name = baseStatsPreSplitFrom)]
-    pub fn get_base_stats_pre_split_from(&self, source: MetadataSource) -> Option<StatsPreSplit> {
-        base_stats_pre_split_lookup(self.national_dex.get(), self.forme_index, source)
     }
 
     #[wasm_bindgen(js_name = getBaseStat)]

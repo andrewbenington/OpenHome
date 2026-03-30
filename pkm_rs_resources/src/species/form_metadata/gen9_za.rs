@@ -4,7 +4,7 @@ use pkm_rs_types::{PkmType, Stats8};
 
 use crate::{
     levelup::Learnset,
-    species::form_metadata::{MetadataTable, PersonalTable},
+    species::form_metadata::{BaseStats, MetadataTable, PersonalTable},
 };
 
 // binary files are from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
@@ -82,6 +82,7 @@ impl PersonalInfoLegendsZa {
     }
 }
 
+#[derive(Debug)]
 pub struct PersonalTableLegendsZa(Vec<PersonalInfoLegendsZa>);
 
 impl PersonalTableLegendsZa {
@@ -127,15 +128,10 @@ impl PersonalTable for PersonalTableLegendsZa {
     }
 }
 
+#[derive(Debug)]
 pub struct MetadataTableLegendsZa {
     personal: PersonalTableLegendsZa,
     learnsets: Vec<Learnset>,
-}
-
-impl MetadataTableLegendsZa {
-    pub fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<Stats8> {
-        self.personal.get_form_stats(national_dex, forme_index)
-    }
 }
 
 impl MetadataTable for MetadataTableLegendsZa {
@@ -150,5 +146,15 @@ impl MetadataTable for MetadataTableLegendsZa {
     fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&Learnset> {
         self.learnsets
             .get(self.get_game_index(national_dex, forme_index)? as usize)
+    }
+
+    fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {
+        self.personal
+            .get_form_stats(national_dex, forme_index)
+            .map(BaseStats::modern)
+    }
+
+    fn get_source_name(&self) -> &'static str {
+        "Legends: Z-A"
     }
 }

@@ -5,7 +5,7 @@ use pkm_rs_types::{NationalDex, PkmType, StatsPreSplit};
 use crate::{
     levelup::Learnset,
     log,
-    species::form_metadata::{MetadataTable, PersonalTable},
+    species::form_metadata::{BaseStats, MetadataTable, PersonalTable},
 };
 
 // binary files are from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
@@ -56,6 +56,7 @@ impl PersonalInfoGen2 {
     }
 }
 
+#[derive(Debug)]
 pub struct PersonalTableGen2(Vec<PersonalInfoGen2>);
 
 impl PersonalTableGen2 {
@@ -110,15 +111,10 @@ impl PersonalTable for PersonalTableGen2 {
     }
 }
 
+#[derive(Debug)]
 pub struct MetadataTableGen2 {
     personal: PersonalTableGen2,
     learnsets: Vec<Learnset>,
-}
-
-impl MetadataTableGen2 {
-    pub fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<StatsPreSplit> {
-        self.personal.get_form_stats(national_dex, forme_index)
-    }
 }
 
 impl MetadataTable for MetadataTableGen2 {
@@ -133,5 +129,15 @@ impl MetadataTable for MetadataTableGen2 {
     fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&Learnset> {
         self.learnsets
             .get(self.get_game_index(national_dex, forme_index)? as usize)
+    }
+
+    fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<super::BaseStats> {
+        self.personal
+            .get_form_stats(national_dex, forme_index)
+            .map(BaseStats::pre_split)
+    }
+
+    fn get_source_name(&self) -> &'static str {
+        "Gold/Silver/Crystal"
     }
 }
