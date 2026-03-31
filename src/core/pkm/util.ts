@@ -1,5 +1,11 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { AbilityIndex, extraFormTypeOverride, MetadataLookup, SpeciesAndForme } from '@pkm-rs/pkg'
+import {
+  AbilityIndex,
+  extraFormTypeOverride,
+  FormeMetadata,
+  MetadataLookup,
+  SpeciesAndForme,
+} from '@pkm-rs/pkg'
 import { FourMoves, Stats, StatsPreSplit } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
@@ -123,6 +129,21 @@ export const getBaseMon = (dexNum: number, forme?: number) => {
   }
 
   return mon
+}
+
+export const getPrevos = (dexNum: number, forme?: number) => {
+  let mon = SpeciesAndForme.tryNew(dexNum, forme ?? 0)
+  let metadata = mon?.getMetadata()
+
+  const prevos: FormeMetadata[] = []
+
+  while (metadata?.preEvolution) {
+    mon = metadata.preEvolution
+    metadata = mon?.getMetadata()
+    prevos.push(metadata)
+  }
+
+  return prevos
 }
 
 export const getTypes = (mon: PKMInterface): Type[] => {
