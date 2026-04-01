@@ -24,41 +24,41 @@ export const SHADOW_TYPE_COLOR = '#604E82'
 
 export const colorForType = (type: PkmType) => {
   switch (type) {
-    case PkmType.Normal:
+    case 'Normal':
       return 'rgb(144,153,161)'
-    case PkmType.Fire:
+    case 'Fire':
       return 'rgb(255, 156, 84)'
-    case PkmType.Fighting:
+    case 'Fighting':
       return 'rgb(206, 64, 105)'
-    case PkmType.Water:
+    case 'Water':
       return 'rgb(76, 144, 214)'
-    case PkmType.Flying:
+    case 'Flying':
       return 'rgb(143, 168, 221)'
-    case PkmType.Grass:
+    case 'Grass':
       return 'rgb(99, 187, 91)'
-    case PkmType.Poison:
+    case 'Poison':
       return 'rgb(171, 106, 200)'
-    case PkmType.Electric:
+    case 'Electric':
       return 'rgb(244, 210, 59)'
-    case PkmType.Ground:
+    case 'Ground':
       return 'rgb(217, 119, 70)'
-    case PkmType.Psychic:
+    case 'Psychic':
       return 'rgb(249, 113, 119)'
-    case PkmType.Rock:
+    case 'Rock':
       return 'rgb(199, 183, 139)'
-    case PkmType.Ice:
+    case 'Ice':
       return 'rgb(116, 206, 192)'
-    case PkmType.Bug:
+    case 'Bug':
       return 'rgb(144, 193, 44)'
-    case PkmType.Dragon:
+    case 'Dragon':
       return 'rgb(10, 109, 196)'
-    case PkmType.Ghost:
+    case 'Ghost':
       return 'rgb(83, 105, 172)'
-    case PkmType.Dark:
+    case 'Dark':
       return 'rgb(90, 83, 102)'
-    case PkmType.Steel:
+    case 'Steel':
       return 'rgb(90, 142, 161)'
-    case PkmType.Fairy:
+    case 'Fairy':
       return 'rgb(236, 143, 230)'
     default:
       return '#555'
@@ -67,7 +67,7 @@ export const colorForType = (type: PkmType) => {
 
 export const contrastColorForType = (type: PkmType) => {
   switch (type) {
-    case PkmType.Electric:
+    case 'Electric':
       return 'black'
     default:
       return 'white'

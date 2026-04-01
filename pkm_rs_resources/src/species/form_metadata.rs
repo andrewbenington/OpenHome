@@ -1,11 +1,12 @@
 pub mod gen1;
 pub mod gen2;
-pub mod gen3;
 pub mod gen8_bdsp;
 pub mod gen8_la;
 pub mod gen8_swsh;
 pub mod gen9_sv;
 pub mod gen9_za;
+
+use std::marker::PhantomData;
 
 use pkm_rs_types::{OriginGame, OriginMark, PkmType, Stats8, StatsPreSplit};
 use serde::{Deserialize, Serialize};
@@ -17,14 +18,12 @@ use wasm_bindgen::prelude::*;
 use tsify::Tsify;
 
 use crate::{
-    levelup::Learnset,
+    ExpectLog,
+    levelup::LearnsetMoves,
     log,
     species::form_metadata::{
         gen1::{METADATA_TABLE_RED_BLUE, METADATA_TABLE_YELLOW},
         gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GOLD_SILVER},
-        gen3::{
-            METADATA_TABLE_EMERALD, METADATA_TABLE_FIRERED_LEAFGREEN, METADATA_TABLE_RUBY_SAPPHIRE,
-        },
         gen8_bdsp::METADATA_TABLE_BDSP,
         gen8_la::METADATA_TABLE_LA,
         gen8_swsh::METADATA_TABLE_SWSH,
@@ -165,13 +164,47 @@ pub fn all_metadata_sources() -> Vec<MetadataSource> {
     METADATA_SOURCES.to_vec()
 }
 
-pub trait PersonalTable {
+pub trait PersonalInfo {
+    fn from_pkl_bytes(bytes: &'static [u8]) -> Self;
+
+    fn stats(&self) -> BaseStats;
+
+    fn types_fallible(&self) -> (Option<PkmType>, Option<PkmType>);
+
+    // gives the game index for this species' form of index form_index if present.
+    // base forms are usually in national dex order, so other form game indices
+    // need to be found using the base form's personal info entry
+    fn game_index_for_form(&self, national_dex: u16, form_index: u16) -> Option<u16>;
+
+    fn forms_offset(&self) -> Option<u16>;
+
+    fn form_count(&self) -> u8;
+
+    // pub fn ability1(&self) -> AbilityIndex {
+    //     AbilityIndex::new(u16::from_le_bytes([self.0[0x12], self.0[0x13]]))
+    //         .expect("Gen 9 ability 1 should be valid")
+    // }
+
+    // pub fn ability2(&self) -> AbilityIndex {
+    //     AbilityIndex::from_index(u16::from_le_bytes([self.0[0x14], self.0[0x15]]))
+    //         .expect("Gen 9 ability 2 should be valid")
+    // }
+
+    // pub fn ability_hidden(&self) -> AbilityIndex {
+    //     AbilityIndex::from_index(u16::from_le_bytes([self.0[0x16], self.0[0x17]]))
+    //         .expect("Gen 9 hidden ability should be valid")
+    // }
+
+    fn source_name(&self) -> &'static str;
+}
+
+pub trait PersonalTableTrait {
     fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, PkmType)>;
 
     fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16>;
 }
 
-impl<T: PersonalTable> PersonalTable for &T {
+impl<T: PersonalTableTrait> PersonalTableTrait for &T {
     fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, PkmType)> {
         (**self).get_types(national_dex, forme_index)
     }
@@ -181,12 +214,122 @@ impl<T: PersonalTable> PersonalTable for &T {
     }
 }
 
+fn format_bad_type_error(
+    national_dex: u16,
+    forme_index: u16,
+    source_name: &'static str,
+    type_index: u8,
+) -> String {
+    format!(
+        "Invalid type {type_index} for national dex {national_dex} forme index {forme_index} in personal table {source_name}"
+    )
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct PersonalTable<
+    INFO: PersonalInfo,
+    const TABLE_BYTE_LEN: usize,
+    const ENTRY_BYTE_LEN: usize,
+>(&'static [u8; TABLE_BYTE_LEN], PhantomData<INFO>);
+
+impl<INFO: PersonalInfo, const TABLE_BYTE_LEN: usize, const ENTRY_BYTE_LEN: usize>
+    PersonalTable<INFO, TABLE_BYTE_LEN, ENTRY_BYTE_LEN>
+{
+    pub const fn from_pkl_bytes(bytes: &'static [u8; TABLE_BYTE_LEN]) -> Self {
+        Self(bytes, PhantomData)
+    }
+
+    pub fn get_personal_info_by_game_index(&self, game_index: u16) -> INFO {
+        log!(
+            "get_personal_info_by_game_index: called with game_index: {} in table with entry byte len {}",
+            game_index,
+            ENTRY_BYTE_LEN
+        );
+        let offset = (game_index as usize) * ENTRY_BYTE_LEN;
+        log!(
+            "get_personal_info_by_game_index: calculated byte offset: {:02X} for game_index: {}, {:?}",
+            offset,
+            game_index,
+            &self.0[offset..offset + ENTRY_BYTE_LEN]
+        );
+        INFO::from_pkl_bytes(&self.0[offset..offset + ENTRY_BYTE_LEN])
+    }
+
+    pub fn get_base_form_personal_info(&self, national_dex: u16) -> INFO {
+        self.get_personal_info_by_game_index(national_dex)
+    }
+
+    pub fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
+        log!(
+            "get_game_index: called with national_dex: {} form_index: {}",
+            national_dex,
+            form_index
+        );
+        self.get_base_form_personal_info(national_dex)
+            .game_index_for_form(national_dex, form_index)
+    }
+
+    pub fn get_personal_info(&self, national_dex: u16, form_index: u16) -> Option<INFO> {
+        self.get_game_index(national_dex, form_index)
+            .map(|game_index| self.get_personal_info_by_game_index(game_index))
+    }
+
+    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
+        log!(
+            "get_types: called with national dex {} forme index {}",
+            national_dex,
+            forme_index
+        );
+
+        let personal_info = self.get_personal_info(national_dex, forme_index)?;
+
+        log!(
+            "get_types: called with national dex {} forme index {} in {}",
+            national_dex,
+            forme_index,
+            personal_info.source_name()
+        );
+
+        let types_fallible = personal_info.types_fallible();
+
+        log!(
+            "get_types: got personal info for national dex {} forme index {} in {}, types_fallible: {:?}",
+            national_dex,
+            forme_index,
+            personal_info.source_name(),
+            types_fallible
+        );
+
+        let type1 = types_fallible.0.expect_log(format_bad_type_error(
+            national_dex,
+            forme_index,
+            personal_info.source_name(),
+            1,
+        ));
+
+        let type2 = types_fallible.1.expect_log(format_bad_type_error(
+            national_dex,
+            forme_index,
+            personal_info.source_name(),
+            2,
+        ));
+
+        Some(deduplicate_types(type1, type2))
+    }
+
+    pub fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {
+        self.get_personal_info(national_dex, forme_index)
+            .as_ref()
+            .map(PersonalInfo::stats)
+    }
+}
+
 pub trait MetadataTable {
-    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, PkmType)>;
+    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)>;
 
     fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16>;
 
-    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&Learnset>;
+    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&LearnsetMoves>;
 
     fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats>;
 
@@ -202,7 +345,7 @@ where
     T: std::ops::Deref<Target = U>,
     U: MetadataTable + ?Sized + 'static,
 {
-    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, PkmType)> {
+    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
         (**self).get_types(national_dex, forme_index)
     }
 
@@ -210,7 +353,7 @@ where
         (**self).get_game_index(national_dex, forme_index)
     }
 
-    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&Learnset> {
+    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&LearnsetMoves> {
         (**self).get_levelup_learnset(national_dex, forme_index)
     }
 
@@ -250,22 +393,22 @@ impl MetadataTableReader {
         }
     }
 
-    pub fn get_types(&self) -> (PkmType, PkmType) {
+    pub fn get_types(&self) -> (PkmType, Option<PkmType>) {
         self.inner
             .get_types(self.national_dex, self.forme_index)
-            .expect(READER_SHOULD_BE_VALID)
+            .expect_log(READER_SHOULD_BE_VALID)
     }
 
     pub fn get_game_index(&self) -> u16 {
         self.inner
             .get_game_index(self.national_dex, self.forme_index)
-            .expect(READER_SHOULD_BE_VALID)
+            .expect_log(READER_SHOULD_BE_VALID)
     }
 
-    pub fn get_levelup_learnset(&self) -> &Learnset {
+    pub fn get_levelup_learnset(&self) -> &LearnsetMoves {
         self.inner
             .get_levelup_learnset(self.national_dex, self.forme_index)
-            .expect(READER_SHOULD_BE_VALID)
+            .expect_log(READER_SHOULD_BE_VALID)
     }
 
     pub fn get_base_stats(&self) -> BaseStats {
@@ -277,16 +420,13 @@ impl MetadataTableReader {
         );
         self.inner
             .get_base_stats(self.national_dex, self.forme_index)
-            .expect(READER_SHOULD_BE_VALID)
+            .expect_log(READER_SHOULD_BE_VALID)
     }
 
     pub fn types(&self) -> (PkmType, Option<PkmType>) {
-        let (type1, type2) = self
-            .inner
+        self.inner
             .get_types(self.national_dex, self.forme_index)
-            .expect(READER_SHOULD_BE_VALID);
-
-        deduplicate_types(type1, type2)
+            .expect_log(READER_SHOULD_BE_VALID)
     }
 }
 
@@ -332,6 +472,7 @@ pub fn current_metadata_reader(national_dex: u16, forme_index: u16) -> Option<Me
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
 #[tsify(into_wasm_abi, from_wasm_abi)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BaseStats {
     PreSplit(StatsPreSplit),
     Modern(Stats8),
@@ -365,7 +506,14 @@ pub fn current_base_stats(national_dex: u16, forme_index: u16) -> Option<Stats8>
         national_dex,
         forme_index
     );
-    current_metadata_table().get_base_stats(national_dex, forme_index)
+    current_metadata_table()
+        .get_base_stats(national_dex, forme_index)
+        .map(|base_stats| match base_stats {
+            BaseStats::PreSplit(_) => {
+                panic!("Current metadata table should not have pre-split stats")
+            }
+            BaseStats::Modern(stats) => stats,
+        })
 }
 
 fn deduplicate_types(type1: PkmType, type2: PkmType) -> (PkmType, Option<PkmType>) {
@@ -385,9 +533,7 @@ pub fn source_has_form_metadata(
 }
 
 pub fn types_lookup(national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-    let (type1, type2) = current_metadata_table().get_types(national_dex, forme_index)?;
-
-    Some(deduplicate_types(type1, type2))
+    current_metadata_table().get_types(national_dex, forme_index)
 }
 
 fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTable {
@@ -396,9 +542,9 @@ fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTabl
         MetadataSource::Yellow => &METADATA_TABLE_YELLOW,
         MetadataSource::GoldSilver => &METADATA_TABLE_GOLD_SILVER,
         MetadataSource::Crystal => &METADATA_TABLE_CRYSTAL,
-        MetadataSource::RubySapphire => &METADATA_TABLE_RUBY_SAPPHIRE,
-        MetadataSource::Emerald => &METADATA_TABLE_EMERALD,
-        MetadataSource::FireRedLeafGreen => &METADATA_TABLE_FIRERED_LEAFGREEN,
+        MetadataSource::RubySapphire => todo!(),
+        MetadataSource::Emerald => todo!(),
+        MetadataSource::FireRedLeafGreen => todo!(),
         MetadataSource::SwordShield => &METADATA_TABLE_SWSH,
         MetadataSource::BrilliantDiamondShiningPearl => &METADATA_TABLE_BDSP,
         MetadataSource::LegendsArceus => &METADATA_TABLE_LA,
@@ -422,27 +568,65 @@ pub fn types_lookup_with_source(
     forme_index: u16,
     source: MetadataSource,
 ) -> Option<(PkmType, Option<PkmType>)> {
-    let (type1, type2) = metadata_table_by_source(source).get_types(national_dex, forme_index)?;
-
-    Some(deduplicate_types(type1, type2))
+    metadata_table_by_source(source).get_types(national_dex, forme_index)
 }
 
 pub fn levelup_learnset_lookup(
     national_dex: u16,
     forme_index: u16,
     source: MetadataSource,
-) -> Option<&'static Learnset> {
+) -> Option<&'static LearnsetMoves> {
     metadata_table_by_source(source).get_levelup_learnset(national_dex, forme_index)
 }
 
 #[cfg(test)]
 mod test {
-    use pkm_rs_types::{NationalDex, PkmType, Stats8};
+    use super::*;
+    use pkm_rs_types::{Generation, NationalDex, PkmType, Stats8};
 
     use crate::species::{
-        NatDexIndex,
+        FormeMetadata, NatDexIndex,
         form_metadata::{BaseStats, MetadataSource},
     };
+
+    const PICHU_SPIKY_EARED: u16 = 1;
+    const ARCEUS_LEGEND: u16 = 18;
+
+    const METADATA_SOURCES_IMPLEMENTED: [MetadataSource; 9] = [
+        MetadataSource::RedBlue,
+        MetadataSource::Yellow,
+        MetadataSource::GoldSilver,
+        MetadataSource::Crystal,
+        // MetadataSource::RubySapphire,
+        // MetadataSource::Emerald,
+        // MetadataSource::FireRedLeafGreen,
+        // MetadataSource::DiamondPearl,
+        // MetadataSource::Platinum,
+        // MetadataSource::HeartGoldSoulSilver,
+        // MetadataSource::BlackWhite,
+        // MetadataSource::Black2White2,
+        // MetadataSource::XY,
+        // MetadataSource::OmegaRubyAlphaSapphire,
+        // MetadataSource::SunMoon,
+        // MetadataSource::UltraSunUltraMoon,
+        // MetadataSource::LetsGoPikachuEevee,
+        MetadataSource::SwordShield,
+        MetadataSource::BrilliantDiamondShiningPearl,
+        MetadataSource::LegendsArceus,
+        MetadataSource::ScarletViolet,
+        MetadataSource::LegendsZa,
+    ];
+
+    fn has_entry(source: MetadataSource, national_dex: u16, forme_index: u16) -> bool {
+        metadata_table_by_source(source).form_is_present(national_dex, forme_index)
+    }
+
+    fn present_in_scarlet_violet(form: &FormeMetadata) -> bool {
+        !(form.forme_name.contains("Totem")
+            || (form.is_mega && form.introduced == Generation::G9) // Legends Z-A introduced mega evolutions
+            || (form.national_dex.get() == NationalDex::Pichu && form.forme_index == PICHU_SPIKY_EARED)
+            || (form.national_dex.get() == NationalDex::Arceus && form.forme_index == ARCEUS_LEGEND))
+    }
 
     #[test]
     fn test_get_stats() {
@@ -467,6 +651,9 @@ mod test {
                 .expect("1-1025 are valid national dex indices")
                 .get_species_metadata();
             for form in species_metadata.formes {
+                if !present_in_scarlet_violet(form) {
+                    continue;
+                }
                 super::types_lookup(national_dex, form.forme_index)
                     .ok_or(format!("Missing types for {}", form.forme_name))?;
             }
@@ -482,6 +669,9 @@ mod test {
                 .expect("1-1025 are valid national dex indices")
                 .get_species_metadata();
             for form in species_metadata.formes {
+                if !present_in_scarlet_violet(form) {
+                    continue;
+                }
                 let (type1, type2) = super::types_lookup(national_dex, form.forme_index)
                     .ok_or(format!("Missing types for {}", form.forme_name))?;
                 if let Some(type2) = type2
@@ -544,5 +734,18 @@ mod test {
         }
 
         Ok(())
+    }
+
+    #[test]
+    fn pikachu_present_in_all_sources() -> Result<(), impl std::fmt::Debug> {
+        METADATA_SOURCES_IMPLEMENTED
+            .into_iter()
+            .try_for_each(|source| {
+                if !has_entry(source, NationalDex::Pikachu as u16, 0) {
+                    Err(format!("Pikachu not found in metadata source {source:?}"))
+                } else {
+                    Ok(())
+                }
+            })
     }
 }

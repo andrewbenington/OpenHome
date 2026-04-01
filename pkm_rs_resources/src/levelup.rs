@@ -19,7 +19,7 @@ pub struct LearnsetMove {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Default)]
-pub struct Learnset {
+pub struct LearnsetMoves {
     pub(crate) moves: Vec<LearnsetMove>,
 }
 
@@ -48,7 +48,7 @@ impl From<LearnsetMove> for LearnsetMoveJs {
     }
 }
 
-impl Learnset {
+impl LearnsetMoves {
     pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
         let length = bytes.len();
         if length == 0 {
@@ -99,3 +99,41 @@ fn u8_slice_to_u16_le(slice: &[u8]) -> Vec<u16> {
         .map(|chunk| u16::from_le_bytes([chunk[0], chunk[1]]))
         .collect()
 }
+
+// #[derive(Debug, Clone, Copy)]
+// pub struct Learnsets<const LENGTH: usize>(&'static [u8; LENGTH]);
+
+// impl<const LENGTH: usize> Learnsets<LENGTH> {
+//     pub fn from_pkl_bytes(bytes: &'static [u8; LENGTH]) -> Self {
+//         Self(bytes)
+//     }
+
+//     pub fn get_learnset_by_game_index(&self, game_index: u16) -> Option<Learnset> {
+//         if game_index as usize >= self.count() {
+//             return None;
+//         }
+
+//         let move_indices_raw = u8_slice_to_u16_le(&self.0[..self.moves_span_size()]);
+//         let levels = &self.0[self.moves_span_size()..];
+
+//         let offset = (game_index as usize) * 3; // 2 bytes per move, 1 byte per level
+//         LearnsetMoves::from_pkl_bytes(&self.0[offset..offset + 3])
+//     }
+
+//     pub const fn count(&self) -> usize {
+//         LENGTH / 3
+//     }
+
+//     const fn moves_span_size(&self) -> usize {
+//         self.count() * 2
+//     }
+// }
+
+// #[derive(Debug, Clone, Copy)]
+// pub struct Learnset(&'static [u8]);
+
+// impl Learnset {
+//     pub fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
+//         Self(bytes)
+//     }
+// }

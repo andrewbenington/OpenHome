@@ -19,7 +19,6 @@ import {
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
   SpeedCharacteristics,
-  Types,
 } from '@pokemon-resources/index'
 import Prando from 'prando'
 
@@ -133,15 +132,15 @@ export const getBaseMon = (dexNum: number, forme?: number) => {
 
 export const getTypes = (mon: PKMInterface): PkmType[] => {
   if (mon.extraFormIndex !== undefined) {
-    const extraFormTypeIndices: number[] | undefined = extraFormTypeOverride(mon.extraFormIndex)
+    const extraFormTypeIndices: PkmType[] | undefined = extraFormTypeOverride(mon.extraFormIndex)
     if (extraFormTypeIndices) {
-      return extraFormTypeIndices.map((idx) => Types[idx])
+      return extraFormTypeIndices
     }
   }
 
   const metadata = mon.metadata
   if (!metadata) {
-    return [PkmType.Normal]
+    return ['Normal']
   }
 
   const metadataSource = MetadataSourceByFormat(mon.format)
@@ -319,22 +318,22 @@ export function getCharacteristic(mon: PKMInterface) {
 }
 
 const HIDDEN_POWER_TYPES: PkmType[] = [
-  PkmType.Fighting,
-  PkmType.Flying,
-  PkmType.Poison,
-  PkmType.Ground,
-  PkmType.Rock,
-  PkmType.Bug,
-  PkmType.Ghost,
-  PkmType.Steel,
-  PkmType.Fire,
-  PkmType.Water,
-  PkmType.Grass,
-  PkmType.Electric,
-  PkmType.Psychic,
-  PkmType.Ice,
-  PkmType.Dragon,
-  PkmType.Dark,
+  'Fighting',
+  'Flying',
+  'Poison',
+  'Ground',
+  'Rock',
+  'Bug',
+  'Ghost',
+  'Steel',
+  'Fire',
+  'Water',
+  'Grass',
+  'Electric',
+  'Psychic',
+  'Ice',
+  'Dragon',
+  'Dark',
 ]
 
 export type HiddenPowerWithBP = {

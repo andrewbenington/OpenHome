@@ -2,9 +2,9 @@ use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
 
 use crate::{
-    Error, Result,
+    Error, ExpectLog, Result,
     abilities::AbilityIndex,
-    levelup::Learnset,
+    levelup::LearnsetMoves,
     log,
     species::{
         ALL_SPECIES,
@@ -432,8 +432,10 @@ impl FormeMetadata {
     }
 
     fn types(&self) -> (PkmType, Option<PkmType>) {
-        types_lookup(self.national_dex.get(), self.forme_index)
-            .expect("All forms should have a valid type")
+        types_lookup(self.national_dex.get(), self.forme_index).expect_log(format!(
+            "no types found for {} forme {}",
+            self.species_name, self.forme_name
+        ))
     }
 
     fn types_with_source(&self, source: MetadataSource) -> Option<(PkmType, Option<PkmType>)> {
@@ -758,7 +760,7 @@ impl SpeciesAndForme {
         self.forme_index
     }
 
-    pub fn get_levelup_learnset(&self, source: MetadataSource) -> Option<&'static Learnset> {
+    pub fn get_levelup_learnset(&self, source: MetadataSource) -> Option<&'static LearnsetMoves> {
         levelup_learnset_lookup(self.national_dex.get(), self.forme_index, source)
     }
 }

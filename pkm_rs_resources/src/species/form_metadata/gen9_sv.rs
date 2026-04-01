@@ -1,45 +1,60 @@
-use std::sync::LazyLock;
-
 use pkm_rs_types::{PkmType, Stats8};
 
 use crate::{
-    levelup::Learnset,
-    species::form_metadata::{BaseStats, MetadataTable, PersonalTable},
+    ExpectLog,
+    levelup::LearnsetMoves,
+    log,
+    species::form_metadata::{BaseStats, MetadataTable, PersonalInfo, PersonalTable},
 };
 
 // binary files are from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
-
-const SV_PERSONAL_BYTES: &[u8] = include_bytes!("pkhex_bin/personal/personal_sv");
-const SV_LEVELUP_BYTES: &[u8] = include_bytes!("pkhex_bin/levelup/lvlmove_sv.pkl");
+const SV_PERSONAL_FILE_SIZE: usize = 113920;
+const SV_PERSONAL_BYTES: &[u8; SV_PERSONAL_FILE_SIZE] =
+    include_bytes!("pkhex_bin/personal/personal_sv");
+const SV_LEVELUP_FILE_SIZE: usize = 63433;
+const SV_LEVELUP_BYTES: &[u8; SV_LEVELUP_FILE_SIZE] =
+    include_bytes!("pkhex_bin/levelup/lvlmove_sv.pkl");
 pub const SV_ENTRY_SIZE: usize = 0x50;
 
-pub static METADATA_TABLE_SV: LazyLock<MetadataTableScarletViolet> =
-    LazyLock::new(|| MetadataTableScarletViolet {
-        personal: PersonalTableScarletViolet::from_pkl_bytes(SV_PERSONAL_BYTES),
-        learnsets: Learnset::all_from_pkl_bytes(SV_LEVELUP_BYTES),
-    });
+pub static METADATA_TABLE_SV: MetadataTableScarletViolet = MetadataTableScarletViolet {
+    personal_table: PersonalTableScarletViolet::from_pkl_bytes(SV_PERSONAL_BYTES),
+    learnsets: vec![],
+};
 
 #[derive(Clone, Copy)]
 pub struct PersonalInfoScarletViolet([u8; SV_ENTRY_SIZE]);
 
 impl PersonalInfoScarletViolet {
     pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
-        Self(bytes.try_into().unwrap())
-    }
-
-    pub fn stats(&self) -> Stats8 {
-        Stats8::from_bytes(self.0[0..6].try_into().unwrap())
-    }
-
-    pub const fn types(&self) -> (PkmType, PkmType) {
-        (
-            PkmType::from_byte(self.0[6]).expect("scarlet/violet type 1 should be valid"),
-            PkmType::from_byte(self.0[7]).expect("scarlet/violet type 2 should be valid"),
+        log!("from_pkl_bytes called with bytes length: {}", bytes.len());
+        Self(
+            bytes
+                .try_into()
+                .expect_log("Scarlet/Violet entry too short"),
         )
     }
 
-    pub fn form_stats_index(&self) -> Option<u16> {
-        let stored_index = i16::from_le_bytes(self.0[0x18..0x1A].try_into().unwrap());
+    pub fn stats(&self) -> Stats8 {
+        Stats8::from_bytes(
+            self.0[0..6]
+                .try_into()
+                .expect_log("Scarlet/Violet entry too short for stats"),
+        )
+    }
+
+    pub fn forms_offset(&self) -> Option<u16> {
+        log!(
+            "forms_offset raw bytes: {:02X} {:02X}; all: {:02X?}",
+            self.0[0x18],
+            self.0[0x19],
+            &self.0
+        );
+        let stored_index = i16::from_le_bytes(
+            self.0[0x18..0x1A]
+                .try_into()
+                .expect_log("Scarlet/Violet entry too short for forms_offset"),
+        );
+        log!("forms_offset stored_index: {}", stored_index);
         if stored_index == -1 {
             None
         } else {
@@ -47,118 +62,137 @@ impl PersonalInfoScarletViolet {
         }
     }
 
-    pub fn form_index(&self, national_dex: u16, form_index: u16) -> u16 {
-        if let Some(form_stats_index) = self.form_stats_index()
-            && form_index > 0
+    pub fn game_index_for_form(&self, national_dex: u16, form_index: u16) -> Option<u16> {
+        if form_index == 0 {
+            return Some(national_dex);
+        }
+        if let Some(forms_offset) = self.forms_offset()
             && form_index < self.form_count() as u16
         {
-            form_stats_index + form_index - 1
+            log!(
+                "game_index_for_form: forms_offset: {}, form_index: {}",
+                forms_offset,
+                form_index,
+            );
+            log!(
+                "game_index_for_form: forms_offset: {}, form_index: {}, returning {}",
+                forms_offset,
+                form_index,
+                forms_offset + form_index - 1
+            );
+            Some(forms_offset + form_index - 1)
         } else {
-            national_dex
+            None
         }
     }
-
-    // pub fn has_form(&self, form_index: u16) -> bool {
-    //     form_index > 0 && self.form_stats_index().is_some() && form_index < self.form_count() as u16
-    // }
-
-    // pub fn ability1(&self) -> AbilityIndex {
-    //     AbilityIndex::new(u16::from_le_bytes([self.0[0x12], self.0[0x13]]))
-    //         .expect("Gen 9 ability 1 should be valid")
-    // }
-
-    // pub fn ability2(&self) -> AbilityIndex {
-    //     AbilityIndex::from_index(u16::from_le_bytes([self.0[0x14], self.0[0x15]]))
-    //         .expect("Gen 9 ability 2 should be valid")
-    // }
-
-    // pub fn ability_hidden(&self) -> AbilityIndex {
-    //     AbilityIndex::from_index(u16::from_le_bytes([self.0[0x16], self.0[0x17]]))
-    //         .expect("Gen 9 hidden ability should be valid")
-    // }
 
     pub const fn form_count(&self) -> u8 {
         self.0[0x1A]
     }
 }
 
-pub struct PersonalTableScarletViolet(Vec<PersonalInfoScarletViolet>);
-
-impl PersonalTableScarletViolet {
-    pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
-        let count = bytes.len() / SV_ENTRY_SIZE;
-        let mut entries = Vec::<PersonalInfoScarletViolet>::with_capacity(count);
-        for i in 0..count {
-            let offset = i * SV_ENTRY_SIZE;
-            entries.push(PersonalInfoScarletViolet::from_pkl_bytes(
-                bytes[offset..offset + SV_ENTRY_SIZE]
-                    .try_into()
-                    .expect("incorrect slice length for scarlet/violet personal table"),
-            ));
-        }
-        Self(entries)
+impl PersonalInfo for PersonalInfoScarletViolet {
+    fn from_pkl_bytes(bytes: &[u8]) -> Self {
+        Self::from_pkl_bytes(bytes)
     }
 
-    pub fn get_personal_info(
-        &self,
-        national_dex: u16,
-        forme_index: u16,
-    ) -> Option<&PersonalInfoScarletViolet> {
-        self.get_game_index(national_dex, forme_index)
-            .and_then(|game_index| self.0.get(game_index as usize))
+    fn stats(&self) -> BaseStats {
+        BaseStats::modern(self.stats())
     }
 
-    pub fn get_form_stats(&self, national_dex: u16, forme_index: u16) -> Option<Stats8> {
-        self.get_personal_info(national_dex, forme_index)
-            .map(PersonalInfoScarletViolet::stats)
-    }
-}
-
-impl PersonalTable for PersonalTableScarletViolet {
-    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, PkmType)> {
-        self.get_personal_info(national_dex, forme_index)
-            .map(PersonalInfoScarletViolet::types)
+    fn types_fallible(&self) -> (Option<PkmType>, Option<PkmType>) {
+        log!(
+            "types_fallible raw bytes: {:02X} {:02X}",
+            self.0[6],
+            self.0[7]
+        );
+        (PkmType::from_byte(self.0[6]), PkmType::from_byte(self.0[7]))
     }
 
-    fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16> {
-        self.0
-            .get(national_dex as usize)
-            .map(|info| info.form_index(national_dex, forme_index))
+    fn forms_offset(&self) -> Option<u16> {
+        self.forms_offset()
+    }
+
+    fn game_index_for_form(&self, national_dex: u16, form_index: u16) -> Option<u16> {
+        self.game_index_for_form(national_dex, form_index)
+    }
+
+    fn form_count(&self) -> u8 {
+        self.form_count()
+    }
+
+    fn source_name(&self) -> &'static str {
+        "Scarlet/Violet"
     }
 }
+
+pub type PersonalTableScarletViolet =
+    PersonalTable<PersonalInfoScarletViolet, SV_PERSONAL_FILE_SIZE, SV_ENTRY_SIZE>;
 
 pub struct MetadataTableScarletViolet {
-    personal: PersonalTableScarletViolet,
-    learnsets: Vec<Learnset>,
-}
-
-impl MetadataTableScarletViolet {
-    pub fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<Stats8> {
-        self.personal.get_form_stats(national_dex, forme_index)
-    }
+    personal_table: PersonalTableScarletViolet,
+    learnsets: Vec<LearnsetMoves>,
 }
 
 impl MetadataTable for MetadataTableScarletViolet {
-    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, PkmType)> {
-        self.personal.get_types(national_dex, forme_index)
+    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
+        log!(
+            "get_types called with national_dex: {}, forme_index: {}",
+            national_dex,
+            forme_index
+        );
+        self.personal_table.get_types(national_dex, forme_index)
     }
 
     fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16> {
-        self.personal.get_game_index(national_dex, forme_index)
+        self.personal_table
+            .get_game_index(national_dex, forme_index)
     }
 
-    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&Learnset> {
+    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&LearnsetMoves> {
         self.learnsets
             .get(self.get_game_index(national_dex, forme_index)? as usize)
     }
 
     fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {
-        self.personal
-            .get_form_stats(national_dex, forme_index)
-            .map(BaseStats::modern)
+        self.personal_table
+            .get_base_stats(national_dex, forme_index)
     }
 
     fn get_source_name(&self) -> &'static str {
         "Scarlet/Violet"
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_personal_info_scarlet_violet() {
+        let bulbasaur_info = METADATA_TABLE_SV
+            .get_base_stats(1, 0)
+            .expect_log("Bulbasaur not found");
+        let modern_stats = match bulbasaur_info {
+            BaseStats::Modern(stats) => stats,
+            _ => panic!("Expected modern stats"),
+        };
+        assert_eq!(
+            modern_stats,
+            Stats8 {
+                hp: 45,
+                atk: 49,
+                def: 49,
+                spa: 65,
+                spd: 65,
+                spe: 45
+            }
+        );
+        assert_eq!(
+            METADATA_TABLE_SV.get_types(1, 0),
+            Some((PkmType::Grass, Some(PkmType::Poison)))
+        );
+        // assert_eq!(bulbasaur_info.form_count(), 1);
+        // assert_eq!(bulbasaur_info.forms_offset(), None);
+        // assert_eq!(bulbasaur_info.game_index_for_form(0), Some(0));
     }
 }

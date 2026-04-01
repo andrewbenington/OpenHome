@@ -1,11 +1,13 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use strum_macros::{Display, EnumString};
+use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 use crate::Generation;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[tsify(into_wasm_abi, from_wasm_abi)]
 #[derive(Debug, Default, EnumString, Display, Serialize, PartialEq, Eq, Clone, Copy)]
 #[repr(u8)]
 pub enum PkmType {
@@ -125,6 +127,31 @@ impl PkmTypes {
             "dark" => Some(PkmType::Dark),
             "fairy" => Some(PkmType::Fairy),
             _ => None,
+        }
+    }
+
+    #[wasm_bindgen(js_name = "toString")]
+    pub fn to_string(value: u8) -> String {
+        let pkm_type = PkmType::from_byte(value).expect("Invalid type byte");
+        match pkm_type {
+            PkmType::Normal => "normal".into(),
+            PkmType::Fighting => "fighting".into(),
+            PkmType::Flying => "flying".into(),
+            PkmType::Poison => "poison".into(),
+            PkmType::Ground => "ground".into(),
+            PkmType::Rock => "rock".into(),
+            PkmType::Bug => "bug".into(),
+            PkmType::Ghost => "ghost".into(),
+            PkmType::Steel => "steel".into(),
+            PkmType::Fire => "fire".into(),
+            PkmType::Water => "water".into(),
+            PkmType::Grass => "grass".into(),
+            PkmType::Electric => "electric".into(),
+            PkmType::Psychic => "psychic".into(),
+            PkmType::Ice => "ice".into(),
+            PkmType::Dragon => "dragon".into(),
+            PkmType::Dark => "dark".into(),
+            PkmType::Fairy => "fairy".into(),
         }
     }
 }

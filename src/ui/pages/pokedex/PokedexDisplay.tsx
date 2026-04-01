@@ -300,6 +300,7 @@ function PokedexMain(props: PokedexMetadataProps) {
   const type1 = reader.type1()
   const type2 = reader.type2()
   const stats = reader.baseStats()
+  console.log({ type1, type2, stats })
 
   return (
     <>

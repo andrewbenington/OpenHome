@@ -266,7 +266,7 @@ impl HyperTraining {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 pub struct StatsPreSplit {
     pub hp: u16,
     pub atk: u16,
@@ -276,7 +276,7 @@ pub struct StatsPreSplit {
 }
 
 impl StatsPreSplit {
-    pub const fn from_bytes_u8(bytes: [u8; 10]) -> Self {
+    pub const fn from_bytes_u8(bytes: [u8; 5]) -> Self {
         Self {
             hp: bytes[0] as u16,
             atk: bytes[1] as u16,

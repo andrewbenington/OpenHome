@@ -16,6 +16,7 @@ serde-wasm-bindgen = { version = "0.6.5", optional = true }
 getrandom = { version = "0.4.2", features = ["wasm_js"] }
 strum = "0.28.0"
 strum_macros = "0.28.0"
+tsify = "0.5.6"
 
 [lib]
 name = "pkm_rs_types"
