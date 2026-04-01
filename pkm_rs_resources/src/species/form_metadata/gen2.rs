@@ -1,4 +1,4 @@
-use pkm_rs_types::{NationalDex, PkmType, Stats8, StatsPreSplit};
+use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 use crate::{
     ExpectLog,

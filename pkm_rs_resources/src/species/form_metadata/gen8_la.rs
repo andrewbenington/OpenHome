@@ -68,7 +68,7 @@ impl PersonalInfo for PersonalInfoLegendsArceus {
     }
 
     fn stats(&self) -> BaseStats {
-        BaseStats::modern(self.stats())
+        BaseStats::Modern(self.stats())
     }
 
     fn types_fallible(&self) -> (Option<PkmType>, Option<PkmType>) {

@@ -66,7 +66,7 @@ impl PersonalInfo for PersonalInfoLegendsZa {
     }
 
     fn stats(&self) -> BaseStats {
-        BaseStats::modern(self.stats())
+        BaseStats::Modern(self.stats())
     }
 
     fn types_fallible(&self) -> (Option<PkmType>, Option<PkmType>) {

@@ -15,7 +15,6 @@ const SWSH_LEVELUP_BYTES: &[u8; SWSH_LEVELUP_FILE_SIZE] =
     include_bytes!("pkhex_bin/levelup/lvlmove_swsh.pkl");
 
 const SWSH_ENTRY_SIZE: usize = 0xB0;
-const SWSH_ENTRY_COUNT: usize = SWSH_PERSONAL_BYTES.len() / SWSH_ENTRY_SIZE;
 
 pub static METADATA_TABLE_SWSH: MetadataTableSwordShield = MetadataTableSwordShield {
     personal: PersonalTableSwordShield::from_pkl_bytes(SWSH_PERSONAL_BYTES),
@@ -68,7 +67,7 @@ impl PersonalInfo for PersonalInfoSwordShield {
     }
 
     fn stats(&self) -> BaseStats {
-        BaseStats::modern(self.stats())
+        BaseStats::Modern(self.stats())
     }
 
     fn types_fallible(&self) -> (Option<PkmType>, Option<PkmType>) {

@@ -194,22 +194,6 @@ pub trait PersonalInfo: Sized {
     fn source_name(&self) -> &'static str;
 }
 
-pub trait PersonalTableTrait {
-    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, PkmType)>;
-
-    fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16>;
-}
-
-impl<T: PersonalTableTrait> PersonalTableTrait for &T {
-    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, PkmType)> {
-        (**self).get_types(national_dex, forme_index)
-    }
-
-    fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16> {
-        (**self).get_game_index(national_dex, forme_index)
-    }
-}
-
 fn format_bad_type_error(
     national_dex: u16,
     forme_index: u16,
@@ -472,16 +456,6 @@ pub fn current_metadata_reader(national_dex: u16, forme_index: u16) -> Option<Me
 pub enum BaseStats {
     PreSplit(StatsPreSplit),
     Modern(Stats8),
-}
-
-impl BaseStats {
-    const fn pre_split(stat: StatsPreSplit) -> Self {
-        Self::PreSplit(stat)
-    }
-
-    const fn modern(stat: Stats8) -> Self {
-        Self::Modern(stat)
-    }
 }
 
 fn current_metadata_table() -> &'static MetadataTableScarletViolet {

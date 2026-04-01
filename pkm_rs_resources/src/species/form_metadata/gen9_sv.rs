@@ -3,7 +3,6 @@ use pkm_rs_types::{PkmType, Stats8};
 use crate::{
     ExpectLog,
     levelup::LearnsetMoves,
-    log,
     species::form_metadata::{BaseStats, MetadataTable, PersonalInfo, PersonalTable},
 };
 
@@ -78,7 +77,7 @@ impl PersonalInfo for PersonalInfoScarletViolet {
     }
 
     fn stats(&self) -> BaseStats {
-        BaseStats::modern(self.stats())
+        BaseStats::Modern(self.stats())
     }
 
     fn types_fallible(&self) -> (Option<PkmType>, Option<PkmType>) {
