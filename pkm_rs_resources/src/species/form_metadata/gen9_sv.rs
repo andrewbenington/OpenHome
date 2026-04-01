@@ -26,7 +26,6 @@ pub struct PersonalInfoScarletViolet([u8; SV_ENTRY_SIZE]);
 
 impl PersonalInfoScarletViolet {
     pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
-        log!("from_pkl_bytes called with bytes length: {}", bytes.len());
         Self(
             bytes
                 .try_into()
@@ -43,18 +42,11 @@ impl PersonalInfoScarletViolet {
     }
 
     pub fn forms_offset(&self) -> Option<u16> {
-        log!(
-            "forms_offset raw bytes: {:02X} {:02X}; all: {:02X?}",
-            self.0[0x18],
-            self.0[0x19],
-            &self.0
-        );
         let stored_index = i16::from_le_bytes(
             self.0[0x18..0x1A]
                 .try_into()
                 .expect_log("Scarlet/Violet entry too short for forms_offset"),
         );
-        log!("forms_offset stored_index: {}", stored_index);
         if stored_index == -1 {
             None
         } else {
@@ -69,17 +61,6 @@ impl PersonalInfoScarletViolet {
         if let Some(forms_offset) = self.forms_offset()
             && form_index < self.form_count() as u16
         {
-            log!(
-                "game_index_for_form: forms_offset: {}, form_index: {}",
-                forms_offset,
-                form_index,
-            );
-            log!(
-                "game_index_for_form: forms_offset: {}, form_index: {}, returning {}",
-                forms_offset,
-                form_index,
-                forms_offset + form_index - 1
-            );
             Some(forms_offset + form_index - 1)
         } else {
             None
@@ -101,11 +82,6 @@ impl PersonalInfo for PersonalInfoScarletViolet {
     }
 
     fn types_fallible(&self) -> (Option<PkmType>, Option<PkmType>) {
-        log!(
-            "types_fallible raw bytes: {:02X} {:02X}",
-            self.0[6],
-            self.0[7]
-        );
         (PkmType::from_byte(self.0[6]), PkmType::from_byte(self.0[7]))
     }
 
@@ -128,11 +104,6 @@ pub struct MetadataTableScarletViolet {
 
 impl MetadataTable for MetadataTableScarletViolet {
     fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-        log!(
-            "get_types called with national_dex: {}, forme_index: {}",
-            national_dex,
-            forme_index
-        );
         self.personal_table.get_types(national_dex, forme_index)
     }
 

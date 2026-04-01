@@ -164,7 +164,7 @@ pub fn all_metadata_sources() -> Vec<MetadataSource> {
     METADATA_SOURCES.to_vec()
 }
 
-pub trait PersonalInfo {
+pub trait PersonalInfo: Sized {
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self;
 
     fn stats(&self) -> BaseStats;
