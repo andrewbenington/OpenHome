@@ -109,16 +109,8 @@ impl PersonalInfo for PersonalInfoScarletViolet {
         (PkmType::from_byte(self.0[6]), PkmType::from_byte(self.0[7]))
     }
 
-    fn forms_offset(&self) -> Option<u16> {
-        self.forms_offset()
-    }
-
     fn game_index_for_form(&self, national_dex: u16, form_index: u16) -> Option<u16> {
         self.game_index_for_form(national_dex, form_index)
-    }
-
-    fn form_count(&self) -> u8 {
-        self.form_count()
     }
 
     fn source_name(&self) -> &'static str {

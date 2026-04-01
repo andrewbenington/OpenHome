@@ -176,10 +176,6 @@ pub trait PersonalInfo {
     // need to be found using the base form's personal info entry
     fn game_index_for_form(&self, national_dex: u16, form_index: u16) -> Option<u16>;
 
-    fn forms_offset(&self) -> Option<u16>;
-
-    fn form_count(&self) -> u8;
-
     // pub fn ability1(&self) -> AbilityIndex {
     //     AbilityIndex::new(u16::from_le_bytes([self.0[0x12], self.0[0x13]]))
     //         .expect("Gen 9 ability 1 should be valid")

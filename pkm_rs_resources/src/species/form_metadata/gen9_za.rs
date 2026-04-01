@@ -77,14 +77,6 @@ impl PersonalInfo for PersonalInfoLegendsZa {
         self.game_index_for_form(national_dex, form_index)
     }
 
-    fn form_count(&self) -> u8 {
-        self.form_count()
-    }
-
-    fn forms_offset(&self) -> Option<u16> {
-        self.forms_offset()
-    }
-
     fn source_name(&self) -> &'static str {
         "Legends: Z-A"
     }

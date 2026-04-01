@@ -77,14 +77,6 @@ impl PersonalInfo for PersonalInfoGen2 {
         }
     }
 
-    fn form_count(&self) -> u8 {
-        1
-    }
-
-    fn forms_offset(&self) -> Option<u16> {
-        None
-    }
-
     fn source_name(&self) -> &'static str {
         "Gen 2"
     }
