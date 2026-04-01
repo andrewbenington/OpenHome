@@ -697,7 +697,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
     errorsFound = false
 
-    if (isPrevoNickname(this.dexNum, this.formeNum, this.nickname) && this.metadata?.speciesName) {
+    if (
+      isPrevoSpeciesName(this.dexNum, this.formeNum, this.nickname) &&
+      this.metadata?.speciesName
+    ) {
       this.nickname = this.metadata.speciesName
       this.isNicknamed = false
       errorsFound = true
@@ -735,9 +738,16 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (
       other.nickname !== this.nickname &&
       other.nickname !== this.nickname.slice(0, 10) &&
-      !isPrevoNickname(this.dexNum, this.formeNum, other.nickname)
+      !isPrevoSpeciesName(this.dexNum, this.formeNum, other.nickname)
     ) {
       this.nickname = other.nickname
+    }
+
+    if (
+      isPrevoSpeciesName(this.dexNum, this.formeNum, this.nickname) &&
+      this.metadata?.speciesName
+    ) {
+      this.nickname = this.metadata.speciesName
     }
 
     this.heldItemIndex = other.heldItemIndex
@@ -907,10 +917,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (other.obedienceLevel !== undefined) {
       this.obedienceLevel = other.obedienceLevel
     }
-
-    if (save && save.origin >= OriginGame.Sword) {
-      this.nickname = other.nickname
-    }
   }
 
   private abilityNumMatchesIndex(): boolean {
@@ -974,9 +980,9 @@ const FORMATS_WITHOUT_ABILITIES = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
 
 const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
 
-function isPrevoNickname(dexNum: number, formeNum?: number, nickname?: string): boolean {
+function isPrevoSpeciesName(dexNum: number, formeNum: number, nickname: string): boolean {
   for (const prevo of getPrevos(dexNum, formeNum)) {
-    if (nickname?.toUpperCase() === prevo.speciesName.toUpperCase()) {
+    if (nickname.toUpperCase() === prevo.speciesName.toUpperCase()) {
       return true
     }
   }
