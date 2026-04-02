@@ -1,4 +1,4 @@
-use pkm_rs_types::{PkmType, Stats8};
+use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 use crate::{
     levelup::{LearnsetFileReader, LearnsetReader},
@@ -59,6 +59,8 @@ impl PersonalInfoLegendsZa {
 }
 
 impl PersonalInfo for PersonalInfoLegendsZa {
+    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Baxcalibur;
+
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self::from_pkl_bytes(bytes)
     }

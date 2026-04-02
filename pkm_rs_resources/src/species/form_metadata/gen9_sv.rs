@@ -1,4 +1,4 @@
-use pkm_rs_types::{PkmType, Stats8};
+use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 use crate::{
     ExpectLog,
@@ -72,6 +72,8 @@ impl PersonalInfoScarletViolet {
 }
 
 impl PersonalInfo for PersonalInfoScarletViolet {
+    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Pecharunt;
+
     fn from_pkl_bytes(bytes: &[u8]) -> Self {
         Self::from_pkl_bytes(bytes)
     }

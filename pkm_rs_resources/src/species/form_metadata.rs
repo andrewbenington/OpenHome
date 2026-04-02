@@ -1,5 +1,6 @@
 pub mod gen1;
 pub mod gen2;
+pub mod gen7_alola;
 pub mod gen8_bdsp;
 pub mod gen8_la;
 pub mod gen8_swsh;
@@ -8,7 +9,7 @@ pub mod gen9_za;
 
 use std::marker::PhantomData;
 
-use pkm_rs_types::{OriginGame, OriginMark, PkmType, Stats8, StatsPreSplit};
+use pkm_rs_types::{NationalDex, OriginGame, OriginMark, PkmType, Stats8, StatsPreSplit};
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "wasm")]
@@ -24,6 +25,7 @@ use crate::{
     species::form_metadata::{
         gen1::{METADATA_TABLE_RED_BLUE, METADATA_TABLE_YELLOW},
         gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GOLD_SILVER},
+        gen7_alola::{METADATA_TABLE_SUN_MOON, METADATA_TABLE_USUM},
         gen8_bdsp::METADATA_TABLE_BDSP,
         gen8_la::METADATA_TABLE_LA,
         gen8_swsh::METADATA_TABLE_SWSH,
@@ -104,7 +106,7 @@ impl MetadataSource {
             Self::Black2White2 => "Black 2/White 2",
             Self::XY => "X/Y",
             Self::OmegaRubyAlphaSapphire => "Omega Ruby/Alpha Sapphire",
-            Self::SunMoon => "(Ultra) Sun/Moon",
+            Self::SunMoon => "Sun/Moon",
             Self::UltraSunUltraMoon => "Ultra Sun/Ultra Moon",
             Self::LetsGoPikachuEevee => "Let's Go Pikachu/Eevee",
             Self::SwordShield => "Sword/Shield",
@@ -165,6 +167,8 @@ pub fn all_metadata_sources() -> Vec<MetadataSource> {
 }
 
 pub trait PersonalInfo: Sized {
+    const MAX_NATIONAL_DEX: NationalDex;
+
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self;
 
     fn stats(&self) -> BaseStats;
@@ -240,11 +244,10 @@ impl<INFO: PersonalInfo, const TABLE_BYTE_LEN: usize, const ENTRY_BYTE_LEN: usiz
     }
 
     pub fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
-        log!(
-            "get_game_index: called with national_dex: {} form_index: {}",
-            national_dex,
-            form_index
-        );
+        if national_dex > INFO::MAX_NATIONAL_DEX as u16 {
+            return None;
+        }
+
         self.get_base_form_personal_info(national_dex)
             .game_index_for_form(national_dex, form_index)
     }
@@ -515,11 +518,6 @@ fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTabl
         MetadataSource::RubySapphire => todo!(),
         MetadataSource::Emerald => todo!(),
         MetadataSource::FireRedLeafGreen => todo!(),
-        MetadataSource::SwordShield => &METADATA_TABLE_SWSH,
-        MetadataSource::BrilliantDiamondShiningPearl => &METADATA_TABLE_BDSP,
-        MetadataSource::LegendsArceus => &METADATA_TABLE_LA,
-        MetadataSource::ScarletViolet => &METADATA_TABLE_SV,
-        MetadataSource::LegendsZa => &METADATA_TABLE_ZA,
         MetadataSource::DiamondPearl => todo!(),
         MetadataSource::Platinum => todo!(),
         MetadataSource::HeartGoldSoulSilver => todo!(),
@@ -527,9 +525,14 @@ fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTabl
         MetadataSource::Black2White2 => todo!(),
         MetadataSource::XY => todo!(),
         MetadataSource::OmegaRubyAlphaSapphire => todo!(),
-        MetadataSource::SunMoon => todo!(),
-        MetadataSource::UltraSunUltraMoon => todo!(),
+        MetadataSource::SunMoon => &METADATA_TABLE_SUN_MOON,
+        MetadataSource::UltraSunUltraMoon => &METADATA_TABLE_USUM,
         MetadataSource::LetsGoPikachuEevee => todo!(),
+        MetadataSource::SwordShield => &METADATA_TABLE_SWSH,
+        MetadataSource::BrilliantDiamondShiningPearl => &METADATA_TABLE_BDSP,
+        MetadataSource::LegendsArceus => &METADATA_TABLE_LA,
+        MetadataSource::ScarletViolet => &METADATA_TABLE_SV,
+        MetadataSource::LegendsZa => &METADATA_TABLE_ZA,
     }
 }
 
@@ -562,7 +565,7 @@ mod test {
     const PICHU_SPIKY_EARED: u16 = 1;
     const ARCEUS_LEGEND: u16 = 18;
 
-    const METADATA_SOURCES_IMPLEMENTED: [MetadataSource; 9] = [
+    const METADATA_SOURCES_IMPLEMENTED: [MetadataSource; 11] = [
         MetadataSource::RedBlue,
         MetadataSource::Yellow,
         MetadataSource::GoldSilver,
@@ -577,8 +580,8 @@ mod test {
         // MetadataSource::Black2White2,
         // MetadataSource::XY,
         // MetadataSource::OmegaRubyAlphaSapphire,
-        // MetadataSource::SunMoon,
-        // MetadataSource::UltraSunUltraMoon,
+        MetadataSource::SunMoon,
+        MetadataSource::UltraSunUltraMoon,
         // MetadataSource::LetsGoPikachuEevee,
         MetadataSource::SwordShield,
         MetadataSource::BrilliantDiamondShiningPearl,

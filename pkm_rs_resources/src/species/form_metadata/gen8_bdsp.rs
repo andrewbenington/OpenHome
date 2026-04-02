@@ -1,6 +1,4 @@
-use std::sync::LazyLock;
-
-use pkm_rs_types::{PkmType, Stats8};
+use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 use crate::{
     levelup::{LearnsetFileReader, LearnsetReader},
@@ -17,10 +15,10 @@ const BDSP_LEVELUP_BYTES: &[u8; BDSP_LEVELUP_FILE_SIZE] =
     include_bytes!("pkhex_bin/levelup/lvlmove_bdsp.pkl");
 const BDSP_ENTRY_SIZE: usize = 0x44;
 
-pub static METADATA_TABLE_BDSP: LazyLock<MetadataTableBdsp> = LazyLock::new(|| MetadataTableBdsp {
+pub static METADATA_TABLE_BDSP: MetadataTableBdsp = MetadataTableBdsp {
     personal: PersonalTableBdsp::from_pkl_bytes(BDSP_PERSONAL_BYTES),
     learnsets: LearnsetFileReader::from_pkl_bytes(BDSP_LEVELUP_BYTES),
-});
+};
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoBdsp([u8; BDSP_ENTRY_SIZE]);
@@ -62,6 +60,8 @@ impl PersonalInfoBdsp {
 }
 
 impl PersonalInfo for PersonalInfoBdsp {
+    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Arceus;
+
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self::from_pkl_bytes(bytes)
     }

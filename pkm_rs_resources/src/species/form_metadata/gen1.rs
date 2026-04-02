@@ -1,4 +1,4 @@
-use pkm_rs_types::{PkmType, StatsPreSplit};
+use pkm_rs_types::{NationalDex, PkmType, StatsPreSplit};
 
 use crate::{
     ExpectLog,
@@ -51,6 +51,8 @@ impl PersonalInfoGen1 {
 }
 
 impl PersonalInfo for PersonalInfoGen1 {
+    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Mew;
+
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self::from_pkl_bytes(bytes)
     }

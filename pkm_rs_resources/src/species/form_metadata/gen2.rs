@@ -53,6 +53,8 @@ impl PersonalInfoGen2 {
 const UNOWN_Z: u16 = 26;
 
 impl PersonalInfo for PersonalInfoGen2 {
+    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Celebi;
+
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self::from_pkl_bytes(bytes)
     }

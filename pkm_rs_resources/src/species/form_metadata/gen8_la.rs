@@ -1,6 +1,6 @@
 use std::sync::LazyLock;
 
-use pkm_rs_types::{PkmType, Stats8};
+use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 use crate::{
     levelup::{LearnsetFileReader, LearnsetReader},
@@ -63,6 +63,8 @@ impl PersonalInfoLegendsArceus {
 }
 
 impl PersonalInfo for PersonalInfoLegendsArceus {
+    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Enamorus;
+
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self::from_pkl_bytes(bytes)
     }
