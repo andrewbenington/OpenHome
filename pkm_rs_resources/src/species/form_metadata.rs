@@ -523,7 +523,7 @@ mod test {
     use pkm_rs_types::{Generation, NationalDex, PkmType, Stats8};
 
     use crate::species::{
-        FormeMetadata, NatDexIndex,
+        FormeMetadata, NATIONAL_DEX_MAX, NatDexIndex,
         form_metadata::{BaseStats, MetadataSource},
     };
 
@@ -566,6 +566,23 @@ mod test {
             || (form.national_dex.get() == NationalDex::Arceus && form.forme_index == ARCEUS_LEGEND))
     }
 
+    fn try_all_forms(
+        callback: impl Fn(&FormeMetadata) -> Result<(), String>,
+    ) -> Result<(), String> {
+        for national_dex in NationalDex::Bulbasaur as u16..=NATIONAL_DEX_MAX as u16 {
+            let species_metadata = NatDexIndex::new(national_dex)
+                .expect("1-1025 are valid national dex indices")
+                .get_species_metadata();
+            for form in species_metadata.formes {
+                if !present_in_scarlet_violet(form) {
+                    continue;
+                }
+                callback(form)?;
+            }
+        }
+        Ok(())
+    }
+
     #[test]
     fn test_get_stats() {
         assert_eq!(
@@ -584,97 +601,70 @@ mod test {
 
     #[test]
     fn all_forms_have_types() -> Result<(), String> {
-        for national_dex in NationalDex::Bulbasaur as u16..=NationalDex::Pecharunt as u16 {
-            let species_metadata = NatDexIndex::new(national_dex)
-                .expect("1-1025 are valid national dex indices")
-                .get_species_metadata();
-            for form in species_metadata.formes {
-                if !present_in_scarlet_violet(form) {
-                    continue;
-                }
-                super::types_lookup(national_dex, form.forme_index)
-                    .ok_or(format!("Missing types for {}", form.forme_name))?;
-            }
-        }
-
-        Ok(())
+        try_all_forms(|form| {
+            super::types_lookup(form.national_dex.get(), form.forme_index)
+                .ok_or(format!("Missing types for {}", form.forme_name))?;
+            Ok(())
+        })
     }
 
     #[test]
     fn no_form_duplicates_type() -> Result<(), String> {
-        for national_dex in NationalDex::Bulbasaur as u16..=NationalDex::Pecharunt as u16 {
-            let species_metadata = NatDexIndex::new(national_dex)
-                .expect("1-1025 are valid national dex indices")
-                .get_species_metadata();
-            for form in species_metadata.formes {
-                if !present_in_scarlet_violet(form) {
-                    continue;
-                }
-                let (type1, type2) = super::types_lookup(national_dex, form.forme_index)
-                    .ok_or(format!("Missing types for {}", form.forme_name))?;
-                if let Some(type2) = type2
-                    && type1 == type2
-                {
-                    return Err(format!(
-                        "Form {} has duplicate types: {:?} and {:?}",
-                        form.forme_name, type1, type2
-                    ));
-                }
+        try_all_forms(|form| {
+            let form_name = &form.forme_name;
+            let (type1, type2) = super::types_lookup(form.national_dex.get(), form.forme_index)
+                .ok_or(format!("Missing types for {form_name}"))?;
+            if let Some(type2) = type2
+                && type1 == type2
+            {
+                Err(format!(
+                    "Form {form_name} has duplicate types: {type1:?} and {type2:?}"
+                ))
+            } else {
+                Ok(())
             }
-        }
-
-        Ok(())
+        })
     }
 
     #[test]
     fn no_zero_stats() -> Result<(), String> {
-        for national_dex in NationalDex::Bulbasaur as u16..=NationalDex::Pecharunt as u16 {
-            let species_metadata = NatDexIndex::new(national_dex)
-                .expect("1-1025 are valid national dex indices")
-                .get_species_metadata();
-            for form in species_metadata.formes {
-                if !present_in_scarlet_violet(form) {
-                    continue;
+        try_all_forms(|form| {
+            let form_name = &form.forme_name;
+            let stats = super::base_stats_lookup(
+                form.national_dex.get(),
+                form.forme_index,
+                MetadataSource::ScarletViolet,
+            )
+            .ok_or(format!("Missing stats for {form_name}"))?;
+            match stats {
+                BaseStats::PreSplit(stats) => {
+                    if stats.hp == 0
+                        || stats.atk == 0
+                        || stats.def == 0
+                        || stats.spc == 0
+                        || stats.spe == 0
+                    {
+                        return Err(format!(
+                            "Form {form_name} has one or more zero base stats: {stats:?}"
+                        ));
+                    }
                 }
-                let stats = super::base_stats_lookup(
-                    national_dex,
-                    form.forme_index,
-                    MetadataSource::ScarletViolet,
-                )
-                .ok_or(format!("Missing stats for {}", form.forme_name))?;
-                match stats {
-                    BaseStats::PreSplit(stats) => {
-                        if stats.hp == 0
-                            || stats.atk == 0
-                            || stats.def == 0
-                            || stats.spc == 0
-                            || stats.spe == 0
-                        {
-                            return Err(format!(
-                                "Form {} has one or more zero base stats: {:?}",
-                                form.forme_name, stats
-                            ));
-                        }
+                BaseStats::Modern(stats) => {
+                    if stats.hp == 0
+                        || stats.atk == 0
+                        || stats.def == 0
+                        || stats.spa == 0
+                        || stats.spd == 0
+                        || stats.spe == 0
+                    {
+                        return Err(format!(
+                            "Form {form_name} has one or more zero base stats: {stats:?}"
+                        ));
                     }
-                    BaseStats::Modern(stats) => {
-                        if stats.hp == 0
-                            || stats.atk == 0
-                            || stats.def == 0
-                            || stats.spa == 0
-                            || stats.spd == 0
-                            || stats.spe == 0
-                        {
-                            return Err(format!(
-                                "Form {} has one or more zero base stats: {:?}",
-                                form.forme_name, stats
-                            ));
-                        }
-                    }
-                };
-            }
-        }
-
-        Ok(())
+                }
+            };
+            Ok(())
+        })
     }
 
     #[test]
@@ -688,5 +678,15 @@ mod test {
                     Ok(())
                 }
             })
+    }
+
+    #[test]
+    fn no_form_panics_for_any_source() -> Result<(), String> {
+        try_all_forms(|form| {
+            METADATA_SOURCES_IMPLEMENTED.into_iter().for_each(|source| {
+                super::base_stats_lookup(form.national_dex.get(), form.forme_index, source);
+            });
+            Ok(())
+        })
     }
 }

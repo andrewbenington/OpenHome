@@ -123,7 +123,7 @@ impl PersonalInfoGen4 {
 }
 
 impl PersonalInfo for PersonalInfoGen4 {
-    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Genesect;
+    const MAX_NATIONAL_DEX: NationalDex = NationalDex::Arceus;
 
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self::from_pkl_bytes(bytes)
