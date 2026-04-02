@@ -42,6 +42,9 @@ impl PersonalInfoBdsp {
     }
 
     pub fn game_index_for_form(&self, national_dex: u16, form_index: u16) -> Option<u16> {
+        if !self.is_present_in_game() {
+            return None;
+        }
         if form_index == 0 {
             return Some(national_dex);
         }
@@ -56,6 +59,10 @@ impl PersonalInfoBdsp {
 
     pub const fn form_count(&self) -> u8 {
         self.0[0x20]
+    }
+
+    const fn is_present_in_game(&self) -> bool {
+        ((self.0[0x21] >> 6) & 1) == 1
     }
 }
 

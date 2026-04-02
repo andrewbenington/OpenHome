@@ -1,6 +1,8 @@
 pub mod gen1;
 pub mod gen2;
+pub mod gen6;
 pub mod gen7_alola;
+pub mod gen7_lgpe;
 pub mod gen8_bdsp;
 pub mod gen8_la;
 pub mod gen8_swsh;
@@ -21,11 +23,12 @@ use tsify::Tsify;
 use crate::{
     ExpectLog,
     levelup::LearnsetReader,
-    log,
     species::form_metadata::{
         gen1::{METADATA_TABLE_RED_BLUE, METADATA_TABLE_YELLOW},
         gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GOLD_SILVER},
+        gen6::{METADATA_TABLE_ORAS, METADATA_TABLE_XY},
         gen7_alola::{METADATA_TABLE_SUN_MOON, METADATA_TABLE_USUM},
+        gen7_lgpe::METADATA_TABLE_LGPE,
         gen8_bdsp::METADATA_TABLE_BDSP,
         gen8_la::METADATA_TABLE_LA,
         gen8_swsh::METADATA_TABLE_SWSH,
@@ -224,18 +227,7 @@ impl<INFO: PersonalInfo, const TABLE_BYTE_LEN: usize, const ENTRY_BYTE_LEN: usiz
     }
 
     pub fn get_personal_info_by_game_index(&self, game_index: u16) -> INFO {
-        log!(
-            "get_personal_info_by_game_index: called with game_index: {} in table with entry byte len {}",
-            game_index,
-            ENTRY_BYTE_LEN
-        );
         let offset = (game_index as usize) * ENTRY_BYTE_LEN;
-        log!(
-            "get_personal_info_by_game_index: calculated byte offset: {:02X} for game_index: {}, {:?}",
-            offset,
-            game_index,
-            &self.0[offset..offset + ENTRY_BYTE_LEN]
-        );
         INFO::from_pkl_bytes(&self.0[offset..offset + ENTRY_BYTE_LEN])
     }
 
@@ -258,30 +250,8 @@ impl<INFO: PersonalInfo, const TABLE_BYTE_LEN: usize, const ENTRY_BYTE_LEN: usiz
     }
 
     fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-        log!(
-            "get_types: called with national dex {} forme index {}",
-            national_dex,
-            forme_index
-        );
-
         let personal_info = self.get_personal_info(national_dex, forme_index)?;
-
-        log!(
-            "get_types: called with national dex {} forme index {} in {}",
-            national_dex,
-            forme_index,
-            personal_info.source_name()
-        );
-
         let types_fallible = personal_info.types_fallible();
-
-        log!(
-            "get_types: got personal info for national dex {} forme index {} in {}, types_fallible: {:?}",
-            national_dex,
-            forme_index,
-            personal_info.source_name(),
-            types_fallible
-        );
 
         let type1 = types_fallible.0.expect_log(format_bad_type_error(
             national_dex,
@@ -395,12 +365,6 @@ impl MetadataTableReader {
     }
 
     pub fn get_base_stats(&self) -> BaseStats {
-        log!(
-            "{}: Looking up base stats for national dex {} forme index {}",
-            self.inner.get_source_name(),
-            self.national_dex,
-            self.forme_index
-        );
         self.inner
             .get_base_stats(self.national_dex, self.forme_index)
             .expect_log(READER_SHOULD_BE_VALID)
@@ -474,11 +438,6 @@ pub fn base_stats_lookup(
 }
 
 pub fn current_base_stats(national_dex: u16, forme_index: u16) -> Option<Stats8> {
-    log!(
-        "Looking up base stats for national dex {} forme index {} in current metadata table",
-        national_dex,
-        forme_index
-    );
     current_metadata_table()
         .get_base_stats(national_dex, forme_index)
         .map(|base_stats| match base_stats {
@@ -523,11 +482,11 @@ fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTabl
         MetadataSource::HeartGoldSoulSilver => todo!(),
         MetadataSource::BlackWhite => todo!(),
         MetadataSource::Black2White2 => todo!(),
-        MetadataSource::XY => todo!(),
-        MetadataSource::OmegaRubyAlphaSapphire => todo!(),
+        MetadataSource::XY => &METADATA_TABLE_XY,
+        MetadataSource::OmegaRubyAlphaSapphire => &METADATA_TABLE_ORAS,
         MetadataSource::SunMoon => &METADATA_TABLE_SUN_MOON,
         MetadataSource::UltraSunUltraMoon => &METADATA_TABLE_USUM,
-        MetadataSource::LetsGoPikachuEevee => todo!(),
+        MetadataSource::LetsGoPikachuEevee => &METADATA_TABLE_LGPE,
         MetadataSource::SwordShield => &METADATA_TABLE_SWSH,
         MetadataSource::BrilliantDiamondShiningPearl => &METADATA_TABLE_BDSP,
         MetadataSource::LegendsArceus => &METADATA_TABLE_LA,
