@@ -64,6 +64,7 @@ export default class PK3 {
   ribbons: string[]
   trainerGender: boolean
   checksum: number
+  originalBytes?: ArrayBuffer
 
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
@@ -77,6 +78,7 @@ export default class PK3 {
       }
 
       const dataView = new DataView(buffer)
+      this.originalBytes = buffer
 
       this.personalityValue = dataView.getUint32(0x0, true)
       this.trainerID = dataView.getUint16(0x4, true)

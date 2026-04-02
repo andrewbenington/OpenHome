@@ -1,19 +1,21 @@
 use crate::pkm::ohpkm::OhpkmV1;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
-#[cfg(feature = "wasm")]
-use crate::pkm::ohpkm::v2_sections::MonTag;
+use crate::pkm::ohpkm::v2_sections::pkm_bytes::{self, OriginalBackup, PkmBytes, UnconvertedPkm};
 use crate::pkm::ohpkm::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MonTags,
     MostRecentSave, Notes, PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
 };
 use crate::pkm::{Error, Result};
-
-#[cfg(feature = "wasm")]
-use pkm_rs_types::TrainerData;
 use strum_macros::Display;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "wasm")]
+use pkm_rs_types::TrainerData;
+
+#[cfg(feature = "wasm")]
+use crate::pkm::ohpkm::v2_sections::MonTag;
 
 #[cfg(feature = "wasm")]
 use crate::pkm::ohpkm::extra_form::ExtraFormIndex;
@@ -101,38 +103,42 @@ fn rgb_to_display_color(rgb: [u8; 3]) -> String {
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Display)]
 #[repr(u16)]
 pub enum SectionTagV2 {
-    MainData,
-    GameboyData,
-    Gen45Data,
-    Gen67Data,
-    SwordShield,
-    BdspTmFlags,
-    LegendsArceus,
-    ScarletViolet,
-    PastHandler,
-    PluginData,
-    Notes,
-    MostRecentSave,
-    Tag,
+    MainData = 0x00,
+    GameboyData = 0x01,
+    Gen45Data = 0x02,
+    Gen67Data = 0x03,
+    SwordShield = 0x04,
+    BdspTmFlags = 0x05,
+    LegendsArceus = 0x06,
+    ScarletViolet = 0x07,
+    PastHandler = 0x08,
+    PluginData = 0x09,
+    Notes = 0x0A,
+    MostRecentSave = 0x0B,
+    Tag = 0x0C,
+    OriginalBackup = 0x0D,
+    UnconvertedPkm = 0x0E,
 }
 
 impl SectionTagV2 {
     pub const fn new(tag: u16) -> Option<Self> {
         match tag {
-            0 => Some(Self::MainData),
-            1 => Some(Self::GameboyData),
-            2 => Some(Self::Gen45Data),
-            3 => Some(Self::Gen67Data),
-            4 => Some(Self::SwordShield),
-            5 => Some(Self::BdspTmFlags),
-            6 => Some(Self::LegendsArceus),
-            7 => Some(Self::ScarletViolet),
-            8 => Some(Self::PastHandler),
-            9 => Some(Self::PluginData),
-            10 => Some(Self::Notes),
-            11 => Some(Self::MostRecentSave),
-            12 => Some(Self::Tag),
-            13.. => None,
+            0x00 => Some(Self::MainData),
+            0x01 => Some(Self::GameboyData),
+            0x02 => Some(Self::Gen45Data),
+            0x03 => Some(Self::Gen67Data),
+            0x04 => Some(Self::SwordShield),
+            0x05 => Some(Self::BdspTmFlags),
+            0x06 => Some(Self::LegendsArceus),
+            0x07 => Some(Self::ScarletViolet),
+            0x08 => Some(Self::PastHandler),
+            0x09 => Some(Self::PluginData),
+            0x0A => Some(Self::Notes),
+            0x0B => Some(Self::MostRecentSave),
+            0x0C => Some(Self::Tag),
+            0x0D => Some(Self::OriginalBackup),
+            0x0E => Some(Self::UnconvertedPkm),
+            _ => None,
         }
     }
 
@@ -151,6 +157,8 @@ impl SectionTagV2 {
             Self::Notes => 0,
             Self::MostRecentSave => 31,
             Self::Tag => 0,
+            Self::OriginalBackup => 2, // Size of the tag
+            Self::UnconvertedPkm => 2, // Size of the tag
         }
     }
 }
@@ -188,6 +196,8 @@ pub struct OhpkmV2 {
     notes: Option<Notes>,
     most_recent_save: Option<MostRecentSave>,
     tags: Option<MonTags>,
+    original_data: Option<OriginalBackup>,
+    unconverted_pkm: Option<UnconvertedPkm>,
 }
 
 impl OhpkmV2 {
@@ -206,8 +216,11 @@ impl OhpkmV2 {
             notes: None,
             most_recent_save: None,
             tags: None,
+            original_data: None,
+            unconverted_pkm: None,
         })
     }
+
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let sectioned_data = SectionedData::<SectionTagV2>::from_bytes(bytes)?;
 
@@ -232,6 +245,45 @@ impl OhpkmV2 {
             notes: Notes::extract_from(&sectioned_data)?,
             most_recent_save: MostRecentSave::extract_from(&sectioned_data)?,
             tags: MonTags::extract_from(&sectioned_data)?,
+            original_data: OriginalBackup::extract_from(&sectioned_data)?,
+            unconverted_pkm: UnconvertedPkm::extract_from(&sectioned_data)?,
+        };
+
+        Ok(result)
+    }
+
+    pub fn from_bytes_fixing_errors(bytes: &[u8]) -> Result<Self> {
+        let sectioned_data = SectionedData::<SectionTagV2>::from_bytes(bytes)?;
+
+        if sectioned_data.magic_number != MAGIC_NUMBER {
+            return Err(Error::other("Bad magic number"));
+        } else if sectioned_data.version != 2 {
+            return Err(Error::other("Bad version number"));
+        }
+
+        let result = Self {
+            main_data: MainDataV2::extract_from(&sectioned_data)?
+                .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
+            gameboy_data: GameboyData::extract_from(&sectioned_data).ok().flatten(),
+            gen45_data: Gen45Data::extract_from(&sectioned_data).ok().flatten(),
+            gen67_data: Gen67Data::extract_from(&sectioned_data).ok().flatten(),
+            swsh_data: SwordShieldData::extract_from(&sectioned_data)
+                .ok()
+                .flatten(),
+            bdsp_data: BdspData::extract_from(&sectioned_data).ok().flatten(),
+            la_data: LegendsArceusData::extract_from(&sectioned_data)
+                .ok()
+                .flatten(),
+            sv_data: ScarletVioletData::extract_from(&sectioned_data)
+                .ok()
+                .flatten(),
+            handler_data: PastHandlerData::extract_all_from(&sectioned_data).unwrap_or_default(),
+            plugin_data: PluginData::extract_from(&sectioned_data).ok().flatten(),
+            notes: Notes::extract_from(&sectioned_data).ok().flatten(),
+            most_recent_save: MostRecentSave::extract_from(&sectioned_data).ok().flatten(),
+            tags: MonTags::extract_from(&sectioned_data).ok().flatten(),
+            original_data: OriginalBackup::extract_from(&sectioned_data).ok().flatten(),
+            unconverted_pkm: UnconvertedPkm::extract_from(&sectioned_data).ok().flatten(),
         };
 
         Ok(result)
@@ -252,6 +304,8 @@ impl OhpkmV2 {
             notes: None,
             most_recent_save: None,
             tags: None,
+            original_data: None,
+            unconverted_pkm: None,
         }
     }
 
@@ -265,12 +319,14 @@ impl OhpkmV2 {
             .add_if_some(self.swsh_data)?
             .add_if_some(self.bdsp_data)?
             .add_if_some(self.la_data)?
-            .add_if_some(self.clone().sv_data)?
+            .add_if_some(self.sv_data)?
             .add_all(self.handler_data.clone())?
             .add_if_some(self.plugin_data.clone())?
             .add_if_some(self.notes.clone())?
             .add_if_some(self.most_recent_save.clone())?
-            .add_if_some(self.tags.clone())?;
+            .add_if_some(self.tags.clone())?
+            .add_if_some(self.original_data)?
+            .add_if_some(self.unconverted_pkm)?;
         Ok(sectioned_data)
     }
 
@@ -285,6 +341,14 @@ impl OhpkmV2 {
 impl OhpkmV2 {
     #[wasm_bindgen(constructor)]
     pub fn from_byte_vector(bytes: &[u8]) -> JsResult<Self> {
+        if !bytes.is_empty() {
+            Self::from_bytes(bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+        } else {
+            Ok(Self::default())
+        }
+    }
+    #[wasm_bindgen(js_name = "fromByteVectorFixingErrors")]
+    pub fn from_byte_vector_fixing_errors(bytes: &[u8]) -> JsResult<Self> {
         if !bytes.is_empty() {
             Self::from_bytes(bytes).map_err(|e| JsValue::from_str(&e.to_string()))
         } else {
@@ -1830,6 +1894,37 @@ impl OhpkmV2 {
         self.most_recent_save.clone()
     }
 
+    // Original Data
+    #[wasm_bindgen(getter = originalData)]
+    pub fn original_data(&self) -> Option<OriginalDataJs> {
+        self.original_data.map(|d| OriginalDataJs {
+            tag: d.tag(),
+            data: d.data_as_bytes().to_vec(),
+        })
+    }
+
+    #[wasm_bindgen(js_name = trySetOriginalData)]
+    pub fn try_set_original_data(&mut self, tag: pkm_bytes::Tag, data: Vec<u8>) -> Result<()> {
+        let pkm_bytes = PkmBytes::new(tag, &data)?;
+
+        self.original_data = Some(OriginalBackup::new(pkm_bytes));
+        Ok(())
+    }
+
+    // Unconverted PKM (Pokémon that have been opted out of intergenerational conversion)
+    #[wasm_bindgen(getter = unconvertedPkm)]
+    pub fn unconverted_pkm(&self) -> Option<Vec<u8>> {
+        self.unconverted_pkm?.to_bytes().ok()
+    }
+
+    #[wasm_bindgen(js_name = trySetUnconvertedPkm)]
+    pub fn try_set_unconverted_pkm(&mut self, tag: pkm_bytes::Tag, data: Vec<u8>) -> Result<()> {
+        let pkm_bytes = PkmBytes::new(tag, &data)?;
+
+        self.unconverted_pkm = Some(UnconvertedPkm::new(pkm_bytes));
+        Ok(())
+    }
+
     // Calculated
     #[wasm_bindgen(js_name = isShinyWasm)]
     pub fn is_shiny(&self) -> bool {
@@ -1879,6 +1974,14 @@ impl OhpkmV2 {
 }
 
 #[cfg(feature = "wasm")]
+#[wasm_bindgen]
+pub struct OriginalDataJs {
+    pub tag: pkm_bytes::Tag,
+    #[wasm_bindgen(getter_with_clone)]
+    pub data: Vec<u8>,
+}
+
+#[cfg(feature = "wasm")]
 fn add_section_bytes_to_js_object<T: DataSection<ErrorType = Error>>(
     obj: &js_sys::Object,
     section: &Option<T>,
@@ -1893,4 +1996,36 @@ fn add_section_bytes_to_js_object<T: DataSection<ErrorType = Error>>(
         )?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn build_all_ohpkms() -> std::result::Result<(), String> {
+        let path = "/Users/andrewbenington/Library/Application Support/OpenHome/storage/mons_v2";
+        for entry in std::fs::read_dir(path).unwrap() {
+            let entry = entry.unwrap();
+            if !entry
+                .file_name()
+                .into_string()
+                .map(|s| s.ends_with(".ohpkm"))
+                .unwrap_or(false)
+            {
+                continue;
+            }
+            let data = std::fs::read(entry.path()).unwrap();
+            println!(
+                "Testing file: {}",
+                entry.path().file_name().unwrap().to_string_lossy()
+            );
+            OhpkmV2::from_bytes(&data).map_err(|e| {
+                format!(
+                    "failed to build ohpkm file {}: {e}",
+                    entry.path().file_name().unwrap().to_string_lossy()
+                )
+            })?;
+        }
+        Ok(())
+    }
 }

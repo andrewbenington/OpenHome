@@ -98,14 +98,19 @@ export default class PK8 {
   trainerGender: boolean
   level: number
   stats: types.Stats
+  originalBytes?: ArrayBuffer
+
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
+
       if (encrypted) {
         const unencryptedBytes = encryption.decryptByteArrayGen89(buffer)
         const unshuffledBytes = encryption.unshuffleBlocksGen89(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
+
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.sanity = dataView.getUint16(0x4, true)

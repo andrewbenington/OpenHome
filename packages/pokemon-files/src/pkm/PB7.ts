@@ -91,6 +91,7 @@ export default class PB7 {
   isMega: number
   megaForme: number
   trainerGender: boolean
+  originalBytes?: ArrayBuffer
   constructor(arg: ArrayBuffer | PKMInterface, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
@@ -99,6 +100,7 @@ export default class PB7 {
         const unshuffledBytes = encryption.unshuffleBlocksGen67(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)

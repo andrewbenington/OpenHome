@@ -93,6 +93,7 @@ export default class PA9 {
   tmFlagsLza: Uint8Array
   ribbons: string[]
   trainerGender: boolean
+  originalBytes?: ArrayBuffer
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
@@ -101,6 +102,7 @@ export default class PA9 {
         const unshuffledBytes = encryption.unshuffleBlocksGen89(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)
