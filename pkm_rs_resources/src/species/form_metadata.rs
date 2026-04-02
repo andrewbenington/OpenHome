@@ -1,5 +1,8 @@
 pub mod gen1;
 pub mod gen2;
+pub mod gen3;
+pub mod gen4;
+pub mod gen5;
 pub mod gen6;
 pub mod gen7_alola;
 pub mod gen7_lgpe;
@@ -26,6 +29,9 @@ use crate::{
     species::form_metadata::{
         gen1::{METADATA_TABLE_RED_BLUE, METADATA_TABLE_YELLOW},
         gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GOLD_SILVER},
+        gen3::{METADATA_TABLE_EMERALD, METADATA_TABLE_FRLG, METADATA_TABLE_RUBY_SAPPHIRE},
+        gen4::{METADATA_TABLE_DIAMOND_PEARL, METADATA_TABLE_HGSS, METADATA_TABLE_PLATINUM},
+        gen5::{METADATA_TABLE_B2W2, METADATA_TABLE_BW},
         gen6::{METADATA_TABLE_ORAS, METADATA_TABLE_XY},
         gen7_alola::{METADATA_TABLE_SUN_MOON, METADATA_TABLE_USUM},
         gen7_lgpe::METADATA_TABLE_LGPE,
@@ -474,14 +480,14 @@ fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTabl
         MetadataSource::Yellow => &METADATA_TABLE_YELLOW,
         MetadataSource::GoldSilver => &METADATA_TABLE_GOLD_SILVER,
         MetadataSource::Crystal => &METADATA_TABLE_CRYSTAL,
-        MetadataSource::RubySapphire => todo!(),
-        MetadataSource::Emerald => todo!(),
-        MetadataSource::FireRedLeafGreen => todo!(),
-        MetadataSource::DiamondPearl => todo!(),
-        MetadataSource::Platinum => todo!(),
-        MetadataSource::HeartGoldSoulSilver => todo!(),
-        MetadataSource::BlackWhite => todo!(),
-        MetadataSource::Black2White2 => todo!(),
+        MetadataSource::RubySapphire => &METADATA_TABLE_RUBY_SAPPHIRE,
+        MetadataSource::Emerald => &METADATA_TABLE_EMERALD,
+        MetadataSource::FireRedLeafGreen => &METADATA_TABLE_FRLG,
+        MetadataSource::DiamondPearl => &METADATA_TABLE_DIAMOND_PEARL,
+        MetadataSource::Platinum => &METADATA_TABLE_PLATINUM,
+        MetadataSource::HeartGoldSoulSilver => &METADATA_TABLE_HGSS,
+        MetadataSource::BlackWhite => &METADATA_TABLE_BW,
+        MetadataSource::Black2White2 => &METADATA_TABLE_B2W2,
         MetadataSource::XY => &METADATA_TABLE_XY,
         MetadataSource::OmegaRubyAlphaSapphire => &METADATA_TABLE_ORAS,
         MetadataSource::SunMoon => &METADATA_TABLE_SUN_MOON,
@@ -524,24 +530,24 @@ mod test {
     const PICHU_SPIKY_EARED: u16 = 1;
     const ARCEUS_LEGEND: u16 = 18;
 
-    const METADATA_SOURCES_IMPLEMENTED: [MetadataSource; 11] = [
+    const METADATA_SOURCES_IMPLEMENTED: [MetadataSource; 22] = [
         MetadataSource::RedBlue,
         MetadataSource::Yellow,
         MetadataSource::GoldSilver,
         MetadataSource::Crystal,
-        // MetadataSource::RubySapphire,
-        // MetadataSource::Emerald,
-        // MetadataSource::FireRedLeafGreen,
-        // MetadataSource::DiamondPearl,
-        // MetadataSource::Platinum,
-        // MetadataSource::HeartGoldSoulSilver,
-        // MetadataSource::BlackWhite,
-        // MetadataSource::Black2White2,
-        // MetadataSource::XY,
-        // MetadataSource::OmegaRubyAlphaSapphire,
+        MetadataSource::RubySapphire,
+        MetadataSource::Emerald,
+        MetadataSource::FireRedLeafGreen,
+        MetadataSource::DiamondPearl,
+        MetadataSource::Platinum,
+        MetadataSource::HeartGoldSoulSilver,
+        MetadataSource::BlackWhite,
+        MetadataSource::Black2White2,
+        MetadataSource::XY,
+        MetadataSource::OmegaRubyAlphaSapphire,
         MetadataSource::SunMoon,
         MetadataSource::UltraSunUltraMoon,
-        // MetadataSource::LetsGoPikachuEevee,
+        MetadataSource::LetsGoPikachuEevee,
         MetadataSource::SwordShield,
         MetadataSource::BrilliantDiamondShiningPearl,
         MetadataSource::LegendsArceus,
@@ -627,6 +633,9 @@ mod test {
                 .expect("1-1025 are valid national dex indices")
                 .get_species_metadata();
             for form in species_metadata.formes {
+                if !present_in_scarlet_violet(form) {
+                    continue;
+                }
                 let stats = super::base_stats_lookup(
                     national_dex,
                     form.forme_index,

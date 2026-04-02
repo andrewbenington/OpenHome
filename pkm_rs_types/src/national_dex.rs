@@ -1,8 +1,11 @@
+use num_enum::TryFromPrimitive;
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, TryFromPrimitive)]
+#[repr(u16)]
 pub enum NationalDex {
     Bulbasaur = 1,
     Ivysaur,
