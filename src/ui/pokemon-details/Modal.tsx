@@ -126,7 +126,7 @@ const PokemonDetailsModal = (props: {
         originalDataTagToMonFormat(mon.originalData.tag) === newFormat
       ) {
         const O = saveFileTypeFromString(originalDataTagToMonFormat(mon.originalData.tag)) ?? P
-        setDisplayMon(new O(mon.originalData.data.buffer as ArrayBuffer, true))
+        setDisplayMon(O.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
       } else {
         setDisplayMon(new P(mon))
       }

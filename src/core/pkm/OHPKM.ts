@@ -344,7 +344,15 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
           } catch (e) {
             console.error('Failed to set original data from bytes', e)
           }
+        } else {
+          console.error(
+            `No original data tag found for format ${other.format}, cannot set original bytes on OHPKM`
+          )
         }
+      } else {
+        console.warn(
+          'No original bytes found in other mon, skipping setting original data on OHPKM'
+        )
       }
     }
     if (this.openhomeId === '0004-d889ca57-401aab08-30') {
@@ -1011,8 +1019,12 @@ export function monFormatToOriginalDataTag(format: string): Option<Tag> {
       return Tag.Pk9
     case 'PA9':
       return Tag.Pa9
-    default:
-      return undefined
+    case 'PK3RR':
+      return Tag.Pk3Rr
+    case 'PK3UB':
+      return Tag.Pk3Ub
+    case 'PB8LUMI':
+      return Tag.Pb8Lumi
   }
 }
 
@@ -1044,8 +1056,8 @@ export function originalDataTagToMonFormat(tag: Tag): string {
       return 'PK9'
     case Tag.Pa9:
       return 'PA9'
-    case Tag.Pa8Lumi:
-      return 'PA8LUMI'
+    case Tag.Pb8Lumi:
+      return 'PB8LUMI'
     case Tag.Pk3Rr:
       return 'PK3RR'
     case Tag.Pk3Ub:

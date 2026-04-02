@@ -107,12 +107,12 @@ export default class PA8 {
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
-      this.originalBytes = buffer
       if (encrypted) {
         const unencryptedBytes = encryption.decryptByteArrayGen8A(buffer)
         const unshuffledBytes = encryption.unshuffleBlocksGen8A(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.sanity = dataView.getUint16(0x4, true)

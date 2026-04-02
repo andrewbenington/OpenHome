@@ -44,7 +44,7 @@ pub enum Tag {
 
     Pk3Rr = 0xfffe,
     Pk3Ub = 0xfffd,
-    Pa8Lumi = 0xfffc,
+    Pb8Lumi = 0xfffc,
 }
 
 impl Tag {
@@ -74,7 +74,7 @@ impl TryFrom<u16> for Tag {
 
             0xfffe => Ok(Self::Pk3Rr),
             0xfffd => Ok(Self::Pk3Ub),
-            0xfffc => Ok(Self::Pa8Lumi),
+            0xfffc => Ok(Self::Pb8Lumi),
 
             other => Err(Error::TagError {
                 tag_type: "OriginalBackup",
@@ -103,7 +103,7 @@ impl Tag {
 
             Self::Pk3Rr => PK3CFRU_PARTY_SIZE,
             Self::Pk3Ub => PK3CFRU_PARTY_SIZE,
-            Self::Pa8Lumi => PB8LUMI_SIZE,
+            Self::Pb8Lumi => PB8LUMI_SIZE,
         }
     }
 }
@@ -173,12 +173,12 @@ impl PkmBytes {
 
             Self::Pk3Rr(_) => Tag::Pk3Rr,
             Self::Pk3Ub(_) => Tag::Pk3Ub,
-            Self::Pb8Lumi(_) => Tag::Pa8Lumi,
+            Self::Pb8Lumi(_) => Tag::Pb8Lumi,
         }
     }
 
     pub fn new(tag: Tag, data: &[u8]) -> Result<Self> {
-        if data.len() != tag.data_size() {
+        if data.len() > tag.data_size() {
             return Err(Error::BufferSize {
                 field: format!("OriginalBackup({})", tag),
                 expected: tag.data_size(),
@@ -187,25 +187,23 @@ impl PkmBytes {
         }
 
         match tag {
-            Tag::Pk1 => Ok(Self::Pk1(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pk2 => Ok(Self::Pk2(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pk3 => Ok(Self::Pk3(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pk4 => Ok(Self::Pk4(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pk5 => Ok(Self::Pk5(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pk6 => Ok(Self::Pk6(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pk7 => Ok(Self::Pk7(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pb7 => Ok(Self::Pb7(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pk8 => Ok(Self::Pk8(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pa8 => Ok(Self::Pa8(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pb8 => Ok(Self::Pb8(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pk9 => Ok(Self::Pk9(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pa9 => Ok(Self::Pa9(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
+            Tag::Pk1 => Ok(Self::Pk1(copy_to_sized_array(data))),
+            Tag::Pk2 => Ok(Self::Pk2(copy_to_sized_array(data))),
+            Tag::Pk3 => Ok(Self::Pk3(copy_to_sized_array(data))),
+            Tag::Pk4 => Ok(Self::Pk4(copy_to_sized_array(data))),
+            Tag::Pk5 => Ok(Self::Pk5(copy_to_sized_array(data))),
+            Tag::Pk6 => Ok(Self::Pk6(copy_to_sized_array(data))),
+            Tag::Pk7 => Ok(Self::Pk7(copy_to_sized_array(data))),
+            Tag::Pb7 => Ok(Self::Pb7(copy_to_sized_array(data))),
+            Tag::Pk8 => Ok(Self::Pk8(copy_to_sized_array(data))),
+            Tag::Pa8 => Ok(Self::Pa8(copy_to_sized_array(data))),
+            Tag::Pb8 => Ok(Self::Pb8(copy_to_sized_array(data))),
+            Tag::Pk9 => Ok(Self::Pk9(copy_to_sized_array(data))),
+            Tag::Pa9 => Ok(Self::Pa9(copy_to_sized_array(data))),
 
-            Tag::Pk3Rr => Ok(Self::Pk3Rr(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pk3Ub => Ok(Self::Pk3Ub(*data.as_array().expect(LENGTH_CHECKED_MESSAGE))),
-            Tag::Pa8Lumi => Ok(Self::Pb8Lumi(
-                *data.as_array().expect(LENGTH_CHECKED_MESSAGE),
-            )),
+            Tag::Pk3Rr => Ok(Self::Pk3Rr(copy_to_sized_array(data))),
+            Tag::Pk3Ub => Ok(Self::Pk3Ub(copy_to_sized_array(data))),
+            Tag::Pb8Lumi => Ok(Self::Pb8Lumi(copy_to_sized_array(data))),
         }
     }
 
@@ -235,6 +233,13 @@ impl PkmBytes {
         bytes.extend_from_slice(self.data_as_bytes());
         bytes
     }
+}
+
+fn copy_to_sized_array<const N: usize>(slice: &[u8]) -> [u8; N] {
+    let mut arr = [0u8; N];
+    let len = slice.len().min(N);
+    arr[..len].copy_from_slice(&slice[..len]);
+    arr
 }
 
 #[derive(Debug, Clone, Copy)]
