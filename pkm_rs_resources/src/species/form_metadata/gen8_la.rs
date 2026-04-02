@@ -3,7 +3,7 @@ use std::sync::LazyLock;
 use pkm_rs_types::{PkmType, Stats8};
 
 use crate::{
-    levelup::LearnsetMoves,
+    levelup::{LearnsetFileReader, LearnsetReader},
     species::form_metadata::{BaseStats, MetadataTable, PersonalInfo, PersonalTable},
 };
 
@@ -20,7 +20,7 @@ const LA_ENTRY_SIZE: usize = 0xB0;
 pub static METADATA_TABLE_LA: LazyLock<MetadataTableLegendsArceus> =
     LazyLock::new(|| MetadataTableLegendsArceus {
         personal: PersonalTableLegendsArceus::from_pkl_bytes(LA_PERSONAL_BYTES),
-        learnsets: LearnsetMoves::all_from_pkl_bytes(LA_LEVELUP_BYTES),
+        learnsets: LearnsetFileReader::from_pkl_bytes(LA_LEVELUP_BYTES),
     });
 
 #[derive(Debug, Clone, Copy)]
@@ -90,7 +90,7 @@ pub type PersonalTableLegendsArceus =
 #[derive(Debug)]
 pub struct MetadataTableLegendsArceus {
     personal: PersonalTableLegendsArceus,
-    learnsets: Vec<LearnsetMoves>,
+    learnsets: LearnsetFileReader,
 }
 
 impl MetadataTable for MetadataTableLegendsArceus {
@@ -102,9 +102,9 @@ impl MetadataTable for MetadataTableLegendsArceus {
         self.personal.get_game_index(national_dex, forme_index)
     }
 
-    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&LearnsetMoves> {
+    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<LearnsetReader> {
         self.learnsets
-            .get(self.get_game_index(national_dex, forme_index)? as usize)
+            .learnset_at_index(self.get_game_index(national_dex, forme_index)?)
     }
 
     fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {

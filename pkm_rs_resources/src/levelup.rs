@@ -1,9 +1,10 @@
 use crate::moves::MoveSlot;
-#[cfg(feature = "wasm")]
-use pkm_rs_types::pkl_file::PklFileData;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "wasm")]
+use pkm_rs_types::pkl_file::PklFileData;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LearnsetCondition {
@@ -15,12 +16,6 @@ pub enum LearnsetCondition {
 pub struct LearnsetMove {
     pub(crate) move_id: MoveSlot,
     pub(crate) condition: LearnsetCondition,
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Default)]
-pub struct LearnsetMoves {
-    pub(crate) moves: Vec<LearnsetMove>,
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -48,48 +43,59 @@ impl From<LearnsetMove> for LearnsetMoveJs {
     }
 }
 
-impl LearnsetMoves {
-    pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
-        let length = bytes.len();
-        if length == 0 {
-            return Self::default();
-        }
+#[derive(Debug, Clone, Copy)]
+pub struct LearnsetFileReader(PklFileData<'static>);
 
-        let levelup_move_count = length / 3; // 2 bytes per move, 1 byte per level
-        let moves_span_size = (levelup_move_count) * 2;
-        let move_indices_raw = u8_slice_to_u16_le(&bytes[..moves_span_size]);
-        let levels = &bytes[moves_span_size..];
-
-        // Implementation for parsing PKL data into learnset moves
-        Self {
-            moves: move_indices_raw
-                .into_iter()
-                .zip(levels)
-                .map(|(move_id_raw, level)| {
-                    if *level == 0 {
-                        LearnsetMove {
-                            move_id: MoveSlot::from_u16(move_id_raw),
-                            condition: LearnsetCondition::Evolution,
-                        }
-                    } else {
-                        LearnsetMove {
-                            move_id: MoveSlot::from_u16(move_id_raw),
-                            condition: LearnsetCondition::LevelUp(*level),
-                        }
-                    }
-                })
-                .collect(),
-        }
+impl LearnsetFileReader {
+    pub const fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
+        Self(PklFileData::from_bytes(bytes))
     }
 
-    pub fn all_from_pkl_bytes(bytes: &[u8]) -> Vec<Self> {
-        let pkl_file_data = PklFileData::from_bytes(bytes);
-        let mut all_learnsets = vec![Self::default()];
-        for i in 1..pkl_file_data.length() {
-            all_learnsets.push(Self::from_pkl_bytes(pkl_file_data.get_entry(i)));
+    pub fn learnset_at_index(&self, game_index: u16) -> Option<LearnsetReader> {
+        if game_index as usize >= self.0.length() {
+            return None;
         }
 
-        all_learnsets
+        Some(LearnsetReader(self.0.get_entry(game_index as usize)))
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct LearnsetReader(&'static [u8]);
+
+impl LearnsetReader {
+    pub const fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
+        Self(bytes)
+    }
+
+    pub const fn move_count(&self) -> usize {
+        self.0.len() / 3 // 2 bytes per move, 1 byte per level
+    }
+
+    pub fn get_move(&self, index: usize) -> Option<LearnsetMove> {
+        if index >= self.move_count() {
+            return None;
+        }
+
+        let moves_span_size = (self.move_count()) * 2;
+        let move_indices_raw = u8_slice_to_u16_le(&self.0[..moves_span_size]);
+        let move_id = MoveSlot::from_u16(move_indices_raw[index]);
+
+        let levels = &self.0[moves_span_size..];
+        let level = levels[index];
+        let condition = if level == 0 {
+            LearnsetCondition::Evolution
+        } else {
+            LearnsetCondition::LevelUp(level)
+        };
+
+        Some(LearnsetMove { move_id, condition })
+    }
+
+    pub fn all_moves(&self) -> Vec<LearnsetMove> {
+        (0..self.move_count())
+            .filter_map(|index| self.get_move(index))
+            .collect()
     }
 }
 
@@ -99,41 +105,3 @@ fn u8_slice_to_u16_le(slice: &[u8]) -> Vec<u16> {
         .map(|chunk| u16::from_le_bytes([chunk[0], chunk[1]]))
         .collect()
 }
-
-// #[derive(Debug, Clone, Copy)]
-// pub struct Learnsets<const LENGTH: usize>(&'static [u8; LENGTH]);
-
-// impl<const LENGTH: usize> Learnsets<LENGTH> {
-//     pub fn from_pkl_bytes(bytes: &'static [u8; LENGTH]) -> Self {
-//         Self(bytes)
-//     }
-
-//     pub fn get_learnset_by_game_index(&self, game_index: u16) -> Option<Learnset> {
-//         if game_index as usize >= self.count() {
-//             return None;
-//         }
-
-//         let move_indices_raw = u8_slice_to_u16_le(&self.0[..self.moves_span_size()]);
-//         let levels = &self.0[self.moves_span_size()..];
-
-//         let offset = (game_index as usize) * 3; // 2 bytes per move, 1 byte per level
-//         LearnsetMoves::from_pkl_bytes(&self.0[offset..offset + 3])
-//     }
-
-//     pub const fn count(&self) -> usize {
-//         LENGTH / 3
-//     }
-
-//     const fn moves_span_size(&self) -> usize {
-//         self.count() * 2
-//     }
-// }
-
-// #[derive(Debug, Clone, Copy)]
-// pub struct Learnset(&'static [u8]);
-
-// impl Learnset {
-//     pub fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
-//         Self(bytes)
-//     }
-// }

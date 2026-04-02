@@ -19,7 +19,7 @@ use tsify::Tsify;
 
 use crate::{
     ExpectLog,
-    levelup::LearnsetMoves,
+    levelup::LearnsetReader,
     log,
     species::form_metadata::{
         gen1::{METADATA_TABLE_RED_BLUE, METADATA_TABLE_YELLOW},
@@ -309,7 +309,7 @@ pub trait MetadataTable {
 
     fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16>;
 
-    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&LearnsetMoves>;
+    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<LearnsetReader>;
 
     fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats>;
 
@@ -333,7 +333,7 @@ where
         (**self).get_game_index(national_dex, forme_index)
     }
 
-    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&LearnsetMoves> {
+    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<LearnsetReader> {
         (**self).get_levelup_learnset(national_dex, forme_index)
     }
 
@@ -385,7 +385,7 @@ impl MetadataTableReader {
             .expect_log(READER_SHOULD_BE_VALID)
     }
 
-    pub fn get_levelup_learnset(&self) -> &LearnsetMoves {
+    pub fn get_levelup_learnset(&self) -> LearnsetReader {
         self.inner
             .get_levelup_learnset(self.national_dex, self.forme_index)
             .expect_log(READER_SHOULD_BE_VALID)
@@ -545,7 +545,7 @@ pub fn levelup_learnset_lookup(
     national_dex: u16,
     forme_index: u16,
     source: MetadataSource,
-) -> Option<&'static LearnsetMoves> {
+) -> Option<LearnsetReader> {
     metadata_table_by_source(source).get_levelup_learnset(national_dex, forme_index)
 }
 

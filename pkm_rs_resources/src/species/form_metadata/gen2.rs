@@ -2,7 +2,7 @@ use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
 use crate::{
     ExpectLog,
-    levelup::LearnsetMoves,
+    levelup::{LearnsetFileReader, LearnsetReader},
     species::form_metadata::{BaseStats, MetadataTable, PersonalInfo, PersonalTable},
 };
 
@@ -17,18 +17,20 @@ const GOLD_SILVER_LEVELUP_FILE_SIZE: usize = 7131;
 const GOLD_SILVER_LEVELUP_BYTES: &[u8; GOLD_SILVER_LEVELUP_FILE_SIZE] =
     include_bytes!("pkhex_bin/levelup/lvlmove_gs.pkl");
 
+const CRYSTAL_LEVELUP_FILE_SIZE: usize = 7155;
+const CRYSTAL_LEVELUP_BYTES: &[u8; CRYSTAL_LEVELUP_FILE_SIZE] =
+    include_bytes!("pkhex_bin/levelup/lvlmove_c.pkl");
+
 const GEN2_SILVER_ENTRY_SIZE: usize = 0x20;
 
 pub static METADATA_TABLE_GOLD_SILVER: MetadataTableGen2 = MetadataTableGen2 {
     personal: PersonalTableGen2::from_pkl_bytes(GOLD_SILVER_PERSONAL_BYTES),
-    learnsets: vec![],
-    // learnsets: LearnsetMoves::all_from_pkl_bytes(GOLD_SILVER_LEVELUP_BYTES),
+    learnsets: LearnsetFileReader::from_pkl_bytes(GOLD_SILVER_LEVELUP_BYTES),
 };
 
 pub static METADATA_TABLE_CRYSTAL: MetadataTableGen2 = MetadataTableGen2 {
     personal: PersonalTableGen2::from_pkl_bytes(CRYSTAL_PERSONAL_BYTES),
-    learnsets: vec![],
-    // learnsets: LearnsetMoves::all_from_pkl_bytes(CRYSTAL_LEVELUP_BYTES),
+    learnsets: LearnsetFileReader::from_pkl_bytes(CRYSTAL_LEVELUP_BYTES),
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -88,7 +90,7 @@ pub type PersonalTableGen2 =
 #[derive(Debug)]
 pub struct MetadataTableGen2 {
     personal: PersonalTableGen2,
-    learnsets: Vec<LearnsetMoves>,
+    learnsets: LearnsetFileReader,
 }
 
 impl MetadataTable for MetadataTableGen2 {
@@ -100,9 +102,9 @@ impl MetadataTable for MetadataTableGen2 {
         self.personal.get_game_index(national_dex, forme_index)
     }
 
-    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&LearnsetMoves> {
+    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<LearnsetReader> {
         self.learnsets
-            .get(self.get_game_index(national_dex, forme_index)? as usize)
+            .learnset_at_index(self.get_game_index(national_dex, forme_index)?)
     }
 
     fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {

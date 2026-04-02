@@ -2,7 +2,7 @@ use pkm_rs_types::{PkmType, StatsPreSplit};
 
 use crate::{
     ExpectLog,
-    levelup::LearnsetMoves,
+    levelup::{LearnsetFileReader, LearnsetReader},
     species::form_metadata::{BaseStats, MetadataTable, PersonalInfo, PersonalTable},
 };
 
@@ -25,14 +25,12 @@ const GEN1_ENTRY_SIZE: usize = 0x1c;
 
 pub static METADATA_TABLE_RED_BLUE: MetadataTableGen1 = MetadataTableGen1 {
     personal: PersonalTableGen1::from_pkl_bytes(RED_BLUE_PERSONAL_BYTES),
-    learnsets: vec![],
-    // learnsets: LearnsetMoves::all_from_pkl_bytes(RED_BLUE_LEVELUP_BYTES),
+    learnsets: LearnsetFileReader::from_pkl_bytes(RED_BLUE_LEVELUP_BYTES),
 };
 
 pub static METADATA_TABLE_YELLOW: MetadataTableGen1 = MetadataTableGen1 {
     personal: PersonalTableGen1::from_pkl_bytes(YELLOW_PERSONAL_BYTES),
-    learnsets: vec![],
-    // learnsets: LearnsetMoves::all_from_pkl_bytes(YELLOW_LEVELUP_BYTES),
+    learnsets: LearnsetFileReader::from_pkl_bytes(YELLOW_LEVELUP_BYTES),
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -87,7 +85,7 @@ pub type PersonalTableGen1 =
 #[derive(Debug)]
 pub struct MetadataTableGen1 {
     personal: PersonalTableGen1,
-    learnsets: Vec<LearnsetMoves>,
+    learnsets: LearnsetFileReader,
 }
 
 impl MetadataTable for MetadataTableGen1 {
@@ -99,9 +97,9 @@ impl MetadataTable for MetadataTableGen1 {
         self.personal.get_game_index(national_dex, forme_index)
     }
 
-    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&LearnsetMoves> {
+    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<LearnsetReader> {
         self.learnsets
-            .get(self.get_game_index(national_dex, forme_index)? as usize)
+            .learnset_at_index(self.get_game_index(national_dex, forme_index)?)
     }
 
     fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {

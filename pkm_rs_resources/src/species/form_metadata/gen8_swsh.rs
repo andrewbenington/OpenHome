@@ -1,7 +1,7 @@
 use pkm_rs_types::{PkmType, Stats8};
 
 use crate::{
-    levelup::LearnsetMoves,
+    levelup::{LearnsetFileReader, LearnsetReader},
     species::form_metadata::{BaseStats, MetadataTable, PersonalInfo, PersonalTable},
 };
 
@@ -18,7 +18,7 @@ const SWSH_ENTRY_SIZE: usize = 0xB0;
 
 pub static METADATA_TABLE_SWSH: MetadataTableSwordShield = MetadataTableSwordShield {
     personal: PersonalTableSwordShield::from_pkl_bytes(SWSH_PERSONAL_BYTES),
-    learnsets: vec![],
+    learnsets: LearnsetFileReader::from_pkl_bytes(SWSH_LEVELUP_BYTES),
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -89,7 +89,7 @@ type PersonalTableSwordShield =
 #[derive(Debug)]
 pub struct MetadataTableSwordShield {
     personal: PersonalTableSwordShield,
-    learnsets: Vec<LearnsetMoves>,
+    learnsets: LearnsetFileReader,
 }
 
 impl MetadataTable for MetadataTableSwordShield {
@@ -101,9 +101,9 @@ impl MetadataTable for MetadataTableSwordShield {
         self.personal.get_game_index(national_dex, forme_index)
     }
 
-    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&LearnsetMoves> {
+    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<LearnsetReader> {
         self.learnsets
-            .get(self.get_game_index(national_dex, forme_index)? as usize)
+            .learnset_at_index(self.get_game_index(national_dex, forme_index)?)
     }
 
     fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {

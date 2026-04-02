@@ -1,7 +1,7 @@
 use pkm_rs_types::{PkmType, Stats8};
 
 use crate::{
-    levelup::LearnsetMoves,
+    levelup::{LearnsetFileReader, LearnsetReader},
     species::form_metadata::{BaseStats, MetadataTable, PersonalInfo, PersonalTable},
 };
 
@@ -10,15 +10,13 @@ const ZA_PERSONAL_FILE_SIZE: usize = 115600;
 const ZA_PERSONAL_BYTES: &[u8; ZA_PERSONAL_FILE_SIZE] =
     include_bytes!("pkhex_bin/personal/personal_za");
 
-const ZA_LEVELUP_FILE_SIZE: usize = 27312;
 const ZA_LEVELUP_BYTES: &[u8] = include_bytes!("pkhex_bin/levelup/lvlmove_za.pkl");
 
 const ZA_ENTRY_SIZE: usize = 0x50;
 
 pub static METADATA_TABLE_ZA: MetadataTableLegendsZa = MetadataTableLegendsZa {
     personal: PersonalTableLegendsZa::from_pkl_bytes(ZA_PERSONAL_BYTES),
-    learnsets: vec![],
-    // learnsets: LearnsetMoves::all_from_pkl_bytes(ZA_LEVELUP_BYTES),
+    learnsets: LearnsetFileReader::from_pkl_bytes(ZA_LEVELUP_BYTES),
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -88,7 +86,7 @@ pub type PersonalTableLegendsZa =
 #[derive(Debug)]
 pub struct MetadataTableLegendsZa {
     personal: PersonalTableLegendsZa,
-    learnsets: Vec<LearnsetMoves>,
+    learnsets: LearnsetFileReader,
 }
 
 impl MetadataTable for MetadataTableLegendsZa {
@@ -100,9 +98,9 @@ impl MetadataTable for MetadataTableLegendsZa {
         self.personal.get_game_index(national_dex, forme_index)
     }
 
-    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<&LearnsetMoves> {
+    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<LearnsetReader> {
         self.learnsets
-            .get(self.get_game_index(national_dex, forme_index)? as usize)
+            .learnset_at_index(self.get_game_index(national_dex, forme_index)?)
     }
 
     fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {

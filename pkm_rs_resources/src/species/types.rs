@@ -4,7 +4,7 @@ use strum_macros::{Display, EnumString};
 use crate::{
     Error, ExpectLog, Result,
     abilities::AbilityIndex,
-    levelup::LearnsetMoves,
+    levelup::{LearnsetMoveJs, LearnsetReader},
     log,
     species::{
         ALL_SPECIES,
@@ -18,11 +18,11 @@ use pkm_rs_types::{GameSetting, Generation, PkmType, TeraType};
 use serde::{Serialize, Serializer};
 
 #[cfg(feature = "wasm")]
+use crate::species::form_metadata::current_base_stats;
+#[cfg(feature = "wasm")]
 use crate::species::form_metadata::{BaseStats, base_stats_lookup};
 #[cfg(feature = "wasm")]
 use crate::stats::Stat;
-#[cfg(feature = "wasm")]
-use crate::{levelup::LearnsetMoveJs, species::form_metadata::current_base_stats};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{Gender, Stats8};
 #[cfg(feature = "wasm")]
@@ -621,14 +621,14 @@ impl FormeMetadata {
 
     #[wasm_bindgen(js_name = levelUpLearnset)]
     pub fn level_up_learnset(&self, source: MetadataSource) -> Option<Vec<LearnsetMoveJs>> {
-        let learnset_moves_js = self
-            .forme_ref()
-            .get_levelup_learnset(source)?
-            .moves
-            .iter()
-            .map(|learnset_move| LearnsetMoveJs::from(*learnset_move))
-            .collect();
-        Some(learnset_moves_js)
+        Some(
+            self.forme_ref()
+                .get_levelup_learnset(source)?
+                .all_moves()
+                .into_iter()
+                .map(LearnsetMoveJs::from)
+                .collect(),
+        )
     }
 }
 
@@ -760,7 +760,7 @@ impl SpeciesAndForme {
         self.forme_index
     }
 
-    pub fn get_levelup_learnset(&self, source: MetadataSource) -> Option<&'static LearnsetMoves> {
+    pub fn get_levelup_learnset(&self, source: MetadataSource) -> Option<LearnsetReader> {
         levelup_learnset_lookup(self.national_dex.get(), self.forme_index, source)
     }
 }
