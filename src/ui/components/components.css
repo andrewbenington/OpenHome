@@ -56,6 +56,15 @@
   padding: 1px;
 }
 
+.number-cell {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: end;
+  padding: 1px 8px 1px 1px;
+  font-family: monospace;
+}
+
 .mono-cell {
   font-family: monospace;
 }
