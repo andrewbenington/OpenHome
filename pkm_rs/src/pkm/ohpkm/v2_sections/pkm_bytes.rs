@@ -132,7 +132,7 @@ pub enum PkmBytes {
 const LENGTH_CHECKED_MESSAGE: &str = "data length checked above";
 
 impl PkmBytes {
-    const fn data_as_bytes(&self) -> &[u8] {
+    pub const fn data_as_bytes(&self) -> &[u8] {
         let bytes: &[u8] = match self {
             Self::Pk1(bytes) => bytes,
             Self::Pk2(bytes) => bytes,
@@ -155,7 +155,7 @@ impl PkmBytes {
         bytes
     }
 
-    const fn tag(&self) -> Tag {
+    pub const fn tag(&self) -> Tag {
         match self {
             Self::Pk1(_) => Tag::Pk1,
             Self::Pk2(_) => Tag::Pk2,
@@ -243,6 +243,14 @@ pub struct OriginalBackup(PkmBytes);
 impl OriginalBackup {
     pub const fn new(pkm_bytes: PkmBytes) -> Self {
         Self(pkm_bytes)
+    }
+
+    pub const fn tag(&self) -> Tag {
+        self.0.tag()
+    }
+
+    pub const fn data_as_bytes(&self) -> &[u8] {
+        self.0.data_as_bytes()
     }
 }
 

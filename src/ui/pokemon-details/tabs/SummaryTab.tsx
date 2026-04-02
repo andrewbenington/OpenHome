@@ -20,6 +20,7 @@ import { PKM } from '@pokemon-files/pkm/PKM'
 import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
+import { OHPKM } from 'src/core/pkm/OHPKM'
 import { MonTag } from 'src/ui/util/tags'
 import { TagIcon } from '../../components/TagIcon'
 import useMonSprite from '../useMonSprite'
@@ -28,7 +29,11 @@ type MonWithManagementData = PKMInterface & {
   tags?: MonTag[]
 }
 
-const SummaryDisplay = (props: { mon: PKMInterface }) => {
+type SummaryDisplayProps = {
+  mon: PKMInterface
+}
+
+const SummaryDisplay = (props: SummaryDisplayProps) => {
   const { mon } = props
   const tags = useMemo(() => {
     return (mon as MonWithManagementData).tags ?? []
@@ -151,6 +156,9 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
               color="white"
               backgroundColor="#f2352d"
             />
+          )}
+          {mon instanceof OHPKM && mon.unconvertedPkm && (
+            <AttributeTag label="Has Unconverted PKM" color="white" backgroundColor="blue" />
           )}
           {mon.isNoble && <AttributeTag label="NOBLE" backgroundColor="#cccc00" color="white" />}
           {'isShadow' in mon && (mon.isShadow as boolean) && (

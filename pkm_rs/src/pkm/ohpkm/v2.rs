@@ -137,6 +137,7 @@ impl SectionTagV2 {
             0x0B => Some(Self::MostRecentSave),
             0x0C => Some(Self::Tag),
             0x0D => Some(Self::OriginalBackup),
+            0x0E => Some(Self::UnconvertedPkm),
             _ => None,
         }
     }
@@ -1895,8 +1896,11 @@ impl OhpkmV2 {
 
     // Original Data
     #[wasm_bindgen(getter = originalData)]
-    pub fn original_data(&self) -> Option<Vec<u8>> {
-        self.original_data?.to_bytes().ok()
+    pub fn original_data(&self) -> Option<OriginalDataJs> {
+        self.original_data.map(|d| OriginalDataJs {
+            tag: d.tag(),
+            data: d.data_as_bytes().to_vec(),
+        })
     }
 
     #[wasm_bindgen(js_name = trySetOriginalData)]
@@ -1970,6 +1974,14 @@ impl OhpkmV2 {
 }
 
 #[cfg(feature = "wasm")]
+#[wasm_bindgen]
+pub struct OriginalDataJs {
+    pub tag: pkm_bytes::Tag,
+    #[wasm_bindgen(getter_with_clone)]
+    pub data: Vec<u8>,
+}
+
+#[cfg(feature = "wasm")]
 fn add_section_bytes_to_js_object<T: DataSection<ErrorType = Error>>(
     obj: &js_sys::Object,
     section: &Option<T>,
@@ -1984,4 +1996,36 @@ fn add_section_bytes_to_js_object<T: DataSection<ErrorType = Error>>(
         )?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn build_all_ohpkms() -> std::result::Result<(), String> {
+        let path = "/Users/andrewbenington/Library/Application Support/OpenHome/storage/mons_v2";
+        for entry in std::fs::read_dir(path).unwrap() {
+            let entry = entry.unwrap();
+            if !entry
+                .file_name()
+                .into_string()
+                .map(|s| s.ends_with(".ohpkm"))
+                .unwrap_or(false)
+            {
+                continue;
+            }
+            let data = std::fs::read(entry.path()).unwrap();
+            println!(
+                "Testing file: {}",
+                entry.path().file_name().unwrap().to_string_lossy()
+            );
+            OhpkmV2::from_bytes(&data).map_err(|e| {
+                format!(
+                    "failed to build ohpkm file {}: {e}",
+                    entry.path().file_name().unwrap().to_string_lossy()
+                )
+            })?;
+        }
+        Ok(())
+    }
 }

@@ -982,7 +982,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     )
   }
 }
-function monFormatToOriginalDataTag(format: string): Option<Tag> {
+
+export function monFormatToOriginalDataTag(format: string): Option<Tag> {
   switch (format) {
     case 'PK1':
       return Tag.Pk1
@@ -1012,6 +1013,43 @@ function monFormatToOriginalDataTag(format: string): Option<Tag> {
       return Tag.Pa9
     default:
       return undefined
+  }
+}
+
+export function originalDataTagToMonFormat(tag: Tag): string {
+  switch (tag) {
+    case Tag.Pk1:
+      return 'PK1'
+    case Tag.Pk2:
+      return 'PK2'
+    case Tag.Pk3:
+      return 'PK3'
+    case Tag.Pk4:
+      return 'PK4'
+    case Tag.Pk5:
+      return 'PK5'
+    case Tag.Pk6:
+      return 'PK6'
+    case Tag.Pk7:
+      return 'PK7'
+    case Tag.Pb7:
+      return 'PB7'
+    case Tag.Pk8:
+      return 'PK8'
+    case Tag.Pa8:
+      return 'PA8'
+    case Tag.Pb8:
+      return 'PB8'
+    case Tag.Pk9:
+      return 'PK9'
+    case Tag.Pa9:
+      return 'PA9'
+    case Tag.Pa8Lumi:
+      return 'PA8LUMI'
+    case Tag.Pk3Rr:
+      return 'PK3RR'
+    case Tag.Pk3Ub:
+      return 'PK3UB'
   }
 }
 
