@@ -57,7 +57,13 @@ import {
   trainerMemoryToWasm,
 } from './convert'
 import { isEvolution } from './Lookup'
-import { adjustMovePPBetweenFormats, generateIVs, getAbilityFromNumber, ivsFromDVs } from './util'
+import {
+  adjustMovePPBetweenFormats,
+  generateIVs,
+  getAbilityFromNumber,
+  getPrevos,
+  ivsFromDVs,
+} from './util'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getName() {
@@ -691,6 +697,23 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
     errorsFound = false
 
+    if (
+      isPrevoSpeciesName(this.dexNum, this.formeNum, this.nickname) &&
+      this.metadata?.speciesName
+    ) {
+      this.nickname = this.metadata.speciesName
+      this.isNicknamed = false
+      errorsFound = true
+    }
+
+    if (
+      this.nickname.toLocaleUpperCase() === this.metadata?.speciesName.toLocaleUpperCase() &&
+      this.isNicknamed
+    ) {
+      this.isNicknamed = false
+      errorsFound = true
+    }
+
     return errorsFound
   }
 
@@ -709,6 +732,22 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (this.dexNum === other.dexNum || isEvolution(this, other)) {
       this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
       this.extraFormIndex = other.extraFormIndex
+    }
+
+    // Don't update nickname if the only difference is that it's a truncated version of the original
+    if (
+      other.nickname !== this.nickname &&
+      other.nickname !== this.nickname.slice(0, 10) &&
+      !isPrevoSpeciesName(this.dexNum, this.formeNum, other.nickname)
+    ) {
+      this.nickname = other.nickname
+    }
+
+    if (
+      isPrevoSpeciesName(this.dexNum, this.formeNum, this.nickname) &&
+      this.metadata?.speciesName
+    ) {
+      this.nickname = this.metadata.speciesName
     }
 
     this.heldItemIndex = other.heldItemIndex
@@ -878,10 +917,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (other.obedienceLevel !== undefined) {
       this.obedienceLevel = other.obedienceLevel
     }
-
-    if (save && save.origin >= OriginGame.Sword) {
-      this.nickname = other.nickname
-    }
   }
 
   private abilityNumMatchesIndex(): boolean {
@@ -944,3 +979,12 @@ const HIDDEN_ABILITY: AbilityNum = 4
 const FORMATS_WITHOUT_ABILITIES = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
 
 const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
+
+function isPrevoSpeciesName(dexNum: number, formeNum: number, nickname: string): boolean {
+  for (const prevo of getPrevos(dexNum, formeNum)) {
+    if (nickname.toUpperCase() === prevo.speciesName.toUpperCase()) {
+      return true
+    }
+  }
+  return false
+}
