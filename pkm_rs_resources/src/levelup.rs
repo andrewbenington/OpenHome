@@ -1,10 +1,9 @@
 use crate::moves::MoveSlot;
 
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
+use pkm_rs_types::pkl_file::PklFileData;
 
 #[cfg(feature = "wasm")]
-use pkm_rs_types::pkl_file::PklFileData;
+use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LearnsetCondition {

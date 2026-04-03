@@ -14,11 +14,15 @@ pub mod gen9_za;
 
 use std::marker::PhantomData;
 
-use pkm_rs_types::{NationalDex, OriginGame, OriginMark, PkmType, Stats8, StatsPreSplit};
-use serde::{Deserialize, Serialize};
+use pkm_rs_types::{NationalDex, OriginGame, PkmType, Stats8, StatsPreSplit};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "wasm")]
+use pkm_rs_types::OriginMark;
+#[cfg(feature = "wasm")]
+use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "wasm")]
 use tsify::Tsify;
@@ -26,20 +30,23 @@ use tsify::Tsify;
 use crate::{
     ExpectLog,
     levelup::LearnsetReader,
-    species::form_metadata::{
-        gen1::{METADATA_TABLE_RED_BLUE, METADATA_TABLE_YELLOW},
-        gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GOLD_SILVER},
-        gen3::{METADATA_TABLE_EMERALD, METADATA_TABLE_FRLG, METADATA_TABLE_RUBY_SAPPHIRE},
-        gen4::{METADATA_TABLE_DIAMOND_PEARL, METADATA_TABLE_HGSS, METADATA_TABLE_PLATINUM},
-        gen5::{METADATA_TABLE_B2W2, METADATA_TABLE_BW},
-        gen6::{METADATA_TABLE_ORAS, METADATA_TABLE_XY},
-        gen7_alola::{METADATA_TABLE_SUN_MOON, METADATA_TABLE_USUM},
-        gen7_lgpe::METADATA_TABLE_LGPE,
-        gen8_bdsp::METADATA_TABLE_BDSP,
-        gen8_la::METADATA_TABLE_LA,
-        gen8_swsh::METADATA_TABLE_SWSH,
-        gen9_sv::{METADATA_TABLE_SV, MetadataTableScarletViolet},
-        gen9_za::METADATA_TABLE_ZA,
+    species::{
+        form,
+        form_metadata::{
+            gen1::{METADATA_TABLE_RED_BLUE, METADATA_TABLE_YELLOW},
+            gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GOLD_SILVER},
+            gen3::{METADATA_TABLE_EMERALD, METADATA_TABLE_FRLG, METADATA_TABLE_RUBY_SAPPHIRE},
+            gen4::{METADATA_TABLE_DIAMOND_PEARL, METADATA_TABLE_HGSS, METADATA_TABLE_PLATINUM},
+            gen5::{METADATA_TABLE_B2W2, METADATA_TABLE_BW},
+            gen6::{METADATA_TABLE_ORAS, METADATA_TABLE_XY},
+            gen7_alola::{METADATA_TABLE_SUN_MOON, METADATA_TABLE_USUM},
+            gen7_lgpe::METADATA_TABLE_LGPE,
+            gen8_bdsp::METADATA_TABLE_BDSP,
+            gen8_la::METADATA_TABLE_LA,
+            gen8_swsh::METADATA_TABLE_SWSH,
+            gen9_sv::METADATA_TABLE_SV,
+            gen9_za::METADATA_TABLE_ZA,
+        },
     },
 };
 
@@ -127,6 +134,7 @@ impl MetadataSource {
     }
 }
 
+#[cfg(feature = "wasm")]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct MetadataSources;
 
@@ -145,6 +153,7 @@ impl MetadataSources {
     }
 }
 
+#[cfg(feature = "wasm")]
 pub const METADATA_SOURCES: [MetadataSource; 22] = [
     MetadataSource::RedBlue,
     MetadataSource::Yellow,
@@ -170,6 +179,7 @@ pub const METADATA_SOURCES: [MetadataSource; 22] = [
     MetadataSource::LegendsZa,
 ];
 
+#[cfg(feature = "wasm")]
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "allMetadataSources"))]
 pub fn all_metadata_sources() -> Vec<MetadataSource> {
     METADATA_SOURCES.to_vec()
@@ -417,22 +427,39 @@ pub fn metadata_reader_for(
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "currentMetadataReader"))]
 pub fn current_metadata_reader(national_dex: u16, forme_index: u16) -> Option<MetadataTableReader> {
     MetadataTableReader::new(
-        Box::new(current_metadata_table()),
+        Box::new(most_recent_metadata_table_for(national_dex, forme_index)),
         national_dex,
         forme_index,
     )
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
-#[tsify(into_wasm_abi, from_wasm_abi)]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BaseStats {
     PreSplit(StatsPreSplit),
     Modern(Stats8),
 }
 
-fn current_metadata_table() -> &'static MetadataTableScarletViolet {
-    &METADATA_TABLE_SV
+fn most_recent_metadata_table_for(
+    national_dex: u16,
+    forme_index: u16,
+) -> &'static dyn MetadataTable {
+    if METADATA_TABLE_SV.form_is_present(national_dex, forme_index) {
+        &METADATA_TABLE_SV
+    } else if METADATA_TABLE_ZA.form_is_present(national_dex, forme_index) {
+        &METADATA_TABLE_ZA
+    } else if METADATA_TABLE_BDSP.form_is_present(national_dex, forme_index) {
+        &METADATA_TABLE_BDSP
+    } else if METADATA_TABLE_SWSH.form_is_present(national_dex, forme_index) {
+        &METADATA_TABLE_SWSH
+    } else if METADATA_TABLE_LGPE.form_is_present(national_dex, forme_index) {
+        &METADATA_TABLE_LGPE
+    } else if national_dex == NationalDex::Pichu as u16 && forme_index == form::PICHU_SPIKY_EARED {
+        &METADATA_TABLE_HGSS
+    } else {
+        &METADATA_TABLE_USUM
+    }
 }
 
 pub fn base_stats_lookup(
@@ -444,7 +471,7 @@ pub fn base_stats_lookup(
 }
 
 pub fn current_base_stats(national_dex: u16, forme_index: u16) -> Option<Stats8> {
-    current_metadata_table()
+    most_recent_metadata_table_for(national_dex, forme_index)
         .get_base_stats(national_dex, forme_index)
         .map(|base_stats| match base_stats {
             BaseStats::PreSplit(_) => {
@@ -468,10 +495,6 @@ pub fn source_has_form_metadata(
     forme_index: u16,
 ) -> bool {
     metadata_table_by_source(source).form_is_present(national_dex, forme_index)
-}
-
-pub fn types_lookup(national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-    current_metadata_table().get_types(national_dex, forme_index)
 }
 
 fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTable {
@@ -501,33 +524,41 @@ fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTabl
     }
 }
 
-pub fn types_lookup_with_source(
+pub fn types_lookup(
     national_dex: u16,
     forme_index: u16,
-    source: MetadataSource,
+    source: Option<MetadataSource>,
 ) -> Option<(PkmType, Option<PkmType>)> {
-    metadata_table_by_source(source).get_types(national_dex, forme_index)
+    match source {
+        Some(source) => metadata_table_by_source(source).get_types(national_dex, forme_index),
+        None => most_recent_metadata_table_for(national_dex, forme_index)
+            .get_types(national_dex, forme_index),
+    }
 }
 
 pub fn levelup_learnset_lookup(
     national_dex: u16,
     forme_index: u16,
-    source: MetadataSource,
+    source: Option<MetadataSource>,
 ) -> Option<LearnsetReader> {
-    metadata_table_by_source(source).get_levelup_learnset(national_dex, forme_index)
+    match source {
+        Some(source) => {
+            metadata_table_by_source(source).get_levelup_learnset(national_dex, forme_index)
+        }
+        None => most_recent_metadata_table_for(national_dex, forme_index)
+            .get_levelup_learnset(national_dex, forme_index),
+    }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-    use pkm_rs_types::{Generation, NationalDex, PkmType, Stats8};
+    use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
     use crate::species::{
-        FormeMetadata, NATIONAL_DEX_MAX, NatDexIndex,
-        form_metadata::{BaseStats, MetadataSource},
+        FormeMetadata, NATIONAL_DEX_MAX, NatDexIndex, form_metadata::MetadataSource,
     };
 
-    const PICHU_SPIKY_EARED: u16 = 1;
     const ARCEUS_LEGEND: u16 = 18;
 
     const METADATA_SOURCES_IMPLEMENTED: [MetadataSource; 22] = [
@@ -559,10 +590,9 @@ mod test {
         metadata_table_by_source(source).form_is_present(national_dex, forme_index)
     }
 
-    fn present_in_scarlet_violet(form: &FormeMetadata) -> bool {
+    fn form_has_current_data(form: &FormeMetadata) -> bool {
         !(form.forme_name.contains("Totem")
-            || (form.is_mega && form.introduced == Generation::G9) // Legends Z-A introduced mega evolutions
-            || (form.national_dex.get() == NationalDex::Pichu && form.forme_index == PICHU_SPIKY_EARED)
+        || (form.national_dex.get() == NationalDex::Xerneas && form.forme_index == 1) // Active Xerneas
             || (form.national_dex.get() == NationalDex::Arceus && form.forme_index == ARCEUS_LEGEND))
     }
 
@@ -574,7 +604,7 @@ mod test {
                 .expect("1-1025 are valid national dex indices")
                 .get_species_metadata();
             for form in species_metadata.formes {
-                if !present_in_scarlet_violet(form) {
+                if !form_has_current_data(form) {
                     continue;
                 }
                 callback(form)?;
@@ -594,7 +624,7 @@ mod test {
     #[test]
     fn test_get_types() {
         assert_eq!(
-            super::types_lookup(NationalDex::Pikachu as u16, 0),
+            super::types_lookup(NationalDex::Pikachu as u16, 0, None),
             Some((PkmType::Electric, None))
         );
     }
@@ -602,7 +632,7 @@ mod test {
     #[test]
     fn all_forms_have_types() -> Result<(), String> {
         try_all_forms(|form| {
-            super::types_lookup(form.national_dex.get(), form.forme_index)
+            super::types_lookup(form.national_dex.get(), form.forme_index, None)
                 .ok_or(format!("Missing types for {}", form.forme_name))?;
             Ok(())
         })
@@ -612,8 +642,9 @@ mod test {
     fn no_form_duplicates_type() -> Result<(), String> {
         try_all_forms(|form| {
             let form_name = &form.forme_name;
-            let (type1, type2) = super::types_lookup(form.national_dex.get(), form.forme_index)
-                .ok_or(format!("Missing types for {form_name}"))?;
+            let (type1, type2) =
+                super::types_lookup(form.national_dex.get(), form.forme_index, None)
+                    .ok_or(format!("Missing types for {form_name}"))?;
             if let Some(type2) = type2
                 && type1 == type2
             {
@@ -630,40 +661,21 @@ mod test {
     fn no_zero_stats() -> Result<(), String> {
         try_all_forms(|form| {
             let form_name = &form.forme_name;
-            let stats = super::base_stats_lookup(
-                form.national_dex.get(),
-                form.forme_index,
-                MetadataSource::ScarletViolet,
-            )
-            .ok_or(format!("Missing stats for {form_name}"))?;
-            match stats {
-                BaseStats::PreSplit(stats) => {
-                    if stats.hp == 0
-                        || stats.atk == 0
-                        || stats.def == 0
-                        || stats.spc == 0
-                        || stats.spe == 0
-                    {
-                        return Err(format!(
-                            "Form {form_name} has one or more zero base stats: {stats:?}"
-                        ));
-                    }
-                }
-                BaseStats::Modern(stats) => {
-                    if stats.hp == 0
-                        || stats.atk == 0
-                        || stats.def == 0
-                        || stats.spa == 0
-                        || stats.spd == 0
-                        || stats.spe == 0
-                    {
-                        return Err(format!(
-                            "Form {form_name} has one or more zero base stats: {stats:?}"
-                        ));
-                    }
-                }
-            };
-            Ok(())
+            let stats = super::current_base_stats(form.national_dex.get(), form.forme_index)
+                .ok_or(format!("Missing stats for {form_name}"))?;
+            if stats.hp == 0
+                || stats.atk == 0
+                || stats.def == 0
+                || stats.spa == 0
+                || stats.spd == 0
+                || stats.spe == 0
+            {
+                Err(format!(
+                    "Form {form_name} has one or more zero base stats: {stats:?}"
+                ))
+            } else {
+                Ok(())
+            }
         })
     }
 

@@ -7,6 +7,7 @@ import { usePokedex } from '@openhome-ui/state/pokedex'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import {
   allMetadataSources,
+  currentMetadataReader,
   FormeMetadata,
   metadataReaderFor,
   MetadataSource,
@@ -281,18 +282,23 @@ type PokedexMetadataProps = {
   selectedForme: FormeMetadata
   setSelectedForme: (forme?: FormeMetadata) => void
   setSelectedSpecies: (species?: SpeciesMetadata) => void
-  metadataSource: MetadataSource
+  metadataSource?: MetadataSource
 }
 
 function PokedexMain(props: PokedexMetadataProps) {
   const { pokedex, species, selectedForme, setSelectedForme, setSelectedSpecies, metadataSource } =
     props
 
-  const reader = metadataReaderFor(metadataSource, species.nationalDex, selectedForme.formeIndex)
+  const reader = metadataSource
+    ? metadataReaderFor(metadataSource, species.nationalDex, selectedForme.formeIndex)
+    : currentMetadataReader(species.nationalDex, selectedForme.formeIndex)
   if (!reader) {
+    const message = metadataSource
+      ? `No metadata available for this Pokémon in Pokémon ${MetadataSources.display(metadataSource)}.`
+      : 'No metadata available for this Pokémon.'
     return (
       <Flex width="100%" height="100%" align="center" justify="center">
-        <Text>No metadata available for this Pokémon.</Text>
+        <Text>{message}</Text>
       </Flex>
     )
   }
@@ -300,7 +306,6 @@ function PokedexMain(props: PokedexMetadataProps) {
   const type1 = reader.type1()
   const type2 = reader.type2()
   const stats = reader.baseStats()
-  console.log({ type1, type2, stats })
 
   return (
     <>

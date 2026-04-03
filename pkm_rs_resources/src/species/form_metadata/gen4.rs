@@ -55,7 +55,7 @@ impl PersonalInfoGen4 {
         Self(
             bytes
                 .try_into()
-                .expect_log("bad length for PersonalInfoGen3"),
+                .expect_log("bad length for PersonalInfoGen4"),
         )
     }
 
@@ -63,7 +63,7 @@ impl PersonalInfoGen4 {
         Stats8::from_bytes(
             self.0[0..6]
                 .try_into()
-                .expect_log("bad length for PersonalInfoGen3::stats"),
+                .expect_log("bad length for PersonalInfoGen4::stats"),
         )
     }
 
@@ -71,7 +71,13 @@ impl PersonalInfoGen4 {
         if form_index == 0 {
             return Some(national_dex);
         }
+
+        // Spiky Eared Pichu's metadata is zeroed out, so if this is HGSS return Pichu's data.
         if Self::supports_form(national_dex, form_index)
+            && national_dex == NationalDex::Pichu as u16
+        {
+            Some(NationalDex::Pichu as u16)
+        } else if Self::supports_form(national_dex, form_index)
             && let Some(forms_offset) = self.forms_offset()
             && form_index < self.form_count() as u16
         {
@@ -142,7 +148,7 @@ impl PersonalInfo for PersonalInfoGen4 {
     }
 
     fn source_name(&self) -> &'static str {
-        "Black/White"
+        "Gen 4"
     }
 }
 

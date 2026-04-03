@@ -1,4 +1,4 @@
-mod form_metadata;
+pub mod form_metadata;
 mod metadata;
 mod types;
 

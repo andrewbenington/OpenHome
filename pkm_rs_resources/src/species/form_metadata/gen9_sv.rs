@@ -54,6 +54,9 @@ impl PersonalInfoScarletViolet {
     }
 
     pub fn game_index_for_form(&self, national_dex: u16, form_index: u16) -> Option<u16> {
+        if !self.is_present_in_game() {
+            return None;
+        }
         if form_index == 0 {
             return Some(national_dex);
         }
@@ -68,6 +71,10 @@ impl PersonalInfoScarletViolet {
 
     pub const fn form_count(&self) -> u8 {
         self.0[0x1A]
+    }
+
+    pub const fn is_present_in_game(&self) -> bool {
+        self.0[0x1C] == 1
     }
 }
 

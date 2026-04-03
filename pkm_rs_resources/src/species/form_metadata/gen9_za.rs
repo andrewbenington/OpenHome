@@ -113,3 +113,15 @@ impl MetadataTable for MetadataTableLegendsZa {
         "Legends: Z-A"
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_personal_info_legends_za() {
+        assert_eq!(
+            METADATA_TABLE_ZA.get_types(NationalDex::Alakazam as u16, 0),
+            Some((PkmType::Psychic, None))
+        );
+    }
+}

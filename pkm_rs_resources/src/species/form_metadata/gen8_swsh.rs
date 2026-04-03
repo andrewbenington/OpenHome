@@ -60,7 +60,7 @@ impl PersonalInfoSwordShield {
     }
 
     pub const fn form_count(&self) -> u8 {
-        self.0[0x1A]
+        self.0[0x20]
     }
 
     const fn is_present_in_game(&self) -> bool {
@@ -121,5 +121,15 @@ impl MetadataTable for MetadataTableSwordShield {
 
     fn get_source_name(&self) -> &'static str {
         "Sword/Shield"
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn mega_venusaur_not_present() {
+        assert!(!METADATA_TABLE_SWSH.form_is_present(3, 1));
     }
 }

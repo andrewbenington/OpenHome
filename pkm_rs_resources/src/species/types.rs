@@ -4,19 +4,20 @@ use strum_macros::{Display, EnumString};
 use crate::{
     Error, ExpectLog, Result,
     abilities::AbilityIndex,
-    levelup::{LearnsetMoveJs, LearnsetReader},
-    log,
+    levelup::LearnsetReader,
     species::{
         ALL_SPECIES,
-        form_metadata::{
-            MetadataSource, levelup_learnset_lookup, source_has_form_metadata, types_lookup,
-            types_lookup_with_source,
-        },
+        form_metadata::{MetadataSource, levelup_learnset_lookup, types_lookup},
     },
 };
+
 use pkm_rs_types::{GameSetting, Generation, PkmType, TeraType};
 use serde::{Serialize, Serializer};
 
+#[cfg(feature = "wasm")]
+use crate::levelup::LearnsetMoveJs;
+#[cfg(feature = "wasm")]
+use crate::log;
 #[cfg(feature = "wasm")]
 use crate::species::form_metadata::current_base_stats;
 #[cfg(feature = "wasm")]
@@ -421,7 +422,10 @@ impl FormeMetadata {
             .any(|mega| mega.mega_forme.forme_index == self.forme_index)
     }
 
+    #[cfg(feature = "wasm")]
     fn has_data_for_source(&self, source: MetadataSource) -> bool {
+        use crate::species::form_metadata::source_has_form_metadata;
+
         log!(
             "checking if {} forme {} has data for source {:?}",
             self.species_name,
@@ -431,27 +435,20 @@ impl FormeMetadata {
         source_has_form_metadata(source, self.national_dex.get(), self.forme_index)
     }
 
-    fn types(&self) -> (PkmType, Option<PkmType>) {
-        types_lookup(self.national_dex.get(), self.forme_index).expect_log(format!(
+    fn types_from_source_or_latest(
+        &self,
+        source: Option<MetadataSource>,
+    ) -> (PkmType, Option<PkmType>) {
+        types_lookup(self.national_dex.get(), self.forme_index, source).expect_log(format!(
             "no types found for {} forme {}",
             self.species_name, self.forme_name
         ))
     }
 
-    fn types_with_source(&self, source: MetadataSource) -> Option<(PkmType, Option<PkmType>)> {
-        log!(
-            "looking up types for {} forme {} with source {:?}",
-            self.species_name,
-            self.forme_name,
-            source
-        );
-        types_lookup_with_source(self.national_dex.get(), self.forme_index, source)
-    }
-
     /// Tera Type assigned by Pokémon HOME for the species when not originally
     /// from Scarlet/Violet
     pub fn transferred_tera_type(&self) -> TeraType {
-        TeraType::Standard(match self.types() {
+        TeraType::Standard(match self.types_from_source_or_latest(None) {
             (PkmType::Normal, Some(type2)) => type2,
             (type1, _) => type1,
         })
@@ -474,32 +471,32 @@ impl FormeMetadata {
 
     #[wasm_bindgen(getter = type1)]
     pub fn type_1(&self) -> PkmType {
-        self.types().0
+        self.types_from_source_or_latest(None).0
     }
 
     #[wasm_bindgen(js_name = type1WithSource)]
     pub fn type_1_with_source(&self, source: MetadataSource) -> Option<PkmType> {
-        Some(self.types_with_source(source)?.0)
+        Some(self.types_from_source_or_latest(Some(source)).0)
     }
 
     #[wasm_bindgen(getter = type1Index)]
     pub fn type_1_index(&self) -> u8 {
-        self.types().0 as u8
+        self.types_from_source_or_latest(None).0 as u8
     }
 
     #[wasm_bindgen(getter = type2)]
     pub fn type_2(&self) -> Option<PkmType> {
-        self.types().1
+        self.types_from_source_or_latest(None).1
     }
 
     #[wasm_bindgen(js_name = type2WithSource)]
     pub fn type_2_with_source(&self, source: MetadataSource) -> Option<PkmType> {
-        self.types_with_source(source)?.1
+        self.types_from_source_or_latest(Some(source)).1
     }
 
     #[wasm_bindgen(getter = type2Index)]
     pub fn type_2_index(&self) -> Option<u8> {
-        self.types().1.map(|t| t as u8)
+        self.types_from_source_or_latest(None).1.map(|t| t as u8)
     }
 
     #[wasm_bindgen(getter)]
@@ -620,7 +617,7 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(js_name = levelUpLearnset)]
-    pub fn level_up_learnset(&self, source: MetadataSource) -> Option<Vec<LearnsetMoveJs>> {
+    pub fn level_up_learnset(&self, source: Option<MetadataSource>) -> Option<Vec<LearnsetMoveJs>> {
         Some(
             self.forme_ref()
                 .get_levelup_learnset(source)?
@@ -760,7 +757,7 @@ impl SpeciesAndForme {
         self.forme_index
     }
 
-    pub fn get_levelup_learnset(&self, source: MetadataSource) -> Option<LearnsetReader> {
+    pub fn get_levelup_learnset(&self, source: Option<MetadataSource>) -> Option<LearnsetReader> {
         levelup_learnset_lookup(self.national_dex.get(), self.forme_index, source)
     }
 }

@@ -1,13 +1,17 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use strum_macros::{Display, EnumString};
+
+use crate::Generation;
+
+#[cfg(feature = "wasm")]
+use serde::Deserialize;
+#[cfg(feature = "wasm")]
 use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use crate::Generation;
-
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
-#[tsify(into_wasm_abi, from_wasm_abi)]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Default, EnumString, Display, Serialize, PartialEq, Eq, Clone, Copy)]
 #[repr(u8)]
 pub enum PkmType {
@@ -103,6 +107,7 @@ impl PkmType {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct PkmTypes;
 
+#[cfg(feature = "wasm")]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 impl PkmTypes {
     #[wasm_bindgen(js_name = "tryFromString")]
