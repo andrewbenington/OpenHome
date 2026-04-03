@@ -112,7 +112,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   trainerName: string
   trainerGender: boolean
   isFakemon: boolean = false
-  originalBytes?: Uint8Array
+  originalBytes?: ArrayBuffer
 
   pluginForm?: number
 
@@ -121,9 +121,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   constructor(arg: ArrayBuffer | OHPKM) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
-
-      this.originalBytes = new Uint8Array(arg)
 
       // https://github.com/Skeli789/Complete-Fire-Red-Upgrade/blob/master/include/new/pokemon_storage_system.h
       // https://github.com/Skeli789/Complete-Fire-Red-Upgrade/blob/master/include/pokemon.h

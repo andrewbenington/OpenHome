@@ -382,7 +382,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs"
-version = "1.10.0"
+version = "1.10.1"
 dependencies = [
  "console_error_panic_hook",
  "getrandom",
@@ -405,7 +405,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_derive"
-version = "1.10.0"
+version = "1.10.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -414,7 +414,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_resources"
-version = "1.10.0"
+version = "1.10.1"
 dependencies = [
  "getrandom",
  "js-sys",
@@ -432,7 +432,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_types"
-version = "1.10.0"
+version = "1.10.1"
 dependencies = [
  "getrandom",
  "js-sys",

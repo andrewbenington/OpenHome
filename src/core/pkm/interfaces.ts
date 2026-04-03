@@ -25,7 +25,6 @@ export type PKMInterface = AllPKMFields & {
   // If met in a plugin save, this will be the save's plugin_identifier. otherwise this is empty
   pluginOrigin?: PluginIdentifier // why are there two of these??
   isFakemon?: boolean
-  originalBytes?: Uint8Array
   selectColor?: string
   // User-defined display color for this Pokemon in boxes (CSS color string)
   displayColor?: string

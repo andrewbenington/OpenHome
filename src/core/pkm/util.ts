@@ -2,6 +2,7 @@ import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   AbilityIndex,
   extraFormTypeOverride,
+  FormeMetadata,
   MetadataSource,
   MetadataSummaryLookup,
   PkmType,
@@ -128,6 +129,21 @@ export const getBaseMon = (dexNum: number, forme?: number) => {
   }
 
   return mon
+}
+
+export const getPrevos = (dexNum: number, forme?: number) => {
+  let mon = SpeciesAndForme.tryNew(dexNum, forme ?? 0)
+  let metadata = mon?.getMetadata()
+
+  const prevos: FormeMetadata[] = []
+
+  while (metadata?.preEvolution) {
+    mon = metadata.preEvolution
+    metadata = mon?.getMetadata()
+    prevos.push(metadata)
+  }
+
+  return prevos
 }
 
 export const getTypes = (mon: PKMInterface): PkmType[] => {

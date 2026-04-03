@@ -42,9 +42,11 @@ export default class PK1 {
   movePPUps: FourMoves
   trainerName: string
   nickname: string
+  originalBytes?: ArrayBuffer
   constructor(arg: ArrayBuffer | AllPKMFields) {
     if (arg instanceof ArrayBuffer) {
       const buffer = new Uint8Array(arg)[2] === 0xff ? arg.slice(3) : arg
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.gameOfOrigin = 0
       this.language = 0

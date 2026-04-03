@@ -7,7 +7,7 @@ interface TypeIconProps {
   type?: PkmType
   typeIndex?: number
   border?: boolean
-  size?: number
+  size?: number | string
 }
 
 const TypeIcon = (props: TypeIconProps) => {

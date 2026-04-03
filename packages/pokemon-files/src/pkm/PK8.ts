@@ -98,14 +98,19 @@ export default class PK8 {
   trainerGender: boolean
   level: number
   stats: types.Stats
+  originalBytes?: ArrayBuffer
+
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
+
       if (encrypted) {
         const unencryptedBytes = encryption.decryptByteArrayGen89(buffer)
         const unshuffledBytes = encryption.unshuffleBlocksGen89(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
+
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.sanity = dataView.getUint16(0x4, true)
@@ -332,16 +337,11 @@ export default class PK8 {
         spe: false,
       }
       this.trainerGender = other.trainerGender
-      this.level = other.level ?? 0
-      this.stats = other.stats ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
     }
+    // heal and recalculate level in case the source was not accurate
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
   }
 
   static fromBytes(buffer: ArrayBuffer): PK8 {
