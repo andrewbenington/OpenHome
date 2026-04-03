@@ -303,7 +303,7 @@ export default class PA9 {
 
     this.checksum = this.calculcateChecksum()
 
-    // heal and recalculate level in case the source was not accurate
+    // heal and recalculate in case the source was not accurate
     this.level = this.getLevel()
     this.stats = this.getStats()
     this.currentHP = this.stats.hp

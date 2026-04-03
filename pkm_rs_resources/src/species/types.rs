@@ -759,6 +759,16 @@ impl SpeciesAndForme {
         }
     }
 
+    pub fn get_prevos(&self) -> Vec<SpeciesAndForme> {
+        let mut prevos = Vec::new();
+        let mut current = *self;
+        while let Some(forme_ref) = current.get_forme_metadata().pre_evolution {
+            prevos.push(forme_ref);
+            current = forme_ref;
+        }
+        prevos
+    }
+
     pub const fn get_ndex(&self) -> NatDexIndex {
         self.national_dex
     }

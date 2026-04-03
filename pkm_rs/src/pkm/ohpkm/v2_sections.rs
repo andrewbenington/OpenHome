@@ -294,9 +294,7 @@ impl MainDataV2 {
             {
                 self.reset_nickname_to_species();
                 errors_found = true;
-            }
-
-            if self.nickname_matches_species_eng_ignore_case() {
+            } else if self.nickname_matches_species_eng_ignore_case() {
                 // Fix Pokémon imported from an older game that had their nicknames kept as all caps
                 if !self.nickname_matches_species_eng() {
                     self.nickname = species_metadata.name.into();
@@ -308,6 +306,14 @@ impl MainDataV2 {
                     self.is_nicknamed = false;
                     errors_found = true;
                 }
+            } else if is_prevo_species_name(&self.species_and_forme, &self.nickname.to_string()) {
+                self.reset_nickname_to_species();
+                self.is_nicknamed = false;
+                errors_found = true;
+            } else if !self.is_nicknamed && !self.nickname_matches_species_eng() {
+                // If the nickname doesn't match the species name, it should be considered nicknamed
+                self.is_nicknamed = true;
+                errors_found = true;
             }
         }
 
@@ -349,6 +355,13 @@ impl MainDataV2 {
 
         errors_found
     }
+}
+
+fn is_prevo_species_name(species_and_forme: &SpeciesAndForme, name: &str) -> bool {
+    species_and_forme
+        .get_prevos()
+        .iter()
+        .any(|prevo| prevo.get_species_metadata().name.eq_ignore_ascii_case(name))
 }
 
 impl DataSection for MainDataV2 {
