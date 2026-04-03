@@ -58,6 +58,7 @@ export default class XDPKM {
   contest: types.ContestStats
   shadowID: number
   ribbons: string[]
+
   constructor(arg: ArrayBuffer | AllPKMFields) {
     if (arg instanceof ArrayBuffer) {
       const buffer = arg

@@ -16,6 +16,7 @@ import {
   ShinyLeaves,
   SpeciesAndForme,
   SpeciesLookup,
+  Tag,
   TrainerData,
   TrainerMemory,
   updatePidIfWouldBecomeShinyGen345,
@@ -334,6 +335,25 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       this.tmFlagsSV = other.tmFlagsSV
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
+
+      if (other.originalBytes) {
+        const tag = monFormatToOriginalDataTag(other.format)
+        if (tag) {
+          try {
+            this.trySetOriginalData(tag, new Uint8Array(other.originalBytes))
+          } catch (e) {
+            console.error('Failed to set original data from bytes', e)
+          }
+        } else {
+          console.error(
+            `No original data tag found for format ${other.format}, cannot set original bytes on OHPKM`
+          )
+        }
+      } else {
+        console.warn(
+          'No original bytes found in other mon, skipping setting original data on OHPKM'
+        )
+      }
     }
     if (this.openhomeId === '0004-d889ca57-401aab08-30') {
       this.extraFormIndex = ExtraFormIndex.CharizardClone
@@ -968,6 +988,80 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.ability !== undefined &&
       this.ability.index === hiddenOrFirst.index
     )
+  }
+}
+
+export function monFormatToOriginalDataTag(format: string): Option<Tag> {
+  switch (format) {
+    case 'PK1':
+      return Tag.Pk1
+    case 'PK2':
+      return Tag.Pk2
+    case 'PK3':
+      return Tag.Pk3
+    case 'PK4':
+      return Tag.Pk4
+    case 'PK5':
+      return Tag.Pk5
+    case 'PK6':
+      return Tag.Pk6
+    case 'PK7':
+      return Tag.Pk7
+    case 'PB7':
+      return Tag.Pb7
+    case 'PK8':
+      return Tag.Pk8
+    case 'PA8':
+      return Tag.Pa8
+    case 'PB8':
+      return Tag.Pb8
+    case 'PK9':
+      return Tag.Pk9
+    case 'PA9':
+      return Tag.Pa9
+    case 'PK3RR':
+      return Tag.Pk3Rr
+    case 'PK3UB':
+      return Tag.Pk3Ub
+    case 'PB8LUMI':
+      return Tag.Pb8Lumi
+  }
+}
+
+export function originalDataTagToMonFormat(tag: Tag): string {
+  switch (tag) {
+    case Tag.Pk1:
+      return 'PK1'
+    case Tag.Pk2:
+      return 'PK2'
+    case Tag.Pk3:
+      return 'PK3'
+    case Tag.Pk4:
+      return 'PK4'
+    case Tag.Pk5:
+      return 'PK5'
+    case Tag.Pk6:
+      return 'PK6'
+    case Tag.Pk7:
+      return 'PK7'
+    case Tag.Pb7:
+      return 'PB7'
+    case Tag.Pk8:
+      return 'PK8'
+    case Tag.Pa8:
+      return 'PA8'
+    case Tag.Pb8:
+      return 'PB8'
+    case Tag.Pk9:
+      return 'PK9'
+    case Tag.Pa9:
+      return 'PA9'
+    case Tag.Pb8Lumi:
+      return 'PB8LUMI'
+    case Tag.Pk3Rr:
+      return 'PK3RR'
+    case Tag.Pk3Ub:
+      return 'PK3UB'
   }
 }
 

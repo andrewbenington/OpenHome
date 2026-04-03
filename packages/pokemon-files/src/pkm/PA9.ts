@@ -93,6 +93,10 @@ export default class PA9 {
   tmFlagsLza: Uint8Array
   ribbons: string[]
   trainerGender: boolean
+  level: number
+  stats: types.Stats
+  originalBytes?: ArrayBuffer
+
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
@@ -101,6 +105,7 @@ export default class PA9 {
         const unshuffledBytes = encryption.unshuffleBlocksGen89(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)
@@ -318,6 +323,11 @@ export default class PA9 {
       this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], '') ?? []
       this.trainerGender = other.trainerGender
     }
+
+    // heal and recalculate level in case the source was not accurate
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
   }
 
   static fromBytes(buffer: ArrayBuffer): PA9 {
@@ -419,6 +429,8 @@ export default class PA9 {
         .filter((index) => index > -1 && index < 47)
     )
     byteLogic.setFlag(dataView, 0x125, 7, this.trainerGender)
+    dataView.setUint8(0x148, this.level)
+    types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
     return buffer
   }
 

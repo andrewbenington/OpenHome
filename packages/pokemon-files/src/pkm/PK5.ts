@@ -69,6 +69,8 @@ export default class PK5 {
   trainerName: string
   trainerGender: boolean
   checksum: number
+  originalBytes?: ArrayBuffer
+
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
@@ -81,6 +83,7 @@ export default class PK5 {
       }
 
       const dataView = new DataView(buffer)
+      this.originalBytes = buffer
 
       this.personalityValue = dataView.getUint32(0x0, true)
       this.dexNum = dataView.getUint16(0x8, true)

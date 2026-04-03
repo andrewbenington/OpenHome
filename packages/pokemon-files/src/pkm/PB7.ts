@@ -91,6 +91,7 @@ export default class PB7 {
   isMega: number
   megaForme: number
   trainerGender: boolean
+  originalBytes?: ArrayBuffer
   constructor(arg: ArrayBuffer | PKMInterface, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
@@ -99,6 +100,7 @@ export default class PB7 {
         const unshuffledBytes = encryption.unshuffleBlocksGen67(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)
@@ -291,23 +293,19 @@ export default class PB7 {
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
       this.statusCondition = other.statusCondition ?? 0
-      this.level = other.level ?? 0
       this.dirtType = other.dirtType ?? 0
       this.dirtLocation = other.dirtLocation ?? 0
       this.currentHP = other.currentHP ?? 0
-      this.stats = other.stats ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
       this.cp = other.cp ?? 0
       this.isMega = other.isMega ?? 0
       this.megaForme = other.megaForme ?? 0
       this.trainerGender = other.trainerGender
     }
+
+    // heal and recalculate level in case the source was not accurate
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
   }
 
   static fromBytes(buffer: ArrayBuffer): PB7 {
