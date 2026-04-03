@@ -337,16 +337,11 @@ export default class PK8 {
         spe: false,
       }
       this.trainerGender = other.trainerGender
-      this.level = other.level ?? 0
-      this.stats = other.stats ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
     }
+    // heal and recalculate level in case the source was not accurate
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
   }
 
   static fromBytes(buffer: ArrayBuffer): PK8 {

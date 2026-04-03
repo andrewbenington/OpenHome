@@ -245,6 +245,7 @@ fn copy_to_sized_array<const N: usize>(slice: &[u8]) -> [u8; N] {
 #[derive(Debug, Clone, Copy)]
 pub struct OriginalBackup(PkmBytes);
 
+#[cfg(feature = "wasm")]
 impl OriginalBackup {
     pub const fn new(pkm_bytes: PkmBytes) -> Self {
         Self(pkm_bytes)
