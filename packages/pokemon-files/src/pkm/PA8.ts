@@ -103,7 +103,10 @@ export default class PA8 {
   isNoble: boolean
   ribbons: string[]
   trainerGender: boolean
+  level: number
+  stats: types.Stats
   originalBytes?: ArrayBuffer
+
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
@@ -352,6 +355,11 @@ export default class PA8 {
       this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], 'Hisui') ?? []
       this.trainerGender = other.trainerGender
     }
+
+    // heal and recalculate level in case the source was not accurate
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
   }
 
   static fromBytes(buffer: ArrayBuffer): PA8 {

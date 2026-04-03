@@ -336,10 +336,12 @@ export default class PB8 {
         spe: false,
       }
       this.trainerGender = other.trainerGender
-      this.level = this.getLevel()
-      this.stats = this.getStats()
-      this.currentHP = this.stats.hp
     }
+
+    // heal and recalculate level in case the source was not accurate
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
   }
 
   static fromBytes(buffer: ArrayBuffer): PB8 {

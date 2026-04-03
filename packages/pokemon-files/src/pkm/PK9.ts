@@ -94,6 +94,8 @@ export default class PK9 {
   tmFlagsSV: Uint8Array
   ribbons: string[]
   trainerGender: boolean
+  level: number
+  stats: types.Stats
   originalBytes?: ArrayBuffer
 
   constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
@@ -325,6 +327,10 @@ export default class PK9 {
       this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], '') ?? []
       this.trainerGender = other.trainerGender
     }
+    // heal and recalculate level in case the source was not accurate
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
   }
 
   static fromBytes(buffer: ArrayBuffer): PK9 {

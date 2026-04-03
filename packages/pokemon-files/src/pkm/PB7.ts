@@ -300,10 +300,12 @@ export default class PB7 {
       this.isMega = other.isMega ?? 0
       this.megaForme = other.megaForme ?? 0
       this.trainerGender = other.trainerGender
-      this.level = this.getLevel()
-      this.stats = this.getStats()
-      this.currentHP = this.stats.hp
     }
+
+    // heal and recalculate level in case the source was not accurate
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
   }
 
   static fromBytes(buffer: ArrayBuffer): PB7 {
