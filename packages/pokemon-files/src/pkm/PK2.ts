@@ -4,7 +4,7 @@ import {
   ItemGen2,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   OriginGames,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
@@ -49,9 +49,12 @@ export default class PK2 {
   trainerName: string
   nickname: string
   trainerGender: boolean
+  originalBytes?: ArrayBuffer
+
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
       const buffer = new Uint8Array(arg)[2] === 0xff ? arg.slice(3) : arg
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.gameOfOrigin = 0
       this.language = 0
@@ -282,7 +285,7 @@ export default class PK2 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

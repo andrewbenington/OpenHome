@@ -5,7 +5,7 @@ import {
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
@@ -100,6 +100,8 @@ export default class PB8 {
   trainerGender: boolean
   level: number
   stats: types.Stats
+  originalBytes?: ArrayBuffer
+
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     const { encrypted, strategy } = options
 
@@ -110,6 +112,7 @@ export default class PB8 {
         const unshuffledBytes = encryption.unshuffleBlocksGen89(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)
@@ -286,10 +289,13 @@ export default class PB8 {
       this.trainerMemory = other.trainerMemory
       this.hyperTraining = other.hyperTraining
       this.trainerGender = other.trainerGender
-      this.level = 0
-      this.stats = other.stats
     }
+
+    // heal and recalculate in case the source was not accurate
     this.checksum = this.calculcateChecksum()
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PB8 {
@@ -461,7 +467,7 @@ export default class PB8 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

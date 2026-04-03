@@ -5,7 +5,7 @@ import {
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
@@ -93,16 +93,21 @@ export default class PK7 {
   handlerMemory: types.Memory
   trainerMemory: types.Memory
   trainerGender: boolean
+  originalBytes?: ArrayBuffer
+
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     const { encrypted, strategy } = options
 
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
+
       if (encrypted) {
         const unencryptedBytes = encryption.decryptByteArrayGen67(buffer)
         const unshuffledBytes = encryption.unshuffleBlocksGen67(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
+
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)
@@ -457,7 +462,7 @@ export default class PK7 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

@@ -7,7 +7,7 @@ import {
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
@@ -71,6 +71,8 @@ export default class PK5 {
   trainerName: string
   trainerGender: boolean
   checksum: number
+  originalBytes?: ArrayBuffer
+
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     const { encrypted } = options
     if (arg instanceof ArrayBuffer) {
@@ -84,6 +86,7 @@ export default class PK5 {
       }
 
       const dataView = new DataView(buffer)
+      this.originalBytes = buffer
 
       this.personalityValue = dataView.getUint32(0x0, true)
       this.dexNum = dataView.getUint16(0x8, true)
@@ -364,7 +367,7 @@ export default class PK5 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

@@ -5,7 +5,7 @@ import {
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
@@ -94,6 +94,7 @@ export default class PB7 {
   isMega: number
   megaForme: number
   trainerGender: boolean
+  originalBytes?: ArrayBuffer
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     const { encrypted, strategy } = options
@@ -105,6 +106,7 @@ export default class PB7 {
         const unshuffledBytes = encryption.unshuffleBlocksGen67(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)
@@ -273,17 +275,17 @@ export default class PB7 {
       this.hyperTraining = other.hyperTraining
       this.language = other.language
       this.statusCondition = 0
-      this.level = 0
       this.dirtType = 0
       this.dirtLocation = 0
-      this.currentHP = other.currentHP ?? 0
-      this.stats = other.stats
       this.cp = 0
       this.isMega = 0
       this.megaForme = 0
       this.trainerGender = other.trainerGender
     }
     this.checksum = this.calculcateChecksum()
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PB7 {
@@ -445,7 +447,7 @@ export default class PB7 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

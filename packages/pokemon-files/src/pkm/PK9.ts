@@ -5,7 +5,7 @@ import {
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
@@ -97,9 +97,13 @@ export default class PK9 {
   tmFlagsSV: Uint8Array
   ribbons: string[]
   trainerGender: boolean
+  level: number
+  stats: types.Stats
+  originalBytes?: ArrayBuffer
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     const { encrypted } = options
+
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       if (encrypted) {
@@ -107,6 +111,8 @@ export default class PK9 {
         const unshuffledBytes = encryption.unshuffleBlocksGen89(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
+
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)
@@ -299,6 +305,10 @@ export default class PK9 {
       this.trainerGender = other.trainerGender
       this.checksum = this.calculcateChecksum()
     }
+    // heal and recalculate in case the source was not accurate
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK9 {
@@ -405,6 +415,8 @@ export default class PK9 {
         .filter((index) => index > -1 && index < 47)
     )
     byteLogic.setFlag(dataView, 0x125, 7, this.trainerGender)
+    dataView.setUint8(0x148, this.level)
+    types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
     return buffer
   }
 
@@ -457,7 +469,7 @@ export default class PK9 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

@@ -5,7 +5,7 @@ import {
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
@@ -105,6 +105,10 @@ export default class PA8 {
   isNoble: boolean
   ribbons: string[]
   trainerGender: boolean
+  level: number
+  stats: types.Stats
+  originalBytes?: ArrayBuffer
+
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     const { encrypted, strategy } = options
 
@@ -115,6 +119,7 @@ export default class PA8 {
         const unshuffledBytes = encryption.unshuffleBlocksGen8A(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)
@@ -322,6 +327,11 @@ export default class PA8 {
       this.trainerGender = other.trainerGender
     }
     this.checksum = this.calculcateChecksum()
+
+    // heal and recalculate level in case the source was not accurate
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PA8 {
@@ -439,6 +449,8 @@ export default class PA8 {
     dataView.setFloat32(0xac, getHeightCalculated(this), true)
     dataView.setFloat32(0xb0, getHeightCalculated(this), true)
     byteLogic.setFlag(dataView, 0x13d, 7, this.trainerGender)
+    dataView.setUint8(0x148, this.level)
+    types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
     return buffer
   }
 
@@ -507,7 +519,7 @@ export default class PA8 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

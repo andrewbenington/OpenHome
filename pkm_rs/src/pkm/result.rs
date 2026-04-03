@@ -70,6 +70,10 @@ pub enum Error {
         field: &'static str,
         source: Box<dyn std::error::Error>,
     },
+    TagError {
+        tag_type: &'static str,
+        value: u16,
+    },
 
     MoveError {
         value: u16,
@@ -169,6 +173,9 @@ impl Display for Error {
                 format!("Error reading field {field}: {source}")
                     .to_owned()
             }
+            Error::TagError { tag_type, value } => {
+                format!("Invalid tag value {value} for tag type {tag_type}")
+            }
 
             Error::MoveError { value, source } => {
                 format!("Invalid move reference {value} (source: {source})").to_owned()
@@ -200,7 +207,8 @@ impl From<pkm_rs_resources::Error> for Error {
             pkm_rs_resources::Error::BufferSize { field, expected, received } => Self::BufferSize { field, expected, received },
             pkm_rs_resources::Error::CryptRange { range, buffer_size } => Self::CryptRange { range, buffer_size },
             pkm_rs_resources::Error::NationalDex { national_dex } => Self::NationalDex { value: national_dex, source: NdexConvertSource::Other },
-            pkm_rs_resources::Error::FormeIndex { national_dex, forme_index } => Self::FormeIndex { national_dex, forme_index },
+            pkm_rs_resources::Error::FormeIndex { national_dex, forme_index,
+                 } => Self::FormeIndex { national_dex, forme_index },
             pkm_rs_resources::Error::LanguageIndex { language_index } => Self::LanguageIndex { language_index },
             pkm_rs_resources::Error::NatureIndex { nature_index } => Self::NatureIndex { nature_index },
             pkm_rs_resources::Error::AbilityIndex { ability_index } => Self::AbilityIndex { ability_index },

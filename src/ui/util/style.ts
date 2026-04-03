@@ -12,12 +12,22 @@ export function grayscaleIf(condition: boolean | undefined) {
   return condition ? 'grayed-out' : undefined
 }
 
+// completely unnecessary but it makes it readable
 export function includeClass(className: string) {
   return {
-    with(otherClassName: string) {
+    with(withClassName: string) {
       return {
         if(condition: boolean | undefined) {
-          return condition ? `${className} ${otherClassName}` : className
+          return condition ? `${className} ${withClassName}` : className
+        },
+        unless(condition: boolean | undefined) {
+          return {
+            then(conditionClassName: string) {
+              return condition
+                ? `${className} ${conditionClassName}`
+                : `${className} ${withClassName}`
+            },
+          }
         },
       }
     },

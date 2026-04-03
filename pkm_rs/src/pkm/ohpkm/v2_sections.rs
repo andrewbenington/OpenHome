@@ -24,6 +24,8 @@ use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 use serde::{Deserialize, Serialize};
 use std::num::NonZeroU16;
 
+pub mod pkm_bytes;
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -693,7 +695,7 @@ impl DataSection for GameboyData {
         Ok(Self {
             dvs: StatsPreSplit::from_dv_bytes(bytes[0..2].try_into().unwrap()),
             met_time_of_day: bytes[2],
-            evs_g12: StatsPreSplit::from_bytes(bytes[3..13].try_into().unwrap()),
+            evs_g12: StatsPreSplit::from_bytes_u16_le(bytes[3..13].try_into().unwrap()),
         })
     }
 

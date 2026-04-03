@@ -10,7 +10,7 @@ import {
 import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { MetadataLookup, OriginGames } from '@pkm-rs/pkg'
+import { MetadataSummaryLookup, OriginGames } from '@pkm-rs/pkg'
 import SortableDataGrid from 'src/ui/components/SortableDataGrid'
 import { useLookups } from 'src/ui/state/lookups/useLookups'
 
@@ -68,7 +68,7 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
       ),
       getFilterValue: (value) =>
         (value.homeMon &&
-          MetadataLookup(value.homeMon.dexNum, value.homeMon.formeNum)?.speciesName) ||
+          MetadataSummaryLookup(value.homeMon.dexNum, value.homeMon.formeNum)?.speciesName) ||
         'Unknown',
     },
     {

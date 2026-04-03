@@ -310,6 +310,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "num_enum"
+version = "0.7.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d0bca838442ec211fa11de3a8b0e0e8f3a4522575b5c4c06ed722e005036f26"
+dependencies = [
+ "num_enum_derive",
+ "rustversion",
+]
+
+[[package]]
+name = "num_enum_derive"
+version = "0.7.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "680998035259dcfcafe653688bf2aa6d3e2dc05e98be6ab46afb089dc84f1df8"
+dependencies = [
+ "proc-macro-crate",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "once_cell"
 version = "1.21.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -360,7 +382,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs"
-version = "1.10.0"
+version = "1.10.1"
 dependencies = [
  "console_error_panic_hook",
  "getrandom",
@@ -384,7 +406,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_derive"
-version = "1.10.0"
+version = "1.10.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -393,7 +415,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_resources"
-version = "1.10.0"
+version = "1.10.1"
 dependencies = [
  "getrandom",
  "js-sys",
@@ -405,21 +427,24 @@ dependencies = [
  "static_assertions",
  "strum",
  "strum_macros",
+ "tsify",
  "wasm-bindgen",
 ]
 
 [[package]]
 name = "pkm_rs_types"
-version = "1.10.0"
+version = "1.10.1"
 dependencies = [
  "getrandom",
  "js-sys",
+ "num_enum",
  "pkm_rs_derive",
  "serde",
  "serde-wasm-bindgen",
  "static_assertions",
  "strum",
  "strum_macros",
+ "tsify",
  "wasm-bindgen",
 ]
 
@@ -431,6 +456,15 @@ checksum = "479ca8adacdd7ce8f1fb39ce9ecccbfe93a3f1344b3d0d97f20bc0196208f62b"
 dependencies = [
  "proc-macro2",
  "syn",
+]
+
+[[package]]
+name = "proc-macro-crate"
+version = "3.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e67ba7e9b2b56446f1d419b1d807906278ffa1a658a8a5d8a39dcb1f5a78614f"
+dependencies = [
+ "toml_edit",
 ]
 
 [[package]]
@@ -604,6 +638,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "toml_datetime"
+version = "1.1.1+spec-1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3165f65f62e28e0115a00b2ebdd37eb6f3b641855f9d636d3cd4103767159ad7"
+dependencies = [
+ "serde_core",
+]
+
+[[package]]
+name = "toml_edit"
+version = "0.25.10+spec-1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a82418ca169e235e6c399a84e395ab6debeb3bc90edc959bf0f48647c6a32d1b"
+dependencies = [
+ "indexmap",
+ "toml_datetime",
+ "toml_parser",
+ "winnow",
+]
+
+[[package]]
+name = "toml_parser"
+version = "1.1.2+spec-1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a2abe9b86193656635d2411dc43050282ca48aa31c2451210f4202550afb7526"
+dependencies = [
+ "winnow",
+]
+
+[[package]]
 name = "tsify"
 version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -757,6 +821,15 @@ checksum = "854ba17bb104abfb26ba36da9729addc7ce7f06f5c0f90f3c391f8461cca21f9"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "winnow"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09dac053f1cd375980747450bfc7250c264eaae0583872e845c0c7cd578872b5"
+dependencies = [
+ "memchr",
 ]
 
 [[package]]

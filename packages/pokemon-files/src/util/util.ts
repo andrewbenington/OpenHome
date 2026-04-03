@@ -7,7 +7,7 @@ import { PKM, PkmClass } from '@pokemon-files/pkm/PKM'
 import {
   Gender,
   Generation,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
   OriginGames,
@@ -70,7 +70,7 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
   // xoring the other three values with this to calculate upper half of personality value
   // will ensure shininess or non-shininess depending on original mon
   let newPersonalityValue = BigInt(personalityValue)
-  const metadata = MetadataLookup(mon.dexNum, 0)
+  const metadata = MetadataSummaryLookup(mon.dexNum, 0)
   if (!metadata) {
     return Number(newPersonalityValue)
   }
@@ -262,7 +262,7 @@ export class MoveFilter<P extends PKMInterface> {
 }
 
 export function getHeightCalculated(mon: AllPKMFields) {
-  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
   if (!formeMetadata || mon.heightScalar === undefined || !mon.heightDeviation) return 0
 
   const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
@@ -270,7 +270,7 @@ export function getHeightCalculated(mon: AllPKMFields) {
 }
 
 export function getWeightCalculated(mon: AllPKMFields) {
-  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
   if (!formeMetadata || mon.weightScalar === undefined || !mon.weightDeviation) return 0
 
   const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)

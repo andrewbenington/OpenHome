@@ -1,5 +1,13 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { AbilityIndex, extraFormTypeOverride, MetadataLookup, SpeciesAndForme } from '@pkm-rs/pkg'
+import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
+import {
+  AbilityIndex,
+  extraFormTypeOverride,
+  FormeMetadata,
+  MetadataSource,
+  MetadataSummaryLookup,
+  PkmType,
+  SpeciesAndForme,
+} from '@pkm-rs/pkg'
 import { FourMoves, Stats, StatsPreSplit } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
@@ -12,8 +20,6 @@ import {
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
   SpeedCharacteristics,
-  Type,
-  Types,
 } from '@pokemon-resources/index'
 import Prando from 'prando'
 
@@ -22,7 +28,7 @@ export const getAbilityFromNumber = (
   formeNum: number,
   abilityNum: number
 ): AbilityIndex | undefined => {
-  return MetadataLookup(dexNum, formeNum)?.abilityByNum(abilityNum)
+  return MetadataSummaryLookup(dexNum, formeNum)?.abilityByNum(abilityNum)
 }
 
 export const ivsFromDVs = (dvs: StatsPreSplit) => {
@@ -125,11 +131,26 @@ export const getBaseMon = (dexNum: number, forme?: number) => {
   return mon
 }
 
-export const getTypes = (mon: PKMInterface): Type[] => {
+export const getPrevos = (dexNum: number, forme?: number) => {
+  let mon = SpeciesAndForme.tryNew(dexNum, forme ?? 0)
+  let metadata = mon?.getMetadata()
+
+  const prevos: FormeMetadata[] = []
+
+  while (metadata?.preEvolution) {
+    mon = metadata.preEvolution
+    metadata = mon?.getMetadata()
+    prevos.push(metadata)
+  }
+
+  return prevos
+}
+
+export const getTypes = (mon: PKMInterface): PkmType[] => {
   if (mon.extraFormIndex !== undefined) {
-    const extraFormTypeIndices: number[] | undefined = extraFormTypeOverride(mon.extraFormIndex)
+    const extraFormTypeIndices: PkmType[] | undefined = extraFormTypeOverride(mon.extraFormIndex)
     if (extraFormTypeIndices) {
-      return extraFormTypeIndices.map((idx) => Types[idx])
+      return extraFormTypeIndices
     }
   }
 
@@ -138,22 +159,57 @@ export const getTypes = (mon: PKMInterface): Type[] => {
     return ['Normal']
   }
 
-  const type1 = metadata.type1 as Type
-  const type2 = metadata.type2 as Type | undefined
+  const metadataSource = MetadataSourceByFormat(mon.format)
 
-  if (
-    mon.format === 'PK1' &&
-    (mon.dexNum === NationalDex.Magnemite || mon.dexNum === NationalDex.Magneton)
-  ) {
-    return ['Electric']
-  } else if (['PK1', 'PK2', 'PK3', 'COLOPKM', 'XDPKM', 'PK4', 'PK5'].includes(mon.format)) {
-    if (type2 === 'Fairy') {
-      return [type1]
-    } else if (type1 === 'Fairy') {
-      return type2 ? ['Normal', type2] : ['Normal']
-    }
-  }
+  console.assert(
+    metadata.type1WithSource(metadataSource) !== undefined,
+    `Missing type 1 for ${metadata.formeName} from source ${metadataSource}`
+  )
+  const type1 = metadata.type1WithSource(metadataSource) ?? metadata.type1
+  const type2 = metadata.type2WithSource(metadataSource)
+
   return type2 ? [type1, type2] : [type1]
+}
+
+function MetadataSourceByFormat(format: MonFormat | 'OHPKM'): MetadataSource {
+  switch (format) {
+    case 'PK1':
+      return MetadataSource.Yellow
+    case 'PK2':
+      return MetadataSource.Crystal
+    case 'PK3':
+    case 'COLOPKM':
+    case 'XDPKM':
+      return MetadataSource.Emerald
+    case 'PK4':
+      return MetadataSource.HeartGoldSoulSilver
+    case 'PK5':
+      return MetadataSource.Black2White2
+    case 'PK6':
+      return MetadataSource.OmegaRubyAlphaSapphire
+    case 'PK7':
+      return MetadataSource.UltraSunUltraMoon
+    case 'PB7':
+      return MetadataSource.LetsGoPikachuEevee
+    case 'PK8':
+      return MetadataSource.SwordShield
+    case 'PB8':
+    case 'PB8LUMI':
+      return MetadataSource.BrilliantDiamondShiningPearl
+    case 'PA8':
+      return MetadataSource.LegendsArceus
+    case 'PK9':
+    case 'PK3RR':
+    case 'PK3UB':
+      return MetadataSource.ScarletViolet
+    case 'PA9':
+      return MetadataSource.LegendsZa
+    case 'OHPKM':
+      return MetadataSource.ScarletViolet
+    default:
+      console.warn(`Unknown format ${format}, defaulting to Scarlet/Violet metadata source`)
+      return MetadataSource.ScarletViolet
+  }
 }
 
 export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
@@ -277,7 +333,7 @@ export function getCharacteristic(mon: PKMInterface) {
   }
 }
 
-const hpTypes: Type[] = [
+const HIDDEN_POWER_TYPES: PkmType[] = [
   'Fighting',
   'Flying',
   'Poison',
@@ -297,7 +353,7 @@ const hpTypes: Type[] = [
 ]
 
 export type HiddenPowerWithBP = {
-  type: Type
+  type: PkmType
   power: number
 }
 
@@ -313,7 +369,7 @@ export function getHiddenPowerGen2(dvs: StatsPreSplit): HiddenPowerWithBP {
   const basePower = Math.floor(numerator / 2) + 31
 
   return {
-    type: hpTypes[typeIndex],
+    type: HIDDEN_POWER_TYPES[typeIndex],
     power: basePower,
   }
 }
@@ -322,13 +378,13 @@ function mostSignificantBit(value: number) {
   return value & 0b1000 ? 1 : 0
 }
 
-export function getHiddenPowerType(ivs: Stats): Type {
+export function getHiddenPowerType(ivs: Stats): PkmType {
   const numerator =
     [0, ivs.spd, ivs.spa, ivs.spe, ivs.def, ivs.atk, ivs.hp].reduce(
       (prev, value) => (prev << 1) + (value & 1)
     ) * 15
 
-  return hpTypes[Math.floor(numerator / 63)]
+  return HIDDEN_POWER_TYPES[Math.floor(numerator / 63)]
 }
 
 export function getHiddenPowerPower(ivs: Stats): number {

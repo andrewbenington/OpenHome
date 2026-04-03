@@ -645,8 +645,8 @@ mod tests {
         let crown_byte = 0b100000;
         let crown = ShinyLeaves::from_byte(crown_byte);
 
-        let ShinyLeaves::Crown = crown else {
+        if !crown.has_crown() {
             panic!("expected crown, got leaves");
-        };
+        }
     }
 }

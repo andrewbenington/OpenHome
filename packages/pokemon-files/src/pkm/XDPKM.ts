@@ -4,7 +4,7 @@ import {
   ItemGen3,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
@@ -62,6 +62,7 @@ export default class XDPKM {
   contest: types.ContestStats
   shadowID: number
   ribbons: string[]
+
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
       const buffer = arg
@@ -283,7 +284,7 @@ export default class XDPKM {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

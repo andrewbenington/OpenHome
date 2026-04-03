@@ -5,7 +5,7 @@ import {
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
@@ -100,15 +100,20 @@ export default class PK8 {
   trainerGender: boolean
   level: number
   stats: types.Stats
+  originalBytes?: ArrayBuffer
+
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     const { encrypted } = options
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
+
       if (encrypted) {
         const unencryptedBytes = encryption.decryptByteArrayGen89(buffer)
         const unshuffledBytes = encryption.unshuffleBlocksGen89(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
+
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)
@@ -285,10 +290,13 @@ export default class PK8 {
       this.trainerMemory = other.trainerMemory
       this.hyperTraining = other.hyperTraining
       this.trainerGender = other.trainerGender
-      this.stats = other.stats
-      this.level = this.speciesMetadata?.calculateLevel(this.exp) ?? 1
-      this.checksum = this.calculcateChecksum()
     }
+
+    // heal and recalculate in case the source was not accurate
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
+    this.checksum = this.calculcateChecksum()
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK8 {
@@ -452,7 +460,7 @@ export default class PK8 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

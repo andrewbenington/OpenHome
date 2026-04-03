@@ -9,13 +9,13 @@ import {
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
-  OriginGame,
   PokeDate,
   ShinyLeaves,
   SpeciesAndForme,
   SpeciesLookup,
+  Tag,
   TrainerData,
   TrainerMemory,
   updatePidIfWouldBecomeShinyGen345,
@@ -57,7 +57,13 @@ import {
   trainerMemoryToWasm,
 } from './convert'
 import { isEvolution } from './Lookup'
-import { adjustMovePPBetweenFormats, generateIVs, getAbilityFromNumber, ivsFromDVs } from './util'
+import {
+  adjustMovePPBetweenFormats,
+  generateIVs,
+  getAbilityFromNumber,
+  getPrevos,
+  ivsFromDVs,
+} from './util'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getName() {
@@ -337,6 +343,25 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       this.tmFlagsSV = other.tmFlagsSV
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
+
+      if (other.originalBytes) {
+        const tag = monFormatToOriginalDataTag(other.format)
+        if (tag) {
+          try {
+            this.trySetOriginalData(tag, new Uint8Array(other.originalBytes))
+          } catch (e) {
+            console.error('Failed to set original data from bytes', e)
+          }
+        } else {
+          console.error(
+            `No original data tag found for format ${other.format}, cannot set original bytes on OHPKM`
+          )
+        }
+      } else {
+        console.warn(
+          'No original bytes found in other mon, skipping setting original data on OHPKM'
+        )
+      }
     }
     if (this.openhomeId === '0004-d889ca57-401aab08-30') {
       this.extraFormIndex = ExtraFormIndex.CharizardClone
@@ -642,7 +667,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {
@@ -664,6 +689,22 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (this.dexNum === other.dexNum || isEvolution(this, other)) {
       this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
       this.extraFormIndex = other.extraFormIndex
+    }
+
+    // Don't update nickname if the only difference is that it's a truncated version of the original
+    if (
+      other.nickname !== this.nickname &&
+      other.nickname !== this.nickname.slice(0, 10) &&
+      !isPrevoSpeciesName(this.dexNum, this.formeNum, other.nickname)
+    ) {
+      this.nickname = other.nickname
+    }
+
+    if (
+      isPrevoSpeciesName(this.dexNum, this.formeNum, this.nickname) &&
+      this.metadata?.speciesName
+    ) {
+      this.nickname = this.metadata.speciesName
     }
 
     this.heldItemIndex = other.heldItemIndex
@@ -833,10 +874,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (other.obedienceLevel !== undefined) {
       this.obedienceLevel = other.obedienceLevel
     }
-
-    if (save && save.origin >= OriginGame.Sword) {
-      this.nickname = other.nickname
-    }
   }
 
   private abilityNumMatchesIndex(): boolean {
@@ -891,6 +928,80 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 }
 
+export function monFormatToOriginalDataTag(format: string): Option<Tag> {
+  switch (format) {
+    case 'PK1':
+      return Tag.Pk1
+    case 'PK2':
+      return Tag.Pk2
+    case 'PK3':
+      return Tag.Pk3
+    case 'PK4':
+      return Tag.Pk4
+    case 'PK5':
+      return Tag.Pk5
+    case 'PK6':
+      return Tag.Pk6
+    case 'PK7':
+      return Tag.Pk7
+    case 'PB7':
+      return Tag.Pb7
+    case 'PK8':
+      return Tag.Pk8
+    case 'PA8':
+      return Tag.Pa8
+    case 'PB8':
+      return Tag.Pb8
+    case 'PK9':
+      return Tag.Pk9
+    case 'PA9':
+      return Tag.Pa9
+    case 'PK3RR':
+      return Tag.Pk3Rr
+    case 'PK3UB':
+      return Tag.Pk3Ub
+    case 'PB8LUMI':
+      return Tag.Pb8Lumi
+  }
+}
+
+export function originalDataTagToMonFormat(tag: Tag): string {
+  switch (tag) {
+    case Tag.Pk1:
+      return 'PK1'
+    case Tag.Pk2:
+      return 'PK2'
+    case Tag.Pk3:
+      return 'PK3'
+    case Tag.Pk4:
+      return 'PK4'
+    case Tag.Pk5:
+      return 'PK5'
+    case Tag.Pk6:
+      return 'PK6'
+    case Tag.Pk7:
+      return 'PK7'
+    case Tag.Pb7:
+      return 'PB7'
+    case Tag.Pk8:
+      return 'PK8'
+    case Tag.Pa8:
+      return 'PA8'
+    case Tag.Pb8:
+      return 'PB8'
+    case Tag.Pk9:
+      return 'PK9'
+    case Tag.Pa9:
+      return 'PA9'
+    case Tag.Pb8Lumi:
+      return 'PB8LUMI'
+    case Tag.Pk3Rr:
+      return 'PK3RR'
+    case Tag.Pk3Ub:
+      return 'PK3UB'
+  }
+}
+
 type AbilityNum = 1 | 2 | 4
 const FIRST_ABILITY: AbilityNum = 1
 const SECOND_ABILITY: AbilityNum = 2
@@ -899,3 +1010,12 @@ const HIDDEN_ABILITY: AbilityNum = 4
 const FORMATS_WITHOUT_ABILITIES = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
 
 const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
+
+function isPrevoSpeciesName(dexNum: number, formeNum: number, nickname: string): boolean {
+  for (const prevo of getPrevos(dexNum, formeNum)) {
+    if (nickname.toUpperCase() === prevo.speciesName.toUpperCase()) {
+      return true
+    }
+  }
+  return false
+}

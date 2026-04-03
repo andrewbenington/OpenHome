@@ -1,7 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getTypes, isMegaStone, isZCrystal } from '@openhome-core/pkm/util'
-import { Gender, OriginGame } from '@pkm-rs/pkg'
-import { Type } from '@pokemon-resources/index'
+import { Gender, OriginGame, PkmType } from '@pkm-rs/pkg'
 
 export interface Filter {
   dexNumber?: number
@@ -9,8 +8,8 @@ export interface Filter {
   heldItem?: number | HeldItemCategory
   gender?: Gender
   ability?: number
-  type1?: Type
-  type2?: Type
+  type1?: PkmType
+  type2?: PkmType
   gameOfOrigin?: OriginGame
   ribbon?: string
   shiny?: string

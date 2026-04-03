@@ -1,4 +1,4 @@
-VERSION=1.10.0
+VERSION=1.10.1
 
 .PHONY: help
 help: # Display this help.
@@ -38,7 +38,7 @@ clean:
 	@rm -rf src-tauri/target
 
 .PHONY: check
-check:
+check: wasm-compile
 	@pnpm run typecheck
 	@pnpm run lint
 	@pnpm run format

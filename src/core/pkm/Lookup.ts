@@ -3,7 +3,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { dvsFromIVs, getBaseMon } from '@openhome-core/pkm/util'
 import { Option } from '@openhome-core/util/functional'
 import { PKMFormeRef } from '@openhome-core/util/types'
-import { MetadataLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import { MetadataSummaryLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { generatePersonalityValuePreservingAttributes } from '@pokemon-files/util'
 import { gen12StringToUTF, utf16StringToGen12 } from '../save/util/Strings'
 import { bytesToString } from '../save/util/byteLogic'
@@ -109,8 +109,8 @@ export const getMonGen345Identifier = (mon: PKMInterface): Option<Gen345Identifi
 }
 
 export function isEvolution(prevo: PKMFormeRef, possibleEvo: PKMFormeRef): boolean {
-  const prevoForme = MetadataLookup(prevo.dexNum, prevo.formeNum)
-  const possibleEvoForme = MetadataLookup(possibleEvo.dexNum, possibleEvo.formeNum)
+  const prevoForme = MetadataSummaryLookup(prevo.dexNum, prevo.formeNum)
+  const possibleEvoForme = MetadataSummaryLookup(possibleEvo.dexNum, possibleEvo.formeNum)
 
   if (!prevoForme || !possibleEvoForme) return false
 
