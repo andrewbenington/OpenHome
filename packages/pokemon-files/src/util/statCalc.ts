@@ -2,7 +2,7 @@ import { NationalDex, NationalDexMax } from '@pokemon-resources/consts/NationalD
 
 import { PKM } from '@pokemon-files/pkm/PKM'
 
-import { MetadataLookup, SpeciesLookup, Stat, Stats } from '@pkm-rs/pkg'
+import { MetadataSummaryLookup, SpeciesLookup, Stat, Stats } from '@pkm-rs/pkg'
 import {
   AllPKMs,
   PKMWithDVs,
@@ -85,7 +85,7 @@ export const getStatGen3Onward = (mon: PKMWithStandardStatCalc, stat: Stat, leve
 
   const natureMultiplier = mon.nature.multiplierFor(stat)
 
-  const metadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  const metadata = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
   const statAbbr = Stats.abbrLower(stat) as StatAbbr
 
   if (metadata) {
@@ -110,7 +110,7 @@ export const getHPGen3Onward = (mon: PKMWithStandardStatCalc, level: number) => 
     return 1
   }
 
-  const baseHP = MetadataLookup(mon.dexNum, mon.formeNum)?.baseStats?.hp
+  const baseHP = MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.baseStats?.hp
 
   if (baseHP) {
     const iv = mon.ivs.hp

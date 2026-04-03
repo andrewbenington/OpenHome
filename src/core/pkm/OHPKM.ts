@@ -9,7 +9,7 @@ import {
   HyperTraining,
   Item,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
   PokeDate,
@@ -659,7 +659,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

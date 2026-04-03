@@ -4,7 +4,7 @@ import {
   ExtraFormIndex,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
   SpeciesLookup,
@@ -480,7 +480,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

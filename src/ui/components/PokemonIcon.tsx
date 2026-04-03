@@ -8,7 +8,7 @@ import {
   extraFormSpriteName,
   FormeMetadata,
   Generation,
-  MetadataLookup,
+  MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
 import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
 import { useMonDisplay } from '../hooks/useMonDisplay'
@@ -63,7 +63,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
   } = props
   const { showNotesIndicator, showTags } = useMonDisplay()
 
-  const formeMetadata = MetadataLookup(dexNumber, formeNumber ?? 0)
+  const formeMetadata = MetadataSummaryLookup(dexNumber, formeNumber ?? 0)
 
   const isGen9Mega = formeMetadata?.isMega && formeMetadata.introducedGen === Generation.G9
   const extraFormWithSprite = Boolean(extraFormIndex && extraFormSpriteName(extraFormIndex))

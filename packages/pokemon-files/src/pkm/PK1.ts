@@ -3,7 +3,7 @@ import {
   ItemGen1,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   OriginGames,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
@@ -239,7 +239,7 @@ export default class PK1 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

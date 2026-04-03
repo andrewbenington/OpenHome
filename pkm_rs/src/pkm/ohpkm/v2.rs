@@ -1,6 +1,6 @@
 use crate::pkm::ohpkm::OhpkmV1;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
-use crate::pkm::ohpkm::v2_sections::pkm_bytes::{self, OriginalBackup, PkmBytes, UnconvertedPkm};
+use crate::pkm::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, UnconvertedPkm};
 use crate::pkm::ohpkm::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MonTags,
     MostRecentSave, Notes, PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
@@ -10,6 +10,9 @@ use strum_macros::Display;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "wasm")]
+use crate::pkm::ohpkm::v2_sections::pkm_bytes::{self, PkmBytes};
 
 #[cfg(feature = "wasm")]
 use pkm_rs_types::TrainerData;

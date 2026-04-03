@@ -9,7 +9,7 @@ import { getBallIconPath } from '@openhome-ui/images/items'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { OriginGames } from '@pkm-rs/pkg'
 import { getLocationString, RibbonTitles } from '@pokemon-resources/index'
-import { Badge, Flex } from '@radix-ui/themes'
+import { Badge, Flex, Grid } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import './style.css'
 
@@ -154,30 +154,30 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
         </Flex>
       </Flex>
       <div style={{ flex: 1 }} />
-      <div className="center-flex">
-        <MoveCard
-          move={mon.moves[0]}
-          movePP={mon.moves[0] ? mon.movePP[0] : undefined}
-          maxPP={getMoveMaxPP(mon.moves[0], mon.format, mon.movePPUps[0])}
-        />
-        <MoveCard
-          move={mon.moves[1]}
-          movePP={mon.moves[1] ? mon.movePP[1] : undefined}
-          maxPP={getMoveMaxPP(mon.moves[1], mon.format, mon.movePPUps[1])}
-        />
-      </div>
-      <div className="center-flex">
-        <MoveCard
-          move={mon.moves[2]}
-          movePP={mon.moves[2] ? mon.movePP[2] : undefined}
-          maxPP={getMoveMaxPP(mon.moves[2], mon.format, mon.movePPUps[2])}
-        />
-        <MoveCard
-          move={mon.moves[3]}
-          movePP={mon.moves[3] ? mon.movePP[3] : undefined}
-          maxPP={getMoveMaxPP(mon.moves[3], mon.format, mon.movePPUps[3])}
-        />
-      </div>
+      <Flex direction="row" justify="center">
+        <Grid columns="repeat(2, 1fr)" gap="2" maxWidth="40rem" minWidth="30rem">
+          <MoveCard
+            move={mon.moves[0]}
+            movePP={mon.moves[0] ? mon.movePP[0] : undefined}
+            maxPP={getMoveMaxPP(mon.moves[0], mon.format, mon.movePPUps[0])}
+          />
+          <MoveCard
+            move={mon.moves[1]}
+            movePP={mon.moves[1] ? mon.movePP[1] : undefined}
+            maxPP={getMoveMaxPP(mon.moves[1], mon.format, mon.movePPUps[1])}
+          />
+          <MoveCard
+            move={mon.moves[2]}
+            movePP={mon.moves[2] ? mon.movePP[2] : undefined}
+            maxPP={getMoveMaxPP(mon.moves[2], mon.format, mon.movePPUps[2])}
+          />
+          <MoveCard
+            move={mon.moves[3]}
+            movePP={mon.moves[3] ? mon.movePP[3] : undefined}
+            maxPP={getMoveMaxPP(mon.moves[3], mon.format, mon.movePPUps[3])}
+          />
+        </Grid>
+      </Flex>
     </Flex>
   )
 }

@@ -2,7 +2,7 @@ import { useDraggable } from '@dnd-kit/core'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { MonWithLocation } from '@openhome-ui/state/saves'
-import { MetadataLookup } from '@pkm-rs/pkg'
+import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { CSSProperties, useMemo } from 'react'
 import { TopRightIndicator } from 'src/ui/components/pokemon/indicator/TopRightIndicator'
 import PokemonIcon from '../../components/PokemonIcon'
@@ -64,7 +64,7 @@ const DraggableMon = (props: DraggableMonProps) => {
     let formeNumber = mon.formeNum
 
     if (isMegaStone(mon.heldItemIndex)) {
-      const megaForStone = MetadataLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
+      const megaForStone = MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
         (mega) => mega.requiredItemId === mon.heldItemIndex
       )
 

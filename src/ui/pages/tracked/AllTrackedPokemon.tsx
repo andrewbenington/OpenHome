@@ -27,7 +27,7 @@ import {
 } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
-import { MetadataLookup, OriginGames } from '@pkm-rs/pkg'
+import { MetadataSummaryLookup, OriginGames } from '@pkm-rs/pkg'
 import { Moves } from '@pokemon-resources/moves'
 import { useCallback, useRef, useState } from 'react'
 import { SelectColumn } from 'react-data-grid'
@@ -220,7 +220,7 @@ function useColumns(
         numericSorter((mon) => mon.formeNum)
       ),
       getFilterValue: (value) =>
-        MetadataLookup(value.dexNum, value.formeNum)?.speciesName || 'Unknown',
+        MetadataSummaryLookup(value.dexNum, value.formeNum)?.speciesName || 'Unknown',
     },
     {
       key: 'nickname',
