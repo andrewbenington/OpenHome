@@ -434,6 +434,8 @@ export default class PK9 {
         .filter((index) => index > -1 && index < 47)
     )
     byteLogic.setFlag(dataView, 0x125, 7, this.trainerGender)
+    dataView.setUint8(0x148, this.level)
+    types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
     return buffer
   }
 

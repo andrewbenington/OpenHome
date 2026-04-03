@@ -474,6 +474,8 @@ export default class PA8 {
     dataView.setFloat32(0xac, getHeightCalculated(this), true)
     dataView.setFloat32(0xb0, getHeightCalculated(this), true)
     byteLogic.setFlag(dataView, 0x13d, 7, this.trainerGender)
+    dataView.setUint8(0x148, this.level)
+    types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
     return buffer
   }
 
