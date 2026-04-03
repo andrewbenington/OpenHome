@@ -1,7 +1,7 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "1.10.0",
+  "version": "1.10.1",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "pokemon",
@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/andrewbenington/OpenHome.git"
   },
-  "packageManager": "pnpm@10.32.1",
+  "packageManager": "pnpm@10.33.0",
   "license": "GPL-3.0-only",
   "author": {
     "name": "Andrew Benington",

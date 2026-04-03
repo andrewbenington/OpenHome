@@ -1,6 +1,6 @@
 [package]
 name = "pkm_rs_derive"
-version = "1.10.0"
+version = "1.10.1"
 authors = ["Andrew Benington"]
 edition = "2024"
 description = "Macros for the pkm_rs crate"

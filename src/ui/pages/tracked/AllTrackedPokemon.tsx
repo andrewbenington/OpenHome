@@ -382,6 +382,7 @@ function useColumns(
       getFilterValue: (mon) => mon.stats.hp.toString(),
       sortFunction: numericSorter((mon) => mon.stats.hp),
       cellClass: 'number-cell',
+      noFilter: true,
     },
     {
       key: 'atk',
@@ -391,6 +392,7 @@ function useColumns(
       getFilterValue: (mon) => mon.stats.atk.toString(),
       sortFunction: numericSorter((mon) => mon.stats.atk),
       cellClass: 'number-cell',
+      noFilter: true,
     },
     {
       key: 'def',
@@ -400,6 +402,7 @@ function useColumns(
       getFilterValue: (mon) => mon.stats.def.toString(),
       sortFunction: numericSorter((mon) => mon.stats.def),
       cellClass: 'number-cell',
+      noFilter: true,
     },
     {
       key: 'spa',
@@ -409,6 +412,7 @@ function useColumns(
       getFilterValue: (mon) => mon.stats.spa.toString(),
       sortFunction: numericSorter((mon) => mon.stats.spa),
       cellClass: 'number-cell',
+      noFilter: true,
     },
     {
       key: 'spd',
@@ -418,6 +422,7 @@ function useColumns(
       getFilterValue: (mon) => mon.stats.spd.toString(),
       sortFunction: numericSorter((mon) => mon.stats.spd),
       cellClass: 'number-cell',
+      noFilter: true,
     },
     {
       key: 'spe',
@@ -427,6 +432,7 @@ function useColumns(
       getFilterValue: (mon) => mon.stats.spe.toString(),
       sortFunction: numericSorter((mon) => mon.stats.spe),
       cellClass: 'number-cell',
+      noFilter: true,
     },
     {
       key: 'move_1',
@@ -483,6 +489,7 @@ function useColumns(
       sortFunction: stringSorter((mon) => mon.openhomeId),
       renderValue: (mon) => mon.openhomeId,
       cellClass: 'mono-cell',
+      noFilter: true,
     },
   ]
 }

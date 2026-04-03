@@ -153,6 +153,7 @@ pub enum SignificantUpdate {
     V1_9_1,
     V1_9_2,
     V1_10_0,
+    V1_10_1,
 }
 
 impl SignificantUpdate {
@@ -169,6 +170,7 @@ impl SignificantUpdate {
             Self::V1_9_1 => Version::parse("1.9.1").unwrap(),
             Self::V1_9_2 => Version::parse("1.9.2").unwrap(),
             Self::V1_10_0 => Version::parse("1.10.0").unwrap(),
+            Self::V1_10_1 => Version::parse("1.10.1").unwrap(),
         }
     }
 
@@ -182,56 +184,38 @@ impl SignificantUpdate {
         }
     }
 
-    pub fn get_features(&self) -> Option<Vec<String>> {
+    pub fn get_features(&self) -> Option<Vec<&'static str>> {
         match self {
             Self::V1_8_0AlphaOhpkmV2 => Some(vec![
-                String::from(
-                    "Tracked Pokémon may now have associated notes, using the 'Notes' tab in the Pokémon details popup",
-                ),
-                String::from(
-                    "Multiple past trainers' data are persisted, meaning friendship, etc can be independently tracked across many games for the same Pokémon",
-                ),
+                "Tracked Pokémon may now have associated notes, using the 'Notes' tab in the Pokémon details popup",
+                "Multiple past trainers' data are persisted, meaning friendship, etc can be independently tracked across many games for the same Pokémon",
             ]),
-            Self::V1_8_0AlphaFeatureMessages => Some(vec![String::from(
+            Self::V1_8_0AlphaFeatureMessages => Some(vec![
                 "Right clicking on some elements now offers actions in a context menu",
-            )]),
-            Self::V1_8_1 => Some(vec![String::from(
-                "A bug present when launching v1.8.0 has been fixed",
-            )]),
+            ]),
+            Self::V1_8_1 => Some(vec!["A bug present when launching v1.8.0 has been fixed"]),
             Self::V1_8_2 => Some(vec![
-                String::from(
-                    "Pokémon can optionally display extra information on the top-right of box view icons. This can be changed using the \"Display\" tab on the right panel of the home screen",
-                ),
-                String::from(
-                    "A bug preventing new users from launching v1.8.0 or v1.8.1 has been fixed",
-                ),
+                "Pokémon can optionally display extra information on the top-right of box view icons. This can be changed using the \"Display\" tab on the right panel of the home screen",
+                "A bug preventing new users from launching v1.8.0 or v1.8.1 has been fixed",
             ]),
             Self::V1_9_0 => Some(vec![
-                String::from("Save files and Pokémon from Pokémon Legends: Z-A are now supported"),
-                String::from(
-                    "Tools for finding and recovering tracked Pokémon have been added to the \"Tracked Pokémon\" tab",
-                ),
+                "Save files and Pokémon from Pokémon Legends: Z-A are now supported",
+                "Tools for finding and recovering tracked Pokémon have been added to the \"Tracked Pokémon\" tab",
             ]),
-            Self::V1_9_1 => Some(vec![String::from(
+            Self::V1_9_1 => Some(vec![
                 "Bugs related to form updates, the item bag, and Pokédex display have been fixed",
-            )]),
-            Self::V1_9_2 => Some(vec![String::from(
-                "Fixed a regression causing some Pokémon to 'devolve'",
-            )]),
+            ]),
+            Self::V1_9_2 => Some(vec!["Fixed a regression causing some Pokémon to 'devolve'"]),
             Self::V1_10_0 => Some(vec![
-                String::from(
-                    "Multi-select/drag is now supported in OpenHome boxes. Use the button in the Home boxes to the top right (next to the name edit button) to toggle multi-select",
-                ),
-                String::from("Support for Pokémon Luminescent Platinum has been added"),
-                String::from(
-                    "Cosplay Pikachu and Pokémon with forms exclusive to ROM hacks can now be moved into OpenHome and to supported save files",
-                ),
-                String::from(
-                    "Using the Display tab in the Pokémon details modal, you can assign tags and background colors to your Pokémon",
-                ),
-                String::from(
-                    "Image resources have been replaced to reduce bundle size and loading times",
-                ),
+                "Multi-select/drag is now supported in OpenHome boxes. Use the button in the Home boxes to the top right (next to the name edit button) to toggle multi-select",
+                "Support for Pokémon Luminescent Platinum has been added",
+                "Cosplay Pikachu and Pokémon with forms exclusive to ROM hacks can now be moved into OpenHome and to supported save files",
+                "Using the Display tab in the Pokémon details modal, you can assign tags and background colors to your Pokémon",
+                "Image resources have been replaced to reduce bundle size and loading times",
+            ]),
+            Self::V1_10_1 => Some(vec![
+                "All newly tracked Pokémon will now keep a backup copy of their original data in its raw byte format. This should increase the chance of data recovery in case of future bugs or oversights. Backup data can be viewed via the toggle in the bottom left of that Pokémon details modal, but Pokémon tracked from before version 1.10.1 will not have backup data or this toggle.",
+                "More columns have been added to the \"Tracked Pokémon\" tab, including stats, types, gender, shiny status, and moves",
             ]),
             _ => None,
         }
@@ -247,18 +231,18 @@ impl SignificantUpdate {
 #[derive(Debug, Clone, Serialize)]
 pub struct UpdateFeatures {
     version: String,
-    feature_messages: Vec<String>,
+    feature_messages: Vec<&'static str>,
 }
 
 impl UpdateFeatures {
-    pub fn new(version: Version, feature_messages: Vec<String>) -> Self {
+    pub fn new(version: Version, feature_messages: Vec<&'static str>) -> Self {
         Self {
             version: version.to_string(),
             feature_messages,
         }
     }
 
-    pub fn add_feature_messages(&mut self, feature_messages: &[String]) {
+    pub fn add_feature_messages(&mut self, feature_messages: &[&'static str]) {
         self.feature_messages.extend_from_slice(feature_messages);
     }
 
