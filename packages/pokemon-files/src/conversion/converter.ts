@@ -39,9 +39,3 @@ export class PkmConverter {
     return this._inner.metLocationIndexPlatinumHgss(ohpkm)
   }
 }
-
-const DP_FARAWAY_PLACE = 0xbba
-
-function validDPLocation(index: number): boolean {
-  return index >= 0x0070 && index < 2000
-}
