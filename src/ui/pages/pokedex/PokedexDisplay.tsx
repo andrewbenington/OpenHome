@@ -319,8 +319,6 @@ function PokedexMain(props: PokedexMetadataProps) {
     )
   }
 
-  console.log('metadata reader', reader.sourceName)
-
   const type1 = reader.type1()
   const type2 = reader.type2()
   const stats = reader.baseStats()
