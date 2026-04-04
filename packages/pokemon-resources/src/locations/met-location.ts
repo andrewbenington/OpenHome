@@ -131,8 +131,8 @@ const ORIGIN_GAME_BY_FORMAT: { [key: string]: OriginGame } = {
   PA9: OriginGame.LegendsZa,
 }
 
-export const getFormatLocationString = (index: number, format: string, egg = false) => {
-  const game = ORIGIN_GAME_BY_FORMAT[format as MonFormat]
+export const getFormatLocationString = (index: number, format: MonFormat, egg = false) => {
+  const game = ORIGIN_GAME_BY_FORMAT[format]
   if (game <= OriginGame.White && index === 30001) {
     return 'at the Poké Transfer Lab'
   }

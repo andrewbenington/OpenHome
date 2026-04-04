@@ -1,7 +1,8 @@
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
-import { ConvertStrategies, ConvertStrategy, ExtraFormIndex } from '@pkm-rs/pkg'
-import { PA8, PK3, PK8 } from '@pokemon-files/pkm'
+import { ConvertStrategies, ConvertStrategy, ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
+import { PA8, PK3, PK4, PK7, PK8 } from '@pokemon-files/pkm'
 import { HyperTrainStats, Stats } from '@pokemon-files/util'
+import { getFormatLocationString } from '@pokemon-resources/locations'
 import fs from 'fs'
 import path from 'path'
 import { assert, beforeAll, describe, expect, test } from 'vitest'
@@ -244,6 +245,86 @@ describe('OHPKM conversion strategies', () => {
     expect(pk8.nickname, 'PK8 species name is title case (game default)').toEqual('Pikachu')
     pk8 = PK8.fromOhpkm(original, MODERN_STRATEGY)
     expect(pk8.nickname, 'PK8 species name is title case (modern)').toEqual('Pikachu')
+  })
+
+  const LEGALITY_STRATEGY: ConvertStrategy = {
+    'metData.originAndLocation': 'MaximizeLegality',
+  }
+  const LOCATION_MATCH_STRATEGY: ConvertStrategy = {
+    'metData.originAndLocation': 'UseLocationNameMatch',
+  }
+
+  test('met data conversion strategy', () => {
+    const original = OHPKM.defaultWithSpecies(NationalDex.Pikachu, 0)
+    original.gameOfOrigin = OriginGame.AlphaSapphire
+
+    let pk4 = PK4.fromOhpkm(original, LOCATION_MATCH_STRATEGY)
+    expect(
+      pk4.gameOfOrigin,
+      'Alpha Sapphire converted to Sapphire in PK4 (location match strategy)'
+    ).toEqual(OriginGame.Sapphire)
+    expect(
+      getFormatLocationString(pk4.metLocationIndex, 'PK4'),
+      'Alpha Sapphire -> PK4 location is Hoenn with location match strategy'
+    ).toContain('Hoenn')
+
+    pk4 = PK4.fromOhpkm(original, LEGALITY_STRATEGY)
+    expect(
+      pk4.gameOfOrigin,
+      'Alpha Sapphire converted to Sapphire in PK4 (legality strategy)'
+    ).toEqual(OriginGame.Sapphire)
+    expect(
+      getFormatLocationString(pk4.metLocationIndex, 'PK4'),
+      'Alpha Sapphire -> PK4 location is Pal Park with legality strategy'
+    ).toContain('Pal Park')
+  })
+
+  test('met data is preserved for original format', () => {
+    const original = OHPKM.defaultWithSpecies(NationalDex.Pikachu, 0)
+    original.gameOfOrigin = OriginGame.Diamond
+    original.metLocationIndex = 6 // Jubilife City
+
+    let pk4 = PK4.fromOhpkm(original, LEGALITY_STRATEGY)
+    expect(pk4.gameOfOrigin, 'Diamond origin preserved (legality strategy)').toEqual(
+      OriginGame.Diamond
+    )
+    expect(
+      getFormatLocationString(pk4.metLocationIndex, 'PK4'),
+      'Diamond -> Original location preserved with legality strategy'
+    ).toContain('Jubilife City')
+
+    pk4 = PK4.fromOhpkm(original, LOCATION_MATCH_STRATEGY)
+    expect(pk4.gameOfOrigin, 'Diamond origin preserved (location match strategy)').toEqual(
+      OriginGame.Diamond
+    )
+    expect(
+      getFormatLocationString(pk4.metLocationIndex, 'PK4'),
+      'Diamond -> Original location preserved with location match strategy'
+    ).toContain('Jubilife City')
+  })
+
+  test('met data is preserved for transferrable format', () => {
+    const original = OHPKM.defaultWithSpecies(NationalDex.Pikachu, 0)
+    original.gameOfOrigin = OriginGame.OmegaRuby
+    original.metLocationIndex = 280 // Granite Cave
+
+    let pk7 = PK7.fromOhpkm(original, LEGALITY_STRATEGY)
+    expect(pk7.gameOfOrigin, 'Omega Ruby origin preserved (legality strategy)').toEqual(
+      OriginGame.OmegaRuby
+    )
+    expect(
+      pk7.metLocationIndex,
+      'Omega Ruby -> PK7 location index preserved with legality strategy'
+    ).toBe(280)
+
+    pk7 = PK7.fromOhpkm(original, LOCATION_MATCH_STRATEGY)
+    expect(pk7.gameOfOrigin, 'Omega Ruby origin preserved (location match strategy)').toEqual(
+      OriginGame.OmegaRuby
+    )
+    expect(
+      getFormatLocationString(pk7.metLocationIndex, 'PK7'),
+      'Omega Ruby -> PK7 location index is Hoenn with location match strategy'
+    ).toContain('Hoenn')
   })
 })
 
