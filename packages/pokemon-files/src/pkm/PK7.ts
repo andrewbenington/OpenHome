@@ -31,7 +31,7 @@ export default class PK7 {
     return 232
   }
   encryptionConstant: number
-  checksum: number
+  checksum: number = 0
   dexNum: number
   heldItemIndex: number
   trainerID: number
@@ -306,7 +306,7 @@ export default class PK7 {
       this.trainerMemory = other.trainerMemory
       this.trainerGender = other.trainerGender
     }
-    this.checksum = this.calculcateChecksum()
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK7 {
@@ -425,7 +425,7 @@ export default class PK7 {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
-  public calculcateChecksum() {
+  public calculateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0xe8)
   }
 

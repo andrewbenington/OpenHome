@@ -35,7 +35,6 @@ export function getLocationStringOrOrigin(
 }
 
 export const getLocationString = (game: number, index: number, format: string, egg = false) => {
-  console.log('getLocationString', { game, index, format, egg })
   if (game <= OriginGame.White && index === 30001) {
     return 'at the Poké Transfer Lab'
   }

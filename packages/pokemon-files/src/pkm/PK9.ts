@@ -303,12 +303,13 @@ export default class PK9 {
       this.tmFlagsSV = other.tmFlagsSV ?? new Uint8Array(22)
       this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], '')
       this.trainerGender = other.trainerGender
-      this.checksum = this.calculcateChecksum()
     }
+
     // heal and recalculate in case the source was not accurate
     this.level = this.getLevel()
     this.stats = this.getStats()
     this.currentHP = this.stats.hp
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK9 {
@@ -432,7 +433,7 @@ export default class PK9 {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
-  public calculcateChecksum() {
+  public calculateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x148)
   }
 

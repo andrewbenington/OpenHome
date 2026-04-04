@@ -31,7 +31,7 @@ export default class PB8 {
     return 344
   }
   encryptionConstant: number
-  checksum: number
+  checksum: number = 0
   dexNum: number
   heldItemIndex: number
   trainerID: number
@@ -292,10 +292,10 @@ export default class PB8 {
     }
 
     // heal and recalculate in case the source was not accurate
-    this.checksum = this.calculcateChecksum()
     this.level = this.getLevel()
     this.stats = this.getStats()
     this.currentHP = this.stats.hp
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PB8 {
@@ -430,7 +430,7 @@ export default class PB8 {
     this.eggLocationIndexInternal = value === 0 ? 0xffff : value
   }
 
-  public calculcateChecksum() {
+  public calculateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x148)
   }
 

@@ -31,7 +31,7 @@ export default class PA8 {
     return 360
   }
   encryptionConstant: number
-  checksum: number
+  checksum: number = 0
   dexNum: number
   heldItemIndex: number
   trainerID: number
@@ -326,12 +326,12 @@ export default class PA8 {
       this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], 'Hisui')
       this.trainerGender = other.trainerGender
     }
-    this.checksum = this.calculcateChecksum()
 
     // heal and recalculate in case the source was not accurate
     this.level = this.getLevel()
     this.stats = this.getStats()
     this.currentHP = this.stats.hp
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PA8 {
@@ -482,7 +482,7 @@ export default class PA8 {
     return getWeightCalculated(this)
   }
 
-  public calculcateChecksum() {
+  public calculateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x168)
   }
 

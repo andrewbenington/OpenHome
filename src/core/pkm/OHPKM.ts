@@ -357,10 +357,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
             `No original data tag found for format ${other.format}, cannot set original bytes on OHPKM`
           )
         }
-      } else {
-        console.warn(
-          'No original bytes found in other mon, skipping setting original data on OHPKM'
-        )
       }
     }
     if (this.openhomeId === '0004-d889ca57-401aab08-30') {

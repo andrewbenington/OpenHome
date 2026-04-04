@@ -80,7 +80,7 @@ export default class PK4 {
   trainerName: string
   trainerGender: boolean
   isFatefulEncounter: boolean
-  checksum: number
+  checksum: number = 0
   originalBytes?: ArrayBuffer
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
@@ -296,8 +296,8 @@ export default class PK4 {
       this.trainerName = other.trainerName
       this.trainerGender = other.trainerGender
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.checksum = this.calculateChecksum()
     }
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK4 {

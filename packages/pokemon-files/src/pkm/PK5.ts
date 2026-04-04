@@ -70,7 +70,7 @@ export default class PK5 {
   nickname: string
   trainerName: string
   trainerGender: boolean
-  checksum: number
+  checksum: number = 0
   originalBytes?: ArrayBuffer
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
@@ -215,8 +215,8 @@ export default class PK5 {
       this.nickname = converter.nickname(other)
       this.trainerName = other.trainerName
       this.trainerGender = other.trainerGender
-      this.checksum = this.calculcateChecksum()
     }
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK5 {
@@ -329,7 +329,7 @@ export default class PK5 {
     return ((this.personalityValue >> 16) & 1) + 1
   }
 
-  public calculcateChecksum() {
+  public calculateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x87)
   }
 

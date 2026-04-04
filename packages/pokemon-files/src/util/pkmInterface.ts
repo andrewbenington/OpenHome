@@ -165,7 +165,7 @@ export interface AllPKMFields {
   heldItemName: string
   languageString: string
   getLevel: () => number
-  calculcateChecksum?: () => number
+  calculateChecksum?: () => number
   refreshChecksum?: () => void
   isShiny: () => boolean
   isSquareShiny: () => boolean

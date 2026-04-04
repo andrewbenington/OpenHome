@@ -47,7 +47,8 @@ impl PkmConverter {
                 self.dest_pkm_format.met_data_maximizing_legality(ohpkm)
             }
             MetDataStrategy::UseLocationNameMatch => MetData::new(
-                self.dest_pkm_format.default_origin(),
+                self.dest_pkm_format
+                    .legalize_origin(ohpkm.get_game_of_origin()),
                 self.met_location_index(ohpkm),
             ),
         }

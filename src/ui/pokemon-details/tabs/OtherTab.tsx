@@ -345,14 +345,14 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         {mon.formArgument !== undefined && (
           <AttributeRow label="Form Argument" value={mon.formArgument.toString()} />
         )}
-        {mon.checksum !== undefined && mon.calculcateChecksum && (
+        {mon.checksum !== undefined && mon.calculateChecksum && (
           <>
             <AttributeRow label="Checksum">
               <code>{u16Display(mon.checksum)}</code>
             </AttributeRow>
-            {'calculcateChecksum' in mon && (
+            {'calculateChecksum' in mon && (
               <AttributeRow label="Calced Checksum">
-                <code>{u16Display(mon.calculcateChecksum())}</code>
+                <code>{u16Display(mon.calculateChecksum())}</code>
               </AttributeRow>
             )}
           </>

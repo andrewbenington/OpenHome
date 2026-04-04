@@ -29,7 +29,7 @@ export default class PB7 {
     return 260
   }
   encryptionConstant: number
-  checksum: number
+  checksum: number = 0
   dexNum: number
   heldItemIndex: number
   trainerID: number
@@ -282,10 +282,11 @@ export default class PB7 {
       this.megaForme = 0
       this.trainerGender = other.trainerGender
     }
-    this.checksum = this.calculcateChecksum()
+
     this.level = this.getLevel()
     this.stats = this.getStats()
     this.currentHP = this.stats.hp
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PB7 {
@@ -410,7 +411,7 @@ export default class PB7 {
     return 0.4
   }
 
-  public calculcateChecksum() {
+  public calculateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0xe8)
   }
 

@@ -1,4 +1,3 @@
-import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import { ConvertStrategies, ExtraFormIndex } from '@pkm-rs/pkg'
 import { PA8, PK3, PK8 } from '@pokemon-files/pkm'
@@ -19,7 +18,7 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
 
   for (const file of files) {
     const bytes = new Uint8Array(fs.readFileSync(path.join(__dirname, 'PKMFiles', 'Gen3', file)))
-    const original = bytesToPKM(bytes, 'PK3') as PK3
+    const original = PK3.fromBytes(bytes.buffer)
     original.refreshChecksum()
 
     const v2 = new OHPKM(original)
@@ -27,9 +26,21 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
       assert(original.gender === v2.gender)
     })
 
-    const roundTrip = PK3.fromOhpkm(v2, ConvertStrategies.getDefault())
-    roundTrip.refreshChecksum()
+    test(`ohpkm v2 game of origin match - ${file}`, () => {
+      assert(original.gameOfOrigin === v2.gameOfOrigin)
+    })
 
+    const roundTrip = PK3.fromOhpkm(v2, ConvertStrategies.getDefault())
+
+    test(`round trip game of origin match - ${file}`, () => {
+      if (original.gameOfOrigin !== roundTrip.gameOfOrigin) {
+        throw new Error(
+          `Game of origin mismatch after round trip: original=${original.gameOfOrigin} roundTrip=${roundTrip.gameOfOrigin}`
+        )
+      }
+    })
+
+    roundTrip.refreshChecksum()
     test(`ability nums match - ${file}`, () => {
       assert(original.abilityNum === roundTrip.abilityNum)
     })

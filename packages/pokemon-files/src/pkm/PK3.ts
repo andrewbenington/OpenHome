@@ -66,7 +66,7 @@ export default class PK3 {
   trainerName: string
   ribbons: string[]
   trainerGender: boolean
-  checksum: number
+  checksum: number = 0
   originalBytes?: ArrayBuffer
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
@@ -193,8 +193,8 @@ export default class PK3 {
       this.trainerName = other.trainerName
       this.ribbons = filterRibbons(other.ribbons, [Gen3ContestRibbons, Gen3StandardRibbons])
       this.trainerGender = other.trainerGender
-      this.checksum = this.calculcateChecksum()
     }
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK3 {
@@ -309,12 +309,12 @@ export default class PK3 {
     return 0
   }
 
-  calculcateChecksum(): number {
+  calculateChecksum(): number {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x20, 0x50)
   }
 
   public refreshChecksum() {
-    this.checksum = this.calculcateChecksum()
+    this.checksum = this.calculateChecksum()
   }
 
   public toPCBytes() {
@@ -328,7 +328,7 @@ export default class PK3 {
   }
 
   public isValid(): boolean {
-    if (this.calculcateChecksum() !== this.checksum) {
+    if (this.calculateChecksum() !== this.checksum) {
       return false
     }
 

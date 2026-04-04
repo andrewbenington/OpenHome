@@ -868,7 +868,7 @@ impl PkmFormat {
         }
 
         println!(
-            "Origin game {:?} is not legal in format {:?}, legalizing origin and met location",
+            "Origin game {:?} is from format {:?}, legalizing origin and met location",
             source_origin, self
         );
 
