@@ -147,7 +147,7 @@ function BaseStatsChartPreSplit({ stats }: BaseStatsChartPreSplitProps) {
           datasets: [
             {
               label: 'Base Stats',
-              data: [stats.hp, stats.atk, stats.def, stats.spe, stats.spe, stats.spc],
+              data: [stats.hp, stats.atk, stats.def, stats.spe, stats.spc],
               fill: true,
               backgroundColor: 'rgba(132, 99, 255, 0.8)',
               borderColor: 'rgb(132, 99, 255)',
