@@ -1,8 +1,10 @@
 import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   AbilityIndex,
+  currentMetadataReader,
   extraFormTypeOverride,
   FormeMetadata,
+  metadataReaderFor,
   MetadataSource,
   MetadataSummaryLookup,
   PkmType,
@@ -154,24 +156,22 @@ export const getTypes = (mon: PKMInterface): PkmType[] => {
     }
   }
 
-  const metadata = mon.metadata
-  if (!metadata) {
+  const metadataReader =
+    mon.format === 'OHPKM'
+      ? currentMetadataReader(mon.dexNum, mon.formeNum)
+      : metadataReaderFor(MetadataSourceByFormat(mon.format), mon.dexNum, mon.formeNum)
+
+  if (!metadataReader) {
     return ['Normal']
   }
 
-  const metadataSource = MetadataSourceByFormat(mon.format)
-
-  console.assert(
-    metadata.type1WithSource(metadataSource) !== undefined,
-    `Missing type 1 for ${metadata.formeName} from source ${metadataSource}`
-  )
-  const type1 = metadata.type1WithSource(metadataSource) ?? metadata.type1
-  const type2 = metadata.type2WithSource(metadataSource)
+  const type1 = metadataReader.type1()
+  const type2 = metadataReader.type2()
 
   return type2 ? [type1, type2] : [type1]
 }
 
-function MetadataSourceByFormat(format: MonFormat | 'OHPKM'): MetadataSource {
+function MetadataSourceByFormat(format: MonFormat): MetadataSource {
   switch (format) {
     case 'PK1':
       return MetadataSource.Yellow
@@ -204,8 +204,6 @@ function MetadataSourceByFormat(format: MonFormat | 'OHPKM'): MetadataSource {
       return MetadataSource.ScarletViolet
     case 'PA9':
       return MetadataSource.LegendsZa
-    case 'OHPKM':
-      return MetadataSource.ScarletViolet
     default:
       console.warn(`Unknown format ${format}, defaulting to Scarlet/Violet metadata source`)
       return MetadataSource.ScarletViolet

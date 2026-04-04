@@ -55,6 +55,7 @@ export const getStandardPKMStats = (mon: PKMWithStandardStats): Stats => {
   }
 }
 
+// TODO: game boy stat calculation
 export const getGameBoyPKMStats = (mon: PKMWithGameBoyStats): Stats => {
   if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return {
