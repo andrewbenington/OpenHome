@@ -6,6 +6,7 @@ import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
+import { ConvertStrategies } from '../state/convert-strategies/ConvertStrategiesProvider'
 
 export type AppState = {
   open_transaction: boolean
@@ -88,6 +89,8 @@ export default interface BackendInterface {
   getState: () => Promise<Errorable<AppState>>
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>
+  getConvertStrategies: () => Promise<Errorable<ConvertStrategies>>
+  updateConvertStrategies: (strategies: ConvertStrategies) => Promise<Errorable<null>>
   setTheme(appTheme: AppTheme): Promise<Errorable<null>>
   saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Errorable<null>>
   emitMenuEvent: (menuEventId: string) => Promise<Errorable<null>>

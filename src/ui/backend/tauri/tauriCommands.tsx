@@ -5,6 +5,8 @@ import { AppTheme } from '@openhome-ui/state/appInfo'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { invoke, InvokeArgs, InvokeOptions } from '@tauri-apps/api/core'
+import { ConvertStrategies } from 'src/ui/state/convert-strategies/ConvertStrategiesProvider'
+import { DEFAULT_CONVERT_STRATEGY } from 'src/ui/state/convert-strategies/useConvertStrategies'
 import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
 
@@ -34,6 +36,8 @@ if (!('fromBase64' in Uint8Array)) {
     return bytes
   }
 }
+
+const ZERO_UUID = '00000000-0000-0000-0000-000000000000'
 
 type OhTauriApi = {
   get_state(): AppState
@@ -70,6 +74,9 @@ type OhTauriApi = {
 
   get_pokedex(): Pokedex
   update_pokedex(updates: PokedexUpdate[]): null
+
+  get_convert_strategies(): ConvertStrategies
+  update_convert_strategies(updates: ConvertStrategies): null
 
   start_transaction(): null
   rollback_transaction(): null
@@ -129,6 +136,27 @@ export const Commands: OhTauriApiNoThrow = {
 
   update_pokedex(updates: PokedexUpdate[]) {
     return invokeAndCatch('update_pokedex', { updates })
+  },
+
+  get_convert_strategies() {
+    return invokeAndCatch('get_convert_strategies').then(
+      R.map((strategies) => {
+        return ZERO_UUID in strategies.strategies_by_id
+          ? strategies
+          : {
+              ...strategies,
+              strategies_by_id: {
+                ...strategies.strategies_by_id,
+                [ZERO_UUID]: { name: 'Default', strategy: DEFAULT_CONVERT_STRATEGY },
+              },
+              default_strategy_id: ZERO_UUID,
+            }
+      })
+    )
+  },
+
+  update_convert_strategies(updates: ConvertStrategies) {
+    return invokeAndCatch('update_convert_strategies', { updates })
   },
 
   get_storage_file_json(relativePath: string) {

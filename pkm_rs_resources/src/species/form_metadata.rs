@@ -409,6 +409,11 @@ impl MetadataTableReader {
     pub fn base_stats(&self) -> BaseStats {
         self.get_base_stats()
     }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = "sourceName"))]
+    pub fn source_name(&self) -> String {
+        self.inner.get_source_name().to_owned()
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "metadataReaderFor"))]

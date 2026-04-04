@@ -1,5 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { SpeciesLookup } from '@pkm-rs/pkg'
+import { ConvertStrategies, SpeciesLookup } from '@pkm-rs/pkg'
 import { fail } from 'assert'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
@@ -126,7 +126,7 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
       const newMon = new OHPKM(firstMon)
 
       newMon.nickname = 'ModTest'
-      radicalRedSave.boxes[0].boxSlots[0] = new PK3RR(newMon)
+      radicalRedSave.boxes[0].boxSlots[0] = PK3RR.fromOhpkm(newMon, ConvertStrategies.getDefault())
       // radicalRedSave.boxes[0].pokemon[0].heldItemIndex = 123;
       // radicalRedSave.boxes[0].pokemon[0].moves[0] = 101;
 

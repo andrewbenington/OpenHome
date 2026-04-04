@@ -1792,13 +1792,13 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         ],
     },
     SpeciesMetadata {
-        name: "Nidoran-F",
+        name: "Nidoran♀",
         national_dex: unsafe { NatDexIndex::new_unchecked(29) },
         level_up_type: LevelUpType::MediumSlow,
         formes: &[FormeMetadata {
-            species_name: "Nidoran-F",
+            species_name: "Nidoran♀",
             national_dex: unsafe { NatDexIndex::new_unchecked(29) },
-            forme_name: "Nidoran-F",
+            forme_name: "Nidoran♀",
             forme_index: 0,
             is_base_forme: true,
             is_mega: false,
@@ -1900,13 +1900,13 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         }],
     },
     SpeciesMetadata {
-        name: "Nidoran-M",
+        name: "Nidoran♂",
         national_dex: unsafe { NatDexIndex::new_unchecked(32) },
         level_up_type: LevelUpType::MediumSlow,
         formes: &[FormeMetadata {
-            species_name: "Nidoran-M",
+            species_name: "Nidoran♂",
             national_dex: unsafe { NatDexIndex::new_unchecked(32) },
-            forme_name: "Nidoran-M",
+            forme_name: "Nidoran♂",
             forme_index: 0,
             is_base_forme: true,
             is_mega: false,

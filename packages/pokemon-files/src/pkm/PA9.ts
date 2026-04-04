@@ -1,6 +1,7 @@
 import {
   AbilityIndex,
   Ball,
+  ConvertStrategy,
   Item,
   Language,
   Languages,
@@ -9,26 +10,29 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import * as conversion from '../conversion'
+import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PA9 {
   static getName() {
-    return 'PA9'
+    return 'PA9' as const
   }
   format: 'PA9' = 'PA9'
   static getBoxSize() {
     return 344
   }
   encryptionConstant: number
-  checksum: number
+  checksum: number = 0
   dexNum: number
   heldItemIndex: number
   trainerID: number
@@ -49,7 +53,6 @@ export default class PA9 {
   evs: types.Stats
   contest: types.ContestStats
   pokerusByte: number
-  ribbonBytes: Uint8Array
   contestMemoryCount: number
   battleMemoryCount: number
   heightScalar: number
@@ -97,7 +100,9 @@ export default class PA9 {
   stats: types.Stats
   originalBytes?: ArrayBuffer
 
-  constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
+    const { encrypted, strategy } = options
+
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       if (encrypted) {
@@ -129,7 +134,6 @@ export default class PA9 {
       this.evs = types.readStatsFromBytesU8(dataView, 0x26)
       this.contest = types.readContestStatsFromBytes(dataView, 0x2c)
       this.pokerusByte = dataView.getUint8(0x32)
-      this.ribbonBytes = new Uint8Array(buffer).slice(0x34, 0x3c)
       this.contestMemoryCount = dataView.getUint8(0x3c)
       this.battleMemoryCount = dataView.getUint8(0x3d)
       this.heightScalar = dataView.getUint8(0x48)
@@ -200,8 +204,10 @@ export default class PA9 {
       this.trainerGender = byteLogic.getFlag(dataView, 0x125, 7)
     } else {
       const other = arg
+      const converter = new PkmConverter('PA9', strategy)
+      const metData = converter.metData(other)
+
       this.encryptionConstant = other.encryptionConstant ?? 0
-      this.checksum = other.checksum ?? 0
       this.dexNum = other.dexNum
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
@@ -220,7 +226,7 @@ export default class PA9 {
         diamond: false,
       }
       this.personalityValue = other.personalityValue ?? 0
-      this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
+      this.nature = other.nature
       this.statNature = other.statNature ?? NatureIndex.newFromPid(this.personalityValue)
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
       this.gender = other.gender ?? 0
@@ -243,7 +249,6 @@ export default class PA9 {
         sheen: 0,
       }
       this.pokerusByte = other.pokerusByte ?? 0
-      this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(8)
       this.contestMemoryCount = other.contestMemoryCount ?? 0
       this.battleMemoryCount = other.battleMemoryCount ?? 0
       this.heightScalar = other.heightScalar ?? 0
@@ -259,79 +264,56 @@ export default class PA9 {
       this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
 
       this.currentHP = other.currentHP ?? 0
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? false
-      this.statusCondition = other.statusCondition ?? 0
-      this.handlerName = other.handlerName ?? ''
-      this.handlerGender = other.handlerGender ?? false
-      this.handlerLanguage = other.handlerLanguage ?? 0
-      this.isCurrentHandler = other.isCurrentHandler ?? false
-      this.handlerID = other.handlerID ?? 0
-      this.handlerFriendship = other.handlerFriendship ?? 0
-      this.handlerMemory = other.handlerMemory ?? {
-        intensity: 0,
-        memory: 0,
-        feeling: 0,
-        textVariables: 0,
-      }
-      this.gameOfOrigin = other.gameOfOrigin
+      this.ivs = converter.ivs(other)
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
+      this.statusCondition = 0
+      this.handlerName = other.handlerName
+      this.handlerGender = other.handlerGender
+      this.handlerLanguage = other.handlerLanguage
+      this.isCurrentHandler = other.isCurrentHandler
+      this.handlerID = other.handlerId
+      this.handlerFriendship = other.handlerFriendship
+      this.handlerMemory = other.handlerMemory
       this.gameOfOriginBattle = other.gameOfOriginBattle ?? 0
-      this.formArgument = other.formArgument ?? 0
-      this.affixedRibbon = other.affixedRibbon ?? undefined
+      this.formArgument = other.formArgument
+      this.affixedRibbon = other.affixedRibbon
       this.language = other.language
       this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship ?? 0
-      this.trainerMemory = other.trainerMemory ?? {
-        intensity: 0,
-        memory: 0,
-        feeling: 0,
-        textVariables: 0,
-      }
-      this.eggDate = other.eggDate ?? undefined
-      this.metDate = other.metDate ?? {
-        month: new Date().getMonth(),
-        day: new Date().getDate(),
-        year: new Date().getFullYear(),
-      }
+      this.trainerFriendship = other.trainerFriendship
+      this.trainerMemory = other.trainerMemory
+      this.eggDate = other.eggDate
+      this.metDate = other.metDate
       this.obedienceLevel = other.obedienceLevel ?? 0
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
       if (other.ball && PA9.allowedBalls().includes(other.ball)) {
         this.ball = other.ball
       } else {
         this.ball = Ball.Strange
       }
-      this.metLevel = other.metLevel ?? 0
-      this.hyperTraining = other.hyperTraining ?? {
-        hp: false,
-        atk: false,
-        def: false,
-        spa: false,
-        spd: false,
-        spe: false,
-      }
+      this.metLevel = other.metLevel
+      this.hyperTraining = other.hyperTraining
       this.homeTracker = other.homeTracker ?? new Uint8Array(8)
       this.tmFlagsLza = other.tmFlagsSV ?? new Uint8Array(22)
-      this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], '') ?? []
+      this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], '')
       this.trainerGender = other.trainerGender
     }
 
-    // heal and recalculate level in case the source was not accurate
+    // heal and recalculate in case the source was not accurate
     this.level = this.getLevel()
     this.stats = this.getStats()
     this.currentHP = this.stats.hp
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
-  static fromBytes(buffer: ArrayBuffer): PA9 {
-    return new PA9(buffer)
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PA9 {
+    return new PA9(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PA9 {
+    return new PA9(ohpkm, { strategy })
   }
 
   toBytes(): ArrayBuffer {
@@ -359,7 +341,6 @@ export default class PA9 {
     types.writeStatsToBytesU8(dataView, 0x26, this.evs)
     types.writeContestStatsToBytes(dataView, 0x2c, this.contest)
     dataView.setUint8(0x32, this.pokerusByte)
-    new Uint8Array(buffer).set(new Uint8Array(this.ribbonBytes.slice(0, 8)), 0x34)
     dataView.setUint8(0x3c, this.contestMemoryCount)
     dataView.setUint8(0x3d, this.battleMemoryCount)
     dataView.setUint8(0x48, this.heightScalar)
@@ -446,7 +427,7 @@ export default class PA9 {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
-  public calcChecksum() {
+  public calculateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x148)
   }
 

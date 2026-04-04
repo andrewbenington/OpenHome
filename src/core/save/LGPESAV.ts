@@ -1,5 +1,5 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PB7 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { LGE_STARTER, LGP_STARTER } from '@pokemon-resources/consts/Formes'
@@ -178,15 +178,15 @@ export class LGPESAV extends OfficialSAV<PB7> {
     return nextEmptyIndex
   }
 
-  convertOhpkm(ohpkm: OHPKM): PB7 {
-    return new PB7(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB7 {
+    return PB7.fromOhpkm(ohpkm, strategy)
   }
 
   getMonAtIndex(monIndex: number) {
     const startByte = PC_OFFSET + MON_BYTE_SIZE * monIndex
     const endByte = PC_OFFSET + MON_BYTE_SIZE * (monIndex + 1)
     const monBytes = this.bytes.slice(startByte, endByte)
-    const mon = new PB7(monBytes.buffer, true)
+    const mon = PB7.fromBytes(monBytes.buffer, true)
 
     if (
       mon.dexNum === 0 ||
@@ -201,7 +201,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
   writeMonAtIndex(mon: PB7 | null, monIndex: number) {
     if (mon === null) {
       // empty slot representation
-      mon = new PB7(new Uint8Array(MON_BYTE_SIZE).buffer)
+      mon = PB7.fromBytes(new Uint8Array(MON_BYTE_SIZE).buffer)
     }
 
     mon.refreshChecksum()
@@ -214,7 +214,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
   static writeMonToStorageBytesAtIndex(bytes: Uint8Array, mon: PB7 | null, monIndex: number) {
     if (mon === null) {
       // empty slot representation
-      mon = new PB7(new Uint8Array(MON_BYTE_SIZE).buffer)
+      mon = PB7.fromBytes(new Uint8Array(MON_BYTE_SIZE).buffer)
     }
 
     mon.refreshChecksum()

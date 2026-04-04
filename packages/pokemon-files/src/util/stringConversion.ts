@@ -384,9 +384,7 @@ export const GBStringDict: { [key: number]: string } = {
 export const readGameBoyStringFromBytes = (dataView: DataView, offset: number, length: number) => {
   let str = ''
 
-  // console.log(bytes);
   for (let i = offset; i < offset + length; i += 1) {
-    // console.log(i, bytes[i], GBStringDict[bytes[i]]);
     const character = dataView.getUint8(i)
 
     if (character === G1_TERMINATOR) {

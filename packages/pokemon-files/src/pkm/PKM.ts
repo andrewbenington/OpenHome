@@ -1,8 +1,9 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import PK3RR from '@openhome-core/save/radicalred/PK3RR'
 import PK3UB from '@openhome-core/save/unbound/PK3UB'
-import { AllPKMFields } from '../util'
+import { ConvertStrategy } from '@pkm-rs/pkg'
 import COLOPKM from './COLOPKM'
 import PA8 from './PA8'
 import PA9 from './PA9'
@@ -38,10 +39,22 @@ export type PKM =
 
 export type RomHackPKM = PK3RR | PK3UB | PB8LUMI
 
-export type PkmClass = new (
-  arg: ArrayBuffer | AllPKMFields,
-  encrypted?: boolean | undefined
-) => PKMInterface
+export type PkmClass<P extends PKMInterface> = {
+  new (arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions): P
+  fromBytes(bytes: ArrayBuffer, encrypted?: boolean): P
+  fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
+  getName(): MonFormat
+}
+
+export type PkmConstructorOptions =
+  | {
+      encrypted?: boolean
+      strategy?: never
+    }
+  | {
+      encrypted?: never
+      strategy: ConvertStrategy
+    }
 
 export function isRomHackFormat(format: string): format is 'PK3RR' | 'PK3UB' | 'PB8LUMI' {
   return format === 'PK3RR' || format === 'PK3UB' || format === 'PB8LUMI'

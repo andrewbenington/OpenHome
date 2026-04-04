@@ -105,6 +105,9 @@ type PokedexDetailsProps = {
 }
 
 type PokedexView = 'main' | 'levelup'
+const MOST_CURRENT_SOURCE = '$CURRENT'
+
+type MostCurrentSource = typeof MOST_CURRENT_SOURCE
 
 function PokedexDetails({
   pokedex,
@@ -116,7 +119,9 @@ function PokedexDetails({
   const [imageError, setImageError] = useState(false)
   const [showShiny, setShowShiny] = useState(false)
   const [currentView, setCurrentView] = useState<PokedexView>('main')
-  const [metadataSource, setMetadataSource] = useState<MetadataSource>(MetadataSource.ScarletViolet)
+  const [metadataSource, setMetadataSource] = useState<MetadataSource | MostCurrentSource>(
+    MOST_CURRENT_SOURCE
+  )
 
   const selectedFormeStatus = getFormeStatus(pokedex, species.nationalDex, selectedForme.formeIndex)
   const spriteResult = useMonSprite({
@@ -240,15 +245,24 @@ function PokedexDetails({
           <div style={{ flex: 1 }} />
           <Select.Root
             value={metadataSource.toString()}
-            onValueChange={(value) => setMetadataSource(parseInt(value) as MetadataSource)}
+            onValueChange={(value) =>
+              setMetadataSource(
+                value === MOST_CURRENT_SOURCE
+                  ? MOST_CURRENT_SOURCE
+                  : (parseInt(value) as MetadataSource)
+              )
+            }
           >
             <Select.Trigger className="pokedex-view-select" />
-            <Select.Content>
+            <Select.Content position="popper">
               {allMetadataSources().map((source) => (
                 <Select.Item key={source} value={source.toString()}>
                   {MetadataSources.display(source)}
                 </Select.Item>
               ))}
+              <Select.Item key={MOST_CURRENT_SOURCE} value={MOST_CURRENT_SOURCE}>
+                Current Data
+              </Select.Item>
             </Select.Content>
           </Select.Root>
         </Flex>
@@ -282,20 +296,22 @@ type PokedexMetadataProps = {
   selectedForme: FormeMetadata
   setSelectedForme: (forme?: FormeMetadata) => void
   setSelectedSpecies: (species?: SpeciesMetadata) => void
-  metadataSource?: MetadataSource
+  metadataSource: MetadataSource | MostCurrentSource
 }
 
 function PokedexMain(props: PokedexMetadataProps) {
   const { pokedex, species, selectedForme, setSelectedForme, setSelectedSpecies, metadataSource } =
     props
 
-  const reader = metadataSource
-    ? metadataReaderFor(metadataSource, species.nationalDex, selectedForme.formeIndex)
-    : currentMetadataReader(species.nationalDex, selectedForme.formeIndex)
+  const reader =
+    metadataSource === MOST_CURRENT_SOURCE
+      ? currentMetadataReader(species.nationalDex, selectedForme.formeIndex)
+      : metadataReaderFor(metadataSource, species.nationalDex, selectedForme.formeIndex)
   if (!reader) {
-    const message = metadataSource
-      ? `No metadata available for this Pokémon in Pokémon ${MetadataSources.display(metadataSource)}.`
-      : 'No metadata available for this Pokémon.'
+    const message =
+      metadataSource !== MOST_CURRENT_SOURCE
+        ? `No metadata available for this Pokémon in Pokémon ${MetadataSources.display(metadataSource)}.`
+        : 'No metadata available for this Pokémon.'
     return (
       <Flex width="100%" height="100%" align="center" justify="center">
         <Text>{message}</Text>
@@ -368,7 +384,9 @@ function PokedexMain(props: PokedexMetadataProps) {
 function PokedexLearnset(props: PokedexMetadataProps) {
   const { selectedForme, metadataSource } = props
 
-  const levelUpLearnset = selectedForme.levelUpLearnset(metadataSource)
+  const levelUpLearnset = selectedForme.levelUpLearnset(
+    metadataSource === MOST_CURRENT_SOURCE ? undefined : metadataSource
+  )
 
   return (
     <Flex direction="column" overflow="hidden" p="1">

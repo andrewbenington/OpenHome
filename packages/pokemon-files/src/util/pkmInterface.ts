@@ -120,7 +120,6 @@ export interface AllPKMFields {
   region?: number
   relearnMoves?: FourMoves
   resortEventStatus?: number
-  ribbonBytes?: Uint8Array
   ribbons?: string[]
   sanity?: number
   scale?: number
@@ -166,7 +165,7 @@ export interface AllPKMFields {
   heldItemName: string
   languageString: string
   getLevel: () => number
-  calcChecksum?: () => number
+  calculateChecksum?: () => number
   refreshChecksum?: () => void
   isShiny: () => boolean
   isSquareShiny: () => boolean

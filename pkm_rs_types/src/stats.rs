@@ -4,6 +4,15 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+pub enum Stat {
+    Hp,
+    Atk,
+    Def,
+    Spa,
+    Spd,
+    Spe,
+}
+
 pub trait Stats: Sized {
     fn get_hp(&self) -> u16;
     fn get_atk(&self) -> u16;
@@ -120,6 +129,28 @@ impl Stats8 {
             }
         }
     }
+
+    pub fn get(&self, stat: Stat) -> u8 {
+        match stat {
+            Stat::Hp => self.hp,
+            Stat::Atk => self.atk,
+            Stat::Def => self.def,
+            Stat::Spa => self.spa,
+            Stat::Spd => self.spd,
+            Stat::Spe => self.spe,
+        }
+    }
+
+    pub fn set(&mut self, stat: Stat, value: u8) {
+        match stat {
+            Stat::Hp => self.hp = value,
+            Stat::Atk => self.atk = value,
+            Stat::Def => self.def = value,
+            Stat::Spa => self.spa = value,
+            Stat::Spd => self.spd = value,
+            Stat::Spe => self.spe = value,
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -143,6 +174,23 @@ impl Stats8 {
     #[wasm_bindgen(getter = stats8)]
     pub fn rust_type_name(&self) -> bool {
         true
+    }
+}
+
+impl IntoIterator for Stats8 {
+    type Item = (Stat, u8);
+    type IntoIter = std::array::IntoIter<(Stat, u8), 6>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        [
+            (Stat::Hp, self.hp),
+            (Stat::Atk, self.atk),
+            (Stat::Def, self.def),
+            (Stat::Spa, self.spa),
+            (Stat::Spd, self.spd),
+            (Stat::Spe, self.spe),
+        ]
+        .into_iter()
     }
 }
 
@@ -245,6 +293,34 @@ impl HyperTraining {
             | ((self.spa as u8) << 3)
             | ((self.spd as u8) << 4)
             | ((self.spe as u8) << 5)
+    }
+
+    pub const fn by_stat(self, stat: Stat) -> bool {
+        match stat {
+            Stat::Hp => self.hp,
+            Stat::Atk => self.atk,
+            Stat::Def => self.def,
+            Stat::Spa => self.spa,
+            Stat::Spd => self.spd,
+            Stat::Spe => self.spe,
+        }
+    }
+}
+
+impl IntoIterator for HyperTraining {
+    type Item = (Stat, bool);
+    type IntoIter = std::array::IntoIter<(Stat, bool), 6>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        [
+            (Stat::Hp, self.hp),
+            (Stat::Atk, self.atk),
+            (Stat::Def, self.def),
+            (Stat::Spa, self.spa),
+            (Stat::Spd, self.spd),
+            (Stat::Spe, self.spe),
+        ]
+        .into_iter()
     }
 }
 

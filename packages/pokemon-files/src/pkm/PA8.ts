@@ -1,6 +1,7 @@
 import {
   AbilityIndex,
   Ball,
+  ConvertStrategy,
   Item,
   Language,
   Languages,
@@ -9,26 +10,28 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { getHeightCalculated, getWeightCalculated, MoveFilter } from '../util/util'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PA8 {
   static getName() {
-    return 'PA8'
+    return 'PA8' as const
   }
   format: 'PA8' = 'PA8'
   static getBoxSize() {
     return 360
   }
   encryptionConstant: number
-  sanity: number
-  checksum: number
+  checksum: number = 0
   dexNum: number
   heldItemIndex: number
   trainerID: number
@@ -47,7 +50,6 @@ export default class PA8 {
   evs: types.Stats
   contest: types.ContestStats
   pokerusByte: number
-  ribbonBytes: Uint8Array
   contestMemoryCount: number
   battleMemoryCount: number
   alphaMove: number
@@ -107,7 +109,9 @@ export default class PA8 {
   stats: types.Stats
   originalBytes?: ArrayBuffer
 
-  constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
+    const { encrypted, strategy } = options
+
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       if (encrypted) {
@@ -118,7 +122,6 @@ export default class PA8 {
       this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
-      this.sanity = dataView.getUint16(0x4, true)
       this.checksum = dataView.getUint16(0x6, true)
       this.dexNum = dataView.getUint16(0x8, true)
       this.heldItemIndex = dataView.getUint16(0xa, true)
@@ -138,7 +141,6 @@ export default class PA8 {
       this.evs = types.readStatsFromBytesU8(dataView, 0x26)
       this.contest = types.readContestStatsFromBytes(dataView, 0x2c)
       this.pokerusByte = dataView.getUint8(0x32)
-      this.ribbonBytes = new Uint8Array(buffer).slice(0x34, 0x3c)
       this.contestMemoryCount = dataView.getUint8(0x3c)
       this.battleMemoryCount = dataView.getUint8(0x3d)
       this.alphaMove = dataView.getUint16(0x3e, true)
@@ -224,16 +226,17 @@ export default class PA8 {
       this.trainerGender = byteLogic.getFlag(dataView, 0x13d, 7)
     } else {
       const other = arg
-      this.encryptionConstant = other.encryptionConstant ?? 0
-      this.sanity = other.sanity ?? 0
-      this.checksum = other.checksum ?? 0
+      const converter = new PkmConverter('PA8', strategy)
+      const metData = converter.metData(other)
+
+      this.encryptionConstant = other.encryptionConstant
       this.dexNum = other.dexNum
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
       this.ability = other.ability
-      this.abilityNum = other.abilityNum ?? 0
+      this.abilityNum = other.abilityNum
       this.markings = types.markingsSixShapesWithColorFromOther(other.markings) ?? {
         circle: false,
         triangle: false,
@@ -242,37 +245,23 @@ export default class PA8 {
         star: false,
         diamond: false,
       }
-      this.personalityValue = other.personalityValue ?? 0
-      this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
+      this.personalityValue = other.personalityValue
+      this.nature = other.nature
       this.statNature = other.statNature ?? NatureIndex.newFromPid(this.personalityValue)
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
       this.flag2LA = other.flag2LA ?? false
-      this.gender = other.gender ?? 0
+      this.gender = other.gender
       this.formeNum = other.formeNum
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.contest = other.contest ?? {
-        cool: 0,
-        beauty: 0,
-        cute: 0,
-        smart: 0,
-        tough: 0,
-        sheen: 0,
-      }
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(8)
-      this.contestMemoryCount = other.contestMemoryCount ?? 0
-      this.battleMemoryCount = other.battleMemoryCount ?? 0
+      this.evs = other.evs
+      this.contest = other.contest
+      this.pokerusByte = other.pokerusByte
+
+      this.contestMemoryCount = other.contestMemoryCount
+      this.battleMemoryCount = other.battleMemoryCount
       this.alphaMove = other.alphaMove ?? 0
-      this.sociability = other.sociability ?? 0
-      this.heightScalar = other.heightScalar ?? 127
-      this.weightScalar = other.weightScalar ?? 127
+      this.sociability = other.sociability
+      this.heightScalar = other.heightScalar
+      this.weightScalar = other.weightScalar
       this.scale = other.scale ?? this.heightScalar
       this.nickname = other.nickname
 
@@ -282,19 +271,12 @@ export default class PA8 {
       this.movePPUps = moveFilter.movePpUps(other)
       this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
 
-      this.currentHP = other.currentHP ?? 0
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? false
+      this.currentHP = other.currentHP
+      this.ivs = converter.ivs(other)
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
       this.dynamaxLevel = other.dynamaxLevel ?? 0
-      this.statusCondition = other.statusCondition ?? 0
+      this.statusCondition = 0
       this.unknownA0 = other.unknownA0 ?? 0
       this.gvs = other.gvs ?? {
         hp: 0,
@@ -304,46 +286,35 @@ export default class PA8 {
         spa: 0,
         spd: 0,
       }
-      this.handlerName = other.handlerName ?? ''
-      this.handlerGender = other.handlerGender ?? false
-      this.handlerLanguage = other.handlerLanguage ?? 0
-      this.isCurrentHandler = other.isCurrentHandler ?? false
-      this.handlerID = other.handlerID ?? 0
-      this.handlerFriendship = other.handlerFriendship ?? 0
-      this.fullness = other.fullness ?? 0
-      this.enjoyment = other.enjoyment ?? 0
-      this.gameOfOrigin = other.gameOfOrigin
+      this.handlerName = other.handlerName
+      this.handlerGender = other.handlerGender
+      this.handlerLanguage = other.handlerLanguage
+      this.isCurrentHandler = other.isCurrentHandler
+      this.handlerID = other.handlerId
+      this.handlerFriendship = other.handlerFriendship
+      this.fullness = other.fullness
+      this.enjoyment = other.enjoyment
       this.gameOfOriginBattle = other.gameOfOriginBattle ?? 0
       this.region = other.region ?? 0
       this.consoleRegion = other.consoleRegion ?? 0
       this.language = other.language
       this.unknownF3 = other.unknownF3 ?? 0
       this.formArgument = other.formArgument ?? 0
-      this.affixedRibbon = other.affixedRibbon ?? undefined
+      this.affixedRibbon = other.affixedRibbon
       this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship ?? 0
-      this.eggDate = other.eggDate ?? undefined
-      this.metDate = other.metDate ?? {
-        month: new Date().getMonth(),
-        day: new Date().getDate(),
-        year: new Date().getFullYear(),
-      }
+      this.trainerFriendship = other.trainerFriendship
+      this.eggDate = other.eggDate
+      this.metDate = other.metDate
       if (other.ball && PA8.allowedBalls().includes(other.ball)) {
         this.ball = other.ball
       } else {
         this.ball = Ball.Strange
       }
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
-      this.metLevel = other.metLevel ?? 0
-      this.hyperTraining = other.hyperTraining ?? {
-        hp: false,
-        atk: false,
-        def: false,
-        spa: false,
-        spd: false,
-        spe: false,
-      }
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
+      this.metLevel = other.metLevel
+      this.hyperTraining = other.hyperTraining
       this.moveFlagsLA = other.moveFlagsLA ?? new Uint8Array(14)
       this.homeTracker = other.homeTracker ?? new Uint8Array(8)
       this.tutorFlagsLA = other.tutorFlagsLA ?? new Uint8Array(8)
@@ -352,18 +323,23 @@ export default class PA8 {
       this.canGigantamax = other.canGigantamax ?? false
       this.isAlpha = other.isAlpha ?? false
       this.isNoble = other.isNoble ?? false
-      this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], 'Hisui') ?? []
+      this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], 'Hisui')
       this.trainerGender = other.trainerGender
     }
 
-    // heal and recalculate level in case the source was not accurate
+    // heal and recalculate in case the source was not accurate
     this.level = this.getLevel()
     this.stats = this.getStats()
     this.currentHP = this.stats.hp
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
-  static fromBytes(buffer: ArrayBuffer): PA8 {
-    return new PA8(buffer)
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PA8 {
+    return new PA8(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PA8 {
+    return new PA8(ohpkm, { strategy })
   }
 
   toBytes(): ArrayBuffer {
@@ -371,7 +347,7 @@ export default class PA8 {
     const dataView = new DataView(buffer)
 
     dataView.setUint32(0x0, this.encryptionConstant, true)
-    dataView.setUint16(0x4, this.sanity, true)
+    dataView.setUint16(0x4, 0, true) // sanity bytes
     dataView.setUint16(0x6, this.checksum, true)
     dataView.setUint16(0x8, this.dexNum, true)
     dataView.setUint16(0xa, this.heldItemIndex, true)
@@ -391,7 +367,6 @@ export default class PA8 {
     types.writeStatsToBytesU8(dataView, 0x26, this.evs)
     types.writeContestStatsToBytes(dataView, 0x2c, this.contest)
     dataView.setUint8(0x32, this.pokerusByte)
-    new Uint8Array(buffer).set(new Uint8Array(this.ribbonBytes.slice(0, 8)), 0x34)
     dataView.setUint8(0x3c, this.contestMemoryCount)
     dataView.setUint8(0x3d, this.battleMemoryCount)
     dataView.setUint16(0x3e, this.alphaMove, true)
@@ -507,7 +482,7 @@ export default class PA8 {
     return getWeightCalculated(this)
   }
 
-  public calcChecksum() {
+  public calculateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x168)
   }
 

@@ -4,7 +4,9 @@ use serde::{Deserialize, Serialize};
 use tauri::Emitter;
 
 use crate::error::{Error, Result};
-use crate::util;
+use crate::storage;
+
+const POKEDEX_FILENAME: &str = "pokedex.json";
 
 #[derive(Default, Debug, Serialize)]
 pub struct PokedexState(pub Mutex<Pokedex>);
@@ -57,12 +59,12 @@ pub struct Pokedex {
 impl Pokedex {
     fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
         Ok(Self {
-            by_dex_number: util::get_storage_file_json(app_handle, "pokedex.json")?,
+            by_dex_number: storage::read_file_json(app_handle, POKEDEX_FILENAME)?,
         })
     }
 
     pub fn write_to_storage(&self, app_handle: &tauri::AppHandle) -> Result<()> {
-        util::write_storage_file_json(app_handle, "pokedex.json", &self.by_dex_number)
+        storage::write_file_json(app_handle, POKEDEX_FILENAME, &self.by_dex_number)
     }
 
     pub fn register(
