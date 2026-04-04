@@ -112,7 +112,7 @@ pub fn settings_schema_js() -> SettingsSchemaWrapper {
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ConvertStrategy {
     #[serde(rename = "nickname.capitalization")]
@@ -121,6 +121,16 @@ pub struct ConvertStrategy {
     pub met_data_origin_location: MetDataStrategy,
     #[serde(rename = "ivs.maxIfHyperTrained")]
     pub max_iv_if_hyper_trained: bool,
+}
+
+impl Default for ConvertStrategy {
+    fn default() -> Self {
+        Self {
+            nickname_capitalization: NicknameCapitalization::GameDefault,
+            met_data_origin_location: MetDataStrategy::MaximizeLegality,
+            max_iv_if_hyper_trained: true,
+        }
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getDefaultConvertStrategy"))]
@@ -196,7 +206,7 @@ pub enum NicknameCapitalization {
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum MetDataStrategy {
-    #[default]
     UseLocationNameMatch,
+    #[default]
     MaximizeLegality,
 }
