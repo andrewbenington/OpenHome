@@ -1,6 +1,7 @@
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
-import { ConvertStrategies, ExtraFormIndex } from '@pkm-rs/pkg'
+import { ConvertStrategies, ConvertStrategy, ExtraFormIndex } from '@pkm-rs/pkg'
 import { PA8, PK3, PK8 } from '@pokemon-files/pkm'
+import { HyperTrainStats, Stats } from '@pokemon-files/util'
 import fs from 'fs'
 import path from 'path'
 import { assert, beforeAll, describe, expect, test } from 'vitest'
@@ -152,6 +153,65 @@ describe('plugin form persistence', () => {
 
     const lumi2 = PB8LUMI.fromOhpkm(ohAgain, ConvertStrategies.getDefault())
     expect(lumi2.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
+  })
+})
+
+function sanitizeWasmStats(fromWasm: Stats): Stats {
+  return {
+    hp: fromWasm.hp,
+    atk: fromWasm.atk,
+    def: fromWasm.def,
+    spa: fromWasm.spa,
+    spd: fromWasm.spd,
+    spe: fromWasm.spe,
+  }
+}
+
+function sanitizeWasmHyperTraining(fromWasm: HyperTrainStats): HyperTrainStats {
+  return {
+    hp: fromWasm.hp,
+    atk: fromWasm.atk,
+    def: fromWasm.def,
+    spa: fromWasm.spa,
+    spd: fromWasm.spd,
+    spe: fromWasm.spe,
+  }
+}
+
+describe('OHPKM conversion strategies', () => {
+  test('hyper training conversion strategy', () => {
+    const PERFECT_IVS_STRATEGY: ConvertStrategy = {
+      'ivs.maxIfHyperTrained': true,
+    }
+    const IGNORE_HYPER_TRAINING_STRATEGY: ConvertStrategy = {
+      'ivs.maxIfHyperTrained': false,
+    }
+    const ORIGINAL_IVS = { hp: 10, atk: 10, def: 10, spa: 10, spd: 10, spe: 10 }
+    const HYPER_TRAINING = { hp: true, atk: false, def: true, spa: false, spd: true, spe: false }
+    const HYPER_TRAINED_IVS = { hp: 31, atk: 10, def: 31, spa: 10, spd: 31, spe: 10 }
+
+    const original = OHPKM.defaultWithSpecies(NationalDex.Pikachu, 0)
+    original.ivs = ORIGINAL_IVS
+    original.hyperTraining = HYPER_TRAINING
+
+    let pk3 = PK3.fromOhpkm(original, PERFECT_IVS_STRATEGY)
+    expect(sanitizeWasmStats(pk3.ivs), 'PK3 IVs are maxed when hyper trained').toEqual(
+      HYPER_TRAINED_IVS
+    )
+    pk3 = PK3.fromOhpkm(original, IGNORE_HYPER_TRAINING_STRATEGY)
+    expect(
+      sanitizeWasmStats(pk3.ivs),
+      'PK3 IVs are unchanged when ignoring hyper training'
+    ).toEqual(ORIGINAL_IVS)
+
+    const pk8 = PK8.fromOhpkm(original, PERFECT_IVS_STRATEGY)
+    expect(sanitizeWasmStats(pk8.ivs), 'PK8 IVs are preserved even when hyper trained').toEqual(
+      ORIGINAL_IVS
+    )
+    expect(
+      sanitizeWasmHyperTraining(pk8.hyperTraining),
+      'PK8 hyper training status is preserved'
+    ).toEqual(HYPER_TRAINING)
   })
 })
 

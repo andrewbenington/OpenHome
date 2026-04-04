@@ -108,27 +108,6 @@ pub fn settings_schema_js() -> SettingsSchemaWrapper {
     }
 }
 
-pub fn get_schema_entry(key: ConvertOption) -> Option<&'static SettingType> {
-    settings_schema()
-        .iter()
-        .find(|(k, _)| *k == key)
-        .map(|(_, d)| d)
-}
-
-// ── Category helpers ───────────────────────────────────────────────────────────
-
-pub fn display_settings_category(category: &str) -> &str {
-    match category {
-        "nickname" => "Nicknames",
-        "metLocation" => "Met Location",
-        other => other,
-    }
-}
-
-pub fn get_settings_category(subcategory: &str) -> &str {
-    subcategory.split('.').next().unwrap_or(subcategory)
-}
-
 // ── ConvertStrategy ────────────────────────────────────────────────────────────
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
@@ -165,7 +144,7 @@ impl ConvertStrategies {
     pub fn get_category_name(identifier: ConvertOption) -> String {
         match identifier {
             ConvertOption::NicknameCapitalization => String::from("Nickname"),
-            ConvertOption::MetDataOriginAndLocation => String::from("Met Location"),
+            ConvertOption::MetDataOriginAndLocation => String::from("Met data"),
             ConvertOption::MaxIvIfHyperTrained => String::from("IVs"),
         }
     }
@@ -174,9 +153,7 @@ impl ConvertStrategies {
     pub fn get_setting_name(identifier: ConvertOption) -> String {
         match identifier {
             ConvertOption::NicknameCapitalization => String::from("Capitalization"),
-            ConvertOption::MetDataOriginAndLocation => {
-                String::from("Use Region for Met Location (when possible)")
-            }
+            ConvertOption::MetDataOriginAndLocation => String::from("Original Game + Met Location"),
             ConvertOption::MaxIvIfHyperTrained => {
                 String::from("Hyper-Trained IVs are Maxed (pre-gen 7)")
             }

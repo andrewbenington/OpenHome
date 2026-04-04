@@ -294,6 +294,13 @@ impl OhpkmV2 {
         Ok(result)
     }
 
+    pub fn default_with_species(national_dex: u16, forme_index: u16) -> Result<Self> {
+        Ok(Self {
+            main_data: MainDataV2::new(national_dex, forme_index)?,
+            ..Default::default()
+        })
+    }
+
     pub fn from_v1(old: OhpkmV1) -> Self {
         Self {
             main_data: MainDataV2::from_v1(old),
@@ -399,13 +406,19 @@ impl OhpkmV2 {
             Ok(Self::default())
         }
     }
+
     #[wasm_bindgen(js_name = "fromByteVectorFixingErrors")]
     pub fn from_byte_vector_fixing_errors(bytes: &[u8]) -> JsResult<Self> {
-        if !bytes.is_empty() {
-            Self::from_bytes(bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+        Ok(if !bytes.is_empty() {
+            Self::from_bytes(bytes)?
         } else {
-            Ok(Self::default())
-        }
+            Self::default()
+        })
+    }
+
+    #[wasm_bindgen(js_name = "defaultWithSpecies")]
+    pub fn default_with_species_js(national_dex: u16, forme_index: u16) -> JsResult<Self> {
+        Ok(Self::default_with_species(national_dex, forme_index)?)
     }
 
     #[wasm_bindgen(getter = openhomeId)]

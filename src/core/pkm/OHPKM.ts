@@ -366,7 +366,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
   // static constructors
 
-  static fromBytes(buffer: ArrayBuffer): OHPKM {
+  static fromBytes(buffer: ArrayBufferLike): OHPKM {
     return new OHPKM(new Uint8Array(buffer))
   }
 
@@ -375,6 +375,11 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     ohpkm.syncWithGameData(mon, save)
 
     return ohpkm
+  }
+
+  static defaultWithSpecies(nationalDex: number, formeIndex: number) {
+    const bytes = OhpkmV2Wasm.defaultWithSpecies(nationalDex, formeIndex).toByteArray()
+    return OHPKM.fromBytes(bytes.buffer)
   }
 
   // getters / setters
