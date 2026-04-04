@@ -204,14 +204,46 @@ describe('OHPKM conversion strategies', () => {
       'PK3 IVs are unchanged when ignoring hyper training'
     ).toEqual(ORIGINAL_IVS)
 
-    const pk8 = PK8.fromOhpkm(original, PERFECT_IVS_STRATEGY)
-    expect(sanitizeWasmStats(pk8.ivs), 'PK8 IVs are preserved even when hyper trained').toEqual(
+    let pk8 = PK8.fromOhpkm(original, PERFECT_IVS_STRATEGY)
+    expect(sanitizeWasmStats(pk8.ivs), 'PK8 IVs are preserved (perfect ivs strategy)').toEqual(
       ORIGINAL_IVS
     )
     expect(
       sanitizeWasmHyperTraining(pk8.hyperTraining),
-      'PK8 hyper training status is preserved'
+      'PK8 hyper training status is preserved (perfect ivs strategy)'
     ).toEqual(HYPER_TRAINING)
+
+    pk8 = PK8.fromOhpkm(original, IGNORE_HYPER_TRAINING_STRATEGY)
+    expect(
+      sanitizeWasmStats(pk8.ivs),
+      'PK8 IVs are preserved (ignore hyper training strategy)'
+    ).toEqual(ORIGINAL_IVS)
+    expect(
+      sanitizeWasmHyperTraining(pk8.hyperTraining),
+      'PK8 hyper training status is preserved (ignore hyper training strategy)'
+    ).toEqual(HYPER_TRAINING)
+  })
+
+  test('nickname capitalization conversion strategy', () => {
+    const GAME_DEFAULT_STRATEGY: ConvertStrategy = {
+      'nickname.capitalization': 'GameDefault',
+    }
+    const MODERN_STRATEGY: ConvertStrategy = {
+      'nickname.capitalization': 'Modern',
+    }
+
+    const original = OHPKM.defaultWithSpecies(NationalDex.Pikachu, 0)
+    expect(original.nickname).toEqual('Pikachu')
+
+    let pk3 = PK3.fromOhpkm(original, GAME_DEFAULT_STRATEGY)
+    expect(pk3.nickname, 'PK3 species name is capitalized').toEqual('PIKACHU')
+    pk3 = PK3.fromOhpkm(original, MODERN_STRATEGY)
+    expect(pk3.nickname, 'Modern capitalization is used').toEqual('Pikachu')
+
+    let pk8 = PK8.fromOhpkm(original, GAME_DEFAULT_STRATEGY)
+    expect(pk8.nickname, 'PK8 species name is title case (game default)').toEqual('Pikachu')
+    pk8 = PK8.fromOhpkm(original, MODERN_STRATEGY)
+    expect(pk8.nickname, 'PK8 species name is title case (modern)').toEqual('Pikachu')
   })
 })
 

@@ -125,6 +125,11 @@ impl MainDataV2 {
     pub fn new(national_dex: u16, forme_index: u16) -> Result<Self> {
         Ok(Self {
             species_and_forme: SpeciesAndForme::new(national_dex, forme_index)?,
+            language: Language::English,
+            nickname: SpeciesAndForme::new(national_dex, forme_index)?
+                .get_species_metadata()
+                .name
+                .into(),
             ..Default::default()
         })
     }
