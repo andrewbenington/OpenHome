@@ -1,5 +1,12 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { ExtraFormIndex, Gender, Languages, OriginGame, SpeciesLookup } from '@pkm-rs/pkg'
+import {
+  ConvertStrategy,
+  ExtraFormIndex,
+  Gender,
+  Languages,
+  OriginGame,
+  SpeciesLookup,
+} from '@pkm-rs/pkg'
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
@@ -42,8 +49,8 @@ export class SwShSAV extends G89SAV<PK8> {
     this.origin = this.trainerBlock.getGame()
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK8 {
-    return new PK8(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK8 {
+    return PK8.fromOhpkm(ohpkm, strategy)
   }
 
   getBoxCount(): number {
@@ -51,7 +58,7 @@ export class SwShSAV extends G89SAV<PK8> {
   }
 
   monConstructor(bytes: ArrayBuffer, encrypted: boolean): PK8 {
-    return new PK8(bytes, encrypted)
+    return new PK8(bytes, { encrypted })
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {

@@ -1,5 +1,6 @@
 import {
   Ball,
+  ConvertStrategy,
   ItemGen3,
   Language,
   Languages,
@@ -9,8 +10,10 @@ import {
 } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/index'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import {
   filterRibbons,
   gen3ContestRibbonsFromBytes,
@@ -20,10 +23,11 @@ import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
+import { PkmConstructorOptions } from './PKM'
 
 export default class XDPKM {
   static getName() {
-    return 'XDPKM'
+    return 'XDPKM' as const
   }
   format: 'XDPKM' = 'XDPKM'
   static getBoxSize() {
@@ -59,7 +63,7 @@ export default class XDPKM {
   shadowID: number
   ribbons: string[]
 
-  constructor(arg: ArrayBuffer | AllPKMFields) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
       const buffer = arg
       const dataView = new DataView(buffer)
@@ -111,74 +115,54 @@ export default class XDPKM {
       )
     } else {
       const other = arg
+      const converter = new PkmConverter('XDPKM', options.strategy)
+      const metData = converter.metData(other)
+
       this.dexNum = other.dexNum
       this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
-      this.currentHP = other.currentHP ?? 0
-      this.trainerFriendship = other.trainerFriendship ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
-      this.metLevel = other.metLevel ?? 0
+      this.currentHP = other.currentHP
+      this.trainerFriendship = other.trainerFriendship
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
+      this.metLevel = other.metLevel
       if (other.ball && XDPKM.maxValidBall() >= other.ball) {
         this.ball = other.ball
       } else {
         this.ball = Ball.Poke
       }
       this.trainerGender = other.trainerGender
-      this.statLevel = other.statLevel ?? 0
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.markings = types.markingsFourShapesFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-      }
-      this.isEgg = other.isEgg ?? false
+      this.pokerusByte = other.pokerusByte
+      this.markings = types.markingsFourShapesFromOther(other.markings)
+      this.isEgg = other.isEgg
       this.exp = other.exp
       this.secretID = other.secretID
       this.trainerID = other.trainerID
-      this.personalityValue = other.personalityValue ?? 0
-      this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.gameOfOrigin = other.gameOfOrigin
+      this.personalityValue = other.personalityValue
+      this.isFatefulEncounter = other.isFatefulEncounter
       this.language = other.language
       this.trainerName = other.trainerName
-      this.nickname = other.nickname
+      this.nickname = converter.nickname(other)
 
       const moveFilter = MoveFilter.fromPkmClass(XDPKM)
       this.moves = moveFilter.moves(other)
       this.movePP = moveFilter.movePp(other, this.format)
       this.movePPUps = moveFilter.movePpUps(other)
 
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.contest = other.contest ?? {
-        cool: 0,
-        beauty: 0,
-        cute: 0,
-        smart: 0,
-        tough: 0,
-        sheen: 0,
-      }
-      this.shadowID = other.shadowID ?? 0
-      this.ribbons =
-        filterRibbons(other.ribbons ?? [], [Gen3ContestRibbons, Gen3StandardRibbons]) ?? []
+      this.evs = other.evs
+      this.ivs = converter.ivs(other)
+      this.contest = other.contest
+      this.shadowID = 0
+      this.ribbons = filterRibbons(other.ribbons, [Gen3ContestRibbons, Gen3StandardRibbons])
+      this.statLevel = this.speciesMetadata?.calculateLevel(this.exp) ?? 1
     }
   }
 
   static fromBytes(buffer: ArrayBuffer): XDPKM {
-    return new XDPKM(buffer)
+    return new XDPKM(buffer, { encrypted: false })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): XDPKM {
+    return new XDPKM(ohpkm, { strategy })
   }
 
   toBytes(): ArrayBuffer {

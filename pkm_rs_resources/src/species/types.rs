@@ -177,6 +177,16 @@ impl GenderRatio {
             }
         }
     }
+
+    #[cfg(feature = "wasm")]
+    pub fn gender_is_allowed(&self, gender: Gender) -> bool {
+        match *self {
+            Self::Genderless => gender == Gender::Genderless,
+            Self::AllMale => gender == Gender::Male,
+            Self::AllFemale => gender == Gender::Female,
+            _ => true,
+        }
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -747,6 +757,16 @@ impl SpeciesAndForme {
             None => *self,
             Some(forme_ref) => forme_ref.get_base_evolution(),
         }
+    }
+
+    pub fn get_prevos(&self) -> Vec<SpeciesAndForme> {
+        let mut prevos = Vec::new();
+        let mut current = *self;
+        while let Some(forme_ref) = current.get_forme_metadata().pre_evolution {
+            prevos.push(forme_ref);
+            current = forme_ref;
+        }
+        prevos
     }
 
     pub const fn get_ndex(&self) -> NatDexIndex {

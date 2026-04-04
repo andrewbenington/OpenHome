@@ -8,7 +8,11 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getBallIconPath } from '@openhome-ui/images/items'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { OriginGames } from '@pkm-rs/pkg'
-import { getLocationString, RibbonTitles } from '@pokemon-resources/index'
+import {
+  getLocationString,
+  getLocationStringOrOrigin,
+  RibbonTitles,
+} from '@pokemon-resources/index'
 import { Badge, Flex, Grid } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import './style.css'
@@ -54,9 +58,23 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
       message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
     if (mon.gameOfOrigin && mon.metLocationIndex) {
-      const location = getLocationString(mon.gameOfOrigin, mon.metLocationIndex, mon.format)
+      try {
+        const location = getLocationStringOrOrigin(
+          mon.gameOfOrigin,
+          mon.metLocationIndex,
+          mon.format
+        )
 
-      message += ` ${location}`
+        message += ` ${location}`
+      } catch (e) {
+        console.error('Error getting location string', {
+          error: e,
+          game: mon.gameOfOrigin,
+          index: mon.metLocationIndex,
+          format: mon.format,
+        })
+        message += ' at an unknown location'
+      }
     }
 
     if ('isFatefulEncounter' in mon && mon.isFatefulEncounter) {

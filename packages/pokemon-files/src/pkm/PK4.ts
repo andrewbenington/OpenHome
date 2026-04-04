@@ -3,6 +3,7 @@ import { Gen4Ribbons } from '@pokemon-resources/index'
 import {
   AbilityIndex,
   Ball,
+  ConvertStrategy,
   Gender,
   Item,
   Language,
@@ -12,14 +13,17 @@ import {
   ShinyLeaves,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { generatePersonalityValuePreservingAttributes, MoveFilter } from '../util/util'
+import { PkmConstructorOptions } from './PKM'
 
 const DP_FARAWAY_PLACE = 0xbba
 
@@ -29,7 +33,7 @@ function validDPLocation(index: number): boolean {
 
 export default class PK4 {
   static getName() {
-    return 'PK4'
+    return 'PK4' as const
   }
   format: 'PK4' = 'PK4'
   personalityValue: number
@@ -53,7 +57,6 @@ export default class PK4 {
   gender: Gender
   formeNum: number
   shinyLeavesInner: ShinyLeaves = new ShinyLeaves()
-  ribbonBytes: Uint8Array
   gameOfOrigin: number
   eggDate: types.PKMDate | undefined
   metDate: types.PKMDate | undefined
@@ -77,10 +80,11 @@ export default class PK4 {
   trainerName: string
   trainerGender: boolean
   isFatefulEncounter: boolean
-  checksum: number
+  checksum: number = 0
   originalBytes?: ArrayBuffer
 
-  constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
+    const { encrypted } = options
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
 
@@ -130,7 +134,7 @@ export default class PK4 {
       this.gender = byteLogic.uIntFromBufferBits(dataView, 0x40, 1, 2, true)
       this.formeNum = byteLogic.uIntFromBufferBits(dataView, 0x40, 3, 5, true)
       this.shinyLeaves = ShinyLeaves.fromByte(dataView.getUint8(0x41))
-      this.ribbonBytes = new Uint8Array(buffer).slice(0x4c, 0x50)
+
       this.gameOfOrigin = dataView.getUint8(0x5f)
       this.eggDate = types.pkmDateFromBytes(dataView, 0x78)
       this.metDate = types.pkmDateFromBytes(dataView, 0x7b)
@@ -184,7 +188,9 @@ export default class PK4 {
       this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x40, 0)
       this.checksum = dataView.getUint16(0x6, true)
     } else {
+      const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
+      const metData = converter.metData(other)
 
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
       this.dexNum = other.dexNum
@@ -225,21 +231,13 @@ export default class PK4 {
       this.movePP = moveFilter.movePp(other, this.format)
       this.movePPUps = moveFilter.movePpUps(other)
 
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
+      this.ivs = converter.ivs(other)
       this.isEgg = other.isEgg ?? false
       this.isNicknamed = other.isNicknamed ?? false
       this.gender =
         other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
       this.formeNum = other.formeNum
       this.shinyLeaves = other.shinyLeaves?.clone() ?? new ShinyLeaves()
-      this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(4)
       this.gameOfOrigin = other.gameOfOrigin
       this.eggDate = other.eggDate ?? {
         month: new Date().getMonth(),
@@ -268,10 +266,10 @@ export default class PK4 {
         this.ballHGSS = 0
       }
 
-      this.metLevel = other.metLevel ?? 0
+      this.metLevel = other.metLevel
       this.encounterType = other.encounterType ?? 0
       this.performance = other.performance ?? 0
-      this.statusCondition = other.statusCondition ?? 0
+      this.statusCondition = 0
       this.currentHP = other.currentHP ?? 0
 
       if (other.eggLocationIndex) {
@@ -286,29 +284,28 @@ export default class PK4 {
         this.eggLocationIndexPtHGSS = 0
       }
 
-      if (other.metLocationIndex) {
-        this.metLocationIndexDP = validDPLocation(other.metLocationIndex)
-          ? other.metLocationIndex
-          : DP_FARAWAY_PLACE
-        this.metLocationIndexPtHGSS = other.metLocationIndex
-        this.metLocationIndex = other.metLocationIndex
-      } else {
-        this.metLocationIndex = 0
-        this.metLocationIndexDP = 0
-        this.metLocationIndexPtHGSS = 0
-      }
+      this.metLocationIndexDP = converter.metLocationIndexDiamondPearl(other)
+      this.metLocationIndexPtHGSS = converter.metLocationIndexPlatinumHgss(other)
+      this.metLocationIndex = metData.locationIndex
+
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLevel = other.metLevel
 
       this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '') ?? []
-      this.nickname = other.nickname
+      this.nickname = converter.nickname(other)
       this.trainerName = other.trainerName
       this.trainerGender = other.trainerGender
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.checksum = other.checksum ?? 0
     }
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
-  static fromBytes(buffer: ArrayBuffer): PK4 {
-    return new PK4(buffer)
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK4 {
+    return new PK4(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK4 {
+    return new PK4(ohpkm, { strategy })
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {
@@ -316,6 +313,7 @@ export default class PK4 {
     const dataView = new DataView(buffer)
 
     dataView.setUint32(0x0, this.personalityValue, true)
+    dataView.setUint16(0x4, 0, true) // sanity bytes
     dataView.setUint16(0x8, this.dexNum, true)
     dataView.setUint16(0xa, this.heldItemIndex, true)
     dataView.setUint16(0xc, this.trainerID, true)
@@ -345,7 +343,6 @@ export default class PK4 {
     byteLogic.uIntToBufferBits(dataView, this.gender, 64, 1, 2, true)
     byteLogic.uIntToBufferBits(dataView, this.formeNum, 0x40, 3, 5, true)
     dataView.setUint8(0x41, this.shinyLeaves.toByte())
-    new Uint8Array(buffer).set(new Uint8Array(this.ribbonBytes.slice(0, 4)), 0x4c)
     dataView.setUint8(0x5f, this.gameOfOrigin)
     types.writePKMDateToBytes(dataView, 0x78, this.eggDate)
     types.writePKMDateToBytes(dataView, 0x7b, this.metDate)
@@ -419,8 +416,12 @@ export default class PK4 {
     return ((this.personalityValue >> 0) & 1) + 1
   }
 
+  public calculateChecksum() {
+    return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x87)
+  }
+
   public refreshChecksum() {
-    this.checksum = encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x87)
+    this.checksum = this.calculateChecksum()
   }
 
   public toPCBytes() {

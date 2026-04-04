@@ -160,6 +160,12 @@ export function uIntToBufferBits(
   let existingValue = 0
   let newValue = 0
 
+  if (value > (1 << bitCount) - 1) {
+    throw new Error(
+      `value must be within the range for the specified bitCount (0 to ${(1 << bitCount) - 1} for bitCount of ${bitCount}; received ${value})`
+    )
+  }
+
   switch (Math.ceil((bitOffset + bitCount) / 8)) {
     case 1:
       existingValue = dataView.getUint8(byteOffset)

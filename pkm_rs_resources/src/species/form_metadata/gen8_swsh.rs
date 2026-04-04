@@ -34,7 +34,7 @@ impl PersonalInfoSwordShield {
     }
 
     pub fn forms_offset(&self) -> Option<u16> {
-        let stored_index = i16::from_le_bytes(self.0[0x18..0x1A].try_into().unwrap());
+        let stored_index = i16::from_le_bytes(self.0[0x1E..0x20].try_into().unwrap());
         if stored_index == -1 {
             None
         } else {

@@ -70,7 +70,6 @@ function readBlocks(data: Uint8Array): SCBlock[] {
   const result: SCBlock[] = []
 
   while (offset < data.length) {
-    // console.log(`offset: ${offset}`)
     const { block, newOffset } = buildSCBlock(data, offset)
 
     result.push(block)
@@ -116,16 +115,6 @@ function toHexString(byteArray: Uint8Array) {
     .join('')
     .toUpperCase()
 }
-
-// function logHashes(data: Record<string, Uint8Array>) {
-//   for (const [name, bytes] of Object.entries(data)) {
-//     let hex = toHexString(bytes)
-//     if (hex.length > 64) {
-//       hex = hex.slice(0, 32) + '...' + hex.slice(-32)
-//     }
-//     console.log(`${name}: ${hex} (${bytes.length})`)
-//   }
-// }
 
 export const SwishCrypto = {
   SIZE_HASH,

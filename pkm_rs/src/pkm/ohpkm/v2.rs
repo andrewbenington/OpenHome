@@ -6,6 +6,9 @@ use crate::pkm::ohpkm::v2_sections::{
     MostRecentSave, Notes, PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
 };
 use crate::pkm::{Error, Result};
+
+use pkm_rs_resources::species::SpeciesMetadata;
+use pkm_rs_types::{HyperTraining, OriginGame, Stats8};
 use strum_macros::Display;
 
 #[cfg(feature = "wasm")]
@@ -38,9 +41,8 @@ use pkm_rs_resources::{
 
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{
-    ContestStats, FlagSet, Gender, Geolocations, HyperTraining, MarkingsSixShapesColors,
-    OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le, StatsPreSplit, TeraType, TeraTypeWasm,
-    TrainerMemory, strings::SizedUtf16String,
+    ContestStats, FlagSet, Gender, Geolocations, MarkingsSixShapesColors, PokeDate, ShinyLeaves,
+    Stats16Le, StatsPreSplit, TeraType, TeraTypeWasm, TrainerMemory, strings::SizedUtf16String,
 };
 
 const MAGIC_NUMBER: u32 = 0x57575757;
@@ -292,6 +294,13 @@ impl OhpkmV2 {
         Ok(result)
     }
 
+    pub fn default_with_species(national_dex: u16, forme_index: u16) -> Result<Self> {
+        Ok(Self {
+            main_data: MainDataV2::new(national_dex, forme_index)?,
+            ..Default::default()
+        })
+    }
+
     pub fn from_v1(old: OhpkmV1) -> Self {
         Self {
             main_data: MainDataV2::from_v1(old),
@@ -336,6 +345,53 @@ impl OhpkmV2 {
     pub fn to_bytes(&self) -> Result<Vec<u8>> {
         Ok(self.to_sectioned_data()?.to_bytes()?)
     }
+
+    pub fn nickname_matches_species_eng(&self) -> bool {
+        self.main_data.nickname_matches_species_eng()
+    }
+
+    pub fn nickname_matches_species_eng_ignore_case(&self) -> bool {
+        self.main_data.nickname_matches_species_eng_ignore_case()
+    }
+
+    pub const fn species_metadata(&self) -> &'static SpeciesMetadata {
+        self.main_data.species_and_forme.get_species_metadata()
+    }
+
+    pub fn fix_errors(&mut self) -> bool {
+        self.main_data.fix_errors()
+    }
+
+    pub fn get_nickname(&self) -> String {
+        self.main_data.nickname.to_string()
+    }
+
+    pub const fn get_game_of_origin(&self) -> OriginGame {
+        self.main_data.game_of_origin
+    }
+
+    pub const fn get_met_location_index(&self) -> u16 {
+        self.main_data.met_location_index
+    }
+
+    pub const fn get_is_fateful_encounter(&self) -> bool {
+        self.main_data.is_fateful_encounter
+    }
+
+    pub const fn get_ivs(&self) -> Stats8 {
+        self.main_data.ivs
+    }
+
+    pub const fn get_hyper_training(&self) -> HyperTraining {
+        self.main_data.hyper_training
+    }
+}
+
+#[cfg(test)]
+impl OhpkmV2 {
+    pub fn get_main_data(&self) -> &MainDataV2 {
+        &self.main_data
+    }
 }
 
 #[cfg(feature = "wasm")]
@@ -350,13 +406,19 @@ impl OhpkmV2 {
             Ok(Self::default())
         }
     }
+
     #[wasm_bindgen(js_name = "fromByteVectorFixingErrors")]
     pub fn from_byte_vector_fixing_errors(bytes: &[u8]) -> JsResult<Self> {
-        if !bytes.is_empty() {
-            Self::from_bytes(bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+        Ok(if !bytes.is_empty() {
+            Self::from_bytes(bytes)?
         } else {
-            Ok(Self::default())
-        }
+            Self::default()
+        })
+    }
+
+    #[wasm_bindgen(js_name = "defaultWithSpecies")]
+    pub fn default_with_species_js(national_dex: u16, forme_index: u16) -> JsResult<Self> {
+        Ok(Self::default_with_species(national_dex, forme_index)?)
     }
 
     #[wasm_bindgen(getter = openhomeId)]
@@ -1973,6 +2035,21 @@ impl OhpkmV2 {
             .iter()
             .map(|t| t.to_string())
             .collect())
+    }
+
+    #[wasm_bindgen(js_name = nicknameMatchesSpeciesEnglish)]
+    pub fn nickname_matches_species_eng_js(&self) -> bool {
+        self.nickname_matches_species_eng()
+    }
+
+    #[wasm_bindgen(js_name = nicknameMatchesSpeciesEnglishIgnoreCase)]
+    pub fn nickname_matches_species_eng_ignore_case_js(&self) -> bool {
+        self.nickname_matches_species_eng_ignore_case()
+    }
+
+    #[wasm_bindgen(js_name = resetNicknameToSpecies)]
+    pub fn reset_nickname_to_species_js(&mut self) {
+        self.main_data.reset_nickname_to_species();
     }
 }
 

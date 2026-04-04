@@ -10,8 +10,11 @@ use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::SpeciesAndForme;
+use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
+use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
+
+#[cfg(feature = "wasm")]
+use crate::pkm::traits::IsShiny;
 
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{ContestStats, Stats8, Stats16Le, StatsPreSplit, TrainerData};
@@ -22,12 +25,6 @@ use serde::{Deserialize, Serialize};
 use std::num::NonZeroU16;
 
 pub mod pkm_bytes;
-
-#[cfg(feature = "wasm")]
-use pkm_rs_resources::species::NatDexIndex;
-
-#[cfg(feature = "wasm")]
-use crate::pkm::traits::IsShiny;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -121,10 +118,18 @@ pub struct MainDataV2 {
     pub display_color_rgb: Option<[u8; 3]>,
 }
 
+const NIDORAN_F: NatDexIndex = unsafe { NatDexIndex::new_unchecked(29) };
+const NIDORAN_M: NatDexIndex = unsafe { NatDexIndex::new_unchecked(32) };
+
 impl MainDataV2 {
     pub fn new(national_dex: u16, forme_index: u16) -> Result<Self> {
         Ok(Self {
             species_and_forme: SpeciesAndForme::new(national_dex, forme_index)?,
+            language: Language::English,
+            nickname: SpeciesAndForme::new(national_dex, forme_index)?
+                .get_species_metadata()
+                .name
+                .into(),
             ..Default::default()
         })
     }
@@ -215,6 +220,153 @@ impl MainDataV2 {
             self.game_of_origin as u8
         )
     }
+
+    pub fn nickname_matches_species_eng_ignore_case(&self) -> bool {
+        self.nickname
+            .to_string()
+            .eq_ignore_ascii_case(self.species_and_forme.get_species_metadata().name)
+    }
+
+    pub fn nickname_matches_species_eng(&self) -> bool {
+        self.nickname.to_string() == self.species_and_forme.get_species_metadata().name
+    }
+
+    pub fn reset_nickname_to_species(&mut self) {
+        self.nickname = self.species_and_forme.get_species_metadata().name.into();
+    }
+
+    fn ability_num_by_index(&self) -> Option<u8> {
+        let form_metadata = self.species_and_forme.get_forme_metadata();
+        if self.ability_index == form_metadata.abilities.0 {
+            Some(1)
+        } else if self.ability_index == form_metadata.abilities.1 {
+            Some(2)
+        } else if let Some(hidden_ability) = form_metadata.hidden_ability
+            && self.ability_index == hidden_ability
+        {
+            Some(4)
+        } else {
+            None
+        }
+    }
+
+    fn ability_is_first_slot(&self) -> bool {
+        self.ability_num_by_index() == Some(1)
+    }
+
+    fn ability_is_second_slot(&self) -> bool {
+        self.ability_num_by_index() == Some(2)
+    }
+
+    fn ability_is_hidden_ability(&self) -> bool {
+        self.ability_num_by_index() == Some(4)
+            || (self
+                .species_and_forme
+                .get_forme_metadata()
+                .hidden_ability
+                .is_none()
+                && self.ability_is_first_slot())
+    }
+
+    fn ability_num_matches_index(&self) -> bool {
+        match self.ability_num {
+            1 => self.ability_is_first_slot(),
+            2 => self.ability_is_second_slot(),
+            4 => self.ability_is_hidden_ability(),
+            _ => false,
+        }
+    }
+
+    pub fn fix_errors(&mut self) -> bool {
+        let mut errors_found = false;
+        let national_dex = self.species_and_forme.get_ndex();
+        let species_metadata = self.species_and_forme.get_species_metadata();
+        let form_metadata = self.species_and_forme.get_forme_metadata();
+
+        // When other languages are added this should be updated
+        if self.language == Language::English {
+            // Previous versions of OpenHome incorrectly translated the gender symbols; here we will fix that
+            if (national_dex == NIDORAN_F
+                && self
+                    .nickname
+                    .to_string()
+                    .eq_ignore_ascii_case("Nidoran\u{E08F}"))
+                || (national_dex == NIDORAN_M
+                    && self
+                        .nickname
+                        .to_string()
+                        .eq_ignore_ascii_case("Nidoran\u{E08E}"))
+            {
+                self.reset_nickname_to_species();
+                errors_found = true;
+            } else if self.nickname_matches_species_eng_ignore_case() {
+                // Fix Pokémon imported from an older game that had their nicknames kept as all caps
+                if !self.nickname_matches_species_eng() {
+                    self.nickname = species_metadata.name.into();
+                    errors_found = true;
+                }
+
+                // Ensure the is_nicknamed flag is accurate. Ignore the situation where the nickname was manually set to the species
+                if self.is_nicknamed {
+                    self.is_nicknamed = false;
+                    errors_found = true;
+                }
+            } else if is_prevo_species_name(&self.species_and_forme, &self.nickname.to_string()) {
+                self.reset_nickname_to_species();
+                self.is_nicknamed = false;
+                errors_found = true;
+            } else if !self.is_nicknamed && !self.nickname_matches_species_eng() {
+                // If the nickname doesn't match the species name, it should be considered nicknamed
+                self.is_nicknamed = true;
+                errors_found = true;
+            }
+        }
+
+        // PLA mons cannot have been hatched
+        if self.game_of_origin == OriginGame::LegendsArceus
+            && (self.egg_date.is_some() || self.egg_location_index.is_some())
+        {
+            self.egg_date = None;
+            self.egg_location_index = None;
+            errors_found = true;
+        }
+
+        // Affixed ribbon must be in the mon's possession
+        if let Some(affixed_ribbon) = self.affixed_ribbon
+            && !self.ribbons.includes(OpenHomeRibbon::Mod(affixed_ribbon))
+        {
+            self.affixed_ribbon = None;
+            errors_found = true;
+        }
+
+        // Fix ability bug from pre-1.5.0 (affected Mind's Eye and Dragon's Maw)
+        // Fix ability bug from pre-1.7.1 (abilities not updated after evolution/capsule/patch)
+        // Fix ability num bug from some point in the past (set to 0 instead of 1)
+        if !self.ability_num_matches_index() {
+            if let Some(fixed_ability_num) = self.ability_num_by_index() {
+                // This ability is a valid one for the species! Set the appropriate ability number
+                self.ability_num = fixed_ability_num;
+            } else {
+                // Hm, this ability is invalid for the species. Let's reset it using the ability number
+                self.ability_index = form_metadata.ability_by_num(self.ability_num)
+            }
+            errors_found = true;
+        }
+
+        if !form_metadata.gender_ratio.gender_is_allowed(self.gender) {
+            self.gender = form_metadata.gender_from_pid(self.personality_value);
+            errors_found = true;
+        }
+
+        errors_found
+    }
+}
+
+fn is_prevo_species_name(species_and_forme: &SpeciesAndForme, name: &str) -> bool {
+    species_and_forme
+        .get_prevos()
+        .iter()
+        .any(|prevo| prevo.get_species_metadata().name.eq_ignore_ascii_case(name))
 }
 
 impl DataSection for MainDataV2 {

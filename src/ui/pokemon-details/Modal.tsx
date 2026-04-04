@@ -1,4 +1,4 @@
-import { saveFileTypeFromString } from '@openhome-core/pkm/FileImport'
+import { fileTypeFromStringNonOhpkm } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
@@ -8,11 +8,12 @@ import HexDisplay from '@openhome-ui/components/HexDisplay'
 import { ArrowLeftIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
+import { isRomHackFormat } from '@pokemon-files/pkm/PKM'
 import { FileSchemas } from '@pokemon-files/schema'
 import { Dialog, Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
-import { isRomHackFormat } from '../../../packages/pokemon-files/src/pkm/PKM'
+import { useConvertStrategies } from '../state/convert-strategies'
 import './style.css'
 import DisplayTab from './tabs/DisplayTab'
 import MetDataMovesTab from './tabs/MetDataMovesTab'
@@ -42,6 +43,7 @@ const PokemonDetailsModal = (props: {
   const [isOriginal, setIsOriginal] = useState(false)
   const [boxIndicatorVisible, setBoxIndicatorVisible] = useState(false)
   const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
+  const { defaultConvertStrategy } = useConvertStrategies()
   const backend = useContext(BackendContext)
 
   useEffect(() => {
@@ -113,7 +115,7 @@ const PokemonDetailsModal = (props: {
       return
     }
 
-    const P = saveFileTypeFromString(newFormat)
+    const P = fileTypeFromStringNonOhpkm(newFormat)
 
     if (!P) {
       throw `Invalid filetype: ${P}`
@@ -125,13 +127,13 @@ const PokemonDetailsModal = (props: {
         mon.originalData &&
         originalDataTagToMonFormat(mon.originalData.tag) === newFormat
       ) {
-        const O = saveFileTypeFromString(originalDataTagToMonFormat(mon.originalData.tag)) ?? P
+        const O = fileTypeFromStringNonOhpkm(originalDataTagToMonFormat(mon.originalData.tag)) ?? P
         setDisplayMon(O.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
       } else {
-        setDisplayMon(new P(mon))
+        setDisplayMon(P.fromOhpkm(mon, defaultConvertStrategy))
       }
     } else {
-      setDisplayMon(new P(new OHPKM(mon)))
+      setDisplayMon(P.fromOhpkm(new OHPKM(mon), defaultConvertStrategy))
     }
   }
 
