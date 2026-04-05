@@ -1,0 +1,32 @@
+# Originally written by https://github.com/coolguygus as part of a larger PR
+
+# Merge strategies for specific files
+# This helps Git handle conflicts more intelligently
+
+# For package.json and lock files, prefer npm/pnpm to resolve after manual merge
+package.json merge=union
+pnpm-lock.yaml merge=union
+
+# For Cargo.toml, use union strategy to combine dependencies
+src-tauri/Cargo.toml merge=union
+
+# Line ending normalization
+* text=auto
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.rs text eol=lf
+
+# Binary files
+*.pk9 binary
+*.pk8 binary
+*.pk7 binary
+*.pk6 binary
+*.pk5 binary
+*.pk4 binary
+*.pa9 binary
+*.ohpkm binary
+*.sav binary
+*.exe binary
