@@ -2,6 +2,8 @@
 use assert_json_diff::{CompareMode, Config, assert_json_matches_no_panic};
 
 #[cfg(test)]
+use crate::convert_strategy::ConvertStrategy;
+#[cfg(test)]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 #[cfg(test)]
 use crate::result::Error;
@@ -211,8 +213,8 @@ pub fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> TestResult<()> 
 
 #[cfg(test)]
 fn find_inconsistencies_from_to_ohpkm<PKM: OhpkmConvert>(mon: OhpkmV2) -> TestResult<()> {
-    let first_pass = PKM::from_ohpkm(&mon);
-    let second_pass = PKM::from_ohpkm(&OhpkmV2::from(&first_pass));
+    let first_pass = PKM::from_ohpkm(&mon, ConvertStrategy::default());
+    let second_pass = PKM::from_ohpkm(&OhpkmV2::from(&first_pass), ConvertStrategy::default());
 
     let expected = first_pass.to_party_bytes();
     let actual = second_pass.to_party_bytes();
@@ -223,7 +225,8 @@ fn find_inconsistencies_from_to_ohpkm<PKM: OhpkmConvert>(mon: OhpkmV2) -> TestRe
 #[cfg(test)]
 fn find_inconsistencies_to_from_ohpkm<PKM: OhpkmConvert>(mon: PKM) -> TestResult<()> {
     let expected = mon.to_party_bytes();
-    let actual: Vec<u8> = PKM::from_ohpkm(&OhpkmV2::from(&mon)).to_party_bytes();
+    let actual: Vec<u8> =
+        PKM::from_ohpkm(&OhpkmV2::from(&mon), ConvertStrategy::default()).to_party_bytes();
 
     ensure_ranges_match(&actual, &expected)
 }

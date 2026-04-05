@@ -1,7 +1,6 @@
 // #[cfg(feature = "wasm")]
 // pub mod wasm;
 
-#[cfg(feature = "wasm")]
 mod converter;
 
 mod option;
@@ -17,6 +16,7 @@ use tsify::Tsify;
 use wasm_bindgen::prelude::*;
 
 use crate::convert_strategy::option::{BoolOption, SettingType, StringOption};
+pub use converter::PkmConverter;
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]

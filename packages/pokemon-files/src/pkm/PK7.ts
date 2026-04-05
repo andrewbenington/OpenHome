@@ -1,6 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   AbilityIndex,
+  ConvertStrategies,
   ConvertStrategy,
   HyperTraining,
   Item,
@@ -66,7 +67,10 @@ export class Pk7Rust {
         throw Error('Pk7Rust cannot be created with any PKM type besides OHPKM')
       }
 
-      this.inner = Pk7Wasm.fromOhpkmBytes(new Uint8Array(other.toBytes()))
+      this.inner = Pk7Wasm.fromOhpkmBytes(
+        new Uint8Array(other.toBytes()),
+        options.strategy || ConvertStrategies.getDefault()
+      )
 
       return
     }

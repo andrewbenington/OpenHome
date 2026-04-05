@@ -1,6 +1,6 @@
 mod pk7;
 
-use crate::traits::Pkm;
+use crate::{convert_strategy::ConvertStrategy, traits::Pkm};
 
 use super::v2_sections::{Gen67Data, MainDataV2};
 
@@ -11,5 +11,5 @@ pub trait OhpkmConvert: Pkm {
         None
     }
 
-    fn from_ohpkm(ohpkm: &super::OhpkmV2) -> Self;
+    fn from_ohpkm(ohpkm: &super::OhpkmV2, strategy: ConvertStrategy) -> Self;
 }

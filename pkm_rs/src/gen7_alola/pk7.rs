@@ -1,5 +1,7 @@
 use super::Pk7Buffer;
 use crate::checksum::{Checksum, RefreshChecksum};
+#[cfg(feature = "wasm")]
+use crate::convert_strategy::ConvertStrategy;
 use crate::encryption;
 use crate::gen7_alola::pk7_buffer::{Pk7BufferMut, Pk7BufferRef};
 use crate::result::{Error, Result};
@@ -389,9 +391,12 @@ impl HasSpeciesAndForme for Pk7 {
 #[allow(clippy::missing_const_for_fn)]
 impl Pk7 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
-    pub fn from_ohpkm_bytes(bytes: Vec<u8>) -> core::result::Result<Pk7, JsValue> {
+    pub fn from_ohpkm_bytes(
+        bytes: Vec<u8>,
+        strategy: ConvertStrategy,
+    ) -> core::result::Result<Pk7, JsValue> {
         let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
-        Ok(Pk7::from_ohpkm(&ohpkm))
+        Ok(Pk7::from_ohpkm(&ohpkm, strategy))
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
@@ -517,6 +522,7 @@ impl ModernEvs for Pk7 {
 mod test {
     use std::path::PathBuf;
 
+    use crate::convert_strategy::ConvertStrategy;
     use crate::gen7_alola::Pk7;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
@@ -572,7 +578,7 @@ mod test {
         // 'r' at position 14 should be leftover from 'Pelipper'
         assert_eq!(mon.nickname.bytes()[14], b'r');
 
-        let mon_recreated = Pk7::from_ohpkm(&OhpkmV2::from(&mon));
+        let mon_recreated = Pk7::from_ohpkm(&OhpkmV2::from(&mon), ConvertStrategy::default());
 
         // leftover 'r' should be preserved after conversion to/from OHPKM
         assert_eq!(mon_recreated.nickname.bytes()[14], b'r');
@@ -594,7 +600,7 @@ mod test {
     fn from_ohpkm() -> TestResult<()> {
         let mon = tests::pkm_from_file::<OhpkmV2>(&PathBuf::from("ohpkm").join("Machamp.ohpkm"))?.0;
 
-        let _ = Pk7::from_ohpkm(&mon);
+        let _ = Pk7::from_ohpkm(&mon, ConvertStrategy::default());
 
         Ok(())
     }
@@ -611,7 +617,7 @@ mod test {
 
         assert_eq!(mon.ability_index().to_u16(), SHARPNESS);
 
-        let converted_pk7 = Pk7::from_ohpkm(&mon);
+        let converted_pk7 = Pk7::from_ohpkm(&mon, ConvertStrategy::default());
 
         // Gallade's Sharpness should be converted to Steadfast when converting to Pk7, since Sharpness is Gen 8+ and Pk7 can only represent Gen 7 abilities
         assert_eq!(converted_pk7.ability_index.to_u16(), STEADFAST);

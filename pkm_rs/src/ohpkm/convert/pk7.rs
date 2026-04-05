@@ -1,7 +1,13 @@
 use pkm_rs_resources::ribbons::OpenHomeRibbonSet;
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
-use crate::{gen7_alola::Pk7, ohpkm::OhpkmV2, traits::HasSpeciesAndForme};
+use crate::{
+    convert_strategy::{ConvertStrategy, PkmConverter},
+    format::PkmFormat,
+    gen7_alola::Pk7,
+    ohpkm::OhpkmV2,
+    traits::HasSpeciesAndForme,
+};
 
 use super::OhpkmConvert;
 use crate::ohpkm;
@@ -83,8 +89,11 @@ impl OhpkmConvert for Pk7 {
         })
     }
 
-    fn from_ohpkm(ohpkm: &OhpkmV2) -> Self {
+    fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Self {
         let form_metadata = ohpkm.get_forme_metadata();
+        let converter = PkmConverter::new(PkmFormat::PK7, strategy);
+        let met_data = converter.met_data(ohpkm);
+
         let mut mon = Self {
             encryption_constant: ohpkm.encryption_constant(),
             sanity: 0,
@@ -130,7 +139,7 @@ impl OhpkmConvert for Pk7 {
             secret_super_training_complete: ohpkm
                 .secret_super_training_complete()
                 .unwrap_or_default(),
-            ivs: ohpkm.ivs(),
+            ivs: converter.ivs(ohpkm),
             is_egg: ohpkm.is_egg(),
             is_nicknamed: ohpkm.is_nicknamed(),
             handler_name: ohpkm.handler_name(),
@@ -149,12 +158,12 @@ impl OhpkmConvert for Pk7 {
             egg_date: ohpkm.egg_date(),
             met_date: ohpkm.met_date(),
             egg_location_index: ohpkm.egg_location_index().unwrap_or(0),
-            met_location_index: ohpkm.met_location_index(),
+            met_location_index: met_data.location_index,
             ball: ohpkm.ball(),
             met_level: ohpkm.met_level(),
             trainer_gender: ohpkm.trainer_gender(),
             hyper_training: ohpkm.hyper_training(),
-            game_of_origin: ohpkm.game_of_origin(),
+            game_of_origin: met_data.origin,
             country: ohpkm.country().unwrap_or_default(),
             region: ohpkm.region().unwrap_or_default(),
             console_region: ohpkm.console_region(),
