@@ -264,7 +264,7 @@ export default class PA8 {
       this.heightScalar = other.heightScalar
       this.weightScalar = other.weightScalar
       this.scale = other.scale ?? this.heightScalar
-      this.nickname = other.nickname
+      this.nickname = converter.nickname(other)
 
       const moveFilter = MoveFilter.fromMoveIndices(LA_VALID_MOVES)
       this.moves = moveFilter.moves(other)

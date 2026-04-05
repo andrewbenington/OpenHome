@@ -257,7 +257,7 @@ export default class PK9 {
       this.weightScalar = other.weightScalar ?? 0
       this.scale = other.scale ?? 0
       this.tmFlagsSVDLC = other.tmFlagsSVDLC ?? new Uint8Array(13)
-      this.nickname = other.nickname
+      this.nickname = converter.nickname(other)
 
       const moveFilter = MoveFilter.fromPkmClass(PK9)
       this.moves = moveFilter.moves(other)
