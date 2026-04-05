@@ -1,9 +1,11 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   AbilityIndex,
+  ConvertStrategy,
   HyperTraining,
   Item,
   Languages,
+  MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
   Pk7 as Pk7Wasm,
@@ -20,6 +22,7 @@ import {
   unshuffleBlocksGen67,
 } from '../util/encryption'
 import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { PkmConstructorOptions } from './PKM'
 import {
   binaryGenderFromBool,
   binaryGenderToBool,
@@ -36,7 +39,7 @@ import {
 
 export class Pk7Rust {
   static getName() {
-    return 'PK7'
+    return 'PK7' as const
   }
   format: 'PK7' = 'PK7'
   static getBoxSize() {
@@ -44,10 +47,11 @@ export class Pk7Rust {
   }
   inner: Pk7Wasm
 
-  constructor(arg: ArrayBuffer | AllPKMFields | Pk7Wasm, encrypted?: boolean) {
+  constructor(arg: ArrayBuffer | AllPKMFields | Pk7Wasm, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
-      if (encrypted) {
+
+      if (options.encrypted) {
         const unencryptedBytes = decryptByteArrayGen67(buffer)
         const unshuffledBytes = unshuffleBlocksGen67(unencryptedBytes)
         buffer = unshuffledBytes
@@ -73,6 +77,14 @@ export class Pk7Rust {
   }
   set encryptionConstant(value: number) {
     this.inner.encryption_constant = value
+  }
+
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): Pk7Rust {
+    return new Pk7Rust(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Pk7Rust {
+    return new Pk7Rust(ohpkm, { strategy })
   }
 
   get sanity() {
@@ -549,10 +561,6 @@ export class Pk7Rust {
     this.inner.trainer_gender = binaryGenderFromBool(value)
   }
 
-  static fromBytes(buffer: ArrayBuffer): Pk7Rust {
-    return new Pk7Rust(buffer)
-  }
-
   public getStats() {
     return getStats(this)
   }
@@ -598,10 +606,6 @@ export class Pk7Rust {
     return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
 
-  public get speciesMetadata() {
-    return SpeciesLookup(this.dexNum)
-  }
-
   isShiny() {
     return (
       (this.trainerID ^
@@ -619,6 +623,14 @@ export class Pk7Rust {
       (this.personalityValue & 0xffff) ^
       ((this.personalityValue >> 16) & 0xffff)
     )
+  }
+
+  public get metadata() {
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+  }
+
+  public get speciesMetadata() {
+    return SpeciesLookup(this.dexNum)
   }
 
   static maxValidMove() {

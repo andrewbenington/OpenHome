@@ -53,6 +53,27 @@
   margin-left: auto;
 }
 
+.right-column-card {
+  min-height: 50%;
+  max-height: 60%;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.right-column-tabs {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.right-column-tab-list {
+  overflow-x: visible;
+  font-size: 14px;
+}
+
 .release-icon-container {
   display: flex;
   flex-wrap: wrap;

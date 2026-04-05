@@ -25,7 +25,7 @@ import { OfficialSAV } from '../../core/save/interfaces'
 import { SunMoonSaveWasm } from '../../core/save/SMSAV_WASM'
 import { MonDisplayState } from '../hooks/useMonDisplay'
 
-const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
+export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
   G2SAV,
   G3SAV,
@@ -49,7 +49,15 @@ const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
 const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV]
 
 export function initialMonDisplayState() {
-  return { filter: {}, topRightIndicator: null, showShiny: true, showItem: true }
+  return {
+    filter: {},
+    topRightIndicator: null,
+    showShiny: true,
+    showItem: true,
+    showNotesIndicator: true,
+    showTags: true,
+    showBackgroundColor: true,
+  }
 }
 
 export const defaultSettings: Settings = {

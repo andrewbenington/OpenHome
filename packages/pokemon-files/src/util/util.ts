@@ -7,11 +7,12 @@ import { PKM, PkmClass } from '@pokemon-files/pkm/PKM'
 import {
   Gender,
   Generation,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
   OriginGames,
 } from '@pkm-rs/pkg'
+import { PKMInterface } from '../../../../src/core/pkm/interfaces'
 import { AllPKMFields, FourMoves } from './pkmInterface'
 
 export function getGen3MiscFlags(pokemon: PKM): number {
@@ -69,7 +70,7 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
   // xoring the other three values with this to calculate upper half of personality value
   // will ensure shininess or non-shininess depending on original mon
   let newPersonalityValue = BigInt(personalityValue)
-  const metadata = MetadataLookup(mon.dexNum, 0)
+  const metadata = MetadataSummaryLookup(mon.dexNum, 0)
   if (!metadata) {
     return Number(newPersonalityValue)
   }
@@ -211,12 +212,12 @@ export function adjustPpForFormat(
 }
 
 type AllowedMoveIndices = number[]
-type PkmClassWithMoveLimit = PkmClass & { maxValidMove: () => number }
+type PkmClassWithMoveLimit<P extends PKMInterface> = PkmClass<P> & { maxValidMove: () => number }
 
-export class MoveFilter {
-  filter: AllowedMoveIndices | PkmClassWithMoveLimit
+export class MoveFilter<P extends PKMInterface> {
+  filter: AllowedMoveIndices | PkmClassWithMoveLimit<P>
 
-  private constructor(filter: AllowedMoveIndices | PkmClassWithMoveLimit) {
+  private constructor(filter: AllowedMoveIndices | PkmClassWithMoveLimit<P>) {
     this.filter = filter
   }
 
@@ -224,7 +225,7 @@ export class MoveFilter {
     return new MoveFilter(filter)
   }
 
-  static fromPkmClass(filter: PkmClassWithMoveLimit) {
+  static fromPkmClass<P extends PKMInterface>(filter: PkmClassWithMoveLimit<P>) {
     return new MoveFilter(filter)
   }
 
@@ -261,7 +262,7 @@ export class MoveFilter {
 }
 
 export function getHeightCalculated(mon: AllPKMFields) {
-  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
   if (!formeMetadata || mon.heightScalar === undefined || !mon.heightDeviation) return 0
 
   const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
@@ -269,7 +270,7 @@ export function getHeightCalculated(mon: AllPKMFields) {
 }
 
 export function getWeightCalculated(mon: AllPKMFields) {
-  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
   if (!formeMetadata || mon.weightScalar === undefined || !mon.weightDeviation) return 0
 
   const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)

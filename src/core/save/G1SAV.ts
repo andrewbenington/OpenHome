@@ -1,7 +1,14 @@
 import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
 import { range, unique } from '@openhome-core/util/functional'
-import { Gender, ItemGen1, Language, OriginGame } from '@pkm-rs/pkg'
+import {
+  ConvertStrategy,
+  ExtraFormIndex,
+  Gender,
+  ItemGen1,
+  Language,
+  OriginGame,
+} from '@pkm-rs/pkg'
 import * as conversion from '@pokemon-files/conversion'
 import { PK1 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
@@ -109,7 +116,7 @@ export class G1SAV extends OfficialSAV<PK1> {
       for (let monIndex = 0; monIndex < pokemonPerBox; monIndex++) {
         if (this.bytes[boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE]) {
           try {
-            const mon = new PK1(
+            const mon = PK1.fromBytes(
               this.bytes.slice(
                 boxByteOffset + this.BOX_PKM_OFFSET + monIndex * this.BOX_PKM_SIZE,
                 boxByteOffset + this.BOX_PKM_OFFSET + (monIndex + 1) * this.BOX_PKM_SIZE
@@ -225,11 +232,12 @@ export class G1SAV extends OfficialSAV<PK1> {
     this.bytes[0x3523] = wholeSaveChecksum
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK1 {
-    return new PK1(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK1 {
+    return PK1.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(dexNumber: number, formeNumber: number) {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     return dexNumber <= NationalDex.Mew && formeNumber === 0
   }
 

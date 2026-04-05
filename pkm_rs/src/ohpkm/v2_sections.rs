@@ -2,6 +2,11 @@ use super::sectioned_data::DataSection;
 use crate::ohpkm::v2::SectionTagV2;
 use crate::result::{Error, Result, StringErrorSource};
 use crate::traits::{IsShiny, IsShiny4096, OhpkmByte, OhpkmBytes};
+use crate::pkm::ohpkm::extra_form::ExtraFormIndex;
+use crate::pkm::ohpkm::sectioned_data::DataSection;
+use crate::pkm::ohpkm::{OhpkmV1, SectionTagV2};
+use crate::pkm::traits::{IsShiny4096, OhpkmByte, OhpkmBytes};
+use crate::pkm::{Error, Result, StringErrorSource};
 use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;
@@ -9,9 +14,12 @@ use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::NatDexIndex;
-use pkm_rs_resources::species::SpeciesAndForme;
+use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
+use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
+
+#[cfg(feature = "wasm")]
+use crate::pkm::traits::IsShiny;
+
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, Stats8, Stats16Le, StatsPreSplit, TrainerData,
@@ -23,6 +31,11 @@ use std::num::NonZeroU16;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
+
+use serde::{Deserialize, Serialize};
+use std::num::NonZeroU16;
+
+pub mod pkm_bytes;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -99,6 +112,7 @@ pub struct MainDataV2 {
     pub language: Language,
     pub form_argument: u32,
     pub affixed_ribbon: Option<ModernRibbon>,
+    pub extra_form: Option<ExtraFormIndex>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
@@ -115,12 +129,22 @@ pub struct MainDataV2 {
     pub obedience_level: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub home_tracker: [u8; 8],
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub display_color_rgb: Option<[u8; 3]>,
 }
+
+const NIDORAN_F: NatDexIndex = unsafe { NatDexIndex::new_unchecked(29) };
+const NIDORAN_M: NatDexIndex = unsafe { NatDexIndex::new_unchecked(32) };
 
 impl MainDataV2 {
     pub fn new(national_dex: u16, forme_index: u16) -> Result<Self> {
         Ok(Self {
             species_and_forme: SpeciesAndForme::new(national_dex, forme_index)?,
+            language: Language::English,
+            nickname: SpeciesAndForme::new(national_dex, forme_index)?
+                .get_species_metadata()
+                .name
+                .into(),
             ..Default::default()
         })
     }
@@ -189,12 +213,14 @@ impl MainDataV2 {
             language: old.language,
             form_argument: old.form_argument,
             affixed_ribbon: old.affixed_ribbon,
+            extra_form: None,
             trainer_name: old.trainer_name,
             trainer_friendship: old.trainer_friendship,
             trainer_memory: old.trainer_memory,
             trainer_affection: old.trainer_affection,
             obedience_level: old.obedience_level,
             home_tracker: old.home_tracker,
+            display_color_rgb: None,
         }
     }
 
@@ -210,6 +236,153 @@ impl MainDataV2 {
             self.game_of_origin as u8
         )
     }
+
+    pub fn nickname_matches_species_eng_ignore_case(&self) -> bool {
+        self.nickname
+            .to_string()
+            .eq_ignore_ascii_case(self.species_and_forme.get_species_metadata().name)
+    }
+
+    pub fn nickname_matches_species_eng(&self) -> bool {
+        self.nickname.to_string() == self.species_and_forme.get_species_metadata().name
+    }
+
+    pub fn reset_nickname_to_species(&mut self) {
+        self.nickname = self.species_and_forme.get_species_metadata().name.into();
+    }
+
+    fn ability_num_by_index(&self) -> Option<u8> {
+        let form_metadata = self.species_and_forme.get_forme_metadata();
+        if self.ability_index == form_metadata.abilities.0 {
+            Some(1)
+        } else if self.ability_index == form_metadata.abilities.1 {
+            Some(2)
+        } else if let Some(hidden_ability) = form_metadata.hidden_ability
+            && self.ability_index == hidden_ability
+        {
+            Some(4)
+        } else {
+            None
+        }
+    }
+
+    fn ability_is_first_slot(&self) -> bool {
+        self.ability_num_by_index() == Some(1)
+    }
+
+    fn ability_is_second_slot(&self) -> bool {
+        self.ability_num_by_index() == Some(2)
+    }
+
+    fn ability_is_hidden_ability(&self) -> bool {
+        self.ability_num_by_index() == Some(4)
+            || (self
+                .species_and_forme
+                .get_forme_metadata()
+                .hidden_ability
+                .is_none()
+                && self.ability_is_first_slot())
+    }
+
+    fn ability_num_matches_index(&self) -> bool {
+        match self.ability_num {
+            1 => self.ability_is_first_slot(),
+            2 => self.ability_is_second_slot(),
+            4 => self.ability_is_hidden_ability(),
+            _ => false,
+        }
+    }
+
+    pub fn fix_errors(&mut self) -> bool {
+        let mut errors_found = false;
+        let national_dex = self.species_and_forme.get_ndex();
+        let species_metadata = self.species_and_forme.get_species_metadata();
+        let form_metadata = self.species_and_forme.get_forme_metadata();
+
+        // When other languages are added this should be updated
+        if self.language == Language::English {
+            // Previous versions of OpenHome incorrectly translated the gender symbols; here we will fix that
+            if (national_dex == NIDORAN_F
+                && self
+                    .nickname
+                    .to_string()
+                    .eq_ignore_ascii_case("Nidoran\u{E08F}"))
+                || (national_dex == NIDORAN_M
+                    && self
+                        .nickname
+                        .to_string()
+                        .eq_ignore_ascii_case("Nidoran\u{E08E}"))
+            {
+                self.reset_nickname_to_species();
+                errors_found = true;
+            } else if self.nickname_matches_species_eng_ignore_case() {
+                // Fix Pokémon imported from an older game that had their nicknames kept as all caps
+                if !self.nickname_matches_species_eng() {
+                    self.nickname = species_metadata.name.into();
+                    errors_found = true;
+                }
+
+                // Ensure the is_nicknamed flag is accurate. Ignore the situation where the nickname was manually set to the species
+                if self.is_nicknamed {
+                    self.is_nicknamed = false;
+                    errors_found = true;
+                }
+            } else if is_prevo_species_name(&self.species_and_forme, &self.nickname.to_string()) {
+                self.reset_nickname_to_species();
+                self.is_nicknamed = false;
+                errors_found = true;
+            } else if !self.is_nicknamed && !self.nickname_matches_species_eng() {
+                // If the nickname doesn't match the species name, it should be considered nicknamed
+                self.is_nicknamed = true;
+                errors_found = true;
+            }
+        }
+
+        // PLA mons cannot have been hatched
+        if self.game_of_origin == OriginGame::LegendsArceus
+            && (self.egg_date.is_some() || self.egg_location_index.is_some())
+        {
+            self.egg_date = None;
+            self.egg_location_index = None;
+            errors_found = true;
+        }
+
+        // Affixed ribbon must be in the mon's possession
+        if let Some(affixed_ribbon) = self.affixed_ribbon
+            && !self.ribbons.includes(OpenHomeRibbon::Mod(affixed_ribbon))
+        {
+            self.affixed_ribbon = None;
+            errors_found = true;
+        }
+
+        // Fix ability bug from pre-1.5.0 (affected Mind's Eye and Dragon's Maw)
+        // Fix ability bug from pre-1.7.1 (abilities not updated after evolution/capsule/patch)
+        // Fix ability num bug from some point in the past (set to 0 instead of 1)
+        if !self.ability_num_matches_index() {
+            if let Some(fixed_ability_num) = self.ability_num_by_index() {
+                // This ability is a valid one for the species! Set the appropriate ability number
+                self.ability_num = fixed_ability_num;
+            } else {
+                // Hm, this ability is invalid for the species. Let's reset it using the ability number
+                self.ability_index = form_metadata.ability_by_num(self.ability_num)
+            }
+            errors_found = true;
+        }
+
+        if !form_metadata.gender_ratio.gender_is_allowed(self.gender) {
+            self.gender = form_metadata.gender_from_pid(self.personality_value);
+            errors_found = true;
+        }
+
+        errors_found
+    }
+}
+
+fn is_prevo_species_name(species_and_forme: &SpeciesAndForme, name: &str) -> bool {
+    species_and_forme
+        .get_prevos()
+        .iter()
+        .any(|prevo| prevo.get_species_metadata().name.eq_ignore_ascii_case(name))
 }
 
 impl DataSection for MainDataV2 {
@@ -294,6 +467,11 @@ impl DataSection for MainDataV2 {
             is_nicknamed: util::get_flag(bytes, 148, 31),
             // bytes[152],
             hyper_training: HyperTraining::from_byte(bytes[153]),
+            display_color_rgb: if bytes[160] != 0 {
+                Some(bytes[161..164].try_into().unwrap())
+            } else {
+                None
+            },
             home_tracker: bytes[172..180].try_into().unwrap(),
             handler_name: SizedUtf16String::<26>::from_bytes(bytes[184..210].try_into().unwrap()),
             handler_language: bytes[211].try_into().ok(),
@@ -328,9 +506,12 @@ impl DataSection for MainDataV2 {
             language: Language::try_from(bytes[242])?,
             form_argument: u32::from_le_bytes(bytes[244..248].try_into().unwrap()),
             affixed_ribbon: ModernRibbon::from_affixed_byte(bytes[248]),
-            // geolocations: Geolocations::from_bytes(bytes[249..259].try_into().unwrap()),
-            // encounter_type: bytes[270],
-            // performance: bytes[271],
+            // gap: 249-263
+
+            // TODO: handle invalid values
+            extra_form: u64::from_le_bytes(bytes[264..272].try_into().unwrap())
+                .try_into()
+                .ok(),
             trainer_name: SizedUtf16String::<26>::from_bytes(bytes[272..298].try_into().unwrap()),
             trainer_friendship: bytes[298],
             trainer_memory: TrainerMemory {
@@ -404,6 +585,11 @@ impl DataSection for MainDataV2 {
 
         bytes[153] = self.hyper_training.to_byte();
 
+        if let Some(rgb) = self.display_color_rgb {
+            bytes[160] = 1;
+            bytes[161..164].copy_from_slice(&rgb);
+        }
+
         // gap: 160..172
 
         bytes[172..180].copy_from_slice(&self.home_tracker);
@@ -442,9 +628,8 @@ impl DataSection for MainDataV2 {
 
         bytes[244..248].copy_from_slice(&self.form_argument.to_le_bytes());
         bytes[248] = ModernRibbon::to_affixed_byte(self.affixed_ribbon);
-        // bytes[249..259].copy_from_slice(&self.geolocations.to_bytes());
-        // bytes[270] = self.encounter_type;
-        // bytes[271] = self.performance;
+        // gap: 249-263
+        bytes[264..272].copy_from_slice(&self.extra_form.map_or(0, |f| f as u64).to_le_bytes());
         bytes[272..298].copy_from_slice(&self.trainer_name);
         bytes[298] = self.trainer_friendship;
 
@@ -522,7 +707,7 @@ impl DataSection for GameboyData {
         Ok(Self {
             dvs: StatsPreSplit::from_dv_bytes(bytes[0..2].try_into().unwrap()),
             met_time_of_day: bytes[2],
-            evs_g12: StatsPreSplit::from_bytes(bytes[3..13].try_into().unwrap()),
+            evs_g12: StatsPreSplit::from_bytes_u16_le(bytes[3..13].try_into().unwrap()),
         })
     }
 
@@ -1282,9 +1467,6 @@ impl DataSection for MostRecentSave {
 pub struct PluginData {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub plugin_origin: String,
-
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub plugin_form: Option<u16>,
 }
 
 impl PluginData {
@@ -1303,10 +1485,7 @@ impl PluginData {
     }
 
     const fn from_origin(plugin_origin: String) -> Self {
-        Self {
-            plugin_origin,
-            plugin_form: None,
-        }
+        Self { plugin_origin }
     }
 
     fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -1318,14 +1497,10 @@ impl PluginData {
             return Self::try_from_origin_utf8(bytes);
         }
 
-        let form_raw = u16::from_le_bytes([bytes[0], bytes[1]]);
-        let plugin_form = if form_raw == 0 { None } else { Some(form_raw) };
-
         let origin = String::from_utf8(bytes[2..].to_vec()).map_err(Error::plugin_origin)?;
 
         Ok(Self {
             plugin_origin: origin,
-            plugin_form,
         })
     }
 }
@@ -1342,16 +1517,6 @@ impl PluginData {
     #[wasm_bindgen(setter = pluginOrigin)]
     pub fn set_plugin_origin(&mut self, value: String) {
         self.plugin_origin = value;
-    }
-
-    #[wasm_bindgen(getter = pluginFormDataWasm)]
-    pub fn plugin_form(&self) -> Option<u16> {
-        self.plugin_form
-    }
-
-    #[wasm_bindgen(setter = pluginFormDataWasm)]
-    pub fn set_plugin_form(&mut self, value: Option<u16>) {
-        self.plugin_form = value;
     }
 }
 
@@ -1398,6 +1563,39 @@ impl DataSection for Notes {
 
     fn to_bytes(&self) -> Vec<u8> {
         self.0.clone().into_bytes()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
+
+/// Custom tags for a Pokemon (label + CSS color string + optional icon)
+/// Stored as JSON string
+#[derive(Debug, Default, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct MonTag {
+    pub label: String,
+    pub color: String,
+    pub icon: Option<String>,
+}
+
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+pub struct MonTags(pub Vec<MonTag>);
+
+impl DataSection for MonTags {
+    type TagType = SectionTagV2;
+    const TAG: Self::TagType = SectionTagV2::Tag;
+
+    type ErrorType = Error;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::ensure_buffer_size(bytes)?;
+        let tags: Vec<MonTag> = serde_json::from_slice(bytes).unwrap_or_default();
+        Ok(Self(tags))
+    }
+
+    fn to_bytes(&self) -> Result<Vec<u8>> {
+        Ok(serde_json::to_vec(&self.0).unwrap_or_default())
     }
 
     fn is_empty(&self) -> bool {

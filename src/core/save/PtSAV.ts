@@ -1,10 +1,7 @@
-import {
-  bytesToUint16LittleEndian,
-  bytesToUint32LittleEndian,
-} from '@openhome-core/save/util/byteLogic'
+import { bytesToUint16LittleEndian } from '@openhome-core/save/util/byteLogic'
 import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Gender, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { Item } from '@pokemon-resources/consts/Items'
 import { PT_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
@@ -55,9 +52,17 @@ export class PtSAV extends G4SAV {
     super(path, bytes)
     // current storage block could be either the first or second one,
     // depending on save count
+    const firstBlockSaveCount = this.getCurrentSaveCount(
+      PtSAV.STORAGE_BLOCK_OFFSET,
+      PtSAV.STORAGE_BLOCK_SIZE
+    )
+    const secondBlockSaveCount = this.getCurrentSaveCount(
+      PtSAV.STORAGE_BLOCK_OFFSET + 0x40000,
+      PtSAV.STORAGE_BLOCK_SIZE
+    )
     if (
-      this.getCurrentSaveCount(PtSAV.STORAGE_BLOCK_OFFSET, PtSAV.STORAGE_BLOCK_SIZE) <
-      this.getCurrentSaveCount(PtSAV.STORAGE_BLOCK_OFFSET + 0x40000, PtSAV.STORAGE_BLOCK_SIZE)
+      secondBlockSaveCount !== undefined &&
+      (firstBlockSaveCount === undefined || secondBlockSaveCount > firstBlockSaveCount)
     ) {
       this.currentSaveStorageBlockOffset += 0x40000
     }
@@ -71,11 +76,8 @@ export class PtSAV extends G4SAV {
     this.buildBoxes()
   }
 
-  getCurrentSaveCount(blockOffset: number, blockSize: number) {
-    return bytesToUint32LittleEndian(this.bytes, blockOffset + blockSize - this.footerSize)
-  }
-
-  supportsMon(dexNumber: number, formeNumber: number) {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     return !isRestricted(PT_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 

@@ -44,7 +44,7 @@ function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {
   }
 }
 
-export function fileTypeFromString(type: string): AnyPkmClass | undefined {
+export function fileTypeFromStringNonOhpkm(type: string): SavePkmClass | undefined {
   switch (type) {
     case 'PK1':
       return PK1
@@ -82,11 +82,16 @@ export function fileTypeFromString(type: string): AnyPkmClass | undefined {
       return PK9
     case 'PA9':
       return PA9
-    case 'OhpkmV2':
-      return OHPKM
     default:
       return undefined
   }
+}
+
+export function fileTypeFromString(type: string): AnyPkmClass | undefined {
+  if (type === 'OhpkmV2') {
+    return OHPKM
+  }
+  return fileTypeFromStringNonOhpkm(type)
 }
 
 export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMInterface => {

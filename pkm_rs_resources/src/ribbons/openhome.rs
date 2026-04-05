@@ -37,7 +37,7 @@ impl ObsoleteRibbonSet {
     }
 
     pub fn add_ribbon(&mut self, ribbon: ObsoleteRibbon) {
-        self.0.set_flag(ribbon.get_index(), true);
+        self.0.set_index(ribbon.get_index(), true);
     }
 
     pub fn add_ribbons(&mut self, ribbons: Vec<ObsoleteRibbon>) {
@@ -456,6 +456,13 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
 
     pub fn get_obsolete(&self) -> Vec<ObsoleteRibbon> {
         self.obsolete.get_ribbons()
+    }
+
+    pub fn includes(&self, ribbon: OpenHomeRibbon) -> bool {
+        match ribbon {
+            OpenHomeRibbon::Mod(ribbon) => self.modern.includes(ribbon),
+            OpenHomeRibbon::Obs(ribbon) => self.obsolete.get_ribbons().contains(&ribbon),
+        }
     }
 }
 

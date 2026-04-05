@@ -42,6 +42,7 @@ pub enum Error {
         context: String,
         source: Option<Box<dyn std::error::Error>>,
     },
+    Tauri(tauri::Error),
 }
 
 impl Error {
@@ -170,6 +171,9 @@ impl Display for Error {
                 Some(source) => format!("{context}: {source}"),
                 None => context.clone(),
             },
+            Self::Tauri(source) => {
+                format!("Tauri error: ({source})")
+            }
         };
 
         f.write_str(&message)
@@ -204,6 +208,12 @@ impl std::error::Error for Error {
 impl<T> From<std::sync::PoisonError<T>> for Error {
     fn from(_: std::sync::PoisonError<T>) -> Self {
         Error::MutexFailure
+    }
+}
+
+impl From<tauri::Error> for Error {
+    fn from(source: tauri::Error) -> Self {
+        Self::Tauri(source)
     }
 }
 

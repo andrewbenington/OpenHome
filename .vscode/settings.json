@@ -1,7 +1,6 @@
 {
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "typescript.preferences.importModuleSpecifier": "relative",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit",
@@ -55,14 +54,7 @@
   ],
   "editor.inlayHints.enabled": "off",
   "editor.tabSize": 2,
-  "rust-analyzer.cargo.features": [
-    "pkm_rs_resources/wasm",
-    "pkm_rs_types/wasm",
-    "pkm_rs/wasm",
-    "pkm_rs_types/randomize",
-    "pkm_rs_resources/randomize",
-    "pkm_rs/randomize"
-  ],
+  "rust-analyzer.cargo.features": ["wasm", "pkm_rs/randomize"],
   "css.completion.completePropertyWithSemicolon": false,
   "rust-analyzer.cargo.targetDir": true,
   "python.defaultInterpreterPath": "generate/.venv/bin/python",

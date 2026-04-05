@@ -1,34 +1,41 @@
 import {
   AbilityIndex,
   Ball,
+  ConvertStrategy,
+  ExtraFormIndex,
+  extraFormIndexFromOrasPikachu,
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
+  orasFormIndexIfSupported,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { NationalDex } from '../../../pokemon-resources/src/consts/NationalDex'
+import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PK6 {
   static getName() {
-    return 'PK6'
+    return 'PK6' as const
   }
   format: 'PK6' = 'PK6'
   static getBoxSize() {
     return 232
   }
   encryptionConstant: number
-  sanity: number
-  checksum: number
+  checksum: number = 0
   dexNum: number
   heldItemIndex: number
   trainerID: number
@@ -41,13 +48,13 @@ export default class PK6 {
   personalityValue: number
   nature: NatureIndex
   formeNum: number
+  extraFormIndex?: ExtraFormIndex
   gender: number
   evs: types.Stats
   contest: types.ContestStats
   markings: types.MarkingsSixShapesNoColor
   pokerusByte: number
   superTrainingFlags: number
-  ribbonBytes: Uint8Array
   contestMemoryCount: number
   battleMemoryCount: number
   superTrainingDistFlags: number
@@ -92,17 +99,23 @@ export default class PK6 {
   isFatefulEncounter: boolean
   ribbons: string[]
   trainerGender: boolean
-  constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
+  originalBytes?: ArrayBuffer
+
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
+    const { encrypted, strategy } = options
+
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
+
       if (encrypted) {
         const unencryptedBytes = encryption.decryptByteArrayGen67(buffer)
         const unshuffledBytes = encryption.unshuffleBlocksGen67(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
+
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
-      this.sanity = dataView.getUint16(0x4, true)
       this.checksum = dataView.getUint16(0x6, true)
       this.dexNum = dataView.getUint16(0x8, true)
       this.heldItemIndex = dataView.getUint16(0xa, true)
@@ -116,13 +129,22 @@ export default class PK6 {
       this.personalityValue = dataView.getUint32(0x18, true)
       this.nature = new NatureIndex(dataView.getUint8(0x1c))
       this.formeNum = byteLogic.uIntFromBufferBits(dataView, 0x1d, 3, 5, true)
+
+      // formeNum should always be the modern form index. Cosplay Pikachu needs to be stored in extraFormIndex.
+      if (this.dexNum === NationalDex.Pikachu) {
+        const extraFormIndex = extraFormIndexFromOrasPikachu(this.formeNum)
+        if (extraFormIndex !== undefined) {
+          this.extraFormIndex = extraFormIndex
+          this.formeNum = 0
+        }
+      }
+
       this.gender = byteLogic.uIntFromBufferBits(dataView, 0x1d, 1, 2, true)
       this.evs = types.readStatsFromBytesU8(dataView, 0x1e)
       this.contest = types.readContestStatsFromBytes(dataView, 0x24)
       this.markings = types.markingsSixShapesNoColorFromBytes(dataView, 0x2a)
       this.pokerusByte = dataView.getUint8(0x2b)
       this.superTrainingFlags = dataView.getUint32(0x2c, true)
-      this.ribbonBytes = new Uint8Array(buffer).slice(0x30, 0x36)
       this.contestMemoryCount = dataView.getUint8(0x38)
       this.battleMemoryCount = dataView.getUint8(0x39)
       this.superTrainingDistFlags = dataView.getUint8(0x3a)
@@ -205,10 +227,11 @@ export default class PK6 {
         .map((index) => ModernRibbons[index])
       this.trainerGender = byteLogic.getFlag(dataView, 0xdd, 7)
     } else {
+      const converter = new PkmConverter('PK6', strategy)
       const other = arg
+      const metData = converter.metData(other)
+
       this.encryptionConstant = other.encryptionConstant ?? 0
-      this.sanity = other.sanity ?? 0
-      this.checksum = other.checksum ?? 0
       this.dexNum = other.dexNum
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
@@ -219,8 +242,20 @@ export default class PK6 {
       this.trainingBagHits = other.trainingBagHits ?? 0
       this.trainingBag = other.trainingBag ?? 0
       this.personalityValue = other.personalityValue ?? 0
-      this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
-      this.formeNum = other.formeNum
+      this.nature = other.nature
+
+      if (other.extraFormIndex !== undefined) {
+        const orasIndex = orasFormIndexIfSupported(other.extraFormIndex)
+        if (orasIndex !== undefined) {
+          this.formeNum = orasIndex
+          this.extraFormIndex = other.extraFormIndex
+        } else {
+          this.formeNum = 0
+        }
+      } else {
+        this.formeNum = other.formeNum
+      }
+
       this.gender = other.gender ?? 0
       this.evs = other.evs ?? {
         hp: 0,
@@ -248,7 +283,6 @@ export default class PK6 {
       }
       this.pokerusByte = other.pokerusByte ?? 0
       this.superTrainingFlags = other.superTrainingFlags ?? 0
-      this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(6)
       this.contestMemoryCount = other.contestMemoryCount ?? 0
       this.battleMemoryCount = other.battleMemoryCount ?? 0
       this.superTrainingDistFlags = other.superTrainingDistFlags ?? 0
@@ -263,19 +297,12 @@ export default class PK6 {
 
       this.secretSuperTrainingUnlocked = other.secretSuperTrainingUnlocked ?? false
       this.secretSuperTrainingComplete = other.secretSuperTrainingComplete ?? false
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? false
-      this.handlerName = other.handlerName ?? ''
-      this.handlerGender = other.handlerGender ?? false
-      this.isCurrentHandler = other.isCurrentHandler ?? false
+      this.ivs = converter.ivs(other)
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
+      this.handlerName = other.handlerName
+      this.handlerGender = other.handlerGender
+      this.isCurrentHandler = other.isCurrentHandler
       this.geolocations = other.geolocations ?? [
         {
           region: 0,
@@ -298,55 +325,46 @@ export default class PK6 {
           country: 0,
         },
       ]
-      this.handlerFriendship = other.handlerFriendship ?? 0
-      this.handlerAffection = other.handlerAffection ?? 0
-      this.handlerMemory = other.handlerMemory ?? {
-        intensity: 0,
-        memory: 0,
-        feeling: 0,
-        textVariables: 0,
-      }
-      this.trainerMemory = other.trainerMemory ?? {
-        intensity: 0,
-        memory: 0,
-        feeling: 0,
-        textVariables: 0,
-      }
+      this.handlerFriendship = other.handlerFriendship
+      this.handlerAffection = other.handlerAffection
+      this.handlerMemory = other.handlerMemory
+      this.trainerMemory = other.trainerMemory
       this.fullness = other.fullness ?? 0
       this.enjoyment = other.enjoyment ?? 0
       this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship ?? 0
-      this.trainerAffection = other.trainerAffection ?? 0
+      this.trainerFriendship = other.trainerFriendship
+      this.trainerAffection = other.trainerAffection
       this.eggDate = other.eggDate ?? undefined
-      this.metDate = other.metDate ?? {
-        month: new Date().getMonth(),
-        day: new Date().getDate(),
-        year: new Date().getFullYear(),
-      }
+      this.metDate = other.metDate
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
       if (other.ball && PK6.maxValidBall() >= other.ball) {
         this.ball = other.ball
       } else {
         this.ball = Ball.Poke
       }
-      this.metLevel = other.metLevel ?? 0
+      this.metLevel = other.metLevel
       this.encounterType = other.encounterType ?? 0
-      this.gameOfOrigin = other.gameOfOrigin
       this.country = other.country ?? 0
       this.region = other.region ?? 0
-      this.consoleRegion = other.consoleRegion ?? 0
+      this.consoleRegion = other.consoleRegion
       this.language = other.language
-      this.statusCondition = other.statusCondition ?? 0
+      this.statusCondition = 0
       this.currentHP = other.currentHP ?? 0
-      this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], 'Toughness Master') ?? []
+      this.isFatefulEncounter = other.isFatefulEncounter
+      this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], 'Toughness Master')
       this.trainerGender = other.trainerGender
     }
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
-  static fromBytes(buffer: ArrayBuffer): PK6 {
-    return new PK6(buffer)
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK6 {
+    return new PK6(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK6 {
+    return new PK6(ohpkm, { strategy })
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {
@@ -354,7 +372,7 @@ export default class PK6 {
     const dataView = new DataView(buffer)
 
     dataView.setUint32(0x0, this.encryptionConstant, true)
-    dataView.setUint16(0x4, this.sanity, true)
+    dataView.setUint16(0x4, 0, true) // sanity bytes
     dataView.setUint16(0x6, this.checksum, true)
     dataView.setUint16(0x8, this.dexNum, true)
     dataView.setUint16(0xa, this.heldItemIndex, true)
@@ -367,14 +385,18 @@ export default class PK6 {
     dataView.setUint8(0x17, this.trainingBag)
     dataView.setUint32(0x18, this.personalityValue, true)
     dataView.setUint8(0x1c, this.nature.index)
-    byteLogic.uIntToBufferBits(dataView, this.formeNum, 29, 3, 5, true)
+
+    const orasFormIndex =
+      (this.extraFormIndex ? orasFormIndexIfSupported(this.extraFormIndex) : undefined) ??
+      this.formeNum
+
+    byteLogic.uIntToBufferBits(dataView, orasFormIndex, 29, 3, 5, true)
     byteLogic.uIntToBufferBits(dataView, this.gender, 29, 1, 2, true)
     types.writeStatsToBytesU8(dataView, 0x1e, this.evs)
     types.writeContestStatsToBytes(dataView, 0x24, this.contest)
     types.markingsSixShapesNoColorToBytes(dataView, 0x2a, this.markings)
     dataView.setUint8(0x2b, this.pokerusByte)
     dataView.setUint32(0x2c, this.superTrainingFlags, true)
-    new Uint8Array(buffer).set(new Uint8Array(this.ribbonBytes.slice(0, 6)), 0x30)
     dataView.setUint8(0x38, this.contestMemoryCount)
     dataView.setUint8(0x39, this.battleMemoryCount)
     dataView.setUint8(0x3a, this.superTrainingDistFlags)
@@ -459,7 +481,7 @@ export default class PK6 {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
-  public calcChecksum() {
+  public calculateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0xe8)
   }
 
@@ -496,7 +518,7 @@ export default class PK6 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

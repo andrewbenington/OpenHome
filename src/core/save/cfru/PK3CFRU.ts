@@ -1,13 +1,16 @@
-import { PKMInterface, PluginPKMInterface } from '@openhome-core/pkm/interfaces'
+import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
 import {
   Ball,
+  ConvertStrategy,
+  ExtraFormIndex,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { PkmConstructorOptions } from '@pokemon-files/pkm/PKM'
 import {
   FourMoves,
   generatePersonalityValuePreservingAttributes,
@@ -30,12 +33,11 @@ import {
   writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
+import { PkmConverter } from '../../../../packages/pokemon-files/src/conversion/converter'
+import { OHPKM } from '../../pkm/OHPKM'
+import { Option } from '../../util/functional'
 import { PluginIdentifier } from '../interfaces'
-
-export interface CFRUToNationalDexEntry {
-  NationalDexIndex: number
-  FormIndex: number
-}
+import { CfruSpeciesAndForm } from './conversion/util'
 
 const INTERNAL_ORIGIN_NON_RR = OriginGame.Invalid6
 const INTERNAL_ORIGIN_FROM_CFRU = OriginGame.FireRed
@@ -75,17 +77,19 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   // static getName() {
   //   return 'PK3RR'
   // }
-  format: string = 'PK3CFRU'
-  abstract pluginIdentifier: PluginIdentifier
+  abstract format: RomHackFormat
 
+  abstract pluginIdentifier: PluginIdentifier
   pluginOrigin?: PluginIdentifier
   personalityValue: number
   trainerID: number
   secretID: number
   language: Language
   markings: MarkingsFourShapes
+  internalSpeciesIndex: number
   dexNum: number
   formeNum: number
+  extraFormIndex: Option<ExtraFormIndex>
   internalHeldItemIndex: number
   abstract heldItemIndex: number
   exp: number
@@ -111,16 +115,17 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   trainerName: string
   trainerGender: boolean
   isFakemon: boolean = false
-  originalBytes?: Uint8Array
+  originalBytes?: ArrayBuffer
+
+  pluginForm?: number
 
   abstract selectColor: string
 
-  constructor(arg: ArrayBuffer | PKMInterface) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
-
-      this.originalBytes = new Uint8Array(arg)
 
       // https://github.com/Skeli789/Complete-Fire-Red-Upgrade/blob/master/include/new/pokemon_storage_system.h
       // https://github.com/Skeli789/Complete-Fire-Red-Upgrade/blob/master/include/pokemon.h
@@ -148,18 +153,19 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.markings = markingsFourShapesFromBytes(dataView, 0x1b)
 
       // Species 28:30
-      const speciesIndex: number = dataView.getUint16(0x1c, true)
-      const speciesData = this.monFromGameIndex(speciesIndex)
+      this.internalSpeciesIndex = dataView.getUint16(0x1c, true)
+      const speciesData = this.monFromGameIndex(this.internalSpeciesIndex)
+      this.extraFormIndex = speciesData.extraFormIndex
 
-      if (speciesData.NationalDexIndex < 0) {
+      if (speciesData.nationalDex < 0) {
         this.dexNum = 0
         this.formeNum = 0
       } else {
-        this.dexNum = speciesData.NationalDexIndex
-        this.formeNum = speciesData.FormIndex
+        this.dexNum = speciesData.nationalDex
+        this.formeNum = speciesData.formIndex
       }
 
-      this.isFakemon = this.indexIsFakemon(speciesIndex)
+      this.isFakemon = this.indexIsFakemon(this.internalSpeciesIndex)
 
       // Held Item 30:32
       this.internalHeldItemIndex = dataView.getUint16(0x1e, true)
@@ -192,7 +198,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       ]
 
       for (let i = 0; i < 4; i++) {
-        const pp = getMoveMaxPP(this.moves[i], this.format, this.movePPUps[i])
+        const pp = getMoveMaxPP(this.moves[i], this.getFormat(), this.movePPUps[i])
 
         if (pp) this.movePP[i] = pp
       }
@@ -227,39 +233,30 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.hasHiddenAbility = getFlag(dataView, 0x36, 31)
     } else {
       const other = arg
+      const converter = new PkmConverter(this.getFormat(), options.strategy)
+      const metData = converter.metData(other)
 
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.language = other.language
-      this.markings = markingsFourShapesFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-      }
+      this.markings = markingsFourShapesFromOther(other.markings)
       this.dexNum = other.dexNum
       this.formeNum = other.formeNum
+      this.extraFormIndex = other.extraFormIndex
       this.internalHeldItemIndex = this.internalItemIndexFromModern(other.heldItemIndex)
       this.exp = other.exp
       this.trainerFriendship = other.trainerFriendship ?? 0
 
       const moveFilter = MoveFilter.fromMoveIndices(this.getValidMoveIndices())
       this.moves = moveFilter.moves(other)
-      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePP = moveFilter.movePp(other, this.getFormat())
       this.movePPUps = moveFilter.movePpUps(other)
 
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
-      this.metLevel = other.metLevel ?? 0
+      this.evs = other.evs
+      this.pokerusByte = other.pokerusByte
+      this.metLocationIndex = metData.locationIndex
+      this.metLevel = other.metLevel
 
       const fromRadicalRed = other.pluginOrigin === 'radical_red'
 
@@ -277,6 +274,12 @@ export abstract class PK3CFRU implements PluginPKMInterface {
         this.internalMetLocationIndex = FIRERED_IN_GAME_TRADE
       }
 
+      this.internalSpeciesIndex = this.monToGameIndex(other.dexNum, other.formeNum)
+
+      if (other.pluginOrigin === this.getPluginIdentifier()) {
+        this.pluginOrigin = other.pluginOrigin
+      }
+
       if (other.ball) {
         this.ball =
           other.ball >= Ball.PokeLegendsArceus && other.ball <= Ball.Origin
@@ -289,14 +292,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       }
 
       this.canGigantamax = !!other.canGigantamax
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
+      this.ivs = converter.ivs(other)
       this.isEgg = other.isEgg ?? false
       this.hasHiddenAbility = other.abilityNum === 4
       this.isNicknamed = other.isNicknamed ?? false
@@ -308,10 +304,19 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   static fromBytes<T extends PK3CFRU>(
-    this: new (buffer: ArrayBuffer) => T,
-    buffer: ArrayBuffer
+    this: new (buffer: ArrayBuffer, options: PkmConstructorOptions) => T,
+    buffer: ArrayBuffer,
+    encrypted?: boolean
   ): T {
-    return new this(buffer)
+    return new this(buffer, { encrypted })
+  }
+
+  static fromOhpkm<T extends PK3CFRU>(
+    this: new (ohpkm: OHPKM, options: PkmConstructorOptions) => T,
+    ohpkm: OHPKM,
+    strategy: ConvertStrategy
+  ): T {
+    return new this(ohpkm, { strategy })
   }
 
   abstract internalItemIndexFromModern(modernIndex: number): number
@@ -321,7 +326,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   abstract moveToGameIndex(nationalMoveId: number): number
   abstract getValidMoveIndices(): number[]
 
-  abstract monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry
+  abstract monFromGameIndex(gameIndex: number): CfruSpeciesAndForm
   abstract monToGameIndex(nationalDexNumber: number, formIndex: number): number
 
   abstract indexIsFakemon(speciesIndex: number): boolean
@@ -354,7 +359,11 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
     // Growth Substructure (starts at 0x1C)
     // 28:30 Species (DexNum)
-    dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, this.formeNum), true)
+    if (this.pluginForm) {
+      dataView.setUint16(0x1c, this.pluginForm, true)
+    } else {
+      dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, this.formeNum), true)
+    }
 
     // 30:32 Held Item
     dataView.setUint16(0x1e, this.internalHeldItemIndex, true)
@@ -466,7 +475,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {
@@ -488,6 +497,14 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   getPluginIdentifier(): PluginIdentifier {
     return this.pluginIdentifier
   }
+
+  extraDisplayFields() {
+    return {
+      'Internal Species Index': this.internalSpeciesIndex,
+    }
+  }
+
+  abstract getFormat(): RomHackFormat
 }
 
 export default PK3CFRU

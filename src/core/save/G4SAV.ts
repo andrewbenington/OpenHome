@@ -5,9 +5,10 @@ import {
   uint16ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
-import { OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
+import { Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
 import { PathData } from './util/path'
@@ -66,7 +67,22 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
       this.origin = OriginGame.Diamond
       return
     }
-    this.origin = bytes[0x80]
+    const possibleOrigin = bytes[0x80]
+    if (G4SAV.includesOrigin(possibleOrigin)) {
+      this.origin = possibleOrigin
+    } else {
+      this.origin = 0
+    }
+  }
+
+  getCurrentSaveCount(blockOffset: number, blockSize: number): Option<number> {
+    const storedCount = bytesToUint32LittleEndian(
+      this.bytes,
+      blockOffset + blockSize - this.footerSize
+    )
+
+    // if the game has only been saved once, the second block will be full of 0xffffffff, so we return -1 to indicate it has never been saved before
+    return storedCount === 0xffffffff ? undefined : storedCount
   }
 
   buildBoxes() {
@@ -87,7 +103,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
           const startByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * monIndex
           const endByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * (monIndex + 1)
           const monData = this.bytes.slice(startByte, endByte)
-          const mon = new PK4(monData.buffer, true)
+          const mon = PK4.fromBytes(monData.buffer, true)
 
           if (mon.dexNum !== 0 && mon.gameOfOrigin !== 0) {
             // set game origin if origin missing and matching mon is found; necessary for diamond/pearl
@@ -105,6 +121,12 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
           console.error(`G4SAV: ${e}`)
         }
       }
+    }
+
+    if (this.origin === 0) {
+      this.origin = this.filePath.raw.toLocaleLowerCase().includes('pearl')
+        ? OriginGame.Pearl
+        : OriginGame.Diamond
     }
   }
 
@@ -152,11 +174,15 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     this.updateStorageChecksum()
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK4 {
-    return new PK4(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK4 {
+    return PK4.fromOhpkm(ohpkm, strategy)
   }
 
-  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract supportsMon(
+    dexNumber: number,
+    formeNumber: number,
+    extraFormIndex?: ExtraFormIndex
+  ): boolean
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]

@@ -20,11 +20,35 @@ export const SortTypes = [
   'Held Item',
   'Is Egg',
   'Shiny Leaves',
+  'Display Color',
+  'First Tag',
+  'Tag Count',
+  'Has Notes',
 ]
 
 export type SortType = (typeof SortTypes)[number]
 
 export type PkmSorter = (a: PKMInterface, b: PKMInterface) => number
+
+type MonTagLike = { label: string; color?: string; icon?: string }
+
+type MonWithManagementData = PKMInterface & {
+  tags?: MonTagLike[]
+  notes?: string
+  displayColor?: string
+}
+
+function monTags(mon: PKMInterface): MonTagLike[] {
+  return (mon as MonWithManagementData).tags ?? []
+}
+
+function monNotes(mon: PKMInterface): string | undefined {
+  return (mon as MonWithManagementData).notes
+}
+
+function monDisplayColor(mon: PKMInterface): string {
+  return (mon as MonWithManagementData).displayColor ?? ''
+}
 
 function chain(sorters: PkmSorter[]): PkmSorter {
   return (a: PKMInterface, b: PKMInterface) => {
@@ -133,6 +157,28 @@ export function getSortFunction(
         (a.shinyLeaves?.hasCrown() ? 6 : (a.shinyLeaves?.count() ?? 0))
     case 'Held Item':
       return sortByHeldItem
+    case 'First Tag':
+      return (a, b) => {
+        const getFirstTag = (mon: PKMInterface) => {
+          return monTags(mon)[0]?.label ?? ''
+        }
+        return getFirstTag(a).localeCompare(getFirstTag(b))
+      }
+    case 'Tag Count':
+      return (a, b) => {
+        const getTagCount = (mon: PKMInterface) => monTags(mon).length
+        return getTagCount(b) - getTagCount(a)
+      }
+    case 'Has Notes':
+      return (a, b) => {
+        const hasNotes = (mon: PKMInterface) => {
+          const notes = monNotes(mon)
+          return typeof notes === 'string' && notes.trim().length > 0
+        }
+        return Number(hasNotes(b)) - Number(hasNotes(a))
+      }
+    case 'Display Color':
+      return (a, b) => monDisplayColor(a).localeCompare(monDisplayColor(b))
     default:
       return () => {
         console.error('unrecognized sort term:', sortStr)

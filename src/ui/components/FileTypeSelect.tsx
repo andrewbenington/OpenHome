@@ -32,6 +32,7 @@ interface FileTypeSelectProps {
   color?: string
   formData: PKMInterface
   onChange: (selectedFormat: string) => void
+  disabled?: boolean
 }
 
 const FileTypeSelect = (props: FileTypeSelectProps) => {
@@ -53,7 +54,11 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
       className="file-type-chip"
       value={currentFormat}
       onChange={(e) => onChange(e.target.value)}
-      style={{ backgroundColor: color ?? fileTypeColors[currentFormat] }}
+      style={{
+        backgroundColor: color ?? fileTypeColors[currentFormat],
+        backgroundImage: props.disabled ? 'none' : undefined,
+      }}
+      disabled={props.disabled}
     >
       <option value="OHPKM">OpenHome</option>
       {baseFormat === 'OHPKM' ? (

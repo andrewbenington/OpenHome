@@ -1,17 +1,20 @@
 import {
   AbilityIndex,
+  ExtraFormIndex,
   FormeMetadata,
   Gender,
   Language,
   NatureIndex,
   ShinyLeaves,
 } from '@pkm-rs/pkg'
+import { MonFormat } from '../../../../src/core/pkm/interfaces'
+import { PluginIdentifier } from '../../../../src/core/save/interfaces'
 import * as types from './types'
 
 export type FourMoves = [number, number, number, number]
 
 export interface AllPKMFields {
-  format: string
+  format: MonFormat | 'OHPKM'
   ability?: AbilityIndex
   abilityNum?: number
   affixedRibbon?: number | undefined
@@ -44,6 +47,7 @@ export interface AllPKMFields {
   evs?: types.Stats
   evsG12?: types.StatsPreSplit
   exp: number
+  extraFormIndex?: ExtraFormIndex
   favorite?: boolean
   fieldEventFatigue1?: number
   fieldEventFatigue2?: number
@@ -101,8 +105,10 @@ export interface AllPKMFields {
   palma?: number
   performance?: number
   personalityValue?: number
-  pluginOrigin?: string
-  pluginForm?: number
+  // pluginIdentifier is the plugin identifier corresponding to the PKM format, regardless of if the Pokémon was originally from that game
+  pluginIdentifier?: PluginIdentifier
+  // pluginOrigin is the plugin identifier of the game the Pokémon originally came from, which will be different than pluginIdentifier if the mon was transferred from a different game
+  pluginOrigin?: PluginIdentifier
   pokeStarFame?: number
   pokerusByte?: number
   receivedDay?: number
@@ -114,7 +120,6 @@ export interface AllPKMFields {
   region?: number
   relearnMoves?: FourMoves
   resortEventStatus?: number
-  ribbonBytes?: Uint8Array
   ribbons?: string[]
   sanity?: number
   scale?: number
@@ -160,12 +165,15 @@ export interface AllPKMFields {
   heldItemName: string
   languageString: string
   getLevel: () => number
-  calcChecksum?: () => number
+  calculateChecksum?: () => number
   refreshChecksum?: () => void
   isShiny: () => boolean
   isSquareShiny: () => boolean
 
   metadata?: FormeMetadata
 
+  originalBytes?: ArrayBuffer
+
   toBytes: ((_options?: types.ToBytesOptions) => ArrayBuffer) | (() => ArrayBuffer)
+  extraDisplayFields?: () => Record<string, string | number | boolean>
 }

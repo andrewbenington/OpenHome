@@ -1,6 +1,6 @@
 [package]
 name = "OpenHome"
-version = "1.9.2"
+version = "1.10.1"
 description = "A tool for moving Pokémon between game saves"
 authors = ["Andrew Benington"]
 edition = "2024"
@@ -21,19 +21,20 @@ opt-level = "s" # Optimize for binary size
 strip = true # Remove debug symbols
 
 [build-dependencies]
-tauri-build = { version = "2.5.5", features = [] }
+tauri-build = { version = "2.5.6", features = [] }
 
 [dependencies]
-tauri = { version = "2.10.2", features = [] }
+pkm_rs = {path = "../pkm_rs"}
+tauri = { version = "2.10.3", features = [] }
 tauri-plugin-shell = "2.3.5"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 tauri-plugin-os = "2.3.2"
-tauri-plugin-dialog = "2.6.0"
-tauri-plugin-fs = "2.4.5"
+tauri-plugin-dialog = "2.7.0"
+tauri-plugin-fs = "2.5.0"
 reqwest = { version = "0.13.2" }
 base64 = "0.22.1"
-zip = "8.1.0"
+zip = "8.5.0"
 static_assertions = "1.1.0"
 sha2 = "0.10.9"
 num = "0.4.3"
@@ -41,9 +42,9 @@ toml = "0.9.8"
 pkm_rs_derive = {path = "../pkm_rs_derive"}
 pkm_rs = {path = "../pkm_rs"}
 bytes = "1.11.1"
-semver = "1.0.27"
+semver = "1.0.28"
 strum = { version = "0.28.0", features = ["derive"] }
-uuid = { version = "1.21.0", features = ["v4"] }
+uuid = { version = "1.23.0", features = ["v4"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 dialog = "0.3.0"

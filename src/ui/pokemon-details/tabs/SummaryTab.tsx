@@ -8,16 +8,36 @@ import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
-import { colorForType, colorIsDark } from '@openhome-ui/util/color'
-import { genderFromBool, getPluginColor, MetadataLookup } from '@pkm-rs/pkg'
+import { colorIsDark, SHADOW_TYPE_COLOR } from '@openhome-ui/util/color'
+import {
+  extraFormDisplayName,
+  genderFromBool,
+  getPluginColor,
+  MetadataSummaryLookup,
+  OriginGames,
+} from '@pkm-rs/pkg'
+import { PKM } from '@pokemon-files/pkm/PKM'
 import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import { getRomHackFormName } from 'src/core/save/rom-hack/forms'
+import { OHPKM } from 'src/core/pkm/OHPKM'
+import { MonTag } from 'src/ui/util/tags'
+import { TagIcon } from '../../components/TagIcon'
 import useMonSprite from '../useMonSprite'
 
-const SummaryDisplay = (props: { mon: PKMInterface }) => {
+type MonWithManagementData = PKMInterface & {
+  tags?: MonTag[]
+}
+
+type SummaryDisplayProps = {
+  mon: PKMInterface
+}
+
+const SummaryDisplay = (props: SummaryDisplayProps) => {
   const { mon } = props
+  const tags = useMemo(() => {
+    return (mon as MonWithManagementData).tags ?? []
+  }, [mon])
   const spriteResult = useMonSprite({
     dexNum: mon.dexNum,
     formeNum: mon.formeNum,
@@ -25,11 +45,11 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
     isShiny: mon.isShiny(),
     isFemale: mon.gender === 1,
     format: mon.format,
-    pluginForm: mon.pluginForm,
+    extraFormIndex: mon.extraFormIndex,
   })
 
   const itemAltText = useMemo(() => {
-    const monData = MetadataLookup(mon.dexNum, mon.formeNum)
+    const monData = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
 
     if (!monData) return 'pokemon sprite'
     return `${monData.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
@@ -37,8 +57,8 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
 
   return (
     <Grid columns="2" width="100%" p="3" gap="2">
-      <div>
-        <div className="summary-column">
+      <Flex direction="column" gap="2">
+        <div className="mon-image-container">
           {spriteResult.loading ? (
             <Spinner style={{ margin: 'auto', height: 32 }} />
           ) : spriteResult.path ? (
@@ -98,6 +118,23 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
           )}
           <div>{mon.heldItemName}</div>
         </AttributeRow>
+        <Flex direction="row" gap="1" align="center" wrap="wrap">
+          {tags.length > 0 &&
+            tags.map((tag, i) => (
+              <Badge
+                key={i}
+                variant="solid"
+                size="1"
+                style={{
+                  backgroundColor: tag.color ?? '#888',
+                  color: colorIsDark(tag.color ?? '#888') ? '#fff' : '#000',
+                }}
+              >
+                <TagIcon iconName={tag.icon} size={10} />
+                {tag.label}
+              </Badge>
+            ))}
+        </Flex>
         <div>
           {mon.isShiny() && (
             <AttributeTag
@@ -120,31 +157,42 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
               backgroundColor="#f2352d"
             />
           )}
+          {mon instanceof OHPKM && mon.unconvertedPkm && (
+            <AttributeTag label="Has Unconverted PKM" color="white" backgroundColor="blue" />
+          )}
           {mon.isNoble && <AttributeTag label="NOBLE" backgroundColor="#cccc00" color="white" />}
           {'isShadow' in mon && (mon.isShadow as boolean) && (
-            <AttributeTag label="SHADOW" backgroundColor={colorForType('shadow')} color="white" />
+            <AttributeTag label="SHADOW" backgroundColor={SHADOW_TYPE_COLOR} color="white" />
           )}
           {mon.isNsPokemon && (
             <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />
           )}
         </div>
-      </div>
+      </Flex>
       <Flex direction="column" gap="2px">
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow label="Species">
           <Flex gap="1">
-            {mon.pluginOrigin && mon.pluginForm !== undefined ? (
+            {mon.extraFormIndex ? (
               <span
-                className="rom-hack-form-name"
+                className="extra-form-name"
                 style={{
-                  color: colorIsDark(getPluginColor(mon.pluginOrigin)) ? '#fff' : '#000',
-                  backgroundColor: getPluginColor(mon.pluginOrigin),
+                  color: colorIsDark(
+                    mon.pluginOrigin
+                      ? getPluginColor(mon.pluginOrigin)
+                      : OriginGames.color(mon.gameOfOrigin)
+                  )
+                    ? '#fff'
+                    : '#000',
+                  backgroundColor: mon.pluginOrigin
+                    ? getPluginColor(mon.pluginOrigin)
+                    : OriginGames.color(mon.gameOfOrigin),
                 }}
               >
-                {getRomHackFormName(mon.pluginOrigin, mon.dexNum, mon.pluginForm)}
+                {extraFormDisplayName(mon.extraFormIndex)}
               </span>
             ) : (
-              MetadataLookup(mon.dexNum, mon.formeNum)?.formeName
+              MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.formeName
             )}
             <GenderIcon gender={mon.gender} />
           </Flex>
@@ -161,7 +209,7 @@ const SummaryDisplay = (props: { mon: PKMInterface }) => {
             <GenderIcon gender={genderFromBool(mon.trainerGender)} />
           </Flex>
         </AttributeRow>
-        <AttributeRow label="Trainer ID" value={getDisplayID(mon as any)} />
+        <AttributeRow label="Trainer ID" value={getDisplayID(mon as PKM)} />
         {mon.ability !== undefined && (
           <AttributeRow
             label="Ability"

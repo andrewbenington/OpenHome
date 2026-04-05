@@ -53,6 +53,10 @@ pub enum Error {
         national_dex: NatDexIndex,
         forme_index: u16,
     },
+    ExtraFormIndex {
+        national_dex: NatDexIndex,
+        extra_form_index: u64,
+    },
     LanguageIndex {
         language_index: u8,
     },
@@ -69,6 +73,10 @@ pub enum Error {
     FieldError {
         field: &'static str,
         source: Box<dyn std::error::Error>,
+    },
+    TagError {
+        tag_type: &'static str,
+        value: u16,
     },
 
     MoveError {
@@ -99,6 +107,10 @@ impl Error {
 
     pub const fn plugin_origin(error: FromUtf8Error) -> Self {
         Self::StringDecode { source: StringErrorSource::PluginOrigin(error) }
+    }
+
+    pub const fn extra_form_index(national_dex: NatDexIndex, extra_form_index: u64) -> Self {
+        Self::ExtraFormIndex { national_dex, extra_form_index }
     }
 }
 
@@ -144,6 +156,17 @@ impl Display for Error {
                 )
                 .to_owned()
             }
+            Error::ExtraFormIndex {
+                national_dex,
+                extra_form_index,
+            } => {
+                let species_metadata = national_dex.get_species_metadata();
+                format!(
+                    "Invalid extra form index {extra_form_index} (Pokémon species {})",
+                    species_metadata.name
+                )
+                .to_owned()
+            }
             Error::LanguageIndex { language_index } => {
                 format!("Invalid language index {language_index} (must be between 1 and {LANGUAGE_MAX}")
                     .to_owned()
@@ -167,6 +190,7 @@ impl Display for Error {
                 format!("Error reading field {field}: {source}")
                     .to_owned()
             }
+
             Error::MoveError { value, source } => {
                 format!("Invalid move reference {value} (source: {source})").to_owned()
             }
@@ -195,7 +219,8 @@ impl From<pkm_rs_resources::Error> for Error {
             pkm_rs_resources::Error::BufferSize { requirement_source, expected, received } => Self::BufferSize { requirement_source: Some(requirement_source), expected, received },
             pkm_rs_resources::Error::CryptRange { range, buffer_size } => Self::CryptRange { range, buffer_size },
             pkm_rs_resources::Error::NationalDex { national_dex } => Self::NationalDex { value: national_dex, source: NdexConvertSource::Other },
-            pkm_rs_resources::Error::FormeIndex { national_dex, forme_index } => Self::FormeIndex { national_dex, forme_index },
+            pkm_rs_resources::Error::FormeIndex { national_dex, forme_index,
+                 } => Self::FormeIndex { national_dex, forme_index },
             pkm_rs_resources::Error::LanguageIndex { language_index } => Self::LanguageIndex { language_index },
             pkm_rs_resources::Error::NatureIndex { nature_index } => Self::NatureIndex { nature_index },
             pkm_rs_resources::Error::AbilityIndex { ability_index } => Self::AbilityIndex { ability_index },

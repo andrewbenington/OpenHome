@@ -5,7 +5,7 @@ import {
   uint16ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConverter'
-import { Gender, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK7 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
@@ -86,7 +86,7 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
           const monData = bytes.slice(startByte, endByte)
 
           try {
-            const mon = new PK7(monData.buffer, true)
+            const mon = PK7.fromBytes(monData.buffer, true)
 
             if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
               this.boxes[box].boxSlots[monIndex] = mon
@@ -128,11 +128,15 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
     this.bytes = SignWithMemeCrypto(this.bytes)
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK7 {
-    return new PK7(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK7 {
+    return PK7.fromOhpkm(ohpkm, strategy)
   }
 
-  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract supportsMon(
+    dexNumber: number,
+    formeNumber: number,
+    extraFormIndex?: ExtraFormIndex
+  ): boolean
 
   calculatePcChecksum(): number {
     return CRC16_Invert(this.bytes, this.getPcOffset(), this.pcSize)
@@ -164,7 +168,7 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
 }
 
 function emptyBoxSlotBytes() {
-  const mon = new PK7(new Uint8Array(232).buffer)
+  const mon = PK7.fromBytes(new Uint8Array(232).buffer)
   mon.checksum = 0x0204
   return new Uint8Array(mon.toPCBytes())
 }

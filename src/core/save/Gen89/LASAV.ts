@@ -1,5 +1,5 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Gender, Languages, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { PA8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { LA_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
@@ -45,8 +45,8 @@ export class LASAV extends G89SAV<PA8> {
     this.displayID = this.tid.toString().padStart(6, '0')
   }
 
-  convertOhpkm(ohpkm: OHPKM): PA8 {
-    return new PA8(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PA8 {
+    return PA8.fromOhpkm(ohpkm, strategy)
   }
 
   getBoxCount(): number {
@@ -54,7 +54,7 @@ export class LASAV extends G89SAV<PA8> {
   }
 
   monConstructor(bytes: ArrayBuffer, encrypted: boolean): PA8 {
-    return new PA8(bytes, encrypted)
+    return new PA8(bytes, { encrypted })
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {
@@ -96,7 +96,8 @@ export class LASAV extends G89SAV<PA8> {
     return 0
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     return !isRestricted(LA_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 

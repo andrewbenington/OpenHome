@@ -1,14 +1,16 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   AbilityIndex,
   Ball,
+  ConvertStrategy,
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { PkmConverter } from '../conversion/converter'
 import { FourMoves } from '../util'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
@@ -16,17 +18,18 @@ import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { getHeightCalculated, getWeightCalculated, MoveFilter } from '../util/util'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PB7 {
   static getName() {
-    return 'PB7'
+    return 'PB7' as const
   }
   format: 'PB7' = 'PB7'
   static getBoxSize() {
     return 260
   }
   encryptionConstant: number
-  checksum: number
+  checksum: number = 0
   dexNum: number
   heldItemIndex: number
   trainerID: number
@@ -91,7 +94,11 @@ export default class PB7 {
   isMega: number
   megaForme: number
   trainerGender: boolean
-  constructor(arg: ArrayBuffer | PKMInterface, encrypted?: boolean) {
+  originalBytes?: ArrayBuffer
+
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
+    const { encrypted, strategy } = options
+
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       if (encrypted) {
@@ -99,6 +106,7 @@ export default class PB7 {
         const unshuffledBytes = encryption.unshuffleBlocksGen67(unencryptedBytes)
         buffer = unshuffledBytes
       }
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)
@@ -188,28 +196,23 @@ export default class PB7 {
       this.trainerGender = byteLogic.getFlag(dataView, 0xdd, 7)
     } else {
       const other = arg
+      const converter = new PkmConverter('PB7', strategy)
+      const metData = converter.metData(other)
+
       this.encryptionConstant = other.encryptionConstant ?? 0
-      this.checksum = other.checksum ?? 0
       this.dexNum = other.dexNum
       this.heldItemIndex = 0
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
       this.ability = other.ability
-      this.abilityNum = other.abilityNum ?? 0
-      this.favorite = other.favorite ?? false
-      this.markings = types.markingsSixShapesWithColorFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-        star: false,
-        diamond: false,
-      }
-      this.personalityValue = other.personalityValue ?? 0
-      this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
-      this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.gender = other.gender ?? 0
+      this.abilityNum = other.abilityNum
+      this.favorite = other.favorite
+      this.markings = types.markingsSixShapesWithColorFromOther(other.markings)
+      this.personalityValue = other.personalityValue
+      this.nature = other.nature
+      this.isFatefulEncounter = other.isFatefulEncounter
+      this.gender = other.gender
       this.formeNum = other.formeNum
       this.evs = {
         hp: 0,
@@ -228,10 +231,10 @@ export default class PB7 {
         spd: 0,
       }
       this.resortEventStatus = other.resortEventStatus ?? 0
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.heightScalar = other.heightScalar ?? 127
-      this.weightScalar = other.weightScalar ?? 127
-      this.formArgument = other.formArgument ?? 0
+      this.pokerusByte = other.pokerusByte
+      this.heightScalar = other.heightScalar
+      this.weightScalar = other.weightScalar
+      this.formArgument = other.formArgument
       this.nickname = other.nickname
 
       const moveFilter = MoveFilter.fromMoveIndices(LGPE_VALID_MOVES)
@@ -239,79 +242,59 @@ export default class PB7 {
       this.movePP = moveFilter.movePp(other, this.format)
       this.movePPUps = moveFilter.movePpUps(other)
       this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
-
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? false
+      this.ivs = converter.ivs(other)
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
       this.handlerName = ''
       this.handlerGender = false
       this.isCurrentHandler = false
       this.handlerFriendship = 0
-      this.fieldEventFatigue1 = other.fieldEventFatigue1 ?? 0
-      this.fieldEventFatigue2 = other.fieldEventFatigue2 ?? 0
-      this.fullness = other.fullness ?? 0
-      this.enjoyment = other.enjoyment ?? 0
+      this.fieldEventFatigue1 = 0
+      this.fieldEventFatigue2 = 0
+      this.fullness = other.fullness
+      this.enjoyment = other.enjoyment
       this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship ?? 0
-      this.receivedYear = other.receivedYear ?? 0
-      this.receivedMonth = other.receivedMonth ?? 0
-      this.receivedDay = other.receivedDay ?? 0
-      this.receivedHour = other.receivedHour ?? 0
-      this.receivedMinute = other.receivedMinute ?? 0
-      this.receivedSecond = other.receivedSecond ?? 0
-      this.eggDate = other.eggDate ?? undefined
-      this.metDate = other.metDate ?? {
-        month: new Date().getMonth(),
-        day: new Date().getDate(),
-        year: new Date().getFullYear(),
-      }
+      this.trainerFriendship = other.trainerFriendship
+      this.receivedYear = 0
+      this.receivedMonth = 0
+      this.receivedDay = 0
+      this.receivedHour = 0
+      this.receivedMinute = 0
+      this.receivedSecond = 0
+      this.eggDate = other.eggDate
+      this.metDate = other.metDate
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
       if (other.ball && PB7.allowedBalls().includes(other.ball)) {
         this.ball = other.ball
       } else {
         this.ball = Ball.Poke
       }
-      this.metLevel = other.metLevel ?? 0
-      this.hyperTraining = other.hyperTraining ?? {
-        hp: false,
-        atk: false,
-        def: false,
-        spa: false,
-        spd: false,
-        spe: false,
-      }
-      this.gameOfOrigin = other.gameOfOrigin
+      this.metLevel = other.metLevel
+      this.hyperTraining = other.hyperTraining
       this.language = other.language
-      this.statusCondition = other.statusCondition ?? 0
-      this.level = other.level ?? 0
-      this.dirtType = other.dirtType ?? 0
-      this.dirtLocation = other.dirtLocation ?? 0
-      this.currentHP = other.currentHP ?? 0
-      this.stats = other.stats ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.cp = other.cp ?? 0
-      this.isMega = other.isMega ?? 0
-      this.megaForme = other.megaForme ?? 0
+      this.statusCondition = 0
+      this.dirtType = 0
+      this.dirtLocation = 0
+      this.cp = 0
+      this.isMega = 0
+      this.megaForme = 0
       this.trainerGender = other.trainerGender
     }
+
+    this.level = this.getLevel()
+    this.stats = this.getStats()
+    this.currentHP = this.stats.hp
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
-  static fromBytes(buffer: ArrayBuffer): PB7 {
-    return new PB7(buffer)
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PB7 {
+    return new PB7(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB7 {
+    return new PB7(ohpkm, { strategy })
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {
@@ -428,7 +411,7 @@ export default class PB7 {
     return 0.4
   }
 
-  public calcChecksum() {
+  public calculateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0xe8)
   }
 
@@ -465,7 +448,7 @@ export default class PB7 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

@@ -1,4 +1,5 @@
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
+import { ConvertStrategies, ConvertStrategy } from '@pkm-rs/pkg'
 import { PK3 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
@@ -13,7 +14,7 @@ beforeAll(initializeWasm)
 
 var blazikenOhpkm: OHPKM
 var blazikenPk3: PK3
-var slowpokeOhpkm: OHPKM
+var slowbroOhpkm: OHPKM
 
 beforeAll(() => {
   blazikenOhpkm = bytesToPKM(
@@ -26,7 +27,7 @@ beforeAll(() => {
     'PK3'
   ) as PK3
 
-  slowpokeOhpkm = bytesToPKM(
+  slowbroOhpkm = bytesToPKM(
     new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'slowbro.ohpkm'))),
     'OhpkmV2'
   ) as OHPKM
@@ -49,7 +50,7 @@ test('gen 3 stat calculations', () => {
 })
 
 test('gen 3 EVs are updated', () => {
-  const emeraldPKM = new PK3(blazikenOhpkm)
+  const emeraldPKM = PK3.fromOhpkm(blazikenOhpkm, ConvertStrategies.getDefault())
 
   // mimicking ev reduction berries and ev gain
   emeraldPKM.evs = {
@@ -72,7 +73,7 @@ test('gen 3 EVs are updated', () => {
 })
 
 test('gen 3 ribbons are updated', () => {
-  const emeraldPKM = new PK3(blazikenOhpkm)
+  const emeraldPKM = PK3.fromOhpkm(blazikenOhpkm, ConvertStrategies.getDefault())
 
   // gaining Gen 3 ribbons
   emeraldPKM.ribbons = [
@@ -91,7 +92,7 @@ test('gen 3 ribbons are updated', () => {
 })
 
 test('gen 3 contest stats are updated', () => {
-  const emeraldPKM = new PK3(blazikenOhpkm)
+  const emeraldPKM = PK3.fromOhpkm(blazikenOhpkm, ConvertStrategies.getDefault())
 
   // gaining cool contest points
   emeraldPKM.contest = {
@@ -116,7 +117,7 @@ test('gen 3 contest stats are updated', () => {
 test('gen 3 conversion to OHPKM and back is lossless', () => {
   const ohPKM = new OHPKM(blazikenPk3)
   // gaining cool contest points
-  const gen3PKM = new PK3(ohPKM)
+  const gen3PKM = PK3.fromOhpkm(ohPKM, ConvertStrategies.getDefault())
 
   expect(blazikenPk3.toBytes()).toEqual(gen3PKM.toBytes())
 })
@@ -127,23 +128,34 @@ test('pk3 and ohpkm have the same gen345Lookup key', () => {
   expect(getMonGen345Identifier(ohPKM)).toEqual(getMonGen345Identifier(blazikenPk3))
 })
 
-test('gen 6+ nickname accuracy', () => {
-  const converted = new PK3(slowpokeOhpkm)
+test('gen 3 nickname converted', () => {
+  const gameDefaultStrategy: ConvertStrategy = {
+    ...ConvertStrategies.getDefault(),
+    'nickname.capitalization': 'GameDefault',
+  }
+  const converted = PK3.fromOhpkm(slowbroOhpkm, gameDefaultStrategy)
 
-  expect(converted.nickname).toBe(slowpokeOhpkm.nickname)
+  expect(converted.nickname).toBe('SLOWBRO')
 })
 
-test('gen 6+ shiny accuracy', () => {
-  const converted = new PK3(slowpokeOhpkm)
-
-  if (!slowpokeOhpkm.personalityValue) {
-    throw Error('mon has no personality value')
+test('gen 3 nickname capitalization override', () => {
+  const modernStrategy: ConvertStrategy = {
+    ...ConvertStrategies.getDefault(),
+    'nickname.capitalization': 'Modern',
   }
-  expect(converted.isShiny()).toBe(slowpokeOhpkm.isShiny())
+  const converted = PK3.fromOhpkm(slowbroOhpkm, modernStrategy)
+
+  expect(converted.nickname).toBe('Slowbro')
+})
+
+test('gen 3 shiny accuracy', () => {
+  const converted = PK3.fromOhpkm(slowbroOhpkm, ConvertStrategies.getDefault())
+
+  expect(converted.isShiny()).toBe(slowbroOhpkm.isShiny())
 })
 
 test('gen 6+ nature accuracy', () => {
-  const converted = new PK3(slowpokeOhpkm)
+  const converted = PK3.fromOhpkm(slowbroOhpkm, ConvertStrategies.getDefault())
 
-  expect(converted.nature.index).toEqual(slowpokeOhpkm.nature.index)
+  expect(converted.nature.index).toEqual(slowbroOhpkm.nature.index)
 })

@@ -2,7 +2,7 @@ import { NationalDex, NationalDexMax } from '@pokemon-resources/consts/NationalD
 
 import { PKM } from '@pokemon-files/pkm/PKM'
 
-import { MetadataLookup, SpeciesLookup, Stat, Stats } from '@pkm-rs/pkg'
+import { MetadataSummaryLookup, SpeciesLookup, Stat, Stats as StatsWasm } from '@pkm-rs/pkg'
 import {
   AllPKMs,
   PKMWithDVs,
@@ -12,7 +12,7 @@ import {
   PKMWithNature,
   SpeciesData,
 } from './interfaces'
-import { StatAbbr } from './types'
+import { StatAbbr, Stats } from './types'
 
 export interface PKMWithStandardStats
   extends AllPKMs, PKMWithModernIVs, PKMWithModernEVs, PKMWithNature {}
@@ -22,7 +22,7 @@ export interface PKMWithStandardStatCalc
 
 export interface PKMWithGameBoyStats extends AllPKMs, PKMWithDVs, PKMWithGameBoyEVs {}
 
-export function getStats(mon: PKM) {
+export function getStats(mon: PKM): Stats {
   if (mon.format === 'PK1' || mon.format === 'PK2') {
     return getGameBoyPKMStats(mon)
   }
@@ -31,7 +31,7 @@ export function getStats(mon: PKM) {
   return getStandardPKMStats(mon)
 }
 
-export const getStandardPKMStats = (mon: PKMWithStandardStats) => {
+export const getStandardPKMStats = (mon: PKMWithStandardStats): Stats => {
   if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return {
       hp: 0,
@@ -55,7 +55,8 @@ export const getStandardPKMStats = (mon: PKMWithStandardStats) => {
   }
 }
 
-export const getGameBoyPKMStats = (mon: PKMWithGameBoyStats) => {
+// TODO: game boy stat calculation
+export const getGameBoyPKMStats = (mon: PKMWithGameBoyStats): Stats => {
   if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return {
       hp: 0,
@@ -85,8 +86,8 @@ export const getStatGen3Onward = (mon: PKMWithStandardStatCalc, stat: Stat, leve
 
   const natureMultiplier = mon.nature.multiplierFor(stat)
 
-  const metadata = MetadataLookup(mon.dexNum, mon.formeNum)
-  const statAbbr = Stats.abbrLower(stat) as StatAbbr
+  const metadata = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
+  const statAbbr = StatsWasm.abbrLower(stat) as StatAbbr
 
   if (metadata) {
     const baseStat = metadata.getBaseStat(stat)
@@ -110,7 +111,7 @@ export const getHPGen3Onward = (mon: PKMWithStandardStatCalc, level: number) => 
     return 1
   }
 
-  const baseHP = MetadataLookup(mon.dexNum, mon.formeNum)?.baseStats?.hp
+  const baseHP = MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.baseStats?.hp
 
   if (baseHP) {
     const iv = mon.ivs.hp

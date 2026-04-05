@@ -1,4 +1,3 @@
-import { Type } from '@openhome-core/util/types'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
@@ -6,9 +5,31 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import useMonSprite from '@openhome-ui/pokemon-details/useMonSprite'
 import { usePokedex } from '@openhome-ui/state/pokedex'
 import { Pokedex } from '@openhome-ui/util/pokedex'
-import { FormeMetadata, MetadataLookup, SpeciesLookup, SpeciesMetadata } from '@pkm-rs/pkg'
-import { Button, Card, Flex, Heading, Separator, Spinner, Text, TextField } from '@radix-ui/themes'
+import {
+  allMetadataSources,
+  currentMetadataReader,
+  FormeMetadata,
+  metadataReaderFor,
+  MetadataSource,
+  MetadataSources,
+  MetadataSummaryLookup,
+  SpeciesLookup,
+  SpeciesMetadata,
+} from '@pkm-rs/pkg'
+import {
+  Button,
+  Card,
+  Flex,
+  Heading,
+  Select,
+  Separator,
+  Spinner,
+  Text,
+  TextField,
+} from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
+import MoveCard from 'src/ui/components/pokemon/MoveCard'
+import { includeClass } from 'src/ui/util/style'
 import BaseStatsChart from './BaseStatsChart'
 import EvolutionFamily from './EvolutionFamily'
 import PokedexSidebar from './PokedexSidebar'
@@ -83,6 +104,11 @@ type PokedexDetailsProps = {
   setSelectedSpecies: (species?: SpeciesMetadata) => void
 }
 
+type PokedexView = 'main' | 'levelup'
+const MOST_CURRENT_SOURCE = '$CURRENT'
+
+type MostCurrentSource = typeof MOST_CURRENT_SOURCE
+
 function PokedexDetails({
   pokedex,
   species,
@@ -92,6 +118,10 @@ function PokedexDetails({
 }: PokedexDetailsProps) {
   const [imageError, setImageError] = useState(false)
   const [showShiny, setShowShiny] = useState(false)
+  const [currentView, setCurrentView] = useState<PokedexView>('main')
+  const [metadataSource, setMetadataSource] = useState<MetadataSource | MostCurrentSource>(
+    MOST_CURRENT_SOURCE
+  )
 
   const selectedFormeStatus = getFormeStatus(pokedex, species.nationalDex, selectedForme.formeIndex)
   const spriteResult = useMonSprite({
@@ -99,6 +129,7 @@ function PokedexDetails({
     formeNum: selectedForme.formeIndex,
     format: 'OHPKM',
     isShiny: selectedFormeStatus === 'ShinyCaught' && showShiny,
+    extraFormIndex: undefined,
   })
 
   useEffect(() => {
@@ -108,25 +139,23 @@ function PokedexDetails({
   const selectedFormeCaught = selectedFormeStatus?.includes('Caught')
 
   return (
-    <Flex direction="row" height="100%" align="center" width="100%">
-      <Flex direction="column" align="center" justify="center" height="100%" width="40%" gap="2">
+    <Flex direction="row" height="100%" align="center" width="100%" overflow="hidden">
+      <Flex
+        direction="column"
+        align="center"
+        justify="center"
+        height="100%"
+        width="40%"
+        maxWidth="30rem"
+        gap="2"
+      >
         <Flex direction="column" height="100%" width="100%" align="center" justify="center" gap="2">
-          <div
-            className="pokedex-image-frame"
-            style={{ minWidth: 140, width: 240, aspectRatio: 1, position: 'relative' }}
-          >
+          <div className="pokedex-image-frame">
             {selectedFormeStatus === 'ShinyCaught' && (
               <button
+                className="pokedex-shiny-toggle"
                 style={{
-                  position: 'absolute',
-                  width: 30,
-                  height: 30,
-                  right: 5,
-                  top: 5,
-                  zIndex: 20,
                   backgroundColor: showShiny ? 'var(--accent-9)' : 'var(--gray-9)',
-                  borderRadius: 15,
-                  boxShadow: 'none',
                 }}
                 onClick={() => setShowShiny(!showShiny)}
               >
@@ -172,6 +201,7 @@ function PokedexDetails({
           <Flex justify="center" gap="2" width="100%" wrap="wrap">
             {species.formes.map((forme) => (
               <Button
+                className="pokedex-raised-button"
                 key={forme.formeIndex}
                 variant={forme.formeIndex === selectedForme.formeIndex ? 'solid' : 'soft'}
                 onClick={() => setSelectedForme(forme)}
@@ -194,59 +224,187 @@ function PokedexDetails({
         </Flex>
       </Flex>
       <Separator orientation="vertical" style={{ height: '100%' }} />
-      <Flex direction="column" height="700px" maxHeight="100%" width="60%" gap="2" p="1">
-        <Flex width="100%" height="50%">
-          <div style={{ width: '50%' }}>
-            <BaseStatsChart forme={selectedForme} />
-          </div>
-
-          <Flex
-            direction="column"
-            align="end"
-            style={{ height: '100%', overflowY: 'auto', width: '50%', padding: 4, gap: 2 }}
+      <Flex direction="column" height="100%" maxHeight="100%" width="60%" gap="2" overflow="auto">
+        <Flex className="openhome-tab-row">
+          <Button
+            className={includeClass('openhome-tab')
+              .with('openhome-tab-selected')
+              .if(currentView === 'main')}
+            onClick={() => setCurrentView('main')}
           >
-            <AttributeRow label="Level-Up">{species.levelUpType}</AttributeRow>
-            <AttributeRow label="Type">
-              <TypeIcon type={selectedForme.type1 as Type} />
-              {selectedForme.type2 && <TypeIcon type={selectedForme.type2 as Type} />}
-            </AttributeRow>
-            <AttributeRow label="Ability 1">{selectedForme.abilities[0].name}</AttributeRow>
-            {selectedForme.abilities[1] !== selectedForme.abilities[0] && (
-              <AttributeRow label="Ability 2">{selectedForme.abilities[1].name}</AttributeRow>
-            )}
-
-            {selectedForme.hiddenAbility && (
-              <AttributeRow label="Ability H">
-                <div>{selectedForme.hiddenAbility.name}</div>
-              </AttributeRow>
-            )}
-
-            <AttributeRow label="Egg Groups">
-              <div>{selectedForme.eggGroups.join(' • ')}</div>
-            </AttributeRow>
-          </Flex>
+            Summary
+          </Button>
+          <Button
+            className={includeClass('openhome-tab')
+              .with('openhome-tab-selected')
+              .if(currentView === 'levelup')}
+            onClick={() => setCurrentView('levelup')}
+          >
+            Levelup Learnset
+          </Button>
+          <div style={{ flex: 1 }} />
+          <Select.Root
+            value={metadataSource.toString()}
+            onValueChange={(value) =>
+              setMetadataSource(
+                value === MOST_CURRENT_SOURCE
+                  ? MOST_CURRENT_SOURCE
+                  : (parseInt(value) as MetadataSource)
+              )
+            }
+          >
+            <Select.Trigger className="pokedex-view-select" />
+            <Select.Content position="popper">
+              {allMetadataSources().map((source) => (
+                <Select.Item key={source} value={source.toString()}>
+                  {MetadataSources.display(source)}
+                </Select.Item>
+              ))}
+              <Select.Item key={MOST_CURRENT_SOURCE} value={MOST_CURRENT_SOURCE}>
+                Current Data
+              </Select.Item>
+            </Select.Content>
+          </Select.Root>
         </Flex>
-        <Flex width="100%" height="50%">
-          <Card className="flex-row" style={{ width: '100%', gap: 8 }}>
-            <Text style={{ flex: 2 }}>{getPokedexSummary(species, selectedForme)}</Text>
-            <Separator orientation="vertical" style={{ height: '100%' }} />
-            <div style={{ height: '100%', flex: 1 }}>
-              <Text weight="bold" size="2">
-                Evolution Family
+        {currentView === 'main' ? (
+          <PokedexMain
+            pokedex={pokedex}
+            species={species}
+            selectedForme={selectedForme}
+            setSelectedForme={setSelectedForme}
+            setSelectedSpecies={setSelectedSpecies}
+            metadataSource={metadataSource}
+          />
+        ) : (
+          <PokedexLearnset
+            pokedex={pokedex}
+            species={species}
+            selectedForme={selectedForme}
+            setSelectedForme={setSelectedForme}
+            setSelectedSpecies={setSelectedSpecies}
+            metadataSource={metadataSource}
+          />
+        )}
+      </Flex>
+    </Flex>
+  )
+}
+
+type PokedexMetadataProps = {
+  pokedex: Pokedex
+  species: SpeciesMetadata
+  selectedForme: FormeMetadata
+  setSelectedForme: (forme?: FormeMetadata) => void
+  setSelectedSpecies: (species?: SpeciesMetadata) => void
+  metadataSource: MetadataSource | MostCurrentSource
+}
+
+function PokedexMain(props: PokedexMetadataProps) {
+  const { pokedex, species, selectedForme, setSelectedForme, setSelectedSpecies, metadataSource } =
+    props
+
+  const reader =
+    metadataSource === MOST_CURRENT_SOURCE
+      ? currentMetadataReader(species.nationalDex, selectedForme.formeIndex)
+      : metadataReaderFor(metadataSource, species.nationalDex, selectedForme.formeIndex)
+  if (!reader) {
+    const message =
+      metadataSource !== MOST_CURRENT_SOURCE
+        ? `No metadata available for this Pokémon in Pokémon ${MetadataSources.display(metadataSource)}.`
+        : 'No metadata available for this Pokémon.'
+    return (
+      <Flex width="100%" height="100%" align="center" justify="center">
+        <Text>{message}</Text>
+      </Flex>
+    )
+  }
+
+  const type1 = reader.type1()
+  const type2 = reader.type2()
+  const stats = reader.baseStats()
+
+  return (
+    <>
+      <Flex width="100%" height="50%">
+        <div id="base-stats-and-attributes" style={{ width: '50%' }}>
+          <BaseStatsChart stats={stats} />
+        </div>
+
+        <Flex
+          direction="column"
+          align="end"
+          style={{ height: '100%', overflowY: 'auto', width: '50%', padding: 4, gap: 2 }}
+        >
+          <AttributeRow label="Level-Up">{species.levelUpType}</AttributeRow>
+          <AttributeRow label="Type">
+            <TypeIcon type={type1} />
+            {type2 && <TypeIcon type={type2} />}
+          </AttributeRow>
+          <AttributeRow label="Ability 1">{selectedForme.abilities[0].name}</AttributeRow>
+          {selectedForme.abilities[1] !== selectedForme.abilities[0] && (
+            <AttributeRow label="Ability 2">{selectedForme.abilities[1].name}</AttributeRow>
+          )}
+
+          {selectedForme.hiddenAbility && (
+            <AttributeRow label="Ability H">
+              <div>{selectedForme.hiddenAbility.name}</div>
+            </AttributeRow>
+          )}
+
+          <AttributeRow label="Egg Groups">
+            <div>{selectedForme.eggGroups.join(' • ')}</div>
+          </AttributeRow>
+        </Flex>
+      </Flex>
+      <Flex width="100%" height="50%">
+        <Card className="flex-row" style={{ width: '100%', gap: 8 }}>
+          <Text style={{ flex: 2 }}>{getPokedexSummary(species, selectedForme)}</Text>
+          <Separator orientation="vertical" style={{ height: '100%' }} />
+          <div style={{ height: '100%', flex: 1 }}>
+            <Text weight="bold" size="2">
+              Evolution Family
+            </Text>
+            <EvolutionFamily
+              height="calc(100% - 16px)"
+              nationalDex={species.nationalDex}
+              formeNumber={selectedForme.formeIndex}
+              pokedex={pokedex}
+              onClick={(nationalDex, formeIndex) => {
+                setSelectedSpecies(SpeciesLookup(nationalDex))
+                setSelectedForme(MetadataSummaryLookup(nationalDex, formeIndex))
+              }}
+            />
+          </div>{' '}
+        </Card>
+      </Flex>
+    </>
+  )
+}
+
+function PokedexLearnset(props: PokedexMetadataProps) {
+  const { selectedForme, metadataSource } = props
+
+  const levelUpLearnset = selectedForme.levelUpLearnset(
+    metadataSource === MOST_CURRENT_SOURCE ? undefined : metadataSource
+  )
+
+  return (
+    <Flex direction="column" overflow="hidden" p="1">
+      <Flex direction="column" gap="1" mt="0.2rem" mx="1rem" overflow="auto">
+        {levelUpLearnset ? (
+          levelUpLearnset.map((learnsetMove) => (
+            <Flex key={`${learnsetMove.move_id}-${learnsetMove.level}`} align="center" gap="2">
+              <Text size="3" style={{ width: '7rem' }}>
+                {learnsetMove.level ? `Level ${learnsetMove.level}: ` : 'On Evolution: '}
               </Text>
-              <EvolutionFamily
-                height="calc(100% - 16px)"
-                nationalDex={species.nationalDex}
-                formeNumber={selectedForme.formeIndex}
-                pokedex={pokedex}
-                onClick={(nationalDex, formeIndex) => {
-                  setSelectedSpecies(SpeciesLookup(nationalDex))
-                  setSelectedForme(MetadataLookup(nationalDex, formeIndex))
-                }}
-              />
-            </div>{' '}
-          </Card>
-        </Flex>
+              <MoveCard move={learnsetMove.move_id} noPP />
+            </Flex>
+          ))
+        ) : (
+          <Flex width="100%" height="50%" align="center" justify="center">
+            <Text>No level-up learnset data available for this forme.</Text>
+          </Flex>
+        )}
       </Flex>
     </Flex>
   )

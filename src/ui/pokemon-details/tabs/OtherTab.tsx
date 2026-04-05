@@ -43,6 +43,7 @@ import {
 } from '@pokemon-resources/consts/TransferRestrictions'
 import {
   BDSPTMMoveIndexes,
+  getLocationStringOrOrigin,
   LATutorMoveIndexes,
   Moves,
   SVTMMoveIndexes,
@@ -82,6 +83,15 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <code>{u32Display(mon.encryptionConstant)}</code>
           </AttributeRow>
         )}
+        <AttributeRow label="Origin Game" value={OriginGames.gameName(mon.gameOfOrigin)} />
+        <AttributeRow
+          label="Met Location"
+          value={
+            mon.metLocationIndex === undefined
+              ? '(not present)'
+              : `${getLocationStringOrOrigin(mon.gameOfOrigin, mon.metLocationIndex, mon.format)} (${mon.metLocationIndex})`
+          }
+        />
         {mon.encryptionConstant !== undefined && (
           <AttributeRow label="Shift Value">
             <code>{(mon.encryptionConstant & 0x3e000) >> (0xd % 24)}</code>
@@ -335,14 +345,14 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         {mon.formArgument !== undefined && (
           <AttributeRow label="Form Argument" value={mon.formArgument.toString()} />
         )}
-        {mon.checksum !== undefined && mon.calcChecksum && (
+        {mon.checksum !== undefined && mon.calculateChecksum && (
           <>
             <AttributeRow label="Checksum">
               <code>{u16Display(mon.checksum)}</code>
             </AttributeRow>
-            {'calcChecksum' in mon && (
+            {'calculateChecksum' in mon && (
               <AttributeRow label="Calced Checksum">
-                <code>{u16Display(mon.calcChecksum())}</code>
+                <code>{u16Display(mon.calculateChecksum())}</code>
               </AttributeRow>
             )}
           </>
@@ -368,11 +378,16 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         )}
         {mon.eggDate && <AttributeRow label="Hatch Date" value={mon.eggDate} />}
         <AttributeRow label="Egg Location Index" value={mon.eggLocationIndex} />
-        <AttributeRow label="Gender" value={mon.gender} />
+        <AttributeRow label="Plugin Origin" value={mon.pluginOrigin} />
+        <AttributeRow label="Extra Form Index" value={mon.extraFormIndex} />
         <AttributeRow label="Is Egg" value={String(Boolean(mon.isEgg))} />
         <AttributeRow label="Is Nicknamed" value={String(Boolean(mon.isNicknamed))} />
         <AttributeRow label="Is Favorite" value={String(Boolean(mon.favorite))} />
         <AttributeRow label="Is Shadow" value={String(Boolean(mon.isShadow))} />
+        {mon.extraDisplayFields &&
+          Object.entries(mon.extraDisplayFields()).map(([label, value]) => (
+            <AttributeRow key={`extra_field_${label}`} label={label} value={String(value)} />
+          ))}
       </Flex>
     </div>
   )

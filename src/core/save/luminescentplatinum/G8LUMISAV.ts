@@ -1,4 +1,10 @@
-import { Gender, OriginGame } from '@pkm-rs/pkg'
+import {
+  ConvertStrategy,
+  ExtraFormIndex,
+  Gender,
+  luminescentSupportsExtraForm,
+  OriginGame,
+} from '@pkm-rs/pkg'
 import { utf16BytesToString } from '@pokemon-files/util'
 
 import { OHPKM } from '../../pkm/OHPKM'
@@ -196,16 +202,12 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
 
   // Builds a Luminescent Platinum Pokémon instance from raw bytes
   buildPKM(bytes: ArrayBuffer, encrypted: boolean): PB8LUMI {
-    const mon = new PB8LUMI(bytes, encrypted)
-    mon.pluginOrigin = this.pluginIdentifier
-    return mon
+    return PB8LUMI.fromBytes(bytes, encrypted)
   }
 
   // Converts an OpenHome Pokémon into the Luminescent format
-  convertOhpkm(ohpkm: OHPKM): PB8LUMI {
-    const mon = new PB8LUMI(ohpkm)
-    mon.pluginOrigin = this.pluginIdentifier
-    return mon
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB8LUMI {
+    return PB8LUMI.fromOhpkm(ohpkm, strategy)
   }
 
   // Writes modified Pokémon back into the save buffer
@@ -228,7 +230,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
           )
         }
       } else {
-        const emptyMon = new PB8LUMI(new Uint8Array(PB8LUMI.getBoxSize()).buffer)
+        const emptyMon = PB8LUMI.fromBytes(new Uint8Array(PB8LUMI.getBoxSize()).buffer)
         this.bytes.set(new Uint8Array(emptyMon.toPCBytes()), writeIndex)
       }
     })
@@ -247,7 +249,8 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
     return uint8ArrayToBase64(this.calculateChecksumBytes())
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return luminescentSupportsExtraForm(extraFormIndex)
     return !isRestricted(LP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 

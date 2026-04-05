@@ -1,7 +1,14 @@
 import { get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
 import { unique } from '@openhome-core/util/functional'
-import { Gender, ItemGen2, Language, OriginGame } from '@pkm-rs/pkg'
+import {
+  ConvertStrategy,
+  ExtraFormIndex,
+  Gender,
+  ItemGen2,
+  Language,
+  OriginGame,
+} from '@pkm-rs/pkg'
 import { PK2 } from '@pokemon-files/pkm'
 import { EXCLAMATION } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
@@ -85,7 +92,7 @@ export class G2SAV extends OfficialSAV<PK2> {
 
       this.boxes[boxNumber] = new Box(`Box ${boxNumber + 1}`, pokemonPerBox)
       for (let monIndex = 0; monIndex < monCount; monIndex++) {
-        const mon = new PK2(
+        const mon = PK2.fromBytes(
           this.bytes.slice(
             offset + 1 + pokemonPerBox + 1 + monIndex * 0x20,
             offset + 1 + pokemonPerBox + 1 + (monIndex + 1) * 0x20
@@ -202,8 +209,8 @@ export class G2SAV extends OfficialSAV<PK2> {
     }
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK2 {
-    return new PK2(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK2 {
+    return PK2.fromOhpkm(ohpkm, strategy)
   }
 
   areGoldSilverChecksumsValid() {
@@ -255,7 +262,8 @@ export class G2SAV extends OfficialSAV<PK2> {
     return checksum2 === this.bytes[0x1f0d]
   }
 
-  supportsMon(dexNumber: number, formeNumber: number) {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     return (
       (dexNumber <= NationalDex.Celebi && formeNumber === 0) ||
       (dexNumber === NationalDex.Unown && formeNumber < EXCLAMATION)

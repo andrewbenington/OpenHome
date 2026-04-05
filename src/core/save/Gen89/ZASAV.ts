@@ -1,5 +1,5 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Gender, Languages, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { PA9 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
@@ -51,8 +51,8 @@ export class ZASAV extends G89SAV<PA9> {
     this.origin = this.trainerBlock.getGame()
   }
 
-  convertOhpkm(ohpkm: OHPKM): PA9 {
-    return new PA9(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PA9 {
+    return PA9.fromOhpkm(ohpkm, strategy)
   }
 
   getBoxCount(): number {
@@ -60,7 +60,7 @@ export class ZASAV extends G89SAV<PA9> {
   }
 
   monConstructor(bytes: ArrayBuffer, encrypted: boolean): PA9 {
-    return new PA9(bytes, encrypted)
+    return new PA9(bytes, { encrypted })
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {
@@ -100,7 +100,8 @@ export class ZASAV extends G89SAV<PA9> {
     return BOX_SLOT_GAP_BYTES
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     const revision = this.scBlocks ? this.getSaveRevision() : 'Mega Dimension'
     switch (revision) {
       case 'Base Game':

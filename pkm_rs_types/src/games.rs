@@ -403,6 +403,10 @@ impl OriginGame {
         self >= Self::X && self <= Self::UltraMoon
     }
 
+    pub fn is_sm_usum(self) -> bool {
+        self >= Self::Sun && self <= Self::UltraMoon
+    }
+
     pub fn is_lets_go(self) -> bool {
         self == Self::LetsGoEevee || self == Self::LetsGoPikachu
     }

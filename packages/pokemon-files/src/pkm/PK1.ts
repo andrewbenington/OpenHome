@@ -1,24 +1,28 @@
 import {
+  ConvertStrategy,
   Generation,
   ItemGen1,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   OriginGames,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import * as conversion from '../conversion'
+import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import { getLevelGen12, getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PK1 {
   static getName() {
-    return 'PK1'
+    return 'PK1' as const
   }
   format: 'PK1' = 'PK1'
   static getBoxSize() {
@@ -42,9 +46,12 @@ export default class PK1 {
   movePPUps: FourMoves
   trainerName: string
   nickname: string
-  constructor(arg: ArrayBuffer | AllPKMFields) {
+  originalBytes?: ArrayBuffer
+
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
       const buffer = new Uint8Array(arg)[2] === 0xff ? arg.slice(3) : arg
+      this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.gameOfOrigin = 0
       this.language = 0
@@ -92,18 +99,19 @@ export default class PK1 {
       if (dataView.byteLength >= 66) {
         this.nickname = stringLogic.readGameBoyStringFromBytes(dataView, 0x37, 11)
       } else {
-        this.nickname = this.metadata?.formeName ?? ''
+        this.nickname = this.speciesMetadata?.name ?? ''
       }
     } else {
+      const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
       this.dexNum = other.dexNum
       this.currentHP = other.currentHP ?? 0
-      this.level = other.level ?? 0
-      this.statusCondition = other.statusCondition ?? 0
-      this.type1 = other.type1 ?? 0
-      this.type2 = other.type2 ?? 0
+      this.level = 0
+      this.statusCondition = 0
+      this.type1 = 0
+      this.type2 = 0
       this.heldItemIndexGen1 = ItemGen1.fromModern(other.heldItemIndex)
 
       const moveFilter = MoveFilter.fromPkmClass(PK1)
@@ -130,20 +138,20 @@ export default class PK1 {
         spe: 0,
         spc: 0,
       }
-      this.dvs = other.dvs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spc: 0,
-      }
+      this.dvs = other.dvs
       this.trainerName = other.trainerName
-      this.nickname = other.nickname
+      this.nickname = converter.nickname(other)
     }
+
+    this.level = getLevelGen12(this.dexNum, this.exp)
   }
 
   static fromBytes(buffer: ArrayBuffer): PK1 {
-    return new PK1(buffer)
+    return new PK1(buffer, { encrypted: false })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK1 {
+    return new PK1(ohpkm, { strategy })
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {
@@ -237,7 +245,7 @@ export default class PK1 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

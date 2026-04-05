@@ -1,6 +1,7 @@
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { R } from '@openhome-core/util/functional'
+import { ConvertStrategies, ConvertStrategy } from '@pkm-rs/pkg'
 import { PK1 } from '@pokemon-files/pkm'
 import assert, { fail } from 'assert'
 import fs from 'fs'
@@ -77,7 +78,7 @@ test('inserting mon works', () => {
   }
   const modifiedSaveFile1 = result1.value as G1SAV
 
-  modifiedSaveFile1.boxes[7].boxSlots[11] = new PK1(slowbroOH)
+  modifiedSaveFile1.boxes[7].boxSlots[11] = PK1.fromOhpkm(slowbroOH, ConvertStrategies.getDefault())
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, boxSlot: 0 })
   modifiedSaveFile1.prepareForSaving()
 
@@ -93,5 +94,34 @@ test('inserting mon works', () => {
 
   expect(modifiedSaveFile2.boxes[7].boxSlots[0]?.nickname).toEqual('KABUTOPS')
   expect(modifiedSaveFile2.boxes[7].boxSlots[10]?.nickname).toEqual('MEW')
+  expect(modifiedSaveFile2.boxes[7].boxSlots[11]?.nickname).toEqual('SLOWBRO')
+})
+
+test('inserting mon with game capitalization gives correct nickname', () => {
+  const result1 = buildUnknownSaveFile(emptyPathData, new Uint8Array(blueSaveFile.bytes), [G1SAV])
+
+  if (R.isErr(result1)) {
+    fail(result1.err)
+  }
+  const modifiedSaveFile1 = result1.value as G1SAV
+
+  const modernStrategy: ConvertStrategy = {
+    ...ConvertStrategies.getDefault(),
+    'nickname.capitalization': 'Modern',
+  }
+  modifiedSaveFile1.boxes[7].boxSlots[11] = PK1.fromOhpkm(slowbroOH, modernStrategy)
+  modifiedSaveFile1.updatedBoxSlots.push({ box: 7, boxSlot: 0 })
+  modifiedSaveFile1.prepareForSaving()
+
+  const result2 = buildUnknownSaveFile(emptyPathData, new Uint8Array(modifiedSaveFile1.bytes), [
+    G1SAV,
+  ])
+
+  if (R.isErr(result2)) {
+    fail(result2.err)
+  }
+
+  const modifiedSaveFile2 = result2.value as G1SAV
+
   expect(modifiedSaveFile2.boxes[7].boxSlots[11]?.nickname).toEqual('Slowbro')
 })

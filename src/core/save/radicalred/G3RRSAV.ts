@@ -1,8 +1,18 @@
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
-import { ItemRadicalRed } from '@pkm-rs/pkg'
+import {
+  ConvertStrategy,
+  ExtraFormIndex,
+  ItemRadicalRed,
+  radicalRedSupportsExtraForm,
+} from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
-import { FRLG_SECURITY_COPY_OFFSET, FRLG_SECURITY_OFFSET } from '../G3SAV'
+import {
+  FRLG_SECURITY_COPY_OFFSET,
+  FRLG_SECURITY_OFFSET,
+  GEN3_SIGNATURE,
+  GEN3_SIGNATURE_OFFSET,
+} from '../G3SAV'
 import { SlotMetadata } from '../interfaces'
 import { bytesToUint32LittleEndian } from '../util/byteLogic'
 import { PathData } from '../util/path'
@@ -20,11 +30,12 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
 
   pluginIdentifier = 'radical_red' as const
 
-  convertOhpkm(ohpkm: OHPKM): PK3RR {
-    return new PK3RR(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3RR {
+    return PK3RR.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(dexNumber: number, formeNumber: number) {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return radicalRedSupportsExtraForm(extraFormIndex)
     return !isRestricted(RR_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 
@@ -52,6 +63,9 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
 
     const securityKey = bytesToUint32LittleEndian(firstSectionBytes, FRLG_SECURITY_OFFSET)
     const securityKeyCopy = bytesToUint32LittleEndian(firstSectionBytes, FRLG_SECURITY_COPY_OFFSET)
+
+    const signature = bytesToUint32LittleEndian(firstSectionBytes, GEN3_SIGNATURE_OFFSET)
+    if (signature !== GEN3_SIGNATURE) return false
 
     // Radical Red seems to have the security key set to 0, which has a 1 in 4.2 billion
     // chance to happen in vanilla FireRed (if it can even be 0 at all)

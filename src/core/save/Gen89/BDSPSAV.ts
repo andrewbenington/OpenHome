@@ -1,5 +1,5 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Gender, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
@@ -131,7 +131,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
   getBoxCount = () => BOX_COUNT
 
   buildPKM(bytes: ArrayBuffer, encrypted: boolean): PB8 {
-    return new PB8(bytes, encrypted)
+    return PB8.fromBytes(bytes, encrypted)
   }
 
   getMonBoxSizeBytes(): number {
@@ -161,7 +161,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
           console.error(e)
         }
       } else {
-        const mon = new PB8(new Uint8Array(PB8.getBoxSize()).buffer)
+        const mon = PB8.fromBytes(new Uint8Array(PB8.getBoxSize()).buffer)
 
         this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
       }
@@ -169,8 +169,8 @@ export class BDSPSAV extends OfficialSAV<PB8> {
     this.bytes.set(this.calculateChecksumBytes(), HASH_OFFSET)
   }
 
-  convertOhpkm(ohpkm: OHPKM): PB8 {
-    return new PB8(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB8 {
+    return PB8.fromOhpkm(ohpkm, strategy)
   }
 
   calculateChecksumBytes() {
@@ -184,7 +184,8 @@ export class BDSPSAV extends OfficialSAV<PB8> {
     return uint8ArrayToBase64(this.calculateChecksumBytes())
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     return !isRestricted(BDSP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 

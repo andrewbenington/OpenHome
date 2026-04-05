@@ -32,7 +32,7 @@ export default [
           caughtErrorsIgnorePattern: '^_',
         },
       ],
-      'no-console': ['warn', { allow: ['info', 'warn', 'error'] }],
+      'no-console': ['warn', { allow: ['info', 'warn', 'error', 'assert'] }],
       eqeqeq: 'error',
       '@stylistic/ts/padding-line-between-statements': [
         'error',

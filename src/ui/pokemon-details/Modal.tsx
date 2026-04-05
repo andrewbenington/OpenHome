@@ -1,6 +1,6 @@
-import { fileTypeFromString } from '@openhome-core/pkm/FileImport'
+import { fileTypeFromStringNonOhpkm } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import Fallback from '@openhome-ui/components/Fallback'
 import FileTypeSelect from '@openhome-ui/components/FileTypeSelect'
@@ -9,11 +9,14 @@ import { ArrowLeftIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
+import { isRomHackFormat } from '@pokemon-files/pkm/PKM'
 import { FileSchemas } from '@pokemon-files/schema'
-import { Dialog, Flex, VisuallyHidden } from '@radix-ui/themes'
+import { Dialog, Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
+import { useConvertStrategies } from '../state/convert-strategies'
 import './style.css'
+import DisplayTab from './tabs/DisplayTab'
 import MetDataMovesTab from './tabs/MetDataMovesTab'
 import NotesDisplay from './tabs/NotesTab'
 import OtherDisplay from './tabs/OtherTab'
@@ -38,12 +41,17 @@ const PokemonDetailsModal = (props: {
     boxIndicatorProps,
   } = props
   const [displayMon, setDisplayMon] = useState(mon)
+  const [isOriginal, setIsOriginal] = useState(false)
   const [boxIndicatorVisible, setBoxIndicatorVisible] = useState(false)
   const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
+  const { defaultConvertStrategy } = useConvertStrategies()
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
 
-  useEffect(() => setDisplayMon(mon), [mon])
+  useEffect(() => {
+    setDisplayMon(mon)
+    setIsOriginal(false)
+  }, [mon])
 
   const showTemporaryBoxIndicator = useCallback(() => {
     setBoxIndicatorVisible(true)
@@ -88,6 +96,55 @@ const PokemonDetailsModal = (props: {
     [navigateLeft, navigateRight]
   )
 
+  function updateIsOriginal(isOriginal: boolean) {
+    setIsOriginal(isOriginal)
+    if (isOriginal && mon instanceof OHPKM && mon.originalData) {
+      switchFormat(originalDataTagToMonFormat(mon.originalData.tag))
+    } else if (mon) {
+      switchFormat(mon.format)
+    }
+  }
+
+  function switchFormat(newFormat: string) {
+    if (!mon) return
+    if (mon.format === newFormat) {
+      setDisplayMon(mon)
+      return
+    }
+
+    if (newFormat === 'OHPKM') {
+      setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon))
+      return
+    }
+
+    const P = fileTypeFromStringNonOhpkm(newFormat)
+
+    if (!P) {
+      throw `Invalid filetype: ${P}`
+    }
+
+    try {
+      if (mon instanceof OHPKM) {
+        if (
+          isOriginal &&
+          mon.originalData &&
+          originalDataTagToMonFormat(mon.originalData.tag) === newFormat
+        ) {
+          const O =
+            fileTypeFromStringNonOhpkm(originalDataTagToMonFormat(mon.originalData.tag)) ?? P
+          setDisplayMon(O.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
+        } else {
+          setDisplayMon(P.fromOhpkm(mon, defaultConvertStrategy))
+        }
+      } else {
+        setDisplayMon(P.fromOhpkm(new OHPKM(mon), defaultConvertStrategy))
+      }
+    } catch (e) {
+      console.error(e)
+      displayError(`Error converting to ${P.getName()}`, `${e}`)
+    }
+  }
+
   return (
     <Dialog.Root open={!!(mon && displayMon)} onOpenChange={(open) => !open && onClose?.()}>
       <Dialog.Content
@@ -116,31 +173,8 @@ const PokemonDetailsModal = (props: {
                   currentFormat={displayMon.format}
                   color={displayMon.selectColor}
                   formData={mon}
-                  onChange={(newFormat) => {
-                    if (mon.format === newFormat) {
-                      setDisplayMon(mon)
-                      return
-                    }
-                    if (newFormat === 'OHPKM') {
-                      setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon))
-                      return
-                    }
-                    const P = fileTypeFromString(newFormat)
-
-                    if (!P) {
-                      throw `Invalid filetype: ${P}`
-                    }
-                    try {
-                      if (mon instanceof OHPKM) {
-                        setDisplayMon(new P(mon as any))
-                      } else {
-                        setDisplayMon(new P(new OHPKM(mon) as any))
-                      }
-                    } catch (e) {
-                      console.error(e)
-                      displayError(`Error converting to ${P.getName()}`, `${e}`)
-                    }
-                  }}
+                  disabled={isOriginal}
+                  onChange={switchFormat}
                 />
                 <button
                   style={{ padding: '4px 6px 2px 6px' }}
@@ -164,10 +198,23 @@ const PokemonDetailsModal = (props: {
                 <>
                   <SideTabs.Tab value="trainers">Trainers</SideTabs.Tab>
                   <SideTabs.Tab value="notes">Notes</SideTabs.Tab>
+                  <SideTabs.Tab value="display">Display</SideTabs.Tab>
                   <SideTabs.Tab value="recent-save">Recent Save</SideTabs.Tab>
                 </>
               )}
               <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
+              <div style={{ flex: 1 }} />
+              {(isOriginal || (mon instanceof OHPKM && mon.originalData)) && (
+                <Flex align="center" gap="2" style={{ fontWeight: 'bold' }}>
+                  <Switch
+                    radius="full"
+                    size="1"
+                    checked={isOriginal}
+                    onCheckedChange={updateIsOriginal}
+                  />
+                  Show Original Data
+                </Flex>
+              )}
             </SideTabs.TabList>
             <Fallback>
               <SideTabs.Panel value="summary">
@@ -193,6 +240,9 @@ const PokemonDetailsModal = (props: {
                   <SideTabs.Panel value="notes">
                     <NotesDisplay mon={mon} />
                   </SideTabs.Panel>
+                  <SideTabs.Panel value="display">
+                    <DisplayTab mon={mon} key={mon.openhomeId} />
+                  </SideTabs.Panel>
                   <SideTabs.Panel value="recent-save">
                     <RecentSaveTab mon={mon} />
                   </SideTabs.Panel>
@@ -208,7 +258,7 @@ const PokemonDetailsModal = (props: {
                       //   : new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))
                     }
                     format={
-                      displayMon.pluginIdentifier
+                      isRomHackFormat(displayMon.format)
                         ? undefined
                         : (displayMon.format as keyof typeof FileSchemas | 'OHPKM')
                     }

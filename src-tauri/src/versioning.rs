@@ -1,4 +1,4 @@
-use pkm_rs::ohpkm::{OhpkmV2, v1::OhpkmV1};
+use pkm_rs::ohpkm::{v1::OhpkmV1, OhpkmV2};
 use semver::Version;
 use serde::Serialize;
 use std::{
@@ -7,19 +7,18 @@ use std::{
 };
 use strum::{self, EnumIter, IntoEnumIterator};
 
-use crate::{
-    deprecated,
-    error::{Error, Result},
-    pkm_storage::{Bank, StoredBankData},
-    util::{self, prepend_appdata_to_path, read_file_text, write_file_contents},
-};
+use crate::deprecated;
+use crate::error::{Error, Result};
+use crate::pkm_storage::{Bank, StoredBankData};
+use crate::storage::{self, MONS_V2_DIR};
+use crate::util;
 
 const VERSION_FILE: &str = "version.txt";
 
 pub fn get_version_last_used(app_handle: &tauri::AppHandle) -> Result<Option<String>> {
-    let last_version_path = prepend_appdata_to_path(app_handle, VERSION_FILE)?;
+    let last_version_path = util::prepend_appdata_to_path(app_handle, VERSION_FILE)?;
 
-    match read_file_text(&last_version_path) {
+    match util::read_file_text(&last_version_path) {
         Ok(version) => Ok(Some(version.trim().to_owned())),
         Err(Error::FileMissing { .. }) => Ok(None),
         Err(e) => Err(e),
@@ -35,14 +34,14 @@ pub fn update_version_last_used(app_handle: &tauri::AppHandle) -> Result<()> {
         return Ok(());
     }
 
-    let last_version_path = prepend_appdata_to_path(app_handle, VERSION_FILE)?;
+    let last_version_path = util::prepend_appdata_to_path(app_handle, VERSION_FILE)?;
 
     // Create OpenHome directory if it doesn't exist
     if let Some(parent) = last_version_path.parent() {
         util::create_directory(parent)?;
     }
 
-    write_file_contents(
+    util::write_file_contents(
         &last_version_path,
         app_handle.package_info().version.to_string(),
     )
@@ -152,6 +151,8 @@ pub enum SignificantUpdate {
     V1_9_0,
     V1_9_1,
     V1_9_2,
+    V1_10_0,
+    V1_10_1,
 }
 
 impl SignificantUpdate {
@@ -167,6 +168,8 @@ impl SignificantUpdate {
             Self::V1_9_0 => Version::parse("1.9.0").unwrap(),
             Self::V1_9_1 => Version::parse("1.9.1").unwrap(),
             Self::V1_9_2 => Version::parse("1.9.2").unwrap(),
+            Self::V1_10_0 => Version::parse("1.10.0").unwrap(),
+            Self::V1_10_1 => Version::parse("1.10.1").unwrap(),
         }
     }
 
@@ -180,42 +183,39 @@ impl SignificantUpdate {
         }
     }
 
-    pub fn get_features(&self) -> Option<Vec<String>> {
+    pub fn get_features(&self) -> Option<Vec<&'static str>> {
         match self {
             Self::V1_8_0AlphaOhpkmV2 => Some(vec![
-                String::from(
-                    "Tracked Pokémon may now have associated notes, using the 'Notes' tab in the Pokémon details popup",
-                ),
-                String::from(
-                    "Multiple past trainers' data are persisted, meaning friendship, etc can be independently tracked across many games for the same Pokémon",
-                ),
+                "Tracked Pokémon may now have associated notes, using the 'Notes' tab in the Pokémon details popup",
+                "Multiple past trainers' data are persisted, meaning friendship, etc can be independently tracked across many games for the same Pokémon",
             ]),
-            Self::V1_8_0AlphaFeatureMessages => Some(vec![String::from(
+            Self::V1_8_0AlphaFeatureMessages => Some(vec![
                 "Right clicking on some elements now offers actions in a context menu",
-            )]),
-            Self::V1_8_1 => Some(vec![String::from(
-                "A bug present when launching v1.8.0 has been fixed",
-            )]),
+            ]),
+            Self::V1_8_1 => Some(vec!["A bug present when launching v1.8.0 has been fixed"]),
             Self::V1_8_2 => Some(vec![
-                String::from(
-                    "Pokémon can optionally display extra information on the top-right of box view icons. This can be changed using the \"Display\" tab on the right panel of the home screen",
-                ),
-                String::from(
-                    "A bug preventing new users from launching v1.8.0 or v1.8.1 has been fixed",
-                ),
+                "Pokémon can optionally display extra information on the top-right of box view icons. This can be changed using the \"Display\" tab on the right panel of the home screen",
+                "A bug preventing new users from launching v1.8.0 or v1.8.1 has been fixed",
             ]),
             Self::V1_9_0 => Some(vec![
-                String::from("Save files and Pokémon from Pokémon Legends: Z-A are now supported"),
-                String::from(
-                    "Tools for finding and recovering tracked Pokémon have been added to the \"Tracked Pokémon\" tab",
-                ),
+                "Save files and Pokémon from Pokémon Legends: Z-A are now supported",
+                "Tools for finding and recovering tracked Pokémon have been added to the \"Tracked Pokémon\" tab",
             ]),
-            Self::V1_9_1 => Some(vec![String::from(
+            Self::V1_9_1 => Some(vec![
                 "Bugs related to form updates, the item bag, and Pokédex display have been fixed",
-            )]),
-            Self::V1_9_2 => Some(vec![String::from(
-                "Fixed a regression causing some Pokémon to 'devolve'",
-            )]),
+            ]),
+            Self::V1_9_2 => Some(vec!["Fixed a regression causing some Pokémon to 'devolve'"]),
+            Self::V1_10_0 => Some(vec![
+                "Multi-select/drag is now supported in OpenHome boxes. Use the button in the Home boxes to the top right (next to the name edit button) to toggle multi-select",
+                "Support for Pokémon Luminescent Platinum has been added",
+                "Cosplay Pikachu and Pokémon with forms exclusive to ROM hacks can now be moved into OpenHome and to supported save files",
+                "Using the Display tab in the Pokémon details modal, you can assign tags and background colors to your Pokémon",
+                "Image resources have been replaced to reduce bundle size and loading times",
+            ]),
+            Self::V1_10_1 => Some(vec![
+                "All newly tracked Pokémon will now keep a backup copy of their original data in its raw byte format. This should increase the chance of data recovery in case of future bugs or oversights. Backup data can be viewed via the toggle in the bottom left of that Pokémon details modal, but Pokémon tracked from before version 1.10.1 will not have backup data or this toggle.",
+                "More columns have been added to the \"Tracked Pokémon\" tab, including stats, types, gender, shiny status, and moves",
+            ]),
             _ => None,
         }
     }
@@ -230,18 +230,18 @@ impl SignificantUpdate {
 #[derive(Debug, Clone, Serialize)]
 pub struct UpdateFeatures {
     version: String,
-    feature_messages: Vec<String>,
+    feature_messages: Vec<&'static str>,
 }
 
 impl UpdateFeatures {
-    pub fn new(version: Version, feature_messages: Vec<String>) -> Self {
+    pub fn new(version: Version, feature_messages: Vec<&'static str>) -> Self {
         Self {
             version: version.to_string(),
             feature_messages,
         }
     }
 
-    pub fn add_feature_messages(&mut self, feature_messages: &[String]) {
+    pub fn add_feature_messages(&mut self, feature_messages: &[&'static str]) {
         self.feature_messages.extend_from_slice(feature_messages);
     }
 
@@ -260,16 +260,16 @@ pub fn get_significant_updates(
 }
 
 pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
-    // Skip migration logic if no box data file exists
-    let full_path = util::prepend_appdata_storage_to_path(app_handle, deprecated::BOXDATA_FILE)?;
-    if !full_path.exists() {
-        return Ok(());
-    }
-
-    let mut old_boxes = util::get_storage_file_json::<_, Vec<deprecated::BoxPreV1_5_0>>(
+    let Some(old_boxes_r) = storage::read_file_json_if_exists::<_, Vec<deprecated::BoxPreV1_5_0>>(
         app_handle,
         deprecated::BOXDATA_FILE,
-    )?;
+    ) else {
+        // Skip migration logic if no box data file exists
+        return Ok(());
+    };
+
+    let mut old_boxes = old_boxes_r?;
+
     old_boxes.sort_by_key(|b| b.index);
 
     let mut new_bank = Bank::default();
@@ -278,9 +278,11 @@ pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
         new_bank.add_box(old_box.upgrade());
     }
 
-    let banks_path = util::prepend_appdata_storage_to_path(app_handle, "banks.json")?;
-
-    util::write_file_json(banks_path, StoredBankData::from_banks(vec![new_bank]))
+    storage::write_file_json(
+        app_handle,
+        "banks.json",
+        StoredBankData::from_banks(vec![new_bank]),
+    )
 }
 
 pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
@@ -292,7 +294,7 @@ pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
             ))
         })?;
 
-        let v2_dir = util::prepend_appdata_storage_to_path(app_handle, "mons_v2")?;
+        let v2_dir = storage::get_path(app_handle, MONS_V2_DIR)?;
         fs::create_dir_all(&v2_dir).map_err(|e| Error::FileWrite {
             path: v2_dir,
             source: Box::new(e),
@@ -300,12 +302,9 @@ pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
 
         let ohpkm_v2 = OhpkmV2::from_v1(ohpkm_v1);
         let bytes_v2 = ohpkm_v2.to_bytes();
-        if let Some(filename) = PathBuf::from(&path).file_name() {
-            let v2_path = Path::join(
-                &util::prepend_appdata_storage_to_path(app_handle, "mons_v2")?,
-                filename,
-            );
 
+        if let Some(filename) = PathBuf::from(&path).file_name() {
+            let v2_path = Path::join(&storage::get_path(app_handle, MONS_V2_DIR)?, filename);
             util::write_file_contents(v2_path, bytes_v2)?;
         }
     }
@@ -313,14 +312,17 @@ pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
     Ok(())
 }
 
+const MONS_DIR_OLD: &str = "mons";
+const MONS_V1_DIR: &str = "mons_v1";
+
 pub fn handle_old_mons_directories_for_ohpkm_v2(app_handle: &tauri::AppHandle) -> Result<()> {
-    let old_mons_dir = util::prepend_appdata_storage_to_path(app_handle, "mons")?;
+    let old_mons_dir = storage::get_path(app_handle, MONS_DIR_OLD)?;
 
     if !fs::exists(&old_mons_dir).map_err(|e| Error::file_access(&old_mons_dir, e))? {
         return Ok(());
     }
 
-    let v1_dir = util::prepend_appdata_storage_to_path(app_handle, "mons_v1")?;
+    let v1_dir = storage::get_path(app_handle, MONS_V1_DIR)?;
 
     if fs::exists(&v1_dir).map_err(|e| Error::file_access(&v1_dir, e))? {
         fs::remove_dir_all(&v1_dir).map_err(|e| Error::file_access(&v1_dir, e))?;

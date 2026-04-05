@@ -3,11 +3,11 @@ use std::{collections::HashMap, fs};
 use crate::{
     error::{Error, Result},
     pkm_storage::FilenameToBytesMap,
-    util,
+    storage, util,
 };
 
 pub fn get_all_ohpkm_v1_bytes(app_handle: &tauri::AppHandle) -> Result<FilenameToBytesMap> {
-    let mons_path = util::prepend_appdata_storage_to_path(app_handle, "mons")?;
+    let mons_path = storage::get_path(app_handle, "mons")?;
     if !mons_path.try_exists().is_ok_and(|exists| exists) {
         return Ok(HashMap::new());
     }

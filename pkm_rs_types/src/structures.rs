@@ -5,7 +5,7 @@ use strum_macros::{Display, EnumString};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use crate::{OriginGame, strings::SizedUtf16String, util};
+use crate::{strings::SizedUtf16String, util, OriginGame};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -188,6 +188,10 @@ impl<const N: usize, FLAG: Copy + Into<usize> + From<usize>> FlagSet<N, FLAG> {
 
     pub fn set_flag(&mut self, flag: FLAG, value: bool) {
         util::set_flag(&mut self.raw, 0, flag.into(), value);
+    }
+
+    pub fn get_flag(&self, index: usize) -> bool {
+        util::get_flag(&self.raw, 0, index)
     }
 
     pub const fn clear(&mut self) {
@@ -910,6 +914,6 @@ mod tests {
 
         if !crown.has_crown() {
             panic!("expected crown, got leaves");
-        };
+        }
     }
 }

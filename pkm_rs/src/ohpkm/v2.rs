@@ -43,39 +43,102 @@ use wasm_bindgen::prelude::*;
 const MAGIC_NUMBER: u32 = 0x57575757;
 const CURRENT_VERSION: u16 = 2;
 
+#[cfg(feature = "wasm")]
+fn parse_display_color_to_rgb(value: &str) -> Option<[u8; 3]> {
+    let trimmed = value.trim();
+
+    if let Some(hex) = trimmed.strip_prefix('#') {
+        let parse_hex = |s: &str| u8::from_str_radix(s, 16).ok();
+
+        return match hex.len() {
+            3 => {
+                let mut chars = hex.chars();
+                let r = chars.next()?;
+                let g = chars.next()?;
+                let b = chars.next()?;
+                let rr = parse_hex(&format!("{r}{r}"))?;
+                let gg = parse_hex(&format!("{g}{g}"))?;
+                let bb = parse_hex(&format!("{b}{b}"))?;
+                Some([rr, gg, bb])
+            }
+            6 | 8 => {
+                let r = parse_hex(&hex[0..2])?;
+                let g = parse_hex(&hex[2..4])?;
+                let b = parse_hex(&hex[4..6])?;
+                Some([r, g, b])
+            }
+            _ => None,
+        };
+    }
+
+    if (trimmed.starts_with("rgb(") || trimmed.starts_with("rgba(")) && trimmed.ends_with(')') {
+        let body = trimmed.split_once('(')?.1.strip_suffix(')')?;
+        let parts: Vec<&str> = body.split(',').map(str::trim).collect();
+        if parts.len() < 3 {
+            return None;
+        }
+
+        let parse_component = |part: &str| {
+            let component = part.parse::<f32>().ok()?;
+            if !(0.0..=255.0).contains(&component) {
+                return None;
+            }
+            Some(component.round() as u8)
+        };
+
+        let r = parse_component(parts[0])?;
+        let g = parse_component(parts[1])?;
+        let b = parse_component(parts[2])?;
+        return Some([r, g, b]);
+    }
+
+    None
+}
+
+#[cfg(feature = "wasm")]
+fn rgb_to_display_color(rgb: [u8; 3]) -> String {
+    format!("#{:02x}{:02x}{:02x}", rgb[0], rgb[1], rgb[2])
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Display)]
 #[repr(u16)]
 pub enum SectionTagV2 {
-    MainData,
-    GameboyData,
-    Gen45Data,
-    Gen67Data,
-    SwordShield,
-    BdspTmFlags,
-    LegendsArceus,
-    ScarletViolet,
-    PastHandler,
-    PluginData,
-    Notes,
-    MostRecentSave,
+    MainData = 0x00,
+    GameboyData = 0x01,
+    Gen45Data = 0x02,
+    Gen67Data = 0x03,
+    SwordShield = 0x04,
+    BdspTmFlags = 0x05,
+    LegendsArceus = 0x06,
+    ScarletViolet = 0x07,
+    PastHandler = 0x08,
+    PluginData = 0x09,
+    Notes = 0x0A,
+    MostRecentSave = 0x0B,
+    Tag = 0x0C,
+    OriginalBackup = 0x0D,
+    UnconvertedPkm = 0x0E,
 }
 
 impl SectionTagV2 {
     pub const fn new(tag: u16) -> Option<Self> {
         match tag {
-            0 => Some(Self::MainData),
-            1 => Some(Self::GameboyData),
-            2 => Some(Self::Gen45Data),
-            3 => Some(Self::Gen67Data),
-            4 => Some(Self::SwordShield),
-            5 => Some(Self::BdspTmFlags),
-            6 => Some(Self::LegendsArceus),
-            7 => Some(Self::ScarletViolet),
-            8 => Some(Self::PastHandler),
-            9 => Some(Self::PluginData),
-            10 => Some(Self::Notes),
-            11 => Some(Self::MostRecentSave),
-            12.. => None,
+            0x00 => Some(Self::MainData),
+            0x01 => Some(Self::GameboyData),
+            0x02 => Some(Self::Gen45Data),
+            0x03 => Some(Self::Gen67Data),
+            0x04 => Some(Self::SwordShield),
+            0x05 => Some(Self::BdspTmFlags),
+            0x06 => Some(Self::LegendsArceus),
+            0x07 => Some(Self::ScarletViolet),
+            0x08 => Some(Self::PastHandler),
+            0x09 => Some(Self::PluginData),
+            0x0A => Some(Self::Notes),
+            0x0B => Some(Self::MostRecentSave),
+            0x0C => Some(Self::Tag),
+            0x0D => Some(Self::OriginalBackup),
+            0x0E => Some(Self::UnconvertedPkm),
+            0x0F => None,
         }
     }
 
@@ -93,6 +156,9 @@ impl SectionTagV2 {
             Self::PluginData => 0,
             Self::Notes => 0,
             Self::MostRecentSave => 31,
+            Self::Tag => 0,
+            Self::OriginalBackup => 2, // Size of the tag
+            Self::UnconvertedPkm => 2, // Size of the tag
         }
     }
 }
@@ -1463,8 +1529,12 @@ impl OhpkmV2 {
             plugin_data: None,
             notes: None,
             most_recent_save: None,
+            tags: None,
+            original_data: None,
+            unconverted_pkm: None,
         })
     }
+    
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let sectioned_data = SectionedData::<SectionTagV2>::from_bytes(bytes)?;
 
@@ -1474,7 +1544,7 @@ impl OhpkmV2 {
             return Err(Error::other("Bad version number"));
         }
 
-        Ok(Self {
+        let result = Self {
             main_data: MainDataV2::extract_from(&sectioned_data)?
                 .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
             gameboy_data: GameboyData::extract_from(&sectioned_data)?,
@@ -1488,6 +1558,55 @@ impl OhpkmV2 {
             plugin_data: PluginData::extract_from(&sectioned_data)?,
             notes: Notes::extract_from(&sectioned_data)?,
             most_recent_save: MostRecentSave::extract_from(&sectioned_data)?,
+            tags: MonTags::extract_from(&sectioned_data)?,
+            original_data: OriginalBackup::extract_from(&sectioned_data)?,
+            unconverted_pkm: UnconvertedPkm::extract_from(&sectioned_data)?,
+        };
+
+        Ok(result)
+    }
+
+    pub fn from_bytes_fixing_errors(bytes: &[u8]) -> Result<Self> {
+        let sectioned_data = SectionedData::<SectionTagV2>::from_bytes(bytes)?;
+
+        if sectioned_data.magic_number != MAGIC_NUMBER {
+            return Err(Error::other("Bad magic number"));
+        } else if sectioned_data.version != 2 {
+            return Err(Error::other("Bad version number"));
+        }
+
+        let result = Self {
+            main_data: MainDataV2::extract_from(&sectioned_data)?
+                .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
+            gameboy_data: GameboyData::extract_from(&sectioned_data).ok().flatten(),
+            gen45_data: Gen45Data::extract_from(&sectioned_data).ok().flatten(),
+            gen67_data: Gen67Data::extract_from(&sectioned_data).ok().flatten(),
+            swsh_data: SwordShieldData::extract_from(&sectioned_data)
+                .ok()
+                .flatten(),
+            bdsp_data: BdspData::extract_from(&sectioned_data).ok().flatten(),
+            la_data: LegendsArceusData::extract_from(&sectioned_data)
+                .ok()
+                .flatten(),
+            sv_data: ScarletVioletData::extract_from(&sectioned_data)
+                .ok()
+                .flatten(),
+            handler_data: PastHandlerData::extract_all_from(&sectioned_data).unwrap_or_default(),
+            plugin_data: PluginData::extract_from(&sectioned_data).ok().flatten(),
+            notes: Notes::extract_from(&sectioned_data).ok().flatten(),
+            most_recent_save: MostRecentSave::extract_from(&sectioned_data).ok().flatten(),
+            tags: MonTags::extract_from(&sectioned_data).ok().flatten(),
+            original_data: OriginalBackup::extract_from(&sectioned_data).ok().flatten(),
+            unconverted_pkm: UnconvertedPkm::extract_from(&sectioned_data).ok().flatten(),
+        };
+
+        Ok(result)
+    }
+
+    pub fn default_with_species(national_dex: u16, forme_index: u16) -> Result<Self> {
+        Ok(Self {
+            main_data: MainDataV2::new(national_dex, forme_index)?,
+            ..Default::default()
         })
     }
 
@@ -1505,6 +1624,9 @@ impl OhpkmV2 {
             plugin_data: PluginData::from_v1(old),
             notes: None,
             most_recent_save: None,
+            tags: None,
+            original_data: None,
+            unconverted_pkm: None,
         }
     }
 
@@ -1522,12 +1644,62 @@ impl OhpkmV2 {
             .add_all(self.handler_data.clone())
             .add_if_some(self.plugin_data.clone())
             .add_if_some(self.notes.clone())
-            .add_if_some(self.most_recent_save.clone());
-        sectioned_data
+            .add_if_some(self.most_recent_save.clone())
+            .add_if_some(self.tags.clone())
+            .add_if_some(self.original_data)
+            .add_if_some(self.unconverted_pkm);
+        Ok(sectioned_data)
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {
         self.to_sectioned_data().to_bytes()
+    }
+
+    pub fn nickname_matches_species_eng(&self) -> bool {
+        self.main_data.nickname_matches_species_eng()
+    }
+
+    pub fn nickname_matches_species_eng_ignore_case(&self) -> bool {
+        self.main_data.nickname_matches_species_eng_ignore_case()
+    }
+
+    pub const fn species_metadata(&self) -> &'static SpeciesMetadata {
+        self.main_data.species_and_forme.get_species_metadata()
+    }
+
+    pub fn fix_errors(&mut self) -> bool {
+        self.main_data.fix_errors()
+    }
+
+    pub fn get_nickname(&self) -> String {
+        self.main_data.nickname.to_string()
+    }
+
+    pub const fn get_game_of_origin(&self) -> OriginGame {
+        self.main_data.game_of_origin
+    }
+
+    pub const fn get_met_location_index(&self) -> u16 {
+        self.main_data.met_location_index
+    }
+
+    pub const fn get_is_fateful_encounter(&self) -> bool {
+        self.main_data.is_fateful_encounter
+    }
+
+    pub const fn get_ivs(&self) -> Stats8 {
+        self.main_data.ivs
+    }
+
+    pub const fn get_hyper_training(&self) -> HyperTraining {
+        self.main_data.hyper_training
+    }
+}
+
+#[cfg(test)]
+impl OhpkmV2 {
+    pub fn get_main_data(&self) -> &MainDataV2 {
+        &self.main_data
     }
 }
 
@@ -1542,6 +1714,20 @@ impl OhpkmV2 {
         } else {
             Ok(Self::default())
         }
+    }
+
+    #[wasm_bindgen(js_name = "fromByteVectorFixingErrors")]
+    pub fn from_byte_vector_fixing_errors(bytes: &[u8]) -> JsResult<Self> {
+        Ok(if !bytes.is_empty() {
+            Self::from_bytes(bytes)?
+        } else {
+            Self::default()
+        })
+    }
+
+    #[wasm_bindgen(js_name = "defaultWithSpecies")]
+    pub fn default_with_species_js(national_dex: u16, forme_index: u16) -> JsResult<Self> {
+        Ok(Self::default_with_species(national_dex, forme_index)?)
     }
 
     pub fn to_bytes_js(&self) -> Vec<u8> {
@@ -1985,6 +2171,16 @@ impl OhpkmV2 {
         self.set_affixed_ribbon(v);
     }
 
+    #[wasm_bindgen(getter = extraFormIndex)]
+    pub fn extra_form_index(&self) -> Option<ExtraFormIndex> {
+        self.main_data.extra_form
+    }
+
+    #[wasm_bindgen(setter = extraFormIndex)]
+    pub fn set_extra_form_index(&mut self, v: Option<ExtraFormIndex>) {
+        self.main_data.extra_form = v;
+    }
+
     #[wasm_bindgen(getter = trainerFriendship)]
     pub fn trainer_friendship_js(&self) -> u8 {
         self.trainer_friendship()
@@ -2130,7 +2326,12 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(setter = movesWasm)]
     pub fn set_move_indices_js(&mut self, value: &[u16]) {
-        self.main_data.moves.set_indices(value);
+        self.main_data.moves = [
+            MoveSlot::from(value[0]),
+            MoveSlot::from(value[1]),
+            MoveSlot::from(value[2]),
+            MoveSlot::from(value[3]),
+        ]
     }
 
     #[wasm_bindgen(getter = movePpWasm)]

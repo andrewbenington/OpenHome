@@ -298,7 +298,7 @@ impl OhpkmV1 {
             tutor_flags_la: bytes[368..376].try_into().unwrap(),
             master_flags_la: bytes[376..384].try_into().unwrap(),
             tm_flags_sv: bytes[384..406].try_into().unwrap(),
-            evs_g12: StatsPreSplit::from_bytes(bytes[410..420].try_into().unwrap()),
+            evs_g12: StatsPreSplit::from_bytes_u16_le(bytes[410..420].try_into().unwrap()),
             tm_flags_sv_dlc: if bytes.len() >= 433 {
                 bytes[420..433].try_into().unwrap()
             } else {

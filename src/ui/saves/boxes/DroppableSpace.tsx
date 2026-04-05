@@ -75,7 +75,6 @@ const DroppableSpace = ({
         ...style,
       }}
       ref={setNodeRef}
-      // onMouseEnter={() => console.log('mouse entering ' + dropID)}
     >
       {children}
     </div>
