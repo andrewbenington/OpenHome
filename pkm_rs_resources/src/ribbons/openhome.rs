@@ -13,7 +13,7 @@ use wasm_bindgen::prelude::*;
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Default, Debug, Clone, Copy)]
-pub struct ObsoleteRibbonSet(FlagSet<6>);
+pub struct ObsoleteRibbonSet(FlagSet<6, ObsoleteRibbon>);
 
 impl ObsoleteRibbonSet {
     pub const fn from_bytes(bytes: [u8; 6]) -> Self {
@@ -21,11 +21,7 @@ impl ObsoleteRibbonSet {
     }
 
     pub fn get_ribbons(&self) -> Vec<ObsoleteRibbon> {
-        self.0
-            .get_flags()
-            .into_iter()
-            .map(ObsoleteRibbon::from)
-            .collect()
+        self.0.get_flags().into_iter().collect()
     }
 
     pub const fn to_bytes(self) -> [u8; 6] {
@@ -37,7 +33,7 @@ impl ObsoleteRibbonSet {
     }
 
     pub fn add_ribbon(&mut self, ribbon: ObsoleteRibbon) {
-        self.0.set_index(ribbon.get_index(), true);
+        self.0.set_flag(ribbon, true);
     }
 
     pub fn add_ribbons(&mut self, ribbons: Vec<ObsoleteRibbon>) {
@@ -128,10 +124,10 @@ impl FromIterator<ObsoleteRibbon> for ObsoleteRibbonSet {
 
 impl IntoIterator for ObsoleteRibbonSet {
     type Item = ObsoleteRibbon;
-    type IntoIter = std::iter::Map<std::vec::IntoIter<usize>, fn(usize) -> ObsoleteRibbon>;
+    type IntoIter = std::vec::IntoIter<ObsoleteRibbon>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.0.get_flags().into_iter().map(ObsoleteRibbon::from)
+        self.0.get_flags().into_iter()
     }
 }
 
@@ -310,6 +306,12 @@ impl From<usize> for ObsoleteRibbon {
             47 => ObsoleteRibbon::ToughMasterSinnoh,
             _ => panic!("Invalid value for ObsoleteRibbon: {}", value),
         }
+    }
+}
+
+impl From<ObsoleteRibbon> for usize {
+    fn from(value: ObsoleteRibbon) -> Self {
+        value.get_index()
     }
 }
 

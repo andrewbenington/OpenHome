@@ -4,12 +4,16 @@ use super::v2_sections::{
     Notes, PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
 };
 use crate::ohpkm::OhpkmConvert;
+use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::v1::OhpkmV1;
+use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
+use crate::ohpkm::v2_sections::{MonTag, MonTags, pkm_bytes};
 use crate::result::{Error, Result};
 use crate::traits::{HasSpeciesAndForme, IsShiny, PkmBytes};
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::moves::MoveSlots;
+use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_types::TrainerData;
 use pkm_rs_types::{AbilityNumber, BinaryGender};
 use serde::Serialize;
@@ -138,7 +142,7 @@ impl SectionTagV2 {
             0x0C => Some(Self::Tag),
             0x0D => Some(Self::OriginalBackup),
             0x0E => Some(Self::UnconvertedPkm),
-            0x0F => None,
+            0x0F.. => None,
         }
     }
 
@@ -196,6 +200,14 @@ pub struct OhpkmV2 {
     plugin_data: Option<PluginData>,
     notes: Option<Notes>,
     most_recent_save: Option<MostRecentSave>,
+    #[cfg_attr(feature = "randomize", randomize(skip))]
+    tags: Option<MonTags>,
+    #[cfg_attr(feature = "randomize", randomize(skip))]
+    #[serde(skip)]
+    original_data: Option<OriginalBackup>,
+    #[cfg_attr(feature = "randomize", randomize(skip))]
+    #[serde(skip)]
+    unconverted_pkm: Option<UnconvertedPkm>,
 }
 
 impl OhpkmV2 {
@@ -557,6 +569,14 @@ impl OhpkmV2 {
         self.main_data.affixed_ribbon = v;
     }
 
+    pub const fn extra_form_index(&self) -> Option<ExtraFormIndex> {
+        self.main_data.extra_form
+    }
+
+    pub const fn set_extra_form_index(&mut self, v: Option<ExtraFormIndex>) {
+        self.main_data.extra_form = v;
+    }
+
     pub const fn trainer_friendship(&self) -> u8 {
         self.main_data.trainer_friendship
     }
@@ -720,12 +740,12 @@ impl OhpkmV2 {
     }
 
     pub fn add_gen3_ribbons(&mut self, ribbon_indices: Vec<usize>) {
-        use pkm_rs_resources::ribbons::Gen3Ribbon;
+        use pkm_rs_resources::ribbons::DsGen3Ribbon;
 
         ribbon_indices
             .into_iter()
-            .map(Gen3Ribbon::from_index)
-            .map(Gen3Ribbon::to_openhome)
+            .map(DsGen3Ribbon::from_index)
+            .map(DsGen3Ribbon::to_openhome)
             .for_each(|r| self.main_data.ribbons.add_ribbon(r));
     }
 
@@ -1534,7 +1554,7 @@ impl OhpkmV2 {
             unconverted_pkm: None,
         })
     }
-    
+
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let sectioned_data = SectionedData::<SectionTagV2>::from_bytes(bytes)?;
 
@@ -1648,7 +1668,7 @@ impl OhpkmV2 {
             .add_if_some(self.tags.clone())
             .add_if_some(self.original_data)
             .add_if_some(self.unconverted_pkm);
-        Ok(sectioned_data)
+        sectioned_data
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {
@@ -2172,13 +2192,13 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = extraFormIndex)]
-    pub fn extra_form_index(&self) -> Option<ExtraFormIndex> {
-        self.main_data.extra_form
+    pub fn extra_form_index_js(&self) -> Option<ExtraFormIndex> {
+        self.extra_form_index()
     }
 
     #[wasm_bindgen(setter = extraFormIndex)]
-    pub fn set_extra_form_index(&mut self, v: Option<ExtraFormIndex>) {
-        self.main_data.extra_form = v;
+    pub fn set_extra_form_index_js(&mut self, v: Option<ExtraFormIndex>) {
+        self.set_extra_form_index(v);
     }
 
     #[wasm_bindgen(getter = trainerFriendship)]
@@ -2326,12 +2346,7 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(setter = movesWasm)]
     pub fn set_move_indices_js(&mut self, value: &[u16]) {
-        self.main_data.moves = [
-            MoveSlot::from(value[0]),
-            MoveSlot::from(value[1]),
-            MoveSlot::from(value[2]),
-            MoveSlot::from(value[3]),
-        ]
+        self.main_data.moves.set_indices(value);
     }
 
     #[wasm_bindgen(getter = movePpWasm)]
@@ -2404,12 +2419,12 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(js_name = addGen3Ribbons)]
     pub fn add_gen3_ribbons_js(&mut self, ribbon_indices: Vec<usize>) {
-        use pkm_rs_resources::ribbons::Gen3Ribbon;
+        use pkm_rs_resources::ribbons::DsGen3Ribbon;
 
         ribbon_indices
             .into_iter()
-            .map(Gen3Ribbon::from_index)
-            .map(Gen3Ribbon::to_openhome)
+            .map(DsGen3Ribbon::from_index)
+            .map(DsGen3Ribbon::to_openhome)
             .for_each(|r| self.main_data.ribbons.add_ribbon(r));
     }
 
@@ -2431,22 +2446,14 @@ impl OhpkmV2 {
         Some(self.plugin_data.clone()?.plugin_origin)
     }
 
-    #[wasm_bindgen(getter = pluginFormWasm)]
-    pub fn plugin_form(&self) -> Option<u16> {
-        self.plugin_data.as_ref().and_then(|x| x.plugin_form)
-    }
-
-    #[wasm_bindgen(js_name = setPluginDataWasm)]
-    pub fn set_plugin_data(&mut self, origin: String, form: Option<u16>) {
-        self.plugin_data = Some(PluginData {
-            plugin_origin: origin,
-            plugin_form: form,
-        });
-    }
-
-    #[wasm_bindgen(js_name = clearPluginDataWasm)]
-    pub fn clear_plugin_data(&mut self) {
-        self.plugin_data = None;
+    #[wasm_bindgen(setter = pluginOriginWasm)]
+    pub fn set_plugin_origin_js(&mut self, value: Option<String>) {
+        match value {
+            Some(plugin_origin) => {
+                self.plugin_data.get_or_insert_default().plugin_origin = plugin_origin
+            }
+            None => self.plugin_data = None,
+        }
     }
 
     // Game Boy
@@ -3268,10 +3275,71 @@ impl OhpkmV2 {
         }
     }
 
+    // Display Color (CSS color string like '#ff0000' or 'rgba(255, 0, 0, 0.5)')
+    #[wasm_bindgen(getter = displayColor)]
+    pub fn display_color(&self) -> Option<String> {
+        Some(rgb_to_display_color(self.main_data.display_color_rgb?))
+    }
+
+    #[wasm_bindgen(setter = displayColor)]
+    pub fn set_display_color(&mut self, value: Option<String>) {
+        self.main_data.display_color_rgb =
+            value.and_then(|color| parse_display_color_to_rgb(&color));
+    }
+
+    // Tags (Vec of label, color, icon)
+    #[wasm_bindgen(getter = tags)]
+    pub fn tags(&self) -> JsValue {
+        serde_wasm_bindgen::to_value(&self.tags.clone().unwrap_or_default().0).unwrap()
+    }
+
+    /// Set or clear the tags by passing a serialized JSON string or an empty array.
+    #[wasm_bindgen(js_name = setTags)]
+    pub fn set_tags(&mut self, tags_js: JsValue) {
+        if let Ok(vec) = serde_wasm_bindgen::from_value::<Vec<MonTag>>(tags_js) {
+            if vec.is_empty() {
+                self.tags = None;
+            } else {
+                self.tags = Some(MonTags(vec));
+            }
+        }
+    }
+
     // Most Recent save
     #[wasm_bindgen(getter = mostRecentSaveWasm)]
     pub fn most_recent_save_js(&self) -> Option<MostRecentSave> {
         self.most_recent_save.clone()
+    }
+
+    // Original Data
+    #[wasm_bindgen(getter = originalData)]
+    pub fn original_data(&self) -> Option<OriginalDataJs> {
+        self.original_data.map(|d| OriginalDataJs {
+            tag: d.tag(),
+            data: d.data_as_bytes().to_vec(),
+        })
+    }
+
+    #[wasm_bindgen(js_name = trySetOriginalData)]
+    pub fn try_set_original_data(&mut self, tag: pkm_bytes::Tag, data: Vec<u8>) -> Result<()> {
+        let pkm_bytes = StoredPkmBytes::new(tag, &data)?;
+
+        self.original_data = Some(OriginalBackup::new(pkm_bytes));
+        Ok(())
+    }
+
+    // Unconverted PKM (Pokémon that have been opted out of intergenerational conversion)
+    #[wasm_bindgen(getter = unconvertedPkm)]
+    pub fn unconverted_pkm(&self) -> Option<Vec<u8>> {
+        Some(self.unconverted_pkm?.to_bytes())
+    }
+
+    #[wasm_bindgen(js_name = trySetUnconvertedPkm)]
+    pub fn try_set_unconverted_pkm(&mut self, tag: pkm_bytes::Tag, data: Vec<u8>) -> Result<()> {
+        let pkm_bytes = StoredPkmBytes::new(tag, &data)?;
+
+        self.unconverted_pkm = Some(UnconvertedPkm::new(pkm_bytes));
+        Ok(())
     }
 
     // Calculated
@@ -3319,6 +3387,29 @@ impl OhpkmV2 {
             .map(|t| t.to_string())
             .collect()
     }
+
+    #[wasm_bindgen(js_name = nicknameMatchesSpeciesEnglish)]
+    pub fn nickname_matches_species_eng_js(&self) -> bool {
+        self.nickname_matches_species_eng()
+    }
+
+    #[wasm_bindgen(js_name = nicknameMatchesSpeciesEnglishIgnoreCase)]
+    pub fn nickname_matches_species_eng_ignore_case_js(&self) -> bool {
+        self.nickname_matches_species_eng_ignore_case()
+    }
+
+    #[wasm_bindgen(js_name = resetNicknameToSpecies)]
+    pub fn reset_nickname_to_species_js(&mut self) {
+        self.main_data.reset_nickname_to_species();
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+pub struct OriginalDataJs {
+    pub tag: pkm_bytes::Tag,
+    #[wasm_bindgen(getter_with_clone)]
+    pub data: Vec<u8>,
 }
 
 #[cfg(feature = "wasm")]
@@ -3401,5 +3492,37 @@ impl IsShiny for OhpkmV2 {
 
     fn is_square_shiny(&self) -> bool {
         self.main_data.is_square_shiny()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn build_all_ohpkms() -> std::result::Result<(), String> {
+        let path = "/Users/andrewbenington/Library/Application Support/OpenHome/storage/mons_v2";
+        for entry in std::fs::read_dir(path).unwrap() {
+            let entry = entry.unwrap();
+            if !entry
+                .file_name()
+                .into_string()
+                .map(|s| s.ends_with(".ohpkm"))
+                .unwrap_or(false)
+            {
+                continue;
+            }
+            let data = std::fs::read(entry.path()).unwrap();
+            println!(
+                "Testing file: {}",
+                entry.path().file_name().unwrap().to_string_lossy()
+            );
+            OhpkmV2::from_bytes(&data).map_err(|e| {
+                format!(
+                    "failed to build ohpkm file {}: {e}",
+                    entry.path().file_name().unwrap().to_string_lossy()
+                )
+            })?;
+        }
+        Ok(())
     }
 }

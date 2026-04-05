@@ -214,7 +214,7 @@ impl Pk7 {
         buf.set_trainer_id(self.trainer_id);
         buf.set_secret_id(self.secret_id);
         buf.set_exp(self.exp);
-        buf.set_ability_index_raw(self.ability_index.get() as u8);
+        buf.set_ability_index_raw(self.ability_index.to_u16() as u8);
         buf.set_ability_num(self.ability_num);
         buf.set_markings(self.markings);
         buf.set_personality_value(self.personality_value);
@@ -406,13 +406,13 @@ impl Pk7 {
 
     #[wasm_bindgen(getter = abilityIndex)]
     pub fn ability_index(&self) -> AbilityIndexWasm {
-        AbilityIndexWasm::try_from(self.ability_index.get())
+        AbilityIndexWasm::try_from(self.ability_index.to_u16())
             .expect("AbilityIndexWasm should accept any valid ability index")
     }
 
     #[wasm_bindgen(setter = abilityIndex)]
     pub fn set_ability_index(&mut self, value: AbilityIndexWasm) -> Result<()> {
-        self.ability_index = AbilityIndexBounded::try_from(value.get())?;
+        self.ability_index = AbilityIndexBounded::try_from(value.to_u16())?;
         Ok(())
     }
 
@@ -609,12 +609,12 @@ mod test {
         )?
         .0;
 
-        assert_eq!(mon.ability_index().get(), SHARPNESS);
+        assert_eq!(mon.ability_index().to_u16(), SHARPNESS);
 
         let converted_pk7 = Pk7::from_ohpkm(&mon);
 
         // Gallade's Sharpness should be converted to Steadfast when converting to Pk7, since Sharpness is Gen 8+ and Pk7 can only represent Gen 7 abilities
-        assert_eq!(converted_pk7.ability_index.get(), STEADFAST);
+        assert_eq!(converted_pk7.ability_index.to_u16(), STEADFAST);
 
         Ok(())
     }

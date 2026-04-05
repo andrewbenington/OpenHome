@@ -784,9 +784,9 @@ pub enum LinkTradeIndex {
 #[cfg(all(test, feature = "wasm"))]
 mod tests {
     use super::*;
-    use crate::pkm::Result;
-    use crate::pkm::format::PkmFormat;
-    use crate::pkm::ohpkm::OhpkmV2;
+    use crate::format::PkmFormat;
+    use crate::ohpkm::OhpkmV2;
+    use crate::result::Result;
 
     const POKEMON_GO_HOME_TRANSFER: u16 = 30012;
 

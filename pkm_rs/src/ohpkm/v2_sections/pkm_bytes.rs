@@ -1,8 +1,9 @@
-use crate::pkm::{
-    Error, Result,
-    ohpkm::{SectionTagV2, sectioned_data::DataSection},
-};
 use strum_macros::Display;
+
+use crate::{
+    ohpkm::{sectioned_data::DataSection, v2::SectionTagV2},
+    result::{Error, Result},
+};
 
 const PK1_PARTY_SIZE: usize = 66;
 const PK2_PARTY_SIZE: usize = 73;
@@ -109,7 +110,7 @@ impl Tag {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Display, Debug)]
-pub enum PkmBytes {
+pub enum StoredPkmBytes {
     Pk1([u8; PK1_PARTY_SIZE]),
     Pk2([u8; PK2_PARTY_SIZE]),
     Pk3([u8; PK3_PARTY_SIZE]),
@@ -131,7 +132,7 @@ pub enum PkmBytes {
 
 const LENGTH_CHECKED_MESSAGE: &str = "data length checked above";
 
-impl PkmBytes {
+impl StoredPkmBytes {
     pub const fn data_as_bytes(&self) -> &[u8] {
         let bytes: &[u8] = match self {
             Self::Pk1(bytes) => bytes,
@@ -180,7 +181,7 @@ impl PkmBytes {
     pub fn new(tag: Tag, data: &[u8]) -> Result<Self> {
         if data.len() > tag.data_size() {
             return Err(Error::BufferSize {
-                field: format!("OriginalBackup({})", tag),
+                requirement_source: Some(format!("OriginalBackup({tag})")),
                 expected: tag.data_size(),
                 received: data.len(),
             });
@@ -210,7 +211,7 @@ impl PkmBytes {
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         if bytes.len() < 2 {
             return Err(Error::BufferSize {
-                field: String::from("OriginalBackup"),
+                requirement_source: Some(String::from("OriginalBackup")),
                 expected: 2,
                 received: bytes.len(),
             });
@@ -243,11 +244,11 @@ fn copy_to_sized_array<const N: usize>(slice: &[u8]) -> [u8; N] {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct OriginalBackup(PkmBytes);
+pub struct OriginalBackup(StoredPkmBytes);
 
 #[cfg(feature = "wasm")]
 impl OriginalBackup {
-    pub const fn new(pkm_bytes: PkmBytes) -> Self {
+    pub const fn new(pkm_bytes: StoredPkmBytes) -> Self {
         Self(pkm_bytes)
     }
 
@@ -267,11 +268,11 @@ impl DataSection for OriginalBackup {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Ok(Self(PkmBytes::from_bytes(bytes)?))
+        Ok(Self(StoredPkmBytes::from_bytes(bytes)?))
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        Ok(self.0.to_bytes())
+    fn to_bytes(&self) -> Vec<u8> {
+        self.0.to_bytes()
     }
 
     fn is_empty(&self) -> bool {
@@ -281,11 +282,11 @@ impl DataSection for OriginalBackup {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct UnconvertedPkm(PkmBytes);
+pub struct UnconvertedPkm(StoredPkmBytes);
 
 #[cfg(feature = "wasm")]
 impl UnconvertedPkm {
-    pub const fn new(pkm_bytes: PkmBytes) -> Self {
+    pub const fn new(pkm_bytes: StoredPkmBytes) -> Self {
         Self(pkm_bytes)
     }
 }
@@ -297,11 +298,11 @@ impl DataSection for UnconvertedPkm {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Ok(Self(PkmBytes::from_bytes(bytes)?))
+        Ok(Self(StoredPkmBytes::from_bytes(bytes)?))
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        Ok(self.0.to_bytes())
+    fn to_bytes(&self) -> Vec<u8> {
+        self.0.to_bytes()
     }
 
     fn is_empty(&self) -> bool {

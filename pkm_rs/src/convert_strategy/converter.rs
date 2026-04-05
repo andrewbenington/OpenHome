@@ -1,7 +1,7 @@
 use super::{ConvertStrategy, MetDataStrategy};
-use crate::pkm::format::PkmFormat;
-use crate::pkm::location::{Location, MetData};
-use crate::pkm::ohpkm::OhpkmV2;
+use crate::format::PkmFormat;
+use crate::location::{Location, MetData};
+use crate::ohpkm::OhpkmV2;
 
 use pkm_rs_types::Stats8;
 #[cfg(feature = "wasm")]

@@ -9,7 +9,10 @@ pub fn calculate_stats_modern<I: Stats, E: Stats>(
     level: u8,
     nature: &'static NatureMetadata,
 ) -> Stats16Le {
-    let base_stats: Stats16Le = species_and_forme.get_forme_metadata().base_stats;
+    let base_stats: Stats16Le = species_and_forme
+        .get_forme_metadata()
+        .get_base_stats()
+        .into();
     Stats16Le {
         hp: calculate_hp_modern(base_stats, ivs, evs, level as u16),
         atk: calculate_stat_modern(

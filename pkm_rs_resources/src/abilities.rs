@@ -26,27 +26,27 @@ impl<const MAX: u16> AbilityIndexBounded<MAX> {
     /// # Safety
     ///
     /// - `index` must be greater than zero and at most the maximum ability index supported by this version of the library.
-    pub const unsafe fn new_unchecked(index: u16) -> AbilityIndexWasm {
-        unsafe { AbilityIndexWasm(NonZeroU16::new_unchecked(index)) }
+    pub const unsafe fn new_unchecked(index: u16) -> AbilityIndexBounded<MAX> {
+        unsafe { AbilityIndexBounded(NonZeroU16::new_unchecked(index)) }
     }
 
-    pub const fn get(&self) -> u16 {
+    pub const fn to_u16(&self) -> u16 {
         self.0.get()
     }
 
     pub const fn get_metadata(&self) -> &AbilityMetadata {
-        ALL_ABILITIES[(self.get() - 1) as usize]
+        ALL_ABILITIES[(self.to_u16() - 1) as usize]
     }
 
     pub const fn to_le_bytes(self) -> [u8; 2] {
-        self.get().to_le_bytes()
+        self.to_u16().to_le_bytes()
     }
 
     pub const fn change_bound<const NEW_MAX: u16>(self) -> Option<AbilityIndexBounded<NEW_MAX>> {
-        if self.get() > NEW_MAX {
+        if self.to_u16() > NEW_MAX {
             return None;
         }
-        Some(AbilityIndexBounded(NonZeroU16::new(self.get()).unwrap()))
+        Some(AbilityIndexBounded(NonZeroU16::new(self.to_u16()).unwrap()))
     }
 }
 
@@ -58,7 +58,7 @@ impl<const MAX: u16> Default for AbilityIndexBounded<MAX> {
 
 impl<const MAX: u16> std::fmt::Display for AbilityIndexBounded<MAX> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} ({})", self.get_metadata().name, self.get())
+        write!(f, "{} ({})", self.get_metadata().name, self.to_u16())
     }
 }
 
@@ -101,7 +101,7 @@ impl<const MAX: u16> Randomize for AbilityIndexBounded<MAX> {
 
 impl<const MAX: u16> From<AbilityIndexBounded<MAX>> for u8 {
     fn from(val: AbilityIndexBounded<MAX>) -> Self {
-        val.get() as u8
+        val.to_u16() as u8
     }
 }
 
@@ -125,7 +125,7 @@ impl<const MAX: u16> TryFrom<u16> for AbilityIndexBounded<MAX> {
 
 impl<const MAX: u16> From<AbilityIndexBounded<MAX>> for u16 {
     fn from(val: AbilityIndexBounded<MAX>) -> Self {
-        val.get()
+        val.to_u16()
     }
 }
 
@@ -148,16 +148,16 @@ impl AbilityIndexWasm {
         unsafe { AbilityIndexWasm(NonZeroU16::new_unchecked(index)) }
     }
 
-    pub const fn get(&self) -> u16 {
+    pub const fn to_u16(&self) -> u16 {
         self.0.get()
     }
 
     pub const fn get_metadata(&self) -> &AbilityMetadata {
-        ALL_ABILITIES[(self.get() - 1) as usize]
+        ALL_ABILITIES[(self.to_u16() - 1) as usize]
     }
 
     pub const fn to_le_bytes(self) -> [u8; 2] {
-        self.get().to_le_bytes()
+        self.to_u16().to_le_bytes()
     }
 }
 
@@ -171,7 +171,7 @@ impl AbilityIndexWasm {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn index(&self) -> u16 {
-        self.get()
+        self.to_u16()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
@@ -193,7 +193,7 @@ impl Default for AbilityIndexWasm {
 
 impl std::fmt::Display for AbilityIndexWasm {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} ({})", self.get_metadata().name, self.get())
+        write!(f, "{} ({})", self.get_metadata().name, self.to_u16())
     }
 }
 
@@ -226,7 +226,7 @@ impl TryFrom<u8> for AbilityIndexWasm {
 
 impl From<AbilityIndexWasm> for u8 {
     fn from(val: AbilityIndexWasm) -> Self {
-        val.get() as u8
+        val.to_u16() as u8
     }
 }
 
@@ -258,13 +258,13 @@ impl<const MAX: u16> TryFrom<AbilityIndexWasm> for AbilityIndexBounded<MAX> {
     type Error = Error;
 
     fn try_from(value: AbilityIndexWasm) -> Result<Self> {
-        AbilityIndexBounded::try_from(value.get())
+        AbilityIndexBounded::try_from(value.to_u16())
     }
 }
 
 impl From<AbilityIndexWasm> for u16 {
     fn from(val: AbilityIndexWasm) -> Self {
-        val.get()
+        val.to_u16()
     }
 }
 

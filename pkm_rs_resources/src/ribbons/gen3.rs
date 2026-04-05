@@ -355,6 +355,25 @@ impl Gen3Ribbon {
     }
 }
 
+impl TryFrom<OpenHomeRibbon> for Gen3Ribbon {
+    type Error = ();
+
+    fn try_from(value: OpenHomeRibbon) -> Result<Self, Self::Error> {
+        match value {
+            OpenHomeRibbon::Mod(modern) => Self::from_modern_if_present(modern).ok_or(()),
+            OpenHomeRibbon::Obs(obsolete) => Self::from_obsolete_if_present(obsolete).ok_or(()),
+        }
+    }
+}
+
+impl TryFrom<ModernRibbon> for Gen3Ribbon {
+    type Error = ();
+
+    fn try_from(value: ModernRibbon) -> Result<Self, Self::Error> {
+        Self::from_modern_if_present(value).ok_or(())
+    }
+}
+
 impl Display for Gen3Ribbon {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.get_name())

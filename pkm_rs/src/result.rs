@@ -190,7 +190,9 @@ impl Display for Error {
                 format!("Error reading field {field}: {source}")
                     .to_owned()
             }
-
+            Error::TagError { tag_type, value } => {
+                format!("Invalid tag value {value} for tag type {tag_type}")
+            }
             Error::MoveError { value, source } => {
                 format!("Invalid move reference {value} (source: {source})").to_owned()
             }

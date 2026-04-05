@@ -1,10 +1,19 @@
-use pkm_rs_types::PkmType;
+use pkm_rs_types::{NationalDex, PkmType};
 use serde::Serialize;
+use strum::EnumIter;
+use strum::IntoEnumIterator;
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_resources::species::NatDexIndex;
+
+#[cfg(feature = "randomize")]
+use rand::seq::IteratorRandom;
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, EnumIter)]
 pub enum ExtraFormIndex {
     /* Cosplay Pikachu */
     PikachuRockStar = 1,
@@ -416,6 +425,96 @@ impl ExtraFormIndex {
             Self::NymbleSevii | Self::LokixSevii => Some((PkmType::Bug, Some(PkmType::Dragon))),
             _ => None,
         }
+    }
+
+    pub const fn national_dex(&self) -> NationalDex {
+        match self {
+            Self::VenusaurClone | Self::VenusaurGiga => NationalDex::Venusaur,
+            Self::CharizardClone | Self::CharizardGiga => NationalDex::Charizard,
+            Self::BlastoiseClone | Self::BlastoiseGiga => NationalDex::Blastoise,
+            Self::PikachuRockStar
+            | Self::PikachuBelle
+            | Self::PikachuPopStar
+            | Self::PikachuPhD
+            | Self::PikachuLibre
+            | Self::PikachuCosplay
+            | Self::PikachuSurfing
+            | Self::PikachuFlying
+            | Self::PikachuGiga
+            | Self::PikachuClone => NationalDex::Pikachu,
+            Self::ButterfreeGiga => NationalDex::Butterfree,
+            Self::MeowthGiga => NationalDex::Meowth,
+            Self::MachampGiga => NationalDex::Machamp,
+            Self::DoduoSevii => NationalDex::Doduo,
+            Self::DodrioSevii => NationalDex::Dodrio,
+            Self::GengarGiga | Self::GengarStitched => NationalDex::Gengar,
+            Self::OnixCrystal => NationalDex::Onix,
+            Self::KinglerGiga => NationalDex::Kingler,
+            Self::LaprasGiga => NationalDex::Lapras,
+            Self::EeveeGiga | Self::EeveeBandana => NationalDex::Eevee,
+            Self::SnorlaxGiga => NationalDex::Snorlax,
+            Self::MewtwoArmorMk1 | Self::MewtwoArmorMk2 => NationalDex::Mewtwo,
+            Self::TeddiursaSevii => NationalDex::Teddiursa,
+            Self::UrsaringSevii => NationalDex::Ursaring,
+            Self::MantineSevii => NationalDex::Mantine,
+            Self::FeebasSevii => NationalDex::Feebas,
+            Self::MiloticSevii => NationalDex::Milotic,
+            Self::CarnivineSevii => NationalDex::Carnivine,
+            Self::MantykeSevii => NationalDex::Mantyke,
+            Self::DialgaPrimal => NationalDex::Dialga,
+            Self::BlitzleSevii => NationalDex::Blitzle,
+            Self::ZebstrikaSevii => NationalDex::Zebstrika,
+            Self::GarbodorGiga => NationalDex::Garbodor,
+            Self::ClauncherSevii => NationalDex::Clauncher,
+            Self::ClawitzerSevii => NationalDex::Clawitzer,
+            Self::NoibatSevii => NationalDex::Noibat,
+            Self::NoivernSevii => NationalDex::Noivern,
+            Self::WishiwashiSevii | Self::WishiwashiSeviiSchool => NationalDex::Wishiwashi,
+            Self::DhelmiseSevii => NationalDex::Dhelmise,
+            Self::MelmetalGiga => NationalDex::Melmetal,
+            Self::CorviknightGiga => NationalDex::Corviknight,
+            Self::OrbeetleGiga => NationalDex::Orbeetle,
+            Self::DrednawGiga => NationalDex::Drednaw,
+            Self::CoalossalGiga => NationalDex::Coalossal,
+            Self::FlappleGiga => NationalDex::Flapple,
+            Self::AppletunGiga => NationalDex::Appletun,
+            Self::SandacondaGiga => NationalDex::Sandaconda,
+            Self::ToxtricityGiga | Self::ToxtricityLowKeyGiga => NationalDex::Toxtricity,
+            Self::SizzlipedeSevii => NationalDex::Sizzlipede,
+            Self::CentiskorchGiga | Self::CentiskorchSevii | Self::CentiskorchSeviiGiga => {
+                NationalDex::Centiskorch
+            }
+            Self::HattereneGiga => NationalDex::Hatterene,
+            Self::GrimmsnarlGiga => NationalDex::Grimmsnarl,
+            Self::AlcremieGiga => NationalDex::Alcremie,
+            Self::CopperajahGiga => NationalDex::Copperajah,
+            Self::DuraludonGiga => NationalDex::Duraludon,
+            Self::RillaboomGiga => NationalDex::Rillaboom,
+            Self::CinderaceGiga => NationalDex::Cinderace,
+            Self::InteleonGiga => NationalDex::Inteleon,
+            Self::EternatusEternamax => NationalDex::Eternatus,
+            Self::UrsifuSingleGiga | Self::UrsifuRapidGiga => NationalDex::Urshifu,
+            Self::NymbleSevii => NationalDex::Nymble,
+            Self::LokixSevii => NationalDex::Lokix,
+        }
+    }
+
+    pub fn all_by_national_dex(national_dex: NationalDex) -> Vec<Self> {
+        Self::iter()
+            .filter(|form: &ExtraFormIndex| form.national_dex() == national_dex)
+            .collect()
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl ExtraFormIndex {
+    pub fn randomized_for_national_dex<R: rand::Rng>(
+        national_dex: NatDexIndex,
+        rng: &mut R,
+    ) -> Option<Self> {
+        Self::all_by_national_dex(national_dex.into())
+            .into_iter()
+            .choose(rng)
     }
 }
 

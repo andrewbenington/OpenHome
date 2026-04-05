@@ -5,8 +5,11 @@ mod save;
 mod strings;
 mod util;
 
+pub mod convert_strategy;
+pub mod format;
 pub mod gen7_alola;
 pub mod gen7_lgpe;
+pub mod location;
 pub mod ohpkm;
 pub mod result;
 // pub mod rom_hacks;

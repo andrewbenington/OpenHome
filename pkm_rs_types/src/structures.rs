@@ -5,7 +5,7 @@ use strum_macros::{Display, EnumString};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use crate::{strings::SizedUtf16String, util, OriginGame};
+use crate::{OriginGame, strings::SizedUtf16String, util};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -190,8 +190,8 @@ impl<const N: usize, FLAG: Copy + Into<usize> + From<usize>> FlagSet<N, FLAG> {
         util::set_flag(&mut self.raw, 0, flag.into(), value);
     }
 
-    pub fn get_flag(&self, index: usize) -> bool {
-        util::get_flag(&self.raw, 0, index)
+    pub fn get_flag(&self, flag: FLAG) -> bool {
+        util::get_flag(&self.raw, 0, flag.into())
     }
 
     pub const fn clear(&mut self) {

@@ -97,14 +97,12 @@ impl OhpkmConvert for Pk7 {
             ability_index: ohpkm.ability_index().change_bound().unwrap_or(
                 form_metadata
                     .get_ability(ohpkm.ability_num())
-                    .try_into()
+                    .change_bound()
                     .unwrap_or(
                         form_metadata
                             .get_ability(AbilityNumber::First)
-                            .try_into()
-                            .expect(
-                                "All Pk7-compatible Pokémon should have a compatible first ability",
-                            ),
+                            .change_bound()
+                            .expect("Pk7 max ability <= overall max ability"),
                     ),
             ),
             ability_num: ohpkm.ability_num(),

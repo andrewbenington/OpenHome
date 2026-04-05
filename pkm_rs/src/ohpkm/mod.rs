@@ -2,6 +2,7 @@ mod convert;
 mod v2;
 mod v2_sections;
 
+pub mod extra_form;
 pub mod v1;
 pub use v2::OhpkmV2;
 pub mod sectioned_data;

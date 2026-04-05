@@ -16,7 +16,7 @@ use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use crate::pkm::convert_strategy::option::{BoolOption, SettingType, StringOption};
+use crate::convert_strategy::option::{BoolOption, SettingType, StringOption};
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]

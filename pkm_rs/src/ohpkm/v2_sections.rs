@@ -1,12 +1,8 @@
 use super::sectioned_data::DataSection;
+use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::v2::SectionTagV2;
 use crate::result::{Error, Result, StringErrorSource};
 use crate::traits::{IsShiny, IsShiny4096, OhpkmByte, OhpkmBytes};
-use crate::pkm::ohpkm::extra_form::ExtraFormIndex;
-use crate::pkm::ohpkm::sectioned_data::DataSection;
-use crate::pkm::ohpkm::{OhpkmV1, SectionTagV2};
-use crate::pkm::traits::{IsShiny4096, OhpkmByte, OhpkmBytes};
-use crate::pkm::{Error, Result, StringErrorSource};
 use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;
@@ -16,9 +12,6 @@ use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
-
-#[cfg(feature = "wasm")]
-use crate::pkm::traits::IsShiny;
 
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
@@ -32,8 +25,7 @@ use std::num::NonZeroU16;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
-use serde::{Deserialize, Serialize};
-use std::num::NonZeroU16;
+use serde::Deserialize;
 
 pub mod pkm_bytes;
 
@@ -55,7 +47,6 @@ const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
 };
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct MainDataV2 {
     pub personality_value: u32,
@@ -251,31 +242,31 @@ impl MainDataV2 {
         self.nickname = self.species_and_forme.get_species_metadata().name.into();
     }
 
-    fn ability_num_by_index(&self) -> Option<u8> {
+    const fn ability_num_by_index(&self) -> Option<AbilityNumber> {
         let form_metadata = self.species_and_forme.get_forme_metadata();
-        if self.ability_index == form_metadata.abilities.0 {
-            Some(1)
-        } else if self.ability_index == form_metadata.abilities.1 {
-            Some(2)
+        if self.ability_index.to_u16() == form_metadata.abilities.0.to_u16() {
+            Some(AbilityNumber::First)
+        } else if self.ability_index.to_u16() == form_metadata.abilities.1.to_u16() {
+            Some(AbilityNumber::Second)
         } else if let Some(hidden_ability) = form_metadata.hidden_ability
-            && self.ability_index == hidden_ability
+            && self.ability_index.to_u16() == hidden_ability.to_u16()
         {
-            Some(4)
+            Some(AbilityNumber::Hidden)
         } else {
             None
         }
     }
 
     fn ability_is_first_slot(&self) -> bool {
-        self.ability_num_by_index() == Some(1)
+        self.ability_num_by_index() == Some(AbilityNumber::First)
     }
 
     fn ability_is_second_slot(&self) -> bool {
-        self.ability_num_by_index() == Some(2)
+        self.ability_num_by_index() == Some(AbilityNumber::Second)
     }
 
     fn ability_is_hidden_ability(&self) -> bool {
-        self.ability_num_by_index() == Some(4)
+        self.ability_num_by_index() == Some(AbilityNumber::Hidden)
             || (self
                 .species_and_forme
                 .get_forme_metadata()
@@ -286,10 +277,9 @@ impl MainDataV2 {
 
     fn ability_num_matches_index(&self) -> bool {
         match self.ability_num {
-            1 => self.ability_is_first_slot(),
-            2 => self.ability_is_second_slot(),
-            4 => self.ability_is_hidden_ability(),
-            _ => false,
+            AbilityNumber::First => self.ability_is_first_slot(),
+            AbilityNumber::Second => self.ability_is_second_slot(),
+            AbilityNumber::Hidden => self.ability_is_hidden_ability(),
         }
     }
 
@@ -364,7 +354,7 @@ impl MainDataV2 {
                 self.ability_num = fixed_ability_num;
             } else {
                 // Hm, this ability is invalid for the species. Let's reset it using the ability number
-                self.ability_index = form_metadata.ability_by_num(self.ability_num)
+                self.ability_index = form_metadata.get_ability(self.ability_num)
             }
             errors_found = true;
         }
@@ -565,6 +555,7 @@ impl DataSection for MainDataV2 {
         bytes[82] = self.scale;
 
         self.moves.write_spans(&mut bytes, MOVE_DATA_OFFSETS);
+        // writes move indices, pp, and pp ups in one go to ensure consistency
 
         bytes[96..122].copy_from_slice(&self.nickname);
 
@@ -573,6 +564,10 @@ impl DataSection for MainDataV2 {
         bytes[128] = self.met_level;
         bytes[129..131].copy_from_slice(&self.egg_location_index.unwrap_or(0).to_le_bytes());
         bytes[131..133].copy_from_slice(&self.met_location_index.to_le_bytes());
+
+        // byte 133 is unused
+
+        // bytes 134..=137 are used for move pp ups, written via self.moves.write_spans
 
         bytes[138..140].copy_from_slice(&self.relearn_moves[0].to_le_bytes());
         bytes[140..142].copy_from_slice(&self.relearn_moves[1].to_le_bytes());
@@ -645,6 +640,95 @@ impl DataSection for MainDataV2 {
 
     fn is_empty(&self) -> bool {
         false
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for MainDataV2 {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let species_and_forme = SpeciesAndForme::randomized(rng);
+        let ability_num = AbilityNumber::randomized(rng);
+        let ability_index = species_and_forme
+            .get_forme_metadata()
+            .get_ability(ability_num);
+        Self {
+            personality_value: u32::randomized(rng),
+            encryption_constant: u32::randomized(rng),
+            species_and_forme,
+            held_item_index: u16::randomized(rng),
+            trainer_id: u16::randomized(rng),
+            secret_id: u16::randomized(rng),
+            exp: u32::randomized(rng),
+            ability_index,
+            ability_num,
+            favorite: bool::randomized(rng),
+            is_shadow: bool::randomized(rng),
+            markings: MarkingsSixShapesColors::randomized(rng),
+            nature: NatureIndex::randomized(rng),
+            mint_nature: Option::<NatureIndex>::randomized(rng),
+            is_fateful_encounter: bool::randomized(rng),
+            gender: Gender::randomized(rng),
+            evs: Stats8::randomized(rng),
+            contest: ContestStats::randomized(rng),
+            pokerus_byte: u8::randomized(rng),
+            contest_memory_count: u8::randomized(rng),
+            battle_memory_count: u8::randomized(rng),
+            ribbons: OpenHomeRibbonSet::randomized(rng),
+            sociability: u32::randomized(rng),
+            height_scalar: u8::randomized(rng),
+            weight_scalar: u8::randomized(rng),
+            scale: u8::randomized(rng),
+            moves: MoveSlots::randomized(rng),
+            nickname: SizedUtf16String::randomized(rng),
+            relearn_moves: [
+                MoveIndex::randomized(rng),
+                MoveIndex::randomized(rng),
+                MoveIndex::randomized(rng),
+                MoveIndex::randomized(rng),
+            ],
+            ivs: Stats8::randomized(rng),
+            is_egg: bool::randomized(rng),
+            is_nicknamed: bool::randomized(rng),
+            handler_name: SizedUtf16String::randomized(rng),
+            handler_language: Option::<Language>::randomized(rng),
+            is_current_handler: bool::randomized(rng),
+            handler_id: u16::randomized(rng),
+            handler_friendship: u8::randomized(rng),
+            handler_memory: TrainerMemory::randomized(rng),
+            handler_affection: u8::randomized(rng),
+            handler_gender: BinaryGender::randomized(rng),
+            fullness: u8::randomized(rng),
+            enjoyment: u8::randomized(rng),
+            game_of_origin: OriginGame::randomized(rng),
+            game_of_origin_battle: Option::<OriginGame>::randomized(rng),
+            console_region: u8::randomized(rng),
+            language: Language::randomized(rng),
+            form_argument: u32::randomized(rng),
+            affixed_ribbon: Option::<ModernRibbon>::randomized(rng),
+            extra_form: {
+                // randomize whether there should be an extra form or not with a 50/50 chance, and if there is, randomize it appropriately for the mon's species. If the species doesn't have any extra forms this will just be None.
+                if bool::randomized(rng) {
+                    ExtraFormIndex::randomized_for_national_dex(species_and_forme.get_ndex(), rng)
+                } else {
+                    None
+                }
+            },
+            trainer_name: SizedUtf16String::randomized(rng),
+            trainer_friendship: u8::randomized(rng),
+            trainer_memory: TrainerMemory::randomized(rng),
+            trainer_affection: u8::randomized(rng),
+            egg_date: Option::<PokeDate>::randomized(rng),
+            met_date: PokeDate::randomized(rng),
+            ball: Ball::randomized(rng),
+            egg_location_index: Option::<u16>::randomized(rng),
+            met_location_index: u16::randomized(rng),
+            met_level: u8::randomized(rng),
+            hyper_training: HyperTraining::randomized(rng),
+            trainer_gender: BinaryGender::randomized(rng),
+            obedience_level: u8::randomized(rng),
+            home_tracker: rand::random(),
+            display_color_rgb: Option::<[u8; 3]>::randomized(rng),
+        }
     }
 }
 
@@ -1487,22 +1571,6 @@ impl PluginData {
     const fn from_origin(plugin_origin: String) -> Self {
         Self { plugin_origin }
     }
-
-    fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
-        if bytes.len() < 2 {
-            return Self::try_from_origin_utf8(bytes);
-        }
-
-        if bytes[0].is_ascii_alphabetic() && bytes[1].is_ascii_alphabetic() {
-            return Self::try_from_origin_utf8(bytes);
-        }
-
-        let origin = String::from_utf8(bytes[2..].to_vec()).map_err(Error::plugin_origin)?;
-
-        Ok(Self {
-            plugin_origin: origin,
-        })
-    }
 }
 
 #[cfg(feature = "wasm")]
@@ -1589,13 +1657,13 @@ impl DataSection for MonTags {
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes)?;
+        Self::ensure_buffer_size(bytes);
         let tags: Vec<MonTag> = serde_json::from_slice(bytes).unwrap_or_default();
         Ok(Self(tags))
     }
 
-    fn to_bytes(&self) -> Result<Vec<u8>> {
-        Ok(serde_json::to_vec(&self.0).unwrap_or_default())
+    fn to_bytes(&self) -> Vec<u8> {
+        serde_json::to_vec(&self.0).unwrap_or_default()
     }
 
     fn is_empty(&self) -> bool {

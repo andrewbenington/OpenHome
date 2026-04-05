@@ -3,7 +3,7 @@
     "rust-analyzer": {
       "initialization_options": {
         "cargo": {
-          "features": "all"
+          "features": "pkm_rs/wasm"
         },
         "inlayHints": { "typeHints": { "enable": true } }
       }

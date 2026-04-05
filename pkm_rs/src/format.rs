@@ -1,7 +1,7 @@
-use crate::pkm::location::{self, MetData};
-use crate::pkm::ohpkm::OhpkmV2;
+use crate::location::{self, MetData};
+use crate::ohpkm::OhpkmV2;
 
-use super::location::{LinkTradeIndex, Location};
+use crate::location::{LinkTradeIndex, Location};
 use pkm_rs_types::{Generation, OriginGame};
 
 #[cfg(feature = "wasm")]

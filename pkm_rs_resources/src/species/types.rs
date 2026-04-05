@@ -1,21 +1,14 @@
-use crate::{abilities::AbilityIndexWasm, species::ALL_SPECIES, Error, Result};
-use pkm_rs_types::{AbilityNumber, GameSetting, Generation, PkmType, Stats16Le, TeraType};
+use crate::{Error, Result, abilities::AbilityIndexWasm, species::ALL_SPECIES};
+use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
 use serde::{Serialize, Serializer};
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
 
 use crate::{
-    abilities::AbilityIndex,
+    ExpectLog,
     levelup::LearnsetReader,
-    species::{
-        form_metadata::{levelup_learnset_lookup, types_lookup, MetadataSource},
-        ALL_SPECIES,
-    },
-    Error, ExpectLog, Result,
+    species::form_metadata::{MetadataSource, levelup_learnset_lookup, types_lookup},
 };
-
-use pkm_rs_types::{GameSetting, Generation, PkmType, TeraType};
-use serde::{Serialize, Serializer};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -23,15 +16,15 @@ use pkm_rs_types::randomize::Randomize;
 use rand::RngExt;
 
 #[cfg(feature = "wasm")]
-use crate::levelup::LearnsetMoveJs;
-#[cfg(feature = "wasm")]
 use crate::log;
 #[cfg(feature = "wasm")]
 use crate::species::form_metadata::current_base_stats;
 #[cfg(feature = "wasm")]
-use crate::species::form_metadata::{base_stats_lookup, BaseStats};
+use crate::species::form_metadata::{BaseStats, base_stats_lookup};
 #[cfg(feature = "wasm")]
 use crate::stats::Stat;
+#[cfg(feature = "wasm")]
+use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{Gender, Stats8};
 #[cfg(feature = "wasm")]
@@ -119,6 +112,19 @@ impl Serialize for NatDexIndex {
 impl Default for NatDexIndex {
     fn default() -> Self {
         Self(unsafe { NonZeroU16::new_unchecked(1) })
+    }
+}
+
+impl From<NationalDex> for NatDexIndex {
+    fn from(ndex: NationalDex) -> Self {
+        NatDexIndex::new(ndex as u16).expect("All NationalDex values should be a valid NatDexIndex")
+    }
+}
+
+impl From<NatDexIndex> for NationalDex {
+    fn from(ndex: NatDexIndex) -> Self {
+        NationalDex::try_from(ndex.get())
+            .expect("All NatDexIndex values should be a valid NationalDex")
     }
 }
 
@@ -364,10 +370,10 @@ pub struct FormeMetadata {
     pub gender_ratio: GenderRatio,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub abilities: (AbilityIndexWasm, AbilityIndexWasm),
+    pub abilities: (AbilityIndexBounded, AbilityIndexBounded),
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = hiddenAbility))]
-    pub hidden_ability: Option<AbilityIndexWasm>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub hidden_ability: Option<AbilityIndexBounded>,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseHeight))]
     pub base_height: u32,
@@ -421,7 +427,7 @@ impl FormeMetadata {
         self.forme_ref().get_species_metadata()
     }
 
-    pub fn get_ability(&self, ability_num: AbilityNumber) -> AbilityIndexWasm {
+    pub fn get_ability(&self, ability_num: AbilityNumber) -> AbilityIndexBounded {
         match ability_num {
             AbilityNumber::First => self.abilities.0,
             AbilityNumber::Second => self.abilities.1,
@@ -529,25 +535,27 @@ impl FormeMetadata {
 
     #[wasm_bindgen(getter)]
     pub fn abilities(&self) -> Vec<AbilityIndexWasm> {
-        vec![self.abilities.0, self.abilities.1]
+        vec![self.abilities.0.into(), self.abilities.1.into()]
     }
 
     #[wasm_bindgen(js_name = abilityByNum)]
-    pub fn ability_by_num(&self, num: u8) -> AbilityIndexWasm {
-        match num {
-            4 => self.hidden_ability.unwrap_or(self.abilities.0),
-            2 => self.abilities.1,
-            _ => self.abilities.0,
-        }
+    pub fn ability_by_num_js(&self, num: u8) -> AbilityIndexWasm {
+        self.get_ability(AbilityNumber::from_u8_first_three_bits(num).unwrap_or_default())
+            .into()
     }
 
     #[wasm_bindgen(js_name = abilityByNumGen3)]
     pub fn ability_by_num_gen_3(&self, num: u8) -> AbilityIndexWasm {
-        if num == 2 && self.abilities.1.get() <= 77 {
-            self.abilities.1
+        if num == 2 && self.abilities.1.to_u16() <= 77 {
+            self.abilities.1.into()
         } else {
-            self.abilities.0
+            self.abilities.0.into()
         }
+    }
+
+    #[wasm_bindgen(getter = hiddenAbility)]
+    pub fn hidden_ability(&self) -> Option<AbilityIndexWasm> {
+        self.hidden_ability.map(|ability| ability.into())
     }
 
     #[wasm_bindgen(getter = eggGroups)]

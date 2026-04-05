@@ -1,4 +1,4 @@
-use crate::moves::MoveSlot;
+use crate::moves::MoveIndex;
 
 use pkm_rs_types::pkl_file::PklFileData;
 
@@ -13,7 +13,7 @@ pub enum LearnsetCondition {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LearnsetMove {
-    pub(crate) move_id: MoveSlot,
+    pub(crate) move_id: MoveIndex,
     pub(crate) condition: LearnsetCondition,
 }
 
@@ -78,7 +78,7 @@ impl LearnsetReader {
 
         let moves_span_size = (self.move_count()) * 2;
         let move_indices_raw = u8_slice_to_u16_le(&self.0[..moves_span_size]);
-        let move_id = MoveSlot::from_u16(move_indices_raw[index]);
+        let move_id = MoveIndex::from_u16(move_indices_raw[index]);
 
         let levels = &self.0[moves_span_size..];
         let level = levels[index];

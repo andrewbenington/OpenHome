@@ -25,6 +25,7 @@ tauri-build = { version = "2.5.6", features = [] }
 
 [dependencies]
 pkm_rs = {path = "../pkm_rs"}
+pkm_rs_derive = {path = "../pkm_rs_derive"}
 tauri = { version = "2.10.3", features = [] }
 tauri-plugin-shell = "2.3.5"
 serde = { version = "1.0.228", features = ["derive"] }
@@ -39,8 +40,6 @@ static_assertions = "1.1.0"
 sha2 = "0.10.9"
 num = "0.4.3"
 toml = "0.9.8"
-pkm_rs_derive = {path = "../pkm_rs_derive"}
-pkm_rs = {path = "../pkm_rs"}
 bytes = "1.11.1"
 semver = "1.0.28"
 strum = { version = "0.28.0", features = ["derive"] }

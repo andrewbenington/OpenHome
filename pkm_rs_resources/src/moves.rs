@@ -11,7 +11,7 @@ use pkm_rs_types::randomize::Randomize;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, Clone, Copy, Serialize)]
+#[derive(Debug, Default, Clone, Copy, Serialize, PartialEq, Eq)]
 pub struct MoveSlot {
     pub move_index: MoveIndex,
     pub pp: u8,

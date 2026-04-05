@@ -2,9 +2,7 @@ use pkm_rs_types::FlagSet;
 use serde::{Serialize, Serializer};
 use std::fmt::Display;
 
-use crate::ribbons::{
-    gen3::Gen3Ribbon, ModernRibbon, ObsoleteRibbon, OpenHomeRibbon, OpenHomeRibbonSet,
-};
+use crate::ribbons::{ModernRibbon, ObsoleteRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -18,11 +16,11 @@ impl DsGen3RibbonSet {
         Self(FlagSet::from_bytes(bytes))
     }
 
-    pub fn get_ribbons(&self) -> Vec<Gen3Ribbon> {
+    pub fn get_ribbons(&self) -> Vec<DsGen3Ribbon> {
         self.0
             .get_flags()
             .into_iter()
-            .map(Gen3Ribbon::from_index)
+            .map(DsGen3Ribbon::from_index)
             .collect()
     }
 
@@ -34,22 +32,22 @@ impl DsGen3RibbonSet {
         self.0.clear();
     }
 
-    pub fn add_ribbon(&mut self, ribbon: Gen3Ribbon) {
+    pub fn add_ribbon(&mut self, ribbon: DsGen3Ribbon) {
         self.0.set_flag(ribbon.get_index(), true);
     }
 
-    pub fn add_ribbons(&mut self, ribbons: Vec<Gen3Ribbon>) {
+    pub fn add_ribbons(&mut self, ribbons: Vec<DsGen3Ribbon>) {
         ribbons
             .into_iter()
             .for_each(|ribbon| self.add_ribbon(ribbon));
     }
 
-    pub fn set_ribbons(&mut self, ribbons: Vec<Gen3Ribbon>) {
+    pub fn set_ribbons(&mut self, ribbons: Vec<DsGen3Ribbon>) {
         self.clear_ribbons();
         self.add_ribbons(ribbons);
     }
 
-    pub fn with_ribbons(mut self, ribbons: Vec<Gen3Ribbon>) -> Self {
+    pub fn with_ribbons(mut self, ribbons: Vec<DsGen3Ribbon>) -> Self {
         self.add_ribbons(ribbons);
         self
     }
@@ -66,7 +64,7 @@ impl Serialize for DsGen3RibbonSet {
 
 #[derive(Debug, Serialize, PartialEq, Eq, Clone, Copy)]
 #[repr(u8)]
-pub enum Gen3Ribbon {
+pub enum DsGen3Ribbon {
     CoolHoenn,
     CoolSuperHoenn,
     CoolHyperHoenn,
@@ -101,13 +99,13 @@ pub enum Gen3Ribbon {
     World,
 }
 
-impl Gen3Ribbon {
+impl DsGen3Ribbon {
     pub const fn get_index(self) -> usize {
         self as usize
     }
 
-    pub fn from_index(index: usize) -> Gen3Ribbon {
-        if index > Gen3Ribbon::World as usize {
+    pub fn from_index(index: usize) -> DsGen3Ribbon {
+        if index > DsGen3Ribbon::World as usize {
             panic!("Attempting to get Gen3Ribbon from index > 31")
         }
 
@@ -116,169 +114,171 @@ impl Gen3Ribbon {
 
     const fn get_name(&self) -> &'static str {
         match self {
-            Gen3Ribbon::CoolHoenn => "Cool Ribbon",
-            Gen3Ribbon::CoolSuperHoenn => "Cool Super Ribbon",
-            Gen3Ribbon::CoolHyperHoenn => "Cool Hyper Ribbon",
-            Gen3Ribbon::CoolMasterHoenn => "Cool Master Ribbon",
-            Gen3Ribbon::BeautyHoenn => "Beauty Ribbon",
-            Gen3Ribbon::BeautySuperHoenn => "Beauty Super Ribbon",
-            Gen3Ribbon::BeautyHyperHoenn => "Beauty Hyper Ribbon",
-            Gen3Ribbon::BeautyMasterHoenn => "Beauty Master Ribbon",
-            Gen3Ribbon::CuteHoenn => "Cute Ribbon",
-            Gen3Ribbon::CuteSuperHoenn => "Cute Super Ribbon",
-            Gen3Ribbon::CuteHyperHoenn => "Cute Hyper Ribbon",
-            Gen3Ribbon::CuteMasterHoenn => "Cute Master Ribbon",
-            Gen3Ribbon::SmartHoenn => "Smart Ribbon",
-            Gen3Ribbon::SmartSuperHoenn => "Smart Super Ribbon",
-            Gen3Ribbon::SmartHyperHoenn => "Smart Hyper Ribbon",
-            Gen3Ribbon::SmartMasterHoenn => "Smart Master Ribbon",
-            Gen3Ribbon::ToughHoenn => "Tough Ribbon",
-            Gen3Ribbon::ToughSuperHoenn => "Tough Super Ribbon",
-            Gen3Ribbon::ToughHyperHoenn => "Tough Hyper Ribbon",
-            Gen3Ribbon::ToughMasterHoenn => "Tough Master Ribbon",
-            Gen3Ribbon::Champion => "Champion Ribbon",
-            Gen3Ribbon::Winning => "Winning Ribbon",
-            Gen3Ribbon::Victory => "Victory Ribbon",
-            Gen3Ribbon::Artist => "Artist Ribbon",
-            Gen3Ribbon::Effort => "Effort Ribbon",
-            Gen3Ribbon::BattleChampion => "Battle Champion Ribbon",
-            Gen3Ribbon::RegionalChampion => "Regional Champion Ribbon",
-            Gen3Ribbon::NationalChampion => "National Champion Ribbon",
-            Gen3Ribbon::Country => "Country Ribbon",
-            Gen3Ribbon::National => "National Ribbon",
-            Gen3Ribbon::Earth => "Earth Ribbon",
-            Gen3Ribbon::World => "World Ribbon",
+            DsGen3Ribbon::CoolHoenn => "Cool Ribbon",
+            DsGen3Ribbon::CoolSuperHoenn => "Cool Super Ribbon",
+            DsGen3Ribbon::CoolHyperHoenn => "Cool Hyper Ribbon",
+            DsGen3Ribbon::CoolMasterHoenn => "Cool Master Ribbon",
+            DsGen3Ribbon::BeautyHoenn => "Beauty Ribbon",
+            DsGen3Ribbon::BeautySuperHoenn => "Beauty Super Ribbon",
+            DsGen3Ribbon::BeautyHyperHoenn => "Beauty Hyper Ribbon",
+            DsGen3Ribbon::BeautyMasterHoenn => "Beauty Master Ribbon",
+            DsGen3Ribbon::CuteHoenn => "Cute Ribbon",
+            DsGen3Ribbon::CuteSuperHoenn => "Cute Super Ribbon",
+            DsGen3Ribbon::CuteHyperHoenn => "Cute Hyper Ribbon",
+            DsGen3Ribbon::CuteMasterHoenn => "Cute Master Ribbon",
+            DsGen3Ribbon::SmartHoenn => "Smart Ribbon",
+            DsGen3Ribbon::SmartSuperHoenn => "Smart Super Ribbon",
+            DsGen3Ribbon::SmartHyperHoenn => "Smart Hyper Ribbon",
+            DsGen3Ribbon::SmartMasterHoenn => "Smart Master Ribbon",
+            DsGen3Ribbon::ToughHoenn => "Tough Ribbon",
+            DsGen3Ribbon::ToughSuperHoenn => "Tough Super Ribbon",
+            DsGen3Ribbon::ToughHyperHoenn => "Tough Hyper Ribbon",
+            DsGen3Ribbon::ToughMasterHoenn => "Tough Master Ribbon",
+            DsGen3Ribbon::Champion => "Champion Ribbon",
+            DsGen3Ribbon::Winning => "Winning Ribbon",
+            DsGen3Ribbon::Victory => "Victory Ribbon",
+            DsGen3Ribbon::Artist => "Artist Ribbon",
+            DsGen3Ribbon::Effort => "Effort Ribbon",
+            DsGen3Ribbon::BattleChampion => "Battle Champion Ribbon",
+            DsGen3Ribbon::RegionalChampion => "Regional Champion Ribbon",
+            DsGen3Ribbon::NationalChampion => "National Champion Ribbon",
+            DsGen3Ribbon::Country => "Country Ribbon",
+            DsGen3Ribbon::National => "National Ribbon",
+            DsGen3Ribbon::Earth => "Earth Ribbon",
+            DsGen3Ribbon::World => "World Ribbon",
         }
     }
 
     pub fn from_name(name: &str) -> Option<Self> {
         match name {
-            "Cool Ribbon" => Some(Gen3Ribbon::CoolHoenn),
-            "Cool Super Ribbon" => Some(Gen3Ribbon::CoolSuperHoenn),
-            "Cool Hyper Ribbon" => Some(Gen3Ribbon::CoolHyperHoenn),
-            "Cool Master Ribbon" => Some(Gen3Ribbon::CoolMasterHoenn),
-            "Beauty Ribbon" => Some(Gen3Ribbon::BeautyHoenn),
-            "Beauty Super Ribbon" => Some(Gen3Ribbon::BeautySuperHoenn),
-            "Beauty Hyper Ribbon" => Some(Gen3Ribbon::BeautyHyperHoenn),
-            "Beauty Master Ribbon" => Some(Gen3Ribbon::BeautyMasterHoenn),
-            "Cute Ribbon" => Some(Gen3Ribbon::CuteHoenn),
-            "Cute Super Ribbon" => Some(Gen3Ribbon::CuteSuperHoenn),
-            "Cute Hyper Ribbon" => Some(Gen3Ribbon::CuteHyperHoenn),
-            "Cute Master Ribbon" => Some(Gen3Ribbon::CuteMasterHoenn),
-            "Smart Ribbon" => Some(Gen3Ribbon::SmartHoenn),
-            "Smart Super Ribbon" => Some(Gen3Ribbon::SmartSuperHoenn),
-            "Smart Hyper Ribbon" => Some(Gen3Ribbon::SmartHyperHoenn),
-            "Smart Master Ribbon" => Some(Gen3Ribbon::SmartMasterHoenn),
-            "Tough Ribbon" => Some(Gen3Ribbon::ToughHoenn),
-            "Tough Super Ribbon" => Some(Gen3Ribbon::ToughSuperHoenn),
-            "Tough Hyper Ribbon" => Some(Gen3Ribbon::ToughHyperHoenn),
-            "Tough Master Ribbon" => Some(Gen3Ribbon::ToughMasterHoenn),
-            "Champion Ribbon" => Some(Gen3Ribbon::Champion),
-            "Winning Ribbon" => Some(Gen3Ribbon::Winning),
-            "Victory Ribbon" => Some(Gen3Ribbon::Victory),
-            "Artist Ribbon" => Some(Gen3Ribbon::Artist),
-            "Effort Ribbon" => Some(Gen3Ribbon::Effort),
-            "Battle Champion Ribbon" => Some(Gen3Ribbon::BattleChampion),
-            "Regional Champion Ribbon" => Some(Gen3Ribbon::RegionalChampion),
-            "National Champion Ribbon" => Some(Gen3Ribbon::NationalChampion),
-            "Country Ribbon" => Some(Gen3Ribbon::Country),
-            "National Ribbon" => Some(Gen3Ribbon::National),
-            "Earth Ribbon" => Some(Gen3Ribbon::Earth),
-            "World Ribbon" => Some(Gen3Ribbon::World),
+            "Cool Ribbon" => Some(DsGen3Ribbon::CoolHoenn),
+            "Cool Super Ribbon" => Some(DsGen3Ribbon::CoolSuperHoenn),
+            "Cool Hyper Ribbon" => Some(DsGen3Ribbon::CoolHyperHoenn),
+            "Cool Master Ribbon" => Some(DsGen3Ribbon::CoolMasterHoenn),
+            "Beauty Ribbon" => Some(DsGen3Ribbon::BeautyHoenn),
+            "Beauty Super Ribbon" => Some(DsGen3Ribbon::BeautySuperHoenn),
+            "Beauty Hyper Ribbon" => Some(DsGen3Ribbon::BeautyHyperHoenn),
+            "Beauty Master Ribbon" => Some(DsGen3Ribbon::BeautyMasterHoenn),
+            "Cute Ribbon" => Some(DsGen3Ribbon::CuteHoenn),
+            "Cute Super Ribbon" => Some(DsGen3Ribbon::CuteSuperHoenn),
+            "Cute Hyper Ribbon" => Some(DsGen3Ribbon::CuteHyperHoenn),
+            "Cute Master Ribbon" => Some(DsGen3Ribbon::CuteMasterHoenn),
+            "Smart Ribbon" => Some(DsGen3Ribbon::SmartHoenn),
+            "Smart Super Ribbon" => Some(DsGen3Ribbon::SmartSuperHoenn),
+            "Smart Hyper Ribbon" => Some(DsGen3Ribbon::SmartHyperHoenn),
+            "Smart Master Ribbon" => Some(DsGen3Ribbon::SmartMasterHoenn),
+            "Tough Ribbon" => Some(DsGen3Ribbon::ToughHoenn),
+            "Tough Super Ribbon" => Some(DsGen3Ribbon::ToughSuperHoenn),
+            "Tough Hyper Ribbon" => Some(DsGen3Ribbon::ToughHyperHoenn),
+            "Tough Master Ribbon" => Some(DsGen3Ribbon::ToughMasterHoenn),
+            "Champion Ribbon" => Some(DsGen3Ribbon::Champion),
+            "Winning Ribbon" => Some(DsGen3Ribbon::Winning),
+            "Victory Ribbon" => Some(DsGen3Ribbon::Victory),
+            "Artist Ribbon" => Some(DsGen3Ribbon::Artist),
+            "Effort Ribbon" => Some(DsGen3Ribbon::Effort),
+            "Battle Champion Ribbon" => Some(DsGen3Ribbon::BattleChampion),
+            "Regional Champion Ribbon" => Some(DsGen3Ribbon::RegionalChampion),
+            "National Champion Ribbon" => Some(DsGen3Ribbon::NationalChampion),
+            "Country Ribbon" => Some(DsGen3Ribbon::Country),
+            "National Ribbon" => Some(DsGen3Ribbon::National),
+            "Earth Ribbon" => Some(DsGen3Ribbon::Earth),
+            "World Ribbon" => Some(DsGen3Ribbon::World),
             _ => None,
         }
     }
 
-    const fn from_obsolete_if_present(obsolete: ObsoleteRibbon) -> Option<Gen3Ribbon> {
+    const fn from_obsolete_if_present(obsolete: ObsoleteRibbon) -> Option<DsGen3Ribbon> {
         match obsolete {
-            ObsoleteRibbon::CoolHoenn => Some(Gen3Ribbon::CoolHoenn),
-            ObsoleteRibbon::CoolSuperHoenn => Some(Gen3Ribbon::CoolSuperHoenn),
-            ObsoleteRibbon::CoolHyperHoenn => Some(Gen3Ribbon::CoolHyperHoenn),
-            ObsoleteRibbon::CoolMasterHoenn => Some(Gen3Ribbon::CoolMasterHoenn),
-            ObsoleteRibbon::BeautyHoenn => Some(Gen3Ribbon::BeautyHoenn),
-            ObsoleteRibbon::BeautySuperHoenn => Some(Gen3Ribbon::BeautySuperHoenn),
-            ObsoleteRibbon::BeautyHyperHoenn => Some(Gen3Ribbon::BeautyHyperHoenn),
-            ObsoleteRibbon::BeautyMasterHoenn => Some(Gen3Ribbon::BeautyMasterHoenn),
-            ObsoleteRibbon::CuteHoenn => Some(Gen3Ribbon::CuteHoenn),
-            ObsoleteRibbon::CuteSuperHoenn => Some(Gen3Ribbon::CuteSuperHoenn),
-            ObsoleteRibbon::CuteHyperHoenn => Some(Gen3Ribbon::CuteHyperHoenn),
-            ObsoleteRibbon::CuteMasterHoenn => Some(Gen3Ribbon::CuteMasterHoenn),
-            ObsoleteRibbon::SmartHoenn => Some(Gen3Ribbon::SmartHoenn),
-            ObsoleteRibbon::SmartSuperHoenn => Some(Gen3Ribbon::SmartSuperHoenn),
-            ObsoleteRibbon::SmartHyperHoenn => Some(Gen3Ribbon::SmartHyperHoenn),
-            ObsoleteRibbon::SmartMasterHoenn => Some(Gen3Ribbon::SmartMasterHoenn),
-            ObsoleteRibbon::ToughHoenn => Some(Gen3Ribbon::ToughHoenn),
-            ObsoleteRibbon::ToughSuperHoenn => Some(Gen3Ribbon::ToughSuperHoenn),
-            ObsoleteRibbon::ToughHyperHoenn => Some(Gen3Ribbon::ToughHyperHoenn),
-            ObsoleteRibbon::ToughMasterHoenn => Some(Gen3Ribbon::ToughMasterHoenn),
-            ObsoleteRibbon::Winning => Some(Gen3Ribbon::Winning),
-            ObsoleteRibbon::Victory => Some(Gen3Ribbon::Victory),
+            ObsoleteRibbon::CoolHoenn => Some(DsGen3Ribbon::CoolHoenn),
+            ObsoleteRibbon::CoolSuperHoenn => Some(DsGen3Ribbon::CoolSuperHoenn),
+            ObsoleteRibbon::CoolHyperHoenn => Some(DsGen3Ribbon::CoolHyperHoenn),
+            ObsoleteRibbon::CoolMasterHoenn => Some(DsGen3Ribbon::CoolMasterHoenn),
+            ObsoleteRibbon::BeautyHoenn => Some(DsGen3Ribbon::BeautyHoenn),
+            ObsoleteRibbon::BeautySuperHoenn => Some(DsGen3Ribbon::BeautySuperHoenn),
+            ObsoleteRibbon::BeautyHyperHoenn => Some(DsGen3Ribbon::BeautyHyperHoenn),
+            ObsoleteRibbon::BeautyMasterHoenn => Some(DsGen3Ribbon::BeautyMasterHoenn),
+            ObsoleteRibbon::CuteHoenn => Some(DsGen3Ribbon::CuteHoenn),
+            ObsoleteRibbon::CuteSuperHoenn => Some(DsGen3Ribbon::CuteSuperHoenn),
+            ObsoleteRibbon::CuteHyperHoenn => Some(DsGen3Ribbon::CuteHyperHoenn),
+            ObsoleteRibbon::CuteMasterHoenn => Some(DsGen3Ribbon::CuteMasterHoenn),
+            ObsoleteRibbon::SmartHoenn => Some(DsGen3Ribbon::SmartHoenn),
+            ObsoleteRibbon::SmartSuperHoenn => Some(DsGen3Ribbon::SmartSuperHoenn),
+            ObsoleteRibbon::SmartHyperHoenn => Some(DsGen3Ribbon::SmartHyperHoenn),
+            ObsoleteRibbon::SmartMasterHoenn => Some(DsGen3Ribbon::SmartMasterHoenn),
+            ObsoleteRibbon::ToughHoenn => Some(DsGen3Ribbon::ToughHoenn),
+            ObsoleteRibbon::ToughSuperHoenn => Some(DsGen3Ribbon::ToughSuperHoenn),
+            ObsoleteRibbon::ToughHyperHoenn => Some(DsGen3Ribbon::ToughHyperHoenn),
+            ObsoleteRibbon::ToughMasterHoenn => Some(DsGen3Ribbon::ToughMasterHoenn),
+            ObsoleteRibbon::Winning => Some(DsGen3Ribbon::Winning),
+            ObsoleteRibbon::Victory => Some(DsGen3Ribbon::Victory),
             _ => None,
         }
     }
 
-    const fn from_modern_if_present(modern: ModernRibbon) -> Option<Gen3Ribbon> {
+    const fn from_modern_if_present(modern: ModernRibbon) -> Option<DsGen3Ribbon> {
         match modern {
-            ModernRibbon::Gen3Champion => Some(Gen3Ribbon::Champion),
-            ModernRibbon::Effort => Some(Gen3Ribbon::Effort),
-            ModernRibbon::Artist => Some(Gen3Ribbon::Artist),
-            ModernRibbon::Country => Some(Gen3Ribbon::Country),
-            ModernRibbon::National => Some(Gen3Ribbon::National),
-            ModernRibbon::Earth => Some(Gen3Ribbon::Earth),
-            ModernRibbon::World => Some(Gen3Ribbon::World),
-            ModernRibbon::BattleChampion => Some(Gen3Ribbon::BattleChampion),
-            ModernRibbon::RegionalChampion => Some(Gen3Ribbon::RegionalChampion),
-            ModernRibbon::NationalChampion => Some(Gen3Ribbon::NationalChampion),
+            ModernRibbon::Gen3Champion => Some(DsGen3Ribbon::Champion),
+            ModernRibbon::Effort => Some(DsGen3Ribbon::Effort),
+            ModernRibbon::Artist => Some(DsGen3Ribbon::Artist),
+            ModernRibbon::Country => Some(DsGen3Ribbon::Country),
+            ModernRibbon::National => Some(DsGen3Ribbon::National),
+            ModernRibbon::Earth => Some(DsGen3Ribbon::Earth),
+            ModernRibbon::World => Some(DsGen3Ribbon::World),
+            ModernRibbon::BattleChampion => Some(DsGen3Ribbon::BattleChampion),
+            ModernRibbon::RegionalChampion => Some(DsGen3Ribbon::RegionalChampion),
+            ModernRibbon::NationalChampion => Some(DsGen3Ribbon::NationalChampion),
             _ => None,
         }
     }
 
     pub const fn to_openhome(self) -> OpenHomeRibbon {
         match self {
-            Gen3Ribbon::Champion => OpenHomeRibbon::Mod(ModernRibbon::Gen3Champion),
-            Gen3Ribbon::Effort => OpenHomeRibbon::Mod(ModernRibbon::Effort),
-            Gen3Ribbon::Artist => OpenHomeRibbon::Mod(ModernRibbon::Artist),
-            Gen3Ribbon::Country => OpenHomeRibbon::Mod(ModernRibbon::Country),
-            Gen3Ribbon::National => OpenHomeRibbon::Mod(ModernRibbon::National),
-            Gen3Ribbon::Earth => OpenHomeRibbon::Mod(ModernRibbon::Earth),
-            Gen3Ribbon::World => OpenHomeRibbon::Mod(ModernRibbon::World),
-            Gen3Ribbon::BattleChampion => OpenHomeRibbon::Mod(ModernRibbon::BattleChampion),
-            Gen3Ribbon::RegionalChampion => OpenHomeRibbon::Mod(ModernRibbon::RegionalChampion),
-            Gen3Ribbon::NationalChampion => OpenHomeRibbon::Mod(ModernRibbon::NationalChampion),
-            Gen3Ribbon::CoolHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CoolHoenn),
-            Gen3Ribbon::CoolSuperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CoolSuperHoenn),
-            Gen3Ribbon::CoolHyperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CoolHyperHoenn),
-            Gen3Ribbon::CoolMasterHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CoolMasterHoenn),
-            Gen3Ribbon::BeautyHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::BeautyHoenn),
-            Gen3Ribbon::BeautySuperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::BeautySuperHoenn),
-            Gen3Ribbon::BeautyHyperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::BeautyHyperHoenn),
-            Gen3Ribbon::BeautyMasterHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::BeautyMasterHoenn),
-            Gen3Ribbon::CuteHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CuteHoenn),
-            Gen3Ribbon::CuteSuperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CuteSuperHoenn),
-            Gen3Ribbon::CuteHyperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CuteHyperHoenn),
-            Gen3Ribbon::CuteMasterHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CuteMasterHoenn),
-            Gen3Ribbon::SmartHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::SmartHoenn),
-            Gen3Ribbon::SmartSuperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::SmartSuperHoenn),
-            Gen3Ribbon::SmartHyperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::SmartHyperHoenn),
-            Gen3Ribbon::SmartMasterHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::SmartMasterHoenn),
-            Gen3Ribbon::ToughHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::ToughHoenn),
-            Gen3Ribbon::ToughSuperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::ToughSuperHoenn),
-            Gen3Ribbon::ToughHyperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::ToughHyperHoenn),
-            Gen3Ribbon::ToughMasterHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::ToughMasterHoenn),
-            Gen3Ribbon::Winning => OpenHomeRibbon::Obs(ObsoleteRibbon::Winning),
-            Gen3Ribbon::Victory => OpenHomeRibbon::Obs(ObsoleteRibbon::Victory),
+            DsGen3Ribbon::Champion => OpenHomeRibbon::Mod(ModernRibbon::Gen3Champion),
+            DsGen3Ribbon::Effort => OpenHomeRibbon::Mod(ModernRibbon::Effort),
+            DsGen3Ribbon::Artist => OpenHomeRibbon::Mod(ModernRibbon::Artist),
+            DsGen3Ribbon::Country => OpenHomeRibbon::Mod(ModernRibbon::Country),
+            DsGen3Ribbon::National => OpenHomeRibbon::Mod(ModernRibbon::National),
+            DsGen3Ribbon::Earth => OpenHomeRibbon::Mod(ModernRibbon::Earth),
+            DsGen3Ribbon::World => OpenHomeRibbon::Mod(ModernRibbon::World),
+            DsGen3Ribbon::BattleChampion => OpenHomeRibbon::Mod(ModernRibbon::BattleChampion),
+            DsGen3Ribbon::RegionalChampion => OpenHomeRibbon::Mod(ModernRibbon::RegionalChampion),
+            DsGen3Ribbon::NationalChampion => OpenHomeRibbon::Mod(ModernRibbon::NationalChampion),
+            DsGen3Ribbon::CoolHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CoolHoenn),
+            DsGen3Ribbon::CoolSuperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CoolSuperHoenn),
+            DsGen3Ribbon::CoolHyperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CoolHyperHoenn),
+            DsGen3Ribbon::CoolMasterHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CoolMasterHoenn),
+            DsGen3Ribbon::BeautyHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::BeautyHoenn),
+            DsGen3Ribbon::BeautySuperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::BeautySuperHoenn),
+            DsGen3Ribbon::BeautyHyperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::BeautyHyperHoenn),
+            DsGen3Ribbon::BeautyMasterHoenn => {
+                OpenHomeRibbon::Obs(ObsoleteRibbon::BeautyMasterHoenn)
+            }
+            DsGen3Ribbon::CuteHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CuteHoenn),
+            DsGen3Ribbon::CuteSuperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CuteSuperHoenn),
+            DsGen3Ribbon::CuteHyperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CuteHyperHoenn),
+            DsGen3Ribbon::CuteMasterHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::CuteMasterHoenn),
+            DsGen3Ribbon::SmartHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::SmartHoenn),
+            DsGen3Ribbon::SmartSuperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::SmartSuperHoenn),
+            DsGen3Ribbon::SmartHyperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::SmartHyperHoenn),
+            DsGen3Ribbon::SmartMasterHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::SmartMasterHoenn),
+            DsGen3Ribbon::ToughHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::ToughHoenn),
+            DsGen3Ribbon::ToughSuperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::ToughSuperHoenn),
+            DsGen3Ribbon::ToughHyperHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::ToughHyperHoenn),
+            DsGen3Ribbon::ToughMasterHoenn => OpenHomeRibbon::Obs(ObsoleteRibbon::ToughMasterHoenn),
+            DsGen3Ribbon::Winning => OpenHomeRibbon::Obs(ObsoleteRibbon::Winning),
+            DsGen3Ribbon::Victory => OpenHomeRibbon::Obs(ObsoleteRibbon::Victory),
         }
     }
 }
 
-impl Display for DsGen3RibbonSet {
+impl Display for DsGen3Ribbon {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.get_name())
     }
 }
 
-impl FromIterator<Gen3Ribbon> for DsGen3RibbonSet {
-    fn from_iter<T: IntoIterator<Item = Gen3Ribbon>>(iter: T) -> Self {
+impl FromIterator<DsGen3Ribbon> for DsGen3RibbonSet {
+    fn from_iter<T: IntoIterator<Item = DsGen3Ribbon>>(iter: T) -> Self {
         Self::default().with_ribbons(iter.into_iter().collect())
     }
 }
@@ -723,7 +723,7 @@ impl Display for Gen4ContestRibbon {
 
 #[derive(Debug, Clone, Copy, Serialize)]
 pub enum DsRibbon {
-    Gen3(Gen3Ribbon),
+    Gen3(DsGen3Ribbon),
     Gen4S(Gen4StandardRibbon),
     Gen4C(Gen4ContestRibbon),
 }
@@ -774,8 +774,8 @@ impl DsRibbonSet {
             gen3: openhome_set
                 .into_iter()
                 .filter_map(|ribbon| match ribbon {
-                    OpenHomeRibbon::Mod(ribbon) => Gen3Ribbon::from_modern_if_present(ribbon),
-                    OpenHomeRibbon::Obs(ribbon) => Gen3Ribbon::from_obsolete_if_present(ribbon),
+                    OpenHomeRibbon::Mod(ribbon) => DsGen3Ribbon::from_modern_if_present(ribbon),
+                    OpenHomeRibbon::Obs(ribbon) => DsGen3Ribbon::from_obsolete_if_present(ribbon),
                 })
                 .collect(),
             gen4_standard: openhome_set
@@ -839,7 +839,7 @@ impl DsRibbonSet {
         }
     }
 
-    pub fn set_gen3_ribbons(&mut self, ribbons: Vec<Gen3Ribbon>) {
+    pub fn set_gen3_ribbons(&mut self, ribbons: Vec<DsGen3Ribbon>) {
         self.gen3.set_ribbons(ribbons);
     }
 
@@ -851,7 +851,7 @@ impl DsRibbonSet {
         self.gen4_contest.set_ribbons(ribbons);
     }
 
-    pub fn get_gen3(&self) -> Vec<Gen3Ribbon> {
+    pub fn get_gen3(&self) -> Vec<DsGen3Ribbon> {
         self.gen3.get_ribbons()
     }
 

@@ -1,4 +1,4 @@
-use crate::pkm::location::{Location, PAL_PARK_GEN_4};
+use super::{Location, PAL_PARK_GEN_4};
 
 pub const fn index_of(location: Location) -> Option<u16> {
     match location {

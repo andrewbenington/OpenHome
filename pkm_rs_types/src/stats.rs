@@ -146,7 +146,7 @@ impl Stats8 {
         }
     }
 
-    pub fn get(&self, stat: Stat) -> u8 {
+    pub const fn get(&self, stat: Stat) -> u8 {
         match stat {
             Stat::Hp => self.hp,
             Stat::Atk => self.atk,
@@ -157,7 +157,7 @@ impl Stats8 {
         }
     }
 
-    pub fn set(&mut self, stat: Stat, value: u8) {
+    pub const fn set(&mut self, stat: Stat, value: u8) {
         match stat {
             Stat::Hp => self.hp = value,
             Stat::Atk => self.atk = value,
@@ -279,6 +279,18 @@ impl Stats16Le {
     #[allow(clippy::missing_const_for_fn)]
     pub fn rust_type_name(&self) -> bool {
         true
+    }
+}
+impl From<Stats8> for Stats16Le {
+    fn from(stats8: Stats8) -> Self {
+        Stats16Le {
+            hp: stats8.hp as u16,
+            atk: stats8.atk as u16,
+            def: stats8.def as u16,
+            spa: stats8.spa as u16,
+            spd: stats8.spd as u16,
+            spe: stats8.spe as u16,
+        }
     }
 }
 

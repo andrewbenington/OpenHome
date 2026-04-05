@@ -71,7 +71,7 @@ export default class PA9 {
   statusCondition: number
   handlerName: string
   handlerGender: boolean
-  handlerLanguage: Language
+  handlerLanguage?: Language
   isCurrentHandler: boolean
   handlerID: number
   handlerFriendship: number
@@ -370,7 +370,7 @@ export default class PA9 {
     dataView.setUint32(0x90, this.statusCondition, true)
     stringLogic.writeUTF16StringToBytes(dataView, this.handlerName, 0xa8, 12)
     byteLogic.setFlag(dataView, 0xc2, 0, this.handlerGender)
-    dataView.setUint8(0xc3, this.handlerLanguage)
+    dataView.setUint8(0xc3, this.handlerLanguage ?? 0)
     byteLogic.setFlag(dataView, 0xc4, 0, this.isCurrentHandler)
     dataView.setUint16(0xc6, this.handlerID, true)
     dataView.setUint8(0xc8, this.handlerFriendship)

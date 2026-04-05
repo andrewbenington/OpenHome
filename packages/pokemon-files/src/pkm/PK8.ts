@@ -70,7 +70,7 @@ export default class PK8 {
   palma: number
   handlerName: string
   handlerGender: boolean
-  handlerLanguage: Language
+  handlerLanguage?: Language
   handlerID: number
   handlerFriendship: number
   fullness: number
@@ -363,7 +363,7 @@ export default class PK8 {
     dataView.setUint32(0x98, this.palma, true)
     stringLogic.writeUTF16StringToBytes(dataView, this.handlerName, 0xa8, 12)
     byteLogic.setFlag(dataView, 0xc2, 0, this.handlerGender)
-    dataView.setUint8(0xc3, this.handlerLanguage)
+    dataView.setUint8(0xc3, this.handlerLanguage ?? 0)
     dataView.setUint16(0xc6, this.handlerID, true)
     dataView.setUint8(0xc8, this.handlerFriendship)
     dataView.setUint8(0xdc, this.fullness)
