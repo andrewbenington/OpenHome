@@ -12,7 +12,7 @@ const SAVE_SIZE_BYTES = 0x6be00
 export class SunMoonSaveWasm extends OfficialSAV<Pk7Rust> {
   static pkmType = Pk7Rust
   static saveTypeAbbreviation = 'SM/USUM WASM'
-  static saveTypeID = 'G7SAV WASM'
+  static saveTypeID = 'SM/USUM WASM'
 
   inner: SunMoonSave
 

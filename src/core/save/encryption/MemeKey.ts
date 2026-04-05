@@ -136,6 +136,18 @@ export class MemeKey {
 
     return bigIntToBytesBE(result)
   }
+
+  public getModU16() {
+    return this.mod.toString(16)
+  }
+
+  public getPrivateKeyU16() {
+    return this.privateKey.toString(16)
+  }
+
+  public getPublicKeyU16() {
+    return this.publicKey.toString(16)
+  }
 }
 
 export const pokedexAndSaveFileMemeKey = new Uint8Array([

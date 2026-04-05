@@ -18,6 +18,25 @@ use std::io::Read;
 use std::ops::RangeInclusive;
 #[cfg(test)]
 use std::path::Path;
+
+#[cfg(test)]
+pub fn save_bytes_from_file(filename: &Path) -> crate::result::Result<Vec<u8>> {
+    let mut filename = filename.to_path_buf();
+
+    if !filename.starts_with(Path::new("test-files").join("save-files")) {
+        filename = Path::new("test-files").join("save-files").join(&filename);
+    }
+
+    let mut file = File::open(filename).map_err(|e| Error::other(&e.to_string()))?;
+
+    let mut contents = Vec::new();
+    file.read_to_end(&mut contents)
+        .map_err(|e| e.to_string())
+        .unwrap();
+
+    Ok(contents)
+}
+
 #[cfg(test)]
 pub fn pkm_from_file<PKM: Pkm>(filename: &Path) -> crate::result::Result<(PKM, Vec<u8>)> {
     let mut filename = filename.to_path_buf();

@@ -1,5 +1,8 @@
 use std::ops::Range;
 
+use num::{BigInt, bigint::Sign};
+use sha2::{Digest, Sha256};
+
 use crate::result::{Error, Result};
 
 const ENCRYPTION_OFFSET: usize = 8;
@@ -318,27 +321,128 @@ pub enum MemeCryptoVariant {
 }
 
 #[cfg(feature = "wasm")]
+impl MemeCryptoVariant {
+    pub fn checksum_signature_length(&self) -> usize {
+        match self {
+            Self::SunMoon => 0x140,
+            Self::UltraSunUltraMoon => 0x150,
+        }
+    }
+
+    pub fn meme_crypto_offset(&self) -> usize {
+        match self {
+            Self::SunMoon => 0x6ba00,
+            Self::UltraSunUltraMoon => 0x6c000,
+        }
+    }
+}
+
+#[cfg(feature = "wasm")]
 const SIZE_SM: usize = 0x6be00;
 #[cfg(feature = "wasm")]
 const SIZE_USUM: usize = 0x6cc00;
 #[cfg(feature = "wasm")]
 const MEME_SIG_LENGTH: usize = 0x80;
 
-// pub fn sign_with_meme_crypto(bytes: &[u8], variant: MemeCryptoVariant) -> Vec<u8> {
+#[cfg(feature = "wasm")]
+pub fn sign_with_meme_crypto(bytes: &mut [u8], variant: MemeCryptoVariant) -> Vec<u8> {
+    let out_bytes: &mut [u8] = &mut bytes.to_vec();
+    let checksum_table_offset = bytes.len() - 0x200;
+    let checksum_signature_len = variant.checksum_signature_length();
+    let meme_crypto_offset = variant.meme_crypto_offset();
+
+    let signature_span = &mut out_bytes[meme_crypto_offset..meme_crypto_offset + MEME_SIG_LENGTH];
+    let checksum_block_span =
+        &bytes[checksum_table_offset..checksum_table_offset + checksum_signature_len];
+
+    let hash = Sha256::digest(checksum_block_span);
+    signature_span[0..32].copy_from_slice(&hash);
+
+    todo!()
+}
+
+// fn sign_meme_data_in_place(bytes: &mut [u8]) {
 //     let checksum_table_offset = bytes.len() - 0x200;
-//     let checksum_signature_len: usize = match variant {
-//         MemeCryptoVariant::SunMoon => 0x140,
-//         MemeCryptoVariant::UltraSunUltraMoon => 0x150,
-//     };
+//     let checksum_signature_len = variant.checksum_signature_length();
+//     let meme_crypto_offset = variant.meme_crypto_offset();
 
-//     let meme_crypto_offset: usize = match variant {
-//         MemeCryptoVariant::SunMoon => 0x6ba00,
-//         MemeCryptoVariant::UltraSunUltraMoon => 0x6c000,
-//     };
-
-//     let signature_span = &bytes[meme_crypto_offset..meme_crypto_offset + MEME_SIG_LENGTH];
+//     let signature_span = &mut bytes[meme_crypto_offset..meme_crypto_offset + MEME_SIG_LENGTH];
 //     let checksum_block_span =
 //         &bytes[checksum_table_offset..checksum_table_offset + checksum_signature_len];
 
-//     let hash = Sha256::digest();
+//     let hash = Sha256::digest(checksum_block_span);
+//     signature_span[0..32].copy_from_slice(&hash);
 // }
+
+const SIGNING_KEY: [u8; 97] = [
+    0x00, 0x77, 0x54, 0x55, 0x66, 0x8f, 0xff, 0x3c, 0xba, 0x30, 0x26, 0xc2, 0xd0, 0xb2, 0x6b, 0x80,
+    0x85, 0x89, 0x59, 0x58, 0x34, 0x11, 0x57, 0xae, 0xb0, 0x3b, 0x6b, 0x04, 0x95, 0xee, 0x57, 0x80,
+    0x3e, 0x21, 0x86, 0xeb, 0x6c, 0xb2, 0xeb, 0x62, 0xa7, 0x1d, 0xf1, 0x8a, 0x3c, 0x9c, 0x65, 0x79,
+    0x07, 0x76, 0x70, 0x96, 0x1b, 0x3a, 0x61, 0x02, 0xda, 0xbe, 0x5a, 0x19, 0x4a, 0xb5, 0x8c, 0x32,
+    0x50, 0xae, 0xd5, 0x97, 0xfc, 0x78, 0x97, 0x8a, 0x32, 0x6d, 0xb1, 0xd7, 0xb2, 0x8d, 0xcc, 0xcb,
+    0x2a, 0x3e, 0x01, 0x4e, 0xdb, 0xd3, 0x97, 0xad, 0x33, 0xb8, 0xf2, 0x8c, 0xd5, 0x25, 0x05, 0x42,
+    0x51,
+];
+
+const SIGNING_KEY_RAW: &'static [u8; 192] = b"775455668fff3cba3026c2d0b26b8085895958341157aeb03b6b0495ee57803e2186eb6cb2eb62a71df18a3c9c6579077670961b3a6102dabe5a194ab58c3250aed597fc78978a326db1d7b28dcccb2a3e014edbd397ad33b8f28cd525054251";
+
+pub struct MemeKey<'a> {
+    der: &'a [u8],
+    private_key: BigInt,
+    public_key: BigInt,
+    modulo: BigInt,
+}
+
+impl<'a> MemeKey<'a> {
+    pub fn new(der: &'a [u8]) -> Self {
+        // This is really just a placeholder until I implement actual signing with the MEME private key. The values here are not correct and are just meant to allow the signing function to run without panicking due to invalid keys.
+        Self {
+            der,
+            private_key: BigInt::from_bytes_be(Sign::Plus, &SIGNING_KEY),
+            public_key: BigInt::from_bytes_be(Sign::Plus, &der[0x7b..0x7e]),
+            modulo: BigInt::from_bytes_be(Sign::Plus, &der[0x18..0x79]),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+
+    use super::*;
+    use crate::tests::save_bytes_from_file;
+
+    #[test]
+    fn memekey_private_is_accurate() -> Result<()> {
+        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
+
+        let private = MemeKey::new(&moon_bytes).private_key;
+        assert_eq!(
+            private.to_str_radix(16),
+            "775455668fff3cba3026c2d0b26b8085895958341157aeb03b6b0495ee57803e2186eb6cb2eb62a71df18a3c9c6579077670961b3a6102dabe5a194ab58c3250aed597fc78978a326db1d7b28dcccb2a3e014edbd397ad33b8f28cd525054251"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn memekey_public_is_accurate() -> Result<()> {
+        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
+
+        let public = MemeKey::new(&moon_bytes).public_key;
+        assert_eq!(public.to_str_radix(16), "5224");
+        Ok(())
+    }
+
+    #[test]
+    fn memekey_modulo_is_accurate() -> Result<()> {
+        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
+
+        let modulo = MemeKey::new(&moon_bytes).modulo;
+        assert_eq!(
+            modulo.to_str_radix(16),
+            "d9040000fb0400000e28000008280000de0400003b060000da0400005ec800000628000056130000f50400001e060000ee0400004e5b01005b14000007300000f304000057070000c0060000f90400000f2800005918000053200000ef04000028"
+        );
+        Ok(())
+    }
+}
