@@ -6,8 +6,8 @@ use super::v2_sections::{
 use crate::ohpkm::OhpkmConvert;
 use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::v1::OhpkmV1;
-use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
-use crate::ohpkm::v2_sections::{MonTag, MonTags, pkm_bytes};
+use crate::ohpkm::v2_sections::MonTags;
+use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, UnconvertedPkm};
 use crate::result::{Error, Result};
 use crate::traits::{HasSpeciesAndForme, IsShiny, PkmBytes};
 
@@ -39,6 +39,10 @@ use pkm_rs_types::randomize::Randomize;
 
 #[cfg(feature = "wasm")]
 use super::JsResult;
+#[cfg(feature = "wasm")]
+use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
+#[cfg(feature = "wasm")]
+use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 #[cfg(feature = "wasm")]

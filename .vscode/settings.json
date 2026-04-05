@@ -54,8 +54,6 @@
   ],
   "editor.inlayHints.enabled": "off",
   "editor.tabSize": 2,
-  // "rust-analyzer.cargo.features": ["wasm", "pkm_rs/randomize"],
-  // "rust-analyzer.cargo.features": ["pkm_rs/randomize"],
   "rust-analyzer.cargo.features": ["pkm_rs/wasm"],
   "css.completion.completePropertyWithSemicolon": false,
   "rust-analyzer.cargo.targetDir": true,
