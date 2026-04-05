@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::error::Result;
 use crate::storage;
-use pkm_rs::pkm::convert_strategy::ConvertStrategy;
+use pkm_rs::convert_strategy::ConvertStrategy;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

@@ -1,4 +1,4 @@
-import { ConvertStrategy, OriginGame, SunMoonSave } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, OriginGame, SunMoonSave } from '@pkm-rs/pkg'
 import Pk7Rust from '../../../packages/pokemon-files/src/pkm/PK7'
 import { Item } from '../../../packages/pokemon-resources/src/consts/Items'
 import { SM_TRANSFER_RESTRICTIONS } from '../../../packages/pokemon-resources/src/consts/TransferRestrictions'
@@ -96,7 +96,8 @@ export class SunMoonSaveWasm extends OfficialSAV<Pk7Rust> {
     return Pk7Rust.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    if (extraFormIndex !== undefined) return false
     return !isRestricted(SM_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   }
 
