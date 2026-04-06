@@ -15,6 +15,9 @@ use crate::util;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "wasm")]
+use crate::encryption::MemeCrypto;
+
 const SM_TRAINER_DATA_OFFSET: usize = 0x1200;
 const TRAINER_DATA_SIZE: usize = 0xc0;
 const SM_BOX_DATA_OFFSET: usize = 0x04e00;
@@ -28,6 +31,8 @@ const BOX_COLS: usize = 5;
 const BOX_SLOTS: usize = BOX_ROWS * BOX_COLS;
 
 const SM_SIZE_BYTES: usize = 0x6be00;
+#[cfg(feature = "wasm")]
+const SM_PC_CHECKSUM_OFFSET: usize = SM_SIZE_BYTES - 0x200 + 0x14 + (14 * 8) + 6;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Serialize, Debug)]
@@ -53,11 +58,16 @@ impl SunMoonSave {
         })
     }
 
-    pub fn to_bytes(&self) -> Vec<u8> {
+    #[cfg(feature = "wasm")]
+    pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
         let mut bytes = self.bytes.clone();
-        let trainer_bytes = self.trainer.to_bytes();
-        bytes[SM_TRAINER_DATA_OFFSET..SM_TRAINER_DATA_OFFSET + TRAINER_DATA_SIZE]
-            .copy_from_slice(&trainer_bytes);
+        // let trainer_bytes = self.trainer.to_bytes();
+        // bytes[SM_TRAINER_DATA_OFFSET..SM_TRAINER_DATA_OFFSET + TRAINER_DATA_SIZE]
+        //     .copy_from_slice(&trainer_bytes);
+
+        bytes[SM_PC_CHECKSUM_OFFSET..SM_PC_CHECKSUM_OFFSET + 2]
+            .copy_from_slice(&self.calc_checksum().to_le_bytes());
+        MemeCrypto::SunMoon.sign_in_place(&mut bytes);
 
         bytes
     }
@@ -80,6 +90,7 @@ impl SaveData for SunMoonSave {
         let decrypted_bytes = self.get_decrypted_mon_bytes(box_num, offset)?;
         let national_dex = read_u16_le!(decrypted_bytes, 8);
 
+        println!("national dex: {national_dex}");
         if national_dex == 0 {
             return Ok(None);
         }
@@ -195,6 +206,11 @@ impl SunMoonSave {
     pub fn game_of_origin(&self) -> OriginGame {
         OriginGame::from(self.trainer.game_code)
     }
+
+    #[wasm_bindgen(js_name = prepareBytesForSaving)]
+    pub fn prepare_bytes_for_saving_wasm(&self) -> Vec<u8> {
+        self.prepare_bytes_for_saving()
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -219,15 +235,15 @@ impl TrainerDataGen7Alola {
         }
     }
 
-    fn to_bytes(self) -> [u8; TRAINER_DATA_SIZE] {
-        let mut bytes = [0u8; TRAINER_DATA_SIZE];
-        bytes[0..2].copy_from_slice(&self.trainer_id.to_le_bytes());
-        bytes[2..4].copy_from_slice(&self.secret_id.to_le_bytes());
-        bytes[4] = self.game_code;
-        util::set_flag(&mut bytes, 5, 0, self.trainer_gender);
-        bytes[56..80].copy_from_slice(&self.trainer_name.bytes());
-        bytes
-    }
+    // fn to_bytes(self) -> [u8; TRAINER_DATA_SIZE] {
+    //     let mut bytes = [0u8; TRAINER_DATA_SIZE];
+    //     bytes[0..2].copy_from_slice(&self.trainer_id.to_le_bytes());
+    //     bytes[2..4].copy_from_slice(&self.secret_id.to_le_bytes());
+    //     bytes[4] = self.game_code;
+    //     util::set_flag(&mut bytes, 5, 0, self.trainer_gender);
+    //     bytes[56..80].copy_from_slice(&self.trainer_name.bytes());
+    //     bytes
+    // }
 }
 
 #[cfg(feature = "wasm")]
@@ -346,5 +362,44 @@ impl encryption::Crc16CcittInvertChecksum for UltraSunMoonSave {
 
     fn get_bytes(&self) -> &[u8] {
         &self.bytes
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+
+    use crate::result::Result;
+    use crate::tests::save_bytes_from_file;
+
+    use super::*;
+
+    #[test]
+    fn test_sm_encryption() -> std::result::Result<(), Box<dyn std::error::Error>> {
+        use crate::checksum::{ChecksumAlgorithm, ChecksumU16Le};
+
+        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
+        let save = SunMoonSave::from_bytes(&moon_bytes)?;
+        assert_eq!(save.calc_checksum(), 0xb28d);
+
+        let after_serialized_bytes = save.prepare_bytes_for_saving();
+        let reserialized = SunMoonSave::from_bytes(&after_serialized_bytes)?;
+        assert_eq!(reserialized.calc_checksum(), 0xb28d);
+
+        assert_eq!(
+            ChecksumU16Le::calc_over_bytes(&after_serialized_bytes),
+            0x3065
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn sm_save_calculate_checksum() -> Result<()> {
+        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
+        let save = SunMoonSave::from_bytes(&moon_bytes)?;
+
+        assert_eq!(save.calc_checksum(), 0xb28d);
+        Ok(())
     }
 }

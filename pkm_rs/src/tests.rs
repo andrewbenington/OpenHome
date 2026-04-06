@@ -54,10 +54,6 @@ pub fn pkm_from_file<PKM: Pkm>(filename: &Path) -> crate::result::Result<(PKM, V
 
     let pkm = PKM::from_bytes(&contents)?;
 
-    // match toml::to_string(&pkm) {
-    //     Ok(text) => println!("{text}"),
-    //     Err(e) => println!("{e}"),
-    // }
     Ok((pkm, contents))
 }
 
@@ -129,7 +125,7 @@ pub fn to_from_ohpkm_all_in_dir<PKM: OhpkmConvert>(dir: &Path) -> TestResult<()>
 }
 
 #[cfg(test)]
-fn ensure_ranges_match(actual: &[u8], expected: &[u8]) -> TestResult<()> {
+pub fn ensure_ranges_match(actual: &[u8], expected: &[u8]) -> TestResult<()> {
     let differences = find_differing_ranges(actual, expected);
 
     match differences {
@@ -281,8 +277,6 @@ pub fn compare_pkhex_json<PKM: Pkm>(pkm_path: &Path) -> TestResult<()> {
     let pkm_rs_json = serde_json::to_string_pretty(&mon)
         .map_err(|e| TestError::PkmRs(Error::other(&e.to_string())))?;
 
-    // println!("pkm_rs JSON:\n{pkm_rs_json}");
-
     let mut json_path = Path::new("pkhex-json").join(pkm_path);
     json_path.set_extension("json");
     let mut file = File::open(json_path)
@@ -301,11 +295,8 @@ pub fn compare_pkhex_json<PKM: Pkm>(pkm_path: &Path) -> TestResult<()> {
     ) {
         println!("Full pkhex JSON:\n{pkhex_json}");
         println!("Full pkm_rs JSON:\n{pkm_rs_json}");
-        // assert_json_include!(actual: pkm_rs_value, expected: pkhex_value);
         return Err(Error::other(&format!("JSON mismatch: {e}")).into());
     }
-
-    // println!("Golden JSON:\n{file_json}");
 
     Ok(())
 }
@@ -387,6 +378,17 @@ impl Debug for DiffError {
             "{}",
             format_byte_range_differences(&self.differences, &self.actual, &self.expected)
         )
+    }
+}
+
+impl std::error::Error for TestError {}
+
+impl Display for TestError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TestError::PkmRs(e) => write!(f, "PkmRs error: {e}"),
+            TestError::Diff(e) => write!(f, "{e:?}"),
+        }
     }
 }
 

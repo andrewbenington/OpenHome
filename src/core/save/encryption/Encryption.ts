@@ -324,13 +324,11 @@ export const SignMemeDataInPlace = (data: Uint8Array) => {
   data.set(digest.subarray(0, 8), data.length - 8)
 
   const aesEncrypted = key.AesEncrypt(data)
-  console.log('aesEncrypted: ', bytesBeHexString(aesEncrypted))
   const sigBuffer = aesEncrypted.slice(aesEncrypted.length - SIGNATURE_LENGTH)
 
   sigBuffer[0] &= 0x7f
 
   const rsaEncrypted = key.RSAPrivate(sigBuffer)
-
   const signedData = new Uint8Array(data.length)
 
   signedData.set(data.slice(0, data.length - SIGNATURE_LENGTH), 0)
@@ -416,7 +414,4 @@ function uint8ArrayToWordArray(u8arr: Uint8Array) {
     words.push((u8arr[i] << 24) | (u8arr[i + 1] << 16) | (u8arr[i + 2] << 8) | u8arr[i + 3])
   }
   return cryptolib.WordArray.create(words, u8arr.length)
-}
-function bytesBeHexString(aesEncrypted: Uint8Array<ArrayBuffer>): any {
-  throw new Error('Function not implemented.')
 }
