@@ -322,13 +322,13 @@ pub trait Crc16CcittInvertChecksum {
 }
 
 #[cfg(feature = "wasm")]
-pub enum MemeCryptoVariant {
+pub enum MemeCrypto {
     SunMoon,
     UltraSunUltraMoon,
 }
 
 #[cfg(feature = "wasm")]
-impl MemeCryptoVariant {
+impl MemeCrypto {
     pub const fn checksum_signature_length(&self) -> usize {
         match self {
             Self::SunMoon => 0x140,
@@ -342,6 +342,26 @@ impl MemeCryptoVariant {
             Self::UltraSunUltraMoon => 0x6c000,
         }
     }
+
+    #[cfg(feature = "wasm")]
+    pub fn sign(&self, bytes: &mut [u8]) -> Vec<u8> {
+        use sha2::Digest;
+
+        let out_bytes: &mut [u8] = &mut bytes.to_vec();
+        let checksum_table_offset = bytes.len() - 0x200;
+        let checksum_signature_len = self.checksum_signature_length();
+        let meme_crypto_offset = self.meme_crypto_offset();
+
+        let signature_span =
+            &mut out_bytes[meme_crypto_offset..meme_crypto_offset + MEME_SIG_LENGTH];
+        let checksum_block_span =
+            &bytes[checksum_table_offset..checksum_table_offset + checksum_signature_len];
+
+        let hash = Sha256::digest(checksum_block_span);
+        signature_span[0..32].copy_from_slice(&hash);
+
+        todo!()
+    }
 }
 
 #[cfg(feature = "wasm")]
@@ -352,7 +372,7 @@ const SIZE_USUM: usize = 0x6cc00;
 const MEME_SIG_LENGTH: usize = 0x80;
 
 #[cfg(feature = "wasm")]
-pub fn sign_with_meme_crypto(bytes: &mut [u8], variant: MemeCryptoVariant) -> Vec<u8> {
+pub fn sign_with_meme_crypto(bytes: &mut [u8], variant: MemeCrypto) -> Vec<u8> {
     use sha2::Digest;
 
     let out_bytes: &mut [u8] = &mut bytes.to_vec();
@@ -370,18 +390,16 @@ pub fn sign_with_meme_crypto(bytes: &mut [u8], variant: MemeCryptoVariant) -> Ve
     todo!()
 }
 
-// fn sign_meme_data_in_place(bytes: &mut [u8]) {
-//     let checksum_table_offset = bytes.len() - 0x200;
-//     let checksum_signature_len = variant.checksum_signature_length();
-//     let meme_crypto_offset = variant.meme_crypto_offset();
+fn sign_meme_data_in_place(bytes: &mut [u8]) {
+    let signature_offset = bytes.len() - 8;
+    let payload = &bytes[0..signature_offset];
 
-//     let signature_span = &mut bytes[meme_crypto_offset..meme_crypto_offset + MEME_SIG_LENGTH];
-//     let checksum_block_span =
-//         &bytes[checksum_table_offset..checksum_table_offset + checksum_signature_len];
+    let digest = Sha1::digest(payload);
+    bytes[signature_offset..].copy_from_slice(&digest);
 
-//     let hash = Sha256::digest(checksum_block_span);
-//     signature_span[0..32].copy_from_slice(&hash);
-// }
+    let key = MemeKey::pokedex_and_save_file();
+    key.aes_encrypt(bytes);
+}
 
 const POKEDEX_AND_SAVE_FILE_MEME_KEY: [u8; 126] = [
     0x30, 0x7c, 0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05,
@@ -416,13 +434,16 @@ pub struct MemeKey<'a> {
 
 impl<'a> MemeKey<'a> {
     pub fn new(der: &'a [u8]) -> Self {
-        // This is really just a placeholder until I implement actual signing with the MEME private key. The values here are not correct and are just meant to allow the signing function to run without panicking due to invalid keys.
         Self {
             der,
             private_key: BigInt::from_bytes_be(Sign::Plus, &SIGNING_KEY),
             public_key: BigInt::from_bytes_be(Sign::Plus, &der[0x7b..0x7e]),
             modulo: BigInt::from_bytes_be(Sign::Plus, &der[0x18..0x79]),
         }
+    }
+
+    pub fn pokedex_and_save_file() -> Self {
+        Self::new(&POKEDEX_AND_SAVE_FILE_MEME_KEY)
     }
 
     pub fn aes_encrypt(&self, data: &mut [u8]) {
@@ -603,9 +624,8 @@ mod tests {
     }
 
     #[test]
-    fn aes_encrypt_check_first_100() -> Result<()> {
+    fn expected_memekey_encrypt_moon_save() -> Result<()> {
         let mut moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
-
         MemeKey::new(&POKEDEX_AND_SAVE_FILE_MEME_KEY).aes_encrypt(&mut moon_bytes);
 
         let moon_bigint = BigInt::from_bytes_be(Sign::Plus, &moon_bytes[0..100]);

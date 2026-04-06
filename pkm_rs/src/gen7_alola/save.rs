@@ -58,6 +58,7 @@ impl SunMoonSave {
         let trainer_bytes = self.trainer.to_bytes();
         bytes[SM_TRAINER_DATA_OFFSET..SM_TRAINER_DATA_OFFSET + TRAINER_DATA_SIZE]
             .copy_from_slice(&trainer_bytes);
+
         bytes
     }
 }

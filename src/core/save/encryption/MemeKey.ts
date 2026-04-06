@@ -206,7 +206,7 @@ function truncByte(val: number): number {
   return val & 0xff
 }
 
-function bytesToBigIntBE(bytes: Uint8Array) {
+export function bytesToBigIntBE(bytes: Uint8Array) {
   let result = 0n
 
   for (const byte of bytes) {
@@ -214,6 +214,16 @@ function bytesToBigIntBE(bytes: Uint8Array) {
   }
   return result
 }
+
+export function bytesBeHexString(bytes: Uint8Array) {
+  let result = 0n
+
+  for (const byte of bytes) {
+    result = (result << 8n) | BigInt(byte)
+  }
+  return result.toString(16)
+}
+
 function bigIntToBytesBE(value: bigint): Uint8Array {
   // Calculate the number of bytes needed to represent the bigint
   const byteLength = (value.toString(2).length + 7) >> 3 // Equivalent to Math.ceil(value.toString(2).length / 8)
