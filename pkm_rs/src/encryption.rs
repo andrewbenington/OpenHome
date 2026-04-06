@@ -1,7 +1,14 @@
 use std::ops::Range;
 
-use num::{BigInt, bigint::Sign};
-use sha2::{Digest, Sha256};
+use aes::{
+    Aes128,
+    cipher::{BlockEncrypt, KeyInit, generic_array::GenericArray},
+};
+use num::{BigInt, bigint::Sign, traits::sign};
+use sha1::{Digest as Sha1Digest, Sha1};
+
+#[cfg(feature = "wasm")]
+use sha2::Sha256;
 
 use crate::result::{Error, Result};
 
@@ -307,7 +314,7 @@ pub trait Crc16CcittInvertChecksum {
     const RANGE_START: usize;
     const RANGE_SIZE: usize;
 
-    fn get_bytes<'a>(&'a self) -> &'a [u8];
+    fn get_bytes(&self) -> &[u8];
 
     fn calc_checksum(&self) -> u16 {
         crc16_ccitt_invert(self.get_bytes(), Self::RANGE_START, Self::RANGE_SIZE)
@@ -322,14 +329,14 @@ pub enum MemeCryptoVariant {
 
 #[cfg(feature = "wasm")]
 impl MemeCryptoVariant {
-    pub fn checksum_signature_length(&self) -> usize {
+    pub const fn checksum_signature_length(&self) -> usize {
         match self {
             Self::SunMoon => 0x140,
             Self::UltraSunUltraMoon => 0x150,
         }
     }
 
-    pub fn meme_crypto_offset(&self) -> usize {
+    pub const fn meme_crypto_offset(&self) -> usize {
         match self {
             Self::SunMoon => 0x6ba00,
             Self::UltraSunUltraMoon => 0x6c000,
@@ -346,6 +353,8 @@ const MEME_SIG_LENGTH: usize = 0x80;
 
 #[cfg(feature = "wasm")]
 pub fn sign_with_meme_crypto(bytes: &mut [u8], variant: MemeCryptoVariant) -> Vec<u8> {
+    use sha2::Digest;
+
     let out_bytes: &mut [u8] = &mut bytes.to_vec();
     let checksum_table_offset = bytes.len() - 0x200;
     let checksum_signature_len = variant.checksum_signature_length();
@@ -374,6 +383,17 @@ pub fn sign_with_meme_crypto(bytes: &mut [u8], variant: MemeCryptoVariant) -> Ve
 //     signature_span[0..32].copy_from_slice(&hash);
 // }
 
+const POKEDEX_AND_SAVE_FILE_MEME_KEY: [u8; 126] = [
+    0x30, 0x7c, 0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05,
+    0x00, 0x03, 0x6b, 0x00, 0x30, 0x68, 0x02, 0x61, 0x00, 0xb6, 0x1e, 0x19, 0x20, 0x91, 0xf9, 0x0a,
+    0x8f, 0x76, 0xa6, 0xea, 0xaa, 0x9a, 0x3c, 0xe5, 0x8c, 0x86, 0x3f, 0x39, 0xae, 0x25, 0x3f, 0x03,
+    0x78, 0x16, 0xf5, 0x97, 0x58, 0x54, 0xe0, 0x7a, 0x9a, 0x45, 0x66, 0x01, 0xe7, 0xc9, 0x4c, 0x29,
+    0x75, 0x9f, 0xe1, 0x55, 0xc0, 0x64, 0xed, 0xdf, 0xa1, 0x11, 0x44, 0x3f, 0x81, 0xef, 0x1a, 0x42,
+    0x8c, 0xf6, 0xcd, 0x32, 0xf9, 0xda, 0xc9, 0xd4, 0x8e, 0x94, 0xcf, 0xb3, 0xf6, 0x90, 0x12, 0x0e,
+    0x8e, 0x6b, 0x91, 0x11, 0xad, 0xda, 0xf1, 0x1e, 0x7c, 0x96, 0x20, 0x8c, 0x37, 0xc0, 0x14, 0x3f,
+    0xf2, 0xbf, 0x3d, 0x7e, 0x83, 0x11, 0x41, 0xa9, 0x73, 0x02, 0x03, 0x01, 0x00, 0x01,
+];
+
 const SIGNING_KEY: [u8; 97] = [
     0x00, 0x77, 0x54, 0x55, 0x66, 0x8f, 0xff, 0x3c, 0xba, 0x30, 0x26, 0xc2, 0xd0, 0xb2, 0x6b, 0x80,
     0x85, 0x89, 0x59, 0x58, 0x34, 0x11, 0x57, 0xae, 0xb0, 0x3b, 0x6b, 0x04, 0x95, 0xee, 0x57, 0x80,
@@ -384,7 +404,8 @@ const SIGNING_KEY: [u8; 97] = [
     0x51,
 ];
 
-const SIGNING_KEY_RAW: &'static [u8; 192] = b"775455668fff3cba3026c2d0b26b8085895958341157aeb03b6b0495ee57803e2186eb6cb2eb62a71df18a3c9c6579077670961b3a6102dabe5a194ab58c3250aed597fc78978a326db1d7b28dcccb2a3e014edbd397ad33b8f28cd525054251";
+const SIGNATURE_LENGTH: usize = 0x60;
+const AES_CHUNK_LENGTH: usize = 0x10;
 
 pub struct MemeKey<'a> {
     der: &'a [u8],
@@ -403,6 +424,135 @@ impl<'a> MemeKey<'a> {
             modulo: BigInt::from_bytes_be(Sign::Plus, &der[0x18..0x79]),
         }
     }
+
+    pub fn aes_encrypt(&self, data: &mut [u8]) {
+        let (payload, signature) = data.split_at_mut(data.len() - SIGNATURE_LENGTH);
+
+        let key = self.get_aes_key(payload);
+
+        let cipher = Aes128::new_from_slice(&key).expect("AES key length should be valid");
+        let next_xor = &mut [0u8; AES_CHUNK_LENGTH];
+
+        let mut i = 0usize;
+        while i < signature.len() {
+            let block = &mut signature[i..i + AES_CHUNK_LENGTH];
+
+            xor_bytes_in_place(block, next_xor);
+
+            println!(
+                "{i}: next_xor: {};\nblock: {}",
+                bytes_to_hex_string(next_xor),
+                bytes_to_hex_string(block)
+            );
+
+            cipher.encrypt_block(GenericArray::from_mut_slice(block));
+            next_xor.copy_from_slice(block);
+
+            i += AES_CHUNK_LENGTH;
+        }
+
+        xor_bytes_in_place(next_xor, &signature[0..AES_CHUNK_LENGTH]);
+        let sub_key = self.get_sub_key(next_xor);
+
+        println!(
+            "final next_xor: {}, sub_key: {}",
+            bytes_to_hex_string(next_xor),
+            bytes_to_hex_string(&sub_key)
+        );
+
+        let mut i = 0usize;
+        while i < signature.len() {
+            xor_bytes_in_place(&mut signature[i..i + AES_CHUNK_LENGTH], &sub_key);
+
+            i += AES_CHUNK_LENGTH;
+        }
+
+        println!("after subkey xor: {}", bytes_to_hex_string(signature));
+
+        let mut next_xor = [0u8; AES_CHUNK_LENGTH];
+        let mut i = signature.len() - AES_CHUNK_LENGTH;
+        loop {
+            let temp: [u8; AES_CHUNK_LENGTH] =
+                signature[i..i + AES_CHUNK_LENGTH].try_into().unwrap();
+            println!("\n{i}:\ttemp:\t\t{}", bytes_to_hex_string(&temp));
+            let block = &mut signature[i..i + AES_CHUNK_LENGTH];
+
+            cipher.encrypt_block(GenericArray::from_mut_slice(block));
+
+            println!("\tblock:\t\t{}", bytes_to_hex_string(block));
+            xor_bytes_in_place(block, &next_xor);
+            next_xor.copy_from_slice(&temp);
+
+            println!(
+                "{i}:\tnext_xor:\t{};\n\tblock:\t\t{},\n\ttemp:\t\t{}",
+                bytes_to_hex_string(&next_xor),
+                bytes_to_hex_string(block),
+                bytes_to_hex_string(&temp)
+            );
+
+            if i == 0 {
+                break;
+            }
+            i -= AES_CHUNK_LENGTH;
+        }
+
+        let out = data.to_vec();
+
+        println!(
+            "after second encrypt: {}",
+            bytes_to_hex_string(&out[0..100])
+        );
+    }
+
+    fn get_sub_key(&self, temp: &[u8]) -> [u8; AES_CHUNK_LENGTH] {
+        let mut sub_key = [0u8; AES_CHUNK_LENGTH];
+        let mut i = 0usize;
+
+        while i < temp.len() {
+            let b1 = temp[i];
+            let b2 = temp[i + 1];
+
+            sub_key[i] = b1.overflowing_mul(2).0.overflowing_add(b2 >> 7).0;
+            sub_key[i + 1] = b2.overflowing_mul(2).0;
+
+            if i + 2 < temp.len() {
+                sub_key[i + 1] = sub_key[i + 1].overflowing_add(temp[i + 2] >> 7).0;
+            }
+
+            i += 2;
+        }
+
+        if temp[0] & 0x80 != 0 {
+            sub_key[0xf] ^= 0x87;
+        }
+
+        println!(
+            "temp: {}, sub_key: {}",
+            bytes_to_hex_string(temp),
+            bytes_to_hex_string(&sub_key)
+        );
+
+        sub_key
+    }
+
+    pub fn get_aes_key(&self, bytes: &[u8]) -> [u8; AES_CHUNK_LENGTH] {
+        let mut payload = self.der.to_vec();
+        payload.extend_from_slice(bytes);
+
+        Sha1::digest(payload)[..AES_CHUNK_LENGTH]
+            .try_into()
+            .expect("AES_CHUNK_LENGTH sized array")
+    }
+}
+
+fn xor_bytes_in_place(lhs: &mut [u8], rhs: &[u8]) {
+    for (b, k) in lhs.iter_mut().zip(rhs.iter()) {
+        *b ^= k;
+    }
+}
+
+fn bytes_to_hex_string(bytes: &[u8]) -> String {
+    BigInt::from_bytes_be(Sign::Plus, bytes).to_str_radix(16)
 }
 
 #[cfg(test)]
@@ -414,9 +564,7 @@ mod tests {
 
     #[test]
     fn memekey_private_is_accurate() -> Result<()> {
-        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
-
-        let private = MemeKey::new(&moon_bytes).private_key;
+        let private = MemeKey::new(&POKEDEX_AND_SAVE_FILE_MEME_KEY).private_key;
         assert_eq!(
             private.to_str_radix(16),
             "775455668fff3cba3026c2d0b26b8085895958341157aeb03b6b0495ee57803e2186eb6cb2eb62a71df18a3c9c6579077670961b3a6102dabe5a194ab58c3250aed597fc78978a326db1d7b28dcccb2a3e014edbd397ad33b8f28cd525054251"
@@ -427,22 +575,45 @@ mod tests {
 
     #[test]
     fn memekey_public_is_accurate() -> Result<()> {
-        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
-
-        let public = MemeKey::new(&moon_bytes).public_key;
-        assert_eq!(public.to_str_radix(16), "5224");
+        let public = MemeKey::new(&POKEDEX_AND_SAVE_FILE_MEME_KEY).public_key;
+        assert_eq!(public.to_str_radix(16), "10001");
         Ok(())
     }
 
     #[test]
     fn memekey_modulo_is_accurate() -> Result<()> {
-        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
-
-        let modulo = MemeKey::new(&moon_bytes).modulo;
+        let modulo = MemeKey::new(&POKEDEX_AND_SAVE_FILE_MEME_KEY).modulo;
         assert_eq!(
             modulo.to_str_radix(16),
-            "d9040000fb0400000e28000008280000de0400003b060000da0400005ec800000628000056130000f50400001e060000ee0400004e5b01005b14000007300000f304000057070000c0060000f90400000f2800005918000053200000ef04000028"
+            "b61e192091f90a8f76a6eaaa9a3ce58c863f39ae253f037816f5975854e07a9a456601e7c94c29759fe155c064eddfa111443f81ef1a428cf6cd32f9dac9d48e94cfb3f690120e8e6b9111addaf11e7c96208c37c0143ff2bf3d7e831141a973"
         );
+        Ok(())
+    }
+
+    #[test]
+    fn memekey_aes_key_is_accurate() -> Result<()> {
+        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
+
+        let aes_payload = &moon_bytes[..moon_bytes.len() - SIGNATURE_LENGTH];
+        let key_bytes = MemeKey::new(&POKEDEX_AND_SAVE_FILE_MEME_KEY).get_aes_key(aes_payload);
+        println!("key bytes: {:?}", key_bytes);
+        let key = BigInt::from_bytes_be(Sign::Plus, &key_bytes);
+        assert_eq!(key.to_str_radix(16), "7a10b8ae4a34bb592638f90301ac72c8");
+        Ok(())
+    }
+
+    #[test]
+    fn aes_encrypt_check_first_100() -> Result<()> {
+        let mut moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
+
+        MemeKey::new(&POKEDEX_AND_SAVE_FILE_MEME_KEY).aes_encrypt(&mut moon_bytes);
+
+        let moon_bigint = BigInt::from_bytes_be(Sign::Plus, &moon_bytes[0..100]);
+        assert_eq!(
+            moon_bigint.to_str_radix(16),
+            "2d0070051d0070054d007004dd007000cd007004ed00700d9040000fb0400000e28000008280000de0400003b060000da0400005ec800000628000056130000f50400001e060000ee0400004e5b01005b14000007300000f304000057070000c0060000"
+        );
+
         Ok(())
     }
 }

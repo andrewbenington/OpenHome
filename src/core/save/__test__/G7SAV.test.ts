@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'
-import { MemeKey } from '../encryption/MemeKey'
+import { MemeKey, pokedexAndSaveFileMemeKey } from '../encryption/MemeKey'
 import { SMSAV } from '../SMSAV'
 import { USUMSAV } from '../USUMSAV'
 import { PathData } from '../util/path'
@@ -92,6 +92,13 @@ describe('meme key', () => {
     expect(memeKey.getPublicKeyU16()).toBe('5224')
     expect(memeKey.getModU16()).toBe(
       'd9040000fb0400000e28000008280000de0400003b060000da0400005ec800000628000056130000f50400001e060000ee0400004e5b01005b14000007300000f304000057070000c0060000f90400000f2800005918000053200000ef04000028'
+    )
+  })
+
+  test('meme key aes encrypt', () => {
+    const memeKey = new MemeKey(pokedexAndSaveFileMemeKey)
+    expect(memeKey.getAesEncryptedFirst100Hex(saveBytes)).toBe(
+      '2d0070051d0070054d007004dd007000cd007004ed00700d9040000fb0400000e28000008280000de0400003b060000da0400005ec800000628000056130000f50400001e060000ee0400004e5b01005b14000007300000f304000057070000c0060000'
     )
   })
 })

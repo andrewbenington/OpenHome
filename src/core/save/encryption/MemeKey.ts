@@ -61,6 +61,10 @@ export class MemeKey {
       const encryptedSliceWordArray = cipher.process(uint8ArrayToWordArray(slice))
       const encryptedSlice = wordArrayToUint8Array(encryptedSliceWordArray)
 
+      console.log(
+        `i: ${i}: next_xor: ${bytesToBigIntBE(nextXor).toString(16)}; encryptedSlice: ${bytesToBigIntBE(encryptedSlice).toString(16)}`
+      )
+
       nextXor = new Uint8Array(encryptedSlice)
       signature.set(nextXor, i)
     }
@@ -68,27 +72,43 @@ export class MemeKey {
     nextXor = xorBytes(nextXor, signature.slice(0, AES_CHUNK_LENGTH))
     const subKey = this.GetSubKey(nextXor)
 
+    console.log(
+      `final next_xor: ${bytesToBigIntBE(nextXor).toString(16)}, sub_key: ${bytesToBigIntBE(subKey).toString(16)}`
+    )
+
     for (let i = 0; i < signature.length; i += AES_CHUNK_LENGTH) {
       const xorResult = xorBytes(signature.slice(i, i + AES_CHUNK_LENGTH), subKey)
 
       signature.set(xorResult, i)
     }
 
+    console.log(`after subkey xor: ${bytesToBigIntBE(signature).toString(16)}`)
+
     nextXor = new Uint8Array(AES_CHUNK_LENGTH)
     for (let i = signature.length - AES_CHUNK_LENGTH; i >= 0; i -= AES_CHUNK_LENGTH) {
       const temp = signature.slice(i, i + AES_CHUNK_LENGTH)
 
+      console.log(`\n${i}:\ttemp:\t\t${bytesToBigIntBE(temp).toString(16)}`)
       const encryptedSliceWordArray = cipher.process(uint8ArrayToWordArray(temp))
       const encryptedSlice = wordArrayToUint8Array(encryptedSliceWordArray)
 
       signature.set(xorBytes(new Uint8Array(encryptedSlice), nextXor), i)
       nextXor = temp
+
+      console.log(
+        `${i}:\tnext_xor:\t${bytesToBigIntBE(nextXor).toString(16)};\n\tblock:\t\t${bytesToBigIntBE(encryptedSlice).toString(16)}\n\ttemp:\t\t${bytesToBigIntBE(temp).toString(16)}`
+      )
     }
+
+    console.log(`after second encrypt: ${bytesToBigIntBE(signature).toString(16)}`)
 
     const encrypted = new Uint8Array(data.length)
 
     encrypted.set(payload, 0)
     encrypted.set(signature, data.length - SIGNATURE_LENGTH)
+
+    console.log(`\nafter aes encrypt: ${bytesToBigIntBE(encrypted.slice(0, 100)).toString(16)}`)
+
     return encrypted
   }
 
@@ -147,6 +167,17 @@ export class MemeKey {
 
   public getPublicKeyU16() {
     return this.publicKey.toString(16)
+  }
+
+  public getAesKeyHex(data: Uint8Array): string {
+    const payload = data.slice(0, data.length - SIGNATURE_LENGTH)
+    const key = this.GetAesKey(payload)
+    return bytesToBigIntBE(key).toString(16)
+  }
+
+  public getAesEncryptedFirst100Hex(data: Uint8Array): string {
+    const encrypted = this.AesEncrypt(data)
+    return bytesToBigIntBE(encrypted.slice(0, 100)).toString(16)
   }
 }
 
