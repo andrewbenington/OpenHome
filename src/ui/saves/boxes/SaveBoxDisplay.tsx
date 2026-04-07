@@ -177,17 +177,18 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           <Grid columns={save.boxColumns.toString()} gap="1" p="1">
             {range(save.boxColumns * save.boxRows)
               .map((index: number) => currentBox?.boxSlots?.[index])
-              .map((mon, index) => {
+              .map((_, index) => {
                 const location: MonLocation = {
                   isHome: false,
                   box: save.currentPCBox,
                   boxSlot: index,
                   saveIdentifier: save.identifier,
                 }
+                const mon = save.getMonAt(location.box, location.boxSlot)
                 return (
                   <BoxCell
                     onClick={() => setSelectedIndex(index)}
-                    key={`${save.currentPCBox}-${index}`}
+                    key={`${save.currentPCBox}-${index}-${mon?.encryptionConstant ?? mon?.personalityValue ?? mon?.nickname ?? 'empty'}`}
                     dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                     location={location}
                     disabled={

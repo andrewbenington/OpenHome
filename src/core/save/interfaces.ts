@@ -68,6 +68,7 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   getCurrentBox: () => Box<P>
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata
   getMonAt(boxNum: number, boxSlot: number): Option<P>
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
 
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
@@ -126,6 +127,11 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
     const box = this.boxes[boxNum]
     if (!box) return undefined
     return box.boxSlots[boxSlot]
+  }
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
   }
 
   get gameName(): string {
@@ -222,6 +228,12 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
     const box = this.boxes[boxNum]
     if (!box) return undefined
     return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
   }
 }
 

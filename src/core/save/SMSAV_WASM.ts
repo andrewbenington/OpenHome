@@ -3,6 +3,7 @@ import Pk7Rust from '../../../packages/pokemon-files/src/pkm/PK7'
 import { Item } from '../../../packages/pokemon-resources/src/consts/Items'
 import { SM_TRANSFER_RESTRICTIONS } from '../../../packages/pokemon-resources/src/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
+import { Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
 import { isRestricted } from './util/TransferRestrictions'
@@ -114,5 +115,15 @@ export class SunMoonSaveWasm extends OfficialSAV<Pk7Rust> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
+  }
+
+  getMonAt(boxNum: number, boxSlot: number): Option<Pk7Rust> {
+    const rustMon = this.inner.getMonAt(boxNum, boxSlot)
+    return rustMon ? new Pk7Rust(rustMon, {}) : undefined
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<Pk7Rust>): void {
+    console.log(`Setting mon at box ${boxNum}, slot ${boxSlot} to`, mon)
+    this.inner.setMonAt(boxNum, boxSlot, mon ? mon.inner : undefined)
   }
 }

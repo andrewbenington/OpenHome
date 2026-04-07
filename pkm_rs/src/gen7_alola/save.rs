@@ -191,8 +191,13 @@ impl encryption::Crc16CcittInvertChecksum for SunMoonSave {
 #[allow(clippy::missing_const_for_fn)]
 impl SunMoonSave {
     #[wasm_bindgen(js_name = getMonAt)]
-    pub fn get_mon_at_js(&self, box_num: usize, offset: usize) -> Option<Pk7> {
+    pub fn get_mon_at_wasm(&self, box_num: usize, offset: usize) -> Option<Pk7> {
         self.get_mon_at(box_num, offset)
+    }
+
+    #[wasm_bindgen(js_name = setMonAt)]
+    pub fn set_mon_at_wasm(&mut self, box_num: usize, offset: usize, mon: Option<Pk7>) {
+        self.set_mon_at(box_num, offset, mon)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
