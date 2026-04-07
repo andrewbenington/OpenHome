@@ -123,7 +123,6 @@ export class SunMoonSaveWasm extends OfficialSAV<Pk7Rust> {
   }
 
   setMonAt(boxNum: number, boxSlot: number, mon: Option<Pk7Rust>): void {
-    console.log(`Setting mon at box ${boxNum}, slot ${boxSlot} to`, mon)
     this.inner.setMonAt(boxNum, boxSlot, mon ? mon.inner : undefined)
   }
 }

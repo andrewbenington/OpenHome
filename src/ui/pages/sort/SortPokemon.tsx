@@ -129,11 +129,11 @@ export default function SortPokemon() {
         // Find first empty slot in target save
         let destBox = -1
         let destSlot = -1
-        outer: for (let b = 0; b < targetSave.boxes.length; b++) {
-          for (let s = 0; s < targetSave.boxes[b].boxSlots.length; s++) {
-            if (!targetSave.boxes[b].boxSlots[s]) {
-              destBox = b
-              destSlot = s
+        outer: for (let boxIndex = 0; boxIndex < targetSave.boxes.length; boxIndex++) {
+          for (let slot = 0; slot < targetSave.boxes[boxIndex].boxSlots.length; slot++) {
+            if (!targetSave.getMonAt(boxIndex, slot)) {
+              destBox = boxIndex
+              destSlot = slot
               break outer
             }
           }

@@ -1,6 +1,6 @@
 import { get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
-import { unique } from '@openhome-core/util/functional'
+import { Option, unique } from '@openhome-core/util/functional'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -301,5 +301,17 @@ export class G2SAV extends OfficialSAV<PK2> {
 
   get trainerGender() {
     return this.origin === OriginGame.Crystal && this.bytes[0x3e3d] ? Gender.Female : Gender.Male
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK2>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
   }
 }

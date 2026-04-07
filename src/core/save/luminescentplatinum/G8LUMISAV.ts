@@ -7,6 +7,7 @@ import {
 } from '@pkm-rs/pkg'
 import { utf16BytesToString } from '@pokemon-files/util'
 
+import { Option } from 'src/core/util/functional'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, BoxAndSlot, PluginSAV, SlotMetadata } from '../interfaces'
@@ -256,6 +257,18 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
 
   supportsItem(itemIndex: number) {
     return itemIndex <= 1836
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PB8LUMI>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
   }
 }
 
