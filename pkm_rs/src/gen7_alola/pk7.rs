@@ -298,13 +298,13 @@ impl Pk7 {
     }
 
     pub fn from_encryped_bytes(bytes: &[u8]) -> Result<Self> {
-        let decrypted = encryption::decrypt_pkm_bytes_gen_6_7(bytes)?;
-        let unshuffled = encryption::unshuffle_blocks_gen_6_7(&decrypted)?;
+        let decrypted = encryption::decrypt_pkm_bytes_gen_6_7(bytes);
+        let unshuffled = encryption::unshuffle_blocks_gen_6_7(&decrypted);
         Self::from_bytes(&unshuffled)
     }
 
-    pub fn to_box_bytes_encrypted(self) -> Result<Vec<u8>> {
-        let shuffled = encryption::shuffle_blocks_gen_6_7(&self.to_box_bytes())?;
+    pub fn to_box_bytes_encrypted(self) -> Vec<u8> {
+        let shuffled = encryption::shuffle_blocks_gen_6_7(&self.to_box_bytes());
         encryption::decrypt_pkm_bytes_gen_6_7(&shuffled)
     }
 

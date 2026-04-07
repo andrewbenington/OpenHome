@@ -1,3 +1,4 @@
+#[cfg(feature = "wasm")]
 mod pk7;
 
 use crate::{convert_strategy::ConvertStrategy, traits::Pkm};

@@ -1,3 +1,4 @@
+use crate::log;
 use pkm_rs_types::BinaryGender;
 use pkm_rs_types::OriginGame;
 use pkm_rs_types::read_u16_le;
@@ -22,7 +23,6 @@ const SM_TRAINER_DATA_OFFSET: usize = 0x1200;
 const TRAINER_DATA_SIZE: usize = 0xc0;
 const SM_BOX_DATA_OFFSET: usize = 0x04e00;
 
-#[cfg(feature = "wasm")]
 const BOX_DATA_SIZE: usize = 0x36600;
 
 const BOX_COUNT: usize = 32;
@@ -30,7 +30,10 @@ const BOX_ROWS: usize = 6;
 const BOX_COLS: usize = 5;
 const BOX_SLOTS: usize = BOX_ROWS * BOX_COLS;
 
+const SINGLE_BOX_SIZE_BYTES: usize = BOX_SLOTS * Pk7::BOX_SIZE;
+
 const SM_SIZE_BYTES: usize = 0x6be00;
+
 #[cfg(feature = "wasm")]
 const SM_PC_CHECKSUM_OFFSET: usize = SM_SIZE_BYTES - 0x200 + 0x14 + (14 * 8) + 6;
 
@@ -71,6 +74,10 @@ impl SunMoonSave {
 
         bytes
     }
+
+    fn calculate_pc_checksum(&self) -> u16 {
+        encryption::crc16_ccitt_invert(&self.bytes, SM_BOX_DATA_OFFSET, BOX_DATA_SIZE)
+    }
 }
 
 impl SaveData for SunMoonSave {
@@ -80,22 +87,48 @@ impl SaveData for SunMoonSave {
         Self::from_bytes(bytes)
     }
 
-    fn get_decrypted_mon_bytes(&self, box_num: usize, offset: usize) -> Result<Vec<u8>> {
+    fn get_decrypted_mon_bytes(&self, box_num: usize, offset: usize) -> Vec<u8> {
         let decrypted_bytes =
-            encryption::decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))?;
+            encryption::decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset));
         encryption::unshuffle_blocks_gen_6_7(&decrypted_bytes)
     }
 
-    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Option<Pk7>> {
-        let decrypted_bytes = self.get_decrypted_mon_bytes(box_num, offset)?;
-        let national_dex = read_u16_le!(decrypted_bytes, 8);
-
-        println!("national dex: {national_dex}");
-        if national_dex == 0 {
-            return Ok(None);
+    fn get_mon_at(&self, box_num: usize, offset: usize) -> Option<Pk7> {
+        if box_num >= Self::box_count() || offset >= Self::box_slots() {
+            return None;
         }
 
-        Ok(Some(Pk7::from_bytes(&decrypted_bytes)?))
+        let decrypted_bytes = self.get_decrypted_mon_bytes(box_num, offset);
+        let national_dex = read_u16_le!(decrypted_bytes, 8);
+
+        if national_dex > 0 {
+            Pk7::from_bytes(&decrypted_bytes)
+                .inspect_err(|err| log!("malformed pkm at bot {box_num}, slot {offset}: {err}"))
+                .ok()
+        } else {
+            None
+        }
+    }
+
+    fn set_mon_at(&mut self, box_num: usize, offset: usize, mut mon: Option<Pk7>) {
+        let mon_bytes = if let Some(mon) = &mut mon {
+            mon.refresh_checksum();
+            let bytes = mon.to_box_bytes();
+
+            encryption::decrypt_pkm_bytes_gen_6_7(&encryption::shuffle_blocks_gen_6_7(&bytes))
+        } else {
+            vec![0u8; Pk7::BOX_SIZE]
+        };
+
+        // write bytes to box slot
+        let box_offset = SM_BOX_DATA_OFFSET + box_num * SINGLE_BOX_SIZE_BYTES;
+        let mon_offset = box_offset + offset * Pk7::BOX_SIZE;
+        self.bytes[mon_offset..mon_offset + Pk7::BOX_SIZE].copy_from_slice(&mon_bytes);
+
+        // refresh pc checksum
+        let calculated_checksum = self.calculate_pc_checksum();
+        self.bytes[SM_PC_CHECKSUM_OFFSET..SM_PC_CHECKSUM_OFFSET + 2]
+            .copy_from_slice(&calculated_checksum.to_le_bytes());
     }
 
     fn box_rows() -> usize {
@@ -158,7 +191,7 @@ impl encryption::Crc16CcittInvertChecksum for SunMoonSave {
 #[allow(clippy::missing_const_for_fn)]
 impl SunMoonSave {
     #[wasm_bindgen(js_name = getMonAt)]
-    pub fn get_mon_at_js(&self, box_num: usize, offset: usize) -> Result<Option<Pk7>> {
+    pub fn get_mon_at_js(&self, box_num: usize, offset: usize) -> Option<Pk7> {
         self.get_mon_at(box_num, offset)
     }
 
@@ -260,6 +293,8 @@ const USUM_SIZE_BYTES: usize = 0x6cc00;
 const USUM_TRAINER_DATA_OFFSET: usize = 0x1400;
 const USUM_BOX_DATA_OFFSET: usize = 0x05200;
 
+const USUM_PC_CHECKSUM_OFFSET: usize = USUM_SIZE_BYTES - 0x200 + 0x14 + (14 * 8) + 6;
+
 #[derive(Serialize, Debug)]
 pub struct UltraSunMoonSave {
     #[serde(skip_serializing)]
@@ -282,6 +317,10 @@ impl UltraSunMoonSave {
             trainer: my_status,
         })
     }
+
+    fn calculate_pc_checksum(&self) -> u16 {
+        encryption::crc16_ccitt_invert(&self.bytes, USUM_BOX_DATA_OFFSET, BOX_DATA_SIZE)
+    }
 }
 
 impl SaveData for UltraSunMoonSave {
@@ -291,23 +330,47 @@ impl SaveData for UltraSunMoonSave {
         Self::from_bytes(bytes)
     }
 
-    fn get_decrypted_mon_bytes(&self, box_num: usize, offset: usize) -> Result<Vec<u8>> {
+    fn get_decrypted_mon_bytes(&self, box_num: usize, offset: usize) -> Vec<u8> {
         let decrypted_bytes =
-            encryption::decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset))?;
+            encryption::decrypt_pkm_bytes_gen_6_7(&self.get_mon_bytes(box_num, offset));
         encryption::unshuffle_blocks_gen_6_7(&decrypted_bytes)
     }
 
-    fn get_mon_at(&self, box_num: usize, offset: usize) -> Result<Option<Pk7>> {
-        let decrypted_bytes = self.get_decrypted_mon_bytes(box_num, offset)?;
+    fn get_mon_at(&self, box_num: usize, offset: usize) -> Option<Pk7> {
+        let decrypted_bytes = self.get_decrypted_mon_bytes(box_num, offset);
         let national_dex = read_u16_le!(decrypted_bytes, 8);
         if national_dex == 0 {
-            return Ok(None);
+            return None;
         }
 
-        Some(Pk7::from_bytes(
-            &self.get_decrypted_mon_bytes(box_num, offset)?,
-        ))
-        .transpose()
+        if national_dex > 0 {
+            Pk7::from_bytes(&decrypted_bytes)
+                .inspect_err(|err| log!("malformed pkm at bot {box_num}, slot {offset}: {err}"))
+                .ok()
+        } else {
+            None
+        }
+    }
+
+    fn set_mon_at(&mut self, box_num: usize, offset: usize, mut mon: Option<Pk7>) {
+        let mon_bytes = if let Some(mon) = &mut mon {
+            mon.refresh_checksum();
+            let bytes = mon.to_box_bytes();
+
+            encryption::decrypt_pkm_bytes_gen_6_7(&encryption::shuffle_blocks_gen_6_7(&bytes))
+        } else {
+            vec![0u8; Pk7::BOX_SIZE]
+        };
+
+        // write bytes to box slot
+        let box_offset = USUM_BOX_DATA_OFFSET + box_num * SINGLE_BOX_SIZE_BYTES;
+        let mon_offset = box_offset + offset * Pk7::BOX_SIZE;
+        self.bytes[mon_offset..mon_offset + Pk7::BOX_SIZE].copy_from_slice(&mon_bytes);
+
+        // refresh pc checksum
+        let calculated_checksum = self.calculate_pc_checksum();
+        self.bytes[USUM_PC_CHECKSUM_OFFSET..USUM_PC_CHECKSUM_OFFSET + 2]
+            .copy_from_slice(&calculated_checksum.to_le_bytes());
     }
 
     fn box_rows() -> usize {

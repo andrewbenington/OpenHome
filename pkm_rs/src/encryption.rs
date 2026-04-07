@@ -1,7 +1,5 @@
 use std::ops::Range;
 
-use crate::result::{Error, Result};
-
 #[cfg(feature = "wasm")]
 use aes::{
     Aes128,
@@ -98,12 +96,7 @@ impl BlockRange {
     }
 }
 
-pub fn unshuffle_blocks(
-    bytes: &[u8],
-    offset: usize,
-    shift_value: usize,
-    block_size: usize,
-) -> Result<Vec<u8>> {
+fn unshuffle_blocks(bytes: &[u8], offset: usize, shift_value: usize, block_size: usize) -> Vec<u8> {
     rearrange_blocks(
         bytes,
         offset,
@@ -113,12 +106,7 @@ pub fn unshuffle_blocks(
     )
 }
 
-pub fn shuffle_blocks(
-    bytes: &[u8],
-    offset: usize,
-    shift_value: usize,
-    block_size: usize,
-) -> Result<Vec<u8>> {
+fn shuffle_blocks(bytes: &[u8], offset: usize, shift_value: usize, block_size: usize) -> Vec<u8> {
     rearrange_blocks(bytes, offset, shift_value, block_size, SHUFFLE_BLOCK_ORDERS)
 }
 
@@ -128,13 +116,7 @@ fn rearrange_blocks(
     shift_value: usize,
     block_size: usize,
     orders: [[usize; 4]; 24],
-) -> Result<Vec<u8>> {
-    let min_size = offset + block_size * 4;
-    let length = bytes.len();
-    if length < min_size {
-        return Err(Error::buffer_size(min_size, length));
-    }
-
+) -> Vec<u8> {
     let block_order = orders[shift_value];
 
     let block_1 = BlockRange::new(offset, offset + block_size);
@@ -157,6 +139,7 @@ fn rearrange_blocks(
     let misc_bytes = &bytes[misc_range];
 
     let mut unshuffled_bytes = vec![0u8; bytes.len()];
+
     unshuffled_bytes[0..offset].copy_from_slice(&bytes[0..offset]);
     unshuffled_bytes[block_1.to_range()].copy_from_slice(growth_bytes);
     unshuffled_bytes[block_2.to_range()].copy_from_slice(attack_bytes);
@@ -164,13 +147,13 @@ fn rearrange_blocks(
     unshuffled_bytes[block_4.to_range()].copy_from_slice(misc_bytes);
     unshuffled_bytes[block_4.end..bytes.len()].copy_from_slice(&bytes[block_4.end..bytes.len()]);
 
-    Ok(unshuffled_bytes)
+    unshuffled_bytes
 }
 
-pub fn shuffle_blocks_gen_6_7(bytes: &[u8]) -> Result<Vec<u8>> {
+pub fn shuffle_blocks_gen_6_7(bytes: &[u8]) -> Vec<u8> {
     let length = bytes.len();
     if length < GEN_67_MIN_SIZE {
-        return Err(Error::buffer_size(GEN_67_MIN_SIZE, length));
+        panic!("shuffle_blocks_gen_6_7: buffer size {length} is too small",);
     }
 
     let encryption_constant = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
@@ -179,10 +162,10 @@ pub fn shuffle_blocks_gen_6_7(bytes: &[u8]) -> Result<Vec<u8>> {
     shuffle_blocks(bytes, ENCRYPTION_OFFSET, shift_value, GEN_67_BLOCK_SIZE)
 }
 
-pub fn unshuffle_blocks_gen_6_7(bytes: &[u8]) -> Result<Vec<u8>> {
+pub(crate) fn unshuffle_blocks_gen_6_7(bytes: &[u8]) -> Vec<u8> {
     let length = bytes.len();
     if length < GEN_67_MIN_SIZE {
-        return Err(Error::buffer_size(GEN_67_MIN_SIZE, length));
+        panic!("unshuffle_blocks_gen_6_7: buffer size {length} is too small",);
     }
 
     let encryption_constant = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
@@ -191,7 +174,7 @@ pub fn unshuffle_blocks_gen_6_7(bytes: &[u8]) -> Result<Vec<u8>> {
     unshuffle_blocks(bytes, ENCRYPTION_OFFSET, shift_value, GEN_67_BLOCK_SIZE)
 }
 
-pub fn decrypt_pkm_blocks(bytes: &[u8], seed: u32, block_size: usize) -> Result<Vec<u8>> {
+fn decrypt_pkm_blocks(bytes: &[u8], seed: u32, block_size: usize) -> Vec<u8> {
     decrypt_pkm_bytes(
         bytes,
         seed,
@@ -200,15 +183,7 @@ pub fn decrypt_pkm_blocks(bytes: &[u8], seed: u32, block_size: usize) -> Result<
     )
 }
 
-pub fn decrypt_pkm_bytes(bytes: &[u8], seed: u32, start: usize, end: usize) -> Result<Vec<u8>> {
-    let length = bytes.len();
-    if end > length {
-        return Err(Error::CryptRange {
-            range: (start, end),
-            buffer_size: length,
-        });
-    }
-
+fn decrypt_pkm_bytes(bytes: &[u8], seed: u32, start: usize, end: usize) -> Vec<u8> {
     let mut decrypted_bytes = Vec::<u8>::from(bytes);
     let mut current_seed = seed;
     for i in (start..end).step_by(2) {
@@ -219,13 +194,13 @@ pub fn decrypt_pkm_bytes(bytes: &[u8], seed: u32, start: usize, end: usize) -> R
         let decrypted_word = u16::from_le_bytes(bytes[i..i + 2].try_into().unwrap()) ^ xor_value;
         decrypted_bytes[i..i + 2].copy_from_slice(&decrypted_word.to_le_bytes());
     }
-    Ok(decrypted_bytes)
+    decrypted_bytes
 }
 
-pub fn decrypt_pkm_bytes_gen_6_7(bytes: &[u8]) -> Result<Vec<u8>> {
+pub(crate) fn decrypt_pkm_bytes_gen_6_7(bytes: &[u8]) -> Vec<u8> {
     let length = bytes.len();
     if length < GEN_67_MIN_SIZE {
-        return Err(Error::buffer_size(GEN_67_MIN_SIZE, length));
+        panic!("decrypt_pkm_bytes_gen_6_7: buffer size {length} is too small",);
     }
     let encryption_constant = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
     decrypt_pkm_blocks(bytes, encryption_constant, GEN_67_BLOCK_SIZE)
@@ -555,6 +530,7 @@ fn xor_bytes_in_place(lhs: &mut [u8], rhs: &[u8]) {
 #[cfg(feature = "wasm")]
 #[cfg(test)]
 mod tests {
+    use crate::result::Result;
     use std::path::Path;
 
     use super::*;

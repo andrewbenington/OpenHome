@@ -29,7 +29,6 @@ export class SunMoonSaveWasm extends OfficialSAV<Pk7Rust> {
   money: number = 0 // TODO: Gen 7 money
   boxes: Array<Box<Pk7Rust>>
 
-  bytes: Uint8Array = new Uint8Array()
   invalid = false
   tooEarlyToOpen = false
 
@@ -37,7 +36,6 @@ export class SunMoonSaveWasm extends OfficialSAV<Pk7Rust> {
 
   constructor(path: PathData, bytes: Uint8Array) {
     super()
-    this.bytes = bytes
     this.inner = SunMoonSave.fromBytes(bytes)
     this.currentPCBox = this.inner.current_pc_box_idx()
     this.origin = this.inner.game_of_origin()
@@ -61,6 +59,14 @@ export class SunMoonSaveWasm extends OfficialSAV<Pk7Rust> {
         }
       }
     }
+  }
+
+  prepareForSaving() {
+    this.inner.prepareBytesForSaving()
+  }
+
+  get bytes() {
+    return this.inner.prepareBytesForSaving()
   }
 
   static fileIsSave(bytes: Uint8Array): boolean {
@@ -108,9 +114,5 @@ export class SunMoonSaveWasm extends OfficialSAV<Pk7Rust> {
 
   getCurrentBox() {
     return this.boxes[this.currentPCBox]
-  }
-
-  prepareForSaving() {
-    this.bytes = this.inner.toBytes()
   }
 }
