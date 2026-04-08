@@ -10,6 +10,7 @@ import {
   OriginGames,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
+import { filterUndefined } from '../util/sort'
 import { LookupType, SAVClass } from './util'
 import { PathData } from './util/path'
 
@@ -57,6 +58,7 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
 
   currentPCBox: number
   // boxes: Array<Box<P>>
+  getBoxCount(): number
 
   invalid: boolean
   tooEarlyToOpen: boolean
@@ -69,6 +71,7 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata
   getMonAt(boxNum: number, boxSlot: number): Option<P>
   setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
+  getAllMons(): Readonly<P>[]
 
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
@@ -126,6 +129,14 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
 
   abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
   abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
+
+  getBoxCount(): number {
+    return this.boxes.length
+  }
+
+  getAllMons(): Readonly<P>[] {
+    return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
+  }
   // getMonAt(boxNum: number, boxSlot: number): Option<P> {
   //   const box = this.boxes[boxNum]
   //   if (!box) return undefined
@@ -156,6 +167,20 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   get lookupType(): Option<LookupType> {
     return (this.constructor as SAVClass).lookupType
   }
+
+  get boxSlotCount(): number {
+    return this.boxRows * this.boxColumns
+  }
+
+  getBoxMonCount(boxNum: number): number {
+    const box = this.boxes[boxNum]
+    if (!box) return 0
+    return box.boxSlots.filter(filterUndefined).length
+  }
+
+  getBoxName(boxNum: number): string | undefined {
+    return this.boxes[boxNum]?.name
+  }
 }
 
 export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
@@ -171,7 +196,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract trainerGender: Gender
   abstract displayID: string
   abstract currentPCBox: number
-  abstract boxes: Box<P>[]
+  abstract _boxes: Box<P>[]
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
@@ -229,17 +254,28 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
   abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
-  // getMonAt(boxNum: number, boxSlot: number): Option<P> {
-  //   const box = this.boxes[boxNum]
-  //   if (!box) return undefined
-  //   return box.boxSlots[boxSlot]
-  // }
 
-  // setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void {
-  //   const box = this.boxes[boxNum]
-  //   if (!box) return
-  //   box.boxSlots[boxSlot] = mon
-  // }
+  getBoxCount(): number {
+    return this._boxes.length
+  }
+
+  getAllMons(): Readonly<P>[] {
+    return this._boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
+  }
+
+  getBoxName(boxNum: number): string | undefined {
+    return this._boxes[boxNum]?.name
+  }
+
+  getBoxMonCount(boxNum: number): number {
+    const box = this._boxes[boxNum]
+    if (!box) return 0
+    return box.boxSlots.filter(filterUndefined).length
+  }
+
+  get boxSlotCount(): number {
+    return this.boxRows * this.boxColumns
+  }
 }
 
 export function getSaveRef(save: SAV): SaveRef {

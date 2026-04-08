@@ -42,14 +42,11 @@ export default function SortPokemon() {
   const allMonsWithColors: MonWithColors[] = useMemo(() => {
     return savesAndBanks.allOpenSaves
       .flatMap((save) =>
-        save.boxes
-          .flatMap((box) => box.boxSlots)
-          .filter(filterUndefined)
-          .map((mon) => ({
-            mon: ohpkmStore.monOrOhpkmIfTracked(mon),
-            color: OriginGames.color(save.origin),
-            isHome: false,
-          }))
+        save.getAllMons().map((mon) => ({
+          mon: ohpkmStore.monOrOhpkmIfTracked(mon),
+          color: OriginGames.color(save.origin),
+          isHome: false,
+        }))
       )
       .concat(
         savesAndBanks
@@ -129,8 +126,8 @@ export default function SortPokemon() {
         // Find first empty slot in target save
         let destBox = -1
         let destSlot = -1
-        outer: for (let boxIndex = 0; boxIndex < targetSave.boxes.length; boxIndex++) {
-          for (let slot = 0; slot < targetSave.boxes[boxIndex].boxSlots.length; slot++) {
+        outer: for (let boxIndex = 0; boxIndex < targetSave.getBoxCount(); boxIndex++) {
+          for (let slot = 0; slot < targetSave.boxSlotCount; slot++) {
             if (!targetSave.getMonAt(boxIndex, slot)) {
               destBox = boxIndex
               destSlot = slot

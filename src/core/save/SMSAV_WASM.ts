@@ -47,19 +47,6 @@ export class SunMoonSaveWasm extends OfficialSAV<Pk7Rust> {
 
       this.boxes[box] = new Box(boxName, SunMoonSave.box_size())
     }
-
-    for (let box = 0; box < SunMoonSave.box_count(); box++) {
-      for (let monIndex = 0; monIndex < SunMoonSave.box_size(); monIndex++) {
-        try {
-          const mon = this.inner.getMonAt(box, monIndex)
-          if (mon) {
-            this.boxes[box].boxSlots[monIndex] = new Pk7Rust(mon, {})
-          }
-        } catch (e) {
-          console.error(`Error loading mon in box ${box + 1}, slot ${monIndex + 1}:`, e)
-        }
-      }
-    }
   }
 
   prepareForSaving() {

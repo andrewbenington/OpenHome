@@ -43,19 +43,20 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const { dragState, toggleSelection, isSelected } = useDragAndDrop()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
+  const currentBoxIndex = save.currentPCBox
 
-  const currentBox = useMemo(
-    () => (save.currentPCBox < save.boxes.length ? save.boxes[save.currentPCBox] : undefined),
-    [save.boxes, save.currentPCBox]
-  )
+  // const currentBox = useMemo(
+  //   () => (save.currentPCBox < save.getBoxCount() ? save._boxes[save.currentPCBox] : undefined),
+  //   [save._boxes, save.currentPCBox]
+  // )
 
   const selectedMon = useMemo(() => {
-    if (!currentBox || selectedIndex === undefined || selectedIndex >= currentBox.boxSlots.length) {
+    if (selectedIndex === undefined || selectedIndex >= save.boxSlotCount) {
       return undefined
     }
-    const selectedSlot = currentBox.boxSlots[selectedIndex]
+    const selectedSlot = save.getMonAt(save.currentPCBox, selectedIndex)
     return selectedSlot ? ohpkmStore.monOrOhpkmIfTracked(selectedSlot) : undefined
-  }, [currentBox, ohpkmStore, selectedIndex])
+  }, [save, ohpkmStore, selectedIndex])
 
   const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
     const unsupportedMons = mons.filter((mon) => !monSupportedBySave(save, mon))
@@ -149,7 +150,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const displayData = useMemo(() => save.getDisplayData?.() ?? {}, [save])
 
   const allCellsDisabled = range(save.boxColumns * save.boxRows)
-    .map((index: number) => currentBox?.boxSlots?.[index])
+    .map((index: number) => save.getMonAt(save.currentPCBox, index))
     .every(isDisabled)
 
   return save && save.currentPCBox !== undefined ? (
@@ -165,7 +166,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 direction="left"
               />
             </Flex>
-            <div className="box-name">{save.boxes[save.currentPCBox]?.name}</div>
+            <div className="box-name">{save.getBoxName(save.currentPCBox)}</div>
             <Flex align="center" justify="center" flexGrow="4">
               <ArrowButton
                 onClick={() => savesManager.saveBoxNavigateRight(save)}
@@ -176,7 +177,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           </div>
           <Grid columns={save.boxColumns.toString()} gap="1" p="1">
             {range(save.boxColumns * save.boxRows)
-              .map((index: number) => currentBox?.boxSlots?.[index])
+              .map((index: number) => save.getMonAt(save.currentPCBox, index))
               .map((_, index) => {
                 const location: MonLocation = {
                   isHome: false,
@@ -273,7 +274,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   columns: save.boxColumns,
                   rows: save.boxRows,
                   emptyIndexes: range(save.boxColumns * save.boxRows).filter(
-                    (index) => !currentBox?.boxSlots?.[index]
+                    (index) => !save.getMonAt(save.currentPCBox, index)
                   ),
                 }
               : undefined
@@ -292,11 +293,8 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
   const savesManager = useSaves()
   const backend = useContext(BackendContext)
 
-  const currentBoxMonCount = save.boxes[save.currentPCBox]?.boxSlots.filter(Boolean).length ?? 0
-  const totalMonCount = save.boxes.reduce(
-    (sum, box) => sum + (box?.boxSlots.filter(Boolean).length ?? 0),
-    0
-  )
+  const currentBoxMonCount = save.getBoxMonCount(save.currentPCBox)
+  const totalMonCount = save.getAllMons().length
 
   const contextElements = [
     ItemBuilder.fromLabel('Details...').withAction(() => setDetailsModal(true)),

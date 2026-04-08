@@ -150,7 +150,7 @@ export function buildNavigator(
 ) {
   if (currentIndex === undefined) return undefined
   const currentBox =
-    save.currentPCBox < save.boxes.length ? save.boxes[save.currentPCBox] : undefined
+    save.currentPCBox < save._boxes.length ? save._boxes[save.currentPCBox] : undefined
 
   const nonEmptySlots = currentBox?.boxSlots.filter(filterUndefined).length ?? 0
 

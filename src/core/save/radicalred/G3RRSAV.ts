@@ -77,7 +77,7 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
   }
 
   getSlotMetadata = (boxNum: number, boxSlot: number): SlotMetadata => {
-    const mon = this.boxes[boxNum].boxSlots[boxSlot]
+    const mon = this._boxes[boxNum].boxSlots[boxSlot]
 
     if (mon instanceof PK3RR && mon.isFakemon) {
       return {

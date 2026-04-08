@@ -36,7 +36,7 @@ describe('G3SAV - Gen 3 Save File Read Test', async () => {
   })
 
   test('should print the first Pokémon in the first box', () => {
-    const firstPokemon = emeraldSaveFile.boxes[0].boxSlots[0]
+    const firstPokemon = emeraldSaveFile.getMonAt(0, 0)
 
     if (firstPokemon) {
       // display_mon(firstPokemon)
@@ -53,7 +53,7 @@ describe('G3SAV - Gen 3 Save File Read Test', async () => {
       fail('No Pokémon found in the first box, first slot.')
     }
 
-    const secondPokemon = emeraldSaveFile.boxes[1].boxSlots[1]
+    const secondPokemon = emeraldSaveFile.getMonAt(1, 1)
 
     if (secondPokemon) {
       expect(secondPokemon.nickname).toBe('NIDORAN♂')

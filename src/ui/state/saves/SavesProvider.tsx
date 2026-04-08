@@ -60,7 +60,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     // Write appropriate trainer data to handler fields
     for (const save of allOpenSaves) {
-      save.boxes.forEach((box) => {
+      save._boxes.forEach((box) => {
         for (const boxSlot of range(box.boxSlots.length)) {
           const data = box.boxSlots[boxSlot]
           if (!data) continue

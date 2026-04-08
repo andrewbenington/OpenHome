@@ -72,7 +72,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   boxRows = 5
   boxColumns = 6
   currentPCBox: number = 0
-  boxes: Box<PB8LUMI>[] = []
+  _boxes: Box<PB8LUMI>[] = []
   updatedBoxSlots: BoxAndSlot[] = []
 
   private _trainerGender?: Gender
@@ -96,11 +96,11 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
 
     // Initialize PC boxes and names
     const boxNamesBlock = new BoxLayoutLumi(this.bytes)
-    this.boxes = Array(this.getBoxCount())
+    this._boxes = Array(this.getBoxCount())
 
     for (let box = 0; box < this.getBoxCount(); box++) {
       const boxName = boxNamesBlock.getBoxName(box) || `Box ${box + 1}`
-      this.boxes[box] = new Box(boxName, 30)
+      this._boxes[box] = new Box(boxName, 30)
     }
 
     // Parse Pokémon stored in the PC
@@ -115,7 +115,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
 
           // Only populate slots containing valid Pokémon
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].boxSlots[monIndex] = mon
+            this._boxes[box].boxSlots[monIndex] = mon
           }
         } catch (e) {
           console.error(`Failed to parse Pokémon in Box ${box + 1}, Slot ${monIndex + 1}:`, e)
@@ -170,7 +170,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   getBoxCount = () => BOX_COUNT
   getMonBoxSizeBytes = () => PB8LUMI.getBoxSize()
   getBoxSizeBytes = () => G8LumiSAV.boxSizeBytes
-  getCurrentBox = () => this.boxes[this.currentPCBox]
+  getCurrentBox = () => this._boxes[this.currentPCBox]
   getPluginIdentifier = () => G8LumiSAV.saveTypeID
 
   // Determines which Luminescent Platinum save revision the file matches
@@ -214,7 +214,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   // Writes modified Pokémon back into the save buffer
   prepareForSaving() {
     this.updatedBoxSlots.forEach(({ box, boxSlot: monIndex }) => {
-      const mon = this.boxes[box].boxSlots[monIndex]
+      const mon = this._boxes[box].boxSlots[monIndex]
       const writeIndex =
         BOX_MONS_OFFSET + this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * monIndex
 
@@ -260,13 +260,13 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   }
 
   getMonAt(boxNum: number, boxSlot: number) {
-    const box = this.boxes[boxNum]
+    const box = this._boxes[boxNum]
     if (!box) return undefined
     return box.boxSlots[boxSlot]
   }
 
   setMonAt(boxNum: number, boxSlot: number, mon: Option<PB8LUMI>): void {
-    const box = this.boxes[boxNum]
+    const box = this._boxes[boxNum]
     if (!box) return
     box.boxSlots[boxSlot] = mon
   }

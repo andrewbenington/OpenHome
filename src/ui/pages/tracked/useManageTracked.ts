@@ -198,7 +198,7 @@ export function useManageTracked() {
       }
 
       const save = result.value
-      for (const saveMon of save.boxes.flatMap((b) => b.boxSlots).filter(filterUndefined)) {
+      for (const saveMon of save._boxes.flatMap((b) => b.boxSlots).filter(filterUndefined)) {
         let saveMonId: Option<OhpkmIdentifier> = undefined
 
         switch (save.lookupType) {
@@ -339,8 +339,8 @@ function monPossiblySupported(dexNumber: number, formeNumber: number, saveRef: S
 }
 
 function searchSaveForMon(save: SAV, id: OhpkmIdentifier): Option<SaveSearchResult> {
-  for (const boxIndex of range(save.boxes.length)) {
-    const box = save.boxes[boxIndex]
+  for (const boxIndex of range(save._boxes.length)) {
+    const box = save._boxes[boxIndex]
     for (const boxSlot of range(box.boxSlots.length)) {
       const mon = box.boxSlots[boxSlot]
       if (mon && getMonFileIdentifier(mon) === id) {
@@ -354,8 +354,8 @@ function searchSaveForMon(save: SAV, id: OhpkmIdentifier): Option<SaveSearchResu
 }
 
 function searchSaveForMonGen12(save: SAV, id: Gen12Identifier): Option<SaveSearchResult> {
-  for (const boxIndex of range(save.boxes.length)) {
-    const box = save.boxes[boxIndex]
+  for (const boxIndex of range(save._boxes.length)) {
+    const box = save._boxes[boxIndex]
     for (const boxSlot of range(box.boxSlots.length)) {
       const mon = box.boxSlots[boxSlot]
       if (mon && getMonGen12Identifier(mon) === id) {
@@ -369,8 +369,8 @@ function searchSaveForMonGen12(save: SAV, id: Gen12Identifier): Option<SaveSearc
 }
 
 function searchSaveForMonGen345(save: SAV, id: Gen345Identifier): Option<SaveSearchResult> {
-  for (const boxIndex of range(save.boxes.length)) {
-    const box = save.boxes[boxIndex]
+  for (const boxIndex of range(save._boxes.length)) {
+    const box = save._boxes[boxIndex]
     for (const boxSlot of range(box.boxSlots.length)) {
       const mon = box.boxSlots[boxSlot]
       if (mon && getMonGen345Identifier(mon) === id) {
