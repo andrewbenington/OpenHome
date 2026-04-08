@@ -60,18 +60,18 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
     // Write appropriate trainer data to handler fields
     for (const save of allOpenSaves) {
-      save._boxes.forEach((box) => {
-        for (const boxSlot of range(box.boxSlots.length)) {
-          const data = box.boxSlots[boxSlot]
+      for (const boxNum of range(save.getBoxCount())) {
+        for (const boxSlot of range(save.boxSlotCount)) {
+          const data = save.getMonAt(boxNum, boxSlot)
           if (!data) continue
 
           const tracked = ohpkmStore.loadIfTracked(data)
           if (!tracked) continue
 
           tracked.tradeToSave(save)
-          box.boxSlots[boxSlot] = save.convertOhpkm(tracked, defaultConvertStrategy)
+          save.setMonAt(boxNum, boxSlot, save.convertOhpkm(tracked, defaultConvertStrategy))
         }
-      })
+      }
     }
 
     const saveWriters = allOpenSaves.map((save) => save.prepareWriter())

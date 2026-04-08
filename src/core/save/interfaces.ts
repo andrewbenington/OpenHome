@@ -95,12 +95,11 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract trainerGender: Gender
   abstract displayID: string
   abstract currentPCBox: number
-  abstract boxes: Box<P>[]
+  abstract boxes: Readonly<Box<P>>[]
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
   abstract updatedBoxSlots: BoxAndSlot[]
-  abstract getCurrentBox(): Box<P>
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
   abstract supportsItem(itemIndex: number): boolean
   abstract prepareForSaving(): void
@@ -178,6 +177,21 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
     return box.boxSlots.filter(filterUndefined).length
   }
 
+  getFirstNonEmptySlotAfter(boxNum: number, boxSlot: number): number | undefined {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    for (let i = boxSlot + 1; i < box.boxSlots.length; i++) {
+      if (box.boxSlots[i] !== undefined) {
+        return i
+      }
+    }
+    return undefined
+  }
+
+  getCurrentBox(): Readonly<Box<P>> {
+    return this.boxes[this.currentPCBox]
+  }
+
   getBoxName(boxNum: number): string | undefined {
     return this.boxes[boxNum]?.name
   }
@@ -196,12 +210,11 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract trainerGender: Gender
   abstract displayID: string
   abstract currentPCBox: number
-  abstract _boxes: Box<P>[]
+  abstract boxes: Readonly<Box<P>>[]
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
   abstract updatedBoxSlots: BoxAndSlot[]
-  abstract getCurrentBox(): Box<P>
   abstract supportsMon(
     dexNumber: number,
     formeNumber: number,
@@ -256,21 +269,25 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
 
   getBoxCount(): number {
-    return this._boxes.length
+    return this.boxes.length
   }
 
   getAllMons(): Readonly<P>[] {
-    return this._boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
+    return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
   }
 
   getBoxName(boxNum: number): string | undefined {
-    return this._boxes[boxNum]?.name
+    return this.boxes[boxNum]?.name
   }
 
   getBoxMonCount(boxNum: number): number {
-    const box = this._boxes[boxNum]
+    const box = this.boxes[boxNum]
     if (!box) return 0
     return box.boxSlots.filter(filterUndefined).length
+  }
+
+  getCurrentBox(): Readonly<Box<P>> {
+    return this.boxes[this.currentPCBox]
   }
 
   get boxSlotCount(): number {

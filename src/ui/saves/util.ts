@@ -1,7 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { Box, SAV } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
-import { filterUndefined } from '@openhome-core/util/sort'
 import { SaveRef } from '@openhome-core/util/types'
 import BackendInterface from '@openhome-ui/backend/backendInterface'
 import { CtxMenuElementBuilder, ItemBuilder } from '@openhome-ui/components/context-menu/types'
@@ -149,15 +148,13 @@ export function buildNavigator(
   callback?: (index?: number) => void
 ) {
   if (currentIndex === undefined) return undefined
-  const currentBox =
-    save.currentPCBox < save._boxes.length ? save._boxes[save.currentPCBox] : undefined
+  const nonEmptySlotCount = save.getBoxMonCount(save.currentPCBox)
 
-  const nonEmptySlots = currentBox?.boxSlots.filter(filterUndefined).length ?? 0
-
-  if (currentBox === undefined || nonEmptySlots < 2) {
+  if (nonEmptySlotCount < 2) {
     return undefined
   }
 
+  const currentBox = save.getCurrentBox()
   return callback
     ? () => callback(getFollowingMon(currentBox, incrementFunction, currentIndex))
     : () => getFollowingMon(currentBox, incrementFunction, currentIndex)

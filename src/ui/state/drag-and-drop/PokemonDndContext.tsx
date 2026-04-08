@@ -144,13 +144,11 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             ): MonLocation | null => {
               if (!targetSave) return null
 
-              for (let box = startBox; box < targetSave._boxes.length; box++) {
-                const boxSlots = targetSave._boxes[box]?.boxSlots
-                if (!boxSlots) continue
+              for (let box = startBox; box < targetSave.getBoxCount(); box++) {
                 const slotStart = box === startBox ? startSlot : 0
 
-                for (let boxSlot = slotStart; boxSlot < boxSlots.length; boxSlot++) {
-                  if (!boxSlots[boxSlot]) {
+                for (let boxSlot = slotStart; boxSlot < targetSave.boxSlotCount; boxSlot++) {
+                  if (!targetSave.getMonAt(box, boxSlot)) {
                     return {
                       isHome: false,
                       saveIdentifier: targetSave.identifier,

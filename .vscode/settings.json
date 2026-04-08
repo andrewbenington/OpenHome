@@ -54,9 +54,7 @@
   ],
   "editor.inlayHints.enabled": "off",
   "editor.tabSize": 2,
-  "rust-analyzer.cargo.features": [
-    "wasm"
-  ],
+  "rust-analyzer.cargo.features": ["wasm"],
   "css.completion.completePropertyWithSemicolon": false,
   "rust-analyzer.cargo.targetDir": true,
   "python.defaultInterpreterPath": "generate/.venv/bin/python",

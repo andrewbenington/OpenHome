@@ -173,7 +173,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   trainerGender: Gender
 
   currentPCBox: number
-  _boxes: Array<Box<T>>
+  boxes: Array<Box<T>>
   boxNames: string[]
 
   bytes: Uint8Array
@@ -209,7 +209,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
     this.sid = this.primarySave.sid
     this.trainerGender = this.primarySave.trainerGender
     this.currentPCBox = this.primarySave.currentPCBox
-    this._boxes = this.primarySave.boxes
+    this.boxes = this.primarySave.boxes
     this.boxNames = this.primarySave.boxNames
   }
 
@@ -223,11 +223,11 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
       const pcBytes = new Uint8Array(58) // Per pokemon bytes
 
       // Current Mon in loop
-      const mon = this._boxes[box].boxSlots[index]
+      const mon = this.boxes[box].boxSlots[index]
 
       // mon will be undefined if pokemon was moved from this slot
       //  and the slot was left empty
-      const slotMon = this._boxes[box].boxSlots[index]
+      const slotMon = this.boxes[box].boxSlots[index]
 
       if (mon && slotMon) {
         try {
@@ -266,7 +266,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
 
   getCurrentBox() {
-    return this._boxes[this.currentPCBox]
+    return this.boxes[this.currentPCBox]
   }
 
   static includesOrigin(origin: OriginGame) {
@@ -278,13 +278,13 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   static saveTypeID = 'G3RRSAV'
 
   getMonAt(boxNum: number, boxSlot: number) {
-    const box = this._boxes[boxNum]
+    const box = this.boxes[boxNum]
     if (!box) return undefined
     return box.boxSlots[boxSlot]
   }
 
   setMonAt(boxNum: number, boxSlot: number, mon: Option<T>): void {
-    const box = this._boxes[boxNum]
+    const box = this.boxes[boxNum]
     if (!box) return
     box.boxSlots[boxSlot] = mon
   }

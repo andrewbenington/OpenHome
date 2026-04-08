@@ -43,14 +43,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const { dragState, toggleSelection, isSelected } = useDragAndDrop()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
-  const currentBoxIndex = save.currentPCBox
 
-  // const currentBox = useMemo(
-  //   () => (save.currentPCBox < save.getBoxCount() ? save._boxes[save.currentPCBox] : undefined),
-  //   [save._boxes, save.currentPCBox]
-  // )
-
-  const selectedMon = useMemo(() => {
     if (selectedIndex === undefined || selectedIndex >= save.boxSlotCount) {
       return undefined
     }
