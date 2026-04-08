@@ -44,6 +44,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
 
+  const selectedMon = useMemo(() => {
     if (selectedIndex === undefined || selectedIndex >= save.boxSlotCount) {
       return undefined
     }
