@@ -13,13 +13,6 @@ edition = "2024"
 name = "openhome_lib"
 crate-type = ["cdylib", "rlib"]
 
-[profile.release]
-panic = "abort" # Strip expensive panic clean-up logic
-codegen-units = 1 # Compile crates one after another so the compiler can optimize better
-lto = true # Enables link time optimizations
-opt-level = "s" # Optimize for binary size
-strip = true # Remove debug symbols
-
 [build-dependencies]
 tauri-build = { version = "2.5.6", features = [] }
 

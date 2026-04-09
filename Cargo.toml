@@ -1,3 +1,10 @@
 [workspace]
 resolver = "3"
 members = ["src-tauri", "pkm_rs", "pkm_rs_derive", "pkm_rs_resources", "pkm_rs_types"]
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

@@ -44,3 +44,6 @@ randomize = ["rand", "pkm_rs_types/randomize", "pkm_rs_resources/randomize"]
 
 [dev-dependencies]
 assert-json-diff = "2.0.2"
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["--enable-bulk-memory", "--enable-nontrapping-float-to-int"]
