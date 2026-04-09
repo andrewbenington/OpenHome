@@ -1,8 +1,12 @@
-mod checksum;
 mod conversion;
-mod encryption;
 mod strings;
 mod util;
+
+#[cfg(feature = "wasm")]
+mod checksum;
+
+#[cfg(feature = "wasm")]
+mod encryption;
 
 pub mod convert_strategy;
 pub mod format;

@@ -527,7 +527,7 @@ impl DataSection for MainDataV2 {
         bytes[16..20].copy_from_slice(&self.exp.to_le_bytes());
         bytes[20..22].copy_from_slice(&self.ability_index.to_le_bytes());
 
-        util::write_uint3_to_bits(self.ability_num.to_byte(), &mut bytes[22], 0);
+        pkm_rs_types::write_uint3_to_bits(self.ability_num.to_byte(), &mut bytes[22], 0);
         util::set_flag(&mut bytes, 22, 3, self.favorite);
         util::set_flag(&mut bytes, 22, 4, self.is_shadow);
         util::set_flag(&mut bytes, 22, 5, self.is_fateful_encounter);

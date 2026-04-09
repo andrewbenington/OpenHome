@@ -168,7 +168,7 @@ impl OhpkmV1 {
             secret_id: u16::from_le_bytes(bytes[14..16].try_into().unwrap()),
             exp: u32::from_le_bytes(bytes[16..20].try_into().unwrap()),
             ability_index: u16::from_le_bytes(bytes[20..22].try_into().unwrap()),
-            ability_num: util::read_uint3_from_bits(bytes[22], 0),
+            ability_num: pkm_rs_types::read_uint3_from_bits(bytes[22], 0),
             favorite: util::get_flag(bytes, 22, 3),
             can_gigantamax: util::get_flag(bytes, 22, 4),
             is_alpha: util::get_flag(bytes, 22, 5),
@@ -332,7 +332,7 @@ impl PkmBytes for OhpkmV1 {
         bytes[16..20].copy_from_slice(&self.exp.to_le_bytes());
         bytes[20..22].copy_from_slice(&self.ability_index.to_le_bytes());
 
-        util::write_uint3_to_bits(self.ability_num, &mut bytes[22], 0);
+        pkm_rs_types::write_uint3_to_bits(self.ability_num, &mut bytes[22], 0);
         util::set_flag(bytes, 22, 3, self.favorite);
         util::set_flag(bytes, 22, 4, self.can_gigantamax);
         util::set_flag(bytes, 22, 5, self.is_alpha);

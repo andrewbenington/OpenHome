@@ -1,7 +1,7 @@
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::result::Result;
 use crate::traits::bytes::{AsBytes, AsBytesMut};
-use crate::{log, util};
+use crate::util;
 use arbitrary_int::u3;
 use arbitrary_int::u7;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
@@ -57,11 +57,6 @@ impl<'a> Pk7Buffer<&'a [u8]> {
 
 impl<'a> Pk7Buffer<&'a mut [u8]> {
     pub fn box_span_mut(span: &'a mut [u8]) -> Self {
-        log!(
-            "Creating mutable Pk7Buffer with span of length {} (should be {})",
-            span.len(),
-            super::BOX_SIZE
-        );
         assert_eq!(span.len(), super::BOX_SIZE);
         Self(span)
     }
@@ -108,7 +103,7 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn forme_index(&self) -> u8 {
-        util::read_uint5_from_bits(self.bytes()[29], 3)
+        pkm_rs_types::read_uint5_from_bits(self.bytes()[29], 3)
     }
 
     pub fn species_and_forme(&self) -> Result<SpeciesAndForme> {
@@ -536,7 +531,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn set_forme_index(&mut self, v: u8) {
-        util::write_uint5_to_bits(v, &mut self.bytes_mut()[29], 3);
+        pkm_rs_types::write_uint5_to_bits(v, &mut self.bytes_mut()[29], 3);
     }
 
     pub fn set_species_and_forme(&mut self, v: SpeciesAndForme) {
