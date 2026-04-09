@@ -153,6 +153,7 @@ pub enum SignificantUpdate {
     V1_9_2,
     V1_10_0,
     V1_10_1,
+    V1_10_2,
 }
 
 impl SignificantUpdate {
@@ -170,6 +171,7 @@ impl SignificantUpdate {
             Self::V1_9_2 => Version::parse("1.9.2").unwrap(),
             Self::V1_10_0 => Version::parse("1.10.0").unwrap(),
             Self::V1_10_1 => Version::parse("1.10.1").unwrap(),
+            Self::V1_10_2 => Version::parse("1.10.2").unwrap(),
         }
     }
 
@@ -215,6 +217,13 @@ impl SignificantUpdate {
             Self::V1_10_1 => Some(vec![
                 "All newly tracked Pokémon will now keep a backup copy of their original data in its raw byte format. This should increase the chance of data recovery in case of future bugs or oversights. Backup data can be viewed via the toggle in the bottom left of that Pokémon details modal, but Pokémon tracked from before version 1.10.1 will not have backup data or this toggle.",
                 "More columns have been added to the \"Tracked Pokémon\" tab, including stats, types, gender, shiny status, and moves",
+            ]),
+            Self::V1_10_2 => Some(vec![
+                "Some PKM format conversion options have been added to the Settings page. These settings will be used whenever you move a Pokémon from OpenHome into a save file.",
+                "A Pokémon's level-up moveset and compatible games are now viewable in the Pokédex.",
+                "If a Pokémon is moved into a game where none of its known moves are present, it will instead be assigned the four most recent moves from its level-up learnset.",
+                "A bug caused by moving a Pokémon into Legends Arceus when it has no compatible moves has been fixed.",
+                "A bug causing certain Pokémon to keep their pre-evolution's species name has been fixed (English names only). This will be fixed for other languages soon.",
             ]),
             _ => None,
         }
