@@ -83,7 +83,7 @@ pub fn read_uint5_from_bits(byte: u8, bit_offset: u8) -> u8 {
 pub fn six_digit_trainer_display(trainer_id: u16, secret_id: u16) -> String {
     let full_id: u32 = (secret_id as u32) << 16 | (trainer_id as u32);
 
-    format!("{:0>6}", full_id)
+    format!("{:0>6}", full_id % 1_000_000)
 }
 
 mod test {
@@ -114,5 +114,15 @@ mod test {
         let mut byte = 0b11111111;
         crate::util::write_uint5_to_bits(0, &mut byte, 1);
         assert_eq!(byte, 0b11000001);
+    }
+
+    #[test]
+    fn six_digit_trainer_display_formats_correctly() {
+        let trainer_id = 0x7114;
+        let secret_id = 0xb815;
+        assert_eq!(
+            crate::util::six_digit_trainer_display(trainer_id, secret_id),
+            "412948"
+        );
     }
 }

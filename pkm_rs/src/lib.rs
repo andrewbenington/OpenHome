@@ -1,7 +1,6 @@
 mod checksum;
 mod conversion;
 mod encryption;
-mod save;
 mod strings;
 mod util;
 

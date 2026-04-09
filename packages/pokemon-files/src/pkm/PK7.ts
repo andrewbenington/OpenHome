@@ -91,6 +91,10 @@ export class Pk7Rust {
     return new Pk7Rust(ohpkm, { strategy })
   }
 
+  static fromWasm(pk7: Pk7Wasm): Pk7Rust {
+    return new Pk7Rust(pk7, {})
+  }
+
   get sanity() {
     return this.inner.sanity
   }
@@ -589,7 +593,7 @@ export class Pk7Rust {
     return this.inner.ribbon_bytes
   }
 
-  public calcChecksum() {
+  public calculateChecksum() {
     return get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0xe8)
   }
 
@@ -598,7 +602,7 @@ export class Pk7Rust {
   }
 
   public refreshChecksum() {
-    this.checksum = get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0xe8)
+    this.checksum = this.calculateChecksum()
   }
 
   public toPCBytes() {

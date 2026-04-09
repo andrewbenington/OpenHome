@@ -348,3 +348,65 @@ export function saveToStringIdentifier(save: SAV): SaveIdentifier {
     ? `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}${Delimiter}${save.pluginIdentifier}`
     : `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}`
 }
+
+export interface WasmSaveInner<P> {
+  gameOfOrigin: OriginGame
+  secretId: number
+  trainerGender: number
+  trainerId: number
+  trainerName: string
+  displayId: string
+  currentPcBoxIdx: number
+  prepareBytesForSaving(): Uint8Array
+
+  getMonAt(box_num: number, offset: number): Option<P>
+  setMonAt(box_num: number, offset: number, mon?: P | null): void
+}
+
+export abstract class WasmOfficialSave<P extends PKMInterface, WasmP> extends OfficialSAV<P> {
+  inner: WasmSaveInner<WasmP>
+
+  constructor(inner: WasmSaveInner<WasmP>) {
+    super()
+    this.inner = inner
+  }
+
+  get name() {
+    return this.inner.trainerName
+  }
+
+  get tid() {
+    return this.inner.trainerId
+  }
+
+  get sid() {
+    return this.inner.secretId
+  }
+
+  get displayID() {
+    return this.inner.displayId
+  }
+
+  get trainerGender() {
+    return this.inner.trainerGender
+  }
+
+  getCurrentPCBox() {
+    return this.inner.currentPcBoxIdx
+  }
+
+  get origin() {
+    return this.inner.gameOfOrigin
+  }
+
+  abstract monFromWasm(wasmMon: WasmP): P
+
+  getMonAt(boxNum: number, boxSlot: number): Option<P> {
+    const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
+    return wasmMon ? this.monFromWasm(wasmMon) : undefined
+  }
+
+  prepareForSaving(): Uint8Array {
+    return this.inner.prepareBytesForSaving()
+  }
+}

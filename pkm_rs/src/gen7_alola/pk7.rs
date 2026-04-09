@@ -5,7 +5,7 @@ use crate::convert_strategy::ConvertStrategy;
 use crate::encryption;
 use crate::gen7_alola::pk7_buffer::{Pk7BufferMut, Pk7BufferRef};
 use crate::result::{Error, Result};
-use crate::traits::ModernEvs;
+use crate::traits::{AsBytesMut, ModernEvs};
 use crate::traits::{HasSpeciesAndForme, PkmBytes};
 
 use pkm_rs_derive::IsShiny4096;
@@ -335,6 +335,18 @@ impl Pk7 {
             pp_ups: 102,
         }
     }
+
+    pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Vec<u8> {
+        let mut bytes = [0; Self::BOX_SIZE];
+        let mut buffer = Pk7BufferMut::box_span_mut(&mut bytes);
+
+        buffer.set_handler_name(trainer_name);
+        buffer.set_is_current_handler(true);
+        buffer.refresh_checksum();
+
+        let bytes = buffer.as_bytes_mut();
+        encryption::decrypt_pkm_bytes_gen_6_7(&encryption::shuffle_blocks_gen_6_7(bytes))
+    }
 }
 
 impl PkmBytes for Pk7 {
@@ -524,8 +536,10 @@ mod test {
 
     use crate::convert_strategy::ConvertStrategy;
     use crate::gen7_alola::Pk7;
+    use crate::gen7_alola::pk7_buffer::Pk7BufferRef;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
+    use crate::result::Error;
     #[cfg(feature = "randomize")]
     use crate::tests::TestErrorWithSeed;
     use crate::tests::{self, TestResult};
@@ -630,5 +644,18 @@ mod test {
         tests::to_from_ohpkm_all_in_dir::<Pk7>(
             &PathBuf::from("test-files").join("pkm-files").join("pk7"),
         )
+    }
+
+    #[test]
+    fn empty_slot_checksum() -> TestResult<()> {
+        let empty_slot = Pk7::empty_box_slot_bytes(&"RoC".into());
+        if Pk7BufferRef::box_span(&empty_slot).checksum() != 0x0204 {
+            return Err(Error::other(&format!(
+                "Empty slot checksum should be 0x0204; received {:#06x}",
+                Pk7BufferRef::box_span(&empty_slot).checksum()
+            ))
+            .into());
+        }
+        Ok(())
     }
 }

@@ -20,9 +20,9 @@ import { SAVClass } from '@openhome-core/save/util'
 import { XYSAV } from '@openhome-core/save/XYSAV'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { Dispatch, Reducer, createContext } from 'react'
+import { Gen7AlolaSave } from '../../core/save/G7SAV_WASM'
 import { ZASAV } from '../../core/save/Gen89/ZASAV'
 import { OfficialSAV } from '../../core/save/interfaces'
-import { SunMoonSaveWasm } from '../../core/save/SMSAV_WASM'
 import { MonDisplayState } from '../hooks/useMonDisplay'
 
 export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
@@ -37,7 +37,7 @@ export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   XYSAV,
   ORASSAV,
   // SMSAV,
-  SunMoonSaveWasm,
+  Gen7AlolaSave,
   USUMSAV,
   LGPESAV,
   SwShSAV,

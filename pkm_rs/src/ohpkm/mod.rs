@@ -24,12 +24,12 @@ extern "C" {
     fn console_log(s: &str);
 }
 
-#[cfg(feature = "wasm")]
+#[cfg(target_arch = "wasm32")]
 pub fn log<T: ToString>(s: T) {
     console_log(&s.to_string());
 }
 
-#[cfg(not(feature = "wasm"))]
+#[cfg(not(target_arch = "wasm32"))]
 pub fn log<T: ToString>(s: T) {
     println!("{}", s.to_string());
 }

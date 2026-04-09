@@ -1,7 +1,7 @@
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::result::Result;
 use crate::traits::bytes::{AsBytes, AsBytesMut};
-use crate::util;
+use crate::{log, util};
 use arbitrary_int::u3;
 use arbitrary_int::u7;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
@@ -57,6 +57,11 @@ impl<'a> Pk7Buffer<&'a [u8]> {
 
 impl<'a> Pk7Buffer<&'a mut [u8]> {
     pub fn box_span_mut(span: &'a mut [u8]) -> Self {
+        log!(
+            "Creating mutable Pk7Buffer with span of length {} (should be {})",
+            span.len(),
+            super::BOX_SIZE
+        );
         assert_eq!(span.len(), super::BOX_SIZE);
         Self(span)
     }
