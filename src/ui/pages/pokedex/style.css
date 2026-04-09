@@ -220,3 +220,15 @@
   color: var(--accent-contrast);
   height: 2.5rem;
 }
+
+.compatible-game-card {
+  display: flex;
+  width: 6rem;
+  height: 6rem;
+
+  img {
+    width: 100%;
+    margin: auto;
+    max-height: 100%;
+  }
+}

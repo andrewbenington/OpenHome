@@ -252,38 +252,40 @@ function PokedexDetails({
             Games
           </Button>
           <div style={{ flex: 1 }} />
-          <Select.Root
-            value={metadataSource.toString()}
-            onValueChange={(value) =>
-              setMetadataSource(
-                value === MOST_CURRENT_SOURCE
-                  ? MOST_CURRENT_SOURCE
-                  : (parseInt(value) as MetadataSource)
-              )
-            }
-          >
-            <Select.Trigger variant="classic" className="pokedex-view-select" />
-            <Select.Content position="popper">
-              {allMetadataSources().map((source) => (
-                <Select.Item
-                  key={source}
-                  value={source.toString()}
-                  disabled={
-                    !MetadataSources.supportsForm(
-                      source,
-                      selectedForme.nationalDex.index,
-                      selectedForme.formeIndex
-                    )
-                  }
-                >
-                  {MetadataSources.display(source)}
+          {currentView !== 'games' && (
+            <Select.Root
+              value={metadataSource.toString()}
+              onValueChange={(value) =>
+                setMetadataSource(
+                  value === MOST_CURRENT_SOURCE
+                    ? MOST_CURRENT_SOURCE
+                    : (parseInt(value) as MetadataSource)
+                )
+              }
+            >
+              <Select.Trigger variant="classic" className="pokedex-view-select" />
+              <Select.Content position="popper">
+                {allMetadataSources().map((source) => (
+                  <Select.Item
+                    key={source}
+                    value={source.toString()}
+                    disabled={
+                      !MetadataSources.supportsForm(
+                        source,
+                        selectedForme.nationalDex.index,
+                        selectedForme.formeIndex
+                      )
+                    }
+                  >
+                    {MetadataSources.display(source)}
+                  </Select.Item>
+                ))}
+                <Select.Item key={MOST_CURRENT_SOURCE} value={MOST_CURRENT_SOURCE}>
+                  Current Data
                 </Select.Item>
-              ))}
-              <Select.Item key={MOST_CURRENT_SOURCE} value={MOST_CURRENT_SOURCE}>
-                Current Data
-              </Select.Item>
-            </Select.Content>
-          </Select.Root>
+              </Select.Content>
+            </Select.Root>
+          )}
         </Flex>
         <div style={{ height: '100%', overflow: 'auto', paddingTop: '2.5rem' }}>
           {currentView === 'main' ? (
@@ -445,24 +447,15 @@ function PokedexGames(props: PokedexGamesProps) {
         selectedForme.formeIndex
       ).map((origin) => (
         <Card
+          className="compatible-game-card"
           key={origin}
           style={{
-            display: 'flex',
-            width: '6rem',
-            height: '6rem',
             backgroundColor: OriginGames.color(origin),
             '--card-background-color': OriginGames.color(origin),
             padding: OriginGames.isGameboy(origin) ? '0' : '0.25rem',
-            // backgroundColor: save.pluginIdentifier
-            //   ? getPluginColor(save.pluginIdentifier)
-            //   : OriginGames.color(origin),
           }}
         >
-          <img
-            draggable={false}
-            src={OriginGames.logoPath(origin)}
-            style={{ maxWidth: '100%', margin: 'auto', maxHeight: '100%' }}
-          />
+          <img draggable={false} src={OriginGames.logoPath(origin)} />
         </Card>
       ))}
     </Flex>

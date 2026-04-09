@@ -43,6 +43,11 @@ impl PersonalInfoLetsGo {
     }
 
     pub fn game_index_for_form(&self, national_dex: u16, form_index: u16) -> Option<u16> {
+        if national_dex > Self::MAX_NATIONAL_DEX as u16
+            || (national_dex > NationalDex::Mew as u16 && national_dex < NationalDex::Meltan as u16)
+        {
+            return None;
+        }
         if form_index == 0 {
             return Some(national_dex);
         }
