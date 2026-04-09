@@ -100,6 +100,8 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
         }
       }
     }
+
+    // emptyBoxSlotBytes()
   }
 
   abstract getBoxNamesOffset(): number
