@@ -211,6 +211,18 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
       (origin >= OriginGame.HeartGold && origin <= OriginGame.SoulSilver)
     )
   }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK4>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
+  }
 }
 
 const EMPTY_SLOT_BYTES = new Uint8Array([

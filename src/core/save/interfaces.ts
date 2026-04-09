@@ -10,6 +10,7 @@ import {
   OriginGames,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
+import { filterUndefined } from '../util/sort'
 import { LookupType, SAVClass } from './util'
 import { PathData } from './util/path'
 
@@ -56,7 +57,8 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   displayID: string
 
   currentPCBox: number
-  boxes: Array<Box<P>>
+  // boxes: Array<Box<P>>
+  getBoxCount(): number
 
   invalid: boolean
   tooEarlyToOpen: boolean
@@ -68,6 +70,8 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   getCurrentBox: () => Box<P>
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata
   getMonAt(boxNum: number, boxSlot: number): Option<P>
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
+  getAllMons(): Readonly<P>[]
 
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
@@ -91,12 +95,11 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract trainerGender: Gender
   abstract displayID: string
   abstract currentPCBox: number
-  abstract boxes: Box<P>[]
+  abstract boxes: Readonly<Box<P>>[]
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
   abstract updatedBoxSlots: BoxAndSlot[]
-  abstract getCurrentBox(): Box<P>
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
   abstract supportsItem(itemIndex: number): boolean
   abstract prepareForSaving(): void
@@ -122,11 +125,27 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   pluginIdentifier: undefined = undefined
 
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
-  getMonAt(boxNum: number, boxSlot: number): Option<P> {
-    const box = this.boxes[boxNum]
-    if (!box) return undefined
-    return box.boxSlots[boxSlot]
+
+  abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
+  abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
+
+  getBoxCount(): number {
+    return this.boxes.length
   }
+
+  getAllMons(): Readonly<P>[] {
+    return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
+  }
+  // getMonAt(boxNum: number, boxSlot: number): Option<P> {
+  //   const box = this.boxes[boxNum]
+  //   if (!box) return undefined
+  //   return box.boxSlots[boxSlot]
+  // }
+  // setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void {
+  //   const box = this.boxes[boxNum]
+  //   if (!box) return
+  //   box.boxSlots[boxSlot] = mon
+  // }
 
   get gameName(): string {
     return OriginGames.gameName(this.origin)
@@ -147,6 +166,35 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   get lookupType(): Option<LookupType> {
     return (this.constructor as SAVClass).lookupType
   }
+
+  get boxSlotCount(): number {
+    return this.boxRows * this.boxColumns
+  }
+
+  getBoxMonCount(boxNum: number): number {
+    const box = this.boxes[boxNum]
+    if (!box) return 0
+    return box.boxSlots.filter(filterUndefined).length
+  }
+
+  getFirstNonEmptySlotAfter(boxNum: number, boxSlot: number): number | undefined {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    for (let i = boxSlot + 1; i < box.boxSlots.length; i++) {
+      if (box.boxSlots[i] !== undefined) {
+        return i
+      }
+    }
+    return undefined
+  }
+
+  getCurrentBox(): Readonly<Box<P>> {
+    return this.boxes[this.currentPCBox]
+  }
+
+  getBoxName(boxNum: number): string | undefined {
+    return this.boxes[boxNum]?.name
+  }
 }
 
 export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
@@ -162,12 +210,11 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract trainerGender: Gender
   abstract displayID: string
   abstract currentPCBox: number
-  abstract boxes: Box<P>[]
+  abstract boxes: Readonly<Box<P>>[]
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
   abstract updatedBoxSlots: BoxAndSlot[]
-  abstract getCurrentBox(): Box<P>
   abstract supportsMon(
     dexNumber: number,
     formeNumber: number,
@@ -218,10 +265,33 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
     return (this.constructor as SAVClass).lookupType
   }
 
-  getMonAt(boxNum: number, boxSlot: number): Option<P> {
+  abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
+  abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
+
+  getBoxCount(): number {
+    return this.boxes.length
+  }
+
+  getAllMons(): Readonly<P>[] {
+    return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
+  }
+
+  getBoxName(boxNum: number): string | undefined {
+    return this.boxes[boxNum]?.name
+  }
+
+  getBoxMonCount(boxNum: number): number {
     const box = this.boxes[boxNum]
-    if (!box) return undefined
-    return box.boxSlots[boxSlot]
+    if (!box) return 0
+    return box.boxSlots.filter(filterUndefined).length
+  }
+
+  getCurrentBox(): Readonly<Box<P>> {
+    return this.boxes[this.currentPCBox]
+  }
+
+  get boxSlotCount(): number {
+    return this.boxRows * this.boxColumns
   }
 }
 

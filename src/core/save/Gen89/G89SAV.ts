@@ -1,6 +1,7 @@
 import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
 import { PA8, PA9, PB8, PK8, PK9 } from '@pokemon-files/pkm'
 import { AllPKMFields } from '@pokemon-files/util'
+import { Option } from 'src/core/util/functional'
 import {
   SCArrayBlock,
   SCBlock,
@@ -144,6 +145,18 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9 | PA9> extends Offi
 
   getPluginIdentifier() {
     return undefined
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
   }
 }
 

@@ -8,6 +8,7 @@ import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConve
 import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK7 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
+import { Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { SIZE_USUM } from './util'
 import { PathData } from './util/path'
@@ -164,6 +165,18 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
     return {
       'Calculated Checksum': this.calculateChecksumStr(),
     }
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK7>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
   }
 }
 
