@@ -1,7 +1,7 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "1.10.1",
+  "version": "1.10.2",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "pokemon",
@@ -39,7 +39,7 @@
     "test-cargo": "cd pkm_rs_types && cargo test --features wasm; cd ../pkm_rs_resources && cargo test --features wasm; cd ../pkm_rs && cargo test --features wasm; cd ../src-tauri && cargo test",
     "test-vite": "pnpm run wasm-compile && vitest run",
     "test": "pnpm run test-cargo && pnpm run test-vite",
-    "wasm-compile": "wasm-pack build ./pkm_rs --target web -- --features wasm",
+    "wasm-compile": "wasm-pack build ./pkm_rs --target web -- --features wasm && node scripts/patch-types.js",
     "precommit": "pnpm run typecheck && pnpm run format && pnpm run lint",
     "postinstall": "pnpm run wasm-compile"
   },

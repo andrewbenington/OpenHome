@@ -46,6 +46,7 @@
         "./pkm_rs/*"
       ]
     },
+    "typeRoots": ["./src/types", "./node_modules/@types"],
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -65,6 +66,7 @@
     "generate/generateMoveMap.ts",
     "src-tauri/pokemon-wasm",
     "generate/generate-cfru/generateMoveMap.ts",
+    "src/types/pkm-resources-types.d.ts",
     "__mocks__"
   ]
 }

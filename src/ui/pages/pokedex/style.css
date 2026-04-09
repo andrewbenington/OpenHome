@@ -191,6 +191,12 @@
   box-shadow: none !important;
 }
 
+.openhome-tab-row {
+  position: absolute;
+  top: 2.1rem;
+  z-index: 10;
+}
+
 .openhome-tab {
   --transition-duration: 0.15s;
   --transition-timing-function: cubic-bezier(0.57, 0.4, 0.59, 1.49);
@@ -213,4 +219,16 @@
   background-color: var(--accent-9);
   color: var(--accent-contrast);
   height: 2.5rem;
+}
+
+.compatible-game-card {
+  display: flex;
+  width: 6rem;
+  height: 6rem;
+
+  img {
+    width: 100%;
+    margin: auto;
+    max-height: 100%;
+  }
 }

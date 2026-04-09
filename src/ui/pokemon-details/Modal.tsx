@@ -141,7 +141,7 @@ const PokemonDetailsModal = (props: {
       }
     } catch (e) {
       console.error(e)
-      displayError(`Error converting to ${P.getName()}`, `${e}`)
+      displayError(`Error converting to ${P.getFormat()}`, `${e}`)
     }
   }
 
