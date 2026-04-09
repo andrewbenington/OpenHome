@@ -17,6 +17,9 @@ use std::marker::PhantomData;
 use pkm_rs_types::{NationalDex, OriginGame, PkmType, Stats8, StatsPreSplit};
 
 #[cfg(feature = "wasm")]
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
+#[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wasm")]
@@ -51,7 +54,7 @@ use crate::{
 };
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, EnumIter)]
 pub enum MetadataSource {
     RedBlue,
     Yellow,
@@ -106,6 +109,35 @@ impl MetadataSource {
         }
     }
 
+    pub fn all_origin_games(self) -> Vec<OriginGame> {
+        match self {
+            Self::RedBlue => vec![OriginGame::Red, OriginGame::BlueGreen, OriginGame::BlueJpn],
+            Self::Yellow => vec![OriginGame::Yellow],
+            Self::GoldSilver => vec![OriginGame::Gold, OriginGame::Silver],
+            Self::Crystal => vec![OriginGame::Crystal],
+            Self::RubySapphire => vec![OriginGame::Ruby, OriginGame::Sapphire],
+            Self::Emerald => vec![OriginGame::Emerald],
+            Self::FireRedLeafGreen => vec![OriginGame::FireRed, OriginGame::LeafGreen],
+            Self::DiamondPearl => vec![OriginGame::Diamond, OriginGame::Pearl],
+            Self::Platinum => vec![OriginGame::Platinum],
+            Self::HeartGoldSoulSilver => vec![OriginGame::HeartGold, OriginGame::SoulSilver],
+            Self::BlackWhite => vec![OriginGame::Black, OriginGame::White],
+            Self::Black2White2 => vec![OriginGame::Black2, OriginGame::White2],
+            Self::XY => vec![OriginGame::X, OriginGame::Y],
+            Self::OmegaRubyAlphaSapphire => vec![OriginGame::OmegaRuby, OriginGame::AlphaSapphire],
+            Self::SunMoon => vec![OriginGame::Sun, OriginGame::Moon],
+            Self::UltraSunUltraMoon => vec![OriginGame::UltraSun, OriginGame::UltraMoon],
+            Self::LetsGoPikachuEevee => vec![OriginGame::LetsGoPikachu, OriginGame::LetsGoEevee],
+            Self::SwordShield => vec![OriginGame::Sword, OriginGame::Shield],
+            Self::BrilliantDiamondShiningPearl => {
+                vec![OriginGame::BrilliantDiamond, OriginGame::ShiningPearl]
+            }
+            Self::LegendsArceus => vec![OriginGame::LegendsArceus],
+            Self::ScarletViolet => vec![OriginGame::Scarlet, OriginGame::Violet],
+            Self::LegendsZa => vec![OriginGame::LegendsZa],
+        }
+    }
+
     pub const fn display(self) -> &'static str {
         match self {
             Self::RedBlue => "Red/Green/Blue",
@@ -151,38 +183,25 @@ impl MetadataSources {
     pub fn display(value: MetadataSource) -> String {
         value.display().to_owned()
     }
-}
 
-#[cfg(feature = "wasm")]
-pub const METADATA_SOURCES: [MetadataSource; 22] = [
-    MetadataSource::RedBlue,
-    MetadataSource::Yellow,
-    MetadataSource::GoldSilver,
-    MetadataSource::Crystal,
-    MetadataSource::RubySapphire,
-    MetadataSource::Emerald,
-    MetadataSource::FireRedLeafGreen,
-    MetadataSource::DiamondPearl,
-    MetadataSource::Platinum,
-    MetadataSource::HeartGoldSoulSilver,
-    MetadataSource::BlackWhite,
-    MetadataSource::Black2White2,
-    MetadataSource::XY,
-    MetadataSource::OmegaRubyAlphaSapphire,
-    MetadataSource::SunMoon,
-    MetadataSource::UltraSunUltraMoon,
-    MetadataSource::LetsGoPikachuEevee,
-    MetadataSource::SwordShield,
-    MetadataSource::BrilliantDiamondShiningPearl,
-    MetadataSource::LegendsArceus,
-    MetadataSource::ScarletViolet,
-    MetadataSource::LegendsZa,
-];
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "supportsForm"))]
+    pub fn supports_form(source: MetadataSource, national_dex: u16, forme_index: u16) -> bool {
+        source_has_form_metadata(source, national_dex, forme_index)
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "supportedGameOrigins"))]
+    pub fn supported_game_origins(national_dex: u16, forme_index: u16) -> Vec<OriginGame> {
+        MetadataSource::iter()
+            .filter(|source| source_has_form_metadata(*source, national_dex, forme_index))
+            .flat_map(MetadataSource::all_origin_games)
+            .collect()
+    }
+}
 
 #[cfg(feature = "wasm")]
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "allMetadataSources"))]
 pub fn all_metadata_sources() -> Vec<MetadataSource> {
-    METADATA_SOURCES.to_vec()
+    MetadataSource::iter().collect()
 }
 
 pub trait PersonalInfo: Sized {

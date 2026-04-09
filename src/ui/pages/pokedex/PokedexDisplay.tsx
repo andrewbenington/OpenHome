@@ -13,6 +13,7 @@ import {
   MetadataSource,
   MetadataSources,
   MetadataSummaryLookup,
+  OriginGames,
   SpeciesLookup,
   SpeciesMetadata,
 } from '@pkm-rs/pkg'
@@ -104,7 +105,7 @@ type PokedexDetailsProps = {
   setSelectedSpecies: (species?: SpeciesMetadata) => void
 }
 
-type PokedexView = 'main' | 'levelup'
+type PokedexView = 'main' | 'levelup' | 'games'
 const MOST_CURRENT_SOURCE = '$CURRENT'
 
 type MostCurrentSource = typeof MOST_CURRENT_SOURCE
@@ -224,7 +225,7 @@ function PokedexDetails({
         </Flex>
       </Flex>
       <Separator orientation="vertical" style={{ height: '100%' }} />
-      <Flex direction="column" height="100%" maxHeight="100%" width="60%" gap="2" overflow="auto">
+      <Flex direction="column" height="100%" maxHeight="100%" width="60%" overflow="auto">
         <Flex className="openhome-tab-row">
           <Button
             className={includeClass('openhome-tab')
@@ -242,49 +243,66 @@ function PokedexDetails({
           >
             Levelup Learnset
           </Button>
-          <div style={{ flex: 1 }} />
-          <Select.Root
-            value={metadataSource.toString()}
-            onValueChange={(value) =>
-              setMetadataSource(
-                value === MOST_CURRENT_SOURCE
-                  ? MOST_CURRENT_SOURCE
-                  : (parseInt(value) as MetadataSource)
-              )
-            }
+          <Button
+            className={includeClass('openhome-tab')
+              .with('openhome-tab-selected')
+              .if(currentView === 'games')}
+            onClick={() => setCurrentView('games')}
           >
-            <Select.Trigger className="pokedex-view-select" />
-            <Select.Content position="popper">
-              {allMetadataSources().map((source) => (
-                <Select.Item key={source} value={source.toString()}>
-                  {MetadataSources.display(source)}
+            Games
+          </Button>
+          <div style={{ flex: 1 }} />
+          {currentView !== 'games' && (
+            <Select.Root
+              value={metadataSource.toString()}
+              onValueChange={(value) =>
+                setMetadataSource(
+                  value === MOST_CURRENT_SOURCE
+                    ? MOST_CURRENT_SOURCE
+                    : (parseInt(value) as MetadataSource)
+                )
+              }
+            >
+              <Select.Trigger variant="classic" className="pokedex-view-select" />
+              <Select.Content position="popper">
+                {allMetadataSources().map((source) => (
+                  <Select.Item
+                    key={source}
+                    value={source.toString()}
+                    disabled={
+                      !MetadataSources.supportsForm(
+                        source,
+                        selectedForme.nationalDex.index,
+                        selectedForme.formeIndex
+                      )
+                    }
+                  >
+                    {MetadataSources.display(source)}
+                  </Select.Item>
+                ))}
+                <Select.Item key={MOST_CURRENT_SOURCE} value={MOST_CURRENT_SOURCE}>
+                  Current Data
                 </Select.Item>
-              ))}
-              <Select.Item key={MOST_CURRENT_SOURCE} value={MOST_CURRENT_SOURCE}>
-                Current Data
-              </Select.Item>
-            </Select.Content>
-          </Select.Root>
+              </Select.Content>
+            </Select.Root>
+          )}
         </Flex>
-        {currentView === 'main' ? (
-          <PokedexMain
-            pokedex={pokedex}
-            species={species}
-            selectedForme={selectedForme}
-            setSelectedForme={setSelectedForme}
-            setSelectedSpecies={setSelectedSpecies}
-            metadataSource={metadataSource}
-          />
-        ) : (
-          <PokedexLearnset
-            pokedex={pokedex}
-            species={species}
-            selectedForme={selectedForme}
-            setSelectedForme={setSelectedForme}
-            setSelectedSpecies={setSelectedSpecies}
-            metadataSource={metadataSource}
-          />
-        )}
+        <div style={{ height: '100%', overflow: 'auto', paddingTop: '2.5rem' }}>
+          {currentView === 'main' ? (
+            <PokedexMain
+              pokedex={pokedex}
+              species={species}
+              selectedForme={selectedForme}
+              setSelectedForme={setSelectedForme}
+              setSelectedSpecies={setSelectedSpecies}
+              metadataSource={metadataSource}
+            />
+          ) : currentView === 'levelup' ? (
+            <PokedexLearnset selectedForme={selectedForme} metadataSource={metadataSource} />
+          ) : currentView === 'games' ? (
+            <PokedexGames selectedForme={selectedForme} />
+          ) : null}
+        </div>
       </Flex>
     </Flex>
   )
@@ -307,6 +325,7 @@ function PokedexMain(props: PokedexMetadataProps) {
     metadataSource === MOST_CURRENT_SOURCE
       ? currentMetadataReader(species.nationalDex, selectedForme.formeIndex)
       : metadataReaderFor(metadataSource, species.nationalDex, selectedForme.formeIndex)
+
   if (!reader) {
     const message =
       metadataSource !== MOST_CURRENT_SOURCE
@@ -329,7 +348,6 @@ function PokedexMain(props: PokedexMetadataProps) {
         <div id="base-stats-and-attributes" style={{ width: '50%' }}>
           <BaseStatsChart stats={stats} />
         </div>
-
         <Flex
           direction="column"
           align="end"
@@ -381,7 +399,12 @@ function PokedexMain(props: PokedexMetadataProps) {
   )
 }
 
-function PokedexLearnset(props: PokedexMetadataProps) {
+interface PokedexLearnsetProps {
+  selectedForme: FormeMetadata
+  metadataSource: MetadataSource | MostCurrentSource
+}
+
+function PokedexLearnset(props: PokedexLearnsetProps) {
   const { selectedForme, metadataSource } = props
 
   const levelUpLearnset = selectedForme.levelUpLearnset(
@@ -406,6 +429,35 @@ function PokedexLearnset(props: PokedexMetadataProps) {
           </Flex>
         )}
       </Flex>
+    </Flex>
+  )
+}
+
+interface PokedexGamesProps {
+  selectedForme: FormeMetadata
+}
+
+function PokedexGames(props: PokedexGamesProps) {
+  const { selectedForme } = props
+
+  return (
+    <Flex gap="1" overflowY="auto" wrap="wrap" justify="center">
+      {MetadataSources.supportedGameOrigins(
+        selectedForme.nationalDex.index,
+        selectedForme.formeIndex
+      ).map((origin) => (
+        <Card
+          className="compatible-game-card"
+          key={origin}
+          style={{
+            backgroundColor: OriginGames.color(origin),
+            '--card-background-color': OriginGames.color(origin),
+            padding: OriginGames.isGameboy(origin) ? '0' : '0.25rem',
+          }}
+        >
+          <img draggable={false} src={OriginGames.logoPath(origin)} />
+        </Card>
+      ))}
     </Flex>
   )
 }

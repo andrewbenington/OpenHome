@@ -2077,35 +2077,3 @@ fn add_section_bytes_to_js_object<T: DataSection<ErrorType = Error>>(
     }
     Ok(())
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn build_all_ohpkms() -> std::result::Result<(), String> {
-        let path = "/Users/andrewbenington/Library/Application Support/OpenHome/storage/mons_v2";
-        for entry in std::fs::read_dir(path).unwrap() {
-            let entry = entry.unwrap();
-            if !entry
-                .file_name()
-                .into_string()
-                .map(|s| s.ends_with(".ohpkm"))
-                .unwrap_or(false)
-            {
-                continue;
-            }
-            let data = std::fs::read(entry.path()).unwrap();
-            println!(
-                "Testing file: {}",
-                entry.path().file_name().unwrap().to_string_lossy()
-            );
-            OhpkmV2::from_bytes(&data).map_err(|e| {
-                format!(
-                    "failed to build ohpkm file {}: {e}",
-                    entry.path().file_name().unwrap().to_string_lossy()
-                )
-            })?;
-        }
-        Ok(())
-    }
-}

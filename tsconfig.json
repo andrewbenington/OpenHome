@@ -43,6 +43,7 @@
         "./pkm_rs/*"
       ]
     },
+    "typeRoots": ["./src/types", "./node_modules/@types"],
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -60,6 +61,7 @@
     "packages",
     "generate/_rename.js",
     "generate/generate-cfru/generateMoveMap.ts",
+    "src/types/pkm-resources-types.d.ts",
     "__mocks__"
   ]
 }
