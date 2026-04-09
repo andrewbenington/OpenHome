@@ -14,7 +14,7 @@ import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
-import { MetadataLookup } from '@pkm-rs/pkg'
+import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
 
 import { useCallback, useContext, useMemo, useState } from 'react'
@@ -67,7 +67,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           title: 'Import Failed',
           messages: unsupportedMons.map(
             (mon) =>
-              `${MetadataLookup(mon.dexNum, mon.formeNum)?.formeName} cannot be moved into ${save.gameName}`
+              `${MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.formeName} cannot be moved into ${save.gameName}`
           ),
         },
       })

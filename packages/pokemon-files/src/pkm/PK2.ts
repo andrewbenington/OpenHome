@@ -1,23 +1,27 @@
 import {
+  ConvertStrategy,
   Generation,
   ItemGen2,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   OriginGames,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import { getLevelGen12, getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PK2 {
-  static getName() {
-    return 'PK2'
+  static getFormat() {
+    return 'PK2' as const
   }
   format: 'PK2' = 'PK2'
   static getBoxSize() {
@@ -46,7 +50,8 @@ export default class PK2 {
   nickname: string
   trainerGender: boolean
   originalBytes?: ArrayBuffer
-  constructor(arg: ArrayBuffer | AllPKMFields) {
+
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
       const buffer = new Uint8Array(arg)[2] === 0xff ? arg.slice(3) : arg
       this.originalBytes = buffer
@@ -115,6 +120,9 @@ export default class PK2 {
       this.trainerGender = byteLogic.getFlag(dataView, 0x1e, 7)
     } else {
       const other = arg
+      const converter = new PkmConverter('PK2', options.strategy)
+      const metData = converter.metData(other)
+
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
       this.dexNum = other.dexNum
@@ -154,19 +162,23 @@ export default class PK2 {
       this.trainerFriendship = other.trainerFriendship ?? 0
       this.pokerusByte = other.pokerusByte ?? 0
       this.metTimeOfDay = other.metTimeOfDay ?? 0
-      this.metLevel = other.metLevel ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
-      this.level = other.level ?? 0
-      this.statusCondition = other.statusCondition ?? 0
+      this.metLevel = other.metLevel
+      this.metLocationIndex = metData.locationIndex
+      this.statusCondition = 0
       this.currentHP = other.currentHP ?? 0
       this.trainerName = other.trainerName
-      this.nickname = other.nickname
+      this.nickname = converter.nickname(other)
       this.trainerGender = other.trainerGender
+      this.level = getLevelGen12(this.dexNum, this.exp)
     }
   }
 
   static fromBytes(buffer: ArrayBuffer): PK2 {
-    return new PK2(buffer)
+    return new PK2(buffer, { encrypted: false })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK2 {
+    return new PK2(ohpkm, { strategy })
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {
@@ -273,7 +285,7 @@ export default class PK2 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

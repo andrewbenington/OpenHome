@@ -7,11 +7,14 @@ import { PKM, PkmClass } from '@pokemon-files/pkm/PKM'
 import {
   Gender,
   Generation,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
   OriginGames,
+  PkmFormat,
+  PkmFormats,
 } from '@pkm-rs/pkg'
+import { PKMInterface } from '../../../../src/core/pkm/interfaces'
 import { AllPKMFields, FourMoves } from './pkmInterface'
 
 export function getGen3MiscFlags(pokemon: PKM): number {
@@ -69,7 +72,7 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
   // xoring the other three values with this to calculate upper half of personality value
   // will ensure shininess or non-shininess depending on original mon
   let newPersonalityValue = BigInt(personalityValue)
-  const metadata = MetadataLookup(mon.dexNum, 0)
+  const metadata = MetadataSummaryLookup(mon.dexNum, 0)
   if (!metadata) {
     return Number(newPersonalityValue)
   }
@@ -211,21 +214,23 @@ export function adjustPpForFormat(
 }
 
 type AllowedMoveIndices = number[]
-type PkmClassWithMoveLimit = PkmClass & { maxValidMove: () => number }
+type PkmClassWithMoveLimit<P extends PKMInterface> = PkmClass<P> & { maxValidMove: () => number }
 
-export class MoveFilter {
-  filter: AllowedMoveIndices | PkmClassWithMoveLimit
+export class MoveFilter<P extends PKMInterface> {
+  filter: AllowedMoveIndices | PkmClassWithMoveLimit<P>
+  format: PkmFormat
 
-  private constructor(filter: AllowedMoveIndices | PkmClassWithMoveLimit) {
+  private constructor(filter: AllowedMoveIndices | PkmClassWithMoveLimit<P>, format: PkmFormat) {
     this.filter = filter
+    this.format = format
   }
 
-  static fromMoveIndices(filter: AllowedMoveIndices) {
-    return new MoveFilter(filter)
+  static fromMoveIndices(filter: AllowedMoveIndices, format: PkmFormat) {
+    return new MoveFilter(filter, format)
   }
 
-  static fromPkmClass(filter: PkmClassWithMoveLimit) {
-    return new MoveFilter(filter)
+  static fromPkmClass<P extends PKMInterface>(filter: PkmClassWithMoveLimit<P>) {
+    return new MoveFilter(filter, filter.getFormat())
   }
 
   moveIsAllowed(moveIndex: number) {
@@ -234,23 +239,64 @@ export class MoveFilter {
       : moveIndex <= this.filter.maxValidMove()
   }
 
-  private filterByMoves(mon: AllPKMFields, values: FourMoves): FourMoves {
-    return mon.moves.map((moveIndex, i) =>
-      this.moveIsAllowed(moveIndex) ? values[i] : 0
-    ) as FourMoves
+  private filterByMoves(mon: AllPKMFields, toFilter: FourMoves): FourMoves {
+    const filtered: FourMoves = [0, 0, 0, 0]
+    for (let i = 0; i < 4; i++) {
+      if (this.moveIsAllowed(mon.moves[i])) {
+        filtered[i] = toFilter[i]
+      }
+    }
+    return filtered
+  }
+
+  private hasAtLeastOneAllowedMove(mon: AllPKMFields) {
+    return mon.moves.some((move) => this.moveIsAllowed(move))
+  }
+
+  private filteredMovesOrLevelupIfEmpty(mon: AllPKMFields) {
+    const filtered = this.filterByMoves(mon, mon.moves)
+    if (filtered.every((move) => move === 0)) {
+      const metadataSource = PkmFormats.getMetadataSource(this.format)
+      const levelUpLearnset = MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.levelUpLearnset(
+        metadataSource
+      )
+      if (levelUpLearnset) {
+        const fromLevelup: FourMoves = [0, 0, 0, 0]
+        levelUpLearnset.slice(-4).forEach((move, i) => {
+          fromLevelup[i] = move.move_id
+        })
+        return fromLevelup
+      }
+    }
+    return filtered
   }
 
   moves(mon: AllPKMFields) {
-    return this.filterByMoves(mon, mon.moves)
+    return this.filteredMovesOrLevelupIfEmpty(mon)
   }
 
-  movePp(mon: AllPKMFields, adjustForFormat: string) {
-    const filteredMovePp = this.filterByMoves(mon, mon.movePP)
-    return adjustPpForFormat(mon.format, mon.moves, filteredMovePp, mon.movePPUps, adjustForFormat)
+  movePp(mon: AllPKMFields, adjustForFormat: string): FourMoves {
+    if (this.hasAtLeastOneAllowedMove(mon)) {
+      const filteredMovePp = this.filterByMoves(mon, mon.movePP)
+      return adjustPpForFormat(
+        mon.format,
+        mon.moves,
+        filteredMovePp,
+        mon.movePPUps,
+        adjustForFormat
+      )
+    }
+    return this.filteredMovesOrLevelupIfEmpty(mon).map((moveIndex) =>
+      getMoveMaxPP(moveIndex, adjustForFormat)
+    ) as FourMoves
   }
 
-  movePpUps(mon: AllPKMFields) {
-    return this.filterByMoves(mon, mon.movePPUps)
+  movePpUps(mon: AllPKMFields): FourMoves {
+    if (this.hasAtLeastOneAllowedMove(mon)) {
+      return this.filterByMoves(mon, mon.movePPUps)
+    } else {
+      return [0, 0, 0, 0]
+    }
   }
 
   relearnMovesOrDefault(mon: AllPKMFields): FourMoves {
@@ -261,7 +307,7 @@ export class MoveFilter {
 }
 
 export function getHeightCalculated(mon: AllPKMFields) {
-  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
   if (!formeMetadata || mon.heightScalar === undefined || !mon.heightDeviation) return 0
 
   const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
@@ -269,7 +315,7 @@ export function getHeightCalculated(mon: AllPKMFields) {
 }
 
 export function getWeightCalculated(mon: AllPKMFields) {
-  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
   if (!formeMetadata || mon.weightScalar === undefined || !mon.weightDeviation) return 0
 
   const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)

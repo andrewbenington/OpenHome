@@ -3,17 +3,20 @@ import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/othe
 
 import {
   Ball,
+  ConvertStrategy,
   ItemGen3,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import * as conversion from '../conversion'
+import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import {
   filterRibbons,
   gen3ContestRibbonsFromBuffer,
@@ -27,10 +30,11 @@ import {
   getGen3MiscFlags,
   MoveFilter,
 } from '../util/util'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PK3 {
-  static getName() {
-    return 'PK3'
+  static getFormat() {
+    return 'PK3' as const
   }
   format: 'PK3' = 'PK3'
   personalityValue: number
@@ -55,7 +59,6 @@ export default class PK3 {
   ivs: types.Stats
   isEgg: boolean
   abilityNum: number
-  ribbonBytes: Uint8Array
   isFatefulEncounter: boolean
   statusCondition: number
   currentHP: number
@@ -63,10 +66,11 @@ export default class PK3 {
   trainerName: string
   ribbons: string[]
   trainerGender: boolean
-  checksum: number
+  checksum: number = 0
   originalBytes?: ArrayBuffer
 
-  constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
+    const { encrypted } = options
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
 
@@ -119,7 +123,6 @@ export default class PK3 {
       this.ivs = types.read30BitIVsFromBytes(dataView, 0x48)
       this.isEgg = byteLogic.getFlag(dataView, 0x48, 30)
       this.abilityNum = byteLogic.getFlag(dataView, 0x48, 31) ? 2 : 1
-      this.ribbonBytes = new Uint8Array(buffer).slice(0x4c, 0x50)
       this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x4c, 31)
       if (dataView.byteLength >= 100) {
         this.statusCondition = dataView.getUint8(0x50)
@@ -141,18 +144,15 @@ export default class PK3 {
       this.trainerGender = byteLogic.getFlag(dataView, 0x46, 15)
       this.checksum = dataView.getUint16(0x1c, true)
     } else {
+      const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
+      const metData = converter.metData(other)
 
-      this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
+      this.personalityValue = generatePersonalityValuePreservingAttributes(other)
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.language = other.language
-      this.markings = types.markingsFourShapesFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-      }
+      this.markings = types.markingsFourShapesFromOther(other.markings)
       this.dexNum = other.dexNum
       this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
       this.exp = other.exp
@@ -163,42 +163,21 @@ export default class PK3 {
       this.movePP = moveFilter.movePp(other, this.format)
       this.movePPUps = moveFilter.movePpUps(other)
 
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.contest = other.contest ?? {
-        cool: 0,
-        beauty: 0,
-        cute: 0,
-        smart: 0,
-        tough: 0,
-        sheen: 0,
-      }
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
-      this.metLevel = other.metLevel ?? 0
-      this.gameOfOrigin = other.gameOfOrigin
+      this.evs = other.evs
+      this.contest = other.contest
+      this.pokerusByte = other.pokerusByte
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
+      this.metLevel = other.metLevel
       if (other.ball && PK3.maxValidBall() >= other.ball) {
         this.ball = other.ball
       } else {
         this.ball = Ball.Poke
       }
 
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.isEgg = other.isEgg ?? false
-      this.abilityNum = other.abilityNum ?? 1
+      this.ivs = converter.ivs(other)
+      this.isEgg = other.isEgg
+      this.abilityNum = other.abilityNum
       if (
         this.abilityNum === 2 &&
         this.metadata
@@ -207,21 +186,23 @@ export default class PK3 {
       ) {
         this.abilityNum = 1
       }
-      this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(4)
-      this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.statusCondition = other.statusCondition ?? 0
-      this.currentHP = other.currentHP ?? 0
-      this.nickname = other.nickname
+      this.isFatefulEncounter = other.isFatefulEncounter
+      this.statusCondition = 0
+      this.currentHP = other.currentHP
+      this.nickname = converter.nickname(other)
       this.trainerName = other.trainerName
-      this.ribbons =
-        filterRibbons(other.ribbons ?? [], [Gen3ContestRibbons, Gen3StandardRibbons]) ?? []
+      this.ribbons = filterRibbons(other.ribbons, [Gen3ContestRibbons, Gen3StandardRibbons])
       this.trainerGender = other.trainerGender
-      this.checksum = other.checksum ?? 0
     }
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
-  static fromBytes(buffer: ArrayBuffer): PK3 {
-    return new PK3(buffer)
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK3 {
+    return new PK3(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3 {
+    return new PK3(ohpkm, { strategy })
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {
@@ -261,7 +242,6 @@ export default class PK3 {
     types.write30BitIVsToBytes(dataView, 0x48, this.ivs)
     byteLogic.setFlag(dataView, 0x48, 30, this.isEgg)
     byteLogic.setFlag(dataView, 0x48, 31, this.abilityNum === 2)
-    new Uint8Array(buffer).set(new Uint8Array(this.ribbonBytes.slice(0, 4)), 0x4c)
     byteLogic.setFlag(dataView, 0x4c, 31, this.isFatefulEncounter)
     if (options?.includeExtraFields) {
       dataView.setUint8(0x50, this.statusCondition)
@@ -329,12 +309,12 @@ export default class PK3 {
     return 0
   }
 
-  calcChecksum(): number {
+  calculateChecksum(): number {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x20, 0x50)
   }
 
   public refreshChecksum() {
-    this.checksum = this.calcChecksum()
+    this.checksum = this.calculateChecksum()
   }
 
   public toPCBytes() {
@@ -348,7 +328,7 @@ export default class PK3 {
   }
 
   public isValid(): boolean {
-    if (this.calcChecksum() !== this.checksum) {
+    if (this.calculateChecksum() !== this.checksum) {
       return false
     }
 
@@ -375,7 +355,7 @@ export default class PK3 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

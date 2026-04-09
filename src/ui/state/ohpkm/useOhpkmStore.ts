@@ -11,6 +11,7 @@ import {
 } from '../../../core/pkm/Lookup'
 import { SAV } from '../../../core/save/interfaces'
 import { SAVClass } from '../../../core/save/util'
+import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
 
 export type OhpkmStore = {
@@ -37,6 +38,7 @@ export type OhpkmLookup = (id: string) => OHPKM | undefined
 
 export function useOhpkmStore(): OhpkmStore {
   const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
+  const { defaultConvertStrategy } = useConvertStrategies()
   const { lookups, updateLookups } = useLookups()
   const { gen12: gen12Lookup, gen345: gen345Lookup } = lookups
 
@@ -121,9 +123,9 @@ export function useOhpkmStore(): OhpkmStore {
       handleLookupsUpdate(ohpkm, save)
       insertOrUpdate(ohpkm)
 
-      return save.convertOhpkm(ohpkm)
+      return save.convertOhpkm(ohpkm, defaultConvertStrategy)
     },
-    [handleLookupsUpdate, insertOrUpdate]
+    [defaultConvertStrategy, handleLookupsUpdate, insertOrUpdate]
   )
 
   const startTrackingNewMon = useCallback(
@@ -193,7 +195,12 @@ export function useOhpkmStore(): OhpkmStore {
             )
           }
 
-          return ohpkmStore[homeIdentifier]
+          // because the game of origin may have been changed for legality reasons, we need to ignore the origin when looking up in the store
+          const homeIdentifierNoOrigin = homeIdentifier.split('-').slice(0, -1).join('-')
+
+          return Object.entries(ohpkmStore).find(([id, _]) =>
+            id.startsWith(homeIdentifierNoOrigin)
+          )?.[1]
         }
         default:
           // use type system to enforce exhaustiveness

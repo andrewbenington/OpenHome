@@ -1,4 +1,4 @@
-import { FormeMetadata, MetadataLookup } from '@pkm-rs/pkg'
+import { FormeMetadata, MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { assert, beforeAll, describe, expect, test } from 'vitest'
 import { initializeWasm } from './init'
@@ -17,7 +17,7 @@ var Hydrapple: FormeMetadata
 beforeAll(initializeWasm)
 beforeAll(() => {
   function mustLookupForme(nationalDex: number, formeIndex: number) {
-    const metadata = MetadataLookup(nationalDex, formeIndex)
+    const metadata = MetadataSummaryLookup(nationalDex, formeIndex)
     assert(metadata !== undefined)
     return metadata
   }

@@ -1,3 +1,5 @@
+import { PkmType } from '@pkm-rs/pkg'
+
 export function colorIsDark(bgColor?: string) {
   if (!bgColor) return false
   const color = bgColor.charAt(0) === '#' ? bgColor.substring(1, 7) : bgColor
@@ -18,47 +20,56 @@ export function colorIsDark(bgColor?: string) {
   return L <= 0.35
 }
 
-export const colorForType = (type: string) => {
+export const SHADOW_TYPE_COLOR = '#604E82'
+
+export const colorForType = (type: PkmType) => {
   switch (type) {
-    case 'normal':
+    case 'Normal':
       return 'rgb(144,153,161)'
-    case 'fire':
+    case 'Fire':
       return 'rgb(255, 156, 84)'
-    case 'fighting':
+    case 'Fighting':
       return 'rgb(206, 64, 105)'
-    case 'water':
+    case 'Water':
       return 'rgb(76, 144, 214)'
-    case 'flying':
+    case 'Flying':
       return 'rgb(143, 168, 221)'
-    case 'grass':
+    case 'Grass':
       return 'rgb(99, 187, 91)'
-    case 'poison':
+    case 'Poison':
       return 'rgb(171, 106, 200)'
-    case 'electric':
+    case 'Electric':
       return 'rgb(244, 210, 59)'
-    case 'ground':
+    case 'Ground':
       return 'rgb(217, 119, 70)'
-    case 'psychic':
+    case 'Psychic':
       return 'rgb(249, 113, 119)'
-    case 'rock':
+    case 'Rock':
       return 'rgb(199, 183, 139)'
-    case 'ice':
+    case 'Ice':
       return 'rgb(116, 206, 192)'
-    case 'bug':
+    case 'Bug':
       return 'rgb(144, 193, 44)'
-    case 'dragon':
+    case 'Dragon':
       return 'rgb(10, 109, 196)'
-    case 'ghost':
+    case 'Ghost':
       return 'rgb(83, 105, 172)'
-    case 'dark':
+    case 'Dark':
       return 'rgb(90, 83, 102)'
-    case 'steel':
+    case 'Steel':
       return 'rgb(90, 142, 161)'
-    case 'fairy':
+    case 'Fairy':
       return 'rgb(236, 143, 230)'
-    case 'shadow':
-      return '#604E82'
     default:
       return '#555'
+  }
+}
+
+export const contrastColorForType = (type: PkmType) => {
+  switch (type) {
+    case 'Electric':
+      return 'black'
+    default:
+      return 'white'
   }
 }

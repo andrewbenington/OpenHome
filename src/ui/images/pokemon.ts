@@ -3,7 +3,12 @@ import { toGen3RRPokemonIndex } from '@openhome-core/save/radicalred/conversion/
 import { RRSprites } from '@openhome-core/save/radicalred/conversion/RadicalRedSprites'
 import { UBSprites } from '@openhome-core/save/unbound/conversion/UnboundSprites'
 import { MonSpriteData } from '@openhome-ui/state/plugin'
-import { ExtraFormIndex, extraFormSpriteName, isSeviiForm, MetadataLookup } from '@pkm-rs/pkg'
+import {
+  ExtraFormIndex,
+  extraFormSpriteName,
+  isSeviiForm,
+  MetadataSummaryLookup,
+} from '@pkm-rs/pkg'
 import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Formes'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { isRomHackFormat, MonFormat } from '../../core/pkm/interfaces'
@@ -36,7 +41,7 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
   const monFormat = format ?? mon.format
 
   if (isMegaStone(mon.heldItemIndex)) {
-    const megaForStone = MetadataLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
+    const megaForStone = MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
       (mega) => mega.requiredItemId === mon.heldItemIndex
     )
 
@@ -76,7 +81,7 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
 }
 
 export function getSpriteName(mon: MonSpriteData): string {
-  const formeMetadata = MetadataLookup(mon.dexNum, mon.formeNum)
+  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
   let spriteName = formeMetadata?.sprite ?? ''
 
   if (mon.dexNum === NationalDex.Alcremie) {

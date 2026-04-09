@@ -1,8 +1,17 @@
 use crate::util::bit_is_set;
 use pkm_rs_derive::Stats;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+pub enum Stat {
+    Hp,
+    Atk,
+    Def,
+    Spa,
+    Spd,
+    Spe,
+}
 
 pub trait Stats: Sized {
     fn get_hp(&self) -> u16;
@@ -14,7 +23,7 @@ pub trait Stats: Sized {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy, Stats)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Copy, Stats, PartialEq, Eq)]
 pub struct Stats8 {
     pub hp: u8,
     pub atk: u8,
@@ -120,10 +129,33 @@ impl Stats8 {
             }
         }
     }
+
+    pub fn get(&self, stat: Stat) -> u8 {
+        match stat {
+            Stat::Hp => self.hp,
+            Stat::Atk => self.atk,
+            Stat::Def => self.def,
+            Stat::Spa => self.spa,
+            Stat::Spd => self.spd,
+            Stat::Spe => self.spe,
+        }
+    }
+
+    pub fn set(&mut self, stat: Stat, value: u8) {
+        match stat {
+            Stat::Hp => self.hp = value,
+            Stat::Atk => self.atk = value,
+            Stat::Def => self.def = value,
+            Stat::Spa => self.spa = value,
+            Stat::Spd => self.spd = value,
+            Stat::Spe => self.spe = value,
+        }
+    }
 }
 
 #[wasm_bindgen]
 #[cfg(feature = "wasm")]
+#[allow(clippy::missing_const_for_fn)]
 impl Stats8 {
     #[wasm_bindgen(constructor)]
     #[allow(clippy::missing_const_for_fn)]
@@ -142,6 +174,23 @@ impl Stats8 {
     #[wasm_bindgen(getter = stats8)]
     pub fn rust_type_name(&self) -> bool {
         true
+    }
+}
+
+impl IntoIterator for Stats8 {
+    type Item = (Stat, u8);
+    type IntoIter = std::array::IntoIter<(Stat, u8), 6>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        [
+            (Stat::Hp, self.hp),
+            (Stat::Atk, self.atk),
+            (Stat::Def, self.def),
+            (Stat::Spa, self.spa),
+            (Stat::Spd, self.spd),
+            (Stat::Spe, self.spe),
+        ]
+        .into_iter()
     }
 }
 
@@ -192,6 +241,7 @@ impl Stats16Le {
 
 #[wasm_bindgen]
 #[cfg(feature = "wasm")]
+#[allow(clippy::missing_const_for_fn)]
 impl Stats16Le {
     #[wasm_bindgen(constructor)]
     #[allow(clippy::missing_const_for_fn)]
@@ -244,6 +294,34 @@ impl HyperTraining {
             | ((self.spd as u8) << 4)
             | ((self.spe as u8) << 5)
     }
+
+    pub const fn by_stat(self, stat: Stat) -> bool {
+        match stat {
+            Stat::Hp => self.hp,
+            Stat::Atk => self.atk,
+            Stat::Def => self.def,
+            Stat::Spa => self.spa,
+            Stat::Spd => self.spd,
+            Stat::Spe => self.spe,
+        }
+    }
+}
+
+impl IntoIterator for HyperTraining {
+    type Item = (Stat, bool);
+    type IntoIter = std::array::IntoIter<(Stat, bool), 6>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        [
+            (Stat::Hp, self.hp),
+            (Stat::Atk, self.atk),
+            (Stat::Def, self.def),
+            (Stat::Spa, self.spa),
+            (Stat::Spd, self.spd),
+            (Stat::Spe, self.spe),
+        ]
+        .into_iter()
+    }
 }
 
 #[wasm_bindgen]
@@ -264,7 +342,7 @@ impl HyperTraining {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 pub struct StatsPreSplit {
     pub hp: u16,
     pub atk: u16,
@@ -274,7 +352,17 @@ pub struct StatsPreSplit {
 }
 
 impl StatsPreSplit {
-    pub fn from_bytes(bytes: [u8; 10]) -> Self {
+    pub const fn from_bytes_u8(bytes: [u8; 5]) -> Self {
+        Self {
+            hp: bytes[0] as u16,
+            atk: bytes[1] as u16,
+            def: bytes[2] as u16,
+            spe: bytes[3] as u16,
+            spc: bytes[4] as u16,
+        }
+    }
+
+    pub fn from_bytes_u16_le(bytes: [u8; 10]) -> Self {
         Self {
             hp: u16::from_le_bytes(bytes[0..2].try_into().unwrap()),
             atk: u16::from_le_bytes(bytes[2..4].try_into().unwrap()),
@@ -331,7 +419,7 @@ impl StatsPreSplit {
         let mut atk = (ivs.atk - 1).div_ceil(2) as u16;
         if atk & 0b11 == 0b01 {
             atk += 1;
-        } else if atk % 4 == 0 {
+        } else if atk.is_multiple_of(4) {
             atk += 2
         }
 

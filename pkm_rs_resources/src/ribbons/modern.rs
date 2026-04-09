@@ -30,7 +30,7 @@ impl<const N: usize> ModernRibbonSet<N> {
     }
 
     pub fn add_ribbon(&mut self, ribbon: ModernRibbon) {
-        self.0.set_index(ribbon.get_index() as u8, true);
+        self.0.set_index(ribbon.get_index(), true);
     }
 
     pub fn set_ribbons(&mut self, ribbons: Vec<ModernRibbon>) {
@@ -57,6 +57,10 @@ impl<const N: usize> ModernRibbonSet<N> {
         truncated_bytes.copy_from_slice(&self.to_bytes()[0..min_size]);
 
         ModernRibbonSet::<M>::from_bytes(truncated_bytes)
+    }
+
+    pub fn includes(&self, ribbon: ModernRibbon) -> bool {
+        self.0.get_index(ribbon.get_index())
     }
 }
 

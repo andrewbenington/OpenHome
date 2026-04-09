@@ -1,22 +1,23 @@
-use std::path::{Path, PathBuf};
 use tauri::{App, Manager};
 
-use crate::{
-    error::{Error, Result},
-    pkm_storage::StoredBankData,
-    util,
-    versioning::{self, UpdateFeatures},
-};
+use crate::error::{Error, Result};
+use crate::pkm_storage::StoredBankData;
+use crate::state::{GEN12_FILENAME, GEN345_FILENAME};
+use crate::storage::MONS_V2_DIR;
+use crate::versioning;
+use crate::{storage, util};
+
+const BANKS_FILENAME: &str = "banks.json";
 
 #[cfg(target_os = "linux")]
 use dialog::DialogBox;
 #[cfg(not(target_os = "linux"))]
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
-pub fn run_app_startup(app: &App) -> Result<Vec<UpdateFeatures>> {
+pub fn run_app_startup(app: &App) -> Result<Vec<versioning::UpdateFeatures>> {
     let handle = app.handle();
 
-    let update_features: Vec<UpdateFeatures> =
+    let update_features: Vec<versioning::UpdateFeatures> =
         match versioning::handle_updates_get_features(handle, false) {
             Err(error) => match error {
                 Error::OutdatedVersion { .. } => {
@@ -47,55 +48,41 @@ pub fn run_app_startup(app: &App) -> Result<Vec<UpdateFeatures>> {
 }
 
 fn initialize_storage(app_handle: &tauri::AppHandle) -> Result<()> {
-    let storage_path = util::get_storage_path(app_handle)?;
-    util::create_directory(&storage_path)?;
+    storage::create_storage_dir(app_handle)?;
 
     let obj_files = [
-        "gen12_lookup.json",
-        "gen345_lookup.json",
+        GEN12_FILENAME,
+        GEN345_FILENAME,
         "pokedex.json",
         "recent_saves.json",
         "settings.json",
     ];
 
     for obj_file in obj_files {
-        init_storage_json_file(app_handle, obj_file.into(), false)?;
+        storage::create_default_json_if_not_exists::<&str, serde_json::Map<_, _>>(
+            app_handle, &obj_file,
+        )?;
     }
 
     let arr_files = ["save-folders.json"];
 
     for arr_file in arr_files {
-        init_storage_json_file(app_handle, arr_file.into(), true)?;
+        storage::create_default_json_if_not_exists::<&str, Vec<String>>(app_handle, &arr_file)?;
     }
 
-    if !storage_path.join("banks.json").exists() {
-        util::write_storage_file_json(app_handle, "banks.json", StoredBankData::default())?;
-    }
+    storage::create_default_json_if_not_exists::<&'static str, StoredBankData>(
+        app_handle,
+        &BANKS_FILENAME,
+    )?;
 
-    let mons_path = util::get_storage_path(app_handle)?.join("mons_v2");
-    util::create_directory(&mons_path)
+    util::create_directory(storage::get_path(app_handle, MONS_V2_DIR)?)
 }
 
-fn init_storage_json_file(
-    app_handle: &tauri::AppHandle,
-    relative_path: PathBuf,
-    is_array: bool,
-) -> Result<()> {
-    let absolute_path = util::prepend_appdata_storage_to_path(app_handle, &relative_path)?;
-    if !Path::new(&absolute_path).exists() {
-        let contents = match is_array {
-            true => b"[]",
-            false => b"{}",
-        };
-
-        util::write_file_contents(absolute_path, contents)?;
-    }
-    Ok(())
-}
+const SETTINGS_FILENAME: &str = "settings.json";
 
 fn set_theme_from_settings(app: &App) -> Result<()> {
     let settings_json: serde_json::Value =
-        util::get_storage_file_json(app.app_handle(), "settings.json")?;
+        storage::read_or_create_default_json(app.app_handle(), SETTINGS_FILENAME)?;
 
     let app_theme = settings_json["appTheme"].as_str().unwrap_or("light");
 

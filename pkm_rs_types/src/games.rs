@@ -238,53 +238,57 @@ impl OriginGame {
         }
     }
 
-    pub fn logo(&self) -> Option<String> {
+    pub const fn logo(&self) -> Option<&'static str> {
         match *self {
-            Self::Red => Some("Red".to_owned()),
-            Self::BlueGreen => Some("BlueGreen".to_owned()),
-            Self::BlueJpn => Some("BlueJpn".to_owned()),
-            Self::Yellow => Some("Yellow".to_owned()),
-            Self::Gold => Some("Gold".to_owned()),
-            Self::Silver => Some("Silver".to_owned()),
-            Self::Crystal => Some("Crystal".to_owned()),
-            Self::Ruby => Some("Ruby".to_owned()),
-            Self::Sapphire => Some("Sapphire".to_owned()),
-            Self::Emerald => Some("Emerald".to_owned()),
-            Self::FireRed => Some("FireRed".to_owned()),
-            Self::LeafGreen => Some("LeafGreen".to_owned()),
-            Self::ColosseumXd => Some("ColosseumXd".to_owned()),
-            Self::Diamond => Some("Diamond".to_owned()),
-            Self::Pearl => Some("Pearl".to_owned()),
-            Self::Platinum => Some("Platinum".to_owned()),
-            Self::HeartGold => Some("HeartGold".to_owned()),
-            Self::SoulSilver => Some("SoulSilver".to_owned()),
-            Self::BattleRevolution => Some("BattleRevolution".to_owned()),
-            Self::Black => Some("Black".to_owned()),
-            Self::White => Some("White".to_owned()),
-            Self::Black2 => Some("Black2".to_owned()),
-            Self::White2 => Some("White2".to_owned()),
-            Self::X => Some("X".to_owned()),
-            Self::Y => Some("Y".to_owned()),
-            Self::OmegaRuby => Some("OmegaRuby".to_owned()),
-            Self::AlphaSapphire => Some("AlphaSapphire".to_owned()),
-            Self::Go => Some("GO".to_owned()),
-            Self::Sun => Some("Sun".to_owned()),
-            Self::Moon => Some("Moon".to_owned()),
-            Self::UltraSun => Some("UltraSun".to_owned()),
-            Self::UltraMoon => Some("UltraMoon".to_owned()),
-            Self::LetsGoPikachu => Some("LetsGoPikachu".to_owned()),
-            Self::LetsGoEevee => Some("LetsGoEevee".to_owned()),
-            Self::Sword => Some("Sword".to_owned()),
-            Self::Shield => Some("Shield".to_owned()),
-            Self::Home => Some("Home".to_owned()),
-            Self::LegendsArceus => Some("LegendsArceus".to_owned()),
-            Self::BrilliantDiamond => Some("BrilliantDiamond".to_owned()),
-            Self::ShiningPearl => Some("ShiningPearl".to_owned()),
-            Self::Scarlet => Some("Scarlet".to_owned()),
-            Self::Violet => Some("Violet".to_owned()),
-            Self::LegendsZa => Some("LegendsZa".to_owned()),
+            Self::Red => Some("Red"),
+            Self::BlueGreen => Some("BlueGreen"),
+            Self::BlueJpn => Some("BlueJpn"),
+            Self::Yellow => Some("Yellow"),
+            Self::Gold => Some("Gold"),
+            Self::Silver => Some("Silver"),
+            Self::Crystal => Some("Crystal"),
+            Self::Ruby => Some("Ruby"),
+            Self::Sapphire => Some("Sapphire"),
+            Self::Emerald => Some("Emerald"),
+            Self::FireRed => Some("FireRed"),
+            Self::LeafGreen => Some("LeafGreen"),
+            Self::ColosseumXd => Some("ColosseumXd"),
+            Self::Diamond => Some("Diamond"),
+            Self::Pearl => Some("Pearl"),
+            Self::Platinum => Some("Platinum"),
+            Self::HeartGold => Some("HeartGold"),
+            Self::SoulSilver => Some("SoulSilver"),
+            Self::BattleRevolution => Some("BattleRevolution"),
+            Self::Black => Some("Black"),
+            Self::White => Some("White"),
+            Self::Black2 => Some("Black2"),
+            Self::White2 => Some("White2"),
+            Self::X => Some("X"),
+            Self::Y => Some("Y"),
+            Self::OmegaRuby => Some("OmegaRuby"),
+            Self::AlphaSapphire => Some("AlphaSapphire"),
+            Self::Go => Some("GO"),
+            Self::Sun => Some("Sun"),
+            Self::Moon => Some("Moon"),
+            Self::UltraSun => Some("UltraSun"),
+            Self::UltraMoon => Some("UltraMoon"),
+            Self::LetsGoPikachu => Some("LetsGoPikachu"),
+            Self::LetsGoEevee => Some("LetsGoEevee"),
+            Self::Sword => Some("Sword"),
+            Self::Shield => Some("Shield"),
+            Self::Home => Some("Home"),
+            Self::LegendsArceus => Some("LegendsArceus"),
+            Self::BrilliantDiamond => Some("BrilliantDiamond"),
+            Self::ShiningPearl => Some("ShiningPearl"),
+            Self::Scarlet => Some("Scarlet"),
+            Self::Violet => Some("Violet"),
+            Self::LegendsZa => Some("LegendsZa"),
             _ => None,
         }
+    }
+
+    pub fn logo_path(&self) -> Option<String> {
+        self.logo().map(|filename| format!("/logos/{filename}.png"))
     }
 
     // source: https://bulbapedia.bulbagarden.net/wiki/Help:Color_templates
@@ -397,6 +401,10 @@ impl OriginGame {
 
     pub fn is_3ds(self) -> bool {
         self >= Self::X && self <= Self::UltraMoon
+    }
+
+    pub fn is_sm_usum(self) -> bool {
+        self >= Self::Sun && self <= Self::UltraMoon
     }
 
     pub fn is_lets_go(self) -> bool {

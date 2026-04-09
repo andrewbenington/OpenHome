@@ -3,26 +3,29 @@ import { Gen4Ribbons } from '@pokemon-resources/index'
 import {
   AbilityIndex,
   Ball,
-  Gender,
+  ConvertStrategy,
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { generatePersonalityValuePreservingAttributes, MoveFilter } from '../util/util'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PK5 {
-  static getName() {
-    return 'PK5'
+  static getFormat() {
+    return 'PK5' as const
   }
   format: 'PK5' = 'PK5'
   static getBoxSize() {
@@ -50,7 +53,6 @@ export default class PK5 {
   formeNum: number
   nature: NatureIndex
   isNsPokemon: boolean
-  ribbonBytes: Uint8Array
   gameOfOrigin: number
   eggDate: types.PKMDate | undefined
   metDate: types.PKMDate | undefined
@@ -68,10 +70,11 @@ export default class PK5 {
   nickname: string
   trainerName: string
   trainerGender: boolean
-  checksum: number
+  checksum: number = 0
   originalBytes?: ArrayBuffer
 
-  constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
+    const { encrypted } = options
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
 
@@ -122,7 +125,6 @@ export default class PK5 {
       this.formeNum = byteLogic.uIntFromBufferBits(dataView, 0x40, 3, 5, true)
       this.nature = new NatureIndex(dataView.getUint8(0x41))
       this.isNsPokemon = byteLogic.getFlag(dataView, 0x42, 1)
-      this.ribbonBytes = new Uint8Array(buffer).slice(0x4c, 0x50)
       this.gameOfOrigin = dataView.getUint8(0x5f)
       this.eggDate = types.pkmDateFromBytes(dataView, 0x78)
       this.metDate = types.pkmDateFromBytes(dataView, 0x7b)
@@ -160,100 +162,69 @@ export default class PK5 {
       this.trainerGender = byteLogic.getFlag(dataView, 0x84, 7)
       this.checksum = dataView.getUint16(0x6, true)
     } else {
+      const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
+      const metData = converter.metData(other)
 
       this.personalityValue = this.personalityValue =
-        generatePersonalityValuePreservingAttributes(other) ?? 0
+        generatePersonalityValuePreservingAttributes(other)
       this.dexNum = other.dexNum
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
-      this.trainerFriendship = other.trainerFriendship ?? 0
+      this.trainerFriendship = other.trainerFriendship
       this.ability = other.ability
-      this.markings = types.markingsSixShapesNoColorFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-        star: false,
-        diamond: false,
-      }
+      this.markings = types.markingsSixShapesNoColorFromOther(other.markings)
       this.language = other.language
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.contest = other.contest ?? {
-        cool: 0,
-        beauty: 0,
-        cute: 0,
-        smart: 0,
-        tough: 0,
-        sheen: 0,
-      }
+      this.evs = other.evs
+      this.contest = other.contest
 
       const moveFilter = MoveFilter.fromPkmClass(PK5)
       this.moves = moveFilter.moves(other)
       this.movePP = moveFilter.movePp(other, this.format)
       this.movePPUps = moveFilter.movePpUps(other)
 
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? false
-      this.gender =
-        other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
+      this.ivs = converter.ivs(other)
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
+      this.gender = other.gender
       this.formeNum = other.formeNum
-      this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
+      this.nature = other.nature
       this.isNsPokemon = other.isNsPokemon ?? false
-      this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(4)
-      this.gameOfOrigin = other.gameOfOrigin
-      this.eggDate = other.eggDate ?? {
-        month: new Date().getMonth(),
-        day: new Date().getDate(),
-        year: new Date().getFullYear(),
-      }
-      this.metDate = other.metDate ?? {
-        month: new Date().getMonth(),
-        day: new Date().getDate(),
-        year: new Date().getFullYear(),
-      }
+      this.eggDate = other.eggDate
+      this.metDate = other.metDate
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
-      this.pokerusByte = other.pokerusByte ?? 0
+
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
+      this.pokerusByte = other.pokerusByte
       if (other.ball && PK5.maxValidBall() >= other.ball) {
         this.ball = other.ball
       } else {
         this.ball = Ball.Poke
       }
 
-      this.metLevel = other.metLevel ?? 0
+      this.metLevel = other.metLevel
       this.encounterType = other.encounterType ?? 0
       this.pokeStarFame = other.pokeStarFame ?? 0
-      this.statusCondition = other.statusCondition ?? 0
+      this.statusCondition = 0
       this.currentHP = other.currentHP ?? 0
-      this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '') ?? []
+      this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '')
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.nickname = other.nickname
+      this.nickname = converter.nickname(other)
       this.trainerName = other.trainerName
       this.trainerGender = other.trainerGender
-      this.checksum = other.checksum ?? 0
     }
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
-  static fromBytes(buffer: ArrayBuffer): PK5 {
-    return new PK5(buffer)
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK5 {
+    return new PK5(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK5 {
+    return new PK5(ohpkm, { strategy })
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {
@@ -261,6 +232,7 @@ export default class PK5 {
     const dataView = new DataView(buffer)
 
     dataView.setUint32(0x0, this.personalityValue, true)
+    dataView.setUint16(0x4, 0, true) // sanity bytes
     dataView.setUint16(0x8, this.dexNum, true)
     dataView.setUint16(0xa, this.heldItemIndex, true)
     dataView.setUint16(0xc, this.trainerID, true)
@@ -291,7 +263,6 @@ export default class PK5 {
     byteLogic.uIntToBufferBits(dataView, this.formeNum, 64, 3, 5, true)
     dataView.setUint8(0x41, this.nature.index)
     byteLogic.setFlag(dataView, 0x42, 1, this.isNsPokemon)
-    new Uint8Array(buffer).set(new Uint8Array(this.ribbonBytes.slice(0, 4)), 0x4c)
     dataView.setUint8(0x5f, this.gameOfOrigin)
     types.writePKMDateToBytes(dataView, 0x78, this.eggDate)
     types.writePKMDateToBytes(dataView, 0x7b, this.metDate)
@@ -358,7 +329,7 @@ export default class PK5 {
     return ((this.personalityValue >> 16) & 1) + 1
   }
 
-  public calcChecksum() {
+  public calculateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x87)
   }
 
@@ -396,7 +367,7 @@ export default class PK5 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

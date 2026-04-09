@@ -1,7 +1,6 @@
 {
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "typescript.preferences.importModuleSpecifier": "relative",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit",
@@ -51,7 +50,7 @@
   "rust-analyzer.check.command": "clippy",
   "editor.inlayHints.enabled": "off",
   "editor.tabSize": 2,
-  "rust-analyzer.cargo.features": ["pkm_rs/wasm"],
+  "rust-analyzer.cargo.features": ["wasm"],
   "css.completion.completePropertyWithSemicolon": false,
   "rust-analyzer.cargo.targetDir": true,
   "python.defaultInterpreterPath": "generate/.venv/bin/python",

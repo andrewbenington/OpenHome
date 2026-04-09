@@ -11,7 +11,7 @@ import { monSupportedBySave } from '@openhome-core/save/util'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { isMonLocation, MonLocation, useSaves } from '@openhome-ui/state/saves'
-import { MetadataLookup } from '@pkm-rs/pkg'
+import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { Badge } from '@radix-ui/themes'
 import { ReactNode, useCallback, useState } from 'react'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/core/pkm/util'
@@ -55,7 +55,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
   let formeNumber = draggingMon?.formeNum ?? 0
 
   if (draggingMon && isMegaStone(draggingMon.heldItemIndex)) {
-    const megaForStone = MetadataLookup(
+    const megaForStone = MetadataSummaryLookup(
       draggingMon.dexNum,
       draggingMon.formeNum
     )?.megaEvolutions.find((mega) => mega.requiredItemId === draggingMon.heldItemIndex)

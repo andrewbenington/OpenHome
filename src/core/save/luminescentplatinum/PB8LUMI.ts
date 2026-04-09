@@ -3,7 +3,8 @@ import { PB8 } from '@pokemon-files/pkm'
 import { PluginIdentifier } from '../interfaces'
 
 import { Option } from '@openhome-core/util/functional'
-import { ExtraFormIndex, luminescentSupportsExtraForm } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, luminescentSupportsExtraForm } from '@pkm-rs/pkg'
+import { PkmConstructorOptions } from '../../../../packages/pokemon-files/src/pkm/PKM'
 import { OHPKM } from '../../pkm/OHPKM'
 import { getLumiCustomForm as getLumiExtraFormIndex } from './conversion/LuminescentPlatinumFormMap'
 import {
@@ -35,8 +36,8 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
 
   public extraFormIndex: Option<ExtraFormIndex>
 
-  constructor(arg: ArrayBuffer | OHPKM, encrypted?: boolean) {
-    super(arg, encrypted)
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
+    super(arg, options)
     this.lumiFormIndex = this.formeNum
 
     if (arg instanceof ArrayBuffer) {
@@ -58,8 +59,16 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
     }
   }
 
-  static getName() {
-    return 'PB8LUMI'
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PB8LUMI {
+    return new PB8LUMI(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB8LUMI {
+    return new PB8LUMI(ohpkm, { strategy })
+  }
+
+  static getFormat() {
+    return 'PB8LUMI' as const
   }
 
   toBytes(): ArrayBuffer {

@@ -1,14 +1,17 @@
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
 import {
   Ball,
+  ConvertStrategy,
   ExtraFormIndex,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
+  PkmFormat,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { PkmConstructorOptions } from '@pokemon-files/pkm/PKM'
 import {
   FourMoves,
   generatePersonalityValuePreservingAttributes,
@@ -31,6 +34,7 @@ import {
   writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
+import { PkmConverter } from '../../../../packages/pokemon-files/src/conversion/converter'
 import { OHPKM } from '../../pkm/OHPKM'
 import { Option } from '../../util/functional'
 import { PluginIdentifier } from '../interfaces'
@@ -71,7 +75,7 @@ const CFRU_BALLS: Ball[] = [
 ]
 
 export abstract class PK3CFRU implements PluginPKMInterface {
-  // static getName() {
+  // static getFormat() {
   //   return 'PK3RR'
   // }
   abstract format: RomHackFormat
@@ -118,7 +122,9 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
   abstract selectColor: string
 
-  constructor(arg: ArrayBuffer | OHPKM) {
+  abstract getMonFormat(): PkmFormat
+
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       this.originalBytes = buffer
@@ -230,17 +236,14 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.hasHiddenAbility = getFlag(dataView, 0x36, 31)
     } else {
       const other = arg
+      const converter = new PkmConverter(this.getFormat(), options.strategy)
+      const metData = converter.metData(other)
 
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.language = other.language
-      this.markings = markingsFourShapesFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-      }
+      this.markings = markingsFourShapesFromOther(other.markings)
       this.dexNum = other.dexNum
       this.formeNum = other.formeNum
       this.extraFormIndex = other.extraFormIndex
@@ -248,22 +251,15 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.exp = other.exp
       this.trainerFriendship = other.trainerFriendship ?? 0
 
-      const moveFilter = MoveFilter.fromMoveIndices(this.getValidMoveIndices())
+      const moveFilter = MoveFilter.fromMoveIndices(this.getValidMoveIndices(), this.getMonFormat())
       this.moves = moveFilter.moves(other)
       this.movePP = moveFilter.movePp(other, this.getFormat())
       this.movePPUps = moveFilter.movePpUps(other)
 
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
-      this.metLevel = other.metLevel ?? 0
+      this.evs = other.evs
+      this.pokerusByte = other.pokerusByte
+      this.metLocationIndex = metData.locationIndex
+      this.metLevel = other.metLevel
 
       const fromRadicalRed = other.pluginOrigin === 'radical_red'
 
@@ -299,14 +295,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       }
 
       this.canGigantamax = !!other.canGigantamax
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
+      this.ivs = converter.ivs(other)
       this.isEgg = other.isEgg ?? false
       this.hasHiddenAbility = other.abilityNum === 4
       this.isNicknamed = other.isNicknamed ?? false
@@ -318,10 +307,19 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   static fromBytes<T extends PK3CFRU>(
-    this: new (buffer: ArrayBuffer) => T,
-    buffer: ArrayBuffer
+    this: new (buffer: ArrayBuffer, options: PkmConstructorOptions) => T,
+    buffer: ArrayBuffer,
+    encrypted?: boolean
   ): T {
-    return new this(buffer)
+    return new this(buffer, { encrypted })
+  }
+
+  static fromOhpkm<T extends PK3CFRU>(
+    this: new (ohpkm: OHPKM, options: PkmConstructorOptions) => T,
+    ohpkm: OHPKM,
+    strategy: ConvertStrategy
+  ): T {
+    return new this(ohpkm, { strategy })
   }
 
   abstract internalItemIndexFromModern(modernIndex: number): number
@@ -480,7 +478,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

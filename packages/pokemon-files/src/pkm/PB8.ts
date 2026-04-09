@@ -1,34 +1,37 @@
 import {
   AbilityIndex,
   Ball,
+  ConvertStrategy,
   Item,
   Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/other'
+import { OHPKM } from '../../../../src/core/pkm/OHPKM'
+import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import { filterRibbons } from '../util/ribbonLogic'
 import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
+import { PkmConstructorOptions } from './PKM'
 
 export default class PB8 {
-  static getName() {
-    return 'PB8'
+  static getFormat() {
+    return 'PB8' as const
   }
   format: 'PB8' = 'PB8'
   static getBoxSize() {
     return 344
   }
   encryptionConstant: number
-  sanity: number
-  checksum: number
+  checksum: number = 0
   dexNum: number
   heldItemIndex: number
   trainerID: number
@@ -48,7 +51,6 @@ export default class PB8 {
   evs: types.Stats
   contest: types.ContestStats
   pokerusByte: number
-  ribbonBytes: Uint8Array
   contestMemoryCount: number
   battleMemoryCount: number
   sociability: number
@@ -100,7 +102,9 @@ export default class PB8 {
   stats: types.Stats
   originalBytes?: ArrayBuffer
 
-  constructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean) {
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
+    const { encrypted, strategy } = options
+
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
       if (encrypted) {
@@ -111,7 +115,6 @@ export default class PB8 {
       this.originalBytes = buffer
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
-      this.sanity = dataView.getUint16(0x4, true)
       this.checksum = dataView.getUint16(0x6, true)
       this.dexNum = dataView.getUint16(0x8, true)
       this.heldItemIndex = dataView.getUint16(0xa, true)
@@ -132,7 +135,6 @@ export default class PB8 {
       this.evs = types.readStatsFromBytesU8(dataView, 0x26)
       this.contest = types.readContestStatsFromBytes(dataView, 0x2c)
       this.pokerusByte = dataView.getUint8(0x32)
-      this.ribbonBytes = new Uint8Array(buffer).slice(0x34, 0x3c)
       this.contestMemoryCount = dataView.getUint8(0x3c)
       this.battleMemoryCount = dataView.getUint8(0x3d)
       this.sociability = dataView.getUint32(0x48, true)
@@ -209,55 +211,34 @@ export default class PB8 {
       this.stats = types.readStatsFromBytesU16(dataView, 0x14a)
     } else {
       const other = arg
-      this.encryptionConstant = other.encryptionConstant ?? 0
-      this.sanity = other.sanity ?? 0
-      this.checksum = other.checksum ?? 0
+      const converter = new PkmConverter(this.format, strategy)
+      const metData = converter.metData(other)
+
+      this.encryptionConstant = other.encryptionConstant
       this.dexNum = other.dexNum
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
       this.ability = other.ability
-      this.abilityNum = other.abilityNum ?? 0
-      this.favorite = other.favorite ?? false
+      this.abilityNum = other.abilityNum
+      this.favorite = other.favorite
       this.canGigantamax = other.canGigantamax ?? false
-      this.markings = types.markingsSixShapesWithColorFromOther(other.markings) ?? {
-        circle: false,
-        triangle: false,
-        square: false,
-        heart: false,
-        star: false,
-        diamond: false,
-      }
-      this.personalityValue = other.personalityValue ?? 0
-      this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
-      this.statNature = other.statNature ?? NatureIndex.newFromPid(this.personalityValue)
-      this.isFatefulEncounter = other.isFatefulEncounter ?? false
-      this.gender = other.gender ?? 0
+      this.markings = types.markingsSixShapesWithColorFromOther(other.markings)
+      this.personalityValue = other.personalityValue
+      this.nature = other.nature
+      this.statNature = other.statNature
+      this.isFatefulEncounter = other.isFatefulEncounter
+      this.gender = other.gender
       this.formeNum = other.formeNum
-      this.evs = other.evs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.contest = other.contest ?? {
-        cool: 0,
-        beauty: 0,
-        cute: 0,
-        smart: 0,
-        tough: 0,
-        sheen: 0,
-      }
-      this.pokerusByte = other.pokerusByte ?? 0
-      this.ribbonBytes = other.ribbonBytes ?? new Uint8Array(8)
-      this.contestMemoryCount = other.contestMemoryCount ?? 0
-      this.battleMemoryCount = other.battleMemoryCount ?? 0
-      this.sociability = other.sociability ?? 0
-      this.heightScalar = other.heightScalar ?? 127
-      this.weightScalar = other.weightScalar ?? 127
+      this.evs = other.evs
+      this.contest = other.contest
+      this.pokerusByte = other.pokerusByte
+      this.contestMemoryCount = other.contestMemoryCount
+      this.battleMemoryCount = other.battleMemoryCount
+      this.sociability = other.sociability
+      this.heightScalar = other.heightScalar
+      this.weightScalar = other.weightScalar
       this.nickname = other.nickname
 
       const moveFilter = MoveFilter.fromPkmClass(PB8)
@@ -267,85 +248,62 @@ export default class PB8 {
       this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
 
       this.currentHP = other.currentHP ?? 0
-      this.ivs = other.ivs ?? {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spe: 0,
-        spa: 0,
-        spd: 0,
-      }
-      this.isEgg = other.isEgg ?? false
-      this.isNicknamed = other.isNicknamed ?? false
+      this.ivs = converter.ivs(other)
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
       this.dynamaxLevel = other.dynamaxLevel ?? 0
-      this.statusCondition = other.statusCondition ?? 0
+      this.statusCondition = 0
       this.palma = other.palma ?? 0
-      this.handlerName = other.handlerName ?? ''
-      this.handlerGender = other.handlerGender ?? false
-      this.handlerLanguage = other.handlerLanguage ?? 0
-      this.handlerID = other.handlerID ?? 0
-      this.handlerFriendship = other.handlerFriendship ?? 0
-      this.fullness = other.fullness ?? 0
-      this.enjoyment = other.enjoyment ?? 0
-      this.gameOfOrigin = other.gameOfOrigin
+      this.handlerName = other.handlerName
+      this.handlerGender = other.handlerGender
+      this.handlerLanguage = other.handlerLanguage
+      this.handlerID = other.handlerId
+      this.handlerFriendship = other.handlerFriendship
+      this.fullness = other.fullness
+      this.enjoyment = other.enjoyment
       this.gameOfOriginBattle = other.gameOfOriginBattle ?? 0
       this.region = other.region ?? 0
-      this.consoleRegion = other.consoleRegion ?? 0
+      this.consoleRegion = other.consoleRegion
       this.language = other.language
-      this.formArgument = other.formArgument ?? 0
-      this.affixedRibbon = other.affixedRibbon ?? undefined
+      this.formArgument = other.formArgument
+      this.affixedRibbon = other.affixedRibbon
       this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship ?? 0
-      this.eggDate = other.eggDate ?? undefined
-      this.metDate = other.metDate ?? {
-        month: new Date().getMonth(),
-        day: new Date().getDate(),
-        year: new Date().getFullYear(),
-      }
+      this.trainerFriendship = other.trainerFriendship
+      this.eggDate = other.eggDate
+      this.metDate = other.metDate
       this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.metLocationIndex = other.metLocationIndex ?? 0
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
 
       if (other.ball && PB8.maxValidBall() >= other.ball) {
         this.ball = other.ball
       } else {
         this.ball = Ball.Strange
       }
-      this.metLevel = other.metLevel ?? 0
+      this.metLevel = other.metLevel
       this.tmFlagsBDSP = other.tmFlagsBDSP ?? new Uint8Array(14)
       this.homeTracker = other.homeTracker ?? new Uint8Array(8)
-      this.ribbons = filterRibbons(other.ribbons ?? [], [ModernRibbons], 'Twinkling Star') ?? []
+      this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], 'Twinkling Star')
       this.isCurrentHandler = other.isCurrentHandler ?? false
-      this.handlerMemory = other.handlerMemory ?? {
-        intensity: 0,
-        memory: 0,
-        feeling: 0,
-        textVariables: 0,
-      }
-      this.trainerMemory = other.trainerMemory ?? {
-        intensity: 0,
-        memory: 0,
-        feeling: 0,
-        textVariables: 0,
-      }
-      this.hyperTraining = other.hyperTraining ?? {
-        hp: false,
-        atk: false,
-        def: false,
-        spa: false,
-        spd: false,
-        spe: false,
-      }
+      this.handlerMemory = other.handlerMemory
+      this.trainerMemory = other.trainerMemory
+      this.hyperTraining = other.hyperTraining
       this.trainerGender = other.trainerGender
     }
 
-    // heal and recalculate level in case the source was not accurate
+    // heal and recalculate in case the source was not accurate
     this.level = this.getLevel()
     this.stats = this.getStats()
     this.currentHP = this.stats.hp
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
-  static fromBytes(buffer: ArrayBuffer): PB8 {
-    return new PB8(buffer)
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PB8 {
+    return new PB8(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB8 {
+    return new PB8(ohpkm, { strategy })
   }
 
   toBytes(): ArrayBuffer {
@@ -353,7 +311,7 @@ export default class PB8 {
     const dataView = new DataView(buffer)
 
     dataView.setUint32(0x0, this.encryptionConstant, true)
-    dataView.setUint16(0x4, this.sanity, true)
+    dataView.setUint16(0x4, 0, true) // sanity bytes
     dataView.setUint16(0x6, this.checksum, true)
     dataView.setUint16(0x8, this.dexNum, true)
     dataView.setUint16(0xa, this.heldItemIndex, true)
@@ -374,7 +332,6 @@ export default class PB8 {
     types.writeStatsToBytesU8(dataView, 0x26, this.evs)
     types.writeContestStatsToBytes(dataView, 0x2c, this.contest)
     dataView.setUint8(0x32, this.pokerusByte)
-    new Uint8Array(buffer).set(new Uint8Array(this.ribbonBytes.slice(0, 8)), 0x34)
     dataView.setUint8(0x3c, this.contestMemoryCount)
     dataView.setUint8(0x3d, this.battleMemoryCount)
     dataView.setUint32(0x48, this.sociability, true)
@@ -473,7 +430,7 @@ export default class PB8 {
     this.eggLocationIndexInternal = value === 0 ? 0xffff : value
   }
 
-  public calcChecksum() {
+  public calculateChecksum() {
     return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x148)
   }
 
@@ -510,7 +467,7 @@ export default class PB8 {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {

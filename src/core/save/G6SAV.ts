@@ -4,7 +4,7 @@ import {
   uint16ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConverter'
-import { ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PK6 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
@@ -80,7 +80,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
           const startByte = this.getPcOffset() + BOX_SIZE * box + 232 * monIndex
           const endByte = this.getPcOffset() + BOX_SIZE * box + 232 * (monIndex + 1)
           const monData = bytes.slice(startByte, endByte)
-          const mon = new PK6(monData.buffer, true)
+          const mon = PK6.fromBytes(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
             this.boxes[box].boxSlots[monIndex] = mon
@@ -109,7 +109,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
           console.error(e)
         }
       } else {
-        const mon = new PK6(new Uint8Array(232).buffer)
+        const mon = PK6.fromBytes(new Uint8Array(232).buffer)
 
         this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
       }
@@ -117,8 +117,8 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
     this.bytes.set(uint16ToBytesLittleEndian(this.calculatePcChecksum()), this.pcChecksumOffset)
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK6 {
-    return new PK6(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK6 {
+    return PK6.fromOhpkm(ohpkm, strategy)
   }
 
   abstract supportsMon(

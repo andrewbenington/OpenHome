@@ -5,13 +5,12 @@ import {
   Ball,
   ExtraFormIndex,
   Gender,
-  GenderRatio,
   HyperTraining,
   Item,
+  Language,
   Languages,
-  MetadataLookup,
+  MetadataSummaryLookup,
   NatureIndex,
-  OriginGame,
   PokeDate,
   ShinyLeaves,
   SpeciesAndForme,
@@ -34,7 +33,7 @@ import {
 } from '@pokemon-files/util'
 import * as jsTypes from '@pokemon-files/util/types'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { Gen34ContestRibbons, Gen34TowerRibbons, ModernRibbons } from '@pokemon-resources/index'
+import { Gen34ContestRibbons, Gen34TowerRibbons } from '@pokemon-resources/index'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { PluginIdentifier, SAV } from '../save/interfaces'
@@ -67,7 +66,7 @@ import {
 } from './util'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
-  static getName() {
+  static getFormat() {
     return 'OHPKM'
   }
   format: 'OHPKM' = 'OHPKM'
@@ -131,7 +130,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.moves = other.moves as FourMoves
       this.movePP = adjustMovePPBetweenFormats(this, other)
       this.movePPUps = other.movePPUps as FourMoves
+
       this.nickname = other.nickname
+      if (other.language === Language.English && this.nicknameMatchesSpeciesEnglishIgnoreCase()) {
+        this.resetNicknameToSpecies()
+      }
+
       this.language = other.language
       this.gameOfOrigin = other.gameOfOrigin
       this.gameOfOriginBattle = other.gameOfOriginBattle
@@ -209,6 +213,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       // Gen 4+
       this.isNicknamed = other.isNicknamed ?? true
+      if (this.language === Language.English && this.nicknameMatchesSpeciesEnglishIgnoreCase()) {
+        this.isNicknamed = false
+      }
+
       this.eggDate = other.eggDate
       this.eggLocationIndex = other.eggLocationIndex
 
@@ -349,10 +357,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
             `No original data tag found for format ${other.format}, cannot set original bytes on OHPKM`
           )
         }
-      } else {
-        console.warn(
-          'No original bytes found in other mon, skipping setting original data on OHPKM'
-        )
       }
     }
     if (this.openhomeId === '0004-d889ca57-401aab08-30') {
@@ -362,7 +366,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
   // static constructors
 
-  static fromBytes(buffer: ArrayBuffer): OHPKM {
+  static fromBytes(buffer: ArrayBufferLike): OHPKM {
     return new OHPKM(new Uint8Array(buffer))
   }
 
@@ -371,6 +375,11 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     ohpkm.syncWithGameData(mon, save)
 
     return ohpkm
+  }
+
+  static defaultWithSpecies(nationalDex: number, formeIndex: number) {
+    const bytes = OhpkmV2Wasm.defaultWithSpecies(nationalDex, formeIndex).toByteArray()
+    return OHPKM.fromBytes(bytes.buffer)
   }
 
   // getters / setters
@@ -659,82 +668,11 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public get metadata() {
-    return MetadataLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formeNum)
   }
 
   public get speciesMetadata() {
     return SpeciesLookup(this.dexNum)
-  }
-
-  public fixErrors(): boolean {
-    let errorsFound = false
-    const metadata = this.metadata
-
-    // PLA mons cannot have been hatched
-    if (this.gameOfOrigin === OriginGame.LegendsArceus && (this.eggDate || this.eggLocationIndex)) {
-      this.eggDate = undefined
-      this.eggLocationIndex = undefined
-      errorsFound = true
-    }
-
-    // Affixed ribbon must be in the mon's possession
-    if (
-      this.affixedRibbon !== undefined &&
-      this.ribbons.includes(ModernRibbons[this.affixedRibbon])
-    ) {
-      this.affixedRibbon = undefined
-      errorsFound = true
-    }
-
-    // Fix ability bug from pre-1.5.0 (affected Mind's Eye and Dragon's Maw)
-    // Fix ability bug from pre-1.7.1 (abilities not updated after evolution/capsule/patch)
-    // Fix ability num bug from some point in the past (set to 0 instead of 1)
-    if (!this.abilityNumMatchesIndex()) {
-      const fixedAbilityNum = this.abilityNumByIndex()
-      if (fixedAbilityNum) {
-        // ability is valid for this species, just fix the ability num
-        this.abilityNum = fixedAbilityNum
-      } else {
-        // ability doesn't match species at all, fall back to ability num
-        this.ability =
-          getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum) ?? this.ability
-      }
-      errorsFound = true
-    }
-
-    const genderRatio = this.metadata?.genderRatio
-    if (metadata && genderRatio !== undefined) {
-      if (
-        (this.gender === Gender.Genderless && genderRatio !== GenderRatio.Genderless) ||
-        (this.gender !== Gender.Genderless && genderRatio === GenderRatio.Genderless) ||
-        (this.gender === Gender.Male && genderRatio === GenderRatio.AllFemale) ||
-        (this.gender === Gender.Female && genderRatio === GenderRatio.AllMale)
-      ) {
-        this.gender = metadata.genderFromPid(this.personalityValue)
-        errorsFound = true
-      }
-    }
-
-    errorsFound = false
-
-    if (
-      isPrevoSpeciesName(this.dexNum, this.formeNum, this.nickname) &&
-      this.metadata?.speciesName
-    ) {
-      this.nickname = this.metadata.speciesName
-      this.isNicknamed = false
-      errorsFound = true
-    }
-
-    if (
-      this.nickname.toLocaleUpperCase() === this.metadata?.speciesName.toLocaleUpperCase() &&
-      this.isNicknamed
-    ) {
-      this.isNicknamed = false
-      errorsFound = true
-    }
-
-    return errorsFound
   }
 
   public syncWithGameData(other: PKMInterface, save?: SAV) {

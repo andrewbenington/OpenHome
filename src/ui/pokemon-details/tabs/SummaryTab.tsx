@@ -8,12 +8,12 @@ import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
-import { colorForType, colorIsDark } from '@openhome-ui/util/color'
+import { colorIsDark, SHADOW_TYPE_COLOR } from '@openhome-ui/util/color'
 import {
   extraFormDisplayName,
   genderFromBool,
   getPluginColor,
-  MetadataLookup,
+  MetadataSummaryLookup,
   OriginGames,
 } from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm/PKM'
@@ -49,7 +49,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
   })
 
   const itemAltText = useMemo(() => {
-    const monData = MetadataLookup(mon.dexNum, mon.formeNum)
+    const monData = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
 
     if (!monData) return 'pokemon sprite'
     return `${monData.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
@@ -162,7 +162,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           )}
           {mon.isNoble && <AttributeTag label="NOBLE" backgroundColor="#cccc00" color="white" />}
           {'isShadow' in mon && (mon.isShadow as boolean) && (
-            <AttributeTag label="SHADOW" backgroundColor={colorForType('shadow')} color="white" />
+            <AttributeTag label="SHADOW" backgroundColor={SHADOW_TYPE_COLOR} color="white" />
           )}
           {mon.isNsPokemon && (
             <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />
@@ -192,7 +192,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
                 {extraFormDisplayName(mon.extraFormIndex)}
               </span>
             ) : (
-              MetadataLookup(mon.dexNum, mon.formeNum)?.formeName
+              MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.formeName
             )}
             <GenderIcon gender={mon.gender} />
           </Flex>

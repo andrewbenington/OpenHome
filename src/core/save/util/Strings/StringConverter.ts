@@ -385,9 +385,7 @@ export const GBStringDict: { [key: number]: string } = {
 export const gen12StringToUTF = (bytes: Uint8Array, offset: number, length: number) => {
   let str = ''
 
-  // console.log(bytes);
   for (let i = offset; i < offset + length; i += 1) {
-    // console.log(i, bytes[i], GBStringDict[bytes[i]]);
     if (bytes[i] === G1_TERMINATOR) {
       break
     }

@@ -7,4 +7,10 @@ declare module '@pkm-rs/pkg' {
     readonly type2?: Type
     readonly eggGroups: EggGroup[]
   }
+
+  namespace MetadataSources {
+    function supportedGameOrigins(national_dex: number, forme_index: number): OriginGame[]
+  }
+
+  function allMetadataSources(): MetadataSource[]
 }
