@@ -11,6 +11,8 @@ import {
   NatureIndex,
   OriginGame,
   OriginGames,
+  PkmFormat,
+  PkmFormats,
 } from '@pkm-rs/pkg'
 import { PKMInterface } from '../../../../src/core/pkm/interfaces'
 import { AllPKMFields, FourMoves } from './pkmInterface'
@@ -216,17 +218,19 @@ type PkmClassWithMoveLimit<P extends PKMInterface> = PkmClass<P> & { maxValidMov
 
 export class MoveFilter<P extends PKMInterface> {
   filter: AllowedMoveIndices | PkmClassWithMoveLimit<P>
+  format: PkmFormat
 
-  private constructor(filter: AllowedMoveIndices | PkmClassWithMoveLimit<P>) {
+  private constructor(filter: AllowedMoveIndices | PkmClassWithMoveLimit<P>, format: PkmFormat) {
     this.filter = filter
+    this.format = format
   }
 
-  static fromMoveIndices(filter: AllowedMoveIndices) {
-    return new MoveFilter(filter)
+  static fromMoveIndices(filter: AllowedMoveIndices, format: PkmFormat) {
+    return new MoveFilter(filter, format)
   }
 
   static fromPkmClass<P extends PKMInterface>(filter: PkmClassWithMoveLimit<P>) {
-    return new MoveFilter(filter)
+    return new MoveFilter(filter, filter.getFormat())
   }
 
   moveIsAllowed(moveIndex: number) {
@@ -235,23 +239,64 @@ export class MoveFilter<P extends PKMInterface> {
       : moveIndex <= this.filter.maxValidMove()
   }
 
-  private filterByMoves(mon: AllPKMFields, values: FourMoves): FourMoves {
-    return mon.moves.map((moveIndex, i) =>
-      this.moveIsAllowed(moveIndex) ? values[i] : 0
-    ) as FourMoves
+  private filterByMoves(mon: AllPKMFields, toFilter: FourMoves): FourMoves {
+    const filtered: FourMoves = [0, 0, 0, 0]
+    for (let i = 0; i < 4; i++) {
+      if (this.moveIsAllowed(mon.moves[i])) {
+        filtered[i] = toFilter[i]
+      }
+    }
+    return filtered
+  }
+
+  private hasAtLeastOneAllowedMove(mon: AllPKMFields) {
+    return mon.moves.some((move) => this.moveIsAllowed(move))
+  }
+
+  private filteredMovesOrLevelupIfEmpty(mon: AllPKMFields) {
+    const filtered = this.filterByMoves(mon, mon.moves)
+    if (filtered.every((move) => move === 0)) {
+      const metadataSource = PkmFormats.getMetadataSource(this.format)
+      const levelUpLearnset = MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.levelUpLearnset(
+        metadataSource
+      )
+      if (levelUpLearnset) {
+        const fromLevelup: FourMoves = [0, 0, 0, 0]
+        levelUpLearnset.slice(-4).forEach((move, i) => {
+          fromLevelup[i] = move.move_id
+        })
+        return fromLevelup
+      }
+    }
+    return filtered
   }
 
   moves(mon: AllPKMFields) {
-    return this.filterByMoves(mon, mon.moves)
+    return this.filteredMovesOrLevelupIfEmpty(mon)
   }
 
-  movePp(mon: AllPKMFields, adjustForFormat: string) {
-    const filteredMovePp = this.filterByMoves(mon, mon.movePP)
-    return adjustPpForFormat(mon.format, mon.moves, filteredMovePp, mon.movePPUps, adjustForFormat)
+  movePp(mon: AllPKMFields, adjustForFormat: string): FourMoves {
+    if (this.hasAtLeastOneAllowedMove(mon)) {
+      const filteredMovePp = this.filterByMoves(mon, mon.movePP)
+      return adjustPpForFormat(
+        mon.format,
+        mon.moves,
+        filteredMovePp,
+        mon.movePPUps,
+        adjustForFormat
+      )
+    }
+    return this.filteredMovesOrLevelupIfEmpty(mon).map((moveIndex) =>
+      getMoveMaxPP(moveIndex, adjustForFormat)
+    ) as FourMoves
   }
 
-  movePpUps(mon: AllPKMFields) {
-    return this.filterByMoves(mon, mon.movePPUps)
+  movePpUps(mon: AllPKMFields): FourMoves {
+    if (this.hasAtLeastOneAllowedMove(mon)) {
+      return this.filterByMoves(mon, mon.movePPUps)
+    } else {
+      return [0, 0, 0, 0]
+    }
   }
 
   relearnMovesOrDefault(mon: AllPKMFields): FourMoves {

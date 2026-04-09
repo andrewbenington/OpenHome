@@ -39,7 +39,7 @@ import {
 } from './wasm/convert'
 
 export class Pk7Rust {
-  static getName() {
+  static getFormat() {
     return 'PK7' as const
   }
   format: 'PK7' = 'PK7'

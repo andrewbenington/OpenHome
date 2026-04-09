@@ -26,7 +26,7 @@ import { MoveFilter } from '../util/util'
 import { PkmConstructorOptions } from './PKM'
 
 export default class COLOPKM {
-  static getName() {
+  static getFormat() {
     return 'COLOPKM' as const
   }
   format: 'COLOPKM' = 'COLOPKM'

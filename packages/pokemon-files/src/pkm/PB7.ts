@@ -21,7 +21,7 @@ import { getHeightCalculated, getWeightCalculated, MoveFilter } from '../util/ut
 import { PkmConstructorOptions } from './PKM'
 
 export default class PB7 {
-  static getName() {
+  static getFormat() {
     return 'PB7' as const
   }
   format: 'PB7' = 'PB7'
@@ -237,7 +237,7 @@ export default class PB7 {
       this.formArgument = other.formArgument
       this.nickname = converter.nickname(other)
 
-      const moveFilter = MoveFilter.fromMoveIndices(LGPE_VALID_MOVES)
+      const moveFilter = MoveFilter.fromMoveIndices(LGPE_VALID_MOVES, this.format)
       this.moves = moveFilter.moves(other)
       this.movePP = moveFilter.movePp(other, this.format)
       this.movePPUps = moveFilter.movePpUps(other)

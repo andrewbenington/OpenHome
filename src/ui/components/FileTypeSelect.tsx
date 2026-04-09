@@ -42,7 +42,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
   const supportedFormats = useMemo(() => {
     const supportedFormats = unique(
       getEnabledSaveTypes().map((saveType) =>
-        monSupportedBySaveType(saveType, formData) ? saveType.pkmType.getName() : undefined
+        monSupportedBySaveType(saveType, formData) ? saveType.pkmType.getFormat() : undefined
       )
     ).filter(filterUndefined)
 
