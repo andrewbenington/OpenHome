@@ -195,7 +195,12 @@ export function useOhpkmStore(): OhpkmStore {
             )
           }
 
-          return ohpkmStore[homeIdentifier]
+          // because the game of origin may have been changed for legality reasons, we need to ignore the origin when looking up in the store
+          const homeIdentifierNoOrigin = homeIdentifier.split('-').slice(0, -1).join('-')
+
+          return Object.entries(ohpkmStore).find(([id, _]) =>
+            id.startsWith(homeIdentifierNoOrigin)
+          )?.[1]
         }
         default:
           // use type system to enforce exhaustiveness
