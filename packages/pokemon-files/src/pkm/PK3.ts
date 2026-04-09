@@ -33,7 +33,7 @@ import {
 import { PkmConstructorOptions } from './PKM'
 
 export default class PK3 {
-  static getName() {
+  static getFormat() {
     return 'PK3' as const
   }
   format: 'PK3' = 'PK3'

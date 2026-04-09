@@ -2,6 +2,7 @@ use crate::pkm::location::{self, MetData};
 use crate::pkm::ohpkm::OhpkmV2;
 
 use super::location::{LinkTradeIndex, Location};
+use pkm_rs_resources::species::form_metadata::MetadataSource;
 use pkm_rs_types::{Generation, OriginGame};
 
 #[cfg(feature = "wasm")]
@@ -924,10 +925,46 @@ impl PkmFormat {
             }
         }
     }
+
+    pub const fn metadata_source(self) -> MetadataSource {
+        match self {
+            Self::PK1 => MetadataSource::RedBlue,
+            Self::PK2 => MetadataSource::GoldSilver,
+            Self::PK3 => MetadataSource::RubySapphire,
+            Self::ColoPkm | Self::XdPkm => MetadataSource::RubySapphire,
+            Self::PK4 => MetadataSource::DiamondPearl,
+            Self::PK5 => MetadataSource::BlackWhite,
+            Self::PK6 => MetadataSource::XY,
+            Self::PK7 => MetadataSource::SunMoon,
+            Self::PB7 => MetadataSource::LetsGoPikachuEevee,
+            Self::PK8 => MetadataSource::SwordShield,
+            Self::PA8 => MetadataSource::LegendsArceus,
+            Self::PB8 => MetadataSource::BrilliantDiamondShiningPearl,
+            Self::PK9 => MetadataSource::ScarletViolet,
+            Self::PA9 => MetadataSource::LegendsZa,
+
+            Self::PB8LUMI => MetadataSource::BrilliantDiamondShiningPearl,
+            Self::PK3RR | Self::PK3UB => MetadataSource::FireRedLeafGreen,
+        }
+    }
 }
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = "formatMatchesOrigin")]
 pub fn format_matches_origin(format: PkmFormat, origin: OriginGame) -> bool {
     format.matches_origin(origin)
+}
+
+#[cfg(feature = "wasm")]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+pub struct PkmFormats;
+
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+#[cfg(feature = "wasm")]
+impl PkmFormats {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getMetadataSource"))]
+    pub fn metadata_source_wasm(value: PkmFormat) -> MetadataSource {
+        value.metadata_source()
+    }
 }

@@ -18,10 +18,20 @@ const MoveCard = ({ move, movePP, maxPP, noPP, typeOverride }: MoveCardProps) =>
   if (!moveData) {
     console.warn(`An unknown move has been detected. The move index is ${move}.`)
     return (
-      <>
+      <div
+        className={includeClass('move-card')
+          .with('move-card-full')
+          .unless(noPP)
+          .then('move-card-small')}
+        style={{
+          backgroundColor: 'gray',
+          color: 'white',
+          opacity: 0.5,
+        }}
+      >
         <div className="type-icon-container" />
-        <div className="unknown-move-name">(Unknown Move: {move})</div>
-      </>
+        <div className="move-card-vert" />
+      </div>
     )
   }
 

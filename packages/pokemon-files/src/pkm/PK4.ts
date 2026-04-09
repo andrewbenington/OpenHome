@@ -32,7 +32,7 @@ function validDPLocation(index: number): boolean {
 }
 
 export default class PK4 {
-  static getName() {
+  static getFormat() {
     return 'PK4' as const
   }
   format: 'PK4' = 'PK4'

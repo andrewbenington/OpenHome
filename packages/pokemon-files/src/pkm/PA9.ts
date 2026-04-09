@@ -24,7 +24,7 @@ import { MoveFilter } from '../util/util'
 import { PkmConstructorOptions } from './PKM'
 
 export default class PA9 {
-  static getName() {
+  static getFormat() {
     return 'PA9' as const
   }
   format: 'PA9' = 'PA9'

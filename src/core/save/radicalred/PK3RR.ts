@@ -1,5 +1,5 @@
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
-import { ItemRadicalRed } from '@pkm-rs/pkg'
+import { ItemRadicalRed, PkmFormat } from '@pkm-rs/pkg'
 import PK3CFRU from '../cfru/PK3CFRU'
 
 import {
@@ -25,8 +25,12 @@ export default class PK3RR extends PK3CFRU implements PluginPKMInterface {
 
   selectColor = '#660000'
 
-  static getName() {
-    return 'PK3RR'
+  static getFormat() {
+    return 'PK3RR' as const
+  }
+
+  getMonFormat(): PkmFormat {
+    return 'PK3RR' as const
   }
 
   get heldItemIndex(): number {

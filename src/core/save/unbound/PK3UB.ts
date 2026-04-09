@@ -1,5 +1,5 @@
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
-import { ItemUnbound } from '@pkm-rs/pkg'
+import { ItemUnbound, PkmFormat } from '@pkm-rs/pkg'
 import PK3CFRU from '../cfru/PK3CFRU'
 
 import { fromGen3CFRUMoveIndex, toGen3CFRUMoveIndex } from '../cfru/conversion/Gen3CFRUMovesIndex'
@@ -22,8 +22,12 @@ export default class PK3UB extends PK3CFRU implements PluginPKMInterface {
 
   selectColor: string = '#c127fe'
 
-  static getName() {
-    return 'PK3UB'
+  static getFormat() {
+    return 'PK3UB' as const
+  }
+
+  getMonFormat(): PkmFormat {
+    return 'PK3UB' as const
   }
 
   get heldItemIndex(): number {
