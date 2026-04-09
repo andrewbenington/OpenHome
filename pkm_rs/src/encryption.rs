@@ -287,18 +287,6 @@ pub fn crc16_ccitt_invert(bytes: &[u8], start: usize, size: usize) -> u16 {
 // }
 
 #[cfg(feature = "wasm")]
-pub trait Crc16CcittInvertChecksum {
-    const RANGE_START: usize;
-    const RANGE_SIZE: usize;
-
-    fn get_bytes(&self) -> &[u8];
-
-    fn calc_checksum(&self) -> u16 {
-        crc16_ccitt_invert(self.get_bytes(), Self::RANGE_START, Self::RANGE_SIZE)
-    }
-}
-
-#[cfg(feature = "wasm")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MemeCrypto {
     SunMoon,
