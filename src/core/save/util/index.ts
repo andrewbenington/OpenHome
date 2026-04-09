@@ -1,6 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { ConvertStrategy, ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, OriginGame, PkmFormat } from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from '../../../../packages/pokemon-files/src/pkm/PKM'
 import { SAV } from '../interfaces'
 import { PathData } from './path'
@@ -16,7 +16,7 @@ export interface SavePkmClass {
   new (arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions): PKMInterface
   fromBytes(bytes: ArrayBuffer): PKMInterface
   fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PKMInterface
-  getName(): string
+  getFormat(): PkmFormat
 }
 
 export type AnyPkmClass = SavePkmClass | typeof OHPKM

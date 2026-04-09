@@ -43,7 +43,7 @@ export type PkmClass<P extends PKMInterface> = {
   new (arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions): P
   fromBytes(bytes: ArrayBuffer, encrypted?: boolean): P
   fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
-  getName(): MonFormat
+  getFormat(): MonFormat
 }
 
 export type PkmConstructorOptions =

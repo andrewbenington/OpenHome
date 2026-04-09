@@ -23,7 +23,7 @@ import { MoveFilter } from '../util/util'
 import { PkmConstructorOptions } from './PKM'
 
 export default class PK8 {
-  static getName() {
+  static getFormat() {
     return 'PK8' as const
   }
   format: 'PK8' = 'PK8'

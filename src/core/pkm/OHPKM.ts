@@ -66,7 +66,7 @@ import {
 } from './util'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
-  static getName() {
+  static getFormat() {
     return 'OHPKM'
   }
   format: 'OHPKM' = 'OHPKM'

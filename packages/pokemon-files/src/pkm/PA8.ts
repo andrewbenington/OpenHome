@@ -23,7 +23,7 @@ import { getHeightCalculated, getWeightCalculated, MoveFilter } from '../util/ut
 import { PkmConstructorOptions } from './PKM'
 
 export default class PA8 {
-  static getName() {
+  static getFormat() {
     return 'PA8' as const
   }
   format: 'PA8' = 'PA8'
@@ -265,7 +265,7 @@ export default class PA8 {
       this.scale = other.scale ?? this.heightScalar
       this.nickname = other.nickname
 
-      const moveFilter = MoveFilter.fromMoveIndices(LA_VALID_MOVES)
+      const moveFilter = MoveFilter.fromMoveIndices(LA_VALID_MOVES, this.format)
       this.moves = moveFilter.moves(other)
       this.movePP = moveFilter.movePp(other, this.format)
       this.movePPUps = moveFilter.movePpUps(other)

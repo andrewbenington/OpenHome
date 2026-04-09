@@ -8,6 +8,7 @@ import {
   MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
+  PkmFormat,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from '@pokemon-files/pkm/PKM'
@@ -74,7 +75,7 @@ const CFRU_BALLS: Ball[] = [
 ]
 
 export abstract class PK3CFRU implements PluginPKMInterface {
-  // static getName() {
+  // static getFormat() {
   //   return 'PK3RR'
   // }
   abstract format: RomHackFormat
@@ -120,6 +121,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   pluginForm?: number
 
   abstract selectColor: string
+
+  abstract getMonFormat(): PkmFormat
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
@@ -248,7 +251,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.exp = other.exp
       this.trainerFriendship = other.trainerFriendship ?? 0
 
-      const moveFilter = MoveFilter.fromMoveIndices(this.getValidMoveIndices())
+      const moveFilter = MoveFilter.fromMoveIndices(this.getValidMoveIndices(), this.getMonFormat())
       this.moves = moveFilter.moves(other)
       this.movePP = moveFilter.movePp(other, this.getFormat())
       this.movePPUps = moveFilter.movePpUps(other)

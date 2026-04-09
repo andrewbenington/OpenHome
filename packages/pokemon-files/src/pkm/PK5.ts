@@ -24,7 +24,7 @@ import { generatePersonalityValuePreservingAttributes, MoveFilter } from '../uti
 import { PkmConstructorOptions } from './PKM'
 
 export default class PK5 {
-  static getName() {
+  static getFormat() {
     return 'PK5' as const
   }
   format: 'PK5' = 'PK5'

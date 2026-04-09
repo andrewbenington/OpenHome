@@ -67,8 +67,8 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
     return new PB8LUMI(ohpkm, { strategy })
   }
 
-  static getName() {
-    return 'PB8LUMI'
+  static getFormat() {
+    return 'PB8LUMI' as const
   }
 
   toBytes(): ArrayBuffer {
