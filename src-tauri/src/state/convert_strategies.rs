@@ -8,7 +8,6 @@ use uuid::Uuid;
 
 use crate::state::synced_state::{self, SyncedState};
 
-#[cfg_attr(feature = "wasm", derive(Tsify))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct NamedStrategy {
     name: String,
@@ -17,7 +16,6 @@ struct NamedStrategy {
 
 type StrategiesById = HashMap<Uuid, NamedStrategy>;
 
-#[cfg_attr(feature = "wasm", derive(Tsify))]
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct ConvertStrategies {
     strategies_by_id: StrategiesById,
