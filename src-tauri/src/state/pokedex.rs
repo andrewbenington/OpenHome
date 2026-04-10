@@ -38,6 +38,7 @@ pub enum PokedexStatus {
 
 #[derive(Default, Debug, Serialize, Deserialize, Clone)]
 pub struct PokedexEntry {
+    #[serde(alias = "formes")]
     forms: HashMap<FormeNumber, PokedexStatus>,
 }
 
