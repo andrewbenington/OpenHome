@@ -2795,7 +2795,7 @@ checksum = "7edddbd0b52d732b21ad9a5fab5c704c14cd949e5e9a1ec5929a24fded1b904c"
 
 [[package]]
 name = "pkm_rs"
-version = "1.10.2"
+version = "1.10.3"
 dependencies = [
  "console_error_panic_hook",
  "getrandom 0.4.2",
@@ -2816,7 +2816,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_derive"
-version = "1.10.2"
+version = "1.10.3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2825,7 +2825,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_resources"
-version = "1.10.2"
+version = "1.10.3"
 dependencies = [
  "getrandom 0.4.2",
  "js-sys",
@@ -2843,7 +2843,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_types"
-version = "1.10.2"
+version = "1.10.3"
 dependencies = [
  "getrandom 0.4.2",
  "js-sys",
