@@ -1,0 +1,26 @@
+pub mod bytes;
+mod identifiers;
+mod ohpkm_byte;
+mod pkm;
+mod save_data;
+mod stats;
+
+pub use bytes::*;
+pub use identifiers::*;
+pub use ohpkm_byte::*;
+pub use pkm::*;
+pub use save_data::SaveData;
+pub use stats::*;
+
+pub trait TrainerWithSecret {
+    fn get_trainer_id(&self) -> u16;
+    fn get_secret_id(&self) -> u16;
+}
+
+pub trait IsShiny {
+    fn is_shiny(&self) -> bool;
+    fn is_square_shiny(&self) -> bool;
+}
+
+pub use pkm_rs_derive::IsShiny4096;
+pub use pkm_rs_derive::IsShiny8192;

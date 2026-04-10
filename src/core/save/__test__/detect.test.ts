@@ -8,15 +8,14 @@ import { DPSAV } from '../DPSAV'
 import { G1SAV } from '../G1SAV'
 import { G2SAV } from '../G2SAV'
 import { G3SAV } from '../G3SAV'
+import { Gen7AlolaSave } from '../Gen7AlolaSave'
 import { LASAV } from '../Gen89/LASAV'
 import { SwShSAV } from '../Gen89/SwShSAV'
 import { HGSSSAV } from '../HGSSSAV'
 import { ORASSAV } from '../ORASSAV'
 import { PtSAV } from '../PtSAV'
 import { G3RRSAV } from '../radicalred/G3RRSAV'
-import { SMSAV } from '../SMSAV'
 import { G3UBSAV } from '../unbound/G3UBSAV'
-import { USUMSAV } from '../USUMSAV'
 import { buildUnknownSaveFile } from '../util/load'
 import { emptyPathData } from '../util/path'
 import { XYSAV } from '../XYSAV'
@@ -52,8 +51,7 @@ const allSaveTypes = [
   BW2SAV,
   XYSAV,
   ORASSAV,
-  SMSAV,
-  USUMSAV,
+  Gen7AlolaSave,
   SwShSAV,
   LASAV,
 ]

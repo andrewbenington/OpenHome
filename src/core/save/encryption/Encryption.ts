@@ -329,7 +329,6 @@ export const SignMemeDataInPlace = (data: Uint8Array) => {
   sigBuffer[0] &= 0x7f
 
   const rsaEncrypted = key.RSAPrivate(sigBuffer)
-
   const signedData = new Uint8Array(data.length)
 
   signedData.set(data.slice(0, data.length - SIGNATURE_LENGTH), 0)

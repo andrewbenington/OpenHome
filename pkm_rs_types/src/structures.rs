@@ -1,3 +1,4 @@
+use arbitrary_int::u3;
 use serde::{Serialize, Serializer};
 
 use strum_macros::{Display, EnumString};
@@ -5,6 +6,11 @@ use strum_macros::{Display, EnumString};
 use wasm_bindgen::prelude::*;
 
 use crate::{OriginGame, strings::SizedUtf16String, util};
+
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
 
 const MASK_BITS_1_2: u8 = 0b00000110;
 const MASK_BITS_1_2_INVERTED: u8 = 0b11111001;
@@ -111,31 +117,67 @@ impl From<Gender> for bool {
     }
 }
 
+#[cfg(feature = "randomize")]
+impl Randomize for Gender {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        Gender::from_u8(rng.random_range(0..=2))
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, EnumString, Display, Default, Serialize, Clone, Copy, Eq, PartialEq)]
+pub enum BinaryGender {
+    #[default]
+    Male,
+    Female,
+}
+
+impl From<bool> for BinaryGender {
+    fn from(value: bool) -> Self {
+        match value {
+            true => Self::Female,
+            false => Self::Male,
+        }
+    }
+}
+
+impl From<BinaryGender> for bool {
+    fn from(value: BinaryGender) -> Self {
+        value == BinaryGender::Female
+    }
+}
+
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy)]
-pub struct FlagSet<const N: usize> {
+pub struct FlagSet<const N: usize, FLAG: Copy + Into<usize> = usize> {
+    _marker: core::marker::PhantomData<FLAG>,
     raw: [u8; N],
 }
 
-impl<const N: usize> FlagSet<N> {
+impl<const N: usize, FLAG: Copy + Into<usize> + From<usize>> FlagSet<N, FLAG> {
     pub const fn from_bytes(bytes: [u8; N]) -> Self {
-        FlagSet { raw: bytes }
+        FlagSet {
+            _marker: core::marker::PhantomData,
+            raw: bytes,
+        }
     }
 
-    pub fn get_indices(&self) -> Vec<usize> {
+    pub fn get_flags(&self) -> Vec<FLAG> {
         self.raw
             .iter()
             .enumerate()
             .flat_map(|(i, &byte)| {
-                let mut indices = vec![];
+                let mut flags = vec![];
                 let mut remaining = byte;
                 let base = i * 8;
 
                 while remaining != 0 {
                     let bit_pos = remaining.trailing_zeros() as usize;
-                    indices.push(base + bit_pos);
+                    flags.push(FLAG::from(base + bit_pos));
                     remaining &= remaining - 1;
                 }
-                indices
+                flags
             })
             .collect()
     }
@@ -144,30 +186,38 @@ impl<const N: usize> FlagSet<N> {
         self.raw
     }
 
-    pub fn set_index(&mut self, index: usize, value: bool) {
-        util::set_flag(&mut self.raw, 0, index, value);
+    pub fn set_flag(&mut self, flag: FLAG, value: bool) {
+        util::set_flag(&mut self.raw, 0, flag.into(), value);
     }
 
-    pub fn get_index(&self, index: usize) -> bool {
-        util::get_flag(&self.raw, 0, index)
+    pub fn get_flag(&self, flag: FLAG) -> bool {
+        util::get_flag(&self.raw, 0, flag.into())
     }
 
-    pub const fn clear_all(&mut self) {
+    pub const fn clear(&mut self) {
         self.raw = [0; N]
     }
 
-    pub fn add_index(&mut self, index: usize) {
-        self.set_index(index, true);
+    pub fn add_flag(&mut self, flag: FLAG) {
+        self.set_flag(flag, true);
     }
 
-    pub fn add_indices(&mut self, indices: Vec<usize>) {
-        indices.into_iter().for_each(|index| self.add_index(index));
+    pub fn add_flags<I: IntoIterator<Item = FLAG>>(&mut self, flags: I) {
+        flags.into_iter().for_each(|flag| self.add_flag(flag));
     }
 
-    pub fn from_indices(indices: Vec<usize>) -> Self {
-        let mut set = Self::default();
-        set.add_indices(indices);
-        set
+    pub fn set_flags<I: IntoIterator<Item = FLAG>>(&mut self, flags: I) {
+        self.clear();
+        flags.into_iter().for_each(|flag| self.add_flag(flag));
+    }
+
+    pub fn from_flags<I: IntoIterator<Item = FLAG>>(flags: I) -> Self {
+        Self::default().with_flags(flags)
+    }
+
+    pub fn with_flags<I: IntoIterator<Item = FLAG>>(mut self, flags: I) -> Self {
+        self.add_flags(flags);
+        self
     }
 
     pub fn is_empty(&self) -> bool {
@@ -175,7 +225,19 @@ impl<const N: usize> FlagSet<N> {
     }
 }
 
-impl<const N: usize> Serialize for FlagSet<N> {
+impl FlagSet<2> {
+    pub const fn from_u16_le(value: u16) -> Self {
+        Self {
+            _marker: core::marker::PhantomData,
+            raw: value.to_le_bytes(),
+        }
+    }
+}
+
+impl<const N: usize, FLAG: Copy + Into<usize>> Serialize for FlagSet<N, FLAG>
+where
+    FLAG: Serialize,
+{
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -184,15 +246,102 @@ impl<const N: usize> Serialize for FlagSet<N> {
     }
 }
 
-impl<const N: usize> Default for FlagSet<N> {
+impl<const N: usize, FLAG: Copy + Into<usize>> Default for FlagSet<N, FLAG> {
     fn default() -> Self {
-        Self { raw: [0; N] }
+        Self {
+            _marker: core::marker::PhantomData::<FLAG>,
+            raw: [0; N],
+        }
     }
 }
 
-impl<const N: usize> FromIterator<usize> for FlagSet<N> {
-    fn from_iter<T: IntoIterator<Item = usize>>(iter: T) -> Self {
-        Self::from_indices(iter.into_iter().collect())
+impl<const N: usize, T: Into<usize>> FromIterator<T> for FlagSet<N> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        Self::from_flags(iter.into_iter().map(|x| x.into()))
+    }
+}
+
+#[derive(Debug)]
+pub struct FlagReader<'a> {
+    bytes: &'a [u8],
+    length: usize,
+}
+
+impl<'a> FlagReader<'a> {
+    pub fn at_offset(bytes: &'a [u8], offset: usize, length: usize) -> Self {
+        if bytes.len() < offset + length {
+            panic!("buffer too small for FlagReader at offset {offset} with length {length}");
+        }
+
+        Self {
+            bytes: &bytes[offset..offset + length],
+            length,
+        }
+    }
+
+    pub fn get(&self, flag: usize) -> bool {
+        let byte_index = flag / 8;
+        let bit_index = flag % 8;
+
+        if byte_index >= self.length {
+            panic!(
+                "index {flag} out of bounds for FlagReader of length {}",
+                self.length
+            );
+        }
+
+        (self.bytes[byte_index] & (1 << bit_index)) != 0
+    }
+}
+
+#[derive(Debug)]
+pub struct FlagWriter<'a> {
+    bytes: &'a mut [u8],
+    length: usize,
+}
+
+impl<'a> FlagWriter<'a> {
+    pub fn at_offset(bytes: &'a mut [u8], offset: usize, length: usize) -> Self {
+        if bytes.len() < offset + length {
+            panic!("buffer too small for FlagWriter at offset {offset} with length {length}");
+        }
+
+        Self {
+            bytes: &mut bytes[offset..offset + length],
+            length,
+        }
+    }
+
+    pub fn get(&self, index: usize) -> bool {
+        let byte_index = index / 8;
+        let bit_index = index % 8;
+
+        if byte_index >= self.length {
+            panic!(
+                "index {index} out of bounds for FlagWriter of length {}",
+                self.length
+            );
+        }
+
+        (self.bytes[byte_index] & (1 << bit_index)) != 0
+    }
+
+    pub fn set(&mut self, index: usize, value: bool) {
+        let byte_index = index / 8;
+        let bit_index = index % 8;
+
+        if byte_index >= self.length {
+            panic!(
+                "index {index} out of bounds for FlagWriter of length {}",
+                self.length
+            );
+        }
+
+        if value {
+            self.bytes[byte_index] |= 1 << bit_index;
+        } else {
+            self.bytes[byte_index] &= !(1 << bit_index);
+        }
     }
 }
 
@@ -231,6 +380,28 @@ impl PokeDate {
         match value {
             Some(date) => date.to_bytes(),
             None => [0, 0, 0],
+        }
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for PokeDate {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let month: u8 = rng.random_range(1..=12);
+        let year_minus_2000: u8 = rng.random_range(0..=255);
+        let day = rng.random_range(
+            1..=time::util::days_in_month(
+                month
+                    .try_into()
+                    .expect("random month range must be hardcoded from 1-12"),
+                (year_minus_2000 as i32) + 2000,
+            ),
+        );
+
+        PokeDate {
+            year_minus_2000,
+            month,
+            day,
         }
     }
 }
@@ -326,6 +497,7 @@ impl TrainerData {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct TrainerMemory {
     pub intensity: u8,
@@ -356,6 +528,46 @@ impl TrainerMemory {
 
         bytes
     }
+
+    pub fn from_bytes_switch_trainer(bytes: &[u8; 6]) -> Self {
+        Self {
+            intensity: bytes[0],
+            memory: bytes[1],
+            text_variable: u16::from_le_bytes(bytes[3..=4].try_into().unwrap()),
+            feeling: bytes[5],
+        }
+    }
+
+    pub fn to_bytes_switch_trainer(&self) -> [u8; 6] {
+        let mut bytes = [0u8; 6];
+
+        bytes[0] = self.intensity;
+        bytes[1] = self.memory;
+        bytes[3..=4].copy_from_slice(&self.text_variable.to_le_bytes());
+        bytes[5] = self.feeling;
+
+        bytes
+    }
+
+    pub fn from_bytes_switch_handler(bytes: &[u8; 5]) -> Self {
+        Self {
+            intensity: bytes[0],
+            memory: bytes[1],
+            feeling: bytes[2],
+            text_variable: u16::from_le_bytes(bytes[3..=4].try_into().unwrap()),
+        }
+    }
+
+    pub fn to_bytes_switch_handler(&self) -> [u8; 5] {
+        let mut bytes = [0u8; 5];
+
+        bytes[0] = self.intensity;
+        bytes[1] = self.memory;
+        bytes[2] = self.feeling;
+        bytes[3..=4].copy_from_slice(&self.text_variable.to_le_bytes());
+
+        bytes
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -373,6 +585,7 @@ impl TrainerMemory {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct Geolocation {
     pub region: u8,
@@ -403,6 +616,7 @@ impl Geolocation {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct Geolocations(
     pub Geolocation,
@@ -482,6 +696,10 @@ impl ShinyLeaves {
 
     pub const fn is_empty(&self) -> bool {
         self.0 == 0
+    }
+
+    pub const fn new_crown() -> Self {
+        Self(0b100000)
     }
 }
 
@@ -580,17 +798,66 @@ impl ShinyLeaves {
     }
 }
 
+#[cfg(feature = "randomize")]
+impl Randomize for ShinyLeaves {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        match rng.random_range(0..=1) {
+            0 => Self::new_crown(),
+            _ => Self::from_byte(rng.random_range(0..=0b11111)),
+        }
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Display, Serialize)]
+pub enum AbilityNumber {
+    #[default]
+    First,
+    Second,
+    Hidden,
+}
+
+impl AbilityNumber {
+    pub const fn from_u8_first_three_bits(
+        byte: u8,
+    ) -> core::result::Result<Self, InvalidAbilityNumber> {
+        match byte & 0b111 {
+            1 => Ok(Self::First),
+            2 => Ok(Self::Second),
+            4 => Ok(Self::Hidden),
+            invalid => Err(InvalidAbilityNumber(u3::new(invalid))),
+        }
+    }
+
+    pub const fn to_byte(self) -> u8 {
+        match self {
+            Self::First => 1,
+            Self::Second => 2,
+            Self::Hidden => 4,
+        }
+    }
+}
+
+impl TryFrom<u3> for AbilityNumber {
+    type Error = InvalidAbilityNumber;
+
+    fn try_from(value: u3) -> Result<Self, InvalidAbilityNumber> {
+        match value.value() {
+            1 => Ok(Self::First),
+            2 => Ok(Self::Second),
+            4 => Ok(Self::Hidden),
+            _ => Err(InvalidAbilityNumber(value)),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct InvalidAbilityNumber(pub u3);
+
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn flagset_indices() {
-        let flagset = FlagSet {
-            raw: [0b10010100, 0b10110010],
-        };
-        println!("{:?}", flagset.get_indices());
-    }
 
     #[test]
     fn gender_get() {

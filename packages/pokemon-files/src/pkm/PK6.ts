@@ -287,7 +287,7 @@ export default class PK6 {
       this.battleMemoryCount = other.battleMemoryCount ?? 0
       this.superTrainingDistFlags = other.superTrainingDistFlags ?? 0
       this.formArgument = other.formArgument ?? 0
-      this.nickname = other.nickname
+      this.nickname = converter.nickname(other)
 
       const moveFilter = MoveFilter.fromPkmClass(PK6)
       this.moves = moveFilter.moves(other)

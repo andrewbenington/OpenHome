@@ -1,4 +1,4 @@
-use pkm_rs::pkm::ohpkm::{OhpkmV1, OhpkmV2};
+use pkm_rs::ohpkm::{v1::OhpkmV1, OhpkmV2};
 use semver::Version;
 use serde::Serialize;
 use std::{
@@ -311,11 +311,9 @@ pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
 
         let ohpkm_v2 = OhpkmV2::from_v1(ohpkm_v1);
         let bytes_v2 = ohpkm_v2.to_bytes();
-        if let Ok(bytes_v2) = bytes_v2
-            && let Some(filename) = PathBuf::from(&path).file_name()
-        {
-            let v2_path = Path::join(&storage::get_path(app_handle, MONS_V2_DIR)?, filename);
 
+        if let Some(filename) = PathBuf::from(&path).file_name() {
+            let v2_path = Path::join(&storage::get_path(app_handle, MONS_V2_DIR)?, filename);
             util::write_file_contents(v2_path, bytes_v2)?;
         }
     }

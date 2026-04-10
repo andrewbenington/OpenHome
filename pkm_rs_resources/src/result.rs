@@ -11,7 +11,7 @@ use crate::species::{NATIONAL_DEX_MAX, NatDexIndex};
 #[derive(Debug)]
 pub enum Error {
     BufferSize {
-        field: String,
+        requirement_source: String,
         expected: usize,
         received: usize,
     },
@@ -47,7 +47,7 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
-            Error::BufferSize { field, expected, received } => {
+            Error::BufferSize { requirement_source: field, expected, received } => {
                 format!("{field} requires buffer of length {expected}, but actual length is {received}").to_owned()
             }
             Error::CryptRange { range, buffer_size } => {

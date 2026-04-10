@@ -1,21 +1,20 @@
+use crate::{Error, Result, abilities::AbilityIndexWasm, species::ALL_SPECIES};
+use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
+use serde::{Serialize, Serializer};
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
 
 use crate::{
-    Error, ExpectLog, Result,
-    abilities::AbilityIndex,
+    ExpectLog,
     levelup::LearnsetReader,
-    species::{
-        ALL_SPECIES,
-        form_metadata::{MetadataSource, levelup_learnset_lookup, types_lookup},
-    },
+    species::form_metadata::{MetadataSource, levelup_learnset_lookup, types_lookup},
 };
 
-use pkm_rs_types::{GameSetting, Generation, PkmType, TeraType};
-use serde::{Serialize, Serializer};
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
 
-#[cfg(feature = "wasm")]
-use crate::levelup::LearnsetMoveJs;
 #[cfg(feature = "wasm")]
 use crate::log;
 #[cfg(feature = "wasm")]
@@ -24,6 +23,8 @@ use crate::species::form_metadata::current_base_stats;
 use crate::species::form_metadata::{BaseStats, base_stats_lookup};
 #[cfg(feature = "wasm")]
 use crate::stats::Stat;
+#[cfg(feature = "wasm")]
+use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{Gender, Stats8};
 #[cfg(feature = "wasm")]
@@ -89,6 +90,15 @@ impl NatDexIndex {
     }
 }
 
+#[cfg(feature = "randomize")]
+impl Randomize for NatDexIndex {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let index: NonZeroU16 =
+            NonZeroU16::new(rng.random_range(1..=MAX_NATIONAL_DEX) as u16).unwrap();
+        NatDexIndex(index)
+    }
+}
+
 impl Serialize for NatDexIndex {
     fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
@@ -102,6 +112,19 @@ impl Serialize for NatDexIndex {
 impl Default for NatDexIndex {
     fn default() -> Self {
         Self(unsafe { NonZeroU16::new_unchecked(1) })
+    }
+}
+
+impl From<NationalDex> for NatDexIndex {
+    fn from(ndex: NationalDex) -> Self {
+        NatDexIndex::new(ndex as u16).expect("All NationalDex values should be a valid NatDexIndex")
+    }
+}
+
+impl From<NatDexIndex> for NationalDex {
+    fn from(ndex: NatDexIndex) -> Self {
+        NationalDex::try_from(ndex.get())
+            .expect("All NatDexIndex values should be a valid NationalDex")
     }
 }
 
@@ -347,10 +370,10 @@ pub struct FormeMetadata {
     pub gender_ratio: GenderRatio,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub abilities: (AbilityIndex, AbilityIndex),
+    pub abilities: (AbilityIndexBounded, AbilityIndexBounded),
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = hiddenAbility))]
-    pub hidden_ability: Option<AbilityIndex>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub hidden_ability: Option<AbilityIndexBounded>,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseHeight))]
     pub base_height: u32,
@@ -404,10 +427,11 @@ impl FormeMetadata {
         self.forme_ref().get_species_metadata()
     }
 
-    pub const fn get_ability(&self, ability_num: u8) -> AbilityIndex {
+    pub fn get_ability(&self, ability_num: AbilityNumber) -> AbilityIndexBounded {
         match ability_num {
-            1 => self.abilities.0,
-            _ => self.abilities.1,
+            AbilityNumber::First => self.abilities.0,
+            AbilityNumber::Second => self.abilities.1,
+            AbilityNumber::Hidden => self.hidden_ability.unwrap_or(self.abilities.0),
         }
     }
 
@@ -510,26 +534,28 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn abilities(&self) -> Vec<AbilityIndex> {
-        vec![self.abilities.0, self.abilities.1]
+    pub fn abilities(&self) -> Vec<AbilityIndexWasm> {
+        vec![self.abilities.0.into(), self.abilities.1.into()]
     }
 
     #[wasm_bindgen(js_name = abilityByNum)]
-    pub fn ability_by_num(&self, num: u8) -> AbilityIndex {
-        match num {
-            4 => self.hidden_ability.unwrap_or(self.abilities.0),
-            2 => self.abilities.1,
-            _ => self.abilities.0,
-        }
+    pub fn ability_by_num_js(&self, num: u8) -> AbilityIndexWasm {
+        self.get_ability(AbilityNumber::from_u8_first_three_bits(num).unwrap_or_default())
+            .into()
     }
 
     #[wasm_bindgen(js_name = abilityByNumGen3)]
-    pub fn ability_by_num_gen_3(&self, num: u8) -> AbilityIndex {
-        if num == 2 && self.abilities.1.get() <= 77 {
-            self.abilities.1
+    pub fn ability_by_num_gen_3(&self, num: u8) -> AbilityIndexWasm {
+        if num == 2 && self.abilities.1.to_u16() <= 77 {
+            self.abilities.1.into()
         } else {
-            self.abilities.0
+            self.abilities.0.into()
         }
+    }
+
+    #[wasm_bindgen(getter = hiddenAbility)]
+    pub fn hidden_ability(&self) -> Option<AbilityIndexWasm> {
+        self.hidden_ability.map(|ability| ability.into())
     }
 
     #[wasm_bindgen(getter = eggGroups)]
@@ -724,6 +750,13 @@ impl SpeciesAndForme {
         })
     }
 
+    pub const fn base_form(national_dex: NatDexIndex) -> SpeciesAndForme {
+        SpeciesAndForme {
+            national_dex,
+            forme_index: 0,
+        }
+    }
+
     pub const fn new_valid_ndex(
         national_dex: NatDexIndex,
         forme_index: u16,
@@ -777,6 +810,10 @@ impl SpeciesAndForme {
         self.forme_index
     }
 
+    pub const fn to_tuple(self) -> (u16, u16) {
+        (self.national_dex.get(), self.forme_index)
+    }
+
     pub fn get_levelup_learnset(&self, source: Option<MetadataSource>) -> Option<LearnsetReader> {
         levelup_learnset_lookup(self.national_dex.get(), self.forme_index, source)
     }
@@ -824,5 +861,19 @@ impl SpeciesAndForme {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = tryNew))]
     pub fn try_new(national_dex: u16, forme_index: u16) -> Option<Self> {
         Self::new(national_dex, forme_index).ok()
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for SpeciesAndForme {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let national_dex = NatDexIndex::randomized(rng);
+        let forme_count = national_dex.get_species_metadata().formes().len();
+        let forme_index = rng.random_range(0..forme_count) as u16;
+
+        Self {
+            national_dex,
+            forme_index,
+        }
     }
 }

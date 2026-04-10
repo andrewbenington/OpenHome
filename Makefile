@@ -46,6 +46,7 @@ check: wasm-compile
 .PHONY: test
 test: ensure-dependencies
 	@pnpm run test
+	@cargo test
 
 .PHONY: check-rs
 check-rs:
@@ -106,6 +107,10 @@ gen-wasm:
 	@ts-node generate/gen_moves.ts
 	@ts-node generate/gen_species_data.ts
 	@cd pkm_rs_resources && cargo fmt
+
+.PHONY: pkhex-json
+pkhex-json:
+	@cd pkhex-json && dotnet run GeneratePkhexJson.cs
 	
 generate/out/syncPKHexResources.js: generate/syncPKHexResources.ts
 	@echo "compiling generate/syncPKHexResources.ts..."

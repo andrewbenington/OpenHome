@@ -36,6 +36,9 @@
       "@pokemon-files/*": [
         "./packages/pokemon-files/src/*"
       ],
+      "@pokemon-wasm/*": [
+        "./pkm_rs/pkg/*"
+      ],
       "@pokemon-resources/*": [
         "./packages/pokemon-resources/src/*"
       ],
@@ -60,6 +63,8 @@
     "src",
     "packages",
     "generate/_rename.js",
+    "generate/generateMoveMap.ts",
+    "src-tauri/pokemon-wasm",
     "generate/generate-cfru/generateMoveMap.ts",
     "src/types/pkm-resources-types.d.ts",
     "__mocks__"

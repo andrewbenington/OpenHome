@@ -10,6 +10,10 @@ use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Default, EnumString, Display, Serialize, PartialEq, Eq, Clone, Copy)]
@@ -164,6 +168,7 @@ impl PkmTypes {
 const TERA_TYPE_NO_OVERRIDE: u8 = 0x13;
 const TERA_TYPE_STELLAR: u8 = 0x63;
 
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Serialize, Clone, Copy, PartialEq, Eq)]
 pub enum TeraType {
     Standard(PkmType),

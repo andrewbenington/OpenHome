@@ -2,7 +2,7 @@ use crate::error::{Error, Result};
 use crate::storage;
 use crate::{state::synced_state, util};
 use base64::prelude::*;
-use pkm_rs::pkm::ohpkm::OhpkmV2;
+use pkm_rs::ohpkm::OhpkmV2;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use std::{collections::HashMap, fs};
@@ -50,12 +50,7 @@ impl OhpkmBytesStore {
                         "Fixed errors Ohpkm {} with id {identifier}",
                         mon.get_nickname()
                     );
-                    match mon.to_bytes() {
-                        Ok(new_bytes) => *bytes = new_bytes,
-                        Err(err) => println!(
-                            "Failed to reserialize fixed Ohpkm with id {identifier}: {err}"
-                        ),
-                    };
+                    *bytes = mon.to_bytes();
                 }
             }
         }

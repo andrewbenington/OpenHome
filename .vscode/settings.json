@@ -48,9 +48,13 @@
     "unspecified-properties-position": "bottomAlphabetical"
   },
   "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.linkedProjects": [
+    "${workspaceFolder}/Cargo.toml",
+    "${workspaceFolder}/pkm_rs/Cargo.toml"
+  ],
   "editor.inlayHints.enabled": "off",
   "editor.tabSize": 2,
-  "rust-analyzer.cargo.features": ["wasm"],
+  "rust-analyzer.cargo.features": "all",
   "css.completion.completePropertyWithSemicolon": false,
   "rust-analyzer.cargo.targetDir": true,
   "python.defaultInterpreterPath": "generate/.venv/bin/python",

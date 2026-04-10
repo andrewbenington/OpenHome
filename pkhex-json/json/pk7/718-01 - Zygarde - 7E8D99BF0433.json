@@ -1,0 +1,169 @@
+{
+  "encryption_constant": 2579432499,
+  "sanity": 0,
+  "checksum": 32397,
+  "species_and_forme": {
+    "national_dex": "718 (Zygarde)",
+    "forme_index": 1
+  },
+  "held_item_index": 0,
+  "trainer_id": 11558,
+  "secret_id": 27351,
+  "exp": 312558,
+  "ability_index": "Aura Break",
+  "ability_num": "First",
+  "markings": {
+    "circle": "Unset",
+    "square": "Unset",
+    "triangle": "Unset",
+    "heart": "Unset",
+    "star": "Unset",
+    "diamond": "Unset"
+  },
+  "personality_value": 2946875041,
+  "nature": "Calm",
+  "is_fateful_encounter": false,
+  "gender": "Genderless",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "resort_event_status": 0,
+  "pokerus_byte": 0,
+  "super_training_flags": 0,
+  "ribbons": [],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "super_training_dist_flags": 0,
+  "form_argument": 0,
+  "nickname": "Zygarde",
+  "moves": [
+    {
+      "move_index": "Crunch",
+      "pp": 15,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Earthquake",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Camouflage",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Dragon Pulse",
+      "pp": 10,
+      "pp_ups": 0
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "secret_super_training_unlocked": false,
+  "secret_super_training_complete": false,
+  "ivs": {
+    "hp": 26,
+    "atk": 31,
+    "def": 31,
+    "spa": 14,
+    "spd": 12,
+    "spe": 31
+  },
+  "is_egg": false,
+  "is_nicknamed": false,
+  "handler_name": "",
+  "handler_gender": "Male",
+  "is_current_handler": false,
+  "geolocations": [
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    }
+  ],
+  "handler_friendship": 0,
+  "handler_affection": 0,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "text_variable": 0
+  },
+  "fullness": 0,
+  "enjoyment": 0,
+  "trainer_name": "RoC",
+  "trainer_friendship": 0,
+  "trainer_affection": 0,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "text_variable": 0
+  },
+  "egg_date": null,
+  "met_date": "11/17/2017",
+  "egg_location_index": 0,
+  "met_location_index": 118,
+  "ball": "Pok\u00E9",
+  "met_level": 63,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": false,
+    "atk": false,
+    "def": false,
+    "spa": false,
+    "spd": false,
+    "spe": false
+  },
+  "game_of_origin": "Ultra Moon",
+  "country": 49,
+  "region": 0,
+  "console_region": 1,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 63,
+  "form_argument_remain": 0,
+  "form_argument_elapsed": 0,
+  "current_hp": 157,
+  "stats": {
+    "hp": 157,
+    "atk": 135,
+    "def": 113,
+    "spa": 90,
+    "spd": 130,
+    "spe": 169
+  }
+}

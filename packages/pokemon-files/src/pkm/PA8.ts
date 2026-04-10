@@ -1,3 +1,4 @@
+import { Option } from '@openhome-core/util/functional'
 import {
   AbilityIndex,
   Ball,
@@ -72,7 +73,7 @@ export default class PA8 {
   gvs: types.Stats
   handlerName: string
   handlerGender: boolean
-  handlerLanguage: Language
+  handlerLanguage: Option<Language>
   isCurrentHandler: boolean
   handlerID: number
   handlerFriendship: number
@@ -263,7 +264,7 @@ export default class PA8 {
       this.heightScalar = other.heightScalar
       this.weightScalar = other.weightScalar
       this.scale = other.scale ?? this.heightScalar
-      this.nickname = other.nickname
+      this.nickname = converter.nickname(other)
 
       const moveFilter = MoveFilter.fromMoveIndices(LA_VALID_MOVES, this.format)
       this.moves = moveFilter.moves(other)
@@ -399,7 +400,7 @@ export default class PA8 {
     types.writeStatsToBytesU8(dataView, 0xa4, this.gvs)
     stringLogic.writeUTF16StringToBytes(dataView, this.handlerName, 0xb8, 12)
     byteLogic.setFlag(dataView, 0xd2, 0, this.handlerGender)
-    dataView.setUint8(0xd3, this.handlerLanguage)
+    dataView.setUint8(0xd3, this.handlerLanguage ?? 0)
     byteLogic.setFlag(dataView, 0xd4, 0, this.isCurrentHandler)
     dataView.setUint16(0xd6, this.handlerID, true)
     dataView.setUint8(0xd8, this.handlerFriendship)

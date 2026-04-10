@@ -1,28 +1,44 @@
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   AbilityIndex,
-  Ball,
+  ConvertStrategies,
   ConvertStrategy,
+  HyperTraining,
   Item,
-  Language,
   Languages,
   MetadataSummaryLookup,
   NatureIndex,
+  OriginGame,
+  Pk7 as Pk7Wasm,
+  PokeDate,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { ModernRibbons } from '@pokemon-resources/index'
-import { OHPKM } from '../../../../src/core/pkm/OHPKM'
-import { PkmConverter } from '../conversion/converter'
-import * as byteLogic from '../util/byteLogic'
-import * as encryption from '../util/encryption'
-import { FourMoves } from '../util/pkmInterface'
-import { filterRibbons } from '../util/ribbonLogic'
-import { getStats } from '../util/statCalc'
-import * as stringLogic from '../util/stringConversion'
-import * as types from '../util/types'
-import { MoveFilter } from '../util/util'
+import * as jsTypes from '@pokemon-files/util/types'
+import { ModernRibbons } from '../../../pokemon-resources/src'
+import { getStats } from '../util'
+import {
+  decryptByteArrayGen67,
+  get16BitChecksumLittleEndian,
+  shuffleBlocksGen67,
+  unshuffleBlocksGen67,
+} from '../util/encryption'
+import { AllPKMFields, FourMoves } from '../util/pkmInterface'
 import { PkmConstructorOptions } from './PKM'
+import {
+  binaryGenderFromBool,
+  binaryGenderToBool,
+  contestStatsToWasm,
+  convertPokeDate,
+  convertPokeDateOptional,
+  geolocationsFromWasm,
+  geolocationsToWasm,
+  markingsSixShapesColorsFromWasm,
+  markingsSixShapesColorsToWasm,
+  statsToWasmStats8,
+  trainerMemoryToWasm,
+} from './wasm/convert'
 
-export default class PK7 {
+export class PK7 {
   static getFormat() {
     return 'PK7' as const
   }
@@ -30,283 +46,41 @@ export default class PK7 {
   static getBoxSize() {
     return 232
   }
-  encryptionConstant: number
-  checksum: number = 0
-  dexNum: number
-  heldItemIndex: number
-  trainerID: number
-  secretID: number
-  exp: number
-  ability?: AbilityIndex
-  abilityNum: number
-  markings: types.MarkingsSixShapesWithColor
-  personalityValue: number
-  nature: NatureIndex
-  isFatefulEncounter: boolean
-  gender: number
-  formeNum: number
-  evs: types.Stats
-  contest: types.ContestStats
-  resortEventStatus: number
-  pokerusByte: number
-  superTrainingFlags: number
-  contestMemoryCount: number
-  battleMemoryCount: number
-  superTrainingDistFlags: number
-  formArgument: number
-  nickname: string
-  moves: FourMoves
-  movePP: FourMoves
-  movePPUps: FourMoves
-  relearnMoves: FourMoves
-  secretSuperTrainingUnlocked: boolean
-  secretSuperTrainingComplete: boolean
-  ivs: types.Stats
-  isEgg: boolean
-  isNicknamed: boolean
-  handlerName: string
-  handlerGender: boolean
-  isCurrentHandler: boolean
-  geolocations: types.Geolocation[]
-  handlerFriendship: number
-  handlerAffection: number
-  fullness: number
-  enjoyment: number
-  trainerName: string
-  trainerFriendship: number
-  trainerAffection: number
-  eggDate: types.PKMDate | undefined
-  metDate: types.PKMDate | undefined
-  eggLocationIndex: number
-  metLocationIndex: number
-  ball: number
-  metLevel: number
-  hyperTraining: types.HyperTrainStats
-  gameOfOrigin: number
-  country: number
-  region: number
-  consoleRegion: number
-  language: Language
-  statusCondition: number
-  currentHP: number
-  ribbons: string[]
-  handlerMemory: types.Memory
-  trainerMemory: types.Memory
-  trainerGender: boolean
-  originalBytes?: ArrayBuffer
+  inner: Pk7Wasm
 
-  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
-    const { encrypted, strategy } = options
-
+  constructor(arg: ArrayBuffer | AllPKMFields | Pk7Wasm, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
       let buffer = arg
 
-      if (encrypted) {
-        const unencryptedBytes = encryption.decryptByteArrayGen67(buffer)
-        const unshuffledBytes = encryption.unshuffleBlocksGen67(unencryptedBytes)
+      if (options.encrypted) {
+        const unencryptedBytes = decryptByteArrayGen67(buffer)
+        const unshuffledBytes = unshuffleBlocksGen67(unencryptedBytes)
         buffer = unshuffledBytes
       }
-      this.originalBytes = buffer
 
-      const dataView = new DataView(buffer)
-      this.encryptionConstant = dataView.getUint32(0x0, true)
-      this.checksum = dataView.getUint16(0x6, true)
-      this.dexNum = dataView.getUint16(0x8, true)
-      this.heldItemIndex = dataView.getUint16(0xa, true)
-      this.trainerID = dataView.getUint16(0xc, true)
-      this.secretID = dataView.getUint16(0xe, true)
-      this.exp = dataView.getUint32(0x10, true)
-      this.ability = AbilityIndex.fromIndex(dataView.getUint8(0x14))
-      this.abilityNum = dataView.getUint8(0x15)
-      this.markings = types.markingsSixShapesWithColorFromBytes(dataView, 0x16)
-      this.personalityValue = dataView.getUint32(0x18, true)
-      this.nature = new NatureIndex(dataView.getUint8(0x1c))
-      this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x1d, 0)
-      this.gender = byteLogic.uIntFromBufferBits(dataView, 0x1d, 1, 2, true)
-      this.formeNum = byteLogic.uIntFromBufferBits(dataView, 0x1d, 3, 5, true)
-      this.evs = types.readStatsFromBytesU8(dataView, 0x1e)
-      this.contest = types.readContestStatsFromBytes(dataView, 0x24)
-      this.resortEventStatus = dataView.getUint8(0x2a)
-      this.pokerusByte = dataView.getUint8(0x2b)
-      this.superTrainingFlags = dataView.getUint32(0x2c, true)
-
-      this.contestMemoryCount = dataView.getUint8(0x38)
-      this.battleMemoryCount = dataView.getUint8(0x39)
-      this.superTrainingDistFlags = dataView.getUint8(0x3a)
-      this.formArgument = dataView.getUint32(0x3c, true)
-      this.nickname = stringLogic.utf16BytesToString(buffer, 0x40, 12)
-      this.moves = [
-        dataView.getUint16(0x5a, true),
-        dataView.getUint16(0x5c, true),
-        dataView.getUint16(0x5e, true),
-        dataView.getUint16(0x60, true),
-      ]
-      this.movePP = [
-        dataView.getUint8(0x62),
-        dataView.getUint8(0x63),
-        dataView.getUint8(0x64),
-        dataView.getUint8(0x65),
-      ]
-      this.movePPUps = [
-        dataView.getUint8(0x66),
-        dataView.getUint8(0x67),
-        dataView.getUint8(0x68),
-        dataView.getUint8(0x69),
-      ]
-      this.relearnMoves = [
-        dataView.getUint16(0x6a, true),
-        dataView.getUint16(0x6c, true),
-        dataView.getUint16(0x6e, true),
-        dataView.getUint16(0x70, true),
-      ]
-      this.secretSuperTrainingUnlocked = byteLogic.getFlag(dataView, 0x72, 1)
-      this.secretSuperTrainingComplete = byteLogic.getFlag(dataView, 0x72, 2)
-      this.ivs = types.read30BitIVsFromBytes(dataView, 0x74)
-      this.isEgg = byteLogic.getFlag(dataView, 0x74, 30)
-      this.isNicknamed = byteLogic.getFlag(dataView, 0x74, 31)
-      this.handlerName = stringLogic.utf16BytesToString(buffer, 0x78, 12)
-      this.handlerGender = byteLogic.getFlag(dataView, 0x92, 0)
-      this.isCurrentHandler = byteLogic.getFlag(dataView, 0x93, 0)
-      this.geolocations = [
-        types.readGeolocationFromBytes(dataView, 0x94),
-        types.readGeolocationFromBytes(dataView, 0x96),
-        types.readGeolocationFromBytes(dataView, 0x98),
-        types.readGeolocationFromBytes(dataView, 0x9a),
-        types.readGeolocationFromBytes(dataView, 0x9c),
-      ]
-      this.handlerFriendship = dataView.getUint8(0xa2)
-      this.handlerAffection = dataView.getUint8(0xa3)
-      this.fullness = dataView.getUint8(0xae)
-      this.enjoyment = dataView.getUint8(0xaf)
-      this.trainerName = stringLogic.utf16BytesToString(buffer, 0xb0, 12)
-      this.trainerFriendship = dataView.getUint8(0xca)
-      this.trainerAffection = dataView.getUint8(0xcb)
-      this.eggDate = types.pkmDateFromBytes(dataView, 0xd1)
-      this.metDate = types.pkmDateFromBytes(dataView, 0xd4)
-      this.eggLocationIndex = dataView.getUint16(0xd8, true)
-      this.metLocationIndex = dataView.getUint16(0xda, true)
-      this.ball = dataView.getUint8(0xdc)
-      this.metLevel = dataView.getUint8(0xdd)
-      this.hyperTraining = types.readHyperTrainStatsFromBytes(dataView, 0xde)
-      this.gameOfOrigin = dataView.getUint8(0xdf)
-      this.country = dataView.getUint8(0xe0)
-      this.region = dataView.getUint8(0xe1)
-      this.consoleRegion = dataView.getUint8(0xe2)
-      this.language = Languages.fromByteOrNone(dataView.getUint8(0xe3))
-      if (dataView.byteLength >= 260) {
-        this.statusCondition = dataView.getUint8(0xe8)
-      } else {
-        this.statusCondition = 0
-      }
-
-      if (dataView.byteLength >= 260) {
-        this.currentHP = dataView.getUint8(0xf0)
-      } else {
-        this.currentHP = 0
-      }
-      this.ribbons = byteLogic
-        .getFlagIndexes(dataView, 0x30, 0, 50)
-        .map((index) => ModernRibbons[index])
-      this.handlerMemory = types.read3DSHandlerMemoryFromBytes(dataView, 0xa4)
-      this.trainerMemory = types.read3DSTrainerMemoryFromBytes(dataView, 0xcc)
-      this.trainerGender = byteLogic.getFlag(dataView, 0xdd, 7)
+      this.inner = Pk7Wasm.fromBytes(new Uint8Array(buffer))
+    } else if (arg instanceof Pk7Wasm) {
+      this.inner = arg
     } else {
       const other = arg
-      const converter = new PkmConverter('PK7', strategy)
-      const metData = converter.metData(other)
-
-      this.encryptionConstant = other.encryptionConstant
-      this.dexNum = other.dexNum
-      this.heldItemIndex = other.heldItemIndex
-      this.trainerID = other.trainerID
-      this.secretID = other.secretID
-      this.exp = other.exp
-      this.ability = other.ability
-      this.abilityNum = other.abilityNum
-      this.markings = types.markingsSixShapesWithColorFromOther(other.markings)
-      this.personalityValue = other.personalityValue
-      this.nature = other.nature
-      this.isFatefulEncounter = other.isFatefulEncounter
-      this.gender = other.gender
-      this.formeNum = other.formeNum
-      this.evs = other.evs
-      this.contest = other.contest
-      this.resortEventStatus = other.resortEventStatus ?? 0
-      this.pokerusByte = other.pokerusByte
-      this.superTrainingFlags = other.superTrainingFlags ?? 0
-
-      this.contestMemoryCount = other.contestMemoryCount
-      this.battleMemoryCount = other.battleMemoryCount
-      this.superTrainingDistFlags = other.superTrainingDistFlags ?? 0
-      this.formArgument = other.formArgument
-      this.nickname = other.nickname
-      const moveFilter = MoveFilter.fromPkmClass(PK7)
-      this.moves = moveFilter.moves(other)
-      this.movePP = moveFilter.movePp(other, this.format)
-      this.movePPUps = moveFilter.movePpUps(other)
-      this.relearnMoves = moveFilter.relearnMovesOrDefault(other)
-
-      this.secretSuperTrainingUnlocked = other.secretSuperTrainingUnlocked ?? false
-      this.secretSuperTrainingComplete = other.secretSuperTrainingComplete ?? false
-      this.ivs = converter.ivs(other)
-      this.isEgg = other.isEgg
-      this.isNicknamed = other.isNicknamed
-      this.handlerName = other.handlerName
-      this.handlerGender = other.handlerGender
-      this.isCurrentHandler = other.isCurrentHandler
-      this.geolocations = other.geolocations ?? [
-        {
-          region: 0,
-          country: 0,
-        },
-        {
-          region: 0,
-          country: 0,
-        },
-        {
-          region: 0,
-          country: 0,
-        },
-        {
-          region: 0,
-          country: 0,
-        },
-        {
-          region: 0,
-          country: 0,
-        },
-      ]
-      this.handlerFriendship = other.handlerFriendship
-      this.handlerAffection = other.handlerAffection
-      this.fullness = other.fullness
-      this.enjoyment = other.enjoyment
-      this.trainerName = other.trainerName
-      this.trainerFriendship = other.trainerFriendship
-      this.trainerAffection = other.trainerAffection
-      this.eggDate = other.eggDate
-      this.metDate = other.metDate
-      this.eggLocationIndex = other.eggLocationIndex ?? 0
-      this.gameOfOrigin = metData.gameOfOrigin
-      this.metLocationIndex = metData.locationIndex
-      if (other.ball && PK7.maxValidBall() >= other.ball) {
-        this.ball = other.ball
-      } else {
-        this.ball = Ball.Poke
+      if (!(other instanceof OHPKM)) {
+        throw Error('Pk7Rust cannot be created with any PKM type besides OHPKM')
       }
-      this.metLevel = other.metLevel
-      this.hyperTraining = other.hyperTraining
-      this.country = other.country ?? 0
-      this.region = other.region ?? 0
-      this.consoleRegion = other.consoleRegion
-      this.language = other.language
-      this.statusCondition = 0
-      this.currentHP = other.currentHP ?? 0
-      this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], 'Battle Tree Master')
-      this.handlerMemory = other.handlerMemory
-      this.trainerMemory = other.trainerMemory
-      this.trainerGender = other.trainerGender
+
+      this.inner = Pk7Wasm.fromOhpkmBytes(
+        new Uint8Array(other.toBytes()),
+        options.strategy || ConvertStrategies.getDefault()
+      )
+
+      return
     }
-    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
+  }
+
+  get encryptionConstant() {
+    return this.inner.encryption_constant
+  }
+  set encryptionConstant(value: number) {
+    this.inner.encryption_constant = value
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK7 {
@@ -317,125 +91,523 @@ export default class PK7 {
     return new PK7(ohpkm, { strategy })
   }
 
-  toBytes(options?: types.ToBytesOptions): ArrayBuffer {
-    const buffer = new ArrayBuffer(options?.includeExtraFields ? 260 : 232)
-    const dataView = new DataView(buffer)
+  static fromWasm(pk7: Pk7Wasm): PK7 {
+    return new PK7(pk7, {})
+  }
 
-    dataView.setUint32(0x0, this.encryptionConstant, true)
-    dataView.setUint16(0x4, 0, true) // sanity bytes
-    dataView.setUint16(0x6, this.checksum, true)
-    dataView.setUint16(0x8, this.dexNum, true)
-    dataView.setUint16(0xa, this.heldItemIndex, true)
-    dataView.setUint16(0xc, this.trainerID, true)
-    dataView.setUint16(0xe, this.secretID, true)
-    dataView.setUint32(0x10, this.exp, true)
-    dataView.setUint8(0x14, this.ability?.index ?? 0)
-    dataView.setUint8(0x15, this.abilityNum)
-    types.markingsSixShapesWithColorToBytes(dataView, 0x16, this.markings)
-    dataView.setUint32(0x18, this.personalityValue, true)
-    dataView.setUint8(0x1c, this.nature.index)
-    byteLogic.setFlag(dataView, 0x1d, 0, this.isFatefulEncounter)
-    byteLogic.uIntToBufferBits(dataView, this.gender, 29, 1, 2, true)
-    byteLogic.uIntToBufferBits(dataView, this.formeNum, 29, 3, 5, true)
-    types.writeStatsToBytesU8(dataView, 0x1e, this.evs)
-    types.writeContestStatsToBytes(dataView, 0x24, this.contest)
-    dataView.setUint8(0x2a, this.resortEventStatus)
-    dataView.setUint8(0x2b, this.pokerusByte)
-    dataView.setUint32(0x2c, this.superTrainingFlags, true)
-    dataView.setUint8(0x38, this.contestMemoryCount)
-    dataView.setUint8(0x39, this.battleMemoryCount)
-    dataView.setUint8(0x3a, this.superTrainingDistFlags)
-    dataView.setUint32(0x3c, this.formArgument, true)
-    stringLogic.writeUTF16StringToBytes(dataView, this.nickname, 0x40, 12)
-    for (let i = 0; i < 4; i++) {
-      dataView.setUint16(0x5a + i * 2, this.moves[i], true)
+  get sanity() {
+    return this.inner.sanity
+  }
+  set sanity(value: number) {
+    this.inner.sanity = value
+  }
+
+  get checksum() {
+    return this.inner.checksum
+  }
+  set checksum(value: number) {
+    this.inner.checksum = value
+  }
+
+  get dexNum() {
+    return this.inner.species_and_forme.nationalDex
+  }
+
+  get heldItemIndex() {
+    return this.inner.held_item_index
+  }
+  set heldItemIndex(value: number) {
+    this.inner.held_item_index = value
+  }
+
+  get trainerID() {
+    return this.inner.trainer_id
+  }
+  set trainerID(value: number) {
+    this.inner.trainer_id = value
+  }
+
+  get secretID() {
+    return this.inner.secret_id
+  }
+  set secretID(value: number) {
+    this.inner.secret_id = value
+  }
+
+  get exp() {
+    return this.inner.exp
+  }
+  set exp(value: number) {
+    this.inner.exp = value
+  }
+
+  get ability() {
+    return this.inner.abilityIndex
+  }
+  set ability(value: AbilityIndex) {
+    this.inner.abilityIndex = AbilityIndex.fromIndex(value.index) || value
+  }
+
+  get abilityNum() {
+    return this.inner.ability_num
+  }
+  set abilityNum(value: number) {
+    this.inner.ability_num = value
+  }
+
+  get markings() {
+    return markingsSixShapesColorsFromWasm(this.inner.markings)
+  }
+  set markings(value: jsTypes.MarkingsSixShapesWithColor) {
+    this.inner.markings = markingsSixShapesColorsToWasm(value)
+  }
+
+  get personalityValue() {
+    return this.inner.personality_value
+  }
+  set personalityValue(value: number) {
+    this.inner.personality_value = value
+  }
+
+  get nature() {
+    return this.inner.nature.copy()
+  }
+  set nature(value: NatureIndex) {
+    this.inner.nature = value.copy()
+  }
+
+  get isFatefulEncounter() {
+    return this.inner.is_fateful_encounter
+  }
+  set isFatefulEncounter(value: boolean) {
+    this.inner.is_fateful_encounter = value
+  }
+
+  get gender() {
+    return this.inner.gender
+  }
+  set gender(value: number) {
+    this.inner.gender = value
+  }
+
+  get formeNum() {
+    return this.inner.species_and_forme.formeIndex
+  }
+
+  get evs() {
+    return this.inner.evs
+  }
+  set evs(value: jsTypes.Stats) {
+    this.inner.evs = statsToWasmStats8(value)
+  }
+
+  get contest() {
+    return this.inner.contest
+  }
+  set contest(value: jsTypes.ContestStats) {
+    this.inner.contest = contestStatsToWasm(value)
+  }
+
+  get resortEventStatus() {
+    return this.inner.resort_event_status
+  }
+  set resortEventStatus(value: number) {
+    this.inner.resort_event_status = value
+  }
+
+  get pokerusByte() {
+    return this.inner.pokerus_byte
+  }
+  set pokerusByte(value: number) {
+    this.inner.pokerus_byte = value
+  }
+
+  get superTrainingFlags() {
+    return this.inner.super_training_flags
+  }
+  set superTrainingFlags(value: number) {
+    this.inner.super_training_flags = value
+  }
+
+  get contestMemoryCount() {
+    return this.inner.contest_memory_count
+  }
+  set contestMemoryCount(value: number) {
+    this.inner.contest_memory_count = value
+  }
+
+  get battleMemoryCount() {
+    return this.inner.battle_memory_count
+  }
+  set battleMemoryCount(value: number) {
+    this.inner.battle_memory_count = value
+  }
+
+  get superTrainingDistFlags() {
+    return this.inner.super_training_dist_flags
+  }
+  set superTrainingDistFlags(value: number) {
+    this.inner.super_training_dist_flags = value
+  }
+
+  get formArgument() {
+    return this.inner.form_argument
+  }
+  set formArgument(value: number) {
+    this.inner.form_argument = value
+  }
+
+  get nickname() {
+    return this.inner.nickname
+  }
+  set nickname(value: string) {
+    this.inner.nickname = value
+  }
+
+  get moves() {
+    const moves = Array.from(this.inner.move_indices)
+    if (moves.length !== 4) {
+      throw new Error(`PK7 WASM struct has move array length of ${moves.length} (expected 4)`)
     }
 
-    for (let i = 0; i < 4; i++) {
-      dataView.setUint8(0x62 + i, this.movePP[i])
+    return moves as FourMoves
+  }
+  set moves(value: FourMoves) {
+    this.inner.move_indices = new Uint16Array(value)
+  }
+
+  get movePP() {
+    const movePP = Array.from(this.inner.move_pp)
+    if (movePP.length !== 4) {
+      throw new Error(`PK7 WASM struct has move PP array length of ${movePP.length} (expected 4)`)
     }
 
-    for (let i = 0; i < 4; i++) {
-      dataView.setUint8(0x66 + i, this.movePPUps[i])
+    return movePP as FourMoves
+  }
+  set movePP(value: FourMoves) {
+    this.inner.move_pp = new Uint8Array(value)
+  }
+
+  get movePPUps() {
+    const movePPUps = Array.from(this.inner.move_pp_ups)
+    if (movePPUps.length !== 4) {
+      throw new Error(
+        `PK7 WASM struct has move PP up array length of ${movePPUps.length} (expected 4)`
+      )
     }
 
-    for (let i = 0; i < 4; i++) {
-      dataView.setUint16(0x6a + i * 2, this.relearnMoves[i], true)
-    }
-    byteLogic.setFlag(dataView, 0x72, 1, this.secretSuperTrainingUnlocked)
-    byteLogic.setFlag(dataView, 0x72, 2, this.secretSuperTrainingComplete)
-    types.write30BitIVsToBytes(dataView, 0x74, this.ivs)
-    byteLogic.setFlag(dataView, 0x74, 30, this.isEgg)
-    byteLogic.setFlag(dataView, 0x74, 31, this.isNicknamed)
-    stringLogic.writeUTF16StringToBytes(dataView, this.handlerName, 0x78, 12)
-    byteLogic.setFlag(dataView, 0x92, 0, this.handlerGender)
-    byteLogic.setFlag(dataView, 0x93, 0, this.isCurrentHandler)
-    for (let i = 0; i < 5; i++) {
-      types.writeGeolocationToBytes(dataView, 0x94 + 2 * i, this.geolocations[i])
-    }
-    dataView.setUint8(0xa2, this.handlerFriendship)
-    dataView.setUint8(0xa3, this.handlerAffection)
-    dataView.setUint8(0xae, this.fullness)
-    dataView.setUint8(0xaf, this.enjoyment)
-    stringLogic.writeUTF16StringToBytes(dataView, this.trainerName, 0xb0, 12)
-    dataView.setUint8(0xca, this.trainerFriendship)
-    dataView.setUint8(0xcb, this.trainerAffection)
-    types.writePKMDateToBytes(dataView, 0xd1, this.eggDate)
-    types.writePKMDateToBytes(dataView, 0xd4, this.metDate)
-    dataView.setUint16(0xd8, this.eggLocationIndex, true)
-    dataView.setUint16(0xda, this.metLocationIndex, true)
-    dataView.setUint8(0xdc, this.ball)
-    dataView.setUint8(0xdd, this.metLevel)
-    types.writeHyperTrainStatsToBytes(dataView, 0xde, this.hyperTraining)
-    dataView.setUint8(0xdf, this.gameOfOrigin)
-    dataView.setUint8(0xe0, this.country)
-    dataView.setUint8(0xe1, this.region)
-    dataView.setUint8(0xe2, this.consoleRegion)
-    dataView.setUint8(0xe3, this.language)
-    if (options?.includeExtraFields) {
-      dataView.setUint8(0xe8, this.statusCondition)
-    }
+    return movePPUps as FourMoves
+  }
+  set movePPUps(value: FourMoves) {
+    this.inner.move_pp_ups = new Uint8Array(value)
+  }
 
-    if (options?.includeExtraFields) {
-      dataView.setUint8(0xf0, this.currentHP)
+  get relearnMoves() {
+    const relearnMoves = Array.from(this.inner.move_pp_ups)
+    if (relearnMoves.length !== 4) {
+      throw new Error(
+        `PK7 WASM struct has relearn move array length of ${relearnMoves.length} (expected 4)`
+      )
     }
-    byteLogic.setFlagIndexes(
-      dataView,
-      0x30,
-      0,
-      this.ribbons
-        .map((ribbon) => ModernRibbons.indexOf(ribbon))
-        .filter((index) => index > -1 && index < 50)
+    return relearnMoves as FourMoves
+  }
+  set relearnMoves(value: FourMoves) {
+    this.inner.relearn_move_indices = new Uint16Array(value)
+  }
+
+  get secretSuperTrainingUnlocked() {
+    return this.inner.secret_super_training_unlocked
+  }
+  set secretSuperTrainingUnlocked(value: boolean) {
+    this.inner.secret_super_training_unlocked = value
+  }
+
+  get secretSuperTrainingComplete() {
+    return this.inner.secret_super_training_complete
+  }
+  set secretSuperTrainingComplete(value: boolean) {
+    this.inner.secret_super_training_complete = value
+  }
+
+  get ivs() {
+    return this.inner.ivs
+  }
+  set ivs(value: jsTypes.Stats) {
+    this.inner.ivs = statsToWasmStats8(value)
+  }
+
+  get isEgg() {
+    return this.inner.is_egg
+  }
+  set isEgg(value: boolean) {
+    this.inner.is_egg = value
+  }
+
+  get isNicknamed() {
+    return this.inner.is_nicknamed
+  }
+  set isNicknamed(value: boolean) {
+    this.inner.is_nicknamed = value
+  }
+
+  get handlerName() {
+    return this.inner.handler_name
+  }
+  set handlerName(value: string) {
+    this.inner.handler_name = value
+  }
+
+  get handlerGender() {
+    return binaryGenderToBool(this.inner.handler_gender)
+  }
+  set handlerGender(value: boolean) {
+    this.inner.handler_gender = binaryGenderFromBool(value)
+  }
+
+  get isCurrentHandler() {
+    return this.inner.is_current_handler
+  }
+  set isCurrentHandler(value: boolean) {
+    this.inner.is_current_handler = value
+  }
+
+  get geolocations() {
+    return geolocationsFromWasm(this.inner.geolocations)
+  }
+  set geolocations(value: jsTypes.Geolocation[]) {
+    this.inner.geolocations = geolocationsToWasm(value)
+  }
+
+  get handlerFriendship() {
+    return this.inner.handler_friendship
+  }
+  set handlerFriendship(value: number) {
+    this.inner.handler_friendship = value
+  }
+
+  get handlerAffection() {
+    return this.inner.handler_affection
+  }
+  set handlerAffection(value: number) {
+    this.inner.handler_affection = value
+  }
+
+  get fullness() {
+    return this.inner.fullness
+  }
+  set fullness(value: number) {
+    this.inner.fullness = value
+  }
+
+  get enjoyment() {
+    return this.inner.enjoyment
+  }
+  set enjoyment(value: number) {
+    this.inner.enjoyment = value
+  }
+
+  get trainerName() {
+    return this.inner.trainer_name
+  }
+  set trainerName(value: string) {
+    this.inner.trainer_name = value
+  }
+
+  get trainerFriendship() {
+    return this.inner.trainer_friendship
+  }
+  set trainerFriendship(value: number) {
+    this.inner.trainer_friendship = value
+  }
+
+  get trainerAffection() {
+    return this.inner.trainer_affection
+  }
+  set trainerAffection(value: number) {
+    this.inner.trainer_affection = value
+  }
+
+  get eggDate() {
+    return convertPokeDateOptional(this.inner.egg_date)
+  }
+
+  set eggDate(value: jsTypes.PKMDate | undefined) {
+    if (value) {
+      this.inner.egg_date = new PokeDate(value.year, value.month, value.day)
+    } else {
+      this.inner.egg_date = undefined
+    }
+  }
+
+  get metDate() {
+    return convertPokeDate(this.inner.met_date)
+  }
+  set metDate(value: jsTypes.PKMDate) {
+    this.inner.met_date = new PokeDate(value.year, value.month, value.day)
+  }
+
+  get eggLocationIndex() {
+    return this.inner.egg_location_index
+  }
+  set eggLocationIndex(value: number) {
+    this.inner.egg_location_index = value
+  }
+
+  get metLocationIndex() {
+    return this.inner.met_location_index
+  }
+  set metLocationIndex(value: number) {
+    this.inner.met_location_index = value
+  }
+
+  get ball() {
+    return this.inner.ball
+  }
+  set ball(value: number) {
+    this.inner.ball = value
+  }
+
+  get metLevel() {
+    return this.inner.met_level
+  }
+  set metLevel(value: number) {
+    this.inner.met_level = value
+  }
+
+  get hyperTraining() {
+    return this.inner.hyper_training
+  }
+  set hyperTraining(value: jsTypes.HyperTrainStats) {
+    this.inner.hyper_training = new HyperTraining(
+      value.hp,
+      value.atk,
+      value.def,
+      value.spa,
+      value.spd,
+      value.spe
     )
-    types.write3DSHandlerMemoryToBytes(dataView, 0xa4, this.handlerMemory)
-    types.write3DSTrainerMemoryToBytes(dataView, 0xcc, this.trainerMemory)
-    byteLogic.setFlag(dataView, 0xdd, 7, this.trainerGender)
-    return buffer
+  }
+
+  get gameOfOrigin() {
+    return this.inner.game_of_origin
+  }
+  set gameOfOrigin(value: OriginGame) {
+    this.inner.game_of_origin = value
+  }
+
+  get country() {
+    return this.inner.country
+  }
+  set country(value: number) {
+    this.inner.country = value
+  }
+
+  get region() {
+    return this.inner.region
+  }
+  set region(value: number) {
+    this.inner.region = value
+  }
+
+  get consoleRegion() {
+    return this.inner.console_region
+  }
+  set consoleRegion(value: number) {
+    this.inner.console_region = value
+  }
+
+  get language() {
+    return this.inner.language
+  }
+  set language(value: number) {
+    this.inner.language = value
+  }
+
+  get statusCondition() {
+    return this.inner.status_condition
+  }
+  set statusCondition(value: number) {
+    this.inner.status_condition = value
+  }
+
+  get currentHP() {
+    return this.inner.current_hp
+  }
+  set currentHP(value: number) {
+    this.inner.current_hp = value
+  }
+
+  get ribbons() {
+    return this.inner.ribbons.map((ribbonName) =>
+      ribbonName.endsWith('Ribbon') ? ribbonName.substring(0, ribbonName.length - 7) : ribbonName
+    )
+  }
+  set ribbons(ribbonNames: string[]) {
+    this.inner.ribbon_indices = new Uint32Array(
+      ribbonNames.map((name) => ModernRibbons.indexOf(name)).filter((idx) => idx !== -1)
+    )
+  }
+
+  get handlerMemory() {
+    return this.inner.handler_memory
+  }
+  set handlerMemory(value: jsTypes.Memory) {
+    this.inner.handler_memory = trainerMemoryToWasm(value)
+  }
+
+  get trainerMemory() {
+    return this.inner.trainer_memory
+  }
+  set trainerMemory(value: jsTypes.Memory) {
+    this.inner.trainer_memory = trainerMemoryToWasm(value)
+  }
+
+  get trainerGender() {
+    return binaryGenderToBool(this.inner.trainer_gender)
+  }
+  set trainerGender(value: boolean) {
+    this.inner.trainer_gender = binaryGenderFromBool(value)
   }
 
   public getStats() {
     return getStats(this)
   }
 
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
+  public get abilityName() {
+    return this.inner.abilityIndex.name
   }
 
   public get heldItemName() {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
+  public get languageString() {
+    return Languages.stringFromByte(this.language)
+  }
+
+  public get natureName() {
+    return this.inner.nature.name
+  }
+
+  public get ribbonBytes() {
+    return this.inner.ribbon_bytes
+  }
+
   public calculateChecksum() {
-    return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0xe8)
+    return get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0xe8)
+  }
+
+  public toBytes() {
+    return this.inner.toBytes().buffer as ArrayBuffer
   }
 
   public refreshChecksum() {
-    this.checksum = encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0xe8)
+    this.checksum = this.calculateChecksum()
   }
 
   public toPCBytes() {
-    const shuffledBytes = encryption.shuffleBlocksGen67(this.toBytes())
-    return encryption.decryptByteArrayGen67(shuffledBytes)
+    const shuffledBytes = shuffleBlocksGen67(this.toBytes())
+    return decryptByteArrayGen67(shuffledBytes)
   }
 
   public getLevel() {
@@ -481,3 +653,5 @@ export default class PK7 {
     return []
   }
 }
+
+export default PK7

@@ -36,6 +36,7 @@ export type PKM =
   | PB8
   | PK9
   | PA9
+  | PK7
 
 export type RomHackPKM = PK3RR | PK3UB | PB8LUMI
 

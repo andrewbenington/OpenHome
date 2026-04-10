@@ -68,6 +68,28 @@ pub fn read_uint5_from_bits(byte: u8, bit_offset: u8) -> u8 {
     (byte & bit_mask) >> bit_offset
 }
 
+#[macro_export]
+macro_rules! read_u32_le {
+    ($bytes:expr, $start:expr) => {
+        u32::from_le_bytes([
+            $bytes[$start],
+            $bytes[$start + 1],
+            $bytes[$start + 2],
+            $bytes[$start + 3],
+        ])
+    };
+}
+
+// find and replace
+// u16::from_le_bytes\(bytes\[(\d+)\.\.\d+\]\.try_into\(\).unwrap\(\)\)
+// read_u16_le!(bytes, $1)
+#[macro_export]
+macro_rules! read_u16_le {
+    ($bytes:expr, $start:expr) => {
+        u16::from_le_bytes([$bytes[$start], $bytes[$start + 1]])
+    };
+}
+
 mod test {
 
     #[test]

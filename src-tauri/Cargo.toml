@@ -13,18 +13,12 @@ edition = "2024"
 name = "openhome_lib"
 crate-type = ["cdylib", "rlib"]
 
-[profile.release]
-panic = "abort" # Strip expensive panic clean-up logic
-codegen-units = 1 # Compile crates one after another so the compiler can optimize better
-lto = true # Enables link to optimizations
-opt-level = "s" # Optimize for binary size
-strip = true # Remove debug symbols
-
 [build-dependencies]
 tauri-build = { version = "2.5.6", features = [] }
 
 [dependencies]
 pkm_rs = {path = "../pkm_rs"}
+pkm_rs_derive = {path = "../pkm_rs_derive"}
 tauri = { version = "2.10.3", features = [] }
 tauri-plugin-shell = "2.3.5"
 serde = { version = "1.0.228", features = ["derive"] }
@@ -36,6 +30,9 @@ reqwest = { version = "0.13.2" }
 base64 = "0.22.1"
 zip = "8.5.0"
 static_assertions = "1.1.0"
+sha2 = "0.10.9"
+num = "0.4.3"
+toml = "0.9.8"
 bytes = "1.11.1"
 semver = "1.0.28"
 strum = { version = "0.28.0", features = ["derive"] }

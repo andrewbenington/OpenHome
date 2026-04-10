@@ -2,6 +2,8 @@ use std::fmt::Display;
 
 use serde::{Serialize, Serializer};
 
+use crate::InvalidAbilityNumber;
+
 #[derive(Debug)]
 pub enum Error {
     BufferSize {
@@ -13,6 +15,7 @@ pub enum Error {
         expected: usize,
         received: usize,
     },
+    AbilityNumber(InvalidAbilityNumber),
 }
 
 impl Display for Error {
@@ -22,12 +25,13 @@ impl Display for Error {
                 field,
                 offset,
                 buffer_size,
-            } => format!("Buffer too short ({buffer_size}B) to access {field} (at {offset})")
-                .to_owned(),
+            } => format!("Buffer too short ({buffer_size}B) to access {field} (at {offset})"),
             Error::ByteLength { expected, received } => {
-                format!("Invalid byte length (expected {expected}, received {received}").to_owned()
+                format!("Invalid byte length (expected {expected}, received {received})")
             }
-            .to_owned(),
+            Error::AbilityNumber(InvalidAbilityNumber(num)) => {
+                format!("Invalid ability number {num} (must be between 1 and 3)")
+            }
         };
 
         f.write_str(&message)

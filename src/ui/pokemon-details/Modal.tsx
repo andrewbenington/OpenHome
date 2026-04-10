@@ -7,6 +7,7 @@ import FileTypeSelect from '@openhome-ui/components/FileTypeSelect'
 import HexDisplay from '@openhome-ui/components/HexDisplay'
 import { ArrowLeftIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
+import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
 import { isRomHackFormat } from '@pokemon-files/pkm/PKM'
 import { FileSchemas } from '@pokemon-files/schema'
@@ -45,6 +46,7 @@ const PokemonDetailsModal = (props: {
   const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
   const { defaultConvertStrategy } = useConvertStrategies()
   const backend = useContext(BackendContext)
+  const displayError = useDisplayError()
 
   useEffect(() => {
     setDisplayMon(mon)
@@ -121,19 +123,25 @@ const PokemonDetailsModal = (props: {
       throw `Invalid filetype: ${P}`
     }
 
-    if (mon instanceof OHPKM) {
-      if (
-        isOriginal &&
-        mon.originalData &&
-        originalDataTagToMonFormat(mon.originalData.tag) === newFormat
-      ) {
-        const O = fileTypeFromStringNonOhpkm(originalDataTagToMonFormat(mon.originalData.tag)) ?? P
-        setDisplayMon(O.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
+    try {
+      if (mon instanceof OHPKM) {
+        if (
+          isOriginal &&
+          mon.originalData &&
+          originalDataTagToMonFormat(mon.originalData.tag) === newFormat
+        ) {
+          const O =
+            fileTypeFromStringNonOhpkm(originalDataTagToMonFormat(mon.originalData.tag)) ?? P
+          setDisplayMon(O.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
+        } else {
+          setDisplayMon(P.fromOhpkm(mon, defaultConvertStrategy))
+        }
       } else {
-        setDisplayMon(P.fromOhpkm(mon, defaultConvertStrategy))
+        setDisplayMon(P.fromOhpkm(new OHPKM(mon), defaultConvertStrategy))
       }
-    } else {
-      setDisplayMon(P.fromOhpkm(new OHPKM(mon), defaultConvertStrategy))
+    } catch (e) {
+      console.error(e)
+      displayError(`Error converting to ${P.getFormat()}`, `${e}`)
     }
   }
 
