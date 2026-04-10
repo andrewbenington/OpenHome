@@ -154,23 +154,23 @@ export default function FilterPanel() {
             />
           )}
         />
-        {currentMon && currentMon.formes.length > 1 && (
+        {currentMon && currentMon.forms.length > 1 && (
           <Typeahead
             uniqueFieldId="form"
-            options={[...currentMon.formes]}
+            options={[...currentMon.forms]}
             getOptionString={(opt) => opt.formeName}
-            getOptionUniqueID={(opt) => opt.formeIndex.toString()}
+            getOptionUniqueID={(opt) => opt.formIndex.toString()}
             value={
-              filter.formeNumber !== undefined ? currentMon.formes[filter.formeNumber] : undefined
+              filter.formeNumber !== undefined ? currentMon.forms[filter.formeNumber] : undefined
             }
             placeholder="Form"
-            onChange={(option) => setFilter({ formeNumber: option?.formeIndex })}
+            onChange={(option) => setFilter({ formeNumber: option?.formIndex })}
             getIconComponent={(currentForme) =>
               filter.dexNumber &&
               currentForme && (
                 <PokemonIcon
                   dexNumber={filter.dexNumber}
-                  formeNumber={currentForme.formeIndex}
+                  formeNumber={currentForme.formIndex}
                   style={{ width: ICON_SIZE, height: ICON_SIZE }}
                 />
               )

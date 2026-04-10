@@ -67,7 +67,7 @@ export function useManageTracked() {
       const savePaths = await backend.getRecentSaves().then(
         R.map((saves) =>
           Object.values(saves)
-            .filter((s) => monPossiblySupported(mon.dexNum, mon.formeNum, s))
+            .filter((s) => monPossiblySupported(mon.dexNum, mon.formNum, s))
             .map((s) => s.filePath)
         )
       )

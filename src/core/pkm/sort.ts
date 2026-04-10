@@ -66,13 +66,13 @@ function sortByDexNum(a: PKMInterface, b: PKMInterface) {
   return a.dexNum - b.dexNum
 }
 
-function sortByFormeNum(a: PKMInterface, b: PKMInterface) {
-  return (a.formeNum ?? 0) - (b.formeNum ?? 0)
+function sortByFormIndex(a: PKMInterface, b: PKMInterface) {
+  return (a.formNum ?? 0) - (b.formNum ?? 0)
 }
 
 function sortByBaseMon(a: PKMInterface, b: PKMInterface) {
-  const nationalDexA = getBaseMon(a.dexNum, a.formeNum)?.nationalDex ?? 0
-  const nationalDexB = getBaseMon(b.dexNum, b.formeNum)?.nationalDex ?? 0
+  const nationalDexA = getBaseMon(a.dexNum, a.formNum)?.nationalDex ?? 0
+  const nationalDexB = getBaseMon(b.dexNum, b.formNum)?.nationalDex ?? 0
   return nationalDexA - nationalDexB
 }
 
@@ -132,9 +132,9 @@ export function getSortFunction(
     case 'Level':
       return (a, b) => b.getLevel() - a.getLevel()
     case 'Species':
-      return chain([sortByDexNum, sortByFormeNum])
+      return chain([sortByDexNum, sortByFormIndex])
     case 'Species Family':
-      return chain([sortByBaseMon, sortByDexNum, sortByFormeNum])
+      return chain([sortByBaseMon, sortByDexNum, sortByFormIndex])
     case 'Gender':
       return (a, b) => (a.gender ?? Gender.Genderless) - (b.gender ?? Gender.Genderless)
     case 'Origin':

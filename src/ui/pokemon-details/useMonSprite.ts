@@ -42,7 +42,7 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
   }, [
     mon.format,
     mon.dexNum,
-    mon.formeNum,
+    mon.formNum,
     mon.formArgument,
     mon.isFemale,
     mon.isShiny,
@@ -53,13 +53,13 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
     if (spriteResult.errorMessage || spriteResult.path) return
 
     if (isMegaStone(mon.heldItemIndex)) {
-      const megaForStone = MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
+      const megaForStone = MetadataSummaryLookup(mon.dexNum, mon.formNum)?.megaEvolutions.find(
         (mega) => mega.requiredItemId === mon.heldItemIndex
       )
 
-      if (megaForStone) mon.formeNum = megaForStone.megaForme.formeIndex
+      if (megaForStone) mon.formNum = megaForStone.megaForme.formIndex
     } else if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
-      mon.formeNum = displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
+      mon.formNum = displayIndexAdder(mon.heldItemIndex)(mon.formNum)
     }
 
     for (const plugin of spritePlugins) {

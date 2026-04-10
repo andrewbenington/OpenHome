@@ -55,7 +55,7 @@ export default class PK4 {
   isEgg: boolean
   isNicknamed: boolean
   gender: Gender
-  formeNum: number
+  formNum: number
   shinyLeavesInner: ShinyLeaves = new ShinyLeaves()
   gameOfOrigin: number
   eggDate: types.PKMDate | undefined
@@ -132,7 +132,7 @@ export default class PK4 {
       this.isEgg = byteLogic.getFlag(dataView, 0x38, 30)
       this.isNicknamed = byteLogic.getFlag(dataView, 0x38, 31)
       this.gender = byteLogic.uIntFromBufferBits(dataView, 0x40, 1, 2, true)
-      this.formeNum = byteLogic.uIntFromBufferBits(dataView, 0x40, 3, 5, true)
+      this.formNum = byteLogic.uIntFromBufferBits(dataView, 0x40, 3, 5, true)
       this.shinyLeaves = ShinyLeaves.fromByte(dataView.getUint8(0x41))
 
       this.gameOfOrigin = dataView.getUint8(0x5f)
@@ -236,7 +236,7 @@ export default class PK4 {
       this.isNicknamed = other.isNicknamed ?? false
       this.gender =
         other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
-      this.formeNum = other.formeNum
+      this.formNum = other.formNum
       this.shinyLeaves = other.shinyLeaves?.clone() ?? new ShinyLeaves()
       this.gameOfOrigin = other.gameOfOrigin
       this.eggDate = other.eggDate ?? {
@@ -341,7 +341,7 @@ export default class PK4 {
     byteLogic.setFlag(dataView, 0x38, 30, this.isEgg)
     byteLogic.setFlag(dataView, 0x38, 31, this.isNicknamed)
     byteLogic.uIntToBufferBits(dataView, this.gender, 64, 1, 2, true)
-    byteLogic.uIntToBufferBits(dataView, this.formeNum, 0x40, 3, 5, true)
+    byteLogic.uIntToBufferBits(dataView, this.formNum, 0x40, 3, 5, true)
     dataView.setUint8(0x41, this.shinyLeaves.toByte())
     dataView.setUint8(0x5f, this.gameOfOrigin)
     types.writePKMDateToBytes(dataView, 0x78, this.eggDate)
@@ -462,7 +462,7 @@ export default class PK4 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {

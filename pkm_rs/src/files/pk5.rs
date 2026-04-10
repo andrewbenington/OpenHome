@@ -2,7 +2,7 @@ use crate::result::{Error, Result};
 use crate::strings::Gen5String;
 use crate::traits::IsShiny8192;
 use crate::util;
-use crate::{HasSpeciesAndForme, PkmBytes};
+use crate::{HasSpeciesAndForm, PkmBytes};
 
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
@@ -10,7 +10,7 @@ use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::DsRibbonSet;
-use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::{
     BinaryGender, ContestStats, Gender, MarkingsSixShapes, OriginGame, PokeDate, Stats8, Stats16Le,
     read_u16_le, read_u32_le,
@@ -24,7 +24,7 @@ use pkm_rs_types::randomize::Randomize;
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny8192)]
 pub struct Pk5 {
     pub personality_value: u32,
-    pub species_and_forme: SpeciesAndForme,
+    pub species_and_form: SpeciesAndForm,
     pub stored_checksum: u16,
     pub held_item_index: u16,
     pub trainer_id: u16,
@@ -77,7 +77,7 @@ impl Pk5 {
         let mon = Pk5 {
             personality_value: read_u32_le!(bytes, 0),
             stored_checksum: read_u16_le!(bytes, 6),
-            species_and_forme: SpeciesAndForme::new(
+            species_and_form: SpeciesAndForm::new(
                 read_u16_le!(bytes, 8),
                 util::read_uint5_from_bits(bytes[64], 3).into(),
             )?,
@@ -164,7 +164,7 @@ impl PkmBytes for Pk5 {
 
     fn write_box_bytes(&self, bytes: &mut [u8]) {
         bytes[0..4].copy_from_slice(&self.personality_value.to_le_bytes());
-        bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
+        bytes[8..10].copy_from_slice(&self.species_and_form.get_ndex().to_le_bytes());
         bytes[10..12].copy_from_slice(&self.held_item_index.to_le_bytes());
         bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
         bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
@@ -196,7 +196,7 @@ impl PkmBytes for Pk5 {
         util::set_flag(bytes, 56, 31, self.is_nicknamed);
         self.gender.set_bits_1_2(&mut bytes[64]);
         util::write_uint5_to_bits(
-            self.species_and_forme.get_forme_index() as u8,
+            self.species_and_form.get_forme_index() as u8,
             &mut bytes[64],
             3,
         );
@@ -244,13 +244,13 @@ impl PkmBytes for Pk5 {
     }
 }
 
-impl HasSpeciesAndForme for Pk5 {
+impl HasSpeciesAndForm for Pk5 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.species_and_forme.get_species_metadata()
+        self.species_and_form.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static FormeMetadata {
-        self.species_and_forme.get_forme_metadata()
+    fn get_forme_metadata(&self) -> &'static FormMetadata {
+        self.species_and_form.get_forme_metadata()
     }
 
     fn calculate_level(&self) -> u8 {
@@ -267,7 +267,7 @@ impl HasSpeciesAndForme for Pk5 {
 //             encryption_constant: other.personality_value,
 //             sanity: 0,
 //             checksum: 0,
-//             species_and_forme: other.species_and_forme,
+//             species_and_form: other.species_and_form,
 //             held_item_index: other.held_item_index,
 //             trainer_id: other.trainer_id,
 //             secret_id: other.secret_id,
@@ -319,7 +319,7 @@ impl HasSpeciesAndForme for Pk5 {
 //     fn from(other: OhpkmV2) -> Self {
 //         Self {
 //             personality_value: other.personality_value,
-//             species_and_forme: other.species_and_forme,
+//             species_and_form: other.species_and_form,
 //             trainer_id: other.trainer_id,
 //             stored_checksum: 0,
 //             held_item_index: other.held_item_index,

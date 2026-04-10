@@ -4,14 +4,14 @@ use crate::result::{Error, Result};
 use crate::strings::Gen3String;
 use crate::traits::IsShiny8192;
 use crate::util;
-use crate::{HasSpeciesAndForme, PkmBytes};
+use crate::{HasSpeciesAndForm, PkmBytes};
 
 use arbitrary_int::{u2, u4, u7, u30};
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
-use pkm_rs_resources::species::{FormeMetadata, NatDexIndex, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, NatDexIndex, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::{
     BinaryGender, ContestStats, FlagReader, MarkingsFourShapes, OriginGame, Stats8, Stats16Le,
     read_u16_le, read_u32_le,
@@ -134,10 +134,10 @@ impl Pk3 {
         Ok(mon)
     }
 
-    pub fn get_species_and_forme(&self) -> SpeciesAndForme {
+    pub fn get_species_and_form(&self) -> SpeciesAndForm {
         match self.get_unown_form() {
-            Some(form) => form.to_species_and_forme(),
-            None => SpeciesAndForme::base_form(self.pokemon_index.to_national_dex()),
+            Some(form) => form.to_species_and_form(),
+            None => SpeciesAndForm::base_form(self.pokemon_index.to_national_dex()),
         }
     }
 
@@ -172,8 +172,8 @@ impl UnownForm {
         )
     }
 
-    pub const fn to_species_and_forme(self) -> SpeciesAndForme {
-        unsafe { SpeciesAndForme::new_unchecked(UNOWN_NATIONAL_DEX.get(), self.0 as u16) }
+    pub const fn to_species_and_form(self) -> SpeciesAndForm {
+        unsafe { SpeciesAndForm::new_unchecked(UNOWN_NATIONAL_DEX.get(), self.0 as u16) }
     }
 }
 
@@ -258,13 +258,13 @@ impl PkmBytes for Pk3 {
     }
 }
 
-impl HasSpeciesAndForme for Pk3 {
+impl HasSpeciesAndForm for Pk3 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.get_species_and_forme().get_species_metadata()
+        self.get_species_and_form().get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static FormeMetadata {
-        self.get_species_and_forme().get_forme_metadata()
+    fn get_forme_metadata(&self) -> &'static FormMetadata {
+        self.get_species_and_form().get_forme_metadata()
     }
 
     fn calculate_level(&self) -> u8 {

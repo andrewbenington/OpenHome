@@ -38,13 +38,13 @@ pub enum PokedexStatus {
 
 #[derive(Default, Debug, Serialize, Deserialize, Clone)]
 pub struct PokedexEntry {
-    formes: HashMap<FormeNumber, PokedexStatus>,
+    forms: HashMap<FormeNumber, PokedexStatus>,
 }
 
 impl PokedexEntry {
-    pub fn register(&mut self, forme_number: FormeNumber, status: PokedexStatus) {
-        self.formes
-            .entry(forme_number)
+    pub fn register(&mut self, form_index: FormeNumber, status: PokedexStatus) {
+        self.forms
+            .entry(form_index)
             .and_modify(|prev| *prev = max(*prev, status))
             .or_insert(status);
     }
@@ -70,13 +70,13 @@ impl Pokedex {
     pub fn register(
         &mut self,
         dex_number: DexNumber,
-        forme_number: FormeNumber,
+        form_index: FormeNumber,
         status: PokedexStatus,
     ) {
         self.by_dex_number
             .entry(dex_number)
             .or_default()
-            .register(forme_number, status);
+            .register(form_index, status);
     }
 }
 
@@ -84,7 +84,7 @@ impl Pokedex {
 #[serde(rename_all = "camelCase")]
 pub struct PokedexUpdate {
     dex_number: DexNumber,
-    forme_number: FormeNumber,
+    form_index: FormeNumber,
     status: PokedexStatus,
 }
 
@@ -101,7 +101,7 @@ pub fn update_pokedex(
 ) -> Result<()> {
     let mut pokedex = pokedex_state.lock()?;
     for update in updates {
-        pokedex.register(update.dex_number, update.forme_number, update.status);
+        pokedex.register(update.dex_number, update.form_index, update.status);
     }
 
     app_handle

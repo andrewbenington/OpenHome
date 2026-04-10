@@ -8,7 +8,7 @@ pub mod ohpkm;
 #[cfg(test)]
 mod tests;
 
-use pkm_rs_resources::species::{FormeMetadata, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, SpeciesMetadata};
 use serde::Serialize;
 
 pub use plugins::rr::pk3rr::Pk3rr;
@@ -38,16 +38,16 @@ impl<T: PkmBytes + Serialize + IsShiny + Sized> Pkm for T {}
 #[cfg(feature = "randomize")]
 impl<T: PkmBytes + Serialize + IsShiny + Sized + Randomize> Pkm for T {}
 
-pub trait HasSpeciesAndForme: Pkm {
+pub trait HasSpeciesAndForm: Pkm {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata;
-    fn get_forme_metadata(&self) -> &'static FormeMetadata;
+    fn get_forme_metadata(&self) -> &'static FormMetadata;
 
     fn calculate_level(&self) -> u8;
 }
 
-pub trait MaybeHasSpeciesAndForme: Pkm {
+pub trait MaybeHasSpeciesAndForm: Pkm {
     fn try_get_species_metadata(&self) -> Option<&'static SpeciesMetadata>;
-    fn get_forme_metadata(&self) -> Option<&'static FormeMetadata>;
+    fn get_forme_metadata(&self) -> Option<&'static FormMetadata>;
 
     fn calculate_level(&self) -> Option<u8>;
 }
@@ -93,7 +93,7 @@ pub trait Pkm: Serialize + IsShiny {
     fn to_party_bytes(&self) -> Result<Vec<u8>>;
 
     fn get_species_metadata(&self) -> &'static SpeciesMetadata;
-    fn get_forme_metadata(&self) -> &'static FormeMetadata;
+    fn get_forme_metadata(&self) -> &'static FormMetadata;
 
     fn calculate_level(&self) -> u8;
 }

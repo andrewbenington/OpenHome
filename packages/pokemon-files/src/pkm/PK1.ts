@@ -223,7 +223,7 @@ export default class PK1 {
     return 0
   }
 
-  public get formeNum() {
+  public get formNum() {
     return 0
   }
 
@@ -245,7 +245,7 @@ export default class PK1 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {

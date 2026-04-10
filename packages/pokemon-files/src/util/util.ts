@@ -87,7 +87,7 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
     const newNature = NatureIndex.newFromPid(Number(newPersonalityValue))
 
     function getInconsistancy(): string | null {
-      if (shouldCheckUnown && getUnownLetterGen3(Number(newPersonalityValue)) !== mon.formeNum) {
+      if (shouldCheckUnown && getUnownLetterGen3(Number(newPersonalityValue)) !== mon.formNum) {
         return 'wrong unown letter'
       } else if (newGender !== otherGender) {
         return `gender mismatch`
@@ -257,7 +257,7 @@ export class MoveFilter<P extends PKMInterface> {
     const filtered = this.filterByMoves(mon, mon.moves)
     if (filtered.every((move) => move === 0)) {
       const metadataSource = PkmFormats.getMetadataSource(this.format)
-      const levelUpLearnset = MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.levelUpLearnset(
+      const levelUpLearnset = MetadataSummaryLookup(mon.dexNum, mon.formNum)?.levelUpLearnset(
         metadataSource
       )
       if (levelUpLearnset) {
@@ -307,7 +307,7 @@ export class MoveFilter<P extends PKMInterface> {
 }
 
 export function getHeightCalculated(mon: AllPKMFields) {
-  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
+  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formNum)
   if (!formeMetadata || mon.heightScalar === undefined || !mon.heightDeviation) return 0
 
   const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
@@ -315,7 +315,7 @@ export function getHeightCalculated(mon: AllPKMFields) {
 }
 
 export function getWeightCalculated(mon: AllPKMFields) {
-  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
+  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formNum)
   if (!formeMetadata || mon.weightScalar === undefined || !mon.weightDeviation) return 0
 
   const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)

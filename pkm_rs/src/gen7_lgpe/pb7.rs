@@ -1,10 +1,10 @@
 use crate::result::{Error, Result};
-use crate::traits::{HasSpeciesAndForme, IsShiny4096, ModernEvs, PkmBytes};
+use crate::traits::{HasSpeciesAndForm, IsShiny4096, ModernEvs, PkmBytes};
 use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::moves::MoveIndex;
-use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{Gender, PokeDate};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors, Stats8, Stats16Le};
@@ -19,7 +19,7 @@ use pkm_rs_types::randomize::Randomize;
 pub struct Pb7 {
     pub encryption_constant: u32,
     pub checksum: u16,
-    pub species_and_forme: SpeciesAndForme,
+    pub species_and_form: SpeciesAndForm,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -82,7 +82,7 @@ pub struct Pb7 {
     pub stats: Stats16Le,
     pub cp: u16,
     pub is_mega: u8,
-    pub mega_forme: u8,
+    pub mega_form: u8,
     pub trainer_gender: Gender,
 }
 
@@ -96,7 +96,7 @@ impl Pb7 {
         let mon = Pb7 {
             encryption_constant: read_u32_le!(bytes, 0),
             checksum: read_u16_le!(bytes, 6),
-            species_and_forme: SpeciesAndForme::new(
+            species_and_form: SpeciesAndForm::new(
                 read_u16_le!(bytes, 8),
                 util::read_uint5_from_bits(bytes[29], 3).into(),
             )?,
@@ -173,7 +173,7 @@ impl Pb7 {
             stats: Stats16Le::from_bytes(bytes[242..254].try_into().unwrap()),
             cp: read_u16_le!(bytes, 254),
             is_mega: bytes[256],
-            mega_forme: bytes[257],
+            mega_form: bytes[257],
         };
         Ok(mon)
     }
@@ -190,7 +190,7 @@ impl PkmBytes for Pb7 {
     fn write_box_bytes(&self, bytes: &mut [u8]) {
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
-        bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
+        bytes[8..10].copy_from_slice(&self.species_and_form.get_ndex().to_le_bytes());
         bytes[10..12].copy_from_slice(&self.held_item_index.to_le_bytes());
         bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
         bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
@@ -204,7 +204,7 @@ impl PkmBytes for Pb7 {
         self.gender.set_bits_1_2(&mut bytes[29]);
         util::set_flag(bytes, 29, 0, self.is_fateful_encounter);
         util::write_uint5_to_bits(
-            self.species_and_forme.get_forme_index() as u8,
+            self.species_and_form.get_forme_index() as u8,
             &mut bytes[29],
             3,
         );
@@ -281,7 +281,7 @@ impl PkmBytes for Pb7 {
         bytes[242..254].copy_from_slice(&self.stats.to_bytes());
         bytes[254..256].copy_from_slice(&self.cp.to_le_bytes());
         bytes[256] = self.is_mega;
-        bytes[257] = self.mega_forme;
+        bytes[257] = self.mega_form;
     }
 
     fn write_party_bytes(&self, bytes: &mut [u8]) {
@@ -300,13 +300,13 @@ impl PkmBytes for Pb7 {
     }
 }
 
-impl HasSpeciesAndForme for Pb7 {
+impl HasSpeciesAndForm for Pb7 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.species_and_forme.get_species_metadata()
+        self.species_and_form.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static FormeMetadata {
-        self.species_and_forme.get_forme_metadata()
+    fn get_forme_metadata(&self) -> &'static FormMetadata {
+        self.species_and_form.get_forme_metadata()
     }
 
     fn calculate_level(&self) -> u8 {

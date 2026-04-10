@@ -255,7 +255,7 @@ export default class PK2 {
     return 0
   }
 
-  public get formeNum() {
+  public get formNum() {
     if (this.dexNum === NationalDex.Unown) {
       let ivCombinationVal = ((this.dvs.atk >> 1) & 0b11) << 6
       ivCombinationVal += ((this.dvs.def >> 1) & 0b11) << 4
@@ -285,7 +285,7 @@ export default class PK2 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {

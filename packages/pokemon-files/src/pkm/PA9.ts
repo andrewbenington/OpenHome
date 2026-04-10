@@ -49,7 +49,7 @@ export default class PA9 {
   isFatefulEncounter: boolean
   gender: number
   isAlpha: boolean
-  formeNum: number
+  formNum: number
   evs: types.Stats
   contest: types.ContestStats
   pokerusByte: number
@@ -130,7 +130,7 @@ export default class PA9 {
       this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x22, 0)
       this.gender = byteLogic.uIntFromBufferBits(dataView, 0x22, 1, 2, true)
       this.isAlpha = byteLogic.getFlag(dataView, 0x23, 0)
-      this.formeNum = dataView.getUint16(0x24, true)
+      this.formNum = dataView.getUint16(0x24, true)
       this.evs = types.readStatsFromBytesU8(dataView, 0x26)
       this.contest = types.readContestStatsFromBytes(dataView, 0x2c)
       this.pokerusByte = dataView.getUint8(0x32)
@@ -231,7 +231,7 @@ export default class PA9 {
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
       this.gender = other.gender ?? 0
       this.isAlpha = other.isAlpha ?? false
-      this.formeNum = other.formeNum
+      this.formNum = other.formNum
       this.evs = other.evs ?? {
         hp: 0,
         atk: 0,
@@ -337,7 +337,7 @@ export default class PA9 {
     dataView.setUint8(0x21, this.statNature.index)
     byteLogic.setFlag(dataView, 0x22, 0, this.isFatefulEncounter)
     byteLogic.uIntToBufferBits(dataView, this.gender, 34, 1, 2, true)
-    dataView.setUint16(0x24, this.formeNum, true)
+    dataView.setUint16(0x24, this.formNum, true)
     types.writeStatsToBytesU8(dataView, 0x26, this.evs)
     types.writeContestStatsToBytes(dataView, 0x2c, this.contest)
     dataView.setUint8(0x32, this.pokerusByte)
@@ -464,7 +464,7 @@ export default class PA9 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {

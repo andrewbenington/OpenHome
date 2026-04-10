@@ -9,7 +9,7 @@ use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::MonTags;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, UnconvertedPkm};
 use crate::result::{Error, Result};
-use crate::traits::{HasSpeciesAndForme, IsShiny, PkmBytes};
+use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::moves::MoveSlots;
@@ -25,7 +25,7 @@ use pkm_rs_resources::{
     moves::MoveIndex,
     natures::NatureIndex,
     ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet},
-    species::SpeciesAndForme,
+    species::SpeciesAndForm,
 };
 
 use pkm_rs_types::{
@@ -236,12 +236,12 @@ impl OhpkmV2 {
         self.main_data.encryption_constant = v;
     }
 
-    pub const fn species_and_forme(&self) -> SpeciesAndForme {
-        self.main_data.species_and_forme
+    pub const fn species_and_form(&self) -> SpeciesAndForm {
+        self.main_data.species_and_form
     }
 
-    pub const fn set_species_and_forme(&mut self, v: &SpeciesAndForme) {
-        self.main_data.species_and_forme = *v;
+    pub const fn set_species_and_form(&mut self, v: &SpeciesAndForm) {
+        self.main_data.species_and_form = *v;
     }
 
     pub const fn held_item_index(&self) -> u16 {
@@ -754,10 +754,10 @@ impl OhpkmV2 {
     }
 
     //
-    // pub fn set_species_and_forme(&mut self, national_dex: u16, forme_index: u16) -> JsResult<()> {
-    //     match SpeciesAndForme::new(national_dex, forme_index) {
-    //         Ok(species_and_forme) => {
-    //             self.main_data.species_and_forme = species_and_forme;
+    // pub fn set_species_and_form(&mut self, national_dex: u16, form_index: u16) -> JsResult<()> {
+    //     match SpeciesAndForm::new(national_dex, form_index) {
+    //         Ok(species_and_form) => {
+    //             self.main_data.species_and_form = species_and_form;
     //             Ok(())
     //         }
     //         Err(e) => Err(JsValue::from_str(&e.to_string())),
@@ -1351,7 +1351,7 @@ impl OhpkmV2 {
         self.sv_data
             .map(|d| TeraTypeWasm::from(d.tera_type_original))
             .unwrap_or(
-                self.species_and_forme()
+                self.species_and_form()
                     .get_forme_metadata()
                     .transferred_tera_type()
                     .into(),
@@ -1364,7 +1364,7 @@ impl OhpkmV2 {
         if let Some(tera_type) = TeraTypeWasm::from_byte(value) {
             self.sv_data
                 .get_or_insert(ScarletVioletData::default_generated_tera_type(
-                    self.main_data.species_and_forme,
+                    self.main_data.species_and_form,
                 ))
                 .tera_type_original = tera_type.into()
         }
@@ -1379,7 +1379,7 @@ impl OhpkmV2 {
     pub fn set_tera_type_override(&mut self, value: u8) {
         self.sv_data
             .get_or_insert(ScarletVioletData::default_generated_tera_type(
-                self.main_data.species_and_forme,
+                self.main_data.species_and_form,
             ))
             .tera_type_override = TeraType::from_byte(value);
     }
@@ -1539,9 +1539,9 @@ impl OhpkmV2 {
 }
 
 impl OhpkmV2 {
-    pub fn new(national_dex: u16, forme_index: u16) -> Result<Self> {
+    pub fn new(national_dex: u16, form_index: u16) -> Result<Self> {
         Ok(Self {
-            main_data: MainDataV2::new(national_dex, forme_index)?,
+            main_data: MainDataV2::new(national_dex, form_index)?,
             gameboy_data: None,
             gen45_data: None,
             gen67_data: None,
@@ -1627,9 +1627,9 @@ impl OhpkmV2 {
         Ok(result)
     }
 
-    pub fn default_with_species(national_dex: u16, forme_index: u16) -> Result<Self> {
+    pub fn default_with_species(national_dex: u16, form_index: u16) -> Result<Self> {
         Ok(Self {
-            main_data: MainDataV2::new(national_dex, forme_index)?,
+            main_data: MainDataV2::new(national_dex, form_index)?,
             ..Default::default()
         })
     }
@@ -1688,7 +1688,7 @@ impl OhpkmV2 {
     }
 
     pub const fn species_metadata(&self) -> &'static SpeciesMetadata {
-        self.main_data.species_and_forme.get_species_metadata()
+        self.main_data.species_and_form.get_species_metadata()
     }
 
     pub fn fix_errors(&mut self) -> bool {
@@ -1750,8 +1750,8 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(js_name = "defaultWithSpecies")]
-    pub fn default_with_species_js(national_dex: u16, forme_index: u16) -> JsResult<Self> {
-        Ok(Self::default_with_species(national_dex, forme_index)?)
+    pub fn default_with_species_js(national_dex: u16, form_index: u16) -> JsResult<Self> {
+        Ok(Self::default_with_species(national_dex, form_index)?)
     }
 
     pub fn to_bytes_js(&self) -> Vec<u8> {
@@ -1805,13 +1805,13 @@ impl OhpkmV2 {
         self.set_encryption_constant(v);
     }
 
-    #[wasm_bindgen(getter = speciesAndForme)]
-    pub fn species_and_forme_js(&self) -> SpeciesAndForme {
-        self.species_and_forme()
+    #[wasm_bindgen(getter = SpeciesAndForm)]
+    pub fn species_and_form_js(&self) -> SpeciesAndForm {
+        self.species_and_form()
     }
-    #[wasm_bindgen(setter = speciesAndForme)]
-    pub fn set_species_and_forme_js(&mut self, v: &SpeciesAndForme) {
-        self.set_species_and_forme(v);
+    #[wasm_bindgen(setter = SpeciesAndForm)]
+    pub fn set_species_and_form_js(&mut self, v: &SpeciesAndForm) {
+        self.set_species_and_form(v);
     }
 
     #[wasm_bindgen(getter = heldItemIndex)]
@@ -2433,10 +2433,10 @@ impl OhpkmV2 {
     }
 
     // #[wasm_bindgen]
-    // pub fn set_species_and_forme(&mut self, national_dex: u16, forme_index: u16) -> JsResult<_js()> {
-    //     match SpeciesAndForme::new(national_dex, forme_index) {
-    //         Ok(species_and_forme) => {
-    //             self.main_data.species_and_forme = species_and_forme;
+    // pub fn set_species_and_form(&mut self, national_dex: u16, form_index: u16) -> JsResult<_js()> {
+    //     match SpeciesAndForm::new(national_dex, form_index) {
+    //         Ok(species_and_form) => {
+    //             self.main_data.species_and_form = species_and_form;
     //             Ok(())
     //         }
     //         Err(e) => Err(JsValue::from_str(&e.to_string())),
@@ -3100,7 +3100,7 @@ impl OhpkmV2 {
         self.sv_data
             .map(|d| TeraTypeWasm::from(d.tera_type_original))
             .unwrap_or(
-                self.species_and_forme()
+                self.species_and_form()
                     .get_forme_metadata()
                     .transferred_tera_type()
                     .into(),
@@ -3114,7 +3114,7 @@ impl OhpkmV2 {
         if let Some(tera_type) = TeraTypeWasm::from_byte(value) {
             self.sv_data
                 .get_or_insert(ScarletVioletData::default_generated_tera_type(
-                    self.main_data.species_and_forme,
+                    self.main_data.species_and_form,
                 ))
                 .tera_type_original = tera_type.into()
         }
@@ -3131,7 +3131,7 @@ impl OhpkmV2 {
     pub fn set_tera_type_override_js(&mut self, value: u8) {
         self.sv_data
             .get_or_insert(ScarletVioletData::default_generated_tera_type(
-                self.main_data.species_and_forme,
+                self.main_data.species_and_form,
             ))
             .tera_type_override = TeraType::from_byte(value);
     }
@@ -3463,13 +3463,13 @@ impl PkmBytes for OhpkmV2 {
     }
 }
 
-impl HasSpeciesAndForme for OhpkmV2 {
+impl HasSpeciesAndForm for OhpkmV2 {
     fn get_species_metadata(&self) -> &'static pkm_rs_resources::species::SpeciesMetadata {
-        self.main_data.species_and_forme.get_species_metadata()
+        self.main_data.species_and_form.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static pkm_rs_resources::species::FormeMetadata {
-        self.main_data.species_and_forme.get_forme_metadata()
+    fn get_forme_metadata(&self) -> &'static pkm_rs_resources::species::FormMetadata {
+        self.main_data.species_and_form.get_forme_metadata()
     }
 
     fn calculate_level(&self) -> u8 {

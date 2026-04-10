@@ -2,7 +2,7 @@ import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
 import { PB7 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { LGE_STARTER, LGP_STARTER } from '@pokemon-resources/consts/Formes'
+import { LGE_STARTER, LGP_STARTER } from '@pokemon-resources/consts/Forms'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { LGPE_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
@@ -264,8 +264,8 @@ export class LGPESAV extends OfficialSAV<PB7> {
     const mon = this.boxes[boxNum].boxSlots[boxSlot]
 
     if (
-      (mon?.dexNum === NationalDex.Pikachu && mon.formeNum === LGP_STARTER) ||
-      (mon?.dexNum === NationalDex.Eevee && mon.formeNum === LGE_STARTER)
+      (mon?.dexNum === NationalDex.Pikachu && mon.formNum === LGP_STARTER) ||
+      (mon?.dexNum === NationalDex.Eevee && mon.formNum === LGE_STARTER)
     ) {
       return {
         isDisabled: true,

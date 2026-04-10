@@ -105,7 +105,7 @@
       "bitOffset": 1
     },
     {
-      "name": "formeNum",
+      "name": "formNum",
       "type": "number",
       "byteOffset": 29,
       "numBytes": 1,

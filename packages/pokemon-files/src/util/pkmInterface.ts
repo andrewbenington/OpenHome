@@ -1,7 +1,7 @@
 import {
   AbilityIndex,
   ExtraFormIndex,
-  FormeMetadata,
+  FormMetadata,
   Gender,
   Language,
   NatureIndex,
@@ -53,7 +53,7 @@ export interface AllPKMFields {
   fieldEventFatigue2?: number
   flag2LA?: boolean
   formArgument?: number
-  formeNum: number
+  formNum: number
   fullness?: number
   gameOfOrigin: number
   gameOfOriginBattle?: number
@@ -170,7 +170,7 @@ export interface AllPKMFields {
   isShiny: () => boolean
   isSquareShiny: () => boolean
 
-  metadata?: FormeMetadata
+  metadata?: FormMetadata
 
   originalBytes?: ArrayBuffer
 

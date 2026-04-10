@@ -110,7 +110,7 @@ export class PK7 {
   }
 
   get dexNum() {
-    return this.inner.species_and_forme.nationalDex
+    return this.inner.species_and_form.nationalDex
   }
 
   get heldItemIndex() {
@@ -190,8 +190,8 @@ export class PK7 {
     this.inner.gender = value
   }
 
-  get formeNum() {
-    return this.inner.species_and_forme.formeIndex
+  get formNum() {
+    return this.inner.species_and_form.formIndex
   }
 
   get evs() {
@@ -634,7 +634,7 @@ export class PK7 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {

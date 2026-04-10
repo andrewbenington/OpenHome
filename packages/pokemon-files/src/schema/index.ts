@@ -49,7 +49,7 @@ export type Schema = {
   pvAbilityBit?: number
   genderFromDVs?: boolean
   unownFromIVs?: boolean
-  noFormes?: boolean
+  noForms?: boolean
   detectPrefix?: boolean
   shinyFromDVs?: boolean
   shinyThreshold?: number

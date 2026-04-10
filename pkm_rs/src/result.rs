@@ -1,6 +1,6 @@
 use crate::ohpkm::sectioned_data;
 
-use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
+use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
 use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, language::LANGUAGE_MAX, items::ITEM_MAX};
 use pkm_rs_types::InvalidAbilityNumber;
 
@@ -35,10 +35,10 @@ pub enum Error {
         source: NdexConvertSource,
     },
 
-    /// Indicates that the given SpeciesAndForme does not exist
+    /// Indicates that the given SpeciesAndForm does not exist
     /// in the specified generation of games
     GenDex {
-        saf: SpeciesAndForme,
+        saf: SpeciesAndForm,
         generation: NdexConvertSource,
     },
 
@@ -49,9 +49,9 @@ pub enum Error {
         value: u16,
         game: NdexConvertSource,
     },
-    FormeIndex {
+    FormIndex {
         national_dex: NatDexIndex,
-        forme_index: u16,
+        form_index: u16,
     },
     ExtraFormIndex {
         national_dex: NatDexIndex,
@@ -137,22 +137,22 @@ impl Display for Error {
             Error::GenDex { saf, generation } => {
                 let species = saf.get_species_metadata();
                 let form = saf.get_forme_metadata();
-                format!("Pokémon '{}' (form: {}) does not exist in {generation}", species.name, form.forme_name)
+                format!("Pokémon '{}' (form: {}) does not exist in {generation}", species.name, form.form_name)
             }
 
             Error::GameDex { value, game } => {
                 format!("Invalid game dex index {value} in {game} (no corresponding National Dex entry)")
             }        
 
-            Error::FormeIndex {
+            Error::FormIndex {
                 national_dex,
-                forme_index,
+                form_index,
             } => {
                 let species_metadata = national_dex.get_species_metadata();
                 format!(
-                    "Invalid forme index {forme_index} for Pokémon {} (must be <= {})",
+                    "Invalid form index {form_index} for Pokémon {} (must be <= {})",
                     species_metadata.name,
-                    species_metadata.formes.len()
+                    species_metadata.forms.len()
                 )
                 .to_owned()
             }
@@ -221,8 +221,8 @@ impl From<pkm_rs_resources::Error> for Error {
             pkm_rs_resources::Error::BufferSize { requirement_source, expected, received } => Self::BufferSize { requirement_source: Some(requirement_source), expected, received },
             pkm_rs_resources::Error::CryptRange { range, buffer_size } => Self::CryptRange { range, buffer_size },
             pkm_rs_resources::Error::NationalDex { national_dex } => Self::NationalDex { value: national_dex, source: NdexConvertSource::Other },
-            pkm_rs_resources::Error::FormeIndex { national_dex, forme_index,
-                 } => Self::FormeIndex { national_dex, forme_index },
+            pkm_rs_resources::Error::FormIndex { national_dex, form_index,
+                 } => Self::FormIndex { national_dex, form_index },
             pkm_rs_resources::Error::LanguageIndex { language_index } => Self::LanguageIndex { language_index },
             pkm_rs_resources::Error::NatureIndex { nature_index } => Self::NatureIndex { nature_index },
             pkm_rs_resources::Error::AbilityIndex { ability_index } => Self::AbilityIndex { ability_index },
