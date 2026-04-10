@@ -82,7 +82,7 @@ pub struct Pb7 {
     pub stats: Stats16Le,
     pub cp: u16,
     pub is_mega: u8,
-    pub mega_forme: u8,
+    pub mega_form: u8,
     pub trainer_gender: Gender,
 }
 
@@ -173,7 +173,7 @@ impl Pb7 {
             stats: Stats16Le::from_bytes(bytes[242..254].try_into().unwrap()),
             cp: read_u16_le!(bytes, 254),
             is_mega: bytes[256],
-            mega_forme: bytes[257],
+            mega_form: bytes[257],
         };
         Ok(mon)
     }
@@ -281,7 +281,7 @@ impl PkmBytes for Pb7 {
         bytes[242..254].copy_from_slice(&self.stats.to_bytes());
         bytes[254..256].copy_from_slice(&self.cp.to_le_bytes());
         bytes[256] = self.is_mega;
-        bytes[257] = self.mega_forme;
+        bytes[257] = self.mega_form;
     }
 
     fn write_party_bytes(&self, bytes: &mut [u8]) {

@@ -243,7 +243,7 @@ fn format_bad_type_error(
     type_index: u8,
 ) -> String {
     format!(
-        "Invalid type {type_index} for national dex {national_dex} forme index {form_index} in personal table {source_name}"
+        "Invalid type {type_index} for national dex {national_dex} form index {form_index} in personal table {source_name}"
     )
 }
 
@@ -580,7 +580,7 @@ mod test {
     use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
     use crate::species::{
-        FormeMetadata, NATIONAL_DEX_MAX, NatDexIndex, form_metadata::MetadataSource,
+        FormMetadata, NATIONAL_DEX_MAX, NatDexIndex, form_metadata::MetadataSource,
     };
 
     const ARCEUS_LEGEND: u16 = 18;
@@ -614,15 +614,13 @@ mod test {
         metadata_table_by_source(source).form_is_present(national_dex, form_index)
     }
 
-    fn form_has_current_data(form: &FormeMetadata) -> bool {
+    fn form_has_current_data(form: &FormMetadata) -> bool {
         !(form.form_name.contains("Totem")
         || (form.national_dex.get() == NationalDex::Xerneas && form.form_index == 1) // Active Xerneas
             || (form.national_dex.get() == NationalDex::Arceus && form.form_index == ARCEUS_LEGEND))
     }
 
-    fn try_all_forms(
-        callback: impl Fn(&FormeMetadata) -> Result<(), String>,
-    ) -> Result<(), String> {
+    fn try_all_forms(callback: impl Fn(&FormMetadata) -> Result<(), String>) -> Result<(), String> {
         for national_dex in NationalDex::Bulbasaur as u16..=NATIONAL_DEX_MAX as u16 {
             let species_metadata = NatDexIndex::new(national_dex)
                 .expect("1-1025 are valid national dex indices")

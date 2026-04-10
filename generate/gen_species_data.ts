@@ -152,7 +152,7 @@ function falseIfUndef(input?: boolean): boolean {
   return input === true
 }
 
-function convertForme(natDexIndex: number, form: Form): string {
+function convertForm(natDexIndex: number, form: Form): string {
   return `FormeMetadata {
     species_name: "${form.name}",
     national_dex: unsafe { NatDexIndex::new_unchecked(${natDexIndex}) },
@@ -163,7 +163,7 @@ function convertForme(natDexIndex: number, form: Form): string {
     mega_evolution_data: &[${form.megaEvolutionData
       .map(
         (megaForm) =>
-          `MegaEvolutionMetadata { mega_forme: ${SpeciesAndFormToRust(megaForm)}, required_item_id: ${optionalToRust(megaForm.megaStoneId)} }`
+          `MegaEvolutionMetadata { mega_form: ${SpeciesAndFormToRust(megaForm)}, required_item_id: ${optionalToRust(megaForm.megaStoneId)} }`
       )
       .join(',')}],
     is_gmax: ${falseIfUndef(form.isGMax)},
@@ -199,7 +199,7 @@ function convertSpecies(species: Species): string {
     name: "${species.name}",
     national_dex: unsafe { NatDexIndex::new_unchecked(${species.nationalDex}) },
     level_up_type: ${levelUpTypeToRust(species.levelUpType)},
-    forms: &[${species.forms.map((forme) => convertForme(species.nationalDex, forme)).join(',')}]
+    forms: &[${species.forms.map((form) => convertForm(species.nationalDex, form)).join(',')}]
 }`
 }
 
