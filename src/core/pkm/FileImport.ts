@@ -16,11 +16,11 @@ import {
   PK4,
   PK5,
   PK6,
+  PK7,
   PK8,
   PK9,
   XDPKM,
 } from '@pokemon-files/pkm'
-import Pk7Rust from '../../../packages/pokemon-files/src/pkm/PK7'
 
 function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {
   switch (bytes.length) {
@@ -67,7 +67,7 @@ export function fileTypeFromStringNonOhpkm(type: string): SavePkmClass | undefin
     case 'PK6':
       return PK6
     case 'PK7':
-      return Pk7Rust
+      return PK7
     case 'PB7':
       return PB7
     case 'PK8':

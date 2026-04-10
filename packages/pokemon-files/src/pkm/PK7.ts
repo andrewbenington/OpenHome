@@ -38,7 +38,7 @@ import {
   trainerMemoryToWasm,
 } from './wasm/convert'
 
-export class Pk7Rust {
+export class PK7 {
   static getFormat() {
     return 'PK7' as const
   }
@@ -83,16 +83,16 @@ export class Pk7Rust {
     this.inner.encryption_constant = value
   }
 
-  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): Pk7Rust {
-    return new Pk7Rust(buffer, { encrypted })
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK7 {
+    return new PK7(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Pk7Rust {
-    return new Pk7Rust(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK7 {
+    return new PK7(ohpkm, { strategy })
   }
 
-  static fromWasm(pk7: Pk7Wasm): Pk7Rust {
-    return new Pk7Rust(pk7, {})
+  static fromWasm(pk7: Pk7Wasm): PK7 {
+    return new PK7(pk7, {})
   }
 
   get sanity() {
@@ -654,4 +654,4 @@ export class Pk7Rust {
   }
 }
 
-export default Pk7Rust
+export default PK7

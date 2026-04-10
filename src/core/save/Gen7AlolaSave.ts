@@ -5,7 +5,7 @@ import {
   OriginGame,
   Pk7 as Pk7Wasm,
 } from '@pkm-rs/pkg'
-import Pk7Rust from '../../../packages/pokemon-files/src/pkm/PK7'
+import PK7 from '../../../packages/pokemon-files/src/pkm/PK7'
 import { Item } from '../../../packages/pokemon-resources/src/consts/Items'
 import { USUM_TRANSFER_RESTRICTIONS } from '../../../packages/pokemon-resources/src/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
@@ -14,16 +14,16 @@ import { Box, BoxAndSlot, WasmOfficialSave } from './interfaces'
 import { PathData } from './util/path'
 import { isRestricted } from './util/TransferRestrictions'
 
-export class Gen7AlolaSave extends WasmOfficialSave<Pk7Rust, Pk7Wasm> {
-  static pkmType = Pk7Rust
-  static saveTypeAbbreviation = 'SM/USUM WASM'
-  static saveTypeID = 'SM/USUM WASM'
+export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm> {
+  static pkmType = PK7
+  static saveTypeAbbreviation = 'SM/USUM'
+  static saveTypeID = 'SM/USUM'
 
   filePath: PathData
   fileCreated?: Date
 
   money: number = 0 // TODO: Gen 7 money
-  boxes: Array<Box<Pk7Rust>>
+  boxes: Array<Box<PK7>>
 
   invalid = false
   tooEarlyToOpen = false
@@ -52,7 +52,7 @@ export class Gen7AlolaSave extends WasmOfficialSave<Pk7Rust, Pk7Wasm> {
     return Gen7AlolaSaveRust.fileIsSave(bytes)
   }
 
-  static saveTypeName: string = 'Pokémon Sun/Moon/Ultra Sun/Ultra Moon WASM'
+  static saveTypeName: string = 'Pokémon Sun/Moon/Ultra Sun/Ultra Moon'
 
   static includesOrigin(origin: OriginGame) {
     return Gen7AlolaSaveRust.includesOrigin(origin)
@@ -66,8 +66,8 @@ export class Gen7AlolaSave extends WasmOfficialSave<Pk7Rust, Pk7Wasm> {
     return Gen7AlolaSaveRust.BOX_COLS
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Pk7Rust {
-    return Pk7Rust.fromOhpkm(ohpkm, strategy)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK7 {
+    return PK7.fromOhpkm(ohpkm, strategy)
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
@@ -83,11 +83,11 @@ export class Gen7AlolaSave extends WasmOfficialSave<Pk7Rust, Pk7Wasm> {
     return this.boxes[this.currentPCBox]
   }
 
-  setMonAt(boxNum: number, boxSlot: number, mon: Option<Pk7Rust>): void {
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK7>): void {
     this.inner.setMonAt(boxNum, boxSlot, mon ? mon.inner : undefined)
   }
 
-  monFromWasm(wasmMon: Pk7Wasm): Pk7Rust {
-    return Pk7Rust.fromWasm(wasmMon)
+  monFromWasm(wasmMon: Pk7Wasm): PK7 {
+    return PK7.fromWasm(wasmMon)
   }
 }

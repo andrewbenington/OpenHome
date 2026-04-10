@@ -15,7 +15,7 @@ import PK3 from './PK3'
 import PK4 from './PK4'
 import PK5 from './PK5'
 import PK6 from './PK6'
-import { default as PK7, default as Pk7Rust } from './PK7'
+import PK7 from './PK7'
 import PK8 from './PK8'
 import PK9 from './PK9'
 import XDPKM from './XDPKM'
@@ -36,7 +36,7 @@ export type PKM =
   | PB8
   | PK9
   | PA9
-  | Pk7Rust
+  | PK7
 
 export type RomHackPKM = PK3RR | PK3UB | PB8LUMI
 
