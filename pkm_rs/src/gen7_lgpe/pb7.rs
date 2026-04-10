@@ -4,7 +4,7 @@ use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::moves::MoveIndex;
-use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForm, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{Gender, PokeDate};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors, Stats8, Stats16Le};
@@ -305,7 +305,7 @@ impl HasSpeciesAndForm for Pb7 {
         self.species_and_form.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static FormeMetadata {
+    fn get_forme_metadata(&self) -> &'static FormMetadata {
         self.species_and_form.get_forme_metadata()
     }
 

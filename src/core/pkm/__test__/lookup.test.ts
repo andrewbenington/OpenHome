@@ -1,18 +1,18 @@
-import { FormeMetadata, MetadataSummaryLookup } from '@pkm-rs/pkg'
+import { FormMetadata, MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { assert, beforeAll, describe, expect, test } from 'vitest'
 import { initializeWasm } from './init'
 
-var MimeJr: FormeMetadata
-var MrMimeKanto: FormeMetadata
-var MrMimeGalar: FormeMetadata
-var MrRime: FormeMetadata
+var MimeJr: FormMetadata
+var MrMimeKanto: FormMetadata
+var MrMimeGalar: FormMetadata
+var MrRime: FormMetadata
 
-var Vaporeon: FormeMetadata
-var Sylveon: FormeMetadata
+var Vaporeon: FormMetadata
+var Sylveon: FormMetadata
 
-var Applin: FormeMetadata
-var Hydrapple: FormeMetadata
+var Applin: FormMetadata
+var Hydrapple: FormMetadata
 
 beforeAll(initializeWasm)
 beforeAll(() => {

@@ -8,7 +8,7 @@ use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
-use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForm, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     BinaryGender, ContestStats, MarkingsSixShapes, OriginGame, Stats8, Stats16Le, read_u16_le,
@@ -382,7 +382,7 @@ impl HasSpeciesAndForm for Pk6 {
         self.species_and_form.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static FormeMetadata {
+    fn get_forme_metadata(&self) -> &'static FormMetadata {
         self.species_and_form.get_forme_metadata()
     }
 

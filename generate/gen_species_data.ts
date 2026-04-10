@@ -153,7 +153,7 @@ function falseIfUndef(input?: boolean): boolean {
 }
 
 function convertForm(natDexIndex: number, form: Form): string {
-  return `FormeMetadata {
+  return `FormMetadata {
     species_name: "${form.name}",
     national_dex: unsafe { NatDexIndex::new_unchecked(${natDexIndex}) },
     form_name: "${form.formName}",
@@ -310,7 +310,7 @@ async function main() {
   let output = `
 use crate::abilities::AbilityIndex;
 use crate::species::{
-    EggGroup, FormeMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, NatDexIndex, SpeciesAndForm,
+    EggGroup, FormMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, NatDexIndex, SpeciesAndForm,
     SpeciesMetadata,
 };
 use pkm_rs_types::{Generation, PkmType, GameSetting, Stats16Le};

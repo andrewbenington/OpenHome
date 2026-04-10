@@ -6,7 +6,7 @@ use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
-use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForm, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::Gender;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
@@ -326,7 +326,7 @@ impl HasSpeciesAndForm for Pk8 {
         self.species_and_form.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static FormeMetadata {
+    fn get_forme_metadata(&self) -> &'static FormMetadata {
         self.species_and_form.get_forme_metadata()
     }
 

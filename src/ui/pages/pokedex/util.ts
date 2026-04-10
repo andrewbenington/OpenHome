@@ -1,5 +1,5 @@
 import { Pokedex, PokedexStatus } from '@openhome-ui/util/pokedex'
-import { FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
+import { FormMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
 
 export function getHighestFormeStatus(
   pokedex: Pokedex,
@@ -37,7 +37,7 @@ export const StatusIndices: Record<PokedexStatus, number> = {
   ShinyCaught: 2,
 }
 
-export function getPokedexSummary(species: SpeciesMetadata, form: FormeMetadata) {
+export function getPokedexSummary(species: SpeciesMetadata, form: FormMetadata) {
   const types = form.type2 ? `${form.type1}- and ${form.type2}-type` : `${form.type1}-type`
   const name = form.formIndex === 0 ? species.name : form.formeName
   const formeType =

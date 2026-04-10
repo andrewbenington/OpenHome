@@ -11,7 +11,7 @@ use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
-use pkm_rs_resources::species::{FormeMetadata, NatDexIndex, SpeciesAndForm, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, NatDexIndex, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::{
     BinaryGender, ContestStats, FlagReader, MarkingsFourShapes, OriginGame, Stats8, Stats16Le,
     read_u16_le, read_u32_le,
@@ -263,7 +263,7 @@ impl HasSpeciesAndForm for Pk3 {
         self.get_species_and_form().get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static FormeMetadata {
+    fn get_forme_metadata(&self) -> &'static FormMetadata {
         self.get_species_and_form().get_forme_metadata()
     }
 
