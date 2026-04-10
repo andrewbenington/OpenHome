@@ -10,7 +10,7 @@ use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::DsRibbonSet;
-use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForm, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::{
     BinaryGender, ContestStats, Gender, MarkingsSixShapes, OriginGame, PokeDate, Stats8, Stats16Le,
     read_u16_le, read_u32_le,
@@ -249,7 +249,7 @@ impl HasSpeciesAndForm for Pk5 {
         self.species_and_form.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static FormeMetadata {
+    fn get_forme_metadata(&self) -> &'static FormMetadata {
         self.species_and_form.get_forme_metadata()
     }
 

@@ -6,7 +6,7 @@ import { FormsUsingImages } from '@openhome-ui/pokemon-details/useBoxIconImage'
 import {
   ExtraFormIndex,
   extraFormSpriteName,
-  FormeMetadata,
+  FormMetadata,
   Generation,
   MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
@@ -33,7 +33,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   hasNotes?: boolean
 }
 
-function getBackgroundPosition(formeMetadata?: FormeMetadata, isEgg?: boolean) {
+function getBackgroundPosition(formeMetadata?: FormMetadata, isEgg?: boolean) {
   const [x, y] =
     isEgg ||
     !formeMetadata ||
@@ -127,7 +127,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
 }
 
 interface PokemonIconUsingSheetProps {
-  formeMetadata: FormeMetadata
+  formeMetadata: FormMetadata
   isEgg?: boolean
   silhouette?: boolean
   onClick?: MouseEventHandler

@@ -1,7 +1,7 @@
 import {
   AbilityIndex,
   ExtraFormIndex,
-  FormeMetadata,
+  FormMetadata,
   Gender,
   Language,
   NatureIndex,
@@ -170,7 +170,7 @@ export interface AllPKMFields {
   isShiny: () => boolean
   isSquareShiny: () => boolean
 
-  metadata?: FormeMetadata
+  metadata?: FormMetadata
 
   originalBytes?: ArrayBuffer
 
