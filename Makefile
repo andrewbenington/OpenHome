@@ -79,6 +79,8 @@ set-version:
 	@cd pkm_rs_derive && cargo set-version $(VERSION)
 	@cd pkm_rs_resources && cargo set-version $(VERSION)
 	@cd pkm_rs_types && cargo set-version $(VERSION)
+	@cd pkm_rs && cargo build
+	@cd src-tauri && cargo build
 	@pnpm version $(VERSION) --no-git-tag-version --allow-same-version 
 	@pnpm i
 
