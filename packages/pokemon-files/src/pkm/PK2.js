@@ -1,0 +1,254 @@
+import { Generation, ItemGen2, Languages, MetadataLookup, OriginGames, SpeciesLookup, } from '@pkm-rs/pkg';
+import { NationalDex } from '@pokemon-resources/consts/NationalDex';
+import * as byteLogic from '../util/byteLogic';
+import { getLevelGen12, getStats } from '../util/statCalc';
+import * as stringLogic from '../util/stringConversion';
+import * as types from '../util/types';
+import { MoveFilter } from '../util/util';
+export default class PK2 {
+    static getName() {
+        return 'PK2';
+    }
+    format = 'PK2';
+    static getBoxSize() {
+        return 32;
+    }
+    gameOfOrigin;
+    language;
+    dexNum;
+    heldItemIndexGen2;
+    moves;
+    trainerID;
+    exp;
+    evsG12;
+    dvs;
+    movePP;
+    movePPUps;
+    trainerFriendship;
+    pokerusByte;
+    metTimeOfDay;
+    metLevel;
+    metLocationIndex;
+    level;
+    statusCondition;
+    currentHP;
+    trainerName;
+    nickname;
+    trainerGender;
+    constructor(arg) {
+        if (arg instanceof ArrayBuffer) {
+            const buffer = new Uint8Array(arg)[2] === 0xff ? arg.slice(3) : arg;
+            const dataView = new DataView(buffer);
+            this.gameOfOrigin = 0;
+            this.language = 0;
+            this.dexNum = dataView.getUint8(0x0);
+            this.heldItemIndexGen2 = ItemGen2.fromIndex(dataView.getUint8(0x1));
+            this.moves = [
+                dataView.getUint8(0x2),
+                dataView.getUint8(0x3),
+                dataView.getUint8(0x4),
+                dataView.getUint8(0x5),
+            ];
+            this.trainerID = dataView.getUint16(0x6, false);
+            this.exp = (dataView.getUint32(0x8, false) >> 8) & 0xffffff;
+            this.evsG12 = {
+                hp: dataView.getUint16(0xb, false),
+                atk: dataView.getUint16(0xd, false),
+                def: dataView.getUint16(0xf, false),
+                spe: dataView.getUint16(0x11, false),
+                spc: dataView.getUint16(0x13, false),
+            };
+            this.dvs = types.readDVsFromBytes(dataView, 0x15);
+            this.movePP = [
+                byteLogic.uIntFromBufferBits(dataView, 0x17, 0, 6, false),
+                byteLogic.uIntFromBufferBits(dataView, 0x18, 0, 6, false),
+                byteLogic.uIntFromBufferBits(dataView, 0x19, 0, 6, false),
+                byteLogic.uIntFromBufferBits(dataView, 0x1a, 0, 6, false),
+            ];
+            this.movePPUps = [
+                byteLogic.uIntFromBufferBits(dataView, 0x17, 6, 2, false),
+                byteLogic.uIntFromBufferBits(dataView, 0x18, 6, 2, false),
+                byteLogic.uIntFromBufferBits(dataView, 0x19, 6, 2, false),
+                byteLogic.uIntFromBufferBits(dataView, 0x1a, 6, 2, false),
+            ];
+            this.trainerFriendship = dataView.getUint8(0x1b);
+            this.pokerusByte = dataView.getUint8(0x1c);
+            this.metTimeOfDay = byteLogic.uIntFromBufferBits(dataView, 0x1d, 6, 2, false);
+            this.metLevel = byteLogic.uIntFromBufferBits(dataView, 0x1d, 0, 6, false);
+            this.metLocationIndex = byteLogic.uIntFromBufferBits(dataView, 0x1e, 0, 7, false);
+            this.level = dataView.getUint8(0x1f);
+            if (dataView.byteLength >= 70) {
+                this.statusCondition = dataView.getUint8(0x20);
+            }
+            else {
+                this.statusCondition = 0;
+            }
+            if (dataView.byteLength >= 70) {
+                this.currentHP = dataView.getUint8(0x22);
+            }
+            else {
+                this.currentHP = 0;
+            }
+            if (dataView.byteLength >= 70) {
+                this.trainerName = stringLogic.readGameBoyStringFromBytes(dataView, 0x30, 8);
+            }
+            else {
+                this.trainerName = 'TRAINER';
+            }
+            if (dataView.byteLength >= 70) {
+                this.nickname = stringLogic.readGameBoyStringFromBytes(dataView, 0x3b, 11);
+            }
+            else {
+                this.nickname = this.metadata?.formeName ?? '';
+            }
+            this.trainerGender = byteLogic.getFlag(dataView, 0x1e, 7);
+        }
+        else {
+            const other = arg;
+            this.gameOfOrigin = other.gameOfOrigin;
+            this.language = other.language;
+            this.dexNum = other.dexNum;
+            this.heldItemIndexGen2 = ItemGen2.fromModern(other.heldItemIndex);
+            const moveFilter = MoveFilter.fromPkmClass(PK2);
+            this.moves = moveFilter.moves(other);
+            this.movePP = moveFilter.movePp(other, this.format);
+            this.movePPUps = moveFilter.movePpUps(other);
+            if (!(OriginGames.generation(other.gameOfOrigin) === Generation.G1 ||
+                OriginGames.generation(other.gameOfOrigin) === Generation.G2) &&
+                other.personalityValue !== undefined) {
+                this.trainerID = other.personalityValue % 0x10000;
+            }
+            else {
+                this.trainerID = other.trainerID;
+            }
+            this.exp = other.exp;
+            this.evsG12 = other.evsG12 ?? {
+                hp: 0,
+                atk: 0,
+                def: 0,
+                spe: 0,
+                spc: 0,
+            };
+            this.dvs = other.dvs ?? {
+                hp: 0,
+                atk: 0,
+                def: 0,
+                spe: 0,
+                spc: 0,
+            };
+            this.trainerFriendship = other.trainerFriendship ?? 0;
+            this.pokerusByte = other.pokerusByte ?? 0;
+            this.metTimeOfDay = other.metTimeOfDay ?? 0;
+            this.metLevel = other.metLevel ?? 0;
+            this.metLocationIndex = other.metLocationIndex ?? 0;
+            this.level = other.level ?? 0;
+            this.statusCondition = other.statusCondition ?? 0;
+            this.currentHP = other.currentHP ?? 0;
+            this.trainerName = other.trainerName;
+            this.nickname = other.nickname;
+            this.trainerGender = other.trainerGender;
+        }
+    }
+    static fromBytes(buffer) {
+        return new PK2(buffer);
+    }
+    toBytes(options) {
+        const buffer = new ArrayBuffer(options?.includeExtraFields ? 73 : 32);
+        const dataView = new DataView(buffer);
+        dataView.setUint8(0x0, this.dexNum);
+        dataView.setUint8(0x1, this.heldItemIndexGen2?.index ?? 0);
+        for (let i = 0; i < 4; i++) {
+            dataView.setUint8(0x2 + i, this.moves[i]);
+        }
+        dataView.setUint16(0x6, this.trainerID, false);
+        new Uint8Array(buffer).set(byteLogic.uint24ToBytesBigEndian(this.exp), 0x8);
+        dataView.setUint16(0xb, this.evsG12.hp, false);
+        dataView.setUint16(0xd, this.evsG12.atk, false);
+        dataView.setUint16(0xf, this.evsG12.def, false);
+        dataView.setUint16(0x11, this.evsG12.spe, false);
+        dataView.setUint16(0x13, this.evsG12.spc, false);
+        types.writeDVsToBytes(this.dvs, dataView, 0x15);
+        for (let i = 0; i < 4; i++) {
+            byteLogic.uIntToBufferBits(dataView, this.movePP[i], 0x17 + i, 0, 6, false);
+        }
+        for (let i = 0; i < 4; i++) {
+            byteLogic.uIntToBufferBits(dataView, this.movePPUps[i], 0x17 + i, 6, 2, false);
+        }
+        dataView.setUint8(0x1b, this.trainerFriendship);
+        dataView.setUint8(0x1c, this.pokerusByte);
+        byteLogic.uIntToBufferBits(dataView, this.metTimeOfDay, 29, 6, 2, false);
+        byteLogic.uIntToBufferBits(dataView, this.metLevel, 29, 0, 6, false);
+        byteLogic.uIntToBufferBits(dataView, this.metLocationIndex, 30, 0, 7, false);
+        dataView.setUint8(0x1f, this.level);
+        if (options?.includeExtraFields) {
+            dataView.setUint8(0x20, this.statusCondition);
+        }
+        if (options?.includeExtraFields) {
+            dataView.setUint8(0x22, this.currentHP);
+        }
+        if (options?.includeExtraFields) {
+            stringLogic.writeGameBoyStringToBytes(dataView, this.trainerName, 0x30, 8, true);
+        }
+        if (options?.includeExtraFields) {
+            stringLogic.writeGameBoyStringToBytes(dataView, this.nickname, 0x3b, 11, true);
+        }
+        byteLogic.setFlag(dataView, 0x1e, 7, this.trainerGender);
+        return buffer;
+    }
+    getStats() {
+        return getStats(this);
+    }
+    get gender() {
+        return this.metadata?.genderFromAtkDv(this.dvs.atk);
+    }
+    get languageString() {
+        return Languages.stringFromByte(this.language);
+    }
+    get heldItemIndex() {
+        return this.heldItemIndexGen2?.toModern()?.index ?? 0;
+    }
+    get heldItemName() {
+        return this.heldItemIndexGen2?.name ?? 'None';
+    }
+    get secretID() {
+        return 0;
+    }
+    get formeNum() {
+        if (this.dexNum === NationalDex.Unown) {
+            let ivCombinationVal = ((this.dvs.atk >> 1) & 0b11) << 6;
+            ivCombinationVal += ((this.dvs.def >> 1) & 0b11) << 4;
+            ivCombinationVal += ((this.dvs.spe >> 1) & 0b11) << 2;
+            ivCombinationVal += (this.dvs.spc >> 1) & 0b11;
+            ivCombinationVal /= 10;
+            return Math.floor(ivCombinationVal);
+        }
+        return 0;
+    }
+    getLevel() {
+        return getLevelGen12(this.dexNum, this.exp);
+    }
+    isShiny() {
+        return (this.dvs.spe === 10 &&
+            this.dvs.def === 10 &&
+            this.dvs.spc === 10 &&
+            [2, 3, 6, 7, 10, 11, 14, 15].includes(this.dvs.atk));
+    }
+    isSquareShiny() {
+        return false;
+    }
+    get metadata() {
+        return MetadataLookup(this.dexNum, this.formeNum);
+    }
+    get speciesMetadata() {
+        return SpeciesLookup(this.dexNum);
+    }
+    static maxValidMove() {
+        return 251;
+    }
+    static maxValidBall() {
+        return 0;
+    }
+    static allowedBalls() {
+        return [];
+    }
+}
