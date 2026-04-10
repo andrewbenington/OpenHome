@@ -1,14 +1,15 @@
 use std::collections::HashMap;
 
-use crate::error::Result;
-use crate::storage;
+use crate::{
+    data_controller::{DataController, DataDir},
+    error::Result,
+};
 use pkm_rs::convert_strategy::ConvertStrategy;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::state::synced_state::{self, SyncedState};
 
-#[cfg_attr(feature = "wasm", derive(Tsify))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct NamedStrategy {
     name: String,
@@ -17,7 +18,6 @@ struct NamedStrategy {
 
 type StrategiesById = HashMap<Uuid, NamedStrategy>;
 
-#[cfg_attr(feature = "wasm", derive(Tsify))]
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct ConvertStrategies {
     strategies_by_id: StrategiesById,
@@ -41,12 +41,12 @@ impl SyncedState for ConvertStrategies {
 }
 
 impl ConvertStrategies {
-    pub fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
-        storage::read_or_create_default_json(app_handle, JSON_FILENAME)
+    pub fn load_from_storage(data_controller: &impl DataController) -> Result<Self> {
+        data_controller.read_or_create_default_json_file(DataDir::Storage, JSON_FILENAME)
     }
 
-    pub fn write_to_files(&self, app_handle: &tauri::AppHandle) -> Result<()> {
-        storage::write_file_json(app_handle, JSON_FILENAME, self)
+    pub fn write_to_files(&self, data_controller: &impl DataController) -> Result<()> {
+        data_controller.write_file_json(DataDir::Storage, JSON_FILENAME, self)
     }
 }
 

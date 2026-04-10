@@ -1,8 +1,12 @@
-use std::{fs, path::Path};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 use tauri::Emitter;
 
 use crate::{
+    data_controller::{DataController, DataDir},
     error::{Error, Result},
     util::{self, ImageResponse},
 };
@@ -37,37 +41,31 @@ pub struct PluginMetadataWithIcon {
 }
 
 pub fn list_downloaded_plugins(
-    app_handle: &tauri::AppHandle,
+    data_controller: &impl DataController,
 ) -> Result<Vec<PluginMetadataWithIcon>> {
-    let plugins_path = util::get_appdata_dir(app_handle)?.join("plugins");
-
+    let plugins_path = data_controller.absolute_dir_path(DataDir::Plugins)?;
     if !plugins_path.exists() {
         return Ok(Vec::new());
     }
 
-    let plugin_dirs =
+    let plugin_dir_entries =
         fs::read_dir(&plugins_path).map_err(|err| Error::file_access(&plugins_path, err))?;
 
     let mut plugins: Vec<PluginMetadataWithIcon> = vec![];
 
-    for plugin_dir_r in plugin_dirs {
-        let plugin_dir_path = match plugin_dir_r {
-            Ok(dir_entry) => dir_entry.path(),
-            Err(err) => {
-                eprintln!("Broken plugin entry: {err}");
-                continue;
-            }
-        };
-
-        if !plugin_dir_path.is_dir() {
+    for dir_entry in plugin_dir_entries.flatten() {
+        if !dir_entry.path().is_dir() {
             continue;
         }
 
-        let metadata_path = plugin_dir_path.clone().join("plugin.json");
-        match util::read_file_json::<PluginMetadata>(&metadata_path) {
+        let plugin_dir_name = PathBuf::from(dir_entry.file_name());
+        let metadata_r: Result<PluginMetadata> =
+            data_controller.read_file_json(DataDir::Plugins, plugin_dir_name.join("plugin.json"));
+
+        match metadata_r {
             Err(err) => eprintln!("Broken plugin entry: {err}"),
             Ok(metadata) => {
-                plugins.push(metadata.with_icon_bytes(&plugin_dir_path.join("icon.png")))
+                plugins.push(metadata.with_icon_bytes(&dir_entry.path().join("icon.png")))
             }
         }
     }
@@ -100,9 +98,7 @@ pub async fn download_async(
     remote_url: String,
     plugin_metadata: PluginMetadata,
 ) -> Result<String> {
-    let new_plugin_dir = util::get_appdata_dir(&app_handle)?
-        .join("plugins")
-        .join(&plugin_metadata.id);
+    let new_plugin_dir = app_handle.absolute_path(DataDir::Plugins, &plugin_metadata.id)?;
 
     let dist_dir = new_plugin_dir.join("dist");
     util::create_directory(&dist_dir)?;

@@ -1,4 +1,4 @@
-use crate::storage;
+use crate::data_controller::{DataController, DataDir};
 use crate::util;
 use std::collections::HashMap;
 use std::fs;
@@ -154,11 +154,11 @@ pub struct StoredSaveRef {
 }
 
 pub fn get_recent_saves(
-    app_handle: tauri::AppHandle,
+    data_controller: &impl DataController,
 ) -> core::result::Result<HashMap<String, SaveRef>, String> {
-    let recent_saves: HashMap<String, StoredSaveRef> =
-        storage::read_or_create_default_json(&app_handle, RECENT_SAVES_FILENAME)
-            .map_err(|e| format!("Error getting settings: {}", e))?;
+    let recent_saves: HashMap<String, StoredSaveRef> = data_controller
+        .read_or_create_default_json_file(DataDir::Storage, RECENT_SAVES_FILENAME)
+        .map_err(|e| format!("Error getting settings: {}", e))?;
 
     let mut validated_recents: HashMap<String, SaveRef> = HashMap::new();
     for (raw, save) in recent_saves {
