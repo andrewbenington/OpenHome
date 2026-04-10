@@ -3,8 +3,7 @@ import { resolve } from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { SignMemeDataInPlace, SignWithMemeCrypto } from '../encryption/Encryption'
 import { bytesBeHexString, MemeKey, pokedexAndSaveFileMemeKey } from '../encryption/MemeKey'
-import { SMSAV } from '../SMSAV'
-import { USUMSAV } from '../USUMSAV'
+import { Gen7AlolaSave } from '../Gen7AlolaSave'
 import { get16BitChecksumLittleEndian } from '../util/byteLogic'
 import { PathData } from '../util/path'
 import { initializeWasm } from './init'
@@ -12,7 +11,7 @@ import { initializeWasm } from './init'
 beforeAll(initializeWasm)
 
 describe('gen 7 save files', () => {
-  let ultraSunSave: USUMSAV
+  let ultraSunSave: Gen7AlolaSave
   let saveBytes: Uint8Array
 
   beforeAll(() => {
@@ -28,7 +27,7 @@ describe('gen 7 save files', () => {
       separator: '/',
     }
 
-    ultraSunSave = new USUMSAV(parsedPath, saveBytes)
+    ultraSunSave = new Gen7AlolaSave(parsedPath, saveBytes)
   })
 
   test('should have expected trainer name', () => {
@@ -38,14 +37,10 @@ describe('gen 7 save files', () => {
   test('first mon is as expected', () => {
     expect(ultraSunSave.boxes[0].boxSlots[0]?.nickname === 'Bulbasaur')
   })
-
-  test('checksum is expected', () => {
-    expect(ultraSunSave.calculatePcChecksum()).toBe(0x4d97)
-  })
 })
 
 describe('moon save file', () => {
-  let moonSav: SMSAV
+  let moonSav: Gen7AlolaSave
   let saveBytes: Uint8Array
 
   beforeAll(() => {
@@ -61,7 +56,7 @@ describe('moon save file', () => {
       separator: '/',
     }
 
-    moonSav = new SMSAV(parsedPath, saveBytes)
+    moonSav = new Gen7AlolaSave(parsedPath, saveBytes)
   })
 
   test('should have expected trainer name', () => {
@@ -75,10 +70,6 @@ describe('moon save file', () => {
 
   test('first mon is as expected', () => {
     expect(moonSav.boxes[0].boxSlots[0]?.nickname === 'Bulbasaur')
-  })
-
-  test('checksum is expected', () => {
-    expect(moonSav.calculatePcChecksum()).toBe(0xb28d)
   })
 })
 

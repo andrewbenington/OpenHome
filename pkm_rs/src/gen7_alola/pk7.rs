@@ -284,10 +284,6 @@ impl Pk7 {
         buf.set_stats(self.stats);
     }
 
-    // ------------------------------------------------------------------
-    // Legacy byte-slice API (delegates to Pk7Buffer internally)
-    // ------------------------------------------------------------------
-
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
         let size = bytes.len();
         match size {
@@ -346,6 +342,14 @@ impl Pk7 {
 
         let bytes = buffer.as_bytes_mut();
         encryption::decrypt_pkm_bytes_gen_6_7(&encryption::shuffle_blocks_gen_6_7(bytes))
+    }
+
+    pub fn is_empty_slot(bytes: &[u8]) -> bool {
+        let decrypted = encryption::decrypt_pkm_bytes_gen_6_7(bytes);
+        let unshuffled = encryption::unshuffle_blocks_gen_6_7(&decrypted);
+        let buffer = Pk7BufferRef::box_span(&unshuffled);
+
+        buffer.species_ndex() == 0
     }
 }
 
@@ -521,6 +525,11 @@ impl Pk7 {
     #[wasm_bindgen(js_name = toOhpkm)]
     pub fn to_ohpkm(&self) -> OhpkmV2 {
         OhpkmV2::from(self)
+    }
+
+    #[wasm_bindgen(js_name = isEmptySlot)]
+    pub fn is_empty_slot_wasm(bytes: Vec<u8>) -> bool {
+        Self::is_empty_slot(&bytes)
     }
 }
 

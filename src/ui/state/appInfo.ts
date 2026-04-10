@@ -15,12 +15,11 @@ import { ORASSAV } from '@openhome-core/save/ORASSAV'
 import { PtSAV } from '@openhome-core/save/PtSAV'
 import { G3RRSAV } from '@openhome-core/save/radicalred/G3RRSAV'
 import { G3UBSAV } from '@openhome-core/save/unbound/G3UBSAV'
-import { USUMSAV } from '@openhome-core/save/USUMSAV'
 import { SAVClass } from '@openhome-core/save/util'
 import { XYSAV } from '@openhome-core/save/XYSAV'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { Dispatch, Reducer, createContext } from 'react'
-import { Gen7AlolaSave } from '../../core/save/G7SAV_WASM'
+import { Gen7AlolaSave } from '../../core/save/Gen7AlolaSave'
 import { ZASAV } from '../../core/save/Gen89/ZASAV'
 import { OfficialSAV } from '../../core/save/interfaces'
 import { MonDisplayState } from '../hooks/useMonDisplay'
@@ -36,9 +35,7 @@ export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   BW2SAV,
   XYSAV,
   ORASSAV,
-  // SMSAV,
   Gen7AlolaSave,
-  USUMSAV,
   LGPESAV,
   SwShSAV,
   BDSPSAV,

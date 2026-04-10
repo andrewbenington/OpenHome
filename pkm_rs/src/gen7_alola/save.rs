@@ -464,7 +464,16 @@ mod tests {
     }
 
     #[test]
-    fn checksum_calculation_is_correct() -> Result<()> {
+    fn usum_save_calculate_checksum() -> Result<()> {
+        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("ultrasun"))?;
+        let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
+
+        assert_eq!(save.calc_checksum(), 0x4d97);
+        Ok(())
+    }
+
+    #[test]
+    fn pkm_checksum_calculation_is_correct() -> Result<()> {
         let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
         let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
 
