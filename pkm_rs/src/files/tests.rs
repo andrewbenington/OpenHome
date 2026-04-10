@@ -76,7 +76,7 @@ pub mod pk3 {
                 .join("unown-e.pk3")
                 .to_string_lossy(),
         )?;
-        assert_eq!(unown_e.0.get_species_and_forme().get_forme_index(), 4);
+        assert_eq!(unown_e.0.get_species_and_form().get_forme_index(), 4);
 
         let unown_exclamation = pkm_from_file::<Pk3>(
             &PathBuf::from("pkm_files")
@@ -85,10 +85,7 @@ pub mod pk3 {
                 .to_string_lossy(),
         )?;
         assert_eq!(
-            unown_exclamation
-                .0
-                .get_species_and_forme()
-                .get_forme_index(),
+            unown_exclamation.0.get_species_and_form().get_forme_index(),
             26
         );
 

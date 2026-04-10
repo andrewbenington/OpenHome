@@ -6,7 +6,7 @@ use crate::{
     format::PkmFormat,
     gen7_alola::Pk7,
     ohpkm::OhpkmV2,
-    traits::HasSpeciesAndForme,
+    traits::HasSpeciesAndForm,
 };
 
 use super::OhpkmConvert;
@@ -17,7 +17,7 @@ impl OhpkmConvert for Pk7 {
         ohpkm::v2_sections::MainDataV2 {
             personality_value: self.personality_value,
             encryption_constant: self.encryption_constant,
-            species_and_forme: self.species_and_forme,
+            species_and_form: self.species_and_form,
             held_item_index: self.held_item_index,
             trainer_id: self.trainer_id,
             secret_id: self.secret_id,
@@ -98,7 +98,7 @@ impl OhpkmConvert for Pk7 {
             encryption_constant: ohpkm.encryption_constant(),
             sanity: 0,
             checksum: 0,
-            species_and_forme: ohpkm.species_and_forme(),
+            species_and_form: ohpkm.species_and_form(),
             held_item_index: ohpkm.held_item_index(),
             trainer_id: ohpkm.trainer_id(),
             secret_id: ohpkm.secret_id(),

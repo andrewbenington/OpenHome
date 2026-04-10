@@ -1,5 +1,5 @@
 use crate::result::{Error, Result};
-use crate::traits::{HasSpeciesAndForme, IsShiny4096, PkmBytes};
+use crate::traits::{HasSpeciesAndForm, IsShiny4096, PkmBytes};
 use crate::util;
 
 use pkm_rs_resources::ball::Ball;
@@ -7,7 +7,7 @@ use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForm, SpeciesMetadata};
 
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{ContestStats, Stats8, Stats16Le, StatsPreSplit};
@@ -29,7 +29,7 @@ const MIN_SIZE: usize = 420;
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct OhpkmV1 {
     pub encryption_constant: u32,
-    pub species_and_forme: SpeciesAndForme,
+    pub species_and_form: SpeciesAndForm,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -159,7 +159,7 @@ impl OhpkmV1 {
         // try_into() will always succeed thanks to the length check
         let mon = Self {
             encryption_constant: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
-            species_and_forme: SpeciesAndForme::new(
+            species_and_form: SpeciesAndForm::new(
                 u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
                 u16::from_le_bytes(bytes[36..38].try_into().unwrap()),
             )?,
@@ -325,7 +325,7 @@ impl PkmBytes for OhpkmV1 {
     fn write_box_bytes(&self, bytes: &mut [u8]) {
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[4..6].copy_from_slice(&0u16.to_le_bytes());
-        bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
+        bytes[8..10].copy_from_slice(&self.species_and_form.get_ndex().to_le_bytes());
         bytes[10..12].copy_from_slice(&self.held_item_index.to_le_bytes());
         bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
         bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
@@ -349,7 +349,7 @@ impl PkmBytes for OhpkmV1 {
         util::set_flag(bytes, 34, 1, self.flag2_la);
         self.gender.set_bits_2_3(&mut bytes[34]);
 
-        bytes[36..38].copy_from_slice(&self.species_and_forme.get_forme_index().to_le_bytes());
+        bytes[36..38].copy_from_slice(&self.species_and_form.get_forme_index().to_le_bytes());
 
         // THIS IS DIFFERENT FROM Stats8::to_bytes() ON PURPOSE
         // DO NOT CHANGE
@@ -494,13 +494,13 @@ impl PkmBytes for OhpkmV1 {
     }
 }
 
-impl HasSpeciesAndForme for OhpkmV1 {
+impl HasSpeciesAndForm for OhpkmV1 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.species_and_forme.get_species_metadata()
+        self.species_and_form.get_species_metadata()
     }
 
     fn get_forme_metadata(&self) -> &'static FormeMetadata {
-        self.species_and_forme.get_forme_metadata()
+        self.species_and_form.get_forme_metadata()
     }
 
     fn calculate_level(&self) -> u8 {

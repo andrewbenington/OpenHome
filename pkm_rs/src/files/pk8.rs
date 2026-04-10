@@ -1,12 +1,12 @@
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
-use crate::{HasSpeciesAndForme, PkmBytes, util};
+use crate::{HasSpeciesAndForm, PkmBytes, util};
 
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
-use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::Gender;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
@@ -25,7 +25,7 @@ pub struct Pk8 {
     pub encryption_constant: u32,
     pub sanity: u16,
     pub checksum: u16,
-    pub species_and_forme: SpeciesAndForme,
+    pub species_and_form: SpeciesAndForm,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -106,10 +106,7 @@ impl Pk8 {
             encryption_constant: read_u32_le!(bytes, 0),
             sanity: read_u16_le!(bytes, 4),
             checksum: read_u16_le!(bytes, 6),
-            species_and_forme: SpeciesAndForme::new(
-                read_u16_le!(bytes, 8),
-                read_u16_le!(bytes, 36),
-            )?,
+            species_and_form: SpeciesAndForm::new(read_u16_le!(bytes, 8), read_u16_le!(bytes, 36))?,
             held_item_index: read_u16_le!(bytes, 10),
             trainer_id: read_u16_le!(bytes, 12),
             secret_id: read_u16_le!(bytes, 14),
@@ -210,7 +207,7 @@ impl PkmBytes for Pk8 {
         bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
         bytes[4..6].copy_from_slice(&self.sanity.to_le_bytes());
         bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
-        bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
+        bytes[8..10].copy_from_slice(&self.species_and_form.get_ndex().to_le_bytes());
         bytes[10..12].copy_from_slice(&self.held_item_index.to_le_bytes());
         bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
         bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
@@ -324,13 +321,13 @@ impl PkmBytes for Pk8 {
     }
 }
 
-impl HasSpeciesAndForme for Pk8 {
+impl HasSpeciesAndForm for Pk8 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.species_and_forme.get_species_metadata()
+        self.species_and_form.get_species_metadata()
     }
 
     fn get_forme_metadata(&self) -> &'static FormeMetadata {
-        self.species_and_forme.get_forme_metadata()
+        self.species_and_form.get_forme_metadata()
     }
 
     fn calculate_level(&self) -> u8 {

@@ -110,7 +110,7 @@ export class PK7 {
   }
 
   get dexNum() {
-    return this.inner.species_and_forme.nationalDex
+    return this.inner.species_and_form.nationalDex
   }
 
   get heldItemIndex() {
@@ -191,7 +191,7 @@ export class PK7 {
   }
 
   get formNum() {
-    return this.inner.species_and_forme.formIndex
+    return this.inner.species_and_form.formIndex
   }
 
   get evs() {

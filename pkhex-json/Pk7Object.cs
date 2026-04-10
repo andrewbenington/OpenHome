@@ -13,7 +13,7 @@ public static class Pk7Object
       encryption_constant = pk.EncryptionConstant,
       sanity = 0,
       checksum = pk.Checksum,
-      species_and_forme = Util.SpeciesAndForme(pk),
+      species_and_form = Util.SpeciesAndForm(pk),
       held_item_index = pk.HeldItem,
       trainer_id = pk.TID16,
       secret_id = pk.SID16,

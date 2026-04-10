@@ -1,7 +1,7 @@
 pub use crate::ohpkm::OhpkmV2;
 use pkm_rs_resources::species::{FormeMetadata, SpeciesMetadata};
 pub use pkm_rs_resources::{abilities::ABILITY_MAX, species::NATIONAL_DEX_MAX};
-use pkm_rs_resources::{moves::MoveIndex, species::SpeciesAndForme};
+use pkm_rs_resources::{moves::MoveIndex, species::SpeciesAndForm};
 use serde::Serialize;
 
 use crate::result::Result;
@@ -20,14 +20,14 @@ impl<T: PkmBytes + Serialize + IsShiny + Sized> Pkm for T {}
 #[cfg(feature = "randomize")]
 impl<T: PkmBytes + Serialize + IsShiny + Sized + Randomize> Pkm for T {}
 
-pub trait HasSpeciesAndForme: Pkm {
+pub trait HasSpeciesAndForm: Pkm {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata;
     fn get_forme_metadata(&self) -> &'static FormeMetadata;
 
     fn calculate_level(&self) -> u8;
 }
 
-pub trait MaybeHasSpeciesAndForme: Pkm {
+pub trait MaybeHasSpeciesAndForm: Pkm {
     fn try_get_species_metadata(&self) -> Option<&'static SpeciesMetadata>;
     fn get_forme_metadata(&self) -> Option<&'static FormeMetadata>;
 
@@ -60,7 +60,7 @@ pub trait PkmBytes: Sized {
 }
 
 pub trait PkmBase {
-    fn species_and_forme(&self) -> Result<SpeciesAndForme>;
+    fn species_and_form(&self) -> Result<SpeciesAndForm>;
     fn get_move_slots(&self) -> [Result<MoveIndex>; 4];
     fn set_move_slots(&self, move_slots: [Result<MoveIndex>; 4]);
 }

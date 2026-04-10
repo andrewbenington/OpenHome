@@ -38,14 +38,14 @@ impl<T: PkmBytes + Serialize + IsShiny + Sized> Pkm for T {}
 #[cfg(feature = "randomize")]
 impl<T: PkmBytes + Serialize + IsShiny + Sized + Randomize> Pkm for T {}
 
-pub trait HasSpeciesAndForme: Pkm {
+pub trait HasSpeciesAndForm: Pkm {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata;
     fn get_forme_metadata(&self) -> &'static FormeMetadata;
 
     fn calculate_level(&self) -> u8;
 }
 
-pub trait MaybeHasSpeciesAndForme: Pkm {
+pub trait MaybeHasSpeciesAndForm: Pkm {
     fn try_get_species_metadata(&self) -> Option<&'static SpeciesMetadata>;
     fn get_forme_metadata(&self) -> Option<&'static FormeMetadata>;
 

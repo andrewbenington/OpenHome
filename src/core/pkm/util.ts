@@ -8,7 +8,7 @@ import {
   MetadataSource,
   MetadataSummaryLookup,
   PkmType,
-  SpeciesAndForme,
+  SpeciesAndForm,
 } from '@pkm-rs/pkg'
 import { FourMoves, Stats, StatsPreSplit } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
@@ -118,7 +118,7 @@ export const generatePersonalityValue = () => {
 // recursively returns pre-evolution. if provided a mega form, returns the first pre-evolution
 // of the base forme.
 export const getBaseMon = (dexNum: number, form?: number) => {
-  let mon = SpeciesAndForme.tryNew(dexNum, form ?? 0)
+  let mon = SpeciesAndForm.tryNew(dexNum, form ?? 0)
   let metadata = mon?.getMetadata()
 
   if (metadata?.isMega) {
@@ -134,7 +134,7 @@ export const getBaseMon = (dexNum: number, form?: number) => {
 }
 
 export const getPrevos = (dexNum: number, forme?: number) => {
-  let mon = SpeciesAndForme.tryNew(dexNum, forme ?? 0)
+  let mon = SpeciesAndForm.tryNew(dexNum, forme ?? 0)
   let metadata = mon?.getMetadata()
 
   const prevos: FormeMetadata[] = []
