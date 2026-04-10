@@ -11,7 +11,7 @@ export function getHighestFormeStatus(
   let maxStatus: PokedexStatus = 'Seen'
 
   for (const [formIndex, status] of Object.entries(
-    pokedex.byDexNumber[species.nationalDex].formes
+    pokedex.byDexNumber[species.nationalDex].forms
   )) {
     if (StatusIndices[status] > StatusIndices[maxStatus]) {
       maxStatusForme = parseInt(formIndex)
@@ -28,7 +28,7 @@ export function getFormeStatus(
   formIndex: number
 ): PokedexStatus | undefined {
   if (!(nationalDex in pokedex.byDexNumber)) return undefined
-  return pokedex.byDexNumber[nationalDex].formes[formIndex]
+  return pokedex.byDexNumber[nationalDex].forms[formIndex]
 }
 
 export const StatusIndices: Record<PokedexStatus, number> = {
@@ -58,7 +58,7 @@ export function getPokedexSummary(species: SpeciesMetadata, form: FormeMetadata)
 }
 
 function getBaseFormeDescriptor(species: SpeciesMetadata) {
-  const baseForme = species.formes[0]
+  const baseForme = species.forms[0]
 
   if (baseForme.isMythical) {
     return 'Mythical Pokémon'

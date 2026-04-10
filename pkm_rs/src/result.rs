@@ -137,7 +137,7 @@ impl Display for Error {
             Error::GenDex { saf, generation } => {
                 let species = saf.get_species_metadata();
                 let form = saf.get_forme_metadata();
-                format!("Pokémon '{}' (form: {}) does not exist in {generation}", species.name, form.forme_name)
+                format!("Pokémon '{}' (form: {}) does not exist in {generation}", species.name, form.form_name)
             }
 
             Error::GameDex { value, game } => {
@@ -152,7 +152,7 @@ impl Display for Error {
                 format!(
                     "Invalid form index {form_index} for Pokémon {} (must be <= {})",
                     species_metadata.name,
-                    species_metadata.formes.len()
+                    species_metadata.forms.len()
                 )
                 .to_owned()
             }

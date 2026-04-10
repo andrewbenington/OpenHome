@@ -5,7 +5,7 @@ import {
   LGP_STARTER,
   MAROWAK_ALOLA_TOTEM,
   SPIKY_EAR,
-} from '@pokemon-resources/consts/Formes'
+} from '@pokemon-resources/consts/Forms'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 
 interface FormRestrictions {

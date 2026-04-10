@@ -10,7 +10,7 @@ import {
   OriginGame,
 } from '@pkm-rs/pkg'
 import { PK2 } from '@pokemon-files/pkm'
-import { EXCLAMATION } from '@pokemon-resources/consts/Formes'
+import { EXCLAMATION } from '@pokemon-resources/consts/Forms'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'

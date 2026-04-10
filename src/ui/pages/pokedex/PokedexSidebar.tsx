@@ -64,7 +64,7 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
                 filteredSpecies[virtualRow.index]
               )
 
-              setSelectedForme(filteredSpecies[virtualRow.index].formes[caughtFormeIndex])
+              setSelectedForme(filteredSpecies[virtualRow.index].forms[caughtFormeIndex])
               virtualizer.scrollToIndex(virtualRow.index, { behavior: 'smooth', align: 'center' })
             }}
             selected={

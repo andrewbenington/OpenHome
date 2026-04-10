@@ -30,7 +30,7 @@ import {
 } from '@pokemon-files/util'
 import { Countries } from '@pokemon-resources/consts/Countries'
 import { EncounterTypes } from '@pokemon-resources/consts/EncounterTypes'
-import { SWEETS } from '@pokemon-resources/consts/Formes'
+import { SWEETS } from '@pokemon-resources/consts/Forms'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import {
   GEN2_TRANSFER_RESTRICTIONS,

@@ -32,18 +32,18 @@ export default function EvolutionFamily({
   let baseMon = getBaseMon(nationalDex, formeNumber)
 
   if (MONS_WITH_NON_EVOLVABLE_FORMES.includes(nationalDex)) {
-    // Ensures full family is shown even when formes like Ash Greninja are selected
+    // Ensures full family is shown even when forms like Ash Greninja are selected
     baseMon = getBaseMon(nationalDex, 0)
   }
 
   if (!baseMon) return <div />
 
-  const baseMonFormes = baseMon.getSpeciesMetadata().formes
+  const baseMonFormes = baseMon.getSpeciesMetadata().forms
 
   if (MONS_WITH_NON_EVOLVABLE_FORMES.includes(nationalDex)) {
     const otherFormes = SpeciesAndForm.tryNew(nationalDex, formeNumber)
       ?.getSpeciesMetadata()
-      .formes.filter((forme) => !forme.preEvolution && !forme.isMega)
+      .forms.filter((forme) => !forme.preEvolution && !forme.isMega)
 
     if (otherFormes) {
       baseMonFormes.push(...otherFormes)

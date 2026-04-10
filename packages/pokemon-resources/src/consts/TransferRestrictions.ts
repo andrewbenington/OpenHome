@@ -39,7 +39,7 @@ import {
   UNBOUND,
   WASH,
   WORLD_CAP,
-} from './Formes'
+} from './Forms'
 
 export const GEN1_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Mew,

@@ -2,7 +2,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getSpriteName } from '@openhome-ui/images/pokemon'
 import { MonSpriteData } from '@openhome-ui/state/plugin'
 import { ExtraFormIndex, extraFormSpriteName } from '@pkm-rs/pkg'
-import { LGE_STARTER, SPIKY_EAR } from '../../../packages/pokemon-resources/src/consts/Formes'
+import { LGE_STARTER, SPIKY_EAR } from '../../../packages/pokemon-resources/src/consts/Forms'
 import { NationalDex } from '../../../packages/pokemon-resources/src/consts/NationalDex'
 import useMonSprite from './useMonSprite'
 

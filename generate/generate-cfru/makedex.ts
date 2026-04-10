@@ -25,7 +25,7 @@ const buildSpeciesDictionary = () => {
   >()
 
   Object.values(PokemonData).forEach((pokemon) => {
-    pokemon.formes.forEach((forme) => {
+    pokemon.forms.forEach((forme) => {
       const normalizedFormeName = normalizeName(forme.name)
 
       if (!speciesMap.has(normalizedFormeName)) {
