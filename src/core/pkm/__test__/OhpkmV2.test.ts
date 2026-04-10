@@ -1,6 +1,6 @@
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import { ConvertStrategies, ConvertStrategy, ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
-import { PA8, PK3, PK4, PK7, PK8 } from '@pokemon-files/pkm'
+import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@pokemon-files/pkm'
 import { HyperTrainStats, Stats } from '@pokemon-files/util'
 import { getFormatLocationString } from '@pokemon-resources/locations'
 import fs from 'fs'
@@ -178,6 +178,54 @@ function sanitizeWasmHyperTraining(fromWasm: HyperTrainStats): HyperTrainStats {
     spe: fromWasm.spe,
   }
 }
+
+describe('move filter', () => {
+  const HYDRO_PUMP = 56
+  const RAIN_DANCE = 240
+  const AQUA_TAIL = 401
+  const DRAGON_DANCE = 349
+
+  const FOCUS_ENERGY = 116
+  const CRUNCH = 242
+  const HURRICANE = 542
+
+  test('non-filtered moves have no gaps', () => {
+    const ohpkm = OHPKM.defaultWithSpecies(NationalDex.Gyarados, 0)
+    ohpkm.moves = [AQUA_TAIL, RAIN_DANCE, HYDRO_PUMP, DRAGON_DANCE]
+    ohpkm.movePP = [10, 5, 5, 20]
+    ohpkm.movePPUps = [1, 2, 3, 1]
+
+    const pa8 = PA8.fromOhpkm(ohpkm, ConvertStrategies.getDefault())
+    expect(pa8.moves).toEqual([AQUA_TAIL, HYDRO_PUMP, 0, 0])
+    expect(pa8.movePP).toEqual([10, 5, 0, 0])
+    expect(pa8.movePPUps).toEqual([1, 3, 0, 0])
+  })
+
+  test('if no moves are compatible, use level-up moves', () => {
+    const ohpkm = OHPKM.defaultWithSpecies(NationalDex.Gyarados, 0)
+    ohpkm.exp = 80000 // level 40 (slow level-up group)
+    ohpkm.moves = [RAIN_DANCE, DRAGON_DANCE, 0, 0]
+    ohpkm.movePP = [5, 20, 0, 0]
+    ohpkm.movePPUps = [1, 2, 0, 0]
+
+    const pa8 = PA8.fromOhpkm(ohpkm, ConvertStrategies.getDefault())
+    expect(pa8.moves).toEqual([FOCUS_ENERGY, CRUNCH, AQUA_TAIL, HURRICANE])
+    expect(pa8.movePP).toEqual([20, 10, 10, 5])
+    expect(pa8.movePPUps).toEqual([0, 0, 0, 0])
+  })
+
+  test('no changes made if all moves are compatible', () => {
+    const ohpkm = OHPKM.defaultWithSpecies(NationalDex.Gyarados, 0)
+    ohpkm.moves = [AQUA_TAIL, RAIN_DANCE, HYDRO_PUMP, DRAGON_DANCE]
+    ohpkm.movePP = [10, 5, 5, 20]
+    ohpkm.movePPUps = [1, 2, 3, 1]
+
+    const pk9 = PK9.fromOhpkm(ohpkm, ConvertStrategies.getDefault())
+    expect(pk9.moves).toEqual([AQUA_TAIL, RAIN_DANCE, HYDRO_PUMP, DRAGON_DANCE])
+    expect(pk9.movePP).toEqual([10, 5, 5, 20])
+    expect(pk9.movePPUps).toEqual([1, 2, 3, 1])
+  })
+})
 
 describe('OHPKM conversion strategies', () => {
   test('hyper training conversion strategy', () => {
