@@ -1,6 +1,16 @@
+import { Separator } from '@base-ui/react/separator'
 import useIsDev from '@openhome-ui/hooks/isDev'
-import { Box, Tabs, ThemePanel } from '@radix-ui/themes'
+import { Box, Flex, ThemePanel } from '@radix-ui/themes'
+import {
+  RiFileMarkedFill,
+  RiFileMarkedLine,
+  RiHome2Fill,
+  RiHome2Line,
+  RiLayoutGrid2Fill,
+  RiLayoutGrid2Line,
+} from 'react-icons/ri'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
+import { Tabs } from './components/Tabs'
 import AppStateDisplay from './pages/AppStateDisplay'
 import ComponentDebugDisplay from './pages/ComponentDebugDisplay'
 import Home from './pages/home/Home'
@@ -23,53 +33,67 @@ export default function AppTabs() {
       value={tab}
       style={{
         height: '100vh',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
       }}
+      orientation="vertical"
       onValueChange={(tab) => navigate(tab)}
     >
-      <Box height="0" flexGrow="1">
-        <Routes>
-          <Route index path="/" element={homeElement} />
-          <Route path="/home" element={homeElement} />
-          <Route path="/manage/*" element={<TrackedPokemonPage />} />
-          <Route path="/sort" element={<SortPokemon />} />
-          <Route path="/pokedex" element={<PokedexDisplay />} />
-          <Route path="/plugins/*" element={<PluginsPage />} />
-          <Route path="/settings/*" element={<Settings />} />
+      <Flex style={{ height: '100vh ' }}>
+        <Tabs.IconList className="tab-sidebar">
+          <Tabs.Tab value="home">
+            <RiHome2Fill className="active-tab" />
+            <RiHome2Line className="inactive-tab" />
+            Home
+          </Tabs.Tab>
+          <Tabs.Tab value="manage">
+            <RiFileMarkedFill className="active-tab" />
+            <RiFileMarkedLine className="inactive-tab" />
+            Tracked
+          </Tabs.Tab>
+          <Tabs.Tab value="sort">
+            <RiLayoutGrid2Fill className="active-tab" />
+            <RiLayoutGrid2Line className="inactive-tab" />
+            List
+          </Tabs.Tab>
+          <Tabs.Tab value="pokedex">Pokédex</Tabs.Tab>
+          <Tabs.Tab value="plugins">Plugins</Tabs.Tab>
+          <Tabs.Tab value="settings">Settings</Tabs.Tab>
           {isDev && (
             <>
-              <Route path="/state" element={<AppStateDisplay />} />
-              <Route path="/component-debug" element={<ComponentDebugDisplay />} />
+              <Tabs.Tab value="state">App State</Tabs.Tab>
+              <Tabs.Tab value="component-debug">Component Debug</Tabs.Tab>
             </>
           )}
-        </Routes>
-        {isDev && (
-          <>
-            <Tabs.Content value="state">
-              <AppStateDisplay />
-            </Tabs.Content>
-            <Tabs.Content value="theme">
-              <ThemePanel />
-            </Tabs.Content>
-          </>
-        )}
-      </Box>
-      <Tabs.List className="tab-sidebar">
-        <Tabs.Trigger value="home">Home</Tabs.Trigger>
-        <Tabs.Trigger value="manage">Tracked Pokémon</Tabs.Trigger>
-        <Tabs.Trigger value="sort">Sort Pokémon</Tabs.Trigger>
-        <Tabs.Trigger value="pokedex">Pokédex</Tabs.Trigger>
-        <Tabs.Trigger value="plugins">Plugins</Tabs.Trigger>
-        <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
-        {isDev && (
-          <>
-            <Tabs.Trigger value="state">App State</Tabs.Trigger>
-            <Tabs.Trigger value="component-debug">Component Debug</Tabs.Trigger>
-          </>
-        )}
-      </Tabs.List>
+          <Tabs.Indicator />
+        </Tabs.IconList>
+        <Separator className="Separator" orientation="vertical" />
+        <Box>
+          <Routes>
+            <Route index path="/" element={homeElement} />
+            <Route path="/home" element={homeElement} />
+            <Route path="/manage/*" element={<TrackedPokemonPage />} />
+            <Route path="/sort" element={<SortPokemon />} />
+            <Route path="/pokedex" element={<PokedexDisplay />} />
+            <Route path="/plugins/*" element={<PluginsPage />} />
+            <Route path="/settings/*" element={<Settings />} />
+            {isDev && (
+              <>
+                <Route path="/state" element={<AppStateDisplay />} />
+                <Route path="/component-debug" element={<ComponentDebugDisplay />} />
+              </>
+            )}
+          </Routes>
+          {isDev && (
+            <>
+              <Tabs.Panel value="state">
+                <AppStateDisplay />
+              </Tabs.Panel>
+              <Tabs.Panel value="theme">
+                <ThemePanel />
+              </Tabs.Panel>
+            </>
+          )}
+        </Box>
+      </Flex>
     </Tabs.Root>
   )
 }
