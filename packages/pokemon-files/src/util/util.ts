@@ -14,6 +14,7 @@ import {
   PkmFormat,
   PkmFormats,
 } from '@pkm-rs/pkg'
+import { filterUndefined } from 'src/core/util/sort'
 import { PKMInterface } from '../../../../src/core/pkm/interfaces'
 import { AllPKMFields, FourMoves } from './pkmInterface'
 
@@ -240,13 +241,11 @@ export class MoveFilter<P extends PKMInterface> {
   }
 
   private filterByMoves(mon: AllPKMFields, toFilter: FourMoves): FourMoves {
-    const filtered: FourMoves = [0, 0, 0, 0]
-    for (let i = 0; i < 4; i++) {
-      if (this.moveIsAllowed(mon.moves[i])) {
-        filtered[i] = toFilter[i]
-      }
-    }
-    return filtered
+    const filtered = mon.moves
+      .map((move, i) => (this.moveIsAllowed(move) ? toFilter[i] : undefined))
+      .filter(filterUndefined)
+
+    return [filtered[0] ?? 0, filtered[1] ?? 0, filtered[2] ?? 0, filtered[3] ?? 0]
   }
 
   private hasAtLeastOneAllowedMove(mon: AllPKMFields) {
@@ -262,9 +261,15 @@ export class MoveFilter<P extends PKMInterface> {
       )
       if (levelUpLearnset) {
         const fromLevelup: FourMoves = [0, 0, 0, 0]
-        levelUpLearnset.slice(-4).forEach((move, i) => {
-          fromLevelup[i] = move.move_id
-        })
+        levelUpLearnset
+          .filter(
+            (move) =>
+              move.is_evolution || (move.level !== undefined && move.level <= mon.getLevel())
+          )
+          .slice(-4)
+          .forEach((move, i) => {
+            fromLevelup[i] = move.move_id
+          })
         return fromLevelup
       }
     }
