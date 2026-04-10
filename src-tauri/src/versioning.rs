@@ -154,6 +154,7 @@ pub enum SignificantUpdate {
     V1_10_0,
     V1_10_1,
     V1_10_2,
+    V1_10_3,
 }
 
 impl SignificantUpdate {
@@ -172,6 +173,7 @@ impl SignificantUpdate {
             Self::V1_10_0 => Version::parse("1.10.0").unwrap(),
             Self::V1_10_1 => Version::parse("1.10.1").unwrap(),
             Self::V1_10_2 => Version::parse("1.10.2").unwrap(),
+            Self::V1_10_3 => Version::parse("1.10.3").unwrap(),
         }
     }
 
@@ -224,6 +226,9 @@ impl SignificantUpdate {
                 "If a Pokémon is moved into a game where none of its known moves are present, it will instead be assigned the four most recent moves from its level-up learnset.",
                 "A bug caused by moving a Pokémon into Legends Arceus when it has no compatible moves has been fixed.",
                 "A bug causing certain Pokémon to keep their pre-evolution's species name has been fixed (English names only). This will be fixed for other languages soon.",
+            ]),
+            Self::V1_10_3 => Some(vec![
+                "An issue with move filtering, which caused issues with some Pokémon transferred to Legends Arceus, has been fixed.",
             ]),
             _ => None,
         }
