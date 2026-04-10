@@ -9,7 +9,7 @@ pub use types::*;
 use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = MetadataSummaryLookup))]
-pub fn metadata_lookup(national_dex: u16, form_index: u16) -> Option<FormeMetadata> {
+pub fn metadata_lookup(national_dex: u16, form_index: u16) -> Option<FormMetadata> {
     ALL_SPECIES
         .get(national_dex as usize - 1)
         .and_then(|s| s.forms.get(form_index as usize))

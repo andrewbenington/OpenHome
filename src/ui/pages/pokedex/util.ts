@@ -41,38 +41,38 @@ export function getPokedexSummary(species: SpeciesMetadata, form: FormeMetadata)
   const types = form.type2 ? `${form.type1}- and ${form.type2}-type` : `${form.type1}-type`
   const name = form.formIndex === 0 ? species.name : form.formeName
   const formeType =
-    form.formIndex === 0 ? getBaseFormeDescriptor(species) : form.isMega ? 'Mega Evolution' : 'form'
+    form.formIndex === 0 ? getBaseFormDescriptor(species) : form.isMega ? 'Mega Evolution' : 'form'
   let text = `${name} is a ${types} ${formeType} introduced in Generation ${form.introducedGen}.`
 
   if (form.formeName === 'Basculin-White-Striped') {
-    text += ` It is sometimes considered a regional forme from the ${form.regional} region.`
+    text += ` It is sometimes considered a regional form from the ${form.regional} region.`
   } else if (form.regional) {
-    text += ` It is a regional forme from the ${form.regional} region.`
+    text += ` It is a regional form from the ${form.regional} region.`
   }
 
   if (form.isBattleOnly) {
-    text += ` This forme can only be seen in battle.`
+    text += ` This form can only be seen in battle.`
   }
 
   return text
 }
 
-function getBaseFormeDescriptor(species: SpeciesMetadata) {
-  const baseForme = species.forms[0]
+function getBaseFormDescriptor(species: SpeciesMetadata) {
+  const baseForm = species.forms[0]
 
-  if (baseForme.isMythical) {
+  if (baseForm.isMythical) {
     return 'Mythical Pokémon'
   }
-  if (baseForme.isRestrictedLegend) {
+  if (baseForm.isRestrictedLegend) {
     return 'restricted Legendary Pokémon'
   }
-  if (baseForme.isUltraBeast) {
+  if (baseForm.isUltraBeast) {
     return 'Ultra Beast'
   }
-  if (baseForme.isSubLegend) {
+  if (baseForm.isSubLegend) {
     return 'Legendary Pokémon'
   }
-  if (baseForme.isParadox) {
+  if (baseForm.isParadox) {
     return 'Paradox Pokémon'
   }
 

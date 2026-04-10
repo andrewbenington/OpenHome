@@ -39,7 +39,7 @@ export function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentif
   const baseMon = getBaseMon(mon.dexNum, mon.formNum)
 
   if (!baseMon) {
-    throw Error(`Invalid dex/forme: ${mon.dexNum} / ${mon.formNum}`)
+    throw Error(`Invalid dex/form: ${mon.dexNum} / ${mon.formNum}`)
   }
 
   return `${baseMon.nationalDex.toString().padStart(4, '0')}-${bytesToString(

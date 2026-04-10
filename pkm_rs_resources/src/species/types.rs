@@ -335,7 +335,7 @@ pub enum EggGroup {
 }
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone)]
-pub struct FormeMetadata {
+pub struct FormMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub species_name: &'static str,
 
@@ -418,7 +418,7 @@ pub struct FormeMetadata {
     pub sprite_index: (u8, u8),
 }
 
-impl FormeMetadata {
+impl FormMetadata {
     pub const fn forme_ref(&self) -> SpeciesAndForm {
         unsafe { SpeciesAndForm::new_unchecked(self.national_dex.get(), self.form_index) }
     }
@@ -442,18 +442,18 @@ impl FormeMetadata {
         }
     }
 
-    pub fn is_evolution_of(&self, other: &FormeMetadata) -> bool {
+    pub fn is_evolution_of(&self, other: &FormMetadata) -> bool {
         other.evolutions.iter().any(|other_evo| {
             *other_evo == self.forme_ref() || self.is_evolution_of(other_evo.get_forme_metadata())
         })
     }
 
     #[cfg(feature = "wasm")]
-    fn is_mega_forme_of(&self, other: &FormeMetadata) -> bool {
+    fn is_mega_forme_of(&self, other: &FormMetadata) -> bool {
         other
             .mega_evolution_data
             .iter()
-            .any(|mega| mega.mega_forme.form_index == self.form_index)
+            .any(|mega| mega.mega_form.form_index == self.form_index)
     }
 
     #[cfg(feature = "wasm")]
@@ -461,7 +461,7 @@ impl FormeMetadata {
         use crate::species::form_metadata::source_has_form_metadata;
 
         log!(
-            "checking if {} forme {} has data for source {:?}",
+            "checking if {} form {} has data for source {:?}",
             self.species_name,
             self.form_name,
             source
@@ -474,7 +474,7 @@ impl FormeMetadata {
         source: Option<MetadataSource>,
     ) -> (PkmType, Option<PkmType>) {
         types_lookup(self.national_dex.get(), self.form_index, source).expect_log(format!(
-            "no types found for {} forme {}",
+            "no types found for {} form {}",
             self.species_name, self.form_name
         ))
     }
@@ -492,7 +492,7 @@ impl FormeMetadata {
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 #[cfg(feature = "wasm")]
-impl FormeMetadata {
+impl FormMetadata {
     #[wasm_bindgen(js_name = hasDataForSource)]
     pub fn has_data_for_source_js(&self, source: MetadataSource) -> bool {
         self.has_data_for_source(source)
@@ -612,7 +612,7 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(js_name = isEvolutionOf)]
-    pub fn is_evolution_of_js(&self, other: &FormeMetadata) -> bool {
+    pub fn is_evolution_of_js(&self, other: &FormMetadata) -> bool {
         self.is_evolution_of(other)
     }
 
@@ -639,8 +639,8 @@ impl FormeMetadata {
         }
     }
 
-    #[wasm_bindgen(js_name = getMegaBaseForme)]
-    pub fn get_mega_base_forme(&self) -> Option<FormeMetadata> {
+    #[wasm_bindgen(js_name = getMegaBaseForm)]
+    pub fn get_mega_base_forme(&self) -> Option<FormMetadata> {
         if !self.is_mega {
             return None;
         }
@@ -669,7 +669,7 @@ impl FormeMetadata {
 #[derive(Debug, Clone, Copy)]
 pub struct MegaEvolutionMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = megaForme))]
-    pub mega_forme: SpeciesAndForm,
+    pub mega_form: SpeciesAndForm,
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = requiredItemId))]
     pub required_item_id: Option<u16>,
 }
@@ -684,11 +684,11 @@ pub struct SpeciesMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub level_up_type: LevelUpType,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub forms: &'static [FormeMetadata],
+    pub forms: &'static [FormMetadata],
 }
 
 impl SpeciesMetadata {
-    pub const fn get_forme(&self, form_index: usize) -> Option<&'static FormeMetadata> {
+    pub const fn get_forme(&self, form_index: usize) -> Option<&'static FormMetadata> {
         if form_index < self.forms.len() {
             Some(&self.forms[form_index])
         } else {
@@ -706,7 +706,7 @@ impl SpeciesMetadata {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    pub fn forms(&self) -> Vec<FormeMetadata> {
+    pub fn forms(&self) -> Vec<FormMetadata> {
         Vec::from(self.forms)
     }
 
@@ -824,7 +824,7 @@ impl SpeciesAndForm {
         self.national_dex.get_species_metadata()
     }
 
-    pub const fn get_forme_metadata(&self) -> &'static FormeMetadata {
+    pub const fn get_forme_metadata(&self) -> &'static FormMetadata {
         &self.get_species_metadata().forms[self.form_index as usize]
     }
 }
@@ -854,7 +854,7 @@ impl SpeciesAndForm {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = getMetadata))]
-    pub fn get_forme_metadata_js(&self) -> FormeMetadata {
+    pub fn get_forme_metadata_js(&self) -> FormMetadata {
         self.get_forme_metadata().clone()
     }
 

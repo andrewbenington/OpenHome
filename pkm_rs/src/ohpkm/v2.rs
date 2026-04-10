@@ -3468,7 +3468,7 @@ impl HasSpeciesAndForm for OhpkmV2 {
         self.main_data.species_and_form.get_species_metadata()
     }
 
-    fn get_forme_metadata(&self) -> &'static pkm_rs_resources::species::FormeMetadata {
+    fn get_forme_metadata(&self) -> &'static pkm_rs_resources::species::FormMetadata {
         self.main_data.species_and_form.get_forme_metadata()
     }
 

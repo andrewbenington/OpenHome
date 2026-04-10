@@ -1,6 +1,6 @@
 use crate::abilities::AbilityIndexBounded;
 use crate::species::{
-    EggGroup, FormeMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, NatDexIndex,
+    EggGroup, FormMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, NatDexIndex,
     SpeciesAndForm, SpeciesMetadata,
 };
 use pkm_rs_types::{GameSetting, Generation};
@@ -20,7 +20,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bulbasaur",
         national_dex: unsafe { NatDexIndex::new_unchecked(1) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bulbasaur",
             national_dex: unsafe { NatDexIndex::new_unchecked(1) },
             form_name: "Bulbasaur",
@@ -56,7 +56,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ivysaur",
         national_dex: unsafe { NatDexIndex::new_unchecked(2) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ivysaur",
             national_dex: unsafe { NatDexIndex::new_unchecked(2) },
             form_name: "Ivysaur",
@@ -93,7 +93,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(3) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Venusaur",
                 national_dex: unsafe { NatDexIndex::new_unchecked(3) },
                 form_name: "Venusaur",
@@ -101,7 +101,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(3, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(3, 1) },
                     required_item_id: Some(659),
                 }],
                 is_gmax: false,
@@ -127,7 +127,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "venusaur",
                 sprite_index: (3, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Venusaur-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(3) },
                 form_name: "Mega Venusaur",
@@ -164,7 +164,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Charmander",
         national_dex: unsafe { NatDexIndex::new_unchecked(4) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Charmander",
             national_dex: unsafe { NatDexIndex::new_unchecked(4) },
             form_name: "Charmander",
@@ -200,7 +200,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Charmeleon",
         national_dex: unsafe { NatDexIndex::new_unchecked(5) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Charmeleon",
             national_dex: unsafe { NatDexIndex::new_unchecked(5) },
             form_name: "Charmeleon",
@@ -237,7 +237,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(6) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Charizard",
                 national_dex: unsafe { NatDexIndex::new_unchecked(6) },
                 form_name: "Charizard",
@@ -246,11 +246,11 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_mega: false,
                 mega_evolution_data: &[
                     MegaEvolutionMetadata {
-                        mega_forme: unsafe { SpeciesAndForm::new_unchecked(6, 1) },
+                        mega_form: unsafe { SpeciesAndForm::new_unchecked(6, 1) },
                         required_item_id: Some(660),
                     },
                     MegaEvolutionMetadata {
-                        mega_forme: unsafe { SpeciesAndForm::new_unchecked(6, 2) },
+                        mega_form: unsafe { SpeciesAndForm::new_unchecked(6, 2) },
                         required_item_id: Some(678),
                     },
                 ],
@@ -277,7 +277,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "charizard",
                 sprite_index: (7, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Charizard-Mega-X",
                 national_dex: unsafe { NatDexIndex::new_unchecked(6) },
                 form_name: "Mega Charizard X",
@@ -308,7 +308,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "charizard-mega-x",
                 sprite_index: (8, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Charizard-Mega-Y",
                 national_dex: unsafe { NatDexIndex::new_unchecked(6) },
                 form_name: "Mega Charizard Y",
@@ -345,7 +345,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Squirtle",
         national_dex: unsafe { NatDexIndex::new_unchecked(7) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Squirtle",
             national_dex: unsafe { NatDexIndex::new_unchecked(7) },
             form_name: "Squirtle",
@@ -381,7 +381,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wartortle",
         national_dex: unsafe { NatDexIndex::new_unchecked(8) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wartortle",
             national_dex: unsafe { NatDexIndex::new_unchecked(8) },
             form_name: "Wartortle",
@@ -418,7 +418,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(9) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Blastoise",
                 national_dex: unsafe { NatDexIndex::new_unchecked(9) },
                 form_name: "Blastoise",
@@ -426,7 +426,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(9, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(9, 1) },
                     required_item_id: Some(661),
                 }],
                 is_gmax: false,
@@ -452,7 +452,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "blastoise",
                 sprite_index: (12, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Blastoise-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(9) },
                 form_name: "Mega Blastoise",
@@ -489,7 +489,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Caterpie",
         national_dex: unsafe { NatDexIndex::new_unchecked(10) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Caterpie",
             national_dex: unsafe { NatDexIndex::new_unchecked(10) },
             form_name: "Caterpie",
@@ -525,7 +525,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Metapod",
         national_dex: unsafe { NatDexIndex::new_unchecked(11) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Metapod",
             national_dex: unsafe { NatDexIndex::new_unchecked(11) },
             form_name: "Metapod",
@@ -561,7 +561,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Butterfree",
         national_dex: unsafe { NatDexIndex::new_unchecked(12) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Butterfree",
             national_dex: unsafe { NatDexIndex::new_unchecked(12) },
             form_name: "Butterfree",
@@ -597,7 +597,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Weedle",
         national_dex: unsafe { NatDexIndex::new_unchecked(13) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Weedle",
             national_dex: unsafe { NatDexIndex::new_unchecked(13) },
             form_name: "Weedle",
@@ -633,7 +633,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kakuna",
         national_dex: unsafe { NatDexIndex::new_unchecked(14) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kakuna",
             national_dex: unsafe { NatDexIndex::new_unchecked(14) },
             form_name: "Kakuna",
@@ -670,7 +670,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(15) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Beedrill",
                 national_dex: unsafe { NatDexIndex::new_unchecked(15) },
                 form_name: "Beedrill",
@@ -678,7 +678,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(15, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(15, 1) },
                     required_item_id: Some(770),
                 }],
                 is_gmax: false,
@@ -704,7 +704,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "beedrill",
                 sprite_index: (19, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Beedrill-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(15) },
                 form_name: "Mega Beedrill",
@@ -741,7 +741,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pidgey",
         national_dex: unsafe { NatDexIndex::new_unchecked(16) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pidgey",
             national_dex: unsafe { NatDexIndex::new_unchecked(16) },
             form_name: "Pidgey",
@@ -777,7 +777,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pidgeotto",
         national_dex: unsafe { NatDexIndex::new_unchecked(17) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pidgeotto",
             national_dex: unsafe { NatDexIndex::new_unchecked(17) },
             form_name: "Pidgeotto",
@@ -814,7 +814,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(18) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pidgeot",
                 national_dex: unsafe { NatDexIndex::new_unchecked(18) },
                 form_name: "Pidgeot",
@@ -822,7 +822,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(18, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(18, 1) },
                     required_item_id: Some(762),
                 }],
                 is_gmax: false,
@@ -848,7 +848,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pidgeot",
                 sprite_index: (23, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pidgeot-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(18) },
                 form_name: "Mega Pidgeot",
@@ -886,7 +886,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(19) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rattata",
                 national_dex: unsafe { NatDexIndex::new_unchecked(19) },
                 form_name: "Rattata",
@@ -917,7 +917,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "rattata",
                 sprite_index: (25, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rattata-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(19) },
                 form_name: "Alolan Rattata",
@@ -955,7 +955,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(20) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Raticate",
                 national_dex: unsafe { NatDexIndex::new_unchecked(20) },
                 form_name: "Raticate",
@@ -986,7 +986,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "raticate",
                 sprite_index: (27, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Raticate-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(20) },
                 form_name: "Alolan Raticate",
@@ -1017,7 +1017,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "raticate-alola",
                 sprite_index: (28, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Raticate-Alola-Totem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(20) },
                 form_name: "Alolan Raticate (Totem)",
@@ -1054,7 +1054,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Spearow",
         national_dex: unsafe { NatDexIndex::new_unchecked(21) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Spearow",
             national_dex: unsafe { NatDexIndex::new_unchecked(21) },
             form_name: "Spearow",
@@ -1090,7 +1090,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Fearow",
         national_dex: unsafe { NatDexIndex::new_unchecked(22) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Fearow",
             national_dex: unsafe { NatDexIndex::new_unchecked(22) },
             form_name: "Fearow",
@@ -1126,7 +1126,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ekans",
         national_dex: unsafe { NatDexIndex::new_unchecked(23) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ekans",
             national_dex: unsafe { NatDexIndex::new_unchecked(23) },
             form_name: "Ekans",
@@ -1162,7 +1162,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Arbok",
         national_dex: unsafe { NatDexIndex::new_unchecked(24) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Arbok",
             national_dex: unsafe { NatDexIndex::new_unchecked(24) },
             form_name: "Arbok",
@@ -1199,7 +1199,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(25) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pikachu",
                 national_dex: unsafe { NatDexIndex::new_unchecked(25) },
                 form_name: "Pikachu",
@@ -1232,7 +1232,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pikachu",
                 sprite_index: (33, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pikachu-Original",
                 national_dex: unsafe { NatDexIndex::new_unchecked(25) },
                 form_name: "Pikachu (Original)",
@@ -1263,7 +1263,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pikachu-original-cap",
                 sprite_index: (34, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pikachu-Hoenn",
                 national_dex: unsafe { NatDexIndex::new_unchecked(25) },
                 form_name: "Pikachu (Hoenn)",
@@ -1294,7 +1294,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pikachu-hoenn-cap",
                 sprite_index: (35, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pikachu-Sinnoh",
                 national_dex: unsafe { NatDexIndex::new_unchecked(25) },
                 form_name: "Pikachu (Sinnoh)",
@@ -1325,7 +1325,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pikachu-sinnoh-cap",
                 sprite_index: (0, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pikachu-Unova",
                 national_dex: unsafe { NatDexIndex::new_unchecked(25) },
                 form_name: "Pikachu (Unova)",
@@ -1356,7 +1356,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pikachu-unova-cap",
                 sprite_index: (1, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pikachu-Kalos",
                 national_dex: unsafe { NatDexIndex::new_unchecked(25) },
                 form_name: "Pikachu (Kalos)",
@@ -1387,7 +1387,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pikachu-kalos-cap",
                 sprite_index: (2, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pikachu-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(25) },
                 form_name: "Pikachu (Alola)",
@@ -1418,7 +1418,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pikachu-alola-cap",
                 sprite_index: (3, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pikachu-Partner",
                 national_dex: unsafe { NatDexIndex::new_unchecked(25) },
                 form_name: "Pikachu (Partner)",
@@ -1449,7 +1449,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pikachu-partner-cap",
                 sprite_index: (4, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pikachu-Starter",
                 national_dex: unsafe { NatDexIndex::new_unchecked(25) },
                 form_name: "Pikachu (Starter)",
@@ -1480,7 +1480,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pikachu",
                 sprite_index: (4, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pikachu-World",
                 national_dex: unsafe { NatDexIndex::new_unchecked(25) },
                 form_name: "Pikachu (World)",
@@ -1518,7 +1518,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(26) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Raichu",
                 national_dex: unsafe { NatDexIndex::new_unchecked(26) },
                 form_name: "Raichu",
@@ -1527,11 +1527,11 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_mega: false,
                 mega_evolution_data: &[
                     MegaEvolutionMetadata {
-                        mega_forme: unsafe { SpeciesAndForm::new_unchecked(26, 2) },
+                        mega_form: unsafe { SpeciesAndForm::new_unchecked(26, 2) },
                         required_item_id: Some(2635),
                     },
                     MegaEvolutionMetadata {
-                        mega_forme: unsafe { SpeciesAndForm::new_unchecked(26, 3) },
+                        mega_form: unsafe { SpeciesAndForm::new_unchecked(26, 3) },
                         required_item_id: Some(2636),
                     },
                 ],
@@ -1558,7 +1558,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "raichu",
                 sprite_index: (6, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Raichu-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(26) },
                 form_name: "Alolan Raichu",
@@ -1589,7 +1589,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "raichu-alola",
                 sprite_index: (7, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Raichu-Mega-X",
                 national_dex: unsafe { NatDexIndex::new_unchecked(26) },
                 form_name: "Mega Raichu X",
@@ -1620,7 +1620,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "raichu-mega-x",
                 sprite_index: (0, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Raichu-Mega-Y",
                 national_dex: unsafe { NatDexIndex::new_unchecked(26) },
                 form_name: "Mega Raichu Y",
@@ -1658,7 +1658,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(27) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sandshrew",
                 national_dex: unsafe { NatDexIndex::new_unchecked(27) },
                 form_name: "Sandshrew",
@@ -1689,7 +1689,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "sandshrew",
                 sprite_index: (8, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sandshrew-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(27) },
                 form_name: "Alolan Sandshrew",
@@ -1727,7 +1727,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(28) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sandslash",
                 national_dex: unsafe { NatDexIndex::new_unchecked(28) },
                 form_name: "Sandslash",
@@ -1758,7 +1758,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "sandslash",
                 sprite_index: (10, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sandslash-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(28) },
                 form_name: "Alolan Sandslash",
@@ -1795,7 +1795,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Nidoran♀",
         national_dex: unsafe { NatDexIndex::new_unchecked(29) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Nidoran♀",
             national_dex: unsafe { NatDexIndex::new_unchecked(29) },
             form_name: "Nidoran♀",
@@ -1831,7 +1831,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Nidorina",
         national_dex: unsafe { NatDexIndex::new_unchecked(30) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Nidorina",
             national_dex: unsafe { NatDexIndex::new_unchecked(30) },
             form_name: "Nidorina",
@@ -1867,7 +1867,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Nidoqueen",
         national_dex: unsafe { NatDexIndex::new_unchecked(31) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Nidoqueen",
             national_dex: unsafe { NatDexIndex::new_unchecked(31) },
             form_name: "Nidoqueen",
@@ -1903,7 +1903,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Nidoran♂",
         national_dex: unsafe { NatDexIndex::new_unchecked(32) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Nidoran♂",
             national_dex: unsafe { NatDexIndex::new_unchecked(32) },
             form_name: "Nidoran♂",
@@ -1939,7 +1939,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Nidorino",
         national_dex: unsafe { NatDexIndex::new_unchecked(33) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Nidorino",
             national_dex: unsafe { NatDexIndex::new_unchecked(33) },
             form_name: "Nidorino",
@@ -1975,7 +1975,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Nidoking",
         national_dex: unsafe { NatDexIndex::new_unchecked(34) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Nidoking",
             national_dex: unsafe { NatDexIndex::new_unchecked(34) },
             form_name: "Nidoking",
@@ -2011,7 +2011,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Clefairy",
         national_dex: unsafe { NatDexIndex::new_unchecked(35) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Clefairy",
             national_dex: unsafe { NatDexIndex::new_unchecked(35) },
             form_name: "Clefairy",
@@ -2048,7 +2048,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(36) },
         level_up_type: LevelUpType::Fast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Clefable",
                 national_dex: unsafe { NatDexIndex::new_unchecked(36) },
                 form_name: "Clefable",
@@ -2056,7 +2056,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(36, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(36, 1) },
                     required_item_id: Some(2559),
                 }],
                 is_gmax: false,
@@ -2082,7 +2082,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "clefable",
                 sprite_index: (19, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Clefable-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(36) },
                 form_name: "Mega Clefable",
@@ -2120,7 +2120,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(37) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vulpix",
                 national_dex: unsafe { NatDexIndex::new_unchecked(37) },
                 form_name: "Vulpix",
@@ -2151,7 +2151,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vulpix",
                 sprite_index: (20, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vulpix-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(37) },
                 form_name: "Alolan Vulpix",
@@ -2189,7 +2189,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(38) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ninetales",
                 national_dex: unsafe { NatDexIndex::new_unchecked(38) },
                 form_name: "Ninetales",
@@ -2220,7 +2220,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "ninetales",
                 sprite_index: (22, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ninetales-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(38) },
                 form_name: "Alolan Ninetales",
@@ -2257,7 +2257,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Jigglypuff",
         national_dex: unsafe { NatDexIndex::new_unchecked(39) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Jigglypuff",
             national_dex: unsafe { NatDexIndex::new_unchecked(39) },
             form_name: "Jigglypuff",
@@ -2293,7 +2293,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wigglytuff",
         national_dex: unsafe { NatDexIndex::new_unchecked(40) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wigglytuff",
             national_dex: unsafe { NatDexIndex::new_unchecked(40) },
             form_name: "Wigglytuff",
@@ -2329,7 +2329,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Zubat",
         national_dex: unsafe { NatDexIndex::new_unchecked(41) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Zubat",
             national_dex: unsafe { NatDexIndex::new_unchecked(41) },
             form_name: "Zubat",
@@ -2365,7 +2365,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Golbat",
         national_dex: unsafe { NatDexIndex::new_unchecked(42) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Golbat",
             national_dex: unsafe { NatDexIndex::new_unchecked(42) },
             form_name: "Golbat",
@@ -2401,7 +2401,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Oddish",
         national_dex: unsafe { NatDexIndex::new_unchecked(43) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Oddish",
             national_dex: unsafe { NatDexIndex::new_unchecked(43) },
             form_name: "Oddish",
@@ -2437,7 +2437,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gloom",
         national_dex: unsafe { NatDexIndex::new_unchecked(44) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gloom",
             national_dex: unsafe { NatDexIndex::new_unchecked(44) },
             form_name: "Gloom",
@@ -2475,7 +2475,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Vileplume",
         national_dex: unsafe { NatDexIndex::new_unchecked(45) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Vileplume",
             national_dex: unsafe { NatDexIndex::new_unchecked(45) },
             form_name: "Vileplume",
@@ -2511,7 +2511,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Paras",
         national_dex: unsafe { NatDexIndex::new_unchecked(46) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Paras",
             national_dex: unsafe { NatDexIndex::new_unchecked(46) },
             form_name: "Paras",
@@ -2547,7 +2547,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Parasect",
         national_dex: unsafe { NatDexIndex::new_unchecked(47) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Parasect",
             national_dex: unsafe { NatDexIndex::new_unchecked(47) },
             form_name: "Parasect",
@@ -2583,7 +2583,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Venonat",
         national_dex: unsafe { NatDexIndex::new_unchecked(48) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Venonat",
             national_dex: unsafe { NatDexIndex::new_unchecked(48) },
             form_name: "Venonat",
@@ -2619,7 +2619,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Venomoth",
         national_dex: unsafe { NatDexIndex::new_unchecked(49) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Venomoth",
             national_dex: unsafe { NatDexIndex::new_unchecked(49) },
             form_name: "Venomoth",
@@ -2656,7 +2656,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(50) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Diglett",
                 national_dex: unsafe { NatDexIndex::new_unchecked(50) },
                 form_name: "Diglett",
@@ -2687,7 +2687,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "diglett",
                 sprite_index: (35, 1),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Diglett-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(50) },
                 form_name: "Alolan Diglett",
@@ -2725,7 +2725,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(51) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Dugtrio",
                 national_dex: unsafe { NatDexIndex::new_unchecked(51) },
                 form_name: "Dugtrio",
@@ -2756,7 +2756,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "dugtrio",
                 sprite_index: (1, 2),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Dugtrio-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(51) },
                 form_name: "Alolan Dugtrio",
@@ -2794,7 +2794,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(52) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Meowth",
                 national_dex: unsafe { NatDexIndex::new_unchecked(52) },
                 form_name: "Meowth",
@@ -2825,7 +2825,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "meowth",
                 sprite_index: (3, 2),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Meowth-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(52) },
                 form_name: "Alolan Meowth",
@@ -2856,7 +2856,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "meowth-alola",
                 sprite_index: (4, 2),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Meowth-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(52) },
                 form_name: "Galarian Meowth",
@@ -2894,7 +2894,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(53) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Persian",
                 national_dex: unsafe { NatDexIndex::new_unchecked(53) },
                 form_name: "Persian",
@@ -2925,7 +2925,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "persian",
                 sprite_index: (6, 2),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Persian-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(53) },
                 form_name: "Alolan Persian",
@@ -2962,7 +2962,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Psyduck",
         national_dex: unsafe { NatDexIndex::new_unchecked(54) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Psyduck",
             national_dex: unsafe { NatDexIndex::new_unchecked(54) },
             form_name: "Psyduck",
@@ -2998,7 +2998,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Golduck",
         national_dex: unsafe { NatDexIndex::new_unchecked(55) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Golduck",
             national_dex: unsafe { NatDexIndex::new_unchecked(55) },
             form_name: "Golduck",
@@ -3034,7 +3034,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mankey",
         national_dex: unsafe { NatDexIndex::new_unchecked(56) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mankey",
             national_dex: unsafe { NatDexIndex::new_unchecked(56) },
             form_name: "Mankey",
@@ -3070,7 +3070,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Primeape",
         national_dex: unsafe { NatDexIndex::new_unchecked(57) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Primeape",
             national_dex: unsafe { NatDexIndex::new_unchecked(57) },
             form_name: "Primeape",
@@ -3107,7 +3107,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(58) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Growlithe",
                 national_dex: unsafe { NatDexIndex::new_unchecked(58) },
                 form_name: "Growlithe",
@@ -3138,7 +3138,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "growlithe",
                 sprite_index: (12, 2),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Growlithe-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(58) },
                 form_name: "Hisuian Growlithe",
@@ -3176,7 +3176,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(59) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arcanine",
                 national_dex: unsafe { NatDexIndex::new_unchecked(59) },
                 form_name: "Arcanine",
@@ -3207,7 +3207,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arcanine",
                 sprite_index: (14, 2),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arcanine-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(59) },
                 form_name: "Hisuian Arcanine",
@@ -3244,7 +3244,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Poliwag",
         national_dex: unsafe { NatDexIndex::new_unchecked(60) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Poliwag",
             national_dex: unsafe { NatDexIndex::new_unchecked(60) },
             form_name: "Poliwag",
@@ -3280,7 +3280,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Poliwhirl",
         national_dex: unsafe { NatDexIndex::new_unchecked(61) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Poliwhirl",
             national_dex: unsafe { NatDexIndex::new_unchecked(61) },
             form_name: "Poliwhirl",
@@ -3318,7 +3318,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Poliwrath",
         national_dex: unsafe { NatDexIndex::new_unchecked(62) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Poliwrath",
             national_dex: unsafe { NatDexIndex::new_unchecked(62) },
             form_name: "Poliwrath",
@@ -3354,7 +3354,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Abra",
         national_dex: unsafe { NatDexIndex::new_unchecked(63) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Abra",
             national_dex: unsafe { NatDexIndex::new_unchecked(63) },
             form_name: "Abra",
@@ -3390,7 +3390,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kadabra",
         national_dex: unsafe { NatDexIndex::new_unchecked(64) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kadabra",
             national_dex: unsafe { NatDexIndex::new_unchecked(64) },
             form_name: "Kadabra",
@@ -3427,7 +3427,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(65) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Alakazam",
                 national_dex: unsafe { NatDexIndex::new_unchecked(65) },
                 form_name: "Alakazam",
@@ -3435,7 +3435,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(65, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(65, 1) },
                     required_item_id: Some(679),
                 }],
                 is_gmax: false,
@@ -3461,7 +3461,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "alakazam",
                 sprite_index: (21, 2),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Alakazam-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(65) },
                 form_name: "Mega Alakazam",
@@ -3498,7 +3498,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Machop",
         national_dex: unsafe { NatDexIndex::new_unchecked(66) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Machop",
             national_dex: unsafe { NatDexIndex::new_unchecked(66) },
             form_name: "Machop",
@@ -3534,7 +3534,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Machoke",
         national_dex: unsafe { NatDexIndex::new_unchecked(67) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Machoke",
             national_dex: unsafe { NatDexIndex::new_unchecked(67) },
             form_name: "Machoke",
@@ -3570,7 +3570,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Machamp",
         national_dex: unsafe { NatDexIndex::new_unchecked(68) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Machamp",
             national_dex: unsafe { NatDexIndex::new_unchecked(68) },
             form_name: "Machamp",
@@ -3606,7 +3606,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bellsprout",
         national_dex: unsafe { NatDexIndex::new_unchecked(69) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bellsprout",
             national_dex: unsafe { NatDexIndex::new_unchecked(69) },
             form_name: "Bellsprout",
@@ -3642,7 +3642,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Weepinbell",
         national_dex: unsafe { NatDexIndex::new_unchecked(70) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Weepinbell",
             national_dex: unsafe { NatDexIndex::new_unchecked(70) },
             form_name: "Weepinbell",
@@ -3679,7 +3679,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(71) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Victreebel",
                 national_dex: unsafe { NatDexIndex::new_unchecked(71) },
                 form_name: "Victreebel",
@@ -3687,7 +3687,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(71, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(71, 1) },
                     required_item_id: Some(2560),
                 }],
                 is_gmax: false,
@@ -3713,7 +3713,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "victreebel",
                 sprite_index: (28, 2),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Victreebel-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(71) },
                 form_name: "Mega Victreebel",
@@ -3750,7 +3750,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tentacool",
         national_dex: unsafe { NatDexIndex::new_unchecked(72) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tentacool",
             national_dex: unsafe { NatDexIndex::new_unchecked(72) },
             form_name: "Tentacool",
@@ -3786,7 +3786,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tentacruel",
         national_dex: unsafe { NatDexIndex::new_unchecked(73) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tentacruel",
             national_dex: unsafe { NatDexIndex::new_unchecked(73) },
             form_name: "Tentacruel",
@@ -3823,7 +3823,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(74) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Geodude",
                 national_dex: unsafe { NatDexIndex::new_unchecked(74) },
                 form_name: "Geodude",
@@ -3854,7 +3854,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "geodude",
                 sprite_index: (31, 2),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Geodude-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(74) },
                 form_name: "Alolan Geodude",
@@ -3892,7 +3892,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(75) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Graveler",
                 national_dex: unsafe { NatDexIndex::new_unchecked(75) },
                 form_name: "Graveler",
@@ -3923,7 +3923,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "graveler",
                 sprite_index: (33, 2),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Graveler-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(75) },
                 form_name: "Alolan Graveler",
@@ -3961,7 +3961,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(76) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Golem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(76) },
                 form_name: "Golem",
@@ -3992,7 +3992,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "golem",
                 sprite_index: (35, 2),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Golem-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(76) },
                 form_name: "Alolan Golem",
@@ -4030,7 +4030,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(77) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ponyta",
                 national_dex: unsafe { NatDexIndex::new_unchecked(77) },
                 form_name: "Ponyta",
@@ -4061,7 +4061,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "ponyta",
                 sprite_index: (1, 3),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ponyta-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(77) },
                 form_name: "Galarian Ponyta",
@@ -4099,7 +4099,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(78) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rapidash",
                 national_dex: unsafe { NatDexIndex::new_unchecked(78) },
                 form_name: "Rapidash",
@@ -4130,7 +4130,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "rapidash",
                 sprite_index: (3, 3),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rapidash-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(78) },
                 form_name: "Galarian Rapidash",
@@ -4168,7 +4168,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(79) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Slowpoke",
                 national_dex: unsafe { NatDexIndex::new_unchecked(79) },
                 form_name: "Slowpoke",
@@ -4201,7 +4201,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "slowpoke",
                 sprite_index: (5, 3),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Slowpoke-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(79) },
                 form_name: "Galarian Slowpoke",
@@ -4241,7 +4241,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(80) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Slowbro",
                 national_dex: unsafe { NatDexIndex::new_unchecked(80) },
                 form_name: "Slowbro",
@@ -4249,7 +4249,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(80, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(80, 1) },
                     required_item_id: Some(760),
                 }],
                 is_gmax: false,
@@ -4275,7 +4275,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "slowbro",
                 sprite_index: (7, 3),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Slowbro-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(80) },
                 form_name: "Mega Slowbro",
@@ -4306,7 +4306,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "slowbro-mega",
                 sprite_index: (8, 3),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Slowbro-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(80) },
                 form_name: "Galarian Slowbro",
@@ -4343,7 +4343,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Magnemite",
         national_dex: unsafe { NatDexIndex::new_unchecked(81) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Magnemite",
             national_dex: unsafe { NatDexIndex::new_unchecked(81) },
             form_name: "Magnemite",
@@ -4379,7 +4379,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Magneton",
         national_dex: unsafe { NatDexIndex::new_unchecked(82) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Magneton",
             national_dex: unsafe { NatDexIndex::new_unchecked(82) },
             form_name: "Magneton",
@@ -4416,7 +4416,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(83) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Farfetch'd",
                 national_dex: unsafe { NatDexIndex::new_unchecked(83) },
                 form_name: "Farfetch'd",
@@ -4447,7 +4447,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "farfetchd",
                 sprite_index: (12, 3),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Farfetch'd-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(83) },
                 form_name: "Galarian Farfetch'd",
@@ -4484,7 +4484,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Doduo",
         national_dex: unsafe { NatDexIndex::new_unchecked(84) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Doduo",
             national_dex: unsafe { NatDexIndex::new_unchecked(84) },
             form_name: "Doduo",
@@ -4520,7 +4520,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dodrio",
         national_dex: unsafe { NatDexIndex::new_unchecked(85) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dodrio",
             national_dex: unsafe { NatDexIndex::new_unchecked(85) },
             form_name: "Dodrio",
@@ -4556,7 +4556,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Seel",
         national_dex: unsafe { NatDexIndex::new_unchecked(86) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Seel",
             national_dex: unsafe { NatDexIndex::new_unchecked(86) },
             form_name: "Seel",
@@ -4592,7 +4592,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dewgong",
         national_dex: unsafe { NatDexIndex::new_unchecked(87) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dewgong",
             national_dex: unsafe { NatDexIndex::new_unchecked(87) },
             form_name: "Dewgong",
@@ -4629,7 +4629,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(88) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Grimer",
                 national_dex: unsafe { NatDexIndex::new_unchecked(88) },
                 form_name: "Grimer",
@@ -4660,7 +4660,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "grimer",
                 sprite_index: (18, 3),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Grimer-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(88) },
                 form_name: "Alolan Grimer",
@@ -4698,7 +4698,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(89) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Muk",
                 national_dex: unsafe { NatDexIndex::new_unchecked(89) },
                 form_name: "Muk",
@@ -4729,7 +4729,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "muk",
                 sprite_index: (20, 3),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Muk-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(89) },
                 form_name: "Alolan Muk",
@@ -4766,7 +4766,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Shellder",
         national_dex: unsafe { NatDexIndex::new_unchecked(90) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Shellder",
             national_dex: unsafe { NatDexIndex::new_unchecked(90) },
             form_name: "Shellder",
@@ -4802,7 +4802,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cloyster",
         national_dex: unsafe { NatDexIndex::new_unchecked(91) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cloyster",
             national_dex: unsafe { NatDexIndex::new_unchecked(91) },
             form_name: "Cloyster",
@@ -4838,7 +4838,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gastly",
         national_dex: unsafe { NatDexIndex::new_unchecked(92) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gastly",
             national_dex: unsafe { NatDexIndex::new_unchecked(92) },
             form_name: "Gastly",
@@ -4874,7 +4874,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Haunter",
         national_dex: unsafe { NatDexIndex::new_unchecked(93) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Haunter",
             national_dex: unsafe { NatDexIndex::new_unchecked(93) },
             form_name: "Haunter",
@@ -4911,7 +4911,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(94) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gengar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(94) },
                 form_name: "Gengar",
@@ -4919,7 +4919,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(94, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(94, 1) },
                     required_item_id: Some(656),
                 }],
                 is_gmax: false,
@@ -4945,7 +4945,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "gengar",
                 sprite_index: (26, 3),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gengar-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(94) },
                 form_name: "Mega Gengar",
@@ -4982,7 +4982,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Onix",
         national_dex: unsafe { NatDexIndex::new_unchecked(95) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Onix",
             national_dex: unsafe { NatDexIndex::new_unchecked(95) },
             form_name: "Onix",
@@ -5018,7 +5018,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Drowzee",
         national_dex: unsafe { NatDexIndex::new_unchecked(96) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Drowzee",
             national_dex: unsafe { NatDexIndex::new_unchecked(96) },
             form_name: "Drowzee",
@@ -5054,7 +5054,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hypno",
         national_dex: unsafe { NatDexIndex::new_unchecked(97) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hypno",
             national_dex: unsafe { NatDexIndex::new_unchecked(97) },
             form_name: "Hypno",
@@ -5090,7 +5090,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Krabby",
         national_dex: unsafe { NatDexIndex::new_unchecked(98) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Krabby",
             national_dex: unsafe { NatDexIndex::new_unchecked(98) },
             form_name: "Krabby",
@@ -5126,7 +5126,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kingler",
         national_dex: unsafe { NatDexIndex::new_unchecked(99) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kingler",
             national_dex: unsafe { NatDexIndex::new_unchecked(99) },
             form_name: "Kingler",
@@ -5163,7 +5163,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(100) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Voltorb",
                 national_dex: unsafe { NatDexIndex::new_unchecked(100) },
                 form_name: "Voltorb",
@@ -5194,7 +5194,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "voltorb",
                 sprite_index: (33, 3),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Voltorb-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(100) },
                 form_name: "Hisuian Voltorb",
@@ -5232,7 +5232,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(101) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Electrode",
                 national_dex: unsafe { NatDexIndex::new_unchecked(101) },
                 form_name: "Electrode",
@@ -5263,7 +5263,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "electrode",
                 sprite_index: (35, 3),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Electrode-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(101) },
                 form_name: "Hisuian Electrode",
@@ -5300,7 +5300,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Exeggcute",
         national_dex: unsafe { NatDexIndex::new_unchecked(102) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Exeggcute",
             national_dex: unsafe { NatDexIndex::new_unchecked(102) },
             form_name: "Exeggcute",
@@ -5339,7 +5339,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(103) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Exeggutor",
                 national_dex: unsafe { NatDexIndex::new_unchecked(103) },
                 form_name: "Exeggutor",
@@ -5370,7 +5370,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "exeggutor",
                 sprite_index: (2, 4),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Exeggutor-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(103) },
                 form_name: "Alolan Exeggutor",
@@ -5407,7 +5407,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cubone",
         national_dex: unsafe { NatDexIndex::new_unchecked(104) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cubone",
             national_dex: unsafe { NatDexIndex::new_unchecked(104) },
             form_name: "Cubone",
@@ -5446,7 +5446,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(105) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Marowak",
                 national_dex: unsafe { NatDexIndex::new_unchecked(105) },
                 form_name: "Marowak",
@@ -5477,7 +5477,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "marowak",
                 sprite_index: (5, 4),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Marowak-Alola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(105) },
                 form_name: "Alolan Marowak",
@@ -5508,7 +5508,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "marowak-alola",
                 sprite_index: (6, 4),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Marowak-Alola-Totem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(105) },
                 form_name: "Alolan Marowak (Totem)",
@@ -5545,7 +5545,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hitmonlee",
         national_dex: unsafe { NatDexIndex::new_unchecked(106) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hitmonlee",
             national_dex: unsafe { NatDexIndex::new_unchecked(106) },
             form_name: "Hitmonlee",
@@ -5581,7 +5581,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hitmonchan",
         national_dex: unsafe { NatDexIndex::new_unchecked(107) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hitmonchan",
             national_dex: unsafe { NatDexIndex::new_unchecked(107) },
             form_name: "Hitmonchan",
@@ -5617,7 +5617,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lickitung",
         national_dex: unsafe { NatDexIndex::new_unchecked(108) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lickitung",
             national_dex: unsafe { NatDexIndex::new_unchecked(108) },
             form_name: "Lickitung",
@@ -5653,7 +5653,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Koffing",
         national_dex: unsafe { NatDexIndex::new_unchecked(109) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Koffing",
             national_dex: unsafe { NatDexIndex::new_unchecked(109) },
             form_name: "Koffing",
@@ -5692,7 +5692,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(110) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Weezing",
                 national_dex: unsafe { NatDexIndex::new_unchecked(110) },
                 form_name: "Weezing",
@@ -5723,7 +5723,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "weezing",
                 sprite_index: (11, 4),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Weezing-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(110) },
                 form_name: "Galarian Weezing",
@@ -5760,7 +5760,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Rhyhorn",
         national_dex: unsafe { NatDexIndex::new_unchecked(111) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Rhyhorn",
             national_dex: unsafe { NatDexIndex::new_unchecked(111) },
             form_name: "Rhyhorn",
@@ -5796,7 +5796,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Rhydon",
         national_dex: unsafe { NatDexIndex::new_unchecked(112) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Rhydon",
             national_dex: unsafe { NatDexIndex::new_unchecked(112) },
             form_name: "Rhydon",
@@ -5832,7 +5832,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Chansey",
         national_dex: unsafe { NatDexIndex::new_unchecked(113) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Chansey",
             national_dex: unsafe { NatDexIndex::new_unchecked(113) },
             form_name: "Chansey",
@@ -5868,7 +5868,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tangela",
         national_dex: unsafe { NatDexIndex::new_unchecked(114) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tangela",
             national_dex: unsafe { NatDexIndex::new_unchecked(114) },
             form_name: "Tangela",
@@ -5905,7 +5905,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(115) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Kangaskhan",
                 national_dex: unsafe { NatDexIndex::new_unchecked(115) },
                 form_name: "Kangaskhan",
@@ -5913,7 +5913,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(115, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(115, 1) },
                     required_item_id: Some(675),
                 }],
                 is_gmax: false,
@@ -5939,7 +5939,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "kangaskhan",
                 sprite_index: (17, 4),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Kangaskhan-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(115) },
                 form_name: "Mega Kangaskhan",
@@ -5976,7 +5976,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Horsea",
         national_dex: unsafe { NatDexIndex::new_unchecked(116) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Horsea",
             national_dex: unsafe { NatDexIndex::new_unchecked(116) },
             form_name: "Horsea",
@@ -6012,7 +6012,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Seadra",
         national_dex: unsafe { NatDexIndex::new_unchecked(117) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Seadra",
             national_dex: unsafe { NatDexIndex::new_unchecked(117) },
             form_name: "Seadra",
@@ -6048,7 +6048,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Goldeen",
         national_dex: unsafe { NatDexIndex::new_unchecked(118) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Goldeen",
             national_dex: unsafe { NatDexIndex::new_unchecked(118) },
             form_name: "Goldeen",
@@ -6084,7 +6084,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Seaking",
         national_dex: unsafe { NatDexIndex::new_unchecked(119) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Seaking",
             national_dex: unsafe { NatDexIndex::new_unchecked(119) },
             form_name: "Seaking",
@@ -6120,7 +6120,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Staryu",
         national_dex: unsafe { NatDexIndex::new_unchecked(120) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Staryu",
             national_dex: unsafe { NatDexIndex::new_unchecked(120) },
             form_name: "Staryu",
@@ -6157,7 +6157,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(121) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Starmie",
                 national_dex: unsafe { NatDexIndex::new_unchecked(121) },
                 form_name: "Starmie",
@@ -6165,7 +6165,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(121, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(121, 1) },
                     required_item_id: Some(2561),
                 }],
                 is_gmax: false,
@@ -6191,7 +6191,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "starmie",
                 sprite_index: (24, 4),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Starmie-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(121) },
                 form_name: "Mega Starmie",
@@ -6229,7 +6229,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(122) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Mr. Mime",
                 national_dex: unsafe { NatDexIndex::new_unchecked(122) },
                 form_name: "Mr. Mime",
@@ -6260,7 +6260,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "mr-mime",
                 sprite_index: (25, 4),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Mr. Mime-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(122) },
                 form_name: "Galarian Mr. Mime",
@@ -6297,7 +6297,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Scyther",
         national_dex: unsafe { NatDexIndex::new_unchecked(123) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Scyther",
             national_dex: unsafe { NatDexIndex::new_unchecked(123) },
             form_name: "Scyther",
@@ -6335,7 +6335,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Jynx",
         national_dex: unsafe { NatDexIndex::new_unchecked(124) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Jynx",
             national_dex: unsafe { NatDexIndex::new_unchecked(124) },
             form_name: "Jynx",
@@ -6371,7 +6371,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Electabuzz",
         national_dex: unsafe { NatDexIndex::new_unchecked(125) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Electabuzz",
             national_dex: unsafe { NatDexIndex::new_unchecked(125) },
             form_name: "Electabuzz",
@@ -6407,7 +6407,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Magmar",
         national_dex: unsafe { NatDexIndex::new_unchecked(126) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Magmar",
             national_dex: unsafe { NatDexIndex::new_unchecked(126) },
             form_name: "Magmar",
@@ -6444,7 +6444,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(127) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pinsir",
                 national_dex: unsafe { NatDexIndex::new_unchecked(127) },
                 form_name: "Pinsir",
@@ -6452,7 +6452,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(127, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(127, 1) },
                     required_item_id: Some(671),
                 }],
                 is_gmax: false,
@@ -6478,7 +6478,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pinsir",
                 sprite_index: (31, 4),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pinsir-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(127) },
                 form_name: "Mega Pinsir",
@@ -6516,7 +6516,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(128) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tauros",
                 national_dex: unsafe { NatDexIndex::new_unchecked(128) },
                 form_name: "Tauros",
@@ -6547,7 +6547,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "tauros",
                 sprite_index: (33, 4),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tauros-Paldea-Combat",
                 national_dex: unsafe { NatDexIndex::new_unchecked(128) },
                 form_name: "Paldean Tauros (Combat)",
@@ -6578,7 +6578,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "tauros-paldea-combat",
                 sprite_index: (34, 4),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tauros-Paldea-Blaze",
                 national_dex: unsafe { NatDexIndex::new_unchecked(128) },
                 form_name: "Paldean Tauros (Blaze)",
@@ -6609,7 +6609,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "tauros-paldea-blaze",
                 sprite_index: (35, 4),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tauros-Paldea-Aqua",
                 national_dex: unsafe { NatDexIndex::new_unchecked(128) },
                 form_name: "Paldean Tauros (Aqua)",
@@ -6646,7 +6646,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Magikarp",
         national_dex: unsafe { NatDexIndex::new_unchecked(129) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Magikarp",
             national_dex: unsafe { NatDexIndex::new_unchecked(129) },
             form_name: "Magikarp",
@@ -6683,7 +6683,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(130) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gyarados",
                 national_dex: unsafe { NatDexIndex::new_unchecked(130) },
                 form_name: "Gyarados",
@@ -6691,7 +6691,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(130, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(130, 1) },
                     required_item_id: Some(676),
                 }],
                 is_gmax: false,
@@ -6717,7 +6717,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "gyarados",
                 sprite_index: (2, 5),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gyarados-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(130) },
                 form_name: "Mega Gyarados",
@@ -6754,7 +6754,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lapras",
         national_dex: unsafe { NatDexIndex::new_unchecked(131) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lapras",
             national_dex: unsafe { NatDexIndex::new_unchecked(131) },
             form_name: "Lapras",
@@ -6790,7 +6790,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ditto",
         national_dex: unsafe { NatDexIndex::new_unchecked(132) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ditto",
             national_dex: unsafe { NatDexIndex::new_unchecked(132) },
             form_name: "Ditto",
@@ -6827,7 +6827,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(133) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Eevee",
                 national_dex: unsafe { NatDexIndex::new_unchecked(133) },
                 form_name: "Eevee",
@@ -6867,7 +6867,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "eevee",
                 sprite_index: (6, 5),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Eevee-Starter",
                 national_dex: unsafe { NatDexIndex::new_unchecked(133) },
                 form_name: "Eevee (Starter)",
@@ -6904,7 +6904,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Vaporeon",
         national_dex: unsafe { NatDexIndex::new_unchecked(134) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Vaporeon",
             national_dex: unsafe { NatDexIndex::new_unchecked(134) },
             form_name: "Vaporeon",
@@ -6940,7 +6940,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Jolteon",
         national_dex: unsafe { NatDexIndex::new_unchecked(135) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Jolteon",
             national_dex: unsafe { NatDexIndex::new_unchecked(135) },
             form_name: "Jolteon",
@@ -6976,7 +6976,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Flareon",
         national_dex: unsafe { NatDexIndex::new_unchecked(136) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Flareon",
             national_dex: unsafe { NatDexIndex::new_unchecked(136) },
             form_name: "Flareon",
@@ -7012,7 +7012,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Porygon",
         national_dex: unsafe { NatDexIndex::new_unchecked(137) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Porygon",
             national_dex: unsafe { NatDexIndex::new_unchecked(137) },
             form_name: "Porygon",
@@ -7048,7 +7048,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Omanyte",
         national_dex: unsafe { NatDexIndex::new_unchecked(138) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Omanyte",
             national_dex: unsafe { NatDexIndex::new_unchecked(138) },
             form_name: "Omanyte",
@@ -7084,7 +7084,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Omastar",
         national_dex: unsafe { NatDexIndex::new_unchecked(139) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Omastar",
             national_dex: unsafe { NatDexIndex::new_unchecked(139) },
             form_name: "Omastar",
@@ -7120,7 +7120,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kabuto",
         national_dex: unsafe { NatDexIndex::new_unchecked(140) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kabuto",
             national_dex: unsafe { NatDexIndex::new_unchecked(140) },
             form_name: "Kabuto",
@@ -7156,7 +7156,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kabutops",
         national_dex: unsafe { NatDexIndex::new_unchecked(141) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kabutops",
             national_dex: unsafe { NatDexIndex::new_unchecked(141) },
             form_name: "Kabutops",
@@ -7193,7 +7193,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(142) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Aerodactyl",
                 national_dex: unsafe { NatDexIndex::new_unchecked(142) },
                 form_name: "Aerodactyl",
@@ -7201,7 +7201,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(142, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(142, 1) },
                     required_item_id: Some(672),
                 }],
                 is_gmax: false,
@@ -7227,7 +7227,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "aerodactyl",
                 sprite_index: (15, 5),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Aerodactyl-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(142) },
                 form_name: "Mega Aerodactyl",
@@ -7264,7 +7264,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Snorlax",
         national_dex: unsafe { NatDexIndex::new_unchecked(143) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Snorlax",
             national_dex: unsafe { NatDexIndex::new_unchecked(143) },
             form_name: "Snorlax",
@@ -7301,7 +7301,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(144) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Articuno",
                 national_dex: unsafe { NatDexIndex::new_unchecked(144) },
                 form_name: "Articuno",
@@ -7332,7 +7332,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "articuno",
                 sprite_index: (18, 5),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Articuno-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(144) },
                 form_name: "Galarian Articuno",
@@ -7370,7 +7370,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(145) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zapdos",
                 national_dex: unsafe { NatDexIndex::new_unchecked(145) },
                 form_name: "Zapdos",
@@ -7401,7 +7401,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "zapdos",
                 sprite_index: (20, 5),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zapdos-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(145) },
                 form_name: "Galarian Zapdos",
@@ -7439,7 +7439,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(146) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Moltres",
                 national_dex: unsafe { NatDexIndex::new_unchecked(146) },
                 form_name: "Moltres",
@@ -7470,7 +7470,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "moltres",
                 sprite_index: (22, 5),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Moltres-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(146) },
                 form_name: "Galarian Moltres",
@@ -7507,7 +7507,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dratini",
         national_dex: unsafe { NatDexIndex::new_unchecked(147) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dratini",
             national_dex: unsafe { NatDexIndex::new_unchecked(147) },
             form_name: "Dratini",
@@ -7543,7 +7543,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dragonair",
         national_dex: unsafe { NatDexIndex::new_unchecked(148) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dragonair",
             national_dex: unsafe { NatDexIndex::new_unchecked(148) },
             form_name: "Dragonair",
@@ -7580,7 +7580,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(149) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Dragonite",
                 national_dex: unsafe { NatDexIndex::new_unchecked(149) },
                 form_name: "Dragonite",
@@ -7588,7 +7588,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(149, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(149, 1) },
                     required_item_id: Some(2562),
                 }],
                 is_gmax: false,
@@ -7614,7 +7614,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "dragonite",
                 sprite_index: (26, 5),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Dragonite-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(149) },
                 form_name: "Mega Dragonite",
@@ -7652,7 +7652,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(150) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Mewtwo",
                 national_dex: unsafe { NatDexIndex::new_unchecked(150) },
                 form_name: "Mewtwo",
@@ -7661,11 +7661,11 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_mega: false,
                 mega_evolution_data: &[
                     MegaEvolutionMetadata {
-                        mega_forme: unsafe { SpeciesAndForm::new_unchecked(150, 1) },
+                        mega_form: unsafe { SpeciesAndForm::new_unchecked(150, 1) },
                         required_item_id: Some(662),
                     },
                     MegaEvolutionMetadata {
-                        mega_forme: unsafe { SpeciesAndForm::new_unchecked(150, 2) },
+                        mega_form: unsafe { SpeciesAndForm::new_unchecked(150, 2) },
                         required_item_id: Some(663),
                     },
                 ],
@@ -7692,7 +7692,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "mewtwo",
                 sprite_index: (27, 5),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Mewtwo-Mega-X",
                 national_dex: unsafe { NatDexIndex::new_unchecked(150) },
                 form_name: "Mega Mewtwo X",
@@ -7723,7 +7723,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "mewtwo-mega-x",
                 sprite_index: (28, 5),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Mewtwo-Mega-Y",
                 national_dex: unsafe { NatDexIndex::new_unchecked(150) },
                 form_name: "Mega Mewtwo Y",
@@ -7760,7 +7760,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mew",
         national_dex: unsafe { NatDexIndex::new_unchecked(151) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mew",
             national_dex: unsafe { NatDexIndex::new_unchecked(151) },
             form_name: "Mew",
@@ -7796,7 +7796,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Chikorita",
         national_dex: unsafe { NatDexIndex::new_unchecked(152) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Chikorita",
             national_dex: unsafe { NatDexIndex::new_unchecked(152) },
             form_name: "Chikorita",
@@ -7832,7 +7832,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bayleef",
         national_dex: unsafe { NatDexIndex::new_unchecked(153) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bayleef",
             national_dex: unsafe { NatDexIndex::new_unchecked(153) },
             form_name: "Bayleef",
@@ -7869,7 +7869,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(154) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Meganium",
                 national_dex: unsafe { NatDexIndex::new_unchecked(154) },
                 form_name: "Meganium",
@@ -7877,7 +7877,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(154, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(154, 1) },
                     required_item_id: Some(2563),
                 }],
                 is_gmax: false,
@@ -7903,7 +7903,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "meganium",
                 sprite_index: (33, 5),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Meganium-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(154) },
                 form_name: "Mega Meganium",
@@ -7940,7 +7940,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cyndaquil",
         national_dex: unsafe { NatDexIndex::new_unchecked(155) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cyndaquil",
             national_dex: unsafe { NatDexIndex::new_unchecked(155) },
             form_name: "Cyndaquil",
@@ -7976,7 +7976,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Quilava",
         national_dex: unsafe { NatDexIndex::new_unchecked(156) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Quilava",
             national_dex: unsafe { NatDexIndex::new_unchecked(156) },
             form_name: "Quilava",
@@ -8015,7 +8015,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(157) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Typhlosion",
                 national_dex: unsafe { NatDexIndex::new_unchecked(157) },
                 form_name: "Typhlosion",
@@ -8046,7 +8046,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "typhlosion",
                 sprite_index: (0, 6),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Typhlosion-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(157) },
                 form_name: "Hisuian Typhlosion",
@@ -8083,7 +8083,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Totodile",
         national_dex: unsafe { NatDexIndex::new_unchecked(158) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Totodile",
             national_dex: unsafe { NatDexIndex::new_unchecked(158) },
             form_name: "Totodile",
@@ -8119,7 +8119,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Croconaw",
         national_dex: unsafe { NatDexIndex::new_unchecked(159) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Croconaw",
             national_dex: unsafe { NatDexIndex::new_unchecked(159) },
             form_name: "Croconaw",
@@ -8156,7 +8156,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(160) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Feraligatr",
                 national_dex: unsafe { NatDexIndex::new_unchecked(160) },
                 form_name: "Feraligatr",
@@ -8164,7 +8164,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(160, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(160, 1) },
                     required_item_id: Some(2564),
                 }],
                 is_gmax: false,
@@ -8190,7 +8190,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "feraligatr",
                 sprite_index: (4, 6),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Feraligatr-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(160) },
                 form_name: "Mega Feraligatr",
@@ -8227,7 +8227,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sentret",
         national_dex: unsafe { NatDexIndex::new_unchecked(161) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sentret",
             national_dex: unsafe { NatDexIndex::new_unchecked(161) },
             form_name: "Sentret",
@@ -8263,7 +8263,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Furret",
         national_dex: unsafe { NatDexIndex::new_unchecked(162) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Furret",
             national_dex: unsafe { NatDexIndex::new_unchecked(162) },
             form_name: "Furret",
@@ -8299,7 +8299,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hoothoot",
         national_dex: unsafe { NatDexIndex::new_unchecked(163) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hoothoot",
             national_dex: unsafe { NatDexIndex::new_unchecked(163) },
             form_name: "Hoothoot",
@@ -8335,7 +8335,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Noctowl",
         national_dex: unsafe { NatDexIndex::new_unchecked(164) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Noctowl",
             national_dex: unsafe { NatDexIndex::new_unchecked(164) },
             form_name: "Noctowl",
@@ -8371,7 +8371,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ledyba",
         national_dex: unsafe { NatDexIndex::new_unchecked(165) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ledyba",
             national_dex: unsafe { NatDexIndex::new_unchecked(165) },
             form_name: "Ledyba",
@@ -8407,7 +8407,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ledian",
         national_dex: unsafe { NatDexIndex::new_unchecked(166) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ledian",
             national_dex: unsafe { NatDexIndex::new_unchecked(166) },
             form_name: "Ledian",
@@ -8443,7 +8443,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Spinarak",
         national_dex: unsafe { NatDexIndex::new_unchecked(167) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Spinarak",
             national_dex: unsafe { NatDexIndex::new_unchecked(167) },
             form_name: "Spinarak",
@@ -8479,7 +8479,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ariados",
         national_dex: unsafe { NatDexIndex::new_unchecked(168) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ariados",
             national_dex: unsafe { NatDexIndex::new_unchecked(168) },
             form_name: "Ariados",
@@ -8515,7 +8515,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Crobat",
         national_dex: unsafe { NatDexIndex::new_unchecked(169) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Crobat",
             national_dex: unsafe { NatDexIndex::new_unchecked(169) },
             form_name: "Crobat",
@@ -8551,7 +8551,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Chinchou",
         national_dex: unsafe { NatDexIndex::new_unchecked(170) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Chinchou",
             national_dex: unsafe { NatDexIndex::new_unchecked(170) },
             form_name: "Chinchou",
@@ -8587,7 +8587,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lanturn",
         national_dex: unsafe { NatDexIndex::new_unchecked(171) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lanturn",
             national_dex: unsafe { NatDexIndex::new_unchecked(171) },
             form_name: "Lanturn",
@@ -8624,7 +8624,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(172) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pichu",
                 national_dex: unsafe { NatDexIndex::new_unchecked(172) },
                 form_name: "Pichu",
@@ -8655,7 +8655,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pichu",
                 sprite_index: (16, 6),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pichu-Spiky-Eared",
                 national_dex: unsafe { NatDexIndex::new_unchecked(172) },
                 form_name: "Pichu (Spiky Eared)",
@@ -8692,7 +8692,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cleffa",
         national_dex: unsafe { NatDexIndex::new_unchecked(173) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cleffa",
             national_dex: unsafe { NatDexIndex::new_unchecked(173) },
             form_name: "Cleffa",
@@ -8728,7 +8728,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Igglybuff",
         national_dex: unsafe { NatDexIndex::new_unchecked(174) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Igglybuff",
             national_dex: unsafe { NatDexIndex::new_unchecked(174) },
             form_name: "Igglybuff",
@@ -8764,7 +8764,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Togepi",
         national_dex: unsafe { NatDexIndex::new_unchecked(175) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Togepi",
             national_dex: unsafe { NatDexIndex::new_unchecked(175) },
             form_name: "Togepi",
@@ -8800,7 +8800,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Togetic",
         national_dex: unsafe { NatDexIndex::new_unchecked(176) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Togetic",
             national_dex: unsafe { NatDexIndex::new_unchecked(176) },
             form_name: "Togetic",
@@ -8836,7 +8836,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Natu",
         national_dex: unsafe { NatDexIndex::new_unchecked(177) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Natu",
             national_dex: unsafe { NatDexIndex::new_unchecked(177) },
             form_name: "Natu",
@@ -8872,7 +8872,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Xatu",
         national_dex: unsafe { NatDexIndex::new_unchecked(178) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Xatu",
             national_dex: unsafe { NatDexIndex::new_unchecked(178) },
             form_name: "Xatu",
@@ -8908,7 +8908,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mareep",
         national_dex: unsafe { NatDexIndex::new_unchecked(179) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mareep",
             national_dex: unsafe { NatDexIndex::new_unchecked(179) },
             form_name: "Mareep",
@@ -8944,7 +8944,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Flaaffy",
         national_dex: unsafe { NatDexIndex::new_unchecked(180) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Flaaffy",
             national_dex: unsafe { NatDexIndex::new_unchecked(180) },
             form_name: "Flaaffy",
@@ -8981,7 +8981,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(181) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ampharos",
                 national_dex: unsafe { NatDexIndex::new_unchecked(181) },
                 form_name: "Ampharos",
@@ -8989,7 +8989,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(181, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(181, 1) },
                     required_item_id: Some(658),
                 }],
                 is_gmax: false,
@@ -9015,7 +9015,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "ampharos",
                 sprite_index: (25, 6),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ampharos-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(181) },
                 form_name: "Mega Ampharos",
@@ -9052,7 +9052,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bellossom",
         national_dex: unsafe { NatDexIndex::new_unchecked(182) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bellossom",
             national_dex: unsafe { NatDexIndex::new_unchecked(182) },
             form_name: "Bellossom",
@@ -9088,7 +9088,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Marill",
         national_dex: unsafe { NatDexIndex::new_unchecked(183) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Marill",
             national_dex: unsafe { NatDexIndex::new_unchecked(183) },
             form_name: "Marill",
@@ -9124,7 +9124,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Azumarill",
         national_dex: unsafe { NatDexIndex::new_unchecked(184) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Azumarill",
             national_dex: unsafe { NatDexIndex::new_unchecked(184) },
             form_name: "Azumarill",
@@ -9160,7 +9160,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sudowoodo",
         national_dex: unsafe { NatDexIndex::new_unchecked(185) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sudowoodo",
             national_dex: unsafe { NatDexIndex::new_unchecked(185) },
             form_name: "Sudowoodo",
@@ -9196,7 +9196,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Politoed",
         national_dex: unsafe { NatDexIndex::new_unchecked(186) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Politoed",
             national_dex: unsafe { NatDexIndex::new_unchecked(186) },
             form_name: "Politoed",
@@ -9232,7 +9232,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hoppip",
         national_dex: unsafe { NatDexIndex::new_unchecked(187) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hoppip",
             national_dex: unsafe { NatDexIndex::new_unchecked(187) },
             form_name: "Hoppip",
@@ -9268,7 +9268,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Skiploom",
         national_dex: unsafe { NatDexIndex::new_unchecked(188) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Skiploom",
             national_dex: unsafe { NatDexIndex::new_unchecked(188) },
             form_name: "Skiploom",
@@ -9304,7 +9304,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Jumpluff",
         national_dex: unsafe { NatDexIndex::new_unchecked(189) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Jumpluff",
             national_dex: unsafe { NatDexIndex::new_unchecked(189) },
             form_name: "Jumpluff",
@@ -9340,7 +9340,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Aipom",
         national_dex: unsafe { NatDexIndex::new_unchecked(190) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Aipom",
             national_dex: unsafe { NatDexIndex::new_unchecked(190) },
             form_name: "Aipom",
@@ -9376,7 +9376,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sunkern",
         national_dex: unsafe { NatDexIndex::new_unchecked(191) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sunkern",
             national_dex: unsafe { NatDexIndex::new_unchecked(191) },
             form_name: "Sunkern",
@@ -9412,7 +9412,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sunflora",
         national_dex: unsafe { NatDexIndex::new_unchecked(192) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sunflora",
             national_dex: unsafe { NatDexIndex::new_unchecked(192) },
             form_name: "Sunflora",
@@ -9448,7 +9448,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Yanma",
         national_dex: unsafe { NatDexIndex::new_unchecked(193) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Yanma",
             national_dex: unsafe { NatDexIndex::new_unchecked(193) },
             form_name: "Yanma",
@@ -9485,7 +9485,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(194) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Wooper",
                 national_dex: unsafe { NatDexIndex::new_unchecked(194) },
                 form_name: "Wooper",
@@ -9516,7 +9516,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "wooper",
                 sprite_index: (3, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Wooper-Paldea",
                 national_dex: unsafe { NatDexIndex::new_unchecked(194) },
                 form_name: "Paldean Wooper",
@@ -9553,7 +9553,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Quagsire",
         national_dex: unsafe { NatDexIndex::new_unchecked(195) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Quagsire",
             national_dex: unsafe { NatDexIndex::new_unchecked(195) },
             form_name: "Quagsire",
@@ -9589,7 +9589,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Espeon",
         national_dex: unsafe { NatDexIndex::new_unchecked(196) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Espeon",
             national_dex: unsafe { NatDexIndex::new_unchecked(196) },
             form_name: "Espeon",
@@ -9625,7 +9625,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Umbreon",
         national_dex: unsafe { NatDexIndex::new_unchecked(197) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Umbreon",
             national_dex: unsafe { NatDexIndex::new_unchecked(197) },
             form_name: "Umbreon",
@@ -9661,7 +9661,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Murkrow",
         national_dex: unsafe { NatDexIndex::new_unchecked(198) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Murkrow",
             national_dex: unsafe { NatDexIndex::new_unchecked(198) },
             form_name: "Murkrow",
@@ -9698,7 +9698,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(199) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Slowking",
                 national_dex: unsafe { NatDexIndex::new_unchecked(199) },
                 form_name: "Slowking",
@@ -9729,7 +9729,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "slowking",
                 sprite_index: (9, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Slowking-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(199) },
                 form_name: "Galarian Slowking",
@@ -9766,7 +9766,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Misdreavus",
         national_dex: unsafe { NatDexIndex::new_unchecked(200) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Misdreavus",
             national_dex: unsafe { NatDexIndex::new_unchecked(200) },
             form_name: "Misdreavus",
@@ -9803,7 +9803,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(201) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-A",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown",
@@ -9834,7 +9834,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-a",
                 sprite_index: (12, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-B",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown B",
@@ -9865,7 +9865,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-b",
                 sprite_index: (13, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-C",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown C",
@@ -9896,7 +9896,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-c",
                 sprite_index: (14, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-D",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown D",
@@ -9927,7 +9927,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-d",
                 sprite_index: (15, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-E",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown E",
@@ -9958,7 +9958,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-e",
                 sprite_index: (16, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-F",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown F",
@@ -9989,7 +9989,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-f",
                 sprite_index: (17, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-G",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown G",
@@ -10020,7 +10020,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-g",
                 sprite_index: (18, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-H",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown H",
@@ -10051,7 +10051,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-h",
                 sprite_index: (19, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-I",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown I",
@@ -10082,7 +10082,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-i",
                 sprite_index: (20, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-J",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown J",
@@ -10113,7 +10113,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-j",
                 sprite_index: (21, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-K",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown K",
@@ -10144,7 +10144,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-k",
                 sprite_index: (22, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-L",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown L",
@@ -10175,7 +10175,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-l",
                 sprite_index: (23, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-M",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown M",
@@ -10206,7 +10206,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-m",
                 sprite_index: (24, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-N",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown N",
@@ -10237,7 +10237,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-n",
                 sprite_index: (25, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-O",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown O",
@@ -10268,7 +10268,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-o",
                 sprite_index: (26, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-P",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown P",
@@ -10299,7 +10299,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-p",
                 sprite_index: (27, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-Q",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown Q",
@@ -10330,7 +10330,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-q",
                 sprite_index: (28, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-R",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown R",
@@ -10361,7 +10361,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-r",
                 sprite_index: (29, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-S",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown S",
@@ -10392,7 +10392,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-s",
                 sprite_index: (30, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-T",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown T",
@@ -10423,7 +10423,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-t",
                 sprite_index: (31, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-U",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown U",
@@ -10454,7 +10454,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-u",
                 sprite_index: (32, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-V",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown V",
@@ -10485,7 +10485,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-v",
                 sprite_index: (33, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-W",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown W",
@@ -10516,7 +10516,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-w",
                 sprite_index: (34, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-X",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown X",
@@ -10547,7 +10547,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-x",
                 sprite_index: (35, 7),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-Y",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown Y",
@@ -10578,7 +10578,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-y",
                 sprite_index: (0, 8),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-Z",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown Z",
@@ -10609,7 +10609,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-z",
                 sprite_index: (1, 8),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-Exclamation",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown !",
@@ -10640,7 +10640,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "unown-exclamation",
                 sprite_index: (2, 8),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Unown-Question",
                 national_dex: unsafe { NatDexIndex::new_unchecked(201) },
                 form_name: "Unown ?",
@@ -10677,7 +10677,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wobbuffet",
         national_dex: unsafe { NatDexIndex::new_unchecked(202) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wobbuffet",
             national_dex: unsafe { NatDexIndex::new_unchecked(202) },
             form_name: "Wobbuffet",
@@ -10713,7 +10713,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Girafarig",
         national_dex: unsafe { NatDexIndex::new_unchecked(203) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Girafarig",
             national_dex: unsafe { NatDexIndex::new_unchecked(203) },
             form_name: "Girafarig",
@@ -10749,7 +10749,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pineco",
         national_dex: unsafe { NatDexIndex::new_unchecked(204) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pineco",
             national_dex: unsafe { NatDexIndex::new_unchecked(204) },
             form_name: "Pineco",
@@ -10785,7 +10785,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Forretress",
         national_dex: unsafe { NatDexIndex::new_unchecked(205) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Forretress",
             national_dex: unsafe { NatDexIndex::new_unchecked(205) },
             form_name: "Forretress",
@@ -10821,7 +10821,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dunsparce",
         national_dex: unsafe { NatDexIndex::new_unchecked(206) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dunsparce",
             national_dex: unsafe { NatDexIndex::new_unchecked(206) },
             form_name: "Dunsparce",
@@ -10859,7 +10859,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gligar",
         national_dex: unsafe { NatDexIndex::new_unchecked(207) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gligar",
             national_dex: unsafe { NatDexIndex::new_unchecked(207) },
             form_name: "Gligar",
@@ -10896,7 +10896,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(208) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Steelix",
                 national_dex: unsafe { NatDexIndex::new_unchecked(208) },
                 form_name: "Steelix",
@@ -10904,7 +10904,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(208, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(208, 1) },
                     required_item_id: Some(761),
                 }],
                 is_gmax: false,
@@ -10930,7 +10930,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "steelix",
                 sprite_index: (10, 8),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Steelix-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(208) },
                 form_name: "Mega Steelix",
@@ -10967,7 +10967,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Snubbull",
         national_dex: unsafe { NatDexIndex::new_unchecked(209) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Snubbull",
             national_dex: unsafe { NatDexIndex::new_unchecked(209) },
             form_name: "Snubbull",
@@ -11003,7 +11003,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Granbull",
         national_dex: unsafe { NatDexIndex::new_unchecked(210) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Granbull",
             national_dex: unsafe { NatDexIndex::new_unchecked(210) },
             form_name: "Granbull",
@@ -11040,7 +11040,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(211) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Qwilfish",
                 national_dex: unsafe { NatDexIndex::new_unchecked(211) },
                 form_name: "Qwilfish",
@@ -11071,7 +11071,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "qwilfish",
                 sprite_index: (14, 8),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Qwilfish-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(211) },
                 form_name: "Hisuian Qwilfish",
@@ -11109,7 +11109,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(212) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scizor",
                 national_dex: unsafe { NatDexIndex::new_unchecked(212) },
                 form_name: "Scizor",
@@ -11117,7 +11117,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(212, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(212, 1) },
                     required_item_id: Some(670),
                 }],
                 is_gmax: false,
@@ -11143,7 +11143,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scizor",
                 sprite_index: (16, 8),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scizor-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(212) },
                 form_name: "Mega Scizor",
@@ -11180,7 +11180,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Shuckle",
         national_dex: unsafe { NatDexIndex::new_unchecked(213) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Shuckle",
             national_dex: unsafe { NatDexIndex::new_unchecked(213) },
             form_name: "Shuckle",
@@ -11217,7 +11217,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(214) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Heracross",
                 national_dex: unsafe { NatDexIndex::new_unchecked(214) },
                 form_name: "Heracross",
@@ -11225,7 +11225,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(214, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(214, 1) },
                     required_item_id: Some(680),
                 }],
                 is_gmax: false,
@@ -11251,7 +11251,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "heracross",
                 sprite_index: (19, 8),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Heracross-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(214) },
                 form_name: "Mega Heracross",
@@ -11289,7 +11289,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(215) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sneasel",
                 national_dex: unsafe { NatDexIndex::new_unchecked(215) },
                 form_name: "Sneasel",
@@ -11320,7 +11320,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "sneasel",
                 sprite_index: (21, 8),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sneasel-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(215) },
                 form_name: "Hisuian Sneasel",
@@ -11357,7 +11357,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Teddiursa",
         national_dex: unsafe { NatDexIndex::new_unchecked(216) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Teddiursa",
             national_dex: unsafe { NatDexIndex::new_unchecked(216) },
             form_name: "Teddiursa",
@@ -11393,7 +11393,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ursaring",
         national_dex: unsafe { NatDexIndex::new_unchecked(217) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ursaring",
             national_dex: unsafe { NatDexIndex::new_unchecked(217) },
             form_name: "Ursaring",
@@ -11429,7 +11429,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Slugma",
         national_dex: unsafe { NatDexIndex::new_unchecked(218) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Slugma",
             national_dex: unsafe { NatDexIndex::new_unchecked(218) },
             form_name: "Slugma",
@@ -11465,7 +11465,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Magcargo",
         national_dex: unsafe { NatDexIndex::new_unchecked(219) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Magcargo",
             national_dex: unsafe { NatDexIndex::new_unchecked(219) },
             form_name: "Magcargo",
@@ -11501,7 +11501,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Swinub",
         national_dex: unsafe { NatDexIndex::new_unchecked(220) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Swinub",
             national_dex: unsafe { NatDexIndex::new_unchecked(220) },
             form_name: "Swinub",
@@ -11537,7 +11537,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Piloswine",
         national_dex: unsafe { NatDexIndex::new_unchecked(221) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Piloswine",
             national_dex: unsafe { NatDexIndex::new_unchecked(221) },
             form_name: "Piloswine",
@@ -11574,7 +11574,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(222) },
         level_up_type: LevelUpType::Fast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Corsola",
                 national_dex: unsafe { NatDexIndex::new_unchecked(222) },
                 form_name: "Corsola",
@@ -11605,7 +11605,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "corsola",
                 sprite_index: (29, 8),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Corsola-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(222) },
                 form_name: "Galarian Corsola",
@@ -11642,7 +11642,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Remoraid",
         national_dex: unsafe { NatDexIndex::new_unchecked(223) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Remoraid",
             national_dex: unsafe { NatDexIndex::new_unchecked(223) },
             form_name: "Remoraid",
@@ -11678,7 +11678,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Octillery",
         national_dex: unsafe { NatDexIndex::new_unchecked(224) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Octillery",
             national_dex: unsafe { NatDexIndex::new_unchecked(224) },
             form_name: "Octillery",
@@ -11714,7 +11714,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Delibird",
         national_dex: unsafe { NatDexIndex::new_unchecked(225) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Delibird",
             national_dex: unsafe { NatDexIndex::new_unchecked(225) },
             form_name: "Delibird",
@@ -11750,7 +11750,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mantine",
         national_dex: unsafe { NatDexIndex::new_unchecked(226) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mantine",
             national_dex: unsafe { NatDexIndex::new_unchecked(226) },
             form_name: "Mantine",
@@ -11787,7 +11787,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(227) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Skarmory",
                 national_dex: unsafe { NatDexIndex::new_unchecked(227) },
                 form_name: "Skarmory",
@@ -11795,7 +11795,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(227, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(227, 1) },
                     required_item_id: Some(2565),
                 }],
                 is_gmax: false,
@@ -11821,7 +11821,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "skarmory",
                 sprite_index: (35, 8),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Skarmory-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(227) },
                 form_name: "Mega Skarmory",
@@ -11858,7 +11858,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Houndour",
         national_dex: unsafe { NatDexIndex::new_unchecked(228) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Houndour",
             national_dex: unsafe { NatDexIndex::new_unchecked(228) },
             form_name: "Houndour",
@@ -11895,7 +11895,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(229) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Houndoom",
                 national_dex: unsafe { NatDexIndex::new_unchecked(229) },
                 form_name: "Houndoom",
@@ -11903,7 +11903,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(229, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(229, 1) },
                     required_item_id: Some(666),
                 }],
                 is_gmax: false,
@@ -11929,7 +11929,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "houndoom",
                 sprite_index: (1, 9),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Houndoom-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(229) },
                 form_name: "Mega Houndoom",
@@ -11966,7 +11966,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kingdra",
         national_dex: unsafe { NatDexIndex::new_unchecked(230) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kingdra",
             national_dex: unsafe { NatDexIndex::new_unchecked(230) },
             form_name: "Kingdra",
@@ -12002,7 +12002,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Phanpy",
         national_dex: unsafe { NatDexIndex::new_unchecked(231) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Phanpy",
             national_dex: unsafe { NatDexIndex::new_unchecked(231) },
             form_name: "Phanpy",
@@ -12038,7 +12038,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Donphan",
         national_dex: unsafe { NatDexIndex::new_unchecked(232) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Donphan",
             national_dex: unsafe { NatDexIndex::new_unchecked(232) },
             form_name: "Donphan",
@@ -12074,7 +12074,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Porygon2",
         national_dex: unsafe { NatDexIndex::new_unchecked(233) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Porygon2",
             national_dex: unsafe { NatDexIndex::new_unchecked(233) },
             form_name: "Porygon2",
@@ -12110,7 +12110,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Stantler",
         national_dex: unsafe { NatDexIndex::new_unchecked(234) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Stantler",
             national_dex: unsafe { NatDexIndex::new_unchecked(234) },
             form_name: "Stantler",
@@ -12146,7 +12146,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Smeargle",
         national_dex: unsafe { NatDexIndex::new_unchecked(235) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Smeargle",
             national_dex: unsafe { NatDexIndex::new_unchecked(235) },
             form_name: "Smeargle",
@@ -12182,7 +12182,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tyrogue",
         national_dex: unsafe { NatDexIndex::new_unchecked(236) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tyrogue",
             national_dex: unsafe { NatDexIndex::new_unchecked(236) },
             form_name: "Tyrogue",
@@ -12222,7 +12222,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hitmontop",
         national_dex: unsafe { NatDexIndex::new_unchecked(237) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hitmontop",
             national_dex: unsafe { NatDexIndex::new_unchecked(237) },
             form_name: "Hitmontop",
@@ -12258,7 +12258,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Smoochum",
         national_dex: unsafe { NatDexIndex::new_unchecked(238) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Smoochum",
             national_dex: unsafe { NatDexIndex::new_unchecked(238) },
             form_name: "Smoochum",
@@ -12294,7 +12294,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Elekid",
         national_dex: unsafe { NatDexIndex::new_unchecked(239) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Elekid",
             national_dex: unsafe { NatDexIndex::new_unchecked(239) },
             form_name: "Elekid",
@@ -12330,7 +12330,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Magby",
         national_dex: unsafe { NatDexIndex::new_unchecked(240) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Magby",
             national_dex: unsafe { NatDexIndex::new_unchecked(240) },
             form_name: "Magby",
@@ -12366,7 +12366,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Miltank",
         national_dex: unsafe { NatDexIndex::new_unchecked(241) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Miltank",
             national_dex: unsafe { NatDexIndex::new_unchecked(241) },
             form_name: "Miltank",
@@ -12402,7 +12402,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Blissey",
         national_dex: unsafe { NatDexIndex::new_unchecked(242) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Blissey",
             national_dex: unsafe { NatDexIndex::new_unchecked(242) },
             form_name: "Blissey",
@@ -12438,7 +12438,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Raikou",
         national_dex: unsafe { NatDexIndex::new_unchecked(243) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Raikou",
             national_dex: unsafe { NatDexIndex::new_unchecked(243) },
             form_name: "Raikou",
@@ -12474,7 +12474,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Entei",
         national_dex: unsafe { NatDexIndex::new_unchecked(244) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Entei",
             national_dex: unsafe { NatDexIndex::new_unchecked(244) },
             form_name: "Entei",
@@ -12510,7 +12510,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Suicune",
         national_dex: unsafe { NatDexIndex::new_unchecked(245) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Suicune",
             national_dex: unsafe { NatDexIndex::new_unchecked(245) },
             form_name: "Suicune",
@@ -12546,7 +12546,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Larvitar",
         national_dex: unsafe { NatDexIndex::new_unchecked(246) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Larvitar",
             national_dex: unsafe { NatDexIndex::new_unchecked(246) },
             form_name: "Larvitar",
@@ -12582,7 +12582,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pupitar",
         national_dex: unsafe { NatDexIndex::new_unchecked(247) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pupitar",
             national_dex: unsafe { NatDexIndex::new_unchecked(247) },
             form_name: "Pupitar",
@@ -12619,7 +12619,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(248) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tyranitar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(248) },
                 form_name: "Tyranitar",
@@ -12627,7 +12627,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(248, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(248, 1) },
                     required_item_id: Some(669),
                 }],
                 is_gmax: false,
@@ -12653,7 +12653,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "tyranitar",
                 sprite_index: (21, 9),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tyranitar-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(248) },
                 form_name: "Mega Tyranitar",
@@ -12690,7 +12690,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lugia",
         national_dex: unsafe { NatDexIndex::new_unchecked(249) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lugia",
             national_dex: unsafe { NatDexIndex::new_unchecked(249) },
             form_name: "Lugia",
@@ -12726,7 +12726,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ho-Oh",
         national_dex: unsafe { NatDexIndex::new_unchecked(250) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ho-Oh",
             national_dex: unsafe { NatDexIndex::new_unchecked(250) },
             form_name: "Ho-Oh",
@@ -12762,7 +12762,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Celebi",
         national_dex: unsafe { NatDexIndex::new_unchecked(251) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Celebi",
             national_dex: unsafe { NatDexIndex::new_unchecked(251) },
             form_name: "Celebi",
@@ -12798,7 +12798,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Treecko",
         national_dex: unsafe { NatDexIndex::new_unchecked(252) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Treecko",
             national_dex: unsafe { NatDexIndex::new_unchecked(252) },
             form_name: "Treecko",
@@ -12834,7 +12834,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Grovyle",
         national_dex: unsafe { NatDexIndex::new_unchecked(253) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Grovyle",
             national_dex: unsafe { NatDexIndex::new_unchecked(253) },
             form_name: "Grovyle",
@@ -12871,7 +12871,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(254) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sceptile",
                 national_dex: unsafe { NatDexIndex::new_unchecked(254) },
                 form_name: "Sceptile",
@@ -12879,7 +12879,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(254, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(254, 1) },
                     required_item_id: Some(753),
                 }],
                 is_gmax: false,
@@ -12905,7 +12905,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "sceptile",
                 sprite_index: (28, 9),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sceptile-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(254) },
                 form_name: "Mega Sceptile",
@@ -12942,7 +12942,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Torchic",
         national_dex: unsafe { NatDexIndex::new_unchecked(255) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Torchic",
             national_dex: unsafe { NatDexIndex::new_unchecked(255) },
             form_name: "Torchic",
@@ -12978,7 +12978,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Combusken",
         national_dex: unsafe { NatDexIndex::new_unchecked(256) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Combusken",
             national_dex: unsafe { NatDexIndex::new_unchecked(256) },
             form_name: "Combusken",
@@ -13015,7 +13015,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(257) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Blaziken",
                 national_dex: unsafe { NatDexIndex::new_unchecked(257) },
                 form_name: "Blaziken",
@@ -13023,7 +13023,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(257, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(257, 1) },
                     required_item_id: Some(664),
                 }],
                 is_gmax: false,
@@ -13049,7 +13049,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "blaziken",
                 sprite_index: (32, 9),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Blaziken-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(257) },
                 form_name: "Mega Blaziken",
@@ -13086,7 +13086,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mudkip",
         national_dex: unsafe { NatDexIndex::new_unchecked(258) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mudkip",
             national_dex: unsafe { NatDexIndex::new_unchecked(258) },
             form_name: "Mudkip",
@@ -13122,7 +13122,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Marshtomp",
         national_dex: unsafe { NatDexIndex::new_unchecked(259) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Marshtomp",
             national_dex: unsafe { NatDexIndex::new_unchecked(259) },
             form_name: "Marshtomp",
@@ -13159,7 +13159,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(260) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Swampert",
                 national_dex: unsafe { NatDexIndex::new_unchecked(260) },
                 form_name: "Swampert",
@@ -13167,7 +13167,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(260, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(260, 1) },
                     required_item_id: Some(752),
                 }],
                 is_gmax: false,
@@ -13193,7 +13193,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "swampert",
                 sprite_index: (0, 10),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Swampert-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(260) },
                 form_name: "Mega Swampert",
@@ -13230,7 +13230,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Poochyena",
         national_dex: unsafe { NatDexIndex::new_unchecked(261) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Poochyena",
             national_dex: unsafe { NatDexIndex::new_unchecked(261) },
             form_name: "Poochyena",
@@ -13266,7 +13266,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mightyena",
         national_dex: unsafe { NatDexIndex::new_unchecked(262) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mightyena",
             national_dex: unsafe { NatDexIndex::new_unchecked(262) },
             form_name: "Mightyena",
@@ -13303,7 +13303,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(263) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zigzagoon",
                 national_dex: unsafe { NatDexIndex::new_unchecked(263) },
                 form_name: "Zigzagoon",
@@ -13334,7 +13334,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "zigzagoon",
                 sprite_index: (4, 10),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zigzagoon-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(263) },
                 form_name: "Galarian Zigzagoon",
@@ -13372,7 +13372,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(264) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Linoone",
                 national_dex: unsafe { NatDexIndex::new_unchecked(264) },
                 form_name: "Linoone",
@@ -13403,7 +13403,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "linoone",
                 sprite_index: (6, 10),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Linoone-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(264) },
                 form_name: "Galarian Linoone",
@@ -13440,7 +13440,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wurmple",
         national_dex: unsafe { NatDexIndex::new_unchecked(265) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wurmple",
             national_dex: unsafe { NatDexIndex::new_unchecked(265) },
             form_name: "Wurmple",
@@ -13478,7 +13478,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Silcoon",
         national_dex: unsafe { NatDexIndex::new_unchecked(266) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Silcoon",
             national_dex: unsafe { NatDexIndex::new_unchecked(266) },
             form_name: "Silcoon",
@@ -13514,7 +13514,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Beautifly",
         national_dex: unsafe { NatDexIndex::new_unchecked(267) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Beautifly",
             national_dex: unsafe { NatDexIndex::new_unchecked(267) },
             form_name: "Beautifly",
@@ -13550,7 +13550,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cascoon",
         national_dex: unsafe { NatDexIndex::new_unchecked(268) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cascoon",
             national_dex: unsafe { NatDexIndex::new_unchecked(268) },
             form_name: "Cascoon",
@@ -13586,7 +13586,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dustox",
         national_dex: unsafe { NatDexIndex::new_unchecked(269) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dustox",
             national_dex: unsafe { NatDexIndex::new_unchecked(269) },
             form_name: "Dustox",
@@ -13622,7 +13622,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lotad",
         national_dex: unsafe { NatDexIndex::new_unchecked(270) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lotad",
             national_dex: unsafe { NatDexIndex::new_unchecked(270) },
             form_name: "Lotad",
@@ -13658,7 +13658,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lombre",
         national_dex: unsafe { NatDexIndex::new_unchecked(271) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lombre",
             national_dex: unsafe { NatDexIndex::new_unchecked(271) },
             form_name: "Lombre",
@@ -13694,7 +13694,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ludicolo",
         national_dex: unsafe { NatDexIndex::new_unchecked(272) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ludicolo",
             national_dex: unsafe { NatDexIndex::new_unchecked(272) },
             form_name: "Ludicolo",
@@ -13730,7 +13730,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Seedot",
         national_dex: unsafe { NatDexIndex::new_unchecked(273) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Seedot",
             national_dex: unsafe { NatDexIndex::new_unchecked(273) },
             form_name: "Seedot",
@@ -13766,7 +13766,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Nuzleaf",
         national_dex: unsafe { NatDexIndex::new_unchecked(274) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Nuzleaf",
             national_dex: unsafe { NatDexIndex::new_unchecked(274) },
             form_name: "Nuzleaf",
@@ -13802,7 +13802,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Shiftry",
         national_dex: unsafe { NatDexIndex::new_unchecked(275) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Shiftry",
             national_dex: unsafe { NatDexIndex::new_unchecked(275) },
             form_name: "Shiftry",
@@ -13838,7 +13838,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Taillow",
         national_dex: unsafe { NatDexIndex::new_unchecked(276) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Taillow",
             national_dex: unsafe { NatDexIndex::new_unchecked(276) },
             form_name: "Taillow",
@@ -13874,7 +13874,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Swellow",
         national_dex: unsafe { NatDexIndex::new_unchecked(277) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Swellow",
             national_dex: unsafe { NatDexIndex::new_unchecked(277) },
             form_name: "Swellow",
@@ -13910,7 +13910,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wingull",
         national_dex: unsafe { NatDexIndex::new_unchecked(278) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wingull",
             national_dex: unsafe { NatDexIndex::new_unchecked(278) },
             form_name: "Wingull",
@@ -13946,7 +13946,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pelipper",
         national_dex: unsafe { NatDexIndex::new_unchecked(279) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pelipper",
             national_dex: unsafe { NatDexIndex::new_unchecked(279) },
             form_name: "Pelipper",
@@ -13982,7 +13982,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ralts",
         national_dex: unsafe { NatDexIndex::new_unchecked(280) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ralts",
             national_dex: unsafe { NatDexIndex::new_unchecked(280) },
             form_name: "Ralts",
@@ -14018,7 +14018,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kirlia",
         national_dex: unsafe { NatDexIndex::new_unchecked(281) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kirlia",
             national_dex: unsafe { NatDexIndex::new_unchecked(281) },
             form_name: "Kirlia",
@@ -14057,7 +14057,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(282) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gardevoir",
                 national_dex: unsafe { NatDexIndex::new_unchecked(282) },
                 form_name: "Gardevoir",
@@ -14065,7 +14065,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(282, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(282, 1) },
                     required_item_id: Some(657),
                 }],
                 is_gmax: false,
@@ -14091,7 +14091,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "gardevoir",
                 sprite_index: (25, 10),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gardevoir-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(282) },
                 form_name: "Mega Gardevoir",
@@ -14128,7 +14128,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Surskit",
         national_dex: unsafe { NatDexIndex::new_unchecked(283) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Surskit",
             national_dex: unsafe { NatDexIndex::new_unchecked(283) },
             form_name: "Surskit",
@@ -14164,7 +14164,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Masquerain",
         national_dex: unsafe { NatDexIndex::new_unchecked(284) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Masquerain",
             national_dex: unsafe { NatDexIndex::new_unchecked(284) },
             form_name: "Masquerain",
@@ -14200,7 +14200,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Shroomish",
         national_dex: unsafe { NatDexIndex::new_unchecked(285) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Shroomish",
             national_dex: unsafe { NatDexIndex::new_unchecked(285) },
             form_name: "Shroomish",
@@ -14236,7 +14236,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Breloom",
         national_dex: unsafe { NatDexIndex::new_unchecked(286) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Breloom",
             national_dex: unsafe { NatDexIndex::new_unchecked(286) },
             form_name: "Breloom",
@@ -14272,7 +14272,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Slakoth",
         national_dex: unsafe { NatDexIndex::new_unchecked(287) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Slakoth",
             national_dex: unsafe { NatDexIndex::new_unchecked(287) },
             form_name: "Slakoth",
@@ -14308,7 +14308,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Vigoroth",
         national_dex: unsafe { NatDexIndex::new_unchecked(288) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Vigoroth",
             national_dex: unsafe { NatDexIndex::new_unchecked(288) },
             form_name: "Vigoroth",
@@ -14344,7 +14344,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Slaking",
         national_dex: unsafe { NatDexIndex::new_unchecked(289) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Slaking",
             national_dex: unsafe { NatDexIndex::new_unchecked(289) },
             form_name: "Slaking",
@@ -14380,7 +14380,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Nincada",
         national_dex: unsafe { NatDexIndex::new_unchecked(290) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Nincada",
             national_dex: unsafe { NatDexIndex::new_unchecked(290) },
             form_name: "Nincada",
@@ -14418,7 +14418,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ninjask",
         national_dex: unsafe { NatDexIndex::new_unchecked(291) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ninjask",
             national_dex: unsafe { NatDexIndex::new_unchecked(291) },
             form_name: "Ninjask",
@@ -14454,7 +14454,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Shedinja",
         national_dex: unsafe { NatDexIndex::new_unchecked(292) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Shedinja",
             national_dex: unsafe { NatDexIndex::new_unchecked(292) },
             form_name: "Shedinja",
@@ -14490,7 +14490,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Whismur",
         national_dex: unsafe { NatDexIndex::new_unchecked(293) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Whismur",
             national_dex: unsafe { NatDexIndex::new_unchecked(293) },
             form_name: "Whismur",
@@ -14526,7 +14526,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Loudred",
         national_dex: unsafe { NatDexIndex::new_unchecked(294) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Loudred",
             national_dex: unsafe { NatDexIndex::new_unchecked(294) },
             form_name: "Loudred",
@@ -14562,7 +14562,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Exploud",
         national_dex: unsafe { NatDexIndex::new_unchecked(295) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Exploud",
             national_dex: unsafe { NatDexIndex::new_unchecked(295) },
             form_name: "Exploud",
@@ -14598,7 +14598,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Makuhita",
         national_dex: unsafe { NatDexIndex::new_unchecked(296) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Makuhita",
             national_dex: unsafe { NatDexIndex::new_unchecked(296) },
             form_name: "Makuhita",
@@ -14634,7 +14634,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hariyama",
         national_dex: unsafe { NatDexIndex::new_unchecked(297) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hariyama",
             national_dex: unsafe { NatDexIndex::new_unchecked(297) },
             form_name: "Hariyama",
@@ -14670,7 +14670,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Azurill",
         national_dex: unsafe { NatDexIndex::new_unchecked(298) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Azurill",
             national_dex: unsafe { NatDexIndex::new_unchecked(298) },
             form_name: "Azurill",
@@ -14706,7 +14706,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Nosepass",
         national_dex: unsafe { NatDexIndex::new_unchecked(299) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Nosepass",
             national_dex: unsafe { NatDexIndex::new_unchecked(299) },
             form_name: "Nosepass",
@@ -14742,7 +14742,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Skitty",
         national_dex: unsafe { NatDexIndex::new_unchecked(300) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Skitty",
             national_dex: unsafe { NatDexIndex::new_unchecked(300) },
             form_name: "Skitty",
@@ -14778,7 +14778,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Delcatty",
         national_dex: unsafe { NatDexIndex::new_unchecked(301) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Delcatty",
             national_dex: unsafe { NatDexIndex::new_unchecked(301) },
             form_name: "Delcatty",
@@ -14815,7 +14815,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(302) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sableye",
                 national_dex: unsafe { NatDexIndex::new_unchecked(302) },
                 form_name: "Sableye",
@@ -14823,7 +14823,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(302, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(302, 1) },
                     required_item_id: Some(754),
                 }],
                 is_gmax: false,
@@ -14849,7 +14849,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "sableye",
                 sprite_index: (10, 11),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sableye-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(302) },
                 form_name: "Mega Sableye",
@@ -14887,7 +14887,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(303) },
         level_up_type: LevelUpType::Fast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Mawile",
                 national_dex: unsafe { NatDexIndex::new_unchecked(303) },
                 form_name: "Mawile",
@@ -14895,7 +14895,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(303, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(303, 1) },
                     required_item_id: Some(681),
                 }],
                 is_gmax: false,
@@ -14921,7 +14921,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "mawile",
                 sprite_index: (12, 11),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Mawile-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(303) },
                 form_name: "Mega Mawile",
@@ -14958,7 +14958,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Aron",
         national_dex: unsafe { NatDexIndex::new_unchecked(304) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Aron",
             national_dex: unsafe { NatDexIndex::new_unchecked(304) },
             form_name: "Aron",
@@ -14994,7 +14994,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lairon",
         national_dex: unsafe { NatDexIndex::new_unchecked(305) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lairon",
             national_dex: unsafe { NatDexIndex::new_unchecked(305) },
             form_name: "Lairon",
@@ -15031,7 +15031,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(306) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Aggron",
                 national_dex: unsafe { NatDexIndex::new_unchecked(306) },
                 form_name: "Aggron",
@@ -15039,7 +15039,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(306, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(306, 1) },
                     required_item_id: Some(667),
                 }],
                 is_gmax: false,
@@ -15065,7 +15065,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "aggron",
                 sprite_index: (16, 11),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Aggron-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(306) },
                 form_name: "Mega Aggron",
@@ -15102,7 +15102,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Meditite",
         national_dex: unsafe { NatDexIndex::new_unchecked(307) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Meditite",
             national_dex: unsafe { NatDexIndex::new_unchecked(307) },
             form_name: "Meditite",
@@ -15139,7 +15139,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(308) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Medicham",
                 national_dex: unsafe { NatDexIndex::new_unchecked(308) },
                 form_name: "Medicham",
@@ -15147,7 +15147,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(308, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(308, 1) },
                     required_item_id: Some(665),
                 }],
                 is_gmax: false,
@@ -15173,7 +15173,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "medicham",
                 sprite_index: (19, 11),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Medicham-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(308) },
                 form_name: "Mega Medicham",
@@ -15210,7 +15210,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Electrike",
         national_dex: unsafe { NatDexIndex::new_unchecked(309) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Electrike",
             national_dex: unsafe { NatDexIndex::new_unchecked(309) },
             form_name: "Electrike",
@@ -15247,7 +15247,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(310) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Manectric",
                 national_dex: unsafe { NatDexIndex::new_unchecked(310) },
                 form_name: "Manectric",
@@ -15255,7 +15255,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(310, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(310, 1) },
                     required_item_id: Some(682),
                 }],
                 is_gmax: false,
@@ -15281,7 +15281,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "manectric",
                 sprite_index: (22, 11),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Manectric-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(310) },
                 form_name: "Mega Manectric",
@@ -15318,7 +15318,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Plusle",
         national_dex: unsafe { NatDexIndex::new_unchecked(311) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Plusle",
             national_dex: unsafe { NatDexIndex::new_unchecked(311) },
             form_name: "Plusle",
@@ -15354,7 +15354,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Minun",
         national_dex: unsafe { NatDexIndex::new_unchecked(312) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Minun",
             national_dex: unsafe { NatDexIndex::new_unchecked(312) },
             form_name: "Minun",
@@ -15390,7 +15390,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Volbeat",
         national_dex: unsafe { NatDexIndex::new_unchecked(313) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Volbeat",
             national_dex: unsafe { NatDexIndex::new_unchecked(313) },
             form_name: "Volbeat",
@@ -15426,7 +15426,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Illumise",
         national_dex: unsafe { NatDexIndex::new_unchecked(314) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Illumise",
             national_dex: unsafe { NatDexIndex::new_unchecked(314) },
             form_name: "Illumise",
@@ -15462,7 +15462,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Roselia",
         national_dex: unsafe { NatDexIndex::new_unchecked(315) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Roselia",
             national_dex: unsafe { NatDexIndex::new_unchecked(315) },
             form_name: "Roselia",
@@ -15498,7 +15498,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gulpin",
         national_dex: unsafe { NatDexIndex::new_unchecked(316) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gulpin",
             national_dex: unsafe { NatDexIndex::new_unchecked(316) },
             form_name: "Gulpin",
@@ -15534,7 +15534,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Swalot",
         national_dex: unsafe { NatDexIndex::new_unchecked(317) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Swalot",
             national_dex: unsafe { NatDexIndex::new_unchecked(317) },
             form_name: "Swalot",
@@ -15570,7 +15570,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Carvanha",
         national_dex: unsafe { NatDexIndex::new_unchecked(318) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Carvanha",
             national_dex: unsafe { NatDexIndex::new_unchecked(318) },
             form_name: "Carvanha",
@@ -15607,7 +15607,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(319) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sharpedo",
                 national_dex: unsafe { NatDexIndex::new_unchecked(319) },
                 form_name: "Sharpedo",
@@ -15615,7 +15615,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(319, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(319, 1) },
                     required_item_id: Some(759),
                 }],
                 is_gmax: false,
@@ -15641,7 +15641,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "sharpedo",
                 sprite_index: (32, 11),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sharpedo-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(319) },
                 form_name: "Mega Sharpedo",
@@ -15678,7 +15678,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wailmer",
         national_dex: unsafe { NatDexIndex::new_unchecked(320) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wailmer",
             national_dex: unsafe { NatDexIndex::new_unchecked(320) },
             form_name: "Wailmer",
@@ -15714,7 +15714,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wailord",
         national_dex: unsafe { NatDexIndex::new_unchecked(321) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wailord",
             national_dex: unsafe { NatDexIndex::new_unchecked(321) },
             form_name: "Wailord",
@@ -15750,7 +15750,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Numel",
         national_dex: unsafe { NatDexIndex::new_unchecked(322) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Numel",
             national_dex: unsafe { NatDexIndex::new_unchecked(322) },
             form_name: "Numel",
@@ -15787,7 +15787,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(323) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Camerupt",
                 national_dex: unsafe { NatDexIndex::new_unchecked(323) },
                 form_name: "Camerupt",
@@ -15795,7 +15795,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(323, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(323, 1) },
                     required_item_id: Some(767),
                 }],
                 is_gmax: false,
@@ -15821,7 +15821,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "camerupt",
                 sprite_index: (1, 12),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Camerupt-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(323) },
                 form_name: "Mega Camerupt",
@@ -15858,7 +15858,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Torkoal",
         national_dex: unsafe { NatDexIndex::new_unchecked(324) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Torkoal",
             national_dex: unsafe { NatDexIndex::new_unchecked(324) },
             form_name: "Torkoal",
@@ -15894,7 +15894,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Spoink",
         national_dex: unsafe { NatDexIndex::new_unchecked(325) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Spoink",
             national_dex: unsafe { NatDexIndex::new_unchecked(325) },
             form_name: "Spoink",
@@ -15930,7 +15930,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Grumpig",
         national_dex: unsafe { NatDexIndex::new_unchecked(326) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Grumpig",
             national_dex: unsafe { NatDexIndex::new_unchecked(326) },
             form_name: "Grumpig",
@@ -15966,7 +15966,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Spinda",
         national_dex: unsafe { NatDexIndex::new_unchecked(327) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Spinda",
             national_dex: unsafe { NatDexIndex::new_unchecked(327) },
             form_name: "Spinda",
@@ -16002,7 +16002,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Trapinch",
         national_dex: unsafe { NatDexIndex::new_unchecked(328) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Trapinch",
             national_dex: unsafe { NatDexIndex::new_unchecked(328) },
             form_name: "Trapinch",
@@ -16038,7 +16038,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Vibrava",
         national_dex: unsafe { NatDexIndex::new_unchecked(329) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Vibrava",
             national_dex: unsafe { NatDexIndex::new_unchecked(329) },
             form_name: "Vibrava",
@@ -16074,7 +16074,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Flygon",
         national_dex: unsafe { NatDexIndex::new_unchecked(330) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Flygon",
             national_dex: unsafe { NatDexIndex::new_unchecked(330) },
             form_name: "Flygon",
@@ -16110,7 +16110,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cacnea",
         national_dex: unsafe { NatDexIndex::new_unchecked(331) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cacnea",
             national_dex: unsafe { NatDexIndex::new_unchecked(331) },
             form_name: "Cacnea",
@@ -16146,7 +16146,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cacturne",
         national_dex: unsafe { NatDexIndex::new_unchecked(332) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cacturne",
             national_dex: unsafe { NatDexIndex::new_unchecked(332) },
             form_name: "Cacturne",
@@ -16182,7 +16182,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Swablu",
         national_dex: unsafe { NatDexIndex::new_unchecked(333) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Swablu",
             national_dex: unsafe { NatDexIndex::new_unchecked(333) },
             form_name: "Swablu",
@@ -16219,7 +16219,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(334) },
         level_up_type: LevelUpType::Erratic,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Altaria",
                 national_dex: unsafe { NatDexIndex::new_unchecked(334) },
                 form_name: "Altaria",
@@ -16227,7 +16227,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(334, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(334, 1) },
                     required_item_id: Some(755),
                 }],
                 is_gmax: false,
@@ -16253,7 +16253,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "altaria",
                 sprite_index: (13, 12),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Altaria-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(334) },
                 form_name: "Mega Altaria",
@@ -16290,7 +16290,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Zangoose",
         national_dex: unsafe { NatDexIndex::new_unchecked(335) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Zangoose",
             national_dex: unsafe { NatDexIndex::new_unchecked(335) },
             form_name: "Zangoose",
@@ -16326,7 +16326,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Seviper",
         national_dex: unsafe { NatDexIndex::new_unchecked(336) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Seviper",
             national_dex: unsafe { NatDexIndex::new_unchecked(336) },
             form_name: "Seviper",
@@ -16362,7 +16362,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lunatone",
         national_dex: unsafe { NatDexIndex::new_unchecked(337) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lunatone",
             national_dex: unsafe { NatDexIndex::new_unchecked(337) },
             form_name: "Lunatone",
@@ -16398,7 +16398,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Solrock",
         national_dex: unsafe { NatDexIndex::new_unchecked(338) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Solrock",
             national_dex: unsafe { NatDexIndex::new_unchecked(338) },
             form_name: "Solrock",
@@ -16434,7 +16434,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Barboach",
         national_dex: unsafe { NatDexIndex::new_unchecked(339) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Barboach",
             national_dex: unsafe { NatDexIndex::new_unchecked(339) },
             form_name: "Barboach",
@@ -16470,7 +16470,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Whiscash",
         national_dex: unsafe { NatDexIndex::new_unchecked(340) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Whiscash",
             national_dex: unsafe { NatDexIndex::new_unchecked(340) },
             form_name: "Whiscash",
@@ -16506,7 +16506,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Corphish",
         national_dex: unsafe { NatDexIndex::new_unchecked(341) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Corphish",
             national_dex: unsafe { NatDexIndex::new_unchecked(341) },
             form_name: "Corphish",
@@ -16542,7 +16542,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Crawdaunt",
         national_dex: unsafe { NatDexIndex::new_unchecked(342) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Crawdaunt",
             national_dex: unsafe { NatDexIndex::new_unchecked(342) },
             form_name: "Crawdaunt",
@@ -16578,7 +16578,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Baltoy",
         national_dex: unsafe { NatDexIndex::new_unchecked(343) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Baltoy",
             national_dex: unsafe { NatDexIndex::new_unchecked(343) },
             form_name: "Baltoy",
@@ -16614,7 +16614,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Claydol",
         national_dex: unsafe { NatDexIndex::new_unchecked(344) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Claydol",
             national_dex: unsafe { NatDexIndex::new_unchecked(344) },
             form_name: "Claydol",
@@ -16650,7 +16650,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lileep",
         national_dex: unsafe { NatDexIndex::new_unchecked(345) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lileep",
             national_dex: unsafe { NatDexIndex::new_unchecked(345) },
             form_name: "Lileep",
@@ -16686,7 +16686,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cradily",
         national_dex: unsafe { NatDexIndex::new_unchecked(346) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cradily",
             national_dex: unsafe { NatDexIndex::new_unchecked(346) },
             form_name: "Cradily",
@@ -16722,7 +16722,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Anorith",
         national_dex: unsafe { NatDexIndex::new_unchecked(347) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Anorith",
             national_dex: unsafe { NatDexIndex::new_unchecked(347) },
             form_name: "Anorith",
@@ -16758,7 +16758,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Armaldo",
         national_dex: unsafe { NatDexIndex::new_unchecked(348) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Armaldo",
             national_dex: unsafe { NatDexIndex::new_unchecked(348) },
             form_name: "Armaldo",
@@ -16794,7 +16794,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Feebas",
         national_dex: unsafe { NatDexIndex::new_unchecked(349) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Feebas",
             national_dex: unsafe { NatDexIndex::new_unchecked(349) },
             form_name: "Feebas",
@@ -16830,7 +16830,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Milotic",
         national_dex: unsafe { NatDexIndex::new_unchecked(350) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Milotic",
             national_dex: unsafe { NatDexIndex::new_unchecked(350) },
             form_name: "Milotic",
@@ -16867,7 +16867,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(351) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Castform",
                 national_dex: unsafe { NatDexIndex::new_unchecked(351) },
                 form_name: "Castform",
@@ -16898,7 +16898,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "castform",
                 sprite_index: (31, 12),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Castform-Sunny",
                 national_dex: unsafe { NatDexIndex::new_unchecked(351) },
                 form_name: "Castform (Sunny)",
@@ -16929,7 +16929,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "castform-sunny",
                 sprite_index: (32, 12),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Castform-Rainy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(351) },
                 form_name: "Castform (Rainy)",
@@ -16960,7 +16960,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "castform-rainy",
                 sprite_index: (33, 12),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Castform-Snowy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(351) },
                 form_name: "Castform (Snowy)",
@@ -16997,7 +16997,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kecleon",
         national_dex: unsafe { NatDexIndex::new_unchecked(352) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kecleon",
             national_dex: unsafe { NatDexIndex::new_unchecked(352) },
             form_name: "Kecleon",
@@ -17033,7 +17033,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Shuppet",
         national_dex: unsafe { NatDexIndex::new_unchecked(353) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Shuppet",
             national_dex: unsafe { NatDexIndex::new_unchecked(353) },
             form_name: "Shuppet",
@@ -17070,7 +17070,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(354) },
         level_up_type: LevelUpType::Fast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Banette",
                 national_dex: unsafe { NatDexIndex::new_unchecked(354) },
                 form_name: "Banette",
@@ -17078,7 +17078,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(354, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(354, 1) },
                     required_item_id: Some(668),
                 }],
                 is_gmax: false,
@@ -17104,7 +17104,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "banette",
                 sprite_index: (1, 13),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Banette-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(354) },
                 form_name: "Mega Banette",
@@ -17141,7 +17141,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Duskull",
         national_dex: unsafe { NatDexIndex::new_unchecked(355) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Duskull",
             national_dex: unsafe { NatDexIndex::new_unchecked(355) },
             form_name: "Duskull",
@@ -17177,7 +17177,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dusclops",
         national_dex: unsafe { NatDexIndex::new_unchecked(356) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dusclops",
             national_dex: unsafe { NatDexIndex::new_unchecked(356) },
             form_name: "Dusclops",
@@ -17213,7 +17213,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tropius",
         national_dex: unsafe { NatDexIndex::new_unchecked(357) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tropius",
             national_dex: unsafe { NatDexIndex::new_unchecked(357) },
             form_name: "Tropius",
@@ -17250,7 +17250,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(358) },
         level_up_type: LevelUpType::Fast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Chimecho",
                 national_dex: unsafe { NatDexIndex::new_unchecked(358) },
                 form_name: "Chimecho",
@@ -17258,7 +17258,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(358, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(358, 1) },
                     required_item_id: Some(2637),
                 }],
                 is_gmax: false,
@@ -17284,7 +17284,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "chimecho",
                 sprite_index: (6, 13),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Chimecho-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(358) },
                 form_name: "Mega Chimecho",
@@ -17322,7 +17322,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(359) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Absol",
                 national_dex: unsafe { NatDexIndex::new_unchecked(359) },
                 form_name: "Absol",
@@ -17331,11 +17331,11 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_mega: false,
                 mega_evolution_data: &[
                     MegaEvolutionMetadata {
-                        mega_forme: unsafe { SpeciesAndForm::new_unchecked(359, 1) },
+                        mega_form: unsafe { SpeciesAndForm::new_unchecked(359, 1) },
                         required_item_id: Some(677),
                     },
                     MegaEvolutionMetadata {
-                        mega_forme: unsafe { SpeciesAndForm::new_unchecked(359, 2) },
+                        mega_form: unsafe { SpeciesAndForm::new_unchecked(359, 2) },
                         required_item_id: Some(2638),
                     },
                 ],
@@ -17362,7 +17362,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "absol",
                 sprite_index: (7, 13),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Absol-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(359) },
                 form_name: "Mega Absol",
@@ -17393,7 +17393,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "absol-mega",
                 sprite_index: (8, 13),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Absol-Mega-Z",
                 national_dex: unsafe { NatDexIndex::new_unchecked(359) },
                 form_name: "Mega Absol Z",
@@ -17430,7 +17430,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wynaut",
         national_dex: unsafe { NatDexIndex::new_unchecked(360) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wynaut",
             national_dex: unsafe { NatDexIndex::new_unchecked(360) },
             form_name: "Wynaut",
@@ -17466,7 +17466,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Snorunt",
         national_dex: unsafe { NatDexIndex::new_unchecked(361) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Snorunt",
             national_dex: unsafe { NatDexIndex::new_unchecked(361) },
             form_name: "Snorunt",
@@ -17505,7 +17505,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(362) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Glalie",
                 national_dex: unsafe { NatDexIndex::new_unchecked(362) },
                 form_name: "Glalie",
@@ -17513,7 +17513,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(362, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(362, 1) },
                     required_item_id: Some(763),
                 }],
                 is_gmax: false,
@@ -17539,7 +17539,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "glalie",
                 sprite_index: (11, 13),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Glalie-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(362) },
                 form_name: "Mega Glalie",
@@ -17576,7 +17576,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Spheal",
         national_dex: unsafe { NatDexIndex::new_unchecked(363) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Spheal",
             national_dex: unsafe { NatDexIndex::new_unchecked(363) },
             form_name: "Spheal",
@@ -17612,7 +17612,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sealeo",
         national_dex: unsafe { NatDexIndex::new_unchecked(364) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sealeo",
             national_dex: unsafe { NatDexIndex::new_unchecked(364) },
             form_name: "Sealeo",
@@ -17648,7 +17648,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Walrein",
         national_dex: unsafe { NatDexIndex::new_unchecked(365) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Walrein",
             national_dex: unsafe { NatDexIndex::new_unchecked(365) },
             form_name: "Walrein",
@@ -17684,7 +17684,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Clamperl",
         national_dex: unsafe { NatDexIndex::new_unchecked(366) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Clamperl",
             national_dex: unsafe { NatDexIndex::new_unchecked(366) },
             form_name: "Clamperl",
@@ -17722,7 +17722,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Huntail",
         national_dex: unsafe { NatDexIndex::new_unchecked(367) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Huntail",
             national_dex: unsafe { NatDexIndex::new_unchecked(367) },
             form_name: "Huntail",
@@ -17758,7 +17758,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gorebyss",
         national_dex: unsafe { NatDexIndex::new_unchecked(368) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gorebyss",
             national_dex: unsafe { NatDexIndex::new_unchecked(368) },
             form_name: "Gorebyss",
@@ -17794,7 +17794,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Relicanth",
         national_dex: unsafe { NatDexIndex::new_unchecked(369) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Relicanth",
             national_dex: unsafe { NatDexIndex::new_unchecked(369) },
             form_name: "Relicanth",
@@ -17830,7 +17830,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Luvdisc",
         national_dex: unsafe { NatDexIndex::new_unchecked(370) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Luvdisc",
             national_dex: unsafe { NatDexIndex::new_unchecked(370) },
             form_name: "Luvdisc",
@@ -17866,7 +17866,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bagon",
         national_dex: unsafe { NatDexIndex::new_unchecked(371) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bagon",
             national_dex: unsafe { NatDexIndex::new_unchecked(371) },
             form_name: "Bagon",
@@ -17902,7 +17902,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Shelgon",
         national_dex: unsafe { NatDexIndex::new_unchecked(372) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Shelgon",
             national_dex: unsafe { NatDexIndex::new_unchecked(372) },
             form_name: "Shelgon",
@@ -17939,7 +17939,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(373) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Salamence",
                 national_dex: unsafe { NatDexIndex::new_unchecked(373) },
                 form_name: "Salamence",
@@ -17947,7 +17947,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(373, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(373, 1) },
                     required_item_id: Some(769),
                 }],
                 is_gmax: false,
@@ -17973,7 +17973,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "salamence",
                 sprite_index: (23, 13),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Salamence-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(373) },
                 form_name: "Mega Salamence",
@@ -18010,7 +18010,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Beldum",
         national_dex: unsafe { NatDexIndex::new_unchecked(374) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Beldum",
             national_dex: unsafe { NatDexIndex::new_unchecked(374) },
             form_name: "Beldum",
@@ -18046,7 +18046,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Metang",
         national_dex: unsafe { NatDexIndex::new_unchecked(375) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Metang",
             national_dex: unsafe { NatDexIndex::new_unchecked(375) },
             form_name: "Metang",
@@ -18083,7 +18083,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(376) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Metagross",
                 national_dex: unsafe { NatDexIndex::new_unchecked(376) },
                 form_name: "Metagross",
@@ -18091,7 +18091,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(376, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(376, 1) },
                     required_item_id: Some(758),
                 }],
                 is_gmax: false,
@@ -18117,7 +18117,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "metagross",
                 sprite_index: (27, 13),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Metagross-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(376) },
                 form_name: "Mega Metagross",
@@ -18154,7 +18154,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Regirock",
         national_dex: unsafe { NatDexIndex::new_unchecked(377) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Regirock",
             national_dex: unsafe { NatDexIndex::new_unchecked(377) },
             form_name: "Regirock",
@@ -18190,7 +18190,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Regice",
         national_dex: unsafe { NatDexIndex::new_unchecked(378) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Regice",
             national_dex: unsafe { NatDexIndex::new_unchecked(378) },
             form_name: "Regice",
@@ -18226,7 +18226,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Registeel",
         national_dex: unsafe { NatDexIndex::new_unchecked(379) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Registeel",
             national_dex: unsafe { NatDexIndex::new_unchecked(379) },
             form_name: "Registeel",
@@ -18263,7 +18263,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(380) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Latias",
                 national_dex: unsafe { NatDexIndex::new_unchecked(380) },
                 form_name: "Latias",
@@ -18271,7 +18271,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(380, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(380, 1) },
                     required_item_id: Some(684),
                 }],
                 is_gmax: false,
@@ -18297,7 +18297,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "latias",
                 sprite_index: (32, 13),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Latias-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(380) },
                 form_name: "Mega Latias",
@@ -18335,7 +18335,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(381) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Latios",
                 national_dex: unsafe { NatDexIndex::new_unchecked(381) },
                 form_name: "Latios",
@@ -18343,7 +18343,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(381, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(381, 1) },
                     required_item_id: Some(685),
                 }],
                 is_gmax: false,
@@ -18369,7 +18369,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "latios",
                 sprite_index: (34, 13),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Latios-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(381) },
                 form_name: "Mega Latios",
@@ -18407,7 +18407,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(382) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Kyogre",
                 national_dex: unsafe { NatDexIndex::new_unchecked(382) },
                 form_name: "Kyogre",
@@ -18438,7 +18438,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "kyogre",
                 sprite_index: (0, 14),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Kyogre-Primal",
                 national_dex: unsafe { NatDexIndex::new_unchecked(382) },
                 form_name: "Primal Kyogre",
@@ -18476,7 +18476,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(383) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Groudon",
                 national_dex: unsafe { NatDexIndex::new_unchecked(383) },
                 form_name: "Groudon",
@@ -18507,7 +18507,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "groudon",
                 sprite_index: (2, 14),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Groudon-Primal",
                 national_dex: unsafe { NatDexIndex::new_unchecked(383) },
                 form_name: "Primal Groudon",
@@ -18545,7 +18545,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(384) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rayquaza",
                 national_dex: unsafe { NatDexIndex::new_unchecked(384) },
                 form_name: "Rayquaza",
@@ -18553,7 +18553,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(384, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(384, 1) },
                     required_item_id: None,
                 }],
                 is_gmax: false,
@@ -18579,7 +18579,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "rayquaza",
                 sprite_index: (4, 14),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rayquaza-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(384) },
                 form_name: "Mega Rayquaza",
@@ -18616,7 +18616,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Jirachi",
         national_dex: unsafe { NatDexIndex::new_unchecked(385) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Jirachi",
             national_dex: unsafe { NatDexIndex::new_unchecked(385) },
             form_name: "Jirachi",
@@ -18653,7 +18653,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(386) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Deoxys-Normal",
                 national_dex: unsafe { NatDexIndex::new_unchecked(386) },
                 form_name: "Deoxys",
@@ -18684,7 +18684,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "deoxys",
                 sprite_index: (7, 14),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Deoxys-Attack",
                 national_dex: unsafe { NatDexIndex::new_unchecked(386) },
                 form_name: "Deoxys Attack",
@@ -18715,7 +18715,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "deoxys-attack",
                 sprite_index: (8, 14),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Deoxys-Defense",
                 national_dex: unsafe { NatDexIndex::new_unchecked(386) },
                 form_name: "Deoxys Defense",
@@ -18746,7 +18746,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "deoxys-defense",
                 sprite_index: (9, 14),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Deoxys-Speed",
                 national_dex: unsafe { NatDexIndex::new_unchecked(386) },
                 form_name: "Deoxys Speed",
@@ -18783,7 +18783,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Turtwig",
         national_dex: unsafe { NatDexIndex::new_unchecked(387) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Turtwig",
             national_dex: unsafe { NatDexIndex::new_unchecked(387) },
             form_name: "Turtwig",
@@ -18819,7 +18819,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Grotle",
         national_dex: unsafe { NatDexIndex::new_unchecked(388) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Grotle",
             national_dex: unsafe { NatDexIndex::new_unchecked(388) },
             form_name: "Grotle",
@@ -18855,7 +18855,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Torterra",
         national_dex: unsafe { NatDexIndex::new_unchecked(389) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Torterra",
             national_dex: unsafe { NatDexIndex::new_unchecked(389) },
             form_name: "Torterra",
@@ -18891,7 +18891,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Chimchar",
         national_dex: unsafe { NatDexIndex::new_unchecked(390) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Chimchar",
             national_dex: unsafe { NatDexIndex::new_unchecked(390) },
             form_name: "Chimchar",
@@ -18927,7 +18927,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Monferno",
         national_dex: unsafe { NatDexIndex::new_unchecked(391) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Monferno",
             national_dex: unsafe { NatDexIndex::new_unchecked(391) },
             form_name: "Monferno",
@@ -18963,7 +18963,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Infernape",
         national_dex: unsafe { NatDexIndex::new_unchecked(392) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Infernape",
             national_dex: unsafe { NatDexIndex::new_unchecked(392) },
             form_name: "Infernape",
@@ -18999,7 +18999,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Piplup",
         national_dex: unsafe { NatDexIndex::new_unchecked(393) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Piplup",
             national_dex: unsafe { NatDexIndex::new_unchecked(393) },
             form_name: "Piplup",
@@ -19035,7 +19035,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Prinplup",
         national_dex: unsafe { NatDexIndex::new_unchecked(394) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Prinplup",
             national_dex: unsafe { NatDexIndex::new_unchecked(394) },
             form_name: "Prinplup",
@@ -19071,7 +19071,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Empoleon",
         national_dex: unsafe { NatDexIndex::new_unchecked(395) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Empoleon",
             national_dex: unsafe { NatDexIndex::new_unchecked(395) },
             form_name: "Empoleon",
@@ -19107,7 +19107,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Starly",
         national_dex: unsafe { NatDexIndex::new_unchecked(396) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Starly",
             national_dex: unsafe { NatDexIndex::new_unchecked(396) },
             form_name: "Starly",
@@ -19143,7 +19143,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Staravia",
         national_dex: unsafe { NatDexIndex::new_unchecked(397) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Staravia",
             national_dex: unsafe { NatDexIndex::new_unchecked(397) },
             form_name: "Staravia",
@@ -19180,7 +19180,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(398) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Staraptor",
                 national_dex: unsafe { NatDexIndex::new_unchecked(398) },
                 form_name: "Staraptor",
@@ -19188,7 +19188,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(398, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(398, 1) },
                     required_item_id: Some(2639),
                 }],
                 is_gmax: false,
@@ -19214,7 +19214,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "staraptor",
                 sprite_index: (22, 14),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Staraptor-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(398) },
                 form_name: "Mega Staraptor",
@@ -19251,7 +19251,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bidoof",
         national_dex: unsafe { NatDexIndex::new_unchecked(399) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bidoof",
             national_dex: unsafe { NatDexIndex::new_unchecked(399) },
             form_name: "Bidoof",
@@ -19287,7 +19287,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bibarel",
         national_dex: unsafe { NatDexIndex::new_unchecked(400) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bibarel",
             national_dex: unsafe { NatDexIndex::new_unchecked(400) },
             form_name: "Bibarel",
@@ -19323,7 +19323,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kricketot",
         national_dex: unsafe { NatDexIndex::new_unchecked(401) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kricketot",
             national_dex: unsafe { NatDexIndex::new_unchecked(401) },
             form_name: "Kricketot",
@@ -19359,7 +19359,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kricketune",
         national_dex: unsafe { NatDexIndex::new_unchecked(402) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kricketune",
             national_dex: unsafe { NatDexIndex::new_unchecked(402) },
             form_name: "Kricketune",
@@ -19395,7 +19395,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Shinx",
         national_dex: unsafe { NatDexIndex::new_unchecked(403) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Shinx",
             national_dex: unsafe { NatDexIndex::new_unchecked(403) },
             form_name: "Shinx",
@@ -19431,7 +19431,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Luxio",
         national_dex: unsafe { NatDexIndex::new_unchecked(404) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Luxio",
             national_dex: unsafe { NatDexIndex::new_unchecked(404) },
             form_name: "Luxio",
@@ -19467,7 +19467,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Luxray",
         national_dex: unsafe { NatDexIndex::new_unchecked(405) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Luxray",
             national_dex: unsafe { NatDexIndex::new_unchecked(405) },
             form_name: "Luxray",
@@ -19503,7 +19503,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Budew",
         national_dex: unsafe { NatDexIndex::new_unchecked(406) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Budew",
             national_dex: unsafe { NatDexIndex::new_unchecked(406) },
             form_name: "Budew",
@@ -19539,7 +19539,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Roserade",
         national_dex: unsafe { NatDexIndex::new_unchecked(407) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Roserade",
             national_dex: unsafe { NatDexIndex::new_unchecked(407) },
             form_name: "Roserade",
@@ -19575,7 +19575,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cranidos",
         national_dex: unsafe { NatDexIndex::new_unchecked(408) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cranidos",
             national_dex: unsafe { NatDexIndex::new_unchecked(408) },
             form_name: "Cranidos",
@@ -19611,7 +19611,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Rampardos",
         national_dex: unsafe { NatDexIndex::new_unchecked(409) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Rampardos",
             national_dex: unsafe { NatDexIndex::new_unchecked(409) },
             form_name: "Rampardos",
@@ -19647,7 +19647,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Shieldon",
         national_dex: unsafe { NatDexIndex::new_unchecked(410) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Shieldon",
             national_dex: unsafe { NatDexIndex::new_unchecked(410) },
             form_name: "Shieldon",
@@ -19683,7 +19683,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bastiodon",
         national_dex: unsafe { NatDexIndex::new_unchecked(411) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bastiodon",
             national_dex: unsafe { NatDexIndex::new_unchecked(411) },
             form_name: "Bastiodon",
@@ -19720,7 +19720,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(412) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Burmy-Plant",
                 national_dex: unsafe { NatDexIndex::new_unchecked(412) },
                 form_name: "Burmy",
@@ -19753,7 +19753,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "burmy",
                 sprite_index: (0, 15),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Burmy-Sandy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(412) },
                 form_name: "Burmy (Sandy Cloak)",
@@ -19786,7 +19786,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "burmy-sandy",
                 sprite_index: (1, 15),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Burmy-Trash",
                 national_dex: unsafe { NatDexIndex::new_unchecked(412) },
                 form_name: "Burmy (Trash Cloak)",
@@ -19826,7 +19826,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(413) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Wormadam-Plant",
                 national_dex: unsafe { NatDexIndex::new_unchecked(413) },
                 form_name: "Wormadam",
@@ -19857,7 +19857,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "wormadam",
                 sprite_index: (3, 15),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Wormadam-Sandy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(413) },
                 form_name: "Wormadam (Sandy Cloak)",
@@ -19888,7 +19888,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "wormadam-sandy",
                 sprite_index: (4, 15),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Wormadam-Trash",
                 national_dex: unsafe { NatDexIndex::new_unchecked(413) },
                 form_name: "Wormadam (Trash Cloak)",
@@ -19925,7 +19925,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mothim",
         national_dex: unsafe { NatDexIndex::new_unchecked(414) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mothim",
             national_dex: unsafe { NatDexIndex::new_unchecked(414) },
             form_name: "Mothim",
@@ -19961,7 +19961,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Combee",
         national_dex: unsafe { NatDexIndex::new_unchecked(415) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Combee",
             national_dex: unsafe { NatDexIndex::new_unchecked(415) },
             form_name: "Combee",
@@ -19997,7 +19997,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Vespiquen",
         national_dex: unsafe { NatDexIndex::new_unchecked(416) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Vespiquen",
             national_dex: unsafe { NatDexIndex::new_unchecked(416) },
             form_name: "Vespiquen",
@@ -20033,7 +20033,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pachirisu",
         national_dex: unsafe { NatDexIndex::new_unchecked(417) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pachirisu",
             national_dex: unsafe { NatDexIndex::new_unchecked(417) },
             form_name: "Pachirisu",
@@ -20069,7 +20069,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Buizel",
         national_dex: unsafe { NatDexIndex::new_unchecked(418) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Buizel",
             national_dex: unsafe { NatDexIndex::new_unchecked(418) },
             form_name: "Buizel",
@@ -20105,7 +20105,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Floatzel",
         national_dex: unsafe { NatDexIndex::new_unchecked(419) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Floatzel",
             national_dex: unsafe { NatDexIndex::new_unchecked(419) },
             form_name: "Floatzel",
@@ -20141,7 +20141,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cherubi",
         national_dex: unsafe { NatDexIndex::new_unchecked(420) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cherubi",
             national_dex: unsafe { NatDexIndex::new_unchecked(420) },
             form_name: "Cherubi",
@@ -20178,7 +20178,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(421) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Cherrim-Overcast",
                 national_dex: unsafe { NatDexIndex::new_unchecked(421) },
                 form_name: "Cherrim",
@@ -20209,7 +20209,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "cherrim",
                 sprite_index: (13, 15),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Cherrim-Sunshine",
                 national_dex: unsafe { NatDexIndex::new_unchecked(421) },
                 form_name: "Cherrim (Sunshine)",
@@ -20247,7 +20247,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(422) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Shellos-West",
                 national_dex: unsafe { NatDexIndex::new_unchecked(422) },
                 form_name: "Shellos",
@@ -20278,7 +20278,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "shellos-west",
                 sprite_index: (15, 15),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Shellos-East",
                 national_dex: unsafe { NatDexIndex::new_unchecked(422) },
                 form_name: "Shellos (East Sea)",
@@ -20318,7 +20318,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(423) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gastrodon-West",
                 national_dex: unsafe { NatDexIndex::new_unchecked(423) },
                 form_name: "Gastrodon",
@@ -20349,7 +20349,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "gastrodon-west",
                 sprite_index: (17, 15),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gastrodon-East",
                 national_dex: unsafe { NatDexIndex::new_unchecked(423) },
                 form_name: "Gastrodon (East Sea)",
@@ -20386,7 +20386,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ambipom",
         national_dex: unsafe { NatDexIndex::new_unchecked(424) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ambipom",
             national_dex: unsafe { NatDexIndex::new_unchecked(424) },
             form_name: "Ambipom",
@@ -20422,7 +20422,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Drifloon",
         national_dex: unsafe { NatDexIndex::new_unchecked(425) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Drifloon",
             national_dex: unsafe { NatDexIndex::new_unchecked(425) },
             form_name: "Drifloon",
@@ -20458,7 +20458,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Drifblim",
         national_dex: unsafe { NatDexIndex::new_unchecked(426) },
         level_up_type: LevelUpType::Fluctuating,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Drifblim",
             national_dex: unsafe { NatDexIndex::new_unchecked(426) },
             form_name: "Drifblim",
@@ -20494,7 +20494,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Buneary",
         national_dex: unsafe { NatDexIndex::new_unchecked(427) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Buneary",
             national_dex: unsafe { NatDexIndex::new_unchecked(427) },
             form_name: "Buneary",
@@ -20531,7 +20531,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(428) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Lopunny",
                 national_dex: unsafe { NatDexIndex::new_unchecked(428) },
                 form_name: "Lopunny",
@@ -20539,7 +20539,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(428, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(428, 1) },
                     required_item_id: Some(768),
                 }],
                 is_gmax: false,
@@ -20565,7 +20565,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "lopunny",
                 sprite_index: (23, 15),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Lopunny-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(428) },
                 form_name: "Mega Lopunny",
@@ -20602,7 +20602,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mismagius",
         national_dex: unsafe { NatDexIndex::new_unchecked(429) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mismagius",
             national_dex: unsafe { NatDexIndex::new_unchecked(429) },
             form_name: "Mismagius",
@@ -20638,7 +20638,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Honchkrow",
         national_dex: unsafe { NatDexIndex::new_unchecked(430) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Honchkrow",
             national_dex: unsafe { NatDexIndex::new_unchecked(430) },
             form_name: "Honchkrow",
@@ -20674,7 +20674,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Glameow",
         national_dex: unsafe { NatDexIndex::new_unchecked(431) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Glameow",
             national_dex: unsafe { NatDexIndex::new_unchecked(431) },
             form_name: "Glameow",
@@ -20710,7 +20710,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Purugly",
         national_dex: unsafe { NatDexIndex::new_unchecked(432) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Purugly",
             national_dex: unsafe { NatDexIndex::new_unchecked(432) },
             form_name: "Purugly",
@@ -20746,7 +20746,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Chingling",
         national_dex: unsafe { NatDexIndex::new_unchecked(433) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Chingling",
             national_dex: unsafe { NatDexIndex::new_unchecked(433) },
             form_name: "Chingling",
@@ -20782,7 +20782,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Stunky",
         national_dex: unsafe { NatDexIndex::new_unchecked(434) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Stunky",
             national_dex: unsafe { NatDexIndex::new_unchecked(434) },
             form_name: "Stunky",
@@ -20818,7 +20818,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Skuntank",
         national_dex: unsafe { NatDexIndex::new_unchecked(435) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Skuntank",
             national_dex: unsafe { NatDexIndex::new_unchecked(435) },
             form_name: "Skuntank",
@@ -20854,7 +20854,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bronzor",
         national_dex: unsafe { NatDexIndex::new_unchecked(436) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bronzor",
             national_dex: unsafe { NatDexIndex::new_unchecked(436) },
             form_name: "Bronzor",
@@ -20890,7 +20890,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bronzong",
         national_dex: unsafe { NatDexIndex::new_unchecked(437) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bronzong",
             national_dex: unsafe { NatDexIndex::new_unchecked(437) },
             form_name: "Bronzong",
@@ -20926,7 +20926,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bonsly",
         national_dex: unsafe { NatDexIndex::new_unchecked(438) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bonsly",
             national_dex: unsafe { NatDexIndex::new_unchecked(438) },
             form_name: "Bonsly",
@@ -20962,7 +20962,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mime Jr.",
         national_dex: unsafe { NatDexIndex::new_unchecked(439) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mime Jr.",
             national_dex: unsafe { NatDexIndex::new_unchecked(439) },
             form_name: "Mime Jr.",
@@ -21000,7 +21000,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Happiny",
         national_dex: unsafe { NatDexIndex::new_unchecked(440) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Happiny",
             national_dex: unsafe { NatDexIndex::new_unchecked(440) },
             form_name: "Happiny",
@@ -21036,7 +21036,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Chatot",
         national_dex: unsafe { NatDexIndex::new_unchecked(441) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Chatot",
             national_dex: unsafe { NatDexIndex::new_unchecked(441) },
             form_name: "Chatot",
@@ -21072,7 +21072,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Spiritomb",
         national_dex: unsafe { NatDexIndex::new_unchecked(442) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Spiritomb",
             national_dex: unsafe { NatDexIndex::new_unchecked(442) },
             form_name: "Spiritomb",
@@ -21108,7 +21108,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gible",
         national_dex: unsafe { NatDexIndex::new_unchecked(443) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gible",
             national_dex: unsafe { NatDexIndex::new_unchecked(443) },
             form_name: "Gible",
@@ -21144,7 +21144,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gabite",
         national_dex: unsafe { NatDexIndex::new_unchecked(444) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gabite",
             national_dex: unsafe { NatDexIndex::new_unchecked(444) },
             form_name: "Gabite",
@@ -21181,7 +21181,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(445) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Garchomp",
                 national_dex: unsafe { NatDexIndex::new_unchecked(445) },
                 form_name: "Garchomp",
@@ -21190,11 +21190,11 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_mega: false,
                 mega_evolution_data: &[
                     MegaEvolutionMetadata {
-                        mega_forme: unsafe { SpeciesAndForm::new_unchecked(445, 1) },
+                        mega_form: unsafe { SpeciesAndForm::new_unchecked(445, 1) },
                         required_item_id: Some(683),
                     },
                     MegaEvolutionMetadata {
-                        mega_forme: unsafe { SpeciesAndForm::new_unchecked(445, 2) },
+                        mega_form: unsafe { SpeciesAndForm::new_unchecked(445, 2) },
                         required_item_id: Some(2640),
                     },
                 ],
@@ -21221,7 +21221,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "garchomp",
                 sprite_index: (5, 16),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Garchomp-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(445) },
                 form_name: "Mega Garchomp",
@@ -21252,7 +21252,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "garchomp-mega",
                 sprite_index: (6, 16),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Garchomp-Mega-Z",
                 national_dex: unsafe { NatDexIndex::new_unchecked(445) },
                 form_name: "Mega Garchomp Z",
@@ -21289,7 +21289,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Munchlax",
         national_dex: unsafe { NatDexIndex::new_unchecked(446) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Munchlax",
             national_dex: unsafe { NatDexIndex::new_unchecked(446) },
             form_name: "Munchlax",
@@ -21325,7 +21325,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Riolu",
         national_dex: unsafe { NatDexIndex::new_unchecked(447) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Riolu",
             national_dex: unsafe { NatDexIndex::new_unchecked(447) },
             form_name: "Riolu",
@@ -21362,7 +21362,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(448) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Lucario",
                 national_dex: unsafe { NatDexIndex::new_unchecked(448) },
                 form_name: "Lucario",
@@ -21371,11 +21371,11 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_mega: false,
                 mega_evolution_data: &[
                     MegaEvolutionMetadata {
-                        mega_forme: unsafe { SpeciesAndForm::new_unchecked(448, 1) },
+                        mega_form: unsafe { SpeciesAndForm::new_unchecked(448, 1) },
                         required_item_id: Some(673),
                     },
                     MegaEvolutionMetadata {
-                        mega_forme: unsafe { SpeciesAndForm::new_unchecked(448, 2) },
+                        mega_form: unsafe { SpeciesAndForm::new_unchecked(448, 2) },
                         required_item_id: Some(2641),
                     },
                 ],
@@ -21402,7 +21402,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "lucario",
                 sprite_index: (9, 16),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Lucario-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(448) },
                 form_name: "Mega Lucario",
@@ -21433,7 +21433,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "lucario-mega",
                 sprite_index: (10, 16),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Lucario-Mega-Z",
                 national_dex: unsafe { NatDexIndex::new_unchecked(448) },
                 form_name: "Mega Lucario Z",
@@ -21470,7 +21470,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hippopotas",
         national_dex: unsafe { NatDexIndex::new_unchecked(449) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hippopotas",
             national_dex: unsafe { NatDexIndex::new_unchecked(449) },
             form_name: "Hippopotas",
@@ -21506,7 +21506,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hippowdon",
         national_dex: unsafe { NatDexIndex::new_unchecked(450) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hippowdon",
             national_dex: unsafe { NatDexIndex::new_unchecked(450) },
             form_name: "Hippowdon",
@@ -21542,7 +21542,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Skorupi",
         national_dex: unsafe { NatDexIndex::new_unchecked(451) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Skorupi",
             national_dex: unsafe { NatDexIndex::new_unchecked(451) },
             form_name: "Skorupi",
@@ -21578,7 +21578,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Drapion",
         national_dex: unsafe { NatDexIndex::new_unchecked(452) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Drapion",
             national_dex: unsafe { NatDexIndex::new_unchecked(452) },
             form_name: "Drapion",
@@ -21614,7 +21614,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Croagunk",
         national_dex: unsafe { NatDexIndex::new_unchecked(453) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Croagunk",
             national_dex: unsafe { NatDexIndex::new_unchecked(453) },
             form_name: "Croagunk",
@@ -21650,7 +21650,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Toxicroak",
         national_dex: unsafe { NatDexIndex::new_unchecked(454) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Toxicroak",
             national_dex: unsafe { NatDexIndex::new_unchecked(454) },
             form_name: "Toxicroak",
@@ -21686,7 +21686,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Carnivine",
         national_dex: unsafe { NatDexIndex::new_unchecked(455) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Carnivine",
             national_dex: unsafe { NatDexIndex::new_unchecked(455) },
             form_name: "Carnivine",
@@ -21722,7 +21722,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Finneon",
         national_dex: unsafe { NatDexIndex::new_unchecked(456) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Finneon",
             national_dex: unsafe { NatDexIndex::new_unchecked(456) },
             form_name: "Finneon",
@@ -21758,7 +21758,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lumineon",
         national_dex: unsafe { NatDexIndex::new_unchecked(457) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lumineon",
             national_dex: unsafe { NatDexIndex::new_unchecked(457) },
             form_name: "Lumineon",
@@ -21794,7 +21794,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mantyke",
         national_dex: unsafe { NatDexIndex::new_unchecked(458) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mantyke",
             national_dex: unsafe { NatDexIndex::new_unchecked(458) },
             form_name: "Mantyke",
@@ -21830,7 +21830,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Snover",
         national_dex: unsafe { NatDexIndex::new_unchecked(459) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Snover",
             national_dex: unsafe { NatDexIndex::new_unchecked(459) },
             form_name: "Snover",
@@ -21867,7 +21867,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(460) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Abomasnow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(460) },
                 form_name: "Abomasnow",
@@ -21875,7 +21875,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(460, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(460, 1) },
                     required_item_id: Some(674),
                 }],
                 is_gmax: false,
@@ -21901,7 +21901,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "abomasnow",
                 sprite_index: (22, 16),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Abomasnow-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(460) },
                 form_name: "Mega Abomasnow",
@@ -21938,7 +21938,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Weavile",
         national_dex: unsafe { NatDexIndex::new_unchecked(461) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Weavile",
             national_dex: unsafe { NatDexIndex::new_unchecked(461) },
             form_name: "Weavile",
@@ -21974,7 +21974,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Magnezone",
         national_dex: unsafe { NatDexIndex::new_unchecked(462) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Magnezone",
             national_dex: unsafe { NatDexIndex::new_unchecked(462) },
             form_name: "Magnezone",
@@ -22010,7 +22010,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lickilicky",
         national_dex: unsafe { NatDexIndex::new_unchecked(463) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lickilicky",
             national_dex: unsafe { NatDexIndex::new_unchecked(463) },
             form_name: "Lickilicky",
@@ -22046,7 +22046,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Rhyperior",
         national_dex: unsafe { NatDexIndex::new_unchecked(464) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Rhyperior",
             national_dex: unsafe { NatDexIndex::new_unchecked(464) },
             form_name: "Rhyperior",
@@ -22082,7 +22082,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tangrowth",
         national_dex: unsafe { NatDexIndex::new_unchecked(465) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tangrowth",
             national_dex: unsafe { NatDexIndex::new_unchecked(465) },
             form_name: "Tangrowth",
@@ -22118,7 +22118,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Electivire",
         national_dex: unsafe { NatDexIndex::new_unchecked(466) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Electivire",
             national_dex: unsafe { NatDexIndex::new_unchecked(466) },
             form_name: "Electivire",
@@ -22154,7 +22154,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Magmortar",
         national_dex: unsafe { NatDexIndex::new_unchecked(467) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Magmortar",
             national_dex: unsafe { NatDexIndex::new_unchecked(467) },
             form_name: "Magmortar",
@@ -22190,7 +22190,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Togekiss",
         national_dex: unsafe { NatDexIndex::new_unchecked(468) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Togekiss",
             national_dex: unsafe { NatDexIndex::new_unchecked(468) },
             form_name: "Togekiss",
@@ -22226,7 +22226,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Yanmega",
         national_dex: unsafe { NatDexIndex::new_unchecked(469) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Yanmega",
             national_dex: unsafe { NatDexIndex::new_unchecked(469) },
             form_name: "Yanmega",
@@ -22262,7 +22262,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Leafeon",
         national_dex: unsafe { NatDexIndex::new_unchecked(470) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Leafeon",
             national_dex: unsafe { NatDexIndex::new_unchecked(470) },
             form_name: "Leafeon",
@@ -22298,7 +22298,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Glaceon",
         national_dex: unsafe { NatDexIndex::new_unchecked(471) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Glaceon",
             national_dex: unsafe { NatDexIndex::new_unchecked(471) },
             form_name: "Glaceon",
@@ -22334,7 +22334,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gliscor",
         national_dex: unsafe { NatDexIndex::new_unchecked(472) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gliscor",
             national_dex: unsafe { NatDexIndex::new_unchecked(472) },
             form_name: "Gliscor",
@@ -22370,7 +22370,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mamoswine",
         national_dex: unsafe { NatDexIndex::new_unchecked(473) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mamoswine",
             national_dex: unsafe { NatDexIndex::new_unchecked(473) },
             form_name: "Mamoswine",
@@ -22406,7 +22406,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Porygon-Z",
         national_dex: unsafe { NatDexIndex::new_unchecked(474) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Porygon-Z",
             national_dex: unsafe { NatDexIndex::new_unchecked(474) },
             form_name: "Porygon-Z",
@@ -22443,7 +22443,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(475) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gallade",
                 national_dex: unsafe { NatDexIndex::new_unchecked(475) },
                 form_name: "Gallade",
@@ -22451,7 +22451,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(475, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(475, 1) },
                     required_item_id: Some(756),
                 }],
                 is_gmax: false,
@@ -22477,7 +22477,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "gallade",
                 sprite_index: (2, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gallade-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(475) },
                 form_name: "Mega Gallade",
@@ -22514,7 +22514,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Probopass",
         national_dex: unsafe { NatDexIndex::new_unchecked(476) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Probopass",
             national_dex: unsafe { NatDexIndex::new_unchecked(476) },
             form_name: "Probopass",
@@ -22550,7 +22550,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dusknoir",
         national_dex: unsafe { NatDexIndex::new_unchecked(477) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dusknoir",
             national_dex: unsafe { NatDexIndex::new_unchecked(477) },
             form_name: "Dusknoir",
@@ -22587,7 +22587,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(478) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Froslass",
                 national_dex: unsafe { NatDexIndex::new_unchecked(478) },
                 form_name: "Froslass",
@@ -22595,7 +22595,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(478, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(478, 1) },
                     required_item_id: Some(2566),
                 }],
                 is_gmax: false,
@@ -22621,7 +22621,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "froslass",
                 sprite_index: (6, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Froslass-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(478) },
                 form_name: "Mega Froslass",
@@ -22659,7 +22659,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(479) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rotom",
                 national_dex: unsafe { NatDexIndex::new_unchecked(479) },
                 form_name: "Rotom",
@@ -22690,7 +22690,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "rotom",
                 sprite_index: (7, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rotom-Heat",
                 national_dex: unsafe { NatDexIndex::new_unchecked(479) },
                 form_name: "Rotom Heat",
@@ -22721,7 +22721,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "rotom-heat",
                 sprite_index: (8, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rotom-Wash",
                 national_dex: unsafe { NatDexIndex::new_unchecked(479) },
                 form_name: "Rotom Wash",
@@ -22752,7 +22752,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "rotom-wash",
                 sprite_index: (9, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rotom-Frost",
                 national_dex: unsafe { NatDexIndex::new_unchecked(479) },
                 form_name: "Rotom Frost",
@@ -22783,7 +22783,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "rotom-frost",
                 sprite_index: (10, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rotom-Fan",
                 national_dex: unsafe { NatDexIndex::new_unchecked(479) },
                 form_name: "Rotom Fan",
@@ -22814,7 +22814,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "rotom-fan",
                 sprite_index: (11, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rotom-Mow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(479) },
                 form_name: "Rotom Mow",
@@ -22851,7 +22851,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Uxie",
         national_dex: unsafe { NatDexIndex::new_unchecked(480) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Uxie",
             national_dex: unsafe { NatDexIndex::new_unchecked(480) },
             form_name: "Uxie",
@@ -22887,7 +22887,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mesprit",
         national_dex: unsafe { NatDexIndex::new_unchecked(481) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mesprit",
             national_dex: unsafe { NatDexIndex::new_unchecked(481) },
             form_name: "Mesprit",
@@ -22923,7 +22923,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Azelf",
         national_dex: unsafe { NatDexIndex::new_unchecked(482) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Azelf",
             national_dex: unsafe { NatDexIndex::new_unchecked(482) },
             form_name: "Azelf",
@@ -22960,7 +22960,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(483) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Dialga",
                 national_dex: unsafe { NatDexIndex::new_unchecked(483) },
                 form_name: "Dialga",
@@ -22991,7 +22991,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "dialga",
                 sprite_index: (16, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Dialga-Origin",
                 national_dex: unsafe { NatDexIndex::new_unchecked(483) },
                 form_name: "Dialga (Origin Forme)",
@@ -23029,7 +23029,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(484) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Palkia",
                 national_dex: unsafe { NatDexIndex::new_unchecked(484) },
                 form_name: "Palkia",
@@ -23060,7 +23060,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "palkia",
                 sprite_index: (18, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Palkia-Origin",
                 national_dex: unsafe { NatDexIndex::new_unchecked(484) },
                 form_name: "Palkia (Origin Forme)",
@@ -23098,7 +23098,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(485) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Heatran",
                 national_dex: unsafe { NatDexIndex::new_unchecked(485) },
                 form_name: "Heatran",
@@ -23106,7 +23106,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(485, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(485, 1) },
                     required_item_id: Some(2567),
                 }],
                 is_gmax: false,
@@ -23132,7 +23132,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "heatran",
                 sprite_index: (20, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Heatran-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(485) },
                 form_name: "Mega Heatran",
@@ -23169,7 +23169,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Regigigas",
         national_dex: unsafe { NatDexIndex::new_unchecked(486) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Regigigas",
             national_dex: unsafe { NatDexIndex::new_unchecked(486) },
             form_name: "Regigigas",
@@ -23206,7 +23206,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(487) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Giratina-Altered",
                 national_dex: unsafe { NatDexIndex::new_unchecked(487) },
                 form_name: "Giratina",
@@ -23237,7 +23237,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "giratina",
                 sprite_index: (22, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Giratina-Origin",
                 national_dex: unsafe { NatDexIndex::new_unchecked(487) },
                 form_name: "Giratina (Origin Forme)",
@@ -23274,7 +23274,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cresselia",
         national_dex: unsafe { NatDexIndex::new_unchecked(488) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cresselia",
             national_dex: unsafe { NatDexIndex::new_unchecked(488) },
             form_name: "Cresselia",
@@ -23310,7 +23310,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Phione",
         national_dex: unsafe { NatDexIndex::new_unchecked(489) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Phione",
             national_dex: unsafe { NatDexIndex::new_unchecked(489) },
             form_name: "Phione",
@@ -23346,7 +23346,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Manaphy",
         national_dex: unsafe { NatDexIndex::new_unchecked(490) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Manaphy",
             national_dex: unsafe { NatDexIndex::new_unchecked(490) },
             form_name: "Manaphy",
@@ -23383,7 +23383,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(491) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Darkrai",
                 national_dex: unsafe { NatDexIndex::new_unchecked(491) },
                 form_name: "Darkrai",
@@ -23391,7 +23391,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(491, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(491, 1) },
                     required_item_id: Some(2568),
                 }],
                 is_gmax: false,
@@ -23417,7 +23417,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "darkrai",
                 sprite_index: (27, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Darkrai-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(491) },
                 form_name: "Mega Darkrai",
@@ -23455,7 +23455,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(492) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Shaymin-Land",
                 national_dex: unsafe { NatDexIndex::new_unchecked(492) },
                 form_name: "Shaymin",
@@ -23486,7 +23486,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "shaymin",
                 sprite_index: (28, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Shaymin-Sky",
                 national_dex: unsafe { NatDexIndex::new_unchecked(492) },
                 form_name: "Shaymin (Sky Forme)",
@@ -23524,7 +23524,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(493) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Normal",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus",
@@ -23555,7 +23555,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus",
                 sprite_index: (30, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Fighting",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Fighting)",
@@ -23586,7 +23586,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-fighting",
                 sprite_index: (1, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Flying",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Flying)",
@@ -23617,7 +23617,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-flying",
                 sprite_index: (2, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Poison",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Poison)",
@@ -23648,7 +23648,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-poison",
                 sprite_index: (7, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Ground",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Ground)",
@@ -23679,7 +23679,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-ground",
                 sprite_index: (5, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Rock",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Rock)",
@@ -23710,7 +23710,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-rock",
                 sprite_index: (9, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Bug",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Bug)",
@@ -23741,7 +23741,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-bug",
                 sprite_index: (31, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Ghost",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Ghost)",
@@ -23772,7 +23772,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-ghost",
                 sprite_index: (3, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Steel",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Steel)",
@@ -23803,7 +23803,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-steel",
                 sprite_index: (10, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Fire",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Fire)",
@@ -23834,7 +23834,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-fire",
                 sprite_index: (0, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Water",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Water)",
@@ -23865,7 +23865,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-water",
                 sprite_index: (11, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Grass",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Grass)",
@@ -23896,7 +23896,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-grass",
                 sprite_index: (4, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Electric",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Electric)",
@@ -23927,7 +23927,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-electric",
                 sprite_index: (34, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Psychic",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Psychic)",
@@ -23958,7 +23958,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-psychic",
                 sprite_index: (8, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Ice",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Ice)",
@@ -23989,7 +23989,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-ice",
                 sprite_index: (6, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Dragon",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Dragon)",
@@ -24020,7 +24020,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-dragon",
                 sprite_index: (33, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Dark",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Dark)",
@@ -24051,7 +24051,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-dark",
                 sprite_index: (32, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Fairy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Fairy)",
@@ -24082,7 +24082,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "arceus-fairy",
                 sprite_index: (35, 17),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Arceus-Legend",
                 national_dex: unsafe { NatDexIndex::new_unchecked(493) },
                 form_name: "Arceus (Legend)",
@@ -24119,7 +24119,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Victini",
         national_dex: unsafe { NatDexIndex::new_unchecked(494) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Victini",
             national_dex: unsafe { NatDexIndex::new_unchecked(494) },
             form_name: "Victini",
@@ -24155,7 +24155,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Snivy",
         national_dex: unsafe { NatDexIndex::new_unchecked(495) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Snivy",
             national_dex: unsafe { NatDexIndex::new_unchecked(495) },
             form_name: "Snivy",
@@ -24191,7 +24191,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Servine",
         national_dex: unsafe { NatDexIndex::new_unchecked(496) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Servine",
             national_dex: unsafe { NatDexIndex::new_unchecked(496) },
             form_name: "Servine",
@@ -24227,7 +24227,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Serperior",
         national_dex: unsafe { NatDexIndex::new_unchecked(497) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Serperior",
             national_dex: unsafe { NatDexIndex::new_unchecked(497) },
             form_name: "Serperior",
@@ -24263,7 +24263,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tepig",
         national_dex: unsafe { NatDexIndex::new_unchecked(498) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tepig",
             national_dex: unsafe { NatDexIndex::new_unchecked(498) },
             form_name: "Tepig",
@@ -24299,7 +24299,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pignite",
         national_dex: unsafe { NatDexIndex::new_unchecked(499) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pignite",
             national_dex: unsafe { NatDexIndex::new_unchecked(499) },
             form_name: "Pignite",
@@ -24336,7 +24336,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(500) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Emboar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(500) },
                 form_name: "Emboar",
@@ -24344,7 +24344,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(500, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(500, 1) },
                     required_item_id: Some(2569),
                 }],
                 is_gmax: false,
@@ -24370,7 +24370,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "emboar",
                 sprite_index: (18, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Emboar-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(500) },
                 form_name: "Mega Emboar",
@@ -24407,7 +24407,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Oshawott",
         national_dex: unsafe { NatDexIndex::new_unchecked(501) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Oshawott",
             national_dex: unsafe { NatDexIndex::new_unchecked(501) },
             form_name: "Oshawott",
@@ -24443,7 +24443,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dewott",
         national_dex: unsafe { NatDexIndex::new_unchecked(502) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dewott",
             national_dex: unsafe { NatDexIndex::new_unchecked(502) },
             form_name: "Dewott",
@@ -24482,7 +24482,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(503) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Samurott",
                 national_dex: unsafe { NatDexIndex::new_unchecked(503) },
                 form_name: "Samurott",
@@ -24513,7 +24513,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "samurott",
                 sprite_index: (21, 18),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Samurott-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(503) },
                 form_name: "Hisuian Samurott",
@@ -24550,7 +24550,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Patrat",
         national_dex: unsafe { NatDexIndex::new_unchecked(504) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Patrat",
             national_dex: unsafe { NatDexIndex::new_unchecked(504) },
             form_name: "Patrat",
@@ -24586,7 +24586,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Watchog",
         national_dex: unsafe { NatDexIndex::new_unchecked(505) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Watchog",
             national_dex: unsafe { NatDexIndex::new_unchecked(505) },
             form_name: "Watchog",
@@ -24622,7 +24622,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lillipup",
         national_dex: unsafe { NatDexIndex::new_unchecked(506) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lillipup",
             national_dex: unsafe { NatDexIndex::new_unchecked(506) },
             form_name: "Lillipup",
@@ -24658,7 +24658,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Herdier",
         national_dex: unsafe { NatDexIndex::new_unchecked(507) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Herdier",
             national_dex: unsafe { NatDexIndex::new_unchecked(507) },
             form_name: "Herdier",
@@ -24694,7 +24694,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Stoutland",
         national_dex: unsafe { NatDexIndex::new_unchecked(508) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Stoutland",
             national_dex: unsafe { NatDexIndex::new_unchecked(508) },
             form_name: "Stoutland",
@@ -24730,7 +24730,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Purrloin",
         national_dex: unsafe { NatDexIndex::new_unchecked(509) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Purrloin",
             national_dex: unsafe { NatDexIndex::new_unchecked(509) },
             form_name: "Purrloin",
@@ -24766,7 +24766,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Liepard",
         national_dex: unsafe { NatDexIndex::new_unchecked(510) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Liepard",
             national_dex: unsafe { NatDexIndex::new_unchecked(510) },
             form_name: "Liepard",
@@ -24802,7 +24802,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pansage",
         national_dex: unsafe { NatDexIndex::new_unchecked(511) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pansage",
             national_dex: unsafe { NatDexIndex::new_unchecked(511) },
             form_name: "Pansage",
@@ -24838,7 +24838,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Simisage",
         national_dex: unsafe { NatDexIndex::new_unchecked(512) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Simisage",
             national_dex: unsafe { NatDexIndex::new_unchecked(512) },
             form_name: "Simisage",
@@ -24874,7 +24874,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pansear",
         national_dex: unsafe { NatDexIndex::new_unchecked(513) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pansear",
             national_dex: unsafe { NatDexIndex::new_unchecked(513) },
             form_name: "Pansear",
@@ -24910,7 +24910,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Simisear",
         national_dex: unsafe { NatDexIndex::new_unchecked(514) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Simisear",
             national_dex: unsafe { NatDexIndex::new_unchecked(514) },
             form_name: "Simisear",
@@ -24946,7 +24946,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Panpour",
         national_dex: unsafe { NatDexIndex::new_unchecked(515) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Panpour",
             national_dex: unsafe { NatDexIndex::new_unchecked(515) },
             form_name: "Panpour",
@@ -24982,7 +24982,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Simipour",
         national_dex: unsafe { NatDexIndex::new_unchecked(516) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Simipour",
             national_dex: unsafe { NatDexIndex::new_unchecked(516) },
             form_name: "Simipour",
@@ -25018,7 +25018,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Munna",
         national_dex: unsafe { NatDexIndex::new_unchecked(517) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Munna",
             national_dex: unsafe { NatDexIndex::new_unchecked(517) },
             form_name: "Munna",
@@ -25054,7 +25054,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Musharna",
         national_dex: unsafe { NatDexIndex::new_unchecked(518) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Musharna",
             national_dex: unsafe { NatDexIndex::new_unchecked(518) },
             form_name: "Musharna",
@@ -25090,7 +25090,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pidove",
         national_dex: unsafe { NatDexIndex::new_unchecked(519) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pidove",
             national_dex: unsafe { NatDexIndex::new_unchecked(519) },
             form_name: "Pidove",
@@ -25126,7 +25126,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tranquill",
         national_dex: unsafe { NatDexIndex::new_unchecked(520) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tranquill",
             national_dex: unsafe { NatDexIndex::new_unchecked(520) },
             form_name: "Tranquill",
@@ -25162,7 +25162,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Unfezant",
         national_dex: unsafe { NatDexIndex::new_unchecked(521) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Unfezant",
             national_dex: unsafe { NatDexIndex::new_unchecked(521) },
             form_name: "Unfezant",
@@ -25198,7 +25198,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Blitzle",
         national_dex: unsafe { NatDexIndex::new_unchecked(522) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Blitzle",
             national_dex: unsafe { NatDexIndex::new_unchecked(522) },
             form_name: "Blitzle",
@@ -25234,7 +25234,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Zebstrika",
         national_dex: unsafe { NatDexIndex::new_unchecked(523) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Zebstrika",
             national_dex: unsafe { NatDexIndex::new_unchecked(523) },
             form_name: "Zebstrika",
@@ -25270,7 +25270,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Roggenrola",
         national_dex: unsafe { NatDexIndex::new_unchecked(524) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Roggenrola",
             national_dex: unsafe { NatDexIndex::new_unchecked(524) },
             form_name: "Roggenrola",
@@ -25306,7 +25306,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Boldore",
         national_dex: unsafe { NatDexIndex::new_unchecked(525) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Boldore",
             national_dex: unsafe { NatDexIndex::new_unchecked(525) },
             form_name: "Boldore",
@@ -25342,7 +25342,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gigalith",
         national_dex: unsafe { NatDexIndex::new_unchecked(526) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gigalith",
             national_dex: unsafe { NatDexIndex::new_unchecked(526) },
             form_name: "Gigalith",
@@ -25378,7 +25378,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Woobat",
         national_dex: unsafe { NatDexIndex::new_unchecked(527) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Woobat",
             national_dex: unsafe { NatDexIndex::new_unchecked(527) },
             form_name: "Woobat",
@@ -25414,7 +25414,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Swoobat",
         national_dex: unsafe { NatDexIndex::new_unchecked(528) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Swoobat",
             national_dex: unsafe { NatDexIndex::new_unchecked(528) },
             form_name: "Swoobat",
@@ -25450,7 +25450,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Drilbur",
         national_dex: unsafe { NatDexIndex::new_unchecked(529) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Drilbur",
             national_dex: unsafe { NatDexIndex::new_unchecked(529) },
             form_name: "Drilbur",
@@ -25487,7 +25487,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(530) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Excadrill",
                 national_dex: unsafe { NatDexIndex::new_unchecked(530) },
                 form_name: "Excadrill",
@@ -25495,7 +25495,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(530, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(530, 1) },
                     required_item_id: Some(2570),
                 }],
                 is_gmax: false,
@@ -25521,7 +25521,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "excadrill",
                 sprite_index: (13, 19),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Excadrill-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(530) },
                 form_name: "Mega Excadrill",
@@ -25559,7 +25559,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(531) },
         level_up_type: LevelUpType::Fast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Audino",
                 national_dex: unsafe { NatDexIndex::new_unchecked(531) },
                 form_name: "Audino",
@@ -25567,7 +25567,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(531, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(531, 1) },
                     required_item_id: Some(757),
                 }],
                 is_gmax: false,
@@ -25593,7 +25593,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "audino",
                 sprite_index: (14, 19),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Audino-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(531) },
                 form_name: "Mega Audino",
@@ -25630,7 +25630,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Timburr",
         national_dex: unsafe { NatDexIndex::new_unchecked(532) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Timburr",
             national_dex: unsafe { NatDexIndex::new_unchecked(532) },
             form_name: "Timburr",
@@ -25666,7 +25666,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gurdurr",
         national_dex: unsafe { NatDexIndex::new_unchecked(533) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gurdurr",
             national_dex: unsafe { NatDexIndex::new_unchecked(533) },
             form_name: "Gurdurr",
@@ -25702,7 +25702,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Conkeldurr",
         national_dex: unsafe { NatDexIndex::new_unchecked(534) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Conkeldurr",
             national_dex: unsafe { NatDexIndex::new_unchecked(534) },
             form_name: "Conkeldurr",
@@ -25738,7 +25738,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tympole",
         national_dex: unsafe { NatDexIndex::new_unchecked(535) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tympole",
             national_dex: unsafe { NatDexIndex::new_unchecked(535) },
             form_name: "Tympole",
@@ -25774,7 +25774,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Palpitoad",
         national_dex: unsafe { NatDexIndex::new_unchecked(536) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Palpitoad",
             national_dex: unsafe { NatDexIndex::new_unchecked(536) },
             form_name: "Palpitoad",
@@ -25810,7 +25810,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Seismitoad",
         national_dex: unsafe { NatDexIndex::new_unchecked(537) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Seismitoad",
             national_dex: unsafe { NatDexIndex::new_unchecked(537) },
             form_name: "Seismitoad",
@@ -25846,7 +25846,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Throh",
         national_dex: unsafe { NatDexIndex::new_unchecked(538) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Throh",
             national_dex: unsafe { NatDexIndex::new_unchecked(538) },
             form_name: "Throh",
@@ -25882,7 +25882,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sawk",
         national_dex: unsafe { NatDexIndex::new_unchecked(539) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sawk",
             national_dex: unsafe { NatDexIndex::new_unchecked(539) },
             form_name: "Sawk",
@@ -25918,7 +25918,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sewaddle",
         national_dex: unsafe { NatDexIndex::new_unchecked(540) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sewaddle",
             national_dex: unsafe { NatDexIndex::new_unchecked(540) },
             form_name: "Sewaddle",
@@ -25954,7 +25954,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Swadloon",
         national_dex: unsafe { NatDexIndex::new_unchecked(541) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Swadloon",
             national_dex: unsafe { NatDexIndex::new_unchecked(541) },
             form_name: "Swadloon",
@@ -25990,7 +25990,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Leavanny",
         national_dex: unsafe { NatDexIndex::new_unchecked(542) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Leavanny",
             national_dex: unsafe { NatDexIndex::new_unchecked(542) },
             form_name: "Leavanny",
@@ -26026,7 +26026,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Venipede",
         national_dex: unsafe { NatDexIndex::new_unchecked(543) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Venipede",
             national_dex: unsafe { NatDexIndex::new_unchecked(543) },
             form_name: "Venipede",
@@ -26062,7 +26062,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Whirlipede",
         national_dex: unsafe { NatDexIndex::new_unchecked(544) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Whirlipede",
             national_dex: unsafe { NatDexIndex::new_unchecked(544) },
             form_name: "Whirlipede",
@@ -26099,7 +26099,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(545) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scolipede",
                 national_dex: unsafe { NatDexIndex::new_unchecked(545) },
                 form_name: "Scolipede",
@@ -26107,7 +26107,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(545, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(545, 1) },
                     required_item_id: Some(2571),
                 }],
                 is_gmax: false,
@@ -26133,7 +26133,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scolipede",
                 sprite_index: (29, 19),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scolipede-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(545) },
                 form_name: "Mega Scolipede",
@@ -26170,7 +26170,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cottonee",
         national_dex: unsafe { NatDexIndex::new_unchecked(546) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cottonee",
             national_dex: unsafe { NatDexIndex::new_unchecked(546) },
             form_name: "Cottonee",
@@ -26206,7 +26206,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Whimsicott",
         national_dex: unsafe { NatDexIndex::new_unchecked(547) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Whimsicott",
             national_dex: unsafe { NatDexIndex::new_unchecked(547) },
             form_name: "Whimsicott",
@@ -26242,7 +26242,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Petilil",
         national_dex: unsafe { NatDexIndex::new_unchecked(548) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Petilil",
             national_dex: unsafe { NatDexIndex::new_unchecked(548) },
             form_name: "Petilil",
@@ -26281,7 +26281,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(549) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Lilligant",
                 national_dex: unsafe { NatDexIndex::new_unchecked(549) },
                 form_name: "Lilligant",
@@ -26312,7 +26312,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "lilligant",
                 sprite_index: (33, 19),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Lilligant-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(549) },
                 form_name: "Hisuian Lilligant",
@@ -26350,7 +26350,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(550) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Basculin-Red-Striped",
                 national_dex: unsafe { NatDexIndex::new_unchecked(550) },
                 form_name: "Basculin",
@@ -26381,7 +26381,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "basculin-red-striped",
                 sprite_index: (35, 19),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Basculin-Blue-Striped",
                 national_dex: unsafe { NatDexIndex::new_unchecked(550) },
                 form_name: "Basculin (Blue Striped)",
@@ -26412,7 +26412,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "basculin-blue-striped",
                 sprite_index: (0, 20),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Basculin-White-Striped",
                 national_dex: unsafe { NatDexIndex::new_unchecked(550) },
                 form_name: "Basculin (White Striped)",
@@ -26451,7 +26451,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sandile",
         national_dex: unsafe { NatDexIndex::new_unchecked(551) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sandile",
             national_dex: unsafe { NatDexIndex::new_unchecked(551) },
             form_name: "Sandile",
@@ -26487,7 +26487,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Krokorok",
         national_dex: unsafe { NatDexIndex::new_unchecked(552) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Krokorok",
             national_dex: unsafe { NatDexIndex::new_unchecked(552) },
             form_name: "Krokorok",
@@ -26523,7 +26523,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Krookodile",
         national_dex: unsafe { NatDexIndex::new_unchecked(553) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Krookodile",
             national_dex: unsafe { NatDexIndex::new_unchecked(553) },
             form_name: "Krookodile",
@@ -26560,7 +26560,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(554) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Darumaka",
                 national_dex: unsafe { NatDexIndex::new_unchecked(554) },
                 form_name: "Darumaka",
@@ -26591,7 +26591,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "darumaka",
                 sprite_index: (5, 20),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Darumaka-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(554) },
                 form_name: "Galarian Darumaka",
@@ -26629,7 +26629,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(555) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Darmanitan-Standard",
                 national_dex: unsafe { NatDexIndex::new_unchecked(555) },
                 form_name: "Darmanitan",
@@ -26660,7 +26660,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "darmanitan",
                 sprite_index: (7, 20),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Darmanitan-Zen",
                 national_dex: unsafe { NatDexIndex::new_unchecked(555) },
                 form_name: "Darmanitan (Zen Mode)",
@@ -26691,7 +26691,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "darmanitan-zen",
                 sprite_index: (8, 20),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Darmanitan-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(555) },
                 form_name: "Galarian Darmanitan",
@@ -26722,7 +26722,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "darmanitan-galar",
                 sprite_index: (9, 20),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Darmanitan-Galar-Zen",
                 national_dex: unsafe { NatDexIndex::new_unchecked(555) },
                 form_name: "Galarian Darmanitan (Zen Mode)",
@@ -26759,7 +26759,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Maractus",
         national_dex: unsafe { NatDexIndex::new_unchecked(556) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Maractus",
             national_dex: unsafe { NatDexIndex::new_unchecked(556) },
             form_name: "Maractus",
@@ -26795,7 +26795,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dwebble",
         national_dex: unsafe { NatDexIndex::new_unchecked(557) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dwebble",
             national_dex: unsafe { NatDexIndex::new_unchecked(557) },
             form_name: "Dwebble",
@@ -26831,7 +26831,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Crustle",
         national_dex: unsafe { NatDexIndex::new_unchecked(558) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Crustle",
             national_dex: unsafe { NatDexIndex::new_unchecked(558) },
             form_name: "Crustle",
@@ -26867,7 +26867,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Scraggy",
         national_dex: unsafe { NatDexIndex::new_unchecked(559) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Scraggy",
             national_dex: unsafe { NatDexIndex::new_unchecked(559) },
             form_name: "Scraggy",
@@ -26904,7 +26904,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(560) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scrafty",
                 national_dex: unsafe { NatDexIndex::new_unchecked(560) },
                 form_name: "Scrafty",
@@ -26912,7 +26912,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(560, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(560, 1) },
                     required_item_id: Some(2572),
                 }],
                 is_gmax: false,
@@ -26938,7 +26938,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scrafty",
                 sprite_index: (15, 20),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scrafty-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(560) },
                 form_name: "Mega Scrafty",
@@ -26975,7 +26975,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sigilyph",
         national_dex: unsafe { NatDexIndex::new_unchecked(561) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sigilyph",
             national_dex: unsafe { NatDexIndex::new_unchecked(561) },
             form_name: "Sigilyph",
@@ -27012,7 +27012,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(562) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Yamask",
                 national_dex: unsafe { NatDexIndex::new_unchecked(562) },
                 form_name: "Yamask",
@@ -27043,7 +27043,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "yamask",
                 sprite_index: (17, 20),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Yamask-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(562) },
                 form_name: "Galarian Yamask",
@@ -27080,7 +27080,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cofagrigus",
         national_dex: unsafe { NatDexIndex::new_unchecked(563) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cofagrigus",
             national_dex: unsafe { NatDexIndex::new_unchecked(563) },
             form_name: "Cofagrigus",
@@ -27116,7 +27116,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tirtouga",
         national_dex: unsafe { NatDexIndex::new_unchecked(564) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tirtouga",
             national_dex: unsafe { NatDexIndex::new_unchecked(564) },
             form_name: "Tirtouga",
@@ -27152,7 +27152,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Carracosta",
         national_dex: unsafe { NatDexIndex::new_unchecked(565) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Carracosta",
             national_dex: unsafe { NatDexIndex::new_unchecked(565) },
             form_name: "Carracosta",
@@ -27188,7 +27188,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Archen",
         national_dex: unsafe { NatDexIndex::new_unchecked(566) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Archen",
             national_dex: unsafe { NatDexIndex::new_unchecked(566) },
             form_name: "Archen",
@@ -27224,7 +27224,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Archeops",
         national_dex: unsafe { NatDexIndex::new_unchecked(567) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Archeops",
             national_dex: unsafe { NatDexIndex::new_unchecked(567) },
             form_name: "Archeops",
@@ -27260,7 +27260,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Trubbish",
         national_dex: unsafe { NatDexIndex::new_unchecked(568) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Trubbish",
             national_dex: unsafe { NatDexIndex::new_unchecked(568) },
             form_name: "Trubbish",
@@ -27296,7 +27296,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Garbodor",
         national_dex: unsafe { NatDexIndex::new_unchecked(569) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Garbodor",
             national_dex: unsafe { NatDexIndex::new_unchecked(569) },
             form_name: "Garbodor",
@@ -27333,7 +27333,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(570) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zorua",
                 national_dex: unsafe { NatDexIndex::new_unchecked(570) },
                 form_name: "Zorua",
@@ -27364,7 +27364,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "zorua",
                 sprite_index: (26, 20),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zorua-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(570) },
                 form_name: "Hisuian Zorua",
@@ -27402,7 +27402,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(571) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zoroark",
                 national_dex: unsafe { NatDexIndex::new_unchecked(571) },
                 form_name: "Zoroark",
@@ -27433,7 +27433,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "zoroark",
                 sprite_index: (28, 20),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zoroark-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(571) },
                 form_name: "Hisuian Zoroark",
@@ -27470,7 +27470,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Minccino",
         national_dex: unsafe { NatDexIndex::new_unchecked(572) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Minccino",
             national_dex: unsafe { NatDexIndex::new_unchecked(572) },
             form_name: "Minccino",
@@ -27506,7 +27506,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cinccino",
         national_dex: unsafe { NatDexIndex::new_unchecked(573) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cinccino",
             national_dex: unsafe { NatDexIndex::new_unchecked(573) },
             form_name: "Cinccino",
@@ -27542,7 +27542,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gothita",
         national_dex: unsafe { NatDexIndex::new_unchecked(574) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gothita",
             national_dex: unsafe { NatDexIndex::new_unchecked(574) },
             form_name: "Gothita",
@@ -27578,7 +27578,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gothorita",
         national_dex: unsafe { NatDexIndex::new_unchecked(575) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gothorita",
             national_dex: unsafe { NatDexIndex::new_unchecked(575) },
             form_name: "Gothorita",
@@ -27614,7 +27614,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gothitelle",
         national_dex: unsafe { NatDexIndex::new_unchecked(576) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gothitelle",
             national_dex: unsafe { NatDexIndex::new_unchecked(576) },
             form_name: "Gothitelle",
@@ -27650,7 +27650,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Solosis",
         national_dex: unsafe { NatDexIndex::new_unchecked(577) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Solosis",
             national_dex: unsafe { NatDexIndex::new_unchecked(577) },
             form_name: "Solosis",
@@ -27686,7 +27686,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Duosion",
         national_dex: unsafe { NatDexIndex::new_unchecked(578) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Duosion",
             national_dex: unsafe { NatDexIndex::new_unchecked(578) },
             form_name: "Duosion",
@@ -27722,7 +27722,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Reuniclus",
         national_dex: unsafe { NatDexIndex::new_unchecked(579) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Reuniclus",
             national_dex: unsafe { NatDexIndex::new_unchecked(579) },
             form_name: "Reuniclus",
@@ -27758,7 +27758,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ducklett",
         national_dex: unsafe { NatDexIndex::new_unchecked(580) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ducklett",
             national_dex: unsafe { NatDexIndex::new_unchecked(580) },
             form_name: "Ducklett",
@@ -27794,7 +27794,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Swanna",
         national_dex: unsafe { NatDexIndex::new_unchecked(581) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Swanna",
             national_dex: unsafe { NatDexIndex::new_unchecked(581) },
             form_name: "Swanna",
@@ -27830,7 +27830,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Vanillite",
         national_dex: unsafe { NatDexIndex::new_unchecked(582) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Vanillite",
             national_dex: unsafe { NatDexIndex::new_unchecked(582) },
             form_name: "Vanillite",
@@ -27866,7 +27866,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Vanillish",
         national_dex: unsafe { NatDexIndex::new_unchecked(583) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Vanillish",
             national_dex: unsafe { NatDexIndex::new_unchecked(583) },
             form_name: "Vanillish",
@@ -27902,7 +27902,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Vanilluxe",
         national_dex: unsafe { NatDexIndex::new_unchecked(584) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Vanilluxe",
             national_dex: unsafe { NatDexIndex::new_unchecked(584) },
             form_name: "Vanilluxe",
@@ -27939,7 +27939,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(585) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Deerling-Spring",
                 national_dex: unsafe { NatDexIndex::new_unchecked(585) },
                 form_name: "Deerling",
@@ -27970,7 +27970,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "deerling",
                 sprite_index: (7, 21),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Deerling-Summer",
                 national_dex: unsafe { NatDexIndex::new_unchecked(585) },
                 form_name: "Deerling (Summer)",
@@ -28001,7 +28001,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "deerling-summer",
                 sprite_index: (8, 21),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Deerling-Autumn",
                 national_dex: unsafe { NatDexIndex::new_unchecked(585) },
                 form_name: "Deerling (Autumn)",
@@ -28032,7 +28032,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "deerling-autumn",
                 sprite_index: (9, 21),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Deerling-Winter",
                 national_dex: unsafe { NatDexIndex::new_unchecked(585) },
                 form_name: "Deerling (Winter)",
@@ -28070,7 +28070,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(586) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sawsbuck-Spring",
                 national_dex: unsafe { NatDexIndex::new_unchecked(586) },
                 form_name: "Sawsbuck",
@@ -28101,7 +28101,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "sawsbuck",
                 sprite_index: (11, 21),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sawsbuck-Summer",
                 national_dex: unsafe { NatDexIndex::new_unchecked(586) },
                 form_name: "Sawsbuck (Summer)",
@@ -28132,7 +28132,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "sawsbuck-summer",
                 sprite_index: (12, 21),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sawsbuck-Autumn",
                 national_dex: unsafe { NatDexIndex::new_unchecked(586) },
                 form_name: "Sawsbuck (Autumn)",
@@ -28163,7 +28163,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "sawsbuck-autumn",
                 sprite_index: (13, 21),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sawsbuck-Winter",
                 national_dex: unsafe { NatDexIndex::new_unchecked(586) },
                 form_name: "Sawsbuck (Winter)",
@@ -28200,7 +28200,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Emolga",
         national_dex: unsafe { NatDexIndex::new_unchecked(587) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Emolga",
             national_dex: unsafe { NatDexIndex::new_unchecked(587) },
             form_name: "Emolga",
@@ -28236,7 +28236,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Karrablast",
         national_dex: unsafe { NatDexIndex::new_unchecked(588) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Karrablast",
             national_dex: unsafe { NatDexIndex::new_unchecked(588) },
             form_name: "Karrablast",
@@ -28272,7 +28272,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Escavalier",
         national_dex: unsafe { NatDexIndex::new_unchecked(589) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Escavalier",
             national_dex: unsafe { NatDexIndex::new_unchecked(589) },
             form_name: "Escavalier",
@@ -28308,7 +28308,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Foongus",
         national_dex: unsafe { NatDexIndex::new_unchecked(590) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Foongus",
             national_dex: unsafe { NatDexIndex::new_unchecked(590) },
             form_name: "Foongus",
@@ -28344,7 +28344,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Amoonguss",
         national_dex: unsafe { NatDexIndex::new_unchecked(591) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Amoonguss",
             national_dex: unsafe { NatDexIndex::new_unchecked(591) },
             form_name: "Amoonguss",
@@ -28380,7 +28380,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Frillish",
         national_dex: unsafe { NatDexIndex::new_unchecked(592) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Frillish",
             national_dex: unsafe { NatDexIndex::new_unchecked(592) },
             form_name: "Frillish",
@@ -28416,7 +28416,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Jellicent",
         national_dex: unsafe { NatDexIndex::new_unchecked(593) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Jellicent",
             national_dex: unsafe { NatDexIndex::new_unchecked(593) },
             form_name: "Jellicent",
@@ -28452,7 +28452,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Alomomola",
         national_dex: unsafe { NatDexIndex::new_unchecked(594) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Alomomola",
             national_dex: unsafe { NatDexIndex::new_unchecked(594) },
             form_name: "Alomomola",
@@ -28488,7 +28488,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Joltik",
         national_dex: unsafe { NatDexIndex::new_unchecked(595) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Joltik",
             national_dex: unsafe { NatDexIndex::new_unchecked(595) },
             form_name: "Joltik",
@@ -28524,7 +28524,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Galvantula",
         national_dex: unsafe { NatDexIndex::new_unchecked(596) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Galvantula",
             national_dex: unsafe { NatDexIndex::new_unchecked(596) },
             form_name: "Galvantula",
@@ -28560,7 +28560,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ferroseed",
         national_dex: unsafe { NatDexIndex::new_unchecked(597) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ferroseed",
             national_dex: unsafe { NatDexIndex::new_unchecked(597) },
             form_name: "Ferroseed",
@@ -28596,7 +28596,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ferrothorn",
         national_dex: unsafe { NatDexIndex::new_unchecked(598) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ferrothorn",
             national_dex: unsafe { NatDexIndex::new_unchecked(598) },
             form_name: "Ferrothorn",
@@ -28632,7 +28632,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Klink",
         national_dex: unsafe { NatDexIndex::new_unchecked(599) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Klink",
             national_dex: unsafe { NatDexIndex::new_unchecked(599) },
             form_name: "Klink",
@@ -28668,7 +28668,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Klang",
         national_dex: unsafe { NatDexIndex::new_unchecked(600) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Klang",
             national_dex: unsafe { NatDexIndex::new_unchecked(600) },
             form_name: "Klang",
@@ -28704,7 +28704,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Klinklang",
         national_dex: unsafe { NatDexIndex::new_unchecked(601) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Klinklang",
             national_dex: unsafe { NatDexIndex::new_unchecked(601) },
             form_name: "Klinklang",
@@ -28740,7 +28740,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tynamo",
         national_dex: unsafe { NatDexIndex::new_unchecked(602) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tynamo",
             national_dex: unsafe { NatDexIndex::new_unchecked(602) },
             form_name: "Tynamo",
@@ -28776,7 +28776,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Eelektrik",
         national_dex: unsafe { NatDexIndex::new_unchecked(603) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Eelektrik",
             national_dex: unsafe { NatDexIndex::new_unchecked(603) },
             form_name: "Eelektrik",
@@ -28813,7 +28813,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(604) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Eelektross",
                 national_dex: unsafe { NatDexIndex::new_unchecked(604) },
                 form_name: "Eelektross",
@@ -28821,7 +28821,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(604, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(604, 1) },
                     required_item_id: Some(2573),
                 }],
                 is_gmax: false,
@@ -28847,7 +28847,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "eelektross",
                 sprite_index: (32, 21),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Eelektross-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(604) },
                 form_name: "Mega Eelektross",
@@ -28884,7 +28884,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Elgyem",
         national_dex: unsafe { NatDexIndex::new_unchecked(605) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Elgyem",
             national_dex: unsafe { NatDexIndex::new_unchecked(605) },
             form_name: "Elgyem",
@@ -28920,7 +28920,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Beheeyem",
         national_dex: unsafe { NatDexIndex::new_unchecked(606) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Beheeyem",
             national_dex: unsafe { NatDexIndex::new_unchecked(606) },
             form_name: "Beheeyem",
@@ -28956,7 +28956,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Litwick",
         national_dex: unsafe { NatDexIndex::new_unchecked(607) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Litwick",
             national_dex: unsafe { NatDexIndex::new_unchecked(607) },
             form_name: "Litwick",
@@ -28992,7 +28992,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lampent",
         national_dex: unsafe { NatDexIndex::new_unchecked(608) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lampent",
             national_dex: unsafe { NatDexIndex::new_unchecked(608) },
             form_name: "Lampent",
@@ -29029,7 +29029,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(609) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Chandelure",
                 national_dex: unsafe { NatDexIndex::new_unchecked(609) },
                 form_name: "Chandelure",
@@ -29037,7 +29037,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(609, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(609, 1) },
                     required_item_id: Some(2574),
                 }],
                 is_gmax: false,
@@ -29063,7 +29063,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "chandelure",
                 sprite_index: (1, 22),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Chandelure-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(609) },
                 form_name: "Mega Chandelure",
@@ -29100,7 +29100,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Axew",
         national_dex: unsafe { NatDexIndex::new_unchecked(610) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Axew",
             national_dex: unsafe { NatDexIndex::new_unchecked(610) },
             form_name: "Axew",
@@ -29136,7 +29136,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Fraxure",
         national_dex: unsafe { NatDexIndex::new_unchecked(611) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Fraxure",
             national_dex: unsafe { NatDexIndex::new_unchecked(611) },
             form_name: "Fraxure",
@@ -29172,7 +29172,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Haxorus",
         national_dex: unsafe { NatDexIndex::new_unchecked(612) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Haxorus",
             national_dex: unsafe { NatDexIndex::new_unchecked(612) },
             form_name: "Haxorus",
@@ -29208,7 +29208,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cubchoo",
         national_dex: unsafe { NatDexIndex::new_unchecked(613) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cubchoo",
             national_dex: unsafe { NatDexIndex::new_unchecked(613) },
             form_name: "Cubchoo",
@@ -29244,7 +29244,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Beartic",
         national_dex: unsafe { NatDexIndex::new_unchecked(614) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Beartic",
             national_dex: unsafe { NatDexIndex::new_unchecked(614) },
             form_name: "Beartic",
@@ -29280,7 +29280,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cryogonal",
         national_dex: unsafe { NatDexIndex::new_unchecked(615) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cryogonal",
             national_dex: unsafe { NatDexIndex::new_unchecked(615) },
             form_name: "Cryogonal",
@@ -29316,7 +29316,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Shelmet",
         national_dex: unsafe { NatDexIndex::new_unchecked(616) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Shelmet",
             national_dex: unsafe { NatDexIndex::new_unchecked(616) },
             form_name: "Shelmet",
@@ -29352,7 +29352,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Accelgor",
         national_dex: unsafe { NatDexIndex::new_unchecked(617) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Accelgor",
             national_dex: unsafe { NatDexIndex::new_unchecked(617) },
             form_name: "Accelgor",
@@ -29389,7 +29389,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(618) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Stunfisk",
                 national_dex: unsafe { NatDexIndex::new_unchecked(618) },
                 form_name: "Stunfisk",
@@ -29420,7 +29420,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "stunfisk",
                 sprite_index: (10, 22),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Stunfisk-Galar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(618) },
                 form_name: "Galarian Stunfisk",
@@ -29457,7 +29457,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mienfoo",
         national_dex: unsafe { NatDexIndex::new_unchecked(619) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mienfoo",
             national_dex: unsafe { NatDexIndex::new_unchecked(619) },
             form_name: "Mienfoo",
@@ -29493,7 +29493,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mienshao",
         national_dex: unsafe { NatDexIndex::new_unchecked(620) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mienshao",
             national_dex: unsafe { NatDexIndex::new_unchecked(620) },
             form_name: "Mienshao",
@@ -29529,7 +29529,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Druddigon",
         national_dex: unsafe { NatDexIndex::new_unchecked(621) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Druddigon",
             national_dex: unsafe { NatDexIndex::new_unchecked(621) },
             form_name: "Druddigon",
@@ -29565,7 +29565,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Golett",
         national_dex: unsafe { NatDexIndex::new_unchecked(622) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Golett",
             national_dex: unsafe { NatDexIndex::new_unchecked(622) },
             form_name: "Golett",
@@ -29602,7 +29602,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(623) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Golurk",
                 national_dex: unsafe { NatDexIndex::new_unchecked(623) },
                 form_name: "Golurk",
@@ -29610,7 +29610,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(623, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(623, 1) },
                     required_item_id: Some(2642),
                 }],
                 is_gmax: false,
@@ -29636,7 +29636,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "golurk",
                 sprite_index: (16, 22),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Golurk-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(623) },
                 form_name: "Mega Golurk",
@@ -29673,7 +29673,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pawniard",
         national_dex: unsafe { NatDexIndex::new_unchecked(624) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pawniard",
             national_dex: unsafe { NatDexIndex::new_unchecked(624) },
             form_name: "Pawniard",
@@ -29709,7 +29709,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bisharp",
         national_dex: unsafe { NatDexIndex::new_unchecked(625) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bisharp",
             national_dex: unsafe { NatDexIndex::new_unchecked(625) },
             form_name: "Bisharp",
@@ -29745,7 +29745,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bouffalant",
         national_dex: unsafe { NatDexIndex::new_unchecked(626) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bouffalant",
             national_dex: unsafe { NatDexIndex::new_unchecked(626) },
             form_name: "Bouffalant",
@@ -29781,7 +29781,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Rufflet",
         national_dex: unsafe { NatDexIndex::new_unchecked(627) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Rufflet",
             national_dex: unsafe { NatDexIndex::new_unchecked(627) },
             form_name: "Rufflet",
@@ -29820,7 +29820,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(628) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Braviary",
                 national_dex: unsafe { NatDexIndex::new_unchecked(628) },
                 form_name: "Braviary",
@@ -29851,7 +29851,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "braviary",
                 sprite_index: (21, 22),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Braviary-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(628) },
                 form_name: "Hisuian Braviary",
@@ -29888,7 +29888,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Vullaby",
         national_dex: unsafe { NatDexIndex::new_unchecked(629) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Vullaby",
             national_dex: unsafe { NatDexIndex::new_unchecked(629) },
             form_name: "Vullaby",
@@ -29924,7 +29924,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mandibuzz",
         national_dex: unsafe { NatDexIndex::new_unchecked(630) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mandibuzz",
             national_dex: unsafe { NatDexIndex::new_unchecked(630) },
             form_name: "Mandibuzz",
@@ -29960,7 +29960,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Heatmor",
         national_dex: unsafe { NatDexIndex::new_unchecked(631) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Heatmor",
             national_dex: unsafe { NatDexIndex::new_unchecked(631) },
             form_name: "Heatmor",
@@ -29996,7 +29996,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Durant",
         national_dex: unsafe { NatDexIndex::new_unchecked(632) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Durant",
             national_dex: unsafe { NatDexIndex::new_unchecked(632) },
             form_name: "Durant",
@@ -30032,7 +30032,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Deino",
         national_dex: unsafe { NatDexIndex::new_unchecked(633) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Deino",
             national_dex: unsafe { NatDexIndex::new_unchecked(633) },
             form_name: "Deino",
@@ -30068,7 +30068,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Zweilous",
         national_dex: unsafe { NatDexIndex::new_unchecked(634) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Zweilous",
             national_dex: unsafe { NatDexIndex::new_unchecked(634) },
             form_name: "Zweilous",
@@ -30104,7 +30104,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hydreigon",
         national_dex: unsafe { NatDexIndex::new_unchecked(635) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hydreigon",
             national_dex: unsafe { NatDexIndex::new_unchecked(635) },
             form_name: "Hydreigon",
@@ -30140,7 +30140,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Larvesta",
         national_dex: unsafe { NatDexIndex::new_unchecked(636) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Larvesta",
             national_dex: unsafe { NatDexIndex::new_unchecked(636) },
             form_name: "Larvesta",
@@ -30176,7 +30176,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Volcarona",
         national_dex: unsafe { NatDexIndex::new_unchecked(637) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Volcarona",
             national_dex: unsafe { NatDexIndex::new_unchecked(637) },
             form_name: "Volcarona",
@@ -30212,7 +30212,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cobalion",
         national_dex: unsafe { NatDexIndex::new_unchecked(638) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cobalion",
             national_dex: unsafe { NatDexIndex::new_unchecked(638) },
             form_name: "Cobalion",
@@ -30248,7 +30248,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Terrakion",
         national_dex: unsafe { NatDexIndex::new_unchecked(639) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Terrakion",
             national_dex: unsafe { NatDexIndex::new_unchecked(639) },
             form_name: "Terrakion",
@@ -30284,7 +30284,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Virizion",
         national_dex: unsafe { NatDexIndex::new_unchecked(640) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Virizion",
             national_dex: unsafe { NatDexIndex::new_unchecked(640) },
             form_name: "Virizion",
@@ -30321,7 +30321,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(641) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tornadus-Incarnate",
                 national_dex: unsafe { NatDexIndex::new_unchecked(641) },
                 form_name: "Tornadus",
@@ -30352,7 +30352,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "tornadus",
                 sprite_index: (35, 22),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tornadus-Therian",
                 national_dex: unsafe { NatDexIndex::new_unchecked(641) },
                 form_name: "Tornadus (Therian Forme)",
@@ -30390,7 +30390,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(642) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Thundurus-Incarnate",
                 national_dex: unsafe { NatDexIndex::new_unchecked(642) },
                 form_name: "Thundurus",
@@ -30421,7 +30421,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "thundurus",
                 sprite_index: (1, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Thundurus-Therian",
                 national_dex: unsafe { NatDexIndex::new_unchecked(642) },
                 form_name: "Thundurus (Therian Forme)",
@@ -30458,7 +30458,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Reshiram",
         national_dex: unsafe { NatDexIndex::new_unchecked(643) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Reshiram",
             national_dex: unsafe { NatDexIndex::new_unchecked(643) },
             form_name: "Reshiram",
@@ -30494,7 +30494,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Zekrom",
         national_dex: unsafe { NatDexIndex::new_unchecked(644) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Zekrom",
             national_dex: unsafe { NatDexIndex::new_unchecked(644) },
             form_name: "Zekrom",
@@ -30531,7 +30531,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(645) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Landorus-Incarnate",
                 national_dex: unsafe { NatDexIndex::new_unchecked(645) },
                 form_name: "Landorus",
@@ -30562,7 +30562,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "landorus",
                 sprite_index: (5, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Landorus-Therian",
                 national_dex: unsafe { NatDexIndex::new_unchecked(645) },
                 form_name: "Landorus (Therian Forme)",
@@ -30600,7 +30600,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(646) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Kyurem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(646) },
                 form_name: "Kyurem",
@@ -30631,7 +30631,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "kyurem",
                 sprite_index: (7, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Kyurem-White",
                 national_dex: unsafe { NatDexIndex::new_unchecked(646) },
                 form_name: "Kyurem White",
@@ -30662,7 +30662,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "kyurem-white",
                 sprite_index: (9, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Kyurem-Black",
                 national_dex: unsafe { NatDexIndex::new_unchecked(646) },
                 form_name: "Kyurem Black",
@@ -30700,7 +30700,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(647) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Keldeo-Ordinary",
                 national_dex: unsafe { NatDexIndex::new_unchecked(647) },
                 form_name: "Keldeo",
@@ -30731,7 +30731,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "keldeo",
                 sprite_index: (10, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Keldeo-Resolute",
                 national_dex: unsafe { NatDexIndex::new_unchecked(647) },
                 form_name: "Keldeo (Resolute)",
@@ -30769,7 +30769,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(648) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Meloetta-Aria",
                 national_dex: unsafe { NatDexIndex::new_unchecked(648) },
                 form_name: "Meloetta",
@@ -30800,7 +30800,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "meloetta",
                 sprite_index: (12, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Meloetta-Pirouette",
                 national_dex: unsafe { NatDexIndex::new_unchecked(648) },
                 form_name: "Meloetta (Pirouette)",
@@ -30838,7 +30838,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(649) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Genesect",
                 national_dex: unsafe { NatDexIndex::new_unchecked(649) },
                 form_name: "Genesect",
@@ -30869,7 +30869,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "genesect",
                 sprite_index: (14, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Genesect-Douse",
                 national_dex: unsafe { NatDexIndex::new_unchecked(649) },
                 form_name: "Genesect (Douse)",
@@ -30900,7 +30900,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "genesect-douse",
                 sprite_index: (15, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Genesect-Shock",
                 national_dex: unsafe { NatDexIndex::new_unchecked(649) },
                 form_name: "Genesect (Shock)",
@@ -30931,7 +30931,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "genesect-shock",
                 sprite_index: (16, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Genesect-Burn",
                 national_dex: unsafe { NatDexIndex::new_unchecked(649) },
                 form_name: "Genesect (Burn)",
@@ -30962,7 +30962,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "genesect-burn",
                 sprite_index: (17, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Genesect-Chill",
                 national_dex: unsafe { NatDexIndex::new_unchecked(649) },
                 form_name: "Genesect (Chill)",
@@ -30999,7 +30999,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Chespin",
         national_dex: unsafe { NatDexIndex::new_unchecked(650) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Chespin",
             national_dex: unsafe { NatDexIndex::new_unchecked(650) },
             form_name: "Chespin",
@@ -31035,7 +31035,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Quilladin",
         national_dex: unsafe { NatDexIndex::new_unchecked(651) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Quilladin",
             national_dex: unsafe { NatDexIndex::new_unchecked(651) },
             form_name: "Quilladin",
@@ -31072,7 +31072,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(652) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Chesnaught",
                 national_dex: unsafe { NatDexIndex::new_unchecked(652) },
                 form_name: "Chesnaught",
@@ -31080,7 +31080,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(652, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(652, 1) },
                     required_item_id: Some(2575),
                 }],
                 is_gmax: false,
@@ -31106,7 +31106,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "chesnaught",
                 sprite_index: (21, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Chesnaught-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(652) },
                 form_name: "Mega Chesnaught",
@@ -31143,7 +31143,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Fennekin",
         national_dex: unsafe { NatDexIndex::new_unchecked(653) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Fennekin",
             national_dex: unsafe { NatDexIndex::new_unchecked(653) },
             form_name: "Fennekin",
@@ -31179,7 +31179,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Braixen",
         national_dex: unsafe { NatDexIndex::new_unchecked(654) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Braixen",
             national_dex: unsafe { NatDexIndex::new_unchecked(654) },
             form_name: "Braixen",
@@ -31216,7 +31216,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(655) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Delphox",
                 national_dex: unsafe { NatDexIndex::new_unchecked(655) },
                 form_name: "Delphox",
@@ -31224,7 +31224,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(655, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(655, 1) },
                     required_item_id: Some(2576),
                 }],
                 is_gmax: false,
@@ -31250,7 +31250,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "delphox",
                 sprite_index: (24, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Delphox-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(655) },
                 form_name: "Mega Delphox",
@@ -31287,7 +31287,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Froakie",
         national_dex: unsafe { NatDexIndex::new_unchecked(656) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Froakie",
             national_dex: unsafe { NatDexIndex::new_unchecked(656) },
             form_name: "Froakie",
@@ -31323,7 +31323,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Frogadier",
         national_dex: unsafe { NatDexIndex::new_unchecked(657) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Frogadier",
             national_dex: unsafe { NatDexIndex::new_unchecked(657) },
             form_name: "Frogadier",
@@ -31360,7 +31360,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(658) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Greninja",
                 national_dex: unsafe { NatDexIndex::new_unchecked(658) },
                 form_name: "Greninja",
@@ -31368,7 +31368,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(658, 3) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(658, 3) },
                     required_item_id: Some(2577),
                 }],
                 is_gmax: false,
@@ -31394,7 +31394,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "greninja",
                 sprite_index: (27, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Greninja-Battle-Bond",
                 national_dex: unsafe { NatDexIndex::new_unchecked(658) },
                 form_name: "Greninja (Battle Bond)",
@@ -31425,7 +31425,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "greninja-ash",
                 sprite_index: (28, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Greninja-Ash",
                 national_dex: unsafe { NatDexIndex::new_unchecked(658) },
                 form_name: "Ash Greninja",
@@ -31456,7 +31456,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "greninja-ash",
                 sprite_index: (28, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Greninja-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(658) },
                 form_name: "Mega Greninja",
@@ -31493,7 +31493,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bunnelby",
         national_dex: unsafe { NatDexIndex::new_unchecked(659) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bunnelby",
             national_dex: unsafe { NatDexIndex::new_unchecked(659) },
             form_name: "Bunnelby",
@@ -31529,7 +31529,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Diggersby",
         national_dex: unsafe { NatDexIndex::new_unchecked(660) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Diggersby",
             national_dex: unsafe { NatDexIndex::new_unchecked(660) },
             form_name: "Diggersby",
@@ -31565,7 +31565,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Fletchling",
         national_dex: unsafe { NatDexIndex::new_unchecked(661) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Fletchling",
             national_dex: unsafe { NatDexIndex::new_unchecked(661) },
             form_name: "Fletchling",
@@ -31601,7 +31601,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Fletchinder",
         national_dex: unsafe { NatDexIndex::new_unchecked(662) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Fletchinder",
             national_dex: unsafe { NatDexIndex::new_unchecked(662) },
             form_name: "Fletchinder",
@@ -31637,7 +31637,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Talonflame",
         national_dex: unsafe { NatDexIndex::new_unchecked(663) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Talonflame",
             national_dex: unsafe { NatDexIndex::new_unchecked(663) },
             form_name: "Talonflame",
@@ -31674,7 +31674,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(664) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Icy Snow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug",
@@ -31705,7 +31705,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Polar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Polar)",
@@ -31736,7 +31736,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Tundra",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Tundra)",
@@ -31767,7 +31767,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Continental",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Continental)",
@@ -31798,7 +31798,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Garden",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Garden)",
@@ -31829,7 +31829,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Elegant",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Elegant)",
@@ -31860,7 +31860,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Meadow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Meadow)",
@@ -31891,7 +31891,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Modern",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Modern)",
@@ -31922,7 +31922,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Marine",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Marine)",
@@ -31953,7 +31953,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Archipelago",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Archipelago)",
@@ -31984,7 +31984,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-High-Plains",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (High Plains)",
@@ -32015,7 +32015,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Sandstorm",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Sandstorm)",
@@ -32046,7 +32046,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-River",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (River)",
@@ -32077,7 +32077,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Monsoon",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Monsoon)",
@@ -32108,7 +32108,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Savanna",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Savanna)",
@@ -32139,7 +32139,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Sun",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Sun)",
@@ -32170,7 +32170,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Ocean",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Ocean)",
@@ -32201,7 +32201,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Jungle",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Jungle)",
@@ -32232,7 +32232,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Fancy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Fancy)",
@@ -32263,7 +32263,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scatterbug",
                 sprite_index: (34, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scatterbug-Pokeball",
                 national_dex: unsafe { NatDexIndex::new_unchecked(664) },
                 form_name: "Scatterbug (Pokeball)",
@@ -32301,7 +32301,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(665) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Icy Snow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa",
@@ -32332,7 +32332,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Polar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Polar)",
@@ -32363,7 +32363,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Tundra",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Tundra)",
@@ -32394,7 +32394,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Continental",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Continental)",
@@ -32425,7 +32425,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Garden",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Garden)",
@@ -32456,7 +32456,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Elegant",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Elegant)",
@@ -32487,7 +32487,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Meadow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Meadow)",
@@ -32518,7 +32518,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Modern",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Modern)",
@@ -32549,7 +32549,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Marine",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Marine)",
@@ -32580,7 +32580,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Archipelago",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Archipelago)",
@@ -32611,7 +32611,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-High-Plains",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (High Plains)",
@@ -32642,7 +32642,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Sandstorm",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Sandstorm)",
@@ -32673,7 +32673,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-River",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (River)",
@@ -32704,7 +32704,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Monsoon",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Monsoon)",
@@ -32735,7 +32735,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Savanna",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Savanna)",
@@ -32766,7 +32766,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Sun",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Sun)",
@@ -32797,7 +32797,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Ocean",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Ocean)",
@@ -32828,7 +32828,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Jungle",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Jungle)",
@@ -32859,7 +32859,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Fancy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Fancy)",
@@ -32890,7 +32890,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "spewpa",
                 sprite_index: (35, 23),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Spewpa-Pokeball",
                 national_dex: unsafe { NatDexIndex::new_unchecked(665) },
                 form_name: "Spewpa (Pokeball)",
@@ -32928,7 +32928,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(666) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Icy Snow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon",
@@ -32959,7 +32959,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (0, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Polar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Polar)",
@@ -32990,7 +32990,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (1, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Tundra",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Tundra)",
@@ -33021,7 +33021,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (2, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Continental",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Continental)",
@@ -33052,7 +33052,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (3, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Garden",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Garden)",
@@ -33083,7 +33083,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (4, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Elegant",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Elegant)",
@@ -33114,7 +33114,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (5, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Meadow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Meadow)",
@@ -33145,7 +33145,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (6, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Modern",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Modern)",
@@ -33176,7 +33176,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (7, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Marine",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Marine)",
@@ -33207,7 +33207,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (8, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Archipelago",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Archipelago)",
@@ -33238,7 +33238,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (9, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-High-Plains",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (High Plains)",
@@ -33269,7 +33269,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (10, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Sandstorm",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Sandstorm)",
@@ -33300,7 +33300,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (11, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-River",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (River)",
@@ -33331,7 +33331,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (12, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Monsoon",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Monsoon)",
@@ -33362,7 +33362,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (13, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Savanna",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Savanna)",
@@ -33393,7 +33393,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (14, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Sun",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Sun)",
@@ -33424,7 +33424,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (15, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Ocean",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Ocean)",
@@ -33455,7 +33455,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (16, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Jungle",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Jungle)",
@@ -33486,7 +33486,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon",
                 sprite_index: (17, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Fancy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Fancy)",
@@ -33517,7 +33517,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vivillon-fancy",
                 sprite_index: (18, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vivillon-Pokeball",
                 national_dex: unsafe { NatDexIndex::new_unchecked(666) },
                 form_name: "Vivillon (Pokeball)",
@@ -33554,7 +33554,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Litleo",
         national_dex: unsafe { NatDexIndex::new_unchecked(667) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Litleo",
             national_dex: unsafe { NatDexIndex::new_unchecked(667) },
             form_name: "Litleo",
@@ -33591,7 +33591,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(668) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pyroar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(668) },
                 form_name: "Pyroar",
@@ -33599,7 +33599,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(668, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(668, 1) },
                     required_item_id: Some(2578),
                 }],
                 is_gmax: false,
@@ -33625,7 +33625,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pyroar",
                 sprite_index: (21, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pyroar-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(668) },
                 form_name: "Mega Pyroar",
@@ -33663,7 +33663,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(669) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Flabébé-Red",
                 national_dex: unsafe { NatDexIndex::new_unchecked(669) },
                 form_name: "Flabébé",
@@ -33694,7 +33694,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "flabebe-red",
                 sprite_index: (23, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Flabébé-Yellow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(669) },
                 form_name: "Flabébé (Yellow)",
@@ -33725,7 +33725,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "flabebe-yellow",
                 sprite_index: (24, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Flabébé-Orange",
                 national_dex: unsafe { NatDexIndex::new_unchecked(669) },
                 form_name: "Flabébé (Orange)",
@@ -33756,7 +33756,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "flabebe-orange",
                 sprite_index: (25, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Flabébé-Blue",
                 national_dex: unsafe { NatDexIndex::new_unchecked(669) },
                 form_name: "Flabébé (Blue)",
@@ -33787,7 +33787,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "flabebe-blue",
                 sprite_index: (26, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Flabébé-White",
                 national_dex: unsafe { NatDexIndex::new_unchecked(669) },
                 form_name: "Flabébé (White)",
@@ -33825,7 +33825,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(670) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Floette-Red",
                 national_dex: unsafe { NatDexIndex::new_unchecked(670) },
                 form_name: "Floette",
@@ -33856,7 +33856,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "floette-red",
                 sprite_index: (28, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Floette-Yellow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(670) },
                 form_name: "Floette (Yellow)",
@@ -33887,7 +33887,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "floette-yellow",
                 sprite_index: (32, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Floette-Orange",
                 national_dex: unsafe { NatDexIndex::new_unchecked(670) },
                 form_name: "Floette (Orange)",
@@ -33918,7 +33918,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "floette-orange",
                 sprite_index: (30, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Floette-Blue",
                 national_dex: unsafe { NatDexIndex::new_unchecked(670) },
                 form_name: "Floette (Blue)",
@@ -33949,7 +33949,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "floette-blue",
                 sprite_index: (29, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Floette-White",
                 national_dex: unsafe { NatDexIndex::new_unchecked(670) },
                 form_name: "Floette (White)",
@@ -33980,7 +33980,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "floette-white",
                 sprite_index: (31, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Floette-Eternal",
                 national_dex: unsafe { NatDexIndex::new_unchecked(670) },
                 form_name: "Floette (Eternal)",
@@ -33988,7 +33988,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: false,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(670, 6) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(670, 6) },
                     required_item_id: Some(2579),
                 }],
                 is_gmax: false,
@@ -34014,7 +34014,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "floette-eternal",
                 sprite_index: (33, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Floette-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(670) },
                 form_name: "Mega Floette",
@@ -34052,7 +34052,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(671) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Florges-Red",
                 national_dex: unsafe { NatDexIndex::new_unchecked(671) },
                 form_name: "Florges",
@@ -34083,7 +34083,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "florges-red",
                 sprite_index: (34, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Florges-Yellow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(671) },
                 form_name: "Florges (Yellow)",
@@ -34114,7 +34114,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "florges-yellow",
                 sprite_index: (2, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Florges-Orange",
                 national_dex: unsafe { NatDexIndex::new_unchecked(671) },
                 form_name: "Florges (Orange)",
@@ -34145,7 +34145,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "florges-orange",
                 sprite_index: (0, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Florges-Blue",
                 national_dex: unsafe { NatDexIndex::new_unchecked(671) },
                 form_name: "Florges (Blue)",
@@ -34176,7 +34176,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "florges-blue",
                 sprite_index: (35, 24),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Florges-White",
                 national_dex: unsafe { NatDexIndex::new_unchecked(671) },
                 form_name: "Florges (White)",
@@ -34213,7 +34213,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Skiddo",
         national_dex: unsafe { NatDexIndex::new_unchecked(672) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Skiddo",
             national_dex: unsafe { NatDexIndex::new_unchecked(672) },
             form_name: "Skiddo",
@@ -34249,7 +34249,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gogoat",
         national_dex: unsafe { NatDexIndex::new_unchecked(673) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gogoat",
             national_dex: unsafe { NatDexIndex::new_unchecked(673) },
             form_name: "Gogoat",
@@ -34285,7 +34285,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pancham",
         national_dex: unsafe { NatDexIndex::new_unchecked(674) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pancham",
             national_dex: unsafe { NatDexIndex::new_unchecked(674) },
             form_name: "Pancham",
@@ -34321,7 +34321,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pangoro",
         national_dex: unsafe { NatDexIndex::new_unchecked(675) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pangoro",
             national_dex: unsafe { NatDexIndex::new_unchecked(675) },
             form_name: "Pangoro",
@@ -34358,7 +34358,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(676) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Furfrou-Natural",
                 national_dex: unsafe { NatDexIndex::new_unchecked(676) },
                 form_name: "Furfrou",
@@ -34389,7 +34389,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "furfrou",
                 sprite_index: (7, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Furfrou-Heart",
                 national_dex: unsafe { NatDexIndex::new_unchecked(676) },
                 form_name: "Furfrou (Heart)",
@@ -34420,7 +34420,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "furfrou-heart",
                 sprite_index: (11, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Furfrou-Star",
                 national_dex: unsafe { NatDexIndex::new_unchecked(676) },
                 form_name: "Furfrou (Star)",
@@ -34451,7 +34451,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "furfrou-star",
                 sprite_index: (16, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Furfrou-Diamond",
                 national_dex: unsafe { NatDexIndex::new_unchecked(676) },
                 form_name: "Furfrou (Diamond)",
@@ -34482,7 +34482,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "furfrou-diamond",
                 sprite_index: (10, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Furfrou-Debutante",
                 national_dex: unsafe { NatDexIndex::new_unchecked(676) },
                 form_name: "Furfrou (Debutante)",
@@ -34513,7 +34513,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "furfrou-debutante",
                 sprite_index: (9, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Furfrou-Matron",
                 national_dex: unsafe { NatDexIndex::new_unchecked(676) },
                 form_name: "Furfrou (Matron)",
@@ -34544,7 +34544,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "furfrou-matron",
                 sprite_index: (14, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Furfrou-Dandy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(676) },
                 form_name: "Furfrou (Dandy)",
@@ -34575,7 +34575,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "furfrou-dandy",
                 sprite_index: (8, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Furfrou-La-Reine",
                 national_dex: unsafe { NatDexIndex::new_unchecked(676) },
                 form_name: "Furfrou (La Reine)",
@@ -34606,7 +34606,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "furfrou-la-reine",
                 sprite_index: (13, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Furfrou-Kabuki",
                 national_dex: unsafe { NatDexIndex::new_unchecked(676) },
                 form_name: "Furfrou (Kabuki)",
@@ -34637,7 +34637,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "furfrou-kabuki",
                 sprite_index: (12, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Furfrou-Pharaoh",
                 national_dex: unsafe { NatDexIndex::new_unchecked(676) },
                 form_name: "Furfrou (Pharaoh)",
@@ -34674,7 +34674,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Espurr",
         national_dex: unsafe { NatDexIndex::new_unchecked(677) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Espurr",
             national_dex: unsafe { NatDexIndex::new_unchecked(677) },
             form_name: "Espurr",
@@ -34713,7 +34713,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(678) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Meowstic-Male",
                 national_dex: unsafe { NatDexIndex::new_unchecked(678) },
                 form_name: "Meowstic (Male)",
@@ -34721,7 +34721,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(678, 2) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(678, 2) },
                     required_item_id: Some(2643),
                 }],
                 is_gmax: false,
@@ -34747,7 +34747,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "meowstic",
                 sprite_index: (18, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Meowstic-Female",
                 national_dex: unsafe { NatDexIndex::new_unchecked(678) },
                 form_name: "Meowstic (Female)",
@@ -34755,7 +34755,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: false,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(678, 3) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(678, 3) },
                     required_item_id: Some(2643),
                 }],
                 is_gmax: false,
@@ -34781,7 +34781,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "meowstic-f",
                 sprite_index: (19, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Meowstic-Male-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(678) },
                 form_name: "Mega Meowstic (Male)",
@@ -34812,7 +34812,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "meowstic-mega",
                 sprite_index: (0, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Meowstic-Female-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(678) },
                 form_name: "Mega Meowstic (Female)",
@@ -34849,7 +34849,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Honedge",
         national_dex: unsafe { NatDexIndex::new_unchecked(679) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Honedge",
             national_dex: unsafe { NatDexIndex::new_unchecked(679) },
             form_name: "Honedge",
@@ -34885,7 +34885,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Doublade",
         national_dex: unsafe { NatDexIndex::new_unchecked(680) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Doublade",
             national_dex: unsafe { NatDexIndex::new_unchecked(680) },
             form_name: "Doublade",
@@ -34922,7 +34922,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(681) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Aegislash-Shield",
                 national_dex: unsafe { NatDexIndex::new_unchecked(681) },
                 form_name: "Aegislash",
@@ -34953,7 +34953,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "aegislash",
                 sprite_index: (22, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Aegislash-Blade",
                 national_dex: unsafe { NatDexIndex::new_unchecked(681) },
                 form_name: "Aegislash (Blade)",
@@ -34990,7 +34990,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Spritzee",
         national_dex: unsafe { NatDexIndex::new_unchecked(682) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Spritzee",
             national_dex: unsafe { NatDexIndex::new_unchecked(682) },
             form_name: "Spritzee",
@@ -35026,7 +35026,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Aromatisse",
         national_dex: unsafe { NatDexIndex::new_unchecked(683) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Aromatisse",
             national_dex: unsafe { NatDexIndex::new_unchecked(683) },
             form_name: "Aromatisse",
@@ -35062,7 +35062,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Swirlix",
         national_dex: unsafe { NatDexIndex::new_unchecked(684) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Swirlix",
             national_dex: unsafe { NatDexIndex::new_unchecked(684) },
             form_name: "Swirlix",
@@ -35098,7 +35098,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Slurpuff",
         national_dex: unsafe { NatDexIndex::new_unchecked(685) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Slurpuff",
             national_dex: unsafe { NatDexIndex::new_unchecked(685) },
             form_name: "Slurpuff",
@@ -35134,7 +35134,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Inkay",
         national_dex: unsafe { NatDexIndex::new_unchecked(686) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Inkay",
             national_dex: unsafe { NatDexIndex::new_unchecked(686) },
             form_name: "Inkay",
@@ -35171,7 +35171,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(687) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Malamar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(687) },
                 form_name: "Malamar",
@@ -35179,7 +35179,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(687, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(687, 1) },
                     required_item_id: Some(2580),
                 }],
                 is_gmax: false,
@@ -35205,7 +35205,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "malamar",
                 sprite_index: (29, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Malamar-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(687) },
                 form_name: "Mega Malamar",
@@ -35242,7 +35242,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Binacle",
         national_dex: unsafe { NatDexIndex::new_unchecked(688) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Binacle",
             national_dex: unsafe { NatDexIndex::new_unchecked(688) },
             form_name: "Binacle",
@@ -35279,7 +35279,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(689) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Barbaracle",
                 national_dex: unsafe { NatDexIndex::new_unchecked(689) },
                 form_name: "Barbaracle",
@@ -35287,7 +35287,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(689, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(689, 1) },
                     required_item_id: Some(2581),
                 }],
                 is_gmax: false,
@@ -35313,7 +35313,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "barbaracle",
                 sprite_index: (31, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Barbaracle-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(689) },
                 form_name: "Mega Barbaracle",
@@ -35350,7 +35350,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Skrelp",
         national_dex: unsafe { NatDexIndex::new_unchecked(690) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Skrelp",
             national_dex: unsafe { NatDexIndex::new_unchecked(690) },
             form_name: "Skrelp",
@@ -35387,7 +35387,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(691) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Dragalge",
                 national_dex: unsafe { NatDexIndex::new_unchecked(691) },
                 form_name: "Dragalge",
@@ -35395,7 +35395,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(691, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(691, 1) },
                     required_item_id: Some(2582),
                 }],
                 is_gmax: false,
@@ -35421,7 +35421,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "dragalge",
                 sprite_index: (33, 25),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Dragalge-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(691) },
                 form_name: "Mega Dragalge",
@@ -35458,7 +35458,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Clauncher",
         national_dex: unsafe { NatDexIndex::new_unchecked(692) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Clauncher",
             national_dex: unsafe { NatDexIndex::new_unchecked(692) },
             form_name: "Clauncher",
@@ -35494,7 +35494,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Clawitzer",
         national_dex: unsafe { NatDexIndex::new_unchecked(693) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Clawitzer",
             national_dex: unsafe { NatDexIndex::new_unchecked(693) },
             form_name: "Clawitzer",
@@ -35530,7 +35530,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Helioptile",
         national_dex: unsafe { NatDexIndex::new_unchecked(694) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Helioptile",
             national_dex: unsafe { NatDexIndex::new_unchecked(694) },
             form_name: "Helioptile",
@@ -35566,7 +35566,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Heliolisk",
         national_dex: unsafe { NatDexIndex::new_unchecked(695) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Heliolisk",
             national_dex: unsafe { NatDexIndex::new_unchecked(695) },
             form_name: "Heliolisk",
@@ -35602,7 +35602,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tyrunt",
         national_dex: unsafe { NatDexIndex::new_unchecked(696) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tyrunt",
             national_dex: unsafe { NatDexIndex::new_unchecked(696) },
             form_name: "Tyrunt",
@@ -35638,7 +35638,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tyrantrum",
         national_dex: unsafe { NatDexIndex::new_unchecked(697) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tyrantrum",
             national_dex: unsafe { NatDexIndex::new_unchecked(697) },
             form_name: "Tyrantrum",
@@ -35674,7 +35674,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Amaura",
         national_dex: unsafe { NatDexIndex::new_unchecked(698) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Amaura",
             national_dex: unsafe { NatDexIndex::new_unchecked(698) },
             form_name: "Amaura",
@@ -35710,7 +35710,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Aurorus",
         national_dex: unsafe { NatDexIndex::new_unchecked(699) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Aurorus",
             national_dex: unsafe { NatDexIndex::new_unchecked(699) },
             form_name: "Aurorus",
@@ -35746,7 +35746,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sylveon",
         national_dex: unsafe { NatDexIndex::new_unchecked(700) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sylveon",
             national_dex: unsafe { NatDexIndex::new_unchecked(700) },
             form_name: "Sylveon",
@@ -35783,7 +35783,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(701) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Hawlucha",
                 national_dex: unsafe { NatDexIndex::new_unchecked(701) },
                 form_name: "Hawlucha",
@@ -35791,7 +35791,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(701, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(701, 1) },
                     required_item_id: Some(2583),
                 }],
                 is_gmax: false,
@@ -35817,7 +35817,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "hawlucha",
                 sprite_index: (7, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Hawlucha-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(701) },
                 form_name: "Mega Hawlucha",
@@ -35854,7 +35854,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dedenne",
         national_dex: unsafe { NatDexIndex::new_unchecked(702) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dedenne",
             national_dex: unsafe { NatDexIndex::new_unchecked(702) },
             form_name: "Dedenne",
@@ -35890,7 +35890,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Carbink",
         national_dex: unsafe { NatDexIndex::new_unchecked(703) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Carbink",
             national_dex: unsafe { NatDexIndex::new_unchecked(703) },
             form_name: "Carbink",
@@ -35926,7 +35926,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Goomy",
         national_dex: unsafe { NatDexIndex::new_unchecked(704) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Goomy",
             national_dex: unsafe { NatDexIndex::new_unchecked(704) },
             form_name: "Goomy",
@@ -35965,7 +35965,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(705) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sliggoo",
                 national_dex: unsafe { NatDexIndex::new_unchecked(705) },
                 form_name: "Sliggoo",
@@ -35996,7 +35996,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "sliggoo",
                 sprite_index: (11, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sliggoo-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(705) },
                 form_name: "Hisuian Sliggoo",
@@ -36034,7 +36034,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(706) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Goodra",
                 national_dex: unsafe { NatDexIndex::new_unchecked(706) },
                 form_name: "Goodra",
@@ -36065,7 +36065,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "goodra",
                 sprite_index: (13, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Goodra-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(706) },
                 form_name: "Hisuian Goodra",
@@ -36102,7 +36102,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Klefki",
         national_dex: unsafe { NatDexIndex::new_unchecked(707) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Klefki",
             national_dex: unsafe { NatDexIndex::new_unchecked(707) },
             form_name: "Klefki",
@@ -36138,7 +36138,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Phantump",
         national_dex: unsafe { NatDexIndex::new_unchecked(708) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Phantump",
             national_dex: unsafe { NatDexIndex::new_unchecked(708) },
             form_name: "Phantump",
@@ -36174,7 +36174,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Trevenant",
         national_dex: unsafe { NatDexIndex::new_unchecked(709) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Trevenant",
             national_dex: unsafe { NatDexIndex::new_unchecked(709) },
             form_name: "Trevenant",
@@ -36211,7 +36211,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(710) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pumpkaboo-Average",
                 national_dex: unsafe { NatDexIndex::new_unchecked(710) },
                 form_name: "Pumpkaboo",
@@ -36242,7 +36242,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pumpkaboo",
                 sprite_index: (18, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pumpkaboo-Small",
                 national_dex: unsafe { NatDexIndex::new_unchecked(710) },
                 form_name: "Pumpkaboo (Small)",
@@ -36273,7 +36273,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pumpkaboo-small",
                 sprite_index: (19, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pumpkaboo-Large",
                 national_dex: unsafe { NatDexIndex::new_unchecked(710) },
                 form_name: "Pumpkaboo (Large)",
@@ -36304,7 +36304,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "pumpkaboo-large",
                 sprite_index: (20, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Pumpkaboo-Super",
                 national_dex: unsafe { NatDexIndex::new_unchecked(710) },
                 form_name: "Pumpkaboo (Super)",
@@ -36342,7 +36342,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(711) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gourgeist-Average",
                 national_dex: unsafe { NatDexIndex::new_unchecked(711) },
                 form_name: "Gourgeist",
@@ -36373,7 +36373,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "gourgeist",
                 sprite_index: (22, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gourgeist-Small",
                 national_dex: unsafe { NatDexIndex::new_unchecked(711) },
                 form_name: "Gourgeist (Small)",
@@ -36404,7 +36404,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "gourgeist-small",
                 sprite_index: (23, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gourgeist-Large",
                 national_dex: unsafe { NatDexIndex::new_unchecked(711) },
                 form_name: "Gourgeist (Large)",
@@ -36435,7 +36435,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "gourgeist-large",
                 sprite_index: (24, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gourgeist-Super",
                 national_dex: unsafe { NatDexIndex::new_unchecked(711) },
                 form_name: "Gourgeist (Super)",
@@ -36472,7 +36472,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bergmite",
         national_dex: unsafe { NatDexIndex::new_unchecked(712) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bergmite",
             national_dex: unsafe { NatDexIndex::new_unchecked(712) },
             form_name: "Bergmite",
@@ -36511,7 +36511,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(713) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Avalugg",
                 national_dex: unsafe { NatDexIndex::new_unchecked(713) },
                 form_name: "Avalugg",
@@ -36542,7 +36542,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "avalugg",
                 sprite_index: (27, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Avalugg-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(713) },
                 form_name: "Hisuian Avalugg",
@@ -36579,7 +36579,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Noibat",
         national_dex: unsafe { NatDexIndex::new_unchecked(714) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Noibat",
             national_dex: unsafe { NatDexIndex::new_unchecked(714) },
             form_name: "Noibat",
@@ -36615,7 +36615,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Noivern",
         national_dex: unsafe { NatDexIndex::new_unchecked(715) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Noivern",
             national_dex: unsafe { NatDexIndex::new_unchecked(715) },
             form_name: "Noivern",
@@ -36652,7 +36652,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(716) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Xerneas-Neutral",
                 national_dex: unsafe { NatDexIndex::new_unchecked(716) },
                 form_name: "Xerneas",
@@ -36683,7 +36683,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "xerneas",
                 sprite_index: (32, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Xerneas-Active",
                 national_dex: unsafe { NatDexIndex::new_unchecked(716) },
                 form_name: "Xerneas (Active)",
@@ -36720,7 +36720,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Yveltal",
         national_dex: unsafe { NatDexIndex::new_unchecked(717) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Yveltal",
             national_dex: unsafe { NatDexIndex::new_unchecked(717) },
             form_name: "Yveltal",
@@ -36757,7 +36757,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(718) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zygarde-50%",
                 national_dex: unsafe { NatDexIndex::new_unchecked(718) },
                 form_name: "Zygarde",
@@ -36788,7 +36788,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "zygarde-50",
                 sprite_index: (34, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zygarde-10%",
                 national_dex: unsafe { NatDexIndex::new_unchecked(718) },
                 form_name: "Zygarde (10%)",
@@ -36819,7 +36819,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "zygarde-10",
                 sprite_index: (35, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zygarde-10%-Power-Construct",
                 national_dex: unsafe { NatDexIndex::new_unchecked(718) },
                 form_name: "Zygarde (10% Power Construct)",
@@ -36850,7 +36850,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "zygarde-10",
                 sprite_index: (35, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zygarde-50%-Power-Construct",
                 national_dex: unsafe { NatDexIndex::new_unchecked(718) },
                 form_name: "Zygarde (50% Power Construct)",
@@ -36881,7 +36881,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "zygarde-50",
                 sprite_index: (34, 26),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zygarde-Complete",
                 national_dex: unsafe { NatDexIndex::new_unchecked(718) },
                 form_name: "Zygarde (Complete)",
@@ -36889,7 +36889,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: false,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(718, 5) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(718, 5) },
                     required_item_id: Some(2584),
                 }],
                 is_gmax: false,
@@ -36915,7 +36915,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "zygarde-complete",
                 sprite_index: (0, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zygarde-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(718) },
                 form_name: "Mega Zygarde",
@@ -36953,7 +36953,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(719) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Diancie",
                 national_dex: unsafe { NatDexIndex::new_unchecked(719) },
                 form_name: "Diancie",
@@ -36961,7 +36961,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(719, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(719, 1) },
                     required_item_id: Some(764),
                 }],
                 is_gmax: false,
@@ -36987,7 +36987,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "diancie",
                 sprite_index: (1, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Diancie-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(719) },
                 form_name: "Mega Diancie",
@@ -37025,7 +37025,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(720) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Hoopa-Confined",
                 national_dex: unsafe { NatDexIndex::new_unchecked(720) },
                 form_name: "Hoopa",
@@ -37056,7 +37056,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "hoopa",
                 sprite_index: (3, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Hoopa-Unbound",
                 national_dex: unsafe { NatDexIndex::new_unchecked(720) },
                 form_name: "Hoopa Unbound",
@@ -37093,7 +37093,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Volcanion",
         national_dex: unsafe { NatDexIndex::new_unchecked(721) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Volcanion",
             national_dex: unsafe { NatDexIndex::new_unchecked(721) },
             form_name: "Volcanion",
@@ -37129,7 +37129,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Rowlet",
         national_dex: unsafe { NatDexIndex::new_unchecked(722) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Rowlet",
             national_dex: unsafe { NatDexIndex::new_unchecked(722) },
             form_name: "Rowlet",
@@ -37165,7 +37165,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dartrix",
         national_dex: unsafe { NatDexIndex::new_unchecked(723) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dartrix",
             national_dex: unsafe { NatDexIndex::new_unchecked(723) },
             form_name: "Dartrix",
@@ -37204,7 +37204,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(724) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Decidueye",
                 national_dex: unsafe { NatDexIndex::new_unchecked(724) },
                 form_name: "Decidueye",
@@ -37235,7 +37235,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "decidueye",
                 sprite_index: (8, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Decidueye-Hisui",
                 national_dex: unsafe { NatDexIndex::new_unchecked(724) },
                 form_name: "Hisuian Decidueye",
@@ -37272,7 +37272,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Litten",
         national_dex: unsafe { NatDexIndex::new_unchecked(725) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Litten",
             national_dex: unsafe { NatDexIndex::new_unchecked(725) },
             form_name: "Litten",
@@ -37308,7 +37308,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Torracat",
         national_dex: unsafe { NatDexIndex::new_unchecked(726) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Torracat",
             national_dex: unsafe { NatDexIndex::new_unchecked(726) },
             form_name: "Torracat",
@@ -37344,7 +37344,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Incineroar",
         national_dex: unsafe { NatDexIndex::new_unchecked(727) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Incineroar",
             national_dex: unsafe { NatDexIndex::new_unchecked(727) },
             form_name: "Incineroar",
@@ -37380,7 +37380,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Popplio",
         national_dex: unsafe { NatDexIndex::new_unchecked(728) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Popplio",
             national_dex: unsafe { NatDexIndex::new_unchecked(728) },
             form_name: "Popplio",
@@ -37416,7 +37416,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Brionne",
         national_dex: unsafe { NatDexIndex::new_unchecked(729) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Brionne",
             national_dex: unsafe { NatDexIndex::new_unchecked(729) },
             form_name: "Brionne",
@@ -37452,7 +37452,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Primarina",
         national_dex: unsafe { NatDexIndex::new_unchecked(730) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Primarina",
             national_dex: unsafe { NatDexIndex::new_unchecked(730) },
             form_name: "Primarina",
@@ -37488,7 +37488,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pikipek",
         national_dex: unsafe { NatDexIndex::new_unchecked(731) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pikipek",
             national_dex: unsafe { NatDexIndex::new_unchecked(731) },
             form_name: "Pikipek",
@@ -37524,7 +37524,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Trumbeak",
         national_dex: unsafe { NatDexIndex::new_unchecked(732) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Trumbeak",
             national_dex: unsafe { NatDexIndex::new_unchecked(732) },
             form_name: "Trumbeak",
@@ -37560,7 +37560,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Toucannon",
         national_dex: unsafe { NatDexIndex::new_unchecked(733) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Toucannon",
             national_dex: unsafe { NatDexIndex::new_unchecked(733) },
             form_name: "Toucannon",
@@ -37596,7 +37596,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Yungoos",
         national_dex: unsafe { NatDexIndex::new_unchecked(734) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Yungoos",
             national_dex: unsafe { NatDexIndex::new_unchecked(734) },
             form_name: "Yungoos",
@@ -37633,7 +37633,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(735) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gumshoos",
                 national_dex: unsafe { NatDexIndex::new_unchecked(735) },
                 form_name: "Gumshoos",
@@ -37664,7 +37664,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "gumshoos",
                 sprite_index: (20, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gumshoos-Totem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(735) },
                 form_name: "Gumshoos (Totem)",
@@ -37701,7 +37701,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Grubbin",
         national_dex: unsafe { NatDexIndex::new_unchecked(736) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Grubbin",
             national_dex: unsafe { NatDexIndex::new_unchecked(736) },
             form_name: "Grubbin",
@@ -37737,7 +37737,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Charjabug",
         national_dex: unsafe { NatDexIndex::new_unchecked(737) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Charjabug",
             national_dex: unsafe { NatDexIndex::new_unchecked(737) },
             form_name: "Charjabug",
@@ -37774,7 +37774,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(738) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vikavolt",
                 national_dex: unsafe { NatDexIndex::new_unchecked(738) },
                 form_name: "Vikavolt",
@@ -37805,7 +37805,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "vikavolt",
                 sprite_index: (23, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Vikavolt-Totem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(738) },
                 form_name: "Vikavolt (Totem)",
@@ -37842,7 +37842,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Crabrawler",
         national_dex: unsafe { NatDexIndex::new_unchecked(739) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Crabrawler",
             national_dex: unsafe { NatDexIndex::new_unchecked(739) },
             form_name: "Crabrawler",
@@ -37879,7 +37879,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(740) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Crabominable",
                 national_dex: unsafe { NatDexIndex::new_unchecked(740) },
                 form_name: "Crabominable",
@@ -37887,7 +37887,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(740, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(740, 1) },
                     required_item_id: Some(2644),
                 }],
                 is_gmax: false,
@@ -37913,7 +37913,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "crabominable",
                 sprite_index: (25, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Crabominable-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(740) },
                 form_name: "Mega Crabominable",
@@ -37951,7 +37951,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(741) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Oricorio-Baile",
                 national_dex: unsafe { NatDexIndex::new_unchecked(741) },
                 form_name: "Oricorio",
@@ -37982,7 +37982,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "oricorio-baile",
                 sprite_index: (26, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Oricorio-Pom-Pom",
                 national_dex: unsafe { NatDexIndex::new_unchecked(741) },
                 form_name: "Oricorio (Pom Pom)",
@@ -38013,7 +38013,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "oricorio-pom-pom",
                 sprite_index: (27, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Oricorio-Pa'u",
                 national_dex: unsafe { NatDexIndex::new_unchecked(741) },
                 form_name: "Oricorio (Pa'u)",
@@ -38044,7 +38044,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "oricorio-pau",
                 sprite_index: (28, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Oricorio-Sensu",
                 national_dex: unsafe { NatDexIndex::new_unchecked(741) },
                 form_name: "Oricorio (Sensu)",
@@ -38081,7 +38081,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cutiefly",
         national_dex: unsafe { NatDexIndex::new_unchecked(742) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cutiefly",
             national_dex: unsafe { NatDexIndex::new_unchecked(742) },
             form_name: "Cutiefly",
@@ -38118,7 +38118,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(743) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ribombee",
                 national_dex: unsafe { NatDexIndex::new_unchecked(743) },
                 form_name: "Ribombee",
@@ -38149,7 +38149,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "ribombee",
                 sprite_index: (31, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ribombee-Totem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(743) },
                 form_name: "Ribombee (Totem)",
@@ -38187,7 +38187,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(744) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rockruff",
                 national_dex: unsafe { NatDexIndex::new_unchecked(744) },
                 form_name: "Rockruff",
@@ -38220,7 +38220,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "rockruff",
                 sprite_index: (32, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Rockruff-Own-Tempo",
                 national_dex: unsafe { NatDexIndex::new_unchecked(744) },
                 form_name: "Rockruff (Own Tempo)",
@@ -38258,7 +38258,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(745) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Lycanroc-Midday",
                 national_dex: unsafe { NatDexIndex::new_unchecked(745) },
                 form_name: "Lycanroc",
@@ -38289,7 +38289,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "lycanroc-midday",
                 sprite_index: (33, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Lycanroc-Midnight",
                 national_dex: unsafe { NatDexIndex::new_unchecked(745) },
                 form_name: "Lycanroc (Midnight)",
@@ -38320,7 +38320,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "lycanroc-midnight",
                 sprite_index: (34, 27),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Lycanroc-Dusk",
                 national_dex: unsafe { NatDexIndex::new_unchecked(745) },
                 form_name: "Lycanroc (Dusk)",
@@ -38358,7 +38358,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(746) },
         level_up_type: LevelUpType::Fast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Wishiwashi-Solo",
                 national_dex: unsafe { NatDexIndex::new_unchecked(746) },
                 form_name: "Wishiwashi",
@@ -38389,7 +38389,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "wishiwashi-solo",
                 sprite_index: (0, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Wishiwashi-School",
                 national_dex: unsafe { NatDexIndex::new_unchecked(746) },
                 form_name: "Wishiwashi (School)",
@@ -38426,7 +38426,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mareanie",
         national_dex: unsafe { NatDexIndex::new_unchecked(747) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mareanie",
             national_dex: unsafe { NatDexIndex::new_unchecked(747) },
             form_name: "Mareanie",
@@ -38462,7 +38462,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Toxapex",
         national_dex: unsafe { NatDexIndex::new_unchecked(748) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Toxapex",
             national_dex: unsafe { NatDexIndex::new_unchecked(748) },
             form_name: "Toxapex",
@@ -38498,7 +38498,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mudbray",
         national_dex: unsafe { NatDexIndex::new_unchecked(749) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mudbray",
             national_dex: unsafe { NatDexIndex::new_unchecked(749) },
             form_name: "Mudbray",
@@ -38534,7 +38534,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mudsdale",
         national_dex: unsafe { NatDexIndex::new_unchecked(750) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mudsdale",
             national_dex: unsafe { NatDexIndex::new_unchecked(750) },
             form_name: "Mudsdale",
@@ -38570,7 +38570,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dewpider",
         national_dex: unsafe { NatDexIndex::new_unchecked(751) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dewpider",
             national_dex: unsafe { NatDexIndex::new_unchecked(751) },
             form_name: "Dewpider",
@@ -38607,7 +38607,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(752) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Araquanid",
                 national_dex: unsafe { NatDexIndex::new_unchecked(752) },
                 form_name: "Araquanid",
@@ -38638,7 +38638,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "araquanid",
                 sprite_index: (7, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Araquanid-Totem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(752) },
                 form_name: "Araquanid (Totem)",
@@ -38675,7 +38675,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Fomantis",
         national_dex: unsafe { NatDexIndex::new_unchecked(753) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Fomantis",
             national_dex: unsafe { NatDexIndex::new_unchecked(753) },
             form_name: "Fomantis",
@@ -38712,7 +38712,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(754) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Lurantis",
                 national_dex: unsafe { NatDexIndex::new_unchecked(754) },
                 form_name: "Lurantis",
@@ -38743,7 +38743,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "lurantis",
                 sprite_index: (9, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Lurantis-Totem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(754) },
                 form_name: "Lurantis (Totem)",
@@ -38780,7 +38780,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Morelull",
         national_dex: unsafe { NatDexIndex::new_unchecked(755) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Morelull",
             national_dex: unsafe { NatDexIndex::new_unchecked(755) },
             form_name: "Morelull",
@@ -38816,7 +38816,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Shiinotic",
         national_dex: unsafe { NatDexIndex::new_unchecked(756) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Shiinotic",
             national_dex: unsafe { NatDexIndex::new_unchecked(756) },
             form_name: "Shiinotic",
@@ -38852,7 +38852,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Salandit",
         national_dex: unsafe { NatDexIndex::new_unchecked(757) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Salandit",
             national_dex: unsafe { NatDexIndex::new_unchecked(757) },
             form_name: "Salandit",
@@ -38889,7 +38889,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(758) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Salazzle",
                 national_dex: unsafe { NatDexIndex::new_unchecked(758) },
                 form_name: "Salazzle",
@@ -38920,7 +38920,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "salazzle",
                 sprite_index: (13, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Salazzle-Totem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(758) },
                 form_name: "Salazzle (Totem)",
@@ -38957,7 +38957,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Stufful",
         national_dex: unsafe { NatDexIndex::new_unchecked(759) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Stufful",
             national_dex: unsafe { NatDexIndex::new_unchecked(759) },
             form_name: "Stufful",
@@ -38993,7 +38993,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bewear",
         national_dex: unsafe { NatDexIndex::new_unchecked(760) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bewear",
             national_dex: unsafe { NatDexIndex::new_unchecked(760) },
             form_name: "Bewear",
@@ -39029,7 +39029,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bounsweet",
         national_dex: unsafe { NatDexIndex::new_unchecked(761) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bounsweet",
             national_dex: unsafe { NatDexIndex::new_unchecked(761) },
             form_name: "Bounsweet",
@@ -39065,7 +39065,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Steenee",
         national_dex: unsafe { NatDexIndex::new_unchecked(762) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Steenee",
             national_dex: unsafe { NatDexIndex::new_unchecked(762) },
             form_name: "Steenee",
@@ -39101,7 +39101,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tsareena",
         national_dex: unsafe { NatDexIndex::new_unchecked(763) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tsareena",
             national_dex: unsafe { NatDexIndex::new_unchecked(763) },
             form_name: "Tsareena",
@@ -39137,7 +39137,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Comfey",
         national_dex: unsafe { NatDexIndex::new_unchecked(764) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Comfey",
             national_dex: unsafe { NatDexIndex::new_unchecked(764) },
             form_name: "Comfey",
@@ -39173,7 +39173,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Oranguru",
         national_dex: unsafe { NatDexIndex::new_unchecked(765) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Oranguru",
             national_dex: unsafe { NatDexIndex::new_unchecked(765) },
             form_name: "Oranguru",
@@ -39209,7 +39209,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Passimian",
         national_dex: unsafe { NatDexIndex::new_unchecked(766) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Passimian",
             national_dex: unsafe { NatDexIndex::new_unchecked(766) },
             form_name: "Passimian",
@@ -39245,7 +39245,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wimpod",
         national_dex: unsafe { NatDexIndex::new_unchecked(767) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wimpod",
             national_dex: unsafe { NatDexIndex::new_unchecked(767) },
             form_name: "Wimpod",
@@ -39282,7 +39282,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(768) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Golisopod",
                 national_dex: unsafe { NatDexIndex::new_unchecked(768) },
                 form_name: "Golisopod",
@@ -39290,7 +39290,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(768, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(768, 1) },
                     required_item_id: Some(2645),
                 }],
                 is_gmax: false,
@@ -39316,7 +39316,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "golisopod",
                 sprite_index: (23, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Golisopod-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(768) },
                 form_name: "Mega Golisopod",
@@ -39353,7 +39353,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sandygast",
         national_dex: unsafe { NatDexIndex::new_unchecked(769) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sandygast",
             national_dex: unsafe { NatDexIndex::new_unchecked(769) },
             form_name: "Sandygast",
@@ -39389,7 +39389,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Palossand",
         national_dex: unsafe { NatDexIndex::new_unchecked(770) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Palossand",
             national_dex: unsafe { NatDexIndex::new_unchecked(770) },
             form_name: "Palossand",
@@ -39425,7 +39425,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pyukumuku",
         national_dex: unsafe { NatDexIndex::new_unchecked(771) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pyukumuku",
             national_dex: unsafe { NatDexIndex::new_unchecked(771) },
             form_name: "Pyukumuku",
@@ -39461,7 +39461,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Type: Null",
         national_dex: unsafe { NatDexIndex::new_unchecked(772) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Type: Null",
             national_dex: unsafe { NatDexIndex::new_unchecked(772) },
             form_name: "Type: Null",
@@ -39498,7 +39498,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(773) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally",
@@ -39529,7 +39529,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Fighting",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Fighting)",
@@ -39560,7 +39560,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-fighting",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Flying",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Flying)",
@@ -39591,7 +39591,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-flying",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Poison",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Poison)",
@@ -39622,7 +39622,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-poison",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Ground",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Ground)",
@@ -39653,7 +39653,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-ground",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Rock",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Rock)",
@@ -39684,7 +39684,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-rock",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Bug",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Bug)",
@@ -39715,7 +39715,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-bug",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Ghost",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Ghost)",
@@ -39746,7 +39746,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-ghost",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Steel",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Steel)",
@@ -39777,7 +39777,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-steel",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Fire",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Fire)",
@@ -39808,7 +39808,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-fire",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Water",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Water)",
@@ -39839,7 +39839,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-water",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Grass",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Grass)",
@@ -39870,7 +39870,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-grass",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Electric",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Electric)",
@@ -39901,7 +39901,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-electric",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Psychic",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Psychic)",
@@ -39932,7 +39932,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-psychic",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Ice",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Ice)",
@@ -39963,7 +39963,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-ice",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Dragon",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Dragon)",
@@ -39994,7 +39994,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-dragon",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Dark",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Dark)",
@@ -40025,7 +40025,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "silvally-dark",
                 sprite_index: (28, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Silvally-Fairy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(773) },
                 form_name: "Silvally (Fairy)",
@@ -40063,7 +40063,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(774) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Meteor-Red",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior (Red Meteor)",
@@ -40094,7 +40094,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "minior-meteor",
                 sprite_index: (29, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Meteor-Orange",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior (Orange Meteor)",
@@ -40125,7 +40125,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "minior-meteor",
                 sprite_index: (29, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Meteor-Yellow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior (Yellow Meteor)",
@@ -40156,7 +40156,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "minior-meteor",
                 sprite_index: (29, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Meteor-Green",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior (Green Meteor)",
@@ -40187,7 +40187,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "minior-meteor",
                 sprite_index: (29, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Meteor-Blue",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior (Blue Meteor)",
@@ -40218,7 +40218,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "minior-meteor",
                 sprite_index: (29, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Meteor-Indigo",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior (Indigo Meteor)",
@@ -40249,7 +40249,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "minior-meteor",
                 sprite_index: (29, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Meteor-Violet",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior (Violet Meteor)",
@@ -40280,7 +40280,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "minior-meteor",
                 sprite_index: (29, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Core-Red",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior",
@@ -40311,7 +40311,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "minior-core-red",
                 sprite_index: (29, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Core-Orange",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior (Orange Core)",
@@ -40342,7 +40342,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "minior-core-orange",
                 sprite_index: (29, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Core-Yellow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior (Yellow Core)",
@@ -40373,7 +40373,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "minior-core-yellow",
                 sprite_index: (29, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Core-Green",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior (Green Core)",
@@ -40404,7 +40404,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "minior-core-green",
                 sprite_index: (29, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Core-Blue",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior (Blue Core)",
@@ -40435,7 +40435,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "minior-core-blue",
                 sprite_index: (29, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Core-Indigo",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior (Indigo Core)",
@@ -40466,7 +40466,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "minior-core-indigo",
                 sprite_index: (29, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Minior-Core-Violet",
                 national_dex: unsafe { NatDexIndex::new_unchecked(774) },
                 form_name: "Minior (Violet Core)",
@@ -40503,7 +40503,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Komala",
         national_dex: unsafe { NatDexIndex::new_unchecked(775) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Komala",
             national_dex: unsafe { NatDexIndex::new_unchecked(775) },
             form_name: "Komala",
@@ -40539,7 +40539,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Turtonator",
         national_dex: unsafe { NatDexIndex::new_unchecked(776) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Turtonator",
             national_dex: unsafe { NatDexIndex::new_unchecked(776) },
             form_name: "Turtonator",
@@ -40576,7 +40576,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(777) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Togedemaru",
                 national_dex: unsafe { NatDexIndex::new_unchecked(777) },
                 form_name: "Togedemaru",
@@ -40607,7 +40607,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "togedemaru",
                 sprite_index: (32, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Togedemaru-Totem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(777) },
                 form_name: "Togedemaru (Totem)",
@@ -40645,7 +40645,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(778) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Mimikyu-Disguised",
                 national_dex: unsafe { NatDexIndex::new_unchecked(778) },
                 form_name: "Mimikyu",
@@ -40676,7 +40676,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "mimikyu",
                 sprite_index: (33, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Mimikyu-Busted",
                 national_dex: unsafe { NatDexIndex::new_unchecked(778) },
                 form_name: "Mimikyu (Busted)",
@@ -40707,7 +40707,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "mimikyu-busted",
                 sprite_index: (33, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Mimikyu-Totem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(778) },
                 form_name: "Mimikyu (Totem)",
@@ -40738,7 +40738,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "mimikyu",
                 sprite_index: (33, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Mimikyu-Busted-Totem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(778) },
                 form_name: "Mimikyu (Busted Totem)",
@@ -40775,7 +40775,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bruxish",
         national_dex: unsafe { NatDexIndex::new_unchecked(779) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bruxish",
             national_dex: unsafe { NatDexIndex::new_unchecked(779) },
             form_name: "Bruxish",
@@ -40812,7 +40812,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(780) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Drampa",
                 national_dex: unsafe { NatDexIndex::new_unchecked(780) },
                 form_name: "Drampa",
@@ -40820,7 +40820,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(780, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(780, 1) },
                     required_item_id: Some(2585),
                 }],
                 is_gmax: false,
@@ -40846,7 +40846,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "drampa",
                 sprite_index: (35, 28),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Drampa-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(780) },
                 form_name: "Mega Drampa",
@@ -40883,7 +40883,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dhelmise",
         national_dex: unsafe { NatDexIndex::new_unchecked(781) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dhelmise",
             national_dex: unsafe { NatDexIndex::new_unchecked(781) },
             form_name: "Dhelmise",
@@ -40919,7 +40919,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Jangmo-o",
         national_dex: unsafe { NatDexIndex::new_unchecked(782) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Jangmo-o",
             national_dex: unsafe { NatDexIndex::new_unchecked(782) },
             form_name: "Jangmo-o",
@@ -40955,7 +40955,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hakamo-o",
         national_dex: unsafe { NatDexIndex::new_unchecked(783) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hakamo-o",
             national_dex: unsafe { NatDexIndex::new_unchecked(783) },
             form_name: "Hakamo-o",
@@ -40992,7 +40992,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(784) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Kommo-o",
                 national_dex: unsafe { NatDexIndex::new_unchecked(784) },
                 form_name: "Kommo-o",
@@ -41023,7 +41023,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "kommo-o",
                 sprite_index: (3, 29),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Kommo-o-Totem",
                 national_dex: unsafe { NatDexIndex::new_unchecked(784) },
                 form_name: "Kommo-o (Totem)",
@@ -41060,7 +41060,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tapu Koko",
         national_dex: unsafe { NatDexIndex::new_unchecked(785) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tapu Koko",
             national_dex: unsafe { NatDexIndex::new_unchecked(785) },
             form_name: "Tapu Koko",
@@ -41096,7 +41096,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tapu Lele",
         national_dex: unsafe { NatDexIndex::new_unchecked(786) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tapu Lele",
             national_dex: unsafe { NatDexIndex::new_unchecked(786) },
             form_name: "Tapu Lele",
@@ -41132,7 +41132,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tapu Bulu",
         national_dex: unsafe { NatDexIndex::new_unchecked(787) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tapu Bulu",
             national_dex: unsafe { NatDexIndex::new_unchecked(787) },
             form_name: "Tapu Bulu",
@@ -41168,7 +41168,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tapu Fini",
         national_dex: unsafe { NatDexIndex::new_unchecked(788) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tapu Fini",
             national_dex: unsafe { NatDexIndex::new_unchecked(788) },
             form_name: "Tapu Fini",
@@ -41204,7 +41204,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cosmog",
         national_dex: unsafe { NatDexIndex::new_unchecked(789) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cosmog",
             national_dex: unsafe { NatDexIndex::new_unchecked(789) },
             form_name: "Cosmog",
@@ -41240,7 +41240,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cosmoem",
         national_dex: unsafe { NatDexIndex::new_unchecked(790) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cosmoem",
             national_dex: unsafe { NatDexIndex::new_unchecked(790) },
             form_name: "Cosmoem",
@@ -41278,7 +41278,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Solgaleo",
         national_dex: unsafe { NatDexIndex::new_unchecked(791) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Solgaleo",
             national_dex: unsafe { NatDexIndex::new_unchecked(791) },
             form_name: "Solgaleo",
@@ -41314,7 +41314,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lunala",
         national_dex: unsafe { NatDexIndex::new_unchecked(792) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lunala",
             national_dex: unsafe { NatDexIndex::new_unchecked(792) },
             form_name: "Lunala",
@@ -41350,7 +41350,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Nihilego",
         national_dex: unsafe { NatDexIndex::new_unchecked(793) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Nihilego",
             national_dex: unsafe { NatDexIndex::new_unchecked(793) },
             form_name: "Nihilego",
@@ -41386,7 +41386,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Buzzwole",
         national_dex: unsafe { NatDexIndex::new_unchecked(794) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Buzzwole",
             national_dex: unsafe { NatDexIndex::new_unchecked(794) },
             form_name: "Buzzwole",
@@ -41422,7 +41422,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pheromosa",
         national_dex: unsafe { NatDexIndex::new_unchecked(795) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pheromosa",
             national_dex: unsafe { NatDexIndex::new_unchecked(795) },
             form_name: "Pheromosa",
@@ -41458,7 +41458,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Xurkitree",
         national_dex: unsafe { NatDexIndex::new_unchecked(796) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Xurkitree",
             national_dex: unsafe { NatDexIndex::new_unchecked(796) },
             form_name: "Xurkitree",
@@ -41494,7 +41494,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Celesteela",
         national_dex: unsafe { NatDexIndex::new_unchecked(797) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Celesteela",
             national_dex: unsafe { NatDexIndex::new_unchecked(797) },
             form_name: "Celesteela",
@@ -41530,7 +41530,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kartana",
         national_dex: unsafe { NatDexIndex::new_unchecked(798) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kartana",
             national_dex: unsafe { NatDexIndex::new_unchecked(798) },
             form_name: "Kartana",
@@ -41566,7 +41566,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Guzzlord",
         national_dex: unsafe { NatDexIndex::new_unchecked(799) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Guzzlord",
             national_dex: unsafe { NatDexIndex::new_unchecked(799) },
             form_name: "Guzzlord",
@@ -41603,7 +41603,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(800) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Necrozma",
                 national_dex: unsafe { NatDexIndex::new_unchecked(800) },
                 form_name: "Necrozma",
@@ -41634,7 +41634,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "necrozma",
                 sprite_index: (19, 29),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Necrozma-Dusk-Mane",
                 national_dex: unsafe { NatDexIndex::new_unchecked(800) },
                 form_name: "Necrozma (Dusk Mane)",
@@ -41665,7 +41665,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "necrozma-dusk-mane",
                 sprite_index: (20, 29),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Necrozma-Dawn-Wings",
                 national_dex: unsafe { NatDexIndex::new_unchecked(800) },
                 form_name: "Necrozma (Dawn Wings)",
@@ -41696,7 +41696,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "necrozma-dawn-wings",
                 sprite_index: (21, 29),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Necrozma-Ultra",
                 national_dex: unsafe { NatDexIndex::new_unchecked(800) },
                 form_name: "Ultra Necrozma",
@@ -41734,7 +41734,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(801) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Magearna",
                 national_dex: unsafe { NatDexIndex::new_unchecked(801) },
                 form_name: "Magearna",
@@ -41742,7 +41742,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(801, 2) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(801, 2) },
                     required_item_id: Some(2646),
                 }],
                 is_gmax: false,
@@ -41768,7 +41768,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "magearna",
                 sprite_index: (23, 29),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Magearna-Original",
                 national_dex: unsafe { NatDexIndex::new_unchecked(801) },
                 form_name: "Magearna (Original)",
@@ -41776,7 +41776,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: false,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(801, 3) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(801, 3) },
                     required_item_id: Some(2646),
                 }],
                 is_gmax: false,
@@ -41802,7 +41802,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "magearna-original",
                 sprite_index: (24, 29),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Magearna-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(801) },
                 form_name: "Mega Magearna",
@@ -41833,7 +41833,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "magearna-mega",
                 sprite_index: (0, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Magearna-Mega-Original",
                 national_dex: unsafe { NatDexIndex::new_unchecked(801) },
                 form_name: "Mega Magearna (Original Color)",
@@ -41870,7 +41870,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Marshadow",
         national_dex: unsafe { NatDexIndex::new_unchecked(802) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Marshadow",
             national_dex: unsafe { NatDexIndex::new_unchecked(802) },
             form_name: "Marshadow",
@@ -41906,7 +41906,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Poipole",
         national_dex: unsafe { NatDexIndex::new_unchecked(803) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Poipole",
             national_dex: unsafe { NatDexIndex::new_unchecked(803) },
             form_name: "Poipole",
@@ -41942,7 +41942,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Naganadel",
         national_dex: unsafe { NatDexIndex::new_unchecked(804) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Naganadel",
             national_dex: unsafe { NatDexIndex::new_unchecked(804) },
             form_name: "Naganadel",
@@ -41978,7 +41978,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Stakataka",
         national_dex: unsafe { NatDexIndex::new_unchecked(805) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Stakataka",
             national_dex: unsafe { NatDexIndex::new_unchecked(805) },
             form_name: "Stakataka",
@@ -42014,7 +42014,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Blacephalon",
         national_dex: unsafe { NatDexIndex::new_unchecked(806) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Blacephalon",
             national_dex: unsafe { NatDexIndex::new_unchecked(806) },
             form_name: "Blacephalon",
@@ -42051,7 +42051,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(807) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zeraora",
                 national_dex: unsafe { NatDexIndex::new_unchecked(807) },
                 form_name: "Zeraora",
@@ -42059,7 +42059,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(807, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(807, 1) },
                     required_item_id: Some(2586),
                 }],
                 is_gmax: false,
@@ -42085,7 +42085,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "zeraora",
                 sprite_index: (30, 29),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zeraora-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(807) },
                 form_name: "Mega Zeraora",
@@ -42122,7 +42122,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Meltan",
         national_dex: unsafe { NatDexIndex::new_unchecked(808) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Meltan",
             national_dex: unsafe { NatDexIndex::new_unchecked(808) },
             form_name: "Meltan",
@@ -42158,7 +42158,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Melmetal",
         national_dex: unsafe { NatDexIndex::new_unchecked(809) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Melmetal",
             national_dex: unsafe { NatDexIndex::new_unchecked(809) },
             form_name: "Melmetal",
@@ -42194,7 +42194,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Grookey",
         national_dex: unsafe { NatDexIndex::new_unchecked(810) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Grookey",
             national_dex: unsafe { NatDexIndex::new_unchecked(810) },
             form_name: "Grookey",
@@ -42230,7 +42230,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Thwackey",
         national_dex: unsafe { NatDexIndex::new_unchecked(811) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Thwackey",
             national_dex: unsafe { NatDexIndex::new_unchecked(811) },
             form_name: "Thwackey",
@@ -42266,7 +42266,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Rillaboom",
         national_dex: unsafe { NatDexIndex::new_unchecked(812) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Rillaboom",
             national_dex: unsafe { NatDexIndex::new_unchecked(812) },
             form_name: "Rillaboom",
@@ -42302,7 +42302,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Scorbunny",
         national_dex: unsafe { NatDexIndex::new_unchecked(813) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Scorbunny",
             national_dex: unsafe { NatDexIndex::new_unchecked(813) },
             form_name: "Scorbunny",
@@ -42338,7 +42338,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Raboot",
         national_dex: unsafe { NatDexIndex::new_unchecked(814) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Raboot",
             national_dex: unsafe { NatDexIndex::new_unchecked(814) },
             form_name: "Raboot",
@@ -42374,7 +42374,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cinderace",
         national_dex: unsafe { NatDexIndex::new_unchecked(815) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cinderace",
             national_dex: unsafe { NatDexIndex::new_unchecked(815) },
             form_name: "Cinderace",
@@ -42410,7 +42410,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sobble",
         national_dex: unsafe { NatDexIndex::new_unchecked(816) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sobble",
             national_dex: unsafe { NatDexIndex::new_unchecked(816) },
             form_name: "Sobble",
@@ -42446,7 +42446,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Drizzile",
         national_dex: unsafe { NatDexIndex::new_unchecked(817) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Drizzile",
             national_dex: unsafe { NatDexIndex::new_unchecked(817) },
             form_name: "Drizzile",
@@ -42482,7 +42482,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Inteleon",
         national_dex: unsafe { NatDexIndex::new_unchecked(818) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Inteleon",
             national_dex: unsafe { NatDexIndex::new_unchecked(818) },
             form_name: "Inteleon",
@@ -42518,7 +42518,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Skwovet",
         national_dex: unsafe { NatDexIndex::new_unchecked(819) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Skwovet",
             national_dex: unsafe { NatDexIndex::new_unchecked(819) },
             form_name: "Skwovet",
@@ -42554,7 +42554,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Greedent",
         national_dex: unsafe { NatDexIndex::new_unchecked(820) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Greedent",
             national_dex: unsafe { NatDexIndex::new_unchecked(820) },
             form_name: "Greedent",
@@ -42590,7 +42590,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Rookidee",
         national_dex: unsafe { NatDexIndex::new_unchecked(821) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Rookidee",
             national_dex: unsafe { NatDexIndex::new_unchecked(821) },
             form_name: "Rookidee",
@@ -42626,7 +42626,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Corvisquire",
         national_dex: unsafe { NatDexIndex::new_unchecked(822) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Corvisquire",
             national_dex: unsafe { NatDexIndex::new_unchecked(822) },
             form_name: "Corvisquire",
@@ -42662,7 +42662,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Corviknight",
         national_dex: unsafe { NatDexIndex::new_unchecked(823) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Corviknight",
             national_dex: unsafe { NatDexIndex::new_unchecked(823) },
             form_name: "Corviknight",
@@ -42698,7 +42698,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Blipbug",
         national_dex: unsafe { NatDexIndex::new_unchecked(824) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Blipbug",
             national_dex: unsafe { NatDexIndex::new_unchecked(824) },
             form_name: "Blipbug",
@@ -42734,7 +42734,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dottler",
         national_dex: unsafe { NatDexIndex::new_unchecked(825) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dottler",
             national_dex: unsafe { NatDexIndex::new_unchecked(825) },
             form_name: "Dottler",
@@ -42770,7 +42770,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Orbeetle",
         national_dex: unsafe { NatDexIndex::new_unchecked(826) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Orbeetle",
             national_dex: unsafe { NatDexIndex::new_unchecked(826) },
             form_name: "Orbeetle",
@@ -42806,7 +42806,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Nickit",
         national_dex: unsafe { NatDexIndex::new_unchecked(827) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Nickit",
             national_dex: unsafe { NatDexIndex::new_unchecked(827) },
             form_name: "Nickit",
@@ -42842,7 +42842,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Thievul",
         national_dex: unsafe { NatDexIndex::new_unchecked(828) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Thievul",
             national_dex: unsafe { NatDexIndex::new_unchecked(828) },
             form_name: "Thievul",
@@ -42878,7 +42878,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gossifleur",
         national_dex: unsafe { NatDexIndex::new_unchecked(829) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gossifleur",
             national_dex: unsafe { NatDexIndex::new_unchecked(829) },
             form_name: "Gossifleur",
@@ -42914,7 +42914,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Eldegoss",
         national_dex: unsafe { NatDexIndex::new_unchecked(830) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Eldegoss",
             national_dex: unsafe { NatDexIndex::new_unchecked(830) },
             form_name: "Eldegoss",
@@ -42950,7 +42950,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wooloo",
         national_dex: unsafe { NatDexIndex::new_unchecked(831) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wooloo",
             national_dex: unsafe { NatDexIndex::new_unchecked(831) },
             form_name: "Wooloo",
@@ -42986,7 +42986,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dubwool",
         national_dex: unsafe { NatDexIndex::new_unchecked(832) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dubwool",
             national_dex: unsafe { NatDexIndex::new_unchecked(832) },
             form_name: "Dubwool",
@@ -43022,7 +43022,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Chewtle",
         national_dex: unsafe { NatDexIndex::new_unchecked(833) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Chewtle",
             national_dex: unsafe { NatDexIndex::new_unchecked(833) },
             form_name: "Chewtle",
@@ -43058,7 +43058,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Drednaw",
         national_dex: unsafe { NatDexIndex::new_unchecked(834) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Drednaw",
             national_dex: unsafe { NatDexIndex::new_unchecked(834) },
             form_name: "Drednaw",
@@ -43094,7 +43094,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Yamper",
         national_dex: unsafe { NatDexIndex::new_unchecked(835) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Yamper",
             national_dex: unsafe { NatDexIndex::new_unchecked(835) },
             form_name: "Yamper",
@@ -43130,7 +43130,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Boltund",
         national_dex: unsafe { NatDexIndex::new_unchecked(836) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Boltund",
             national_dex: unsafe { NatDexIndex::new_unchecked(836) },
             form_name: "Boltund",
@@ -43166,7 +43166,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Rolycoly",
         national_dex: unsafe { NatDexIndex::new_unchecked(837) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Rolycoly",
             national_dex: unsafe { NatDexIndex::new_unchecked(837) },
             form_name: "Rolycoly",
@@ -43202,7 +43202,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Carkol",
         national_dex: unsafe { NatDexIndex::new_unchecked(838) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Carkol",
             national_dex: unsafe { NatDexIndex::new_unchecked(838) },
             form_name: "Carkol",
@@ -43238,7 +43238,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Coalossal",
         national_dex: unsafe { NatDexIndex::new_unchecked(839) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Coalossal",
             national_dex: unsafe { NatDexIndex::new_unchecked(839) },
             form_name: "Coalossal",
@@ -43274,7 +43274,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Applin",
         national_dex: unsafe { NatDexIndex::new_unchecked(840) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Applin",
             national_dex: unsafe { NatDexIndex::new_unchecked(840) },
             form_name: "Applin",
@@ -43314,7 +43314,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Flapple",
         national_dex: unsafe { NatDexIndex::new_unchecked(841) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Flapple",
             national_dex: unsafe { NatDexIndex::new_unchecked(841) },
             form_name: "Flapple",
@@ -43350,7 +43350,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Appletun",
         national_dex: unsafe { NatDexIndex::new_unchecked(842) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Appletun",
             national_dex: unsafe { NatDexIndex::new_unchecked(842) },
             form_name: "Appletun",
@@ -43386,7 +43386,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Silicobra",
         national_dex: unsafe { NatDexIndex::new_unchecked(843) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Silicobra",
             national_dex: unsafe { NatDexIndex::new_unchecked(843) },
             form_name: "Silicobra",
@@ -43422,7 +43422,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sandaconda",
         national_dex: unsafe { NatDexIndex::new_unchecked(844) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sandaconda",
             national_dex: unsafe { NatDexIndex::new_unchecked(844) },
             form_name: "Sandaconda",
@@ -43459,7 +43459,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(845) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Cramorant",
                 national_dex: unsafe { NatDexIndex::new_unchecked(845) },
                 form_name: "Cramorant",
@@ -43490,7 +43490,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "cramorant",
                 sprite_index: (32, 30),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Cramorant-Gulping",
                 national_dex: unsafe { NatDexIndex::new_unchecked(845) },
                 form_name: "Cramorant (Gulping)",
@@ -43521,7 +43521,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "cramorant-gulping",
                 sprite_index: (33, 30),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Cramorant-Gorging",
                 national_dex: unsafe { NatDexIndex::new_unchecked(845) },
                 form_name: "Cramorant (Gorging)",
@@ -43558,7 +43558,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Arrokuda",
         national_dex: unsafe { NatDexIndex::new_unchecked(846) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Arrokuda",
             national_dex: unsafe { NatDexIndex::new_unchecked(846) },
             form_name: "Arrokuda",
@@ -43594,7 +43594,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Barraskewda",
         national_dex: unsafe { NatDexIndex::new_unchecked(847) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Barraskewda",
             national_dex: unsafe { NatDexIndex::new_unchecked(847) },
             form_name: "Barraskewda",
@@ -43630,7 +43630,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Toxel",
         national_dex: unsafe { NatDexIndex::new_unchecked(848) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Toxel",
             national_dex: unsafe { NatDexIndex::new_unchecked(848) },
             form_name: "Toxel",
@@ -43669,7 +43669,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(849) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Toxtricity-Amped",
                 national_dex: unsafe { NatDexIndex::new_unchecked(849) },
                 form_name: "Toxtricity",
@@ -43700,7 +43700,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "toxtricity",
                 sprite_index: (2, 31),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Toxtricity-Low-Key",
                 national_dex: unsafe { NatDexIndex::new_unchecked(849) },
                 form_name: "Toxtricity (Low Key)",
@@ -43737,7 +43737,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sizzlipede",
         national_dex: unsafe { NatDexIndex::new_unchecked(850) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sizzlipede",
             national_dex: unsafe { NatDexIndex::new_unchecked(850) },
             form_name: "Sizzlipede",
@@ -43773,7 +43773,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Centiskorch",
         national_dex: unsafe { NatDexIndex::new_unchecked(851) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Centiskorch",
             national_dex: unsafe { NatDexIndex::new_unchecked(851) },
             form_name: "Centiskorch",
@@ -43809,7 +43809,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Clobbopus",
         national_dex: unsafe { NatDexIndex::new_unchecked(852) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Clobbopus",
             national_dex: unsafe { NatDexIndex::new_unchecked(852) },
             form_name: "Clobbopus",
@@ -43845,7 +43845,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Grapploct",
         national_dex: unsafe { NatDexIndex::new_unchecked(853) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Grapploct",
             national_dex: unsafe { NatDexIndex::new_unchecked(853) },
             form_name: "Grapploct",
@@ -43882,7 +43882,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(854) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sinistea-Phony",
                 national_dex: unsafe { NatDexIndex::new_unchecked(854) },
                 form_name: "Sinistea",
@@ -43913,7 +43913,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "sinistea",
                 sprite_index: (8, 31),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sinistea-Antique",
                 national_dex: unsafe { NatDexIndex::new_unchecked(854) },
                 form_name: "Sinistea (Antique)",
@@ -43951,7 +43951,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(855) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Polteageist-Phony",
                 national_dex: unsafe { NatDexIndex::new_unchecked(855) },
                 form_name: "Polteageist",
@@ -43982,7 +43982,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "polteageist",
                 sprite_index: (9, 31),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Polteageist-Antique",
                 national_dex: unsafe { NatDexIndex::new_unchecked(855) },
                 form_name: "Polteageist (Antique)",
@@ -44019,7 +44019,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hatenna",
         national_dex: unsafe { NatDexIndex::new_unchecked(856) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hatenna",
             national_dex: unsafe { NatDexIndex::new_unchecked(856) },
             form_name: "Hatenna",
@@ -44055,7 +44055,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hattrem",
         national_dex: unsafe { NatDexIndex::new_unchecked(857) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hattrem",
             national_dex: unsafe { NatDexIndex::new_unchecked(857) },
             form_name: "Hattrem",
@@ -44091,7 +44091,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hatterene",
         national_dex: unsafe { NatDexIndex::new_unchecked(858) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hatterene",
             national_dex: unsafe { NatDexIndex::new_unchecked(858) },
             form_name: "Hatterene",
@@ -44127,7 +44127,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Impidimp",
         national_dex: unsafe { NatDexIndex::new_unchecked(859) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Impidimp",
             national_dex: unsafe { NatDexIndex::new_unchecked(859) },
             form_name: "Impidimp",
@@ -44163,7 +44163,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Morgrem",
         national_dex: unsafe { NatDexIndex::new_unchecked(860) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Morgrem",
             national_dex: unsafe { NatDexIndex::new_unchecked(860) },
             form_name: "Morgrem",
@@ -44199,7 +44199,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Grimmsnarl",
         national_dex: unsafe { NatDexIndex::new_unchecked(861) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Grimmsnarl",
             national_dex: unsafe { NatDexIndex::new_unchecked(861) },
             form_name: "Grimmsnarl",
@@ -44235,7 +44235,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Obstagoon",
         national_dex: unsafe { NatDexIndex::new_unchecked(862) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Obstagoon",
             national_dex: unsafe { NatDexIndex::new_unchecked(862) },
             form_name: "Obstagoon",
@@ -44271,7 +44271,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Perrserker",
         national_dex: unsafe { NatDexIndex::new_unchecked(863) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Perrserker",
             national_dex: unsafe { NatDexIndex::new_unchecked(863) },
             form_name: "Perrserker",
@@ -44307,7 +44307,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cursola",
         national_dex: unsafe { NatDexIndex::new_unchecked(864) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cursola",
             national_dex: unsafe { NatDexIndex::new_unchecked(864) },
             form_name: "Cursola",
@@ -44343,7 +44343,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sirfetch'd",
         national_dex: unsafe { NatDexIndex::new_unchecked(865) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sirfetch'd",
             national_dex: unsafe { NatDexIndex::new_unchecked(865) },
             form_name: "Sirfetch'd",
@@ -44379,7 +44379,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mr. Rime",
         national_dex: unsafe { NatDexIndex::new_unchecked(866) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mr. Rime",
             national_dex: unsafe { NatDexIndex::new_unchecked(866) },
             form_name: "Mr. Rime",
@@ -44415,7 +44415,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Runerigus",
         national_dex: unsafe { NatDexIndex::new_unchecked(867) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Runerigus",
             national_dex: unsafe { NatDexIndex::new_unchecked(867) },
             form_name: "Runerigus",
@@ -44451,7 +44451,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Milcery",
         national_dex: unsafe { NatDexIndex::new_unchecked(868) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Milcery",
             national_dex: unsafe { NatDexIndex::new_unchecked(868) },
             form_name: "Milcery",
@@ -44488,7 +44488,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(869) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Alcremie-Vanilla-Cream",
                 national_dex: unsafe { NatDexIndex::new_unchecked(869) },
                 form_name: "Alcremie",
@@ -44519,7 +44519,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "alcremie-vanilla-cream",
                 sprite_index: (23, 31),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Alcremie-Ruby-Cream",
                 national_dex: unsafe { NatDexIndex::new_unchecked(869) },
                 form_name: "Alcremie (Ruby Cream)",
@@ -44550,7 +44550,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "alcremie-ruby-cream",
                 sprite_index: (24, 31),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Alcremie-Matcha-Cream",
                 national_dex: unsafe { NatDexIndex::new_unchecked(869) },
                 form_name: "Alcremie (Matcha Cream)",
@@ -44581,7 +44581,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "alcremie-matcha-cream",
                 sprite_index: (25, 31),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Alcremie-Mint-Cream",
                 national_dex: unsafe { NatDexIndex::new_unchecked(869) },
                 form_name: "Alcremie (Mint Cream)",
@@ -44612,7 +44612,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "alcremie-mint-cream",
                 sprite_index: (26, 31),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Alcremie-Lemon-Cream",
                 national_dex: unsafe { NatDexIndex::new_unchecked(869) },
                 form_name: "Alcremie (Lemon Cream)",
@@ -44643,7 +44643,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "alcremie-lemon-cream",
                 sprite_index: (27, 31),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Alcremie-Salted-Cream",
                 national_dex: unsafe { NatDexIndex::new_unchecked(869) },
                 form_name: "Alcremie (Salted Cream)",
@@ -44674,7 +44674,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "alcremie-salted-cream",
                 sprite_index: (28, 31),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Alcremie-Ruby-Swirl",
                 national_dex: unsafe { NatDexIndex::new_unchecked(869) },
                 form_name: "Alcremie (Ruby Swirl)",
@@ -44705,7 +44705,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "alcremie-ruby-swirl",
                 sprite_index: (29, 31),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Alcremie-Caramel-Swirl",
                 national_dex: unsafe { NatDexIndex::new_unchecked(869) },
                 form_name: "Alcremie (Caramel Swirl)",
@@ -44736,7 +44736,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "alcremie-caramel-swirl",
                 sprite_index: (30, 31),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Alcremie-Rainbow-Swirl",
                 national_dex: unsafe { NatDexIndex::new_unchecked(869) },
                 form_name: "Alcremie (Rainbow Swirl)",
@@ -44774,7 +44774,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(870) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Falinks",
                 national_dex: unsafe { NatDexIndex::new_unchecked(870) },
                 form_name: "Falinks",
@@ -44782,7 +44782,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(870, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(870, 1) },
                     required_item_id: Some(2587),
                 }],
                 is_gmax: false,
@@ -44808,7 +44808,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "falinks",
                 sprite_index: (32, 31),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Falinks-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(870) },
                 form_name: "Mega Falinks",
@@ -44845,7 +44845,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pincurchin",
         national_dex: unsafe { NatDexIndex::new_unchecked(871) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pincurchin",
             national_dex: unsafe { NatDexIndex::new_unchecked(871) },
             form_name: "Pincurchin",
@@ -44881,7 +44881,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Snom",
         national_dex: unsafe { NatDexIndex::new_unchecked(872) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Snom",
             national_dex: unsafe { NatDexIndex::new_unchecked(872) },
             form_name: "Snom",
@@ -44917,7 +44917,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Frosmoth",
         national_dex: unsafe { NatDexIndex::new_unchecked(873) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Frosmoth",
             national_dex: unsafe { NatDexIndex::new_unchecked(873) },
             form_name: "Frosmoth",
@@ -44953,7 +44953,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Stonjourner",
         national_dex: unsafe { NatDexIndex::new_unchecked(874) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Stonjourner",
             national_dex: unsafe { NatDexIndex::new_unchecked(874) },
             form_name: "Stonjourner",
@@ -44990,7 +44990,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(875) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Eiscue",
                 national_dex: unsafe { NatDexIndex::new_unchecked(875) },
                 form_name: "Eiscue",
@@ -45021,7 +45021,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "eiscue",
                 sprite_index: (1, 32),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Eiscue-Noice",
                 national_dex: unsafe { NatDexIndex::new_unchecked(875) },
                 form_name: "Eiscue (Noice)",
@@ -45059,7 +45059,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(876) },
         level_up_type: LevelUpType::Fast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Indeedee-M",
                 national_dex: unsafe { NatDexIndex::new_unchecked(876) },
                 form_name: "Indeedee",
@@ -45090,7 +45090,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "indeedee",
                 sprite_index: (3, 32),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Indeedee-F",
                 national_dex: unsafe { NatDexIndex::new_unchecked(876) },
                 form_name: "Indeedee (F)",
@@ -45128,7 +45128,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(877) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Morpeko",
                 national_dex: unsafe { NatDexIndex::new_unchecked(877) },
                 form_name: "Morpeko",
@@ -45159,7 +45159,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "morpeko",
                 sprite_index: (5, 32),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Morpeko-Hangry",
                 national_dex: unsafe { NatDexIndex::new_unchecked(877) },
                 form_name: "Morpeko (Hangry)",
@@ -45196,7 +45196,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cufant",
         national_dex: unsafe { NatDexIndex::new_unchecked(878) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cufant",
             national_dex: unsafe { NatDexIndex::new_unchecked(878) },
             form_name: "Cufant",
@@ -45232,7 +45232,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Copperajah",
         national_dex: unsafe { NatDexIndex::new_unchecked(879) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Copperajah",
             national_dex: unsafe { NatDexIndex::new_unchecked(879) },
             form_name: "Copperajah",
@@ -45268,7 +45268,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dracozolt",
         national_dex: unsafe { NatDexIndex::new_unchecked(880) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dracozolt",
             national_dex: unsafe { NatDexIndex::new_unchecked(880) },
             form_name: "Dracozolt",
@@ -45304,7 +45304,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Arctozolt",
         national_dex: unsafe { NatDexIndex::new_unchecked(881) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Arctozolt",
             national_dex: unsafe { NatDexIndex::new_unchecked(881) },
             form_name: "Arctozolt",
@@ -45340,7 +45340,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dracovish",
         national_dex: unsafe { NatDexIndex::new_unchecked(882) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dracovish",
             national_dex: unsafe { NatDexIndex::new_unchecked(882) },
             form_name: "Dracovish",
@@ -45376,7 +45376,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Arctovish",
         national_dex: unsafe { NatDexIndex::new_unchecked(883) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Arctovish",
             national_dex: unsafe { NatDexIndex::new_unchecked(883) },
             form_name: "Arctovish",
@@ -45412,7 +45412,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Duraludon",
         national_dex: unsafe { NatDexIndex::new_unchecked(884) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Duraludon",
             national_dex: unsafe { NatDexIndex::new_unchecked(884) },
             form_name: "Duraludon",
@@ -45448,7 +45448,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dreepy",
         national_dex: unsafe { NatDexIndex::new_unchecked(885) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dreepy",
             national_dex: unsafe { NatDexIndex::new_unchecked(885) },
             form_name: "Dreepy",
@@ -45484,7 +45484,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Drakloak",
         national_dex: unsafe { NatDexIndex::new_unchecked(886) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Drakloak",
             national_dex: unsafe { NatDexIndex::new_unchecked(886) },
             form_name: "Drakloak",
@@ -45520,7 +45520,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dragapult",
         national_dex: unsafe { NatDexIndex::new_unchecked(887) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dragapult",
             national_dex: unsafe { NatDexIndex::new_unchecked(887) },
             form_name: "Dragapult",
@@ -45557,7 +45557,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(888) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zacian-Hero",
                 national_dex: unsafe { NatDexIndex::new_unchecked(888) },
                 form_name: "Zacian",
@@ -45588,7 +45588,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "zacian",
                 sprite_index: (17, 32),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zacian-Crowned",
                 national_dex: unsafe { NatDexIndex::new_unchecked(888) },
                 form_name: "Zacian (Crowned)",
@@ -45626,7 +45626,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(889) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zamazenta-Hero",
                 national_dex: unsafe { NatDexIndex::new_unchecked(889) },
                 form_name: "Zamazenta",
@@ -45657,7 +45657,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "zamazenta",
                 sprite_index: (19, 32),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zamazenta-Crowned",
                 national_dex: unsafe { NatDexIndex::new_unchecked(889) },
                 form_name: "Zamazenta (Crowned)",
@@ -45695,7 +45695,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(890) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Eternatus",
                 national_dex: unsafe { NatDexIndex::new_unchecked(890) },
                 form_name: "Eternatus",
@@ -45726,7 +45726,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "eternatus",
                 sprite_index: (21, 32),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Eternatus-Eternamax",
                 national_dex: unsafe { NatDexIndex::new_unchecked(890) },
                 form_name: "Eternatus (Eternamax)",
@@ -45763,7 +45763,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kubfu",
         national_dex: unsafe { NatDexIndex::new_unchecked(891) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kubfu",
             national_dex: unsafe { NatDexIndex::new_unchecked(891) },
             form_name: "Kubfu",
@@ -45802,7 +45802,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(892) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Urshifu-Single-Strike",
                 national_dex: unsafe { NatDexIndex::new_unchecked(892) },
                 form_name: "Urshifu",
@@ -45833,7 +45833,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "urshifu",
                 sprite_index: (24, 32),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Urshifu-Rapid-Strike",
                 national_dex: unsafe { NatDexIndex::new_unchecked(892) },
                 form_name: "Urshifu (Rapid Strike)",
@@ -45871,7 +45871,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(893) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zarude",
                 national_dex: unsafe { NatDexIndex::new_unchecked(893) },
                 form_name: "Zarude",
@@ -45902,7 +45902,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "zarude",
                 sprite_index: (25, 32),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Zarude-Dada",
                 national_dex: unsafe { NatDexIndex::new_unchecked(893) },
                 form_name: "Zarude (Dada)",
@@ -45939,7 +45939,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Regieleki",
         national_dex: unsafe { NatDexIndex::new_unchecked(894) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Regieleki",
             national_dex: unsafe { NatDexIndex::new_unchecked(894) },
             form_name: "Regieleki",
@@ -45975,7 +45975,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Regidrago",
         national_dex: unsafe { NatDexIndex::new_unchecked(895) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Regidrago",
             national_dex: unsafe { NatDexIndex::new_unchecked(895) },
             form_name: "Regidrago",
@@ -46011,7 +46011,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Glastrier",
         national_dex: unsafe { NatDexIndex::new_unchecked(896) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Glastrier",
             national_dex: unsafe { NatDexIndex::new_unchecked(896) },
             form_name: "Glastrier",
@@ -46047,7 +46047,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Spectrier",
         national_dex: unsafe { NatDexIndex::new_unchecked(897) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Spectrier",
             national_dex: unsafe { NatDexIndex::new_unchecked(897) },
             form_name: "Spectrier",
@@ -46084,7 +46084,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(898) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Calyrex",
                 national_dex: unsafe { NatDexIndex::new_unchecked(898) },
                 form_name: "Calyrex",
@@ -46115,7 +46115,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "calyrex",
                 sprite_index: (31, 32),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Calyrex-Ice-Rider",
                 national_dex: unsafe { NatDexIndex::new_unchecked(898) },
                 form_name: "Calyrex (Ice Rider)",
@@ -46146,7 +46146,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "calyrex-ice-rider",
                 sprite_index: (32, 32),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Calyrex-Shadow-Rider",
                 national_dex: unsafe { NatDexIndex::new_unchecked(898) },
                 form_name: "Calyrex (Shadow Rider)",
@@ -46183,7 +46183,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wyrdeer",
         national_dex: unsafe { NatDexIndex::new_unchecked(899) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wyrdeer",
             national_dex: unsafe { NatDexIndex::new_unchecked(899) },
             form_name: "Wyrdeer",
@@ -46219,7 +46219,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kleavor",
         national_dex: unsafe { NatDexIndex::new_unchecked(900) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kleavor",
             national_dex: unsafe { NatDexIndex::new_unchecked(900) },
             form_name: "Kleavor",
@@ -46256,7 +46256,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(901) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ursaluna",
                 national_dex: unsafe { NatDexIndex::new_unchecked(901) },
                 form_name: "Ursaluna",
@@ -46287,7 +46287,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "ursaluna",
                 sprite_index: (0, 33),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ursaluna Bloodmoon",
                 national_dex: unsafe { NatDexIndex::new_unchecked(901) },
                 form_name: "Bloodmoon Ursaluna",
@@ -46325,7 +46325,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(902) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Basculegion-M",
                 national_dex: unsafe { NatDexIndex::new_unchecked(902) },
                 form_name: "Basculegion",
@@ -46356,7 +46356,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "basculegion",
                 sprite_index: (2, 33),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Basculegion-F",
                 national_dex: unsafe { NatDexIndex::new_unchecked(902) },
                 form_name: "Basculegion (F)",
@@ -46393,7 +46393,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sneasler",
         national_dex: unsafe { NatDexIndex::new_unchecked(903) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sneasler",
             national_dex: unsafe { NatDexIndex::new_unchecked(903) },
             form_name: "Sneasler",
@@ -46429,7 +46429,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Overqwil",
         national_dex: unsafe { NatDexIndex::new_unchecked(904) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Overqwil",
             national_dex: unsafe { NatDexIndex::new_unchecked(904) },
             form_name: "Overqwil",
@@ -46466,7 +46466,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(905) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Enamorus-Incarnate",
                 national_dex: unsafe { NatDexIndex::new_unchecked(905) },
                 form_name: "Enamorus",
@@ -46497,7 +46497,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "enamorus",
                 sprite_index: (6, 33),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Enamorus-Therian",
                 national_dex: unsafe { NatDexIndex::new_unchecked(905) },
                 form_name: "Enamorus (Therian Forme)",
@@ -46534,7 +46534,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sprigatito",
         national_dex: unsafe { NatDexIndex::new_unchecked(906) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sprigatito",
             national_dex: unsafe { NatDexIndex::new_unchecked(906) },
             form_name: "Sprigatito",
@@ -46570,7 +46570,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Floragato",
         national_dex: unsafe { NatDexIndex::new_unchecked(907) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Floragato",
             national_dex: unsafe { NatDexIndex::new_unchecked(907) },
             form_name: "Floragato",
@@ -46606,7 +46606,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Meowscarada",
         national_dex: unsafe { NatDexIndex::new_unchecked(908) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Meowscarada",
             national_dex: unsafe { NatDexIndex::new_unchecked(908) },
             form_name: "Meowscarada",
@@ -46642,7 +46642,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Fuecoco",
         national_dex: unsafe { NatDexIndex::new_unchecked(909) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Fuecoco",
             national_dex: unsafe { NatDexIndex::new_unchecked(909) },
             form_name: "Fuecoco",
@@ -46678,7 +46678,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Crocalor",
         national_dex: unsafe { NatDexIndex::new_unchecked(910) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Crocalor",
             national_dex: unsafe { NatDexIndex::new_unchecked(910) },
             form_name: "Crocalor",
@@ -46714,7 +46714,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Skeledirge",
         national_dex: unsafe { NatDexIndex::new_unchecked(911) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Skeledirge",
             national_dex: unsafe { NatDexIndex::new_unchecked(911) },
             form_name: "Skeledirge",
@@ -46750,7 +46750,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Quaxly",
         national_dex: unsafe { NatDexIndex::new_unchecked(912) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Quaxly",
             national_dex: unsafe { NatDexIndex::new_unchecked(912) },
             form_name: "Quaxly",
@@ -46786,7 +46786,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Quaxwell",
         national_dex: unsafe { NatDexIndex::new_unchecked(913) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Quaxwell",
             national_dex: unsafe { NatDexIndex::new_unchecked(913) },
             form_name: "Quaxwell",
@@ -46822,7 +46822,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Quaquaval",
         national_dex: unsafe { NatDexIndex::new_unchecked(914) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Quaquaval",
             national_dex: unsafe { NatDexIndex::new_unchecked(914) },
             form_name: "Quaquaval",
@@ -46858,7 +46858,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lechonk",
         national_dex: unsafe { NatDexIndex::new_unchecked(915) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lechonk",
             national_dex: unsafe { NatDexIndex::new_unchecked(915) },
             form_name: "Lechonk",
@@ -46897,7 +46897,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(916) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Oinkologne",
                 national_dex: unsafe { NatDexIndex::new_unchecked(916) },
                 form_name: "Oinkologne",
@@ -46928,7 +46928,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "oinkologne",
                 sprite_index: (18, 33),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Oinkologne-F",
                 national_dex: unsafe { NatDexIndex::new_unchecked(916) },
                 form_name: "Oinkologne (F)",
@@ -46965,7 +46965,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tarountula",
         national_dex: unsafe { NatDexIndex::new_unchecked(917) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tarountula",
             national_dex: unsafe { NatDexIndex::new_unchecked(917) },
             form_name: "Tarountula",
@@ -47001,7 +47001,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Spidops",
         national_dex: unsafe { NatDexIndex::new_unchecked(918) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Spidops",
             national_dex: unsafe { NatDexIndex::new_unchecked(918) },
             form_name: "Spidops",
@@ -47037,7 +47037,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Nymble",
         national_dex: unsafe { NatDexIndex::new_unchecked(919) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Nymble",
             national_dex: unsafe { NatDexIndex::new_unchecked(919) },
             form_name: "Nymble",
@@ -47073,7 +47073,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Lokix",
         national_dex: unsafe { NatDexIndex::new_unchecked(920) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Lokix",
             national_dex: unsafe { NatDexIndex::new_unchecked(920) },
             form_name: "Lokix",
@@ -47109,7 +47109,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pawmi",
         national_dex: unsafe { NatDexIndex::new_unchecked(921) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pawmi",
             national_dex: unsafe { NatDexIndex::new_unchecked(921) },
             form_name: "Pawmi",
@@ -47145,7 +47145,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pawmo",
         national_dex: unsafe { NatDexIndex::new_unchecked(922) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pawmo",
             national_dex: unsafe { NatDexIndex::new_unchecked(922) },
             form_name: "Pawmo",
@@ -47181,7 +47181,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pawmot",
         national_dex: unsafe { NatDexIndex::new_unchecked(923) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pawmot",
             national_dex: unsafe { NatDexIndex::new_unchecked(923) },
             form_name: "Pawmot",
@@ -47217,7 +47217,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tandemaus",
         national_dex: unsafe { NatDexIndex::new_unchecked(924) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tandemaus",
             national_dex: unsafe { NatDexIndex::new_unchecked(924) },
             form_name: "Tandemaus",
@@ -47256,7 +47256,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(925) },
         level_up_type: LevelUpType::Fast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Maushold",
                 national_dex: unsafe { NatDexIndex::new_unchecked(925) },
                 form_name: "Maushold",
@@ -47287,7 +47287,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "maushold",
                 sprite_index: (28, 33),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Maushold-Four",
                 national_dex: unsafe { NatDexIndex::new_unchecked(925) },
                 form_name: "Maushold (Family of Four)",
@@ -47324,7 +47324,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Fidough",
         national_dex: unsafe { NatDexIndex::new_unchecked(926) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Fidough",
             national_dex: unsafe { NatDexIndex::new_unchecked(926) },
             form_name: "Fidough",
@@ -47360,7 +47360,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dachsbun",
         national_dex: unsafe { NatDexIndex::new_unchecked(927) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dachsbun",
             national_dex: unsafe { NatDexIndex::new_unchecked(927) },
             form_name: "Dachsbun",
@@ -47396,7 +47396,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Smoliv",
         national_dex: unsafe { NatDexIndex::new_unchecked(928) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Smoliv",
             national_dex: unsafe { NatDexIndex::new_unchecked(928) },
             form_name: "Smoliv",
@@ -47432,7 +47432,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dolliv",
         national_dex: unsafe { NatDexIndex::new_unchecked(929) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dolliv",
             national_dex: unsafe { NatDexIndex::new_unchecked(929) },
             form_name: "Dolliv",
@@ -47468,7 +47468,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Arboliva",
         national_dex: unsafe { NatDexIndex::new_unchecked(930) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Arboliva",
             national_dex: unsafe { NatDexIndex::new_unchecked(930) },
             form_name: "Arboliva",
@@ -47505,7 +47505,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(931) },
         level_up_type: LevelUpType::Erratic,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Squawkabilly",
                 national_dex: unsafe { NatDexIndex::new_unchecked(931) },
                 form_name: "Squawkabilly",
@@ -47536,7 +47536,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "squawkabilly",
                 sprite_index: (35, 33),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Squawkabilly-Blue",
                 national_dex: unsafe { NatDexIndex::new_unchecked(931) },
                 form_name: "Squawkabilly (Blue)",
@@ -47567,7 +47567,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "squawkabilly-blue",
                 sprite_index: (0, 34),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Squawkabilly-Yellow",
                 national_dex: unsafe { NatDexIndex::new_unchecked(931) },
                 form_name: "Squawkabilly (Yellow)",
@@ -47598,7 +47598,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "squawkabilly-yellow",
                 sprite_index: (2, 34),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Squawkabilly-White",
                 national_dex: unsafe { NatDexIndex::new_unchecked(931) },
                 form_name: "Squawkabilly (White)",
@@ -47635,7 +47635,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Nacli",
         national_dex: unsafe { NatDexIndex::new_unchecked(932) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Nacli",
             national_dex: unsafe { NatDexIndex::new_unchecked(932) },
             form_name: "Nacli",
@@ -47671,7 +47671,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Naclstack",
         national_dex: unsafe { NatDexIndex::new_unchecked(933) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Naclstack",
             national_dex: unsafe { NatDexIndex::new_unchecked(933) },
             form_name: "Naclstack",
@@ -47707,7 +47707,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Garganacl",
         national_dex: unsafe { NatDexIndex::new_unchecked(934) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Garganacl",
             national_dex: unsafe { NatDexIndex::new_unchecked(934) },
             form_name: "Garganacl",
@@ -47743,7 +47743,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Charcadet",
         national_dex: unsafe { NatDexIndex::new_unchecked(935) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Charcadet",
             national_dex: unsafe { NatDexIndex::new_unchecked(935) },
             form_name: "Charcadet",
@@ -47781,7 +47781,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Armarouge",
         national_dex: unsafe { NatDexIndex::new_unchecked(936) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Armarouge",
             national_dex: unsafe { NatDexIndex::new_unchecked(936) },
             form_name: "Armarouge",
@@ -47817,7 +47817,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ceruledge",
         national_dex: unsafe { NatDexIndex::new_unchecked(937) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ceruledge",
             national_dex: unsafe { NatDexIndex::new_unchecked(937) },
             form_name: "Ceruledge",
@@ -47853,7 +47853,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tadbulb",
         national_dex: unsafe { NatDexIndex::new_unchecked(938) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tadbulb",
             national_dex: unsafe { NatDexIndex::new_unchecked(938) },
             form_name: "Tadbulb",
@@ -47889,7 +47889,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bellibolt",
         national_dex: unsafe { NatDexIndex::new_unchecked(939) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bellibolt",
             national_dex: unsafe { NatDexIndex::new_unchecked(939) },
             form_name: "Bellibolt",
@@ -47925,7 +47925,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wattrel",
         national_dex: unsafe { NatDexIndex::new_unchecked(940) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wattrel",
             national_dex: unsafe { NatDexIndex::new_unchecked(940) },
             form_name: "Wattrel",
@@ -47961,7 +47961,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kilowattrel",
         national_dex: unsafe { NatDexIndex::new_unchecked(941) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kilowattrel",
             national_dex: unsafe { NatDexIndex::new_unchecked(941) },
             form_name: "Kilowattrel",
@@ -47997,7 +47997,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Maschiff",
         national_dex: unsafe { NatDexIndex::new_unchecked(942) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Maschiff",
             national_dex: unsafe { NatDexIndex::new_unchecked(942) },
             form_name: "Maschiff",
@@ -48033,7 +48033,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Mabosstiff",
         national_dex: unsafe { NatDexIndex::new_unchecked(943) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Mabosstiff",
             national_dex: unsafe { NatDexIndex::new_unchecked(943) },
             form_name: "Mabosstiff",
@@ -48069,7 +48069,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Shroodle",
         national_dex: unsafe { NatDexIndex::new_unchecked(944) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Shroodle",
             national_dex: unsafe { NatDexIndex::new_unchecked(944) },
             form_name: "Shroodle",
@@ -48105,7 +48105,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Grafaiai",
         national_dex: unsafe { NatDexIndex::new_unchecked(945) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Grafaiai",
             national_dex: unsafe { NatDexIndex::new_unchecked(945) },
             form_name: "Grafaiai",
@@ -48141,7 +48141,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bramblin",
         national_dex: unsafe { NatDexIndex::new_unchecked(946) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bramblin",
             national_dex: unsafe { NatDexIndex::new_unchecked(946) },
             form_name: "Bramblin",
@@ -48177,7 +48177,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Brambleghast",
         national_dex: unsafe { NatDexIndex::new_unchecked(947) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Brambleghast",
             national_dex: unsafe { NatDexIndex::new_unchecked(947) },
             form_name: "Brambleghast",
@@ -48213,7 +48213,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Toedscool",
         national_dex: unsafe { NatDexIndex::new_unchecked(948) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Toedscool",
             national_dex: unsafe { NatDexIndex::new_unchecked(948) },
             form_name: "Toedscool",
@@ -48249,7 +48249,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Toedscruel",
         national_dex: unsafe { NatDexIndex::new_unchecked(949) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Toedscruel",
             national_dex: unsafe { NatDexIndex::new_unchecked(949) },
             form_name: "Toedscruel",
@@ -48285,7 +48285,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Klawf",
         national_dex: unsafe { NatDexIndex::new_unchecked(950) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Klawf",
             national_dex: unsafe { NatDexIndex::new_unchecked(950) },
             form_name: "Klawf",
@@ -48321,7 +48321,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Capsakid",
         national_dex: unsafe { NatDexIndex::new_unchecked(951) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Capsakid",
             national_dex: unsafe { NatDexIndex::new_unchecked(951) },
             form_name: "Capsakid",
@@ -48358,7 +48358,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(952) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scovillain",
                 national_dex: unsafe { NatDexIndex::new_unchecked(952) },
                 form_name: "Scovillain",
@@ -48366,7 +48366,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(952, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(952, 1) },
                     required_item_id: Some(2647),
                 }],
                 is_gmax: false,
@@ -48392,7 +48392,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "scovillain",
                 sprite_index: (23, 34),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Scovillain-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(952) },
                 form_name: "Mega Scovillain",
@@ -48429,7 +48429,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Rellor",
         national_dex: unsafe { NatDexIndex::new_unchecked(953) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Rellor",
             national_dex: unsafe { NatDexIndex::new_unchecked(953) },
             form_name: "Rellor",
@@ -48465,7 +48465,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Rabsca",
         national_dex: unsafe { NatDexIndex::new_unchecked(954) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Rabsca",
             national_dex: unsafe { NatDexIndex::new_unchecked(954) },
             form_name: "Rabsca",
@@ -48501,7 +48501,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Flittle",
         national_dex: unsafe { NatDexIndex::new_unchecked(955) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Flittle",
             national_dex: unsafe { NatDexIndex::new_unchecked(955) },
             form_name: "Flittle",
@@ -48537,7 +48537,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Espathra",
         national_dex: unsafe { NatDexIndex::new_unchecked(956) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Espathra",
             national_dex: unsafe { NatDexIndex::new_unchecked(956) },
             form_name: "Espathra",
@@ -48573,7 +48573,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tinkatink",
         national_dex: unsafe { NatDexIndex::new_unchecked(957) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tinkatink",
             national_dex: unsafe { NatDexIndex::new_unchecked(957) },
             form_name: "Tinkatink",
@@ -48609,7 +48609,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tinkatuff",
         national_dex: unsafe { NatDexIndex::new_unchecked(958) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tinkatuff",
             national_dex: unsafe { NatDexIndex::new_unchecked(958) },
             form_name: "Tinkatuff",
@@ -48645,7 +48645,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Tinkaton",
         national_dex: unsafe { NatDexIndex::new_unchecked(959) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Tinkaton",
             national_dex: unsafe { NatDexIndex::new_unchecked(959) },
             form_name: "Tinkaton",
@@ -48681,7 +48681,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wiglett",
         national_dex: unsafe { NatDexIndex::new_unchecked(960) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wiglett",
             national_dex: unsafe { NatDexIndex::new_unchecked(960) },
             form_name: "Wiglett",
@@ -48717,7 +48717,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wugtrio",
         national_dex: unsafe { NatDexIndex::new_unchecked(961) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wugtrio",
             national_dex: unsafe { NatDexIndex::new_unchecked(961) },
             form_name: "Wugtrio",
@@ -48753,7 +48753,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Bombirdier",
         national_dex: unsafe { NatDexIndex::new_unchecked(962) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Bombirdier",
             national_dex: unsafe { NatDexIndex::new_unchecked(962) },
             form_name: "Bombirdier",
@@ -48789,7 +48789,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Finizen",
         national_dex: unsafe { NatDexIndex::new_unchecked(963) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Finizen",
             national_dex: unsafe { NatDexIndex::new_unchecked(963) },
             form_name: "Finizen",
@@ -48826,7 +48826,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(964) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Palafin",
                 national_dex: unsafe { NatDexIndex::new_unchecked(964) },
                 form_name: "Palafin",
@@ -48857,7 +48857,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "palafin",
                 sprite_index: (35, 34),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Palafin-Hero",
                 national_dex: unsafe { NatDexIndex::new_unchecked(964) },
                 form_name: "Palafin (Hero)",
@@ -48894,7 +48894,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Varoom",
         national_dex: unsafe { NatDexIndex::new_unchecked(965) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Varoom",
             national_dex: unsafe { NatDexIndex::new_unchecked(965) },
             form_name: "Varoom",
@@ -48930,7 +48930,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Revavroom",
         national_dex: unsafe { NatDexIndex::new_unchecked(966) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Revavroom",
             national_dex: unsafe { NatDexIndex::new_unchecked(966) },
             form_name: "Revavroom",
@@ -48966,7 +48966,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cyclizar",
         national_dex: unsafe { NatDexIndex::new_unchecked(967) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cyclizar",
             national_dex: unsafe { NatDexIndex::new_unchecked(967) },
             form_name: "Cyclizar",
@@ -49002,7 +49002,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Orthworm",
         national_dex: unsafe { NatDexIndex::new_unchecked(968) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Orthworm",
             national_dex: unsafe { NatDexIndex::new_unchecked(968) },
             form_name: "Orthworm",
@@ -49038,7 +49038,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Glimmet",
         national_dex: unsafe { NatDexIndex::new_unchecked(969) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Glimmet",
             national_dex: unsafe { NatDexIndex::new_unchecked(969) },
             form_name: "Glimmet",
@@ -49075,7 +49075,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(970) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Glimmora",
                 national_dex: unsafe { NatDexIndex::new_unchecked(970) },
                 form_name: "Glimmora",
@@ -49083,7 +49083,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(970, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(970, 1) },
                     required_item_id: Some(2650),
                 }],
                 is_gmax: false,
@@ -49109,7 +49109,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "glimmora",
                 sprite_index: (6, 35),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Glimmora-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(970) },
                 form_name: "Mega Glimmora",
@@ -49146,7 +49146,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Greavard",
         national_dex: unsafe { NatDexIndex::new_unchecked(971) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Greavard",
             national_dex: unsafe { NatDexIndex::new_unchecked(971) },
             form_name: "Greavard",
@@ -49182,7 +49182,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Houndstone",
         national_dex: unsafe { NatDexIndex::new_unchecked(972) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Houndstone",
             national_dex: unsafe { NatDexIndex::new_unchecked(972) },
             form_name: "Houndstone",
@@ -49218,7 +49218,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Flamigo",
         national_dex: unsafe { NatDexIndex::new_unchecked(973) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Flamigo",
             national_dex: unsafe { NatDexIndex::new_unchecked(973) },
             form_name: "Flamigo",
@@ -49254,7 +49254,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cetoddle",
         national_dex: unsafe { NatDexIndex::new_unchecked(974) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cetoddle",
             national_dex: unsafe { NatDexIndex::new_unchecked(974) },
             form_name: "Cetoddle",
@@ -49290,7 +49290,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Cetitan",
         national_dex: unsafe { NatDexIndex::new_unchecked(975) },
         level_up_type: LevelUpType::MediumSlow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Cetitan",
             national_dex: unsafe { NatDexIndex::new_unchecked(975) },
             form_name: "Cetitan",
@@ -49326,7 +49326,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Veluza",
         national_dex: unsafe { NatDexIndex::new_unchecked(976) },
         level_up_type: LevelUpType::Fast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Veluza",
             national_dex: unsafe { NatDexIndex::new_unchecked(976) },
             form_name: "Veluza",
@@ -49362,7 +49362,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dondozo",
         national_dex: unsafe { NatDexIndex::new_unchecked(977) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dondozo",
             national_dex: unsafe { NatDexIndex::new_unchecked(977) },
             form_name: "Dondozo",
@@ -49399,7 +49399,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(978) },
         level_up_type: LevelUpType::MediumSlow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tatsugiri",
                 national_dex: unsafe { NatDexIndex::new_unchecked(978) },
                 form_name: "Tatsugiri",
@@ -49407,7 +49407,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(978, 3) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(978, 3) },
                     required_item_id: Some(2649),
                 }],
                 is_gmax: false,
@@ -49433,7 +49433,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "tatsugiri",
                 sprite_index: (14, 35),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tatsugiri-Droopy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(978) },
                 form_name: "Tatsugiri (Droopy)",
@@ -49441,7 +49441,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: false,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(978, 4) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(978, 4) },
                     required_item_id: Some(2649),
                 }],
                 is_gmax: false,
@@ -49467,7 +49467,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "tatsugiri-droopy",
                 sprite_index: (15, 35),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tatsugiri-Stretchy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(978) },
                 form_name: "Tatsugiri (Stretchy)",
@@ -49475,7 +49475,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: false,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(978, 5) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(978, 5) },
                     required_item_id: Some(2649),
                 }],
                 is_gmax: false,
@@ -49501,7 +49501,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "tatsugiri-stretchy",
                 sprite_index: (16, 35),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tatsugiri-Mega-Curly",
                 national_dex: unsafe { NatDexIndex::new_unchecked(978) },
                 form_name: "Mega Tatsugiri (Curly Form)",
@@ -49532,7 +49532,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "tatsugiri-curly-mega",
                 sprite_index: (0, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tatsugiri-Mega-Droopy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(978) },
                 form_name: "Mega Tatsugiri (Droopy Form)",
@@ -49563,7 +49563,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "tatsugiri-droopy-mega",
                 sprite_index: (0, 0),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Tatsugiri-Mega-Stretchy",
                 national_dex: unsafe { NatDexIndex::new_unchecked(978) },
                 form_name: "Mega Tatsugiri (Stretchy Form)",
@@ -49600,7 +49600,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Annihilape",
         national_dex: unsafe { NatDexIndex::new_unchecked(979) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Annihilape",
             national_dex: unsafe { NatDexIndex::new_unchecked(979) },
             form_name: "Annihilape",
@@ -49636,7 +49636,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Clodsire",
         national_dex: unsafe { NatDexIndex::new_unchecked(980) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Clodsire",
             national_dex: unsafe { NatDexIndex::new_unchecked(980) },
             form_name: "Clodsire",
@@ -49672,7 +49672,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Farigiraf",
         national_dex: unsafe { NatDexIndex::new_unchecked(981) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Farigiraf",
             national_dex: unsafe { NatDexIndex::new_unchecked(981) },
             form_name: "Farigiraf",
@@ -49709,7 +49709,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(982) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Dudunsparce",
                 national_dex: unsafe { NatDexIndex::new_unchecked(982) },
                 form_name: "Dudunsparce",
@@ -49740,7 +49740,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "dudunsparce",
                 sprite_index: (20, 35),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Dudunsparce-Three-Segment",
                 national_dex: unsafe { NatDexIndex::new_unchecked(982) },
                 form_name: "Dudunsparce (Three Segment)",
@@ -49777,7 +49777,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Kingambit",
         national_dex: unsafe { NatDexIndex::new_unchecked(983) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Kingambit",
             national_dex: unsafe { NatDexIndex::new_unchecked(983) },
             form_name: "Kingambit",
@@ -49813,7 +49813,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Great Tusk",
         national_dex: unsafe { NatDexIndex::new_unchecked(984) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Great Tusk",
             national_dex: unsafe { NatDexIndex::new_unchecked(984) },
             form_name: "Great Tusk",
@@ -49849,7 +49849,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Scream Tail",
         national_dex: unsafe { NatDexIndex::new_unchecked(985) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Scream Tail",
             national_dex: unsafe { NatDexIndex::new_unchecked(985) },
             form_name: "Scream Tail",
@@ -49885,7 +49885,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Brute Bonnet",
         national_dex: unsafe { NatDexIndex::new_unchecked(986) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Brute Bonnet",
             national_dex: unsafe { NatDexIndex::new_unchecked(986) },
             form_name: "Brute Bonnet",
@@ -49921,7 +49921,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Flutter Mane",
         national_dex: unsafe { NatDexIndex::new_unchecked(987) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Flutter Mane",
             national_dex: unsafe { NatDexIndex::new_unchecked(987) },
             form_name: "Flutter Mane",
@@ -49957,7 +49957,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Slither Wing",
         national_dex: unsafe { NatDexIndex::new_unchecked(988) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Slither Wing",
             national_dex: unsafe { NatDexIndex::new_unchecked(988) },
             form_name: "Slither Wing",
@@ -49993,7 +49993,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Sandy Shocks",
         national_dex: unsafe { NatDexIndex::new_unchecked(989) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Sandy Shocks",
             national_dex: unsafe { NatDexIndex::new_unchecked(989) },
             form_name: "Sandy Shocks",
@@ -50029,7 +50029,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Iron Treads",
         national_dex: unsafe { NatDexIndex::new_unchecked(990) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Iron Treads",
             national_dex: unsafe { NatDexIndex::new_unchecked(990) },
             form_name: "Iron Treads",
@@ -50065,7 +50065,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Iron Bundle",
         national_dex: unsafe { NatDexIndex::new_unchecked(991) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Iron Bundle",
             national_dex: unsafe { NatDexIndex::new_unchecked(991) },
             form_name: "Iron Bundle",
@@ -50101,7 +50101,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Iron Hands",
         national_dex: unsafe { NatDexIndex::new_unchecked(992) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Iron Hands",
             national_dex: unsafe { NatDexIndex::new_unchecked(992) },
             form_name: "Iron Hands",
@@ -50137,7 +50137,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Iron Jugulis",
         national_dex: unsafe { NatDexIndex::new_unchecked(993) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Iron Jugulis",
             national_dex: unsafe { NatDexIndex::new_unchecked(993) },
             form_name: "Iron Jugulis",
@@ -50173,7 +50173,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Iron Moth",
         national_dex: unsafe { NatDexIndex::new_unchecked(994) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Iron Moth",
             national_dex: unsafe { NatDexIndex::new_unchecked(994) },
             form_name: "Iron Moth",
@@ -50209,7 +50209,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Iron Thorns",
         national_dex: unsafe { NatDexIndex::new_unchecked(995) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Iron Thorns",
             national_dex: unsafe { NatDexIndex::new_unchecked(995) },
             form_name: "Iron Thorns",
@@ -50245,7 +50245,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Frigibax",
         national_dex: unsafe { NatDexIndex::new_unchecked(996) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Frigibax",
             national_dex: unsafe { NatDexIndex::new_unchecked(996) },
             form_name: "Frigibax",
@@ -50281,7 +50281,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Arctibax",
         national_dex: unsafe { NatDexIndex::new_unchecked(997) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Arctibax",
             national_dex: unsafe { NatDexIndex::new_unchecked(997) },
             form_name: "Arctibax",
@@ -50318,7 +50318,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(998) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Baxcalibur",
                 national_dex: unsafe { NatDexIndex::new_unchecked(998) },
                 form_name: "Baxcalibur",
@@ -50326,7 +50326,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_forme: unsafe { SpeciesAndForm::new_unchecked(998, 1) },
+                    mega_form: unsafe { SpeciesAndForm::new_unchecked(998, 1) },
                     required_item_id: Some(2648),
                 }],
                 is_gmax: false,
@@ -50352,7 +50352,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "baxcalibur",
                 sprite_index: (0, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Baxcalibur-Mega",
                 national_dex: unsafe { NatDexIndex::new_unchecked(998) },
                 form_name: "Mega Baxcalibur",
@@ -50390,7 +50390,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(999) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gimmighoul",
                 national_dex: unsafe { NatDexIndex::new_unchecked(999) },
                 form_name: "Gimmighoul",
@@ -50421,7 +50421,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "gimmighoul",
                 sprite_index: (1, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Gimmighoul-Roaming",
                 national_dex: unsafe { NatDexIndex::new_unchecked(999) },
                 form_name: "Gimmighoul (Roaming)",
@@ -50458,7 +50458,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gholdengo",
         national_dex: unsafe { NatDexIndex::new_unchecked(1000) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gholdengo",
             national_dex: unsafe { NatDexIndex::new_unchecked(1000) },
             form_name: "Gholdengo",
@@ -50494,7 +50494,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Wo-Chien",
         national_dex: unsafe { NatDexIndex::new_unchecked(1001) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Wo-Chien",
             national_dex: unsafe { NatDexIndex::new_unchecked(1001) },
             form_name: "Wo-Chien",
@@ -50530,7 +50530,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Chien-Pao",
         national_dex: unsafe { NatDexIndex::new_unchecked(1002) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Chien-Pao",
             national_dex: unsafe { NatDexIndex::new_unchecked(1002) },
             form_name: "Chien-Pao",
@@ -50566,7 +50566,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Ting-Lu",
         national_dex: unsafe { NatDexIndex::new_unchecked(1003) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Ting-Lu",
             national_dex: unsafe { NatDexIndex::new_unchecked(1003) },
             form_name: "Ting-Lu",
@@ -50602,7 +50602,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Chi-Yu",
         national_dex: unsafe { NatDexIndex::new_unchecked(1004) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Chi-Yu",
             national_dex: unsafe { NatDexIndex::new_unchecked(1004) },
             form_name: "Chi-Yu",
@@ -50638,7 +50638,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Roaring Moon",
         national_dex: unsafe { NatDexIndex::new_unchecked(1005) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Roaring Moon",
             national_dex: unsafe { NatDexIndex::new_unchecked(1005) },
             form_name: "Roaring Moon",
@@ -50674,7 +50674,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Iron Valiant",
         national_dex: unsafe { NatDexIndex::new_unchecked(1006) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Iron Valiant",
             national_dex: unsafe { NatDexIndex::new_unchecked(1006) },
             form_name: "Iron Valiant",
@@ -50711,7 +50711,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(1007) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Koraidon-Apex",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1007) },
                 form_name: "Koraidon",
@@ -50742,7 +50742,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "koraidon",
                 sprite_index: (10, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Koraidon-Limited",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1007) },
                 form_name: "Koraidon (Limited)",
@@ -50773,7 +50773,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "koraidon",
                 sprite_index: (11, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Koraidon-Sprinting",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1007) },
                 form_name: "Koraidon (Sprinting)",
@@ -50804,7 +50804,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "koraidon",
                 sprite_index: (11, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Koraidon-Swimming",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1007) },
                 form_name: "Koraidon (Swimming)",
@@ -50835,7 +50835,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "koraidon",
                 sprite_index: (11, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Koraidon-Gliding",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1007) },
                 form_name: "Koraidon (Gliding)",
@@ -50873,7 +50873,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(1008) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Miraidon-Ultimate",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1008) },
                 form_name: "Miraidon",
@@ -50904,7 +50904,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "miraidon",
                 sprite_index: (12, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Miraidon-Low-Power",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1008) },
                 form_name: "Miraidon (Low Power)",
@@ -50935,7 +50935,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "miraidon",
                 sprite_index: (13, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Miraidon-Drive",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1008) },
                 form_name: "Miraidon (Drive)",
@@ -50966,7 +50966,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "miraidon",
                 sprite_index: (13, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Miraidon-Aquatic",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1008) },
                 form_name: "Miraidon (Aquatic)",
@@ -50997,7 +50997,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "miraidon",
                 sprite_index: (13, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Miraidon-Glide",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1008) },
                 form_name: "Miraidon (Glide)",
@@ -51034,7 +51034,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Walking Wake",
         national_dex: unsafe { NatDexIndex::new_unchecked(1009) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Walking Wake",
             national_dex: unsafe { NatDexIndex::new_unchecked(1009) },
             form_name: "Walking Wake",
@@ -51070,7 +51070,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Iron Leaves",
         national_dex: unsafe { NatDexIndex::new_unchecked(1010) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Iron Leaves",
             national_dex: unsafe { NatDexIndex::new_unchecked(1010) },
             form_name: "Iron Leaves",
@@ -51106,7 +51106,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Dipplin",
         national_dex: unsafe { NatDexIndex::new_unchecked(1011) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Dipplin",
             national_dex: unsafe { NatDexIndex::new_unchecked(1011) },
             form_name: "Dipplin",
@@ -51143,7 +51143,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(1012) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Poltchageist-Counterfeit",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1012) },
                 form_name: "Poltchageist",
@@ -51174,7 +51174,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "poltchageist",
                 sprite_index: (17, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Poltchageist-Artisan",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1012) },
                 form_name: "Poltchageist",
@@ -51212,7 +51212,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(1013) },
         level_up_type: LevelUpType::MediumFast,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sinistcha-Unremarkable",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1013) },
                 form_name: "Sinistcha",
@@ -51243,7 +51243,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "sinistcha",
                 sprite_index: (18, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Sinistcha-Masterpiece",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1013) },
                 form_name: "Sinistcha",
@@ -51280,7 +51280,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Okidogi",
         national_dex: unsafe { NatDexIndex::new_unchecked(1014) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Okidogi",
             national_dex: unsafe { NatDexIndex::new_unchecked(1014) },
             form_name: "Okidogi",
@@ -51316,7 +51316,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Munkidori",
         national_dex: unsafe { NatDexIndex::new_unchecked(1015) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Munkidori",
             national_dex: unsafe { NatDexIndex::new_unchecked(1015) },
             form_name: "Munkidori",
@@ -51352,7 +51352,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Fezandipiti",
         national_dex: unsafe { NatDexIndex::new_unchecked(1016) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Fezandipiti",
             national_dex: unsafe { NatDexIndex::new_unchecked(1016) },
             form_name: "Fezandipiti",
@@ -51389,7 +51389,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(1017) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ogerpon-Teal-Mask",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1017) },
                 form_name: "Ogerpon",
@@ -51420,7 +51420,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "ogerpon",
                 sprite_index: (22, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ogerpon-Wellspring-Mask",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1017) },
                 form_name: "Ogerpon (Wellspring Mask)",
@@ -51451,7 +51451,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "ogerpon-wellspring-mask",
                 sprite_index: (23, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ogerpon-Hearthflame-Mask",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1017) },
                 form_name: "Ogerpon (Hearthflame Mask)",
@@ -51482,7 +51482,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "ogerpon-hearthflame-mask",
                 sprite_index: (24, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Ogerpon-Cornerstone-Mask",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1017) },
                 form_name: "Ogerpon (Cornerstone Mask)",
@@ -51519,7 +51519,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Archaludon",
         national_dex: unsafe { NatDexIndex::new_unchecked(1018) },
         level_up_type: LevelUpType::MediumFast,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Archaludon",
             national_dex: unsafe { NatDexIndex::new_unchecked(1018) },
             form_name: "Archaludon",
@@ -51555,7 +51555,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Hydrapple",
         national_dex: unsafe { NatDexIndex::new_unchecked(1019) },
         level_up_type: LevelUpType::Erratic,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Hydrapple",
             national_dex: unsafe { NatDexIndex::new_unchecked(1019) },
             form_name: "Hydrapple",
@@ -51591,7 +51591,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Gouging Fire",
         national_dex: unsafe { NatDexIndex::new_unchecked(1020) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Gouging Fire",
             national_dex: unsafe { NatDexIndex::new_unchecked(1020) },
             form_name: "Gouging Fire",
@@ -51627,7 +51627,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Raging Bolt",
         national_dex: unsafe { NatDexIndex::new_unchecked(1021) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Raging Bolt",
             national_dex: unsafe { NatDexIndex::new_unchecked(1021) },
             form_name: "Raging Bolt",
@@ -51663,7 +51663,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Iron Boulder",
         national_dex: unsafe { NatDexIndex::new_unchecked(1022) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Iron Boulder",
             national_dex: unsafe { NatDexIndex::new_unchecked(1022) },
             form_name: "Iron Boulder",
@@ -51699,7 +51699,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Iron Crown",
         national_dex: unsafe { NatDexIndex::new_unchecked(1023) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Iron Crown",
             national_dex: unsafe { NatDexIndex::new_unchecked(1023) },
             form_name: "Iron Crown",
@@ -51736,7 +51736,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         national_dex: unsafe { NatDexIndex::new_unchecked(1024) },
         level_up_type: LevelUpType::Slow,
         forms: &[
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Terapagos",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1024) },
                 form_name: "Terapagos",
@@ -51767,7 +51767,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "terapagos",
                 sprite_index: (32, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Terapagos Terastal",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1024) },
                 form_name: "Terapagos (Terastal)",
@@ -51798,7 +51798,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 sprite: "terapagos-terastal",
                 sprite_index: (32, 36),
             },
-            FormeMetadata {
+            FormMetadata {
                 species_name: "Terapagos Stellar",
                 national_dex: unsafe { NatDexIndex::new_unchecked(1024) },
                 form_name: "Terapagos (Stellar)",
@@ -51835,7 +51835,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         name: "Pecharunt",
         national_dex: unsafe { NatDexIndex::new_unchecked(1025) },
         level_up_type: LevelUpType::Slow,
-        forms: &[FormeMetadata {
+        forms: &[FormMetadata {
             species_name: "Pecharunt",
             national_dex: unsafe { NatDexIndex::new_unchecked(1025) },
             form_name: "Pecharunt",

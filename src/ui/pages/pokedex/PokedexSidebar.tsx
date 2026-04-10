@@ -1,7 +1,7 @@
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { Pokedex } from '@openhome-ui/util/pokedex'
-import { all_species_data, FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
+import { all_species_data, FormMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { CSSProperties, useEffect, useMemo, useRef } from 'react'
 import './style.css'
@@ -12,11 +12,17 @@ export type PokedexSidebarProps = {
   pokedex: Pokedex
   selectedSpecies?: SpeciesMetadata
   setSelectedSpecies: (species: SpeciesMetadata) => void
-  setSelectedForme: (forme: FormeMetadata) => void
+  setSelectedForm: (form: FormMetadata) => void
 }
 
 export default function PokedexSidebar(props: PokedexSidebarProps) {
-  const { filter, selectedSpecies, setSelectedSpecies, setSelectedForme, pokedex } = props
+  const {
+    filter,
+    selectedSpecies,
+    setSelectedSpecies,
+    setSelectedForm: setSelectedForme,
+    pokedex,
+  } = props
 
   const ALL_SPECIES_DATA = useMemo(() => all_species_data(), [])
 

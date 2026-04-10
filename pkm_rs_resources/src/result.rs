@@ -64,7 +64,7 @@ impl Display for Error {
             } => {
                 let species_metadata = national_dex.get_species_metadata();
                 format!(
-                    "Invalid forme index {form_index} for Pokémon {} (must be <= {})",
+                    "Invalid form index {form_index} for Pokémon {} (must be <= {})",
                     species_metadata.name,
                     species_metadata.forms.len()
                 )

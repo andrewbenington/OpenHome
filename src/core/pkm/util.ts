@@ -3,7 +3,7 @@ import {
   AbilityIndex,
   currentMetadataReader,
   extraFormTypeOverride,
-  FormeMetadata,
+  FormMetadata,
   metadataReaderFor,
   MetadataSource,
   MetadataSummaryLookup,
@@ -116,13 +116,13 @@ export const generatePersonalityValue = () => {
 }
 
 // recursively returns pre-evolution. if provided a mega form, returns the first pre-evolution
-// of the base forme.
+// of the base form.
 export const getBaseMon = (dexNum: number, form?: number) => {
   let mon = SpeciesAndForm.tryNew(dexNum, form ?? 0)
   let metadata = mon?.getMetadata()
 
   if (metadata?.isMega) {
-    metadata = metadata?.getMegaBaseForme() ?? metadata
+    metadata = metadata?.getMegaBaseForm() ?? metadata
   }
 
   while (metadata?.preEvolution) {
@@ -133,11 +133,11 @@ export const getBaseMon = (dexNum: number, form?: number) => {
   return mon
 }
 
-export const getPrevos = (dexNum: number, forme?: number) => {
-  let mon = SpeciesAndForm.tryNew(dexNum, forme ?? 0)
+export const getPrevos = (dexNum: number, formIndex?: number) => {
+  let mon = SpeciesAndForm.tryNew(dexNum, formIndex ?? 0)
   let metadata = mon?.getMetadata()
 
-  const prevos: FormeMetadata[] = []
+  const prevos: FormMetadata[] = []
 
   while (metadata?.preEvolution) {
     mon = metadata.preEvolution

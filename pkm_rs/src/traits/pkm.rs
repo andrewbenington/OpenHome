@@ -1,5 +1,5 @@
 pub use crate::ohpkm::OhpkmV2;
-use pkm_rs_resources::species::{FormeMetadata, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, SpeciesMetadata};
 pub use pkm_rs_resources::{abilities::ABILITY_MAX, species::NATIONAL_DEX_MAX};
 use pkm_rs_resources::{moves::MoveIndex, species::SpeciesAndForm};
 use serde::Serialize;
@@ -22,14 +22,14 @@ impl<T: PkmBytes + Serialize + IsShiny + Sized + Randomize> Pkm for T {}
 
 pub trait HasSpeciesAndForm: Pkm {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata;
-    fn get_forme_metadata(&self) -> &'static FormeMetadata;
+    fn get_forme_metadata(&self) -> &'static FormMetadata;
 
     fn calculate_level(&self) -> u8;
 }
 
 pub trait MaybeHasSpeciesAndForm: Pkm {
     fn try_get_species_metadata(&self) -> Option<&'static SpeciesMetadata>;
-    fn get_forme_metadata(&self) -> Option<&'static FormeMetadata>;
+    fn get_forme_metadata(&self) -> Option<&'static FormMetadata>;
 
     fn calculate_level(&self) -> Option<u8>;
 }
