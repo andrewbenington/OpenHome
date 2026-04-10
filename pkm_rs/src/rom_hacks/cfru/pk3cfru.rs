@@ -6,7 +6,7 @@ use crate::util;
 
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::MoveIndex;
-use pkm_rs_resources::species::SpeciesAndForme;
+use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_types::Gender;
 use pkm_rs_types::{MarkingsFourShapes, OriginGame, Stats8};
 use pkm_rs_types::{read_u16_le, read_u32_le};
@@ -70,8 +70,8 @@ fn cfru_ball_index(ball: Ball) -> u8 {
 
 #[cfg(not(feature = "randomize"))]
 pub trait CfruSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy {
-    fn try_to_species_and_forme(self) -> Result<SpeciesAndForme>;
-    fn try_from_species_and_forme(species: &SpeciesAndForme) -> Result<Self>;
+    fn try_to_species_and_form(self) -> Result<SpeciesAndForm>;
+    fn try_from_species_and_form(species: &SpeciesAndForm) -> Result<Self>;
 
     fn is_fakemon(&self) -> bool;
     fn plugin_identifier() -> &'static str;
@@ -79,8 +79,8 @@ pub trait CfruSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy {
 
 #[cfg(feature = "randomize")]
 pub trait CfruSpeciesIndex: From<u16> + Into<u16> + Serialize + Copy + Randomize {
-    fn try_to_species_and_forme(self) -> Result<SpeciesAndForme>;
-    fn try_from_species_and_forme(species: &SpeciesAndForme) -> Result<Self>;
+    fn try_to_species_and_form(self) -> Result<SpeciesAndForm>;
+    fn try_from_species_and_form(species: &SpeciesAndForm) -> Result<Self>;
 
     fn is_fakemon(&self) -> bool;
     fn plugin_identifier() -> &'static str;
@@ -444,13 +444,13 @@ impl<I: CfruSpeciesIndex> IsShiny for Pk3Cfru<I> {
 //     }
 // }
 
-// impl<I: CfruSpeciesIndex> HasSpeciesAndForme for Pk3CfruNonFakemon<I> {
+// impl<I: CfruSpeciesIndex> HasSpeciesAndForm for Pk3CfruNonFakemon<I> {
 //     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-//         self.try_get_species_and_forme().get_species_metadata()
+//         self.try_get_species_and_form().get_species_metadata()
 //     }
 
 //     fn get_forme_metadata(&self) -> &'static FormeMetadata {
-//         self.species_and_forme.get_forme_metadata()
+//         self.species_and_form.get_forme_metadata()
 //     }
 
 //     fn calculate_level(&self) -> u8 {

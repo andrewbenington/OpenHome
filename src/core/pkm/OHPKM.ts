@@ -13,7 +13,7 @@ import {
   NatureIndex,
   PokeDate,
   ShinyLeaves,
-  SpeciesAndForme,
+  SpeciesAndForm,
   SpeciesLookup,
   Tag,
   TrainerData,
@@ -111,7 +111,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
 
-      this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formNum)
+      this.SpeciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
       this.extraFormIndex = other.extraFormIndex
 
       if (other.personalityValue === undefined) {
@@ -385,7 +385,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   // getters / setters
 
   get dexNum() {
-    return this.speciesAndForme.nationalDex
+    return this.SpeciesAndForm.nationalDex
   }
 
   get ability() {
@@ -396,7 +396,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   get formNum() {
-    return this.speciesAndForme.formIndex
+    return this.SpeciesAndForm.formIndex
   }
 
   get evsG12() {
@@ -683,12 +683,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.movePPUps = other.movePPUps as FourMoves
 
     if (this.dexNum !== other.dexNum && isEvolution(this, other)) {
-      this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formNum)
+      this.SpeciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
       this.extraFormIndex = other.extraFormIndex
     }
 
     if (this.dexNum === other.dexNum || isEvolution(this, other)) {
-      this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formNum)
+      this.SpeciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
       this.extraFormIndex = other.extraFormIndex
     }
 

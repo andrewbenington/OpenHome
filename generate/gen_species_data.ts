@@ -81,8 +81,8 @@ type Forme = {
   readonly abilityH?: number
   readonly height: number
   readonly weight: number
-  readonly evos?: readonly SpeciesAndForme[]
-  readonly prevo?: SpeciesAndForme
+  readonly evos?: readonly SpeciesAndForm[]
+  readonly prevo?: SpeciesAndForm
   readonly eggGroups: readonly string[]
   readonly gen: number
   readonly regional?: RegionalForme
@@ -98,7 +98,7 @@ type Forme = {
 
 export type RegionalForme = 'Alola' | 'Galar' | 'Hisui' | 'Paldea'
 
-type SpeciesAndForme = {
+type SpeciesAndForm = {
   readonly nationalDex: number
   readonly formIndex: number
 }
@@ -114,12 +114,12 @@ function statsToRust(stats: {
   return `Stats16Le::new(${stats.hp}, ${stats.atk}, ${stats.def}, ${stats.spa}, ${stats.spd}, ${stats.spe})`
 }
 
-function speciesAndFormeToRust(ref: SpeciesAndForme): string {
-  return `unsafe { SpeciesAndForme::new_unchecked(${ref.nationalDex}, ${ref.formIndex}) }`
+function SpeciesAndFormToRust(ref: SpeciesAndForm): string {
+  return `unsafe { SpeciesAndForm::new_unchecked(${ref.nationalDex}, ${ref.formIndex}) }`
 }
 
-function evolutionsToRust(evos?: readonly SpeciesAndForme[]): string {
-  return `&[${(evos ?? []).map(speciesAndFormeToRust).join(',')}]`
+function evolutionsToRust(evos?: readonly SpeciesAndForm[]): string {
+  return `&[${(evos ?? []).map(SpeciesAndFormToRust).join(',')}]`
 }
 
 function optionalToRust<T, S>(value: T | null | undefined, tranformer?: (T) => S): string {
@@ -163,7 +163,7 @@ function convertForme(natDexIndex: number, forme: Forme): string {
     mega_evolution_data: &[${forme.megaEvolutionData
       .map(
         (megaForm) =>
-          `MegaEvolutionMetadata { mega_forme: ${speciesAndFormeToRust(megaForm)}, required_item_id: ${optionalToRust(megaForm.megaStoneId)} }`
+          `MegaEvolutionMetadata { mega_forme: ${SpeciesAndFormToRust(megaForm)}, required_item_id: ${optionalToRust(megaForm.megaStoneId)} }`
       )
       .join(',')}],
     is_gmax: ${falseIfUndef(forme.isGMax)},
@@ -180,7 +180,7 @@ function convertForme(natDexIndex: number, forme: Forme): string {
     base_height: ${forme.height},
     base_weight: ${forme.weight},
     evolutions: ${evolutionsToRust(forme.evos)},
-    pre_evolution: ${optionalToRust(forme.prevo, speciesAndFormeToRust)},
+    pre_evolution: ${optionalToRust(forme.prevo, SpeciesAndFormToRust)},
     egg_groups: (${eggGroupToRust(forme.eggGroups[0])}, ${optionalToRust(forme.eggGroups[1], eggGroupToRust)}),
     introduced: Generation::G${forme.gen},
     is_restricted_legend: ${falseIfUndef(forme.restrictedLegendary)},
@@ -267,7 +267,7 @@ function rowToForm(
   }
 }
 
-async function getAllSpeciesAndFormes() {
+async function getAllSpeciesAndForms() {
   const db = new Database('generate/pkm.db')
 
   const speciesRows = camelcaseKeys(await speciesGetAll(db))
@@ -305,12 +305,12 @@ async function getAllSpeciesAndFormes() {
 }
 
 async function main() {
-  const allSpecies: Species[] = await getAllSpeciesAndFormes()
+  const allSpecies: Species[] = await getAllSpeciesAndForms()
 
   let output = `
 use crate::abilities::AbilityIndex;
 use crate::species::{
-    EggGroup, FormeMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, NatDexIndex, SpeciesAndForme,
+    EggGroup, FormeMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, NatDexIndex, SpeciesAndForm,
     SpeciesMetadata,
 };
 use pkm_rs_types::{Generation, PkmType, GameSetting, Stats16Le};

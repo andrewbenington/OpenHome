@@ -10,7 +10,7 @@ use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::ModernRibbonSet;
-use pkm_rs_resources::species::SpeciesAndForme;
+use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_types::Stats16Le;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
@@ -106,8 +106,8 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
         pkm_rs_types::read_uint5_from_bits(self.bytes()[29], 3)
     }
 
-    pub fn species_and_forme(&self) -> Result<SpeciesAndForme> {
-        Ok(SpeciesAndForme::new(
+    pub fn species_and_form(&self) -> Result<SpeciesAndForm> {
+        Ok(SpeciesAndForm::new(
             self.species_ndex(),
             self.form_index().into(),
         )?)
@@ -534,7 +534,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
         pkm_rs_types::write_uint5_to_bits(v, &mut self.bytes_mut()[29], 3);
     }
 
-    pub fn set_species_and_forme(&mut self, v: SpeciesAndForme) {
+    pub fn set_species_and_form(&mut self, v: SpeciesAndForm) {
         self.set_species_ndex(v.get_ndex().get());
         self.set_forme_index(v.get_forme_index() as u8);
     }

@@ -1,6 +1,6 @@
 use crate::ohpkm::sectioned_data;
 
-use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
+use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
 use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, language::LANGUAGE_MAX, items::ITEM_MAX};
 use pkm_rs_types::InvalidAbilityNumber;
 
@@ -35,10 +35,10 @@ pub enum Error {
         source: NdexConvertSource,
     },
 
-    /// Indicates that the given SpeciesAndForme does not exist
+    /// Indicates that the given SpeciesAndForm does not exist
     /// in the specified generation of games
     GenDex {
-        saf: SpeciesAndForme,
+        saf: SpeciesAndForm,
         generation: NdexConvertSource,
     },
 

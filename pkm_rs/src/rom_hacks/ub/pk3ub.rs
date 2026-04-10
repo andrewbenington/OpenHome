@@ -1,4 +1,4 @@
-use pkm_rs_resources::species::SpeciesAndForme;
+use pkm_rs_resources::species::SpeciesAndForm;
 use serde::Serialize;
 
 use crate::result::{Error, NdexConvertSource, Result};
@@ -11,7 +11,7 @@ use pkm_rs_types::randomize::Randomize;
 pub struct UnboundSpeciesIndex(u16);
 
 impl CfruSpeciesIndex for UnboundSpeciesIndex {
-    fn try_to_species_and_forme(self) -> Result<SpeciesAndForme> {
+    fn try_to_species_and_form(self) -> Result<SpeciesAndForm> {
         super::UB_TO_NATIONAL_DEX_MAP
             .get(&self.0)
             .ok_or(Error::GameDex {
@@ -21,7 +21,7 @@ impl CfruSpeciesIndex for UnboundSpeciesIndex {
             .copied()
     }
 
-    fn try_from_species_and_forme(saf: &SpeciesAndForme) -> Result<Self> {
+    fn try_from_species_and_form(saf: &SpeciesAndForm) -> Result<Self> {
         super::NATIONAL_DEX_TO_UB_MAP
             .get(&saf.to_tuple())
             .ok_or(Error::GenDex {

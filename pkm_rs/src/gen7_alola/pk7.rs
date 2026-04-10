@@ -6,7 +6,7 @@ use crate::encryption;
 use crate::gen7_alola::pk7_buffer::{Pk7BufferMut, Pk7BufferRef};
 use crate::result::{Error, Result};
 use crate::traits::{AsBytesMut, ModernEvs};
-use crate::traits::{HasSpeciesAndForme, PkmBytes};
+use crate::traits::{HasSpeciesAndForm, PkmBytes};
 
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
@@ -16,7 +16,7 @@ use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
-use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForme, SpeciesMetadata};
+use pkm_rs_resources::species::{FormeMetadata, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, HyperTraining, MarkingsSixShapesColors, OriginGame,
@@ -46,7 +46,7 @@ pub struct Pk7 {
     pub encryption_constant: u32,
     pub sanity: u16,
     pub checksum: u16,
-    pub species_and_forme: SpeciesAndForme,
+    pub species_and_form: SpeciesAndForm,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -131,7 +131,7 @@ impl Pk7 {
             encryption_constant: buf.encryption_constant(),
             sanity: buf.sanity(),
             checksum: buf.checksum(),
-            species_and_forme: buf.species_and_forme()?,
+            species_and_form: buf.species_and_form()?,
             held_item_index: buf.held_item_index(),
             trainer_id: buf.trainer_id(),
             secret_id: buf.secret_id(),
@@ -211,7 +211,7 @@ impl Pk7 {
     pub fn write_to_box_buffer(&self, buf: &mut Pk7BufferMut) {
         buf.set_encryption_constant(self.encryption_constant);
         buf.reset_sanity();
-        buf.set_species_and_forme(self.species_and_forme);
+        buf.set_species_and_form(self.species_and_form);
         buf.set_held_item_index(self.held_item_index);
         buf.set_trainer_id(self.trainer_id);
         buf.set_secret_id(self.secret_id);
@@ -316,7 +316,7 @@ impl Pk7 {
 
     pub fn calculate_stats(&self) -> Stats16Le {
         helpers::calculate_stats_modern(
-            self.species_and_forme,
+            self.species_and_form,
             &self.ivs,
             &self.evs,
             self.calculate_level(),
@@ -386,13 +386,13 @@ impl PkmBytes for Pk7 {
     }
 }
 
-impl HasSpeciesAndForme for Pk7 {
+impl HasSpeciesAndForm for Pk7 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.species_and_forme.get_species_metadata()
+        self.species_and_form.get_species_metadata()
     }
 
     fn get_forme_metadata(&self) -> &'static FormeMetadata {
-        self.species_and_forme.get_forme_metadata()
+        self.species_and_form.get_forme_metadata()
     }
 
     fn calculate_level(&self) -> u8 {
@@ -503,14 +503,14 @@ impl Pk7 {
     }
 
     #[wasm_bindgen]
-    pub fn set_species_and_forme(
+    pub fn set_species_and_form(
         &mut self,
         national_dex: u16,
         form_index: u16,
     ) -> core::result::Result<(), JsValue> {
-        match SpeciesAndForme::new(national_dex, form_index) {
-            Ok(species_and_forme) => {
-                self.species_and_forme = species_and_forme;
+        match SpeciesAndForm::new(national_dex, form_index) {
+            Ok(species_and_form) => {
+                self.species_and_form = species_and_form;
                 Ok(())
             }
             Err(e) => Err(JsValue::from_str(&e.to_string())),

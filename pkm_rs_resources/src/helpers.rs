@@ -1,15 +1,15 @@
 use pkm_rs_types::{Stats, Stats16Le};
 
-use crate::{natures::NatureMetadata, species::SpeciesAndForme, stats::Stat};
+use crate::{natures::NatureMetadata, species::SpeciesAndForm, stats::Stat};
 
 pub fn calculate_stats_modern<I: Stats, E: Stats>(
-    species_and_forme: SpeciesAndForme,
+    species_and_form: SpeciesAndForm,
     ivs: &I,
     evs: &E,
     level: u8,
     nature: &'static NatureMetadata,
 ) -> Stats16Le {
-    let base_stats: Stats16Le = species_and_forme
+    let base_stats: Stats16Le = species_and_form
         .get_forme_metadata()
         .get_base_stats()
         .into();

@@ -11,7 +11,7 @@ use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
+use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
 
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
@@ -51,7 +51,7 @@ const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
 pub struct MainDataV2 {
     pub personality_value: u32,
     pub encryption_constant: u32,
-    pub species_and_forme: SpeciesAndForme,
+    pub species_and_form: SpeciesAndForm,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -130,9 +130,9 @@ const NIDORAN_M: NatDexIndex = unsafe { NatDexIndex::new_unchecked(32) };
 impl MainDataV2 {
     pub fn new(national_dex: u16, form_index: u16) -> Result<Self> {
         Ok(Self {
-            species_and_forme: SpeciesAndForme::new(national_dex, form_index)?,
+            species_and_form: SpeciesAndForm::new(national_dex, form_index)?,
             language: Language::English,
-            nickname: SpeciesAndForme::new(national_dex, form_index)?
+            nickname: SpeciesAndForm::new(national_dex, form_index)?
                 .get_species_metadata()
                 .name
                 .into(),
@@ -142,7 +142,7 @@ impl MainDataV2 {
     pub fn from_v1(old: super::v1::OhpkmV1) -> Self {
         MainDataV2 {
             encryption_constant: old.encryption_constant,
-            species_and_forme: old.species_and_forme,
+            species_and_form: old.species_and_form,
             held_item_index: old.held_item_index,
             trainer_id: old.trainer_id,
             secret_id: old.secret_id,
@@ -217,7 +217,7 @@ impl MainDataV2 {
 
     #[cfg(feature = "wasm")]
     pub fn openhome_id(&self) -> String {
-        let base_mon = self.species_and_forme.get_base_evolution();
+        let base_mon = self.species_and_form.get_base_evolution();
         format!(
             "{:04}-{:04x}{:04x}-{:08x}-{:02x}",
             base_mon.get_ndex().get(),
@@ -231,19 +231,19 @@ impl MainDataV2 {
     pub fn nickname_matches_species_eng_ignore_case(&self) -> bool {
         self.nickname
             .to_string()
-            .eq_ignore_ascii_case(self.species_and_forme.get_species_metadata().name)
+            .eq_ignore_ascii_case(self.species_and_form.get_species_metadata().name)
     }
 
     pub fn nickname_matches_species_eng(&self) -> bool {
-        self.nickname.to_string() == self.species_and_forme.get_species_metadata().name
+        self.nickname.to_string() == self.species_and_form.get_species_metadata().name
     }
 
     pub fn reset_nickname_to_species(&mut self) {
-        self.nickname = self.species_and_forme.get_species_metadata().name.into();
+        self.nickname = self.species_and_form.get_species_metadata().name.into();
     }
 
     const fn ability_num_by_index(&self) -> Option<AbilityNumber> {
-        let form_metadata = self.species_and_forme.get_forme_metadata();
+        let form_metadata = self.species_and_form.get_forme_metadata();
         if self.ability_index.to_u16() == form_metadata.abilities.0.to_u16() {
             Some(AbilityNumber::First)
         } else if self.ability_index.to_u16() == form_metadata.abilities.1.to_u16() {
@@ -268,7 +268,7 @@ impl MainDataV2 {
     fn ability_is_hidden_ability(&self) -> bool {
         self.ability_num_by_index() == Some(AbilityNumber::Hidden)
             || (self
-                .species_and_forme
+                .species_and_form
                 .get_forme_metadata()
                 .hidden_ability
                 .is_none()
@@ -285,9 +285,9 @@ impl MainDataV2 {
 
     pub fn fix_errors(&mut self) -> bool {
         let mut errors_found = false;
-        let national_dex = self.species_and_forme.get_ndex();
-        let species_metadata = self.species_and_forme.get_species_metadata();
-        let form_metadata = self.species_and_forme.get_forme_metadata();
+        let national_dex = self.species_and_form.get_ndex();
+        let species_metadata = self.species_and_form.get_species_metadata();
+        let form_metadata = self.species_and_form.get_forme_metadata();
 
         // When other languages are added this should be updated
         if self.language == Language::English {
@@ -317,7 +317,7 @@ impl MainDataV2 {
                     self.is_nicknamed = false;
                     errors_found = true;
                 }
-            } else if is_prevo_species_name(&self.species_and_forme, &self.nickname.to_string()) {
+            } else if is_prevo_species_name(&self.species_and_form, &self.nickname.to_string()) {
                 self.reset_nickname_to_species();
                 self.is_nicknamed = false;
                 errors_found = true;
@@ -368,8 +368,8 @@ impl MainDataV2 {
     }
 }
 
-fn is_prevo_species_name(species_and_forme: &SpeciesAndForme, name: &str) -> bool {
-    species_and_forme
+fn is_prevo_species_name(species_and_form: &SpeciesAndForm, name: &str) -> bool {
+    species_and_form
         .get_prevos()
         .iter()
         .any(|prevo| prevo.get_species_metadata().name.eq_ignore_ascii_case(name))
@@ -389,7 +389,7 @@ impl DataSection for MainDataV2 {
         let data = Self {
             personality_value: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
             encryption_constant: u32::from_le_bytes(bytes[4..8].try_into().unwrap()),
-            species_and_forme: SpeciesAndForme::new(
+            species_and_form: SpeciesAndForm::new(
                 u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
                 u16::from_le_bytes(bytes[10..12].try_into().unwrap()),
             )?,
@@ -520,8 +520,8 @@ impl DataSection for MainDataV2 {
 
         bytes[0..4].copy_from_slice(&self.personality_value.to_le_bytes());
         bytes[4..8].copy_from_slice(&self.encryption_constant.to_le_bytes());
-        bytes[8..10].copy_from_slice(&self.species_and_forme.get_ndex().to_le_bytes());
-        bytes[10..12].copy_from_slice(&self.species_and_forme.get_forme_index().to_le_bytes());
+        bytes[8..10].copy_from_slice(&self.species_and_form.get_ndex().to_le_bytes());
+        bytes[10..12].copy_from_slice(&self.species_and_form.get_forme_index().to_le_bytes());
         bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
         bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
         bytes[16..20].copy_from_slice(&self.exp.to_le_bytes());
@@ -646,15 +646,15 @@ impl DataSection for MainDataV2 {
 #[cfg(feature = "randomize")]
 impl Randomize for MainDataV2 {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
-        let species_and_forme = SpeciesAndForme::randomized(rng);
+        let species_and_form = SpeciesAndForm::randomized(rng);
         let ability_num = AbilityNumber::randomized(rng);
-        let ability_index = species_and_forme
+        let ability_index = species_and_form
             .get_forme_metadata()
             .get_ability(ability_num);
         Self {
             personality_value: u32::randomized(rng),
             encryption_constant: u32::randomized(rng),
-            species_and_forme,
+            species_and_form,
             held_item_index: u16::randomized(rng),
             trainer_id: u16::randomized(rng),
             secret_id: u16::randomized(rng),
@@ -708,7 +708,7 @@ impl Randomize for MainDataV2 {
             extra_form: {
                 // randomize whether there should be an extra form or not with a 50/50 chance, and if there is, randomize it appropriately for the mon's species. If the species doesn't have any extra forms this will just be None.
                 if bool::randomized(rng) {
-                    ExtraFormIndex::randomized_for_national_dex(species_and_forme.get_ndex(), rng)
+                    ExtraFormIndex::randomized_for_national_dex(species_and_form.get_ndex(), rng)
                 } else {
                     None
                 }
@@ -757,8 +757,8 @@ impl GameboyData {
     }
 
     pub fn from_main_data(main_data: &MainDataV2) -> Self {
-        if main_data.species_and_forme.get_ndex() == UNOWN {
-            let letter_index = main_data.species_and_forme.get_forme_index();
+        if main_data.species_and_form.get_ndex() == UNOWN {
+            let letter_index = main_data.species_and_form.get_forme_index();
 
             Self {
                 dvs: StatsPreSplit::dvs_from_ivs_lossy(&main_data.ivs)
@@ -1231,9 +1231,9 @@ impl ScarletVioletData {
         }
     }
 
-    pub fn default_generated_tera_type(species_and_forme: SpeciesAndForme) -> Self {
+    pub fn default_generated_tera_type(species_and_form: SpeciesAndForm) -> Self {
         Self {
-            tera_type_original: species_and_forme
+            tera_type_original: species_and_form
                 .get_forme_metadata()
                 .transferred_tera_type(),
             ..Default::default()
