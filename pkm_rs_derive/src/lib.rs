@@ -175,7 +175,7 @@ pub fn derive_forme_ref(input: TokenStream) -> TokenStream {
         }
     };
 
-    let required = HashSet::from(["national_dex".to_owned(), "forme_num".to_owned()]);
+    let required = HashSet::from(["national_dex".to_owned(), "form_num".to_owned()]);
 
     let present_fields: HashSet<_> = fields
         .iter()

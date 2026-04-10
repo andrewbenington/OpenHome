@@ -41,7 +41,7 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
           >
             <PokemonIcon
               dexNumber={value.homeMon.dexNum}
-              formeNumber={value.homeMon.formeNum}
+              formeNumber={value.homeMon.formNum}
               style={{ width: 30, height: 30 }}
             />
           </button>
@@ -64,11 +64,11 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
       cellClass: 'centered-cell',
       sortFunction: multiSorter(
         numericSorter((value) => value.homeMon?.dexNum),
-        numericSorter((value) => value.homeMon?.formeNum)
+        numericSorter((value) => value.homeMon?.formNum)
       ),
       getFilterValue: (value) =>
         (value.homeMon &&
-          MetadataSummaryLookup(value.homeMon.dexNum, value.homeMon.formeNum)?.speciesName) ||
+          MetadataSummaryLookup(value.homeMon.dexNum, value.homeMon.formNum)?.speciesName) ||
         'Unknown',
     },
     {

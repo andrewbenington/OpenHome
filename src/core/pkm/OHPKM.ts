@@ -111,7 +111,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
 
-      this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
+      this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formNum)
       this.extraFormIndex = other.extraFormIndex
 
       if (other.personalityValue === undefined) {
@@ -194,7 +194,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.ability =
         other.ability ??
-        getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum) ??
+        getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum) ??
         this.ability
 
       this.isShadow = other.isShadow ?? false
@@ -377,8 +377,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return ohpkm
   }
 
-  static defaultWithSpecies(nationalDex: number, formeIndex: number) {
-    const bytes = OhpkmV2Wasm.defaultWithSpecies(nationalDex, formeIndex).toByteArray()
+  static defaultWithSpecies(nationalDex: number, formIndex: number) {
+    const bytes = OhpkmV2Wasm.defaultWithSpecies(nationalDex, formIndex).toByteArray()
     return OHPKM.fromBytes(bytes.buffer)
   }
 
@@ -395,8 +395,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.abilityIndex = value
   }
 
-  get formeNum() {
-    return this.speciesAndForme.formeIndex
+  get formNum() {
+    return this.speciesAndForme.formIndex
   }
 
   get evsG12() {
@@ -668,7 +668,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {
@@ -683,12 +683,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.movePPUps = other.movePPUps as FourMoves
 
     if (this.dexNum !== other.dexNum && isEvolution(this, other)) {
-      this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
+      this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formNum)
       this.extraFormIndex = other.extraFormIndex
     }
 
     if (this.dexNum === other.dexNum || isEvolution(this, other)) {
-      this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
+      this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formNum)
       this.extraFormIndex = other.extraFormIndex
     }
 
@@ -696,13 +696,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (
       other.nickname !== this.nickname &&
       other.nickname !== this.nickname.slice(0, 10) &&
-      !isPrevoSpeciesName(this.dexNum, this.formeNum, other.nickname)
+      !isPrevoSpeciesName(this.dexNum, this.formNum, other.nickname)
     ) {
       this.nickname = other.nickname
     }
 
     if (
-      isPrevoSpeciesName(this.dexNum, this.formeNum, this.nickname) &&
+      isPrevoSpeciesName(this.dexNum, this.formNum, this.nickname) &&
       this.metadata?.speciesName
     ) {
       this.nickname = this.metadata.speciesName
@@ -1012,8 +1012,8 @@ const FORMATS_WITHOUT_ABILITIES = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
 
 const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
 
-function isPrevoSpeciesName(dexNum: number, formeNum: number, nickname: string): boolean {
-  for (const prevo of getPrevos(dexNum, formeNum)) {
+function isPrevoSpeciesName(dexNum: number, formNum: number, nickname: string): boolean {
+  for (const prevo of getPrevos(dexNum, formNum)) {
     if (nickname.toUpperCase() === prevo.speciesName.toUpperCase()) {
       return true
     }

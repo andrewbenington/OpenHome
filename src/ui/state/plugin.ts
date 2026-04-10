@@ -5,7 +5,7 @@ import { Dispatch, Reducer, createContext } from 'react'
 
 export interface MonSpriteData {
   dexNum: number
-  formeNum: number
+  formNum: number
   format: MonFormat | 'OHPKM'
   formArgument?: number
   heldItemIndex?: number

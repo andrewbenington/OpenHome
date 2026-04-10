@@ -31,7 +31,7 @@ export default function ReleaseArea() {
             <PokemonIcon
               key={`delete_mon_${i}`}
               dexNumber={mon.dexNum}
-              formeNumber={mon.formeNum}
+              formeNumber={mon.formNum}
               style={{ height: 32, width: 32 }}
             />
           ))}

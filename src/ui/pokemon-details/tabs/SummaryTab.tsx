@@ -40,7 +40,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
   }, [mon])
   const spriteResult = useMonSprite({
     dexNum: mon.dexNum,
-    formeNum: mon.formeNum,
+    formNum: mon.formNum,
     formArgument: mon.formArgument,
     isShiny: mon.isShiny(),
     isFemale: mon.gender === 1,
@@ -49,7 +49,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
   })
 
   const itemAltText = useMemo(() => {
-    const monData = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
+    const monData = MetadataSummaryLookup(mon.dexNum, mon.formNum)
 
     if (!monData) return 'pokemon sprite'
     return `${monData.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
@@ -71,7 +71,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           ) : (
             <PokemonIcon
               dexNumber={mon.dexNum}
-              formeNumber={mon.formeNum}
+              formeNumber={mon.formNum}
               style={{
                 width: '60%',
                 height: '90%',
@@ -192,7 +192,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
                 {extraFormDisplayName(mon.extraFormIndex)}
               </span>
             ) : (
-              MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.formeName
+              MetadataSummaryLookup(mon.dexNum, mon.formNum)?.formeName
             )}
             <GenderIcon gender={mon.gender} />
           </Flex>

@@ -296,7 +296,7 @@ export default class PK3 {
     return this.metadata?.abilityByNumGen3(this.abilityNum)
   }
 
-  public get formeNum() {
+  public get formNum() {
     if (this.dexNum === NationalDex.Unown) {
       let letterValue = (this.personalityValue >> 24) & 0x3
 
@@ -355,7 +355,7 @@ export default class PK3 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {

@@ -10,11 +10,11 @@ export function getHighestFormeStatus(
   let maxStatusForme = 0
   let maxStatus: PokedexStatus = 'Seen'
 
-  for (const [formeIndex, status] of Object.entries(
+  for (const [formIndex, status] of Object.entries(
     pokedex.byDexNumber[species.nationalDex].formes
   )) {
     if (StatusIndices[status] > StatusIndices[maxStatus]) {
-      maxStatusForme = parseInt(formeIndex)
+      maxStatusForme = parseInt(formIndex)
       maxStatus = status
     }
   }
@@ -25,10 +25,10 @@ export function getHighestFormeStatus(
 export function getFormeStatus(
   pokedex: Pokedex,
   nationalDex: number,
-  formeIndex: number
+  formIndex: number
 ): PokedexStatus | undefined {
   if (!(nationalDex in pokedex.byDexNumber)) return undefined
-  return pokedex.byDexNumber[nationalDex].formes[formeIndex]
+  return pokedex.byDexNumber[nationalDex].formes[formIndex]
 }
 
 export const StatusIndices: Record<PokedexStatus, number> = {
@@ -37,24 +37,20 @@ export const StatusIndices: Record<PokedexStatus, number> = {
   ShinyCaught: 2,
 }
 
-export function getPokedexSummary(species: SpeciesMetadata, forme: FormeMetadata) {
-  const types = forme.type2 ? `${forme.type1}- and ${forme.type2}-type` : `${forme.type1}-type`
-  const name = forme.formeIndex === 0 ? species.name : forme.formeName
+export function getPokedexSummary(species: SpeciesMetadata, form: FormeMetadata) {
+  const types = form.type2 ? `${form.type1}- and ${form.type2}-type` : `${form.type1}-type`
+  const name = form.formIndex === 0 ? species.name : form.formeName
   const formeType =
-    forme.formeIndex === 0
-      ? getBaseFormeDescriptor(species)
-      : forme.isMega
-        ? 'Mega Evolution'
-        : 'forme'
-  let text = `${name} is a ${types} ${formeType} introduced in Generation ${forme.introducedGen}.`
+    form.formIndex === 0 ? getBaseFormeDescriptor(species) : form.isMega ? 'Mega Evolution' : 'form'
+  let text = `${name} is a ${types} ${formeType} introduced in Generation ${form.introducedGen}.`
 
-  if (forme.formeName === 'Basculin-White-Striped') {
-    text += ` It is sometimes considered a regional forme from the ${forme.regional} region.`
-  } else if (forme.regional) {
-    text += ` It is a regional forme from the ${forme.regional} region.`
+  if (form.formeName === 'Basculin-White-Striped') {
+    text += ` It is sometimes considered a regional forme from the ${form.regional} region.`
+  } else if (form.regional) {
+    text += ` It is a regional forme from the ${form.regional} region.`
   }
 
-  if (forme.isBattleOnly) {
+  if (form.isBattleOnly) {
     text += ` This forme can only be seen in battle.`
   }
 

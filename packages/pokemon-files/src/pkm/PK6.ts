@@ -47,7 +47,7 @@ export default class PK6 {
   trainingBag: number
   personalityValue: number
   nature: NatureIndex
-  formeNum: number
+  formNum: number
   extraFormIndex?: ExtraFormIndex
   gender: number
   evs: types.Stats
@@ -128,14 +128,14 @@ export default class PK6 {
       this.trainingBag = dataView.getUint8(0x17)
       this.personalityValue = dataView.getUint32(0x18, true)
       this.nature = new NatureIndex(dataView.getUint8(0x1c))
-      this.formeNum = byteLogic.uIntFromBufferBits(dataView, 0x1d, 3, 5, true)
+      this.formNum = byteLogic.uIntFromBufferBits(dataView, 0x1d, 3, 5, true)
 
-      // formeNum should always be the modern form index. Cosplay Pikachu needs to be stored in extraFormIndex.
+      // formNum should always be the modern form index. Cosplay Pikachu needs to be stored in extraFormIndex.
       if (this.dexNum === NationalDex.Pikachu) {
-        const extraFormIndex = extraFormIndexFromOrasPikachu(this.formeNum)
+        const extraFormIndex = extraFormIndexFromOrasPikachu(this.formNum)
         if (extraFormIndex !== undefined) {
           this.extraFormIndex = extraFormIndex
-          this.formeNum = 0
+          this.formNum = 0
         }
       }
 
@@ -247,13 +247,13 @@ export default class PK6 {
       if (other.extraFormIndex !== undefined) {
         const orasIndex = orasFormIndexIfSupported(other.extraFormIndex)
         if (orasIndex !== undefined) {
-          this.formeNum = orasIndex
+          this.formNum = orasIndex
           this.extraFormIndex = other.extraFormIndex
         } else {
-          this.formeNum = 0
+          this.formNum = 0
         }
       } else {
-        this.formeNum = other.formeNum
+        this.formNum = other.formNum
       }
 
       this.gender = other.gender ?? 0
@@ -388,7 +388,7 @@ export default class PK6 {
 
     const orasFormIndex =
       (this.extraFormIndex ? orasFormIndexIfSupported(this.extraFormIndex) : undefined) ??
-      this.formeNum
+      this.formNum
 
     byteLogic.uIntToBufferBits(dataView, orasFormIndex, 29, 3, 5, true)
     byteLogic.uIntToBufferBits(dataView, this.gender, 29, 1, 2, true)
@@ -518,7 +518,7 @@ export default class PK6 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {

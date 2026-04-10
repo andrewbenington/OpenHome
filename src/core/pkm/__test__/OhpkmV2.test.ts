@@ -81,12 +81,12 @@ describe('evolution and form change update ohpkm', async () => {
 
     const dialgaOhpkm = new OHPKM(dialgaPa8)
 
-    expect(dialgaOhpkm.formeNum).toEqual(0)
+    expect(dialgaOhpkm.formNum).toEqual(0)
 
-    dialgaPa8.formeNum = 1 // origin forme
+    dialgaPa8.formNum = 1 // origin forme
 
     dialgaOhpkm.syncWithGameData(dialgaPa8)
-    expect(dialgaOhpkm.formeNum).toEqual(1)
+    expect(dialgaOhpkm.formNum).toEqual(1)
   })
 
   test(`galar mr mime evolution updates OHPKM species/form`, () => {
@@ -96,21 +96,21 @@ describe('evolution and form change update ohpkm', async () => {
 
     const mrMimeGalarPk8 = PK8.fromBytes(mrMimeBytes.buffer)
     expect(mrMimeGalarPk8.dexNum).toEqual(NationalDex.MrMime)
-    expect(mrMimeGalarPk8.formeNum).toEqual(1)
+    expect(mrMimeGalarPk8.formNum).toEqual(1)
 
     const mrMimeOhpkm = new OHPKM(mrMimeGalarPk8)
 
     expect(mrMimeOhpkm.dexNum).toEqual(NationalDex.MrMime)
-    expect(mrMimeOhpkm.formeNum).toEqual(1)
+    expect(mrMimeOhpkm.formNum).toEqual(1)
 
     // simulate evolution
     const mrRime = mrMimeGalarPk8
     mrRime.dexNum = NationalDex.MrRime
-    mrRime.formeNum = 0
+    mrRime.formNum = 0
 
     mrMimeOhpkm.syncWithGameData(mrRime)
     expect(mrMimeOhpkm.dexNum).toEqual(NationalDex.MrRime)
-    expect(mrMimeOhpkm.formeNum).toEqual(0)
+    expect(mrMimeOhpkm.formNum).toEqual(0)
   })
 })
 

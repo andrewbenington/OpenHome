@@ -159,18 +159,18 @@ export default function FilterPanel() {
             uniqueFieldId="form"
             options={[...currentMon.formes]}
             getOptionString={(opt) => opt.formeName}
-            getOptionUniqueID={(opt) => opt.formeIndex.toString()}
+            getOptionUniqueID={(opt) => opt.formIndex.toString()}
             value={
               filter.formeNumber !== undefined ? currentMon.formes[filter.formeNumber] : undefined
             }
             placeholder="Form"
-            onChange={(option) => setFilter({ formeNumber: option?.formeIndex })}
+            onChange={(option) => setFilter({ formeNumber: option?.formIndex })}
             getIconComponent={(currentForme) =>
               filter.dexNumber &&
               currentForme && (
                 <PokemonIcon
                   dexNumber={filter.dexNumber}
-                  formeNumber={currentForme.formeIndex}
+                  formeNumber={currentForme.formIndex}
                   style={{ width: ICON_SIZE, height: ICON_SIZE }}
                 />
               )

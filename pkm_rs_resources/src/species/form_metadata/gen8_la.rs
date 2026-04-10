@@ -103,21 +103,21 @@ pub struct MetadataTableLegendsArceus {
 }
 
 impl MetadataTable for MetadataTableLegendsArceus {
-    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-        self.personal.get_types(national_dex, forme_index)
+    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
+        self.personal.get_types(national_dex, form_index)
     }
 
-    fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16> {
-        self.personal.get_game_index(national_dex, forme_index)
+    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
+        self.personal.get_game_index(national_dex, form_index)
     }
 
-    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<LearnsetReader> {
+    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
         self.learnsets
-            .learnset_at_index(self.get_game_index(national_dex, forme_index)?)
+            .learnset_at_index(self.get_game_index(national_dex, form_index)?)
     }
 
-    fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {
-        self.personal.get_base_stats(national_dex, forme_index)
+    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
+        self.personal.get_base_stats(national_dex, form_index)
     }
 
     fn get_source_name(&self) -> &'static str {

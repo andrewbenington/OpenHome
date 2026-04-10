@@ -61,11 +61,11 @@ export default function EvolutionFamily({
     >
       {baseMonFormes
         .filter((forme) => !forme.isMega)
-        .map(({ nationalDex, formeIndex }) => (
+        .map(({ nationalDex, formIndex }) => (
           <EvolutionLine
             nationalDex={nationalDex.index}
-            formeNumber={formeIndex}
-            key={formeIndex}
+            formeNumber={formIndex}
+            key={formIndex}
             pokedex={pokedex}
             onClick={onClick}
           />
@@ -84,10 +84,10 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
       <Flex align="center" gap="2">
         <Flex direction="column" gap="2" align="center">
           {evolutions.slice(0, 4).map((evo, i) => (
-            <Flex key={`${evo.nationalDex}-${evo.formeIndex}`} align="center" gap="2">
+            <Flex key={`${evo.nationalDex}-${evo.formIndex}`} align="center" gap="2">
               <EvolutionLine
                 nationalDex={evo.nationalDex}
-                formeNumber={evo.formeIndex}
+                formeNumber={evo.formIndex}
                 pokedex={pokedex}
                 onClick={onClick}
               />
@@ -109,7 +109,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
         />
         <Flex direction="column" gap="2">
           {evolutions.slice(4).map((evo, i) => (
-            <Flex key={`${evo.nationalDex}-${evo.formeIndex}`} align="center" gap="2">
+            <Flex key={`${evo.nationalDex}-${evo.formIndex}`} align="center" gap="2">
               <ArrowRightIcon
                 style={{
                   rotate: `${(1.5 - i) * -36}deg`,
@@ -119,7 +119,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
               />
               <EvolutionLine
                 nationalDex={evo.nationalDex}
-                formeNumber={evo.formeIndex}
+                formeNumber={evo.formIndex}
                 pokedex={pokedex}
                 onClick={onClick}
               />
@@ -141,7 +141,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
       {!MetadataSummaryLookup(nationalDex, formeNumber)?.regional && megaFormes.length > 0 && (
         <Flex direction="column" gap="2">
           {megaFormes.map((mega, i) => (
-            <Flex key={`${nationalDex}-${mega.megaForme.formeIndex}`} align="center" gap="2">
+            <Flex key={`${nationalDex}-${mega.megaForme.formIndex}`} align="center" gap="2">
               <ArrowLeftRightIcon
                 style={{
                   rotate: `${((megaFormes.length - 1) / 2 - i) * -36}deg`,
@@ -151,13 +151,13 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
               />
               <TooltipPokemonIcon
                 dexNumber={nationalDex}
-                formeNumber={mega.megaForme.formeIndex}
+                formeNumber={mega.megaForme.formIndex}
                 silhouette={
-                  !getFormeStatus(pokedex, nationalDex, mega.megaForme.formeIndex)?.includes(
+                  !getFormeStatus(pokedex, nationalDex, mega.megaForme.formIndex)?.includes(
                     'Caught'
                   )
                 }
-                onClick={() => onClick?.(nationalDex, mega.megaForme.formeIndex)}
+                onClick={() => onClick?.(nationalDex, mega.megaForme.formIndex)}
               />
             </Flex>
           ))}
@@ -165,7 +165,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
       )}
       <Flex direction="column" gap="2">
         {evolutions.map((evo, i) => (
-          <Flex key={`${evo.nationalDex}-${evo.formeIndex}`} align="center" gap="2">
+          <Flex key={`${evo.nationalDex}-${evo.formIndex}`} align="center" gap="2">
             <ArrowRightIcon
               style={{
                 rotate: `${((evolutions.length - 1) / 2 - i) * -36}deg`,
@@ -175,7 +175,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
             />
             <EvolutionLine
               nationalDex={evo.nationalDex}
-              formeNumber={evo.formeIndex}
+              formeNumber={evo.formIndex}
               pokedex={pokedex}
               onClick={onClick}
             />

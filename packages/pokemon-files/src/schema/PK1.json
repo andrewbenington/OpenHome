@@ -132,7 +132,7 @@
   ],
   "stringEncoding": "GameBoy",
   "endian": "Big",
-  "noFormes": true,
+  "noForms": true,
   "detectPrefix": true,
   "genderFromDVs": true,
   "shinyFromDVs": true,

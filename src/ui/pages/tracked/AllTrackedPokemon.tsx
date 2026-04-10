@@ -209,7 +209,7 @@ function useColumns(
         <button onClick={() => onSelectMon(value)} className="mon-icon-button">
           <PokemonIcon
             dexNumber={value.dexNum}
-            formeNumber={value.formeNum}
+            formeNumber={value.formNum}
             style={{ width: 30, height: 30 }}
           />
         </button>
@@ -217,10 +217,10 @@ function useColumns(
       cellClass: 'centered-cell',
       sortFunction: multiSorter(
         numericSorter((mon) => mon.dexNum),
-        numericSorter((mon) => mon.formeNum)
+        numericSorter((mon) => mon.formNum)
       ),
       getFilterValue: (value) =>
-        MetadataSummaryLookup(value.dexNum, value.formeNum)?.speciesName || 'Unknown',
+        MetadataSummaryLookup(value.dexNum, value.formNum)?.speciesName || 'Unknown',
     },
     {
       key: 'nickname',

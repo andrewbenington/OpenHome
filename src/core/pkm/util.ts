@@ -27,10 +27,10 @@ import Prando from 'prando'
 
 export const getAbilityFromNumber = (
   dexNum: number,
-  formeNum: number,
+  formNum: number,
   abilityNum: number
 ): AbilityIndex | undefined => {
-  return MetadataSummaryLookup(dexNum, formeNum)?.abilityByNum(abilityNum)
+  return MetadataSummaryLookup(dexNum, formNum)?.abilityByNum(abilityNum)
 }
 
 export const ivsFromDVs = (dvs: StatsPreSplit) => {
@@ -115,10 +115,10 @@ export const generatePersonalityValue = () => {
   return Math.floor(Math.random() * 2 ** 32)
 }
 
-// recursively returns pre-evolution. if provided a mega forme, returns the first pre-evolution
+// recursively returns pre-evolution. if provided a mega form, returns the first pre-evolution
 // of the base forme.
-export const getBaseMon = (dexNum: number, forme?: number) => {
-  let mon = SpeciesAndForme.tryNew(dexNum, forme ?? 0)
+export const getBaseMon = (dexNum: number, form?: number) => {
+  let mon = SpeciesAndForme.tryNew(dexNum, form ?? 0)
   let metadata = mon?.getMetadata()
 
   if (metadata?.isMega) {
@@ -158,8 +158,8 @@ export const getTypes = (mon: PKMInterface): PkmType[] => {
 
   const metadataReader =
     mon.format === 'OHPKM'
-      ? currentMetadataReader(mon.dexNum, mon.formeNum)
-      : metadataReaderFor(MetadataSourceByFormat(mon.format), mon.dexNum, mon.formeNum)
+      ? currentMetadataReader(mon.dexNum, mon.formNum)
+      : metadataReaderFor(MetadataSourceByFormat(mon.format), mon.dexNum, mon.formNum)
 
   if (!metadataReader) {
     return ['Normal']
