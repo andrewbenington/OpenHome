@@ -206,9 +206,9 @@ pub struct OhpkmV2 {
 }
 
 impl OhpkmV2 {
-    pub fn new(national_dex: u16, forme_index: u16) -> Result<Self> {
+    pub fn new(national_dex: u16, form_index: u16) -> Result<Self> {
         Ok(Self {
-            main_data: MainDataV2::new(national_dex, forme_index)?,
+            main_data: MainDataV2::new(national_dex, form_index)?,
             gameboy_data: None,
             gen45_data: None,
             gen67_data: None,
@@ -294,9 +294,9 @@ impl OhpkmV2 {
         Ok(result)
     }
 
-    pub fn default_with_species(national_dex: u16, forme_index: u16) -> Result<Self> {
+    pub fn default_with_species(national_dex: u16, form_index: u16) -> Result<Self> {
         Ok(Self {
-            main_data: MainDataV2::new(national_dex, forme_index)?,
+            main_data: MainDataV2::new(national_dex, form_index)?,
             ..Default::default()
         })
     }
@@ -417,8 +417,8 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(js_name = "defaultWithSpecies")]
-    pub fn default_with_species_js(national_dex: u16, forme_index: u16) -> JsResult<Self> {
-        Ok(Self::default_with_species(national_dex, forme_index)?)
+    pub fn default_with_species_js(national_dex: u16, form_index: u16) -> JsResult<Self> {
+        Ok(Self::default_with_species(national_dex, form_index)?)
     }
 
     #[wasm_bindgen(getter = openhomeId)]
@@ -1078,8 +1078,8 @@ impl OhpkmV2 {
     }
 
     // #[wasm_bindgen]
-    // pub fn set_species_and_forme(&mut self, national_dex: u16, forme_index: u16) -> JsResult<()> {
-    //     match SpeciesAndForme::new(national_dex, forme_index) {
+    // pub fn set_species_and_forme(&mut self, national_dex: u16, form_index: u16) -> JsResult<()> {
+    //     match SpeciesAndForme::new(national_dex, form_index) {
     //         Ok(species_and_forme) => {
     //             self.main_data.species_and_forme = species_and_forme;
     //             Ok(())

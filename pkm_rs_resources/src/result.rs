@@ -22,9 +22,9 @@ pub enum Error {
     NationalDex {
         national_dex: u16,
     },
-    FormeIndex {
+    FormIndex {
         national_dex: NatDexIndex,
-        forme_index: u16,
+        form_index: u16,
     },
     LanguageIndex {
         language_index: u8,
@@ -58,13 +58,13 @@ impl Display for Error {
                 format!("Invalid National Dex number {national_dex} (must be between 1 and {NATIONAL_DEX_MAX}")
                     .to_owned()
             }
-            Error::FormeIndex {
+            Error::FormIndex {
                 national_dex,
-                forme_index,
+                form_index,
             } => {
                 let species_metadata = national_dex.get_species_metadata();
                 format!(
-                    "Invalid forme index {forme_index} for Pokémon {} (must be <= {})",
+                    "Invalid forme index {form_index} for Pokémon {} (must be <= {})",
                     species_metadata.name,
                     species_metadata.formes.len()
                 )

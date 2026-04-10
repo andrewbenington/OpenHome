@@ -264,8 +264,8 @@ export class LGPESAV extends OfficialSAV<PB7> {
     const mon = this.boxes[boxNum].boxSlots[boxSlot]
 
     if (
-      (mon?.dexNum === NationalDex.Pikachu && mon.formeNum === LGP_STARTER) ||
-      (mon?.dexNum === NationalDex.Eevee && mon.formeNum === LGE_STARTER)
+      (mon?.dexNum === NationalDex.Pikachu && mon.formNum === LGP_STARTER) ||
+      (mon?.dexNum === NationalDex.Eevee && mon.formNum === LGE_STARTER)
     ) {
       return {
         isDisabled: true,

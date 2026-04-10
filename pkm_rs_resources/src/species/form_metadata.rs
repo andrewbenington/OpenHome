@@ -185,14 +185,14 @@ impl MetadataSources {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "supportsForm"))]
-    pub fn supports_form(source: MetadataSource, national_dex: u16, forme_index: u16) -> bool {
-        source_has_form_metadata(source, national_dex, forme_index)
+    pub fn supports_form(source: MetadataSource, national_dex: u16, form_index: u16) -> bool {
+        source_has_form_metadata(source, national_dex, form_index)
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "supportedGameOrigins"))]
-    pub fn supported_game_origins(national_dex: u16, forme_index: u16) -> Vec<OriginGame> {
+    pub fn supported_game_origins(national_dex: u16, form_index: u16) -> Vec<OriginGame> {
         MetadataSource::iter()
-            .filter(|source| source_has_form_metadata(*source, national_dex, forme_index))
+            .filter(|source| source_has_form_metadata(*source, national_dex, form_index))
             .flat_map(MetadataSource::all_origin_games)
             .collect()
     }
@@ -238,12 +238,12 @@ pub trait PersonalInfo: Sized {
 
 fn format_bad_type_error(
     national_dex: u16,
-    forme_index: u16,
+    form_index: u16,
     source_name: &'static str,
     type_index: u8,
 ) -> String {
     format!(
-        "Invalid type {type_index} for national dex {national_dex} forme index {forme_index} in personal table {source_name}"
+        "Invalid type {type_index} for national dex {national_dex} forme index {form_index} in personal table {source_name}"
     )
 }
 
@@ -284,20 +284,20 @@ impl<INFO: PersonalInfo, const TABLE_BYTE_LEN: usize, const ENTRY_BYTE_LEN: usiz
             .map(|game_index| self.get_personal_info_by_game_index(game_index))
     }
 
-    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-        let personal_info = self.get_personal_info(national_dex, forme_index)?;
+    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
+        let personal_info = self.get_personal_info(national_dex, form_index)?;
         let types_fallible = personal_info.types_fallible();
 
         let type1 = types_fallible.0.expect_log(format_bad_type_error(
             national_dex,
-            forme_index,
+            form_index,
             personal_info.source_name(),
             1,
         ));
 
         let type2 = types_fallible.1.expect_log(format_bad_type_error(
             national_dex,
-            forme_index,
+            form_index,
             personal_info.source_name(),
             2,
         ));
@@ -305,24 +305,24 @@ impl<INFO: PersonalInfo, const TABLE_BYTE_LEN: usize, const ENTRY_BYTE_LEN: usiz
         Some(deduplicate_types(type1, type2))
     }
 
-    pub fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {
-        self.get_personal_info(national_dex, forme_index)
+    pub fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
+        self.get_personal_info(national_dex, form_index)
             .as_ref()
             .map(PersonalInfo::stats)
     }
 }
 
 pub trait MetadataTable {
-    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)>;
+    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)>;
 
-    fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16>;
+    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16>;
 
-    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<LearnsetReader>;
+    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader>;
 
-    fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats>;
+    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats>;
 
-    fn form_is_present(&self, national_dex: u16, forme_index: u16) -> bool {
-        self.get_game_index(national_dex, forme_index).is_some()
+    fn form_is_present(&self, national_dex: u16, form_index: u16) -> bool {
+        self.get_game_index(national_dex, form_index).is_some()
     }
 
     fn get_source_name(&self) -> &'static str;
@@ -333,24 +333,24 @@ where
     T: std::ops::Deref<Target = U>,
     U: MetadataTable + ?Sized + 'static,
 {
-    fn get_types(&self, national_dex: u16, forme_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-        (**self).get_types(national_dex, forme_index)
+    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
+        (**self).get_types(national_dex, form_index)
     }
 
-    fn get_game_index(&self, national_dex: u16, forme_index: u16) -> Option<u16> {
-        (**self).get_game_index(national_dex, forme_index)
+    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
+        (**self).get_game_index(national_dex, form_index)
     }
 
-    fn get_levelup_learnset(&self, national_dex: u16, forme_index: u16) -> Option<LearnsetReader> {
-        (**self).get_levelup_learnset(national_dex, forme_index)
+    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
+        (**self).get_levelup_learnset(national_dex, form_index)
     }
 
-    fn get_base_stats(&self, national_dex: u16, forme_index: u16) -> Option<BaseStats> {
-        (**self).get_base_stats(national_dex, forme_index)
+    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
+        (**self).get_base_stats(national_dex, form_index)
     }
 
-    fn form_is_present(&self, national_dex: u16, forme_index: u16) -> bool {
-        (**self).form_is_present(national_dex, forme_index)
+    fn form_is_present(&self, national_dex: u16, form_index: u16) -> bool {
+        (**self).form_is_present(national_dex, form_index)
     }
 
     fn get_source_name(&self) -> &'static str {
@@ -362,19 +362,19 @@ where
 pub struct MetadataTableReader {
     inner: Box<dyn MetadataTable>,
     national_dex: u16,
-    forme_index: u16,
+    form_index: u16,
 }
 
 const READER_SHOULD_BE_VALID: &str =
     "MetadataTableReader should only be constructed if the form is present in the table";
 
 impl MetadataTableReader {
-    pub fn new(inner: Box<dyn MetadataTable>, national_dex: u16, forme_index: u16) -> Option<Self> {
-        if inner.form_is_present(national_dex, forme_index) {
+    pub fn new(inner: Box<dyn MetadataTable>, national_dex: u16, form_index: u16) -> Option<Self> {
+        if inner.form_is_present(national_dex, form_index) {
             Some(Self {
                 inner,
                 national_dex,
-                forme_index,
+                form_index,
             })
         } else {
             None
@@ -383,31 +383,31 @@ impl MetadataTableReader {
 
     pub fn get_types(&self) -> (PkmType, Option<PkmType>) {
         self.inner
-            .get_types(self.national_dex, self.forme_index)
+            .get_types(self.national_dex, self.form_index)
             .expect_log(READER_SHOULD_BE_VALID)
     }
 
     pub fn get_game_index(&self) -> u16 {
         self.inner
-            .get_game_index(self.national_dex, self.forme_index)
+            .get_game_index(self.national_dex, self.form_index)
             .expect_log(READER_SHOULD_BE_VALID)
     }
 
     pub fn get_levelup_learnset(&self) -> LearnsetReader {
         self.inner
-            .get_levelup_learnset(self.national_dex, self.forme_index)
+            .get_levelup_learnset(self.national_dex, self.form_index)
             .expect_log(READER_SHOULD_BE_VALID)
     }
 
     pub fn get_base_stats(&self) -> BaseStats {
         self.inner
-            .get_base_stats(self.national_dex, self.forme_index)
+            .get_base_stats(self.national_dex, self.form_index)
             .expect_log(READER_SHOULD_BE_VALID)
     }
 
     pub fn types(&self) -> (PkmType, Option<PkmType>) {
         self.inner
-            .get_types(self.national_dex, self.forme_index)
+            .get_types(self.national_dex, self.form_index)
             .expect_log(READER_SHOULD_BE_VALID)
     }
 }
@@ -439,21 +439,21 @@ impl MetadataTableReader {
 pub fn metadata_reader_for(
     source: MetadataSource,
     national_dex: u16,
-    forme_index: u16,
+    form_index: u16,
 ) -> Option<MetadataTableReader> {
     MetadataTableReader::new(
         Box::new(metadata_table_by_source(source)),
         national_dex,
-        forme_index,
+        form_index,
     )
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "currentMetadataReader"))]
-pub fn current_metadata_reader(national_dex: u16, forme_index: u16) -> Option<MetadataTableReader> {
+pub fn current_metadata_reader(national_dex: u16, form_index: u16) -> Option<MetadataTableReader> {
     MetadataTableReader::new(
-        Box::new(most_recent_metadata_table_for(national_dex, forme_index)),
+        Box::new(most_recent_metadata_table_for(national_dex, form_index)),
         national_dex,
-        forme_index,
+        form_index,
     )
 }
 
@@ -467,19 +467,19 @@ pub enum BaseStats {
 
 fn most_recent_metadata_table_for(
     national_dex: u16,
-    forme_index: u16,
+    form_index: u16,
 ) -> &'static dyn MetadataTable {
-    if METADATA_TABLE_SV.form_is_present(national_dex, forme_index) {
+    if METADATA_TABLE_SV.form_is_present(national_dex, form_index) {
         &METADATA_TABLE_SV
-    } else if METADATA_TABLE_ZA.form_is_present(national_dex, forme_index) {
+    } else if METADATA_TABLE_ZA.form_is_present(national_dex, form_index) {
         &METADATA_TABLE_ZA
-    } else if METADATA_TABLE_BDSP.form_is_present(national_dex, forme_index) {
+    } else if METADATA_TABLE_BDSP.form_is_present(national_dex, form_index) {
         &METADATA_TABLE_BDSP
-    } else if METADATA_TABLE_SWSH.form_is_present(national_dex, forme_index) {
+    } else if METADATA_TABLE_SWSH.form_is_present(national_dex, form_index) {
         &METADATA_TABLE_SWSH
-    } else if METADATA_TABLE_LGPE.form_is_present(national_dex, forme_index) {
+    } else if METADATA_TABLE_LGPE.form_is_present(national_dex, form_index) {
         &METADATA_TABLE_LGPE
-    } else if national_dex == NationalDex::Pichu as u16 && forme_index == form::PICHU_SPIKY_EARED {
+    } else if national_dex == NationalDex::Pichu as u16 && form_index == form::PICHU_SPIKY_EARED {
         &METADATA_TABLE_HGSS
     } else {
         &METADATA_TABLE_USUM
@@ -488,15 +488,15 @@ fn most_recent_metadata_table_for(
 
 pub fn base_stats_lookup(
     national_dex: u16,
-    forme_index: u16,
+    form_index: u16,
     source: MetadataSource,
 ) -> Option<BaseStats> {
-    metadata_table_by_source(source).get_base_stats(national_dex, forme_index)
+    metadata_table_by_source(source).get_base_stats(national_dex, form_index)
 }
 
-pub fn current_base_stats(national_dex: u16, forme_index: u16) -> Option<Stats8> {
-    most_recent_metadata_table_for(national_dex, forme_index)
-        .get_base_stats(national_dex, forme_index)
+pub fn current_base_stats(national_dex: u16, form_index: u16) -> Option<Stats8> {
+    most_recent_metadata_table_for(national_dex, form_index)
+        .get_base_stats(national_dex, form_index)
         .map(|base_stats| match base_stats {
             BaseStats::PreSplit(_) => {
                 panic!("Current metadata table should not have pre-split stats")
@@ -516,9 +516,9 @@ fn deduplicate_types(type1: PkmType, type2: PkmType) -> (PkmType, Option<PkmType
 pub fn source_has_form_metadata(
     source: MetadataSource,
     national_dex: u16,
-    forme_index: u16,
+    form_index: u16,
 ) -> bool {
-    metadata_table_by_source(source).form_is_present(national_dex, forme_index)
+    metadata_table_by_source(source).form_is_present(national_dex, form_index)
 }
 
 fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTable {
@@ -550,27 +550,27 @@ fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTabl
 
 pub fn types_lookup(
     national_dex: u16,
-    forme_index: u16,
+    form_index: u16,
     source: Option<MetadataSource>,
 ) -> Option<(PkmType, Option<PkmType>)> {
     match source {
-        Some(source) => metadata_table_by_source(source).get_types(national_dex, forme_index),
-        None => most_recent_metadata_table_for(national_dex, forme_index)
-            .get_types(national_dex, forme_index),
+        Some(source) => metadata_table_by_source(source).get_types(national_dex, form_index),
+        None => most_recent_metadata_table_for(national_dex, form_index)
+            .get_types(national_dex, form_index),
     }
 }
 
 pub fn levelup_learnset_lookup(
     national_dex: u16,
-    forme_index: u16,
+    form_index: u16,
     source: Option<MetadataSource>,
 ) -> Option<LearnsetReader> {
     match source {
         Some(source) => {
-            metadata_table_by_source(source).get_levelup_learnset(national_dex, forme_index)
+            metadata_table_by_source(source).get_levelup_learnset(national_dex, form_index)
         }
-        None => most_recent_metadata_table_for(national_dex, forme_index)
-            .get_levelup_learnset(national_dex, forme_index),
+        None => most_recent_metadata_table_for(national_dex, form_index)
+            .get_levelup_learnset(national_dex, form_index),
     }
 }
 
@@ -610,14 +610,14 @@ mod test {
         MetadataSource::LegendsZa,
     ];
 
-    fn has_entry(source: MetadataSource, national_dex: u16, forme_index: u16) -> bool {
-        metadata_table_by_source(source).form_is_present(national_dex, forme_index)
+    fn has_entry(source: MetadataSource, national_dex: u16, form_index: u16) -> bool {
+        metadata_table_by_source(source).form_is_present(national_dex, form_index)
     }
 
     fn form_has_current_data(form: &FormeMetadata) -> bool {
         !(form.forme_name.contains("Totem")
-        || (form.national_dex.get() == NationalDex::Xerneas && form.forme_index == 1) // Active Xerneas
-            || (form.national_dex.get() == NationalDex::Arceus && form.forme_index == ARCEUS_LEGEND))
+        || (form.national_dex.get() == NationalDex::Xerneas && form.form_index == 1) // Active Xerneas
+            || (form.national_dex.get() == NationalDex::Arceus && form.form_index == ARCEUS_LEGEND))
     }
 
     fn try_all_forms(
@@ -656,7 +656,7 @@ mod test {
     #[test]
     fn all_forms_have_types() -> Result<(), String> {
         try_all_forms(|form| {
-            super::types_lookup(form.national_dex.get(), form.forme_index, None)
+            super::types_lookup(form.national_dex.get(), form.form_index, None)
                 .ok_or(format!("Missing types for {}", form.forme_name))?;
             Ok(())
         })
@@ -667,7 +667,7 @@ mod test {
         try_all_forms(|form| {
             let form_name = &form.forme_name;
             let (type1, type2) =
-                super::types_lookup(form.national_dex.get(), form.forme_index, None)
+                super::types_lookup(form.national_dex.get(), form.form_index, None)
                     .ok_or(format!("Missing types for {form_name}"))?;
             if let Some(type2) = type2
                 && type1 == type2
@@ -685,7 +685,7 @@ mod test {
     fn no_zero_stats() -> Result<(), String> {
         try_all_forms(|form| {
             let form_name = &form.forme_name;
-            let stats = super::current_base_stats(form.national_dex.get(), form.forme_index)
+            let stats = super::current_base_stats(form.national_dex.get(), form.form_index)
                 .ok_or(format!("Missing stats for {form_name}"))?;
             if stats.hp == 0
                 || stats.atk == 0
@@ -720,7 +720,7 @@ mod test {
     fn no_form_panics_for_any_source() -> Result<(), String> {
         try_all_forms(|form| {
             METADATA_SOURCES_IMPLEMENTED.into_iter().for_each(|source| {
-                super::base_stats_lookup(form.national_dex.get(), form.forme_index, source);
+                super::base_stats_lookup(form.national_dex.get(), form.form_index, source);
             });
             Ok(())
         })

@@ -57,7 +57,7 @@ impl NatDexIndex {
     /// # Safety
     ///
     /// - `national_dex` must be greater than zero and at most the maximum National Dex number supported by this version of the library.
-    /// - `forme_index` must be less than the total number of formes for the Pokémon with the given `national_dex` number
+    /// - `form_index` must be less than the total number of formes for the Pokémon with the given `national_dex` number
     pub const unsafe fn new_unchecked(index: u16) -> NatDexIndex {
         unsafe { NatDexIndex(NonZeroU16::new_unchecked(index)) }
     }
@@ -345,8 +345,8 @@ pub struct FormeMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub forme_name: &'static str,
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = formeIndex))]
-    pub forme_index: u16,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = formIndex))]
+    pub form_index: u16,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isBaseForme))]
     pub is_base_forme: bool,
@@ -420,7 +420,7 @@ pub struct FormeMetadata {
 
 impl FormeMetadata {
     pub const fn forme_ref(&self) -> SpeciesAndForme {
-        unsafe { SpeciesAndForme::new_unchecked(self.national_dex.get(), self.forme_index) }
+        unsafe { SpeciesAndForme::new_unchecked(self.national_dex.get(), self.form_index) }
     }
 
     pub const fn species_metadata(&self) -> &SpeciesMetadata {
@@ -453,7 +453,7 @@ impl FormeMetadata {
         other
             .mega_evolution_data
             .iter()
-            .any(|mega| mega.mega_forme.forme_index == self.forme_index)
+            .any(|mega| mega.mega_forme.form_index == self.form_index)
     }
 
     #[cfg(feature = "wasm")]
@@ -466,14 +466,14 @@ impl FormeMetadata {
             self.forme_name,
             source
         );
-        source_has_form_metadata(source, self.national_dex.get(), self.forme_index)
+        source_has_form_metadata(source, self.national_dex.get(), self.form_index)
     }
 
     fn types_from_source_or_latest(
         &self,
         source: Option<MetadataSource>,
     ) -> (PkmType, Option<PkmType>) {
-        types_lookup(self.national_dex.get(), self.forme_index, source).expect_log(format!(
+        types_lookup(self.national_dex.get(), self.form_index, source).expect_log(format!(
             "no types found for {} forme {}",
             self.species_name, self.forme_name
         ))
@@ -618,12 +618,12 @@ impl FormeMetadata {
 
     #[wasm_bindgen(getter = baseStats)]
     pub fn get_base_stats(&self) -> Stats8 {
-        current_base_stats(self.national_dex.get(), self.forme_index).unwrap_or_default()
+        current_base_stats(self.national_dex.get(), self.form_index).unwrap_or_default()
     }
 
     #[wasm_bindgen(js_name = baseStatsFrom)]
     pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<BaseStats> {
-        base_stats_lookup(self.national_dex.get(), self.forme_index, source)
+        base_stats_lookup(self.national_dex.get(), self.form_index, source)
     }
 
     #[wasm_bindgen(js_name = getBaseStat)]
@@ -688,9 +688,9 @@ pub struct SpeciesMetadata {
 }
 
 impl SpeciesMetadata {
-    pub const fn get_forme(&self, forme_index: usize) -> Option<&'static FormeMetadata> {
-        if forme_index < self.formes.len() {
-            Some(&self.formes[forme_index])
+    pub const fn get_forme(&self, form_index: usize) -> Option<&'static FormeMetadata> {
+        if form_index < self.formes.len() {
+            Some(&self.formes[form_index])
         } else {
             None
         }
@@ -730,58 +730,58 @@ impl SpeciesMetadata {
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize)]
 pub struct SpeciesAndForme {
     national_dex: NatDexIndex,
-    forme_index: u16,
+    form_index: u16,
 }
 
 impl SpeciesAndForme {
-    pub fn new(national_dex: u16, forme_index: u16) -> Result<SpeciesAndForme> {
+    pub fn new(national_dex: u16, form_index: u16) -> Result<SpeciesAndForme> {
         let valid_ndex = NatDexIndex::new(national_dex)?;
 
-        if valid_ndex.get_species_metadata().formes.len() <= forme_index as usize {
-            return Err(Error::FormeIndex {
+        if valid_ndex.get_species_metadata().formes.len() <= form_index as usize {
+            return Err(Error::FormIndex {
                 national_dex: valid_ndex,
-                forme_index,
+                form_index,
             });
         }
 
         Ok(SpeciesAndForme {
             national_dex: valid_ndex,
-            forme_index,
+            form_index,
         })
     }
 
     pub const fn base_form(national_dex: NatDexIndex) -> SpeciesAndForme {
         SpeciesAndForme {
             national_dex,
-            forme_index: 0,
+            form_index: 0,
         }
     }
 
     pub const fn new_valid_ndex(
         national_dex: NatDexIndex,
-        forme_index: u16,
+        form_index: u16,
     ) -> Result<SpeciesAndForme> {
-        if national_dex.get_species_metadata().formes.len() <= forme_index as usize {
-            return Err(Error::FormeIndex {
+        if national_dex.get_species_metadata().formes.len() <= form_index as usize {
+            return Err(Error::FormIndex {
                 national_dex,
-                forme_index,
+                form_index,
             });
         }
 
         Ok(SpeciesAndForme {
             national_dex,
-            forme_index,
+            form_index,
         })
     }
 
     /// # Safety
     ///
     /// - `national_dex` must be greater than zero and at most the maximum National Dex number supported by this version of the library.
-    /// - `forme_index` must be less than the total number of formes for the Pokémon with the given `national_dex` number
-    pub const unsafe fn new_unchecked(national_dex: u16, forme_index: u16) -> SpeciesAndForme {
+    /// - `form_index` must be less than the total number of formes for the Pokémon with the given `national_dex` number
+    pub const unsafe fn new_unchecked(national_dex: u16, form_index: u16) -> SpeciesAndForme {
         SpeciesAndForme {
             national_dex: unsafe { NatDexIndex::new_unchecked(national_dex) },
-            forme_index,
+            form_index,
         }
     }
 
@@ -807,15 +807,15 @@ impl SpeciesAndForme {
     }
 
     pub const fn get_forme_index(&self) -> u16 {
-        self.forme_index
+        self.form_index
     }
 
     pub const fn to_tuple(self) -> (u16, u16) {
-        (self.national_dex.get(), self.forme_index)
+        (self.national_dex.get(), self.form_index)
     }
 
     pub fn get_levelup_learnset(&self, source: Option<MetadataSource>) -> Option<LearnsetReader> {
-        levelup_learnset_lookup(self.national_dex.get(), self.forme_index, source)
+        levelup_learnset_lookup(self.national_dex.get(), self.form_index, source)
     }
 }
 
@@ -825,7 +825,7 @@ impl SpeciesAndForme {
     }
 
     pub const fn get_forme_metadata(&self) -> &'static FormeMetadata {
-        &self.get_species_metadata().formes[self.forme_index as usize]
+        &self.get_species_metadata().formes[self.form_index as usize]
     }
 }
 
@@ -834,8 +834,8 @@ impl SpeciesAndForme {
 #[cfg(feature = "wasm")]
 impl SpeciesAndForme {
     #[wasm_bindgen(constructor)]
-    pub fn new_js(national_dex: u16, forme_index: u16) -> core::result::Result<Self, JsValue> {
-        Self::new(national_dex, forme_index).map_err(|e| JsValue::from_str(&e.to_string()))
+    pub fn new_js(national_dex: u16, form_index: u16) -> core::result::Result<Self, JsValue> {
+        Self::new(national_dex, form_index).map_err(|e| JsValue::from_str(&e.to_string()))
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nationalDex))]
@@ -843,9 +843,9 @@ impl SpeciesAndForme {
         self.national_dex.get()
     }
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = formeIndex))]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = formIndex))]
     pub fn get_forme_index_js(&self) -> u16 {
-        self.forme_index
+        self.form_index
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = getSpeciesMetadata))]
@@ -859,8 +859,8 @@ impl SpeciesAndForme {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = tryNew))]
-    pub fn try_new(national_dex: u16, forme_index: u16) -> Option<Self> {
-        Self::new(national_dex, forme_index).ok()
+    pub fn try_new(national_dex: u16, form_index: u16) -> Option<Self> {
+        Self::new(national_dex, form_index).ok()
     }
 }
 
@@ -869,11 +869,11 @@ impl Randomize for SpeciesAndForme {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
         let national_dex = NatDexIndex::randomized(rng);
         let forme_count = national_dex.get_species_metadata().formes().len();
-        let forme_index = rng.random_range(0..forme_count) as u16;
+        let form_index = rng.random_range(0..forme_count) as u16;
 
         Self {
             national_dex,
-            forme_index,
+            form_index,
         }
     }
 }

@@ -52,17 +52,17 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
   )
 
   const draggingMon = dragState.payload?.kind === 'mon' ? dragState.payload.monData.mon : undefined
-  let formeNumber = draggingMon?.formeNum ?? 0
+  let formeNumber = draggingMon?.formNum ?? 0
 
   if (draggingMon && isMegaStone(draggingMon.heldItemIndex)) {
     const megaForStone = MetadataSummaryLookup(
       draggingMon.dexNum,
-      draggingMon.formeNum
+      draggingMon.formNum
     )?.megaEvolutions.find((mega) => mega.requiredItemId === draggingMon.heldItemIndex)
 
-    if (megaForStone) formeNumber = megaForStone.megaForme.formeIndex
+    if (megaForStone) formeNumber = megaForStone.megaForme.formIndex
   } else if (draggingMon && isBattleFormeItem(draggingMon.dexNum, draggingMon.heldItemIndex)) {
-    formeNumber = displayIndexAdder(draggingMon.heldItemIndex)(draggingMon.formeNum)
+    formeNumber = displayIndexAdder(draggingMon.heldItemIndex)(draggingMon.formNum)
   }
 
   const onDragOver = useCallback(
@@ -196,7 +196,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               if (
                 !dest.isHome &&
                 targetSave &&
-                !targetSave.supportsMon(currMon.dexNum, currMon.formeNum)
+                !targetSave.supportsMon(currMon.dexNum, currMon.formNum)
               ) {
                 continue
               }

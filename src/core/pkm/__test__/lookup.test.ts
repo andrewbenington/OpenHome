@@ -16,8 +16,8 @@ var Hydrapple: FormeMetadata
 
 beforeAll(initializeWasm)
 beforeAll(() => {
-  function mustLookupForme(nationalDex: number, formeIndex: number) {
-    const metadata = MetadataSummaryLookup(nationalDex, formeIndex)
+  function mustLookupForme(nationalDex: number, formIndex: number) {
+    const metadata = MetadataSummaryLookup(nationalDex, formIndex)
     assert(metadata !== undefined)
     return metadata
   }

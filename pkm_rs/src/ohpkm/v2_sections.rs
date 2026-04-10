@@ -128,11 +128,11 @@ const NIDORAN_F: NatDexIndex = unsafe { NatDexIndex::new_unchecked(29) };
 const NIDORAN_M: NatDexIndex = unsafe { NatDexIndex::new_unchecked(32) };
 
 impl MainDataV2 {
-    pub fn new(national_dex: u16, forme_index: u16) -> Result<Self> {
+    pub fn new(national_dex: u16, form_index: u16) -> Result<Self> {
         Ok(Self {
-            species_and_forme: SpeciesAndForme::new(national_dex, forme_index)?,
+            species_and_forme: SpeciesAndForme::new(national_dex, form_index)?,
             language: Language::English,
-            nickname: SpeciesAndForme::new(national_dex, forme_index)?
+            nickname: SpeciesAndForme::new(national_dex, form_index)?
                 .get_species_metadata()
                 .name
                 .into(),

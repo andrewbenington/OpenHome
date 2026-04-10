@@ -171,7 +171,7 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
 
   const spriteResult = useBoxIconImage({
     dexNum: dexNumber,
-    formeNum: formeNumber ?? 0,
+    formNum: formeNumber ?? 0,
     format: 'OHPKM',
     extraFormIndex,
   })

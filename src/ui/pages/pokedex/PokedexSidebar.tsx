@@ -95,7 +95,7 @@ type PokedexTabProps = {
 }
 
 function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabProps) {
-  const [formeIndex, maxStatus] = useMemo(() => {
+  const [formIndex, maxStatus] = useMemo(() => {
     return getHighestFormeStatus(pokedex, species)
   }, [pokedex, species])
 
@@ -121,7 +121,7 @@ function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabPr
       <div className="pokedex-icon-container">
         <PokemonIcon
           dexNumber={species.nationalDex}
-          formeNumber={formeIndex}
+          formeNumber={formIndex}
           silhouette={!isSeen}
           grayedOut={!isCaught}
           style={{ minWidth: 32, height: 36 }} // leave this alone

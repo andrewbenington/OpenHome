@@ -157,7 +157,7 @@ function convertForme(natDexIndex: number, forme: Forme): string {
     species_name: "${forme.name}",
     national_dex: unsafe { NatDexIndex::new_unchecked(${natDexIndex}) },
     forme_name: "${forme.formeName}",
-    forme_index: ${forme.formeNumber},
+    form_index: ${forme.formeNumber},
     is_base_forme: ${forme.isBaseForme},
     is_mega: ${falseIfUndef(forme.isMega)},
     mega_evolution_data: &[${forme.megaEvolutionData

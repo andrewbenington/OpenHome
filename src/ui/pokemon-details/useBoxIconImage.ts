@@ -37,7 +37,7 @@ export default function useBoxIconImage(mon: MonSpriteData): MonSpriteResult {
     }
   }
 
-  const boxIconOverride = FormsUsingImages.get(mon.dexNum)?.includes(mon.formeNum)
+  const boxIconOverride = FormsUsingImages.get(mon.dexNum)?.includes(mon.formNum)
   if (boxIconOverride) {
     return {
       loading: false,

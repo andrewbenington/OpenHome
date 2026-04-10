@@ -102,14 +102,14 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
         read_u16_le!(self.bytes(), 8)
     }
 
-    pub fn forme_index(&self) -> u8 {
+    pub fn form_index(&self) -> u8 {
         pkm_rs_types::read_uint5_from_bits(self.bytes()[29], 3)
     }
 
     pub fn species_and_forme(&self) -> Result<SpeciesAndForme> {
         Ok(SpeciesAndForme::new(
             self.species_ndex(),
-            self.forme_index().into(),
+            self.form_index().into(),
         )?)
     }
 

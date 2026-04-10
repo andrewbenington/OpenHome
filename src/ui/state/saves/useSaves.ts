@@ -892,14 +892,14 @@ export function pokedexSeenFromSave(saveFile: SAV) {
   for (const mon of saveFile.getAllMons()) {
     pokedexUpdates.push({
       dexNumber: mon.dexNum,
-      formeNumber: mon.formeNum,
+      formeNumber: mon.formNum,
       status: 'Seen',
     })
 
     if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
       pokedexUpdates.push({
         dexNumber: mon.dexNum,
-        formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
+        formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formNum),
         status: 'Seen',
       })
     }

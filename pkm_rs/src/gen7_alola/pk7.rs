@@ -506,9 +506,9 @@ impl Pk7 {
     pub fn set_species_and_forme(
         &mut self,
         national_dex: u16,
-        forme_index: u16,
+        form_index: u16,
     ) -> core::result::Result<(), JsValue> {
-        match SpeciesAndForme::new(national_dex, forme_index) {
+        match SpeciesAndForme::new(national_dex, form_index) {
             Ok(species_and_forme) => {
                 self.species_and_forme = species_and_forme;
                 Ok(())
