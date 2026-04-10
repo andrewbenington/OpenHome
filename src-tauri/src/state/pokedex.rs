@@ -38,12 +38,12 @@ pub enum PokedexStatus {
 
 #[derive(Default, Debug, Serialize, Deserialize, Clone)]
 pub struct PokedexEntry {
-    formes: HashMap<FormeNumber, PokedexStatus>,
+    forms: HashMap<FormeNumber, PokedexStatus>,
 }
 
 impl PokedexEntry {
     pub fn register(&mut self, form_index: FormeNumber, status: PokedexStatus) {
-        self.formes
+        self.forms
             .entry(form_index)
             .and_modify(|prev| *prev = max(*prev, status))
             .or_insert(status);

@@ -12,7 +12,7 @@ use wasm_bindgen::prelude::*;
 pub fn metadata_lookup(national_dex: u16, form_index: u16) -> Option<FormeMetadata> {
     ALL_SPECIES
         .get(national_dex as usize - 1)
-        .and_then(|s| s.formes.get(form_index as usize))
+        .and_then(|s| s.forms.get(form_index as usize))
         .cloned()
 }
 

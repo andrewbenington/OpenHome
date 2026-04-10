@@ -50,7 +50,7 @@ export default function PokedexDisplay() {
 
   const pokedex = pokedexState.pokedex
   const caughtCount = Object.values(pokedex.byDexNumber).filter((entry) =>
-    Object.values(entry.formes).some((status) => status.endsWith('Caught'))
+    Object.values(entry.forms).some((status) => status.endsWith('Caught'))
   ).length
 
   const seenCount = Object.values(pokedex.byDexNumber).length
@@ -200,7 +200,7 @@ function PokedexDetails({
           <div className="pokedex-caption">{selectedForme.formeName}</div>
 
           <Flex justify="center" gap="2" width="100%" wrap="wrap">
-            {species.formes.map((forme) => (
+            {species.forms.map((forme) => (
               <Button
                 className="pokedex-raised-button"
                 key={forme.formIndex}

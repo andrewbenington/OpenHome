@@ -9,7 +9,7 @@ import {
   isSeviiForm,
   MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
-import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Formes'
+import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Forms'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { isRomHackFormat, MonFormat } from '../../core/pkm/interfaces'
 import { getLumiFormIndexByExtraFormIndex } from '../../core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'

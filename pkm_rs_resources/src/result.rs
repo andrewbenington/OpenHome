@@ -66,7 +66,7 @@ impl Display for Error {
                 format!(
                     "Invalid forme index {form_index} for Pokémon {} (must be <= {})",
                     species_metadata.name,
-                    species_metadata.formes.len()
+                    species_metadata.forms.len()
                 )
                 .to_owned()
             }

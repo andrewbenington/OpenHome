@@ -615,7 +615,7 @@ mod test {
     }
 
     fn form_has_current_data(form: &FormeMetadata) -> bool {
-        !(form.forme_name.contains("Totem")
+        !(form.form_name.contains("Totem")
         || (form.national_dex.get() == NationalDex::Xerneas && form.form_index == 1) // Active Xerneas
             || (form.national_dex.get() == NationalDex::Arceus && form.form_index == ARCEUS_LEGEND))
     }
@@ -627,7 +627,7 @@ mod test {
             let species_metadata = NatDexIndex::new(national_dex)
                 .expect("1-1025 are valid national dex indices")
                 .get_species_metadata();
-            for form in species_metadata.formes {
+            for form in species_metadata.forms {
                 if !form_has_current_data(form) {
                     continue;
                 }
@@ -657,7 +657,7 @@ mod test {
     fn all_forms_have_types() -> Result<(), String> {
         try_all_forms(|form| {
             super::types_lookup(form.national_dex.get(), form.form_index, None)
-                .ok_or(format!("Missing types for {}", form.forme_name))?;
+                .ok_or(format!("Missing types for {}", form.form_name))?;
             Ok(())
         })
     }
@@ -665,7 +665,7 @@ mod test {
     #[test]
     fn no_form_duplicates_type() -> Result<(), String> {
         try_all_forms(|form| {
-            let form_name = &form.forme_name;
+            let form_name = &form.form_name;
             let (type1, type2) =
                 super::types_lookup(form.national_dex.get(), form.form_index, None)
                     .ok_or(format!("Missing types for {form_name}"))?;
@@ -684,7 +684,7 @@ mod test {
     #[test]
     fn no_zero_stats() -> Result<(), String> {
         try_all_forms(|form| {
-            let form_name = &form.forme_name;
+            let form_name = &form.form_name;
             let stats = super::current_base_stats(form.national_dex.get(), form.form_index)
                 .ok_or(format!("Missing stats for {form_name}"))?;
             if stats.hp == 0
