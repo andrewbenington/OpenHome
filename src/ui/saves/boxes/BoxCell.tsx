@@ -14,6 +14,7 @@ import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
+import { Lookup } from '@pkm-rs/pkg'
 import { Button, Dialog, Flex, TextField } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { useMonDisplay } from 'src/ui/hooks/useMonDisplay'
@@ -131,20 +132,15 @@ function BoxCell({
 
   const openRenameDialog = useCallback(() => {
     if (!mon) return
-    setRenameValue(mon.nickname)
+    setRenameValue(mon.isNicknamed ? mon.nickname : '')
     setRenameOpen(true)
   }, [mon])
 
   const confirmRename = useCallback(() => {
-    setMonNickname(renameValue.trim(), location)
+    if (!mon) return
+    setMonNickname(renameValue.trim() || Lookup.speciesName(mon.dexNum, mon.language), location)
     setRenameOpen(false)
-  }, [renameValue, location, setMonNickname])
-
-  const clearNickname = useCallback(() => {
-    setMonNickname('', location)
-    setRenameValue('')
-    setRenameOpen(false)
-  }, [location, setMonNickname])
+  }, [renameValue, location, setMonNickname, mon])
 
   const tagSubmenu = useMemo(() => {
     if (!mon || !hasOpenHomeId(mon)) return undefined
@@ -291,15 +287,15 @@ function BoxCell({
               <TextField.Root
                 value={renameValue}
                 onChange={(e) => setRenameValue(e.target.value)}
-                placeholder={mon?.nickname}
+                placeholder={Lookup.speciesName(mon.dexNum, mon.language)}
               />
 
               <Flex gap="2" justify="end">
                 <Button variant="soft" color="gray" onClick={() => setRenameOpen(false)}>
                   Cancel
                 </Button>
-                <Button variant="soft" color="gray" onClick={clearNickname}>
-                  Clear
+                <Button variant="soft" color="gray" onClick={() => setRenameValue('')}>
+                  Reset
                 </Button>
                 <Button onClick={confirmRename}>Save</Button>
               </Flex>

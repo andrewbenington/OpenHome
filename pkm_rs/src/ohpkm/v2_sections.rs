@@ -235,6 +235,7 @@ impl MainDataV2 {
     pub fn nickname_matches_species_ignore_case(&self) -> bool {
         self.nickname
             .to_string()
+            .trim()
             .eq_ignore_ascii_case(lookup::species_name(self.national_dex(), self.language))
     }
 

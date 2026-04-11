@@ -6,7 +6,7 @@ import { monSupportedBySave, SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
 import { Option, R, Result } from '@openhome-core/util/functional'
-import { Item } from '@pkm-rs/pkg'
+import { Item, Lookup } from '@pkm-rs/pkg'
 import { MarkingsSixShapesWithColor } from '@pokemon-files/util'
 import { useCallback, useContext, useRef } from 'react'
 import { displayIndexAdder, isBattleFormeItem } from '../../../core/pkm/util'
@@ -505,6 +505,7 @@ export function useSaves(): SavesAndBanksManager {
       }
 
       ohpkm.nickname = nickname
+      ohpkm.isNicknamed = nickname !== Lookup.speciesName(ohpkm.dexNum, ohpkm.language)
       ohpkmStore.insertOrUpdate(ohpkm)
     },
     [
