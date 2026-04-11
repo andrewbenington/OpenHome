@@ -1,4 +1,5 @@
 mod commands;
+mod data_controller;
 mod deprecated;
 mod error;
 mod menu;
@@ -7,7 +8,6 @@ mod plugin;
 mod saves;
 mod startup;
 mod state;
-mod storage;
 mod util;
 mod versioning;
 

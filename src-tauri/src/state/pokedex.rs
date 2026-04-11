@@ -3,8 +3,8 @@ use std::{cmp::max, collections::HashMap, ops::Deref, sync::Mutex};
 use serde::{Deserialize, Serialize};
 use tauri::Emitter;
 
+use crate::data_controller::{DataController, DataDir};
 use crate::error::{Error, Result};
-use crate::storage;
 
 const POKEDEX_FILENAME: &str = "pokedex.json";
 
@@ -60,12 +60,12 @@ pub struct Pokedex {
 impl Pokedex {
     fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
         Ok(Self {
-            by_dex_number: storage::read_file_json(app_handle, POKEDEX_FILENAME)?,
+            by_dex_number: app_handle.read_file_json(DataDir::Storage, POKEDEX_FILENAME)?,
         })
     }
 
     pub fn write_to_storage(&self, app_handle: &tauri::AppHandle) -> Result<()> {
-        storage::write_file_json(app_handle, POKEDEX_FILENAME, &self.by_dex_number)
+        app_handle.write_file_json(DataDir::Storage, POKEDEX_FILENAME, &self.by_dex_number)
     }
 
     pub fn register(

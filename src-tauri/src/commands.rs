@@ -1,10 +1,10 @@
+use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
 use crate::pkm_storage::FilenameToBytesMap;
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloaded_plugins};
 use crate::state::{AppState, AppStateInner};
-use crate::storage::MONS_V2_DIR;
 use crate::util::ImageResponse;
-use crate::{menu, saves, storage, util};
+use crate::{menu, saves, util};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::fs;
@@ -39,7 +39,7 @@ pub fn get_file_created(absolute_path: PathBuf) -> Result<Option<u128>> {
 
 #[tauri::command]
 pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> Result<FilenameToBytesMap> {
-    let mons_path = storage::get_path(&app_handle, MONS_V2_DIR)?;
+    let mons_path = app_handle.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
     let mon_files = fs::read_dir(&mons_path).map_err(|e| Error::file_access(&mons_path, e))?;
 
     let mut map = HashMap::new();
@@ -68,7 +68,7 @@ pub fn delete_storage_files(
 ) -> HashMap<PathBuf, Result<()>> {
     let mut result = HashMap::new();
     for relative_path in relative_paths {
-        let Ok(full_path) = storage::get_path(&app_handle, &relative_path) else {
+        let Ok(full_path) = app_handle.absolute_path(DataDir::Storage, &relative_path) else {
             continue;
         };
 
@@ -87,7 +87,7 @@ pub fn write_storage_file_bytes(
     relative_path: PathBuf,
     bytes: Vec<u8>,
 ) -> Result<()> {
-    let full_path = storage::get_path(&app_handle, relative_path)?;
+    let full_path = app_handle.absolute_path(DataDir::Storage, relative_path)?;
     util::write_file_contents(full_path, bytes)
 }
 
@@ -105,7 +105,7 @@ fn write_storage_file_text(
     relative_path: PathBuf,
     text: String,
 ) -> Result<()> {
-    let full_path = storage::get_path(&app_handle, relative_path)?;
+    let full_path = app_handle.absolute_path(DataDir::Storage, relative_path)?;
     util::write_file_contents(full_path, text)
 }
 
@@ -114,7 +114,7 @@ pub fn get_storage_file_json(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
 ) -> Result<Value> {
-    storage::read_file_json(&app_handle, &relative_path)
+    app_handle.read_file_json(DataDir::Storage, &relative_path)
 }
 
 #[tauri::command]
@@ -209,7 +209,7 @@ pub fn set_app_theme(
 pub fn validate_recent_saves(
     app_handle: tauri::AppHandle,
 ) -> core::result::Result<HashMap<String, saves::SaveRef>, String> {
-    saves::get_recent_saves(app_handle)
+    saves::get_recent_saves(&app_handle)
 }
 
 #[tauri::command]
@@ -246,19 +246,15 @@ pub fn list_installed_plugins(app_handle: tauri::AppHandle) -> Result<Vec<Plugin
 
 #[tauri::command]
 pub fn load_plugin_code(app_handle: tauri::AppHandle, plugin_id: String) -> Result<String> {
-    let relative_path = &PathBuf::from("plugins")
-        .join(plugin_id)
-        .join("dist")
-        .join("index.js");
-
-    util::get_appdata_file_text(&app_handle, relative_path)
+    let relative_path = &PathBuf::from(plugin_id).join("dist").join("index.js");
+    app_handle.read_file_text(DataDir::Plugins, relative_path)
 }
 
 #[tauri::command]
 pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> Result<()> {
-    let plugins_dir = util::prepend_appdata_to_path(&app_handle, "plugins")?;
-    let plugin_dir = plugins_dir.join(&plugin_id);
-
+    let plugin_dir = app_handle
+        .absolute_dir_path(DataDir::Plugins)?
+        .join(&plugin_id);
     util::delete_directory(&plugin_dir)
 }
 

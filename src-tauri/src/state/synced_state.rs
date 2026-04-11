@@ -5,6 +5,7 @@ use std::sync::Mutex;
 use serde::Serialize;
 use tauri::Emitter;
 
+use crate::data_controller;
 use crate::error::{Error, Result};
 use crate::state::{ConvertStrategies, LookupState, OhpkmBytesStore};
 
@@ -85,11 +86,14 @@ impl AllSyncedState {
         Ok(self.lock()?.convert_strategies.0.clone())
     }
 
-    pub fn save_to_files(&self, app_handle: &tauri::AppHandle) -> Result<()> {
+    pub fn save_to_files(
+        &self,
+        data_controller: &impl data_controller::DataController,
+    ) -> Result<()> {
         let locked = self.lock()?;
-        locked.ohpkm_store.0.write_to_mons_v2(app_handle)?;
-        locked.lookups.0.write_to_files(app_handle)?;
-        locked.convert_strategies.0.write_to_files(app_handle)
+        locked.ohpkm_store.0.write_to_mons_v2(data_controller)?;
+        locked.lookups.0.write_to_files(data_controller)?;
+        locked.convert_strategies.0.write_to_files(data_controller)
     }
 }
 
