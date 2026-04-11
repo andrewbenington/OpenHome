@@ -13,6 +13,8 @@ import {
   getAllItems,
   Item,
   ItemMetadata,
+  Language,
+  Lookup,
   OriginGames,
   OriginGameWithData,
   SpeciesLookup,
@@ -142,7 +144,7 @@ export default function FilterPanel() {
         <Typeahead
           uniqueFieldId="species"
           options={Object.values(ALL_SPECIES_DATA)}
-          getOptionString={(opt) => opt.nameEnglish}
+          getOptionString={(opt) => Lookup.speciesName(opt.nationalDex, Language.English)}
           getOptionUniqueID={(opt) => opt.nationalDex.toString()}
           value={filter.dexNumber ? SpeciesLookup(filter.dexNumber) : undefined}
           placeholder="Species"

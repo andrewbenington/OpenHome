@@ -1,7 +1,4 @@
-use crate::{
-    Error, Result, abilities::AbilityIndexWasm, language::Language, pkhex_text,
-    species::ALL_SPECIES,
-};
+use crate::{Error, Result, abilities::AbilityIndexWasm, species::ALL_SPECIES};
 use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
 use serde::{Serialize, Serializer};
 use std::num::NonZeroU16;
@@ -105,8 +102,7 @@ impl Serialize for NatDexIndex {
     where
         S: Serializer,
     {
-        let message = format!("{} ({})", self.get(), self.get_species_metadata().name);
-        serializer.serialize_str(&message)
+        serializer.serialize_u16(self.get())
     }
 }
 
@@ -563,11 +559,6 @@ impl FormMetadata {
         self.evolutions.to_vec()
     }
 
-    #[wasm_bindgen(getter = speciesName)]
-    pub fn species_name(&self) -> String {
-        crate::pkhex_text::species_name_en(self.national_dex).to_owned()
-    }
-
     #[wasm_bindgen(getter = formeName)]
     pub fn form_name(&self) -> String {
         self.form_name.to_owned()
@@ -670,8 +661,6 @@ pub struct MegaEvolutionMetadata {
 #[derive(Debug, Clone)]
 pub struct SpeciesMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub name: &'static str,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub national_dex: NatDexIndex,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub level_up_type: LevelUpType,
@@ -687,25 +676,11 @@ impl SpeciesMetadata {
             None
         }
     }
-
-    pub fn name_for_language(&self, language: Language) -> &'static str {
-        pkhex_text::species_name(language, self.national_dex)
-    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
 impl SpeciesMetadata {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nameEnglish))]
-    pub fn name_english(&self) -> String {
-        pkhex_text::species_name_en(self.national_dex).to_owned()
-    }
-
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = nameForLanguage))]
-    pub fn name_for_language_wasm(&self, language: Language) -> String {
-        self.name_for_language(language).to_owned()
-    }
-
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn forms(&self) -> Vec<FormMetadata> {
         Vec::from(self.forms)

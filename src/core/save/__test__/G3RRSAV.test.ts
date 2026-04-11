@@ -1,5 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { ConvertStrategies, SpeciesLookup } from '@pkm-rs/pkg'
+import { ConvertStrategies, Language, Lookup } from '@pkm-rs/pkg'
 import { fail } from 'assert'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
@@ -47,7 +47,7 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
       expect(firstPokemon.moves[0]).toBe(33) // Tackle
       expect(firstPokemon.moves[1]).toBe(336) // Howl
       expect(firstPokemon.dexNum).toBe(261)
-      expect(SpeciesLookup(firstPokemon.dexNum)?.nameEnglish).toBe('Poochyena')
+      expect(Lookup.speciesName(firstPokemon.dexNum, Language.English)).toBe('Poochyena')
     } else {
       fail('No Pokémon found in the first box, first slot.')
     }

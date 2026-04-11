@@ -1,5 +1,5 @@
 import { R } from '@openhome-core/util/functional'
-import { SpeciesLookup } from '@pkm-rs/pkg'
+import { Language, Lookup } from '@pkm-rs/pkg'
 import { fail } from 'assert'
 import fs from 'fs'
 import path from 'path'
@@ -48,7 +48,7 @@ describe('G3SAV - Gen 3 Save File Read Test', async () => {
       expect(firstPokemon.moves[1]).toBe(45) // Growl
       expect(firstPokemon.dexNum).toBe(1)
       expect(firstPokemon.exp).toBe(135)
-      expect(SpeciesLookup(firstPokemon.dexNum)?.nameEnglish).toBe('Bulbasaur')
+      expect(Lookup.speciesName(firstPokemon.dexNum, Language.English)).toBe('Bulbasaur')
     } else {
       fail('No Pokémon found in the first box, first slot.')
     }

@@ -12,7 +12,7 @@ import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import { useLookups } from '@openhome-ui/state/lookups/useLookups'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { MetadataSummaryLookup, OriginGames } from '@pkm-rs/pkg'
+import { Language, Lookup, OriginGames } from '@pkm-rs/pkg'
 
 type G12LookupRow = {
   gen12ID: string
@@ -67,9 +67,7 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
         numericSorter((value) => value.homeMon?.formNum)
       ),
       getFilterValue: (value) =>
-        (value.homeMon &&
-          MetadataSummaryLookup(value.homeMon.dexNum, value.homeMon.formNum)?.speciesName) ||
-        'Unknown',
+        value.homeMon ? Lookup.speciesName(value.homeMon.dexNum, Language.English) : 'Unknown',
     },
     {
       key: 'game',

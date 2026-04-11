@@ -8,6 +8,7 @@ use crate::util;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::language::Language;
+use pkm_rs_resources::lookup;
 use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
@@ -129,13 +130,12 @@ const NIDORAN_M: NatDexIndex = unsafe { NatDexIndex::new_unchecked(32) };
 
 impl MainDataV2 {
     pub fn new(national_dex: u16, form_index: u16) -> Result<Self> {
+        let species_and_form = SpeciesAndForm::new(national_dex, form_index)?;
+        let national_dex = species_and_form.get_ndex();
         Ok(Self {
-            species_and_form: SpeciesAndForm::new(national_dex, form_index)?,
+            species_and_form,
             language: Language::English,
-            nickname: SpeciesAndForm::new(national_dex, form_index)?
-                .get_species_metadata()
-                .name
-                .into(),
+            nickname: lookup::species_name(national_dex, Language::English).into(),
             ..Default::default()
         })
     }
@@ -215,6 +215,10 @@ impl MainDataV2 {
         }
     }
 
+    pub const fn national_dex(&self) -> NatDexIndex {
+        self.species_and_form.get_ndex()
+    }
+
     #[cfg(feature = "wasm")]
     pub fn openhome_id(&self) -> String {
         let base_mon = self.species_and_form.get_base_evolution();
@@ -229,37 +233,18 @@ impl MainDataV2 {
     }
 
     pub fn nickname_matches_species_ignore_case(&self) -> bool {
-        self.nickname.to_string().eq_ignore_ascii_case(
-            self.species_and_form
-                .get_species_metadata()
-                .name_for_language(self.language),
-        )
-    }
-
-    pub fn nickname_matches_species_eng_ignore_case(&self) -> bool {
         self.nickname
             .to_string()
-            .eq_ignore_ascii_case(self.species_and_form.get_species_metadata().name)
+            .eq_ignore_ascii_case(lookup::species_name(self.national_dex(), self.language))
     }
 
     pub fn nickname_matches_species(&self) -> bool {
-        self.nickname.to_string()
-            == self
-                .species_and_form
-                .get_species_metadata()
-                .name_for_language(self.language)
-    }
-
-    pub fn nickname_matches_species_eng(&self) -> bool {
-        self.nickname.to_string() == self.species_and_form.get_species_metadata().name
+        self.nickname.to_string() == lookup::species_name(self.national_dex(), self.language)
     }
 
     pub fn reset_nickname_to_species(&mut self) {
-        self.nickname = self
-            .species_and_form
-            .get_species_metadata()
-            .name_for_language(self.language)
-            .into();
+        self.nickname = lookup::species_name(self.national_dex(), self.language).into();
+        self.is_nicknamed = false;
     }
 
     const fn ability_num_by_index(&self) -> Option<AbilityNumber> {
@@ -305,29 +290,18 @@ impl MainDataV2 {
 
     pub fn fix_errors(&mut self) -> bool {
         let mut errors_found = false;
-        let national_dex = self.species_and_form.get_ndex();
-        let species_metadata = self.species_and_form.get_species_metadata();
         let form_metadata = self.species_and_form.get_forme_metadata();
 
-        // Previous versions of OpenHome incorrectly translated the gender symbols; here we will fix that (for English)
-        if self.language == Language::English
-            && (national_dex == NIDORAN_F
-                && self
-                    .nickname
-                    .to_string()
-                    .eq_ignore_ascii_case("Nidoran\u{E08F}"))
-            || (national_dex == NIDORAN_M
-                && self
-                    .nickname
-                    .to_string()
-                    .eq_ignore_ascii_case("Nidoran\u{E08E}"))
+        // Previous versions of OpenHome incorrectly translated the gender symbols for the Nidorans; here we will fix that
+        if (self.national_dex() == NIDORAN_F && self.nickname.to_string().contains("\u{E08F}"))
+            || (self.national_dex() == NIDORAN_M && self.nickname.to_string().contains("\u{E08E}"))
         {
             self.reset_nickname_to_species();
             errors_found = true;
         } else if self.nickname_matches_species_ignore_case() {
             // Fix Pokémon imported from an older game that had their nicknames kept as all caps
             if !self.nickname_matches_species() {
-                self.nickname = species_metadata.name_for_language(self.language).into();
+                self.reset_nickname_to_species();
                 errors_found = true;
             }
 
@@ -395,12 +369,10 @@ fn is_prevo_species_name(
     name: &str,
     language: Language,
 ) -> bool {
-    species_and_form.get_prevos().iter().any(|prevo| {
-        prevo
-            .get_species_metadata()
-            .name_for_language(language)
-            .eq_ignore_ascii_case(name)
-    })
+    species_and_form
+        .get_prevos()
+        .iter()
+        .any(|prevo| name.eq_ignore_ascii_case(lookup::species_name(prevo.get_ndex(), language)))
 }
 
 impl DataSection for MainDataV2 {

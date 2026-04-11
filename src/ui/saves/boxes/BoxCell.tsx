@@ -279,34 +279,34 @@ function BoxCell({
           )}
         </div>
       </OpenHomeCtxMenu>
-      <Dialog.Root open={renameOpen} onOpenChange={setRenameOpen}>
-        <Dialog.Content maxWidth="360px" style={{ padding: 16, borderRadius: 8 }}>
-          <Flex direction="column" gap="1">
-            <Dialog.Title>
-              Rename {mon?.speciesMetadata?.nameForLanguage(mon.language) ?? 'Pokémon'}
-            </Dialog.Title>
-            <Dialog.Description>Enter a nickname for this Pokémon</Dialog.Description>
-          </Flex>
-
-          <Flex direction="column" gap="3" mt="3">
-            <TextField.Root
-              value={renameValue}
-              onChange={(e) => setRenameValue(e.target.value)}
-              placeholder={mon?.nickname}
-            />
-
-            <Flex gap="2" justify="end">
-              <Button variant="soft" color="gray" onClick={() => setRenameOpen(false)}>
-                Cancel
-              </Button>
-              <Button variant="soft" color="gray" onClick={clearNickname}>
-                Clear
-              </Button>
-              <Button onClick={confirmRename}>Save</Button>
+      {mon && (
+        <Dialog.Root open={renameOpen} onOpenChange={setRenameOpen}>
+          <Dialog.Content maxWidth="360px" style={{ padding: 16, borderRadius: 8 }}>
+            <Flex direction="column" gap="1">
+              <Dialog.Title>Rename {mon.nickname}</Dialog.Title>
+              <Dialog.Description>Enter a nickname for this Pokémon</Dialog.Description>
             </Flex>
-          </Flex>
-        </Dialog.Content>
-      </Dialog.Root>
+
+            <Flex direction="column" gap="3" mt="3">
+              <TextField.Root
+                value={renameValue}
+                onChange={(e) => setRenameValue(e.target.value)}
+                placeholder={mon?.nickname}
+              />
+
+              <Flex gap="2" justify="end">
+                <Button variant="soft" color="gray" onClick={() => setRenameOpen(false)}>
+                  Cancel
+                </Button>
+                <Button variant="soft" color="gray" onClick={clearNickname}>
+                  Clear
+                </Button>
+                <Button onClick={confirmRename}>Save</Button>
+              </Flex>
+            </Flex>
+          </Dialog.Content>
+        </Dialog.Root>
+      )}
     </>
   )
 }

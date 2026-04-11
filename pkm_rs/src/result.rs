@@ -1,5 +1,7 @@
 use crate::ohpkm::sectioned_data;
 
+use pkm_rs_resources::language::Language;
+use pkm_rs_resources::lookup;
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
 use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, language::LANGUAGE_MAX, items::ITEM_MAX};
 use pkm_rs_types::InvalidAbilityNumber;
@@ -135,9 +137,8 @@ impl Display for Error {
             }
 
             Error::GenDex { saf, generation } => {
-                let species = saf.get_species_metadata();
                 let form = saf.get_forme_metadata();
-                format!("Pokémon '{}' (form: {}) does not exist in {generation}", species.name, form.form_name)
+                format!("Pokémon '{}' (form: {}) does not exist in {generation}", lookup::species_name(saf.get_ndex(), Language::English), form.form_name)
             }
 
             Error::GameDex { value, game } => {
@@ -150,8 +151,8 @@ impl Display for Error {
             } => {
                 let species_metadata = national_dex.get_species_metadata();
                 format!(
-                    "Invalid form index {form_index} for Pokémon {} (must be <= {})",
-                    species_metadata.name,
+                    "Invalid form index {form_index} for national dex {} (must be <= {})",
+                    lookup::species_name(*national_dex, Language::English),
                     species_metadata.forms.len()
                 )
                 .to_owned()
@@ -160,10 +161,9 @@ impl Display for Error {
                 national_dex,
                 extra_form_index,
             } => {
-                let species_metadata = national_dex.get_species_metadata();
                 format!(
                     "Invalid extra form index {extra_form_index} (Pokémon species {})",
-                    species_metadata.name
+                    lookup::species_name(*national_dex, Language::English)
                 )
                 .to_owned()
             }
