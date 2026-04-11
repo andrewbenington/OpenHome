@@ -3,7 +3,7 @@
   "sanity": 0,
   "checksum": 32397,
   "species_and_form": {
-    "national_dex": "718 (Zygarde)",
+    "national_dex": 718,
     "form_index": 1
   },
   "held_item_index": 0,

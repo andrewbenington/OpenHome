@@ -3,7 +3,7 @@
   "sanity": 0,
   "checksum": 2887,
   "species_and_form": {
-    "national_dex": "730 (Primarina)",
+    "national_dex": 730,
     "form_index": 0
   },
   "held_item_index": 243,
