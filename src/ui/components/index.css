@@ -9,12 +9,15 @@
 }
 
 .IconList {
-  width: 3.5rem;
+  --icon-list-padding: 0.3rem;
+  padding-top: var(--icon-list-padding);
+  width: 3rem;
 
   .Tab {
     display: flex;
     flex-direction: column;
-    height: 3rem;
+    min-height: 3rem;
+    height: fit-content;
     font-size: 0.65rem;
     text-wrap: wrap;
     line-height: 0.8rem;
@@ -36,7 +39,7 @@
   }
 
   svg {
-    height: 65%;
+    height: 1.5rem;
     width: auto;
   }
 }
@@ -84,16 +87,17 @@
 
 .Indicator {
   position: absolute;
+  left: var(--icon-list-padding);
   z-index: -1;
-  translate: 0 calc(var(--active-tab-top) - 0.5rem);
-  aspect-ratio: 1;
-  width: calc(100% - 1rem);
+  translate: 0 calc(var(--active-tab-top) - 0.3rem);
+  height: calc(var(--active-tab-height) + 0.2rem);
+  width: calc(100% - (var(--icon-list-padding) * 2));
   border-radius: 0.25rem;
   background-color: var(--color-gray-200);
   box-shadow:
     var(--color-gray-300) 0px 0px 0px 1px,
     var(--color-gray-500) 0px 0px 0px 1px inset;
-  transition-property: translate;
+  transition-property: translate, height;
   transition-duration: 200ms;
   transition-timing-function: ease-in-out;
 }

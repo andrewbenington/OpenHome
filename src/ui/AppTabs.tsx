@@ -1,15 +1,8 @@
 import { Separator } from '@base-ui/react/separator'
 import useIsDev from '@openhome-ui/hooks/isDev'
 import { Box, Flex, ThemePanel } from '@radix-ui/themes'
-import {
-  RiFileMarkedFill,
-  RiFileMarkedLine,
-  RiHome2Fill,
-  RiHome2Line,
-  RiLayoutGrid2Fill,
-  RiLayoutGrid2Line,
-} from 'react-icons/ri'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
+import { AppTabIconsActive, AppTabIconsInactive } from './components/Icons'
 import { Tabs } from './components/Tabs'
 import AppStateDisplay from './pages/AppStateDisplay'
 import ComponentDebugDisplay from './pages/ComponentDebugDisplay'
@@ -38,27 +31,47 @@ export default function AppTabs() {
       <Flex style={{ height: '100vh' }}>
         <Tabs.IconList className="tab-sidebar">
           <Tabs.Tab value="home">
-            <RiHome2Fill className="active-tab" />
-            <RiHome2Line className="inactive-tab" />
+            <AppTabIconsActive.Home />
+            <AppTabIconsInactive.Home />
             Home
           </Tabs.Tab>
           <Tabs.Tab value="manage">
-            <RiFileMarkedFill className="active-tab" />
-            <RiFileMarkedLine className="inactive-tab" />
+            <AppTabIconsActive.Tracked />
+            <AppTabIconsInactive.Tracked />
             Tracked
           </Tabs.Tab>
           <Tabs.Tab value="sort">
-            <RiLayoutGrid2Fill className="active-tab" />
-            <RiLayoutGrid2Line className="inactive-tab" />
+            <AppTabIconsActive.List />
+            <AppTabIconsInactive.List />
             List
           </Tabs.Tab>
-          <Tabs.Tab value="pokedex">Pokédex</Tabs.Tab>
-          <Tabs.Tab value="plugins">Plugins</Tabs.Tab>
-          <Tabs.Tab value="settings">Settings</Tabs.Tab>
+          <Tabs.Tab value="pokedex">
+            <AppTabIconsActive.Pokedex />
+            <AppTabIconsInactive.Pokedex />
+            Pokédex
+          </Tabs.Tab>
+          <Tabs.Tab value="plugins">
+            <AppTabIconsActive.Plugins />
+            <AppTabIconsInactive.Plugins />
+            Sprite Plugins
+          </Tabs.Tab>
+          <Tabs.Tab value="settings">
+            <AppTabIconsActive.Settings />
+            <AppTabIconsInactive.Settings />
+            Settings
+          </Tabs.Tab>
           {isDev && (
             <>
-              <Tabs.Tab value="state">App State</Tabs.Tab>
-              <Tabs.Tab value="component-debug">Component Debug</Tabs.Tab>
+              <Tabs.Tab value="state">
+                <AppTabIconsActive.AppState />
+                <AppTabIconsInactive.AppState />
+                App State
+              </Tabs.Tab>
+              <Tabs.Tab value="component-debug">
+                <AppTabIconsActive.ComponentDebug />
+                <AppTabIconsInactive.ComponentDebug />
+                Component Debug
+              </Tabs.Tab>
             </>
           )}
           <Tabs.Indicator />
