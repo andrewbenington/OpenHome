@@ -40,7 +40,12 @@ pub fn update_version_last_used(app_handle: &tauri::AppHandle) -> Result<()> {
         &last_version_path,
         app_handle.package_info().version.to_string(),
     )
-    .map_err(|err| Error::file_write(&last_version_path, err))
+    .map_err(|err| Error::file_write(&last_version_path, err))?;
+
+    let cfg_path = app_handle.get_config_folder()?.join(VERSION_FILE);
+
+    util::write_file_contents(&cfg_path, app_handle.package_info().version.to_string())
+        .map_err(|err| Error::file_write(&cfg_path, err))
 }
 
 pub fn handle_updates_get_features(
