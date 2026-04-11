@@ -1,4 +1,7 @@
-use crate::{Error, Result, abilities::AbilityIndexWasm, species::ALL_SPECIES};
+use crate::{
+    Error, Result, abilities::AbilityIndexWasm, language::Language, pkhex_text,
+    species::ALL_SPECIES,
+};
 use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
 use serde::{Serialize, Serializer};
 use std::num::NonZeroU16;
@@ -15,8 +18,6 @@ use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
 use rand::RngExt;
 
-#[cfg(feature = "wasm")]
-use crate::log;
 #[cfg(feature = "wasm")]
 use crate::species::form_metadata::current_base_stats;
 #[cfg(feature = "wasm")]
@@ -459,13 +460,6 @@ impl FormMetadata {
     #[cfg(feature = "wasm")]
     fn has_data_for_source(&self, source: MetadataSource) -> bool {
         use crate::species::form_metadata::source_has_form_metadata;
-
-        log!(
-            "checking if {} form {} has data for source {:?}",
-            self.species_name,
-            self.form_name,
-            source
-        );
         source_has_form_metadata(source, self.national_dex.get(), self.form_index)
     }
 
@@ -573,7 +567,7 @@ impl FormMetadata {
 
     #[wasm_bindgen(getter = speciesName)]
     pub fn species_name(&self) -> String {
-        self.species_name.to_owned()
+        crate::pkhex_text::species_name_en(self.national_dex).to_owned()
     }
 
     #[wasm_bindgen(getter = formeName)]
@@ -695,14 +689,23 @@ impl SpeciesMetadata {
             None
         }
     }
+
+    pub fn name_for_language(&self, language: Language) -> &'static str {
+        pkhex_text::species_name(language, self.national_dex)
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
 impl SpeciesMetadata {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    pub fn name(&self) -> String {
-        self.name.to_owned()
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nameEnglish))]
+    pub fn name_english(&self) -> String {
+        pkhex_text::species_name_en(self.national_dex).to_owned()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = nameForLanguage))]
+    pub fn name_for_language_wasm(&self, language: Language) -> String {
+        self.name_for_language(language).to_owned()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]

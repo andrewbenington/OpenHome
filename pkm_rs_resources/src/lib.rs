@@ -1,3 +1,4 @@
+mod pkhex_text;
 mod result;
 
 pub mod abilities;
@@ -12,6 +13,7 @@ pub mod restrictions;
 pub mod ribbons;
 pub mod species;
 pub mod stats;
+pub mod text_resource;
 
 pub use result::*;
 

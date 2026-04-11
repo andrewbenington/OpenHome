@@ -142,7 +142,7 @@ export default function FilterPanel() {
         <Typeahead
           uniqueFieldId="species"
           options={Object.values(ALL_SPECIES_DATA)}
-          getOptionString={(opt) => opt.name}
+          getOptionString={(opt) => opt.nameEnglish}
           getOptionUniqueID={(opt) => opt.nationalDex.toString()}
           value={filter.dexNumber ? SpeciesLookup(filter.dexNumber) : undefined}
           placeholder="Species"
