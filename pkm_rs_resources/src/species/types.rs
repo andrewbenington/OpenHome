@@ -337,9 +337,6 @@ pub enum EggGroup {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone)]
 pub struct FormMetadata {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub species_name: &'static str,
-
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = nationalDex))]
     pub national_dex: NatDexIndex,
 
@@ -468,8 +465,9 @@ impl FormMetadata {
         source: Option<MetadataSource>,
     ) -> (PkmType, Option<PkmType>) {
         types_lookup(self.national_dex.get(), self.form_index, source).expect_log(format!(
-            "no types found for {} form {}",
-            self.species_name, self.form_name
+            "no types found for nat dex {} form {}",
+            self.national_dex.get(),
+            self.form_index
         ))
     }
 
