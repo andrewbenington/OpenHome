@@ -31,7 +31,7 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
   const filteredSpecies = useMemo(
     () =>
       Object.values(ALL_SPECIES_DATA).filter(
-        (mon) => !filter || mon.name.toUpperCase().startsWith(filter?.trim().toUpperCase())
+        (mon) => !filter || mon.nameEnglish.toUpperCase().startsWith(filter?.trim().toUpperCase())
       ),
     [ALL_SPECIES_DATA, filter]
   )
@@ -133,7 +133,7 @@ function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabPr
           style={{ minWidth: 32, height: 36 }} // leave this alone
         />
       </div>
-      {species.nationalDex}. {species.name}
+      {species.nationalDex}. {species.nameEnglish}
       <div style={{ flex: 1 }} />
       {maxStatus === 'ShinyCaught' && (
         <img

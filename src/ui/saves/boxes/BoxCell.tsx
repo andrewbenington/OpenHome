@@ -282,7 +282,9 @@ function BoxCell({
       <Dialog.Root open={renameOpen} onOpenChange={setRenameOpen}>
         <Dialog.Content maxWidth="360px" style={{ padding: 16, borderRadius: 8 }}>
           <Flex direction="column" gap="1">
-            <Dialog.Title>Rename {mon?.speciesMetadata?.name ?? 'Pokémon'}</Dialog.Title>
+            <Dialog.Title>
+              Rename {mon?.speciesMetadata?.nameForLanguage(mon.language) ?? 'Pokémon'}
+            </Dialog.Title>
             <Dialog.Description>Enter a nickname for this Pokémon</Dialog.Description>
           </Flex>
 

@@ -228,10 +228,26 @@ impl MainDataV2 {
         )
     }
 
+    pub fn nickname_matches_species_ignore_case(&self) -> bool {
+        self.nickname.to_string().eq_ignore_ascii_case(
+            self.species_and_form
+                .get_species_metadata()
+                .name_for_language(self.language),
+        )
+    }
+
     pub fn nickname_matches_species_eng_ignore_case(&self) -> bool {
         self.nickname
             .to_string()
             .eq_ignore_ascii_case(self.species_and_form.get_species_metadata().name)
+    }
+
+    pub fn nickname_matches_species(&self) -> bool {
+        self.nickname.to_string()
+            == self
+                .species_and_form
+                .get_species_metadata()
+                .name_for_language(self.language)
     }
 
     pub fn nickname_matches_species_eng(&self) -> bool {
@@ -239,7 +255,11 @@ impl MainDataV2 {
     }
 
     pub fn reset_nickname_to_species(&mut self) {
-        self.nickname = self.species_and_form.get_species_metadata().name.into();
+        self.nickname = self
+            .species_and_form
+            .get_species_metadata()
+            .name_for_language(self.language)
+            .into();
     }
 
     const fn ability_num_by_index(&self) -> Option<AbilityNumber> {
@@ -289,43 +309,45 @@ impl MainDataV2 {
         let species_metadata = self.species_and_form.get_species_metadata();
         let form_metadata = self.species_and_form.get_forme_metadata();
 
-        // When other languages are added this should be updated
-        if self.language == Language::English {
-            // Previous versions of OpenHome incorrectly translated the gender symbols; here we will fix that
-            if (national_dex == NIDORAN_F
+        // Previous versions of OpenHome incorrectly translated the gender symbols; here we will fix that (for English)
+        if self.language == Language::English
+            && (national_dex == NIDORAN_F
                 && self
                     .nickname
                     .to_string()
                     .eq_ignore_ascii_case("Nidoran\u{E08F}"))
-                || (national_dex == NIDORAN_M
-                    && self
-                        .nickname
-                        .to_string()
-                        .eq_ignore_ascii_case("Nidoran\u{E08E}"))
-            {
-                self.reset_nickname_to_species();
-                errors_found = true;
-            } else if self.nickname_matches_species_eng_ignore_case() {
-                // Fix Pokémon imported from an older game that had their nicknames kept as all caps
-                if !self.nickname_matches_species_eng() {
-                    self.nickname = species_metadata.name.into();
-                    errors_found = true;
-                }
-
-                // Ensure the is_nicknamed flag is accurate. Ignore the situation where the nickname was manually set to the species
-                if self.is_nicknamed {
-                    self.is_nicknamed = false;
-                    errors_found = true;
-                }
-            } else if is_prevo_species_name(&self.species_and_form, &self.nickname.to_string()) {
-                self.reset_nickname_to_species();
-                self.is_nicknamed = false;
-                errors_found = true;
-            } else if !self.is_nicknamed && !self.nickname_matches_species_eng() {
-                // If the nickname doesn't match the species name, it should be considered nicknamed
-                self.is_nicknamed = true;
+            || (national_dex == NIDORAN_M
+                && self
+                    .nickname
+                    .to_string()
+                    .eq_ignore_ascii_case("Nidoran\u{E08E}"))
+        {
+            self.reset_nickname_to_species();
+            errors_found = true;
+        } else if self.nickname_matches_species_ignore_case() {
+            // Fix Pokémon imported from an older game that had their nicknames kept as all caps
+            if !self.nickname_matches_species() {
+                self.nickname = species_metadata.name_for_language(self.language).into();
                 errors_found = true;
             }
+
+            // Ensure the is_nicknamed flag is accurate. Ignore the situation where the nickname was manually set to the species
+            if self.is_nicknamed {
+                self.is_nicknamed = false;
+                errors_found = true;
+            }
+        } else if is_prevo_species_name(
+            &self.species_and_form,
+            &self.nickname.to_string(),
+            self.language,
+        ) {
+            self.reset_nickname_to_species();
+            self.is_nicknamed = false;
+            errors_found = true;
+        } else if !self.is_nicknamed && !self.nickname_matches_species() {
+            // If the nickname doesn't match the species name, it should be considered nicknamed
+            self.is_nicknamed = true;
+            errors_found = true;
         }
 
         // PLA mons cannot have been hatched
@@ -368,11 +390,17 @@ impl MainDataV2 {
     }
 }
 
-fn is_prevo_species_name(species_and_form: &SpeciesAndForm, name: &str) -> bool {
-    species_and_form
-        .get_prevos()
-        .iter()
-        .any(|prevo| prevo.get_species_metadata().name.eq_ignore_ascii_case(name))
+fn is_prevo_species_name(
+    species_and_form: &SpeciesAndForm,
+    name: &str,
+    language: Language,
+) -> bool {
+    species_and_form.get_prevos().iter().any(|prevo| {
+        prevo
+            .get_species_metadata()
+            .name_for_language(language)
+            .eq_ignore_ascii_case(name)
+    })
 }
 
 impl DataSection for MainDataV2 {

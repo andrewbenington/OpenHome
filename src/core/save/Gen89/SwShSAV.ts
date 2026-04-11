@@ -237,7 +237,10 @@ class TrainerBlock {
     const index = this.dataView.getUint8(0x25)
 
     if (index <= 2) {
-      return SpeciesLookup(index * 3 + NationalDex.Grookey)?.name ?? 'Unknown'
+      return (
+        SpeciesLookup(index * 3 + NationalDex.Grookey)?.nameForLanguage(this.getLanguage()) ??
+        'Unknown'
+      )
     }
 
     return 'Not Selected'

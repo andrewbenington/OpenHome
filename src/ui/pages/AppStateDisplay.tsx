@@ -74,7 +74,7 @@ function monDisplay(mon: PKMInterface) {
   const species = SpeciesLookup(mon.dexNum)
 
   return {
-    species: species?.name,
+    species: species?.nameEnglish,
     form: species?.forms[mon.formNum ?? 0].formeName,
     nickname: mon.nickname,
     origin: mon.gameOfOrigin ? `Pokémon ${OriginGames.gameName(mon.gameOfOrigin)}` : undefined,
