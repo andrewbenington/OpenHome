@@ -48,12 +48,20 @@ pub fn create_menu(app: &App) -> core::result::Result<Menu<Wry>, Box<dyn std::er
         true,
         Some("CmdOrCtrl+D"),
     )?;
+    let open_config_item = MenuItem::with_id(
+        handle,
+        "open-config",
+        "Open Config Folder",
+        true,
+        Some("CmdOrCtrl+Shift+D"),
+    )?;
     let file_submenu_items = SubmenuBuilder::new(handle, "File")
         .item(&open_item)
         .item(&save_item)
         .item(&reset_item)
         .separator()
-        .item(&open_appdata_item);
+        .item(&open_appdata_item)
+        .item(&open_config_item);
 
     let exit_item = MenuItem::with_id(handle, "exit", "Exit", true, Some("CmdOrCtrl+Q"))?;
     let file_submenu = match cfg!(target_os = "macos") {
@@ -139,6 +147,12 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
         "open-appdata" => match app_handle.path().app_data_dir() {
             Err(err) => {
                 println!["Error getting data directory: {}", err];
+            }
+            Ok(dir) => command_open(dir.to_str().unwrap_or_default()),
+        },
+        "open-config" => match app_handle.path().app_config_dir() {
+            Err(err) => {
+                println!["Error getting config directory: {}", err];
             }
             Ok(dir) => command_open(dir.to_str().unwrap_or_default()),
         },

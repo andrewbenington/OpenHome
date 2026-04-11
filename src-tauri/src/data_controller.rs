@@ -27,6 +27,8 @@ impl DataDir {
 pub trait DataController {
     fn get_data_folder(&self) -> Result<PathBuf>;
 
+    fn get_config_folder(&self) -> Result<PathBuf>;
+
     fn absolute_path<P>(&self, dir: DataDir, relative_path: P) -> Result<PathBuf>
     where
         P: AsRef<Path>,
@@ -121,6 +123,11 @@ impl DataController for tauri::AppHandle {
     fn get_data_folder(&self) -> Result<PathBuf> {
         use tauri::Manager;
         Ok(self.path().app_data_dir()?)
+    }
+
+    fn get_config_folder(&self) -> Result<PathBuf> {
+        use tauri::Manager;
+        Ok(self.path().app_config_dir()?)
     }
 }
 
