@@ -5,7 +5,7 @@ import { useTransactionState } from '@openhome-ui/state/app-state'
 import { AppInfoContext, AppInfoState } from '@openhome-ui/state/appInfo'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { ItemBagContext, ItemBagState } from '@openhome-ui/state/items'
-import { Item, OriginGames, SpeciesLookup } from '@pkm-rs/pkg'
+import { Item, Lookup, OriginGames, SpeciesLookup } from '@pkm-rs/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import { useContext } from 'react'
 import { OHPKM } from 'src/core/pkm/OHPKM'
@@ -74,7 +74,7 @@ function monDisplay(mon: PKMInterface) {
   const species = SpeciesLookup(mon.dexNum)
 
   return {
-    species: species?.name,
+    species: Lookup.speciesName(mon.dexNum, mon.language),
     form: species?.forms[mon.formNum ?? 0].formeName,
     nickname: mon.nickname,
     origin: mon.gameOfOrigin ? `Pokémon ${OriginGames.gameName(mon.gameOfOrigin)}` : undefined,

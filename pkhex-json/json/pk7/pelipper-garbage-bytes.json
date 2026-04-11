@@ -3,7 +3,7 @@
   "sanity": 0,
   "checksum": 49147,
   "species_and_form": {
-    "national_dex": "279 (Pelipper)",
+    "national_dex": 279,
     "form_index": 0
   },
   "held_item_index": 282,

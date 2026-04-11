@@ -3,7 +3,7 @@
   "sanity": 0,
   "checksum": 53703,
   "species_and_form": {
-    "national_dex": "111 (Rhyhorn)",
+    "national_dex": 111,
     "form_index": 0
   },
   "held_item_index": 0,

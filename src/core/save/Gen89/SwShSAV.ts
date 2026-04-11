@@ -3,9 +3,10 @@ import {
   ConvertStrategy,
   ExtraFormIndex,
   Gender,
+  Language,
   Languages,
+  Lookup,
   OriginGame,
-  SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
@@ -237,7 +238,8 @@ class TrainerBlock {
     const index = this.dataView.getUint8(0x25)
 
     if (index <= 2) {
-      return SpeciesLookup(index * 3 + NationalDex.Grookey)?.name ?? 'Unknown'
+      const nationalDex = NationalDex.Grookey + index * 3
+      return Lookup.speciesName(nationalDex, Language.English)
     }
 
     return 'Not Selected'

@@ -1679,12 +1679,12 @@ impl OhpkmV2 {
         self.to_sectioned_data().to_bytes()
     }
 
-    pub fn nickname_matches_species_eng(&self) -> bool {
-        self.main_data.nickname_matches_species_eng()
+    pub fn nickname_matches_species(&self) -> bool {
+        self.main_data.nickname_matches_species()
     }
 
-    pub fn nickname_matches_species_eng_ignore_case(&self) -> bool {
-        self.main_data.nickname_matches_species_eng_ignore_case()
+    pub fn nickname_matches_species_ignore_case(&self) -> bool {
+        self.main_data.nickname_matches_species_ignore_case()
     }
 
     pub const fn species_metadata(&self) -> &'static SpeciesMetadata {
@@ -3392,14 +3392,14 @@ impl OhpkmV2 {
             .collect()
     }
 
-    #[wasm_bindgen(js_name = nicknameMatchesSpeciesEnglish)]
-    pub fn nickname_matches_species_eng_js(&self) -> bool {
-        self.nickname_matches_species_eng()
+    #[wasm_bindgen(js_name = nicknameMatchesSpecies)]
+    pub fn nickname_matches_species_js(&self) -> bool {
+        self.nickname_matches_species()
     }
 
-    #[wasm_bindgen(js_name = nicknameMatchesSpeciesEnglishIgnoreCase)]
-    pub fn nickname_matches_species_eng_ignore_case_js(&self) -> bool {
-        self.nickname_matches_species_eng_ignore_case()
+    #[wasm_bindgen(js_name = nicknameMatchesSpeciesIgnoreCase)]
+    pub fn nickname_matches_species_ignore_case_js(&self) -> bool {
+        self.nickname_matches_species_ignore_case()
     }
 
     #[wasm_bindgen(js_name = resetNicknameToSpecies)]

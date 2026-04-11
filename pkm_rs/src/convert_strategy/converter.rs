@@ -3,6 +3,7 @@ use crate::format::PkmFormat;
 use crate::location::{Location, MetData};
 use crate::ohpkm::OhpkmV2;
 
+use pkm_rs_resources::lookup;
 use pkm_rs_types::Stats8;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -25,17 +26,20 @@ impl PkmConverter {
     }
 
     pub fn nickname(&self, ohpkm: &OhpkmV2) -> String {
-        if !ohpkm.nickname_matches_species_eng() {
+        if !ohpkm.nickname_matches_species() {
             return ohpkm.get_nickname().to_owned();
         }
 
+        let national_dex = ohpkm.species_and_form().get_ndex();
+        let species_name = lookup::species_name(national_dex, ohpkm.language()).to_owned();
+
         match self.strategy.nickname_capitalization {
-            super::NicknameCapitalization::Modern => ohpkm.species_metadata().name.to_owned(),
+            super::NicknameCapitalization::Modern => species_name,
             super::NicknameCapitalization::GameDefault => {
                 if self.dest_pkm_format.species_nickname_all_caps() {
-                    ohpkm.species_metadata().name.to_uppercase()
+                    species_name.to_uppercase()
                 } else {
-                    ohpkm.species_metadata().name.to_owned()
+                    species_name
                 }
             }
         }

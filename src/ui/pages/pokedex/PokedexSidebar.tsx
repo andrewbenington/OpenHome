@@ -1,7 +1,7 @@
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { Pokedex } from '@openhome-ui/util/pokedex'
-import { all_species_data, FormMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
+import { all_species_data, FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { CSSProperties, useEffect, useMemo, useRef } from 'react'
 import './style.css'
@@ -31,7 +31,11 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
   const filteredSpecies = useMemo(
     () =>
       Object.values(ALL_SPECIES_DATA).filter(
-        (mon) => !filter || mon.name.toUpperCase().startsWith(filter?.trim().toUpperCase())
+        (mon) =>
+          !filter ||
+          Lookup.speciesName(mon.nationalDex, Language.English)
+            .toUpperCase()
+            .startsWith(filter?.trim().toUpperCase())
       ),
     [ALL_SPECIES_DATA, filter]
   )
@@ -133,7 +137,7 @@ function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabPr
           style={{ minWidth: 32, height: 36 }} // leave this alone
         />
       </div>
-      {species.nationalDex}. {species.name}
+      {species.nationalDex}. {Lookup.speciesName(species.nationalDex, Language.English)}
       <div style={{ flex: 1 }} />
       {maxStatus === 'ShinyCaught' && (
         <img

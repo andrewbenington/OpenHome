@@ -1,3 +1,4 @@
+mod pkhex_text;
 mod result;
 
 pub mod abilities;
@@ -6,12 +7,14 @@ pub mod helpers;
 pub mod items;
 pub mod language;
 pub mod levelup;
+pub mod lookup;
 pub mod moves;
 pub mod natures;
 pub mod restrictions;
 pub mod ribbons;
 pub mod species;
 pub mod stats;
+pub mod text_resource;
 
 pub use result::*;
 

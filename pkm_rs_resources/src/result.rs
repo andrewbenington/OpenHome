@@ -6,6 +6,7 @@ use crate::abilities::ABILITY_MAX;
 use crate::items::ITEM_MAX;
 use crate::language::LANGUAGE_MAX;
 use crate::natures::NATURE_MAX;
+use crate::pkhex_text;
 use crate::species::{NATIONAL_DEX_MAX, NatDexIndex};
 
 #[derive(Debug)]
@@ -65,7 +66,7 @@ impl Display for Error {
                 let species_metadata = national_dex.get_species_metadata();
                 format!(
                     "Invalid form index {form_index} for Pokémon {} (must be <= {})",
-                    species_metadata.name,
+                    pkhex_text::species_name_en(*national_dex),
                     species_metadata.forms.len()
                 )
                 .to_owned()

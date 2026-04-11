@@ -3,7 +3,7 @@
   "sanity": 0,
   "checksum": 21812,
   "species_and_form": {
-    "national_dex": "745 (Lycanroc)",
+    "national_dex": 745,
     "form_index": 1
   },
   "held_item_index": 218,
@@ -43,7 +43,9 @@
   "resort_event_status": 0,
   "pokerus_byte": 0,
   "super_training_flags": 0,
-  "ribbons": ["Alola Champion Ribbon"],
+  "ribbons": [
+    "Alola Champion Ribbon"
+  ],
   "contest_memory_count": 0,
   "battle_memory_count": 0,
   "super_training_dist_flags": 0,

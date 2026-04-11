@@ -1,5 +1,5 @@
 import { Pokedex, PokedexStatus } from '@openhome-ui/util/pokedex'
-import { FormMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
+import { FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
 
 export function getHighestFormeStatus(
   pokedex: Pokedex,
@@ -39,7 +39,10 @@ export const StatusIndices: Record<PokedexStatus, number> = {
 
 export function getPokedexSummary(species: SpeciesMetadata, form: FormMetadata) {
   const types = form.type2 ? `${form.type1}- and ${form.type2}-type` : `${form.type1}-type`
-  const name = form.formIndex === 0 ? species.name : form.formeName
+  const name =
+    form.formIndex === 0
+      ? Lookup.speciesName(species.nationalDex, Language.English)
+      : form.formeName
   const formeType =
     form.formIndex === 0 ? getBaseFormDescriptor(species) : form.isMega ? 'Mega Evolution' : 'form'
   let text = `${name} is a ${types} ${formeType} introduced in Generation ${form.introducedGen}.`

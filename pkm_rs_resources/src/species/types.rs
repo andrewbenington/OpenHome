@@ -16,8 +16,6 @@ use pkm_rs_types::randomize::Randomize;
 use rand::RngExt;
 
 #[cfg(feature = "wasm")]
-use crate::log;
-#[cfg(feature = "wasm")]
 use crate::species::form_metadata::current_base_stats;
 #[cfg(feature = "wasm")]
 use crate::species::form_metadata::{BaseStats, base_stats_lookup};
@@ -104,8 +102,7 @@ impl Serialize for NatDexIndex {
     where
         S: Serializer,
     {
-        let message = format!("{} ({})", self.get(), self.get_species_metadata().name);
-        serializer.serialize_str(&message)
+        serializer.serialize_u16(self.get())
     }
 }
 
@@ -336,9 +333,6 @@ pub enum EggGroup {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone)]
 pub struct FormMetadata {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub species_name: &'static str,
-
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = nationalDex))]
     pub national_dex: NatDexIndex,
 
@@ -459,13 +453,6 @@ impl FormMetadata {
     #[cfg(feature = "wasm")]
     fn has_data_for_source(&self, source: MetadataSource) -> bool {
         use crate::species::form_metadata::source_has_form_metadata;
-
-        log!(
-            "checking if {} form {} has data for source {:?}",
-            self.species_name,
-            self.form_name,
-            source
-        );
         source_has_form_metadata(source, self.national_dex.get(), self.form_index)
     }
 
@@ -474,8 +461,9 @@ impl FormMetadata {
         source: Option<MetadataSource>,
     ) -> (PkmType, Option<PkmType>) {
         types_lookup(self.national_dex.get(), self.form_index, source).expect_log(format!(
-            "no types found for {} form {}",
-            self.species_name, self.form_name
+            "no types found for nat dex {} form {}",
+            self.national_dex.get(),
+            self.form_index
         ))
     }
 
@@ -569,11 +557,6 @@ impl FormMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn evolutions(&self) -> Vec<SpeciesAndForm> {
         self.evolutions.to_vec()
-    }
-
-    #[wasm_bindgen(getter = speciesName)]
-    pub fn species_name(&self) -> String {
-        self.species_name.to_owned()
     }
 
     #[wasm_bindgen(getter = formeName)]
@@ -678,8 +661,6 @@ pub struct MegaEvolutionMetadata {
 #[derive(Debug, Clone)]
 pub struct SpeciesMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub name: &'static str,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub national_dex: NatDexIndex,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub level_up_type: LevelUpType,
@@ -700,11 +681,6 @@ impl SpeciesMetadata {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
 impl SpeciesMetadata {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    pub fn name(&self) -> String {
-        self.name.to_owned()
-    }
-
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn forms(&self) -> Vec<FormMetadata> {
         Vec::from(self.forms)

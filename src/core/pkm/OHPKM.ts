@@ -9,6 +9,7 @@ import {
   Item,
   Language,
   Languages,
+  Lookup,
   MetadataSummaryLookup,
   NatureIndex,
   PokeDate,
@@ -132,7 +133,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.movePPUps = other.movePPUps as FourMoves
 
       this.nickname = other.nickname
-      if (other.language === Language.English && this.nicknameMatchesSpeciesEnglishIgnoreCase()) {
+      if (this.nicknameMatchesSpeciesIgnoreCase()) {
         this.resetNicknameToSpecies()
       }
 
@@ -213,7 +214,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       // Gen 4+
       this.isNicknamed = other.isNicknamed ?? true
-      if (this.language === Language.English && this.nicknameMatchesSpeciesEnglishIgnoreCase()) {
+      if (this.nicknameMatchesSpecies()) {
         this.isNicknamed = false
       }
 
@@ -696,16 +697,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (
       other.nickname !== this.nickname &&
       other.nickname !== this.nickname.slice(0, 10) &&
-      !isPrevoSpeciesName(this.dexNum, this.formNum, other.nickname)
+      !isPrevoSpeciesName(this.dexNum, this.formNum, other.nickname, this.language)
     ) {
       this.nickname = other.nickname
     }
 
-    if (
-      isPrevoSpeciesName(this.dexNum, this.formNum, this.nickname) &&
-      this.metadata?.speciesName
-    ) {
-      this.nickname = this.metadata.speciesName
+    if (isPrevoSpeciesName(this.dexNum, this.formNum, this.nickname, this.language)) {
+      this.nickname = Lookup.speciesName(this.dexNum, this.language)
     }
 
     this.heldItemIndex = other.heldItemIndex
@@ -1012,9 +1010,16 @@ const FORMATS_WITHOUT_ABILITIES = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
 
 const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
 
-function isPrevoSpeciesName(dexNum: number, formNum: number, nickname: string): boolean {
+function isPrevoSpeciesName(
+  dexNum: number,
+  formNum: number,
+  nickname: string,
+  language: Language
+): boolean {
   for (const prevo of getPrevos(dexNum, formNum)) {
-    if (nickname.toUpperCase() === prevo.speciesName.toUpperCase()) {
+    if (
+      nickname.toUpperCase() === Lookup.speciesName(prevo.nationalDex.index, language).toUpperCase()
+    ) {
       return true
     }
   }

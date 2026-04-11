@@ -10,7 +10,7 @@ public static class Util
 
   public static object SpeciesAndForm(PKM pk)
   {
-    return new { national_dex = pk.Species.ToString() + " (" + SpeciesName.GetSpeciesNameGeneration(pk.Species, pk.Language, pk.Format) + ")", form_index = pk.Form };
+    return new { national_dex = pk.Species, form_index = pk.Form };
   }
 
   public static string FormatAbilityNum(int abilityNum)

@@ -4,6 +4,7 @@ import {
   ItemGen1,
   Language,
   Languages,
+  Lookup,
   MetadataSummaryLookup,
   OriginGames,
   SpeciesLookup,
@@ -99,7 +100,7 @@ export default class PK1 {
       if (dataView.byteLength >= 66) {
         this.nickname = stringLogic.readGameBoyStringFromBytes(dataView, 0x37, 11)
       } else {
-        this.nickname = this.speciesMetadata?.name ?? ''
+        this.nickname = Lookup.speciesName(this.dexNum, this.language)
       }
     } else {
       const converter = new PkmConverter(this.format, options.strategy)
