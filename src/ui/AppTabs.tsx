@@ -31,13 +31,11 @@ export default function AppTabs() {
   return (
     <Tabs.Root
       value={tab}
-      style={{
-        height: '100vh',
-      }}
+      style={{ height: '100vh' }}
       orientation="vertical"
       onValueChange={(tab) => navigate(tab)}
     >
-      <Flex style={{ height: '100vh ' }}>
+      <Flex style={{ height: '100vh' }}>
         <Tabs.IconList className="tab-sidebar">
           <Tabs.Tab value="home">
             <RiHome2Fill className="active-tab" />
@@ -66,32 +64,34 @@ export default function AppTabs() {
           <Tabs.Indicator />
         </Tabs.IconList>
         <Separator className="Separator" orientation="vertical" />
-        <Box>
-          <Routes>
-            <Route index path="/" element={homeElement} />
-            <Route path="/home" element={homeElement} />
-            <Route path="/manage/*" element={<TrackedPokemonPage />} />
-            <Route path="/sort" element={<SortPokemon />} />
-            <Route path="/pokedex" element={<PokedexDisplay />} />
-            <Route path="/plugins/*" element={<PluginsPage />} />
-            <Route path="/settings/*" element={<Settings />} />
+        <Box style={{ flex: 1, width: '100%', height: '100%', overflowY: 'hidden' }}>
+          <div style={{ height: '100%' }}>
+            <Routes>
+              <Route index path="/" element={homeElement} />
+              <Route path="/home" element={homeElement} />
+              <Route path="/manage/*" element={<TrackedPokemonPage />} />
+              <Route path="/sort" element={<SortPokemon />} />
+              <Route path="/pokedex" element={<PokedexDisplay />} />
+              <Route path="/plugins/*" element={<PluginsPage />} />
+              <Route path="/settings/*" element={<Settings />} />
+              {isDev && (
+                <>
+                  <Route path="/state" element={<AppStateDisplay />} />
+                  <Route path="/component-debug" element={<ComponentDebugDisplay />} />
+                </>
+              )}
+            </Routes>
             {isDev && (
               <>
-                <Route path="/state" element={<AppStateDisplay />} />
-                <Route path="/component-debug" element={<ComponentDebugDisplay />} />
+                <Tabs.Panel value="state">
+                  <AppStateDisplay />
+                </Tabs.Panel>
+                <Tabs.Panel value="theme">
+                  <ThemePanel />
+                </Tabs.Panel>
               </>
             )}
-          </Routes>
-          {isDev && (
-            <>
-              <Tabs.Panel value="state">
-                <AppStateDisplay />
-              </Tabs.Panel>
-              <Tabs.Panel value="theme">
-                <ThemePanel />
-              </Tabs.Panel>
-            </>
-          )}
+          </div>
         </Box>
       </Flex>
     </Tabs.Root>

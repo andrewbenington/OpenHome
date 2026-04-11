@@ -94,7 +94,7 @@
     var(--color-gray-300) 0px 0px 0px 1px,
     var(--color-gray-500) 0px 0px 0px 1px inset;
   transition-property: translate;
-  transition-duration: 100ms;
+  transition-duration: 200ms;
   transition-timing-function: ease-in-out;
 }
 
