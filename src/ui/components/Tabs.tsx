@@ -6,7 +6,7 @@ import {
   TabsRootProps,
   TabsTabProps,
 } from '@base-ui/react/tabs'
-import './index.css'
+import './Tabs.css'
 
 export const Tabs = {
   Root: (props: TabsRootProps) => <BaseUiTabs.Root {...props} className="Tabs" />,

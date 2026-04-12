@@ -236,6 +236,7 @@ label {
 @media (prefers-color-scheme: light) {
   .radix-themes {
     --color-panel: var(--color-light-panel);
+    --color-bar: var(--color-light-panel);
     --color-background: var(--color-light-background);
   }
 }
@@ -243,6 +244,7 @@ label {
 @media (prefers-color-scheme: dark) {
   .radix-themes {
     --color-panel: var(--color-dark-panel);
+    --color-bar: var(--color-dark-panel);
     --color-background: var(--color-dark-background);
   }
 }

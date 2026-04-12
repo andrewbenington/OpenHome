@@ -5,7 +5,7 @@
   z-index: 0;
   padding: 0.5rem;
   gap: 0.5rem;
-  background-color: var(--color-panel);
+  background-color: var(--color-bar);
 }
 
 .IconList {
@@ -128,6 +128,6 @@
 }
 
 .Separator {
-  width: 1px;
+  width: 0.5px;
   background-color: var(--color-gray-500);
 }
