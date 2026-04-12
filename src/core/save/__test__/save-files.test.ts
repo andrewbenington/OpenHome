@@ -136,28 +136,9 @@ describe('Handler trainers', () => {
 
     // Trade back to Emerald
     original.tradeToSave(emeraldSave)
-    expect(original.handlerName).toBeNullable()
+    expect(original.handlerName).toBe('')
+    expect(original.handlerAffection).toBe(0)
+    expect(original.handlerFriendship).toBe(0)
     expect(original.isCurrentHandler).toBe(false)
   })
 })
-
-// describe('Save file detection - multiple possibilities', () => {
-//   for (const [fileName, gameNames] of Object.entries(possibleSaveTypesByFilename)) {
-//     test(`${fileName} should be one of Pokémon ${gameNames.join(', ')}`, () => {
-//       const possibilities = getPossibleSaveTypes(
-//         new Uint8Array(fs.readFileSync(path.join(__dirname, 'save-files', fileName))),
-//         allSaveTypes
-//       )
-//       expect(
-//         possibilities
-//           .map((p) => p.saveTypeName)
-//           .map(removePokemonPrefix)
-//           .toSorted()
-//       ).toEqual(gameNames.toSorted())
-//     })
-//   }
-// })
-
-// function removePokemonPrefix(str: string) {
-//   return str.replace(/Pokémon\s/i, '')
-// }
