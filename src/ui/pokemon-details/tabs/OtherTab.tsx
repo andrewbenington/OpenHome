@@ -107,6 +107,9 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           }
         >
           <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
+          <AttributeRow label="Actual ID" indent={10}>
+            <code>{`${u16Display(mon.trainerID)}`}</code>
+          </AttributeRow>
           {mon.secretID !== undefined && (
             <AttributeRow label="Secret ID" indent={10}>
               <code>{`${u16Display(mon.secretID)}`}</code>
@@ -117,6 +120,25 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           )}
           {!!mon.trainerAffection && (
             <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
+          )}
+        </AttributeRowExpand>
+        <AttributeRowExpand
+          summary="Last Handler"
+          value={
+            <Flex gap="1">
+              {mon.handlerName ?? '(empty)'}
+              <GenderIcon gender={genderFromBool(mon.handlerGender ?? false)} />
+            </Flex>
+          }
+        >
+          <AttributeRow label="Handler ID" indent={10}>
+            <code>{`${u16Display(mon.handlerID ?? 0)}`}</code>
+          </AttributeRow>
+          {!!mon.handlerFriendship && (
+            <AttributeRow label="Friendship" value={mon.handlerFriendship.toString()} indent={10} />
+          )}
+          {!!mon.handlerAffection && (
+            <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
           )}
         </AttributeRowExpand>
         {mon instanceof OHPKM && (

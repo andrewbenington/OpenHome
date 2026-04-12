@@ -45,7 +45,7 @@ export class SwShSAV extends G89SAV<PK8> {
 
     this.tid = this.trainerBlock.getTID()
     this.sid = this.trainerBlock.getSID()
-    this.displayID = (this.trainerBlock.getFullID() % 1000000).toString().padStart(6, '0')
+    this.displayID = this.trainerBlock.getFullID().toString().slice(-6).padStart(6, '0')
     this.origin = this.trainerBlock.getGame()
   }
 
@@ -167,6 +167,10 @@ export class SwShSAV extends G89SAV<PK8> {
 
   get trainerGender(): Gender {
     return this.trainerBlock.getGender() ? Gender.Female : Gender.Male
+  }
+
+  get language() {
+    return this.trainerBlock.getLanguage()
   }
 }
 
