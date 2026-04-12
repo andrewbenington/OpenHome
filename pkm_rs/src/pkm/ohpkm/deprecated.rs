@@ -1,5 +1,5 @@
+use crate::pkm::ohpkm::OhpkmSectionTag;
 use crate::pkm::ohpkm::sectioned_data::DataSection;
-use crate::pkm::ohpkm::{OhpkmSectionTag, OhpkmV1};
 use crate::pkm::traits::{OhpkmByte, OhpkmBytes};
 use crate::pkm::{Error, Result};
 
@@ -33,24 +33,6 @@ pub struct PastHandlerDataV1 {
 }
 
 impl PastHandlerDataV1 {
-    pub fn from_v1(old: OhpkmV1) -> Option<Self> {
-        if !old.handler_name.is_empty() {
-            Some(PastHandlerDataV1 {
-                id: NonZeroU16::new(old.handler_id),
-                secret_id: None,
-                name: old.handler_name,
-                friendship: old.handler_friendship,
-                memory: old.handler_memory,
-                affection: old.handler_affection,
-                gender: Gender::from(old.handler_gender),
-                origin_game: None,
-                origin_plugin: None,
-            })
-        } else {
-            None
-        }
-    }
-
     #[cfg(feature = "wasm")]
     pub fn known_trainer_data_matches(
         &self,
