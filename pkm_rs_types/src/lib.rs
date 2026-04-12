@@ -1,4 +1,5 @@
 mod games;
+mod language;
 mod markings;
 mod national_dex;
 mod pkm_types;
@@ -8,6 +9,7 @@ mod structures;
 mod util;
 
 pub use games::*;
+pub use language::*;
 pub use markings::*;
 pub use national_dex::*;
 pub use pkm_types::*;

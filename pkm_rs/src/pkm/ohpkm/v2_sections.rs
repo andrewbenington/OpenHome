@@ -1,17 +1,17 @@
 use crate::pkm::ohpkm::extra_form::ExtraFormIndex;
 use crate::pkm::ohpkm::sectioned_data::DataSection;
-use crate::pkm::ohpkm::{OhpkmV1, SectionTagV2};
+use crate::pkm::ohpkm::{OhpkmSectionTag, OhpkmV1};
 use crate::pkm::traits::{IsShiny4096, OhpkmByte, OhpkmBytes};
 use crate::pkm::{Error, Result, StringErrorSource};
 use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndex;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveSlot;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
+use pkm_rs_types::Language;
 
 #[cfg(feature = "wasm")]
 use crate::pkm::traits::IsShiny;
@@ -370,8 +370,8 @@ fn is_prevo_species_name(species_and_forme: &SpeciesAndForme, name: &str) -> boo
 }
 
 impl DataSection for MainDataV2 {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::MainData;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::MainData;
 
     type ErrorType = Error;
 
@@ -701,8 +701,8 @@ impl GameboyData {
 }
 
 impl DataSection for GameboyData {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::GameboyData;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::GameboyData;
 
     type ErrorType = Error;
 
@@ -765,8 +765,8 @@ impl Gen45Data {
 }
 
 impl DataSection for Gen45Data {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::Gen45Data;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::Gen45Data;
 
     type ErrorType = Error;
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -854,8 +854,8 @@ impl Gen67Data {
 }
 
 impl DataSection for Gen67Data {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::Gen67Data;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::Gen67Data;
 
     type ErrorType = Error;
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -940,8 +940,8 @@ impl SwordShieldData {
 }
 
 impl DataSection for SwordShieldData {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::SwordShield;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::SwordShield;
 
     type ErrorType = Error;
 
@@ -996,8 +996,8 @@ impl BdspData {
 }
 
 impl DataSection for BdspData {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::BdspTmFlags;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::BdspTmFlags;
 
     type ErrorType = Error;
 
@@ -1069,8 +1069,8 @@ impl LegendsArceusData {
 }
 
 impl DataSection for LegendsArceusData {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::LegendsArceus;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::LegendsArceus;
 
     type ErrorType = Error;
 
@@ -1159,8 +1159,8 @@ impl ScarletVioletData {
 }
 
 impl DataSection for ScarletVioletData {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::ScarletViolet;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::ScarletViolet;
 
     type ErrorType = Error;
 
@@ -1199,9 +1199,10 @@ impl DataSection for ScarletVioletData {
     }
 }
 
+#[deprecated(since = "1.10.4", note = "please use `PastHandlerDataV2` instead")]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Serialize, Clone)]
-pub struct PastHandlerData {
+pub struct PastHandlerDataV1 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub id: Option<NonZeroU16>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -1217,10 +1218,10 @@ pub struct PastHandlerData {
     pub origin_plugin: Option<String>,
 }
 
-impl PastHandlerData {
+impl PastHandlerDataV1 {
     pub fn from_v1(old: OhpkmV1) -> Option<Self> {
         if !old.handler_name.is_empty() {
-            Some(PastHandlerData {
+            Some(PastHandlerDataV1 {
                 id: NonZeroU16::new(old.handler_id),
                 secret_id: None,
                 name: old.handler_name,
@@ -1275,7 +1276,7 @@ impl PastHandlerData {
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 #[allow(clippy::too_many_arguments)]
-impl PastHandlerData {
+impl PastHandlerDataV1 {
     #[wasm_bindgen(getter)]
     pub fn id(&self) -> Option<u16> {
         self.id.map(NonZeroU16::get)
@@ -1327,7 +1328,7 @@ impl PastHandlerData {
     }
 }
 
-impl From<TrainerData> for PastHandlerData {
+impl From<TrainerData> for PastHandlerDataV1 {
     fn from(other: TrainerData) -> Self {
         Self {
             id: NonZeroU16::new(other.id),
@@ -1343,15 +1344,15 @@ impl From<TrainerData> for PastHandlerData {
     }
 }
 
-impl DataSection for PastHandlerData {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::PastHandler;
+impl DataSection for PastHandlerDataV1 {
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::PastHandlerV1;
 
     type ErrorType = Error;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        let origin_plugin = if bytes.len() > SectionTagV2::PastHandler.min_size() {
-            String::from_utf8(bytes[SectionTagV2::PastHandler.min_size()..].to_vec()).ok()
+        let origin_plugin = if bytes.len() > OhpkmSectionTag::PastHandlerV1.min_size() {
+            String::from_utf8(bytes[OhpkmSectionTag::PastHandlerV1.min_size()..].to_vec()).ok()
         } else {
             None
         };
@@ -1419,8 +1420,8 @@ impl MostRecentSave {
 }
 
 impl DataSection for MostRecentSave {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::MostRecentSave;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::MostRecentSave;
 
     type ErrorType = Error;
 
@@ -1522,8 +1523,8 @@ impl PluginData {
 }
 
 impl DataSection for PluginData {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::PluginData;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::PluginData;
 
     type ErrorType = Error;
 
@@ -1545,8 +1546,8 @@ impl DataSection for PluginData {
 pub struct Notes(pub String);
 
 impl DataSection for Notes {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::Notes;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::Notes;
 
     type ErrorType = Error;
 
@@ -1582,8 +1583,8 @@ pub struct MonTag {
 pub struct MonTags(pub Vec<MonTag>);
 
 impl DataSection for MonTags {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::Tag;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::Tag;
 
     type ErrorType = Error;
 

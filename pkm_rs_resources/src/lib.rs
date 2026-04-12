@@ -3,7 +3,6 @@ mod result;
 pub mod abilities;
 pub mod ball;
 pub mod items;
-pub mod language;
 pub mod levelup;
 pub mod moves;
 pub mod natures;

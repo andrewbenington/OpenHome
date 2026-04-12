@@ -1,6 +1,6 @@
 use crate::pkm::{
     Error, Result,
-    ohpkm::{SectionTagV2, sectioned_data::DataSection},
+    ohpkm::{OhpkmSectionTag, sectioned_data::DataSection},
 };
 use strum_macros::Display;
 
@@ -261,8 +261,8 @@ impl OriginalBackup {
 }
 
 impl DataSection for OriginalBackup {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::OriginalBackup;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::OriginalBackup;
 
     type ErrorType = Error;
 
@@ -291,8 +291,8 @@ impl UnconvertedPkm {
 }
 
 impl DataSection for UnconvertedPkm {
-    type TagType = SectionTagV2;
-    const TAG: Self::TagType = SectionTagV2::UnconvertedPkm;
+    type TagType = OhpkmSectionTag;
+    const TAG: Self::TagType = OhpkmSectionTag::UnconvertedPkm;
 
     type ErrorType = Error;
 

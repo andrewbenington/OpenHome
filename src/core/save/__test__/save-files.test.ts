@@ -1,6 +1,10 @@
 import { R } from '@openhome-core/util/functional'
-import fs from 'fs'
-import path from 'path'
+import { ConvertStrategies } from '@pkm-rs/pkg'
+import { PK7 } from '@pokemon-files/pkm'
+import { fail } from 'assert'
+import fs, { readFileSync } from 'fs'
+import path, { resolve } from 'path'
+import { OHPKM } from 'src/core/pkm/OHPKM'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { BW2SAV } from '../BW2SAV'
 import { BWSAV } from '../BWSAV'
@@ -18,7 +22,7 @@ import { SMSAV } from '../SMSAV'
 import { G3UBSAV } from '../unbound/G3UBSAV'
 import { USUMSAV } from '../USUMSAV'
 import { buildUnknownSaveFile } from '../util/load'
-import { emptyPathData } from '../util/path'
+import { emptyPathData, PathData } from '../util/path'
 import { XYSAV } from '../XYSAV'
 import { initializeWasm } from './init'
 
@@ -76,6 +80,65 @@ describe('Save file detection - single possibility', () => {
       expect(saveFile?.gameName).toBe(gameName)
     })
   }
+})
+
+describe('Handler trainers', () => {
+  let ultraSunSave: USUMSAV
+  let emeraldSave: G3SAV
+  let saveBytes: Uint8Array
+
+  beforeAll(() => {
+    const savePath = resolve(__dirname, 'save-files/ultrasun')
+
+    saveBytes = new Uint8Array(readFileSync(savePath))
+
+    const parsedPath: PathData = {
+      raw: 'save-files/ultrasun',
+      name: 'ultrasun',
+      dir: 'save-files',
+      ext: '',
+      separator: '/',
+    }
+
+    ultraSunSave = new USUMSAV(parsedPath, saveBytes)
+
+    emeraldSave = new G3SAV(
+      emptyPathData,
+      readFileSync(path.join(__dirname, 'save-files', 'emerald.sav'))
+    )
+
+    if (emeraldSave === undefined) {
+      fail(`Failed to build save file: got undefined`)
+      return
+    }
+  })
+
+  test('handler trainer data is preserved through OHPKM', () => {
+    const pk3 = emeraldSave.getMonAt(5, 0)
+    if (!pk3) {
+      fail('No PK3 found in Emerald save at box 0 slot 0')
+    }
+
+    expect(pk3.trainerID).toBe(emeraldSave.tid)
+    const original = OHPKM.fromMonInSave(pk3, emeraldSave)
+
+    // Trade to Ultra Sun
+    original.tradeToSave(ultraSunSave)
+    // Ultra Sun trainer should be in handlers list
+    expect(original.handlers.map((h) => h.id)).toContain(ultraSunSave.tid)
+    expect(original.handlerName).toBe(ultraSunSave.name)
+    expect(original.isCurrentHandler).toBeTruthy()
+
+    // Ultra Sun trainer should be in handlers list
+    const pk7 = PK7.fromOhpkm(original, ConvertStrategies.getDefault())
+    expect(pk7.handlerName).toBe(ultraSunSave.name)
+    expect(pk7.isCurrentHandler).toBeTruthy()
+
+    // Trade back to Emerald
+    original.tradeToSave(emeraldSave)
+    expect(original.handlerName).toBeNullable()
+    expect(original.isCurrentHandler).toBe(false)
+  })
 })
 
 // describe('Save file detection - multiple possibilities', () => {

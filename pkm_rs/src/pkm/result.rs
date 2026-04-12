@@ -2,9 +2,11 @@ use crate::pkm::ohpkm::sectioned_data;
 
 use std::fmt::{Display};
 use std::string::FromUtf8Error;
+use pkm_rs_types::LANGUAGE_MAX;
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
-use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, language::LANGUAGE_MAX, items::ITEM_MAX};
+use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, items::ITEM_MAX};
 use serde::{Serialize, Serializer};
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::JsValue;
 
@@ -324,5 +326,29 @@ pub type Result<T> = core::result::Result<T, Error>;
 impl From<Error> for JsValue {
     fn from(value: Error) -> Self {
         value.to_string().into()
+    }
+}
+
+impl From<pkm_rs_types::Error> for Error {
+    fn from(value: pkm_rs_types::Error) -> Self {
+        match value {
+            pkm_rs_types::Error::BufferSize {
+                field,
+                offset,
+                buffer_size,
+            } => Self::BufferSize {
+                field,
+                expected: offset,
+                received: buffer_size,
+            },
+            pkm_rs_types::Error::ByteLength { expected, received } => Self::BufferSize {
+                field: String::from("(unknown pkm_rs_types field"),
+                expected,
+                received,
+            },
+            pkm_rs_types::Error::LanguageIndex { language_index } => {
+                Self::LanguageIndex { language_index }
+            }
+        }
     }
 }
