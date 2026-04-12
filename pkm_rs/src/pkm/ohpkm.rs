@@ -1,3 +1,4 @@
+mod deprecated;
 mod extra_form;
 mod v1;
 mod v2;

@@ -1,14 +1,15 @@
 use crate::pkm::ohpkm::OhpkmV1;
+use crate::pkm::ohpkm::deprecated::PastHandlerDataV1;
 use crate::pkm::ohpkm::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::pkm::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, UnconvertedPkm};
 use crate::pkm::ohpkm::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MonTags,
-    MostRecentSave, Notes, PastHandlerDataV1, PluginData, ScarletVioletData, SwordShieldData,
+    MostRecentSave, Notes, PluginData, ScarletVioletData, SwordShieldData,
 };
 use crate::pkm::{Error, Result};
 
 use pkm_rs_resources::species::SpeciesMetadata;
-use pkm_rs_types::{HyperTraining, Language, OriginGame, Stats8};
+use pkm_rs_types::{HyperTraining, OriginGame, Stats8};
 use strum_macros::Display;
 
 #[cfg(feature = "wasm")]
@@ -18,7 +19,7 @@ use wasm_bindgen::prelude::*;
 use crate::pkm::ohpkm::v2_sections::pkm_bytes::{self, PkmBytes};
 
 #[cfg(feature = "wasm")]
-use pkm_rs_types::TrainerData;
+use pkm_rs_types::{Language, TrainerData};
 
 #[cfg(feature = "wasm")]
 use crate::pkm::ohpkm::v2_sections::MonTag;
