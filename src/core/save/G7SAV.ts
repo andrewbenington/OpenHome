@@ -5,7 +5,7 @@ import {
   uint16ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConverter'
-import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK7 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
@@ -159,6 +159,10 @@ export abstract class G7SAV extends OfficialSAV<PK7> {
     return {
       'Calculated Checksum': this.calculateChecksumStr(),
     }
+  }
+
+  get language(): Language {
+    return this.bytes[this.trainerDataOffset + 0x35]
   }
 }
 

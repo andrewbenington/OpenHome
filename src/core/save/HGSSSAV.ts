@@ -1,7 +1,7 @@
 import { bytesToUint16LittleEndian } from '@openhome-core/save/util/byteLogic'
 import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { Item } from '@pokemon-resources/consts/Items'
 import { HGSS_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
@@ -105,5 +105,9 @@ export class HGSSSAV extends G4SAV {
 
   static includesOrigin(origin: OriginGame) {
     return origin === OriginGame.HeartGold || origin === OriginGame.SoulSilver
+  }
+
+  get language(): Language {
+    return this.bytes[HGSSSAV.TRAINER_ID_OFFSET + 0x19]
   }
 }

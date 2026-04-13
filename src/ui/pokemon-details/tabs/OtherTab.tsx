@@ -97,6 +97,13 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <code>{(mon.encryptionConstant & 0x3e000) >> (0xd % 24)}</code>
           </AttributeRow>
         )}
+        <AttributeRow label="Current Handler:">
+          {mon.isCurrentHandler ? (
+            (mon.handlerName ?? 'Unknown') + ' (not OT)'
+          ) : (
+            <b>{mon.trainerName + ' (OT)'}</b>
+          )}
+        </AttributeRow>
         <AttributeRowExpand
           summary="Original Trainer"
           value={

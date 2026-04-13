@@ -34,19 +34,21 @@ export class SwShSAV extends G89SAV<PK8> {
   static saveTypeName = 'Pokémon Sword/Shield'
   static saveTypeID = 'SwShSAV'
 
-  trainerBlock: TrainerBlock
+  myStatusBlock: MyStatusBlock
+  trainerCardBlock: TrainerCardBlock
   origin: OriginGame
 
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
 
-    this.trainerBlock = new TrainerBlock(this.getBlockMust('TrainerCard', 'object'))
-    this.name = this.trainerBlock.getName()
+    this.myStatusBlock = new MyStatusBlock(this.getBlockMust('MyStatus', 'object'))
+    this.trainerCardBlock = new TrainerCardBlock(this.getBlockMust('TrainerCard', 'object'))
+    this.name = this.myStatusBlock.getName()
 
-    this.tid = this.trainerBlock.getTID()
-    this.sid = this.trainerBlock.getSID()
-    this.displayID = this.trainerBlock.getFullID().toString().slice(-6).padStart(6, '0')
-    this.origin = this.trainerBlock.getGame()
+    this.tid = this.myStatusBlock.getTID()
+    this.sid = this.myStatusBlock.getSID()
+    this.displayID = this.myStatusBlock.getFullID().toString().slice(-6).padStart(6, '0')
+    this.origin = this.myStatusBlock.getGame()
   }
 
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK8 {
@@ -136,21 +138,19 @@ export class SwShSAV extends G89SAV<PK8> {
   }
 
   getDisplayData() {
-    const trainerBlock = this.trainerBlock
-
-    const pokedexOwned = trainerBlock.getPokeDexOwned()
+    const pokedexOwned = this.trainerCardBlock.getPokeDexOwned()
 
     if (pokedexOwned === 0xffff) {
       return { Status: 'New Save File' }
     }
 
     return {
-      'Player Character': trainerBlock.getGender() ? 'Gloria' : 'Victor',
+      'Player Character': this.myStatusBlock.getGender() ? 'Gloria' : 'Victor',
       'Save Version': this.getSaveRevision(),
-      Language: Languages.stringFromByte(trainerBlock.getLanguage()),
+      Language: Languages.stringFromByte(this.myStatusBlock.getLanguage()),
       Pokédex: pokedexOwned,
-      'Shiny Pokémon Found': trainerBlock.getShinyPokemonFound(),
-      Starter: trainerBlock.getStarter(),
+      'Shiny Pokémon Found': this.trainerCardBlock.getShinyPokemonFound(),
+      Starter: this.trainerCardBlock.getStarter(),
     }
   }
 
@@ -166,15 +166,16 @@ export class SwShSAV extends G89SAV<PK8> {
   }
 
   get trainerGender(): Gender {
-    return this.trainerBlock.getGender() ? Gender.Female : Gender.Male
+    return this.myStatusBlock.getGender() ? Gender.Female : Gender.Male
   }
 
   get language() {
-    return this.trainerBlock.getLanguage()
+    return this.myStatusBlock.getLanguage()
   }
 }
 
 const BlockKeys = {
+  MyStatus: 0xf25c070e,
   TeamNames: 0x1920c1e4,
   TeamIndexes: 0x33f39467,
   BoxLayout: 0x19722c89,
@@ -201,7 +202,7 @@ const BlockKeys = {
   BoxesUnlocked: 0x71825204,
 }
 
-class TrainerBlock {
+class TrainerCardBlock {
   dataView: DataView<ArrayBuffer>
 
   constructor(scBlock: SCObjectBlock) {
@@ -245,5 +246,35 @@ class TrainerBlock {
     }
 
     return 'Not Selected'
+  }
+}
+
+class MyStatusBlock {
+  dataView: DataView<ArrayBuffer>
+
+  constructor(scBlock: SCObjectBlock) {
+    this.dataView = new DataView(scBlock.raw)
+  }
+
+  public getName(): string {
+    return utf16BytesToString(this.dataView.buffer, 0xb0, 24)
+  }
+  public getLanguage(): number {
+    return this.dataView.getUint8(0xa7)
+  }
+  public getFullID(): number {
+    return this.dataView.getUint32(0xa0, true)
+  }
+  public getTID(): number {
+    return this.dataView.getUint16(0xa0, true)
+  }
+  public getSID(): number {
+    return this.dataView.getUint16(0xa2, true)
+  }
+  public getGame(): OriginGame {
+    return this.dataView.getUint8(0xa4)
+  }
+  public getGender(): boolean {
+    return !!(this.dataView.getUint8(0xa5) & 1)
   }
 }

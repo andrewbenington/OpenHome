@@ -34,6 +34,9 @@ export type OhpkmStore = {
   ) => OHPKM
 }
 
+// FALSE IN PRODUCTION
+const FORCE_MISSED_LOOKUP = false
+
 export type OhpkmLookup = (id: string) => OHPKM | undefined
 
 export function useOhpkmStore(): OhpkmStore {
@@ -144,6 +147,7 @@ export function useOhpkmStore(): OhpkmStore {
 
   const loadIfTracked = useCallback(
     (mon: PKMInterface): Option<OHPKM> => {
+      if (FORCE_MISSED_LOOKUP) return undefined
       const format: MonFormat = mon.format as MonFormat
       switch (format) {
         case 'PK1':
