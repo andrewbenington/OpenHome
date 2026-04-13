@@ -2,6 +2,7 @@ import {
   ConvertStrategy,
   ExtraFormIndex,
   Gender,
+  Language,
   luminescentSupportsExtraForm,
   OriginGame,
 } from '@pkm-rs/pkg'
@@ -76,6 +77,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
 
   private _trainerGender?: Gender
   myStatusBlock: MyStatusBlock
+  configBlock: ConfigBlock
 
   constructor(path: PathData, bytes: Uint8Array) {
     super()
@@ -85,6 +87,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
 
     // Parse trainer information
     this.myStatusBlock = new MyStatusBlock(bytes)
+    this.configBlock = new ConfigBlock(bytes)
     this.name = this.myStatusBlock.getName()
 
     const fullTrainerID = this.myStatusBlock.getFullID()
@@ -257,6 +260,10 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   supportsItem(itemIndex: number) {
     return itemIndex <= 1836
   }
+
+  get language() {
+    return this.configBlock.getLanguage()
+  }
 }
 
 // Reads PC box names and layout information from the save file
@@ -306,6 +313,18 @@ class MyStatusBlock {
   public getGame(): OriginGame {
     const origin = this.dataView.getUint8(0x2b)
     return origin === 0 ? OriginGame.BrilliantDiamond : OriginGame.ShiningPearl
+  }
+}
+
+class ConfigBlock {
+  dataView: DataView<ArrayBuffer>
+
+  constructor(saveBytes: Uint8Array) {
+    this.dataView = new DataView(saveBytes.slice(0x79b74, 0x79b74 + 0x40).buffer)
+  }
+
+  public getLanguage(): Language {
+    return this.dataView.getUint32(0x04, true)
   }
 }
 
