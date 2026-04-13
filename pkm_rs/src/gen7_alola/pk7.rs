@@ -3,6 +3,7 @@ use crate::checksum::{Checksum, RefreshChecksum};
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption;
+use crate::gen7_alola::Pk7AbilityIndex;
 use crate::gen7_alola::pk7_buffer::{Pk7BufferMut, Pk7BufferRef};
 use crate::result::{Error, Result};
 use crate::traits::{AsBytesMut, ModernEvs};
@@ -34,9 +35,6 @@ use pkm_rs_resources::abilities::AbilityIndexWasm;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
-
-const NEUROFORCE: u16 = 233;
-type Pk7AbilityIndex = AbilityIndexBounded<NEUROFORCE>;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
@@ -215,7 +213,7 @@ impl Pk7 {
         buf.set_trainer_id(self.trainer_id);
         buf.set_secret_id(self.secret_id);
         buf.set_exp(self.exp);
-        buf.set_ability_index_raw(self.ability_index.to_u16() as u8);
+        buf.set_ability_index(self.ability_index);
         buf.set_ability_num(self.ability_num);
         buf.set_markings(self.markings);
         buf.set_personality_value(self.personality_value);

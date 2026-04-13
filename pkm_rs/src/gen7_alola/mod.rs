@@ -5,7 +5,9 @@ mod save;
 use pk7_buffer::Pk7Buffer;
 
 pub use pk7::*;
-use pkm_rs_resources::{moves::MoveDataOffsets, ribbons::ModernRibbon};
+use pkm_rs_resources::{
+    abilities::AbilityIndexBounded, moves::MoveDataOffsets, ribbons::ModernRibbon,
+};
 pub use save::Gen7AlolaSave;
 
 const BOX_SIZE: usize = 232;
@@ -18,3 +20,6 @@ const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
     pp: 98,
     pp_ups: 102,
 };
+
+const NEUROFORCE: u16 = 233;
+pub type Pk7AbilityIndex = AbilityIndexBounded<NEUROFORCE>;
