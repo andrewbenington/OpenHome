@@ -173,7 +173,6 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   getBoxCount = () => BOX_COUNT
   getMonBoxSizeBytes = () => PB8LUMI.getBoxSize()
   getBoxSizeBytes = () => G8LumiSAV.boxSizeBytes
-  getCurrentBox = () => this.boxes[this.currentPCBox]
   getPluginIdentifier = () => G8LumiSAV.saveTypeID
 
   // Determines which Luminescent Platinum save revision the file matches

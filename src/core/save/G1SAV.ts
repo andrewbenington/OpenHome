@@ -245,11 +245,6 @@ export class G1SAV extends OfficialSAV<PK1> {
   supportsItem(itemIndex: number) {
     return ItemGen1.fromModern(itemIndex) !== undefined
   }
-
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   static saveTypeAbbreviation = 'RBY (Int)'
   static saveTypeName = 'Pokémon Red/Blue/Yellow (INT)'
   static saveTypeID = 'G1SAV'

@@ -126,10 +126,6 @@ export class SwShSAV extends G89SAV<PK8> {
     }
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   getSaveRevision(): SWSH_SAVE_REVISION {
     return this.getBlock('ZukanR2')
       ? 'Crown Tundra'

@@ -296,10 +296,6 @@ export class LGPESAV extends OfficialSAV<PB7> {
     return dataView.getUint16(POKE_LIST_HEADER_CHECKSUM_OFFSET, true)
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   getDisplayData() {
     return {
       'Stored PC Checksum': displayChecksum(this.getStoredPcChecksum()),

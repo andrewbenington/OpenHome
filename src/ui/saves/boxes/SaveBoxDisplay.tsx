@@ -21,7 +21,7 @@ import { useCallback, useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { includeClass } from '../../util/style'
-import { buildBackwardNavigator, buildForwardNavigator } from '../util'
+import { useBoxNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
@@ -39,10 +39,16 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
-  const [selectedIndex, setSelectedIndex] = useState<number>()
   const { dragState, toggleSelection, isSelected } = useDragAndDrop()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
+
+  const {
+    currentSlot: selectedIndex,
+    setCurrentSlot: setSelectedIndex,
+    navigateNext: navigateRight,
+    navigatePrev: navigateLeft,
+  } = useBoxNavigator(save, save.currentPCBox, undefined)
 
   const selectedMon = useMemo(() => {
     if (selectedIndex === undefined || selectedIndex >= save.boxSlotCount) {
@@ -129,16 +135,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       return false
     },
     [dragState?.payload, saveFromIdentifier, save]
-  )
-
-  const navigateRight = useMemo(
-    () => buildForwardNavigator(save, selectedIndex, setSelectedIndex),
-    [save, selectedIndex]
-  )
-
-  const navigateLeft = useMemo(
-    () => buildBackwardNavigator(save, selectedIndex, setSelectedIndex),
-    [save, selectedIndex]
   )
 
   const displayData = useMemo(() => save.getDisplayData?.() ?? {}, [save])

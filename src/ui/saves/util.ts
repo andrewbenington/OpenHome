@@ -1,5 +1,4 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { Box, SAV } from '@openhome-core/save/interfaces'
+import { SAV } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import BackendInterface from '@openhome-ui/backend/backendInterface'
@@ -69,30 +68,30 @@ export function filterEmpty<T>(value: T | null | undefined): value is T {
   return value !== null && value !== undefined
 }
 
-/**
- *
- * Iterates through the box, updating the index with 'incrementFunction'. Returns
- * undefined if the first non-empty slot is at 'index', otherwise returns the index of the
- * first non-empty box slot
- */
-export function getFollowingMon(
-  currentBox: Box<PKMInterface>,
-  incrementFunction: (index: number) => number,
-  index: number
-) {
-  let prevIndex = index
-
+export function getNextFullSlotBoxWrapping(save: SAV, boxNum: number, boxSlot: number): number {
+  let peekSlot = boxSlot
   function slotIsEmpty(index: number) {
-    return currentBox.boxSlots[index] === undefined
+    return save.getMonAt(boxNum, index) === undefined
   }
 
   do {
-    prevIndex = incrementFunction(prevIndex)
-  } while (prevIndex !== index && slotIsEmpty(prevIndex))
+    peekSlot = (peekSlot + 1) % save.boxSlotCount
+  } while (peekSlot !== boxSlot && slotIsEmpty(peekSlot))
 
-  if (prevIndex !== index) {
-    return prevIndex
+  return peekSlot
+}
+
+export function getPrevFullSlotBoxWrapping(save: SAV, boxNum: number, boxSlot: number): number {
+  let peekSlot = boxSlot
+  function slotIsEmpty(index: number) {
+    return save.getMonAt(boxNum, index) === undefined
   }
+
+  do {
+    peekSlot = moduloUnderflowWrap(peekSlot - 1, save.boxSlotCount)
+  } while (peekSlot !== boxSlot && slotIsEmpty(peekSlot))
+
+  return peekSlot
 }
 
 function moduloUnderflowWrap(a: number, b: number): number {
@@ -141,59 +140,25 @@ export function useOpenHomeBoxNavigator() {
   }
 }
 
-export function buildNavigator(
-  incrementFunction: (index: number) => number,
-  save: SAV,
-  currentIndex?: number,
-  callback?: (index?: number) => void
-) {
-  if (currentIndex === undefined) return undefined
-  const nonEmptySlotCount = save.getBoxMonCount(save.currentPCBox)
+export function useBoxNavigator(save: SAV, boxNum: number, boxSlot: Option<number>) {
+  const [currentSlot, setCurrentSlot] = useState<Option<number>>(boxSlot)
 
-  if (nonEmptySlotCount < 2) {
-    return undefined
+  function navigateNext() {
+    if (currentSlot === undefined) return
+    setCurrentSlot(getNextFullSlotBoxWrapping(save, boxNum, currentSlot))
   }
 
-  const currentBox = save.getCurrentBox()
-  return callback
-    ? () => callback(getFollowingMon(currentBox, incrementFunction, currentIndex))
-    : () => getFollowingMon(currentBox, incrementFunction, currentIndex)
-}
+  function navigatePrev() {
+    if (currentSlot === undefined) return
+    setCurrentSlot(getPrevFullSlotBoxWrapping(save, boxNum, currentSlot))
+  }
 
-/**
- *
- * If there are at least two Pokémon in the save's current box, returns a function
- * that gives the next index of a Pokémon (wrapping end to start if necessary).
- * Otherwise returns undefined
- */
-export function buildForwardNavigator(
-  save: SAV,
-  currentIndex?: number,
-  callback?: (index?: number) => void
-) {
-  if (!save || currentIndex === undefined) return undefined
-
-  const boxSize = save.boxColumns * save.boxRows
-  const getNext = (index: number) => (index + 1) % boxSize
-
-  return buildNavigator(getNext, save, currentIndex, callback)
-}
-
-/**
- *
- * If there are at least two Pokémon in the save's current box, returns a function
- * that gives the previous index of a Pokémon (wrapping start to end if necessary).
- * Otherwise returns undefined
- */
-export function buildBackwardNavigator(
-  save: SAV,
-  index?: number,
-  callback?: (index?: number) => void
-) {
-  const boxSize = save.boxColumns * save.boxRows
-  const getPrevious = (index: number) => (index === 0 ? boxSize - 1 : index - 1)
-
-  return buildNavigator(getPrevious, save, index, callback)
+  return {
+    currentSlot,
+    setCurrentSlot,
+    navigateNext,
+    navigatePrev,
+  }
 }
 
 export function buildRecentSaveContextElements(

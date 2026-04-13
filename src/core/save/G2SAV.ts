@@ -275,10 +275,6 @@ export class G2SAV extends OfficialSAV<PK2> {
     return ItemGen2.fromModern(itemIndex) !== undefined
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   static saveTypeAbbreviation = 'GSC (Int)'
   static saveTypeName = 'Pokémon Gold/Silver/Crystal (INT)'
   static saveTypeID = 'G2SAV'

@@ -100,8 +100,6 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9 | PA9> extends Offi
     extraFormIndex?: ExtraFormIndex
   ): boolean
 
-  abstract getCurrentBox(): Box<P>
-
   abstract monConstructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean): P
 
   prepareForSaving() {

@@ -196,10 +196,6 @@ export class BDSPSAV extends OfficialSAV<PB8> {
     return itemIndex <= Item.DsSounds
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   getDisplayData() {
     return {
       'Player Character': this.myStatusBlock.getGender() ? 'Dawn' : 'Lucas',

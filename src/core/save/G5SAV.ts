@@ -178,10 +178,6 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     extraFormIndex?: ExtraFormIndex
   ): boolean
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   static gen4ValidDateAndSize(bytes: Uint8Array, offset: number) {
     const size = bytesToUint32LittleEndian(bytes, offset - 0xc)
 
