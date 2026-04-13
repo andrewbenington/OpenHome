@@ -6,6 +6,7 @@ import {
   ExtraFormIndex,
   Gender,
   getPluginColor,
+  Language,
   OriginGame,
   OriginGames,
 } from '@pkm-rs/pkg'
@@ -89,6 +90,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract tid: number
   abstract sid?: number | undefined
   abstract trainerGender: Gender
+  abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number
   abstract boxes: Box<P>[]
@@ -160,6 +162,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract tid: number
   abstract sid?: number | undefined
   abstract trainerGender: Gender
+  abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number
   abstract boxes: Box<P>[]

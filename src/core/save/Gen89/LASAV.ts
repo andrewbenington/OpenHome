@@ -37,12 +37,13 @@ export class LASAV extends G89SAV<PA8> {
 
     this.myStatusBlock = new MyStatusBlock(this.getBlockMust('MyStatus', 'object'))
     this.name = this.myStatusBlock.getName()
-
-    const fullTrainerID = this.myStatusBlock.getFullID()
-
-    this.tid = fullTrainerID % 1000000
+    this.tid = this.myStatusBlock.getTID()
     this.sid = this.myStatusBlock.getSID()
-    this.displayID = this.tid.toString().padStart(6, '0')
+    this.displayID = this.myStatusBlock.getFullID().toString().slice(-6).padStart(6, '0')
+  }
+
+  get language() {
+    return this.myStatusBlock.getLanguage()
   }
 
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PA8 {
@@ -168,6 +169,9 @@ class MyStatusBlock {
   public getFullID(): number {
     return this.dataView.getUint32(0x10, true)
   }
+  public getTID(): number {
+    return this.dataView.getUint16(0x10, true)
+  }
   public getSID(): number {
     return this.dataView.getUint16(0x12, true)
   }
@@ -175,6 +179,7 @@ class MyStatusBlock {
     return !!(this.dataView.getUint8(0x15) & 1)
   }
   public getLanguage(): number {
-    return this.dataView.getUint8(0x17)
+    const stored = this.dataView.getUint8(0x17)
+    return stored >= 6 ? stored - 1 : stored
   }
 }

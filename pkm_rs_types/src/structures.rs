@@ -4,6 +4,7 @@ use strum_macros::{Display, EnumString};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+use crate::language::Language;
 use crate::{OriginGame, strings::SizedUtf16String, util};
 
 const MASK_BITS_1_2: u8 = 0b00000110;
@@ -288,6 +289,7 @@ pub struct TrainerData {
     pub memory: TrainerMemory,
     pub affection: u8,
     pub gender: Gender,
+    pub language: Language,
     pub origin_game: Option<OriginGame>,
 }
 
@@ -310,6 +312,7 @@ impl TrainerData {
         memory: Option<TrainerMemory>,
         affection: u8,
         gender: Gender,
+        language: Language,
         origin_game: Option<OriginGame>,
     ) -> Self {
         Self {
@@ -320,6 +323,7 @@ impl TrainerData {
             memory: memory.unwrap_or_default(),
             affection,
             gender,
+            language,
             origin_game,
         }
     }

@@ -617,6 +617,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         memory,
         affection,
         save.trainerGender,
+        save.language ?? Language.None,
         save.origin
       ),
       save.isPlugin ? save.pluginIdentifier : undefined
@@ -634,8 +635,18 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   public tradeToSave(save: SAV) {
     this.tradeToSaveWasm(save.origin)
 
-    this.isCurrentHandler = !this.isFrom(save)
-    if (!this.isCurrentHandler) return
+    const isOriginalSave = this.isFrom(save)
+    this.isCurrentHandler = !isOriginalSave
+    if (isOriginalSave) {
+      this.handlerName = ''
+      this.handlerAffection = 0
+      this.handlerFriendship = 0
+      this.handlerMemoryWasm = new TrainerMemory(0, 0, 0, 0)
+      this.handlerId = 0
+      this.handlerLanguage = 0
+      this.handlerGender = false
+      return
+    }
 
     this.handlerName = save.name
 
@@ -645,6 +656,9 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.handlerAffection = existingTrainerData.affection
       this.handlerFriendship = existingTrainerData.friendship
       this.handlerMemoryWasm = existingTrainerData.memory
+      this.handlerId = existingTrainerData.id ?? 0
+      this.handlerLanguage = existingTrainerData.language ?? 0
+      this.handlerGender = existingTrainerData.gender === Gender.Female
     } else {
       this.handlerFriendship = 70 // TODO: PER-FORM BASE FRIENDSHIP
       this.updateTrainerData(save, 70, 0)

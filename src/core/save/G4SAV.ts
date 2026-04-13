@@ -5,7 +5,7 @@ import {
   uint16ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
-import { ConvertStrategy, ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'
@@ -33,6 +33,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
   abstract tid: number
   abstract sid: number
   abstract displayID: string
+  abstract language: Language
 
   currentPCBox: number = 0 // TODO: Gen 4 current box
 

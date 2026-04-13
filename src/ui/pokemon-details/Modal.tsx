@@ -97,6 +97,13 @@ const PokemonDetailsModal = (props: {
   function updateIsOriginal(isOriginal: boolean) {
     setIsOriginal(isOriginal)
     if (isOriginal && mon instanceof OHPKM && mon.originalData) {
+      if (isOriginal && mon.originalData) {
+        const O = fileTypeFromStringNonOhpkm(originalDataTagToMonFormat(mon.originalData.tag))
+        if (O) {
+          setDisplayMon(O.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
+          return
+        }
+      }
       switchFormat(originalDataTagToMonFormat(mon.originalData.tag))
     } else if (mon) {
       switchFormat(mon.format)
