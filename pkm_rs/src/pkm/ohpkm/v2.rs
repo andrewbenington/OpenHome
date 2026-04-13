@@ -150,6 +150,7 @@ impl OhpkmSectionTag {
             0x0C => Some(Self::Tag),
             0x0D => Some(Self::OriginalBackup),
             0x0E => Some(Self::UnconvertedPkm),
+            0x0F => Some(Self::PastHandlerV2),
             _ => None,
         }
     }
