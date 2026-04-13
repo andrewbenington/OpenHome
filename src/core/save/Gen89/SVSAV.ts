@@ -35,7 +35,6 @@ export class SVSAV extends G89SAV<PK9> {
 
     this.trainerBlock = new MyStatus(this.getBlockMust('MyStatus', 'object'))
     this.name = this.trainerBlock.getName()
-    const fullTrainerID = this.trainerBlock.getFullID()
 
     this.boxes.forEach((box, i) => {
       if (!box.name) {
@@ -43,9 +42,9 @@ export class SVSAV extends G89SAV<PK9> {
       }
     })
 
-    this.tid = fullTrainerID % 1000000
+    this.tid = this.trainerBlock.getTID()
     this.sid = this.trainerBlock.getSID()
-    this.displayID = this.tid.toString().padStart(6, '0')
+    this.displayID = this.trainerBlock.getFullID().toString().slice(-6).padStart(6, '0')
     this.origin = this.trainerBlock.getGame()
   }
 
@@ -159,6 +158,10 @@ export class SVSAV extends G89SAV<PK9> {
   get trainerGender() {
     return this.trainerBlock.getGender() ? Gender.Female : Gender.Male
   }
+
+  get language() {
+    return this.trainerBlock.getLanguage()
+  }
 }
 
 const BlockKeys = {
@@ -195,6 +198,9 @@ class MyStatus {
   }
   public getFullID(): number {
     return this.dataView.getUint32(0x00, true)
+  }
+  public getTID(): number {
+    return this.dataView.getUint16(0x00, true)
   }
   public getSID(): number {
     return this.dataView.getUint16(0x02, true)

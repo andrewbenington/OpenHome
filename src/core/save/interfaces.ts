@@ -6,6 +6,7 @@ import {
   ExtraFormIndex,
   Gender,
   getPluginColor,
+  Language,
   OriginGame,
   OriginGames,
 } from '@pkm-rs/pkg'
@@ -93,6 +94,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract tid: number
   abstract sid?: number | undefined
   abstract trainerGender: Gender
+  abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number
   abstract boxes: Readonly<Box<P>>[]
@@ -208,6 +210,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract tid: number
   abstract sid?: number | undefined
   abstract trainerGender: Gender
+  abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number
   abstract boxes: Readonly<Box<P>>[]
@@ -351,6 +354,7 @@ export function saveToStringIdentifier(save: SAV): SaveIdentifier {
 
 export interface WasmSaveInner<P> {
   gameOfOrigin: OriginGame
+  language?: Language
   secretId: number
   trainerGender: number
   trainerId: number
@@ -397,6 +401,10 @@ export abstract class WasmOfficialSave<P extends PKMInterface, WasmP> extends Of
 
   get origin() {
     return this.inner.gameOfOrigin
+  }
+
+  get language() {
+    return this.inner.language
   }
 
   abstract monFromWasm(wasmMon: WasmP): P

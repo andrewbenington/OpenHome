@@ -1,5 +1,5 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { PB7 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { LGE_STARTER, LGP_STARTER } from '@pokemon-resources/consts/Forms'
@@ -321,6 +321,10 @@ export class LGPESAV extends OfficialSAV<PB7> {
     const box = this.boxes[boxNum]
     if (!box) return
     box.boxSlots[boxSlot] = mon
+  }
+
+  get language(): Language {
+    return this.bytes[this.trainerDataOffset + 0x35]
   }
 }
 

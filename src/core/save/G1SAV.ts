@@ -55,6 +55,7 @@ export class G1SAV extends OfficialSAV<PK1> {
   name: string
   tid: number
   displayID: string
+  language = Language.None
 
   currentPCBox: number
   boxes: Array<Box<PK1>>

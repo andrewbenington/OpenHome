@@ -1,4 +1,4 @@
-import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { PA8, PA9, PB8, PK8, PK9 } from '@pokemon-files/pkm'
 import { AllPKMFields } from '@pokemon-files/util'
 import { Option } from 'src/core/util/functional'
@@ -28,6 +28,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9 | PA9> extends Offi
 
   money: number = 0
   name: string = ''
+  abstract language: Language
   tid: number = 0
   sid: number = 0
   displayID: string = ''

@@ -5,7 +5,7 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
-import { Gender, OriginGame } from '@pkm-rs/pkg'
+import { Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { Option } from 'src/core/util/functional'
 import { Box, BoxAndSlot, PluginIdentifier, PluginSAV } from '../interfaces'
 import { LookupType } from '../util'
@@ -171,6 +171,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   sid: number
   displayID: string
   trainerGender: Gender
+  language = Language.None
 
   currentPCBox: number
   boxes: Array<Box<T>>

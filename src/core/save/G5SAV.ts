@@ -6,7 +6,7 @@ import {
 } from '@openhome-core/save/util/byteLogic'
 import { gen5StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { Option, unique } from '@openhome-core/util/functional'
-import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK5 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
@@ -219,5 +219,9 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     const box = this.boxes[boxNum]
     if (!box) return
     box.boxSlots[boxSlot] = mon
+  }
+
+  get language(): Language {
+    return this.bytes[this.trainerDataOffset + 0x1e]
   }
 }

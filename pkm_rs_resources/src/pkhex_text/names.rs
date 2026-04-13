@@ -1,4 +1,5 @@
-use crate::{language::Language, species::NatDexIndex, text_resource::TextResource};
+use crate::{species::NatDexIndex, text_resource::TextResource};
+use pkm_rs_types::Language;
 
 static SPECIES_NAMES_GERMAN: TextResource =
     TextResource::new(include_str!("species/text_Species_de.txt"));

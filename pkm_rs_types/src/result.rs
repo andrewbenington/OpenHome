@@ -1,3 +1,5 @@
+use crate::LANGUAGE_MAX;
+
 use std::fmt::Display;
 
 use serde::{Serialize, Serializer};
@@ -16,6 +18,9 @@ pub enum Error {
         received: usize,
     },
     AbilityNumber(InvalidAbilityNumber),
+    LanguageIndex {
+        language_index: u8,
+    },
 }
 
 impl Display for Error {
@@ -31,6 +36,11 @@ impl Display for Error {
             }
             Error::AbilityNumber(InvalidAbilityNumber(num)) => {
                 format!("Invalid ability number {num} (must be between 1 and 3)")
+            }
+            Error::LanguageIndex { language_index } => {
+                format!(
+                    "Invalid language index {language_index} (must be between 0 and {LANGUAGE_MAX}"
+                )
             }
         };
 

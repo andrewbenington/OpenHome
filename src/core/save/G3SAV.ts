@@ -5,7 +5,14 @@ import {
   uint32ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { gen3StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
-import { ConvertStrategy, ExtraFormIndex, Gender, ItemGen3, OriginGame } from '@pkm-rs/pkg'
+import {
+  ConvertStrategy,
+  ExtraFormIndex,
+  Gender,
+  ItemGen3,
+  Language,
+  OriginGame,
+} from '@pkm-rs/pkg'
 import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
@@ -94,6 +101,7 @@ export class G3SaveBackup {
   money: number = -1
 
   name: string = ''
+  language = Language.None
 
   tid: number = 0
 
@@ -221,6 +229,7 @@ export class G3SAV extends OfficialSAV<PK3> {
   tid: number
   sid: number
   displayID: string
+  language = Language.None
 
   currentPCBox: number
   boxes: Array<Box<PK3>>

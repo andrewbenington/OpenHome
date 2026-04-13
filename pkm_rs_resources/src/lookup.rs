@@ -1,5 +1,6 @@
-use crate::{language::Language, pkhex_text, species::NatDexIndex};
+use crate::{pkhex_text, species::NatDexIndex};
 
+use pkm_rs_types::Language;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 

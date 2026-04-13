@@ -1,10 +1,9 @@
-use std::fmt::Display;
-
+use pkm_rs_types::LANGUAGE_MAX;
 use serde::{Serialize, Serializer};
+use std::fmt::Display;
 
 use crate::abilities::ABILITY_MAX;
 use crate::items::ITEM_MAX;
-use crate::language::LANGUAGE_MAX;
 use crate::natures::NATURE_MAX;
 use crate::pkhex_text;
 use crate::species::{NATIONAL_DEX_MAX, NatDexIndex};
@@ -118,6 +117,33 @@ impl Serialize for Error {
 impl From<Error> for String {
     fn from(value: Error) -> Self {
         value.to_string()
+    }
+}
+
+impl From<pkm_rs_types::Error> for Error {
+    fn from(value: pkm_rs_types::Error) -> Self {
+        match value {
+            pkm_rs_types::Error::BufferSize {
+                field,
+                offset,
+                buffer_size,
+            } => Self::BufferSize {
+                requirement_source: field,
+                expected: offset,
+                received: buffer_size,
+            },
+            pkm_rs_types::Error::ByteLength { expected, received } => Self::BufferSize {
+                requirement_source: String::from("(unknown pkm_rs_types field"),
+                expected,
+                received,
+            },
+            pkm_rs_types::Error::AbilityNumber(index) => Self::AbilityIndex {
+                ability_index: index.0.into(),
+            },
+            pkm_rs_types::Error::LanguageIndex { language_index } => {
+                Self::LanguageIndex { language_index }
+            }
+        }
     }
 }
 

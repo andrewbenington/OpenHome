@@ -43,6 +43,7 @@ export class G2SAV extends OfficialSAV<PK2> {
   tid: number
   sid?: number | undefined
   displayID: string
+  language = Language.None
 
   currentPCBox: number
   boxes: Array<Box<PK2>>

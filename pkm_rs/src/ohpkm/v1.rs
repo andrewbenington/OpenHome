@@ -3,14 +3,13 @@ use crate::traits::{HasSpeciesAndForm, IsShiny4096, PkmBytes};
 use crate::util;
 
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
 
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{ContestStats, Stats8, Stats16Le, StatsPreSplit};
+use pkm_rs_types::{ContestStats, Language, Stats8, Stats16Le, StatsPreSplit};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 use pkm_rs_types::{Geolocations, HyperTraining, MarkingsSixShapesColors};
 

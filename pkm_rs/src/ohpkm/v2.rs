@@ -1,9 +1,11 @@
 use super::sectioned_data::{DataSection, SectionTag, SectionedData};
 use super::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
-    Notes, PastHandlerData, PluginData, ScarletVioletData, SwordShieldData,
+    Notes, PastHandlerDataV2, PluginData, ScarletVioletData, SwordShieldData,
 };
 use crate::ohpkm::OhpkmConvert;
+#[allow(deprecated)]
+use crate::ohpkm::deprecated::PastHandlerDataV1;
 use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::MonTags;
@@ -14,14 +16,13 @@ use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::species::SpeciesMetadata;
-use pkm_rs_types::TrainerData;
 use pkm_rs_types::{AbilityNumber, BinaryGender};
+use pkm_rs_types::{Language, TrainerData};
 use serde::Serialize;
 use strum_macros::Display;
 
 use pkm_rs_resources::{
     ball::Ball,
-    language::Language,
     moves::MoveIndex,
     natures::NatureIndex,
     ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet},
@@ -108,9 +109,10 @@ fn rgb_to_display_color(rgb: [u8; 3]) -> String {
     format!("#{:02x}{:02x}{:02x}", rgb[0], rgb[1], rgb[2])
 }
 
+#[allow(deprecated)]
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Display)]
 #[repr(u16)]
-pub enum SectionTagV2 {
+pub enum OhpkmSectionTag {
     MainData = 0x00,
     GameboyData = 0x01,
     Gen45Data = 0x02,
@@ -119,16 +121,19 @@ pub enum SectionTagV2 {
     BdspTmFlags = 0x05,
     LegendsArceus = 0x06,
     ScarletViolet = 0x07,
-    PastHandler = 0x08,
     PluginData = 0x09,
     Notes = 0x0A,
     MostRecentSave = 0x0B,
     Tag = 0x0C,
     OriginalBackup = 0x0D,
     UnconvertedPkm = 0x0E,
+    PastHandlerV2 = 0x0F,
+
+    // deprecated, but can't mark it as such without warnings
+    PastHandlerV1 = 0x08,
 }
 
-impl SectionTagV2 {
+impl OhpkmSectionTag {
     pub const fn new(tag: u16) -> Option<Self> {
         match tag {
             0x00 => Some(Self::MainData),
@@ -139,17 +144,25 @@ impl SectionTagV2 {
             0x05 => Some(Self::BdspTmFlags),
             0x06 => Some(Self::LegendsArceus),
             0x07 => Some(Self::ScarletViolet),
-            0x08 => Some(Self::PastHandler),
+            #[allow(deprecated)]
+            0x08 => Some(Self::PastHandlerV1),
             0x09 => Some(Self::PluginData),
             0x0A => Some(Self::Notes),
             0x0B => Some(Self::MostRecentSave),
             0x0C => Some(Self::Tag),
             0x0D => Some(Self::OriginalBackup),
             0x0E => Some(Self::UnconvertedPkm),
-            0x0F.. => None,
+            0x0F => Some(Self::PastHandlerV2),
+            _ => None,
         }
     }
 
+    // The minimum guaranteed size of the section's data after being serialized to bytes. This number should never increase,
+    // because that would break the ability to read older OHPKM files. If new fields are added to a section, they should be added
+    // after the existing fields, and the new fields should be either optional or default to a specific value. If neither of these
+    // options work, then the existing section should be deprecated and a new one (e.g. "PluginDataV2") should be used. The old
+    // section's code should be preserved to allow for reading old files. Any files with deprecated sections should convert them
+    // to current versions when read, so that the next time they are written they don't have deprecated sections anymore.
     pub const fn min_size(&self) -> usize {
         match *self {
             Self::MainData => 305,
@@ -160,18 +173,21 @@ impl SectionTagV2 {
             Self::BdspTmFlags => 14,
             Self::LegendsArceus => 44,
             Self::ScarletViolet => 37,
-            Self::PastHandler => 39,
+            Self::PastHandlerV2 => 40,
             Self::PluginData => 0,
             Self::Notes => 0,
             Self::MostRecentSave => 31,
             Self::Tag => 0,
             Self::OriginalBackup => 2, // Size of the tag
             Self::UnconvertedPkm => 2, // Size of the tag
+
+            #[allow(deprecated)]
+            Self::PastHandlerV1 => 39,
         }
     }
 }
 
-impl SectionTag for SectionTagV2 {
+impl SectionTag for OhpkmSectionTag {
     fn from_index(index: u16) -> Option<Self> {
         Self::new(index)
     }
@@ -199,7 +215,7 @@ pub struct OhpkmV2 {
     la_data: Option<LegendsArceusData>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     sv_data: Option<ScarletVioletData>,
-    handler_data: Vec<PastHandlerData>,
+    handler_data: Vec<PastHandlerDataV2>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     plugin_data: Option<PluginData>,
     notes: Option<Notes>,
@@ -1426,7 +1442,7 @@ impl OhpkmV2 {
 
     // Past Handlers
 
-    pub fn handlers(&self) -> Vec<PastHandlerData> {
+    pub fn handlers(&self) -> Vec<PastHandlerDataV2> {
         self.handler_data.clone()
     }
 
@@ -1434,7 +1450,7 @@ impl OhpkmV2 {
         &mut self,
         name: String,
         gender: Gender,
-    ) -> Option<PastHandlerData> {
+    ) -> Option<PastHandlerDataV2> {
         let sized_string = SizedUtf16String::<26>::from(name);
         self.handler_data
             .iter()
@@ -1448,7 +1464,7 @@ impl OhpkmV2 {
         sid: u16,
         game: OriginGame,
         plugin: Option<String>,
-    ) -> Option<PastHandlerData> {
+    ) -> Option<PastHandlerDataV2> {
         self.handler_data
             .iter()
             .find(|h| h.known_trainer_data_matches(tid, sid, game, &plugin))
@@ -1469,7 +1485,7 @@ impl OhpkmV2 {
         {
             matching_unknown_record.update_from(&handler, plugin)
         } else {
-            let mut handler_data = PastHandlerData::from(handler);
+            let mut handler_data = PastHandlerDataV2::from(handler);
             handler_data.origin_plugin = plugin;
             self.handler_data.push(handler_data);
         }
@@ -1560,13 +1576,24 @@ impl OhpkmV2 {
     }
 
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        let sectioned_data = SectionedData::<SectionTagV2>::from_bytes(bytes)?;
+        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes)?;
 
         if sectioned_data.magic_number != MAGIC_NUMBER {
             return Err(Error::other("Bad magic number"));
         } else if sectioned_data.version != 2 {
             return Err(Error::other("Bad version number"));
         }
+
+        #[allow(deprecated)]
+        let past_handler_data_v1 = PastHandlerDataV1::extract_all_from(&sectioned_data)?;
+        let past_handler_data_v2 = if !past_handler_data_v1.is_empty() {
+            past_handler_data_v1
+                .into_iter()
+                .map(PastHandlerDataV2::from_v1)
+                .collect()
+        } else {
+            PastHandlerDataV2::extract_all_from(&sectioned_data)?
+        };
 
         let result = Self {
             main_data: MainDataV2::extract_from(&sectioned_data)?
@@ -1578,7 +1605,7 @@ impl OhpkmV2 {
             bdsp_data: BdspData::extract_from(&sectioned_data)?,
             la_data: LegendsArceusData::extract_from(&sectioned_data)?,
             sv_data: ScarletVioletData::extract_from(&sectioned_data)?,
-            handler_data: PastHandlerData::extract_all_from(&sectioned_data)?,
+            handler_data: past_handler_data_v2,
             plugin_data: PluginData::extract_from(&sectioned_data)?,
             notes: Notes::extract_from(&sectioned_data)?,
             most_recent_save: MostRecentSave::extract_from(&sectioned_data)?,
@@ -1591,13 +1618,24 @@ impl OhpkmV2 {
     }
 
     pub fn from_bytes_fixing_errors(bytes: &[u8]) -> Result<Self> {
-        let sectioned_data = SectionedData::<SectionTagV2>::from_bytes(bytes)?;
+        let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes)?;
 
         if sectioned_data.magic_number != MAGIC_NUMBER {
             return Err(Error::other("Bad magic number"));
         } else if sectioned_data.version != 2 {
             return Err(Error::other("Bad version number"));
         }
+
+        #[allow(deprecated)]
+        let past_handler_data_v1 = PastHandlerDataV1::extract_all_from(&sectioned_data)?;
+        let past_handler_data_v2 = if !past_handler_data_v1.is_empty() {
+            past_handler_data_v1
+                .into_iter()
+                .map(PastHandlerDataV2::from_v1)
+                .collect()
+        } else {
+            PastHandlerDataV2::extract_all_from(&sectioned_data)?
+        };
 
         let result = Self {
             main_data: MainDataV2::extract_from(&sectioned_data)?
@@ -1615,7 +1653,7 @@ impl OhpkmV2 {
             sv_data: ScarletVioletData::extract_from(&sectioned_data)
                 .ok()
                 .flatten(),
-            handler_data: PastHandlerData::extract_all_from(&sectioned_data).unwrap_or_default(),
+            handler_data: past_handler_data_v2,
             plugin_data: PluginData::extract_from(&sectioned_data).ok().flatten(),
             notes: Notes::extract_from(&sectioned_data).ok().flatten(),
             most_recent_save: MostRecentSave::extract_from(&sectioned_data).ok().flatten(),
@@ -1644,7 +1682,7 @@ impl OhpkmV2 {
             bdsp_data: BdspData::from_v1(old),
             la_data: LegendsArceusData::from_v1(old),
             sv_data: ScarletVioletData::from_v1(old),
-            handler_data: PastHandlerData::from_v1(old).map_or(Vec::new(), |hd| vec![hd]),
+            handler_data: PastHandlerDataV2::from_ohpkm_v1(old).map_or(Vec::new(), |hd| vec![hd]),
             plugin_data: PluginData::from_v1(old),
             notes: None,
             most_recent_save: None,
@@ -1654,7 +1692,7 @@ impl OhpkmV2 {
         }
     }
 
-    pub fn to_sectioned_data(&self) -> SectionedData<SectionTagV2> {
+    pub fn to_sectioned_data(&self) -> SectionedData<OhpkmSectionTag> {
         let mut sectioned_data = SectionedData::new(MAGIC_NUMBER, CURRENT_VERSION);
         sectioned_data
             .add(self.main_data)
@@ -3213,7 +3251,7 @@ impl OhpkmV2 {
 
     // Past Handlers
     #[wasm_bindgen(getter = handlers)]
-    pub fn handlers_js(&self) -> Vec<PastHandlerData> {
+    pub fn handlers_js(&self) -> Vec<PastHandlerDataV2> {
         self.handler_data.clone()
     }
 
@@ -3222,7 +3260,7 @@ impl OhpkmV2 {
         &mut self,
         name: String,
         gender: Gender,
-    ) -> Option<PastHandlerData> {
+    ) -> Option<PastHandlerDataV2> {
         let sized_string = SizedUtf16String::<26>::from(name);
         self.handler_data
             .iter()
@@ -3237,7 +3275,7 @@ impl OhpkmV2 {
         sid: u16,
         game: OriginGame,
         plugin: Option<String>,
-    ) -> Option<PastHandlerData> {
+    ) -> Option<PastHandlerDataV2> {
         self.handler_data
             .iter()
             .find(|h| h.known_trainer_data_matches(tid, sid, game, &plugin))
@@ -3259,7 +3297,7 @@ impl OhpkmV2 {
         {
             matching_unknown_record.update_from(&handler, plugin)
         } else {
-            let mut handler_data = PastHandlerData::from(handler);
+            let mut handler_data = PastHandlerDataV2::from(handler);
             handler_data.origin_plugin = plugin;
             self.handler_data.push(handler_data);
         }

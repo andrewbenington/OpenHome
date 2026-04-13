@@ -1,10 +1,9 @@
 use crate::ohpkm::sectioned_data;
 
-use pkm_rs_resources::language::Language;
 use pkm_rs_resources::lookup;
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
-use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, language::LANGUAGE_MAX, items::ITEM_MAX};
-use pkm_rs_types::InvalidAbilityNumber;
+use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, items::ITEM_MAX};
+use pkm_rs_types::{InvalidAbilityNumber, Language, LANGUAGE_MAX};
 
 use std::fmt::{Display};
 use std::string::FromUtf8Error;
@@ -238,6 +237,7 @@ impl From<pkm_rs_types::Error> for Error {
             pkm_rs_types::Error::BufferSize { field, offset, buffer_size } => Self::BufferSize { requirement_source: Some(field), expected: offset, received: buffer_size },
             pkm_rs_types::Error::ByteLength { expected, received } => Self::BufferSize { requirement_source: None, expected, received },
             pkm_rs_types::Error::AbilityNumber(invalid_ability_number) => Self::AbilityNumber(invalid_ability_number),
+            pkm_rs_types::Error::LanguageIndex { language_index } => Self::LanguageIndex { language_index },
         }
     }
 }

@@ -1,4 +1,6 @@
 mod convert;
+#[allow(deprecated)]
+mod deprecated;
 mod extra_form;
 pub mod sectioned_data;
 mod v1;

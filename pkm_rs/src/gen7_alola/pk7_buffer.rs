@@ -6,17 +6,16 @@ use arbitrary_int::u3;
 use arbitrary_int::u7;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::language::Language;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::ModernRibbonSet;
 use pkm_rs_resources::species::SpeciesAndForm;
-use pkm_rs_types::Stats16Le;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, Gender, Geolocations, HyperTraining,
     MarkingsSixShapesColors, OriginGame, PokeDate, Stats8, TrainerMemory,
 };
+use pkm_rs_types::{Language, Stats16Le};
 use pkm_rs_types::{read_u16_le, read_u32_le};
 
 const CHECKSUM_OFFSET: usize = 6;

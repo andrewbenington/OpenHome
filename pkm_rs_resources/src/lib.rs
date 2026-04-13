@@ -5,7 +5,6 @@ pub mod abilities;
 pub mod ball;
 pub mod helpers;
 pub mod items;
-pub mod language;
 pub mod levelup;
 pub mod lookup;
 pub mod moves;

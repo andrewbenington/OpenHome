@@ -6,6 +6,7 @@ use crate::traits::{PkmBytes, SaveData};
 use crate::util;
 
 use pkm_rs_types::BinaryGender;
+use pkm_rs_types::Language;
 use pkm_rs_types::OriginGame;
 use pkm_rs_types::read_u16_le;
 use pkm_rs_types::strings::SizedUtf16String;
@@ -364,6 +365,11 @@ impl Gen7AlolaSave {
         OriginGame::from(self.get_trainer_data().game_code)
     }
 
+    #[wasm_bindgen(getter = language)]
+    pub fn language_wasm(&self) -> Language {
+        self.get_trainer_data().language
+    }
+
     #[wasm_bindgen(js_name = includesOrigin)]
     pub fn includes_origin_wasm(origin: OriginGame) -> bool {
         Self::includes_origin(origin)
@@ -386,6 +392,7 @@ pub struct TrainerDataGen7Alola {
     pub trainer_id: u16,
     pub secret_id: u16,
     pub game_code: u8,
+    pub language: Language,
     pub trainer_gender: BinaryGender,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: SizedUtf16String<26>,
@@ -397,6 +404,7 @@ impl TrainerDataGen7Alola {
             trainer_id: read_u16_le!(block_bytes, 0),
             secret_id: read_u16_le!(block_bytes, 2),
             game_code: block_bytes[4],
+            language: Language::try_from(block_bytes[0x35]).unwrap_or(Language::None),
             trainer_gender: BinaryGender::from(util::get_flag(block_bytes, 5, 0)),
             trainer_name: SizedUtf16String::from_bytes(block_bytes[56..82].try_into().unwrap()),
         }

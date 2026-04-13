@@ -1,4 +1,6 @@
 mod convert;
+#[allow(deprecated)]
+mod deprecated;
 mod v2;
 mod v2_sections;
 

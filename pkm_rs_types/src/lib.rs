@@ -1,5 +1,6 @@
 mod capped;
 mod games;
+mod language;
 mod markings;
 mod national_dex;
 mod pkm_types;
@@ -11,6 +12,7 @@ mod util;
 
 pub use capped::*;
 pub use games::*;
+pub use language::*;
 pub use markings::*;
 pub use national_dex::*;
 pub use pkm_types::*;
