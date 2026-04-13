@@ -20,6 +20,81 @@ use pkm_rs_types::{read_u16_le, read_u32_le};
 
 const CHECKSUM_OFFSET: usize = 6;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Offset {
+    EncryptionConstant = 0,
+    Sanity = 4,
+    Checksum = 6,
+    NationalDex = 8,
+    HeldItem = 10,
+    TrainerId = 12,
+    SecretId = 14,
+    Exp = 16,
+    AbilityIndex = 20,
+    AbilityNum = 21,
+    Markings = 22,
+    PersonalityValue = 24,
+    Nature = 28,
+    FormIndexFatefulEncounterGender = 29,
+    Evs = 30,
+    Contest = 36,
+    ResortEventStatus = 42,
+    Pokerus = 43,
+    SuperTraining = 44,
+    Ribbons = 48,
+    ContestMemoryCount = 56,
+    BattleMemoryCount = 57,
+    SuperTrainingDist = 58,
+    FormArgument = 60,
+    Nickname = 64,
+    RelearnMoves = 106,
+    SecretSuperTraining = 114,
+    IvsEggNicknamed = 116,
+    HandlerName = 120,
+    HandlerGender = 146,
+    IsCurrentHandler = 147,
+    Geolocations = 148,
+    HandlerFriendship = 162,
+    HandlerAffection = 163,
+    HandlerMemoryIntensity = 164,
+    HandlerMemoryMemory = 165,
+    HandlerMemoryFeeling = 166,
+    HandlerMemoryTextVariable = 168,
+    Fullness = 174,
+    Enjoyment = 175,
+    TrainerName = 176,
+    TrainerFriendship = 202,
+    TrainerAffection = 203,
+    TrainerMemoryIntensity = 204,
+    TrainerMemoryMemory = 205,
+    TrainerMemoryTextVariable = 206,
+    TrainerMemoryFeeling = 208,
+    EggDate = 209,
+    MetDate = 212,
+    EggLocation = 216,
+    MetLocation = 218,
+    Ball = 220,
+    MetLevelTrainerGender = 221,
+    HyperTraining = 222,
+    GameOfOrigin = 223,
+    Country = 224,
+    Region = 225,
+    ConsoleRegion = 226,
+    Language = 227,
+    StatusCondition = 232,
+    StatLevel = 237,
+    FormArgumentRemain = 238,
+    FormArgumentElapsed = 239,
+    CurrentHp = 240,
+    Stats = 242,
+}
+
+impl From<Offset> for usize {
+    fn from(offset: Offset) -> usize {
+        offset as usize
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Pk7Buffer<S> — generic over the byte storage so that a single impl block
 // covers all getters, and a second (narrower) block covers setters.
@@ -51,7 +126,7 @@ impl<'a> Pk7Buffer<&'a [u8]> {
 }
 
 // ------------------------------------------------------------------
-// Constructors — mutable
+// Methods — mutable
 // ------------------------------------------------------------------
 
 impl<'a> Pk7Buffer<&'a mut [u8]> {
@@ -67,6 +142,58 @@ impl<'a> Pk7Buffer<&'a mut [u8]> {
 }
 
 // ------------------------------------------------------------------
+// Accessors
+// ------------------------------------------------------------------
+
+impl<S: AsRef<[u8]>> Pk7Buffer<S> {
+    fn get_u8(&self, offset: Offset) -> u8 {
+        let offset = offset as usize;
+        self.bytes()[offset]
+    }
+
+    fn get_u16_le(&self, offset: Offset) -> u16 {
+        let offset = offset as usize;
+        read_u16_le!(self.bytes(), offset)
+    }
+
+    fn get_u32_le(&self, offset: Offset) -> u32 {
+        let offset = offset as usize;
+        read_u32_le!(self.bytes(), offset)
+    }
+
+    fn get_flag(&self, offset: Offset, bit_index: usize) -> bool {
+        util::get_flag(self.bytes(), offset as usize, bit_index)
+    }
+
+    fn get_array<const N: usize>(&self, offset: Offset) -> [u8; N] {
+        let offset = offset as usize;
+        self.bytes()[offset..offset + N].try_into().unwrap()
+    }
+}
+
+impl Pk7Buffer<&mut [u8]> {
+    fn set_u8(&mut self, offset: Offset, v: u8) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset] = v;
+    }
+
+    fn set_u16_le(&mut self, offset: Offset, v: u16) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 2].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_u32_le(&mut self, offset: Offset, v: u32) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_array<const N: usize>(&mut self, offset: Offset, v: &[u8; N]) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + N].copy_from_slice(v);
+    }
+}
+
+// ------------------------------------------------------------------
 // Shared methods
 // ------------------------------------------------------------------
 
@@ -78,31 +205,25 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     pub fn is_party(&self) -> bool {
         self.bytes().len() == super::PARTY_SIZE
     }
-}
 
-// ==================================================================
-// Getters (available on both Pk7BufferRef and Pk7BufferMut)
-// ==================================================================
-
-impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     pub fn encryption_constant(&self) -> u32 {
-        read_u32_le!(self.bytes(), 0)
+        self.get_u32_le(Offset::EncryptionConstant)
     }
 
     pub fn sanity(&self) -> u16 {
-        read_u16_le!(self.bytes(), 4)
+        self.get_u16_le(Offset::Sanity)
     }
 
     pub fn checksum(&self) -> u16 {
-        read_u16_le!(self.bytes(), CHECKSUM_OFFSET)
+        self.get_u16_le(Offset::Checksum)
     }
 
     pub fn species_ndex(&self) -> u16 {
-        read_u16_le!(self.bytes(), 8)
+        self.get_u16_le(Offset::NationalDex)
     }
 
     pub fn form_index(&self) -> u8 {
-        pkm_rs_types::read_uint5_from_bits(self.bytes()[29], 3)
+        pkm_rs_types::read_uint5_from_bits(self.get_u8(Offset::FormIndexFatefulEncounterGender), 3)
     }
 
     pub fn species_and_form(&self) -> Result<SpeciesAndForm> {
@@ -113,23 +234,23 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn held_item_index(&self) -> u16 {
-        read_u16_le!(self.bytes(), 10)
+        self.get_u16_le(Offset::HeldItem)
     }
 
     pub fn trainer_id(&self) -> u16 {
-        read_u16_le!(self.bytes(), 12)
+        self.get_u16_le(Offset::TrainerId)
     }
 
     pub fn secret_id(&self) -> u16 {
-        read_u16_le!(self.bytes(), 14)
+        self.get_u16_le(Offset::SecretId)
     }
 
     pub fn exp(&self) -> u32 {
-        read_u32_le!(self.bytes(), 16)
+        self.get_u32_le(Offset::Exp)
     }
 
     pub fn ability_index_raw(&self) -> u8 {
-        self.bytes()[20]
+        self.get_u8(Offset::AbilityIndex)
     }
 
     pub fn ability_index(&self) -> Result<AbilityIndexWasm> {
@@ -137,15 +258,15 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn ability_num_raw(&self) -> u8 {
-        u3::extract_u8(self.bytes()[21], 0).into()
+        u3::extract_u8(self.get_u8(Offset::AbilityNum), 0).into()
     }
 
     pub fn ability_num(&self) -> Result<AbilityNumber> {
-        Ok(u3::extract_u8(self.bytes()[21], 0).try_into()?)
+        Ok(u3::extract_u8(self.get_u8(Offset::AbilityNum), 0).try_into()?)
     }
 
     pub fn markings_raw(&self) -> [u8; 2] {
-        self.bytes()[22..24].try_into().unwrap()
+        self.get_array(Offset::Markings)
     }
 
     pub fn markings(&self) -> MarkingsSixShapesColors {
@@ -153,11 +274,11 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn personality_value(&self) -> u32 {
-        read_u32_le!(self.bytes(), 24)
+        self.get_u32_le(Offset::PersonalityValue)
     }
 
     pub fn nature_raw(&self) -> u8 {
-        self.bytes()[28]
+        self.get_u8(Offset::Nature)
     }
 
     pub fn nature(&self) -> Result<NatureIndex> {
@@ -165,124 +286,120 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn is_fateful_encounter(&self) -> bool {
-        util::get_flag(self.bytes(), 29, 0)
+        self.get_flag(Offset::FormIndexFatefulEncounterGender, 0)
     }
 
     pub fn gender(&self) -> Gender {
-        Gender::from_bits_1_2(self.bytes()[29])
+        Gender::from_bits_1_2(self.get_u8(Offset::FormIndexFatefulEncounterGender))
     }
 
-    pub fn evs_raw(&self) -> &[u8; 6] {
-        self.bytes()[30..36].try_into().unwrap()
+    pub fn evs_raw(&self) -> [u8; 6] {
+        self.get_array(Offset::Evs)
     }
 
     pub fn evs(&self) -> Stats8 {
-        Stats8::from_bytes(*self.evs_raw())
+        Stats8::from_bytes(self.evs_raw())
     }
 
-    pub fn contest_raw(&self) -> &[u8; 6] {
-        self.bytes()[36..42].try_into().unwrap()
+    pub fn contest_raw(&self) -> [u8; 6] {
+        self.get_array(Offset::Contest)
     }
 
     pub fn contest(&self) -> ContestStats {
-        ContestStats::from_bytes(*self.contest_raw())
+        ContestStats::from_bytes(self.contest_raw())
     }
 
     pub fn resort_event_status(&self) -> u8 {
-        self.bytes()[42]
+        self.get_u8(Offset::ResortEventStatus)
     }
 
     pub fn pokerus_byte(&self) -> u8 {
-        self.bytes()[43]
+        self.get_u8(Offset::Pokerus)
     }
 
     pub fn super_training_flags(&self) -> u32 {
-        read_u32_le!(self.bytes(), 44)
+        self.get_u32_le(Offset::SuperTraining)
     }
 
-    pub fn ribbons_raw(&self) -> &[u8; 7] {
-        self.bytes()[48..55].try_into().unwrap()
+    pub fn ribbons_raw(&self) -> [u8; 7] {
+        self.get_array(Offset::Ribbons)
     }
 
     pub fn ribbons(&self) -> ModernRibbonSet<7, { super::MAX_RIBBON_ALOLA }> {
-        ModernRibbonSet::from_bytes(*self.ribbons_raw())
+        ModernRibbonSet::from_bytes(self.ribbons_raw())
     }
 
     pub fn contest_memory_count(&self) -> u8 {
-        self.bytes()[56]
+        self.get_u8(Offset::ContestMemoryCount)
     }
 
     pub fn battle_memory_count(&self) -> u8 {
-        self.bytes()[57]
+        self.get_u8(Offset::BattleMemoryCount)
     }
 
     pub fn super_training_dist_flags(&self) -> u8 {
-        self.bytes()[58]
+        self.get_u8(Offset::SuperTrainingDist)
     }
 
     pub fn form_argument(&self) -> u32 {
-        read_u32_le!(self.bytes(), 60)
+        self.get_u32_le(Offset::FormArgument)
     }
 
-    pub fn nickname_raw(&self) -> &[u8; 26] {
-        self.bytes()[64..90].try_into().unwrap()
+    pub fn nickname_raw(&self) -> [u8; 26] {
+        self.get_array(Offset::Nickname)
     }
 
     pub fn nickname(&self) -> SizedUtf16String<26> {
-        SizedUtf16String::<26>::from_bytes(*self.nickname_raw())
-    }
-
-    pub fn move_slots_bytes(&self) -> &[u8] {
-        self.bytes()
+        SizedUtf16String::<26>::from_bytes(self.nickname_raw())
     }
 
     pub fn move_slots(&self) -> MoveSlots {
         MoveSlots::from_bytes(self.bytes(), super::MOVE_DATA_OFFSETS)
     }
 
-    pub fn relearn_move_raw(&self, idx: usize) -> &[u8; 2] {
-        let off = 106 + idx * 2;
+    pub fn relearn_move_raw(&self, idx: usize) -> [u8; 2] {
+        let off = Offset::RelearnMoves as usize + idx * 2;
         self.bytes()[off..off + 2].try_into().unwrap()
     }
 
     pub fn relearn_move(&self, idx: usize) -> MoveIndex {
-        MoveIndex::from_le_bytes(*self.relearn_move_raw(idx))
+        MoveIndex::from_le_bytes(self.relearn_move_raw(idx))
     }
 
     pub fn secret_super_training_unlocked(&self) -> bool {
-        util::get_flag(self.bytes(), 114, 0)
+        self.get_flag(Offset::SecretSuperTraining, 0)
     }
 
     pub fn secret_super_training_complete(&self) -> bool {
-        util::get_flag(self.bytes(), 114, 1)
+        self.get_flag(Offset::SecretSuperTraining, 1)
     }
 
-    pub fn ivs_raw(&self) -> &[u8; 4] {
-        self.bytes()[116..120].try_into().unwrap()
+    fn ivs_egg_nicknamed_raw(&self) -> [u8; 4] {
+        self.get_array(Offset::IvsEggNicknamed)
     }
 
     pub fn ivs(&self) -> Stats8 {
-        Stats8::from_30_bits(*self.ivs_raw())
+        Stats8::from_30_bits(self.ivs_egg_nicknamed_raw())
     }
 
     pub fn is_egg(&self) -> bool {
-        util::get_flag(self.bytes(), 116, 30)
+        self.get_flag(Offset::IvsEggNicknamed, 30)
     }
 
     pub fn is_nicknamed(&self) -> bool {
-        util::get_flag(self.bytes(), 116, 31)
+        self.get_flag(Offset::IvsEggNicknamed, 31)
     }
 
-    pub fn handler_name_raw(&self) -> &[u8; 26] {
-        self.bytes()[120..146].try_into().unwrap()
+    fn handler_name_raw(&self) -> [u8; 26] {
+        self.get_array(Offset::HandlerName)
     }
 
     pub fn handler_name(&self) -> SizedUtf16String<26> {
-        SizedUtf16String::<26>::from_bytes(*self.handler_name_raw())
+        SizedUtf16String::<26>::from_bytes(self.handler_name_raw())
     }
 
-    pub fn handler_gender_raw(&self) -> bool {
-        util::get_flag(self.bytes(), 146, 0)
+    fn handler_gender_raw(&self) -> bool {
+        self.get_flag(Offset::HandlerGender, 0)
     }
 
     pub fn handler_gender(&self) -> BinaryGender {
@@ -290,39 +407,39 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn is_current_handler(&self) -> bool {
-        util::get_flag(self.bytes(), 147, 0)
+        self.get_flag(Offset::IsCurrentHandler, 0)
     }
 
-    pub fn geolocations_raw(&self) -> &[u8; 10] {
-        self.bytes()[148..158].try_into().unwrap()
+    fn geolocations_raw(&self) -> [u8; 10] {
+        self.get_array(Offset::Geolocations)
     }
 
     pub fn geolocations(&self) -> Geolocations {
-        Geolocations::from_bytes(*self.geolocations_raw())
+        Geolocations::from_bytes(self.geolocations_raw())
     }
 
     pub fn handler_friendship(&self) -> u8 {
-        self.bytes()[162]
+        self.get_u8(Offset::HandlerFriendship)
     }
 
     pub fn handler_affection(&self) -> u8 {
-        self.bytes()[163]
+        self.get_u8(Offset::HandlerAffection)
     }
 
     pub fn handler_memory_intensity(&self) -> u8 {
-        self.bytes()[164]
+        self.get_u8(Offset::HandlerMemoryIntensity)
     }
 
     pub fn handler_memory_memory(&self) -> u8 {
-        self.bytes()[165]
+        self.get_u8(Offset::HandlerMemoryMemory)
     }
 
     pub fn handler_memory_feeling(&self) -> u8 {
-        self.bytes()[166]
+        self.get_u8(Offset::HandlerMemoryFeeling)
     }
 
     pub fn handler_memory_text_variable(&self) -> u16 {
-        read_u16_le!(self.bytes(), 168)
+        self.get_u16_le(Offset::HandlerMemoryTextVariable)
     }
 
     pub fn handler_memory(&self) -> TrainerMemory {
@@ -335,43 +452,43 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn fullness(&self) -> u8 {
-        self.bytes()[174]
+        self.get_u8(Offset::Fullness)
     }
 
     pub fn enjoyment(&self) -> u8 {
-        self.bytes()[175]
+        self.get_u8(Offset::Enjoyment)
     }
 
-    pub fn trainer_name_raw(&self) -> &[u8; 26] {
-        self.bytes()[176..202].try_into().unwrap()
+    fn trainer_name_raw(&self) -> [u8; 26] {
+        self.get_array(Offset::TrainerName)
     }
 
     pub fn trainer_name(&self) -> SizedUtf16String<26> {
-        SizedUtf16String::<26>::from_bytes(*self.trainer_name_raw())
+        SizedUtf16String::<26>::from_bytes(self.trainer_name_raw())
     }
 
     pub fn trainer_friendship(&self) -> u8 {
-        self.bytes()[202]
+        self.get_u8(Offset::TrainerFriendship)
     }
 
     pub fn trainer_affection(&self) -> u8 {
-        self.bytes()[203]
+        self.get_u8(Offset::TrainerAffection)
     }
 
     pub fn trainer_memory_intensity(&self) -> u8 {
-        self.bytes()[204]
+        self.get_u8(Offset::TrainerMemoryIntensity)
     }
 
     pub fn trainer_memory_memory(&self) -> u8 {
-        self.bytes()[205]
+        self.get_u8(Offset::TrainerMemoryMemory)
     }
 
     pub fn trainer_memory_text_variable(&self) -> u16 {
-        read_u16_le!(self.bytes(), 206)
+        self.get_u16_le(Offset::TrainerMemoryTextVariable)
     }
 
     pub fn trainer_memory_feeling(&self) -> u8 {
-        self.bytes()[208]
+        self.get_u8(Offset::TrainerMemoryFeeling)
     }
 
     pub fn trainer_memory(&self) -> TrainerMemory {
@@ -383,40 +500,40 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
         }
     }
 
-    pub fn egg_date_raw(&self) -> &[u8; 3] {
-        self.bytes()[209..212].try_into().unwrap()
+    fn egg_date_raw(&self) -> [u8; 3] {
+        self.get_array(Offset::EggDate)
     }
 
     pub fn egg_date(&self) -> Option<PokeDate> {
-        PokeDate::from_bytes_optional(*self.egg_date_raw())
+        PokeDate::from_bytes_optional(self.egg_date_raw())
     }
 
-    pub fn met_date_raw(&self) -> &[u8; 3] {
-        self.bytes()[212..215].try_into().unwrap()
+    fn met_date_raw(&self) -> [u8; 3] {
+        self.get_array(Offset::MetDate)
     }
 
     pub fn met_date(&self) -> PokeDate {
-        PokeDate::from_bytes(*self.met_date_raw())
+        PokeDate::from_bytes(self.met_date_raw())
     }
 
     pub fn egg_location_index(&self) -> u16 {
-        read_u16_le!(self.bytes(), 216)
+        self.get_u16_le(Offset::EggLocation)
     }
 
     pub fn met_location_index(&self) -> u16 {
-        read_u16_le!(self.bytes(), 218)
+        self.get_u16_le(Offset::MetLocation)
     }
 
-    pub fn ball_raw(&self) -> u8 {
-        self.bytes()[220]
+    fn ball_raw(&self) -> u8 {
+        self.get_u8(Offset::Ball)
     }
 
     pub fn ball(&self) -> Ball {
         Ball::from(self.ball_raw())
     }
 
-    pub fn met_level_raw(&self) -> u8 {
-        u7::extract_u8(self.bytes()[221], 0).into()
+    fn met_level_raw(&self) -> u8 {
+        u7::extract_u8(self.get_u8(Offset::MetLevelTrainerGender), 0).into()
     }
 
     pub fn met_level(&self) -> u8 {
@@ -424,23 +541,23 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn trainer_gender_raw(&self) -> bool {
-        util::get_flag(self.bytes(), 221, 7)
+        self.get_flag(Offset::MetLevelTrainerGender, 7)
     }
 
     pub fn trainer_gender(&self) -> BinaryGender {
         self.trainer_gender_raw().into()
     }
 
-    pub fn hyper_training_raw(&self) -> u8 {
-        self.bytes()[222]
+    fn hyper_training_raw(&self) -> u8 {
+        self.get_u8(Offset::HyperTraining)
     }
 
     pub fn hyper_training(&self) -> HyperTraining {
         HyperTraining::from_byte(self.hyper_training_raw())
     }
 
-    pub fn game_of_origin_raw(&self) -> u8 {
-        self.bytes()[223]
+    fn game_of_origin_raw(&self) -> u8 {
+        self.get_u8(Offset::GameOfOrigin)
     }
 
     pub fn game_of_origin(&self) -> OriginGame {
@@ -448,19 +565,19 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn country(&self) -> u8 {
-        self.bytes()[224]
+        self.get_u8(Offset::Country)
     }
 
     pub fn region(&self) -> u8 {
-        self.bytes()[225]
+        self.get_u8(Offset::Region)
     }
 
     pub fn console_region(&self) -> u8 {
-        self.bytes()[226]
+        self.get_u8(Offset::ConsoleRegion)
     }
 
-    pub fn language_raw(&self) -> u8 {
-        self.bytes()[227]
+    fn language_raw(&self) -> u8 {
+        self.get_u8(Offset::Language)
     }
 
     pub fn language(&self) -> Result<Language> {
@@ -472,46 +589,42 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     // ------------------------------------------------------------------
 
     pub fn status_condition(&self) -> u32 {
-        read_u32_le!(self.bytes(), 232)
+        self.get_u32_le(Offset::StatusCondition)
     }
 
     pub fn stat_level(&self) -> u8 {
-        self.bytes()[237]
+        self.get_u8(Offset::StatLevel)
     }
 
     pub fn form_argument_remain(&self) -> u8 {
-        self.bytes()[238]
+        self.get_u8(Offset::FormArgumentRemain)
     }
 
     pub fn form_argument_elapsed(&self) -> u8 {
-        self.bytes()[239]
+        self.get_u8(Offset::FormArgumentElapsed)
     }
 
     pub fn current_hp(&self) -> u16 {
-        read_u16_le!(self.bytes(), 240)
+        self.get_u16_le(Offset::CurrentHp)
     }
 
-    pub fn stats_raw(&self) -> &[u8; 12] {
-        self.bytes()[242..254].try_into().unwrap()
+    pub fn stats_raw(&self) -> [u8; 12] {
+        self.get_array(Offset::Stats)
     }
 
     pub fn stats(&self) -> Stats16Le {
-        Stats16Le::from_bytes(*self.stats_raw())
+        Stats16Le::from_bytes(self.stats_raw())
     }
 }
 
 // ==================================================================
-// SETTERS  (available only on Pk7BufferMut)
+// Setters  (available only on Pk7BufferMut)
 // ==================================================================
 
 impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
     fn bytes_mut(&mut self) -> &mut [u8] {
         self.0.as_mut()
     }
-
-    // ------------------------------------------------------------------
-    // Block A  (offsets 0 – 63)
-    // ------------------------------------------------------------------
 
     pub fn set_encryption_constant(&mut self, v: u32) {
         self.bytes_mut()[0..4].copy_from_slice(&v.to_le_bytes());
@@ -696,10 +809,6 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
         util::set_flag(bytes, 116, 31, v);
     }
 
-    // ------------------------------------------------------------------
-    // Block C  (offsets 120 – 175)
-    // ------------------------------------------------------------------
-
     pub fn set_handler_name_raw(&mut self, v: &[u8; 26]) {
         self.bytes_mut()[120..146].copy_from_slice(v);
     }
@@ -768,10 +877,6 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
     pub fn set_enjoyment(&mut self, v: u8) {
         self.bytes_mut()[175] = v;
     }
-
-    // ------------------------------------------------------------------
-    // Block D  (offsets 176 – 231)
-    // ------------------------------------------------------------------
 
     pub fn set_trainer_name_raw(&mut self, v: &[u8; 26]) {
         self.bytes_mut()[176..202].copy_from_slice(v);
@@ -931,7 +1036,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
 }
 
 // ==================================================================
-// Trait impls — only for the mutable variant
+// Trait impls
 // ==================================================================
 
 impl<S: AsRef<[u8]>> AsBytes for Pk7Buffer<S> {
