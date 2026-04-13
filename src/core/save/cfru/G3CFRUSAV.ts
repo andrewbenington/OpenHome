@@ -266,10 +266,6 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   static includesOrigin(origin: OriginGame) {
     return origin === OriginGame.FireRed
   }

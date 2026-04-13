@@ -79,10 +79,6 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm> {
     return itemIndex <= Item.FairyMemory
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   setMonAt(boxNum: number, boxSlot: number, mon: Option<PK7>): void {
     this.inner.setMonAt(boxNum, boxSlot, mon ? mon.inner : undefined)
   }

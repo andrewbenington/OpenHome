@@ -350,10 +350,6 @@ export class G3SAV extends OfficialSAV<PK3> {
     return ItemGen3.fromModern(itemIndex) !== undefined
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   static saveTypeAbbreviation = 'RSE/FRLG'
   static saveTypeName = 'Pokémon Ruby/Sapphire/Emerald/FireRed/LeafGreen'
   static saveTypeID = 'G3SAV'

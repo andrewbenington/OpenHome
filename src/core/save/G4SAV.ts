@@ -185,10 +185,6 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     extraFormIndex?: ExtraFormIndex
   ): boolean
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   static saveTypeAbbreviation = 'DPPt/HGSS'
   static saveTypeName = 'Pokémon Diamond/Pearl/Platinum/HeartGold/SoulSilver'
   static saveTypeID = 'G4SAV'

@@ -68,7 +68,6 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
 
   isPlugin: boolean
 
-  getCurrentBox: () => Box<P>
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata
   getMonAt(boxNum: number, boxSlot: number): Option<P>
   setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
@@ -190,10 +189,6 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
     return undefined
   }
 
-  getCurrentBox(): Readonly<Box<P>> {
-    return this.boxes[this.currentPCBox]
-  }
-
   getBoxName(boxNum: number): string | undefined {
     return this.boxes[boxNum]?.name
   }
@@ -287,10 +282,6 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
     const box = this.boxes[boxNum]
     if (!box) return 0
     return box.boxSlots.filter(filterUndefined).length
-  }
-
-  getCurrentBox(): Readonly<Box<P>> {
-    return this.boxes[this.currentPCBox]
   }
 
   get boxSlotCount(): number {

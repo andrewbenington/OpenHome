@@ -111,10 +111,6 @@ export class LASAV extends G89SAV<PA8> {
     return false
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   getOrigin() {
     return OriginGame.LegendsArceus
   }

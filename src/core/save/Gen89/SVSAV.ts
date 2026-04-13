@@ -122,10 +122,6 @@ export class SVSAV extends G89SAV<PK9> {
     }
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   getSaveRevision(): SV_SAVE_REVISION {
     return this.getBlock('BlueberryPoints')
       ? 'Indigo Disk'

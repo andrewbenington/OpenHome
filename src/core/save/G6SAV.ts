@@ -132,10 +132,6 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
     return CRC16_CCITT(this.bytes, this.getPcOffset(), this.pcDataSize)
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   getMonAt(boxNum: number, boxSlot: number) {
     const box = this.boxes[boxNum]
     if (!box) return undefined
