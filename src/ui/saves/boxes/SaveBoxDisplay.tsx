@@ -15,8 +15,7 @@ import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
-import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
-
+import { Button, Card, Dialog, Flex, Grid, Separator } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
@@ -149,9 +148,10 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
   return save && save.currentPCBox !== undefined ? (
     <>
-      <Flex direction="column" width="100%" gap="1">
-        <SaveHeader save={save} setDetailsModal={setDetailsModal} />
+      <Flex direction="column" width="100%">
         <Card className={includeClass('box-card').with('box-card-disabled').if(allCellsDisabled)}>
+          <SaveHeader save={save} setDetailsModal={setDetailsModal} />
+          <Separator />
           <div className="box-navigation">
             <Flex align="center" justify="center" flexGrow="4">
               <ArrowButton
@@ -209,18 +209,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           </Grid>
         </Card>
         <Dialog.Root open={detailsModal} onOpenChange={setDetailsModal}>
-          <Dialog.Content
-            style={{
-              minWidth: 800,
-              width: '80%',
-              maxHeight: 'fit-content',
-              height: '95%',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2,
-            }}
-          >
+          <Dialog.Content className="save-details-modal">
             <AttributeRow label="Game">Pokémon {save.gameName}</AttributeRow>
             <AttributeRow label="Trainer Name">{save.name}</AttributeRow>
             <AttributeRow label="Trainer Display ID">{save.displayID}</AttributeRow>
@@ -310,41 +299,39 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
 
   return (
     <OpenHomeCtxMenu elements={contextElements}>
-      <Card style={{ padding: 0 }}>
-        <div className="save-header">
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
-            <div
-              className="save-header-game diagonal-clip"
-              style={{
-                backgroundColor: save.gameColor,
-                color: colorIsDark(save.gameColor) ? 'white' : 'black',
-              }}
-            >
-              <Button
-                className="save-close-button"
-                onClick={() => savesManager.removeSave(save)}
-                disabled={!!save.updatedBoxSlots.length}
-                color="tomato"
-                style={{ padding: 1 }}
-              >
-                <MdClose />
-              </Button>
-              {save.gameName}
-            </div>
-            {save?.name}
-          </div>
-          <div className="save-menu-buttons-right" style={{ marginRight: 4 }}>
+      <div className="save-header">
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div
+            className="save-header-game diagonal-clip"
+            style={{
+              backgroundColor: save.gameColor,
+              color: colorIsDark(save.gameColor) ? 'white' : 'black',
+            }}
+          >
             <Button
-              className="mini-button"
-              onClick={() => setDetailsModal(true)}
-              variant="outline"
-              color="gray"
+              className="save-close-button"
+              onClick={() => savesManager.removeSave(save)}
+              disabled={!!save.updatedBoxSlots.length}
+              color="tomato"
+              style={{ padding: 1 }}
             >
-              <MenuIcon />
+              <MdClose />
             </Button>
+            {save.gameName}
           </div>
+          {save?.name}
         </div>
-      </Card>
+        <div className="save-menu-buttons-right">
+          <Button
+            className="mini-button"
+            onClick={() => setDetailsModal(true)}
+            variant="outline"
+            color="gray"
+          >
+            <MenuIcon />
+          </Button>
+        </div>
+      </div>
     </OpenHomeCtxMenu>
   )
 }

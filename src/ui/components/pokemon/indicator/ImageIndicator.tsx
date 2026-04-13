@@ -7,15 +7,23 @@ export type ImageIndicatorProps = {
   src: string
   backgroundColor: string
   text?: string
+  style?: React.CSSProperties
 }
 
-export function ImageIndicator({ tooltip, src, backgroundColor, text }: ImageIndicatorProps) {
+export function ImageIndicator({
+  tooltip,
+  src,
+  backgroundColor,
+  text,
+  style,
+}: ImageIndicatorProps) {
   const filterClass = colorIsDark(backgroundColor) ? 'white-filter' : 'black-filter'
   return (
     <Indicator
       className={includeClass('image-indicator-with-text').if(Boolean(text))}
       tooltip={tooltip}
       backgroundColor={backgroundColor}
+      style={style}
     >
       <img
         className={filterClass}
