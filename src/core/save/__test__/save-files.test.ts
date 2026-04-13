@@ -12,15 +12,14 @@ import { DPSAV } from '../DPSAV'
 import { G1SAV } from '../G1SAV'
 import { G2SAV } from '../G2SAV'
 import { G3SAV } from '../G3SAV'
+import { Gen7AlolaSave } from '../Gen7AlolaSave'
 import { LASAV } from '../Gen89/LASAV'
 import { SwShSAV } from '../Gen89/SwShSAV'
 import { HGSSSAV } from '../HGSSSAV'
 import { ORASSAV } from '../ORASSAV'
 import { PtSAV } from '../PtSAV'
 import { G3RRSAV } from '../radicalred/G3RRSAV'
-import { SMSAV } from '../SMSAV'
 import { G3UBSAV } from '../unbound/G3UBSAV'
-import { USUMSAV } from '../USUMSAV'
 import { buildUnknownSaveFile } from '../util/load'
 import { emptyPathData, PathData } from '../util/path'
 import { XYSAV } from '../XYSAV'
@@ -56,8 +55,7 @@ const allSaveTypes = [
   BW2SAV,
   XYSAV,
   ORASSAV,
-  SMSAV,
-  USUMSAV,
+  Gen7AlolaSave,
   SwShSAV,
   LASAV,
 ]
@@ -83,7 +81,7 @@ describe('Save file detection - single possibility', () => {
 })
 
 describe('Handler trainers', () => {
-  let ultraSunSave: USUMSAV
+  let ultraSunSave: Gen7AlolaSave
   let emeraldSave: G3SAV
   let saveBytes: Uint8Array
 
@@ -100,7 +98,7 @@ describe('Handler trainers', () => {
       separator: '/',
     }
 
-    ultraSunSave = new USUMSAV(parsedPath, saveBytes)
+    ultraSunSave = new Gen7AlolaSave(parsedPath, saveBytes)
 
     emeraldSave = new G3SAV(
       emptyPathData,
