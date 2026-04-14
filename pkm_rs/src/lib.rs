@@ -12,6 +12,8 @@ pub mod convert_strategy;
 pub mod format;
 
 #[cfg(feature = "wasm")]
+pub mod gen3;
+#[cfg(feature = "wasm")]
 pub mod gen7_alola;
 // pub mod gen7_lgpe;
 pub mod location;
