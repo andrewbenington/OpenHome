@@ -19,7 +19,7 @@ serde-wasm-bindgen = { version = "0.6.5", optional = true }
 pkm_rs_derive = { path = "../pkm_rs_derive" }
 static_assertions = "1.1.0"
 sha2 = "0.10.9"
-rand = "0.10.0"
+rand = "0.10.1"
 getrandom = { version = "0.4.2", features = ["wasm_js"] }
 phf = { version = "0.13.1", features = ["macros"] }
 strum = "0.28.0"
