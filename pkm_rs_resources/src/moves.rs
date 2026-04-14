@@ -27,10 +27,14 @@ impl MoveSlot {
         }
     }
 
-    pub fn from_bytes(bytes: &[u8], offsets: MoveDataOffsets, index: usize) -> Self {
-        let move_offset = offsets.moves + (2 * index);
-        let pp_offset = offsets.pp + index;
-        let pp_ups_offset = offsets.pp_ups + index;
+    pub fn from_bytes<T: Into<usize>>(
+        bytes: &[u8],
+        offsets: MoveDataOffsets<T>,
+        index: usize,
+    ) -> Self {
+        let move_offset = offsets.moves.into() + (2 * index);
+        let pp_offset = offsets.pp.into() + index;
+        let pp_ups_offset = offsets.pp_ups.into() + index;
 
         Self {
             move_index: MoveIndex::from_u16(read_u16_le!(bytes, move_offset)),
@@ -39,10 +43,15 @@ impl MoveSlot {
         }
     }
 
-    pub fn write_to_offsets(&self, bytes: &mut [u8], offsets: MoveDataOffsets, index: usize) {
-        let move_offset = offsets.moves + (2 * index);
-        let pp_offset = offsets.pp + index;
-        let pp_ups_offset = offsets.pp_ups + index;
+    pub fn write_to_offsets<T: Into<usize>>(
+        &self,
+        bytes: &mut [u8],
+        offsets: MoveDataOffsets<T>,
+        index: usize,
+    ) {
+        let move_offset = offsets.moves.into() + (2 * index);
+        let pp_offset = offsets.pp.into() + index;
+        let pp_ups_offset = offsets.pp_ups.into() + index;
 
         bytes[move_offset..move_offset + 2].copy_from_slice(&self.move_index.to_le_bytes());
         bytes[pp_offset] = self.pp;
@@ -56,7 +65,7 @@ impl MoveSlot {
 pub struct MoveSlots([MoveSlot; 4]);
 
 impl MoveSlots {
-    pub fn from_bytes(bytes: &[u8], offsets: MoveDataOffsets) -> Self {
+    pub fn from_bytes<T: Into<usize> + Copy>(bytes: &[u8], offsets: MoveDataOffsets<T>) -> Self {
         Self([
             MoveSlot::from_bytes(bytes, offsets, 0),
             MoveSlot::from_bytes(bytes, offsets, 1),
@@ -74,7 +83,11 @@ impl MoveSlots {
         ])
     }
 
-    pub fn write_spans(&self, bytes: &mut [u8], offsets: MoveDataOffsets) {
+    pub fn write_spans<T: Into<usize> + Copy>(
+        &self,
+        bytes: &mut [u8],
+        offsets: MoveDataOffsets<T>,
+    ) {
         self.0
             .iter()
             .enumerate()
@@ -157,10 +170,10 @@ impl<'a> IntoIterator for &'a mut MoveSlots {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct MoveDataOffsets {
-    pub moves: usize,
-    pub pp: usize,
-    pub pp_ups: usize,
+pub struct MoveDataOffsets<T: Into<usize> = usize> {
+    pub moves: T,
+    pub pp: T,
+    pub pp_ups: T,
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
