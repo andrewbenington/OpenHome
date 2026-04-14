@@ -548,6 +548,7 @@ impl ContestStats {
     }
 }
 
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum ContestStat {

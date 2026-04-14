@@ -815,6 +815,60 @@ impl Randomize for ShinyLeaves {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Display, Serialize)]
+pub enum SimpleAbilityNumber {
+    #[default]
+    First,
+    Second,
+}
+
+impl SimpleAbilityNumber {
+    pub const fn from_u8_first_bit(byte: u8) -> Self {
+        if (byte & 0b1) != 0 {
+            Self::Second
+        } else {
+            Self::First
+        }
+    }
+
+    pub const fn to_bool(self) -> bool {
+        match self {
+            Self::First => false,
+            Self::Second => true,
+        }
+    }
+}
+
+impl From<bool> for SimpleAbilityNumber {
+    fn from(value: bool) -> Self {
+        match value {
+            true => Self::Second,
+            false => Self::First,
+        }
+    }
+}
+
+impl From<SimpleAbilityNumber> for AbilityNumber {
+    fn from(value: SimpleAbilityNumber) -> Self {
+        match value {
+            SimpleAbilityNumber::First => AbilityNumber::First,
+            SimpleAbilityNumber::Second => AbilityNumber::Second,
+        }
+    }
+}
+
+impl From<AbilityNumber> for SimpleAbilityNumber {
+    fn from(value: AbilityNumber) -> Self {
+        match value {
+            AbilityNumber::First => SimpleAbilityNumber::First,
+            AbilityNumber::Second => SimpleAbilityNumber::Second,
+            AbilityNumber::Hidden => SimpleAbilityNumber::First, // hidden => first
+        }
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Display, Serialize)]
 pub enum AbilityNumber {
     #[default]
     First = 1,
