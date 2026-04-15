@@ -7,6 +7,7 @@ mod pkm_storage;
 mod plugin;
 mod saves;
 mod startup;
+mod startup_config;
 mod state;
 mod util;
 mod versioning;
@@ -21,6 +22,22 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
+            let startup_config_state =
+                match startup_config::StartupConfigState::load_from_storage(app.handle()) {
+                    Ok(state) => state,
+                    Err(err) => {
+                        util::show_error_dialog(
+                            app,
+                            err.to_string(),
+                            "OpenHome Failed to Launch - Startup Config Error",
+                        );
+
+                        app.handle().exit(1);
+                        std::process::exit(1);
+                    }
+                };
+            app.manage(startup_config_state);
+
             let update_features_r = startup::run_app_startup(app);
             let Ok(update_features) = update_features_r else {
                 let launch_error = update_features_r.unwrap_err();
