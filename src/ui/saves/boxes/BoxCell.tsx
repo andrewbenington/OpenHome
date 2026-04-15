@@ -96,14 +96,14 @@ function BoxCell({
           importedMons.push(mon)
           pokedexUpdates.push({
             dexNumber: mon.dexNum,
-            formeNumber: mon.formNum,
+            formIndex: mon.formNum,
             status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
           })
 
           if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
             pokedexUpdates.push({
               dexNumber: mon.dexNum,
-              formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formNum),
+              formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formNum),
               status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
             })
           }

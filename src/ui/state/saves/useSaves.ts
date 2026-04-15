@@ -330,9 +330,12 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const addSave = useCallback(
-    (save: SAV) => {
-      backend.addRecentSave(getSaveRef(save))
-      backend.registerInPokedex(pokedexSeenFromSave(save))
+    async (save: SAV) => {
+      await backend.addRecentSave(getSaveRef(save))
+      const result = await backend.registerInPokedex(pokedexSeenFromSave(save))
+      if (R.isErr(result)) {
+        console.error('Error registering pokedex entries from save:', result.err)
+      }
       if (save.trainerGender !== undefined) {
         const allOhpkms = ohpkmStore.getAllStored()
         for (const mon of allOhpkms) {
@@ -893,14 +896,14 @@ export function pokedexSeenFromSave(saveFile: SAV) {
   for (const mon of saveFile.getAllMons()) {
     pokedexUpdates.push({
       dexNumber: mon.dexNum,
-      formeNumber: mon.formNum,
+      formIndex: mon.formNum,
       status: 'Seen',
     })
 
     if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
       pokedexUpdates.push({
         dexNumber: mon.dexNum,
-        formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formNum),
+        formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formNum),
         status: 'Seen',
       })
     }
