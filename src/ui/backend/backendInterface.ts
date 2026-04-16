@@ -45,6 +45,11 @@ export default interface BackendInterface {
   addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
 
+  /* prompt user to select new data directory location */
+  promptChangeDataDir: () => Promise<Errorable<null>>
+  /* get the current data directory path */
+  getDataDirPath: () => Promise<Errorable<string>>
+
   /* write synced state to disk during save */
   saveSyncedState: () => Promise<Errorable<void>>
 

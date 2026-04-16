@@ -20,10 +20,11 @@ use crate::{error::Error, state::synced_state::AllSyncedState};
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             let startup_config_state =
-                match startup_config::StartupConfigState::load_from_storage(app.handle()) {
+                match startup_config::StartupConfigState::load_or_create(app.handle()) {
                     Ok(state) => state,
                     Err(err) => {
                         util::show_error_dialog(
@@ -158,6 +159,8 @@ pub fn run() {
             commands::handle_windows_accellerator,
             commands::open_directory,
             commands::open_file_location,
+            startup_config::get_data_dir_path,
+            startup_config::change_data_dir,
             pkm_storage::load_banks,
             pkm_storage::write_banks,
             state::get_lookups,

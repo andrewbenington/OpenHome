@@ -124,13 +124,8 @@ impl DataController for tauri::AppHandle {
     fn get_data_folder(&self) -> Result<PathBuf> {
         use tauri::Manager;
         let data_folder = self.path().app_data_dir()?;
-        println!("Getting data folder path from startup config");
         let state = self.state::<StartupConfigState>();
-        println!("Got state: {:?}", state.lock()?.get_data_dir_path());
-        let d = Ok(state.lock()?.get_data_dir_path().unwrap_or(data_folder));
-
-        println!("data folder path: {:?}", d);
-        d
+        Ok(state.lock()?.get_data_dir_path().unwrap_or(data_folder))
     }
 
     fn get_config_folder(&self) -> Result<PathBuf> {
@@ -162,7 +157,7 @@ where
     serde_json::from_str(&json_str).map_err(|e| Error::file_malformed(&full_path, e))
 }
 
-fn write_file_json<P, V>(path: P, value: V) -> Result<()>
+pub(crate) fn write_file_json<P, V>(path: P, value: V) -> Result<()>
 where
     P: AsRef<Path>,
     V: serde::ser::Serialize,

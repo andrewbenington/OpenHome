@@ -62,6 +62,10 @@ const DummyBackend: BackendInterface = {
   saveLocalFile: async () => R.Err('no backend in use'),
   emitMenuEvent: async () => R.Err('no backend in use'),
 
+  /* data directory */
+  promptChangeDataDir: async () => R.Err('no backend in use'),
+  getDataDirPath: async () => R.Err('no backend in use'),
+
   /* plugins */
   getImageData: async () => R.Err('no backend in use'),
   listInstalledPlugins: async () => R.Err('no backend in use'),

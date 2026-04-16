@@ -44,7 +44,7 @@ export default function App() {
       style={{ background: 'var(--background-gradient)' }}
       radius="small"
     >
-      <div id="app-container">
+      <div id="app-container" className="root">
         <BackendProvider backend={TauriBackend}>
           <ErrorContext.Provider value={[errorState, errorDispatch]}>
             <AppWithBackend />

@@ -1,6 +1,5 @@
 use std::{cmp::max, collections::HashMap, ops::Deref, sync::Mutex};
 
-use pkm_rs::log;
 use serde::{Deserialize, Serialize};
 use tauri::Emitter;
 
@@ -75,12 +74,6 @@ impl Pokedex {
         form_index: FormeNumber,
         status: PokedexStatus,
     ) {
-        log!(
-            "Registering in pokedex: dex {}, form {}, status {:?}",
-            dex_number,
-            form_index,
-            status
-        );
         self.by_dex_number
             .entry(dex_number)
             .or_default()
