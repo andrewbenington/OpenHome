@@ -1,10 +1,10 @@
 {
   "sanity": 0,
-  "checksum": 27003,
-  "national_dex": 257,
-  "held_item_index": 215,
-  "trainer_id": 34978,
-  "secret_id": 48423,
+  "checksum": 33285,
+  "national_dex": 260,
+  "held_item_index": 0,
+  "trainer_id": 52250,
+  "secret_id": 16149,
   "exp": 1059860,
   "ability_num": "First",
   "markings": {
@@ -13,16 +13,16 @@
     "triangle": false,
     "heart": false
   },
-  "personality_value": 2195646127,
+  "personality_value": 1094668794,
   "is_fateful_encounter": false,
   "gender": "Male",
   "evs": {
-    "hp": 6,
-    "atk": 252,
-    "def": 0,
+    "hp": 252,
+    "atk": 6,
+    "def": 252,
     "spa": 0,
     "spd": 0,
-    "spe": 252
+    "spe": 0
   },
   "contest": {
     "cool": 0,
@@ -34,39 +34,38 @@
   },
   "pokerus_byte": 0,
   "ribbons": [
-    "G3 Champion Ribbon",
-    "Effort Ribbon"
+    "G3 Champion Ribbon"
   ],
-  "nickname": "BLAZIKEN",
+  "nickname": "SWAMPERT",
   "moves": [
     {
-      "move_index": "Aerial Ace",
-      "pp": 32,
-      "pp_ups": 3
-    },
-    {
-      "move_index": "Sky Uppercut",
+      "move_index": "Waterfall",
       "pp": 24,
-      "pp_ups": 3
-    },
-    {
-      "move_index": "Blaze Kick",
-      "pp": 16,
       "pp_ups": 3
     },
     {
       "move_index": "Earthquake",
       "pp": 16,
       "pp_ups": 3
+    },
+    {
+      "move_index": "Dive",
+      "pp": 16,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Muddy Water",
+      "pp": 16,
+      "pp_ups": 3
     }
   ],
   "ivs": {
-    "hp": 11,
-    "atk": 19,
-    "def": 20,
-    "spa": 18,
-    "spd": 9,
-    "spe": 4
+    "hp": 15,
+    "atk": 8,
+    "def": 14,
+    "spa": 28,
+    "spd": 31,
+    "spe": 24
   },
   "is_egg": false,
   "trainer_name": "RoC",
@@ -75,17 +74,17 @@
   "ball": "Pok\u00E9",
   "met_level": 5,
   "trainer_gender": "Male",
-  "game_of_origin": "Emerald",
+  "game_of_origin": "Sapphire",
   "language": "English",
   "status_condition": 0,
   "stat_level": 100,
-  "current_hp": 282,
+  "current_hp": 388,
   "stats": {
-    "hp": 282,
-    "atk": 359,
-    "def": 165,
-    "spa": 243,
-    "spd": 154,
-    "spe": 208
+    "hp": 388,
+    "atk": 234,
+    "def": 262,
+    "spa": 223,
+    "spd": 194,
+    "spe": 149
   }
 }

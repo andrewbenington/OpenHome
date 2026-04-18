@@ -1,13 +1,13 @@
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::result::Result;
+use crate::strings::Gen3String;
 use crate::traits::bytes::{AsBytes, AsBytesMut};
 use crate::util;
 use arbitrary_int::u4;
 use arbitrary_int::u7;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::MoveSlots;
+use pkm_rs_resources::moves::{MoveSlots, PpUpStorage};
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
-use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     BinaryGender, ContestStats, MarkingsFourShapes, OriginGame, SimpleAbilityNumber, Stats8,
 };
@@ -250,16 +250,20 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         Gen3RibbonSet::from_u32(self.get_u32_le(Offset::RibbonsFatefulEncounter))
     }
 
-    pub fn nickname_raw(&self) -> [u8; 26] {
+    pub fn nickname_raw(&self) -> [u8; 10] {
         self.get_array(Offset::Nickname)
     }
 
-    pub fn nickname(&self) -> SizedUtf16String<26> {
-        SizedUtf16String::<26>::from_bytes(self.nickname_raw())
+    pub fn nickname(&self) -> Gen3String<10> {
+        Gen3String::<10>::from_bytes(self.nickname_raw())
     }
 
     pub fn move_slots(&self) -> MoveSlots {
-        MoveSlots::from_bytes(self.bytes(), super::MOVE_DATA_OFFSETS)
+        MoveSlots::from_bytes(
+            self.bytes(),
+            super::MOVE_DATA_OFFSETS,
+            PpUpStorage::SingleByte,
+        )
     }
 
     fn ivs_egg_ability_raw(&self) -> [u8; 4] {
@@ -274,12 +278,12 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         self.get_flag(Offset::IvsEggAbility, 30)
     }
 
-    fn trainer_name_raw(&self) -> [u8; 26] {
+    fn trainer_name_raw(&self) -> [u8; 7] {
         self.get_array(Offset::TrainerName)
     }
 
-    pub fn trainer_name(&self) -> SizedUtf16String<26> {
-        SizedUtf16String::<26>::from_bytes(self.trainer_name_raw())
+    pub fn trainer_name(&self) -> Gen3String<7> {
+        Gen3String::<7>::from_bytes(self.trainer_name_raw())
     }
 
     pub fn trainer_friendship(&self) -> u8 {
@@ -331,7 +335,7 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
     }
 
     // ------------------------------------------------------------------
-    // Party-only fields  (offsets 232 – 259)
+    // Party-only fields  (offsets 80 – 100)
     // ------------------------------------------------------------------
 
     pub fn status_condition(&self) -> u32 {
@@ -446,11 +450,11 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
         self.set_is_fateful_encounter(is_fateful_encounter);
     }
 
-    fn set_nickname_raw(&mut self, v: &[u8; 26]) {
+    fn set_nickname_raw(&mut self, v: &[u8; 10]) {
         self.set_array(Offset::Nickname, v);
     }
 
-    pub fn set_nickname(&mut self, v: &SizedUtf16String<26>) {
+    pub fn set_nickname(&mut self, v: &Gen3String<10>) {
         self.set_nickname_raw(&v.bytes());
     }
 
@@ -466,11 +470,11 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
         self.set_flag(Offset::IvsEggAbility, 30, v);
     }
 
-    fn set_trainer_name_raw(&mut self, v: &[u8; 26]) {
+    fn set_trainer_name_raw(&mut self, v: &[u8; 7]) {
         self.set_array(Offset::TrainerName, v);
     }
 
-    pub fn set_trainer_name(&mut self, v: &SizedUtf16String<26>) {
+    pub fn set_trainer_name(&mut self, v: &Gen3String<7>) {
         self.set_trainer_name_raw(&v.bytes());
     }
 
@@ -524,7 +528,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
     }
 
     // ------------------------------------------------------------------
-    // Party-only fields  (offsets 232 – 259)
+    // Party-only fields  (offsets 80 – 100)
     // ------------------------------------------------------------------
 
     pub fn set_status_condition(&mut self, v: u32) {

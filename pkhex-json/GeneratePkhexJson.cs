@@ -22,6 +22,10 @@ static object PkmToJsonObject(PKM pk)
     {
         return Pk7Object.Build(pk7);
     }
+    else if (pk is PK3 pk3)
+    {
+        return Pk3Object.Build(pk3);
+    }
     else
     {
         return new {};

@@ -207,7 +207,7 @@ impl Gen3ContestRibbonLevel {
     }
 }
 
-#[derive(Debug, Serialize, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[repr(u8)]
 pub enum Gen3Ribbon {
     CoolHoenn,
@@ -345,7 +345,7 @@ impl Gen3Ribbon {
             Gen3Ribbon::ToughSuperHoenn => "Tough Super Ribbon",
             Gen3Ribbon::ToughHyperHoenn => "Tough Hyper Ribbon",
             Gen3Ribbon::ToughMasterHoenn => "Tough Master Ribbon",
-            Gen3Ribbon::Champion => "Champion Ribbon",
+            Gen3Ribbon::Champion => "G3 Champion Ribbon",
             Gen3Ribbon::Winning => "Winning Ribbon",
             Gen3Ribbon::Victory => "Victory Ribbon",
             Gen3Ribbon::Artist => "Artist Ribbon",
@@ -509,6 +509,15 @@ impl TryFrom<ModernRibbon> for Gen3Ribbon {
 impl Display for Gen3Ribbon {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.get_name())
+    }
+}
+
+impl Serialize for Gen3Ribbon {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.get_name().serialize(serializer)
     }
 }
 

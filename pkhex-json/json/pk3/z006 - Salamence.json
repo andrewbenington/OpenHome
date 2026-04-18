@@ -1,11 +1,11 @@
 {
   "sanity": 0,
-  "checksum": 27003,
-  "national_dex": 257,
-  "held_item_index": 215,
+  "checksum": 32690,
+  "national_dex": 373,
+  "held_item_index": 0,
   "trainer_id": 34978,
   "secret_id": 48423,
-  "exp": 1059860,
+  "exp": 1250000,
   "ability_num": "First",
   "markings": {
     "circle": false,
@@ -13,12 +13,12 @@
     "triangle": false,
     "heart": false
   },
-  "personality_value": 2195646127,
+  "personality_value": 3861304239,
   "is_fateful_encounter": false,
   "gender": "Male",
   "evs": {
-    "hp": 6,
-    "atk": 252,
+    "hp": 252,
+    "atk": 6,
     "def": 0,
     "spa": 0,
     "spd": 0,
@@ -33,59 +33,56 @@
     "sheen": 0
   },
   "pokerus_byte": 0,
-  "ribbons": [
-    "G3 Champion Ribbon",
-    "Effort Ribbon"
-  ],
-  "nickname": "BLAZIKEN",
+  "ribbons": [],
+  "nickname": "SALAMENCE",
   "moves": [
     {
-      "move_index": "Aerial Ace",
-      "pp": 32,
-      "pp_ups": 3
-    },
-    {
-      "move_index": "Sky Uppercut",
+      "move_index": "Dragon Claw",
       "pp": 24,
       "pp_ups": 3
     },
     {
-      "move_index": "Blaze Kick",
-      "pp": 16,
+      "move_index": "Crunch",
+      "pp": 24,
       "pp_ups": 3
     },
     {
-      "move_index": "Earthquake",
-      "pp": 16,
+      "move_index": "Fly",
+      "pp": 24,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Flamethrower",
+      "pp": 24,
       "pp_ups": 3
     }
   ],
   "ivs": {
-    "hp": 11,
-    "atk": 19,
-    "def": 20,
-    "spa": 18,
-    "spd": 9,
-    "spe": 4
+    "hp": 6,
+    "atk": 9,
+    "def": 9,
+    "spa": 28,
+    "spd": 7,
+    "spe": 16
   },
   "is_egg": false,
   "trainer_name": "RoC",
-  "trainer_friendship": 255,
-  "met_location_index": 16,
+  "trainer_friendship": 159,
+  "met_location_index": 63,
   "ball": "Pok\u00E9",
-  "met_level": 5,
+  "met_level": 30,
   "trainer_gender": "Male",
   "game_of_origin": "Emerald",
   "language": "English",
   "status_condition": 0,
   "stat_level": 100,
-  "current_hp": 282,
+  "current_hp": 369,
   "stats": {
-    "hp": 282,
-    "atk": 359,
-    "def": 165,
-    "spa": 243,
+    "hp": 369,
+    "atk": 285,
+    "def": 174,
+    "spa": 253,
     "spd": 154,
-    "spe": 208
+    "spe": 312
   }
 }

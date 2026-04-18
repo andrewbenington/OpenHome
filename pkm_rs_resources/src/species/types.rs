@@ -844,8 +844,10 @@ impl SpeciesAndForm {
 impl Randomize for SpeciesAndForm {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
         let national_dex = NatDexIndex::randomized(rng);
+        println!("randomized ndex: {}", national_dex.get());
         let forme_count = national_dex.get_species_metadata().forms().len();
         let form_index = rng.random_range(0..forme_count) as u16;
+        println!("randomized form: {}", form_index);
 
         Self {
             national_dex,

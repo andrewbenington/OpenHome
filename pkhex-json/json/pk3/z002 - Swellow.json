@@ -1,8 +1,8 @@
 {
   "sanity": 0,
-  "checksum": 27003,
-  "national_dex": 257,
-  "held_item_index": 215,
+  "checksum": 49033,
+  "national_dex": 277,
+  "held_item_index": 183,
   "trainer_id": 34978,
   "secret_id": 48423,
   "exp": 1059860,
@@ -13,16 +13,16 @@
     "triangle": false,
     "heart": false
   },
-  "personality_value": 2195646127,
+  "personality_value": 4267281127,
   "is_fateful_encounter": false,
   "gender": "Male",
   "evs": {
-    "hp": 6,
+    "hp": 252,
     "atk": 252,
     "def": 0,
     "spa": 0,
     "spd": 0,
-    "spe": 252
+    "spe": 6
   },
   "contest": {
     "cool": 0,
@@ -34,10 +34,9 @@
   },
   "pokerus_byte": 0,
   "ribbons": [
-    "G3 Champion Ribbon",
-    "Effort Ribbon"
+    "G3 Champion Ribbon"
   ],
-  "nickname": "BLAZIKEN",
+  "nickname": "SWELLOW",
   "moves": [
     {
       "move_index": "Aerial Ace",
@@ -45,47 +44,47 @@
       "pp_ups": 3
     },
     {
-      "move_index": "Sky Uppercut",
+      "move_index": "Fly",
       "pp": 24,
       "pp_ups": 3
     },
     {
-      "move_index": "Blaze Kick",
-      "pp": 16,
-      "pp_ups": 3
+      "move_index": "Secret Power",
+      "pp": 20,
+      "pp_ups": 0
     },
     {
-      "move_index": "Earthquake",
-      "pp": 16,
+      "move_index": "Steel Wing",
+      "pp": 40,
       "pp_ups": 3
     }
   ],
   "ivs": {
-    "hp": 11,
-    "atk": 19,
-    "def": 20,
-    "spa": 18,
-    "spd": 9,
-    "spe": 4
+    "hp": 12,
+    "atk": 10,
+    "def": 29,
+    "spa": 21,
+    "spd": 24,
+    "spe": 20
   },
   "is_egg": false,
   "trainer_name": "RoC",
   "trainer_friendship": 255,
-  "met_location_index": 16,
-  "ball": "Pok\u00E9",
-  "met_level": 5,
+  "met_location_index": 19,
+  "ball": "Ultra",
+  "met_level": 4,
   "trainer_gender": "Male",
   "game_of_origin": "Emerald",
   "language": "English",
   "status_condition": 0,
   "stat_level": 100,
-  "current_hp": 282,
+  "current_hp": 305,
   "stats": {
-    "hp": 282,
-    "atk": 359,
-    "def": 165,
-    "spa": 243,
-    "spd": 154,
-    "spe": 208
+    "hp": 305,
+    "atk": 272,
+    "def": 154,
+    "spa": 126,
+    "spd": 129,
+    "spe": 248
   }
 }

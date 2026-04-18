@@ -1,1 +1,88 @@
-{}
+{
+  "sanity": 0,
+  "checksum": 34927,
+  "national_dex": 201,
+  "held_item_index": 0,
+  "trainer_id": 32153,
+  "secret_id": 50405,
+  "exp": 15625,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 487957610,
+  "is_fateful_encounter": false,
+  "gender": "Genderless",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus_byte": 0,
+  "ribbons": [],
+  "nickname": "UNOWN",
+  "moves": [
+    {
+      "move_index": "Hidden Power",
+      "pp": 15,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "\u003Cempty\u003E",
+      "pp": 0,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "\u003Cempty\u003E",
+      "pp": 0,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "\u003Cempty\u003E",
+      "pp": 0,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 15,
+    "atk": 30,
+    "def": 23,
+    "spa": 11,
+    "spd": 15,
+    "spe": 18
+  },
+  "is_egg": false,
+  "trainer_name": "MATT",
+  "trainer_friendship": 255,
+  "met_location_index": 194,
+  "ball": "Master",
+  "met_level": 25,
+  "trainer_gender": "Male",
+  "game_of_origin": "FireRed",
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 25,
+  "current_hp": 62,
+  "stats": {
+    "hp": 62,
+    "atk": 43,
+    "def": 34,
+    "spa": 43,
+    "spd": 32,
+    "spe": 36
+  }
+}

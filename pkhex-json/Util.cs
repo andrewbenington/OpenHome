@@ -35,6 +35,18 @@ public static class Util
     };
   }
 
+  public static object MarkingsFourShapes(IAppliedMarkings3 pk)
+  {
+    return new
+    {
+      circle = pk.MarkingCircle,
+      square = pk.MarkingSquare,
+      triangle = pk.MarkingTriangle,
+      heart = pk.MarkingHeart,
+    };
+  }
+
+
   public static object MarkingsSixShapesColors(IAppliedMarkings7 pk)
   {
     return new
@@ -81,7 +93,15 @@ public static class Util
 
   static object FormatMoveName(int moveId, GameStrings strings)
   {
+    try
+    {
+      
     return moveId == 0 ? "<empty>" : strings.movelist.GetValue(moveId);
+    }
+    catch (Exception)
+    {
+      return $"<invalid move: {moveId}>";
+    }
   }
 
   static object MoveData(PKM pk, int moveIndex, GameStrings strings)
