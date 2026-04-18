@@ -180,9 +180,7 @@ export default class PK3 {
       this.abilityNum = other.abilityNum
       if (
         this.abilityNum === 2 &&
-        this.metadata
-          ?.abilityByNumGen3(this.abilityNum)
-          ?.equals(this.metadata.abilityByNumGen3(this.abilityNum))
+        this.metadata?.abilityByNumGen3(1)?.equals(this.metadata.abilityByNumGen3(2))
       ) {
         this.abilityNum = 1
       }
