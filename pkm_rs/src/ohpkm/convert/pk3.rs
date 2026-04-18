@@ -3,6 +3,7 @@ use pkm_rs_resources::ribbons::Gen3Ribbon;
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
 use crate::{
+    conversion::gen3_pokemon_index::Gen3PokemonIndex,
     convert_strategy::{ConvertStrategy, PkmConverter},
     format::PkmFormat,
     gen3::{PK3_MAX_ABILITY, Pk3},
@@ -31,7 +32,7 @@ impl OhpkmConvert for Pk3 {
         ohpkm::v2_sections::MainDataV2 {
             personality_value: self.personality_value,
             encryption_constant: self.personality_value, // Mirror Poké Transporter's behavior of using the personality value as the encryption constant
-            species_and_form: self.species_and_form,
+            species_and_form: self.species_and_form(),
             held_item_index: self.held_item_index,
             trainer_id: self.trainer_id,
             secret_id: self.secret_id,
@@ -52,11 +53,10 @@ impl OhpkmConvert for Pk3 {
                 .map(Gen3Ribbon::to_openhome)
                 .collect(),
             moves: self.moves,
-            nickname: self.nickname,
-            relearn_moves: self.relearn_moves,
+            nickname: self.nickname.to_string().into(),
             ivs: self.ivs,
             is_egg: self.is_egg,
-            is_nicknamed: !lookup::species_name(self.species_and_form.get_ndex(), self.language)
+            is_nicknamed: !lookup::species_name(self.national_dex.to_national_dex(), self.language)
                 .eq_ignore_ascii_case(&self.nickname.to_string()),
             // handler_name: self.handler_name,
             // is_current_handler: self.is_current_handler,
@@ -70,7 +70,7 @@ impl OhpkmConvert for Pk3 {
             // console_region: self.console_region,
             language: self.language,
             // form_argument: self.form_argument,
-            trainer_name: self.trainer_name,
+            trainer_name: self.trainer_name.to_string().into(),
             trainer_friendship: self.trainer_friendship,
             // trainer_memory: self.trainer_memory,
             // trainer_affection: self.trainer_affection,
@@ -101,7 +101,10 @@ impl OhpkmConvert for Pk3 {
         let mut mon = Self {
             sanity: 0,
             checksum: 0,
-            species_and_form: ohpkm.species_and_form(),
+            national_dex: Gen3PokemonIndex::from_national_dex(
+                ohpkm.species_and_form().get_ndex().index(),
+            )
+            .expect("invalid national dex for pk3"),
             held_item_index: ohpkm.held_item_index(),
             trainer_id: ohpkm.trainer_id(),
             secret_id: ohpkm.secret_id(),
@@ -119,12 +122,11 @@ impl OhpkmConvert for Pk3 {
                 .into_iter()
                 .filter_map(Gen3Ribbon::from_openhome_if_present)
                 .collect(),
-            nickname: ohpkm.nickname(),
+            nickname: ohpkm.nickname().to_string().into(),
             moves: ohpkm.moves(),
-            relearn_moves: ohpkm.relearn_moves(),
             ivs: converter.ivs(ohpkm),
             is_egg: ohpkm.is_egg(),
-            trainer_name: ohpkm.trainer_name(),
+            trainer_name: ohpkm.trainer_name().to_string().into(),
             trainer_friendship: ohpkm.trainer_friendship(),
             met_location_index: met_data.location_index,
             ball: ohpkm.ball(),
@@ -134,8 +136,6 @@ impl OhpkmConvert for Pk3 {
             language: ohpkm.language(),
             status_condition: 0,
             stat_level: 0,
-            form_argument_remain: 0,
-            form_argument_elapsed: 0,
             current_hp: 0,
             stats: Stats16Le::default(),
         };

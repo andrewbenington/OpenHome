@@ -11,7 +11,7 @@ use crate::util;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::lookup;
-use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
+use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
@@ -441,7 +441,7 @@ impl DataSection for MainDataV2 {
             height_scalar: bytes[80],
             weight_scalar: bytes[81],
             scale: bytes[82],
-            moves: MoveSlots::from_bytes(bytes, MOVE_DATA_OFFSETS),
+            moves: MoveSlots::from_bytes(bytes, MOVE_DATA_OFFSETS, PpUpStorage::FourBytes),
             nickname: SizedUtf16String::<26>::from_bytes(bytes[96..122].try_into().unwrap()),
             egg_date: PokeDate::from_bytes_optional(bytes[122..125].try_into().unwrap()),
             met_date: PokeDate::from_bytes(bytes[125..128].try_into().unwrap()),

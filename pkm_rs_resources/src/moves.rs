@@ -27,23 +27,23 @@ impl MoveSlot {
         }
     }
 
-    pub fn from_bytes<T: Into<usize>>(
+    pub fn from_bytes<Offset: Into<usize> + Copy>(
         bytes: &[u8],
-        offsets: MoveDataOffsets<T>,
+        offsets: MoveDataOffsets<Offset>,
+        pp_up_storage: PpUpStorage,
         index: usize,
     ) -> Self {
         let move_offset = offsets.moves.into() + (2 * index);
         let pp_offset = offsets.pp.into() + index;
-        let pp_ups_offset = offsets.pp_ups.into() + index;
 
         Self {
             move_index: MoveIndex::from_u16(read_u16_le!(bytes, move_offset)),
             pp: bytes[pp_offset],
-            pp_ups: bytes[pp_ups_offset],
+            pp_ups: pp_up_storage.get_pp_ups(bytes, offsets, index),
         }
     }
 
-    pub fn write_to_offsets<T: Into<usize>>(
+    pub fn write_to_offsets<T: Into<usize> + Copy>(
         &self,
         bytes: &mut [u8],
         offsets: MoveDataOffsets<T>,
@@ -65,12 +65,16 @@ impl MoveSlot {
 pub struct MoveSlots([MoveSlot; 4]);
 
 impl MoveSlots {
-    pub fn from_bytes<T: Into<usize> + Copy>(bytes: &[u8], offsets: MoveDataOffsets<T>) -> Self {
+    pub fn from_bytes<T: Into<usize> + Copy>(
+        bytes: &[u8],
+        offsets: MoveDataOffsets<T>,
+        pp_up_storage: PpUpStorage,
+    ) -> Self {
         Self([
-            MoveSlot::from_bytes(bytes, offsets, 0),
-            MoveSlot::from_bytes(bytes, offsets, 1),
-            MoveSlot::from_bytes(bytes, offsets, 2),
-            MoveSlot::from_bytes(bytes, offsets, 3),
+            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 0),
+            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 1),
+            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 2),
+            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 3),
         ])
     }
 
@@ -166,6 +170,26 @@ impl<'a> IntoIterator for &'a mut MoveSlots {
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.iter_mut()
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum PpUpStorage {
+    SingleByte,
+    FourBytes,
+}
+
+impl PpUpStorage {
+    fn get_pp_ups(
+        &self,
+        bytes: &[u8],
+        offsets: MoveDataOffsets<impl Into<usize>>,
+        index: usize,
+    ) -> u8 {
+        match self {
+            PpUpStorage::SingleByte => bytes[offsets.pp_ups.into()] >> (2 * index) & 0b11,
+            PpUpStorage::FourBytes => bytes[offsets.pp_ups.into() + index],
+        }
     }
 }
 

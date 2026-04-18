@@ -1,10 +1,10 @@
 {
   "sanity": 0,
-  "checksum": 27003,
-  "national_dex": 257,
-  "held_item_index": 215,
-  "trainer_id": 34978,
-  "secret_id": 48423,
+  "checksum": 57883,
+  "national_dex": 254,
+  "held_item_index": 205,
+  "trainer_id": 15933,
+  "secret_id": 36181,
   "exp": 1059860,
   "ability_num": "First",
   "markings": {
@@ -13,7 +13,7 @@
     "triangle": false,
     "heart": false
   },
-  "personality_value": 2195646127,
+  "personality_value": 1987512567,
   "is_fateful_encounter": false,
   "gender": "Male",
   "evs": {
@@ -34,39 +34,38 @@
   },
   "pokerus_byte": 0,
   "ribbons": [
-    "G3 Champion Ribbon",
-    "Effort Ribbon"
+    "G3 Champion Ribbon"
   ],
-  "nickname": "BLAZIKEN",
+  "nickname": "SCEPTILE",
   "moves": [
+    {
+      "move_index": "Leaf Blade",
+      "pp": 24,
+      "pp_ups": 3
+    },
     {
       "move_index": "Aerial Ace",
       "pp": 32,
       "pp_ups": 3
     },
     {
-      "move_index": "Sky Uppercut",
-      "pp": 24,
-      "pp_ups": 3
-    },
-    {
-      "move_index": "Blaze Kick",
+      "move_index": "Dig",
       "pp": 16,
       "pp_ups": 3
     },
     {
-      "move_index": "Earthquake",
-      "pp": 16,
+      "move_index": "Flash",
+      "pp": 32,
       "pp_ups": 3
     }
   ],
   "ivs": {
-    "hp": 11,
-    "atk": 19,
-    "def": 20,
-    "spa": 18,
-    "spd": 9,
-    "spe": 4
+    "hp": 17,
+    "atk": 14,
+    "def": 14,
+    "spa": 23,
+    "spd": 6,
+    "spe": 19
   },
   "is_egg": false,
   "trainer_name": "RoC",
@@ -75,17 +74,17 @@
   "ball": "Pok\u00E9",
   "met_level": 5,
   "trainer_gender": "Male",
-  "game_of_origin": "Emerald",
+  "game_of_origin": "Ruby",
   "language": "English",
   "status_condition": 0,
   "stat_level": 100,
-  "current_hp": 282,
+  "current_hp": 268,
   "stats": {
-    "hp": 282,
-    "atk": 359,
-    "def": 165,
-    "spa": 243,
-    "spd": 154,
-    "spe": 208
+    "hp": 268,
+    "atk": 252,
+    "def": 149,
+    "spa": 261,
+    "spd": 181,
+    "spe": 294
   }
 }

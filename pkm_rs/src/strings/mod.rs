@@ -1,7 +1,7 @@
 // mod gameboy;
 
-// mod gen3;
-// pub use gen3::Gen3String;
+mod gen3;
+pub use gen3::Gen3String;
 
 // mod gen4;
 
