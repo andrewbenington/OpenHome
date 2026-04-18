@@ -33,7 +33,7 @@ beforeAll(async () => {
   const slowpokeBytes = fs.readFileSync(
     path.join('src/core/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm')
   )
-  slowbroOH = bytesToPKM(new Uint8Array(slowpokeBytes), 'OhpkmV2') as OHPKM
+  slowbroOH = bytesToPKM(new Uint8Array(slowpokeBytes), 'OHPKM') as OHPKM
 })
 
 test('pc box decoded correctly', () => {

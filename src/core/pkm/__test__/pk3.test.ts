@@ -19,7 +19,7 @@ var slowbroOhpkm: OHPKM
 beforeAll(() => {
   blazikenOhpkm = bytesToPKM(
     new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'blaziken.ohpkm'))),
-    'OhpkmV2'
+    'OHPKM'
   ) as OHPKM
 
   blazikenPk3 = bytesToPKM(
@@ -29,7 +29,7 @@ beforeAll(() => {
 
   slowbroOhpkm = bytesToPKM(
     new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'slowbro.ohpkm'))),
-    'OhpkmV2'
+    'OHPKM'
   ) as OHPKM
 })
 
