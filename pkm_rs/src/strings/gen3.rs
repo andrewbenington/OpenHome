@@ -3,6 +3,9 @@ use std::fmt::Display;
 
 use crate::conversion::gen3_string_encoding;
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
@@ -11,7 +14,7 @@ use rand::{
     distr::{Alphanumeric, SampleString},
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Gen3String<const N: usize> {
     raw: [u8; N],
 }

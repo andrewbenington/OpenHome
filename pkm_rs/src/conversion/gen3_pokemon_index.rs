@@ -7,6 +7,9 @@ use serde::Serialize;
 
 use crate::result::{Error, NdexConvertSource};
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
 const fn gen3_to_national_dex(key: u16) -> Option<u16> {
     match key {
         0 => None,
@@ -819,7 +822,7 @@ const fn national_dex_to_gen3(value: u16) -> Option<NonZeroU16> {
         }
     }
 }
-
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 pub struct Gen3PokemonIndex(NonZeroU16);
@@ -864,6 +867,13 @@ impl Default for Gen3PokemonIndex {
     }
 }
 
+impl From<Gen3PokemonIndex> for u16 {
+    fn from(gen3_index: Gen3PokemonIndex) -> Self {
+        gen3_index.0.get()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct InvalidGen3PokemonIndex(u16);
 
 impl From<InvalidGen3PokemonIndex> for Error {

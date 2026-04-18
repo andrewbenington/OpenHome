@@ -150,6 +150,38 @@ fn rearrange_blocks(
     unshuffled_bytes
 }
 
+const GEN3_BLOCKS_OFFSET: usize = 0x20;
+const GEN3_BLOCK_SIZE: usize = 12;
+
+pub fn shuffle_blocks_gen_3(bytes: &[u8]) -> Vec<u8> {
+    let personality_value = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
+    let shift_value = (personality_value % 24) as usize;
+
+    shuffle_blocks(bytes, GEN3_BLOCKS_OFFSET, shift_value, GEN3_BLOCK_SIZE)
+}
+
+pub fn unshuffle_blocks_gen_3(bytes: &[u8]) -> Vec<u8> {
+    let personality_value = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
+    let shift_value = (personality_value % 24) as usize;
+
+    unshuffle_blocks(bytes, GEN3_BLOCKS_OFFSET, shift_value, GEN3_BLOCK_SIZE)
+}
+
+pub fn decrypt_pkm_bytes_gen_3(bytes: &[u8]) -> Vec<u8> {
+    let personality_value = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
+    let encryption_xor = u32::from_le_bytes(bytes[4..8].try_into().unwrap());
+    let encryption_key = personality_value ^ encryption_xor;
+
+    let mut out_bytes = bytes.to_vec();
+
+    for i in (GEN3_BLOCKS_OFFSET..GEN3_BLOCKS_OFFSET + 4 * GEN3_BLOCK_SIZE).step_by(4) {
+        let value = u32::from_le_bytes(bytes[i..i + 4].try_into().unwrap()) ^ encryption_key;
+        out_bytes[i..i + 4].copy_from_slice(&value.to_le_bytes());
+    }
+
+    out_bytes.to_vec()
+}
+
 pub fn shuffle_blocks_gen_6_7(bytes: &[u8]) -> Vec<u8> {
     let length = bytes.len();
     if length < GEN_67_MIN_SIZE {

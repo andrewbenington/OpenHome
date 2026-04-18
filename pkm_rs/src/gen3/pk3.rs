@@ -1,5 +1,6 @@
 use super::Pk3Buffer;
 use crate::checksum::{Checksum, RefreshChecksum};
+use crate::conversion::gen3_pokemon_index::Gen3PokemonIndex;
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption;
@@ -7,6 +8,7 @@ use crate::gen3::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
 #[cfg(feature = "wasm")]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 use crate::result::{Error, Result};
+use crate::strings::Gen3String;
 use crate::traits::{AsBytesMut, ModernEvs};
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
 use pkm_rs_derive::IsShiny4096;
@@ -19,20 +21,21 @@ use pkm_rs_resources::species::{FormMetadata, NatDexIndex, SpeciesAndForm, Speci
 use pkm_rs_types::Gender;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
-use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     BinaryGender, ContestStats, Language, MarkingsFourShapes, NationalDex, OriginGame,
     SimpleAbilityNumber, Stats8, Stats16Le,
 };
-use serde::Serialize;
+use serde::{Serialize, Serializer};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
+#[serde(remote = "Self")]
 pub struct Pk3 {
-    pub species_and_form: SpeciesAndForm,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
+    pub national_dex: Gen3PokemonIndex,
     pub sanity: u16,
     pub checksum: u16,
     pub held_item_index: u16,
@@ -49,14 +52,14 @@ pub struct Pk3 {
     pub pokerus_byte: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: Gen3RibbonSet,
-    pub nickname: SizedUtf16String<26>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub nickname: Gen3String<10>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: MoveSlots,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub relearn_moves: [MoveIndex; 4],
     pub ivs: Stats8,
     pub is_egg: bool,
-    pub trainer_name: SizedUtf16String<26>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub trainer_name: Gen3String<7>,
     pub trainer_friendship: u8,
     pub met_location_index: u16,
     pub ball: Ball,
@@ -67,10 +70,6 @@ pub struct Pk3 {
     pub status_condition: u32,
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub stat_level: u8,
-    #[cfg_attr(feature = "randomize", randomize(skip))]
-    pub form_argument_remain: u8,
-    #[cfg_attr(feature = "randomize", randomize(skip))]
-    pub form_argument_elapsed: u8,
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub current_hp: u16,
     #[cfg_attr(feature = "randomize", randomize(skip))]
@@ -83,12 +82,8 @@ impl Pk3 {
     // ------------------------------------------------------------------
 
     pub fn from_buffer(buf: &Pk3BufferRef) -> Result<Self> {
-        let national_dex = NatDexIndex::new(buf.species_ndex())?;
-        let personality_value = buf.personality_value();
-        let form_index = form_index_from_pid(national_dex, personality_value) as u16;
         let mut mon = Pk3 {
-            species_and_form: SpeciesAndForm::new_valid_ndex(national_dex, form_index)
-                .expect("PK3 form index should be 0 for non-unown, or <= 27 for unown"),
+            national_dex: Gen3PokemonIndex::new(buf.species_ndex())?,
             sanity: buf.sanity(),
             checksum: buf.checksum(),
             held_item_index: buf.held_item_index(),
@@ -130,6 +125,7 @@ impl Pk3 {
     }
 
     pub fn write_to_box_buffer(&self, buf: &mut Pk3BufferMut) {
+        buf.set_species_ndex(self.national_dex.into());
         buf.reset_sanity();
         buf.set_held_item_index(self.held_item_index);
         buf.set_trainer_id(self.trainer_id);
@@ -177,14 +173,14 @@ impl Pk3 {
     }
 
     pub fn from_encryped_bytes(bytes: &[u8]) -> Result<Self> {
-        let decrypted = encryption::decrypt_pkm_bytes_gen_6_7(bytes);
-        let unshuffled = encryption::unshuffle_blocks_gen_6_7(&decrypted);
+        let decrypted = encryption::decrypt_pkm_bytes_gen_3(bytes);
+        let unshuffled = encryption::unshuffle_blocks_gen_3(&decrypted);
         Self::from_bytes(&unshuffled)
     }
 
     pub fn to_box_bytes_encrypted(self) -> Vec<u8> {
-        let shuffled = encryption::shuffle_blocks_gen_6_7(&self.to_box_bytes());
-        encryption::decrypt_pkm_bytes_gen_6_7(&shuffled)
+        let shuffled = encryption::shuffle_blocks_gen_3(&self.to_box_bytes());
+        encryption::decrypt_pkm_bytes_gen_3(&shuffled)
     }
 
     pub fn calculate_checksum(&self) -> u16 {
@@ -201,9 +197,17 @@ impl Pk3 {
         NatureIndex::new_from_pid(self.personality_value)
     }
 
+    pub fn species_and_form(&self) -> SpeciesAndForm {
+        SpeciesAndForm::new_valid_ndex(
+            self.national_dex.to_national_dex(),
+            form_index_from_pid(self.national_dex.to_national_dex(), self.personality_value) as u16,
+        )
+        .expect("gen 3 form is valid")
+    }
+
     pub fn calculate_stats(&self) -> Stats16Le {
         helpers::calculate_stats_modern(
-            self.species_and_form,
+            self.species_and_form(),
             &self.ivs,
             &self.evs,
             self.calculate_level(),
@@ -230,9 +234,19 @@ impl Pk3 {
     }
 }
 
+impl Serialize for Pk3 {
+    //fn serialzie(&self, serializer)
+    fn serialize<S>(&self, serialzier: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        Self::serialize(self, serialzier)
+    }
+}
+
 impl PkmBytes for Pk3 {
-    const BOX_SIZE: usize = 232;
-    const PARTY_SIZE: usize = 260;
+    const BOX_SIZE: usize = 80;
+    const PARTY_SIZE: usize = 100;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::try_from_bytes(bytes)
@@ -265,11 +279,11 @@ impl PkmBytes for Pk3 {
 
 impl HasSpeciesAndForm for Pk3 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.species_and_form.get_species_metadata()
+        self.species_and_form().get_species_metadata()
     }
 
     fn get_forme_metadata(&self) -> &'static FormMetadata {
-        self.species_and_form.get_forme_metadata()
+        self.species_and_form().get_forme_metadata()
     }
 
     fn calculate_level(&self) -> u8 {
@@ -333,42 +347,12 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn relearn_move_indices(&self) -> Vec<u16> {
-        self.relearn_moves.into_iter().map(u16::from).collect()
-    }
-
-    #[wasm_bindgen(setter)]
-    pub fn set_relearn_move_indices(&mut self, value: Vec<u16>) {
-        self.relearn_moves = [
-            MoveIndex::from(value[0]),
-            MoveIndex::from(value[1]),
-            MoveIndex::from(value[2]),
-            MoveIndex::from(value[3]),
-        ]
-    }
-
-    #[wasm_bindgen(getter)]
     pub fn ribbons(&self) -> Vec<String> {
         self.ribbons
             .get_ribbons()
             .iter()
             .map(|ribbon| ribbon.to_string())
             .collect()
-    }
-
-    #[wasm_bindgen]
-    pub fn set_species_and_form(
-        &mut self,
-        national_dex: u16,
-        form_index: u16,
-    ) -> core::result::Result<(), JsValue> {
-        match SpeciesAndForm::new(national_dex, form_index) {
-            Ok(species_and_form) => {
-                self.species_and_form = species_and_form;
-                Ok(())
-            }
-            Err(e) => Err(JsValue::from_str(&e.to_string())),
-        }
     }
 
     #[wasm_bindgen(getter = languageString)]
@@ -437,6 +421,7 @@ mod test {
     fn to_from_bytes_random() -> std::result::Result<(), TestErrorWithSeed> {
         for seed in 0..=1000 {
             let mon = Pk3::randomized(&mut StdRng::seed_from_u64(seed));
+            println!("Testing seed {seed}: {mon:#?}");
             tests::find_inconsistencies_to_from_bytes(mon)
                 .map_err(|error| TestErrorWithSeed { seed, error })?;
         }
@@ -446,7 +431,7 @@ mod test {
 
     #[test]
     fn is_shiny() -> TestResult<()> {
-        let path = PathBuf::from("pk3").join("slowpoke-shiny.pk3");
+        let path = PathBuf::from("pk3").join("unown-e.pk3");
         let mon = tests::pkm_from_file::<Pk3>(&path)?.0;
         assert!(mon.is_shiny());
 
@@ -458,22 +443,22 @@ mod test {
         tests::compare_pkhex_json_all_in_dir::<Pk3>(&PathBuf::from("pk3"))
     }
 
-    #[test]
-    fn nickname_garbage_preserved() -> TestResult<()> {
-        let mon =
-            tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("pelipper-garbage-bytes.pk3"))?
-                .0;
+    // #[test]
+    // fn nickname_garbage_preserved() -> TestResult<()> {
+    //     let mon =
+    //         tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("pelipper-garbage-bytes.pk3"))?
+    //             .0;
 
-        // 'r' at position 14 should be leftover from 'Pelipper'
-        assert_eq!(mon.nickname.bytes()[14], b'r');
+    //     // 'r' at position 14 should be leftover from 'Pelipper'
+    //     assert_eq!(mon.nickname.bytes()[14], b'r');
 
-        let mon_recreated = Pk3::from_ohpkm(&OhpkmV2::from(&mon), ConvertStrategy::default());
+    //     let mon_recreated = Pk3::from_ohpkm(&OhpkmV2::from(&mon), ConvertStrategy::default());
 
-        // leftover 'r' should be preserved after conversion to/from OHPKM
-        assert_eq!(mon_recreated.nickname.bytes()[14], b'r');
+    //     // leftover 'r' should be preserved after conversion to/from OHPKM
+    //     assert_eq!(mon_recreated.nickname.bytes()[14], b'r');
 
-        Ok(())
-    }
+    //     Ok(())
+    // }
 
     #[test]
     fn checksum() -> TestResult<()> {

@@ -1,1 +1,114 @@
-{}
+{
+  "encryption_constant": 2919506640,
+  "sanity": 0,
+  "checksum": 25985,
+  "species_and_form": {
+    "national_dex": 0,
+    "form_index": 0
+  },
+  "held_item_index": 4899,
+  "trainer_id": 34978,
+  "secret_id": 48423,
+  "exp": 321124454,
+  "ability_index": "(None)",
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 2919506640,
+  "nature": "Modest",
+  "is_fateful_encounter": false,
+  "gender": "Genderless",
+  "evs": {
+    "hp": 114,
+    "atk": 170,
+    "def": 35,
+    "spa": 114,
+    "spd": 170,
+    "spe": 19
+  },
+  "contest": {
+    "cool": 35,
+    "beauty": 19,
+    "cute": 114,
+    "smart": 170,
+    "tough": 35,
+    "sheen": 19
+  },
+  "pokerus_byte": 114,
+  "ribbons": [
+    "Artist Ribbon",
+    "Effort Ribbon",
+    "Battle Champion Ribbon",
+    "National Champion Ribbon",
+    "Country Ribbon",
+    "World Ribbon"
+  ],
+  "nickname": "HUNTAIL",
+  "moves": [
+    {
+      "move_index": "\u003Cinvalid move: 43762\u003E",
+      "pp": 120,
+      "pp_ups": 2
+    },
+    {
+      "move_index": "\u003Cinvalid move: 4884\u003E",
+      "pp": 179,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "\u003Cinvalid move: 43656\u003E",
+      "pp": 44,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "\u003Cinvalid move: 4717\u003E",
+      "pp": 28,
+      "pp_ups": 1
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "ivs": {
+    "hp": 29,
+    "atk": 25,
+    "def": 1,
+    "spa": 29,
+    "spd": 6,
+    "spe": 23
+  },
+  "is_egg": false,
+  "is_nicknamed": true,
+  "handler_name": "",
+  "handler_gender": "Male",
+  "is_current_handler": false,
+  "trainer_name": "RoC",
+  "trainer_friendship": 236,
+  "egg_date": null,
+  "met_date": "",
+  "egg_location_index": 0,
+  "met_location_index": 153,
+  "ball": "Net",
+  "met_level": 59,
+  "trainer_gender": "Male",
+  "game_of_origin": "LeafGreen",
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 100,
+  "current_hp": 167,
+  "stats": {
+    "hp": 167,
+    "atk": 64,
+    "def": 14,
+    "spa": 68,
+    "spd": 53,
+    "spe": 32
+  }
+}

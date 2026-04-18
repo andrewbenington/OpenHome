@@ -212,7 +212,9 @@ fn find_inconsistencies_from_file<PKM: Pkm>(path: &Path) -> TestResult<()> {
 #[cfg(test)]
 pub fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> TestResult<()> {
     let expected = mon.to_box_bytes();
+    println!("to bytes: {}", u8_slice_to_hex_string(&expected));
     let actual = PKM::from_bytes(&expected)?.to_box_bytes();
+    println!("actual: {}", u8_slice_to_hex_string(&actual));
 
     let differences = find_differing_ranges(&actual, &expected);
 

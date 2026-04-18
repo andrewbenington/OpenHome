@@ -7,7 +7,7 @@ use arbitrary_int::u3;
 use arbitrary_int::u7;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
+use pkm_rs_resources::moves::{MoveIndex, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::ModernRibbonSet;
 use pkm_rs_resources::species::SpeciesAndForm;
@@ -360,7 +360,11 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn move_slots(&self) -> MoveSlots {
-        MoveSlots::from_bytes(self.bytes(), super::MOVE_DATA_OFFSETS)
+        MoveSlots::from_bytes(
+            self.bytes(),
+            super::MOVE_DATA_OFFSETS,
+            PpUpStorage::FourBytes,
+        )
     }
 
     pub fn relearn_move_raw(&self, idx: usize) -> [u8; 2] {
