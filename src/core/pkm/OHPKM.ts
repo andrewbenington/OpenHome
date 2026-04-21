@@ -723,7 +723,11 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     }
 
     this.heldItemIndex = other.heldItemIndex
-    if (other.ability && !FORMATS_WITHOUT_ABILITIES.includes(other.format)) {
+    if (
+      FORMATS_ALLOWING_ABILITY_CHANGE.includes(other.format) &&
+      other.ability &&
+      !FORMATS_WITHOUT_ABILITIES.includes(other.format)
+    ) {
       // don't update if OHPKM has hidden ability and the other mon is from
       // a game without hidden abilities
       if (
@@ -941,6 +945,14 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.ability.index === hiddenOrFirst.index
     )
   }
+
+  abilityNumFromPidGen34(): AbilityNum {
+    if (this.personalityValue % 2 === 1) {
+      return 2
+    } else {
+      return 1
+    }
+  }
 }
 
 export function monFormatToOriginalDataTag(format: string): Option<Tag> {
@@ -1023,6 +1035,19 @@ const SECOND_ABILITY: AbilityNum = 2
 const HIDDEN_ABILITY: AbilityNum = 4
 
 const FORMATS_WITHOUT_ABILITIES = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
+
+const FORMATS_ALLOWING_ABILITY_CHANGE = [
+  'PK3RR',
+  'PK3UB',
+  'PK6',
+  'PK7',
+  'PK8',
+  'PA8',
+  'PB8',
+  'PK9',
+  'PA9',
+  'PB8LUMI',
+]
 
 const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
 

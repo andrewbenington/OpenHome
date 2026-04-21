@@ -15,7 +15,7 @@ use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForme};
 use pkm_rs_types::Language;
-use pkm_rs_types::TrainerData;
+use pkm_rs_types::{Generation, TrainerData};
 use std::num::NonZeroU16;
 
 #[cfg(feature = "wasm")]
@@ -278,6 +278,48 @@ impl MainDataV2 {
             2 => self.ability_is_second_slot(),
             4 => self.ability_is_hidden_ability(),
             _ => false,
+        }
+    }
+
+    const fn ability_num_from_pid_gen34(&self) -> u8 {
+        if self.personality_value % 2 == 1 {
+            2
+        } else {
+            1
+        }
+    }
+
+    pub fn ability_changed_from(&self) -> Option<AbilityIndex> {
+        let form_metadata = self.species_and_forme.get_forme_metadata();
+
+        let origin_generation = self.game_of_origin.generation();
+        if origin_generation == Generation::G3 {
+            let gen34_ability_num = self.ability_num_from_pid_gen34();
+            let gen3_ability_index = form_metadata.ability_by_num_gen_3(gen34_ability_num);
+            if gen3_ability_index != self.ability_index {
+                Some(gen3_ability_index)
+            } else {
+                None
+            }
+        } else if origin_generation == Generation::G4 {
+            let gen34_ability_num = self.ability_num_from_pid_gen34();
+            if gen34_ability_num != self.ability_num {
+                Some(form_metadata.ability_by_num(gen34_ability_num))
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+
+    pub fn ability_was_changed(&self) -> bool {
+        self.ability_changed_from().is_some()
+    }
+
+    pub fn revert_ability_by_num(&mut self) {
+        if let Some(original_ability_index) = self.ability_changed_from() {
+            self.ability_index = original_ability_index;
         }
     }
 
