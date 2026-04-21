@@ -55,6 +55,8 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   // Bulk operations
   moveBoxToBank(save: SAV): number
   moveSaveToBank(save: SAV): number
+
+  // OHPKM modification
   updateMonDisplayColor(monId: string, color: string | undefined): void
   updateMonTags(
     monId: string,
@@ -62,6 +64,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   ): void
   moveMonItemToBag: (monLocation: MonLocation) => void
   giveItemToMon: (monLocation: MonLocation, item: Item) => void
+  revertMonAbility: (monId: OhpkmIdentifier) => void
 
   allMonsInCurrentBank: () => string[]
 }
@@ -478,6 +481,19 @@ export function useSaves(): SavesAndBanksManager {
     ]
   )
 
+  const revertMonAbility = useCallback(
+    (identifier: OhpkmIdentifier) => {
+      const result = ohpkmStore.tryLoadFromId(identifier)
+      if (R.isErr(result)) return result
+
+      const mon = result.value
+      mon.revertAbilityByNum()
+
+      ohpkmStore.insertOrUpdate(mon)
+    },
+    [ohpkmStore]
+  )
+
   const setMonNickname = useCallback(
     (nickname: string, location: MonLocation) => {
       let ohpkm: OHPKM
@@ -855,6 +871,7 @@ export function useSaves(): SavesAndBanksManager {
     updateMonTags,
     moveMonItemToBag,
     giveItemToMon,
+    revertMonAbility,
 
     allMonsInCurrentBank,
   }
