@@ -31,7 +31,7 @@ beforeAll(() => {
     new Uint8Array(
       fs.readFileSync(path.join('src/core/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm'))
     ),
-    'OhpkmV2'
+    'OHPKM'
   ) as OHPKM
 })
 
