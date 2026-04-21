@@ -18,9 +18,10 @@ import {
 } from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm/PKM'
 import { getDisplayID } from '@pokemon-files/util'
-import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
+import { Badge, Button, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { OHPKM } from 'src/core/pkm/OHPKM'
+import { useSaves } from 'src/ui/state/saves'
 import { MonTag } from 'src/ui/util/tags'
 import { TagIcon } from '../../components/TagIcon'
 import useMonSprite from '../useMonSprite'
@@ -54,6 +55,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
     if (!monData) return 'pokemon sprite'
     return `${monData.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
   }, [mon])
+  const { revertMonAbility } = useSaves()
 
   return (
     <Grid columns="2" width="100%" p="3" gap="2">
@@ -211,10 +213,21 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
         </AttributeRow>
         <AttributeRow label="Trainer ID" value={getDisplayID(mon as PKM)} />
         {mon.ability !== undefined && (
-          <AttributeRow
-            label="Ability"
-            value={`${mon.ability.name} (${mon.abilityNum === 4 ? 'HA' : mon.abilityNum})`}
-          />
+          <AttributeRow label="Ability">
+            {mon.ability.name} ({mon.abilityNum === 4 ? 'HA' : mon.abilityNum})
+            {mon instanceof OHPKM &&
+              mon.abilityWasChanged() &&
+              !mon.metadata?.abilityByNum(1).equals(mon.metadata?.abilityByNum(2)) && (
+                <Button
+                  size="1"
+                  radius="full"
+                  style={{ height: '1rem', marginLeft: 5 }}
+                  onClick={() => revertMonAbility(mon.openhomeId)}
+                >
+                  Revert
+                </Button>
+              )}
+          </AttributeRow>
         )}
         <AttributeRow label="Level">{mon.getLevel()}</AttributeRow>
         <AttributeRow label="EXP">{mon.exp}</AttributeRow>

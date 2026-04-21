@@ -174,6 +174,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             }
           />
         )}
+        {mon instanceof OHPKM && (
+          <AttributeRow label="Ability Number From PID" value={mon.abilityNumFromPidGen34()} />
+        )}
+        {mon.abilityNum !== undefined && (
+          <AttributeRow label="Ability Number" value={mon.abilityNum} />
+        )}
         {mon.formArgument !== undefined && mon.dexNum === NationalDex.Alcremie && (
           <AttributeRow label="Sweet" value={SWEETS[mon.formArgument]} />
         )}
@@ -503,14 +509,14 @@ function HiddenPowerDisplay(props: { mon: AllPKMFields }) {
 }
 
 function u16Display(val: number) {
-  return `${hexStr(val, 4)} (${val})`
+  return `${hexStrLittleEndian(val, 4)} (${val})`
 }
 
 function u32Display(val: number) {
-  return `${hexStr(val, 8)} (${val})`
+  return `${hexStrLittleEndian(val, 8)} (${val})`
 }
 
-function hexStr(val: number, digits: number) {
+function hexStrLittleEndian(val: number, digits: number) {
   return '0x' + val.toString(16).toUpperCase().padStart(digits, '0')
 }
 

@@ -424,6 +424,18 @@ impl OhpkmV2 {
     pub const fn get_hyper_training(&self) -> HyperTraining {
         self.main_data.hyper_training
     }
+
+    pub const fn originates_from_plugin(&self) -> bool {
+        self.plugin_data.is_some()
+    }
+
+    pub fn ability_was_changed(&self) -> bool {
+        !self.originates_from_plugin() && self.main_data.ability_was_changed()
+    }
+
+    pub fn revert_ability_by_num(&mut self) {
+        self.main_data.revert_ability_by_num()
+    }
 }
 
 #[cfg(test)]
@@ -2089,6 +2101,16 @@ impl OhpkmV2 {
     #[wasm_bindgen(js_name = resetNicknameToSpecies)]
     pub fn reset_nickname_to_species_js(&mut self) {
         self.main_data.reset_nickname_to_species();
+    }
+
+    #[wasm_bindgen(js_name = abilityWasChanged)]
+    pub fn ability_was_changed_js(&self) -> bool {
+        self.ability_was_changed()
+    }
+
+    #[wasm_bindgen(js_name = revertAbilityByNum)]
+    pub fn revert_ability_by_num_js(&mut self) {
+        self.main_data.revert_ability_by_num()
     }
 }
 

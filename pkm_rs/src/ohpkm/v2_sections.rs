@@ -17,9 +17,11 @@ use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet}
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
 
 use pkm_rs_types::Language;
+
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, Stats8, Stats16Le, StatsPreSplit, TrainerData,
+    AbilityNumber, BinaryGender, ContestStats, Generation, Stats8, Stats16Le, StatsPreSplit,
+    TrainerData,
 };
 use pkm_rs_types::{FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, TeraType};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
@@ -289,6 +291,51 @@ impl MainDataV2 {
             AbilityNumber::First => self.ability_is_first_slot(),
             AbilityNumber::Second => self.ability_is_second_slot(),
             AbilityNumber::Hidden => self.ability_is_hidden_ability(),
+        }
+    }
+
+    const fn ability_num_from_pid_gen34(&self) -> AbilityNumber {
+        if self.personality_value % 2 == 1 {
+            AbilityNumber::Second
+        } else {
+            AbilityNumber::First
+        }
+    }
+
+    pub fn ability_changed_from(&self) -> Option<AbilityIndexBounded> {
+        let form_metadata = self.species_and_form.get_forme_metadata();
+
+        let origin_generation = self.game_of_origin.generation();
+        if origin_generation == Generation::G3 {
+            let gen34_ability_num = self.ability_num_from_pid_gen34();
+            let gen3_ability_index: AbilityIndexBounded = form_metadata
+                .ability_by_num_gen_3(gen34_ability_num)
+                .try_into()
+                .expect("gen 3 ability index always under ability index bound");
+            if gen3_ability_index != self.ability_index {
+                Some(gen3_ability_index)
+            } else {
+                None
+            }
+        } else if origin_generation == Generation::G4 {
+            let gen34_ability_num = self.ability_num_from_pid_gen34();
+            if gen34_ability_num != self.ability_num {
+                Some(form_metadata.get_ability(gen34_ability_num))
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+
+    pub fn ability_was_changed(&self) -> bool {
+        self.ability_changed_from().is_some()
+    }
+
+    pub fn revert_ability_by_num(&mut self) {
+        if let Some(original_ability_index) = self.ability_changed_from() {
+            self.ability_index = original_ability_index;
         }
     }
 

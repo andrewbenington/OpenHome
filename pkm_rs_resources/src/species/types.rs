@@ -533,8 +533,8 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(js_name = abilityByNumGen3)]
-    pub fn ability_by_num_gen_3(&self, num: u8) -> AbilityIndexWasm {
-        if num == 2 && self.abilities.1.to_u16() <= 77 {
+    pub fn ability_by_num_gen_3(&self, num: AbilityNumber) -> AbilityIndexWasm {
+        if num == AbilityNumber::Second && self.abilities.1.to_u16() <= 77 {
             self.abilities.1.into()
         } else {
             self.abilities.0.into()

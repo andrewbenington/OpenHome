@@ -376,6 +376,28 @@ describe('OHPKM conversion strategies', () => {
   })
 })
 
+describe('gen 3 ability during OHPKM conversion', () => {
+  test('2nd ability is left alone if present in gen 3', () => {
+    const withShellArmorBytes = new Uint8Array(
+      fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OhpkmV2', 'crawdaunt-shell-armor.ohpkm'))
+    )
+    const withShellArmor = OHPKM.fromBytes(withShellArmorBytes.buffer)
+    expect(withShellArmor.abilityNum).toEqual(2)
+
+    const shellArmorkpk3 = PK3.fromOhpkm(withShellArmor, ConvertStrategies.getDefault())
+
+    expect(shellArmorkpk3.abilityNum, 'Shell Armor: Expected ability num from PID').toEqual(2)
+    expect(shellArmorkpk3.ability?.index).toEqual(75) // Shell Armor
+
+    withShellArmor.syncWithGameData(shellArmorkpk3)
+    expect(withShellArmor.abilityNum, 'Ability num should not be updated from PK3').toEqual(2)
+    expect(
+      withShellArmor.abilityIndex.index,
+      'Ability index should not be updated from PK3'
+    ).toEqual(75)
+  })
+})
+
 function diffSpans(
   a: Uint8Array,
   b: Uint8Array,
