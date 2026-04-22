@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "OpenHome"
-version = "1.10.3"
+version = "1.10.4"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -2795,7 +2795,7 @@ checksum = "7edddbd0b52d732b21ad9a5fab5c704c14cd949e5e9a1ec5929a24fded1b904c"
 
 [[package]]
 name = "pkm_rs"
-version = "1.10.3"
+version = "1.10.4"
 dependencies = [
  "console_error_panic_hook",
  "getrandom 0.4.2",
@@ -2816,7 +2816,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_derive"
-version = "1.10.3"
+version = "1.10.4"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2825,7 +2825,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_resources"
-version = "1.10.3"
+version = "1.10.4"
 dependencies = [
  "getrandom 0.4.2",
  "js-sys",
@@ -2843,7 +2843,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_types"
-version = "1.10.3"
+version = "1.10.4"
 dependencies = [
  "getrandom 0.4.2",
  "js-sys",
@@ -3482,9 +3482,9 @@ checksum = "f87165f0995f63a9fbeea62b64d10b4d9d8e78ec6d7d51fb2125fda7bb36788f"
 
 [[package]]
 name = "rustls-webpki"
-version = "0.103.10"
+version = "0.103.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df33b2b81ac578cabaf06b89b0631153a3f416b0a886e8a7a1707fb51abbd1ef"
+checksum = "8279bb85272c9f10811ae6a6c547ff594d6a7f3c6c6b02ee9726d1d0dcfcdd06"
 dependencies = [
  "aws-lc-rs",
  "ring",
