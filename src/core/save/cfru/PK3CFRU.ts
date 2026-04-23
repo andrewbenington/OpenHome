@@ -1,5 +1,6 @@
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
 import {
+  AbilityNumber,
   Ball,
   ConvertStrategy,
   ExtraFormIndex,
@@ -443,7 +444,11 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get abilityNum() {
-    return this.hasHiddenAbility ? 4 : ((this.personalityValue >> 0) & 1) + 1
+    return this.hasHiddenAbility
+      ? AbilityNumber.Hidden
+      : this.personalityValue & 1
+        ? AbilityNumber.Second
+        : AbilityNumber.First
   }
 
   public get ability() {

@@ -527,18 +527,18 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(js_name = abilityByNum)]
-    pub fn ability_by_num_js(&self, num: u8) -> AbilityIndexWasm {
-        self.get_ability(AbilityNumber::from_u8_first_three_bits(num).unwrap_or_default())
-            .into()
+    pub fn ability_by_num(&self, ability_num: AbilityNumber) -> AbilityIndexWasm {
+        self.get_ability(ability_num).into()
     }
 
     #[wasm_bindgen(js_name = abilityByNumGen3)]
-    pub fn ability_by_num_gen_3(&self, num: AbilityNumber) -> AbilityIndexWasm {
-        if num == AbilityNumber::Second && self.abilities.1.to_u16() <= 77 {
-            self.abilities.1.into()
+    pub fn ability_by_num_gen_3(&self, ability_num: AbilityNumber) -> AbilityIndexWasm {
+        if ability_num == AbilityNumber::Second && self.abilities.1.to_u16() <= 77 {
+            self.abilities.1
         } else {
-            self.abilities.0.into()
+            self.abilities.0
         }
+        .into()
     }
 
     #[wasm_bindgen(getter = hiddenAbility)]

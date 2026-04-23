@@ -383,6 +383,7 @@ describe('gen 3 ability during OHPKM conversion', () => {
     )
     const withShellArmor = OHPKM.fromBytes(withShellArmorBytes.buffer)
     expect(withShellArmor.abilityNum).toEqual(2)
+    expect(withShellArmor.ability?.index).toEqual(75) // Shell Armor
 
     const shellArmorkpk3 = PK3.fromOhpkm(withShellArmor, ConvertStrategies.getDefault())
 

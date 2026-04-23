@@ -817,9 +817,9 @@ impl Randomize for ShinyLeaves {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Display, Serialize)]
 pub enum AbilityNumber {
     #[default]
-    First,
-    Second,
-    Hidden,
+    First = 1,
+    Second = 2,
+    Hidden = 4,
 }
 
 impl AbilityNumber {

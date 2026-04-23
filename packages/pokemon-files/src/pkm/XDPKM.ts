@@ -1,4 +1,5 @@
 import {
+  AbilityNumber,
   Ball,
   ConvertStrategy,
   ItemGen3,
@@ -242,7 +243,7 @@ export default class XDPKM {
   }
 
   public get abilityNum() {
-    return ((this.personalityValue >> 0) & 1) + 1
+    return this.personalityValue & 1 ? AbilityNumber.Second : AbilityNumber.First
   }
 
   public get ability() {

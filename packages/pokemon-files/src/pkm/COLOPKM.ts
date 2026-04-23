@@ -1,5 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
+  AbilityNumber,
   Ball,
   ConvertStrategy,
   ItemGen3,
@@ -240,7 +241,7 @@ export default class COLOPKM {
   }
 
   public get abilityNum() {
-    return ((this.personalityValue >> 0) & 1) + 1
+    return this.personalityValue & 1 ? AbilityNumber.Second : AbilityNumber.First
   }
 
   public get ability() {

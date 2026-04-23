@@ -1,6 +1,7 @@
 import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   AbilityIndex,
+  AbilityNumber,
   currentMetadataReader,
   extraFormTypeOverride,
   FormMetadata,
@@ -28,7 +29,7 @@ import Prando from 'prando'
 export const getAbilityFromNumber = (
   dexNum: number,
   formNum: number,
-  abilityNum: number
+  abilityNum: AbilityNumber
 ): AbilityIndex | undefined => {
   return MetadataSummaryLookup(dexNum, formNum)?.abilityByNum(abilityNum)
 }

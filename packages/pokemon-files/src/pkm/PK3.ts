@@ -2,6 +2,7 @@ import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/other'
 
 import {
+  AbilityNumber,
   Ball,
   ConvertStrategy,
   ItemGen3,
@@ -180,8 +181,14 @@ export default class PK3 {
       this.abilityNum = other.abilityNum
       if (
         this.abilityNum === 2 &&
-        !this.metadata?.abilityByNum(2)?.equals(this.metadata.abilityByNumGen3(2))
+        !this.metadata
+          ?.abilityByNum(AbilityNumber.Second)
+          ?.equals(this.metadata.abilityByNumGen3(AbilityNumber.Second))
       ) {
+        console.log(
+          this.metadata?.abilityByNum(AbilityNumber.Second).index,
+          this.metadata?.abilityByNumGen3(AbilityNumber.Second).index
+        )
         this.abilityNum = 1
       }
       this.isFatefulEncounter = other.isFatefulEncounter

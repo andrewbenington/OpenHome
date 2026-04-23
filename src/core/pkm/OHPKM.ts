@@ -2,6 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { intersection, Option, unique } from '@openhome-core/util/functional'
 import {
   AbilityIndex,
+  AbilityNumber,
   Ball,
   ExtraFormIndex,
   Gender,
@@ -893,62 +894,11 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     }
   }
 
-  private abilityNumMatchesIndex(): boolean {
-    if (this.abilityNum === FIRST_ABILITY) return this.abilityIsFirstSlot()
-    if (this.abilityNum === SECOND_ABILITY) return this.abilityIsSecondSlot()
-    if (this.abilityNum === HIDDEN_ABILITY) return this.abilityIsHiddenSlot()
-
-    return false
-  }
-
-  private abilityNumByIndex(): AbilityNum | undefined {
-    const metadata = this.metadata
-    if (!metadata) return undefined
-
-    const [ability1, ability2] = metadata.abilities
-
-    if (this.ability?.index === ability1.index) return FIRST_ABILITY
-    if (this.ability?.index === ability2.index) return SECOND_ABILITY
-    if (metadata.hiddenAbility && this.ability?.index === metadata.hiddenAbility.index) {
-      return HIDDEN_ABILITY
-    }
-
-    return undefined
-  }
-
-  private abilityIsFirstSlot(): boolean {
-    const metadata = this.metadata
-    return (
-      metadata !== undefined &&
-      this.ability !== undefined &&
-      this.ability.index === metadata.abilities[0].index
-    )
-  }
-
-  private abilityIsSecondSlot(): boolean {
-    const metadata = this.metadata
-    return (
-      metadata !== undefined &&
-      this.ability !== undefined &&
-      this.ability.index === metadata.abilities[1].index
-    )
-  }
-
-  private abilityIsHiddenSlot(): boolean {
-    const metadata = this.metadata
-    const hiddenOrFirst = metadata?.hiddenAbility ?? metadata?.abilities[0]
-    return (
-      hiddenOrFirst !== undefined &&
-      this.ability !== undefined &&
-      this.ability.index === hiddenOrFirst.index
-    )
-  }
-
-  abilityNumFromPidGen34(): AbilityNum {
+  abilityNumFromPidGen34(): AbilityNumber {
     if (this.personalityValue % 2 === 1) {
-      return 2
+      return AbilityNumber.Second
     } else {
-      return 1
+      return AbilityNumber.First
     }
   }
 }
@@ -1026,11 +976,6 @@ export function originalDataTagToMonFormat(tag: Tag): string {
       return 'PK3UB'
   }
 }
-
-type AbilityNum = 1 | 2 | 4
-const FIRST_ABILITY: AbilityNum = 1
-const SECOND_ABILITY: AbilityNum = 2
-const HIDDEN_ABILITY: AbilityNum = 4
 
 const FORMATS_WITHOUT_ABILITIES = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
 

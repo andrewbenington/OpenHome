@@ -10,6 +10,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { colorIsDark, SHADOW_TYPE_COLOR } from '@openhome-ui/util/color'
 import {
+  AbilityNumber,
   extraFormDisplayName,
   genderFromBool,
   getPluginColor,
@@ -217,7 +218,9 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
             {mon.ability.name} ({mon.abilityNum === 4 ? 'HA' : mon.abilityNum})
             {mon instanceof OHPKM &&
               mon.abilityWasChanged() &&
-              !mon.metadata?.abilityByNum(1).equals(mon.metadata?.abilityByNum(2)) && (
+              !mon.metadata
+                ?.abilityByNum(AbilityNumber.First)
+                .equals(mon.metadata?.abilityByNum(AbilityNumber.Second)) && (
                 <Button
                   size="1"
                   radius="full"
