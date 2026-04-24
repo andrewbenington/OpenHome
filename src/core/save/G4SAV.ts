@@ -7,11 +7,14 @@ import {
 import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
+import * as encryption from '@pokemon-files/util/encryption'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
 import { PathData } from './util/path'
+
+const PKM_BOX_SIZE = 136
 
 export abstract class G4SAV extends OfficialSAV<PK4> {
   static BOX_COUNT = 18
@@ -101,12 +104,10 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     for (let box = 0; box < 18; box++) {
       for (let monIndex = 0; monIndex < 30; monIndex++) {
         try {
-          const startByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * monIndex
-          const endByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * (monIndex + 1)
-          const monData = this.bytes.slice(startByte, endByte)
-          const mon = PK4.fromBytes(monData.buffer, true)
+          const monData = this.getMonBytesAt(box, monIndex)
+          const mon = PK4.fromBytes(monData, true)
 
-          if (mon.dexNum !== 0 && mon.gameOfOrigin !== 0) {
+          if (!this.slotIsEmpty(box, monIndex)) {
             // set game origin if origin missing and matching mon is found; necessary for diamond/pearl
             if (
               this.origin === 0 &&
@@ -129,6 +130,18 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
         ? OriginGame.Pearl
         : OriginGame.Diamond
     }
+  }
+
+  getMonBytesAt(box: number, boxSlot: number): ArrayBuffer {
+    const startByte = this.currentSaveBoxStartOffset + this.boxSize * box + PKM_BOX_SIZE * boxSlot
+    const endByte =
+      this.currentSaveBoxStartOffset + this.boxSize * box + PKM_BOX_SIZE * (boxSlot + 1)
+    return this.bytes.slice(startByte, endByte).buffer
+  }
+
+  slotIsEmpty(box: number, boxSlot: number): boolean {
+    const mon = PK4.fromBytes(this.getMonBytesAt(box, boxSlot), true)
+    return mon.dexNum === 0
   }
 
   getStorageChecksum() {
@@ -155,7 +168,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const mon = this.boxes[box].boxSlots[index]
 
-      const writeIndex = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * index
+      const writeIndex = this.currentSaveBoxStartOffset + this.boxSize * box + PKM_BOX_SIZE * index
 
       // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
@@ -169,10 +182,15 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
           console.error(`G4SAV.prepareForSaving: ${e}`)
         }
       } else {
-        this.bytes.set(EMPTY_SLOT_BYTES, writeIndex)
+        this.bytes.set(G4SAV.emptySlotBytes(), writeIndex)
       }
     })
     this.updateStorageChecksum()
+  }
+
+  static emptySlotBytes(): Uint8Array<ArrayBuffer> {
+    const shuffledBytes = encryption.shuffleBlocksGen45(emptySlotBytes().buffer)
+    return new Uint8Array(encryption.decryptByteArrayGen45(shuffledBytes))
   }
 
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK4 {
@@ -214,13 +232,5 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
   }
 }
 
-const EMPTY_SLOT_BYTES = new Uint8Array([
-  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x88, 0x1, 0x88, 0x1,
-  0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1,
-  0x88, 0x1, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1,
-  0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-  0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-])
+// return new array so mutations don't happen
+const emptySlotBytes = () => new Uint8Array(136)
