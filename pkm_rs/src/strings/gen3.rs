@@ -3,9 +3,6 @@ use std::fmt::Display;
 
 use crate::conversion::gen3_string_encoding;
 
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
-
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]

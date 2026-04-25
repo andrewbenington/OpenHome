@@ -290,8 +290,8 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         self.get_u8(Offset::TrainerFriendship)
     }
 
-    pub fn met_location_index(&self) -> u16 {
-        self.get_u16_le(Offset::MetLocation)
+    pub fn met_location_index(&self) -> u8 {
+        self.get_u8(Offset::MetLocation)
     }
 
     fn met_data_raw(&self) -> u16 {
@@ -482,8 +482,8 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
         self.set_u8(Offset::TrainerFriendship, v);
     }
 
-    pub fn set_met_location_index(&mut self, v: u16) {
-        self.set_u16_le(Offset::MetLocation, v);
+    pub fn set_met_location_index(&mut self, v: u8) {
+        self.set_u8(Offset::MetLocation, v);
     }
 
     fn set_met_data_raw(&mut self, v: u16) {
