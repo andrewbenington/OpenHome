@@ -12,8 +12,8 @@ const POKEDEX_FILENAME: &str = "pokedex.json";
 pub struct PokedexState(pub Mutex<Pokedex>);
 
 impl PokedexState {
-    pub fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
-        let inner = Pokedex::load_from_storage(app_handle)?;
+    pub fn load_from_storage(data_controller: &impl DataController) -> Result<Self> {
+        let inner = Pokedex::load_from_storage(data_controller)?;
         Ok(Self(Mutex::new(inner)))
     }
 }
@@ -58,14 +58,14 @@ pub struct Pokedex {
 }
 
 impl Pokedex {
-    fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
+    fn load_from_storage(data_controller: &impl DataController) -> Result<Self> {
         Ok(Self {
-            by_dex_number: app_handle.read_file_json(DataDir::Storage, POKEDEX_FILENAME)?,
+            by_dex_number: data_controller.read_file_json(DataDir::Storage, POKEDEX_FILENAME)?,
         })
     }
 
-    pub fn write_to_storage(&self, app_handle: &tauri::AppHandle) -> Result<()> {
-        app_handle.write_file_json(DataDir::Storage, POKEDEX_FILENAME, &self.by_dex_number)
+    pub fn write_to_storage(&self, data_controller: &impl DataController) -> Result<()> {
+        data_controller.write_file_json(DataDir::Storage, POKEDEX_FILENAME, &self.by_dex_number)
     }
 
     pub fn register(

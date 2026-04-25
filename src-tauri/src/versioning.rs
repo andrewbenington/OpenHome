@@ -43,7 +43,7 @@ pub fn update_version_last_used(app_handle: &tauri::AppHandle) -> Result<()> {
     .map_err(|err| Error::file_write(&last_version_path, err))?;
 
     util::create_directory(app_handle.get_config_folder()?)?;
-    let cfg_path = app_handle.get_config_folder()?.join(VERSION_FILE);
+    let cfg_path = app_handle.get_data_folder()?.join(VERSION_FILE);
 
     util::write_file_contents(&cfg_path, app_handle.package_info().version.to_string())
         .map_err(|err| Error::file_write(&cfg_path, err))

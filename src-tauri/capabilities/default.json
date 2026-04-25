@@ -9,6 +9,8 @@
     "os:default",
     "dialog:default",
     "fs:default",
-    "fs:allow-app-meta"
+    "fs:allow-app-meta",
+    "process:default",
+    "process:allow-restart"
   ]
 }

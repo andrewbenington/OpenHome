@@ -12,8 +12,8 @@ body {
   --color-dark-panel: #081721;
   --color-dark-background: rgb(1, 83, 84);
 
-  --side-tab-hover: rgb(142, 174, 176);
-  --side-tab-selected: rgb(116, 155, 155);
+  --side-tab-bar-light: rgb(139, 201, 174);
+  --side-tab-bar-dark: rgb(68, 102, 102);
 }
 
 img {
@@ -33,6 +33,9 @@ img {
     --attribute-row-content: rgb(160, 218, 194);
     --autocomplete-scrollbar: rgb(80, 158, 146);
     --autocomplete-background-color: #fff;
+    --side-tab-bar: var(--side-tab-bar-light);
+    --side-tab-hover: rgb(140, 181, 166);
+    --side-tab-selected: rgb(116, 155, 146);
   }
 }
 
@@ -44,6 +47,9 @@ img {
     --attribute-row-content: rgb(74, 108, 112);
     --autocomplete-scrollbar: #fff;
     --autocomplete-background-color: #333;
+    --side-tab-bar: var(--side-tab-bar-dark);
+    --side-tab-hover: rgb(142, 174, 176);
+    --side-tab-selected: rgb(116, 155, 155);
   }
 }
 

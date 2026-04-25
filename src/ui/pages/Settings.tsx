@@ -10,11 +10,14 @@ import {
   SettingType,
   StringOption,
 } from '@pkm-rs/pkg'
-import { Card, RadioGroup, Select, Separator } from '@radix-ui/themes'
-import { ReactNode, useContext, useEffect } from 'react'
+import { Card, Flex, RadioGroup, Select, Separator } from '@radix-ui/themes'
+import { ReactNode, useContext, useEffect, useState } from 'react'
 import { Route, Routes } from 'react-router'
+import { R } from 'src/core/util/functional'
 import { stringSorter } from 'src/core/util/sort'
+import { AlertDialog } from '../components/AlertDialog'
 import SideTabs from '../components/side-tabs/SideTabs'
+import useDisplayError from '../hooks/displayError'
 import { usePathSegment } from '../hooks/routing'
 import { ConvertStrategyKey, useConvertStrategies } from '../state/convert-strategies'
 
@@ -22,6 +25,12 @@ export default function Settings() {
   const [appInfoState, dispatchAppInfoState] = useContext(AppInfoContext)
   const backend = useContext(BackendContext)
   const { currentSegment, setCurrentSegment } = usePathSegment('settings', 'general')
+  const [dataDirPath, setDataDirPath] = useState<string>()
+  const displayError = useDisplayError()
+
+  useEffect(() => {
+    backend.getDataDirPath().then(R.match((value) => setDataDirPath(value), console.error))
+  }, [backend, displayError])
 
   useEffect(() => {
     backend.updateSettings(appInfoState.settings).catch(console.error)
@@ -29,7 +38,7 @@ export default function Settings() {
 
   const generalElement = (
     <Card style={{ margin: 8, width: '100%' }}>
-      <b>Enabled ROM Hack Formats</b>
+      <b style={{ fontSize: '1.25rem' }}>Enabled ROM Hack Formats</b>
       <div style={{ margin: 8 }}>
         {appInfoState.extraSaveTypes.map((saveType) => (
           <label className="flex-row" key={saveType.saveTypeName}>
@@ -47,8 +56,7 @@ export default function Settings() {
           </label>
         ))}
       </div>
-
-      <b>App Theme</b>
+      <b style={{ fontSize: '1.25rem' }}>App Theme</b>
       <RadioGroup.Root
         onValueChange={(newValue: AppTheme) => {
           if (!newValue) return
@@ -62,6 +70,28 @@ export default function Settings() {
         <RadioGroup.Item value="light">Light</RadioGroup.Item>
         <RadioGroup.Item value="dark">Dark</RadioGroup.Item>
       </RadioGroup.Root>
+      <b style={{ fontSize: '1.25rem' }}>Data</b>
+      <Flex direction="column" gap="2">
+        <div>
+          Your OpenHome data is stored locally on your machine. You can change the location of this
+          data, here. Note that changing the data directory will cause the app to restart.
+        </div>
+        <Flex gap="2">
+          <b>Current Data Directory:</b>
+          <div>{dataDirPath}</div>
+          <AlertDialog.Confirm
+            title="Move Data Directory?"
+            description="Are you sure you want to move the data directory? All files will be copied to the new location, and the app will restart. After they are copied to the new directory successfully, your storage and plugins will be removed from the old directory."
+            triggerButtonMessage="Change"
+            confirmButtonMessage="Select New Directory..."
+            onConfirm={() => {
+              backend
+                .promptChangeDataDir()
+                .then(R.mapErr((err) => displayError('Error changing data directory', err)))
+            }}
+          />
+        </Flex>
+      </Flex>
     </Card>
   )
 

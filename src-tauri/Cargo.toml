@@ -37,6 +37,7 @@ bytes = "1.11.1"
 semver = "1.0.28"
 strum = { version = "0.28.0", features = ["derive"] }
 uuid = { version = "1.23.0", features = ["v4"] }
+tauri-plugin-process = "2"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 dialog = "0.3.0"

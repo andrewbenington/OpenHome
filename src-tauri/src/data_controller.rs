@@ -2,6 +2,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use crate::error::{Error, Result};
+use crate::startup_config::StartupConfigState;
 
 const STORAGE_DIR_NAME: &str = "storage";
 pub const MONS_V2_DIR: &str = "mons_v2";
@@ -122,7 +123,9 @@ pub trait DataController {
 impl DataController for tauri::AppHandle {
     fn get_data_folder(&self) -> Result<PathBuf> {
         use tauri::Manager;
-        Ok(self.path().app_data_dir()?)
+        let data_folder = self.path().app_data_dir()?;
+        let state = self.state::<StartupConfigState>();
+        Ok(state.lock()?.get_data_dir_path().unwrap_or(data_folder))
     }
 
     fn get_config_folder(&self) -> Result<PathBuf> {
@@ -142,7 +145,7 @@ where
     fs::read_to_string(full_path.as_ref()).map_err(|e| Error::file_malformed(&full_path, e))
 }
 
-fn read_file_json<P, T>(full_path: P) -> Result<T>
+pub(crate) fn read_file_json<P, T>(full_path: P) -> Result<T>
 where
     P: AsRef<Path>,
     T: serde::de::DeserializeOwned,
@@ -154,7 +157,7 @@ where
     serde_json::from_str(&json_str).map_err(|e| Error::file_malformed(&full_path, e))
 }
 
-fn write_file_json<P, V>(path: P, value: V) -> Result<()>
+pub(crate) fn write_file_json<P, V>(path: P, value: V) -> Result<()>
 where
     P: AsRef<Path>,
     V: serde::ser::Serialize,

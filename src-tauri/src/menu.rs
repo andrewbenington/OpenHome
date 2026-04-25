@@ -1,6 +1,8 @@
 use std::process::Command;
 
-use tauri::{App, AppHandle, Emitter, Manager, Wry, image::Image, include_image, menu::*};
+use tauri::{App, AppHandle, Emitter, Wry, image::Image, include_image, menu::*};
+
+use crate::data_controller::DataController;
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
 
 #[cfg(target_os = "macos")]
@@ -144,13 +146,13 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
         "reset" => {
             let _ = app_handle.emit("reset", ());
         }
-        "open-appdata" => match app_handle.path().app_data_dir() {
+        "open-appdata" => match app_handle.get_data_folder() {
             Err(err) => {
                 println!["Error getting data directory: {}", err];
             }
             Ok(dir) => command_open(dir.to_str().unwrap_or_default()),
         },
-        "open-config" => match app_handle.path().app_config_dir() {
+        "open-config" => match app_handle.get_config_folder() {
             Err(err) => {
                 println!["Error getting config directory: {}", err];
             }
