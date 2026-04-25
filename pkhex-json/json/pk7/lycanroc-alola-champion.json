@@ -43,9 +43,7 @@
   "resort_event_status": 0,
   "pokerus_byte": 0,
   "super_training_flags": 0,
-  "ribbons": [
-    "Alola Champion Ribbon"
-  ],
+  "ribbons": ["Alola Champion Ribbon"],
   "contest_memory_count": 0,
   "battle_memory_count": 0,
   "super_training_dist_flags": 0,

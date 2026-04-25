@@ -43,7 +43,7 @@ pub(super) enum Offset {
     RibbonsFatefulEncounter = 0x4c,
     StatusCondition = 0x50,
     StatLevel = 0x54,
-    HeldMailId = 0x55,
+    // HeldMailId = 0x55,
     CurrentHp = 0x56,
     Stats = 0x58,
 }

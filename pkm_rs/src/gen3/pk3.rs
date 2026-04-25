@@ -83,6 +83,8 @@ impl Pk3 {
     // ------------------------------------------------------------------
 
     pub fn from_buffer(buf: &Pk3BufferRef) -> Result<Self> {
+        let ndex = buf.species_ndex();
+        let personality_value = buf.personality_value();
         let mut mon = Pk3 {
             national_dex: Gen3PokemonIndex::new(buf.species_ndex())?,
             sanity: buf.sanity(),
@@ -95,6 +97,9 @@ impl Pk3 {
             markings: buf.markings(),
             personality_value: buf.personality_value(),
             is_fateful_encounter: buf.is_fateful_encounter(),
+            gender: SpeciesAndForm::new(ndex, 0)?
+                .get_forme_metadata()
+                .gender_from_pid(personality_value),
             evs: buf.evs(),
             contest: buf.contest(),
             pokerus_byte: buf.pokerus_byte(),
