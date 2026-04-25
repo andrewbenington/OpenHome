@@ -75,7 +75,6 @@ pub fn handle_updates_get_features(
     };
 
     let current_version = app_handle.package_info().version.clone();
-    // let current_version = Version::new(1, 5, 0);
 
     if current_version < last_used_semver && !ignore_version_error {
         return Err(Error::outdated_version(last_used_semver, current_version));
@@ -108,20 +107,14 @@ pub fn handle_updates_get_features(
 
             if let Some(update_features) = update.get_features() {
                 if let Some(prev) = &mut prev_o {
-                    if prev.version_matches(update.get_non_prerelease()) {
+                    if prev.version_matches(update.version()) {
                         prev.add_feature_messages(&update_features);
                     } else {
                         all_update_features.push(prev.clone());
-                        prev_o = Some(UpdateFeatures::new(
-                            update.get_non_prerelease(),
-                            update_features,
-                        ))
+                        prev_o = Some(UpdateFeatures::new(update.version(), update_features))
                     }
                 } else {
-                    prev_o = Some(UpdateFeatures::new(
-                        update.get_non_prerelease(),
-                        update_features,
-                    ));
+                    prev_o = Some(UpdateFeatures::new(update.version(), update_features));
                 }
             }
         }
@@ -157,6 +150,7 @@ pub enum SignificantUpdate {
     V1_10_2,
     V1_10_3,
     V1_10_5,
+    V1_11_0Beta2,
 }
 
 impl SignificantUpdate {
@@ -177,6 +171,7 @@ impl SignificantUpdate {
             Self::V1_10_2 => Version::parse("1.10.2").unwrap(),
             Self::V1_10_3 => Version::parse("1.10.3").unwrap(),
             Self::V1_10_5 => Version::parse("1.10.5").unwrap(),
+            Self::V1_11_0Beta2 => Version::parse("1.11.0-beta.2").unwrap(),
         }
     }
 
@@ -237,14 +232,12 @@ impl SignificantUpdate {
                 "A bug causing Bad Eggs to appear in empty box slots in Gen 4 has been fixed.",
                 "Hisui Poké balls are now converted to regular Poké balls when moving into Radical Red or Unbound. These games do not support Hisui balls and glitched/crashed when trying to display them.",
             ]),
+            Self::V1_11_0Beta2 => Some(vec![
+                "The data folder location can now be changed under Settings. NOTE: if you want to return to OpenHome version 1.10.*, make sure you set the data folder back to its original location in AppData first.",
+                "The UI tabs have been moved to the left side of the window for a cleaner look.",
+            ]),
             _ => None,
         }
-    }
-
-    pub fn get_non_prerelease(&self) -> Version {
-        let version = self.version();
-
-        Version::new(version.major, version.minor, version.patch)
     }
 }
 
