@@ -3,7 +3,7 @@ use std::ops::Range;
 #[cfg(feature = "wasm")]
 use aes::{
     Aes128,
-    cipher::{BlockEncrypt, KeyInit, generic_array::GenericArray},
+    cipher::{BlockCipherEncrypt, KeyInit},
 };
 #[cfg(feature = "wasm")]
 use num::{BigInt, bigint::Sign};
@@ -426,7 +426,7 @@ impl<'a> MemeKey<'a> {
 
             xor_bytes_in_place(block, next_xor);
 
-            cipher.encrypt_block(GenericArray::from_mut_slice(block));
+            cipher.encrypt_block(block.try_into().expect("block is correct length"));
             next_xor.copy_from_slice(block);
 
             i += AES_CHUNK_LENGTH;
@@ -449,7 +449,7 @@ impl<'a> MemeKey<'a> {
                 signature[i..i + AES_CHUNK_LENGTH].try_into().unwrap();
             let block = &mut signature[i..i + AES_CHUNK_LENGTH];
 
-            cipher.encrypt_block(GenericArray::from_mut_slice(block));
+            cipher.encrypt_block(block.try_into().expect("block is correct length"));
 
             xor_bytes_in_place(block, &next_xor);
             next_xor.copy_from_slice(&temp);
