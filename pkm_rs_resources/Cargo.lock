@@ -254,7 +254,7 @@ checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 
 [[package]]
 name = "pkm_rs_derive"
-version = "1.10.4"
+version = "1.10.5"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -263,7 +263,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_resources"
-version = "1.10.4"
+version = "1.10.5"
 dependencies = [
  "getrandom",
  "js-sys",
@@ -281,7 +281,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_types"
-version = "1.10.3"
+version = "1.10.4"
 dependencies = [
  "getrandom",
  "js-sys",

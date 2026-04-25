@@ -156,6 +156,7 @@ pub enum SignificantUpdate {
     V1_10_1,
     V1_10_2,
     V1_10_3,
+    V1_10_5,
 }
 
 impl SignificantUpdate {
@@ -175,6 +176,7 @@ impl SignificantUpdate {
             Self::V1_10_1 => Version::parse("1.10.1").unwrap(),
             Self::V1_10_2 => Version::parse("1.10.2").unwrap(),
             Self::V1_10_3 => Version::parse("1.10.3").unwrap(),
+            Self::V1_10_5 => Version::parse("1.10.5").unwrap(),
         }
     }
 
@@ -230,6 +232,10 @@ impl SignificantUpdate {
             ]),
             Self::V1_10_3 => Some(vec![
                 "An issue with move filtering, which caused issues with some Pokémon transferred to Legends Arceus, has been fixed.",
+            ]),
+            Self::V1_10_5 => Some(vec![
+                "A bug causing Bad Eggs to appear in empty box slots in Gen 4 has been fixed.",
+                "Hisui Poké balls are now converted to regular Poké balls when moving into Radical Red or Unbound. These games do not support Hisui balls and glitched/crashed when trying to display them.",
             ]),
             _ => None,
         }
