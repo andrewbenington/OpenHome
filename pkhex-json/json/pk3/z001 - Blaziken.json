@@ -33,10 +33,7 @@
     "sheen": 0
   },
   "pokerus_byte": 0,
-  "ribbons": [
-    "G3 Champion Ribbon",
-    "Effort Ribbon"
-  ],
+  "ribbons": ["G3 Champion Ribbon", "Effort Ribbon"],
   "nickname": "BLAZIKEN",
   "moves": [
     {
