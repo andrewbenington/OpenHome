@@ -44,15 +44,15 @@
     "postinstall": "pnpm run wasm-compile"
   },
   "dependencies": {
-    "@base-ui/react": "^1.3.0",
-    "@dnd-kit/collision": "^0.3.2",
+    "@base-ui/react": "^1.4.1",
+    "@dnd-kit/collision": "^0.4.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/modifiers": "^9.0.0",
-    "@dnd-kit/react": "^0.3.2",
+    "@dnd-kit/react": "^0.4.0",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@radix-ui/themes": "^3.3.0",
-    "@tanstack/react-virtual": "^3.13.23",
+    "@tanstack/react-virtual": "^3.13.24",
     "@tauri-apps/api": "2.10.1",
     "@tauri-apps/plugin-dialog": "^2.7.0",
     "@tauri-apps/plugin-fs": "^2.5.0",
@@ -70,8 +70,8 @@
     "react-data-grid": "7.0.0-beta.59",
     "react-error-boundary": "^6.1.1",
     "react-icons": "^5.6.0",
-    "react-router": "^7.14.0",
-    "uuid": "^13.0.0",
+    "react-router": "^7.14.2",
+    "uuid": "^14.0.0",
     "zustand": "^5.0.12"
   },
   "devDependencies": {
@@ -84,9 +84,9 @@
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.58.1",
-    "@typescript-eslint/parser": "^8.58.1",
-    "@typescript/native-preview": "7.0.0-dev.20260410.1",
+    "@typescript-eslint/eslint-plugin": "^8.59.0",
+    "@typescript-eslint/parser": "^8.59.0",
+    "@typescript/native-preview": "7.0.0-dev.20260425.1",
     "@vitejs/plugin-react": "^6.0.1",
     "better-sqlite3": "^12.9.0",
     "camelcase-keys": "^10.0.2",
@@ -97,12 +97,12 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "jsdom": "^29.0.2",
-    "prettier": "^3.8.3",
     "madge": "^8.0.0",
+    "prettier": "^3.8.3",
     "react-dom": "^19.2.5",
     "typescript": "^6.0.3",
-    "vite": "^8.0.9",
-    "vitest": "^4.1.4"
+    "vite": "^8.0.10",
+    "vitest": "^4.1.5"
   },
   "pnpm": {
     "peerDependencyRules": {
