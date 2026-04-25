@@ -299,8 +299,4 @@ export default class XDPKM {
   static maxValidBall() {
     return 12
   }
-
-  static allowedBalls() {
-    return []
-  }
 }

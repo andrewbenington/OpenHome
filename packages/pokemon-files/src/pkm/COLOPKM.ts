@@ -297,8 +297,4 @@ export default class COLOPKM {
   static maxValidBall() {
     return 12
   }
-
-  static allowedBalls() {
-    return []
-  }
 }

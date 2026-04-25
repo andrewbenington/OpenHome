@@ -299,8 +299,4 @@ export default class PK2 {
   static maxValidBall() {
     return 0
   }
-
-  static allowedBalls() {
-    return []
-  }
 }

@@ -381,8 +381,4 @@ export default class PK5 {
   static maxValidBall() {
     return 25
   }
-
-  static allowedBalls() {
-    return []
-  }
 }

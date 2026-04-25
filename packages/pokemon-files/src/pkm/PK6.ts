@@ -532,8 +532,4 @@ export default class PK6 {
   static maxValidBall() {
     return 25
   }
-
-  static allowedBalls() {
-    return []
-  }
 }

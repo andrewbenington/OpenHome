@@ -493,10 +493,6 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     return Ball.Beast
   }
 
-  static allowedBalls() {
-    return []
-  }
-
   getPluginIdentifier(): PluginIdentifier {
     return this.pluginIdentifier
   }

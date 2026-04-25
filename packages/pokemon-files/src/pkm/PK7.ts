@@ -570,14 +570,6 @@ export class PK7 {
     return Languages.stringFromByte(this.language)
   }
 
-  public get natureName() {
-    return this.inner.nature.name
-  }
-
-  public get ribbonBytes() {
-    return this.inner.ribbon_bytes
-  }
-
   public calculateChecksum() {
     return get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0xe8)
   }
@@ -632,10 +624,6 @@ export class PK7 {
 
   static maxValidBall() {
     return 26
-  }
-
-  static allowedBalls() {
-    return []
   }
 }
 

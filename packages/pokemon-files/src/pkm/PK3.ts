@@ -374,8 +374,4 @@ export default class PK3 {
   static maxValidBall() {
     return 12
   }
-
-  static allowedBalls() {
-    return []
-  }
 }

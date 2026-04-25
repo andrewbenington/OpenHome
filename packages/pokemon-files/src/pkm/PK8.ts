@@ -474,8 +474,4 @@ export default class PK8 {
   static maxValidBall() {
     return 26
   }
-
-  static allowedBalls() {
-    return []
-  }
 }

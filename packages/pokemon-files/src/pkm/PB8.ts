@@ -481,8 +481,4 @@ export default class PB8 {
   static maxValidBall() {
     return 27
   }
-
-  static allowedBalls() {
-    return []
-  }
 }

@@ -56,7 +56,6 @@ export type Schema = {
   maxValidMove: number
   maxRibbon?: string
   maxBall?: number
-  allowedBalls?: number[]
   defaultBall?: string
   checksumStart?: number
   checksumEnd?: number
