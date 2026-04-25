@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use tauri::{App, AppHandle, Emitter, Wry, image::Image, include_image, menu::*};
+use tauri::{image::Image, include_image, menu::*, App, AppHandle, Emitter, Wry};
 
 use crate::data_controller::DataController;
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");

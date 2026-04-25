@@ -15,9 +15,7 @@ use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
-
 use pkm_rs_types::Language;
-
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, Generation, Stats8, Stats16Le, StatsPreSplit,
