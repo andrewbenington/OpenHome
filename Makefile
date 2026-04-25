@@ -112,6 +112,10 @@ gen-wasm:
 .PHONY: pkhex-json
 pkhex-json:
 	@cd pkhex-json && dotnet run GeneratePkhexJson.cs
+
+.PHONY: test-pkhex-json
+test-pkhex-json:
+	@cargo test --package pkm_rs --lib --all-features -- compare_pkhex_json
 	
 generate/out/syncPKHexResources.js: generate/syncPKHexResources.ts
 	@echo "compiling generate/syncPKHexResources.ts..."

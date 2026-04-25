@@ -824,7 +824,7 @@ const fn national_dex_to_gen3(value: u16) -> Option<NonZeroU16> {
 }
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Gen3PokemonIndex(NonZeroU16);
 
 const INVALID_INDEX_MESSAGE: &str =
@@ -864,6 +864,15 @@ impl Gen3PokemonIndex {
 impl Default for Gen3PokemonIndex {
     fn default() -> Self {
         Self(unsafe { NonZeroU16::new_unchecked(1) })
+    }
+}
+
+impl Serialize for Gen3PokemonIndex {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        self.to_national_dex().serialize(serializer)
     }
 }
 
