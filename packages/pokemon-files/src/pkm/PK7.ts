@@ -20,9 +20,8 @@ import {
   decryptByteArrayGen67,
   get16BitChecksumLittleEndian,
   shuffleBlocksGen67,
-  unshuffleBlocksGen67,
 } from '../util/encryption'
-import { AllPKMFields, FourMoves } from '../util/pkmInterface'
+import { FourMoves } from '../util/pkmInterface'
 import { PkmConstructorOptions } from './PKM'
 import {
   binaryGenderFromBool,
@@ -48,31 +47,17 @@ export class PK7 {
   }
   inner: Pk7Wasm
 
-  constructor(arg: ArrayBuffer | AllPKMFields | Pk7Wasm, options: PkmConstructorOptions) {
-    if (arg instanceof ArrayBuffer) {
-      let buffer = arg
-
-      if (options.encrypted) {
-        const unencryptedBytes = decryptByteArrayGen67(buffer)
-        const unshuffledBytes = unshuffleBlocksGen67(unencryptedBytes)
-        buffer = unshuffledBytes
-      }
-
-      this.inner = Pk7Wasm.fromBytes(new Uint8Array(buffer))
-    } else if (arg instanceof Pk7Wasm) {
+  constructor(arg: OHPKM | Pk7Wasm, options: PkmConstructorOptions) {
+    if (arg instanceof Pk7Wasm) {
       this.inner = arg
+      return
     } else {
-      const other = arg
-      if (!(other instanceof OHPKM)) {
-        throw Error('Pk7Rust cannot be created with any PKM type besides OHPKM')
-      }
+      const ohpkmBytes = new Uint8Array(arg.toBytes())
 
       this.inner = Pk7Wasm.fromOhpkmBytes(
-        new Uint8Array(other.toBytes()),
+        ohpkmBytes,
         options.strategy || ConvertStrategies.getDefault()
       )
-
-      return
     }
   }
 
@@ -84,7 +69,7 @@ export class PK7 {
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK7 {
-    return new PK7(buffer, { encrypted })
+    return new PK7(Pk7Wasm.fromBytes(new Uint8Array(buffer)), { encrypted })
   }
 
   static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK7 {

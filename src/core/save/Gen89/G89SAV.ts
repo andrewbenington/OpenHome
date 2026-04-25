@@ -1,6 +1,6 @@
 import { ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { PA8, PA9, PB8, PK8, PK9 } from '@pokemon-files/pkm'
-import { AllPKMFields } from '@pokemon-files/util'
+import { OHPKM } from 'src/core/pkm/OHPKM'
 import { Option } from 'src/core/util/functional'
 import {
   SCArrayBlock,
@@ -100,7 +100,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9 | PA9> extends Offi
     extraFormIndex?: ExtraFormIndex
   ): boolean
 
-  abstract monConstructor(arg: ArrayBuffer | AllPKMFields, encrypted?: boolean): P
+  abstract monConstructor(arg: ArrayBuffer | OHPKM, encrypted?: boolean): P
 
   prepareForSaving() {
     const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
