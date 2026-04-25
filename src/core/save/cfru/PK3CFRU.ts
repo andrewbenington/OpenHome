@@ -426,10 +426,6 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     return this.metadata?.genderFromPid(this.personalityValue)
   }
 
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
-  }
-
   public get heldItemName() {
     return this.itemToString(this.internalHeldItemIndex)
   }

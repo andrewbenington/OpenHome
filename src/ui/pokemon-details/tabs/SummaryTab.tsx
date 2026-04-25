@@ -14,6 +14,7 @@ import {
   extraFormDisplayName,
   genderFromBool,
   getPluginColor,
+  Languages,
   MetadataSummaryLookup,
   OriginGames,
 } from '@pkm-rs/pkg'
@@ -108,7 +109,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           )}
           <div style={{ fontWeight: 'bold' }}>{mon.nickname}</div>
           <Badge variant="solid" color="gray" ml="2" size="1">
-            {mon.languageString}
+            {Languages.stringFromByte(mon.language)}
           </Badge>
         </div>
         <AttributeRow label="Item" justifyEnd>

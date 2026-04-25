@@ -516,11 +516,6 @@ impl Pk7 {
         }
     }
 
-    #[wasm_bindgen(getter = languageString)]
-    pub fn language_string(&self) -> String {
-        self.language.as_str().to_owned()
-    }
-
     #[wasm_bindgen(js_name = toOhpkm)]
     pub fn to_ohpkm(&self) -> OhpkmV2 {
         OhpkmV2::from(self)

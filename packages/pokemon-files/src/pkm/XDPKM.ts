@@ -226,10 +226,6 @@ export default class XDPKM {
     return this.metadata?.genderFromPid(this.personalityValue)
   }
 
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
-  }
-
   public get heldItemIndex() {
     return this.heldItemIndexGen3?.toModern()?.index ?? 0
   }

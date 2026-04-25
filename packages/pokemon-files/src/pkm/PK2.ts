@@ -3,7 +3,6 @@ import {
   Generation,
   ItemGen2,
   Language,
-  Languages,
   MetadataSummaryLookup,
   OriginGames,
   SpeciesLookup,
@@ -237,10 +236,6 @@ export default class PK2 {
 
   public get gender() {
     return this.metadata?.genderFromAtkDv(this.dvs.atk)
-  }
-
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
   }
 
   public get heldItemIndex() {

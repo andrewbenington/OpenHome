@@ -224,10 +224,6 @@ export default class COLOPKM {
     return this.metadata?.genderFromPid(this.personalityValue)
   }
 
-  public get languageString() {
-    return Languages.stringFromByteGcn(this.language)
-  }
-
   public get heldItemIndex() {
     return this.heldItemIndexGen3?.toModern()?.index ?? 0
   }

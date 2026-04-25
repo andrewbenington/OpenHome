@@ -5,7 +5,6 @@ import {
   ConvertStrategy,
   HyperTraining,
   Item,
-  Languages,
   MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
@@ -564,10 +563,6 @@ export class PK7 {
 
   public get heldItemName() {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
-  }
-
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
   }
 
   public calculateChecksum() {

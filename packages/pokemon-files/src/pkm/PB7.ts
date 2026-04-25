@@ -387,10 +387,6 @@ export default class PB7 {
     return getStats(this)
   }
 
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
-  }
-
   public get heldItemName() {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }

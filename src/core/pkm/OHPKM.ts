@@ -9,7 +9,6 @@ import {
   HyperTraining,
   Item,
   Language,
-  Languages,
   Lookup,
   MetadataSummaryLookup,
   NatureIndex,
@@ -578,10 +577,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
   public get heldItemName() {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
-  }
-
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
   }
 
   public getLevel(): number {

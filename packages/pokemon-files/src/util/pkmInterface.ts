@@ -163,7 +163,6 @@ export interface AllPKMFields {
   weightAbsolute?: number
   weightDeviation?: number
   heldItemName: string
-  languageString: string
   getLevel: () => number
   calculateChecksum?: () => number
   refreshChecksum?: () => void
