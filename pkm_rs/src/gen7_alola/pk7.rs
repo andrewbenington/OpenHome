@@ -16,6 +16,7 @@ use pkm_rs_resources::helpers;
 use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
+use pkm_rs_resources::species::form_metadata::MetadataSource;
 use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
@@ -313,12 +314,14 @@ impl Pk7 {
 
     pub fn calculate_stats(&self) -> Stats16Le {
         helpers::calculate_stats_modern(
+            MetadataSource::UltraSunUltraMoon,
             self.species_and_form,
             &self.ivs,
             &self.evs,
             self.calculate_level(),
             self.nature.get_metadata(),
         )
+        .expect("pk7 has species/form present in ultra sun + moon")
     }
 
     pub const fn move_data_offsets() -> MoveDataOffsets {

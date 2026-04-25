@@ -82,7 +82,7 @@ impl OhpkmConvert for Pk3 {
             // } else {
             //     Some(self.egg_location_index)
             // },
-            met_location_index: self.met_location_index,
+            met_location_index: self.met_location_index as u16,
             met_level: self.met_level,
             // hyper_training: self.hyper_training,
             trainer_gender: self.trainer_gender,
@@ -128,7 +128,7 @@ impl OhpkmConvert for Pk3 {
             is_egg: ohpkm.is_egg(),
             trainer_name: ohpkm.trainer_name().to_string().into(),
             trainer_friendship: ohpkm.trainer_friendship(),
-            met_location_index: met_data.location_index,
+            met_location_index: met_data.location_index as u8,
             ball: ohpkm.ball(),
             met_level: ohpkm.met_level(),
             trainer_gender: ohpkm.trainer_gender(),

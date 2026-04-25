@@ -14,9 +14,10 @@ use crate::traits::{HasSpeciesAndForm, PkmBytes};
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::helpers;
-use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
+use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
+use pkm_rs_resources::species::form_metadata::MetadataSource;
 use pkm_rs_resources::species::{FormMetadata, NatDexIndex, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::Gender;
 #[cfg(feature = "randomize")]
@@ -61,7 +62,7 @@ pub struct Pk3 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: Gen3String<7>,
     pub trainer_friendship: u8,
-    pub met_location_index: u16,
+    pub met_location_index: u8,
     pub ball: Ball,
     pub met_level: u8,
     pub trainer_gender: BinaryGender,
@@ -207,12 +208,14 @@ impl Pk3 {
 
     pub fn calculate_stats(&self) -> Stats16Le {
         helpers::calculate_stats_modern(
+            MetadataSource::Emerald,
             self.species_and_form(),
             &self.ivs,
             &self.evs,
             self.calculate_level(),
             self.nature().get_metadata(),
         )
+        .expect("pk3 has valid species/form, present in Emerald data")
     }
 
     pub fn empty_box_slot_bytes() -> Vec<u8> {

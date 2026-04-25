@@ -1,19 +1,29 @@
 use pkm_rs_types::{Stats, Stats16Le};
 
-use crate::{natures::NatureMetadata, species::SpeciesAndForm, stats::Stat};
+use crate::{
+    natures::NatureMetadata,
+    species::{
+        SpeciesAndForm,
+        form_metadata::{BaseStats, MetadataSource},
+    },
+    stats::Stat,
+};
 
 pub fn calculate_stats_modern<I: Stats, E: Stats>(
+    metadata_source: MetadataSource,
     species_and_form: SpeciesAndForm,
     ivs: &I,
     evs: &E,
     level: u8,
     nature: &'static NatureMetadata,
-) -> Stats16Le {
-    let base_stats: Stats16Le = species_and_form
-        .get_forme_metadata()
-        .get_base_stats()
-        .into();
-    Stats16Le {
+) -> Option<Stats16Le> {
+    let Some(BaseStats::Modern(stats8)) = species_and_form.get_base_stats_from(metadata_source)
+    else {
+        return None;
+    };
+
+    let base_stats = Stats16Le::from(stats8);
+    Some(Stats16Le {
         hp: calculate_hp_modern(base_stats, ivs, evs, level as u16),
         atk: calculate_stat_modern(
             base_stats.atk,
@@ -55,7 +65,7 @@ pub fn calculate_stats_modern<I: Stats, E: Stats>(
             nature,
             Stat::Speed,
         ),
-    }
+    })
 }
 
 pub fn calculate_hp_modern<I: Stats, E: Stats>(

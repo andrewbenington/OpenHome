@@ -456,6 +456,10 @@ impl FormMetadata {
         source_has_form_metadata(source, self.national_dex.get(), self.form_index)
     }
 
+    pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<BaseStats> {
+        base_stats_lookup(self.national_dex.get(), self.form_index, source)
+    }
+
     fn types_from_source_or_latest(
         &self,
         source: Option<MetadataSource>,
@@ -605,8 +609,8 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(js_name = baseStatsFrom)]
-    pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<BaseStats> {
-        base_stats_lookup(self.national_dex.get(), self.form_index, source)
+    pub fn get_base_stats_from_js(&self, source: MetadataSource) -> Option<BaseStats> {
+        self.get_base_stats_from(source)
     }
 
     #[wasm_bindgen(js_name = getBaseStat)]
@@ -802,6 +806,10 @@ impl SpeciesAndForm {
 
     pub const fn get_forme_metadata(&self) -> &'static FormMetadata {
         &self.get_species_metadata().forms[self.form_index as usize]
+    }
+
+    pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<BaseStats> {
+        base_stats_lookup(self.national_dex.get(), self.form_index, source)
     }
 }
 
