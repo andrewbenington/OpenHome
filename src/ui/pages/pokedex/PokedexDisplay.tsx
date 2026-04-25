@@ -79,13 +79,8 @@ export default function PokedexDisplay() {
             <PokedexDetails
               pokedex={pokedex}
               species={selectedSpecies}
-<<<<<<< HEAD
               selectedForm={selectedForm}
               setSelectedForm={setSelectedForm}
-=======
-              selectedForme={selectedForme}
-              setSelectedForm={setSelectedForme}
->>>>>>> wasm
               setSelectedSpecies={setSelectedSpecies}
             />
           )}
@@ -94,11 +89,7 @@ export default function PokedexDisplay() {
           filter={filter}
           selectedSpecies={selectedSpecies}
           setSelectedSpecies={setSelectedSpecies}
-<<<<<<< HEAD
           setSelectedForm={setSelectedForm}
-=======
-          setSelectedForm={setSelectedForme}
->>>>>>> wasm
           pokedex={pokedex}
         />
       </Flex>
@@ -109,11 +100,7 @@ export default function PokedexDisplay() {
 type PokedexDetailsProps = {
   pokedex: Pokedex
   species: SpeciesMetadata
-<<<<<<< HEAD
   selectedForm: FormMetadata
-=======
-  selectedForme: FormMetadata
->>>>>>> wasm
   setSelectedForm: (form?: FormMetadata) => void
   setSelectedSpecies: (species?: SpeciesMetadata) => void
 }
@@ -126,13 +113,8 @@ type MostCurrentSource = typeof MOST_CURRENT_SOURCE
 function PokedexDetails({
   pokedex,
   species,
-<<<<<<< HEAD
   selectedForm,
   setSelectedForm: setSelectedForm,
-=======
-  selectedForme,
-  setSelectedForm: setSelectedForme,
->>>>>>> wasm
   setSelectedSpecies,
 }: PokedexDetailsProps) {
   const [imageError, setImageError] = useState(false)
@@ -142,17 +124,10 @@ function PokedexDetails({
     MOST_CURRENT_SOURCE
   )
 
-<<<<<<< HEAD
   const selectedFormStatus = getFormeStatus(pokedex, species.nationalDex, selectedForm.formIndex)
   const spriteResult = useMonSprite({
     dexNum: species.nationalDex,
     formNum: selectedForm.formIndex,
-=======
-  const selectedFormeStatus = getFormeStatus(pokedex, species.nationalDex, selectedForme.formIndex)
-  const spriteResult = useMonSprite({
-    dexNum: species.nationalDex,
-    formNum: selectedForme.formIndex,
->>>>>>> wasm
     format: 'OHPKM',
     isShiny: selectedFormStatus === 'ShinyCaught' && showShiny,
     extraFormIndex: undefined,
@@ -196,11 +171,7 @@ function PokedexDetails({
             {imageError ? (
               <PokemonIcon
                 dexNumber={species.nationalDex}
-<<<<<<< HEAD
                 formeNumber={selectedForm.formIndex}
-=======
-                formeNumber={selectedForme.formIndex}
->>>>>>> wasm
                 style={{ width: '90%', height: 0, paddingBottom: '90%' }}
                 silhouette={!selectedFormCaught}
               />
@@ -233,13 +204,8 @@ function PokedexDetails({
               <Button
                 className="pokedex-raised-button"
                 key={form.formIndex}
-<<<<<<< HEAD
                 variant={form.formIndex === selectedForm.formIndex ? 'solid' : 'soft'}
                 onClick={() => setSelectedForm(form)}
-=======
-                variant={form.formIndex === selectedForme.formIndex ? 'solid' : 'soft'}
-                onClick={() => setSelectedForme(form)}
->>>>>>> wasm
                 size="4"
                 style={{ minWidth: 0, padding: 0, aspectRatio: 1 }}
               >
@@ -306,13 +272,8 @@ function PokedexDetails({
                     disabled={
                       !MetadataSources.supportsForm(
                         source,
-<<<<<<< HEAD
                         selectedForm.nationalDex.index,
                         selectedForm.formIndex
-=======
-                        selectedForme.nationalDex.index,
-                        selectedForme.formIndex
->>>>>>> wasm
                       )
                     }
                   >
@@ -337,11 +298,7 @@ function PokedexDetails({
               metadataSource={metadataSource}
             />
           ) : currentView === 'levelup' ? (
-<<<<<<< HEAD
             <PokedexLearnset selectedForm={selectedForm} metadataSource={metadataSource} />
-=======
-            <PokedexLearnset selectedForm={selectedForme} metadataSource={metadataSource} />
->>>>>>> wasm
           ) : currentView === 'games' ? (
             <PokedexGames selectedForm={selectedForm} />
           ) : null}
@@ -354,13 +311,8 @@ function PokedexDetails({
 type PokedexMetadataProps = {
   pokedex: Pokedex
   species: SpeciesMetadata
-<<<<<<< HEAD
   selectedForm: FormMetadata
   setSelectedForm: (form?: FormMetadata) => void
-=======
-  selectedForme: FormMetadata
-  setSelectedForme: (form?: FormMetadata) => void
->>>>>>> wasm
   setSelectedSpecies: (species?: SpeciesMetadata) => void
   metadataSource: MetadataSource | MostCurrentSource
 }
@@ -371,13 +323,8 @@ function PokedexMain(props: PokedexMetadataProps) {
 
   const reader =
     metadataSource === MOST_CURRENT_SOURCE
-<<<<<<< HEAD
       ? currentMetadataReader(species.nationalDex, selectedForm.formIndex)
       : metadataReaderFor(metadataSource, species.nationalDex, selectedForm.formIndex)
-=======
-      ? currentMetadataReader(species.nationalDex, selectedForme.formIndex)
-      : metadataReaderFor(metadataSource, species.nationalDex, selectedForme.formIndex)
->>>>>>> wasm
 
   if (!reader) {
     const message =
@@ -438,19 +385,11 @@ function PokedexMain(props: PokedexMetadataProps) {
             <EvolutionFamily
               height="calc(100% - 16px)"
               nationalDex={species.nationalDex}
-<<<<<<< HEAD
               formNumber={selectedForm.formIndex}
               pokedex={pokedex}
               onClick={(nationalDex, formIndex) => {
                 setSelectedSpecies(SpeciesLookup(nationalDex))
                 setSelectedForm(MetadataSummaryLookup(nationalDex, formIndex))
-=======
-              formNumber={selectedForme.formIndex}
-              pokedex={pokedex}
-              onClick={(nationalDex, formIndex) => {
-                setSelectedSpecies(SpeciesLookup(nationalDex))
-                setSelectedForme(MetadataSummaryLookup(nationalDex, formIndex))
->>>>>>> wasm
               }}
             />
           </div>{' '}
@@ -495,11 +434,7 @@ function PokedexLearnset(props: PokedexLearnsetProps) {
 }
 
 interface PokedexGamesProps {
-<<<<<<< HEAD
   selectedForm: FormMetadata
-=======
-  selectedForme: FormMetadata
->>>>>>> wasm
 }
 
 function PokedexGames(props: PokedexGamesProps) {
@@ -508,13 +443,8 @@ function PokedexGames(props: PokedexGamesProps) {
   return (
     <Flex gap="1" overflowY="auto" wrap="wrap" justify="center">
       {MetadataSources.supportedGameOrigins(
-<<<<<<< HEAD
         selectedForm.nationalDex.index,
         selectedForm.formIndex
-=======
-        selectedForme.nationalDex.index,
-        selectedForme.formIndex
->>>>>>> wasm
       ).map((origin) => (
         <Card
           className="compatible-game-card"
