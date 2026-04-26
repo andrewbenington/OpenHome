@@ -13,7 +13,7 @@ use crate::traits::{AsBytesMut, ModernEvs};
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::items::ItemGen3;
+use pkm_rs_resources::items::{Item, ItemGen3};
 use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
@@ -40,7 +40,7 @@ pub struct Pk3 {
     pub pokemon_index: Gen3PokemonIndex,
     pub sanity: u16,
     pub checksum: u16,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub held_item_index: Option<ItemGen3>,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -250,6 +250,10 @@ impl Pk3 {
 
         buffer.species_ndex() == 0
     }
+
+    pub fn modern_held_item(&self) -> Option<Item> {
+        self.held_item_index?.to_modern()
+    }
 }
 
 impl Serialize for Pk3 {
@@ -329,6 +333,11 @@ impl Pk3 {
         Pk3::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
     }
 
+    #[wasm_bindgen(js_name = fromEncryptedBytes)]
+    pub fn from_encrypted_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk3, JsValue> {
+        Pk3::from_encryped_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+    }
+
     #[wasm_bindgen(js_name = toBoxBytes)]
     pub fn to_box_bytes_wasm(&self) -> Vec<u8> {
         self.to_box_bytes()
@@ -358,6 +367,24 @@ impl Pk3 {
     #[wasm_bindgen(getter = isNicknamed)]
     pub fn is_nicknamed_js(&self) -> bool {
         self.is_nicknamed()
+    }
+
+    #[wasm_bindgen(getter = heldItemIndex)]
+    pub fn held_item_index_js(&self) -> u16 {
+        match self.modern_held_item() {
+            Some(item) => item.get(),
+            None => 0,
+        }
+    }
+
+    #[wasm_bindgen(setter = heldItemIndex)]
+    pub fn set_held_item_index_js(&mut self, v: u16) {
+        self.held_item_index = ItemGen3::from_modern_index(v)
+    }
+
+    #[wasm_bindgen(getter = heldItemName)]
+    pub fn held_item_name_js(&self) -> Option<String> {
+        self.held_item_index.map(|item| item.get_metadata().name())
     }
 
     #[wasm_bindgen(getter = nature)]
@@ -424,8 +451,13 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(js_name = isEmptySlot)]
-    pub fn is_empty_slot_wasm(bytes: Vec<u8>) -> bool {
+    pub fn is_empty_slot_js(bytes: Vec<u8>) -> bool {
         Self::is_empty_slot(&bytes)
+    }
+
+    #[wasm_bindgen(js_name = calculateStats)]
+    pub fn calculate_stats_js(&self) -> Stats16Le {
+        self.calculate_stats()
     }
 }
 
