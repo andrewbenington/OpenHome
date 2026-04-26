@@ -327,3 +327,12 @@ impl ItemGen3 {
         Self::from_modern_index(modern_index)
     }
 }
+
+impl Serialize for ItemGen3 {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.0.serialize(serializer)
+    }
+}

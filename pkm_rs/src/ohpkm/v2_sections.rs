@@ -227,7 +227,7 @@ impl MainDataV2 {
         let base_mon = self.species_and_form.get_base_evolution();
         format!(
             "{:04}-{:04x}{:04x}-{:08x}-{:02x}",
-            base_mon.get_ndex().get(),
+            base_mon.get_ndex().to_u16(),
             self.trainer_id,
             self.secret_id,
             self.personality_value,

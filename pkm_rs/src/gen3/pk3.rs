@@ -13,12 +13,13 @@ use crate::traits::{AsBytesMut, ModernEvs};
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::helpers;
+use pkm_rs_resources::items::ItemGen3;
 use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
 use pkm_rs_resources::species::form_metadata::MetadataSource;
 use pkm_rs_resources::species::{FormMetadata, NatDexIndex, SpeciesAndForm, SpeciesMetadata};
+use pkm_rs_resources::{helpers, lookup};
 use pkm_rs_types::Gender;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -35,11 +36,12 @@ use wasm_bindgen::prelude::*;
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 #[serde(remote = "Self")]
 pub struct Pk3 {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
-    pub national_dex: Gen3PokemonIndex,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub pokemon_index: Gen3PokemonIndex,
     pub sanity: u16,
     pub checksum: u16,
-    pub held_item_index: u16,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
+    pub held_item_index: Option<ItemGen3>,
     pub trainer_id: u16,
     pub secret_id: u16,
     pub exp: u32,
@@ -53,13 +55,11 @@ pub struct Pk3 {
     pub pokerus_byte: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: Gen3RibbonSet,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub nickname: Gen3String<10>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: MoveSlots,
     pub ivs: Stats8,
     pub is_egg: bool,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: Gen3String<7>,
     pub trainer_friendship: u8,
     pub met_location_index: u8,
@@ -86,10 +86,10 @@ impl Pk3 {
         let ndex = buf.species_ndex();
         let personality_value = buf.personality_value();
         let mut mon = Pk3 {
-            national_dex: Gen3PokemonIndex::new(buf.species_ndex())?,
+            pokemon_index: Gen3PokemonIndex::new(buf.species_ndex())?,
             sanity: buf.sanity(),
             checksum: buf.checksum(),
-            held_item_index: buf.held_item_index(),
+            held_item_index: ItemGen3::new(buf.held_item_index()),
             trainer_id: buf.trainer_id(),
             secret_id: buf.secret_id(),
             exp: buf.exp(),
@@ -131,9 +131,9 @@ impl Pk3 {
     }
 
     pub fn write_to_box_buffer(&self, buf: &mut Pk3BufferMut) {
-        buf.set_species_ndex(self.national_dex.into());
+        buf.set_species_ndex(self.pokemon_index.into());
         buf.reset_sanity();
-        buf.set_held_item_index(self.held_item_index);
+        buf.set_held_item_index(self.held_item_index.map_or(0, |i| i.get()));
         buf.set_trainer_id(self.trainer_id);
         buf.set_secret_id(self.secret_id);
         buf.set_exp(self.exp);
@@ -189,6 +189,15 @@ impl Pk3 {
         encryption::decrypt_pkm_bytes_gen_3(&shuffled)
     }
 
+    pub fn get_national_dex(&self) -> NatDexIndex {
+        self.pokemon_index.to_national_dex()
+    }
+
+    pub fn is_nicknamed(&self) -> bool {
+        self.nickname.to_string()
+            == lookup::species_name(self.get_national_dex(), self.language).to_uppercase()
+    }
+
     pub fn calculate_checksum(&self) -> u16 {
         let mut bytes = [0u8; Self::BOX_SIZE];
         self.write_box_bytes(&mut bytes);
@@ -205,8 +214,9 @@ impl Pk3 {
 
     pub fn species_and_form(&self) -> SpeciesAndForm {
         SpeciesAndForm::new_valid_ndex(
-            self.national_dex.to_national_dex(),
-            form_index_from_pid(self.national_dex.to_national_dex(), self.personality_value) as u16,
+            self.pokemon_index.to_national_dex(),
+            form_index_from_pid(self.pokemon_index.to_national_dex(), self.personality_value)
+                as u16,
         )
         .expect("gen 3 form is valid")
     }
@@ -319,9 +329,40 @@ impl Pk3 {
         Pk3::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
     }
 
-    #[wasm_bindgen(js_name = toBytes)]
-    pub fn get_bytes_wasm(&self) -> Vec<u8> {
+    #[wasm_bindgen(js_name = toBoxBytes)]
+    pub fn to_box_bytes_wasm(&self) -> Vec<u8> {
         self.to_box_bytes()
+    }
+
+    #[wasm_bindgen(js_name = toPartyBytes)]
+    pub fn to_party_bytes_wasm(&self) -> Vec<u8> {
+        self.to_party_bytes()
+    }
+
+    #[wasm_bindgen(getter = nationalDex)]
+    pub fn national_dex_js(&self) -> u16 {
+        self.get_national_dex().to_u16()
+    }
+
+    #[wasm_bindgen(setter = nationalDex)]
+    pub fn set_national_dex_js(&mut self, v: u16) -> Result<()> {
+        self.pokemon_index = Gen3PokemonIndex::from_national_dex(v)?;
+        Ok(())
+    }
+
+    #[wasm_bindgen(getter = formIndex)]
+    pub fn form_index_js(&self) -> u16 {
+        self.species_and_form().get_forme_index()
+    }
+
+    #[wasm_bindgen(getter = isNicknamed)]
+    pub fn is_nicknamed_js(&self) -> bool {
+        self.is_nicknamed()
+    }
+
+    #[wasm_bindgen(getter = nature)]
+    pub fn nature_js(&self) -> NatureIndex {
+        self.nature()
     }
 
     #[wasm_bindgen(getter)]
@@ -361,6 +402,15 @@ impl Pk3 {
             .iter()
             .map(|ribbon| ribbon.to_string())
             .collect()
+    }
+    #[wasm_bindgen(js_name = refreshChecksum)]
+    pub fn refresh_checksum_js(&mut self) {
+        self.refresh_checksum();
+    }
+
+    #[wasm_bindgen(setter = ribbons)]
+    pub fn set_ribbons_js(&mut self, v: Vec<String>) {
+        self.ribbons = Gen3RibbonSet::from_names(v);
     }
 
     #[wasm_bindgen(getter = languageString)]

@@ -2,6 +2,7 @@ import * as PkmWasm from '../../../../../pkm_rs/pkg'
 import {
   ContestStats,
   Geolocation,
+  MarkingsFourShapes,
   MarkingsSixShapesWithColor,
   Memory,
   PKMDate,
@@ -109,6 +110,20 @@ export function markingsColorValueFromWasm(value: PkmWasm.MarkingValue): 'blue' 
     case PkmWasm.MarkingValue.Unset:
       return null
   }
+}
+
+export function markingsFourShapesFromWasm(value: PkmWasm.MarkingsFourShapes): MarkingsFourShapes {
+  const { circle, square, triangle, heart } = value
+  return {
+    circle,
+    square,
+    triangle,
+    heart,
+  }
+}
+
+export function markingsFourShapesToWasm(value: MarkingsFourShapes): PkmWasm.MarkingsFourShapes {
+  return new PkmWasm.MarkingsFourShapes(value.circle, value.square, value.triangle, value.heart)
 }
 
 export function markingsSixShapesColorsFromWasm(

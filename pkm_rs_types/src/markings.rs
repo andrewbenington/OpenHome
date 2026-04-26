@@ -39,6 +39,21 @@ impl MarkingsFourShapes {
     }
 }
 
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl MarkingsFourShapes {
+    #[wasm_bindgen(constructor)]
+    pub fn new_js(circle: bool, square: bool, triangle: bool, heart: bool) -> Self {
+        Self {
+            circle,
+            square,
+            triangle,
+            heart,
+        }
+    }
+}
+
 impl From<MarkingsSixShapes> for MarkingsFourShapes {
     fn from(other: MarkingsSixShapes) -> Self {
         MarkingsFourShapes {

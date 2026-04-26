@@ -24,7 +24,7 @@ static SPECIES_NAMES_CH_TRADITIONAL: TextResource =
 
 pub fn species_name_en(national_dex: NatDexIndex) -> &'static str {
     SPECIES_NAMES_ENGLISH
-        .line(national_dex.get() as usize)
+        .line(national_dex.to_u16() as usize)
         .expect("All valid NatDexIndex values should have a species name")
 }
 
@@ -44,6 +44,6 @@ pub fn species_name(language: Language, national_dex: NatDexIndex) -> &'static s
     };
 
     text_resource
-        .line(national_dex.get() as usize)
+        .line(national_dex.to_u16() as usize)
         .expect("All valid NatDexIndex values should have a species name")
 }

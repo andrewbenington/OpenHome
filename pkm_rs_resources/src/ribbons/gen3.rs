@@ -109,6 +109,14 @@ impl Gen3RibbonSet {
             .for_each(|ribbon| self.add_ribbon(ribbon));
         self
     }
+
+    pub fn from_names(names: Vec<String>) -> Self {
+        names
+            .iter()
+            .map(|s| s.strip_suffix(" Ribbon").unwrap_or(s))
+            .filter_map(Gen3Ribbon::from_name)
+            .collect()
+    }
 }
 
 impl FromIterator<Gen3Ribbon> for Gen3RibbonSet {
