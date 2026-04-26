@@ -1,4 +1,4 @@
-use pkm_rs::ohpkm::{v1::OhpkmV1, OhpkmV2};
+use pkm_rs::ohpkm::{OhpkmV2, v1::OhpkmV1};
 use semver::Version;
 use serde::Serialize;
 use std::{fs, path::PathBuf};
@@ -151,6 +151,7 @@ pub enum SignificantUpdate {
     V1_10_3,
     V1_10_5,
     V1_11_0Beta2,
+    V1_11_0Beta3,
 }
 
 impl SignificantUpdate {
@@ -172,6 +173,7 @@ impl SignificantUpdate {
             Self::V1_10_3 => Version::parse("1.10.3").unwrap(),
             Self::V1_10_5 => Version::parse("1.10.5").unwrap(),
             Self::V1_11_0Beta2 => Version::parse("1.11.0-beta.2").unwrap(),
+            Self::V1_11_0Beta3 => Version::parse("1.11.0-beta.3").unwrap(),
         }
     }
 
@@ -236,6 +238,7 @@ impl SignificantUpdate {
                 "The data folder location can now be changed under Settings. NOTE: if you want to return to OpenHome version 1.10.*, make sure you set the data folder back to its original location in AppData first.",
                 "The UI tabs have been moved to the left side of the window for a cleaner look.",
             ]),
+            Self::V1_11_0Beta3 => Some(vec!["A Pokedex read/write bug has been fixed."]),
             _ => None,
         }
     }
