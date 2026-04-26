@@ -39,7 +39,7 @@ pub enum PokedexStatus {
 #[derive(Default, Debug, Serialize, Deserialize, Clone)]
 pub struct PokedexEntry {
     #[serde(rename(deserialize = "formes"))]
-    #[serde(alias = "formes")]
+    #[serde(alias = "forms")]
     forms: HashMap<FormeNumber, PokedexStatus>,
 }
 
@@ -52,7 +52,7 @@ impl PokedexEntry {
     }
 }
 
-#[derive(Default, Debug, Serialize, Clone)]
+#[derive(Default, Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Pokedex {
     by_dex_number: HashMap<DexNumber, PokedexEntry>,
@@ -109,4 +109,44 @@ pub fn update_pokedex(
     app_handle
         .emit("pokedex_update", pokedex.clone())
         .map_err(|err| Error::other_with_source("Could not emit 'pokedex_update' to frontend", err))
+}
+
+#[cfg(test)]
+mod test {
+    use crate::error::{Error, Result};
+    use crate::state::{Pokedex, PokedexStatus};
+
+    #[test]
+    fn serialize_deserialize() -> Result<()> {
+        let mut pokedex = Pokedex::default();
+        pokedex.register(25, 0, PokedexStatus::Caught);
+        pokedex.register(26, 1, PokedexStatus::Seen);
+
+        let serialized = serde_json::to_string(&pokedex)
+            .map_err(|err| Error::other_with_source("serialize Pokedex", err))?;
+        let deserialized: Pokedex = serde_json::from_str(&serialized)
+            .map_err(|err| Error::other_with_source("deserialize Pokedex", err))?;
+
+        let pikachu_entry = deserialized
+            .by_dex_number
+            .get(&25)
+            .expect("pikachu is present in pokedex");
+        let pikachu_base_form = pikachu_entry
+            .forms
+            .get(&0)
+            .expect("pikachu base form is present in pokedex");
+        assert_eq!(*pikachu_base_form, PokedexStatus::Caught);
+
+        let raichu_entry = deserialized
+            .by_dex_number
+            .get(&26)
+            .expect("raichu is present in pokedex");
+        let raichu_alolan_form = raichu_entry
+            .forms
+            .get(&1)
+            .expect("raichu alolan form is present in pokedex");
+        assert_eq!(*raichu_alolan_form, PokedexStatus::Seen);
+
+        Ok(())
+    }
 }
