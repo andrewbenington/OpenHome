@@ -18,7 +18,7 @@ import { filterUndefined } from 'src/core/util/sort'
 import { PKMInterface } from '../../../../src/core/pkm/interfaces'
 import { AllPKMFields, FourMoves } from './pkmInterface'
 
-export function getGen3MiscFlags(pokemon: PKM): number {
+export function getGen3MiscFlags(pokemon: PKMInterface): number {
   if ('isEgg' in pokemon && pokemon.isEgg) {
     return 0b0110
   }

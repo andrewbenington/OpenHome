@@ -11,6 +11,12 @@ use rand::{
     distr::{Alphanumeric, SampleString},
 };
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::JsValue;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::convert::*;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::describe::*;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Gen3String<const N: usize> {
     raw: [u8; N],
@@ -94,5 +100,31 @@ impl<const N: usize> Randomize for Gen3String<N> {
         let length: usize = rng.random_range(0..N);
         let utf8: String = Alphanumeric.sample_string(rng, length);
         Self::from(utf8)
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl<const N: usize> WasmDescribe for Gen3String<N> {
+    fn describe() {
+        js_sys::JsString::describe()
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl<const N: usize> IntoWasmAbi for Gen3String<N> {
+    type Abi = <js_sys::JsString as IntoWasmAbi>::Abi;
+
+    fn into_abi(self) -> Self::Abi {
+        JsValue::from_str(&self.to_string()).into_abi()
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl<const N: usize> FromWasmAbi for Gen3String<N> {
+    type Abi = <js_sys::JsString as IntoWasmAbi>::Abi;
+
+    unsafe fn from_abi(js: Self::Abi) -> Self {
+        let val = unsafe { JsValue::from_abi(js) };
+        Self::from(val.as_string().unwrap_or_default())
     }
 }

@@ -12,6 +12,7 @@ import PB8 from './PB8'
 import PK1 from './PK1'
 import PK2 from './PK2'
 import PK3 from './PK3'
+import PK3JavaScript from './PK3JavaScript'
 import PK4 from './PK4'
 import PK5 from './PK5'
 import PK6 from './PK6'
@@ -24,6 +25,7 @@ export type PKM =
   | PK1
   | PK2
   | PK3
+  | PK3JavaScript
   | COLOPKM
   | XDPKM
   | PK4

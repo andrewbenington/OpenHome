@@ -49,7 +49,6 @@ export class PK7 {
   constructor(arg: OHPKM | Pk7Wasm, options: PkmConstructorOptions) {
     if (arg instanceof Pk7Wasm) {
       this.inner = arg
-      return
     } else {
       const ohpkmBytes = new Uint8Array(arg.toBytes())
 
@@ -67,8 +66,8 @@ export class PK7 {
     this.inner.encryption_constant = value
   }
 
-  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK7 {
-    return new PK7(Pk7Wasm.fromBytes(new Uint8Array(buffer)), { encrypted })
+  static fromBytes(buffer: ArrayBuffer, _encrypted?: boolean): PK7 {
+    return PK7.fromWasm(Pk7Wasm.fromBytes(new Uint8Array(buffer)))
   }
 
   static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK7 {

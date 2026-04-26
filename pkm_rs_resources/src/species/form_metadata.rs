@@ -616,8 +616,8 @@ mod test {
 
     fn form_has_current_data(form: &FormMetadata) -> bool {
         !(form.form_name.contains("Totem")
-        || (form.national_dex.get() == NationalDex::Xerneas && form.form_index == 1) // Active Xerneas
-            || (form.national_dex.get() == NationalDex::Arceus && form.form_index == ARCEUS_LEGEND))
+        || (form.national_dex.to_u16() == NationalDex::Xerneas && form.form_index == 1) // Active Xerneas
+            || (form.national_dex.to_u16() == NationalDex::Arceus && form.form_index == ARCEUS_LEGEND))
     }
 
     fn try_all_forms(callback: impl Fn(&FormMetadata) -> Result<(), String>) -> Result<(), String> {
@@ -654,7 +654,7 @@ mod test {
     #[test]
     fn all_forms_have_types() -> Result<(), String> {
         try_all_forms(|form| {
-            super::types_lookup(form.national_dex.get(), form.form_index, None)
+            super::types_lookup(form.national_dex.to_u16(), form.form_index, None)
                 .ok_or(format!("Missing types for {}", form.form_name))?;
             Ok(())
         })
@@ -665,7 +665,7 @@ mod test {
         try_all_forms(|form| {
             let form_name = &form.form_name;
             let (type1, type2) =
-                super::types_lookup(form.national_dex.get(), form.form_index, None)
+                super::types_lookup(form.national_dex.to_u16(), form.form_index, None)
                     .ok_or(format!("Missing types for {form_name}"))?;
             if let Some(type2) = type2
                 && type1 == type2
@@ -683,7 +683,7 @@ mod test {
     fn no_zero_stats() -> Result<(), String> {
         try_all_forms(|form| {
             let form_name = &form.form_name;
-            let stats = super::current_base_stats(form.national_dex.get(), form.form_index)
+            let stats = super::current_base_stats(form.national_dex.to_u16(), form.form_index)
                 .ok_or(format!("Missing stats for {form_name}"))?;
             if stats.hp == 0
                 || stats.atk == 0
@@ -718,7 +718,7 @@ mod test {
     fn no_form_panics_for_any_source() -> Result<(), String> {
         try_all_forms(|form| {
             METADATA_SOURCES_IMPLEMENTED.into_iter().for_each(|source| {
-                super::base_stats_lookup(form.national_dex.get(), form.form_index, source);
+                super::base_stats_lookup(form.national_dex.to_u16(), form.form_index, source);
             });
             Ok(())
         })

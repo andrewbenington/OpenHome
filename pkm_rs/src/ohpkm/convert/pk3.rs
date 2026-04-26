@@ -56,8 +56,11 @@ impl OhpkmConvert for Pk3 {
             nickname: self.nickname.to_string().into(),
             ivs: self.ivs,
             is_egg: self.is_egg,
-            is_nicknamed: !lookup::species_name(self.national_dex.to_national_dex(), self.language)
-                .eq_ignore_ascii_case(&self.nickname.to_string()),
+            is_nicknamed: !lookup::species_name(
+                self.pokemon_index.to_national_dex(),
+                self.language,
+            )
+            .eq_ignore_ascii_case(&self.nickname.to_string()),
             // handler_name: self.handler_name,
             // is_current_handler: self.is_current_handler,
             // handler_friendship: self.handler_friendship,
@@ -101,7 +104,7 @@ impl OhpkmConvert for Pk3 {
         let mut mon = Self {
             sanity: 0,
             checksum: 0,
-            national_dex: Gen3PokemonIndex::from_national_dex(
+            pokemon_index: Gen3PokemonIndex::from_national_dex(
                 ohpkm.species_and_form().get_ndex().index(),
             )
             .expect("invalid national dex for pk3"),

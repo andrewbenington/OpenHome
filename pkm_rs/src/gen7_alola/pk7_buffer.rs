@@ -661,7 +661,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn set_species_and_form(&mut self, v: SpeciesAndForm) {
-        self.set_species_ndex(v.get_ndex().get());
+        self.set_species_ndex(v.get_ndex().to_u16());
         self.set_forme_index(v.get_forme_index() as u8);
     }
 

@@ -49,7 +49,7 @@ impl NatDexIndex {
     }
 
     pub const fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        &ALL_SPECIES[(self.get() - 1) as usize]
+        &ALL_SPECIES[(self.to_u16() - 1) as usize]
     }
 
     /// # Safety
@@ -60,7 +60,7 @@ impl NatDexIndex {
         unsafe { NatDexIndex(NonZeroU16::new_unchecked(index)) }
     }
 
-    pub const fn get(&self) -> u16 {
+    pub const fn to_u16(&self) -> u16 {
         self.0.get()
     }
 
@@ -69,7 +69,7 @@ impl NatDexIndex {
     }
 
     pub const fn to_le_bytes(self) -> [u8; 2] {
-        self.get().to_le_bytes()
+        self.to_u16().to_le_bytes()
     }
 }
 
@@ -78,7 +78,7 @@ impl NatDexIndex {
 impl NatDexIndex {
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn index(&self) -> u16 {
-        self.get()
+        self.to_u16()
     }
 
     #[cfg(feature = "wasm")]
@@ -102,7 +102,7 @@ impl Serialize for NatDexIndex {
     where
         S: Serializer,
     {
-        serializer.serialize_u16(self.get())
+        serializer.serialize_u16(self.to_u16())
     }
 }
 
@@ -120,7 +120,7 @@ impl From<NationalDex> for NatDexIndex {
 
 impl From<NatDexIndex> for NationalDex {
     fn from(ndex: NatDexIndex) -> Self {
-        NationalDex::try_from(ndex.get())
+        NationalDex::try_from(ndex.to_u16())
             .expect("All NatDexIndex values should be a valid NationalDex")
     }
 }
@@ -414,7 +414,7 @@ pub struct FormMetadata {
 
 impl FormMetadata {
     pub const fn forme_ref(&self) -> SpeciesAndForm {
-        unsafe { SpeciesAndForm::new_unchecked(self.national_dex.get(), self.form_index) }
+        unsafe { SpeciesAndForm::new_unchecked(self.national_dex.to_u16(), self.form_index) }
     }
 
     pub const fn species_metadata(&self) -> &SpeciesMetadata {
@@ -453,20 +453,20 @@ impl FormMetadata {
     #[cfg(feature = "wasm")]
     fn has_data_for_source(&self, source: MetadataSource) -> bool {
         use crate::species::form_metadata::source_has_form_metadata;
-        source_has_form_metadata(source, self.national_dex.get(), self.form_index)
+        source_has_form_metadata(source, self.national_dex.to_u16(), self.form_index)
     }
 
     pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<BaseStats> {
-        base_stats_lookup(self.national_dex.get(), self.form_index, source)
+        base_stats_lookup(self.national_dex.to_u16(), self.form_index, source)
     }
 
     fn types_from_source_or_latest(
         &self,
         source: Option<MetadataSource>,
     ) -> (PkmType, Option<PkmType>) {
-        types_lookup(self.national_dex.get(), self.form_index, source).expect_log(format!(
+        types_lookup(self.national_dex.to_u16(), self.form_index, source).expect_log(format!(
             "no types found for nat dex {} form {}",
-            self.national_dex.get(),
+            self.national_dex.to_u16(),
             self.form_index
         ))
     }
@@ -605,7 +605,7 @@ impl FormMetadata {
 
     #[wasm_bindgen(getter = baseStats)]
     pub fn get_base_stats(&self) -> Stats8 {
-        current_base_stats(self.national_dex.get(), self.form_index).unwrap_or_default()
+        current_base_stats(self.national_dex.to_u16(), self.form_index).unwrap_or_default()
     }
 
     #[wasm_bindgen(js_name = baseStatsFrom)]
@@ -791,11 +791,11 @@ impl SpeciesAndForm {
     }
 
     pub const fn to_tuple(self) -> (u16, u16) {
-        (self.national_dex.get(), self.form_index)
+        (self.national_dex.to_u16(), self.form_index)
     }
 
     pub fn get_levelup_learnset(&self, source: Option<MetadataSource>) -> Option<LearnsetReader> {
-        levelup_learnset_lookup(self.national_dex.get(), self.form_index, source)
+        levelup_learnset_lookup(self.national_dex.to_u16(), self.form_index, source)
     }
 }
 
@@ -809,7 +809,7 @@ impl SpeciesAndForm {
     }
 
     pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<BaseStats> {
-        base_stats_lookup(self.national_dex.get(), self.form_index, source)
+        base_stats_lookup(self.national_dex.to_u16(), self.form_index, source)
     }
 }
 
@@ -824,7 +824,7 @@ impl SpeciesAndForm {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nationalDex))]
     pub fn get_ndex_js(&self) -> u16 {
-        self.national_dex.get()
+        self.national_dex.to_u16()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = formIndex))]
@@ -852,7 +852,7 @@ impl SpeciesAndForm {
 impl Randomize for SpeciesAndForm {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
         let national_dex = NatDexIndex::randomized(rng);
-        println!("randomized ndex: {}", national_dex.get());
+        println!("randomized ndex: {}", national_dex.to_u16());
         let forme_count = national_dex.get_species_metadata().forms().len();
         let form_index = rng.random_range(0..forme_count) as u16;
         println!("randomized form: {}", form_index);
