@@ -1,5 +1,5 @@
-use pkm_rs_resources::lookup;
 use pkm_rs_resources::ribbons::Gen3Ribbon;
+use pkm_rs_resources::{items::ItemGen3, lookup};
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
 use crate::{
@@ -33,7 +33,11 @@ impl OhpkmConvert for Pk3 {
             personality_value: self.personality_value,
             encryption_constant: self.personality_value, // Mirror Poké Transporter's behavior of using the personality value as the encryption constant
             species_and_form: self.species_and_form(),
-            held_item_index: self.held_item_index,
+            held_item_index: self
+                .held_item_index
+                .and_then(|item_g3| item_g3.to_modern())
+                .map(|item| item.get())
+                .unwrap_or(0),
             trainer_id: self.trainer_id,
             secret_id: self.secret_id,
             exp: self.exp,
@@ -108,7 +112,7 @@ impl OhpkmConvert for Pk3 {
                 ohpkm.species_and_form().get_ndex().index(),
             )
             .expect("invalid national dex for pk3"),
-            held_item_index: ohpkm.held_item_index(),
+            held_item_index: ItemGen3::from_modern_index(ohpkm.held_item_index()),
             trainer_id: ohpkm.trainer_id(),
             secret_id: ohpkm.secret_id(),
             exp: ohpkm.exp(),

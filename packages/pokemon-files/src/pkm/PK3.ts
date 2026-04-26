@@ -44,8 +44,10 @@ export default class PK3 implements PKMInterface {
     }
   }
 
-  static fromBytes(buffer: ArrayBuffer): PK3 {
-    return PK3.fromWasm(Pk3Wasm.fromBytes(new Uint8Array(buffer)))
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK3 {
+    const bytes = new Uint8Array(buffer)
+    const pk3Wasm = encrypted ? Pk3Wasm.fromEncryptedBytes(bytes) : Pk3Wasm.fromBytes(bytes)
+    return PK3.fromWasm(pk3Wasm)
   }
 
   static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3 {
@@ -88,10 +90,10 @@ export default class PK3 implements PKMInterface {
   }
 
   get heldItemIndex() {
-    return this.inner.held_item_index
+    return this.inner.heldItemIndex
   }
   set heldItemIndex(value: number) {
-    this.inner.held_item_index = value
+    this.inner.heldItemIndex = value
   }
 
   get trainerID() {
@@ -326,7 +328,7 @@ export default class PK3 implements PKMInterface {
   }
 
   get heldItemName() {
-    return this.inner.held_item_index?.name ?? 'None'
+    return this.inner.heldItemName ?? 'None'
   }
 
   public refreshChecksum() {
@@ -345,6 +347,10 @@ export default class PK3 implements PKMInterface {
 
   public isValid(): boolean {
     return this.dexNum > 0 && this.dexNum <= NationalDex.Deoxys
+  }
+
+  public getStats() {
+    return this.inner.calculateStats()
   }
 
   isShiny() {
