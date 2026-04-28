@@ -24,8 +24,8 @@ export default function PluginsPage() {
   return (
     <SideTabs.Root value={currentSegment} onValueChange={setCurrentSegment}>
       <SideTabs.TabList>
-        <SideTabs.Tab value="browse">Browse Plugins</SideTabs.Tab>
         <SideTabs.Tab value="installed">Installed Plugins</SideTabs.Tab>
+        <SideTabs.Tab value="browse">Browse Plugins</SideTabs.Tab>
       </SideTabs.TabList>
       <Routes>
         <Route index path="/" element={browsePluginsElement} />

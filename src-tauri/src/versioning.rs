@@ -152,6 +152,7 @@ pub enum SignificantUpdate {
     V1_10_5,
     V1_11_0Beta2,
     V1_11_0Beta3,
+    V1_11_0Rc1,
 }
 
 impl SignificantUpdate {
@@ -174,6 +175,7 @@ impl SignificantUpdate {
             Self::V1_10_5 => Version::parse("1.10.5").unwrap(),
             Self::V1_11_0Beta2 => Version::parse("1.11.0-beta.2").unwrap(),
             Self::V1_11_0Beta3 => Version::parse("1.11.0-beta.3").unwrap(),
+            Self::V1_11_0Rc1 => Version::parse("1.11.0-rc.1").unwrap(),
         }
     }
 
@@ -239,6 +241,7 @@ impl SignificantUpdate {
                 "The UI tabs have been moved to the left side of the window for a cleaner look.",
             ]),
             Self::V1_11_0Beta3 => Some(vec!["A Pokedex read/write bug has been fixed."]),
+            Self::V1_11_0Rc1 => Some(vec!["Plugin support has been fixed."]),
             _ => None,
         }
     }
