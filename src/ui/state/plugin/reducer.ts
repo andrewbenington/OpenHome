@@ -1,7 +1,9 @@
 import { MonFormat } from '@openhome-core/pkm/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { ExtraFormIndex } from '@pkm-rs/pkg'
-import { Dispatch, Reducer, createContext } from 'react'
+import { Reducer, createContext } from 'react'
+import { ImageResponse } from 'src/ui/backend/backendInterface'
+import { PluginState } from './PluginProvider'
 
 export interface MonSpriteData {
   dexNum: number
@@ -19,10 +21,13 @@ export interface OpenHomePlugin {
   name: string
   version: string
   api_version: number
+  icon: string
+  assets: Record<string, string>
+  icon_image: ImageResponse | null
   getMonSpritePath?: (params: MonSpriteData) => string | null
 }
 
-export type PluginState = { plugins: OpenHomePlugin[]; loaded: boolean }
+export type PluginStateInternal = { plugins: OpenHomePlugin[]; loaded: boolean }
 export type PluginAction =
   | {
       type: 'register_plugin'
@@ -41,8 +46,8 @@ export type PluginAction =
       payload: boolean
     }
 
-export const pluginReducer: Reducer<PluginState, PluginAction> = (
-  state: PluginState,
+export const pluginReducer: Reducer<PluginStateInternal, PluginAction> = (
+  state: PluginStateInternal,
   action: PluginAction
 ) => {
   const { type, payload } = action
@@ -80,9 +85,18 @@ export const pluginReducer: Reducer<PluginState, PluginAction> = (
   }
 }
 
-const initialState = { plugins: [], loaded: false }
+const initialState: PluginState = {
+  installedPlugins: [],
+  enabledPlugins: [],
+  loading: false,
+  availablePlugins: {},
+  setAvailablePlugins: () => {},
+  setUseDevRepo: () => {},
+  useDevRepo: false,
+  loadInstalled: async () => {},
+  outdatedPluginCount: 0,
+  registerPlugin: () => {},
+  deletePlugin: () => {},
+}
 
-export const PluginContext = createContext<[PluginState, Dispatch<PluginAction>]>([
-  initialState,
-  () => null,
-])
+export const PluginContext = createContext<PluginState>(initialState)

@@ -3,70 +3,28 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import useIsDev from '@openhome-ui/hooks/isDev'
-import { AppInfoContext } from '@openhome-ui/state/appInfo'
-import { PluginContext } from '@openhome-ui/state/plugin'
-import { loadPlugin, PluginMetadata, PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
+import { loadPlugin, PluginMetadata } from '@openhome-ui/util/plugin'
 import { Badge, Flex, Progress, Spinner, Switch } from '@radix-ui/themes'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { OpenHomePlugin, PluginContext } from 'src/ui/state/plugin/reducer'
 import { CURRENT_PLUGIN_API_VERSION } from './Plugins'
 import './style.css'
 
-const GITHUB_REPO =
+export const GITHUB_REPO =
   'https://raw.githubusercontent.com/andrewbenington/OpenHome-Plugins/refs/heads/main'
-const LOCAL_REPO = 'http://127.0.0.1:5500'
+export const LOCAL_REPO = 'http://127.0.0.1:5500'
 
 export default function BrowsePlugins() {
-  const displayError = useDisplayError()
-  const [installedPlugins, setInstalledPlugins] = useState<PluginMetadataWithIcon[]>()
-  const [availablePlugins, setAvailablePlugins] = useState<Record<string, string>>()
-  const [loading, setLoading] = useState(false)
-  const [useDevRepo, setUseDevRepo] = useState(false)
-  const [{ settings }] = useContext(AppInfoContext)
-  const [pluginState, dispatchPluginState] = useContext(PluginContext)
-  const backend = useContext(BackendContext)
+  const {
+    loading,
+    availablePlugins,
+    setAvailablePlugins,
+    installedPlugins,
+    useDevRepo,
+    setUseDevRepo,
+    loadInstalled,
+  } = useContext(PluginContext)
   const isDev = useIsDev()
-
-  useEffect(() => {
-    backend.updateSettings(settings).catch(console.error)
-  }, [settings, backend])
-
-  useEffect(() => {
-    setLoading(true)
-    fetch(`${useDevRepo ? LOCAL_REPO : GITHUB_REPO}/plugins-v2.json`)
-      .then(async (resp) => {
-        setLoading(false)
-        try {
-          const response: { v2: Record<string, string> } = await resp.json()
-          const available = response.v2
-
-          setAvailablePlugins(available)
-        } catch (e) {
-          console.error(e)
-          setAvailablePlugins({})
-          displayError('Error Finding Available Plugins', `${e}`)
-        }
-      })
-      .finally(() => {
-        dispatchPluginState({ type: 'set_loaded', payload: true })
-        setLoading(false)
-      })
-  }, [displayError, useDevRepo, dispatchPluginState])
-
-  const loadInstalled = useCallback(
-    async () =>
-      backend.listInstalledPlugins().then(
-        R.match(
-          (plugins) => setInstalledPlugins(plugins),
-          (err) => displayError('Error Getting Installed Plugins', err)
-        )
-      ),
-    [backend, displayError]
-  )
-
-  useEffect(() => {
-    if (installedPlugins && pluginState.loaded) return
-    loadInstalled()
-  }, [installedPlugins, loadInstalled, pluginState.loaded])
 
   return loading ? (
     <Flex direction="column" justify="center" height="100%">
@@ -90,7 +48,7 @@ export default function BrowsePlugins() {
         {availablePlugins &&
           Object.entries(availablePlugins).map(([name, location]) => (
             <AvailablePluginCard
-              key={name}
+              key={location}
               name={name}
               location={location}
               useDevRepo={useDevRepo}
@@ -108,7 +66,7 @@ type AvailablePluginCardProps = {
   location: string
   useDevRepo?: boolean
   reloadInstalled: () => void
-  installedInstance?: PluginMetadataWithIcon
+  installedInstance?: OpenHomePlugin
 }
 
 function AvailablePluginCard(props: AvailablePluginCardProps) {
@@ -116,7 +74,7 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
   const [metadata, setMetadata] = useState<PluginMetadata>()
   const [error, setError] = useState<string>()
   const displayError = useDisplayError()
-  const [, dispatchPlugins] = useContext(PluginContext)
+  const { registerPlugin } = useContext(PluginContext)
   const [progressPercent, setProgressPercent] = useState<number>()
   const backend = useContext(BackendContext)
 
@@ -138,8 +96,6 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
       stopListening()
     }
   }, [backend, metadata])
-
-  useEffect(() => setError(undefined), [location])
 
   useEffect(() => {
     if (error) return
@@ -172,7 +128,7 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
               (code) => {
                 try {
                   setProgressPercent(100)
-                  dispatchPlugins({ type: 'register_plugin', payload: loadPlugin(code) })
+                  registerPlugin(loadPlugin(code))
                   reloadInstalled()
                   setTimeout(() => {
                     // show full progress bar for 200s before hiding

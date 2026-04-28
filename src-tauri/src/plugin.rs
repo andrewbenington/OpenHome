@@ -112,7 +112,7 @@ pub async fn download_async(
 
     emit_download_progress(&app_handle, plugin_metadata.id.clone(), 10.0);
 
-    let zip_file_url = format!("{}/assets.zip", remote_url);
+    let zip_file_url = format!("{remote_url}/assets.zip");
 
     // Decompress assets directory
     util::download_extract_zip_file(&zip_file_url, &new_plugin_dir.join("assets"), |pct| {
@@ -125,7 +125,7 @@ pub async fn download_async(
     emit_download_progress(&app_handle, plugin_metadata.id.clone(), 10.0 + ASSETS_PCT);
 
     download_to_file(
-        &format!("{}/icon.png", remote_url),
+        &format!("{remote_url}/icon.png"),
         &new_plugin_dir.join("icon.png"),
     )
     .await?;

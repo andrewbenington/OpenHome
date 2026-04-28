@@ -8,10 +8,10 @@ import BrowsePlugins from './BrowsePlugins'
 import InstalledPlugins from './InstalledPlugins'
 import './style.css'
 
-export const CURRENT_PLUGIN_API_VERSION = 2
+export const CURRENT_PLUGIN_API_VERSION = 3
 
 export default function PluginsPage() {
-  const { currentSegment, setCurrentSegment } = usePathSegment('plugins', 'browse')
+  const { currentSegment, setCurrentSegment } = usePathSegment('plugins', 'installed')
   const [{ settings }] = useContext(AppInfoContext)
   const backend = useContext(BackendContext)
 
@@ -19,7 +19,7 @@ export default function PluginsPage() {
     backend.updateSettings(settings).catch(console.error)
   }, [settings, backend])
 
-  const browsePluginsElement = <BrowsePlugins />
+  const browsePluginsElement = <InstalledPlugins />
 
   return (
     <SideTabs.Root value={currentSegment} onValueChange={setCurrentSegment}>
@@ -29,7 +29,7 @@ export default function PluginsPage() {
       </SideTabs.TabList>
       <Routes>
         <Route index path="/" element={browsePluginsElement} />
-        <Route path="browse" element={browsePluginsElement} />
+        <Route path="browse" element={<BrowsePlugins />} />
         <Route path="installed" element={<InstalledPlugins />} />
       </Routes>
     </SideTabs.Root>

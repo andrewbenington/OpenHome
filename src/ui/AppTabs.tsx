@@ -1,6 +1,7 @@
 import { Separator } from '@base-ui/react/separator'
 import useIsDev from '@openhome-ui/hooks/isDev'
-import { Box, Flex, ThemePanel } from '@radix-ui/themes'
+import { Badge, Box, Flex, ThemePanel } from '@radix-ui/themes'
+import { PropsWithChildren, useContext } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
 import { AppTabIconsActive, AppTabIconsInactive } from './components/Icons'
 import { Tabs } from './components/Tabs'
@@ -12,12 +13,14 @@ import PokedexDisplay from './pages/pokedex/PokedexDisplay'
 import Settings from './pages/Settings'
 import SortPokemon from './pages/sort/SortPokemon'
 import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
+import { PluginContext } from './state/plugin/reducer'
 
 export default function AppTabs() {
   const isDev = useIsDev()
 
   const tab = useLocation().pathname.split('/')[1] || 'home'
   const navigate = useNavigate()
+  const { outdatedPluginCount } = useContext(PluginContext)
 
   const homeElement = <Home />
 
@@ -51,9 +54,11 @@ export default function AppTabs() {
             Pokédex
           </Tabs.Tab>
           <Tabs.Tab value="plugins">
-            <AppTabIconsActive.Plugins />
-            <AppTabIconsInactive.Plugins />
-            Sprite Plugins
+            <NotificationBadge count={outdatedPluginCount}>
+              <AppTabIconsActive.Plugins />
+              <AppTabIconsInactive.Plugins />
+              Sprite Plugins
+            </NotificationBadge>
           </Tabs.Tab>
           <Tabs.Tab value="settings">
             <AppTabIconsActive.Settings />
@@ -108,5 +113,25 @@ export default function AppTabs() {
         </Box>
       </Flex>
     </Tabs.Root>
+  )
+}
+
+type NotificationBadgeProps = PropsWithChildren & { count?: number }
+
+function NotificationBadge(props: NotificationBadgeProps) {
+  const { count, children } = props
+  return count ? (
+    <div style={{ position: 'relative' }}>
+      <Badge
+        radius="full"
+        variant="solid"
+        style={{ position: 'absolute', top: '-0.5rem', right: 0 }}
+      >
+        {count}
+      </Badge>
+      {children}
+    </div>
+  ) : (
+    children
   )
 }

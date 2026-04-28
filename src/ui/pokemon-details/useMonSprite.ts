@@ -4,21 +4,9 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getPokemonSpritePath } from '@openhome-ui/images/pokemon'
-import { CURRENT_PLUGIN_API_VERSION } from '@openhome-ui/pages/plugins/Plugins'
-import { MonSpriteData, OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
-import { useContext, useEffect, useMemo, useState } from 'react'
-
-type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>
-
-type SpritePlugin = RequiredFields<OpenHomePlugin, 'getMonSpritePath'>
-function isSpritePlugin(plugin: OpenHomePlugin): plugin is SpritePlugin {
-  return !!plugin.getMonSpritePath
-}
-
-function currentApiVersion(plugin: OpenHomePlugin) {
-  return plugin.api_version >= CURRENT_PLUGIN_API_VERSION
-}
+import { useContext, useEffect, useState } from 'react'
+import { MonSpriteData, PluginContext } from 'src/ui/state/plugin/reducer'
 
 type MonSpriteResult =
   | { loading: true; path?: undefined; errorMessage?: undefined; severity?: undefined }
@@ -26,16 +14,11 @@ type MonSpriteResult =
   | { loading: false; path: string; errorMessage?: string; severity?: 'error' | 'warning' }
 
 export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
-  const [pluginState] = useContext(PluginContext)
+  const { enabledPlugins } = useContext(PluginContext)
   const backend = useContext(BackendContext)
   const [spriteResult, setSpriteResult] = useState<MonSpriteResult>({ loading: true })
   const [loadError, setLoadError] = useState(false)
   const displayError = useDisplayError()
-
-  const spritePlugins: SpritePlugin[] = useMemo(
-    () => pluginState.plugins.filter(isSpritePlugin).filter(currentApiVersion),
-    [pluginState.plugins]
-  )
 
   useEffect(() => {
     setSpriteResult({ loading: true })
@@ -62,10 +45,10 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
       mon.formNum = displayIndexAdder(mon.heldItemIndex)(mon.formNum)
     }
 
-    for (const plugin of spritePlugins) {
-      const spritePath = plugin.getMonSpritePath(mon)
+    for (const plugin of enabledPlugins) {
+      const spritePath = plugin.getMonSpritePath?.(mon)
 
-      if (spritePath !== null) {
+      if (spritePath) {
         backend.getPluginPath(plugin.id).then((pluginPath) => {
           const absolutePath = `${pluginPath}/${spritePath}`
 
@@ -102,7 +85,7 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
     })
   }, [
     mon.format,
-    spritePlugins,
+    enabledPlugins,
     backend,
     loadError,
     displayError,
