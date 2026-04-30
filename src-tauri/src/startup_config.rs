@@ -13,6 +13,7 @@ use crate::data_controller::read_file_json;
 use crate::data_controller::write_file_json;
 use crate::error::Error;
 use crate::error::Result;
+use crate::util;
 
 #[derive(Serialize)]
 pub struct StartupConfigState(pub Mutex<StartupConfig>);
@@ -49,6 +50,10 @@ impl StartupConfig {
     fn load_or_create(app_handle: &tauri::AppHandle) -> Result<Self> {
         let file_path = Self::get_file_path(app_handle)?;
         if !file_path.exists() {
+            let config_path = app_handle.get_config_folder()?;
+            if !config_path.exists() {
+                util::create_directory(config_path)?;
+            }
             let default = Self::default();
             default.write_to_storage(app_handle)?;
             Ok(default)
