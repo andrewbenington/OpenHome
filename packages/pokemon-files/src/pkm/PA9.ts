@@ -336,6 +336,7 @@ export default class PA9 {
     dataView.setUint8(0x20, this.nature.index)
     dataView.setUint8(0x21, this.statNature.index)
     byteLogic.setFlag(dataView, 0x22, 0, this.isFatefulEncounter)
+    byteLogic.setFlag(dataView, 0x23, 0, this.isAlpha)
     byteLogic.uIntToBufferBits(dataView, this.gender, 34, 1, 2, true)
     dataView.setUint16(0x24, this.formNum, true)
     types.writeStatsToBytesU8(dataView, 0x26, this.evs)
