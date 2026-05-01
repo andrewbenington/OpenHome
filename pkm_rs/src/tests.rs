@@ -17,7 +17,7 @@ use std::io::Read;
 #[cfg(test)]
 use std::ops::RangeInclusive;
 #[cfg(test)]
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 #[cfg(test)]
 pub fn save_bytes_from_file(filename: &Path) -> crate::result::Result<Vec<u8>> {
@@ -129,7 +129,7 @@ pub fn ensure_ranges_match(actual: &[u8], expected: &[u8]) -> TestResult<()> {
     let differences = find_differing_ranges(actual, expected);
 
     match differences {
-        Some(diffs) => Err(DiffError::new(diffs, actual.to_vec(), expected.to_vec()).into()),
+        Some(diffs) => Err(DiffError::new(diffs, actual.to_vec(), expected.to_vec(), None).into()),
         None => Ok(()),
     }
 }
@@ -203,6 +203,7 @@ fn find_inconsistencies_from_file<PKM: Pkm>(path: &Path) -> TestResult<()> {
             diffs,
             actual.to_vec(),
             file_bytes.to_vec(),
+            Some(path.into()),
         ))),
         None => Ok(()),
     }
@@ -223,6 +224,7 @@ pub fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> TestResult<()> 
             diffs,
             actual.to_vec(),
             expected.to_vec(),
+            None,
         ))),
         None => Ok(()),
     }
@@ -351,23 +353,35 @@ pub struct DiffError {
     differences: Vec<ByteRange>,
     actual: Vec<u8>,
     expected: Vec<u8>,
+    path: Option<PathBuf>,
 }
 
 impl DiffError {
-    fn new(differences: Vec<ByteRange>, actual: Vec<u8>, expected: Vec<u8>) -> Self {
+    fn new(
+        differences: Vec<ByteRange>,
+        actual: Vec<u8>,
+        expected: Vec<u8>,
+        path: Option<PathBuf>,
+    ) -> Self {
+        println!("path: {path:?}");
         Self {
             differences,
             actual,
             expected,
+            path,
         }
     }
 }
 
 impl Display for DiffError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let path_display = match &self.path {
+            Some(path) => format!("\npath:\t {}", path.to_string_lossy()),
+            None => String::new(),
+        };
         write!(
             f,
-            "{}",
+            "{}{path_display}",
             format_byte_range_differences(&self.differences, &self.actual, &self.expected)
         )
     }
@@ -375,9 +389,13 @@ impl Display for DiffError {
 
 impl Debug for DiffError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let path_display = match &self.path {
+            Some(path) => format!("\npath:\t {}", path.to_string_lossy()),
+            None => String::new(),
+        };
         write!(
             f,
-            "{}",
+            "{}{path_display}",
             format_byte_range_differences(&self.differences, &self.actual, &self.expected)
         )
     }

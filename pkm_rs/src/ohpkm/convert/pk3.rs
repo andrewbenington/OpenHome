@@ -65,33 +65,13 @@ impl OhpkmConvert for Pk3 {
                 self.language,
             )
             .eq_ignore_ascii_case(&self.nickname.to_string()),
-            // handler_name: self.handler_name,
-            // is_current_handler: self.is_current_handler,
-            // handler_friendship: self.handler_friendship,
-            // handler_memory: self.handler_memory,
-            // handler_affection: self.handler_affection,
-            // handler_gender: self.handler_gender,
-            // fullness: self.fullness,
-            // enjoyment: self.enjoyment,
             game_of_origin: self.game_of_origin,
-            // console_region: self.console_region,
             language: self.language,
-            // form_argument: self.form_argument,
             trainer_name: self.trainer_name.to_string().into(),
             trainer_friendship: self.trainer_friendship,
-            // trainer_memory: self.trainer_memory,
-            // trainer_affection: self.trainer_affection,
-            // egg_date: self.egg_date,
-            // met_date: self.met_date,
             ball: self.ball,
-            // egg_location_index: if self.egg_location_index == 0 {
-            //     None
-            // } else {
-            //     Some(self.egg_location_index)
-            // },
             met_location_index: self.met_location_index as u16,
             met_level: self.met_level,
-            // hyper_training: self.hyper_training,
             trainer_gender: self.trainer_gender,
             ..Default::default()
         }
@@ -116,6 +96,8 @@ impl OhpkmConvert for Pk3 {
             trainer_id: ohpkm.trainer_id(),
             secret_id: ohpkm.secret_id(),
             exp: ohpkm.exp(),
+            has_species_data: true,
+            is_bad_egg: false,
             ability_num: ohpkm.ability_num().into(),
             markings: ohpkm.markings().into(),
             personality_value: ohpkm.personality_value(),

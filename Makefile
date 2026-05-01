@@ -112,6 +112,7 @@ gen-wasm:
 .PHONY: pkhex-json
 pkhex-json:
 	@cd pkhex-json && dotnet run GeneratePkhexJson.cs
+	@npx prettier --write pkhex-json
 
 .PHONY: test-pkhex-json
 test-pkhex-json:

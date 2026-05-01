@@ -45,6 +45,8 @@ pub struct Pk3 {
     pub trainer_id: u16,
     pub secret_id: u16,
     pub exp: u32,
+    pub has_species_data: bool,
+    pub is_bad_egg: bool,
     pub ability_num: SimpleAbilityNumber,
     pub markings: MarkingsFourShapes,
     pub personality_value: u32,
@@ -93,6 +95,8 @@ impl Pk3 {
             trainer_id: buf.trainer_id(),
             secret_id: buf.secret_id(),
             exp: buf.exp(),
+            has_species_data: buf.has_species(),
+            is_bad_egg: buf.is_bad_egg(),
             ability_num: buf.ability_num(),
             markings: buf.markings(),
             personality_value: buf.personality_value(),
@@ -107,7 +111,7 @@ impl Pk3 {
             nickname: buf.nickname(),
             moves: buf.move_slots(),
             ivs: buf.ivs(),
-            is_egg: buf.is_egg(),
+            is_egg: buf.is_egg_flag_2(),
             trainer_name: buf.trainer_name(),
             trainer_friendship: buf.trainer_friendship(),
             met_location_index: buf.met_location_index(),
@@ -137,6 +141,8 @@ impl Pk3 {
         buf.set_trainer_id(self.trainer_id);
         buf.set_secret_id(self.secret_id);
         buf.set_exp(self.exp);
+        buf.set_has_species(self.has_species_data);
+        buf.set_is_bad_egg(self.is_bad_egg);
         buf.set_ability_num(self.ability_num);
         buf.set_markings(self.markings);
         buf.set_personality_value(self.personality_value);
@@ -148,7 +154,7 @@ impl Pk3 {
         buf.set_nickname(&self.nickname);
         buf.set_move_slots(&self.moves);
         buf.set_ivs(&self.ivs);
-        buf.set_is_egg(self.is_egg);
+        buf.set_is_egg_flags(self.is_egg);
         buf.set_trainer_name(&self.trainer_name);
         buf.set_trainer_friendship(self.trainer_friendship);
         buf.set_met_location_index(self.met_location_index);
@@ -487,12 +493,13 @@ mod test {
 
     use crate::convert_strategy::ConvertStrategy;
     use crate::gen3::Pk3;
+    use crate::gen3::pk3_buffer::Pk3BufferMut;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
     #[cfg(feature = "randomize")]
     use crate::tests::TestErrorWithSeed;
     use crate::tests::{self, TestResult};
-    use crate::traits::IsShiny;
+    use crate::traits::{IsShiny, PkmBytes};
 
     #[cfg(feature = "randomize")]
     use pkm_rs_types::randomize::Randomize;
@@ -504,6 +511,21 @@ mod test {
         tests::to_from_bytes_all_in_dir::<Pk3>(
             &PathBuf::from("test-files").join("pkm-files").join("pk3"),
         )
+    }
+
+    #[test]
+    fn blaziken_pk3() -> TestResult<()> {
+        let path = PathBuf::from("pk3").join("blaziken.pkm");
+        let mon = tests::pkm_from_file::<Pk3>(&path)?.0;
+        assert_eq!(mon.secret_id, 0xbd27);
+
+        let mut bytes = mon.to_box_bytes();
+
+        let buffer = Pk3BufferMut::box_span_mut(&mut bytes);
+
+        assert_eq!(buffer.secret_id(), 0xbd27);
+
+        Ok(())
     }
 
     #[cfg(feature = "randomize")]
@@ -552,9 +574,7 @@ mod test {
 
     #[test]
     fn checksum() -> TestResult<()> {
-        let mon =
-            tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("primarina-garbage-bytes.pk3"))?
-                .0;
+        let mon = tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("blaziken.pkm"))?.0;
         assert_eq!(mon.checksum, mon.calculate_checksum());
 
         Ok(())
