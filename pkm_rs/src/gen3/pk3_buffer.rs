@@ -14,8 +14,6 @@ use pkm_rs_types::{
 use pkm_rs_types::{Language, Stats16Le};
 use pkm_rs_types::{read_u16_le, read_u32_le};
 
-const CHECKSUM_OFFSET: usize = 6;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum Offset {
     PersonalityValue = 0x0,
@@ -23,6 +21,7 @@ pub(super) enum Offset {
     SecretId = 0x6,
     Nickname = 0x8,
     Language = 0x12,
+    Flags0x13 = 0x13,
     TrainerName = 0x14,
     Markings = 0x1b,
     Checksum = 0x1c,
@@ -194,6 +193,18 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         self.get_u16_le(Offset::SecretId)
     }
 
+    pub fn is_bad_egg(&self) -> bool {
+        self.get_flag(Offset::Flags0x13, 0)
+    }
+
+    pub fn has_species(&self) -> bool {
+        self.get_flag(Offset::Flags0x13, 1)
+    }
+
+    pub fn is_egg_flag_1(&self) -> bool {
+        self.get_flag(Offset::Flags0x13, 2)
+    }
+
     pub fn exp(&self) -> u32 {
         self.get_u32_le(Offset::Exp)
     }
@@ -274,7 +285,7 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         Stats8::from_30_bits(self.ivs_egg_ability_raw())
     }
 
-    pub fn is_egg(&self) -> bool {
+    pub fn is_egg_flag_2(&self) -> bool {
         self.get_flag(Offset::IvsEggAbility, 30)
     }
 
@@ -392,6 +403,18 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
         self.set_u16_le(Offset::SecretId, v);
     }
 
+    pub fn set_is_bad_egg(&mut self, v: bool) {
+        self.set_flag(Offset::Flags0x13, 0, v);
+    }
+
+    pub fn set_has_species(&mut self, v: bool) {
+        self.set_flag(Offset::Flags0x13, 1, v);
+    }
+
+    pub fn set_is_egg_flag_1(&mut self, v: bool) {
+        self.set_flag(Offset::Flags0x13, 2, v);
+    }
+
     pub fn set_exp(&mut self, v: u32) {
         self.set_u32_le(Offset::Exp, v);
     }
@@ -459,15 +482,24 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
     }
 
     pub fn set_move_slots(&mut self, v: &MoveSlots) {
-        v.write_spans(self.bytes_mut(), super::MOVE_DATA_OFFSETS);
+        v.write_spans(
+            self.bytes_mut(),
+            super::MOVE_DATA_OFFSETS,
+            PpUpStorage::SingleByte,
+        );
     }
 
     pub fn set_ivs(&mut self, v: &Stats8) {
         v.write_30_bits(self.bytes_mut(), Offset::IvsEggAbility as usize);
     }
 
-    pub fn set_is_egg(&mut self, v: bool) {
+    pub fn set_is_egg_flag_2(&mut self, v: bool) {
         self.set_flag(Offset::IvsEggAbility, 30, v);
+    }
+
+    pub fn set_is_egg_flags(&mut self, v: bool) {
+        self.set_is_egg_flag_1(v);
+        self.set_is_egg_flag_2(v);
     }
 
     fn set_trainer_name_raw(&mut self, v: &[u8; 7]) {
@@ -570,10 +602,10 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for Pk3Buffer<S> {
 
 impl<S: AsRef<[u8]>> Checksum for Pk3Buffer<S> {
     type A = ChecksumU16Le;
-    const SPAN_START: usize = 8;
+    const SPAN_START: usize = 0x20;
     const SPAN_END: usize = super::BOX_SIZE;
 }
 
 impl<S: AsRef<[u8]> + AsMut<[u8]>> RefreshChecksum for Pk3Buffer<S> {
-    const STORED_OFFSET: usize = CHECKSUM_OFFSET;
+    const STORED_OFFSET: usize = Offset::Checksum as usize;
 }

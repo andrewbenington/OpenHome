@@ -1,11 +1,13 @@
 {
   "sanity": 0,
   "checksum": 57883,
-  "national_dex": 254,
+  "pokemon_index": 279,
   "held_item_index": 205,
   "trainer_id": 15933,
   "secret_id": 36181,
   "exp": 1059860,
+  "has_species_data": true,
+  "is_bad_egg": false,
   "ability_num": "First",
   "markings": {
     "circle": false,

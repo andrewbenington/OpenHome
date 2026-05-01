@@ -43,7 +43,7 @@ impl MoveSlot {
         }
     }
 
-    pub fn write_to_offsets<T: Into<usize> + Copy>(
+    fn write_move_and_pp_to_offsets<T: Into<usize> + Copy>(
         &self,
         bytes: &mut [u8],
         offsets: MoveDataOffsets<T>,
@@ -51,11 +51,20 @@ impl MoveSlot {
     ) {
         let move_offset = offsets.moves.into() + (2 * index);
         let pp_offset = offsets.pp.into() + index;
-        let pp_ups_offset = offsets.pp_ups.into() + index;
 
         bytes[move_offset..move_offset + 2].copy_from_slice(&self.move_index.to_le_bytes());
         bytes[pp_offset] = self.pp;
-        bytes[pp_ups_offset] = self.pp_ups;
+    }
+
+    pub fn write_to_offsets<T: Into<usize> + Copy>(
+        &self,
+        bytes: &mut [u8],
+        offsets: MoveDataOffsets<T>,
+        index: usize,
+        pp_up_storage: PpUpStorage,
+    ) {
+        self.write_move_and_pp_to_offsets(bytes, offsets, index);
+        pp_up_storage.write_pp_ups(bytes, offsets, index, self.pp_ups);
     }
 }
 
@@ -91,11 +100,12 @@ impl MoveSlots {
         &self,
         bytes: &mut [u8],
         offsets: MoveDataOffsets<T>,
+        pp_up_storage: PpUpStorage,
     ) {
         self.0
             .iter()
             .enumerate()
-            .for_each(|(i, slot)| slot.write_to_offsets(bytes, offsets, i));
+            .for_each(|(i, slot)| slot.write_to_offsets(bytes, offsets, i, pp_up_storage));
     }
 
     pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, MoveSlot> {
@@ -189,6 +199,34 @@ impl PpUpStorage {
         match self {
             PpUpStorage::SingleByte => bytes[offsets.pp_ups.into()] >> (2 * index) & 0b11,
             PpUpStorage::FourBytes => bytes[offsets.pp_ups.into() + index],
+        }
+    }
+
+    fn write_pp_ups_single_byte(
+        bytes: &mut [u8],
+        offsets: MoveDataOffsets<impl Into<usize>>,
+        index: usize,
+        value: u8,
+    ) {
+        let pp_ups_offset: usize = offsets.pp_ups.into();
+        let current_byte = bytes[pp_ups_offset];
+
+        let shift_val = index * 2;
+        let mask: u8 = !(3 << shift_val);
+
+        bytes[pp_ups_offset] = (current_byte & mask) | (value << shift_val);
+    }
+
+    fn write_pp_ups(
+        &self,
+        bytes: &mut [u8],
+        offsets: MoveDataOffsets<impl Into<usize>>,
+        index: usize,
+        value: u8,
+    ) {
+        match self {
+            PpUpStorage::SingleByte => Self::write_pp_ups_single_byte(bytes, offsets, index, value),
+            PpUpStorage::FourBytes => bytes[offsets.pp_ups.into() + index] = value,
         }
     }
 }

@@ -603,7 +603,8 @@ impl DataSection for MainDataV2 {
         bytes[81] = self.weight_scalar;
         bytes[82] = self.scale;
 
-        self.moves.write_spans(&mut bytes, MOVE_DATA_OFFSETS);
+        self.moves
+            .write_spans(&mut bytes, MOVE_DATA_OFFSETS, PpUpStorage::FourBytes);
         // writes move indices, pp, and pp ups in one go to ensure consistency
 
         bytes[96..122].copy_from_slice(&self.nickname);

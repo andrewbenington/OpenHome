@@ -786,7 +786,11 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn set_move_slots(&mut self, v: &MoveSlots) {
-        v.write_spans(self.bytes_mut(), super::MOVE_DATA_OFFSETS);
+        v.write_spans(
+            self.bytes_mut(),
+            super::MOVE_DATA_OFFSETS,
+            PpUpStorage::FourBytes,
+        );
     }
 
     fn set_relearn_move_raw(&mut self, idx: usize, v: [u8; 2]) {
