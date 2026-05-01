@@ -57,7 +57,7 @@ export class SwShSAV extends G89SAV<PK8> {
   }
 
   getBoxCount(): number {
-    return 30
+    return 32
   }
 
   monConstructor(bytes: ArrayBuffer, encrypted: boolean): PK8 {
