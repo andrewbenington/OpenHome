@@ -39,7 +39,7 @@
     "test-cargo": "cargo test --workspace --all-features  --tests",
     "test-vite": "pnpm run wasm-compile && vitest run",
     "test": "pnpm run test-cargo && pnpm run test-vite",
-    "wasm-compile": "wasm-pack build --release ./pkm_rs --target web -- --features wasm && node scripts/patch-types.js",
+    "wasm-compile": "wasm-pack build --release ./pkm_rs --target web -- --features wasm && node scripts/patch-types.mjs",
     "precommit": "pnpm run typecheck && pnpm run format && pnpm run lint",
     "postinstall": "pnpm run wasm-compile"
   },
