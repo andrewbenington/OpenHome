@@ -299,7 +299,7 @@ fn from_to_ohpkm_all_in_dir<PKM: OhpkmConvert>() -> Result<()> {
                 }
                 let path = ohpkm_dir.join(dir_entry.file_name());
                 let filename = path.to_string_lossy();
-                println!("filename: {filename:#?}");
+
                 if let Err(e) =
                     find_inconsistencies_from_to_ohpkm::<PKM>(pkm_from_file(&filename)?.0)
                 {
@@ -327,7 +327,7 @@ fn to_from_ohpkm_all_in_dir<PKM: OhpkmConvert>(dir: &Path) -> Result<()> {
                 }
                 let path = dir.join(dir_entry.file_name());
                 let filename = path.to_string_lossy();
-                println!("filename: {filename:#?}");
+
                 if let Err(e) =
                     find_inconsistencies_to_from_ohpkm::<PKM>(pkm_from_file(&filename)?.0)
                 {
@@ -397,7 +397,6 @@ fn u8_slice_to_hex_string(slice: &[u8]) -> String {
 fn find_inconsistencies_from_file<PKM: Pkm>(filename: &str) -> Result<()> {
     use crate::result::Error;
 
-    println!("filename: {filename}");
     let result = pkm_from_file::<PKM>(filename);
     let (mon, bytes) = result.unwrap_or_else(|e| panic!("could not load {filename}: {e}"));
 

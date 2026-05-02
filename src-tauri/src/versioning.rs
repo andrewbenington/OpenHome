@@ -150,9 +150,7 @@ pub enum SignificantUpdate {
     V1_10_2,
     V1_10_3,
     V1_10_5,
-    V1_11_0Beta2,
-    V1_11_0Beta3,
-    V1_11_0Rc1,
+    V1_11_0,
 }
 
 impl SignificantUpdate {
@@ -173,9 +171,7 @@ impl SignificantUpdate {
             Self::V1_10_2 => Version::parse("1.10.2").unwrap(),
             Self::V1_10_3 => Version::parse("1.10.3").unwrap(),
             Self::V1_10_5 => Version::parse("1.10.5").unwrap(),
-            Self::V1_11_0Beta2 => Version::parse("1.11.0-beta.2").unwrap(),
-            Self::V1_11_0Beta3 => Version::parse("1.11.0-beta.3").unwrap(),
-            Self::V1_11_0Rc1 => Version::parse("1.11.0-rc.1").unwrap(),
+            Self::V1_11_0 => Version::parse("1.11.0").unwrap(),
         }
     }
 
@@ -236,12 +232,14 @@ impl SignificantUpdate {
                 "A bug causing Bad Eggs to appear in empty box slots in Gen 4 has been fixed.",
                 "Hisui Poké balls are now converted to regular Poké balls when moving into Radical Red or Unbound. These games do not support Hisui balls and glitched/crashed when trying to display them.",
             ]),
-            Self::V1_11_0Beta2 => Some(vec![
-                "The data folder location can now be changed under Settings. NOTE: if you want to return to OpenHome version 1.10.*, make sure you set the data folder back to its original location in AppData first.",
+            Self::V1_11_0 => Some(vec![
+                "The data folder location can now be changed under Settings.",
                 "The UI tabs have been moved to the left side of the window for a cleaner look.",
+                "Fixed bug removing Alpha status when transferring to Legends Z-A.",
+                "Fixed bug causing bad eggs to appear in empty slots in Gen 7 save files.",
+                "The nickname flag should be set correctly for all Pokémon regardless of language.",
+                "Sword/Shield boxes 31-32 are now visible.",
             ]),
-            Self::V1_11_0Beta3 => Some(vec!["A Pokedex read/write bug has been fixed."]),
-            Self::V1_11_0Rc1 => Some(vec!["Plugin support has been fixed."]),
             _ => None,
         }
     }

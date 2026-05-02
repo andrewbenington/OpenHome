@@ -193,10 +193,6 @@ impl PkmFormat {
     pub fn legalize_origin(&self, origin: OriginGame) -> OriginGame {
         use OriginGame::*;
         if self.origin_is_legal(origin) {
-            println!(
-                "Origin game {:?} is legal in format {:?}, no need to legalize",
-                origin, self
-            );
             return origin;
         }
 
@@ -867,11 +863,6 @@ impl PkmFormat {
             // this format matches the origin game, so the met location index should be valid in the new format
             return MetData::new(source_origin, source_met_location);
         }
-
-        println!(
-            "Origin game {:?} is from format {:?}, legalizing origin and met location",
-            source_origin, self
-        );
 
         match self {
             PkmFormat::PK1 | PkmFormat::PK2 => {

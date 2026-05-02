@@ -3561,10 +3561,12 @@ impl IsShiny for OhpkmV2 {
 
 #[cfg(test)]
 mod tests {
+    use std::path::Path;
+
     use super::*;
     #[test]
     fn build_all_ohpkms() -> std::result::Result<(), String> {
-        let path = "/Users/andrewbenington/Library/Application Support/OpenHome/storage/mons_v2";
+        let path = Path::new("test-files").join("pkm-files").join("ohpkm");
         for entry in std::fs::read_dir(path).unwrap() {
             let entry = entry.unwrap();
             if !entry
@@ -3576,10 +3578,6 @@ mod tests {
                 continue;
             }
             let data = std::fs::read(entry.path()).unwrap();
-            println!(
-                "Testing file: {}",
-                entry.path().file_name().unwrap().to_string_lossy()
-            );
             OhpkmV2::from_bytes(&data).map_err(|e| {
                 format!(
                     "failed to build ohpkm file {}: {e}",

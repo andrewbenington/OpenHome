@@ -272,7 +272,6 @@ impl From<AbilityIndexWasm> for u16 {
 impl Randomize for AbilityIndexWasm {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
         let index = rng.random_range(1..ABILITY_MAX) as u16;
-        println!("Randomizing AbilityIndex: {index}");
         AbilityIndexWasm(NonZeroU16::new(index).expect("should never be zero; range starts at 1"))
     }
 }

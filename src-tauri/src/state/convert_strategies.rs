@@ -30,7 +30,6 @@ impl SyncedState for ConvertStrategies {
     const ID: &'static str = "convert_strategies";
 
     fn union_with(&mut self, other: Self) {
-        println!("Updating convert strategies: {:?}", other);
         for (key, value) in other.strategies_by_id {
             self.strategies_by_id.insert(key, value);
         }
