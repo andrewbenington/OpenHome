@@ -3,7 +3,7 @@ use std::{cmp::max, collections::HashMap, ops::Deref, sync::Mutex};
 use serde::{Deserialize, Serialize};
 use tauri::Emitter;
 
-use crate::data_controller::{DataController, DataDir};
+use crate::data_controller::{DataController, DataDir, JsonDataReader};
 use crate::error::{Error, Result};
 
 const POKEDEX_FILENAME: &str = "pokedex.json";
@@ -38,7 +38,8 @@ pub enum PokedexStatus {
 
 #[derive(Default, Debug, Serialize, Deserialize, Clone)]
 pub struct PokedexEntry {
-    #[serde(rename(deserialize = "formes"))]
+    // for compatibility with v1.10.*; for v1.12.0 the only macro should be #[serde(alias = "formes")]
+    #[serde(rename = "formes")]
     #[serde(alias = "forms")]
     forms: HashMap<FormeNumber, PokedexStatus>,
 }
@@ -50,6 +51,11 @@ impl PokedexEntry {
             .and_modify(|prev| *prev = max(*prev, status))
             .or_insert(status);
     }
+
+    #[cfg(test)]
+    fn form_status(&self, form_index: FormeNumber) -> Option<PokedexStatus> {
+        self.forms.get(&form_index).copied()
+    }
 }
 
 #[derive(Default, Debug, Serialize, Deserialize, Clone)]
@@ -59,9 +65,9 @@ pub struct Pokedex {
 }
 
 impl Pokedex {
-    fn load_from_storage(data_controller: &impl DataController) -> Result<Self> {
+    fn load_from_storage(data_reader: &impl JsonDataReader) -> Result<Self> {
         Ok(Self {
-            by_dex_number: data_controller.read_file_json(DataDir::Storage, POKEDEX_FILENAME)?,
+            by_dex_number: data_reader.read_file_json(DataDir::Storage, POKEDEX_FILENAME)?,
         })
     }
 
@@ -79,6 +85,11 @@ impl Pokedex {
             .entry(dex_number)
             .or_default()
             .register(form_index, status);
+    }
+
+    #[cfg(test)]
+    fn form_status(&self, dex_number: DexNumber, form_index: FormeNumber) -> Option<PokedexStatus> {
+        self.by_dex_number.get(&dex_number)?.form_status(form_index)
     }
 }
 
@@ -113,8 +124,11 @@ pub fn update_pokedex(
 
 #[cfg(test)]
 mod test {
+    use serde_json::json;
+
+    use crate::data_controller::MockSingleJsonFile;
     use crate::error::{Error, Result};
-    use crate::state::{Pokedex, PokedexStatus};
+    use crate::state::{Pokedex, PokedexEntry, PokedexStatus};
 
     #[test]
     fn serialize_deserialize() -> Result<()> {
@@ -127,25 +141,98 @@ mod test {
         let deserialized: Pokedex = serde_json::from_str(&serialized)
             .map_err(|err| Error::other_with_source("deserialize Pokedex", err))?;
 
-        let pikachu_entry = deserialized
-            .by_dex_number
-            .get(&25)
-            .expect("pikachu is present in pokedex");
-        let pikachu_base_form = pikachu_entry
-            .forms
-            .get(&0)
+        let pikachu_base_form_status = deserialized
+            .form_status(25, 0)
             .expect("pikachu base form is present in pokedex");
-        assert_eq!(*pikachu_base_form, PokedexStatus::Caught);
+        assert_eq!(pikachu_base_form_status, PokedexStatus::Caught);
 
-        let raichu_entry = deserialized
-            .by_dex_number
-            .get(&26)
-            .expect("raichu is present in pokedex");
-        let raichu_alolan_form = raichu_entry
-            .forms
-            .get(&1)
+        let raichu_alolan_form_status = deserialized
+            .form_status(26, 1)
             .expect("raichu alolan form is present in pokedex");
-        assert_eq!(*raichu_alolan_form, PokedexStatus::Seen);
+        assert_eq!(raichu_alolan_form_status, PokedexStatus::Seen);
+
+        Ok(())
+    }
+
+    #[test]
+    fn serializes_to_formes() -> Result<()> {
+        let mut pokedex = Pokedex::default();
+        pokedex.register(25, 0, PokedexStatus::Caught);
+
+        let serialized = serde_json::to_string(&pokedex)
+            .map_err(|err| Error::other_with_source("serialize Pokedex", err))?;
+
+        if !serialized.contains("formes") {
+            if serialized.contains("forms") {
+                Err(Error::other(
+                    "expected pokédex to serialize forms field to 'formes', but instead found 'forms'",
+                ))
+            } else {
+                Err(Error::other(
+                    "expected pokédex to serialize forms field to 'formes', but 'formes' was not found in output",
+                ))
+            }
+        } else {
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn entry_deserializes_from_forms() -> Result<()> {
+        let pokedex_json = json!({"forms":{"0":"Seen"}});
+        let pikachu_entry: PokedexEntry = serde_json::from_value(pokedex_json)
+            .map_err(|e| Error::other_with_source("deserialize pokedex entry", e))?;
+
+        let base_form_status = pikachu_entry
+            .form_status(0)
+            .expect("base form present in pokedex");
+
+        assert_eq!(base_form_status, PokedexStatus::Seen);
+
+        Ok(())
+    }
+
+    #[test]
+    fn entry_deserializes_from_formes() -> Result<()> {
+        let pokedex_json = json!({"formes":{"0":"Seen"}});
+        let pikachu_entry: PokedexEntry = serde_json::from_value(pokedex_json)
+            .map_err(|e| Error::other_with_source("deserialize pokedex entry", e))?;
+
+        let base_form_status = pikachu_entry
+            .form_status(0)
+            .expect("base form present in pokedex");
+
+        assert_eq!(base_form_status, PokedexStatus::Seen);
+
+        Ok(())
+    }
+
+    #[test]
+    fn dex_deserializes_from_forms() -> Result<()> {
+        let pokedex_json = json!({"25": {"forms":{"0":"Seen"}}});
+        let mock_reader = MockSingleJsonFile::from_value(pokedex_json);
+        let pokedex: Pokedex = Pokedex::load_from_storage(&mock_reader)?;
+
+        let pikachu_base_form_status = pokedex
+            .form_status(25, 0)
+            .expect("pikachu base form is present in pokedex");
+
+        assert_eq!(pikachu_base_form_status, PokedexStatus::Seen);
+
+        Ok(())
+    }
+
+    #[test]
+    fn dex_deserializes_from_formes() -> Result<()> {
+        let pokedex_json = json!({"25": {"formes":{"0":"Seen"}}});
+        let mock_reader = MockSingleJsonFile::from_value(pokedex_json);
+        let pokedex: Pokedex = Pokedex::load_from_storage(&mock_reader)?;
+
+        let pikachu_base_form_status = pokedex
+            .form_status(25, 0)
+            .expect("pikachu base form is present in pokedex");
+
+        assert_eq!(pikachu_base_form_status, PokedexStatus::Seen);
 
         Ok(())
     }

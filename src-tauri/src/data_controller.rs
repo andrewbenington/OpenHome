@@ -134,6 +134,44 @@ impl DataController for tauri::AppHandle {
     }
 }
 
+pub trait JsonDataReader {
+    fn read_file_json<P, T>(&self, dir: DataDir, relative_path: P) -> Result<T>
+    where
+        P: AsRef<Path>,
+        T: serde::de::DeserializeOwned;
+}
+
+impl<D: DataController> JsonDataReader for D {
+    fn read_file_json<P, T>(&self, dir: DataDir, relative_path: P) -> Result<T>
+    where
+        P: AsRef<Path>,
+        T: serde::de::DeserializeOwned,
+    {
+        self.read_file_json(dir, relative_path)
+    }
+}
+
+#[cfg(test)]
+pub struct MockSingleJsonFile(serde_json::Value);
+
+#[cfg(test)]
+impl MockSingleJsonFile {
+    pub fn from_value(value: serde_json::Value) -> Self {
+        Self(value)
+    }
+}
+
+#[cfg(test)]
+impl JsonDataReader for MockSingleJsonFile {
+    fn read_file_json<P, T>(&self, _dir: DataDir, relative_path: P) -> Result<T>
+    where
+        P: AsRef<Path>,
+        T: serde::de::DeserializeOwned,
+    {
+        serde_json::from_value(self.0.clone()).map_err(|e| Error::file_malformed(&relative_path, e))
+    }
+}
+
 fn read_file_text<P>(full_path: P) -> Result<String>
 where
     P: AsRef<Path>,

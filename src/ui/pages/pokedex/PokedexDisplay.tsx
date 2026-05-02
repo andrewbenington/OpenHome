@@ -50,7 +50,7 @@ export default function PokedexDisplay() {
 
   const pokedex = pokedexState.pokedex
   const caughtCount = Object.values(pokedex.byDexNumber).filter((entry) =>
-    Object.values(entry.forms).some((status) => status.endsWith('Caught'))
+    Object.values(entry.formes).some((status) => status.endsWith('Caught'))
   ).length
 
   const seenCount = Object.values(pokedex.byDexNumber).length

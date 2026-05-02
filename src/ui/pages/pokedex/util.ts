@@ -11,7 +11,7 @@ export function getHighestFormeStatus(
   let maxStatus: PokedexStatus = 'Seen'
 
   for (const [formIndex, status] of Object.entries(
-    pokedex.byDexNumber[species.nationalDex].forms
+    pokedex.byDexNumber[species.nationalDex].formes
   )) {
     if (StatusIndices[status] > StatusIndices[maxStatus]) {
       maxStatusForme = parseInt(formIndex)
@@ -28,7 +28,7 @@ export function getFormeStatus(
   formIndex: number
 ): PokedexStatus | undefined {
   if (!(nationalDex in pokedex.byDexNumber)) return undefined
-  return pokedex.byDexNumber[nationalDex].forms[formIndex]
+  return pokedex.byDexNumber[nationalDex].formes[formIndex]
 }
 
 export const StatusIndices: Record<PokedexStatus, number> = {
