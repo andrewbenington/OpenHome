@@ -30,6 +30,10 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
 
   pluginIdentifier = 'radical_red' as const
 
+  getBoxCount() {
+    return 18
+  }
+
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3RR {
     return PK3RR.fromOhpkm(ohpkm, strategy)
   }

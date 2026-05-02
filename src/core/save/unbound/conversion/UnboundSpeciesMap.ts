@@ -419,33 +419,33 @@ export const UnboundToNationalDexMap: Record<string, CfruSpeciesAndForm | null> 
   '410': { nationalDex: 386, formIndex: 0 }, // Deoxys
   '411': { nationalDex: 358, formIndex: 0 }, // Chimecho
   '412': null, // Bad.Egg (not found)
-  '413': { nationalDex: 201, formIndex: 1 }, // Unown-B
-  '414': { nationalDex: 201, formIndex: 2 }, // Unown-C
-  '415': { nationalDex: 201, formIndex: 3 }, // Unown-D
-  '416': { nationalDex: 201, formIndex: 4 }, // Unown-E
-  '417': null, // Unown-F (not found)
-  '418': { nationalDex: 201, formIndex: 6 }, // Unown-G
-  '419': { nationalDex: 201, formIndex: 7 }, // Unown-H
-  '420': { nationalDex: 201, formIndex: 8 }, // Unown-I
-  '421': { nationalDex: 201, formIndex: 9 }, // Unown-J
-  '422': { nationalDex: 201, formIndex: 10 }, // Unown-K
-  '423': { nationalDex: 201, formIndex: 11 }, // Unown-L
-  '424': null, // Unown-M (not found)
-  '425': { nationalDex: 201, formIndex: 13 }, // Unown-N
-  '426': { nationalDex: 201, formIndex: 14 }, // Unown-O
-  '427': { nationalDex: 201, formIndex: 15 }, // Unown-P
-  '428': { nationalDex: 201, formIndex: 16 }, // Unown-Q
-  '429': { nationalDex: 201, formIndex: 17 }, // Unown-R
-  '430': { nationalDex: 201, formIndex: 18 }, // Unown-S
-  '431': { nationalDex: 201, formIndex: 19 }, // Unown-T
-  '432': { nationalDex: 201, formIndex: 20 }, // Unown-U
-  '433': { nationalDex: 201, formIndex: 21 }, // Unown-V
-  '434': { nationalDex: 201, formIndex: 22 }, // Unown-W
-  '435': { nationalDex: 201, formIndex: 23 }, // Unown-X
-  '436': { nationalDex: 201, formIndex: 24 }, // Unown-Y
-  '437': null, // Unown-Z (not found)
-  '438': { nationalDex: 201, formIndex: 0 }, // Unown-!
-  '439': { nationalDex: 201, formIndex: 0 }, // Unown-?
+  // '413': { nationalDex: 201, formIndex: 1 }, // Unown-B
+  // '414': { nationalDex: 201, formIndex: 2 }, // Unown-C
+  // '415': { nationalDex: 201, formIndex: 3 }, // Unown-D
+  // '416': { nationalDex: 201, formIndex: 4 }, // Unown-E
+  // '417': { nationalDex: 201, formIndex: 5 }, // Unown-F
+  // '418': { nationalDex: 201, formIndex: 6 }, // Unown-G
+  // '419': { nationalDex: 201, formIndex: 7 }, // Unown-H
+  // '420': { nationalDex: 201, formIndex: 8 }, // Unown-I
+  // '421': { nationalDex: 201, formIndex: 9 }, // Unown-J
+  // '422': { nationalDex: 201, formIndex: 10 }, // Unown-K
+  // '423': { nationalDex: 201, formIndex: 11 }, // Unown-L
+  // '424': { nationalDex: 201, formIndex: 12 }, // Unown-M
+  // '425': { nationalDex: 201, formIndex: 13 }, // Unown-N
+  // '426': { nationalDex: 201, formIndex: 14 }, // Unown-O
+  // '427': { nationalDex: 201, formIndex: 15 }, // Unown-P
+  // '428': { nationalDex: 201, formIndex: 16 }, // Unown-Q
+  // '429': { nationalDex: 201, formIndex: 17 }, // Unown-R
+  // '430': { nationalDex: 201, formIndex: 18 }, // Unown-S
+  // '431': { nationalDex: 201, formIndex: 19 }, // Unown-T
+  // '432': { nationalDex: 201, formIndex: 20 }, // Unown-U
+  // '433': { nationalDex: 201, formIndex: 21 }, // Unown-V
+  // '434': { nationalDex: 201, formIndex: 22 }, // Unown-W
+  // '435': { nationalDex: 201, formIndex: 23 }, // Unown-X
+  // '436': { nationalDex: 201, formIndex: 24 }, // Unown-Y
+  // '437': null, // Unown-Z (not found)
+  // '438': { nationalDex: 201, formIndex: 0 }, // Unown-!
+  // '439': { nationalDex: 201, formIndex: 0 }, // Unown-?
   '440': { nationalDex: 387, formIndex: 0 }, // Turtwig
   '441': { nationalDex: 388, formIndex: 0 }, // Grotle
   '442': { nationalDex: 389, formIndex: 0 }, // Torterra
@@ -609,7 +609,7 @@ export const UnboundToNationalDexMap: Record<string, CfruSpeciesAndForm | null> 
   '600': { nationalDex: 547, formIndex: 0 }, // Whimsicott
   '601': { nationalDex: 548, formIndex: 0 }, // Petilil
   '602': { nationalDex: 549, formIndex: 0 }, // Lilligant
-  '603': { nationalDex: 550, formIndex: 1 }, // Basculin-Blue-Striped
+  '603': { nationalDex: 550, formIndex: 0 }, // Basculin-Red-Striped
   '604': { nationalDex: 551, formIndex: 0 }, // Sandile
   '605': { nationalDex: 552, formIndex: 0 }, // Krokorok
   '606': { nationalDex: 553, formIndex: 0 }, // Krookodile
@@ -717,8 +717,8 @@ export const UnboundToNationalDexMap: Record<string, CfruSpeciesAndForm | null> 
   '708': { nationalDex: 412, formIndex: 0 }, // Burmy
   '709': { nationalDex: 413, formIndex: 1 }, // Wormadam-Sandy
   '710': { nationalDex: 413, formIndex: 2 }, // Wormadam-Trash
-  '711': { nationalDex: 422, formIndex: 0 }, // Shellos
-  '712': { nationalDex: 423, formIndex: 0 }, // Gastrodon
+  '711': { nationalDex: 422, formIndex: 1 }, // Shellos
+  '712': { nationalDex: 423, formIndex: 1 }, // Gastrodon
   '713': { nationalDex: 479, formIndex: 1 }, // Rotom-Heat
   '714': { nationalDex: 479, formIndex: 2 }, // Rotom-Wash
   '715': { nationalDex: 479, formIndex: 3 }, // Rotom-Frost
@@ -742,14 +742,14 @@ export const UnboundToNationalDexMap: Record<string, CfruSpeciesAndForm | null> 
   '733': { nationalDex: 493, formIndex: 14 }, // Arceus-Ice
   '734': { nationalDex: 493, formIndex: 15 }, // Arceus-Dragon
   '735': { nationalDex: 493, formIndex: 16 }, // Arceus-Dark
-  '736': { nationalDex: 550, formIndex: 0 }, // Basculin-Red-Striped
+  '736': { nationalDex: 550, formIndex: 1 }, // Basculin-Blue-Striped
   '737': { nationalDex: 555, formIndex: 1 }, // Darmanitan-Zen
-  '738': { nationalDex: 585, formIndex: 0 }, // Deerling
-  '739': { nationalDex: 585, formIndex: 0 }, // Deerling
-  '740': { nationalDex: 585, formIndex: 0 }, // Deerling
-  '741': { nationalDex: 586, formIndex: 0 }, // Sawsbuck
-  '742': { nationalDex: 586, formIndex: 0 }, // Sawsbuck
-  '743': { nationalDex: 586, formIndex: 0 }, // Sawsbuck
+  '738': { nationalDex: 585, formIndex: 1 }, // Deerling
+  '739': { nationalDex: 585, formIndex: 2 }, // Deerling
+  '740': { nationalDex: 585, formIndex: 3 }, // Deerling
+  '741': { nationalDex: 586, formIndex: 1 }, // Sawsbuck
+  '742': { nationalDex: 586, formIndex: 2 }, // Sawsbuck
+  '743': { nationalDex: 586, formIndex: 3 }, // Sawsbuck
   '744': { nationalDex: 449, formIndex: 0 }, // Hippopotas
   '745': { nationalDex: 450, formIndex: 0 }, // Hippowdon
   '746': { nationalDex: 648, formIndex: 1 }, // Meloetta-Pirouette
@@ -859,16 +859,16 @@ export const UnboundToNationalDexMap: Record<string, CfruSpeciesAndForm | null> 
   '850': { nationalDex: 671, formIndex: 2 }, // Florges-Orange
   '851': { nationalDex: 671, formIndex: 1 }, // Florges-Yellow
   '852': { nationalDex: 671, formIndex: 4 }, // Florges-White
-  '853': { nationalDex: 710, formIndex: 0 }, // Pumpkaboo
-  '854': { nationalDex: 710, formIndex: 0 }, // Pumpkaboo
-  '855': { nationalDex: 710, formIndex: 0 }, // Pumpkaboo
-  '856': { nationalDex: 711, formIndex: 0 }, // Gourgeist
-  '857': { nationalDex: 711, formIndex: 0 }, // Gourgeist
-  '858': { nationalDex: 711, formIndex: 0 }, // Gourgeist
+  '853': { nationalDex: 710, formIndex: 1 }, // Pumpkaboo
+  '854': { nationalDex: 710, formIndex: 2 }, // Pumpkaboo
+  '855': { nationalDex: 710, formIndex: 3 }, // Pumpkaboo
+  '856': { nationalDex: 711, formIndex: 1 }, // Gourgeist
+  '857': { nationalDex: 711, formIndex: 2 }, // Gourgeist
+  '858': { nationalDex: 711, formIndex: 3 }, // Gourgeist
   '859': { nationalDex: 676, formIndex: 1 }, // Furfrou-Heart
   '860': { nationalDex: 676, formIndex: 3 }, // Furfrou-Diamond
   '861': { nationalDex: 676, formIndex: 2 }, // Furfrou-Star
-  '862': { nationalDex: 676, formIndex: 0 }, // Furfrou-Pharoah
+  '862': { nationalDex: 676, formIndex: 9 }, // Furfrou-Pharoah
   '863': { nationalDex: 676, formIndex: 8 }, // Furfrou-Kabuki
   '864': { nationalDex: 676, formIndex: 7 }, // Furfrou-La Reine
   '865': { nationalDex: 676, formIndex: 5 }, // Furfrou-Matron

@@ -72,11 +72,11 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   sectors: G3CFRUSector[]
   pcDataContiguous: Uint8Array
   currentPCBox: number
-  boxes = new Array<Box<T>>(14)
+  boxes: Box<T>[]
   boxNames: string[]
   firstSectorIndex: number = 0
 
-  constructor(bytes: Uint8Array, PkmClass: new (bytes: ArrayBuffer) => T) {
+  constructor(bytes: Uint8Array, PkmClass: new (bytes: ArrayBuffer) => T, boxCount: number) {
     this.bytes = bytes
     this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
     this.securityKey = bytesToUint32LittleEndian(bytes, 0xf20)
@@ -93,9 +93,8 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
     this.trainerGender = this.sectors[0].data[0x08] ? Gender.Female : Gender.Male
 
-    const boxes: number = 18
-    const nBytes: number = boxes * 58 * 30
-    const nMons: number = boxes * 30
+    const nBytes: number = boxCount * 58 * 30
+    const nMons: number = boxCount * 30
     const fullSectionsUsed: number = Math.floor(nBytes / 4080)
     const leftoverBytes: number = nBytes % 4080
 
@@ -110,7 +109,8 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
 
     this.currentPCBox = this.pcDataContiguous[0]
     this.boxNames = []
-    for (let i = 0; i < boxes; i++) {
+    this.boxes = new Array<Box<T>>(boxCount)
+    for (let i = 0; i < boxCount; i++) {
       // TODO: More research into where BOX names are located
       this.boxes[i] = new Box('Box' + (i + 1), 30)
     }
@@ -189,8 +189,12 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
     this.bytes = bytes
     this.filePath = path
 
-    const saveOne = new G3CFRUSaveBackup<T>(bytes.slice(0, 0xe000), pkmType)
-    const saveTwo = new G3CFRUSaveBackup<T>(bytes.slice(0xe000, 0x1c000), pkmType)
+    const saveOne = new G3CFRUSaveBackup<T>(bytes.slice(0, 0xe000), pkmType, this.getBoxCount())
+    const saveTwo = new G3CFRUSaveBackup<T>(
+      bytes.slice(0xe000, 0x1c000),
+      pkmType,
+      this.getBoxCount()
+    )
 
     if (saveOne.saveIndex > saveTwo.saveIndex) {
       this.primarySave = saveOne
@@ -265,6 +269,8 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   }
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+
+  abstract getBoxCount(): number
 
   static includesOrigin(origin: OriginGame) {
     return origin === OriginGame.FireRed
