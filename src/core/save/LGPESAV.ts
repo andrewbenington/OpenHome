@@ -2,11 +2,12 @@ import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { PB7 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
-import { LGE_STARTER, LGP_STARTER } from '@pokemon-resources/consts/Formes'
+import { LGE_STARTER, LGP_STARTER } from '@pokemon-resources/consts/Forms'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { LGPE_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
+import { Option } from '../util/functional'
 import { CRC16_NoInvert } from './encryption/Encryption'
 import { Box, BoxAndSlot, OfficialSAV, SlotMetadata } from './interfaces'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from './util/byteLogic'
@@ -263,8 +264,8 @@ export class LGPESAV extends OfficialSAV<PB7> {
     const mon = this.boxes[boxNum].boxSlots[boxSlot]
 
     if (
-      (mon?.dexNum === NationalDex.Pikachu && mon.formeNum === LGP_STARTER) ||
-      (mon?.dexNum === NationalDex.Eevee && mon.formeNum === LGE_STARTER)
+      (mon?.dexNum === NationalDex.Pikachu && mon.formNum === LGP_STARTER) ||
+      (mon?.dexNum === NationalDex.Eevee && mon.formNum === LGE_STARTER)
     ) {
       return {
         isDisabled: true,
@@ -295,10 +296,6 @@ export class LGPESAV extends OfficialSAV<PB7> {
     return dataView.getUint16(POKE_LIST_HEADER_CHECKSUM_OFFSET, true)
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   getDisplayData() {
     return {
       'Stored PC Checksum': displayChecksum(this.getStoredPcChecksum()),
@@ -308,6 +305,18 @@ export class LGPESAV extends OfficialSAV<PB7> {
       'Party Indices': this.pokeListHeader.partyIndices.join(', '),
       'Box Count': this.pokeListHeader.boxCount,
     }
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PB7>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
   }
 
   get language(): Language {

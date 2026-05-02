@@ -43,7 +43,7 @@ export default class PB7 {
   nature: NatureIndex
   isFatefulEncounter: boolean
   gender: number
-  formeNum: number
+  formNum: number
   evs: types.Stats
   avs: types.Stats
   resortEventStatus: number
@@ -123,7 +123,7 @@ export default class PB7 {
       this.nature = new NatureIndex(dataView.getUint8(0x1c))
       this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x1d, 0)
       this.gender = byteLogic.uIntFromBufferBits(dataView, 0x1d, 1, 2, true)
-      this.formeNum = byteLogic.uIntFromBufferBits(dataView, 0x1d, 3, 5, true)
+      this.formNum = byteLogic.uIntFromBufferBits(dataView, 0x1d, 3, 5, true)
       this.evs = types.readStatsFromBytesU8(dataView, 0x1e)
       this.avs = types.readStatsFromBytesU8(dataView, 0x24)
       this.resortEventStatus = dataView.getUint8(0x2a)
@@ -213,7 +213,7 @@ export default class PB7 {
       this.nature = other.nature
       this.isFatefulEncounter = other.isFatefulEncounter
       this.gender = other.gender
-      this.formeNum = other.formeNum
+      this.formNum = other.formNum
       this.evs = {
         hp: 0,
         atk: 0,
@@ -235,7 +235,7 @@ export default class PB7 {
       this.heightScalar = other.heightScalar
       this.weightScalar = other.weightScalar
       this.formArgument = other.formArgument
-      this.nickname = other.nickname
+      this.nickname = converter.nickname(other)
 
       const moveFilter = MoveFilter.fromMoveIndices(LGPE_VALID_MOVES, this.format)
       this.moves = moveFilter.moves(other)
@@ -316,7 +316,7 @@ export default class PB7 {
     dataView.setUint8(0x1c, this.nature.index)
     byteLogic.setFlag(dataView, 0x1d, 0, this.isFatefulEncounter)
     byteLogic.uIntToBufferBits(dataView, this.gender, 29, 1, 2, true)
-    byteLogic.uIntToBufferBits(dataView, this.formeNum, 29, 3, 5, true)
+    byteLogic.uIntToBufferBits(dataView, this.formNum, 29, 3, 5, true)
     types.writeStatsToBytesU8(dataView, 0x1e, this.evs)
     types.writeStatsToBytesU8(dataView, 0x24, this.avs)
     dataView.setUint8(0x2a, this.resortEventStatus)
@@ -387,10 +387,6 @@ export default class PB7 {
     return getStats(this)
   }
 
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
-  }
-
   public get heldItemName() {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
@@ -448,7 +444,7 @@ export default class PB7 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {

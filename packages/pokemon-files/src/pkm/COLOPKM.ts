@@ -1,5 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
+  AbilityNumber,
   Ball,
   ConvertStrategy,
   ItemGen3,
@@ -223,10 +224,6 @@ export default class COLOPKM {
     return this.metadata?.genderFromPid(this.personalityValue)
   }
 
-  public get languageString() {
-    return Languages.stringFromByteGcn(this.language)
-  }
-
   public get heldItemIndex() {
     return this.heldItemIndexGen3?.toModern()?.index ?? 0
   }
@@ -240,14 +237,14 @@ export default class COLOPKM {
   }
 
   public get abilityNum() {
-    return ((this.personalityValue >> 0) & 1) + 1
+    return this.personalityValue & 1 ? AbilityNumber.Second : AbilityNumber.First
   }
 
   public get ability() {
     return this.metadata?.abilityByNumGen3(this.abilityNum)
   }
 
-  public get formeNum() {
+  public get formNum() {
     if (this.dexNum === NationalDex.Unown) {
       let letterValue = (this.personalityValue >> 24) & 0x3
       letterValue = ((this.personalityValue >> 16) & 0x3) | (letterValue << 2)
@@ -282,7 +279,7 @@ export default class COLOPKM {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {
@@ -295,9 +292,5 @@ export default class COLOPKM {
 
   static maxValidBall() {
     return 12
-  }
-
-  static allowedBalls() {
-    return []
   }
 }

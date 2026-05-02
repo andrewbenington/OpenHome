@@ -4,6 +4,7 @@ import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { BDSP_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { Option } from 'src/core/util/functional'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, BoxAndSlot, OfficialSAV } from '../interfaces'
@@ -195,10 +196,6 @@ export class BDSPSAV extends OfficialSAV<PB8> {
     return itemIndex <= Item.DsSounds
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   getDisplayData() {
     return {
       'Player Character': this.myStatusBlock.getGender() ? 'Dawn' : 'Lucas',
@@ -239,6 +236,18 @@ export class BDSPSAV extends OfficialSAV<PB8> {
 
   get trainerGender() {
     return this.myStatusBlock.getGender() ? Gender.Female : Gender.Male
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PB8>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
   }
 
   get language() {

@@ -27,7 +27,7 @@ import {
 } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
-import { MetadataSummaryLookup, OriginGames } from '@pkm-rs/pkg'
+import { Language, Lookup, OriginGames } from '@pkm-rs/pkg'
 import { Moves } from '@pokemon-resources/moves'
 import { useCallback, useRef, useState } from 'react'
 import { SelectColumn } from 'react-data-grid'
@@ -209,7 +209,7 @@ function useColumns(
         <button onClick={() => onSelectMon(value)} className="mon-icon-button">
           <PokemonIcon
             dexNumber={value.dexNum}
-            formeNumber={value.formeNum}
+            formeNumber={value.formNum}
             style={{ width: 30, height: 30 }}
           />
         </button>
@@ -217,10 +217,9 @@ function useColumns(
       cellClass: 'centered-cell',
       sortFunction: multiSorter(
         numericSorter((mon) => mon.dexNum),
-        numericSorter((mon) => mon.formeNum)
+        numericSorter((mon) => mon.formNum)
       ),
-      getFilterValue: (value) =>
-        MetadataSummaryLookup(value.dexNum, value.formeNum)?.speciesName || 'Unknown',
+      getFilterValue: (value) => Lookup.speciesName(value.dexNum, Language.English),
     },
     {
       key: 'nickname',

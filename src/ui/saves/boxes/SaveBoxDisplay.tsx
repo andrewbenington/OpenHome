@@ -15,13 +15,12 @@ import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
-import { Button, Card, Dialog, Flex, Grid } from '@radix-ui/themes'
-
+import { Button, Card, Dialog, Flex, Grid, Separator } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { includeClass } from '../../util/style'
-import { buildBackwardNavigator, buildForwardNavigator } from '../util'
+import { useBoxNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
@@ -39,23 +38,24 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
   const { saveIndex } = props
-  const [selectedIndex, setSelectedIndex] = useState<number>()
   const { dragState, toggleSelection, isSelected } = useDragAndDrop()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
 
-  const currentBox = useMemo(
-    () => (save.currentPCBox < save.boxes.length ? save.boxes[save.currentPCBox] : undefined),
-    [save.boxes, save.currentPCBox]
-  )
+  const {
+    currentSlot: selectedIndex,
+    setCurrentSlot: setSelectedIndex,
+    navigateNext: navigateRight,
+    navigatePrev: navigateLeft,
+  } = useBoxNavigator(save, save.currentPCBox, undefined)
 
   const selectedMon = useMemo(() => {
-    if (!currentBox || selectedIndex === undefined || selectedIndex >= currentBox.boxSlots.length) {
+    if (selectedIndex === undefined || selectedIndex >= save.boxSlotCount) {
       return undefined
     }
-    const selectedSlot = currentBox.boxSlots[selectedIndex]
+    const selectedSlot = save.getMonAt(save.currentPCBox, selectedIndex)
     return selectedSlot ? ohpkmStore.monOrOhpkmIfTracked(selectedSlot) : undefined
-  }, [currentBox, ohpkmStore, selectedIndex])
+  }, [save, ohpkmStore, selectedIndex])
 
   const attemptImportMons = (mons: PKMInterface[], location: MonLocation) => {
     const unsupportedMons = mons.filter((mon) => !monSupportedBySave(save, mon))
@@ -67,7 +67,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           title: 'Import Failed',
           messages: unsupportedMons.map(
             (mon) =>
-              `${MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.formeName} cannot be moved into ${save.gameName}`
+              `${MetadataSummaryLookup(mon.dexNum, mon.formNum)?.formeName} cannot be moved into ${save.gameName}`
           ),
         },
       })
@@ -136,27 +136,18 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     [dragState?.payload, saveFromIdentifier, save]
   )
 
-  const navigateRight = useMemo(
-    () => buildForwardNavigator(save, selectedIndex, setSelectedIndex),
-    [save, selectedIndex]
-  )
-
-  const navigateLeft = useMemo(
-    () => buildBackwardNavigator(save, selectedIndex, setSelectedIndex),
-    [save, selectedIndex]
-  )
-
   const displayData = useMemo(() => save.getDisplayData?.() ?? {}, [save])
 
   const allCellsDisabled = range(save.boxColumns * save.boxRows)
-    .map((index: number) => currentBox?.boxSlots?.[index])
+    .map((index: number) => save.getMonAt(save.currentPCBox, index))
     .every(isDisabled)
 
   return save && save.currentPCBox !== undefined ? (
     <>
-      <Flex direction="column" width="100%" gap="1">
-        <SaveHeader save={save} setDetailsModal={setDetailsModal} />
+      <Flex direction="column" width="100%">
         <Card className={includeClass('box-card').with('box-card-disabled').if(allCellsDisabled)}>
+          <SaveHeader save={save} setDetailsModal={setDetailsModal} />
+          <Separator />
           <div className="box-navigation">
             <Flex align="center" justify="center" flexGrow="4">
               <ArrowButton
@@ -165,7 +156,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 direction="left"
               />
             </Flex>
-            <div className="box-name">{save.boxes[save.currentPCBox]?.name}</div>
+            <div className="box-name">{save.getBoxName(save.currentPCBox)}</div>
             <Flex align="center" justify="center" flexGrow="4">
               <ArrowButton
                 onClick={() => savesManager.saveBoxNavigateRight(save)}
@@ -176,18 +167,19 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           </div>
           <Grid columns={save.boxColumns.toString()} gap="1" p="1">
             {range(save.boxColumns * save.boxRows)
-              .map((index: number) => currentBox?.boxSlots?.[index])
-              .map((mon, index) => {
+              .map((index: number) => save.getMonAt(save.currentPCBox, index))
+              .map((_, index) => {
                 const location: MonLocation = {
                   isHome: false,
                   box: save.currentPCBox,
                   boxSlot: index,
                   saveIdentifier: save.identifier,
                 }
+                const mon = save.getMonAt(location.box, location.boxSlot)
                 return (
                   <BoxCell
                     onClick={() => setSelectedIndex(index)}
-                    key={`${save.currentPCBox}-${index}`}
+                    key={`${save.currentPCBox}-${index}-${mon?.encryptionConstant ?? mon?.personalityValue ?? mon?.nickname ?? 'empty'}`}
                     dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                     location={location}
                     disabled={
@@ -213,18 +205,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           </Grid>
         </Card>
         <Dialog.Root open={detailsModal} onOpenChange={setDetailsModal}>
-          <Dialog.Content
-            style={{
-              minWidth: 800,
-              width: '80%',
-              maxHeight: 'fit-content',
-              height: '95%',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2,
-            }}
-          >
+          <Dialog.Content className="save-details-modal">
             <AttributeRow label="Game">Pokémon {save.gameName}</AttributeRow>
             <AttributeRow label="Trainer Name">{save.name}</AttributeRow>
             <AttributeRow label="Trainer Display ID">{save.displayID}</AttributeRow>
@@ -272,7 +253,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   columns: save.boxColumns,
                   rows: save.boxRows,
                   emptyIndexes: range(save.boxColumns * save.boxRows).filter(
-                    (index) => !currentBox?.boxSlots?.[index]
+                    (index) => !save.getMonAt(save.currentPCBox, index)
                   ),
                 }
               : undefined
@@ -291,11 +272,8 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
   const savesManager = useSaves()
   const backend = useContext(BackendContext)
 
-  const currentBoxMonCount = save.boxes[save.currentPCBox]?.boxSlots.filter(Boolean).length ?? 0
-  const totalMonCount = save.boxes.reduce(
-    (sum, box) => sum + (box?.boxSlots.filter(Boolean).length ?? 0),
-    0
-  )
+  const currentBoxMonCount = save.getBoxMonCount(save.currentPCBox)
+  const totalMonCount = save.getAllMons().length
 
   const contextElements = [
     ItemBuilder.fromLabel('Details...').withAction(() => setDetailsModal(true)),
@@ -317,41 +295,39 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
 
   return (
     <OpenHomeCtxMenu elements={contextElements}>
-      <Card style={{ padding: 0 }}>
-        <div className="save-header">
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
-            <div
-              className="save-header-game diagonal-clip"
-              style={{
-                backgroundColor: save.gameColor,
-                color: colorIsDark(save.gameColor) ? 'white' : 'black',
-              }}
-            >
-              <Button
-                className="save-close-button"
-                onClick={() => savesManager.removeSave(save)}
-                disabled={!!save.updatedBoxSlots.length}
-                color="tomato"
-                style={{ padding: 1 }}
-              >
-                <MdClose />
-              </Button>
-              {save.gameName}
-            </div>
-            {save?.name}
-          </div>
-          <div className="save-menu-buttons-right" style={{ marginRight: 4 }}>
+      <div className="save-header">
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div
+            className="save-header-game diagonal-clip"
+            style={{
+              backgroundColor: save.gameColor,
+              color: colorIsDark(save.gameColor) ? 'white' : 'black',
+            }}
+          >
             <Button
-              className="mini-button"
-              onClick={() => setDetailsModal(true)}
-              variant="outline"
-              color="gray"
+              className="save-close-button"
+              onClick={() => savesManager.removeSave(save)}
+              disabled={!!save.updatedBoxSlots.length}
+              color="tomato"
+              style={{ padding: 1 }}
             >
-              <MenuIcon />
+              <MdClose />
             </Button>
+            {save.gameName}
           </div>
+          {save?.name}
         </div>
-      </Card>
+        <div className="save-menu-buttons-right">
+          <Button
+            className="mini-button"
+            onClick={() => setDetailsModal(true)}
+            variant="outline"
+            color="gray"
+          >
+            <MenuIcon />
+          </Button>
+        </div>
+      </div>
     </OpenHomeCtxMenu>
   )
 }

@@ -1,0 +1,12 @@
+{
+  "lsp": {
+    "rust-analyzer": {
+      "initialization_options": {
+        "cargo": {
+          "features": "all"
+        },
+        "inlayHints": { "typeHints": { "enable": true } }
+      }
+    }
+  }
+}

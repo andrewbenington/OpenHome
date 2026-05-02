@@ -5,12 +5,13 @@ use std::fmt::Display;
 use crate::abilities::ABILITY_MAX;
 use crate::items::ITEM_MAX;
 use crate::natures::NATURE_MAX;
+use crate::pkhex_text;
 use crate::species::{NATIONAL_DEX_MAX, NatDexIndex};
 
 #[derive(Debug)]
 pub enum Error {
     BufferSize {
-        field: String,
+        requirement_source: String,
         expected: usize,
         received: usize,
     },
@@ -21,9 +22,9 @@ pub enum Error {
     NationalDex {
         national_dex: u16,
     },
-    FormeIndex {
+    FormIndex {
         national_dex: NatDexIndex,
-        forme_index: u16,
+        form_index: u16,
     },
     LanguageIndex {
         language_index: u8,
@@ -46,7 +47,7 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
-            Error::BufferSize { field, expected, received } => {
+            Error::BufferSize { requirement_source: field, expected, received } => {
                 format!("{field} requires buffer of length {expected}, but actual length is {received}").to_owned()
             }
             Error::CryptRange { range, buffer_size } => {
@@ -57,15 +58,15 @@ impl Display for Error {
                 format!("Invalid National Dex number {national_dex} (must be between 1 and {NATIONAL_DEX_MAX}")
                     .to_owned()
             }
-            Error::FormeIndex {
+            Error::FormIndex {
                 national_dex,
-                forme_index,
+                form_index,
             } => {
                 let species_metadata = national_dex.get_species_metadata();
                 format!(
-                    "Invalid forme index {forme_index} for Pokémon {} (must be <= {})",
-                    species_metadata.name,
-                    species_metadata.formes.len()
+                    "Invalid form index {form_index} for Pokémon {} (must be <= {})",
+                    pkhex_text::species_name_en(*national_dex),
+                    species_metadata.forms.len()
                 )
                 .to_owned()
             }
@@ -127,14 +128,17 @@ impl From<pkm_rs_types::Error> for Error {
                 offset,
                 buffer_size,
             } => Self::BufferSize {
-                field,
+                requirement_source: field,
                 expected: offset,
                 received: buffer_size,
             },
             pkm_rs_types::Error::ByteLength { expected, received } => Self::BufferSize {
-                field: String::from("(unknown pkm_rs_types field"),
+                requirement_source: String::from("(unknown pkm_rs_types field"),
                 expected,
                 received,
+            },
+            pkm_rs_types::Error::AbilityNumber(index) => Self::AbilityIndex {
+                ability_index: index.0.into(),
             },
             pkm_rs_types::Error::LanguageIndex { language_index } => {
                 Self::LanguageIndex { language_index }

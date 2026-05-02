@@ -120,10 +120,6 @@ export class ZASAV extends G89SAV<PA9> {
     }
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   getSaveRevision(): ZA_SAVE_REVISION {
     return this.getBlock('Donuts') ? 'Mega Dimension' : 'Base Game'
   }

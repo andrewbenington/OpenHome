@@ -1,9 +1,12 @@
 use crate::util::bit_is_set;
 use pkm_rs_derive::Stats;
 use serde::{Deserialize, Serialize};
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
 pub enum Stat {
     Hp,
     Atk,
@@ -23,6 +26,7 @@ pub trait Stats: Sized {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Deserialize, Clone, Copy, Stats, PartialEq, Eq)]
 pub struct Stats8 {
     pub hp: u8,
@@ -58,6 +62,18 @@ impl Stats8 {
             spe: ((iv_bytes >> 15) & 0x1f).try_into().unwrap(),
             spa: ((iv_bytes >> 20) & 0x1f).try_into().unwrap(),
             spd: ((iv_bytes >> 25) & 0x1f).try_into().unwrap(),
+        }
+    }
+
+    pub fn from_u30(ivs_u30: arbitrary_int::u30) -> Self {
+        let ivs_u32 = ivs_u30.value();
+        Stats8 {
+            hp: (ivs_u32 & 0x1f).try_into().unwrap(),
+            atk: ((ivs_u32 >> 5) & 0x1f).try_into().unwrap(),
+            def: ((ivs_u32 >> 10) & 0x1f).try_into().unwrap(),
+            spe: ((ivs_u32 >> 15) & 0x1f).try_into().unwrap(),
+            spa: ((ivs_u32 >> 20) & 0x1f).try_into().unwrap(),
+            spd: ((ivs_u32 >> 25) & 0x1f).try_into().unwrap(),
         }
     }
 
@@ -130,7 +146,7 @@ impl Stats8 {
         }
     }
 
-    pub fn get(&self, stat: Stat) -> u8 {
+    pub const fn get(&self, stat: Stat) -> u8 {
         match stat {
             Stat::Hp => self.hp,
             Stat::Atk => self.atk,
@@ -141,7 +157,7 @@ impl Stats8 {
         }
     }
 
-    pub fn set(&mut self, stat: Stat, value: u8) {
+    pub const fn set(&mut self, stat: Stat, value: u8) {
         match stat {
             Stat::Hp => self.hp = value,
             Stat::Atk => self.atk = value,
@@ -172,6 +188,7 @@ impl Stats8 {
 
     // ensure TypeScript doesn't allow Stats8 and Stats16Le to be confused
     #[wasm_bindgen(getter = stats8)]
+    #[allow(clippy::missing_const_for_fn)]
     pub fn rust_type_name(&self) -> bool {
         true
     }
@@ -195,6 +212,7 @@ impl IntoIterator for Stats8 {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, Stats)]
 pub struct Stats16Le {
     pub hp: u16,
@@ -258,12 +276,26 @@ impl Stats16Le {
 
     // ensure TypeScript doesn't allow Stats8 and Stats16Le to be confused
     #[wasm_bindgen(getter = stats16Le)]
+    #[allow(clippy::missing_const_for_fn)]
     pub fn rust_type_name(&self) -> bool {
         true
     }
 }
+impl From<Stats8> for Stats16Le {
+    fn from(stats8: Stats8) -> Self {
+        Stats16Le {
+            hp: stats8.hp as u16,
+            atk: stats8.atk as u16,
+            def: stats8.def as u16,
+            spa: stats8.spa as u16,
+            spd: stats8.spd as u16,
+            spe: stats8.spe as u16,
+        }
+    }
+}
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct HyperTraining {
     pub hp: bool,
@@ -342,6 +374,7 @@ impl HyperTraining {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 pub struct StatsPreSplit {
     pub hp: u16,
@@ -463,6 +496,7 @@ impl StatsPreSplit {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct ContestStats {
     pub cool: u8,
@@ -512,4 +546,14 @@ impl ContestStats {
             sheen,
         }
     }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum ContestStat {
+    Cool,
+    Beauty,
+    Cute,
+    Smart,
+    Tough,
 }

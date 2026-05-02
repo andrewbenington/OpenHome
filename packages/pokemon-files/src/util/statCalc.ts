@@ -86,7 +86,7 @@ export const getStatGen3Onward = (mon: PKMWithStandardStatCalc, stat: Stat, leve
 
   const natureMultiplier = mon.nature.multiplierFor(stat)
 
-  const metadata = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
+  const metadata = MetadataSummaryLookup(mon.dexNum, mon.formNum)
   const statAbbr = StatsWasm.abbrLower(stat) as StatAbbr
 
   if (metadata) {
@@ -111,7 +111,7 @@ export const getHPGen3Onward = (mon: PKMWithStandardStatCalc, level: number) => 
     return 1
   }
 
-  const baseHP = MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.baseStats?.hp
+  const baseHP = MetadataSummaryLookup(mon.dexNum, mon.formNum)?.baseStats?.hp
 
   if (baseHP) {
     const iv = mon.ivs.hp

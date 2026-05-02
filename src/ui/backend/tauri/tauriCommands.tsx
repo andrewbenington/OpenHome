@@ -62,6 +62,9 @@ type OhTauriApi = {
   delete_plugin(pluginId: string): string
   handle_windows_accellerator(menuEventId: string): null
 
+  change_data_dir(): null
+  get_data_dir_path(): string
+
   load_banks(): StoredBankDataSerialized
   write_banks(bankData: StoredBankDataSerialized): null
 
@@ -165,6 +168,14 @@ export const Commands: OhTauriApiNoThrow = {
 
   write_storage_file_json(relativePath: string, data: JSONValue) {
     return invokeAndCatch('write_storage_file_json', { relativePath, data })
+  },
+
+  change_data_dir() {
+    return invokeAndCatch('change_data_dir')
+  },
+
+  get_data_dir_path() {
+    return invokeAndCatch('get_data_dir_path')
   },
 
   load_banks() {

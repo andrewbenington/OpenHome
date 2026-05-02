@@ -2,6 +2,7 @@ import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/other'
 
 import {
+  AbilityNumber,
   Ball,
   ConvertStrategy,
   ItemGen3,
@@ -180,8 +181,14 @@ export default class PK3 {
       this.abilityNum = other.abilityNum
       if (
         this.abilityNum === 2 &&
-        !this.metadata?.abilityByNum(2)?.equals(this.metadata.abilityByNumGen3(2))
+        !this.metadata
+          ?.abilityByNum(AbilityNumber.Second)
+          ?.equals(this.metadata.abilityByNumGen3(AbilityNumber.Second))
       ) {
+        console.log(
+          this.metadata?.abilityByNum(AbilityNumber.Second).index,
+          this.metadata?.abilityByNumGen3(AbilityNumber.Second).index
+        )
         this.abilityNum = 1
       }
       this.isFatefulEncounter = other.isFatefulEncounter
@@ -274,10 +281,6 @@ export default class PK3 {
     return this.metadata?.genderFromPid(this.personalityValue)
   }
 
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
-  }
-
   public get heldItemIndex() {
     return this.heldItemIndexGen3?.toModern()?.index ?? 0
   }
@@ -294,7 +297,7 @@ export default class PK3 {
     return this.metadata?.abilityByNumGen3(this.abilityNum)
   }
 
-  public get formeNum() {
+  public get formNum() {
     if (this.dexNum === NationalDex.Unown) {
       let letterValue = (this.personalityValue >> 24) & 0x3
 
@@ -353,7 +356,7 @@ export default class PK3 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {
@@ -366,9 +369,5 @@ export default class PK3 {
 
   static maxValidBall() {
     return 12
-  }
-
-  static allowedBalls() {
-    return []
   }
 }

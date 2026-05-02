@@ -61,20 +61,20 @@ const DraggableMon = (props: DraggableMonProps) => {
   const monWithManagement = mon as MonWithManagementData
 
   const formeNumber = useMemo(() => {
-    let formeNumber = mon.formeNum
+    let formeNumber = mon.formNum
 
     if (isMegaStone(mon.heldItemIndex)) {
-      const megaForStone = MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.megaEvolutions.find(
+      const megaForStone = MetadataSummaryLookup(mon.dexNum, mon.formNum)?.megaEvolutions.find(
         (mega) => mega.requiredItemId === mon.heldItemIndex
       )
 
-      if (megaForStone) formeNumber = megaForStone.megaForme.formeIndex
+      if (megaForStone) formeNumber = megaForStone.megaForme.formIndex
     } else if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
-      formeNumber = displayIndexAdder(mon.heldItemIndex)(mon.formeNum)
+      formeNumber = displayIndexAdder(mon.heldItemIndex)(mon.formNum)
     }
 
     return formeNumber
-  }, [mon.dexNum, mon.formeNum, mon.heldItemIndex])
+  }, [mon.dexNum, mon.formNum, mon.heldItemIndex])
 
   const topRightIndicatorComponent = useMemo(
     () =>

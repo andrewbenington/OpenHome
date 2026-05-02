@@ -30,7 +30,6 @@ import { UB_TRANSFER_RESTRICTIONS } from '../../../core/save/unbound/G3UBSAV'
 import { buildUnknownSaveFile } from '../../../core/save/util/load'
 import { isRestricted, TransferRestrictions } from '../../../core/save/util/TransferRestrictions'
 import { Option, R, range } from '../../../core/util/functional'
-import { filterUndefined } from '../../../core/util/sort'
 import { SaveRef } from '../../../core/util/types'
 import { BackendContext } from '../../backend/backendContext'
 import useDisplayError from '../../hooks/displayError'
@@ -68,7 +67,7 @@ export function useManageTracked() {
       const savePaths = await backend.getRecentSaves().then(
         R.map((saves) =>
           Object.values(saves)
-            .filter((s) => monPossiblySupported(mon.dexNum, mon.formeNum, s))
+            .filter((s) => monPossiblySupported(mon.dexNum, mon.formNum, s))
             .map((s) => s.filePath)
         )
       )
@@ -198,7 +197,7 @@ export function useManageTracked() {
       }
 
       const save = result.value
-      for (const saveMon of save.boxes.flatMap((b) => b.boxSlots).filter(filterUndefined)) {
+      for (const saveMon of save.getAllMons()) {
         let saveMonId: Option<OhpkmIdentifier> = undefined
 
         switch (save.lookupType) {
@@ -339,10 +338,9 @@ function monPossiblySupported(dexNumber: number, formeNumber: number, saveRef: S
 }
 
 function searchSaveForMon(save: SAV, id: OhpkmIdentifier): Option<SaveSearchResult> {
-  for (const boxIndex of range(save.boxes.length)) {
-    const box = save.boxes[boxIndex]
-    for (const boxSlot of range(box.boxSlots.length)) {
-      const mon = box.boxSlots[boxSlot]
+  for (const boxIndex of range(save.getBoxCount())) {
+    for (const boxSlot of range(save.boxSlotCount)) {
+      const mon = save.getMonAt(boxIndex, boxSlot)
       if (mon && getMonFileIdentifier(mon) === id) {
         return {
           match: mon,
@@ -354,10 +352,9 @@ function searchSaveForMon(save: SAV, id: OhpkmIdentifier): Option<SaveSearchResu
 }
 
 function searchSaveForMonGen12(save: SAV, id: Gen12Identifier): Option<SaveSearchResult> {
-  for (const boxIndex of range(save.boxes.length)) {
-    const box = save.boxes[boxIndex]
-    for (const boxSlot of range(box.boxSlots.length)) {
-      const mon = box.boxSlots[boxSlot]
+  for (const boxIndex of range(save.getBoxCount())) {
+    for (const boxSlot of range(save.boxSlotCount)) {
+      const mon = save.getMonAt(boxIndex, boxSlot)
       if (mon && getMonGen12Identifier(mon) === id) {
         return {
           match: mon,
@@ -369,10 +366,9 @@ function searchSaveForMonGen12(save: SAV, id: Gen12Identifier): Option<SaveSearc
 }
 
 function searchSaveForMonGen345(save: SAV, id: Gen345Identifier): Option<SaveSearchResult> {
-  for (const boxIndex of range(save.boxes.length)) {
-    const box = save.boxes[boxIndex]
-    for (const boxSlot of range(box.boxSlots.length)) {
-      const mon = box.boxSlots[boxSlot]
+  for (const boxIndex of range(save.getBoxCount())) {
+    for (const boxSlot of range(save.boxSlotCount)) {
+      const mon = save.getMonAt(boxIndex, boxSlot)
       if (mon && getMonGen345Identifier(mon) === id) {
         return {
           match: mon,

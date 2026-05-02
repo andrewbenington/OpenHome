@@ -1,80 +1,25 @@
-use pkm_rs_types::FlagSet;
-use serde::{Serialize, Serializer};
+use serde::Serialize;
 use std::fmt::Display;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-#[derive(Default, Debug, Clone, Copy)]
-pub struct ModernRibbonSet<const N: usize>(FlagSet<N>);
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
 
-impl<const N: usize> ModernRibbonSet<N> {
-    pub const fn from_bytes(bytes: [u8; N]) -> Self {
-        Self(FlagSet::from_bytes(bytes))
-    }
+use crate::ribbons::ribbon_set::Ribbon;
+use crate::ribbons::ribbon_set::RibbonSet;
 
-    pub fn get_ribbons(&self) -> Vec<ModernRibbon> {
-        self.0
-            .get_indices()
-            .into_iter()
-            .map(ModernRibbon::from)
-            .collect()
-    }
+// #[cfg_attr(feature = "randomize", derive(Randomize))]
+// #[derive(Default, Debug, Clone, Copy)]
+// pub struct ModernRibbonSet_OLD<const N: usize, const MAX: usize>(FlagSet<N>);
 
-    pub const fn to_bytes(self) -> [u8; N] {
-        self.0.to_bytes()
-    }
-
-    pub const fn clear_ribbons(&mut self) {
-        self.0.clear_all();
-    }
-
-    pub fn add_ribbon(&mut self, ribbon: ModernRibbon) {
-        self.0.set_index(ribbon.get_index(), true);
-    }
-
-    pub fn set_ribbons(&mut self, ribbons: Vec<ModernRibbon>) {
-        self.clear_ribbons();
-        ribbons
-            .into_iter()
-            .for_each(|ribbon| self.add_ribbon(ribbon));
-    }
-
-    pub fn from_ribbons(ribbons: Vec<ModernRibbon>) -> Self {
-        let mut ribbon_set = Self(FlagSet::from_bytes([0u8; N]));
-        ribbons
-            .into_iter()
-            .for_each(|ribbon| ribbon_set.add_ribbon(ribbon));
-
-        ribbon_set
-    }
-
-    pub fn truncate_to<const M: usize>(self) -> ModernRibbonSet<M> {
-        let mut truncated_bytes = [0u8; M];
-
-        let min_size = N.min(M);
-
-        truncated_bytes.copy_from_slice(&self.to_bytes()[0..min_size]);
-
-        ModernRibbonSet::<M>::from_bytes(truncated_bytes)
-    }
-
-    pub fn includes(&self, ribbon: ModernRibbon) -> bool {
-        self.0.get_index(ribbon.get_index())
-    }
-}
-
-impl<const N: usize> Serialize for ModernRibbonSet<N> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        self.get_ribbons().serialize(serializer)
-    }
-}
+pub type ModernRibbonSet<const N: usize, const MAX: usize = { ModernRibbon::Partner as usize }> =
+    RibbonSet<N, ModernRibbon, MAX>;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Serialize, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Serialize, PartialEq, Eq, Clone, Copy, PartialOrd, Ord)]
 pub enum ModernRibbon {
     KalosChampion,
     Gen3Champion,
@@ -190,6 +135,7 @@ pub enum ModernRibbon {
 }
 
 impl ModernRibbon {
+    pub const MAX: usize = ModernRibbon::Partner as usize;
     pub const fn get_name(&self) -> &'static str {
         match self {
             ModernRibbon::KalosChampion => "Kalos Champion Ribbon",
@@ -546,7 +492,7 @@ impl ModernRibbon {
     pub fn from_affixed_byte(affixed_byte: u8) -> Option<ModernRibbon> {
         match affixed_byte {
             0xff => None,
-            value => Some(ModernRibbon::from(value as usize)),
+            value => ModernRibbon::from_index(value),
         }
     }
 
@@ -556,6 +502,135 @@ impl ModernRibbon {
             Some(ribbon) => ribbon.get_index() as u8,
         }
     }
+
+    pub fn from_index(value: impl Into<usize>) -> Option<Self> {
+        match value.into() {
+            0 => Some(Self::KalosChampion),
+            1 => Some(Self::Gen3Champion),
+            2 => Some(Self::SinnohChampion),
+            3 => Some(Self::BestFriends),
+            4 => Some(Self::Training),
+            5 => Some(Self::SkillfulBattler),
+            6 => Some(Self::ExpertBattler),
+            7 => Some(Self::Effort),
+            8 => Some(Self::Alert),
+            9 => Some(Self::Shock),
+            10 => Some(Self::Downcast),
+            11 => Some(Self::Careless),
+            12 => Some(Self::Relax),
+            13 => Some(Self::Snooze),
+            14 => Some(Self::Smile),
+            15 => Some(Self::Gorgeous),
+            16 => Some(Self::Royal),
+            17 => Some(Self::GorgeousRoyal),
+            18 => Some(Self::Artist),
+            19 => Some(Self::Footprint),
+            20 => Some(Self::Record),
+            21 => Some(Self::Legend),
+            22 => Some(Self::Country),
+            23 => Some(Self::National),
+            24 => Some(Self::Earth),
+            25 => Some(Self::World),
+            26 => Some(Self::Classic),
+            27 => Some(Self::Premier),
+            28 => Some(Self::Event),
+            29 => Some(Self::Birthday),
+            30 => Some(Self::Special),
+            31 => Some(Self::Souvenir),
+            32 => Some(Self::Wishing),
+            33 => Some(Self::BattleChampion),
+            34 => Some(Self::RegionalChampion),
+            35 => Some(Self::NationalChampion),
+            36 => Some(Self::WorldChampion),
+            37 => Some(Self::ContestMemory),
+            38 => Some(Self::BattleMemory),
+            39 => Some(Self::HoennChampion),
+            40 => Some(Self::ContestStar),
+            41 => Some(Self::CoolnessMaster),
+            42 => Some(Self::BeautyMaster),
+            43 => Some(Self::CutenessMaster),
+            44 => Some(Self::ClevernessMaster),
+            45 => Some(Self::ToughnessMaster),
+            46 => Some(Self::AlolaChampion),
+            47 => Some(Self::BattleRoyalChampion),
+            48 => Some(Self::BattleTreeGreat),
+            49 => Some(Self::BattleTreeMaster),
+            50 => Some(Self::GalarChampion),
+            51 => Some(Self::TowerMaster),
+            52 => Some(Self::MasterRank),
+            53 => Some(Self::LunchtimeMark),
+            54 => Some(Self::SleepyTimeMark),
+            55 => Some(Self::DuskMark),
+            56 => Some(Self::DawnMark),
+            57 => Some(Self::CloudyMark),
+            58 => Some(Self::RainyMark),
+            59 => Some(Self::StormyMark),
+            60 => Some(Self::SnowyMark),
+            61 => Some(Self::BlizzardMark),
+            62 => Some(Self::DryMark),
+            63 => Some(Self::SandstormMark),
+            64 => Some(Self::MistyMark),
+            65 => Some(Self::DestinyMark),
+            66 => Some(Self::FishingMark),
+            67 => Some(Self::CurryMark),
+            68 => Some(Self::UncommonMark),
+            69 => Some(Self::RareMark),
+            70 => Some(Self::RowdyMark),
+            71 => Some(Self::AbsentMindedMark),
+            72 => Some(Self::JitteryMark),
+            73 => Some(Self::ExcitedMark),
+            74 => Some(Self::CharismaticMark),
+            75 => Some(Self::CalmnessMark),
+            76 => Some(Self::IntenseMark),
+            77 => Some(Self::ZonedOutMark),
+            78 => Some(Self::JoyfulMark),
+            79 => Some(Self::AngryMark),
+            80 => Some(Self::SmileyMark),
+            81 => Some(Self::TearyMark),
+            82 => Some(Self::UpbeatMark),
+            83 => Some(Self::PeevedMark),
+            84 => Some(Self::IntellectualMark),
+            85 => Some(Self::FerociousMark),
+            86 => Some(Self::CraftyMark),
+            87 => Some(Self::ScowlingMark),
+            88 => Some(Self::KindlyMark),
+            89 => Some(Self::FlusteredMark),
+            90 => Some(Self::PumpedUpMark),
+            91 => Some(Self::ZeroEnergyMark),
+            92 => Some(Self::PridefulMark),
+            93 => Some(Self::UnsureMark),
+            94 => Some(Self::HumbleMark),
+            95 => Some(Self::ThornyMark),
+            96 => Some(Self::VigorMark),
+            97 => Some(Self::SlumpMark),
+            98 => Some(Self::Hisui),
+            99 => Some(Self::TwinklingStar),
+            100 => Some(Self::PaldeaChampion),
+            101 => Some(Self::JumboMark),
+            102 => Some(Self::MiniMark),
+            103 => Some(Self::ItemfinderMark),
+            104 => Some(Self::PartnerMark),
+            105 => Some(Self::GourmandMark),
+            106 => Some(Self::OnceInALifetime),
+            107 => Some(Self::AlphaMark),
+            108 => Some(Self::MightiestMark),
+            109 => Some(Self::TitanMark),
+            110 => Some(Self::Partner),
+            _ => None,
+        }
+    }
+}
+
+impl From<usize> for ModernRibbon {
+    fn from(value: usize) -> Self {
+        Self::from_index(value).expect("Invalid ribbon index")
+    }
+}
+
+impl From<ModernRibbon> for usize {
+    fn from(ribbon: ModernRibbon) -> Self {
+        ribbon.get_index()
+    }
 }
 
 impl Display for ModernRibbon {
@@ -564,121 +639,6 @@ impl Display for ModernRibbon {
     }
 }
 
-impl From<usize> for ModernRibbon {
-    fn from(value: usize) -> Self {
-        match value {
-            0 => ModernRibbon::KalosChampion,
-            1 => ModernRibbon::Gen3Champion,
-            2 => ModernRibbon::SinnohChampion,
-            3 => ModernRibbon::BestFriends,
-            4 => ModernRibbon::Training,
-            5 => ModernRibbon::SkillfulBattler,
-            6 => ModernRibbon::ExpertBattler,
-            7 => ModernRibbon::Effort,
-            8 => ModernRibbon::Alert,
-            9 => ModernRibbon::Shock,
-            10 => ModernRibbon::Downcast,
-            11 => ModernRibbon::Careless,
-            12 => ModernRibbon::Relax,
-            13 => ModernRibbon::Snooze,
-            14 => ModernRibbon::Smile,
-            15 => ModernRibbon::Gorgeous,
-            16 => ModernRibbon::Royal,
-            17 => ModernRibbon::GorgeousRoyal,
-            18 => ModernRibbon::Artist,
-            19 => ModernRibbon::Footprint,
-            20 => ModernRibbon::Record,
-            21 => ModernRibbon::Legend,
-            22 => ModernRibbon::Country,
-            23 => ModernRibbon::National,
-            24 => ModernRibbon::Earth,
-            25 => ModernRibbon::World,
-            26 => ModernRibbon::Classic,
-            27 => ModernRibbon::Premier,
-            28 => ModernRibbon::Event,
-            29 => ModernRibbon::Birthday,
-            30 => ModernRibbon::Special,
-            31 => ModernRibbon::Souvenir,
-            32 => ModernRibbon::Wishing,
-            33 => ModernRibbon::BattleChampion,
-            34 => ModernRibbon::RegionalChampion,
-            35 => ModernRibbon::NationalChampion,
-            36 => ModernRibbon::WorldChampion,
-            37 => ModernRibbon::ContestMemory,
-            38 => ModernRibbon::BattleMemory,
-            39 => ModernRibbon::HoennChampion,
-            40 => ModernRibbon::ContestStar,
-            41 => ModernRibbon::CoolnessMaster,
-            42 => ModernRibbon::BeautyMaster,
-            43 => ModernRibbon::CutenessMaster,
-            44 => ModernRibbon::ClevernessMaster,
-            45 => ModernRibbon::ToughnessMaster,
-            46 => ModernRibbon::AlolaChampion,
-            47 => ModernRibbon::BattleRoyalChampion,
-            48 => ModernRibbon::BattleTreeGreat,
-            49 => ModernRibbon::BattleTreeMaster,
-            50 => ModernRibbon::GalarChampion,
-            51 => ModernRibbon::TowerMaster,
-            52 => ModernRibbon::MasterRank,
-            53 => ModernRibbon::LunchtimeMark,
-            54 => ModernRibbon::SleepyTimeMark,
-            55 => ModernRibbon::DuskMark,
-            56 => ModernRibbon::DawnMark,
-            57 => ModernRibbon::CloudyMark,
-            58 => ModernRibbon::RainyMark,
-            59 => ModernRibbon::StormyMark,
-            60 => ModernRibbon::SnowyMark,
-            61 => ModernRibbon::BlizzardMark,
-            62 => ModernRibbon::DryMark,
-            63 => ModernRibbon::SandstormMark,
-            64 => ModernRibbon::MistyMark,
-            65 => ModernRibbon::DestinyMark,
-            66 => ModernRibbon::FishingMark,
-            67 => ModernRibbon::CurryMark,
-            68 => ModernRibbon::UncommonMark,
-            69 => ModernRibbon::RareMark,
-            70 => ModernRibbon::RowdyMark,
-            71 => ModernRibbon::AbsentMindedMark,
-            72 => ModernRibbon::JitteryMark,
-            73 => ModernRibbon::ExcitedMark,
-            74 => ModernRibbon::CharismaticMark,
-            75 => ModernRibbon::CalmnessMark,
-            76 => ModernRibbon::IntenseMark,
-            77 => ModernRibbon::ZonedOutMark,
-            78 => ModernRibbon::JoyfulMark,
-            79 => ModernRibbon::AngryMark,
-            80 => ModernRibbon::SmileyMark,
-            81 => ModernRibbon::TearyMark,
-            82 => ModernRibbon::UpbeatMark,
-            83 => ModernRibbon::PeevedMark,
-            84 => ModernRibbon::IntellectualMark,
-            85 => ModernRibbon::FerociousMark,
-            86 => ModernRibbon::CraftyMark,
-            87 => ModernRibbon::ScowlingMark,
-            88 => ModernRibbon::KindlyMark,
-            89 => ModernRibbon::FlusteredMark,
-            90 => ModernRibbon::PumpedUpMark,
-            91 => ModernRibbon::ZeroEnergyMark,
-            92 => ModernRibbon::PridefulMark,
-            93 => ModernRibbon::UnsureMark,
-            94 => ModernRibbon::HumbleMark,
-            95 => ModernRibbon::ThornyMark,
-            96 => ModernRibbon::VigorMark,
-            97 => ModernRibbon::SlumpMark,
-            98 => ModernRibbon::Hisui,
-            99 => ModernRibbon::TwinklingStar,
-            100 => ModernRibbon::PaldeaChampion,
-            101 => ModernRibbon::JumboMark,
-            102 => ModernRibbon::MiniMark,
-            103 => ModernRibbon::ItemfinderMark,
-            104 => ModernRibbon::PartnerMark,
-            105 => ModernRibbon::GourmandMark,
-            106 => ModernRibbon::OnceInALifetime,
-            107 => ModernRibbon::AlphaMark,
-            108 => ModernRibbon::MightiestMark,
-            109 => ModernRibbon::TitanMark,
-            110 => ModernRibbon::Partner,
-            _ => panic!("Invalid value for ModernRibbon: {}", value),
-        }
-    }
+impl Ribbon for ModernRibbon {
+    const MAX: usize = ModernRibbon::Partner as usize;
 }

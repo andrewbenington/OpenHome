@@ -15,6 +15,16 @@
   }
 }
 
+.modal-footer {
+  background-color: var(--color-bar);
+  padding: 0.2rem;
+  font-size: 0.75rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .modal-arrow:hover {
   background-color: rgb(96, 144, 144);
   transition: left 0.15s;

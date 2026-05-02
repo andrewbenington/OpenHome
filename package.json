@@ -1,7 +1,7 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "1.10.5",
+  "version": "1.11.0",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "pokemon",
@@ -22,6 +22,10 @@
     "name": "Andrew Benington",
     "email": "andrewbenington57@gmail.com"
   },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "main": "./out/main/index.js",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -32,26 +36,28 @@
     "build": "pnpm run wasm-compile && pnpm vite build",
     "dev": "pnpm run wasm-compile && pnpm vite",
     "tauri": "tauri",
-    "test-cargo": "cd pkm_rs_types && cargo test --features wasm; cd ../pkm_rs_resources && cargo test --features wasm; cd ../pkm_rs && cargo test --features wasm; cd ../src-tauri && cargo test",
+    "test-cargo": "cargo test --workspace --all-features  --tests",
     "test-vite": "pnpm run wasm-compile && vitest run",
     "test": "pnpm run test-cargo && pnpm run test-vite",
-    "wasm-compile": "wasm-pack build ./pkm_rs --target web -- --features wasm && node scripts/patch-types.js",
+    "wasm-compile": "wasm-pack build --release ./pkm_rs --target web -- --features wasm && node scripts/patch-types.js",
     "precommit": "pnpm run typecheck && pnpm run format && pnpm run lint",
     "postinstall": "pnpm run wasm-compile"
   },
   "dependencies": {
-    "@dnd-kit/collision": "^0.3.2",
+    "@base-ui/react": "^1.4.1",
+    "@dnd-kit/collision": "^0.4.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/modifiers": "^9.0.0",
-    "@dnd-kit/react": "^0.3.2",
+    "@dnd-kit/react": "^0.4.0",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@radix-ui/themes": "^3.3.0",
-    "@tanstack/react-virtual": "^3.13.23",
+    "@tanstack/react-virtual": "^3.13.24",
     "@tauri-apps/api": "2.10.1",
     "@tauri-apps/plugin-dialog": "^2.7.0",
     "@tauri-apps/plugin-fs": "^2.5.0",
     "@tauri-apps/plugin-os": "^2.3.2",
+    "@tauri-apps/plugin-process": "~2.3.1",
     "chart.js": "^4.5.1",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.20",
@@ -64,8 +70,8 @@
     "react-data-grid": "7.0.0-beta.59",
     "react-error-boundary": "^6.1.1",
     "react-icons": "^5.6.0",
-    "react-router": "^7.14.0",
-    "uuid": "^13.0.0",
+    "react-router": "^7.14.2",
+    "uuid": "^14.0.0",
     "zustand": "^5.0.12"
   },
   "devDependencies": {
@@ -78,9 +84,9 @@
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.58.2",
-    "@typescript-eslint/parser": "^8.58.2",
-    "@typescript/native-preview": "7.0.0-dev.20260419.1",
+    "@typescript-eslint/eslint-plugin": "^8.58.1",
+    "@typescript-eslint/parser": "^8.58.1",
+    "@typescript/native-preview": "7.0.0-dev.20260409.1",
     "@vitejs/plugin-react": "^6.0.1",
     "better-sqlite3": "^12.9.0",
     "camelcase-keys": "^10.0.2",
@@ -95,8 +101,8 @@
     "prettier": "^3.8.3",
     "react-dom": "^19.2.5",
     "typescript": "^6.0.3",
-    "vite": "^8.0.9",
-    "vitest": "^4.1.4"
+    "vite": "^8.0.10",
+    "vitest": "^4.1.5"
   },
   "pnpm": {
     "peerDependencyRules": {

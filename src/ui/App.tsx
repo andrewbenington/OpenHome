@@ -1,4 +1,4 @@
-import { partitionResults, R } from '@openhome-core/util/functional'
+import { R } from '@openhome-core/util/functional'
 import '@openhome-ui/App.css'
 import AppTabs from '@openhome-ui/AppTabs'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
@@ -22,15 +22,14 @@ import { ItemBagContext, itemBagReducer } from '@openhome-ui/state/items'
 import { LookupsProvider } from '@openhome-ui/state/lookups'
 import { MouseContext, mouseReducer } from '@openhome-ui/state/mouse'
 import { OhpkmStoreProvider } from '@openhome-ui/state/ohpkm'
-import { PluginContext, pluginReducer } from '@openhome-ui/state/plugin'
 import { SavesProvider } from '@openhome-ui/state/saves'
 import ErrorMessageModal from '@openhome-ui/top-level/ErrorMessageModal'
 import UpdateMessageModal from '@openhome-ui/top-level/UpdateMessageModal'
-import { loadPlugin } from '@openhome-ui/util/plugin'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
 import BanksAndBoxesProvider from './state-zustand/banks-and-boxes/Provider'
 import ConvertStrategiesProvider from './state/convert-strategies/ConvertStrategiesProvider'
+import PluginsProvider from './state/plugin/PluginProvider'
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
@@ -44,7 +43,7 @@ export default function App() {
       style={{ background: 'var(--background-gradient)' }}
       radius="small"
     >
-      <div id="app-container">
+      <div id="app-container" className="root">
         <BackendProvider backend={TauriBackend}>
           <ErrorContext.Provider value={[errorState, errorDispatch]}>
             <AppWithBackend />
@@ -88,7 +87,6 @@ function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
   const [dragState, setDragState] = useState<DragMonState>(emptyDragState())
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
-  const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
   const [settingsLoading, setSettingsLoading] = useState(false)
   const [bagState, bagDispatch] = useReducer(itemBagReducer, {
     itemCounts: {},
@@ -141,46 +139,10 @@ function AppWithBackend() {
       .filter((saveType) => appInfoState.settings.enabledSaveTypes[saveType.saveTypeID])
   }, [appInfoState])
 
-  useEffect(() => {
-    if (pluginState.loaded || !appInfoState.settingsLoaded) return
-    backend.listInstalledPlugins().then(
-      R.match(
-        (plugins) => {
-          const promises = plugins
-            .filter((plugin) => appInfoState.settings.enabledPlugins[plugin.id])
-            .map((plugin) => backend.loadPluginCode(plugin.id))
-
-          Promise.all(promises).then((results) => {
-            const { failures, successes } = partitionResults(results)
-
-            if (failures.length) {
-              displayError('Some Plugins Failed to Load', failures)
-            }
-
-            const plugins = successes.map(loadPlugin)
-
-            pluginDispatch({ type: 'register_plugins', payload: plugins })
-            pluginDispatch({ type: 'set_loaded', payload: true })
-          })
-        },
-        (err) => {
-          pluginDispatch({ type: 'set_loaded', payload: true })
-          displayError('Error Getting Installed Plugins', err)
-        }
-      )
-    )
-  }, [
-    backend,
-    displayError,
-    pluginState,
-    appInfoState.settingsLoaded,
-    appInfoState.settings.enabledPlugins,
-  ])
-
   return (
     <BanksAndBoxesProvider>
-      <PluginContext.Provider value={[pluginState, pluginDispatch]}>
-        <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
+      <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
+        <PluginsProvider>
           <TransactionStateProvider>
             <MouseContext.Provider value={[mouseState, mouseDispatch]}>
               <LookupsProvider>
@@ -210,8 +172,8 @@ function AppWithBackend() {
               </LookupsProvider>
             </MouseContext.Provider>
           </TransactionStateProvider>
-        </AppInfoContext.Provider>
-      </PluginContext.Provider>
+        </PluginsProvider>
+      </AppInfoContext.Provider>
     </BanksAndBoxesProvider>
   )
 }

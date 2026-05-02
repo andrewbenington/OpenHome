@@ -1,6 +1,6 @@
 import { get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
-import { unique } from '@openhome-core/util/functional'
+import { Option, unique } from '@openhome-core/util/functional'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -10,7 +10,7 @@ import {
   OriginGame,
 } from '@pkm-rs/pkg'
 import { PK2 } from '@pokemon-files/pkm'
-import { EXCLAMATION } from '@pokemon-resources/consts/Formes'
+import { EXCLAMATION } from '@pokemon-resources/consts/Forms'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
@@ -275,10 +275,6 @@ export class G2SAV extends OfficialSAV<PK2> {
     return ItemGen2.fromModern(itemIndex) !== undefined
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   static saveTypeAbbreviation = 'GSC (Int)'
   static saveTypeName = 'Pokémon Gold/Silver/Crystal (INT)'
   static saveTypeID = 'G2SAV'
@@ -302,5 +298,17 @@ export class G2SAV extends OfficialSAV<PK2> {
 
   get trainerGender() {
     return this.origin === OriginGame.Crystal && this.bytes[0x3e3d] ? Gender.Female : Gender.Male
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK2>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
   }
 }

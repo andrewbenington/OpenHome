@@ -203,10 +203,6 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     extraFormIndex?: ExtraFormIndex
   ): boolean
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   static saveTypeAbbreviation = 'DPPt/HGSS'
   static saveTypeName = 'Pokémon Diamond/Pearl/Platinum/HeartGold/SoulSilver'
   static saveTypeID = 'G4SAV'
@@ -229,6 +225,18 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
       (origin >= OriginGame.Diamond && origin <= OriginGame.Platinum) ||
       (origin >= OriginGame.HeartGold && origin <= OriginGame.SoulSilver)
     )
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK4>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
   }
 }
 

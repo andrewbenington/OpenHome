@@ -1,8 +1,8 @@
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getSpriteName } from '@openhome-ui/images/pokemon'
-import { MonSpriteData } from '@openhome-ui/state/plugin'
 import { ExtraFormIndex, extraFormSpriteName } from '@pkm-rs/pkg'
-import { LGE_STARTER, SPIKY_EAR } from '../../../packages/pokemon-resources/src/consts/Formes'
+import { MonSpriteData } from 'src/ui/state/plugin/reducer'
+import { LGE_STARTER, SPIKY_EAR } from '../../../packages/pokemon-resources/src/consts/Forms'
 import { NationalDex } from '../../../packages/pokemon-resources/src/consts/NationalDex'
 import useMonSprite from './useMonSprite'
 
@@ -37,7 +37,7 @@ export default function useBoxIconImage(mon: MonSpriteData): MonSpriteResult {
     }
   }
 
-  const boxIconOverride = FormsUsingImages.get(mon.dexNum)?.includes(mon.formeNum)
+  const boxIconOverride = FormsUsingImages.get(mon.dexNum)?.includes(mon.formNum)
   if (boxIconOverride) {
     return {
       loading: false,

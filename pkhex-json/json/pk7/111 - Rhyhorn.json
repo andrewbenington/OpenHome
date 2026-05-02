@@ -1,0 +1,169 @@
+{
+  "encryption_constant": 1872531959,
+  "sanity": 0,
+  "checksum": 53703,
+  "species_and_form": {
+    "national_dex": 111,
+    "form_index": 0
+  },
+  "held_item_index": 0,
+  "trainer_id": 3613,
+  "secret_id": 64988,
+  "exp": 1250,
+  "ability_index": "Reckless",
+  "ability_num": "Hidden",
+  "markings": {
+    "circle": "Unset",
+    "square": "Unset",
+    "triangle": "Unset",
+    "heart": "Unset",
+    "star": "Unset",
+    "diamond": "Unset"
+  },
+  "personality_value": 1872531959,
+  "nature": "Quiet",
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "resort_event_status": 0,
+  "pokerus_byte": 0,
+  "super_training_flags": 0,
+  "ribbons": [],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "super_training_dist_flags": 0,
+  "form_argument": 0,
+  "nickname": "Rhyhorn",
+  "moves": [
+    {
+      "move_index": "Horn Attack",
+      "pp": 25,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Tail Whip",
+      "pp": 30,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Stomp",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "\u003Cempty\u003E",
+      "pp": 0,
+      "pp_ups": 0
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "secret_super_training_unlocked": false,
+  "secret_super_training_complete": false,
+  "ivs": {
+    "hp": 23,
+    "atk": 19,
+    "def": 8,
+    "spa": 18,
+    "spd": 8,
+    "spe": 28
+  },
+  "is_egg": false,
+  "is_nicknamed": false,
+  "handler_name": "RoC",
+  "handler_gender": "Male",
+  "is_current_handler": true,
+  "geolocations": [
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    }
+  ],
+  "handler_friendship": 70,
+  "handler_affection": 0,
+  "handler_memory": {
+    "intensity": 1,
+    "memory": 4,
+    "feeling": 7,
+    "text_variable": 0
+  },
+  "fullness": 0,
+  "enjoyment": 0,
+  "trainer_name": "RoC",
+  "trainer_friendship": 70,
+  "trainer_affection": 0,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "text_variable": 0
+  },
+  "egg_date": null,
+  "met_date": "11/7/2016",
+  "egg_location_index": 0,
+  "met_location_index": 75,
+  "ball": "Dream",
+  "met_level": 10,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": false,
+    "atk": false,
+    "def": false,
+    "spa": false,
+    "spd": false,
+    "spe": false
+  },
+  "game_of_origin": "Black",
+  "country": 49,
+  "region": 49,
+  "console_region": 1,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 10,
+  "form_argument_remain": 0,
+  "form_argument_elapsed": 0,
+  "current_hp": 38,
+  "stats": {
+    "hp": 38,
+    "atk": 23,
+    "def": 24,
+    "spa": 13,
+    "spd": 11,
+    "spe": 10
+  }
+}

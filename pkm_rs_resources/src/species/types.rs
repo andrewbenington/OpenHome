@@ -1,29 +1,28 @@
+use crate::{Error, Result, abilities::AbilityIndexWasm, species::ALL_SPECIES};
+use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
+use serde::{Serialize, Serializer};
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
 
 use crate::{
-    Error, ExpectLog, Result,
-    abilities::AbilityIndex,
+    ExpectLog,
     levelup::LearnsetReader,
-    species::{
-        ALL_SPECIES,
-        form_metadata::{MetadataSource, levelup_learnset_lookup, types_lookup},
-    },
+    species::form_metadata::{MetadataSource, levelup_learnset_lookup, types_lookup},
 };
 
-use pkm_rs_types::{GameSetting, Generation, PkmType, TeraType};
-use serde::{Serialize, Serializer};
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
 
-#[cfg(feature = "wasm")]
-use crate::levelup::LearnsetMoveJs;
-#[cfg(feature = "wasm")]
-use crate::log;
 #[cfg(feature = "wasm")]
 use crate::species::form_metadata::current_base_stats;
 #[cfg(feature = "wasm")]
 use crate::species::form_metadata::{BaseStats, base_stats_lookup};
 #[cfg(feature = "wasm")]
 use crate::stats::Stat;
+#[cfg(feature = "wasm")]
+use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{Gender, Stats8};
 #[cfg(feature = "wasm")]
@@ -56,7 +55,7 @@ impl NatDexIndex {
     /// # Safety
     ///
     /// - `national_dex` must be greater than zero and at most the maximum National Dex number supported by this version of the library.
-    /// - `forme_index` must be less than the total number of formes for the Pokémon with the given `national_dex` number
+    /// - `form_index` must be less than the total number of forms for the Pokémon with the given `national_dex` number
     pub const unsafe fn new_unchecked(index: u16) -> NatDexIndex {
         unsafe { NatDexIndex(NonZeroU16::new_unchecked(index)) }
     }
@@ -89,19 +88,40 @@ impl NatDexIndex {
     }
 }
 
+#[cfg(feature = "randomize")]
+impl Randomize for NatDexIndex {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let index: NonZeroU16 =
+            NonZeroU16::new(rng.random_range(1..=MAX_NATIONAL_DEX) as u16).unwrap();
+        NatDexIndex(index)
+    }
+}
+
 impl Serialize for NatDexIndex {
     fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        let message = format!("{} ({})", self.get(), self.get_species_metadata().name);
-        serializer.serialize_str(&message)
+        serializer.serialize_u16(self.get())
     }
 }
 
 impl Default for NatDexIndex {
     fn default() -> Self {
         Self(unsafe { NonZeroU16::new_unchecked(1) })
+    }
+}
+
+impl From<NationalDex> for NatDexIndex {
+    fn from(ndex: NationalDex) -> Self {
+        NatDexIndex::new(ndex as u16).expect("All NationalDex values should be a valid NatDexIndex")
+    }
+}
+
+impl From<NatDexIndex> for NationalDex {
+    fn from(ndex: NatDexIndex) -> Self {
+        NationalDex::try_from(ndex.get())
+            .expect("All NatDexIndex values should be a valid NationalDex")
     }
 }
 
@@ -312,21 +332,18 @@ pub enum EggGroup {
 }
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone)]
-pub struct FormeMetadata {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub species_name: &'static str,
-
+pub struct FormMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = nationalDex))]
     pub national_dex: NatDexIndex,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub forme_name: &'static str,
+    pub form_name: &'static str,
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = formeIndex))]
-    pub forme_index: u16,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = formIndex))]
+    pub form_index: u16,
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isBaseForme))]
-    pub is_base_forme: bool,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isBaseForm))]
+    pub is_base_form: bool,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isMega))]
     pub is_mega: bool,
@@ -347,10 +364,10 @@ pub struct FormeMetadata {
     pub gender_ratio: GenderRatio,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub abilities: (AbilityIndex, AbilityIndex),
+    pub abilities: (AbilityIndexBounded, AbilityIndexBounded),
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = hiddenAbility))]
-    pub hidden_ability: Option<AbilityIndex>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub hidden_ability: Option<AbilityIndexBounded>,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseHeight))]
     pub base_height: u32,
@@ -359,10 +376,10 @@ pub struct FormeMetadata {
     pub base_weight: u32,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub evolutions: &'static [SpeciesAndForme],
+    pub evolutions: &'static [SpeciesAndForm],
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = preEvolution))]
-    pub pre_evolution: Option<SpeciesAndForme>,
+    pub pre_evolution: Option<SpeciesAndForm>,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub egg_groups: (EggGroup, Option<EggGroup>),
@@ -395,63 +412,58 @@ pub struct FormeMetadata {
     pub sprite_index: (u8, u8),
 }
 
-impl FormeMetadata {
-    pub const fn forme_ref(&self) -> SpeciesAndForme {
-        unsafe { SpeciesAndForme::new_unchecked(self.national_dex.get(), self.forme_index) }
+impl FormMetadata {
+    pub const fn forme_ref(&self) -> SpeciesAndForm {
+        unsafe { SpeciesAndForm::new_unchecked(self.national_dex.get(), self.form_index) }
     }
 
     pub const fn species_metadata(&self) -> &SpeciesMetadata {
         self.forme_ref().get_species_metadata()
     }
 
-    pub const fn get_ability(&self, ability_num: u8) -> AbilityIndex {
+    pub fn get_ability(&self, ability_num: AbilityNumber) -> AbilityIndexBounded {
         match ability_num {
-            1 => self.abilities.0,
-            _ => self.abilities.1,
+            AbilityNumber::First => self.abilities.0,
+            AbilityNumber::Second => self.abilities.1,
+            AbilityNumber::Hidden => self.hidden_ability.unwrap_or(self.abilities.0),
         }
     }
 
-    pub fn get_base_evolution(&self) -> SpeciesAndForme {
+    pub fn get_base_evolution(&self) -> SpeciesAndForm {
         match self.pre_evolution {
             None => self.forme_ref(),
             Some(forme_ref) => forme_ref.get_base_evolution(),
         }
     }
 
-    pub fn is_evolution_of(&self, other: &FormeMetadata) -> bool {
+    pub fn is_evolution_of(&self, other: &FormMetadata) -> bool {
         other.evolutions.iter().any(|other_evo| {
             *other_evo == self.forme_ref() || self.is_evolution_of(other_evo.get_forme_metadata())
         })
     }
 
     #[cfg(feature = "wasm")]
-    fn is_mega_forme_of(&self, other: &FormeMetadata) -> bool {
+    fn is_mega_forme_of(&self, other: &FormMetadata) -> bool {
         other
             .mega_evolution_data
             .iter()
-            .any(|mega| mega.mega_forme.forme_index == self.forme_index)
+            .any(|mega| mega.mega_form.form_index == self.form_index)
     }
 
     #[cfg(feature = "wasm")]
     fn has_data_for_source(&self, source: MetadataSource) -> bool {
         use crate::species::form_metadata::source_has_form_metadata;
-
-        log!(
-            "checking if {} forme {} has data for source {:?}",
-            self.species_name,
-            self.forme_name,
-            source
-        );
-        source_has_form_metadata(source, self.national_dex.get(), self.forme_index)
+        source_has_form_metadata(source, self.national_dex.get(), self.form_index)
     }
 
     fn types_from_source_or_latest(
         &self,
         source: Option<MetadataSource>,
     ) -> (PkmType, Option<PkmType>) {
-        types_lookup(self.national_dex.get(), self.forme_index, source).expect_log(format!(
-            "no types found for {} forme {}",
-            self.species_name, self.forme_name
+        types_lookup(self.national_dex.get(), self.form_index, source).expect_log(format!(
+            "no types found for nat dex {} form {}",
+            self.national_dex.get(),
+            self.form_index
         ))
     }
 
@@ -468,7 +480,7 @@ impl FormeMetadata {
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 #[cfg(feature = "wasm")]
-impl FormeMetadata {
+impl FormMetadata {
     #[wasm_bindgen(js_name = hasDataForSource)]
     pub fn has_data_for_source_js(&self, source: MetadataSource) -> bool {
         self.has_data_for_source(source)
@@ -510,26 +522,28 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(getter)]
-    pub fn abilities(&self) -> Vec<AbilityIndex> {
-        vec![self.abilities.0, self.abilities.1]
+    pub fn abilities(&self) -> Vec<AbilityIndexWasm> {
+        vec![self.abilities.0.into(), self.abilities.1.into()]
     }
 
     #[wasm_bindgen(js_name = abilityByNum)]
-    pub fn ability_by_num(&self, num: u8) -> AbilityIndex {
-        match num {
-            4 => self.hidden_ability.unwrap_or(self.abilities.0),
-            2 => self.abilities.1,
-            _ => self.abilities.0,
-        }
+    pub fn ability_by_num(&self, ability_num: AbilityNumber) -> AbilityIndexWasm {
+        self.get_ability(ability_num).into()
     }
 
     #[wasm_bindgen(js_name = abilityByNumGen3)]
-    pub fn ability_by_num_gen_3(&self, num: u8) -> AbilityIndex {
-        if num == 2 && self.abilities.1.get() <= 77 {
+    pub fn ability_by_num_gen_3(&self, ability_num: AbilityNumber) -> AbilityIndexWasm {
+        if ability_num == AbilityNumber::Second && self.abilities.1.to_u16() <= 77 {
             self.abilities.1
         } else {
             self.abilities.0
         }
+        .into()
+    }
+
+    #[wasm_bindgen(getter = hiddenAbility)]
+    pub fn hidden_ability(&self) -> Option<AbilityIndexWasm> {
+        self.hidden_ability.map(|ability| ability.into())
     }
 
     #[wasm_bindgen(getter = eggGroups)]
@@ -541,18 +555,13 @@ impl FormeMetadata {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    pub fn evolutions(&self) -> Vec<SpeciesAndForme> {
+    pub fn evolutions(&self) -> Vec<SpeciesAndForm> {
         self.evolutions.to_vec()
     }
 
-    #[wasm_bindgen(getter = speciesName)]
-    pub fn species_name(&self) -> String {
-        self.species_name.to_owned()
-    }
-
     #[wasm_bindgen(getter = formeName)]
-    pub fn forme_name(&self) -> String {
-        self.forme_name.to_owned()
+    pub fn form_name(&self) -> String {
+        self.form_name.to_owned()
     }
 
     #[wasm_bindgen(getter = introducedGen)]
@@ -586,18 +595,18 @@ impl FormeMetadata {
     }
 
     #[wasm_bindgen(js_name = isEvolutionOf)]
-    pub fn is_evolution_of_js(&self, other: &FormeMetadata) -> bool {
+    pub fn is_evolution_of_js(&self, other: &FormMetadata) -> bool {
         self.is_evolution_of(other)
     }
 
     #[wasm_bindgen(getter = baseStats)]
     pub fn get_base_stats(&self) -> Stats8 {
-        current_base_stats(self.national_dex.get(), self.forme_index).unwrap_or_default()
+        current_base_stats(self.national_dex.get(), self.form_index).unwrap_or_default()
     }
 
     #[wasm_bindgen(js_name = baseStatsFrom)]
     pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<BaseStats> {
-        base_stats_lookup(self.national_dex.get(), self.forme_index, source)
+        base_stats_lookup(self.national_dex.get(), self.form_index, source)
     }
 
     #[wasm_bindgen(js_name = getBaseStat)]
@@ -613,14 +622,14 @@ impl FormeMetadata {
         }
     }
 
-    #[wasm_bindgen(js_name = getMegaBaseForme)]
-    pub fn get_mega_base_forme(&self) -> Option<FormeMetadata> {
+    #[wasm_bindgen(js_name = getMegaBaseForm)]
+    pub fn get_mega_base_forme(&self) -> Option<FormMetadata> {
         if !self.is_mega {
             return None;
         }
 
         self.species_metadata()
-            .formes
+            .forms
             .iter()
             .find(|other| self.is_mega_forme_of(other))
             .cloned()
@@ -643,7 +652,7 @@ impl FormeMetadata {
 #[derive(Debug, Clone, Copy)]
 pub struct MegaEvolutionMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = megaForme))]
-    pub mega_forme: SpeciesAndForme,
+    pub mega_form: SpeciesAndForm,
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = requiredItemId))]
     pub required_item_id: Option<u16>,
 }
@@ -652,19 +661,17 @@ pub struct MegaEvolutionMetadata {
 #[derive(Debug, Clone)]
 pub struct SpeciesMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub name: &'static str,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub national_dex: NatDexIndex,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub level_up_type: LevelUpType,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub formes: &'static [FormeMetadata],
+    pub forms: &'static [FormMetadata],
 }
 
 impl SpeciesMetadata {
-    pub const fn get_forme(&self, forme_index: usize) -> Option<&'static FormeMetadata> {
-        if forme_index < self.formes.len() {
-            Some(&self.formes[forme_index])
+    pub const fn get_forme(&self, form_index: usize) -> Option<&'static FormMetadata> {
+        if form_index < self.forms.len() {
+            Some(&self.forms[form_index])
         } else {
             None
         }
@@ -675,13 +682,8 @@ impl SpeciesMetadata {
 #[allow(clippy::missing_const_for_fn)]
 impl SpeciesMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    pub fn name(&self) -> String {
-        self.name.to_owned()
-    }
-
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    pub fn formes(&self) -> Vec<FormeMetadata> {
-        Vec::from(self.formes)
+    pub fn forms(&self) -> Vec<FormMetadata> {
+        Vec::from(self.forms)
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nationalDex))]
@@ -702,64 +704,71 @@ impl SpeciesMetadata {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize)]
-pub struct SpeciesAndForme {
+pub struct SpeciesAndForm {
     national_dex: NatDexIndex,
-    forme_index: u16,
+    form_index: u16,
 }
 
-impl SpeciesAndForme {
-    pub fn new(national_dex: u16, forme_index: u16) -> Result<SpeciesAndForme> {
+impl SpeciesAndForm {
+    pub fn new(national_dex: u16, form_index: u16) -> Result<SpeciesAndForm> {
         let valid_ndex = NatDexIndex::new(national_dex)?;
 
-        if valid_ndex.get_species_metadata().formes.len() <= forme_index as usize {
-            return Err(Error::FormeIndex {
+        if valid_ndex.get_species_metadata().forms.len() <= form_index as usize {
+            return Err(Error::FormIndex {
                 national_dex: valid_ndex,
-                forme_index,
+                form_index,
             });
         }
 
-        Ok(SpeciesAndForme {
+        Ok(SpeciesAndForm {
             national_dex: valid_ndex,
-            forme_index,
+            form_index,
         })
+    }
+
+    pub const fn base_form(national_dex: NatDexIndex) -> SpeciesAndForm {
+        SpeciesAndForm {
+            national_dex,
+            form_index: 0,
+        }
     }
 
     pub const fn new_valid_ndex(
         national_dex: NatDexIndex,
-        forme_index: u16,
-    ) -> Result<SpeciesAndForme> {
-        if national_dex.get_species_metadata().formes.len() <= forme_index as usize {
-            return Err(Error::FormeIndex {
+        form_index: u16,
+    ) -> Result<SpeciesAndForm> {
+        if national_dex.get_species_metadata().forms.len() <= form_index as usize {
+            return Err(Error::FormIndex {
                 national_dex,
-                forme_index,
+                form_index,
             });
         }
 
-        Ok(SpeciesAndForme {
+        Ok(SpeciesAndForm {
             national_dex,
-            forme_index,
+            form_index,
         })
     }
 
     /// # Safety
     ///
     /// - `national_dex` must be greater than zero and at most the maximum National Dex number supported by this version of the library.
-    /// - `forme_index` must be less than the total number of formes for the Pokémon with the given `national_dex` number
-    pub const unsafe fn new_unchecked(national_dex: u16, forme_index: u16) -> SpeciesAndForme {
-        SpeciesAndForme {
+    /// - `form_index` must be less than the total number of forms for the Pokémon with the given `national_dex` number
+    pub const unsafe fn new_unchecked(national_dex: u16, form_index: u16) -> SpeciesAndForm {
+        SpeciesAndForm {
             national_dex: unsafe { NatDexIndex::new_unchecked(national_dex) },
-            forme_index,
+            form_index,
         }
     }
 
-    pub fn get_base_evolution(&self) -> SpeciesAndForme {
+    pub fn get_base_evolution(&self) -> SpeciesAndForm {
         match self.get_forme_metadata().pre_evolution {
             None => *self,
             Some(forme_ref) => forme_ref.get_base_evolution(),
         }
     }
 
-    pub fn get_prevos(&self) -> Vec<SpeciesAndForme> {
+    pub fn get_prevos(&self) -> Vec<SpeciesAndForm> {
         let mut prevos = Vec::new();
         let mut current = *self;
         while let Some(forme_ref) = current.get_forme_metadata().pre_evolution {
@@ -774,31 +783,35 @@ impl SpeciesAndForme {
     }
 
     pub const fn get_forme_index(&self) -> u16 {
-        self.forme_index
+        self.form_index
+    }
+
+    pub const fn to_tuple(self) -> (u16, u16) {
+        (self.national_dex.get(), self.form_index)
     }
 
     pub fn get_levelup_learnset(&self, source: Option<MetadataSource>) -> Option<LearnsetReader> {
-        levelup_learnset_lookup(self.national_dex.get(), self.forme_index, source)
+        levelup_learnset_lookup(self.national_dex.get(), self.form_index, source)
     }
 }
 
-impl SpeciesAndForme {
+impl SpeciesAndForm {
     pub const fn get_species_metadata(&self) -> &'static SpeciesMetadata {
         self.national_dex.get_species_metadata()
     }
 
-    pub const fn get_forme_metadata(&self) -> &'static FormeMetadata {
-        &self.get_species_metadata().formes[self.forme_index as usize]
+    pub const fn get_forme_metadata(&self) -> &'static FormMetadata {
+        &self.get_species_metadata().forms[self.form_index as usize]
     }
 }
 
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 #[cfg(feature = "wasm")]
-impl SpeciesAndForme {
+impl SpeciesAndForm {
     #[wasm_bindgen(constructor)]
-    pub fn new_js(national_dex: u16, forme_index: u16) -> core::result::Result<Self, JsValue> {
-        Self::new(national_dex, forme_index).map_err(|e| JsValue::from_str(&e.to_string()))
+    pub fn new_js(national_dex: u16, form_index: u16) -> core::result::Result<Self, JsValue> {
+        Self::new(national_dex, form_index).map_err(|e| JsValue::from_str(&e.to_string()))
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nationalDex))]
@@ -806,9 +819,9 @@ impl SpeciesAndForme {
         self.national_dex.get()
     }
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = formeIndex))]
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = formIndex))]
     pub fn get_forme_index_js(&self) -> u16 {
-        self.forme_index
+        self.form_index
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = getSpeciesMetadata))]
@@ -817,12 +830,26 @@ impl SpeciesAndForme {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = getMetadata))]
-    pub fn get_forme_metadata_js(&self) -> FormeMetadata {
+    pub fn get_forme_metadata_js(&self) -> FormMetadata {
         self.get_forme_metadata().clone()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = tryNew))]
-    pub fn try_new(national_dex: u16, forme_index: u16) -> Option<Self> {
-        Self::new(national_dex, forme_index).ok()
+    pub fn try_new(national_dex: u16, form_index: u16) -> Option<Self> {
+        Self::new(national_dex, form_index).ok()
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for SpeciesAndForm {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let national_dex = NatDexIndex::randomized(rng);
+        let forme_count = national_dex.get_species_metadata().forms().len();
+        let form_index = rng.random_range(0..forme_count) as u16;
+
+        Self {
+            national_dex,
+            form_index,
+        }
     }
 }

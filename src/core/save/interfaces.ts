@@ -11,6 +11,7 @@ import {
   OriginGames,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
+import { filterUndefined } from '../util/sort'
 import { LookupType, SAVClass } from './util'
 import { PathData } from './util/path'
 
@@ -57,7 +58,8 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   displayID: string
 
   currentPCBox: number
-  boxes: Array<Box<P>>
+  // boxes: Array<Box<P>>
+  getBoxCount(): number
 
   invalid: boolean
   tooEarlyToOpen: boolean
@@ -66,9 +68,10 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
 
   isPlugin: boolean
 
-  getCurrentBox: () => Box<P>
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata
   getMonAt(boxNum: number, boxSlot: number): Option<P>
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
+  getAllMons(): Readonly<P>[]
 
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
@@ -93,12 +96,11 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number
-  abstract boxes: Box<P>[]
+  abstract boxes: Readonly<Box<P>>[]
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
   abstract updatedBoxSlots: BoxAndSlot[]
-  abstract getCurrentBox(): Box<P>
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
   abstract supportsItem(itemIndex: number): boolean
   abstract prepareForSaving(): void
@@ -124,11 +126,27 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   pluginIdentifier: undefined = undefined
 
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
-  getMonAt(boxNum: number, boxSlot: number): Option<P> {
-    const box = this.boxes[boxNum]
-    if (!box) return undefined
-    return box.boxSlots[boxSlot]
+
+  abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
+  abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
+
+  getBoxCount(): number {
+    return this.boxes.length
   }
+
+  getAllMons(): Readonly<P>[] {
+    return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
+  }
+  // getMonAt(boxNum: number, boxSlot: number): Option<P> {
+  //   const box = this.boxes[boxNum]
+  //   if (!box) return undefined
+  //   return box.boxSlots[boxSlot]
+  // }
+  // setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void {
+  //   const box = this.boxes[boxNum]
+  //   if (!box) return
+  //   box.boxSlots[boxSlot] = mon
+  // }
 
   get gameName(): string {
     return OriginGames.gameName(this.origin)
@@ -149,6 +167,31 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   get lookupType(): Option<LookupType> {
     return (this.constructor as SAVClass).lookupType
   }
+
+  get boxSlotCount(): number {
+    return this.boxRows * this.boxColumns
+  }
+
+  getBoxMonCount(boxNum: number): number {
+    const box = this.boxes[boxNum]
+    if (!box) return 0
+    return box.boxSlots.filter(filterUndefined).length
+  }
+
+  getFirstNonEmptySlotAfter(boxNum: number, boxSlot: number): number | undefined {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    for (let i = boxSlot + 1; i < box.boxSlots.length; i++) {
+      if (box.boxSlots[i] !== undefined) {
+        return i
+      }
+    }
+    return undefined
+  }
+
+  getBoxName(boxNum: number): string | undefined {
+    return this.boxes[boxNum]?.name
+  }
 }
 
 export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
@@ -165,12 +208,11 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number
-  abstract boxes: Box<P>[]
+  abstract boxes: Readonly<Box<P>>[]
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
   abstract updatedBoxSlots: BoxAndSlot[]
-  abstract getCurrentBox(): Box<P>
   abstract supportsMon(
     dexNumber: number,
     formeNumber: number,
@@ -221,10 +263,29 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
     return (this.constructor as SAVClass).lookupType
   }
 
-  getMonAt(boxNum: number, boxSlot: number): Option<P> {
+  abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
+  abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
+
+  getBoxCount(): number {
+    return this.boxes.length
+  }
+
+  getAllMons(): Readonly<P>[] {
+    return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
+  }
+
+  getBoxName(boxNum: number): string | undefined {
+    return this.boxes[boxNum]?.name
+  }
+
+  getBoxMonCount(boxNum: number): number {
     const box = this.boxes[boxNum]
-    if (!box) return undefined
-    return box.boxSlots[boxSlot]
+    if (!box) return 0
+    return box.boxSlots.filter(filterUndefined).length
+  }
+
+  get boxSlotCount(): number {
+    return this.boxRows * this.boxColumns
   }
 }
 
@@ -280,4 +341,71 @@ export function saveToStringIdentifier(save: SAV): SaveIdentifier {
   return save.pluginIdentifier
     ? `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}${Delimiter}${save.pluginIdentifier}`
     : `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}`
+}
+
+export interface WasmSaveInner<P> {
+  gameOfOrigin: OriginGame
+  language?: Language
+  secretId: number
+  trainerGender: number
+  trainerId: number
+  trainerName: string
+  displayId: string
+  currentPcBoxIdx: number
+  prepareBytesForSaving(): Uint8Array
+
+  getMonAt(box_num: number, offset: number): Option<P>
+  setMonAt(box_num: number, offset: number, mon?: P | null): void
+}
+
+export abstract class WasmOfficialSave<P extends PKMInterface, WasmP> extends OfficialSAV<P> {
+  inner: WasmSaveInner<WasmP>
+
+  constructor(inner: WasmSaveInner<WasmP>) {
+    super()
+    this.inner = inner
+  }
+
+  get name() {
+    return this.inner.trainerName
+  }
+
+  get tid() {
+    return this.inner.trainerId
+  }
+
+  get sid() {
+    return this.inner.secretId
+  }
+
+  get displayID() {
+    return this.inner.displayId
+  }
+
+  get trainerGender() {
+    return this.inner.trainerGender
+  }
+
+  getCurrentPCBox() {
+    return this.inner.currentPcBoxIdx
+  }
+
+  get origin() {
+    return this.inner.gameOfOrigin
+  }
+
+  get language() {
+    return this.inner.language
+  }
+
+  abstract monFromWasm(wasmMon: WasmP): P
+
+  getMonAt(boxNum: number, boxSlot: number): Option<P> {
+    const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
+    return wasmMon ? this.monFromWasm(wasmMon) : undefined
+  }
+
+  prepareForSaving(): Uint8Array {
+    return this.inner.prepareBytesForSaving()
+  }
 }

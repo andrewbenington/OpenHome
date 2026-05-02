@@ -17,6 +17,7 @@ import { PK3 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
+import { Option } from '../util/functional'
 import { filterUndefined } from '../util/sort'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
@@ -349,10 +350,6 @@ export class G3SAV extends OfficialSAV<PK3> {
     return ItemGen3.fromModern(itemIndex) !== undefined
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   static saveTypeAbbreviation = 'RSE/FRLG'
   static saveTypeName = 'Pokémon Ruby/Sapphire/Emerald/FireRed/LeafGreen'
   static saveTypeID = 'G3SAV'
@@ -394,5 +391,17 @@ export class G3SAV extends OfficialSAV<PK3> {
 
   get trainerGender() {
     return this.primarySave.trainerGender
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK3>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
   }
 }

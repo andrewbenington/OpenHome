@@ -52,15 +52,15 @@ type GenderRatio =
 type Species = {
   readonly name: string
   readonly nationalDex: number
-  readonly formes: readonly Forme[]
+  readonly forms: readonly Form[]
   readonly levelUpType: LevelUpType
 }
 
-type Forme = {
+type Form = {
   readonly name: string
-  readonly formeName: string
-  readonly formeNumber: number
-  readonly isBaseForme: boolean
+  readonly formName: string
+  readonly formNumber: number
+  readonly isBaseForm: boolean
   readonly isMega: boolean
   readonly megaEvolutionData: MegaEvolutionGetByBaseFormRow[]
   readonly isGMax: boolean
@@ -81,24 +81,24 @@ type Forme = {
   readonly abilityH?: number
   readonly height: number
   readonly weight: number
-  readonly evos?: readonly SpeciesAndForme[]
-  readonly prevo?: SpeciesAndForme
+  readonly evos?: readonly SpeciesAndForm[]
+  readonly prevo?: SpeciesAndForm
   readonly eggGroups: readonly string[]
   readonly gen: number
-  readonly regional?: RegionalForme
+  readonly regional?: RegionalForm
   readonly subLegendary: boolean
   readonly restrictedLegendary: boolean
   readonly ultraBeast: boolean
   readonly paradox: boolean
   readonly mythical: boolean
-  readonly cosmeticForme: boolean
+  readonly cosmeticForm: boolean
   readonly sprite: string
   readonly spriteIndex: readonly [number, number]
 }
 
-export type RegionalForme = 'Alola' | 'Galar' | 'Hisui' | 'Paldea'
+export type RegionalForm = 'Alola' | 'Galar' | 'Hisui' | 'Paldea'
 
-type SpeciesAndForme = {
+type SpeciesAndForm = {
   readonly nationalDex: number
   readonly formIndex: number
 }
@@ -114,12 +114,12 @@ function statsToRust(stats: {
   return `Stats16Le::new(${stats.hp}, ${stats.atk}, ${stats.def}, ${stats.spa}, ${stats.spd}, ${stats.spe})`
 }
 
-function speciesAndFormeToRust(ref: SpeciesAndForme): string {
-  return `unsafe { SpeciesAndForme::new_unchecked(${ref.nationalDex}, ${ref.formIndex}) }`
+function SpeciesAndFormToRust(ref: SpeciesAndForm): string {
+  return `unsafe { SpeciesAndForm::new_unchecked(${ref.nationalDex}, ${ref.formIndex}) }`
 }
 
-function evolutionsToRust(evos?: readonly SpeciesAndForme[]): string {
-  return `&[${(evos ?? []).map(speciesAndFormeToRust).join(',')}]`
+function evolutionsToRust(evos?: readonly SpeciesAndForm[]): string {
+  return `&[${(evos ?? []).map(SpeciesAndFormToRust).join(',')}]`
 }
 
 function optionalToRust<T, S>(value: T | null | undefined, tranformer?: (T) => S): string {
@@ -152,45 +152,45 @@ function falseIfUndef(input?: boolean): boolean {
   return input === true
 }
 
-function convertForme(natDexIndex: number, forme: Forme): string {
-  return `FormeMetadata {
-    species_name: "${forme.name}",
+function convertForm(natDexIndex: number, form: Form): string {
+  return `FormMetadata {
+    species_name: "${form.name}",
     national_dex: unsafe { NatDexIndex::new_unchecked(${natDexIndex}) },
-    forme_name: "${forme.formeName}",
-    forme_index: ${forme.formeNumber},
-    is_base_forme: ${forme.isBaseForme},
-    is_mega: ${falseIfUndef(forme.isMega)},
-    mega_evolution_data: &[${forme.megaEvolutionData
+    form_name: "${form.formName}",
+    form_index: ${form.formNumber},
+    is_base_form: ${form.isBaseForm},
+    is_mega: ${falseIfUndef(form.isMega)},
+    mega_evolution_data: &[${form.megaEvolutionData
       .map(
         (megaForm) =>
-          `MegaEvolutionMetadata { mega_forme: ${speciesAndFormeToRust(megaForm)}, required_item_id: ${optionalToRust(megaForm.megaStoneId)} }`
+          `MegaEvolutionMetadata { mega_form: ${SpeciesAndFormToRust(megaForm)}, required_item_id: ${optionalToRust(megaForm.megaStoneId)} }`
       )
       .join(',')}],
-    is_gmax: ${falseIfUndef(forme.isGMax)},
-    is_battle_only: ${falseIfUndef(forme.isBattleOnly)},
-    is_cosmetic: ${falseIfUndef(forme.cosmeticForme)},
-    types: (PkmType::${forme.types[0]}, ${optionalToRust(forme.types[1], pkmTypeToRust)}),
-    gender_ratio: GenderRatio::${forme.genderRatio},
-    base_stats: ${statsToRust(forme.baseStats)},
+    is_gmax: ${falseIfUndef(form.isGMax)},
+    is_battle_only: ${falseIfUndef(form.isBattleOnly)},
+    is_cosmetic: ${falseIfUndef(form.cosmeticForm)},
+    types: (PkmType::${form.types[0]}, ${optionalToRust(form.types[1], pkmTypeToRust)}),
+    gender_ratio: GenderRatio::${form.genderRatio},
+    base_stats: ${statsToRust(form.baseStats)},
     abilities: (
-      unsafe { AbilityIndex::new_unchecked(${forme.ability1}) },
-      unsafe { AbilityIndex::new_unchecked(${forme.ability2 ?? forme.ability1}) },
+      unsafe { AbilityIndex::new_unchecked(${form.ability1}) },
+      unsafe { AbilityIndex::new_unchecked(${form.ability2 ?? form.ability1}) },
     ),
-    hidden_ability: ${optionalToRust(forme.abilityH, (val: number) => `unsafe { AbilityIndex::new_unchecked(${val}) }`)},
-    base_height: ${forme.height},
-    base_weight: ${forme.weight},
-    evolutions: ${evolutionsToRust(forme.evos)},
-    pre_evolution: ${optionalToRust(forme.prevo, speciesAndFormeToRust)},
-    egg_groups: (${eggGroupToRust(forme.eggGroups[0])}, ${optionalToRust(forme.eggGroups[1], eggGroupToRust)}),
-    introduced: Generation::G${forme.gen},
-    is_restricted_legend: ${falseIfUndef(forme.restrictedLegendary)},
-    is_sub_legend: ${falseIfUndef(forme.subLegendary)},
-    is_mythical: ${falseIfUndef(forme.mythical)},
-    is_ultra_beast: ${falseIfUndef(forme.ultraBeast)},
-    is_paradox: ${falseIfUndef(forme.paradox)},
-    regional: ${optionalToRust(forme.regional, regionToRust)},
-    sprite: "${forme.sprite}",
-    sprite_index: (${forme.spriteIndex}),
+    hidden_ability: ${optionalToRust(form.abilityH, (val: number) => `unsafe { AbilityIndex::new_unchecked(${val}) }`)},
+    base_height: ${form.height},
+    base_weight: ${form.weight},
+    evolutions: ${evolutionsToRust(form.evos)},
+    pre_evolution: ${optionalToRust(form.prevo, SpeciesAndFormToRust)},
+    egg_groups: (${eggGroupToRust(form.eggGroups[0])}, ${optionalToRust(form.eggGroups[1], eggGroupToRust)}),
+    introduced: Generation::G${form.gen},
+    is_restricted_legend: ${falseIfUndef(form.restrictedLegendary)},
+    is_sub_legend: ${falseIfUndef(form.subLegendary)},
+    is_mythical: ${falseIfUndef(form.mythical)},
+    is_ultra_beast: ${falseIfUndef(form.ultraBeast)},
+    is_paradox: ${falseIfUndef(form.paradox)},
+    regional: ${optionalToRust(form.regional, regionToRust)},
+    sprite: "${form.sprite}",
+    sprite_index: (${form.spriteIndex}),
 }`
 }
 
@@ -199,16 +199,16 @@ function convertSpecies(species: Species): string {
     name: "${species.name}",
     national_dex: unsafe { NatDexIndex::new_unchecked(${species.nationalDex}) },
     level_up_type: ${levelUpTypeToRust(species.levelUpType)},
-    formes: &[${species.formes.map((forme) => convertForme(species.nationalDex, forme)).join(',')}]
+    forms: &[${species.forms.map((form) => convertForm(species.nationalDex, form)).join(',')}]
 }`
 }
 
-function rowToSpecies(row: SpeciesGetAllRow, forms: Forme[]): Species {
+function rowToSpecies(row: SpeciesGetAllRow, forms: Form[]): Species {
   return {
     name: row.name,
     nationalDex: row.nationalDex,
     levelUpType: row.levelUpType,
-    formes: forms,
+    forms: forms,
   }
 }
 
@@ -217,12 +217,12 @@ function rowToForm(
   evos: EvolutionsGetByPrevoRow[],
   prevo: EvolutionsGetByEvoRow | null,
   megas: MegaEvolutionGetByBaseFormRow[]
-): Forme {
+): Form {
   return {
     name: row.name,
-    formeName: row.displayName,
-    formeNumber: row.formIndex,
-    isBaseForme: row.isBaseForm === 1,
+    formName: row.displayName,
+    formNumber: row.formIndex,
+    isBaseForm: row.isBaseForm === 1,
     isMega: row.isMega === 1,
     megaEvolutionData: megas,
     isGMax: row.isGmax === 1,
@@ -261,13 +261,13 @@ function rowToForm(
     ultraBeast: row.isUltraBeast === 1,
     paradox: row.isParadox === 1,
     mythical: row.isMythical === 1,
-    cosmeticForme: false, // Placeholder
+    cosmeticForm: false, // Placeholder
     sprite: row.spriteName,
     spriteIndex: [row.spriteRow, row.spriteCol],
   }
 }
 
-async function getAllSpeciesAndFormes() {
+async function getAllSpeciesAndForms() {
   const db = new Database('generate/pkm.db')
 
   const speciesRows = camelcaseKeys(await speciesGetAll(db))
@@ -275,7 +275,7 @@ async function getAllSpeciesAndFormes() {
 
   for (const species of speciesRows) {
     const formeRows = camelcaseKeys(await formGetByNationalDex(db, species.nationalDex))
-    const speciesForms: Forme[] = []
+    const speciesForms: Form[] = []
     for (const formeRow of formeRows) {
       const evolutions = camelcaseKeys(
         await evolutionsGetByPrevo(db, {
@@ -305,12 +305,12 @@ async function getAllSpeciesAndFormes() {
 }
 
 async function main() {
-  const allSpecies: Species[] = await getAllSpeciesAndFormes()
+  const allSpecies: Species[] = await getAllSpeciesAndForms()
 
   let output = `
 use crate::abilities::AbilityIndex;
 use crate::species::{
-    EggGroup, FormeMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, NatDexIndex, SpeciesAndForme,
+    EggGroup, FormMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, NatDexIndex, SpeciesAndForm,
     SpeciesMetadata,
 };
 use pkm_rs_types::{Generation, PkmType, GameSetting, Stats16Le};

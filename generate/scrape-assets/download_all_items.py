@@ -267,5 +267,5 @@ def download_png(url, directory, filename, overwrite=False):
 # scrape_bulbapedia_gen_8()
 # scrape_bulbapedia_gen_3()
 scrape_bulbapedia_mega_stones()
-# print(POKEMON_DATA["19"]["formes"][1])
-# print(exclude_forme_gen8(19, POKEMON_DATA["19"]["formes"][1]))
+# print(POKEMON_DATA["19"]["forms"][1])
+# print(exclude_forme_gen8(19, POKEMON_DATA["19"]["forms"][1]))

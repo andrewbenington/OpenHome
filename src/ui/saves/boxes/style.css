@@ -40,9 +40,13 @@
 }
 
 .box-card {
-  padding: 6px 2px 2px;
+  padding: 0;
   display: flex;
   flex-direction: column;
+
+  .rt-Separator {
+    margin-bottom: 0.25rem;
+  }
 }
 
 .box-card-disabled {
@@ -99,8 +103,10 @@
   display: flex;
   flex-direction: row;
   position: relative;
-  margin: 1px;
   align-items: center;
+  width: 100%;
+  margin: 0;
+  inset: 1px;
 }
 
 .save-header svg {
@@ -110,11 +116,27 @@
 
 .save-header-game {
   font-weight: bold;
-  border-radius: 4px 0px 0px 4px;
   display: flex;
   flex-direction: row;
   gap: 4px;
   padding: 4px 14px 4px 4px;
+  border-top-left-radius: 4px;
+}
+
+.save-menu-buttons-right {
+  margin-right: 6px;
+}
+
+.save-details-modal {
+  display: flex;
+  flex-direction: column;
+  min-width: 800px;
+  width: 80%;
+  max-height: fit-content;
+  height: 95%;
+  overflow: hidden;
+  gap: 1px;
+  padding: 0;
 }
 
 .home-box-delete-button {

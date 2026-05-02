@@ -1,5 +1,5 @@
 import { R } from '@openhome-core/util/functional'
-import { SpeciesLookup } from '@pkm-rs/pkg'
+import { Language, Lookup } from '@pkm-rs/pkg'
 import { fail } from 'assert'
 import fs from 'fs'
 import path from 'path'
@@ -36,7 +36,7 @@ describe('G3SAV - Gen 3 Save File Read Test', async () => {
   })
 
   test('should print the first Pokémon in the first box', () => {
-    const firstPokemon = emeraldSaveFile.boxes[0].boxSlots[0]
+    const firstPokemon = emeraldSaveFile.getMonAt(0, 0)
 
     if (firstPokemon) {
       // display_mon(firstPokemon)
@@ -48,12 +48,12 @@ describe('G3SAV - Gen 3 Save File Read Test', async () => {
       expect(firstPokemon.moves[1]).toBe(45) // Growl
       expect(firstPokemon.dexNum).toBe(1)
       expect(firstPokemon.exp).toBe(135)
-      expect(SpeciesLookup(firstPokemon.dexNum)?.name).toBe('Bulbasaur')
+      expect(Lookup.speciesName(firstPokemon.dexNum, Language.English)).toBe('Bulbasaur')
     } else {
       fail('No Pokémon found in the first box, first slot.')
     }
 
-    const secondPokemon = emeraldSaveFile.boxes[1].boxSlots[1]
+    const secondPokemon = emeraldSaveFile.getMonAt(1, 1)
 
     if (secondPokemon) {
       expect(secondPokemon.nickname).toBe('NIDORAN♂')

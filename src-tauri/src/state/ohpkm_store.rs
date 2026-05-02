@@ -1,8 +1,8 @@
+use crate::data_controller::{DataController, DataDir};
 use crate::error::{Error, Result};
-use crate::storage;
 use crate::{state::synced_state, util};
 use base64::prelude::*;
-use pkm_rs::pkm::ohpkm::OhpkmV2;
+use pkm_rs::ohpkm::OhpkmV2;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use std::{collections::HashMap, fs};
@@ -50,12 +50,7 @@ impl OhpkmBytesStore {
                         "Fixed errors Ohpkm {} with id {identifier}",
                         mon.get_nickname()
                     );
-                    match mon.to_bytes() {
-                        Ok(new_bytes) => *bytes = new_bytes,
-                        Err(err) => println!(
-                            "Failed to reserialize fixed Ohpkm with id {identifier}: {err}"
-                        ),
-                    };
+                    *bytes = mon.to_bytes();
                 }
             }
         }
@@ -78,13 +73,13 @@ impl OhpkmBytesStore {
         }
     }
 
-    pub fn load_from_mons_v2(app_handle: &tauri::AppHandle) -> Result<Self> {
-        let mons_v2_dir = storage::get_path(app_handle, "mons_v2")?;
+    pub fn load_from_mons_v2(data_controller: &impl DataController) -> Result<Self> {
+        let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, "mons_v2")?;
         Self::load_from_directory(&mons_v2_dir)
     }
 
-    pub fn write_to_mons_v2(&self, app_handle: &tauri::AppHandle) -> Result<()> {
-        let mons_v2_dir = storage::get_path(app_handle, "mons_v2")?;
+    pub fn write_to_mons_v2(&self, data_controller: &impl DataController) -> Result<()> {
+        let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, "mons_v2")?;
         Self::write_to_directory(self, &mons_v2_dir)
     }
 

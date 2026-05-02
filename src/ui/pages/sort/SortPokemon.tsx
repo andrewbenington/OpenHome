@@ -42,14 +42,11 @@ export default function SortPokemon() {
   const allMonsWithColors: MonWithColors[] = useMemo(() => {
     return savesAndBanks.allOpenSaves
       .flatMap((save) =>
-        save.boxes
-          .flatMap((box) => box.boxSlots)
-          .filter(filterUndefined)
-          .map((mon) => ({
-            mon: ohpkmStore.monOrOhpkmIfTracked(mon),
-            color: OriginGames.color(save.origin),
-            isHome: false,
-          }))
+        save.getAllMons().map((mon) => ({
+          mon: ohpkmStore.monOrOhpkmIfTracked(mon),
+          color: OriginGames.color(save.origin),
+          isHome: false,
+        }))
       )
       .concat(
         savesAndBanks
@@ -96,7 +93,7 @@ export default function SortPokemon() {
   // Saves that can accept at least one of the selected mons
   const validDestSaves = useMemo(() => {
     return savesAndBanks.allOpenSaves.filter((save) =>
-      selectedHomeMons.some((item) => save.supportsMon(item.mon.dexNum, item.mon.formeNum))
+      selectedHomeMons.some((item) => save.supportsMon(item.mon.dexNum, item.mon.formNum))
     )
   }, [savesAndBanks.allOpenSaves, selectedHomeMons])
 
@@ -106,7 +103,7 @@ export default function SortPokemon() {
 
       for (const item of selectedHomeMons) {
         const mon = item.mon
-        if (!targetSave.supportsMon(mon.dexNum, mon.formeNum)) {
+        if (!targetSave.supportsMon(mon.dexNum, mon.formNum)) {
           currentFailures.push(`${mon.nickname || 'Pokémon'}: Not supported by target save`)
           continue
         }
@@ -129,11 +126,11 @@ export default function SortPokemon() {
         // Find first empty slot in target save
         let destBox = -1
         let destSlot = -1
-        outer: for (let b = 0; b < targetSave.boxes.length; b++) {
-          for (let s = 0; s < targetSave.boxes[b].boxSlots.length; s++) {
-            if (!targetSave.boxes[b].boxSlots[s]) {
-              destBox = b
-              destSlot = s
+        outer: for (let boxIndex = 0; boxIndex < targetSave.getBoxCount(); boxIndex++) {
+          for (let slot = 0; slot < targetSave.boxSlotCount; slot++) {
+            if (!targetSave.getMonAt(boxIndex, slot)) {
+              destBox = boxIndex
+              destSlot = slot
               break outer
             }
           }
@@ -196,7 +193,7 @@ export default function SortPokemon() {
           >
             <PokemonIcon
               dexNumber={monWithSave.mon.dexNum}
-              formeNumber={monWithSave.mon.formeNum}
+              formeNumber={monWithSave.mon.formNum}
               isEgg={monWithSave.mon.isEgg}
               isShiny={monWithSave.mon.isShiny()}
               style={{ width: 30, height: 30 }}

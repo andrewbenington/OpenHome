@@ -1,24 +1,19 @@
-use pkm_rs::pkm::ohpkm::{OhpkmV1, OhpkmV2};
+use pkm_rs::ohpkm::{OhpkmV2, v1::OhpkmV1};
 use semver::Version;
 use serde::Serialize;
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
+use std::{fs, path::PathBuf};
 use strum::{self, EnumIter, IntoEnumIterator};
 
-use crate::deprecated;
+use crate::data_controller::{DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
 use crate::pkm_storage::{Bank, StoredBankData};
-use crate::storage::{self, MONS_V2_DIR};
 use crate::util;
+use crate::{data_controller::DataController, deprecated};
 
 const VERSION_FILE: &str = "version.txt";
 
 pub fn get_version_last_used(app_handle: &tauri::AppHandle) -> Result<Option<String>> {
-    let last_version_path = util::prepend_appdata_to_path(app_handle, VERSION_FILE)?;
-
-    match util::read_file_text(&last_version_path) {
+    match app_handle.read_file_text(DataDir::OpenHomeRoot, VERSION_FILE) {
         Ok(version) => Ok(Some(version.trim().to_owned())),
         Err(Error::FileMissing { .. }) => Ok(None),
         Err(e) => Err(e),
@@ -34,7 +29,7 @@ pub fn update_version_last_used(app_handle: &tauri::AppHandle) -> Result<()> {
         return Ok(());
     }
 
-    let last_version_path = util::prepend_appdata_to_path(app_handle, VERSION_FILE)?;
+    let last_version_path = app_handle.absolute_path(DataDir::OpenHomeRoot, VERSION_FILE)?;
 
     // Create OpenHome directory if it doesn't exist
     if let Some(parent) = last_version_path.parent() {
@@ -45,7 +40,13 @@ pub fn update_version_last_used(app_handle: &tauri::AppHandle) -> Result<()> {
         &last_version_path,
         app_handle.package_info().version.to_string(),
     )
-    .map_err(|err| Error::file_write(&last_version_path, err))
+    .map_err(|err| Error::file_write(&last_version_path, err))?;
+
+    util::create_directory(app_handle.get_config_folder()?)?;
+    let cfg_path = app_handle.get_data_folder()?.join(VERSION_FILE);
+
+    util::write_file_contents(&cfg_path, app_handle.package_info().version.to_string())
+        .map_err(|err| Error::file_write(&cfg_path, err))
 }
 
 pub fn handle_updates_get_features(
@@ -74,7 +75,6 @@ pub fn handle_updates_get_features(
     };
 
     let current_version = app_handle.package_info().version.clone();
-    // let current_version = Version::new(1, 5, 0);
 
     if current_version < last_used_semver && !ignore_version_error {
         return Err(Error::outdated_version(last_used_semver, current_version));
@@ -107,20 +107,14 @@ pub fn handle_updates_get_features(
 
             if let Some(update_features) = update.get_features() {
                 if let Some(prev) = &mut prev_o {
-                    if prev.version_matches(update.get_non_prerelease()) {
+                    if prev.version_matches(update.version()) {
                         prev.add_feature_messages(&update_features);
                     } else {
                         all_update_features.push(prev.clone());
-                        prev_o = Some(UpdateFeatures::new(
-                            update.get_non_prerelease(),
-                            update_features,
-                        ))
+                        prev_o = Some(UpdateFeatures::new(update.version(), update_features))
                     }
                 } else {
-                    prev_o = Some(UpdateFeatures::new(
-                        update.get_non_prerelease(),
-                        update_features,
-                    ));
+                    prev_o = Some(UpdateFeatures::new(update.version(), update_features));
                 }
             }
         }
@@ -136,9 +130,9 @@ pub fn handle_updates_get_features(
 fn appdata_dir_exists(app_handle: &tauri::AppHandle) -> Result<bool> {
     tauri::Manager::path(app_handle)
         .app_data_dir()
-        .map_err(Error::appdata)?
+        .map_err(Error::data_folder)?
         .try_exists()
-        .map_err(Error::appdata)
+        .map_err(Error::data_folder)
 }
 
 #[derive(EnumIter, Clone, Copy, strum::Display, Debug, PartialEq, Eq, Hash, Serialize)]
@@ -156,6 +150,7 @@ pub enum SignificantUpdate {
     V1_10_2,
     V1_10_3,
     V1_10_5,
+    V1_11_0,
 }
 
 impl SignificantUpdate {
@@ -176,6 +171,7 @@ impl SignificantUpdate {
             Self::V1_10_2 => Version::parse("1.10.2").unwrap(),
             Self::V1_10_3 => Version::parse("1.10.3").unwrap(),
             Self::V1_10_5 => Version::parse("1.10.5").unwrap(),
+            Self::V1_11_0 => Version::parse("1.11.0").unwrap(),
         }
     }
 
@@ -236,14 +232,16 @@ impl SignificantUpdate {
                 "A bug causing Bad Eggs to appear in empty box slots in Gen 4 has been fixed.",
                 "Hisui Poké balls are now converted to regular Poké balls when moving into Radical Red or Unbound. These games do not support Hisui balls and glitched/crashed when trying to display them.",
             ]),
+            Self::V1_11_0 => Some(vec![
+                "The data folder location can now be changed under Settings.",
+                "The UI tabs have been moved to the left side of the window for a cleaner look.",
+                "Fixed bug removing Alpha status when transferring to Legends Z-A.",
+                "Fixed bug causing bad eggs to appear in empty slots in Gen 7 save files.",
+                "The nickname flag should be set correctly for all Pokémon regardless of language.",
+                "Sword/Shield boxes 31-32 are now visible.",
+            ]),
             _ => None,
         }
-    }
-
-    pub fn get_non_prerelease(&self) -> Version {
-        let version = self.version();
-
-        Version::new(version.major, version.minor, version.patch)
     }
 }
 
@@ -280,10 +278,12 @@ pub fn get_significant_updates(
 }
 
 pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
-    let Some(old_boxes_r) = storage::read_file_json_if_exists::<_, Vec<deprecated::BoxPreV1_5_0>>(
-        app_handle,
-        deprecated::BOXDATA_FILE,
-    ) else {
+    let Some(old_boxes_r) = app_handle
+        .read_file_json_if_exists::<_, Vec<deprecated::BoxPreV1_5_0>>(
+            DataDir::Storage,
+            deprecated::BOXDATA_FILE,
+        )
+    else {
         // Skip migration logic if no box data file exists
         return Ok(());
     };
@@ -298,8 +298,8 @@ pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
         new_bank.add_box(old_box.upgrade());
     }
 
-    storage::write_file_json(
-        app_handle,
+    app_handle.write_file_json(
+        DataDir::Storage,
         "banks.json",
         StoredBankData::from_banks(vec![new_bank]),
     )
@@ -314,7 +314,7 @@ pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
             ))
         })?;
 
-        let v2_dir = storage::get_path(app_handle, MONS_V2_DIR)?;
+        let v2_dir = app_handle.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
         fs::create_dir_all(&v2_dir).map_err(|e| Error::FileWrite {
             path: v2_dir,
             source: Box::new(e),
@@ -322,11 +322,11 @@ pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
 
         let ohpkm_v2 = OhpkmV2::from_v1(ohpkm_v1);
         let bytes_v2 = ohpkm_v2.to_bytes();
-        if let Ok(bytes_v2) = bytes_v2
-            && let Some(filename) = PathBuf::from(&path).file_name()
-        {
-            let v2_path = Path::join(&storage::get_path(app_handle, MONS_V2_DIR)?, filename);
 
+        if let Some(filename) = PathBuf::from(&path).file_name() {
+            let v2_path = app_handle
+                .absolute_path(DataDir::Storage, MONS_V2_DIR)?
+                .join(filename);
             util::write_file_contents(v2_path, bytes_v2)?;
         }
     }
@@ -338,13 +338,13 @@ const MONS_DIR_OLD: &str = "mons";
 const MONS_V1_DIR: &str = "mons_v1";
 
 pub fn handle_old_mons_directories_for_ohpkm_v2(app_handle: &tauri::AppHandle) -> Result<()> {
-    let old_mons_dir = storage::get_path(app_handle, MONS_DIR_OLD)?;
+    let old_mons_dir = app_handle.absolute_path(DataDir::Storage, MONS_DIR_OLD)?;
 
     if !fs::exists(&old_mons_dir).map_err(|e| Error::file_access(&old_mons_dir, e))? {
         return Ok(());
     }
 
-    let v1_dir = storage::get_path(app_handle, MONS_V1_DIR)?;
+    let v1_dir = app_handle.absolute_path(DataDir::Storage, MONS_V1_DIR)?;
 
     if fs::exists(&v1_dir).map_err(|e| Error::file_access(&v1_dir, e))? {
         fs::remove_dir_all(&v1_dir).map_err(|e| Error::file_access(&v1_dir, e))?;

@@ -3,8 +3,13 @@ use serde::Serialize;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum Ball {
     None,
@@ -96,6 +101,12 @@ impl From<u8> for Ball {
     }
 }
 
+impl From<arbitrary_int::u4> for Ball {
+    fn from(value: arbitrary_int::u4) -> Self {
+        Ball::from(value.value())
+    }
+}
+
 impl Ball {
     pub fn poke_if_newer_than(self, other: Ball) -> Ball {
         if self > other { Ball::Poke } else { self }
@@ -108,43 +119,53 @@ impl Ball {
     pub const fn name(&self) -> &'static str {
         match self {
             Ball::None => "None",
-            Ball::Master => "Master Ball",
-            Ball::Ultra => "Ultra Ball",
-            Ball::Great => "Great Ball",
-            Ball::Poke => "Poké Ball",
-            Ball::Safari => "Safari Ball",
-            Ball::Net => "Net Ball",
-            Ball::Dive => "Dive Ball",
-            Ball::Nest => "Nest Ball",
-            Ball::Repeat => "Repeat Ball",
-            Ball::Timer => "Timer Ball",
-            Ball::Luxury => "Luxury Ball",
-            Ball::Premier => "Premier Ball",
-            Ball::Dusk => "Dusk Ball",
-            Ball::Heal => "Heal Ball",
-            Ball::Quick => "Quick Ball",
-            Ball::Cherish => "Cherish Ball",
-            Ball::Fast => "Fast Ball",
-            Ball::Level => "Level Ball",
-            Ball::Lure => "Lure Ball",
-            Ball::Heavy => "Heavy Ball",
-            Ball::Love => "Love Ball",
-            Ball::Friend => "Friend Ball",
-            Ball::Moon => "Moon Ball",
-            Ball::Sport => "Sport Ball",
-            Ball::Dream => "Dream Ball",
-            Ball::Beast => "Beast Ball",
-            Ball::Strange => "Strange Ball",
-            Ball::PokeLegendsArceus => "Poké Ball (Hisui)",
-            Ball::GreatLegendsArceus => "Great Ball (Hisui)",
-            Ball::UltraLegendsArceus => "Ultra Ball (Hisui)",
-            Ball::Feather => "Feather Ball",
-            Ball::Wing => "Wing Ball",
-            Ball::Jet => "Jet Ball",
-            Ball::HeavyLegendsArceus => "Heavy Ball (Hisui)",
-            Ball::Leaden => "Leaden Ball",
-            Ball::Gigaton => "Gigaton Ball",
-            Ball::Origin => "Origin Ball",
+            Ball::Master => "Master",
+            Ball::Ultra => "Ultra",
+            Ball::Great => "Great",
+            Ball::Poke => "Poké",
+            Ball::Safari => "Safari",
+            Ball::Net => "Net",
+            Ball::Dive => "Dive",
+            Ball::Nest => "Nest",
+            Ball::Repeat => "Repeat",
+            Ball::Timer => "Timer",
+            Ball::Luxury => "Luxury",
+            Ball::Premier => "Premier",
+            Ball::Dusk => "Dusk",
+            Ball::Heal => "Heal",
+            Ball::Quick => "Quick",
+            Ball::Cherish => "Cherish",
+            Ball::Fast => "Fast",
+            Ball::Level => "Level",
+            Ball::Lure => "Lure",
+            Ball::Heavy => "Heavy",
+            Ball::Love => "Love",
+            Ball::Friend => "Friend",
+            Ball::Moon => "Moon",
+            Ball::Sport => "Sport",
+            Ball::Dream => "Dream",
+            Ball::Beast => "Beast",
+            Ball::Strange => "Strange",
+            Ball::PokeLegendsArceus => "Poké (Hisui)",
+            Ball::GreatLegendsArceus => "Great (Hisui)",
+            Ball::UltraLegendsArceus => "Ultra (Hisui)",
+            Ball::Feather => "Feather",
+            Ball::Wing => "Wing",
+            Ball::Jet => "Jet",
+            Ball::HeavyLegendsArceus => "Heavy (Hisui)",
+            Ball::Leaden => "Leaden",
+            Ball::Gigaton => "Gigaton",
+            Ball::Origin => "Origin",
+        }
+    }
+
+    pub fn get_name_full(&self) -> String {
+        match self {
+            Ball::PokeLegendsArceus => "Poké Ball (Hisui)".to_owned(),
+            Ball::GreatLegendsArceus => "Great Ball (Hisui)".to_owned(),
+            Ball::UltraLegendsArceus => "Ultra Ball (Hisui)".to_owned(),
+            Ball::HeavyLegendsArceus => "Heavy Ball (Hisui)".to_owned(),
+            _ => format!("{} Ball", self.name()),
         }
     }
 
@@ -153,6 +174,22 @@ impl Ball {
             index: *self as u8,
             name: self.name().to_owned(),
         }
+    }
+}
+
+impl Serialize for Ball {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        self.name().serialize(serializer)
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for Ball {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        Ball::from(rng.random_range(0..BALL_COUNT) as u8)
     }
 }
 

@@ -5,7 +5,7 @@ import {
   LGP_STARTER,
   MAROWAK_ALOLA_TOTEM,
   SPIKY_EAR,
-} from '@pokemon-resources/consts/Formes'
+} from '@pokemon-resources/consts/Forms'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 
 interface FormRestrictions {
@@ -153,7 +153,7 @@ export const RegionalForms: FormRestrictions = {
 export const isRestricted = (
   restrictions: TransferRestrictions,
   dexNum: number,
-  formeNum?: number
+  formNum?: number
 ) => {
   const { maxDexNum, transferableDexNums, excludedForms } = restrictions
 
@@ -163,7 +163,7 @@ export const isRestricted = (
   if (transferableDexNums && !transferableDexNums.includes(dexNum)) {
     return true
   }
-  if (excludedForms && excludedForms[dexNum] && excludedForms[dexNum]?.includes(formeNum ?? 0)) {
+  if (excludedForms && excludedForms[dexNum] && excludedForms[dexNum]?.includes(formNum ?? 0)) {
     return true
   }
   return false

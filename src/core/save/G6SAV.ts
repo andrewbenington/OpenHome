@@ -7,6 +7,7 @@ import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConve
 import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK6 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
+import { Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
 
@@ -131,8 +132,16 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
     return CRC16_CCITT(this.bytes, this.getPcOffset(), this.pcDataSize)
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK6>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
   }
 
   get language(): Language {

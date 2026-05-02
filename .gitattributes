@@ -3,12 +3,10 @@
 # Merge strategies for specific files
 # This helps Git handle conflicts more intelligently
 
-# For package.json and lock files, prefer npm/pnpm to resolve after manual merge
-package.json merge=union
-pnpm-lock.yaml merge=union
-
-# For Cargo.toml, use union strategy to combine dependencies
-src-tauri/Cargo.toml merge=union
+# always regenerate, never merge
+package-lock.json merge=ours
+yarn.lock merge=ours
+Cargo.lock merge=ours
 
 # Line ending normalization
 * text=auto

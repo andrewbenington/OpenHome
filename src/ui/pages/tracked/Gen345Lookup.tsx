@@ -1,16 +1,10 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
-import {
-  gameOrPluginSorter,
-  multiSorter,
-  numericSorter,
-  SortableColumn,
-  stringSorter,
-} from '@openhome-core/util/sort'
+import { gameOrPluginSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
 import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { MetadataSummaryLookup, OriginGames } from '@pkm-rs/pkg'
+import { OriginGames } from '@pkm-rs/pkg'
 import SortableDataGrid from 'src/ui/components/SortableDataGrid'
 import { useLookups } from 'src/ui/state/lookups/useLookups'
 
@@ -41,35 +35,12 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
           >
             <PokemonIcon
               dexNumber={value.homeMon.dexNum}
-              formeNumber={value.homeMon.formeNum}
+              formeNumber={value.homeMon.formNum}
               style={{ width: 30, height: 30 }}
             />
           </button>
         ),
       cellClass: 'centered-cell',
-    },
-    {
-      key: 'game',
-      name: 'Original Game',
-      width: '10rem',
-      renderValue: (value) => (
-        <div className="flex-row-centered">
-          <OriginGameIndicator
-            originGame={value.homeMon?.gameOfOrigin}
-            plugin={value.homeMon?.pluginOrigin as PluginIdentifier}
-            withName
-          />
-        </div>
-      ),
-      cellClass: 'centered-cell',
-      sortFunction: multiSorter(
-        numericSorter((value) => value.homeMon?.dexNum),
-        numericSorter((value) => value.homeMon?.formeNum)
-      ),
-      getFilterValue: (value) =>
-        (value.homeMon &&
-          MetadataSummaryLookup(value.homeMon.dexNum, value.homeMon.formeNum)?.speciesName) ||
-        'Unknown',
     },
     {
       key: 'game',

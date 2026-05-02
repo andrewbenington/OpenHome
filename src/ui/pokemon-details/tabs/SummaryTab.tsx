@@ -10,9 +10,11 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { colorIsDark, SHADOW_TYPE_COLOR } from '@openhome-ui/util/color'
 import {
+  AbilityNumber,
   extraFormDisplayName,
   genderFromBool,
   getPluginColor,
+  Languages,
   MetadataSummaryLookup,
   OriginGames,
 } from '@pkm-rs/pkg'
@@ -41,7 +43,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
   }, [mon])
   const spriteResult = useMonSprite({
     dexNum: mon.dexNum,
-    formeNum: mon.formeNum,
+    formNum: mon.formNum,
     formArgument: mon.formArgument,
     isShiny: mon.isShiny(),
     isFemale: mon.gender === 1,
@@ -50,7 +52,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
   })
 
   const itemAltText = useMemo(() => {
-    const monData = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
+    const monData = MetadataSummaryLookup(mon.dexNum, mon.formNum)
 
     if (!monData) return 'pokemon sprite'
     return `${monData.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
@@ -73,7 +75,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           ) : (
             <PokemonIcon
               dexNumber={mon.dexNum}
-              formeNumber={mon.formeNum}
+              formeNumber={mon.formNum}
               style={{
                 width: '60%',
                 height: '90%',
@@ -107,7 +109,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           )}
           <div style={{ fontWeight: 'bold' }}>{mon.nickname}</div>
           <Badge variant="solid" color="gray" ml="2" size="1">
-            {mon.languageString}
+            {Languages.stringFromByte(mon.language)}
           </Badge>
         </div>
         <AttributeRow label="Item" justifyEnd>
@@ -194,7 +196,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
                 {extraFormDisplayName(mon.extraFormIndex)}
               </span>
             ) : (
-              MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.formeName
+              MetadataSummaryLookup(mon.dexNum, mon.formNum)?.formeName
             )}
             <GenderIcon gender={mon.gender} />
           </Flex>
@@ -217,7 +219,9 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
             {mon.ability.name} ({mon.abilityNum === 4 ? 'HA' : mon.abilityNum})
             {mon instanceof OHPKM &&
               mon.abilityWasChanged() &&
-              !mon.metadata?.abilityByNum(1).equals(mon.metadata?.abilityByNum(2)) && (
+              !mon.metadata
+                ?.abilityByNum(AbilityNumber.First)
+                .equals(mon.metadata?.abilityByNum(AbilityNumber.Second)) && (
                 <Button
                   size="1"
                   radius="full"

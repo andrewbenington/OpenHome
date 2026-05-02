@@ -1,4 +1,5 @@
 mod commands;
+mod data_controller;
 mod deprecated;
 mod error;
 mod menu;
@@ -6,8 +7,8 @@ mod pkm_storage;
 mod plugin;
 mod saves;
 mod startup;
+mod startup_config;
 mod state;
-mod storage;
 mod util;
 mod versioning;
 
@@ -19,8 +20,25 @@ use crate::{error::Error, state::synced_state::AllSyncedState};
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
+            let startup_config_state =
+                match startup_config::StartupConfigState::load_or_create(app.handle()) {
+                    Ok(state) => state,
+                    Err(err) => {
+                        util::show_error_dialog(
+                            app,
+                            err.to_string(),
+                            "OpenHome Failed to Launch - Startup Config Error",
+                        );
+
+                        app.handle().exit(1);
+                        std::process::exit(1);
+                    }
+                };
+            app.manage(startup_config_state);
+
             let update_features_r = startup::run_app_startup(app);
             let Ok(update_features) = update_features_r else {
                 let launch_error = update_features_r.unwrap_err();
@@ -141,6 +159,8 @@ pub fn run() {
             commands::handle_windows_accellerator,
             commands::open_directory,
             commands::open_file_location,
+            startup_config::get_data_dir_path,
+            startup_config::change_data_dir,
             pkm_storage::load_banks,
             pkm_storage::write_banks,
             state::get_lookups,

@@ -59,7 +59,11 @@ export const get8BitChecksum = (bytes: Uint8Array, start: number, end: number) =
   return checksum
 }
 
-export const get16BitChecksumLittleEndian = (bytes: ArrayBuffer, start: number, end: number) => {
+export const get16BitChecksumLittleEndian = (
+  bytes: ArrayBufferLike,
+  start: number,
+  end: number
+) => {
   let checksum = 0
 
   for (let i = start; i < end; i += 2) {

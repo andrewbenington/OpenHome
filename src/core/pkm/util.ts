@@ -1,14 +1,15 @@
 import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   AbilityIndex,
+  AbilityNumber,
   currentMetadataReader,
   extraFormTypeOverride,
-  FormeMetadata,
+  FormMetadata,
   metadataReaderFor,
   MetadataSource,
   MetadataSummaryLookup,
   PkmType,
-  SpeciesAndForme,
+  SpeciesAndForm,
 } from '@pkm-rs/pkg'
 import { FourMoves, Stats, StatsPreSplit } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
@@ -27,10 +28,10 @@ import Prando from 'prando'
 
 export const getAbilityFromNumber = (
   dexNum: number,
-  formeNum: number,
-  abilityNum: number
+  formNum: number,
+  abilityNum: AbilityNumber
 ): AbilityIndex | undefined => {
-  return MetadataSummaryLookup(dexNum, formeNum)?.abilityByNum(abilityNum)
+  return MetadataSummaryLookup(dexNum, formNum)?.abilityByNum(abilityNum)
 }
 
 export const ivsFromDVs = (dvs: StatsPreSplit) => {
@@ -115,14 +116,14 @@ export const generatePersonalityValue = () => {
   return Math.floor(Math.random() * 2 ** 32)
 }
 
-// recursively returns pre-evolution. if provided a mega forme, returns the first pre-evolution
-// of the base forme.
-export const getBaseMon = (dexNum: number, forme?: number) => {
-  let mon = SpeciesAndForme.tryNew(dexNum, forme ?? 0)
+// recursively returns pre-evolution. if provided a mega form, returns the first pre-evolution
+// of the base form.
+export const getBaseMon = (dexNum: number, form?: number) => {
+  let mon = SpeciesAndForm.tryNew(dexNum, form ?? 0)
   let metadata = mon?.getMetadata()
 
   if (metadata?.isMega) {
-    metadata = metadata?.getMegaBaseForme() ?? metadata
+    metadata = metadata?.getMegaBaseForm() ?? metadata
   }
 
   while (metadata?.preEvolution) {
@@ -133,11 +134,11 @@ export const getBaseMon = (dexNum: number, forme?: number) => {
   return mon
 }
 
-export const getPrevos = (dexNum: number, forme?: number) => {
-  let mon = SpeciesAndForme.tryNew(dexNum, forme ?? 0)
+export const getPrevos = (dexNum: number, formIndex?: number) => {
+  let mon = SpeciesAndForm.tryNew(dexNum, formIndex ?? 0)
   let metadata = mon?.getMetadata()
 
-  const prevos: FormeMetadata[] = []
+  const prevos: FormMetadata[] = []
 
   while (metadata?.preEvolution) {
     mon = metadata.preEvolution
@@ -158,8 +159,8 @@ export const getTypes = (mon: PKMInterface): PkmType[] => {
 
   const metadataReader =
     mon.format === 'OHPKM'
-      ? currentMetadataReader(mon.dexNum, mon.formeNum)
-      : metadataReaderFor(MetadataSourceByFormat(mon.format), mon.dexNum, mon.formeNum)
+      ? currentMetadataReader(mon.dexNum, mon.formNum)
+      : metadataReaderFor(MetadataSourceByFormat(mon.format), mon.dexNum, mon.formNum)
 
   if (!metadataReader) {
     return ['Normal']

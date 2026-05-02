@@ -1,7 +1,7 @@
 import {
   AbilityIndex,
   ExtraFormIndex,
-  FormeMetadata,
+  FormMetadata,
   Gender,
   Language,
   NatureIndex,
@@ -53,7 +53,7 @@ export interface AllPKMFields {
   fieldEventFatigue2?: number
   flag2LA?: boolean
   formArgument?: number
-  formeNum: number
+  formNum: number
   fullness?: number
   gameOfOrigin: number
   gameOfOriginBattle?: number
@@ -163,14 +163,13 @@ export interface AllPKMFields {
   weightAbsolute?: number
   weightDeviation?: number
   heldItemName: string
-  languageString: string
   getLevel: () => number
   calculateChecksum?: () => number
   refreshChecksum?: () => void
   isShiny: () => boolean
   isSquareShiny: () => boolean
 
-  metadata?: FormeMetadata
+  metadata?: FormMetadata
 
   originalBytes?: ArrayBuffer
 

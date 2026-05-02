@@ -1,5 +1,6 @@
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
 import {
+  AbilityNumber,
   Ball,
   ConvertStrategy,
   ExtraFormIndex,
@@ -89,7 +90,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   markings: MarkingsFourShapes
   internalSpeciesIndex: number
   dexNum: number
-  formeNum: number
+  formNum: number
   extraFormIndex: Option<ExtraFormIndex>
   internalHeldItemIndex: number
   abstract heldItemIndex: number
@@ -162,10 +163,10 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
       if (speciesData.nationalDex < 0) {
         this.dexNum = 0
-        this.formeNum = 0
+        this.formNum = 0
       } else {
         this.dexNum = speciesData.nationalDex
-        this.formeNum = speciesData.formIndex
+        this.formNum = speciesData.formIndex
       }
 
       this.isFakemon = this.indexIsFakemon(this.internalSpeciesIndex)
@@ -245,7 +246,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.language = other.language
       this.markings = markingsFourShapesFromOther(other.markings)
       this.dexNum = other.dexNum
-      this.formeNum = other.formeNum
+      this.formNum = other.formNum
       this.extraFormIndex = other.extraFormIndex
       this.internalHeldItemIndex = this.internalItemIndexFromModern(other.heldItemIndex)
       this.exp = other.exp
@@ -277,7 +278,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
         this.internalMetLocationIndex = FIRERED_IN_GAME_TRADE
       }
 
-      this.internalSpeciesIndex = this.monToGameIndex(other.dexNum, other.formeNum)
+      this.internalSpeciesIndex = this.monToGameIndex(other.dexNum, other.formNum)
 
       if (other.pluginOrigin === this.getPluginIdentifier()) {
         this.pluginOrigin = other.pluginOrigin
@@ -360,7 +361,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     if (this.pluginForm) {
       dataView.setUint16(0x1c, this.pluginForm, true)
     } else {
-      dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, this.formeNum), true)
+      dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, this.formNum), true)
     }
 
     // 30:32 Held Item
@@ -425,10 +426,6 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     return this.metadata?.genderFromPid(this.personalityValue)
   }
 
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
-  }
-
   public get heldItemName() {
     return this.itemToString(this.internalHeldItemIndex)
   }
@@ -438,7 +435,11 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get abilityNum() {
-    return this.hasHiddenAbility ? 4 : ((this.personalityValue >> 0) & 1) + 1
+    return this.hasHiddenAbility
+      ? AbilityNumber.Hidden
+      : this.personalityValue & 1
+        ? AbilityNumber.Second
+        : AbilityNumber.First
   }
 
   public get ability() {
@@ -473,7 +474,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {
@@ -486,10 +487,6 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
   static maxValidBall() {
     return Ball.Beast
-  }
-
-  static allowedBalls() {
-    return []
   }
 
   getPluginIdentifier(): PluginIdentifier {

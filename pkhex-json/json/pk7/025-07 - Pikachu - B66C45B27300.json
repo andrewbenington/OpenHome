@@ -1,0 +1,164 @@
+{
+  "encryption_constant": 1169322752,
+  "sanity": 0,
+  "checksum": 46700,
+  "species_and_form": {
+    "national_dex": 25,
+    "form_index": 7
+  },
+  "held_item_index": 571,
+  "trainer_id": 18075,
+  "secret_id": 31115,
+  "exp": 9261,
+  "ability_index": "Static",
+  "ability_num": "First",
+  "markings": {
+    "circle": "Unset",
+    "square": "Unset",
+    "triangle": "Unset",
+    "heart": "Unset",
+    "star": "Unset",
+    "diamond": "Unset"
+  },
+  "personality_value": 565550533,
+  "nature": "Hardy",
+  "is_fateful_encounter": true,
+  "gender": "Male",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "resort_event_status": 0,
+  "pokerus_byte": 0,
+  "super_training_flags": 0,
+  "ribbons": ["Wishing Ribbon"],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "super_training_dist_flags": 0,
+  "form_argument": 0,
+  "nickname": "Pikachu",
+  "moves": [
+    {
+      "move_index": "Thunderbolt",
+      "pp": 15,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Quick Attack",
+      "pp": 30,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Thunder",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Iron Tail",
+      "pp": 15,
+      "pp_ups": 0
+    }
+  ],
+  "relearn_moves": ["Thunderbolt", "Quick Attack", "Thunder", "Iron Tail"],
+  "secret_super_training_unlocked": false,
+  "secret_super_training_complete": false,
+  "ivs": {
+    "hp": 1,
+    "atk": 0,
+    "def": 30,
+    "spa": 7,
+    "spd": 12,
+    "spe": 18
+  },
+  "is_egg": false,
+  "is_nicknamed": false,
+  "handler_name": "",
+  "handler_gender": "Male",
+  "is_current_handler": false,
+  "geolocations": [
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    },
+    {
+      "region": 0,
+      "country": 0
+    }
+  ],
+  "handler_friendship": 0,
+  "handler_affection": 0,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "text_variable": 0
+  },
+  "fullness": 0,
+  "enjoyment": 0,
+  "trainer_name": "Ash",
+  "trainer_friendship": 70,
+  "trainer_affection": 0,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "text_variable": 0
+  },
+  "egg_date": null,
+  "met_date": "11/17/2017",
+  "egg_location_index": 0,
+  "met_location_index": 40005,
+  "ball": "Pok\u00E9",
+  "met_level": 21,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": false,
+    "atk": false,
+    "def": false,
+    "spa": false,
+    "spd": false,
+    "spe": false
+  },
+  "game_of_origin": "Ultra Moon",
+  "country": 49,
+  "region": 49,
+  "console_region": 1,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 21,
+  "form_argument_remain": 0,
+  "form_argument_elapsed": 0,
+  "current_hp": 45,
+  "stats": {
+    "hp": 45,
+    "atk": 28,
+    "def": 28,
+    "spa": 27,
+    "spd": 28,
+    "spe": 46
+  }
+}

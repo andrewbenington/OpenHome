@@ -78,6 +78,11 @@ export const TauriBackend: BackendInterface = {
     )
   },
 
+  /* prompt user to select new data directory location */
+  promptChangeDataDir: Commands.change_data_dir,
+  /* get the current data directory path */
+  getDataDirPath: Commands.get_data_dir_path,
+
   /* write synced state to disk during save */
   saveSyncedState: Commands.save_synced_state,
 

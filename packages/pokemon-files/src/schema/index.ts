@@ -49,14 +49,13 @@ export type Schema = {
   pvAbilityBit?: number
   genderFromDVs?: boolean
   unownFromIVs?: boolean
-  noFormes?: boolean
+  noForms?: boolean
   detectPrefix?: boolean
   shinyFromDVs?: boolean
   shinyThreshold?: number
   maxValidMove: number
   maxRibbon?: string
   maxBall?: number
-  allowedBalls?: number[]
   defaultBall?: string
   checksumStart?: number
   checksumEnd?: number

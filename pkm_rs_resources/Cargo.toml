@@ -1,6 +1,6 @@
 [package]
 name = "pkm_rs_resources"
-version = "1.10.5"
+version = "1.11.0"
 edition = "2024"
 description = "Resource data and associated types for the pkm_rs crate"
 repository = "https://github.com/andrewbenington/OpenHome"
@@ -12,12 +12,14 @@ serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 num = "0.4.3"
 getrandom = { version = "0.4.2", features = ["wasm_js"] }
-wasm-bindgen = { version = "0.2.114", optional = true }
-js-sys = { version = "0.3.91", optional = true }
+wasm-bindgen = { version = "0.2.118", optional = true }
+js-sys = { version = "0.3.95", optional = true }
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
 static_assertions = "1.1.0"
 strum = "0.28.0"
 strum_macros = "0.28.0"
+rand = { version = "0.10.1", optional = true }
+arbitrary-int = "2.1.1"
 tsify = "0.5.6"
 
 [lib]
@@ -30,3 +32,4 @@ missing_const_for_fn = "warn"
 
 [features]
 wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen", "getrandom/wasm_js", "pkm_rs_types/wasm"]
+randomize = ["rand", "pkm_rs_types/randomize"]
