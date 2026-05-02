@@ -135,7 +135,7 @@ pub struct NatureStatData {
 }
 
 pub struct NatureMetadata {
-    name: &'static str,
+    pub name: &'static str,
     stats: Option<NatureStatData>,
 }
 

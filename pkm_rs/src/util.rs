@@ -49,6 +49,16 @@ pub fn six_digit_trainer_display(trainer_id: u16, secret_id: u16) -> String {
     format!("{:0>6}", full_id % 1_000_000)
 }
 
+pub fn unown_form_from_pid_gen3(pid: u32) -> u8 {
+    let mut letter_value = (pid >> 24) & 0x3;
+
+    letter_value = ((pid >> 16) & 0x3) | (letter_value << 2);
+    letter_value = ((pid >> 8) & 0x3) | (letter_value << 2);
+    letter_value = (pid & 0x3) | (letter_value << 2);
+
+    (letter_value % 28) as u8
+}
+
 mod test {
     #[cfg(feature = "wasm")]
     #[test]

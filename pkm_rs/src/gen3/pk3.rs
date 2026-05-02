@@ -13,6 +13,7 @@ use crate::strings::{Gen3NicknameString, Gen3TrainerString};
 use crate::tests::PkhexJson;
 use crate::traits::{AsBytesMut, ModernEvs};
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
+use crate::util::unown_form_from_pid_gen3;
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::items::{Item, ItemGen3};
@@ -545,13 +546,7 @@ pub fn form_index_from_pid(national_dex: NatDexIndex, pid: u32) -> u8 {
         return 0;
     }
 
-    let mut letter_value = (pid >> 24) & 0x3;
-
-    letter_value = ((pid >> 16) & 0x3) | (letter_value << 2);
-    letter_value = ((pid >> 8) & 0x3) | (letter_value << 2);
-    letter_value = (pid & 0x3) | (letter_value << 2);
-
-    (letter_value % 28) as u8
+    unown_form_from_pid_gen3(pid)
 }
 #[cfg(test)]
 impl PkhexJson for Pk3 {

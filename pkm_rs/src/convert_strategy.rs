@@ -2,6 +2,7 @@
 // pub mod wasm;
 
 mod converter;
+mod personality_value;
 
 mod option;
 
@@ -15,7 +16,10 @@ use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use crate::convert_strategy::option::{BoolOption, SettingType, StringOption};
+use crate::convert_strategy::{
+    option::{BoolOption, SettingType, StringOption},
+    personality_value::{NatureStrategy, ShinyStrategy},
+};
 pub use converter::PkmConverter;
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
@@ -51,6 +55,14 @@ pub enum ConvertOption {
     MetDataOriginAndLocation,
     #[serde(rename = "ivs.maxIfHyperTrained")]
     MaxIvIfHyperTrained,
+    #[serde(rename = "personalityValue.preserveShiny")]
+    PreservePidShiny,
+    #[serde(rename = "personalityValue.preserveGender")]
+    PreservePidGender,
+    #[serde(rename = "personalityValue.preserveNature")]
+    PreservePidNature,
+    #[serde(rename = "personalityValue.preserveUnownForm")]
+    PreservePidUnownForm,
 }
 
 impl Display for ConvertOption {
@@ -59,6 +71,10 @@ impl Display for ConvertOption {
             Self::NicknameCapitalization => "nickname.capitalization",
             Self::MetDataOriginAndLocation => "metData.originAndLocation",
             Self::MaxIvIfHyperTrained => "ivs.maxIfHyperTrained",
+            Self::PreservePidShiny => "personalityValue.preserveShiny",
+            Self::PreservePidGender => "personalityValue.preserveGender",
+            Self::PreservePidNature => "personalityValue.preserveNature",
+            Self::PreservePidUnownForm => "personalityValue.preserveUnownForm",
         };
         write!(f, "{}", s)
     }
@@ -83,6 +99,21 @@ pub const fn settings_schema() -> &'static [(ConvertOption, SettingType)] {
         ),
         (
             ConvertOption::MaxIvIfHyperTrained,
+            Bool(BoolOption { default: true }),
+        ),
+        (
+            ConvertOption::PreservePidGender,
+            Bool(BoolOption { default: true }),
+        ),
+        (
+            ConvertOption::PreservePidNature,
+            String(StringOption {
+                default: "KeepMintNature",
+                allowed_values: Some(&["KeepMintNature", "KeepOriginalNature"]),
+            }),
+        ),
+        (
+            ConvertOption::PreservePidShiny,
             Bool(BoolOption { default: true }),
         ),
     ]
@@ -121,6 +152,14 @@ pub struct ConvertStrategy {
     pub met_data_origin_location: MetDataStrategy,
     #[serde(rename = "ivs.maxIfHyperTrained")]
     pub max_iv_if_hyper_trained: bool,
+    #[serde(rename = "personalityValue.preserveShiny")]
+    pub preserve_pid_shiny: bool,
+    #[serde(rename = "personalityValue.preserveGender")]
+    pub preserve_pid_gender: bool,
+    #[serde(rename = "personalityValue.preserveNature")]
+    pub preserve_pid_nature: NatureStrategy,
+    #[serde(rename = "personalityValue.preserveUnownForm")]
+    pub preserve_pid_unown_form: bool,
 }
 
 impl Default for ConvertStrategy {
@@ -129,6 +168,10 @@ impl Default for ConvertStrategy {
             nickname_capitalization: NicknameCapitalization::GameDefault,
             met_data_origin_location: MetDataStrategy::MaximizeLegality,
             max_iv_if_hyper_trained: true,
+            preserve_pid_gender: true,
+            preserve_pid_shiny: true,
+            preserve_pid_nature: Default::default(),
+            preserve_pid_unown_form: true,
         }
     }
 }
@@ -156,6 +199,10 @@ impl ConvertStrategies {
             ConvertOption::NicknameCapitalization => String::from("Nickname"),
             ConvertOption::MetDataOriginAndLocation => String::from("Met data"),
             ConvertOption::MaxIvIfHyperTrained => String::from("IVs"),
+            ConvertOption::PreservePidShiny
+            | ConvertOption::PreservePidGender
+            | ConvertOption::PreservePidNature
+            | ConvertOption::PreservePidUnownForm => String::from("Personality value"),
         }
     }
 
@@ -166,6 +213,18 @@ impl ConvertStrategies {
             ConvertOption::MetDataOriginAndLocation => String::from("Original Game + Met Location"),
             ConvertOption::MaxIvIfHyperTrained => {
                 String::from("Hyper-Trained IVs are Maxed (pre-gen 7)")
+            }
+            ConvertOption::PreservePidShiny => {
+                String::from("Alter PID to preserve shininess (gen 3-5)")
+            }
+            ConvertOption::PreservePidGender => {
+                String::from("Alter PID to preserve gender (gen 3-5)")
+            }
+            ConvertOption::PreservePidNature => {
+                String::from("Alter PID to preserve nature (gen 3-5)")
+            }
+            ConvertOption::PreservePidUnownForm => {
+                String::from("Alter PID to preserve Unown form (gen 3-5)")
             }
         }
     }
@@ -186,6 +245,18 @@ impl ConvertStrategies {
             ),
             ConvertOption::MaxIvIfHyperTrained => String::from(
                 "If true, any hyper-trained IVs will be set to 31 when transferred to a game without hyper training.",
+            ),
+            ConvertOption::PreservePidShiny => String::from(
+                "Decides how a personality value is altered to preserve shiny status."
+            ),
+            ConvertOption::PreservePidNature => String::from(
+                "Decides how a personality value is altered to preserve a Pokémon's nature."
+            ),
+            ConvertOption::PreservePidGender => String::from(
+                "Decides how a personality value is altered to preserve a Pokémon's gender."
+            ),
+            ConvertOption::PreservePidUnownForm => String::from(
+                "Decides how a personality value is altered to preserve a Pokémon's form if the species is Unown."
             ),
         }
     }
