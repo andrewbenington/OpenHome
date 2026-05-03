@@ -1,3 +1,4 @@
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { PossibleSaves } from '@openhome-core/save/util/path'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { JSONArray, JSONObject, JSONValue, SaveRef } from '@openhome-core/util/types'
@@ -9,7 +10,6 @@ import { ConvertStrategies } from 'src/ui/state/convert-strategies/ConvertStrate
 import { DEFAULT_CONVERT_STRATEGY } from 'src/ui/state/convert-strategies/useConvertStrategies'
 import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
-import { OhpkmIdentifier } from 'src/core/pkm/Lookup'
 
 export type StringToBytes = Record<string, Uint8Array>
 export type StringToB64 = Record<string, string>
@@ -60,7 +60,7 @@ type OhTauriApi = {
   list_installed_plugins(): PluginMetadataWithIcon[]
   load_plugin_code(pluginId: string): string
   delete_plugin(pluginId: string): string
-  handle_windows_accellerator(menuEventId: string): null
+  handle_windows_accelerator(menuEventId: string): null
 
   permanently_delete_ohpkms(identifiers: OhpkmIdentifier[]): RustUnitResultByString
 
@@ -240,8 +240,8 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('delete_plugin', { pluginId })
   },
 
-  handle_windows_accellerator(menuEventId: string) {
-    return invokeAndCatch('handle_windows_accellerator', { menuEventId })
+  handle_windows_accelerator(menuEventId: string) {
+    return invokeAndCatch('handle_windows_accelerator', { menuEventId })
   },
 
   open_directory(absolutePath: string) {

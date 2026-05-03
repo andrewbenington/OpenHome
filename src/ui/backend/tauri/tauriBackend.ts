@@ -239,7 +239,7 @@ export const TauriBackend: BackendInterface = {
   getConvertStrategies: Commands.get_convert_strategies,
   updateConvertStrategies: Commands.update_convert_strategies,
   setTheme: Commands.set_app_theme,
-  emitMenuEvent: Commands.handle_windows_accellerator,
+  emitMenuEvent: Commands.handle_windows_accelerator,
 
   getImageData: Commands.get_image_data,
   listInstalledPlugins: Commands.list_installed_plugins,

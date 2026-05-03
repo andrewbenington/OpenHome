@@ -153,7 +153,7 @@ pub fn run() {
             commands::list_installed_plugins,
             commands::load_plugin_code,
             commands::delete_plugin,
-            commands::handle_windows_accellerator,
+            commands::handle_windows_accelerator,
             commands::open_directory,
             commands::open_file_location,
             startup_config::get_data_dir_path,

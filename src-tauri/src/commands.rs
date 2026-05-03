@@ -204,6 +204,6 @@ pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> Result<
 }
 
 #[tauri::command]
-pub fn handle_windows_accellerator(app_handle: tauri::AppHandle, menu_event_id: String) {
+pub fn handle_windows_accelerator(app_handle: tauri::AppHandle, menu_event_id: String) {
     menu::handle_menu_event_id(&app_handle, menu_event_id.as_ref());
 }
