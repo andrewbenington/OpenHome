@@ -3382,6 +3382,11 @@ impl OhpkmV2 {
         self.get_started_tracking_seconds().map(NonZeroU64::get)
     }
 
+    #[wasm_bindgen(setter = startedTrackingSeconds)]
+    pub fn set_started_tracking_seconds_js(&mut self, seconds: u64) {
+        self.main_data.started_tracking_seconds = NonZeroU64::new(seconds)
+    }
+
     // Original Data
     #[wasm_bindgen(getter = originalData)]
     pub fn original_data(&self) -> Option<OriginalDataJs> {
