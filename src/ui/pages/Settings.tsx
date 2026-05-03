@@ -82,7 +82,7 @@ export default function Settings() {
           <AlertDialog.Confirm
             title="Move Data Directory?"
             description="Are you sure you want to move the data directory? All files will be copied to the new location, and the app will restart. After they are copied to the new directory successfully, your storage and plugins will be removed from the old directory."
-            triggerButtonMessage="Change"
+            triggerButton="Change"
             confirmButtonMessage="Select New Directory..."
             onConfirm={() => {
               backend

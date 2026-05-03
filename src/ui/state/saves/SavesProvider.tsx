@@ -14,6 +14,7 @@ import { useConvertStrategies } from '../convert-strategies'
 import { ItemBagContext } from '../items/reducer'
 import { useOhpkmStore } from '../ohpkm'
 import { openSavesReducer, SavesContext } from './reducer'
+import { AlertDialog } from 'src/ui/components/AlertDialog'
 
 export type SavesProviderProps = {
   children: ReactNode
@@ -24,6 +25,7 @@ type SaveTypeCallback = (saveType?: SAVClass | PromiseLike<SAVClass>) => void
 export default function SavesProvider({ children }: SavesProviderProps) {
   const backend = useContext(BackendContext)
   const [itemBagState, bagDispatch] = useContext(ItemBagContext)
+  const [releaseWarningDisplayed, setReleaseWarningDisplayed] = useState(false)
   const displayError = useDisplayError()
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
     monsToRelease: [],
@@ -45,90 +47,97 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   }, [])
 
   const allOpenSaves = Object.values(openSavesState.openSaves)
-    .filter((data) => !!data)
     .sort((a, b) => a.index - b.index)
     .map((data) => data.save)
 
-  const saveChanges = useCallback(async (): Promise<Result<null, SaveError[]>> => {
-    const result = await backend.startTransaction()
+  const saveChanges = useCallback(
+    async (releaseWarningAccepted: boolean): Promise<Result<null, SaveError[]>> => {
+      const shouldReleasePokemon = openSavesState.monsToRelease.length > 0
+      if (shouldReleasePokemon && !releaseWarningAccepted) {
+        setReleaseWarningDisplayed(true)
+        return R.Ok(null)
+      }
+      const result = await backend.startTransaction()
 
-    if (R.isErr(result)) {
-      displayError('Error Starting Save Transaction', result.err)
-      return R.Err([TransactionStart(result.err)])
-    }
+      if (R.isErr(result)) {
+        displayError('Error Starting Save Transaction', result.err)
+        return R.Err([TransactionStart(result.err)])
+      }
 
-    // Write appropriate trainer data to handler fields
-    for (const save of allOpenSaves) {
-      for (const boxNum of range(save.getBoxCount())) {
-        for (const boxSlot of range(save.boxSlotCount)) {
-          const data = save.getMonAt(boxNum, boxSlot)
-          if (!data) continue
+      // Write appropriate trainer data to handler fields
+      for (const save of allOpenSaves) {
+        for (const boxNum of range(save.getBoxCount())) {
+          for (const boxSlot of range(save.boxSlotCount)) {
+            const data = save.getMonAt(boxNum, boxSlot)
+            if (!data) continue
 
-          const tracked = ohpkmStore.loadIfTracked(data)
-          if (!tracked) continue
+            const trackedData = ohpkmStore.loadIfTracked(data)
+            if (!trackedData) continue
 
-          tracked.tradeToSave(save)
-          save.setMonAt(boxNum, boxSlot, save.convertOhpkm(tracked, defaultConvertStrategy))
+            trackedData.tradeToSave(save)
+            save.setMonAt(boxNum, boxSlot, save.convertOhpkm(trackedData, defaultConvertStrategy))
+          }
         }
       }
-    }
 
-    const saveWriters = allOpenSaves.map((save) => save.prepareWriter())
+      const saveWriters = allOpenSaves.map((save) => save.prepareWriter())
 
-    const promises = [
-      backend.writeAllSaveFiles(saveWriters),
-      backend.deleteHomeMons(
-        openSavesState.monsToRelease.filter(
-          (monOrIdentifier) => typeof monOrIdentifier === 'string'
-        )
-      ),
-    ]
+      const promises = [
+        backend.writeAllSaveFiles(saveWriters),
+        backend.deleteHomeMons(
+          openSavesState.monsToRelease.filter(
+            (monOrIdentifier) => typeof monOrIdentifier === 'string'
+          )
+        ),
+      ]
 
-    if (itemBagState.modified) {
-      const saveBagResult = await backend.saveItemBag(itemBagState.itemCounts)
-      if (R.isErr(saveBagResult)) {
-        displayError('Error Saving Bag', saveBagResult.err)
-        await backend.rollbackTransaction()
-        return R.Err([SaveItemBagData(saveBagResult.err)])
+      if (itemBagState.modified) {
+        const saveBagResult = await backend.saveItemBag(itemBagState.itemCounts)
+        if (R.isErr(saveBagResult)) {
+          displayError('Error Saving Bag', saveBagResult.err)
+          await backend.rollbackTransaction()
+          return R.Err([SaveItemBagData(saveBagResult.err)])
+        }
+        bagDispatch({ type: 'clear_modified' })
       }
-      bagDispatch({ type: 'clear_modified' })
-    }
 
-    const results = (await Promise.all(promises)).flat()
-    const errors = results.filter(R.isErr).map((r) => r.err)
+      const results = (await Promise.all(promises)).flat()
+      const errors = results.filter(R.isErr).map((r) => r.err)
 
-    if (errors.length) {
-      displayError('Error Saving', errors)
-      backend.rollbackTransaction()
-      return R.Err(errors.map(BackendSaveError))
-    }
+      if (errors.length) {
+        displayError('Error Saving', errors)
+        backend.rollbackTransaction()
+        return R.Err(errors.map(BackendSaveError))
+      }
 
-    const syncedStateResult = await backend.saveSyncedState()
-    if (R.isErr(syncedStateResult)) {
-      displayError('Error Saving', syncedStateResult.err)
-      return R.Err([BackendSaveError(syncedStateResult.err)])
-    }
+      const syncedStateResult = await backend.saveSyncedState()
+      if (R.isErr(syncedStateResult)) {
+        displayError('Error Saving', syncedStateResult.err)
+        return R.Err([BackendSaveError(syncedStateResult.err)])
+      }
 
-    const commitResult = await backend.commitTransaction()
-    if (R.isErr(commitResult)) {
-      return R.Err([TransactionCommit(commitResult.err)])
-    }
+      const commitResult = await backend.commitTransaction()
+      if (R.isErr(commitResult)) {
+        return R.Err([TransactionCommit(commitResult.err)])
+      }
 
-    openSavesDispatch({ type: 'clear_updated_box_slots' })
-    openSavesDispatch({ type: 'clear_mons_to_release' })
+      openSavesDispatch({ type: 'clear_updated_box_slots' })
+      openSavesDispatch({ type: 'clear_mons_to_release' })
 
-    return R.Ok(null)
-  }, [
-    backend,
-    allOpenSaves,
-    openSavesState.monsToRelease,
-    itemBagState.modified,
-    itemBagState.itemCounts,
-    displayError,
-    ohpkmStore,
-    defaultConvertStrategy,
-    bagDispatch,
-  ])
+      return R.Ok(null)
+    },
+    [
+      backend,
+      allOpenSaves,
+      openSavesState.monsToRelease,
+      itemBagState.modified,
+      itemBagState.itemCounts,
+      displayError,
+      ohpkmStore,
+      defaultConvertStrategy,
+      bagDispatch,
+    ]
+  )
 
   // load bag
   useEffect(() => {
@@ -149,7 +158,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   useEffect(() => {
     // returns a function to stop listening
     const stopListening = backend.registerListeners({
-      onSave: saveChanges,
+      onSave: () => saveChanges(false),
       onReset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
         reloadBankStore()
@@ -198,6 +207,18 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           disambiguationResolver.current?.(selected)
           navigate('/home')
         }}
+      />
+      <AlertDialog.Confirm
+        title={`Release ${openSavesState.monsToRelease.length} Pokémon`}
+        open={releaseWarningDisplayed}
+        description={`Are you sure you want to release ${openSavesState.monsToRelease.length} Pokémon? This will permanently delete each Pokémon and its associated tracking data. This action cannot be undone.`}
+        triggerButton="Change"
+        confirmButtonMessage={`Release ${openSavesState.monsToRelease.length} Pokémon`}
+        onConfirm={async () => {
+          await saveChanges(true)
+          setReleaseWarningDisplayed(false)
+        }}
+        onCancel={() => setReleaseWarningDisplayed(false)}
       />
     </>
   )

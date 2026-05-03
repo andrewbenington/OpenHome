@@ -34,30 +34,43 @@ export const AlertDialog = {
   ),
   Confirm: (props: ConfirmDialogProps) => {
     const {
-      triggerButtonMessage: buttonMessage,
+      triggerButton,
       title,
       description,
       onCancel,
       onConfirm,
       confirmButtonMessage,
+      open: isOpenControlled,
     } = props
-    const [isOpen, setIsOpen] = useState(false)
+    const [isOpenUncontrolled, setIsOpenUncontrolled] = useState(false)
+
+    const stateIsControlled = isOpenControlled !== undefined
+    const isOpen = stateIsControlled ? isOpenControlled : isOpenUncontrolled
 
     function cancelAndClose() {
       onCancel?.()
-      setIsOpen(false)
+      if (!stateIsControlled) {
+        setIsOpenUncontrolled(false)
+      }
     }
 
     function confirmAndClose() {
       onConfirm?.()
-      setIsOpen(false)
+      if (!stateIsControlled) {
+        setIsOpenUncontrolled(false)
+      }
     }
 
     return (
-      <AlertDialog.Root open={isOpen || FORCE_DIALOG_FOR_TESTING} onOpenChange={setIsOpen}>
-        <AlertDialog.Trigger data-color="theme">{buttonMessage}</AlertDialog.Trigger>
+      <AlertDialog.Root
+        open={isOpen || FORCE_DIALOG_FOR_TESTING}
+        onOpenChange={stateIsControlled ? undefined : setIsOpenUncontrolled}
+      >
+        {triggerButton && (
+          <AlertDialog.Trigger data-color="theme">{triggerButton}</AlertDialog.Trigger>
+        )}
         <AlertDialog.Portal container={document.getElementById('app-container')}>
-          <AlertDialog.Backdrop onClick={() => setIsOpen(false)} />
+          <AlertDialog.Backdrop onClick={cancelAndClose} />
           <AlertDialog.Popup>
             <AlertDialog.Title>{title}</AlertDialog.Title>
             <AlertDialog.Description>{description}</AlertDialog.Description>
@@ -75,10 +88,11 @@ export const AlertDialog = {
 }
 
 type ConfirmDialogProps = {
-  triggerButtonMessage: string
+  triggerButton?: string
   title: string
   description: string
   confirmButtonMessage?: string
   onCancel?: () => void
   onConfirm?: () => void
+  open?: boolean
 }
