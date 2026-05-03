@@ -26,6 +26,8 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   const backend = useContext(BackendContext)
   const [itemBagState, bagDispatch] = useContext(ItemBagContext)
   const [releaseWarningDisplayed, setReleaseWarningDisplayed] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [changesSavedDisplayed, setChangesSavedDisplayed] = useState(false)
   const displayError = useDisplayError()
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
     monsToRelease: [],
@@ -52,15 +54,20 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
   const saveChanges = useCallback(
     async (releaseWarningAccepted: boolean): Promise<Result<null, SaveError[]>> => {
+      if (saving) return R.Ok(null)
+
       const shouldReleasePokemon = openSavesState.monsToRelease.length > 0
       if (shouldReleasePokemon && !releaseWarningAccepted) {
         setReleaseWarningDisplayed(true)
         return R.Ok(null)
       }
+
+      setSaving(true)
       const result = await backend.startTransaction()
 
       if (R.isErr(result)) {
         displayError('Error Starting Save Transaction', result.err)
+        setSaving(false)
         return R.Err([TransactionStart(result.err)])
       }
 
@@ -96,6 +103,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
         if (R.isErr(saveBagResult)) {
           displayError('Error Saving Bag', saveBagResult.err)
           await backend.rollbackTransaction()
+          setSaving(false)
           return R.Err([SaveItemBagData(saveBagResult.err)])
         }
         bagDispatch({ type: 'clear_modified' })
@@ -107,26 +115,33 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       if (errors.length) {
         displayError('Error Saving', errors)
         backend.rollbackTransaction()
+        setSaving(false)
         return R.Err(errors.map(BackendSaveError))
       }
 
       const syncedStateResult = await backend.saveSyncedState()
       if (R.isErr(syncedStateResult)) {
         displayError('Error Saving', syncedStateResult.err)
+        setSaving(false)
         return R.Err([BackendSaveError(syncedStateResult.err)])
       }
 
       const commitResult = await backend.commitTransaction()
       if (R.isErr(commitResult)) {
+        setSaving(false)
         return R.Err([TransactionCommit(commitResult.err)])
       }
 
       openSavesDispatch({ type: 'clear_updated_box_slots' })
       openSavesDispatch({ type: 'clear_mons_to_release' })
 
+      setChangesSavedDisplayed(true)
+
+      setSaving(false)
       return R.Ok(null)
     },
     [
+      saving,
       backend,
       allOpenSaves,
       openSavesState.monsToRelease,
@@ -193,6 +208,10 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     hideReleaseWarning()
   }
 
+  function dismissSavedMessage() {
+    setChangesSavedDisplayed(false)
+  }
+
   return (
     <>
       <SavesContext.Provider
@@ -206,6 +225,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           promptDisambiguation,
         }}
       >
+        <div />
         {children}
       </SavesContext.Provider>
       <SaveDisambiguationDialog
@@ -221,7 +241,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
         title={`Release ${openSavesState.monsToRelease.length} Pokémon`}
         open={releaseWarningDisplayed}
         description={`Are you sure you want to release ${openSavesState.monsToRelease.length} Pokémon? This will permanently delete each Pokémon and its associated tracking data. This action cannot be undone.`}
-        triggerButton="Change"
         actions={[
           { uniqueLabel: 'Cancel', action: hideReleaseWarning, type: 'cancel' },
           {
@@ -230,6 +249,17 @@ export default function SavesProvider({ children }: SavesProviderProps) {
             type: 'destructive',
           },
         ]}
+      />
+      <PromptDialog
+        title={saving ? 'Saving Changes...' : 'Changes Saved'}
+        open={changesSavedDisplayed || saving}
+        onClose={dismissSavedMessage}
+        description={
+          saving
+            ? 'Saving changes...'
+            : 'All changes to boxes, save files, Pokédex, and settings have been saved.'
+        }
+        actions={[{ uniqueLabel: 'Ok', action: dismissSavedMessage }]}
       />
     </>
   )

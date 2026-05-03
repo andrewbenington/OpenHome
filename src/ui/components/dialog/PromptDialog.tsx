@@ -7,6 +7,7 @@ type PromptDialogProps = {
   description: string
   actions: PromptDialogAction[]
   open?: boolean
+  onClose?: () => void
 }
 
 export type PromptDialogActionType = 'cancel' | 'destructive'
@@ -18,31 +19,28 @@ export type PromptDialogAction = {
 }
 
 export default function PromptDialog(props: PromptDialogProps) {
-  const { triggerButton, title, description, actions, open: isOpenControlled } = props
+  const { triggerButton, title, description, actions, open: isOpenControlled, onClose } = props
   const [isOpenUncontrolled, setIsOpenUncontrolled] = useState(false)
 
   const stateIsControlled = isOpenControlled !== undefined
   const isOpen = stateIsControlled ? isOpenControlled : isOpenUncontrolled
 
-  const onCancel = actions.find((a) => a.type === 'cancel')?.action
-
-  function cancelAndClose() {
-    onCancel?.()
+  function onOpenChange(open: boolean) {
+    if (!open) {
+      onClose?.()
+    }
     if (!stateIsControlled) {
-      setIsOpenUncontrolled(false)
+      setIsOpenUncontrolled(open)
     }
   }
 
   return (
-    <AlertDialog.Root
-      open={isOpen}
-      onOpenChange={stateIsControlled ? undefined : setIsOpenUncontrolled}
-    >
+    <AlertDialog.Root open={isOpen} onOpenChange={onOpenChange}>
       {triggerButton && (
         <AlertDialog.Trigger data-color="theme">{triggerButton}</AlertDialog.Trigger>
       )}
       <AlertDialog.Portal container={document.getElementById('app-container')}>
-        <AlertDialog.Backdrop onClick={cancelAndClose} />
+        <AlertDialog.Backdrop onClick={() => onOpenChange(false)} />
         <AlertDialog.Popup>
           <AlertDialog.Title>{title}</AlertDialog.Title>
           <AlertDialog.Description>{description}</AlertDialog.Description>
@@ -56,7 +54,7 @@ export default function PromptDialog(props: PromptDialogProps) {
                     setIsOpenUncontrolled(false)
                   }
                 }}
-                data-color={type === 'destructive' ? 'red' : type === 'cancel' ? 'grey' : 'blue'}
+                data-color={type === 'destructive' ? 'red' : type === 'cancel' ? 'grey' : 'theme'}
               >
                 {uniqueLabel}
               </AlertDialog.Close>

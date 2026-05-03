@@ -436,6 +436,7 @@ function SingleBoxMonDisplay() {
       <PromptDialog
         title="Tracking Data Missing"
         open={missingIdData !== undefined}
+        onClose={dismissMissingIdDialog}
         description={`There is a Pokémon in this box slot, but its tracking data cannot be found. This Pokémon's OpenHome ID was ${missingIdData?.id}, and is was from the ${missingIdEvoFamily} evolution family.`}
         actions={[
           { uniqueLabel: 'Cancel', action: dismissMissingIdDialog, type: 'cancel' },
