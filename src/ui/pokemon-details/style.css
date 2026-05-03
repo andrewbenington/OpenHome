@@ -17,7 +17,7 @@
 
 .modal-footer {
   background-color: var(--color-bar);
-  padding: 0.2rem;
+  padding: 0.2rem 0.5rem;
   font-size: 0.75rem;
   display: flex;
   flex-direction: row;

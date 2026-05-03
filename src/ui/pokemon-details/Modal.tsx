@@ -299,6 +299,10 @@ const PokemonDetailsModal = (props: {
             </Flex>
             <Separator orientation="vertical" />
             <div>Level {mon.getLevel()}</div>
+            <div style={{ flex: 1 }} />
+            {mon instanceof OHPKM && (
+              <div>Tracked since {mon.startedTrackingTimestamp?.format('MMMM D, YYYY')}</div>
+            )}
           </div>
           {navigateLeft && (
             <button className="modal-arrow modal-arrow-left" onClick={navigateLeft}>

@@ -4,7 +4,9 @@ use crate::{state::synced_state, util};
 use base64::prelude::*;
 use pkm_rs::ohpkm::OhpkmV2;
 use serde::{Deserialize, Serialize};
+use std::num::NonZeroU64;
 use std::path::{Path, PathBuf};
+use std::time::{Duration, UNIX_EPOCH};
 use std::{collections::HashMap, fs};
 
 #[derive(Default, Serialize, Deserialize, Clone)]
@@ -15,8 +17,8 @@ impl OhpkmBytesStore {
         let mon_files = fs::read_dir(path).map_err(|e| Error::file_access(&path, e))?;
 
         let mut map = HashMap::new();
-        for mon_file_os_str in mon_files.flatten() {
-            let path = mon_file_os_str.path();
+        for dir_entry in mon_files.flatten() {
+            let path = dir_entry.path();
             if !path
                 .extension()
                 .is_some_and(|ext| ext.eq_ignore_ascii_case("ohpkm"))
@@ -25,12 +27,19 @@ impl OhpkmBytesStore {
             }
 
             if let Ok(mon_bytes) = util::read_file_bytes(path) {
-                let mon_identifier = mon_file_os_str
-                    .file_name()
-                    .to_string_lossy()
-                    .trim_end_matches(".ohpkm")
-                    .to_owned();
-                map.insert(mon_identifier, mon_bytes);
+                let file_created_seconds = dir_entry
+                    .metadata()
+                    .ok()
+                    .and_then(|m| m.created().or(m.modified()).ok())
+                    .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                    .as_ref()
+                    .map(Duration::as_secs)
+                    .and_then(NonZeroU64::new);
+
+                if let Ok(mut mon) = OhpkmV2::from_bytes(&mon_bytes, file_created_seconds) {
+                    mon.set_started_tracking_if_missing(file_created_seconds);
+                    map.insert(mon.openhome_id(), mon.to_bytes());
+                }
             }
         }
 
@@ -43,7 +52,7 @@ impl OhpkmBytesStore {
 
     fn fix_errors(&mut self) {
         for (identifier, bytes) in self.0.iter_mut() {
-            if let Ok(mut mon) = OhpkmV2::from_bytes(bytes) {
+            if let Ok(mut mon) = OhpkmV2::from_bytes(bytes, None) {
                 let had_errors = mon.fix_errors();
                 if had_errors {
                     println!(

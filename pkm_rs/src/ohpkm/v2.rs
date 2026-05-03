@@ -1,3 +1,5 @@
+use std::num::NonZeroU64;
+
 use super::sectioned_data::{DataSection, SectionTag, SectionedData};
 use super::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
@@ -231,7 +233,6 @@ pub struct OhpkmV2 {
 }
 
 impl OhpkmV2 {
-    #[cfg(feature = "wasm")]
     pub fn openhome_id(&self) -> String {
         self.main_data.openhome_id()
     }
@@ -1491,7 +1492,7 @@ impl OhpkmV2 {
         }
     }
 
-    // Notes
+    // Other metadata
 
     pub fn notes(&self) -> Option<String> {
         Some(self.notes.clone()?.0)
@@ -1504,10 +1505,20 @@ impl OhpkmV2 {
         }
     }
 
-    // Most Recent save
-
     pub fn most_recent_save(&self) -> Option<MostRecentSave> {
         self.most_recent_save.clone()
+    }
+
+    pub fn get_started_tracking_seconds(&self) -> Option<NonZeroU64> {
+        self.main_data.started_tracking_seconds
+    }
+
+    pub fn set_started_tracking_if_missing(
+        &mut self,
+        started_tracking_seconds: Option<NonZeroU64>,
+    ) {
+        self.main_data
+            .with_timestamp_if_missing(started_tracking_seconds);
     }
 
     // Calculated
@@ -1575,7 +1586,7 @@ impl OhpkmV2 {
         })
     }
 
-    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
+    pub fn from_bytes(bytes: &[u8], file_created_seconds: Option<NonZeroU64>) -> Result<Self> {
         let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes)?;
 
         if sectioned_data.magic_number != MAGIC_NUMBER {
@@ -1596,8 +1607,9 @@ impl OhpkmV2 {
         };
 
         let result = Self {
-            main_data: MainDataV2::extract_from(&sectioned_data)?
-                .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
+            main_data: *MainDataV2::extract_from(&sectioned_data)?
+                .ok_or(Error::other("Main data not present in OHPKM V2 file"))?
+                .with_timestamp_if_missing(file_created_seconds),
             gameboy_data: GameboyData::extract_from(&sectioned_data)?,
             gen45_data: Gen45Data::extract_from(&sectioned_data)?,
             gen67_data: Gen67Data::extract_from(&sectioned_data)?,
@@ -1784,7 +1796,7 @@ impl OhpkmV2 {
     #[wasm_bindgen(constructor)]
     pub fn from_byte_vector(bytes: &[u8]) -> JsResult<Self> {
         if !bytes.is_empty() {
-            Self::from_bytes(bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+            Self::from_bytes(bytes, None).map_err(|e| JsValue::from_str(&e.to_string()))
         } else {
             Ok(Self::default())
         }
@@ -1793,7 +1805,7 @@ impl OhpkmV2 {
     #[wasm_bindgen(js_name = "fromByteVectorFixingErrors")]
     pub fn from_byte_vector_fixing_errors(bytes: &[u8]) -> JsResult<Self> {
         Ok(if !bytes.is_empty() {
-            Self::from_bytes(bytes)?
+            Self::from_bytes(bytes, None)?
         } else {
             Self::default()
         })
@@ -3365,6 +3377,11 @@ impl OhpkmV2 {
         self.most_recent_save.clone()
     }
 
+    #[wasm_bindgen(getter = startedTrackingSeconds)]
+    pub fn started_tracking_seconds_js(&self) -> Option<u64> {
+        self.get_started_tracking_seconds().map(NonZeroU64::get)
+    }
+
     // Original Data
     #[wasm_bindgen(getter = originalData)]
     pub fn original_data(&self) -> Option<OriginalDataJs> {
@@ -3499,7 +3516,7 @@ impl PkmBytes for OhpkmV2 {
     const PARTY_SIZE: usize = 0;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        match Self::from_bytes(bytes) {
+        match Self::from_bytes(bytes, None) {
             Ok(ohpkm) => Ok(ohpkm),
             Err(err) => Err(Error::other(&err.to_string())),
         }
@@ -3561,7 +3578,10 @@ impl IsShiny for OhpkmV2 {
 
 #[cfg(test)]
 mod tests {
-    use std::path::Path;
+    use std::{
+        path::Path,
+        time::{Duration, UNIX_EPOCH},
+    };
 
     use super::*;
     #[test]
@@ -3578,7 +3598,17 @@ mod tests {
                 continue;
             }
             let data = std::fs::read(entry.path()).unwrap();
-            OhpkmV2::from_bytes(&data).map_err(|e| {
+
+            let file_created_seconds = entry
+                .metadata()
+                .ok()
+                .and_then(|m| m.created().or(m.modified()).ok())
+                .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                .as_ref()
+                .map(Duration::as_secs)
+                .and_then(NonZeroU64::new);
+
+            OhpkmV2::from_bytes(&data, file_created_seconds).map_err(|e| {
                 format!(
                     "failed to build ohpkm file {}: {e}",
                     entry.path().file_name().unwrap().to_string_lossy()
