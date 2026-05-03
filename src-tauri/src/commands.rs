@@ -1,6 +1,5 @@
-use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
+use crate::data_controller::{DataController, DataDir};
 use crate::error::{Error, Result};
-use crate::pkm_storage::FilenameToBytesMap;
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloaded_plugins};
 use crate::state::{AppState, AppStateInner};
 use crate::util::ImageResponse;
@@ -35,60 +34,6 @@ pub fn get_file_created(absolute_path: PathBuf) -> Result<Option<u128>> {
         .duration_since(SystemTime::UNIX_EPOCH)
         .map(|dur| dur.as_millis())
         .ok())
-}
-
-#[tauri::command]
-pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> Result<FilenameToBytesMap> {
-    let mons_path = app_handle.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
-    let mon_files = fs::read_dir(&mons_path).map_err(|e| Error::file_access(&mons_path, e))?;
-
-    let mut map = HashMap::new();
-    for mon_file_os_str in mon_files.flatten() {
-        let path = mon_file_os_str.path();
-        if !path
-            .extension()
-            .is_some_and(|ext| ext.eq_ignore_ascii_case("ohpkm"))
-        {
-            continue;
-        }
-
-        if let Ok(mon_bytes) = util::read_file_bytes(path) {
-            let mon_filename = mon_file_os_str.file_name().to_string_lossy().into_owned();
-            map.insert(mon_filename, mon_bytes);
-        }
-    }
-
-    Ok(map)
-}
-
-#[tauri::command]
-pub fn delete_storage_files(
-    app_handle: tauri::AppHandle,
-    relative_paths: Vec<PathBuf>,
-) -> HashMap<PathBuf, Result<()>> {
-    let mut result = HashMap::new();
-    for relative_path in relative_paths {
-        let Ok(full_path) = app_handle.absolute_path(DataDir::Storage, &relative_path) else {
-            continue;
-        };
-
-        result.insert(
-            relative_path.clone(),
-            fs::remove_file(full_path).map_err(|e| Error::file_access(&relative_path, e)),
-        );
-    }
-
-    result
-}
-
-#[tauri::command]
-pub fn write_storage_file_bytes(
-    app_handle: tauri::AppHandle,
-    relative_path: PathBuf,
-    bytes: Vec<u8>,
-) -> Result<()> {
-    let full_path = app_handle.absolute_path(DataDir::Storage, relative_path)?;
-    util::write_file_contents(full_path, bytes)
 }
 
 #[tauri::command]
@@ -259,6 +204,6 @@ pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> Result<
 }
 
 #[tauri::command]
-pub fn handle_windows_accellerator(app_handle: tauri::AppHandle, menu_event_id: String) {
+pub fn handle_windows_accelerator(app_handle: tauri::AppHandle, menu_event_id: String) {
     menu::handle_menu_event_id(&app_handle, menu_event_id.as_ref());
 }

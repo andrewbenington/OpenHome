@@ -1,3 +1,4 @@
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { PossibleSaves } from '@openhome-core/save/util/path'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { JSONArray, JSONObject, JSONValue, SaveRef } from '@openhome-core/util/types'
@@ -39,14 +40,13 @@ if (!('fromBase64' in Uint8Array)) {
 
 const ZERO_UUID = '00000000-0000-0000-0000-000000000000'
 
+type RustUnitResultByString = Record<string, RustResult<null, string>>
+
 type OhTauriApi = {
   get_state(): AppState
   save_synced_state(): void
   get_file_bytes(absolutePath: string): number[]
   get_file_created(absolutePath: string): number
-  get_ohpkm_files(): Record<string, number[]>
-  delete_storage_files(relativePaths: string[]): Record<string, RustResult<null, string>>
-  write_storage_file_bytes(relativePath: string, bytes: Uint8Array): null
   write_storage_file_json(relativePath: string, value: JSONValue): null
   get_storage_file_json(relativePath: string): JSONObject | JSONArray
   find_suggested_saves(saveFolders: string[]): PossibleSaves
@@ -60,7 +60,9 @@ type OhTauriApi = {
   list_installed_plugins(): PluginMetadataWithIcon[]
   load_plugin_code(pluginId: string): string
   delete_plugin(pluginId: string): string
-  handle_windows_accellerator(menuEventId: string): null
+  handle_windows_accelerator(menuEventId: string): null
+
+  permanently_delete_ohpkms(identifiers: OhpkmIdentifier[]): RustUnitResultByString
 
   change_data_dir(): null
   get_data_dir_path(): string
@@ -129,6 +131,10 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('get_ohpkm_store')
   },
 
+  permanently_delete_ohpkms(identifiers: OhpkmIdentifier[]) {
+    return invokeAndCatch('permanently_delete_ohpkms', { openhomeIds: identifiers })
+  },
+
   add_to_ohpkm_store(updates: StringToBytes): Promise<Errorable<null>> {
     return invokeAndCatch('add_to_ohpkm_store', { updates })
   },
@@ -190,18 +196,6 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('write_file_bytes', { absolutePath, bytes })
   },
 
-  write_storage_file_bytes(relativePath: string, bytes: Uint8Array) {
-    return invokeAndCatch('write_storage_file_bytes', { relativePath, bytes })
-  },
-
-  async get_ohpkm_files() {
-    return invokeAndCatch('get_ohpkm_files')
-  },
-
-  async delete_storage_files(relativePaths: string[]) {
-    return invokeAndCatch('delete_storage_files', { relativePaths })
-  },
-
   start_transaction() {
     return invokeAndCatch('start_transaction')
   },
@@ -246,8 +240,8 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('delete_plugin', { pluginId })
   },
 
-  handle_windows_accellerator(menuEventId: string) {
-    return invokeAndCatch('handle_windows_accellerator', { menuEventId })
+  handle_windows_accelerator(menuEventId: string) {
+    return invokeAndCatch('handle_windows_accelerator', { menuEventId })
   },
 
   open_directory(absolutePath: string) {

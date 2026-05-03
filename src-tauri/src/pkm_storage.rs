@@ -107,7 +107,6 @@ impl Box {
 }
 
 pub type BoxIdentifiers = HashMap<u8, String>;
-pub type FilenameToBytesMap = HashMap<String, Vec<u8>>;
 
 #[tauri::command]
 pub fn load_banks(app_handle: tauri::AppHandle) -> Result<StoredBankData> {

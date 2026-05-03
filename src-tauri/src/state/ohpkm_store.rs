@@ -1,4 +1,4 @@
-use crate::data_controller::{DataController, DataDir};
+use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
 use crate::{state::synced_state, util};
 use base64::prelude::*;
@@ -74,12 +74,12 @@ impl OhpkmBytesStore {
     }
 
     pub fn load_from_mons_v2(data_controller: &impl DataController) -> Result<Self> {
-        let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, "mons_v2")?;
+        let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
         Self::load_from_directory(&mons_v2_dir)
     }
 
     pub fn write_to_mons_v2(&self, data_controller: &impl DataController) -> Result<()> {
-        let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, "mons_v2")?;
+        let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
         Self::write_to_directory(self, &mons_v2_dir)
     }
 
@@ -94,6 +94,10 @@ impl OhpkmBytesStore {
 
     pub fn includes(&self, identifier: &str) -> bool {
         self.0.contains_key(identifier)
+    }
+
+    pub fn remove(&mut self, identifier: &str) -> bool {
+        self.0.remove(identifier).is_some()
     }
 }
 
@@ -128,4 +132,44 @@ pub fn add_to_ohpkm_store(
         .lock()?
         .ohpkm_store
         .union_with(&app_handle, updates)
+}
+
+type DeleteResultsById = HashMap<String, Result<()>>;
+
+#[tauri::command]
+pub fn permanently_delete_ohpkms(
+    app_handle: tauri::AppHandle,
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    openhome_ids: Vec<String>,
+) -> Result<DeleteResultsById> {
+    // first remove from the ohpkm store
+    synced_state
+        .lock()?
+        .ohpkm_store
+        .replace(&app_handle, |store| {
+            let mut new_store = store.clone();
+            for identifier in &openhome_ids {
+                new_store.remove(&identifier);
+            }
+            new_store
+        })?;
+    let mut results = HashMap::new();
+
+    // then delete from the disk
+    for identifier in openhome_ids {
+        let relative_path = Path::new(MONS_V2_DIR).join(format!("{identifier}.ohpkm"));
+        match app_handle.absolute_path(DataDir::Storage, &relative_path) {
+            Ok(full_path) => {
+                let deletion_result =
+                    fs::remove_file(full_path).map_err(|e| Error::file_access(&relative_path, e));
+                results.insert(identifier, deletion_result);
+            }
+            Err(source_err) => {
+                let error = Error::file_access(&relative_path, source_err);
+                results.insert(identifier, Err(error));
+            }
+        };
+    }
+
+    Ok(results)
 }

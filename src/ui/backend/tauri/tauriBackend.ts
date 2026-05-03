@@ -65,8 +65,7 @@ export const TauriBackend: BackendInterface = {
     )
   },
   deleteHomeMons: async function (identifiers: string[]): Promise<Errorable<null>> {
-    const monFilePaths = identifiers.map((identifier) => `mons/${identifier}.ohpkm`)
-    return Commands.delete_storage_files(monFilePaths).then(
+    return Commands.permanently_delete_ohpkms(identifiers).then(
       R.map((deletionResults) => {
         for (const [file, result] of Object.entries(deletionResults)) {
           if (isRustErr(result)) {
@@ -240,7 +239,7 @@ export const TauriBackend: BackendInterface = {
   getConvertStrategies: Commands.get_convert_strategies,
   updateConvertStrategies: Commands.update_convert_strategies,
   setTheme: Commands.set_app_theme,
-  emitMenuEvent: Commands.handle_windows_accellerator,
+  emitMenuEvent: Commands.handle_windows_accelerator,
 
   getImageData: Commands.get_image_data,
   listInstalledPlugins: Commands.list_installed_plugins,

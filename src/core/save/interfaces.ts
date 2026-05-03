@@ -137,16 +137,6 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   getAllMons(): Readonly<P>[] {
     return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
   }
-  // getMonAt(boxNum: number, boxSlot: number): Option<P> {
-  //   const box = this.boxes[boxNum]
-  //   if (!box) return undefined
-  //   return box.boxSlots[boxSlot]
-  // }
-  // setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void {
-  //   const box = this.boxes[boxNum]
-  //   if (!box) return
-  //   box.boxSlots[boxSlot] = mon
-  // }
 
   get gameName(): string {
     return OriginGames.gameName(this.origin)
