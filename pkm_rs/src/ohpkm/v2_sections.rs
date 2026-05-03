@@ -136,16 +136,6 @@ pub struct MainDataV2 {
 const NIDORAN_F: NatDexIndex = unsafe { NatDexIndex::new_unchecked(29) };
 const NIDORAN_M: NatDexIndex = unsafe { NatDexIndex::new_unchecked(32) };
 
-fn current_time_unix_seconds() -> NonZeroU64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .ok()
-        .as_ref()
-        .map(Duration::as_secs)
-        .and_then(NonZeroU64::new)
-        .expect("current time is after the unix epoch")
-}
-
 impl MainDataV2 {
     pub fn new(national_dex: u16, form_index: u16) -> Result<Self> {
         let species_and_form = SpeciesAndForm::new(national_dex, form_index)?;
