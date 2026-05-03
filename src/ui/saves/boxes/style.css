@@ -250,3 +250,10 @@
 .box-icon-mon-empty {
   background-color: #fff3;
 }
+
+.box-slot-missing-id {
+  aspect-ratio: 1;
+  margin: auto;
+  font-weight: bold;
+  font-size: 1.2rem;
+}

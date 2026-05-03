@@ -1,5 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
+import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { monSupportedBySave } from '@openhome-core/save/util'
@@ -37,6 +37,7 @@ import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
 import { includeClass } from 'src/ui/util/style'
 import {
+  BankBoxCoordinates,
   OPENHOME_BOX_COLUMNS,
   OPENHOME_BOX_ROWS,
   OPENHOME_BOX_SLOTS,
@@ -49,6 +50,8 @@ import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 import DroppableSpace from './DroppableSpace'
 import './style.css'
+import PromptDialog from 'src/ui/components/dialog/PromptDialog'
+import { Language, Lookup } from '@pkm-rs/pkg'
 
 export type BoxViewMode = 'one' | 'all'
 
@@ -232,10 +235,16 @@ export default function HomeBoxDisplay() {
   )
 }
 
+type MissingIdData = {
+  id: OhpkmIdentifier
+  location: BankBoxCoordinates
+}
+
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
   const { importMonsToLocation, saveFromIdentifier } = useSaves()
-  const { getCurrentBox, getCurrentBank } = useBanksAndBoxes()
+  const { getCurrentBox, getCurrentBank, clearAtHomeLocation } = useBanksAndBoxes()
+  const [missingIdData, setMissingIdData] = useState<MissingIdData>()
   const [, dispatchError] = useContext(ErrorContext)
   const { dragState, isSelected, toggleSelection } = useDragAndDrop()
   const { sortHomeBox, sortAllHomeBoxes, removeDupesFromHomeBox } = useBanksAndBoxes()
@@ -328,90 +337,112 @@ function SingleBoxMonDisplay() {
     [getCurrentBox, removeDupesFromHomeBox, sortAllHomeBoxes, sortHomeBox]
   )
 
+  function dismissMissingIdDialog() {
+    setMissingIdData(undefined)
+  }
+
+  const missingIdEvoFamily = missingIdData
+    ? Lookup.speciesName(parseInt(missingIdData.id.split('-')[0]), Language.English)
+    : undefined
+
+  function clearMissingIdSlot() {
+    if (missingIdData) clearAtHomeLocation(missingIdData.location)
+    dismissMissingIdDialog()
+  }
+
   return (
-    <OpenHomeCtxMenu elements={contextElements}>
-      <div>
-        <Grid columns={OPENHOME_BOX_COLUMNS.toString()} gap="1">
-          {range(OPENHOME_BOX_SLOTS)
-            .map((index: number) => currentBox.identifiers.get(index))
-            .map((identifier, index) => {
-              const result = identifier ? ohpkmStore.tryLoadFromId(identifier) : undefined
-              const currentBankIndex = getCurrentBank().index
-              const currentBoxIndex = getCurrentBox().index
+    <>
+      <OpenHomeCtxMenu elements={contextElements}>
+        <div>
+          <Grid columns={OPENHOME_BOX_COLUMNS.toString()} gap="1">
+            {range(OPENHOME_BOX_SLOTS)
+              .map((index: number) => currentBox.identifiers.get(index))
+              .map((identifier, index) => {
+                const currentBankIndex = getCurrentBank().index
+                const currentBoxIndex = getCurrentBox().index
 
-              if (result && R.isErr(result)) {
-                return (
-                  <Tooltip key={`${currentBoxIndex}-${index}`} content={identifier}>
-                    <Button
-                      radius="full"
-                      size="1"
-                      style={{
-                        aspectRatio: 1,
-                        margin: 'auto',
-                        fontWeight: 'bold',
-                        fontSize: '1.2rem',
-                      }}
-                    >
-                      !
-                    </Button>
-                  </Tooltip>
-                )
-              }
-
-              const mon = result?.value
-
-              const thisLocation: HomeMonLocation = {
-                bank: currentBankIndex,
-                box: currentBoxIndex,
-                boxSlot: index,
-                isHome: true,
-              }
-
-              return (
-                <BoxCell
-                  key={`${currentBoxIndex}-${index}`}
-                  onClick={() => setSelectedIndex(index)}
-                  dragID={`home_${currentBoxIndex}_${index}`}
-                  location={thisLocation}
-                  mon={mon}
-                  zIndex={0}
-                  onDrop={(importedMons) => {
-                    if (importedMons) {
-                      attemptImportMons(importedMons, thisLocation)
-                    }
-                  }}
-                  disabled={
-                    // don't allow a swap with a pokémon not supported by the source save
-                    mon && dragData && !dragData.isHome && !sourceSupportsMon(mon)
-                  }
-                  ctxMenuBuilders={contextElements}
-                  multiSelectEnabled={dragState.multiSelectEnabled}
-                  isSelected={isSelected(thisLocation)}
-                  onToggleSelect={() => toggleSelection(thisLocation)}
-                />
-              )
-            })}
-        </Grid>
-        <PokemonDetailsModal
-          mon={selectedMon}
-          onClose={() => setSelectedIndex(undefined)}
-          navigateRight={navigateRight}
-          navigateLeft={navigateLeft}
-          boxIndicatorProps={
-            selectedIndex !== undefined
-              ? {
-                  currentIndex: selectedIndex,
-                  columns: OPENHOME_BOX_COLUMNS,
-                  rows: OPENHOME_BOX_ROWS,
-                  emptyIndexes: range(OPENHOME_BOX_SLOTS).filter(
-                    (boxSlot) => !currentBox.identifiers.has(boxSlot)
-                  ),
+                const thisLocation: HomeMonLocation = {
+                  bank: currentBankIndex,
+                  box: currentBoxIndex,
+                  boxSlot: index,
+                  isHome: true,
                 }
-              : undefined
-          }
-        />
-      </div>
-    </OpenHomeCtxMenu>
+
+                const result = identifier ? ohpkmStore.tryLoadFromId(identifier) : undefined
+                if (result && R.isErr(result)) {
+                  return (
+                    <Tooltip key={`${currentBoxIndex}-${index}`} content={identifier}>
+                      <Button
+                        className="box-slot-missing-id"
+                        radius="full"
+                        size="1"
+                        onClick={() =>
+                          identifier && setMissingIdData({ id: identifier, location: thisLocation })
+                        }
+                      >
+                        !
+                      </Button>
+                    </Tooltip>
+                  )
+                }
+
+                const mon = result?.value
+
+                return (
+                  <BoxCell
+                    key={`${currentBoxIndex}-${index}`}
+                    onClick={() => setSelectedIndex(index)}
+                    dragID={`home_${currentBoxIndex}_${index}`}
+                    location={thisLocation}
+                    mon={mon}
+                    zIndex={0}
+                    onDrop={(importedMons) => {
+                      if (importedMons) {
+                        attemptImportMons(importedMons, thisLocation)
+                      }
+                    }}
+                    disabled={
+                      // don't allow a swap with a pokémon not supported by the source save
+                      mon && dragData && !dragData.isHome && !sourceSupportsMon(mon)
+                    }
+                    ctxMenuBuilders={contextElements}
+                    multiSelectEnabled={dragState.multiSelectEnabled}
+                    isSelected={isSelected(thisLocation)}
+                    onToggleSelect={() => toggleSelection(thisLocation)}
+                  />
+                )
+              })}
+          </Grid>
+        </div>
+      </OpenHomeCtxMenu>
+      <PokemonDetailsModal
+        mon={selectedMon}
+        onClose={() => setSelectedIndex(undefined)}
+        navigateRight={navigateRight}
+        navigateLeft={navigateLeft}
+        boxIndicatorProps={
+          selectedIndex !== undefined
+            ? {
+                currentIndex: selectedIndex,
+                columns: OPENHOME_BOX_COLUMNS,
+                rows: OPENHOME_BOX_ROWS,
+                emptyIndexes: range(OPENHOME_BOX_SLOTS).filter(
+                  (boxSlot) => !currentBox.identifiers.has(boxSlot)
+                ),
+              }
+            : undefined
+        }
+      />
+      <PromptDialog
+        title="Tracking Data Missing"
+        open={missingIdData !== undefined}
+        description={`There is a Pokémon in this box slot, but its tracking data cannot be found. This Pokémon's OpenHome ID was ${missingIdData?.id}, and is was from the ${missingIdEvoFamily} evolution family.`}
+        actions={[
+          { uniqueLabel: 'Cancel', action: dismissMissingIdDialog, type: 'cancel' },
+          { uniqueLabel: 'Clear this slot', action: clearMissingIdSlot, type: 'destructive' },
+        ]}
+      />
+    </>
   )
 }
 
