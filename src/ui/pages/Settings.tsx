@@ -15,11 +15,11 @@ import { ReactNode, useContext, useEffect, useState } from 'react'
 import { Route, Routes } from 'react-router'
 import { R } from 'src/core/util/functional'
 import { stringSorter } from 'src/core/util/sort'
-import { AlertDialog } from '../components/dialog/AlertDialog'
 import SideTabs from '../components/side-tabs/SideTabs'
 import useDisplayError from '../hooks/displayError'
 import { usePathSegment } from '../hooks/routing'
 import { ConvertStrategyKey, useConvertStrategies } from '../state/convert-strategies'
+import PromptDialog from '../components/dialog/PromptDialog'
 
 export default function Settings() {
   const [appInfoState, dispatchAppInfoState] = useContext(AppInfoContext)
@@ -79,7 +79,7 @@ export default function Settings() {
         <Flex gap="2">
           <b>Current Data Directory:</b>
           <div>{dataDirPath}</div>
-          <AlertDialog.Confirm
+          <PromptDialog
             title="Move Data Directory?"
             description="Are you sure you want to move the data directory? All files will be copied to the new location, and the app will restart. After they are copied to the new directory successfully, your storage and plugins will be removed from the old directory."
             triggerButton="Change"

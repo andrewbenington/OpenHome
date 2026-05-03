@@ -14,7 +14,7 @@ import { useConvertStrategies } from '../convert-strategies'
 import { ItemBagContext } from '../items/reducer'
 import { useOhpkmStore } from '../ohpkm'
 import { openSavesReducer, SavesContext } from './reducer'
-import { AlertDialog } from '@openhome-ui/components/dialog/AlertDialog'
+import PromptDialog from 'src/ui/components/dialog/PromptDialog'
 
 export type SavesProviderProps = {
   children: ReactNode
@@ -208,7 +208,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           navigate('/home')
         }}
       />
-      <AlertDialog.Confirm
+      <PromptDialog
         title={`Release ${openSavesState.monsToRelease.length} Pokémon`}
         open={releaseWarningDisplayed}
         description={`Are you sure you want to release ${openSavesState.monsToRelease.length} Pokémon? This will permanently delete each Pokémon and its associated tracking data. This action cannot be undone.`}
