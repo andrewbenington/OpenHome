@@ -22,6 +22,10 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> {
   static saveTypeName = 'Pokémon Unbound'
   static saveTypeID = 'G3UBSAV'
 
+  getBoxCount() {
+    return 18
+  }
+
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3UB {
     return PK3UB.fromOhpkm(ohpkm, strategy)
   }

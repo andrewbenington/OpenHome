@@ -7,6 +7,7 @@ import {
   Language,
   Languages,
   MetadataSummaryLookup,
+  NationalDex,
   NatureIndex,
   OriginGame,
   PkmFormat,
@@ -164,6 +165,9 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       if (speciesData.nationalDex < 0) {
         this.dexNum = 0
         this.formNum = 0
+      } else if (speciesData.nationalDex === NationalDex.Unown) {
+        this.dexNum = NationalDex.Unown
+        this.formNum = unownFormFromPid(this.personalityValue)
       } else {
         this.dexNum = speciesData.nationalDex
         this.formNum = speciesData.formIndex
@@ -361,7 +365,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     if (this.pluginForm) {
       dataView.setUint16(0x1c, this.pluginForm, true)
     } else {
-      dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, this.formNum), true)
+      const formNum = this.dexNum === NationalDex.Unown ? 0 : this.formNum
+      dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, formNum), true)
     }
 
     // 30:32 Held Item
@@ -500,6 +505,16 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   abstract getFormat(): RomHackFormat
+}
+
+function unownFormFromPid(pid: number) {
+  let letterValue = (pid >> 24) & 0x3
+
+  letterValue = ((pid >> 16) & 0x3) | (letterValue << 2)
+  letterValue = ((pid >> 8) & 0x3) | (letterValue << 2)
+  letterValue = (pid & 0x3) | (letterValue << 2)
+
+  return letterValue % 28
 }
 
 export default PK3CFRU
