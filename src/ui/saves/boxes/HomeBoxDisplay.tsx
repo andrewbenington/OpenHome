@@ -340,7 +340,22 @@ function SingleBoxMonDisplay() {
               const currentBoxIndex = getCurrentBox().index
 
               if (result && R.isErr(result)) {
-                return <div key={`${currentBoxIndex}-${index}`}>!</div>
+                return (
+                  <Tooltip key={`${currentBoxIndex}-${index}`} content={identifier}>
+                    <Button
+                      radius="full"
+                      size="1"
+                      style={{
+                        aspectRatio: 1,
+                        margin: 'auto',
+                        fontWeight: 'bold',
+                        fontSize: '1.2rem',
+                      }}
+                    >
+                      !
+                    </Button>
+                  </Tooltip>
+                )
               }
 
               const mon = result?.value

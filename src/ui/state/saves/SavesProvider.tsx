@@ -14,7 +14,7 @@ import { useConvertStrategies } from '../convert-strategies'
 import { ItemBagContext } from '../items/reducer'
 import { useOhpkmStore } from '../ohpkm'
 import { openSavesReducer, SavesContext } from './reducer'
-import { AlertDialog } from 'src/ui/components/AlertDialog'
+import { AlertDialog } from '@openhome-ui/components/dialog/AlertDialog'
 
 export type SavesProviderProps = {
   children: ReactNode
