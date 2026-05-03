@@ -65,8 +65,7 @@ export const TauriBackend: BackendInterface = {
     )
   },
   deleteHomeMons: async function (identifiers: string[]): Promise<Errorable<null>> {
-    const monFilePaths = identifiers.map((identifier) => `mons/${identifier}.ohpkm`)
-    return Commands.delete_storage_files(monFilePaths).then(
+    return Commands.permanently_delete_ohpkms(identifiers).then(
       R.map((deletionResults) => {
         for (const [file, result] of Object.entries(deletionResults)) {
           if (isRustErr(result)) {

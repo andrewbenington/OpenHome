@@ -79,10 +79,9 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     const promises = [
       backend.writeAllSaveFiles(saveWriters),
       backend.deleteHomeMons(
-        openSavesState.monsToRelease
-          .filter((mon) => mon instanceof OHPKM)
-          .map(getMonFileIdentifier)
-          .filter(filterUndefined)
+        openSavesState.monsToRelease.filter(
+          (monOrIdentifier) => typeof monOrIdentifier === 'string'
+        )
       ),
     ]
 

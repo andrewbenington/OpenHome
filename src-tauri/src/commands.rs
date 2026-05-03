@@ -66,19 +66,22 @@ pub fn delete_storage_files(
     app_handle: tauri::AppHandle,
     relative_paths: Vec<PathBuf>,
 ) -> HashMap<PathBuf, Result<()>> {
-    let mut result = HashMap::new();
+    let mut results = HashMap::new();
     for relative_path in relative_paths {
-        let Ok(full_path) = app_handle.absolute_path(DataDir::Storage, &relative_path) else {
-            continue;
+        match app_handle.absolute_path(DataDir::Storage, &relative_path) {
+            Ok(full_path) => {
+                let deletion_result =
+                    fs::remove_file(full_path).map_err(|e| Error::file_access(&relative_path, e));
+                results.insert(relative_path, deletion_result);
+            }
+            Err(source_err) => {
+                let error = Error::file_access(&relative_path, source_err);
+                results.insert(relative_path, Err(error));
+            }
         };
-
-        result.insert(
-            relative_path.clone(),
-            fs::remove_file(full_path).map_err(|e| Error::file_access(&relative_path, e)),
-        );
     }
 
-    result
+    results
 }
 
 #[tauri::command]

@@ -9,6 +9,7 @@ import { ConvertStrategies } from 'src/ui/state/convert-strategies/ConvertStrate
 import { DEFAULT_CONVERT_STRATEGY } from 'src/ui/state/convert-strategies/useConvertStrategies'
 import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
+import { OhpkmIdentifier } from 'src/core/pkm/Lookup'
 
 export type StringToBytes = Record<string, Uint8Array>
 export type StringToB64 = Record<string, string>
@@ -39,13 +40,14 @@ if (!('fromBase64' in Uint8Array)) {
 
 const ZERO_UUID = '00000000-0000-0000-0000-000000000000'
 
+type RustUnitResultByString = Record<string, RustResult<null, string>>
+
 type OhTauriApi = {
   get_state(): AppState
   save_synced_state(): void
   get_file_bytes(absolutePath: string): number[]
   get_file_created(absolutePath: string): number
-  get_ohpkm_files(): Record<string, number[]>
-  delete_storage_files(relativePaths: string[]): Record<string, RustResult<null, string>>
+  delete_storage_files(relativePaths: string[]): RustUnitResultByString
   write_storage_file_bytes(relativePath: string, bytes: Uint8Array): null
   write_storage_file_json(relativePath: string, value: JSONValue): null
   get_storage_file_json(relativePath: string): JSONObject | JSONArray
@@ -61,6 +63,9 @@ type OhTauriApi = {
   load_plugin_code(pluginId: string): string
   delete_plugin(pluginId: string): string
   handle_windows_accellerator(menuEventId: string): null
+
+  get_ohpkm_files(): Record<string, number[]>
+  permanently_delete_ohpkms(identifiers: OhpkmIdentifier[]): RustUnitResultByString
 
   change_data_dir(): null
   get_data_dir_path(): string
@@ -127,6 +132,10 @@ export const Commands: OhTauriApiNoThrow = {
 
   get_ohpkm_store() {
     return invokeAndCatch('get_ohpkm_store')
+  },
+
+  permanently_delete_ohpkms(identifiers: OhpkmIdentifier[]) {
+    return invokeAndCatch('permanently_delete_ohpkms', { openhomeIds: identifiers })
   },
 
   add_to_ohpkm_store(updates: StringToBytes): Promise<Errorable<null>> {
