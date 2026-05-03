@@ -1,7 +1,6 @@
-import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Option, R, range } from '@openhome-core/util/functional'
-import { filterUndefined } from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'

@@ -1,4 +1,4 @@
-use crate::data_controller::{DataController, DataDir};
+use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
 use crate::{state::synced_state, util};
 use base64::prelude::*;
@@ -74,12 +74,12 @@ impl OhpkmBytesStore {
     }
 
     pub fn load_from_mons_v2(data_controller: &impl DataController) -> Result<Self> {
-        let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, "mons_v2")?;
+        let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
         Self::load_from_directory(&mons_v2_dir)
     }
 
     pub fn write_to_mons_v2(&self, data_controller: &impl DataController) -> Result<()> {
-        let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, "mons_v2")?;
+        let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
         Self::write_to_directory(self, &mons_v2_dir)
     }
 
@@ -157,7 +157,7 @@ pub fn permanently_delete_ohpkms(
 
     // then delete from the disk
     for identifier in openhome_ids {
-        let relative_path = Path::new("mons_v2").join(format!("{identifier}.ohpkm"));
+        let relative_path = Path::new(MONS_V2_DIR).join(format!("{identifier}.ohpkm"));
         match app_handle.absolute_path(DataDir::Storage, &relative_path) {
             Ok(full_path) => {
                 let deletion_result =

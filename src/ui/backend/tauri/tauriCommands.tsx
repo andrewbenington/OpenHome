@@ -47,8 +47,6 @@ type OhTauriApi = {
   save_synced_state(): void
   get_file_bytes(absolutePath: string): number[]
   get_file_created(absolutePath: string): number
-  delete_storage_files(relativePaths: string[]): RustUnitResultByString
-  write_storage_file_bytes(relativePath: string, bytes: Uint8Array): null
   write_storage_file_json(relativePath: string, value: JSONValue): null
   get_storage_file_json(relativePath: string): JSONObject | JSONArray
   find_suggested_saves(saveFolders: string[]): PossibleSaves
@@ -64,7 +62,6 @@ type OhTauriApi = {
   delete_plugin(pluginId: string): string
   handle_windows_accellerator(menuEventId: string): null
 
-  get_ohpkm_files(): Record<string, number[]>
   permanently_delete_ohpkms(identifiers: OhpkmIdentifier[]): RustUnitResultByString
 
   change_data_dir(): null
@@ -197,18 +194,6 @@ export const Commands: OhTauriApiNoThrow = {
 
   write_file_bytes(absolutePath: string, bytes: Uint8Array) {
     return invokeAndCatch('write_file_bytes', { absolutePath, bytes })
-  },
-
-  write_storage_file_bytes(relativePath: string, bytes: Uint8Array) {
-    return invokeAndCatch('write_storage_file_bytes', { relativePath, bytes })
-  },
-
-  async get_ohpkm_files() {
-    return invokeAndCatch('get_ohpkm_files')
-  },
-
-  async delete_storage_files(relativePaths: string[]) {
-    return invokeAndCatch('delete_storage_files', { relativePaths })
   },
 
   start_transaction() {

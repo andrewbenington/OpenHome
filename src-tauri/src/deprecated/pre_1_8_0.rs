@@ -3,10 +3,10 @@ use std::{collections::HashMap, fs};
 use crate::{
     data_controller::{DataController, DataDir},
     error::{Error, Result},
-    pkm_storage::FilenameToBytesMap,
     util,
 };
 
+type FilenameToBytesMap = HashMap<String, Vec<u8>>;
 pub fn get_all_ohpkm_v1_bytes(app_handle: &tauri::AppHandle) -> Result<FilenameToBytesMap> {
     let mons_path = app_handle.absolute_path(DataDir::Storage, "mons")?;
     if !mons_path.try_exists().is_ok_and(|exists| exists) {
