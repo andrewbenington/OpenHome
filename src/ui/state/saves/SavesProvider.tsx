@@ -184,6 +184,15 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     )
   }
 
+  function hideReleaseWarning() {
+    setReleaseWarningDisplayed(false)
+  }
+
+  async function saveChangesReleaseConfirmed() {
+    await saveChanges(true)
+    hideReleaseWarning()
+  }
+
   return (
     <>
       <SavesContext.Provider
@@ -213,12 +222,14 @@ export default function SavesProvider({ children }: SavesProviderProps) {
         open={releaseWarningDisplayed}
         description={`Are you sure you want to release ${openSavesState.monsToRelease.length} Pokémon? This will permanently delete each Pokémon and its associated tracking data. This action cannot be undone.`}
         triggerButton="Change"
-        confirmButtonMessage={`Release ${openSavesState.monsToRelease.length} Pokémon`}
-        onConfirm={async () => {
-          await saveChanges(true)
-          setReleaseWarningDisplayed(false)
-        }}
-        onCancel={() => setReleaseWarningDisplayed(false)}
+        actions={[
+          { uniqueLabel: 'Cancel', action: hideReleaseWarning, type: 'cancel' },
+          {
+            uniqueLabel: `Release ${openSavesState.monsToRelease.length} Pokémon`,
+            action: saveChangesReleaseConfirmed,
+            type: 'destructive',
+          },
+        ]}
       />
     </>
   )

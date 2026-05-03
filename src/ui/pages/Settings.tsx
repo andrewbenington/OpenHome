@@ -83,12 +83,18 @@ export default function Settings() {
             title="Move Data Directory?"
             description="Are you sure you want to move the data directory? All files will be copied to the new location, and the app will restart. After they are copied to the new directory successfully, your storage and plugins will be removed from the old directory."
             triggerButton="Change"
-            confirmButtonMessage="Select New Directory..."
-            onConfirm={() => {
-              backend
-                .promptChangeDataDir()
-                .then(R.mapErr((err) => displayError('Error changing data directory', err)))
-            }}
+            actions={[
+              { uniqueLabel: 'Cancel', action: () => {}, type: 'cancel' },
+              {
+                uniqueLabel: 'Select New Directory...',
+                action: () => {
+                  backend
+                    .promptChangeDataDir()
+                    .then(R.mapErr((err) => displayError('Error changing data directory', err)))
+                },
+                type: 'destructive',
+              },
+            ]}
           />
         </Flex>
       </Flex>

@@ -5,36 +5,29 @@ type PromptDialogProps = {
   triggerButton?: string
   title: string
   description: string
-  confirmButtonMessage?: string
-  onCancel?: () => void
-  onConfirm?: () => void
+  actions: PromptDialogAction[]
   open?: boolean
 }
 
+export type PromptDialogActionType = 'cancel' | 'destructive'
+
+export type PromptDialogAction = {
+  uniqueLabel: string
+  action: (() => void) | (() => Promise<void>)
+  type?: PromptDialogActionType
+}
+
 export default function PromptDialog(props: PromptDialogProps) {
-  const {
-    triggerButton,
-    title,
-    description,
-    onCancel,
-    onConfirm,
-    confirmButtonMessage,
-    open: isOpenControlled,
-  } = props
+  const { triggerButton, title, description, actions, open: isOpenControlled } = props
   const [isOpenUncontrolled, setIsOpenUncontrolled] = useState(false)
 
   const stateIsControlled = isOpenControlled !== undefined
   const isOpen = stateIsControlled ? isOpenControlled : isOpenUncontrolled
 
+  const onCancel = actions.find((a) => a.type === 'cancel')?.action
+
   function cancelAndClose() {
     onCancel?.()
-    if (!stateIsControlled) {
-      setIsOpenUncontrolled(false)
-    }
-  }
-
-  function confirmAndClose() {
-    onConfirm?.()
     if (!stateIsControlled) {
       setIsOpenUncontrolled(false)
     }
@@ -54,10 +47,20 @@ export default function PromptDialog(props: PromptDialogProps) {
           <AlertDialog.Title>{title}</AlertDialog.Title>
           <AlertDialog.Description>{description}</AlertDialog.Description>
           <AlertDialog.Actions>
-            <AlertDialog.Close onClick={cancelAndClose}>Cancel</AlertDialog.Close>
-            <AlertDialog.Close data-color="red" onClick={confirmAndClose}>
-              {confirmButtonMessage ?? 'Confirm'}
-            </AlertDialog.Close>
+            {actions.map(({ uniqueLabel, action, type }) => (
+              <AlertDialog.Close
+                key={uniqueLabel}
+                onClick={async () => {
+                  await action()
+                  if (!stateIsControlled) {
+                    setIsOpenUncontrolled(false)
+                  }
+                }}
+                data-color={type === 'destructive' ? 'red' : type === 'cancel' ? 'grey' : 'blue'}
+              >
+                {uniqueLabel}
+              </AlertDialog.Close>
+            ))}
           </AlertDialog.Actions>
         </AlertDialog.Popup>
       </AlertDialog.Portal>
