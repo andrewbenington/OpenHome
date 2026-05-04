@@ -23,10 +23,12 @@ import PK3RR from './PK3RR'
 export const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   transferableDexNums: RRTransferMon,
   excludedForms: RRExcludedForms,
+  supportsExtraForm: radicalRedSupportsExtraForm,
 }
 
 export class G3RRSAV extends G3CFRUSAV<PK3RR> {
   static transferRestrictions: TransferRestrictions = RR_TRANSFER_RESTRICTIONS
+  transferRestrictions: TransferRestrictions = G3RRSAV.transferRestrictions
 
   pluginIdentifier = 'radical_red' as const
 
@@ -39,8 +41,7 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return radicalRedSupportsExtraForm(extraFormIndex)
-    return !isRestricted(RR_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+    return !isRestricted(RR_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

@@ -1,4 +1,4 @@
-import { GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import { ExtraFormIndex, GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import {
   BDSP_TRANSFER_RESTRICTIONS,
@@ -67,7 +67,7 @@ export function useManageTracked() {
       const savePaths = await backend.getRecentSaves().then(
         R.map((saves) =>
           Object.values(saves)
-            .filter((s) => monPossiblySupported(mon.dexNum, mon.formNum, s))
+            .filter((s) => monPossiblySupported(mon.dexNum, mon.formNum, s, mon.extraFormIndex))
             .map((s) => s.filePath)
         )
       )
@@ -292,11 +292,16 @@ export type FindingSavesForAllState =
   | { type: 'complete'; foundMons: number; totalMons: number; missingMonIds: OhpkmIdentifier[] }
   | { type: 'error'; error: string }
 
-function monPossiblySupported(dexNumber: number, formeNumber: number, saveRef: SaveRef) {
+function monPossiblySupported(
+  dexNumber: number,
+  formeNumber: number,
+  saveRef: SaveRef,
+  extraFormIndex?: ExtraFormIndex
+) {
   if (saveRef.game === null) return false
 
   function isSupported(restrictions: TransferRestrictions) {
-    return !isRestricted(restrictions, dexNumber, formeNumber)
+    return !isRestricted(restrictions, dexNumber, formeNumber, extraFormIndex)
   }
 
   if (saveRef.pluginIdentifier === 'radical_red') {

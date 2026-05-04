@@ -14,6 +14,7 @@ import { OHPKM } from '../pkm/OHPKM'
 import { filterUndefined } from '../util/sort'
 import { LookupType, SAVClass } from './util'
 import { PathData } from './util/path'
+import { TransferRestrictions } from './util/TransferRestrictions'
 
 type SparseArray<T> = (T | undefined)[]
 export class Box<P extends PKMInterface> {
@@ -185,6 +186,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
 }
 
 export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
+  abstract transferRestrictions: TransferRestrictions
   abstract origin: OriginGame
   abstract boxRows: number
   abstract boxColumns: number

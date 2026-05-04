@@ -15,7 +15,7 @@ import { ORASSAV } from '@openhome-core/save/ORASSAV'
 import { PtSAV } from '@openhome-core/save/PtSAV'
 import { G3RRSAV } from '@openhome-core/save/radicalred/G3RRSAV'
 import { G3UBSAV } from '@openhome-core/save/unbound/G3UBSAV'
-import { SAVClass } from '@openhome-core/save/util'
+import { PluginSaveClass, SAVClass } from '@openhome-core/save/util'
 import { XYSAV } from '@openhome-core/save/XYSAV'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { Dispatch, Reducer, createContext } from 'react'
@@ -83,7 +83,7 @@ export type AppInfoState = {
   settings: Settings
   settingsLoaded: boolean
   officialSaveTypes: SAVClass[]
-  extraSaveTypes: SAVClass[]
+  extraSaveTypes: PluginSaveClass[]
   error?: string
 }
 

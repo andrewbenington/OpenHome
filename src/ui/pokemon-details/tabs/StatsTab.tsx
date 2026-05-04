@@ -72,14 +72,23 @@ export default function StatsDisplay(props: { mon: PKMInterface }) {
     if (mon.ivs) {
       items.push(createMenuItem('IVs'))
     }
-    if (mon.dvs && !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum)) {
+    if (
+      mon.dvs &&
+      !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex)
+    ) {
       items.push(createMenuItem('DVs'))
     }
     items.push(createMenuItem('EVs'))
-    if ('avs' in mon && !isRestricted(LGPE_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum)) {
+    if (
+      'avs' in mon &&
+      !isRestricted(LGPE_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex)
+    ) {
       items.push(createMenuItem('AVs'))
     }
-    if ('gvs' in mon && !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum)) {
+    if (
+      'gvs' in mon &&
+      !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex)
+    ) {
       items.push(createMenuItem('GVs'))
     }
     if (mon.contest) {

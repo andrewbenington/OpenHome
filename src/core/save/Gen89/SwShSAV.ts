@@ -102,15 +102,19 @@ export class SwShSAV extends G89SAV<PK8> {
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return false
     const revision = this.scBlocks ? this.getSaveRevision() : 'Crown Tundra'
     switch (revision) {
       case 'Base Game':
-        return !isRestricted(SWSH_TRANSFER_RESTRICTIONS_BASE, dexNumber, formeNumber)
+        return !isRestricted(
+          SWSH_TRANSFER_RESTRICTIONS_BASE,
+          dexNumber,
+          formeNumber,
+          extraFormIndex
+        )
       case 'Isle Of Armor':
-        return !isRestricted(SWSH_TRANSFER_RESTRICTIONS_IOA, dexNumber, formeNumber)
+        return !isRestricted(SWSH_TRANSFER_RESTRICTIONS_IOA, dexNumber, formeNumber, extraFormIndex)
       case 'Crown Tundra':
-        return !isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, dexNumber, formeNumber)
+        return !isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, dexNumber, formeNumber, extraFormIndex)
     }
   }
 

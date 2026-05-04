@@ -1,3 +1,21 @@
+use pkm_rs_resources::ExpectLog;
+use pkm_rs_resources::abilities::AbilityIndexBounded;
+use pkm_rs_resources::species::EggGroup;
+use pkm_rs_resources::species::FormMetadata;
+use pkm_rs_resources::species::GenderRatio;
+use pkm_rs_resources::species::MegaEvolutionMetadata;
+use pkm_rs_resources::species::NatDexIndex;
+use pkm_rs_resources::species::SpeciesAndForm;
+use pkm_rs_resources::species::SpeciesMetadata;
+use pkm_rs_resources::species::form_metadata::MetadataSource;
+use pkm_rs_resources::species::form_metadata::current_base_stats;
+use pkm_rs_resources::species::form_metadata::types_lookup;
+use pkm_rs_types::AbilityNumber;
+use pkm_rs_types::GameSetting;
+use pkm_rs_types::Gender;
+use pkm_rs_types::Generation;
+use pkm_rs_types::Stats8;
+use pkm_rs_types::TeraType;
 use pkm_rs_types::{NationalDex, PkmType};
 use serde::Serialize;
 use strum::EnumIter;
@@ -5,9 +23,6 @@ use strum::IntoEnumIterator;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
-
-#[cfg(feature = "randomize")]
-use pkm_rs_resources::species::NatDexIndex;
 
 #[cfg(feature = "randomize")]
 use rand::seq::IteratorRandom;
@@ -150,6 +165,47 @@ impl ExtraFormIndex {
                 | Self::CentiskorchSeviiGiga
                 | Self::NymbleSevii
                 | Self::LokixSevii
+        )
+    }
+
+    pub const fn is_gmax(&self) -> bool {
+        matches!(
+            self,
+            Self::CharizardGiga
+                | Self::ButterfreeGiga
+                | Self::PikachuGiga
+                | Self::MeowthGiga
+                | Self::MachampGiga
+                | Self::GengarGiga
+                | Self::KinglerGiga
+                | Self::LaprasGiga
+                | Self::EeveeGiga
+                | Self::SnorlaxGiga
+                | Self::GarbodorGiga
+                | Self::MelmetalGiga
+                | Self::CorviknightGiga
+                | Self::OrbeetleGiga
+                | Self::DrednawGiga
+                | Self::CoalossalGiga
+                | Self::FlappleGiga
+                | Self::AppletunGiga
+                | Self::SandacondaGiga
+                | Self::ToxtricityGiga
+                | Self::ToxtricityLowKeyGiga
+                | Self::CentiskorchGiga
+                | Self::HattereneGiga
+                | Self::GrimmsnarlGiga
+                | Self::AlcremieGiga
+                | Self::CopperajahGiga
+                | Self::DuraludonGiga
+                | Self::VenusaurGiga
+                | Self::BlastoiseGiga
+                | Self::RillaboomGiga
+                | Self::CinderaceGiga
+                | Self::InteleonGiga
+                | Self::UrsifuSingleGiga
+                | Self::UrsifuRapidGiga
+                | Self::EternatusEternamax
         )
     }
 
@@ -422,7 +478,13 @@ impl ExtraFormIndex {
             Self::MantykeSevii | Self::MantineSevii => {
                 Some((PkmType::Electric, Some(PkmType::Poison)))
             }
+            Self::DoduoSevii | Self::DodrioSevii => Some((PkmType::Fire, Some(PkmType::Ground))),
             Self::NymbleSevii | Self::LokixSevii => Some((PkmType::Bug, Some(PkmType::Dragon))),
+            Self::TeddiursaSevii => Some((PkmType::Ghost, None)),
+            Self::UrsaringSevii => Some((PkmType::Ghost, Some(PkmType::Fighting))),
+            Self::BlitzleSevii | Self::ZebstrikaSevii => {
+                Some((PkmType::Ice, Some(PkmType::Electric)))
+            }
             _ => None,
         }
     }
@@ -596,6 +658,278 @@ pub fn extra_form_type_override(form: ExtraFormIndex) -> Option<Vec<PkmType>> {
         Some((t1, None)) => Some(vec![t1]),
         None => None,
     }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "extraFormsByNationalDex")]
+pub fn extra_forms_by_national_dex_js(national_dex: NationalDex) -> Vec<ExtraFormIndex> {
+    ExtraFormIndex::all_by_national_dex(national_dex)
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Clone)]
+pub struct ExtraFormMetadata {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = extraFormIndex))]
+    pub extra_form_index: ExtraFormIndex,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = nationalDex))]
+    pub national_dex: NatDexIndex,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
+    pub form_name: String,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = formIndex))]
+    pub form_index: u16,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isBaseForm))]
+    pub is_base_form: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isMega))]
+    pub is_mega: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub mega_evolution_data: &'static [MegaEvolutionMetadata],
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isGmax))]
+    pub is_gmax: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isBattleOnly))]
+    pub is_battle_only: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isCosmetic))]
+    pub is_cosmetic: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = genderRatio))]
+    pub gender_ratio: GenderRatio,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub abilities: (AbilityIndexBounded, AbilityIndexBounded),
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub hidden_ability: Option<AbilityIndexBounded>,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseHeight))]
+    pub base_height: u32,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = baseWeight))]
+    pub base_weight: u32,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub evolutions: &'static [SpeciesAndForm],
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = preEvolution))]
+    pub pre_evolution: Option<SpeciesAndForm>,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub egg_groups: (EggGroup, Option<EggGroup>),
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub introduced: Generation,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isRestrictedLegend))]
+    pub is_restricted_legend: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isSubLegend))]
+    pub is_sub_legend: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isMythical))]
+    pub is_mythical: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isUltraBeast))]
+    pub is_ultra_beast: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = isParadox))]
+    pub is_paradox: bool,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub regional: Option<GameSetting>,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub sprite: String,
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub sprite_index: (u8, u8),
+}
+
+impl ExtraFormMetadata {
+    pub fn from_base_metadata(base_form_metadata: FormMetadata, form: ExtraFormIndex) -> Self {
+        Self {
+            extra_form_index: form,
+            national_dex: base_form_metadata.national_dex,
+            form_name: form.display_name(),
+            form_index: base_form_metadata.form_index,
+            is_base_form: base_form_metadata.is_base_form,
+            is_mega: base_form_metadata.is_mega,
+            mega_evolution_data: &[],
+            is_gmax: form.is_gmax(),
+            is_battle_only: base_form_metadata.is_battle_only,
+            is_cosmetic: base_form_metadata.is_cosmetic,
+            gender_ratio: base_form_metadata.gender_ratio,
+            abilities: base_form_metadata.abilities.clone(),
+            hidden_ability: base_form_metadata.hidden_ability,
+            base_height: base_form_metadata.base_height,
+            base_weight: base_form_metadata.base_weight,
+            evolutions: base_form_metadata.evolutions,
+            pre_evolution: base_form_metadata.pre_evolution,
+            egg_groups: base_form_metadata.egg_groups.clone(),
+            introduced: base_form_metadata.introduced,
+            is_restricted_legend: base_form_metadata.is_restricted_legend,
+            is_sub_legend: base_form_metadata.is_sub_legend,
+            is_mythical: base_form_metadata.is_mythical,
+            is_ultra_beast: base_form_metadata.is_ultra_beast,
+            is_paradox: base_form_metadata.is_paradox,
+            regional: base_form_metadata.regional.clone(),
+            sprite: form.sprite_name().unwrap_or(base_form_metadata.sprite()),
+            sprite_index: base_form_metadata.sprite_index,
+        }
+    }
+    pub const fn forme_ref(&self) -> SpeciesAndForm {
+        unsafe { SpeciesAndForm::new_unchecked(self.national_dex.get(), self.form_index) }
+    }
+
+    pub const fn species_metadata(&self) -> &SpeciesMetadata {
+        self.forme_ref().get_species_metadata()
+    }
+
+    pub fn get_ability(&self, ability_num: AbilityNumber) -> AbilityIndexBounded {
+        match ability_num {
+            AbilityNumber::First => self.abilities.0,
+            AbilityNumber::Second => self.abilities.1,
+            AbilityNumber::Hidden => self.hidden_ability.unwrap_or(self.abilities.0),
+        }
+    }
+
+    pub fn get_base_evolution(&self) -> SpeciesAndForm {
+        match self.pre_evolution {
+            None => self.forme_ref(),
+            Some(forme_ref) => forme_ref.get_base_evolution(),
+        }
+    }
+
+    fn types_from_source_or_latest(
+        &self,
+        source: Option<MetadataSource>,
+    ) -> (PkmType, Option<PkmType>) {
+        self.extra_form_index.type_overrides().unwrap_or(
+            types_lookup(self.national_dex.get(), self.form_index, source).expect_log(format!(
+                "no types found for nat dex {} form {}",
+                self.national_dex.get(),
+                self.form_index
+            )),
+        )
+    }
+
+    /// Tera Type assigned by Pokémon HOME for the species when not originally
+    /// from Scarlet/Violet
+    pub fn transferred_tera_type(&self) -> TeraType {
+        TeraType::Standard(match self.types_from_source_or_latest(None) {
+            (PkmType::Normal, Some(type2)) => type2,
+            (type1, _) => type1,
+        })
+    }
+}
+
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+#[cfg(feature = "wasm")]
+impl ExtraFormMetadata {
+    #[wasm_bindgen(getter = megaEvolutions)]
+    pub fn mega_evolutions(&self) -> Vec<MegaEvolutionMetadata> {
+        self.mega_evolution_data.to_vec()
+    }
+
+    #[wasm_bindgen(getter = type1)]
+    pub fn type_1(&self) -> PkmType {
+        self.types_from_source_or_latest(None).0
+    }
+
+    #[wasm_bindgen(js_name = type1WithSource)]
+    pub fn type_1_with_source(&self, source: MetadataSource) -> Option<PkmType> {
+        Some(self.types_from_source_or_latest(Some(source)).0)
+    }
+
+    #[wasm_bindgen(getter = type1Index)]
+    pub fn type_1_index(&self) -> u8 {
+        self.types_from_source_or_latest(None).0 as u8
+    }
+
+    #[wasm_bindgen(getter = type2)]
+    pub fn type_2(&self) -> Option<PkmType> {
+        self.types_from_source_or_latest(None).1
+    }
+
+    #[wasm_bindgen(js_name = type2WithSource)]
+    pub fn type_2_with_source(&self, source: MetadataSource) -> Option<PkmType> {
+        self.types_from_source_or_latest(Some(source)).1
+    }
+
+    #[wasm_bindgen(getter = type2Index)]
+    pub fn type_2_index(&self) -> Option<u8> {
+        self.types_from_source_or_latest(None).1.map(|t| t as u8)
+    }
+
+    #[wasm_bindgen(getter = eggGroups)]
+    pub fn egg_groups(&self) -> Vec<String> {
+        match self.egg_groups.1 {
+            Some(egg_group_1) => vec![self.egg_groups.0.to_string(), egg_group_1.to_string()],
+            None => vec![self.egg_groups.0.to_string()],
+        }
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+    pub fn evolutions(&self) -> Vec<SpeciesAndForm> {
+        self.evolutions.to_vec()
+    }
+
+    #[wasm_bindgen(getter = formeName)]
+    pub fn form_name(&self) -> String {
+        self.form_name.to_owned()
+    }
+
+    #[wasm_bindgen(getter = introducedGen)]
+    pub fn introduced_gen(&self) -> Generation {
+        self.introduced
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn regional(&self) -> Option<String> {
+        self.regional.as_ref().map(GameSetting::to_string)
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn sprite(&self) -> String {
+        self.sprite.to_owned()
+    }
+
+    #[wasm_bindgen(getter = spriteCoords)]
+    pub fn sprite_coords(&self) -> Vec<u8> {
+        vec![self.sprite_index.0, self.sprite_index.1]
+    }
+
+    #[wasm_bindgen(js_name = genderFromAtkDv)]
+    pub fn gender_from_atk_dv(&self, atk_dv: u8) -> Gender {
+        self.gender_ratio.gender_for_atk_dv(atk_dv)
+    }
+
+    #[wasm_bindgen(js_name = genderFromPid)]
+    pub fn gender_from_pid(&self, pid: u32) -> Gender {
+        self.gender_ratio.gender_for_pid(pid)
+    }
+
+    #[wasm_bindgen(getter = baseStats)]
+    pub fn get_base_stats(&self) -> Stats8 {
+        current_base_stats(self.national_dex.get(), self.form_index).unwrap_or_default()
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = "extraFormMetadata")]
+pub fn extra_form_metadata_js(form: ExtraFormIndex) -> ExtraFormMetadata {
+    let base_form_metadata = SpeciesAndForm::base_form(form.national_dex().into())
+        .get_forme_metadata()
+        .clone();
+
+    ExtraFormMetadata::from_base_metadata(base_form_metadata, form)
 }
 
 pub struct InvalidExtraFormIndex;

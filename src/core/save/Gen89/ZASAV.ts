@@ -100,13 +100,12 @@ export class ZASAV extends G89SAV<PA9> {
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return false
     const revision = this.scBlocks ? this.getSaveRevision() : 'Mega Dimension'
     switch (revision) {
       case 'Base Game':
-        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_BASE, dexNumber, formeNumber)
+        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_BASE, dexNumber, formeNumber, extraFormIndex)
       case 'Mega Dimension':
-        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_MD, dexNumber, formeNumber)
+        return !isRestricted(ZA_TRANSFER_RESTRICTIONS_MD, dexNumber, formeNumber, extraFormIndex)
     }
   }
 

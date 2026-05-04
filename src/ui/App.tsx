@@ -134,8 +134,8 @@ function AppWithBackend() {
   }, [backend, appInfoState.settings, appInfoState.settingsLoaded, debouncedUpdateSettings])
 
   const getEnabledSaveTypes = useCallback(() => {
-    return appInfoState.extraSaveTypes
-      .concat(appInfoState.officialSaveTypes)
+    return appInfoState.officialSaveTypes
+      .concat(appInfoState.extraSaveTypes)
       .filter((saveType) => appInfoState.settings.enabledSaveTypes[saveType.saveTypeID])
   }, [appInfoState])
 

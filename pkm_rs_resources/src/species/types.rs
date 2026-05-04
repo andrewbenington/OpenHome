@@ -162,7 +162,7 @@ impl GenderRatio {
     }
 
     #[cfg(feature = "wasm")]
-    const fn gender_for_pid(&self, pid: u32) -> Gender {
+    pub const fn gender_for_pid(&self, pid: u32) -> Gender {
         match self {
             Self::Genderless => Gender::Genderless,
             Self::AllMale => Gender::Male,
@@ -179,7 +179,7 @@ impl GenderRatio {
     }
 
     #[cfg(feature = "wasm")]
-    const fn gender_for_atk_dv(&self, atk_dv: u8) -> Gender {
+    pub const fn gender_for_atk_dv(&self, atk_dv: u8) -> Gender {
         match self {
             Self::Genderless => Gender::Genderless,
             Self::AllMale => Gender::Male,
