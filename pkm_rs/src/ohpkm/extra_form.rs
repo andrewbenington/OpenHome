@@ -8,19 +8,20 @@ use pkm_rs_resources::species::NatDexIndex;
 use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_resources::species::form_metadata::MetadataSource;
-use pkm_rs_resources::species::form_metadata::current_base_stats;
 use pkm_rs_resources::species::form_metadata::types_lookup;
 use pkm_rs_types::AbilityNumber;
 use pkm_rs_types::GameSetting;
-use pkm_rs_types::Gender;
 use pkm_rs_types::Generation;
-use pkm_rs_types::Stats8;
 use pkm_rs_types::TeraType;
 use pkm_rs_types::{NationalDex, PkmType};
 use serde::Serialize;
 use strum::EnumIter;
 use strum::IntoEnumIterator;
 
+#[cfg(feature = "wasm")]
+use pkm_rs_resources::species::form_metadata::current_base_stats;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::{Gender, Stats8};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
