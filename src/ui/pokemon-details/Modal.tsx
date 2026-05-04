@@ -261,12 +261,7 @@ const PokemonDetailsModal = (props: {
                 <SideTabs.Panel value="raw">
                   <Fallback>
                     <HexDisplay
-                      data={
-                        new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))
-                        // displayMon.originalBytes
-                        //   ? displayMon.originalBytes
-                        //   : new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))
-                      }
+                      data={new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))}
                       format={
                         isRomHackFormat(displayMon.format)
                           ? undefined

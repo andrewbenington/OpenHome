@@ -229,8 +229,12 @@ export default function SortPokemon() {
           </button>
         </Flex>
       </Card>
-      <Flex direction="column" gap="2" style={{ flex: 1, height: '100%' }}>
-        <Card style={{ contain: 'none' }}>
+      <Flex
+        direction="column"
+        gap="2"
+        style={{ flex: 1, height: '100%', contain: 'none', overflow: 'visible' }}
+      >
+        <Card style={{ contain: 'none', overflow: 'visible' }}>
           <Flex direction="row" gap="2" align="center" wrap="wrap">
             <Autocomplete
               value={sort ?? null}
