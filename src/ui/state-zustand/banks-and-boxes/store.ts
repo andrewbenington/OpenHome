@@ -332,9 +332,10 @@ function buildNewBox(
 
 function firstEmptyBoxSlot(box: SimpleOpenHomeBox): Option<number> {
   let firstEmptyIndex: Option<number> = undefined
-  for (const [index, contents] of box.identifiers) {
-    if (!contents && (firstEmptyIndex === undefined || firstEmptyIndex > index)) {
-      firstEmptyIndex = index
+  for (const boxSlot of range(0, OPENHOME_BOX_SLOTS)) {
+    const contents = box.identifiers.get(boxSlot)
+    if (!contents && (firstEmptyIndex === undefined || firstEmptyIndex > boxSlot)) {
+      firstEmptyIndex = boxSlot
     }
   }
 

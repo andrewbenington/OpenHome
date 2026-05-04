@@ -1,12 +1,15 @@
+use std::num::NonZeroU64;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
+
 use crate::result::{Error, Result};
-use crate::traits::{HasSpeciesAndForm, IsShiny4096, PkmBytes};
+use crate::traits::{IsShiny4096, PkmBytes};
 use crate::util;
 
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
+use pkm_rs_resources::species::SpeciesAndForm;
 
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{ContestStats, Language, Stats8, Stats16Le, StatsPreSplit};
@@ -15,16 +18,8 @@ use pkm_rs_types::{Geolocations, HyperTraining, MarkingsSixShapesColors};
 
 use serde::Serialize;
 
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
-
-#[cfg(feature = "randomize")]
-use pkm_rs_types::randomize::Randomize;
-
 const MIN_SIZE: usize = 420;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct OhpkmV1 {
     pub encryption_constant: u32,
@@ -53,22 +48,16 @@ pub struct OhpkmV1 {
     pub pokerus_byte: u8,
     pub contest_memory_count: u8,
     pub battle_memory_count: u8,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: OpenHomeRibbonSet<16>,
     pub sociability: u32,
     pub height_scalar: u8,
     pub weight_scalar: u8,
     pub scale: u8,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: [MoveIndex; 4],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_pp: [u8; 4],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub nickname: SizedUtf16String<26>,
     pub avs: Stats16Le,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_pp_ups: [u8; 4],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveIndex; 4],
     pub ivs: Stats8,
     pub is_egg: bool,
@@ -79,7 +68,6 @@ pub struct OhpkmV1 {
     pub unknown_a0: u32,
     pub gvs: Stats8,
     pub dvs: StatsPreSplit,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub handler_name: SizedUtf16String<26>,
     pub handler_language: u8,
     pub is_current_handler: bool,
@@ -104,7 +92,6 @@ pub struct OhpkmV1 {
     pub enjoyment: u8,
     pub game_of_origin: OriginGame,
     pub game_of_origin_battle: Option<OriginGame>,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub plugin_origin: SizedUtf16String<32>,
     pub country: u8,
     pub region: u8,
@@ -116,7 +103,7 @@ pub struct OhpkmV1 {
     pub geolocations: Geolocations,
     pub encounter_type: u8,
     pub performance: u8,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+
     pub trainer_name: SizedUtf16String<26>,
     pub trainer_friendship: u8,
     pub trainer_memory: TrainerMemory,
@@ -130,23 +117,17 @@ pub struct OhpkmV1 {
     pub hyper_training: HyperTraining,
     pub trainer_gender: Gender,
     pub obedience_level: u8,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub home_tracker: [u8; 8],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tr_flags_swsh: [u8; 14],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tm_flags_bdsp: [u8; 14],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_flags_la: [u8; 14],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tutor_flags_la: [u8; 8],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub master_flags_la: [u8; 8],
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tm_flags_sv: [u8; 22],
     pub evs_g12: StatsPreSplit,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub tm_flags_sv_dlc: [u8; 13],
+
+    pub file_timestamp_seconds: Option<NonZeroU64>,
 }
 
 impl OhpkmV1 {
@@ -308,7 +289,20 @@ impl OhpkmV1 {
             } else {
                 SizedUtf16String::<32>::default()
             },
+            file_timestamp_seconds: None,
         };
+        Ok(mon)
+    }
+
+    pub fn from_bytes_and_timestamp(bytes: &[u8], timestamp: SystemTime) -> Result<Self> {
+        let mut mon = OhpkmV1::from_bytes(bytes)?;
+        mon.file_timestamp_seconds = timestamp
+            .duration_since(UNIX_EPOCH)
+            .ok()
+            .as_ref()
+            .map(Duration::as_secs)
+            .and_then(NonZeroU64::new);
+
         Ok(mon)
     }
 }
@@ -489,32 +483,6 @@ impl PkmBytes for OhpkmV1 {
     }
 
     fn to_party_bytes(&self) -> Vec<u8> {
-        self.to_box_bytes()
-    }
-}
-
-impl HasSpeciesAndForm for OhpkmV1 {
-    fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.species_and_form.get_species_metadata()
-    }
-
-    fn get_forme_metadata(&self) -> &'static FormMetadata {
-        self.species_and_form.get_forme_metadata()
-    }
-
-    fn calculate_level(&self) -> u8 {
-        self.get_species_metadata()
-            .level_up_type
-            .calculate_level(self.exp)
-    }
-}
-
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
-#[allow(clippy::missing_const_for_fn)]
-impl OhpkmV1 {
-    #[wasm_bindgen(js_name = "toBytes")]
-    pub fn to_bytes_wasm(&self) -> Vec<u8> {
         self.to_box_bytes()
     }
 }

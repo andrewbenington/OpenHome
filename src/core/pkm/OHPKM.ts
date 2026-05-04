@@ -65,6 +65,7 @@ import {
   getPrevos,
   ivsFromDVs,
 } from './util'
+import dayjs, { Dayjs } from 'dayjs'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getFormat() {
@@ -559,6 +560,17 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
   set pluginOrigin(origin: Option<PluginIdentifier>) {
     this.pluginOriginWasm = origin
+  }
+
+  get startedTrackingTimestamp() {
+    const timestampSeconds = this.startedTrackingSeconds
+    return timestampSeconds ? dayjs.unix(Number(timestampSeconds)) : undefined
+  }
+
+  set startedTrackingTimestamp(timestamp: Option<Dayjs>) {
+    if (timestamp) {
+      this.startedTrackingSeconds = BigInt(timestamp.unix())
+    }
   }
 
   // derived fields

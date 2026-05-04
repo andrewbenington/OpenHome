@@ -23,13 +23,17 @@ use pkm_rs_types::{
 };
 use pkm_rs_types::{FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors, TeraType};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
+#[cfg(feature = "randomize")]
+use rand::RngExt;
+use serde::Deserialize;
 use serde::Serialize;
-use std::num::NonZeroU16;
+use std::num::{NonZeroU16, NonZeroU64};
+
+#[cfg(feature = "randomize")]
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
-
-use serde::Deserialize;
 
 pub mod pkm_bytes;
 
@@ -126,6 +130,8 @@ pub struct MainDataV2 {
     pub home_tracker: [u8; 8],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub display_color_rgb: Option<[u8; 3]>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub started_tracking_seconds: Option<NonZeroU64>,
 }
 
 const NIDORAN_F: NatDexIndex = unsafe { NatDexIndex::new_unchecked(29) };
@@ -142,6 +148,7 @@ impl MainDataV2 {
             ..Default::default()
         })
     }
+
     pub fn from_v1(old: super::v1::OhpkmV1) -> Self {
         MainDataV2 {
             encryption_constant: old.encryption_constant,
@@ -215,6 +222,7 @@ impl MainDataV2 {
             obedience_level: old.obedience_level,
             home_tracker: old.home_tracker,
             display_color_rgb: None,
+            started_tracking_seconds: old.file_timestamp_seconds,
         }
     }
 
@@ -222,7 +230,6 @@ impl MainDataV2 {
         self.species_and_form.get_ndex()
     }
 
-    #[cfg(feature = "wasm")]
     pub fn openhome_id(&self) -> String {
         let base_mon = self.species_and_form.get_base_evolution();
         format!(
@@ -233,6 +240,17 @@ impl MainDataV2 {
             self.personality_value,
             self.game_of_origin as u8
         )
+    }
+
+    pub fn with_timestamp_if_missing(
+        &mut self,
+        started_tracking_seconds: Option<NonZeroU64>,
+    ) -> &mut Self {
+        if self.started_tracking_seconds.is_none() {
+            self.started_tracking_seconds = started_tracking_seconds;
+        }
+
+        self
     }
 
     pub fn nickname_matches_species_ignore_case(&self) -> bool {
@@ -525,13 +543,9 @@ impl DataSection for MainDataV2 {
                 text_variable: u16::from_le_bytes(bytes[220..222].try_into().unwrap()),
             },
             handler_affection: bytes[222],
-            // super_training_flags: u32::from_le_bytes(bytes[223..227].try_into().unwrap()),
-            // super_training_dist_flags: bytes[227],
-            // secret_super_training_unlocked: util::get_flag(bytes, 228, 0),
-            // secret_super_training_complete: util::get_flag(bytes, 228, 1),
-            // training_bag_hits: bytes[229],
-            // training_bag: bytes[230],
-            // 231..235
+            started_tracking_seconds: NonZeroU64::new(u64::from_le_bytes(
+                bytes[223..231].try_into().unwrap(),
+            )),
             // poke_star_fame: bytes[232],
             obedience_level: bytes[233],
             // shiny_leaves: bytes[234] & 0x3f,
@@ -651,11 +665,9 @@ impl DataSection for MainDataV2 {
         bytes[220..222].copy_from_slice(&self.handler_memory.text_variable.to_le_bytes());
 
         bytes[222] = self.handler_affection;
-        // bytes[223..227].copy_from_slice(&self.super_training_flags.to_le_bytes());
-        // bytes[227] = self.super_training_dist_flags;
-
-        // bytes[229] = self.training_bag_hits;
-        // bytes[230] = self.training_bag;
+        if let Some(seconds) = self.started_tracking_seconds {
+            bytes[223..231].copy_from_slice(&seconds.get().to_le_bytes());
+        }
         // bytes[232] = self.poke_star_fame;
         bytes[233] = self.obedience_level;
 
@@ -690,6 +702,17 @@ impl DataSection for MainDataV2 {
     fn is_empty(&self) -> bool {
         false
     }
+}
+
+#[cfg(feature = "randomize")]
+fn current_time_unix_seconds() -> NonZeroU64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .ok()
+        .as_ref()
+        .map(Duration::as_secs)
+        .and_then(NonZeroU64::new)
+        .expect("current time is after the unix epoch")
 }
 
 #[cfg(feature = "randomize")]
@@ -777,6 +800,10 @@ impl Randomize for MainDataV2 {
             obedience_level: u8::randomized(rng),
             home_tracker: rand::random(),
             display_color_rgb: Option::<[u8; 3]>::randomized(rng),
+            started_tracking_seconds: match bool::randomized(rng) {
+                false => None,
+                true => NonZeroU64::new(rng.random_range(1..=current_time_unix_seconds().get())),
+            },
         }
     }
 }

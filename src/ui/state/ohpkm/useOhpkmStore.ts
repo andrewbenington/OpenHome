@@ -13,6 +13,7 @@ import { SAV } from '../../../core/save/interfaces'
 import { SAVClass } from '../../../core/save/util'
 import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
+import dayjs from 'dayjs'
 
 export type OhpkmStore = {
   getById(id: string): OHPKM | undefined
@@ -134,6 +135,7 @@ export function useOhpkmStore(): OhpkmStore {
   const startTrackingNewMon = useCallback(
     <P extends PKMInterface>(mon: P, sourceSave: Option<SAV<P>>, destSave: Option<SAV>) => {
       const ohpkm = sourceSave ? OHPKM.fromMonInSave(mon, sourceSave) : new OHPKM(mon)
+      ohpkm.startedTrackingTimestamp = dayjs()
       if (destSave) {
         handleLookupsUpdate(ohpkm, destSave)
       }
