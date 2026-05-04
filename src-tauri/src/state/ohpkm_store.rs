@@ -27,16 +27,16 @@ impl OhpkmBytesStore {
             }
 
             if let Ok(mon_bytes) = util::read_file_bytes(path) {
-                let file_created_seconds = dir_entry
-                    .metadata()
-                    .ok()
-                    .and_then(|m| m.created().or(m.modified()).ok())
-                    .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-                    .as_ref()
-                    .map(Duration::as_secs)
-                    .and_then(NonZeroU64::new);
+                if let Ok(mut mon) = OhpkmV2::from_bytes(&mon_bytes) {
+                    let file_created_seconds = dir_entry
+                        .metadata()
+                        .ok()
+                        .and_then(|m| m.created().or(m.modified()).ok())
+                        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                        .as_ref()
+                        .map(Duration::as_secs)
+                        .and_then(NonZeroU64::new);
 
-                if let Ok(mut mon) = OhpkmV2::from_bytes(&mon_bytes, file_created_seconds) {
                     mon.set_started_tracking_if_missing(file_created_seconds);
                     map.insert(mon.openhome_id(), mon.to_bytes());
                 }
@@ -52,7 +52,7 @@ impl OhpkmBytesStore {
 
     fn fix_errors(&mut self) {
         for (identifier, bytes) in self.0.iter_mut() {
-            if let Ok(mut mon) = OhpkmV2::from_bytes(bytes, None) {
+            if let Ok(mut mon) = OhpkmV2::from_bytes(bytes) {
                 let had_errors = mon.fix_errors();
                 if had_errors {
                     println!(

@@ -1586,7 +1586,7 @@ impl OhpkmV2 {
         })
     }
 
-    pub fn from_bytes(bytes: &[u8], file_created_seconds: Option<NonZeroU64>) -> Result<Self> {
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let sectioned_data = SectionedData::<OhpkmSectionTag>::from_bytes(bytes)?;
 
         if sectioned_data.magic_number != MAGIC_NUMBER {
@@ -1607,9 +1607,8 @@ impl OhpkmV2 {
         };
 
         let result = Self {
-            main_data: *MainDataV2::extract_from(&sectioned_data)?
-                .ok_or(Error::other("Main data not present in OHPKM V2 file"))?
-                .with_timestamp_if_missing(file_created_seconds),
+            main_data: MainDataV2::extract_from(&sectioned_data)?
+                .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
             gameboy_data: GameboyData::extract_from(&sectioned_data)?,
             gen45_data: Gen45Data::extract_from(&sectioned_data)?,
             gen67_data: Gen67Data::extract_from(&sectioned_data)?,
@@ -1796,7 +1795,7 @@ impl OhpkmV2 {
     #[wasm_bindgen(constructor)]
     pub fn from_byte_vector(bytes: &[u8]) -> JsResult<Self> {
         if !bytes.is_empty() {
-            Self::from_bytes(bytes, None).map_err(|e| JsValue::from_str(&e.to_string()))
+            Self::from_bytes(bytes).map_err(|e| JsValue::from_str(&e.to_string()))
         } else {
             Ok(Self::default())
         }
@@ -1805,7 +1804,7 @@ impl OhpkmV2 {
     #[wasm_bindgen(js_name = "fromByteVectorFixingErrors")]
     pub fn from_byte_vector_fixing_errors(bytes: &[u8]) -> JsResult<Self> {
         Ok(if !bytes.is_empty() {
-            Self::from_bytes(bytes, None)?
+            Self::from_bytes(bytes)?
         } else {
             Self::default()
         })
@@ -3521,7 +3520,7 @@ impl PkmBytes for OhpkmV2 {
     const PARTY_SIZE: usize = 0;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        match Self::from_bytes(bytes, None) {
+        match Self::from_bytes(bytes) {
             Ok(ohpkm) => Ok(ohpkm),
             Err(err) => Err(Error::other(&err.to_string())),
         }
@@ -3583,10 +3582,7 @@ impl IsShiny for OhpkmV2 {
 
 #[cfg(test)]
 mod tests {
-    use std::{
-        path::Path,
-        time::{Duration, UNIX_EPOCH},
-    };
+    use std::path::Path;
 
     use super::*;
     #[test]
@@ -3602,18 +3598,9 @@ mod tests {
             {
                 continue;
             }
+
             let data = std::fs::read(entry.path()).unwrap();
-
-            let file_created_seconds = entry
-                .metadata()
-                .ok()
-                .and_then(|m| m.created().or(m.modified()).ok())
-                .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-                .as_ref()
-                .map(Duration::as_secs)
-                .and_then(NonZeroU64::new);
-
-            OhpkmV2::from_bytes(&data, file_created_seconds).map_err(|e| {
+            OhpkmV2::from_bytes(&data).map_err(|e| {
                 format!(
                     "failed to build ohpkm file {}: {e}",
                     entry.path().file_name().unwrap().to_string_lossy()

@@ -410,8 +410,7 @@ impl Pk7 {
         bytes: Vec<u8>,
         strategy: ConvertStrategy,
     ) -> core::result::Result<Pk7, JsValue> {
-        let ohpkm =
-            OhpkmV2::from_bytes(&bytes, None).map_err(|e| JsValue::from_str(&e.to_string()))?;
+        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
         Ok(Pk7::from_ohpkm(&ohpkm, strategy))
     }
 
