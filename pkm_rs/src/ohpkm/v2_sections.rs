@@ -25,14 +25,15 @@ use pkm_rs_types::{FlagSet, Geolocations, HyperTraining, MarkingsSixShapesColors
 use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 #[cfg(feature = "randomize")]
 use rand::RngExt;
+use serde::Deserialize;
 use serde::Serialize;
 use std::num::{NonZeroU16, NonZeroU64};
+
+#[cfg(feature = "randomize")]
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
-
-use serde::Deserialize;
 
 pub mod pkm_bytes;
 
