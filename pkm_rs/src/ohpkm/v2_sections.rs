@@ -704,6 +704,17 @@ impl DataSection for MainDataV2 {
 }
 
 #[cfg(feature = "randomize")]
+fn current_time_unix_seconds() -> NonZeroU64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .ok()
+        .as_ref()
+        .map(Duration::as_secs)
+        .and_then(NonZeroU64::new)
+        .expect("current time is after the unix epoch")
+}
+
+#[cfg(feature = "randomize")]
 impl Randomize for MainDataV2 {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
         let species_and_form = SpeciesAndForm::randomized(rng);
