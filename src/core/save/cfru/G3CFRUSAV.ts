@@ -108,6 +108,9 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
     })
 
     this.currentPCBox = this.pcDataContiguous[0]
+    if (this.currentPCBox >= boxCount) {
+      this.currentPCBox = 0
+    }
     this.boxNames = []
     this.boxes = new Array<Box<T>>(boxCount)
     for (let i = 0; i < boxCount; i++) {
