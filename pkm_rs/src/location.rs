@@ -353,7 +353,10 @@ pub enum Location {
 pub const CANT_TELL_GEN2: u16 = 126;
 pub const FATEFUL_ENCOUNTER_GEN_3: u16 = 255;
 pub const PAL_PARK_GEN_4: u16 = 55;
-pub const POKE_TRANSFER_LAB_GEN_5: u16 = 60;
+/// Gen V Unova map index for the Poké Transfer Lab building on Route 15.
+pub const POKE_TRANSFER_LAB_INDEX_GEN_5: u16 = 60;
+/// Gen V met location for Pokémon transferred from Gen IV or lower via Poké Transfer.
+pub const POKE_TRANSFER_MET_LOCATION_GEN_5: u16 = 30001;
 pub const GO_PARK_LETS_GO: u16 = 50;
 pub const FARAWAY_PLACE_SWSH: u16 = 40002;
 
@@ -808,7 +811,7 @@ mod tests {
 
             // Omega Ruby treated as Ruby
             assert_eq!(met_data.origin, OriginGame::Ruby);
-            assert_eq!(met_data.location_index, POKE_TRANSFER_LAB_GEN_5);
+            assert_eq!(met_data.location_index, POKE_TRANSFER_MET_LOCATION_GEN_5);
 
             Ok(())
         }
@@ -822,9 +825,9 @@ mod tests {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Ruby, 200);
             let met_data = PkmFormat::PK8.met_data_maximizing_legality(&ohpkm);
 
-            // Gen 3 games use the poké transfer lab
+            // Gen 3 origin: Poké Transfer met location
             assert_eq!(met_data.origin, OriginGame::Ruby);
-            assert_eq!(met_data.location_index, POKE_TRANSFER_LAB_GEN_5);
+            assert_eq!(met_data.location_index, POKE_TRANSFER_MET_LOCATION_GEN_5);
 
             Ok(())
         }
@@ -834,9 +837,9 @@ mod tests {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Diamond, 2000);
             let met_data = PkmFormat::PK8.met_data_maximizing_legality(&ohpkm);
 
-            // Gen 4 games use the poké transfer lab
+            // Gen 4 origin: Poké Transfer met location
             assert_eq!(met_data.origin, OriginGame::Diamond);
-            assert_eq!(met_data.location_index, POKE_TRANSFER_LAB_GEN_5);
+            assert_eq!(met_data.location_index, POKE_TRANSFER_MET_LOCATION_GEN_5);
 
             Ok(())
         }
@@ -862,7 +865,7 @@ mod tests {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Ruby, 200);
             let met_data = PkmFormat::PB7.met_data_maximizing_legality(&ohpkm);
 
-            // Gen 3 games use the poké transfer lab
+            // Gen 3 origin: Let's Go uses the 3DS transfer slot index
             assert_eq!(met_data.origin, OriginGame::LetsGoEevee);
             assert_eq!(met_data.location_index, LinkTradeIndex::Pkm3dsSwitch as u16);
 
@@ -914,9 +917,9 @@ mod tests {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Ruby, 200);
             let met_data = PkmFormat::PK8.met_data_maximizing_legality(&ohpkm);
 
-            // Gen 3 games use the poké transfer lab
+            // Gen 3 origin: Poké Transfer met location
             assert_eq!(met_data.origin, OriginGame::Ruby);
-            assert_eq!(met_data.location_index, POKE_TRANSFER_LAB_GEN_5);
+            assert_eq!(met_data.location_index, POKE_TRANSFER_MET_LOCATION_GEN_5);
 
             Ok(())
         }
@@ -926,9 +929,9 @@ mod tests {
             let ohpkm = ohpkm_with_origin_and_location(OriginGame::Diamond, 2000);
             let met_data = PkmFormat::PK8.met_data_maximizing_legality(&ohpkm);
 
-            // Gen 4 games use the poké transfer lab
+            // Gen 4 origin: Poké Transfer met location
             assert_eq!(met_data.origin, OriginGame::Diamond);
-            assert_eq!(met_data.location_index, POKE_TRANSFER_LAB_GEN_5);
+            assert_eq!(met_data.location_index, POKE_TRANSFER_MET_LOCATION_GEN_5);
 
             Ok(())
         }
