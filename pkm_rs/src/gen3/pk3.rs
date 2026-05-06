@@ -9,6 +9,8 @@ use crate::gen3::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 use crate::result::{Error, Result};
 use crate::strings::Gen3String;
+#[cfg(test)]
+use crate::tests::PkhexJson;
 use crate::traits::{AsBytesMut, ModernEvs};
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
 use pkm_rs_derive::IsShiny4096;
@@ -28,6 +30,8 @@ use pkm_rs_types::{
     SimpleAbilityNumber, Stats8, Stats16Le,
 };
 use serde::{Serialize, Serializer};
+#[cfg(test)]
+use serde_json::json;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -485,6 +489,21 @@ pub fn form_index_from_pid(national_dex: NatDexIndex, pid: u32) -> u8 {
     letter_value = (pid & 0x3) | (letter_value << 2);
 
     (letter_value % 28) as u8
+}
+#[cfg(test)]
+impl PkhexJson for Pk3 {
+    fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
+        let mut value = serde_json::to_value(&self)?;
+        value["nickname_trash"] = json!(
+            self.nickname
+                .bytes()
+                .iter()
+                .map(|b| format!("{:02X}", b))
+                .collect::<String>()
+        );
+
+        Ok(value)
+    }
 }
 
 #[cfg(test)]

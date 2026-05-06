@@ -251,7 +251,7 @@ fn find_inconsistencies_to_from_ohpkm<PKM: OhpkmConvert>(mon: PKM) -> TestResult
 }
 
 #[cfg(test)]
-pub fn compare_pkhex_json_all_in_dir<PKM: Pkm>(dir: &Path) -> TestResult<()> {
+pub fn compare_pkhex_json_all_in_dir<PKM: Pkm + PkhexJson>(dir: &Path) -> TestResult<()> {
     use std::fs;
 
     let full_dir = Path::new("test-files").join("pkm-files").join(dir);
@@ -275,10 +275,11 @@ pub fn compare_pkhex_json_all_in_dir<PKM: Pkm>(dir: &Path) -> TestResult<()> {
 }
 
 #[cfg(test)]
-pub fn compare_pkhex_json<PKM: Pkm>(pkm_path: &Path) -> TestResult<()> {
+pub fn compare_pkhex_json<PKM: Pkm + PkhexJson>(pkm_path: &Path) -> TestResult<()> {
     let mon = pkm_from_file::<PKM>(pkm_path)?.0;
 
-    let pkm_rs_json = serde_json::to_string_pretty(&mon)
+    let pkm_rs_value = mon
+        .to_pkhex_json_value()
         .map_err(|e| TestError::PkmRs(Error::other(&e.to_string())))?;
 
     let mut json_path = Path::new("pkhex-json").join(pkm_path);
@@ -286,7 +287,6 @@ pub fn compare_pkhex_json<PKM: Pkm>(pkm_path: &Path) -> TestResult<()> {
     let mut file = File::open(json_path)
         .map_err(|e| Error::other(&format!("Failed to open JSON file: {e}")))?;
 
-    let pkm_rs_value: serde_json::Value = serde_json::from_str(&pkm_rs_json).unwrap();
     let mut pkhex_json = String::new();
     file.read_to_string(&mut pkhex_json)
         .map_err(|e| Error::other(&e.to_string()))?;
@@ -298,7 +298,11 @@ pub fn compare_pkhex_json<PKM: Pkm>(pkm_path: &Path) -> TestResult<()> {
         Config::new(CompareMode::Strict),
     ) {
         println!("Full pkhex JSON:\n{pkhex_json}");
-        println!("Full pkm_rs JSON:\n{pkm_rs_json}");
+        println!(
+            "Full pkm_rs JSON:\n{}",
+            serde_json::to_string_pretty(&pkm_rs_value)
+                .map_err(|e| TestError::PkmRs(Error::other(&e.to_string())))?
+        );
         return Err(Error::other(&format!("JSON mismatch: {e}")).into());
     }
 
@@ -429,4 +433,9 @@ fn format_byte_range_differences(diffs: &[ByteRange], actual: &[u8], expected: &
         output.push_str(&format!("  actual:    {actual_hex}\n"));
     }
     output
+}
+
+#[cfg(test)]
+pub trait PkhexJson {
+    fn to_pkhex_json_value(&self) -> Result<serde_json::Value, serde_json::Error>;
 }

@@ -1,6 +1,6 @@
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
-use crate::gen7_alola::Pk7AbilityIndex;
-use crate::result::Result;
+use crate::gen7_alola::{Pk7AbilityIndex, Pk7SpeciesAndForm};
+use crate::result::{Error, Result};
 use crate::traits::bytes::{AsBytes, AsBytesMut};
 use crate::util;
 use arbitrary_int::u3;
@@ -232,11 +232,10 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
         pkm_rs_types::read_uint5_from_bits(self.get_u8(Offset::FormIndexFatefulEncounterGender), 3)
     }
 
-    pub fn species_and_form(&self) -> Result<SpeciesAndForm> {
-        Ok(SpeciesAndForm::new(
-            self.species_ndex(),
-            self.form_index().into(),
-        )?)
+    pub fn species_and_form(&self) -> Result<Pk7SpeciesAndForm> {
+        let species_and_form = SpeciesAndForm::new(self.species_ndex(), self.form_index().into())?;
+
+        Pk7SpeciesAndForm::try_new(species_and_form).ok_or(Error::form_index(species_and_form))
     }
 
     pub fn held_item_index(&self) -> u16 {

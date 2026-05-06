@@ -49,6 +49,7 @@
   "super_training_dist_flags": 0,
   "form_argument": 0,
   "nickname": "Mimikyu",
+  "nickname_trash": "4D0069006D0069006B0079007500000000000000000000000000",
   "moves": [
     {
       "move_index": "Feint Attack",

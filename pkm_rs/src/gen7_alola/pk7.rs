@@ -3,8 +3,8 @@ use crate::checksum::{Checksum, RefreshChecksum};
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption;
-use crate::gen7_alola::Pk7AbilityIndex;
 use crate::gen7_alola::pk7_buffer::{Pk7BufferMut, Pk7BufferRef};
+use crate::gen7_alola::{Pk7AbilityIndex, Pk7SpeciesAndForm};
 use crate::result::{Error, Result};
 use crate::traits::{AsBytesMut, ModernEvs};
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
@@ -44,7 +44,7 @@ pub struct Pk7 {
     pub encryption_constant: u32,
     pub sanity: u16,
     pub checksum: u16,
-    pub species_and_form: SpeciesAndForm,
+    pub species_and_form: Pk7SpeciesAndForm,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -209,7 +209,7 @@ impl Pk7 {
     pub fn write_to_box_buffer(&self, buf: &mut Pk7BufferMut) {
         buf.set_encryption_constant(self.encryption_constant);
         buf.reset_sanity();
-        buf.set_species_and_form(self.species_and_form);
+        buf.set_species_and_form(self.species_and_form.0);
         buf.set_held_item_index(self.held_item_index);
         buf.set_trainer_id(self.trainer_id);
         buf.set_secret_id(self.secret_id);
@@ -315,13 +315,18 @@ impl Pk7 {
     pub fn calculate_stats(&self) -> Stats16Le {
         helpers::calculate_stats_modern(
             MetadataSource::UltraSunUltraMoon,
-            self.species_and_form,
+            self.species_and_form.0,
             &self.ivs,
             &self.evs,
             self.calculate_level(),
             self.nature.get_metadata(),
         )
-        .expect("pk7 has species/form present in ultra sun + moon")
+        .unwrap_or_else(|| {
+            panic!(
+                "pk7 has species/form present in ultra sun + moon: {:#?}",
+                self.species_and_form.0
+            )
+        })
     }
 
     pub const fn move_data_offsets() -> MoveDataOffsets {
@@ -384,11 +389,11 @@ impl PkmBytes for Pk7 {
 
 impl HasSpeciesAndForm for Pk7 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.species_and_form.get_species_metadata()
+        self.species_and_form.0.get_species_metadata()
     }
 
     fn get_forme_metadata(&self) -> &'static FormMetadata {
-        self.species_and_form.get_forme_metadata()
+        self.species_and_form.0.get_forme_metadata()
     }
 
     fn calculate_level(&self) -> u8 {
@@ -506,7 +511,7 @@ impl Pk7 {
     ) -> core::result::Result<(), JsValue> {
         match SpeciesAndForm::new(national_dex, form_index) {
             Ok(species_and_form) => {
-                self.species_and_form = species_and_form;
+                self.species_and_form = species_and_form.try_into()?;
                 Ok(())
             }
             Err(e) => Err(JsValue::from_str(&e.to_string())),
@@ -527,6 +532,22 @@ impl Pk7 {
 impl ModernEvs for Pk7 {
     fn get_evs(&self) -> Stats8 {
         self.evs
+    }
+}
+
+#[cfg(test)]
+impl crate::tests::PkhexJson for Pk7 {
+    fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
+        let mut value = serde_json::to_value(&self)?;
+        value["nickname_trash"] = serde_json::json!(
+            self.nickname
+                .bytes()
+                .iter()
+                .map(|b| format!("{:02X}", b))
+                .collect::<String>()
+        );
+
+        Ok(value)
     }
 }
 

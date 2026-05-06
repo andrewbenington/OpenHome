@@ -37,6 +37,7 @@
   "pokerus_byte": 0,
   "ribbons": ["G3 Champion Ribbon", "Effort Ribbon"],
   "nickname": "BLAZIKEN",
+  "nickname_trash": "BCC6BBD4C3C5BFC8FF00",
   "moves": [
     {
       "move_index": "Aerial Ace",

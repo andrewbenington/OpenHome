@@ -37,6 +37,7 @@
   "pokerus_byte": 0,
   "ribbons": ["G3 Champion Ribbon"],
   "nickname": "SCEPTILE",
+  "nickname_trash": "CDBDBFCACEC3C6BFFF00",
   "moves": [
     {
       "move_index": "Leaf Blade",

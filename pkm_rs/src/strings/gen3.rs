@@ -17,9 +17,44 @@ use wasm_bindgen::JsValue;
 use wasm_bindgen::convert::*;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::describe::*;
+
+const TERMINATOR: u8 = 0xff;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Gen3String<const N: usize> {
     raw: [u8; N],
+}
+
+impl<const N: usize> Gen3String<N> {
+    fn from_str(value: impl Into<String>, terminator_filled: bool) -> Self {
+        let mut raw = [0; N];
+        let encoded: Vec<u8> = value
+            .into()
+            .chars()
+            .filter_map(gen3_string_encoding::encode)
+            .collect();
+
+        let len = encoded.len().min(N);
+        raw[..len].copy_from_slice(&encoded[..len]);
+
+        if terminator_filled {
+            for i in len..N {
+                raw[i] = TERMINATOR;
+            }
+        } else if len < N {
+            raw[len] = TERMINATOR;
+        }
+
+        Self { raw }
+    }
+
+    pub fn from_str_terminator_filled(value: impl Into<String>) -> Self {
+        Self::from_str(value, true)
+    }
+
+    pub fn from_str_single_terminator(value: impl Into<String>) -> Self {
+        Self::from_str(value, false)
+    }
 }
 
 impl<const N: usize> From<&str> for Gen3String<N> {
@@ -33,13 +68,11 @@ impl<const N: usize> From<&str> for Gen3String<N> {
         let len = encoded.len().min(N);
         raw[..len].copy_from_slice(&encoded[..len]);
 
-        Gen3String { raw }
-    }
-}
+        if len < N {
+            raw[len] = TERMINATOR;
+        }
 
-impl<const N: usize> From<String> for Gen3String<N> {
-    fn from(value: String) -> Self {
-        Gen3String::from(value.as_str())
+        Gen3String { raw }
     }
 }
 
@@ -48,7 +81,7 @@ impl<const N: usize> From<&Gen3String<N>> for String {
         val.raw
             .iter()
             .copied()
-            .take_while(|c| *c != 0xff)
+            .take_while(|c| *c != TERMINATOR)
             .map(gen3_string_encoding::decode)
             .map(|o| o.unwrap_or('\u{FFFD}'))
             .collect()
@@ -99,7 +132,7 @@ impl<const N: usize> Randomize for Gen3String<N> {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
         let length: usize = rng.random_range(0..N);
         let utf8: String = Alphanumeric.sample_string(rng, length);
-        Self::from(utf8)
+        Self::from_str_single_terminator(utf8)
     }
 }
 
@@ -125,6 +158,6 @@ impl<const N: usize> FromWasmAbi for Gen3String<N> {
 
     unsafe fn from_abi(js: Self::Abi) -> Self {
         let val = unsafe { JsValue::from_abi(js) };
-        Self::from(val.as_string().unwrap_or_default())
+        Self::from_str_single_terminator(val.as_string().unwrap_or_default())
     }
 }

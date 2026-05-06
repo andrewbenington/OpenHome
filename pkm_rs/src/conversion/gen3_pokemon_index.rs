@@ -2,7 +2,9 @@ use std::num::NonZeroU16;
 
 use pkm_rs_resources::species::NatDexIndex;
 #[cfg(feature = "randomize")]
-use pkm_rs_types::randomize::Randomize;
+use pkm_rs_types::{NationalDex, randomize::Randomize};
+#[cfg(feature = "randomize")]
+use rand::RngExt;
 use serde::Serialize;
 
 use crate::result::{Error, NdexConvertSource};
@@ -823,7 +825,6 @@ const fn national_dex_to_gen3(value: u16) -> Option<NonZeroU16> {
     }
 }
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 pub struct Gen3PokemonIndex(NonZeroU16);
 
@@ -864,6 +865,14 @@ impl Gen3PokemonIndex {
 impl Default for Gen3PokemonIndex {
     fn default() -> Self {
         Self(unsafe { NonZeroU16::new_unchecked(1) })
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for Gen3PokemonIndex {
+    fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
+        Self::from_national_dex(rng.random_range(1..=NationalDex::Deoxys as u16))
+            .expect("all pokémon through Deoxys have a gen 3 index")
     }
 }
 

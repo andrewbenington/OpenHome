@@ -29,6 +29,7 @@ public static class Pk3Object
       pokerus_byte = pk.PokerusState,
       ribbons = Util.GetRibbons(pk),
       nickname = pk.Nickname,
+      nickname_trash = System.Convert.ToHexString(pk.NicknameTrash),
       moves = Util.AllMoveData(pk, strings),
       ivs = Util.IVs(pk),
       is_egg = pk.IsEgg,
