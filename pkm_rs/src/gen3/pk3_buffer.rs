@@ -1,6 +1,6 @@
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::result::Result;
-use crate::strings::Gen3String;
+use crate::strings::{Gen3NicknameString, Gen3TrainerString};
 use crate::traits::bytes::{AsBytes, AsBytesMut};
 use crate::util;
 use arbitrary_int::u4;
@@ -265,8 +265,8 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         self.get_array(Offset::Nickname)
     }
 
-    pub fn nickname(&self) -> Gen3String<10> {
-        Gen3String::<10>::from_bytes(self.nickname_raw())
+    pub fn nickname(&self) -> Gen3NicknameString<10> {
+        Gen3NicknameString::<10>::from_bytes(self.nickname_raw())
     }
 
     pub fn move_slots(&self) -> MoveSlots {
@@ -293,8 +293,8 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         self.get_array(Offset::TrainerName)
     }
 
-    pub fn trainer_name(&self) -> Gen3String<7> {
-        Gen3String::<7>::from_bytes(self.trainer_name_raw())
+    pub fn trainer_name(&self) -> Gen3TrainerString<7> {
+        Gen3TrainerString::<7>::from_bytes(self.trainer_name_raw())
     }
 
     pub fn trainer_friendship(&self) -> u8 {
@@ -477,7 +477,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
         self.set_array(Offset::Nickname, v);
     }
 
-    pub fn set_nickname(&mut self, v: &Gen3String<10>) {
+    pub fn set_nickname(&mut self, v: &Gen3NicknameString<10>) {
         self.set_nickname_raw(&v.bytes());
     }
 
@@ -506,7 +506,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
         self.set_array(Offset::TrainerName, v);
     }
 
-    pub fn set_trainer_name(&mut self, v: &Gen3String<7>) {
+    pub fn set_trainer_name(&mut self, v: &Gen3TrainerString<7>) {
         self.set_trainer_name_raw(&v.bytes());
     }
 

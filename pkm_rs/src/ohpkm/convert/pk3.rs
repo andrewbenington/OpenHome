@@ -2,7 +2,7 @@ use pkm_rs_resources::ribbons::Gen3Ribbon;
 use pkm_rs_resources::{items::ItemGen3, lookup};
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
-use crate::strings::Gen3String;
+use crate::strings::{Gen3NicknameString, Gen3TrainerString};
 use crate::{
     conversion::gen3_pokemon_index::Gen3PokemonIndex,
     convert_strategy::{ConvertStrategy, PkmConverter},
@@ -112,11 +112,11 @@ impl OhpkmConvert for Pk3 {
                 .into_iter()
                 .filter_map(Gen3Ribbon::from_openhome_if_present)
                 .collect(),
-            nickname: Gen3String::from_str_single_terminator(&ohpkm.nickname()),
+            nickname: Gen3NicknameString::from_stringlike(&ohpkm.nickname()),
             moves: ohpkm.moves(),
             ivs: converter.ivs(ohpkm),
             is_egg: ohpkm.is_egg(),
-            trainer_name: Gen3String::from_str_terminator_filled(&ohpkm.trainer_name().to_string()),
+            trainer_name: Gen3TrainerString::from_stringlike(&ohpkm.trainer_name()),
             trainer_friendship: ohpkm.trainer_friendship(),
             met_location_index: met_data.location_index as u8,
             ball: ohpkm.ball(),

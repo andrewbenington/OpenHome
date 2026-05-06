@@ -8,7 +8,7 @@ use crate::gen3::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
 #[cfg(feature = "wasm")]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 use crate::result::{Error, Result};
-use crate::strings::Gen3String;
+use crate::strings::{Gen3NicknameString, Gen3TrainerString};
 #[cfg(test)]
 use crate::tests::PkhexJson;
 use crate::traits::{AsBytesMut, ModernEvs};
@@ -61,12 +61,12 @@ pub struct Pk3 {
     pub pokerus_byte: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: Gen3RibbonSet,
-    pub nickname: Gen3String<10>,
+    pub nickname: Gen3NicknameString<10>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: MoveSlots,
     pub ivs: Stats8,
     pub is_egg: bool,
-    pub trainer_name: Gen3String<7>,
+    pub trainer_name: Gen3TrainerString<7>,
     pub trainer_friendship: u8,
     pub met_location_index: u8,
     pub ball: Ball,

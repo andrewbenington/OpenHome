@@ -1,5 +1,5 @@
 use serde::Serialize;
-use std::fmt::Display;
+use std::{fmt::Display, marker::PhantomData};
 
 use crate::conversion::gen3_string_encoding;
 
@@ -20,64 +20,78 @@ use wasm_bindgen::describe::*;
 
 const TERMINATOR: u8 = 0xff;
 
+pub type Gen3NicknameString<const N: usize> = Gen3String<N, SingleTerminator>;
+pub type Gen3TrainerString<const N: usize> = Gen3String<N, TerminatorFill>;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Gen3String<const N: usize> {
+pub struct Gen3String<const N: usize, TS: TerminatorStrategy> {
     raw: [u8; N],
+    _terminator_strategy: PhantomData<TS>,
 }
 
-impl<const N: usize> Gen3String<N> {
-    fn from_str(value: impl Into<String>, terminator_filled: bool) -> Self {
+impl<const N: usize, TS: TerminatorStrategy> Gen3String<N, TS> {
+    fn from_raw(raw: [u8; N]) -> Self {
+        Self {
+            raw,
+            _terminator_strategy: PhantomData,
+        }
+    }
+
+    fn from_str_inner(s: &str) -> Self {
         let mut raw = [0; N];
-        let encoded: Vec<u8> = value
-            .into()
-            .chars()
-            .filter_map(gen3_string_encoding::encode)
-            .collect();
+        let encoded: Vec<u8> = s.chars().filter_map(gen3_string_encoding::encode).collect();
 
         let len = encoded.len().min(N);
         raw[..len].copy_from_slice(&encoded[..len]);
 
-        if terminator_filled {
-            for i in len..N {
-                raw[i] = TERMINATOR;
-            }
-        } else if len < N {
-            raw[len] = TERMINATOR;
-        }
+        TS::set_terminators(&mut raw, len);
 
-        Self { raw }
+        Self::from_raw(raw)
     }
 
-    pub fn from_str_terminator_filled(value: impl Into<String>) -> Self {
-        Self::from_str(value, true)
-    }
-
-    pub fn from_str_single_terminator(value: impl Into<String>) -> Self {
-        Self::from_str(value, false)
+    pub fn from_stringlike(value: impl Into<String>) -> Self {
+        Self::from_str_inner(&value.into())
     }
 }
 
-impl<const N: usize> From<&str> for Gen3String<N> {
+pub trait TerminatorStrategy {
+    fn set_terminators<const N: usize>(raw: &mut [u8; N], str_len: usize);
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct SingleTerminator;
+impl TerminatorStrategy for SingleTerminator {
+    fn set_terminators<const N: usize>(raw: &mut [u8; N], str_len: usize) {
+        if str_len < N {
+            raw[str_len] = TERMINATOR;
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct TerminatorFill;
+impl TerminatorStrategy for TerminatorFill {
+    fn set_terminators<const N: usize>(raw: &mut [u8; N], str_len: usize) {
+        for i in str_len..N {
+            raw[i] = TERMINATOR;
+        }
+    }
+}
+
+impl<const N: usize, TS: TerminatorStrategy> From<&str> for Gen3String<N, TS> {
     fn from(value: &str) -> Self {
-        let mut raw = [0; N];
-        let encoded: Vec<u8> = value
-            .chars()
-            .filter_map(gen3_string_encoding::encode)
-            .collect();
-
-        let len = encoded.len().min(N);
-        raw[..len].copy_from_slice(&encoded[..len]);
-
-        if len < N {
-            raw[len] = TERMINATOR;
-        }
-
-        Gen3String { raw }
+        Self::from_str_inner(value)
     }
 }
 
-impl<const N: usize> From<&Gen3String<N>> for String {
-    fn from(val: &Gen3String<N>) -> Self {
+impl<const N: usize, TS: TerminatorStrategy> From<String> for Gen3String<N, TS> {
+    fn from(value: String) -> Self {
+        Self::from_str_inner(&value)
+    }
+}
+
+impl<const N: usize, TS: TerminatorStrategy> From<&Gen3String<N, TS>> for String {
+    fn from(val: &Gen3String<N, TS>) -> Self {
         val.raw
             .iter()
             .copied()
@@ -88,13 +102,13 @@ impl<const N: usize> From<&Gen3String<N>> for String {
     }
 }
 
-impl<const N: usize> From<Gen3String<N>> for String {
-    fn from(val: Gen3String<N>) -> Self {
+impl<const N: usize, TS: TerminatorStrategy> From<Gen3String<N, TS>> for String {
+    fn from(val: Gen3String<N, TS>) -> Self {
         (&val).into()
     }
 }
 
-impl<const N: usize> Display for Gen3String<N> {
+impl<const N: usize, TS: TerminatorStrategy> Display for Gen3String<N, TS> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let decoded: String = self.into();
 
@@ -102,13 +116,13 @@ impl<const N: usize> Display for Gen3String<N> {
     }
 }
 
-impl<const N: usize> Default for Gen3String<N> {
+impl<const N: usize, TS: TerminatorStrategy> Default for Gen3String<N, TS> {
     fn default() -> Self {
-        Self { raw: [0; N] }
+        Self::from_raw([0; N])
     }
 }
 
-impl<const N: usize> Serialize for Gen3String<N> {
+impl<const N: usize, TS: TerminatorStrategy> Serialize for Gen3String<N, TS> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -117,9 +131,9 @@ impl<const N: usize> Serialize for Gen3String<N> {
     }
 }
 
-impl<const N: usize> Gen3String<N> {
+impl<const N: usize, TS: TerminatorStrategy> Gen3String<N, TS> {
     pub const fn from_bytes(bytes: [u8; N]) -> Self {
-        Gen3String { raw: bytes }
+        Self::from_raw(bytes)
     }
 
     pub const fn bytes(&self) -> [u8; N] {
@@ -128,23 +142,23 @@ impl<const N: usize> Gen3String<N> {
 }
 
 #[cfg(feature = "randomize")]
-impl<const N: usize> Randomize for Gen3String<N> {
+impl<const N: usize, TS: TerminatorStrategy> Randomize for Gen3String<N, TS> {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
         let length: usize = rng.random_range(0..N);
         let utf8: String = Alphanumeric.sample_string(rng, length);
-        Self::from_str_single_terminator(utf8)
+        Self::from(utf8)
     }
 }
 
 #[cfg(feature = "wasm")]
-impl<const N: usize> WasmDescribe for Gen3String<N> {
+impl<const N: usize, TS: TerminatorStrategy> WasmDescribe for Gen3String<N, TS> {
     fn describe() {
         js_sys::JsString::describe()
     }
 }
 
 #[cfg(feature = "wasm")]
-impl<const N: usize> IntoWasmAbi for Gen3String<N> {
+impl<const N: usize, TS: TerminatorStrategy> IntoWasmAbi for Gen3String<N, TS> {
     type Abi = <js_sys::JsString as IntoWasmAbi>::Abi;
 
     fn into_abi(self) -> Self::Abi {
@@ -153,11 +167,11 @@ impl<const N: usize> IntoWasmAbi for Gen3String<N> {
 }
 
 #[cfg(feature = "wasm")]
-impl<const N: usize> FromWasmAbi for Gen3String<N> {
+impl<const N: usize, TS: TerminatorStrategy> FromWasmAbi for Gen3String<N, TS> {
     type Abi = <js_sys::JsString as IntoWasmAbi>::Abi;
 
     unsafe fn from_abi(js: Self::Abi) -> Self {
         let val = unsafe { JsValue::from_abi(js) };
-        Self::from_str_single_terminator(val.as_string().unwrap_or_default())
+        Self::from(val.as_string().unwrap_or_default())
     }
 }
