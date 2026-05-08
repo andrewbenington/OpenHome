@@ -5,7 +5,6 @@ import {
   MarkingsSixShapesWithColor,
   Memory,
   PKMDate,
-  StatsPreSplit,
 } from '@pokemon-files/util'
 
 export function convertPokeDate(date: PkmWasm.PokeDate): PKMDate {

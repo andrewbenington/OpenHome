@@ -22,13 +22,13 @@ use pkm_rs_resources::ribbons::Gen3RibbonSet;
 use pkm_rs_resources::species::form_metadata::MetadataSource;
 use pkm_rs_resources::species::{FormMetadata, NatDexIndex, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_resources::{helpers, lookup};
+use pkm_rs_types::Gender;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 use pkm_rs_types::{
     BinaryGender, ContestStats, Language, MarkingsFourShapes, NationalDex, OriginGame,
     SimpleAbilityNumber, Stats8, Stats16Le,
 };
-use pkm_rs_types::{Gender, PkmStats};
 use serde::{Serialize, Serializer};
 #[cfg(test)]
 use serde_json::json;
@@ -427,20 +427,20 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_js(&self) -> PkmStats {
+    pub fn ivs_js(&self) -> Stats16Le {
         self.ivs.into()
     }
     #[wasm_bindgen(setter = ivs)]
-    pub fn iet_evs_js(&mut self, v: PkmStats) {
+    pub fn iet_evs_js(&mut self, v: Stats16Le) {
         self.ivs = v.try_into().expect("ivs should not exceed 31 each");
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_js(&self) -> PkmStats {
+    pub fn evs_js(&self) -> Stats16Le {
         self.evs.into()
     }
     #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_js(&mut self, v: PkmStats) {
+    pub fn set_evs_js(&mut self, v: Stats16Le) {
         self.evs = v.try_into().expect("evs should not exceed 255 each");
     }
 
@@ -513,8 +513,8 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats_js(&self) -> PkmStats {
-        self.calculate_stats().into()
+    pub fn calculate_stats_js(&self) -> Stats16Le {
+        self.calculate_stats()
     }
 }
 

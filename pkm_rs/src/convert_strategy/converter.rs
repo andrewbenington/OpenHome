@@ -9,7 +9,7 @@ use pkm_rs_types::Stats8;
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wasm")]
-use pkm_rs_types::{OriginGame, PkmStats};
+use pkm_rs_types::{OriginGame, Stats16Le};
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct PkmConverter {
@@ -154,7 +154,7 @@ impl PkmConverter {
     }
 
     #[wasm_bindgen(js_name = "ivs")]
-    pub fn ivs_js(&self, ohpkm: &OhpkmV2) -> PkmStats {
+    pub fn ivs_js(&self, ohpkm: &OhpkmV2) -> Stats16Le {
         self.ivs(ohpkm).into()
     }
 }

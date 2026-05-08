@@ -18,10 +18,12 @@ use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::species::SpeciesMetadata;
-#[cfg(feature = "wasm")]
-use pkm_rs_types::PkmStats;
-use pkm_rs_types::{AbilityNumber, BinaryGender};
-use pkm_rs_types::{Language, TrainerData};
+use pkm_rs_types::{
+    AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining,
+    Language, MarkingsSixShapesColors, OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le,
+    StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory, strings::SizedUtf16String,
+};
+
 use serde::Serialize;
 use strum_macros::Display;
 
@@ -31,12 +33,6 @@ use pkm_rs_resources::{
     natures::NatureIndex,
     ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet},
     species::SpeciesAndForm,
-};
-
-use pkm_rs_types::{
-    ContestStats, FlagSet, Gender, Geolocations, HyperTraining, MarkingsSixShapesColors,
-    OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le, StatsPreSplit, TeraType, TeraTypeWasm,
-    TrainerMemory, strings::SizedUtf16String,
 };
 
 #[cfg(feature = "randomize")]
@@ -1997,11 +1993,11 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = evsWasm)]
-    pub fn evs_js(&self) -> PkmStats {
+    pub fn evs_js(&self) -> Stats16Le {
         self.evs().into()
     }
     #[wasm_bindgen(setter = evsWasm)]
-    pub fn set_evs_js(&mut self, v: PkmStats) {
+    pub fn set_evs_js(&mut self, v: Stats16Le) {
         self.set_evs(&v.try_into().expect("evs should not exceed 255 each"));
     }
 
@@ -2097,11 +2093,11 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_js(&self) -> PkmStats {
+    pub fn ivs_js(&self) -> Stats16Le {
         self.ivs().into()
     }
     #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_js(&mut self, v: &PkmStats) {
+    pub fn set_ivs_js(&mut self, v: &Stats16Le) {
         self.set_ivs(v.to_stats8_truncated());
     }
 
@@ -2972,12 +2968,12 @@ impl OhpkmV2 {
     // Legends Arceus
 
     #[wasm_bindgen(getter = gvs)]
-    pub fn gvs_js(&self) -> Option<PkmStats> {
+    pub fn gvs_js(&self) -> Option<Stats16Le> {
         Some(self.la_data?.gvs.into())
     }
 
     #[wasm_bindgen(setter = gvs)]
-    pub fn set_gvs_js(&mut self, value: Option<PkmStats>) {
+    pub fn set_gvs_js(&mut self, value: Option<Stats16Le>) {
         match value {
             Some(gvs) => {
                 self.la_data.get_or_insert_default().gvs =

@@ -35,6 +35,7 @@ import {
 import * as jsTypes from '@pokemon-files/util/types'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen34ContestRibbons, Gen34TowerRibbons } from '@pokemon-resources/index'
+import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { PluginIdentifier, SAV } from '../save/interfaces'
@@ -57,7 +58,6 @@ import {
   getPrevos,
   ivsFromDVs,
 } from './util'
-import dayjs, { Dayjs } from 'dayjs'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getFormat() {
@@ -713,7 +713,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.hyperTraining = other.hyperTraining
     }
 
-    console.log('RIBBONS: ', other.ribbons)
     this.ribbons = unique([...this.ribbons, ...(other.ribbons ?? [])])
     if (other.contest) {
       this.contest = other.contest

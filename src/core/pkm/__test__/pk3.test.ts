@@ -76,8 +76,6 @@ test('gen 3 ribbons are updated', () => {
   const emeraldPKM = PK3.fromOhpkm(blazikenOhpkm, ConvertStrategies.getDefault())
 
   // gaining Gen 3 ribbons
-  console.log('blazikenOhpkm.ribbons 1', blazikenOhpkm.ribbons)
-  console.log('emeraldPKM.ribbons 1', emeraldPKM.ribbons)
   emeraldPKM.ribbons = [
     ...emeraldPKM.ribbons,
     'Cool (Hoenn)',
@@ -86,9 +84,9 @@ test('gen 3 ribbons are updated', () => {
     'Cool Master (Hoenn)',
     'Winning',
   ]
-  console.log('emeraldPKM.ribbons 2', emeraldPKM.ribbons)
+
   blazikenOhpkm.syncWithGameData(emeraldPKM)
-  console.log('blazikenOhpkm.ribbons 2', blazikenOhpkm.ribbons)
+
   expect(blazikenOhpkm.ribbons).toContain('Cool Master (Hoenn)')
   expect(blazikenOhpkm.ribbons).toContain('Winning')
   expect(blazikenOhpkm.ribbons).toContain('Effort')
