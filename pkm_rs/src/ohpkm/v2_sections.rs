@@ -74,6 +74,7 @@ pub struct MainDataV2 {
     pub mint_nature: Option<NatureIndex>,
     pub is_fateful_encounter: bool,
     pub gender: Gender,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
     pub contest: ContestStats,
     pub pokerus_byte: u8,
@@ -91,6 +92,7 @@ pub struct MainDataV2 {
     pub nickname: SizedUtf16String<26>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveIndex; 4],
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ivs: Stats8,
     pub is_egg: bool,
     pub is_nicknamed: bool,
@@ -242,7 +244,7 @@ impl MainDataV2 {
         )
     }
 
-    pub fn with_timestamp_if_missing(
+    pub const fn with_timestamp_if_missing(
         &mut self,
         started_tracking_seconds: Option<NonZeroU64>,
     ) -> &mut Self {
@@ -1186,6 +1188,7 @@ impl DataSection for BdspData {
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct LegendsArceusData {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub gvs: Stats8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_flags: FlagSet<14>,

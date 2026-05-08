@@ -74,24 +74,6 @@ export function contestStatsToWasm(value: ContestStats): PkmWasm.ContestStats {
   )
 }
 
-export function statsFromWasmStats8(value: PkmWasm.Stats8): Stats {
-  const { free, ...stats } = value
-  return stats
-}
-
-export function statsToWasmStats8(value: Stats): PkmWasm.Stats8 {
-  return new PkmWasm.Stats8(value.hp, value.atk, value.def, value.spa, value.spd, value.spe)
-}
-
-export function statsFromWasmStats16Le(value: PkmWasm.Stats16Le): Stats {
-  const { free, ...stats } = value
-  return stats
-}
-
-export function statsToWasmStats16Le(value: Stats): PkmWasm.Stats16Le {
-  return new PkmWasm.Stats16Le(value.hp, value.atk, value.def, value.spa, value.spd, value.spe)
-}
-
 export function trainerMemoryToWasm(value: Memory): PkmWasm.TrainerMemory {
   return new PkmWasm.TrainerMemory(
     value.intensity,

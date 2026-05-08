@@ -7,7 +7,10 @@ use pkm_rs_types::{ContestStat, FlagSet};
 use pkm_rs_types::randomize::Randomize;
 use serde::{Serialize, Serializer};
 
-use crate::ribbons::{ModernRibbon, ObsoleteRibbon, OpenHomeRibbon};
+use crate::{
+    log,
+    ribbons::{ModernRibbon, ObsoleteRibbon, OpenHomeRibbon},
+};
 
 #[derive(Debug, Default, Serialize, PartialEq, Eq, Clone, Copy)]
 struct Cool;
@@ -72,11 +75,11 @@ impl Gen3RibbonSet {
     }
 
     pub fn get_ribbons(&self) -> Vec<Gen3Ribbon> {
-        let mut all_ribbons = self.cool.get_ribbons(ContestStat::Cool);
-        all_ribbons.extend(self.beauty.get_ribbons(ContestStat::Beauty));
-        all_ribbons.extend(self.cute.get_ribbons(ContestStat::Cute));
-        all_ribbons.extend(self.smart.get_ribbons(ContestStat::Smart));
-        all_ribbons.extend(self.tough.get_ribbons(ContestStat::Tough));
+        let mut all_ribbons = self.cool.get_ribbons();
+        all_ribbons.extend(self.beauty.get_ribbons());
+        all_ribbons.extend(self.cute.get_ribbons());
+        all_ribbons.extend(self.smart.get_ribbons());
+        all_ribbons.extend(self.tough.get_ribbons());
         let other_ribbons: Vec<_> = self
             .non_contest
             .get_flags()
@@ -113,9 +116,26 @@ impl Gen3RibbonSet {
     pub fn from_names(names: Vec<String>) -> Self {
         names
             .iter()
-            .map(|s| s.strip_suffix(" Ribbon").unwrap_or(s))
+            .map(|s| s.strip_suffix("").unwrap_or(s))
             .filter_map(Gen3Ribbon::from_name)
             .collect()
+    }
+
+    const fn contest_ribbon_level(&self, stat: ContestStat) -> Gen3ContestRibbonLevel {
+        match stat {
+            ContestStat::Cool => self.cool.0,
+            ContestStat::Beauty => self.beauty.0,
+            ContestStat::Cute => self.cute.0,
+            ContestStat::Smart => self.smart.0,
+            ContestStat::Tough => self.tough.0,
+        }
+    }
+
+    pub fn has_ribbon(&self, ribbon: Gen3Ribbon) -> bool {
+        match ribbon.metadata() {
+            Metadata::Contest { stat, level } => self.contest_ribbon_level(stat) >= level,
+            Metadata::NonContest { index } => self.non_contest.get_flag(index),
+        }
     }
 }
 
@@ -151,10 +171,15 @@ impl<Stat: ContestStatMarker> Gen3ContestRibbons<Stat> {
         self.0
     }
 
-    pub fn get_ribbons(&self, stat: ContestStat) -> Vec<Gen3Ribbon> {
-        let base_ribbon = Gen3Ribbon::contest_stat_base(stat);
+    pub fn get_ribbons(&self) -> Vec<Gen3Ribbon> {
+        let base_ribbon = Gen3Ribbon::contest_stat_base(Stat::_STAT);
+
+        println!(
+            "base ribbon: {:#?}; current level: {:#?}",
+            base_ribbon, self.0
+        );
         let mut ribbons: Vec<Gen3Ribbon> = Vec::new();
-        for i in 1..(self.0.to_u8()) {
+        for i in 1..=(self.0.to_u8()) {
             let base_ribbon_offset = i - 1;
             ribbons.push(base_ribbon + base_ribbon_offset);
         }
@@ -179,7 +204,7 @@ impl<Stat: ContestStatMarker> Gen3ContestRibbons<Stat> {
 }
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum Gen3ContestRibbonLevel {
     #[default]
     None,
@@ -252,6 +277,16 @@ pub enum Gen3Ribbon {
     World,
 }
 
+enum Metadata {
+    Contest {
+        stat: ContestStat,
+        level: Gen3ContestRibbonLevel,
+    },
+    NonContest {
+        index: usize,
+    },
+}
+
 impl Gen3Ribbon {
     pub const fn get_index(self) -> usize {
         self as usize
@@ -276,6 +311,25 @@ impl Gen3Ribbon {
             ContestStat::Cute => Gen3Ribbon::CuteHoenn,
             ContestStat::Smart => Gen3Ribbon::SmartHoenn,
             ContestStat::Tough => Gen3Ribbon::ToughHoenn,
+        }
+    }
+
+    const fn metadata(self) -> Metadata {
+        match self.constest_data() {
+            Some((stat, level)) => Metadata::Contest { stat, level },
+            None => Metadata::NonContest {
+                index: self as usize - 20,
+            },
+        }
+    }
+
+    const fn constest_data(self) -> Option<(ContestStat, Gen3ContestRibbonLevel)> {
+        if let Some(stat) = self.constest_stat()
+            && let Some(level) = self.contest_level()
+        {
+            Some((stat, level))
+        } else {
+            None
         }
     }
 
@@ -333,76 +387,83 @@ impl Gen3Ribbon {
 
     const fn get_name(&self) -> &'static str {
         match self {
-            Gen3Ribbon::CoolHoenn => "Cool Ribbon",
-            Gen3Ribbon::CoolSuperHoenn => "Cool Super Ribbon",
-            Gen3Ribbon::CoolHyperHoenn => "Cool Hyper Ribbon",
-            Gen3Ribbon::CoolMasterHoenn => "Cool Master Ribbon",
-            Gen3Ribbon::BeautyHoenn => "Beauty Ribbon",
-            Gen3Ribbon::BeautySuperHoenn => "Beauty Super Ribbon",
-            Gen3Ribbon::BeautyHyperHoenn => "Beauty Hyper Ribbon",
-            Gen3Ribbon::BeautyMasterHoenn => "Beauty Master Ribbon",
-            Gen3Ribbon::CuteHoenn => "Cute Ribbon",
-            Gen3Ribbon::CuteSuperHoenn => "Cute Super Ribbon",
-            Gen3Ribbon::CuteHyperHoenn => "Cute Hyper Ribbon",
-            Gen3Ribbon::CuteMasterHoenn => "Cute Master Ribbon",
-            Gen3Ribbon::SmartHoenn => "Smart Ribbon",
-            Gen3Ribbon::SmartSuperHoenn => "Smart Super Ribbon",
-            Gen3Ribbon::SmartHyperHoenn => "Smart Hyper Ribbon",
-            Gen3Ribbon::SmartMasterHoenn => "Smart Master Ribbon",
-            Gen3Ribbon::ToughHoenn => "Tough Ribbon",
-            Gen3Ribbon::ToughSuperHoenn => "Tough Super Ribbon",
-            Gen3Ribbon::ToughHyperHoenn => "Tough Hyper Ribbon",
-            Gen3Ribbon::ToughMasterHoenn => "Tough Master Ribbon",
-            Gen3Ribbon::Champion => "G3 Champion Ribbon",
-            Gen3Ribbon::Winning => "Winning Ribbon",
-            Gen3Ribbon::Victory => "Victory Ribbon",
-            Gen3Ribbon::Artist => "Artist Ribbon",
-            Gen3Ribbon::Effort => "Effort Ribbon",
-            Gen3Ribbon::BattleChampion => "Battle Champion Ribbon",
-            Gen3Ribbon::RegionalChampion => "Regional Champion Ribbon",
-            Gen3Ribbon::NationalChampion => "National Champion Ribbon",
-            Gen3Ribbon::Country => "Country Ribbon",
-            Gen3Ribbon::National => "National Ribbon",
-            Gen3Ribbon::Earth => "Earth Ribbon",
-            Gen3Ribbon::World => "World Ribbon",
+            Gen3Ribbon::CoolHoenn => "Cool (Hoenn)",
+            Gen3Ribbon::CoolSuperHoenn => "Cool Super (Hoenn)",
+            Gen3Ribbon::CoolHyperHoenn => "Cool Hyper (Hoenn)",
+            Gen3Ribbon::CoolMasterHoenn => "Cool Master (Hoenn)",
+            Gen3Ribbon::BeautyHoenn => "Beauty (Hoenn)",
+            Gen3Ribbon::BeautySuperHoenn => "Beauty Super (Hoenn)",
+            Gen3Ribbon::BeautyHyperHoenn => "Beauty Hyper (Hoenn)",
+            Gen3Ribbon::BeautyMasterHoenn => "Beauty Master (Hoenn)",
+            Gen3Ribbon::CuteHoenn => "Cute (Hoenn)",
+            Gen3Ribbon::CuteSuperHoenn => "Cute Super (Hoenn)",
+            Gen3Ribbon::CuteHyperHoenn => "Cute Hyper (Hoenn)",
+            Gen3Ribbon::CuteMasterHoenn => "Cute Master (Hoenn)",
+            Gen3Ribbon::SmartHoenn => "Smart (Hoenn)",
+            Gen3Ribbon::SmartSuperHoenn => "Smart Super (Hoenn)",
+            Gen3Ribbon::SmartHyperHoenn => "Smart Hyper (Hoenn)",
+            Gen3Ribbon::SmartMasterHoenn => "Smart Master (Hoenn)",
+            Gen3Ribbon::ToughHoenn => "Tough (Hoenn)",
+            Gen3Ribbon::ToughSuperHoenn => "Tough Super",
+            Gen3Ribbon::ToughHyperHoenn => "Tough Hyper (Hoenn)",
+            Gen3Ribbon::ToughMasterHoenn => "Tough Master (Hoenn)",
+            Gen3Ribbon::Champion => "G3 Champion",
+            Gen3Ribbon::Winning => "Winning",
+            Gen3Ribbon::Victory => "Victory",
+            Gen3Ribbon::Artist => "Artist",
+            Gen3Ribbon::Effort => "Effort",
+            Gen3Ribbon::BattleChampion => "Battle Champion",
+            Gen3Ribbon::RegionalChampion => "Regional Champion",
+            Gen3Ribbon::NationalChampion => "National Champion",
+            Gen3Ribbon::Country => "Country",
+            Gen3Ribbon::National => "National",
+            Gen3Ribbon::Earth => "Earth",
+            Gen3Ribbon::World => "World",
         }
     }
 
     pub fn from_name(name: &str) -> Option<Self> {
+        log!("getting ribbon from {name}");
+        let name = name.strip_suffix(" Ribbon").unwrap_or(name);
+        let name = name.strip_suffix(" (Hoenn)").unwrap_or(name);
+        let name = name.strip_suffix(" Ribbon").unwrap_or(name);
         match name {
-            "Cool Ribbon" => Some(Gen3Ribbon::CoolHoenn),
-            "Cool Super Ribbon" => Some(Gen3Ribbon::CoolSuperHoenn),
-            "Cool Hyper Ribbon" => Some(Gen3Ribbon::CoolHyperHoenn),
-            "Cool Master Ribbon" => Some(Gen3Ribbon::CoolMasterHoenn),
-            "Beauty Ribbon" => Some(Gen3Ribbon::BeautyHoenn),
-            "Beauty Super Ribbon" => Some(Gen3Ribbon::BeautySuperHoenn),
-            "Beauty Hyper Ribbon" => Some(Gen3Ribbon::BeautyHyperHoenn),
-            "Beauty Master Ribbon" => Some(Gen3Ribbon::BeautyMasterHoenn),
-            "Cute Ribbon" => Some(Gen3Ribbon::CuteHoenn),
-            "Cute Super Ribbon" => Some(Gen3Ribbon::CuteSuperHoenn),
-            "Cute Hyper Ribbon" => Some(Gen3Ribbon::CuteHyperHoenn),
-            "Cute Master Ribbon" => Some(Gen3Ribbon::CuteMasterHoenn),
-            "Smart Ribbon" => Some(Gen3Ribbon::SmartHoenn),
-            "Smart Super Ribbon" => Some(Gen3Ribbon::SmartSuperHoenn),
-            "Smart Hyper Ribbon" => Some(Gen3Ribbon::SmartHyperHoenn),
-            "Smart Master Ribbon" => Some(Gen3Ribbon::SmartMasterHoenn),
-            "Tough Ribbon" => Some(Gen3Ribbon::ToughHoenn),
-            "Tough Super Ribbon" => Some(Gen3Ribbon::ToughSuperHoenn),
-            "Tough Hyper Ribbon" => Some(Gen3Ribbon::ToughHyperHoenn),
-            "Tough Master Ribbon" => Some(Gen3Ribbon::ToughMasterHoenn),
-            "Champion Ribbon" => Some(Gen3Ribbon::Champion),
-            "Winning Ribbon" => Some(Gen3Ribbon::Winning),
-            "Victory Ribbon" => Some(Gen3Ribbon::Victory),
-            "Artist Ribbon" => Some(Gen3Ribbon::Artist),
-            "Effort Ribbon" => Some(Gen3Ribbon::Effort),
-            "Battle Champion Ribbon" => Some(Gen3Ribbon::BattleChampion),
-            "Regional Champion Ribbon" => Some(Gen3Ribbon::RegionalChampion),
-            "National Champion Ribbon" => Some(Gen3Ribbon::NationalChampion),
-            "Country Ribbon" => Some(Gen3Ribbon::Country),
-            "National Ribbon" => Some(Gen3Ribbon::National),
-            "Earth Ribbon" => Some(Gen3Ribbon::Earth),
-            "World Ribbon" => Some(Gen3Ribbon::World),
-            _ => None,
+            "Cool" => Some(Gen3Ribbon::CoolHoenn),
+            "Cool Super" => Some(Gen3Ribbon::CoolSuperHoenn),
+            "Cool Hyper" => Some(Gen3Ribbon::CoolHyperHoenn),
+            "Cool Master" => Some(Gen3Ribbon::CoolMasterHoenn),
+            "Beauty" => Some(Gen3Ribbon::BeautyHoenn),
+            "Beauty Super" => Some(Gen3Ribbon::BeautySuperHoenn),
+            "Beauty Hyper" => Some(Gen3Ribbon::BeautyHyperHoenn),
+            "Beauty Master" => Some(Gen3Ribbon::BeautyMasterHoenn),
+            "Cute" => Some(Gen3Ribbon::CuteHoenn),
+            "Cute Super" => Some(Gen3Ribbon::CuteSuperHoenn),
+            "Cute Hyper" => Some(Gen3Ribbon::CuteHyperHoenn),
+            "Cute Master" => Some(Gen3Ribbon::CuteMasterHoenn),
+            "Smart" => Some(Gen3Ribbon::SmartHoenn),
+            "Smart Super" => Some(Gen3Ribbon::SmartSuperHoenn),
+            "Smart Hyper" => Some(Gen3Ribbon::SmartHyperHoenn),
+            "Smart Master" => Some(Gen3Ribbon::SmartMasterHoenn),
+            "Tough" => Some(Gen3Ribbon::ToughHoenn),
+            "Tough Super" => Some(Gen3Ribbon::ToughSuperHoenn),
+            "Tough Hyper" => Some(Gen3Ribbon::ToughHyperHoenn),
+            "Tough Master" => Some(Gen3Ribbon::ToughMasterHoenn),
+            "Champion" => Some(Gen3Ribbon::Champion),
+            "Winning" => Some(Gen3Ribbon::Winning),
+            "Victory" => Some(Gen3Ribbon::Victory),
+            "Artist" => Some(Gen3Ribbon::Artist),
+            "Effort" => Some(Gen3Ribbon::Effort),
+            "Battle Champion" => Some(Gen3Ribbon::BattleChampion),
+            "Regional Champion" => Some(Gen3Ribbon::RegionalChampion),
+            "National Champion" => Some(Gen3Ribbon::NationalChampion),
+            "Country" => Some(Gen3Ribbon::Country),
+            "National" => Some(Gen3Ribbon::National),
+            "Earth" => Some(Gen3Ribbon::Earth),
+            "World" => Some(Gen3Ribbon::World),
+            _ => {
+                log!("no ribbon found for {name}");
+                None
+            }
         }
     }
 

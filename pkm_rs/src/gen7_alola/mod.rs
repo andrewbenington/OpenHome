@@ -18,9 +18,6 @@ use pkm_rs_types::randomize::Randomize;
 
 use serde::Serialize;
 
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
-
 const BOX_SIZE: usize = 232;
 const PARTY_SIZE: usize = 260;
 
@@ -35,7 +32,6 @@ const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
 const NEUROFORCE: u16 = 233;
 pub type Pk7AbilityIndex = AbilityIndexBounded<NEUROFORCE>;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Pk7SpeciesAndForm(SpeciesAndForm);
 
@@ -52,7 +48,7 @@ impl Pk7SpeciesAndForm {
         }
     }
 
-    pub fn into_inner(self) -> SpeciesAndForm {
+    pub const fn into_inner(self) -> SpeciesAndForm {
         self.0
     }
 }

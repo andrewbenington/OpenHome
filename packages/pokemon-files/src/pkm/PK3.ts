@@ -21,8 +21,8 @@ import {
   contestStatsToWasm,
   markingsFourShapesFromWasm,
   markingsFourShapesToWasm,
-  statsToWasmStats8,
 } from './wasm/convert'
+import { Option } from 'src/core/util/functional'
 
 export default class PK3 implements PKMInterface {
   static getFormat() {
@@ -48,6 +48,12 @@ export default class PK3 implements PKMInterface {
     const bytes = new Uint8Array(buffer)
     const pk3Wasm = encrypted ? Pk3Wasm.fromEncryptedBytes(bytes) : Pk3Wasm.fromBytes(bytes)
     return PK3.fromWasm(pk3Wasm)
+  }
+
+  static fromSlotBytes(buffer: ArrayBuffer): Option<PK3> {
+    const bytes = new Uint8Array(buffer)
+    const inner = Pk3Wasm.fromSlotBytes(bytes)
+    return inner ? PK3.fromWasm(inner) : undefined
   }
 
   static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3 {
@@ -168,7 +174,7 @@ export default class PK3 implements PKMInterface {
     return this.inner.evs
   }
   set evs(value: jsTypes.Stats) {
-    this.inner.evs = statsToWasmStats8(value)
+    this.inner.evs = value
   }
 
   get contest() {
@@ -234,7 +240,7 @@ export default class PK3 implements PKMInterface {
     return this.inner.ivs
   }
   set ivs(value: jsTypes.Stats) {
-    this.inner.ivs = statsToWasmStats8(value)
+    this.inner.ivs = value
   }
 
   get isEgg() {
@@ -317,7 +323,7 @@ export default class PK3 implements PKMInterface {
     )
   }
   set ribbons(ribbonNames: string[]) {
-    this.inner.ribbons = ribbonNames
+    this.inner.ribbons = ribbonNames.map((r) => `${r} Ribbon`)
   }
 
   get trainerGender() {

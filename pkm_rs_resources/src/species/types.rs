@@ -24,7 +24,7 @@ use crate::stats::Stat;
 #[cfg(feature = "wasm")]
 use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
 #[cfg(feature = "wasm")]
-use pkm_rs_types::{Gender, Stats8};
+use pkm_rs_types::{Gender, PkmStats};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -604,8 +604,10 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(getter = baseStats)]
-    pub fn get_base_stats(&self) -> Stats8 {
-        current_base_stats(self.national_dex.to_u16(), self.form_index).unwrap_or_default()
+    pub fn get_base_stats(&self) -> PkmStats {
+        current_base_stats(self.national_dex.to_u16(), self.form_index)
+            .map(PkmStats::from)
+            .unwrap_or_default()
     }
 
     #[wasm_bindgen(js_name = baseStatsFrom)]
@@ -614,7 +616,7 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(js_name = getBaseStat)]
-    pub fn get_base_stat(&self, stat: Stat) -> u8 {
+    pub fn get_base_stat(&self, stat: Stat) -> u16 {
         let base_stats = self.get_base_stats();
         match stat {
             Stat::HP => base_stats.hp,

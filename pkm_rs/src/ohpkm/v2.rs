@@ -18,6 +18,8 @@ use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::species::SpeciesMetadata;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::PkmStats;
 use pkm_rs_types::{AbilityNumber, BinaryGender};
 use pkm_rs_types::{Language, TrainerData};
 use serde::Serialize;
@@ -450,8 +452,8 @@ impl OhpkmV2 {
         self.main_data.ivs
     }
 
-    pub const fn set_ivs(&mut self, v: &Stats8) {
-        self.main_data.ivs = *v;
+    pub const fn set_ivs(&mut self, v: Stats8) {
+        self.main_data.ivs = v;
     }
 
     pub const fn is_egg(&self) -> bool {
@@ -1509,11 +1511,11 @@ impl OhpkmV2 {
         self.most_recent_save.clone()
     }
 
-    pub fn get_started_tracking_seconds(&self) -> Option<NonZeroU64> {
+    pub const fn get_started_tracking_seconds(&self) -> Option<NonZeroU64> {
         self.main_data.started_tracking_seconds
     }
 
-    pub fn set_started_tracking_if_missing(
+    pub const fn set_started_tracking_if_missing(
         &mut self,
         started_tracking_seconds: Option<NonZeroU64>,
     ) {
@@ -1995,12 +1997,12 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = evsWasm)]
-    pub fn evs_js(&self) -> Stats8 {
-        self.evs()
+    pub fn evs_js(&self) -> PkmStats {
+        self.evs().into()
     }
     #[wasm_bindgen(setter = evsWasm)]
-    pub fn set_evs_js(&mut self, v: &Stats8) {
-        self.set_evs(v);
+    pub fn set_evs_js(&mut self, v: PkmStats) {
+        self.set_evs(&v.try_into().expect("evs should not exceed 255 each"));
     }
 
     #[wasm_bindgen(getter = contestWasm)]
@@ -2094,13 +2096,13 @@ impl OhpkmV2 {
         self.set_scale(v);
     }
 
-    #[wasm_bindgen(getter = ivsWasm)]
-    pub fn ivs_js(&self) -> Stats8 {
-        self.ivs()
+    #[wasm_bindgen(getter = ivs)]
+    pub fn ivs_js(&self) -> PkmStats {
+        self.ivs().into()
     }
-    #[wasm_bindgen(setter = ivsWasm)]
-    pub fn set_ivs_js(&mut self, v: &Stats8) {
-        self.set_ivs(v);
+    #[wasm_bindgen(setter = ivs)]
+    pub fn set_ivs_js(&mut self, v: &PkmStats) {
+        self.set_ivs(v.to_stats8_truncated());
     }
 
     #[wasm_bindgen(getter = isEgg)]
@@ -2523,7 +2525,7 @@ impl OhpkmV2 {
 
     // Game Boy
 
-    #[wasm_bindgen(getter = dvsWasm)]
+    #[wasm_bindgen(getter = dvs)]
     pub fn dvs_js(&self) -> StatsPreSplit {
         match self.gameboy_data {
             Some(data) => data.dvs,
@@ -2536,12 +2538,12 @@ impl OhpkmV2 {
         Some(self.gameboy_data?.met_time_of_day)
     }
 
-    #[wasm_bindgen(getter = evsG12Wasm)]
+    #[wasm_bindgen(getter = evsG12)]
     pub fn evs_g12_js(&self) -> Option<StatsPreSplit> {
         Some(self.gameboy_data?.evs_g12)
     }
 
-    #[wasm_bindgen(setter = evsG12Wasm)]
+    #[wasm_bindgen(setter = evsG12)]
     pub fn update_evs_g12_js(&mut self, value: StatsPreSplit) {
         if let Some(gameboy_data) = &mut self.gameboy_data {
             gameboy_data.evs_g12 = value
@@ -2851,12 +2853,12 @@ impl OhpkmV2 {
         }
     }
 
-    #[wasm_bindgen(getter = avsWasm)]
+    #[wasm_bindgen(getter = avs)]
     pub fn avs_js(&self) -> Option<Stats16Le> {
         Some(self.gen67_data?.avs)
     }
 
-    #[wasm_bindgen(setter = avsWasm)]
+    #[wasm_bindgen(setter = avs)]
     pub fn set_avs_js(&mut self, value: Option<Stats16Le>) {
         match value {
             Some(avs) => self.gen67_data.get_or_insert_default().avs = avs,
@@ -2969,15 +2971,18 @@ impl OhpkmV2 {
 
     // Legends Arceus
 
-    #[wasm_bindgen(getter = gvsWasm)]
-    pub fn gvs_js(&self) -> Option<Stats8> {
-        Some(self.la_data?.gvs)
+    #[wasm_bindgen(getter = gvs)]
+    pub fn gvs_js(&self) -> Option<PkmStats> {
+        Some(self.la_data?.gvs.into())
     }
 
-    #[wasm_bindgen(setter = gvsWasm)]
-    pub fn set_gvs_js(&mut self, value: Option<Stats8>) {
+    #[wasm_bindgen(setter = gvs)]
+    pub fn set_gvs_js(&mut self, value: Option<PkmStats>) {
         match value {
-            Some(gvs) => self.la_data.get_or_insert_default().gvs = gvs,
+            Some(gvs) => {
+                self.la_data.get_or_insert_default().gvs =
+                    gvs.try_into().expect("gvs should not exceed 9 each")
+            }
             None => {
                 if let Some(la_data) = &mut self.la_data {
                     la_data.gvs = Stats8::default()

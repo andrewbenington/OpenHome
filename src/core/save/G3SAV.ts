@@ -174,19 +174,13 @@ export class G3SaveBackup {
       this.boxes[i] = new Box(gen3StringToUTF(this.pcDataContiguous, 0x8344 + i * 9, 10), 30)
     }
     for (let i = 0; i < 420; i++) {
+      const box = this.boxes[Math.floor(i / 30)]
+      const slot = i % 30
       try {
         const buffer = this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80).buffer
-        const mon = PK3.fromBytes(buffer, true)
-
-        const box = this.boxes[Math.floor(i / 30)]
-
-        if (mon.isValid()) {
-          box.boxSlots[i % 30] = mon
-        } else {
-          box.boxSlots[i % 30] = undefined
-        }
+        box.boxSlots[slot] = PK3.fromSlotBytes(buffer)
       } catch (e) {
-        throw Error(`File does not have valid Pokémon data: ${e}`)
+        throw Error(`File does has invalid Pokémon data at box ${box}/slot ${slot}: ${e}`)
       }
     }
 

@@ -22,13 +22,13 @@ use pkm_rs_resources::ribbons::Gen3RibbonSet;
 use pkm_rs_resources::species::form_metadata::MetadataSource;
 use pkm_rs_resources::species::{FormMetadata, NatDexIndex, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_resources::{helpers, lookup};
-use pkm_rs_types::Gender;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 use pkm_rs_types::{
     BinaryGender, ContestStats, Language, MarkingsFourShapes, NationalDex, OriginGame,
     SimpleAbilityNumber, Stats8, Stats16Le,
 };
+use pkm_rs_types::{Gender, PkmStats};
 use serde::{Serialize, Serializer};
 #[cfg(test)]
 use serde_json::json;
@@ -56,6 +56,7 @@ pub struct Pk3 {
     pub personality_value: u32,
     pub is_fateful_encounter: bool,
     pub gender: Gender,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
     pub contest: ContestStats,
     pub pokerus_byte: u8,
@@ -64,6 +65,7 @@ pub struct Pk3 {
     pub nickname: Gen3NicknameString<10>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: MoveSlots,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ivs: Stats8,
     pub is_egg: bool,
     pub trainer_name: Gen3TrainerString<7>,
@@ -136,6 +138,24 @@ impl Pk3 {
         }
 
         Ok(mon)
+    }
+
+    pub fn from_slot_bytes(bytes: &[u8]) -> Result<Option<Self>> {
+        let decrypted = encryption::decrypt_pkm_bytes_gen_3(bytes);
+        let unshuffled = encryption::unshuffle_blocks_gen_3(&decrypted);
+
+        let size = bytes.len();
+        let buffer = match size {
+            Self::BOX_SIZE => Pk3Buffer::box_span(bytes),
+            Self::PARTY_SIZE => Pk3Buffer::party_span(bytes),
+            _ => return Err(Error::buffer_size(Self::BOX_SIZE, size)),
+        };
+
+        if buffer.species_ndex() == 0 {
+            Ok(None)
+        } else {
+            Self::from_encryped_bytes(&unshuffled).map(Some)
+        }
     }
 
     pub fn write_to_box_buffer(&self, buf: &mut Pk3BufferMut) {
@@ -325,6 +345,10 @@ impl HasSpeciesAndForm for Pk3 {
     }
 }
 
+fn error_to_js(e: Error) -> JsValue {
+    JsValue::from_str(&e.to_string())
+}
+
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
@@ -334,18 +358,23 @@ impl Pk3 {
         bytes: Vec<u8>,
         strategy: ConvertStrategy,
     ) -> core::result::Result<Pk3, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
+        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(error_to_js)?;
         Ok(Pk3::from_ohpkm(&ohpkm, strategy))
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
     pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+        Pk3::from_bytes(&bytes).map_err(error_to_js)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
     pub fn from_encrypted_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_encryped_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+        Pk3::from_encryped_bytes(&bytes).map_err(error_to_js)
+    }
+
+    #[wasm_bindgen(js_name = fromSlotBytes)]
+    pub fn from_slot_byte_vector(bytes: Vec<u8>) -> core::result::Result<Option<Pk3>, JsValue> {
+        Self::from_slot_bytes(&bytes).map_err(error_to_js)
     }
 
     #[wasm_bindgen(js_name = toBoxBytes)]
@@ -395,6 +424,24 @@ impl Pk3 {
     #[wasm_bindgen(getter = heldItemName)]
     pub fn held_item_name_js(&self) -> Option<String> {
         self.held_item_index.map(|item| item.get_metadata().name())
+    }
+
+    #[wasm_bindgen(getter = ivs)]
+    pub fn ivs_js(&self) -> PkmStats {
+        self.ivs.into()
+    }
+    #[wasm_bindgen(setter = ivs)]
+    pub fn iet_evs_js(&mut self, v: PkmStats) {
+        self.ivs = v.try_into().expect("ivs should not exceed 31 each");
+    }
+
+    #[wasm_bindgen(getter = evs)]
+    pub fn evs_js(&self) -> PkmStats {
+        self.evs.into()
+    }
+    #[wasm_bindgen(setter = evs)]
+    pub fn set_evs_js(&mut self, v: PkmStats) {
+        self.evs = v.try_into().expect("evs should not exceed 255 each");
     }
 
     #[wasm_bindgen(getter = nature)]
@@ -466,8 +513,8 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats_js(&self) -> Stats16Le {
-        self.calculate_stats()
+    pub fn calculate_stats_js(&self) -> PkmStats {
+        self.calculate_stats().into()
     }
 }
 
@@ -493,7 +540,7 @@ pub fn form_index_from_pid(national_dex: NatDexIndex, pid: u32) -> u8 {
 #[cfg(test)]
 impl PkhexJson for Pk3 {
     fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
-        let mut value = serde_json::to_value(&self)?;
+        let mut value = serde_json::to_value(self)?;
         value["nickname_trash"] = json!(
             self.nickname
                 .bytes()
@@ -520,6 +567,7 @@ mod test {
     use crate::tests::{self, TestResult};
     use crate::traits::{IsShiny, PkmBytes};
 
+    use pkm_rs_resources::ribbons::Gen3Ribbon;
     #[cfg(feature = "randomize")]
     use pkm_rs_types::randomize::Randomize;
     #[cfg(feature = "randomize")]
@@ -647,4 +695,24 @@ mod test {
     //     }
     //     Ok(())
     // }
+
+    #[test]
+    fn set_contest_ribbon() -> TestResult<()> {
+        let mut mon = tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("blaziken.pkm"))?.0;
+
+        mon.ribbons.add_ribbon(Gen3Ribbon::BeautyHoenn);
+
+        assert!(mon.ribbons.has_ribbon(Gen3Ribbon::BeautyHoenn));
+        assert!(mon.ribbons.get_ribbons().contains(&Gen3Ribbon::BeautyHoenn));
+
+        mon.ribbons.add_ribbon(Gen3Ribbon::BeautyMasterHoenn);
+        assert!(mon.ribbons.has_ribbon(Gen3Ribbon::BeautyMasterHoenn));
+        assert!(
+            mon.ribbons
+                .get_ribbons()
+                .contains(&Gen3Ribbon::BeautyMasterHoenn)
+        );
+
+        Ok(())
+    }
 }

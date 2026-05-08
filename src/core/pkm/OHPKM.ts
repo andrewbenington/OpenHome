@@ -47,14 +47,6 @@ import {
   geolocationsToWasm,
   markingsSixShapesColorsFromWasm,
   markingsSixShapesColorsToWasm,
-  stats16LeToWasmNullable,
-  stats8ToWasm,
-  stats8ToWasmNullable,
-  statsFromWasm,
-  statsFromWasmNullable,
-  statsPreSplitFromWasm,
-  statsPreSplitFromWasmNullable,
-  statsPreSplitToWasm,
   trainerMemoryToWasm,
 } from './convert'
 import { isEvolution } from './Lookup'
@@ -167,12 +159,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
 
-      this.ivs = stats8ToWasm(
-        other.ivs ?? (other.dvs !== undefined ? ivsFromDVs(other.dvs) : generateIVs(prng))
-      )
+      this.ivs = other.ivs ?? (other.dvs !== undefined ? ivsFromDVs(other.dvs) : generateIVs(prng))
 
       if (other.evs) {
-        this.evs = stats8ToWasm(other.evs)
+        this.evs = other.evs
       }
 
       if (other.contest) {
@@ -186,11 +176,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.metLevel = other.metLevel ?? 0
 
       if (other.dvs && other.evsG12) {
-        this.setGameboyData(
-          statsPreSplitToWasm(other.dvs),
-          other.metTimeOfDay ?? 0,
-          statsPreSplitToWasm(other.evsG12)
-        )
+        this.setGameboyData(other.dvs, other.metTimeOfDay ?? 0, other.evsG12)
       }
 
       this.metLocationIndex = other.metLocationIndex ?? 0
@@ -401,39 +387,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return this.SpeciesAndForm.formIndex
   }
 
-  get evsG12() {
-    return statsPreSplitFromWasmNullable(this.evsG12Wasm)
-  }
-  set evsG12(value: jsTypes.StatsPreSplit | undefined) {
-    if (value) {
-      this.evsG12Wasm = statsPreSplitToWasm(value)
-    }
-  }
-
-  get ivs() {
-    return statsFromWasm(this.ivsWasm)
-  }
-  set ivs(value: jsTypes.Stats) {
-    this.ivsWasm = stats8ToWasm(value)
-  }
-
   get evs() {
-    return statsFromWasm(this.evsWasm)
+    return this.evsWasm
   }
 
   set evs(value: Stats) {
-    this.evsWasm = stats8ToWasm(value)
-  }
-
-  get dvs() {
-    return statsPreSplitFromWasm(this.dvsWasm)
-  }
-
-  get avs() {
-    return statsFromWasmNullable(this.avsWasm)
-  }
-  set avs(value: Stats | undefined) {
-    this.avsWasm = stats16LeToWasmNullable(value)
+    this.evsWasm = value
   }
 
   get contest() {
@@ -538,13 +497,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       value.spd,
       value.spe
     )
-  }
-
-  get gvs() {
-    return statsFromWasmNullable(this.gvsWasm)
-  }
-  set gvs(value: Stats | undefined) {
-    this.gvsWasm = stats8ToWasmNullable(value)
   }
 
   get shinyLeaves() {
@@ -761,6 +713,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.hyperTraining = other.hyperTraining
     }
 
+    console.log('RIBBONS: ', other.ribbons)
     this.ribbons = unique([...this.ribbons, ...(other.ribbons ?? [])])
     if (other.contest) {
       this.contest = other.contest

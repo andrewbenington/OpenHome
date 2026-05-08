@@ -44,6 +44,7 @@ pub struct Pk7 {
     pub encryption_constant: u32,
     pub sanity: u16,
     pub checksum: u16,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub species_and_form: Pk7SpeciesAndForm,
     pub held_item_index: u16,
     pub trainer_id: u16,
@@ -57,6 +58,7 @@ pub struct Pk7 {
     pub nature: NatureIndex,
     pub is_fateful_encounter: bool,
     pub gender: Gender,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
     pub contest: ContestStats,
     pub resort_event_status: u8,
@@ -75,6 +77,7 @@ pub struct Pk7 {
     pub relearn_moves: [MoveIndex; 4],
     pub secret_super_training_unlocked: bool,
     pub secret_super_training_complete: bool,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ivs: Stats8,
     pub is_egg: bool,
     pub is_nicknamed: bool,
@@ -518,6 +521,36 @@ impl Pk7 {
         }
     }
 
+    #[wasm_bindgen(getter = nationalDex)]
+    pub fn national_dex_js(&self) -> u16 {
+        self.species_and_form.0.get_ndex_js()
+    }
+
+    #[wasm_bindgen(getter = formIndex)]
+    pub fn form_index_js(&self) -> u16 {
+        self.species_and_form.0.get_forme_index()
+    }
+
+    #[wasm_bindgen(getter = evs)]
+    pub fn evs_js(&self) -> Stats16Le {
+        self.evs.into()
+    }
+
+    #[wasm_bindgen(setter = evs)]
+    pub fn set_evs_js(&mut self, v: Stats16Le) {
+        self.evs = v.to_stats8_truncated()
+    }
+
+    #[wasm_bindgen(getter = ivs)]
+    pub fn ivs_js(&self) -> Stats16Le {
+        self.ivs.into()
+    }
+
+    #[wasm_bindgen(setter = ivs)]
+    pub fn set_ivs_js(&mut self, v: Stats16Le) {
+        self.ivs = v.to_stats8_truncated()
+    }
+
     #[wasm_bindgen(js_name = toOhpkm)]
     pub fn to_ohpkm(&self) -> OhpkmV2 {
         OhpkmV2::from(self)
@@ -538,7 +571,7 @@ impl ModernEvs for Pk7 {
 #[cfg(test)]
 impl crate::tests::PkhexJson for Pk7 {
     fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
-        let mut value = serde_json::to_value(&self)?;
+        let mut value = serde_json::to_value(self)?;
         value["nickname_trash"] = serde_json::json!(
             self.nickname
                 .bytes()

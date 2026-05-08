@@ -30,7 +30,7 @@ pub struct Gen3String<const N: usize, TS: TerminatorStrategy> {
 }
 
 impl<const N: usize, TS: TerminatorStrategy> Gen3String<N, TS> {
-    fn from_raw(raw: [u8; N]) -> Self {
+    const fn from_raw(raw: [u8; N]) -> Self {
         Self {
             raw,
             _terminator_strategy: PhantomData,
@@ -72,9 +72,9 @@ impl TerminatorStrategy for SingleTerminator {
 pub struct TerminatorFill;
 impl TerminatorStrategy for TerminatorFill {
     fn set_terminators<const N: usize>(raw: &mut [u8; N], str_len: usize) {
-        for i in str_len..N {
+        (str_len..N).for_each(|i| {
             raw[i] = TERMINATOR;
-        }
+        });
     }
 }
 

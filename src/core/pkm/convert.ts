@@ -5,7 +5,6 @@ import {
   MarkingsSixShapesWithColor,
   Memory,
   PKMDate,
-  Stats,
   StatsPreSplit,
 } from '@pokemon-files/util'
 
@@ -84,87 +83,6 @@ export function contestStatsToWasm(value: ContestStats): PkmWasm.ContestStats {
     value.tough,
     value.sheen
   )
-}
-
-export function stats8FromWasm(value: PkmWasm.Stats8): Stats {
-  return {
-    hp: value.hp,
-    atk: value.atk,
-    def: value.def,
-    spa: value.spa,
-    spd: value.spd,
-    spe: value.spe,
-  }
-}
-
-export function stats8ToWasm(value: Stats): PkmWasm.Stats8 {
-  return new PkmWasm.Stats8(value.hp, value.atk, value.def, value.spa, value.spd, value.spe)
-}
-
-export function stats8ToWasmNullable(value: Stats | undefined): PkmWasm.Stats8 | undefined {
-  if (!value) return undefined
-  return new PkmWasm.Stats8(value.hp, value.atk, value.def, value.spa, value.spd, value.spe)
-}
-
-export function statsFromWasm(value: PkmWasm.Stats16Le | PkmWasm.Stats8): Stats {
-  return {
-    hp: value.hp,
-    atk: value.atk,
-    def: value.def,
-    spa: value.spa,
-    spd: value.spd,
-    spe: value.spe,
-  }
-}
-
-export function stats16LeToWasmNullable(value: Stats | undefined): PkmWasm.Stats16Le | undefined {
-  if (!value) return undefined
-  return new PkmWasm.Stats16Le(value.hp, value.atk, value.def, value.spa, value.spd, value.spe)
-}
-
-export function statsFromWasmNullable(
-  value: PkmWasm.Stats8 | PkmWasm.Stats16Le | undefined
-): Stats | undefined {
-  if (!value) return undefined
-  return {
-    hp: value.hp,
-    atk: value.atk,
-    def: value.def,
-    spa: value.spa,
-    spd: value.spd,
-    spe: value.spe,
-  }
-}
-
-export function stats16LeToWasm(value: Stats): PkmWasm.Stats16Le {
-  return new PkmWasm.Stats16Le(value.hp, value.atk, value.def, value.spa, value.spd, value.spe)
-}
-
-export function statsPreSplitFromWasm(value: PkmWasm.StatsPreSplit): StatsPreSplit {
-  return {
-    hp: value.hp,
-    atk: value.atk,
-    def: value.def,
-    spc: value.spc,
-    spe: value.spe,
-  }
-}
-
-export function statsPreSplitToWasm(value: StatsPreSplit): PkmWasm.StatsPreSplit {
-  return new PkmWasm.StatsPreSplit(value.hp, value.atk, value.def, value.spc, value.spe)
-}
-
-export function statsPreSplitFromWasmNullable(
-  value: PkmWasm.StatsPreSplit | undefined
-): StatsPreSplit | undefined {
-  if (!value) return undefined
-  return {
-    hp: value.hp,
-    atk: value.atk,
-    def: value.def,
-    spc: value.spc,
-    spe: value.spe,
-  }
 }
 
 export function trainerMemoryFromWasm(value: PkmWasm.TrainerMemory): Memory {

@@ -32,7 +32,6 @@ import {
   geolocationsToWasm,
   markingsSixShapesColorsFromWasm,
   markingsSixShapesColorsToWasm,
-  statsToWasmStats8,
   trainerMemoryToWasm,
 } from './wasm/convert'
 
@@ -93,7 +92,7 @@ export class PK7 {
   }
 
   get dexNum() {
-    return this.inner.species_and_form.nationalDex
+    return this.inner.nationalDex
   }
 
   get heldItemIndex() {
@@ -174,14 +173,14 @@ export class PK7 {
   }
 
   get formNum() {
-    return this.inner.species_and_form.formIndex
+    return this.inner.formIndex
   }
 
   get evs() {
     return this.inner.evs
   }
   set evs(value: jsTypes.Stats) {
-    this.inner.evs = statsToWasmStats8(value)
+    this.inner.evs = value
   }
 
   get contest() {
@@ -316,7 +315,7 @@ export class PK7 {
     return this.inner.ivs
   }
   set ivs(value: jsTypes.Stats) {
-    this.inner.ivs = statsToWasmStats8(value)
+    this.inner.ivs = value
   }
 
   get isEgg() {

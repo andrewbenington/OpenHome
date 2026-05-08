@@ -112,7 +112,7 @@ impl OhpkmConvert for Pk3 {
                 .into_iter()
                 .filter_map(Gen3Ribbon::from_openhome_if_present)
                 .collect(),
-            nickname: Gen3NicknameString::from_stringlike(&ohpkm.nickname()),
+            nickname: Gen3NicknameString::from_stringlike(converter.nickname(ohpkm)),
             moves: ohpkm.moves(),
             ivs: converter.ivs(ohpkm),
             is_egg: ohpkm.is_egg(),
