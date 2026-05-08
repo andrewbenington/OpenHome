@@ -189,10 +189,6 @@ impl<Stat: ContestStatMarker> Gen3ContestRibbons<Stat> {
     pub fn get_ribbons(&self) -> Vec<Gen3Ribbon> {
         let base_ribbon = Gen3Ribbon::contest_stat_base(Stat::_STAT);
 
-        println!(
-            "base ribbon: {:#?}; current level: {:#?}",
-            base_ribbon, self.0
-        );
         let mut ribbons: Vec<Gen3Ribbon> = Vec::new();
         for i in 1..=(self.0.to_u8()) {
             let base_ribbon_offset = i - 1;

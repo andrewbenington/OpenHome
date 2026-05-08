@@ -94,7 +94,7 @@ pub fn from_to_ohpkm_all_in_dir<PKM: OhpkmConvert>() -> TestResult<()> {
                     continue;
                 }
                 let path = ohpkm_dir.join(dir_entry.file_name());
-                find_inconsistencies_from_to_ohpkm::<PKM>(pkm_from_file(&path)?.0)?;
+                find_inconsistencies_from_to_ohpkm::<PKM>(pkm_from_file(&path)?.0, Some(path))?;
             }
         }
     }
@@ -116,7 +116,7 @@ pub fn to_from_ohpkm_all_in_dir<PKM: OhpkmConvert>(dir: &Path) -> TestResult<()>
                     continue;
                 }
                 let path = dir.join(dir_entry.file_name());
-                find_inconsistencies_to_from_ohpkm::<PKM>(pkm_from_file(&path)?.0)?;
+                find_inconsistencies_to_from_ohpkm::<PKM>(pkm_from_file(&path)?.0, Some(path))?;
             }
         }
     }
@@ -125,11 +125,15 @@ pub fn to_from_ohpkm_all_in_dir<PKM: OhpkmConvert>(dir: &Path) -> TestResult<()>
 }
 
 #[cfg(test)]
-pub fn ensure_ranges_match(actual: &[u8], expected: &[u8]) -> TestResult<()> {
+pub fn ensure_ranges_match(
+    actual: &[u8],
+    expected: &[u8],
+    path: Option<PathBuf>,
+) -> TestResult<()> {
     let differences = find_differing_ranges(actual, expected);
 
     match differences {
-        Some(diffs) => Err(DiffError::new(diffs, actual.to_vec(), expected.to_vec(), None).into()),
+        Some(diffs) => Err(DiffError::new(diffs, actual.to_vec(), expected.to_vec(), path).into()),
         None => Ok(()),
     }
 }
@@ -231,23 +235,29 @@ pub fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> TestResult<()> 
 }
 
 #[cfg(test)]
-fn find_inconsistencies_from_to_ohpkm<PKM: OhpkmConvert>(mon: OhpkmV2) -> TestResult<()> {
+fn find_inconsistencies_from_to_ohpkm<PKM: OhpkmConvert>(
+    mon: OhpkmV2,
+    path: Option<PathBuf>,
+) -> TestResult<()> {
     let first_pass = PKM::from_ohpkm(&mon, ConvertStrategy::default());
     let second_pass = PKM::from_ohpkm(&OhpkmV2::from(&first_pass), ConvertStrategy::default());
 
     let expected = first_pass.to_party_bytes();
     let actual = second_pass.to_party_bytes();
 
-    ensure_ranges_match(&actual, &expected)
+    ensure_ranges_match(&actual, &expected, path)
 }
 
 #[cfg(test)]
-fn find_inconsistencies_to_from_ohpkm<PKM: OhpkmConvert>(mon: PKM) -> TestResult<()> {
+fn find_inconsistencies_to_from_ohpkm<PKM: OhpkmConvert>(
+    mon: PKM,
+    path: Option<PathBuf>,
+) -> TestResult<()> {
     let expected = mon.to_party_bytes();
     let actual: Vec<u8> =
         PKM::from_ohpkm(&OhpkmV2::from(&mon), ConvertStrategy::default()).to_party_bytes();
 
-    ensure_ranges_match(&actual, &expected)
+    ensure_ranges_match(&actual, &expected, path)
 }
 
 #[cfg(test)]

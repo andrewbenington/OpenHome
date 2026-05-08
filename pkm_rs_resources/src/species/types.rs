@@ -1,14 +1,12 @@
-use crate::{Error, Result, abilities::AbilityIndexWasm, species::ALL_SPECIES};
+use crate::ExpectLog;
+use crate::levelup::LearnsetReader;
+use crate::species;
+use crate::species::form_metadata::{levelup_learnset_lookup, types_lookup};
+use crate::{Error, Result, abilities::AbilityIndexWasm, metadata_source::MetadataSource};
 use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
 use serde::{Serialize, Serializer};
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
-
-use crate::{
-    ExpectLog,
-    levelup::LearnsetReader,
-    species::form_metadata::{MetadataSource, levelup_learnset_lookup, types_lookup},
-};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -49,7 +47,7 @@ impl NatDexIndex {
     }
 
     pub const fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        &ALL_SPECIES[(self.to_u16() - 1) as usize]
+        &species::ALL_SPECIES[(self.to_u16() - 1) as usize]
     }
 
     /// # Safety

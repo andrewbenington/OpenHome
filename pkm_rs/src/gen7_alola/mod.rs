@@ -4,6 +4,7 @@ mod pk7_buffer;
 use pk7_buffer::Pk7Buffer;
 
 mod save;
+use pkm_rs_resources::metadata_source::MetadataSource;
 pub use save::Gen7AlolaSave;
 
 pub use pk7::*;
@@ -12,7 +13,7 @@ use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::moves::MoveDataOffsets;
 use pkm_rs_resources::ribbons::ModernRibbon;
 use pkm_rs_resources::species::SpeciesAndForm;
-use pkm_rs_resources::species::form_metadata::{MetadataSource, source_has_form_metadata};
+use pkm_rs_resources::species::form_metadata::source_has_form_metadata;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 

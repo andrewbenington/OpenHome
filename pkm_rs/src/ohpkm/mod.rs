@@ -6,6 +6,7 @@ mod v2_sections;
 
 pub mod extra_form;
 pub mod v1;
+use pkm_rs_resources::metadata_source::MetadataSource;
 pub use v2::OhpkmV2;
 pub mod sectioned_data;
 pub use convert::OhpkmConvert;
@@ -64,3 +65,5 @@ const fn is_shiny_gen_3_to_5(pid: u32, tid: u16, sid: u16) -> bool {
 const fn is_shiny_gen_6_plus(pid: u32, tid: u16, sid: u16) -> bool {
     shiny_xor_value(pid, tid, sid) < 16
 }
+
+const MOVE_METADATA_SOURCE: MetadataSource = MetadataSource::ScarletViolet;

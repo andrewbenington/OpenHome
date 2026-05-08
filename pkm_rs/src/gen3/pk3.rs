@@ -16,10 +16,10 @@ use crate::traits::{HasSpeciesAndForm, PkmBytes};
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::items::{Item, ItemGen3};
+use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
-use pkm_rs_resources::species::form_metadata::MetadataSource;
 use pkm_rs_resources::species::{FormMetadata, NatDexIndex, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_resources::{helpers, lookup};
 #[cfg(feature = "wasm")]

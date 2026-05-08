@@ -1,3 +1,4 @@
+use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::ribbons::Gen3Ribbon;
 use pkm_rs_resources::{items::ItemGen3, lookup};
 use pkm_rs_types::{AbilityNumber, Stats16Le};
@@ -57,7 +58,10 @@ impl OhpkmConvert for Pk3 {
                 .into_iter()
                 .map(Gen3Ribbon::to_openhome)
                 .collect(),
-            moves: self.moves,
+            moves: self
+                .moves
+                .to_pp_adjusted(MetadataSource::Emerald, ohpkm::MOVE_METADATA_SOURCE)
+                .unwrap_or_default(),
             nickname: self.nickname.to_string().into(),
             ivs: self.ivs,
             is_egg: self.is_egg,
@@ -113,7 +117,10 @@ impl OhpkmConvert for Pk3 {
                 .filter_map(Gen3Ribbon::from_openhome_if_present)
                 .collect(),
             nickname: Gen3NicknameString::from_stringlike(converter.nickname(ohpkm)),
-            moves: ohpkm.moves(),
+            moves: ohpkm
+                .moves()
+                .to_pp_adjusted(ohpkm::MOVE_METADATA_SOURCE, MetadataSource::Emerald)
+                .unwrap_or_default(),
             ivs: converter.ivs(ohpkm),
             is_egg: ohpkm.is_egg(),
             trainer_name: Gen3TrainerString::from_stringlike(&ohpkm.trainer_name()),

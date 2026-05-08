@@ -1,11 +1,9 @@
 use pkm_rs_types::{Stats, Stats16Le};
 
 use crate::{
+    metadata_source::MetadataSource,
     natures::NatureMetadata,
-    species::{
-        SpeciesAndForm,
-        form_metadata::{BaseStats, MetadataSource},
-    },
+    species::{SpeciesAndForm, form_metadata::BaseStats},
     stats::Stat,
 };
 

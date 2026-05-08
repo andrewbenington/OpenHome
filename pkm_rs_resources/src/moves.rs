@@ -9,6 +9,14 @@ use serde::{Serialize, Serializer};
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
+mod max_pp;
+mod unusable;
+
+pub use max_pp::adjust_pp_between_games;
+pub use max_pp::get_base_max_pp;
+
+use crate::metadata_source::MetadataSource;
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Clone, Copy, Serialize, PartialEq, Eq)]
@@ -66,6 +74,19 @@ impl MoveSlot {
         self.write_move_and_pp_to_offsets(bytes, offsets, index);
         pp_up_storage.write_pp_ups(bytes, offsets, index, self.pp_ups);
     }
+
+    pub fn to_pp_adjusted(
+        self,
+        source_metadata: MetadataSource,
+        dest_metadata: MetadataSource,
+    ) -> Option<Self> {
+        let adjusted_pp = adjust_pp_between_games(source_metadata, dest_metadata, self)?;
+
+        Some(Self {
+            pp: adjusted_pp,
+            ..self
+        })
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -110,6 +131,27 @@ impl MoveSlots {
 
     pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, MoveSlot> {
         self.0.iter_mut()
+    }
+
+    // returns 0, 1, 2, or 3 (or None)
+    fn first_empty_index(&self) -> Option<usize> {
+        self.0.iter().enumerate().find_map(|(index, slot)| {
+            if slot.move_index.is_empty() {
+                Some(index)
+            } else {
+                None
+            }
+        })
+    }
+
+    pub fn to_pp_adjusted(
+        self,
+        source_metadata: MetadataSource,
+        dest_metadata: MetadataSource,
+    ) -> Option<Self> {
+        self.into_iter()
+            .map(|m| m.to_pp_adjusted(source_metadata, dest_metadata))
+            .collect()
     }
 }
 
@@ -180,6 +222,36 @@ impl<'a> IntoIterator for &'a mut MoveSlots {
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.iter_mut()
+    }
+}
+
+impl FromIterator<MoveSlot> for MoveSlots {
+    fn from_iter<T: IntoIterator<Item = MoveSlot>>(iter: T) -> Self {
+        let mut from_iter = iter.into_iter();
+        let mut move_slots = Self::default();
+
+        while let Some(index) = move_slots.first_empty_index()
+            && let Some(slot) = from_iter.next()
+        {
+            move_slots.0[index] = slot
+        }
+
+        move_slots
+    }
+}
+
+impl FromIterator<Option<MoveSlot>> for MoveSlots {
+    fn from_iter<T: IntoIterator<Item = Option<MoveSlot>>>(iter: T) -> Self {
+        let mut from_iter = iter.into_iter();
+        let mut move_slots = Self::default();
+
+        while let Some(index) = move_slots.first_empty_index()
+            && let Some(slot) = from_iter.next().flatten()
+        {
+            move_slots.0[index] = slot
+        }
+
+        move_slots
     }
 }
 
