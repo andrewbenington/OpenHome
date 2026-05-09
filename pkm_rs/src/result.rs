@@ -1,17 +1,18 @@
-use crate::ohpkm::sectioned_data;
+use crate::sectioned_data;
 
 use pkm_rs_resources::lookup;
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
-use pkm_rs_resources::{species::MAX_NATIONAL_DEX, natures::NATURE_MAX, abilities::ABILITY_MAX, items::ITEM_MAX};
-use pkm_rs_types::{InvalidAbilityNumber, Language, LANGUAGE_MAX};
+use pkm_rs_resources::{
+    abilities::ABILITY_MAX, items::ITEM_MAX, natures::NATURE_MAX, species::MAX_NATIONAL_DEX,
+};
+use pkm_rs_types::{InvalidAbilityNumber, LANGUAGE_MAX, Language};
 
-use std::fmt::{Display};
-use std::string::FromUtf8Error;
 use serde::{Serialize, Serializer};
+use std::fmt::Display;
+use std::string::FromUtf8Error;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::JsValue;
-
 
 #[derive(Debug)]
 pub enum MoveErrorKind {
@@ -95,11 +96,19 @@ pub enum Error {
 
 impl Error {
     pub const fn buffer_size(expected: usize, received: usize) -> Self {
-        Self::BufferSize { requirement_source: None, expected, received }
+        Self::BufferSize {
+            requirement_source: None,
+            expected,
+            received,
+        }
     }
 
     pub fn buffer_size_with_source(source: &str, expected: usize, received: usize) -> Self {
-        Self::BufferSize { requirement_source: Some(String::from(source)), expected, received }
+        Self::BufferSize {
+            requirement_source: Some(String::from(source)),
+            expected,
+            received,
+        }
     }
 
     pub fn other(message: &str) -> Self {
@@ -107,11 +116,16 @@ impl Error {
     }
 
     pub const fn plugin_origin(error: FromUtf8Error) -> Self {
-        Self::StringDecode { source: StringErrorSource::PluginOrigin(error) }
+        Self::StringDecode {
+            source: StringErrorSource::PluginOrigin(error),
+        }
     }
 
     pub const fn extra_form_index(national_dex: NatDexIndex, extra_form_index: u64) -> Self {
-        Self::ExtraFormIndex { national_dex, extra_form_index }
+        Self::ExtraFormIndex {
+            national_dex,
+            extra_form_index,
+        }
     }
 }
 
@@ -142,7 +156,7 @@ impl Display for Error {
 
             Error::GameDex { value, game } => {
                 format!("Invalid game dex index {value} in {game} (no corresponding National Dex entry)")
-            }        
+            }
 
             Error::FormIndex {
                 national_dex,
@@ -217,16 +231,42 @@ impl std::error::Error for Error {
 impl From<pkm_rs_resources::Error> for Error {
     fn from(value: pkm_rs_resources::Error) -> Self {
         match value {
-            pkm_rs_resources::Error::BufferSize { requirement_source, expected, received } => Self::BufferSize { requirement_source: Some(requirement_source), expected, received },
-            pkm_rs_resources::Error::CryptRange { range, buffer_size } => Self::CryptRange { range, buffer_size },
-            pkm_rs_resources::Error::NationalDex { national_dex } => Self::NationalDex { value: national_dex, source: NdexConvertSource::Other },
-            pkm_rs_resources::Error::FormIndex { national_dex, form_index,
-                 } => Self::FormIndex { national_dex, form_index },
-            pkm_rs_resources::Error::LanguageIndex { language_index } => Self::LanguageIndex { language_index },
-            pkm_rs_resources::Error::NatureIndex { nature_index } => Self::NatureIndex { nature_index },
-            pkm_rs_resources::Error::AbilityIndex { ability_index } => Self::AbilityIndex { ability_index },
+            pkm_rs_resources::Error::BufferSize {
+                requirement_source,
+                expected,
+                received,
+            } => Self::BufferSize {
+                requirement_source: Some(requirement_source),
+                expected,
+                received,
+            },
+            pkm_rs_resources::Error::CryptRange { range, buffer_size } => {
+                Self::CryptRange { range, buffer_size }
+            }
+            pkm_rs_resources::Error::NationalDex { national_dex } => Self::NationalDex {
+                value: national_dex,
+                source: NdexConvertSource::Other,
+            },
+            pkm_rs_resources::Error::FormIndex {
+                national_dex,
+                form_index,
+            } => Self::FormIndex {
+                national_dex,
+                form_index,
+            },
+            pkm_rs_resources::Error::LanguageIndex { language_index } => {
+                Self::LanguageIndex { language_index }
+            }
+            pkm_rs_resources::Error::NatureIndex { nature_index } => {
+                Self::NatureIndex { nature_index }
+            }
+            pkm_rs_resources::Error::AbilityIndex { ability_index } => {
+                Self::AbilityIndex { ability_index }
+            }
             pkm_rs_resources::Error::ItemIndex { item_index } => Self::ItemIndex { item_index },
-            pkm_rs_resources::Error::FieldError { field, source } => Self::FieldError { field, source },
+            pkm_rs_resources::Error::FieldError { field, source } => {
+                Self::FieldError { field, source }
+            }
         }
     }
 }
@@ -234,10 +274,26 @@ impl From<pkm_rs_resources::Error> for Error {
 impl From<pkm_rs_types::Error> for Error {
     fn from(value: pkm_rs_types::Error) -> Self {
         match value {
-            pkm_rs_types::Error::BufferSize { field, offset, buffer_size } => Self::BufferSize { requirement_source: Some(field), expected: offset, received: buffer_size },
-            pkm_rs_types::Error::ByteLength { expected, received } => Self::BufferSize { requirement_source: None, expected, received },
-            pkm_rs_types::Error::AbilityNumber(invalid_ability_number) => Self::AbilityNumber(invalid_ability_number),
-            pkm_rs_types::Error::LanguageIndex { language_index } => Self::LanguageIndex { language_index },
+            pkm_rs_types::Error::BufferSize {
+                field,
+                offset,
+                buffer_size,
+            } => Self::BufferSize {
+                requirement_source: Some(field),
+                expected: offset,
+                received: buffer_size,
+            },
+            pkm_rs_types::Error::ByteLength { expected, received } => Self::BufferSize {
+                requirement_source: None,
+                expected,
+                received,
+            },
+            pkm_rs_types::Error::AbilityNumber(invalid_ability_number) => {
+                Self::AbilityNumber(invalid_ability_number)
+            }
+            pkm_rs_types::Error::LanguageIndex { language_index } => {
+                Self::LanguageIndex { language_index }
+            }
         }
     }
 }
@@ -245,11 +301,24 @@ impl From<pkm_rs_types::Error> for Error {
 impl From<sectioned_data::Error> for Error {
     fn from(value: sectioned_data::Error) -> Self {
         match value {
-            sectioned_data::Error::BufferTooShort { field, expected, received } => Self::BufferSize { requirement_source: Some(field), expected, received },
-            sectioned_data::Error::SectionOutOfBounds { section_name, offset, length, buffer_size } => Self::BufferSize { 
+            sectioned_data::Error::BufferTooShort {
+                field,
+                expected,
+                received,
+            } => Self::BufferSize {
+                requirement_source: Some(field),
+                expected,
+                received,
+            },
+            sectioned_data::Error::SectionOutOfBounds {
+                section_name,
+                offset,
+                length,
+                buffer_size,
+            } => Self::BufferSize {
                 requirement_source: Some(section_name),
-                expected: (offset+length) as usize, 
-                received: buffer_size 
+                expected: (offset + length) as usize,
+                received: buffer_size,
             },
         }
     }
@@ -313,7 +382,6 @@ pub enum MoveErrorSource {
     Name,
 }
 
-
 impl Display for MoveErrorSource {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
@@ -334,16 +402,17 @@ pub enum StringErrorSource {
     MostRecentSaveFilePath(FromUtf8Error),
 }
 
-
 impl Display for StringErrorSource {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Other => f.write_str("other"),
-            Self::PluginOrigin(utf_error) =>  {
+            Self::PluginOrigin(utf_error) => {
                 f.write_fmt(format_args!("OHPKM plugin origin: {utf_error}"))
-            },
+            }
             Self::Notes(utf_error) => f.write_fmt(format_args!("OHPKM notes: {utf_error}")),
-            Self::MostRecentSaveFilePath(utf_error) => f.write_fmt(format_args!("OHPKM most recent save file path: {utf_error}")),
+            Self::MostRecentSaveFilePath(utf_error) => f.write_fmt(format_args!(
+                "OHPKM most recent save file path: {utf_error}"
+            )),
         }
     }
 }

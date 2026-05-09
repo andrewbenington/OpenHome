@@ -18,6 +18,7 @@ pub mod location;
 pub mod ohpkm;
 pub mod result;
 // pub mod rom_hacks;
+pub mod sectioned_data;
 pub mod traits;
 
 #[cfg(test)]

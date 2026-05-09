@@ -6,9 +6,8 @@ mod v2_sections;
 
 pub mod extra_form;
 pub mod v1;
-pub use v2::OhpkmV2;
-pub mod sectioned_data;
 pub use convert::OhpkmConvert;
+pub use v2::OhpkmV2;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::JsValue;
