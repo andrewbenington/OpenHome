@@ -9,12 +9,16 @@ import { buildUnknownSaveFile } from '../util/load'
 import { emptyPathData } from '../util/path'
 import { initializeWasm } from './init'
 
+function saveTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'save-files', ...pathElements)
+}
+
 describe('G3SAV - Gen 3 Save File Read Test', async () => {
   await initializeWasm()
 
   const result = buildUnknownSaveFile(
     emptyPathData,
-    new Uint8Array(fs.readFileSync(path.join(__dirname, 'save-files', 'emerald.sav'))),
+    new Uint8Array(fs.readFileSync(saveTestFilePath('emerald.sav'))),
 
     [G3SAV]
   )

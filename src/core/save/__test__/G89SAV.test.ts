@@ -2,7 +2,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Ball, ConvertStrategies, OriginGame } from '@pkm-rs/pkg'
 import { PA8, PK4, PK8 } from '@pokemon-files/pkm'
 import { readFileSync } from 'fs'
-import { resolve } from 'path'
+import path from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { PKMInterface } from '../../pkm/interfaces'
 import { SCBoolBlock, SCObjectBlock, writeSCBlock } from '../encryption/SwishCrypto/SCBlock'
@@ -13,6 +13,14 @@ import { PathData } from '../util/path'
 import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
+
+function pkmTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'pkm-files', ...pathElements)
+}
+
+function saveTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'save-files', ...pathElements)
+}
 
 const swordPath: PathData = {
   raw: 'save-files/sword',
@@ -37,19 +45,19 @@ describe('gen 8 save files', () => {
   let magmortar: PK4
 
   beforeAll(() => {
-    let savePath = resolve(__dirname, 'save-files/sword')
+    let savePath = saveTestFilePath('sword')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     swordSave = new SwShSAV(swordPath, saveBytes)
 
-    savePath = resolve(__dirname, 'save-files/legendsarceus')
+    savePath = saveTestFilePath('legendsarceus')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     arceusSave = new LASAV(arceusPath, saveBytes)
 
-    const monPath = resolve('src/core/pkm/__test__/PKMFiles/Gen4/magmortar.pkm')
+    const monPath = pkmTestFilePath('pk4', 'magmortar.pkm')
     const monBytes = new Uint8Array(readFileSync(monPath))
 
     magmortar = PK4.fromBytes(monBytes.buffer)

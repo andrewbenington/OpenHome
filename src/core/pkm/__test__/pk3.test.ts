@@ -16,25 +16,29 @@ var blazikenOhpkm: OHPKM
 var blazikenPk3: PK3
 var slowbroOhpkm: OHPKM
 
+function pkmTestFilePath(dir: string, filename: string): string {
+  return path.join(__dirname, 'pkm-files', dir, filename)
+}
+
 beforeAll(() => {
   blazikenOhpkm = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'blaziken.ohpkm'))),
+    new Uint8Array(fs.readFileSync(pkmTestFilePath('ohpkm', 'blaziken.ohpkm'))),
     'OHPKM'
   ) as OHPKM
 
   blazikenPk3 = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm'))),
+    new Uint8Array(fs.readFileSync(pkmTestFilePath('pk3', 'blaziken.pkm'))),
     'PK3'
   ) as PK3
 
   slowbroOhpkm = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'slowbro.ohpkm'))),
+    new Uint8Array(fs.readFileSync(pkmTestFilePath('ohpkm', 'slowbro.ohpkm'))),
     'OHPKM'
   ) as OHPKM
 })
 
 test('gen 3 stat calculations', () => {
-  const file = path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm')
+  const file = pkmTestFilePath('pk3', 'blaziken.pkm')
   const fileBytes = fs.readFileSync(file)
   const bytes = new Uint8Array(fileBytes)
   const mon = bytesToPKM(bytes, 'pkm')

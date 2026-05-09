@@ -2,7 +2,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ConvertStrategies, Language, Lookup } from '@pkm-rs/pkg'
 import { fail } from 'assert'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { resolve } from 'path'
+import path, { resolve } from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { G3RRSAV } from '../radicalred/G3RRSAV'
 import PK3RR from '../radicalred/PK3RR'
@@ -11,13 +11,16 @@ import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
 
+function saveTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'save-files', ...pathElements)
+}
+
 describe('G3RRSAV - Radical Red Save File Read Test', () => {
   let radicalRedSave: G3RRSAV
   let saveBytes: Uint8Array
 
   beforeAll(() => {
-    const savePath = resolve(__dirname, 'save-files/radicalred.sav')
-
+    const savePath = saveTestFilePath('radicalred.sav')
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     const parsedPath: PathData = {
