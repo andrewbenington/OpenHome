@@ -225,7 +225,7 @@ impl MainDataV2 {
         )
     }
 
-    pub fn with_timestamp_if_missing(
+    pub const fn with_timestamp_if_missing(
         &mut self,
         started_tracking_seconds: Option<NonZeroU64>,
     ) -> &mut Self {

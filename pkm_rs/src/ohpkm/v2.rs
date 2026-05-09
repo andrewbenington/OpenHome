@@ -1515,7 +1515,7 @@ impl OhpkmV2 {
         self.main_data.started_tracking_seconds
     }
 
-    pub fn set_started_tracking_if_missing(
+    pub const fn set_started_tracking_if_missing(
         &mut self,
         started_tracking_seconds: Option<NonZeroU64>,
     ) {
