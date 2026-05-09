@@ -65,19 +65,6 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
     })
 
     test(`moves match - ${file}`, () => {
-      const originalMoveData = original.moves.map((moveIndex, i) => ({
-        move: Moves[moveIndex].name,
-        index: moveIndex,
-        pp: original.movePP[i],
-        ppUps: original.movePPUps[i],
-      }))
-      const roundTripMoveData = roundTrip.moves.map((moveIndex, i) => ({
-        move: Moves[moveIndex].name,
-        index: moveIndex,
-        pp: roundTrip.movePP[i],
-        ppUps: roundTrip.movePPUps[i],
-      }))
-      expect(JSON.stringify(originalMoveData)).toEqual(JSON.stringify(roundTripMoveData))
       expect(original.moves, 'move indices').toEqual(roundTrip.moves)
       expect(original.movePP, 'move PP').toEqual(roundTrip.movePP)
       expect(original.movePPUps, 'move PP Ups').toEqual(roundTrip.movePPUps)
@@ -88,6 +75,10 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
 
     test(`bytes match - ${file}`, () => {
       if (!expectedBytes.every((v, i) => v === actualBytes[i])) {
+        // first compare JSON to give a more readable outputAZcdsvx bfdgn
+        const other = PK3.fromBytes(actualBytes.buffer)
+        expect(original.toJson()).toEqual(roundTrip.toJson())
+        expect(roundTrip.toJson()).toEqual(other.toJson())
         throw new Error(diffSpans(expectedBytes, actualBytes))
       }
     })

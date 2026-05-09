@@ -254,8 +254,8 @@ fn find_inconsistencies_to_from_ohpkm<PKM: OhpkmConvert>(
     path: Option<PathBuf>,
 ) -> TestResult<()> {
     let expected = mon.to_party_bytes();
-    let actual: Vec<u8> =
-        PKM::from_ohpkm(&OhpkmV2::from(&mon), ConvertStrategy::default()).to_party_bytes();
+    let ohpkm = OhpkmV2::from(&mon);
+    let actual: Vec<u8> = PKM::from_ohpkm(&ohpkm, ConvertStrategy::default()).to_party_bytes();
 
     ensure_ranges_match(&actual, &expected, path)
 }

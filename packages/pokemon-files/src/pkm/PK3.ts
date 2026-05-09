@@ -124,7 +124,6 @@ export default class PK3 implements PKMInterface {
   }
 
   get ability() {
-    console.log('ABILITY NUM: ', this.abilityNum)
     return this.metadata?.abilityByNumGen3(this.abilityNum)
   }
 
@@ -358,6 +357,10 @@ export default class PK3 implements PKMInterface {
 
   public getStats() {
     return this.inner.calculateStats()
+  }
+
+  public toJson() {
+    return JSON.parse(this.inner.toJson())
   }
 
   isShiny() {

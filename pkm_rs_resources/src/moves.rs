@@ -148,9 +148,12 @@ impl MoveSlots {
         self,
         source_metadata: MetadataSource,
         dest_metadata: MetadataSource,
-    ) -> Option<Self> {
+    ) -> Self {
         self.into_iter()
-            .map(|m| m.to_pp_adjusted(source_metadata, dest_metadata))
+            .map(|m| {
+                m.to_pp_adjusted(source_metadata, dest_metadata)
+                    .unwrap_or_default()
+            })
             .collect()
     }
 }
@@ -233,7 +236,7 @@ impl FromIterator<MoveSlot> for MoveSlots {
         while let Some(index) = move_slots.first_empty_index()
             && let Some(slot) = from_iter.next()
         {
-            move_slots.0[index] = slot
+            move_slots.0[index] = slot;
         }
 
         move_slots

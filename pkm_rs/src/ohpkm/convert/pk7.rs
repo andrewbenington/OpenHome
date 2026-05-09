@@ -1,4 +1,4 @@
-use pkm_rs_resources::ribbons::OpenHomeRibbonSet;
+use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
 use crate::{
@@ -37,7 +37,10 @@ impl OhpkmConvert for Pk7 {
             contest_memory_count: self.contest_memory_count,
             battle_memory_count: self.battle_memory_count,
             ribbons: OpenHomeRibbonSet::from_modern(self.ribbons),
-            moves: self.moves,
+            moves: self.moves.to_pp_adjusted(
+                MetadataSource::UltraSunUltraMoon,
+                ohpkm::MOVE_METADATA_SOURCE,
+            ),
             nickname: self.nickname,
             relearn_moves: self.relearn_moves,
             ivs: self.ivs,
@@ -134,7 +137,10 @@ impl OhpkmConvert for Pk7 {
             super_training_dist_flags: ohpkm.super_training_dist_flags().unwrap_or_default(),
             form_argument: ohpkm.form_argument(),
             nickname: ohpkm.nickname(),
-            moves: ohpkm.moves(),
+            moves: ohpkm.moves().to_pp_adjusted(
+                ohpkm::MOVE_METADATA_SOURCE,
+                MetadataSource::UltraSunUltraMoon,
+            ),
             relearn_moves: ohpkm.relearn_moves(),
             secret_super_training_unlocked: ohpkm
                 .secret_super_training_unlocked()

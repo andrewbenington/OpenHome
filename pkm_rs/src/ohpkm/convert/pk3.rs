@@ -60,8 +60,7 @@ impl OhpkmConvert for Pk3 {
                 .collect(),
             moves: self
                 .moves
-                .to_pp_adjusted(MetadataSource::Emerald, ohpkm::MOVE_METADATA_SOURCE)
-                .unwrap_or_default(),
+                .to_pp_adjusted(MetadataSource::Emerald, ohpkm::MOVE_METADATA_SOURCE),
             nickname: self.nickname.to_string().into(),
             ivs: self.ivs,
             is_egg: self.is_egg,
@@ -119,8 +118,7 @@ impl OhpkmConvert for Pk3 {
             nickname: Gen3NicknameString::from_stringlike(converter.nickname(ohpkm)),
             moves: ohpkm
                 .moves()
-                .to_pp_adjusted(ohpkm::MOVE_METADATA_SOURCE, MetadataSource::Emerald)
-                .unwrap_or_default(),
+                .to_pp_adjusted(ohpkm::MOVE_METADATA_SOURCE, MetadataSource::Emerald),
             ivs: converter.ivs(ohpkm),
             is_egg: ohpkm.is_egg(),
             trainer_name: Gen3TrainerString::from_stringlike(&ohpkm.trainer_name()),

@@ -525,6 +525,13 @@ impl Pk3 {
     pub fn calculate_stats_js(&self) -> Stats16Le {
         self.calculate_stats()
     }
+
+    #[wasm_bindgen(js_name = toJson)]
+    pub fn to_json(&self) -> Result<String> {
+        Ok(serde_json::to_value(self)
+            .map_err(|e| Error::Other(e.to_string()))?
+            .to_string())
+    }
 }
 
 impl ModernEvs for Pk3 {
