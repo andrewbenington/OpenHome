@@ -6,11 +6,11 @@
         {
           "external": {
             "command": "prettier",
-            "arguments": ["--stdin-filepath", "{buffer_path}"],
-          },
-        },
+            "arguments": ["--stdin-filepath", "{buffer_path}"]
+          }
+        }
       ],
-      "format_on_save": "on",
+      "format_on_save": "on"
     },
     "TypeScript": {
       "formatter": [
@@ -18,28 +18,28 @@
         {
           "external": {
             "command": "prettier",
-            "arguments": ["--stdin-filepath", "{buffer_path}"],
-          },
-        },
+            "arguments": ["--stdin-filepath", "{buffer_path}"]
+          }
+        }
       ],
-      "format_on_save": "on",
-    },
+      "format_on_save": "on"
+    }
   },
   "lsp": {
     "rust-analyzer": {
       "initialization_options": {
         "cargo": {
-          "features": "all",
+          "features": "all"
         },
-        "inlayHints": { "typeHints": { "enable": true } },
-      },
+        "inlayHints": { "typeHints": { "enable": true } }
+      }
     },
     "eslint": {
       "settings": {
         "codeActionOnSave": {
-          "rules": ["import/order"],
-        },
-      },
-    },
-  },
+          "rules": ["import/order"]
+        }
+      }
+    }
+  }
 }

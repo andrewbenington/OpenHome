@@ -2,6 +2,7 @@ import {
   AbilityNumber,
   Ball,
   ConvertStrategy,
+  Gen3Ribbon,
   ItemGen3,
   Language,
   Languages,
@@ -62,7 +63,7 @@ export default class XDPKM {
   ivs: types.Stats
   contest: types.ContestStats
   shadowID: number
-  ribbons: string[]
+  ribbons: Gen3Ribbon[]
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
@@ -153,7 +154,10 @@ export default class XDPKM {
       this.ivs = converter.ivs(other)
       this.contest = other.contest
       this.shadowID = 0
-      this.ribbons = filterRibbons(other.ribbons, [Gen3ContestRibbons, Gen3StandardRibbons])
+      this.ribbons = filterRibbons(other.ribbons, [
+        Gen3ContestRibbons,
+        Gen3StandardRibbons,
+      ]) as Gen3Ribbon[]
       this.statLevel = this.speciesMetadata?.calculateLevel(this.exp) ?? 1
     }
   }

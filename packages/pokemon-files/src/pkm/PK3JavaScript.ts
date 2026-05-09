@@ -5,6 +5,7 @@ import {
   AbilityNumber,
   Ball,
   ConvertStrategy,
+  Gen3Ribbon,
   ItemGen3,
   Language,
   Languages,
@@ -65,7 +66,7 @@ export default class PK3JavaScript {
   currentHP: number
   nickname: string
   trainerName: string
-  ribbons: string[]
+  ribbons: Gen3Ribbon[]
   trainerGender: boolean
   checksum: number = 0
   originalBytes?: ArrayBuffer
@@ -196,7 +197,10 @@ export default class PK3JavaScript {
       this.currentHP = other.currentHP
       this.nickname = converter.nickname(other)
       this.trainerName = other.trainerName
-      this.ribbons = filterRibbons(other.ribbons, [Gen3ContestRibbons, Gen3StandardRibbons])
+      this.ribbons = filterRibbons(other.ribbons, [
+        Gen3ContestRibbons,
+        Gen3StandardRibbons,
+      ]) as Gen3Ribbon[]
       this.trainerGender = other.trainerGender
     }
     this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
@@ -258,7 +262,7 @@ export default class PK3JavaScript {
 
     stringLogic.writeGen3StringToBytes(dataView, this.nickname, 0x8, 10, false)
     stringLogic.writeGen3StringToBytes(dataView, this.trainerName, 0x14, 7, true)
-    gen3ContestRibbonsToBuffer(dataView, 0x4c, 0, this.ribbons)
+    gen3ContestRibbonsToBuffer(dataView, 0x4c, 0, this.ribbons as Gen3Ribbon[])
     byteLogic.setFlagIndexes(
       dataView,
       0x4c,
