@@ -12,14 +12,16 @@ import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
 
+function pkmTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'pkm-files', ...pathElements)
+}
+
 describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
-  const files = fs
-    .readdirSync(path.join(__dirname, 'PKMFiles', 'Gen3'))
-    .filter((f) => f.endsWith('.pkm'))
+  const files = fs.readdirSync(pkmTestFilePath('pk3')).filter((f) => f.endsWith('.pkm'))
   await initializeWasm()
 
   for (const file of files) {
-    const bytes = new Uint8Array(fs.readFileSync(path.join(__dirname, 'PKMFiles', 'Gen3', file)))
+    const bytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pk3', file)))
     const original = PK3.fromBytes(bytes.buffer)
     original.refreshChecksum()
 
@@ -72,9 +74,7 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
 
 describe('evolution and form change update ohpkm', async () => {
   test(`dialga form change updates OHPKM form`, () => {
-    const dialgaBytes = new Uint8Array(
-      fs.readFileSync(path.join(__dirname, 'PKMFiles', 'LA', 'dialga.pa8'))
-    )
+    const dialgaBytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pa8', 'dialga.pa8')))
 
     const dialgaPa8 = PA8.fromBytes(dialgaBytes.buffer)
     expect(dialgaPa8.dexNum).toEqual(NationalDex.Dialga)
@@ -90,9 +90,7 @@ describe('evolution and form change update ohpkm', async () => {
   })
 
   test(`galar mr mime evolution updates OHPKM species/form`, () => {
-    const mrMimeBytes = new Uint8Array(
-      fs.readFileSync(path.join(__dirname, 'PKMFiles', 'Gen8', 'mr-mime-galar.pk8'))
-    )
+    const mrMimeBytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pk8', 'mr-mime-galar.pk8')))
 
     const mrMimeGalarPk8 = PK8.fromBytes(mrMimeBytes.buffer)
     expect(mrMimeGalarPk8.dexNum).toEqual(NationalDex.MrMime)
@@ -128,9 +126,7 @@ describe('plugin form persistence', () => {
 
   test('PB8LUMI → OHPKM → bytes → OHPKM → PB8LUMI roundtrip', () => {
     const stitchedGengarBytes = new Uint8Array(
-      fs.readFileSync(
-        path.join(__dirname, 'PKMFiles', 'rom-hack', 'luminescent', 'stitched-gengar.pb8lumi')
-      )
+      fs.readFileSync(pkmTestFilePath('romhack', 'luminescent', 'stitched-gengar.pb8lumi'))
     )
 
     const original = PB8LUMI.fromBytes(stitchedGengarBytes.buffer)
@@ -379,7 +375,7 @@ describe('OHPKM conversion strategies', () => {
 describe('gen 3 ability during OHPKM conversion', () => {
   test('2nd ability is left alone if present in gen 3', () => {
     const withShellArmorBytes = new Uint8Array(
-      fs.readFileSync(path.join(__dirname, 'PKMFiles', 'OhpkmV2', 'crawdaunt-shell-armor.ohpkm'))
+      fs.readFileSync(pkmTestFilePath('ohpkm', 'crawdaunt-shell-armor.ohpkm'))
     )
     const withShellArmor = OHPKM.fromBytes(withShellArmorBytes.buffer)
     expect(withShellArmor.abilityNum).toEqual(2)

@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs'
-import { resolve } from 'path'
+import path from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { SignMemeDataInPlace, SignWithMemeCrypto } from '../encryption/Encryption'
 import { bytesBeHexString, MemeKey, pokedexAndSaveFileMemeKey } from '../encryption/MemeKey'
@@ -10,12 +10,16 @@ import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
 
+function saveTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'save-files', ...pathElements)
+}
+
 describe('gen 7 save files', () => {
   let ultraSunSave: Gen7AlolaSave
   let saveBytes: Uint8Array
 
   beforeAll(() => {
-    const savePath = resolve(__dirname, 'save-files/ultrasun')
+    const savePath = saveTestFilePath('ultrasun')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
@@ -44,8 +48,7 @@ describe('moon save file', () => {
   let saveBytes: Uint8Array
 
   beforeAll(() => {
-    const savePath = resolve(__dirname, 'save-files/moon')
-
+    const savePath = saveTestFilePath('moon')
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     const parsedPath: PathData = {
@@ -77,7 +80,7 @@ describe('meme key', () => {
   let saveBytes: Uint8Array
 
   beforeAll(() => {
-    const savePath = resolve(__dirname, 'save-files/moon')
+    const savePath = saveTestFilePath('moon')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
   })

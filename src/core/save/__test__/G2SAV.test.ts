@@ -12,6 +12,15 @@ import { emptyPathData } from '../util/path'
 import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
+
+function pkmTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'pkm-files', ...pathElements)
+}
+
+function saveTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'save-files', ...pathElements)
+}
+
 let crystalSaveFile: G2SAV
 var slowbroOH: OHPKM
 
@@ -19,7 +28,7 @@ beforeAll(async () => {
   await initializeWasm()
   const result = buildUnknownSaveFile(
     emptyPathData,
-    new Uint8Array(fs.readFileSync(path.join(__dirname, 'save-files', 'crystal.sav'))),
+    new Uint8Array(fs.readFileSync(saveTestFilePath('crystal.sav'))),
 
     [G2SAV]
   )
@@ -30,9 +39,7 @@ beforeAll(async () => {
 
   crystalSaveFile = result.value as G2SAV
 
-  const slowpokeBytes = fs.readFileSync(
-    path.join('src/core/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm')
-  )
+  const slowpokeBytes = fs.readFileSync(pkmTestFilePath('ohpkm', 'slowbro.ohpkm'))
   slowbroOH = bytesToPKM(new Uint8Array(slowpokeBytes), 'OHPKM') as OHPKM
 })
 

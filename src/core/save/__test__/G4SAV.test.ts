@@ -12,9 +12,13 @@ import { buildUnknownSaveFile } from '../util/load'
 import { emptyPathData } from '../util/path'
 import { initializeWasm } from './init'
 
+function saveTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'save-files', ...pathElements)
+}
+
 describe('Platinum save file read/write', async () => {
   await initializeWasm()
-  const saveFilePath = path.join(__dirname, 'save-files', 'platinum.sav')
+  const saveFilePath = saveTestFilePath('platinum.sav')
   const platinumSaveBytes = new Uint8Array(fs.readFileSync(saveFilePath))
   const saveFile = new PtSAV(emptyPathData, platinumSaveBytes)
 
@@ -104,7 +108,7 @@ describe('Platinum save file read/write', async () => {
 
 describe('Pearl save file read/write', async () => {
   await initializeWasm()
-  const saveFilePath = path.join(__dirname, 'save-files', 'pearl.sav')
+  const saveFilePath = saveTestFilePath('pearl.sav')
   const saveBytes = new Uint8Array(fs.readFileSync(saveFilePath))
   const saveFile = new DPSAV(emptyPathData, saveBytes)
 
@@ -194,7 +198,7 @@ describe('Pearl save file read/write', async () => {
 
 describe('HeartGold save file read/write', async () => {
   await initializeWasm()
-  const saveFilePath = path.join(__dirname, 'save-files', 'heartgold.sav')
+  const saveFilePath = saveTestFilePath('heartgold.sav')
   const saveBytes = new Uint8Array(fs.readFileSync(saveFilePath))
   const saveFile = new HGSSSAV(emptyPathData, saveBytes)
 
