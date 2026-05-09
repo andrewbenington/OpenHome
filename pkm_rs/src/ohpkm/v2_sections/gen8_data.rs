@@ -135,6 +135,7 @@ impl DataSection for BdspData {
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct LegendsArceusData {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub gvs: Stats8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub move_flags: FlagSet<14>,
