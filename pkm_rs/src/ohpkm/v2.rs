@@ -2,15 +2,15 @@ use std::num::NonZeroU64;
 
 use super::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
-    Notes, PastHandlerDataV2, PluginData, ScarletVioletData, SwordShieldData,
+    Notes, PluginData, ScarletVioletData, SwordShieldData,
 };
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
 use crate::ohpkm::deprecated::PastHandlerDataV1;
 use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::v1::OhpkmV1;
-use crate::ohpkm::v2_sections::MonTags;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, UnconvertedPkm};
+use crate::ohpkm::v2_sections::{MonTags, PastHandlerDataV2};
 use crate::result::{Error, Result};
 #[cfg(feature = "wasm")]
 use crate::sectioned_data::DataSection;
