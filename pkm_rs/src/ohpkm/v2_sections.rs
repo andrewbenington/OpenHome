@@ -4,21 +4,15 @@ use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result, StringErrorSource};
 use crate::sectioned_data::DataSection;
-use crate::traits::{IsShiny, OhpkmByte, OhpkmBytes};
+use crate::traits::{OhpkmByte, OhpkmBytes};
 use crate::util;
 
-use pkm_rs_resources::abilities::AbilityIndexBounded;
-use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::lookup;
-use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
-use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
+use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_types::Language;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{FlagSet, Geolocations, TeraType};
-use pkm_rs_types::{Gender, OriginGame, ShinyLeaves, TrainerMemory};
-use pkm_rs_types::{Stats8, Stats16Le, StatsPreSplit, TrainerData};
+use pkm_rs_types::{Gender, OriginGame, TrainerMemory};
+use pkm_rs_types::{Stats8, Stats16Le, TrainerData};
 use serde::Deserialize;
 use serde::Serialize;
 use std::num::NonZeroU16;
@@ -26,164 +20,21 @@ use std::num::NonZeroU16;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
+mod gameboy_data;
+mod gen45_data;
 mod main_data;
-pub use main_data::MainDataV2;
+
 pub mod pkm_bytes;
+
+pub use gameboy_data::GameboyData;
+pub use gen45_data::Gen45Data;
+pub use main_data::MainDataV2;
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 fn bytes_are_empty(bytes: &[u8]) -> bool {
     bytes.iter().all(|b| *b == 0)
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
-pub struct GameboyData {
-    pub dvs: StatsPreSplit,
-    pub met_time_of_day: u8,
-    pub evs_g12: StatsPreSplit,
-}
-
-const UNOWN: NatDexIndex = unsafe { NatDexIndex::new_unchecked(201) };
-
-impl GameboyData {
-    pub fn from_v1(old: super::v1::OhpkmV1) -> Option<Self> {
-        if !old.game_of_origin.is_gameboy() && old.met_time_of_day == 0 && old.evs_g12.is_empty() {
-            None
-        } else {
-            Some(Self {
-                dvs: old.dvs,
-                met_time_of_day: old.met_time_of_day,
-                evs_g12: old.evs_g12,
-            })
-        }
-    }
-
-    pub fn from_main_data(main_data: &MainDataV2) -> Self {
-        if main_data.species_and_form.get_ndex() == UNOWN {
-            let letter_index = main_data.species_and_form.get_forme_index();
-
-            Self {
-                dvs: StatsPreSplit::dvs_from_ivs_lossy(&main_data.ivs)
-                    .force_dvs_for_unown_letter(letter_index),
-                ..Default::default()
-            }
-        } else {
-            Self {
-                dvs: if main_data.is_shiny() {
-                    StatsPreSplit::shiny_dvs_from_ivs(&main_data.ivs)
-                } else {
-                    StatsPreSplit::dvs_from_ivs_lossy(&main_data.ivs)
-                },
-                ..Default::default()
-            }
-        }
-    }
-}
-
-impl DataSection for GameboyData {
-    type TagType = OhpkmSectionTag;
-    const TAG: Self::TagType = OhpkmSectionTag::GameboyData;
-
-    type ErrorType = Error;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes);
-
-        // try_into() will always succeed thanks to the buffer size check
-        Ok(Self {
-            dvs: StatsPreSplit::from_dv_bytes(bytes[0..2].try_into().unwrap()),
-            met_time_of_day: bytes[2],
-            evs_g12: StatsPreSplit::from_bytes_u16_le(bytes[3..13].try_into().unwrap()),
-        })
-    }
-
-    fn to_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0u8; 13];
-
-        bytes[0..2].copy_from_slice(&self.dvs.to_dv_bytes());
-        bytes[2] = self.met_time_of_day;
-        bytes[3..13].copy_from_slice(&self.evs_g12.to_bytes());
-
-        bytes.to_vec()
-    }
-
-    fn is_empty(&self) -> bool {
-        self.met_time_of_day == 0 && self.evs_g12.is_empty()
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
-pub struct Gen45Data {
-    pub encounter_type: u8,
-    pub performance: u8,
-    pub shiny_leaves: ShinyLeaves,
-    pub poke_star_fame: u8,
-    pub is_ns_pokemon: bool,
-}
-
-impl Gen45Data {
-    pub fn from_v1(old: super::v1::OhpkmV1) -> Option<Self> {
-        if !old.game_of_origin.is_ds()
-            && old.encounter_type == 0
-            && old.performance == 0
-            && old.shiny_leaves.is_empty()
-            && old.poke_star_fame == 0
-            && !old.is_ns_pokemon
-        {
-            None
-        } else {
-            Some(Self {
-                encounter_type: old.encounter_type,
-                performance: old.performance,
-                shiny_leaves: old.shiny_leaves,
-                poke_star_fame: old.poke_star_fame,
-                is_ns_pokemon: old.is_ns_pokemon,
-            })
-        }
-    }
-}
-
-impl DataSection for Gen45Data {
-    type TagType = OhpkmSectionTag;
-    const TAG: Self::TagType = OhpkmSectionTag::Gen45Data;
-
-    type ErrorType = Error;
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::ensure_buffer_size(bytes);
-
-        Ok(Self {
-            encounter_type: bytes[0],
-            performance: bytes[1],
-            shiny_leaves: ShinyLeaves::from_byte(bytes[2]),
-            poke_star_fame: bytes[3],
-            is_ns_pokemon: util::get_flag(bytes, 4, 0),
-        })
-    }
-
-    fn to_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0u8; 33];
-
-        bytes[0] = self.encounter_type;
-        bytes[1] = self.performance;
-        bytes[2] = self.shiny_leaves.to_byte();
-        bytes[3] = self.poke_star_fame;
-        util::set_flag(&mut bytes, 4, 0, self.is_ns_pokemon);
-
-        bytes.to_vec()
-    }
-
-    fn is_empty(&self) -> bool {
-        self.encounter_type == 0
-            && self.performance == 0
-            && self.shiny_leaves.is_empty()
-            && self.poke_star_fame == 0
-            && !self.is_ns_pokemon
-    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
