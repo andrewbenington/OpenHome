@@ -1,4 +1,4 @@
-use crate::ohpkm::sectioned_data;
+use crate::sectioned_data;
 
 use pkm_rs_resources::lookup;
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};

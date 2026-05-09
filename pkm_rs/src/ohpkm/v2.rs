@@ -1,6 +1,5 @@
 use std::num::NonZeroU64;
 
-use super::sectioned_data::{DataSection, SectionTag, SectionedData};
 use super::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
     Notes, PastHandlerDataV2, PluginData, ScarletVioletData, SwordShieldData,
@@ -13,6 +12,9 @@ use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::MonTags;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, UnconvertedPkm};
 use crate::result::{Error, Result};
+#[cfg(feature = "wasm")]
+use crate::sectioned_data::DataSection;
+use crate::sectioned_data::{SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;

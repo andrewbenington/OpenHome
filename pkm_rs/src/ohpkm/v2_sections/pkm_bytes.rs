@@ -1,6 +1,7 @@
-use crate::ohpkm::sectioned_data::DataSection;
 use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result};
+use crate::sectioned_data::DataSection;
+
 use strum_macros::Display;
 
 const PK1_PARTY_SIZE: usize = 66;
