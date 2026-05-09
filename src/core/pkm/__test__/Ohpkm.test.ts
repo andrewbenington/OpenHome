@@ -1,7 +1,7 @@
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import { ConvertStrategies, ConvertStrategy, ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
 import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@pokemon-files/pkm'
-import { HyperTrainStats, Stats } from '@pokemon-files/util'
+import { getMoveMaxPP, HyperTrainStats, Stats } from '@pokemon-files/util'
 import { getFormatLocationString } from '@pokemon-resources/locations'
 import fs from 'fs'
 import path from 'path'
@@ -9,6 +9,7 @@ import { assert, beforeAll, describe, expect, test } from 'vitest'
 import { NationalDex } from '../../../../packages/pokemon-resources/src/consts/NationalDex'
 import { OHPKM } from '../OHPKM'
 import { initializeWasm } from './init'
+import { Moves } from '@pokemon-resources/moves'
 
 beforeAll(initializeWasm)
 
@@ -57,6 +58,29 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
 
     test(`genders match - ${file}`, () => {
       assert(original.gender === roundTrip.gender)
+    })
+
+    test(`ribbons match - ${file}`, () => {
+      expect(original.ribbons).toEqual(roundTrip.ribbons)
+    })
+
+    test(`moves match - ${file}`, () => {
+      const originalMoveData = original.moves.map((moveIndex, i) => ({
+        move: Moves[moveIndex].name,
+        index: moveIndex,
+        pp: original.movePP[i],
+        ppUps: original.movePPUps[i],
+      }))
+      const roundTripMoveData = roundTrip.moves.map((moveIndex, i) => ({
+        move: Moves[moveIndex].name,
+        index: moveIndex,
+        pp: roundTrip.movePP[i],
+        ppUps: roundTrip.movePPUps[i],
+      }))
+      expect(JSON.stringify(originalMoveData)).toEqual(JSON.stringify(roundTripMoveData))
+      expect(original.moves, 'move indices').toEqual(roundTrip.moves)
+      expect(original.movePP, 'move PP').toEqual(roundTrip.movePP)
+      expect(original.movePPUps, 'move PP Ups').toEqual(roundTrip.movePPUps)
     })
 
     const expectedBytes = new Uint8Array(original.toBytes())

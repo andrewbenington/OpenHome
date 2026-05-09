@@ -5,7 +5,10 @@ use pkm_rs_types::{ContestStat, FlagSet};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
-use serde::{Serialize, Serializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error};
+
+#[cfg(feature = "wasm")]
+use tsify::Tsify;
 
 use crate::{
     log,
@@ -39,6 +42,8 @@ impl ContestStatMarker for Tough {
 }
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
+#[cfg_attr(feature = "wasm", derive(Tsify))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Default, Debug, Clone, Copy)]
 pub struct Gen3RibbonSet {
     cool: Gen3ContestRibbons<Cool>,
@@ -154,6 +159,16 @@ impl Serialize for Gen3RibbonSet {
     }
 }
 
+impl<'de> Deserialize<'de> for Gen3RibbonSet {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Gen3RibbonSet, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let ribbons: Vec<Gen3Ribbon> = Vec::deserialize(deserializer)?;
+        Ok(Self::default().with_ribbons(ribbons))
+    }
+}
+
 trait ContestStatMarker {
     const _STAT: ContestStat;
 }
@@ -241,35 +256,60 @@ impl Gen3ContestRibbonLevel {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "wasm", derive(Tsify))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[repr(u8)]
 pub enum Gen3Ribbon {
+    #[serde(rename = "Cool (Hoenn)")]
     CoolHoenn,
+    #[serde(rename = "Cool Super (Hoenn)")]
     CoolSuperHoenn,
+    #[serde(rename = "Cool Hyper (Hoenn)")]
     CoolHyperHoenn,
+    #[serde(rename = "Cool Master (Hoenn)")]
     CoolMasterHoenn,
+    #[serde(rename = "Beauty (Hoenn)")]
     BeautyHoenn,
+    #[serde(rename = "Beauty Super (Hoenn)")]
     BeautySuperHoenn,
+    #[serde(rename = "Beauty Hyper (Hoenn)")]
     BeautyHyperHoenn,
+    #[serde(rename = "Beauty Master (Hoenn)")]
     BeautyMasterHoenn,
+    #[serde(rename = "Cute (Hoenn)")]
     CuteHoenn,
+    #[serde(rename = "Cute Super (Hoenn)")]
     CuteSuperHoenn,
+    #[serde(rename = "Cute Hyper (Hoenn)")]
     CuteHyperHoenn,
+    #[serde(rename = "Cute Master (Hoenn)")]
     CuteMasterHoenn,
+    #[serde(rename = "Smart (Hoenn)")]
     SmartHoenn,
+    #[serde(rename = "Smart Super (Hoenn)")]
     SmartSuperHoenn,
+    #[serde(rename = "Smart Hyper (Hoenn)")]
     SmartHyperHoenn,
+    #[serde(rename = "Smart Master (Hoenn)")]
     SmartMasterHoenn,
+    #[serde(rename = "Tough (Hoenn)")]
     ToughHoenn,
+    #[serde(rename = "Tough Super (Hoenn)")]
     ToughSuperHoenn,
+    #[serde(rename = "Tough Hyper (Hoenn)")]
     ToughHyperHoenn,
+    #[serde(rename = "Tough Master (Hoenn)")]
     ToughMasterHoenn,
     Champion,
     Winning,
     Victory,
     Artist,
     Effort,
+    #[serde(rename = "Battle Champion")]
     BattleChampion,
+    #[serde(rename = "Regional Champion")]
     RegionalChampion,
+    #[serde(rename = "National Champion")]
     NationalChampion,
     Country,
     National,
@@ -407,7 +447,7 @@ impl Gen3Ribbon {
             Gen3Ribbon::ToughSuperHoenn => "Tough Super",
             Gen3Ribbon::ToughHyperHoenn => "Tough Hyper (Hoenn)",
             Gen3Ribbon::ToughMasterHoenn => "Tough Master (Hoenn)",
-            Gen3Ribbon::Champion => "G3 Champion",
+            Gen3Ribbon::Champion => "Champion",
             Gen3Ribbon::Winning => "Winning",
             Gen3Ribbon::Victory => "Victory",
             Gen3Ribbon::Artist => "Artist",
@@ -423,7 +463,6 @@ impl Gen3Ribbon {
     }
 
     pub fn from_name(name: &str) -> Option<Self> {
-        log!("getting ribbon from {name}");
         let name = name.strip_suffix(" Ribbon").unwrap_or(name);
         let name = name.strip_suffix(" (Hoenn)").unwrap_or(name);
         let name = name.strip_suffix(" Ribbon").unwrap_or(name);
@@ -587,6 +626,19 @@ impl Serialize for Gen3Ribbon {
         S: Serializer,
     {
         self.get_name().serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for Gen3Ribbon {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Gen3Ribbon, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let string_value = String::deserialize(deserializer)?;
+
+        Self::from_name(&string_value).ok_or(D::Error::custom(format!(
+            "invalid Gen3Ribbon: {string_value}"
+        )))
     }
 }
 

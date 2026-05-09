@@ -22,6 +22,8 @@ use pkm_rs_resources::ribbons::Gen3RibbonSet;
 use pkm_rs_resources::species::form_metadata::MetadataSource;
 use pkm_rs_resources::species::{FormMetadata, NatDexIndex, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_resources::{helpers, lookup};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::AbilityNumber;
 use pkm_rs_types::Gender;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -51,6 +53,7 @@ pub struct Pk3 {
     pub exp: u32,
     pub has_species_data: bool,
     pub is_bad_egg: bool,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ability_num: SimpleAbilityNumber,
     pub markings: MarkingsFourShapes,
     pub personality_value: u32,
@@ -141,9 +144,6 @@ impl Pk3 {
     }
 
     pub fn from_slot_bytes(bytes: &[u8]) -> Result<Option<Self>> {
-        let decrypted = encryption::decrypt_pkm_bytes_gen_3(bytes);
-        let unshuffled = encryption::unshuffle_blocks_gen_3(&decrypted);
-
         let size = bytes.len();
         let buffer = match size {
             Self::BOX_SIZE => Pk3Buffer::box_span(bytes),
@@ -154,7 +154,7 @@ impl Pk3 {
         if buffer.species_ndex() == 0 {
             Ok(None)
         } else {
-            Self::from_encryped_bytes(&unshuffled).map(Some)
+            Self::from_encryped_bytes(bytes).map(Some)
         }
     }
 
@@ -433,6 +433,15 @@ impl Pk3 {
     #[wasm_bindgen(setter = ivs)]
     pub fn iet_evs_js(&mut self, v: Stats16Le) {
         self.ivs = v.try_into().expect("ivs should not exceed 31 each");
+    }
+
+    #[wasm_bindgen(getter = abilityNum)]
+    pub fn ability_num_js(&self) -> AbilityNumber {
+        self.ability_num.into()
+    }
+    #[wasm_bindgen(setter = abilityNum)]
+    pub fn set_ability_num_js(&mut self, v: AbilityNumber) {
+        self.ability_num = v.into()
     }
 
     #[wasm_bindgen(getter = evs)]

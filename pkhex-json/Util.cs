@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using PKHeX.Core;
 
-public static class Util
+public static partial class Util
 {
 
   public static object SpeciesAndForm(PKM pk)
@@ -158,7 +158,13 @@ public static class Util
 
   static string ReformatRibbonName(string s)
   {
-    var parts = Regex.Split(s, @"(?=[A-Z])").Where(p => p.Length > 0).ToArray();
+    Console.WriteLine("ribbon: " + s);
+    if (s == "RibbonChampionG3")
+    {
+      s = "RibbonChampion";
+    }
+    
+    var parts = RibbonRegex().Split(s).Where(p => p.Length > 0).ToArray();
     if (parts.Length == 3 && parts[1] == "Champion")
     {
       return $"{parts[2]} {parts[1]} {parts[0]}";
@@ -268,4 +274,7 @@ public static class Util
   {
     return strings.balllist.GetValue(pk.Ball).ToString().Replace(" Ball", "").Replace("Poke", "Poké");
   }
+
+  [GeneratedRegex(@"(?=[A-Z])")]
+  private static partial Regex RibbonRegex();
 }

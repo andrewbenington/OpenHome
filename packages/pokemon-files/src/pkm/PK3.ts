@@ -10,6 +10,7 @@ import {
 } from '@pkm-rs/pkg'
 import { FourMoves } from '@pokemon-files/util'
 import { PKMInterface } from 'src/core/pkm/interfaces'
+import { Option } from 'src/core/util/functional'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import * as encryption from '../util/encryption'
 import * as jsTypes from '../util/types'
@@ -22,7 +23,6 @@ import {
   markingsFourShapesFromWasm,
   markingsFourShapesToWasm,
 } from './wasm/convert'
-import { Option } from 'src/core/util/functional'
 
 export default class PK3 implements PKMInterface {
   static getFormat() {
@@ -124,14 +124,15 @@ export default class PK3 implements PKMInterface {
   }
 
   get ability() {
+    console.log('ABILITY NUM: ', this.abilityNum)
     return this.metadata?.abilityByNumGen3(this.abilityNum)
   }
 
   get abilityNum() {
-    return this.inner.ability_num
+    return this.inner.abilityNum
   }
   set abilityNum(value: number) {
-    this.inner.ability_num = value
+    this.inner.abilityNum = value
   }
 
   get markings() {
