@@ -240,7 +240,10 @@ fn find_inconsistencies_from_to_ohpkm<PKM: OhpkmConvert>(
     path: Option<PathBuf>,
 ) -> TestResult<()> {
     let first_pass = PKM::from_ohpkm(&mon, ConvertStrategy::default());
-    let second_pass = PKM::from_ohpkm(&OhpkmV2::from(&first_pass), ConvertStrategy::default());
+    let second_pass = PKM::from_ohpkm(
+        &OhpkmV2::convert_without_backup(&first_pass),
+        ConvertStrategy::default(),
+    );
 
     let expected = first_pass.to_party_bytes();
     let actual = second_pass.to_party_bytes();
@@ -254,7 +257,7 @@ fn find_inconsistencies_to_from_ohpkm<PKM: OhpkmConvert>(
     path: Option<PathBuf>,
 ) -> TestResult<()> {
     let expected = mon.to_party_bytes();
-    let ohpkm = OhpkmV2::from(&mon);
+    let ohpkm = OhpkmV2::convert_with_backup(&mon, &expected)?;
     let actual: Vec<u8> = PKM::from_ohpkm(&ohpkm, ConvertStrategy::default()).to_party_bytes();
 
     ensure_ranges_match(&actual, &expected, path)

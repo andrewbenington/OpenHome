@@ -368,10 +368,10 @@ function PokedexMain(props: PokedexMetadataProps) {
               <div>{selectedForm.hiddenAbility.name}</div>
             </AttributeRow>
           )}
-
           <AttributeRow label="Egg Groups">
             <div>{selectedForm.eggGroups.join(' • ')}</div>
           </AttributeRow>
+          <AttributeRow label="Gender Ratio">{selectedForm.genderRatio}</AttributeRow>
         </Flex>
       </Flex>
       <Flex width="100%" height="50%">

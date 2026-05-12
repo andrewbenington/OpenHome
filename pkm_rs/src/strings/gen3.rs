@@ -52,6 +52,15 @@ impl<const N: usize, TS: TerminatorStrategy> Gen3String<N, TS> {
     pub fn from_stringlike(value: impl Into<String>) -> Self {
         Self::from_str_inner(&value.into())
     }
+
+    // because both have the same N, both are enforced to be the same length and no length check is needed
+    pub fn identical_until_terminator(&self, other: &Gen3String<N, TS>) -> bool {
+        self.raw
+            .into_iter()
+            .take_while(|byte| *byte != TERMINATOR)
+            .enumerate()
+            .all(|(index, byte)| other.raw[index] == byte)
+    }
 }
 
 pub trait TerminatorStrategy {

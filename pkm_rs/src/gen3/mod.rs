@@ -8,8 +8,8 @@ use pk3_buffer::Offset;
 use pk3_buffer::Pk3Buffer;
 use pkm_rs_resources::{abilities::AbilityIndexBounded, moves::MoveDataOffsets};
 
-const BOX_SIZE: usize = 80;
-const PARTY_SIZE: usize = 100;
+pub(crate) const BOX_SIZE: usize = 80;
+pub(crate) const PARTY_SIZE: usize = 100;
 
 const MOVE_DATA_OFFSETS: MoveDataOffsets<Offset> = MoveDataOffsets {
     moves: Offset::Moves,

@@ -26,7 +26,7 @@ pub(super) enum Offset {
     Markings = 0x1b,
     Checksum = 0x1c,
     Sanity = 0x1e,
-    NationalDex = 0x20,
+    SpeciesIndex = 0x20,
     HeldItem = 0x22,
     Exp = 0x24,
     MovePpUps = 0x28,
@@ -177,8 +177,8 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         self.get_u16_le(Offset::Checksum)
     }
 
-    pub fn species_ndex(&self) -> u16 {
-        self.get_u16_le(Offset::NationalDex)
+    pub fn gen3_species_index(&self) -> u16 {
+        self.get_u16_le(Offset::SpeciesIndex)
     }
 
     pub fn held_item_index(&self) -> u16 {
@@ -388,7 +388,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
     }
 
     pub fn set_species_ndex(&mut self, v: u16) {
-        self.set_u16_le(Offset::NationalDex, v);
+        self.set_u16_le(Offset::SpeciesIndex, v);
     }
 
     pub fn set_held_item_index(&mut self, v: u16) {

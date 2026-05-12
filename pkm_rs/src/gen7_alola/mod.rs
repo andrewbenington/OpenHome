@@ -19,8 +19,8 @@ use pkm_rs_types::randomize::Randomize;
 
 use serde::Serialize;
 
-const BOX_SIZE: usize = 232;
-const PARTY_SIZE: usize = 260;
+pub(crate) const BOX_SIZE: usize = 232;
+pub(crate) const PARTY_SIZE: usize = 260;
 
 const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
 

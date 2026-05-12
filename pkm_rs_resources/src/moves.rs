@@ -10,7 +10,7 @@ use serde::{Serialize, Serializer};
 use pkm_rs_types::randomize::Randomize;
 
 mod max_pp;
-mod unusable;
+// mod unusable;
 
 pub use max_pp::adjust_pp_between_games;
 pub use max_pp::get_base_max_pp;

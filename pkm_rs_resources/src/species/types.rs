@@ -124,7 +124,7 @@ impl From<NatDexIndex> for NationalDex {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, Default, PartialEq, Eq, Clone, Copy, EnumString, Display)]
 pub enum GenderRatio {
     #[default]
     Genderless,

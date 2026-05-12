@@ -94,10 +94,10 @@ impl Pk3 {
     // ------------------------------------------------------------------
 
     pub fn from_buffer(buf: &Pk3BufferRef) -> Result<Self> {
-        let ndex = buf.species_ndex();
+        let pokemon_index = Gen3PokemonIndex::new(buf.gen3_species_index())?;
         let personality_value = buf.personality_value();
         let mut mon = Pk3 {
-            pokemon_index: Gen3PokemonIndex::new(buf.species_ndex())?,
+            pokemon_index,
             sanity: buf.sanity(),
             checksum: buf.checksum(),
             held_item_index: ItemGen3::new(buf.held_item_index()),
@@ -110,7 +110,7 @@ impl Pk3 {
             markings: buf.markings(),
             personality_value: buf.personality_value(),
             is_fateful_encounter: buf.is_fateful_encounter(),
-            gender: SpeciesAndForm::new(ndex, 0)?
+            gender: SpeciesAndForm::base_form(pokemon_index.to_national_dex())
                 .get_forme_metadata()
                 .gender_from_pid(personality_value),
             evs: buf.evs(),
@@ -151,7 +151,7 @@ impl Pk3 {
             _ => return Err(Error::buffer_size(Self::BOX_SIZE, size)),
         };
 
-        if buffer.species_ndex() == 0 {
+        if buffer.gen3_species_index() == 0 {
             Ok(None)
         } else {
             Self::from_encryped_bytes(bytes).map(Some)
@@ -278,7 +278,7 @@ impl Pk3 {
         let unshuffled = encryption::unshuffle_blocks_gen_6_7(&decrypted);
         let buffer = Pk3BufferRef::box_span(&unshuffled);
 
-        buffer.species_ndex() == 0
+        buffer.gen3_species_index() == 0
     }
 
     pub fn modern_held_item(&self) -> Option<Item> {
@@ -512,8 +512,8 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(js_name = toOhpkm)]
-    pub fn to_ohpkm(&self) -> OhpkmV2 {
-        OhpkmV2::from(self)
+    pub fn to_ohpkm(&self) -> Result<OhpkmV2> {
+        OhpkmV2::convert_with_backup(self, &self.to_party_bytes())
     }
 
     #[wasm_bindgen(js_name = isEmptySlot)]
@@ -584,6 +584,7 @@ mod test {
     use crate::traits::{IsShiny, PkmBytes};
 
     use pkm_rs_resources::ribbons::Gen3Ribbon;
+    use pkm_rs_types::Gender;
     #[cfg(feature = "randomize")]
     use pkm_rs_types::randomize::Randomize;
     #[cfg(feature = "randomize")]
@@ -638,22 +639,26 @@ mod test {
         tests::compare_pkhex_json_all_in_dir::<Pk3>(&PathBuf::from("pk3"))
     }
 
-    // #[test]
-    // fn nickname_garbage_preserved() -> TestResult<()> {
-    //     let mon =
-    //         tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("pelipper-garbage-bytes.pk3"))?
-    //             .0;
+    #[test]
+    fn nickname_garbage_preserved() -> TestResult<()> {
+        let (mon, bytes) =
+            tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("jirachi-garbage.pkm"))?;
 
-    //     // 'r' at position 14 should be leftover from 'Pelipper'
-    //     assert_eq!(mon.nickname.bytes()[14], b'r');
+        // trash bytes from an event mon
+        assert_eq!(mon.nickname.bytes()[9], 0x70);
+        assert_eq!(mon.nickname.bytes()[8], 0x08);
 
-    //     let mon_recreated = Pk3::from_ohpkm(&OhpkmV2::from(&mon), ConvertStrategy::default());
+        let mon_recreated = Pk3::from_ohpkm(
+            &OhpkmV2::convert_with_backup(&mon, &bytes)?,
+            ConvertStrategy::default(),
+        );
 
-    //     // leftover 'r' should be preserved after conversion to/from OHPKM
-    //     assert_eq!(mon_recreated.nickname.bytes()[14], b'r');
+        // trash bytes should be preserved
+        assert_eq!(mon_recreated.nickname.bytes()[9], 0x70);
+        assert_eq!(mon_recreated.nickname.bytes()[8], 0x08);
 
-    //     Ok(())
-    // }
+        Ok(())
+    }
 
     #[test]
     fn checksum() -> TestResult<()> {
@@ -728,6 +733,16 @@ mod test {
                 .get_ribbons()
                 .contains(&Gen3Ribbon::BeautyMasterHoenn)
         );
+
+        Ok(())
+    }
+
+    #[test]
+    fn kyogre_is_nonbinary() -> TestResult<()> {
+        let path = PathBuf::from("pk3").join("382 - Kyogre.pkm");
+        let mon = tests::pkm_from_file::<Pk3>(&path)?.0;
+
+        assert_eq!(mon.gender, Gender::Genderless);
 
         Ok(())
     }

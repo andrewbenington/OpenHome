@@ -9,12 +9,10 @@ use crate::ohpkm::OhpkmConvert;
 use crate::ohpkm::deprecated::PastHandlerDataV1;
 use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::v1::OhpkmV1;
-use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, UnconvertedPkm};
+use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
 use crate::ohpkm::v2_sections::{MonTags, PastHandlerDataV2};
 use crate::result::{Error, Result};
-#[cfg(feature = "wasm")]
-use crate::sectioned_data::DataSection;
-use crate::sectioned_data::{SectionTag, SectionedData};
+use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;
@@ -42,8 +40,6 @@ use pkm_rs_types::randomize::Randomize;
 
 #[cfg(feature = "wasm")]
 use super::JsResult;
-#[cfg(feature = "wasm")]
-use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
 #[cfg(feature = "wasm")]
@@ -233,6 +229,25 @@ pub struct OhpkmV2 {
 }
 
 impl OhpkmV2 {
+    pub fn convert_without_backup<PKM: OhpkmConvert>(other: &PKM) -> Self {
+        Self {
+            main_data: other.to_main_data(),
+            gen67_data: other.to_gen_67_data(),
+            ..Default::default()
+        }
+    }
+
+    pub fn convert_with_backup<PKM: OhpkmConvert>(
+        other: &PKM,
+        original_bytes: &[u8],
+    ) -> Result<Self> {
+        let mut ohpkm = Self::convert_without_backup(other);
+        let stored_bytes = PKM::bytes_to_stored(original_bytes)?;
+        ohpkm.set_original_data_bytes(stored_bytes);
+
+        Ok(ohpkm)
+    }
+
     pub fn openhome_id(&self) -> String {
         self.main_data.openhome_id()
     }
@@ -769,17 +784,6 @@ impl OhpkmV2 {
             .map(DsGen3Ribbon::to_openhome)
             .for_each(|r| self.main_data.ribbons.add_ribbon(r));
     }
-
-    //
-    // pub fn set_species_and_form(&mut self, national_dex: u16, form_index: u16) -> JsResult<()> {
-    //     match SpeciesAndForm::new(national_dex, form_index) {
-    //         Ok(species_and_form) => {
-    //             self.main_data.species_and_form = species_and_form;
-    //             Ok(())
-    //         }
-    //         Err(e) => Err(JsValue::from_str(&e.to_string())),
-    //     }
-    // }
 
     // Plugins
 
@@ -1519,6 +1523,14 @@ impl OhpkmV2 {
     ) {
         self.main_data
             .with_timestamp_if_missing(started_tracking_seconds);
+    }
+
+    pub fn original_data_bytes(&self) -> Option<StoredPkmBytes> {
+        self.original_data.map(|data| *data.tagged_bytes())
+    }
+
+    pub const fn set_original_data_bytes(&mut self, original_bytes: StoredPkmBytes) {
+        self.original_data = Some(OriginalBackup::new(original_bytes));
     }
 
     // Calculated
@@ -3391,7 +3403,7 @@ impl OhpkmV2 {
 
     // Original Data
     #[wasm_bindgen(getter = originalData)]
-    pub fn original_data(&self) -> Option<OriginalDataJs> {
+    pub fn original_data_js(&self) -> Option<OriginalDataJs> {
         self.original_data.map(|d| OriginalDataJs {
             tag: d.tag(),
             data: d.data_as_bytes().to_vec(),
@@ -3399,7 +3411,7 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(js_name = trySetOriginalData)]
-    pub fn try_set_original_data(&mut self, tag: pkm_bytes::Tag, data: Vec<u8>) -> Result<()> {
+    pub fn try_set_original_data_js(&mut self, tag: pkm_bytes::Tag, data: Vec<u8>) -> Result<()> {
         let pkm_bytes = StoredPkmBytes::new(tag, &data)?;
 
         self.original_data = Some(OriginalBackup::new(pkm_bytes));
@@ -3563,15 +3575,15 @@ impl HasSpeciesAndForm for OhpkmV2 {
     }
 }
 
-impl<T: OhpkmConvert> From<&T> for OhpkmV2 {
-    fn from(pkm: &T) -> Self {
-        Self {
-            main_data: pkm.to_main_data(),
-            gen67_data: pkm.to_gen_67_data(),
-            ..Default::default()
-        }
-    }
-}
+// impl<T: OhpkmConvert> From<&T> for OhpkmV2 {
+//     fn from(pkm: &T) -> Self {
+//         Self {
+//             main_data: pkm.to_main_data(),
+//             gen67_data: pkm.to_gen_67_data(),
+//             ..Default::default()
+//         }
+//     }
+// }
 
 impl IsShiny for OhpkmV2 {
     fn is_shiny(&self) -> bool {

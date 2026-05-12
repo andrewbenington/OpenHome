@@ -552,8 +552,8 @@ impl Pk7 {
     }
 
     #[wasm_bindgen(js_name = toOhpkm)]
-    pub fn to_ohpkm(&self) -> OhpkmV2 {
-        OhpkmV2::from(self)
+    pub fn to_ohpkm(&self) -> Result<OhpkmV2> {
+        OhpkmV2::convert_with_backup(self, &self.to_party_bytes())
     }
 
     #[wasm_bindgen(js_name = isEmptySlot)]
@@ -639,14 +639,16 @@ mod test {
 
     #[test]
     fn nickname_garbage_preserved() -> TestResult<()> {
-        let mon =
-            tests::pkm_from_file::<Pk7>(&PathBuf::from("pk7").join("pelipper-garbage-bytes.pk7"))?
-                .0;
+        let (mon, bytes) =
+            tests::pkm_from_file::<Pk7>(&PathBuf::from("pk7").join("pelipper-garbage-bytes.pk7"))?;
 
         // 'r' at position 14 should be leftover from 'Pelipper'
         assert_eq!(mon.nickname.bytes()[14], b'r');
 
-        let mon_recreated = Pk7::from_ohpkm(&OhpkmV2::from(&mon), ConvertStrategy::default());
+        let mon_recreated = Pk7::from_ohpkm(
+            &OhpkmV2::convert_with_backup(&mon, &bytes)?,
+            ConvertStrategy::default(),
+        );
 
         // leftover 'r' should be preserved after conversion to/from OHPKM
         assert_eq!(mon_recreated.nickname.bytes()[14], b'r');

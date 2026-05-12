@@ -3,6 +3,8 @@ use pkm_rs_resources::ribbons::Gen3Ribbon;
 use pkm_rs_resources::{items::ItemGen3, lookup};
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
+use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
+use crate::result::{Error, Result};
 use crate::strings::{Gen3NicknameString, Gen3TrainerString};
 use crate::{
     conversion::gen3_pokemon_index::Gen3PokemonIndex,
@@ -14,7 +16,7 @@ use crate::{
 };
 
 use super::OhpkmConvert;
-use crate::ohpkm;
+use crate::{gen3, ohpkm};
 
 impl OhpkmConvert for Pk3 {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
@@ -89,6 +91,20 @@ impl OhpkmConvert for Pk3 {
         let converter = PkmConverter::new(PkmFormat::PK3, strategy);
         let met_data = converter.met_data(ohpkm);
 
+        let mut nickname_gen3 = Gen3NicknameString::from_stringlike(converter.nickname(ohpkm));
+
+        // if the nickname has been otherwise unchanged, use a copy of the original data's nickname
+        // to preserve trash bytes
+        if let Some(StoredPkmBytes::Pk3(original_bytes)) = ohpkm.original_data_bytes()
+            && let Ok(original_pk3) = Pk3::try_from_bytes(&original_bytes)
+            && original_pk3
+                .nickname
+                .identical_until_terminator(&nickname_gen3)
+        {
+            println!("using trash bytes for {:?}", ohpkm.nickname());
+            nickname_gen3 = original_pk3.nickname;
+        }
+
         let mut mon = Self {
             sanity: 0,
             checksum: 0,
@@ -115,7 +131,7 @@ impl OhpkmConvert for Pk3 {
                 .into_iter()
                 .filter_map(Gen3Ribbon::from_openhome_if_present)
                 .collect(),
-            nickname: Gen3NicknameString::from_stringlike(converter.nickname(ohpkm)),
+            nickname: nickname_gen3,
             moves: ohpkm
                 .moves()
                 .to_pp_adjusted(ohpkm::MOVE_METADATA_SOURCE, MetadataSource::Emerald),
@@ -142,5 +158,32 @@ impl OhpkmConvert for Pk3 {
         mon.refresh_checksum();
 
         mon
+    }
+
+    fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
+        if bytes.len() == gen3::BOX_SIZE {
+            let mut extended = bytes.to_vec();
+            extended.resize(gen3::PARTY_SIZE, 0);
+            return extended
+                .try_into()
+                .map_err(|_| {
+                    Error::buffer_size_with_source(
+                        "Pk3::OhpkmConvert::bytes_to_stored",
+                        gen3::PARTY_SIZE,
+                        bytes.len(),
+                    )
+                })
+                .map(StoredPkmBytes::Pk3);
+        }
+        bytes
+            .try_into()
+            .map_err(|_| {
+                Error::buffer_size_with_source(
+                    "Pk3::OhpkmConvert::bytes_to_stored",
+                    gen3::PARTY_SIZE,
+                    bytes.len(),
+                )
+            })
+            .map(StoredPkmBytes::Pk3)
     }
 }

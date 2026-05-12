@@ -1,0 +1,91 @@
+{
+  "sanity": 0,
+  "checksum": 56342,
+  "pokemon_index": 405,
+  "held_item_index": null,
+  "trainer_id": 34978,
+  "secret_id": 48423,
+  "exp": 428750,
+  "has_species_data": true,
+  "is_bad_egg": false,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 2108585458,
+  "is_fateful_encounter": false,
+  "gender": "Genderless",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus_byte": 0,
+  "ribbons": [],
+  "nickname": "GROUDON",
+  "nickname_trash": "C1CCC9CFBEC9C8FF0000",
+  "moves": [
+    {
+      "move_index": "Fire Blast",
+      "pp": 5,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Rest",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Fissure",
+      "pp": 5,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Solar Beam",
+      "pp": 10,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 30,
+    "atk": 27,
+    "def": 4,
+    "spa": 25,
+    "spd": 27,
+    "spe": 30
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_friendship": 0,
+  "met_location_index": 205,
+  "ball": "Pok\u00E9",
+  "met_level": 70,
+  "trainer_gender": "Male",
+  "game_of_origin": "Emerald",
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 70,
+  "current_hp": 241,
+  "stats": {
+    "hp": 241,
+    "atk": 233,
+    "def": 223,
+    "spa": 145,
+    "spd": 149,
+    "spe": 152
+  }
+}

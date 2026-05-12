@@ -1,10 +1,13 @@
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
+use crate::convert_strategy::ConvertStrategy;
+use crate::convert_strategy::PkmConverter;
+use crate::format::PkmFormat;
+use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
+use crate::result::{Error, Result};
 use crate::{
-    convert_strategy::{ConvertStrategy, PkmConverter},
-    format::PkmFormat,
-    gen7_alola::Pk7,
+    gen7_alola::{self, Pk7},
     ohpkm::OhpkmV2,
     traits::HasSpeciesAndForm,
 };
@@ -192,5 +195,34 @@ impl OhpkmConvert for Pk7 {
         mon.refresh_checksum();
 
         mon
+    }
+
+    fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
+        if bytes.len() == gen7_alola::BOX_SIZE {
+            let mut extended = bytes.to_vec();
+            extended.resize(gen7_alola::PARTY_SIZE, 0);
+            let extended_len = extended.len();
+
+            return extended
+                .try_into()
+                .map_err(|_| {
+                    Error::buffer_size_with_source(
+                        "Pk7::OhpkmConvert::bytes_to_stored",
+                        gen7_alola::PARTY_SIZE,
+                        extended_len,
+                    )
+                })
+                .map(StoredPkmBytes::Pk7);
+        }
+        bytes
+            .try_into()
+            .map_err(|_| {
+                Error::buffer_size_with_source(
+                    "Pk7::OhpkmConvert::bytes_to_stored",
+                    gen7_alola::PARTY_SIZE,
+                    bytes.len(),
+                )
+            })
+            .map(StoredPkmBytes::Pk7)
     }
 }
