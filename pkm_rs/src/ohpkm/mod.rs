@@ -1,3 +1,4 @@
+#[cfg(feature = "wasm")]
 use pkm_rs_resources::metadata_source::MetadataSource;
 
 mod convert;
@@ -67,4 +68,5 @@ const fn is_shiny_gen_6_plus(pid: u32, tid: u16, sid: u16) -> bool {
     shiny_xor_value(pid, tid, sid) < 16
 }
 
+#[cfg(feature = "wasm")]
 const MOVE_METADATA_SOURCE: MetadataSource = MetadataSource::ScarletViolet;

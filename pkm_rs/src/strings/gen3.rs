@@ -20,7 +20,9 @@ use wasm_bindgen::describe::*;
 
 const TERMINATOR: u8 = 0xff;
 
+#[cfg(feature = "wasm")]
 pub type Gen3NicknameString<const N: usize> = Gen3String<N, SingleTerminator>;
+#[cfg(feature = "wasm")]
 pub type Gen3TrainerString<const N: usize> = Gen3String<N, TerminatorFill>;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -67,8 +69,11 @@ pub trait TerminatorStrategy {
     fn set_terminators<const N: usize>(raw: &mut [u8; N], str_len: usize);
 }
 
+#[cfg(feature = "wasm")]
 #[derive(Debug, Clone, Copy)]
 pub struct SingleTerminator;
+
+#[cfg(feature = "wasm")]
 impl TerminatorStrategy for SingleTerminator {
     fn set_terminators<const N: usize>(raw: &mut [u8; N], str_len: usize) {
         if str_len < N {
@@ -77,8 +82,11 @@ impl TerminatorStrategy for SingleTerminator {
     }
 }
 
+#[cfg(feature = "wasm")]
 #[derive(Debug, Clone, Copy)]
 pub struct TerminatorFill;
+
+#[cfg(feature = "wasm")]
 impl TerminatorStrategy for TerminatorFill {
     fn set_terminators<const N: usize>(raw: &mut [u8; N], str_len: usize) {
         (str_len..N).for_each(|i| {
