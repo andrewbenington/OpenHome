@@ -16,7 +16,7 @@ use crate::{
 };
 
 use super::OhpkmConvert;
-use crate::{gen3, ohpkm};
+use crate::{gen3, log, ohpkm};
 
 impl OhpkmConvert for Pk3 {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
@@ -32,6 +32,8 @@ impl OhpkmConvert for Pk3 {
         } else {
             self.ability_num.into()
         };
+
+        // log!("pk3 pid: {}", self.personality_value);
 
         ohpkm::v2_sections::MainDataV2 {
             personality_value: self.personality_value,
@@ -104,6 +106,8 @@ impl OhpkmConvert for Pk3 {
             println!("using trash bytes for {:?}", ohpkm.nickname());
             nickname_gen3 = original_pk3.nickname;
         }
+
+        log!("ohpkm pid: {}", ohpkm.personality_value());
 
         let mut mon = Self {
             sanity: 0,

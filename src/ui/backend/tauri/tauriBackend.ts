@@ -50,7 +50,7 @@ export const TauriBackend: BackendInterface = {
         Object.fromEntries(
           Object.entries(b64ByIdentifier).map(([identifier, b64String]) => [
             identifier,
-            new OHPKM(Uint8Array.fromBase64(b64String)),
+            OHPKM.fromBytes(Uint8Array.fromBase64(b64String).buffer),
           ])
         )
       )

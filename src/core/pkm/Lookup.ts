@@ -81,7 +81,7 @@ export const getMonGen345Identifier = (mon: PKMInterface): Option<Gen345Identifi
   const baseMon = getBaseMon(mon.dexNum, mon.formNum)
 
   try {
-    const ohpkm = new OHPKM(mon)
+    const ohpkm = OHPKM.fromMonUnknownSave(mon)
     let pk3CompatiblePID
 
     if (mon instanceof OHPKM) {

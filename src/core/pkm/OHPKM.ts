@@ -58,6 +58,7 @@ import {
   getPrevos,
   ivsFromDVs,
 } from './util'
+import { PK3, PK7 } from '@pokemon-files/pkm'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getFormat() {
@@ -65,7 +66,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
   format: 'OHPKM' = 'OHPKM'
 
-  constructor(arg: Uint8Array | AllPKMFields) {
+  private constructor(arg: Uint8Array | AllPKMFields) {
     if (arg instanceof Uint8Array) {
       super(arg)
     } else {
@@ -359,8 +360,15 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   static fromMonInSave(mon: PKMInterface, save: SAV): OHPKM {
-    const ohpkm = new OHPKM(mon)
+    const ohpkm = OHPKM.fromMonUnknownSave(mon)
     ohpkm.syncWithGameData(mon, save)
+
+    return ohpkm
+  }
+
+  static fromMonUnknownSave(mon: PKMInterface): OHPKM {
+    const ohpkm =
+      mon instanceof PK3 || mon instanceof PK7 ? OHPKM.fromWasmImpl(mon) : new OHPKM(mon)
 
     return ohpkm
   }
@@ -368,6 +376,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static defaultWithSpecies(nationalDex: number, formIndex: number) {
     const bytes = OhpkmV2Wasm.defaultWithSpecies(nationalDex, formIndex).toByteArray()
     return OHPKM.fromBytes(bytes.buffer)
+  }
+
+  private static fromWasmImpl(mon: PK3 | PK7): OHPKM {
+    return new OHPKM(mon.inner.toOhpkm().toByteArray())
   }
 
   // getters / setters

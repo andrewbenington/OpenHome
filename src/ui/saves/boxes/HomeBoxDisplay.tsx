@@ -259,7 +259,7 @@ function SingleBoxMonDisplay() {
     (mons: PKMInterface[], location: MonLocation) => {
       for (const mon of mons) {
         try {
-          const identifier = getMonFileIdentifier(new OHPKM(mon))
+          const identifier = getMonFileIdentifier(OHPKM.fromMonUnknownSave(mon))
 
           if (!identifier) continue
 

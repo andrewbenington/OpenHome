@@ -126,7 +126,7 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
     const firstMon = radicalRedSave.boxes[0].boxSlots[0]
 
     if (firstMon) {
-      const newMon = new OHPKM(firstMon)
+      const newMon = OHPKM.fromMonInSave(firstMon, radicalRedSave)
 
       newMon.nickname = 'ModTest'
       radicalRedSave.boxes[0].boxSlots[0] = PK3RR.fromOhpkm(newMon, ConvertStrategies.getDefault())

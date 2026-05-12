@@ -121,7 +121,7 @@ test('gen 3 contest stats are updated', () => {
 })
 
 test('gen 3 conversion to OHPKM and back is lossless', () => {
-  const ohPKM = new OHPKM(blazikenPk3)
+  const ohPKM = OHPKM.fromMonUnknownSave(blazikenPk3)
   // gaining cool contest points
   const gen3PKM = PK3.fromOhpkm(ohPKM, ConvertStrategies.getDefault())
 
@@ -129,7 +129,7 @@ test('gen 3 conversion to OHPKM and back is lossless', () => {
 })
 
 test('pk3 and ohpkm have the same gen345Lookup key', () => {
-  const ohPKM = new OHPKM(blazikenPk3)
+  const ohPKM = OHPKM.fromMonUnknownSave(blazikenPk3)
 
   expect(getMonGen345Identifier(ohPKM)).toEqual(getMonGen345Identifier(blazikenPk3))
 })
