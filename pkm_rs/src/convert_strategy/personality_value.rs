@@ -48,7 +48,7 @@ impl ShinyStrategy {
         }
     }
 
-    fn is_satisfied(&self, pid: u32, mon: &OhpkmV2) -> bool {
+    const fn is_satisfied(&self, pid: u32, mon: &OhpkmV2) -> bool {
         let xor_value = pkm_rs_types::shiny_xor_value(pid, mon.trainer_id(), mon.secret_id());
 
         xor_value < self.xor_threshold()
