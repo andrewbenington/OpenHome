@@ -3,6 +3,7 @@ use pkm_rs_resources::ribbons::Gen3Ribbon;
 use pkm_rs_resources::{items::ItemGen3, lookup};
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
+use crate::convert_strategy::PidModificationStrategy;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::{Error, Result};
 use crate::strings::{Gen3NicknameString, Gen3TrainerString};
@@ -16,7 +17,7 @@ use crate::{
 };
 
 use super::OhpkmConvert;
-use crate::{gen3, log, ohpkm};
+use crate::{gen3, ohpkm};
 
 impl OhpkmConvert for Pk3 {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
@@ -32,8 +33,6 @@ impl OhpkmConvert for Pk3 {
         } else {
             self.ability_num.into()
         };
-
-        // log!("pk3 pid: {}", self.personality_value);
 
         ohpkm::v2_sections::MainDataV2 {
             personality_value: self.personality_value,
@@ -103,11 +102,8 @@ impl OhpkmConvert for Pk3 {
                 .nickname
                 .identical_until_terminator(&nickname_gen3)
         {
-            println!("using trash bytes for {:?}", ohpkm.nickname());
             nickname_gen3 = original_pk3.nickname;
         }
-
-        log!("ohpkm pid: {}", ohpkm.personality_value());
 
         let mut mon = Self {
             sanity: 0,
@@ -124,7 +120,7 @@ impl OhpkmConvert for Pk3 {
             is_bad_egg: false,
             ability_num: ohpkm.ability_num().into(),
             markings: ohpkm.markings().into(),
-            personality_value: ohpkm.personality_value(),
+            personality_value: PidModificationStrategy::default().get_modified_pid(ohpkm),
             is_fateful_encounter: ohpkm.is_fateful_encounter(),
             gender: ohpkm.gender(),
             evs: ohpkm.evs(),

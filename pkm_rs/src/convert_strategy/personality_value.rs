@@ -27,7 +27,7 @@ impl NatureStrategy {
     }
 
     fn is_satisfied(&self, pid: u32, mon: &OhpkmV2) -> bool {
-        NatureIndex::new_from_pid(pid) == self.relevant_nature(&mon)
+        NatureIndex::new_from_pid(pid) == self.relevant_nature(mon)
     }
 }
 
@@ -41,7 +41,7 @@ pub enum ShinyStrategy {
 }
 
 impl ShinyStrategy {
-    fn xor_threshold(self) -> u16 {
+    const fn xor_threshold(self) -> u16 {
         match self {
             ShinyStrategy::KeepShiny8192 => 8,
             ShinyStrategy::KeepShiny4096 => 16,
@@ -71,22 +71,22 @@ impl PidModificationStrategy {
         }
 
         if let Some(nature_strategy) = self.nature
-            && !nature_strategy.is_satisfied(pid, &mon)
+            && !nature_strategy.is_satisfied(pid, mon)
         {
             inconsistencies.push(DerivedField::Nature);
         }
 
         if let Some(shiny_strategy) = self.shiny
-            && !shiny_strategy.is_satisfied(pid, &mon)
+            && !shiny_strategy.is_satisfied(pid, mon)
         {
             inconsistencies.push(DerivedField::Shiny);
         }
 
-        if self.keep_unown_letter && mon.species_and_form().get_ndex() == NationalDex::Unown.into()
+        if self.keep_unown_letter
+            && mon.species_and_form().get_ndex() == NationalDex::Unown.into()
+            && unown_form_from_pid_gen3(pid) as u16 != mon.species_and_form().get_forme_index()
         {
-            if unown_form_from_pid_gen3(pid) as u16 != mon.species_and_form().get_forme_index() {
-                inconsistencies.push(DerivedField::UnownLetter);
-            }
+            inconsistencies.push(DerivedField::UnownLetter);
         }
 
         inconsistencies
@@ -99,7 +99,7 @@ impl PidModificationStrategy {
         let mut new_pid = mon.personality_value();
 
         for i in 0..u16::MAX {
-            let inconsistencies = self.find_inconsistencies(new_pid, &mon);
+            let inconsistencies = self.find_inconsistencies(new_pid, mon);
             if inconsistencies.is_empty() {
                 return new_pid;
             }
@@ -128,7 +128,13 @@ impl Default for PidModificationStrategy {
         }
     }
 }
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = generatePk3CompatiblePid)]
+pub fn generate_pk3_compatible_pid(mon: &OhpkmV2) -> u32 {
+    PidModificationStrategy::default().get_modified_pid(mon)
+}
 
+#[derive(Debug, Clone, Copy)]
 enum DerivedField {
     Nature,
     Gender,

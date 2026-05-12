@@ -18,9 +18,10 @@ use wasm_bindgen::prelude::*;
 
 use crate::convert_strategy::{
     option::{BoolOption, SettingType, StringOption},
-    personality_value::{NatureStrategy, ShinyStrategy},
+    personality_value::NatureStrategy,
 };
 pub use converter::PkmConverter;
+pub use personality_value::PidModificationStrategy;
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]

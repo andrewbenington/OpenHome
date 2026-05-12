@@ -299,7 +299,6 @@ export class G3SAV extends OfficialSAV<PK3> {
   }
 
   prepareForSaving() {
-    console.log(this.updatedBoxSlots)
     this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const monOffset = 30 * box + index
       const pcBytes = new Uint8Array(80)

@@ -6,6 +6,7 @@ import {
   Ball,
   ExtraFormIndex,
   Gender,
+  generatePk3CompatiblePid,
   HyperTraining,
   Item,
   Language,
@@ -24,7 +25,6 @@ import {
 import {
   AllPKMFields,
   FourMoves,
-  generatePersonalityValuePreservingAttributes,
   getHeightCalculated,
   getStandardPKMStats,
   getWeightCalculated,
@@ -101,7 +101,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
             .concat(other.trainerID.toString())
         )
 
-        this.personalityValue = generatePersonalityValuePreservingAttributes(other)
+        this.personalityValue = this.generatePk3CompatiblePid()
       } else {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
@@ -871,6 +871,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     } else {
       return AbilityNumber.First
     }
+  }
+
+  generatePk3CompatiblePid(): number {
+    return generatePk3CompatiblePid(OhpkmV2Wasm.fromByteVectorFixingErrors(this.toByteArray()))
   }
 }
 
