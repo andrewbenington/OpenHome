@@ -1,9 +1,9 @@
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
-use crate::conversion::gen3_string_encoding::Gen3Encoding;
 use crate::result::Result;
-use crate::strings::{Gen3NicknameString, Gen3TrainerString};
+use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
 use crate::traits::bytes::{AsBytes, AsBytesMut};
 use crate::util;
+
 use arbitrary_int::u4;
 use arbitrary_int::u7;
 use pkm_rs_resources::ball::Ball;

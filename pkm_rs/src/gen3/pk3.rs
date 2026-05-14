@@ -1,7 +1,6 @@
 use super::Pk3Buffer;
 use crate::checksum::{Checksum, RefreshChecksum};
 use crate::conversion::gen3_pokemon_index::Gen3PokemonIndex;
-use crate::conversion::gen3_string_encoding::Gen3Encoding;
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption;
@@ -11,7 +10,7 @@ use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 use crate::result::{Error, Result};
 #[cfg(feature = "wasm")]
 use crate::strings::Gen3String;
-use crate::strings::{Gen3NicknameString, Gen3TrainerString};
+use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
 #[cfg(test)]
 use crate::tests::PkhexJson;
 use crate::traits::{AsBytesMut, ModernEvs};
