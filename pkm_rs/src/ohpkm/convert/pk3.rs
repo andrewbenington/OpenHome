@@ -3,6 +3,7 @@ use pkm_rs_resources::ribbons::Gen3Ribbon;
 use pkm_rs_resources::{items::ItemGen3, lookup};
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
+use crate::conversion::gen3_string_encoding::Gen3Encoding;
 use crate::convert_strategy::PidModificationStrategy;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::{Error, Result};
@@ -91,8 +92,10 @@ impl OhpkmConvert for Pk3 {
     fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Self {
         let converter = PkmConverter::new(PkmFormat::PK3, strategy);
         let met_data = converter.met_data(ohpkm);
+        let str_encoding = Gen3Encoding::from_language(ohpkm.language());
 
-        let mut nickname_gen3 = Gen3NicknameString::from_stringlike(converter.nickname(ohpkm));
+        let mut nickname_gen3 =
+            Gen3NicknameString::from_stringlike(converter.nickname(ohpkm), str_encoding);
 
         // if the nickname has been otherwise unchanged, use a copy of the original data's nickname
         // to preserve trash bytes
@@ -137,7 +140,7 @@ impl OhpkmConvert for Pk3 {
                 .to_pp_adjusted(ohpkm::MOVE_METADATA_SOURCE, MetadataSource::Emerald),
             ivs: converter.ivs(ohpkm),
             is_egg: ohpkm.is_egg(),
-            trainer_name: Gen3TrainerString::from_stringlike(&ohpkm.trainer_name()),
+            trainer_name: Gen3TrainerString::from_stringlike(&ohpkm.trainer_name(), str_encoding),
             trainer_friendship: ohpkm.trainer_friendship(),
             met_location_index: met_data.location_index as u8,
             ball: ohpkm.ball(),

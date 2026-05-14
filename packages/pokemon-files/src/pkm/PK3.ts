@@ -255,10 +255,10 @@ export default class PK3 implements PKMInterface {
   }
 
   get trainerName() {
-    return this.inner.trainer_name
+    return this.inner.trainerName
   }
   set trainerName(value: string) {
-    this.inner.trainer_name = value
+    this.inner.trainerName = value
   }
 
   get trainerFriendship() {

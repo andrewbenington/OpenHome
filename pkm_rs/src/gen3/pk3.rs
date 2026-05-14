@@ -1,6 +1,7 @@
 use super::Pk3Buffer;
 use crate::checksum::{Checksum, RefreshChecksum};
 use crate::conversion::gen3_pokemon_index::Gen3PokemonIndex;
+use crate::conversion::gen3_string_encoding::Gen3Encoding;
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption;
@@ -8,6 +9,8 @@ use crate::gen3::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
 #[cfg(feature = "wasm")]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 use crate::result::{Error, Result};
+#[cfg(feature = "wasm")]
+use crate::strings::Gen3String;
 use crate::strings::{Gen3NicknameString, Gen3TrainerString};
 #[cfg(test)]
 use crate::tests::PkhexJson;
@@ -66,12 +69,14 @@ pub struct Pk3 {
     pub pokerus_byte: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: Gen3RibbonSet,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub nickname: Gen3NicknameString<10>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ivs: Stats8,
     pub is_egg: bool,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: Gen3TrainerString<7>,
     pub trainer_friendship: u8,
     pub met_location_index: u8,
@@ -97,6 +102,8 @@ impl Pk3 {
     pub fn from_buffer(buf: &Pk3BufferRef) -> Result<Self> {
         let pokemon_index = Gen3PokemonIndex::new(buf.gen3_species_index())?;
         let personality_value = buf.personality_value();
+        let language = buf.language()?;
+        let str_encoding = Gen3Encoding::from_language(language);
         let mut mon = Pk3 {
             pokemon_index,
             sanity: buf.sanity(),
@@ -118,18 +125,18 @@ impl Pk3 {
             contest: buf.contest(),
             pokerus_byte: buf.pokerus_byte(),
             ribbons: buf.ribbons(),
-            nickname: buf.nickname(),
+            nickname: buf.nickname(str_encoding),
             moves: buf.move_slots(),
             ivs: buf.ivs(),
             is_egg: buf.is_egg_flag_2(),
-            trainer_name: buf.trainer_name(),
+            trainer_name: buf.trainer_name(str_encoding),
             trainer_friendship: buf.trainer_friendship(),
             met_location_index: buf.met_location_index(),
             ball: buf.ball(),
             met_level: buf.met_level(),
             trainer_gender: buf.trainer_gender(),
             game_of_origin: buf.game_of_origin(),
-            language: buf.language()?,
+            language,
             ..Default::default()
         };
 
@@ -432,7 +439,7 @@ impl Pk3 {
         self.ivs.into()
     }
     #[wasm_bindgen(setter = ivs)]
-    pub fn iet_evs_js(&mut self, v: Stats16Le) {
+    pub fn set_ivs_js(&mut self, v: Stats16Le) {
         self.ivs = v.try_into().expect("ivs should not exceed 31 each");
     }
 
@@ -497,14 +504,36 @@ impl Pk3 {
             .map(|ribbon| ribbon.to_string())
             .collect()
     }
-    #[wasm_bindgen(js_name = refreshChecksum)]
-    pub fn refresh_checksum_js(&mut self) {
-        self.refresh_checksum();
-    }
 
     #[wasm_bindgen(setter = ribbons)]
     pub fn set_ribbons_js(&mut self, v: Vec<String>) {
         self.ribbons = Gen3RibbonSet::from_names(v);
+    }
+
+    #[wasm_bindgen(getter = nickname)]
+    pub fn nickname_js(&self) -> String {
+        self.nickname.convert_to_string()
+    }
+
+    #[wasm_bindgen(setter = nickname)]
+    pub fn set_nickname_js(&mut self, v: String) {
+        self.nickname = Gen3String::from_stringlike(v, Gen3Encoding::from_language(self.language))
+    }
+
+    #[wasm_bindgen(getter = trainerName)]
+    pub fn trainer_name_js(&self) -> String {
+        self.trainer_name.convert_to_string()
+    }
+
+    #[wasm_bindgen(setter = trainerName)]
+    pub fn set_trainer_name_js(&mut self, v: String) {
+        self.trainer_name =
+            Gen3String::from_stringlike(v, Gen3Encoding::from_language(self.language))
+    }
+
+    #[wasm_bindgen(js_name = refreshChecksum)]
+    pub fn refresh_checksum_js(&mut self) {
+        self.refresh_checksum();
     }
 
     #[wasm_bindgen(getter = languageString)]

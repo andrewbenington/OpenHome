@@ -1,4 +1,5 @@
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
+use crate::conversion::gen3_string_encoding::Gen3Encoding;
 use crate::result::Result;
 use crate::strings::{Gen3NicknameString, Gen3TrainerString};
 use crate::traits::bytes::{AsBytes, AsBytesMut};
@@ -265,8 +266,8 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         self.get_array(Offset::Nickname)
     }
 
-    pub fn nickname(&self) -> Gen3NicknameString<10> {
-        Gen3NicknameString::<10>::from_bytes(self.nickname_raw())
+    pub fn nickname(&self, encoding: Gen3Encoding) -> Gen3NicknameString<10> {
+        Gen3NicknameString::<10>::from_raw(self.nickname_raw(), encoding)
     }
 
     pub fn move_slots(&self) -> MoveSlots {
@@ -293,8 +294,8 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         self.get_array(Offset::TrainerName)
     }
 
-    pub fn trainer_name(&self) -> Gen3TrainerString<7> {
-        Gen3TrainerString::<7>::from_bytes(self.trainer_name_raw())
+    pub fn trainer_name(&self, encoding: Gen3Encoding) -> Gen3TrainerString<7> {
+        Gen3TrainerString::<7>::from_raw(self.trainer_name_raw(), encoding)
     }
 
     pub fn trainer_friendship(&self) -> u8 {
