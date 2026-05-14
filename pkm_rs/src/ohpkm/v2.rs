@@ -12,7 +12,6 @@ use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, UnconvertedPkm};
 use crate::ohpkm::v2_sections::{MonTags, PastHandlerDataV2};
 use crate::result::{Error, Result};
-#[cfg(feature = "wasm")]
 use crate::sectioned_data::DataSection;
 use crate::sectioned_data::{SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
