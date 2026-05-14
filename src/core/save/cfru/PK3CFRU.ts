@@ -27,7 +27,6 @@ import {
   markingsFourShapesToBytes,
   MoveFilter,
   read30BitIVsFromBytes,
-  readGen3StringFromBytes,
   readStatsFromBytesU8,
   setFlag,
   Stats,
@@ -143,7 +142,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.secretID = dataView.getUint16(0x6, true)
 
       // Nickname 8:18
-      this.nickname = readGen3StringFromBytes(dataView, 0x8, 10)
+      this.nickname = Gen3Strings.decode10Bytes(new Uint8Array(buffer).slice(0x8, 0x8 + 10), 'Int')
 
       // Language 18
       this.language = Languages.fromByteOrNone(dataView.getUint8(0x12))
@@ -152,7 +151,10 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       // this.sanity = dataView.getUint8(0x13)
 
       // OT Name 20:27
-      this.trainerName = readGen3StringFromBytes(dataView, 0x14, 7)
+      this.trainerName = Gen3Strings.decode7Bytes(
+        new Uint8Array(buffer).slice(0x14, 0x14 + 7),
+        'Int'
+      )
 
       // Markings 27
       this.markings = markingsFourShapesFromBytes(dataView, 0x1b)
