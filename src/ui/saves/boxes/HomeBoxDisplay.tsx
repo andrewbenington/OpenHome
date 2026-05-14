@@ -353,7 +353,7 @@ function SingleBoxMonDisplay() {
   return (
     <>
       <OpenHomeCtxMenu elements={contextElements}>
-        <Grid className="home-box-card" columns={OPENHOME_BOX_COLUMNS.toString()} gap="1">
+        <Grid className="home-box-grid" columns={OPENHOME_BOX_COLUMNS.toString()} gap="1">
           {range(OPENHOME_BOX_SLOTS)
             .map((index: number) => currentBox.identifiers.get(index))
             .map((identifier, index) => {

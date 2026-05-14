@@ -55,9 +55,9 @@
   width: 100%;
 }
 
-.home-box-card {
+.home-box-grid {
   aspect-ratio: 6 / 5;
-  height: 30rem;
+  width: 100%;
 }
 
 .box-card-disabled {
