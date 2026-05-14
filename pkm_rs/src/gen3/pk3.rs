@@ -1,9 +1,9 @@
 use super::Pk3Buffer;
 use crate::checksum::{Checksum, RefreshChecksum};
-use crate::conversion::gen3_pokemon_index::Gen3PokemonIndex;
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption;
+use crate::gen3::Gen3PokemonIndex;
 use crate::gen3::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
 #[cfg(feature = "wasm")]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
@@ -16,6 +16,7 @@ use crate::tests::PkhexJson;
 use crate::traits::{AsBytesMut, ModernEvs};
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
 use crate::util::unown_form_from_pid_gen3;
+
 use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::items::{Item, ItemGen3};

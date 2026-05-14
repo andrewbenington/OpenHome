@@ -1,8 +1,10 @@
 mod pk3;
 mod pk3_buffer;
+mod pokemon_index;
 // mod save;
 
 pub use pk3::*;
+pub use pokemon_index::Gen3PokemonIndex;
 
 use pk3_buffer::Offset;
 use pk3_buffer::Pk3Buffer;

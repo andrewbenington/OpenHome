@@ -4,11 +4,11 @@ use pkm_rs_resources::{items::ItemGen3, lookup};
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
 use crate::convert_strategy::PidModificationStrategy;
+use crate::gen3::Gen3PokemonIndex;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::{Error, Result};
 use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
 use crate::{
-    conversion::gen3_pokemon_index::Gen3PokemonIndex,
     convert_strategy::{ConvertStrategy, PkmConverter},
     format::PkmFormat,
     gen3::{PK3_MAX_ABILITY, Pk3},
