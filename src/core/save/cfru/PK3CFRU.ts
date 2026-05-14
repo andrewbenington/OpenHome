@@ -4,6 +4,7 @@ import {
   Ball,
   ConvertStrategy,
   ExtraFormIndex,
+  Gen3Strings,
   Language,
   Languages,
   MetadataSummaryLookup,
@@ -33,7 +34,6 @@ import {
   uIntFromBufferBits,
   uIntToBufferBits,
   write30BitIVsToBytes,
-  writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
 import { PkmConverter } from '../../../../packages/pokemon-files/src/conversion/converter'
@@ -346,7 +346,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     dataView.setUint16(0x6, this.secretID, true)
 
     // 8:18 Nickname (10 bytes)
-    writeGen3StringToBytes(dataView, this.nickname, 0x8, 10, false)
+    const encodedNickname = Gen3Strings.encodeTo10BytesSingleTerminator(this.nickname, 'Int')
+    new Uint8Array(buffer).set(encodedNickname, 0x8)
 
     // 18 Language
     dataView.setUint8(0x12, this.language)
@@ -355,7 +356,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     // dataView.setUint8(0x13, SANITY VALUE IDK);
 
     // 20:27 OT Name (7 bytes)
-    writeGen3StringToBytes(dataView, this.trainerName, 0x14, 7, false)
+    const encodedTrainerName = Gen3Strings.encodeTo7BytesSingleTerminator(this.trainerName, 'Int')
+    new Uint8Array(buffer).set(encodedTrainerName, 0x14)
 
     // 27 Markings
     markingsFourShapesToBytes(dataView, 0x1b, this.markings)

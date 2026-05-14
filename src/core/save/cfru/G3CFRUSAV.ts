@@ -293,6 +293,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
     const box = this.boxes[boxNum]
     if (!box) return
     box.boxSlots[boxSlot] = mon
+    this.updatedBoxSlots.push({ box: boxNum, boxSlot: boxSlot })
   }
 }
 

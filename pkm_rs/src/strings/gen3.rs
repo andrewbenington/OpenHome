@@ -1,5 +1,5 @@
 use pkm_rs_types::Language;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::{fmt::Display, marker::PhantomData};
 
 #[cfg(feature = "randomize")]
@@ -7,9 +7,10 @@ use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
 use rand::RngExt;
 
-use wasm_bindgen::JsValue;
-use wasm_bindgen::convert::*;
-use wasm_bindgen::describe::*;
+#[cfg(feature = "wasm")]
+use tsify::Tsify;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::{JsValue, convert::*, describe::*, prelude::*};
 
 const TERMINATOR: u8 = 0xff;
 
@@ -155,6 +156,8 @@ impl<const N: usize, TS: TerminatorStrategy> IntoWasmAbi for Gen3String<N, TS> {
     }
 }
 
+#[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Gen3Encoding {
@@ -254,3 +257,41 @@ const ENCODING_JPN: [char; 256] = [
     INVALID, // F
              // 256 length so indexing by a u8 (to usize) is always valid
 ];
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+pub struct Gen3Strings;
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+impl Gen3Strings {
+    #[wasm_bindgen(js_name = encodeTo7BytesSingleTerminator)]
+    pub fn encode_to_7_bytes_single_terminator(value: String, encoding: Gen3Encoding) -> Vec<u8> {
+        Gen3String::<7, SingleTerminator>::from_stringlike(value, encoding)
+            .bytes()
+            .to_vec()
+    }
+
+    #[wasm_bindgen(js_name = encodeTo10BytesSingleTerminator)]
+    pub fn encode_to_10_bytes_single_terminator(value: String, encoding: Gen3Encoding) -> Vec<u8> {
+        Gen3String::<10, SingleTerminator>::from_stringlike(value, encoding)
+            .bytes()
+            .to_vec()
+    }
+
+    #[wasm_bindgen(js_name = decode7Bytes)]
+    pub fn decode_7_bytes(bytes: Vec<u8>, encoding: Gen3Encoding) -> String {
+        let mut byte_array = [0u8; 7];
+        let byte_count = bytes.len().min(7);
+        byte_array[0..byte_count].copy_from_slice(&bytes[0..byte_count]);
+        Gen3String::<7, SingleTerminator>::from_raw(byte_array, encoding).convert_to_string()
+    }
+
+    #[wasm_bindgen(js_name = decode10Bytes)]
+    pub fn decode_10_bytes(bytes: Vec<u8>, encoding: Gen3Encoding) -> String {
+        let mut byte_array = [0u8; 10];
+        let byte_count = bytes.len().min(10);
+        byte_array[0..byte_count].copy_from_slice(&bytes[0..byte_count]);
+        Gen3String::<10, SingleTerminator>::from_raw(byte_array, encoding).convert_to_string()
+    }
+}

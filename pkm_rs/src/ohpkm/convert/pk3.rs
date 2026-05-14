@@ -3,6 +3,7 @@ use pkm_rs_resources::ribbons::Gen3Ribbon;
 use pkm_rs_resources::{items::ItemGen3, lookup};
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
+use super::OhpkmConvert;
 use crate::convert_strategy::PidModificationStrategy;
 use crate::gen3::Gen3PokemonIndex;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
@@ -15,8 +16,6 @@ use crate::{
     ohpkm::OhpkmV2,
     traits::HasSpeciesAndForm,
 };
-
-use super::OhpkmConvert;
 use crate::{gen3, ohpkm};
 
 impl OhpkmConvert for Pk3 {

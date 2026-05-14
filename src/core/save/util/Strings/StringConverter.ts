@@ -446,51 +446,6 @@ export const gen3StringToUTF = (bytes: Uint8Array, offset: number, length: numbe
 }
 
 /**
- * Convert string to Gen 3 encoded bytes. Uses a proprietary encoding,
- * terminated with 0xff character. Characters not in Gen 3 character
- * set will be replaced with '?'
- * @param str the string to encode
- * @param length character length of string
- * @param terminate include 0xff at the end
- * @param terminateFill fill remaining bytes with 0xff
- * @returns UInt8Array of Gen 3 bytes
- */
-export const utf16StringToGen3 = (
-  str: string,
-  length: number,
-  terminate: boolean,
-  terminateFill: boolean
-) => {
-  const bufView = new Uint8Array(length)
-  let i = 0
-
-  for (; i < Math.min(str.length, length); i++) {
-    const gen3Char = Gen3CharacterSet.indexOf(str.charAt(i))
-
-    if (str.charCodeAt(i) === 0) {
-      break
-    } else if (gen3Char === -1) {
-      // missing characters are now '?'
-      bufView[i] = 172
-    } else {
-      bufView[i] = gen3Char
-    }
-  }
-  const terminatorStart = i + 1
-
-  if (terminatorStart === length) {
-    // no room for terminator
-    return bufView
-  }
-  if (terminateFill) {
-    bufView.set(new Uint8Array(length - terminatorStart).fill(0xff), terminatorStart)
-  } else if (terminate) {
-    bufView[terminatorStart] = 0xff
-  }
-  return bufView
-}
-
-/**
  * Convert Gen 4 encoded bytes to string. Uses a proprietary encoding,
  * terminated with 0xffff character
  * @param bytes the buffer from which to read
