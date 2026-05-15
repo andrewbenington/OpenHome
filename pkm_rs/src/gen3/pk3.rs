@@ -36,8 +36,7 @@ use pkm_rs_types::{
     SimpleAbilityNumber, Stats8, Stats16Le,
 };
 use serde::{Serialize, Serializer};
-#[cfg(test)]
-use serde_json::json;
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -581,13 +580,14 @@ pub fn form_index_from_pid(national_dex: NatDexIndex, pid: u32) -> u8 {
 impl PkhexJson for Pk3 {
     fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
         let mut value = serde_json::to_value(self)?;
-        value["nickname_trash"] = json!(
+        value["nickname_trash"] = serde_json::json!(
             self.nickname
                 .bytes()
                 .iter()
                 .map(|b| format!("{:02X}", b))
                 .collect::<String>()
         );
+        value["level"] = serde_json::json!(self.calculate_level());
 
         Ok(value)
     }

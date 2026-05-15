@@ -1,8 +1,10 @@
 use crate::ExpectLog;
 use crate::levelup::LearnsetReader;
 use crate::species;
+use crate::species::form_metadata::{BaseStats, base_stats_lookup};
 use crate::species::form_metadata::{levelup_learnset_lookup, types_lookup};
 use crate::{Error, Result, abilities::AbilityIndexWasm, metadata_source::MetadataSource};
+use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
 use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
 use serde::{Serialize, Serializer};
 use std::num::NonZeroU16;
@@ -16,11 +18,7 @@ use rand::RngExt;
 #[cfg(feature = "wasm")]
 use crate::species::form_metadata::current_base_stats;
 #[cfg(feature = "wasm")]
-use crate::species::form_metadata::{BaseStats, base_stats_lookup};
-#[cfg(feature = "wasm")]
 use crate::stats::Stat;
-#[cfg(feature = "wasm")]
-use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::{Gender, Stats16Le};
 #[cfg(feature = "wasm")]
@@ -223,16 +221,15 @@ impl LevelUpType {
     pub fn calculate_level(&self, exp: u32) -> u8 {
         self.get_thresholds()
             .iter()
-            .position(|threshold| *threshold >= exp)
-            .unwrap_or(99) as u8
-            + 1
+            .position(|threshold| *threshold > exp)
+            .unwrap_or(100) as u8
     }
 
     pub fn get_min_exp_for_level(&self, level: u8) -> u32 {
-        if level > 100 {
-            panic!("level too high: {level}")
+        if level > 100 || level == 0 {
+            return 0;
         }
-        self.get_thresholds()[level as usize]
+        self.get_thresholds()[level as usize - 1]
     }
 
     const fn get_thresholds(&self) -> [u32; 100] {
@@ -861,5 +858,17 @@ impl Randomize for SpeciesAndForm {
             national_dex,
             form_index,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::species::LevelUpType;
+
+    #[test]
+    fn slow_level_expected() {
+        assert_eq!(LevelUpType::Slow.get_min_exp_for_level(1), 0);
+        assert_eq!(LevelUpType::Slow.get_min_exp_for_level(63), 312558);
+        assert_eq!(LevelUpType::Slow.calculate_level(317341), 63);
     }
 }

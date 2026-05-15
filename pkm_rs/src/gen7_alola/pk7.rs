@@ -579,6 +579,7 @@ impl crate::tests::PkhexJson for Pk7 {
                 .map(|b| format!("{:02X}", b))
                 .collect::<String>()
         );
+        value["level"] = serde_json::json!(self.calculate_level());
 
         Ok(value)
     }

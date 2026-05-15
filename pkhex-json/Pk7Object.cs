@@ -76,6 +76,7 @@ public static class Pk7Object
             form_argument_elapsed = pk.FormArgumentElapsed,
             current_hp = pk.Stat_HPCurrent,
             stats = Util.Stats(pk),
+            level = pk.CurrentLevel
         };
     }
 }

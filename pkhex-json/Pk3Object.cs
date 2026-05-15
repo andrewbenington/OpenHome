@@ -46,6 +46,7 @@ public static class Pk3Object
             stat_level = pk.Stat_Level,
             current_hp = pk.Stat_HPCurrent,
             stats = Util.Stats(pk),
+            level = pk.CurrentLevel
         };
     }
 }
