@@ -98,15 +98,14 @@ export class SVSAV extends G89SAV<PK9> {
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return false
     const revision = this.scBlocks ? this.getSaveRevision() : 'Indigo Disk'
     switch (revision) {
       case 'Base Game':
-        return !isRestricted(SV_TRANSFER_RESTRICTIONS_BASE, dexNumber, formeNumber)
+        return !isRestricted(SV_TRANSFER_RESTRICTIONS_BASE, dexNumber, formeNumber, extraFormIndex)
       case 'Teal Mask':
-        return !isRestricted(SV_TRANSFER_RESTRICTIONS_TM, dexNumber, formeNumber)
+        return !isRestricted(SV_TRANSFER_RESTRICTIONS_TM, dexNumber, formeNumber, extraFormIndex)
       case 'Indigo Disk':
-        return !isRestricted(SV_TRANSFER_RESTRICTIONS_ID, dexNumber, formeNumber)
+        return !isRestricted(SV_TRANSFER_RESTRICTIONS_ID, dexNumber, formeNumber, extraFormIndex)
     }
   }
 

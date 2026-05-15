@@ -12,5 +12,7 @@ declare module '@pkm-rs/pkg' {
     function supportedGameOrigins(national_dex: number, form_index: number): OriginGame[]
   }
 
+  function extraFormsByNationalDex(national_dex: number): ExtraFormIndex[]
+
   function allMetadataSources(): MetadataSource[]
 }

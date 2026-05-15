@@ -8,11 +8,17 @@ import { Pokedex } from '@openhome-ui/util/pokedex'
 import {
   allMetadataSources,
   currentMetadataReader,
+  extraFormMetadata,
+  ExtraFormMetadata,
+  extraFormsByNationalDex,
   FormMetadata,
+  getPluginColor,
   metadataReaderFor,
   MetadataSource,
   MetadataSources,
   MetadataSummaryLookup,
+  orasFormIndexIfSupported,
+  OriginGame,
   OriginGames,
   SpeciesLookup,
   SpeciesMetadata,
@@ -28,7 +34,7 @@ import {
   Text,
   TextField,
 } from '@radix-ui/themes'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import MoveCard from 'src/ui/components/pokemon/MoveCard'
 import { includeClass } from 'src/ui/util/style'
 import BaseStatsChart from './BaseStatsChart'
@@ -36,13 +42,15 @@ import EvolutionFamily from './EvolutionFamily'
 import PokedexSidebar from './PokedexSidebar'
 import './style.css'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
-import { getFormeStatus, getPokedexSummary } from './util'
+import { getFormeStatus, getPokedexSummary, isExtraFormMetadata } from './util'
+import { AppInfoContext } from 'src/ui/state/appInfo'
+import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 
 export default function PokedexDisplay() {
   const pokedexState = usePokedex()
   const [filter, setFilter] = useState('')
   const [selectedSpecies, setSelectedSpecies] = useState<SpeciesMetadata>()
-  const [selectedForm, setSelectedForm] = useState<FormMetadata>()
+  const [selectedForm, setSelectedForm] = useState<FormMetadata | ExtraFormMetadata>()
 
   if (!pokedexState.loaded) {
     return <Spinner />
@@ -100,8 +108,8 @@ export default function PokedexDisplay() {
 type PokedexDetailsProps = {
   pokedex: Pokedex
   species: SpeciesMetadata
-  selectedForm: FormMetadata
-  setSelectedForm: (form?: FormMetadata) => void
+  selectedForm: FormMetadata | ExtraFormMetadata
+  setSelectedForm: (form?: FormMetadata | ExtraFormMetadata) => void
   setSelectedSpecies: (species?: SpeciesMetadata) => void
 }
 
@@ -114,7 +122,7 @@ function PokedexDetails({
   pokedex,
   species,
   selectedForm,
-  setSelectedForm: setSelectedForm,
+  setSelectedForm,
   setSelectedSpecies,
 }: PokedexDetailsProps) {
   const [imageError, setImageError] = useState(false)
@@ -130,7 +138,7 @@ function PokedexDetails({
     formNum: selectedForm.formIndex,
     format: 'OHPKM',
     isShiny: selectedFormStatus === 'ShinyCaught' && showShiny,
-    extraFormIndex: undefined,
+    extraFormIndex: isExtraFormMetadata(selectedForm) ? selectedForm.extraFormIndex : undefined,
   })
 
   useEffect(() => {
@@ -204,7 +212,11 @@ function PokedexDetails({
               <Button
                 className="pokedex-raised-button"
                 key={form.formIndex}
-                variant={form.formIndex === selectedForm.formIndex ? 'solid' : 'soft'}
+                variant={
+                  form.formIndex === selectedForm.formIndex && !isExtraFormMetadata(selectedForm)
+                    ? 'solid'
+                    : 'soft'
+                }
                 onClick={() => setSelectedForm(form)}
                 size="4"
                 style={{ minWidth: 0, padding: 0, aspectRatio: 1 }}
@@ -218,6 +230,35 @@ function PokedexDetails({
                       'Caught'
                     )
                   }
+                />
+              </Button>
+            ))}
+          </Flex>
+          {extraFormsByNationalDex(species.nationalDex).length > 0 && (
+            <Heading size="3" mt="2" mb="1">
+              Extra Forms
+            </Heading>
+          )}
+          <Flex justify="center" gap="2" width="100%" wrap="wrap">
+            {extraFormsByNationalDex(species.nationalDex).map((form) => (
+              <Button
+                className="pokedex-raised-button"
+                key={form}
+                variant={
+                  isExtraFormMetadata(selectedForm) && selectedForm.extraFormIndex === form
+                    ? 'solid'
+                    : 'soft'
+                }
+                onClick={() => setSelectedForm(extraFormMetadata(form))}
+                size="4"
+                style={{ minWidth: 0, padding: 0, aspectRatio: 1 }}
+              >
+                <TooltipPokemonIcon
+                  dexNumber={species.nationalDex}
+                  // formeNumber={form.formIndex}
+                  extraFormIndex={form}
+                  style={{ width: 48, height: 48 }}
+                  silhouette={!getFormeStatus(pokedex, species.nationalDex, 0)?.includes('Caught')}
                 />
               </Button>
             ))}
@@ -298,7 +339,13 @@ function PokedexDetails({
               metadataSource={metadataSource}
             />
           ) : currentView === 'levelup' ? (
-            <PokedexLearnset selectedForm={selectedForm} metadataSource={metadataSource} />
+            isExtraFormMetadata(selectedForm) ? (
+              <Heading size="2" m="3" align="center">
+                Extra form learnsets are not yet supported
+              </Heading>
+            ) : (
+              <PokedexLearnset selectedForm={selectedForm} metadataSource={metadataSource} />
+            )
           ) : currentView === 'games' ? (
             <PokedexGames selectedForm={selectedForm} />
           ) : null}
@@ -311,8 +358,8 @@ function PokedexDetails({
 type PokedexMetadataProps = {
   pokedex: Pokedex
   species: SpeciesMetadata
-  selectedForm: FormMetadata
-  setSelectedForm: (form?: FormMetadata) => void
+  selectedForm: FormMetadata | ExtraFormMetadata
+  setSelectedForm: (form?: FormMetadata | ExtraFormMetadata) => void
   setSelectedSpecies: (species?: SpeciesMetadata) => void
   metadataSource: MetadataSource | MostCurrentSource
 }
@@ -320,6 +367,8 @@ type PokedexMetadataProps = {
 function PokedexMain(props: PokedexMetadataProps) {
   const { pokedex, species, selectedForm, setSelectedForm, setSelectedSpecies, metadataSource } =
     props
+
+  const isExtraForm = isExtraFormMetadata(selectedForm)
 
   const reader =
     metadataSource === MOST_CURRENT_SOURCE
@@ -338,8 +387,8 @@ function PokedexMain(props: PokedexMetadataProps) {
     )
   }
 
-  const type1 = reader.type1()
-  const type2 = reader.type2()
+  const type1 = isExtraForm ? selectedForm.type1 : reader.type1()
+  const type2 = isExtraForm ? selectedForm.type2 : reader.type2()
   const stats = reader.baseStats()
 
   return (
@@ -358,15 +407,19 @@ function PokedexMain(props: PokedexMetadataProps) {
             <TypeIcon type={type1} />
             {type2 && <TypeIcon type={type2} />}
           </AttributeRow>
-          <AttributeRow label="Ability 1">{selectedForm.abilities[0].name}</AttributeRow>
-          {selectedForm.abilities[1] !== selectedForm.abilities[0] && (
-            <AttributeRow label="Ability 2">{selectedForm.abilities[1].name}</AttributeRow>
-          )}
+          {!isExtraFormMetadata(selectedForm) && (
+            <>
+              <AttributeRow label="Ability 1">{selectedForm.abilities[0].name}</AttributeRow>
+              {selectedForm.abilities[1] !== selectedForm.abilities[0] && (
+                <AttributeRow label="Ability 2">{selectedForm.abilities[1].name}</AttributeRow>
+              )}
 
-          {selectedForm.hiddenAbility && (
-            <AttributeRow label="Ability H">
-              <div>{selectedForm.hiddenAbility.name}</div>
-            </AttributeRow>
+              {selectedForm.hiddenAbility && (
+                <AttributeRow label="Ability H">
+                  <div>{selectedForm.hiddenAbility.name}</div>
+                </AttributeRow>
+              )}
+            </>
           )}
           <AttributeRow label="Egg Groups">
             <div>{selectedForm.eggGroups.join(' • ')}</div>
@@ -434,30 +487,72 @@ function PokedexLearnset(props: PokedexLearnsetProps) {
 }
 
 interface PokedexGamesProps {
-  selectedForm: FormMetadata
+  selectedForm: FormMetadata | ExtraFormMetadata
 }
 
 function PokedexGames(props: PokedexGamesProps) {
   const { selectedForm } = props
+  const [{ extraSaveTypes }] = useContext(AppInfoContext)
 
   return (
-    <Flex gap="1" overflowY="auto" wrap="wrap" justify="center">
-      {MetadataSources.supportedGameOrigins(
-        selectedForm.nationalDex.index,
-        selectedForm.formIndex
-      ).map((origin) => (
-        <Card
-          className="compatible-game-card"
-          key={origin}
-          style={{
-            backgroundColor: OriginGames.color(origin),
-            '--card-background-color': OriginGames.color(origin),
-            padding: OriginGames.isGameboy(origin) ? '0' : '0.25rem',
-          }}
-        >
-          <img draggable={false} src={OriginGames.logoPath(origin)} />
-        </Card>
-      ))}
-    </Flex>
+    <>
+      <Flex gap="1" overflowY="auto" wrap="wrap" justify="center">
+        {MetadataSources.supportedGameOrigins(
+          selectedForm.nationalDex.index,
+          selectedForm.formIndex
+        )
+          .filter((origin) => {
+            if (isExtraFormMetadata(selectedForm)) {
+              return (
+                (origin === OriginGame.OmegaRuby || origin === OriginGame.AlphaSapphire) &&
+                orasFormIndexIfSupported(selectedForm.extraFormIndex) !== undefined
+              )
+            } else {
+              return true
+            }
+          })
+          .map((origin) => (
+            <Card
+              className="compatible-game-card"
+              key={origin}
+              style={{
+                backgroundColor: OriginGames.color(origin),
+                '--card-background-color': OriginGames.color(origin),
+                padding: OriginGames.isGameboy(origin) ? '0' : '0.25rem',
+              }}
+            >
+              <img draggable={false} src={OriginGames.logoPath(origin)} />
+            </Card>
+          ))}
+      </Flex>
+      <Heading size="4" align="center" my="1rem" style={{ width: '100%' }}>
+        Plugins
+      </Heading>
+      <Flex gap="1" overflowY="auto" wrap="wrap" justify="center" mb="1rem">
+        {extraSaveTypes
+          .filter(
+            (saveType) =>
+              !isRestricted(
+                saveType.transferRestrictions,
+                selectedForm.nationalDex.index,
+                selectedForm.formIndex,
+                isExtraFormMetadata(selectedForm) ? selectedForm.extraFormIndex : undefined
+              )
+          )
+          .map((saveType) => (
+            <Card
+              className="compatible-game-card"
+              key={origin}
+              style={{
+                backgroundColor: getPluginColor(saveType.getPluginIdentifier()),
+                '--card-background-color': getPluginColor(saveType.getPluginIdentifier()),
+                padding: '0.25rem',
+              }}
+            >
+              <img draggable={false} src={`logos/${saveType.getPluginIdentifier()}.png`} />
+            </Card>
+          ))}
+      </Flex>
+    </>
   )
 }

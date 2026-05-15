@@ -40,6 +40,7 @@ export const LP_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   excludedForms: {
     ...TransferLockedForms,
   },
+  supportsExtraForm: luminescentSupportsExtraForm,
 }
 
 export class G8LumiSAV extends PluginSAV<PB8LUMI> {
@@ -49,6 +50,9 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   static saveTypeID = 'luminescent_platinum'
   static pkmType = PB8LUMI
   static boxSizeBytes = PB8LUMI.getBoxSize() * 30
+  static transferRestrictions: TransferRestrictions = LP_TRANSFER_RESTRICTIONS
+
+  transferRestrictions: TransferRestrictions = G8LumiSAV.transferRestrictions
 
   isPlugin = true as const
   pluginIdentifier = 'luminescent_platinum' as const
@@ -253,8 +257,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return luminescentSupportsExtraForm(extraFormIndex)
-    return !isRestricted(LP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+    return !isRestricted(LP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

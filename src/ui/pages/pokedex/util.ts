@@ -1,5 +1,5 @@
 import { Pokedex, PokedexStatus } from '@openhome-ui/util/pokedex'
-import { FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
+import { ExtraFormMetadata, FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
 
 export function getHighestFormeStatus(
   pokedex: Pokedex,
@@ -37,15 +37,22 @@ export const StatusIndices: Record<PokedexStatus, number> = {
   ShinyCaught: 2,
 }
 
-export function getPokedexSummary(species: SpeciesMetadata, form: FormMetadata) {
+export function getPokedexSummary(
+  species: SpeciesMetadata,
+  form: FormMetadata | ExtraFormMetadata
+) {
+  const isExtraForm = isExtraFormMetadata(form)
   const types = form.type2 ? `${form.type1}- and ${form.type2}-type` : `${form.type1}-type`
+
   const name =
-    form.formIndex === 0
+    form.formIndex === 0 && !isExtraForm
       ? Lookup.speciesName(species.nationalDex, Language.English)
       : form.formeName
   const formeType =
     form.formIndex === 0 ? getBaseFormDescriptor(species) : form.isMega ? 'Mega Evolution' : 'form'
-  let text = `${name} is a ${types} ${formeType} introduced in Generation ${form.introducedGen}.`
+  let text = isExtraForm
+    ? `${name} is a ${types} extra form.`
+    : `${name} is a ${types} ${formeType} introduced in Generation ${form.introducedGen}.`
 
   if (form.formeName === 'Basculin-White-Striped') {
     text += ` It is sometimes considered a regional form from the ${form.regional} region.`
@@ -80,4 +87,10 @@ function getBaseFormDescriptor(species: SpeciesMetadata) {
   }
 
   return 'Pokémon'
+}
+
+export function isExtraFormMetadata(
+  metadata: FormMetadata | ExtraFormMetadata
+): metadata is ExtraFormMetadata {
+  return 'extraFormIndex' in metadata
 }

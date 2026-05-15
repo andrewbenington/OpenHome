@@ -98,8 +98,7 @@ export class LASAV extends G89SAV<PA8> {
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return false
-    return !isRestricted(LA_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+    return !isRestricted(LA_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(_: number) {
