@@ -8,6 +8,7 @@ use wasm_bindgen::prelude::*;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct MarkingsFourShapes {
@@ -35,6 +36,21 @@ impl MarkingsFourShapes {
         byte.set_bit(3, self.heart);
 
         byte
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl MarkingsFourShapes {
+    #[wasm_bindgen(constructor)]
+    pub fn new_js(circle: bool, square: bool, triangle: bool, heart: bool) -> Self {
+        Self {
+            circle,
+            square,
+            triangle,
+            heart,
+        }
     }
 }
 

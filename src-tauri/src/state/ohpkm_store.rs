@@ -26,20 +26,20 @@ impl OhpkmBytesStore {
                 continue;
             }
 
-            if let Ok(mon_bytes) = util::read_file_bytes(path) {
-                if let Ok(mut mon) = OhpkmV2::from_bytes(&mon_bytes) {
-                    let file_created_seconds = dir_entry
-                        .metadata()
-                        .ok()
-                        .and_then(|m| m.created().or(m.modified()).ok())
-                        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-                        .as_ref()
-                        .map(Duration::as_secs)
-                        .and_then(NonZeroU64::new);
+            if let Ok(mon_bytes) = util::read_file_bytes(path)
+                && let Ok(mut mon) = OhpkmV2::from_bytes(&mon_bytes)
+            {
+                let file_created_seconds = dir_entry
+                    .metadata()
+                    .ok()
+                    .and_then(|m| m.created().or(m.modified()).ok())
+                    .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                    .as_ref()
+                    .map(Duration::as_secs)
+                    .and_then(NonZeroU64::new);
 
-                    mon.set_started_tracking_if_missing(file_created_seconds);
-                    map.insert(mon.openhome_id(), mon.to_bytes());
-                }
+                mon.set_started_tracking_if_missing(file_created_seconds);
+                map.insert(mon.openhome_id(), mon.to_bytes());
             }
         }
 
@@ -158,7 +158,7 @@ pub fn permanently_delete_ohpkms(
         .replace(&app_handle, |store| {
             let mut new_store = store.clone();
             for identifier in &openhome_ids {
-                new_store.remove(&identifier);
+                new_store.remove(identifier);
             }
             new_store
         })?;

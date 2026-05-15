@@ -6,9 +6,4 @@
   <ItemGroup>
     <PackageReference Include="PKHeX.Core" Version="25.*" />
   </ItemGroup>
-  <ItemGroup>
-  <None Include="test-files/pkm-files/**">
-    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-  </None>
-</ItemGroup>
 </Project>

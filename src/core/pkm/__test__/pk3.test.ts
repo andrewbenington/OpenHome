@@ -83,12 +83,14 @@ test('gen 3 ribbons are updated', () => {
   emeraldPKM.ribbons = [
     ...emeraldPKM.ribbons,
     'Cool (Hoenn)',
-    'Cool Super',
-    'Cool Hyper',
+    'Cool Super (Hoenn)',
+    'Cool Hyper (Hoenn)',
     'Cool Master (Hoenn)',
     'Winning',
   ]
+
   blazikenOhpkm.syncWithGameData(emeraldPKM)
+
   expect(blazikenOhpkm.ribbons).toContain('Cool Master (Hoenn)')
   expect(blazikenOhpkm.ribbons).toContain('Winning')
   expect(blazikenOhpkm.ribbons).toContain('Effort')
@@ -119,7 +121,7 @@ test('gen 3 contest stats are updated', () => {
 })
 
 test('gen 3 conversion to OHPKM and back is lossless', () => {
-  const ohPKM = new OHPKM(blazikenPk3)
+  const ohPKM = OHPKM.fromMonUnknownSave(blazikenPk3)
   // gaining cool contest points
   const gen3PKM = PK3.fromOhpkm(ohPKM, ConvertStrategies.getDefault())
 
@@ -127,7 +129,7 @@ test('gen 3 conversion to OHPKM and back is lossless', () => {
 })
 
 test('pk3 and ohpkm have the same gen345Lookup key', () => {
-  const ohPKM = new OHPKM(blazikenPk3)
+  const ohPKM = OHPKM.fromMonUnknownSave(blazikenPk3)
 
   expect(getMonGen345Identifier(ohPKM)).toEqual(getMonGen345Identifier(blazikenPk3))
 })

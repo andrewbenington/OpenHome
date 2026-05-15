@@ -4,10 +4,10 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
-import { gen3StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import {
   ConvertStrategy,
   ExtraFormIndex,
+  Gen3Strings,
   Gender,
   ItemGen3,
   Language,
@@ -158,7 +158,8 @@ export class G3SaveBackup {
         break
     }
 
-    this.name = gen3StringToUTF(this.sectors[0].data, 0, 10)
+    const trainerNameSlice = this.sectors[0].data.slice(0, 7)
+    this.name = Gen3Strings.decode7Bytes(trainerNameSlice, 'Int')
     // concatenate pc data from all sectors
     this.pcDataContiguous = new Uint8Array(33744)
     this.sectors.slice(5).forEach((sector, i) => {
@@ -171,26 +172,24 @@ export class G3SaveBackup {
     this.currentPCBox = this.pcDataContiguous[0]
 
     for (let i = 0; i < 14; i++) {
-      this.boxes[i] = new Box(gen3StringToUTF(this.pcDataContiguous, 0x8344 + i * 9, 10), 30)
+      const boxNameStart = 0x8344 + i * 9
+      const boxNameSlice = this.pcDataContiguous.slice(boxNameStart, boxNameStart + 10)
+      const boxName = Gen3Strings.decode10Bytes(boxNameSlice, 'Int')
+      this.boxes[i] = new Box(boxName, 30)
     }
     for (let i = 0; i < 420; i++) {
+      const box = this.boxes[Math.floor(i / 30)]
+      const slot = i % 30
       try {
         const buffer = this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80).buffer
-        const mon = PK3.fromBytes(buffer, true)
-
-        const box = this.boxes[Math.floor(i / 30)]
-
-        if (mon.isValid()) {
-          box.boxSlots[i % 30] = mon
-        } else {
-          box.boxSlots[i % 30] = undefined
-        }
+        box.boxSlots[slot] = PK3.fromSlotBytes(buffer)
       } catch (e) {
-        throw Error(`File does not have valid Pokémon data: ${e}`)
+        throw Error(
+          `File does has invalid Pokémon data at box ${Math.floor(i / 30)}/slot ${slot}: ${e}`
+        )
       }
     }
 
-    this.name = gen3StringToUTF(this.sectors[0].data, 0x00, 7)
     this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
     this.trainerGender = this.sectors[0].data[0x08] ? Gender.Female : Gender.Male
@@ -384,7 +383,7 @@ export class G3SAV extends OfficialSAV<PK3> {
       securityKeyCopyFRLG: new DataView(
         this.primarySave.sectors[0].data.buffer as ArrayBuffer
       ).getUint32(0xf20, true),
-      rivalName: gen3StringToUTF(this.primarySave.sectors[3].data, 0x0bcc, 8),
+      // rivalName: gen3StringToUTF(this.primarySave.sectors[3].data, 0x0bcc, 8),
       gameCode: this.primarySave.gameCode,
     }
   }

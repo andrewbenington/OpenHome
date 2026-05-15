@@ -5,13 +5,11 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
-import { Gender, Language, OriginGame } from '@pkm-rs/pkg'
+import { Gen3Strings, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { Option } from 'src/core/util/functional'
 import { Box, BoxAndSlot, PluginIdentifier, PluginSAV } from '../interfaces'
 import { LookupType } from '../util'
 import { PathData } from '../util/path'
-import { gen3StringToUTF } from '../util/Strings/StringConverter'
-// import { RRTransferMon } from './conversion/RRTransferMons'
 
 export const SAVE_SIZES_BYTES = [0x20000, 0x20010]
 
@@ -88,7 +86,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
     }
     this.sectors.sort((sector1, sector2) => sector1.sectionID - sector2.sectionID)
 
-    this.name = gen3StringToUTF(this.sectors[0].data, 0x00, 7)
+    this.name = Gen3Strings.decode7Bytes(this.sectors[0].data.slice(0, 7), 'Int')
     this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
     this.trainerGender = this.sectors[0].data[0x08] ? Gender.Female : Gender.Male
@@ -293,6 +291,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
     const box = this.boxes[boxNum]
     if (!box) return
     box.boxSlots[boxSlot] = mon
+    this.updatedBoxSlots.push({ box: boxNum, boxSlot: boxSlot })
   }
 }
 

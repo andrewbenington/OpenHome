@@ -28,7 +28,7 @@ function loadOhpkmFromB64(response: StringToB64): OhpkmStoreData {
   return Object.fromEntries(
     Object.entries(response).map(([identifier, b64String]) => [
       identifier,
-      new OHPKM(Uint8Array.fromBase64(b64String)),
+      OHPKM.fromBytes(Uint8Array.fromBase64(b64String).buffer),
     ])
   )
 }

@@ -49,6 +49,7 @@
   "super_training_dist_flags": 0,
   "form_argument": 0,
   "nickname": "Rhyhorn",
+  "nickname_trash": "52006800790068006F0072006E00000000000000000000000000",
   "moves": [
     {
       "move_index": "Horn Attack",
@@ -165,5 +166,6 @@
     "spa": 13,
     "spd": 11,
     "spe": 10
-  }
+  },
+  "level": 10
 }

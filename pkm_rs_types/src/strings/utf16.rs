@@ -56,10 +56,16 @@ impl<const N: usize> From<String> for SizedUtf16String<N> {
     }
 }
 
+impl<const N: usize> From<&SizedUtf16String<N>> for String {
+    fn from(value: &SizedUtf16String<N>) -> Self {
+        let u16_values = u8_slice_to_u16_le(&value.raw_le);
+        String::from_utf16_lossy(&u16_values)
+    }
+}
+
 impl<const N: usize> Display for SizedUtf16String<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let u16_values = u8_slice_to_u16_le(&self.raw_le);
-        write!(f, "{}", String::from_utf16_lossy(&u16_values))
+        String::from(self).fmt(f)
     }
 }
 

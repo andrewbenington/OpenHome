@@ -49,6 +49,7 @@
   "super_training_dist_flags": 0,
   "form_argument": 0,
   "nickname": "Attenborough",
+  "nickname_trash": "41007400740065006E0062006F0072006F007500670068000000",
   "moves": [
     {
       "move_index": "False Swipe",
@@ -165,5 +166,6 @@
     "spa": 148,
     "spd": 146,
     "spe": 234
-  }
+  },
+  "level": 100
 }

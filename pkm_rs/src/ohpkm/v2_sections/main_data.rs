@@ -8,7 +8,7 @@ use crate::util;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::lookup;
-use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
+use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
@@ -57,6 +57,7 @@ pub struct MainDataV2 {
     pub mint_nature: Option<NatureIndex>,
     pub is_fateful_encounter: bool,
     pub gender: Gender,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
     pub contest: ContestStats,
     pub pokerus_byte: u8,
@@ -74,6 +75,7 @@ pub struct MainDataV2 {
     pub nickname: SizedUtf16String<26>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveIndex; 4],
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ivs: Stats8,
     pub is_egg: bool,
     pub is_nicknamed: bool,
@@ -217,7 +219,7 @@ impl MainDataV2 {
         let base_mon = self.species_and_form.get_base_evolution();
         format!(
             "{:04}-{:04x}{:04x}-{:08x}-{:02x}",
-            base_mon.get_ndex().get(),
+            base_mon.get_ndex().to_u16(),
             self.trainer_id,
             self.secret_id,
             self.personality_value,
@@ -487,7 +489,7 @@ impl DataSection for MainDataV2 {
             height_scalar: bytes[80],
             weight_scalar: bytes[81],
             scale: bytes[82],
-            moves: MoveSlots::from_bytes(bytes, MOVE_DATA_OFFSETS),
+            moves: MoveSlots::from_bytes(bytes, MOVE_DATA_OFFSETS, PpUpStorage::FourBytes),
             nickname: SizedUtf16String::<26>::from_bytes(bytes[96..122].try_into().unwrap()),
             egg_date: PokeDate::from_bytes_optional(bytes[122..125].try_into().unwrap()),
             met_date: PokeDate::from_bytes(bytes[125..128].try_into().unwrap()),
@@ -600,8 +602,9 @@ impl DataSection for MainDataV2 {
         bytes[81] = self.weight_scalar;
         bytes[82] = self.scale;
 
-        self.moves.write_spans(&mut bytes, MOVE_DATA_OFFSETS);
         // writes move indices, pp, and pp ups in one go to ensure consistency
+        self.moves
+            .write_spans(&mut bytes, MOVE_DATA_OFFSETS, PpUpStorage::FourBytes);
 
         bytes[96..122].copy_from_slice(&self.nickname);
 

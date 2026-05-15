@@ -1,10 +1,13 @@
-use pkm_rs_resources::ribbons::OpenHomeRibbonSet;
+use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
+use crate::convert_strategy::ConvertStrategy;
+use crate::convert_strategy::PkmConverter;
+use crate::format::PkmFormat;
+use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
+use crate::result::{Error, Result};
 use crate::{
-    convert_strategy::{ConvertStrategy, PkmConverter},
-    format::PkmFormat,
-    gen7_alola::Pk7,
+    gen7_alola::{self, Pk7},
     ohpkm::OhpkmV2,
     traits::HasSpeciesAndForm,
 };
@@ -17,7 +20,7 @@ impl OhpkmConvert for Pk7 {
         ohpkm::v2_sections::MainDataV2 {
             personality_value: self.personality_value,
             encryption_constant: self.encryption_constant,
-            species_and_form: self.species_and_form,
+            species_and_form: self.species_and_form.into_inner(),
             held_item_index: self.held_item_index,
             trainer_id: self.trainer_id,
             secret_id: self.secret_id,
@@ -37,7 +40,10 @@ impl OhpkmConvert for Pk7 {
             contest_memory_count: self.contest_memory_count,
             battle_memory_count: self.battle_memory_count,
             ribbons: OpenHomeRibbonSet::from_modern(self.ribbons),
-            moves: self.moves,
+            moves: self.moves.to_pp_adjusted(
+                MetadataSource::UltraSunUltraMoon,
+                ohpkm::MOVE_METADATA_SOURCE,
+            ),
             nickname: self.nickname,
             relearn_moves: self.relearn_moves,
             ivs: self.ivs,
@@ -98,7 +104,10 @@ impl OhpkmConvert for Pk7 {
             encryption_constant: ohpkm.encryption_constant(),
             sanity: 0,
             checksum: 0,
-            species_and_form: ohpkm.species_and_form(),
+            species_and_form: ohpkm
+                .species_and_form()
+                .try_into()
+                .expect("pk7 mon/form should be valid"),
             held_item_index: ohpkm.held_item_index(),
             trainer_id: ohpkm.trainer_id(),
             secret_id: ohpkm.secret_id(),
@@ -131,7 +140,10 @@ impl OhpkmConvert for Pk7 {
             super_training_dist_flags: ohpkm.super_training_dist_flags().unwrap_or_default(),
             form_argument: ohpkm.form_argument(),
             nickname: ohpkm.nickname(),
-            moves: ohpkm.moves(),
+            moves: ohpkm.moves().to_pp_adjusted(
+                ohpkm::MOVE_METADATA_SOURCE,
+                MetadataSource::UltraSunUltraMoon,
+            ),
             relearn_moves: ohpkm.relearn_moves(),
             secret_super_training_unlocked: ohpkm
                 .secret_super_training_unlocked()
@@ -183,5 +195,34 @@ impl OhpkmConvert for Pk7 {
         mon.refresh_checksum();
 
         mon
+    }
+
+    fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
+        if bytes.len() == gen7_alola::BOX_SIZE {
+            let mut extended = bytes.to_vec();
+            extended.resize(gen7_alola::PARTY_SIZE, 0);
+            let extended_len = extended.len();
+
+            return extended
+                .try_into()
+                .map_err(|_| {
+                    Error::buffer_size_with_source(
+                        "Pk7::OhpkmConvert::bytes_to_stored",
+                        gen7_alola::PARTY_SIZE,
+                        extended_len,
+                    )
+                })
+                .map(StoredPkmBytes::Pk7);
+        }
+        bytes
+            .try_into()
+            .map_err(|_| {
+                Error::buffer_size_with_source(
+                    "Pk7::OhpkmConvert::bytes_to_stored",
+                    gen7_alola::PARTY_SIZE,
+                    bytes.len(),
+                )
+            })
+            .map(StoredPkmBytes::Pk7)
     }
 }

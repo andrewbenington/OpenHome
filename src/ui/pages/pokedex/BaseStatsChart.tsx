@@ -1,5 +1,5 @@
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
-import { BaseStats, Stats8, StatsPreSplit } from '@pkm-rs/pkg'
+import { BaseStats, StatsPreSplit } from '@pkm-rs/pkg'
 import { Text } from '@radix-ui/themes'
 import {
   Chart as ChartJS,
@@ -12,6 +12,7 @@ import {
 } from 'chart.js'
 import { Radar } from 'react-chartjs-2'
 import StatsTable from '../../components/pokemon/StatsTable'
+import { Stats } from '@pokemon-files/util'
 
 export type BaseStatsChartProps = {
   stats: BaseStats
@@ -26,7 +27,7 @@ export default function BaseStatsChart({ stats }: BaseStatsChartProps) {
 }
 
 type BaseStatsChartModernProps = {
-  stats: Stats8
+  stats: Stats
 }
 
 function BaseStatsChartModern({ stats }: BaseStatsChartModernProps) {

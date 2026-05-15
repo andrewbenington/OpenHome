@@ -49,6 +49,7 @@
   "super_training_dist_flags": 0,
   "form_argument": 0,
   "nickname": "Zygarde",
+  "nickname_trash": "5A00790067006100720064006500000000000000000000000000",
   "moves": [
     {
       "move_index": "Crunch",
@@ -165,5 +166,6 @@
     "spa": 90,
     "spd": 130,
     "spe": 169
-  }
+  },
+  "level": 63
 }

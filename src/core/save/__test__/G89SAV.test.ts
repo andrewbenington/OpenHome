@@ -151,7 +151,7 @@ describe('gen 8 save files', () => {
       throw new Error('Expected mon not found')
     }
 
-    const ohpkm = new OHPKM(mon)
+    const ohpkm = OHPKM.fromMonInSave(mon, swordSave)
 
     ohpkm.nickname = 'NEW NAME'
     swordSave.boxes[1].boxSlots[3] = convertToPk8(ohpkm)
@@ -171,7 +171,7 @@ describe('gen 8 save files', () => {
       throw new Error('Expected mon not found')
     }
 
-    const ohpkm = new OHPKM(mon)
+    const ohpkm = OHPKM.fromMonInSave(mon, swordSave)
 
     ohpkm.nickname = 'NEW NAME'
     swordSave.boxes[1].boxSlots[3] = convertToPk8(ohpkm)
@@ -193,7 +193,7 @@ describe('gen 8 save files', () => {
     }
     expect(mon.nickname).toBe('Decidueye')
 
-    const ohpkm = new OHPKM(mon)
+    const ohpkm = OHPKM.fromMonInSave(mon, arceusSave)
 
     ohpkm.nickname = 'NEW NAME'
     arceusSave.boxes[13].boxSlots[1] = convertToPa8(ohpkm)
@@ -226,11 +226,11 @@ function toHexString(byteArray: Uint8Array) {
 function convertToPk8(mon: PKMInterface) {
   return mon instanceof OHPKM
     ? PK8.fromOhpkm(mon, ConvertStrategies.getDefault())
-    : PK8.fromOhpkm(new OHPKM(mon), ConvertStrategies.getDefault())
+    : PK8.fromOhpkm(OHPKM.fromMonUnknownSave(mon), ConvertStrategies.getDefault())
 }
 
 function convertToPa8(mon: PKMInterface) {
   return mon instanceof OHPKM
     ? PA8.fromOhpkm(mon, ConvertStrategies.getDefault())
-    : PA8.fromOhpkm(new OHPKM(mon), ConvertStrategies.getDefault())
+    : PA8.fromOhpkm(OHPKM.fromMonUnknownSave(mon), ConvertStrategies.getDefault())
 }

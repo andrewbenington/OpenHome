@@ -245,18 +245,23 @@ fn copy_to_sized_array<const N: usize>(slice: &[u8]) -> [u8; N] {
 #[derive(Debug, Clone, Copy)]
 pub struct OriginalBackup(StoredPkmBytes);
 
-#[cfg(feature = "wasm")]
 impl OriginalBackup {
     pub const fn new(pkm_bytes: StoredPkmBytes) -> Self {
         Self(pkm_bytes)
     }
 
+    #[cfg(feature = "wasm")]
     pub const fn tag(&self) -> Tag {
         self.0.tag()
     }
 
+    #[cfg(feature = "wasm")]
     pub const fn data_as_bytes(&self) -> &[u8] {
         self.0.data_as_bytes()
+    }
+
+    pub const fn tagged_bytes(&self) -> &StoredPkmBytes {
+        &self.0
     }
 }
 

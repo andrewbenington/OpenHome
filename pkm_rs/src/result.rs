@@ -95,6 +95,13 @@ pub enum Error {
 }
 
 impl Error {
+    pub const fn form_index(species_and_form: SpeciesAndForm) -> Self {
+        Self::FormIndex {
+            national_dex: species_and_form.get_ndex(),
+            form_index: species_and_form.get_forme_index(),
+        }
+    }
+
     pub const fn buffer_size(expected: usize, received: usize) -> Self {
         Self::BufferSize {
             requirement_source: None,

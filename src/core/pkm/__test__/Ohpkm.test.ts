@@ -25,7 +25,7 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
     const original = PK3.fromBytes(bytes.buffer)
     original.refreshChecksum()
 
-    const v2 = new OHPKM(original)
+    const v2 = OHPKM.fromMonUnknownSave(original)
     test(`ohpkm v2 genders match - ${file}`, () => {
       assert(original.gender === v2.gender)
     })
@@ -61,11 +61,25 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
       assert(original.gender === roundTrip.gender)
     })
 
+    test(`ribbons match - ${file}`, () => {
+      expect(original.ribbons).toEqual(roundTrip.ribbons)
+    })
+
+    test(`moves match - ${file}`, () => {
+      expect(original.moves, 'move indices').toEqual(roundTrip.moves)
+      expect(original.movePP, 'move PP').toEqual(roundTrip.movePP)
+      expect(original.movePPUps, 'move PP Ups').toEqual(roundTrip.movePPUps)
+    })
+
     const expectedBytes = new Uint8Array(original.toBytes())
     const actualBytes = new Uint8Array(roundTrip.toBytes())
 
     test(`bytes match - ${file}`, () => {
       if (!expectedBytes.every((v, i) => v === actualBytes[i])) {
+        // first compare JSON to give a more readable outputAZcdsvx bfdgn
+        const other = PK3.fromBytes(actualBytes.buffer)
+        expect(original.toJson()).toEqual(roundTrip.toJson())
+        expect(roundTrip.toJson()).toEqual(other.toJson())
         throw new Error(diffSpans(expectedBytes, actualBytes))
       }
     })
@@ -79,7 +93,7 @@ describe('evolution and form change update ohpkm', async () => {
     const dialgaPa8 = PA8.fromBytes(dialgaBytes.buffer)
     expect(dialgaPa8.dexNum).toEqual(NationalDex.Dialga)
 
-    const dialgaOhpkm = new OHPKM(dialgaPa8)
+    const dialgaOhpkm = OHPKM.fromMonUnknownSave(dialgaPa8)
 
     expect(dialgaOhpkm.formNum).toEqual(0)
 
@@ -96,7 +110,7 @@ describe('evolution and form change update ohpkm', async () => {
     expect(mrMimeGalarPk8.dexNum).toEqual(NationalDex.MrMime)
     expect(mrMimeGalarPk8.formNum).toEqual(1)
 
-    const mrMimeOhpkm = new OHPKM(mrMimeGalarPk8)
+    const mrMimeOhpkm = OHPKM.fromMonUnknownSave(mrMimeGalarPk8)
 
     expect(mrMimeOhpkm.dexNum).toEqual(NationalDex.MrMime)
     expect(mrMimeOhpkm.formNum).toEqual(1)
@@ -114,7 +128,7 @@ describe('evolution and form change update ohpkm', async () => {
 
 describe('plugin form persistence', () => {
   test('pluginForm survives OHPKM serialization', () => {
-    const starter = new OHPKM(new Uint8Array())
+    const starter = OHPKM.fromBytes(new Uint8Array().buffer)
     starter.pluginOrigin = 'luminescent_platinum'
     starter.extraFormIndex = ExtraFormIndex.GengarStitched
 
@@ -135,14 +149,14 @@ describe('plugin form persistence', () => {
     expect(original.dexNum).toEqual(NationalDex.Gengar)
     expect(original.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
 
-    const ohpkm = new OHPKM(original)
+    const ohpkm = OHPKM.fromMonUnknownSave(original)
     expect(ohpkm.pluginOrigin).toEqual('luminescent_platinum')
 
     const lumi = PB8LUMI.fromOhpkm(ohpkm, ConvertStrategies.getDefault())
     expect(lumi.pluginOrigin).toEqual('luminescent_platinum')
     expect(lumi.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
 
-    const ohFromLumi = new OHPKM(lumi)
+    const ohFromLumi = OHPKM.fromMonUnknownSave(lumi)
     const roundBytes = ohFromLumi.toBytes()
     const ohAgain = OHPKM.fromBytes(roundBytes)
     expect(ohAgain.pluginOrigin).toEqual('luminescent_platinum')

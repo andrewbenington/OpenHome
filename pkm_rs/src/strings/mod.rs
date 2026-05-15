@@ -1,7 +1,9 @@
 // mod gameboy;
 
-// mod gen3;
-// pub use gen3::Gen3String;
+#[cfg(feature = "wasm")]
+mod gen3;
+#[cfg(feature = "wasm")]
+pub use gen3::*;
 
 // mod gen4;
 

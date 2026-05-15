@@ -1,14 +1,14 @@
-use crate::{Error, Result, abilities::AbilityIndexWasm, species::ALL_SPECIES};
+use crate::ExpectLog;
+use crate::levelup::LearnsetReader;
+use crate::species;
+use crate::species::form_metadata::{BaseStats, base_stats_lookup};
+use crate::species::form_metadata::{levelup_learnset_lookup, types_lookup};
+use crate::{Error, Result, abilities::AbilityIndexWasm, metadata_source::MetadataSource};
+use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
 use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
 use serde::{Serialize, Serializer};
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
-
-use crate::{
-    ExpectLog,
-    levelup::LearnsetReader,
-    species::form_metadata::{MetadataSource, levelup_learnset_lookup, types_lookup},
-};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -18,13 +18,9 @@ use rand::RngExt;
 #[cfg(feature = "wasm")]
 use crate::species::form_metadata::current_base_stats;
 #[cfg(feature = "wasm")]
-use crate::species::form_metadata::{BaseStats, base_stats_lookup};
-#[cfg(feature = "wasm")]
 use crate::stats::Stat;
 #[cfg(feature = "wasm")]
-use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
-#[cfg(feature = "wasm")]
-use pkm_rs_types::{Gender, Stats8};
+use pkm_rs_types::{Gender, Stats16Le};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -49,7 +45,7 @@ impl NatDexIndex {
     }
 
     pub const fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        &ALL_SPECIES[(self.get() - 1) as usize]
+        &species::ALL_SPECIES[(self.to_u16() - 1) as usize]
     }
 
     /// # Safety
@@ -60,7 +56,7 @@ impl NatDexIndex {
         unsafe { NatDexIndex(NonZeroU16::new_unchecked(index)) }
     }
 
-    pub const fn get(&self) -> u16 {
+    pub const fn to_u16(&self) -> u16 {
         self.0.get()
     }
 
@@ -69,7 +65,7 @@ impl NatDexIndex {
     }
 
     pub const fn to_le_bytes(self) -> [u8; 2] {
-        self.get().to_le_bytes()
+        self.to_u16().to_le_bytes()
     }
 }
 
@@ -78,7 +74,7 @@ impl NatDexIndex {
 impl NatDexIndex {
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
     pub fn index(&self) -> u16 {
-        self.get()
+        self.to_u16()
     }
 
     #[cfg(feature = "wasm")]
@@ -102,7 +98,7 @@ impl Serialize for NatDexIndex {
     where
         S: Serializer,
     {
-        serializer.serialize_u16(self.get())
+        serializer.serialize_u16(self.to_u16())
     }
 }
 
@@ -120,13 +116,13 @@ impl From<NationalDex> for NatDexIndex {
 
 impl From<NatDexIndex> for NationalDex {
     fn from(ndex: NatDexIndex) -> Self {
-        NationalDex::try_from(ndex.get())
+        NationalDex::try_from(ndex.to_u16())
             .expect("All NatDexIndex values should be a valid NationalDex")
     }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, Default, PartialEq, Eq, Clone, Copy, EnumString, Display)]
 pub enum GenderRatio {
     #[default]
     Genderless,
@@ -225,16 +221,15 @@ impl LevelUpType {
     pub fn calculate_level(&self, exp: u32) -> u8 {
         self.get_thresholds()
             .iter()
-            .position(|threshold| *threshold >= exp)
-            .unwrap_or(99) as u8
-            + 1
+            .position(|threshold| *threshold > exp)
+            .unwrap_or(100) as u8
     }
 
-    pub fn get_min_exp_for_level(&self, level: u8) -> u32 {
-        if level > 100 {
-            panic!("level too high: {level}")
+    pub const fn get_min_exp_for_level(&self, level: u8) -> u32 {
+        if level > 100 || level == 0 {
+            return 0;
         }
-        self.get_thresholds()[level as usize]
+        self.get_thresholds()[level as usize - 1]
     }
 
     const fn get_thresholds(&self) -> [u32; 100] {
@@ -414,7 +409,7 @@ pub struct FormMetadata {
 
 impl FormMetadata {
     pub const fn forme_ref(&self) -> SpeciesAndForm {
-        unsafe { SpeciesAndForm::new_unchecked(self.national_dex.get(), self.form_index) }
+        unsafe { SpeciesAndForm::new_unchecked(self.national_dex.to_u16(), self.form_index) }
     }
 
     pub const fn species_metadata(&self) -> &SpeciesMetadata {
@@ -453,16 +448,20 @@ impl FormMetadata {
     #[cfg(feature = "wasm")]
     fn has_data_for_source(&self, source: MetadataSource) -> bool {
         use crate::species::form_metadata::source_has_form_metadata;
-        source_has_form_metadata(source, self.national_dex.get(), self.form_index)
+        source_has_form_metadata(source, self.national_dex.to_u16(), self.form_index)
+    }
+
+    pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<BaseStats> {
+        base_stats_lookup(self.national_dex.to_u16(), self.form_index, source)
     }
 
     fn types_from_source_or_latest(
         &self,
         source: Option<MetadataSource>,
     ) -> (PkmType, Option<PkmType>) {
-        types_lookup(self.national_dex.get(), self.form_index, source).expect_log(format!(
+        types_lookup(self.national_dex.to_u16(), self.form_index, source).expect_log(format!(
             "no types found for nat dex {} form {}",
-            self.national_dex.get(),
+            self.national_dex.to_u16(),
             self.form_index
         ))
     }
@@ -600,17 +599,19 @@ impl FormMetadata {
     }
 
     #[wasm_bindgen(getter = baseStats)]
-    pub fn get_base_stats(&self) -> Stats8 {
-        current_base_stats(self.national_dex.get(), self.form_index).unwrap_or_default()
+    pub fn get_base_stats(&self) -> Stats16Le {
+        current_base_stats(self.national_dex.to_u16(), self.form_index)
+            .map(Stats16Le::from)
+            .unwrap_or_default()
     }
 
     #[wasm_bindgen(js_name = baseStatsFrom)]
-    pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<BaseStats> {
-        base_stats_lookup(self.national_dex.get(), self.form_index, source)
+    pub fn get_base_stats_from_js(&self, source: MetadataSource) -> Option<BaseStats> {
+        self.get_base_stats_from(source)
     }
 
     #[wasm_bindgen(js_name = getBaseStat)]
-    pub fn get_base_stat(&self, stat: Stat) -> u8 {
+    pub fn get_base_stat(&self, stat: Stat) -> u16 {
         let base_stats = self.get_base_stats();
         match stat {
             Stat::HP => base_stats.hp,
@@ -787,11 +788,11 @@ impl SpeciesAndForm {
     }
 
     pub const fn to_tuple(self) -> (u16, u16) {
-        (self.national_dex.get(), self.form_index)
+        (self.national_dex.to_u16(), self.form_index)
     }
 
     pub fn get_levelup_learnset(&self, source: Option<MetadataSource>) -> Option<LearnsetReader> {
-        levelup_learnset_lookup(self.national_dex.get(), self.form_index, source)
+        levelup_learnset_lookup(self.national_dex.to_u16(), self.form_index, source)
     }
 }
 
@@ -802,6 +803,10 @@ impl SpeciesAndForm {
 
     pub const fn get_forme_metadata(&self) -> &'static FormMetadata {
         &self.get_species_metadata().forms[self.form_index as usize]
+    }
+
+    pub fn get_base_stats_from(&self, source: MetadataSource) -> Option<BaseStats> {
+        base_stats_lookup(self.national_dex.to_u16(), self.form_index, source)
     }
 }
 
@@ -816,7 +821,7 @@ impl SpeciesAndForm {
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nationalDex))]
     pub fn get_ndex_js(&self) -> u16 {
-        self.national_dex.get()
+        self.national_dex.to_u16()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = formIndex))]
@@ -844,12 +849,26 @@ impl SpeciesAndForm {
 impl Randomize for SpeciesAndForm {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
         let national_dex = NatDexIndex::randomized(rng);
+        println!("randomized ndex: {}", national_dex.to_u16());
         let forme_count = national_dex.get_species_metadata().forms().len();
         let form_index = rng.random_range(0..forme_count) as u16;
+        println!("randomized form: {}", form_index);
 
         Self {
             national_dex,
             form_index,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::species::LevelUpType;
+
+    #[test]
+    fn slow_level_expected() {
+        assert_eq!(LevelUpType::Slow.get_min_exp_for_level(1), 0);
+        assert_eq!(LevelUpType::Slow.get_min_exp_for_level(63), 312558);
+        assert_eq!(LevelUpType::Slow.calculate_level(317341), 63);
     }
 }
