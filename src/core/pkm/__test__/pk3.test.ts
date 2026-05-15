@@ -16,25 +16,29 @@ var blazikenOhpkm: OHPKM
 var blazikenPk3: PK3
 var slowbroOhpkm: OHPKM
 
+function pkmTestFilePath(dir: string, filename: string): string {
+  return path.join(__dirname, 'pkm-files', dir, filename)
+}
+
 beforeAll(() => {
   blazikenOhpkm = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'blaziken.ohpkm'))),
+    new Uint8Array(fs.readFileSync(pkmTestFilePath('ohpkm', 'blaziken.ohpkm'))),
     'OHPKM'
   ) as OHPKM
 
   blazikenPk3 = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm'))),
+    new Uint8Array(fs.readFileSync(pkmTestFilePath('pk3', 'blaziken.pkm'))),
     'PK3'
   ) as PK3
 
   slowbroOhpkm = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'slowbro.ohpkm'))),
+    new Uint8Array(fs.readFileSync(pkmTestFilePath('ohpkm', 'slowbro.ohpkm'))),
     'OHPKM'
   ) as OHPKM
 })
 
 test('gen 3 stat calculations', () => {
-  const file = path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm')
+  const file = pkmTestFilePath('pk3', 'blaziken.pkm')
   const fileBytes = fs.readFileSync(file)
   const bytes = new Uint8Array(fileBytes)
   const mon = bytesToPKM(bytes, 'pkm')
@@ -79,12 +83,14 @@ test('gen 3 ribbons are updated', () => {
   emeraldPKM.ribbons = [
     ...emeraldPKM.ribbons,
     'Cool (Hoenn)',
-    'Cool Super',
-    'Cool Hyper',
+    'Cool Super (Hoenn)',
+    'Cool Hyper (Hoenn)',
     'Cool Master (Hoenn)',
     'Winning',
   ]
+
   blazikenOhpkm.syncWithGameData(emeraldPKM)
+
   expect(blazikenOhpkm.ribbons).toContain('Cool Master (Hoenn)')
   expect(blazikenOhpkm.ribbons).toContain('Winning')
   expect(blazikenOhpkm.ribbons).toContain('Effort')
@@ -115,7 +121,7 @@ test('gen 3 contest stats are updated', () => {
 })
 
 test('gen 3 conversion to OHPKM and back is lossless', () => {
-  const ohPKM = new OHPKM(blazikenPk3)
+  const ohPKM = OHPKM.fromMonUnknownSave(blazikenPk3)
   // gaining cool contest points
   const gen3PKM = PK3.fromOhpkm(ohPKM, ConvertStrategies.getDefault())
 
@@ -123,7 +129,7 @@ test('gen 3 conversion to OHPKM and back is lossless', () => {
 })
 
 test('pk3 and ohpkm have the same gen345Lookup key', () => {
-  const ohPKM = new OHPKM(blazikenPk3)
+  const ohPKM = OHPKM.fromMonUnknownSave(blazikenPk3)
 
   expect(getMonGen345Identifier(ohPKM)).toEqual(getMonGen345Identifier(blazikenPk3))
 })

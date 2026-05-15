@@ -254,7 +254,7 @@ export function useSaves(): SavesAndBanksManager {
           }
 
           if (nextSlot.box < currentBankBoxCount) {
-            const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
+            const homeMon = mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon)
             ohpkmStore.insertOrUpdate(homeMon)
 
             moveOhpkmToHome(homeMon.openhomeId, nextSlot, true)
@@ -278,7 +278,7 @@ export function useSaves(): SavesAndBanksManager {
             nextIndex++
           }
           if (nextIndex < tempSave.boxRows * tempSave.boxColumns) {
-            const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
+            const homeMon = mon instanceof OHPKM ? mon : OHPKM.fromMonInSave(mon, tempSave)
 
             moveMonBetweenSaves(
               undefined,

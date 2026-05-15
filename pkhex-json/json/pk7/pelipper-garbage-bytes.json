@@ -49,6 +49,7 @@
   "super_training_dist_flags": 0,
   "form_argument": 0,
   "nickname": "Caesar",
+  "nickname_trash": "4300610065007300610072000000720000000000000000000000",
   "moves": [
     {
       "move_index": "Hydro Pump",
@@ -165,5 +166,6 @@
     "spa": 197,
     "spd": 169,
     "spe": 173
-  }
+  },
+  "level": 100
 }

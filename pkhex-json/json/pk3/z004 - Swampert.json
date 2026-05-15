@@ -1,0 +1,92 @@
+{
+  "sanity": 0,
+  "checksum": 33285,
+  "pokemon_index": 285,
+  "held_item_index": null,
+  "trainer_id": 52250,
+  "secret_id": 16149,
+  "exp": 1059860,
+  "has_species_data": true,
+  "is_bad_egg": false,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 1094668794,
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 252,
+    "atk": 6,
+    "def": 252,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus_byte": 0,
+  "ribbons": ["Champion"],
+  "nickname": "SWAMPERT",
+  "nickname_trash": "CDD1BBC7CABFCCCEFF00",
+  "moves": [
+    {
+      "move_index": "Waterfall",
+      "pp": 24,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Earthquake",
+      "pp": 16,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Dive",
+      "pp": 16,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Muddy Water",
+      "pp": 16,
+      "pp_ups": 3
+    }
+  ],
+  "ivs": {
+    "hp": 15,
+    "atk": 8,
+    "def": 14,
+    "spa": 28,
+    "spd": 31,
+    "spe": 24
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_friendship": 255,
+  "met_location_index": 16,
+  "ball": "Pok\u00E9",
+  "met_level": 5,
+  "trainer_gender": "Male",
+  "game_of_origin": "Sapphire",
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 100,
+  "current_hp": 388,
+  "stats": {
+    "hp": 388,
+    "atk": 234,
+    "def": 262,
+    "spa": 223,
+    "spd": 194,
+    "spe": 149
+  },
+  "level": 100
+}

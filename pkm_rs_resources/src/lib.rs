@@ -7,6 +7,7 @@ pub mod helpers;
 pub mod items;
 pub mod levelup;
 pub mod lookup;
+pub mod metadata_source;
 pub mod moves;
 pub mod natures;
 pub mod restrictions;

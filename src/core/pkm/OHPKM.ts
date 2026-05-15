@@ -6,6 +6,7 @@ import {
   Ball,
   ExtraFormIndex,
   Gender,
+  generatePk3CompatiblePid,
   HyperTraining,
   Item,
   Language,
@@ -24,7 +25,6 @@ import {
 import {
   AllPKMFields,
   FourMoves,
-  generatePersonalityValuePreservingAttributes,
   getHeightCalculated,
   getStandardPKMStats,
   getWeightCalculated,
@@ -35,6 +35,7 @@ import {
 import * as jsTypes from '@pokemon-files/util/types'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen34ContestRibbons, Gen34TowerRibbons } from '@pokemon-resources/index'
+import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { PluginIdentifier, SAV } from '../save/interfaces'
@@ -47,14 +48,6 @@ import {
   geolocationsToWasm,
   markingsSixShapesColorsFromWasm,
   markingsSixShapesColorsToWasm,
-  stats16LeToWasmNullable,
-  stats8ToWasm,
-  stats8ToWasmNullable,
-  statsFromWasm,
-  statsFromWasmNullable,
-  statsPreSplitFromWasm,
-  statsPreSplitFromWasmNullable,
-  statsPreSplitToWasm,
   trainerMemoryToWasm,
 } from './convert'
 import { isEvolution } from './Lookup'
@@ -65,7 +58,7 @@ import {
   getPrevos,
   ivsFromDVs,
 } from './util'
-import dayjs, { Dayjs } from 'dayjs'
+import { PK3, PK7 } from '@pokemon-files/pkm'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getFormat() {
@@ -73,7 +66,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
   format: 'OHPKM' = 'OHPKM'
 
-  constructor(arg: Uint8Array | AllPKMFields) {
+  private constructor(arg: Uint8Array | AllPKMFields) {
     if (arg instanceof Uint8Array) {
       super(arg)
     } else {
@@ -108,7 +101,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
             .concat(other.trainerID.toString())
         )
 
-        this.personalityValue = generatePersonalityValuePreservingAttributes(other)
+        this.personalityValue = this.generatePk3CompatiblePid()
       } else {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
@@ -167,12 +160,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
 
-      this.ivs = stats8ToWasm(
-        other.ivs ?? (other.dvs !== undefined ? ivsFromDVs(other.dvs) : generateIVs(prng))
-      )
+      this.ivs = other.ivs ?? (other.dvs !== undefined ? ivsFromDVs(other.dvs) : generateIVs(prng))
 
       if (other.evs) {
-        this.evs = stats8ToWasm(other.evs)
+        this.evs = other.evs
       }
 
       if (other.contest) {
@@ -186,11 +177,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.metLevel = other.metLevel ?? 0
 
       if (other.dvs && other.evsG12) {
-        this.setGameboyData(
-          statsPreSplitToWasm(other.dvs),
-          other.metTimeOfDay ?? 0,
-          statsPreSplitToWasm(other.evsG12)
-        )
+        this.setGameboyData(other.dvs, other.metTimeOfDay ?? 0, other.evsG12)
       }
 
       this.metLocationIndex = other.metLocationIndex ?? 0
@@ -373,8 +360,15 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   static fromMonInSave(mon: PKMInterface, save: SAV): OHPKM {
-    const ohpkm = new OHPKM(mon)
+    const ohpkm = OHPKM.fromMonUnknownSave(mon)
     ohpkm.syncWithGameData(mon, save)
+
+    return ohpkm
+  }
+
+  static fromMonUnknownSave(mon: PKMInterface): OHPKM {
+    const ohpkm =
+      mon instanceof PK3 || mon instanceof PK7 ? OHPKM.fromWasmImpl(mon) : new OHPKM(mon)
 
     return ohpkm
   }
@@ -382,6 +376,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static defaultWithSpecies(nationalDex: number, formIndex: number) {
     const bytes = OhpkmV2Wasm.defaultWithSpecies(nationalDex, formIndex).toByteArray()
     return OHPKM.fromBytes(bytes.buffer)
+  }
+
+  private static fromWasmImpl(mon: PK3 | PK7): OHPKM {
+    return new OHPKM(mon.inner.toOhpkm().toByteArray())
   }
 
   // getters / setters
@@ -401,39 +399,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return this.SpeciesAndForm.formIndex
   }
 
-  get evsG12() {
-    return statsPreSplitFromWasmNullable(this.evsG12Wasm)
-  }
-  set evsG12(value: jsTypes.StatsPreSplit | undefined) {
-    if (value) {
-      this.evsG12Wasm = statsPreSplitToWasm(value)
-    }
-  }
-
-  get ivs() {
-    return statsFromWasm(this.ivsWasm)
-  }
-  set ivs(value: jsTypes.Stats) {
-    this.ivsWasm = stats8ToWasm(value)
-  }
-
   get evs() {
-    return statsFromWasm(this.evsWasm)
+    return this.evsWasm
   }
 
   set evs(value: Stats) {
-    this.evsWasm = stats8ToWasm(value)
-  }
-
-  get dvs() {
-    return statsPreSplitFromWasm(this.dvsWasm)
-  }
-
-  get avs() {
-    return statsFromWasmNullable(this.avsWasm)
-  }
-  set avs(value: Stats | undefined) {
-    this.avsWasm = stats16LeToWasmNullable(value)
+    this.evsWasm = value
   }
 
   get contest() {
@@ -538,13 +509,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       value.spd,
       value.spe
     )
-  }
-
-  get gvs() {
-    return statsFromWasmNullable(this.gvsWasm)
-  }
-  set gvs(value: Stats | undefined) {
-    this.gvsWasm = stats8ToWasmNullable(value)
   }
 
   get shinyLeaves() {
@@ -907,6 +871,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     } else {
       return AbilityNumber.First
     }
+  }
+
+  generatePk3CompatiblePid(): number {
+    return generatePk3CompatiblePid(OhpkmV2Wasm.fromByteVectorFixingErrors(this.toByteArray()))
   }
 }
 

@@ -5,8 +5,8 @@ import {
   ConvertStrategy,
   MetData,
   PkmConverter as PkmConverterWasm,
-  Stats8,
 } from '@pkm-rs/pkg'
+import { Stats } from '@pokemon-files/util'
 
 export class PkmConverter {
   format: MonFormat
@@ -23,7 +23,7 @@ export class PkmConverter {
     return this._inner.nickname(ohpkm)
   }
 
-  ivs(ohpkm: OHPKM): Stats8 {
+  ivs(ohpkm: OHPKM): Stats {
     return this._inner.ivs(ohpkm)
   }
 

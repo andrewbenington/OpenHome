@@ -49,7 +49,7 @@ const Home = () => {
 
         try {
           if (extension.toUpperCase() === 'OHPKM') {
-            mon = new OHPKM(new Uint8Array(buffer))
+            mon = OHPKM.fromBytes(buffer)
           } else {
             mon = bytesToPKM(new Uint8Array(buffer), extension.toUpperCase())
           }

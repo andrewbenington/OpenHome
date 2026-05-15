@@ -9,6 +9,14 @@ use serde::{Serialize, Serializer};
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
+mod max_pp;
+// mod unusable;
+
+pub use max_pp::adjust_pp_between_games;
+pub use max_pp::get_base_max_pp;
+
+use crate::metadata_source::MetadataSource;
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Clone, Copy, Serialize, PartialEq, Eq)]
@@ -27,26 +35,57 @@ impl MoveSlot {
         }
     }
 
-    pub fn from_bytes(bytes: &[u8], offsets: MoveDataOffsets, index: usize) -> Self {
-        let move_offset = offsets.moves + (2 * index);
-        let pp_offset = offsets.pp + index;
-        let pp_ups_offset = offsets.pp_ups + index;
+    pub fn from_bytes<Offset: Into<usize> + Copy>(
+        bytes: &[u8],
+        offsets: MoveDataOffsets<Offset>,
+        pp_up_storage: PpUpStorage,
+        index: usize,
+    ) -> Self {
+        let move_offset = offsets.moves.into() + (2 * index);
+        let pp_offset = offsets.pp.into() + index;
 
         Self {
             move_index: MoveIndex::from_u16(read_u16_le!(bytes, move_offset)),
             pp: bytes[pp_offset],
-            pp_ups: bytes[pp_ups_offset],
+            pp_ups: pp_up_storage.get_pp_ups(bytes, offsets, index),
         }
     }
 
-    pub fn write_to_offsets(&self, bytes: &mut [u8], offsets: MoveDataOffsets, index: usize) {
-        let move_offset = offsets.moves + (2 * index);
-        let pp_offset = offsets.pp + index;
-        let pp_ups_offset = offsets.pp_ups + index;
+    fn write_move_and_pp_to_offsets<T: Into<usize> + Copy>(
+        &self,
+        bytes: &mut [u8],
+        offsets: MoveDataOffsets<T>,
+        index: usize,
+    ) {
+        let move_offset = offsets.moves.into() + (2 * index);
+        let pp_offset = offsets.pp.into() + index;
 
         bytes[move_offset..move_offset + 2].copy_from_slice(&self.move_index.to_le_bytes());
         bytes[pp_offset] = self.pp;
-        bytes[pp_ups_offset] = self.pp_ups;
+    }
+
+    pub fn write_to_offsets<T: Into<usize> + Copy>(
+        &self,
+        bytes: &mut [u8],
+        offsets: MoveDataOffsets<T>,
+        index: usize,
+        pp_up_storage: PpUpStorage,
+    ) {
+        self.write_move_and_pp_to_offsets(bytes, offsets, index);
+        pp_up_storage.write_pp_ups(bytes, offsets, index, self.pp_ups);
+    }
+
+    pub fn to_pp_adjusted(
+        self,
+        source_metadata: MetadataSource,
+        dest_metadata: MetadataSource,
+    ) -> Option<Self> {
+        let adjusted_pp = adjust_pp_between_games(source_metadata, dest_metadata, self)?;
+
+        Some(Self {
+            pp: adjusted_pp,
+            ..self
+        })
     }
 }
 
@@ -56,12 +95,16 @@ impl MoveSlot {
 pub struct MoveSlots([MoveSlot; 4]);
 
 impl MoveSlots {
-    pub fn from_bytes(bytes: &[u8], offsets: MoveDataOffsets) -> Self {
+    pub fn from_bytes<T: Into<usize> + Copy>(
+        bytes: &[u8],
+        offsets: MoveDataOffsets<T>,
+        pp_up_storage: PpUpStorage,
+    ) -> Self {
         Self([
-            MoveSlot::from_bytes(bytes, offsets, 0),
-            MoveSlot::from_bytes(bytes, offsets, 1),
-            MoveSlot::from_bytes(bytes, offsets, 2),
-            MoveSlot::from_bytes(bytes, offsets, 3),
+            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 0),
+            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 1),
+            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 2),
+            MoveSlot::from_bytes(bytes, offsets, pp_up_storage, 3),
         ])
     }
 
@@ -74,15 +117,44 @@ impl MoveSlots {
         ])
     }
 
-    pub fn write_spans(&self, bytes: &mut [u8], offsets: MoveDataOffsets) {
+    pub fn write_spans<T: Into<usize> + Copy>(
+        &self,
+        bytes: &mut [u8],
+        offsets: MoveDataOffsets<T>,
+        pp_up_storage: PpUpStorage,
+    ) {
         self.0
             .iter()
             .enumerate()
-            .for_each(|(i, slot)| slot.write_to_offsets(bytes, offsets, i));
+            .for_each(|(i, slot)| slot.write_to_offsets(bytes, offsets, i, pp_up_storage));
     }
 
     pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, MoveSlot> {
         self.0.iter_mut()
+    }
+
+    // returns 0, 1, 2, or 3 (or None)
+    fn first_empty_index(&self) -> Option<usize> {
+        self.0.iter().enumerate().find_map(|(index, slot)| {
+            if slot.move_index.is_empty() {
+                Some(index)
+            } else {
+                None
+            }
+        })
+    }
+
+    pub fn to_pp_adjusted(
+        self,
+        source_metadata: MetadataSource,
+        dest_metadata: MetadataSource,
+    ) -> Self {
+        self.into_iter()
+            .map(|m| {
+                m.to_pp_adjusted(source_metadata, dest_metadata)
+                    .unwrap_or_default()
+            })
+            .collect()
     }
 }
 
@@ -156,11 +228,89 @@ impl<'a> IntoIterator for &'a mut MoveSlots {
     }
 }
 
+impl FromIterator<MoveSlot> for MoveSlots {
+    fn from_iter<T: IntoIterator<Item = MoveSlot>>(iter: T) -> Self {
+        let mut from_iter = iter.into_iter();
+        let mut move_slots = Self::default();
+
+        while let Some(index) = move_slots.first_empty_index()
+            && let Some(slot) = from_iter.next()
+        {
+            move_slots.0[index] = slot;
+        }
+
+        move_slots
+    }
+}
+
+impl FromIterator<Option<MoveSlot>> for MoveSlots {
+    fn from_iter<T: IntoIterator<Item = Option<MoveSlot>>>(iter: T) -> Self {
+        let mut from_iter = iter.into_iter();
+        let mut move_slots = Self::default();
+
+        while let Some(index) = move_slots.first_empty_index()
+            && let Some(slot) = from_iter.next().flatten()
+        {
+            move_slots.0[index] = slot
+        }
+
+        move_slots
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum PpUpStorage {
+    SingleByte,
+    FourBytes,
+}
+
+impl PpUpStorage {
+    fn get_pp_ups(
+        &self,
+        bytes: &[u8],
+        offsets: MoveDataOffsets<impl Into<usize>>,
+        index: usize,
+    ) -> u8 {
+        match self {
+            PpUpStorage::SingleByte => bytes[offsets.pp_ups.into()] >> (2 * index) & 0b11,
+            PpUpStorage::FourBytes => bytes[offsets.pp_ups.into() + index],
+        }
+    }
+
+    fn write_pp_ups_single_byte(
+        bytes: &mut [u8],
+        offsets: MoveDataOffsets<impl Into<usize>>,
+        index: usize,
+        value: u8,
+    ) {
+        let pp_ups_offset: usize = offsets.pp_ups.into();
+        let current_byte = bytes[pp_ups_offset];
+
+        let shift_val = index * 2;
+        let mask: u8 = !(3 << shift_val);
+
+        bytes[pp_ups_offset] = (current_byte & mask) | (value << shift_val);
+    }
+
+    fn write_pp_ups(
+        &self,
+        bytes: &mut [u8],
+        offsets: MoveDataOffsets<impl Into<usize>>,
+        index: usize,
+        value: u8,
+    ) {
+        match self {
+            PpUpStorage::SingleByte => Self::write_pp_ups_single_byte(bytes, offsets, index, value),
+            PpUpStorage::FourBytes => bytes[offsets.pp_ups.into() + index] = value,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
-pub struct MoveDataOffsets {
-    pub moves: usize,
-    pub pp: usize,
-    pub pp_ups: usize,
+pub struct MoveDataOffsets<T: Into<usize> = usize> {
+    pub moves: T,
+    pub pp: T,
+    pub pp_ups: T,
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]

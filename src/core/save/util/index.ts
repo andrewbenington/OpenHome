@@ -1,8 +1,9 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ConvertStrategy, ExtraFormIndex, OriginGame, PkmFormat } from '@pkm-rs/pkg'
-import { SAV } from '../interfaces'
+import { PluginSAV, SAV } from '../interfaces'
 import { PathData } from './path'
+import { TransferRestrictions } from './TransferRestrictions'
 
 export const SIZE_SM = 0x6be00
 export const SIZE_USUM = 0x6cc00
@@ -29,6 +30,11 @@ export interface SAVClass<S extends SAV = SAV> {
   saveTypeID: string
   saveTypeAbbreviation: string
   getPluginIdentifier?: () => string
+}
+
+export interface PluginSaveClass<S extends PluginSAV = PluginSAV> extends SAVClass<S> {
+  transferRestrictions: TransferRestrictions
+  getPluginIdentifier: () => string
 }
 
 export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never

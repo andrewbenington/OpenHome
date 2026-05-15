@@ -122,7 +122,7 @@ const PokemonDetailsModal = (props: {
     }
 
     if (newFormat === 'OHPKM') {
-      setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon))
+      setDisplayMon(mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon))
       return
     }
 
@@ -146,7 +146,7 @@ const PokemonDetailsModal = (props: {
           setDisplayMon(P.fromOhpkm(mon, defaultConvertStrategy))
         }
       } else {
-        setDisplayMon(P.fromOhpkm(new OHPKM(mon), defaultConvertStrategy))
+        setDisplayMon(P.fromOhpkm(OHPKM.fromMonUnknownSave(mon), defaultConvertStrategy))
       }
     } catch (e) {
       console.error(e)

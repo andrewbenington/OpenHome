@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using PKHeX.Core;
 
-public static class Util
+public static partial class Util
 {
 
   public static object SpeciesAndForm(PKM pk)
@@ -34,6 +34,18 @@ public static class Util
       _ => throw new ArgumentException($"Unexpected marking color: {color}"),
     };
   }
+
+  public static object MarkingsFourShapes(IAppliedMarkings3 pk)
+  {
+    return new
+    {
+      circle = pk.MarkingCircle,
+      square = pk.MarkingSquare,
+      triangle = pk.MarkingTriangle,
+      heart = pk.MarkingHeart,
+    };
+  }
+
 
   public static object MarkingsSixShapesColors(IAppliedMarkings7 pk)
   {
@@ -81,7 +93,15 @@ public static class Util
 
   static object FormatMoveName(int moveId, GameStrings strings)
   {
+    try
+    {
+      
     return moveId == 0 ? "<empty>" : strings.movelist.GetValue(moveId);
+    }
+    catch (Exception)
+    {
+      return $"<invalid move: {moveId}>";
+    }
   }
 
   static object MoveData(PKM pk, int moveIndex, GameStrings strings)
@@ -138,7 +158,12 @@ public static class Util
 
   static string ReformatRibbonName(string s)
   {
-    var parts = Regex.Split(s, @"(?=[A-Z])").Where(p => p.Length > 0).ToArray();
+    if (s == "RibbonChampionG3")
+    {
+      s = "RibbonChampion";
+    }
+    
+    var parts = RibbonRegex().Split(s).Where(p => p.Length > 0).ToArray();
     if (parts.Length == 3 && parts[1] == "Champion")
     {
       return $"{parts[2]} {parts[1]} {parts[0]}";
@@ -248,4 +273,7 @@ public static class Util
   {
     return strings.balllist.GetValue(pk.Ball).ToString().Replace(" Ball", "").Replace("Poke", "Poké");
   }
+
+  [GeneratedRegex(@"(?=[A-Z])")]
+  private static partial Regex RibbonRegex();
 }

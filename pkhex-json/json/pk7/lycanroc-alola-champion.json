@@ -49,6 +49,7 @@
   "super_training_dist_flags": 0,
   "form_argument": 0,
   "nickname": "Remus",
+  "nickname_trash": "520065006D007500730000006F00630000000000000000000000",
   "moves": [
     {
       "move_index": "Crunch",
@@ -165,5 +166,6 @@
     "spa": 140,
     "spd": 178,
     "spe": 258
-  }
+  },
+  "level": 100
 }

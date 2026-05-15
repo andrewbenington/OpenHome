@@ -71,8 +71,7 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm> {
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return false
-    return !isRestricted(USUM_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+    return !isRestricted(USUM_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

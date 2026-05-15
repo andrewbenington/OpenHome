@@ -57,6 +57,5 @@
   "rust-analyzer.cargo.features": "all",
   "css.completion.completePropertyWithSemicolon": false,
   "rust-analyzer.cargo.targetDir": true,
-  "python.defaultInterpreterPath": "generate/.venv/bin/python",
   "python.terminal.activateEnvironment": true
 }

@@ -4,7 +4,6 @@ import { dvsFromIVs, getBaseMon } from '@openhome-core/pkm/util'
 import { Option } from '@openhome-core/util/functional'
 import { PKMFormeRef } from '@openhome-core/util/types'
 import { MetadataSummaryLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { generatePersonalityValuePreservingAttributes } from '@pokemon-files/util'
 import { gen12StringToUTF, utf16StringToGen12 } from '../save/util/Strings'
 import { bytesToString } from '../save/util/byteLogic'
 
@@ -81,12 +80,12 @@ export const getMonGen345Identifier = (mon: PKMInterface): Option<Gen345Identifi
   const baseMon = getBaseMon(mon.dexNum, mon.formNum)
 
   try {
-    const ohpkm = new OHPKM(mon)
+    const ohpkm = OHPKM.fromMonUnknownSave(mon)
     let pk3CompatiblePID
 
     if (mon instanceof OHPKM) {
       // Get the personality value that will be generated
-      pk3CompatiblePID = generatePersonalityValuePreservingAttributes(mon)
+      pk3CompatiblePID = mon.generatePk3CompatiblePid()
     } else if (mon.personalityValue !== undefined) {
       pk3CompatiblePID = mon.personalityValue
     } else {

@@ -11,7 +11,7 @@ export class BW2SAV extends G5SAV {
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     if (extraFormIndex !== undefined) return false
-    return !isRestricted(BW2_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+    return !isRestricted(BW2_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

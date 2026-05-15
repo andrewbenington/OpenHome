@@ -1,9 +1,9 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ConvertStrategies, Language, Lookup } from '@pkm-rs/pkg'
 import { fail } from 'assert'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { resolve } from 'path'
-import { beforeAll, describe, expect, test } from 'vitest'
+import { readFileSync } from 'fs'
+import path, { resolve } from 'path'
+import { assert, beforeAll, describe, expect, test } from 'vitest'
 import { G3RRSAV } from '../radicalred/G3RRSAV'
 import PK3RR from '../radicalred/PK3RR'
 import { PathData } from '../util/path'
@@ -11,13 +11,16 @@ import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
 
+function saveTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'save-files', ...pathElements)
+}
+
 describe('G3RRSAV - Radical Red Save File Read Test', () => {
   let radicalRedSave: G3RRSAV
   let saveBytes: Uint8Array
 
   beforeAll(() => {
-    const savePath = resolve(__dirname, 'save-files/radicalred.sav')
-
+    const savePath = saveTestFilePath('radicalred.sav')
     saveBytes = new Uint8Array(readFileSync(savePath))
 
     const parsedPath: PathData = {
@@ -105,25 +108,24 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
 describe('G3RRSAV - Radical Red Save File Write Test', () => {
   let radicalRedSave: G3RRSAV
   let saveBytes: Uint8Array
+  const savePathData: PathData = {
+    raw: 'save-files/radicalred.sav',
+    name: 'radical red',
+    dir: 'save-files',
+    ext: '.sav',
+    separator: '/',
+  }
 
   beforeAll(() => {
     const savePath = resolve(__dirname, 'save-files/radicalred.sav')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
-    const parsedPath: PathData = {
-      raw: 'save-files/radicalred.sav',
-      name: 'radical red',
-      dir: 'save-files',
-      ext: '.sav',
-      separator: '/',
-    }
-
-    radicalRedSave = new G3RRSAV(parsedPath, saveBytes)
+    radicalRedSave = new G3RRSAV(savePathData, saveBytes)
     const firstMon = radicalRedSave.boxes[0].boxSlots[0]
 
     if (firstMon) {
-      const newMon = new OHPKM(firstMon)
+      const newMon = OHPKM.fromMonInSave(firstMon, radicalRedSave)
 
       newMon.nickname = 'ModTest'
       radicalRedSave.boxes[0].boxSlots[0] = PK3RR.fromOhpkm(newMon, ConvertStrategies.getDefault())
@@ -131,44 +133,22 @@ describe('G3RRSAV - Radical Red Save File Write Test', () => {
       // radicalRedSave.boxes[0].pokemon[0].moves[0] = 101;
 
       radicalRedSave.updatedBoxSlots.push({ box: 0, boxSlot: 0 })
-      radicalRedSave.prepareForSaving()
     }
   })
 
   test('should modify a Pokémon and save changes to a new file', () => {
     // Modify the nickname, held item, or other properties of the first Pokémon in the first box
+    const modifiedSave = new G3RRSAV(savePathData, saveBytes)
+    const firstMon = modifiedSave.getMonAt(0, 0)
 
-    if (radicalRedSave.boxes[0].boxSlots[0]) {
-      const newSavePath = resolve(__dirname, 'save-files/radicalred_modified.sav')
+    expect(firstMon).toBeDefined()
+    assert(firstMon !== undefined)
 
-      writeFileSync(newSavePath, radicalRedSave.bytes)
+    firstMon.nickname = 'ModTest'
+    modifiedSave.setMonAt(0, 0, firstMon)
+    modifiedSave.prepareForSaving()
 
-      const fileExists = existsSync(newSavePath)
-
-      expect(fileExists).toBe(true)
-    } else {
-      fail('No Pokémon found in the first box, first slot.')
-    }
-  })
-
-  test('should check if modifications were made', () => {
-    const parsedPath: PathData = {
-      raw: 'save-files/radicalred_modified.sav',
-      name: 'radical red',
-      dir: 'save-files',
-      ext: '.sav',
-      separator: '/',
-    }
-
-    const newSavePath = resolve(__dirname, 'save-files/radicalred_modified.sav')
-    const fileExists = existsSync(newSavePath)
-
-    expect(fileExists).toBe(true)
-
-    const modifiedSaveBytes = new Uint8Array(readFileSync(newSavePath))
-    const modifiedRadicalRedSave = new G3RRSAV(parsedPath, modifiedSaveBytes)
-
-    const mon = modifiedRadicalRedSave.boxes[0].boxSlots[0]
-    expect(mon?.nickname).toBe('ModTest')
+    const rebuiltSave = new G3RRSAV(savePathData, modifiedSave.prepareWriter().bytes)
+    expect(rebuiltSave.getMonAt(0, 0)?.nickname).toBe('ModTest')
   })
 })

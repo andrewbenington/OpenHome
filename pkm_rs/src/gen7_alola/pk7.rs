@@ -4,6 +4,7 @@ use crate::checksum::{Checksum, RefreshChecksum};
 use crate::convert_strategy::ConvertStrategy;
 use crate::encryption;
 use crate::gen7_alola::pk7_buffer::{Pk7BufferMut, Pk7BufferRef};
+use crate::gen7_alola::{Pk7AbilityIndex, Pk7SpeciesAndForm};
 use crate::result::{Error, Result};
 use crate::traits::{AsBytesMut, ModernEvs};
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
@@ -12,6 +13,7 @@ use pkm_rs_derive::IsShiny4096;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::helpers;
+use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
@@ -35,9 +37,6 @@ use pkm_rs_resources::abilities::AbilityIndexWasm;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
-const NEUROFORCE: u16 = 233;
-type Pk7AbilityIndex = AbilityIndexBounded<NEUROFORCE>;
-
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
@@ -45,7 +44,8 @@ pub struct Pk7 {
     pub encryption_constant: u32,
     pub sanity: u16,
     pub checksum: u16,
-    pub species_and_form: SpeciesAndForm,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub species_and_form: Pk7SpeciesAndForm,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -58,6 +58,7 @@ pub struct Pk7 {
     pub nature: NatureIndex,
     pub is_fateful_encounter: bool,
     pub gender: Gender,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
     pub contest: ContestStats,
     pub resort_event_status: u8,
@@ -76,6 +77,7 @@ pub struct Pk7 {
     pub relearn_moves: [MoveIndex; 4],
     pub secret_super_training_unlocked: bool,
     pub secret_super_training_complete: bool,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ivs: Stats8,
     pub is_egg: bool,
     pub is_nicknamed: bool,
@@ -210,12 +212,12 @@ impl Pk7 {
     pub fn write_to_box_buffer(&self, buf: &mut Pk7BufferMut) {
         buf.set_encryption_constant(self.encryption_constant);
         buf.reset_sanity();
-        buf.set_species_and_form(self.species_and_form);
+        buf.set_species_and_form(self.species_and_form.0);
         buf.set_held_item_index(self.held_item_index);
         buf.set_trainer_id(self.trainer_id);
         buf.set_secret_id(self.secret_id);
         buf.set_exp(self.exp);
-        buf.set_ability_index_raw(self.ability_index.to_u16() as u8);
+        buf.set_ability_index(self.ability_index);
         buf.set_ability_num(self.ability_num);
         buf.set_markings(self.markings);
         buf.set_personality_value(self.personality_value);
@@ -315,20 +317,23 @@ impl Pk7 {
 
     pub fn calculate_stats(&self) -> Stats16Le {
         helpers::calculate_stats_modern(
-            self.species_and_form,
+            MetadataSource::UltraSunUltraMoon,
+            self.species_and_form.0,
             &self.ivs,
             &self.evs,
             self.calculate_level(),
             self.nature.get_metadata(),
         )
+        .unwrap_or_else(|| {
+            panic!(
+                "pk7 has species/form present in ultra sun + moon: {:#?}",
+                self.species_and_form.0
+            )
+        })
     }
 
     pub const fn move_data_offsets() -> MoveDataOffsets {
-        MoveDataOffsets {
-            moves: 90,
-            pp: 98,
-            pp_ups: 102,
-        }
+        super::MOVE_DATA_OFFSETS
     }
 
     pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Vec<u8> {
@@ -387,11 +392,11 @@ impl PkmBytes for Pk7 {
 
 impl HasSpeciesAndForm for Pk7 {
     fn get_species_metadata(&self) -> &'static SpeciesMetadata {
-        self.species_and_form.get_species_metadata()
+        self.species_and_form.0.get_species_metadata()
     }
 
     fn get_forme_metadata(&self) -> &'static FormMetadata {
-        self.species_and_form.get_forme_metadata()
+        self.species_and_form.0.get_forme_metadata()
     }
 
     fn calculate_level(&self) -> u8 {
@@ -509,16 +514,46 @@ impl Pk7 {
     ) -> core::result::Result<(), JsValue> {
         match SpeciesAndForm::new(national_dex, form_index) {
             Ok(species_and_form) => {
-                self.species_and_form = species_and_form;
+                self.species_and_form = species_and_form.try_into()?;
                 Ok(())
             }
             Err(e) => Err(JsValue::from_str(&e.to_string())),
         }
     }
 
+    #[wasm_bindgen(getter = nationalDex)]
+    pub fn national_dex_js(&self) -> u16 {
+        self.species_and_form.0.get_ndex_js()
+    }
+
+    #[wasm_bindgen(getter = formIndex)]
+    pub fn form_index_js(&self) -> u16 {
+        self.species_and_form.0.get_forme_index()
+    }
+
+    #[wasm_bindgen(getter = evs)]
+    pub fn evs_js(&self) -> Stats16Le {
+        self.evs.into()
+    }
+
+    #[wasm_bindgen(setter = evs)]
+    pub fn set_evs_js(&mut self, v: Stats16Le) {
+        self.evs = v.to_stats8_truncated()
+    }
+
+    #[wasm_bindgen(getter = ivs)]
+    pub fn ivs_js(&self) -> Stats16Le {
+        self.ivs.into()
+    }
+
+    #[wasm_bindgen(setter = ivs)]
+    pub fn set_ivs_js(&mut self, v: Stats16Le) {
+        self.ivs = v.to_stats8_truncated()
+    }
+
     #[wasm_bindgen(js_name = toOhpkm)]
-    pub fn to_ohpkm(&self) -> OhpkmV2 {
-        OhpkmV2::from(self)
+    pub fn to_ohpkm(&self) -> Result<OhpkmV2> {
+        OhpkmV2::convert_with_backup(self, &self.to_party_bytes())
     }
 
     #[wasm_bindgen(js_name = isEmptySlot)]
@@ -530,6 +565,23 @@ impl Pk7 {
 impl ModernEvs for Pk7 {
     fn get_evs(&self) -> Stats8 {
         self.evs
+    }
+}
+
+#[cfg(test)]
+impl crate::tests::PkhexJson for Pk7 {
+    fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
+        let mut value = serde_json::to_value(self)?;
+        value["nickname_trash"] = serde_json::json!(
+            self.nickname
+                .bytes()
+                .iter()
+                .map(|b| format!("{:02X}", b))
+                .collect::<String>()
+        );
+        value["level"] = serde_json::json!(self.calculate_level());
+
+        Ok(value)
     }
 }
 
@@ -588,14 +640,16 @@ mod test {
 
     #[test]
     fn nickname_garbage_preserved() -> TestResult<()> {
-        let mon =
-            tests::pkm_from_file::<Pk7>(&PathBuf::from("pk7").join("pelipper-garbage-bytes.pk7"))?
-                .0;
+        let (mon, bytes) =
+            tests::pkm_from_file::<Pk7>(&PathBuf::from("pk7").join("pelipper-garbage-bytes.pk7"))?;
 
         // 'r' at position 14 should be leftover from 'Pelipper'
         assert_eq!(mon.nickname.bytes()[14], b'r');
 
-        let mon_recreated = Pk7::from_ohpkm(&OhpkmV2::from(&mon), ConvertStrategy::default());
+        let mon_recreated = Pk7::from_ohpkm(
+            &OhpkmV2::convert_with_backup(&mon, &bytes)?,
+            ConvertStrategy::default(),
+        );
 
         // leftover 'r' should be preserved after conversion to/from OHPKM
         assert_eq!(mon_recreated.nickname.bytes()[14], b'r');

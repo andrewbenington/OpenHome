@@ -3,7 +3,7 @@ import { ConvertStrategies } from '@pkm-rs/pkg'
 import { PK7 } from '@pokemon-files/pkm'
 import { fail } from 'assert'
 import fs, { readFileSync } from 'fs'
-import path, { resolve } from 'path'
+import path from 'path'
 import { OHPKM } from 'src/core/pkm/OHPKM'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { BW2SAV } from '../BW2SAV'
@@ -26,6 +26,10 @@ import { XYSAV } from '../XYSAV'
 import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
+
+function saveTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'save-files', ...pathElements)
+}
 
 const saveTypesByFilename = {
   'crystal.sav': 'Crystal',
@@ -86,7 +90,7 @@ describe('Handler trainers', () => {
   let saveBytes: Uint8Array
 
   beforeAll(() => {
-    const savePath = resolve(__dirname, 'save-files/ultrasun')
+    const savePath = saveTestFilePath('ultrasun')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
@@ -100,10 +104,7 @@ describe('Handler trainers', () => {
 
     ultraSunSave = new Gen7AlolaSave(parsedPath, saveBytes)
 
-    emeraldSave = new G3SAV(
-      emptyPathData,
-      readFileSync(path.join(__dirname, 'save-files', 'emerald.sav'))
-    )
+    emeraldSave = new G3SAV(emptyPathData, readFileSync(saveTestFilePath('emerald.sav')))
 
     if (emeraldSave === undefined) {
       fail(`Failed to build save file: got undefined`)

@@ -74,8 +74,7 @@ export class DPSAV extends G4SAV {
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return false
-    return !isRestricted(DP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+    return !isRestricted(DP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

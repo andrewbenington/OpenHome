@@ -1,0 +1,92 @@
+{
+  "sanity": 0,
+  "checksum": 32690,
+  "pokemon_index": 397,
+  "held_item_index": null,
+  "trainer_id": 34978,
+  "secret_id": 48423,
+  "exp": 1250000,
+  "has_species_data": true,
+  "is_bad_egg": false,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 3861304239,
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 252,
+    "atk": 6,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 252
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus_byte": 0,
+  "ribbons": [],
+  "nickname": "SALAMENCE",
+  "nickname_trash": "CDBBC6BBC7BFC8BDBFFF",
+  "moves": [
+    {
+      "move_index": "Dragon Claw",
+      "pp": 24,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Crunch",
+      "pp": 24,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Fly",
+      "pp": 24,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Flamethrower",
+      "pp": 24,
+      "pp_ups": 3
+    }
+  ],
+  "ivs": {
+    "hp": 6,
+    "atk": 9,
+    "def": 9,
+    "spa": 28,
+    "spd": 7,
+    "spe": 16
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_friendship": 159,
+  "met_location_index": 63,
+  "ball": "Pok\u00E9",
+  "met_level": 30,
+  "trainer_gender": "Male",
+  "game_of_origin": "Emerald",
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 100,
+  "current_hp": 369,
+  "stats": {
+    "hp": 369,
+    "atk": 285,
+    "def": 174,
+    "spa": 253,
+    "spd": 154,
+    "spe": 312
+  },
+  "level": 100
+}

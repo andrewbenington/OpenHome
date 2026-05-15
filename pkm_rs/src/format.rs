@@ -1,8 +1,8 @@
+use super::location::{LinkTradeIndex, Location};
 use crate::location::{self, MetData};
 use crate::ohpkm::OhpkmV2;
 
-use super::location::{LinkTradeIndex, Location};
-use pkm_rs_resources::species::form_metadata::MetadataSource;
+use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_types::{Generation, OriginGame};
 
 #[cfg(feature = "wasm")]

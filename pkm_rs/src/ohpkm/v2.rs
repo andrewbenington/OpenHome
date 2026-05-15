@@ -1,49 +1,44 @@
 use std::num::NonZeroU64;
 
-use super::sectioned_data::{DataSection, SectionTag, SectionedData};
 use super::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
-    Notes, PastHandlerDataV2, PluginData, ScarletVioletData, SwordShieldData,
+    Notes, PluginData, ScarletVioletData, SwordShieldData,
 };
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
 use crate::ohpkm::deprecated::PastHandlerDataV1;
 use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::v1::OhpkmV1;
-use crate::ohpkm::v2_sections::MonTags;
-use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, UnconvertedPkm};
+use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
+use crate::ohpkm::v2_sections::{MonTags, PastHandlerDataV2};
 use crate::result::{Error, Result};
+use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::species::SpeciesMetadata;
-use pkm_rs_types::{AbilityNumber, BinaryGender};
-use pkm_rs_types::{Language, TrainerData};
+use pkm_rs_types::strings::SizedUtf16String;
+use pkm_rs_types::{
+    AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining,
+    Language, MarkingsSixShapesColors, OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le,
+    StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory,
+};
+
 use serde::Serialize;
 use strum_macros::Display;
 
-use pkm_rs_resources::{
-    ball::Ball,
-    moves::MoveIndex,
-    natures::NatureIndex,
-    ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet},
-    species::SpeciesAndForm,
-};
-
-use pkm_rs_types::{
-    ContestStats, FlagSet, Gender, Geolocations, HyperTraining, MarkingsSixShapesColors,
-    OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le, StatsPreSplit, TeraType, TeraTypeWasm,
-    TrainerMemory, strings::SizedUtf16String,
-};
+use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::moves::MoveIndex;
+use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
+use pkm_rs_resources::species::SpeciesAndForm;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
 #[cfg(feature = "wasm")]
 use super::JsResult;
-#[cfg(feature = "wasm")]
-use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
 #[cfg(feature = "wasm")]
@@ -233,6 +228,25 @@ pub struct OhpkmV2 {
 }
 
 impl OhpkmV2 {
+    pub fn convert_without_backup<PKM: OhpkmConvert>(other: &PKM) -> Self {
+        Self {
+            main_data: other.to_main_data(),
+            gen67_data: other.to_gen_67_data(),
+            ..Default::default()
+        }
+    }
+
+    pub fn convert_with_backup<PKM: OhpkmConvert>(
+        other: &PKM,
+        original_bytes: &[u8],
+    ) -> Result<Self> {
+        let mut ohpkm = Self::convert_without_backup(other);
+        let stored_bytes = PKM::bytes_to_stored(original_bytes)?;
+        ohpkm.set_original_data_bytes(stored_bytes);
+
+        Ok(ohpkm)
+    }
+
     pub fn openhome_id(&self) -> String {
         self.main_data.openhome_id()
     }
@@ -450,8 +464,8 @@ impl OhpkmV2 {
         self.main_data.ivs
     }
 
-    pub const fn set_ivs(&mut self, v: &Stats8) {
-        self.main_data.ivs = *v;
+    pub const fn set_ivs(&mut self, v: Stats8) {
+        self.main_data.ivs = v;
     }
 
     pub const fn is_egg(&self) -> bool {
@@ -769,17 +783,6 @@ impl OhpkmV2 {
             .map(DsGen3Ribbon::to_openhome)
             .for_each(|r| self.main_data.ribbons.add_ribbon(r));
     }
-
-    //
-    // pub fn set_species_and_form(&mut self, national_dex: u16, form_index: u16) -> JsResult<()> {
-    //     match SpeciesAndForm::new(national_dex, form_index) {
-    //         Ok(species_and_form) => {
-    //             self.main_data.species_and_form = species_and_form;
-    //             Ok(())
-    //         }
-    //         Err(e) => Err(JsValue::from_str(&e.to_string())),
-    //     }
-    // }
 
     // Plugins
 
@@ -1509,16 +1512,24 @@ impl OhpkmV2 {
         self.most_recent_save.clone()
     }
 
-    pub fn get_started_tracking_seconds(&self) -> Option<NonZeroU64> {
+    pub const fn get_started_tracking_seconds(&self) -> Option<NonZeroU64> {
         self.main_data.started_tracking_seconds
     }
 
-    pub fn set_started_tracking_if_missing(
+    pub const fn set_started_tracking_if_missing(
         &mut self,
         started_tracking_seconds: Option<NonZeroU64>,
     ) {
         self.main_data
             .with_timestamp_if_missing(started_tracking_seconds);
+    }
+
+    pub fn original_data_bytes(&self) -> Option<StoredPkmBytes> {
+        self.original_data.map(|data| *data.tagged_bytes())
+    }
+
+    pub const fn set_original_data_bytes(&mut self, original_bytes: StoredPkmBytes) {
+        self.original_data = Some(OriginalBackup::new(original_bytes));
     }
 
     // Calculated
@@ -1995,12 +2006,12 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = evsWasm)]
-    pub fn evs_js(&self) -> Stats8 {
-        self.evs()
+    pub fn evs_js(&self) -> Stats16Le {
+        self.evs().into()
     }
     #[wasm_bindgen(setter = evsWasm)]
-    pub fn set_evs_js(&mut self, v: &Stats8) {
-        self.set_evs(v);
+    pub fn set_evs_js(&mut self, v: Stats16Le) {
+        self.set_evs(&v.try_into().expect("evs should not exceed 255 each"));
     }
 
     #[wasm_bindgen(getter = contestWasm)]
@@ -2094,13 +2105,13 @@ impl OhpkmV2 {
         self.set_scale(v);
     }
 
-    #[wasm_bindgen(getter = ivsWasm)]
-    pub fn ivs_js(&self) -> Stats8 {
-        self.ivs()
+    #[wasm_bindgen(getter = ivs)]
+    pub fn ivs_js(&self) -> Stats16Le {
+        self.ivs().into()
     }
-    #[wasm_bindgen(setter = ivsWasm)]
-    pub fn set_ivs_js(&mut self, v: &Stats8) {
-        self.set_ivs(v);
+    #[wasm_bindgen(setter = ivs)]
+    pub fn set_ivs_js(&mut self, v: &Stats16Le) {
+        self.set_ivs(v.to_stats8_truncated());
     }
 
     #[wasm_bindgen(getter = isEgg)]
@@ -2523,7 +2534,7 @@ impl OhpkmV2 {
 
     // Game Boy
 
-    #[wasm_bindgen(getter = dvsWasm)]
+    #[wasm_bindgen(getter = dvs)]
     pub fn dvs_js(&self) -> StatsPreSplit {
         match self.gameboy_data {
             Some(data) => data.dvs,
@@ -2536,12 +2547,12 @@ impl OhpkmV2 {
         Some(self.gameboy_data?.met_time_of_day)
     }
 
-    #[wasm_bindgen(getter = evsG12Wasm)]
+    #[wasm_bindgen(getter = evsG12)]
     pub fn evs_g12_js(&self) -> Option<StatsPreSplit> {
         Some(self.gameboy_data?.evs_g12)
     }
 
-    #[wasm_bindgen(setter = evsG12Wasm)]
+    #[wasm_bindgen(setter = evsG12)]
     pub fn update_evs_g12_js(&mut self, value: StatsPreSplit) {
         if let Some(gameboy_data) = &mut self.gameboy_data {
             gameboy_data.evs_g12 = value
@@ -2851,12 +2862,12 @@ impl OhpkmV2 {
         }
     }
 
-    #[wasm_bindgen(getter = avsWasm)]
+    #[wasm_bindgen(getter = avs)]
     pub fn avs_js(&self) -> Option<Stats16Le> {
         Some(self.gen67_data?.avs)
     }
 
-    #[wasm_bindgen(setter = avsWasm)]
+    #[wasm_bindgen(setter = avs)]
     pub fn set_avs_js(&mut self, value: Option<Stats16Le>) {
         match value {
             Some(avs) => self.gen67_data.get_or_insert_default().avs = avs,
@@ -2969,15 +2980,18 @@ impl OhpkmV2 {
 
     // Legends Arceus
 
-    #[wasm_bindgen(getter = gvsWasm)]
-    pub fn gvs_js(&self) -> Option<Stats8> {
-        Some(self.la_data?.gvs)
+    #[wasm_bindgen(getter = gvs)]
+    pub fn gvs_js(&self) -> Option<Stats16Le> {
+        Some(self.la_data?.gvs.into())
     }
 
-    #[wasm_bindgen(setter = gvsWasm)]
-    pub fn set_gvs_js(&mut self, value: Option<Stats8>) {
+    #[wasm_bindgen(setter = gvs)]
+    pub fn set_gvs_js(&mut self, value: Option<Stats16Le>) {
         match value {
-            Some(gvs) => self.la_data.get_or_insert_default().gvs = gvs,
+            Some(gvs) => {
+                self.la_data.get_or_insert_default().gvs =
+                    gvs.try_into().expect("gvs should not exceed 9 each")
+            }
             None => {
                 if let Some(la_data) = &mut self.la_data {
                     la_data.gvs = Stats8::default()
@@ -3388,7 +3402,7 @@ impl OhpkmV2 {
 
     // Original Data
     #[wasm_bindgen(getter = originalData)]
-    pub fn original_data(&self) -> Option<OriginalDataJs> {
+    pub fn original_data_js(&self) -> Option<OriginalDataJs> {
         self.original_data.map(|d| OriginalDataJs {
             tag: d.tag(),
             data: d.data_as_bytes().to_vec(),
@@ -3396,7 +3410,7 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(js_name = trySetOriginalData)]
-    pub fn try_set_original_data(&mut self, tag: pkm_bytes::Tag, data: Vec<u8>) -> Result<()> {
+    pub fn try_set_original_data_js(&mut self, tag: pkm_bytes::Tag, data: Vec<u8>) -> Result<()> {
         let pkm_bytes = StoredPkmBytes::new(tag, &data)?;
 
         self.original_data = Some(OriginalBackup::new(pkm_bytes));
@@ -3557,16 +3571,6 @@ impl HasSpeciesAndForm for OhpkmV2 {
         self.get_species_metadata()
             .level_up_type
             .calculate_level(self.main_data.exp)
-    }
-}
-
-impl<T: OhpkmConvert> From<&T> for OhpkmV2 {
-    fn from(pkm: &T) -> Self {
-        Self {
-            main_data: pkm.to_main_data(),
-            gen67_data: pkm.to_gen_67_data(),
-            ..Default::default()
-        }
     }
 }
 

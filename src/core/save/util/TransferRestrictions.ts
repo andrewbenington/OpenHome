@@ -1,3 +1,4 @@
+import { ExtraFormIndex } from '@pkm-rs/pkg'
 import {
   BASE,
   BLOOD_MOON,
@@ -19,6 +20,11 @@ export interface TransferRestrictions {
   transferableDexNums?: number[]
   // e.g. Alolan forms in BDSP
   excludedForms?: FormRestrictions
+  // forms that are one of the following:
+  //  - fanmade (e.g. Sevii forms)
+  //  - never given an official form index (e.g. gigantamax forms)
+  //  - had their form index given to other forms (e.g. cosplay Pikachu)
+  supportsExtraForm?: (extraForm: ExtraFormIndex) => boolean
 }
 
 export const CapPikachus: FormRestrictions = {
@@ -153,10 +159,14 @@ export const RegionalForms: FormRestrictions = {
 export const isRestricted = (
   restrictions: TransferRestrictions,
   dexNum: number,
-  formNum?: number
+  formNum?: number,
+  extraFormIndex?: ExtraFormIndex
 ) => {
-  const { maxDexNum, transferableDexNums, excludedForms } = restrictions
+  const { maxDexNum, transferableDexNums, excludedForms, supportsExtraForm } = restrictions
 
+  if (extraFormIndex && !supportsExtraForm?.(extraFormIndex)) {
+    return true
+  }
   if (maxDexNum && dexNum > maxDexNum) {
     return true
   }

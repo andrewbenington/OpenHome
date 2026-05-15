@@ -76,7 +76,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
 
     for (const mon of mons) {
       try {
-        const identifier = getMonFileIdentifier(new OHPKM(mon))
+        const identifier = getMonFileIdentifier(OHPKM.fromMonUnknownSave(mon))
 
         if (!identifier) continue
 
@@ -165,7 +165,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
               />
             </Flex>
           </div>
-          <Grid columns={save.boxColumns.toString()} gap="1" p="1">
+          <Grid className="box-grid" columns={save.boxColumns.toString()} gap="1" p="1">
             {range(save.boxColumns * save.boxRows)
               .map((index: number) => save.getMonAt(save.currentPCBox, index))
               .map((_, index) => {

@@ -206,12 +206,17 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <AttributeRow label="Gen 4 Encounter Type" value={EncounterTypes[mon.encounterType]} />
           )}
         {mon.shinyLeaves !== undefined &&
-          !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) && (
+          !isRestricted(
+            HGSS_TRANSFER_RESTRICTIONS,
+            mon.dexNum,
+            mon.formNum,
+            mon.extraFormIndex
+          ) && (
             <AttributeRow label="Shiny Leaves">
               <ShinyLeavesDisplay leaves={mon.shinyLeaves} />
             </AttributeRow>
           )}
-        {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+        {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.geolocations &&
           mon.geolocations[0].country > 0 && (
             <AttributeRowExpand
@@ -229,7 +234,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               )}
             </AttributeRowExpand>
           )}
-        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formNum) &&
+        {!isRestricted(
+          SWSH_TRANSFER_RESTRICTIONS_CT,
+          mon.dexNum,
+          mon.formNum,
+          mon.extraFormIndex
+        ) &&
           mon.trFlagsSwSh &&
           getFlagsInArrayRange(mon.trFlagsSwSh, 0, 14).length > 0 && (
             <AttributeRowExpand
@@ -243,7 +253,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               ))}
             </AttributeRowExpand>
           )}
-        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.tmFlagsBDSP &&
           getFlagsInArrayRange(mon.tmFlagsBDSP, 0, 14).length > 0 && (
             <AttributeRowExpand
@@ -257,7 +267,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               ))}
             </AttributeRowExpand>
           )}
-        {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+        {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.tutorFlagsLA &&
           getFlagsInArrayRange(mon.tutorFlagsLA, 0, 8).length > 0 && (
             <AttributeRowExpand
@@ -272,7 +282,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             </AttributeRowExpand>
           )}
 
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formNum) &&
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.tmFlagsSV &&
           getFlagsInArrayRange(mon.tmFlagsSV, 0, 22).length > 0 && (
             <AttributeRowExpand
@@ -287,8 +297,13 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             </AttributeRowExpand>
           )}
 
-        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formNum) ||
-          !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum)) &&
+        {(!isRestricted(
+          SWSH_TRANSFER_RESTRICTIONS_CT,
+          mon.dexNum,
+          mon.formNum,
+          mon.extraFormIndex
+        ) ||
+          !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex)) &&
           mon.trainerMemory && (
             <AttributeRowExpand summary="Trainer Memory" value={mon.trainerName}>
               <AttributeRow
@@ -311,7 +326,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               </AttributeRow>
             </AttributeRowExpand>
           )}
-        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formNum) &&
+        {!isRestricted(
+          SWSH_TRANSFER_RESTRICTIONS_CT,
+          mon.dexNum,
+          mon.formNum,
+          mon.extraFormIndex
+        ) &&
           mon.dynamaxLevel !== undefined && (
             <>
               <AttributeRow label="Dynamax">
@@ -326,9 +346,9 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               )}
             </>
           )}
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formNum) &&
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           hasTeraTypes(mon) && <TeraTypeData mon={mon} />}
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formNum) &&
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.obedienceLevel !== undefined && (
             <AttributeRow label="Obedience" value={mon.obedienceLevel.toString()} />
           )}
@@ -363,13 +383,13 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             )}
           </>
         )}
-        {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) && (
+        {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) && (
           <AttributeRow
             label="Gen 1/2 ID"
             value={getMonGen12Identifier(mon as PKMInterface & { dvs: StatsPreSplit })}
           />
         )}
-        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           (mon instanceof PK3 ||
             mon instanceof PK4 ||
             mon instanceof PK5 ||
