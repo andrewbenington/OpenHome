@@ -308,8 +308,8 @@ impl PkmFormat {
         }
 
         if self.generation() >= Generation::G5 && legalized_origin.generation() <= Generation::G4 {
-            // Pokémon transferred up through Gen 5 have their location reset to the Poké Transfer Lab
-            return super::location::POKE_TRANSFER_LAB_GEN_5;
+            // Pokémon brought up through Gen V Poké Transfer use the transfer met index, not the Lab map index
+            return super::location::POKE_TRANSFER_MET_LOCATION_GEN_5;
         }
 
         let origin_was_changed = original_origin != legalized_origin;
@@ -338,7 +338,7 @@ impl PkmFormat {
             },
             Self::PK4 => location::gen4::index_of(location),
             Self::PK5 => match location {
-                Location::PokeTransferLab => Some(super::location::POKE_TRANSFER_LAB_GEN_5),
+                Location::PokeTransferLab => Some(super::location::POKE_TRANSFER_LAB_INDEX_GEN_5),
                 Location::LinkTrade => Some(30002),
                 Location::KantoGen3 => Some(30004),
                 Location::JohtoGen4 => Some(30005),
