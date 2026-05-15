@@ -225,7 +225,7 @@ impl LevelUpType {
             .unwrap_or(100) as u8
     }
 
-    pub fn get_min_exp_for_level(&self, level: u8) -> u32 {
+    pub const fn get_min_exp_for_level(&self, level: u8) -> u32 {
         if level > 100 || level == 0 {
             return 0;
         }
