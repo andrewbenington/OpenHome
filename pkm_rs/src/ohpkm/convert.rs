@@ -3,10 +3,10 @@ mod pk3;
 #[cfg(feature = "wasm")]
 mod pk7;
 
+use crate::convert_strategy::ConvertStrategy;
+use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::Result;
-use crate::{
-    convert_strategy::ConvertStrategy, ohpkm::v2_sections::pkm_bytes::StoredPkmBytes, traits::Pkm,
-};
+use crate::traits::Pkm;
 
 use super::v2_sections::{Gen67Data, MainDataV2};
 
