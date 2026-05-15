@@ -18,22 +18,21 @@ use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::species::SpeciesMetadata;
+use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining,
     Language, MarkingsSixShapesColors, OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le,
-    StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory, strings::SizedUtf16String,
+    StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory,
 };
 
 use serde::Serialize;
 use strum_macros::Display;
 
-use pkm_rs_resources::{
-    ball::Ball,
-    moves::MoveIndex,
-    natures::NatureIndex,
-    ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet},
-    species::SpeciesAndForm,
-};
+use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::moves::MoveIndex;
+use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
+use pkm_rs_resources::species::SpeciesAndForm;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -3574,16 +3573,6 @@ impl HasSpeciesAndForm for OhpkmV2 {
             .calculate_level(self.main_data.exp)
     }
 }
-
-// impl<T: OhpkmConvert> From<&T> for OhpkmV2 {
-//     fn from(pkm: &T) -> Self {
-//         Self {
-//             main_data: pkm.to_main_data(),
-//             gen67_data: pkm.to_gen_67_data(),
-//             ..Default::default()
-//         }
-//     }
-// }
 
 impl IsShiny for OhpkmV2 {
     fn is_shiny(&self) -> bool {

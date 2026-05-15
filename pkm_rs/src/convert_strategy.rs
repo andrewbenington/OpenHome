@@ -1,5 +1,5 @@
-// #[cfg(feature = "wasm")]
-// pub mod wasm;
+use crate::convert_strategy::option::{BoolOption, SettingType, StringOption};
+use crate::convert_strategy::personality_value::NatureStrategy;
 
 mod converter;
 mod personality_value;
@@ -16,10 +16,6 @@ use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use crate::convert_strategy::{
-    option::{BoolOption, SettingType, StringOption},
-    personality_value::NatureStrategy,
-};
 pub use converter::PkmConverter;
 pub use personality_value::PidModificationStrategy;
 
