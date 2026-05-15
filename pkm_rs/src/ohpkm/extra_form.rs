@@ -1,5 +1,6 @@
 use pkm_rs_resources::ExpectLog;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
+use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::species::EggGroup;
 use pkm_rs_resources::species::FormMetadata;
 use pkm_rs_resources::species::GenderRatio;
@@ -7,7 +8,6 @@ use pkm_rs_resources::species::MegaEvolutionMetadata;
 use pkm_rs_resources::species::NatDexIndex;
 use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_resources::species::SpeciesMetadata;
-use pkm_rs_resources::species::form_metadata::MetadataSource;
 use pkm_rs_resources::species::form_metadata::types_lookup;
 use pkm_rs_types::AbilityNumber;
 use pkm_rs_types::GameSetting;
@@ -21,7 +21,7 @@ use strum::IntoEnumIterator;
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::species::form_metadata::current_base_stats;
 #[cfg(feature = "wasm")]
-use pkm_rs_types::{Gender, Stats8};
+use pkm_rs_types::{Gender, Stats16Le};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -766,26 +766,26 @@ impl ExtraFormMetadata {
             is_battle_only: base_form_metadata.is_battle_only,
             is_cosmetic: base_form_metadata.is_cosmetic,
             gender_ratio: base_form_metadata.gender_ratio,
-            abilities: base_form_metadata.abilities.clone(),
+            abilities: base_form_metadata.abilities,
             hidden_ability: base_form_metadata.hidden_ability,
             base_height: base_form_metadata.base_height,
             base_weight: base_form_metadata.base_weight,
             evolutions: base_form_metadata.evolutions,
             pre_evolution: base_form_metadata.pre_evolution,
-            egg_groups: base_form_metadata.egg_groups.clone(),
+            egg_groups: base_form_metadata.egg_groups,
             introduced: base_form_metadata.introduced,
             is_restricted_legend: base_form_metadata.is_restricted_legend,
             is_sub_legend: base_form_metadata.is_sub_legend,
             is_mythical: base_form_metadata.is_mythical,
             is_ultra_beast: base_form_metadata.is_ultra_beast,
             is_paradox: base_form_metadata.is_paradox,
-            regional: base_form_metadata.regional.clone(),
+            regional: base_form_metadata.regional,
             sprite: form.sprite_name().unwrap_or(base_form_metadata.sprite()),
             sprite_index: base_form_metadata.sprite_index,
         }
     }
     pub const fn forme_ref(&self) -> SpeciesAndForm {
-        unsafe { SpeciesAndForm::new_unchecked(self.national_dex.get(), self.form_index) }
+        unsafe { SpeciesAndForm::new_unchecked(self.national_dex.to_u16(), self.form_index) }
     }
 
     pub const fn species_metadata(&self) -> &SpeciesMetadata {
@@ -812,9 +812,9 @@ impl ExtraFormMetadata {
         source: Option<MetadataSource>,
     ) -> (PkmType, Option<PkmType>) {
         self.extra_form_index.type_overrides().unwrap_or(
-            types_lookup(self.national_dex.get(), self.form_index, source).expect_log(format!(
+            types_lookup(self.national_dex.to_u16(), self.form_index, source).expect_log(format!(
                 "no types found for nat dex {} form {}",
-                self.national_dex.get(),
+                self.national_dex.to_u16(),
                 self.form_index
             )),
         )
@@ -918,8 +918,10 @@ impl ExtraFormMetadata {
     }
 
     #[wasm_bindgen(getter = baseStats)]
-    pub fn get_base_stats(&self) -> Stats8 {
-        current_base_stats(self.national_dex.get(), self.form_index).unwrap_or_default()
+    pub fn get_base_stats(&self) -> Stats16Le {
+        current_base_stats(self.national_dex.to_u16(), self.form_index)
+            .unwrap_or_default()
+            .into()
     }
 }
 
