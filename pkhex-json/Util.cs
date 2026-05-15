@@ -158,7 +158,6 @@ public static partial class Util
 
   static string ReformatRibbonName(string s)
   {
-    Console.WriteLine("ribbon: " + s);
     if (s == "RibbonChampionG3")
     {
       s = "RibbonChampion";
