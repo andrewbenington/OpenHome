@@ -53,12 +53,12 @@ impl OhpkmBytesStore {
     fn fix_errors(&mut self) {
         for (identifier, bytes) in self.0.iter_mut() {
             if let Ok(mut mon) = OhpkmV2::from_bytes(bytes) {
-                let had_errors = mon.fix_errors();
-                if had_errors {
-                    println!(
-                        "Fixed errors Ohpkm {} with id {identifier}",
-                        mon.get_nickname()
-                    );
+                let errors = mon.fix_errors();
+                if !errors.is_empty() {
+                    println!("Fixed Ohpkm {} with id {identifier}:", mon.get_nickname());
+                    for error in errors {
+                        println!("\t{error}");
+                    }
                     *bytes = mon.to_bytes();
                 }
             }
