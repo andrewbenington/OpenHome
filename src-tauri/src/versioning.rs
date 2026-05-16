@@ -151,6 +151,7 @@ pub enum SignificantUpdate {
     V1_10_3,
     V1_10_5,
     V1_11_0,
+    V1_11_1,
 }
 
 impl SignificantUpdate {
@@ -172,6 +173,7 @@ impl SignificantUpdate {
             Self::V1_10_3 => Version::parse("1.10.3").unwrap(),
             Self::V1_10_5 => Version::parse("1.10.5").unwrap(),
             Self::V1_11_0 => Version::parse("1.11.0").unwrap(),
+            Self::V1_11_1 => Version::parse("1.11.1").unwrap(),
         }
     }
 
@@ -239,6 +241,14 @@ impl SignificantUpdate {
                 "Fixed bug causing bad eggs to appear in empty slots in Gen 7 save files.",
                 "The nickname flag should be set correctly for all Pokémon regardless of language.",
                 "Sword/Shield boxes 31-32 are now visible.",
+            ]),
+            Self::V1_11_1 => Some(vec![
+                "Extra forms, such as Cosplay Pikachu and ROM hack exclusives, are now viewable in the Pokédex.",
+                "PK3 code has been rewritten in Rust, and should now be lossless when converting to and from OHPKM. Previously, nickname and trainer name garbage bytes were not preserved, although this is not visible in-game.",
+                "Control over PID changes when converting to PK3 is now available through the Settings. This includes the ability to automatically alter the PID to preserve nature, gender, etc. By default these fields are preserved. The PID is always reverted to the original when going back to OHPKM.",
+                "Generation 3 Pokémon and save files in the Japanese language now use the correct character encoding.",
+                "Fixed bug in level calculation for PK7.",
+                "Fixed visual bug in boxes on Linux.",
             ]),
             _ => None,
         }
