@@ -55,6 +55,7 @@
   "editor.inlayHints.enabled": "off",
   "editor.tabSize": 2,
   "rust-analyzer.cargo.features": "all",
+  "rust-analyzer.cargo.target": "aarch64-linux-android",
   "css.completion.completePropertyWithSemicolon": false,
   "rust-analyzer.cargo.targetDir": true,
   "python.terminal.activateEnvironment": true

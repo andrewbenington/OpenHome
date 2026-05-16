@@ -19,9 +19,12 @@ use crate::{error::Error, state::synced_state::AllSyncedState};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             let startup_config_state =
                 match startup_config::StartupConfigState::load_or_create(app.handle()) {
@@ -121,23 +124,29 @@ pub fn run() {
 
             app.manage(state::AppState::from_update_features(update_features));
 
-            match menu::create_menu(app) {
-                Ok(menu) => {
-                    let _ = app.set_menu(menu);
-                    Ok(())
-                }
-                Err(e) => {
-                    eprintln!("Error creating menu: {}", e);
-                    Err(e)
+            cfg_select! {
+                mobile => Ok(()),
+                _ => {
+                    match menu::create_menu(app) {
+                        Ok(menu) => {
+                            let _ = app.set_menu(menu);
+                            Ok(())
+                        }
+                        Err(e) => {
+                            eprintln!("Error creating menu: {}", e);
+                            Err(e)
+                        }
+                    }
                 }
             }
-        })
-        .on_menu_event(|app_handle, event| {
-            menu::handle_menu_event(app_handle, event);
-        })
-        .plugin(tauri_plugin_os::init())
-        .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_shell::init())
+        });
+
+    #[cfg(not(mobile))]
+    let builder = builder.on_menu_event(|app_handle, event| {
+        menu::handle_menu_event(app_handle, event);
+    });
+
+    builder
         .invoke_handler(tauri::generate_handler![
             commands::get_state,
             commands::get_file_bytes,
@@ -157,6 +166,7 @@ pub fn run() {
             commands::open_directory,
             commands::open_file_location,
             startup_config::get_data_dir_path,
+            #[cfg(not(mobile))]
             startup_config::change_data_dir,
             pkm_storage::load_banks,
             pkm_storage::write_banks,

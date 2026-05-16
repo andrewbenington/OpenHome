@@ -1,17 +1,26 @@
+#[cfg(not(mobile))]
 use std::process::Command;
 
-use tauri::{image::Image, include_image, menu::*, App, AppHandle, Emitter, Wry};
+#[cfg(not(mobile))]
+use tauri::{App, Wry, image::Image, include_image};
+use tauri::{AppHandle, Emitter};
 
+#[cfg(not(mobile))]
+use tauri::menu::*;
+
+#[cfg(not(mobile))]
 use crate::data_controller::DataController;
+#[cfg(not(mobile))]
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
 
-#[cfg(target_os = "macos")]
-const OPEN_CMD: &str = "open";
-#[cfg(target_os = "linux")]
-const OPEN_CMD: &str = "xdg-open";
-#[cfg(target_os = "windows")]
-const OPEN_CMD: &str = "explorer";
+#[cfg(not(mobile))]
+const OPEN_CMD: &str = cfg_select! {
+    target_os = "macos" => "open",
+    target_os = "linux" => "xdg-open",
+    target_os = "windows" => "explorer"
+};
 
+#[cfg(not(mobile))]
 pub fn create_menu(app: &App) -> core::result::Result<Menu<Wry>, Box<dyn std::error::Error>> {
     let handle = app.handle();
     let menu = Menu::new(handle)?;
@@ -114,6 +123,7 @@ pub fn create_menu(app: &App) -> core::result::Result<Menu<Wry>, Box<dyn std::er
     Ok(menu)
 }
 
+#[cfg(not(mobile))]
 fn command_open(target: &str) {
     let child = Command::new(OPEN_CMD)
         .arg(target) // <- Specify the directory you'd like to open.
@@ -124,6 +134,7 @@ fn command_open(target: &str) {
     }
 }
 
+#[cfg(not(mobile))]
 pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
     handle_menu_event_id(app_handle, event.id.as_ref());
 }
@@ -146,12 +157,14 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
         "reset" => {
             let _ = app_handle.emit("reset", ());
         }
+        #[cfg(not(mobile))]
         "open-appdata" => match app_handle.get_data_folder() {
             Err(err) => {
                 println!["Error getting data directory: {}", err];
             }
             Ok(dir) => command_open(dir.to_str().unwrap_or_default()),
         },
+        #[cfg(not(mobile))]
         "open-config" => match app_handle.get_config_folder() {
             Err(err) => {
                 println!["Error getting config directory: {}", err];
@@ -172,7 +185,9 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
 
         // Help menu actions
         // "about" => println!("About action triggered!"),
+        #[cfg(not(mobile))]
         "check-updates" => command_open("https://andrewbenington.github.io/OpenHome/download.html"),
+        #[cfg(not(mobile))]
         "visit-github" => command_open("https://github.com/andrewbenington/OpenHome"),
 
         _ => (),
