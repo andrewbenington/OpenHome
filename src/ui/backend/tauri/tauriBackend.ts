@@ -20,6 +20,8 @@ import dayjs from 'dayjs'
 import { Commands, StoredBankDataSerialized } from './tauriCommands'
 import { isRustErr } from './types'
 
+const IS_ANDROID: boolean = true
+
 async function pathDataFromRaw(raw: string): Promise<PathData> {
   const filename = await path.basename(raw)
   const dir = await path.dirname(raw)
@@ -95,19 +97,35 @@ export const TauriBackend: BackendInterface = {
 
   /* game saves */
   loadSaveFile: async (pathData: PathData): Promise<Errorable<LoadSaveResponse>> => {
-    const bytesResult = await Commands.get_file_bytes(pathData.raw)
-    if (R.isErr(bytesResult)) {
-      return bytesResult
+    console.log({ pathData })
+    if (IS_ANDROID) {
+      const fileBytes = await readFile(pathData.raw) // Commands.get_file_bytes(pathData.raw)
+      return R.Ok({
+        path: pathData,
+        fileBytes,
+        createdDate: new Date(),
+      })
     }
-    const timestampResult = await Commands.get_file_created(pathData.raw)
-    if (R.isErr(timestampResult)) {
-      return timestampResult
+
+    try {
+      const bytesResult = await readFile(pathData.raw) // Commands.get_file_bytes(pathData.raw)
+      console.log({ bytesResult })
+      // if (R.isErr(bytesResult)) {
+      //   return bytesResult
+      // }
+      const timestampResult = await Commands.get_file_created(pathData.raw)
+      if (R.isErr(timestampResult)) {
+        return timestampResult
+      }
+      return R.Ok({
+        path: pathData,
+        fileBytes: bytesResult,
+        createdDate: new Date(timestampResult.value),
+      })
+    } catch (e) {
+      console.log({ e })
+      return R.Err(String(e))
     }
-    return R.Ok({
-      path: pathData,
-      fileBytes: new Uint8Array(bytesResult.value),
-      createdDate: new Date(timestampResult.value),
-    })
   },
   writeSaveFile: Commands.write_file_bytes,
   saveLocalFile: async (bytes: Uint8Array, suggestedName: string) => {
@@ -215,6 +233,7 @@ export const TauriBackend: BackendInterface = {
   pickFile: async (): Promise<Errorable<PathData | undefined>> => {
     const filePath = await fileDialog({ directory: false, title: 'Select File' })
     if (!filePath) return R.Ok(undefined)
+    console.log({ filePath })
     return R.Ok(await pathDataFromRaw(filePath))
   },
   pickFolder: async (): Promise<Errorable<string | undefined>> => {

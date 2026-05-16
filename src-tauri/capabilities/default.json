@@ -10,6 +10,9 @@
     "dialog:default",
     "fs:default",
     "fs:allow-app-meta",
+    "fs:read-all",
+    "fs:read-files",
+    "fs:allow-read",
     "process:default",
     "process:allow-restart"
   ]

@@ -1,8 +1,8 @@
+import { AlertDialog } from '@openhome-ui/components/dialog/AlertDialog'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { Callout } from '@radix-ui/themes'
 import { useContext } from 'react'
-import { AlertDialog } from '@openhome-ui/components/dialog/AlertDialog'
 
 export default function ErrorMessageModal() {
   const [errorState, dispatchErrorState] = useContext(ErrorContext)

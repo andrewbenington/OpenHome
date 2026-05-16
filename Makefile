@@ -80,7 +80,7 @@ set-version:
 	@cd pkm_rs_types && cargo set-version $(VERSION)
 	@cd pkm_rs && cargo build
 	@cd src-tauri && cargo build
-	@pnpm version $(VERSION) --no-git-tag-version --allow-same-version 
+	@pnpm version $(VERSION) --no-git-tag-version --allow-same-version
 	@pnpm i
 
 .PHONY: release-mac
@@ -117,7 +117,7 @@ pkhex-json:
 .PHONY: test-pkhex-json
 test-pkhex-json:
 	@cargo test --package pkm_rs --lib --all-features -- compare_pkhex_json
-	
+
 generate/out/syncPKHexResources.js: generate/syncPKHexResources.ts
 	@echo "compiling generate/syncPKHexResources.ts..."
 	@cd generate && tsc
@@ -138,3 +138,16 @@ download-item-sprites:
 .PHONY: schema
 schema:
 	@sqlite3 generate/pkm.db .schema > generate/schema.sql
+
+## Android
+.PHONY: android-init
+android-init:
+	@echo "sdk.dir=${ANDROID_HOME}" > src-tauri/gen/android/local.properties
+
+.PHONY: android-run
+android-run:
+	@npx pnpm tauri android dev
+
+.PHONY: stream-android-logs
+stream-android-logs:
+	@adb logcat -s RustStdoutStderr | grep -v "s_glBindAttribLocation"

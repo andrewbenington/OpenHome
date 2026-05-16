@@ -4,9 +4,9 @@
   "version": "1.11.1",
   "identifier": "dev.andrewbenington.openhome",
   "build": {
-    "beforeDevCommand": "pnpm run dev",
+    "beforeDevCommand": "npx pnpm run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "pnpm run build",
+    "beforeBuildCommand": "npx pnpm run build",
     "frontendDist": "../dist"
   },
   "app": {
