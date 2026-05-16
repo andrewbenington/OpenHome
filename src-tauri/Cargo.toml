@@ -14,7 +14,7 @@ name = "openhome_lib"
 crate-type = ["cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.6.0", features = [] }
+tauri-build = { version = "2.6.1", features = [] }
 
 [dependencies]
 pkm_rs = {path = "../pkm_rs"}
