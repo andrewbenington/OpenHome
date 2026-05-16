@@ -165,3 +165,16 @@ schema:
 .PHONY: git-fix-pnpm
 git-fix-pnpm:
 	@pnpm i --merge-git-branch-lockfiles
+
+## Android
+.PHONY: android-init
+android-init:
+	@echo "sdk.dir=${ANDROID_HOME}" > src-tauri/gen/android/local.properties
+
+.PHONY: android-run
+android-run:
+	@npx pnpm tauri android dev
+
+.PHONY: stream-android-logs
+stream-android-logs:
+	@adb logcat -s RustStdoutStderr | grep -v "s_glBindAttribLocation"
