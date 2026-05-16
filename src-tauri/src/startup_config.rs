@@ -1,15 +1,16 @@
 use crate::commands::CommandResult;
-use crate::data_controller::TauriDataController;
-use openhome_core::data_controller::DataController;
+use openhome_core::Result;
 use openhome_core::startup_config::StartupConfig;
-use openhome_core::{Error, Result};
 use serde::Serialize;
+#[cfg(not(mobile))]
 use std::fs;
 use std::ops::Deref;
+#[cfg(not(mobile))]
 use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Mutex;
 use tauri::Manager;
+#[cfg(not(mobile))]
 use tauri_plugin_dialog::DialogExt;
 
 #[derive(Serialize)]
@@ -42,6 +43,7 @@ pub fn get_data_dir_path(
         .unwrap_or(app_handle.path().app_data_dir()?))
 }
 
+#[cfg(not(mobile))]
 #[tauri::command]
 #[specta::specta]
 pub async fn change_data_dir(
@@ -101,6 +103,7 @@ pub async fn change_data_dir(
     app_handle.restart();
 }
 
+#[cfg(not(mobile))]
 fn copy_all_directory_items(src_path: &Path, dst_path: &Path) -> Result<()> {
     let dir_entries =
         fs::read_dir(src_path).map_err(|source| Error::file_access(&src_path, source))?;
@@ -124,6 +127,7 @@ fn copy_all_directory_items(src_path: &Path, dst_path: &Path) -> Result<()> {
     Ok(())
 }
 
+#[cfg(not(mobile))]
 fn is_dir_empty_ignore_ds_store(path: &Path) -> Result<bool> {
     let mut entries = fs::read_dir(path).map_err(|source| Error::file_access(&path, source))?;
     for entry in entries.by_ref() {

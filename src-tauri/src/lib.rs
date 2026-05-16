@@ -74,10 +74,13 @@ pub fn run() {
 
     let specta_handler = specta_builder.invoke_handler();
 
-    tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             let startup_config_state = match startup_config::StartupConfigState::load_or_create() {
                 Ok(state) => state,
@@ -159,14 +162,19 @@ pub fn run() {
 
             app.manage(state::AppState::from_update_features(update_features));
 
-            match menu::create_menu(app) {
-                Ok(menu) => {
-                    let _ = app.set_menu(menu);
-                    Ok(())
-                }
-                Err(e) => {
-                    eprintln!("Error creating menu: {}", e);
-                    Err(e)
+            cfg_select! {
+                mobile => Ok(()),
+                _ => {
+                    match menu::create_menu(app) {
+                        Ok(menu) => {
+                            let _ = app.set_menu(menu);
+                            Ok(())
+                        }
+                        Err(e) => {
+                            eprintln!("Error creating menu: {}", e);
+                            Err(e)
+                        }
+                    }
                 }
             }
         })
@@ -183,7 +191,52 @@ pub fn run() {
             | "add_to_ohpkm_store"
             | "log" => RAW_HANDLER(invoke),
             _ => specta_handler(invoke),
-        })
+        });
+
+    #[cfg(not(mobile))]
+    let builder = builder.on_menu_event(|app_handle, event| {
+        menu::handle_menu_event(app_handle, event);
+    });
+
+    builder
+        .invoke_handler(tauri::generate_handler![
+            commands::get_state,
+            commands::get_file_bytes,
+            commands::get_file_created,
+            commands::get_image_data,
+            commands::get_storage_file_json,
+            commands::write_storage_file_json,
+            commands::write_file_bytes,
+            commands::find_suggested_saves,
+            commands::set_app_theme,
+            commands::validate_recent_saves,
+            commands::download_plugin,
+            commands::list_installed_plugins,
+            commands::load_plugin_code,
+            commands::delete_plugin,
+            commands::handle_windows_accelerator,
+            commands::open_directory,
+            commands::open_file_location,
+            startup_config::get_data_dir_path,
+            #[cfg(not(mobile))]
+            startup_config::change_data_dir,
+            pkm_storage::load_banks,
+            pkm_storage::write_banks,
+            state::get_lookups,
+            state::add_to_lookups,
+            state::get_ohpkm_store,
+            state::permanently_delete_ohpkms,
+            state::remove_dangling,
+            state::add_to_ohpkm_store,
+            state::get_pokedex,
+            state::update_pokedex,
+            state::get_convert_strategies,
+            state::update_convert_strategies,
+            state::start_transaction,
+            state::rollback_transaction,
+            state::commit_transaction,
+            state::synced_state::save_synced_state,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

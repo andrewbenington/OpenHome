@@ -63,5 +63,6 @@
     "MACOSX_DEPLOYMENT_TARGET": "14.6"
   },
   "rust-analyzer.cargo.features": "all",
-  "rust-analyzer.cargo.targetDir": true
+  "rust-analyzer.cargo.targetDir": true,
+  "rust-analyzer.cargo.target": "aarch64-linux-android",
 }
