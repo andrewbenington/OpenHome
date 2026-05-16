@@ -202,7 +202,6 @@ impl SectionTag for OhpkmSectionTag {
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OhpkmV2 {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     main_data: MainDataV2,
     gameboy_data: Option<GameboyData>,
     gen45_data: Option<Gen45Data>,
@@ -210,10 +209,8 @@ pub struct OhpkmV2 {
     swsh_data: Option<SwordShieldData>,
     bdsp_data: Option<BdspData>,
     la_data: Option<LegendsArceusData>,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     sv_data: Option<ScarletVioletData>,
     handler_data: Vec<PastHandlerDataV2>,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     plugin_data: Option<PluginData>,
     notes: Option<Notes>,
     most_recent_save: Option<MostRecentSave>,
