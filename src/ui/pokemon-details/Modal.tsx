@@ -275,7 +275,7 @@ const PokemonDetailsModal = (props: {
           )}
           <Separator />
           <div className="modal-footer">
-            <Flex gap="1" align="center">
+            <Flex gap="1" align="center" minWidth="7rem">
               <PokemonIcon
                 dexNumber={mon.dexNum}
                 formeNumber={mon.formNum}
@@ -283,8 +283,7 @@ const PokemonDetailsModal = (props: {
               />
               {mon.nickname}
             </Flex>
-            <Separator orientation="vertical" />
-            <Flex gap="1" align="center">
+            <Flex gap="1" align="center" minWidth="5rem">
               <OriginGameIndicator
                 originGame={mon.gameOfOrigin}
                 plugin={mon.pluginOrigin}
@@ -292,7 +291,9 @@ const PokemonDetailsModal = (props: {
               />
               {mon.trainerName}
             </Flex>
-            <Separator orientation="vertical" />
+            {mon.personalityValue && (
+              <code>PID {mon.personalityValue.toString(16).padStart(8, '0')}</code>
+            )}
             <div>Level {mon.getLevel()}</div>
             <div style={{ flex: 1 }} />
             {mon instanceof OHPKM && (
