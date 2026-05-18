@@ -117,7 +117,7 @@
   line-height: 1.75rem;
   letter-spacing: -0.0025em;
   font-weight: 700;
-  background-color: var(--side-tab-bar);
+  background-color: var(--color-sidebar);
   border-bottom: 1px solid var(--gray-a5);
 }
 

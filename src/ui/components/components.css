@@ -181,14 +181,14 @@
 .attribute-row-label {
   min-width: calc(33% - var(--indent, 0px));
   height: 100%;
-  min-height: 28px;
+  min-height: 1.75rem;
   margin-left: var(--indent, 0px);
   display: grid;
   align-items: center;
 }
 
 .attribute-row-label-text {
-  padding-left: 8px;
+  padding-left: 0.5rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

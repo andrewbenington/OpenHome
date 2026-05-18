@@ -11,12 +11,10 @@
   flex-direction: column;
   min-width: 8rem;
   width: fit-content;
-  background-color: var(--side-tab-bar);
+  background-color: var(--color-sidebar);
   gap: 4px;
-  padding: 8px;
-  box-shadow:
-    rgba(0, 0, 0, 0.3) 0px 3px 12px,
-    rgba(0, 0, 0, 0.23) 0px 3px 6px !important;
+  padding: var(--padding-radius-sm-lg);
+  border-right: 0.5px solid var(--color-gray-500);
 }
 
 .side-tab-panel {
@@ -32,20 +30,21 @@
 }
 
 .side-tab {
-  border-radius: 6px;
+  border-radius: var(--border-radius-sm);
   background-color: transparent;
-  color: white;
   text-align: start;
   padding: 2px 6px;
 }
 
 .side-tab:hover {
-  background-color: var(--side-tab-hover);
+  background-color: var(--color-sidebar-hover);
 }
 
 .side-tab-active,
 .side-tab:active {
-  background-color: var(--side-tab-selected);
+  color: white;
+  font-weight: bold;
+  background-color: var(--color-sidebar-selected);
   box-shadow:
     rgb(0, 0, 0) 0px 0px 0px 0px,
     rgba(21, 21, 21, 0.08) 0px 1px 2px 0px,

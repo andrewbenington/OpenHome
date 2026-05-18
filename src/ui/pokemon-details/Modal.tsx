@@ -11,7 +11,7 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
 import { isRomHackFormat } from '@pokemon-files/pkm/PKM'
 import { FileSchemas } from '@pokemon-files/schema'
-import { Dialog, Flex, Separator, Switch, VisuallyHidden } from '@radix-ui/themes'
+import { Dialog, Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
 import { OriginGameIndicator } from '../components/pokemon/indicator/OriginGame'
@@ -157,19 +157,7 @@ const PokemonDetailsModal = (props: {
   return (
     <Dialog.Root open={!!(mon && displayMon)} onOpenChange={(open) => !open && onClose?.()}>
       {mon && (
-        <Dialog.Content
-          onKeyDown={handleArrows}
-          minWidth="800px"
-          maxWidth="80%"
-          width="fit-content"
-          style={{
-            position: 'inherit',
-            overflow: 'hidden',
-            height: 'fit-content',
-            padding: 0,
-            borderRadius: 4,
-          }}
-        >
+        <Dialog.Content className="pokemon-modal" onKeyDown={handleArrows}>
           <VisuallyHidden>
             <Dialog.Title>Pokémon Details</Dialog.Title>
             <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
@@ -226,6 +214,9 @@ const PokemonDetailsModal = (props: {
                   </Flex>
                 )}
               </SideTabs.TabList>
+              {/* <div className="full-vert-separator">
+                <Separator orientation="vertical" size="4" />
+              </div> */}
               <Fallback>
                 <SideTabs.Panel value="summary">
                   <SummaryDisplay mon={displayMon} />
@@ -273,7 +264,6 @@ const PokemonDetailsModal = (props: {
               </Fallback>
             </SideTabs.Root>
           )}
-          <Separator />
           <div className="modal-footer">
             <Flex gap="1" align="center" minWidth="7rem">
               <PokemonIcon
@@ -313,7 +303,7 @@ const PokemonDetailsModal = (props: {
           {boxIndicatorProps && (
             <div
               className="modal-box-indicator-wrapper"
-              style={{ opacity: boxIndicatorVisible ? 1 : 0, pointerEvents: 'none' }}
+              style={{ opacity: boxIndicatorVisible ? 1 : 0.9, pointerEvents: 'none' }}
             >
               <MiniBoxIndicator {...boxIndicatorProps} />
             </div>
