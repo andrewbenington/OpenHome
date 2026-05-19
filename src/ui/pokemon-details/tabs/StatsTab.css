@@ -1,0 +1,26 @@
+.stats-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  position: relative;
+  gap: 8px;
+  padding-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.stats-selectors {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-container {
+  height: calc(100% - 40px);
+}
+
+.sheen-stars {
+  padding: 10px;
+}

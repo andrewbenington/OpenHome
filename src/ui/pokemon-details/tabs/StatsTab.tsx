@@ -24,6 +24,7 @@ import {
 } from 'chart.js'
 import { useEffect, useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
+import './StatsTab.css'
 
 function getMaxValue(stat: string, evType?: string): number | undefined {
   switch (stat) {

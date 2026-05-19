@@ -21,9 +21,11 @@
   justify-content: center;
   width: fit-content;
   padding: 0;
-  min-width: 18px;
-  height: 18px;
+  min-width: 1rem;
+  height: 1rem;
   box-shadow: rgba(255, 255, 255, 0.5) 0px 0px 0px 1px;
+  /* border: 1px solid oklch(28% 0.75% 264deg / 65%); */
+  border-radius: var(--border-radius-xs);
 }
 
 .numerical-indicator {

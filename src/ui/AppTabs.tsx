@@ -75,7 +75,7 @@ export default function AppTabs() {
               <Tabs.Tab value="component-debug">
                 <AppTabIconsActive.ComponentDebug />
                 <AppTabIconsInactive.ComponentDebug />
-                Component Debug
+                Visual Debug
               </Tabs.Tab>
             </>
           )}

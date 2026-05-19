@@ -94,7 +94,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         renderCell: (params) =>
           params.row.valid ? (
             <button
-              className="save-grid-open-button"
+              className="save-grid-button"
               onClick={(e) => {
                 e.preventDefault()
                 onOpen(params.row.filePath)
@@ -106,12 +106,12 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
             </button>
           ) : (
             <button
-              className="save-grid-error-button"
+              className="save-grid-button save-grid-error-button"
               onClick={() =>
                 displayError('Invalid Save', 'File is missing, renamed, or inaccessbile')
               }
             >
-              <ErrorIcon style={{ width: 20, height: 20 }} />
+              <ErrorIcon />
             </button>
           ),
         cellClass: 'centered-cell',

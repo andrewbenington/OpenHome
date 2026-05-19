@@ -22,6 +22,8 @@
 
   --padding-radius-xs-sm: 0.15rem;
   --padding-radius-sm-lg: 0.45rem;
+
+  --height-mini-button: 1.5rem;
 }
 
 :root {
@@ -65,6 +67,8 @@
   --color-gray-950: oklch(12% 5% 264deg / 95%);
 
   --color-border-light: var(--color-gray-400);
+  --color-translucent-light: #fff8;
+  --color-translucent-dark: #0008;
 
   @media (prefers-color-scheme: dark) {
     --color-blue: oklch(69% 50% 264deg);
@@ -106,6 +110,7 @@
   --attribute-row-content: var(--primitive-teal-300);
 
   --byte-hover: var(--primitive-teal-100);
+  --color-translucent: var(--color-translucent-light);
 
   --gradient-angle: 310deg;
 
@@ -137,6 +142,7 @@
     --attribute-row-content: var(--primitive-teal-700);
 
     --byte-hover: var(--primitive-teal-600);
+    --color-translucent: var(--color-translucent-dark);
 
     --color-sidebar: var(--primitive-sidebar-dark);
     --color-sidebar-hover: var(--primitive-sidebar-hover-dark);
@@ -158,6 +164,10 @@
       --color-bar: var(--color-panel);
     }
   }
+}
+
+p {
+  margin: 0;
 }
 
 img {
@@ -292,8 +302,6 @@ label {
 
 .radix-themes {
   --cursor-button: pointer;
-  --card-border-width: 1px;
-  --radius-4: 3px;
   font-size: inherit;
   .rt-BaseMenuSeparator {
     margin: 0px 0px;
@@ -315,6 +323,9 @@ label {
   }
   .rt-Separator:where(.rt-r-orientation-horizontal) {
     width: 100%;
+  }
+  .rt-Button {
+    border-radius: var(--border-radius-sm);
   }
 }
 
@@ -377,15 +388,16 @@ label {
 }
 
 .mini-button {
-  padding: 0px;
+  padding: var(--padding-radius-xs-sm);
   aspect-ratio: 1;
-  height: 20px;
-  width: 20px;
+  height: var(--height-mini-button);
+  width: fit-content;
   transition: none;
+  border-radius: var(--border-radius-sm);
 
   svg {
-    height: 18px;
-    width: 18px;
+    height: 1rem;
+    width: 1rem;
   }
 }
 
@@ -416,4 +428,9 @@ label {
 
 .rdg-cell * {
   align-items: center;
+}
+
+.pad-x-sm-lg {
+  padding-left: var(--padding-radius-sm-lg);
+  padding-right: var(--padding-radius-sm-lg);
 }

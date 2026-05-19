@@ -203,20 +203,17 @@ const PokemonDetailsModal = (props: {
                 <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
                 <div style={{ flex: 1 }} />
                 {(isOriginal || (mon instanceof OHPKM && mon.originalData)) && (
-                  <Flex align="center" gap="2" style={{ fontWeight: 'bold' }}>
+                  <Flex className="original-data-switch" align="center" gap="2">
                     <Switch
                       radius="full"
                       size="1"
                       checked={isOriginal}
                       onCheckedChange={updateIsOriginal}
                     />
-                    Show Original Data
+                    Show Original
                   </Flex>
                 )}
               </SideTabs.TabList>
-              {/* <div className="full-vert-separator">
-                <Separator orientation="vertical" size="4" />
-              </div> */}
               <Fallback>
                 <SideTabs.Panel value="summary">
                   <SummaryDisplay mon={displayMon} />
@@ -303,7 +300,7 @@ const PokemonDetailsModal = (props: {
           {boxIndicatorProps && (
             <div
               className="modal-box-indicator-wrapper"
-              style={{ opacity: boxIndicatorVisible ? 1 : 0.9, pointerEvents: 'none' }}
+              style={{ opacity: boxIndicatorVisible ? 1 : 0, pointerEvents: 'none' }}
             >
               <MiniBoxIndicator {...boxIndicatorProps} />
             </div>

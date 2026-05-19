@@ -15,7 +15,7 @@ import {
 } from '@pokemon-resources/index'
 import { Badge, Flex, Grid } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
-import './style.css'
+import './MetDataMovesTab.css'
 
 const metTimesOfDay = ['in the morning', 'during the daytime', 'in the evening']
 
@@ -108,9 +108,9 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
   const markImage = mon.gameOfOrigin ? OriginGames.markPath(mon.gameOfOrigin) : undefined
 
   return (
-    <Flex direction="column" ml="4" mr="4" mt="2" height="calc(100% - 24px)">
+    <Flex className="pokemon-modal-content" direction="column" height="100%">
       <Flex direction="row" style={{ flex: 1 }}>
-        <div style={{ flex: 1 }}>
+        <div className="met-data-left-side">
           <Flex direction="row" gap="1" align="center">
             {'ball' in mon && mon.ball ? (
               <img
@@ -122,7 +122,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
             ) : (
               <div />
             )}
-            <p style={{ fontWeight: 'bold' }}>
+            <p className="pokemon-nickname">
               {mon.nickname}
               {'affixedRibbon' in mon && mon.affixedRibbon
                 ? ` ${RibbonTitles[mon.affixedRibbon]}`
@@ -132,17 +132,13 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
               {Languages.stringFromByte(mon.language)}
             </Badge>
           </Flex>
-          {eggMessage ? <p>{eggMessage}</p> : <div />}
-          <p>{metMessage}</p>
-          {/* check for undefined because 0 nature is Hardy */}
-          {'nature' in mon ? (
-            <div>
-              <p>{natureMessage}</p>
-              <p>{getCharacteristic(mon as any)}</p>
-            </div>
-          ) : (
-            <div />
-          )}
+          <div className="met-data-text">
+            {eggMessage && <p>{eggMessage}</p>}
+            <p>{metMessage}</p>
+            {/* check for undefined because 0 nature is Hardy */}
+            {natureMessage && <p>{natureMessage}</p>}
+            <p>{getCharacteristic(mon)}.</p>
+          </div>
         </div>
         <Flex direction="column">
           <div className="game-container">

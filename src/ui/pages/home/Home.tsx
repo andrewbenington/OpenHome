@@ -68,7 +68,7 @@ const Home = () => {
 
   return (
     <Flex direction="row" style={{ height: '100%' }}>
-      <Flex className="save-file-column" gap="3">
+      <Flex className="save-file-column">
         {range(savesAndBanks.allOpenSaves.length).map((i) => (
           <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
         ))}

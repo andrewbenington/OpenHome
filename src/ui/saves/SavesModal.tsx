@@ -97,15 +97,11 @@ const SavesModal = (props: SavesModalProps) => {
           height: 'calc(90vh - 32px)',
           overflow: 'hidden',
           padding: 0,
-          borderRadius: 4,
         }}
       >
         <SideTabs.Root defaultValue="recents">
           <SideTabs.TabList>
-            <Button
-              onClick={() => openSaveAndCloseModal()}
-              style={{ margin: 8, width: 'calc(100% - 16px)' }}
-            >
+            <Button onClick={() => openSaveAndCloseModal()} size="1" style={{ width: '100%' }}>
               Open File
             </Button>
             <SideTabs.Tab value="recents">Recents</SideTabs.Tab>

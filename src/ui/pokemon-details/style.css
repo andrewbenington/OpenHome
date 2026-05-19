@@ -80,3 +80,28 @@
     opacity: 0.5;
   }
 }
+
+.original-data-switch {
+  font-size: 0.8rem;
+}
+
+.pokemon-modal-content {
+  padding: var(--padding-radius-sm-lg);
+  gap: var(--padding-radius-sm-lg);
+}
+
+.pokemon-nickname {
+  font-weight: bold;
+  margin: 0;
+}
+
+.pokemon-modal-card {
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-panel);
+  padding: var(--padding-radius-sm-lg);
+  font-size: 0.9rem;
+}
+
+.limit-text-width {
+  max-width: 32rem;
+}

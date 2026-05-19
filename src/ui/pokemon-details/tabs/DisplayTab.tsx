@@ -2,7 +2,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { TagIcon } from '@openhome-ui/components/TagIcon'
 import { useSaves } from '@openhome-ui/state/saves'
 import { DISPLAY_COLOR_PRESETS, MonTag, TAG_PRESETS } from '@openhome-ui/util/tags'
-import { Badge, Button, Card, Flex, Grid, Text, TextField } from '@radix-ui/themes'
+import { Badge, Button, Flex, Grid, Text, TextField } from '@radix-ui/themes'
 import { useState } from 'react'
 import useDebounce from 'src/ui/hooks/useDebounce'
 import { Typeahead } from '../../components/typeahead'
@@ -74,9 +74,9 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
   }
 
   return (
-    <div className="display-tab-root">
+    <div className="display-tab-root pokemon-modal-content">
       <Flex direction="column" gap="2">
-        <Card style={{ padding: 6 }}>
+        <div className="pokemon-modal-card">
           <Flex gap="1" direction="column" align="start">
             <Flex direction="row" gap="2" align="center">
               <Text as="div" size="2" weight="bold" color="gray" style={{ height: '100%' }}>
@@ -136,8 +136,8 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
               ))}
             </Grid>
           </Flex>
-        </Card>
-        <Card style={{ padding: 8 }}>
+        </div>
+        <div className="pokemon-modal-card">
           <Flex gap="2" direction="column">
             <Text as="div" size="2" weight="bold" color="gray">
               Add Tags (Max 3)
@@ -246,7 +246,7 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
               </Flex>
             )}
           </Flex>
-        </Card>
+        </div>
       </Flex>
     </div>
   )

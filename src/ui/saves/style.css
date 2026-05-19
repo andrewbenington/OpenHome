@@ -20,10 +20,11 @@
   display: flex;
   flex-direction: column;
   transition: background-color 0.2s;
-  padding: 0;
+  padding: var(--padding-radius-sm-lg);
   cursor: pointer;
   position: relative;
   border-radius: var(--border-radius-lg);
+  box-sizing: border-box;
 }
 
 .save-card:hover::after {
@@ -52,19 +53,18 @@
 
 .save-file-path {
   overflow-wrap: anywhere;
-  width: calc(100% - 12px);
-  font-size: 12px;
+  width: 100%;
+  font-size: 0.75rem;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 6px;
-  line-height: 1.2;
   transition: max-height 0.3s;
   cursor: pointer;
   text-align: start;
   display: flex;
   flex-direction: column-reverse;
-  padding: 0px 3px 3px;
+  padding: var(--padding-radius-xs-sm);
   z-index: 1;
+  background-color: var(--color-translucent);
 }
 
 .save-grid-error-button-container {
@@ -78,22 +78,21 @@
 .save-grid-error-button {
   background-color: rgb(213, 18, 18);
   color: white;
-  height: 26px;
-  width: 56px;
-  padding: 0;
   display: grid;
   align-items: center;
   justify-content: center;
 }
 
-.save-grid-open-button {
-  height: 26px;
-  width: 56px;
+.save-grid-button {
+  height: 1.25rem;
+  width: 3.5rem;
+  font-size: 0.8rem;
+  padding: 0;
 }
 
 .bank-ribbon {
-  padding: 2px 6px;
-  height: 32px;
+  padding: var(--padding-radius-sm-lg);
+  height: 2.25rem;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -103,6 +102,19 @@
 
 .bank-ribbon input {
   text-indent: 0px;
+}
+
+.bank-select-container {
+  flex: 1;
+  width: 0;
+  height: 100%;
+}
+
+.bank-select {
+  border-radius: var(--border-radius-sm);
+  height: 100%;
+  font-size: small;
+  padding: 0.2rem;
 }
 
 .white-filter {

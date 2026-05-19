@@ -147,24 +147,20 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         <div className={includeClass('box-card').with('box-card-disabled').if(allCellsDisabled)}>
           <SaveHeader save={save} setDetailsModal={setDetailsModal} />
           <Separator />
-          <div className="box-navigation">
-            <Flex align="center" justify="center" flexGrow="4">
-              <ArrowButton
-                onClick={() => savesManager.saveBoxNavigateLeft(save)}
-                dragID={`arrow_left_${save.tid}_${save.sid}`}
-                direction="left"
-              />
-            </Flex>
+          <div className="box-navigation pad-x-sm-lg">
+            <ArrowButton
+              onClick={() => savesManager.saveBoxNavigateLeft(save)}
+              dragID={`arrow_left_${save.tid}_${save.sid}`}
+              direction="left"
+            />
             <div className="box-name">{save.getBoxName(save.currentPCBox)}</div>
-            <Flex align="center" justify="center" flexGrow="4">
-              <ArrowButton
-                onClick={() => savesManager.saveBoxNavigateRight(save)}
-                dragID={`arrow_right_${save.tid}_${save.sid}`}
-                direction="right"
-              />
-            </Flex>
+            <ArrowButton
+              onClick={() => savesManager.saveBoxNavigateRight(save)}
+              dragID={`arrow_right_${save.tid}_${save.sid}`}
+              direction="right"
+            />
           </div>
-          <Grid className="box-grid" columns={save.boxColumns.toString()} gap="1" p="1">
+          <Grid className="box-grid" columns={save.boxColumns.toString()}>
             {range(save.boxColumns * save.boxRows)
               .map((index: number) => save.getMonAt(save.currentPCBox, index))
               .map((_, index) => {
