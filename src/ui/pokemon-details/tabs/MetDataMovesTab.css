@@ -6,7 +6,7 @@
 }
 
 .met-data-text {
-  font-size: 0.9rem;
+  font-size: var(--font-size-standard);
   display: flex;
   flex-direction: column;
   gap: var(--padding-radius-sm-lg);

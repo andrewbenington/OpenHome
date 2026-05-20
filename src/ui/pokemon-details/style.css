@@ -1,6 +1,6 @@
 .pokemon-modal {
   width: fit-content;
-  min-width: 50rem;
+  min-width: 60rem;
   max-width: 80%;
   position: inherit;
   overflow: hidden;
@@ -82,7 +82,7 @@
 }
 
 .original-data-switch {
-  font-size: 0.8rem;
+  font-size: var(--font-size-text);
 }
 
 .pokemon-modal-content {

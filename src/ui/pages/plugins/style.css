@@ -1,17 +1,17 @@
 .plugin-display {
-  width: 200px;
-  height: 200px;
+  width: 12.5rem;
+  height: 12.5rem;
   position: relative;
   background-color: #fff6;
-  border-radius: 8px;
+  border-radius: var(--border-radius-sm);
   border-width: 0px;
   overflow: hidden;
 }
 
 .plugin-icon {
   image-rendering: pixelated;
-  width: 180px;
-  height: 180px;
+  width: 11rem;
+  height: 11rem;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -20,9 +20,10 @@
 
 .status-chip {
   position: absolute !important;
-  bottom: 6px;
-  right: 6px;
+  bottom: var(--padding-radius-sm-lg);
+  right: var(--padding-radius-sm-lg);
   height: fit-content;
+  border: var(--soft-border);
 }
 
 .name-chip {
@@ -31,7 +32,7 @@
   left: 0;
   width: 100%;
   display: flex;
-  padding: 8px 8px;
+  padding: var(--padding-radius-sm-lg);
   font-weight: bold;
   color: #000;
   background-color: #eff;
@@ -64,14 +65,16 @@
 
 .delete-icon {
   position: absolute;
-  bottom: 4px;
-  left: 4px;
+  bottom: var(--padding-radius-sm-lg);
+  left: var(--padding-radius-sm-lg);
   cursor: pointer;
-  background-color: transparent;
+  background-color: var(--color-destructive);
+  font-size: 1rem;
   transition: background-color 0.08s;
-  color: #aa0000;
-  border-radius: 16px;
-  padding: 4px;
+  color: var(--color-gray-950);
+  border-radius: var(--border-radius-sm);
+  padding: var(--padding-radius-xs-sm);
+  border: var(--soft-border);
 }
 
 .delete-icon:hover {

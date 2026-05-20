@@ -109,7 +109,10 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
 
   return (
     <Flex className="pokemon-modal-content" direction="column" height="100%">
-      <Flex direction="row" style={{ flex: 1 }}>
+      <div
+        className="pokemon-modal-card"
+        style={{ display: 'flex', flexDirection: 'row', flex: 1 }}
+      >
         <div className="met-data-left-side">
           <Flex direction="row" gap="1" align="center">
             {'ball' in mon && mon.ball ? (
@@ -166,8 +169,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
             <div />
           )}
         </Flex>
-      </Flex>
-      <div style={{ flex: 1 }} />
+      </div>
       <Flex direction="row" justify="center">
         <Grid columns="repeat(2, 1fr)" gap="2" maxWidth="40rem" minWidth="30rem">
           <MoveCard

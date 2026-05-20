@@ -1,20 +1,19 @@
 .type-icon-container {
-  height: 100%;
+  height: 2rem;
+  width: 2rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: 0px 8px;
-  width: 30px;
+  margin: 0px var(--padding-radius-sm-lg);
 }
 
 .attribute-row {
   --diagonal-length: 8px;
-  height: fit-content;
   display: flex;
   flex-direction: row;
   align-items: center;
   width: 100%;
-  font-size: 0.9em;
+  height: calc(var(--font-size-text) + 2 * var(--padding-radius-sm-lg));
 }
 
 .attribute-row-label {
@@ -26,22 +25,25 @@
     calc(100% - 0px) 0%,
     100% 0%
   );
+  font-size: var(--font-size-text);
+  font-weight: 500;
   margin-right: calc(-1 * var(--diagonal-length));
+  height: inherit;
+  min-width: calc(33% - var(--indent, 0px));
 }
 
 .attribute-row-content {
   background-color: var(--attribute-row-content);
   max-width: calc(67%);
   width: calc(67%);
-  height: 28px;
-  min-height: 28px;
-  padding: 0px 12px 0px 4px;
+  height: inherit;
   display: flex;
-  gap: 4px;
+  gap: var(--padding-radius-xs-sm);
   flex-direction: row;
   align-items: center;
   overflow-wrap: break-word;
   overflow: hidden;
+  font-size: var(--font-size-text);
   padding-right: calc(8px + var(--diagonal-length));
   padding-left: calc(4px + var(--diagonal-length));
 }

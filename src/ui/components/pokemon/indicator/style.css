@@ -10,9 +10,8 @@
 
 .extra-indicator {
   position: absolute;
-  height: 40%;
-  right: 0;
-  top: 0;
+  right: var(--padding-radius-xs-sm);
+  top: var(--padding-radius-xs-sm);
 }
 
 .indicator {
@@ -21,10 +20,9 @@
   justify-content: center;
   width: fit-content;
   padding: 0;
-  min-width: 1rem;
-  height: 1rem;
-  box-shadow: rgba(255, 255, 255, 0.5) 0px 0px 0px 1px;
-  /* border: 1px solid oklch(28% 0.75% 264deg / 65%); */
+  min-width: 1.25rem;
+  height: 1.25rem;
+  box-shadow: rgba(25r5, 255, 255, 0.5) 0px 0px 0px 1px;
   border-radius: var(--border-radius-xs);
 }
 

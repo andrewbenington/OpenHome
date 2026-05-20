@@ -4,6 +4,7 @@
   --font-weight-normal: var(--primitive-font-weight-normal);
   --font-weight-medium: var(--primitive-font-weight-medium);
 
+  font-size: 14px;
   font-family: var(--font-sans);
   font-weight: var(--font-weight-normal);
   color-scheme: light dark;
@@ -24,6 +25,9 @@
   --padding-radius-sm-lg: 0.45rem;
 
   --height-mini-button: 1.5rem;
+
+  --font-size-standard: 1rem;
+  --font-size-text: 0.9rem;
 }
 
 :root {
@@ -69,6 +73,8 @@
   --color-border-light: var(--color-gray-400);
   --color-translucent-light: #fff8;
   --color-translucent-dark: #0008;
+
+  --soft-border: 0.5px solid var(--color-gray-800);
 
   @media (prefers-color-scheme: dark) {
     --color-blue: oklch(69% 50% 264deg);
@@ -136,7 +142,7 @@
     --color-gray-border: var(--primitive-gray-300-dark);
     --color-gray-text: var(--primitive-gray-700-dark);
 
-    --color-destructive: var(--primitive-red-dark);
+    --color-destructive: var(--primitive-red-light);
 
     --attribute-row-label: var(--primitive-teal-600);
     --attribute-row-content: var(--primitive-teal-700);
@@ -381,6 +387,18 @@ label {
     opacity: 0;
     animation: rt-dialog-content-hide 100ms cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
+}
+
+.rt-Badge {
+  border-radius: var(--border-radius-sm);
+}
+
+.rt-SwitchThumb,
+.rt-SwitchRoot::before {
+  border-radius: 9999px;
+  --switch-height: 1.2rem;
+  --switch-width: 2rem;
+  --switch-thumb-size: 1.1rem;
 }
 
 .diagonal-clip {

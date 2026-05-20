@@ -115,16 +115,15 @@
     rgb(0, 0, 0) 0px 0px 0px 0px,
     rgba(21, 21, 21, 0.08) 0px 2px 8px -2px,
     rgba(21, 21, 21, 0.08) 0px 6px 12px -2px;
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
 }
 
 .autocomplete-dropdown::-webkit-scrollbar-thumb {
-  border-radius: 10px;
   background-color: var(--autocomplete-scrollbar);
 }
 
 .autocomplete-option {
-  padding: 4px 8px;
+  padding: 40px 8px;
   cursor: pointer;
   width: calc(100% - 16px);
   list-style: none;
@@ -179,9 +178,6 @@
 }
 
 .attribute-row-label {
-  min-width: calc(33% - var(--indent, 0px));
-  height: 100%;
-  min-height: 1.75rem;
   margin-left: var(--indent, 0px);
   display: grid;
   align-items: center;

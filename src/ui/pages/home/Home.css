@@ -98,4 +98,5 @@
   font-weight: bold;
   cursor: default;
   height: 26px;
+  border-top-left-radius: var(--border-radius-lg);
 }
