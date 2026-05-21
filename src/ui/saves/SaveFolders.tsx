@@ -3,8 +3,9 @@ import { R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { AddFolderIcon, RemoveIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { Button, Card, Dialog, Flex } from '@radix-ui/themes'
+import { Button, Card, Flex } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useState } from 'react'
+import { Dialog } from '../components/dialog/Dialog'
 
 export default function SaveFolders() {
   const [saveFolders, setSaveFolders] = useState<SaveFolder[]>()
@@ -142,42 +143,30 @@ function FolderLabelDialog(props: FolderLabelDialogProps) {
   const { open, submitLabel, onClose } = props
   const [label, setLabel] = useState('')
 
+  function onSave() {
+    submitLabel(label)
+    setLabel('')
+  }
+
   return (
-    <Dialog.Root open={open} onOpenChange={(open) => !open && onClose()}>
-      <Dialog.Content
-        style={{
-          padding: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 8,
-        }}
-        width="300px"
-      >
-        <Dialog.Title mt="2" mb="0">
-          Set Folder Label
-        </Dialog.Title>
-        <input placeholder="Label" value={label} onChange={(e) => setLabel(e.target.value)} />
-        <Flex direction="row" gap="2" justify="end">
-          <Button
-            variant="outline"
-            onClick={() => {
-              setLabel('')
-              onClose()
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            style={{ padding: '0px 16px' }}
-            onClick={() => {
-              submitLabel(label)
-              setLabel('')
-            }}
-          >
-            Save
-          </Button>
-        </Flex>
-      </Dialog.Content>
-    </Dialog.Root>
+    <Dialog.Container
+      open={open}
+      onOpenChange={(open) => !open && onClose()}
+      style={{
+        padding: 8,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+      }}
+    >
+      <Dialog.Title>Set Folder Label</Dialog.Title>
+      <input placeholder="Label" value={label} onChange={(e) => setLabel(e.target.value)} />
+      <Dialog.Actions>
+        <Dialog.Close onClick={() => setLabel('')}>Cancel</Dialog.Close>
+        <Dialog.Close color="theme" onClick={onSave}>
+          Save
+        </Dialog.Close>
+      </Dialog.Actions>
+    </Dialog.Container>
   )
 }

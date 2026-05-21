@@ -41,9 +41,9 @@ export const Dialog = {
   Description: (props: React.ComponentProps<typeof BaseUiDialog.Description>) => (
     <BaseUiDialog.Description {...props} />
   ),
-  Close: (props: React.ComponentProps<typeof BaseUiDialog.Close>) => (
-    <BaseUiDialog.Close {...props} className={styles.Button} />
-  ),
+  Close: (
+    props: React.ComponentProps<typeof BaseUiDialog.Close> & { color?: 'destructive' | 'theme' }
+  ) => <BaseUiDialog.Close data-color={props.color} {...props} className={styles.Button} />,
   Actions: (props: React.HTMLAttributes<HTMLDivElement>) => (
     <div {...props} className={styles.Actions} />
   ),
