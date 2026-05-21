@@ -75,9 +75,7 @@ function ManageDialog(props: { onClose: () => void }) {
   return (
     <>
       <Dialog.Root onOpenChange={(o) => !o && onClose()}>
-        <Dialog.Trigger>
-          <Button size="1">Manage...</Button>
-        </Dialog.Trigger>
+        <Dialog.Trigger>Manage...</Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Backdrop />
           <Dialog.Popup style={{ width: '50rem' }}>
