@@ -388,17 +388,7 @@ type TransferToSaveButtonProps = {
 function TransferToSaveButton(props: TransferToSaveButtonProps) {
   const { save, onClick } = props
   return (
-    <Button
-      key={save.identifier}
-      onClick={() => onClick(save)}
-      style={{
-        backgroundColor: 'gray',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-        padding: 'var(--padding-radius-sm-lg',
-      }}
-    >
+    <Button className="transfer-to-save-button" key={save.identifier} onClick={() => onClick(save)}>
       <Flex direction="row" align="center" width="100%" gap="var(--padding-radius-sm-lg)">
         <b>{save.name}</b>
         <p>(TID {save.displayID})</p>

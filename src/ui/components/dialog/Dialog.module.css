@@ -58,7 +58,7 @@
   min-height: 100dvh;
   inset: 0;
   background-color: black;
-  opacity: 0.2;
+  opacity: 0.4;
   transition: opacity 75ms;
 
   @supports (-webkit-touch-callout: none) {
@@ -87,7 +87,6 @@
   transform: translate(-50%, -50%);
   width: 36rem;
   max-width: calc(100vw - 3rem);
-  margin-top: -2rem;
   border-radius: var(--border-radius-lg);
   background: var(--color-panel);
   color: var(--color-gray-900);

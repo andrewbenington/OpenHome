@@ -22,3 +22,11 @@
   font-size: small;
   margin-left: auto;
 }
+
+.transfer-to-save-button {
+  background-color: var(--color-gray-500);
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  padding: var(--padding-radius-sm-lg);
+}
