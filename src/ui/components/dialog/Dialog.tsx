@@ -47,4 +47,7 @@ export const Dialog = {
   Actions: (props: React.HTMLAttributes<HTMLDivElement>) => (
     <div {...props} className={styles.Actions} />
   ),
+  Action: (
+    props: React.HTMLAttributes<HTMLButtonElement> & { color?: 'destructive' | 'theme' }
+  ) => <button data-color={props.color} {...props} className={styles.Button} />,
 }
