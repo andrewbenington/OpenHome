@@ -27,15 +27,13 @@
 }
 
 .numerical-indicator {
-  font-weight: bold;
-  font-size: 12px;
-  padding: 2px;
-  height: 14px;
-  min-width: 14px;
+  font-size: 0.8rem;
+  padding: var(--padding-radius-xs-sm);
+  height: 1rem;
 }
 
 .image-indicator-with-text {
-  padding: 0px 4px;
+  padding: 0px var(--padding-radius-sm-lg);
 }
 
 @media (prefers-color-scheme: dark) {

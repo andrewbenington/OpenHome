@@ -1,6 +1,6 @@
 .plugin-display {
-  width: 12.5rem;
-  height: 12.5rem;
+  width: 15rem;
+  height: 15rem;
   position: relative;
   background-color: #fff6;
   border-radius: var(--border-radius-sm);
@@ -75,6 +75,9 @@
   border-radius: var(--border-radius-sm);
   padding: var(--padding-radius-xs-sm);
   border: var(--soft-border);
+  display: grid;
+  align-items: center;
+  justify-content: center;
 }
 
 .delete-icon:hover {

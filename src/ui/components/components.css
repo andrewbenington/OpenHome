@@ -204,14 +204,15 @@
   object-fit: contain;
 }
 
-.file-type-chip {
+.file-type-select {
   color: white;
   font-weight: bold;
   font-size: small;
   box-shadow: none;
   flex: 1;
-  padding: 4px 22px 2px 6px;
-  height: fit-content;
+  padding: 0 1.5rem 0 var(--padding-radius-sm-lg);
+  height: var(--height-mini-button);
+  width: 0;
 }
 
 .datagrid {

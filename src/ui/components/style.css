@@ -80,9 +80,9 @@ summary::-webkit-details-marker {
   position: absolute;
   width: 40%;
   height: 40%;
-  right: 0;
-  top: 0;
-  z-index: 2;
+  left: var(--padding-radius-xs-sm);
+  bottom: var(--padding-radius-xs-sm);
+  z-index: 10;
   pointer-events: none;
 }
 
