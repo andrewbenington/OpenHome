@@ -73,6 +73,7 @@
   --color-border-light: var(--color-gray-400);
   --color-translucent-light: #fff8;
   --color-translucent-dark: #0008;
+  --color-destructive: #aa0000;
 
   --soft-border: 0.5px solid var(--color-gray-800);
 
@@ -101,8 +102,6 @@
   --color-danger: var(--primitive-red-light);
   --color-sidebar-hover: rgb(140, 181, 166); /* also needs a primitive */
   --color-panel: var(--primitive-teal-300);
-
-  --color-destructive: var(--primitive-red-light);
 
   --color-sidebar: var(--primitive-sidebar-light);
   --color-sidebar-hover: var(--primitive-sidebar-hover-light);
@@ -141,8 +140,6 @@
     --color-gray-subtle: var(--primitive-gray-100-dark);
     --color-gray-border: var(--primitive-gray-300-dark);
     --color-gray-text: var(--primitive-gray-700-dark);
-
-    --color-destructive: var(--primitive-red-light);
 
     --attribute-row-label: var(--primitive-teal-600);
     --attribute-row-content: var(--primitive-teal-700);
