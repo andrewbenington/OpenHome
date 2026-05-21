@@ -3,6 +3,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getSortFunction, SortType, SortTypes } from '@openhome-core/pkm/sort'
 import { SAV } from '@openhome-core/save/interfaces'
 import { filterUndefined } from '@openhome-core/util/sort'
+import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import { ClearIcon, ErrorIcon } from '@openhome-ui/components/Icons'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
@@ -10,9 +11,10 @@ import SavesModal from '@openhome-ui/saves/SavesModal'
 import { useSaves } from '@openhome-ui/state/saves'
 import { HomeMonLocation, SaveMonLocation } from '@openhome-ui/state/saves/reducer'
 import { OriginGames } from '@pkm-rs/pkg'
-import { Badge, Button, Callout, Card, Dialog, Flex, Separator } from '@radix-ui/themes'
+import { Badge, Button, Callout, Card, Flex } from '@radix-ui/themes'
 import { useCallback, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
+import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
 import { Typeahead } from 'src/ui/components/typeahead'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '../../state/ohpkm'
@@ -245,8 +247,7 @@ export default function SortPokemon() {
               getOptionUniqueID={(opt) => opt}
               placeholder="Sort"
             />
-            <p className="hint">View a Pokémon's summary with alt + click</p>
-            {selectedIndices.size > 0 && (
+            {selectedIndices.size > 0 ? (
               <Flex gap="3" align="center">
                 <span style={{ fontSize: 12, color: '#aaa' }}>{selectedIndices.size} selected</span>
                 {selectedIndices.size === 1 && (
@@ -276,6 +277,8 @@ export default function SortPokemon() {
                   Clear
                 </Button>
               </Flex>
+            ) : (
+              <p className="hint">View a Pokémon's summary with alt + click</p>
             )}
           </Flex>
         </Card>
@@ -309,54 +312,32 @@ export default function SortPokemon() {
             : undefined
         }
       />
-      <Dialog.Root open={transferDialogOpen} onOpenChange={setTransferDialogOpen}>
-        <Dialog.Content
-          width="340px"
-          style={{
-            padding: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-          }}
-        >
-          <Dialog.Title mt="2" mb="0">
-            Transfer to Save
-          </Dialog.Title>
-          <Separator style={{ width: '100%' }} />
-          {validDestSaves.length === 0 ? (
-            <Dialog.Description style={{ color: '#f87171' }}>
-              No open save files can accept the selected Pokémon. Open a compatible save file first.
+      <Dialog.Container open={transferDialogOpen} onOpenChange={setTransferDialogOpen}>
+        <Dialog.Title>Transfer to Save</Dialog.Title>
+        {validDestSaves.length === 0 ? (
+          <Dialog.Description style={{ color: '#f87171' }}>
+            No open save files can accept the selected Pokémon. Open a compatible save file first.
+          </Dialog.Description>
+        ) : (
+          <>
+            <Dialog.Description>
+              Choose which save to send {selectedHomeMons.length} Pokémon to:
             </Dialog.Description>
-          ) : (
-            <>
-              <Dialog.Description>
-                Choose which save to send {selectedHomeMons.length} Pokémon to:
-              </Dialog.Description>
-              <Flex gap="1" mt="1" direction="column">
-                {validDestSaves.map((save) => (
-                  <Button
-                    key={save.identifier}
-                    onClick={() => transferToSave(save)}
-                    style={{
-                      width: '100%',
-                      minHeight: 36,
-                      height: 'fit-content',
-                      borderLeft: `4px solid ${OriginGames.color(save.origin)}`,
-                    }}
-                  >
-                    {save.name} ({save.displayID})
-                  </Button>
-                ))}
-              </Flex>
-            </>
-          )}
-          <Dialog.Close>
-            <Button variant="outline" color="gray">
-              Cancel
-            </Button>
-          </Dialog.Close>
-        </Dialog.Content>
-      </Dialog.Root>
+            <Flex gap="1" mt="1" direction="column">
+              {validDestSaves.map((save) => (
+                <TransferToSaveButton
+                  key={save.filePath.raw}
+                  save={save}
+                  onClick={transferToSave}
+                />
+              ))}
+            </Flex>
+          </>
+        )}
+        <Dialog.Actions>
+          <Dialog.Close>{validDestSaves.length > 0 ? 'Cancel' : 'Ok'}</Dialog.Close>
+        </Dialog.Actions>
+      </Dialog.Container>
 
       {toastErrors && toastErrors.length > 0 && (
         <div
@@ -396,5 +377,34 @@ export default function SortPokemon() {
         </div>
       )}
     </Flex>
+  )
+}
+
+type TransferToSaveButtonProps = {
+  save: SAV
+  onClick: (save: SAV) => void
+}
+
+function TransferToSaveButton(props: TransferToSaveButtonProps) {
+  const { save, onClick } = props
+  return (
+    <Button
+      key={save.identifier}
+      onClick={() => onClick(save)}
+      style={{
+        backgroundColor: 'gray',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+        padding: 'var(--padding-radius-sm-lg',
+      }}
+    >
+      <Flex direction="row" align="center" width="100%" gap="var(--padding-radius-sm-lg)">
+        <b>{save.name}</b>
+        <p>(TID {save.displayID})</p>
+        <div style={{ flex: 1 }} />
+        <OriginGameIndicator withName originGame={save.origin} plugin={save.pluginIdentifier} />
+      </Flex>
+    </Button>
   )
 }

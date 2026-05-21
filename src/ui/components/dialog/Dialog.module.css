@@ -13,6 +13,7 @@
   user-select: none;
   color: white;
   min-width: 3rem;
+  width: fit-content;
 
   &[data-color='red'] {
     background-color: var(--color-destructive);
@@ -57,7 +58,7 @@
   min-height: 100dvh;
   inset: 0;
   background-color: black;
-  opacity: 0.3;
+  opacity: 0.2;
   transition: opacity 75ms;
 
   @supports (-webkit-touch-callout: none) {
@@ -65,7 +66,7 @@
   }
 
   @media (prefers-color-scheme: dark) {
-    opacity: 0.7;
+    opacity: 0.6;
   }
 
   &[data-starting-style],
@@ -82,16 +83,21 @@
   position: fixed;
   top: 50%;
   left: 50%;
+  padding: var(--alert-padding-y) var(--alert-padding-x);
   transform: translate(-50%, -50%);
   width: 36rem;
   max-width: calc(100vw - 3rem);
   margin-top: -2rem;
-  padding: var(--alert-padding-y) var(--alert-padding-x);
   border-radius: var(--border-radius-lg);
   background: var(--color-panel);
   color: var(--color-gray-900);
   transition: all 75ms;
   contain: content;
+
+  box-shadow:
+    rgba(255, 255, 255, 0.1) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0.3) 0px 3px 12px,
+    rgba(0, 0, 0, 0.23) 0px 3px 6px !important;
 
   @media (prefers-color-scheme: dark) {
     outline: 1px solid var(--color-gray-300);
@@ -102,6 +108,10 @@
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.9);
   }
+}
+
+.ModalPopup {
+  background: var(--background-gradient);
 }
 
 .Title {
@@ -125,5 +135,8 @@
 .Actions {
   display: flex;
   justify-content: end;
-  gap: 0.5rem;
+  align-items: end;
+  margin-left: auto;
+  margin-top: calc(2 * var(--padding-radius-sm-lg));
+  gap: var(--padding-radius-sm-lg);
 }

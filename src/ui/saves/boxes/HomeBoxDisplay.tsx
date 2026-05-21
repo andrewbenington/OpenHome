@@ -394,7 +394,6 @@ function SingleBoxMonDisplay() {
                   dragID={`home_${currentBoxIndex}_${index}`}
                   location={thisLocation}
                   mon={mon}
-                  zIndex={0}
                   onDrop={(importedMons) => {
                     if (importedMons) {
                       attemptImportMons(importedMons, thisLocation)

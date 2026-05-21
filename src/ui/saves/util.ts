@@ -1,13 +1,19 @@
-import { SAV } from '@openhome-core/save/interfaces'
+import {
+  pluginGameName,
+  PluginIdentifier,
+  pluginOriginMarkPath,
+  SAV,
+} from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import BackendInterface from '@openhome-ui/backend/backendInterface'
 import { CtxMenuElementBuilder, ItemBuilder } from '@openhome-ui/components/context-menu/types'
-import { OriginGames } from '@pkm-rs/pkg'
+import { getPluginColor, OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '../state/ohpkm'
+import { getOriginIconPath } from '../images/game'
 
 export type SaveViewMode = 'card' | 'grid'
 
@@ -178,4 +184,30 @@ export function buildRecentSaveContextElements(
       `Reveal in ${backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
     ).withAction(() => backend.openDirectory(save.filePath.dir)),
   ]
+}
+
+export type GameOrPluginDetails = {
+  name: string
+  markIconPath: Option<string>
+  backgroundColor: string
+}
+
+export function getDetailsOfficialSave(originGame: number): GameOrPluginDetails {
+  const gameMetadata = OriginGames.getMetadata(originGame)
+  const markImage = getOriginIconPath(gameMetadata)
+  const backgroundColor = OriginGames.color(originGame)
+
+  return {
+    name: gameMetadata.name,
+    markIconPath: markImage,
+    backgroundColor,
+  }
+}
+
+export function getDetailsPluginSave(pluginId: PluginIdentifier): GameOrPluginDetails {
+  return {
+    name: pluginGameName(pluginId),
+    markIconPath: pluginOriginMarkPath(pluginId),
+    backgroundColor: getPluginColor(pluginId),
+  }
 }

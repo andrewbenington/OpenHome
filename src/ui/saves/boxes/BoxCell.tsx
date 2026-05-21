@@ -33,7 +33,6 @@ interface BoxCellProps {
   onDrop: (_: PKMInterface[]) => void
   disabled?: boolean
   disabledReason?: string
-  zIndex: number
   mon: PKMInterface | undefined
   borderColor?: string
   dragID: string
@@ -49,7 +48,6 @@ function BoxCell({
   onDrop,
   disabled,
   disabledReason,
-  zIndex,
   mon,
   borderColor,
   dragID,
@@ -241,7 +239,6 @@ function BoxCell({
             borderWidth: 1,
             backgroundColor: cellBackgroundColor,
             borderColor: isSelected ? '#4ade80' : borderColor,
-            zIndex,
           }}
           onDrop={(e) => {
             e.preventDefault()

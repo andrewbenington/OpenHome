@@ -185,7 +185,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                       save.getSlotMetadata?.(save.currentPCBox, index)?.disabledReason
                     }
                     mon={mon ? ohpkmStore.monOrOhpkmIfTracked(mon) : undefined}
-                    zIndex={1}
                     onDrop={(importedMons) => {
                       if (importedMons) {
                         attemptImportMons(importedMons, location)

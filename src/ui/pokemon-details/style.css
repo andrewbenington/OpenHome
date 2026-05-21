@@ -2,10 +2,9 @@
   width: fit-content;
   min-width: 60rem;
   max-width: 80%;
-  position: inherit;
   overflow: hidden;
   height: fit-content;
-  padding: 0;
+  padding: 0 !important;
   border-radius: var(--border-radius-lg);
 }
 
