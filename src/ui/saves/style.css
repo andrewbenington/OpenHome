@@ -126,23 +126,22 @@
 
 .draggable-item {
   position: relative;
-  width: 24px;
-  height: 24px;
+  width: 1.5rem;
+  height: 1.5rem;
   cursor: grab;
 }
 
 .item-bag-area {
-  border-radius: 6px;
+  border-radius: var(--border-radius-sm);
   box-sizing: content-box;
   justify-content: start;
   align-items: start;
   height: 100%;
-  padding: 5px 0px;
 }
 
 .item-bag-slot {
-  padding: 6px;
+  padding: var(--padding-radius-sm-lg);
   aspect-ratio: 1;
   background-color: #6662;
-  border-radius: 4px;
+  border-radius: var(--border-radius-xs);
 }

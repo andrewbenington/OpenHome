@@ -66,6 +66,7 @@
   align-items: center;
   text-align: center;
   position: relative;
+  overflow: hidden;
 }
 
 .box-navigation svg {
@@ -78,7 +79,7 @@
   align-items: center;
   text-align: center;
   flex: 1;
-  min-width: 50%;
+  min-width: 40%;
   width: fit-content;
   max-width: 80%;
   margin: 0px var(--padding-radius-sm-lg);
@@ -92,7 +93,6 @@
   padding: var(--padding-radius-sm-lg);
   width: 100%;
   height: fit-content;
-  max-height: 100%;
   overflow: auto;
   display: flex;
   flex-direction: column;
