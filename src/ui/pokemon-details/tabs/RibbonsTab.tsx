@@ -3,6 +3,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getRibbonSpritePath } from '@openhome-ui/images/ribbons'
 import { Gen9Ribbons } from '@pokemon-resources/consts/Ribbons'
 import { Tooltip } from '@radix-ui/themes'
+import './RibbonsTab.css'
 
 const RibbonsDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
@@ -40,7 +41,7 @@ const RibbonsDisplay = (props: { mon: PKMInterface }) => {
   }
 
   return (
-    <div className="ribbons-container">
+    <div className="ribbons-container pokemon-modal-content">
       {mon.ribbons?.map((ribbon) => {
         const ribbonDisplay = formatRibbon(ribbon)
 

@@ -60,7 +60,6 @@
   opacity: 0.3;
   transition: opacity 75ms;
 
-  /* iOS 26+: Ensure the backdrop covers the entire visible viewport. */
   @supports (-webkit-touch-callout: none) {
     position: absolute;
   }
@@ -76,8 +75,8 @@
 }
 
 .Popup {
-  --alert-padding-x: 0.75rem;
-  --alert-padding-y: 0.5rem;
+  --alert-padding-x: var(--padding-radius-sm-lg);
+  --alert-padding-y: var(--padding-radius-sm-lg);
 
   box-sizing: border-box;
   position: fixed;
@@ -88,14 +87,11 @@
   max-width: calc(100vw - 3rem);
   margin-top: -2rem;
   padding: var(--alert-padding-y) var(--alert-padding-x);
-  border-radius: 0.4rem;
-  outline: 1px solid var(--color-gray-300);
+  border-radius: var(--border-radius-lg);
   background: var(--color-panel);
   color: var(--color-gray-900);
   transition: all 75ms;
   contain: content;
-
-  box-shadow: var(--shadow-6);
 
   @media (prefers-color-scheme: dark) {
     outline: 1px solid var(--color-gray-300);
@@ -117,7 +113,7 @@
   line-height: 1.75rem;
   letter-spacing: -0.0025em;
   font-weight: 700;
-  background-color: var(--side-tab-bar);
+  background-color: var(--color-sidebar);
   border-bottom: 1px solid var(--gray-a5);
 }
 

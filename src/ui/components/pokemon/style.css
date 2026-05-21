@@ -18,16 +18,8 @@
   }
 }
 
-@media (prefers-color-scheme: light) {
-  .gender-icon {
-    color: white;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .gender-icon {
-    color: black;
-  }
+.gender-icon {
+  color: white;
 }
 
 .markings-container {
@@ -37,7 +29,7 @@
   padding: 5px;
   background-color: #666;
   margin-top: 10px;
-  border-radius: 5px;
+  border-radius: var(--border-radius-sm);
 }
 
 .marking-shape {
@@ -98,15 +90,15 @@
 }
 
 .dynamax-level {
-  height: 20px;
-  width: 8px;
-  margin-right: 4px;
+  height: 1.25rem;
+  width: 0.5rem;
+  margin-right: 0.2rem;
 }
 
 .move-card {
   flex: 1;
   display: flex;
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
   flex-direction: column;
   align-items: center;
   display: flex;

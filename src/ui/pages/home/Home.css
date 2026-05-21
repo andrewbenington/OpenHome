@@ -20,7 +20,8 @@
 }
 
 .save-file-column {
-  padding: 8px 4px 8px 8px;
+  padding: var(--padding-radius-sm-lg);
+  gap: var(--padding-radius-sm-lg);
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
@@ -34,7 +35,7 @@
 }
 
 .home-box-column {
-  padding: 8px 12px 8px 4px;
+  padding: var(--padding-radius-sm-lg) 0px;
   display: flex;
   flex-direction: column;
   justify-content: start;
@@ -42,11 +43,11 @@
   flex: 1;
   min-width: 480px;
   max-width: 600px;
-  margin-left: auto;
+  box-sizing: content-box;
 }
 
 .right-column {
-  padding: 8px 8px 8px 4px;
+  padding: var(--padding-radius-sm-lg);
   display: flex;
   flex-direction: column;
   width: 300px;
@@ -84,7 +85,7 @@
   position: relative;
   border: none;
   flex: 1;
-  border-radius: 3px;
+  border-radius: var(--border-radius-lg);
 }
 
 .drop-area-text {
@@ -97,4 +98,5 @@
   font-weight: bold;
   cursor: default;
   height: 26px;
+  border-top-left-radius: var(--border-radius-lg);
 }

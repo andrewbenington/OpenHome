@@ -1,19 +1,179 @@
-body {
-  margin: 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
-    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+:root {
+  --font-sans: var(--primitive-font-sans);
+  --font-mono: var(--primitive-font-mono);
+  --font-weight-normal: var(--primitive-font-weight-normal);
+  --font-weight-medium: var(--primitive-font-weight-medium);
+
+  font-size: 14px;
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-normal);
+  color-scheme: light dark;
+  background-color: var(--color-surface);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  user-select: none;
-  -webkit-user-select: none !important;
-  --color-light-panel: #dfd;
-  --color-light-background: rgb(83, 180, 165);
-  --color-dark-panel: #081721;
-  --color-dark-background: rgb(1, 83, 84);
+  -webkit-text-size-adjust: 100%;
+}
 
-  --side-tab-bar-light: rgb(139, 201, 174);
-  --side-tab-bar-dark: rgb(68, 102, 102);
+:root {
+  --border-radius-xs: 0.1rem;
+  --border-radius-sm: 0.25rem;
+  --border-radius-lg: 0.6rem;
+
+  --padding-radius-xs-sm: 0.15rem;
+  --padding-radius-sm-lg: 0.45rem;
+
+  --height-mini-button: 1.5rem;
+
+  --font-size-standard: 1rem;
+  --font-size-text: 0.9rem;
+}
+
+:root {
+  /* OpenHome's primary teal colors */
+  --primitive-teal-100: #dfd;
+  --primitive-teal-200: rgb(179, 225, 206);
+  --primitive-teal-300: rgb(160, 218, 194);
+  --primitive-teal-400: rgb(125, 206, 171);
+  --primitive-teal-450: rgb(83, 180, 165);
+  --primitive-teal-500: rgb(125, 154, 156);
+  --primitive-teal-600: rgb(108, 141, 141);
+  --primitive-teal-700: rgb(74, 108, 112);
+  --primitive-teal-800: rgb(1, 83, 84);
+
+  --primitive-navy-800: rgba(54, 69, 78, 1);
+  --primitive-navy-900: #081721;
+  --primitive-navy-950: #5d707f;
+
+  --primitive-sidebar-light: var(--color-panel);
+  --primitive-sidebar-hover-light: rgb(140, 181, 166);
+  --primitive-sidebar-selected-light: rgb(116, 155, 146);
+  --primitive-sidebar-dark: rgb(68, 102, 102);
+  --primitive-sidebar-hover-dark: rgb(103, 132, 134);
+  --primitive-sidebar-selected-dark: var(--primitive-teal-500);
+
+  --primitive-blue-light: oklch(45% 50% 264deg);
+  --primitive-blue-dark: oklch(69% 50% 264deg);
+  --primitive-red-light: oklch(65.953% 0.21938 25.564);
+  --primitive-red-dark: oklch(80% 55% 31deg);
+
+  --color-gray-50: oklch(98% 0.25% 264deg);
+  --color-gray-100: oklch(95% 0.5% 264deg / 90%);
+  --color-gray-200: oklch(93% 0.875% 264deg / 85%);
+  --color-gray-300: oklch(92% 1.125% 264deg / 80%);
+  --color-gray-400: oklch(82% 1% 264deg / 80%);
+  --color-gray-500: oklch(12% 7.5% 264deg / 50%);
+  --color-gray-600: oklch(12% 7% 264deg / 67%);
+  --color-gray-700: oklch(12% 6% 264deg / 77%);
+  --color-gray-800: oklch(12% 5% 264deg / 85%);
+  --color-gray-900: oklch(12% 5% 264deg / 90%);
+  --color-gray-950: oklch(12% 5% 264deg / 95%);
+
+  --color-border-light: var(--color-gray-400);
+  --color-translucent-light: #fff8;
+  --color-translucent-dark: #0008;
+
+  --soft-border: 0.5px solid var(--color-gray-800);
+
+  @media (prefers-color-scheme: dark) {
+    --color-blue: oklch(69% 50% 264deg);
+    --color-red: oklch(80% 55% 31deg);
+    --color-gray-50: oklch(17% 0.25% 264deg);
+    --color-gray-100: oklch(28% 0.75% 264deg / 65%);
+    --color-gray-200: oklch(29% 0.75% 264deg / 80%);
+    --color-gray-300: oklch(35% 0.75% 264deg / 80%);
+    --color-gray-400: oklch(47% 0.875% 264deg / 80%);
+    --color-gray-500: oklch(64% 1% 264deg / 80%);
+    --color-gray-600: oklch(82% 1% 264deg / 80%);
+    --color-gray-700: oklch(92% 1.125% 264deg / 80%);
+    --color-gray-800: oklch(93% 0.875% 264deg / 85%);
+    --color-gray-900: oklch(95% 0.5% 264deg / 90%);
+    --color-gray-950: oklch(94% 0.375% 264deg / 95%);
+  }
+}
+
+/* light mode (default) */
+:root {
+  --color-panel: var(--primitive-teal-100); /* still needs a primitive — see note */
+  --color-surface: var(--primitive-navy-950);
+  --color-accent: var(--primitive-blue-light);
+  --color-danger: var(--primitive-red-light);
+  --color-sidebar-hover: rgb(140, 181, 166); /* also needs a primitive */
+  --color-panel: var(--primitive-teal-300);
+
+  --color-destructive: var(--primitive-red-light);
+
+  --color-sidebar: var(--primitive-sidebar-light);
+  --color-sidebar-hover: var(--primitive-sidebar-hover-light);
+  --color-sidebar-selected: var(--primitive-sidebar-selected-light);
+
+  --color-gray-subtle: var(--primitive-gray-100);
+  --color-gray-border: var(--primitive-gray-300);
+  --color-gray-text: var(--primitive-gray-700);
+
+  --attribute-row-label: var(--primitive-teal-200);
+  --attribute-row-content: var(--primitive-teal-300);
+
+  --byte-hover: var(--primitive-teal-100);
+  --color-translucent: var(--color-translucent-light);
+
+  --gradient-angle: 310deg;
+
+  --background-gradient: linear-gradient(
+    var(--gradient-angle),
+    var(--primitive-teal-450) 0%,
+    var(--primitive-teal-400) 85%
+  );
+
+  .radix-themes {
+    --color-panel: var(--primitive-teal-100);
+    --color-bar: var(--color-panel);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-panel: var(--primitive-navy-900);
+    --color-accent: var(--primitive-blue-dark);
+    --color-danger: var(--primitive-red-dark);
+
+    --color-gray-subtle: var(--primitive-gray-100-dark);
+    --color-gray-border: var(--primitive-gray-300-dark);
+    --color-gray-text: var(--primitive-gray-700-dark);
+
+    --color-destructive: var(--primitive-red-light);
+
+    --attribute-row-label: var(--primitive-teal-600);
+    --attribute-row-content: var(--primitive-teal-700);
+
+    --byte-hover: var(--primitive-teal-600);
+    --color-translucent: var(--color-translucent-dark);
+
+    --color-sidebar: var(--primitive-sidebar-dark);
+    --color-sidebar-hover: var(--primitive-sidebar-hover-dark);
+    --color-sidebar-selected: var(--primitive-sidebar-selected-dark);
+
+    --autocomplete-scrollbar: #fff;
+    --autocomplete-background-color: #333;
+
+    --gradient-angle: 355deg;
+
+    --background-gradient: linear-gradient(
+      var(--gradient-angle),
+      var(--primitive-navy-800) 0%,
+      var(--primitive-teal-800) 85%
+    );
+
+    .radix-themes {
+      --color-panel: var(--primitive-navy-900);
+      --color-bar: var(--color-panel);
+    }
+  }
+}
+
+p {
+  margin: 0;
 }
 
 img {
@@ -23,33 +183,8 @@ img {
 
 @media (prefers-color-scheme: light) {
   body {
-    --background-gradient: linear-gradient(
-      355deg,
-      rgba(83, 180, 165, 1) 0%,
-      rgba(125, 206, 171, 1) 85%
-    );
-    --byte-hover: #fffa;
-    --attribute-row-label: rgb(179, 225, 206);
-    --attribute-row-content: rgb(160, 218, 194);
     --autocomplete-scrollbar: rgb(80, 158, 146);
     --autocomplete-background-color: #fff;
-    --side-tab-bar: var(--side-tab-bar-light);
-    --side-tab-hover: rgb(140, 181, 166);
-    --side-tab-selected: rgb(116, 155, 146);
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    --background-gradient: linear-gradient(310deg, rgba(54, 69, 78, 1) 0%, rgba(1, 83, 84, 1) 85%);
-    --byte-hover: #ccc6;
-    --attribute-row-label: rgb(108, 141, 141);
-    --attribute-row-content: rgb(74, 108, 112);
-    --autocomplete-scrollbar: #fff;
-    --autocomplete-background-color: #333;
-    --side-tab-bar: var(--side-tab-bar-dark);
-    --side-tab-hover: rgb(142, 174, 176);
-    --side-tab-selected: rgb(116, 155, 155);
   }
 }
 
@@ -70,20 +205,6 @@ body,
   -webkit-user-select: none !important;
   -webkit-user-drag: none !important;
   overflow: hidden;
-}
-
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  font-weight: 400;
-
-  color-scheme: dark;
-  background-color: #5d707f;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
 }
 
 ::-webkit-scrollbar {
@@ -118,7 +239,7 @@ select {
 
 button,
 select {
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
   border: 2px solid transparent;
   font-size: small;
   font-weight: 500;
@@ -141,7 +262,7 @@ select:focus-visible {
 
 input,
 fieldset {
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
   border: 1px solid transparent;
   font-size: small;
   font-weight: 500;
@@ -187,8 +308,7 @@ label {
 
 .radix-themes {
   --cursor-button: pointer;
-  --card-border-width: 2px;
-  --radius-4: 3px;
+  font-size: inherit;
   .rt-BaseMenuSeparator {
     margin: 0px 0px;
   }
@@ -205,10 +325,13 @@ label {
     flex-direction: row;
   }
   .rt-Card {
-    --base-card-border-radius: 5px;
+    --base-card-border-radius: var(--border-radius-lg);
   }
   .rt-Separator:where(.rt-r-orientation-horizontal) {
     width: 100%;
+  }
+  .rt-Button {
+    border-radius: var(--border-radius-sm);
   }
 }
 
@@ -216,9 +339,12 @@ label {
 .rt-BaseMenuViewport {
   min-width: 13.75rem;
   background-color: var(--color-panel-solid);
-  border-radius: 3px;
-  padding: 0.15rem;
+  border-radius: var(--border-radius-lg);
   gap: 0.2rem;
+}
+
+.rt-BaseMenuViewport {
+  padding: var(--padding-radius-sm-lg);
 }
 
 .rt-ContextMenuSubContent {
@@ -228,7 +354,7 @@ label {
 .rt-BaseMenuItem {
   font-size: 0.8rem;
   line-height: 1;
-  border-radius: 2px;
+  border-radius: var(--border-radius-sm);
   display: flex;
   align-items: center;
   height: 1.5rem;
@@ -237,22 +363,6 @@ label {
   outline: none;
   cursor: pointer;
   padding: 0.5rem;
-}
-
-@media (prefers-color-scheme: light) {
-  .radix-themes {
-    --color-panel: var(--color-light-panel);
-    --color-bar: var(--color-light-panel);
-    --color-background: var(--color-light-background);
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .radix-themes {
-    --color-panel: var(--color-dark-panel);
-    --color-bar: var(--color-dark-panel);
-    --color-background: var(--color-dark-background);
-  }
 }
 
 .rt-BaseDialogOverlay {
@@ -279,20 +389,33 @@ label {
   }
 }
 
+.rt-Badge {
+  border-radius: var(--border-radius-sm);
+}
+
+.rt-SwitchThumb,
+.rt-SwitchRoot::before {
+  border-radius: 9999px;
+  --switch-height: 1.2rem;
+  --switch-width: 2rem;
+  --switch-thumb-size: 1.1rem;
+}
+
 .diagonal-clip {
   clip-path: polygon(0% 0%, 0% 100%, calc(100% - 12px) 100%, calc(100% - 0px) 0%, 100% 0%);
 }
 
 .mini-button {
-  padding: 0px;
+  padding: var(--padding-radius-xs-sm);
   aspect-ratio: 1;
-  height: 20px;
-  width: 20px;
+  height: var(--height-mini-button);
+  width: fit-content;
   transition: none;
+  border-radius: var(--border-radius-sm);
 
   svg {
-    height: 18px;
-    width: 18px;
+    height: 1rem;
+    width: 1rem;
   }
 }
 
@@ -325,36 +448,7 @@ label {
   align-items: center;
 }
 
-:root {
-  --color-blue: oklch(45% 50% 264deg);
-  --color-red: oklch(50% 55% 31deg);
-
-  --color-gray-50: oklch(98% 0.25% 264deg);
-  --color-gray-100: oklch(12% 9.5% 264deg / 5%);
-  --color-gray-200: oklch(12% 9% 264deg / 7%);
-  --color-gray-300: oklch(12% 8.5% 264deg / 17%);
-  --color-gray-400: oklch(12% 8% 264deg / 38%);
-  --color-gray-500: oklch(12% 7.5% 264deg / 50%);
-  --color-gray-600: oklch(12% 7% 264deg / 67%);
-  --color-gray-700: oklch(12% 6% 264deg / 77%);
-  --color-gray-800: oklch(12% 5% 264deg / 85%);
-  --color-gray-900: oklch(12% 5% 264deg / 90%);
-  --color-gray-950: oklch(12% 5% 264deg / 95%);
-
-  @media (prefers-color-scheme: dark) {
-    --color-blue: oklch(69% 50% 264deg);
-    --color-red: oklch(80% 55% 31deg);
-
-    --color-gray-50: oklch(17% 0.25% 264deg);
-    --color-gray-100: oklch(28% 0.75% 264deg / 65%);
-    --color-gray-200: oklch(29% 0.75% 264deg / 80%);
-    --color-gray-300: oklch(35% 0.75% 264deg / 80%);
-    --color-gray-400: oklch(47% 0.875% 264deg / 80%);
-    --color-gray-500: oklch(64% 1% 264deg / 80%);
-    --color-gray-600: oklch(82% 1% 264deg / 80%);
-    --color-gray-700: oklch(92% 1.125% 264deg / 80%);
-    --color-gray-800: oklch(93% 0.875% 264deg / 85%);
-    --color-gray-900: oklch(95% 0.5% 264deg / 90%);
-    --color-gray-950: oklch(94% 0.375% 264deg / 95%);
-  }
+.pad-x-sm-lg {
+  padding-left: var(--padding-radius-sm-lg);
+  padding-right: var(--padding-radius-sm-lg);
 }

@@ -27,11 +27,13 @@ import { RemoveIcon } from '@openhome-ui/components/Icons'
 import { MonLocation } from '@openhome-ui/state/saves'
 import { Button, Flex, Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
+import { includeClass } from 'src/ui/util/style'
 import { SimpleOpenHomeBox } from '../../../core/save/util/storage'
 import {
   boxNameOrDefault,
   OPENHOME_BOX_COLUMNS,
   OPENHOME_BOX_ROWS,
+  OPENHOME_BOX_SLOTS,
   useBanksAndBoxes,
 } from '../../state-zustand/banks-and-boxes/store'
 import DroppableSpace from './DroppableSpace'
@@ -226,22 +228,35 @@ type BoxMonIconsProps = {
 
 function BoxWithMons({ box, debugMode }: BoxMonIconsProps) {
   const boxName = boxNameOrDefault(box)
+  const allSlotsFull = box.identifiers.size === OPENHOME_BOX_SLOTS
+
   return (
     <Flex direction="column" width="100%" height="100%">
       <div className="box-icon-mon-container">
         {range(OPENHOME_BOX_COLUMNS).map((i) => (
           <div className="box-icon-mon-col" key={`pos-display-col-${i}`}>
-            {range(OPENHOME_BOX_ROWS).map((j) => (
-              <div
-                className={`box-icon-mon-indicator ${!box.identifiers.has(j * OPENHOME_BOX_COLUMNS + i) ? 'box-icon-mon-empty' : ''}`}
-                key={`pos-display-cell-${i}-${j}`}
-              />
-            ))}
+            {range(OPENHOME_BOX_ROWS).map((j) => {
+              const slotIsEmpty = !box.identifiers.has(j * OPENHOME_BOX_COLUMNS + i)
+              return (
+                <div
+                  className={includeClass('box-icon-mon-indicator')
+                    .with('box-icon-mon-empty')
+                    .if(slotIsEmpty)}
+                  key={`pos-display-cell-${i}-${j}`}
+                />
+              )
+            })}
           </div>
         ))}
       </div>
       <div className="box-overview-title-container" style={fontStyleFromStringLength(boxName)}>
-        <div className="box-overview-title">{boxName}</div>
+        <div
+          className={includeClass('box-overview-title')
+            .with('box-overview-title-full')
+            .if(allSlotsFull)}
+        >
+          {boxName}
+        </div>
       </div>
       {debugMode && (
         <div style={{ fontWeight: 'lighter' }}>

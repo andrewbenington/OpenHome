@@ -8,14 +8,13 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { ItemBuilder, OpenHomeCtxMenu, SubmenuBuilder } from '@openhome-ui/components/context-menu'
 import Fallback from '@openhome-ui/components/Fallback'
-import { MenuIcon } from '@openhome-ui/components/Icons'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
-import { Button, Card, Dialog, Flex, Grid, Separator } from '@radix-ui/themes'
+import { Button, Dialog, Flex, Grid, Separator } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
@@ -145,27 +144,23 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   return save && save.currentPCBox !== undefined ? (
     <>
       <Flex direction="column" width="100%">
-        <Card className={includeClass('box-card').with('box-card-disabled').if(allCellsDisabled)}>
+        <div className={includeClass('box-card').with('box-card-disabled').if(allCellsDisabled)}>
           <SaveHeader save={save} setDetailsModal={setDetailsModal} />
           <Separator />
-          <div className="box-navigation">
-            <Flex align="center" justify="center" flexGrow="4">
-              <ArrowButton
-                onClick={() => savesManager.saveBoxNavigateLeft(save)}
-                dragID={`arrow_left_${save.tid}_${save.sid}`}
-                direction="left"
-              />
-            </Flex>
+          <div className="box-navigation pad-x-sm-lg">
+            <ArrowButton
+              onClick={() => savesManager.saveBoxNavigateLeft(save)}
+              dragID={`arrow_left_${save.tid}_${save.sid}`}
+              direction="left"
+            />
             <div className="box-name">{save.getBoxName(save.currentPCBox)}</div>
-            <Flex align="center" justify="center" flexGrow="4">
-              <ArrowButton
-                onClick={() => savesManager.saveBoxNavigateRight(save)}
-                dragID={`arrow_right_${save.tid}_${save.sid}`}
-                direction="right"
-              />
-            </Flex>
+            <ArrowButton
+              onClick={() => savesManager.saveBoxNavigateRight(save)}
+              dragID={`arrow_right_${save.tid}_${save.sid}`}
+              direction="right"
+            />
           </div>
-          <Grid className="box-grid" columns={save.boxColumns.toString()} gap="1" p="1">
+          <Grid className="box-grid" columns={save.boxColumns.toString()}>
             {range(save.boxColumns * save.boxRows)
               .map((index: number) => save.getMonAt(save.currentPCBox, index))
               .map((_, index) => {
@@ -203,7 +198,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 )
               })}
           </Grid>
-        </Card>
+        </div>
         <Dialog.Root open={detailsModal} onOpenChange={setDetailsModal}>
           <Dialog.Content className="save-details-modal">
             <AttributeRow label="Game">Pokémon {save.gameName}</AttributeRow>
@@ -293,39 +288,35 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
       ),
   ]
 
+  const gameColorIsDark = colorIsDark(save.gameColor)
+
   return (
     <OpenHomeCtxMenu elements={contextElements}>
-      <div className="save-header">
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
+      <div className="save-header-container">
+        <div className="save-header-inner">
           <div
             className="save-header-game diagonal-clip"
             style={{
               backgroundColor: save.gameColor,
-              color: colorIsDark(save.gameColor) ? 'white' : 'black',
+              color: gameColorIsDark ? 'white' : 'black',
             }}
           >
             <Button
-              className="save-close-button"
+              className="save-close-button mini-button"
               onClick={() => savesManager.removeSave(save)}
               disabled={!!save.updatedBoxSlots.length}
-              color="tomato"
-              style={{ padding: 1 }}
+              style={{
+                padding: 1,
+                backgroundColor: gameColorIsDark
+                  ? 'var(--primitive-red-light)'
+                  : 'var(--primitive-red-dark)',
+              }}
             >
               <MdClose />
             </Button>
             {save.gameName}
           </div>
           {save?.name}
-        </div>
-        <div className="save-menu-buttons-right">
-          <Button
-            className="mini-button"
-            onClick={() => setDetailsModal(true)}
-            variant="outline"
-            color="gray"
-          >
-            <MenuIcon />
-          </Button>
         </div>
       </div>
     </OpenHomeCtxMenu>

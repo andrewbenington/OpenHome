@@ -17,3 +17,8 @@
   width: 30px;
   height: 30px;
 }
+
+.hint {
+  font-size: small;
+  margin-left: auto;
+}

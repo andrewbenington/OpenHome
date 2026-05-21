@@ -1,0 +1,27 @@
+.extra-form-name {
+  font-weight: bold;
+  background-color: black;
+  padding: 0 0.2rem;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+  border-radius: 0.25rem;
+}
+
+.mon-image-container {
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.summary-image {
+  max-height: 100px;
+  transform: scale(2);
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+
+.nickname-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}

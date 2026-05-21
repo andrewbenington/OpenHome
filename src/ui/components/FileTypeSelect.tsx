@@ -50,7 +50,7 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
 
   return (
     <select
-      className="file-type-chip"
+      className="file-type-select"
       value={currentFormat}
       onChange={(e) => onChange(e.target.value)}
       style={{

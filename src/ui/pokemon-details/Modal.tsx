@@ -11,7 +11,7 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
 import { isRomHackFormat } from '@pokemon-files/pkm/PKM'
 import { FileSchemas } from '@pokemon-files/schema'
-import { Dialog, Flex, Separator, Switch, VisuallyHidden } from '@radix-ui/themes'
+import { Dialog, Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
 import { OriginGameIndicator } from '../components/pokemon/indicator/OriginGame'
@@ -157,19 +157,7 @@ const PokemonDetailsModal = (props: {
   return (
     <Dialog.Root open={!!(mon && displayMon)} onOpenChange={(open) => !open && onClose?.()}>
       {mon && (
-        <Dialog.Content
-          onKeyDown={handleArrows}
-          minWidth="800px"
-          maxWidth="80%"
-          width="fit-content"
-          style={{
-            position: 'inherit',
-            overflow: 'hidden',
-            height: 'fit-content',
-            padding: 0,
-            borderRadius: 4,
-          }}
-        >
+        <Dialog.Content className="pokemon-modal" onKeyDown={handleArrows}>
           <VisuallyHidden>
             <Dialog.Title>Pokémon Details</Dialog.Title>
             <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
@@ -177,7 +165,7 @@ const PokemonDetailsModal = (props: {
           {mon && displayMon && (
             <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary">
               <SideTabs.TabList>
-                <Flex direction="row" gap="2" mb="1">
+                <Flex direction="row" gap="var(--padding-radius-sm-lg">
                   <FileTypeSelect
                     baseFormat={mon.format}
                     currentFormat={displayMon.format}
@@ -187,7 +175,7 @@ const PokemonDetailsModal = (props: {
                     onChange={switchFormat}
                   />
                   <button
-                    style={{ padding: '4px 6px 2px 6px' }}
+                    className="mini-button"
                     onClick={() => {
                       displayMon.refreshChecksum?.()
                       backend.saveLocalFile(
@@ -215,14 +203,14 @@ const PokemonDetailsModal = (props: {
                 <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
                 <div style={{ flex: 1 }} />
                 {(isOriginal || (mon instanceof OHPKM && mon.originalData)) && (
-                  <Flex align="center" gap="2" style={{ fontWeight: 'bold' }}>
+                  <Flex className="original-data-switch" align="center" gap="2">
                     <Switch
                       radius="full"
                       size="1"
                       checked={isOriginal}
                       onCheckedChange={updateIsOriginal}
                     />
-                    Show Original Data
+                    Show Original
                   </Flex>
                 )}
               </SideTabs.TabList>
@@ -273,7 +261,6 @@ const PokemonDetailsModal = (props: {
               </Fallback>
             </SideTabs.Root>
           )}
-          <Separator />
           <div className="modal-footer">
             <Flex gap="1" align="center" minWidth="7rem">
               <PokemonIcon

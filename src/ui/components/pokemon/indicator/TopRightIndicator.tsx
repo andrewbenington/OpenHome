@@ -92,7 +92,7 @@ function TopRightNumericalIndicator({ value, percent }: TopRightNumericalIndicat
   return (
     value !== undefined &&
     (percent || value > 0) && (
-      <Indicator className="numerical-indicator" backgroundColor="#e60040">
+      <Indicator className="numerical-indicator" backgroundColor="var(--accent-9)">
         {value}
         {percent ? '%' : ''}
       </Indicator>

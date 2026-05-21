@@ -51,7 +51,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
           }}
           onClick={onOpen}
         >
-          <Flex direction="row" width="100%" justify="start" style={{ padding: 8 }} gap="2">
+          <Flex direction="row" width="100%" justify="start" gap="2">
             {size >= standardViewMinSize && (
               <Badge variant="solid" size="3">
                 <b>{save.trainerName}</b>
@@ -92,12 +92,12 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
         {!save.valid && (
           <div className="save-grid-error-button-container">
             <button
-              className="save-grid-error-button"
+              className="save-grid-button save-grid-error-button"
               onClick={() =>
                 displayError('Invalid Save', 'File is missing, renamed, or inaccessbile')
               }
             >
-              <ErrorIcon style={{ width: 20 }} />
+              <ErrorIcon />
             </button>
           </div>
         )}

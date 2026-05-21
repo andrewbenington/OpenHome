@@ -3,7 +3,6 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getSortFunction, SortType, SortTypes } from '@openhome-core/pkm/sort'
 import { SAV } from '@openhome-core/save/interfaces'
 import { filterUndefined } from '@openhome-core/util/sort'
-import Autocomplete from '@openhome-ui/components/Autocomplete'
 import { ClearIcon, ErrorIcon } from '@openhome-ui/components/Icons'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
@@ -14,6 +13,7 @@ import { OriginGames } from '@pkm-rs/pkg'
 import { Badge, Button, Callout, Card, Dialog, Flex, Separator } from '@radix-ui/themes'
 import { useCallback, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
+import { Typeahead } from 'src/ui/components/typeahead'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '../../state/ohpkm'
 import './SortPokemon.css'
@@ -236,14 +236,16 @@ export default function SortPokemon() {
       >
         <Card style={{ contain: 'none', overflow: 'visible' }}>
           <Flex direction="row" gap="2" align="center" wrap="wrap">
-            <Autocomplete
+            <Typeahead<string>
               value={sort ?? null}
               options={SortTypes}
               onChange={(value) => setSort(value)}
-              label="Sort"
+              uniqueFieldId="sort"
               getOptionString={(opt) => opt}
               getOptionUniqueID={(opt) => opt}
+              placeholder="Sort"
             />
+            <p className="hint">View a Pokémon's summary with alt + click</p>
             {selectedIndices.size > 0 && (
               <Flex gap="3" align="center">
                 <span style={{ fontSize: 12, color: '#aaa' }}>{selectedIndices.size} selected</span>

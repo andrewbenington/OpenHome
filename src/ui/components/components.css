@@ -86,55 +86,6 @@
   background-color: #fff3;
 }
 
-.autocomplete {
-  padding-left: 0px;
-  font-size: small;
-  padding: 0px 0px;
-  max-height: 2.2em;
-  & svg {
-    width: 20px;
-    height: 20px;
-  }
-  & button {
-    padding: 2px;
-  }
-}
-
-.autocomplete-dropdown {
-  display: inline-flex;
-  flex-direction: column;
-  margin-block-start: 4px;
-  position: fixed;
-  z-index: 2;
-  overflow-y: auto;
-  padding-inline-start: 0px;
-  max-height: 300px;
-  margin-right: 0px;
-  background-color: var(--autocomplete-background-color);
-  box-shadow:
-    rgb(0, 0, 0) 0px 0px 0px 0px,
-    rgba(21, 21, 21, 0.08) 0px 2px 8px -2px,
-    rgba(21, 21, 21, 0.08) 0px 6px 12px -2px;
-  border-radius: 3px;
-}
-
-.autocomplete-dropdown::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: var(--autocomplete-scrollbar);
-}
-
-.autocomplete-option {
-  padding: 4px 8px;
-  cursor: pointer;
-  width: calc(100% - 16px);
-  list-style: none;
-  overflow: visible;
-}
-
-.selected {
-  background-color: var(--accent-6);
-}
-
 .loading-overlay {
   display: flex;
   align-items: center;
@@ -179,16 +130,13 @@
 }
 
 .attribute-row-label {
-  min-width: calc(33% - var(--indent, 0px));
-  height: 100%;
-  min-height: 28px;
   margin-left: var(--indent, 0px);
   display: grid;
   align-items: center;
 }
 
 .attribute-row-label-text {
-  padding-left: 8px;
+  padding-left: 0.5rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -208,14 +156,15 @@
   object-fit: contain;
 }
 
-.file-type-chip {
+.file-type-select {
   color: white;
   font-weight: bold;
   font-size: small;
   box-shadow: none;
   flex: 1;
-  padding: 4px 22px 2px 6px;
-  height: fit-content;
+  padding: 0 1.5rem 0 var(--padding-radius-sm-lg);
+  height: var(--height-mini-button);
+  width: 0;
 }
 
 .datagrid {
