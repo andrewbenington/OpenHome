@@ -69,7 +69,7 @@ export default function HomeBoxDisplay() {
   const {
     addBoxCurrentBank,
     getCurrentBox,
-    removeDupesFromHomeBox,
+    removeAllHomeDupes,
     setBoxNameCurrentBank,
     sortAllHomeBoxes,
     sortHomeBox,
@@ -210,8 +210,8 @@ export default function HomeBoxDisplay() {
                     ))}
                   </DropdownMenu.SubContent>
                 </DropdownMenu.Sub>
-                <DropdownMenu.Item onClick={() => removeDupesFromHomeBox(getCurrentBox().index)}>
-                  Remove duplicates from this box
+                <DropdownMenu.Item onClick={removeAllHomeDupes}>
+                  Remove duplicates from all banks + boxes
                 </DropdownMenu.Item>
               </DropdownMenu.Content>
             </DropdownMenu.Root>
@@ -243,11 +243,12 @@ type MissingIdData = {
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
   const { importMonsToLocation, saveFromIdentifier } = useSaves()
-  const { getCurrentBox, getCurrentBank, clearAtHomeLocation } = useBanksAndBoxes()
+  const { getCurrentBox, getCurrentBank, clearAtHomeLocation, removeAllHomeDupes } =
+    useBanksAndBoxes()
   const [missingIdData, setMissingIdData] = useState<MissingIdData>()
   const [, dispatchError] = useContext(ErrorContext)
   const { dragState, isSelected, toggleSelection } = useDragAndDrop()
-  const { sortHomeBox, sortAllHomeBoxes, removeDupesFromHomeBox } = useBanksAndBoxes()
+  const { sortHomeBox, sortAllHomeBoxes } = useBanksAndBoxes()
   const {
     currentIndex: selectedIndex,
     setCurrentIndex: setSelectedIndex,
@@ -318,9 +319,6 @@ function SingleBoxMonDisplay() {
 
   const contextElements = useMemo(
     () => [
-      Item.label('Remove duplicates from this box').action(() =>
-        removeDupesFromHomeBox(getCurrentBox().index)
-      ),
       Submenu.label('Sort this box...').with(
         ...SortTypes.map((sortType) =>
           Item.label(`By ${sortType}`).action(() => sortHomeBox(getCurrentBox().index, sortType))
@@ -332,8 +330,10 @@ function SingleBoxMonDisplay() {
         )
       ),
     ],
-    [getCurrentBox, removeDupesFromHomeBox, sortAllHomeBoxes, sortHomeBox]
+    [getCurrentBox, sortAllHomeBoxes, sortHomeBox]
   )
+
+  const removeDupesItem = Item.label('Remove duplicates from this box').action(removeAllHomeDupes)
 
   function dismissMissingIdDialog() {
     setMissingIdData(undefined)
@@ -350,7 +350,7 @@ function SingleBoxMonDisplay() {
 
   return (
     <>
-      <OpenHomeCtxMenu elements={contextElements}>
+      <OpenHomeCtxMenu sections={[contextElements, [removeDupesItem]]}>
         <Grid className="home-box-grid" columns={OPENHOME_BOX_COLUMNS.toString()} gap="1">
           {range(OPENHOME_BOX_SLOTS)
             .map((index: number) => currentBox.identifiers.get(index))

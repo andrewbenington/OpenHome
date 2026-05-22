@@ -67,6 +67,7 @@ export interface BanksAndBoxesState {
   reorderBoxesCurrentBank: (idsInNewOrder: string[]) => void
   firstEmptySlotInBox: (boxIndex: number) => Option<number>
   removeDupesFromBox: (boxIndex: number) => void
+  removeDupesFromEverywhere: () => void
   allMonsCurrentBank: () => OhpkmIdentifier[]
   allMonsInBoxCurrentBank: (boxIndex: number) => OhpkmIdentifier[]
   findHomeLocation: (identifier: OhpkmIdentifier) => Option<BankBoxCoordinates>
@@ -233,6 +234,10 @@ export const createBanksAndBoxesStore = (
           set((state) => {
             removeDupes(requireBoxCurrentBank(state, boxIndex))
           }),
+        removeDupesFromEverywhere: () =>
+          set((state) => {
+            removeAllDupes(state.banks)
+          }),
         allMonsCurrentBank: (): OhpkmIdentifier[] => {
           return Array.from(readonlyState().getCurrentBank().boxes.values()).flatMap((box) =>
             Array.from(box.identifiers.values())
@@ -379,6 +384,31 @@ function removeDupes<T extends SimpleOpenHomeBox>(box: T) {
   }
 }
 
+// when called using a mutable state (via immer), mutations to the returned value
+// will be preserved by immer
+function removeBoxDupesInner<T extends SimpleOpenHomeBox>(alreadyPresent: Set<string>, box: T) {
+  for (let slot = 0; slot < OPENHOME_BOX_SLOTS; slot++) {
+    const identifier = box.identifiers.get(slot)
+
+    if (!identifier) continue
+    if (alreadyPresent.has(identifier)) {
+      box.identifiers.delete(slot)
+    } else {
+      alreadyPresent.add(identifier)
+    }
+  }
+}
+
+// when called using a mutable state (via immer), mutations to the returned value
+// will be preserved by immer
+function removeAllDupes<T extends SimpleOpenHomeBank>(banks: T[]) {
+  const alreadyPresent: Set<string> = new Set()
+
+  banks
+    .flatMap((bank) => Array.from(bank.boxes.values()))
+    .forEach((box) => removeBoxDupesInner(alreadyPresent, box))
+}
+
 type BanksAndBoxesStore = ReturnType<typeof createBanksAndBoxesStore>
 
 export const BanksAndBoxesStoreContext = createContext<BanksAndBoxesStore | null>(null)
@@ -428,7 +458,7 @@ export function useBanksAndBoxes() {
   const setBoxNameCurrentBank = withSelectors.use.setBoxNameCurrentBank()
   const getCurrentBox = withSelectors.use.getCurrentBox()
   const switchBoxCurrentBank = withSelectors.use.setCurrentBox()
-  const removeDupesFromHomeBox = withSelectors.use.removeDupesFromBox()
+  const removeAllHomeDupes = withSelectors.use.removeDupesFromEverywhere()
   const overwriteBoxSlotsCurrentBank = withSelectors.use.overwriteBoxSlotsCurrentBank()
   const overwriteAllBoxSlotsCurrentBank = withSelectors.use.overwriteAllBoxSlotsCurrentBank()
 
@@ -574,7 +604,7 @@ export function useBanksAndBoxes() {
     getCurrentBox,
     sortHomeBox,
     sortAllHomeBoxes,
-    removeDupesFromHomeBox,
+    removeAllHomeDupes,
 
     switchBoxCurrentBank,
     switchToPreviousBox,
