@@ -592,9 +592,7 @@ export function useBanksAndBoxes() {
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = backend.registerListeners({
-      onSave: saveChanges,
-    })
+    const stopListening = backend.onMenuEvent('save', saveChanges)
 
     // the "stop listening" function should be called when the effect returns,
     // otherwise duplicate listeners will exist

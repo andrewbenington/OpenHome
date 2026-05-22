@@ -173,9 +173,9 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = backend.registerListeners({
-      onSave: () => saveChanges(false),
-      onReset: () => {
+    const stopListening = backend.onMenuEvents({
+      save: () => saveChanges(false),
+      reset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
         reloadBankStore()
         openSavesDispatch({ type: 'close_all_saves' })

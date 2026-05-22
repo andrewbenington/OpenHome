@@ -28,9 +28,7 @@ const Home = () => {
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = backend.registerListeners({
-      onOpen: () => setOpenSaveDialog(true),
-    })
+    const stopListening = backend.onMenuEvent('open', () => setOpenSaveDialog(true))
 
     // the "stop listening" function should be called when the effect returns,
     // otherwise duplicate listeners will exist

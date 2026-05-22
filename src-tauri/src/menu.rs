@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use tauri::{image::Image, include_image, menu::*, App, AppHandle, Emitter, Wry};
+use tauri::{App, AppHandle, Emitter, Wry, image::Image, include_image, menu::*};
 
 use crate::data_controller::DataController;
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
@@ -76,14 +76,24 @@ pub fn create_menu(app: &App) -> core::result::Result<Menu<Wry>, Box<dyn std::er
     }?;
 
     menu.append(&file_submenu)?;
-    let zoom_in_item = MenuItem::with_id(handle, "zoom_in", "Zoom In", true, None::<&str>)?;
-    let zoom_out_item = MenuItem::with_id(handle, "zoom_out", "Zoom Out", true, None::<&str>)?;
+    let zoom_in_item =
+        MenuItem::with_id(handle, "zoom_in", "Zoom In", true, Some("CmdOrCtrl+NUMADD"))?;
+    let zoom_out_item =
+        MenuItem::with_id(handle, "zoom_out", "Zoom Out", true, Some("CmdOrCtrl+-"))?;
+    let reset_zoom_item = MenuItem::with_id(
+        handle,
+        "reset_zoom",
+        "Reset Zoom",
+        true,
+        Some("CmdOrCtrl+0"),
+    )?;
     let show_toolbar_item =
         MenuItem::with_id(handle, "show_toolbar", "Show Toolbar", true, None::<&str>)?;
 
     let view_submenu = SubmenuBuilder::new(handle, "View")
         .item(&zoom_in_item)
         .item(&zoom_out_item)
+        .item(&reset_zoom_item)
         .item(&show_toolbar_item)
         .build()?;
 
@@ -135,14 +145,10 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
         "open" => app_handle
             .emit("open", ())
             .unwrap_or_else(|err| println!("Error emitting 'open' event: {err}")),
-        "save" => {
-            let result = app_handle.emit("save", ());
-            if let Err(error) = result {
-                println!("Error saving: {}", error);
-            } else {
-                println!("Save successful");
-            }
-        }
+        "save" => match app_handle.emit("save", ()) {
+            Ok(_) => println!("Save successful"),
+            Err(error) => println!("Error saving: {error}"),
+        },
         "reset" => {
             let _ = app_handle.emit("reset", ());
         }
@@ -166,8 +172,15 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
         // "paste" => println!("Paste action triggered!"),
 
         // View menu actions
-        // "zoom_in" => println!("Zoom In action triggered!"),
-        // "zoom_out" => println!("Zoom Out action triggered!"),
+        "zoom_in" => app_handle
+            .emit("zoom_in", ())
+            .unwrap_or_else(|err| println!("Error emitting 'zoom_in' event: {err}")),
+        "zoom_out" => app_handle
+            .emit("zoom_out", ())
+            .unwrap_or_else(|err| println!("Error emitting 'zoom_out' event: {err}")),
+        "reset_zoom" => app_handle
+            .emit("reset_zoom", ())
+            .unwrap_or_else(|err| println!("Error emitting 'reset_zoom' event: {err}")),
         // "show_toolbar" => println!("Show Toolbar action triggered!"),
 
         // Help menu actions

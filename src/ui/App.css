@@ -3,8 +3,9 @@
   --font-mono: var(--primitive-font-mono);
   --font-weight-normal: var(--primitive-font-weight-normal);
   --font-weight-medium: var(--primitive-font-weight-medium);
+  --base-font-size: 14px;
 
-  font-size: 14px;
+  font-size: var(--base-font-size);
   font-family: var(--font-sans);
   font-weight: var(--font-weight-normal);
   color-scheme: light dark;

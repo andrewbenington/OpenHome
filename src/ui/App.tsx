@@ -133,6 +133,23 @@ function AppWithBackend() {
     debouncedUpdateSettings(backend, appInfoState.settings)
   }, [backend, appInfoState.settings, appInfoState.settingsLoaded, debouncedUpdateSettings])
 
+  useEffect(() => {
+    // returns a function to stop listening
+    const stopListening = backend.onMenuEvents({
+      zoom_in: () =>
+        appInfoDispatch({ type: 'set_zoom_level', payload: appInfoState.settings.zoomLevel + 10 }),
+      zoom_out: () =>
+        appInfoDispatch({ type: 'set_zoom_level', payload: appInfoState.settings.zoomLevel - 10 }),
+      reset_zoom: () => appInfoDispatch({ type: 'set_zoom_level', payload: 100 }),
+    })
+
+    // the "stop listening" function should be called when the effect returns,
+    // otherwise duplicate listeners will exist
+    return () => {
+      stopListening()
+    }
+  }, [appInfoState.settings.zoomLevel, backend])
+
   const getEnabledSaveTypes = useCallback(() => {
     return appInfoState.officialSaveTypes
       .concat(appInfoState.extraSaveTypes)
