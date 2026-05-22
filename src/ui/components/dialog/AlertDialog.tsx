@@ -1,7 +1,10 @@
 import { AlertDialog as BaseUiAlertDialog } from '@base-ui/react/alert-dialog'
-import styles from './AlertDialog.module.css'
+import styles from './Dialog.module.css'
 
 export const FORCE_DIALOG_FOR_TESTING = false
+
+export type AlertDialogContainerProps = React.ComponentProps<typeof BaseUiAlertDialog.Popup> &
+  Pick<React.ComponentProps<typeof BaseUiAlertDialog.Root>, 'open' | 'onOpenChange'>
 
 export const AlertDialog = {
   Root: (props: React.ComponentProps<typeof BaseUiAlertDialog.Root>) => (
@@ -11,7 +14,7 @@ export const AlertDialog = {
     <BaseUiAlertDialog.Trigger {...props} className={styles.Button} />
   ),
   Portal: (props: React.ComponentProps<typeof BaseUiAlertDialog.Portal>) => (
-    <BaseUiAlertDialog.Portal {...props} />
+    <BaseUiAlertDialog.Portal container={document.getElementById('app-container')} {...props} />
   ),
   Backdrop: (props: React.ComponentProps<typeof BaseUiAlertDialog.Backdrop>) => (
     <BaseUiAlertDialog.Backdrop {...props} className={styles.Backdrop} />
@@ -19,6 +22,17 @@ export const AlertDialog = {
   Popup: (props: React.ComponentProps<typeof BaseUiAlertDialog.Popup>) => (
     <BaseUiAlertDialog.Popup {...props} className={styles.Popup} />
   ),
+  Container: (props: AlertDialogContainerProps) => {
+    const { open, onOpenChange, ...popupProps } = props
+    return (
+      <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
+        <AlertDialog.Portal>
+          <AlertDialog.Backdrop />
+          <AlertDialog.Popup {...popupProps} />
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
+    )
+  },
   Title: (props: React.ComponentProps<typeof BaseUiAlertDialog.Title>) => (
     <BaseUiAlertDialog.Title {...props} className={styles.Title} />
   ),

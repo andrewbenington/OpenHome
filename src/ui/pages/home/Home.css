@@ -26,8 +26,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 18rem !important;
-  min-width: 18rem;
+  width: 20rem;
+  min-width: 20rem;
 }
 
 .save-file-stack {
@@ -100,6 +100,6 @@
   align-items: center;
   font-weight: bold;
   cursor: default;
-  height: 26px;
+  height: 1.75rem;
   border-top-left-radius: var(--border-radius-lg);
 }

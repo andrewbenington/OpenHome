@@ -57,5 +57,5 @@
   "rust-analyzer.cargo.features": "all",
   "css.completion.completePropertyWithSemicolon": false,
   "rust-analyzer.cargo.targetDir": true,
-  "python.terminal.activateEnvironment": true
+  "python.terminal.activateEnvironment": false
 }

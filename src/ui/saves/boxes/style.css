@@ -106,13 +106,14 @@
 }
 
 .save-header-container {
+  --close-button-height: var(--height-mini-button);
   display: flex;
   flex-direction: row;
   position: relative;
   align-items: center;
   width: 100%;
   margin: 0;
-  height: 2rem;
+  height: calc(var(--close-button-height) + 2 * var(--padding-radius-sm-lg));
 }
 
 .save-header-container svg {
@@ -155,10 +156,13 @@
   display: grid;
   aspect-ratio: 1;
   align-items: center;
-  height: fit-content;
+  height: var(--close-button-height);
+  width: var(--close-button-height);
   background-color: var(--color-destructive);
   border: 0.5px solid var(--color-gray-800);
   border-radius: var(--border-radius-sm) !important;
+  background-color: var(--color-destructive);
+  padding: var(--padding-radius-xs-sm);
 }
 
 .save-details-modal {

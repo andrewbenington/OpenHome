@@ -2,6 +2,7 @@ import { fileTypeFromStringNonOhpkm } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
 import FileTypeSelect from '@openhome-ui/components/FileTypeSelect'
 import HexDisplay from '@openhome-ui/components/HexDisplay'
@@ -11,7 +12,7 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
 import { isRomHackFormat } from '@pokemon-files/pkm/PKM'
 import { FileSchemas } from '@pokemon-files/schema'
-import { Dialog, Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
+import { Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
 import { OriginGameIndicator } from '../components/pokemon/indicator/OriginGame'
@@ -154,10 +155,13 @@ const PokemonDetailsModal = (props: {
     }
   }
 
+  if (!mon) return null
+
   return (
     <Dialog.Root open={!!(mon && displayMon)} onOpenChange={(open) => !open && onClose?.()}>
-      {mon && (
-        <Dialog.Content className="pokemon-modal" onKeyDown={handleArrows}>
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Popup className="pokemon-modal" onKeyDown={handleArrows}>
           <VisuallyHidden>
             <Dialog.Title>Pokémon Details</Dialog.Title>
             <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
@@ -287,26 +291,26 @@ const PokemonDetailsModal = (props: {
               <div>Tracked since {mon.startedTrackingTimestamp?.format('MMMM D, YYYY')}</div>
             )}
           </div>
-          {navigateLeft && (
-            <button className="modal-arrow modal-arrow-left" onClick={navigateLeft}>
-              <ArrowLeftIcon />
-            </button>
-          )}
-          {navigateRight && (
-            <button className="modal-arrow modal-arrow-right" onClick={navigateRight}>
-              <ArrowRightIcon />
-            </button>
-          )}
-          {boxIndicatorProps && (
-            <div
-              className="modal-box-indicator-wrapper"
-              style={{ opacity: boxIndicatorVisible ? 1 : 0, pointerEvents: 'none' }}
-            >
-              <MiniBoxIndicator {...boxIndicatorProps} />
-            </div>
-          )}
-        </Dialog.Content>
-      )}
+        </Dialog.Popup>
+        {navigateLeft && (
+          <button className="modal-arrow modal-arrow-left" onClick={navigateLeft}>
+            <ArrowLeftIcon />
+          </button>
+        )}
+        {navigateRight && (
+          <button className="modal-arrow modal-arrow-right" onClick={navigateRight}>
+            <ArrowRightIcon />
+          </button>
+        )}
+        {boxIndicatorProps && (
+          <div
+            className="modal-box-indicator-wrapper"
+            style={{ opacity: boxIndicatorVisible ? 1 : 0, pointerEvents: 'none' }}
+          >
+            <MiniBoxIndicator {...boxIndicatorProps} />
+          </div>
+        )}
+      </Dialog.Portal>
     </Dialog.Root>
   )
 }

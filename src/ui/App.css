@@ -17,7 +17,7 @@
 }
 
 :root {
-  --border-radius-xs: 0.1rem;
+  --border-radius-xs: 0.15rem;
   --border-radius-sm: 0.25rem;
   --border-radius-lg: 0.6rem;
 
@@ -73,6 +73,7 @@
   --color-border-light: var(--color-gray-400);
   --color-translucent-light: #fff8;
   --color-translucent-dark: #0008;
+  --color-destructive: #aa0000;
 
   --soft-border: 0.5px solid var(--color-gray-800);
 
@@ -95,14 +96,11 @@
 
 /* light mode (default) */
 :root {
-  --color-panel: var(--primitive-teal-100); /* still needs a primitive — see note */
+  --color-panel: var(--primitive-teal-100);
   --color-surface: var(--primitive-navy-950);
   --color-accent: var(--primitive-blue-light);
   --color-danger: var(--primitive-red-light);
-  --color-sidebar-hover: rgb(140, 181, 166); /* also needs a primitive */
   --color-panel: var(--primitive-teal-300);
-
-  --color-destructive: var(--primitive-red-light);
 
   --color-sidebar: var(--primitive-sidebar-light);
   --color-sidebar-hover: var(--primitive-sidebar-hover-light);
@@ -141,8 +139,6 @@
     --color-gray-subtle: var(--primitive-gray-100-dark);
     --color-gray-border: var(--primitive-gray-300-dark);
     --color-gray-text: var(--primitive-gray-700-dark);
-
-    --color-destructive: var(--primitive-red-light);
 
     --attribute-row-label: var(--primitive-teal-600);
     --attribute-row-content: var(--primitive-teal-700);
@@ -233,8 +229,6 @@ select {
   appearance: none;
   background: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path fill="white" d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>')
     100% 50% no-repeat transparent;
-  padding-left: 4px;
-  padding-right: 24px;
 }
 
 button,
@@ -244,7 +238,6 @@ select {
   font-size: small;
   font-weight: 500;
   font-family: inherit;
-  transition: border-color 0.25s;
 }
 
 button:not(:disabled) {

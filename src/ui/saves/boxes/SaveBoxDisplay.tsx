@@ -185,7 +185,6 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                       save.getSlotMetadata?.(save.currentPCBox, index)?.disabledReason
                     }
                     mon={mon ? ohpkmStore.monOrOhpkmIfTracked(mon) : undefined}
-                    zIndex={1}
                     onDrop={(importedMons) => {
                       if (importedMons) {
                         attemptImportMons(importedMons, location)
@@ -305,12 +304,6 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
               className="save-close-button mini-button"
               onClick={() => savesManager.removeSave(save)}
               disabled={!!save.updatedBoxSlots.length}
-              style={{
-                padding: 1,
-                backgroundColor: gameColorIsDark
-                  ? 'var(--primitive-red-light)'
-                  : 'var(--primitive-red-dark)',
-              }}
             >
               <MdClose />
             </Button>

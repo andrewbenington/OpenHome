@@ -15,8 +15,9 @@ import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Lookup } from '@pkm-rs/pkg'
-import { Button, Dialog, Flex, TextField } from '@radix-ui/themes'
+import { Flex, TextField } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo, useState } from 'react'
+import { Dialog } from 'src/ui/components/dialog/Dialog'
 import { useMonDisplay } from 'src/ui/hooks/useMonDisplay'
 import '../style.css'
 import DraggableMon from './DraggableMon'
@@ -33,7 +34,6 @@ interface BoxCellProps {
   onDrop: (_: PKMInterface[]) => void
   disabled?: boolean
   disabledReason?: string
-  zIndex: number
   mon: PKMInterface | undefined
   borderColor?: string
   dragID: string
@@ -49,7 +49,6 @@ function BoxCell({
   onDrop,
   disabled,
   disabledReason,
-  zIndex,
   mon,
   borderColor,
   dragID,
@@ -241,7 +240,6 @@ function BoxCell({
             borderWidth: 1,
             backgroundColor: cellBackgroundColor,
             borderColor: isSelected ? '#4ade80' : borderColor,
-            zIndex,
           }}
           onDrop={(e) => {
             e.preventDefault()
@@ -276,32 +274,24 @@ function BoxCell({
         </div>
       </OpenHomeCtxMenu>
       {mon && (
-        <Dialog.Root open={renameOpen} onOpenChange={setRenameOpen}>
-          <Dialog.Content maxWidth="360px" style={{ padding: 16, borderRadius: 8 }}>
-            <Flex direction="column" gap="1">
-              <Dialog.Title>Rename {mon.nickname}</Dialog.Title>
-              <Dialog.Description>Enter a nickname for this Pokémon</Dialog.Description>
-            </Flex>
-
-            <Flex direction="column" gap="3" mt="3">
-              <TextField.Root
-                value={renameValue}
-                onChange={(e) => setRenameValue(e.target.value)}
-                placeholder={Lookup.speciesName(mon.dexNum, mon.language)}
-              />
-
-              <Flex gap="2" justify="end">
-                <Button variant="soft" color="gray" onClick={() => setRenameOpen(false)}>
-                  Cancel
-                </Button>
-                <Button variant="soft" color="gray" onClick={() => setRenameValue('')}>
-                  Reset
-                </Button>
-                <Button onClick={confirmRename}>Save</Button>
-              </Flex>
-            </Flex>
-          </Dialog.Content>
-        </Dialog.Root>
+        <Dialog.Container open={renameOpen} onOpenChange={setRenameOpen}>
+          <Dialog.Title>Rename {mon.nickname}</Dialog.Title>
+          <Dialog.Description>Enter a nickname for this Pokémon</Dialog.Description>
+          <Flex direction="column" gap="3" mt="3">
+            <TextField.Root
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              placeholder={Lookup.speciesName(mon.dexNum, mon.language)}
+            />
+            <Dialog.Actions>
+              <Dialog.Close>Cancel</Dialog.Close>
+              <Dialog.Action onClick={() => setRenameValue('')}>Reset</Dialog.Action>
+              <Dialog.Close color="theme" onClick={confirmRename}>
+                Save
+              </Dialog.Close>
+            </Dialog.Actions>
+          </Flex>
+        </Dialog.Container>
       )}
     </>
   )
