@@ -5,7 +5,7 @@ import { SortTypes } from '@openhome-core/pkm/sort'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { R, range } from '@openhome-core/util/functional'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
-import { ItemBuilder, SubmenuBuilder } from '@openhome-ui/components/context-menu/types'
+import { Item, Submenu } from '@openhome-ui/components/context-menu/types'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import {
   AddIcon,
@@ -318,19 +318,17 @@ function SingleBoxMonDisplay() {
 
   const contextElements = useMemo(
     () => [
-      ItemBuilder.fromLabel('Remove duplicates from this box').withAction(() =>
+      Item.label('Remove duplicates from this box').action(() =>
         removeDupesFromHomeBox(getCurrentBox().index)
       ),
-      SubmenuBuilder.fromLabel('Sort this box...').withBuilders(
-        SortTypes.map((sortType) =>
-          ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
-            sortHomeBox(getCurrentBox().index, sortType)
-          )
+      Submenu.label('Sort this box...').with(
+        ...SortTypes.map((sortType) =>
+          Item.label(`By ${sortType}`).action(() => sortHomeBox(getCurrentBox().index, sortType))
         )
       ),
-      SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
-        SortTypes.map((sortType) =>
-          ItemBuilder.fromLabel(`By ${sortType}`).withAction(() => sortAllHomeBoxes(sortType))
+      Submenu.label('Sort all boxes...').with(
+        ...SortTypes.map((sortType) =>
+          Item.label(`By ${sortType}`).action(() => sortAllHomeBoxes(sortType))
         )
       ),
     ],
@@ -403,7 +401,7 @@ function SingleBoxMonDisplay() {
                     // don't allow a swap with a pokémon not supported by the source save
                     mon && dragData && !dragData.isHome && !sourceSupportsMon(mon)
                   }
-                  ctxMenuBuilders={contextElements}
+                  contextMenu={contextElements}
                   multiSelectEnabled={dragState.multiSelectEnabled}
                   isSelected={isSelected(thisLocation)}
                   onToggleSelect={() => toggleSelection(thisLocation)}

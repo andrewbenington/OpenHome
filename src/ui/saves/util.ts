@@ -7,7 +7,7 @@ import {
 import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import BackendInterface from '@openhome-ui/backend/backendInterface'
-import { CtxMenuElementBuilder, ItemBuilder } from '@openhome-ui/components/context-menu/types'
+import { CtxMenuElementBuilder, Item } from '@openhome-ui/components/context-menu/types'
 import { getPluginColor, OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
 import { useState } from 'react'
@@ -178,11 +178,11 @@ export function buildRecentSaveContextElements(
 ): Option<CtxMenuElementBuilder>[] {
   return [
     removeRecentSave
-      ? ItemBuilder.fromLabel('Remove Save').withAction(() => removeRecentSave(save.filePath.raw))
+      ? Item.label('Remove Save').action(() => removeRecentSave(save.filePath.raw))
       : undefined,
-    ItemBuilder.fromLabel(
+    Item.label(
       `Reveal in ${backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
-    ).withAction(() => backend.openDirectory(save.filePath.dir)),
+    ).action(() => backend.openDirectory(save.filePath.dir)),
   ]
 }
 

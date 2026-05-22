@@ -4,10 +4,10 @@ import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import {
   CtxMenuElementBuilder,
-  ItemBuilder,
-  LabelBuilder,
+  Item,
+  Label,
   OpenHomeCtxMenu,
-  SubmenuBuilder,
+  Submenu,
 } from '@openhome-ui/components/context-menu'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
@@ -38,26 +38,15 @@ interface BoxCellProps {
   borderColor?: string
   dragID: string
   location: MonLocation
-  ctxMenuBuilders?: CtxMenuElementBuilder[]
+  contextMenu?: CtxMenuElementBuilder[]
   isSelected?: boolean
   onToggleSelect?: () => void
   multiSelectEnabled?: boolean
 }
 
-function BoxCell({
-  onClick,
-  onDrop,
-  disabled,
-  disabledReason,
-  mon,
-  borderColor,
-  dragID,
-  location,
-  ctxMenuBuilders,
-  isSelected,
-  onToggleSelect,
-  multiSelectEnabled,
-}: BoxCellProps) {
+function BoxCell(props: BoxCellProps) {
+  const { onClick, onDrop, disabled, disabledReason, mon, borderColor, dragID } = props
+  const { location, isSelected, onToggleSelect, multiSelectEnabled } = props
   const { filter, topRightIndicator, showItem, showShiny } = useMonDisplay()
   const backend = useContext(BackendContext)
   const displayError = useDisplayError()
@@ -145,15 +134,11 @@ function BoxCell({
     if (!mon || !hasOpenHomeId(mon)) return undefined
     const monId = mon.openhomeId
 
-    const builder = SubmenuBuilder.fromLabel('Set Tag')
+    const builder = Submenu.label('Set Tag')
     for (const preset of TAG_PRESETS) {
-      builder.withBuilder(
-        ItemBuilder.fromLabel(preset.label).withAction(() => updateMonTags(monId, [preset]))
-      )
+      builder.with(Item.label(preset.label).action(() => updateMonTags(monId, [preset])))
     }
-    builder.withBuilder(
-      ItemBuilder.fromLabel('Clear Tag').withAction(() => updateMonTags(monId, undefined))
-    )
+    builder.with(Item.label('Clear Tag').action(() => updateMonTags(monId, undefined)))
     return builder
   }, [mon, updateMonTags])
 
@@ -161,34 +146,26 @@ function BoxCell({
     if (!mon || !hasOpenHomeId(mon)) return undefined
     const monId = mon.openhomeId
 
-    const builder = SubmenuBuilder.fromLabel('Set Display Color')
+    const builder = Submenu.label('Set Display Color')
     for (const preset of DISPLAY_COLOR_PRESETS) {
-      builder.withBuilder(
-        ItemBuilder.fromLabel(preset.name).withAction(() =>
-          updateMonDisplayColor(monId, preset.color)
-        )
-      )
+      builder.with(Item.label(preset.name).action(() => updateMonDisplayColor(monId, preset.color)))
     }
-    builder.withBuilder(
-      ItemBuilder.fromLabel('Clear Display Color').withAction(() =>
-        updateMonDisplayColor(monId, undefined)
-      )
+    builder.with(
+      Item.label('Clear Display Color').action(() => updateMonDisplayColor(monId, undefined))
     )
     return builder
   }, [mon, updateMonDisplayColor])
 
-  const monCtxMenuItemBuilders = mon
+  const contextMenuItems = mon
     ? [
-        LabelBuilder.fromMon(mon),
-        ItemBuilder.fromLabel('Change Nickname').withAction(openRenameDialog),
+        Label.mon(mon),
+        Item.label('Change Nickname').action(openRenameDialog),
         tagSubmenu,
         displayColorSubmenu,
         mon.heldItemIndex > 0
-          ? ItemBuilder.fromLabel('Move Item to Bag').withAction(() => moveMonItemToBag(location))
+          ? Item.label('Move Item to Bag').action(() => moveMonItemToBag(location))
           : undefined,
-        ItemBuilder.fromLabel('Move To Release Area').withAction(() =>
-          releaseMonAtLocation(location)
-        ),
+        Item.label('Move To Release Area').action(() => releaseMonAtLocation(location)),
       ]
     : undefined
 
@@ -230,7 +207,7 @@ function BoxCell({
 
   return (
     <>
-      <OpenHomeCtxMenu sections={[monCtxMenuItemBuilders, ctxMenuBuilders]}>
+      <OpenHomeCtxMenu sections={[contextMenuItems, props.contextMenu]}>
         <div
           style={{
             padding: 0,

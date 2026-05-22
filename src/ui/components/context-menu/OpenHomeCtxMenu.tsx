@@ -7,7 +7,7 @@ import {
   CtxMenuElement,
   CtxMenuElementBuilder,
   CtxMenuSectionBuilders,
-  SeparatorBuilder,
+  Separator,
   renderContent,
 } from './types'
 
@@ -27,7 +27,7 @@ export default function OpenHomeCtxMenu(props: ContextMenuProps) {
     const allBuilders =
       elements?.filter(filterUndefined) ??
       sections?.filter(filterUndefined).flatMap((section, i) => {
-        const builders = i > 0 ? [SeparatorBuilder, ...section] : section
+        const builders = i > 0 ? [Separator, ...section] : section
         return builders.filter(filterUndefined)
       }) ??
       []

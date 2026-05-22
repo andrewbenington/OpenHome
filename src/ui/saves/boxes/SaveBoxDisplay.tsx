@@ -6,7 +6,7 @@ import { monSupportedBySave } from '@openhome-core/save/util'
 import { range } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
-import { ItemBuilder, OpenHomeCtxMenu, SubmenuBuilder } from '@openhome-ui/components/context-menu'
+import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
 import Fallback from '@openhome-ui/components/Fallback'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { ErrorContext } from '@openhome-ui/state/error'
@@ -270,18 +270,16 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
   const totalMonCount = save.getAllMons().length
 
   const contextElements = [
-    ItemBuilder.fromLabel('Details...').withAction(() => setDetailsModal(true)),
-    ItemBuilder.fromLabel('Open file location').withAction(() =>
-      backend.openDirectory(save.filePath.dir)
-    ),
-    SubmenuBuilder.fromLabel('Move to Bank...')
-      .withBuilder(
-        ItemBuilder.fromLabel(`This Box (${currentBoxMonCount})`).withAction(() => {
+    Item.label('Details...').action(() => setDetailsModal(true)),
+    Item.label('Open file location').action(() => backend.openDirectory(save.filePath.dir)),
+    Submenu.label('Move to Bank...')
+      .with(
+        Item.label(`This Box (${currentBoxMonCount})`).action(() => {
           savesManager.moveBoxToBank(save)
         })
       )
-      .withBuilder(
-        ItemBuilder.fromLabel(`Entire Save (${totalMonCount})`).withAction(() => {
+      .with(
+        Item.label(`Entire Save (${totalMonCount})`).action(() => {
           savesManager.moveSaveToBank(save)
         })
       ),
