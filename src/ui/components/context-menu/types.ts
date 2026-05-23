@@ -56,8 +56,8 @@ export class Item implements CtxMenuElementBuilder {
   build(): ItemData {
     return {
       content: this.content,
-      action: this.action,
-      disabled: this.action === undefined,
+      action: this.#action,
+      disabled: this.#action === undefined,
       __cm_type_tag: 'item',
     }
   }

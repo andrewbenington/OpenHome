@@ -33,6 +33,8 @@ export type AddBoxLocation = 'start' | 'end' | ['before', number] | ['after', nu
 
 type ReverseLookup = Map<OhpkmIdentifier, BankBoxCoordinates>
 
+type LocationsByIdentifier = Record<OhpkmIdentifier, BankBoxCoordinates>
+
 export interface BanksAndBoxesState {
   reloadStore: () => Promise<void>
 
@@ -68,7 +70,7 @@ export interface BanksAndBoxesState {
   firstEmptySlotInBox: (boxIndex: number) => Option<number>
   removeDupesFromBox: (boxIndex: number) => void
   removeDupesFromEverywhere: () => void
-  allMonsCurrentBank: () => OhpkmIdentifier[]
+  allMonsCurrentBank: () => LocationsByIdentifier
   allMonsInBoxCurrentBank: (boxIndex: number) => OhpkmIdentifier[]
   findHomeLocation: (identifier: OhpkmIdentifier) => Option<BankBoxCoordinates>
   indexOfBoxId: (id: string) => Option<number>
@@ -238,10 +240,23 @@ export const createBanksAndBoxesStore = (
           set((state) => {
             removeAllDupes(state.banks)
           }),
-        allMonsCurrentBank: (): OhpkmIdentifier[] => {
-          return Array.from(readonlyState().getCurrentBank().boxes.values()).flatMap((box) =>
-            Array.from(box.identifiers.values())
-          )
+        allMonsCurrentBank: (): LocationsByIdentifier => {
+          const locationsByIdentifier: LocationsByIdentifier = {}
+
+          readonlyState()
+            .getCurrentBank()
+            .boxes.values()
+            .forEach((box) =>
+              box.identifiers.entries().forEach(([boxSlot, identifier]) => {
+                locationsByIdentifier[identifier] = {
+                  bank: readonlyState().currentBankIndex,
+                  box: box.index,
+                  boxSlot,
+                }
+              })
+            )
+
+          return locationsByIdentifier
         },
         allMonsInBoxCurrentBank: (boxIndex: number): OhpkmIdentifier[] => {
           const box = readonlyState().getCurrentBank().boxes.get(boxIndex)
@@ -514,10 +529,16 @@ export function useBanksAndBoxes() {
   }
 
   function sortAllHomeBoxes(sortType: string): Result<null, IdentifierNotPresentError[]> {
-    const loadResults = ohpkmStore.tryLoadFromIds(allMonsInCurrentBank())
+    const currentBankMons = allMonsInCurrentBank()
+    const loadResults = ohpkmStore.tryLoadFromIds(Object.keys(currentBankMons))
     const { successes: allMons, failures } = partitionResults(loadResults)
     if (failures.length) {
-      return R.Err(failures)
+      failures.forEach((failure) => {
+        const location = currentBankMons[failure.identifier]
+        console.error(
+          `Pokémon cannot be found: ${failure.identifier} (location: box ${location.box}/slot ${location.boxSlot})`
+        )
+      })
     }
 
     const sorted = allMons.toSorted(getSortFunctionNullable(sortType))
