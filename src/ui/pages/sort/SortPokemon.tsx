@@ -10,12 +10,12 @@ import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
 import SavesModal from '@openhome-ui/saves/SavesModal'
 import { useSaves } from '@openhome-ui/state/saves'
 import { HomeMonLocation, SaveMonLocation } from '@openhome-ui/state/saves/reducer'
-import { OriginGames } from '@pkm-rs/pkg'
-import { Badge, Button, Callout, Card, Flex } from '@radix-ui/themes'
+import { Badge, Button, Callout, Flex } from '@radix-ui/themes'
 import { useCallback, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
 import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
 import { Typeahead } from 'src/ui/components/typeahead'
+import { getDetailsOfficialSave, getDetailsPluginSave } from 'src/ui/saves/util'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '../../state/ohpkm'
 import './SortPokemon.css'
@@ -44,11 +44,16 @@ export default function SortPokemon() {
   const allMonsWithColors: MonWithColors[] = useMemo(() => {
     return savesAndBanks.allOpenSaves
       .flatMap((save) =>
-        save.getAllMons().map((mon) => ({
-          mon: ohpkmStore.monOrOhpkmIfTracked(mon),
-          color: OriginGames.color(save.origin),
-          isHome: false,
-        }))
+        save.getAllMons().map((mon) => {
+          const { backgroundColor } = save.pluginIdentifier
+            ? getDetailsPluginSave(save.pluginIdentifier)
+            : getDetailsOfficialSave(save.origin)
+          return {
+            mon: ohpkmStore.monOrOhpkmIfTracked(mon),
+            color: backgroundColor,
+            isHome: false,
+          }
+        })
       )
       .concat(
         savesAndBanks
@@ -207,22 +212,31 @@ export default function SortPokemon() {
   }, [sortedMonsWithColors, selectedIndices])
 
   return (
-    <Flex direction="row" wrap="wrap" overflow="hidden" height="calc(100% - 16px)" m="2" gap="2">
-      <Card style={{ height: '100%' }}>
-        <Flex direction="column" gap="1" style={{ width: 180, flex: 0 }}>
-          <Badge color="gray" size="3" style={{ border: `2px solid ${OPENHOME_COLOR}` }}>
+    <div className="sort-pokemon-layout">
+      <div className="card-lg-radius">
+        <Flex className="sort-pokemon-saves-column">
+          <Badge color="gray" size="3" style={{ border: `1px solid ${OPENHOME_COLOR}` }}>
             OpenHome
           </Badge>
-          {savesAndBanks.allOpenSaves.map((save) => (
-            <Badge
-              color="gray"
-              size="3"
-              key={save.tid}
-              style={{ border: `2px solid ${OriginGames.color(save.origin)}` }}
-            >
-              {save.name} ({save.tid})
-            </Badge>
-          ))}
+          {savesAndBanks.allOpenSaves.map((save) => {
+            const { backgroundColor } = save.pluginIdentifier
+              ? getDetailsPluginSave(save.pluginIdentifier)
+              : getDetailsOfficialSave(save.origin)
+            return (
+              <Badge
+                color="gray"
+                size="3"
+                key={save.tid}
+                style={{ border: `1px solid ${backgroundColor}` }}
+              >
+                <p>
+                  {save.name} ({save.tid})
+                </p>
+                <div style={{ flex: 1 }} />
+                <OriginGameIndicator originGame={save.origin} plugin={save.pluginIdentifier} />
+              </Badge>
+            )
+          })}
           <button
             onClick={() => setOpenSaveDialog(true)}
             style={{ padding: 0, display: 'grid', justifyContent: 'center' }}
@@ -230,13 +244,9 @@ export default function SortPokemon() {
             <MdAdd />
           </button>
         </Flex>
-      </Card>
-      <Flex
-        direction="column"
-        gap="2"
-        style={{ flex: 1, height: '100%', contain: 'none', overflow: 'visible' }}
-      >
-        <Card style={{ contain: 'none', overflow: 'visible' }}>
+      </div>
+      <div className="sort-pokemon-main-content">
+        <div className="card-lg-radius">
           <Flex direction="row" gap="2" align="center" wrap="wrap">
             <Typeahead<string>
               value={sort ?? null}
@@ -249,7 +259,7 @@ export default function SortPokemon() {
             />
             {selectedIndices.size > 0 ? (
               <Flex gap="3" align="center">
-                <span style={{ fontSize: 12, color: '#aaa' }}>{selectedIndices.size} selected</span>
+                <span className="faint-text">{selectedIndices.size} selected</span>
                 {selectedIndices.size === 1 && (
                   <Button
                     size="1"
@@ -278,23 +288,14 @@ export default function SortPokemon() {
                 </Button>
               </Flex>
             ) : (
-              <p className="hint">View a Pokémon's summary with alt + click</p>
+              <p className="hint faint-text">View a Pokémon's summary with alt + click</p>
             )}
           </Flex>
-        </Card>
-        <Card style={{ overflowY: 'hidden', height: '100%', padding: 0 }}>
-          <Flex
-            direction="row"
-            wrap="wrap"
-            justify="center"
-            overflow="auto"
-            height="calc(100% - 16px)"
-            style={{ padding: 8, alignContent: 'start' }}
-          >
-            {boxCells}
-          </Flex>
-        </Card>
-      </Flex>
+        </div>
+        <div className="panel-lg-radius full-height no-overflow">
+          <Flex className="sort-mon-grid">{boxCells}</Flex>
+        </div>
+      </div>
       <SavesModal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)} />
       <PokemonDetailsModal
         mon={detailsMon}
@@ -343,8 +344,8 @@ export default function SortPokemon() {
         <div
           style={{
             position: 'fixed',
-            bottom: 24,
-            right: 24,
+            bottom: '1.5rem',
+            right: '1.5rem',
             zIndex: 9999,
           }}
         >
@@ -364,8 +365,8 @@ export default function SortPokemon() {
               onClick={() => setToastErrors(undefined)}
               style={{
                 position: 'absolute',
-                top: 8,
-                right: 8,
+                top: '0.5rem',
+                right: '0.5rem',
                 background: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
@@ -376,7 +377,7 @@ export default function SortPokemon() {
           </Callout.Root>
         </div>
       )}
-    </Flex>
+    </div>
   )
 }
 

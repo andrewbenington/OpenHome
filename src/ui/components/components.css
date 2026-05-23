@@ -75,12 +75,12 @@
 }
 
 .byte-row-display {
-  font-size: small;
+  font-size: var(--font-size-text);
   font-weight: bold;
 }
 
 .single-byte-display {
-  font-size: small;
+  font-size: var(--font-size-text);
 }
 .single-byte-display:hover {
   background-color: #fff3;
@@ -92,7 +92,7 @@
   justify-content: center;
   height: 100vh;
 
-  --logo-side: 128px;
+  --logo-side: 8rem;
 }
 
 .loading-centered-container {
@@ -143,16 +143,17 @@
 }
 
 .attribute-tag {
-  margin-top: 5px;
-  padding: 3px;
+  margin-top: var(--padding-radius-xs-sm);
+  padding: 0.25rem;
   display: grid;
   width: fit-content;
   font-weight: bold;
-  border-radius: 5px;
+  border-radius: var(--border-radius-sm);
 }
 
 .attribute-tag-icon {
-  height: 18px;
+  height: 1.2rem;
+  aspect-ratio: 1;
   object-fit: contain;
 }
 
@@ -178,7 +179,7 @@
   .rdg-row .rdg-cell {
     outline: none;
     border-bottom: none;
-    font-size: 0.8rem;
+    font-size: var(--font-size-text);
     border-color: var(--gray-8);
     border-width: 0.5px;
 

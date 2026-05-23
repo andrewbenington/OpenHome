@@ -71,7 +71,7 @@ function BankSelector(props: { disabled?: boolean }) {
       <DropdownMenu.Trigger disabled={disabled}>
         <Button className="bank-select">
           Switch Bank
-          <DropdownMenu.TriggerIcon />
+          <DropdownMenu.TriggerIcon width="0.75rem" height="0.75rem" />
         </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
