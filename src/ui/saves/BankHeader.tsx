@@ -36,7 +36,7 @@ export default function BankHeader() {
           autoFocus
         />
       ) : (
-        <Heading size="5">{getCurrentBankName()}</Heading>
+        <Heading style={{ fontSize: '1.5rem' }}>{getCurrentBankName()}</Heading>
       )}
 
       <Flex direction="row-reverse" flexGrow="1" width="0" gap="1">
@@ -71,7 +71,7 @@ function BankSelector(props: { disabled?: boolean }) {
       <DropdownMenu.Trigger disabled={disabled}>
         <Button className="bank-select">
           Switch Bank
-          <DropdownMenu.TriggerIcon width="0.75rem" height="0.75rem" />
+          <DropdownMenu.TriggerIcon style={{ width: '0.8rem', height: '0.8rem' }} />
         </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
