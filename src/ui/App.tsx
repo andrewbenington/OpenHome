@@ -31,6 +31,8 @@ import BanksAndBoxesProvider from './state-zustand/banks-and-boxes/Provider'
 import ConvertStrategiesProvider from './state/convert-strategies/ConvertStrategiesProvider'
 import PluginsProvider from './state/plugin/PluginProvider'
 
+const ZOOM_CHANGE_PCT = 5
+
 export default function App() {
   const isDarkMode = useIsDarkMode()
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
@@ -137,9 +139,15 @@ function AppWithBackend() {
     // returns a function to stop listening
     const stopListening = backend.onMenuEvents({
       zoom_in: () =>
-        appInfoDispatch({ type: 'set_zoom_level', payload: appInfoState.settings.zoomLevel + 10 }),
+        appInfoDispatch({
+          type: 'set_zoom_level',
+          payload: appInfoState.settings.zoomLevel + ZOOM_CHANGE_PCT,
+        }),
       zoom_out: () =>
-        appInfoDispatch({ type: 'set_zoom_level', payload: appInfoState.settings.zoomLevel - 10 }),
+        appInfoDispatch({
+          type: 'set_zoom_level',
+          payload: appInfoState.settings.zoomLevel - ZOOM_CHANGE_PCT,
+        }),
       reset_zoom: () => appInfoDispatch({ type: 'set_zoom_level', payload: 100 }),
     })
 

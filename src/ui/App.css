@@ -485,7 +485,3 @@ label {
 .no-overflow {
   overflow: hidden;
 }
-
-.auto-overflow-y {
-  overflow-y: auto;
-}
