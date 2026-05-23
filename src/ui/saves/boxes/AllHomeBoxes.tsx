@@ -21,7 +21,7 @@ import {
   CtxMenuElementBuilder,
   Item,
   OpenHomeCtxMenu,
-  Submenu as Submenu,
+  Submenu,
 } from '@openhome-ui/components/context-menu'
 import { RemoveIcon } from '@openhome-ui/components/Icons'
 import { MonLocation } from '@openhome-ui/state/saves'
@@ -308,18 +308,11 @@ function useSaveContextActions() {
 }
 
 function useBoxContextActions(box: SimpleOpenHomeBox): CtxMenuElementBuilder[][] {
-  const {
-    removeDupesFromHomeBox,
-    sortHomeBox,
-    sortAllHomeBoxes,
-    deleteBoxCurrentBank,
-    addBoxCurrentBank,
-  } = useBanksAndBoxes()
+  const { sortHomeBox, sortAllHomeBoxes, deleteBoxCurrentBank, addBoxCurrentBank } =
+    useBanksAndBoxes()
+
   const boxIsEmpty = box.identifiers.size === 0
   const boxActions = [
-    Item.label('Remove duplicates from this box')
-      .action(() => removeDupesFromHomeBox(box.index))
-      .disabled(!boxIsEmpty),
     Submenu.label('Sort this box...')
       .with(
         ...SortTypes.map((sortType) =>
