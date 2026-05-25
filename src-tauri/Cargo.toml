@@ -22,7 +22,7 @@ pkm_rs_derive = {path = "../pkm_rs_derive"}
 tauri = { version = "2.11.1", features = [] }
 tauri-plugin-shell = "2.3.5"
 serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.149"
+serde_json = "1.0.150"
 tauri-plugin-os = "2.3.2"
 tauri-plugin-dialog = "2.7.1"
 tauri-plugin-fs = "2.5.1"
