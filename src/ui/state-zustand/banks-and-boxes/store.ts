@@ -484,7 +484,7 @@ export function useBanksAndBoxes() {
   const findHomeLocation = withSelectors.use.findHomeLocation()
 
   const allMonsInCurrentBankWithLocations = withSelectors.use.allMonsCurrentBank()
-  const allMonsInCurrentBank = () => Object.keys(withSelectors.use.allMonsCurrentBank())
+  const allMonsInCurrentBank = () => Object.keys(allMonsInCurrentBankWithLocations())
   const allMonsInHomeBoxCurrentBank = withSelectors.use.allMonsInBoxCurrentBank()
   const firstHomeBoxEmptySlot = withSelectors.use.firstEmptySlotInBox()
 
