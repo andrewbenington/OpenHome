@@ -3,7 +3,7 @@
   height: 15rem;
   position: relative;
   background-color: #fff6;
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius-lg);
   border-width: 0px;
   overflow: hidden;
 }
@@ -13,8 +13,9 @@
   width: 11rem;
   height: 11rem;
   position: absolute;
-  bottom: 0;
-  left: 0;
+  top: 50%;
+  left: 50%;
+  translate: -50% -45%;
   object-fit: contain;
 }
 
@@ -27,6 +28,7 @@
 }
 
 .name-chip {
+  --version-badge-height: calc(1rem + 2 * var(--padding-radius-xs-sm));
   position: absolute;
   top: 0;
   left: 0;
@@ -36,13 +38,15 @@
   font-weight: bold;
   color: #000;
   background-color: #eff;
+  height: var(--version-badge-height);
 }
 
 .version-badge {
   position: absolute;
-  right: 6px;
-  top: 6px;
+  right: var(--padding-radius-sm-lg);
+  top: var(--padding-radius-sm-lg);
   font-weight: bold;
+  height: var(--version-badge-height);
 }
 
 .plugin-progress {
@@ -82,4 +86,20 @@
 
 .delete-icon:hover {
   background-color: #6666;
+}
+
+.plugin-page-content {
+  padding: var(--padding-radius-sm-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-radius-sm-lg);
+}
+
+.plugin-page-cards {
+  gap: var(--padding-radius-sm-lg);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  height: fit-content;
 }

@@ -173,8 +173,10 @@
   }
 }
 
-p {
+p,
+b {
   margin: 0;
+  font-size: var(--font-size-standard);
 }
 
 img {
@@ -268,6 +270,11 @@ fieldset {
   transition: border-color 0.25s;
 }
 
+input[type='checkbox'] {
+  height: 1rem;
+  width: 1rem;
+}
+
 label {
   display: flex;
   flex-direction: column;
@@ -310,7 +317,9 @@ label {
   --space-1: 0.3rem;
   --space-2: 0.55rem;
   --space-3: 0.85rem;
+  --space-4: 1.25rem;
   --space-5: 1.75rem;
+  --space-6: 2rem;
 
   --line-height-1: 1rem;
 
@@ -404,13 +413,10 @@ label {
 .rt-SwitchThumb,
 .rt-SwitchRoot::before {
   border-radius: 9999px;
-  --switch-height: 1.2rem;
-  --switch-width: 2rem;
-  --switch-thumb-size: 1.1rem;
 }
 
 .diagonal-clip {
-  clip-path: polygon(0% 0%, 0% 100%, calc(100% - 12px) 100%, calc(100% - 0px) 0%, 100% 0%);
+  clip-path: polygon(0% 0%, 0% 100%, calc(100% - 0.75rem) 100%, calc(100% - 0px) 0%, 100% 0%);
 }
 
 .mini-button {

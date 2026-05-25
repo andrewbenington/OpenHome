@@ -31,9 +31,9 @@ export default function BrowsePlugins() {
       <Spinner style={{ margin: 'auto', height: 32 }} />
     </Flex>
   ) : (
-    <div style={{ padding: 16 }}>
+    <div className="plugin-page-content">
       {isDev && (
-        <label className="flex-row" style={{ gap: 8, marginBottom: 8 }}>
+        <label className="flex-row">
           <Switch
             checked={useDevRepo}
             onCheckedChange={(val) => {
@@ -44,7 +44,7 @@ export default function BrowsePlugins() {
           Use Local Repo
         </label>
       )}
-      <div style={{ gap: 8, display: 'flex', flexWrap: 'wrap' }}>
+      <div className="plugin-page-cards">
         {availablePlugins &&
           Object.entries(availablePlugins).map(([name, location]) => (
             <AvailablePluginCard

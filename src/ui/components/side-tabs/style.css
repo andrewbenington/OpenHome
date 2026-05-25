@@ -9,7 +9,7 @@
 .side-tab-list {
   display: flex;
   flex-direction: column;
-  min-width: 9rem;
+  min-width: 10rem;
   width: fit-content;
   background-color: var(--color-sidebar);
   gap: var(--padding-radius-sm-lg);
