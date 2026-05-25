@@ -33,7 +33,7 @@ export type AddBoxLocation = 'start' | 'end' | ['before', number] | ['after', nu
 
 type ReverseLookup = Map<OhpkmIdentifier, BankBoxCoordinates>
 
-type LocationsByIdentifier = Record<OhpkmIdentifier, BankBoxCoordinates>
+export type LocationsByIdentifier = Record<OhpkmIdentifier, BankBoxCoordinates>
 
 export interface BanksAndBoxesState {
   reloadStore: () => Promise<void>
@@ -483,7 +483,8 @@ export function useBanksAndBoxes() {
   const setAtHomeLocation = withSelectors.use.setAtLocation()
   const findHomeLocation = withSelectors.use.findHomeLocation()
 
-  const allMonsInCurrentBank = withSelectors.use.allMonsCurrentBank()
+  const allMonsInCurrentBankWithLocations = withSelectors.use.allMonsCurrentBank()
+  const allMonsInCurrentBank = () => Object.keys(withSelectors.use.allMonsCurrentBank())
   const allMonsInHomeBoxCurrentBank = withSelectors.use.allMonsInBoxCurrentBank()
   const firstHomeBoxEmptySlot = withSelectors.use.firstEmptySlotInBox()
 
@@ -529,7 +530,7 @@ export function useBanksAndBoxes() {
   }
 
   function sortAllHomeBoxes(sortType: string): Result<null, IdentifierNotPresentError[]> {
-    const currentBankMons = allMonsInCurrentBank()
+    const currentBankMons = allMonsInCurrentBankWithLocations()
     const loadResults = ohpkmStore.tryLoadFromIds(Object.keys(currentBankMons))
     const { successes: allMons, failures } = partitionResults(loadResults)
     if (failures.length) {

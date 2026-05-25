@@ -116,7 +116,7 @@ export default function AllTrackedPokemon({
   return (
     <OpenHomeCtxMenu
       elements={contextMenuBuilders}
-      onOpenChange={(open) => {
+      onOpenChange={(open: boolean) => {
         if (!open) setCtxMenuMonId(undefined)
       }}
       style={{ overflow: 'hidden' }}
