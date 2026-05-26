@@ -75,7 +75,7 @@
   background-color: var(--color-destructive);
   font-size: 1rem;
   transition: background-color 0.08s;
-  color: var(--color-gray-950);
+  color: white;
   border-radius: var(--border-radius-sm);
   padding: var(--padding-radius-xs-sm);
   border: var(--soft-border);
