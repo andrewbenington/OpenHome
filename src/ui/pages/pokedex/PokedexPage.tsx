@@ -11,6 +11,7 @@ import {
   FormMetadata,
   MetadataSource,
   MetadataSources,
+  NationalDex,
   SpeciesMetadata,
 } from '@pkm-rs/pkg'
 import {
@@ -53,7 +54,9 @@ export default function PokedexPage() {
     Object.values(entry.formes).some((status) => status.endsWith('Caught'))
   ).length
 
-  const seenCount = Object.values(pokedex.byDexNumber).length
+  const seenCount = new Set(
+    Object.keys(pokedex.byDexNumber).filter((v) => parseInt(v) <= NationalDex.Pecharunt)
+  ).size
 
   return (
     <div className="pokedex-page">

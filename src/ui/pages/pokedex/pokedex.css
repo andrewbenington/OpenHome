@@ -79,6 +79,7 @@
 
 .pokedex-filter-field {
   margin: 0;
+  width: calc(var(--sidebar-width) - var(--padding-radius-sm-lg));
 }
 
 .pokedex-body {
