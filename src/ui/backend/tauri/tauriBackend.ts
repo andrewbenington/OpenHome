@@ -5,6 +5,7 @@ import { Errorable, R } from '@openhome-core/util/functional'
 import { JSONObject, LoadSaveResponse, SaveRef } from '@openhome-core/util/types'
 import BackendInterface, {
   BankOrBoxChange,
+  MenuEvent,
   OhpkmStore,
   StoredLookups,
 } from '@openhome-ui/backend/backendInterface'
@@ -289,15 +290,6 @@ export const TauriBackend: BackendInterface = {
       }),
     ]
 
-    if (listeners.onSave) {
-      unlistenPromises.push(listen('save', listeners.onSave))
-    }
-    if (listeners.onReset) {
-      unlistenPromises.push(listen('reset', listeners.onReset))
-    }
-    if (listeners.onOpen) {
-      unlistenPromises.push(listen('open', listeners.onOpen))
-    }
     if (listeners.onStateUpdate) {
       for (const [stateType, listener] of Object.entries(listeners.onStateUpdate)) {
         unlistenPromises.push(
@@ -335,6 +327,28 @@ export const TauriBackend: BackendInterface = {
 
     return () =>
       unlistenPromise.then((unlistenFunctions) => {
+        for (const unlistenFunction of unlistenFunctions) {
+          try {
+            unlistenFunction()
+          } catch (e) {
+            console.error(e)
+          }
+        }
+      })
+  },
+  onMenuEvent: (event: MenuEvent, callback: () => void) => {
+    const unlistenPromise = listen(event, callback)
+
+    return () => unlistenPromise.then((unlistenFunction) => unlistenFunction())
+  },
+  onMenuEvents: (eventsAndCallbacks: Partial<Record<MenuEvent, () => void>>) => {
+    const unlistenPromises: Promise<UnlistenFn>[] = []
+    for (const [event, callback] of Object.entries(eventsAndCallbacks)) {
+      unlistenPromises.push(listen(event, callback))
+    }
+
+    return () =>
+      Promise.all(unlistenPromises).then((unlistenFunctions) => {
         for (const unlistenFunction of unlistenFunctions) {
           try {
             unlistenFunction()

@@ -113,7 +113,7 @@
 .bank-select {
   border-radius: var(--border-radius-sm);
   height: var(--height-mini-button);
-  font-size: small;
+  font-size: var(--font-size-standard);
 }
 
 .white-filter {

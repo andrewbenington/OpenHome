@@ -1,23 +1,26 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
 import { getSaveRef, SAV, SaveIdentifier } from '@openhome-core/save/interfaces'
 import { monSupportedBySave, SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
 import { Option, R, Result } from '@openhome-core/util/functional'
+import { BackendContext } from '@openhome-ui/backend/backendContext'
+import {
+  OPENHOME_BOX_SLOTS,
+  useBanksAndBoxes,
+} from '@openhome-ui/state-zustand/banks-and-boxes/store'
+import { AppInfoContext } from '@openhome-ui/state/appInfo'
+import { useConvertStrategies } from '@openhome-ui/state/convert-strategies'
+import { ItemBagContext } from '@openhome-ui/state/items'
+import { OhpkmStoreData } from '@openhome-ui/state/ohpkm'
+import { IdentifierNotPresentError, useOhpkmStore } from '@openhome-ui/state/ohpkm/useOhpkmStore'
+import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { Item, Lookup } from '@pkm-rs/pkg'
 import { MarkingsSixShapesWithColor } from '@pokemon-files/util'
 import { useCallback, useContext, useRef } from 'react'
-import { displayIndexAdder, isBattleFormeItem } from '../../../core/pkm/util'
-import { BackendContext } from '../../backend/backendContext'
-import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
-import { PokedexUpdate } from '../../util/pokedex'
-import { AppInfoContext } from '../appInfo'
-import { useConvertStrategies } from '../convert-strategies'
-import { ItemBagContext } from '../items'
-import { OhpkmStoreData } from '../ohpkm'
-import { IdentifierNotPresentError, useOhpkmStore } from '../ohpkm/useOhpkmStore'
 import {
   HomeMonLocation,
   MonLocation,
@@ -65,7 +68,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   giveItemToMon: (monLocation: MonLocation, item: Item) => void
   revertMonAbility: (monId: OhpkmIdentifier) => void
 
-  allMonsInCurrentBank: () => string[]
+  allMonsInCurrentBank: () => OhpkmIdentifier[]
 }
 
 export function useSaves(): SavesAndBanksManager {

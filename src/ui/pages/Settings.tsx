@@ -15,11 +15,12 @@ import { ReactNode, useContext, useEffect, useState } from 'react'
 import { Route, Routes } from 'react-router'
 import { R } from 'src/core/util/functional'
 import { stringSorter } from 'src/core/util/sort'
+import PromptDialog from '../components/dialog/PromptDialog'
 import SideTabs from '../components/side-tabs/SideTabs'
 import useDisplayError from '../hooks/displayError'
 import { usePathSegment } from '../hooks/routing'
 import { ConvertStrategyKey, useConvertStrategies } from '../state/convert-strategies'
-import PromptDialog from '../components/dialog/PromptDialog'
+import './Settings.css'
 
 export default function Settings() {
   const [appInfoState, dispatchAppInfoState] = useContext(AppInfoContext)
@@ -111,19 +112,19 @@ export default function Settings() {
       <Routes>
         <Route index path="" element={generalElement} />
         <Route path="general" element={generalElement} />
-        <Route path="conversion" element={<PKMConversion2 />} />
+        <Route path="conversion" element={<PKMConversion />} />
       </Routes>
     </SideTabs.Root>
   )
 }
 
-function PKMConversion2() {
+function PKMConversion() {
   const schema = getConvertSettingsSchema().settings_schema
   return (
-    <Card style={{ margin: 8, width: '100%' }}>
+    <Card style={{ margin: 'var(--padding-radius-sm-lg)', width: '100%' }}>
       <b>PKM Conversion Settings</b>
-      <Separator style={{ margin: '8px 0' }} />
-      <div style={{ fontSize: 12 }}>
+      <Separator style={{ margin: 'var(--padding-radius-sm-lg) 0' }} />
+      <div className="pkm-conversion-settings-content">
         {Object.entries(schema)
           .toSorted(stringSorter(([key]) => key))
           .map(([key, setting]) => (
@@ -168,8 +169,8 @@ interface PKMConversionSettingControlProps {
 function PKMConversionSettingControl({ identifier, descriptor }: PKMConversionSettingControlProps) {
   const defaultStrategy = getDefaultConvertStrategy()
   return (
-    <div style={{ marginBottom: 16 }}>
-      <span style={{ display: 'inline-flex' }}>
+    <div>
+      <span className="settings-checkbox-flex">
         {convertSettingControlRenderer(descriptor)(
           (stringDescriptor) => (
             <PKMStringConversionSettingControl
@@ -179,9 +180,7 @@ function PKMConversionSettingControl({ identifier, descriptor }: PKMConversionSe
             />
           ),
           (_numberDescriptor) => (
-            <p style={{ margin: 0, color: 'var(--gray-11)' }}>
-              {ConvertStrategies.getCategoryName(identifier)}:
-            </p>
+            <p>{ConvertStrategies.getCategoryName(identifier)}:</p>
           ),
           (boolDescriptor) => (
             <PKMBoolConversionSettingControl
@@ -208,12 +207,10 @@ function PKMBoolConversionSettingControl({
 }: PKMBoolConversionSettingControlProps) {
   const { defaultConvertStrategy, updateDefaultConvertStrategy } = useConvertStrategies()
   return (
-    <div style={{ marginBottom: 16 }}>
-      <span style={{ display: 'inline-flex' }}>
-        <p style={{ margin: 0, color: 'var(--gray-11)' }}>
-          {ConvertStrategies.getCategoryName(identifier)}:
-        </p>
-        <b style={{ paddingLeft: 8 }}>{ConvertStrategies.getSettingName(identifier)}</b>
+    <div className="pkm-conversion-setting">
+      <span className="settings-checkbox-flex">
+        <p>{ConvertStrategies.getCategoryName(identifier)}:</p>
+        <b>{ConvertStrategies.getSettingName(identifier)}</b>
         <input
           type="checkbox"
           onChange={(e) =>
@@ -226,12 +223,9 @@ function PKMBoolConversionSettingControl({
             (defaultConvertStrategy[identifier as keyof ConvertStrategy] as boolean | undefined) ??
             descriptor.default
           }
-          style={{ marginLeft: 8 }}
         />
       </span>
-      <p style={{ marginTop: 4, color: 'var(--gray-11)' }}>
-        {ConvertStrategies.getDescription(identifier)}
-      </p>
+      <p>{ConvertStrategies.getDescription(identifier)}</p>
     </div>
   )
 }
@@ -249,16 +243,12 @@ function PKMStringConversionSettingControl({
   const { defaultConvertStrategy, updateDefaultConvertStrategy } = useConvertStrategies()
   const value = defaultConvertStrategy[identifier] as string | undefined
   return (
-    <div style={{ marginBottom: 16 }}>
+    <div className="pkm-conversion-setting">
       <span style={{ display: 'inline-flex' }}>
-        <p style={{ margin: 0, color: 'var(--gray-11)' }}>
-          {ConvertStrategies.getCategoryName(identifier)}:
-        </p>
+        <p>{ConvertStrategies.getCategoryName(identifier)}:</p>
         <b style={{ paddingLeft: 8 }}>{ConvertStrategies.getSettingName(identifier)}</b>
       </span>
-      <p style={{ marginTop: 4, color: 'var(--gray-11)' }}>
-        {ConvertStrategies.getDescription(identifier)}
-      </p>
+      <p>{ConvertStrategies.getDescription(identifier)}</p>
       <Select.Root
         value={value}
         onValueChange={(newValue) =>
@@ -269,7 +259,7 @@ function PKMStringConversionSettingControl({
         }
         size="1"
       >
-        <Select.Trigger style={{ display: 'flex' }} />
+        <Select.Trigger />
         <Select.Content side="right">
           {descriptor.allowed_values?.map((option) => (
             <Select.Item key={option} value={option}>

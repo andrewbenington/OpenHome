@@ -1,0 +1,25 @@
+.settings-checkbox-flex {
+  display: inline-flex;
+  gap: var(--padding-radius-sm-lg);
+  align-items: center;
+
+  p {
+    color: var(--gray-11);
+  }
+}
+
+.pkm-conversion-settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4 * var(--padding-radius-sm-lg));
+}
+
+.pkm-conversion-setting {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-radius-sm-lg);
+
+  .rt-SelectTrigger {
+    width: fit-content;
+  }
+}

@@ -27,7 +27,7 @@ export function ImageIndicator({
     >
       <img
         className={filterClass}
-        style={{ maxHeight: 15, maxWidth: 15 }}
+        style={{ maxHeight: '1rem', maxWidth: '1rem' }}
         draggable={false}
         src={src}
       />

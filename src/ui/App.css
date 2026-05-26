@@ -3,8 +3,9 @@
   --font-mono: var(--primitive-font-mono);
   --font-weight-normal: var(--primitive-font-weight-normal);
   --font-weight-medium: var(--primitive-font-weight-medium);
+  --base-font-size: 14px;
 
-  font-size: 14px;
+  font-size: var(--base-font-size);
   font-family: var(--font-sans);
   font-weight: var(--font-weight-normal);
   color-scheme: light dark;
@@ -24,10 +25,14 @@
   --padding-radius-xs-sm: 0.15rem;
   --padding-radius-sm-lg: 0.45rem;
 
+  --grid-gap: 0.3rem;
+
   --height-mini-button: 1.5rem;
 
   --font-size-standard: 1rem;
   --font-size-text: 0.9rem;
+
+  --box-slot-side: 2.5rem;
 }
 
 :root {
@@ -71,11 +76,9 @@
   --color-gray-950: oklch(12% 5% 264deg / 95%);
 
   --color-border-light: var(--color-gray-400);
-  --color-translucent-light: #fff8;
-  --color-translucent-dark: #0008;
+  --color-translucent-light: #ccc8;
+  --color-translucent-dark: #8888;
   --color-destructive: #aa0000;
-
-  --soft-border: 0.5px solid var(--color-gray-800);
 
   @media (prefers-color-scheme: dark) {
     --color-blue: oklch(69% 50% 264deg);
@@ -115,6 +118,7 @@
 
   --byte-hover: var(--primitive-teal-100);
   --color-translucent: var(--color-translucent-light);
+  --soft-border: 0.5px solid #4448;
 
   --gradient-angle: 310deg;
 
@@ -146,6 +150,8 @@
     --byte-hover: var(--primitive-teal-600);
     --color-translucent: var(--color-translucent-dark);
 
+    --soft-border: 1px solid var(--color-translucent);
+
     --color-sidebar: var(--primitive-sidebar-dark);
     --color-sidebar-hover: var(--primitive-sidebar-hover-dark);
     --color-sidebar-selected: var(--primitive-sidebar-selected-dark);
@@ -168,7 +174,18 @@
   }
 }
 
-p {
+p,
+b {
+  margin: 0;
+  font-size: var(--font-size-standard);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 0;
 }
 
@@ -235,7 +252,7 @@ button,
 select {
   border-radius: var(--border-radius-sm);
   border: 2px solid transparent;
-  font-size: small;
+  font-size: var(--font-size-standard);
   font-weight: 500;
   font-family: inherit;
 }
@@ -245,7 +262,7 @@ button:not(:disabled) {
 }
 
 button {
-  padding: 0.3em 0.3em;
+  padding: 0.3rem 0.3rem;
 }
 
 select:focus,
@@ -257,10 +274,15 @@ input,
 fieldset {
   border-radius: var(--border-radius-sm);
   border: 1px solid transparent;
-  font-size: small;
+  font-size: var(--font-size-standard);
   font-weight: 500;
   font-family: inherit;
   transition: border-color 0.25s;
+}
+
+input[type='checkbox'] {
+  height: 1rem;
+  width: 1rem;
 }
 
 label {
@@ -301,12 +323,24 @@ label {
 
 .radix-themes {
   --cursor-button: pointer;
-  font-size: inherit;
+
+  --space-1: 0.3rem;
+  --space-2: 0.55rem;
+  --space-3: 0.85rem;
+  --space-4: 1.25rem;
+  --space-5: 1.75rem;
+  --space-6: 2rem;
+
+  --line-height-1: 1rem;
+
+  --font-size-1: var(--font-size-text);
+  --font-size-2: var(--font-size-standard);
+
+  font-size: var(--base-font-size);
   .rt-BaseMenuSeparator {
     margin: 0px 0px;
   }
   --cursor-menu-item: pointer;
-  --default-font-size: 0.9em;
   .rt-BaseTabList {
     background-color: var(--color-panel);
   }
@@ -389,13 +423,10 @@ label {
 .rt-SwitchThumb,
 .rt-SwitchRoot::before {
   border-radius: 9999px;
-  --switch-height: 1.2rem;
-  --switch-width: 2rem;
-  --switch-thumb-size: 1.1rem;
 }
 
 .diagonal-clip {
-  clip-path: polygon(0% 0%, 0% 100%, calc(100% - 12px) 100%, calc(100% - 0px) 0%, 100% 0%);
+  clip-path: polygon(0% 0%, 0% 100%, calc(100% - 0.75rem) 100%, calc(100% - 0px) 0%, 100% 0%);
 }
 
 .mini-button {
@@ -410,6 +441,11 @@ label {
     height: 1rem;
     width: 1rem;
   }
+}
+
+svg {
+  height: 1rem;
+  width: 1rem;
 }
 
 .hidden {
@@ -444,4 +480,29 @@ label {
 .pad-x-sm-lg {
   padding-left: var(--padding-radius-sm-lg);
   padding-right: var(--padding-radius-sm-lg);
+}
+
+.card-sm-radius {
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-panel);
+  padding: var(--padding-radius-sm-lg);
+}
+
+.card-lg-radius {
+  border-radius: var(--border-radius-lg);
+  background-color: var(--color-panel);
+  padding: var(--padding-radius-sm-lg);
+}
+
+.panel-lg-radius {
+  border-radius: var(--border-radius-lg);
+  background-color: var(--color-panel);
+}
+
+.full-height {
+  height: 100%;
+}
+
+.no-overflow {
+  overflow: hidden;
 }

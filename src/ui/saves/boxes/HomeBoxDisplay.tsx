@@ -116,7 +116,13 @@ export default function HomeBoxDisplay() {
               autoFocus
             />
           ) : (
-            <Heading size="3" style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}>
+            <Heading
+              style={{
+                visibility: viewMode === 'one' ? 'visible' : 'collapse',
+                fontSize: '1.1rem',
+                lineHeight: 1.1,
+              }}
+            >
               {currentBox.name?.trim() || `Box ${currentBox.index + 1}`}
             </Heading>
           )}

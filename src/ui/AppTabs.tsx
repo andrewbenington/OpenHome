@@ -9,7 +9,7 @@ import AppStateDisplay from './pages/AppStateDisplay'
 import ComponentDebugDisplay from './pages/ComponentDebugDisplay'
 import Home from './pages/home/Home'
 import PluginsPage from './pages/plugins/Plugins'
-import PokedexDisplay from './pages/pokedex/PokedexDisplay'
+import PokedexPage from './pages/pokedex/PokedexPage'
 import Settings from './pages/Settings'
 import SortPokemon from './pages/sort/SortPokemon'
 import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
@@ -89,7 +89,7 @@ export default function AppTabs() {
               <Route path="/home" element={homeElement} />
               <Route path="/manage/*" element={<TrackedPokemonPage />} />
               <Route path="/sort" element={<SortPokemon />} />
-              <Route path="/pokedex" element={<PokedexDisplay />} />
+              <Route path="/pokedex" element={<PokedexPage />} />
               <Route path="/plugins/*" element={<PluginsPage />} />
               <Route path="/settings/*" element={<Settings />} />
               {isDev && (

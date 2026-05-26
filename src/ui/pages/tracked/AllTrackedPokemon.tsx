@@ -116,7 +116,7 @@ export default function AllTrackedPokemon({
   return (
     <OpenHomeCtxMenu
       elements={contextMenuBuilders}
-      onOpenChange={(open) => {
+      onOpenChange={(open: boolean) => {
         if (!open) setCtxMenuMonId(undefined)
       }}
       style={{ overflow: 'hidden' }}
@@ -208,7 +208,7 @@ function useColumns(
           <PokemonIcon
             dexNumber={value.dexNum}
             formeNumber={value.formNum}
-            style={{ width: 30, height: 30 }}
+            style={{ width: '2rem', height: '2rem' }}
           />
         </button>
       ),
