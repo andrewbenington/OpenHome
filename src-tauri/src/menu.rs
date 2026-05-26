@@ -149,7 +149,6 @@ pub fn handle_menu_event(app_handle: &AppHandle, event: MenuEvent) {
 pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
     match event_id {
         // File menu actions
-        // "new" => println!("New file action triggered!"),
         "open" => app_handle
             .emit("open", ())
             .unwrap_or_else(|err| println!("Error emitting 'open' event: {err}")),
@@ -173,11 +172,6 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
             Ok(dir) => command_open(dir.to_str().unwrap_or_default()),
         },
         "exit" => std::process::exit(0),
-
-        // Edit menu actions
-        // "cut" => println!("Cut action triggered!"),
-        // "copy" => println!("Copy action triggered!"),
-        // "paste" => println!("Paste action triggered!"),
 
         // View menu actions
         "zoom_in" => app_handle
