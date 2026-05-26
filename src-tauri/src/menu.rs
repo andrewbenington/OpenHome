@@ -5,12 +5,12 @@ use tauri::{App, AppHandle, Emitter, Wry, image::Image, include_image, menu::*};
 use crate::data_controller::DataController;
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
 
-#[cfg(target_os = "macos")]
-const OPEN_CMD: &str = "open";
-#[cfg(target_os = "linux")]
-const OPEN_CMD: &str = "xdg-open";
-#[cfg(target_os = "windows")]
-const OPEN_CMD: &str = "explorer";
+const OPEN_CMD: &str = cfg_select! {
+    target_os = "macos" => "open",
+    target_os = "linux" => "xdg-open",
+    windows => "explorer",
+    _ => panic!("unsupported target"),
+};
 
 pub fn create_menu(app: &App) -> core::result::Result<Menu<Wry>, Box<dyn std::error::Error>> {
     let handle = app.handle();
@@ -76,6 +76,14 @@ pub fn create_menu(app: &App) -> core::result::Result<Menu<Wry>, Box<dyn std::er
     }?;
 
     menu.append(&file_submenu)?;
+
+    let edit_submenu = SubmenuBuilder::new(handle, "Edit")
+        .cut()
+        .copy()
+        .paste()
+        .build()?;
+    menu.append(&edit_submenu)?;
+
     let zoom_in_item =
         MenuItem::with_id(handle, "zoom_in", "Zoom In", true, Some("CmdOrCtrl+NUMADD"))?;
     let zoom_out_item =
@@ -181,10 +189,8 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
         "reset_zoom" => app_handle
             .emit("reset_zoom", ())
             .unwrap_or_else(|err| println!("Error emitting 'reset_zoom' event: {err}")),
-        // "show_toolbar" => println!("Show Toolbar action triggered!"),
 
         // Help menu actions
-        // "about" => println!("About action triggered!"),
         "check-updates" => command_open("https://andrewbenington.github.io/OpenHome/download.html"),
         "visit-github" => command_open("https://github.com/andrewbenington/OpenHome"),
 

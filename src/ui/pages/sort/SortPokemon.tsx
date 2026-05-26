@@ -216,7 +216,7 @@ export default function SortPokemon() {
       <div className="card-lg-radius">
         <Flex className="sort-pokemon-saves-column">
           <Badge color="gray" size="3" style={{ border: `1px solid ${OPENHOME_COLOR}` }}>
-            OpenHome
+            OpenHome Boxes
           </Badge>
           {savesAndBanks.allOpenSaves.map((save) => {
             const { backgroundColor } = save.pluginIdentifier

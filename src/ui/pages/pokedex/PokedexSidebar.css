@@ -1,8 +1,9 @@
 .pokedex-sidebar {
+  --padding-x: calc(2 * var(--padding-radius-sm-lg));
   width: var(--sidebar-width);
-  padding: 0 calc(2 * var(--padding-radius-sm-lg));
+  padding: var(--padding-x) var(--padding-x) 0 var(--padding-x);
   box-sizing: border-box;
-  height: 100%;
+  height: calc(100% - 2 * var(--padding-radius-sm-lg));
   background-color: var(--color-panel);
   box-shadow:
     rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset,
