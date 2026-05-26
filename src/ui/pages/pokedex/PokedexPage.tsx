@@ -1,5 +1,3 @@
-import AttributeRow from '@openhome-ui/components/AttributeRow'
-import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import useMonSprite from '@openhome-ui/pokemon-details/useMonSprite'
@@ -7,21 +5,16 @@ import { usePokedex } from '@openhome-ui/state/pokedex'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import {
   allMetadataSources,
-  currentMetadataReader,
   extraFormMetadata,
   ExtraFormMetadata,
   extraFormsByNationalDex,
   FormMetadata,
-  metadataReaderFor,
   MetadataSource,
   MetadataSources,
-  MetadataSummaryLookup,
-  SpeciesLookup,
   SpeciesMetadata,
 } from '@pkm-rs/pkg'
 import {
   Button,
-  Card,
   Flex,
   Heading,
   Select,
@@ -33,15 +26,19 @@ import {
 import { useEffect, useState } from 'react'
 import MoveCard from 'src/ui/components/pokemon/MoveCard'
 import { includeClass } from 'src/ui/util/style'
-import BaseStatsChart from './BaseStatsChart'
-import EvolutionFamily from './EvolutionFamily'
 import './pokedex.css'
 import { PokedexGames } from './PokedexGames'
 import PokedexSidebar from './PokedexSidebar'
+import PokedexSummary from './PokedexSummary'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
-import { getFormeStatus, getPokedexSummary, isExtraFormMetadata } from './util'
+import { getFormeStatus, isExtraFormMetadata } from './util'
 
-export default function PokedexDisplay() {
+type PokedexView = 'summary' | 'levelup' | 'games'
+
+export const MOST_CURRENT_SOURCE = '$CURRENT'
+export type MostCurrentSource = typeof MOST_CURRENT_SOURCE
+
+export default function PokedexPage() {
   const pokedexState = usePokedex()
   const [filter, setFilter] = useState('')
   const [selectedSpecies, setSelectedSpecies] = useState<SpeciesMetadata>()
@@ -108,11 +105,6 @@ type PokedexDetailsProps = {
   setSelectedSpecies: (species?: SpeciesMetadata) => void
 }
 
-type PokedexView = 'main' | 'levelup' | 'games'
-const MOST_CURRENT_SOURCE = '$CURRENT'
-
-type MostCurrentSource = typeof MOST_CURRENT_SOURCE
-
 function PokedexDetails({
   pokedex,
   species,
@@ -122,7 +114,7 @@ function PokedexDetails({
 }: PokedexDetailsProps) {
   const [imageError, setImageError] = useState(false)
   const [showShiny, setShowShiny] = useState(false)
-  const [currentView, setCurrentView] = useState<PokedexView>('main')
+  const [currentView, setCurrentView] = useState<PokedexView>('summary')
   const [metadataSource, setMetadataSource] = useState<MetadataSource | MostCurrentSource>(
     MOST_CURRENT_SOURCE
   )
@@ -262,8 +254,8 @@ function PokedexDetails({
           <Button
             className={includeClass('pokedex-tab')
               .with('pokedex-tab-selected')
-              .if(currentView === 'main')}
-            onClick={() => setCurrentView('main')}
+              .if(currentView === 'summary')}
+            onClick={() => setCurrentView('summary')}
           >
             Summary
           </Button>
@@ -320,8 +312,8 @@ function PokedexDetails({
           )}
         </Flex>
         <div style={{ height: '100%', overflow: 'auto', paddingTop: '2.5rem' }}>
-          {currentView === 'main' ? (
-            <PokedexMain
+          {currentView === 'summary' ? (
+            <PokedexSummary
               pokedex={pokedex}
               species={species}
               selectedForm={selectedForm}
@@ -343,103 +335,6 @@ function PokedexDetails({
         </div>
       </Flex>
     </Flex>
-  )
-}
-
-type PokedexMetadataProps = {
-  pokedex: Pokedex
-  species: SpeciesMetadata
-  selectedForm: FormMetadata | ExtraFormMetadata
-  setSelectedForm: (form?: FormMetadata | ExtraFormMetadata) => void
-  setSelectedSpecies: (species?: SpeciesMetadata) => void
-  metadataSource: MetadataSource | MostCurrentSource
-}
-
-function PokedexMain(props: PokedexMetadataProps) {
-  const { pokedex, species, selectedForm, setSelectedForm, setSelectedSpecies, metadataSource } =
-    props
-
-  const isExtraForm = isExtraFormMetadata(selectedForm)
-
-  const reader =
-    metadataSource === MOST_CURRENT_SOURCE
-      ? currentMetadataReader(species.nationalDex, selectedForm.formIndex)
-      : metadataReaderFor(metadataSource, species.nationalDex, selectedForm.formIndex)
-
-  if (!reader) {
-    const message =
-      metadataSource !== MOST_CURRENT_SOURCE
-        ? `No metadata available for this Pokémon in Pokémon ${MetadataSources.display(metadataSource)}.`
-        : 'No metadata available for this Pokémon.'
-    return (
-      <Flex width="100%" height="100%" align="center" justify="center">
-        <Text>{message}</Text>
-      </Flex>
-    )
-  }
-
-  const type1 = isExtraForm ? selectedForm.type1 : reader.type1()
-  const type2 = isExtraForm ? selectedForm.type2 : reader.type2()
-  const stats = reader.baseStats()
-
-  return (
-    <>
-      <Flex width="100%" height="50%">
-        <div id="base-stats-and-attributes" style={{ width: '50%' }}>
-          <BaseStatsChart stats={stats} />
-        </div>
-        <Flex
-          direction="column"
-          align="end"
-          style={{ height: '100%', overflowY: 'auto', width: '50%', padding: 4, gap: 2 }}
-        >
-          <AttributeRow label="Level-Up">{species.levelUpType}</AttributeRow>
-          <AttributeRow label="Type">
-            <TypeIcon type={type1} />
-            {type2 && <TypeIcon type={type2} />}
-          </AttributeRow>
-          {!isExtraFormMetadata(selectedForm) && (
-            <>
-              <AttributeRow label="Ability 1">{selectedForm.abilities[0].name}</AttributeRow>
-              {selectedForm.abilities[1] !== selectedForm.abilities[0] && (
-                <AttributeRow label="Ability 2">{selectedForm.abilities[1].name}</AttributeRow>
-              )}
-
-              {selectedForm.hiddenAbility && (
-                <AttributeRow label="Ability H">
-                  <div>{selectedForm.hiddenAbility.name}</div>
-                </AttributeRow>
-              )}
-            </>
-          )}
-          <AttributeRow label="Egg Groups">
-            <div>{selectedForm.eggGroups.join(' • ')}</div>
-          </AttributeRow>
-          <AttributeRow label="Gender Ratio">{selectedForm.genderRatio}</AttributeRow>
-        </Flex>
-      </Flex>
-      <Flex width="100%" height="50%">
-        <Card className="flex-row" style={{ width: '100%', gap: 8 }}>
-          <Text style={{ flex: 2 }}>{getPokedexSummary(species, selectedForm)}</Text>
-          <Separator orientation="vertical" style={{ height: '100%' }} />
-          <div style={{ height: '100%', flex: 1 }}>
-            <Text weight="bold" size="2">
-              Evolution Family
-            </Text>
-            <EvolutionFamily
-              height="calc(100% - 16px)"
-              nationalDex={species.nationalDex}
-              formNumber={selectedForm.formIndex}
-              pokedex={pokedex}
-              onClick={(nationalDex, formIndex) => {
-                setSelectedSpecies(SpeciesLookup(nationalDex))
-                setSelectedForm(MetadataSummaryLookup(nationalDex, formIndex))
-              }}
-            />
-          </div>{' '}
-        </Card>
-      </Flex>
-    </>
   )
 }
 
