@@ -148,7 +148,7 @@ function AppWithBackend() {
           type: 'set_zoom_level',
           payload: appInfoState.settings.zoomLevel - ZOOM_CHANGE_PCT,
         }),
-      reset_zoom: () => appInfoDispatch({ type: 'set_zoom_level', payload: 100 }),
+      reset_zoom: () => appInfoDispatch((() => ({ type: 'set_zoom_level', payload: 100 }))()),
     })
 
     // the "stop listening" function should be called when the effect returns,

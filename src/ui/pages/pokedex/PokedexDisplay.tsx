@@ -12,14 +12,10 @@ import {
   ExtraFormMetadata,
   extraFormsByNationalDex,
   FormMetadata,
-  getPluginColor,
   metadataReaderFor,
   MetadataSource,
   MetadataSources,
   MetadataSummaryLookup,
-  orasFormIndexIfSupported,
-  OriginGame,
-  OriginGames,
   SpeciesLookup,
   SpeciesMetadata,
 } from '@pkm-rs/pkg'
@@ -34,17 +30,16 @@ import {
   Text,
   TextField,
 } from '@radix-ui/themes'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import MoveCard from 'src/ui/components/pokemon/MoveCard'
 import { includeClass } from 'src/ui/util/style'
 import BaseStatsChart from './BaseStatsChart'
 import EvolutionFamily from './EvolutionFamily'
+import './pokedex.css'
+import { PokedexGames } from './PokedexGames'
 import PokedexSidebar from './PokedexSidebar'
-import './style.css'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
 import { getFormeStatus, getPokedexSummary, isExtraFormMetadata } from './util'
-import { AppInfoContext } from 'src/ui/state/appInfo'
-import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 
 export default function PokedexDisplay() {
   const pokedexState = usePokedex()
@@ -64,9 +59,9 @@ export default function PokedexDisplay() {
   const seenCount = Object.values(pokedex.byDexNumber).length
 
   return (
-    <Flex direction="column" height="100%" minWidth="940px">
+    <div className="pokedex-page">
       <div className="pokedex-header">
-        <Heading>National Pokédex</Heading>
+        <h1 className="pokedex-header-title">National Pokédex</h1>
         <div style={{ flex: 1 }} />
         <Text>
           <b>Caught:</b> {caughtCount}
@@ -75,14 +70,14 @@ export default function PokedexDisplay() {
           <b>Seen:</b> {seenCount}
         </Text>
         <TextField.Root
-          size="1"
+          className="pokedex-filter-field"
           placeholder="Filter..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
       </div>
-      <Flex style={{ height: 'calc(100% - 34px)' }}>
-        <Flex className="pokedex-body" direction="column" width="calc(100% - 300px)">
+      <Flex style={{ height: 'calc(100% - var(--top-bar-height))' }}>
+        <Flex className="pokedex-body" direction="column" width="calc(100% - var(--sidebar-width))">
           {selectedSpecies && selectedForm && (
             <PokedexDetails
               pokedex={pokedex}
@@ -101,7 +96,7 @@ export default function PokedexDisplay() {
           pokedex={pokedex}
         />
       </Flex>
-    </Flex>
+    </div>
   )
 }
 
@@ -170,7 +165,7 @@ function PokedexDetails({
               >
                 <img
                   alt="shiny icon"
-                  style={{ width: 26, height: 26, marginLeft: -4, marginTop: -4 }}
+                  style={{ width: '100%', height: '100%' }}
                   draggable={false}
                   src={getPublicImageURL('icons/Shiny.png')}
                 />
@@ -202,7 +197,7 @@ function PokedexDetails({
                 />
               </>
             ) : (
-              <Spinner style={{ margin: 'auto', height: 32 }} />
+              <Spinner style={{ margin: 'auto', height: '2rem' }} />
             )}
           </div>
           <div className="pokedex-caption">{selectedForm.formeName}</div>
@@ -224,7 +219,7 @@ function PokedexDetails({
                 <TooltipPokemonIcon
                   dexNumber={species.nationalDex}
                   formeNumber={form.formIndex}
-                  style={{ width: 48, height: 48 }}
+                  style={{ width: '3rem', height: '3rem' }}
                   silhouette={
                     !getFormeStatus(pokedex, species.nationalDex, form.formIndex)?.includes(
                       'Caught'
@@ -234,11 +229,7 @@ function PokedexDetails({
               </Button>
             ))}
           </Flex>
-          {extraFormsByNationalDex(species.nationalDex).length > 0 && (
-            <Heading size="3" mt="2" mb="1">
-              Extra Forms
-            </Heading>
-          )}
+          {extraFormsByNationalDex(species.nationalDex).length > 0 && <h3>Extra Forms</h3>}
           <Flex justify="center" gap="2" width="100%" wrap="wrap">
             {extraFormsByNationalDex(species.nationalDex).map((form) => (
               <Button
@@ -255,9 +246,9 @@ function PokedexDetails({
               >
                 <TooltipPokemonIcon
                   dexNumber={species.nationalDex}
-                  // formeNumber={form.formIndex}
+                  formeNumber={0}
                   extraFormIndex={form}
-                  style={{ width: 48, height: 48 }}
+                  style={{ width: '3rem', height: '3rem' }}
                   silhouette={!getFormeStatus(pokedex, species.nationalDex, 0)?.includes('Caught')}
                 />
               </Button>
@@ -267,26 +258,26 @@ function PokedexDetails({
       </Flex>
       <Separator orientation="vertical" style={{ height: '100%' }} />
       <Flex direction="column" height="100%" maxHeight="100%" width="60%" overflow="auto">
-        <Flex className="openhome-tab-row">
+        <Flex className="pokedex-tab-row">
           <Button
-            className={includeClass('openhome-tab')
-              .with('openhome-tab-selected')
+            className={includeClass('pokedex-tab')
+              .with('pokedex-tab-selected')
               .if(currentView === 'main')}
             onClick={() => setCurrentView('main')}
           >
             Summary
           </Button>
           <Button
-            className={includeClass('openhome-tab')
-              .with('openhome-tab-selected')
+            className={includeClass('pokedex-tab')
+              .with('pokedex-tab-selected')
               .if(currentView === 'levelup')}
             onClick={() => setCurrentView('levelup')}
           >
             Levelup Learnset
           </Button>
           <Button
-            className={includeClass('openhome-tab')
-              .with('openhome-tab-selected')
+            className={includeClass('pokedex-tab')
+              .with('pokedex-tab-selected')
               .if(currentView === 'games')}
             onClick={() => setCurrentView('games')}
           >
@@ -470,9 +461,9 @@ function PokedexLearnset(props: PokedexLearnsetProps) {
         {levelUpLearnset ? (
           levelUpLearnset.map((learnsetMove) => (
             <Flex key={`${learnsetMove.move_id}-${learnsetMove.level}`} align="center" gap="2">
-              <Text size="3" style={{ width: '7rem' }}>
+              <p style={{ width: '7rem', fontSize: '1.1rem' }}>
                 {learnsetMove.level ? `Level ${learnsetMove.level}: ` : 'On Evolution: '}
-              </Text>
+              </p>
               <MoveCard move={learnsetMove.move_id} noPP />
             </Flex>
           ))
@@ -483,76 +474,5 @@ function PokedexLearnset(props: PokedexLearnsetProps) {
         )}
       </Flex>
     </Flex>
-  )
-}
-
-interface PokedexGamesProps {
-  selectedForm: FormMetadata | ExtraFormMetadata
-}
-
-function PokedexGames(props: PokedexGamesProps) {
-  const { selectedForm } = props
-  const [{ extraSaveTypes }] = useContext(AppInfoContext)
-
-  return (
-    <>
-      <Flex gap="1" overflowY="auto" wrap="wrap" justify="center">
-        {MetadataSources.supportedGameOrigins(
-          selectedForm.nationalDex.index,
-          selectedForm.formIndex
-        )
-          .filter((origin) => {
-            if (isExtraFormMetadata(selectedForm)) {
-              return (
-                (origin === OriginGame.OmegaRuby || origin === OriginGame.AlphaSapphire) &&
-                orasFormIndexIfSupported(selectedForm.extraFormIndex) !== undefined
-              )
-            } else {
-              return true
-            }
-          })
-          .map((origin) => (
-            <Card
-              className="compatible-game-card"
-              key={origin}
-              style={{
-                backgroundColor: OriginGames.color(origin),
-                '--card-background-color': OriginGames.color(origin),
-                padding: OriginGames.isGameboy(origin) ? '0' : '0.25rem',
-              }}
-            >
-              <img draggable={false} src={OriginGames.logoPath(origin)} />
-            </Card>
-          ))}
-      </Flex>
-      <Heading size="4" align="center" my="1rem" style={{ width: '100%' }}>
-        Plugins
-      </Heading>
-      <Flex gap="1" overflowY="auto" wrap="wrap" justify="center" mb="1rem">
-        {extraSaveTypes
-          .filter(
-            (saveType) =>
-              !isRestricted(
-                saveType.transferRestrictions,
-                selectedForm.nationalDex.index,
-                selectedForm.formIndex,
-                isExtraFormMetadata(selectedForm) ? selectedForm.extraFormIndex : undefined
-              )
-          )
-          .map((saveType) => (
-            <Card
-              className="compatible-game-card"
-              key={origin}
-              style={{
-                backgroundColor: getPluginColor(saveType.getPluginIdentifier()),
-                '--card-background-color': getPluginColor(saveType.getPluginIdentifier()),
-                padding: '0.25rem',
-              }}
-            >
-              <img draggable={false} src={`logos/${saveType.getPluginIdentifier()}.png`} />
-            </Card>
-          ))}
-      </Flex>
-    </>
   )
 }

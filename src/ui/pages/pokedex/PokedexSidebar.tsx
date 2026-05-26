@@ -3,8 +3,9 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import { all_species_data, FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { CSSProperties, useEffect, useMemo, useRef } from 'react'
-import './style.css'
+import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
+import { classNames, includeClass } from 'src/ui/util/style'
+import './pokedex.css'
 import { getHighestFormeStatus, StatusIndices } from './util'
 
 export type PokedexSidebarProps = {
@@ -40,15 +41,32 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
     [ALL_SPECIES_DATA, filter]
   )
 
+  // these are necessary to ensure the sidebar resizes correctly when zooming
+  const [baseFontSize, setBaseFontSize] = useState(() =>
+    parseFloat(getComputedStyle(document.documentElement).fontSize)
+  )
   const virtualizer = useVirtualizer({
     count: filteredSpecies.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 32,
+    estimateSize: () => baseFontSize * 3,
     overscan: 5,
-    gap: 8,
-    paddingStart: 8,
-    paddingEnd: 8,
   })
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const newBaseFont = parseFloat(getComputedStyle(document.documentElement).fontSize)
+      setBaseFontSize(newBaseFont)
+      virtualizer.setOptions({
+        ...virtualizer.options,
+        estimateSize: () => newBaseFont * 3,
+      })
+      virtualizer.measure()
+    })
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['style', 'class'], // class changes can affect font-size too
+    })
+    return () => observer.disconnect()
+  }, [virtualizer])
 
   useEffect(() => {
     if (selectedSpecies) {
@@ -81,7 +99,6 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
               selectedSpecies?.nationalDex === filteredSpecies[virtualRow.index].nationalDex
             }
             style={{
-              // height: `${virtualRow.size}px`,
               position: 'absolute',
               top: 0,
               left: 0,
@@ -114,18 +131,15 @@ function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabPr
 
   return (
     <button
-      className="pokedex-tab"
+      className={classNames(
+        'pokedex-sidebar-button',
+        selected
+          ? 'pokedex-sidebar-button-selected'
+          : includeClass('pokedex-sidebar-button-caught').if(isCaught)
+      )}
       key={species.nationalDex}
       onClick={onClick}
-      style={{
-        backgroundColor: selected
-          ? 'var(--accent-10)'
-          : isCaught
-            ? 'var(--accent-6)'
-            : 'var(--gray-7',
-        fontWeight: isCaught ? 'bold' : 'normal',
-        ...style,
-      }}
+      style={style}
     >
       {/* pokedex-icon-container must be on an outer element for unknown reasons */}
       <div className="pokedex-icon-container">
@@ -134,15 +148,14 @@ function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabPr
           formeNumber={formIndex}
           silhouette={!isSeen}
           grayedOut={!isCaught}
-          style={{ minWidth: 32, height: 36 }} // leave this alone
         />
       </div>
       {species.nationalDex}. {Lookup.speciesName(species.nationalDex, Language.English)}
       <div style={{ flex: 1 }} />
       {maxStatus === 'ShinyCaught' && (
         <img
+          className="pokedex-sidebar-shiny-icon"
           alt="shiny icon"
-          style={{ width: 26, height: 26, marginRight: 5 }}
           draggable={false}
           src={getPublicImageURL('icons/Shiny.png')}
         />

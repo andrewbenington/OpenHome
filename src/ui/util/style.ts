@@ -34,6 +34,15 @@ export function includeClass(className: string) {
     if(condition: boolean | undefined) {
       return condition ? className : undefined
     },
+    unless(unlessCondition: boolean | undefined) {
+      return {
+        then(conditionClassName: string) {
+          return unlessCondition
+            ? `${className} ${conditionClassName}`
+            : `${className} ${className}`
+        },
+      }
+    },
   }
 }
 
