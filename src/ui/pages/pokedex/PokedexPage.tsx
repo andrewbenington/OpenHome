@@ -24,10 +24,10 @@ import {
   TextField,
 } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
-import MoveCard from 'src/ui/components/pokemon/MoveCard'
 import { includeClass } from 'src/ui/util/style'
 import './pokedex.css'
 import { PokedexGames } from './PokedexGames'
+import PokedexLearnset from './PokedexLearnset'
 import PokedexSidebar from './PokedexSidebar'
 import PokedexSummary from './PokedexSummary'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
@@ -193,7 +193,6 @@ function PokedexDetails({
             )}
           </div>
           <div className="pokedex-caption">{selectedForm.formeName}</div>
-
           <Flex justify="center" gap="2" width="100%" wrap="wrap">
             {species.forms.map((form) => (
               <Button
@@ -333,40 +332,6 @@ function PokedexDetails({
             <PokedexGames selectedForm={selectedForm} />
           ) : null}
         </div>
-      </Flex>
-    </Flex>
-  )
-}
-
-interface PokedexLearnsetProps {
-  selectedForm: FormMetadata
-  metadataSource: MetadataSource | MostCurrentSource
-}
-
-function PokedexLearnset(props: PokedexLearnsetProps) {
-  const { selectedForm, metadataSource } = props
-
-  const levelUpLearnset = selectedForm.levelUpLearnset(
-    metadataSource === MOST_CURRENT_SOURCE ? undefined : metadataSource
-  )
-
-  return (
-    <Flex direction="column" overflow="hidden" p="1">
-      <Flex direction="column" gap="1" mt="0.2rem" mx="1rem" overflow="auto">
-        {levelUpLearnset ? (
-          levelUpLearnset.map((learnsetMove) => (
-            <Flex key={`${learnsetMove.move_id}-${learnsetMove.level}`} align="center" gap="2">
-              <p style={{ width: '7rem', fontSize: '1.1rem' }}>
-                {learnsetMove.level ? `Level ${learnsetMove.level}: ` : 'On Evolution: '}
-              </p>
-              <MoveCard move={learnsetMove.move_id} noPP />
-            </Flex>
-          ))
-        ) : (
-          <Flex width="100%" height="50%" align="center" justify="center">
-            <Text>No level-up learnset data available for this form.</Text>
-          </Flex>
-        )}
       </Flex>
     </Flex>
   )

@@ -5,14 +5,12 @@ import {
   FormMetadata,
   MetadataSource,
   MetadataSources,
-  SpeciesMetadata,
-} from '@pkm-rs/pkg'
-import {
   MetadataSummaryLookup,
   SpeciesLookup,
+  SpeciesMetadata,
   currentMetadataReader,
   metadataReaderFor,
-} from '@pokemon-wasm/pkm_rs'
+} from '@pkm-rs/pkg'
 import { Card, Flex, Separator, Text } from '@radix-ui/themes'
 import { Pokedex } from 'src/ui/util/pokedex'
 import BaseStatsChart from './BaseStatsChart'

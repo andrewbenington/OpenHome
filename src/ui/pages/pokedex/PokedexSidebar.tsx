@@ -5,7 +5,7 @@ import { all_species_data, FormMetadata, Language, Lookup, SpeciesMetadata } fro
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
 import { classNames, includeClass } from 'src/ui/util/style'
-import './pokedex.css'
+import './PokedexSidebar.css'
 import { getHighestFormeStatus, StatusIndices } from './util'
 
 export type PokedexSidebarProps = {
@@ -79,9 +79,9 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
 
   return (
     <div ref={parentRef} className="pokedex-sidebar">
-      <div style={{ height: virtualizer.getTotalSize(), width: '100%', position: 'relative' }}>
+      <div className="pokedex-sidebar-inner" style={{ height: virtualizer.getTotalSize() }}>
         {virtualizer.getVirtualItems().map((virtualRow) => (
-          <PokedexTab
+          <PokedexSidebarButton
             key={virtualRow.index}
             pokedex={pokedex}
             species={filteredSpecies[virtualRow.index]}
@@ -99,9 +99,6 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
               selectedSpecies?.nationalDex === filteredSpecies[virtualRow.index].nationalDex
             }
             style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
               height: `${virtualRow.size}px`,
               transform: `translateY(${virtualRow.start}px)`,
             }}
@@ -121,7 +118,7 @@ type PokedexTabProps = {
   style?: CSSProperties
 }
 
-function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabProps) {
+function PokedexSidebarButton({ pokedex, species, onClick, selected, style }: PokedexTabProps) {
   const [formIndex, maxStatus] = useMemo(() => {
     return getHighestFormeStatus(pokedex, species)
   }, [pokedex, species])
