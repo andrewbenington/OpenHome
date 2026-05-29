@@ -1,7 +1,7 @@
 import { bytesToUint16LittleEndian } from '@openhome-core/save/util/byteLogic'
 import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
+import { ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK4 } from '@pokemon-files/pkm'
 import { Item } from '@pokemon-resources/consts/Items'
 import { DP_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
@@ -74,8 +74,7 @@ export class DPSAV extends G4SAV {
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return false
-    return !isRestricted(DP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+    return !isRestricted(DP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {
@@ -100,5 +99,9 @@ export class DPSAV extends G4SAV {
 
   static includesOrigin(origin: OriginGame) {
     return origin === OriginGame.Diamond || origin === OriginGame.Pearl
+  }
+
+  get language(): Language {
+    return this.bytes[DPSAV.TRAINER_ID_OFFSET + 0x19]
   }
 }

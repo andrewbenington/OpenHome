@@ -5,8 +5,8 @@ import {
   uint16ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
 import { gen5StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
-import { unique } from '@openhome-core/util/functional'
-import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
+import { Option, unique } from '@openhome-core/util/functional'
+import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { PK5 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
@@ -178,10 +178,6 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     extraFormIndex?: ExtraFormIndex
   ): boolean
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   static gen4ValidDateAndSize(bytes: Uint8Array, offset: number) {
     const size = bytesToUint32LittleEndian(bytes, offset - 0xc)
 
@@ -207,5 +203,21 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     const g5Origin = bytes[G5SAV.originOffset]
 
     return g5Origin >= OriginGame.White && g5Origin <= OriginGame.Black2
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK5>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
+  }
+
+  get language(): Language {
+    return this.bytes[this.trainerDataOffset + 0x1e]
   }
 }

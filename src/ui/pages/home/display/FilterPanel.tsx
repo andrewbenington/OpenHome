@@ -13,6 +13,8 @@ import {
   getAllItems,
   Item,
   ItemMetadata,
+  Language,
+  Lookup,
   OriginGames,
   OriginGameWithData,
   SpeciesLookup,
@@ -142,7 +144,7 @@ export default function FilterPanel() {
         <Typeahead
           uniqueFieldId="species"
           options={Object.values(ALL_SPECIES_DATA)}
-          getOptionString={(opt) => opt.name}
+          getOptionString={(opt) => Lookup.speciesName(opt.nationalDex, Language.English)}
           getOptionUniqueID={(opt) => opt.nationalDex.toString()}
           value={filter.dexNumber ? SpeciesLookup(filter.dexNumber) : undefined}
           placeholder="Species"
@@ -154,23 +156,23 @@ export default function FilterPanel() {
             />
           )}
         />
-        {currentMon && currentMon.formes.length > 1 && (
+        {currentMon && currentMon.forms.length > 1 && (
           <Typeahead
             uniqueFieldId="form"
-            options={[...currentMon.formes]}
+            options={[...currentMon.forms]}
             getOptionString={(opt) => opt.formeName}
-            getOptionUniqueID={(opt) => opt.formeIndex.toString()}
+            getOptionUniqueID={(opt) => opt.formIndex.toString()}
             value={
-              filter.formeNumber !== undefined ? currentMon.formes[filter.formeNumber] : undefined
+              filter.formeNumber !== undefined ? currentMon.forms[filter.formeNumber] : undefined
             }
             placeholder="Form"
-            onChange={(option) => setFilter({ formeNumber: option?.formeIndex })}
+            onChange={(option) => setFilter({ formeNumber: option?.formIndex })}
             getIconComponent={(currentForme) =>
               filter.dexNumber &&
               currentForme && (
                 <PokemonIcon
                   dexNumber={filter.dexNumber}
-                  formeNumber={currentForme.formeIndex}
+                  formeNumber={currentForme.formIndex}
                   style={{ width: ICON_SIZE, height: ICON_SIZE }}
                 />
               )

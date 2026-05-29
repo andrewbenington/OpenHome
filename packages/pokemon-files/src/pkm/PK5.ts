@@ -50,7 +50,7 @@ export default class PK5 {
   isEgg: boolean
   isNicknamed: boolean
   gender: number
-  formeNum: number
+  formNum: number
   nature: NatureIndex
   isNsPokemon: boolean
   gameOfOrigin: number
@@ -122,7 +122,7 @@ export default class PK5 {
       this.isEgg = byteLogic.getFlag(dataView, 0x38, 30)
       this.isNicknamed = byteLogic.getFlag(dataView, 0x38, 31)
       this.gender = byteLogic.uIntFromBufferBits(dataView, 0x40, 1, 2, true)
-      this.formeNum = byteLogic.uIntFromBufferBits(dataView, 0x40, 3, 5, true)
+      this.formNum = byteLogic.uIntFromBufferBits(dataView, 0x40, 3, 5, true)
       this.nature = new NatureIndex(dataView.getUint8(0x41))
       this.isNsPokemon = byteLogic.getFlag(dataView, 0x42, 1)
       this.gameOfOrigin = dataView.getUint8(0x5f)
@@ -189,7 +189,7 @@ export default class PK5 {
       this.isEgg = other.isEgg
       this.isNicknamed = other.isNicknamed
       this.gender = other.gender
-      this.formeNum = other.formeNum
+      this.formNum = other.formNum
       this.nature = other.nature
       this.isNsPokemon = other.isNsPokemon ?? false
       this.eggDate = other.eggDate
@@ -260,7 +260,7 @@ export default class PK5 {
     byteLogic.setFlag(dataView, 0x38, 30, this.isEgg)
     byteLogic.setFlag(dataView, 0x38, 31, this.isNicknamed)
     byteLogic.uIntToBufferBits(dataView, this.gender, 64, 1, 2, true)
-    byteLogic.uIntToBufferBits(dataView, this.formeNum, 64, 3, 5, true)
+    byteLogic.uIntToBufferBits(dataView, this.formNum, 64, 3, 5, true)
     dataView.setUint8(0x41, this.nature.index)
     byteLogic.setFlag(dataView, 0x42, 1, this.isNsPokemon)
     dataView.setUint8(0x5f, this.gameOfOrigin)
@@ -317,10 +317,6 @@ export default class PK5 {
     return getStats(this)
   }
 
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
-  }
-
   public get heldItemName() {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
@@ -367,7 +363,7 @@ export default class PK5 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {
@@ -380,9 +376,5 @@ export default class PK5 {
 
   static maxValidBall() {
     return 25
-  }
-
-  static allowedBalls() {
-    return []
   }
 }

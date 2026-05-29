@@ -1,6 +1,8 @@
 import {
+  AbilityNumber,
   Ball,
   ConvertStrategy,
+  Gen3Ribbon,
   ItemGen3,
   Language,
   Languages,
@@ -61,7 +63,7 @@ export default class XDPKM {
   ivs: types.Stats
   contest: types.ContestStats
   shadowID: number
-  ribbons: string[]
+  ribbons: Gen3Ribbon[]
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     if (arg instanceof ArrayBuffer) {
@@ -152,7 +154,10 @@ export default class XDPKM {
       this.ivs = converter.ivs(other)
       this.contest = other.contest
       this.shadowID = 0
-      this.ribbons = filterRibbons(other.ribbons, [Gen3ContestRibbons, Gen3StandardRibbons])
+      this.ribbons = filterRibbons(other.ribbons, [
+        Gen3ContestRibbons,
+        Gen3StandardRibbons,
+      ]) as Gen3Ribbon[]
       this.statLevel = this.speciesMetadata?.calculateLevel(this.exp) ?? 1
     }
   }
@@ -225,10 +230,6 @@ export default class XDPKM {
     return this.metadata?.genderFromPid(this.personalityValue)
   }
 
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
-  }
-
   public get heldItemIndex() {
     return this.heldItemIndexGen3?.toModern()?.index ?? 0
   }
@@ -242,14 +243,14 @@ export default class XDPKM {
   }
 
   public get abilityNum() {
-    return ((this.personalityValue >> 0) & 1) + 1
+    return this.personalityValue & 1 ? AbilityNumber.Second : AbilityNumber.First
   }
 
   public get ability() {
     return this.metadata?.abilityByNumGen3(this.abilityNum)
   }
 
-  public get formeNum() {
+  public get formNum() {
     if (this.dexNum === NationalDex.Unown) {
       let letterValue = (this.personalityValue >> 24) & 0x3
       letterValue = ((this.personalityValue >> 16) & 0x3) | (letterValue << 2)
@@ -284,7 +285,7 @@ export default class XDPKM {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {
@@ -297,9 +298,5 @@ export default class XDPKM {
 
   static maxValidBall() {
     return 12
-  }
-
-  static allowedBalls() {
-    return []
   }
 }

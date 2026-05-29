@@ -118,7 +118,7 @@
       "bitOffset": 2
     },
     {
-      "name": "formeNum",
+      "name": "formNum",
       "type": "number",
       "numBytes": 2,
       "endian": "Little",

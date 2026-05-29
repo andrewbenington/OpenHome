@@ -30,7 +30,7 @@ import {
 } from '@pokemon-files/util'
 import { Countries } from '@pokemon-resources/consts/Countries'
 import { EncounterTypes } from '@pokemon-resources/consts/EncounterTypes'
-import { SWEETS } from '@pokemon-resources/consts/Formes'
+import { SWEETS } from '@pokemon-resources/consts/Forms'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
@@ -97,6 +97,13 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <code>{(mon.encryptionConstant & 0x3e000) >> (0xd % 24)}</code>
           </AttributeRow>
         )}
+        <AttributeRow label="Current Handler:">
+          {mon.isCurrentHandler ? (
+            (mon.handlerName ?? 'Unknown') + ' (not OT)'
+          ) : (
+            <b>{mon.trainerName + ' (OT)'}</b>
+          )}
+        </AttributeRow>
         <AttributeRowExpand
           summary="Original Trainer"
           value={
@@ -107,6 +114,9 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           }
         >
           <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
+          <AttributeRow label="Actual ID" indent={10}>
+            <code>{`${u16Display(mon.trainerID)}`}</code>
+          </AttributeRow>
           {mon.secretID !== undefined && (
             <AttributeRow label="Secret ID" indent={10}>
               <code>{`${u16Display(mon.secretID)}`}</code>
@@ -117,6 +127,25 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           )}
           {!!mon.trainerAffection && (
             <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
+          )}
+        </AttributeRowExpand>
+        <AttributeRowExpand
+          summary="Last Handler"
+          value={
+            <Flex gap="1">
+              {mon.handlerName ?? '(empty)'}
+              <GenderIcon gender={genderFromBool(mon.handlerGender ?? false)} />
+            </Flex>
+          }
+        >
+          <AttributeRow label="Handler ID" indent={10}>
+            <code>{`${u16Display(mon.handlerID ?? 0)}`}</code>
+          </AttributeRow>
+          {!!mon.handlerFriendship && (
+            <AttributeRow label="Friendship" value={mon.handlerFriendship.toString()} indent={10} />
+          )}
+          {!!mon.handlerAffection && (
+            <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
           )}
         </AttributeRowExpand>
         {mon instanceof OHPKM && (
@@ -145,6 +174,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             }
           />
         )}
+        {mon instanceof OHPKM && (
+          <AttributeRow label="Ability Number From PID" value={mon.abilityNumFromPidGen34()} />
+        )}
+        {mon.abilityNum !== undefined && (
+          <AttributeRow label="Ability Number" value={mon.abilityNum} />
+        )}
         {mon.formArgument !== undefined && mon.dexNum === NationalDex.Alcremie && (
           <AttributeRow label="Sweet" value={SWEETS[mon.formArgument]} />
         )}
@@ -171,12 +206,17 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <AttributeRow label="Gen 4 Encounter Type" value={EncounterTypes[mon.encounterType]} />
           )}
         {mon.shinyLeaves !== undefined &&
-          !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && (
+          !isRestricted(
+            HGSS_TRANSFER_RESTRICTIONS,
+            mon.dexNum,
+            mon.formNum,
+            mon.extraFormIndex
+          ) && (
             <AttributeRow label="Shiny Leaves">
               <ShinyLeavesDisplay leaves={mon.shinyLeaves} />
             </AttributeRow>
           )}
-        {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.geolocations &&
           mon.geolocations[0].country > 0 && (
             <AttributeRowExpand
@@ -194,7 +234,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               )}
             </AttributeRowExpand>
           )}
-        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(
+          SWSH_TRANSFER_RESTRICTIONS_CT,
+          mon.dexNum,
+          mon.formNum,
+          mon.extraFormIndex
+        ) &&
           mon.trFlagsSwSh &&
           getFlagsInArrayRange(mon.trFlagsSwSh, 0, 14).length > 0 && (
             <AttributeRowExpand
@@ -208,7 +253,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               ))}
             </AttributeRowExpand>
           )}
-        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.tmFlagsBDSP &&
           getFlagsInArrayRange(mon.tmFlagsBDSP, 0, 14).length > 0 && (
             <AttributeRowExpand
@@ -222,7 +267,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               ))}
             </AttributeRowExpand>
           )}
-        {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.tutorFlagsLA &&
           getFlagsInArrayRange(mon.tutorFlagsLA, 0, 8).length > 0 && (
             <AttributeRowExpand
@@ -237,7 +282,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             </AttributeRowExpand>
           )}
 
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.tmFlagsSV &&
           getFlagsInArrayRange(mon.tmFlagsSV, 0, 22).length > 0 && (
             <AttributeRowExpand
@@ -252,8 +297,13 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             </AttributeRowExpand>
           )}
 
-        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) ||
-          !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
+        {(!isRestricted(
+          SWSH_TRANSFER_RESTRICTIONS_CT,
+          mon.dexNum,
+          mon.formNum,
+          mon.extraFormIndex
+        ) ||
+          !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex)) &&
           mon.trainerMemory && (
             <AttributeRowExpand summary="Trainer Memory" value={mon.trainerName}>
               <AttributeRow
@@ -276,7 +326,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               </AttributeRow>
             </AttributeRowExpand>
           )}
-        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(
+          SWSH_TRANSFER_RESTRICTIONS_CT,
+          mon.dexNum,
+          mon.formNum,
+          mon.extraFormIndex
+        ) &&
           mon.dynamaxLevel !== undefined && (
             <>
               <AttributeRow label="Dynamax">
@@ -291,9 +346,9 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               )}
             </>
           )}
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           hasTeraTypes(mon) && <TeraTypeData mon={mon} />}
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.obedienceLevel !== undefined && (
             <AttributeRow label="Obedience" value={mon.obedienceLevel.toString()} />
           )}
@@ -328,13 +383,13 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             )}
           </>
         )}
-        {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && (
+        {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) && (
           <AttributeRow
             label="Gen 1/2 ID"
             value={getMonGen12Identifier(mon as PKMInterface & { dvs: StatsPreSplit })}
           />
         )}
-        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           (mon instanceof PK3 ||
             mon instanceof PK4 ||
             mon instanceof PK5 ||
@@ -474,27 +529,27 @@ function HiddenPowerDisplay(props: { mon: AllPKMFields }) {
 }
 
 function u16Display(val: number) {
-  return `${hexStr(val, 4)} (${val})`
+  return `${hexStrLittleEndian(val, 4)} (${val})`
 }
 
 function u32Display(val: number) {
-  return `${hexStr(val, 8)} (${val})`
+  return `${hexStrLittleEndian(val, 8)} (${val})`
 }
 
-function hexStr(val: number, digits: number) {
-  return '0x' + changeEndianness(val.toString(16).toUpperCase().padStart(digits, '0'))
+function hexStrLittleEndian(val: number, digits: number) {
+  return '0x' + val.toString(16).toUpperCase().padStart(digits, '0')
 }
 
-const changeEndianness = (hex: string) => {
-  const result = []
-  let len = hex.length - 2
+// const changeEndianness = (hex: string) => {
+//   const result = []
+//   let len = hex.length - 2
 
-  while (len >= 0) {
-    result.push(hex.substr(len, 2))
-    len -= 2
-  }
-  return result.join('')
-}
+//   while (len >= 0) {
+//     result.push(hex.substr(len, 2))
+//     len -= 2
+//   }
+//   return result.join('')
+// }
 
 function getFlagsInArrayRange(bytes: Uint8Array, offset: number, size: number) {
   return getFlagsInRange(new DataView(bytes.buffer), offset, size)

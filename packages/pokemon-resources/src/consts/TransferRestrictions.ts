@@ -39,7 +39,8 @@ import {
   UNBOUND,
   WASH,
   WORLD_CAP,
-} from './Formes'
+} from './Forms'
+import { orasFormIndexIfSupported } from '@pkm-rs/pkg'
 
 export const GEN1_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Mew,
@@ -157,12 +158,14 @@ export const ORAS_TRANSFER_RESTRICTIONS: TransferRestrictions = {
     [NationalDex.Palkia]: [ORIGIN],
     [NationalDex.Zygarde]: [TEN_PCT, TEN_PCT_PC, COMPLETE],
   },
+  supportsExtraForm: (form) => orasFormIndexIfSupported(form) !== undefined,
 }
 
 export const SM_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Marshadow,
   excludedForms: {
     ...Gen89RegionalForms,
+    [NationalDex.Eevee]: [LGE_STARTER],
     [NationalDex.Pikachu]: [LGP_STARTER, WORLD_CAP],
     [NationalDex.Pichu]: [SPIKY_EAR],
     [NationalDex.Dialga]: [ORIGIN],
@@ -175,6 +178,7 @@ export const USUM_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Zeraora,
   excludedForms: {
     ...Gen89RegionalForms,
+    [NationalDex.Eevee]: [LGE_STARTER],
     [NationalDex.Pikachu]: [LGP_STARTER, WORLD_CAP],
     [NationalDex.Pichu]: [SPIKY_EAR],
     [NationalDex.Dialga]: [ORIGIN],

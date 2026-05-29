@@ -1,7 +1,7 @@
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { Pokedex } from '@openhome-ui/util/pokedex'
-import { all_species_data, FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
+import { all_species_data, FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { CSSProperties, useEffect, useMemo, useRef } from 'react'
 import './style.css'
@@ -12,11 +12,17 @@ export type PokedexSidebarProps = {
   pokedex: Pokedex
   selectedSpecies?: SpeciesMetadata
   setSelectedSpecies: (species: SpeciesMetadata) => void
-  setSelectedForme: (forme: FormeMetadata) => void
+  setSelectedForm: (form: FormMetadata) => void
 }
 
 export default function PokedexSidebar(props: PokedexSidebarProps) {
-  const { filter, selectedSpecies, setSelectedSpecies, setSelectedForme, pokedex } = props
+  const {
+    filter,
+    selectedSpecies,
+    setSelectedSpecies,
+    setSelectedForm: setSelectedForme,
+    pokedex,
+  } = props
 
   const ALL_SPECIES_DATA = useMemo(() => all_species_data(), [])
 
@@ -25,7 +31,11 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
   const filteredSpecies = useMemo(
     () =>
       Object.values(ALL_SPECIES_DATA).filter(
-        (mon) => !filter || mon.name.toUpperCase().startsWith(filter?.trim().toUpperCase())
+        (mon) =>
+          !filter ||
+          Lookup.speciesName(mon.nationalDex, Language.English)
+            .toUpperCase()
+            .startsWith(filter?.trim().toUpperCase())
       ),
     [ALL_SPECIES_DATA, filter]
   )
@@ -64,7 +74,7 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
                 filteredSpecies[virtualRow.index]
               )
 
-              setSelectedForme(filteredSpecies[virtualRow.index].formes[caughtFormeIndex])
+              setSelectedForme(filteredSpecies[virtualRow.index].forms[caughtFormeIndex])
               virtualizer.scrollToIndex(virtualRow.index, { behavior: 'smooth', align: 'center' })
             }}
             selected={
@@ -95,7 +105,7 @@ type PokedexTabProps = {
 }
 
 function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabProps) {
-  const [formeIndex, maxStatus] = useMemo(() => {
+  const [formIndex, maxStatus] = useMemo(() => {
     return getHighestFormeStatus(pokedex, species)
   }, [pokedex, species])
 
@@ -121,13 +131,13 @@ function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabPr
       <div className="pokedex-icon-container">
         <PokemonIcon
           dexNumber={species.nationalDex}
-          formeNumber={formeIndex}
+          formeNumber={formIndex}
           silhouette={!isSeen}
           grayedOut={!isCaught}
           style={{ minWidth: 32, height: 36 }} // leave this alone
         />
       </div>
-      {species.nationalDex}. {species.name}
+      {species.nationalDex}. {Lookup.speciesName(species.nationalDex, Language.English)}
       <div style={{ flex: 1 }} />
       {maxStatus === 'ShinyCaught' && (
         <img

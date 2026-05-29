@@ -6,7 +6,7 @@ use serde::{Serialize, Serializer};
 
 #[derive(Debug)]
 pub enum Error {
-    AppDataAccess {
+    DataFolderAccess {
         source: Box<dyn std::error::Error>,
     },
     FileAccess {
@@ -46,8 +46,8 @@ pub enum Error {
 }
 
 impl Error {
-    pub fn appdata<E: std::error::Error + 'static>(source: E) -> Error {
-        Error::AppDataAccess {
+    pub fn data_folder<E: std::error::Error + 'static>(source: E) -> Error {
+        Error::DataFolderAccess {
             source: Box::new(source),
         }
     }
@@ -120,7 +120,7 @@ impl Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
-            Self::AppDataAccess { source } => {
+            Self::DataFolderAccess { source } => {
                 format!("Could not access app data directory: {source}")
             }
             Self::FileAccess { path, source } => format!(
@@ -192,7 +192,7 @@ impl Serialize for Error {
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            Self::AppDataAccess { source }
+            Self::DataFolderAccess { source }
             | Self::FileAccess { source, .. }
             | Self::FileDownload { source, .. }
             | Self::FileMalformed { source, .. }

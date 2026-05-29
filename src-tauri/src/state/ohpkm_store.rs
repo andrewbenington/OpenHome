@@ -1,10 +1,12 @@
+use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
-use crate::storage;
 use crate::{state::synced_state, util};
 use base64::prelude::*;
-use pkm_rs::pkm::ohpkm::OhpkmV2;
+use pkm_rs::ohpkm::OhpkmV2;
 use serde::{Deserialize, Serialize};
+use std::num::NonZeroU64;
 use std::path::{Path, PathBuf};
+use std::time::{Duration, UNIX_EPOCH};
 use std::{collections::HashMap, fs};
 
 #[derive(Default, Serialize, Deserialize, Clone)]
@@ -15,8 +17,8 @@ impl OhpkmBytesStore {
         let mon_files = fs::read_dir(path).map_err(|e| Error::file_access(&path, e))?;
 
         let mut map = HashMap::new();
-        for mon_file_os_str in mon_files.flatten() {
-            let path = mon_file_os_str.path();
+        for dir_entry in mon_files.flatten() {
+            let path = dir_entry.path();
             if !path
                 .extension()
                 .is_some_and(|ext| ext.eq_ignore_ascii_case("ohpkm"))
@@ -24,13 +26,20 @@ impl OhpkmBytesStore {
                 continue;
             }
 
-            if let Ok(mon_bytes) = util::read_file_bytes(path) {
-                let mon_identifier = mon_file_os_str
-                    .file_name()
-                    .to_string_lossy()
-                    .trim_end_matches(".ohpkm")
-                    .to_owned();
-                map.insert(mon_identifier, mon_bytes);
+            if let Ok(mon_bytes) = util::read_file_bytes(path)
+                && let Ok(mut mon) = OhpkmV2::from_bytes(&mon_bytes)
+            {
+                let file_created_seconds = dir_entry
+                    .metadata()
+                    .ok()
+                    .and_then(|m| m.created().or(m.modified()).ok())
+                    .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                    .as_ref()
+                    .map(Duration::as_secs)
+                    .and_then(NonZeroU64::new);
+
+                mon.set_started_tracking_if_missing(file_created_seconds);
+                map.insert(mon.openhome_id(), mon.to_bytes());
             }
         }
 
@@ -50,12 +59,7 @@ impl OhpkmBytesStore {
                         "Fixed errors Ohpkm {} with id {identifier}",
                         mon.get_nickname()
                     );
-                    match mon.to_bytes() {
-                        Ok(new_bytes) => *bytes = new_bytes,
-                        Err(err) => println!(
-                            "Failed to reserialize fixed Ohpkm with id {identifier}: {err}"
-                        ),
-                    };
+                    *bytes = mon.to_bytes();
                 }
             }
         }
@@ -78,13 +82,13 @@ impl OhpkmBytesStore {
         }
     }
 
-    pub fn load_from_mons_v2(app_handle: &tauri::AppHandle) -> Result<Self> {
-        let mons_v2_dir = storage::get_path(app_handle, "mons_v2")?;
+    pub fn load_from_mons_v2(data_controller: &impl DataController) -> Result<Self> {
+        let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
         Self::load_from_directory(&mons_v2_dir)
     }
 
-    pub fn write_to_mons_v2(&self, app_handle: &tauri::AppHandle) -> Result<()> {
-        let mons_v2_dir = storage::get_path(app_handle, "mons_v2")?;
+    pub fn write_to_mons_v2(&self, data_controller: &impl DataController) -> Result<()> {
+        let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
         Self::write_to_directory(self, &mons_v2_dir)
     }
 
@@ -99,6 +103,10 @@ impl OhpkmBytesStore {
 
     pub fn includes(&self, identifier: &str) -> bool {
         self.0.contains_key(identifier)
+    }
+
+    pub fn remove(&mut self, identifier: &str) -> bool {
+        self.0.remove(identifier).is_some()
     }
 }
 
@@ -133,4 +141,44 @@ pub fn add_to_ohpkm_store(
         .lock()?
         .ohpkm_store
         .union_with(&app_handle, updates)
+}
+
+type DeleteResultsById = HashMap<String, Result<()>>;
+
+#[tauri::command]
+pub fn permanently_delete_ohpkms(
+    app_handle: tauri::AppHandle,
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+    openhome_ids: Vec<String>,
+) -> Result<DeleteResultsById> {
+    // first remove from the ohpkm store
+    synced_state
+        .lock()?
+        .ohpkm_store
+        .replace(&app_handle, |store| {
+            let mut new_store = store.clone();
+            for identifier in &openhome_ids {
+                new_store.remove(identifier);
+            }
+            new_store
+        })?;
+    let mut results = HashMap::new();
+
+    // then delete from the disk
+    for identifier in openhome_ids {
+        let relative_path = Path::new(MONS_V2_DIR).join(format!("{identifier}.ohpkm"));
+        match app_handle.absolute_path(DataDir::Storage, &relative_path) {
+            Ok(full_path) => {
+                let deletion_result =
+                    fs::remove_file(full_path).map_err(|e| Error::file_access(&relative_path, e));
+                results.insert(identifier, deletion_result);
+            }
+            Err(source_err) => {
+                let error = Error::file_access(&relative_path, source_err);
+                results.insert(identifier, Err(error));
+            }
+        };
+    }
+
+    Ok(results)
 }

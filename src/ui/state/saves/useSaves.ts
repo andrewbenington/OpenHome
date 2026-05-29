@@ -6,8 +6,7 @@ import { monSupportedBySave, SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
 import { Option, R, Result } from '@openhome-core/util/functional'
-import { filterUndefined } from '@openhome-core/util/sort'
-import { Item } from '@pkm-rs/pkg'
+import { Item, Lookup } from '@pkm-rs/pkg'
 import { MarkingsSixShapesWithColor } from '@pokemon-files/util'
 import { useCallback, useContext, useRef } from 'react'
 import { displayIndexAdder, isBattleFormeItem } from '../../../core/pkm/util'
@@ -55,6 +54,8 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   // Bulk operations
   moveBoxToBank(save: SAV): number
   moveSaveToBank(save: SAV): number
+
+  // OHPKM modification
   updateMonDisplayColor(monId: string, color: string | undefined): void
   updateMonTags(
     monId: string,
@@ -62,6 +63,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   ): void
   moveMonItemToBag: (monLocation: MonLocation) => void
   giveItemToMon: (monLocation: MonLocation, item: Item) => void
+  revertMonAbility: (monId: OhpkmIdentifier) => void
 
   allMonsInCurrentBank: () => string[]
 }
@@ -101,7 +103,7 @@ export function useSaves(): SavesAndBanksManager {
   const getMonAtSaveLocation = useCallback(
     (location: SaveMonLocation) => {
       const save = openSavesState.openSaves[location.saveIdentifier].save
-      return save.boxes[location.box].boxSlots[location.boxSlot]
+      return save.getMonAt(location.box, location.boxSlot)
     },
     [openSavesState.openSaves]
   )
@@ -144,8 +146,8 @@ export function useSaves(): SavesAndBanksManager {
       }
 
       const destSaveMon = ohpkm ? ohpkmStore.updateAndConvertForSave(ohpkm, destSave) : undefined
-      const displacedMon = destSave.boxes[dest.box].boxSlots[dest.boxSlot]
-      destSave.boxes[dest.box].boxSlots[dest.boxSlot] = destSaveMon
+      const displacedMon = destSave.getMonAt(dest.box, dest.boxSlot)
+      destSave.setMonAt(dest.box, dest.boxSlot, destSaveMon)
       destSave.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
 
       return displacedMon
@@ -161,8 +163,8 @@ export function useSaves(): SavesAndBanksManager {
       const save = openSavesState.openSaves[dest.saveIdentifier].save
 
       if (!identifier) {
-        const displacedMon = save.boxes[dest.box].boxSlots[dest.boxSlot]
-        save.boxes[dest.box].boxSlots[dest.boxSlot] = undefined
+        const displacedMon = save.getMonAt(dest.box, dest.boxSlot)
+        save.setMonAt(dest.box, dest.boxSlot, undefined)
         save.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
         return R.Ok(displacedMon)
       }
@@ -174,8 +176,8 @@ export function useSaves(): SavesAndBanksManager {
 
       const ohpkm = monResult.value
       const saveFormatMon = ohpkmStore.updateAndConvertForSave(ohpkm, save)
-      const displacedMon = save.boxes[dest.box].boxSlots[dest.boxSlot]
-      save.boxes[dest.box].boxSlots[dest.boxSlot] = saveFormatMon
+      const displacedMon = save.getMonAt(dest.box, dest.boxSlot)
+      save.setMonAt(dest.box, dest.boxSlot, saveFormatMon)
       save.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
 
       return R.Ok(displacedMon)
@@ -252,7 +254,7 @@ export function useSaves(): SavesAndBanksManager {
           }
 
           if (nextSlot.box < currentBankBoxCount) {
-            const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
+            const homeMon = mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon)
             ohpkmStore.insertOrUpdate(homeMon)
 
             moveOhpkmToHome(homeMon.openhomeId, nextSlot, true)
@@ -270,13 +272,13 @@ export function useSaves(): SavesAndBanksManager {
 
         mons.forEach((mon) => {
           while (
-            tempSave.boxes[dest.box].boxSlots[nextIndex] &&
+            tempSave.getMonAt(dest.box, nextIndex) &&
             nextIndex < tempSave.boxRows * tempSave.boxColumns
           ) {
             nextIndex++
           }
           if (nextIndex < tempSave.boxRows * tempSave.boxColumns) {
-            const homeMon = mon instanceof OHPKM ? mon : new OHPKM(mon)
+            const homeMon = mon instanceof OHPKM ? mon : OHPKM.fromMonInSave(mon, tempSave)
 
             moveMonBetweenSaves(
               undefined,
@@ -309,7 +311,7 @@ export function useSaves(): SavesAndBanksManager {
       openSavesDispatch({
         type: 'set_save_box',
         payload: {
-          boxIndex: save.currentPCBox > 0 ? save.currentPCBox - 1 : save.boxes.length - 1,
+          boxIndex: save.currentPCBox > 0 ? save.currentPCBox - 1 : save.getBoxCount() - 1,
           save,
         },
       })
@@ -322,7 +324,7 @@ export function useSaves(): SavesAndBanksManager {
       openSavesDispatch({
         type: 'set_save_box',
         payload: {
-          boxIndex: (save.currentPCBox + 1) % save.boxes.length,
+          boxIndex: (save.currentPCBox + 1) % save.getBoxCount(),
           save,
         },
       })
@@ -331,9 +333,12 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const addSave = useCallback(
-    (save: SAV) => {
-      backend.addRecentSave(getSaveRef(save))
-      backend.registerInPokedex(pokedexSeenFromSave(save))
+    async (save: SAV) => {
+      await backend.addRecentSave(getSaveRef(save))
+      const result = await backend.registerInPokedex(pokedexSeenFromSave(save))
+      if (R.isErr(result)) {
+        console.error('Error registering pokedex entries from save:', result.err)
+      }
       if (save.trainerGender !== undefined) {
         const allOhpkms = ohpkmStore.getAllStored()
         for (const mon of allOhpkms) {
@@ -353,7 +358,7 @@ export function useSaves(): SavesAndBanksManager {
         }
       }
       const toUpdate: OhpkmStoreData = {}
-      for (const mon of save.boxes.flatMap((b) => b.boxSlots).filter(filterUndefined)) {
+      for (const mon of save.getAllMons()) {
         const trackedData = ohpkmStore.loadIfTracked(mon)
         if (trackedData) {
           trackedData.syncWithGameData(mon, save)
@@ -457,9 +462,10 @@ export function useSaves(): SavesAndBanksManager {
         const save = saveFromIdentifier(location.saveIdentifier)
         ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, save)
 
-        save.boxes[location.box].boxSlots[location.boxSlot] = save.convertOhpkm(
-          ohpkm,
-          defaultConvertStrategy
+        save.setMonAt(
+          location.box,
+          location.boxSlot,
+          save.convertOhpkm(ohpkm, defaultConvertStrategy)
         )
         save.updatedBoxSlots.push({ box: location.box, boxSlot: location.boxSlot })
       }
@@ -476,6 +482,19 @@ export function useSaves(): SavesAndBanksManager {
       saveFromIdentifier,
       defaultConvertStrategy,
     ]
+  )
+
+  const revertMonAbility = useCallback(
+    (identifier: OhpkmIdentifier) => {
+      const result = ohpkmStore.tryLoadFromId(identifier)
+      if (R.isErr(result)) return result
+
+      const mon = result.value
+      mon.revertAbilityByNum()
+
+      ohpkmStore.insertOrUpdate(mon)
+    },
+    [ohpkmStore]
   )
 
   const setMonNickname = useCallback(
@@ -496,14 +515,16 @@ export function useSaves(): SavesAndBanksManager {
         const save = saveFromIdentifier(location.saveIdentifier)
         ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, save)
 
-        save.boxes[location.box].boxSlots[location.boxSlot] = save.convertOhpkm(
-          ohpkm,
-          defaultConvertStrategy
+        save.setMonAt(
+          location.box,
+          location.boxSlot,
+          save.convertOhpkm(ohpkm, defaultConvertStrategy)
         )
         save.updatedBoxSlots.push({ box: location.box, boxSlot: location.boxSlot })
       }
 
       ohpkm.nickname = nickname
+      ohpkm.isNicknamed = nickname !== Lookup.speciesName(ohpkm.dexNum, ohpkm.language)
       ohpkmStore.insertOrUpdate(ohpkm)
     },
     [
@@ -639,9 +660,6 @@ export function useSaves(): SavesAndBanksManager {
 
   const moveBoxToBank = useCallback(
     (save: SAV): number => {
-      const currentBox = save.boxes[save.currentPCBox]
-      if (!currentBox) return 0
-
       let movedCount = 0
       const boxSize = OPENHOME_BOX_SLOTS
       let currentBankBox = banksAndBoxes.getCurrentBox().index
@@ -656,8 +674,8 @@ export function useSaves(): SavesAndBanksManager {
         currentBankBox++
       }
 
-      for (let i = 0; i < currentBox.boxSlots.length; i++) {
-        const mon = currentBox.boxSlots[i]
+      for (let boxSlot = 0; boxSlot < save.boxSlotCount; boxSlot++) {
+        const mon = save.getMonAt(save.currentPCBox, boxSlot)
         if (!mon) continue
 
         while (currentBankBox < banksAndBoxes.getCurrentBank().boxes.size) {
@@ -691,8 +709,8 @@ export function useSaves(): SavesAndBanksManager {
           ohpkm.openhomeId
         )
 
-        currentBox.boxSlots[i] = undefined
-        save.updatedBoxSlots.push({ box: save.currentPCBox, boxSlot: i })
+        save.setMonAt(save.currentPCBox, boxSlot, undefined)
+        save.updatedBoxSlots.push({ box: save.currentPCBox, boxSlot: boxSlot })
 
         movedCount++
         currentSlot++
@@ -718,12 +736,9 @@ export function useSaves(): SavesAndBanksManager {
         currentBankBox++
       }
 
-      for (let boxIdx = 0; boxIdx < save.boxes.length; boxIdx++) {
-        const saveBox = save.boxes[boxIdx]
-        if (!saveBox) continue
-
-        for (let slotIdx = 0; slotIdx < saveBox.boxSlots.length; slotIdx++) {
-          const mon = saveBox.boxSlots[slotIdx]
+      for (let boxIdx = 0; boxIdx < save.getBoxCount(); boxIdx++) {
+        for (let slotIdx = 0; slotIdx < save.boxSlotCount; slotIdx++) {
+          const mon = save.getMonAt(boxIdx, slotIdx)
           if (!mon) continue
 
           while (currentBankBox < banksAndBoxes.getCurrentBank().boxes.size) {
@@ -757,7 +772,7 @@ export function useSaves(): SavesAndBanksManager {
             ohpkm.openhomeId
           )
 
-          saveBox.boxSlots[slotIdx] = undefined
+          save.setMonAt(boxIdx, slotIdx, undefined)
           save.updatedBoxSlots.push({ box: boxIdx, boxSlot: slotIdx })
 
           totalMoved++
@@ -855,17 +870,18 @@ export function useSaves(): SavesAndBanksManager {
     updateMonTags,
     moveMonItemToBag,
     giveItemToMon,
+    revertMonAbility,
 
     allMonsInCurrentBank,
   }
 }
 
 function moveMonWithinSave(save: SAV, source: SaveMonLocation, dest: SaveMonLocation) {
-  const sourceMon = save.boxes[source.box].boxSlots[source.boxSlot]
-  const displacedMon = save.boxes[dest.box].boxSlots[dest.boxSlot]
-  save.boxes[dest.box].boxSlots[dest.boxSlot] = sourceMon
+  const sourceMon = save.getMonAt(source.box, source.boxSlot)
+  const displacedMon = save.getMonAt(dest.box, dest.boxSlot)
+  save.setMonAt(dest.box, dest.boxSlot, sourceMon)
   save.updatedBoxSlots.push({ box: dest.box, boxSlot: dest.boxSlot })
-  save.boxes[source.box].boxSlots[source.boxSlot] = displacedMon
+  save.setMonAt(source.box, source.boxSlot, displacedMon)
   save.updatedBoxSlots.push({ box: source.box, boxSlot: source.boxSlot })
 }
 
@@ -894,17 +910,17 @@ export type SaveErrorType = SaveError['type']
 export function pokedexSeenFromSave(saveFile: SAV) {
   const pokedexUpdates: PokedexUpdate[] = []
 
-  for (const mon of saveFile.boxes.flatMap((box) => box.boxSlots).filter(filterUndefined)) {
+  for (const mon of saveFile.getAllMons()) {
     pokedexUpdates.push({
       dexNumber: mon.dexNum,
-      formeNumber: mon.formeNum,
+      formIndex: mon.formNum,
       status: 'Seen',
     })
 
     if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
       pokedexUpdates.push({
         dexNumber: mon.dexNum,
-        formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
+        formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formNum),
         status: 'Seen',
       })
     }

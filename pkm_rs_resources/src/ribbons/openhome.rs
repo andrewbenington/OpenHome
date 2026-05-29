@@ -4,11 +4,16 @@ use std::{error::Error, fmt::Display};
 
 use crate::ribbons::{ModernRibbon, ModernRibbonSet};
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Default, Debug, Clone, Copy)]
-pub struct ObsoleteRibbonSet(FlagSet<6>);
+pub struct ObsoleteRibbonSet(FlagSet<6, ObsoleteRibbon>);
 
 impl ObsoleteRibbonSet {
     pub const fn from_bytes(bytes: [u8; 6]) -> Self {
@@ -16,11 +21,7 @@ impl ObsoleteRibbonSet {
     }
 
     pub fn get_ribbons(&self) -> Vec<ObsoleteRibbon> {
-        self.0
-            .get_indices()
-            .into_iter()
-            .map(ObsoleteRibbon::from)
-            .collect()
+        self.0.get_flags().into_iter().collect()
     }
 
     pub const fn to_bytes(self) -> [u8; 6] {
@@ -28,11 +29,11 @@ impl ObsoleteRibbonSet {
     }
 
     pub const fn clear_ribbons(&mut self) {
-        self.0.clear_all();
+        self.0.clear();
     }
 
     pub fn add_ribbon(&mut self, ribbon: ObsoleteRibbon) {
-        self.0.set_index(ribbon.get_index(), true);
+        self.0.set_flag(ribbon, true);
     }
 
     pub fn add_ribbons(&mut self, ribbons: Vec<ObsoleteRibbon>) {
@@ -123,10 +124,10 @@ impl FromIterator<ObsoleteRibbon> for ObsoleteRibbonSet {
 
 impl IntoIterator for ObsoleteRibbonSet {
     type Item = ObsoleteRibbon;
-    type IntoIter = std::iter::Map<std::vec::IntoIter<usize>, fn(usize) -> ObsoleteRibbon>;
+    type IntoIter = std::vec::IntoIter<ObsoleteRibbon>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.0.get_indices().into_iter().map(ObsoleteRibbon::from)
+        self.0.get_flags().into_iter()
     }
 }
 
@@ -308,6 +309,12 @@ impl From<usize> for ObsoleteRibbon {
     }
 }
 
+impl From<ObsoleteRibbon> for usize {
+    fn from(value: ObsoleteRibbon) -> Self {
+        value.get_index()
+    }
+}
+
 #[derive(Debug, Clone, Copy, Serialize)]
 pub enum OpenHomeRibbon {
     Mod(ModernRibbon),
@@ -339,11 +346,13 @@ impl Display for OpenHomeRibbon {
 }
 
 const OBSOLETE_RIBBON_BYTES: usize = 6;
+const MAX_MODERN_RIBBON: usize = ModernRibbon::MAX;
 
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Default, Debug, Clone, Copy)]
 pub struct OpenHomeRibbonSet<const MODERN_BYTE_COUNT: usize> {
     obsolete: ObsoleteRibbonSet,
-    modern: ModernRibbonSet<MODERN_BYTE_COUNT>,
+    modern: ModernRibbonSet<MODERN_BYTE_COUNT, MAX_MODERN_RIBBON>,
 }
 
 impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
@@ -379,14 +388,14 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
 
     pub fn from_obsolete(obsolete: ObsoleteRibbonSet) -> Self {
         Self {
-            modern: ModernRibbonSet::<MODERN_BYTE_COUNT>::default(),
+            modern: ModernRibbonSet::<MODERN_BYTE_COUNT, MAX_MODERN_RIBBON>::default(),
             obsolete,
         }
     }
 
-    pub fn from_modern<const M: usize>(modern: ModernRibbonSet<M>) -> Self {
+    pub fn from_modern<const M: usize, const MAX: usize>(modern: ModernRibbonSet<M, MAX>) -> Self {
         Self {
-            modern: modern.truncate_to::<MODERN_BYTE_COUNT>(),
+            modern: modern.with_max::<MODERN_BYTE_COUNT, MAX_MODERN_RIBBON>(),
             obsolete: ObsoleteRibbonSet::default(),
         }
     }
@@ -410,7 +419,7 @@ impl<const MODERN_BYTE_COUNT: usize> OpenHomeRibbonSet<MODERN_BYTE_COUNT> {
 
     pub const fn clear_ribbons(&mut self) {
         self.obsolete.clear_ribbons();
-        self.modern.clear_ribbons();
+        self.modern.clear();
     }
 
     pub fn add_ribbon(&mut self, ribbon: OpenHomeRibbon) {

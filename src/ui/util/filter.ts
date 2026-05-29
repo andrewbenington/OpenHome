@@ -33,7 +33,7 @@ export function filterApplies(filter: Filter, mon: monData) {
   if (filter.dexNumber && mon.dexNum !== filter.dexNumber) {
     return false
   }
-  if (filter.formeNumber !== undefined && mon.formeNum !== filter.formeNumber) {
+  if (filter.formeNumber !== undefined && mon.formNum !== filter.formeNumber) {
     return false
   }
   if (filter.heldItem !== undefined && !heldItemPassesFilter(mon.heldItemIndex, filter.heldItem)) {

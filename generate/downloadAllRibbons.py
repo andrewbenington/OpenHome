@@ -2,12 +2,9 @@ import json
 import os
 import re
 import threading
-import time
 import urllib.request
 
 import requests
-from bs4 import BeautifulSoup
-from items import Items
 
 os.makedirs("ribbons", exist_ok=True)
 
@@ -76,5 +73,5 @@ def download_all_sprites():
 # scrape_bulbapedia_gen_9()
 # scrape_bulbapedia_gen_8()
 download_all_sprites()
-# print(POKEMON_DATA["19"]["formes"][1])
-# print(exclude_forme_gen8(19, POKEMON_DATA["19"]["formes"][1]))
+# print(POKEMON_DATA["19"]["forms"][1])
+# print(exclude_forme_gen8(19, POKEMON_DATA["19"]["forms"][1]))

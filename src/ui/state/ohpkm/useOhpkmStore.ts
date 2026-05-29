@@ -13,6 +13,7 @@ import { SAV } from '../../../core/save/interfaces'
 import { SAVClass } from '../../../core/save/util'
 import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
+import dayjs from 'dayjs'
 
 export type OhpkmStore = {
   getById(id: string): OHPKM | undefined
@@ -33,6 +34,9 @@ export type OhpkmStore = {
     destSave: Option<SAV>
   ) => OHPKM
 }
+
+// FALSE IN PRODUCTION
+const FORCE_MISSED_LOOKUP = false
 
 export type OhpkmLookup = (id: string) => OHPKM | undefined
 
@@ -130,7 +134,10 @@ export function useOhpkmStore(): OhpkmStore {
 
   const startTrackingNewMon = useCallback(
     <P extends PKMInterface>(mon: P, sourceSave: Option<SAV<P>>, destSave: Option<SAV>) => {
-      const ohpkm = sourceSave ? OHPKM.fromMonInSave(mon, sourceSave) : new OHPKM(mon)
+      const ohpkm = sourceSave
+        ? OHPKM.fromMonInSave(mon, sourceSave)
+        : OHPKM.fromMonUnknownSave(mon)
+      ohpkm.startedTrackingTimestamp = dayjs()
       if (destSave) {
         handleLookupsUpdate(ohpkm, destSave)
       }
@@ -144,6 +151,7 @@ export function useOhpkmStore(): OhpkmStore {
 
   const loadIfTracked = useCallback(
     (mon: PKMInterface): Option<OHPKM> => {
+      if (FORCE_MISSED_LOOKUP) return undefined
       const format: MonFormat = mon.format as MonFormat
       switch (format) {
         case 'PK1':

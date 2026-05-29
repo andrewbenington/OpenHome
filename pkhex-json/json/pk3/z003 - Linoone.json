@@ -1,0 +1,92 @@
+{
+  "sanity": 0,
+  "checksum": 42440,
+  "pokemon_index": 289,
+  "held_item_index": null,
+  "trainer_id": 34978,
+  "secret_id": 48423,
+  "exp": 1000000,
+  "has_species_data": true,
+  "is_bad_egg": false,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 86321655,
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 252,
+    "atk": 252,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 6
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus_byte": 0,
+  "ribbons": ["Champion"],
+  "nickname": "LINOONE",
+  "nickname_trash": "C6C3C8C9C9C8BFFF0000",
+  "moves": [
+    {
+      "move_index": "Cut",
+      "pp": 48,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Surf",
+      "pp": 24,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Strength",
+      "pp": 24,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Rock Smash",
+      "pp": 24,
+      "pp_ups": 3
+    }
+  ],
+  "ivs": {
+    "hp": 17,
+    "atk": 1,
+    "def": 1,
+    "spa": 29,
+    "spd": 2,
+    "spe": 21
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_friendship": 255,
+  "met_location_index": 18,
+  "ball": "Ultra",
+  "met_level": 3,
+  "trainer_gender": "Male",
+  "game_of_origin": "Emerald",
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 100,
+  "current_hp": 346,
+  "stats": {
+    "hp": 346,
+    "atk": 188,
+    "def": 140,
+    "spa": 134,
+    "spd": 129,
+    "spe": 227
+  },
+  "level": 100
+}

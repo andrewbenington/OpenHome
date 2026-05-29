@@ -28,7 +28,7 @@ function loadOhpkmFromB64(response: StringToB64): OhpkmStoreData {
   return Object.fromEntries(
     Object.entries(response).map(([identifier, b64String]) => [
       identifier,
-      new OHPKM(Uint8Array.fromBase64(b64String)),
+      OHPKM.fromBytes(Uint8Array.fromBase64(b64String).buffer),
     ])
   )
 }
@@ -68,7 +68,7 @@ function useSyncedOhpkmState(): SyncedStateController<OhpkmStoreData, StringToB6
 function getPokedexUpdate(mon: OHPKM): PokedexUpdate {
   return {
     dexNumber: mon.dexNum,
-    formeNumber: mon.formeNum,
+    formIndex: mon.formNum,
     status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
   }
 }
@@ -78,7 +78,7 @@ function getPokedexUpdates(mon: OHPKM): PokedexUpdate[] {
   if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
     updates.push({
       ...getPokedexUpdate(mon),
-      formeNumber: displayIndexAdder(mon.heldItemIndex)(mon.formeNum),
+      formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formNum),
     })
   }
   return updates

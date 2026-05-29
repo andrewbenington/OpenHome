@@ -1,4 +1,4 @@
-VERSION=1.10.3
+VERSION=1.11.1
 
 .PHONY: help
 help: # Display this help.
@@ -108,6 +108,15 @@ gen-wasm:
 	@ts-node generate/gen_moves.ts
 	@ts-node generate/gen_species_data.ts
 	@cd pkm_rs_resources && cargo fmt
+
+.PHONY: pkhex-json
+pkhex-json:
+	@cd pkhex-json && dotnet run GeneratePkhexJson.cs
+	@npx prettier --write pkhex-json
+
+.PHONY: test-pkhex-json
+test-pkhex-json:
+	@cargo test --package pkm_rs --lib --all-features -- compare_pkhex_json
 	
 generate/out/syncPKHexResources.js: generate/syncPKHexResources.ts
 	@echo "compiling generate/syncPKHexResources.ts..."

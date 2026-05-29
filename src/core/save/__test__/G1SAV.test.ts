@@ -16,10 +16,19 @@ let blueSaveFile: G1SAV
 var slowbroOH: OHPKM
 
 beforeAll(initializeWasm)
+
+function pkmTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'pkm-files', ...pathElements)
+}
+
+function saveTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'save-files', ...pathElements)
+}
+
 beforeAll(() => {
   const result = buildUnknownSaveFile(
     emptyPathData,
-    new Uint8Array(fs.readFileSync(path.join(__dirname, 'save-files', 'blue.sav'))),
+    new Uint8Array(fs.readFileSync(saveTestFilePath('blue.sav'))),
     [G1SAV]
   )
 
@@ -28,10 +37,8 @@ beforeAll(() => {
   blueSaveFile = result.value as G1SAV
 
   slowbroOH = bytesToPKM(
-    new Uint8Array(
-      fs.readFileSync(path.join('src/core/pkm/__test__/PKMFiles/OhpkmV2', 'slowbro.ohpkm'))
-    ),
-    'OhpkmV2'
+    new Uint8Array(fs.readFileSync(pkmTestFilePath('ohpkm', 'slowbro.ohpkm'))),
+    'OHPKM'
   ) as OHPKM
 })
 

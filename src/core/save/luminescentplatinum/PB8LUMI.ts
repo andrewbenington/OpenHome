@@ -38,16 +38,16 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
     super(arg, options)
-    this.lumiFormIndex = this.formeNum
+    this.lumiFormIndex = this.formNum
 
     if (arg instanceof ArrayBuffer) {
       this.pluginOrigin = 'luminescent_platinum'
       this.heldItemIndex = fromLumiItemIndex(this.heldItemIndex) ?? 0
 
-      const extraFormIndex = getLumiExtraFormIndex(this.dexNum, this.formeNum)
+      const extraFormIndex = getLumiExtraFormIndex(this.dexNum, this.formNum)
       if (extraFormIndex) {
         this.extraFormIndex = extraFormIndex.extraFormIndex
-        this.formeNum = extraFormIndex.fallbackForm
+        this.formNum = extraFormIndex.fallbackForm
       }
     } else {
       if (arg.pluginOrigin === 'luminescent_platinum') {

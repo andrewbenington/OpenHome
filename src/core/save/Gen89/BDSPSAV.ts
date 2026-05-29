@@ -1,9 +1,10 @@
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { ConvertStrategy, ExtraFormIndex, Gender, OriginGame } from '@pkm-rs/pkg'
+import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { PB8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { BDSP_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { Option } from 'src/core/util/functional'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, BoxAndSlot, OfficialSAV } from '../interfaces'
@@ -59,6 +60,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
   tooEarlyToOpen: boolean = false
 
   myStatusBlock: MyStatusBlock
+  configBlock: ConfigBlock
   boxes: Box<PB8>[] = []
 
   updatedBoxSlots: BoxAndSlot[] = []
@@ -69,6 +71,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
     this.filePath = path
 
     this.myStatusBlock = new MyStatusBlock(bytes)
+    this.configBlock = new ConfigBlock(bytes)
 
     this.name = this.myStatusBlock.getName()
     const fullTrainerID = this.myStatusBlock.getFullID()
@@ -185,16 +188,11 @@ export class BDSPSAV extends OfficialSAV<PB8> {
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return false
-    return !isRestricted(BDSP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+    return !isRestricted(BDSP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {
     return itemIndex <= Item.DsSounds
-  }
-
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
   }
 
   getDisplayData() {
@@ -237,6 +235,22 @@ export class BDSPSAV extends OfficialSAV<PB8> {
 
   get trainerGender() {
     return this.myStatusBlock.getGender() ? Gender.Female : Gender.Male
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PB8>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
+  }
+
+  get language() {
+    return this.configBlock.getLanguage()
   }
 }
 
@@ -282,6 +296,18 @@ class MyStatusBlock {
     const origin = this.dataView.getUint8(0x2b)
 
     return origin === 0 ? OriginGame.BrilliantDiamond : OriginGame.ShiningPearl
+  }
+}
+
+class ConfigBlock {
+  dataView: DataView<ArrayBuffer>
+
+  constructor(saveBytes: Uint8Array) {
+    this.dataView = new DataView(saveBytes.slice(0x79b74, 0x79b74 + 0x40).buffer)
+  }
+
+  public getLanguage(): Language {
+    return this.dataView.getUint32(0x04, true)
   }
 }
 

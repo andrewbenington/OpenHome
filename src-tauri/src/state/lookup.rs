@@ -2,9 +2,9 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
+use crate::data_controller::{DataController, DataDir};
 use crate::error::Result;
 use crate::state::synced_state::{self, AllSyncedState};
-use crate::storage;
 
 type IdentifierLookup = HashMap<String, String>;
 
@@ -19,16 +19,18 @@ pub struct LookupState {
 }
 
 impl LookupState {
-    pub fn load_from_storage(app_handle: &tauri::AppHandle) -> Result<Self> {
+    pub fn load_from_storage(data_controller: &impl DataController) -> Result<Self> {
         Ok(Self {
-            gen_12: storage::read_or_create_default_json(app_handle, GEN12_FILENAME)?,
-            gen_345: storage::read_or_create_default_json(app_handle, GEN345_FILENAME)?,
+            gen_12: data_controller
+                .read_or_create_default_json_file(DataDir::Storage, GEN12_FILENAME)?,
+            gen_345: data_controller
+                .read_or_create_default_json_file(DataDir::Storage, GEN345_FILENAME)?,
         })
     }
 
-    pub fn write_to_files(&self, app_handle: &tauri::AppHandle) -> Result<()> {
-        storage::write_file_json(app_handle, GEN12_FILENAME, &self.gen_12)?;
-        storage::write_file_json(app_handle, GEN345_FILENAME, &self.gen_345)
+    pub fn write_to_files(&self, data_controller: &impl DataController) -> Result<()> {
+        data_controller.write_file_json(DataDir::Storage, GEN12_FILENAME, &self.gen_12)?;
+        data_controller.write_file_json(DataDir::Storage, GEN345_FILENAME, &self.gen_345)
     }
 }
 

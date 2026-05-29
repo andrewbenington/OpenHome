@@ -47,7 +47,7 @@ export type LoadSaveResponse = {
 
 export interface PKMFormeRef {
   dexNum: number
-  formeNum: number
+  formNum: number
 }
 
 export type JSONValue = string | number | boolean | null | undefined | JSONArray | JSONObject

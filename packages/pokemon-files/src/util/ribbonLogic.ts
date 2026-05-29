@@ -1,13 +1,14 @@
 import { Gen3ContestRibbons } from '@pokemon-resources/index'
 
 import { uIntFromBufferBits, uIntToBufferBits } from './byteLogic'
+import { Gen3Ribbon } from '@pkm-rs/pkg'
 
 export function gen3ContestRibbonsFromBuffer(
   dataView: DataView,
   byteOffset: number,
   bitOffset: number
-) {
-  const ribbons: string[] = []
+): Gen3Ribbon[] {
+  const ribbons: Gen3Ribbon[] = []
   const coolRibbonsNum = uIntFromBufferBits(dataView, byteOffset, bitOffset, 3)
 
   for (let i = 0; i < coolRibbonsNum; i++) {
@@ -41,8 +42,8 @@ export function gen3ContestRibbonsFromBuffer(
   return ribbons
 }
 
-export function gen3ContestRibbonsFromBytes(dataView: DataView, byteOffset: number) {
-  const ribbons: string[] = []
+export function gen3ContestRibbonsFromBytes(dataView: DataView, byteOffset: number): Gen3Ribbon[] {
+  const ribbons: Gen3Ribbon[] = []
   const coolRibbonsNum = dataView.getUint8(byteOffset)
 
   for (let i = 0; i < coolRibbonsNum; i++) {
@@ -80,7 +81,7 @@ export function gen3ContestRibbonsToBuffer(
   dataView: DataView,
   byteOffset: number,
   bitOffset: number,
-  ribbons: string[]
+  ribbons: Gen3Ribbon[]
 ) {
   let maxCoolRibbon = 0
   let maxBeautyRibbon = 0
@@ -136,7 +137,7 @@ export function gen3ContestRibbonsToBuffer(
 export function gen3ContestRibbonsToBytes(
   dataView: DataView,
   byteOffset: number,
-  ribbons: string[]
+  ribbons: Gen3Ribbon[]
 ) {
   let maxCoolRibbon = 0
   let maxBeautyRibbon = 0

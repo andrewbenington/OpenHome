@@ -2,11 +2,13 @@ import {
   ConvertStrategy,
   ExtraFormIndex,
   Gender,
+  Language,
   luminescentSupportsExtraForm,
   OriginGame,
 } from '@pkm-rs/pkg'
 import { utf16BytesToString } from '@pokemon-files/util'
 
+import { Option } from 'src/core/util/functional'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, BoxAndSlot, PluginSAV, SlotMetadata } from '../interfaces'
@@ -38,6 +40,7 @@ export const LP_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   excludedForms: {
     ...TransferLockedForms,
   },
+  supportsExtraForm: luminescentSupportsExtraForm,
 }
 
 export class G8LumiSAV extends PluginSAV<PB8LUMI> {
@@ -47,6 +50,9 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   static saveTypeID = 'luminescent_platinum'
   static pkmType = PB8LUMI
   static boxSizeBytes = PB8LUMI.getBoxSize() * 30
+  static transferRestrictions: TransferRestrictions = LP_TRANSFER_RESTRICTIONS
+
+  transferRestrictions: TransferRestrictions = G8LumiSAV.transferRestrictions
 
   isPlugin = true as const
   pluginIdentifier = 'luminescent_platinum' as const
@@ -76,6 +82,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
 
   private _trainerGender?: Gender
   myStatusBlock: MyStatusBlock
+  configBlock: ConfigBlock
 
   constructor(path: PathData, bytes: Uint8Array) {
     super()
@@ -85,6 +92,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
 
     // Parse trainer information
     this.myStatusBlock = new MyStatusBlock(bytes)
+    this.configBlock = new ConfigBlock(bytes)
     this.name = this.myStatusBlock.getName()
 
     const fullTrainerID = this.myStatusBlock.getFullID()
@@ -169,7 +177,6 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   getBoxCount = () => BOX_COUNT
   getMonBoxSizeBytes = () => PB8LUMI.getBoxSize()
   getBoxSizeBytes = () => G8LumiSAV.boxSizeBytes
-  getCurrentBox = () => this.boxes[this.currentPCBox]
   getPluginIdentifier = () => G8LumiSAV.saveTypeID
 
   // Determines which Luminescent Platinum save revision the file matches
@@ -250,12 +257,27 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return luminescentSupportsExtraForm(extraFormIndex)
-    return !isRestricted(LP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+    return !isRestricted(LP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {
     return itemIndex <= 1836
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PB8LUMI>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
+  }
+
+  get language() {
+    return this.configBlock.getLanguage()
   }
 }
 
@@ -306,6 +328,18 @@ class MyStatusBlock {
   public getGame(): OriginGame {
     const origin = this.dataView.getUint8(0x2b)
     return origin === 0 ? OriginGame.BrilliantDiamond : OriginGame.ShiningPearl
+  }
+}
+
+class ConfigBlock {
+  dataView: DataView<ArrayBuffer>
+
+  constructor(saveBytes: Uint8Array) {
+    this.dataView = new DataView(saveBytes.slice(0x79b74, 0x79b74 + 0x40).buffer)
+  }
+
+  public getLanguage(): Language {
+    return this.dataView.getUint32(0x04, true)
   }
 }
 

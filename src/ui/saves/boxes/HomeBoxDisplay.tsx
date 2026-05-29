@@ -1,11 +1,12 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
+import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { R, range } from '@openhome-core/util/functional'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ItemBuilder, SubmenuBuilder } from '@openhome-ui/components/context-menu/types'
+import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import {
   AddIcon,
   DevIcon,
@@ -21,6 +22,8 @@ import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { HomeMonLocation, MonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
+import { includeClass } from '@openhome-ui/util/style'
+import { Language, Lookup } from '@pkm-rs/pkg'
 import {
   Button,
   Card,
@@ -35,8 +38,8 @@ import { ToggleGroup } from 'radix-ui'
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaSquare } from 'react-icons/fa'
-import { includeClass } from 'src/ui/util/style'
 import {
+  BankBoxCoordinates,
   OPENHOME_BOX_COLUMNS,
   OPENHOME_BOX_ROWS,
   OPENHOME_BOX_SLOTS,
@@ -232,10 +235,16 @@ export default function HomeBoxDisplay() {
   )
 }
 
+type MissingIdData = {
+  id: OhpkmIdentifier
+  location: BankBoxCoordinates
+}
+
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
   const { importMonsToLocation, saveFromIdentifier } = useSaves()
-  const { getCurrentBox, getCurrentBank } = useBanksAndBoxes()
+  const { getCurrentBox, getCurrentBank, clearAtHomeLocation } = useBanksAndBoxes()
+  const [missingIdData, setMissingIdData] = useState<MissingIdData>()
   const [, dispatchError] = useContext(ErrorContext)
   const { dragState, isSelected, toggleSelection } = useDragAndDrop()
   const { sortHomeBox, sortAllHomeBoxes, removeDupesFromHomeBox } = useBanksAndBoxes()
@@ -250,7 +259,7 @@ function SingleBoxMonDisplay() {
     (mons: PKMInterface[], location: MonLocation) => {
       for (const mon of mons) {
         try {
-          const identifier = getMonFileIdentifier(new OHPKM(mon))
+          const identifier = getMonFileIdentifier(OHPKM.fromMonUnknownSave(mon))
 
           if (!identifier) continue
 
@@ -328,22 +337,28 @@ function SingleBoxMonDisplay() {
     [getCurrentBox, removeDupesFromHomeBox, sortAllHomeBoxes, sortHomeBox]
   )
 
+  function dismissMissingIdDialog() {
+    setMissingIdData(undefined)
+  }
+
+  const missingIdEvoFamily = missingIdData
+    ? Lookup.speciesName(parseInt(missingIdData.id.split('-')[0]), Language.English)
+    : undefined
+
+  function clearMissingIdSlot() {
+    if (missingIdData) clearAtHomeLocation(missingIdData.location)
+    dismissMissingIdDialog()
+  }
+
   return (
-    <OpenHomeCtxMenu elements={contextElements}>
-      <div>
-        <Grid columns={OPENHOME_BOX_COLUMNS.toString()} gap="1">
+    <>
+      <OpenHomeCtxMenu elements={contextElements}>
+        <Grid className="home-box-grid" columns={OPENHOME_BOX_COLUMNS.toString()} gap="1">
           {range(OPENHOME_BOX_SLOTS)
             .map((index: number) => currentBox.identifiers.get(index))
             .map((identifier, index) => {
-              const result = identifier ? ohpkmStore.tryLoadFromId(identifier) : undefined
               const currentBankIndex = getCurrentBank().index
               const currentBoxIndex = getCurrentBox().index
-
-              if (result && R.isErr(result)) {
-                return <div key={`${currentBoxIndex}-${index}`}>!</div>
-              }
-
-              const mon = result?.value
 
               const thisLocation: HomeMonLocation = {
                 bank: currentBankIndex,
@@ -351,6 +366,26 @@ function SingleBoxMonDisplay() {
                 boxSlot: index,
                 isHome: true,
               }
+
+              const result = identifier ? ohpkmStore.tryLoadFromId(identifier) : undefined
+              if (result && R.isErr(result)) {
+                return (
+                  <Tooltip key={`${currentBoxIndex}-${index}`} content={identifier}>
+                    <Button
+                      className="box-slot-missing-id"
+                      radius="full"
+                      size="1"
+                      onClick={() =>
+                        identifier && setMissingIdData({ id: identifier, location: thisLocation })
+                      }
+                    >
+                      !
+                    </Button>
+                  </Tooltip>
+                )
+              }
+
+              const mon = result?.value
 
               return (
                 <BoxCell
@@ -377,26 +412,36 @@ function SingleBoxMonDisplay() {
               )
             })}
         </Grid>
-        <PokemonDetailsModal
-          mon={selectedMon}
-          onClose={() => setSelectedIndex(undefined)}
-          navigateRight={navigateRight}
-          navigateLeft={navigateLeft}
-          boxIndicatorProps={
-            selectedIndex !== undefined
-              ? {
-                  currentIndex: selectedIndex,
-                  columns: OPENHOME_BOX_COLUMNS,
-                  rows: OPENHOME_BOX_ROWS,
-                  emptyIndexes: range(OPENHOME_BOX_SLOTS).filter(
-                    (boxSlot) => !currentBox.identifiers.has(boxSlot)
-                  ),
-                }
-              : undefined
-          }
-        />
-      </div>
-    </OpenHomeCtxMenu>
+      </OpenHomeCtxMenu>
+      <PokemonDetailsModal
+        mon={selectedMon}
+        onClose={() => setSelectedIndex(undefined)}
+        navigateRight={navigateRight}
+        navigateLeft={navigateLeft}
+        boxIndicatorProps={
+          selectedIndex !== undefined
+            ? {
+                currentIndex: selectedIndex,
+                columns: OPENHOME_BOX_COLUMNS,
+                rows: OPENHOME_BOX_ROWS,
+                emptyIndexes: range(OPENHOME_BOX_SLOTS).filter(
+                  (boxSlot) => !currentBox.identifiers.has(boxSlot)
+                ),
+              }
+            : undefined
+        }
+      />
+      <PromptDialog
+        title="Tracking Data Missing"
+        open={missingIdData !== undefined}
+        onClose={dismissMissingIdDialog}
+        description={`There is a Pokémon in this box slot, but its tracking data cannot be found. This Pokémon's OpenHome ID was ${missingIdData?.id}, and is was from the ${missingIdEvoFamily} evolution family.`}
+        actions={[
+          { uniqueLabel: 'Cancel', action: dismissMissingIdDialog, type: 'cancel' },
+          { uniqueLabel: 'Clear this slot', action: clearMissingIdSlot, type: 'destructive' },
+        ]}
+      />
+    </>
   )
 }
 

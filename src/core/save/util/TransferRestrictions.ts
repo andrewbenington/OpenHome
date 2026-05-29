@@ -1,3 +1,4 @@
+import { ExtraFormIndex } from '@pkm-rs/pkg'
 import {
   BASE,
   BLOOD_MOON,
@@ -5,7 +6,7 @@ import {
   LGP_STARTER,
   MAROWAK_ALOLA_TOTEM,
   SPIKY_EAR,
-} from '@pokemon-resources/consts/Formes'
+} from '@pokemon-resources/consts/Forms'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 
 interface FormRestrictions {
@@ -19,6 +20,11 @@ export interface TransferRestrictions {
   transferableDexNums?: number[]
   // e.g. Alolan forms in BDSP
   excludedForms?: FormRestrictions
+  // forms that are one of the following:
+  //  - fanmade (e.g. Sevii forms)
+  //  - never given an official form index (e.g. gigantamax forms)
+  //  - had their form index given to other forms (e.g. cosplay Pikachu)
+  supportsExtraForm?: (extraForm: ExtraFormIndex) => boolean
 }
 
 export const CapPikachus: FormRestrictions = {
@@ -153,17 +159,21 @@ export const RegionalForms: FormRestrictions = {
 export const isRestricted = (
   restrictions: TransferRestrictions,
   dexNum: number,
-  formeNum?: number
+  formNum?: number,
+  extraFormIndex?: ExtraFormIndex
 ) => {
-  const { maxDexNum, transferableDexNums, excludedForms } = restrictions
+  const { maxDexNum, transferableDexNums, excludedForms, supportsExtraForm } = restrictions
 
+  if (extraFormIndex && !supportsExtraForm?.(extraFormIndex)) {
+    return true
+  }
   if (maxDexNum && dexNum > maxDexNum) {
     return true
   }
   if (transferableDexNums && !transferableDexNums.includes(dexNum)) {
     return true
   }
-  if (excludedForms && excludedForms[dexNum] && excludedForms[dexNum]?.includes(formeNum ?? 0)) {
+  if (excludedForms && excludedForms[dexNum] && excludedForms[dexNum]?.includes(formNum ?? 0)) {
     return true
   }
   return false

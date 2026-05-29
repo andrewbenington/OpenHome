@@ -88,7 +88,7 @@ export function fileTypeFromStringNonOhpkm(type: string): SavePkmClass | undefin
 }
 
 export function fileTypeFromString(type: string): AnyPkmClass | undefined {
-  if (type === 'OhpkmV2') {
+  if (type.toUpperCase() === 'OHPKM') {
     return OHPKM
   }
   return fileTypeFromStringNonOhpkm(type)

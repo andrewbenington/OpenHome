@@ -1,11 +1,14 @@
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
 import {
+  AbilityNumber,
   Ball,
   ConvertStrategy,
   ExtraFormIndex,
+  Gen3Strings,
   Language,
   Languages,
   MetadataSummaryLookup,
+  NationalDex,
   NatureIndex,
   OriginGame,
   PkmFormat,
@@ -24,14 +27,12 @@ import {
   markingsFourShapesToBytes,
   MoveFilter,
   read30BitIVsFromBytes,
-  readGen3StringFromBytes,
   readStatsFromBytesU8,
   setFlag,
   Stats,
   uIntFromBufferBits,
   uIntToBufferBits,
   write30BitIVsToBytes,
-  writeGen3StringToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
 import { PkmConverter } from '../../../../packages/pokemon-files/src/conversion/converter'
@@ -89,7 +90,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   markings: MarkingsFourShapes
   internalSpeciesIndex: number
   dexNum: number
-  formeNum: number
+  formNum: number
   extraFormIndex: Option<ExtraFormIndex>
   internalHeldItemIndex: number
   abstract heldItemIndex: number
@@ -141,7 +142,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.secretID = dataView.getUint16(0x6, true)
 
       // Nickname 8:18
-      this.nickname = readGen3StringFromBytes(dataView, 0x8, 10)
+      this.nickname = Gen3Strings.decode10Bytes(new Uint8Array(buffer).slice(0x8, 0x8 + 10), 'Int')
 
       // Language 18
       this.language = Languages.fromByteOrNone(dataView.getUint8(0x12))
@@ -150,7 +151,10 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       // this.sanity = dataView.getUint8(0x13)
 
       // OT Name 20:27
-      this.trainerName = readGen3StringFromBytes(dataView, 0x14, 7)
+      this.trainerName = Gen3Strings.decode7Bytes(
+        new Uint8Array(buffer).slice(0x14, 0x14 + 7),
+        'Int'
+      )
 
       // Markings 27
       this.markings = markingsFourShapesFromBytes(dataView, 0x1b)
@@ -162,10 +166,13 @@ export abstract class PK3CFRU implements PluginPKMInterface {
 
       if (speciesData.nationalDex < 0) {
         this.dexNum = 0
-        this.formeNum = 0
+        this.formNum = 0
+      } else if (speciesData.nationalDex === NationalDex.Unown) {
+        this.dexNum = NationalDex.Unown
+        this.formNum = unownFormFromPid(this.personalityValue)
       } else {
         this.dexNum = speciesData.nationalDex
-        this.formeNum = speciesData.formIndex
+        this.formNum = speciesData.formIndex
       }
 
       this.isFakemon = this.indexIsFakemon(this.internalSpeciesIndex)
@@ -245,7 +252,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
       this.language = other.language
       this.markings = markingsFourShapesFromOther(other.markings)
       this.dexNum = other.dexNum
-      this.formeNum = other.formeNum
+      this.formNum = other.formNum
       this.extraFormIndex = other.extraFormIndex
       this.internalHeldItemIndex = this.internalItemIndexFromModern(other.heldItemIndex)
       this.exp = other.exp
@@ -277,19 +284,14 @@ export abstract class PK3CFRU implements PluginPKMInterface {
         this.internalMetLocationIndex = FIRERED_IN_GAME_TRADE
       }
 
-      this.internalSpeciesIndex = this.monToGameIndex(other.dexNum, other.formeNum)
+      this.internalSpeciesIndex = this.monToGameIndex(other.dexNum, other.formNum)
 
       if (other.pluginOrigin === this.getPluginIdentifier()) {
         this.pluginOrigin = other.pluginOrigin
       }
 
-      if (other.ball) {
-        this.ball =
-          other.ball >= Ball.PokeLegendsArceus && other.ball <= Ball.Origin
-            ? Ball.PokeLegendsArceus
-            : other.ball === Ball.Sport
-              ? Ball.Poke
-              : other.ball
+      if (other.ball && other.ball <= Ball.Beast && other.ball !== Ball.Sport) {
+        this.ball = other.ball
       } else {
         this.ball = Ball.Poke
       }
@@ -346,7 +348,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     dataView.setUint16(0x6, this.secretID, true)
 
     // 8:18 Nickname (10 bytes)
-    writeGen3StringToBytes(dataView, this.nickname, 0x8, 10, false)
+    const encodedNickname = Gen3Strings.encodeTo10BytesSingleTerminator(this.nickname, 'Int')
+    new Uint8Array(buffer).set(encodedNickname, 0x8)
 
     // 18 Language
     dataView.setUint8(0x12, this.language)
@@ -355,7 +358,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     // dataView.setUint8(0x13, SANITY VALUE IDK);
 
     // 20:27 OT Name (7 bytes)
-    writeGen3StringToBytes(dataView, this.trainerName, 0x14, 7, false)
+    const encodedTrainerName = Gen3Strings.encodeTo7BytesSingleTerminator(this.trainerName, 'Int')
+    new Uint8Array(buffer).set(encodedTrainerName, 0x14)
 
     // 27 Markings
     markingsFourShapesToBytes(dataView, 0x1b, this.markings)
@@ -365,7 +369,8 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     if (this.pluginForm) {
       dataView.setUint16(0x1c, this.pluginForm, true)
     } else {
-      dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, this.formeNum), true)
+      const formNum = this.dexNum === NationalDex.Unown ? 0 : this.formNum
+      dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, formNum), true)
     }
 
     // 30:32 Held Item
@@ -430,10 +435,6 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     return this.metadata?.genderFromPid(this.personalityValue)
   }
 
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
-  }
-
   public get heldItemName() {
     return this.itemToString(this.internalHeldItemIndex)
   }
@@ -443,7 +444,11 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get abilityNum() {
-    return this.hasHiddenAbility ? 4 : ((this.personalityValue >> 0) & 1) + 1
+    return this.hasHiddenAbility
+      ? AbilityNumber.Hidden
+      : this.personalityValue & 1
+        ? AbilityNumber.Second
+        : AbilityNumber.First
   }
 
   public get ability() {
@@ -478,7 +483,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {
@@ -493,10 +498,6 @@ export abstract class PK3CFRU implements PluginPKMInterface {
     return Ball.Beast
   }
 
-  static allowedBalls() {
-    return []
-  }
-
   getPluginIdentifier(): PluginIdentifier {
     return this.pluginIdentifier
   }
@@ -508,6 +509,16 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   abstract getFormat(): RomHackFormat
+}
+
+function unownFormFromPid(pid: number) {
+  let letterValue = (pid >> 24) & 0x3
+
+  letterValue = ((pid >> 16) & 0x3) | (letterValue << 2)
+  letterValue = ((pid >> 8) & 0x3) | (letterValue << 2)
+  letterValue = (pid & 0x3) | (letterValue << 2)
+
+  return letterValue % 28
 }
 
 export default PK3CFRU

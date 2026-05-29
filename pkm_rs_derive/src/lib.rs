@@ -5,6 +5,10 @@ use quote::quote;
 use syn::{
     Data, DeriveInput, Fields, FnArg, ItemImpl, PatType, parse_macro_input, spanned::Spanned,
 };
+
+#[cfg(debug_assertions)]
+mod randomize;
+
 #[proc_macro_derive(IsShiny4096)]
 pub fn derive_is_shiny_4096(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -54,19 +58,13 @@ pub fn derive_is_shiny_4096(input: TokenStream) -> TokenStream {
     }
 
     let expanded = quote! {
-        impl crate::pkm::traits::IsShiny for #struct_name {
+        impl crate::traits::IsShiny for #struct_name {
             fn is_shiny(&self) -> bool {
-                (((self.personality_value & 0xffff) as u16) ^
-                (((self.personality_value >> 16) & 0xffff) as u16) ^
-                self.trainer_id ^
-                self.secret_id) < 16
+                pkm_rs_types::shiny_xor_value(self.personality_value, self.trainer_id, self.secret_id) < 16
             }
 
             fn is_square_shiny(&self) -> bool {
-                (((self.personality_value & 0xffff) as u16) ^
-                (((self.personality_value >> 16) & 0xffff) as u16) ^
-                self.trainer_id ^
-                self.secret_id) == 0
+                pkm_rs_types::shiny_xor_value(self.personality_value, self.trainer_id, self.secret_id) == 0
             }
         }
     };
@@ -123,19 +121,13 @@ pub fn derive_is_shiny_8192(input: TokenStream) -> TokenStream {
     }
 
     let expanded = quote! {
-        impl crate::pkm::traits::IsShiny for #struct_name {
+        impl crate::traits::IsShiny for #struct_name {
             fn is_shiny(&self) -> bool {
-                (((self.personality_value & 0xffff) as u16) ^
-                (((self.personality_value >> 16) & 0xffff) as u16) ^
-                self.trainer_id ^
-                self.secret_id) < 8
+                pkm_rs_types::shiny_xor_value(self.personality_value, self.trainer_id, self.secret_id) < 8
             }
 
             fn is_square_shiny(&self) -> bool {
-                (((self.personality_value & 0xffff) as u16) ^
-                (((self.personality_value >> 16) & 0xffff) as u16) ^
-                self.trainer_id ^
-                self.secret_id) == 0
+                pkm_rs_types::shiny_xor_value(self.personality_value, self.trainer_id, self.secret_id) == 0
             }
         }
     };
@@ -171,7 +163,7 @@ pub fn derive_forme_ref(input: TokenStream) -> TokenStream {
         }
     };
 
-    let required = HashSet::from(["national_dex".to_owned(), "forme_num".to_owned()]);
+    let required = HashSet::from(["national_dex".to_owned(), "form_num".to_owned()]);
 
     let present_fields: HashSet<_> = fields
         .iter()
@@ -255,7 +247,7 @@ pub fn derive_stats(input: TokenStream) -> TokenStream {
     }
 
     let expanded = quote! {
-        impl crate::stats::Stats for #struct_name {
+        impl ::pkm_rs_types::Stats for #struct_name {
             fn get_hp(&self) -> u16 {
                 self.hp as u16
             }
@@ -372,4 +364,30 @@ pub fn safe_wasm_impl(_attr: TokenStream, item: TokenStream) -> TokenStream {
     };
 
     output.into()
+}
+
+#[cfg(debug_assertions)]
+#[proc_macro_derive(Randomize, attributes(randomize))]
+pub fn derive_randomize(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    let name = &input.ident;
+    let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
+
+    let randomized_body = match &input.data {
+        Data::Struct(data) => randomize::gen_struct_sample(name, &data.fields),
+        Data::Enum(data) => {
+            randomize::gen_enum_sample(name, &data.variants.iter().collect::<Vec<_>>())
+        }
+        Data::Union(_) => panic!("Randomize cannot be derived for unions"),
+    };
+
+    quote! {
+        impl #impl_generics Randomize for #name #ty_generics #where_clause
+        {
+            fn randomized<R: rand::Rng>(rng: &mut R) -> #name #ty_generics {
+                #randomized_body
+            }
+        }
+    }
+    .into()
 }

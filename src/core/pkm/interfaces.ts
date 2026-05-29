@@ -1,4 +1,4 @@
-import { FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
+import { FormMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
 import { PKM, RomHackPKM } from '@pokemon-files/pkm/PKM'
 import { AllPKMFields, Stats } from '@pokemon-files/util'
 import { PluginIdentifier } from '../save/interfaces'
@@ -28,7 +28,7 @@ export type PKMInterface = AllPKMFields & {
   selectColor?: string
   // User-defined display color for this Pokemon in boxes (CSS color string)
   displayColor?: string
-  metadata?: FormeMetadata
+  metadata?: FormMetadata
   speciesMetadata?: SpeciesMetadata
 }
 

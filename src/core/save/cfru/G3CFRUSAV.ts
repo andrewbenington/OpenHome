@@ -5,12 +5,11 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
-import { Gender, OriginGame } from '@pkm-rs/pkg'
+import { Gen3Strings, Gender, Language, OriginGame } from '@pkm-rs/pkg'
+import { Option } from 'src/core/util/functional'
 import { Box, BoxAndSlot, PluginIdentifier, PluginSAV } from '../interfaces'
 import { LookupType } from '../util'
 import { PathData } from '../util/path'
-import { gen3StringToUTF } from '../util/Strings/StringConverter'
-// import { RRTransferMon } from './conversion/RRTransferMons'
 
 export const SAVE_SIZES_BYTES = [0x20000, 0x20010]
 
@@ -71,11 +70,11 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   sectors: G3CFRUSector[]
   pcDataContiguous: Uint8Array
   currentPCBox: number
-  boxes = new Array<Box<T>>(14)
+  boxes: Box<T>[]
   boxNames: string[]
   firstSectorIndex: number = 0
 
-  constructor(bytes: Uint8Array, PkmClass: new (bytes: ArrayBuffer) => T) {
+  constructor(bytes: Uint8Array, PkmClass: new (bytes: ArrayBuffer) => T, boxCount: number) {
     this.bytes = bytes
     this.saveIndex = bytesToUint32LittleEndian(bytes, 0xffc)
     this.securityKey = bytesToUint32LittleEndian(bytes, 0xf20)
@@ -87,14 +86,13 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
     }
     this.sectors.sort((sector1, sector2) => sector1.sectionID - sector2.sectionID)
 
-    this.name = gen3StringToUTF(this.sectors[0].data, 0x00, 7)
+    this.name = Gen3Strings.decode7Bytes(this.sectors[0].data.slice(0, 7), 'Int')
     this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
     this.trainerGender = this.sectors[0].data[0x08] ? Gender.Female : Gender.Male
 
-    const boxes: number = 18
-    const nBytes: number = boxes * 58 * 30
-    const nMons: number = boxes * 30
+    const nBytes: number = boxCount * 58 * 30
+    const nMons: number = boxCount * 30
     const fullSectionsUsed: number = Math.floor(nBytes / 4080)
     const leftoverBytes: number = nBytes % 4080
 
@@ -108,8 +106,12 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
     })
 
     this.currentPCBox = this.pcDataContiguous[0]
+    if (this.currentPCBox >= boxCount) {
+      this.currentPCBox = 0
+    }
     this.boxNames = []
-    for (let i = 0; i < boxes; i++) {
+    this.boxes = new Array<Box<T>>(boxCount)
+    for (let i = 0; i < boxCount; i++) {
       // TODO: More research into where BOX names are located
       this.boxes[i] = new Box('Box' + (i + 1), 30)
     }
@@ -170,6 +172,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   sid: number
   displayID: string
   trainerGender: Gender
+  language = Language.None
 
   currentPCBox: number
   boxes: Array<Box<T>>
@@ -187,8 +190,12 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
     this.bytes = bytes
     this.filePath = path
 
-    const saveOne = new G3CFRUSaveBackup<T>(bytes.slice(0, 0xe000), pkmType)
-    const saveTwo = new G3CFRUSaveBackup<T>(bytes.slice(0xe000, 0x1c000), pkmType)
+    const saveOne = new G3CFRUSaveBackup<T>(bytes.slice(0, 0xe000), pkmType, this.getBoxCount())
+    const saveTwo = new G3CFRUSaveBackup<T>(
+      bytes.slice(0xe000, 0x1c000),
+      pkmType,
+      this.getBoxCount()
+    )
 
     if (saveOne.saveIndex > saveTwo.saveIndex) {
       this.primarySave = saveOne
@@ -264,9 +271,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
 
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
+  abstract getBoxCount(): number
 
   static includesOrigin(origin: OriginGame) {
     return origin === OriginGame.FireRed
@@ -275,6 +280,19 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   static saveTypeAbbreviation = 'Radical Red'
   static saveTypeName = 'Pokémon Radical Red'
   static saveTypeID = 'G3RRSAV'
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<T>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
+    this.updatedBoxSlots.push({ box: boxNum, boxSlot: boxSlot })
+  }
 }
 
 export const findFirstSectionOffset = (bytes: Uint8Array): number => {

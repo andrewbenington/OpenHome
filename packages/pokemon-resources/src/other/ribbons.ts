@@ -1,4 +1,6 @@
-export const Gen3StandardRibbons = [
+import { DsGen3Ribbon, Gen3Ribbon, Gen4ContestRibbon, Gen4StandardRibbon } from '@pkm-rs/pkg'
+
+export const Gen3StandardRibbons: Gen3Ribbon[] = [
   'Champion',
   'Winning',
   'Victory',
@@ -13,7 +15,7 @@ export const Gen3StandardRibbons = [
   'World',
 ]
 
-export const Gen3ContestRibbons = [
+export const Gen3ContestRibbons: Gen3Ribbon[] = [
   'Cool (Hoenn)',
   'Cool Super (Hoenn)',
   'Cool Hyper (Hoenn)',
@@ -49,7 +51,9 @@ export const Gen34TowerRibbons = [
   'World Ability',
 ]
 
-export const Gen34ContestRibbons = [
+export type DsRibbon = DsGen3Ribbon | Gen4StandardRibbon | Gen4ContestRibbon
+
+export const Gen34ContestRibbons: DsRibbon[] = [
   'Cool (Hoenn)',
   'Cool Super (Hoenn)',
   'Cool Hyper (Hoenn)',

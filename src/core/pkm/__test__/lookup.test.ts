@@ -1,41 +1,41 @@
-import { FormeMetadata, MetadataSummaryLookup } from '@pkm-rs/pkg'
+import { FormMetadata, MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { assert, beforeAll, describe, expect, test } from 'vitest'
 import { initializeWasm } from './init'
 
-var MimeJr: FormeMetadata
-var MrMimeKanto: FormeMetadata
-var MrMimeGalar: FormeMetadata
-var MrRime: FormeMetadata
+var MimeJr: FormMetadata
+var MrMimeKanto: FormMetadata
+var MrMimeGalar: FormMetadata
+var MrRime: FormMetadata
 
-var Vaporeon: FormeMetadata
-var Sylveon: FormeMetadata
+var Vaporeon: FormMetadata
+var Sylveon: FormMetadata
 
-var Applin: FormeMetadata
-var Hydrapple: FormeMetadata
+var Applin: FormMetadata
+var Hydrapple: FormMetadata
 
 beforeAll(initializeWasm)
 beforeAll(() => {
-  function mustLookupForme(nationalDex: number, formeIndex: number) {
-    const metadata = MetadataSummaryLookup(nationalDex, formeIndex)
+  function mustLookupForm(nationalDex: number, formIndex: number) {
+    const metadata = MetadataSummaryLookup(nationalDex, formIndex)
     assert(metadata !== undefined)
     return metadata
   }
 
-  function mustLookupBaseForme(nationalDex: number) {
-    return mustLookupForme(nationalDex, 0)
+  function mustLookupBaseForm(nationalDex: number) {
+    return mustLookupForm(nationalDex, 0)
   }
 
-  MimeJr = mustLookupBaseForme(NationalDex.MimeJr)
-  MrMimeKanto = mustLookupBaseForme(NationalDex.MrMime)
-  MrMimeGalar = mustLookupForme(NationalDex.MrMime, 1)
-  MrRime = mustLookupBaseForme(NationalDex.MrRime)
+  MimeJr = mustLookupBaseForm(NationalDex.MimeJr)
+  MrMimeKanto = mustLookupBaseForm(NationalDex.MrMime)
+  MrMimeGalar = mustLookupForm(NationalDex.MrMime, 1)
+  MrRime = mustLookupBaseForm(NationalDex.MrRime)
 
-  Vaporeon = mustLookupBaseForme(NationalDex.Vaporeon)
-  Sylveon = mustLookupBaseForme(NationalDex.Sylveon)
+  Vaporeon = mustLookupBaseForm(NationalDex.Vaporeon)
+  Sylveon = mustLookupBaseForm(NationalDex.Sylveon)
 
-  Applin = mustLookupBaseForme(NationalDex.Applin)
-  Hydrapple = mustLookupBaseForme(NationalDex.Hydrapple)
+  Applin = mustLookupBaseForm(NationalDex.Applin)
+  Hydrapple = mustLookupBaseForm(NationalDex.Hydrapple)
 })
 
 describe('validate expected evolution relationships', () => {

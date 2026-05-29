@@ -13,6 +13,7 @@ export type OriginGameIndicatorProps = {
   plugin?: Nullable<PluginIdentifier>
   withName?: boolean
   tooltip?: string
+  style?: React.CSSProperties
 }
 
 export function OriginGameIndicator({
@@ -20,6 +21,7 @@ export function OriginGameIndicator({
   plugin,
   withName,
   tooltip,
+  style,
 }: OriginGameIndicatorProps) {
   if (originGame === undefined || originGame === null) return null
 
@@ -37,6 +39,7 @@ export function OriginGameIndicator({
       src={markIconPath}
       backgroundColor={backgroundColor}
       text={withName ? name : undefined}
+      style={style}
     />
   )
 }

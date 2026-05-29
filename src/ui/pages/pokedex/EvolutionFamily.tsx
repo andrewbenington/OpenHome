@@ -1,14 +1,14 @@
 import { getBaseMon } from '@openhome-core/pkm/util'
 import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import { Pokedex } from '@openhome-ui/util/pokedex'
-import { MetadataSummaryLookup, SpeciesAndForme } from '@pkm-rs/pkg'
+import { MetadataSummaryLookup, SpeciesAndForm } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
 import { getFormeStatus } from './util'
 
-const MONS_WITH_NON_EVOLVABLE_FORMES = [
+const MONS_WITH_NON_EVOLVABLE_FORMS = [
   NationalDex.Floette,
   NationalDex.Ursaluna,
   NationalDex.Greninja,
@@ -16,7 +16,7 @@ const MONS_WITH_NON_EVOLVABLE_FORMES = [
 
 export type EvolutionFamilyProps = {
   nationalDex: number
-  formeNumber: number
+  formNumber: number
   pokedex: Pokedex
   height?: Responsive<string>
   onClick?: (nationalDex: number, formeNumber: number) => void
@@ -24,29 +24,29 @@ export type EvolutionFamilyProps = {
 
 export default function EvolutionFamily({
   nationalDex,
-  formeNumber,
+  formNumber: formIndex,
   pokedex,
   height,
   onClick,
 }: EvolutionFamilyProps) {
-  let baseMon = getBaseMon(nationalDex, formeNumber)
+  let baseMon = getBaseMon(nationalDex, formIndex)
 
-  if (MONS_WITH_NON_EVOLVABLE_FORMES.includes(nationalDex)) {
-    // Ensures full family is shown even when formes like Ash Greninja are selected
+  if (MONS_WITH_NON_EVOLVABLE_FORMS.includes(nationalDex)) {
+    // Ensures full family is shown even when forms like Ash Greninja are selected
     baseMon = getBaseMon(nationalDex, 0)
   }
 
   if (!baseMon) return <div />
 
-  const baseMonFormes = baseMon.getSpeciesMetadata().formes
+  const baseMonForms = baseMon.getSpeciesMetadata().forms
 
-  if (MONS_WITH_NON_EVOLVABLE_FORMES.includes(nationalDex)) {
-    const otherFormes = SpeciesAndForme.tryNew(nationalDex, formeNumber)
+  if (MONS_WITH_NON_EVOLVABLE_FORMS.includes(nationalDex)) {
+    const otherForms = SpeciesAndForm.tryNew(nationalDex, formIndex)
       ?.getSpeciesMetadata()
-      .formes.filter((forme) => !forme.preEvolution && !forme.isMega)
+      .forms.filter((form) => !form.preEvolution && !form.isMega)
 
-    if (otherFormes) {
-      baseMonFormes.push(...otherFormes)
+    if (otherForms) {
+      baseMonForms.push(...otherForms)
     }
   }
 
@@ -59,13 +59,13 @@ export default function EvolutionFamily({
       align="center"
       overflow="auto"
     >
-      {baseMonFormes
-        .filter((forme) => !forme.isMega)
-        .map(({ nationalDex, formeIndex }) => (
+      {baseMonForms
+        .filter((form) => !form.isMega)
+        .map(({ nationalDex, formIndex }) => (
           <EvolutionLine
             nationalDex={nationalDex.index}
-            formeNumber={formeIndex}
-            key={formeIndex}
+            formNumber={formIndex}
+            key={formIndex}
             pokedex={pokedex}
             onClick={onClick}
           />
@@ -74,8 +74,8 @@ export default function EvolutionFamily({
   )
 }
 
-function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: EvolutionFamilyProps) {
-  const formeMetadata = MetadataSummaryLookup(nationalDex, formeNumber)
+function EvolutionLine({ nationalDex, formNumber, pokedex, onClick }: EvolutionFamilyProps) {
+  const formeMetadata = MetadataSummaryLookup(nationalDex, formNumber)
   const evolutions = formeMetadata?.evolutions ?? []
   const megaFormes = formeMetadata?.megaEvolutions ?? []
 
@@ -84,10 +84,10 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
       <Flex align="center" gap="2">
         <Flex direction="column" gap="2" align="center">
           {evolutions.slice(0, 4).map((evo, i) => (
-            <Flex key={`${evo.nationalDex}-${evo.formeIndex}`} align="center" gap="2">
+            <Flex key={`${evo.nationalDex}-${evo.formIndex}`} align="center" gap="2">
               <EvolutionLine
                 nationalDex={evo.nationalDex}
-                formeNumber={evo.formeIndex}
+                formNumber={evo.formIndex}
                 pokedex={pokedex}
                 onClick={onClick}
               />
@@ -103,13 +103,13 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
         </Flex>
         <TooltipPokemonIcon
           dexNumber={nationalDex}
-          formeNumber={formeNumber}
-          silhouette={!getFormeStatus(pokedex, nationalDex, formeNumber)?.includes('Caught')}
-          onClick={() => onClick?.(nationalDex, formeNumber)}
+          formeNumber={formNumber}
+          silhouette={!getFormeStatus(pokedex, nationalDex, formNumber)?.includes('Caught')}
+          onClick={() => onClick?.(nationalDex, formNumber)}
         />
         <Flex direction="column" gap="2">
           {evolutions.slice(4).map((evo, i) => (
-            <Flex key={`${evo.nationalDex}-${evo.formeIndex}`} align="center" gap="2">
+            <Flex key={`${evo.nationalDex}-${evo.formIndex}`} align="center" gap="2">
               <ArrowRightIcon
                 style={{
                   rotate: `${(1.5 - i) * -36}deg`,
@@ -119,7 +119,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
               />
               <EvolutionLine
                 nationalDex={evo.nationalDex}
-                formeNumber={evo.formeIndex}
+                formNumber={evo.formIndex}
                 pokedex={pokedex}
                 onClick={onClick}
               />
@@ -134,14 +134,14 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
     <Flex align="center" gap="2">
       <TooltipPokemonIcon
         dexNumber={nationalDex}
-        formeNumber={formeNumber}
-        silhouette={!getFormeStatus(pokedex, nationalDex, formeNumber)?.includes('Caught')}
-        onClick={() => onClick?.(nationalDex, formeNumber)}
+        formeNumber={formNumber}
+        silhouette={!getFormeStatus(pokedex, nationalDex, formNumber)?.includes('Caught')}
+        onClick={() => onClick?.(nationalDex, formNumber)}
       />
-      {!MetadataSummaryLookup(nationalDex, formeNumber)?.regional && megaFormes.length > 0 && (
+      {!MetadataSummaryLookup(nationalDex, formNumber)?.regional && megaFormes.length > 0 && (
         <Flex direction="column" gap="2">
           {megaFormes.map((mega, i) => (
-            <Flex key={`${nationalDex}-${mega.megaForme.formeIndex}`} align="center" gap="2">
+            <Flex key={`${nationalDex}-${mega.megaForme.formIndex}`} align="center" gap="2">
               <ArrowLeftRightIcon
                 style={{
                   rotate: `${((megaFormes.length - 1) / 2 - i) * -36}deg`,
@@ -151,13 +151,13 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
               />
               <TooltipPokemonIcon
                 dexNumber={nationalDex}
-                formeNumber={mega.megaForme.formeIndex}
+                formeNumber={mega.megaForme.formIndex}
                 silhouette={
-                  !getFormeStatus(pokedex, nationalDex, mega.megaForme.formeIndex)?.includes(
+                  !getFormeStatus(pokedex, nationalDex, mega.megaForme.formIndex)?.includes(
                     'Caught'
                   )
                 }
-                onClick={() => onClick?.(nationalDex, mega.megaForme.formeIndex)}
+                onClick={() => onClick?.(nationalDex, mega.megaForme.formIndex)}
               />
             </Flex>
           ))}
@@ -165,7 +165,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
       )}
       <Flex direction="column" gap="2">
         {evolutions.map((evo, i) => (
-          <Flex key={`${evo.nationalDex}-${evo.formeIndex}`} align="center" gap="2">
+          <Flex key={`${evo.nationalDex}-${evo.formIndex}`} align="center" gap="2">
             <ArrowRightIcon
               style={{
                 rotate: `${((evolutions.length - 1) / 2 - i) * -36}deg`,
@@ -175,7 +175,7 @@ function EvolutionLine({ nationalDex, formeNumber, pokedex, onClick }: Evolution
             />
             <EvolutionLine
               nationalDex={evo.nationalDex}
-              formeNumber={evo.formeIndex}
+              formNumber={evo.formIndex}
               pokedex={pokedex}
               onClick={onClick}
             />

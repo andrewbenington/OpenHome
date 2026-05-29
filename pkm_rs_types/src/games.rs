@@ -3,6 +3,9 @@ use strum_macros::{Display, EnumString};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
 pub enum ColosseumOrXd {
     Colosseum,
     XD,
@@ -10,7 +13,8 @@ pub enum ColosseumOrXd {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 #[repr(u8)]
 pub enum OriginGame {
     #[default]
@@ -424,6 +428,15 @@ impl OriginGame {
     }
 }
 
+impl Serialize for OriginGame {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        self.game_name().serialize(serializer)
+    }
+}
+
 impl From<u8> for OriginGame {
     fn from(value: u8) -> Self {
         match value {
@@ -484,6 +497,13 @@ impl From<u8> for OriginGame {
         }
     }
 }
+
+impl From<arbitrary_int::u4> for OriginGame {
+    fn from(value: arbitrary_int::u4) -> Self {
+        OriginGame::from(value.value())
+    }
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OriginGames;
 

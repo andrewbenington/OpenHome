@@ -89,6 +89,7 @@ export class MemeKey {
 
     encrypted.set(payload, 0)
     encrypted.set(signature, data.length - SIGNATURE_LENGTH)
+
     return encrypted
   }
 
@@ -126,7 +127,6 @@ export class MemeKey {
   public RSAPublic(data: Uint8Array) {
     const M = bytesToBigIntBE(data)
     const result = modPow(M, this.publicKey, this.mod)
-
     return bigIntToBytesBE(result)
   }
 
@@ -135,6 +135,39 @@ export class MemeKey {
     const result = modPow(M, this.privateKey, this.mod)
 
     return bigIntToBytesBE(result)
+  }
+
+  public getModU16() {
+    return this.mod.toString(16)
+  }
+
+  public getPrivateKeyU16() {
+    return this.privateKey.toString(16)
+  }
+
+  public getPublicKeyU16() {
+    return this.publicKey.toString(16)
+  }
+
+  public getAesKeyHex(data: Uint8Array): string {
+    const payload = data.slice(0, data.length - SIGNATURE_LENGTH)
+    const key = this.GetAesKey(payload)
+    return bytesToBigIntBE(key).toString(16)
+  }
+
+  public getAesEncryptedFirst100Hex(data: Uint8Array): string {
+    const encrypted = this.AesEncrypt(data)
+    return bytesToBigIntBE(encrypted.slice(0, 100)).toString(16)
+  }
+
+  public getRsaPublicHex(data: Uint8Array): string {
+    const rsaPublic = this.RSAPublic(data)
+    return bytesToBigIntBE(rsaPublic).toString(16)
+  }
+
+  public getRsaPrivateHex(data: Uint8Array): string {
+    const rsaPrivate = this.RSAPrivate(data)
+    return bytesToBigIntBE(rsaPrivate).toString(16)
   }
 }
 
@@ -163,7 +196,7 @@ function truncByte(val: number): number {
   return val & 0xff
 }
 
-function bytesToBigIntBE(bytes: Uint8Array) {
+export function bytesToBigIntBE(bytes: Uint8Array) {
   let result = 0n
 
   for (const byte of bytes) {
@@ -171,6 +204,16 @@ function bytesToBigIntBE(bytes: Uint8Array) {
   }
   return result
 }
+
+export function bytesBeHexString(bytes: Uint8Array) {
+  let result = 0n
+
+  for (const byte of bytes) {
+    result = (result << 8n) | BigInt(byte)
+  }
+  return result.toString(16)
+}
+
 function bigIntToBytesBE(value: bigint): Uint8Array {
   // Calculate the number of bytes needed to represent the bigint
   const byteLength = (value.toString(2).length + 7) >> 3 // Equivalent to Math.ceil(value.toString(2).length / 8)

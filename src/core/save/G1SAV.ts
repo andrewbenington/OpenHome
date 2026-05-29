@@ -1,6 +1,6 @@
 import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
-import { range, unique } from '@openhome-core/util/functional'
+import { Option, range, unique } from '@openhome-core/util/functional'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -55,6 +55,7 @@ export class G1SAV extends OfficialSAV<PK1> {
   name: string
   tid: number
   displayID: string
+  language = Language.None
 
   currentPCBox: number
   boxes: Array<Box<PK1>>
@@ -244,11 +245,6 @@ export class G1SAV extends OfficialSAV<PK1> {
   supportsItem(itemIndex: number) {
     return ItemGen1.fromModern(itemIndex) !== undefined
   }
-
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   static saveTypeAbbreviation = 'RBY (Int)'
   static saveTypeName = 'Pokémon Red/Blue/Yellow (INT)'
   static saveTypeID = 'G1SAV'
@@ -273,6 +269,18 @@ export class G1SAV extends OfficialSAV<PK1> {
 
   get trainerGender() {
     return Gender.Male
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK1>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
   }
 }
 

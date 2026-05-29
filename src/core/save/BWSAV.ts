@@ -9,8 +9,7 @@ export class BWSAV extends G5SAV {
   static transferRestrictions = BW_TRANSFER_RESTRICTIONS
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return false
-    return !isRestricted(BW_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+    return !isRestricted(BW_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

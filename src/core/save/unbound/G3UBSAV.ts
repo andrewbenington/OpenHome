@@ -11,10 +11,13 @@ import PK3UB from './PK3UB'
 
 export const UB_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Enamorus,
+  supportsExtraForm: unboundSupportsExtraForm,
 }
 
 export class G3UBSAV extends G3CFRUSAV<PK3UB> {
   static transferRestrictions: TransferRestrictions = UB_TRANSFER_RESTRICTIONS
+
+  transferRestrictions: TransferRestrictions = G3UBSAV.transferRestrictions
 
   pluginIdentifier = 'unbound' as const
 
@@ -22,13 +25,16 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> {
   static saveTypeName = 'Pokémon Unbound'
   static saveTypeID = 'G3UBSAV'
 
+  getBoxCount() {
+    return 18
+  }
+
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3UB {
     return PK3UB.fromOhpkm(ohpkm, strategy)
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    if (extraFormIndex !== undefined) return unboundSupportsExtraForm(extraFormIndex)
-    return !isRestricted(UB_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+    return !isRestricted(UB_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

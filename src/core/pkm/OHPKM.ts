@@ -2,18 +2,20 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { intersection, Option, unique } from '@openhome-core/util/functional'
 import {
   AbilityIndex,
+  AbilityNumber,
   Ball,
   ExtraFormIndex,
   Gender,
+  generatePk3CompatiblePid,
   HyperTraining,
   Item,
   Language,
-  Languages,
+  Lookup,
   MetadataSummaryLookup,
   NatureIndex,
   PokeDate,
   ShinyLeaves,
-  SpeciesAndForme,
+  SpeciesAndForm,
   SpeciesLookup,
   Tag,
   TrainerData,
@@ -23,7 +25,6 @@ import {
 import {
   AllPKMFields,
   FourMoves,
-  generatePersonalityValuePreservingAttributes,
   getHeightCalculated,
   getStandardPKMStats,
   getWeightCalculated,
@@ -34,6 +35,7 @@ import {
 import * as jsTypes from '@pokemon-files/util/types'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen34ContestRibbons, Gen34TowerRibbons } from '@pokemon-resources/index'
+import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { PluginIdentifier, SAV } from '../save/interfaces'
@@ -46,14 +48,6 @@ import {
   geolocationsToWasm,
   markingsSixShapesColorsFromWasm,
   markingsSixShapesColorsToWasm,
-  stats16LeToWasmNullable,
-  stats8ToWasm,
-  stats8ToWasmNullable,
-  statsFromWasm,
-  statsFromWasmNullable,
-  statsPreSplitFromWasm,
-  statsPreSplitFromWasmNullable,
-  statsPreSplitToWasm,
   trainerMemoryToWasm,
 } from './convert'
 import { isEvolution } from './Lookup'
@@ -64,6 +58,7 @@ import {
   getPrevos,
   ivsFromDVs,
 } from './util'
+import { PK3, PK7 } from '@pokemon-files/pkm'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getFormat() {
@@ -71,7 +66,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
   format: 'OHPKM' = 'OHPKM'
 
-  constructor(arg: Uint8Array | AllPKMFields) {
+  private constructor(arg: Uint8Array | AllPKMFields) {
     if (arg instanceof Uint8Array) {
       super(arg)
     } else {
@@ -106,12 +101,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
             .concat(other.trainerID.toString())
         )
 
-        this.personalityValue = generatePersonalityValuePreservingAttributes(other)
+        this.personalityValue = this.generatePk3CompatiblePid()
       } else {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
 
-      this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
+      this.SpeciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
       this.extraFormIndex = other.extraFormIndex
 
       if (other.personalityValue === undefined) {
@@ -132,7 +127,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.movePPUps = other.movePPUps as FourMoves
 
       this.nickname = other.nickname
-      if (other.language === Language.English && this.nicknameMatchesSpeciesEnglishIgnoreCase()) {
+      if (this.nicknameMatchesSpeciesIgnoreCase()) {
         this.resetNicknameToSpecies()
       }
 
@@ -165,12 +160,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
 
-      this.ivs = stats8ToWasm(
-        other.ivs ?? (other.dvs !== undefined ? ivsFromDVs(other.dvs) : generateIVs(prng))
-      )
+      this.ivs = other.ivs ?? (other.dvs !== undefined ? ivsFromDVs(other.dvs) : generateIVs(prng))
 
       if (other.evs) {
-        this.evs = stats8ToWasm(other.evs)
+        this.evs = other.evs
       }
 
       if (other.contest) {
@@ -184,17 +177,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.metLevel = other.metLevel ?? 0
 
       if (other.dvs && other.evsG12) {
-        this.setGameboyData(
-          statsPreSplitToWasm(other.dvs),
-          other.metTimeOfDay ?? 0,
-          statsPreSplitToWasm(other.evsG12)
-        )
+        this.setGameboyData(other.dvs, other.metTimeOfDay ?? 0, other.evsG12)
       }
 
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.ability =
         other.ability ??
-        getAbilityFromNumber(this.dexNum, this.formeNum, this.abilityNum) ??
+        getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum) ??
         this.ability
 
       this.isShadow = other.isShadow ?? false
@@ -213,7 +202,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       // Gen 4+
       this.isNicknamed = other.isNicknamed ?? true
-      if (this.language === Language.English && this.nicknameMatchesSpeciesEnglishIgnoreCase()) {
+      if (this.nicknameMatchesSpecies()) {
         this.isNicknamed = false
       }
 
@@ -371,21 +360,32 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   static fromMonInSave(mon: PKMInterface, save: SAV): OHPKM {
-    const ohpkm = new OHPKM(mon)
+    const ohpkm = OHPKM.fromMonUnknownSave(mon)
     ohpkm.syncWithGameData(mon, save)
 
     return ohpkm
   }
 
-  static defaultWithSpecies(nationalDex: number, formeIndex: number) {
-    const bytes = OhpkmV2Wasm.defaultWithSpecies(nationalDex, formeIndex).toByteArray()
+  static fromMonUnknownSave(mon: PKMInterface): OHPKM {
+    const ohpkm =
+      mon instanceof PK3 || mon instanceof PK7 ? OHPKM.fromWasmImpl(mon) : new OHPKM(mon)
+
+    return ohpkm
+  }
+
+  static defaultWithSpecies(nationalDex: number, formIndex: number) {
+    const bytes = OhpkmV2Wasm.defaultWithSpecies(nationalDex, formIndex).toByteArray()
     return OHPKM.fromBytes(bytes.buffer)
+  }
+
+  private static fromWasmImpl(mon: PK3 | PK7): OHPKM {
+    return new OHPKM(mon.inner.toOhpkm().toByteArray())
   }
 
   // getters / setters
 
   get dexNum() {
-    return this.speciesAndForme.nationalDex
+    return this.SpeciesAndForm.nationalDex
   }
 
   get ability() {
@@ -395,43 +395,16 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.abilityIndex = value
   }
 
-  get formeNum() {
-    return this.speciesAndForme.formeIndex
-  }
-
-  get evsG12() {
-    return statsPreSplitFromWasmNullable(this.evsG12Wasm)
-  }
-  set evsG12(value: jsTypes.StatsPreSplit | undefined) {
-    if (value) {
-      this.evsG12Wasm = statsPreSplitToWasm(value)
-    }
-  }
-
-  get ivs() {
-    return statsFromWasm(this.ivsWasm)
-  }
-  set ivs(value: jsTypes.Stats) {
-    this.ivsWasm = stats8ToWasm(value)
+  get formNum() {
+    return this.SpeciesAndForm.formIndex
   }
 
   get evs() {
-    return statsFromWasm(this.evsWasm)
+    return this.evsWasm
   }
 
   set evs(value: Stats) {
-    this.evsWasm = stats8ToWasm(value)
-  }
-
-  get dvs() {
-    return statsPreSplitFromWasm(this.dvsWasm)
-  }
-
-  get avs() {
-    return statsFromWasmNullable(this.avsWasm)
-  }
-  set avs(value: Stats | undefined) {
-    this.avsWasm = stats16LeToWasmNullable(value)
+    this.evsWasm = value
   }
 
   get contest() {
@@ -443,39 +416,39 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   get moves() {
-    const values = Array.from(this.move_indices)
+    const values = Array.from(this.movesWasm)
     if (values.length !== 4) throw Error('move array length != 4')
     return values as FourMoves
   }
   set moves(value: FourMoves) {
-    this.move_indices = new Uint16Array(value)
+    this.movesWasm = new Uint16Array(value)
   }
 
   get movePP() {
-    const values = Array.from(this.move_pp)
+    const values = Array.from(this.movePpWasm)
     if (values.length !== 4) throw Error('move pp array length != 4')
     return values as FourMoves
   }
   set movePP(value: FourMoves) {
-    this.move_pp = new Uint8Array(value)
+    this.movePpWasm = new Uint8Array(value)
   }
 
   get movePPUps() {
-    const values = Array.from(this.move_pp_ups)
+    const values = Array.from(this.movePpUpsWasm)
     if (values.length !== 4) throw Error('move pp up array length != 4')
     return values as FourMoves
   }
   set movePPUps(value: FourMoves) {
-    this.move_pp_ups = new Uint8Array(value)
+    this.movePpUpsWasm = new Uint8Array(value)
   }
 
   get relearnMoves() {
-    const values = Array.from(this.relearn_move_indices)
+    const values = Array.from(this.relearnMovesWasm)
     if (values.length !== 4) throw Error('relearn move array length != 4')
     return values as FourMoves
   }
   set relearnMoves(value: FourMoves) {
-    this.relearn_move_indices = new Uint16Array(value)
+    this.relearnMovesWasm = new Uint16Array(value)
   }
 
   get trainerMemory() {
@@ -538,13 +511,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     )
   }
 
-  get gvs() {
-    return statsFromWasmNullable(this.gvsWasm)
-  }
-  set gvs(value: Stats | undefined) {
-    this.gvsWasm = stats8ToWasmNullable(value)
-  }
-
   get shinyLeaves() {
     return this.shinyLeavesWasm
   }
@@ -558,6 +524,17 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
   set pluginOrigin(origin: Option<PluginIdentifier>) {
     this.pluginOriginWasm = origin
+  }
+
+  get startedTrackingTimestamp() {
+    const timestampSeconds = this.startedTrackingSeconds
+    return timestampSeconds ? dayjs.unix(Number(timestampSeconds)) : undefined
+  }
+
+  set startedTrackingTimestamp(timestamp: Option<Dayjs>) {
+    if (timestamp) {
+      this.startedTrackingSeconds = BigInt(timestamp.unix())
+    }
   }
 
   // derived fields
@@ -576,10 +553,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
   public get heldItemName() {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
-  }
-
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
   }
 
   public getLevel(): number {
@@ -617,6 +590,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         memory,
         affection,
         save.trainerGender,
+        save.language ?? Language.None,
         save.origin
       ),
       save.isPlugin ? save.pluginIdentifier : undefined
@@ -634,8 +608,18 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   public tradeToSave(save: SAV) {
     this.tradeToSaveWasm(save.origin)
 
-    this.isCurrentHandler = !this.isFrom(save)
-    if (!this.isCurrentHandler) return
+    const isOriginalSave = this.isFrom(save)
+    this.isCurrentHandler = !isOriginalSave
+    if (isOriginalSave) {
+      this.handlerName = ''
+      this.handlerAffection = 0
+      this.handlerFriendship = 0
+      this.handlerMemoryWasm = new TrainerMemory(0, 0, 0, 0)
+      this.handlerId = 0
+      this.handlerLanguage = 0
+      this.handlerGender = false
+      return
+    }
 
     this.handlerName = save.name
 
@@ -645,6 +629,9 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.handlerAffection = existingTrainerData.affection
       this.handlerFriendship = existingTrainerData.friendship
       this.handlerMemoryWasm = existingTrainerData.memory
+      this.handlerId = existingTrainerData.id ?? 0
+      this.handlerLanguage = existingTrainerData.language ?? 0
+      this.handlerGender = existingTrainerData.gender === Gender.Female
     } else {
       this.handlerFriendship = 70 // TODO: PER-FORM BASE FRIENDSHIP
       this.updateTrainerData(save, 70, 0)
@@ -668,7 +655,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {
@@ -683,12 +670,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.movePPUps = other.movePPUps as FourMoves
 
     if (this.dexNum !== other.dexNum && isEvolution(this, other)) {
-      this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
+      this.SpeciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
       this.extraFormIndex = other.extraFormIndex
     }
 
     if (this.dexNum === other.dexNum || isEvolution(this, other)) {
-      this.speciesAndForme = new SpeciesAndForme(other.dexNum, other.formeNum)
+      this.SpeciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
       this.extraFormIndex = other.extraFormIndex
     }
 
@@ -696,20 +683,21 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (
       other.nickname !== this.nickname &&
       other.nickname !== this.nickname.slice(0, 10) &&
-      !isPrevoSpeciesName(this.dexNum, this.formeNum, other.nickname)
+      !isPrevoSpeciesName(this.dexNum, this.formNum, other.nickname, this.language)
     ) {
       this.nickname = other.nickname
     }
 
-    if (
-      isPrevoSpeciesName(this.dexNum, this.formeNum, this.nickname) &&
-      this.metadata?.speciesName
-    ) {
-      this.nickname = this.metadata.speciesName
+    if (isPrevoSpeciesName(this.dexNum, this.formNum, this.nickname, this.language)) {
+      this.nickname = Lookup.speciesName(this.dexNum, this.language)
     }
 
     this.heldItemIndex = other.heldItemIndex
-    if (other.ability && !FORMATS_WITHOUT_ABILITIES.includes(other.format)) {
+    if (
+      FORMATS_ALLOWING_ABILITY_CHANGE.includes(other.format) &&
+      other.ability &&
+      !FORMATS_WITHOUT_ABILITIES.includes(other.format)
+    ) {
       // don't update if OHPKM has hidden ability and the other mon is from
       // a game without hidden abilities
       if (
@@ -877,55 +865,16 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     }
   }
 
-  private abilityNumMatchesIndex(): boolean {
-    if (this.abilityNum === FIRST_ABILITY) return this.abilityIsFirstSlot()
-    if (this.abilityNum === SECOND_ABILITY) return this.abilityIsSecondSlot()
-    if (this.abilityNum === HIDDEN_ABILITY) return this.abilityIsHiddenSlot()
-
-    return false
-  }
-
-  private abilityNumByIndex(): AbilityNum | undefined {
-    const metadata = this.metadata
-    if (!metadata) return undefined
-
-    const [ability1, ability2] = metadata.abilities
-
-    if (this.ability?.index === ability1.index) return FIRST_ABILITY
-    if (this.ability?.index === ability2.index) return SECOND_ABILITY
-    if (metadata.hiddenAbility && this.ability?.index === metadata.hiddenAbility.index) {
-      return HIDDEN_ABILITY
+  abilityNumFromPidGen34(): AbilityNumber {
+    if (this.personalityValue % 2 === 1) {
+      return AbilityNumber.Second
+    } else {
+      return AbilityNumber.First
     }
-
-    return undefined
   }
 
-  private abilityIsFirstSlot(): boolean {
-    const metadata = this.metadata
-    return (
-      metadata !== undefined &&
-      this.ability !== undefined &&
-      this.ability.index === metadata.abilities[0].index
-    )
-  }
-
-  private abilityIsSecondSlot(): boolean {
-    const metadata = this.metadata
-    return (
-      metadata !== undefined &&
-      this.ability !== undefined &&
-      this.ability.index === metadata.abilities[1].index
-    )
-  }
-
-  private abilityIsHiddenSlot(): boolean {
-    const metadata = this.metadata
-    const hiddenOrFirst = metadata?.hiddenAbility ?? metadata?.abilities[0]
-    return (
-      hiddenOrFirst !== undefined &&
-      this.ability !== undefined &&
-      this.ability.index === hiddenOrFirst.index
-    )
+  generatePk3CompatiblePid(): number {
+    return generatePk3CompatiblePid(OhpkmV2Wasm.fromByteVectorFixingErrors(this.toByteArray()))
   }
 }
 
@@ -1003,18 +952,33 @@ export function originalDataTagToMonFormat(tag: Tag): string {
   }
 }
 
-type AbilityNum = 1 | 2 | 4
-const FIRST_ABILITY: AbilityNum = 1
-const SECOND_ABILITY: AbilityNum = 2
-const HIDDEN_ABILITY: AbilityNum = 4
-
 const FORMATS_WITHOUT_ABILITIES = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
+
+const FORMATS_ALLOWING_ABILITY_CHANGE = [
+  'PK3RR',
+  'PK3UB',
+  'PK6',
+  'PK7',
+  'PK8',
+  'PA8',
+  'PB8',
+  'PK9',
+  'PA9',
+  'PB8LUMI',
+]
 
 const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
 
-function isPrevoSpeciesName(dexNum: number, formeNum: number, nickname: string): boolean {
-  for (const prevo of getPrevos(dexNum, formeNum)) {
-    if (nickname.toUpperCase() === prevo.speciesName.toUpperCase()) {
+function isPrevoSpeciesName(
+  dexNum: number,
+  formNum: number,
+  nickname: string,
+  language: Language
+): boolean {
+  for (const prevo of getPrevos(dexNum, formNum)) {
+    if (
+      nickname.toUpperCase() === Lookup.speciesName(prevo.nationalDex.index, language).toUpperCase()
+    ) {
       return true
     }
   }

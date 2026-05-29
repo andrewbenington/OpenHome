@@ -1,6 +1,6 @@
 name: 'Bug Report'
 description: 'Report a bug to help us improve.'
-title: '[BUG] <short-description>'
+title: '[BUG] enter a short description here'
 labels: ['bug']
 assignees: []
 
@@ -20,26 +20,6 @@ body:
       required: true
 
   - type: textarea
-    id: steps
-    attributes:
-      label: 'Steps to reproduce'
-      description: 'List the steps to reproduce the issue.'
-      placeholder: |
-        1. Go to '...'
-        2. Click on '...'
-        3. Scroll down to '...'
-        4. See error
-    validations:
-      required: true
-
-  - type: textarea
-    id: expected
-    attributes:
-      label: 'Expected behavior'
-      description: 'What did you expect to happen?'
-      placeholder: 'The summary page should load without crashing.'
-
-  - type: textarea
     id: screenshots
     attributes:
       label: 'Screenshots'
@@ -51,7 +31,7 @@ body:
     attributes:
       label: 'Save file'
       description: 'If applicable, upload your Pokémon save file to help us reproduce the bug.'
-      placeholder: "Attach your .sav or .dsv file here. Please use a service like https://file.io/, since GitHub doesn't support uploading save files."
+      placeholder: "Attach your save file here. Please compress and upload as a .zip file, as GitHub won't allow uploading binary files. Avoid using services like limewire, as files uploaded there expire in a week."
 
   - type: input
     id: platform
@@ -66,8 +46,10 @@ body:
     id: version
     attributes:
       label: 'Version'
-      description: 'Which version are you using?'
+      description: 'Which version of OpenHome are you using?'
       placeholder: 'e.g. 1.5.0'
+    validations:
+      required: true
 
   - type: textarea
     id: additional

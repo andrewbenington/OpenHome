@@ -7,7 +7,7 @@ import MoveCard from '@openhome-ui/components/pokemon/MoveCard'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getBallIconPath } from '@openhome-ui/images/items'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
-import { OriginGames } from '@pkm-rs/pkg'
+import { Languages, OriginGames } from '@pkm-rs/pkg'
 import {
   getLocationString,
   getLocationStringOrOrigin,
@@ -129,7 +129,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
                 : ''}
             </p>
             <Badge variant="solid" color="gray" ml="2" size="1">
-              {mon.languageString}
+              {Languages.stringFromByte(mon.language)}
             </Badge>
           </Flex>
           {eggMessage ? <p>{eggMessage}</p> : <div />}

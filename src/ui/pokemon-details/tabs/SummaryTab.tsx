@@ -10,17 +10,20 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { colorIsDark, SHADOW_TYPE_COLOR } from '@openhome-ui/util/color'
 import {
+  AbilityNumber,
   extraFormDisplayName,
   genderFromBool,
   getPluginColor,
+  Languages,
   MetadataSummaryLookup,
   OriginGames,
 } from '@pkm-rs/pkg'
 import { PKM } from '@pokemon-files/pkm/PKM'
 import { getDisplayID } from '@pokemon-files/util'
-import { Badge, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
+import { Badge, Button, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { OHPKM } from 'src/core/pkm/OHPKM'
+import { useSaves } from 'src/ui/state/saves'
 import { MonTag } from 'src/ui/util/tags'
 import { TagIcon } from '../../components/TagIcon'
 import useMonSprite from '../useMonSprite'
@@ -40,7 +43,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
   }, [mon])
   const spriteResult = useMonSprite({
     dexNum: mon.dexNum,
-    formeNum: mon.formeNum,
+    formNum: mon.formNum,
     formArgument: mon.formArgument,
     isShiny: mon.isShiny(),
     isFemale: mon.gender === 1,
@@ -49,11 +52,12 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
   })
 
   const itemAltText = useMemo(() => {
-    const monData = MetadataSummaryLookup(mon.dexNum, mon.formeNum)
+    const monData = MetadataSummaryLookup(mon.dexNum, mon.formNum)
 
     if (!monData) return 'pokemon sprite'
     return `${monData.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
   }, [mon])
+  const { revertMonAbility } = useSaves()
 
   return (
     <Grid columns="2" width="100%" p="3" gap="2">
@@ -71,7 +75,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           ) : (
             <PokemonIcon
               dexNumber={mon.dexNum}
-              formeNumber={mon.formeNum}
+              formeNumber={mon.formNum}
               style={{
                 width: '60%',
                 height: '90%',
@@ -105,7 +109,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           )}
           <div style={{ fontWeight: 'bold' }}>{mon.nickname}</div>
           <Badge variant="solid" color="gray" ml="2" size="1">
-            {mon.languageString}
+            {Languages.stringFromByte(mon.language)}
           </Badge>
         </div>
         <AttributeRow label="Item" justifyEnd>
@@ -192,7 +196,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
                 {extraFormDisplayName(mon.extraFormIndex)}
               </span>
             ) : (
-              MetadataSummaryLookup(mon.dexNum, mon.formeNum)?.formeName
+              MetadataSummaryLookup(mon.dexNum, mon.formNum)?.formeName
             )}
             <GenderIcon gender={mon.gender} />
           </Flex>
@@ -211,10 +215,23 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
         </AttributeRow>
         <AttributeRow label="Trainer ID" value={getDisplayID(mon as PKM)} />
         {mon.ability !== undefined && (
-          <AttributeRow
-            label="Ability"
-            value={`${mon.ability.name} (${mon.abilityNum === 4 ? 'HA' : mon.abilityNum})`}
-          />
+          <AttributeRow label="Ability">
+            {mon.ability.name} ({mon.abilityNum === 4 ? 'HA' : mon.abilityNum})
+            {mon instanceof OHPKM &&
+              mon.abilityWasChanged() &&
+              !mon.metadata
+                ?.abilityByNum(AbilityNumber.First)
+                .equals(mon.metadata?.abilityByNum(AbilityNumber.Second)) && (
+                <Button
+                  size="1"
+                  radius="full"
+                  style={{ height: '1rem', marginLeft: 5 }}
+                  onClick={() => revertMonAbility(mon.openhomeId)}
+                >
+                  Revert
+                </Button>
+              )}
+          </AttributeRow>
         )}
         <AttributeRow label="Level">{mon.getLevel()}</AttributeRow>
         <AttributeRow label="EXP">{mon.exp}</AttributeRow>

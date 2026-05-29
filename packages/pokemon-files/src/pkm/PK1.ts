@@ -3,7 +3,7 @@ import {
   Generation,
   ItemGen1,
   Language,
-  Languages,
+  Lookup,
   MetadataSummaryLookup,
   OriginGames,
   SpeciesLookup,
@@ -99,7 +99,7 @@ export default class PK1 {
       if (dataView.byteLength >= 66) {
         this.nickname = stringLogic.readGameBoyStringFromBytes(dataView, 0x37, 11)
       } else {
-        this.nickname = this.speciesMetadata?.name ?? ''
+        this.nickname = Lookup.speciesName(this.dexNum, this.language)
       }
     } else {
       const converter = new PkmConverter(this.format, options.strategy)
@@ -203,10 +203,6 @@ export default class PK1 {
     return this.metadata?.genderFromAtkDv(this.dvs.atk)
   }
 
-  public get languageString() {
-    return Languages.stringFromByte(this.language)
-  }
-
   public get heldItemIndex() {
     return this.heldItemIndexGen1?.toModern()?.index ?? 0
   }
@@ -223,7 +219,7 @@ export default class PK1 {
     return 0
   }
 
-  public get formeNum() {
+  public get formNum() {
     return 0
   }
 
@@ -245,7 +241,7 @@ export default class PK1 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formeNum)
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
   }
 
   public get speciesMetadata() {
@@ -258,9 +254,5 @@ export default class PK1 {
 
   static maxValidBall() {
     return 0
-  }
-
-  static allowedBalls() {
-    return []
   }
 }

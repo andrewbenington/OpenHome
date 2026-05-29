@@ -4,7 +4,6 @@ import { dvsFromIVs, getBaseMon } from '@openhome-core/pkm/util'
 import { Option } from '@openhome-core/util/functional'
 import { PKMFormeRef } from '@openhome-core/util/types'
 import { MetadataSummaryLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { generatePersonalityValuePreservingAttributes } from '@pokemon-files/util'
 import { gen12StringToUTF, utf16StringToGen12 } from '../save/util/Strings'
 import { bytesToString } from '../save/util/byteLogic'
 
@@ -28,7 +27,7 @@ export const getMonFileIdentifier = (mon: PKMInterface): OhpkmIdentifier | undef
 
 type HomeIdentifierDerivableMon = {
   dexNum: number
-  formeNum: number
+  formNum: number
   trainerID: number
   secretID: number
   personalityValue: number
@@ -36,10 +35,10 @@ type HomeIdentifierDerivableMon = {
 }
 
 export function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentifier {
-  const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
+  const baseMon = getBaseMon(mon.dexNum, mon.formNum)
 
   if (!baseMon) {
-    throw Error(`Invalid dex/forme: ${mon.dexNum} / ${mon.formeNum}`)
+    throw Error(`Invalid dex/form: ${mon.dexNum} / ${mon.formNum}`)
   }
 
   return `${baseMon.nationalDex.toString().padStart(4, '0')}-${bytesToString(
@@ -59,7 +58,7 @@ export const getMonGen12Identifier = (mon: PKMInterface): Option<Gen12Identifier
   }
 
   const convertedTrainerName = gen12StringToUTF(utf16StringToGen12(mon.trainerName, 8, true), 0, 8)
-  const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
+  const baseMon = getBaseMon(mon.dexNum, mon.formNum)
   let tid = mon.trainerID
 
   if (mon instanceof OHPKM && !OriginGames.isGameboy(mon.gameOfOrigin)) {
@@ -78,15 +77,15 @@ export const getMonGen12Identifier = (mon: PKMInterface): Option<Gen12Identifier
 
 export type Gen345Identifier = string
 export const getMonGen345Identifier = (mon: PKMInterface): Option<Gen345Identifier> => {
-  const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
+  const baseMon = getBaseMon(mon.dexNum, mon.formNum)
 
   try {
-    const ohpkm = new OHPKM(mon)
+    const ohpkm = OHPKM.fromMonUnknownSave(mon)
     let pk3CompatiblePID
 
     if (mon instanceof OHPKM) {
       // Get the personality value that will be generated
-      pk3CompatiblePID = generatePersonalityValuePreservingAttributes(mon)
+      pk3CompatiblePID = mon.generatePk3CompatiblePid()
     } else if (mon.personalityValue !== undefined) {
       pk3CompatiblePID = mon.personalityValue
     } else {
@@ -109,21 +108,21 @@ export const getMonGen345Identifier = (mon: PKMInterface): Option<Gen345Identifi
 }
 
 export function isEvolution(prevo: PKMFormeRef, possibleEvo: PKMFormeRef): boolean {
-  const prevoForme = MetadataSummaryLookup(prevo.dexNum, prevo.formeNum)
-  const possibleEvoForme = MetadataSummaryLookup(possibleEvo.dexNum, possibleEvo.formeNum)
+  const prevoForme = MetadataSummaryLookup(prevo.dexNum, prevo.formNum)
+  const possibleEvoForme = MetadataSummaryLookup(possibleEvo.dexNum, possibleEvo.formNum)
 
   if (!prevoForme || !possibleEvoForme) return false
 
   if (
     prevoForme.evolutions.some(
-      (evo) => evo.nationalDex === possibleEvo.dexNum && evo.formeIndex === possibleEvo.formeNum
+      (evo) => evo.nationalDex === possibleEvo.dexNum && evo.formIndex === possibleEvo.formNum
     )
   ) {
     return true
   }
 
   for (const evo of prevoForme.evolutions) {
-    if (isEvolution(prevo, { dexNum: evo.nationalDex, formeNum: evo.formeIndex })) {
+    if (isEvolution(prevo, { dexNum: evo.nationalDex, formNum: evo.formIndex })) {
       return true
     }
   }
