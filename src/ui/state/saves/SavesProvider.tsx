@@ -4,17 +4,18 @@ import { Option, R, range } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { Button, Callout, Dialog, Flex, Separator } from '@radix-ui/themes'
+import { Button, Callout, Flex } from '@radix-ui/themes'
 import { ReactNode, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { SAVClass } from 'src/core/save/util'
 import { Result } from 'src/core/util/functional'
+import { Dialog } from 'src/ui/components/dialog/Dialog'
+import PromptDialog from 'src/ui/components/dialog/PromptDialog'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { useConvertStrategies } from '../convert-strategies'
 import { ItemBagContext } from '../items/reducer'
 import { useOhpkmStore } from '../ohpkm'
 import { openSavesReducer, SavesContext } from './reducer'
-import PromptDialog from 'src/ui/components/dialog/PromptDialog'
 
 export type SavesProviderProps = {
   children: ReactNode
@@ -172,9 +173,9 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = backend.registerListeners({
-      onSave: () => saveChanges(false),
-      onReset: () => {
+    const stopListening = backend.onMenuEvents({
+      save: () => saveChanges(false),
+      reset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
         reloadBankStore()
         openSavesDispatch({ type: 'close_all_saves' })
@@ -214,7 +215,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
   return (
     <>
-      <SavesContext.Provider
+      <SavesContext
         value={{
           openSavesState,
           openSavesDispatch,
@@ -227,7 +228,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       >
         <div />
         {children}
-      </SavesContext.Provider>
+      </SavesContext>
       <SaveDisambiguationDialog
         open={Boolean(disambiguationSaveTypes)}
         saveTypes={disambiguationSaveTypes}
@@ -310,38 +311,23 @@ interface SaveDisambiguationDialogProps {
 
 function SaveDisambiguationDialog({ open, saveTypes, onSelect }: SaveDisambiguationDialogProps) {
   return (
-    <Dialog.Root open={open} onOpenChange={(open) => !open && onSelect?.()}>
-      <Dialog.Content
-        width="300px"
-        style={{
-          padding: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 8,
-        }}
-      >
-        <Dialog.Title mt="2" mb="0">
-          Ambiguous Save Type
-        </Dialog.Title>
-        <Separator style={{ width: '100%' }} />
-        <Dialog.Description>Select a save type to proceed:</Dialog.Description>
-        <Flex gap="1" mt="1" direction="column">
-          {saveTypes?.map((saveType) => (
-            <Button
-              key={saveType.saveTypeID}
-              onClick={() => onSelect?.(saveType)}
-              style={{ width: '100%', minHeight: 36, height: 'fit-content' }}
-            >
-              {saveType.saveTypeName}
-            </Button>
-          ))}
-        </Flex>
-        <Dialog.Close>
-          <Button variant="outline" color="gray">
-            Cancel
+    <Dialog.Container open={open} onOpenChange={(open) => !open && onSelect?.()}>
+      <Dialog.Title>Ambiguous Save Type</Dialog.Title>
+      <Dialog.Description>Select a save type to proceed:</Dialog.Description>
+      <Flex gap="1" mt="1" direction="column">
+        {saveTypes?.map((saveType) => (
+          <Button
+            key={saveType.saveTypeID}
+            onClick={() => onSelect?.(saveType)}
+            style={{ width: '100%', minHeight: 36, height: 'fit-content' }}
+          >
+            {saveType.saveTypeName}
           </Button>
-        </Dialog.Close>
-      </Dialog.Content>
-    </Dialog.Root>
+        ))}
+      </Flex>
+      <Dialog.Actions>
+        <Dialog.Close>Cancel</Dialog.Close>
+      </Dialog.Actions>
+    </Dialog.Container>
   )
 }

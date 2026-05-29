@@ -5,7 +5,7 @@ import { SortTypes } from '@openhome-core/pkm/sort'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { R, range } from '@openhome-core/util/functional'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
-import { ItemBuilder, SubmenuBuilder } from '@openhome-ui/components/context-menu/types'
+import { Item, Submenu } from '@openhome-ui/components/context-menu/types'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import {
   AddIcon,
@@ -69,7 +69,7 @@ export default function HomeBoxDisplay() {
   const {
     addBoxCurrentBank,
     getCurrentBox,
-    removeDupesFromHomeBox,
+    removeAllHomeDupes,
     setBoxNameCurrentBank,
     sortAllHomeBoxes,
     sortHomeBox,
@@ -116,7 +116,13 @@ export default function HomeBoxDisplay() {
               autoFocus
             />
           ) : (
-            <Heading size="3" style={{ visibility: viewMode === 'one' ? 'visible' : 'collapse' }}>
+            <Heading
+              style={{
+                visibility: viewMode === 'one' ? 'visible' : 'collapse',
+                fontSize: '1.1rem',
+                lineHeight: 1.1,
+              }}
+            >
               {currentBox.name?.trim() || `Box ${currentBox.index + 1}`}
             </Heading>
           )}
@@ -210,8 +216,8 @@ export default function HomeBoxDisplay() {
                     ))}
                   </DropdownMenu.SubContent>
                 </DropdownMenu.Sub>
-                <DropdownMenu.Item onClick={() => removeDupesFromHomeBox(getCurrentBox().index)}>
-                  Remove duplicates from this box
+                <DropdownMenu.Item onClick={removeAllHomeDupes}>
+                  Remove duplicates from all banks + boxes
                 </DropdownMenu.Item>
               </DropdownMenu.Content>
             </DropdownMenu.Root>
@@ -243,11 +249,12 @@ type MissingIdData = {
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
   const { importMonsToLocation, saveFromIdentifier } = useSaves()
-  const { getCurrentBox, getCurrentBank, clearAtHomeLocation } = useBanksAndBoxes()
+  const { getCurrentBox, getCurrentBank, clearAtHomeLocation, removeAllHomeDupes } =
+    useBanksAndBoxes()
   const [missingIdData, setMissingIdData] = useState<MissingIdData>()
   const [, dispatchError] = useContext(ErrorContext)
   const { dragState, isSelected, toggleSelection } = useDragAndDrop()
-  const { sortHomeBox, sortAllHomeBoxes, removeDupesFromHomeBox } = useBanksAndBoxes()
+  const { sortHomeBox, sortAllHomeBoxes } = useBanksAndBoxes()
   const {
     currentIndex: selectedIndex,
     setCurrentIndex: setSelectedIndex,
@@ -318,24 +325,21 @@ function SingleBoxMonDisplay() {
 
   const contextElements = useMemo(
     () => [
-      ItemBuilder.fromLabel('Remove duplicates from this box').withAction(() =>
-        removeDupesFromHomeBox(getCurrentBox().index)
-      ),
-      SubmenuBuilder.fromLabel('Sort this box...').withBuilders(
-        SortTypes.map((sortType) =>
-          ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
-            sortHomeBox(getCurrentBox().index, sortType)
-          )
+      Submenu.label('Sort this box...').with(
+        ...SortTypes.map((sortType) =>
+          Item.label(`By ${sortType}`).action(() => sortHomeBox(getCurrentBox().index, sortType))
         )
       ),
-      SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
-        SortTypes.map((sortType) =>
-          ItemBuilder.fromLabel(`By ${sortType}`).withAction(() => sortAllHomeBoxes(sortType))
+      Submenu.label('Sort all boxes...').with(
+        ...SortTypes.map((sortType) =>
+          Item.label(`By ${sortType}`).action(() => sortAllHomeBoxes(sortType))
         )
       ),
     ],
-    [getCurrentBox, removeDupesFromHomeBox, sortAllHomeBoxes, sortHomeBox]
+    [getCurrentBox, sortAllHomeBoxes, sortHomeBox]
   )
+
+  const removeDupesItem = Item.label('Remove duplicates from this box').action(removeAllHomeDupes)
 
   function dismissMissingIdDialog() {
     setMissingIdData(undefined)
@@ -352,7 +356,7 @@ function SingleBoxMonDisplay() {
 
   return (
     <>
-      <OpenHomeCtxMenu elements={contextElements}>
+      <OpenHomeCtxMenu sections={[contextElements, [removeDupesItem]]}>
         <Grid className="home-box-grid" columns={OPENHOME_BOX_COLUMNS.toString()} gap="1">
           {range(OPENHOME_BOX_SLOTS)
             .map((index: number) => currentBox.identifiers.get(index))
@@ -394,7 +398,6 @@ function SingleBoxMonDisplay() {
                   dragID={`home_${currentBoxIndex}_${index}`}
                   location={thisLocation}
                   mon={mon}
-                  zIndex={0}
                   onDrop={(importedMons) => {
                     if (importedMons) {
                       attemptImportMons(importedMons, thisLocation)
@@ -404,7 +407,7 @@ function SingleBoxMonDisplay() {
                     // don't allow a swap with a pokémon not supported by the source save
                     mon && dragData && !dragData.isHome && !sourceSupportsMon(mon)
                   }
-                  ctxMenuBuilders={contextElements}
+                  contextMenu={contextElements}
                   multiSelectEnabled={dragState.multiSelectEnabled}
                   isSelected={isSelected(thisLocation)}
                   onToggleSelect={() => toggleSelection(thisLocation)}

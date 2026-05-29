@@ -1,12 +1,14 @@
 .pokemon-icon-container {
   position: relative;
   transform: translate(0, 0);
+  width: fit-content;
+  height: fit-content;
 }
 
 .pokemon-icon-tags {
   position: absolute;
-  top: -2px;
-  left: -4px;
+  top: 0;
+  left: -0.25rem;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -14,8 +16,8 @@
 }
 
 .pokemon-icon-tag {
-  width: 14px;
-  height: 14px;
+  width: 1rem;
+  height: 1rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -28,8 +30,8 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 8px;
-  height: 8px;
+  width: 0.5rem;
+  height: 0.5rem;
   border-radius: 50%;
   background-color: #facc15;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
@@ -42,9 +44,7 @@
   margin: auto;
   height: 100%;
   width: 100%;
-  /* z-index: 1; */
   top: 0;
-  /* position: absolute; */
   object-fit: contain;
 }
 
@@ -75,64 +75,15 @@
 }
 
 .byte-row-display {
-  font-size: small;
+  font-size: var(--font-size-text);
   font-weight: bold;
 }
 
 .single-byte-display {
-  font-size: small;
+  font-size: var(--font-size-text);
 }
 .single-byte-display:hover {
   background-color: #fff3;
-}
-
-.autocomplete {
-  padding-left: 0px;
-  font-size: small;
-  padding: 0px 0px;
-  max-height: 2.2em;
-  & svg {
-    width: 20px;
-    height: 20px;
-  }
-  & button {
-    padding: 2px;
-  }
-}
-
-.autocomplete-dropdown {
-  display: inline-flex;
-  flex-direction: column;
-  margin-block-start: 4px;
-  position: fixed;
-  z-index: 2;
-  overflow-y: auto;
-  padding-inline-start: 0px;
-  max-height: 300px;
-  margin-right: 0px;
-  background-color: var(--autocomplete-background-color);
-  box-shadow:
-    rgb(0, 0, 0) 0px 0px 0px 0px,
-    rgba(21, 21, 21, 0.08) 0px 2px 8px -2px,
-    rgba(21, 21, 21, 0.08) 0px 6px 12px -2px;
-  border-radius: 3px;
-}
-
-.autocomplete-dropdown::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: var(--autocomplete-scrollbar);
-}
-
-.autocomplete-option {
-  padding: 4px 8px;
-  cursor: pointer;
-  width: calc(100% - 16px);
-  list-style: none;
-  overflow: visible;
-}
-
-.selected {
-  background-color: var(--accent-6);
 }
 
 .loading-overlay {
@@ -141,11 +92,12 @@
   justify-content: center;
   height: 100vh;
 
-  --logo-side: 128px;
+  --logo-side: 9rem;
+  --logo-offset: calc(50% - var(--logo-side) / 2);
 }
 
 .loading-centered-container {
-  height: var(--logo-side);
+  height: fit-content;
   width: 100%;
   position: relative;
 }
@@ -154,22 +106,25 @@
   width: var(--logo-side);
   height: var(--logo-side);
   position: absolute;
-  left: calc(50% - var(--logo-side) / 2);
+  left: var(--logo-offset);
+  top: var(--logo-offset);
 }
 
 .loading-openhome-logo-letter {
   width: var(--logo-side);
   height: var(--logo-side);
   position: absolute;
-  left: calc(50% - var(--logo-side) / 2);
+  left: var(--logo-offset);
+  top: var(--logo-offset);
   animation: spin 0.7s ease-in-out infinite;
 }
 
 .loading-message {
   position: absolute;
-  top: var(--logo-side);
+  top: calc(var(--logo-offset) + var(--logo-side));
   width: 100%;
   text-align: center;
+  font-size: 1.5rem;
 }
 
 @keyframes spin {
@@ -179,48 +134,48 @@
 }
 
 .attribute-row-label {
-  min-width: calc(33% - var(--indent, 0px));
-  height: 100%;
-  min-height: 28px;
   margin-left: var(--indent, 0px);
   display: grid;
   align-items: center;
 }
 
 .attribute-row-label-text {
-  padding-left: 8px;
+  padding-left: 0.5rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .attribute-tag {
-  margin-top: 5px;
-  padding: 3px;
+  margin-top: var(--padding-radius-xs-sm);
+  padding: 0.25rem;
   display: grid;
   width: fit-content;
   font-weight: bold;
-  border-radius: 5px;
+  border-radius: var(--border-radius-sm);
 }
 
 .attribute-tag-icon {
-  height: 18px;
+  height: 1.2rem;
+  aspect-ratio: 1;
   object-fit: contain;
 }
 
-.file-type-chip {
+.file-type-select {
   color: white;
   font-weight: bold;
-  font-size: small;
+  font-size: var(--font-size-standard);
   box-shadow: none;
   flex: 1;
-  padding: 4px 22px 2px 6px;
-  height: fit-content;
+  padding: 0 1.5rem 0 var(--padding-radius-sm-lg);
+  height: var(--height-mini-button);
+  width: 0;
 }
 
 .datagrid {
   position: relative;
   background-color: var(--gray-3);
+  --header-font-size: var(--font-size-text);
 
   .rdg-cell[role='columnheader'] {
     background-color: var(--gray-8);
@@ -229,7 +184,7 @@
   .rdg-row .rdg-cell {
     outline: none;
     border-bottom: none;
-    font-size: 0.8rem;
+    font-size: var(--font-size-text);
     border-color: var(--gray-8);
     border-width: 0.5px;
 
@@ -280,6 +235,10 @@
 
   .rdg-row-odd:not([aria-selected='true']).releasing-mon-row {
     background-color: var(--tomato-3);
+  }
+
+  .rdg-checkbox-input {
+    width: 1.25rem;
   }
 
   a {

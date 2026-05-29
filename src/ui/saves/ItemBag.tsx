@@ -9,9 +9,9 @@ export default function ItemBag() {
   const itemCounts = useItemBag()
 
   return (
-    <Flex direction="column" p="1" gap="2" style={{ marginLeft: 5 }}>
+    <Flex direction="column" p="var(--padding-radius-sm-lg)">
       <DroppableSpace dropID="item-bag" className="item-bag-area">
-        <Grid columns="6" gap="2" justify="end" align={'end'}>
+        <Grid columns="6" gap="var(--padding-radius-sm-lg)">
           {Object.entries(itemCounts)
             .filter(([indexStr]) => parseInt(indexStr) > 0)
             .map(([indexStr, count]) => {

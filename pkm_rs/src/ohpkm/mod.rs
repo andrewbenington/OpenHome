@@ -4,6 +4,7 @@ use pkm_rs_resources::metadata_source::MetadataSource;
 mod convert;
 #[allow(deprecated)]
 mod deprecated;
+mod issues;
 mod v2;
 mod v2_sections;
 

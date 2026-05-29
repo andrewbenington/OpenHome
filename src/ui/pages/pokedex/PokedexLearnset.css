@@ -1,0 +1,14 @@
+.pokedex-learnset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-radius-sm-lg);
+  padding: var(--padding-radius-sm-lg);
+  overflow: auto;
+  box-sizing: border-box;
+  height: calc(100% - 2 * var(--padding-radius-sm-lg));
+}
+
+.learnset-move-requirement {
+  width: 7rem;
+  font-size: 1.1rem;
+}

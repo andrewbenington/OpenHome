@@ -13,12 +13,11 @@ import {
 } from '@openhome-core/util/sort'
 import {
   CtxMenuElementBuilder,
-  ItemBuilder,
-  LabelBuilder,
+  Item,
+  Label,
   OpenHomeCtxMenu,
-  SeparatorBuilder,
+  Separator,
 } from '@openhome-ui/components/context-menu'
-import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import {
@@ -33,6 +32,7 @@ import { useCallback, useRef, useState } from 'react'
 import { SelectColumn } from 'react-data-grid'
 import { useNavigate } from 'react-router'
 import GenderIcon from 'src/ui/components/pokemon/GenderIcon'
+import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
 import TypeIcon from 'src/ui/components/pokemon/TypeIcon'
 import { getPublicImageURL } from 'src/ui/images/images'
 import './style.css'
@@ -66,16 +66,14 @@ export default function AllTrackedPokemon({
     (mon: OHPKM) => {
       const homeLocation = findHomeLocation(mon.openhomeId)
       const actions: CtxMenuElementBuilder[] = [
-        LabelBuilder.fromMon(mon),
+        Label.mon(mon),
         homeLocation
-          ? ItemBuilder.fromLabel('Jump to Box').withAction(() => {
+          ? Item.label('Jump to Box').action(() => {
               switchBoxCurrentBank(homeLocation.box)
               navigate('/home')
             })
-          : ItemBuilder.fromLabel('Find Containing Save').withAction(() =>
-              findSaveForMon(mon.openhomeId)
-            ),
-        ItemBuilder.fromLabel(`Move To Release Area`).withAction(() => {
+          : Item.label('Find Containing Save').action(() => findSaveForMon(mon.openhomeId)),
+        Item.label(`Move To Release Area`).action(() => {
           releaseMonsById(mon.openhomeId)
           deselectIds(mon.openhomeId)
         }),
@@ -83,9 +81,9 @@ export default function AllTrackedPokemon({
 
       if (selectedIds.size > 0) {
         actions.push(
-          SeparatorBuilder,
-          LabelBuilder.fromLabel(`Bulk Actions (${selectedIds.size} selected)`),
-          ItemBuilder.fromLabel(`Move Selected To Release Area`).withAction(() => {
+          Separator,
+          Label.label(`Bulk Actions (${selectedIds.size} selected)`),
+          Item.label(`Move Selected To Release Area`).action(() => {
             releaseMonsById(...selectedIds)
             deselectIds(...selectedIds)
           })
@@ -93,9 +91,9 @@ export default function AllTrackedPokemon({
       }
 
       actions.push(
-        SeparatorBuilder,
-        LabelBuilder.fromLabel(`For All Tracked`),
-        ItemBuilder.fromLabel('Recover Missing Pokémon...').withAction(findSavesForAllMons)
+        Separator,
+        Label.label(`For All Tracked`),
+        Item.label('Recover Missing Pokémon...').action(findSavesForAllMons)
       )
       return actions
     },
@@ -118,7 +116,7 @@ export default function AllTrackedPokemon({
   return (
     <OpenHomeCtxMenu
       elements={contextMenuBuilders}
-      onOpenChange={(open) => {
+      onOpenChange={(open: boolean) => {
         if (!open) setCtxMenuMonId(undefined)
       }}
       style={{ overflow: 'hidden' }}
@@ -210,7 +208,7 @@ function useColumns(
           <PokemonIcon
             dexNumber={value.dexNum}
             formeNumber={value.formNum}
-            style={{ width: 30, height: 30 }}
+            style={{ width: '2rem', height: '2rem' }}
           />
         </button>
       ),
@@ -293,10 +291,10 @@ function useColumns(
     {
       key: 'last_save',
       name: 'Last Save',
-      width: '9rem',
+      width: '10rem',
       renderValue: (value) => (
         <div className="flex-row-centered">
-          <OriginGameIndicator
+          <GameIndicator
             originGame={value.mostRecentSaveWasm?.game}
             withName
             tooltip={value.mostRecentSaveWasm?.file_path}
@@ -305,7 +303,7 @@ function useColumns(
       ),
       getFilterValue: (mon) => {
         const game = mon.mostRecentSaveWasm?.game
-        return game ? OriginGames.gameName(game) : '(Unknown)'
+        return game ? OriginGames.gameNameFull(game) : '(Unknown)'
       },
       cellClass: 'centered-cell',
       sortFunction: gameSorter((mon) => mon.mostRecentSaveWasm?.game),
@@ -315,9 +313,9 @@ function useColumns(
       name: 'Original Game',
       width: '10rem',
       renderValue: (value) => (
-        <OriginGameIndicator originGame={value.gameOfOrigin} plugin={value.pluginOrigin} withName />
+        <GameIndicator originGame={value.gameOfOrigin} plugin={value.pluginOrigin} withName />
       ),
-      getFilterValue: (mon) => OriginGames.gameName(mon.gameOfOrigin),
+      getFilterValue: (mon) => OriginGames.gameNameFull(mon.gameOfOrigin),
       sortFunction: gameOrPluginSorter(
         (mon) => mon.gameOfOrigin,
         (mon) => mon.pluginOrigin

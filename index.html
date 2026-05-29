@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OpenHome</title>
     <style>
+      :root {
+        --base-font-size: 14px;
+
+        font-size: var(--base-font-size);
+      }
+
       @media (prefers-color-scheme: light) {
         body {
           --background-gradient: linear-gradient(
@@ -47,7 +53,7 @@
   <body style="height: 100vh; overflow: hidden; margin: 0">
     <div id="root">
       <div class="loading-logo-container">
-        <img src="logos/logo-full.png" style="width: 128px; height: 128px; position: absolute" />
+        <img src="logos/logo-full.png" style="width: 9rem; height: 9rem; position: absolute" />
       </div>
     </div>
 

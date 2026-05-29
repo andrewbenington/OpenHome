@@ -2,6 +2,7 @@ import { fileTypeFromStringNonOhpkm } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
 import FileTypeSelect from '@openhome-ui/components/FileTypeSelect'
 import HexDisplay from '@openhome-ui/components/HexDisplay'
@@ -11,10 +12,10 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
 import { isRomHackFormat } from '@pokemon-files/pkm/PKM'
 import { FileSchemas } from '@pokemon-files/schema'
-import { Dialog, Flex, Separator, Switch, VisuallyHidden } from '@radix-ui/themes'
+import { Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
-import { OriginGameIndicator } from '../components/pokemon/indicator/OriginGame'
+import { GameIndicator } from '../components/pokemon/indicator/GameIndicator'
 import PokemonIcon from '../components/PokemonIcon'
 import { useConvertStrategies } from '../state/convert-strategies'
 import './style.css'
@@ -154,22 +155,13 @@ const PokemonDetailsModal = (props: {
     }
   }
 
+  if (!mon) return null
+
   return (
     <Dialog.Root open={!!(mon && displayMon)} onOpenChange={(open) => !open && onClose?.()}>
-      {mon && (
-        <Dialog.Content
-          onKeyDown={handleArrows}
-          minWidth="800px"
-          maxWidth="80%"
-          width="fit-content"
-          style={{
-            position: 'inherit',
-            overflow: 'hidden',
-            height: 'fit-content',
-            padding: 0,
-            borderRadius: 4,
-          }}
-        >
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Popup className="pokemon-modal" onKeyDown={handleArrows}>
           <VisuallyHidden>
             <Dialog.Title>Pokémon Details</Dialog.Title>
             <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
@@ -177,7 +169,7 @@ const PokemonDetailsModal = (props: {
           {mon && displayMon && (
             <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary">
               <SideTabs.TabList>
-                <Flex direction="row" gap="2" mb="1">
+                <Flex direction="row" gap="var(--padding-radius-sm-lg">
                   <FileTypeSelect
                     baseFormat={mon.format}
                     currentFormat={displayMon.format}
@@ -187,7 +179,7 @@ const PokemonDetailsModal = (props: {
                     onChange={switchFormat}
                   />
                   <button
-                    style={{ padding: '4px 6px 2px 6px' }}
+                    className="mini-button"
                     onClick={() => {
                       displayMon.refreshChecksum?.()
                       backend.saveLocalFile(
@@ -215,14 +207,14 @@ const PokemonDetailsModal = (props: {
                 <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
                 <div style={{ flex: 1 }} />
                 {(isOriginal || (mon instanceof OHPKM && mon.originalData)) && (
-                  <Flex align="center" gap="2" style={{ fontWeight: 'bold' }}>
+                  <Flex className="original-data-switch" align="center" gap="2">
                     <Switch
                       radius="full"
                       size="1"
                       checked={isOriginal}
                       onCheckedChange={updateIsOriginal}
                     />
-                    Show Original Data
+                    Show Original
                   </Flex>
                 )}
               </SideTabs.TabList>
@@ -273,9 +265,8 @@ const PokemonDetailsModal = (props: {
               </Fallback>
             </SideTabs.Root>
           )}
-          <Separator />
           <div className="modal-footer">
-            <Flex gap="1" align="center">
+            <Flex gap="1" align="center" minWidth="7rem">
               <PokemonIcon
                 dexNumber={mon.dexNum}
                 formeNumber={mon.formNum}
@@ -283,42 +274,43 @@ const PokemonDetailsModal = (props: {
               />
               {mon.nickname}
             </Flex>
-            <Separator orientation="vertical" />
-            <Flex gap="1" align="center">
-              <OriginGameIndicator
+            <Flex gap="1" align="center" minWidth="5rem">
+              <GameIndicator
                 originGame={mon.gameOfOrigin}
                 plugin={mon.pluginOrigin}
                 style={{ minWidth: 15, height: 15 }}
               />
               {mon.trainerName}
             </Flex>
-            <Separator orientation="vertical" />
+            {mon.personalityValue && (
+              <code>PID {mon.personalityValue.toString(16).padStart(8, '0')}</code>
+            )}
             <div>Level {mon.getLevel()}</div>
             <div style={{ flex: 1 }} />
             {mon instanceof OHPKM && (
               <div>Tracked since {mon.startedTrackingTimestamp?.format('MMMM D, YYYY')}</div>
             )}
           </div>
-          {navigateLeft && (
-            <button className="modal-arrow modal-arrow-left" onClick={navigateLeft}>
-              <ArrowLeftIcon />
-            </button>
-          )}
-          {navigateRight && (
-            <button className="modal-arrow modal-arrow-right" onClick={navigateRight}>
-              <ArrowRightIcon />
-            </button>
-          )}
-          {boxIndicatorProps && (
-            <div
-              className="modal-box-indicator-wrapper"
-              style={{ opacity: boxIndicatorVisible ? 1 : 0, pointerEvents: 'none' }}
-            >
-              <MiniBoxIndicator {...boxIndicatorProps} />
-            </div>
-          )}
-        </Dialog.Content>
-      )}
+        </Dialog.Popup>
+        {navigateLeft && (
+          <button className="modal-arrow modal-arrow-left" onClick={navigateLeft}>
+            <ArrowLeftIcon />
+          </button>
+        )}
+        {navigateRight && (
+          <button className="modal-arrow modal-arrow-right" onClick={navigateRight}>
+            <ArrowRightIcon />
+          </button>
+        )}
+        {boxIndicatorProps && (
+          <div
+            className="modal-box-indicator-wrapper"
+            style={{ opacity: boxIndicatorVisible ? 1 : 0, pointerEvents: 'none' }}
+          >
+            <MiniBoxIndicator {...boxIndicatorProps} />
+          </div>
+        )}
+      </Dialog.Portal>
     </Dialog.Root>
   )
 }

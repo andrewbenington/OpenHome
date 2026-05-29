@@ -34,7 +34,25 @@ export function includeClass(className: string) {
     if(condition: boolean | undefined) {
       return condition ? className : undefined
     },
+    unless(unlessCondition: boolean | undefined) {
+      return {
+        then(conditionClassName: string) {
+          return unlessCondition
+            ? `${className} ${conditionClassName}`
+            : `${className} ${className}`
+        },
+      }
+    },
   }
 }
 
 export type CssRemSize = `${number}rem`
+
+const DEFAULT_BASE_FONT_SIZE = 14
+
+export function updateStyleForUiScale(scale: number) {
+  document.documentElement.style.setProperty('--scaling', (scale / 100).toString())
+  document
+    .querySelector('html')
+    ?.style.setProperty('--base-font-size', `${(scale / 100) * DEFAULT_BASE_FONT_SIZE}px`)
+}

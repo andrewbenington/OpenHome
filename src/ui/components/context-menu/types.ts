@@ -3,61 +3,66 @@ import React, { ReactNode } from 'react'
 import { PKMInterface } from '../../../core/pkm/interfaces'
 import PokemonIcon from '../PokemonIcon'
 
-export type Element = Item | Separator | Label | Submenu | Checkbox
+export type Element = ItemData | Separator | LabelData | SubmenuData | CheckboxData
+
+type SingleElementBuilder = () => Element
+
+type MultiElementBuilder = () => Element[]
 
 export interface CtxMenuElementBuilder {
-  build: () => Element
+  build: SingleElementBuilder | MultiElementBuilder
 }
 
 export type CtxMenuSectionBuilders = Option<CtxMenuElementBuilder>[]
 
-function buildElement(builder: CtxMenuElementBuilder): Element {
-  return builder.build()
+function buildElements(builder: CtxMenuElementBuilder): Element[] {
+  const result = builder.build()
+  return Array.isArray(result) ? result : [result]
 }
 
 type NoTag<T> = Omit<T, '__cm_type_tag'>
 
 //* ITEM *//
 
-type Item = {
+type ItemData = {
   content: ElementContent
   action?: () => void
   disabled: boolean
   __cm_type_tag: 'item'
 }
 
-export class ItemBuilder implements CtxMenuElementBuilder {
+export class Item implements CtxMenuElementBuilder {
   content: ElementContent
-  action?: () => void
-  disabled: boolean = true
+  #action?: () => void
+  #disabled: boolean = true
 
   private constructor(content: ElementContent) {
     this.content = content
   }
 
-  static fromLabel(label: string): ItemBuilder {
-    return new ItemBuilder({ label })
+  static label(label: string): Item {
+    return new Item({ label })
   }
 
-  static fromComponent(component: ReactNode): ItemBuilder {
-    return new ItemBuilder({ component })
+  static component(component: ReactNode): Item {
+    return new Item({ component })
   }
 
-  withAction(action?: () => void): ItemBuilder {
-    this.action = action
+  action(action?: () => void): Item {
+    this.#action = action
     return this
   }
 
-  withDisabled(disabled: boolean): ItemBuilder {
-    this.disabled = disabled
+  disabled(disabled: boolean): Item {
+    this.#disabled = disabled
     return this
   }
 
-  build(): Item {
+  build(): ItemData {
     return {
       content: this.content,
-      action: this.action,
-      disabled: this.action === undefined,
+      action: this.#action,
+      disabled: this.#action === undefined,
       __cm_type_tag: 'item',
     }
   }
@@ -74,104 +79,99 @@ export function renderContent(content: ElementContent): ReactNode {
 
 //* LABEL *//
 
-type Label = {
+type LabelData = {
   content: ElementContent
   __cm_type_tag: 'label'
 }
 
-export class LabelBuilder implements CtxMenuElementBuilder {
-  data: NoTag<Label>
+export class Label implements CtxMenuElementBuilder {
+  data: NoTag<LabelData>
 
   private constructor(content: ElementContent) {
     this.data = { content }
   }
 
-  static fromLabel(label: string): LabelBuilder {
-    return new LabelBuilder({ label })
+  static label(label: string): Label {
+    return new Label({ label })
   }
 
-  static fromComponent(component: ReactNode): LabelBuilder {
-    return new LabelBuilder({ component })
+  static component(component: ReactNode): Label {
+    return new Label({ component })
   }
 
-  static fromMon(mon: PKMInterface, size: number = 16): LabelBuilder {
-    return LabelBuilder.fromComponent(
+  static mon(mon: PKMInterface): Label {
+    return Label.component(
       React.createElement(
         React.Fragment,
         null,
         React.createElement(PokemonIcon, {
           dexNumber: mon.dexNum,
           formeNumber: mon.formNum,
-          style: { width: size, height: size, marginRight: 8 },
+          style: { width: '1.5rem', height: '1.5rem', marginRight: '0.25rem' },
         }),
         mon.nickname
       )
     )
   }
 
-  build(): Label {
-    return { ...this.data, __cm_type_tag: 'label' }
+  build(): Element[] {
+    return [{ ...this.data, __cm_type_tag: 'label' }, SeparatorData]
   }
 }
 
 //* SEPARATOR *//
 
-export const Separator = Object.freeze({ __cm_type_tag: 'separator' })
+export const SeparatorData = Object.freeze({ __cm_type_tag: 'separator' })
 
-type Separator = typeof Separator
+type Separator = typeof SeparatorData
 
-export const SeparatorBuilder = Object.freeze({
+export const Separator = Object.freeze({
   build() {
-    return Separator
+    return SeparatorData
   },
 })
 
 //* SUBMENU *//
 
-type Submenu = {
+type SubmenuData = {
   content: ElementContent
   items: Element[]
   disabled: boolean
   __cm_type_tag: 'submenu'
 }
 
-export class SubmenuBuilder implements CtxMenuElementBuilder {
+export class Submenu implements CtxMenuElementBuilder {
   content: ElementContent
   builders: CtxMenuElementBuilder[] = []
-  disabled: boolean = true
+  #disabled: boolean = true
 
   private constructor(content: ElementContent) {
     this.content = content
   }
 
-  static fromLabel(label: string): SubmenuBuilder {
-    return new SubmenuBuilder({ label })
+  static label(label: string): Submenu {
+    return new Submenu({ label })
   }
 
-  static fromComponent(component: ReactNode): SubmenuBuilder {
-    return new SubmenuBuilder({ component })
+  static component(component: ReactNode): Submenu {
+    return new Submenu({ component })
   }
 
-  withBuilder(builder: CtxMenuElementBuilder): SubmenuBuilder {
-    this.builders.push(builder)
-    return this
-  }
-
-  withBuilders(builders: CtxMenuElementBuilder[]): SubmenuBuilder {
+  with(...builders: CtxMenuElementBuilder[]): Submenu {
     this.builders.push(...builders)
     return this
   }
 
-  withDisabled(disabled: boolean): SubmenuBuilder {
-    this.disabled = disabled
+  disabled(disabled: boolean): Submenu {
+    this.#disabled = disabled
     return this
   }
 
-  build(): Submenu {
+  build(): SubmenuData {
     return {
       content: this.content,
-      items: this.builders.map(buildElement),
-      disabled: this.disabled,
+      items: this.builders.flatMap(buildElements),
+      disabled: this.#disabled,
       __cm_type_tag: 'submenu',
     }
   }
@@ -179,7 +179,7 @@ export class SubmenuBuilder implements CtxMenuElementBuilder {
 
 //* CHECKBOX *//
 
-type Checkbox = {
+type CheckboxData = {
   content: ElementContent
   onValueChanged: () => void
   getIsChecked: () => CheckedState
@@ -189,40 +189,40 @@ type Checkbox = {
 
 type CheckedState = boolean | 'indeterminate'
 
-export class CheckboxBuilder implements CtxMenuElementBuilder {
-  content: Checkbox['content']
-  onValueChanged: Option<Checkbox['onValueChanged']>
-  getIsChecked: Option<Checkbox['getIsChecked']>
-  disabled: Checkbox['disabled'] = true
+export class Checkbox implements CtxMenuElementBuilder {
+  content: CheckboxData['content']
+  onValueChanged: Option<CheckboxData['onValueChanged']>
+  getIsChecked: Option<CheckboxData['getIsChecked']>
+  #disabled: CheckboxData['disabled'] = true
 
   private constructor(content: ElementContent) {
     this.content = content
   }
 
-  static fromLabel(label: string): CheckboxBuilder {
-    return new CheckboxBuilder({ label })
+  static label(label: string): Checkbox {
+    return new Checkbox({ label })
   }
 
-  static fromComponent(component: ReactNode): CheckboxBuilder {
-    return new CheckboxBuilder({ component })
+  static component(component: ReactNode): Checkbox {
+    return new Checkbox({ component })
   }
 
-  handleValueChanged(handler: CheckboxBuilder['onValueChanged']): CheckboxBuilder {
+  handleValueChanged(handler: Checkbox['onValueChanged']): Checkbox {
     this.onValueChanged = handler
     return this
   }
 
-  handleIsChecked(handler: CheckboxBuilder['getIsChecked']): CheckboxBuilder {
+  handleIsChecked(handler: Checkbox['getIsChecked']): Checkbox {
     this.getIsChecked = handler
     return this
   }
 
-  withDisabled(disabled: boolean): CheckboxBuilder {
-    this.disabled = disabled
+  disabled(disabled: boolean): Checkbox {
+    this.#disabled = disabled
     return this
   }
 
-  build(): Checkbox {
+  build(): CheckboxData {
     if (!this.onValueChanged) {
       throw Error('CheckboxBuilder not provided onValueChanged() function')
     }
@@ -233,7 +233,7 @@ export class CheckboxBuilder implements CtxMenuElementBuilder {
       content: this.content,
       onValueChanged: this.onValueChanged,
       getIsChecked: this.getIsChecked ?? notChecked,
-      disabled: this.disabled,
+      disabled: this.#disabled,
       __cm_type_tag: 'checkbox',
     }
   }

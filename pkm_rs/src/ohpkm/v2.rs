@@ -8,6 +8,7 @@ use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
 use crate::ohpkm::deprecated::PastHandlerDataV1;
 use crate::ohpkm::extra_form::ExtraFormIndex;
+use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
 use crate::ohpkm::v2_sections::{MonTags, PastHandlerDataV2};
@@ -1748,7 +1749,7 @@ impl OhpkmV2 {
         self.main_data.species_and_form.get_species_metadata()
     }
 
-    pub fn fix_errors(&mut self) -> bool {
+    pub fn fix_errors(&mut self) -> Vec<OhpkmIssue> {
         self.main_data.fix_errors()
     }
 

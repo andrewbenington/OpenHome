@@ -1,7 +1,7 @@
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
-import { Badge, Flex } from '@radix-ui/themes'
+import { Badge } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo } from 'react'
 import { MdDelete } from 'react-icons/md'
 import { OpenHomePlugin, PluginContext } from 'src/ui/state/plugin/reducer'
@@ -12,7 +12,7 @@ export default function InstalledPlugins() {
   const { installedPlugins, deletePlugin } = useContext(PluginContext)
 
   return (
-    <Flex gap="2" wrap="wrap" p="4" align="start" justify="start" style={{ alignContent: 'start' }}>
+    <div className="plugin-page-content plugin-page-cards">
       {installedPlugins &&
         Object.entries(installedPlugins).map(([, metadata]) => (
           <InstalledPluginCard
@@ -21,7 +21,7 @@ export default function InstalledPlugins() {
             onDelete={() => deletePlugin(metadata.id)}
           />
         ))}
-    </Flex>
+    </div>
   )
 }
 

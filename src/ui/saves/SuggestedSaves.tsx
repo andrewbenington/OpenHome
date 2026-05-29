@@ -15,6 +15,7 @@ import { Flex } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { R } from 'src/core/util/functional'
 import SortableDataGrid from 'src/ui/components/SortableDataGrid'
+import { GameIndicator } from '../components/pokemon/indicator/GameIndicator'
 import SaveCard from './SaveCard'
 import { filterEmpty, SaveViewMode } from './util'
 
@@ -97,11 +98,13 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
 
       renderCell: (params) => (
         <button
+          className="save-grid-button"
           onClick={(e) => {
             e.preventDefault()
             onOpen(params.row.filePath)
           }}
-          disabled={params.row.tooEarlyToOpen || params.row.filePath.raw in openSavePaths}
+          disabled={params.row.filePath.raw in openSavePaths}
+          title={params.row.filePath.raw in openSavePaths ? 'Save is already open' : undefined}
         >
           Open
         </button>
@@ -112,13 +115,16 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       key: 'game',
       name: 'Game',
       width: '8rem',
-      renderValue: (value) => {
-        return value.gameLogoPath ? (
-          <img alt="save logo" height={40} src={value.gameLogoPath} />
-        ) : (
-          <div>{value.gameName}</div>
-        )
-      },
+      renderValue: (value) => (
+        <div className="flex-row-centered">
+          <GameIndicator
+            originGame={value.origin}
+            plugin={value.pluginIdentifier}
+            withName
+            tooltip={value.filePath.raw}
+          />
+        </div>
+      ),
       sortFunction: numericSorter((val) => val.origin),
       cellClass: 'centered-cell',
     },

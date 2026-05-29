@@ -1,0 +1,36 @@
+.met-data-left-side {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 1rem;
+}
+
+.met-data-text {
+  font-size: var(--font-size-standard);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-radius-sm-lg);
+
+  p {
+    max-width: 32rem;
+  }
+}
+
+.game-container {
+  position: relative;
+  width: 100px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-image {
+  width: 100px;
+  height: 60px;
+  object-fit: contain;
+  position: absolute;
+  left: 0;
+  right: 0;
+  opacity: 0.6;
+}

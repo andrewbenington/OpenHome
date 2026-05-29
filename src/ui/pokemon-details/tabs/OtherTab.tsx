@@ -83,7 +83,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <code>{u32Display(mon.encryptionConstant)}</code>
           </AttributeRow>
         )}
-        <AttributeRow label="Origin Game" value={OriginGames.gameName(mon.gameOfOrigin)} />
+        <AttributeRow label="Origin Game" value={OriginGames.gameNameFull(mon.gameOfOrigin)} />
         <AttributeRow
           label="Met Location"
           value={
@@ -539,17 +539,6 @@ function u32Display(val: number) {
 function hexStrLittleEndian(val: number, digits: number) {
   return '0x' + val.toString(16).toUpperCase().padStart(digits, '0')
 }
-
-// const changeEndianness = (hex: string) => {
-//   const result = []
-//   let len = hex.length - 2
-
-//   while (len >= 0) {
-//     result.push(hex.substr(len, 2))
-//     len -= 2
-//   }
-//   return result.join('')
-// }
 
 function getFlagsInArrayRange(bytes: Uint8Array, offset: number, size: number) {
   return getFlagsInRange(new DataView(bytes.buffer), offset, size)

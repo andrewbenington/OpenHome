@@ -2,7 +2,7 @@ import { useDroppable } from '@dnd-kit/core'
 import { MonLocation } from '@openhome-ui/state/saves'
 import { CSSProperties, ReactNode, useEffect, useRef } from 'react'
 
-const getBackgroundDetails = (disabled?: boolean) => {
+const getBackgroundDetails = (disabled?: boolean): CSSProperties => {
   if (disabled) {
     return {
       backgroundBlendMode: 'multiply',
@@ -66,7 +66,7 @@ const DroppableSpace = ({
         outlineStyle: 'solid',
         outlineWidth: 2,
         outlineColor: isOver ? 'var(--accent-8)' : 'transparent',
-        borderRadius: 3,
+        borderRadius: 'var(--border-radius-lg',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

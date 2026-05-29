@@ -53,6 +53,8 @@ const DummyBackend: BackendInterface = {
   openFileLocation: async () => R.Err('no backend in use'),
   getPlatform: () => 'none',
   registerListeners: (_: Partial<BackendListeners>) => () => {},
+  onMenuEvent: () => () => {},
+  onMenuEvents: () => () => {},
   getState: async () => R.Err('no backend in use'),
   getSettings: async () => R.Err('no backend in use'),
   updateSettings: async () => R.Err('no backend in use'),

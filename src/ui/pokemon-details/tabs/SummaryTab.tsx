@@ -27,6 +27,7 @@ import { useSaves } from 'src/ui/state/saves'
 import { MonTag } from 'src/ui/util/tags'
 import { TagIcon } from '../../components/TagIcon'
 import useMonSprite from '../useMonSprite'
+import './SummaryTab.css'
 
 type MonWithManagementData = PKMInterface & {
   tags?: MonTag[]
@@ -60,7 +61,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
   const { revertMonAbility } = useSaves()
 
   return (
-    <Grid columns="2" width="100%" p="3" gap="2">
+    <Grid className="pokemon-modal-content" columns="2" width="100%">
       <Flex direction="column" gap="2">
         <div className="mon-image-container">
           {spriteResult.loading ? (

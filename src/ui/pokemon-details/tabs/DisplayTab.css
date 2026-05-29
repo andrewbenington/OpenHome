@@ -1,8 +1,5 @@
 .display-tab-root {
-  padding: 8px;
-  height: calc(100% - 16px);
   overflow-y: auto;
-  color: var(--gray-12);
 }
 
 .display-tab-flex-fill {
@@ -21,7 +18,7 @@
 .display-tab-color-input {
   padding: 0;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
 }
 
@@ -29,7 +26,7 @@
   height: 40px;
   border-width: 2px;
   border-style: solid;
-  border-radius: 6px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -61,7 +58,7 @@
 .display-tab-tag-preset {
   padding: 4px 10px;
   border: 2px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--border-radius-sm);
   font-size: 12px;
   color: #fff;
   text-shadow: 0 0 2px #000;
@@ -73,7 +70,7 @@
 .display-tab-tag-color-input {
   padding: 0;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
 }
 

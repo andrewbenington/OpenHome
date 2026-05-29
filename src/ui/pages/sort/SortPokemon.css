@@ -1,19 +1,81 @@
+.sort-pokemon-layout {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  overflow: hidden;
+  height: 100%;
+  gap: var(--padding-radius-sm-lg);
+  padding: var(--padding-radius-sm-lg);
+  box-sizing: border-box;
+}
+
+.sort-pokemon-saves-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-radius-sm-lg);
+  width: 15rem;
+  flex: 0;
+}
+
+.sort-pokemon-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-radius-sm-lg);
+  flex: 1;
+  width: 0;
+  height: 100%;
+  contain: none;
+  overflow: visible;
+}
+
+.sort-mon-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  overflow-y: auto;
+  height: 100%;
+  gap: var(--grid-gap);
+  padding: var(--padding-radius-sm-lg);
+  margin-left: auto;
+  justify-content: center;
+  align-content: start;
+}
+
 .sort-mon-cell {
-  width: 36px;
-  height: 36px;
-  margin: 4px;
-  border-radius: 4px;
-  border-width: 2px;
+  border-radius: var(--border-radius-sm);
+  border-width: 1px;
   border-style: solid;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  width: var(--box-slot-size);
+  height: var(--box-slot-size);
 }
 
 .sort-mon-button {
   padding: 0;
   border: none;
   background: transparent;
-  width: 30px;
-  height: 30px;
+  width: 2rem;
+  height: 2rem;
+}
+
+.hint {
+  font-size: var(--font-size-standard);
+  margin-left: auto;
+  padding-right: 0.5rem;
+}
+
+.transfer-to-save-button {
+  background-color: var(--color-gray-500);
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  padding: var(--padding-radius-sm-lg);
+}
+
+.faint-text {
+  color: var(--color-gray-700);
+  font-size: 0.85rem;
 }

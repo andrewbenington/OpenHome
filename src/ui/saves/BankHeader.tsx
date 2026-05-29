@@ -11,7 +11,7 @@ export default function BankHeader() {
 
   return (
     <Card className="bank-ribbon">
-      <div style={{ flexGrow: 1, width: 0 }}>{<BankSelector disabled={editing} />}</div>
+      <div className="bank-select-container">{<BankSelector disabled={editing} />}</div>
       {editing ? (
         <TextField.Root
           size="1"
@@ -36,7 +36,7 @@ export default function BankHeader() {
           autoFocus
         />
       ) : (
-        <Heading size="5">{getCurrentBankName()}</Heading>
+        <Heading style={{ fontSize: '1.5rem' }}>{getCurrentBankName()}</Heading>
       )}
 
       <Flex direction="row-reverse" flexGrow="1" width="0" gap="1">
@@ -69,9 +69,9 @@ function BankSelector(props: { disabled?: boolean }) {
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu.Trigger disabled={disabled}>
-        <Button variant="soft" size="1">
+        <Button className="bank-select">
           Switch Bank
-          <DropdownMenu.TriggerIcon />
+          <DropdownMenu.TriggerIcon style={{ width: '0.8rem', height: '0.8rem' }} />
         </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>

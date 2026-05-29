@@ -77,7 +77,7 @@ function monDisplay(mon: PKMInterface) {
     species: Lookup.speciesName(mon.dexNum, mon.language),
     form: species?.forms[mon.formNum ?? 0].formeName,
     nickname: mon.nickname,
-    origin: mon.gameOfOrigin ? `Pokémon ${OriginGames.gameName(mon.gameOfOrigin)}` : undefined,
+    origin: mon.gameOfOrigin ? `Pokémon ${OriginGames.gameNameFull(mon.gameOfOrigin)}` : undefined,
   }
 }
 

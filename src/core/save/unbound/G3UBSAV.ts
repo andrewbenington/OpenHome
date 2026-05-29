@@ -45,7 +45,7 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> {
     return 'unbound'
   }
 
-  get gameName() {
+  get gameNameFull() {
     return 'Unbound'
   }
 

@@ -1,4 +1,4 @@
-VERSION=1.11.1
+VERSION=1.11.2
 
 .PHONY: help
 help: # Display this help.
@@ -12,10 +12,15 @@ build-mac-arm:
 build-mac-intel:
 	@npx tauri build --target x86_64-apple-darwin
 
-.PHONY: start
-start: ensure-dependencies
+.PHONY: wasm-compile
+wasm-compile:
 	@pnpm i
-	@pnpm run tauri dev
+	@pnpm wasm-compile
+
+.PHONY: start
+start: ensure-dependencies wasm-compile
+	@pnpm i
+	@pnpm tauri dev
 
 .PHONY: build-appimage
 build-appimage:

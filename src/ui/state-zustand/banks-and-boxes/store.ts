@@ -33,6 +33,8 @@ export type AddBoxLocation = 'start' | 'end' | ['before', number] | ['after', nu
 
 type ReverseLookup = Map<OhpkmIdentifier, BankBoxCoordinates>
 
+export type LocationsByIdentifier = Record<OhpkmIdentifier, BankBoxCoordinates>
+
 export interface BanksAndBoxesState {
   reloadStore: () => Promise<void>
 
@@ -67,7 +69,8 @@ export interface BanksAndBoxesState {
   reorderBoxesCurrentBank: (idsInNewOrder: string[]) => void
   firstEmptySlotInBox: (boxIndex: number) => Option<number>
   removeDupesFromBox: (boxIndex: number) => void
-  allMonsCurrentBank: () => OhpkmIdentifier[]
+  removeDupesFromEverywhere: () => void
+  allMonsCurrentBank: () => LocationsByIdentifier
   allMonsInBoxCurrentBank: (boxIndex: number) => OhpkmIdentifier[]
   findHomeLocation: (identifier: OhpkmIdentifier) => Option<BankBoxCoordinates>
   indexOfBoxId: (id: string) => Option<number>
@@ -233,10 +236,27 @@ export const createBanksAndBoxesStore = (
           set((state) => {
             removeDupes(requireBoxCurrentBank(state, boxIndex))
           }),
-        allMonsCurrentBank: (): OhpkmIdentifier[] => {
-          return Array.from(readonlyState().getCurrentBank().boxes.values()).flatMap((box) =>
-            Array.from(box.identifiers.values())
-          )
+        removeDupesFromEverywhere: () =>
+          set((state) => {
+            removeAllDupes(state.banks)
+          }),
+        allMonsCurrentBank: (): LocationsByIdentifier => {
+          const locationsByIdentifier: LocationsByIdentifier = {}
+
+          readonlyState()
+            .getCurrentBank()
+            .boxes.values()
+            .forEach((box) =>
+              box.identifiers.entries().forEach(([boxSlot, identifier]) => {
+                locationsByIdentifier[identifier] = {
+                  bank: readonlyState().currentBankIndex,
+                  box: box.index,
+                  boxSlot,
+                }
+              })
+            )
+
+          return locationsByIdentifier
         },
         allMonsInBoxCurrentBank: (boxIndex: number): OhpkmIdentifier[] => {
           const box = readonlyState().getCurrentBank().boxes.get(boxIndex)
@@ -379,6 +399,31 @@ function removeDupes<T extends SimpleOpenHomeBox>(box: T) {
   }
 }
 
+// when called using a mutable state (via immer), mutations to the returned value
+// will be preserved by immer
+function removeBoxDupesInner<T extends SimpleOpenHomeBox>(alreadyPresent: Set<string>, box: T) {
+  for (let slot = 0; slot < OPENHOME_BOX_SLOTS; slot++) {
+    const identifier = box.identifiers.get(slot)
+
+    if (!identifier) continue
+    if (alreadyPresent.has(identifier)) {
+      box.identifiers.delete(slot)
+    } else {
+      alreadyPresent.add(identifier)
+    }
+  }
+}
+
+// when called using a mutable state (via immer), mutations to the returned value
+// will be preserved by immer
+function removeAllDupes<T extends SimpleOpenHomeBank>(banks: T[]) {
+  const alreadyPresent: Set<string> = new Set()
+
+  banks
+    .flatMap((bank) => Array.from(bank.boxes.values()))
+    .forEach((box) => removeBoxDupesInner(alreadyPresent, box))
+}
+
 type BanksAndBoxesStore = ReturnType<typeof createBanksAndBoxesStore>
 
 export const BanksAndBoxesStoreContext = createContext<BanksAndBoxesStore | null>(null)
@@ -428,7 +473,7 @@ export function useBanksAndBoxes() {
   const setBoxNameCurrentBank = withSelectors.use.setBoxNameCurrentBank()
   const getCurrentBox = withSelectors.use.getCurrentBox()
   const switchBoxCurrentBank = withSelectors.use.setCurrentBox()
-  const removeDupesFromHomeBox = withSelectors.use.removeDupesFromBox()
+  const removeAllHomeDupes = withSelectors.use.removeDupesFromEverywhere()
   const overwriteBoxSlotsCurrentBank = withSelectors.use.overwriteBoxSlotsCurrentBank()
   const overwriteAllBoxSlotsCurrentBank = withSelectors.use.overwriteAllBoxSlotsCurrentBank()
 
@@ -438,7 +483,8 @@ export function useBanksAndBoxes() {
   const setAtHomeLocation = withSelectors.use.setAtLocation()
   const findHomeLocation = withSelectors.use.findHomeLocation()
 
-  const allMonsInCurrentBank = withSelectors.use.allMonsCurrentBank()
+  const allMonsInCurrentBankWithLocations = withSelectors.use.allMonsCurrentBank()
+  const allMonsInCurrentBank = () => Object.keys(allMonsInCurrentBankWithLocations())
   const allMonsInHomeBoxCurrentBank = withSelectors.use.allMonsInBoxCurrentBank()
   const firstHomeBoxEmptySlot = withSelectors.use.firstEmptySlotInBox()
 
@@ -484,10 +530,16 @@ export function useBanksAndBoxes() {
   }
 
   function sortAllHomeBoxes(sortType: string): Result<null, IdentifierNotPresentError[]> {
-    const loadResults = ohpkmStore.tryLoadFromIds(allMonsInCurrentBank())
+    const currentBankMons = allMonsInCurrentBankWithLocations()
+    const loadResults = ohpkmStore.tryLoadFromIds(Object.keys(currentBankMons))
     const { successes: allMons, failures } = partitionResults(loadResults)
     if (failures.length) {
-      return R.Err(failures)
+      failures.forEach((failure) => {
+        const location = currentBankMons[failure.identifier]
+        console.error(
+          `Pokémon cannot be found: ${failure.identifier} (location: box ${location.box}/slot ${location.boxSlot})`
+        )
+      })
     }
 
     const sorted = allMons.toSorted(getSortFunctionNullable(sortType))
@@ -541,9 +593,7 @@ export function useBanksAndBoxes() {
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = backend.registerListeners({
-      onSave: saveChanges,
-    })
+    const stopListening = backend.onMenuEvent('save', saveChanges)
 
     // the "stop listening" function should be called when the effect returns,
     // otherwise duplicate listeners will exist
@@ -574,7 +624,7 @@ export function useBanksAndBoxes() {
     getCurrentBox,
     sortHomeBox,
     sortAllHomeBoxes,
-    removeDupesFromHomeBox,
+    removeAllHomeDupes,
 
     switchBoxCurrentBank,
     switchToPreviousBox,

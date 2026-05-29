@@ -31,6 +31,10 @@ import BanksAndBoxesProvider from './state-zustand/banks-and-boxes/Provider'
 import ConvertStrategiesProvider from './state/convert-strategies/ConvertStrategiesProvider'
 import PluginsProvider from './state/plugin/PluginProvider'
 
+const ZOOM_CHANGE_PCT = 5
+const ZOOM_MIN_PCT = 50
+const ZOOM_MAX_PCT = 160
+
 export default function App() {
   const isDarkMode = useIsDarkMode()
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
@@ -132,6 +136,29 @@ function AppWithBackend() {
     if (!appInfoState.settingsLoaded) return
     debouncedUpdateSettings(backend, appInfoState.settings)
   }, [backend, appInfoState.settings, appInfoState.settingsLoaded, debouncedUpdateSettings])
+
+  useEffect(() => {
+    // returns a function to stop listening
+    const stopListening = backend.onMenuEvents({
+      zoom_in: () =>
+        appInfoDispatch({
+          type: 'set_zoom_level',
+          payload: Math.min(appInfoState.settings.zoomLevel + ZOOM_CHANGE_PCT, ZOOM_MAX_PCT),
+        }),
+      zoom_out: () =>
+        appInfoDispatch({
+          type: 'set_zoom_level',
+          payload: Math.max(appInfoState.settings.zoomLevel - ZOOM_CHANGE_PCT, ZOOM_MIN_PCT),
+        }),
+      reset_zoom: () => appInfoDispatch((() => ({ type: 'set_zoom_level', payload: 100 }))()),
+    })
+
+    // the "stop listening" function should be called when the effect returns,
+    // otherwise duplicate listeners will exist
+    return () => {
+      stopListening()
+    }
+  }, [appInfoState.settings.zoomLevel, backend])
 
   const getEnabledSaveTypes = useCallback(() => {
     return appInfoState.officialSaveTypes

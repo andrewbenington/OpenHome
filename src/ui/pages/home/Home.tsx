@@ -28,9 +28,7 @@ const Home = () => {
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = backend.registerListeners({
-      onOpen: () => setOpenSaveDialog(true),
-    })
+    const stopListening = backend.onMenuEvent('open', () => setOpenSaveDialog(true))
 
     // the "stop listening" function should be called when the effect returns,
     // otherwise duplicate listeners will exist
@@ -68,7 +66,7 @@ const Home = () => {
 
   return (
     <Flex direction="row" style={{ height: '100%' }}>
-      <Flex className="save-file-column" gap="3">
+      <Flex className="save-file-column">
         {range(savesAndBanks.allOpenSaves.length).map((i) => (
           <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
         ))}
@@ -79,14 +77,7 @@ const Home = () => {
       </Flex>
       <div className="home-box-column">
         <BankHeader />
-        <Flex
-          direction="row"
-          width="100%"
-          maxWidth="600px"
-          minWidth="480px"
-          height="0"
-          flexGrow="1"
-        >
+        <Flex direction="row" width="100%" height="0" flexGrow="1">
           <HomeBoxDisplay />
         </Flex>
       </div>
@@ -104,7 +95,7 @@ const Home = () => {
             <Tabs.Content value="display" style={{ flexGrow: 1 }}>
               <DisplayPanel />
             </Tabs.Content>
-            <Tabs.Content value="bag" style={{ maxHeight: 'calc(100% - 32px)', overflow: 'auto' }}>
+            <Tabs.Content value="bag" style={{ overflow: 'auto' }}>
               <ItemBag />
             </Tabs.Content>
           </Tabs.Root>

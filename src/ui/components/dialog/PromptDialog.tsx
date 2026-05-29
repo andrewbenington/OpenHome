@@ -39,7 +39,7 @@ export default function PromptDialog(props: PromptDialogProps) {
       {triggerButton && (
         <AlertDialog.Trigger data-color="theme">{triggerButton}</AlertDialog.Trigger>
       )}
-      <AlertDialog.Portal container={document.getElementById('app-container')}>
+      <AlertDialog.Portal>
         <AlertDialog.Backdrop onClick={() => onOpenChange(false)} />
         <AlertDialog.Popup>
           <AlertDialog.Title>{title}</AlertDialog.Title>

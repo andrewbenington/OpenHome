@@ -54,7 +54,7 @@ const MoveCard = ({ move, movePP, maxPP, noPP, typeOverride }: MoveCardProps) =>
   const content = (
     <>
       <div className="type-icon-container">
-        <TypeIcon type={type} key={`${type}_type_icon`} size={noPP ? 22 : 32} border />
+        <TypeIcon type={type} key={`${type}_type_icon`} size={noPP ? '1.5rem' : '2rem'} border />
       </div>
       <div className="move-card-vert">
         <div className="move-name" style={{ color: contrastColorForType(type) }}>

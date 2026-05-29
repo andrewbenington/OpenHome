@@ -1,5 +1,5 @@
 .type-icon-border {
-  border-radius: 16px;
+  border-radius: 50%;
 }
 
 .gender-icon {
@@ -18,26 +18,18 @@
   }
 }
 
-@media (prefers-color-scheme: light) {
-  .gender-icon {
-    color: white;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .gender-icon {
-    color: black;
-  }
+.gender-icon {
+  color: white;
 }
 
 .markings-container {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  padding: 5px;
+  padding: var(--padding-radius-xs-sm);
   background-color: #666;
-  margin-top: 10px;
-  border-radius: 5px;
+  margin-top: var(--padding-radius-sm-lg);
+  border-radius: var(--border-radius-sm);
 }
 
 .marking-shape {
@@ -98,15 +90,15 @@
 }
 
 .dynamax-level {
-  height: 20px;
-  width: 8px;
-  margin-right: 4px;
+  height: 1.25rem;
+  width: 0.5rem;
+  margin-right: 0.2rem;
 }
 
 .move-card {
   flex: 1;
   display: flex;
-  border-radius: 3px;
+  border-radius: var(--border-radius-sm);
   flex-direction: column;
   align-items: center;
   display: flex;
@@ -114,12 +106,12 @@
 }
 
 .move-card-full {
-  height: 44px;
+  height: 3rem;
 }
 
 .move-card-small {
-  height: 28px;
-  font-size: 0.8em;
+  height: 1.75rem;
+  font-size: 0.8rem;
   max-width: 12rem;
 }
 

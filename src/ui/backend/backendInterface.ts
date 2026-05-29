@@ -91,6 +91,8 @@ export default interface BackendInterface {
   openFileLocation: (filePath: string) => Promise<Errorable<null>>
   getPlatform: () => string
   registerListeners: (listeners: Partial<BackendListeners>) => () => void
+  onMenuEvent: (event: MenuEvent, listener: () => void) => () => void
+  onMenuEvents: (eventsAndCallbacks: Partial<Record<MenuEvent, () => void>>) => () => void
   getState: () => Promise<Errorable<AppState>>
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>
@@ -111,10 +113,10 @@ export default interface BackendInterface {
 
 export type BankOrBoxChange = { bank: number; box: number }
 
+export type MenuEvent = 'save' | 'reset' | 'open' | 'zoom_in' | 'zoom_out' | 'reset_zoom'
+
 export interface BackendListeners {
-  onSave: () => void
-  onReset: () => void
-  onOpen: () => void
+  onMenuEvent: (event: MenuEvent) => void
   onLookupsUpdate: (updated_lookups: StoredLookups) => void
   onStateUpdate: Record<string, <State>(updated_state: State) => void>
   onPokedexUpdate: (updated_pokedex: Pokedex) => void

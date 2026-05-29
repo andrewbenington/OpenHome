@@ -19,19 +19,21 @@ import { Option, range } from '@openhome-core/util/functional'
 import { filterUndefined, numericSorter } from '@openhome-core/util/sort'
 import {
   CtxMenuElementBuilder,
-  ItemBuilder,
+  Item,
   OpenHomeCtxMenu,
-  SubmenuBuilder,
+  Submenu,
 } from '@openhome-ui/components/context-menu'
 import { RemoveIcon } from '@openhome-ui/components/Icons'
 import { MonLocation } from '@openhome-ui/state/saves'
 import { Button, Flex, Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
+import { includeClass } from 'src/ui/util/style'
 import { SimpleOpenHomeBox } from '../../../core/save/util/storage'
 import {
   boxNameOrDefault,
   OPENHOME_BOX_COLUMNS,
   OPENHOME_BOX_ROWS,
+  OPENHOME_BOX_SLOTS,
   useBanksAndBoxes,
 } from '../../state-zustand/banks-and-boxes/store'
 import DroppableSpace from './DroppableSpace'
@@ -226,22 +228,35 @@ type BoxMonIconsProps = {
 
 function BoxWithMons({ box, debugMode }: BoxMonIconsProps) {
   const boxName = boxNameOrDefault(box)
+  const allSlotsFull = box.identifiers.size === OPENHOME_BOX_SLOTS
+
   return (
     <Flex direction="column" width="100%" height="100%">
       <div className="box-icon-mon-container">
         {range(OPENHOME_BOX_COLUMNS).map((i) => (
           <div className="box-icon-mon-col" key={`pos-display-col-${i}`}>
-            {range(OPENHOME_BOX_ROWS).map((j) => (
-              <div
-                className={`box-icon-mon-indicator ${!box.identifiers.has(j * OPENHOME_BOX_COLUMNS + i) ? 'box-icon-mon-empty' : ''}`}
-                key={`pos-display-cell-${i}-${j}`}
-              />
-            ))}
+            {range(OPENHOME_BOX_ROWS).map((j) => {
+              const slotIsEmpty = !box.identifiers.has(j * OPENHOME_BOX_COLUMNS + i)
+              return (
+                <div
+                  className={includeClass('box-icon-mon-indicator')
+                    .with('box-icon-mon-empty')
+                    .if(slotIsEmpty)}
+                  key={`pos-display-cell-${i}-${j}`}
+                />
+              )
+            })}
           </div>
         ))}
       </div>
       <div className="box-overview-title-container" style={fontStyleFromStringLength(boxName)}>
-        <div className="box-overview-title">{boxName}</div>
+        <div
+          className={includeClass('box-overview-title')
+            .with('box-overview-title-full')
+            .if(allSlotsFull)}
+        >
+          {boxName}
+        </div>
       </div>
       {debugMode && (
         <div style={{ fontWeight: 'lighter' }}>
@@ -280,55 +295,48 @@ function calculateNewBoxOrder(movedFromIndex: number, movedIntoIndex: number, bo
 function useSaveContextActions() {
   const { sortAllHomeBoxes, addBoxCurrentBank } = useBanksAndBoxes()
   return [
-    SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
-      SortTypes.map((sortType) =>
-        ItemBuilder.fromLabel(`By ${sortType}`).withAction(() => sortAllHomeBoxes(sortType))
+    Submenu.label('Sort all boxes...').with(
+      ...SortTypes.map((sortType) =>
+        Item.label(`By ${sortType}`).action(() => sortAllHomeBoxes(sortType))
       )
     ),
-    SubmenuBuilder.fromLabel('Add Box...').withBuilders([
-      ItemBuilder.fromLabel('Beginning').withAction(() => addBoxCurrentBank('start')),
-      ItemBuilder.fromLabel('End').withAction(() => addBoxCurrentBank('end')),
-    ]),
+    Submenu.label('Add Box...').with(
+      Item.label('Beginning').action(() => addBoxCurrentBank('start')),
+      Item.label('End').action(() => addBoxCurrentBank('end'))
+    ),
   ]
 }
 
 function useBoxContextActions(box: SimpleOpenHomeBox): CtxMenuElementBuilder[][] {
-  const {
-    removeDupesFromHomeBox,
-    sortHomeBox,
-    sortAllHomeBoxes,
-    deleteBoxCurrentBank,
-    addBoxCurrentBank,
-  } = useBanksAndBoxes()
+  const { sortHomeBox, sortAllHomeBoxes, deleteBoxCurrentBank, addBoxCurrentBank } =
+    useBanksAndBoxes()
+
   const boxIsEmpty = box.identifiers.size === 0
   const boxActions = [
-    ItemBuilder.fromLabel('Remove duplicates from this box')
-      .withAction(() => removeDupesFromHomeBox(box.index))
-      .withDisabled(!boxIsEmpty),
-    SubmenuBuilder.fromLabel('Sort this box...')
-      .withBuilders(
-        SortTypes.map((sortType) =>
-          ItemBuilder.fromLabel(`By ${sortType}`).withAction(() => sortHomeBox(box.index, sortType))
+    Submenu.label('Sort this box...')
+      .with(
+        ...SortTypes.map((sortType) =>
+          Item.label(`By ${sortType}`).action(() => sortHomeBox(box.index, sortType))
         )
       )
-      .withDisabled(boxIsEmpty),
-    SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
-      SortTypes.map((sortType) =>
-        ItemBuilder.fromLabel(`By ${sortType}`).withAction(() => sortAllHomeBoxes(sortType))
+      .disabled(boxIsEmpty),
+    Submenu.label('Sort all boxes...').with(
+      ...SortTypes.map((sortType) =>
+        Item.label(`By ${sortType}`).action(() => sortAllHomeBoxes(sortType))
       )
     ),
-    ItemBuilder.fromLabel('Delete Box')
-      .withAction(() => deleteBoxCurrentBank(box.id))
-      .withDisabled(!boxIsEmpty),
+    Item.label('Delete Box')
+      .action(() => deleteBoxCurrentBank(box.id))
+      .disabled(!boxIsEmpty),
   ]
 
   const addBoxActions = [
-    SubmenuBuilder.fromLabel('Add Box...').withBuilders([
-      ItemBuilder.fromLabel('Before').withAction(() => addBoxCurrentBank(['before', box.index])),
-      ItemBuilder.fromLabel('After').withAction(() => addBoxCurrentBank(['after', box.index])),
-      ItemBuilder.fromLabel('Beginning').withAction(() => addBoxCurrentBank('start')),
-      ItemBuilder.fromLabel('End').withAction(() => addBoxCurrentBank('end')),
-    ]),
+    Submenu.label('Add Box...').with(
+      Item.label('Before').action(() => addBoxCurrentBank(['before', box.index])),
+      Item.label('After').action(() => addBoxCurrentBank(['after', box.index])),
+      Item.label('Beginning').action(() => addBoxCurrentBank('start')),
+      Item.label('End').action(() => addBoxCurrentBank('end'))
+    ),
   ]
 
   return [boxActions, addBoxActions]

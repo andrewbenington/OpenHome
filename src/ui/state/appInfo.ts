@@ -23,6 +23,7 @@ import { Gen7AlolaSave } from '../../core/save/Gen7AlolaSave'
 import { ZASAV } from '../../core/save/Gen89/ZASAV'
 import { OfficialSAV } from '../../core/save/interfaces'
 import { MonDisplayState } from '../hooks/useMonDisplay'
+import { updateStyleForUiScale } from '../util/style'
 
 export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
@@ -66,6 +67,7 @@ export const defaultSettings: Settings = {
   saveViewMode: 'card',
   monDisplayState: initialMonDisplayState(),
   appTheme: 'system',
+  zoomLevel: 100,
 }
 
 export type AppTheme = 'light' | 'dark' | 'system'
@@ -77,6 +79,7 @@ export type Settings = {
   saveViewMode: SaveViewMode
   monDisplayState: MonDisplayState
   appTheme: AppTheme
+  zoomLevel: number
 }
 
 export type AppInfoState = {
@@ -119,6 +122,10 @@ export type AppInfoAction =
       payload: AppTheme
     }
   | { type: 'set_mon_display_state'; payload: MonDisplayState }
+  | {
+      type: 'set_zoom_level'
+      payload: number
+    }
   | {
       type: 'set_error'
       payload: string | undefined
@@ -171,6 +178,8 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
         }
       })
 
+      updateStyleForUiScale(payload.zoomLevel)
+
       return { ...state, settings: { ...payload, enabledSaveTypes: enabled }, settingsLoaded: true }
     }
     case 'set_icon_size': {
@@ -190,6 +199,10 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
     }
     case 'set_mon_display_state': {
       return { ...state, settings: { ...state.settings, monDisplayState: payload } }
+    }
+    case 'set_zoom_level': {
+      updateStyleForUiScale(payload)
+      return { ...state, settings: { ...state.settings, zoomLevel: payload } }
     }
     case 'set_error': {
       return { ...state, error: payload }

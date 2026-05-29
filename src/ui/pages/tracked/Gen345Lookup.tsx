@@ -1,10 +1,10 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { gameOrPluginSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
-import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGames } from '@pkm-rs/pkg'
+import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
 import SortableDataGrid from 'src/ui/components/SortableDataGrid'
 import { useLookups } from 'src/ui/state/lookups/useLookups'
 
@@ -47,14 +47,14 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
       name: 'Original Game',
       width: '10rem',
       renderValue: (value) => (
-        <OriginGameIndicator
+        <GameIndicator
           originGame={value.homeMon?.gameOfOrigin}
           plugin={value.homeMon?.pluginOrigin as PluginIdentifier}
           withName
         />
       ),
       getFilterValue: (val) =>
-        val.homeMon ? OriginGames.gameName(val.homeMon.gameOfOrigin) : '(Unknown)',
+        val.homeMon ? OriginGames.gameNameFull(val.homeMon.gameOfOrigin) : '(Unknown)',
       sortFunction: gameOrPluginSorter(
         (val) => val.homeMon?.gameOfOrigin,
         (val) => val.homeMon?.pluginOrigin

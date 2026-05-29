@@ -1,4 +1,5 @@
 use crate::ohpkm::extra_form::ExtraFormIndex;
+use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
@@ -254,6 +255,11 @@ impl MainDataV2 {
         self.is_nicknamed = false;
     }
 
+    fn ability_index_by_num(&self, ability_num: AbilityNumber) -> AbilityIndexBounded {
+        let form_metadata = self.species_and_form.get_forme_metadata();
+        form_metadata.get_ability(ability_num)
+    }
+
     const fn ability_num_by_index(&self) -> Option<AbilityNumber> {
         let form_metadata = self.species_and_form.get_forme_metadata();
         if self.ability_index.to_u16() == form_metadata.abilities.0.to_u16() {
@@ -269,30 +275,8 @@ impl MainDataV2 {
         }
     }
 
-    fn ability_is_first_slot(&self) -> bool {
-        self.ability_num_by_index() == Some(AbilityNumber::First)
-    }
-
-    fn ability_is_second_slot(&self) -> bool {
-        self.ability_num_by_index() == Some(AbilityNumber::Second)
-    }
-
-    fn ability_is_hidden_ability(&self) -> bool {
-        self.ability_num_by_index() == Some(AbilityNumber::Hidden)
-            || (self
-                .species_and_form
-                .get_forme_metadata()
-                .hidden_ability
-                .is_none()
-                && self.ability_is_first_slot())
-    }
-
     fn ability_num_matches_index(&self) -> bool {
-        match self.ability_num {
-            AbilityNumber::First => self.ability_is_first_slot(),
-            AbilityNumber::Second => self.ability_is_second_slot(),
-            AbilityNumber::Hidden => self.ability_is_hidden_ability(),
-        }
+        self.ability_index_by_num(self.ability_num) == self.ability_index
     }
 
     const fn ability_num_from_pid_gen34(&self) -> AbilityNumber {
@@ -340,27 +324,30 @@ impl MainDataV2 {
         }
     }
 
-    pub fn fix_errors(&mut self) -> bool {
-        let mut errors_found = false;
+    pub fn fix_errors(&mut self) -> Vec<OhpkmIssue> {
+        let mut errors_found = Vec::<OhpkmIssue>::new();
         let form_metadata = self.species_and_form.get_forme_metadata();
 
         // Previous versions of OpenHome incorrectly translated the gender symbols for the Nidorans; here we will fix that
         if (self.national_dex() == NIDORAN_F && self.nickname.to_string().contains("\u{E08F}"))
             || (self.national_dex() == NIDORAN_M && self.nickname.to_string().contains("\u{E08E}"))
         {
+            errors_found.push(OhpkmIssue::SpeciesNameCorrupted {
+                corrupted: self.nickname.to_string(),
+                expected: lookup::species_name(self.national_dex(), self.language).to_owned(),
+            });
             self.reset_nickname_to_species();
-            errors_found = true;
         } else if self.nickname_matches_species_ignore_case() {
             // Fix Pokémon imported from an older game that had their nicknames kept as all caps
             if !self.nickname_matches_species() {
                 self.reset_nickname_to_species();
-                errors_found = true;
+                errors_found.push(OhpkmIssue::SpeciesNameAllCaps)
             }
 
             // Ensure the is_nicknamed flag is accurate. Ignore the situation where the nickname was manually set to the species
             if self.is_nicknamed {
                 self.is_nicknamed = false;
-                errors_found = true;
+                errors_found.push(OhpkmIssue::NicknameFlagIncorrect { expected: false })
             }
         } else if is_prevo_species_name(
             &self.species_and_form,
@@ -369,11 +356,11 @@ impl MainDataV2 {
         ) {
             self.reset_nickname_to_species();
             self.is_nicknamed = false;
-            errors_found = true;
+            errors_found.push(OhpkmIssue::HadPrevoSpeciesName)
         } else if !self.is_nicknamed && !self.nickname_matches_species() {
             // If the nickname doesn't match the species name, it should be considered nicknamed
             self.is_nicknamed = true;
-            errors_found = true;
+            errors_found.push(OhpkmIssue::NicknameFlagIncorrect { expected: true })
         }
 
         // PLA mons cannot have been hatched
@@ -382,7 +369,7 @@ impl MainDataV2 {
         {
             self.egg_date = None;
             self.egg_location_index = None;
-            errors_found = true;
+            errors_found.push(OhpkmIssue::UnexpectedEggData)
         }
 
         // Affixed ribbon must be in the mon's possession
@@ -390,7 +377,7 @@ impl MainDataV2 {
             && !self.ribbons.includes(OpenHomeRibbon::Mod(affixed_ribbon))
         {
             self.affixed_ribbon = None;
-            errors_found = true;
+            errors_found.push(OhpkmIssue::AffixedRibbonNotPresent)
         }
 
         // Fix ability bug from pre-1.5.0 (affected Mind's Eye and Dragon's Maw)
@@ -398,18 +385,24 @@ impl MainDataV2 {
         // Fix ability num bug from some point in the past (set to 0 instead of 1)
         if !self.ability_num_matches_index() {
             if let Some(fixed_ability_num) = self.ability_num_by_index() {
+                errors_found.push(OhpkmIssue::AbilityNumIndexMismatch {
+                    index: self.ability_index,
+                    number: self.ability_num,
+                });
                 // This ability is a valid one for the species! Set the appropriate ability number
                 self.ability_num = fixed_ability_num;
             } else {
                 // Hm, this ability is invalid for the species. Let's reset it using the ability number
                 self.ability_index = form_metadata.get_ability(self.ability_num)
             }
-            errors_found = true;
         }
 
         if !form_metadata.gender_ratio.gender_is_allowed(self.gender) {
+            errors_found.push(OhpkmIssue::InvalidGender {
+                gender: self.gender,
+                ratio: form_metadata.gender_ratio,
+            });
             self.gender = form_metadata.gender_from_pid(self.personality_value);
-            errors_found = true;
         }
 
         errors_found

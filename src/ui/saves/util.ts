@@ -1,11 +1,17 @@
-import { SAV } from '@openhome-core/save/interfaces'
+import {
+  pluginGameName,
+  PluginIdentifier,
+  pluginOriginMarkPath,
+  SAV,
+} from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import BackendInterface from '@openhome-ui/backend/backendInterface'
-import { CtxMenuElementBuilder, ItemBuilder } from '@openhome-ui/components/context-menu/types'
-import { OriginGames } from '@pkm-rs/pkg'
+import { CtxMenuElementBuilder, Item } from '@openhome-ui/components/context-menu/types'
+import { getPluginColor, OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
 import { useState } from 'react'
+import { getOriginIconPath } from '../images/game'
 import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '../state/ohpkm'
 
@@ -172,10 +178,36 @@ export function buildRecentSaveContextElements(
 ): Option<CtxMenuElementBuilder>[] {
   return [
     removeRecentSave
-      ? ItemBuilder.fromLabel('Remove Save').withAction(() => removeRecentSave(save.filePath.raw))
+      ? Item.label('Remove Save').action(() => removeRecentSave(save.filePath.raw))
       : undefined,
-    ItemBuilder.fromLabel(
+    Item.label(
       `Reveal in ${backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
-    ).withAction(() => backend.openDirectory(save.filePath.dir)),
+    ).action(() => backend.openDirectory(save.filePath.dir)),
   ]
+}
+
+export type GameOrPluginDetails = {
+  shortName: string
+  markIconPath: Option<string>
+  backgroundColor: string
+}
+
+export function getDetailsOfficialSave(originGame: number): GameOrPluginDetails {
+  const gameMetadata = OriginGames.getMetadata(originGame)
+  const markImage = getOriginIconPath(gameMetadata)
+  const backgroundColor = OriginGames.color(originGame)
+
+  return {
+    shortName: OriginGames.gameNameShort(originGame),
+    markIconPath: markImage,
+    backgroundColor,
+  }
+}
+
+export function getDetailsPluginSave(pluginId: PluginIdentifier): GameOrPluginDetails {
+  return {
+    shortName: pluginGameName(pluginId, 'short'),
+    markIconPath: pluginOriginMarkPath(pluginId),
+    backgroundColor: getPluginColor(pluginId),
+  }
 }
