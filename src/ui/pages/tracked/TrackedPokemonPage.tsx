@@ -8,7 +8,7 @@ import { OhpkmIdentifier } from 'src/core/pkm/Lookup'
 import { SAV } from 'src/core/save/interfaces'
 import { Dialog } from 'src/ui/components/dialog/Dialog'
 import MessageRibbon from 'src/ui/components/MessageRibbon'
-import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGameIndicator'
+import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
 import { usePathSegment } from 'src/ui/hooks/routing'
 import { useSaves } from 'src/ui/state/saves'
 import { numericSorter } from '../../../core/util/sort'
@@ -220,7 +220,7 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
         <Flex direction="column" gap="2" ml="4">
           <Flex gap="1" align="center">
             <div className="fixed-width-label">Game:</div>
-            <OriginGameIndicator
+            <GameIndicator
               originGame={state.save.origin}
               plugin={state.save.pluginIdentifier}
               withName
@@ -307,7 +307,7 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
         <Flex direction="column" gap="2">
           <Flex gap="1" align="center">
             <p className="fixed-width-label">Game:</p>
-            <OriginGameIndicator
+            <GameIndicator
               originGame={state.currentSaveRef.game}
               plugin={state.currentSaveRef.pluginIdentifier}
               withName

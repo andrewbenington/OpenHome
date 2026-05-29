@@ -1,14 +1,13 @@
 import { StatsPreSplit } from '@pokemon-files/util'
-import { OHPKM } from 'src/core/pkm/OHPKM'
 import { PKMInterface } from '../../../../core/pkm/interfaces'
 import { TopRightIndicatorType } from '../../../hooks/useMonDisplay'
 import { getPublicImageURL } from '../../../images/images'
 import { BallsImageList } from '../../../images/items'
 import GenderIcon from '../GenderIcon'
+import { GameIndicator } from './GameIndicator'
 import { ImageIndicator } from './ImageIndicator'
 import { Indicator } from './Indicator'
-import { OriginGameIndicator } from './OriginGameIndicator'
-import './style.css'
+import './Indicator.css'
 
 type TopRightIndicatorProps = {
   mon: PKMInterface
@@ -21,33 +20,29 @@ export function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps
       return <GenderIcon gender={mon.gender} />
     case 'EVs (Total)':
       const evsTotal = Object.values(mon.evs ?? mon.evsG12 ?? {}).reduce((p, c) => p + c, 0)
-      return <TopRightNumericalIndicator value={evsTotal} />
+      return <NumericalIndicator value={evsTotal} />
     case 'EV (HP)':
-      return <TopRightNumericalIndicator value={mon.evs?.hp} />
+      return <NumericalIndicator value={mon.evs?.hp} />
     case 'EV (Attack)':
-      return <TopRightNumericalIndicator value={mon.evs?.atk} />
+      return <NumericalIndicator value={mon.evs?.atk} />
     case 'EV (Defense)':
-      return <TopRightNumericalIndicator value={mon.evs?.def} />
+      return <NumericalIndicator value={mon.evs?.def} />
     case 'EV (Special Attack)':
-      return <TopRightNumericalIndicator value={mon.evs?.spa} />
+      return <NumericalIndicator value={mon.evs?.spa} />
     case 'EV (Special Defense)':
-      return <TopRightNumericalIndicator value={mon.evs?.spd} />
+      return <NumericalIndicator value={mon.evs?.spd} />
     case 'EV (Speed)':
-      return <TopRightNumericalIndicator value={mon.evs?.spe} />
+      return <NumericalIndicator value={mon.evs?.spe} />
     case 'IVs/DVs (Percent)':
       const ivsOrDvsPercent = mon.ivs ? getIvsPercent(mon) : hasDvs(mon) ? getDvsPercent(mon) : 0
-      return <TopRightNumericalIndicator value={ivsOrDvsPercent} percent />
+      return <NumericalIndicator value={ivsOrDvsPercent} percent />
     case 'Perfect IVs Count':
       const perfectIvsCount = getPerfectIvsCount(mon)
-      return <TopRightNumericalIndicator value={perfectIvsCount} />
+      return <NumericalIndicator value={perfectIvsCount} />
     case 'Origin Game':
-      return <OriginGameIndicator originGame={mon.gameOfOrigin} plugin={mon.pluginOrigin} />
+      return <GameIndicator originGame={mon.gameOfOrigin} plugin={mon.pluginOrigin} />
     case 'Most Recent Save':
-      return (
-        mon instanceof OHPKM && <OriginGameIndicator originGame={mon.mostRecentSaveWasm?.game} />
-      )
-    case 'Ribbon Count':
-      return <TopRightNumericalIndicator value={mon.ribbons?.length} />
+      return <NumericalIndicator value={mon.ribbons?.length} />
     case 'Ball':
       return (
         mon.ball && (
@@ -88,7 +83,7 @@ function hasDvs(mon: PKMInterface): mon is PKMInterface & { dvs: StatsPreSplit }
   return (mon as any).dvs !== undefined
 }
 
-function TopRightNumericalIndicator({ value, percent }: TopRightNumericalIndicatorProps) {
+function NumericalIndicator({ value, percent }: TopRightNumericalIndicatorProps) {
   return (
     value !== undefined &&
     (percent || value > 0) && (

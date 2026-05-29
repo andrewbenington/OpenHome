@@ -47,7 +47,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
       if (pluginSaveType) {
         message += ` in ${pluginSaveType.saveTypeName}`
       } else {
-        message += ` in ${OriginGames.gameName(mon.gameOfOrigin) ?? '(unknown game)'}`
+        message += ` in ${OriginGames.gameNameFull(mon.gameOfOrigin) ?? '(unknown game)'}`
       }
     }
 
@@ -149,7 +149,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
               <img
                 className="game-image"
                 draggable={false}
-                alt={`${mon.pluginOrigin ?? OriginGames.gameName(mon.gameOfOrigin)} logo`}
+                alt={`${mon.pluginOrigin ?? OriginGames.gameNameFull(mon.gameOfOrigin)} logo`}
                 src={
                   mon.pluginOrigin
                     ? `logos/${mon.pluginOrigin}.png`

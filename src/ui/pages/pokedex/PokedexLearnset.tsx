@@ -1,5 +1,4 @@
-import { FormMetadata } from '@pkm-rs/pkg'
-import { MetadataSource } from '@pokemon-wasm/pkm_rs'
+import { FormMetadata, MetadataSource } from '@pkm-rs/pkg'
 import { Flex, Text } from '@radix-ui/themes'
 import MoveCard from 'src/ui/components/pokemon/MoveCard'
 import './PokedexLearnset.css'

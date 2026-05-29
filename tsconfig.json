@@ -36,9 +36,6 @@
       "@pokemon-files/*": [
         "./packages/pokemon-files/src/*"
       ],
-      "@pokemon-wasm/*": [
-        "./pkm_rs/pkg/*"
-      ],
       "@pokemon-resources/*": [
         "./packages/pokemon-resources/src/*"
       ],

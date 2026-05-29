@@ -83,11 +83,11 @@ impl OriginGame {
         }
     }
 
-    pub const fn game_name(&self) -> &'static str {
+    pub const fn game_name_full(&self) -> &'static str {
         match *self {
             Self::Red => "Red",
             Self::BlueGreen => "Blue/Green",
-            Self::BlueJpn => "BlueJpn",
+            Self::BlueJpn => "Blue (Japan)",
             Self::Yellow => "Yellow",
             Self::Gold => "Gold",
             Self::Silver => "Silver",
@@ -141,6 +141,63 @@ impl OriginGame {
         }
     }
 
+    pub const fn game_name_short(&self) -> &'static str {
+        match *self {
+            Self::Red => "Red",
+            Self::BlueGreen => "Blue/Green",
+            Self::BlueJpn => "Blue (JPN)",
+            Self::Yellow => "Yellow",
+            Self::Gold => "Gold",
+            Self::Silver => "Silver",
+            Self::Crystal => "Crystal",
+            Self::Ruby => "Ruby",
+            Self::Sapphire => "Sapphire",
+            Self::Emerald => "Emerald",
+            Self::FireRed => "FireRed",
+            Self::LeafGreen => "LeafGreen",
+            Self::ColosseumXd => "Colosseum/XD",
+            Self::Diamond => "Diamond",
+            Self::Pearl => "Pearl",
+            Self::Platinum => "Platinum",
+            Self::HeartGold => "HeartGold",
+            Self::SoulSilver => "SoulSilver",
+            Self::BattleRevolution => "Battle Rev.",
+            Self::Black => "Black",
+            Self::White => "White",
+            Self::Black2 => "Black 2",
+            Self::White2 => "White 2",
+            Self::X => "X",
+            Self::Y => "Y",
+            Self::OmegaRuby => "Ω Ruby",
+            Self::AlphaSapphire => "α Sapphire",
+            Self::Go => "Go",
+            Self::Sun => "Sun",
+            Self::Moon => "Moon",
+            Self::UltraSun => "Ultra Sun",
+            Self::UltraMoon => "Ultra Moon",
+            Self::LetsGoPikachu => "L.G. Pikachu",
+            Self::LetsGoEevee => "L.G. Eevee",
+            Self::Sword => "Sword",
+            Self::Shield => "Shield",
+            Self::Home => "Home",
+            Self::LegendsArceus => "Leg.: Arceus",
+            Self::BrilliantDiamond => "Brill. Diamond",
+            Self::ShiningPearl => "Shin. Pearl",
+            Self::Scarlet => "Scarlet",
+            Self::Violet => "Violet",
+            Self::LegendsZa => "Leg.: Z-A",
+            Self::Invalid0 => "Invalid (0)",
+            Self::Invalid6 => "Invalid (6)",
+            Self::Invalid9 => "Invalid (9)",
+            Self::Invalid13 => "Invalid (13)",
+            Self::Invalid14 => "Invalid (14)",
+            Self::Invalid17 => "Invalid (17)",
+            Self::Invalid18 => "Invalid (18)",
+            Self::Invalid19 => "Invalid (19)",
+            Self::Invalid28 => "Invalid (28)",
+            Self::Invalid29 => "Invalid (29)",
+        }
+    }
     pub const fn generation(&self) -> Generation {
         match *self {
             Self::Red | Self::BlueGreen | Self::BlueJpn | Self::Yellow => Generation::G1,
@@ -433,7 +490,7 @@ impl Serialize for OriginGame {
     where
         S: serde::Serializer,
     {
-        self.game_name().serialize(serializer)
+        self.game_name_full().serialize(serializer)
     }
 }
 
@@ -511,9 +568,14 @@ pub struct OriginGames;
 #[allow(clippy::missing_const_for_fn)]
 #[cfg(feature = "wasm")]
 impl OriginGames {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gameName"))]
-    pub fn game_name(value: u8) -> String {
-        OriginGame::from(value).game_name().to_owned()
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gameNameFull"))]
+    pub fn game_name_full(value: u8) -> String {
+        OriginGame::from(value).game_name_full().to_owned()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gameNameShort"))]
+    pub fn game_name_short(value: u8) -> String {
+        OriginGame::from(value).game_name_short().to_owned()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -660,7 +722,7 @@ impl OriginGameWithData {
     pub fn new(origin: OriginGame) -> Self {
         Self {
             origin,
-            name: origin.game_name().to_owned(),
+            name: origin.game_name_full().to_owned(),
             mark: origin.mark(),
             generation: origin.generation(),
         }

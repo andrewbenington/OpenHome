@@ -25,7 +25,7 @@ export default function TrainersDisplay(props: { mon: OHPKM }) {
               {handler.origin_game && (
                 <img
                   draggable={false}
-                  alt={`${handler.origin_plugin ?? OriginGames.gameName(handler.origin_game)} logo`}
+                  alt={`${handler.origin_plugin ?? OriginGames.gameNameFull(handler.origin_game)} logo`}
                   src={
                     handler.origin_plugin
                       ? `logos/${handler.origin_plugin}.png`

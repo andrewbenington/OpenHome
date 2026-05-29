@@ -10,13 +10,8 @@ export type ImageIndicatorProps = {
   style?: React.CSSProperties
 }
 
-export function ImageIndicator({
-  tooltip,
-  src,
-  backgroundColor,
-  text,
-  style,
-}: ImageIndicatorProps) {
+export function ImageIndicator(props: ImageIndicatorProps) {
+  const { tooltip, src, backgroundColor, text, style } = props
   const filterClass = colorIsDark(backgroundColor) ? 'white-filter' : 'black-filter'
   return (
     <Indicator

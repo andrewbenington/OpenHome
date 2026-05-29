@@ -11,9 +11,9 @@ import { CtxMenuElementBuilder, Item } from '@openhome-ui/components/context-men
 import { getPluginColor, OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
 import { useState } from 'react'
+import { getOriginIconPath } from '../images/game'
 import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '../state/ohpkm'
-import { getOriginIconPath } from '../images/game'
 
 export type SaveViewMode = 'card' | 'grid'
 
@@ -187,7 +187,7 @@ export function buildRecentSaveContextElements(
 }
 
 export type GameOrPluginDetails = {
-  name: string
+  shortName: string
   markIconPath: Option<string>
   backgroundColor: string
 }
@@ -198,7 +198,7 @@ export function getDetailsOfficialSave(originGame: number): GameOrPluginDetails 
   const backgroundColor = OriginGames.color(originGame)
 
   return {
-    name: gameMetadata.name,
+    shortName: OriginGames.gameNameShort(originGame),
     markIconPath: markImage,
     backgroundColor,
   }
@@ -206,7 +206,7 @@ export function getDetailsOfficialSave(originGame: number): GameOrPluginDetails 
 
 export function getDetailsPluginSave(pluginId: PluginIdentifier): GameOrPluginDetails {
   return {
-    name: pluginGameName(pluginId),
+    shortName: pluginGameName(pluginId, 'short'),
     markIconPath: pluginOriginMarkPath(pluginId),
     backgroundColor: getPluginColor(pluginId),
   }

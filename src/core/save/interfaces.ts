@@ -139,8 +139,12 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
     return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
   }
 
-  get gameName(): string {
-    return OriginGames.gameName(this.origin)
+  get gameNameFull(): string {
+    return OriginGames.gameNameFull(this.origin)
+  }
+
+  get gameNameShort(): string {
+    return OriginGames.gameNameShort(this.origin)
   }
 
   get gameColor(): string {
@@ -235,8 +239,12 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   abstract pluginIdentifier: PluginIdentifier
 
-  get gameName(): string {
+  get gameNameFull(): string {
     return pluginGameName(this.pluginIdentifier)
+  }
+
+  get gameNameShort(): string {
+    return pluginGameName(this.pluginIdentifier, 'short')
   }
 
   get gameColor(): string {
@@ -294,15 +302,16 @@ export function getSaveRef(save: SAV): SaveRef {
   }
 }
 export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum'
+export type GameNameType = 'short' | 'full'
 
-export function pluginGameName(identifier: PluginIdentifier): string {
+export function pluginGameName(identifier: PluginIdentifier, type = 'full'): string {
   switch (identifier) {
     case 'radical_red':
       return 'Radical Red'
     case 'unbound':
       return 'Unbound'
     case 'luminescent_platinum':
-      return 'Luminescent Platinum'
+      return type === 'full' ? 'Luminescent Platinum' : 'Lumi. Platinum'
     default:
       return 'Unknown Plugin'
   }

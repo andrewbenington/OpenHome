@@ -10,10 +10,11 @@ import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
 import SavesModal from '@openhome-ui/saves/SavesModal'
 import { useSaves } from '@openhome-ui/state/saves'
 import { HomeMonLocation, SaveMonLocation } from '@openhome-ui/state/saves/reducer'
+import { getPluginColor, OriginGames } from '@pkm-rs/pkg'
 import { Badge, Button, Callout, Flex } from '@radix-ui/themes'
 import { useCallback, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
-import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGameIndicator'
+import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
 import { Typeahead } from 'src/ui/components/typeahead'
 import { getDetailsOfficialSave, getDetailsPluginSave } from 'src/ui/saves/util'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
@@ -45,9 +46,9 @@ export default function SortPokemon() {
     return savesAndBanks.allOpenSaves
       .flatMap((save) =>
         save.getAllMons().map((mon) => {
-          const { backgroundColor } = save.pluginIdentifier
-            ? getDetailsPluginSave(save.pluginIdentifier)
-            : getDetailsOfficialSave(save.origin)
+          const backgroundColor = save.pluginIdentifier
+            ? getPluginColor(save.pluginIdentifier)
+            : OriginGames.color(save.origin)
           return {
             mon: ohpkmStore.monOrOhpkmIfTracked(mon),
             color: backgroundColor,
@@ -233,7 +234,7 @@ export default function SortPokemon() {
                   {save.name} ({save.tid})
                 </p>
                 <div style={{ flex: 1 }} />
-                <OriginGameIndicator originGame={save.origin} plugin={save.pluginIdentifier} />
+                <GameIndicator originGame={save.origin} plugin={save.pluginIdentifier} />
               </Badge>
             )
           })}
@@ -387,7 +388,7 @@ function TransferToSaveButton(props: TransferToSaveButtonProps) {
         <b>{save.name}</b>
         <p>(TID {save.displayID})</p>
         <div style={{ flex: 1 }} />
-        <OriginGameIndicator withName originGame={save.origin} plugin={save.pluginIdentifier} />
+        <GameIndicator withName originGame={save.origin} plugin={save.pluginIdentifier} />
       </Flex>
     </Button>
   )

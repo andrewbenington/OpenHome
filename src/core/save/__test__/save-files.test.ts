@@ -79,7 +79,7 @@ describe('Save file detection - single possibility', () => {
 
       const saveFile = result.value
 
-      expect(saveFile?.gameName).toBe(gameName)
+      expect(saveFile?.gameNameFull).toBe(gameName)
     })
   }
 })

@@ -83,7 +83,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <code>{u32Display(mon.encryptionConstant)}</code>
           </AttributeRow>
         )}
-        <AttributeRow label="Origin Game" value={OriginGames.gameName(mon.gameOfOrigin)} />
+        <AttributeRow label="Origin Game" value={OriginGames.gameNameFull(mon.gameOfOrigin)} />
         <AttributeRow
           label="Met Location"
           value={
