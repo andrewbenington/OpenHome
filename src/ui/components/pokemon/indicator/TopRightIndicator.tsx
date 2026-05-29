@@ -7,7 +7,7 @@ import { BallsImageList } from '../../../images/items'
 import GenderIcon from '../GenderIcon'
 import { ImageIndicator } from './ImageIndicator'
 import { Indicator } from './Indicator'
-import { OriginGameIndicator } from './OriginGame'
+import { OriginGameIndicator } from './OriginGameIndicator'
 import './style.css'
 
 type TopRightIndicatorProps = {

@@ -13,7 +13,7 @@ import { HomeMonLocation, SaveMonLocation } from '@openhome-ui/state/saves/reduc
 import { Badge, Button, Callout, Flex } from '@radix-ui/themes'
 import { useCallback, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
-import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
+import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGameIndicator'
 import { Typeahead } from 'src/ui/components/typeahead'
 import { getDetailsOfficialSave, getDetailsPluginSave } from 'src/ui/saves/util'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
@@ -203,7 +203,7 @@ export default function SortPokemon() {
               formeNumber={monWithSave.mon.formNum}
               isEgg={monWithSave.mon.isEgg}
               isShiny={monWithSave.mon.isShiny()}
-              style={{ width: 30, height: 30 }}
+              style={{ width: '80%', height: '80%' }}
             />
           </button>
         </div>
@@ -341,14 +341,7 @@ export default function SortPokemon() {
       </Dialog.Container>
 
       {toastErrors && toastErrors.length > 0 && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '1.5rem',
-            right: '1.5rem',
-            zIndex: 9999,
-          }}
-        >
+        <div style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: 9999 }}>
           <Callout.Root variant="surface" color="red" size="2">
             <Callout.Icon>
               <ErrorIcon />

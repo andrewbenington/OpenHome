@@ -20,7 +20,11 @@
 }
 
 .ContextMenuLabel {
-  padding: 4px 8px;
+  padding: var(--padding-radius-xs-sm) 0;
+  font-size: 0.8rem !important;
+  display: flex;
+  flex-direction: row;
+  align-items: end;
 }
 
 .rt-ContextMenuSeparator {
@@ -33,7 +37,7 @@
   padding: 0 1rem;
 }
 .rt-ContextMenuItemIndicator {
-  padding: 0 0.5rem;
+  padding: 0 0rem;
 }
 .ContextMenuSubTrigger[data-state='open'] {
   background-color: var(--accent-4);

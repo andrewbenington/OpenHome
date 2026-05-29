@@ -2,9 +2,10 @@
   border: none;
   transition: color 0.25s;
   padding: 0;
-  width: 36px;
+  width: 2.5rem;
   height: var(--height-mini-button);
 }
+
 .arrow-button div svg {
   width: 1rem;
   height: 1rem;

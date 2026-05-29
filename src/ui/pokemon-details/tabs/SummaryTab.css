@@ -7,14 +7,14 @@
 }
 
 .mon-image-container {
-  height: 200px;
+  height: 15rem;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .summary-image {
-  max-height: 100px;
+  height: 7.5rem;
   transform: scale(2);
   image-rendering: pixelated;
   object-fit: contain;

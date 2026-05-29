@@ -42,14 +42,15 @@
 }
 
 .sort-mon-cell {
-  width: var(--box-slot-side);
-  height: var(--box-slot-side);
   border-radius: var(--border-radius-sm);
   border-width: 1px;
   border-style: solid;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  width: var(--box-slot-size);
+  height: var(--box-slot-size);
 }
 
 .sort-mon-button {

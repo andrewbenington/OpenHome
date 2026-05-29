@@ -35,7 +35,7 @@
 
 .autocomplete-dropdown::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: var(--autocomplete-scrollbar);
+  background-color: var(--dark-scrollbar);
 }
 
 .autocomplete-option {

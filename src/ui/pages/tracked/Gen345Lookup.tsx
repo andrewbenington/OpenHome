@@ -1,10 +1,10 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { gameOrPluginSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
-import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGames } from '@pkm-rs/pkg'
+import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGameIndicator'
 import SortableDataGrid from 'src/ui/components/SortableDataGrid'
 import { useLookups } from 'src/ui/state/lookups/useLookups'
 

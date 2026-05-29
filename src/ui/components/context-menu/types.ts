@@ -5,14 +5,19 @@ import PokemonIcon from '../PokemonIcon'
 
 export type Element = ItemData | Separator | LabelData | SubmenuData | CheckboxData
 
+type SingleElementBuilder = () => Element
+
+type MultiElementBuilder = () => Element[]
+
 export interface CtxMenuElementBuilder {
-  build: () => Element
+  build: SingleElementBuilder | MultiElementBuilder
 }
 
 export type CtxMenuSectionBuilders = Option<CtxMenuElementBuilder>[]
 
-function buildElement(builder: CtxMenuElementBuilder): Element {
-  return builder.build()
+function buildElements(builder: CtxMenuElementBuilder): Element[] {
+  const result = builder.build()
+  return Array.isArray(result) ? result : [result]
 }
 
 type NoTag<T> = Omit<T, '__cm_type_tag'>
@@ -94,7 +99,7 @@ export class Label implements CtxMenuElementBuilder {
     return new Label({ component })
   }
 
-  static mon(mon: PKMInterface, size: number = 16): Label {
+  static mon(mon: PKMInterface): Label {
     return Label.component(
       React.createElement(
         React.Fragment,
@@ -102,15 +107,15 @@ export class Label implements CtxMenuElementBuilder {
         React.createElement(PokemonIcon, {
           dexNumber: mon.dexNum,
           formeNumber: mon.formNum,
-          style: { width: size, height: size, marginRight: 8 },
+          style: { width: '1.5rem', height: '1.5rem', marginRight: '0.25rem' },
         }),
         mon.nickname
       )
     )
   }
 
-  build(): LabelData {
-    return { ...this.data, __cm_type_tag: 'label' }
+  build(): Element[] {
+    return [{ ...this.data, __cm_type_tag: 'label' }, SeparatorData]
   }
 }
 
@@ -165,7 +170,7 @@ export class Submenu implements CtxMenuElementBuilder {
   build(): SubmenuData {
     return {
       content: this.content,
-      items: this.builders.map(buildElement),
+      items: this.builders.flatMap(buildElements),
       disabled: this.#disabled,
       __cm_type_tag: 'submenu',
     }

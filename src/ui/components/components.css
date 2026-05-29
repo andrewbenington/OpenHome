@@ -1,6 +1,8 @@
 .pokemon-icon-container {
   position: relative;
   transform: translate(0, 0);
+  width: fit-content;
+  height: fit-content;
 }
 
 .pokemon-icon-tags {
@@ -162,7 +164,7 @@
 .file-type-select {
   color: white;
   font-weight: bold;
-  font-size: small;
+  font-size: var(--font-size-standard);
   box-shadow: none;
   flex: 1;
   padding: 0 1.5rem 0 var(--padding-radius-sm-lg);
