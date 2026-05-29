@@ -15,10 +15,10 @@ build-mac-intel:
 .PHONY: wasm-compile
 wasm-compile:
 	@pnpm i
-	@pnpm wasm-compile
+	@pnpm wasm-compile-dev
 
 .PHONY: start
-start: ensure-dependencies wasm-compile
+start: ensure-dependencies
 	@pnpm i
 	@pnpm tauri dev
 
