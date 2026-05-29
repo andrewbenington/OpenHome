@@ -488,6 +488,9 @@ svg {
   border-radius: var(--border-radius-sm);
   background-color: var(--color-panel);
   padding: var(--padding-radius-sm-lg);
+
+  box-shadow: 0 0 0 1px
+    color-mix(in oklab, color(display-p3 1 1 1 / 0.134), color(display-p3 0.192 0.192 0.192) 25%);
 }
 
 .panel-lg-radius > ::-webkit-scrollbar-thumb {
@@ -498,6 +501,9 @@ svg {
   border-radius: var(--border-radius-lg);
   background-color: var(--color-panel);
   padding: var(--padding-radius-sm-lg);
+
+  box-shadow: 0 0 0 1px
+    color-mix(in oklab, color(display-p3 1 1 1 / 0.134), color(display-p3 0.192 0.192 0.192) 25%);
 }
 
 .panel-lg-radius {

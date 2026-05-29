@@ -10,7 +10,7 @@ import {
   SettingType,
   StringOption,
 } from '@pkm-rs/pkg'
-import { Card, Flex, RadioGroup, Select, Separator } from '@radix-ui/themes'
+import { Flex, RadioGroup, Select, Separator } from '@radix-ui/themes'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import { Route, Routes } from 'react-router'
 import { R } from 'src/core/util/functional'
@@ -38,68 +38,74 @@ export default function Settings() {
   }, [appInfoState.settings, backend])
 
   const generalElement = (
-    <Card style={{ margin: 8, width: '100%' }}>
-      <b style={{ fontSize: '1.25rem' }}>Enabled ROM Hack Formats</b>
-      <div style={{ margin: 8 }}>
-        {appInfoState.extraSaveTypes.map((saveType) => (
-          <label className="flex-row" key={saveType.saveTypeName}>
-            <input
-              type="checkbox"
-              onChange={(e) =>
-                dispatchAppInfoState({
-                  type: 'set_savetype_enabled',
-                  payload: { saveType, enabled: e.target.checked },
-                })
-              }
-              checked={appInfoState.settings.enabledSaveTypes[saveType.saveTypeID]}
-            />
-            {saveType.saveTypeName}
-          </label>
-        ))}
-      </div>
-      <b style={{ fontSize: '1.25rem' }}>App Theme</b>
-      <RadioGroup.Root
-        onValueChange={(newValue: AppTheme) => {
-          if (!newValue) return
-          backend.setTheme(newValue)
-          dispatchAppInfoState({ type: 'set_app_theme', payload: newValue })
-        }}
-        value={appInfoState.settings.appTheme}
-        style={{ margin: 8 }}
-      >
-        <RadioGroup.Item value="system">System</RadioGroup.Item>
-        <RadioGroup.Item value="light">Light</RadioGroup.Item>
-        <RadioGroup.Item value="dark">Dark</RadioGroup.Item>
-      </RadioGroup.Root>
-      <b style={{ fontSize: '1.25rem' }}>Data</b>
-      <Flex direction="column" gap="2">
-        <div>
-          Your OpenHome data is stored locally on your machine. You can change the location of this
-          data, here. Note that changing the data directory will cause the app to restart.
+    <div className="settings-content-inner">
+      <div>
+        <GroupHeader name="Enabled ROM Hack Formats" />
+        <div style={{ margin: 8 }}>
+          {appInfoState.extraSaveTypes.map((saveType) => (
+            <label className="flex-row" key={saveType.saveTypeName}>
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  dispatchAppInfoState({
+                    type: 'set_savetype_enabled',
+                    payload: { saveType, enabled: e.target.checked },
+                  })
+                }
+                checked={appInfoState.settings.enabledSaveTypes[saveType.saveTypeID]}
+              />
+              {saveType.saveTypeName}
+            </label>
+          ))}
         </div>
-        <Flex gap="2">
-          <b>Current Data Directory:</b>
-          <div>{dataDirPath}</div>
-          <PromptDialog
-            title="Move Data Directory?"
-            description="Are you sure you want to move the data directory? All files will be copied to the new location, and the app will restart. After they are copied to the new directory successfully, your storage and plugins will be removed from the old directory."
-            triggerButton="Change"
-            actions={[
-              { uniqueLabel: 'Cancel', action: () => {}, type: 'cancel' },
-              {
-                uniqueLabel: 'Select New Directory...',
-                action: () => {
-                  backend
-                    .promptChangeDataDir()
-                    .then(R.mapErr((err) => displayError('Error changing data directory', err)))
+      </div>
+      <div>
+        <GroupHeader name="App Theme" />
+        <RadioGroup.Root
+          onValueChange={(newValue: AppTheme) => {
+            if (!newValue) return
+            backend.setTheme(newValue)
+            dispatchAppInfoState({ type: 'set_app_theme', payload: newValue })
+          }}
+          value={appInfoState.settings.appTheme}
+          style={{ margin: 8 }}
+        >
+          <RadioGroup.Item value="system">System</RadioGroup.Item>
+          <RadioGroup.Item value="light">Light</RadioGroup.Item>
+          <RadioGroup.Item value="dark">Dark</RadioGroup.Item>
+        </RadioGroup.Root>
+      </div>
+      <div>
+        <GroupHeader name="Data" />
+        <Flex direction="column" gap="2">
+          <div>
+            Your OpenHome data is stored locally on your machine. You can change the location of
+            this data here. Note that changing the data directory will cause the app to restart.
+          </div>
+          <Flex gap="2">
+            <b>Current Data Directory:</b>
+            <div>{dataDirPath}</div>
+            <PromptDialog
+              title="Move Data Directory?"
+              description="Are you sure you want to move the data directory? All files will be copied to the new location, and the app will restart. After they are copied to the new directory successfully, your storage and plugins will be removed from the old directory."
+              triggerButton="Change"
+              actions={[
+                { uniqueLabel: 'Cancel', action: () => {}, type: 'cancel' },
+                {
+                  uniqueLabel: 'Select New Directory...',
+                  action: () => {
+                    backend
+                      .promptChangeDataDir()
+                      .then(R.mapErr((err) => displayError('Error changing data directory', err)))
+                  },
+                  type: 'destructive',
                 },
-                type: 'destructive',
-              },
-            ]}
-          />
+              ]}
+            />
+          </Flex>
         </Flex>
-      </Flex>
-    </Card>
+      </div>
+    </div>
   )
 
   return (
@@ -109,33 +115,52 @@ export default function Settings() {
         <SideTabs.Tab value="conversion">PKM Conversion</SideTabs.Tab>
         <div style={{ flex: 1 }} />
       </SideTabs.TabList>
-      <Routes>
-        <Route index path="" element={generalElement} />
-        <Route path="general" element={generalElement} />
-        <Route path="conversion" element={<PKMConversion />} />
-      </Routes>
+      <div className="settings-content">
+        <div className="settings-content-card card-lg-radius">
+          <Routes>
+            <Route index path="" element={generalElement} />
+            <Route path="general" element={generalElement} />
+            <Route path="conversion" element={<PKMConversion />} />
+          </Routes>
+        </div>
+      </div>
     </SideTabs.Root>
+  )
+}
+
+function GroupHeader(props: { name: string }) {
+  return (
+    <div>
+      <p className="group-name">{props.name}</p>
+      <Separator style={{ margin: 'var(--padding-radius-sm-lg) 0' }} />
+    </div>
   )
 }
 
 function PKMConversion() {
   const schema = getConvertSettingsSchema().settings_schema
+
+  const grouped = Object.groupBy(Object.entries(schema), ([identifier]) =>
+    ConvertStrategies.getCategoryName(identifier as ConvertStrategyKey)
+  )
+
   return (
-    <Card style={{ margin: 'var(--padding-radius-sm-lg)', width: '100%' }}>
-      <b>PKM Conversion Settings</b>
-      <Separator style={{ margin: 'var(--padding-radius-sm-lg) 0' }} />
-      <div className="pkm-conversion-settings-content">
-        {Object.entries(schema)
-          .toSorted(stringSorter(([key]) => key))
-          .map(([key, setting]) => (
-            <PKMConversionSettingControl
-              key={key}
-              identifier={key as ConvertStrategyKey}
-              descriptor={setting}
-            />
-          ))}
-      </div>
-    </Card>
+    <div className="settings-content-inner">
+      {Object.entries(grouped)
+        .toSorted(stringSorter(([category]) => category))
+        .map(([category, settings]) => (
+          <div key={category} className="settings-group">
+            <GroupHeader name={category} />
+            {settings?.map(([identifier, setting]) => (
+              <PKMConversionSettingControl
+                key={identifier}
+                identifier={identifier as ConvertStrategyKey}
+                descriptor={setting}
+              />
+            ))}
+          </div>
+        ))}
+    </div>
   )
 }
 
@@ -207,10 +232,9 @@ function PKMBoolConversionSettingControl({
 }: PKMBoolConversionSettingControlProps) {
   const { defaultConvertStrategy, updateDefaultConvertStrategy } = useConvertStrategies()
   return (
-    <div className="pkm-conversion-setting">
+    <div className="single-setting-container">
       <span className="settings-checkbox-flex">
-        <p>{ConvertStrategies.getCategoryName(identifier)}:</p>
-        <b>{ConvertStrategies.getSettingName(identifier)}</b>
+        <p>{ConvertStrategies.getSettingName(identifier)}</p>
         <input
           type="checkbox"
           onChange={(e) =>
@@ -225,7 +249,7 @@ function PKMBoolConversionSettingControl({
           }
         />
       </span>
-      <p>{ConvertStrategies.getDescription(identifier)}</p>
+      <p className="setting-description">{ConvertStrategies.getDescription(identifier)}</p>
     </div>
   )
 }
@@ -243,12 +267,9 @@ function PKMStringConversionSettingControl({
   const { defaultConvertStrategy, updateDefaultConvertStrategy } = useConvertStrategies()
   const value = defaultConvertStrategy[identifier] as string | undefined
   return (
-    <div className="pkm-conversion-setting">
-      <span style={{ display: 'inline-flex' }}>
-        <p>{ConvertStrategies.getCategoryName(identifier)}:</p>
-        <b style={{ paddingLeft: 8 }}>{ConvertStrategies.getSettingName(identifier)}</b>
-      </span>
-      <p>{ConvertStrategies.getDescription(identifier)}</p>
+    <div className="single-setting-container">
+      <p>{ConvertStrategies.getSettingName(identifier)}</p>
+      <p className="setting-description">{ConvertStrategies.getDescription(identifier)}</p>
       <Select.Root
         value={value}
         onValueChange={(newValue) =>

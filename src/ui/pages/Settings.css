@@ -1,25 +1,53 @@
+.settings-content {
+  max-height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+
+  padding: var(--padding-radius-sm-lg);
+}
+
+.settings-content-card {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem;
+}
+
 .settings-checkbox-flex {
   display: inline-flex;
   gap: var(--padding-radius-sm-lg);
   align-items: center;
-
-  p {
-    color: var(--gray-11);
-  }
 }
 
-.pkm-conversion-settings-content {
+.group-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.settings-group {
   display: flex;
   flex-direction: column;
-  gap: calc(4 * var(--padding-radius-sm-lg));
 }
 
-.pkm-conversion-setting {
+.settings-content-inner {
+  display: flex;
+  flex-direction: column;
+  gap: calc(2 * var(--padding-radius-sm-lg));
+}
+
+.single-setting-container {
   display: flex;
   flex-direction: column;
   gap: var(--padding-radius-sm-lg);
+  margin-bottom: 1rem;
 
   .rt-SelectTrigger {
     width: fit-content;
+    margin-left: 0.5rem;
   }
+}
+
+.setting-description {
+  color: var(--gray-11);
+  padding-left: 0.5rem;
 }
