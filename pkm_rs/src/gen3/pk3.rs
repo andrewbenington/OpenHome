@@ -763,11 +763,20 @@ mod test {
 
     #[test]
     fn kyogre_is_nonbinary() -> TestResult<()> {
+
+        print!("Hello world");
+
         let path = PathBuf::from("pk3").join("382 - Kyogre.pkm");
         let mon = tests::pkm_from_file::<Pk3>(&path)?.0;
 
         assert_eq!(mon.gender, Gender::Genderless);
 
+        Ok(())
+    }
+
+    #[test]
+    fn test_empty() -> TestResult<()>
+    {
         Ok(())
     }
 }
