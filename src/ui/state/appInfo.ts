@@ -178,6 +178,8 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
         }
       })
 
+      updateStyleForUiScale(payload.zoomLevel)
+
       return { ...state, settings: { ...payload, enabledSaveTypes: enabled }, settingsLoaded: true }
     }
     case 'set_icon_size': {
