@@ -10,10 +10,11 @@ import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
 import SavesModal from '@openhome-ui/saves/SavesModal'
 import { useSaves } from '@openhome-ui/state/saves'
 import { HomeMonLocation, SaveMonLocation } from '@openhome-ui/state/saves/reducer'
+import { getPluginColor, OriginGames } from '@pkm-rs/pkg'
 import { Badge, Button, Callout, Flex } from '@radix-ui/themes'
 import { useCallback, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
-import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
+import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
 import { Typeahead } from 'src/ui/components/typeahead'
 import { getDetailsOfficialSave, getDetailsPluginSave } from 'src/ui/saves/util'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
@@ -45,9 +46,9 @@ export default function SortPokemon() {
     return savesAndBanks.allOpenSaves
       .flatMap((save) =>
         save.getAllMons().map((mon) => {
-          const { backgroundColor } = save.pluginIdentifier
-            ? getDetailsPluginSave(save.pluginIdentifier)
-            : getDetailsOfficialSave(save.origin)
+          const backgroundColor = save.pluginIdentifier
+            ? getPluginColor(save.pluginIdentifier)
+            : OriginGames.color(save.origin)
           return {
             mon: ohpkmStore.monOrOhpkmIfTracked(mon),
             color: backgroundColor,
@@ -203,7 +204,7 @@ export default function SortPokemon() {
               formeNumber={monWithSave.mon.formNum}
               isEgg={monWithSave.mon.isEgg}
               isShiny={monWithSave.mon.isShiny()}
-              style={{ width: 30, height: 30 }}
+              style={{ width: '80%', height: '80%' }}
             />
           </button>
         </div>
@@ -233,7 +234,7 @@ export default function SortPokemon() {
                   {save.name} ({save.tid})
                 </p>
                 <div style={{ flex: 1 }} />
-                <OriginGameIndicator originGame={save.origin} plugin={save.pluginIdentifier} />
+                <GameIndicator originGame={save.origin} plugin={save.pluginIdentifier} />
               </Badge>
             )
           })}
@@ -341,14 +342,7 @@ export default function SortPokemon() {
       </Dialog.Container>
 
       {toastErrors && toastErrors.length > 0 && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '1.5rem',
-            right: '1.5rem',
-            zIndex: 9999,
-          }}
-        >
+        <div style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: 9999 }}>
           <Callout.Root variant="surface" color="red" size="2">
             <Callout.Icon>
               <ErrorIcon />
@@ -394,7 +388,7 @@ function TransferToSaveButton(props: TransferToSaveButtonProps) {
         <b>{save.name}</b>
         <p>(TID {save.displayID})</p>
         <div style={{ flex: 1 }} />
-        <OriginGameIndicator withName originGame={save.origin} plugin={save.pluginIdentifier} />
+        <GameIndicator withName originGame={save.origin} plugin={save.pluginIdentifier} />
       </Flex>
     </Button>
   )

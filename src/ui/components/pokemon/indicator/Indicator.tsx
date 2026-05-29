@@ -9,13 +9,9 @@ export type IndicatorProps = {
   style?: React.CSSProperties
 } & PropsWithChildren
 
-export function Indicator({
-  className,
-  tooltip,
-  backgroundColor,
-  children,
-  style,
-}: IndicatorProps) {
+export function Indicator(props: IndicatorProps) {
+  const { className, tooltip, backgroundColor, children, style } = props
+
   const badgeElement = (
     <Badge
       className={classNames('indicator', className)}

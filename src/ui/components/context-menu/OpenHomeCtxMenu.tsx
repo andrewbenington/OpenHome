@@ -87,11 +87,15 @@ function CtxMenuCheckboxItem(props: RadixCtxMenu.CheckboxItemProps) {
   return <RadixCtxMenu.CheckboxItem {...props} style={{ color: 'inherit', ...props.style }} />
 }
 
-function buildComponent(builder: CtxMenuElementBuilder, index: number): ReactNode {
-  return componentFromElement(builder.build(), index)
+function buildComponent(builder: CtxMenuElementBuilder): ReactNode[] {
+  return componentsFromElements(builder.build())
 }
 
-function componentFromElement(element: CtxMenuElement, index: number): ReactNode {
+function componentsFromElements(elements: CtxMenuElement | CtxMenuElement[]): ReactNode[] {
+  return (Array.isArray(elements) ? elements : [elements]).flatMap(componentsFromElement)
+}
+
+function componentsFromElement(element: CtxMenuElement, index: number): ReactNode {
   switch (element.__cm_type_tag) {
     case 'item':
       return (
@@ -115,7 +119,9 @@ function componentFromElement(element: CtxMenuElement, index: number): ReactNode
       return (
         <CtxMenuSubmenu key={index}>
           <CtxMenuSubmenuTrigger>{renderContent(element.content)}</CtxMenuSubmenuTrigger>
-          <CtxMenuSubmenuContent>{element.items.map(componentFromElement)}</CtxMenuSubmenuContent>
+          <CtxMenuSubmenuContent>
+            {element.items.flatMap(componentsFromElement)}
+          </CtxMenuSubmenuContent>
         </CtxMenuSubmenu>
       )
     case 'checkbox':

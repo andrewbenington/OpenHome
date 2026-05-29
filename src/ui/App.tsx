@@ -32,6 +32,8 @@ import ConvertStrategiesProvider from './state/convert-strategies/ConvertStrateg
 import PluginsProvider from './state/plugin/PluginProvider'
 
 const ZOOM_CHANGE_PCT = 5
+const ZOOM_MIN_PCT = 50
+const ZOOM_MAX_PCT = 160
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
@@ -141,12 +143,12 @@ function AppWithBackend() {
       zoom_in: () =>
         appInfoDispatch({
           type: 'set_zoom_level',
-          payload: appInfoState.settings.zoomLevel + ZOOM_CHANGE_PCT,
+          payload: Math.min(appInfoState.settings.zoomLevel + ZOOM_CHANGE_PCT, ZOOM_MAX_PCT),
         }),
       zoom_out: () =>
         appInfoDispatch({
           type: 'set_zoom_level',
-          payload: appInfoState.settings.zoomLevel - ZOOM_CHANGE_PCT,
+          payload: Math.max(appInfoState.settings.zoomLevel - ZOOM_CHANGE_PCT, ZOOM_MIN_PCT),
         }),
       reset_zoom: () => appInfoDispatch((() => ({ type: 'set_zoom_level', payload: 100 }))()),
     })

@@ -56,6 +56,18 @@
   width: 100%;
 }
 
+.sort-mon-cell .pokemon-icon-container {
+  width: 80%;
+  height: 80%;
+  margin: auto;
+}
+
+.sort-mon-cell .pokemon-icon-image,
+.sort-mon-cell .sort-mon-button {
+  width: 100%;
+  height: 100%;
+}
+
 .box-card-disabled {
   --card-background-color: #666;
 }

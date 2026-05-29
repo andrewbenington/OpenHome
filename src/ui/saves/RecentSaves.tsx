@@ -12,7 +12,6 @@ import { SaveRef } from '@openhome-core/util/types'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
-import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
@@ -20,6 +19,7 @@ import { useSaves } from '@openhome-ui/state/saves'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
 import SaveCard from './SaveCard'
 import { buildRecentSaveContextElements, formatTime, formatTimeSince, SaveViewMode } from './util'
 
@@ -122,7 +122,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         width: '10rem',
         renderValue: (value) => (
           <div className="flex-row-centered">
-            <OriginGameIndicator
+            <GameIndicator
               originGame={value.game ?? undefined}
               plugin={value.pluginIdentifier as PluginIdentifier}
               withName
@@ -131,7 +131,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           </div>
         ),
         sortFunction: numericSorter((val) => val.game ?? -1),
-        getFilterValue: (val) => OriginGames.gameName(val.game ?? -1),
+        getFilterValue: (val) => OriginGames.gameNameShort(val.game ?? -1),
         cellClass: 'centered-cell',
       },
       {

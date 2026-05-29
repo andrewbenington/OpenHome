@@ -18,7 +18,6 @@ import {
   OpenHomeCtxMenu,
   Separator,
 } from '@openhome-ui/components/context-menu'
-import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import {
@@ -33,6 +32,7 @@ import { useCallback, useRef, useState } from 'react'
 import { SelectColumn } from 'react-data-grid'
 import { useNavigate } from 'react-router'
 import GenderIcon from 'src/ui/components/pokemon/GenderIcon'
+import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
 import TypeIcon from 'src/ui/components/pokemon/TypeIcon'
 import { getPublicImageURL } from 'src/ui/images/images'
 import './style.css'
@@ -291,10 +291,10 @@ function useColumns(
     {
       key: 'last_save',
       name: 'Last Save',
-      width: '9rem',
+      width: '10rem',
       renderValue: (value) => (
         <div className="flex-row-centered">
-          <OriginGameIndicator
+          <GameIndicator
             originGame={value.mostRecentSaveWasm?.game}
             withName
             tooltip={value.mostRecentSaveWasm?.file_path}
@@ -303,7 +303,7 @@ function useColumns(
       ),
       getFilterValue: (mon) => {
         const game = mon.mostRecentSaveWasm?.game
-        return game ? OriginGames.gameName(game) : '(Unknown)'
+        return game ? OriginGames.gameNameFull(game) : '(Unknown)'
       },
       cellClass: 'centered-cell',
       sortFunction: gameSorter((mon) => mon.mostRecentSaveWasm?.game),
@@ -313,9 +313,9 @@ function useColumns(
       name: 'Original Game',
       width: '10rem',
       renderValue: (value) => (
-        <OriginGameIndicator originGame={value.gameOfOrigin} plugin={value.pluginOrigin} withName />
+        <GameIndicator originGame={value.gameOfOrigin} plugin={value.pluginOrigin} withName />
       ),
-      getFilterValue: (mon) => OriginGames.gameName(mon.gameOfOrigin),
+      getFilterValue: (mon) => OriginGames.gameNameFull(mon.gameOfOrigin),
       sortFunction: gameOrPluginSorter(
         (mon) => mon.gameOfOrigin,
         (mon) => mon.pluginOrigin

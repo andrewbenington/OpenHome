@@ -15,7 +15,7 @@ import { FileSchemas } from '@pokemon-files/schema'
 import { Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
-import { OriginGameIndicator } from '../components/pokemon/indicator/OriginGame'
+import { GameIndicator } from '../components/pokemon/indicator/GameIndicator'
 import PokemonIcon from '../components/PokemonIcon'
 import { useConvertStrategies } from '../state/convert-strategies'
 import './style.css'
@@ -275,7 +275,7 @@ const PokemonDetailsModal = (props: {
               {mon.nickname}
             </Flex>
             <Flex gap="1" align="center" minWidth="5rem">
-              <OriginGameIndicator
+              <GameIndicator
                 originGame={mon.gameOfOrigin}
                 plugin={mon.pluginOrigin}
                 style={{ minWidth: 15, height: 15 }}

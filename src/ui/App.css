@@ -33,6 +33,7 @@
   --font-size-text: 0.9rem;
 
   --box-slot-side: 2.5rem;
+  --box-slot-size: 4rem;
 }
 
 :root {
@@ -156,8 +157,8 @@
     --color-sidebar-hover: var(--primitive-sidebar-hover-dark);
     --color-sidebar-selected: var(--primitive-sidebar-selected-dark);
 
-    --autocomplete-scrollbar: #fff;
-    --autocomplete-background-color: #333;
+    --dark-scrollbar: #fff;
+    --dropdown-background-color: #333;
 
     --gradient-angle: 355deg;
 
@@ -196,8 +197,8 @@ img {
 
 @media (prefers-color-scheme: light) {
   body {
-    --autocomplete-scrollbar: rgb(80, 158, 146);
-    --autocomplete-background-color: #fff;
+    --dark-scrollbar: rgb(80, 158, 146);
+    --dropdown-background-color: #fff;
   }
 }
 
@@ -246,6 +247,7 @@ select {
   appearance: none;
   background: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path fill="white" d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>')
     100% 50% no-repeat transparent;
+  background-size: 1.75rem;
 }
 
 button,
@@ -380,7 +382,7 @@ label {
 
 .rt-BaseMenuItem {
   font-size: 0.8rem;
-  line-height: 1;
+  line-height: 0.8;
   border-radius: var(--border-radius-sm);
   display: flex;
   align-items: center;
@@ -389,7 +391,7 @@ label {
   user-select: none;
   outline: none;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0 var(--padding-radius-xs-sm);
 }
 
 .rt-BaseDialogOverlay {
@@ -486,6 +488,10 @@ svg {
   border-radius: var(--border-radius-sm);
   background-color: var(--color-panel);
   padding: var(--padding-radius-sm-lg);
+}
+
+.panel-lg-radius > ::-webkit-scrollbar-thumb {
+  background-color: var(--dark-scrollbar);
 }
 
 .card-lg-radius {

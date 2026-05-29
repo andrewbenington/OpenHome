@@ -66,7 +66,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           title: 'Import Failed',
           messages: unsupportedMons.map(
             (mon) =>
-              `${MetadataSummaryLookup(mon.dexNum, mon.formNum)?.formeName} cannot be moved into ${save.gameName}`
+              `${MetadataSummaryLookup(mon.dexNum, mon.formNum)?.formeName} cannot be moved into ${save.gameNameFull}`
           ),
         },
       })
@@ -200,7 +200,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
         </div>
         <Dialog.Root open={detailsModal} onOpenChange={setDetailsModal}>
           <Dialog.Content className="save-details-modal">
-            <AttributeRow label="Game">Pokémon {save.gameName}</AttributeRow>
+            <AttributeRow label="Game">Pokémon {save.gameNameFull}</AttributeRow>
             <AttributeRow label="Trainer Name">{save.name}</AttributeRow>
             <AttributeRow label="Trainer Display ID">{save.displayID}</AttributeRow>
             <AttributeRow label="Trainer Real ID">
@@ -305,7 +305,7 @@ function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
             >
               <MdClose />
             </Button>
-            {save.gameName}
+            {save.gameNameFull}
           </div>
           {save?.name}
         </div>

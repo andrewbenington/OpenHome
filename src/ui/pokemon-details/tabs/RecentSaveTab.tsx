@@ -26,7 +26,7 @@ export default function RecentSaveTab(props: { mon: OHPKM }) {
           <div style={{ flex: 1 }} />
           <img
             draggable={false}
-            alt={`${OriginGames.gameName(mon.mostRecentSaveWasm.game)} logo`}
+            alt={`${OriginGames.gameNameFull(mon.mostRecentSaveWasm.game)} logo`}
             src={OriginGames.logoPath(mon.mostRecentSaveWasm.game)}
             style={{ height: 32 }}
           />

@@ -1,10 +1,16 @@
 .pokemon-modal {
+  --content-height: 34rem;
+  --footer-height: 1.6rem;
+
   width: fit-content;
-  min-width: 60rem;
-  max-width: 80%;
-  overflow: hidden;
-  height: fit-content;
-  padding: 0 !important;
+  min-width: min(90vw, 60rem);
+  max-width: 90vw;
+
+  height: calc(var(--content-height) + var(--footer-height));
+  max-height: 90vh;
+
+  overflow: auto;
+  padding: 0;
   border-radius: var(--border-radius-lg);
 }
 
@@ -27,6 +33,7 @@
 }
 
 .modal-footer {
+  height: var(--footer-height);
   background-color: var(--color-bar);
   padding: 0.2rem 0.5rem;
   font-size: 0.75rem;
@@ -34,6 +41,7 @@
   flex-direction: row;
   align-items: center;
   gap: 0.75rem;
+  box-sizing: border-box;
   border-top: var(--soft-border);
 }
 
@@ -61,8 +69,9 @@
 
 .pokemon-modal-tabs {
   width: 100%;
-  min-height: 400px;
-  max-height: 85vh;
+  height: var(--content-height);
+  max-height: calc(90vh - var(--footer-height));
+
   & .side-tab-panel {
     height: initial;
   }

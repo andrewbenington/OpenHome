@@ -83,11 +83,11 @@ impl OriginGame {
         }
     }
 
-    pub const fn game_name(&self) -> &'static str {
+    pub const fn game_name_full(&self) -> &'static str {
         match *self {
             Self::Red => "Red",
             Self::BlueGreen => "Blue/Green",
-            Self::BlueJpn => "BlueJpn",
+            Self::BlueJpn => "Blue (Japan)",
             Self::Yellow => "Yellow",
             Self::Gold => "Gold",
             Self::Silver => "Silver",
@@ -141,6 +141,21 @@ impl OriginGame {
         }
     }
 
+    pub const fn game_name_short(&self) -> &'static str {
+        match *self {
+            Self::BlueJpn => "Blue (JPN)",
+            Self::BattleRevolution => "Battle Rev.",
+            Self::OmegaRuby => "Ω Ruby",
+            Self::AlphaSapphire => "α Sapphire",
+            Self::LetsGoPikachu => "L.G. Pikachu",
+            Self::LetsGoEevee => "L.G. Eevee",
+            Self::LegendsArceus => "Leg.: Arceus",
+            Self::BrilliantDiamond => "Brill. Diamond",
+            Self::ShiningPearl => "Shin. Pearl",
+            Self::LegendsZa => "Leg.: Z-A",
+            _ => self.game_name_full(),
+        }
+    }
     pub const fn generation(&self) -> Generation {
         match *self {
             Self::Red | Self::BlueGreen | Self::BlueJpn | Self::Yellow => Generation::G1,
@@ -172,6 +187,7 @@ impl OriginGame {
             | Self::ShiningPearl => Generation::G8,
             Self::Scarlet | Self::Violet | Self::LegendsZa => Generation::G9,
             Self::Go | Self::Home => Generation::None,
+
             _ => Generation::None,
         }
     }
@@ -433,7 +449,7 @@ impl Serialize for OriginGame {
     where
         S: serde::Serializer,
     {
-        self.game_name().serialize(serializer)
+        self.game_name_full().serialize(serializer)
     }
 }
 
@@ -511,9 +527,14 @@ pub struct OriginGames;
 #[allow(clippy::missing_const_for_fn)]
 #[cfg(feature = "wasm")]
 impl OriginGames {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gameName"))]
-    pub fn game_name(value: u8) -> String {
-        OriginGame::from(value).game_name().to_owned()
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gameNameFull"))]
+    pub fn game_name_full(value: u8) -> String {
+        OriginGame::from(value).game_name_full().to_owned()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "gameNameShort"))]
+    pub fn game_name_short(value: u8) -> String {
+        OriginGame::from(value).game_name_short().to_owned()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -660,7 +681,7 @@ impl OriginGameWithData {
     pub fn new(origin: OriginGame) -> Self {
         Self {
             origin,
-            name: origin.game_name().to_owned(),
+            name: origin.game_name_full().to_owned(),
             mark: origin.mark(),
             generation: origin.generation(),
         }
