@@ -273,7 +273,7 @@ impl Gen7AlolaSave {
 }
 
 #[cfg(feature = "wasm")]
-#[wasm_bindgen]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_class = Gen7AlolaSaveRust))]
 #[allow(clippy::missing_const_for_fn)]
 impl Gen7AlolaSave {
     #[wasm_bindgen(js_name = getMonAt)]

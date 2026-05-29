@@ -161,7 +161,7 @@ impl AbilityIndexWasm {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_class = AbilityIndex))]
 #[allow(clippy::missing_const_for_fn)]
 impl AbilityIndexWasm {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = fromIndex))]
