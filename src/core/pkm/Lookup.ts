@@ -76,14 +76,17 @@ export const getMonGen12Identifier = (mon: PKMInterface): Option<Gen12Identifier
 }
 
 export type Gen345Identifier = string
-export const getMonGen345Identifier = (mon: PKMInterface): Option<Gen345Identifier> => {
+export const getMonGen345Identifier = (
+  mon: PKMInterface,
+  keepOriginalPid: boolean = false
+): Option<Gen345Identifier> => {
   const baseMon = getBaseMon(mon.dexNum, mon.formNum)
 
   try {
     const ohpkm = OHPKM.fromMonUnknownSave(mon)
     let pk3CompatiblePID
 
-    if (mon instanceof OHPKM) {
+    if (mon instanceof OHPKM && !keepOriginalPid) {
       // Get the personality value that will be generated
       pk3CompatiblePID = mon.generatePk3CompatiblePid()
     } else if (mon.personalityValue !== undefined) {

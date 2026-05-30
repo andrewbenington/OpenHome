@@ -1,5 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
+import { OriginGames } from '@pkm-rs/pkg/pkm_rs'
+import dayjs from 'dayjs'
 import { createContext, useCallback, useContext } from 'react'
 import { OhpkmStoreData } from '.'
 import { MonFormat, PKMInterface } from '../../../core/pkm/interfaces'
@@ -13,7 +15,6 @@ import { SAV } from '../../../core/save/interfaces'
 import { SAVClass } from '../../../core/save/util'
 import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
-import dayjs from 'dayjs'
 
 export type OhpkmStore = {
   getById(id: string): OHPKM | undefined
@@ -108,7 +109,10 @@ export function useOhpkmStore(): OhpkmStore {
           gen12: { ...lookups.gen12, [gen12Identifier]: ohpkmIdentifier },
         })
       } else if (lookupType === 'gen345') {
-        const gen345Identifier = getMonGen345Identifier(ohpkm)
+        // If original generation, keep the original PID
+        const isOriginalGen =
+          OriginGames.generation(ohpkm.gameOfOrigin) === OriginGames.generation(save.origin)
+        const gen345Identifier = getMonGen345Identifier(ohpkm, isOriginalGen)
         if (!gen345Identifier) {
           throw Error(`could not build gen 3/4/5 identifier for mon ${ohpkmIdentifier}`)
         }
