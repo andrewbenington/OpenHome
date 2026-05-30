@@ -59,6 +59,24 @@ pub const fn unown_form_from_pid_gen3(pid: u32) -> u8 {
     (letter_value % 28) as u8
 }
 
+#[cfg(feature = "wasm")]
+pub mod personality_value {
+    // mirrors the strategy used by Poké Transporter to ensure non-shiny Pokémon do not become shiny in later generations
+    pub const fn poke_transporter_shiny_adjust(pid: u32, trainer_id: u16, secret_id: u16) -> u32 {
+        let xor_value = pkm_rs_types::shiny_xor_value(pid, trainer_id, secret_id);
+        if xor_value >= 8 && xor_value < 16 {
+            // if a mon would be shiny post-gen5 but not in gen3-5, flip the most significant bit
+            flip_most_significant_bit(pid)
+        } else {
+            pid
+        }
+    }
+
+    pub const fn flip_most_significant_bit(value: u32) -> u32 {
+        value ^ (1 << (u32::BITS - 1))
+    }
+}
+
 mod test {
     #[cfg(feature = "wasm")]
     #[test]

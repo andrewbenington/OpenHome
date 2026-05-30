@@ -4,11 +4,13 @@ import {
   AbilityIndex,
   Ball,
   ConvertStrategy,
+  Generation,
   Item,
   Language,
   Languages,
   MetadataSummaryLookup,
   NatureIndex,
+  OriginGames,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
@@ -166,8 +168,15 @@ export default class PK5 {
       const other = arg
       const metData = converter.metData(other)
 
-      this.personalityValue = this.personalityValue =
-        generatePersonalityValuePreservingAttributes(other)
+      // because this PID modification function assumes you want to preserve nature, which is not
+      // derived from PID in gen 5, this is a carveout to ensure that the original PID is preserved
+      // if the OHPKM is from gen 5 originally.
+      if (OriginGames.generation(other.gameOfOrigin) === Generation.G5) {
+        this.personalityValue = other.personalityValue
+      } else {
+        this.personalityValue = generatePersonalityValuePreservingAttributes(other)
+      }
+
       this.dexNum = other.dexNum
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID

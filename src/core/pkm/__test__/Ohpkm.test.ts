@@ -78,12 +78,24 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
       if (!expectedBytes.every((v, i) => v === actualBytes[i])) {
         // first compare JSON to give a more readable outputAZcdsvx bfdgn
         const other = PK3.fromBytes(actualBytes.buffer)
-        expect(original.toJson()).toEqual(roundTrip.toJson())
-        expect(roundTrip.toJson()).toEqual(other.toJson())
+        expect(original.toJson(), 'original -> roundTrip').toEqual(roundTrip.toJson())
+        expect(roundTrip.toJson(), 'roundTrip -> other').toEqual(other.toJson())
         throw new Error(diffSpans(expectedBytes, actualBytes))
       }
     })
   }
+
+  test(`pid bit flipped to avoid making shiny`, () => {
+    const bytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pk3', 'z006 - Salamence.pkm')))
+    const original = PK3.fromBytes(bytes.buffer)
+    const v2 = OHPKM.fromMonUnknownSave(original)
+    const roundTrip = PK3.fromOhpkm(v2, ConvertStrategies.getDefault())
+
+    expect(original.personalityValue, 'original PID').toEqual(3861304239)
+    expect(v2.personalityValue, 'ohpkm PID').toEqual(1713820591)
+    expect(v2.pidBitFlippedForShiny).toBe(true)
+    expect(roundTrip.personalityValue, 'roundTrip PID').toEqual(3861304239)
+  })
 })
 
 describe('evolution and form change update ohpkm', async () => {

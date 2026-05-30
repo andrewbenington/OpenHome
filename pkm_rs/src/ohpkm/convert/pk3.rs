@@ -1,22 +1,17 @@
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::ribbons::Gen3Ribbon;
 use pkm_rs_resources::{items::ItemGen3, lookup};
-use pkm_rs_types::{AbilityNumber, Stats16Le};
+use pkm_rs_types::{AbilityNumber, Generation, Stats16Le};
 
 use super::OhpkmConvert;
-use crate::convert_strategy::PidModificationStrategy;
-use crate::gen3::Gen3PokemonIndex;
+use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
+use crate::gen3::{Gen3PokemonIndex, PK3_MAX_ABILITY, Pk3};
+use crate::ohpkm::OhpkmV2;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::{Error, Result};
 use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
-use crate::{
-    convert_strategy::{ConvertStrategy, PkmConverter},
-    format::PkmFormat,
-    gen3::{PK3_MAX_ABILITY, Pk3},
-    ohpkm::OhpkmV2,
-    traits::HasSpeciesAndForm,
-};
-use crate::{gen3, ohpkm};
+use crate::{format::PkmFormat, traits::HasSpeciesAndForm};
+use crate::{gen3, ohpkm, util::personality_value};
 
 impl OhpkmConvert for Pk3 {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
@@ -33,8 +28,15 @@ impl OhpkmConvert for Pk3 {
             self.ability_num.into()
         };
 
+        let adjusted_pid = personality_value::poke_transporter_shiny_adjust(
+            self.personality_value,
+            self.trainer_id,
+            self.secret_id,
+        );
+
         ohpkm::v2_sections::MainDataV2 {
-            personality_value: self.personality_value,
+            personality_value: adjusted_pid,
+            pid_bit_flipped_for_shiny: self.personality_value != adjusted_pid,
             encryption_constant: self.personality_value, // Mirror Poké Transporter's behavior of using the personality value as the encryption constant
             species_and_form: self.species_and_form(),
             held_item_index: self
@@ -106,6 +108,14 @@ impl OhpkmConvert for Pk3 {
             nickname_gen3 = original_pk3.nickname;
         }
 
+        let personality_value = if ohpkm.game_of_origin().generation() != Generation::G3 {
+            PidModificationStrategy::default().get_modified_pid(ohpkm)
+        } else if ohpkm.pid_bit_flipped_for_shiny() {
+            personality_value::flip_most_significant_bit(ohpkm.personality_value())
+        } else {
+            ohpkm.personality_value()
+        };
+
         let mut mon = Self {
             sanity: 0,
             checksum: 0,
@@ -121,7 +131,7 @@ impl OhpkmConvert for Pk3 {
             is_bad_egg: false,
             ability_num: ohpkm.ability_num().into(),
             markings: ohpkm.markings().into(),
-            personality_value: PidModificationStrategy::default().get_modified_pid(ohpkm),
+            personality_value,
             is_fateful_encounter: ohpkm.is_fateful_encounter(),
             gender: ohpkm.gender(),
             evs: ohpkm.evs(),
@@ -186,5 +196,23 @@ impl OhpkmConvert for Pk3 {
                 )
             })
             .map(StoredPkmBytes::Pk3)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::{gen3::Pk3, tests, traits::IsShiny};
+    use std::path::PathBuf;
+
+    #[test]
+    fn xor_gt_8_lt_16_doesnt_make_shiny() -> tests::TestResult<()> {
+        let path = PathBuf::from("pk3").join("z006 - Salamence.pkm");
+        let pk3 = tests::pkm_from_file::<Pk3>(&path)?.0;
+
+        let ohpkm = pk3.to_ohpkm()?;
+
+        assert_eq!(pk3.is_shiny(), ohpkm.is_shiny());
+
+        Ok(())
     }
 }

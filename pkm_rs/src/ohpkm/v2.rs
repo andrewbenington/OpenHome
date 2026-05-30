@@ -1781,6 +1781,10 @@ impl OhpkmV2 {
         self.plugin_data.is_some()
     }
 
+    pub const fn pid_bit_flipped_for_shiny(&self) -> bool {
+        self.main_data.pid_bit_flipped_for_shiny
+    }
+
     pub fn ability_was_changed(&self) -> bool {
         !self.originates_from_plugin() && self.main_data.ability_was_changed()
     }
@@ -2569,6 +2573,13 @@ impl OhpkmV2 {
             met_time_of_day,
             evs_g12,
         })
+    }
+
+    // Gen 3/4/5
+
+    #[wasm_bindgen(getter = pidBitFlippedForShiny)]
+    pub fn pid_bit_flipped_for_shiny_js(&self) -> bool {
+        self.main_data.pid_bit_flipped_for_shiny
     }
 
     // Gen 4/5

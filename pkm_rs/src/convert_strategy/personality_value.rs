@@ -48,10 +48,11 @@ impl ShinyStrategy {
         }
     }
 
-    const fn is_satisfied(&self, pid: u32, mon: &OhpkmV2) -> bool {
+    fn is_satisfied(&self, pid: u32, mon: &OhpkmV2) -> bool {
         let xor_value = pkm_rs_types::shiny_xor_value(pid, mon.trainer_id(), mon.secret_id());
+        let pid_is_shiny = xor_value < self.xor_threshold();
 
-        xor_value < self.xor_threshold()
+        pid_is_shiny == mon.is_shiny()
     }
 }
 
@@ -79,6 +80,7 @@ impl PidModificationStrategy {
         if let Some(shiny_strategy) = self.shiny
             && !shiny_strategy.is_satisfied(pid, mon)
         {
+            println!("shiny not satisfied");
             inconsistencies.push(DerivedField::Shiny);
         }
 
@@ -88,6 +90,8 @@ impl PidModificationStrategy {
         {
             inconsistencies.push(DerivedField::UnownLetter);
         }
+
+        println!("find_inconsistencies: {inconsistencies:?}");
 
         inconsistencies
     }
@@ -99,10 +103,13 @@ impl PidModificationStrategy {
         let mut new_pid = mon.personality_value();
 
         for i in 0..u16::MAX {
+            println!("pokemon: {}", mon.nickname());
+            println!("\tis_shiny: {}", mon.is_shiny());
             let inconsistencies = self.find_inconsistencies(new_pid, mon);
             if inconsistencies.is_empty() {
                 return new_pid;
             }
+            println!("inconsistencies: {inconsistencies:?}");
 
             let (mut pid_upper, mut pid_lower) = pkm_rs_types::pid_upper_lower(new_pid);
             pid_lower ^= i;
@@ -121,13 +128,14 @@ impl PidModificationStrategy {
 impl Default for PidModificationStrategy {
     fn default() -> Self {
         Self {
-            nature: Default::default(),
+            nature: Some(NatureStrategy::default()),
             keep_gender: true,
-            shiny: Default::default(),
+            shiny: Some(ShinyStrategy::default()),
             keep_unown_letter: true,
         }
     }
 }
+
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = generatePk3CompatiblePid)]
 pub fn generate_pk3_compatible_pid(mon: &OhpkmV2) -> u32 {
@@ -181,6 +189,7 @@ mod test {
 
         let strategy = PidModificationStrategy {
             shiny: Some(ShinyStrategy::KeepShiny4096),
+            nature: None, // Gen 5 doesn't use the PID for nature generation, so this won't match
             ..Default::default()
         };
 
@@ -246,6 +255,30 @@ mod test {
         let new_pid = strategy.get_modified_pid(&mon);
 
         assert!(pkm_rs_types::shiny_xor_value(new_pid, mon.trainer_id(), mon.secret_id()) < 8);
+        assert_eq!(NatureIndex::new_from_pid(new_pid), mon.nature());
+        assert_eq!(
+            mon.get_forme_metadata().gender_from_pid(new_pid),
+            mon.gender()
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn nature_preserved() -> tests::TestResult<()> {
+        let path = PathBuf::from("ohpkm").join("ditto-bold.ohpkm");
+        let mon = tests::pkm_from_file::<OhpkmV2>(&path)?.0;
+
+        let strategy = PidModificationStrategy {
+            shiny: Some(ShinyStrategy::KeepShiny8192),
+            nature: Some(NatureStrategy::KeepMintNature),
+            keep_gender: true,
+            ..Default::default()
+        };
+
+        let new_pid = strategy.get_modified_pid(&mon);
+
+        assert!(pkm_rs_types::shiny_xor_value(new_pid, mon.trainer_id(), mon.secret_id()) >= 8);
         assert_eq!(NatureIndex::new_from_pid(new_pid), mon.nature());
         assert_eq!(
             mon.get_forme_metadata().gender_from_pid(new_pid),

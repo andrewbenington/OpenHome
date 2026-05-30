@@ -17,7 +17,7 @@ use crate::traits::{AsBytesMut, ModernEvs};
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
 use crate::util::unown_form_from_pid_gen3;
 
-use pkm_rs_derive::IsShiny4096;
+use pkm_rs_derive::IsShiny8192;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::items::{Item, ItemGen3};
 use pkm_rs_resources::metadata_source::MetadataSource;
@@ -42,7 +42,7 @@ use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
+#[derive(Debug, Default, Serialize, Clone, Copy, IsShiny8192)]
 #[serde(remote = "Self")]
 pub struct Pk3 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -651,7 +651,7 @@ mod test {
 
     #[test]
     fn is_shiny() -> TestResult<()> {
-        let path = PathBuf::from("pk3").join("unown-e.pk3");
+        let path = PathBuf::from("pk3").join("unown-e.pkm");
         let mon = tests::pkm_from_file::<Pk3>(&path)?.0;
         assert!(mon.is_shiny());
 
@@ -767,6 +767,20 @@ mod test {
         let mon = tests::pkm_from_file::<Pk3>(&path)?.0;
 
         assert_eq!(mon.gender, Gender::Genderless);
+
+        Ok(())
+    }
+
+    #[test]
+    fn nature_preserved() -> TestResult<()> {
+        let path = PathBuf::from("ohpkm").join("ditto-bold.ohpkm");
+        let mon = tests::pkm_from_file::<OhpkmV2>(&path)?.0;
+
+        assert_eq!(mon.gender(), Gender::Genderless);
+
+        let pk3 = Pk3::from_ohpkm(&mon, ConvertStrategy::default());
+
+        assert_eq!(mon.nature(), pk3.nature());
 
         Ok(())
     }

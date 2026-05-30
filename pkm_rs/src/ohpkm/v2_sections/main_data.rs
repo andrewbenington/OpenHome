@@ -118,6 +118,7 @@ pub struct MainDataV2 {
     pub display_color_rgb: Option<[u8; 3]>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub started_tracking_seconds: Option<NonZeroU64>,
+    pub pid_bit_flipped_for_shiny: bool,
 }
 
 const NIDORAN_F: NatDexIndex = unsafe { NatDexIndex::new_unchecked(29) };
@@ -209,6 +210,7 @@ impl MainDataV2 {
             home_tracker: old.home_tracker,
             display_color_rgb: None,
             started_tracking_seconds: old.file_timestamp_seconds,
+            pid_bit_flipped_for_shiny: false,
         }
     }
 
@@ -449,6 +451,7 @@ impl DataSection for MainDataV2 {
             is_shadow: util::get_flag(bytes, 22, 4),
             is_fateful_encounter: util::get_flag(bytes, 22, 5),
             trainer_gender: BinaryGender::from(util::get_flag(bytes, 22, 6)),
+            pid_bit_flipped_for_shiny: util::get_flag(bytes, 22, 7),
 
             game_of_origin: OriginGame::from(bytes[24]),
             game_of_origin_battle: match bytes[25] {
@@ -573,6 +576,7 @@ impl DataSection for MainDataV2 {
         util::set_flag(&mut bytes, 22, 4, self.is_shadow);
         util::set_flag(&mut bytes, 22, 5, self.is_fateful_encounter);
         util::set_flag(&mut bytes, 22, 6, bool::from(self.trainer_gender));
+        util::set_flag(&mut bytes, 22, 7, self.pid_bit_flipped_for_shiny);
 
         bytes[24] = self.game_of_origin as u8;
         bytes[25] = self.game_of_origin_battle.map_or(0, |g| g as u8);
@@ -783,6 +787,7 @@ impl Randomize for MainDataV2 {
                 false => None,
                 true => NonZeroU64::new(rng.random_range(1..=current_time_unix_seconds().get())),
             },
+            pid_bit_flipped_for_shiny: false,
         }
     }
 }
