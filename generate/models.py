@@ -218,8 +218,16 @@ class PokemonForm(BaseModel):
             return ""
         if forme_name in ["-Meadow", "-Four"]:
             forme_name = ""
+        elif "Pikachu-" in self.name:
+            forme_name = forme_name[1:2]
         elif forme_name == "-Mega":
             forme_name = "M"
+        elif forme_name == "-Galar":
+            forme_name = "G"
+        elif forme_name == "-Alola":
+            forme_name = "A"
+        elif self.national_dex == 676:
+            forme_name = forme_name[1:3]
         elif forme_name == "-La Reine":
             forme_name = "-La_Reine"
         elif "_Cream" in forme_name or "Caramel_Swirl" in forme_name or "Rainbow_Swirl" in forme_name:
@@ -227,7 +235,7 @@ class PokemonForm(BaseModel):
         elif self.name == "Tauros-Paldea":
             forme_name = "-Paldea_Combat"
         elif forme_name == "-Galar_Zen":
-            forme_name = "-Zen_Galar"
+            forme_name = "GZ"
         elif forme_name == "-Original":
             forme_name = "-Original_Color"
         
