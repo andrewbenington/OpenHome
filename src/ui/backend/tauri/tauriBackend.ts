@@ -223,7 +223,8 @@ export const TauriBackend: BackendInterface = {
     return R.Ok(path ?? undefined)
   },
   getResourcesPath: path.resourceDir,
-  getPluginPath: async (pluginId: string) => `${await path.appDataDir()}/plugins/${pluginId}`,
+  getPluginPath: async (pluginId: string) =>
+    Commands.get_data_dir_path().then(R.map((dataDirPath) => `${dataDirPath}/plugins/${pluginId}`)),
   openDirectory: Commands.open_directory,
   openFileLocation: Commands.open_file_location,
   getPlatform: platform,

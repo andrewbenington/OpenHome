@@ -7,6 +7,7 @@
 }
 
 .mon-image-container {
+  position: relative; /* necessary for image load error indicator */
   height: 15rem;
   display: flex;
   justify-content: center;

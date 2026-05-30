@@ -49,10 +49,14 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
       const spritePath = plugin.getMonSpritePath?.(mon)
 
       if (spritePath) {
-        backend.getPluginPath(plugin.id).then((pluginPath) => {
-          const absolutePath = `${pluginPath}/${spritePath}`
-
-          backend.getImageData(absolutePath).then(
+        backend
+          .getPluginPath(plugin.id)
+          .then(
+            R.asyncFlatMap((pluginPath: string) =>
+              backend.getImageData(`${pluginPath}/${spritePath}`)
+            )
+          )
+          .then(
             R.match(
               (imageData) =>
                 setSpriteResult({
@@ -74,7 +78,6 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
               }
             )
           )
-        })
         return
       }
     }

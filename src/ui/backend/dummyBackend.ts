@@ -71,7 +71,7 @@ const DummyBackend: BackendInterface = {
   /* plugins */
   getImageData: async () => R.Err('no backend in use'),
   listInstalledPlugins: async () => R.Err('no backend in use'),
-  getPluginPath: async () => '',
+  getPluginPath: async () => R.Err('no backend in use'),
   downloadPlugin: async () => R.Err('no backend in use'),
   loadPluginCode: async () => R.Err('no backend in use'),
   deletePlugin: async () => R.Err('no backend in use'),
