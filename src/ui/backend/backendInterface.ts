@@ -105,7 +105,7 @@ export default interface BackendInterface {
   /* plugins */
   getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>
   listInstalledPlugins: () => Promise<Errorable<PluginMetadataWithIcon[]>>
-  getPluginPath: (pluginId: string) => Promise<string>
+  getPluginPath: (pluginId: string) => Promise<Errorable<string>>
   downloadPlugin(remoteUrl: string): Promise<Errorable<string>>
   loadPluginCode(pluginId: string): Promise<Errorable<string>>
   deletePlugin(pluginId: string): Promise<Errorable<string>>

@@ -90,7 +90,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
               <Badge
                 variant="solid"
                 color="tomato"
-                style={{ position: 'absolute', bottom: '10%', right: '10%' }}
+                style={{ position: 'absolute', top: '0.5rem', left: '0.5rem' }}
               >
                 <ErrorIcon fontSize={20} />
               </Badge>
