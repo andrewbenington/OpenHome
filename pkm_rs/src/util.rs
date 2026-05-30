@@ -59,6 +59,7 @@ pub const fn unown_form_from_pid_gen3(pid: u32) -> u8 {
     (letter_value % 28) as u8
 }
 
+#[cfg(feature = "wasm")]
 pub mod personality_value {
     // mirrors the strategy used by Poké Transporter to ensure non-shiny Pokémon do not become shiny in later generations
     pub const fn poke_transporter_shiny_adjust(pid: u32, trainer_id: u16, secret_id: u16) -> u32 {
