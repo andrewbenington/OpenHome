@@ -152,6 +152,8 @@ pub enum SignificantUpdate {
     V1_10_5,
     V1_11_0,
     V1_11_1,
+    V1_11_2,
+    V1_11_3,
 }
 
 impl SignificantUpdate {
@@ -174,6 +176,8 @@ impl SignificantUpdate {
             Self::V1_10_5 => Version::parse("1.10.5").unwrap(),
             Self::V1_11_0 => Version::parse("1.11.0").unwrap(),
             Self::V1_11_1 => Version::parse("1.11.1").unwrap(),
+            Self::V1_11_2 => Version::parse("1.11.2").unwrap(),
+            Self::V1_11_3 => Version::parse("1.11.3").unwrap(),
         }
     }
 
@@ -249,6 +253,13 @@ impl SignificantUpdate {
                 "Generation 3 Pokémon and save files in the Japanese language now use the correct character encoding.",
                 "Fixed bug in level calculation for PK7.",
                 "Fixed visual bug in boxes on Linux.",
+            ]),
+            Self::V1_11_2 => Some(vec![
+                "The UI can now be zoomed via the View menu (or keyboard shortcuts).",
+            ]),
+            Self::V1_11_3 => Some(vec![
+                "Various bugs relating to PID conversion have been fixed.",
+                "Image plugins no longer break after changing the data directory.",
             ]),
             _ => None,
         }
