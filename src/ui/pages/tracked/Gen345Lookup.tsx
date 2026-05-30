@@ -1,13 +1,18 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
-import { gameOrPluginSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
+import {
+  gameOrPluginSorter,
+  multiSorter,
+  numericSorter,
+  SortableColumn,
+  stringSorter,
+} from '@openhome-core/util/sort'
 import Badge from '@openhome-ui/components/badge/Badge'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import { useLookups } from '@openhome-ui/state/lookups/useLookups'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { OriginGames } from '@pkm-rs/pkg'
-
+import { Language, Lookup, OriginGames } from '@pkm-rs/pkg'
 type G345LookupRow = {
   gen345ID: string
   homeID: string
@@ -41,6 +46,14 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
           </button>
         ),
       cellClass: 'centered-cell',
+      sortFunction: multiSorter(
+        numericSorter((value) => value.homeMon?.nationalDex),
+        numericSorter((value) => value.homeMon?.formIndex)
+      ),
+      getFilterValue: (value) =>
+        value.homeMon?.nationalDex
+          ? Lookup.speciesName(value.homeMon?.nationalDex, Language.English)
+          : undefined,
     },
     {
       key: 'game',

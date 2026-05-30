@@ -218,11 +218,6 @@ img {
   }
 }
 
-div {
-  user-select: none;
-  -webkit-user-select: none !important;
-}
-
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
@@ -231,8 +226,6 @@ html,
 body,
 #root {
   height: 100%;
-  user-select: none;
-  -webkit-user-select: none !important;
   -webkit-user-drag: none !important;
   overflow: hidden;
 }
