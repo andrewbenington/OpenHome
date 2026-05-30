@@ -1,10 +1,11 @@
 
-from enum import Enum
 import re
+from enum import Enum
 from typing import Optional
 
+import requests
+from bs4 import BeautifulSoup
 from pydantic import BaseModel, Field
-
 
 
 class PokemonType(str, Enum):
@@ -208,6 +209,60 @@ class PokemonForm(BaseModel):
         female_tag = '-female' if is_female and form_name in female_stats else ('-f' if is_female else '')
         return f"https://img.pokemondb.net/sprites/{game}/{shininess}/{form_name}{female_tag}{extension}"
     
+    def bulbagarden_sprite_url(self, is_shiny: bool, game: str, is_female=False) -> str | None:
+        # if self.introduced_gen != 9 or not self.is_mega:
+        #     return None
+        segments = self.name.split("-")
+        forme_name = "-" + "_".join(segments[1:]).replace("%", "_Percent").replace("keball", "ké_Ball").replace("Paldea_Fire", "Paldea_Blaze").replace("Paldea_Water", "Paldea_Aqua").replace("_Striped", "").replace(" ", "_")
+        if "Totem" in forme_name:
+            return ""
+        if forme_name in ["-Meadow", "-Four"]:
+            forme_name = ""
+        elif forme_name == "-Mega":
+            forme_name = "M"
+        elif forme_name == "-La Reine":
+            forme_name = "-La_Reine"
+        elif "_Cream" in forme_name or "Caramel_Swirl" in forme_name or "Rainbow_Swirl" in forme_name:
+            forme_name = forme_name[:-6]
+        elif self.name == "Tauros-Paldea":
+            forme_name = "-Paldea_Combat"
+        elif forme_name == "-Galar_Zen":
+            forme_name = "-Zen_Galar"
+        elif forme_name == "-Original":
+            forme_name = "-Original_Color"
+        
+        shiny_suffix = "_s" if is_shiny else ""
+
+        bulbaFilePage = f'https://archives.bulbagarden.net/wiki/File:HOME{str(self.national_dex).zfill(4)}{"" if self.form_index == 0 and self.national_dex != 666 else forme_name}{shiny_suffix}.png'
+
+        print(is_shiny, bulbaFilePage, forme_name)
+
+
+        return self.bulbagarden_image_url_from_page(bulbaFilePage)
+        
+    
+    @staticmethod
+    def bulbagarden_image_url_from_page(url: str):
+        # Send an HTTP request to the URL and get the page content
+        response = requests.get(url)
+        page_content = response.text
+
+        # Create a BeautifulSoup object to parse the page content
+        soup = BeautifulSoup(page_content, "html.parser")
+
+        # Find the first image whose alt attribute starts with "File:"
+        target_img = None
+
+        for img in soup.find_all('img'):
+            alt_text = img.get('alt')
+            if alt_text and str(alt_text).startswith('File:'):
+                target_img = img
+                break
+
+        # If a matching image is found, download it
+        if target_img:
+            return str(target_img.get('src'))
+
     def gen3_form(self) -> str | None:
         if self.form_index > 0 or self.national_dex == 201:
             return self.name.split('-')[1]
@@ -302,7 +357,7 @@ class PokemonForm(BaseModel):
         if self.name == "Floette-Eternal":
             return False
         
-        return self.regional == "Paldea"
+        return True
 
     def separate_female_sprite(self):
         return self.national_dex in GENDER_DIFFERENCES

@@ -1,42 +1,49 @@
 import os
 import sqlite3
+import subprocess
 import threading
 import urllib.request
+from pathlib import Path
+
 import database
 from models import PokemonForm, SpeciesWithForms
 
-if not os.path.isdir('public'):
-    print("current directory must be project source. exiting")
-    exit(1)
+# if not os.path.isdir('public'):
+#     print("current directory must be project source. exiting")
+#     exit(1)
 
 POKEMON_DATA: list[SpeciesWithForms] = []
 
-with sqlite3.connect("generate/pkm.db") as conn:
+threadEvent = threading.Event()
+
+with sqlite3.connect("pkm.db") as conn:
     POKEMON_DATA = database.get_species(conn)
 
 def download_all_sprites_all_mons():
-    os.makedirs("public/sprites/home/shiny", exist_ok=True)
-    os.makedirs("public/sprites/gen1", exist_ok=True)
-    os.makedirs("public/sprites/gen2/shiny", exist_ok=True)
-    os.makedirs("public/sprites/gen3/shiny", exist_ok=True)
-    os.makedirs("public/sprites/gen3gc/shiny", exist_ok=True)
-    os.makedirs("public/sprites/gen4/shiny", exist_ok=True)
-    # os.makedirs("public/sprites/gen5/shiny", exist_ok=True)
-    # os.makedirs("public/sprites/gen6/shiny", exist_ok=True)
-    # os.makedirs("public/sprites/gen7/shiny", exist_ok=True)
-    # os.makedirs("public/sprites/gen8/shiny", exist_ok=True)
-    # os.makedirs("public/sprites/gen8a/shiny", exist_ok=True)
-    os.makedirs("public/sprites/gen9/shiny", exist_ok=True)
-    os.makedirs("public/sprites/gen9za/shiny", exist_ok=True)
+    os.makedirs("../public/sprites/home/shiny", exist_ok=True)
+    os.makedirs("../public/sprites/gen1", exist_ok=True)
+    os.makedirs("../public/sprites/gen2/shiny", exist_ok=True)
+    os.makedirs("../public/sprites/gen3/shiny", exist_ok=True)
+    os.makedirs("../public/sprites/gen3gc/shiny", exist_ok=True)
+    os.makedirs("../public/sprites/gen4/shiny", exist_ok=True)
+    # os.makedirs("../public/sprites/gen5/shiny", exist_ok=True)
+    # os.makedirs("../public/sprites/gen6/shiny", exist_ok=True)
+    # os.makedirs("../public/sprites/gen7/shiny", exist_ok=True)
+    # os.makedirs("../public/sprites/gen8/shiny", exist_ok=True)
+    # os.makedirs("../public/sprites/gen8a/shiny", exist_ok=True)
+    os.makedirs("../public/sprites/gen9/shiny", exist_ok=True)
+    os.makedirs("../public/sprites/gen9za/shiny", exist_ok=True)
     for mon in POKEMON_DATA:
         for form in mon.forms:
             if form.form_index >= len(mon.forms):
                 print(f"{form.name} INVALID INDEX: {len(mon.forms)} ({len(mon.forms)} present)")
             thread_all_sprite_downloads(form)
 
-def download_png(url, directory, filename):
-    # Check if the file already exists in the directory
-    if os.path.isfile(os.path.join(directory, filename)):
+def download_png(url: str | None, directory, filename: str):
+    if url is None:
+        return False, False
+
+    if os.path.isfile(os.path.join(directory, filename)) or os.path.isfile(os.path.join(directory, filename.replace("png", "webp"))):
         # print(f"{filename} already exists in {directory}")
         return False, False
 
@@ -45,7 +52,9 @@ def download_png(url, directory, filename):
         opener = urllib.request.build_opener()
         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
         urllib.request.install_opener(opener)
-        urllib.request.urlretrieve(url, os.path.join(directory, filename))
+        png_path = os.path.join(directory, filename)
+        urllib.request.urlretrieve(url, png_path)
+        convert_to_webp(png_path)
         print(f"\tDownloaded {filename} to {directory}")
         return True, False
     except Exception as e:
@@ -53,7 +62,24 @@ def download_png(url, directory, filename):
         return True, "404" not in str(e)
     # print(f"{filename} from {url}")
     # return False, False
+    
+def convert_to_webp(input_path: str, output_path: str | None = None) -> str:
+    input = Path(input_path)
+    output = Path(output_path) if output_path else input.with_suffix('.webp')
 
+    subprocess.run([
+        'magick', str(input),
+        '-background', 'none',
+        '-resize', '384x384',
+        '-gravity', 'center',
+        '-extent', '384x384',
+        '-quality', '80',
+        str(output)
+    ], check=True)
+
+    input.unlink()
+
+    return str(output)
 
 gender_differences = [
     3, 12, 19, 20, 25, 26, 41, 42, 44, 45, 64, 65, 84, 85, 97, 111, 112, 118,
@@ -117,17 +143,17 @@ def thread_all_sprite_downloads(form: PokemonForm):
 
 
 def download_all_sprites(form: PokemonForm):
-    if "Totem" in form.name:
-        return
-    if form.national_dex <= 151 and form.form_index == 0:
-        download_sprite_variants_pokemon_db(form, "red-blue", "gen1", False)
-    if form.national_dex <= 251 and form.form_index == 0 or form.national_dex == 201 and form.form_index <= 25:
-        download_sprite_variants_pokemon_db(form, "crystal", "gen2", False)
-    if form.national_dex <= 386 and form.form_index == 0 or form.national_dex == 201 or form.national_dex == 386:
-        download_sprite_variants_pokemon_db(form, "emerald", "gen3", False)
-        # download_sprite_variants_pokencyclopedia_coloxd(form)
-    if form.national_dex <= 493 and form.has_gen4_sprite():
-        download_sprite_variants_pokemon_db(form, "heartgold-soulsilver", "gen4", form.national_dex != 133 and form.national_dex != 419)
+    # if "Totem" in form.name:
+    #     return
+    # if form.national_dex <= 151 and form.form_index == 0:
+    #     download_sprite_variants_pokemon_db(form, "red-blue", "gen1", False)
+    # if form.national_dex <= 251 and form.form_index == 0 or form.national_dex == 201 and form.form_index <= 25:
+    #     download_sprite_variants_pokemon_db(form, "crystal", "gen2", False)
+    # if form.national_dex <= 386 and form.form_index == 0 or form.national_dex == 201 or form.national_dex == 386:
+    #     download_sprite_variants_pokemon_db(form, "emerald", "gen3", False)
+    #     # download_sprite_variants_pokencyclopedia_coloxd(form)
+    # if form.national_dex <= 493 and form.has_gen4_sprite():
+    #     download_sprite_variants_pokemon_db(form, "heartgold-soulsilver", "gen4", form.national_dex != 133 and form.national_dex != 419)
     # if form.national_dex <= 649 and not excludeFormGen5(form):
     #     download_sprite_variants_pokemon_db(form, "black-white/anim", "gen5", form.national_dex != 133)
     # if form.national_dex <= 721 and not excludeFormGen456(form: PokemonForm):
@@ -138,12 +164,12 @@ def download_all_sprites(form: PokemonForm):
     #     download_sprite_variants_pokemon_db(
     #         form.national_dex, form.form_index, form_name, "ultra-sun-ultra-moon", "gen7", form.national_dex != 133)
     if form.national_dex <= 1025 and form.has_home_sprite():
-        download_sprite_variants_pokemon_db(form, "home", "home")
+        download_sprite_variants_bulbagarden(form, "home", "home")
     # if dex_number <= 724 and not excludeFormLA(form: PokemonForm):
     #     download_sprite_variants_pokemon_db(
     #         dex_number, form.form_index, form_name, "legends-arceus", "gen8a")
-    if form.national_dex <= 1025 and form.has_scarlet_violet_sprite():
-        download_sprite_variants_pokemon_db(form,  "scarlet-violet", "gen9")
+    # if form.national_dex <= 1025 and form.has_scarlet_violet_sprite():
+    #     download_sprite_variants_pokemon_db(form,  "scarlet-violet", "gen9")
 
 def download_sprite_variants_pokemon_db(form: PokemonForm, game, folder, includeFemale=True):
     if "-totem" in form.name:
@@ -152,18 +178,48 @@ def download_sprite_variants_pokemon_db(form: PokemonForm, game, folder, include
     extension = ".gif" if "anim" in game else ".png"
 
     for sprite_name in [form.sprite_name]:
-        download_png(form.pokemon_db_sprite_url(False, game, False), "public/sprites/" + folder, sprite_name + extension)
+        download_png(form.pokemon_db_sprite_url(False, game, False), "../public/sprites/" + folder, sprite_name + extension)
         
         if game == "red-blue" or game == 'scarlet-violet':
             continue
 
-        download_png(form.pokemon_db_sprite_url(True, game, False), "public/sprites/" + folder + "/shiny", sprite_name + extension)
+        download_png(form.pokemon_db_sprite_url(True, game, False), "../public/sprites/" + folder + "/shiny", sprite_name + extension)
         if includeFemale and form.national_dex in gender_differences and form.form_index == 0 and form.national_dex != 255 and form.national_dex != 418:
-            download_png(form.pokemon_db_sprite_url(False, game, is_female=True), "public/sprites/" + folder, sprite_name + "-f" + extension)
-            download_png(form.pokemon_db_sprite_url(True, game, is_female=True), "public/sprites/" + folder + "/shiny", sprite_name + "-f" + extension)
+            download_png(form.pokemon_db_sprite_url(False, game, is_female=True), "../public/sprites/" + folder, sprite_name + "-f" + extension)
+            download_png(form.pokemon_db_sprite_url(True, game, is_female=True), "../public/sprites/" + folder + "/shiny", sprite_name + "-f" + extension)
+
+def download_sprite_variants_bulbagarden(form: PokemonForm, game, folder, includeFemale=True):
+    if "-totem" in form.name:
+        return
+    
+    extension = ".gif" if "anim" in game else ".png"
+
+    for sprite_name in [form.sprite_name]:
+        filename = sprite_name + extension
+        filename = filename.replace("png", "webp")
+
+        if not os.path.isfile(os.path.join("../public/sprites/" + folder, filename)):
+            download_png(form.bulbagarden_sprite_url(False, game, False), "../public/sprites/" + folder, sprite_name + extension)
+        
+        if game == "red-blue" or game == 'scarlet-violet':
+            continue
+
+        if not os.path.isfile(os.path.join("../public/sprites/" + folder + "/shiny", filename)):
+            download_png(form.bulbagarden_sprite_url(True, game, False), "../public/sprites/" + folder + "/shiny", sprite_name + extension)
+
+        if includeFemale and form.national_dex in gender_differences and form.form_index == 0 and form.national_dex != 255 and form.national_dex != 418:
+            filename = sprite_name + "-f" + extension
+            filename = filename.replace("png", "webp")
+            if not os.path.isfile(os.path.join("../public/sprites/" + folder, filename)):
+                download_png(form.bulbagarden_sprite_url(False, game, is_female=True), "../public/sprites/" + folder, sprite_name + "-f" + extension)
+
+            if not os.path.isfile(os.path.join("../public/sprites/" + folder + "/shiny", filename)):
+                download_png(form.bulbagarden_sprite_url(True, game, is_female=True), "../public/sprites/" + folder + "/shiny", sprite_name + "-f" + extension)
 
 # def download_sprite_variants_pokencyclopedia_coloxd(form: PokemonForm):
-#     download_png(form.colo_xd_sprite_url(False), "public/sprites/gen3gc", form.name + ".gif")
-#     download_png(form.colo_xd_sprite_url(True), "public/sprites/gen3gc/shiny", form.name + ".gif")
+#     download_png(form.colo_xd_sprite_url(False), "../public/sprites/gen3gc", form.name + ".gif")
+#     download_png(form.colo_xd_sprite_url(True), "../public/sprites/gen3gc/shiny", form.name + ".gif")
+
+
 
 download_all_sprites_all_mons()
