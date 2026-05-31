@@ -2833,12 +2833,12 @@ impl OhpkmV2 {
         }
     }
 
-    #[wasm_bindgen(getter = geolocationsWasm)]
+    #[wasm_bindgen(getter = geolocations)]
     pub fn geolocations_js(&self) -> Option<Geolocations> {
         Some(self.gen67_data?.geolocations)
     }
 
-    #[wasm_bindgen(setter = geolocationsWasm)]
+    #[wasm_bindgen(setter = geolocations)]
     pub fn set_geolocations_js(&mut self, value: Option<Geolocations>) {
         match value {
             Some(geolocations) => {

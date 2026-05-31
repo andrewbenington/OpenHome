@@ -22,6 +22,7 @@ import {
   TrainerMemory,
   updatePidIfWouldBecomeShinyGen345,
 } from '@pkm-rs/pkg'
+import { PK3, PK7 } from '@pokemon-files/pkm'
 import {
   AllPKMFields,
   FourMoves,
@@ -44,8 +45,6 @@ import {
   contestStatsToWasm,
   convertPokeDate,
   convertPokeDateOptional,
-  geolocationsFromWasm,
-  geolocationsToWasm,
   markingsSixShapesColorsFromWasm,
   markingsSixShapesColorsToWasm,
   trainerMemoryToWasm,
@@ -58,7 +57,6 @@ import {
   getPrevos,
   ivsFromDVs,
 } from './util'
-import { PK3, PK7 } from '@pokemon-files/pkm'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getFormat() {
@@ -463,13 +461,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
   set handlerMemory(value: jsTypes.Memory) {
     this.handlerMemoryWasm = trainerMemoryToWasm(value)
-  }
-
-  get geolocations() {
-    return geolocationsFromWasm(this.geolocationsWasm)
-  }
-  set geolocations(value: jsTypes.Geolocation[] | undefined) {
-    this.geolocationsWasm = geolocationsToWasm(value)
   }
 
   get eggDate() {

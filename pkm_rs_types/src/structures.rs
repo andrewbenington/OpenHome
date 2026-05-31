@@ -1,9 +1,7 @@
 use arbitrary_int::u3;
-use serde::{Serialize, Serializer};
+use serde::{Deserialize, Serialize, Serializer};
 
 use strum_macros::{Display, EnumString};
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
 
 use crate::language::Language;
 use crate::{OriginGame, strings::SizedUtf16String, util};
@@ -12,6 +10,11 @@ use crate::{OriginGame, strings::SizedUtf16String, util};
 use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
 use rand::RngExt;
+
+#[cfg(feature = "wasm")]
+use tsify::Tsify;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
 
 const MASK_BITS_1_2: u8 = 0b00000110;
 const MASK_BITS_1_2_INVERTED: u8 = 0b11111001;
@@ -588,7 +591,8 @@ impl TrainerMemory {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct Geolocation {
@@ -609,17 +613,8 @@ impl Geolocation {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[allow(clippy::missing_const_for_fn)]
-impl Geolocation {
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(constructor)]
-    pub fn new(region: u8, country: u8) -> Geolocation {
-        Geolocation { region, country }
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct Geolocations(
@@ -649,22 +644,6 @@ impl Geolocations {
         bytes[6..8].copy_from_slice(&self.3.to_bytes());
         bytes[8..10].copy_from_slice(&self.4.to_bytes());
         bytes
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[allow(clippy::missing_const_for_fn)]
-impl Geolocations {
-    #[cfg(feature = "wasm")]
-    #[wasm_bindgen(constructor)]
-    pub fn new(
-        geo1: Geolocation,
-        geo2: Geolocation,
-        geo3: Geolocation,
-        geo4: Geolocation,
-        geo5: Geolocation,
-    ) -> Geolocations {
-        Geolocations(geo1, geo2, geo3, geo4, geo5)
     }
 }
 

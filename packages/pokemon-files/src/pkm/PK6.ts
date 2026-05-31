@@ -4,6 +4,7 @@ import {
   ConvertStrategy,
   ExtraFormIndex,
   extraFormIndexFromOrasPikachu,
+  Geolocations,
   Item,
   Language,
   Languages,
@@ -72,7 +73,7 @@ export default class PK6 {
   handlerName: string
   handlerGender: boolean
   isCurrentHandler: boolean
-  geolocations: types.Geolocation[]
+  geolocations: Geolocations
   handlerFriendship: number
   handlerAffection: number
   handlerMemory: types.Memory

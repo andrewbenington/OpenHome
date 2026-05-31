@@ -3,6 +3,7 @@ import {
   ExtraFormIndex,
   FormMetadata,
   Gender,
+  Geolocations,
   Language,
   NatureIndex,
   PkmFormat,
@@ -58,7 +59,7 @@ export interface AllPKMFields {
   gameOfOrigin: number
   gameOfOriginBattle?: number
   gender?: Gender
-  geolocations?: types.Geolocation[]
+  geolocations?: Geolocations
   gvs?: types.Stats
   handlerAffection?: number
   handlerFriendship?: number

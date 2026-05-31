@@ -1,11 +1,5 @@
 import * as PkmWasm from '@pkm-rs/pkg'
-import {
-  ContestStats,
-  Geolocation,
-  MarkingsSixShapesWithColor,
-  Memory,
-  PKMDate,
-} from '@pokemon-files/util'
+import { ContestStats, MarkingsSixShapesWithColor, Memory, PKMDate } from '@pokemon-files/util'
 
 export function convertPokeDate(date: PkmWasm.PokeDate): PKMDate {
   return {
@@ -23,43 +17,6 @@ export function convertPokeDateOptional(date?: PkmWasm.PokeDate | null): PKMDate
     month: date.month,
     day: date.day,
   }
-}
-
-export function geolocationFromWasm(value: PkmWasm.Geolocation): Geolocation {
-  return {
-    region: value.region,
-    country: value.country,
-  }
-}
-
-export function geolocationToWasm(value: Geolocation): PkmWasm.Geolocation {
-  return new PkmWasm.Geolocation(value.region, value.country)
-}
-
-export function geolocationsFromWasm(
-  value: PkmWasm.Geolocations | undefined
-): Geolocation[] | undefined {
-  if (!value) return undefined
-  return [
-    geolocationFromWasm(value[0]),
-    geolocationFromWasm(value[1]),
-    geolocationFromWasm(value[2]),
-    geolocationFromWasm(value[3]),
-    geolocationFromWasm(value[4]),
-  ]
-}
-
-export function geolocationsToWasm(
-  value: Geolocation[] | undefined
-): PkmWasm.Geolocations | undefined {
-  if (!value) return undefined
-  return new PkmWasm.Geolocations(
-    geolocationToWasm(value[0]),
-    geolocationToWasm(value[1]),
-    geolocationToWasm(value[2]),
-    geolocationToWasm(value[3]),
-    geolocationToWasm(value[4])
-  )
 }
 
 export function contestStatsFromWasm(value: PkmWasm.ContestStats): ContestStats {

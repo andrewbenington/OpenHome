@@ -3,6 +3,7 @@ import {
   AbilityIndex,
   ConvertStrategies,
   ConvertStrategy,
+  Geolocations,
   HyperTraining,
   Item,
   MetadataSummaryLookup,
@@ -28,8 +29,6 @@ import {
   contestStatsToWasm,
   convertPokeDate,
   convertPokeDateOptional,
-  geolocationsFromWasm,
-  geolocationsToWasm,
   markingsSixShapesColorsFromWasm,
   markingsSixShapesColorsToWasm,
   trainerMemoryToWasm,
@@ -354,10 +353,10 @@ export class PK7 {
   }
 
   get geolocations() {
-    return geolocationsFromWasm(this.inner.geolocations)
+    return this.inner.geolocations
   }
-  set geolocations(value: jsTypes.Geolocation[]) {
-    this.inner.geolocations = geolocationsToWasm(value)
+  set geolocations(value: Geolocations) {
+    this.inner.geolocations = value
   }
 
   get handlerFriendship() {
