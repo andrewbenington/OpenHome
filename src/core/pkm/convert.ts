@@ -1,5 +1,5 @@
 import * as PkmWasm from '@pkm-rs/pkg'
-import { ContestStats, MarkingsSixShapesWithColor, PKMDate } from '@pokemon-files/util'
+import { MarkingsSixShapesWithColor, PKMDate } from '@pokemon-files/util'
 
 export function convertPokeDate(date: PkmWasm.PokeDate): PKMDate {
   return {
@@ -17,28 +17,6 @@ export function convertPokeDateOptional(date?: PkmWasm.PokeDate | null): PKMDate
     month: date.month,
     day: date.day,
   }
-}
-
-export function contestStatsFromWasm(value: PkmWasm.ContestStats): ContestStats {
-  return {
-    cool: value.cool,
-    beauty: value.beauty,
-    cute: value.cute,
-    smart: value.smart,
-    tough: value.tough,
-    sheen: value.sheen,
-  }
-}
-
-export function contestStatsToWasm(value: ContestStats): PkmWasm.ContestStats {
-  return new PkmWasm.ContestStats(
-    value.cool,
-    value.beauty,
-    value.cute,
-    value.smart,
-    value.tough,
-    value.sheen
-  )
 }
 
 export function markingsColorValueFromWasm(value: PkmWasm.MarkingValue): 'blue' | 'red' | null {

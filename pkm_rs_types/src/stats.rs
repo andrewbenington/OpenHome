@@ -471,7 +471,8 @@ const fn dv_from_iv(iv: u8) -> u16 {
     ((iv - 1) / 2) as u16
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct ContestStats {
@@ -504,23 +505,6 @@ impl ContestStats {
             self.tough,
             self.sheen,
         ]
-    }
-}
-
-#[allow(clippy::missing_const_for_fn)]
-#[wasm_bindgen]
-#[cfg(feature = "wasm")]
-impl ContestStats {
-    #[wasm_bindgen(constructor)]
-    pub fn new(cool: u8, beauty: u8, cute: u8, smart: u8, tough: u8, sheen: u8) -> Self {
-        ContestStats {
-            cool,
-            beauty,
-            cute,
-            smart,
-            tough,
-            sheen,
-        }
     }
 }
 

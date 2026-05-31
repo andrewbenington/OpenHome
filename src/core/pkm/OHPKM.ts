@@ -41,8 +41,6 @@ import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { PluginIdentifier, SAV } from '../save/interfaces'
 import {
-  contestStatsFromWasm,
-  contestStatsToWasm,
   convertPokeDate,
   convertPokeDateOptional,
   markingsSixShapesColorsFromWasm,
@@ -164,7 +162,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       }
 
       if (other.contest) {
-        this.contest = contestStatsToWasm(other.contest)
+        this.contest = other.contest
       }
 
       this.ball = other.ball !== undefined ? other.ball : Ball.Poke
@@ -394,22 +392,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
   get formNum() {
     return this.SpeciesAndForm.formIndex
-  }
-
-  get evs() {
-    return this.evsWasm
-  }
-
-  set evs(value: Stats) {
-    this.evsWasm = value
-  }
-
-  get contest() {
-    return contestStatsFromWasm(this.contestWasm)
-  }
-
-  set contest(value: jsTypes.ContestStats) {
-    this.contestWasm = contestStatsToWasm(value)
   }
 
   get moves() {

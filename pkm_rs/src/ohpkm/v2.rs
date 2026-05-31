@@ -2007,20 +2007,20 @@ impl OhpkmV2 {
         self.set_gender(Gender::from_u8(v));
     }
 
-    #[wasm_bindgen(getter = evsWasm)]
+    #[wasm_bindgen(getter = evs)]
     pub fn evs_js(&self) -> Stats16Le {
         self.evs().into()
     }
-    #[wasm_bindgen(setter = evsWasm)]
+    #[wasm_bindgen(setter = evs)]
     pub fn set_evs_js(&mut self, v: Stats16Le) {
         self.set_evs(&v.try_into().expect("evs should not exceed 255 each"));
     }
 
-    #[wasm_bindgen(getter = contestWasm)]
+    #[wasm_bindgen(getter = contest)]
     pub fn contest_js(&self) -> ContestStats {
         self.contest()
     }
-    #[wasm_bindgen(setter = contestWasm)]
+    #[wasm_bindgen(setter = contest)]
     pub fn set_contest_js(&mut self, v: &ContestStats) {
         self.set_contest(v);
     }

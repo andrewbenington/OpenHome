@@ -19,7 +19,6 @@ import { PkmConstructorOptions } from './PKM'
 import {
   binaryGenderFromBool,
   binaryGenderToBool,
-  contestStatsToWasm,
   markingsFourShapesFromWasm,
   markingsFourShapesToWasm,
 } from './wasm/convert'
@@ -181,7 +180,7 @@ export default class PK3 implements PKMInterface {
     return this.inner.contest
   }
   set contest(value: jsTypes.ContestStats) {
-    this.inner.contest = contestStatsToWasm(value)
+    this.inner.contest = value
   }
 
   get pokerusByte() {

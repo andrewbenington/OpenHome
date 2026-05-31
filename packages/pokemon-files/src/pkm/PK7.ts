@@ -1,6 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   AbilityIndex,
+  ContestStats,
   ConvertStrategies,
   ConvertStrategy,
   Geolocations,
@@ -27,7 +28,6 @@ import { PkmConstructorOptions } from './PKM'
 import {
   binaryGenderFromBool,
   binaryGenderToBool,
-  contestStatsToWasm,
   convertPokeDate,
   convertPokeDateOptional,
   markingsSixShapesColorsFromWasm,
@@ -185,8 +185,8 @@ export class PK7 {
   get contest() {
     return this.inner.contest
   }
-  set contest(value: jsTypes.ContestStats) {
-    this.inner.contest = contestStatsToWasm(value)
+  set contest(value: ContestStats) {
+    this.inner.contest = value
   }
 
   get resortEventStatus() {
