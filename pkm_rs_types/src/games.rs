@@ -523,6 +523,9 @@ impl From<arbitrary_int::u4> for OriginGame {
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OriginGames;
 
+#[cfg(feature = "wasm")]
+pub static CHAMPIONS_COLOR: &str = "#E4332D";
+
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 #[cfg(feature = "wasm")]
@@ -573,11 +576,26 @@ impl OriginGames {
         OriginGame::from(value).color().to_owned()
     }
 
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "pluginColor"))]
+    pub fn plugin_color_js(plugin_identifier: &str) -> String {
+        plugin_color(plugin_identifier).to_owned()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "championsColor"))]
+    pub fn champions_color_js() -> String {
+        CHAMPIONS_COLOR.to_owned()
+    }
+
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "logoPath"))]
     pub fn logo_path(value: u8) -> Option<String> {
         OriginGame::from(value)
             .logo()
             .map(|filename| format!("/logos/{filename}.png"))
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "championsLogoPath"))]
+    pub fn champions_logo_path() -> String {
+        "/logos/Champions.png".to_owned()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getMetadata"))]
@@ -625,11 +643,6 @@ pub fn plugin_color(plugin_identifier: &str) -> &'static str {
         "luminescent_platinum" => "#25C2A0",
         _ => "#666666",
     }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getPluginColor"))]
-pub fn plugin_color_js(plugin_identifier: &str) -> String {
-    plugin_color(plugin_identifier).to_owned()
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]

@@ -67,7 +67,7 @@
 
 .pokedex-icon-container {
   width: 3rem;
-  height: 2.5rem;
+  height: 2.75rem;
   padding: 0 0.5rem;
   background-color: var(--gray-7);
   border-radius: 2rem;
@@ -79,8 +79,10 @@
   overflow: visible;
   position: relative;
 
-  .pokemon-icon-image {
+  .pokemon-spritesheet-icon,
+  .pokemon-icon-img {
     width: 2.5rem;
     aspect-ratio: 1;
+    margin-left: 0.25rem;
   }
 }

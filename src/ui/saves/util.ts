@@ -8,7 +8,7 @@ import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import BackendInterface from '@openhome-ui/backend/backendInterface'
 import { CtxMenuElementBuilder, Item } from '@openhome-ui/components/context-menu/types'
-import { getPluginColor, OriginGames } from '@pkm-rs/pkg'
+import { OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { getOriginIconPath } from '../images/game'
@@ -208,6 +208,6 @@ export function getDetailsPluginSave(pluginId: PluginIdentifier): GameOrPluginDe
   return {
     shortName: pluginGameName(pluginId, 'short'),
     markIconPath: pluginOriginMarkPath(pluginId),
-    backgroundColor: getPluginColor(pluginId),
+    backgroundColor: OriginGames.pluginColor(pluginId),
   }
 }

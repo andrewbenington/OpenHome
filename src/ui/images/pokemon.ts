@@ -84,10 +84,11 @@ export function getSpriteName(mon: MonSpriteData): string {
   const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formNum)
   let spriteName = formeMetadata?.sprite ?? ''
 
+  const female = mon.isFemale ? '-f' : ''
   if (mon.dexNum === NationalDex.Alcremie) {
     spriteName = `${
       formeMetadata?.formeName?.toLowerCase() ?? 'alcremie-vanilla-cream'
-    }-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
+    }-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}${female}`
   }
   return spriteName
 }

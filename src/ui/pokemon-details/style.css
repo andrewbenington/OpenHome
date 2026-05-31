@@ -9,7 +9,7 @@
   height: calc(var(--content-height) + var(--footer-height));
   max-height: 90vh;
 
-  overflow: auto;
+  overflow: hidden;
   padding: 0;
   border-radius: var(--border-radius-lg);
 }

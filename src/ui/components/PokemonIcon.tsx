@@ -10,7 +10,9 @@ import {
   Generation,
   MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
+import { CHAMPS_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
+import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 import { useMonDisplay } from '../hooks/useMonDisplay'
 import useBoxIconImage from '../pokemon-details/useBoxIconImage'
 import { classNames, grayscaleIf } from '../util/style'
@@ -65,11 +67,15 @@ export default function PokemonIcon(props: PokemonIconProps) {
 
   const formeMetadata = MetadataSummaryLookup(dexNumber, formeNumber ?? 0)
 
+  const inChampions = !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   const isGen9Mega = formeMetadata?.isMega && formeMetadata.introducedGen === Generation.G9
   const extraFormWithSprite = Boolean(extraFormIndex && extraFormSpriteName(extraFormIndex))
 
   const shouldUseImage =
-    isGen9Mega || extraFormWithSprite || FormsUsingImages.get(dexNumber)?.includes(formeNumber ?? 0)
+    inChampions ||
+    isGen9Mega ||
+    extraFormWithSprite ||
+    FormsUsingImages.get(dexNumber)?.includes(formeNumber ?? 0)
 
   const monImage = shouldUseImage ? (
     <PokemonIconUsingImage
@@ -78,6 +84,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
       extraFormIndex={extraFormIndex}
       silhouette={silhouette}
       onClick={onClick}
+      isShiny={isShiny}
     />
   ) : formeMetadata ? (
     <PokemonIconUsingSheet
@@ -141,7 +148,7 @@ function PokemonIconUsingSheet(props: PokemonIconUsingSheetProps) {
   return (
     <div
       draggable={false}
-      className="pokemon-icon-image"
+      className="pokemon-spritesheet-icon"
       style={{
         backgroundImage: `url(${BoxIcons})`,
         backgroundPosition: getBackgroundPosition(formeMetadata, isEgg),
@@ -161,6 +168,7 @@ interface PokemonIconUsingImageProps {
   formeNumber?: number
   extraFormIndex?: number
   silhouette?: boolean
+  isShiny?: boolean
   onClick?: MouseEventHandler
 }
 
@@ -174,11 +182,12 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
     formNum: formeNumber ?? 0,
     format: 'OHPKM',
     extraFormIndex,
+    isShiny: props.isShiny,
   })
 
   return (
     <img
-      className="fill-parent"
+      className="pokemon-icon-img"
       alt="pokemon sprite"
       draggable={false}
       src={spriteResult.path}
