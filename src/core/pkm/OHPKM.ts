@@ -7,7 +7,6 @@ import {
   ExtraFormIndex,
   Gender,
   generatePk3CompatiblePid,
-  HyperTraining,
   Item,
   Language,
   Lookup,
@@ -453,20 +452,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
   set markings(value: jsTypes.MarkingsSixShapesWithColor) {
     this.markingsWasm = markingsSixShapesColorsToWasm(value)
-  }
-
-  get hyperTraining() {
-    return this.hyperTrainingWasm
-  }
-  set hyperTraining(value: jsTypes.HyperTrainStats) {
-    this.hyperTrainingWasm = new HyperTraining(
-      value.hp,
-      value.atk,
-      value.def,
-      value.spa,
-      value.spd,
-      value.spe
-    )
   }
 
   get shinyLeaves() {

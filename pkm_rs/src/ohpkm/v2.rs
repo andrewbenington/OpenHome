@@ -2360,11 +2360,11 @@ impl OhpkmV2 {
         self.main_data.met_level = v;
     }
 
-    #[wasm_bindgen(getter = hyperTrainingWasm)]
+    #[wasm_bindgen(getter = hyperTraining)]
     pub fn hyper_training_js(&self) -> HyperTraining {
         self.main_data.hyper_training
     }
-    #[wasm_bindgen(setter = hyperTrainingWasm)]
+    #[wasm_bindgen(setter = hyperTraining)]
     pub fn set_hyper_training_js(&mut self, v: &HyperTraining) {
         self.main_data.hyper_training = *v;
     }

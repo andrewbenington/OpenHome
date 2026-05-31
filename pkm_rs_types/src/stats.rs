@@ -285,7 +285,8 @@ fn u16_le_slice_to_u8<const N: usize>(slice: [u16; N]) -> Vec<u8> {
     slice.into_iter().flat_map(u16::to_le_bytes).collect()
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct HyperTraining {
@@ -344,23 +345,6 @@ impl IntoIterator for HyperTraining {
             (Stat::Spe, self.spe),
         ]
         .into_iter()
-    }
-}
-
-#[wasm_bindgen]
-#[cfg(feature = "wasm")]
-impl HyperTraining {
-    #[wasm_bindgen(constructor)]
-    #[allow(clippy::missing_const_for_fn)]
-    pub fn new(hp: bool, atk: bool, def: bool, spa: bool, spd: bool, spe: bool) -> Self {
-        HyperTraining {
-            hp,
-            atk,
-            def,
-            spa,
-            spd,
-            spe,
-        }
     }
 }
 

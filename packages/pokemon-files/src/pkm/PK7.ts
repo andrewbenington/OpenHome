@@ -458,15 +458,8 @@ export class PK7 {
   get hyperTraining() {
     return this.inner.hyper_training
   }
-  set hyperTraining(value: jsTypes.HyperTrainStats) {
-    this.inner.hyper_training = new HyperTraining(
-      value.hp,
-      value.atk,
-      value.def,
-      value.spa,
-      value.spd,
-      value.spe
-    )
+  set hyperTraining(value: HyperTraining) {
+    this.inner.hyper_training = value
   }
 
   get gameOfOrigin() {
