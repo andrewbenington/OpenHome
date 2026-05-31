@@ -39,12 +39,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { PluginIdentifier, SAV } from '../save/interfaces'
-import {
-  convertPokeDate,
-  convertPokeDateOptional,
-  markingsSixShapesColorsFromWasm,
-  markingsSixShapesColorsToWasm,
-} from './convert'
+import { convertPokeDate, convertPokeDateOptional } from './convert'
 import { isEvolution } from './Lookup'
 import {
   adjustMovePPBetweenFormats,
@@ -447,13 +442,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.metDateWasm = new PokeDate(value.year, value.month, value.day)
   }
 
-  get markings() {
-    return markingsSixShapesColorsFromWasm(this.markingsWasm)
-  }
-  set markings(value: jsTypes.MarkingsSixShapesWithColor) {
-    this.markingsWasm = markingsSixShapesColorsToWasm(value)
-  }
-
   get shinyLeaves() {
     return this.shinyLeavesWasm
   }
@@ -682,7 +670,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         if (markingVal && this.markings[markingType as MarkingShape] === null) {
           this.markings[markingType as MarkingShape] = 'blue'
         } else if (!markingVal && this.markings[markingType as MarkingShape]) {
-          this.markings[markingType as MarkingShape] = null
+          this.markings[markingType as MarkingShape] = 'unset'
         }
       }
     }

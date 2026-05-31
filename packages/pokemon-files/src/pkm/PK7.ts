@@ -7,6 +7,7 @@ import {
   Geolocations,
   HyperTraining,
   Item,
+  MarkingsSixShapesColors,
   MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
@@ -30,8 +31,6 @@ import {
   binaryGenderToBool,
   convertPokeDate,
   convertPokeDateOptional,
-  markingsSixShapesColorsFromWasm,
-  markingsSixShapesColorsToWasm,
 } from './wasm/convert'
 
 export class PK7 {
@@ -137,10 +136,10 @@ export class PK7 {
   }
 
   get markings() {
-    return markingsSixShapesColorsFromWasm(this.inner.markings)
+    return this.inner.markings
   }
-  set markings(value: jsTypes.MarkingsSixShapesWithColor) {
-    this.inner.markings = markingsSixShapesColorsToWasm(value)
+  set markings(value: MarkingsSixShapesColors) {
+    this.inner.markings = value
   }
 
   get personalityValue() {

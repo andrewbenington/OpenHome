@@ -7,6 +7,7 @@ import {
   Item,
   Language,
   Languages,
+  MarkingsSixShapesColors,
   MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
@@ -44,7 +45,7 @@ export default class PK8 {
   abilityNum: number
   favorite: boolean
   canGigantamax: boolean
-  markings: types.MarkingsSixShapesWithColor
+  markings: MarkingsSixShapesColors
   personalityValue: number
   nature: NatureIndex
   statNature: NatureIndex

@@ -1,5 +1,5 @@
 import * as PkmWasm from '../../../../../pkm_rs/pkg'
-import { MarkingsSixShapesWithColor, PKMDate } from '../../util'
+import { PKMDate } from '../../util'
 
 export function convertPokeDate(date: PkmWasm.PokeDate): PKMDate {
   return {
@@ -17,43 +17,6 @@ export function convertPokeDateOptional(date?: PkmWasm.PokeDate | null): PKMDate
     month: date.month,
     day: date.day,
   }
-}
-
-export function markingsColorValueFromWasm(value: PkmWasm.MarkingValue): 'blue' | 'red' | null {
-  switch (value) {
-    case PkmWasm.MarkingValue.Blue:
-      return 'blue'
-    case PkmWasm.MarkingValue.Red:
-      return 'red'
-    case PkmWasm.MarkingValue.Unset:
-      return null
-  }
-}
-
-export function markingsSixShapesColorsFromWasm(
-  value: PkmWasm.MarkingsSixShapesColors
-): MarkingsSixShapesWithColor {
-  return {
-    circle: markingsColorValueFromWasm(value.circle),
-    square: markingsColorValueFromWasm(value.square),
-    triangle: markingsColorValueFromWasm(value.triangle),
-    heart: markingsColorValueFromWasm(value.heart),
-    star: markingsColorValueFromWasm(value.star),
-    diamond: markingsColorValueFromWasm(value.diamond),
-  }
-}
-
-export function markingsSixShapesColorsToWasm(
-  value: MarkingsSixShapesWithColor
-): PkmWasm.MarkingsSixShapesColors {
-  return new PkmWasm.MarkingsSixShapesColors(
-    value.circle,
-    value.square,
-    value.triangle,
-    value.heart,
-    value.star,
-    value.diamond
-  )
 }
 
 export function binaryGenderFromBool(value: boolean): PkmWasm.BinaryGender {

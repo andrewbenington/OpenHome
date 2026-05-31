@@ -1960,12 +1960,12 @@ impl OhpkmV2 {
         self.set_is_shadow(v);
     }
 
-    #[wasm_bindgen(getter = markingsWasm)]
+    #[wasm_bindgen(getter = markings)]
     pub fn markings_js(&self) -> MarkingsSixShapesColors {
         self.markings()
     }
 
-    #[wasm_bindgen(setter = markingsWasm)]
+    #[wasm_bindgen(setter = markings)]
     pub fn set_markings_js(&mut self, v: &MarkingsSixShapesColors) {
         self.set_markings(v);
     }

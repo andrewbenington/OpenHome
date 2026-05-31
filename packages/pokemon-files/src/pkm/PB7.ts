@@ -6,6 +6,7 @@ import {
   Item,
   Language,
   Languages,
+  MarkingsSixShapesColors,
   MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
@@ -39,7 +40,7 @@ export default class PB7 {
   ability?: AbilityIndex
   abilityNum: number
   favorite: boolean
-  markings: types.MarkingsSixShapesWithColor
+  markings: MarkingsSixShapesColors
   personalityValue: number
   nature: NatureIndex
   isFatefulEncounter: boolean

@@ -4,6 +4,7 @@ import {
   HyperTraining,
   MarkingsFourShapes,
   MarkingsSixShapes,
+  MarkingsSixShapesColors,
   StatsPreSplit,
   TrainerMemory,
 } from '@pkm-rs/pkg'
@@ -210,10 +211,10 @@ export function writeContestStatsToBytes(dataView: DataView, offset: number, val
 export type MarkingShapePreGen6 = 'circle' | 'square' | 'triangle' | 'heart'
 export type MarkingShape = MarkingShapePreGen6 | 'star' | 'diamond'
 
-export type MarkingColorValue = null | 'blue' | 'red'
-export type MarkingsSixShapesWithColor = Record<MarkingShape, MarkingColorValue>
+export type MarkingColorValue = 'unset' | 'blue' | 'red'
+// export type MarkingsSixShapesWithColor = Record<MarkingShape, MarkingColorValue>
 
-export type Markings = MarkingsFourShapes | MarkingsSixShapes | MarkingsSixShapesWithColor
+export type Markings = MarkingsFourShapes | MarkingsSixShapes | MarkingsSixShapesColors
 
 export function markingDisplay(marking: MarkingShape) {
   switch (marking) {
@@ -232,7 +233,7 @@ export function markingDisplay(marking: MarkingShape) {
   }
 }
 
-export function markingsHaveColor(markings: Markings): markings is MarkingsSixShapesWithColor {
+export function markingsHaveColor(markings: Markings): markings is MarkingsSixShapesColors {
   return typeof markings.circle !== 'boolean'
 }
 
@@ -293,7 +294,7 @@ export function twoColorMarkingFromInt(value: number): MarkingColorValue {
     case 2:
       return 'red'
     default:
-      return null
+      return 'unset'
   }
 }
 
@@ -353,31 +354,31 @@ export function markingColorValueFromOther(marking: boolean | MarkingColorValue)
     case true:
       return 'blue'
     case false:
-      return null
+      return 'unset'
     default:
       return marking
   }
 }
 
-export function markingsSixShapesWithColorFromOther(other?: Markings): MarkingsSixShapesWithColor {
+export function markingsSixShapesWithColorFromOther(other?: Markings): MarkingsSixShapesColors {
   if (!other) {
     return {
-      circle: null,
-      triangle: null,
-      square: null,
-      heart: null,
-      star: null,
-      diamond: null,
+      circle: 'unset',
+      triangle: 'unset',
+      square: 'unset',
+      heart: 'unset',
+      star: 'unset',
+      diamond: 'unset',
     }
   }
 
-  const coloredMarkings: MarkingsSixShapesWithColor = {
+  const coloredMarkings: MarkingsSixShapesColors = {
     circle: markingColorValueFromOther(other.circle),
     triangle: markingColorValueFromOther(other.triangle),
     square: markingColorValueFromOther(other.square),
     heart: markingColorValueFromOther(other.heart),
-    star: null,
-    diamond: null,
+    star: 'unset',
+    diamond: 'unset',
   }
 
   if ('star' in other) {
@@ -391,7 +392,7 @@ export function markingsSixShapesWithColorFromOther(other?: Markings): MarkingsS
 export function markingsSixShapesWithColorFromBytes(
   data: DataView,
   offset: number
-): MarkingsSixShapesWithColor {
+): MarkingsSixShapesColors {
   const markingsValue = data.getUint16(offset, true)
 
   return {
@@ -407,7 +408,7 @@ export function markingsSixShapesWithColorFromBytes(
 export function markingsSixShapesWithColorToBytes(
   dataView: DataView,
   offset: number,
-  value: MarkingsSixShapesWithColor
+  value: MarkingsSixShapesColors
 ) {
   uIntToBufferBits(dataView, twoColorMarkingToInt(value.circle), offset, 0, 2)
   uIntToBufferBits(dataView, twoColorMarkingToInt(value.triangle), offset, 2, 2)

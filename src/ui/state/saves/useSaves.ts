@@ -18,8 +18,7 @@ import { ItemBagContext } from '@openhome-ui/state/items'
 import { OhpkmStoreData } from '@openhome-ui/state/ohpkm'
 import { IdentifierNotPresentError, useOhpkmStore } from '@openhome-ui/state/ohpkm/useOhpkmStore'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { Item, Lookup } from '@pkm-rs/pkg'
-import { MarkingsSixShapesWithColor } from '@pokemon-files/util'
+import { Item, Lookup, MarkingsSixShapesColors } from '@pkm-rs/pkg'
 import { useCallback, useContext, useRef } from 'react'
 import {
   HomeMonLocation,
@@ -46,7 +45,7 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   setMonHeldItem(item: Item | undefined, location: MonLocation): void
   setMonNickname(nickname: string, location: MonLocation): void
   updateMonNotes(monId: string, notes: string | undefined): void
-  updateMonMarkings(monId: string, markings: MarkingsSixShapesWithColor): void
+  updateMonMarkings(monId: string, markings: MarkingsSixShapesColors): void
   moveMon(source: MonWithLocation, dest: MonLocation): void
   recoverMonToBox(id: OhpkmIdentifier, bankIndex: number): void
 
@@ -553,7 +552,7 @@ export function useSaves(): SavesAndBanksManager {
   )
 
   const updateMonMarkings = useCallback(
-    (monId: string, markings: MarkingsSixShapesWithColor) => {
+    (monId: string, markings: MarkingsSixShapesColors) => {
       const result = ohpkmStore.tryLoadFromId(monId)
       if (R.isErr(result)) return result
 
