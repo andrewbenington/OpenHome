@@ -220,14 +220,6 @@ class PokemonForm(BaseModel):
             forme_name = ""
         elif "Pikachu-" in self.name:
             forme_name = forme_name[1:2]
-        elif forme_name == "-Mega":
-            forme_name = "M"
-        elif forme_name == "-Galar":
-            forme_name = "G"
-        elif forme_name == "-Alola":
-            forme_name = "A"
-        elif self.national_dex == 676:
-            forme_name = forme_name[1:3]
         elif forme_name == "-La Reine":
             forme_name = "-La_Reine"
         elif "_Cream" in forme_name or "Caramel_Swirl" in forme_name or "Rainbow_Swirl" in forme_name:
@@ -238,13 +230,18 @@ class PokemonForm(BaseModel):
             forme_name = "GZ"
         elif forme_name == "-Original":
             forme_name = "-Original_Color"
+        elif forme_name == "-Male_Mega" or  forme_name == "-Female_Mega":
+            forme_name = "-Mega"
+        elif is_female:
+            forme_name = "-Female"
         
-        shiny_suffix = "_s" if is_shiny else ""
+        shiny_suffix = " shiny" if is_shiny else ""
 
-        bulbaFilePage = f'https://archives.bulbagarden.net/wiki/File:HOME{str(self.national_dex).zfill(4)}{"" if self.form_index == 0 and self.national_dex != 666 else forme_name}{shiny_suffix}.png'
+        game_str = "Menu_CP_" if game == "champions" else "HOME"
 
-        print(is_shiny, bulbaFilePage, forme_name)
+        form_suffix = "" if self.form_index == 0 and not (self.national_dex == 666 or self.national_dex == 671 or is_female) else forme_name
 
+        bulbaFilePage = f'https://archives.bulbagarden.net/wiki/File:{game_str}{str(self.national_dex).zfill(4)}{form_suffix}{shiny_suffix}.png'
 
         return self.bulbagarden_image_url_from_page(bulbaFilePage)
         
@@ -270,6 +267,8 @@ class PokemonForm(BaseModel):
         # If a matching image is found, download it
         if target_img:
             return str(target_img.get('src'))
+        
+        print(f"no image found for {url}")
 
     def gen3_form(self) -> str | None:
         if self.form_index > 0 or self.national_dex == 201:
@@ -360,9 +359,6 @@ class PokemonForm(BaseModel):
     
     def has_home_sprite(self):
         if self.national_dex == NatDex.PICHU and self.form_index == SPIKY_EAR_PICHU:
-            return False
-        
-        if self.name == "Floette-Eternal":
             return False
         
         return True
@@ -717,7 +713,7 @@ GENDER_DIFFERENCES = [
     257, 267, 269, 272, 274, 275, 307, 308, 315, 316, 317, 322, 323, 332, 350,
     369, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 407, 415, 417, 418,
     419, 424, 443, 444, 445, 449, 450, 453, 454, 456, 457, 459, 460, 461, 464,
-    465, 473, 521, 592, 593, 668]
+    465, 473, 521, 592, 593, 668, 902]
 
 
 FIRST_FORM_ONLY_456 = [

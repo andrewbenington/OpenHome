@@ -2,7 +2,7 @@ import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import BoxIcons from '@openhome-ui/images/BoxIcons.webp'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
-import { FormsUsingImages } from '@openhome-ui/pokemon-details/useBoxIconImage'
+import { FormsUsingImages, IN_CHAMPIONS } from '@openhome-ui/pokemon-details/useBoxIconImage'
 import {
   ExtraFormIndex,
   extraFormSpriteName,
@@ -65,11 +65,15 @@ export default function PokemonIcon(props: PokemonIconProps) {
 
   const formeMetadata = MetadataSummaryLookup(dexNumber, formeNumber ?? 0)
 
+  const inChampions = IN_CHAMPIONS.includes(dexNumber)
   const isGen9Mega = formeMetadata?.isMega && formeMetadata.introducedGen === Generation.G9
   const extraFormWithSprite = Boolean(extraFormIndex && extraFormSpriteName(extraFormIndex))
 
   const shouldUseImage =
-    isGen9Mega || extraFormWithSprite || FormsUsingImages.get(dexNumber)?.includes(formeNumber ?? 0)
+    inChampions ||
+    isGen9Mega ||
+    extraFormWithSprite ||
+    FormsUsingImages.get(dexNumber)?.includes(formeNumber ?? 0)
 
   const monImage = shouldUseImage ? (
     <PokemonIconUsingImage
@@ -78,6 +82,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
       extraFormIndex={extraFormIndex}
       silhouette={silhouette}
       onClick={onClick}
+      isShiny={isShiny}
     />
   ) : formeMetadata ? (
     <PokemonIconUsingSheet
@@ -161,6 +166,7 @@ interface PokemonIconUsingImageProps {
   formeNumber?: number
   extraFormIndex?: number
   silhouette?: boolean
+  isShiny?: boolean
   onClick?: MouseEventHandler
 }
 
@@ -174,6 +180,7 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
     formNum: formeNumber ?? 0,
     format: 'OHPKM',
     extraFormIndex,
+    isShiny: props.isShiny,
   })
 
   return (
