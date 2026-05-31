@@ -1,5 +1,5 @@
 import * as PkmWasm from '@pkm-rs/pkg'
-import { ContestStats, MarkingsSixShapesWithColor, Memory, PKMDate } from '@pokemon-files/util'
+import { ContestStats, MarkingsSixShapesWithColor, PKMDate } from '@pokemon-files/util'
 
 export function convertPokeDate(date: PkmWasm.PokeDate): PKMDate {
   return {
@@ -38,24 +38,6 @@ export function contestStatsToWasm(value: ContestStats): PkmWasm.ContestStats {
     value.smart,
     value.tough,
     value.sheen
-  )
-}
-
-export function trainerMemoryFromWasm(value: PkmWasm.TrainerMemory): Memory {
-  return {
-    intensity: value.intensity,
-    memory: value.memory,
-    feeling: value.feeling,
-    textVariables: value.textVariables,
-  }
-}
-
-export function trainerMemoryToWasm(value: Memory): PkmWasm.TrainerMemory {
-  return new PkmWasm.TrainerMemory(
-    value.intensity,
-    value.memory,
-    value.feeling,
-    value.textVariables
   )
 }
 

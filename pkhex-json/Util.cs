@@ -221,7 +221,7 @@ public static partial class Util
       intensity = pk.OriginalTrainerMemoryIntensity,
       memory = pk.OriginalTrainerMemory,
       feeling = pk.OriginalTrainerMemoryFeeling,
-      text_variable = pk.OriginalTrainerMemoryVariable,
+      textVariables = pk.OriginalTrainerMemoryVariable,
     };
   }
 
@@ -232,7 +232,7 @@ public static partial class Util
       intensity = pk.HandlingTrainerMemoryIntensity,
       memory = pk.HandlingTrainerMemory,
       feeling = pk.HandlingTrainerMemoryFeeling,
-      text_variable = pk.HandlingTrainerMemoryVariable,
+      textVariables = pk.HandlingTrainerMemoryVariable,
     };
   }
 

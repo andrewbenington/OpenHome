@@ -2170,11 +2170,11 @@ impl OhpkmV2 {
         self.set_handler_friendship(v);
     }
 
-    #[wasm_bindgen(getter = handlerMemoryWasm)]
+    #[wasm_bindgen(getter = handlerMemory)]
     pub fn handler_memory_js(&self) -> TrainerMemory {
         self.handler_memory()
     }
-    #[wasm_bindgen(setter = handlerMemoryWasm)]
+    #[wasm_bindgen(setter = handlerMemory)]
     pub fn set_handler_memory_js(&mut self, v: &TrainerMemory) {
         self.set_handler_memory(v);
     }
@@ -2288,11 +2288,11 @@ impl OhpkmV2 {
         self.set_trainer_friendship(v);
     }
 
-    #[wasm_bindgen(getter = trainerMemoryWasm)]
+    #[wasm_bindgen(getter = trainerMemory)]
     pub fn trainer_memory_js(&self) -> TrainerMemory {
         self.trainer_memory()
     }
-    #[wasm_bindgen(setter = trainerMemoryWasm)]
+    #[wasm_bindgen(setter = trainerMemory)]
     pub fn set_trainer_memory_js(&mut self, v: &TrainerMemory) {
         self.set_trainer_memory(v);
     }

@@ -121,7 +121,7 @@
     "intensity": 1,
     "memory": 4,
     "feeling": 7,
-    "text_variable": 0
+    "textVariables": 0
   },
   "fullness": 0,
   "enjoyment": 0,
@@ -132,7 +132,7 @@
     "intensity": 0,
     "memory": 0,
     "feeling": 0,
-    "text_variable": 0
+    "textVariables": 0
   },
   "egg_date": null,
   "met_date": "11/7/2016",

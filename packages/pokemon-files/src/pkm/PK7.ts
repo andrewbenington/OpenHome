@@ -12,6 +12,7 @@ import {
   Pk7 as Pk7Wasm,
   PokeDate,
   SpeciesLookup,
+  TrainerMemory,
 } from '@pkm-rs/pkg'
 import * as jsTypes from '@pokemon-files/util/types'
 import { ModernRibbons } from '../../../pokemon-resources/src'
@@ -31,7 +32,6 @@ import {
   convertPokeDateOptional,
   markingsSixShapesColorsFromWasm,
   markingsSixShapesColorsToWasm,
-  trainerMemoryToWasm,
 } from './wasm/convert'
 
 export class PK7 {
@@ -532,15 +532,15 @@ export class PK7 {
   get handlerMemory() {
     return this.inner.handler_memory
   }
-  set handlerMemory(value: jsTypes.Memory) {
-    this.inner.handler_memory = trainerMemoryToWasm(value)
+  set handlerMemory(value: TrainerMemory) {
+    this.inner.handler_memory = value
   }
 
   get trainerMemory() {
     return this.inner.trainer_memory
   }
-  set trainerMemory(value: jsTypes.Memory) {
-    this.inner.trainer_memory = trainerMemoryToWasm(value)
+  set trainerMemory(value: TrainerMemory) {
+    this.inner.trainer_memory = value
   }
 
   get trainerGender() {

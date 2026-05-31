@@ -503,7 +503,8 @@ impl TrainerData {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Clone, Copy, Default, Serialize)]
 pub struct TrainerMemory {
@@ -511,7 +512,7 @@ pub struct TrainerMemory {
     pub memory: u8,
     pub feeling: u8,
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = textVariables))]
+    #[cfg_attr(feature = "wasm", serde(rename = "textVariables"))]
     pub text_variable: u16,
 }
 
@@ -574,20 +575,6 @@ impl TrainerMemory {
         bytes[3..=4].copy_from_slice(&self.text_variable.to_le_bytes());
 
         bytes
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[allow(clippy::missing_const_for_fn)]
-impl TrainerMemory {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(constructor))]
-    pub fn new(intensity: u8, memory: u8, feeling: u8, text_variable: u16) -> TrainerMemory {
-        TrainerMemory {
-            intensity,
-            memory,
-            feeling,
-            text_variable,
-        }
     }
 }
 

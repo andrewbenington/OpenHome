@@ -47,7 +47,6 @@ import {
   convertPokeDateOptional,
   markingsSixShapesColorsFromWasm,
   markingsSixShapesColorsToWasm,
-  trainerMemoryToWasm,
 } from './convert'
 import { isEvolution } from './Lookup'
 import {
@@ -449,20 +448,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.relearnMovesWasm = new Uint16Array(value)
   }
 
-  get trainerMemory() {
-    return trainerMemoryToWasm(this.trainerMemoryWasm)
-  }
-  set trainerMemory(value: jsTypes.Memory) {
-    this.trainerMemoryWasm = trainerMemoryToWasm(value)
-  }
-
-  get handlerMemory() {
-    return trainerMemoryToWasm(this.handlerMemoryWasm)
-  }
-  set handlerMemory(value: jsTypes.Memory) {
-    this.handlerMemoryWasm = trainerMemoryToWasm(value)
-  }
-
   get eggDate() {
     return convertPokeDateOptional(this.eggDateWasm)
   }
@@ -605,7 +590,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.handlerName = ''
       this.handlerAffection = 0
       this.handlerFriendship = 0
-      this.handlerMemoryWasm = new TrainerMemory(0, 0, 0, 0)
+      this.handlerMemory = { intensity: 0, memory: 0, feeling: 0, textVariables: 0 }
       this.handlerId = 0
       this.handlerLanguage = 0
       this.handlerGender = false
@@ -619,7 +604,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (existingTrainerData) {
       this.handlerAffection = existingTrainerData.affection
       this.handlerFriendship = existingTrainerData.friendship
-      this.handlerMemoryWasm = existingTrainerData.memory
+      this.handlerMemory = existingTrainerData.memory
       this.handlerId = existingTrainerData.id ?? 0
       this.handlerLanguage = existingTrainerData.language ?? 0
       this.handlerGender = existingTrainerData.gender === Gender.Female
@@ -773,13 +758,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         other.handlerFriendship ?? 70, // TODO: USE BASE FRIENDSHIP
         other.handlerAffection ?? 0,
         other.handlerMemory
-          ? new TrainerMemory(
-              other.handlerMemory.intensity,
-              other.handlerMemory.memory,
-              other.handlerMemory.feeling,
-              other.handlerMemory.textVariables
-            )
-          : undefined
       )
     }
 
