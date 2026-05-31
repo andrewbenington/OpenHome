@@ -1,14 +1,17 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::BitSet;
 
+#[cfg(feature = "wasm")]
+use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct MarkingsFourShapes {
@@ -39,21 +42,6 @@ impl MarkingsFourShapes {
     }
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
-#[allow(clippy::missing_const_for_fn)]
-impl MarkingsFourShapes {
-    #[wasm_bindgen(constructor)]
-    pub fn new_js(circle: bool, square: bool, triangle: bool, heart: bool) -> Self {
-        Self {
-            circle,
-            square,
-            triangle,
-            heart,
-        }
-    }
-}
-
 impl From<MarkingsSixShapes> for MarkingsFourShapes {
     fn from(other: MarkingsSixShapes) -> Self {
         MarkingsFourShapes {
@@ -76,8 +64,9 @@ impl From<MarkingsSixShapesColors> for MarkingsFourShapes {
     }
 }
 
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct MarkingsSixShapes {
     pub circle: bool,

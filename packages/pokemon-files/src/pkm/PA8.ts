@@ -2,7 +2,9 @@ import { Option } from '@openhome-core/util/functional'
 import {
   AbilityIndex,
   Ball,
+  ContestStats,
   ConvertStrategy,
+  HyperTraining,
   Item,
   Language,
   Languages,
@@ -49,7 +51,7 @@ export default class PA8 {
   gender: number
   formNum: number
   evs: types.Stats
-  contest: types.ContestStats
+  contest: ContestStats
   pokerusByte: number
   contestMemoryCount: number
   battleMemoryCount: number
@@ -95,7 +97,7 @@ export default class PA8 {
   eggLocationIndex: number
   metLocationIndex: number
   metLevel: number
-  hyperTraining: types.HyperTrainStats
+  hyperTraining: HyperTraining
   moveFlagsLA: Uint8Array
   homeTracker: Uint8Array
   tutorFlagsLA: Uint8Array

@@ -1,16 +1,21 @@
 import {
   AbilityIndex,
+  ContestStats,
   ExtraFormIndex,
   FormMetadata,
   Gender,
   Geolocations,
+  HyperTraining,
   Language,
   NatureIndex,
   PkmFormat,
   ShinyLeaves,
+  StatsPreSplit,
+  TrainerMemory,
 } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../../../../src/core/save/interfaces'
 import * as types from './types'
+import { Markings } from './types'
 
 export type FourMoves = [number, number, number, number]
 
@@ -28,7 +33,7 @@ export interface AllPKMFields {
   canGigantamax?: boolean
   checksum?: number
   consoleRegion?: number
-  contest?: types.ContestStats
+  contest?: ContestStats
   contestMemoryCount?: number
   country?: number
   cp?: number
@@ -36,7 +41,7 @@ export interface AllPKMFields {
   dexNum: number
   dirtLocation?: number
   dirtType?: number
-  dvs?: types.StatsPreSplit
+  dvs?: StatsPreSplit
   dynamaxLevel?: number
   eggDate?: types.PKMDate | undefined
   eggLocationIndex?: number
@@ -46,7 +51,7 @@ export interface AllPKMFields {
   encryptionConstant?: number
   enjoyment?: number
   evs?: types.Stats
-  evsG12?: types.StatsPreSplit
+  evsG12?: StatsPreSplit
   exp: number
   extraFormIndex?: ExtraFormIndex
   favorite?: boolean
@@ -66,12 +71,12 @@ export interface AllPKMFields {
   handlerGender?: boolean
   handlerID?: number
   handlerLanguage?: number
-  handlerMemory?: types.Memory
+  handlerMemory?: TrainerMemory
   handlerName?: string
   heightScalar?: number
   heldItemIndex: number
   homeTracker?: Uint8Array
-  hyperTraining?: types.HyperTrainStats
+  hyperTraining?: HyperTraining
   isAlpha?: boolean
   isCurrentHandler?: boolean
   isEgg?: boolean
@@ -84,10 +89,7 @@ export interface AllPKMFields {
   ivs?: types.Stats
   language: Language
   level?: number
-  markings?:
-    | types.MarkingsFourShapes
-    | types.MarkingsSixShapesNoColor
-    | types.MarkingsSixShapesWithColor
+  markings?: Markings
   masterFlagsLA?: Uint8Array
   megaForme?: number
   metDate?: types.PKMDate | undefined
@@ -149,7 +151,7 @@ export interface AllPKMFields {
   trainerFriendship?: number
   trainerGender: boolean
   trainerID: number
-  trainerMemory?: types.Memory
+  trainerMemory?: TrainerMemory
   trainerName: string
   trainingBag?: number
   trainingBagHits?: number

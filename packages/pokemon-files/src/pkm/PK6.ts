@@ -1,6 +1,7 @@
 import {
   AbilityIndex,
   Ball,
+  ContestStats,
   ConvertStrategy,
   ExtraFormIndex,
   extraFormIndexFromOrasPikachu,
@@ -12,6 +13,7 @@ import {
   NatureIndex,
   orasFormIndexIfSupported,
   SpeciesLookup,
+  TrainerMemory,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
@@ -52,7 +54,7 @@ export default class PK6 {
   extraFormIndex?: ExtraFormIndex
   gender: number
   evs: types.Stats
-  contest: types.ContestStats
+  contest: ContestStats
   markings: types.MarkingsSixShapesNoColor
   pokerusByte: number
   superTrainingFlags: number
@@ -76,8 +78,8 @@ export default class PK6 {
   geolocations: Geolocations
   handlerFriendship: number
   handlerAffection: number
-  handlerMemory: types.Memory
-  trainerMemory: types.Memory
+  handlerMemory: TrainerMemory
+  trainerMemory: TrainerMemory
   fullness: number
   enjoyment: number
   trainerName: string

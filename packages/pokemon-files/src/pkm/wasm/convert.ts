@@ -1,5 +1,5 @@
 import * as PkmWasm from '../../../../../pkm_rs/pkg'
-import { MarkingsFourShapes, MarkingsSixShapesWithColor, PKMDate } from '../../util'
+import { MarkingsSixShapesWithColor, PKMDate } from '../../util'
 
 export function convertPokeDate(date: PkmWasm.PokeDate): PKMDate {
   return {
@@ -28,20 +28,6 @@ export function markingsColorValueFromWasm(value: PkmWasm.MarkingValue): 'blue' 
     case PkmWasm.MarkingValue.Unset:
       return null
   }
-}
-
-export function markingsFourShapesFromWasm(value: PkmWasm.MarkingsFourShapes): MarkingsFourShapes {
-  const { circle, square, triangle, heart } = value
-  return {
-    circle,
-    square,
-    triangle,
-    heart,
-  }
-}
-
-export function markingsFourShapesToWasm(value: MarkingsFourShapes): PkmWasm.MarkingsFourShapes {
-  return new PkmWasm.MarkingsFourShapes(value.circle, value.square, value.triangle, value.heart)
 }
 
 export function markingsSixShapesColorsFromWasm(

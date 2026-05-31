@@ -4,6 +4,7 @@ use crate::util::bit_is_set;
 use pkm_rs_derive::Stats;
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "wasm")]
 use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;

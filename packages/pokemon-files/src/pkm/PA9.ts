@@ -1,13 +1,16 @@
 import {
   AbilityIndex,
   Ball,
+  ContestStats,
   ConvertStrategy,
+  HyperTraining,
   Item,
   Language,
   Languages,
   MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
+  TrainerMemory,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
@@ -51,7 +54,7 @@ export default class PA9 {
   isAlpha: boolean
   formNum: number
   evs: types.Stats
-  contest: types.ContestStats
+  contest: ContestStats
   pokerusByte: number
   contestMemoryCount: number
   battleMemoryCount: number
@@ -75,7 +78,7 @@ export default class PA9 {
   isCurrentHandler: boolean
   handlerID: number
   handlerFriendship: number
-  handlerMemory: types.Memory
+  handlerMemory: TrainerMemory
   gameOfOrigin: number
   gameOfOriginBattle: number
   formArgument: number
@@ -83,7 +86,7 @@ export default class PA9 {
   language: Language
   trainerName: string
   trainerFriendship: number
-  trainerMemory: types.Memory
+  trainerMemory: TrainerMemory
   eggDate: types.PKMDate | undefined
   metDate: types.PKMDate | undefined
   obedienceLevel: number
@@ -91,7 +94,7 @@ export default class PA9 {
   metLocationIndex: number
   ball: number
   metLevel: number
-  hyperTraining: types.HyperTrainStats
+  hyperTraining: HyperTraining
   homeTracker: Uint8Array
   tmFlagsLza: Uint8Array
   ribbons: string[]

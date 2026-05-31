@@ -18,7 +18,7 @@ import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import useIsDev from '@openhome-ui/hooks/isDev'
-import { genderFromBool, Generation, OriginGames } from '@pkm-rs/pkg'
+import { genderFromBool, Generation, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import {
   AllPKMFields,
@@ -26,7 +26,6 @@ import {
   getFlagsInRange,
   getHeightCalculated,
   getWeightCalculated,
-  StatsPreSplit,
 } from '@pokemon-files/util'
 import { Countries } from '@pokemon-resources/consts/Countries'
 import { EncounterTypes } from '@pokemon-resources/consts/EncounterTypes'

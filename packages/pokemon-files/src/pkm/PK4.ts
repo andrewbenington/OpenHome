@@ -3,6 +3,7 @@ import { Gen4Ribbons } from '@pokemon-resources/index'
 import {
   AbilityIndex,
   Ball,
+  ContestStats,
   ConvertStrategy,
   Gender,
   Item,
@@ -47,7 +48,7 @@ export default class PK4 {
   markings: types.MarkingsSixShapesNoColor
   language: Language
   evs: types.Stats
-  contest: types.ContestStats
+  contest: ContestStats
   moves: FourMoves
   movePP: FourMoves
   movePPUps: FourMoves

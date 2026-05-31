@@ -2,6 +2,7 @@ import {
   AbilityIndex,
   Ball,
   ConvertStrategy,
+  HyperTraining,
   Item,
   Language,
   Languages,
@@ -81,7 +82,7 @@ export default class PB7 {
   metLocationIndex: number
   ball: number
   metLevel: number
-  hyperTraining: types.HyperTrainStats
+  hyperTraining: HyperTraining
   gameOfOrigin: number
   language: Language
   statusCondition: number
