@@ -10,7 +10,7 @@ import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
 import SavesModal from '@openhome-ui/saves/SavesModal'
 import { useSaves } from '@openhome-ui/state/saves'
 import { HomeMonLocation, SaveMonLocation } from '@openhome-ui/state/saves/reducer'
-import { getPluginColor, OriginGames } from '@pkm-rs/pkg'
+import { OriginGames } from '@pkm-rs/pkg'
 import { Badge, Button, Callout, Flex } from '@radix-ui/themes'
 import { useCallback, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
@@ -47,7 +47,7 @@ export default function SortPokemon() {
       .flatMap((save) =>
         save.getAllMons().map((mon) => {
           const backgroundColor = save.pluginIdentifier
-            ? getPluginColor(save.pluginIdentifier)
+            ? OriginGames.pluginColor(save.pluginIdentifier)
             : OriginGames.color(save.origin)
           return {
             mon: ohpkmStore.monOrOhpkmIfTracked(mon),

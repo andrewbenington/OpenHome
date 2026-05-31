@@ -5,7 +5,6 @@ import {
   ConvertStrategy,
   ExtraFormIndex,
   Gender,
-  getPluginColor,
   Language,
   OriginGame,
   OriginGames,
@@ -248,7 +247,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   }
 
   get gameColor(): string {
-    return getPluginColor(this.pluginIdentifier)
+    return OriginGames.pluginColor(this.pluginIdentifier)
   }
 
   get gameLogoPath(): string {

@@ -3,7 +3,7 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { getPluginColor, OriginGames } from '@pkm-rs/pkg'
+import { OriginGames } from '@pkm-rs/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo, useState } from 'react'
 import { classNames, grayscaleIf } from '../util/style'
@@ -30,7 +30,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
 
   const backgroundColor = useMemo(() => {
     return save.pluginIdentifier
-      ? getPluginColor(save.pluginIdentifier)
+      ? OriginGames.pluginColor(save.pluginIdentifier)
       : OriginGames.color(save.game ?? 0)
   }, [save.game, save.pluginIdentifier])
 

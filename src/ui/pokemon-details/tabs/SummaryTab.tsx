@@ -13,7 +13,6 @@ import {
   AbilityNumber,
   extraFormDisplayName,
   genderFromBool,
-  getPluginColor,
   Languages,
   MetadataSummaryLookup,
   OriginGames,
@@ -184,13 +183,13 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
                 style={{
                   color: colorIsDark(
                     mon.pluginOrigin
-                      ? getPluginColor(mon.pluginOrigin)
+                      ? OriginGames.pluginColor(mon.pluginOrigin)
                       : OriginGames.color(mon.gameOfOrigin)
                   )
                     ? '#fff'
                     : '#000',
                   backgroundColor: mon.pluginOrigin
-                    ? getPluginColor(mon.pluginOrigin)
+                    ? OriginGames.pluginColor(mon.pluginOrigin)
                     : OriginGames.color(mon.gameOfOrigin),
                 }}
               >

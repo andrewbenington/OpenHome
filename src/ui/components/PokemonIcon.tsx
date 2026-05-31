@@ -2,7 +2,7 @@ import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import BoxIcons from '@openhome-ui/images/BoxIcons.webp'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
-import { FormsUsingImages, IN_CHAMPIONS } from '@openhome-ui/pokemon-details/useBoxIconImage'
+import { FormsUsingImages } from '@openhome-ui/pokemon-details/useBoxIconImage'
 import {
   ExtraFormIndex,
   extraFormSpriteName,
@@ -10,7 +10,9 @@ import {
   Generation,
   MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
+import { CHAMPS_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
+import { isRestricted } from 'src/core/save/util/TransferRestrictions'
 import { useMonDisplay } from '../hooks/useMonDisplay'
 import useBoxIconImage from '../pokemon-details/useBoxIconImage'
 import { classNames, grayscaleIf } from '../util/style'
@@ -65,7 +67,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
 
   const formeMetadata = MetadataSummaryLookup(dexNumber, formeNumber ?? 0)
 
-  const inChampions = IN_CHAMPIONS.includes(dexNumber)
+  const inChampions = !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
   const isGen9Mega = formeMetadata?.isMega && formeMetadata.introducedGen === Generation.G9
   const extraFormWithSprite = Boolean(extraFormIndex && extraFormSpriteName(extraFormIndex))
 
@@ -146,7 +148,7 @@ function PokemonIconUsingSheet(props: PokemonIconUsingSheetProps) {
   return (
     <div
       draggable={false}
-      className="pokemon-icon-image"
+      className="pokemon-spritesheet-icon"
       style={{
         backgroundImage: `url(${BoxIcons})`,
         backgroundPosition: getBackgroundPosition(formeMetadata, isEgg),
@@ -185,7 +187,7 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
 
   return (
     <img
-      className="fill-parent"
+      className="pokemon-icon-img"
       alt="pokemon sprite"
       draggable={false}
       src={spriteResult.path}
