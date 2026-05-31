@@ -9,6 +9,7 @@ import {
   Item,
   Language,
   Languages,
+  MarkingsSixShapes,
   MetadataSummaryLookup,
   NatureIndex,
   orasFormIndexIfSupported,
@@ -55,7 +56,7 @@ export default class PK6 {
   gender: number
   evs: types.Stats
   contest: ContestStats
-  markings: types.MarkingsSixShapesNoColor
+  markings: MarkingsSixShapes
   pokerusByte: number
   superTrainingFlags: number
   contestMemoryCount: number

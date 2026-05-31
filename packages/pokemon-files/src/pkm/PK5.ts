@@ -9,6 +9,7 @@ import {
   Item,
   Language,
   Languages,
+  MarkingsSixShapes,
   MetadataSummaryLookup,
   NatureIndex,
   OriginGames,
@@ -42,7 +43,7 @@ export default class PK5 {
   exp: number
   trainerFriendship: number
   ability?: AbilityIndex
-  markings: types.MarkingsSixShapesNoColor
+  markings: MarkingsSixShapes
   language: Language
   evs: types.Stats
   contest: ContestStats

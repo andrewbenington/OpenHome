@@ -3,6 +3,7 @@ import {
   Geolocation,
   HyperTraining,
   MarkingsFourShapes,
+  MarkingsSixShapes,
   StatsPreSplit,
   TrainerMemory,
 } from '@pkm-rs/pkg'
@@ -209,12 +210,10 @@ export function writeContestStatsToBytes(dataView: DataView, offset: number, val
 export type MarkingShapePreGen6 = 'circle' | 'square' | 'triangle' | 'heart'
 export type MarkingShape = MarkingShapePreGen6 | 'star' | 'diamond'
 
-export type MarkingsSixShapesNoColor = Record<MarkingShape, boolean>
-
 export type MarkingColorValue = null | 'blue' | 'red'
 export type MarkingsSixShapesWithColor = Record<MarkingShape, MarkingColorValue>
 
-export type Markings = MarkingsFourShapes | MarkingsSixShapesNoColor | MarkingsSixShapesWithColor
+export type Markings = MarkingsFourShapes | MarkingsSixShapes | MarkingsSixShapesWithColor
 
 export function markingDisplay(marking: MarkingShape) {
   switch (marking) {
@@ -263,7 +262,7 @@ export function markingsFourShapesToBytes(
 export function markingsSixShapesNoColorFromBytes(
   dataView: DataView,
   offset: number
-): MarkingsSixShapesNoColor {
+): MarkingsSixShapes {
   return {
     circle: getFlag(dataView, offset, 0),
     triangle: getFlag(dataView, offset, 1),
@@ -277,7 +276,7 @@ export function markingsSixShapesNoColorFromBytes(
 export function markingsSixShapesNoColorToBytes(
   dataView: DataView,
   offset: number,
-  value: MarkingsSixShapesNoColor
+  value: MarkingsSixShapes
 ) {
   setFlag(dataView, offset, 0, value.circle)
   setFlag(dataView, offset, 1, value.triangle)
@@ -327,7 +326,7 @@ export function markingsFourShapesFromOther(other?: Markings): MarkingsFourShape
   }
 }
 
-export function markingsSixShapesNoColorFromOther(other?: Markings): MarkingsSixShapesNoColor {
+export function markingsSixShapesNoColorFromOther(other?: Markings): MarkingsSixShapes {
   if (!other) {
     return {
       circle: false,
