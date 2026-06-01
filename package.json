@@ -101,8 +101,8 @@
     "prettier": "^3.8.3",
     "react-dom": "^19.2.6",
     "typescript": "^6.0.3",
-    "vite": "^8.0.14",
-    "vitest": "^4.1.7"
+    "vite": "^8.0.15",
+    "vitest": "^4.1.8"
   },
   "pnpm": {
     "peerDependencyRules": {
