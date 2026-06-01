@@ -1,7 +1,13 @@
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
-import { ConvertStrategies, ConvertStrategy, ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
+import {
+  ConvertStrategies,
+  ConvertStrategy,
+  ExtraFormIndex,
+  HyperTraining,
+  OriginGame,
+} from '@pkm-rs/pkg'
 import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@pokemon-files/pkm'
-import { HyperTrainStats, Stats } from '@pokemon-files/util'
+import { Stats } from '@pokemon-files/util'
 import { getFormatLocationString } from '@pokemon-resources/locations'
 import fs from 'fs'
 import path from 'path'
@@ -190,7 +196,7 @@ function sanitizeWasmStats(fromWasm: Stats): Stats {
   }
 }
 
-function sanitizeWasmHyperTraining(fromWasm: HyperTrainStats): HyperTrainStats {
+function sanitizeWasmHyperTraining(fromWasm: HyperTraining): HyperTraining {
   return {
     hp: fromWasm.hp,
     atk: fromWasm.atk,

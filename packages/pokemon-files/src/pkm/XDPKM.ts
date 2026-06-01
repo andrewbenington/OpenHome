@@ -1,11 +1,13 @@
 import {
   AbilityNumber,
   Ball,
+  ContestStats,
   ConvertStrategy,
   Gen3Ribbon,
   ItemGen3,
   Language,
   Languages,
+  MarkingsFourShapes,
   MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
@@ -45,7 +47,7 @@ export default class XDPKM {
   trainerGender: boolean
   statLevel: number
   pokerusByte: number
-  markings: types.MarkingsFourShapes
+  markings: MarkingsFourShapes
   isEgg: boolean
   exp: number
   secretID: number
@@ -61,7 +63,7 @@ export default class XDPKM {
   movePPUps: FourMoves
   evs: types.Stats
   ivs: types.Stats
-  contest: types.ContestStats
+  contest: ContestStats
   shadowID: number
   ribbons: Gen3Ribbon[]
 

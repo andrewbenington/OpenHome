@@ -1,13 +1,17 @@
 import {
   AbilityIndex,
   Ball,
+  ContestStats,
   ConvertStrategy,
+  HyperTraining,
   Item,
   Language,
   Languages,
+  MarkingsSixShapesColors,
   MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
+  TrainerMemory,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/other'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
@@ -41,7 +45,7 @@ export default class PB8 {
   abilityNum: number
   favorite: boolean
   canGigantamax: boolean
-  markings: types.MarkingsSixShapesWithColor
+  markings: MarkingsSixShapesColors
   personalityValue: number
   nature: NatureIndex
   statNature: NatureIndex
@@ -49,7 +53,7 @@ export default class PB8 {
   gender: number
   formNum: number
   evs: types.Stats
-  contest: types.ContestStats
+  contest: ContestStats
   pokerusByte: number
   contestMemoryCount: number
   battleMemoryCount: number
@@ -94,9 +98,9 @@ export default class PB8 {
   homeTracker: Uint8Array
   ribbons: string[]
   isCurrentHandler: boolean
-  handlerMemory: types.Memory
-  trainerMemory: types.Memory
-  hyperTraining: types.HyperTrainStats
+  handlerMemory: TrainerMemory
+  trainerMemory: TrainerMemory
+  hyperTraining: HyperTraining
   trainerGender: boolean
   level: number
   stats: types.Stats

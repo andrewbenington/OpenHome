@@ -3,11 +3,13 @@ import { Gen4Ribbons } from '@pokemon-resources/index'
 import {
   AbilityIndex,
   Ball,
+  ContestStats,
   ConvertStrategy,
   Generation,
   Item,
   Language,
   Languages,
+  MarkingsSixShapes,
   MetadataSummaryLookup,
   NatureIndex,
   OriginGames,
@@ -41,10 +43,10 @@ export default class PK5 {
   exp: number
   trainerFriendship: number
   ability?: AbilityIndex
-  markings: types.MarkingsSixShapesNoColor
+  markings: MarkingsSixShapes
   language: Language
   evs: types.Stats
-  contest: types.ContestStats
+  contest: ContestStats
   moves: FourMoves
   movePP: FourMoves
   movePPUps: FourMoves

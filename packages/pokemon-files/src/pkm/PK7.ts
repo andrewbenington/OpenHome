@@ -1,16 +1,20 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   AbilityIndex,
+  ContestStats,
   ConvertStrategies,
   ConvertStrategy,
+  Geolocations,
   HyperTraining,
   Item,
+  MarkingsSixShapesColors,
   MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
   Pk7 as Pk7Wasm,
   PokeDate,
   SpeciesLookup,
+  TrainerMemory,
 } from '@pkm-rs/pkg'
 import * as jsTypes from '@pokemon-files/util/types'
 import { ModernRibbons } from '../../../pokemon-resources/src'
@@ -25,14 +29,8 @@ import { PkmConstructorOptions } from './PKM'
 import {
   binaryGenderFromBool,
   binaryGenderToBool,
-  contestStatsToWasm,
   convertPokeDate,
   convertPokeDateOptional,
-  geolocationsFromWasm,
-  geolocationsToWasm,
-  markingsSixShapesColorsFromWasm,
-  markingsSixShapesColorsToWasm,
-  trainerMemoryToWasm,
 } from './wasm/convert'
 
 export class PK7 {
@@ -138,10 +136,10 @@ export class PK7 {
   }
 
   get markings() {
-    return markingsSixShapesColorsFromWasm(this.inner.markings)
+    return this.inner.markings
   }
-  set markings(value: jsTypes.MarkingsSixShapesWithColor) {
-    this.inner.markings = markingsSixShapesColorsToWasm(value)
+  set markings(value: MarkingsSixShapesColors) {
+    this.inner.markings = value
   }
 
   get personalityValue() {
@@ -186,8 +184,8 @@ export class PK7 {
   get contest() {
     return this.inner.contest
   }
-  set contest(value: jsTypes.ContestStats) {
-    this.inner.contest = contestStatsToWasm(value)
+  set contest(value: ContestStats) {
+    this.inner.contest = value
   }
 
   get resortEventStatus() {
@@ -354,10 +352,10 @@ export class PK7 {
   }
 
   get geolocations() {
-    return geolocationsFromWasm(this.inner.geolocations)
+    return this.inner.geolocations
   }
-  set geolocations(value: jsTypes.Geolocation[]) {
-    this.inner.geolocations = geolocationsToWasm(value)
+  set geolocations(value: Geolocations) {
+    this.inner.geolocations = value
   }
 
   get handlerFriendship() {
@@ -459,15 +457,8 @@ export class PK7 {
   get hyperTraining() {
     return this.inner.hyper_training
   }
-  set hyperTraining(value: jsTypes.HyperTrainStats) {
-    this.inner.hyper_training = new HyperTraining(
-      value.hp,
-      value.atk,
-      value.def,
-      value.spa,
-      value.spd,
-      value.spe
-    )
+  set hyperTraining(value: HyperTraining) {
+    this.inner.hyper_training = value
   }
 
   get gameOfOrigin() {
@@ -533,15 +524,15 @@ export class PK7 {
   get handlerMemory() {
     return this.inner.handler_memory
   }
-  set handlerMemory(value: jsTypes.Memory) {
-    this.inner.handler_memory = trainerMemoryToWasm(value)
+  set handlerMemory(value: TrainerMemory) {
+    this.inner.handler_memory = value
   }
 
   get trainerMemory() {
     return this.inner.trainer_memory
   }
-  set trainerMemory(value: jsTypes.Memory) {
-    this.inner.trainer_memory = trainerMemoryToWasm(value)
+  set trainerMemory(value: TrainerMemory) {
+    this.inner.trainer_memory = value
   }
 
   get trainerGender() {

@@ -7,7 +7,6 @@ import {
   ExtraFormIndex,
   Gender,
   generatePk3CompatiblePid,
-  HyperTraining,
   Item,
   Language,
   Lookup,
@@ -22,6 +21,7 @@ import {
   TrainerMemory,
   updatePidIfWouldBecomeShinyGen345,
 } from '@pkm-rs/pkg'
+import { PK3, PK7 } from '@pokemon-files/pkm'
 import {
   AllPKMFields,
   FourMoves,
@@ -39,17 +39,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { PluginIdentifier, SAV } from '../save/interfaces'
-import {
-  contestStatsFromWasm,
-  contestStatsToWasm,
-  convertPokeDate,
-  convertPokeDateOptional,
-  geolocationsFromWasm,
-  geolocationsToWasm,
-  markingsSixShapesColorsFromWasm,
-  markingsSixShapesColorsToWasm,
-  trainerMemoryToWasm,
-} from './convert'
+import { convertPokeDate, convertPokeDateOptional } from './convert'
 import { isEvolution } from './Lookup'
 import {
   adjustMovePPBetweenFormats,
@@ -58,7 +48,6 @@ import {
   getPrevos,
   ivsFromDVs,
 } from './util'
-import { PK3, PK7 } from '@pokemon-files/pkm'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getFormat() {
@@ -167,7 +156,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       }
 
       if (other.contest) {
-        this.contest = contestStatsToWasm(other.contest)
+        this.contest = other.contest
       }
 
       this.ball = other.ball !== undefined ? other.ball : Ball.Poke
@@ -399,22 +388,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return this.SpeciesAndForm.formIndex
   }
 
-  get evs() {
-    return this.evsWasm
-  }
-
-  set evs(value: Stats) {
-    this.evsWasm = value
-  }
-
-  get contest() {
-    return contestStatsFromWasm(this.contestWasm)
-  }
-
-  set contest(value: jsTypes.ContestStats) {
-    this.contestWasm = contestStatsToWasm(value)
-  }
-
   get moves() {
     const values = Array.from(this.movesWasm)
     if (values.length !== 4) throw Error('move array length != 4')
@@ -451,27 +424,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.relearnMovesWasm = new Uint16Array(value)
   }
 
-  get trainerMemory() {
-    return trainerMemoryToWasm(this.trainerMemoryWasm)
-  }
-  set trainerMemory(value: jsTypes.Memory) {
-    this.trainerMemoryWasm = trainerMemoryToWasm(value)
-  }
-
-  get handlerMemory() {
-    return trainerMemoryToWasm(this.handlerMemoryWasm)
-  }
-  set handlerMemory(value: jsTypes.Memory) {
-    this.handlerMemoryWasm = trainerMemoryToWasm(value)
-  }
-
-  get geolocations() {
-    return geolocationsFromWasm(this.geolocationsWasm)
-  }
-  set geolocations(value: jsTypes.Geolocation[] | undefined) {
-    this.geolocationsWasm = geolocationsToWasm(value)
-  }
-
   get eggDate() {
     return convertPokeDateOptional(this.eggDateWasm)
   }
@@ -488,27 +440,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
   set metDate(value: jsTypes.PKMDate) {
     this.metDateWasm = new PokeDate(value.year, value.month, value.day)
-  }
-
-  get markings() {
-    return markingsSixShapesColorsFromWasm(this.markingsWasm)
-  }
-  set markings(value: jsTypes.MarkingsSixShapesWithColor) {
-    this.markingsWasm = markingsSixShapesColorsToWasm(value)
-  }
-
-  get hyperTraining() {
-    return this.hyperTrainingWasm
-  }
-  set hyperTraining(value: jsTypes.HyperTrainStats) {
-    this.hyperTrainingWasm = new HyperTraining(
-      value.hp,
-      value.atk,
-      value.def,
-      value.spa,
-      value.spd,
-      value.spe
-    )
   }
 
   get shinyLeaves() {
@@ -614,7 +545,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.handlerName = ''
       this.handlerAffection = 0
       this.handlerFriendship = 0
-      this.handlerMemoryWasm = new TrainerMemory(0, 0, 0, 0)
+      this.handlerMemory = { intensity: 0, memory: 0, feeling: 0, textVariables: 0 }
       this.handlerId = 0
       this.handlerLanguage = 0
       this.handlerGender = false
@@ -628,7 +559,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (existingTrainerData) {
       this.handlerAffection = existingTrainerData.affection
       this.handlerFriendship = existingTrainerData.friendship
-      this.handlerMemoryWasm = existingTrainerData.memory
+      this.handlerMemory = existingTrainerData.memory
       this.handlerId = existingTrainerData.id ?? 0
       this.handlerLanguage = existingTrainerData.language ?? 0
       this.handlerGender = existingTrainerData.gender === Gender.Female
@@ -739,7 +670,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         if (markingVal && this.markings[markingType as MarkingShape] === null) {
           this.markings[markingType as MarkingShape] = 'blue'
         } else if (!markingVal && this.markings[markingType as MarkingShape]) {
-          this.markings[markingType as MarkingShape] = null
+          this.markings[markingType as MarkingShape] = 'unset'
         }
       }
     }
@@ -782,13 +713,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         other.handlerFriendship ?? 70, // TODO: USE BASE FRIENDSHIP
         other.handlerAffection ?? 0,
         other.handlerMemory
-          ? new TrainerMemory(
-              other.handlerMemory.intensity,
-              other.handlerMemory.memory,
-              other.handlerMemory.feeling,
-              other.handlerMemory.textVariables
-            )
-          : undefined
       )
     }
 

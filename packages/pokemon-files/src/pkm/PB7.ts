@@ -2,9 +2,11 @@ import {
   AbilityIndex,
   Ball,
   ConvertStrategy,
+  HyperTraining,
   Item,
   Language,
   Languages,
+  MarkingsSixShapesColors,
   MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
@@ -38,7 +40,7 @@ export default class PB7 {
   ability?: AbilityIndex
   abilityNum: number
   favorite: boolean
-  markings: types.MarkingsSixShapesWithColor
+  markings: MarkingsSixShapesColors
   personalityValue: number
   nature: NatureIndex
   isFatefulEncounter: boolean
@@ -81,7 +83,7 @@ export default class PB7 {
   metLocationIndex: number
   ball: number
   metLevel: number
-  hyperTraining: types.HyperTrainStats
+  hyperTraining: HyperTraining
   gameOfOrigin: number
   language: Language
   statusCondition: number

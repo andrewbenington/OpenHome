@@ -13,12 +13,12 @@
   "ability_index": "Keen Eye",
   "ability_num": "First",
   "markings": {
-    "circle": "Unset",
-    "square": "Unset",
-    "triangle": "Unset",
-    "heart": "Unset",
-    "star": "Unset",
-    "diamond": "Unset"
+    "circle": "unset",
+    "square": "unset",
+    "triangle": "unset",
+    "heart": "unset",
+    "star": "unset",
+    "diamond": "unset"
   },
   "personality_value": 3979283180,
   "nature": "Jolly",
@@ -121,7 +121,7 @@
     "intensity": 0,
     "memory": 0,
     "feeling": 0,
-    "text_variable": 0
+    "textVariables": 0
   },
   "fullness": 255,
   "enjoyment": 0,
@@ -132,7 +132,7 @@
     "intensity": 0,
     "memory": 0,
     "feeling": 0,
-    "text_variable": 0
+    "textVariables": 0
   },
   "egg_date": null,
   "met_date": "11/9/2016",

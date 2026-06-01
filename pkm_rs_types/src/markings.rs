@@ -1,14 +1,17 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::BitSet;
 
+#[cfg(feature = "wasm")]
+use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct MarkingsFourShapes {
@@ -39,21 +42,6 @@ impl MarkingsFourShapes {
     }
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
-#[allow(clippy::missing_const_for_fn)]
-impl MarkingsFourShapes {
-    #[wasm_bindgen(constructor)]
-    pub fn new_js(circle: bool, square: bool, triangle: bool, heart: bool) -> Self {
-        Self {
-            circle,
-            square,
-            triangle,
-            heart,
-        }
-    }
-}
-
 impl From<MarkingsSixShapes> for MarkingsFourShapes {
     fn from(other: MarkingsSixShapes) -> Self {
         MarkingsFourShapes {
@@ -76,8 +64,9 @@ impl From<MarkingsSixShapesColors> for MarkingsFourShapes {
     }
 }
 
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct MarkingsSixShapes {
     pub circle: bool,
@@ -138,13 +127,17 @@ impl From<MarkingsSixShapesColors> for MarkingsSixShapes {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub enum MarkingValue {
     #[default]
+    #[serde(rename = "unset")]
     Unset,
+    #[serde(rename = "blue")]
     Blue,
+    #[serde(rename = "red")]
     Red,
 }
 
@@ -188,7 +181,8 @@ impl MarkingValue {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct MarkingsSixShapesColors {
@@ -223,29 +217,6 @@ impl MarkingsSixShapesColors {
         u16_val |= self.diamond.to_u16() << 10;
 
         u16_val.to_le_bytes()
-    }
-}
-
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
-impl MarkingsSixShapesColors {
-    #[wasm_bindgen(constructor)]
-    pub fn from_strings_optional(
-        circle: Option<String>,
-        square: Option<String>,
-        triangle: Option<String>,
-        heart: Option<String>,
-        star: Option<String>,
-        diamond: Option<String>,
-    ) -> Self {
-        Self {
-            circle: MarkingValue::from_string_optional(circle),
-            square: MarkingValue::from_string_optional(square),
-            triangle: MarkingValue::from_string_optional(triangle),
-            heart: MarkingValue::from_string_optional(heart),
-            star: MarkingValue::from_string_optional(star),
-            diamond: MarkingValue::from_string_optional(diamond),
-        }
     }
 }
 

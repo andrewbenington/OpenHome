@@ -1,3 +1,13 @@
+import {
+  ContestStats,
+  Geolocation,
+  HyperTraining,
+  MarkingsFourShapes,
+  MarkingsSixShapes,
+  MarkingsSixShapesColors,
+  StatsPreSplit,
+  TrainerMemory,
+} from '@pkm-rs/pkg'
 import { getFlag, setFlag, uIntFromBufferBits, uIntToBufferBits } from './byteLogic'
 
 export type ToBytesOptions = {
@@ -23,13 +33,6 @@ export function writePKMDateToBytes(dataView: DataView, offset: number, date: PK
   dataView.setUint8(offset, date ? date.year - 2000 : 0)
   dataView.setUint8(offset + 1, date ? date.month : 0)
   dataView.setUint8(offset + 2, date ? date.day : 0)
-}
-
-export interface Memory {
-  intensity: number
-  memory: number
-  feeling: number
-  textVariables: number
 }
 
 export interface Stats {
@@ -61,14 +64,6 @@ export function isStandardStats(stats?: object): stats is Stats {
 
 export type StatAbbr = keyof Stats
 
-export interface StatsPreSplit {
-  hp: number
-  atk: number
-  def: number
-  spc: number
-  spe: number
-}
-
 export function isStatsPreSplit(stats?: object): stats is StatsPreSplit {
   return (
     stats !== undefined &&
@@ -83,24 +78,6 @@ export function isStatsPreSplit(stats?: object): stats is StatsPreSplit {
     'spe' in stats &&
     typeof stats.spe === 'number'
   )
-}
-
-export interface HyperTrainStats {
-  hp: boolean
-  atk: boolean
-  def: boolean
-  spa: boolean
-  spd: boolean
-  spe: boolean
-}
-
-export interface ContestStats {
-  cool: number
-  beauty: number
-  cute: number
-  smart: number
-  tough: number
-  sheen: number
 }
 
 export function isContestStats(stats?: object): stats is ContestStats {
@@ -177,7 +154,7 @@ export function read30BitIVsFromBytes(dataView: DataView, offset: number): Stats
 export const writeHyperTrainStatsToBytes = (
   dataView: DataView,
   offset: number,
-  value: HyperTrainStats
+  value: HyperTraining
 ) => {
   setFlag(dataView, offset, 0, value.hp)
   setFlag(dataView, offset, 1, value.atk)
@@ -187,7 +164,7 @@ export const writeHyperTrainStatsToBytes = (
   setFlag(dataView, offset, 5, value.spe)
 }
 
-export function readHyperTrainStatsFromBytes(dataView: DataView, offset: number): HyperTrainStats {
+export function readHyperTrainStatsFromBytes(dataView: DataView, offset: number): HyperTraining {
   return {
     hp: getFlag(dataView, offset, 0),
     atk: getFlag(dataView, offset, 1),
@@ -231,21 +208,13 @@ export function writeContestStatsToBytes(dataView: DataView, offset: number, val
   dataView.setUint8(offset + 5, value.sheen)
 }
 
-export interface Geolocation {
-  region: number
-  country: number
-}
-
 export type MarkingShapePreGen6 = 'circle' | 'square' | 'triangle' | 'heart'
 export type MarkingShape = MarkingShapePreGen6 | 'star' | 'diamond'
 
-export type MarkingsFourShapes = Record<MarkingShapePreGen6, boolean>
-export type MarkingsSixShapesNoColor = Record<MarkingShape, boolean>
+export type MarkingColorValue = 'unset' | 'blue' | 'red'
+// export type MarkingsSixShapesWithColor = Record<MarkingShape, MarkingColorValue>
 
-export type MarkingColorValue = null | 'blue' | 'red'
-export type MarkingsSixShapesWithColor = Record<MarkingShape, MarkingColorValue>
-
-export type Markings = MarkingsFourShapes | MarkingsSixShapesNoColor | MarkingsSixShapesWithColor
+export type Markings = MarkingsFourShapes | MarkingsSixShapes | MarkingsSixShapesColors
 
 export function markingDisplay(marking: MarkingShape) {
   switch (marking) {
@@ -264,7 +233,7 @@ export function markingDisplay(marking: MarkingShape) {
   }
 }
 
-export function markingsHaveColor(markings: Markings): markings is MarkingsSixShapesWithColor {
+export function markingsHaveColor(markings: Markings): markings is MarkingsSixShapesColors {
   return typeof markings.circle !== 'boolean'
 }
 
@@ -294,7 +263,7 @@ export function markingsFourShapesToBytes(
 export function markingsSixShapesNoColorFromBytes(
   dataView: DataView,
   offset: number
-): MarkingsSixShapesNoColor {
+): MarkingsSixShapes {
   return {
     circle: getFlag(dataView, offset, 0),
     triangle: getFlag(dataView, offset, 1),
@@ -308,7 +277,7 @@ export function markingsSixShapesNoColorFromBytes(
 export function markingsSixShapesNoColorToBytes(
   dataView: DataView,
   offset: number,
-  value: MarkingsSixShapesNoColor
+  value: MarkingsSixShapes
 ) {
   setFlag(dataView, offset, 0, value.circle)
   setFlag(dataView, offset, 1, value.triangle)
@@ -325,7 +294,7 @@ export function twoColorMarkingFromInt(value: number): MarkingColorValue {
     case 2:
       return 'red'
     default:
-      return null
+      return 'unset'
   }
 }
 
@@ -358,7 +327,7 @@ export function markingsFourShapesFromOther(other?: Markings): MarkingsFourShape
   }
 }
 
-export function markingsSixShapesNoColorFromOther(other?: Markings): MarkingsSixShapesNoColor {
+export function markingsSixShapesNoColorFromOther(other?: Markings): MarkingsSixShapes {
   if (!other) {
     return {
       circle: false,
@@ -385,31 +354,31 @@ export function markingColorValueFromOther(marking: boolean | MarkingColorValue)
     case true:
       return 'blue'
     case false:
-      return null
+      return 'unset'
     default:
       return marking
   }
 }
 
-export function markingsSixShapesWithColorFromOther(other?: Markings): MarkingsSixShapesWithColor {
+export function markingsSixShapesWithColorFromOther(other?: Markings): MarkingsSixShapesColors {
   if (!other) {
     return {
-      circle: null,
-      triangle: null,
-      square: null,
-      heart: null,
-      star: null,
-      diamond: null,
+      circle: 'unset',
+      triangle: 'unset',
+      square: 'unset',
+      heart: 'unset',
+      star: 'unset',
+      diamond: 'unset',
     }
   }
 
-  const coloredMarkings: MarkingsSixShapesWithColor = {
+  const coloredMarkings: MarkingsSixShapesColors = {
     circle: markingColorValueFromOther(other.circle),
     triangle: markingColorValueFromOther(other.triangle),
     square: markingColorValueFromOther(other.square),
     heart: markingColorValueFromOther(other.heart),
-    star: null,
-    diamond: null,
+    star: 'unset',
+    diamond: 'unset',
   }
 
   if ('star' in other) {
@@ -423,7 +392,7 @@ export function markingsSixShapesWithColorFromOther(other?: Markings): MarkingsS
 export function markingsSixShapesWithColorFromBytes(
   data: DataView,
   offset: number
-): MarkingsSixShapesWithColor {
+): MarkingsSixShapesColors {
   const markingsValue = data.getUint16(offset, true)
 
   return {
@@ -439,7 +408,7 @@ export function markingsSixShapesWithColorFromBytes(
 export function markingsSixShapesWithColorToBytes(
   dataView: DataView,
   offset: number,
-  value: MarkingsSixShapesWithColor
+  value: MarkingsSixShapesColors
 ) {
   uIntToBufferBits(dataView, twoColorMarkingToInt(value.circle), offset, 0, 2)
   uIntToBufferBits(dataView, twoColorMarkingToInt(value.triangle), offset, 2, 2)
@@ -474,7 +443,10 @@ export function writeDVsToBytes(dvs: StatsPreSplit, buffer: DataView, offset: nu
   buffer.setUint16(offset, dvBytes, false)
 }
 
-export function readSwitchTrainerMemoryFromBytes(dataView: DataView, offset: number): Memory {
+export function readSwitchTrainerMemoryFromBytes(
+  dataView: DataView,
+  offset: number
+): TrainerMemory {
   return {
     intensity: dataView.getUint8(offset),
     memory: dataView.getUint8(offset + 1),
@@ -483,7 +455,10 @@ export function readSwitchTrainerMemoryFromBytes(dataView: DataView, offset: num
   }
 }
 
-export function readSwitchHandlerMemoryFromBytes(dataView: DataView, offset: number): Memory {
+export function readSwitchHandlerMemoryFromBytes(
+  dataView: DataView,
+  offset: number
+): TrainerMemory {
   return {
     intensity: dataView.getUint8(offset),
     memory: dataView.getUint8(offset + 1),
@@ -492,7 +467,7 @@ export function readSwitchHandlerMemoryFromBytes(dataView: DataView, offset: num
   }
 }
 
-export function read3DSTrainerMemoryFromBytes(dataView: DataView, offset: number): Memory {
+export function read3DSTrainerMemoryFromBytes(dataView: DataView, offset: number): TrainerMemory {
   return {
     intensity: dataView.getUint8(offset),
     memory: dataView.getUint8(offset + 1),
@@ -501,7 +476,7 @@ export function read3DSTrainerMemoryFromBytes(dataView: DataView, offset: number
   }
 }
 
-export function read3DSHandlerMemoryFromBytes(dataView: DataView, offset: number): Memory {
+export function read3DSHandlerMemoryFromBytes(dataView: DataView, offset: number): TrainerMemory {
   return {
     intensity: dataView.getUint8(offset),
     memory: dataView.getUint8(offset + 1),
@@ -510,28 +485,44 @@ export function read3DSHandlerMemoryFromBytes(dataView: DataView, offset: number
   }
 }
 
-export function writeSwitchTrainerMemoryToBytes(dataView: DataView, offset: number, value: Memory) {
+export function writeSwitchTrainerMemoryToBytes(
+  dataView: DataView,
+  offset: number,
+  value: TrainerMemory
+) {
   dataView.setUint8(offset, value.intensity)
   dataView.setUint8(offset + 1, value.memory)
   dataView.setUint16(offset + 3, value.textVariables, true)
   dataView.setUint8(offset + 5, value.feeling)
 }
 
-export function writeSwitchHandlerMemoryToBytes(dataView: DataView, offset: number, value: Memory) {
+export function writeSwitchHandlerMemoryToBytes(
+  dataView: DataView,
+  offset: number,
+  value: TrainerMemory
+) {
   dataView.setUint8(offset, value.intensity)
   dataView.setUint8(offset + 1, value.memory)
   dataView.setUint8(offset + 2, value.feeling)
   dataView.setUint16(offset + 3, value.textVariables, true)
 }
 
-export function write3DSTrainerMemoryToBytes(dataView: DataView, offset: number, value: Memory) {
+export function write3DSTrainerMemoryToBytes(
+  dataView: DataView,
+  offset: number,
+  value: TrainerMemory
+) {
   dataView.setUint8(offset, value.intensity)
   dataView.setUint8(offset + 1, value.memory)
   dataView.setUint16(offset + 2, value.textVariables, true)
   dataView.setUint8(offset + 4, value.feeling)
 }
 
-export function write3DSHandlerMemoryToBytes(dataView: DataView, offset: number, value: Memory) {
+export function write3DSHandlerMemoryToBytes(
+  dataView: DataView,
+  offset: number,
+  value: TrainerMemory
+) {
   dataView.setUint8(offset, value.intensity)
   dataView.setUint8(offset + 1, value.memory)
   dataView.setUint8(offset + 2, value.feeling)

@@ -6,6 +6,7 @@ import {
   MetadataSummaryLookup,
   OriginGames,
   SpeciesLookup,
+  StatsPreSplit,
 } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
@@ -33,8 +34,8 @@ export default class PK2 {
   moves: FourMoves
   trainerID: number
   exp: number
-  evsG12: types.StatsPreSplit
-  dvs: types.StatsPreSplit
+  evsG12: StatsPreSplit
+  dvs: StatsPreSplit
   movePP: FourMoves
   movePPUps: FourMoves
   trainerFriendship: number

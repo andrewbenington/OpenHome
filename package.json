@@ -42,7 +42,7 @@
     "wasm-compile-dev": "wasm-pack build ./pkm_rs --target web -- --features wasm && node scripts/patch-types.mjs",
     "wasm-compile": "wasm-pack build --release ./pkm_rs --target web -- --features wasm && node scripts/patch-types.mjs",
     "precommit": "pnpm run typecheck && pnpm run format && pnpm run lint",
-    "postinstall": "pnpm run wasm-compile"
+    "postinstall": "pnpm run wasm-compile-dev"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

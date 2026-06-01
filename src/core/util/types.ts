@@ -24,7 +24,7 @@ export type Type =
   | 'Normal'
 
 // 1 = blue/black, 2 = red
-export type MarkingValue = boolean | 'blue' | 'red' | null
+export type MarkingValue = boolean | 'blue' | 'red' | 'unset'
 
 export interface SaveRef extends Partial<JSONObject> {
   filePath: PathData

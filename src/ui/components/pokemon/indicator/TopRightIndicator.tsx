@@ -1,4 +1,4 @@
-import { StatsPreSplit } from '@pokemon-files/util'
+import { StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
 import { PKMInterface } from '../../../../core/pkm/interfaces'
 import { TopRightIndicatorType } from '../../../hooks/useMonDisplay'
 import { getPublicImageURL } from '../../../images/images'

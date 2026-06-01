@@ -10,8 +10,9 @@ import {
   MetadataSummaryLookup,
   PkmType,
   SpeciesAndForm,
+  StatsPreSplit,
 } from '@pkm-rs/pkg'
-import { FourMoves, Stats, StatsPreSplit } from '@pokemon-files/util'
+import { FourMoves, Stats } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import {
