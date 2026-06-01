@@ -13,12 +13,12 @@
   "ability_index": "Oblivious",
   "ability_num": "First",
   "markings": {
-    "circle": "Unset",
-    "square": "Unset",
-    "triangle": "Unset",
-    "heart": "Unset",
-    "star": "Unset",
-    "diamond": "Unset"
+    "circle": "unset",
+    "square": "unset",
+    "triangle": "unset",
+    "heart": "unset",
+    "star": "unset",
+    "diamond": "unset"
   },
   "personality_value": 1934308535,
   "nature": "Hardy",

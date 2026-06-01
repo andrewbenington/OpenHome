@@ -1,3 +1,5 @@
+import { PluginIdentifier } from '@openhome-core/save/interfaces'
+import { MonTag } from '@openhome-ui/util/tags'
 import {
   AbilityIndex,
   ContestStats,
@@ -13,7 +15,6 @@ import {
   StatsPreSplit,
   TrainerMemory,
 } from '@pkm-rs/pkg'
-import { PluginIdentifier } from '../../../../src/core/save/interfaces'
 import * as types from './types'
 import { Markings } from './types'
 
@@ -139,6 +140,7 @@ export interface AllPKMFields {
   statusCondition?: number
   superTrainingDistFlags?: number
   superTrainingFlags?: number
+  tags?: MonTag[]
   teraTypeOriginal?: number
   teraTypeOverride?: number
   tmFlagsBDSP?: Uint8Array

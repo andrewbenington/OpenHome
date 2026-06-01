@@ -28,9 +28,9 @@ public static partial class Util
   {
     return color switch
     {
-      MarkingColor.Pink => "Red",
-      MarkingColor.Blue => "Blue",
-      MarkingColor.None => "Unset",
+      MarkingColor.Pink => "red",
+      MarkingColor.Blue => "blue",
+      MarkingColor.None => "unset",
       _ => throw new ArgumentException($"Unexpected marking color: {color}"),
     };
   }
