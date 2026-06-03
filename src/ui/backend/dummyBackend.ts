@@ -75,6 +75,8 @@ const DummyBackend: BackendInterface = {
   downloadPlugin: async () => R.Err('no backend in use'),
   loadPluginCode: async () => R.Err('no backend in use'),
   deletePlugin: async () => R.Err('no backend in use'),
+  getLogs: async () => R.Err('no backend in use'),
+  log: async () => R.Err('no backend in use'),
 }
 
 export default DummyBackend

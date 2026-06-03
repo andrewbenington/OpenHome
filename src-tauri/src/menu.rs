@@ -1,6 +1,7 @@
 use std::process::Command;
 
 use tauri::{App, AppHandle, Emitter, Wry, image::Image, include_image, menu::*};
+use tracing::{error, info};
 
 use crate::data_controller::DataController;
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
@@ -151,23 +152,23 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
         // File menu actions
         "open" => app_handle
             .emit("open", ())
-            .unwrap_or_else(|err| println!("Error emitting 'open' event: {err}")),
+            .unwrap_or_else(|err| error!("Error emitting 'open' event: {err}")),
         "save" => match app_handle.emit("save", ()) {
-            Ok(_) => println!("Save successful"),
-            Err(error) => println!("Error saving: {error}"),
+            Ok(_) => info!("Save successful"),
+            Err(error) => error!("Error saving: {error}"),
         },
         "reset" => {
             let _ = app_handle.emit("reset", ());
         }
         "open-appdata" => match app_handle.get_data_folder() {
             Err(err) => {
-                println!["Error getting data directory: {}", err];
+                error!["Error getting data directory: {}", err];
             }
             Ok(dir) => command_open(dir.to_str().unwrap_or_default()),
         },
         "open-config" => match app_handle.get_config_folder() {
             Err(err) => {
-                println!["Error getting config directory: {}", err];
+                error!["Error getting config directory: {}", err];
             }
             Ok(dir) => command_open(dir.to_str().unwrap_or_default()),
         },
@@ -176,13 +177,13 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
         // View menu actions
         "zoom_in" => app_handle
             .emit("zoom_in", ())
-            .unwrap_or_else(|err| println!("Error emitting 'zoom_in' event: {err}")),
+            .unwrap_or_else(|err| error!("Error emitting 'zoom_in' event: {err}")),
         "zoom_out" => app_handle
             .emit("zoom_out", ())
-            .unwrap_or_else(|err| println!("Error emitting 'zoom_out' event: {err}")),
+            .unwrap_or_else(|err| error!("Error emitting 'zoom_out' event: {err}")),
         "reset_zoom" => app_handle
             .emit("reset_zoom", ())
-            .unwrap_or_else(|err| println!("Error emitting 'reset_zoom' event: {err}")),
+            .unwrap_or_else(|err| error!("Error emitting 'reset_zoom' event: {err}")),
 
         // Help menu actions
         "check-updates" => command_open("https://andrewbenington.github.io/OpenHome/download.html"),
