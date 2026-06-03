@@ -30,6 +30,16 @@ export type PluginDownloadProgress = {
   progress: number
 }
 
+export type LogEntry = {
+  timestamp: string
+  level: string
+  target: string
+  message: string
+  fields: Record<string, unknown>
+}
+
+export type LogLevel = 'error' | 'warn' | 'info' | 'debug' | 'trace'
+
 export type StoredLookups = { gen12: LookupMap; gen345: LookupMap }
 
 export type OhpkmStore = Record<string, OHPKM>
@@ -101,6 +111,8 @@ export default interface BackendInterface {
   setTheme(appTheme: AppTheme): Promise<Errorable<null>>
   saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Errorable<null>>
   emitMenuEvent: (menuEventId: string) => Promise<Errorable<null>>
+  getLogs(): Promise<Errorable<LogEntry[]>>
+  log(level: LogLevel, message: string, fields?: Record<string, unknown>): Promise<Errorable<void>>
 
   /* plugins */
   getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>

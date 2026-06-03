@@ -248,6 +248,8 @@ export const TauriBackend: BackendInterface = {
   downloadPlugin: Commands.download_plugin,
   loadPluginCode: Commands.load_plugin_code,
   deletePlugin: Commands.delete_plugin,
+  getLogs: Commands.get_logs_today,
+  log: Commands.log,
 
   registerListeners: (listeners) => {
     const unlistenPromises: Promise<UnlistenFn>[] = [

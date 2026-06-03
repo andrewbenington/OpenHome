@@ -1,0 +1,25 @@
+.logs-container {
+  height: 100%;
+  overflow: auto;
+  font-size: 0.75rem;
+}
+
+.log-line:nth-child(odd) {
+  background-color: var(--color-gray-300);
+}
+
+.log-line:nth-child(even) {
+  background-color: var(--color-gray-200);
+}
+
+.log-timestamp {
+  display: inline-block;
+  font-style: italic;
+  color: var(--color-gray-800);
+  padding: 0 1rem;
+  font-family: monospace;
+  font-size: 0.6rem;
+  text-align: end;
+  width: 4rem;
+  height: 100%;
+}

@@ -14,6 +14,7 @@ import Settings from './pages/Settings'
 import SortPokemon from './pages/sort/SortPokemon'
 import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
 import { PluginContext } from './state/plugin/reducer'
+import Logs from './pages/logs/Logs'
 
 export default function AppTabs() {
   const isDev = useIsDev()
@@ -60,6 +61,11 @@ export default function AppTabs() {
               Sprite Plugins
             </NotificationBadge>
           </Tabs.Tab>
+          <Tabs.Tab value="logs">
+            <AppTabIconsActive.Settings />
+            <AppTabIconsInactive.Settings />
+            Logs
+          </Tabs.Tab>
           <Tabs.Tab value="settings">
             <AppTabIconsActive.Settings />
             <AppTabIconsInactive.Settings />
@@ -91,6 +97,7 @@ export default function AppTabs() {
               <Route path="/sort" element={<SortPokemon />} />
               <Route path="/pokedex" element={<PokedexPage />} />
               <Route path="/plugins/*" element={<PluginsPage />} />
+              <Route path="/logs/*" element={<Logs />} />
               <Route path="/settings/*" element={<Settings />} />
               {isDev && (
                 <>

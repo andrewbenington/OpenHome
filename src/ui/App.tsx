@@ -39,6 +39,8 @@ export default function App() {
   const isDarkMode = useIsDarkMode()
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
 
+  console.log('app')
+
   return (
     <Theme
       accentColor="red"
@@ -57,35 +59,7 @@ export default function App() {
     </Theme>
   )
 }
-
-function buildKeyboardHandler(backend: BackendInterface) {
-  return (e: KeyboardEvent) => {
-    if (!e.ctrlKey) return
-    switch (e.key) {
-      case 'o':
-        backend.emitMenuEvent('open')
-        return
-      case 's':
-        backend.emitMenuEvent('save')
-        return
-      case 't':
-        backend.emitMenuEvent('reset')
-        return
-      case 'd':
-        backend.emitMenuEvent('open-appdata')
-        return
-      case 'q':
-        backend.emitMenuEvent('exit')
-        return
-      case 'u':
-        backend.emitMenuEvent('check-updates')
-        return
-      case 'g':
-        backend.emitMenuEvent('visit-github')
-        return
-    }
-  }
-}
+const webConsole = { ...console }
 
 function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
@@ -140,11 +114,15 @@ function AppWithBackend() {
   useEffect(() => {
     // returns a function to stop listening
     const stopListening = backend.onMenuEvents({
-      zoom_in: () =>
+      zoom_in: () => {
+        console.info('patching...')
+        patchConsole(backend)
+        console.info('patched')
         appInfoDispatch({
           type: 'set_zoom_level',
           payload: Math.min(appInfoState.settings.zoomLevel + ZOOM_CHANGE_PCT, ZOOM_MAX_PCT),
-        }),
+        })
+      },
       zoom_out: () =>
         appInfoDispatch({
           type: 'set_zoom_level',
@@ -165,6 +143,10 @@ function AppWithBackend() {
       .concat(appInfoState.extraSaveTypes)
       .filter((saveType) => appInfoState.settings.enabledSaveTypes[saveType.saveTypeID])
   }, [appInfoState])
+
+  useEffect(() => {
+    patchConsole(backend)
+  }, [backend])
 
   return (
     <BanksAndBoxesProvider>
@@ -203,4 +185,57 @@ function AppWithBackend() {
       </AppInfoContext.Provider>
     </BanksAndBoxesProvider>
   )
+}
+
+function patchConsole(backend: BackendInterface) {
+  const levels = [
+    ['log', 'info'],
+    ['info', 'info'],
+    ['warn', 'warn'],
+    ['error', 'error'],
+    ['debug', 'debug'],
+  ] as const
+
+  for (const [method, level] of levels) {
+    // eslint-disable-next-line no-console
+    console[method] = (...args: unknown[]) => {
+      // Still print to devtools so you're not flying blind
+      webConsole[method](...args)
+      webConsole.info('just logged')
+      const message = args
+        .map((a) => (typeof a === 'object' ? JSON.stringify(a) : String(a)))
+        .join(' ')
+
+      backend.log(level, message, { source: 'console' })
+    }
+  }
+}
+
+function buildKeyboardHandler(backend: BackendInterface) {
+  return (e: KeyboardEvent) => {
+    if (!e.ctrlKey) return
+    switch (e.key) {
+      case 'o':
+        backend.emitMenuEvent('open')
+        return
+      case 's':
+        backend.emitMenuEvent('save')
+        return
+      case 't':
+        backend.emitMenuEvent('reset')
+        return
+      case 'd':
+        backend.emitMenuEvent('open-appdata')
+        return
+      case 'q':
+        backend.emitMenuEvent('exit')
+        return
+      case 'u':
+        backend.emitMenuEvent('check-updates')
+        return
+      case 'g':
+        backend.emitMenuEvent('visit-github')
+        return
+    }
+  }
 }
