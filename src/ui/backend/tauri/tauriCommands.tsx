@@ -5,11 +5,11 @@ import { JSONArray, JSONObject, JSONValue, SaveRef } from '@openhome-core/util/t
 import { AppTheme } from '@openhome-ui/state/appInfo'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
+import { getDefaultConvertStrategy } from '@pkm-rs/pkg'
 import { invoke, InvokeArgs, InvokeOptions } from '@tauri-apps/api/core'
 import { ConvertStrategies } from 'src/ui/state/convert-strategies/ConvertStrategiesProvider'
-import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
+import { AppState, ImageResponse, LogEntry, LogLevel, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
-import { getDefaultConvertStrategy } from '@pkm-rs/pkg'
 
 export type StringToBytes = Record<string, Uint8Array>
 export type StringToB64 = Record<string, string>
@@ -86,6 +86,9 @@ type OhTauriApi = {
   start_transaction(): null
   rollback_transaction(): null
   commit_transaction(): null
+
+  get_logs_today(): LogEntry[]
+  log(level: LogLevel, message: string, fields?: Record<string, unknown>): void
 }
 
 type OhCommand = keyof OhTauriApi
@@ -97,6 +100,8 @@ type OhCommandResult<C extends OhCommand> = ReturnType<OhTauriApi[C]>
 type OhTauriApiNoThrow = {
   [C in OhCommand]: (...args: OhCommandArgs<C>) => Promise<Errorable<OhCommandResult<C>>>
 }
+
+const webConsole = { ...console }
 
 export const Commands: OhTauriApiNoThrow = {
   get_state() {
@@ -250,6 +255,15 @@ export const Commands: OhTauriApiNoThrow = {
 
   open_file_location(filePath: string) {
     return invokeAndCatch('open_file_location', { filePath })
+  },
+
+  get_logs_today() {
+    return invokeAndCatch('get_logs_today')
+  },
+
+  log(level: LogLevel, message: string, fields?: Record<string, unknown | undefined>) {
+    webConsole.trace('logging with command')
+    return invokeAndCatch('log', { entry: { level, message, fields } })
   },
 }
 

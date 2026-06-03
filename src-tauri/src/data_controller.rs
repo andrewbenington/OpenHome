@@ -7,12 +7,14 @@ use crate::startup_config::StartupConfigState;
 const STORAGE_DIR_NAME: &str = "storage";
 pub const MONS_V2_DIR: &str = "mons_v2";
 const PLUGINS_DIR_NAME: &str = "plugins";
+const LOG_DIR_NAME: &str = "logs";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DataDir {
     Storage,
     Plugins,
     OpenHomeRoot,
+    Logs,
 }
 
 impl DataDir {
@@ -20,6 +22,7 @@ impl DataDir {
         match self {
             DataDir::Storage => Some(STORAGE_DIR_NAME),
             DataDir::Plugins => Some(PLUGINS_DIR_NAME),
+            DataDir::Logs => Some(LOG_DIR_NAME),
             DataDir::OpenHomeRoot => None,
         }
     }
