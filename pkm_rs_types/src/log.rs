@@ -27,7 +27,7 @@ pub fn fatal_log<T: ToString>(s: T) -> ! {
 #[macro_export]
 macro_rules! log {
     ($($arg:tt)*) => {{
-        $crate::log(format!($($arg)*));
+        $crate::log::log(format!($($arg)*));
     }};
 }
 

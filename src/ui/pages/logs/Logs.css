@@ -62,12 +62,18 @@
   font-family: monospace;
   width: 100%;
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0 0.5rem;
   box-sizing: border-box;
   font-size: 0.9rem;
-  height: 1.6rem;
+  height: 1.8rem;
+  min-height: fit-content;
+  border-bottom: 0.5px solid var(--color-gray-400);
+
+  & button {
+    height: 1.4rem;
+  }
 }
 
 .log-line:nth-child(odd) {
@@ -81,6 +87,11 @@
 .log-level-trace {
   background-color: rgb(229, 207, 230);
   color: rgb(120, 120, 120);
+}
+
+.log-level-debug {
+  background-color: rgb(188, 236, 200);
+  color: rgb(62, 62, 62);
 }
 
 .log-level-info {
@@ -104,7 +115,7 @@
   border-radius: 3px;
   text-align: center;
   font-weight: bold;
-  padding: 0;
+  margin: 0 0.25rem;
 }
 
 .log-timestamp {
@@ -114,8 +125,6 @@
   font-size: 0.9rem;
   text-align: end;
   width: 6rem;
-  height: 100%;
-  line-height: 1.5rem;
 }
 
 .log-message {
@@ -124,4 +133,10 @@
 
 .log-message-empty {
   color: #888;
+}
+
+.log-ohpkm-button {
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
 }

@@ -1,3 +1,4 @@
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
@@ -33,10 +34,12 @@ export type PluginDownloadProgress = {
 export type LogEntry = {
   timestamp: string
   level: string
-  target: string
+  target?: string
   message: string
-  fields: Record<string, unknown> | null
-  context: Record<string, unknown> | null
+  event?: string
+  fields?: Record<string, unknown>
+  context?: Record<string, unknown>
+  ohpkm_id?: OhpkmIdentifier
 }
 
 export type LogLevel = 'error' | 'warn' | 'info' | 'debug' | 'trace'

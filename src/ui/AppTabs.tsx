@@ -8,13 +8,13 @@ import { Tabs } from './components/Tabs'
 import AppStateDisplay from './pages/AppStateDisplay'
 import ComponentDebugDisplay from './pages/ComponentDebugDisplay'
 import Home from './pages/home/Home'
+import Logs from './pages/logs/Logs'
 import PluginsPage from './pages/plugins/Plugins'
 import PokedexPage from './pages/pokedex/PokedexPage'
 import Settings from './pages/Settings'
 import SortPokemon from './pages/sort/SortPokemon'
 import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
 import { PluginContext } from './state/plugin/reducer'
-import Logs from './pages/logs/Logs'
 
 export default function AppTabs() {
   const isDev = useIsDev()
@@ -62,8 +62,8 @@ export default function AppTabs() {
             </NotificationBadge>
           </Tabs.Tab>
           <Tabs.Tab value="logs">
-            <AppTabIconsActive.Settings />
-            <AppTabIconsInactive.Settings />
+            <AppTabIconsActive.Logs />
+            <AppTabIconsInactive.Logs />
             Logs
           </Tabs.Tab>
           <Tabs.Tab value="settings">
