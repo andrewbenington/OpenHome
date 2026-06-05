@@ -57,7 +57,6 @@ export default function App() {
     </Theme>
   )
 }
-const webConsole = { ...console }
 
 function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
@@ -185,6 +184,8 @@ function AppWithBackend() {
   )
 }
 
+const webConsole = { ...console }
+
 function patchConsole(backend: BackendInterface) {
   const levels = [
     ['log', 'info'],
@@ -197,15 +198,19 @@ function patchConsole(backend: BackendInterface) {
   for (const [method, level] of levels) {
     // eslint-disable-next-line no-console
     console[method] = (...args: unknown[]) => {
-      // Still print to devtools
+      // send message to web console as well
       webConsole[method](...args)
 
-      if (args.length > 0 && typeof args[0] === 'object') {
-        backend.log(level, serializeArg(args.at(1)), JSON.parse(JSON.stringify(args[0])))
+      // remove this function from the stack trace
+      const stack = new Error().stack?.split('\n').slice(1).join('\n')
+
+      if (args.length > 0 && typeof args[0] === 'object' && args[0] !== null) {
+        const context = args[0] as Record<string, unknown>
+        context['stack'] = stack
+        backend.log(level, serializeArg(args.at(1)), JSON.parse(JSON.stringify(context)))
       } else {
         const message = args.map(serializeArg).join(' ')
-
-        backend.log(level, message, { source: 'console' })
+        backend.log(level, message, { stack })
       }
     }
   }

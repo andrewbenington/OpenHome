@@ -1,5 +1,4 @@
 import { R } from '@openhome-core/util/functional'
-import { OhpkmLookup } from '@openhome-ui/state/ohpkm'
 import { SAVClass } from '.'
 import { Errorable } from '../../util/functional'
 import { SAV } from '../interfaces'
@@ -10,12 +9,6 @@ export const getPossibleSaveTypes = (
   supportedSaveTypes: SAVClass[]
 ): SAVClass[] => {
   return supportedSaveTypes.filter((saveType) => saveType.fileIsSave(bytes))
-}
-
-export type MonLookup = {
-  getOhpkmById?: OhpkmLookup
-  gen12LookupMap?: Record<string, string>
-  gen345LookupMap?: Record<string, string>
 }
 
 export const buildUnknownSaveFile = (

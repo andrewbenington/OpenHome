@@ -594,11 +594,16 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public syncWithGameData(other: PKMInterface, save?: SAV) {
+    console.debug(
+      { event: 'sync_with_game_data', ohpkm_id: this.openhomeId },
+      `syncing ${this.nickname} with game data`
+    )
+
     this.exp = other.exp
 
-    this.moves = other.moves as FourMoves
+    this.moves = other.moves
     this.movePP = adjustMovePPBetweenFormats(this, other)
-    this.movePPUps = other.movePPUps as FourMoves
+    this.movePPUps = other.movePPUps
 
     if (this.dexNum !== other.dexNum && isEvolution(this, other)) {
       this.SpeciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
@@ -614,12 +619,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (
       other.nickname !== this.nickname &&
       other.nickname !== this.nickname.slice(0, 10) &&
-      !isPrevoSpeciesName(this.dexNum, this.formNum, other.nickname, this.language)
+      !isPrevoOrCurrentSpeciesName(this.dexNum, this.formNum, other.nickname, this.language)
     ) {
       this.nickname = other.nickname
     }
 
-    if (isPrevoSpeciesName(this.dexNum, this.formNum, this.nickname, this.language)) {
+    if (isPrevoOrCurrentSpeciesName(this.dexNum, this.formNum, this.nickname, this.language)) {
       this.nickname = Lookup.speciesName(this.dexNum, this.language)
     }
 
@@ -893,16 +898,17 @@ const FORMATS_ALLOWING_ABILITY_CHANGE = [
 
 const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
 
-function isPrevoSpeciesName(
+function isPrevoOrCurrentSpeciesName(
   dexNum: number,
   formNum: number,
   nickname: string,
   language: Language
 ): boolean {
-  for (const prevo of getPrevos(dexNum, formNum)) {
-    if (
-      nickname.toUpperCase() === Lookup.speciesName(prevo.nationalDex.index, language).toUpperCase()
-    ) {
+  for (const nationalDex of [
+    dexNum,
+    ...getPrevos(dexNum, formNum).map((prevo) => prevo.nationalDex.index),
+  ]) {
+    if (nickname.toUpperCase() === Lookup.speciesName(nationalDex, language).toUpperCase()) {
       return true
     }
   }

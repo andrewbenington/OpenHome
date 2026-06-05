@@ -83,7 +83,6 @@ export const getMonGen345Identifier = (
   const baseMon = getBaseMon(mon.dexNum, mon.formNum)
 
   try {
-    const ohpkm = OHPKM.fromMonUnknownSave(mon)
     let pk3CompatiblePID
 
     if (mon instanceof OHPKM && !keepOriginalPid) {
@@ -95,8 +94,8 @@ export const getMonGen345Identifier = (
       return undefined
     }
 
-    const trainerId = ohpkm.trainerID
-    const secretId = ohpkm.secretID
+    const trainerId = mon.trainerID
+    const secretId = mon.secretID
 
     if (baseMon) {
       return `${baseMon.nationalDex.toString().padStart(4, '0')}-${bytesToString(

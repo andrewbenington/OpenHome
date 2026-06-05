@@ -44,48 +44,68 @@ pub fn init_logging(log_dir: &std::path::Path) {
 pub struct LogEntry {
     pub timestamp: String,
     pub level: String,
-    pub target: String,
+    pub target: Option<String>,
     pub message: String,
-    pub is_tauri: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub event: Option<String>,
     #[serde(skip_serializing_if = "option_null_or_empty")]
     pub fields: Option<serde_json::Value>,
     #[serde(skip_serializing_if = "option_null_or_empty")]
     pub context: Option<serde_json::Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ohpkm_id: Option<String>,
+    pub is_tauri: bool,
 }
 
 impl LogEntry {
     pub fn from_json(mut v: serde_json::Value) -> Option<Self> {
-        let message = v["fields"]
+        let timestamp = v["timestamp"].as_str()?.to_owned();
+        let level = v["level"].as_str()?.to_owned();
+        let target = v["target"].as_str().map(&str::to_owned);
+
+        let fields = &mut v["fields"];
+
+        let message = fields
             .pop_string("message")
             .unwrap_or(String::from("(empty)"));
 
         let is_tauri = message.starts_with("[TAURI]");
-        let mut context: Option<serde_json::Value> = v["fields"]
+
+        let mut context: Option<serde_json::Value> = fields
             .pop_string("context")
             .and_then(|context_json| serde_json::from_str(&context_json).ok());
 
-        let ohpkm_id = if let Some(value) = v["fields"].pop_string("ohpkm_id") {
-            Some(value)
-        } else if let Some(context) = context.as_mut()
-            && let Some(value) = context.pop_string("ohpkm_id")
+        let ohpkm_id = fields
+            .pop_string("ohpkm_id")
+            .or(context.pop_string("ohpkm_id"));
+
+        let event = fields.pop_string("event").or(context.pop_string("event"));
+
+        let target = if let Some(js_stack_trace) = context.pop_string("stack")
+            && let Some(stack_trace_top) = js_stack_trace.split('\n').nth(0)
+            && let Some((function_name, url)) = stack_trace_top.split_once("@")
         {
-            Some(value)
+            let path_only = url
+                .split('/')
+                .skip_while(|s| !s.starts_with("src"))
+                .collect::<Vec<_>>()
+                .join("/");
+            Some(format!("{function_name}@{path_only}"))
         } else {
-            None
+            target
         };
 
         Some(LogEntry {
-            timestamp: v["timestamp"].as_str()?.to_string(),
-            level: v["level"].as_str()?.to_string(),
-            target: v["target"].as_str().unwrap_or("").to_string(),
+            timestamp,
+            level,
+            target,
             message,
+            event,
             is_tauri,
-            fields: if v["fields"] == serde_json::Value::Null {
+            fields: if *fields == serde_json::Value::Null {
                 None
             } else {
-                Some(v["fields"].clone())
+                Some(fields.clone())
             },
             context,
             ohpkm_id,
@@ -141,6 +161,12 @@ trait PopString {
 impl PopString for serde_json::Value {
     fn pop_string(&mut self, key: &str) -> Option<String> {
         pop_value(self, key)?.as_str().map(str::to_owned)
+    }
+}
+
+impl PopString for Option<serde_json::Value> {
+    fn pop_string(&mut self, key: &str) -> Option<String> {
+        self.as_mut().and_then(|v| v.pop_string(key))
     }
 }
 
@@ -208,32 +234,19 @@ pub struct JsLogEntry {
 }
 
 #[tauri::command]
-pub fn log(mut entry: JsLogEntry) {
-    let mut context = entry
-        .context
-        .as_mut()
-        .and_then(serde_json::Value::as_object_mut);
+pub fn log(entry: JsLogEntry) {
+    let mut context = entry.context.unwrap_or(serde_json::Value::Null);
 
-    println!("context: {context:?}");
-    if let Some(fields) = &mut context {
-        println!("removing message");
-        fields.remove("message");
-    }
-
-    let context = {
-        if let Some(context) = context {
-            serde_json::to_value(context).unwrap_or(serde_json::Value::Null)
-        } else {
-            serde_json::Value::Null
-        }
-    };
+    let message = context.pop_string("message").unwrap_or(entry.message);
+    let ohpkm_id = context.pop_string("ohpkm_id");
+    let event = context.pop_string("event");
 
     use tracing::Level;
     match entry.level.0 {
-        Level::ERROR => tracing::error!(context = %context, "{}", entry.message),
-        Level::WARN => tracing::warn!(context = %context, "{}", entry.message),
-        Level::INFO => tracing::info!(context = %context, "{}", entry.message),
-        Level::DEBUG => tracing::debug!(context = %context, "{}", entry.message),
-        Level::TRACE => tracing::trace!(context = %context, "{}", entry.message),
+        Level::ERROR => tracing::error!(event, ohpkm_id, context = %context, "{}", message),
+        Level::WARN => tracing::warn!(event, ohpkm_id, context = %context, "{}", message),
+        Level::INFO => tracing::info!(event, ohpkm_id, context = %context, "{}", message),
+        Level::DEBUG => tracing::debug!(event, ohpkm_id, context = %context, "{}", message),
+        Level::TRACE => tracing::trace!(event, ohpkm_id, context = %context, "{}", message),
     }
 }

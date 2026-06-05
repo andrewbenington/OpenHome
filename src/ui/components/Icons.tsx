@@ -18,7 +18,9 @@ import {
   MdGrid4X4,
   MdInfo,
   MdMoreVert,
+  MdOutlineTextSnippet,
   MdSelectAll,
+  MdTextSnippet,
 } from 'react-icons/md'
 import {
   RiCamera2Fill,
@@ -72,6 +74,7 @@ export const AppTabIconsActive = {
   List: (props: IconBaseProps) => <BsGrid3X3GapFill {...props} className="active-tab" />,
   Pokedex: (props: IconBaseProps) => <RiFileMarkedFill {...props} className="active-tab" />,
   Plugins: (props: IconBaseProps) => <RiCamera2Fill {...props} className="active-tab" />,
+  Logs: (props: IconBaseProps) => <MdTextSnippet {...props} className="active-tab" />,
   Settings: (props: IconBaseProps) => <RiSettings5Fill {...props} className="active-tab" />,
   AppState: (props: IconBaseProps) => <RiDashboard2Fill {...props} className="active-tab" />,
   ComponentDebug: (props: IconBaseProps) => <RiDashboardFill {...props} className="active-tab" />,
@@ -84,6 +87,7 @@ export const AppTabIconsInactive: typeof AppTabIconsActive = {
   List: (props: IconBaseProps) => <BsGrid3X3Gap {...props} className="inactive-tab" />,
   Pokedex: (props: IconBaseProps) => <RiFileMarkedLine {...props} className="inactive-tab" />,
   Plugins: (props: IconBaseProps) => <RiCamera2Line {...props} className="inactive-tab" />,
+  Logs: (props: IconBaseProps) => <MdOutlineTextSnippet {...props} className="inactive-tab" />,
   Settings: (props: IconBaseProps) => <RiSettings5Line {...props} className="inactive-tab" />,
   AppState: (props: IconBaseProps) => <RiDashboard2Line {...props} className="inactive-tab" />,
   ComponentDebug: (props: IconBaseProps) => <RiDashboardLine {...props} className="inactive-tab" />,

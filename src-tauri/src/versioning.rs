@@ -3,7 +3,7 @@ use semver::Version;
 use serde::Serialize;
 use std::{fs, path::PathBuf};
 use strum::{self, EnumIter, IntoEnumIterator};
-use tracing::info;
+use tracing::{debug, info};
 
 use crate::data_controller::{DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
@@ -92,7 +92,11 @@ pub fn handle_updates_get_features(
             );
         }
         let significant_updates = get_significant_updates(last_used_semver, current_version);
-        info!("Significant update: {significant_updates:?}");
+        if significant_updates.is_empty() {
+            debug!("No significant updates since last launch");
+        } else {
+            info!("Significant updates: {significant_updates:?}");
+        }
 
         let mut prev_o: Option<UpdateFeatures> = None;
 
