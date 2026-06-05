@@ -25,7 +25,7 @@ import {
   TextField,
 } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
-import { includeClass } from 'src/ui/util/style'
+import { cssClass } from 'src/ui/util/style'
 import './pokedex.css'
 import { PokedexGames } from './PokedexGames'
 import PokedexLearnset from './PokedexLearnset'
@@ -254,25 +254,28 @@ function PokedexDetails({
       <Flex direction="column" height="100%" maxHeight="100%" width="60%" overflow="auto">
         <Flex className="pokedex-tab-row">
           <Button
-            className={includeClass('pokedex-tab')
+            className={cssClass('pokedex-tab')
               .with('pokedex-tab-selected')
-              .if(currentView === 'summary')}
+              .if(currentView === 'summary')
+              .build()}
             onClick={() => setCurrentView('summary')}
           >
             Summary
           </Button>
           <Button
-            className={includeClass('pokedex-tab')
+            className={cssClass('pokedex-tab')
               .with('pokedex-tab-selected')
-              .if(currentView === 'levelup')}
+              .if(currentView === 'levelup')
+              .build()}
             onClick={() => setCurrentView('levelup')}
           >
             Levelup Learnset
           </Button>
           <Button
-            className={includeClass('pokedex-tab')
+            className={cssClass('pokedex-tab')
               .with('pokedex-tab-selected')
-              .if(currentView === 'games')}
+              .if(currentView === 'games')
+              .build()}
             onClick={() => setCurrentView('games')}
           >
             Games

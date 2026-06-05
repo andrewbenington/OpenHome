@@ -39,8 +39,6 @@ export default function App() {
   const isDarkMode = useIsDarkMode()
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
 
-  console.log('app')
-
   return (
     <Theme
       accentColor="red"
@@ -199,16 +197,22 @@ function patchConsole(backend: BackendInterface) {
   for (const [method, level] of levels) {
     // eslint-disable-next-line no-console
     console[method] = (...args: unknown[]) => {
-      // Still print to devtools so you're not flying blind
+      // Still print to devtools
       webConsole[method](...args)
-      webConsole.info('just logged')
-      const message = args
-        .map((a) => (typeof a === 'object' ? JSON.stringify(a) : String(a)))
-        .join(' ')
 
-      backend.log(level, message, { source: 'console' })
+      if (args.length > 0 && typeof args[0] === 'object') {
+        backend.log(level, serializeArg(args.at(1)), JSON.parse(JSON.stringify(args[0])))
+      } else {
+        const message = args.map(serializeArg).join(' ')
+
+        backend.log(level, message, { source: 'console' })
+      }
     }
   }
+}
+
+function serializeArg(arg: unknown): string {
+  return typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
 }
 
 function buildKeyboardHandler(backend: BackendInterface) {

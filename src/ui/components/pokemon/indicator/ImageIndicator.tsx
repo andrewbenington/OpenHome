@@ -1,5 +1,5 @@
 import { colorIsDark } from 'src/ui/util/color'
-import { includeClass } from 'src/ui/util/style'
+import { cssClass } from 'src/ui/util/style'
 import { Indicator } from './Indicator'
 
 export type ImageIndicatorProps = {
@@ -15,7 +15,7 @@ export function ImageIndicator(props: ImageIndicatorProps) {
   const filterClass = colorIsDark(backgroundColor) ? 'white-filter' : 'black-filter'
   return (
     <Indicator
-      className={includeClass('image-indicator-with-text').if(Boolean(text))}
+      className={cssClass('image-indicator-with-text').if(text).build()}
       tooltip={tooltip}
       backgroundColor={backgroundColor}
       style={style}

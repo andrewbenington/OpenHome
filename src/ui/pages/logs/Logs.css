@@ -1,25 +1,127 @@
+.logs-page {
+  --header-size: 2rem;
+  --raised-button-box-shadow:
+    rgba(0, 0, 0, 0.17) 0px -1.5rem 1.5rem 0px inset,
+    rgba(0, 0, 0, 0.15) 0px -2.25rem 2rem 0px inset, rgba(0, 0, 0, 0.1) 0px -5rem 5rem 0px inset,
+    rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px,
+    rgba(0, 0, 0, 0.09) 0px 8px 4px;
+  --top-bar-height: 1.2rem;
+  --sidebar-width: 22rem;
+
+  height: 100%;
+  overflow: auto;
+  font-size: 1rem;
+
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 60rem;
+  overflow: visible;
+}
+
 .logs-container {
   height: 100%;
   overflow: auto;
-  font-size: 0.75rem;
+  overscroll-behavior: none;
+}
+
+.logs-header {
+  height: var(--top-bar-height);
+  padding: var(--padding-radius-sm-lg);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: var(--accent-9);
+  box-shadow:
+    rgba(0, 0, 0, 0.07) 0px 1px 1px,
+    rgba(0, 0, 0, 0.07) 0px 2px 2px,
+    rgba(0, 0, 0, 0.07) 0px 4px 4px,
+    rgba(0, 0, 0, 0.07) 0px 8px 8px,
+    rgba(0, 0, 0, 0.07) 0px 16px 16px;
+  color: var(--accent-contrast);
+  gap: 1.5rem;
+  z-index: 100;
+  position: sticky;
+  top: 0;
+
+  input {
+    width: 22rem;
+    background-color: var(--accent-5);
+  }
+}
+.logs-header::before {
+  content: '';
+  display: block;
+  height: 100vh;
+  background: inherit; /* matches the parent's background */
+  position: static;
+  top: 0;
+}
+
+.log-line {
+  font-family: monospace;
+  width: 100%;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0 0.5rem;
+  box-sizing: border-box;
+  font-size: 0.9rem;
+  height: 1.6rem;
 }
 
 .log-line:nth-child(odd) {
-  background-color: var(--color-gray-300);
-}
-
-.log-line:nth-child(even) {
   background-color: var(--color-gray-200);
 }
 
+.log-line:nth-child(even) {
+  background-color: var(--color-gray-100);
+}
+
+.log-level-trace {
+  background-color: rgb(229, 207, 230);
+  color: rgb(120, 120, 120);
+}
+
+.log-level-info {
+  background-color: rgb(188, 190, 236);
+  color: rgb(62, 62, 62);
+}
+
+.log-level-warn {
+  background-color: rgb(237, 179, 141);
+  color: black;
+}
+
+.log-level-error {
+  background-color: rgb(250, 50, 27);
+  color: white;
+}
+
+.log-level {
+  font-size: 0.8rem;
+  width: 3.5rem;
+  border-radius: 3px;
+  text-align: center;
+  font-weight: bold;
+  padding: 0;
+}
+
 .log-timestamp {
-  display: inline-block;
   font-style: italic;
   color: var(--color-gray-800);
-  padding: 0 1rem;
   font-family: monospace;
-  font-size: 0.6rem;
+  font-size: 0.9rem;
   text-align: end;
-  width: 4rem;
+  width: 6rem;
   height: 100%;
+  line-height: 1.5rem;
+}
+
+.log-message {
+  flex: 1;
+}
+
+.log-message-empty {
+  color: #888;
 }

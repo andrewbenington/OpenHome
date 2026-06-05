@@ -53,12 +53,7 @@ export class G3Sector {
   }
 
   writeToBuffer(bytes: Uint8Array, thisIndex: number, firstIndex: number) {
-    const oldChecksum = this.checksum
-
     this.refreshChecksum()
-    if (oldChecksum !== this.checksum) {
-      console.info('checksum changed for', thisIndex)
-    }
     const index = (thisIndex + 14 - firstIndex) % 14
 
     bytes.set(this.data, index * 0x1000)

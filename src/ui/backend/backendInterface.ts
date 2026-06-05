@@ -35,7 +35,8 @@ export type LogEntry = {
   level: string
   target: string
   message: string
-  fields: Record<string, unknown>
+  fields: Record<string, unknown> | null
+  context: Record<string, unknown> | null
 }
 
 export type LogLevel = 'error' | 'warn' | 'info' | 'debug' | 'trace'
@@ -112,7 +113,7 @@ export default interface BackendInterface {
   saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Errorable<null>>
   emitMenuEvent: (menuEventId: string) => Promise<Errorable<null>>
   getLogs(): Promise<Errorable<LogEntry[]>>
-  log(level: LogLevel, message: string, fields?: Record<string, unknown>): Promise<Errorable<void>>
+  log(level: LogLevel, message: string, context?: Record<string, unknown>): Promise<Errorable<void>>
 
   /* plugins */
   getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>

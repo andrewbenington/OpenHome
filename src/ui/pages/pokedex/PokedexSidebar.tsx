@@ -4,7 +4,7 @@ import { Pokedex } from '@openhome-ui/util/pokedex'
 import { all_species_data, FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
-import { classNames, includeClass } from 'src/ui/util/style'
+import { cssClass } from 'src/ui/util/style'
 import './PokedexSidebar.css'
 import { getHighestFormeStatus, StatusIndices } from './util'
 
@@ -128,12 +128,12 @@ function PokedexSidebarButton({ pokedex, species, onClick, selected, style }: Po
 
   return (
     <button
-      className={classNames(
-        'pokedex-sidebar-button',
-        selected
-          ? 'pokedex-sidebar-button-selected'
-          : includeClass('pokedex-sidebar-button-caught').if(isCaught)
-      )}
+      className={cssClass('pokedex-sidebar-button')
+        .with('pokedex-sidebar-button-selected')
+        .if(selected)
+        .with('pokedex-sidebar-button-caught')
+        .if(isCaught)
+        .build()}
       key={species.nationalDex}
       onClick={onClick}
       style={style}

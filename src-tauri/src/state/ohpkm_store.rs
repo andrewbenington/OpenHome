@@ -8,6 +8,7 @@ use std::num::NonZeroU64;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, UNIX_EPOCH};
 use std::{collections::HashMap, fs};
+use tracing::warn;
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct OhpkmBytesStore(HashMap<String, Vec<u8>>);
@@ -55,9 +56,9 @@ impl OhpkmBytesStore {
             if let Ok(mut mon) = OhpkmV2::from_bytes(bytes) {
                 let errors = mon.fix_errors();
                 if !errors.is_empty() {
-                    println!("Fixed Ohpkm {} with id {identifier}:", mon.get_nickname());
+                    warn!(context = %{serde_json::to_string(&errors).unwrap()}, ohpkm_id = mon.openhome_id(), "Fixed Ohpkm {} with id {identifier}:", mon.get_nickname());
                     for error in errors {
-                        println!("\t{error}");
+                        warn!("\t{error}");
                     }
                     *bytes = mon.to_bytes();
                 }
