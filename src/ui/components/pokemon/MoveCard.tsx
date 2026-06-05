@@ -2,7 +2,7 @@ import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import { colorForType, contrastColorForType } from '@openhome-ui/util/color'
 import { PkmType, PkmTypes } from '@pkm-rs/pkg'
 import { Moves } from '@pokemon-resources/index'
-import { includeClass } from 'src/ui/util/style'
+import { cssClass } from 'src/ui/util/style'
 import './style.css'
 
 interface MoveCardProps {
@@ -19,10 +19,11 @@ const MoveCard = ({ move, movePP, maxPP, noPP, typeOverride }: MoveCardProps) =>
     console.warn(`An unknown move has been detected. The move index is ${move}.`)
     return (
       <div
-        className={includeClass('move-card')
-          .with('move-card-full')
-          .unless(noPP)
-          .then('move-card-small')}
+        className={cssClass('move-card')
+          .with('move-card-small')
+          .if(noPP)
+          .else('move-card-full')
+          .build()}
         style={{
           backgroundColor: 'gray',
           color: 'white',
@@ -71,10 +72,11 @@ const MoveCard = ({ move, movePP, maxPP, noPP, typeOverride }: MoveCardProps) =>
 
   return (
     <div
-      className={includeClass('move-card')
-        .with('move-card-full')
-        .unless(noPP)
-        .then('move-card-small')}
+      className={cssClass('move-card')
+        .with('move-card-small')
+        .if(noPP)
+        .else('move-card-full')
+        .build()}
       style={{
         backgroundColor: colorForType(type),
         color: contrastColorForType(type),
