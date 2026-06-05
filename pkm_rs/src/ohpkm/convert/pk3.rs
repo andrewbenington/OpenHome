@@ -1,7 +1,7 @@
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::ribbons::Gen3Ribbon;
 use pkm_rs_resources::{items::ItemGen3, lookup};
-use pkm_rs_types::{AbilityNumber, Generation, Stats16Le};
+use pkm_rs_types::{AbilityNumber, Generation, PokeDate, Stats16Le};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
@@ -90,6 +90,7 @@ impl OhpkmConvert for Pk3 {
             ball: self.ball,
             met_location_index: self.met_location_index as u16,
             met_level: self.met_level,
+            met_date: PokeDate::today(),
             trainer_gender: self.trainer_gender,
             ..Default::default()
         }
