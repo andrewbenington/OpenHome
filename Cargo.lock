@@ -2872,6 +2872,7 @@ name = "pkm_rs_types"
 version = "1.11.4"
 dependencies = [
  "arbitrary-int",
+ "chrono",
  "getrandom 0.4.2",
  "js-sys",
  "num_enum",

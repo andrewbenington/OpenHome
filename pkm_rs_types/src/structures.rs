@@ -1,4 +1,5 @@
 use arbitrary_int::u3;
+use chrono::Datelike;
 use serde::{Deserialize, Serialize, Serializer};
 
 use strum_macros::{Display, EnumString};
@@ -384,6 +385,15 @@ impl PokeDate {
         match value {
             Some(date) => date.to_bytes(),
             None => [0, 0, 0],
+        }
+    }
+
+    pub fn today() -> Self {
+        let today = chrono::Local::now();
+        Self {
+            year_minus_2000: (today.year() - 2000).max(0) as u8,
+            month: today.month() as u8,
+            day: today.day() as u8,
         }
     }
 }
