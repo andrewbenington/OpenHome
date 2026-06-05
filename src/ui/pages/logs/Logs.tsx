@@ -1,11 +1,16 @@
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { R } from '@openhome-core/util/functional'
+import PokemonIcon from '@openhome-ui/components/PokemonIcon'
+import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import { cssClass } from '@openhome-ui/util/style'
 import { Text, TextField } from '@radix-ui/themes'
 import dayjs from 'dayjs'
 import { useContext, useEffect, useState } from 'react'
-import { R } from 'src/core/util/functional'
 import { BackendContext } from 'src/ui/backend/backendContext'
 import { LogEntry } from 'src/ui/backend/backendInterface'
 import { DevDataDisplay } from 'src/ui/components/DevDataDisplay'
-import { cssClass } from 'src/ui/util/style'
 import './Logs.css'
 
 const ALL_LEVELS = ['trace', 'debug', 'log', 'info', 'warn', 'error'] as const
@@ -13,6 +18,8 @@ const ALL_LEVELS = ['trace', 'debug', 'log', 'info', 'warn', 'error'] as const
 export default function Logs() {
   const logData = useTodayLogs()
   const [filter, setFilter] = useState<string>('')
+  const [selectedMon, setSelectedMon] = useState<OHPKM>()
+  const ohpkmStore = useOhpkmStore()
 
   if (logData.logs) {
     return (
@@ -47,9 +54,14 @@ export default function Logs() {
           {logData.logs
             .filter((log) => log.message.toLocaleLowerCase().includes(filter.toLocaleLowerCase()))
             .map((log) => (
-              <LogLine key={log.timestamp} log={log} />
+              <LogLine
+                key={log.timestamp}
+                log={log}
+                onOhpkmClick={(identifier) => setSelectedMon(ohpkmStore.getById(identifier))}
+              />
             ))}
         </div>
+        <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
       </div>
     )
   }
@@ -58,16 +70,30 @@ export default function Logs() {
 
 type LogLineProps = {
   log: LogEntry
+  onOhpkmClick: (openhomeId: OhpkmIdentifier) => void
 }
 
-function LogLine({ log }: LogLineProps) {
+function LogLine({ log, onOhpkmClick }: LogLineProps) {
+  const { ohpkm_id, timestamp, level, message } = log
+  const mon = useOhpkmStore().getById(ohpkm_id ?? '')
+
   return (
-    <div className="log-line" key={log.timestamp}>
-      <span className="log-timestamp">{dayjs(log.timestamp).format('LTS')}</span>
-      <span className={`log-level log-level-${log.level.toLowerCase()}`}>{log.level}</span>
-      <span className={cssClass('log-message').with('log-message-empty').if(!log.message).build()}>
-        {log.message || '(empty)'}
+    <div className="log-line" key={timestamp}>
+      <span className="log-timestamp">{dayjs(timestamp).format('LTS')}</span>
+      <span className={`log-level log-level-${level.toLowerCase()}`}>{level}</span>
+      <span
+        className={cssClass('log-message')
+          .with('log-message-empty')
+          .if(message === '(empty)')
+          .build()}
+      >
+        {message}
       </span>
+      {ohpkm_id && mon && (
+        <button className="log-ohpkm-button" onClick={() => onOhpkmClick(ohpkm_id)}>
+          <PokemonIcon dexNumber={mon.dexNum} formeNumber={mon.formNum} />
+        </button>
+      )}
       <DevDataDisplay data={log} label="context" />
     </div>
   )

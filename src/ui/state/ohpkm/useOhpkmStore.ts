@@ -39,8 +39,6 @@ export type OhpkmStore = {
 // FALSE IN PRODUCTION
 const FORCE_MISSED_LOOKUP = false
 
-export type OhpkmLookup = (id: string) => OHPKM | undefined
-
 export function useOhpkmStore(): OhpkmStore {
   const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
   const { defaultConvertStrategy } = useConvertStrategies()

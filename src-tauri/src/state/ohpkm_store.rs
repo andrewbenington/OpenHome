@@ -56,10 +56,11 @@ impl OhpkmBytesStore {
             if let Ok(mut mon) = OhpkmV2::from_bytes(bytes) {
                 let errors = mon.fix_errors();
                 if !errors.is_empty() {
-                    warn!(context = %{serde_json::to_string(&errors).unwrap()}, ohpkm_id = mon.openhome_id(), "Fixed Ohpkm {} with id {identifier}:", mon.get_nickname());
-                    for error in errors {
-                        warn!("\t{error}");
-                    }
+                    let errors_fixed_msgs: Vec<String> =
+                        errors.into_iter().map(|e| e.to_string()).collect();
+                    let errors_fixed_serialized = serde_json::to_string(&errors_fixed_msgs)
+                        .unwrap_or(String::from("error serializing fixes"));
+                    warn!(event = "ohpkm_errors_fixed", context = %errors_fixed_serialized, ohpkm_id = mon.openhome_id(), "Fixed Ohpkm {identifier} with nickname {}", mon.get_nickname());
                     *bytes = mon.to_bytes();
                 }
             }

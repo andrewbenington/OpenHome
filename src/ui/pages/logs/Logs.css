@@ -62,12 +62,16 @@
   font-family: monospace;
   width: 100%;
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0 0.5rem;
   box-sizing: border-box;
   font-size: 0.9rem;
   height: 1.6rem;
+
+  & button {
+    height: 1.4rem;
+  }
 }
 
 .log-line:nth-child(odd) {
@@ -105,6 +109,7 @@
   text-align: center;
   font-weight: bold;
   padding: 0;
+  margin: 0 0.25rem;
 }
 
 .log-timestamp {
@@ -124,4 +129,10 @@
 
 .log-message-empty {
   color: #888;
+}
+
+.log-ohpkm-button {
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
 }
