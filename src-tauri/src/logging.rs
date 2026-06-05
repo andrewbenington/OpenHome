@@ -81,6 +81,20 @@ impl LogEntry {
 
         let event = fields.pop_string("event").or(context.pop_string("event"));
 
+        let target = if let Some(js_stack_trace) = context.pop_string("stack")
+            && let Some(stack_trace_top) = js_stack_trace.split('\n').nth(0)
+            && let Some((function_name, url)) = stack_trace_top.split_once("@")
+        {
+            let path_only = url
+                .split('/')
+                .skip_while(|s| !s.starts_with("src"))
+                .collect::<Vec<_>>()
+                .join("/");
+            Some(format!("{function_name}@{path_only}"))
+        } else {
+            target
+        };
+
         Some(LogEntry {
             timestamp,
             level,
