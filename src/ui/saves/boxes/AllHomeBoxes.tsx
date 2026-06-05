@@ -27,7 +27,7 @@ import { RemoveIcon } from '@openhome-ui/components/Icons'
 import { MonLocation } from '@openhome-ui/state/saves'
 import { Button, Flex, Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
-import { includeClass } from 'src/ui/util/style'
+import { cssClass } from 'src/ui/util/style'
 import { SimpleOpenHomeBox } from '../../../core/save/util/storage'
 import {
   boxNameOrDefault,
@@ -239,9 +239,10 @@ function BoxWithMons({ box, debugMode }: BoxMonIconsProps) {
               const slotIsEmpty = !box.identifiers.has(j * OPENHOME_BOX_COLUMNS + i)
               return (
                 <div
-                  className={includeClass('box-icon-mon-indicator')
+                  className={cssClass('box-icon-mon-indicator')
                     .with('box-icon-mon-empty')
-                    .if(slotIsEmpty)}
+                    .if(slotIsEmpty)
+                    .build()}
                   key={`pos-display-cell-${i}-${j}`}
                 />
               )
@@ -251,9 +252,10 @@ function BoxWithMons({ box, debugMode }: BoxMonIconsProps) {
       </div>
       <div className="box-overview-title-container" style={fontStyleFromStringLength(boxName)}>
         <div
-          className={includeClass('box-overview-title')
+          className={cssClass('box-overview-title')
             .with('box-overview-title-full')
-            .if(allSlotsFull)}
+            .if(allSlotsFull)
+            .build()}
         >
           {boxName}
         </div>

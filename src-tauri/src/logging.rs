@@ -1,7 +1,6 @@
 use crate::Result;
 
 use tauri::AppHandle;
-use tracing::info;
 
 use crate::data_controller::{DataController, DataDir};
 use chrono::Utc;
@@ -35,7 +34,7 @@ pub fn init_logging(log_dir: &std::path::Path) {
         .with_writer(std::io::stderr);
 
     tracing_subscriber::registry()
-        .with(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")))
+        .with(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("debug")))
         .with(file_layer)
         .with(stderr_layer)
         .init();
@@ -47,12 +46,55 @@ pub struct LogEntry {
     pub level: String,
     pub target: String,
     pub message: String,
-    pub fields: serde_json::Value,
+    pub is_tauri: bool,
+    #[serde(skip_serializing_if = "option_null_or_empty")]
+    pub fields: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "option_null_or_empty")]
+    pub context: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ohpkm_id: Option<String>,
+}
+
+impl LogEntry {
+    pub fn from_json(mut v: serde_json::Value) -> Option<Self> {
+        let message = v["fields"]
+            .pop_string("message")
+            .unwrap_or(String::from("(empty)"));
+
+        let is_tauri = message.starts_with("[TAURI]");
+        let mut context: Option<serde_json::Value> = v["fields"]
+            .pop_string("context")
+            .and_then(|context_json| serde_json::from_str(&context_json).ok());
+
+        let ohpkm_id = if let Some(value) = v["fields"].pop_string("ohpkm_id") {
+            Some(value)
+        } else if let Some(context) = context.as_mut()
+            && let Some(value) = context.pop_string("ohpkm_id")
+        {
+            Some(value)
+        } else {
+            None
+        };
+
+        Some(LogEntry {
+            timestamp: v["timestamp"].as_str()?.to_string(),
+            level: v["level"].as_str()?.to_string(),
+            target: v["target"].as_str().unwrap_or("").to_string(),
+            message,
+            is_tauri,
+            fields: if v["fields"] == serde_json::Value::Null {
+                None
+            } else {
+                Some(v["fields"].clone())
+            },
+            context,
+            ohpkm_id,
+        })
+    }
 }
 
 #[tauri::command]
 pub fn get_logs_today(app: AppHandle) -> Result<Vec<LogEntry>> {
-    info!("getting logs");
     let content = app.read_file_text(
         DataDir::Logs,
         format!("app.log.{}", Utc::now().format("%Y-%m-%d")),
@@ -62,40 +104,136 @@ pub fn get_logs_today(app: AppHandle) -> Result<Vec<LogEntry>> {
         .lines()
         .rev() // newest first
         .filter_map(|line| serde_json::from_str::<serde_json::Value>(line).ok())
-        .filter_map(|v| {
-            Some(LogEntry {
-                timestamp: v["timestamp"].as_str()?.to_string(),
-                level: v["level"].as_str()?.to_string(),
-                target: v["target"].as_str().unwrap_or("").to_string(),
-                message: v["fields"]["message"].as_str().unwrap_or("").to_string(),
-                fields: v["fields"].clone(),
-            })
-        })
+        .filter_map(LogEntry::from_json)
         .collect();
 
     Ok(entries)
 }
 
+fn option_null_or_empty(value: &Option<serde_json::Value>) -> bool {
+    value.as_ref().is_none_or(null_or_empty)
+}
+
+fn null_or_empty(value: &serde_json::Value) -> bool {
+    match value {
+        serde_json::Value::Null => true,
+        serde_json::Value::String(s) => s.is_empty(),
+        serde_json::Value::Array(a) => a.is_empty(),
+        serde_json::Value::Object(o) => o.is_empty(),
+        _ => false,
+    }
+}
+
+fn pop_value(value: &mut serde_json::Value, value_key: &str) -> Option<serde_json::Value> {
+    if let Some(obj) = value.as_object_mut()
+        && let Some(msg_value) = obj.remove(value_key)
+    {
+        Some(msg_value)
+    } else {
+        None
+    }
+}
+
+trait PopString {
+    fn pop_string(&mut self, key: &str) -> Option<String>;
+}
+
+impl PopString for serde_json::Value {
+    fn pop_string(&mut self, key: &str) -> Option<String> {
+        pop_value(self, key)?.as_str().map(str::to_owned)
+    }
+}
+
+struct Level(tracing::Level);
+
+impl<'de> serde::Deserialize<'de> for Level {
+    fn deserialize<D>(deserializer: D) -> std::prelude::v1::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer.deserialize_str(LevelVisitor)
+    }
+}
+
+struct LevelVisitor;
+
+impl<'de> serde::de::Visitor<'de> for LevelVisitor {
+    type Value = Level;
+
+    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+        formatter.write_str("'trace', 'log', 'info', 'warn', 'error'")
+    }
+
+    fn visit_str<E>(self, v: &str) -> std::prelude::v1::Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        match v {
+            "trace" => Ok(Level(tracing::Level::TRACE)),
+            "log" => Ok(Level(tracing::Level::DEBUG)),
+            "info" => Ok(Level(tracing::Level::INFO)),
+            "warn" => Ok(Level(tracing::Level::WARN)),
+            "error" => Ok(Level(tracing::Level::ERROR)),
+            _ => Err(serde::de::Error::invalid_value(
+                serde::de::Unexpected::Str(v),
+                &self,
+            )),
+        }
+    }
+
+    fn visit_borrowed_str<E>(self, v: &'de str) -> std::prelude::v1::Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        match v {
+            "trace" => Ok(Level(tracing::Level::TRACE)),
+            "log" => Ok(Level(tracing::Level::DEBUG)),
+            "info" => Ok(Level(tracing::Level::INFO)),
+            "warn" => Ok(Level(tracing::Level::WARN)),
+            "error" => Ok(Level(tracing::Level::ERROR)),
+            _ => Err(serde::de::Error::invalid_value(
+                serde::de::Unexpected::Str(v),
+                &self,
+            )),
+        }
+    }
+}
+
 #[derive(serde::Deserialize)]
 pub struct JsLogEntry {
-    level: String,
+    level: Level,
     message: String,
     // any extra fields the frontend wants to attach
-    fields: Option<serde_json::Value>,
+    context: Option<serde_json::Value>,
 }
 
 #[tauri::command]
-pub fn log(entry: JsLogEntry) {
-    let fields = entry.fields.unwrap_or(serde_json::Value::Null);
+pub fn log(mut entry: JsLogEntry) {
+    let mut context = entry
+        .context
+        .as_mut()
+        .and_then(serde_json::Value::as_object_mut);
 
-    info!("received command: {fields:?}");
+    println!("context: {context:?}");
+    if let Some(fields) = &mut context {
+        println!("removing message");
+        fields.remove("message");
+    }
 
-    match entry.level.to_lowercase().as_str() {
-        "error" => tracing::error!(source = "js", fields = %fields, "{}", entry.message),
-        "warn" => tracing::warn! (source = "js", fields = %fields, "{}", entry.message),
-        "info" => tracing::info! (source = "js", fields = %fields, "{}", entry.message),
-        "debug" => tracing::debug!(source = "js", fields = %fields, "{}", entry.message),
-        "trace" => tracing::trace!(source = "js", fields = %fields, "{}", entry.message),
-        _ => tracing::info! (source = "js", fields = %fields, "{}", entry.message),
+    let context = {
+        if let Some(context) = context {
+            serde_json::to_value(context).unwrap_or(serde_json::Value::Null)
+        } else {
+            serde_json::Value::Null
+        }
+    };
+
+    use tracing::Level;
+    match entry.level.0 {
+        Level::ERROR => tracing::error!(context = %context, "{}", entry.message),
+        Level::WARN => tracing::warn!(context = %context, "{}", entry.message),
+        Level::INFO => tracing::info!(context = %context, "{}", entry.message),
+        Level::DEBUG => tracing::debug!(context = %context, "{}", entry.message),
+        Level::TRACE => tracing::trace!(context = %context, "{}", entry.message),
     }
 }

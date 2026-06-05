@@ -101,8 +101,6 @@ type OhTauriApiNoThrow = {
   [C in OhCommand]: (...args: OhCommandArgs<C>) => Promise<Errorable<OhCommandResult<C>>>
 }
 
-const webConsole = { ...console }
-
 export const Commands: OhTauriApiNoThrow = {
   get_state() {
     return invokeAndCatch('get_state')
@@ -261,9 +259,8 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('get_logs_today')
   },
 
-  log(level: LogLevel, message: string, fields?: Record<string, unknown | undefined>) {
-    webConsole.trace('logging with command')
-    return invokeAndCatch('log', { entry: { level, message, fields } })
+  log(level: LogLevel, message: string, context?: Record<string, unknown | undefined>) {
+    return invokeAndCatch('log', { entry: { level, message, context } })
   },
 }
 
