@@ -516,7 +516,7 @@ impl TrainerData {
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Clone, Copy, Default, Serialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq, Eq)]
 pub struct TrainerMemory {
     pub intensity: u8,
     pub memory: u8,
