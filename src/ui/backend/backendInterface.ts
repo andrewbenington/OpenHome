@@ -42,7 +42,7 @@ export type LogEntry = {
   ohpkm_id?: OhpkmIdentifier
 }
 
-export type LogLevel = 'error' | 'warn' | 'info' | 'debug' | 'trace'
+export type LogLevel = 'ERROR' | 'WARN' | 'INFO' | 'DEBUG' | 'TRACE'
 
 export type StoredLookups = { gen12: LookupMap; gen345: LookupMap }
 
@@ -117,6 +117,7 @@ export default interface BackendInterface {
   emitMenuEvent: (menuEventId: string) => Promise<Errorable<null>>
   getLogs(): Promise<Errorable<LogEntry[]>>
   log(level: LogLevel, message: string, context?: Record<string, unknown>): Promise<Errorable<void>>
+  onNewLog: (callback: (notification: NewLogNotification) => void) => () => void
 
   /* plugins */
   getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>
@@ -130,6 +131,11 @@ export default interface BackendInterface {
 export type BankOrBoxChange = { bank: number; box: number }
 
 export type MenuEvent = 'save' | 'reset' | 'open' | 'zoom_in' | 'zoom_out' | 'reset_zoom'
+
+export type NewLogNotification = {
+  level: LogLevel
+  timestamp_unix: number
+}
 
 export interface BackendListeners {
   onMenuEvent: (event: MenuEvent) => void

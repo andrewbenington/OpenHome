@@ -1,82 +1,86 @@
 import { R } from '../../core/util/functional'
-import BackendInterface, { BackendListeners } from './backendInterface'
+import BackendInterface from './backendInterface'
+
+const ERROR_NO_BACKEND = async () => R.Err('no backend in use')
+const EMPTY_WITH_CLEANUP = () => () => {}
 
 const DummyBackend: BackendInterface = {
   /* write synced state to disk during save */
-  saveSyncedState: async () => R.Err('no backend in use'),
+  saveSyncedState: ERROR_NO_BACKEND,
 
   /* past gen identifier lookups */
-  loadLookups: async () => R.Err('no backend in use'),
-  addToLookups: async () => R.Err('no backend in use'),
-  removeDangling: async () => R.Err('no backend in use'),
+  loadLookups: ERROR_NO_BACKEND,
+  addToLookups: ERROR_NO_BACKEND,
+  removeDangling: ERROR_NO_BACKEND,
 
   /* ohpkm store */
-  loadOhpkmStore: async () => R.Err('no backend in use'),
-  addToOhpkmStore: async () => R.Err('no backend in use'),
-  deleteHomeMons: async () => R.Err('no backend in use'),
+  loadOhpkmStore: ERROR_NO_BACKEND,
+  addToOhpkmStore: ERROR_NO_BACKEND,
+  deleteHomeMons: ERROR_NO_BACKEND,
 
   /* pokedex */
-  loadPokedex: async () => R.Err('no backend in use'),
-  registerInPokedex: async () => R.Err('no backend in use'),
+  loadPokedex: ERROR_NO_BACKEND,
+  registerInPokedex: ERROR_NO_BACKEND,
 
   /* openhome boxes */
-  loadHomeBanks: async () => R.Err('no backend in use'),
-  writeHomeBanks: async () => R.Err('no backend in use'),
+  loadHomeBanks: ERROR_NO_BACKEND,
+  writeHomeBanks: ERROR_NO_BACKEND,
 
   /* game saves */
-  loadSaveFile: async () => R.Err('no backend in use'),
-  writeSaveFile: async () => R.Err('no backend in use'),
+  loadSaveFile: ERROR_NO_BACKEND,
+  writeSaveFile: ERROR_NO_BACKEND,
 
   /* game save management */
-  getRecentSaves: async () => R.Err('no backend in use'),
-  addRecentSave: async () => R.Err('no backend in use'),
-  removeRecentSave: async () => R.Err('no backend in use'),
-  findSuggestedSaves: async () => R.Err('no backend in use'),
-  getSaveFolders: async () => R.Err('no backend in use'),
-  removeSaveFolder: async () => R.Err('no backend in use'),
-  upsertSaveFolder: async () => R.Err('no backend in use'),
+  getRecentSaves: ERROR_NO_BACKEND,
+  addRecentSave: ERROR_NO_BACKEND,
+  removeRecentSave: ERROR_NO_BACKEND,
+  findSuggestedSaves: ERROR_NO_BACKEND,
+  getSaveFolders: ERROR_NO_BACKEND,
+  removeSaveFolder: ERROR_NO_BACKEND,
+  upsertSaveFolder: ERROR_NO_BACKEND,
 
   /* bag */
-  loadItemBag: async () => R.Err('no backend in use'),
-  saveItemBag: async () => R.Err('no backend in use'),
+  loadItemBag: ERROR_NO_BACKEND,
+  saveItemBag: ERROR_NO_BACKEND,
 
   /* transactions */
-  startTransaction: async () => R.Err('no backend in use'),
-  commitTransaction: async () => R.Err('no backend in use'),
-  rollbackTransaction: async () => R.Err('no backend in use'),
+  startTransaction: ERROR_NO_BACKEND,
+  commitTransaction: ERROR_NO_BACKEND,
+  rollbackTransaction: ERROR_NO_BACKEND,
 
   /* application */
-  pickFile: async () => R.Err('no backend in use'),
-  pickFolder: async () => R.Err('no backend in use'),
+  pickFile: ERROR_NO_BACKEND,
+  pickFolder: ERROR_NO_BACKEND,
   getResourcesPath: async () => '',
-  openDirectory: async () => R.Err('no backend in use'),
-  openFileLocation: async () => R.Err('no backend in use'),
+  openDirectory: ERROR_NO_BACKEND,
+  openFileLocation: ERROR_NO_BACKEND,
   getPlatform: () => 'none',
-  registerListeners: (_: Partial<BackendListeners>) => () => {},
-  onMenuEvent: () => () => {},
-  onMenuEvents: () => () => {},
-  getState: async () => R.Err('no backend in use'),
-  getSettings: async () => R.Err('no backend in use'),
-  updateSettings: async () => R.Err('no backend in use'),
-  getConvertStrategies: async () => R.Err('no backend in use'),
-  updateConvertStrategies: async () => R.Err('no backend in use'),
-  setTheme: async () => R.Err('no backend in use'),
-  saveLocalFile: async () => R.Err('no backend in use'),
-  emitMenuEvent: async () => R.Err('no backend in use'),
+  registerListeners: EMPTY_WITH_CLEANUP,
+  onMenuEvent: EMPTY_WITH_CLEANUP,
+  onMenuEvents: EMPTY_WITH_CLEANUP,
+  getState: ERROR_NO_BACKEND,
+  getSettings: ERROR_NO_BACKEND,
+  updateSettings: ERROR_NO_BACKEND,
+  getConvertStrategies: ERROR_NO_BACKEND,
+  updateConvertStrategies: ERROR_NO_BACKEND,
+  setTheme: ERROR_NO_BACKEND,
+  saveLocalFile: ERROR_NO_BACKEND,
+  emitMenuEvent: ERROR_NO_BACKEND,
 
   /* data directory */
-  promptChangeDataDir: async () => R.Err('no backend in use'),
-  getDataDirPath: async () => R.Err('no backend in use'),
+  promptChangeDataDir: ERROR_NO_BACKEND,
+  getDataDirPath: ERROR_NO_BACKEND,
 
   /* plugins */
-  getImageData: async () => R.Err('no backend in use'),
-  listInstalledPlugins: async () => R.Err('no backend in use'),
-  getPluginPath: async () => R.Err('no backend in use'),
-  downloadPlugin: async () => R.Err('no backend in use'),
-  loadPluginCode: async () => R.Err('no backend in use'),
-  deletePlugin: async () => R.Err('no backend in use'),
-  getLogs: async () => R.Err('no backend in use'),
-  log: async () => R.Err('no backend in use'),
+  getImageData: ERROR_NO_BACKEND,
+  listInstalledPlugins: ERROR_NO_BACKEND,
+  getPluginPath: ERROR_NO_BACKEND,
+  downloadPlugin: ERROR_NO_BACKEND,
+  loadPluginCode: ERROR_NO_BACKEND,
+  deletePlugin: ERROR_NO_BACKEND,
+  getLogs: ERROR_NO_BACKEND,
+  log: ERROR_NO_BACKEND,
+  onNewLog: EMPTY_WITH_CLEANUP,
 }
 
 export default DummyBackend
