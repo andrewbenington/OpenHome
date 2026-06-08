@@ -1,10 +1,11 @@
+import { Option } from 'src/core/util/functional'
 import { filterUndefined } from '../../core/util/sort'
 
 export function hiddenIf(condition: boolean | undefined) {
   return condition ? 'hidden' : undefined
 }
 
-export function classNames(...values: (string | undefined)[]): string {
+export function classNames(...values: Option<string>[]): string {
   return values.filter(filterUndefined).join(' ')
 }
 
@@ -27,10 +28,11 @@ export function cssClass(className: string): PendingState {
   return newPending(className)
 }
 
-function newPending(pendingClass: string, classes?: string[]): PendingState {
+function newPending(pendingClass: Option<string>, classes?: string[]): PendingState {
   return {
-    with(newpendingClass: string) {
-      return newPending(newpendingClass, [...(classes ?? []), pendingClass])
+    with(newPendingClass: Option<string>) {
+      const classesOrEmpty = classes ?? []
+      return newPending(newPendingClass, allDefined(...classesOrEmpty, pendingClass))
     },
     if(condition: unknown) {
       return newIfState(classes ?? [], pendingClass, condition)
@@ -41,27 +43,31 @@ function newPending(pendingClass: string, classes?: string[]): PendingState {
 
 function newNotPending(classes?: string[]): NotPendingState {
   return {
-    with(pendingClass: string) {
+    with(pendingClass: Option<string>) {
       return newPending(pendingClass, classes)
     },
     build: () => buildFromState(classes),
   }
 }
 
-function newIfState(classes: string[], pendingClass: string, condition: unknown): IfState {
+function newIfState(classes: string[], pendingClass: Option<string>, condition: unknown): IfState {
   return {
-    with(className: string) {
-      classes = condition ? [...classes, pendingClass] : classes
+    with(className: Option<string>) {
+      classes = condition ? allDefined(...classes, pendingClass) : classes
       return newPending(className, classes)
     },
     or(orCondition: unknown) {
       return newIfState(classes ?? [], pendingClass, Boolean(condition) || Boolean(orCondition))
     },
-    else(elseClass: string) {
-      return newNotPending([...classes, condition ? pendingClass : elseClass])
+    else(elseClass: Option<string>) {
+      return newNotPending(allDefined(...classes, condition ? pendingClass : elseClass))
     },
-    build: () => buildFromState(condition ? [...classes, pendingClass] : classes),
+    build: () => buildFromState(condition ? allDefined(...classes, pendingClass) : classes),
   }
+}
+
+function allDefined(...args: Option<string>[]) {
+  return args.filter(filterUndefined)
 }
 
 function buildFromState(classes: string[] | undefined) {
@@ -70,7 +76,7 @@ function buildFromState(classes: string[] | undefined) {
 
 type IfStateBuilder = (condition: unknown) => IfState
 
-type PendingStateBuilder = (pendingClass: string) => PendingState
+type PendingStateBuilder = (pendingClass: Option<string>) => PendingState
 
 type BuildFunction = () => string
 
@@ -88,10 +94,38 @@ type PendingState = {
 type IfState = {
   with: PendingStateBuilder
   or: IfStateBuilder
-  else(className: string): NotPendingState
+  else(className: string | undefined): NotPendingState
   build: BuildFunction
 }
 
-export function joinCssClasses(...classes: (string | undefined)[]) {
+export function joinCssClasses(...classes: Option<string>[]) {
   return classes.filter(Boolean).join(' ')
 }
+
+export type RadixColor =
+  | 'gray'
+  | 'gold'
+  | 'bronze'
+  | 'brown'
+  | 'yellow'
+  | 'amber'
+  | 'orange'
+  | 'tomato'
+  | 'red'
+  | 'ruby'
+  | 'crimson'
+  | 'pink'
+  | 'plum'
+  | 'purple'
+  | 'violet'
+  | 'iris'
+  | 'indigo'
+  | 'blue'
+  | 'cyan'
+  | 'teal'
+  | 'jade'
+  | 'green'
+  | 'grass'
+  | 'lime'
+  | 'mint'
+  | 'sky'

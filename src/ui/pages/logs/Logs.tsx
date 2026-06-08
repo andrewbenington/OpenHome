@@ -5,19 +5,25 @@ import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { cssClass } from '@openhome-ui/util/style'
-import { Text, TextField } from '@radix-ui/themes'
+import { CheckboxGroup, Text, TextField } from '@radix-ui/themes'
 import dayjs from 'dayjs'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { BackendContext } from 'src/ui/backend/backendContext'
-import { LogEntry } from 'src/ui/backend/backendInterface'
+import { LogEntry, LogLevel } from 'src/ui/backend/backendInterface'
 import { DevDataDisplay } from 'src/ui/components/DevDataDisplay'
+import { FilterIcon } from 'src/ui/components/Icons'
+import { Popover } from 'src/ui/components/popover/Popover'
+import ToggleButton from 'src/ui/components/ToggleButton'
 import './Logs.css'
+
+const LOG_LEVELS: readonly LogLevel[] = Object.freeze(['ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'])
 
 export default function Logs() {
   const logData = useTodayLogs()
-  const [filter, setFilter] = useState<string>('')
+  const { levels, setLevels, filterText, setFilterText } = useFilter(logData.logs ?? [])
   const [selectedMon, setSelectedMon] = useState<OHPKM>()
   const ohpkmStore = useOhpkmStore()
+  const [filtersOpen, setFiltersOpen] = useState(false)
 
   if (logData.logs) {
     return (
@@ -28,16 +34,53 @@ export default function Logs() {
           <Text>
             <b>Log count:</b> {logData.logs.length}
           </Text>
+          <Popover.Root open={filtersOpen} onOpenChange={(v) => setFiltersOpen(v)}>
+            <Popover.Trigger
+              render={(props) => (
+                <ToggleButton
+                  icon={FilterIcon}
+                  state={filtersOpen}
+                  setState={setFiltersOpen}
+                  toggledClassName="filter-button-toggled"
+                  untoggledClassName="filter-button-untoggled"
+                  {...props}
+                />
+              )}
+            />
+            <Popover.Portal>
+              <Popover.Positioner sideOffset={8}>
+                <Popover.Popup className="logs-filter-popover">
+                  <CheckboxGroup.Root
+                    value={Array.from(levels)}
+                    onValueChange={(value) => setLevels(new Set(value as LogLevel[]))}
+                  >
+                    {LOG_LEVELS.map((level) => (
+                      <CheckboxGroup.Item key={level} value={level}>
+                        <span className={`log-level log-level-${level.toLowerCase()}`}>
+                          {level}
+                        </span>
+                      </CheckboxGroup.Item>
+                    ))}
+                  </CheckboxGroup.Root>
+                </Popover.Popup>
+              </Popover.Positioner>
+            </Popover.Portal>
+          </Popover.Root>
           <TextField.Root
             className="pokedex-filter-field"
-            placeholder="Filter..."
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            placeholder="Search..."
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
           />
         </div>
         <div className="logs-container">
           {logData.logs
-            .filter((log) => log.message.toLocaleLowerCase().includes(filter.toLocaleLowerCase()))
+            .filter(
+              (log) =>
+                (!filterText ||
+                  log.message.toLocaleLowerCase().includes(filterText?.toLocaleLowerCase())) &&
+                levels.has(log.level as LogLevel)
+            )
             .map((log) => (
               <LogLine
                 key={log.timestamp}
@@ -90,21 +133,44 @@ function useTodayLogs() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
 
+  const getLogs = useCallback(() => {
+    setLoading(true)
+    backend
+      .getLogs()
+      .then(R.match(setLogs, setError))
+      .finally(() => setLoading(false))
+  }, [backend])
+
+  backend.onNewLog((_notification) => {
+    getLogs()
+  })
+
   useEffect(() => {
     if (logs === undefined) {
-      setLoading(true)
-      backend
-        .getLogs()
-        .then(R.match(setLogs, setError))
-        .finally(() => setLoading(false))
+      getLogs()
     }
-  }, [backend, logs])
+  }, [getLogs, logs])
 
   return logs
     ? ({ logs, loading: false, error: undefined } as const)
-    : ({
-        loading,
-        error,
-        logs: undefined,
-      } as const)
+    : ({ logs: undefined, loading, error } as const)
+}
+
+function useFilter(logs: LogEntry[]) {
+  const [levels, setLevels] = useState(new Set(LOG_LEVELS))
+  const [filterText, setFilterText] = useState('')
+
+  const filteredLogs = logs.filter(
+    (log) =>
+      (!filterText || log.message.toLocaleLowerCase().includes(filterText?.toLocaleLowerCase())) &&
+      levels.has(log.level as LogLevel)
+  )
+
+  return {
+    levels,
+    setLevels,
+    filterText,
+    setFilterText,
+    filteredLogs,
+  }
 }

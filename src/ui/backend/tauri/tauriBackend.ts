@@ -6,6 +6,7 @@ import { JSONObject, LoadSaveResponse, SaveRef } from '@openhome-core/util/types
 import BackendInterface, {
   BankOrBoxChange,
   MenuEvent,
+  NewLogNotification,
   OhpkmStore,
   StoredLookups,
 } from '@openhome-ui/backend/backendInterface'
@@ -360,6 +361,13 @@ export const TauriBackend: BackendInterface = {
           }
         }
       })
+  },
+  onNewLog: (callback: (notification: NewLogNotification) => void) => {
+    const unlistenPromise = listen('tracing::log', (event) =>
+      callback(event.payload as NewLogNotification)
+    )
+
+    return () => unlistenPromise.then((unlistenFunction) => unlistenFunction())
   },
 }
 

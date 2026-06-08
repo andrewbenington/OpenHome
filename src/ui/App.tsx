@@ -188,11 +188,11 @@ const webConsole = { ...console }
 
 function patchConsole(backend: BackendInterface) {
   const levels = [
-    ['log', 'info'],
-    ['info', 'info'],
-    ['warn', 'warn'],
-    ['error', 'error'],
-    ['debug', 'debug'],
+    ['log', 'INFO'],
+    ['info', 'INFO'],
+    ['warn', 'WARN'],
+    ['error', 'ERROR'],
+    ['debug', 'DEBUG'],
   ] as const
 
   for (const [method, level] of levels) {
@@ -209,11 +209,31 @@ function patchConsole(backend: BackendInterface) {
         context['stack'] = stack
         backend.log(level, serializeArg(args.at(1)), JSON.parse(JSON.stringify(context)))
       } else {
-        const message = args.map(serializeArg).join(' ')
+        const message = formatWithPlaceholders(args)
         backend.log(level, message, { stack })
       }
     }
   }
+}
+
+// attempts to fill log placeholders with args like the web console does
+function formatWithPlaceholders(args: unknown[]): string {
+  if (typeof args[0] !== 'string' || !args[0].includes('%')) {
+    return args.map(serializeArg).join(' ')
+  }
+
+  let i = 1
+  const formatted = args[0].replace(/%[sdifoO]/g, (token) => {
+    if (i >= args.length) return token
+    const val = args[i++]
+    if (token === '%d' || token === '%i') return String(Number(val))
+    if (token === '%f') return String(parseFloat(String(val)))
+    if (token === '%o' || token === '%O') return JSON.stringify(val)
+    return String(val) // %s
+  })
+
+  // append any remaining args that weren't consumed
+  return [formatted, ...args.slice(i).map(serializeArg)].join(' ')
 }
 
 function serializeArg(arg: unknown): string {

@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use tauri::{App, Manager};
+use tauri::{App, Emitter, Manager};
 
 use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
@@ -20,10 +20,16 @@ use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 pub fn run_app_startup(app: &App) -> Result<Vec<versioning::UpdateFeatures>> {
     let handle = app.handle();
 
-    logging::init_logging(&Path::join(
-        &tauri::Manager::path(handle).app_data_dir()?,
-        LOGS_DIR,
-    ));
+    let handle2 = handle.clone();
+    logging::init_logging(
+        &Path::join(&tauri::Manager::path(handle).app_data_dir()?, LOGS_DIR),
+        Some(move |event: logging::NewLogNotification| {
+            let result = handle2.emit("tracing::log", event);
+            if let Err(err) = result {
+                tracing::error!("{err}");
+            }
+        }),
+    );
 
     let update_features: Vec<versioning::UpdateFeatures> =
         match versioning::handle_updates_get_features(handle, false) {

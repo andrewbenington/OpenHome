@@ -39,7 +39,7 @@
     rgba(0, 0, 0, 0.07) 0px 8px 8px,
     rgba(0, 0, 0, 0.07) 0px 16px 16px;
   color: var(--accent-contrast);
-  gap: 1.5rem;
+  gap: 1rem;
   z-index: 100;
   position: sticky;
   top: 0;
@@ -111,11 +111,12 @@
 
 .log-level {
   font-size: 0.8rem;
-  width: 3.5rem;
+  min-width: 3.5rem;
   border-radius: 3px;
   text-align: center;
   font-weight: bold;
   margin: 0 0.25rem;
+  display: block;
 }
 
 .log-timestamp {
@@ -139,4 +140,31 @@
   aspect-ratio: 1;
   padding: 0;
   border: none;
+}
+
+.log-filter-popover {
+  width: fit-content;
+  box-sizing: border-box;
+  padding: var(--padding-radius-sm-lg) calc(1.6 * var(--padding-radius-sm-lg))
+    var(--padding-radius-sm-lg) var(--padding-radius-sm-lg);
+}
+
+.rt-CheckboxGroupItem {
+  display: inline-flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.rt-CheckboxGroupItemInner {
+  width: 3.5rem;
+}
+
+.filter-button-toggled {
+  background-color: white !important;
+  color: black;
+}
+
+.filter-button-untoggled {
+  color: white;
+  box-shadow: inset 0 0 0 1px white;
 }
