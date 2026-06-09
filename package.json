@@ -82,12 +82,12 @@
     "@testing-library/react": "^16.3.2",
     "@types/crypto-js": "^4.2.2",
     "@types/lodash": "^4.17.24",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.2",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.60.0",
-    "@typescript-eslint/parser": "^8.60.0",
-    "@typescript/native-preview": "7.0.0-dev.20260527.2",
+    "@typescript-eslint/eslint-plugin": "^8.61.0",
+    "@typescript-eslint/parser": "^8.61.0",
+    "@typescript/native-preview": "7.0.0-dev.20260608.1",
     "@vitejs/plugin-react": "^6.0.2",
     "better-sqlite3": "^12.10.0",
     "camelcase-keys": "^10.0.2",
@@ -99,10 +99,10 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "jsdom": "^29.1.1",
     "prettier": "^3.8.3",
-    "react-dom": "^19.2.6",
+    "react-dom": "^19.2.7",
     "typescript": "^6.0.3",
-    "vite": "^8.0.14",
-    "vitest": "^4.1.7"
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8"
   },
   "pnpm": {
     "peerDependencyRules": {
