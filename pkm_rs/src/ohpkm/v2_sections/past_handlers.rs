@@ -1,6 +1,5 @@
 use std::num::NonZeroU16;
 
-use crate::log;
 #[allow(deprecated)]
 use crate::ohpkm::deprecated::PastHandlerDataV1;
 use crate::ohpkm::v1::OhpkmV1;
