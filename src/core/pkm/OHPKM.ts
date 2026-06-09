@@ -924,13 +924,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.obedienceLevel = other.obedienceLevel
     }
 
-    if (updates.length) {
-      console.info(
-        { ohpkm_id: this.openhomeId, event: 'game_data_sync', updates },
-        `synced ${this.nickname} with game data`
-      )
-    }
-
     return updates
   }
 
