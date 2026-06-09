@@ -82,17 +82,6 @@ impl PastHandlerDataV2 {
         game: OriginGame,
         plugin: &Option<String>,
     ) -> bool {
-        log!(
-            "self.id: {}/{}, secret {}/{}",
-            self.id
-                .map(|val| val.to_string())
-                .unwrap_or(String::from("(none)")),
-            tid,
-            self.secret_id
-                .map(|val| val.to_string())
-                .unwrap_or(String::from("(none)")),
-            sid
-        );
         self.id.is_some_and(|t| t.get() == tid)
             && self.secret_id.is_some_and(|s| s.get() == sid)
             && self.origin_game.is_some_and(|g| g == game)

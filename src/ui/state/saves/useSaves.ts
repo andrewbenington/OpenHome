@@ -363,7 +363,28 @@ export function useSaves(): SavesAndBanksManager {
       for (const mon of save.getAllMons()) {
         const trackedData = ohpkmStore.loadIfTracked(mon)
         if (trackedData) {
-          trackedData.syncWithGameData(mon, save)
+          const updates = trackedData.syncWithGameData(mon, save)
+
+          if (updates.length > 0) {
+            backend.log('DEBUG', `synced ${mon.nickname} with game data`, {
+              ohpkm_id: trackedData.openhomeId,
+              event: 'game_data_sync',
+              updates,
+            })
+          }
+
+          for (const update of updates) {
+            backend.log(
+              'INFO',
+              `${mon.nickname}: ${update.message ?? `Updated ${update.field} from ${JSON.stringify(update.prevValue)} to ${JSON.stringify(update.newValue)}`}`,
+              {
+                ohpkm_id: trackedData.openhomeId,
+                event: 'game_data_sync',
+                updates,
+              }
+            )
+          }
+
           toUpdate[trackedData.openhomeId] = trackedData
         }
       }

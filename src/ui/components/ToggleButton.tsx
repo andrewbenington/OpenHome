@@ -30,11 +30,6 @@ export default function ToggleButton(props: ToggleButtonProps) {
     ...buttonProps
   } = props
 
-  // console.debug(
-  //   cssClass('mini-button').with(toggledClassName).if(isToggled).else(untoggledClassName).build(),
-  //   { event: 'mini-button-css-class' }
-  // )
-
   const button = (
     <Button
       className={cssClass('mini-button')
@@ -46,10 +41,6 @@ export default function ToggleButton(props: ToggleButtonProps) {
       variant={isToggled ? 'solid' : 'outline'}
       color={isToggled ? undefined : 'gray'}
       disabled={disabled}
-      // style={{
-      //   backgroundColor: isToggled ? 'var(--accent-9)' : undefined,
-      //   color: isToggled ? 'white' : undefined,
-      // }}
       onClick={() => {
         if (isToggled) {
           onUnset?.()
