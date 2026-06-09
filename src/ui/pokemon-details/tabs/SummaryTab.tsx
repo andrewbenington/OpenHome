@@ -117,21 +117,20 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           <div>{mon.heldItemName}</div>
         </AttributeRow>
         <Flex direction="row" gap="1" align="center" wrap="wrap">
-          {mon.tags?.length &&
-            mon.tags.map((tag, i) => (
-              <Badge
-                key={i}
-                variant="solid"
-                size="1"
-                style={{
-                  backgroundColor: tag.color ?? '#888',
-                  color: colorIsDark(tag.color ?? '#888') ? '#fff' : '#000',
-                }}
-              >
-                <TagIcon iconName={tag.icon} size={10} />
-                {tag.label}
-              </Badge>
-            ))}
+          {mon.tags?.map((tag, i) => (
+            <Badge
+              key={i}
+              variant="solid"
+              size="1"
+              style={{
+                backgroundColor: tag.color ?? '#888',
+                color: colorIsDark(tag.color ?? '#888') ? '#fff' : '#000',
+              }}
+            >
+              <TagIcon iconName={tag.icon} size={10} />
+              {tag.label}
+            </Badge>
+          ))}
         </Flex>
         <div>
           {mon.isShiny() && (
