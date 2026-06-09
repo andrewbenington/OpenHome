@@ -2,11 +2,13 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   AbilityNumber,
   Ball,
+  ContestStats,
   ConvertStrategy,
   Gen3Ribbon,
   ItemGen3,
   Language,
   Languages,
+  MarkingsFourShapes,
   MetadataSummaryLookup,
   NatureIndex,
   SpeciesLookup,
@@ -56,10 +58,10 @@ export default class COLOPKM {
   currentHP: number
   evs: types.Stats
   ivs: types.Stats
-  contest: types.ContestStats
+  contest: ContestStats
   isFatefulEncounter: boolean
   pokerusByte: number
-  markings: types.MarkingsFourShapes
+  markings: MarkingsFourShapes
   trainerFriendship: number
   shadowID: number
   shadowGauge: number

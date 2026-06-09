@@ -154,6 +154,7 @@ pub enum SignificantUpdate {
     V1_11_1,
     V1_11_2,
     V1_11_3,
+    V1_11_4,
 }
 
 impl SignificantUpdate {
@@ -178,6 +179,7 @@ impl SignificantUpdate {
             Self::V1_11_1 => Version::parse("1.11.1").unwrap(),
             Self::V1_11_2 => Version::parse("1.11.2").unwrap(),
             Self::V1_11_3 => Version::parse("1.11.3").unwrap(),
+            Self::V1_11_4 => Version::parse("1.11.4").unwrap(),
         }
     }
 
@@ -260,6 +262,9 @@ impl SignificantUpdate {
             Self::V1_11_3 => Some(vec![
                 "Various bugs relating to PID conversion have been fixed.",
                 "Image plugins no longer break after changing the data directory.",
+            ]),
+            Self::V1_11_4 => Some(vec![
+                "Fixed a bug causing changes in Alola games to not be tracked.",
             ]),
             _ => None,
         }

@@ -4,9 +4,9 @@ import {
   MetadataSources,
   OriginGame,
   OriginGames,
-  getPluginColor,
   orasFormIndexIfSupported,
 } from '@pkm-rs/pkg'
+import { CHAMPS_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { Card, Flex } from '@radix-ui/themes'
 import { useContext } from 'react'
 import { isRestricted } from 'src/core/save/util/TransferRestrictions'
@@ -51,6 +51,23 @@ export function PokedexGames(props: PokedexGamesProps) {
               <img draggable={false} src={OriginGames.logoPath(origin)} />
             </Card>
           ))}
+        {!isRestricted(
+          CHAMPS_TRANSFER_RESTRICTIONS,
+          selectedForm.nationalDex.index,
+          selectedForm.formIndex
+        ) && (
+          <Card
+            className="compatible-game-card"
+            key={origin}
+            style={{
+              backgroundColor: OriginGames.championsColor(),
+              '--card-background-color': OriginGames.championsColor(),
+              padding: '0.25rem',
+            }}
+          >
+            <img draggable={false} src={OriginGames.championsLogoPath()} />
+          </Card>
+        )}
       </Flex>
       <h2 style={{ width: '100%', textAlign: 'center', margin: '1rem 0' }}>Plugins</h2>
       <Flex gap="1" overflowY="auto" wrap="wrap" justify="center" mb="1rem">
@@ -69,8 +86,8 @@ export function PokedexGames(props: PokedexGamesProps) {
               className="compatible-game-card"
               key={origin}
               style={{
-                backgroundColor: getPluginColor(saveType.getPluginIdentifier()),
-                '--card-background-color': getPluginColor(saveType.getPluginIdentifier()),
+                backgroundColor: OriginGames.pluginColor(saveType.getPluginIdentifier()),
+                '--card-background-color': OriginGames.pluginColor(saveType.getPluginIdentifier()),
                 padding: '0.25rem',
               }}
             >

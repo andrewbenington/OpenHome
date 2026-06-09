@@ -19,6 +19,9 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm> {
   static saveTypeAbbreviation = 'SM/USUM'
   static saveTypeID = 'SM/USUM'
 
+  MAX_BOX_COUNT: number = Gen7AlolaSaveRust.MAX_BOX_COUNT
+  SLOTS_PER_BOX: number = Gen7AlolaSaveRust.SLOTS_PER_BOX
+
   filePath: PathData
   fileCreated?: Date
 

@@ -1960,12 +1960,12 @@ impl OhpkmV2 {
         self.set_is_shadow(v);
     }
 
-    #[wasm_bindgen(getter = markingsWasm)]
+    #[wasm_bindgen(getter = markings)]
     pub fn markings_js(&self) -> MarkingsSixShapesColors {
         self.markings()
     }
 
-    #[wasm_bindgen(setter = markingsWasm)]
+    #[wasm_bindgen(setter = markings)]
     pub fn set_markings_js(&mut self, v: &MarkingsSixShapesColors) {
         self.set_markings(v);
     }
@@ -2007,20 +2007,20 @@ impl OhpkmV2 {
         self.set_gender(Gender::from_u8(v));
     }
 
-    #[wasm_bindgen(getter = evsWasm)]
+    #[wasm_bindgen(getter = evs)]
     pub fn evs_js(&self) -> Stats16Le {
         self.evs().into()
     }
-    #[wasm_bindgen(setter = evsWasm)]
+    #[wasm_bindgen(setter = evs)]
     pub fn set_evs_js(&mut self, v: Stats16Le) {
         self.set_evs(&v.try_into().expect("evs should not exceed 255 each"));
     }
 
-    #[wasm_bindgen(getter = contestWasm)]
+    #[wasm_bindgen(getter = contest)]
     pub fn contest_js(&self) -> ContestStats {
         self.contest()
     }
-    #[wasm_bindgen(setter = contestWasm)]
+    #[wasm_bindgen(setter = contest)]
     pub fn set_contest_js(&mut self, v: &ContestStats) {
         self.set_contest(v);
     }
@@ -2170,11 +2170,11 @@ impl OhpkmV2 {
         self.set_handler_friendship(v);
     }
 
-    #[wasm_bindgen(getter = handlerMemoryWasm)]
+    #[wasm_bindgen(getter = handlerMemory)]
     pub fn handler_memory_js(&self) -> TrainerMemory {
         self.handler_memory()
     }
-    #[wasm_bindgen(setter = handlerMemoryWasm)]
+    #[wasm_bindgen(setter = handlerMemory)]
     pub fn set_handler_memory_js(&mut self, v: &TrainerMemory) {
         self.set_handler_memory(v);
     }
@@ -2288,11 +2288,11 @@ impl OhpkmV2 {
         self.set_trainer_friendship(v);
     }
 
-    #[wasm_bindgen(getter = trainerMemoryWasm)]
+    #[wasm_bindgen(getter = trainerMemory)]
     pub fn trainer_memory_js(&self) -> TrainerMemory {
         self.trainer_memory()
     }
-    #[wasm_bindgen(setter = trainerMemoryWasm)]
+    #[wasm_bindgen(setter = trainerMemory)]
     pub fn set_trainer_memory_js(&mut self, v: &TrainerMemory) {
         self.set_trainer_memory(v);
     }
@@ -2360,11 +2360,11 @@ impl OhpkmV2 {
         self.main_data.met_level = v;
     }
 
-    #[wasm_bindgen(getter = hyperTrainingWasm)]
+    #[wasm_bindgen(getter = hyperTraining)]
     pub fn hyper_training_js(&self) -> HyperTraining {
         self.main_data.hyper_training
     }
-    #[wasm_bindgen(setter = hyperTrainingWasm)]
+    #[wasm_bindgen(setter = hyperTraining)]
     pub fn set_hyper_training_js(&mut self, v: &HyperTraining) {
         self.main_data.hyper_training = *v;
     }
@@ -2833,12 +2833,12 @@ impl OhpkmV2 {
         }
     }
 
-    #[wasm_bindgen(getter = geolocationsWasm)]
+    #[wasm_bindgen(getter = geolocations)]
     pub fn geolocations_js(&self) -> Option<Geolocations> {
         Some(self.gen67_data?.geolocations)
     }
 
-    #[wasm_bindgen(setter = geolocationsWasm)]
+    #[wasm_bindgen(setter = geolocations)]
     pub fn set_geolocations_js(&mut self, value: Option<Geolocations>) {
         match value {
             Some(geolocations) => {

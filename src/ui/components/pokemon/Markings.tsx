@@ -25,7 +25,7 @@ const MarkingsDisplay = (props: MarkingsProps) => {
           if (modifiedMarkings[shape] === 'blue') {
             modifiedMarkings[shape] = 'red'
           } else if (modifiedMarkings[shape] === 'red') {
-            modifiedMarkings[shape] = null
+            modifiedMarkings[shape] = 'unset'
           } else {
             modifiedMarkings[shape] = 'blue'
           }

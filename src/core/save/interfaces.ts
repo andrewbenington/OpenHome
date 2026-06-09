@@ -1,11 +1,10 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { Option } from '@openhome-core/util/functional'
+import { Option, range } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import {
   ConvertStrategy,
   ExtraFormIndex,
   Gender,
-  getPluginColor,
   Language,
   OriginGame,
   OriginGames,
@@ -248,7 +247,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   }
 
   get gameColor(): string {
-    return getPluginColor(this.pluginIdentifier)
+    return OriginGames.pluginColor(this.pluginIdentifier)
   }
 
   get gameLogoPath(): string {
@@ -401,9 +400,19 @@ export abstract class WasmOfficialSave<P extends PKMInterface, WasmP> extends Of
 
   abstract monFromWasm(wasmMon: WasmP): P
 
+  abstract MAX_BOX_COUNT: number
+  abstract SLOTS_PER_BOX: number
+
   getMonAt(boxNum: number, boxSlot: number): Option<P> {
     const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
     return wasmMon ? this.monFromWasm(wasmMon) : undefined
+  }
+
+  getAllMons() {
+    return range(this.MAX_BOX_COUNT)
+      .flatMap((boxIndex) => range(this.SLOTS_PER_BOX).map((boxSlot) => ({ boxIndex, boxSlot })))
+      .map(({ boxIndex, boxSlot }) => this.getMonAt(boxIndex, boxSlot))
+      .filter(filterUndefined)
   }
 
   prepareForSaving(): Uint8Array {

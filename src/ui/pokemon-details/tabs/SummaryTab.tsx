@@ -13,7 +13,6 @@ import {
   AbilityNumber,
   extraFormDisplayName,
   genderFromBool,
-  getPluginColor,
   Languages,
   MetadataSummaryLookup,
   OriginGames,
@@ -24,14 +23,9 @@ import { Badge, Button, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { OHPKM } from 'src/core/pkm/OHPKM'
 import { useSaves } from 'src/ui/state/saves'
-import { MonTag } from 'src/ui/util/tags'
 import { TagIcon } from '../../components/TagIcon'
 import useMonSprite from '../useMonSprite'
 import './SummaryTab.css'
-
-type MonWithManagementData = PKMInterface & {
-  tags?: MonTag[]
-}
 
 type SummaryDisplayProps = {
   mon: PKMInterface
@@ -39,9 +33,7 @@ type SummaryDisplayProps = {
 
 const SummaryDisplay = (props: SummaryDisplayProps) => {
   const { mon } = props
-  const tags = useMemo(() => {
-    return (mon as MonWithManagementData).tags ?? []
-  }, [mon])
+
   const spriteResult = useMonSprite({
     dexNum: mon.dexNum,
     formNum: mon.formNum,
@@ -50,6 +42,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
     isFemale: mon.gender === 1,
     format: mon.format,
     extraFormIndex: mon.extraFormIndex,
+    heldItemIndex: mon.heldItemIndex,
   })
 
   const itemAltText = useMemo(() => {
@@ -124,21 +117,20 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           <div>{mon.heldItemName}</div>
         </AttributeRow>
         <Flex direction="row" gap="1" align="center" wrap="wrap">
-          {tags.length > 0 &&
-            tags.map((tag, i) => (
-              <Badge
-                key={i}
-                variant="solid"
-                size="1"
-                style={{
-                  backgroundColor: tag.color ?? '#888',
-                  color: colorIsDark(tag.color ?? '#888') ? '#fff' : '#000',
-                }}
-              >
-                <TagIcon iconName={tag.icon} size={10} />
-                {tag.label}
-              </Badge>
-            ))}
+          {mon.tags?.map((tag, i) => (
+            <Badge
+              key={i}
+              variant="solid"
+              size="1"
+              style={{
+                backgroundColor: tag.color ?? '#888',
+                color: colorIsDark(tag.color ?? '#888') ? '#fff' : '#000',
+              }}
+            >
+              <TagIcon iconName={tag.icon} size={10} />
+              {tag.label}
+            </Badge>
+          ))}
         </Flex>
         <div>
           {mon.isShiny() && (
@@ -184,13 +176,13 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
                 style={{
                   color: colorIsDark(
                     mon.pluginOrigin
-                      ? getPluginColor(mon.pluginOrigin)
+                      ? OriginGames.pluginColor(mon.pluginOrigin)
                       : OriginGames.color(mon.gameOfOrigin)
                   )
                     ? '#fff'
                     : '#000',
                   backgroundColor: mon.pluginOrigin
-                    ? getPluginColor(mon.pluginOrigin)
+                    ? OriginGames.pluginColor(mon.pluginOrigin)
                     : OriginGames.color(mon.gameOfOrigin),
                 }}
               >

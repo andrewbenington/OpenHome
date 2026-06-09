@@ -1,8 +1,10 @@
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 
 import {
+  ContestStats,
   ConvertStrategies,
   ConvertStrategy,
+  MarkingsFourShapes,
   MetadataSummaryLookup,
   OriginGame,
   Pk3 as Pk3Wasm,
@@ -16,13 +18,7 @@ import * as encryption from '../util/encryption'
 import * as jsTypes from '../util/types'
 import * as types from '../util/types'
 import { PkmConstructorOptions } from './PKM'
-import {
-  binaryGenderFromBool,
-  binaryGenderToBool,
-  contestStatsToWasm,
-  markingsFourShapesFromWasm,
-  markingsFourShapesToWasm,
-} from './wasm/convert'
+import { binaryGenderFromBool, binaryGenderToBool } from './wasm/convert'
 
 export default class PK3 implements PKMInterface {
   static getFormat() {
@@ -135,10 +131,10 @@ export default class PK3 implements PKMInterface {
   }
 
   get markings() {
-    return markingsFourShapesFromWasm(this.inner.markings)
+    return this.inner.markings
   }
-  set markings(value: jsTypes.MarkingsFourShapes) {
-    this.inner.markings = markingsFourShapesToWasm(value)
+  set markings(value: MarkingsFourShapes) {
+    this.inner.markings = value
   }
 
   get personalityValue() {
@@ -180,8 +176,8 @@ export default class PK3 implements PKMInterface {
   get contest() {
     return this.inner.contest
   }
-  set contest(value: jsTypes.ContestStats) {
-    this.inner.contest = contestStatsToWasm(value)
+  set contest(value: ContestStats) {
+    this.inner.contest = value
   }
 
   get pokerusByte() {

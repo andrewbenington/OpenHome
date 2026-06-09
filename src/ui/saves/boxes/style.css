@@ -62,7 +62,7 @@
   margin: auto;
 }
 
-.sort-mon-cell .pokemon-icon-image,
+.sort-mon-cell .pokemon-spritesheet-icon,
 .sort-mon-cell .sort-mon-button {
   width: 100%;
   height: 100%;

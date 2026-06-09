@@ -1,16 +1,20 @@
 import {
   AbilityIndex,
   Ball,
+  ContestStats,
   ConvertStrategy,
   ExtraFormIndex,
   extraFormIndexFromOrasPikachu,
+  Geolocations,
   Item,
   Language,
   Languages,
+  MarkingsSixShapes,
   MetadataSummaryLookup,
   NatureIndex,
   orasFormIndexIfSupported,
   SpeciesLookup,
+  TrainerMemory,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
@@ -51,8 +55,8 @@ export default class PK6 {
   extraFormIndex?: ExtraFormIndex
   gender: number
   evs: types.Stats
-  contest: types.ContestStats
-  markings: types.MarkingsSixShapesNoColor
+  contest: ContestStats
+  markings: MarkingsSixShapes
   pokerusByte: number
   superTrainingFlags: number
   contestMemoryCount: number
@@ -72,11 +76,11 @@ export default class PK6 {
   handlerName: string
   handlerGender: boolean
   isCurrentHandler: boolean
-  geolocations: types.Geolocation[]
+  geolocations: Geolocations
   handlerFriendship: number
   handlerAffection: number
-  handlerMemory: types.Memory
-  trainerMemory: types.Memory
+  handlerMemory: TrainerMemory
+  trainerMemory: TrainerMemory
   fullness: number
   enjoyment: number
   trainerName: string
