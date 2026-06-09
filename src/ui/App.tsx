@@ -201,12 +201,13 @@ function patchConsole(backend: BackendInterface) {
       // send message to web console as well
       webConsole[method](...args)
 
-      // remove this function from the stack trace
-      const stack = new Error().stack?.split('\n').slice(1).join('\n')
+      // skip first line (this function)
+      const stack = new Error().stack?.split('\n').slice(1)
+      const callsite = stack?.[0]
 
       if (args.length > 0 && typeof args[0] === 'object' && args[0] !== null) {
         const context = args[0] as Record<string, unknown>
-        context['stack'] = stack
+        context['callsite'] = callsite
         backend.log(level, serializeArg(args.at(1)), JSON.parse(JSON.stringify(context)))
       } else {
         const message = formatWithPlaceholders(args)

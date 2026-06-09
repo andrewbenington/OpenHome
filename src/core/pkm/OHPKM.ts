@@ -4,7 +4,6 @@ import {
   AbilityIndex,
   AbilityNumber,
   Ball,
-  ExtraFormIndex,
   Gender,
   generatePk3CompatiblePid,
   Item,
@@ -338,9 +337,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         }
       }
     }
-    if (this.openhomeId === '0004-d889ca57-401aab08-30') {
-      this.extraFormIndex = ExtraFormIndex.CharizardClone
-    }
   }
 
   // static constructors
@@ -538,10 +534,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public tradeToSave(save: SAV) {
-    console.debug('tradeToSave', { original: this.isFrom(save) })
     this.tradeToSaveWasm(save.origin)
 
     const isOriginalSave = this.isFrom(save)
+    console.debug(
+      { isOriginalSave, ohpkm_id: this.openhomeId, event: 'trade_to_save' },
+      'Traded Pokémon to save file'
+    )
     this.isCurrentHandler = !isOriginalSave
     if (isOriginalSave) {
       this.handlerName = ''
@@ -597,15 +596,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return SpeciesLookup(this.dexNum)
   }
   public syncWithGameData(other: PKMInterface, save?: SAV) {
-    console.debug(
-      { event: 'sync_with_game_data', ohpkm_id: this.openhomeId },
-      `syncing ${this.nickname} with game data`
-    )
-
     const updates: SyncUpdate[] = []
 
     if (other.exp !== this.exp) {
-      updates.push(syncUpdate('exp', this.exp, other.exp))
+      updates.push(syncUpdate('experience', this.exp, other.exp))
       this.exp = other.exp
     }
 
@@ -614,11 +608,11 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.moves = other.moves
     }
     if (!arraysEqual(this.movePP, other.movePP)) {
-      updates.push(syncUpdate('movePP', this.movePP, other.movePP))
+      updates.push(syncUpdate('move PP', this.movePP, other.movePP))
       this.movePP = adjustMovePPBetweenFormats(this, other)
     }
     if (!arraysEqual(this.movePPUps, other.movePPUps)) {
-      updates.push(syncUpdate('movePPUps', this.movePPUps, other.movePPUps))
+      updates.push(syncUpdate('move PP ups', this.movePPUps, other.movePPUps))
       this.movePPUps = other.movePPUps
     }
 
@@ -653,7 +647,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     }
 
     if (this.heldItemIndex !== other.heldItemIndex) {
-      updates.push(syncUpdate('heldItemIndex', this.heldItemIndex, other.heldItemIndex))
+      updates.push(syncUpdate('held item', this.heldItemIndex, other.heldItemIndex))
       this.heldItemIndex = other.heldItemIndex
     }
 
@@ -670,31 +664,31 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         !FORMATS_WITHOUT_HIDDEN_ABILITIES.includes(other.format)
       ) {
         if (this.ability?.index !== other.ability.index) {
-          updates.push(syncUpdate('ability', this.ability, other.ability))
+          updates.push(syncUpdate('ability', this.ability.index, other.ability.index))
           this.ability = other.ability
         }
         if (other.abilityNum && this.abilityNum !== other.abilityNum) {
-          updates.push(syncUpdate('abilityNum', this.abilityNum, other.abilityNum))
+          updates.push(syncUpdate('ability number', this.abilityNum, other.abilityNum))
           this.abilityNum = other.abilityNum
         }
       }
     }
 
     if (other.avs && !deepEqual(this.avs, other.avs)) {
-      updates.push(syncUpdate('avs', this.avs, other.avs))
+      updates.push(syncUpdate('AVs', this.avs, other.avs))
       this.avs = other.avs
     }
 
     if (other.evs && !deepEqual(this.evs, other.evs)) {
-      updates.push(syncUpdate('evs', this.evs, other.evs))
+      updates.push(syncUpdate('EVs', this.evs, other.evs))
       this.evs = other.evs
     }
     if (other.evsG12 && !deepEqual(this.evsG12, other.evsG12)) {
-      updates.push(syncUpdate('evsG12', this.evsG12, other.evsG12))
+      updates.push(syncUpdate('EVs (gen 1-2)', this.evsG12, other.evsG12))
       this.evsG12 = other.evsG12
     }
     if (other.hyperTraining && !deepEqual(this.hyperTraining, other.hyperTraining)) {
-      updates.push(syncUpdate('hyperTraining', this.hyperTraining, other.hyperTraining))
+      updates.push(syncUpdate('hyper training', this.hyperTraining, other.hyperTraining))
       this.hyperTraining = other.hyperTraining
     }
 
@@ -705,7 +699,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     }
 
     if (other.contest && !deepEqual(this.contest, other.contest)) {
-      updates.push(syncUpdate('contest', this.contest, other.contest))
+      updates.push(syncUpdate('contest stats', this.contest, other.contest))
       this.contest = other.contest
     }
 
@@ -777,10 +771,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         )
       ) {
         updates.push(
-          syncUpdate(
-            `Handler was updated to ${save.name} in ${OriginGames.gameNameFull(save.origin)}`,
+          syncUpdateMessage(
+            `Handler data updated for ${save.name} in ${OriginGames.gameNameFull(save.origin)}`,
             this.handlerId,
-            save.displayID
+            save.tid
           )
         )
       }
@@ -930,10 +924,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.obedienceLevel = other.obedienceLevel
     }
 
-    console.info(
-      { ohpkm_id: this.openhomeId, event: 'game_data_sync', updates },
-      `synced ${this.nickname} with game data`
-    )
+    if (updates.length) {
+      console.info(
+        { ohpkm_id: this.openhomeId, event: 'game_data_sync', updates },
+        `synced ${this.nickname} with game data`
+      )
+    }
 
     return updates
   }
@@ -1092,14 +1088,23 @@ function syncUpdateMessage(
   }
 }
 
-function arraysEqual<T>(first?: T[] | Uint8Array, second?: T[] | Uint8Array) {
+function arraysEqual<T>(first?: T[] | Uint8Array, second?: T[] | Uint8Array): boolean {
   if (first === undefined || second === undefined) {
     return first === second
   }
-  return first.length === second.length && first.every((item, i) => item === second[i])
+  return (
+    first.length === second.length &&
+    first.every((item, i) => {
+      if (isObject(item) && isObject(second[i])) {
+        return deepEqual(item, second[i])
+      } else {
+        return item === second[i]
+      }
+    })
+  )
 }
 
-function deepEqual(first?: object, second?: object) {
+function deepEqual(first?: object, second?: object): boolean {
   if (first === undefined || second === undefined) {
     return first === second
   }
@@ -1117,7 +1122,7 @@ function deepEqual(first?: object, second?: object) {
 
 type IndexableObject = object & Record<string, any>
 
-function objectsEqual(object1: IndexableObject, object2: IndexableObject) {
+export function objectsEqual(object1: IndexableObject, object2: IndexableObject) {
   if (object1 === null || object2 === null) {
     return object1 === object2
   }

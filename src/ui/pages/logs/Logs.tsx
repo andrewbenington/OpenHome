@@ -14,6 +14,7 @@ import { DevDataDisplay } from 'src/ui/components/DevDataDisplay'
 import { FilterIcon } from 'src/ui/components/Icons'
 import { Popover } from 'src/ui/components/popover/Popover'
 import ToggleButton from 'src/ui/components/ToggleButton'
+import useDebounce from 'src/ui/hooks/useDebounce'
 import './Logs.css'
 
 const LOG_LEVELS: readonly LogLevel[] = Object.freeze(['ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'])
@@ -141,8 +142,9 @@ function useTodayLogs() {
       .finally(() => setLoading(false))
   }, [backend])
 
+  const debouncedGetLogs = useDebounce(getLogs, 300)
   backend.onNewLog((_notification) => {
-    getLogs()
+    debouncedGetLogs()
   })
 
   useEffect(() => {

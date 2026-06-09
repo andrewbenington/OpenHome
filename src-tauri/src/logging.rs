@@ -148,9 +148,8 @@ impl LogEntry {
 
         let event = fields.pop_string("event").or(context.pop_string("event"));
 
-        let target = if let Some(js_stack_trace) = context.pop_string("stack")
-            && let Some(stack_trace_top) = js_stack_trace.split('\n').nth(0)
-            && let Some((function_name, url)) = stack_trace_top.split_once("@")
+        let target = if let Some(js_callsite) = context.pop_string("callsite")
+            && let Some((function_name, url)) = js_callsite.split_once("@")
         {
             let path_only = url
                 .split('/')
