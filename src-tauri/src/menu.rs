@@ -5,12 +5,14 @@ use tauri::{App, AppHandle, Emitter, Wry, image::Image, include_image, menu::*};
 use crate::data_controller::DataController;
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
 
-const OPEN_CMD: &str = cfg_select! {
-    target_os = "macos" => "open",
-    target_os = "linux" => "xdg-open",
-    windows => "explorer",
-    _ => panic!("unsupported target"),
-};
+#[cfg(target_os = "windows")]
+const OPEN_CMD: &str = "explorer";
+
+#[cfg(target_os = "macos")]
+const OPEN_CMD: &str = "open";
+
+#[cfg(all(not(target_os = "windows"), not(target_os = "macos")))]
+const OPEN_CMD: &str = "xdg-open";
 
 pub fn create_menu(app: &App) -> core::result::Result<Menu<Wry>, Box<dyn std::error::Error>> {
     let handle = app.handle();
