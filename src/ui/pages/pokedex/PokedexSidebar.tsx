@@ -45,12 +45,14 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
   const [baseFontSize, setBaseFontSize] = useState(() =>
     parseFloat(getComputedStyle(document.documentElement).fontSize)
   )
+
   const virtualizer = useVirtualizer({
     count: filteredSpecies.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => baseFontSize * 3,
     overscan: 5,
   })
+
   useEffect(() => {
     const observer = new MutationObserver(() => {
       const newBaseFont = parseFloat(getComputedStyle(document.documentElement).fontSize)

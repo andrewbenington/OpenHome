@@ -399,10 +399,7 @@ function SingleBoxMonDisplay() {
               return (
                 <BoxCell
                   key={`${currentBoxIndex}-${index}`}
-                  onClick={() => {
-                    setSelectedIndex(index)
-                    console.info({ ohpkm_id: mon?.openhomeId }, 'clicked on')
-                  }}
+                  onClick={() => setSelectedIndex(index)}
                   dragID={`home_${currentBoxIndex}_${index}`}
                   location={thisLocation}
                   mon={mon}

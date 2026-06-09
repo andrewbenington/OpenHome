@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use std::str::FromStr;
 
 use crate::Result;
@@ -244,20 +245,75 @@ pub struct JsLogEntry {
     context: Option<serde_json::Value>,
 }
 
+const MAX_COMPONENT_LENGTH: usize = 100000;
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum FrontendLogError {
+    EventName,
+    Context,
+    Message,
+}
+
+impl Display for FrontendLogError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            FrontendLogError::EventName => "logging::event_name_too_long",
+            FrontendLogError::Context => "logging::context_data_too_large",
+            FrontendLogError::Message => "logging::message_too_long",
+        })
+    }
+}
+
 #[tauri::command]
 pub fn log(entry: JsLogEntry) {
     let mut context = entry.context.unwrap_or(serde_json::Value::Null);
 
-    let message = context.pop_string("message").unwrap_or(entry.message);
     let ohpkm_id = context.pop_string("ohpkm_id");
+
     let event = context.pop_string("event");
+    if let Some(event) = &event
+        && event.len() > MAX_COMPONENT_LENGTH
+    {
+        tracing::error!(
+            event = %FrontendLogError::EventName,
+            ohpkm_id,
+            "attempting to log event name of {} characters",
+            event.len()
+        );
+        return;
+    }
+
+    let message = context.pop_string("message").unwrap_or(entry.message);
+    if message.len() > MAX_COMPONENT_LENGTH {
+        tracing::error!(
+            event = %FrontendLogError::Message,
+            ohpkm_id,
+            "attempting to log message of {} characters",
+            message.len()
+        );
+        return;
+    }
+
+    let context = match serde_json::to_string(&context) {
+        Ok(context_json) if context_json.len() > MAX_COMPONENT_LENGTH => {
+            tracing::error!(
+            event = %FrontendLogError::Context,
+                ohpkm_id,
+                "attempting to log context data of {} characters",
+                context_json.len()
+            );
+            return;
+        }
+        Ok(context_json) => context_json,
+        Err(err) => format!("ERROR SERIALIZING LOG CONTEXT: {err}"),
+    };
 
     match entry.level {
-        LogLevel::Error => tracing::error!(event, ohpkm_id, context = %context, "{}", message),
-        LogLevel::Warn => tracing::warn!(event, ohpkm_id, context = %context, "{}", message),
-        LogLevel::Info => tracing::info!(event, ohpkm_id, context = %context, "{}", message),
-        LogLevel::Debug => tracing::debug!(event, ohpkm_id, context = %context, "{}", message),
-        LogLevel::Trace => tracing::trace!(event, ohpkm_id, context = %context, "{}", message),
+        LogLevel::Error => tracing::error!(event, ohpkm_id, context, "{}", message),
+        LogLevel::Warn => tracing::warn!(event, ohpkm_id, context, "{}", message),
+        LogLevel::Info => tracing::info!(event, ohpkm_id, context, "{}", message),
+        LogLevel::Debug => tracing::debug!(event, ohpkm_id, context, "{}", message),
+        LogLevel::Trace => tracing::trace!(event, ohpkm_id, context, "{}", message),
     }
 }
 

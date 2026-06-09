@@ -8,21 +8,29 @@
   --top-bar-height: 1.2rem;
   --sidebar-width: 22rem;
 
-  height: 100%;
-  overflow: auto;
-  font-size: 1rem;
+  --timestamp-width: 6rem;
+  --log-event-width: 8rem;
+  --context-button-width: 6rem;
 
   height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-size: 1rem;
+
   display: flex;
   flex-direction: column;
   min-width: 60rem;
-  overflow: visible;
 }
 
 .logs-container {
   height: 100%;
-  overflow: auto;
-  overscroll-behavior: none;
+  overflow-y: auto;
+  background-color: var(--color-gray-100);
+}
+
+.logs-scroll {
+  width: 100%;
+  position: relative;
 }
 
 .logs-header {
@@ -70,6 +78,11 @@
   height: 1.8rem;
   min-height: fit-content;
   border-bottom: 0.5px solid var(--color-gray-400);
+  position: absolute;
+
+  .log-context-button {
+    width: var(--context-button-width);
+  }
 
   & button {
     height: 1.4rem;
@@ -111,12 +124,23 @@
 
 .log-level {
   font-size: 0.8rem;
-  min-width: 3.5rem;
+  min-width: var(--log-level-width);
   border-radius: 3px;
   text-align: center;
   font-weight: bold;
   margin: 0 0.25rem;
   display: block;
+}
+
+.log-event {
+  font-size: 0.8rem;
+  min-width: var(--log-event-width);
+  border-radius: 3px;
+  text-align: center;
+  font-weight: bold;
+  margin: 0 0.25rem;
+  display: block;
+  background-color: var(--accent-6);
 }
 
 .log-timestamp {
@@ -125,7 +149,7 @@
   font-family: monospace;
   font-size: 0.9rem;
   text-align: end;
-  width: 6rem;
+  width: var(--timestamp-width);
 }
 
 .log-message {

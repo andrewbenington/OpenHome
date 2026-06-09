@@ -112,9 +112,7 @@ function AppWithBackend() {
     // returns a function to stop listening
     const stopListening = backend.onMenuEvents({
       zoom_in: () => {
-        console.info('patching...')
         patchConsole(backend)
-        console.info('patched')
         appInfoDispatch({
           type: 'set_zoom_level',
           payload: Math.min(appInfoState.settings.zoomLevel + ZOOM_CHANGE_PCT, ZOOM_MAX_PCT),
@@ -198,6 +196,10 @@ function patchConsole(backend: BackendInterface) {
   for (const [method, level] of levels) {
     // eslint-disable-next-line no-console
     console[method] = (...args: unknown[]) => {
+      if (args?.[0] === 'CONSOLE_ONLY') {
+        webConsole[method](...args.slice(1))
+        return
+      }
       // send message to web console as well
       webConsole[method](...args)
 
@@ -211,7 +213,7 @@ function patchConsole(backend: BackendInterface) {
         backend.log(level, serializeArg(args.at(1)), JSON.parse(JSON.stringify(context)))
       } else {
         const message = formatWithPlaceholders(args)
-        backend.log(level, message, { stack })
+        backend.log(level, message, { callsite })
       }
     }
   }
