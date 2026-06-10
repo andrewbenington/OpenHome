@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { IconType } from 'react-icons'
 import { MdDataArray } from 'react-icons/md'
+import { cssClass } from '../util/style'
 
 export type MiniButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   icon?: IconType
@@ -9,26 +10,17 @@ export type MiniButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 export default function MiniButton(props: MiniButtonProps) {
-  const { icon, style, label, variant, ...buttonProps } = props
+  const { icon, style, label, ...buttonProps } = props
 
   const Icon = useMemo(() => icon ?? MdDataArray, [icon])
 
   return (
     <button
-      style={{
-        padding: 0,
-        minWidth: 0,
-        minHeight: 0,
-        width: 'fit-content',
-        marginTop: 'auto',
-        marginBottom: 'auto',
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: variant === 'outline' ? 'transparent' : undefined,
-        border: variant === 'outline' ? '1px solid currentColor' : '1px solid transparent',
-        ...style,
-      }}
+      className={cssClass('mini-button')
+        .with('mini-button-icon-only')
+        .if(label === undefined)
+        .build()}
+      style={style}
       {...buttonProps}
     >
       <Icon fontSize="large" />
