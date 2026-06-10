@@ -2,8 +2,8 @@ import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import { all_species_data, FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
-import { useVirtualizer } from '@tanstack/react-virtual'
-import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
+import { CSSProperties, useEffect, useMemo, useRef } from 'react'
+import useSimpleVirtualizer from 'src/ui/hooks/useSimpleVirtualizer'
 import { cssClass } from 'src/ui/util/style'
 import './PokedexSidebar.css'
 import { getHighestFormeStatus, StatusIndices } from './util'
@@ -41,34 +41,11 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
     [ALL_SPECIES_DATA, filter]
   )
 
-  // these are necessary to ensure the sidebar resizes correctly when zooming
-  const [baseFontSize, setBaseFontSize] = useState(() =>
-    parseFloat(getComputedStyle(document.documentElement).fontSize)
+  const virtualizer = useSimpleVirtualizer(
+    filteredSpecies.length,
+    (_, baseFontSize) => baseFontSize * 3,
+    parentRef
   )
-
-  const virtualizer = useVirtualizer({
-    count: filteredSpecies.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => baseFontSize * 3,
-    overscan: 5,
-  })
-
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      const newBaseFont = parseFloat(getComputedStyle(document.documentElement).fontSize)
-      setBaseFontSize(newBaseFont)
-      virtualizer.setOptions({
-        ...virtualizer.options,
-        estimateSize: () => newBaseFont * 3,
-      })
-      virtualizer.measure()
-    })
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['style', 'class'], // class changes can affect font-size too
-    })
-    return () => observer.disconnect()
-  }, [virtualizer])
 
   useEffect(() => {
     if (selectedSpecies) {

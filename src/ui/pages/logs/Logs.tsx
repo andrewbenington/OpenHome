@@ -27,40 +27,29 @@ export default function Logs() {
   const ohpkmStore = useOhpkmStore()
   const [filtersOpen, setFiltersOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const containerWidthRef = useRef(0)
-  const excludedWidthRemRef = useRef(0)
+  const [observing, setObserving] = useState(false)
 
   const virtualizer = useSimpleVirtualizer(
     filteredLogs?.length ?? 0,
-    (logIndex, baseFontSize) =>
+    (logIndex: number, baseFontSize: number) =>
       estimateHeight(
         filteredLogs?.[logIndex],
-        containerWidthRef.current - excludedWidthRemRef.current * baseFontSize,
+        (scrollRef.current?.getBoundingClientRect().width ?? 0) -
+          calculateExcludedWidthRem() * baseFontSize,
         baseFontSize
       ),
     scrollRef
   )
 
-  useEffect(() => {
+  if (scrollRef.current && !observing) {
     const measure = () => {
-      const containerWidthPrev = containerWidthRef.current
-      containerWidthRef.current = scrollRef.current?.getBoundingClientRect().width ?? 0
-
-      const excludedWidthRemPrev = excludedWidthRemRef.current
-      excludedWidthRemRef.current = calculateExcludedWidthRem()
-
-      if (
-        containerWidthRef.current !== containerWidthPrev ||
-        excludedWidthRemRef.current !== excludedWidthRemPrev
-      ) {
-        virtualizer.measure() // force re-estimation
-      }
+      virtualizer.measure() // force re-estimation
     }
     measure()
     const observer = new ResizeObserver(measure)
-    if (scrollRef.current) observer.observe(scrollRef.current)
-    return () => observer.disconnect()
-  }, [virtualizer])
+    observer.observe(scrollRef.current)
+    setObserving(true)
+  }
 
   if (logs) {
     return (
@@ -235,7 +224,7 @@ function useFilter(logs: LogEntry[]) {
 
 function estimateLines(text: string, containerWidth: number, fontSize: number): number {
   const charWidth = getMonoCharWidth(fontSize, 'monospace')
-  if (charWidth === undefined || charWidth === 0) return 1
+  if (charWidth === undefined || charWidth < 1) return 1
   const charsPerLine = Math.floor(containerWidth / charWidth)
   if (charsPerLine === 0) {
     return 1
