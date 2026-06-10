@@ -449,6 +449,15 @@ label {
   }
 }
 
+.mini-button-icon-only {
+  width: auto;
+  padding: 0;
+
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}
+
 svg {
   height: 1rem;
   width: 1rem;

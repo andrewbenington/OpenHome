@@ -10,8 +10,10 @@ import dayjs from 'dayjs'
 import { CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { BackendContext } from 'src/ui/backend/backendContext'
 import { LogEntry, LogLevel } from 'src/ui/backend/backendInterface'
-import { DevDataDisplay } from 'src/ui/components/DevDataDisplay'
-import { FilterIcon } from 'src/ui/components/Icons'
+import { Dialog } from 'src/ui/components/dialog/Dialog'
+import { ExpandIcon, FilterIcon } from 'src/ui/components/Icons'
+import { InfoGrid } from 'src/ui/components/InfoGrid'
+import MiniButton from 'src/ui/components/MiniButton'
 import { Popover } from 'src/ui/components/popover/Popover'
 import ToggleButton from 'src/ui/components/ToggleButton'
 import useDebounce from 'src/ui/hooks/useDebounce'
@@ -28,6 +30,7 @@ export default function Logs() {
   const [filtersOpen, setFiltersOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const [observing, setObserving] = useState(false)
+  const [displayedLog, setDisplayedLog] = useState<LogEntry>()
 
   const virtualizer = useSimpleVirtualizer(
     filteredLogs?.length ?? 0,
@@ -108,6 +111,7 @@ export default function Logs() {
                   key={virtualRow.index}
                   log={log}
                   onOhpkmClick={(identifier) => setSelectedMon(ohpkmStore.getById(identifier))}
+                  onDetailsClick={() => setDisplayedLog(log)}
                   style={{
                     height: `${virtualRow.size}px`,
                     transform: `translateY(${virtualRow.start}px)`,
@@ -118,6 +122,13 @@ export default function Logs() {
           </div>
         </div>
         <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
+        <Dialog.Container
+          open={Boolean(displayedLog)}
+          onOpenChange={(open) => !open && setDisplayedLog(undefined)}
+          style={{ width: '80%', maxHeight: '90%', overflow: 'auto' }}
+        >
+          <InfoGrid data={displayedLog ?? {}} />
+        </Dialog.Container>
       </div>
     )
   }
@@ -127,10 +138,12 @@ export default function Logs() {
 type LogLineProps = {
   log: LogEntry
   onOhpkmClick: (openhomeId: OhpkmIdentifier) => void
+  onDetailsClick: () => void
   style?: CSSProperties
 }
 
-function LogLine({ log, onOhpkmClick, style }: LogLineProps) {
+function LogLine(props: LogLineProps) {
+  const { log, style, onOhpkmClick, onDetailsClick } = props
   const { ohpkm_id, timestamp, level, message, event } = log
   const mon = useOhpkmStore().getById(ohpkm_id ?? '')
 
@@ -152,7 +165,7 @@ function LogLine({ log, onOhpkmClick, style }: LogLineProps) {
           <PokemonIcon dexNumber={mon.dexNum} formeNumber={mon.formNum} />
         </button>
       )}
-      <DevDataDisplay className="log-context-button" data={log} label="context" />
+      <MiniButton onClick={onDetailsClick} icon={ExpandIcon} />
     </div>
   )
 }
@@ -184,23 +197,27 @@ function useTodayLogs() {
     }
   }, [getLogs, logs])
 
-  return logs
-    ? ({
-        logs,
-        filteredLogs: logs.filter(
-          (log) =>
-            (!filterText ||
-              log.message.toLocaleLowerCase().includes(filterText?.toLocaleLowerCase())) &&
-            levels.has(log.level as LogLevel)
-        ),
-        filterText,
-        setFilterText,
-        levels,
-        setLevels,
-        loading: false,
-        error: undefined,
-      } as const)
-    : ({ logs: undefined, loading, error } as const)
+  if (logs) {
+    const filteredLogs = logs.filter(
+      (log) =>
+        (!filterText ||
+          log.message.toLocaleLowerCase().includes(filterText?.toLocaleLowerCase())) &&
+        levels.has(log.level as LogLevel)
+    )
+
+    return {
+      logs,
+      filteredLogs,
+      filterText,
+      setFilterText,
+      levels,
+      setLevels,
+      loading: false,
+      error: undefined,
+    } as const
+  } else {
+    return { logs: undefined, loading, error } as const
+  }
 }
 
 function useFilter(logs: LogEntry[]) {
@@ -266,7 +283,8 @@ function calculateExcludedWidthRem() {
   return (
     NON_MESSAGE_WIDTHS.reduce((sum, variable) => {
       const logsPage = document.getElementsByClassName('logs-page')?.[0]
-      if (!logsPage) return 18
+      if (!logsPage) return 0
+
       const style = getComputedStyle(logsPage)
 
       return sum + parseFloat(style.getPropertyValue(variable)?.slice(0, -3))

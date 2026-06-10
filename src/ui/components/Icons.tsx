@@ -8,6 +8,7 @@ import {
   MdArrowDropDown,
   MdArrowForward,
   MdArrowForwardIos,
+  MdArrowOutward,
   MdCheckCircle,
   MdClear,
   MdCompareArrows,
@@ -66,6 +67,7 @@ export const SuccessIcon = MdCheckCircle
 export const DevIcon = MdDataObject
 
 export const SelectIcon = MdSelectAll
+export const ExpandIcon = MdArrowOutward
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AppTabIconsActive = {
