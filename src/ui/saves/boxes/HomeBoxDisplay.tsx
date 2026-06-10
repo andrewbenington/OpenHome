@@ -22,7 +22,7 @@ import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { HomeMonLocation, MonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
-import { includeClass } from '@openhome-ui/util/style'
+import { cssClass } from '@openhome-ui/util/style'
 import { Language, Lookup } from '@pkm-rs/pkg'
 import {
   Button,
@@ -86,7 +86,9 @@ export default function HomeBoxDisplay() {
         <Flex align="center" justify="between" flexGrow="3" width="0">
           <ViewToggle viewMode={viewMode} setViewMode={setViewMode} disabled={editing || moving} />
           <ArrowButton
-            className={includeClass('horiz-collapse').if(viewMode !== 'one')}
+            className={cssClass('horiz-collapse')
+              .if(viewMode !== 'one')
+              .build()}
             onClick={switchToPreviousBox}
             dragID="home-arrow-left"
             direction="left"
@@ -94,9 +96,10 @@ export default function HomeBoxDisplay() {
           />
         </Flex>
         <div
-          className={includeClass('box-name')
+          className={cssClass('box-name')
             .with('horiz-collapse')
-            .if(viewMode !== 'one')}
+            .if(viewMode !== 'one')
+            .build()}
         >
           {editing ? (
             <TextField.Root
@@ -129,7 +132,9 @@ export default function HomeBoxDisplay() {
         </div>
         <Flex align="center" flexGrow="3" width="0" justify="between">
           <ArrowButton
-            className={includeClass('horiz-collapse').if(viewMode !== 'one')}
+            className={cssClass('horiz-collapse')
+              .if(viewMode !== 'one')
+              .build()}
             onClick={switchToNextBox}
             dragID="home-arrow-right"
             direction="right"

@@ -4,10 +4,12 @@ use crate::{state::synced_state, util};
 use base64::prelude::*;
 use pkm_rs::ohpkm::OhpkmV2;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::num::NonZeroU64;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, UNIX_EPOCH};
 use std::{collections::HashMap, fs};
+use tracing::warn;
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct OhpkmBytesStore(HashMap<String, Vec<u8>>);
@@ -55,10 +57,10 @@ impl OhpkmBytesStore {
             if let Ok(mut mon) = OhpkmV2::from_bytes(bytes) {
                 let errors = mon.fix_errors();
                 if !errors.is_empty() {
-                    println!("Fixed Ohpkm {} with id {identifier}:", mon.get_nickname());
-                    for error in errors {
-                        println!("\t{error}");
-                    }
+                    let errors_fixed_msgs: Vec<String> =
+                        errors.into_iter().map(|e| e.to_string()).collect();
+                    let errors_fixed_serialized = json!({"errors_fixed": errors_fixed_msgs});
+                    warn!(event = "ohpkm_errors_fixed", context = %errors_fixed_serialized, ohpkm_id = mon.openhome_id(), "Fixed Ohpkm {identifier} with nickname {}", mon.get_nickname());
                     *bytes = mon.to_bytes();
                 }
             }

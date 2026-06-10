@@ -11,7 +11,7 @@
 .IconList {
   --icon-list-padding: 0.3rem;
   padding-top: var(--icon-list-padding);
-  width: 3rem;
+  width: var(--navigation-sidebar-width);
 
   .Tab {
     display: flex;

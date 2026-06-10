@@ -225,6 +225,8 @@ pub struct OhpkmV2 {
     unconverted_pkm: Option<UnconvertedPkm>,
 }
 
+type DataUpdated = bool;
+
 impl OhpkmV2 {
     pub fn convert_without_backup<PKM: OhpkmConvert>(other: &PKM) -> Self {
         Self {
@@ -1473,23 +1475,33 @@ impl OhpkmV2 {
             .cloned()
     }
 
-    pub fn register_handler(&mut self, handler: TrainerData, plugin: Option<String>) {
+    pub fn register_handler(
+        &mut self,
+        handler: TrainerData,
+        plugin: Option<String>,
+    ) -> DataUpdated {
         if let Some(origin_game) = handler.origin_game
             && let Some(matching_known_record) = self.handler_data.iter_mut().find(|h| {
                 h.known_trainer_data_matches(handler.id, handler.secret_id, origin_game, &plugin)
             })
         {
             matching_known_record.update_from(&handler, plugin);
+
+            true
         } else if let Some(matching_unknown_record) = self
             .handler_data
             .iter_mut()
             .find(|h| h.unknown_trainer_data_matches(&handler.name, handler.gender))
         {
-            matching_unknown_record.update_from(&handler, plugin)
+            matching_unknown_record.update_from(&handler, plugin);
+
+            true
         } else {
             let mut handler_data = PastHandlerDataV2::from(handler);
             handler_data.origin_plugin = plugin;
             self.handler_data.push(handler_data);
+
+            false
         }
     }
 
@@ -3329,24 +3341,12 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(js_name = registerHandler)]
-    pub fn register_handler_js(&mut self, handler: TrainerData, plugin: Option<String>) {
-        if let Some(origin_game) = handler.origin_game
-            && let Some(matching_known_record) = self.handler_data.iter_mut().find(|h| {
-                h.known_trainer_data_matches(handler.id, handler.secret_id, origin_game, &plugin)
-            })
-        {
-            matching_known_record.update_from(&handler, plugin);
-        } else if let Some(matching_unknown_record) = self
-            .handler_data
-            .iter_mut()
-            .find(|h| h.unknown_trainer_data_matches(&handler.name, handler.gender))
-        {
-            matching_unknown_record.update_from(&handler, plugin)
-        } else {
-            let mut handler_data = PastHandlerDataV2::from(handler);
-            handler_data.origin_plugin = plugin;
-            self.handler_data.push(handler_data);
-        }
+    pub fn register_handler_js(
+        &mut self,
+        handler: TrainerData,
+        plugin: Option<String>,
+    ) -> DataUpdated {
+        self.register_handler(handler, plugin)
     }
 
     // Notes

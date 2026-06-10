@@ -1,8 +1,8 @@
 .pokemon-icon-container {
   position: relative;
   transform: translate(0, 0);
-  width: fit-content;
-  height: fit-content;
+  width: inherit;
+  height: inherit;
 }
 
 .pokemon-icon-tags {

@@ -1,13 +1,16 @@
-use tauri::{App, Manager};
+use std::path::Path;
+
+use tauri::{App, Emitter, Manager};
 
 use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
 use crate::pkm_storage::StoredBankData;
 use crate::state::{GEN12_FILENAME, GEN345_FILENAME};
-use crate::util;
 use crate::versioning;
+use crate::{logging, util};
 
 const BANKS_FILENAME: &str = "banks.json";
+const LOGS_DIR: &str = "logs";
 
 #[cfg(target_os = "linux")]
 use dialog::DialogBox;
@@ -16,6 +19,17 @@ use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
 pub fn run_app_startup(app: &App) -> Result<Vec<versioning::UpdateFeatures>> {
     let handle = app.handle();
+
+    let handle2 = handle.clone();
+    logging::init_logging(
+        &Path::join(&tauri::Manager::path(handle).app_data_dir()?, LOGS_DIR),
+        Some(move |event: logging::NewLogNotification| {
+            let result = handle2.emit("tracing::log", event);
+            if let Err(err) = result {
+                tracing::error!("{err}");
+            }
+        }),
+    );
 
     let update_features: Vec<versioning::UpdateFeatures> =
         match versioning::handle_updates_get_features(handle, false) {

@@ -1,4 +1,5 @@
 use arbitrary_int::u3;
+use chrono::Datelike;
 use serde::{Deserialize, Serialize, Serializer};
 
 use strum_macros::{Display, EnumString};
@@ -386,6 +387,15 @@ impl PokeDate {
             None => [0, 0, 0],
         }
     }
+
+    pub fn today() -> Self {
+        let today = chrono::Local::now();
+        Self {
+            year_minus_2000: (today.year() - 2000).max(0) as u8,
+            month: today.month() as u8,
+            day: today.day() as u8,
+        }
+    }
 }
 
 #[cfg(feature = "randomize")]
@@ -506,7 +516,7 @@ impl TrainerData {
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Clone, Copy, Default, Serialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq, Eq)]
 pub struct TrainerMemory {
     pub intensity: u8,
     pub memory: u8,
