@@ -3,7 +3,7 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
 import { getSaveRef, SAV, SaveIdentifier } from '@openhome-core/save/interfaces'
-import { monSupportedBySave, SAVClass } from '@openhome-core/save/util'
+import { SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
 import { Option, R, Result } from '@openhome-core/util/functional'
@@ -341,50 +341,19 @@ export function useSaves(): SavesAndBanksManager {
       if (R.isErr(result)) {
         console.error('Error registering pokedex entries from save:', result.err)
       }
-      if (save.trainerGender !== undefined) {
-        const allOhpkms = ohpkmStore.getAllStored()
-        for (const mon of allOhpkms) {
-          if (!monSupportedBySave(save, mon)) continue
 
-          const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
-          if (!matchingHandler) continue
-
-          mon.updateTrainerData(
-            save,
-            matchingHandler.friendship,
-            matchingHandler.affection,
-            matchingHandler.memory
-          )
-
-          ohpkmStore.insertOrUpdate(mon)
-        }
+      // If any OHPKM has incomplete handler data that matches this save, fill out the remaining
+      // handler data
+      const allOhpkms = ohpkmStore.getAllStored()
+      for (const mon of allOhpkms) {
+        mon.populateMissingHandlerData(save)
       }
+
       const toUpdate: OhpkmStoreData = {}
       for (const mon of save.getAllMons()) {
         const trackedData = ohpkmStore.loadIfTracked(mon)
         if (trackedData) {
-          const updates = trackedData.syncWithGameData(mon, save)
-
-          if (updates.length > 0) {
-            backend.log('DEBUG', `synced ${mon.nickname} with game data`, {
-              ohpkm_id: trackedData.openhomeId,
-              event: 'game_data_sync',
-              updates,
-            })
-          }
-
-          for (const update of updates) {
-            backend.log(
-              'INFO',
-              `${mon.nickname}: ${update.message ?? `Updated ${update.field} from ${JSON.stringify(update.prevValue)} to ${JSON.stringify(update.newValue)}`}`,
-              {
-                ohpkm_id: trackedData.openhomeId,
-                event: 'game_data_sync',
-                updates,
-              }
-            )
-          }
-
+          trackedData.syncWithGameData(mon, save, backend)
           toUpdate[trackedData.openhomeId] = trackedData
         }
       }
@@ -859,6 +828,8 @@ export function useSaves(): SavesAndBanksManager {
     },
     [setMonHeldItem, getMonAtLocation, bagDispatch]
   )
+
+  function getOpenSaveByIndex(index: number) {}
 
   return {
     ...openSavesState,

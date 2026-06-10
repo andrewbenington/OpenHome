@@ -1,5 +1,8 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { intersection, Option, unique } from '@openhome-core/util/functional'
+import { PluginIdentifier, SAV } from '@openhome-core/save/interfaces'
+import { monSupportedBySave } from '@openhome-core/save/util'
+import { Errorable, intersection, Option, unique } from '@openhome-core/util/functional'
+import { LogLevel } from '@openhome-ui/backend/backendInterface'
 import {
   AbilityIndex,
   AbilityNumber,
@@ -11,6 +14,7 @@ import {
   Lookup,
   MetadataSummaryLookup,
   NatureIndex,
+  OhpkmV2 as OhpkmV2Wasm,
   OriginGames,
   PokeDate,
   ShinyLeaves,
@@ -37,8 +41,6 @@ import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen34ContestRibbons, Gen34TowerRibbons } from '@pokemon-resources/index'
 import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
-import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
-import { PluginIdentifier, SAV } from '../save/interfaces'
 import { convertPokeDate, convertPokeDateOptional } from './convert'
 import { isEvolution } from './Lookup'
 import {
@@ -503,6 +505,20 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return this.isSquareShinyWasm()
   }
 
+  public populateMissingHandlerData(save: SAV) {
+    if (!monSupportedBySave(save, this)) return
+
+    const matchingHandler = this.matchingUnknownHandler(save.name, save.trainerGender)
+    if (!matchingHandler) return
+
+    this.updateTrainerData(
+      save,
+      matchingHandler.friendship,
+      matchingHandler.affection,
+      matchingHandler.memory
+    )
+  }
+
   public updateTrainerData(
     save: SAV,
     friendship: number,
@@ -593,7 +609,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   public get speciesMetadata() {
     return SpeciesLookup(this.dexNum)
   }
-  public syncWithGameData(other: PKMInterface, save?: SAV) {
+  public syncWithGameData(other: PKMInterface, save?: SAV, logger?: Logger) {
     const updates: SyncUpdate[] = []
 
     if (other.exp !== this.exp) {
@@ -922,6 +938,26 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.obedienceLevel = other.obedienceLevel
     }
 
+    if (updates.length > 0) {
+      logger?.log('DEBUG', `synced ${this.nickname} with game data`, {
+        ohpkm_id: this.openhomeId,
+        event: 'game_data_sync',
+        updates,
+      })
+    }
+
+    for (const update of updates) {
+      logger?.log(
+        'INFO',
+        `${this.nickname}: ${update.message ?? `Updated ${update.field} from ${JSON.stringify(update.prevValue)} to ${JSON.stringify(update.newValue)}`}`,
+        {
+          ohpkm_id: this.openhomeId,
+          event: 'game_data_sync',
+          updates,
+        }
+      )
+    }
+
     return updates
   }
 
@@ -1138,4 +1174,8 @@ export function objectsEqual(object1: IndexableObject, object2: IndexableObject)
 
 function isObject(object: unknown): object is IndexableObject {
   return object !== null && typeof object === 'object'
+}
+
+export interface Logger {
+  log(level: LogLevel, message: string, context?: Record<string, unknown>): Promise<Errorable<void>>
 }
