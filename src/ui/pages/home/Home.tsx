@@ -1,8 +1,9 @@
+import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { range } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import useDisplayError from '@openhome-ui/hooks/displayError'
+import FilterPanel from '@openhome-ui/pages/home/display/FilterPanel'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
 import BankHeader from '@openhome-ui/saves/BankHeader'
 import HomeBoxDisplay from '@openhome-ui/saves/boxes/HomeBoxDisplay'
@@ -13,8 +14,6 @@ import { useSaves } from '@openhome-ui/state/saves'
 import { Button, Card, Flex, Tabs } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
-import FilterPanel from 'src/ui/pages/home/display/FilterPanel'
-import { bytesToPKM } from '../../../core/pkm/FileImport'
 import DisplayPanel from './display/DisplayPanel'
 import './Home.css'
 import ReleaseArea from './ReleaseArea'
@@ -67,8 +66,8 @@ const Home = () => {
   return (
     <Flex direction="row" style={{ height: '100%' }}>
       <Flex className="save-file-column">
-        {range(savesAndBanks.allOpenSaves.length).map((i) => (
-          <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
+        {savesAndBanks.allOpenSaves().map((save, i) => (
+          <OpenSaveDisplay key={`save_display_${i}`} save={save} />
         ))}
         <Button onClick={() => setOpenSaveDialog(true)}>
           <MdFileOpen />

@@ -5,20 +5,20 @@ import { SAV } from '@openhome-core/save/interfaces'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import { ClearIcon, ErrorIcon } from '@openhome-ui/components/Icons'
+import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
+import { Typeahead } from '@openhome-ui/components/typeahead'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
 import SavesModal from '@openhome-ui/saves/SavesModal'
+import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves/util'
+import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { HomeMonLocation, SaveMonLocation } from '@openhome-ui/state/saves/reducer'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Badge, Button, Callout, Flex } from '@radix-ui/themes'
 import { useCallback, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
-import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
-import { Typeahead } from 'src/ui/components/typeahead'
-import { getDetailsOfficialSave, getDetailsPluginSave } from 'src/ui/saves/util'
-import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
-import { useOhpkmStore } from '../../state/ohpkm'
 import './SortPokemon.css'
 
 function getInnerSortFunction(
@@ -43,7 +43,8 @@ export default function SortPokemon() {
   const banksAndBoxes = useBanksAndBoxes()
 
   const allMonsWithColors: MonWithColors[] = useMemo(() => {
-    return savesAndBanks.allOpenSaves
+    return savesAndBanks
+      .allOpenSaves()
       .flatMap((save) =>
         save.getAllMons().map((mon) => {
           const backgroundColor = save.pluginIdentifier
@@ -99,11 +100,11 @@ export default function SortPokemon() {
   }, [selectedIndices, sortedMonsWithColors])
 
   // Saves that can accept at least one of the selected mons
-  const validDestSaves = useMemo(() => {
-    return savesAndBanks.allOpenSaves.filter((save) =>
+  const validDestSaves = savesAndBanks
+    .allOpenSaves()
+    .filter((save) =>
       selectedHomeMons.some((item) => save.supportsMon(item.mon.dexNum, item.mon.formNum))
     )
-  }, [savesAndBanks.allOpenSaves, selectedHomeMons])
 
   const transferToSave = useCallback(
     (targetSave: SAV) => {
@@ -219,7 +220,7 @@ export default function SortPokemon() {
           <Badge color="gray" size="3" style={{ border: `1px solid ${OPENHOME_COLOR}` }}>
             OpenHome Boxes
           </Badge>
-          {savesAndBanks.allOpenSaves.map((save) => {
+          {savesAndBanks.allOpenSaves().map((save) => {
             const { backgroundColor } = save.pluginIdentifier
               ? getDetailsPluginSave(save.pluginIdentifier)
               : getDetailsOfficialSave(save.origin)

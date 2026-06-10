@@ -3,10 +3,10 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
+import { classNames, grayscaleIf } from '@openhome-ui/util/style'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo, useState } from 'react'
-import { classNames, grayscaleIf } from '../util/style'
 import './style.css'
 import { buildRecentSaveContextElements, formatTimeSince, logoFromSaveRef } from './util'
 
@@ -38,7 +38,14 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
   const backgroundImage = saveLogoPath ? `url(${saveLogoPath})` : undefined
 
   return (
-    <OpenHomeCtxMenu elements={buildRecentSaveContextElements(save, backend, onRemove)}>
+    <OpenHomeCtxMenu
+      elements={buildRecentSaveContextElements(
+        save,
+        backend.getPlatform(),
+        backend.openDirectory,
+        onRemove
+      )}
+    >
       <div style={{ position: 'relative' }}>
         <div
           className={classNames('save-card', grayscaleIf(!save.valid))}

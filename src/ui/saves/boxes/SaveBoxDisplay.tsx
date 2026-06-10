@@ -9,37 +9,35 @@ import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
 import Fallback from '@openhome-ui/components/Fallback'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
+import useDragAndDrop from '@openhome-ui/state/drag-and-drop/useDragAndDrop'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
+import { cssClass } from '@openhome-ui/util/style'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { Button, Dialog, Flex, Grid, Separator } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
-import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
-import { cssClass } from '../../util/style'
 import { useBoxNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
 
 interface OpenSaveDisplayProps {
-  saveIndex: number
+  save: Readonly<SAV>
 }
 
 const ALLOW_DUPE_IMPORT = true
 
 const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
+  const { save } = props
   const savesManager = useSaves()
-  const { allOpenSaves, saveFromIdentifier, importMonsToLocation } = savesManager
+  const { saveFromIdentifier, importMonsToLocation } = savesManager
 
   const ohpkmStore = useOhpkmStore()
   const [, dispatchError] = useContext(ErrorContext)
   const [detailsModal, setDetailsModal] = useState(false)
-  const { saveIndex } = props
   const { dragState, toggleSelection, isSelected } = useDragAndDrop()
-
-  const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
 
   const {
     currentSlot: selectedIndex,

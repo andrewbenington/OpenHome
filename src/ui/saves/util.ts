@@ -4,16 +4,18 @@ import {
   pluginOriginMarkPath,
   SAV,
 } from '@openhome-core/save/interfaces'
-import { Option } from '@openhome-core/util/functional'
+import { Errorable, Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
-import BackendInterface from '@openhome-ui/backend/backendInterface'
 import { CtxMenuElementBuilder, Item } from '@openhome-ui/components/context-menu/types'
+import { getOriginIconPath } from '@openhome-ui/images/game'
+import {
+  OPENHOME_BOX_SLOTS,
+  useBanksAndBoxes,
+} from '@openhome-ui/state-zustand/banks-and-boxes/store'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import { getOriginIconPath } from '../images/game'
-import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
-import { useOhpkmStore } from '../state/ohpkm'
 
 export type SaveViewMode = 'card' | 'grid'
 
@@ -173,16 +175,17 @@ export function useBoxNavigator(save: SAV, boxNum: number, boxSlot: Option<numbe
 
 export function buildRecentSaveContextElements(
   save: SaveRef,
-  backend: BackendInterface,
+  platform: string,
+  openDirectory: (dir: string) => Promise<Errorable<null>>,
   removeRecentSave?: (path: string) => void
 ): Option<CtxMenuElementBuilder>[] {
   return [
     removeRecentSave
       ? Item.label('Remove Save').action(() => removeRecentSave(save.filePath.raw))
       : undefined,
-    Item.label(
-      `Reveal in ${backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
-    ).action(() => backend.openDirectory(save.filePath.dir)),
+    Item.label(`Reveal in ${platform === 'macos' ? 'Finder' : 'File Explorer'}`).action(() =>
+      openDirectory(save.filePath.dir)
+    ),
   ]
 }
 

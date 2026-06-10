@@ -12,6 +12,7 @@ import { SaveRef } from '@openhome-core/util/types'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
+import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
@@ -19,7 +20,6 @@ import { useSaves } from '@openhome-ui/state/saves'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
 import SaveCard from './SaveCard'
 import { buildRecentSaveContextElements, formatTime, formatTimeSince, SaveViewMode } from './util'
 
@@ -31,59 +31,14 @@ interface SaveFileSelectorProps {
 
 export default function RecentSaves(props: SaveFileSelectorProps) {
   const { onOpen, view, cardSize } = props
-  const backend = useContext(BackendContext)
-  const [recentSaves, setRecentSaves] = useState<Record<string, SaveRef>>()
   const savesAndBanks = useSaves()
-  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const displayError = useDisplayError()
+  const backend = useContext(BackendContext)
+  const { recentSaves, removeRecentSave } = useRecentSaves()
 
-  const openSavePaths = useMemo(
-    () => Object.fromEntries(savesAndBanks.allOpenSaves.map((save) => [save.filePath.raw, true])),
-    [savesAndBanks.allOpenSaves]
+  const openSavePaths = Object.fromEntries(
+    savesAndBanks.allOpenSaves().map((save) => [save.filePath.raw, true])
   )
-
-  const getRecentSaves = useCallback(() => {
-    backend.getRecentSaves().then(
-      R.match(
-        (recents) => {
-          const extraSaveIdentifiers = getEnabledSaveTypes()
-            .map(getPluginIdentifier)
-            .filter(filterUndefined)
-
-          // filter out saves from plugins that aren't enabled
-          const filteredRecents = Object.entries(recents).filter(
-            ([, ref]) =>
-              ref.pluginIdentifier === null || extraSaveIdentifiers.includes(ref.pluginIdentifier)
-          )
-
-          setRecentSaves(Object.fromEntries(filteredRecents))
-        },
-        (err) => {
-          displayError('Error Getting Recents', err)
-          setRecentSaves({})
-        }
-      )
-    )
-  }, [backend, displayError, getEnabledSaveTypes])
-
-  const removeRecentSave = useCallback(
-    (path: string) =>
-      backend.removeRecentSave(path).then(
-        R.match(
-          async () => getRecentSaves(),
-          async (err) => {
-            displayError('Could Not Remove Save', err)
-          }
-        )
-      ),
-    [backend, getRecentSaves, displayError]
-  )
-
-  useEffect(() => {
-    if (!recentSaves) {
-      getRecentSaves()
-    }
-  }, [getRecentSaves, recentSaves])
 
   const columns: SortableColumn<SaveRef>[] = useMemo(
     () => [
@@ -183,7 +138,13 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   )
 
   const recentSaveContextElements = useCallback(
-    (saveRef: SaveRef) => buildRecentSaveContextElements(saveRef, backend, removeRecentSave),
+    (saveRef: SaveRef) =>
+      buildRecentSaveContextElements(
+        saveRef,
+        backend.getPlatform(),
+        backend.openDirectory,
+        removeRecentSave
+      ),
     [backend, removeRecentSave]
   )
 
@@ -255,7 +216,12 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         .map((save) => (
           <OpenHomeCtxMenu
             key={save.filePath.raw}
-            elements={buildRecentSaveContextElements(save, backend, removeRecentSave)}
+            elements={buildRecentSaveContextElements(
+              save,
+              backend.getPlatform(),
+              backend.openDirectory,
+              removeRecentSave
+            )}
           >
             <SaveCard
               save={save}
@@ -267,4 +233,56 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         ))}
     </Flex>
   )
+}
+
+function useRecentSaves() {
+  const backend = useContext(BackendContext)
+  const [recentSaves, setRecentSaves] = useState<Record<string, SaveRef>>()
+  const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
+  const displayError = useDisplayError()
+
+  const getRecentSaves = useCallback(() => {
+    backend.getRecentSaves().then(
+      R.match(
+        (recents: Record<string, SaveRef>) => {
+          const extraSaveIdentifiers = getEnabledSaveTypes()
+            .map(getPluginIdentifier)
+            .filter(filterUndefined)
+
+          // filter out saves from plugins that aren't enabled
+          const filteredRecents = Object.entries(recents).filter(
+            ([, ref]) =>
+              ref.pluginIdentifier === null || extraSaveIdentifiers.includes(ref.pluginIdentifier)
+          )
+
+          setRecentSaves(Object.fromEntries(filteredRecents))
+        },
+        (err: string) => {
+          displayError('Error Getting Recents', err)
+          setRecentSaves({})
+        }
+      )
+    )
+  }, [backend, displayError, getEnabledSaveTypes])
+
+  const removeRecentSave = useCallback(
+    (path: string) =>
+      backend.removeRecentSave(path).then(
+        R.match(
+          async () => getRecentSaves(),
+          async (err: string) => {
+            displayError('Could Not Remove Save', err)
+          }
+        )
+      ),
+    [backend, getRecentSaves, displayError]
+  )
+
+  useEffect(() => {
+    if (!recentSaves) {
+      getRecentSaves()
+    }
+  }, [getRecentSaves, recentSaves])
+
+  return { recentSaves, removeRecentSave }
 }

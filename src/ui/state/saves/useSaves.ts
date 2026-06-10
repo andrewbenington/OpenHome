@@ -30,7 +30,9 @@ import {
 } from './reducer'
 
 export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'homeData'>> & {
-  allOpenSaves: readonly SAV[]
+  allOpenSaves: () => readonly SAV[]
+  openSaveByIndex: (index: number) => Option<Readonly<SAV>>
+  openSaveCount: number
 
   importMonsToLocation(mons: PKMInterface[], startingAt: MonLocation): void
 
@@ -829,11 +831,17 @@ export function useSaves(): SavesAndBanksManager {
     [setMonHeldItem, getMonAtLocation, bagDispatch]
   )
 
-  function getOpenSaveByIndex(index: number) {}
+  function openSaveByIndex(index: number) {
+    return allOpenSaves.at(index)
+  }
+
+  const openSaveCount = allOpenSaves.length
 
   return {
     ...openSavesState,
-    allOpenSaves,
+    allOpenSaves: () => allOpenSaves,
+    openSaveByIndex,
+    openSaveCount,
     importMonsToLocation,
 
     addSave,
