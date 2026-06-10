@@ -28,7 +28,7 @@ import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Language, Lookup, OriginGames } from '@pkm-rs/pkg'
 import { Moves } from '@pokemon-resources/moves'
-import { useCallback, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { SelectColumn } from 'react-data-grid'
 import { useNavigate } from 'react-router'
 import GenderIcon from 'src/ui/components/pokemon/GenderIcon'
@@ -50,7 +50,7 @@ export default function AllTrackedPokemon({
 }: AllTrackedPokemonProps) {
   const ohpkmStore = useOhpkmStore()
   const saves = useSaves()
-  const { findHomeLocation } = useBanksAndBoxes()
+  const banksAndBoxes = useBanksAndBoxes()
   const selectionController = useSelectedMons()
   const { selectedIds, deselectIds } = selectionController
   const [contextMenuBuilders, setContextMenuBuilders] = useState<Option<CtxMenuElementBuilder>[]>(
@@ -62,52 +62,40 @@ export default function AllTrackedPokemon({
   const navigate = useNavigate()
   const { switchBoxCurrentBank } = useBanksAndBoxes()
 
-  const buildContextElements = useCallback(
-    (mon: OHPKM) => {
-      const homeLocation = findHomeLocation(mon.openhomeId)
-      const actions: CtxMenuElementBuilder[] = [
-        Label.mon(mon),
-        homeLocation
-          ? Item.label('Jump to Box').action(() => {
-              switchBoxCurrentBank(homeLocation.box)
-              navigate('/home')
-            })
-          : Item.label('Find Containing Save').action(() => findSaveForMon(mon.openhomeId)),
-        Item.label(`Move To Release Area`).action(() => {
-          releaseMonsById(mon.openhomeId)
-          deselectIds(mon.openhomeId)
-        }),
-      ]
-
-      if (selectedIds.size > 0) {
-        actions.push(
-          Separator,
-          Label.label(`Bulk Actions (${selectedIds.size} selected)`),
-          Item.label(`Move Selected To Release Area`).action(() => {
-            releaseMonsById(...selectedIds)
-            deselectIds(...selectedIds)
+  function buildContextElements(mon: OHPKM) {
+    const homeLocation = banksAndBoxes.findLocation(mon.openhomeId)
+    const actions: CtxMenuElementBuilder[] = [
+      Label.mon(mon),
+      homeLocation
+        ? Item.label('Jump to Box').action(() => {
+            switchBoxCurrentBank(homeLocation.box)
+            navigate('/home')
           })
-        )
-      }
+        : Item.label('Find Containing Save').action(() => findSaveForMon(mon.openhomeId)),
+      Item.label(`Move To Release Area`).action(() => {
+        releaseMonsById(mon.openhomeId)
+        deselectIds(mon.openhomeId)
+      }),
+    ]
 
+    if (selectedIds.size > 0) {
       actions.push(
         Separator,
-        Label.label(`For All Tracked`),
-        Item.label('Recover Missing Pokémon...').action(findSavesForAllMons)
+        Label.label(`Bulk Actions (${selectedIds.size} selected)`),
+        Item.label(`Move Selected To Release Area`).action(() => {
+          releaseMonsById(...selectedIds)
+          deselectIds(...selectedIds)
+        })
       )
-      return actions
-    },
-    [
-      deselectIds,
-      findHomeLocation,
-      findSaveForMon,
-      findSavesForAllMons,
-      navigate,
-      releaseMonsById,
-      selectedIds,
-      switchBoxCurrentBank,
-    ]
-  )
+    }
+
+    actions.push(
+      Separator,
+      Label.label(`For All Tracked`),
+      Item.label('Recover Missing Pokémon...').action(findSavesForAllMons)
+    )
+    return actions
+  }
 
   const keyGetter = (row: NoInfer<OHPKM>): string => {
     return row.openhomeId
@@ -190,7 +178,7 @@ function useColumns(
   trackedMonsToRelease: OhpkmIdentifier[],
   onSelectMon: (mon: OHPKM) => void
 ): SortableColumn<OHPKM>[] {
-  const { getBankName, getBoxName, findHomeLocation } = useBanksAndBoxes()
+  const { getBankName, getBoxName, findLocation: findHomeLocation } = useBanksAndBoxes()
 
   // this is necessary because the renderer functions do not update correctly when dependencies change
   const trackedMonsRef = useRef(trackedMonsToRelease)

@@ -40,7 +40,7 @@ import { OhpkmStoreData, useOhpkmStore } from '../../state/ohpkm'
 
 export function useManageTracked() {
   const ohpkmStore = useOhpkmStore()
-  const { findHomeLocation } = useBanksAndBoxes()
+  const { findLocation: findHomeLocation } = useBanksAndBoxes()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { lookups } = useLookups()
   const backend = useContext(BackendContext)

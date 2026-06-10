@@ -72,6 +72,7 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   getMonAt(boxNum: number, boxSlot: number): Option<P>
   setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
   getAllMons(): Readonly<P>[]
+  forEachMon(callback: (mon: Readonly<P>, boxIndex: number, boxSlot: number) => void): void
 
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
@@ -136,6 +137,14 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
 
   getAllMons(): Readonly<P>[] {
     return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
+  }
+
+  forEachMon(callback: (mon: Readonly<P>, boxIndex: number, boxSlot: number) => void) {
+    this.boxes.forEach((box, boxIndex) =>
+      box.boxSlots.forEach((mon, boxSlot) => {
+        if (mon) callback(mon, boxIndex, boxSlot)
+      })
+    )
   }
 
   get gameNameFull(): string {
@@ -271,6 +280,14 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   getAllMons(): Readonly<P>[] {
     return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
+  }
+
+  forEachMon(callback: (mon: Readonly<P>, boxIndex: number, boxSlot: number) => void) {
+    this.boxes.forEach((box, boxIndex) =>
+      box.boxSlots.forEach((mon, boxSlot) => {
+        if (mon) callback(mon, boxIndex, boxSlot)
+      })
+    )
   }
 
   getBoxName(boxNum: number): string | undefined {

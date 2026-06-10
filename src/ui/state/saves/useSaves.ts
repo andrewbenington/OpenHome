@@ -89,11 +89,10 @@ export function useSaves(): SavesAndBanksManager {
   const {
     getCurrentBank,
 
-    getMonAtHomeLocation,
-    homeLocationIsEmpty,
+    getMonAtLocation: getMonAtHomeLocation,
     clearAtHomeLocation,
-    setAtHomeLocation,
-    findHomeLocation,
+    setAtLocation: setAtHomeLocation,
+    findLocation: findHomeLocation,
 
     allMonsInCurrentBank,
     firstHomeBoxEmptySlot,
@@ -239,6 +238,32 @@ export function useSaves(): SavesAndBanksManager {
     [clearAtHomeLocation, findHomeLocation, getMonAtHomeLocation, setAtHomeLocation]
   )
 
+  const nextEmptySlotAddingNewBoxes = useCallback(
+    (currentBox: number, currentSlot: number, boxSize: number) => {
+      while (currentBox < banksAndBoxes.getCurrentBank().boxes.size) {
+        if (currentSlot < boxSize) {
+          const bankSlotEmpty = banksAndBoxes.locationIsEmpty({
+            bank: banksAndBoxes.getCurrentBank().index,
+            box: currentBox,
+            boxSlot: currentSlot,
+          })
+          if (bankSlotEmpty) break
+          currentSlot++
+        } else {
+          currentSlot = 0
+          currentBox++
+        }
+      }
+
+      if (currentBox >= banksAndBoxes.getCurrentBank().boxes.size) {
+        banksAndBoxes.addBoxCurrentBank('end')
+      }
+
+      return { currentBox, currentSlot }
+    },
+    [banksAndBoxes]
+  )
+
   const importMonsToLocation = useCallback(
     (mons: PKMInterface[], startingAt: MonLocation) => {
       const addedMons: OHPKM[] = []
@@ -249,13 +274,13 @@ export function useSaves(): SavesAndBanksManager {
 
         const currentBankBoxCount = getCurrentBank().boxes.size
         mons.forEach((mon) => {
-          while (!homeLocationIsEmpty(nextSlot) && nextSlot.box < currentBankBoxCount) {
-            nextSlot.boxSlot++
-            if (nextSlot.boxSlot >= OPENHOME_BOX_SLOTS) {
-              nextSlot.boxSlot = 0
-              nextSlot.box++
-            }
-          }
+          const nextEmptyLocation = nextEmptySlotAddingNewBoxes(
+            nextSlot.box,
+            nextSlot.boxSlot,
+            OPENHOME_BOX_SLOTS
+          )
+          nextSlot.box = nextEmptyLocation.currentBox
+          nextSlot.boxSlot = nextEmptyLocation.currentSlot
 
           if (nextSlot.box < currentBankBoxCount) {
             const homeMon = mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon)
@@ -301,9 +326,9 @@ export function useSaves(): SavesAndBanksManager {
     },
     [
       getCurrentBank,
-      homeLocationIsEmpty,
       moveMonBetweenSaves,
       moveOhpkmToHome,
+      nextEmptySlotAddingNewBoxes,
       ohpkmStore,
       openSavesState,
       saveFromIdentifier,
@@ -655,53 +680,34 @@ export function useSaves(): SavesAndBanksManager {
   const moveBoxToBank = useCallback(
     (save: SAV): number => {
       let movedCount = 0
-      const boxSize = OPENHOME_BOX_SLOTS
-      let currentBankBox = banksAndBoxes.getCurrentBox().index
+      let currentBox = banksAndBoxes.getCurrentBox().index
       let currentSlot = 0
 
-      while (currentBankBox < banksAndBoxes.getCurrentBank().boxes.size) {
-        const emptyIndex = banksAndBoxes.firstHomeBoxEmptySlot(currentBankBox)
+      while (currentBox < banksAndBoxes.getCurrentBank().boxes.size) {
+        const emptyIndex = banksAndBoxes.firstHomeBoxEmptySlot(currentBox)
         if (emptyIndex !== undefined) {
           currentSlot = emptyIndex
           break
         }
-        currentBankBox++
+        currentBox++
       }
 
       for (let boxSlot = 0; boxSlot < save.boxSlotCount; boxSlot++) {
         const mon = save.getMonAt(save.currentPCBox, boxSlot)
         if (!mon) continue
 
-        while (currentBankBox < banksAndBoxes.getCurrentBank().boxes.size) {
-          if (currentSlot < boxSize) {
-            const bankSlotEmpty = banksAndBoxes.homeLocationIsEmpty({
-              bank: banksAndBoxes.getCurrentBank().index,
-              box: currentBankBox,
-              boxSlot: currentSlot,
-            })
-            if (bankSlotEmpty) break
-            currentSlot++
-          } else {
-            currentSlot = 0
-            currentBankBox++
-          }
-        }
-
-        if (currentBankBox >= banksAndBoxes.getCurrentBank().boxes.size) {
-          banksAndBoxes.addBoxCurrentBank('end')
-        }
+        const nextEmptyLocation = nextEmptySlotAddingNewBoxes(
+          currentBox,
+          currentSlot,
+          OPENHOME_BOX_SLOTS
+        )
+        currentBox = nextEmptyLocation.currentBox
+        currentSlot = nextEmptyLocation.currentSlot
 
         const ohpkm =
           ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, undefined)
 
-        banksAndBoxes.setAtHomeLocation(
-          {
-            bank: banksAndBoxes.getCurrentBank().index,
-            box: currentBankBox,
-            boxSlot: currentSlot,
-          },
-          ohpkm.openhomeId
-        )
+        banksAndBoxes.currentBankSetMon(currentBox, currentSlot, ohpkm.openhomeId)
 
         save.setMonAt(save.currentPCBox, boxSlot, undefined)
         save.updatedBoxSlots.push({ box: save.currentPCBox, boxSlot: boxSlot })
@@ -712,71 +718,48 @@ export function useSaves(): SavesAndBanksManager {
 
       return movedCount
     },
-    [banksAndBoxes, ohpkmStore]
+    [banksAndBoxes, nextEmptySlotAddingNewBoxes, ohpkmStore]
   )
 
   const moveSaveToBank = useCallback(
     (save: SAV): number => {
       let totalMoved = 0
-      let currentBankBox = banksAndBoxes.getCurrentBox().index
+      let currentBox = banksAndBoxes.getCurrentBox().index
       let currentSlot = 0
 
-      while (currentBankBox < banksAndBoxes.getCurrentBank().boxes.size) {
-        const emptyIndex = banksAndBoxes.firstHomeBoxEmptySlot(currentBankBox)
+      while (currentBox < banksAndBoxes.getCurrentBank().boxes.size) {
+        const emptyIndex = banksAndBoxes.firstHomeBoxEmptySlot(currentBox)
         if (emptyIndex !== undefined) {
           currentSlot = emptyIndex
           break
         }
-        currentBankBox++
+        currentBox++
       }
 
-      for (let boxIdx = 0; boxIdx < save.getBoxCount(); boxIdx++) {
-        for (let slotIdx = 0; slotIdx < save.boxSlotCount; slotIdx++) {
-          const mon = save.getMonAt(boxIdx, slotIdx)
-          if (!mon) continue
+      save.forEachMon((mon, boxIndex, boxSlot) => {
+        const nextEmptyLocation = nextEmptySlotAddingNewBoxes(
+          currentBox,
+          currentSlot,
+          OPENHOME_BOX_SLOTS
+        )
+        currentBox = nextEmptyLocation.currentBox
+        currentSlot = nextEmptyLocation.currentSlot
 
-          while (currentBankBox < banksAndBoxes.getCurrentBank().boxes.size) {
-            if (currentSlot < OPENHOME_BOX_SLOTS) {
-              const bankSlotEmpty = banksAndBoxes.homeLocationIsEmpty({
-                bank: banksAndBoxes.getCurrentBank().index,
-                box: currentBankBox,
-                boxSlot: currentSlot,
-              })
-              if (bankSlotEmpty) break
-              currentSlot++
-            } else {
-              currentSlot = 0
-              currentBankBox++
-            }
-          }
+        const ohpkm =
+          ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, undefined)
 
-          if (currentBankBox >= banksAndBoxes.getCurrentBank().boxes.size) {
-            banksAndBoxes.addBoxCurrentBank('end')
-          }
+        banksAndBoxes.currentBankSetMon(currentBox, currentSlot, ohpkm.openhomeId)
 
-          const ohpkm =
-            ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, undefined)
+        save.setMonAt(boxIndex, boxSlot, undefined)
+        save.updatedBoxSlots.push({ box: boxIndex, boxSlot: boxSlot })
 
-          banksAndBoxes.setAtHomeLocation(
-            {
-              bank: banksAndBoxes.getCurrentBank().index,
-              box: currentBankBox,
-              boxSlot: currentSlot,
-            },
-            ohpkm.openhomeId
-          )
-
-          save.setMonAt(boxIdx, slotIdx, undefined)
-          save.updatedBoxSlots.push({ box: boxIdx, boxSlot: slotIdx })
-
-          totalMoved++
-          currentSlot++
-        }
-      }
+        totalMoved++
+        currentSlot++
+      })
 
       return totalMoved
     },
-    [banksAndBoxes, ohpkmStore]
+    [banksAndBoxes, nextEmptySlotAddingNewBoxes, ohpkmStore]
   )
 
   const updateMonDisplayColor = useCallback(

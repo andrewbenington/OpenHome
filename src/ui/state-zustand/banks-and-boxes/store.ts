@@ -477,11 +477,11 @@ export function useBanksAndBoxes() {
   const overwriteBoxSlotsCurrentBank = withSelectors.use.overwriteBoxSlotsCurrentBank()
   const overwriteAllBoxSlotsCurrentBank = withSelectors.use.overwriteAllBoxSlotsCurrentBank()
 
-  const getMonAtHomeLocation = withSelectors.use.getAtLocation()
-  const homeLocationIsEmpty = withSelectors.use.locationIsEmpty()
+  const getMonAtLocation = withSelectors.use.getAtLocation()
+  const locationIsEmpty = withSelectors.use.locationIsEmpty()
   const clearAtHomeLocation = withSelectors.use.clearAtLocation()
-  const setAtHomeLocation = withSelectors.use.setAtLocation()
-  const findHomeLocation = withSelectors.use.findHomeLocation()
+  const setAtLocation = withSelectors.use.setAtLocation()
+  const findLocation = withSelectors.use.findHomeLocation()
 
   const allMonsInCurrentBankWithLocations = withSelectors.use.allMonsCurrentBank()
   const allMonsInCurrentBank = () => Object.keys(allMonsInCurrentBankWithLocations())
@@ -591,6 +591,10 @@ export function useBanksAndBoxes() {
     await reloadBankStore()
   }, [backend, banks, getCurrentBank, reloadBankStore])
 
+  function currentBankSetMon(boxIndex: number, boxSlot: number, contents: OhpkmIdentifier) {
+    setAtLocation({ bank: getCurrentBank().index, box: boxIndex, boxSlot: boxSlot }, contents)
+  }
+
   useEffect(() => {
     // returns a function to stop listening
     const stopListening = backend.onMenuEvent('save', saveChanges)
@@ -630,11 +634,12 @@ export function useBanksAndBoxes() {
     switchToPreviousBox,
     switchToNextBox,
 
-    getMonAtHomeLocation,
-    homeLocationIsEmpty,
+    getMonAtLocation,
+    locationIsEmpty,
     clearAtHomeLocation,
-    setAtHomeLocation,
-    findHomeLocation,
+    setAtLocation,
+    findLocation,
+    currentBankSetMon,
 
     allMonsInCurrentBank,
     allMonsInHomeBoxCurrentBank,

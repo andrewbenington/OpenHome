@@ -117,7 +117,7 @@ export default function SortPokemon() {
           continue
         }
 
-        const coords = banksAndBoxes.findHomeLocation(mon.openhomeId)
+        const coords = banksAndBoxes.findLocation(mon.openhomeId)
         if (!coords) {
           currentFailures.push(
             `${mon.nickname || 'Pokémon'}: Could not find coordinates in OpenHome`

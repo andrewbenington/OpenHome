@@ -39,7 +39,7 @@ function isDragPayload(value: unknown): value is DragPayload {
 export default function PokemonDndContext(props: { children?: ReactNode }) {
   const { children } = props
   const savesAndBanks = useSaves()
-  const { homeLocationIsEmpty, getCurrentBank } = useBanksAndBoxes()
+  const banksAndBoxes = useBanksAndBoxes()
   const { dragState, startDragging, endDragging, clearSelections } = useDragAndDrop()
   const [dragOverId, setDragOverId] = useState<UniqueIdentifier | null>(null)
 
@@ -168,7 +168,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             ): MonLocation | null => {
               if (!dest.isHome) return null
 
-              const currentBank = getCurrentBank()
+              const currentBank = banksAndBoxes.getCurrentBank()
               const bank = dest.bank
 
               for (let box = startBox; box < currentBank.boxes.size; box++) {
@@ -176,7 +176,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
 
                 for (let boxSlot = slotStart; boxSlot < OPENHOME_BOX_SLOTS; boxSlot++) {
                   const location = { bank, box, boxSlot }
-                  if (homeLocationIsEmpty(location)) return { isHome: true, ...location }
+                  if (banksAndBoxes.locationIsEmpty(location)) return { isHome: true, ...location }
                 }
               }
 
