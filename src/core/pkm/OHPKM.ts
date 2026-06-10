@@ -558,7 +558,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     const existingTrainerData = this.findKnownHandler(save.tid, save.sid ?? 0, save.origin)
 
     if (existingTrainerData) {
-      console.debug('existing trainer data', existingTrainerData)
       this.updateTrainerData(
         save,
         existingTrainerData.friendship,
@@ -566,7 +565,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         existingTrainerData.memory
       )
     } else {
-      console.debug('NO existing trainer data', existingTrainerData)
       this.handlerFriendship = 70 // TODO: PER-FORM BASE FRIENDSHIP
       this.updateTrainerData(save, 70, 0)
     }
