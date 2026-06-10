@@ -6,7 +6,6 @@ export default function useSimpleVirtualizer(
   estimateSize: (index: number, baseFontSize: number) => number,
   scrollRef: RefObject<HTMLElement | null>
 ) {
-  // const scrollRef = useRef(null)
   const [baseFontSize, setBaseFontSize] = useState(() =>
     parseFloat(getComputedStyle(document.documentElement).fontSize)
   )
@@ -24,7 +23,7 @@ export default function useSimpleVirtualizer(
       setBaseFontSize(newBaseFont)
       virtualizer.setOptions({
         ...virtualizer.options,
-        estimateSize: () => newBaseFont * 3,
+        estimateSize: (index) => estimateSize(index, newBaseFont),
       })
       virtualizer.measure()
     })
@@ -33,7 +32,7 @@ export default function useSimpleVirtualizer(
       attributeFilter: ['style', 'class'], // class changes can affect font-size too
     })
     return () => observer.disconnect()
-  }, [virtualizer])
+  }, [estimateSize, virtualizer])
 
-  return { ...virtualizer }
+  return virtualizer
 }
