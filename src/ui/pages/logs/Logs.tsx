@@ -263,7 +263,7 @@ function estimateHeight(
   logMessageWidth: number,
   baseFontSize: number
 ): number {
-  const fontSize = baseFontSize
+  const fontSize = baseFontSize * 0.9
 
   const lineCount = estimateLines(log?.message ?? '', logMessageWidth, fontSize)
 

@@ -57,6 +57,7 @@
     background-color: var(--accent-5);
   }
 }
+
 .logs-header::before {
   content: '';
   display: block;
@@ -74,8 +75,8 @@
   gap: 0.5rem;
   padding: 0 0.5rem;
   box-sizing: border-box;
-  font-size: 0.9rem;
-  height: 1.8rem;
+  font-size: 0.8rem;
+  height: 1.6rem;
   min-height: fit-content;
   border-bottom: 0.5px solid var(--color-gray-400);
   position: absolute;
