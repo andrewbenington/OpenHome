@@ -85,6 +85,5 @@ export const getFormatLocationString = (
   language: Language,
   egg = false
 ) => {
-  const game = ORIGIN_GAME_BY_FORMAT[format]
   return getLocationString(ORIGIN_GAME_BY_FORMAT[format], index, format, language, egg)
 }
