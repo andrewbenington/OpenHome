@@ -50,6 +50,12 @@ impl Display for Error {
 
 impl std::error::Error for Error {}
 
+impl From<InvalidAbilityNumber> for Error {
+    fn from(value: InvalidAbilityNumber) -> Self {
+        Self::AbilityNumber(value)
+    }
+}
+
 impl Serialize for Error {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
     where

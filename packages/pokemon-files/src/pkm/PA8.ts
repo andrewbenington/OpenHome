@@ -100,7 +100,7 @@ export default class PA8 {
   metLevel: number
   hyperTraining: HyperTraining
   moveFlagsLA: Uint8Array
-  homeTracker: Uint8Array
+  homeTracker: bigint
   tutorFlagsLA: Uint8Array
   masterFlagsLA: Uint8Array
   favorite: boolean
@@ -211,7 +211,7 @@ export default class PA8 {
       this.metLevel = byteLogic.uIntFromBufferBits(dataView, 0x13d, 0, 7, true)
       this.hyperTraining = types.readHyperTrainStatsFromBytes(dataView, 0x13e)
       this.moveFlagsLA = new Uint8Array(buffer).slice(0x13f, 0x14d)
-      this.homeTracker = new Uint8Array(buffer).slice(0x14d, 0x155)
+      this.homeTracker = dataView.getBigUint64(0x14d)
       this.tutorFlagsLA = new Uint8Array(buffer).slice(0x155, 0x15d)
       this.masterFlagsLA = new Uint8Array(buffer).slice(0x15d, 0x165)
       this.favorite = byteLogic.getFlag(dataView, 0x16, 3)
@@ -320,7 +320,7 @@ export default class PA8 {
       this.metLevel = other.metLevel
       this.hyperTraining = other.hyperTraining
       this.moveFlagsLA = other.moveFlagsLA ?? new Uint8Array(14)
-      this.homeTracker = other.homeTracker ?? new Uint8Array(8)
+      this.homeTracker = other.homeTracker ?? 0n
       this.tutorFlagsLA = other.tutorFlagsLA ?? new Uint8Array(8)
       this.masterFlagsLA = other.masterFlagsLA ?? new Uint8Array(8)
       this.favorite = other.favorite ?? false
@@ -427,7 +427,7 @@ export default class PA8 {
     byteLogic.uIntToBufferBits(dataView, this.metLevel, 317, 0, 7, true)
     types.writeHyperTrainStatsToBytes(dataView, 0x13e, this.hyperTraining)
     new Uint8Array(buffer).set(new Uint8Array(this.moveFlagsLA.slice(0, 14)), 0x13f)
-    new Uint8Array(buffer).set(new Uint8Array(this.homeTracker.slice(0, 8)), 0x14d)
+    dataView.setBigUint64(0x14d, this.homeTracker)
     new Uint8Array(buffer).set(new Uint8Array(this.tutorFlagsLA.slice(0, 8)), 0x155)
     new Uint8Array(buffer).set(new Uint8Array(this.masterFlagsLA.slice(0, 8)), 0x15d)
     byteLogic.setFlag(dataView, 0x16, 3, this.favorite)

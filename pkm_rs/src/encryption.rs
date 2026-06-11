@@ -24,7 +24,7 @@ pub enum Blocks {
     Gen3,
     // Gen45,
     Gen67,
-    // Gen89,
+    Gen89,
     // Gen8a,
 }
 
@@ -34,7 +34,7 @@ impl Blocks {
             Blocks::Gen3 => 0x0c,
             // Blocks::Gen45 => 0x20,
             Blocks::Gen67 => 0x38,
-            // Blocks::Gen89 => 0x50,
+            Blocks::Gen89 => 0x50,
             // Blocks::Gen8a => 0x58,
         }
     }
@@ -229,7 +229,7 @@ pub trait BlockEncrypt {
             // Blocks::Gen67 | Blocks::Gen89 | Blocks::Gen8a => {
             //     (self.get_encryption_constant() & ENCRYPTION_CONSTANT_MASK) >> ENCRYPTION_CONSTANT_SHIFT
             // }
-            Blocks::Gen67 => {
+            Blocks::Gen67 | Blocks::Gen89 => {
                 (self.get_encryption_constant() & ENCRYPTION_CONSTANT_MASK)
                     >> ENCRYPTION_CONSTANT_SHIFT
             }

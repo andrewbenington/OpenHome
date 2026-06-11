@@ -278,7 +278,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.handlerLanguage = other.handlerLanguage ?? 0
       this.statNature = other.statNature !== undefined ? other.statNature : this.nature
       this.affixedRibbon = other.affixedRibbon
-      this.homeTracker = other.homeTracker ?? new Uint8Array(8)
+      this.homeTracker = other.homeTracker ?? undefined
 
       if (other.obedienceLevel !== undefined) {
         this.obedienceLevel = other.obedienceLevel

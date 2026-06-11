@@ -243,7 +243,7 @@ impl<const N: usize, FLAG: Copy + Into<usize>> Serialize for FlagSet<N, FLAG>
 where
     FLAG: Serialize,
 {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -445,7 +445,7 @@ impl PokeDate {
 }
 
 impl Serialize for PokeDate {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -685,7 +685,7 @@ impl ShinyLeaves {
 
 #[cfg(feature = "wasm")]
 impl Serialize for ShinyLeaves {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -876,7 +876,7 @@ impl AbilityNumber {
 impl TryFrom<u3> for AbilityNumber {
     type Error = InvalidAbilityNumber;
 
-    fn try_from(value: u3) -> Result<Self, InvalidAbilityNumber> {
+    fn try_from(value: u3) -> core::result::Result<Self, InvalidAbilityNumber> {
         match value.value() {
             1 => Ok(Self::First),
             2 => Ok(Self::Second),

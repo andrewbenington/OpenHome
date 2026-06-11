@@ -97,7 +97,7 @@ export default class PK9 {
   ball: number
   metLevel: number
   hyperTraining: HyperTraining
-  homeTracker: Uint8Array
+  homeTracker: bigint
   tmFlagsSV: Uint8Array
   ribbons: string[]
   trainerGender: boolean
@@ -200,7 +200,7 @@ export default class PK9 {
       this.ball = dataView.getUint8(0x124)
       this.metLevel = dataView.getUint8(0x125)
       this.hyperTraining = types.readHyperTrainStatsFromBytes(dataView, 0x126)
-      this.homeTracker = new Uint8Array(buffer).slice(0x127, 0x12f)
+      this.homeTracker = dataView.getBigUint64(0x127)
       this.tmFlagsSV = new Uint8Array(buffer).slice(0x12f, 0x145)
       this.ribbons = byteLogic
         .getFlagIndexes(dataView, 0x34, 0, 64)
@@ -303,7 +303,7 @@ export default class PK9 {
       }
       this.metLevel = other.metLevel
       this.hyperTraining = other.hyperTraining
-      this.homeTracker = other.homeTracker ?? new Uint8Array(8)
+      this.homeTracker = other.homeTracker ?? 0n
       this.tmFlagsSV = other.tmFlagsSV ?? new Uint8Array(22)
       this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], '')
       this.trainerGender = other.trainerGender
@@ -401,7 +401,7 @@ export default class PK9 {
     dataView.setUint8(0x124, this.ball)
     dataView.setUint8(0x125, this.metLevel)
     types.writeHyperTrainStatsToBytes(dataView, 0x126, this.hyperTraining)
-    new Uint8Array(buffer).set(new Uint8Array(this.homeTracker.slice(0, 8)), 0x127)
+    dataView.setBigUint64(0x127, this.homeTracker)
     new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsSV.slice(0, 22)), 0x12f)
     byteLogic.setFlagIndexes(
       dataView,

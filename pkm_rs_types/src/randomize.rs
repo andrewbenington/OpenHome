@@ -42,6 +42,12 @@ impl Randomize for u32 {
     }
 }
 
+impl Randomize for u64 {
+    fn randomized<R: Rng>(rng: &mut R) -> Self {
+        rng.random()
+    }
+}
+
 impl<T, const N: usize> Randomize for [T; N]
 where
     T: Randomize + Debug,
