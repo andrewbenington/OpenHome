@@ -1,6 +1,9 @@
 use crate::{pkhex_text, species::NatDexIndex};
 
 use pkm_rs_types::Language;
+
+#[cfg(feature = "wasm")]
+use pkm_rs_types::OriginGame;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -21,5 +24,10 @@ impl Lookup {
             return format!("UNKNOWN SPECIES ({national_dex})");
         };
         pkhex_text::species_name(language, national_dex).to_owned()
+    }
+
+    #[wasm_bindgen(js_name = locationName)]
+    pub fn location_name(game: OriginGame, language: Language, index: usize) -> Option<String> {
+        pkhex_text::location_name(game, language, index).map(&str::to_owned)
     }
 }
