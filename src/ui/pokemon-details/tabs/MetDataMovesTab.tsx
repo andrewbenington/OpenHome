@@ -1,4 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { getLocationString, getLocationStringOrOrigin } from '@openhome-core/pkm/MetLocation'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getCharacteristic, getMoveMaxPP } from '@openhome-core/pkm/util'
 import { getPluginIdentifier } from '@openhome-core/save/util'
@@ -8,11 +9,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getBallIconPath } from '@openhome-ui/images/items'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { Language, Languages, OriginGames } from '@pkm-rs/pkg'
-import {
-  getLocationString,
-  getLocationStringOrOrigin,
-  RibbonTitles,
-} from '@pokemon-resources/index'
+import { RibbonTitles } from '@pokemon-resources/index'
 import { Badge, Flex, Grid } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import './MetDataMovesTab.css'
