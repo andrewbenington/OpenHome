@@ -18,7 +18,7 @@ import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import useIsDev from '@openhome-ui/hooks/isDev'
-import { genderFromBool, Generation, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
+import { genderFromBool, Generation, Language, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import {
   AllPKMFields,
@@ -88,7 +88,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           value={
             mon.metLocationIndex === undefined
               ? '(not present)'
-              : `${getLocationStringOrOrigin(mon.gameOfOrigin, mon.metLocationIndex, mon.format)} (${mon.metLocationIndex})`
+              : `${getLocationStringOrOrigin(mon.gameOfOrigin, mon.metLocationIndex, mon.format, Language.English)} (${mon.metLocationIndex})` // todo: i18n
           }
         />
         {mon.encryptionConstant !== undefined && (

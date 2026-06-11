@@ -630,6 +630,11 @@ impl OriginGames {
         OriginGame::from(value).is_bdsp()
     }
 
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isSwSh"))]
+    pub fn is_swsh(value: u8) -> bool {
+        OriginGame::from(value).is_swsh()
+    }
+
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isScarletViolet"))]
     pub fn is_scarlet_violet(value: u8) -> bool {
         OriginGame::from(value).is_scarlet_violet()

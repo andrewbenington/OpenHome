@@ -4,6 +4,7 @@ import {
   ConvertStrategy,
   ExtraFormIndex,
   HyperTraining,
+  Language,
   OriginGame,
 } from '@pkm-rs/pkg'
 import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@pokemon-files/pkm'
@@ -340,7 +341,7 @@ describe('OHPKM conversion strategies', () => {
       'Alpha Sapphire converted to Sapphire in PK4 (location match strategy)'
     ).toEqual(OriginGame.Sapphire)
     expect(
-      getFormatLocationString(pk4.metLocationIndex, 'PK4'),
+      getFormatLocationString(pk4.metLocationIndex, 'PK4', Language.English),
       'Alpha Sapphire -> PK4 location is Hoenn with location match strategy'
     ).toContain('Hoenn')
 
@@ -350,7 +351,7 @@ describe('OHPKM conversion strategies', () => {
       'Alpha Sapphire converted to Sapphire in PK4 (legality strategy)'
     ).toEqual(OriginGame.Sapphire)
     expect(
-      getFormatLocationString(pk4.metLocationIndex, 'PK4'),
+      getFormatLocationString(pk4.metLocationIndex, 'PK4', Language.English),
       'Alpha Sapphire -> PK4 location is Pal Park with legality strategy'
     ).toContain('Pal Park')
   })
@@ -365,7 +366,7 @@ describe('OHPKM conversion strategies', () => {
       OriginGame.Diamond
     )
     expect(
-      getFormatLocationString(pk4.metLocationIndex, 'PK4'),
+      getFormatLocationString(pk4.metLocationIndex, 'PK4', Language.English),
       'Diamond -> Original location preserved with legality strategy'
     ).toContain('Jubilife City')
 
@@ -374,7 +375,7 @@ describe('OHPKM conversion strategies', () => {
       OriginGame.Diamond
     )
     expect(
-      getFormatLocationString(pk4.metLocationIndex, 'PK4'),
+      getFormatLocationString(pk4.metLocationIndex, 'PK4', Language.English),
       'Diamond -> Original location preserved with location match strategy'
     ).toContain('Jubilife City')
   })
@@ -398,7 +399,7 @@ describe('OHPKM conversion strategies', () => {
       OriginGame.OmegaRuby
     )
     expect(
-      getFormatLocationString(pk7.metLocationIndex, 'PK7'),
+      getFormatLocationString(pk7.metLocationIndex, 'PK7', Language.English),
       'Omega Ruby -> PK7 location index is Hoenn with location match strategy'
     ).toContain('Hoenn')
   })
