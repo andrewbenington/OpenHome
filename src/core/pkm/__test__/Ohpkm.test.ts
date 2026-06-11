@@ -9,11 +9,11 @@ import {
 } from '@pkm-rs/pkg'
 import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@pokemon-files/pkm'
 import { Stats } from '@pokemon-files/util'
-import { getFormatLocationString } from '@pokemon-resources/locations'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import fs from 'fs'
 import path from 'path'
 import { assert, beforeAll, describe, expect, test } from 'vitest'
-import { NationalDex } from '../../../../packages/pokemon-resources/src/consts/NationalDex'
+import { getFormatLocationString } from '../MetLocation'
 import { OHPKM } from '../OHPKM'
 import { initializeWasm } from './init'
 

@@ -4,6 +4,7 @@ import {
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from '@openhome-core/pkm/Lookup'
+import { getLocationStringOrOrigin } from '@openhome-core/pkm/MetLocation'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   getHiddenPowerGen2,
@@ -42,7 +43,6 @@ import {
 } from '@pokemon-resources/consts/TransferRestrictions'
 import {
   BDSPTMMoveIndexes,
-  getLocationStringOrOrigin,
   LATutorMoveIndexes,
   Moves,
   SVTMMoveIndexes,
