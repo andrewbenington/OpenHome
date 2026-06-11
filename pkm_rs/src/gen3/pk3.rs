@@ -2,7 +2,7 @@ use super::Pk3Buffer;
 use crate::checksum::{Checksum, RefreshChecksum};
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::ConvertStrategy;
-use crate::encryption;
+use crate::encryption::{self, BlockEncrypt};
 use crate::gen3::Gen3PokemonIndex;
 use crate::gen3::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
 #[cfg(feature = "wasm")]
@@ -161,7 +161,7 @@ impl Pk3 {
         if buffer.gen3_species_index() == 0 {
             Ok(None)
         } else {
-            Self::from_encryped_bytes(bytes).map(Some)
+            Self::from_encrypted_bytes(bytes).map(Some)
         }
     }
 
@@ -215,15 +215,12 @@ impl Pk3 {
         }
     }
 
-    pub fn from_encryped_bytes(bytes: &[u8]) -> Result<Self> {
-        let decrypted = encryption::decrypt_pkm_bytes_gen_3(bytes);
-        let unshuffled = encryption::unshuffle_blocks_gen_3(&decrypted);
-        Self::from_bytes(&unshuffled)
+    pub fn from_encrypted_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::from_bytes(&Pk3Buffer::box_or_party_span(bytes).to_decrypted_bytes())
     }
 
     pub fn to_box_bytes_encrypted(self) -> Vec<u8> {
-        let shuffled = encryption::shuffle_blocks_gen_3(&self.to_box_bytes());
-        encryption::decrypt_pkm_bytes_gen_3(&shuffled)
+        Pk3Buffer::box_span(&self.to_box_bytes()).to_encrypted_bytes()
     }
 
     pub fn get_national_dex(&self) -> NatDexIndex {
@@ -277,14 +274,22 @@ impl Pk3 {
         buffer.refresh_checksum();
 
         let bytes = buffer.as_bytes_mut();
-        encryption::decrypt_pkm_bytes_gen_6_7(&encryption::shuffle_blocks_gen_6_7(bytes))
+        encryption::crypt_pkm_bytes_gen_3(
+            &encryption::shuffle_blocks_gen_3(bytes),
+            buffer.get_encryption_constant(),
+        )
+        // buffer.to_encrypted_bytes()
     }
 
     pub fn is_empty_slot(bytes: &[u8]) -> bool {
-        let decrypted = encryption::decrypt_pkm_bytes_gen_6_7(bytes);
-        let unshuffled = encryption::unshuffle_blocks_gen_6_7(&decrypted);
+        // let decrypted = Pk3Buffer::box_span(bytes).to_decrypted_bytes();
+        // let buffer = Pk3BufferRef::box_span(&decrypted);
+        let decrypted = encryption::crypt_pkm_bytes_gen_3(
+            bytes,
+            Pk3BufferRef::box_span(bytes).get_encryption_constant(),
+        );
+        let unshuffled = encryption::unshuffle_blocks_gen_3(&decrypted);
         let buffer = Pk3BufferRef::box_span(&unshuffled);
-
         buffer.gen3_species_index() == 0
     }
 
@@ -376,7 +381,7 @@ impl Pk3 {
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
     pub fn from_encrypted_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_encryped_bytes(&bytes).map_err(error_to_js)
+        Pk3::from_encrypted_bytes(&bytes).map_err(error_to_js)
     }
 
     #[wasm_bindgen(js_name = fromSlotBytes)]

@@ -1,5 +1,6 @@
+use super::{Pk7AbilityIndex, Pk7SpeciesAndForm};
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
-use crate::gen7_alola::{Pk7AbilityIndex, Pk7SpeciesAndForm};
+use crate::encryption::BlockEncrypt;
 use crate::result::{Error, Result};
 use crate::traits::bytes::{AsBytes, AsBytesMut};
 use crate::util;
@@ -116,18 +117,23 @@ pub struct Pk7Buffer<S: AsRef<[u8]>>(S);
 
 impl<'a> Pk7Buffer<&'a [u8]> {
     pub fn box_span(span: &'a [u8]) -> Self {
-        assert_eq!(span.len(), super::BOX_SIZE);
+        debug_assert_eq!(span.len(), super::BOX_SIZE);
         Self(span)
     }
 
     pub fn party_span(span: &'a [u8]) -> Self {
-        assert_eq!(span.len(), super::PARTY_SIZE);
+        debug_assert_eq!(span.len(), super::PARTY_SIZE);
+        Self(span)
+    }
+
+    pub fn box_or_party_span(span: &'a [u8]) -> Self {
+        debug_assert!(span.len() == super::PARTY_SIZE || span.len() == super::BOX_SIZE);
         Self(span)
     }
 }
 
 // ------------------------------------------------------------------
-// Methods — mutable
+// Constructors — mutable
 // ------------------------------------------------------------------
 
 impl<'a> Pk7Buffer<&'a mut [u8]> {
@@ -1048,6 +1054,24 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
 // ==================================================================
 // Trait impls
 // ==================================================================
+
+use crate::encryption::Blocks;
+
+impl<S: AsRef<[u8]>> BlockEncrypt for Pk7Buffer<S> {
+    const BLOCKS_TYPE: Blocks = Blocks::Gen67;
+
+    fn get_personality_value(&self) -> u32 {
+        self.personality_value()
+    }
+
+    fn get_encryption_constant(&self) -> u32 {
+        self.encryption_constant()
+    }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        self.0.as_ref().to_vec()
+    }
+}
 
 impl<S: AsRef<[u8]>> AsBytes for Pk7Buffer<S> {
     fn as_bytes(&self) -> &[u8] {

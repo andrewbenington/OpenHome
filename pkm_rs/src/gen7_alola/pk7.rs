@@ -1,12 +1,10 @@
 use super::Pk7Buffer;
+use super::pk7_buffer::{Pk7BufferMut, Pk7BufferRef};
+use super::{Pk7AbilityIndex, Pk7SpeciesAndForm};
 use crate::checksum::{Checksum, RefreshChecksum};
-#[cfg(feature = "wasm")]
-use crate::convert_strategy::ConvertStrategy;
-use crate::encryption;
-use crate::gen7_alola::pk7_buffer::{Pk7BufferMut, Pk7BufferRef};
-use crate::gen7_alola::{Pk7AbilityIndex, Pk7SpeciesAndForm};
+use crate::encryption::BlockEncrypt;
 use crate::result::{Error, Result};
-use crate::traits::{AsBytesMut, ModernEvs};
+use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
 
 use pkm_rs_derive::IsShiny4096;
@@ -294,15 +292,12 @@ impl Pk7 {
         }
     }
 
-    pub fn from_encryped_bytes(bytes: &[u8]) -> Result<Self> {
-        let decrypted = encryption::decrypt_pkm_bytes_gen_6_7(bytes);
-        let unshuffled = encryption::unshuffle_blocks_gen_6_7(&decrypted);
-        Self::from_bytes(&unshuffled)
+    pub fn from_encrypted_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::from_bytes(&Pk7Buffer::box_or_party_span(bytes).to_decrypted_bytes())
     }
 
     pub fn to_box_bytes_encrypted(self) -> Vec<u8> {
-        let shuffled = encryption::shuffle_blocks_gen_6_7(&self.to_box_bytes());
-        encryption::decrypt_pkm_bytes_gen_6_7(&shuffled)
+        Pk7Buffer::box_span(&self.to_box_bytes()).to_encrypted_bytes()
     }
 
     pub fn calculate_checksum(&self) -> u16 {
@@ -344,14 +339,12 @@ impl Pk7 {
         buffer.set_is_current_handler(true);
         buffer.refresh_checksum();
 
-        let bytes = buffer.as_bytes_mut();
-        encryption::decrypt_pkm_bytes_gen_6_7(&encryption::shuffle_blocks_gen_6_7(bytes))
+        buffer.to_encrypted_bytes()
     }
 
     pub fn is_empty_slot(bytes: &[u8]) -> bool {
-        let decrypted = encryption::decrypt_pkm_bytes_gen_6_7(bytes);
-        let unshuffled = encryption::unshuffle_blocks_gen_6_7(&decrypted);
-        let buffer = Pk7BufferRef::box_span(&unshuffled);
+        let decrypted = Pk7Buffer::box_span(bytes).to_decrypted_bytes();
+        let buffer = Pk7BufferRef::box_span(&decrypted);
 
         buffer.species_ndex() == 0
     }
@@ -413,7 +406,7 @@ impl Pk7 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
     pub fn from_ohpkm_bytes(
         bytes: Vec<u8>,
-        strategy: ConvertStrategy,
+        strategy: crate::convert_strategy::ConvertStrategy,
     ) -> core::result::Result<Pk7, JsValue> {
         let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
         Ok(Pk7::from_ohpkm(&ohpkm, strategy))

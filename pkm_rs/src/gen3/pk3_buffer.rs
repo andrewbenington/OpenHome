@@ -82,6 +82,11 @@ impl<'a> Pk3Buffer<&'a [u8]> {
         assert_eq!(span.len(), super::PARTY_SIZE);
         Self(span)
     }
+
+    pub fn box_or_party_span(span: &'a [u8]) -> Self {
+        debug_assert!(span.len() == super::PARTY_SIZE || span.len() == super::BOX_SIZE);
+        Self(span)
+    }
 }
 
 // ------------------------------------------------------------------
@@ -192,6 +197,10 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
 
     pub fn secret_id(&self) -> u16 {
         self.get_u16_le(Offset::SecretId)
+    }
+
+    pub fn trainer_and_secret_id(&self) -> u32 {
+        self.get_u32_le(Offset::TrainerId)
     }
 
     pub fn is_bad_egg(&self) -> bool {
@@ -588,6 +597,24 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
 // ==================================================================
 // Trait impls
 // ==================================================================
+
+use crate::encryption::{BlockEncrypt, Blocks};
+
+impl<S: AsRef<[u8]>> BlockEncrypt for Pk3Buffer<S> {
+    const BLOCKS_TYPE: Blocks = Blocks::Gen3;
+
+    fn get_personality_value(&self) -> u32 {
+        self.personality_value()
+    }
+
+    fn get_encryption_constant(&self) -> u32 {
+        self.personality_value() ^ self.trainer_and_secret_id()
+    }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        self.0.as_ref().to_vec()
+    }
+}
 
 impl<S: AsRef<[u8]>> AsBytes for Pk3Buffer<S> {
     fn as_bytes(&self) -> &[u8] {
