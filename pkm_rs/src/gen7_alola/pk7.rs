@@ -318,6 +318,7 @@ impl Pk7 {
             &self.evs,
             self.calculate_level(),
             self.nature.get_metadata(),
+            Some(self.hyper_training),
         )
         .unwrap_or_else(|| {
             panic!(

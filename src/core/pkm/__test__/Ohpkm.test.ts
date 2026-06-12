@@ -6,6 +6,7 @@ import {
   HyperTraining,
   Language,
   OriginGame,
+  SpeciesAndForm,
 } from '@pkm-rs/pkg'
 import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@pokemon-files/pkm'
 import { Stats } from '@pokemon-files/util'
@@ -135,9 +136,11 @@ describe('evolution and form change update ohpkm', async () => {
     expect(mrMimeOhpkm.formNum).toEqual(1)
 
     // simulate evolution
-    const mrRime = mrMimeGalarPk8
-    mrRime.dexNum = NationalDex.MrRime
-    mrRime.formNum = 0
+    const mrRime = mrMimeOhpkm
+    const mrRimeSpeciesForm = SpeciesAndForm.tryNew(NationalDex.MrRime, 0)
+    assert(mrRimeSpeciesForm !== undefined)
+
+    mrRime.speciesAndForm = mrRimeSpeciesForm
 
     mrMimeOhpkm.syncWithGameData(mrRime)
     expect(mrMimeOhpkm.dexNum).toEqual(NationalDex.MrRime)

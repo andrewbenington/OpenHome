@@ -1881,11 +1881,11 @@ impl OhpkmV2 {
         self.set_encryption_constant(v);
     }
 
-    #[wasm_bindgen(getter = SpeciesAndForm)]
+    #[wasm_bindgen(getter = speciesAndForm)]
     pub fn species_and_form_js(&self) -> SpeciesAndForm {
         self.species_and_form()
     }
-    #[wasm_bindgen(setter = SpeciesAndForm)]
+    #[wasm_bindgen(setter = speciesAndForm)]
     pub fn set_species_and_form_js(&mut self, v: &SpeciesAndForm) {
         self.set_species_and_form(v);
     }

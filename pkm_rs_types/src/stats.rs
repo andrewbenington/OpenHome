@@ -289,7 +289,7 @@ fn u16_le_slice_to_u8<const N: usize>(slice: [u16; N]) -> Vec<u8> {
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
+#[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq)]
 pub struct HyperTraining {
     pub hp: bool,
     pub atk: bool,
@@ -328,6 +328,17 @@ impl HyperTraining {
             Stat::Spa => self.spa,
             Stat::Spd => self.spd,
             Stat::Spe => self.spe,
+        }
+    }
+
+    pub const fn all() -> Self {
+        Self {
+            hp: true,
+            atk: true,
+            def: true,
+            spa: true,
+            spd: true,
+            spe: true,
         }
     }
 }

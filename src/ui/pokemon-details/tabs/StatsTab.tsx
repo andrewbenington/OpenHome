@@ -306,13 +306,14 @@ function labelTextCallback(mon: PKMInterface, display: DisplayType) {
     }
 
     const stat = PkmRsStats.fromAbbr(label)
-    if (!stat || !mon.nature) {
+    const activeNature = mon.statNature ?? mon.nature
+    if (!stat || !activeNature) {
       return label
     }
 
-    if (mon.nature.stats?.decrease === stat) {
+    if (activeNature.stats?.decrease === stat) {
       return `${label}▼`
-    } else if (mon.nature.stats?.increase === stat) {
+    } else if (activeNature.stats?.increase === stat) {
       return `${label}▲`
     } else {
       return `${label}`

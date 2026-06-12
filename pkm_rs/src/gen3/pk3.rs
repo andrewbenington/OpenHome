@@ -263,6 +263,7 @@ impl Pk3 {
             &self.evs,
             self.calculate_level(),
             self.nature().get_metadata(),
+            None,
         )
         .expect("pk3 has valid species/form, present in Emerald data")
     }

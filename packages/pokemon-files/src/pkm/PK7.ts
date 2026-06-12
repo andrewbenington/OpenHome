@@ -38,6 +38,7 @@ export class PK7 {
     return 'PK7' as const
   }
   format: 'PK7' = 'PK7'
+
   static getBoxSize() {
     return 232
   }
