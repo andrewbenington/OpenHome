@@ -1,0 +1,146 @@
+{
+  "encryption_constant": 4001584522,
+  "sanity": 0,
+  "checksum": 2961,
+  "species_and_form": {
+    "national_dex": 620,
+    "form_index": 0
+  },
+  "held_item_index": 0,
+  "trainer_id": 1213,
+  "secret_id": 1990,
+  "exp": 1059860,
+  "ability_index": "Reckless",
+  "ability_num": "Hidden",
+  "markings": {
+    "circle": "unset",
+    "square": "unset",
+    "triangle": "unset",
+    "heart": "unset",
+    "star": "unset",
+    "diamond": "unset"
+  },
+  "personality_value": 586752398,
+  "nature": "Jolly",
+  "is_fateful_encounter": false,
+  "gender": "Female",
+  "evs": {
+    "hp": 6,
+    "atk": 252,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 252
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus_byte": 0,
+  "ribbons": [],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "form_argument": 0,
+  "nickname": "Mienshao",
+  "nickname_trash": "4D00690065006E007300680061006F0000000000000000000000",
+  "moves": [
+    {
+      "move_index": "Acrobatics",
+      "pp": 24,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "High Jump Kick",
+      "pp": 16,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Swords Dance",
+      "pp": 32,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Blaze Kick",
+      "pp": 16,
+      "pp_ups": 3
+    }
+  ],
+  "relearn_moves": ["Pound", "\u003Cempty\u003E", "\u003Cempty\u003E", "\u003Cempty\u003E"],
+  "ivs": {
+    "hp": 31,
+    "atk": 31,
+    "def": 31,
+    "spa": 31,
+    "spd": 31,
+    "spe": 31
+  },
+  "is_egg": false,
+  "is_nicknamed": false,
+  "handler_name": "*DarkLord*",
+  "handler_gender": "Male",
+  "is_current_handler": true,
+  "handler_friendship": 50,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "handler_id": 0,
+  "handler_language": "English",
+  "fullness": 0,
+  "enjoyment": 0,
+  "trainer_name": "*DarkLord*",
+  "trainer_friendship": 0,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "egg_date": "5/11/2018",
+  "met_date": "5/11/2018",
+  "egg_location_index": 60002,
+  "met_location_index": 100,
+  "ball": "Premier",
+  "met_level": 1,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": false,
+    "atk": false,
+    "def": false,
+    "spa": false,
+    "spd": false,
+    "spe": false
+  },
+  "game_of_origin": "Ultra Sun",
+  "game_of_origin_battle": null,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 100,
+  "stats": {
+    "hp": 272,
+    "atk": 349,
+    "def": 156,
+    "spa": 203,
+    "spd": 156,
+    "spe": 339
+  },
+  "level": 100,
+  "palma": 0,
+  "affixed_ribbon": null,
+  "height_scalar": 0,
+  "weight_scalar": 0,
+  "mint_nature": "Jolly",
+  "dynamax_level": 10,
+  "is_favorite": false,
+  "sociability": 0,
+  "home_tracker": null,
+  "tr_flags_swsh": [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0],
+  "can_gigantamax": false,
+  "current_hp": 272
+}

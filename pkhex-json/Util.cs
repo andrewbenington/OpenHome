@@ -186,6 +186,21 @@ public static partial class Util
     return ribbons.ToArray();
   }
 
+
+  public static string[] GetRibbonName(PKM pk)
+  {
+    var allRibbonInfo = RibbonInfo.GetRibbonInfo(pk);
+    var ribbons = new List<string>();
+    foreach (var ribbonInfo in allRibbonInfo)
+    {
+      if (ribbonInfo.HasRibbon)
+      {
+        ribbons.Add(ReformatRibbonName(ribbonInfo.Name));
+      }
+    }
+    return ribbons.ToArray();
+  }
+
   static object GeolocationData(IGeoTrack pk, int index)
   {
     var country = index switch
@@ -272,6 +287,13 @@ public static partial class Util
   public static object FormatBall(PKM pk, GameStrings strings)
   {
     return strings.balllist.GetValue(pk.Ball).ToString().Replace(" Ball", "").Replace("Poke", "Poké");
+  }
+
+  public static object FormatAffixedRibbon(sbyte ribbon, GameStrings strings)
+  {
+    Console.WriteLine("ribbon value: " + ribbon);
+    Console.WriteLine("min ribbon value: " + sbyte.MinValue);
+    return ribbon == -1 ? null : strings.ribbons.GetValue(ribbon);
   }
 
   [GeneratedRegex(@"(?=[A-Z])")]

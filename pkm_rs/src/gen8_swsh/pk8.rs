@@ -647,8 +647,6 @@ mod test {
     use crate::result::Error;
     use crate::tests::TestErrorWithSeed;
     use crate::tests::{self, TestResult};
-    #[cfg(feature = "randomize")]
-    use crate::traits::HasSpeciesAndForm;
     use crate::traits::IsShiny;
 
     use pkm_rs_resources::natures::NatureIndex;
@@ -670,14 +668,6 @@ mod test {
     fn to_from_bytes_random() -> std::result::Result<(), TestErrorWithSeed> {
         for seed in 0..=1000 {
             let mon = Pk8::randomize_and_fix(&mut StdRng::seed_from_u64(seed));
-            println!(
-                "{}:\n\tivs: {:?}\n\tevs: {:?}\n\tmint nature: {:?}\n\thyper training: {:?}",
-                mon.get_forme_metadata().form_name,
-                mon.ivs,
-                mon.evs,
-                mon.mint_nature,
-                mon.hyper_training
-            );
             tests::find_inconsistencies_to_from_bytes(mon)
                 .map_err(|error| TestErrorWithSeed { seed, error })?;
         }
@@ -694,10 +684,10 @@ mod test {
         Ok(())
     }
 
-    // #[test]
-    // fn compare_pkhex_json() -> TestResult<()> {
-    //     tests::compare_pkhex_json_all_in_dir::<Pk8>(&PathBuf::from("pk8"))
-    // }
+    #[test]
+    fn compare_pkhex_json() -> TestResult<()> {
+        tests::compare_pkhex_json_all_in_dir::<Pk8>(&PathBuf::from("pk8"))
+    }
 
     #[test]
     fn nickname_garbage_preserved() -> TestResult<()> {

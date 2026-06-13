@@ -1,0 +1,151 @@
+{
+  "encryption_constant": 1760842800,
+  "sanity": 0,
+  "checksum": 32799,
+  "species_and_form": {
+    "national_dex": 122,
+    "form_index": 1
+  },
+  "held_item_index": 0,
+  "trainer_id": 30756,
+  "secret_id": 45312,
+  "exp": 91125,
+  "ability_index": "Screen Cleaner",
+  "ability_num": "Second",
+  "markings": {
+    "circle": "unset",
+    "square": "unset",
+    "triangle": "unset",
+    "heart": "unset",
+    "star": "unset",
+    "diamond": "unset"
+  },
+  "personality_value": 2258350650,
+  "nature": "Naive",
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus_byte": 0,
+  "ribbons": [],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "form_argument": 0,
+  "nickname": "Mr. Mime",
+  "nickname_trash": "4D0072002E0020004D0069006D00650000000000000000000000",
+  "moves": [
+    {
+      "move_index": "Hypnosis",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Mirror Coat",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Sucker Punch",
+      "pp": 5,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Freeze-Dry",
+      "pp": 20,
+      "pp_ups": 0
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "ivs": {
+    "hp": 13,
+    "atk": 31,
+    "def": 31,
+    "spa": 3,
+    "spd": 12,
+    "spe": 15
+  },
+  "is_egg": false,
+  "is_nicknamed": false,
+  "handler_name": "",
+  "handler_gender": "Male",
+  "is_current_handler": false,
+  "handler_friendship": 0,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "handler_id": 0,
+  "handler_language": "None",
+  "fullness": 0,
+  "enjoyment": 0,
+  "trainer_name": "RoC",
+  "trainer_friendship": 50,
+  "trainer_memory": {
+    "intensity": 1,
+    "memory": 1,
+    "feeling": 15,
+    "textVariables": 53
+  },
+  "egg_date": null,
+  "met_date": "11/17/2019",
+  "egg_location_index": 0,
+  "met_location_index": 106,
+  "ball": "Ultra",
+  "met_level": 45,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": false,
+    "atk": false,
+    "def": false,
+    "spa": false,
+    "spd": false,
+    "spe": false
+  },
+  "game_of_origin": "Sword",
+  "game_of_origin_battle": null,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 45,
+  "stats": {
+    "hp": 105,
+    "atk": 77,
+    "def": 77,
+    "spa": 87,
+    "spd": 81,
+    "spe": 111
+  },
+  "level": 45,
+  "palma": 0,
+  "affixed_ribbon": null,
+  "height_scalar": 35,
+  "weight_scalar": 38,
+  "mint_nature": "Naive",
+  "dynamax_level": 0,
+  "is_favorite": false,
+  "sociability": 0,
+  "home_tracker": null,
+  "tr_flags_swsh": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "can_gigantamax": false,
+  "current_hp": 105
+}
