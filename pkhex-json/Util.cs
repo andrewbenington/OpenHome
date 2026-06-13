@@ -186,21 +186,6 @@ public static partial class Util
     return ribbons.ToArray();
   }
 
-
-  public static string[] GetRibbonName(PKM pk)
-  {
-    var allRibbonInfo = RibbonInfo.GetRibbonInfo(pk);
-    var ribbons = new List<string>();
-    foreach (var ribbonInfo in allRibbonInfo)
-    {
-      if (ribbonInfo.HasRibbon)
-      {
-        ribbons.Add(ReformatRibbonName(ribbonInfo.Name));
-      }
-    }
-    return ribbons.ToArray();
-  }
-
   static object GeolocationData(IGeoTrack pk, int index)
   {
     var country = index switch
