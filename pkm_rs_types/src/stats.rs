@@ -67,50 +67,6 @@ impl Stats8 {
         [self.hp, self.atk, self.def, self.spe, self.spa, self.spd]
     }
 
-    pub fn from_30_bits(bytes: [u8; 4]) -> Self {
-        let iv_bytes = u32::from_le_bytes(bytes);
-        Stats8 {
-            hp: (iv_bytes & 0x1f).try_into().unwrap(),
-            atk: ((iv_bytes >> 5) & 0x1f).try_into().unwrap(),
-            def: ((iv_bytes >> 10) & 0x1f).try_into().unwrap(),
-            spe: ((iv_bytes >> 15) & 0x1f).try_into().unwrap(),
-            spa: ((iv_bytes >> 20) & 0x1f).try_into().unwrap(),
-            spd: ((iv_bytes >> 25) & 0x1f).try_into().unwrap(),
-        }
-    }
-
-    pub fn from_u30(ivs_u30: arbitrary_int::u30) -> Self {
-        let ivs_u32 = ivs_u30.value();
-        Stats8 {
-            hp: (ivs_u32 & 0x1f).try_into().unwrap(),
-            atk: ((ivs_u32 >> 5) & 0x1f).try_into().unwrap(),
-            def: ((ivs_u32 >> 10) & 0x1f).try_into().unwrap(),
-            spe: ((ivs_u32 >> 15) & 0x1f).try_into().unwrap(),
-            spa: ((ivs_u32 >> 20) & 0x1f).try_into().unwrap(),
-            spd: ((ivs_u32 >> 25) & 0x1f).try_into().unwrap(),
-        }
-    }
-
-    pub fn write_30_bits(&self, bytes: &mut [u8], byte_offset: usize) {
-        let current_val =
-            u32::from_le_bytes(bytes[byte_offset..byte_offset + 4].try_into().unwrap());
-        let mut numeric_val: u32 = self.spd as u32;
-        numeric_val <<= 5;
-        numeric_val |= self.spa as u32;
-        numeric_val <<= 5;
-        numeric_val |= self.spe as u32;
-        numeric_val <<= 5;
-        numeric_val |= self.def as u32;
-        numeric_val <<= 5;
-        numeric_val |= self.atk as u32;
-        numeric_val <<= 5;
-        numeric_val |= self.hp as u32;
-
-        numeric_val |= current_val & (0b11 << 30);
-
-        bytes[byte_offset..byte_offset + 4].copy_from_slice(&numeric_val.to_le_bytes());
-    }
-
     pub fn to_ivs_capped(self) -> Ivs {
         Ivs(Self {
             hp: self.hp.min(31),

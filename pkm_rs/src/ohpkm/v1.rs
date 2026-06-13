@@ -12,7 +12,7 @@ use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesAndForm;
 
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{ContestStats, Language, Stats8, Stats16Le, StatsPreSplit};
+use pkm_rs_types::{ContestStats, Ivs, Language, Stats8, Stats16Le, StatsPreSplit};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 use pkm_rs_types::{Geolocations, HyperTraining, MarkingsSixShapesColors};
 
@@ -202,7 +202,7 @@ impl OhpkmV1 {
                 MoveIndex::from(u16::from_le_bytes(bytes[142..144].try_into().unwrap())),
                 MoveIndex::from(u16::from_le_bytes(bytes[144..146].try_into().unwrap())),
             ],
-            ivs: Stats8::from_30_bits(bytes[148..152].try_into().unwrap()),
+            ivs: Ivs::from_30_bits(bytes[148..152].try_into().unwrap()).into(),
             is_egg: util::get_flag(bytes, 148, 30),
             is_nicknamed: util::get_flag(bytes, 148, 31),
             dynamax_level: bytes[152],
@@ -387,7 +387,7 @@ impl PkmBytes for OhpkmV1 {
         bytes[142..144].copy_from_slice(&self.relearn_moves[2].to_le_bytes());
         bytes[144..146].copy_from_slice(&self.relearn_moves[3].to_le_bytes());
 
-        self.ivs.write_30_bits(bytes, 148);
+        self.ivs.to_ivs_capped().write_30_bits(bytes, 148);
         util::set_flag(bytes, 148, 30, self.is_egg);
         util::set_flag(bytes, 148, 31, self.is_nicknamed);
 
