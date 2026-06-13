@@ -232,6 +232,7 @@ impl OhpkmV2 {
         Self {
             main_data: other.to_main_data(),
             gen67_data: other.to_gen_67_data(),
+            swsh_data: other.to_swsh_data(),
             ..Default::default()
         }
     }

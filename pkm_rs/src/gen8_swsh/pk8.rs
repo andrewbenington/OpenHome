@@ -736,12 +736,27 @@ mod test {
         Ok(())
     }
 
-    // #[test]
-    // fn to_from_ohpkm() -> TestResult<()> {
-    //     tests::to_from_ohpkm_all_in_dir::<Pk8>(
-    //         &PathBuf::from("test-files").join("pkm-files").join("pk8"),
-    //     )
-    // }
+    #[test]
+    fn to_from_ohpkm() -> TestResult<()> {
+        tests::to_from_ohpkm_all_in_dir::<Pk8>(
+            &PathBuf::from("test-files").join("pkm-files").join("pk8"),
+        )
+    }
+
+    #[test]
+    fn to_from_ohpkm_keeps_dynamax_level() -> TestResult<()> {
+        let path = PathBuf::from("pk8").join("mienshao.pk8");
+        let mon = tests::pkm_from_file::<Pk8>(&path)?.0;
+        assert!(mon.dynamax_level > 0);
+
+        let ohpkm = mon.to_ohpkm()?;
+        assert_eq!(ohpkm.dynamax_level(), Some(mon.dynamax_level));
+
+        let roundtrip = Pk8::from_ohpkm(&ohpkm, ConvertStrategy::default());
+        assert_eq!(roundtrip.dynamax_level, mon.dynamax_level);
+
+        Ok(())
+    }
 
     #[test]
     fn empty_slot_checksum() -> TestResult<()> {
