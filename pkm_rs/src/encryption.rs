@@ -129,20 +129,6 @@ impl BlockRange {
     }
 }
 
-fn unshuffle_blocks(bytes: &[u8], offset: usize, shift_value: usize, block_size: usize) -> Vec<u8> {
-    rearrange_blocks(
-        bytes,
-        offset,
-        shift_value,
-        block_size,
-        UNSHUFFLE_BLOCK_ORDERS,
-    )
-}
-
-fn shuffle_blocks(bytes: &[u8], offset: usize, shift_value: usize, block_size: usize) -> Vec<u8> {
-    rearrange_blocks(bytes, offset, shift_value, block_size, SHUFFLE_BLOCK_ORDERS)
-}
-
 fn rearrange_blocks(
     bytes: &[u8],
     offset: usize,
@@ -249,30 +235,6 @@ pub trait BlockEncrypt {
     fn unshuffle_blocks(&self, bytes: &[u8]) -> Vec<u8> {
         self.rearrange_blocks(bytes, UNSHUFFLE_BLOCK_ORDERS)
     }
-}
-
-pub fn shuffle_blocks_gen_3(bytes: &[u8]) -> Vec<u8> {
-    let personality_value = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
-    let shift_value = (personality_value % 24) as usize;
-
-    shuffle_blocks(
-        bytes,
-        Blocks::Gen3.blocks_offset(),
-        shift_value,
-        Blocks::Gen3.block_size(),
-    )
-}
-
-pub fn unshuffle_blocks_gen_3(bytes: &[u8]) -> Vec<u8> {
-    let personality_value = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
-    let shift_value = (personality_value % 24) as usize;
-
-    unshuffle_blocks(
-        bytes,
-        Blocks::Gen3.blocks_offset(),
-        shift_value,
-        Blocks::Gen3.block_size(),
-    )
 }
 
 pub fn crypt_pkm_bytes_gen_3(bytes: &[u8], encryption_key: u32) -> Vec<u8> {

@@ -2,7 +2,7 @@ use super::Pk3Buffer;
 use crate::checksum::{Checksum, RefreshChecksum};
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::ConvertStrategy;
-use crate::encryption::{self, BlockEncrypt};
+use crate::encryption::BlockEncrypt;
 use crate::gen3::Gen3PokemonIndex;
 use crate::gen3::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
 #[cfg(feature = "wasm")]
@@ -13,7 +13,7 @@ use crate::strings::Gen3String;
 use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
 #[cfg(test)]
 use crate::tests::PkhexJson;
-use crate::traits::{AsBytesMut, ModernEvs};
+use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
 use crate::util::unown_form_from_pid_gen3;
 
@@ -95,7 +95,7 @@ pub struct Pk3 {
 
 impl Pk3 {
     // ------------------------------------------------------------------
-    // Deserialise from a Pk3Buffer (the single source of all byte offsets)
+    // Deserialise from a Pk3Buffer (byte slice wrapper with field accessors)
     // ------------------------------------------------------------------
 
     pub fn from_buffer(buf: &Pk3BufferRef) -> Result<Self> {
@@ -272,29 +272,9 @@ impl Pk3 {
         self.stats = self.calculate_stats();
     }
 
-    pub fn empty_box_slot_bytes() -> Vec<u8> {
-        let mut bytes = [0; Self::BOX_SIZE];
-        let mut buffer = Pk3BufferMut::box_span_mut(&mut bytes);
-
-        buffer.refresh_checksum();
-
-        let bytes = buffer.as_bytes_mut();
-        encryption::crypt_pkm_bytes_gen_3(
-            &encryption::shuffle_blocks_gen_3(bytes),
-            buffer.get_encryption_constant(),
-        )
-        // buffer.to_encrypted_bytes()
-    }
-
     pub fn is_empty_slot(bytes: &[u8]) -> bool {
-        // let decrypted = Pk3Buffer::box_span(bytes).to_decrypted_bytes();
-        // let buffer = Pk3BufferRef::box_span(&decrypted);
-        let decrypted = encryption::crypt_pkm_bytes_gen_3(
-            bytes,
-            Pk3BufferRef::box_span(bytes).get_encryption_constant(),
-        );
-        let unshuffled = encryption::unshuffle_blocks_gen_3(&decrypted);
-        let buffer = Pk3BufferRef::box_span(&unshuffled);
+        let decrypted = &Pk3Buffer::box_span(bytes).to_decrypted_bytes();
+        let buffer = Pk3BufferRef::box_span(decrypted);
         buffer.gen3_species_index() == 0
     }
 
@@ -304,7 +284,6 @@ impl Pk3 {
 }
 
 impl Serialize for Pk3 {
-    //fn serialzie(&self, serializer)
     fn serialize<S>(&self, serialzier: S) -> std::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
