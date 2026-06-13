@@ -4,7 +4,7 @@ use crate::result::{Error, Result};
 use crate::traits::OhpkmByte;
 use crate::traits::bytes::{AsBytes, AsBytesMut};
 use crate::util;
-use arbitrary_int::u7;
+use arbitrary_int::{u3, u7};
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots, PpUpStorage};
@@ -13,8 +13,9 @@ use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, Gender, HyperTraining, Language,
-    MarkingsSixShapesColors, OriginGame, PokeDate, Stats8, Stats16Le, TrainerMemory, read_u64_le,
+    AbilityNumber, BinaryGender, ContestStats, Gender, HyperTraining, Ivs, Language,
+    MarkingsSixShapesColors, OriginGame, PokeDate, SWITCH_HANDLER_MEMORY_SIZE,
+    SWITCH_TRAINER_MEMORY_SIZE, Stats8, Stats16Le, TrainerMemory, read_u64_le,
 };
 use pkm_rs_types::{read_u16_le, read_u32_le};
 
@@ -36,7 +37,7 @@ enum Offset {
     PersonalityValue = 28,
     Nature = 32,
     MintNature = 33,
-    FormIndexFatefulEncounterGender = 34,
+    FatefulEncounterGender = 34,
     FormNum = 36,
     Evs = 38,
     Contest = 44,
@@ -257,9 +258,7 @@ impl<S: AsRef<[u8]>> Pk8Buffer<S> {
     }
 
     pub fn ability_num(&self) -> Result<AbilityNumber> {
-        Ok(AbilityNumber::from_u8_first_three_bits(
-            self.byte_22_data(),
-        )?)
+        Ok(u3::extract_u8(self.byte_22_data(), 0).try_into()?)
     }
 
     pub fn is_favorite(&self) -> bool {
@@ -299,11 +298,11 @@ impl<S: AsRef<[u8]>> Pk8Buffer<S> {
     }
 
     pub fn is_fateful_encounter(&self) -> bool {
-        self.get_flag(Offset::FormIndexFatefulEncounterGender, 0)
+        self.get_flag(Offset::FatefulEncounterGender, 0)
     }
 
     pub fn gender(&self) -> Gender {
-        Gender::from_bits_1_2(self.get_u8(Offset::FormIndexFatefulEncounterGender))
+        Gender::from_bits_2_3(self.get_u8(Offset::FatefulEncounterGender))
     }
 
     pub fn evs_raw(&self) -> [u8; 6] {
@@ -390,8 +389,8 @@ impl<S: AsRef<[u8]>> Pk8Buffer<S> {
         self.get_array(Offset::IvsEggNicknamed)
     }
 
-    pub fn ivs(&self) -> Stats8 {
-        Stats8::from_30_bits(self.ivs_egg_nicknamed_raw())
+    pub fn ivs(&self) -> Ivs {
+        Ivs::from_30_bits(self.ivs_egg_nicknamed_raw())
     }
 
     pub fn is_egg(&self) -> bool {
@@ -471,12 +470,14 @@ impl<S: AsRef<[u8]>> Pk8Buffer<S> {
     }
 
     pub fn handler_memory(&self) -> TrainerMemory {
-        TrainerMemory {
-            intensity: self.handler_memory_intensity(),
-            memory: self.handler_memory_memory(),
-            feeling: self.handler_memory_feeling(),
-            text_variable: self.handler_memory_text_variable(),
-        }
+        let start = Offset::HandlerMemory as usize;
+        let end = start + SWITCH_HANDLER_MEMORY_SIZE;
+
+        TrainerMemory::from_bytes_switch_handler(
+            self.bytes()[start..end]
+                .try_into()
+                .expect("start..end in handler_memory() should be a slice of length 5"),
+        )
     }
 
     pub fn fullness(&self) -> u8 {
@@ -531,33 +532,14 @@ impl<S: AsRef<[u8]>> Pk8Buffer<S> {
         self.get_u8(Offset::TrainerFriendship)
     }
 
-    pub fn trainer_memory_intensity(&self) -> u8 {
-        let off = Offset::TrainerMemory as usize;
-        self.bytes()[off]
-    }
-
-    pub fn trainer_memory_memory(&self) -> u8 {
-        let off = Offset::TrainerMemory as usize + 1;
-        self.bytes()[off]
-    }
-
-    pub fn trainer_memory_text_variable(&self) -> u16 {
-        let off = Offset::TrainerMemory as usize + 4;
-        read_u16_le!(self.bytes(), off)
-    }
-
-    pub fn trainer_memory_feeling(&self) -> u8 {
-        let off = Offset::TrainerMemory as usize + 2;
-        self.bytes()[off]
-    }
-
     pub fn trainer_memory(&self) -> TrainerMemory {
-        TrainerMemory {
-            intensity: self.trainer_memory_intensity(),
-            memory: self.trainer_memory_memory(),
-            text_variable: self.trainer_memory_text_variable(),
-            feeling: self.trainer_memory_feeling(),
-        }
+        let start = Offset::TrainerMemory as usize;
+        let end = start + SWITCH_TRAINER_MEMORY_SIZE;
+        TrainerMemory::from_bytes_switch_trainer(
+            self.bytes()[start..end]
+                .try_into()
+                .expect("start..end in trainer_memory() should be a slice of length 6"),
+        )
     }
 
     fn egg_date_raw(&self) -> [u8; 3] {
@@ -749,11 +731,11 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk8Buffer<S> {
     }
 
     pub fn set_is_fateful_encounter(&mut self, v: bool) {
-        self.set_flag(Offset::FormIndexFatefulEncounterGender, 0, v);
+        self.set_flag(Offset::FatefulEncounterGender, 0, v);
     }
 
     pub fn set_gender(&mut self, v: Gender) {
-        v.set_bits_1_2(&mut self.bytes_mut()[Offset::FormIndexFatefulEncounterGender as usize]);
+        v.set_bits_2_3(&mut self.bytes_mut()[Offset::FatefulEncounterGender as usize]);
     }
 
     fn set_evs_raw(&mut self, v: &[u8; 6]) {
@@ -839,7 +821,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk8Buffer<S> {
         self.set_relearn_move_raw(idx, v.to_le_bytes());
     }
 
-    pub fn set_ivs(&mut self, v: &Stats8) {
+    pub fn set_ivs(&mut self, v: &Ivs) {
         v.write_30_bits(self.bytes_mut(), Offset::IvsEggNicknamed as usize);
     }
 
@@ -920,10 +902,8 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk8Buffer<S> {
     }
 
     pub fn set_handler_memory(&mut self, v: TrainerMemory) {
-        self.set_handler_memory_intensity(v.intensity);
-        self.set_handler_memory_memory(v.memory);
-        self.set_handler_memory_feeling(v.feeling);
-        self.set_handler_memory_text_variable(v.text_variable);
+        let offset = Offset::HandlerMemory as usize;
+        self.bytes_mut()[offset..offset + 5].copy_from_slice(&v.to_bytes_switch_handler());
     }
 
     pub fn set_fullness(&mut self, v: u8) {
@@ -978,31 +958,9 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk8Buffer<S> {
         self.set_u8(Offset::TrainerFriendship, v);
     }
 
-    pub fn set_trainer_memory_intensity(&mut self, v: u8) {
-        let off = Offset::TrainerMemory as usize;
-        self.bytes_mut()[off] = v;
-    }
-
-    pub fn set_trainer_memory_memory(&mut self, v: u8) {
-        let off = Offset::TrainerMemory as usize + 1;
-        self.bytes_mut()[off] = v;
-    }
-
-    pub fn set_trainer_memory_text_variable(&mut self, v: u16) {
-        let off = Offset::TrainerMemory as usize + 4;
-        self.bytes_mut()[off..off + 2].copy_from_slice(&v.to_le_bytes());
-    }
-
-    pub fn set_trainer_memory_feeling(&mut self, v: u8) {
-        let off = Offset::TrainerMemory as usize + 2;
-        self.bytes_mut()[off] = v;
-    }
-
     pub fn set_trainer_memory(&mut self, v: TrainerMemory) {
-        self.set_trainer_memory_intensity(v.intensity);
-        self.set_trainer_memory_memory(v.memory);
-        self.set_trainer_memory_text_variable(v.text_variable);
-        self.set_trainer_memory_feeling(v.feeling);
+        let offset = Offset::TrainerMemory as usize;
+        self.bytes_mut()[offset..offset + 6].copy_from_slice(&v.to_bytes_switch_trainer());
     }
 
     fn set_egg_date_raw(&mut self, v: [u8; 3]) {
@@ -1125,10 +1083,13 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for Pk8Buffer<S> {
     }
 }
 
+const CHECKSUM_START: usize = 8;
+const CHECKSUM_END: usize = 328;
+
 impl<S: AsRef<[u8]>> Checksum for Pk8Buffer<S> {
     type A = ChecksumU16Le;
-    const SPAN_START: usize = 8;
-    const SPAN_END: usize = super::PKM_DATA_SIZE;
+    const SPAN_START: usize = CHECKSUM_START;
+    const SPAN_END: usize = CHECKSUM_END;
 }
 
 impl<S: AsRef<[u8]> + AsMut<[u8]>> RefreshChecksum for Pk8Buffer<S> {

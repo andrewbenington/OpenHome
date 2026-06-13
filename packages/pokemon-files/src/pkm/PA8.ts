@@ -490,6 +490,10 @@ export default class PA8 {
     this.checksum = encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x168)
   }
 
+  public recalculateStats() {
+    this.stats = this.getStats()
+  }
+
   public toPCBytes() {
     const shuffledBytes = encryption.shuffleBlocksGen8A(this.toBytes())
     return encryption.decryptByteArrayGen8A(shuffledBytes)

@@ -18,7 +18,7 @@ use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Language,
+    AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, Language,
     MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
@@ -36,6 +36,8 @@ use pkm_rs_resources::abilities::AbilityIndexWasm;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::RandomizeAndFix;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
@@ -78,7 +80,7 @@ pub struct Pk8 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveIndex; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ivs: Stats8,
+    pub ivs: Ivs,
     pub is_egg: bool,
     pub is_nicknamed: bool,
     pub dynamax_level: u8,
@@ -281,14 +283,15 @@ impl Pk8 {
         buf.set_tr_flags_swsh(&self.tr_flags_swsh.to_bytes());
         buf.set_home_tracker_raw(self.home_tracker.unwrap_or(0));
         buf.set_hyper_training(self.hyper_training);
+        buf.set_stat_level(self.stat_level);
+        buf.set_current_hp(self.current_hp);
+        buf.set_stats(self.stats);
 
         buf.refresh_checksum();
     }
 
     pub fn write_to_party_buffer(&self, buf: &mut Pk8BufferMut) {
         self.write_to_box_buffer(buf);
-        buf.set_stat_level(self.stat_level);
-        buf.set_stats(self.stats);
     }
 
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -325,6 +328,7 @@ impl Pk8 {
             &self.evs,
             self.calculate_level(),
             self.mint_nature.get_metadata(),
+            Some(self.hyper_training),
         )
         .unwrap_or_else(|| {
             panic!(
@@ -332,6 +336,10 @@ impl Pk8 {
                 self.species_and_form.0
             )
         })
+    }
+
+    pub fn recalculate_stats(&mut self) {
+        self.stats = self.calculate_stats();
     }
 
     pub const fn move_data_offsets() -> MoveDataOffsets {
@@ -359,7 +367,7 @@ impl Pk8 {
 
 impl PkmBytes for Pk8 {
     const BOX_SIZE: usize = 344;
-    const PARTY_SIZE: usize = 344; // PK8 party data is embedded within the same buffer
+    const PARTY_SIZE: usize = 344; // Party data is also stored in the PC now
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::try_from_bytes(bytes)
@@ -393,6 +401,10 @@ impl HasSpeciesAndForm for Pk8 {
     }
 }
 
+fn error_to_js(e: Error) -> JsValue {
+    JsValue::from_str(&e.to_string())
+}
+
 #[cfg(feature = "wasm")]
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
@@ -409,6 +421,11 @@ impl Pk8 {
     #[wasm_bindgen(js_name = fromBytes)]
     pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk8, JsValue> {
         Pk8::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+    }
+
+    #[wasm_bindgen(js_name = fromEncryptedBytes)]
+    pub fn from_encrypted_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk8, JsValue> {
+        Pk8::from_encrypted_bytes(&bytes).map_err(error_to_js)
     }
 
     #[wasm_bindgen(js_name = toBytes)]
@@ -535,7 +552,12 @@ impl Pk8 {
 
     #[wasm_bindgen(setter = ivs)]
     pub fn set_ivs_js(&mut self, v: Stats16Le) {
-        self.ivs = v.to_stats8_truncated()
+        self.ivs = v.to_ivs_capped()
+    }
+
+    #[wasm_bindgen(getter = trFlagsSwSh)]
+    pub fn tr_flags_swsh_js(&self) -> Vec<u8> {
+        self.tr_flags_swsh.to_bytes().to_vec()
     }
 
     #[wasm_bindgen(js_name = toOhpkm)]
@@ -544,14 +566,54 @@ impl Pk8 {
     }
 
     #[wasm_bindgen(js_name = isEmptySlot)]
-    pub fn is_empty_slot_wasm(bytes: Vec<u8>) -> bool {
-        Self::is_empty_slot(&bytes)
+    pub fn is_empty_slot_wasm(bytes: &[u8]) -> bool {
+        Self::is_empty_slot(bytes)
+    }
+
+    #[wasm_bindgen(js_name = emptyBoxSlotBytes)]
+    pub fn empty_box_slot_bytes_js(trainer_name: &str) -> Vec<u8> {
+        Self::empty_box_slot_bytes(&trainer_name.into())
+    }
+
+    #[wasm_bindgen(js_name = calculateChecksum)]
+    pub fn calculate_checksum_js(&self) -> u16 {
+        self.calculate_checksum()
+    }
+
+    #[wasm_bindgen(js_name = calculateLevel)]
+    pub fn calculate_level_js(&self) -> u8 {
+        self.calculate_level()
+    }
+
+    #[wasm_bindgen(js_name = calculateStats)]
+    pub fn calculate_stats_js(&self) -> Stats16Le {
+        self.calculate_stats()
+    }
+
+    #[wasm_bindgen(js_name = recalculateStats)]
+    pub fn recalculate_stats_js(&mut self) {
+        self.recalculate_stats()
+    }
+
+    #[wasm_bindgen(js_name = toBoxBytesEncrypted)]
+    pub fn to_box_bytes_encrypted_js(&self) -> Vec<u8> {
+        self.to_box_bytes_encrypted()
     }
 }
 
 impl ModernEvs for Pk8 {
     fn get_evs(&self) -> Stats8 {
         self.evs
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl RandomizeAndFix for Pk8 {
+    fn fix<R: rand::prelude::Rng>(&mut self, _: &mut R) {
+        self.stat_level = self.calculate_level();
+        self.stats = self.calculate_stats();
+        self.current_hp = self.stats.hp;
+        self.refresh_checksum();
     }
 }
 
@@ -576,34 +638,46 @@ impl crate::tests::PkhexJson for Pk8 {
 mod test {
     use std::path::PathBuf;
 
+    use crate::checksum::Checksum;
     use crate::convert_strategy::ConvertStrategy;
     use crate::gen8_swsh::Pk8;
-    use crate::gen8_swsh::pk8_buffer::Pk8BufferRef;
+    use crate::gen8_swsh::pk8_buffer::{Pk8Buffer, Pk8BufferRef};
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
     use crate::result::Error;
-    #[cfg(feature = "randomize")]
     use crate::tests::TestErrorWithSeed;
     use crate::tests::{self, TestResult};
-    // use crate::traits::IsShiny;
-
     #[cfg(feature = "randomize")]
-    use pkm_rs_types::randomize::Randomize;
+    use crate::traits::HasSpeciesAndForm;
+    use crate::traits::IsShiny;
+
+    use pkm_rs_resources::natures::NatureIndex;
+    #[cfg(feature = "randomize")]
+    use pkm_rs_types::randomize::RandomizeAndFix;
+    use pkm_rs_types::{HyperTraining, Stats16Le};
     #[cfg(feature = "randomize")]
     use rand::{SeedableRng, rngs::StdRng};
 
-    // #[test]
-    // fn to_from_bytes() -> TestResult<()> {
-    //     tests::to_from_bytes_all_in_dir::<Pk8>(
-    //         &PathBuf::from("test-files").join("pkm-files").join("pk8"),
-    //     )
-    // }
+    #[test]
+    fn to_from_bytes() -> TestResult<()> {
+        tests::to_from_bytes_all_in_dir::<Pk8>(
+            &PathBuf::from("test-files").join("pkm-files").join("pk8"),
+        )
+    }
 
     #[cfg(feature = "randomize")]
     #[test]
     fn to_from_bytes_random() -> std::result::Result<(), TestErrorWithSeed> {
         for seed in 0..=1000 {
-            let mon = Pk8::randomized(&mut StdRng::seed_from_u64(seed));
+            let mon = Pk8::randomize_and_fix(&mut StdRng::seed_from_u64(seed));
+            println!(
+                "{}:\n\tivs: {:?}\n\tevs: {:?}\n\tmint nature: {:?}\n\thyper training: {:?}",
+                mon.get_forme_metadata().form_name,
+                mon.ivs,
+                mon.evs,
+                mon.mint_nature,
+                mon.hyper_training
+            );
             tests::find_inconsistencies_to_from_bytes(mon)
                 .map_err(|error| TestErrorWithSeed { seed, error })?;
         }
@@ -611,44 +685,57 @@ mod test {
         Ok(())
     }
 
-    // #[test]
-    // fn is_shiny() -> TestResult<()> {
-    //     let path = PathBuf::from("pk8").join("zacian-shiny.pk8");
-    //     let mon = tests::pkm_from_file::<Pk8>(&path)?.0;
-    //     assert!(mon.is_shiny());
+    #[test]
+    fn is_shiny() -> TestResult<()> {
+        let path = PathBuf::from("pk8").join("bouffalant-shiny.pk8");
+        let mon = tests::pkm_from_file::<Pk8>(&path)?.0;
+        assert!(mon.is_shiny());
 
-    //     Ok(())
-    // }
+        Ok(())
+    }
 
     // #[test]
     // fn compare_pkhex_json() -> TestResult<()> {
     //     tests::compare_pkhex_json_all_in_dir::<Pk8>(&PathBuf::from("pk8"))
     // }
 
-    // #[test]
-    // fn nickname_garbage_preserved() -> TestResult<()> {
-    //     let (mon, bytes) =
-    //         tests::pkm_from_file::<Pk8>(&PathBuf::from("pk8").join("cinderace-garbage-bytes.pk8"))?;
+    #[test]
+    fn nickname_garbage_preserved() -> TestResult<()> {
+        let (mon, bytes) = tests::pkm_from_file::<Pk8>(
+            &PathBuf::from("pk8").join("toxtricity-garbage-bytes.pk8"),
+        )?;
 
-    //     let mon_recreated = Pk8::from_ohpkm(
-    //         &OhpkmV2::convert_with_backup(&mon, &bytes)?,
-    //         ConvertStrategy::default(),
-    //     );
+        let mon_recreated = Pk8::from_ohpkm(
+            &OhpkmV2::convert_with_backup(&mon, &bytes)?,
+            ConvertStrategy::default(),
+        );
 
-    //     assert_eq!(mon.nickname.bytes()[..], mon_recreated.nickname.bytes()[..]);
+        assert_eq!(mon.nickname.bytes()[..], mon_recreated.nickname.bytes()[..]);
 
-    //     Ok(())
-    // }
+        Ok(())
+    }
 
-    // #[test]
-    // fn checksum() -> TestResult<()> {
-    //     let mon =
-    //         tests::pkm_from_file::<Pk8>(&PathBuf::from("pk8").join("eternatus-garbage-bytes.pk8"))?
-    //             .0;
-    //     assert_eq!(mon.checksum, mon.calculate_checksum());
+    #[test]
+    fn checksum() -> TestResult<()> {
+        let (mon, bytes) = tests::pkm_from_file::<Pk8>(
+            &PathBuf::from("pk8").join("toxtricity-garbage-bytes.pk8"),
+        )?;
 
-    //     Ok(())
-    // }
+        let buffer = Pk8Buffer::new(&bytes);
+        assert_eq!(
+            buffer.checksum(),
+            buffer.calculate_checksum(),
+            "Pk8Buffer checksum calculation is correct"
+        );
+
+        assert_eq!(
+            mon.checksum,
+            mon.calculate_checksum(),
+            "Checksum calculation remains correct after deserializing/reserializing"
+        );
+
+        Ok(())
+    }
 
     #[test]
     fn from_ohpkm() -> TestResult<()> {
@@ -673,6 +760,34 @@ mod test {
         if checksum == 0 {
             return Err(Error::other("Empty slot checksum should be non-zero").into());
         }
+        Ok(())
+    }
+
+    const ADAMANT: u8 = 3;
+    const RELAXED: u8 = 7;
+
+    #[test]
+    fn mint_nature_hyper_train_stat_calc() -> TestResult<()> {
+        let path = PathBuf::from("pk8").join("cinderace-mint-nature.pk8");
+        let mon = tests::pkm_from_file::<Pk8>(&path)?.0;
+
+        assert_eq!(mon.nature, NatureIndex::new_js(RELAXED));
+        assert_eq!(mon.mint_nature, NatureIndex::new_js(ADAMANT));
+
+        assert_eq!(mon.hyper_training, HyperTraining::all());
+
+        assert_eq!(
+            mon.calculate_stats(),
+            Stats16Le {
+                hp: 302,
+                atk: 364,
+                def: 186,
+                spa: 149,
+                spd: 186,
+                spe: 337
+            }
+        );
+
         Ok(())
     }
 }

@@ -14,7 +14,7 @@ use pkm_rs_resources::ribbons::ModernRibbonSet;
 use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, Gender, Geolocations, HyperTraining,
+    AbilityNumber, BinaryGender, ContestStats, Gender, Geolocations, HyperTraining, Ivs,
     MarkingsSixShapesColors, OriginGame, PokeDate, Stats8, TrainerMemory,
 };
 use pkm_rs_types::{Language, Stats16Le};
@@ -393,8 +393,8 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
         self.get_array(Offset::IvsEggNicknamed)
     }
 
-    pub fn ivs(&self) -> Stats8 {
-        Stats8::from_30_bits(self.ivs_egg_nicknamed_raw())
+    pub fn ivs(&self) -> Ivs {
+        Ivs::from_30_bits(self.ivs_egg_nicknamed_raw())
     }
 
     pub fn is_egg(&self) -> bool {
@@ -815,7 +815,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
         self.set_flag(Offset::SecretSuperTraining, 1, v);
     }
 
-    pub fn set_ivs(&mut self, v: &Stats8) {
+    pub fn set_ivs(&mut self, v: &Ivs) {
         v.write_30_bits(self.bytes_mut(), Offset::IvsEggNicknamed as usize);
     }
 

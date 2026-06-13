@@ -37,7 +37,7 @@ export class PK7 {
   static getFormat() {
     return 'PK7' as const
   }
-  format: 'PK7' = 'PK7'
+  format = 'PK7' as const
 
   static getBoxSize() {
     return 232
@@ -545,6 +545,10 @@ export class PK7 {
 
   public getStats() {
     return getStats(this)
+  }
+
+  public recalculateStats() {
+    this.inner.recalculateStats()
   }
 
   public get abilityName() {

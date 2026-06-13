@@ -418,6 +418,10 @@ export default class PB8 {
     return getStats(this)
   }
 
+  public recalculateStats() {
+    this.stats = this.getStats()
+  }
+
   public get heldItemName() {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }

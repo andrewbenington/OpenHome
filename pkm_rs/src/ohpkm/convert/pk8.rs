@@ -1,3 +1,4 @@
+use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
 use pkm_rs_types::FlagSet;
 use pkm_rs_types::{AbilityNumber, Stats16Le};
@@ -60,6 +61,7 @@ impl OhpkmConvert for Pk8 {
             handler_friendship: self.handler_friendship,
             handler_memory: self.handler_memory,
             handler_gender: self.handler_gender,
+            handler_language: self.handler_language,
             fullness: self.fullness,
             enjoyment: self.enjoyment,
             game_of_origin: self.game_of_origin,
@@ -157,6 +159,7 @@ impl OhpkmConvert for Pk8 {
             is_current_handler: ohpkm.is_current_handler(),
             handler_friendship: ohpkm.handler_friendship(),
             handler_memory: ohpkm.handler_memory(),
+            handler_language: ohpkm.handler_language(),
             fullness: ohpkm.fullness(),
             enjoyment: ohpkm.enjoyment(),
             trainer_name: ohpkm.trainer_name(),
@@ -166,7 +169,11 @@ impl OhpkmConvert for Pk8 {
             met_date: ohpkm.met_date(),
             egg_location_index: ohpkm.egg_location_index().unwrap_or(0),
             met_location_index: met_data.location_index,
-            ball: ohpkm.ball(),
+            ball: if ohpkm.ball() <= Ball::Beast {
+                ohpkm.ball()
+            } else {
+                Ball::Poke
+            },
             met_level: ohpkm.met_level(),
             trainer_gender: ohpkm.trainer_gender(),
             tr_flags_swsh: ohpkm

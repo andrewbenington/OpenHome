@@ -462,6 +462,9 @@ impl Serialize for PokeDate {
     }
 }
 
+pub const SWITCH_TRAINER_MEMORY_SIZE: usize = 6;
+pub const SWITCH_HANDLER_MEMORY_SIZE: usize = 5;
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Serialize, Clone)]
 pub struct TrainerData {
@@ -547,7 +550,7 @@ impl TrainerMemory {
         bytes
     }
 
-    pub fn from_bytes_switch_trainer(bytes: &[u8; 6]) -> Self {
+    pub fn from_bytes_switch_trainer(bytes: &[u8; SWITCH_TRAINER_MEMORY_SIZE]) -> Self {
         Self {
             intensity: bytes[0],
             memory: bytes[1],
@@ -556,7 +559,7 @@ impl TrainerMemory {
         }
     }
 
-    pub fn to_bytes_switch_trainer(&self) -> [u8; 6] {
+    pub fn to_bytes_switch_trainer(&self) -> [u8; SWITCH_TRAINER_MEMORY_SIZE] {
         let mut bytes = [0u8; 6];
 
         bytes[0] = self.intensity;
@@ -567,7 +570,7 @@ impl TrainerMemory {
         bytes
     }
 
-    pub fn from_bytes_switch_handler(bytes: &[u8; 5]) -> Self {
+    pub fn from_bytes_switch_handler(bytes: &[u8; SWITCH_HANDLER_MEMORY_SIZE]) -> Self {
         Self {
             intensity: bytes[0],
             memory: bytes[1],
@@ -576,8 +579,8 @@ impl TrainerMemory {
         }
     }
 
-    pub fn to_bytes_switch_handler(&self) -> [u8; 5] {
-        let mut bytes = [0u8; 5];
+    pub fn to_bytes_switch_handler(&self) -> [u8; SWITCH_HANDLER_MEMORY_SIZE] {
+        let mut bytes = [0u8; SWITCH_HANDLER_MEMORY_SIZE];
 
         bytes[0] = self.intensity;
         bytes[1] = self.memory;

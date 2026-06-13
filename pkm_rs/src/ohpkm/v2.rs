@@ -21,7 +21,7 @@ use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining,
+    AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
     Language, MarkingsSixShapesColors, OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le,
     StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory,
 };
@@ -460,11 +460,11 @@ impl OhpkmV2 {
         self.main_data.scale = v;
     }
 
-    pub const fn ivs(&self) -> Stats8 {
+    pub const fn ivs(&self) -> Ivs {
         self.main_data.ivs
     }
 
-    pub const fn set_ivs(&mut self, v: Stats8) {
+    pub const fn set_ivs(&mut self, v: Ivs) {
         self.main_data.ivs = v;
     }
 
@@ -1771,7 +1771,7 @@ impl OhpkmV2 {
         self.main_data.is_fateful_encounter
     }
 
-    pub const fn get_ivs(&self) -> Stats8 {
+    pub const fn get_ivs(&self) -> Ivs {
         self.main_data.ivs
     }
 
@@ -2115,7 +2115,7 @@ impl OhpkmV2 {
     }
     #[wasm_bindgen(setter = ivs)]
     pub fn set_ivs_js(&mut self, v: &Stats16Le) {
-        self.set_ivs(v.to_stats8_truncated());
+        self.set_ivs(v.to_ivs_capped());
     }
 
     #[wasm_bindgen(getter = isEgg)]

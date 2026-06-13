@@ -7,6 +7,8 @@ import {
   Languages,
   Lookup,
   OriginGame,
+  Pk8,
+  Pk8 as Pk8Wasm,
 } from '@pkm-rs/pkg'
 import { PK8 } from '@pokemon-files/pkm'
 import { utf16BytesToString } from '@pokemon-files/util'
@@ -60,8 +62,18 @@ export class SwShSAV extends G89SAV<PK8> {
     return 32
   }
 
-  monConstructor(bytes: ArrayBuffer, encrypted: boolean): PK8 {
-    return new PK8(bytes, { encrypted })
+  monConstructor(buffer: ArrayBuffer, encrypted: boolean): PK8 {
+    const bytes = new Uint8Array(buffer)
+    const pk3Wasm = encrypted ? Pk8Wasm.fromEncryptedBytes(bytes) : Pk8Wasm.fromBytes(bytes)
+    return PK8.fromWasm(pk3Wasm)
+  }
+
+  isEmptySlot(bytes: ArrayBuffer): boolean {
+    return Pk8Wasm.isEmptySlot(new Uint8Array(bytes))
+  }
+
+  emptyBoxSlotBytes() {
+    return Pk8.emptyBoxSlotBytes(this.name)
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {

@@ -13,11 +13,11 @@ use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
-use pkm_rs_types::Language;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{AbilityNumber, BinaryGender, ContestStats, Generation, Stats8};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, TrainerMemory};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors};
+use pkm_rs_types::{Ivs, Language};
 #[cfg(feature = "randomize")]
 use rand::RngExt;
 use serde::Serialize;
@@ -77,7 +77,7 @@ pub struct MainDataV2 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveIndex; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ivs: Stats8,
+    pub ivs: Ivs,
     pub is_egg: bool,
     pub is_nicknamed: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -181,7 +181,7 @@ impl MainDataV2 {
             met_location_index: old.met_location_index,
             met_level: old.met_level,
             relearn_moves: old.relearn_moves,
-            ivs: old.ivs,
+            ivs: old.ivs.to_ivs_capped(),
             is_egg: old.is_egg,
             is_nicknamed: old.is_nicknamed,
             hyper_training: old.hyper_training,
@@ -507,7 +507,7 @@ impl DataSection for MainDataV2 {
                 MoveIndex::from(u16::from_le_bytes(bytes[142..144].try_into().unwrap())),
                 MoveIndex::from(u16::from_le_bytes(bytes[144..146].try_into().unwrap())),
             ],
-            ivs: Stats8::from_30_bits(bytes[148..152].try_into().unwrap()),
+            ivs: Ivs::from_30_bits(bytes[148..152].try_into().unwrap()),
             is_egg: util::get_flag(bytes, 148, 30),
             is_nicknamed: util::get_flag(bytes, 148, 31),
             // bytes[152],
@@ -752,7 +752,7 @@ impl Randomize for MainDataV2 {
                 MoveIndex::randomized(rng),
                 MoveIndex::randomized(rng),
             ],
-            ivs: Stats8::randomized(rng),
+            ivs: Ivs::randomized(rng),
             is_egg: bool::randomized(rng),
             is_nicknamed: bool::randomized(rng),
             handler_name: SizedUtf16String::randomized(rng),

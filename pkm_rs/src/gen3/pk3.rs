@@ -28,13 +28,13 @@ use pkm_rs_resources::species::{FormMetadata, NatDexIndex, SpeciesAndForm, Speci
 use pkm_rs_resources::{helpers, lookup};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::AbilityNumber;
-use pkm_rs_types::Gender;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 use pkm_rs_types::{
     BinaryGender, ContestStats, Language, MarkingsFourShapes, NationalDex, OriginGame,
     SimpleAbilityNumber, Stats8, Stats16Le,
 };
+use pkm_rs_types::{Gender, Ivs};
 use serde::{Serialize, Serializer};
 
 #[cfg(feature = "wasm")]
@@ -73,7 +73,7 @@ pub struct Pk3 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ivs: Stats8,
+    pub ivs: Ivs,
     pub is_egg: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub trainer_name: Gen3TrainerString<7>,
@@ -268,6 +268,10 @@ impl Pk3 {
         .expect("pk3 has valid species/form, present in Emerald data")
     }
 
+    pub fn recalculate_stats(&mut self) {
+        self.stats = self.calculate_stats();
+    }
+
     pub fn empty_box_slot_bytes() -> Vec<u8> {
         let mut bytes = [0; Self::BOX_SIZE];
         let mut buffer = Pk3BufferMut::box_span_mut(&mut bytes);
@@ -445,7 +449,7 @@ impl Pk3 {
     }
     #[wasm_bindgen(setter = ivs)]
     pub fn set_ivs_js(&mut self, v: Stats16Le) {
-        self.ivs = v.try_into().expect("ivs should not exceed 31 each");
+        self.ivs = v.to_ivs_capped();
     }
 
     #[wasm_bindgen(getter = abilityNum)]
@@ -556,9 +560,24 @@ impl Pk3 {
         Self::is_empty_slot(&bytes)
     }
 
+    #[wasm_bindgen(js_name = calculateChecksum)]
+    pub fn calculate_checksum_js(&self) -> u16 {
+        self.calculate_checksum()
+    }
+
+    #[wasm_bindgen(js_name = calculateLevel)]
+    pub fn calculate_level_js(&self) -> u8 {
+        self.calculate_level()
+    }
+
     #[wasm_bindgen(js_name = calculateStats)]
     pub fn calculate_stats_js(&self) -> Stats16Le {
         self.calculate_stats()
+    }
+
+    #[wasm_bindgen(js_name = recalculateStats)]
+    pub fn recalculate_stats_js(&mut self) {
+        self.recalculate_stats()
     }
 
     #[wasm_bindgen(js_name = toJson)]

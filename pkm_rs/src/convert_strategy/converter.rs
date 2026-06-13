@@ -4,7 +4,7 @@ use crate::location::{Location, MetData};
 use crate::ohpkm::OhpkmV2;
 
 use pkm_rs_resources::lookup;
-use pkm_rs_types::Stats8;
+use pkm_rs_types::Ivs;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -108,7 +108,7 @@ impl PkmConverter {
         self.dest_pkm_format.fallback_location_index()
     }
 
-    pub fn ivs(&self, ohpkm: &OhpkmV2) -> Stats8 {
+    pub fn ivs(&self, ohpkm: &OhpkmV2) -> Ivs {
         if !self.dest_pkm_format.supports_hyper_training() && self.strategy.max_iv_if_hyper_trained
         {
             let mut ivs = ohpkm.get_ivs();

@@ -18,8 +18,8 @@ use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, HyperTraining, Language, MarkingsSixShapesColors,
-    OriginGame, Stats8, Stats16Le,
+    AbilityNumber, BinaryGender, ContestStats, HyperTraining, Ivs, Language,
+    MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
 };
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
@@ -76,7 +76,7 @@ pub struct Pk7 {
     pub secret_super_training_unlocked: bool,
     pub secret_super_training_complete: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ivs: Stats8,
+    pub ivs: Ivs,
     pub is_egg: bool,
     pub is_nicknamed: bool,
     pub handler_name: SizedUtf16String<26>,
@@ -328,6 +328,10 @@ impl Pk7 {
         })
     }
 
+    pub fn recalculate_stats(&mut self) {
+        self.stats = self.calculate_stats();
+    }
+
     pub const fn move_data_offsets() -> MoveDataOffsets {
         super::MOVE_DATA_OFFSETS
     }
@@ -542,7 +546,7 @@ impl Pk7 {
 
     #[wasm_bindgen(setter = ivs)]
     pub fn set_ivs_js(&mut self, v: Stats16Le) {
-        self.ivs = v.to_stats8_truncated()
+        self.ivs = v.to_ivs_capped()
     }
 
     #[wasm_bindgen(js_name = toOhpkm)]
@@ -553,6 +557,26 @@ impl Pk7 {
     #[wasm_bindgen(js_name = isEmptySlot)]
     pub fn is_empty_slot_wasm(bytes: Vec<u8>) -> bool {
         Self::is_empty_slot(&bytes)
+    }
+
+    #[wasm_bindgen(js_name = calculateChecksum)]
+    pub fn calculate_checksum_js(&self) -> u16 {
+        self.calculate_checksum()
+    }
+
+    #[wasm_bindgen(js_name = calculateLevel)]
+    pub fn calculate_level_js(&self) -> u8 {
+        self.calculate_level()
+    }
+
+    #[wasm_bindgen(js_name = calculateStats)]
+    pub fn calculate_stats_js(&self) -> Stats16Le {
+        self.calculate_stats()
+    }
+
+    #[wasm_bindgen(js_name = recalculateStats)]
+    pub fn recalculate_stats_js(&mut self) {
+        self.recalculate_stats()
     }
 }
 

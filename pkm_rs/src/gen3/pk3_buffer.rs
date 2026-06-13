@@ -10,7 +10,7 @@ use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveSlots, PpUpStorage};
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
 use pkm_rs_types::{
-    BinaryGender, ContestStats, MarkingsFourShapes, OriginGame, SimpleAbilityNumber, Stats8,
+    BinaryGender, ContestStats, Ivs, MarkingsFourShapes, OriginGame, SimpleAbilityNumber, Stats8,
 };
 use pkm_rs_types::{Language, Stats16Le};
 use pkm_rs_types::{read_u16_le, read_u32_le};
@@ -291,8 +291,8 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         self.get_array(Offset::IvsEggAbility)
     }
 
-    pub fn ivs(&self) -> Stats8 {
-        Stats8::from_30_bits(self.ivs_egg_ability_raw())
+    pub fn ivs(&self) -> Ivs {
+        Ivs::from_30_bits(self.ivs_egg_ability_raw())
     }
 
     pub fn is_egg_flag_2(&self) -> bool {
@@ -499,7 +499,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
         );
     }
 
-    pub fn set_ivs(&mut self, v: &Stats8) {
+    pub fn set_ivs(&mut self, v: &Ivs) {
         v.write_30_bits(self.bytes_mut(), Offset::IvsEggAbility as usize);
     }
 

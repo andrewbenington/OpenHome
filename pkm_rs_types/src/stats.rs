@@ -111,6 +111,17 @@ impl Stats8 {
         bytes[byte_offset..byte_offset + 4].copy_from_slice(&numeric_val.to_le_bytes());
     }
 
+    pub fn to_ivs_capped(self) -> Ivs {
+        Ivs(Self {
+            hp: self.hp.min(31),
+            atk: self.atk.min(31),
+            def: self.def.min(31),
+            spa: self.spa.min(31),
+            spd: self.spd.min(31),
+            spe: self.spe.min(31),
+        })
+    }
+
     const fn gv_from_iv(iv: u8) -> u8 {
         match iv {
             0..=19 => 0,
@@ -183,6 +194,106 @@ impl Stats8 {
     }
 }
 
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
+pub struct Ivs(Stats8);
+
+impl Ivs {
+    pub fn from_30_bits(bytes: [u8; 4]) -> Self {
+        let iv_bytes = u32::from_le_bytes(bytes);
+        Self(Stats8 {
+            hp: (iv_bytes & 0x1f).try_into().unwrap(),
+            atk: ((iv_bytes >> 5) & 0x1f).try_into().unwrap(),
+            def: ((iv_bytes >> 10) & 0x1f).try_into().unwrap(),
+            spe: ((iv_bytes >> 15) & 0x1f).try_into().unwrap(),
+            spa: ((iv_bytes >> 20) & 0x1f).try_into().unwrap(),
+            spd: ((iv_bytes >> 25) & 0x1f).try_into().unwrap(),
+        })
+    }
+
+    pub fn from_u30(ivs_u30: arbitrary_int::u30) -> Self {
+        let ivs_u32 = ivs_u30.value();
+        Self(Stats8 {
+            hp: (ivs_u32 & 0x1f).try_into().unwrap(),
+            atk: ((ivs_u32 >> 5) & 0x1f).try_into().unwrap(),
+            def: ((ivs_u32 >> 10) & 0x1f).try_into().unwrap(),
+            spe: ((ivs_u32 >> 15) & 0x1f).try_into().unwrap(),
+            spa: ((ivs_u32 >> 20) & 0x1f).try_into().unwrap(),
+            spd: ((ivs_u32 >> 25) & 0x1f).try_into().unwrap(),
+        })
+    }
+
+    pub fn write_30_bits(&self, bytes: &mut [u8], byte_offset: usize) {
+        let current_val =
+            u32::from_le_bytes(bytes[byte_offset..byte_offset + 4].try_into().unwrap());
+        let mut numeric_val: u32 = self.0.spd as u32;
+        numeric_val <<= 5;
+        numeric_val |= self.0.spa as u32;
+        numeric_val <<= 5;
+        numeric_val |= self.0.spe as u32;
+        numeric_val <<= 5;
+        numeric_val |= self.0.def as u32;
+        numeric_val <<= 5;
+        numeric_val |= self.0.atk as u32;
+        numeric_val <<= 5;
+        numeric_val |= self.0.hp as u32;
+
+        numeric_val |= current_val & (0b11 << 30);
+
+        bytes[byte_offset..byte_offset + 4].copy_from_slice(&numeric_val.to_le_bytes());
+    }
+
+    pub fn set(&mut self, stat: Stat, value: u8) {
+        self.0.set(stat, value.min(31))
+    }
+}
+
+impl From<Ivs> for Stats8 {
+    fn from(value: Ivs) -> Self {
+        value.0
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for Ivs {
+    fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
+        use rand::RngExt;
+        Self(Stats8 {
+            hp: rng.random_range(0..=31),
+            atk: rng.random_range(0..=31),
+            def: rng.random_range(0..=31),
+            spa: rng.random_range(0..=31),
+            spd: rng.random_range(0..=31),
+            spe: rng.random_range(0..=31),
+        })
+    }
+}
+
+impl Stats for Ivs {
+    fn get_hp(&self) -> u16 {
+        self.0.hp as u16
+    }
+
+    fn get_atk(&self) -> u16 {
+        self.0.atk as u16
+    }
+
+    fn get_def(&self) -> u16 {
+        self.0.def as u16
+    }
+
+    fn get_spa(&self) -> u16 {
+        self.0.spa as u16
+    }
+
+    fn get_spd(&self) -> u16 {
+        self.0.spd as u16
+    }
+
+    fn get_spe(&self) -> u16 {
+        self.0.spe as u16
+    }
+}
+
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
@@ -235,6 +346,17 @@ impl Stats16Le {
             spe: u8::try_from(self.spe).unwrap_or(u8::MAX),
         }
     }
+
+    pub fn to_ivs_capped(self) -> Ivs {
+        Ivs(Stats8 {
+            hp: self.hp.min(31) as u8,
+            atk: self.atk.min(31) as u8,
+            def: self.def.min(31) as u8,
+            spa: self.spa.min(31) as u8,
+            spd: self.spd.min(31) as u8,
+            spe: self.spe.min(31) as u8,
+        })
+    }
 }
 
 impl From<Stats8> for Stats16Le {
@@ -246,6 +368,19 @@ impl From<Stats8> for Stats16Le {
             spa: value.spa as u16,
             spd: value.spd as u16,
             spe: value.spe as u16,
+        }
+    }
+}
+
+impl From<Ivs> for Stats16Le {
+    fn from(value: Ivs) -> Self {
+        Self {
+            hp: value.0.hp as u16,
+            atk: value.0.atk as u16,
+            def: value.0.def as u16,
+            spa: value.0.spa as u16,
+            spd: value.0.spd as u16,
+            spe: value.0.spe as u16,
         }
     }
 }
@@ -426,18 +561,18 @@ impl StatsPreSplit {
         self.hp == 0 && self.atk == 0 && self.def == 0 && self.spc == 0 && self.spe == 0
     }
 
-    pub const fn dvs_from_ivs_lossy(ivs: &Stats8) -> Self {
+    pub const fn dvs_from_ivs_lossy(ivs: &Ivs) -> Self {
         Self {
-            hp: dv_from_iv(ivs.hp),
-            atk: dv_from_iv(ivs.atk),
-            def: dv_from_iv(ivs.def),
-            spc: dv_from_iv((ivs.spa + ivs.spd) / 2),
-            spe: dv_from_iv(ivs.spe),
+            hp: dv_from_iv(ivs.0.hp),
+            atk: dv_from_iv(ivs.0.atk),
+            def: dv_from_iv(ivs.0.def),
+            spc: dv_from_iv((ivs.0.spa + ivs.0.spd) / 2),
+            spe: dv_from_iv(ivs.0.spe),
         }
     }
 
-    pub const fn shiny_dvs_from_ivs(ivs: &Stats8) -> Self {
-        let mut atk = (ivs.atk - 1).div_ceil(2) as u16;
+    pub const fn shiny_dvs_from_ivs(ivs: &Ivs) -> Self {
+        let mut atk = (ivs.0.atk - 1).div_ceil(2) as u16;
         if atk & 0b11 == 0b01 {
             atk += 1;
         } else if atk.is_multiple_of(4) {
