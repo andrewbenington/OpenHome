@@ -12,6 +12,8 @@ struct DeFactoIvs<I: Stats> {
     hyper_training: HyperTraining,
 }
 
+const MAX_IV: u16 = 31;
+
 impl<I: Stats> DeFactoIvs<I> {
     fn new(ivs: I, hyper_training: Option<HyperTraining>) -> Self {
         Self {
@@ -22,7 +24,7 @@ impl<I: Stats> DeFactoIvs<I> {
 
     fn get_hp(&self) -> u16 {
         if self.hyper_training.hp {
-            31
+            MAX_IV
         } else {
             self.ivs.get_hp()
         }
@@ -30,7 +32,7 @@ impl<I: Stats> DeFactoIvs<I> {
 
     fn get_atk(&self) -> u16 {
         if self.hyper_training.atk {
-            31
+            MAX_IV
         } else {
             self.ivs.get_atk()
         }
@@ -38,7 +40,7 @@ impl<I: Stats> DeFactoIvs<I> {
 
     fn get_def(&self) -> u16 {
         if self.hyper_training.def {
-            31
+            MAX_IV
         } else {
             self.ivs.get_def()
         }
@@ -46,7 +48,7 @@ impl<I: Stats> DeFactoIvs<I> {
 
     fn get_spa(&self) -> u16 {
         if self.hyper_training.spa {
-            31
+            MAX_IV
         } else {
             self.ivs.get_spa()
         }
@@ -54,7 +56,7 @@ impl<I: Stats> DeFactoIvs<I> {
 
     fn get_spd(&self) -> u16 {
         if self.hyper_training.spd {
-            31
+            MAX_IV
         } else {
             self.ivs.get_spd()
         }
@@ -62,7 +64,7 @@ impl<I: Stats> DeFactoIvs<I> {
 
     fn get_spe(&self) -> u16 {
         if self.hyper_training.spe {
-            31
+            MAX_IV
         } else {
             self.ivs.get_spe()
         }
