@@ -73,10 +73,9 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9 | PA9> extends Offi
             (this.getMonBoxSizeBytes() + this.getBoxSlotGapBytes()) * monIndex
           const endByte = startByte + this.getMonBoxSizeBytes()
           const monData = boxBlock.raw.slice(startByte, endByte)
-          const mon = this.monConstructor(monData, true)
 
-          if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
-            this.boxes[box].boxSlots[monIndex] = mon
+          if (!this.isEmptySlot(monData)) {
+            this.boxes[box].boxSlots[monIndex] = this.monConstructor(monData, true)
           }
         } catch (e) {
           console.error(e)
@@ -102,15 +101,28 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9 | PA9> extends Offi
 
   abstract monConstructor(arg: ArrayBuffer | OHPKM, encrypted?: boolean): P
 
+  emptyBoxSlotBytes(): Uint8Array {
+    const mon = this.monConstructor(new Uint8Array(this.getMonBoxSizeBytes()).buffer)
+
+    mon.refreshChecksum()
+    return new Uint8Array(mon.toPCBytes())
+  }
+
+  isEmptySlot(bytes: ArrayBuffer): boolean {
+    const mon = this.monConstructor(bytes, true)
+
+    return mon.gameOfOrigin === 0 && mon.dexNum === 0
+  }
+
   prepareForSaving() {
     const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
 
-    this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
-      const mon = this.boxes[box].boxSlots[index]
+    this.updatedBoxSlots.forEach(({ box, boxSlot }) => {
+      const mon = this.getMonAt(box, boxSlot)
 
       const writeIndex =
         this.getBoxSizeBytes() * box +
-        (this.getMonBoxSizeBytes() + this.getBoxSlotGapBytes()) * index
+        (this.getMonBoxSizeBytes() + this.getBoxSlotGapBytes()) * boxSlot
       const blockBuffer = new Uint8Array(boxBlock.raw)
 
       // mon will be undefined if pokemon was moved from this slot
@@ -118,9 +130,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9 | PA9> extends Offi
       if (mon) {
         try {
           if (mon.gameOfOrigin && mon?.dexNum) {
-            if ('stats' in mon) {
-              mon.stats = mon.getStats()
-            }
+            mon.recalculateStats()
             mon.refreshChecksum()
             const monBuffer = new Uint8Array(this.getMonBoxSizeBytes())
             const pcBytes = mon.toPCBytes()
@@ -132,10 +142,7 @@ export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9 | PA9> extends Offi
           console.error(e)
         }
       } else {
-        const mon = this.monConstructor(new Uint8Array(this.getMonBoxSizeBytes()).buffer)
-
-        mon.refreshChecksum()
-        blockBuffer.set(new Uint8Array(mon.toPCBytes()), writeIndex)
+        blockBuffer.set(this.emptyBoxSlotBytes(), writeIndex)
       }
     })
 

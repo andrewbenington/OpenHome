@@ -2,8 +2,11 @@
 mod pk3;
 #[cfg(feature = "wasm")]
 mod pk7;
+#[cfg(feature = "wasm")]
+mod pk8;
 
 use crate::convert_strategy::ConvertStrategy;
+use crate::ohpkm::v2_sections::SwordShieldData;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::Result;
 use crate::traits::Pkm;
@@ -14,6 +17,10 @@ pub trait OhpkmConvert: Pkm {
     fn to_main_data(&self) -> MainDataV2;
 
     fn to_gen_67_data(&self) -> Option<Gen67Data> {
+        None
+    }
+
+    fn to_swsh_data(&self) -> Option<SwordShieldData> {
         None
     }
 

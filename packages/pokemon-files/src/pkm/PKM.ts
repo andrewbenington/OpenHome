@@ -38,6 +38,13 @@ export type PKM =
   | PA9
   | PK7
 
+export const WasmPkmFormats = [PK3, PK7, PK8]
+export type WasmPkmFormat = InstanceType<(typeof WasmPkmFormats)[number]>
+
+export function isWasmFormat(pkm: PKMInterface): pkm is WasmPkmFormat {
+  return WasmPkmFormats.some((P) => pkm instanceof P)
+}
+
 export type RomHackPKM = PK3RR | PK3UB | PB8LUMI
 
 export type PkmClass<P extends PKMInterface> = {

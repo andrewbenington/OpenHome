@@ -24,7 +24,7 @@ export default class PK3 implements PKMInterface {
   static getFormat() {
     return 'PK3' as const
   }
-  format: 'PK3' = 'PK3'
+  format = 'PK3' as const
   inner: Pk3Wasm
 
   constructor(arg: Pk3Wasm | OHPKM, options: PkmConstructorOptions) {
@@ -353,6 +353,10 @@ export default class PK3 implements PKMInterface {
 
   public getStats() {
     return this.inner.calculateStats()
+  }
+
+  public recalculateStats() {
+    this.inner.recalculateStats()
   }
 
   public toJson() {

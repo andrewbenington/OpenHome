@@ -76,7 +76,7 @@ export interface AllPKMFields {
   handlerName?: string
   heightScalar?: number
   heldItemIndex: number
-  homeTracker?: Uint8Array
+  homeTracker?: bigint
   hyperTraining?: HyperTraining
   isAlpha?: boolean
   isCurrentHandler?: boolean

@@ -21,7 +21,7 @@ use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining,
+    AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
     Language, MarkingsSixShapesColors, OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le,
     StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory,
 };
@@ -232,6 +232,7 @@ impl OhpkmV2 {
         Self {
             main_data: other.to_main_data(),
             gen67_data: other.to_gen_67_data(),
+            swsh_data: other.to_swsh_data(),
             ..Default::default()
         }
     }
@@ -356,11 +357,11 @@ impl OhpkmV2 {
         self.main_data.nature = *v;
     }
 
-    pub fn stat_nature(&self) -> NatureIndex {
+    pub fn mint_nature(&self) -> NatureIndex {
         self.main_data.mint_nature.unwrap_or(self.main_data.nature)
     }
 
-    pub fn set_stat_nature(&mut self, v: &NatureIndex) {
+    pub fn set_mint_nature(&mut self, v: &NatureIndex) {
         self.main_data.mint_nature = if *v != self.nature() { Some(*v) } else { None };
     }
 
@@ -460,11 +461,11 @@ impl OhpkmV2 {
         self.main_data.scale = v;
     }
 
-    pub const fn ivs(&self) -> Stats8 {
+    pub const fn ivs(&self) -> Ivs {
         self.main_data.ivs
     }
 
-    pub const fn set_ivs(&mut self, v: Stats8) {
+    pub const fn set_ivs(&mut self, v: Ivs) {
         self.main_data.ivs = v;
     }
 
@@ -564,12 +565,12 @@ impl OhpkmV2 {
         self.main_data.game_of_origin = v;
     }
 
-    pub fn game_of_origin_battle(&self) -> Option<u8> {
-        self.main_data.game_of_origin_battle.map(|v| v as u8)
+    pub const fn game_of_origin_battle(&self) -> Option<OriginGame> {
+        self.main_data.game_of_origin_battle
     }
 
-    pub fn set_game_of_origin_battle(&mut self, v: Option<u8>) {
-        self.main_data.game_of_origin_battle = v.and_then(OriginGame::try_from_u8);
+    pub const fn set_game_of_origin_battle(&mut self, v: Option<OriginGame>) {
+        self.main_data.game_of_origin_battle = v;
     }
 
     pub const fn console_region(&self) -> u8 {
@@ -748,22 +749,12 @@ impl OhpkmV2 {
         self.main_data.relearn_moves = value;
     }
 
-    pub fn home_tracker(&self) -> Option<Vec<u8>> {
-        if self.main_data.home_tracker.iter().all(|b| *b == 0) {
-            None
-        } else {
-            Some(self.main_data.home_tracker.to_vec())
-        }
+    pub const fn home_tracker(&self) -> Option<u64> {
+        self.main_data.home_tracker
     }
 
-    pub fn set_home_tracker(&mut self, tracker: Option<Vec<u8>>) {
-        if let Some(tracker) = tracker
-            && tracker.len() == 8
-        {
-            self.main_data.home_tracker.copy_from_slice(&tracker);
-        } else {
-            self.main_data.home_tracker.copy_from_slice(&[0u8; 8]);
-        }
+    pub const fn set_home_tracker(&mut self, tracker: Option<u64>) {
+        self.main_data.home_tracker = tracker
     }
 
     pub fn add_modern_ribbons(&mut self, ribbon_indices: Vec<usize>) {
@@ -1781,7 +1772,7 @@ impl OhpkmV2 {
         self.main_data.is_fateful_encounter
     }
 
-    pub const fn get_ivs(&self) -> Stats8 {
+    pub const fn get_ivs(&self) -> Ivs {
         self.main_data.ivs
     }
 
@@ -1891,11 +1882,11 @@ impl OhpkmV2 {
         self.set_encryption_constant(v);
     }
 
-    #[wasm_bindgen(getter = SpeciesAndForm)]
+    #[wasm_bindgen(getter = speciesAndForm)]
     pub fn species_and_form_js(&self) -> SpeciesAndForm {
         self.species_and_form()
     }
-    #[wasm_bindgen(setter = SpeciesAndForm)]
+    #[wasm_bindgen(setter = speciesAndForm)]
     pub fn set_species_and_form_js(&mut self, v: &SpeciesAndForm) {
         self.set_species_and_form(v);
     }
@@ -1994,11 +1985,11 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(getter = statNature)]
     pub fn stat_nature_js(&self) -> NatureIndex {
-        self.stat_nature()
+        self.mint_nature()
     }
     #[wasm_bindgen(setter = statNature)]
     pub fn set_stat_nature_js(&mut self, v: &NatureIndex) {
-        self.set_stat_nature(v);
+        self.set_mint_nature(v);
     }
 
     #[wasm_bindgen(getter = isFatefulEncounter)]
@@ -2125,7 +2116,7 @@ impl OhpkmV2 {
     }
     #[wasm_bindgen(setter = ivs)]
     pub fn set_ivs_js(&mut self, v: &Stats16Le) {
-        self.set_ivs(v.to_stats8_truncated());
+        self.set_ivs(v.to_ivs_capped());
     }
 
     #[wasm_bindgen(getter = isEgg)]
@@ -2237,11 +2228,11 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = gameOfOriginBattle)]
-    pub fn game_of_origin_battle_js(&self) -> Option<u8> {
+    pub fn game_of_origin_battle_js(&self) -> Option<OriginGame> {
         self.game_of_origin_battle()
     }
     #[wasm_bindgen(setter = gameOfOriginBattle)]
-    pub fn set_game_of_origin_battle_js(&mut self, v: Option<u8>) {
+    pub fn set_game_of_origin_battle_js(&mut self, v: Option<OriginGame>) {
         self.set_game_of_origin_battle(v);
     }
 
@@ -2479,23 +2470,13 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = homeTracker)]
-    pub fn home_tracker_js(&self) -> Option<Vec<u8>> {
-        if self.main_data.home_tracker.iter().all(|b| *b == 0) {
-            None
-        } else {
-            Some(self.main_data.home_tracker.to_vec())
-        }
+    pub fn home_tracker_js(&self) -> Option<u64> {
+        self.home_tracker()
     }
 
     #[wasm_bindgen(setter = homeTracker)]
-    pub fn set_home_tracker_js(&mut self, tracker: Option<Vec<u8>>) {
-        if let Some(tracker) = tracker
-            && tracker.len() == 8
-        {
-            self.main_data.home_tracker.copy_from_slice(&tracker);
-        } else {
-            self.main_data.home_tracker.copy_from_slice(&[0u8; 8]);
-        }
+    pub fn set_home_tracker_js(&mut self, tracker: Option<u64>) {
+        self.set_home_tracker(tracker);
     }
 
     #[wasm_bindgen(js_name = addModernRibbons)]

@@ -48,12 +48,12 @@ pub trait PkmBytes: Sized {
     }
 
     fn to_box_bytes(&self) -> Vec<u8> {
-        let mut bytes = Vec::with_capacity(Self::BOX_SIZE);
+        let mut bytes = vec![0u8; Self::BOX_SIZE];
         self.write_box_bytes(&mut bytes);
         bytes
     }
     fn to_party_bytes(&self) -> Vec<u8> {
-        let mut bytes = Vec::with_capacity(Self::PARTY_SIZE);
+        let mut bytes = vec![0u8; Self::PARTY_SIZE];
         self.write_party_bytes(&mut bytes);
         bytes
     }

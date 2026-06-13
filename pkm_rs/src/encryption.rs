@@ -14,13 +14,46 @@ use sha1::{Digest as Sha1Digest, Sha1};
 use sha2::Sha256;
 
 const ENCRYPTION_OFFSET: usize = 8;
+const STANDARD_BLOCKS_OFFSET: usize = 8;
 const STARTING_SEED: u32 = 0x41c64e6d;
-const GEN_67_BLOCK_SIZE: usize = 0x38;
-const STANDARD_BLOCKS_OFFSET: usize = 0x08;
+const SHUFFLE_ORDER_COUNT: usize = 24;
+const BLOCK_COUNT: usize = 4;
 
-const GEN_67_MIN_SIZE: usize = STANDARD_BLOCKS_OFFSET + 4 * GEN_67_BLOCK_SIZE;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Blocks {
+    Gen3,
+    // Gen45,
+    Gen67,
+    Gen89,
+    // Gen8a,
+}
 
-pub const SHUFFLE_BLOCK_ORDERS: [[usize; 4]; 24] = [
+impl Blocks {
+    const fn block_size(self) -> usize {
+        match self {
+            Blocks::Gen3 => 0x0c,
+            // Blocks::Gen45 => 0x20,
+            Blocks::Gen67 => 0x38,
+            Blocks::Gen89 => 0x50,
+            // Blocks::Gen8a => 0x58,
+        }
+    }
+
+    const fn blocks_offset(self) -> usize {
+        match self {
+            Blocks::Gen3 => 0x20,
+            _ => STANDARD_BLOCKS_OFFSET,
+        }
+    }
+
+    const fn min_buffer_size(self) -> usize {
+        self.blocks_offset() + 4 * self.block_size()
+    }
+}
+
+type ShuffleOrders = [[usize; BLOCK_COUNT]; SHUFFLE_ORDER_COUNT];
+
+pub const SHUFFLE_BLOCK_ORDERS: ShuffleOrders = [
     [0, 1, 2, 3],
     [0, 1, 3, 2],
     [0, 2, 1, 3],
@@ -47,7 +80,7 @@ pub const SHUFFLE_BLOCK_ORDERS: [[usize; 4]; 24] = [
     [3, 2, 1, 0],
 ];
 
-pub const UNSHUFFLE_BLOCK_ORDERS: [[usize; 4]; 24] = [
+pub const UNSHUFFLE_BLOCK_ORDERS: ShuffleOrders = [
     [0, 1, 2, 3],
     [0, 1, 3, 2],
     [0, 2, 1, 3],
@@ -96,20 +129,6 @@ impl BlockRange {
     }
 }
 
-fn unshuffle_blocks(bytes: &[u8], offset: usize, shift_value: usize, block_size: usize) -> Vec<u8> {
-    rearrange_blocks(
-        bytes,
-        offset,
-        shift_value,
-        block_size,
-        UNSHUFFLE_BLOCK_ORDERS,
-    )
-}
-
-fn shuffle_blocks(bytes: &[u8], offset: usize, shift_value: usize, block_size: usize) -> Vec<u8> {
-    rearrange_blocks(bytes, offset, shift_value, block_size, SHUFFLE_BLOCK_ORDERS)
-}
-
 fn rearrange_blocks(
     bytes: &[u8],
     offset: usize,
@@ -150,74 +169,96 @@ fn rearrange_blocks(
     unshuffled_bytes
 }
 
-const GEN3_BLOCKS_OFFSET: usize = 0x20;
-const GEN3_BLOCK_SIZE: usize = 12;
+const ENCRYPTION_CONSTANT_MASK: u32 = 0x3e000;
+const ENCRYPTION_CONSTANT_SHIFT: u32 = 0xd;
 
-pub fn shuffle_blocks_gen_3(bytes: &[u8]) -> Vec<u8> {
-    let personality_value = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
-    let shift_value = (personality_value % 24) as usize;
+pub trait BlockEncrypt {
+    const BLOCKS_TYPE: Blocks;
 
-    shuffle_blocks(bytes, GEN3_BLOCKS_OFFSET, shift_value, GEN3_BLOCK_SIZE)
+    fn get_personality_value(&self) -> u32;
+    fn get_encryption_constant(&self) -> u32;
+
+    fn to_bytes(&self) -> Vec<u8>;
+
+    fn to_crypted_bytes(&self, bytes: &[u8]) -> Vec<u8> {
+        let length = bytes.len();
+        if length < Self::BLOCKS_TYPE.min_buffer_size() {
+            panic!("to_crypted_bytes: buffer size {length} is too small",);
+        }
+
+        if Self::BLOCKS_TYPE == Blocks::Gen3 {
+            crypt_pkm_bytes_gen_3(bytes, self.get_encryption_constant())
+        } else {
+            let block_size = Self::BLOCKS_TYPE.block_size();
+            let encryption_constant = self.get_encryption_constant();
+            crypt_pkm_blocks(bytes, encryption_constant, block_size)
+        }
+    }
+
+    fn to_encrypted_bytes(&self) -> Vec<u8> {
+        self.to_crypted_bytes(&self.shuffle_blocks(&self.to_bytes()))
+    }
+
+    fn to_decrypted_bytes(&self) -> Vec<u8> {
+        self.unshuffle_blocks(&self.to_crypted_bytes(&self.to_bytes()))
+    }
+
+    fn rearrange_blocks(&self, bytes: &[u8], orders: ShuffleOrders) -> Vec<u8> {
+        let length = bytes.len();
+        if length < Self::BLOCKS_TYPE.min_buffer_size() {
+            panic!("rearrange_blocks: buffer size {length} is too small",);
+        }
+
+        let mod_seed = match Self::BLOCKS_TYPE {
+            Blocks::Gen3 => self.get_personality_value(),
+            // Blocks::Gen45 => (self.get_personality_value() & ENCRYPTION_CONSTANT_MASK) >> ENCRYPTION_CONSTANT_SHIFT,
+            // Blocks::Gen67 | Blocks::Gen89 | Blocks::Gen8a => {
+            //     (self.get_encryption_constant() & ENCRYPTION_CONSTANT_MASK) >> ENCRYPTION_CONSTANT_SHIFT
+            // }
+            Blocks::Gen67 | Blocks::Gen89 => {
+                (self.get_encryption_constant() & ENCRYPTION_CONSTANT_MASK)
+                    >> ENCRYPTION_CONSTANT_SHIFT
+            }
+        } as usize;
+
+        let shift_value = mod_seed % SHUFFLE_ORDER_COUNT;
+        let block_size = Self::BLOCKS_TYPE.block_size();
+        let block_offset = Self::BLOCKS_TYPE.blocks_offset();
+
+        rearrange_blocks(bytes, block_offset, shift_value, block_size, orders)
+    }
+
+    fn shuffle_blocks(&self, bytes: &[u8]) -> Vec<u8> {
+        self.rearrange_blocks(bytes, SHUFFLE_BLOCK_ORDERS)
+    }
+
+    fn unshuffle_blocks(&self, bytes: &[u8]) -> Vec<u8> {
+        self.rearrange_blocks(bytes, UNSHUFFLE_BLOCK_ORDERS)
+    }
 }
 
-pub fn unshuffle_blocks_gen_3(bytes: &[u8]) -> Vec<u8> {
-    let personality_value = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
-    let shift_value = (personality_value % 24) as usize;
+pub fn crypt_pkm_bytes_gen_3(bytes: &[u8], encryption_key: u32) -> Vec<u8> {
+    let start = Blocks::Gen3.blocks_offset();
+    let end = start + BLOCK_COUNT * Blocks::Gen3.block_size();
 
-    unshuffle_blocks(bytes, GEN3_BLOCKS_OFFSET, shift_value, GEN3_BLOCK_SIZE)
-}
+    let mut decrypted_bytes = bytes.to_vec();
 
-pub fn decrypt_pkm_bytes_gen_3(bytes: &[u8]) -> Vec<u8> {
-    let personality_value = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
-    let encryption_xor = u32::from_le_bytes(bytes[4..8].try_into().unwrap());
-    let encryption_key = personality_value ^ encryption_xor;
-
-    let mut out_bytes = bytes.to_vec();
-
-    for i in (GEN3_BLOCKS_OFFSET..GEN3_BLOCKS_OFFSET + 4 * GEN3_BLOCK_SIZE).step_by(4) {
+    for i in (start..end).step_by(4) {
         let value = u32::from_le_bytes(bytes[i..i + 4].try_into().unwrap()) ^ encryption_key;
-        out_bytes[i..i + 4].copy_from_slice(&value.to_le_bytes());
+        let mutable_slice: &mut [u8] = decrypted_bytes.as_mut();
+        mutable_slice[i..i + 4].copy_from_slice(&value.to_le_bytes());
     }
 
-    out_bytes.to_vec()
+    decrypted_bytes
 }
 
-pub fn shuffle_blocks_gen_6_7(bytes: &[u8]) -> Vec<u8> {
-    let length = bytes.len();
-    if length < GEN_67_MIN_SIZE {
-        panic!("shuffle_blocks_gen_6_7: buffer size {length} is too small",);
-    }
+fn crypt_pkm_blocks(bytes: &[u8], seed: u32, block_size: usize) -> Vec<u8> {
+    let start = ENCRYPTION_OFFSET;
+    let end = start + BLOCK_COUNT * block_size;
 
-    let encryption_constant = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
-    let shift_value = (((encryption_constant & 0x3e000) >> 0xd) % 24) as usize;
-
-    shuffle_blocks(bytes, ENCRYPTION_OFFSET, shift_value, GEN_67_BLOCK_SIZE)
-}
-
-pub(crate) fn unshuffle_blocks_gen_6_7(bytes: &[u8]) -> Vec<u8> {
-    let length = bytes.len();
-    if length < GEN_67_MIN_SIZE {
-        panic!("unshuffle_blocks_gen_6_7: buffer size {length} is too small",);
-    }
-
-    let encryption_constant = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
-    let shift_value = (((encryption_constant & 0x3e000) >> 0xd) % 24) as usize;
-
-    unshuffle_blocks(bytes, ENCRYPTION_OFFSET, shift_value, GEN_67_BLOCK_SIZE)
-}
-
-fn decrypt_pkm_blocks(bytes: &[u8], seed: u32, block_size: usize) -> Vec<u8> {
-    decrypt_pkm_bytes(
-        bytes,
-        seed,
-        ENCRYPTION_OFFSET,
-        ENCRYPTION_OFFSET + 4 * block_size,
-    )
-}
-
-fn decrypt_pkm_bytes(bytes: &[u8], seed: u32, start: usize, end: usize) -> Vec<u8> {
-    let mut decrypted_bytes = Vec::<u8>::from(bytes);
+    let mut decrypted_bytes = bytes.to_vec();
     let mut current_seed = seed;
+
     for i in (start..end).step_by(2) {
         current_seed = current_seed
             .wrapping_mul(STARTING_SEED)
@@ -226,16 +267,8 @@ fn decrypt_pkm_bytes(bytes: &[u8], seed: u32, start: usize, end: usize) -> Vec<u
         let decrypted_word = u16::from_le_bytes(bytes[i..i + 2].try_into().unwrap()) ^ xor_value;
         decrypted_bytes[i..i + 2].copy_from_slice(&decrypted_word.to_le_bytes());
     }
-    decrypted_bytes
-}
 
-pub(crate) fn decrypt_pkm_bytes_gen_6_7(bytes: &[u8]) -> Vec<u8> {
-    let length = bytes.len();
-    if length < GEN_67_MIN_SIZE {
-        panic!("decrypt_pkm_bytes_gen_6_7: buffer size {length} is too small",);
-    }
-    let encryption_constant = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
-    decrypt_pkm_blocks(bytes, encryption_constant, GEN_67_BLOCK_SIZE)
+    decrypted_bytes
 }
 
 // const CRC16_SEED_TABLE: [u16; 256] = [

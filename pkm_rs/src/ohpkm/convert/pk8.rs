@@ -1,22 +1,21 @@
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
+use pkm_rs_types::FlagSet;
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
+use super::OhpkmConvert;
 use crate::convert_strategy::ConvertStrategy;
 use crate::convert_strategy::PkmConverter;
 use crate::format::PkmFormat;
+use crate::gen8_swsh;
+use crate::gen8_swsh::Pk8;
+use crate::ohpkm;
+use crate::ohpkm::OhpkmV2;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::{Error, Result};
-use crate::{
-    gen7_alola::{self, Pk7},
-    ohpkm::OhpkmV2,
-    traits::HasSpeciesAndForm,
-};
+use crate::traits::HasSpeciesAndForm;
 
-use super::OhpkmConvert;
-use crate::ohpkm;
-
-impl OhpkmConvert for Pk7 {
+impl OhpkmConvert for Pk8 {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
         ohpkm::v2_sections::MainDataV2 {
             personality_value: self.personality_value,
@@ -29,10 +28,15 @@ impl OhpkmConvert for Pk7 {
             ability_index: self
                 .ability_index
                 .change_bound()
-                .expect("Pk7 max ability <= overall max ability"),
+                .expect("Pk8 max ability <= overall max ability"),
             ability_num: self.ability_num,
             markings: self.markings,
             nature: self.nature,
+            mint_nature: if self.mint_nature != self.nature {
+                Some(self.mint_nature)
+            } else {
+                None
+            },
             is_fateful_encounter: self.is_fateful_encounter,
             gender: self.gender,
             evs: self.evs,
@@ -40,11 +44,13 @@ impl OhpkmConvert for Pk7 {
             pokerus_byte: self.pokerus_byte,
             contest_memory_count: self.contest_memory_count,
             battle_memory_count: self.battle_memory_count,
+            sociability: self.sociability,
+            height_scalar: self.height_scalar,
+            weight_scalar: self.weight_scalar,
             ribbons: OpenHomeRibbonSet::from_modern(self.ribbons),
-            moves: self.moves.to_pp_adjusted(
-                MetadataSource::UltraSunUltraMoon,
-                ohpkm::MOVE_METADATA_SOURCE,
-            ),
+            moves: self
+                .moves
+                .to_pp_adjusted(MetadataSource::SwordShield, ohpkm::MOVE_METADATA_SOURCE),
             nickname: self.nickname,
             relearn_moves: self.relearn_moves,
             ivs: self.ivs,
@@ -54,18 +60,18 @@ impl OhpkmConvert for Pk7 {
             is_current_handler: self.is_current_handler,
             handler_friendship: self.handler_friendship,
             handler_memory: self.handler_memory,
-            handler_affection: self.handler_affection,
             handler_gender: self.handler_gender,
+            handler_language: self.handler_language,
             fullness: self.fullness,
             enjoyment: self.enjoyment,
             game_of_origin: self.game_of_origin,
-            console_region: self.console_region,
+            game_of_origin_battle: self.game_of_origin_battle,
             language: self.language,
             form_argument: self.form_argument,
+            affixed_ribbon: self.affixed_ribbon,
             trainer_name: self.trainer_name,
             trainer_friendship: self.trainer_friendship,
             trainer_memory: self.trainer_memory,
-            trainer_affection: self.trainer_affection,
             egg_date: self.egg_date,
             met_date: self.met_date,
             ball: self.ball,
@@ -78,27 +84,23 @@ impl OhpkmConvert for Pk7 {
             met_level: self.met_level,
             hyper_training: self.hyper_training,
             trainer_gender: self.trainer_gender,
+            home_tracker: self.home_tracker,
             ..Default::default()
         }
     }
 
-    fn to_gen_67_data(&self) -> Option<ohpkm::v2_sections::Gen67Data> {
-        Some(ohpkm::v2_sections::Gen67Data {
-            country: self.country,
-            region: self.region,
-            geolocations: self.geolocations,
-            resort_event_status: self.resort_event_status,
-            super_training_flags: self.super_training_flags,
-            super_training_dist_flags: self.super_training_dist_flags,
-            secret_super_training_unlocked: self.secret_super_training_unlocked,
-            secret_super_training_complete: self.secret_super_training_complete,
-            ..Default::default()
+    fn to_swsh_data(&self) -> Option<ohpkm::v2_sections::SwordShieldData> {
+        Some(ohpkm::v2_sections::SwordShieldData {
+            can_gigantamax: self.can_gigantamax,
+            dynamax_level: self.dynamax_level,
+            palma: self.palma,
+            tr_flags: self.tr_flags_swsh.to_bytes(),
         })
     }
 
     fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Self {
         let form_metadata = ohpkm.get_forme_metadata();
-        let converter = PkmConverter::new(PkmFormat::PK7, strategy);
+        let converter = PkmConverter::new(PkmFormat::PK8, strategy);
         let met_data = converter.met_data(ohpkm);
 
         let mut mon = Self {
@@ -108,7 +110,7 @@ impl OhpkmConvert for Pk7 {
             species_and_form: ohpkm
                 .species_and_form()
                 .try_into()
-                .expect("pk7 mon/form should be valid"),
+                .expect("pk8 mon/form should be valid"),
             held_item_index: ohpkm.held_item_index(),
             trainer_id: ohpkm.trainer_id(),
             secret_id: ohpkm.secret_id(),
@@ -121,52 +123,47 @@ impl OhpkmConvert for Pk7 {
                         form_metadata
                             .get_ability(AbilityNumber::First)
                             .change_bound()
-                            .expect("Pk7 max ability <= overall max ability"),
+                            .expect("Pk8 max ability <= overall max ability"),
                     ),
             ),
             ability_num: ohpkm.ability_num(),
+            can_gigantamax: ohpkm.can_gigantamax().unwrap_or(false),
             markings: ohpkm.markings(),
             personality_value: ohpkm.personality_value(),
             nature: ohpkm.nature(),
+            mint_nature: ohpkm.mint_nature(),
             is_fateful_encounter: ohpkm.is_fateful_encounter(),
             gender: ohpkm.gender(),
             evs: ohpkm.evs(),
             contest: ohpkm.contest(),
-            resort_event_status: ohpkm.resort_event_status().unwrap_or_default(),
             pokerus_byte: ohpkm.pokerus_byte(),
-            super_training_flags: ohpkm.super_training_flags().unwrap_or_default(),
             ribbons: ohpkm.ribbons().get_modern().into_iter().collect(),
+            sociability: ohpkm.sociability(),
+            height_scalar: ohpkm.height_scalar(),
+            weight_scalar: ohpkm.weight_scalar(),
             contest_memory_count: ohpkm.contest_memory_count(),
             battle_memory_count: ohpkm.battle_memory_count(),
-            super_training_dist_flags: ohpkm.super_training_dist_flags().unwrap_or_default(),
             form_argument: ohpkm.form_argument(),
+            affixed_ribbon: ohpkm.affixed_ribbon(),
             nickname: ohpkm.nickname(),
-            moves: ohpkm.moves().to_pp_adjusted(
-                ohpkm::MOVE_METADATA_SOURCE,
-                MetadataSource::UltraSunUltraMoon,
-            ),
+            moves: ohpkm
+                .moves()
+                .to_pp_adjusted(ohpkm::MOVE_METADATA_SOURCE, MetadataSource::SwordShield),
             relearn_moves: ohpkm.relearn_moves(),
-            secret_super_training_unlocked: ohpkm
-                .secret_super_training_unlocked()
-                .unwrap_or_default(),
-            secret_super_training_complete: ohpkm
-                .secret_super_training_complete()
-                .unwrap_or_default(),
             ivs: converter.ivs(ohpkm),
             is_egg: ohpkm.is_egg(),
             is_nicknamed: ohpkm.is_nicknamed(),
+            dynamax_level: ohpkm.dynamax_level().unwrap_or(0),
             handler_name: ohpkm.handler_name(),
             handler_gender: ohpkm.handler_gender(),
             is_current_handler: ohpkm.is_current_handler(),
-            geolocations: ohpkm.geolocations().unwrap_or_default(),
             handler_friendship: ohpkm.handler_friendship(),
-            handler_affection: ohpkm.handler_affection(),
             handler_memory: ohpkm.handler_memory(),
+            handler_language: ohpkm.handler_language(),
             fullness: ohpkm.fullness(),
             enjoyment: ohpkm.enjoyment(),
             trainer_name: ohpkm.trainer_name(),
             trainer_friendship: ohpkm.trainer_friendship(),
-            trainer_affection: ohpkm.trainer_affection(),
             trainer_memory: ohpkm.trainer_memory(),
             egg_date: ohpkm.egg_date(),
             met_date: ohpkm.met_date(),
@@ -179,18 +176,21 @@ impl OhpkmConvert for Pk7 {
             },
             met_level: ohpkm.met_level(),
             trainer_gender: ohpkm.trainer_gender(),
+            tr_flags_swsh: ohpkm
+                .tr_flags_swsh()
+                .map(|v| FlagSet::from_bytes(v.try_into().unwrap()))
+                .unwrap_or_default(),
+            home_tracker: ohpkm.home_tracker(),
             hyper_training: ohpkm.hyper_training(),
             game_of_origin: met_data.origin,
-            country: ohpkm.country().unwrap_or_default(),
-            region: ohpkm.region().unwrap_or_default(),
-            console_region: ohpkm.console_region(),
+            game_of_origin_battle: ohpkm.game_of_origin_battle(),
             language: ohpkm.language(),
+            palma: ohpkm.palma().unwrap_or_default(),
             status_condition: 0,
             stat_level: 0,
-            form_argument_remain: 0,
-            form_argument_elapsed: 0,
             current_hp: 0,
             stats: Stats16Le::default(),
+            ..Default::default()
         };
 
         mon.stat_level = mon.calculate_level();
@@ -203,31 +203,15 @@ impl OhpkmConvert for Pk7 {
     }
 
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
-        if bytes.len() == gen7_alola::BOX_SIZE {
-            let mut extended = bytes.to_vec();
-            extended.resize(gen7_alola::PARTY_SIZE, 0);
-            let extended_len = extended.len();
-
-            return extended
-                .try_into()
-                .map_err(|_| {
-                    Error::buffer_size_with_source(
-                        "Pk7::OhpkmConvert::bytes_to_stored",
-                        gen7_alola::PARTY_SIZE,
-                        extended_len,
-                    )
-                })
-                .map(StoredPkmBytes::Pk7);
-        }
         bytes
             .try_into()
             .map_err(|_| {
                 Error::buffer_size_with_source(
-                    "Pk7::OhpkmConvert::bytes_to_stored",
-                    gen7_alola::PARTY_SIZE,
+                    "Pk8::OhpkmConvert::bytes_to_stored",
+                    gen8_swsh::PKM_DATA_SIZE,
                     bytes.len(),
                 )
             })
-            .map(StoredPkmBytes::Pk7)
+            .map(StoredPkmBytes::Pk8)
     }
 }

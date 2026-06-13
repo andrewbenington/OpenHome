@@ -13,11 +13,11 @@ use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
-use pkm_rs_types::Language;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{AbilityNumber, BinaryGender, ContestStats, Generation, Stats8};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, TrainerMemory};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors};
+use pkm_rs_types::{Ivs, Language};
 #[cfg(feature = "randomize")]
 use rand::RngExt;
 use serde::Serialize;
@@ -77,7 +77,7 @@ pub struct MainDataV2 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub relearn_moves: [MoveIndex; 4],
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ivs: Stats8,
+    pub ivs: Ivs,
     pub is_egg: bool,
     pub is_nicknamed: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -113,7 +113,7 @@ pub struct MainDataV2 {
     pub trainer_gender: BinaryGender,
     pub obedience_level: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub home_tracker: [u8; 8],
+    pub home_tracker: Option<u64>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub display_color_rgb: Option<[u8; 3]>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -137,6 +137,7 @@ impl MainDataV2 {
     }
 
     pub fn from_v1(old: crate::ohpkm::v1::OhpkmV1) -> Self {
+        let home_tracker_raw = u64::from_le_bytes(old.home_tracker);
         MainDataV2 {
             encryption_constant: old.encryption_constant,
             species_and_form: old.species_and_form,
@@ -180,7 +181,7 @@ impl MainDataV2 {
             met_location_index: old.met_location_index,
             met_level: old.met_level,
             relearn_moves: old.relearn_moves,
-            ivs: old.ivs,
+            ivs: old.ivs.to_ivs_capped(),
             is_egg: old.is_egg,
             is_nicknamed: old.is_nicknamed,
             hyper_training: old.hyper_training,
@@ -207,7 +208,11 @@ impl MainDataV2 {
             trainer_memory: old.trainer_memory,
             trainer_affection: old.trainer_affection,
             obedience_level: old.obedience_level,
-            home_tracker: old.home_tracker,
+            home_tracker: if home_tracker_raw != 0 {
+                Some(home_tracker_raw)
+            } else {
+                None
+            },
             display_color_rgb: None,
             started_tracking_seconds: old.file_timestamp_seconds,
             pid_bit_flipped_for_shiny: false,
@@ -431,6 +436,8 @@ impl DataSection for MainDataV2 {
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::ensure_buffer_size(bytes);
 
+        let home_tracker_raw = u64::from_le_bytes(bytes[172..180].try_into().unwrap());
+
         // try_into() will always succeed if the buffer range size is correct.
         // if incorrect, it is a fatal coding flaw and will always panic.
         let data = Self {
@@ -500,7 +507,7 @@ impl DataSection for MainDataV2 {
                 MoveIndex::from(u16::from_le_bytes(bytes[142..144].try_into().unwrap())),
                 MoveIndex::from(u16::from_le_bytes(bytes[144..146].try_into().unwrap())),
             ],
-            ivs: Stats8::from_30_bits(bytes[148..152].try_into().unwrap()),
+            ivs: Ivs::from_30_bits(bytes[148..152].try_into().unwrap()),
             is_egg: util::get_flag(bytes, 148, 30),
             is_nicknamed: util::get_flag(bytes, 148, 31),
             // bytes[152],
@@ -510,7 +517,11 @@ impl DataSection for MainDataV2 {
             } else {
                 None
             },
-            home_tracker: bytes[172..180].try_into().unwrap(),
+            home_tracker: if home_tracker_raw != 0 {
+                Some(home_tracker_raw)
+            } else {
+                None
+            },
             handler_name: SizedUtf16String::<26>::from_bytes(bytes[184..210].try_into().unwrap()),
             handler_language: bytes[211].try_into().ok(),
             is_current_handler: util::get_flag(bytes, 212, 0),
@@ -633,7 +644,7 @@ impl DataSection for MainDataV2 {
 
         // gap: 160..172
 
-        bytes[172..180].copy_from_slice(&self.home_tracker);
+        bytes[172..180].copy_from_slice(&self.home_tracker.unwrap_or(0).to_le_bytes());
 
         bytes[184..210].copy_from_slice(&self.handler_name);
         bytes[211] = self.handler_language.map(|l| l as u8).unwrap_or_default();
@@ -741,7 +752,7 @@ impl Randomize for MainDataV2 {
                 MoveIndex::randomized(rng),
                 MoveIndex::randomized(rng),
             ],
-            ivs: Stats8::randomized(rng),
+            ivs: Ivs::randomized(rng),
             is_egg: bool::randomized(rng),
             is_nicknamed: bool::randomized(rng),
             handler_name: SizedUtf16String::randomized(rng),
@@ -781,7 +792,16 @@ impl Randomize for MainDataV2 {
             hyper_training: HyperTraining::randomized(rng),
             trainer_gender: BinaryGender::randomized(rng),
             obedience_level: u8::randomized(rng),
-            home_tracker: rand::random(),
+            home_tracker: if bool::randomized(rng) {
+                let home_tracker_raw = u64::randomized(rng);
+                if home_tracker_raw != 0 {
+                    Some(home_tracker_raw)
+                } else {
+                    None
+                }
+            } else {
+                None
+            },
             display_color_rgb: Option::<[u8; 3]>::randomized(rng),
             started_tracking_seconds: match bool::randomized(rng) {
                 false => None,

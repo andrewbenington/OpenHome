@@ -520,6 +520,12 @@ impl From<arbitrary_int::u4> for OriginGame {
     }
 }
 
+impl AsRef<str> for OriginGame {
+    fn as_ref(&self) -> &str {
+        self.game_name_full()
+    }
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OriginGames;
 

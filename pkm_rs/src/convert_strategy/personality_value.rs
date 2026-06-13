@@ -22,7 +22,7 @@ impl NatureStrategy {
     fn relevant_nature(&self, mon: &OhpkmV2) -> NatureIndex {
         match self {
             NatureStrategy::KeepOriginalNature => mon.nature(),
-            NatureStrategy::KeepMintNature => mon.stat_nature(),
+            NatureStrategy::KeepMintNature => mon.mint_nature(),
         }
     }
 

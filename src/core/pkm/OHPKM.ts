@@ -21,7 +21,7 @@ import {
   TrainerMemory,
   updatePidIfWouldBecomeShinyGen345,
 } from '@pkm-rs/pkg'
-import { PK3, PK7 } from '@pokemon-files/pkm'
+import { isWasmFormat, WasmPkmFormat } from '@pokemon-files/pkm/PKM'
 import {
   AllPKMFields,
   FourMoves,
@@ -95,7 +95,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
 
-      this.SpeciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
+      this.speciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
       this.extraFormIndex = other.extraFormIndex
 
       if (other.personalityValue === undefined) {
@@ -278,7 +278,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.handlerLanguage = other.handlerLanguage ?? 0
       this.statNature = other.statNature !== undefined ? other.statNature : this.nature
       this.affixedRibbon = other.affixedRibbon
-      this.homeTracker = other.homeTracker ?? new Uint8Array(8)
+      this.homeTracker = other.homeTracker ?? undefined
 
       if (other.obedienceLevel !== undefined) {
         this.obedienceLevel = other.obedienceLevel
@@ -353,8 +353,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   static fromMonUnknownSave(mon: PKMInterface): OHPKM {
-    const ohpkm =
-      mon instanceof PK3 || mon instanceof PK7 ? OHPKM.fromWasmImpl(mon) : new OHPKM(mon)
+    const ohpkm = isWasmFormat(mon) ? OHPKM.fromWasmImpl(mon) : new OHPKM(mon)
 
     return ohpkm
   }
@@ -364,14 +363,14 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return OHPKM.fromBytes(bytes.buffer)
   }
 
-  private static fromWasmImpl(mon: PK3 | PK7): OHPKM {
+  private static fromWasmImpl(mon: WasmPkmFormat): OHPKM {
     return new OHPKM(mon.inner.toOhpkm().toByteArray())
   }
 
   // getters / setters
 
   get dexNum() {
-    return this.SpeciesAndForm.nationalDex
+    return this.speciesAndForm.nationalDex
   }
 
   get ability() {
@@ -382,7 +381,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   get formNum() {
-    return this.SpeciesAndForm.formIndex
+    return this.speciesAndForm.formIndex
   }
 
   get moves() {
@@ -503,6 +502,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return this.isSquareShinyWasm()
   }
 
+  public clone() {
+    return new OHPKM(this.toByteArray())
+  }
+
   public updateTrainerData(
     save: SAV,
     friendship: number,
@@ -620,7 +623,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       (this.formNum !== other.formNum || this.extraFormIndex !== other.extraFormIndex)
 
     if (hasEvolved || changedForm) {
-      this.SpeciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
+      this.speciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
       this.extraFormIndex = other.extraFormIndex
     }
 

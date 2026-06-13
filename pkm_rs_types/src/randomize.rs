@@ -9,15 +9,6 @@ pub trait Randomize {
     fn randomized<R: Rng>(rng: &mut R) -> Self;
 }
 
-// impl<T> Randomize for T
-// where
-//     StandardUniform: Distribution<T>,
-// {
-//     fn randomized<R: Rng>(rng: &mut R) -> Self {
-//         rng.random()
-//     }
-// }
-
 impl Randomize for bool {
     fn randomized<R: Rng>(rng: &mut R) -> Self {
         rng.random()
@@ -37,6 +28,12 @@ impl Randomize for u16 {
 }
 
 impl Randomize for u32 {
+    fn randomized<R: Rng>(rng: &mut R) -> Self {
+        rng.random()
+    }
+}
+
+impl Randomize for u64 {
     fn randomized<R: Rng>(rng: &mut R) -> Self {
         rng.random()
     }
@@ -91,6 +88,16 @@ impl Randomize for NonZeroU16 {
 impl Randomize for String {
     fn randomized<R: Rng>(rng: &mut R) -> Self {
         Alphanumeric.sample_string(rng, 64)
+    }
+}
+
+pub trait RandomizeAndFix: Randomize + Sized {
+    fn fix<R: Rng>(&mut self, rng: &mut R);
+
+    fn randomize_and_fix<R: Rng>(rng: &mut R) -> Self {
+        let mut randomized = Self::randomized(rng);
+        randomized.fix(rng);
+        randomized
     }
 }
 
