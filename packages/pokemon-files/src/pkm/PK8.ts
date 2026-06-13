@@ -60,15 +60,18 @@ export default class PK8 {
     this.inner.encryption_constant = value
   }
 
-  static fromBytes(buffer: ArrayBuffer, _encrypted?: boolean): PK8 {
-    return PK8.fromWasm(Pk8Wasm.fromBytes(new Uint8Array(buffer)))
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK8 {
+    const byteArray = new Uint8Array(buffer)
+    return PK8.fromWasm(
+      encrypted ? Pk8Wasm.fromEncryptedBytes(byteArray) : Pk8Wasm.fromBytes(byteArray)
+    )
   }
 
   static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK8 {
     return new PK8(ohpkm, { strategy })
   }
 
-  static fromWasm(pk8: Pk8Wasm): PK8 {
+  private static fromWasm(pk8: Pk8Wasm): PK8 {
     return new PK8(pk8, {})
   }
 

@@ -63,9 +63,7 @@ export class SwShSAV extends G89SAV<PK8> {
   }
 
   monConstructor(buffer: ArrayBuffer, encrypted: boolean): PK8 {
-    const bytes = new Uint8Array(buffer)
-    const pk3Wasm = encrypted ? Pk8Wasm.fromEncryptedBytes(bytes) : Pk8Wasm.fromBytes(bytes)
-    return PK8.fromWasm(pk3Wasm)
+    return PK8.fromBytes(buffer, encrypted)
   }
 
   isEmptySlot(bytes: ArrayBuffer): boolean {
