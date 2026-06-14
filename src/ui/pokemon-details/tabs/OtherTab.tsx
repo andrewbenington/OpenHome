@@ -179,6 +179,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         {mon.abilityNum !== undefined && (
           <AttributeRow label="Ability Number" value={mon.abilityNum} />
         )}
+        {mon.level !== undefined && <AttributeRow label="Stored Level" value={mon.level} />}
         {mon.formArgument !== undefined && mon.dexNum === NationalDex.Alcremie && (
           <AttributeRow label="Sweet" value={SWEETS[mon.formArgument]} />
         )}

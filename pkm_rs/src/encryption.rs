@@ -191,7 +191,14 @@ pub trait BlockEncrypt {
         } else {
             let block_size = Self::BLOCKS_TYPE.block_size();
             let encryption_constant = self.get_encryption_constant();
-            crypt_pkm_blocks(bytes, encryption_constant, block_size)
+
+            let start = ENCRYPTION_OFFSET;
+            let end = start + BLOCK_COUNT * block_size;
+            let bytes = crypt_pkm_blocks(bytes, encryption_constant, start, end);
+
+            let start = end;
+            let end = length;
+            crypt_pkm_blocks(&bytes, encryption_constant, start, end)
         }
     }
 
@@ -252,10 +259,7 @@ pub fn crypt_pkm_bytes_gen_3(bytes: &[u8], encryption_key: u32) -> Vec<u8> {
     decrypted_bytes
 }
 
-fn crypt_pkm_blocks(bytes: &[u8], seed: u32, block_size: usize) -> Vec<u8> {
-    let start = ENCRYPTION_OFFSET;
-    let end = start + BLOCK_COUNT * block_size;
-
+fn crypt_pkm_blocks(bytes: &[u8], seed: u32, start: usize, end: usize) -> Vec<u8> {
     let mut decrypted_bytes = bytes.to_vec();
     let mut current_seed = seed;
 
