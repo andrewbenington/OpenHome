@@ -295,10 +295,14 @@ pub fn compare_pkhex_json<PKM: Pkm + PkhexJson>(pkm_path: &Path) -> TestResult<(
         .to_pkhex_json_value()
         .map_err(|e| TestError::PkmRs(Error::other(&e.to_string())))?;
 
-    let mut json_path = Path::new("pkhex-json").join(pkm_path);
+    let mut json_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("pkhex-json")
+        .join("json")
+        .join(pkm_path);
+    // let mut json_path = Path::new("pkhex-json").join(pkm_path);
     json_path.set_extension("json");
-    let mut file = File::open(json_path)
-        .map_err(|e| Error::other(&format!("Failed to open JSON file: {e}")))?;
+    let mut file = File::open(&json_path)
+        .map_err(|e| Error::other(&format!("Failed to open JSON file {json_path:?}: {e}")))?;
 
     let mut pkhex_json = String::new();
     file.read_to_string(&mut pkhex_json)
@@ -451,4 +455,79 @@ fn format_byte_range_differences(diffs: &[ByteRange], actual: &[u8], expected: &
 #[cfg(test)]
 pub trait PkhexJson {
     fn to_pkhex_json_value(&self) -> Result<serde_json::Value, serde_json::Error>;
+}
+
+#[cfg(test)]
+pub trait PkhexSaveJson {
+    fn to_pkhex_save_json_value(&self) -> Result<serde_json::Value, serde_json::Error>;
+}
+
+#[cfg(test)]
+pub fn compare_pkhex_save_json(save_path: &Path, json_path: &Path) -> TestResult<()> {
+    // 1. Load raw .SAV bytes using your existing helper
+    let save_bytes = save_bytes_from_file(save_path)?;
+
+    // 2. Parse the save using your Rust library's parser
+    // Replace `G3Sav::new` with whatever your library's actual save constructor is
+    let sav = crate::gen3::G3Sav::new(&save_bytes)
+        .map_err(|e| TestError::PkmRs(Error::other(&e.to_string())))?;
+
+    // 3. Convert your parsed Rust save state to serde_json::Value
+    let pkm_rs_value = sav
+        .to_pkhex_save_json_value()
+        .map_err(|e| TestError::PkmRs(Error::other(&e.to_string())))?;
+
+    let rust_out_path = Path::new("test-files")
+        .join("pkhex-json")
+        .join("gen3-hoenn")
+        .join("emerald.rust.json");
+
+    if let Some(parent) = rust_out_path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| {
+            Error::other(&format!(
+                "Failed to create Rust JSON output dir {parent:?}: {e}"
+            ))
+        })?;
+    }
+
+    std::fs::write(
+        &rust_out_path,
+        serde_json::to_string_pretty(&pkm_rs_value)
+            .map_err(|e| TestError::PkmRs(Error::other(&e.to_string())))?,
+    )
+    .map_err(|e| Error::other(&format!("Failed to write Rust JSON {rust_out_path:?}: {e}")))?;
+
+    // 4. Load the golden PKHeX JSON file
+    let mut full_json_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("pkhex-json")
+        .join("json")
+        .join(json_path);
+    if !full_json_path.set_extension("json") {
+        full_json_path.set_extension("json");
+    }
+
+    let mut file = File::open(&full_json_path)
+        .map_err(|e| Error::other(&format!("Failed to open JSON file {full_json_path:?}: {e}")))?;
+
+    let mut pkhex_json = String::new();
+    file.read_to_string(&mut pkhex_json)
+        .map_err(|e| Error::other(&e.to_string()))?;
+    let pkhex_value: serde_json::Value = serde_json::from_str(&pkhex_json).unwrap();
+
+    // 5. Run the JSON structural strict differential comparison
+    if let Err(e) = assert_json_matches_no_panic(
+        &pkm_rs_value,
+        &pkhex_value,
+        Config::new(CompareMode::Strict),
+    ) {
+        println!("Full PKHeX Save JSON:\n{pkhex_json}");
+        println!(
+            "Full pkm_rs Save JSON:\n{}",
+            serde_json::to_string_pretty(&pkm_rs_value)
+                .map_err(|e| TestError::PkmRs(Error::other(&e.to_string())))?
+        );
+        return Err(Error::other(&format!("Save JSON mismatch: {e}")).into());
+    }
+
+    Ok(())
 }

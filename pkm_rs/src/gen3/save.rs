@@ -1,503 +1,403 @@
-use super::Pk7;
-use crate::encryption;
-use crate::log;
-use crate::result::{Error, Result};
-use crate::traits::{PkmBytes, SaveData};
-use crate::util;
+use crate::gen3::interface::PCBox;
+use crate::traits::PkmBytes;
+use crate::{Gen3Strings, gen3::Pk3, strings::Gen3Encoding};
 
-use pkm_rs_types::BinaryGender;
-use pkm_rs_types::Language;
-use pkm_rs_types::OriginGame;
-use pkm_rs_types::read_u16_le;
-use pkm_rs_types::strings::SizedUtf16String;
+use pkm_rs_types::{Gender, Language, OriginGame};
 
-use serde::Serialize;
-
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
-
-#[cfg(feature = "wasm")]
-use crate::encryption::MemeCrypto;
-
-const SM_SIZE_BYTES: usize = 0x6be00;
-const USUM_SIZE_BYTES: usize = 0x6cc00;
-
-const SM_TRAINER_DATA_OFFSET: usize = 0x1200;
-const USUM_TRAINER_DATA_OFFSET: usize = 0x1400;
-const TRAINER_DATA_SIZE: usize = 0xc0;
-
-const SM_BOX_DATA_OFFSET: usize = 0x04e00;
-const USUM_BOX_DATA_OFFSET: usize = 0x05200;
-const BOX_DATA_SIZE: usize = 0x36600;
-
-const BOX_COUNT: usize = 32;
-const BOX_ROWS: usize = 5;
-const BOX_COLS: usize = 6;
-const BOX_SLOTS: usize = BOX_ROWS * BOX_COLS;
-
-#[cfg(feature = "wasm")]
-const USUM_PC_CHECKSUM_OFFSET: usize = USUM_SIZE_BYTES - 0x200 + 0x14 + (14 * 8) + 6;
-#[cfg(feature = "wasm")]
-const SM_PC_CHECKSUM_OFFSET: usize = SM_SIZE_BYTES - 0x200 + 0x14 + (14 * 8) + 6;
-
-const SINGLE_BOX_SIZE_BYTES: usize = BOX_SLOTS * Pk7::BOX_SIZE;
-
-#[derive(Serialize, Debug)]
-enum SaveType {
-    SunMoon,
-    UltraSunMoon,
+pub struct G3Sector {
+    pub data: Vec<u8>, // Should hold 3968 bytes
+    pub section_id: u16,
+    pub checksum: u16,
+    pub signature: u32,
+    pub save_index: u32,
 }
 
-impl SaveType {
-    const fn file_size_bytes(&self) -> usize {
-        match self {
-            SaveType::SunMoon => SM_SIZE_BYTES,
-            SaveType::UltraSunMoon => USUM_SIZE_BYTES,
+impl G3Sector {
+    pub fn from_bytes(bytes: &[u8], index: usize) -> Self {
+        let offset = index * 0x1000;
+
+        let data = bytes[offset..offset + 3968].to_vec();
+        let section_id =
+            u16::from_le_bytes(bytes[offset + 0xff4..offset + 0xff6].try_into().unwrap());
+        let checksum =
+            u16::from_le_bytes(bytes[offset + 0xff6..offset + 0xff8].try_into().unwrap());
+        let signature =
+            u32::from_le_bytes(bytes[offset + 0xff8..offset + 0xffc].try_into().unwrap());
+        let save_index =
+            u32::from_le_bytes(bytes[offset + 0xffc..offset + 0x1000].try_into().unwrap());
+
+        Self {
+            data,
+            section_id,
+            checksum,
+            signature,
+            save_index,
         }
     }
 
-    const fn trainer_data_offset(&self) -> usize {
-        match self {
-            SaveType::SunMoon => SM_TRAINER_DATA_OFFSET,
-            SaveType::UltraSunMoon => USUM_TRAINER_DATA_OFFSET,
-        }
-    }
-
-    const fn box_data_offset(&self) -> usize {
-        match self {
-            SaveType::SunMoon => SM_BOX_DATA_OFFSET,
-            SaveType::UltraSunMoon => USUM_BOX_DATA_OFFSET,
-        }
-    }
-
-    const fn pc_checksum_offset(&self) -> usize {
-        match self {
-            SaveType::SunMoon => SM_PC_CHECKSUM_OFFSET,
-            SaveType::UltraSunMoon => USUM_PC_CHECKSUM_OFFSET,
-        }
-    }
-
-    const fn meme_crypto(&self) -> MemeCrypto {
-        match self {
-            SaveType::SunMoon => MemeCrypto::SunMoon,
-            SaveType::UltraSunMoon => MemeCrypto::UltraSunUltraMoon,
-        }
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Gen7AlolaSaveRust))]
-#[derive(Serialize, Debug)]
-pub struct Gen7AlolaSave {
-    save_type: SaveType,
-    #[serde(skip_serializing)]
-    bytes: Vec<u8>,
-    size: usize,
-}
-
-impl Gen7AlolaSave {
-    fn from_byte(bytes: &[u8], save_type: SaveType) -> Result<Self> {
-        if bytes.len() < save_type.file_size_bytes() {
-            Err(Error::buffer_size_with_source(
-                "gen 7 alola save file",
-                save_type.file_size_bytes(),
-                bytes.len(),
-            ))
-        } else {
-            Ok(Self {
-                save_type,
-                bytes: bytes.to_vec(),
-                size: bytes.len(),
-            })
-        }
-    }
-
-    pub fn from_bytes_sunmoon(bytes: &[u8]) -> Result<Self> {
-        Self::from_byte(bytes, SaveType::SunMoon)
-    }
-
-    pub fn from_bytes_ultra(bytes: &[u8]) -> Result<Self> {
-        Self::from_byte(bytes, SaveType::UltraSunMoon)
-    }
-
-    #[cfg(feature = "wasm")]
-    pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
-        let mut bytes = self.bytes.clone();
-
-        let pc_checksum_offset = self.save_type.pc_checksum_offset();
-        bytes[pc_checksum_offset..pc_checksum_offset + 2]
-            .copy_from_slice(&self.calc_checksum().to_le_bytes());
-        self.save_type.meme_crypto().sign_in_place(&mut bytes);
-
-        bytes
-    }
-
-    fn calculate_pc_checksum(&self) -> u16 {
-        encryption::crc16_ccitt_invert(&self.bytes, self.save_type.box_data_offset(), BOX_DATA_SIZE)
-    }
-
-    fn get_trainer_data(&self) -> TrainerDataGen7Alola {
-        let offset = self.save_type.trainer_data_offset();
-        TrainerDataGen7Alola::from_bytes(
-            &self.bytes[offset..offset + TRAINER_DATA_SIZE]
-                .try_into()
-                .unwrap(),
-        )
-    }
-}
-
-impl SaveData for Gen7AlolaSave {
-    type PkmType = Pk7;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        match bytes.len() {
-            ..SM_SIZE_BYTES => Err(Error::buffer_size_with_source(
-                "gen 7 alola save file",
-                SM_SIZE_BYTES,
-                bytes.len(),
-            )),
-            SM_SIZE_BYTES..USUM_SIZE_BYTES => Self::from_bytes_sunmoon(bytes),
-            USUM_SIZE_BYTES.. => Self::from_bytes_ultra(bytes),
-        }
-    }
-
-    fn get_decrypted_mon_bytes(&self, box_num: usize, offset: usize) -> Vec<u8> {
-        self.get_mon_bytes_decrypted(box_num, offset)
-    }
-
-    fn get_mon_at(&self, box_num: usize, offset: usize) -> Option<Pk7> {
-        if box_num >= Self::box_count() || offset >= Self::box_slots() {
-            return None;
-        }
-
-        let decrypted_bytes = self.get_decrypted_mon_bytes(box_num, offset);
-        let national_dex = read_u16_le!(decrypted_bytes, 8);
-
-        if national_dex > 0 {
-            Pk7::from_bytes(&decrypted_bytes)
-                .inspect_err(|err| log!("malformed pkm at box {box_num}, slot {offset}: {err}"))
-                .ok()
-        } else {
-            None
-        }
-    }
-
-    fn set_mon_at(&mut self, box_num: usize, offset: usize, mut mon: Option<Pk7>) {
-        let mon_bytes = if let Some(mon) = &mut mon {
-            mon.refresh_checksum();
-            let bytes = mon.to_box_bytes();
-
-            encryption::decrypt_pkm_bytes_gen_6_7(&encryption::shuffle_blocks_gen_6_7(&bytes))
-        } else {
-            Pk7::empty_box_slot_bytes(&self.get_trainer_data().trainer_name)
+    pub fn refresh_checksum(&mut self) {
+        let byte_length = match self.section_id {
+            0 => 3884,
+            13 => 2000,
+            _ => 3968,
         };
 
-        // write bytes to box slot
-        let box_offset = self.save_type.box_data_offset() + box_num * SINGLE_BOX_SIZE_BYTES;
-        let mon_offset = box_offset + offset * Pk7::BOX_SIZE;
-        self.bytes[mon_offset..mon_offset + Pk7::BOX_SIZE].copy_from_slice(&mon_bytes);
-
-        // refresh pc checksum
-        let checksum_offset = self.save_type.pc_checksum_offset();
-        let calculated_checksum = self.calculate_pc_checksum();
-        self.bytes[checksum_offset..checksum_offset + 2]
-            .copy_from_slice(&calculated_checksum.to_le_bytes());
-    }
-
-    fn convert_ohpkm(
-        &self,
-        ohpkm: crate::ohpkm::OhpkmV2,
-        strategy: crate::convert_strategy::ConvertStrategy,
-    ) -> Self::PkmType {
-        use crate::ohpkm::OhpkmConvert;
-        Pk7::from_ohpkm(&ohpkm, strategy)
-    }
-
-    fn box_rows() -> usize {
-        BOX_ROWS
-    }
-
-    fn box_cols() -> usize {
-        BOX_COLS
-    }
-
-    fn box_slots() -> usize {
-        BOX_SLOTS
-    }
-
-    fn box_count() -> usize {
-        BOX_COUNT
-    }
-
-    fn max_box_count() -> usize {
-        32
-    }
-
-    fn current_pc_box_idx(&self) -> usize {
-        if self.bytes[0] >= 32 {
-            0
-        } else {
-            self.bytes[0].into()
+        let mut checksum: u64 = 0;
+        for i in (0..byte_length).step_by(4) {
+            let val = u32::from_le_bytes(self.data[i..i + 4].try_into().unwrap());
+            checksum = (checksum + val as u64) & 0xffffffff;
         }
+
+        self.checksum = ((checksum & 0xffff) + ((checksum >> 16) & 0xffff)) as u16;
     }
 
-    fn is_save(bytes: &[u8]) -> bool {
-        bytes.len() == SM_SIZE_BYTES || bytes.len() == USUM_SIZE_BYTES
-    }
+    pub fn write_to_buffer(&mut self, bytes: &mut [u8], this_index: usize, first_index: usize) {
+        let old_checksum = self.checksum;
 
-    fn display_tid(&self) -> String {
-        let trainer_data = self.get_trainer_data();
-        crate::util::six_digit_trainer_display(trainer_data.trainer_id, trainer_data.secret_id)
-    }
+        self.refresh_checksum();
+        if old_checksum != self.checksum {
+            println!("checksum changed for {}", this_index);
+        }
 
-    fn game_of_origin(&self) -> Option<OriginGame> {
-        Some(OriginGame::from(self.get_trainer_data().game_code))
-    }
+        let index = (this_index + 14 - first_index) % 14;
+        let offset = index * 0x1000;
 
-    fn includes_origin(origin: OriginGame) -> bool {
-        matches!(
-            origin,
-            OriginGame::Sun | OriginGame::Moon | OriginGame::UltraSun | OriginGame::UltraMoon
-        )
-    }
-}
+        bytes[offset..offset + 3968].copy_from_slice(&self.data);
 
-impl Gen7AlolaSave {
-    fn get_mon_bytes_decrypted(&self, box_num: usize, offset: usize) -> Vec<u8> {
-        let box_offset = self.save_type.box_data_offset() + BOX_SLOTS * Pk7::BOX_SIZE * box_num;
-        let mon_offset = box_offset + offset * Pk7::BOX_SIZE;
-        let decrypted_bytes = encryption::decrypt_pkm_bytes_gen_6_7(
-            &self.bytes[mon_offset..mon_offset + Pk7::BOX_SIZE],
-        );
-        encryption::unshuffle_blocks_gen_6_7(&decrypted_bytes)
+        bytes[offset + 0xff4..offset + 0xff6].copy_from_slice(&self.section_id.to_le_bytes());
+        bytes[offset + 0xff6..offset + 0xff8].copy_from_slice(&self.checksum.to_le_bytes());
+        bytes[offset + 0xff8..offset + 0xffc].copy_from_slice(&self.signature.to_le_bytes());
+        bytes[offset + 0xffc..offset + 0x1000].copy_from_slice(&self.save_index.to_le_bytes());
     }
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
-#[allow(clippy::missing_const_for_fn)]
-impl Gen7AlolaSave {
-    #[wasm_bindgen(js_name = getMonAt)]
-    pub fn get_mon_at_wasm(&self, box_num: usize, offset: usize) -> Option<Pk7> {
-        self.get_mon_at(box_num, offset)
-    }
-
-    #[wasm_bindgen(js_name = setMonAt)]
-    pub fn set_mon_at_wasm(&mut self, box_num: usize, offset: usize, mon: Option<Pk7>) {
-        self.set_mon_at(box_num, offset, mon)
-    }
-
-    #[wasm_bindgen(js_name = convertOhpkm)]
-    pub fn convert_ohpkm_wasm(
-        &self,
-        ohpkm: crate::ohpkm::OhpkmV2,
-        strategy: crate::convert_strategy::ConvertStrategy,
-    ) -> Pk7 {
-        self.convert_ohpkm(ohpkm, strategy)
-    }
-
-    #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> Result<Self> {
-        Self::from_bytes(&bytes)
-    }
-
-    #[wasm_bindgen]
-    pub fn calc_checksum(&self) -> u16 {
-        encryption::crc16_ccitt_invert(&self.bytes, self.save_type.box_data_offset(), BOX_DATA_SIZE)
-    }
-
-    #[wasm_bindgen(js_name = isValidSave)]
-    pub fn is_valid_save_wasm(bytes: &[u8]) -> bool {
-        Self::is_save(bytes)
-    }
-
-    #[wasm_bindgen(getter = displayId)]
-    pub fn display_tid_wasm(&self) -> String {
-        self.display_tid()
-    }
-
-    #[wasm_bindgen(getter = trainerName)]
-    pub fn trainer_name_wasm(&self) -> String {
-        self.get_trainer_data().trainer_name.to_string()
-    }
-
-    #[wasm_bindgen(getter = trainerId)]
-    pub fn trainer_id_wasm(&self) -> u16 {
-        self.get_trainer_data().trainer_id
-    }
-
-    #[wasm_bindgen(getter = secretId)]
-    pub fn secret_id_wasm(&self) -> u16 {
-        self.get_trainer_data().secret_id
-    }
-
-    #[wasm_bindgen(getter = trainerGender)]
-    pub fn trainer_gender_wasm(&self) -> u16 {
-        self.get_trainer_data().trainer_gender as u16
-    }
-
-    #[wasm_bindgen(getter = MAX_BOX_COUNT)]
-    pub fn max_box_count() -> usize {
-        BOX_COUNT
-    }
-
-    #[wasm_bindgen(getter = BOX_ROWS)]
-    pub fn box_rows() -> usize {
-        BOX_ROWS
-    }
-
-    #[wasm_bindgen(getter = BOX_COLS)]
-    pub fn box_cols() -> usize {
-        BOX_COLS
-    }
-
-    #[wasm_bindgen(getter = SLOTS_PER_BOX)]
-    pub fn box_size() -> usize {
-        BOX_COLS * BOX_ROWS
-    }
-
-    #[wasm_bindgen(getter = currentPcBoxIdx)]
-    pub fn current_pc_box_idx(&self) -> usize {
-        SaveData::current_pc_box_idx(self)
-    }
-
-    #[wasm_bindgen(getter = gameOfOrigin)]
-    pub fn game_of_origin_wasm(&self) -> OriginGame {
-        OriginGame::from(self.get_trainer_data().game_code)
-    }
-
-    #[wasm_bindgen(getter = language)]
-    pub fn language_wasm(&self) -> Language {
-        self.get_trainer_data().language
-    }
-
-    #[wasm_bindgen(js_name = includesOrigin)]
-    pub fn includes_origin_wasm(origin: OriginGame) -> bool {
-        Self::includes_origin(origin)
-    }
-
-    #[wasm_bindgen(js_name = fileIsSave)]
-    pub fn file_is_save_wasm(bytes: &[u8]) -> bool {
-        Self::is_save(bytes)
-    }
-
-    #[wasm_bindgen(js_name = prepareBytesForSaving)]
-    pub fn prepare_bytes_for_saving_wasm(&self) -> Vec<u8> {
-        self.prepare_bytes_for_saving()
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Default, Debug, Serialize, Clone, Copy)]
-pub struct TrainerDataGen7Alola {
-    pub trainer_id: u16,
-    pub secret_id: u16,
-    pub game_code: u8,
+pub struct G3SaveBackup {
+    pub origin: OriginGame,
+    pub bytes: Vec<u8>,
+    pub save_index: u32,
+    pub is_first_save: bool,
+    pub game_code: u32,
+    pub security_key: u32,
+    pub security_key_copy: Option<u32>,
+    pub signature: u32,
+    pub money: i32,
+    pub name: String,
     pub language: Language,
-    pub trainer_gender: BinaryGender,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub trainer_name: SizedUtf16String<26>,
+    pub tid: u16,
+    pub sid: u16,
+    pub trainer_gender: Gender,
+    pub sectors: Vec<G3Sector>,
+    pub pc_data_contiguous: Vec<u8>,
+    pub current_pc_box: u8,
+    pub boxes: Vec<PCBox<Pk3>>,
+    pub first_sector_index: usize,
 }
 
-impl TrainerDataGen7Alola {
-    fn from_bytes(block_bytes: &[u8; TRAINER_DATA_SIZE]) -> Self {
-        Self {
-            trainer_id: read_u16_le!(block_bytes, 0),
-            secret_id: read_u16_le!(block_bytes, 2),
-            game_code: block_bytes[4],
-            language: Language::try_from(block_bytes[0x35]).unwrap_or(Language::None),
-            trainer_gender: BinaryGender::from(util::get_flag(block_bytes, 5, 0)),
-            trainer_name: SizedUtf16String::from_bytes(block_bytes[56..82].try_into().unwrap()),
+impl G3SaveBackup {
+    pub fn new(bytes: &[u8]) -> Result<Self, String> {
+        let save_index = u32::from_le_bytes(bytes[0xffc..0x1000].try_into().unwrap());
+
+        // 1. Extract and sort sectors
+        let mut sectors = Vec::with_capacity(14);
+        for i in 0..14 {
+            sectors.push(G3Sector::from_bytes(bytes, i));
+        }
+        let first_sector_index = sectors[0].section_id as usize;
+        sectors.sort_by_key(|s| s.section_id);
+
+        // 2. Determine game properties
+        let game_code = u32::from_le_bytes(sectors[0].data[0xac..0xb0].try_into().unwrap());
+        let signature = sectors[0].signature;
+
+        let mut security_key = 0;
+        let mut security_key_copy = None;
+        let origin;
+        let money;
+
+        match game_code {
+            0 => {
+                origin = OriginGame::Ruby;
+                let raw_money =
+                    u32::from_le_bytes(sectors[1].data[0x490..0x494].try_into().unwrap());
+                money = raw_money as i32;
+            }
+            1 => {
+                origin = OriginGame::FireRed;
+                security_key =
+                    u32::from_le_bytes(sectors[0].data[0x0af8..0x0afc].try_into().unwrap());
+                security_key_copy = Some(u32::from_le_bytes(
+                    sectors[0].data[0x0f20..0x0f24].try_into().unwrap(),
+                ));
+                let raw_money =
+                    u32::from_le_bytes(sectors[1].data[0x290..0x294].try_into().unwrap());
+                money = (raw_money ^ security_key) as i32;
+            }
+            _ => {
+                origin = OriginGame::Emerald;
+                security_key = u32::from_le_bytes(sectors[0].data[0xac..0xb0].try_into().unwrap());
+                security_key_copy = Some(u32::from_le_bytes(
+                    sectors[0].data[0x01f4..0x01f8].try_into().unwrap(),
+                ));
+                let raw_money =
+                    u32::from_le_bytes(sectors[1].data[0x490..0x494].try_into().unwrap());
+                money = (raw_money ^ security_key) as i32;
+            }
+        }
+
+        // Helper macro to check JPN layout logic (equivalent to JS `get isJapanese()`)
+        let is_japanese = sectors[0].data[0x6] == 0;
+        let charset = if is_japanese {
+            Gen3Encoding::Jpn
+        } else {
+            Gen3Encoding::Int
+        };
+
+        // 3. Decode Trainer Name
+        let name = Gen3Strings::decode_7_bytes(sectors[0].data[0..7].to_vec(), charset);
+
+        // 4. Concatenate contiguous PC box storage data
+        let mut pc_data_contiguous = vec![0u8; 33744];
+
+        for (i, sector) in sectors[5..].iter().enumerate() {
+            let chunk_size = if i + 5 == 13 { 2000 } else { 3968 };
+            let dest_offset = i * 3968;
+            pc_data_contiguous[dest_offset..dest_offset + chunk_size]
+                .copy_from_slice(&sector.data[0..chunk_size]);
+        }
+
+        let current_pc_box = pc_data_contiguous[0];
+
+        // 5. Initialize boxes and allocate space
+        let mut boxes = Vec::with_capacity(14);
+        for i in 0..14 {
+            let name_start = 0x8344 + i * 9;
+            let name_slice = &pc_data_contiguous[name_start..name_start + 10];
+            let box_name = Gen3Strings::decode_10_bytes(name_slice.to_vec(), charset);
+            boxes.push(PCBox::new(box_name, 30));
+        }
+
+        // 6. Populate Box Slots with PK3 logic
+        for i in 0..420 {
+            let box_idx = i / 30;
+            let slot_idx = i % 30;
+            let start = 4 + i * 80;
+            let buffer = &pc_data_contiguous[start..start + 80];
+
+            // Replaces try/catch with robust Rust error propagation
+            boxes[box_idx].box_slots[slot_idx] = Pk3::from_slot_bytes(buffer).map_err(|e| {
+                format!(
+                    "File has invalid Pokémon data at box {}/slot {}: {}",
+                    box_idx, slot_idx, e
+                )
+            })?;
+        }
+
+        let tid = u16::from_le_bytes(sectors[0].data[0x0a..0x0c].try_into().unwrap());
+        let sid = u16::from_le_bytes(sectors[0].data[0x0c..0x0e].try_into().unwrap());
+        let trainer_gender = if sectors[0].data[0x08] != 0 {
+            Gender::Female
+        } else {
+            Gender::Male
+        };
+
+        Ok(Self {
+            origin,
+            bytes: bytes.to_vec(),
+            save_index,
+            is_first_save: false,
+            game_code,
+            security_key,
+            security_key_copy,
+            signature,
+            money,
+            name,
+            language: Language::None,
+            tid,
+            sid,
+            trainer_gender,
+            sectors,
+            pc_data_contiguous,
+            current_pc_box,
+            boxes,
+            first_sector_index,
+        })
+    }
+
+    pub fn is_japanese(&self) -> bool {
+        self.sectors[0].data[0x6] == 0
+    }
+}
+
+pub struct BoxAndSlot {
+    pub box_idx: usize,
+    pub slot_idx: usize,
+}
+
+pub struct G3Sav {
+    pub bytes: Vec<u8>,
+    pub primary_save: G3SaveBackup,
+    pub backup_save: G3SaveBackup,
+    pub primary_save_offset: usize,
+    pub current_pc_box: u8,
+    pub money: i32,
+    pub name: String,
+    pub tid: u16,
+    pub sid: u16,
+    pub display_id: String,
+    pub boxes: Vec<PCBox<Pk3>>,
+    pub origin: OriginGame,
+    pub updated_box_slots: Vec<BoxAndSlot>,
+}
+
+impl G3Sav {
+    pub fn new(bytes: &[u8]) -> Result<Self, String> {
+        let save_one = G3SaveBackup::new(&bytes[0..0xe000])?;
+        let save_two = G3SaveBackup::new(&bytes[0xe000..0x1c000])?;
+
+        let (primary_save, backup_save, primary_save_offset) =
+            if save_one.save_index > save_two.save_index {
+                (save_one, save_two, 0)
+            } else {
+                (save_two, save_one, 0xe000)
+            };
+
+        let current_pc_box = primary_save.current_pc_box;
+        let money = primary_save.money;
+        let name = primary_save.name.clone();
+        let tid = primary_save.tid;
+        let sid = primary_save.sid;
+        let display_id = format!("{:05}", tid);
+        let boxes = primary_save.boxes.clone();
+
+        // Hacky version signature detection mirrored exactly into Rust iterators
+        let trainer_mon = boxes
+            .iter()
+            .flat_map(|b| &b.box_slots)
+            .flatten() // Drops out None values cleanly
+            .find(|mon| {
+                mon.trainer_id == tid
+                    && mon.secret_id == sid
+                    && mon.trainer_name.to_string() == name
+            });
+
+        let origin = match trainer_mon {
+            Some(mon) => mon.game_of_origin,
+            None => primary_save.origin, // Simplified backup fallback layout string match omittable if primary_save detects it
+        };
+
+        Ok(Self {
+            bytes: bytes.to_vec(),
+            primary_save,
+            backup_save,
+            primary_save_offset,
+            current_pc_box,
+            money,
+            name,
+            tid,
+            sid,
+            display_id,
+            boxes,
+            origin,
+            updated_box_slots: Vec::new(),
+        })
+    }
+
+    pub fn prepare_for_saving(&mut self) {
+        // 1. Process updated slots and rebuild continuous raw byte structure
+        for update in &self.updated_box_slots {
+            let mon_offset = 30 * update.box_idx + update.slot_idx;
+            let mut pc_bytes = vec![0u8; 80];
+
+            if let Some(mon) = &mut self.boxes[update.box_idx].box_slots[update.slot_idx] {
+                if mon.game_of_origin != OriginGame::Invalid0 {
+                    mon.refresh_checksum();
+                    pc_bytes.copy_from_slice(&mon.to_box_bytes());
+                }
+            }
+
+            let dest_start = 4 + mon_offset * 80;
+            self.primary_save.pc_data_contiguous[dest_start..dest_start + 80]
+                .copy_from_slice(&pc_bytes);
+        }
+
+        // 2. Slice and distribute contiguous data back into individual sector buffers
+        let mut primary_bytes = self.primary_save.bytes.clone();
+        let first_sector_idx = self.primary_save.first_sector_index;
+
+        for (i, sector) in self.primary_save.sectors[5..].iter_mut().enumerate() {
+            let chunk_size = if i + 5 == 13 { 2000 } else { 3968 };
+            let src_start = i * 3968;
+            let pc_data = &self.primary_save.pc_data_contiguous[src_start..src_start + chunk_size];
+
+            sector.data[0..chunk_size].copy_from_slice(pc_data);
+            sector.write_to_buffer(&mut primary_bytes, i + 5, first_sector_idx);
+        }
+
+        // 3. Write modified save track block back to global array
+        let offset = self.primary_save_offset;
+        self.bytes[offset..offset + 0xe000].copy_from_slice(&primary_bytes);
+        self.primary_save.bytes = primary_bytes;
+    }
+
+    pub fn get_mon_at(&self, box_num: usize, box_slot: usize) -> Option<&Pk3> {
+        self.boxes.get(box_num)?.box_slots.get(box_slot)?.as_ref()
+    }
+
+    pub fn set_mon_at(&mut self, box_num: usize, box_slot: usize, mon: Option<Pk3>) {
+        if let Some(target_box) = self.boxes.get_mut(box_num) {
+            if let Some(target_slot) = target_box.box_slots.get_mut(box_slot) {
+                *target_slot = mon;
+                self.updated_box_slots.push(BoxAndSlot {
+                    box_idx: box_num,
+                    slot_idx: box_slot,
+                });
+            }
         }
     }
-
-    // fn to_bytes(self) -> [u8; TRAINER_DATA_SIZE] {
-    //     let mut bytes = [0u8; TRAINER_DATA_SIZE];
-    //     bytes[0..2].copy_from_slice(&self.trainer_id.to_le_bytes());
-    //     bytes[2..4].copy_from_slice(&self.secret_id.to_le_bytes());
-    //     bytes[4] = self.game_code;
-    //     util::set_flag(&mut bytes, 5, 0, self.trainer_gender);
-    //     bytes[56..80].copy_from_slice(&self.trainer_name.bytes());
-    //     bytes
-    // }
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
-#[allow(clippy::missing_const_for_fn)]
-impl TrainerDataGen7Alola {
-    #[wasm_bindgen]
-    pub fn get_name_js(&self) -> String {
-        self.trainer_name.to_string()
+#[cfg(test)]
+impl crate::tests::PkhexSaveJson for G3Sav {
+    fn to_pkhex_save_json_value(&self) -> Result<serde_json::Value, serde_json::Error> {
+        use crate::tests::PkhexJson;
+
+        serde_json::to_value(serde_json::json!({
+            "trainer": {
+                "name": self.name,
+                "tid": self.tid,
+                "sid": self.sid,
+                "display_id": self.display_id,
+                "money": self.money,
+            },
+            "party": Vec::<serde_json::Value>::new(),
+            "boxes": self.boxes.iter().enumerate().map(|(b_idx, pc_box)| {
+                serde_json::json!({
+                    "box_index": b_idx,
+                    "pokemon": pc_box.box_slots.iter()
+                        .flatten()
+                        .map(|mon: &Pk3| {
+                            mon.to_pkhex_json_value()
+                                .unwrap_or(serde_json::Value::Null)
+                        })
+                        .collect::<Vec<serde_json::Value>>()
+                })
+            }).collect::<Vec<serde_json::Value>>()
+        }))
     }
 }
 
-#[cfg(feature = "wasm")]
 #[cfg(test)]
 mod tests {
     use std::path::Path;
 
-    use crate::checksum::Checksum;
-    use crate::gen7_alola::pk7_buffer::Pk7BufferRef;
-    use crate::result::Result;
-    use crate::tests::save_bytes_from_file;
-
-    use super::*;
-
     #[test]
-    fn test_sm_encryption() -> std::result::Result<(), Box<dyn std::error::Error>> {
-        use crate::checksum::{ChecksumAlgorithm, ChecksumU16Le};
+    fn test_firered_save_against_pkhex_json() {
+        // The helpers automatically look inside "test-files/save-files/" and "test-files/pkhex-json/"
+        let save_path = Path::new("gen3-hoenn").join("emerald.sav");
+        let json_path = Path::new("gen3-hoenn").join("emerald.json");
 
-        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
-        let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
-        assert_eq!(save.calc_checksum(), 0xb28d);
-
-        let after_serialized_bytes = save.prepare_bytes_for_saving();
-        let reserialized = Gen7AlolaSave::from_bytes(&after_serialized_bytes)?;
-        assert_eq!(reserialized.calc_checksum(), 0xb28d);
-
-        assert_eq!(
-            ChecksumU16Le::calc_over_bytes(&after_serialized_bytes),
-            0x3065
-        );
-        Ok(())
-    }
-
-    #[test]
-    fn sm_save_calculate_checksum() -> Result<()> {
-        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
-        let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
-
-        assert_eq!(save.calc_checksum(), 0xb28d);
-        Ok(())
-    }
-
-    #[test]
-    fn usum_save_calculate_checksum() -> Result<()> {
-        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("ultrasun"))?;
-        let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
-
-        assert_eq!(save.calc_checksum(), 0x4d97);
-        Ok(())
-    }
-
-    #[test]
-    fn pkm_checksum_calculation_is_correct() -> Result<()> {
-        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
-        let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
-
-        for box_num in 0..Gen7AlolaSave::box_count() {
-            for slot in 0..Gen7AlolaSave::box_slots() {
-                let mon_bytes = save.get_mon_bytes_decrypted(box_num, slot);
-                let buffer = Pk7BufferRef::box_span(&mon_bytes);
-                if buffer.checksum() != buffer.calculate_checksum() {
-                    return Err(Error::other(&format!(
-                        "Invalid checksum for mon at box {box_num}, slot {slot}: expected {:#06x}, got {:#06x}",
-                        buffer.calculate_checksum(),
-                        buffer.checksum()
-                    )));
-                }
-            }
+        if let Err(e) = crate::tests::compare_pkhex_save_json(&save_path, &json_path) {
+            panic!("Save validation failed!\n{:?}", e);
         }
-        Ok(())
     }
 }
