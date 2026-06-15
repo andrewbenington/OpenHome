@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "OpenHome"
-version = "1.11.2"
+version = "1.11.4"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -2972,7 +2972,7 @@ checksum = "7edddbd0b52d732b21ad9a5fab5c704c14cd949e5e9a1ec5929a24fded1b904c"
 
 [[package]]
 name = "pkm_rs"
-version = "1.11.2"
+version = "1.11.4"
 dependencies = [
  "aes",
  "arbitrary-int",
@@ -2995,7 +2995,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_derive"
-version = "1.11.2"
+version = "1.11.4"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3004,7 +3004,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_resources"
-version = "1.11.2"
+version = "1.11.4"
 dependencies = [
  "arbitrary-int",
  "getrandom 0.4.2",
@@ -3023,7 +3023,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_types"
-version = "1.11.2"
+version = "1.11.4"
 dependencies = [
  "arbitrary-int",
  "getrandom 0.4.2",
@@ -4417,9 +4417,9 @@ checksum = "61c41af27dd6d1e27b1b16b489db798443478cef1f06a660c96db617ba5de3b1"
 
 [[package]]
 name = "tauri"
-version = "2.11.1"
+version = "2.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b93bd86d231f0a8138f11a02a584769fe4b703dc36ae133d783228dbc4801405"
+checksum = "437404997acf375d85f1177afa7e11bb971f274ed6a7b83a2a3e339015f4cc28"
 dependencies = [
  "anyhow",
  "bytes",
@@ -5252,9 +5252,9 @@ checksum = "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be"
 
 [[package]]
 name = "uuid"
-version = "1.23.2"
+version = "1.23.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d258b83ceec21034727ecee8c382cfa6c3e133699b0742c64571814fb420c9f7"
+checksum = "144d6b123cef80b301b8f72a9e2ca4370ddec21950d0a103dd22c437006d2db7"
 dependencies = [
  "getrandom 0.4.2",
  "js-sys",
