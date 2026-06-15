@@ -13,7 +13,6 @@ import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Option } from '@openhome-core/util/functional'
 import { ConvertStrategy, ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { utf16BytesToString } from '@pokemon-files/index'
-import { PK9 } from '@pokemon-files/pkm'
 import { Item } from '@pokemon-resources/consts/Items'
 import {
   SV_TRANSFER_RESTRICTIONS_BASE,
@@ -21,6 +20,7 @@ import {
   SV_TRANSFER_RESTRICTIONS_TM,
 } from '@pokemon-resources/consts/TransferRestrictions'
 import { G89BlockName } from 'src/core/save/Gen89/Gen8Gen9Save'
+import PK9Compass from './PK9Compass'
 
 const SAVE_SIZE_BYTES_MIN = 0x31626f
 // const SAVE_SIZE_BYTES_MAX_SV = 0x43c000
@@ -28,9 +28,9 @@ const SAVE_SIZE_BYTES_MAX_COMPASS = 0x43d000
 
 export type SV_SAVE_REVISION = 'Base Game' | 'Teal Mask' | 'Indigo Disk'
 
-export class CompassSave extends PluginSAV<PK9> {
-  static boxSizeBytes = PK9.getBoxSize() * 30
-  static pkmType = PK9
+export class CompassSave extends PluginSAV<PK9Compass> {
+  static boxSizeBytes = PK9Compass.getBoxSize() * 30
+  static pkmType = PK9Compass
   static saveTypeAbbreviation = 'Compass'
   static saveTypeName = 'Pokémon Compass'
   static saveTypeID = 'CMPSAV'
@@ -56,9 +56,9 @@ export class CompassSave extends PluginSAV<PK9> {
   sid: number = 0
   displayID: string = ''
 
-  currentPCBox: number = 0 // TODO: Gen 8 current box
+  currentPCBox: number = 0 // TODO: Gen 9 current box
 
-  boxes: Array<Box<PK9>>
+  boxes: Array<Box<PK9Compass>>
 
   bytes: Uint8Array
 
@@ -120,16 +120,16 @@ export class CompassSave extends PluginSAV<PK9> {
     this.origin = this.trainerBlock.getGame()
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK9 {
-    return PK9.fromOhpkm(ohpkm, strategy)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK9Compass {
+    return PK9Compass.fromOhpkm(ohpkm, strategy)
   }
 
   getBoxCount(): number {
     return 32
   }
 
-  monConstructor(bytes: ArrayBuffer, encrypted?: boolean): PK9 {
-    return new PK9(bytes, { encrypted })
+  monConstructor(bytes: ArrayBuffer, encrypted?: boolean): PK9Compass {
+    return new PK9Compass(bytes, { encrypted })
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {
@@ -158,7 +158,7 @@ export class CompassSave extends PluginSAV<PK9> {
   }
 
   getMonBoxSizeBytes(): number {
-    return PK9.getBoxSize()
+    return PK9Compass.getBoxSize()
   }
 
   getBoxSizeBytes(): number {
@@ -273,7 +273,7 @@ export class CompassSave extends PluginSAV<PK9> {
     return box.boxSlots[boxSlot]
   }
 
-  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK9>): void {
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK9Compass>): void {
     const box = this.boxes[boxNum]
     if (!box) return
     box.boxSlots[boxSlot] = mon

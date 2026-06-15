@@ -10,6 +10,7 @@ import {
   MarkingsSixShapesColors,
   MetadataSummaryLookup,
   NatureIndex,
+  PkmFormat,
   SpeciesLookup,
   TrainerMemory,
 } from '@pkm-rs/pkg'
@@ -28,10 +29,10 @@ import { MoveFilter } from '../util/util'
 import { PkmConstructorOptions } from './PKM'
 
 export default class PK9 {
-  static getFormat() {
-    return 'PK9' as const
+  static getFormat(): PkmFormat {
+    return 'PK9'
   }
-  format: 'PK9' = 'PK9'
+  format: PkmFormat = 'PK9'
   static getBoxSize() {
     return 344
   }

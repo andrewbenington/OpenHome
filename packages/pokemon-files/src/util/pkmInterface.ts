@@ -10,18 +10,18 @@ import {
   HyperTraining,
   Language,
   NatureIndex,
-  PkmFormat,
   ShinyLeaves,
   StatsPreSplit,
   TrainerMemory,
 } from '@pkm-rs/pkg'
+import { PkmOrOhpkmFormat } from 'src/core/pkm/util'
 import * as types from './types'
 import { Markings } from './types'
 
 export type FourMoves = [number, number, number, number]
 
 export interface AllPKMFields {
-  format: PkmFormat | 'OHPKM'
+  format: PkmOrOhpkmFormat
   ability?: AbilityIndex
   abilityNum?: number
   affixedRibbon?: number | undefined

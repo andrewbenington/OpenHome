@@ -12,6 +12,7 @@ import {
   MetadataSummaryLookup,
   NatureIndex,
   OriginGames,
+  PkmFormat,
   PokeDate,
   ShinyLeaves,
   SpeciesAndForm,
@@ -322,7 +323,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.tmFlagsSV = other.tmFlagsSV
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
 
-      if (other.originalBytes) {
+      if (other.originalBytes && other.format !== 'OHPKM') {
         const tag = monFormatToOriginalDataTag(other.format)
         if (tag) {
           try {
@@ -653,6 +654,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     }
 
     if (
+      other.format !== 'OHPKM' && // for type checking
       FORMATS_ALLOWING_ABILITY_CHANGE.includes(other.format) &&
       other.ability &&
       !FORMATS_WITHOUT_ABILITIES.includes(other.format)
@@ -941,7 +943,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 }
 
-export function monFormatToOriginalDataTag(format: string): Option<Tag> {
+export function monFormatToOriginalDataTag(format: PkmFormat): Option<Tag> {
   switch (format) {
     case 'PK1':
       return Tag.Pk1
@@ -975,10 +977,19 @@ export function monFormatToOriginalDataTag(format: string): Option<Tag> {
       return Tag.Pk3Ub
     case 'PB8LUMI':
       return Tag.Pb8Lumi
+    case 'PK9Compass':
+      return Tag.Pk9Compass
+    case 'COLOPKM':
+    case 'XDPKM':
+      return undefined
+    default:
+      // use type system to enforce exhaustiveness
+      const _exhaustiveCheck: never = format
+      throw Error(`unrecognized format: ${format}`)
   }
 }
 
-export function originalDataTagToMonFormat(tag: Tag): string {
+export function originalDataTagToMonFormat(tag: Tag): PkmFormat {
   switch (tag) {
     case Tag.Pk1:
       return 'PK1'
@@ -1012,12 +1023,20 @@ export function originalDataTagToMonFormat(tag: Tag): string {
       return 'PK3RR'
     case Tag.Pk3Ub:
       return 'PK3UB'
+    case Tag.Pk3Ub:
+      return 'PK3UB'
+    case Tag.Pk9Compass:
+      return 'PK9Compass'
+    default:
+      // use type system to enforce exhaustiveness
+      const _exhaustiveCheck: never = tag
+      throw Error(`unrecognized tag: ${tag}`)
   }
 }
 
-const FORMATS_WITHOUT_ABILITIES = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
+const FORMATS_WITHOUT_ABILITIES: PkmFormat[] = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
 
-const FORMATS_ALLOWING_ABILITY_CHANGE = [
+const FORMATS_ALLOWING_ABILITY_CHANGE: PkmFormat[] = [
   'PK3RR',
   'PK3UB',
   'PK6',
@@ -1028,9 +1047,10 @@ const FORMATS_ALLOWING_ABILITY_CHANGE = [
   'PK9',
   'PA9',
   'PB8LUMI',
+  'PK9Compass',
 ]
 
-const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
+const FORMATS_WITHOUT_HIDDEN_ABILITIES: PkmFormat[] = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
 
 function isPrevoOrCurrentSpeciesName(
   dexNum: number,

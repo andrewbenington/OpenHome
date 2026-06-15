@@ -1,14 +1,14 @@
-import { MonFormat } from '@openhome-core/pkm/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { ExtraFormIndex } from '@pkm-rs/pkg'
 import { Reducer, createContext } from 'react'
+import { PkmOrOhpkmFormat } from 'src/core/pkm/util'
 import { ImageResponse } from 'src/ui/backend/backendInterface'
 import { PluginState } from './PluginProvider'
 
 export interface MonSpriteData {
   dexNum: number
   formNum: number
-  format: MonFormat | 'OHPKM'
+  format: PkmOrOhpkmFormat
   formArgument?: number
   heldItemIndex?: number
   isFemale?: boolean
