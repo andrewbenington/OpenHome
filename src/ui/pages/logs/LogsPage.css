@@ -19,7 +19,7 @@
 
   display: flex;
   flex-direction: column;
-  min-width: 60rem;
+  min-width: 40rem;
 }
 
 .logs-container {
@@ -193,4 +193,10 @@
 .filter-button-untoggled {
   color: white;
   box-shadow: inset 0 0 0 1px white;
+}
+
+@media only screen and (max-width: 62rem) {
+  .hide-small-width {
+    display: none;
+  }
 }

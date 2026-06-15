@@ -20,7 +20,7 @@ export type LogFilter = {
   ohpkm_id?: OhpkmIdentifier
 }
 
-export function useTodayLogs() {
+export function useTodayLogs(openhomeIdFilter?: OhpkmIdentifier) {
   const backend = useContext(BackendContext)
   const [logs, setLogs] = useState<LogEntry[]>()
   const { levels, setLevels, filterText, setFilterText } = useFilter(logs ?? [])
@@ -33,10 +33,10 @@ export function useTodayLogs() {
     const yesterday = today.add(-1, 'day')
     setLoading(true)
     backend
-      .getLogs({ start: yesterday, end: today })
+      .getLogs({ start: yesterday, end: today, ohpkm_id: openhomeIdFilter })
       .then(R.match(setLogs, setError))
       .finally(() => setLoading(false))
-  }, [backend])
+  }, [backend, openhomeIdFilter])
 
   const clearLogs = useCallback(() => {
     const today = dayjs()

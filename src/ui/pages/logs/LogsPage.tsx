@@ -19,7 +19,12 @@ import useSimpleVirtualizer from 'src/ui/hooks/useSimpleVirtualizer'
 import { LOG_LEVELS, useTodayLogs } from '.'
 import './LogsPage.css'
 
-export default function LogsPage() {
+export type LogsPageProps = {
+  openhomeIdFilter?: OhpkmIdentifier
+}
+
+export default function LogsPage(props: LogsPageProps) {
+  const { openhomeIdFilter } = props
   const {
     loading,
     error,
@@ -30,7 +35,7 @@ export default function LogsPage() {
     levels,
     setLevels,
     clearLogs,
-  } = useTodayLogs()
+  } = useTodayLogs(openhomeIdFilter)
   const [selectedMon, setSelectedMon] = useState<OHPKM>()
   const ohpkmStore = useOhpkmStore()
   const [filtersOpen, setFiltersOpen] = useState(false)
@@ -67,7 +72,7 @@ export default function LogsPage() {
           <h1 className="pokedex-header-title">OpenHome Logs</h1>
           <button onClick={clearLogs}>Clear Logs</button>
           <div style={{ flex: 1 }} />
-          <Text>
+          <Text className="hide-small-width">
             <b>Log count:</b> {logs.length}
           </Text>
           <Popover.Root open={filtersOpen} onOpenChange={(v) => setFiltersOpen(v)}>
@@ -117,6 +122,7 @@ export default function LogsPage() {
                 <LogLine
                   key={virtualRow.index}
                   log={log}
+                  ohpkmButton={!openhomeIdFilter}
                   onOhpkmClick={(identifier) => setSelectedMon(ohpkmStore.getById(identifier))}
                   onDetailsClick={() => setDisplayedLog(log)}
                   style={{
@@ -144,13 +150,14 @@ export default function LogsPage() {
 
 type LogLineProps = {
   log: LogEntry
-  onOhpkmClick: (openhomeId: OhpkmIdentifier) => void
+  ohpkmButton: boolean
+  onOhpkmClick?: (openhomeId: OhpkmIdentifier) => void
   onDetailsClick: () => void
   style?: CSSProperties
 }
 
 function LogLine(props: LogLineProps) {
-  const { log, style, onOhpkmClick, onDetailsClick } = props
+  const { log, style, onOhpkmClick, ohpkmButton, onDetailsClick } = props
   const { ohpkm_id, timestamp, level, message, event } = log
   const mon = useOhpkmStore().getById(ohpkm_id ?? '')
 
@@ -167,7 +174,7 @@ function LogLine(props: LogLineProps) {
       >
         {message}
       </span>
-      {ohpkm_id && mon && (
+      {ohpkm_id && ohpkmButton && onOhpkmClick && mon && (
         <button className="log-ohpkm-button" onClick={() => onOhpkmClick(ohpkm_id)}>
           <PokemonIcon dexNumber={mon.dexNum} formeNumber={mon.formNum} />
         </button>
