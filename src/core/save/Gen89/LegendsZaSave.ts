@@ -11,7 +11,7 @@ import { OHPKM } from '../../pkm/OHPKM'
 import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { emptyPathData, PathData } from '../util/path'
-import { G89BlockName, G89SAV } from './G89SAV'
+import { G89BlockName, Gen8Gen9Save } from './Gen8Gen9Save'
 
 export type ZA_SAVE_REVISION = 'Base Game' | 'Mega Dimension'
 
@@ -21,7 +21,7 @@ const SAVE_SIZE_1_0_2 = 0x2f3289
 const SAVE_SIZE_2_0_0 = 0x309fa6
 const SAVE_SIZE_2_0_1 = 0x309fb3
 
-export class ZASAV extends G89SAV<PA9> {
+export class LegendsZaSave extends Gen8Gen9Save<PA9> {
   static boxSizeBytes = (PA9.getBoxSize() + BOX_SLOT_GAP_BYTES) * 30
   static pkmType = PA9
   static saveTypeAbbreviation = 'SV'
@@ -92,7 +92,7 @@ export class ZASAV extends G89SAV<PA9> {
   }
 
   getBoxSizeBytes(): number {
-    return ZASAV.boxSizeBytes
+    return LegendsZaSave.boxSizeBytes
   }
 
   getBoxSlotGapBytes(): number {
@@ -146,7 +146,7 @@ export class ZASAV extends G89SAV<PA9> {
         return false
       }
 
-      const maybeSave = new ZASAV(emptyPathData, bytes)
+      const maybeSave = new LegendsZaSave(emptyPathData, bytes)
       return maybeSave.getBlock('InfiniteRoyale') !== undefined
     } catch {
       return false

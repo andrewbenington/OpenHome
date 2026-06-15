@@ -13,7 +13,7 @@ import { Box, BoxAndSlot, OfficialSAV } from '../interfaces'
 import { PathData } from '../util/path'
 import { BoxNamesBlock } from './BoxNamesBlock'
 
-export abstract class G89SAV<P extends PK8 | PB8 | PA8 | PK9 | PA9> extends OfficialSAV<P> {
+export abstract class Gen8Gen9Save<P extends PK8 | PB8 | PA8 | PK9 | PA9> extends OfficialSAV<P> {
   isPlugin: false = false
   abstract origin: OriginGame
 

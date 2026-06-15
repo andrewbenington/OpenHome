@@ -8,7 +8,7 @@ import { SCArrayBlock, SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { PathData } from '../util/path'
 import { BoxNamesBlock } from './BoxNamesBlock'
-import { G89BlockName, G89SAV } from './G89SAV'
+import { G89BlockName, Gen8Gen9Save } from './Gen8Gen9Save'
 
 export type LA_SAVE_REVISION = 'Base' | 'Daybreak'
 
@@ -16,7 +16,7 @@ const LA_PASTURE_COUNT = 32
 const SAVE_SIZE_MIN = 0x136c00
 const SAVE_SIZE_MAX = 0x13ae00
 
-export class LASAV extends G89SAV<PA8> {
+export class LegendsArceusSave extends Gen8Gen9Save<PA8> {
   static boxSizeBytes = PA8.getBoxSize() * 30
   static pkmType = PA8
   static saveTypeAbbreviation = 'LA'
@@ -90,7 +90,7 @@ export class LASAV extends G89SAV<PA8> {
   }
 
   getBoxSizeBytes(): number {
-    return LASAV.boxSizeBytes
+    return LegendsArceusSave.boxSizeBytes
   }
 
   getBoxSlotGapBytes(): number {

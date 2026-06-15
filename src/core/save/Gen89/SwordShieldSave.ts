@@ -23,14 +23,14 @@ import { OHPKM } from '../../pkm/OHPKM'
 import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { PathData } from '../util/path'
-import { G89BlockName, G89SAV } from './G89SAV'
+import { G89BlockName, Gen8Gen9Save } from './Gen8Gen9Save'
 
 const SAVE_SIZE_BYTES_MIN = 0x171500
 const SAVE_SIZE_BYTES_MAX = 0x187800
 
 export type SWSH_SAVE_REVISION = 'Base Game' | 'Isle Of Armor' | 'Crown Tundra'
 
-export class SwShSAV extends G89SAV<PK8> {
+export class SwordShieldSave extends Gen8Gen9Save<PK8> {
   static boxSizeBytes = PK8.getBoxSize() * 30
   static pkmType = PK8
   static saveTypeAbbreviation = 'SwSh'
@@ -104,7 +104,7 @@ export class SwShSAV extends G89SAV<PK8> {
   }
 
   getBoxSizeBytes(): number {
-    return SwShSAV.boxSizeBytes
+    return SwordShieldSave.boxSizeBytes
   }
 
   getBoxSlotGapBytes(): number {

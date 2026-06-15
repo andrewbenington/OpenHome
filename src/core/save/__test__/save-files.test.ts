@@ -13,8 +13,8 @@ import { G1SAV } from '../G1SAV'
 import { G2SAV } from '../G2SAV'
 import { G3SAV } from '../G3SAV'
 import { Gen7AlolaSave } from '../Gen7AlolaSave'
-import { LASAV } from '../Gen89/LASAV'
-import { SwShSAV } from '../Gen89/SwShSAV'
+import { LegendsArceusSave } from '../Gen89/LegendsArceus'
+import { SwordShieldSave } from '../Gen89/SwordShieldSave'
 import { HGSSSAV } from '../HGSSSAV'
 import { ORASSAV } from '../ORASSAV'
 import { PtSAV } from '../PtSAV'
@@ -60,8 +60,8 @@ const allSaveTypes = [
   XYSAV,
   ORASSAV,
   Gen7AlolaSave,
-  SwShSAV,
-  LASAV,
+  SwordShieldSave,
+  LegendsArceusSave,
 ]
 
 describe('Save file detection - single possibility', () => {

@@ -1,25 +1,25 @@
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { SCBlock, SCObjectBlock } from '@openhome-core/save/encryption/SwishCrypto/SCBlock'
+import { SwishCrypto } from '@openhome-core/save/encryption/SwishCrypto/SwishCrypto'
+import { emptyPathData, PathData } from '@openhome-core/save/util/path'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { ConvertStrategy, ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
+import { utf16BytesToString } from '@pokemon-files/index'
 import { PK9 } from '@pokemon-files/pkm'
-import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import {
   SV_TRANSFER_RESTRICTIONS_BASE,
   SV_TRANSFER_RESTRICTIONS_ID,
   SV_TRANSFER_RESTRICTIONS_TM,
 } from '@pokemon-resources/consts/TransferRestrictions'
-import { OHPKM } from '../../pkm/OHPKM'
-import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
-import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
-import { PathData } from '../util/path'
-import { G89BlockName, G89SAV } from './G89SAV'
+import { G89BlockName, Gen8Gen9Save } from 'src/core/save/Gen89/Gen8Gen9Save'
 
 const SAVE_SIZE_BYTES_MIN = 0x31626f
 const SAVE_SIZE_BYTES_MAX = 0x43c000
 
 export type SV_SAVE_REVISION = 'Base Game' | 'Teal Mask' | 'Indigo Disk'
 
-export class SVSAV extends G89SAV<PK9> {
+export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
   static boxSizeBytes = PK9.getBoxSize() * 30
   static pkmType = PK9
   static saveTypeAbbreviation = 'SV'
@@ -90,7 +90,7 @@ export class SVSAV extends G89SAV<PK9> {
   }
 
   getBoxSizeBytes(): number {
-    return SVSAV.boxSizeBytes
+    return ScarletVioletSave.boxSizeBytes
   }
 
   getBoxSlotGapBytes(): number {
@@ -129,13 +129,14 @@ export class SVSAV extends G89SAV<PK9> {
         : 'Base Game'
   }
 
-  getDisplayData() {
+  getDisplayData(): Record<string, string | number | undefined> {
     const trainerBlock = this.trainerBlock
 
     return {
       'Player Character': trainerBlock.getGender() ? 'Juliana' : 'Florian',
       'Save Version': this.getSaveRevision(),
       Language: Languages.stringFromByte(trainerBlock.getLanguage()),
+      'Is Compass': String(this.getBlock('Compass_Levelcap') !== undefined),
     }
   }
 
@@ -143,7 +144,9 @@ export class SVSAV extends G89SAV<PK9> {
     if (bytes.length < SAVE_SIZE_BYTES_MIN || bytes.length > SAVE_SIZE_BYTES_MAX) {
       return false
     }
-    return SwishCrypto.getIsHashValid(bytes)
+    if (!SwishCrypto.getIsHashValid(bytes)) return false
+    // ensure this isn't Pokémon Compass
+    return new ScarletVioletSave(emptyPathData, bytes).getBlock('Compass_Levelcap') === undefined
   }
 
   static includesOrigin(origin: OriginGame) {
@@ -176,6 +179,8 @@ const BlockKeys = {
 
   TeraRaidDLC: 0x100b93da,
   BlueberryPoints: 0x66a33824,
+
+  Compass_Levelcap: 0xcc806ed6,
 }
 
 class MyStatus {

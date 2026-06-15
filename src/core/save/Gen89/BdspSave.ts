@@ -30,7 +30,7 @@ const BDSP_1_3_VERSION_IDENTIFIER = 0x34
 
 export type BDSP_SAVE_REVISION = '1.0' | '1.1' | '1.2' | '1.3'
 
-export class BDSPSAV extends OfficialSAV<PB8> {
+export class BdspSave extends OfficialSAV<PB8> {
   static boxSizeBytes = PB8.getBoxSize() * 30
   static pkmType = PB8
   static saveTypeAbbreviation = 'BDSP'
@@ -142,7 +142,7 @@ export class BDSPSAV extends OfficialSAV<PB8> {
   }
 
   getBoxSizeBytes(): number {
-    return BDSPSAV.boxSizeBytes
+    return BdspSave.boxSizeBytes
   }
 
   prepareForSaving() {
