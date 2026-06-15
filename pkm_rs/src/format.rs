@@ -8,11 +8,15 @@ use pkm_rs_types::{Generation, OriginGame};
 #[cfg(feature = "wasm")]
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "wasm")]
+use strum::EnumIter;
+#[cfg(feature = "wasm")]
+use strum::IntoEnumIterator;
+#[cfg(feature = "wasm")]
 use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-#[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
+#[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize, EnumIter))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PkmFormat {
@@ -37,6 +41,7 @@ pub enum PkmFormat {
     PK3RR,
     PK3UB,
     PB8LUMI,
+    PK9Compass,
 }
 
 impl PkmFormat {
@@ -65,6 +70,7 @@ impl PkmFormat {
             Self::PA9 => OriginGame::LegendsZa,
             Self::PK3RR | Self::PK3UB => OriginGame::FireRed,
             Self::PB8LUMI => OriginGame::BrilliantDiamond,
+            Self::PK9Compass => OriginGame::Scarlet,
         }
     }
 
@@ -84,7 +90,8 @@ impl PkmFormat {
             Self::PB8 => origin.is_bdsp(),
             Self::PK9 => origin.is_scarlet_violet(),
             Self::PA9 => origin == OriginGame::LegendsZa,
-            Self::PK3RR | Self::PK3UB | Self::PB8LUMI => false,
+
+            Self::PK3RR | Self::PK3UB | Self::PB8LUMI | Self::PK9Compass => false,
         }
     }
 
@@ -99,8 +106,10 @@ impl PkmFormat {
             Self::PK7 | Self::PB7 => Generation::G7,
             Self::PK8 | Self::PA8 | Self::PB8 => Generation::G8,
             Self::PK9 | Self::PA9 => Generation::G9,
+
             Self::PK3RR | Self::PK3UB => Generation::G3,
             Self::PB8LUMI => Generation::G8,
+            Self::PK9Compass => Generation::G9,
         }
     }
 
@@ -112,6 +121,7 @@ impl PkmFormat {
             | Self::PB8
             | Self::PB8LUMI
             | Self::PK9
+            | Self::PK9Compass
             | Self::PA9 => true,
             Self::PK1
             | Self::PK2
@@ -153,7 +163,7 @@ impl PkmFormat {
             | Self::PA9 => LinkTradeIndex::Pkm3dsSwitch as u16,
 
             Self::PK3RR | Self::PK3UB => LinkTradeIndex::PkmGen3 as u16,
-            Self::PB8LUMI => LinkTradeIndex::Pkm3dsSwitch as u16,
+            Self::PB8LUMI | Self::PK9Compass => LinkTradeIndex::Pkm3dsSwitch as u16,
         }
     }
 
@@ -179,6 +189,7 @@ impl PkmFormat {
             Self::PK3RR => origin.generation() == Generation::G3,
             Self::PK3UB => origin.generation() == Generation::G3,
             Self::PB8LUMI => origin <= OriginGame::LegendsArceus,
+            Self::PK9Compass => origin <= OriginGame::Violet,
         }
     }
 
@@ -282,6 +293,7 @@ impl PkmFormat {
             Self::PK3RR => FireRed,
             Self::PK3UB => FireRed,
             Self::PB8LUMI => ShiningPearl,
+            Self::PK9Compass => Scarlet,
         }
     }
 
@@ -797,7 +809,7 @@ impl PkmFormat {
                 Location::SecretBase => Some(627),
                 _ => None,
             },
-            Self::PK9 => match location {
+            Self::PK9 | Self::PK9Compass => match location {
                 Location::LinkTrade => Some(30001),
                 Location::KantoGen3 => Some(30003),
                 Location::JohtoGen4 => Some(30004),
@@ -904,7 +916,7 @@ impl PkmFormat {
 
                 MetData::new(legalized_origin, location_index)
             }
-            PkmFormat::PK3RR | PkmFormat::PK3UB | PkmFormat::PB8LUMI => {
+            PkmFormat::PK3RR | PkmFormat::PK3UB | PkmFormat::PB8LUMI | PkmFormat::PK9Compass => {
                 let legalized_origin = self.legalize_origin(source_origin);
                 let location_index = self.legalize_met_location(
                     source_origin,
@@ -934,8 +946,9 @@ impl PkmFormat {
             Self::PK9 => MetadataSource::ScarletViolet,
             Self::PA9 => MetadataSource::LegendsZa,
 
-            Self::PB8LUMI => MetadataSource::BrilliantDiamondShiningPearl,
             Self::PK3RR | Self::PK3UB => MetadataSource::FireRedLeafGreen,
+            Self::PB8LUMI => MetadataSource::BrilliantDiamondShiningPearl,
+            Self::PK9Compass => MetadataSource::ScarletViolet,
         }
     }
 }
@@ -957,5 +970,10 @@ impl PkmFormats {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getMetadataSource"))]
     pub fn metadata_source_wasm(value: PkmFormat) -> MetadataSource {
         value.metadata_source()
+    }
+
+    #[cfg_attr(feature = "wasm", wasm_bindgen)]
+    pub fn all() -> Vec<PkmFormat> {
+        PkmFormat::iter().collect()
     }
 }

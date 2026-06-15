@@ -8,6 +8,8 @@ import {
   metadataReaderFor,
   MetadataSource,
   MetadataSummaryLookup,
+  PkmFormat,
+  PkmFormats,
   PkmType,
   SpeciesAndForm,
   StatsPreSplit,
@@ -203,6 +205,7 @@ function MetadataSourceByFormat(format: MonFormat): MetadataSource {
     case 'PK9':
     case 'PK3RR':
     case 'PK3UB':
+    case 'PK9Compass':
       return MetadataSource.ScarletViolet
     case 'PA9':
       return MetadataSource.LegendsZa
@@ -431,3 +434,9 @@ export function displayIndexAdder(itemIndex?: number) {
   }
   return (x: number) => x + 1
 }
+
+export function isPkmFormat(value: string): value is PkmFormat {
+  return PkmFormats.all().includes(value as unknown as PkmFormat)
+}
+
+export type PkmOrOhpkmFormat = PkmFormat | 'OHPKM'

@@ -3,7 +3,12 @@ import { PB8 } from '@pokemon-files/pkm'
 import { PluginIdentifier } from '../interfaces'
 
 import { Option } from '@openhome-core/util/functional'
-import { ConvertStrategy, ExtraFormIndex, luminescentSupportsExtraForm } from '@pkm-rs/pkg'
+import {
+  ConvertStrategy,
+  ExtraFormIndex,
+  luminescentSupportsExtraForm,
+  OriginGames,
+} from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from '../../../../packages/pokemon-files/src/pkm/PKM'
 import { OHPKM } from '../../pkm/OHPKM'
 import { getLumiCustomForm as getLumiExtraFormIndex } from './conversion/LuminescentPlatinumFormMap'
@@ -28,7 +33,9 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
   public format: 'PB8LUMI' = 'PB8LUMI'
   public pluginOrigin?: PluginIdentifier
   public pluginIdentifier: PluginIdentifier = 'luminescent_platinum'
-  public selectColor = '#25c2a0'
+  public get selectColor() {
+    return OriginGames.pluginColor('luminescent_platinum')
+  }
 
   public lumiFormIndex: number
 

@@ -10,6 +10,7 @@ import { ArrowLeftIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
+import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
 import { isRomHackFormat } from '@pokemon-files/pkm/PKM'
 import { FileSchemas } from '@pokemon-files/schema'
 import { Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
@@ -115,7 +116,7 @@ const PokemonDetailsModal = (props: {
     }
   }
 
-  function switchFormat(newFormat: string) {
+  function switchFormat(newFormat: PkmFormat | 'OHPKM') {
     if (!mon) return
     if (mon.format === newFormat) {
       setDisplayMon(mon)

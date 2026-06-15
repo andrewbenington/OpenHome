@@ -3,6 +3,7 @@ import { NationalDex, NationalDexMax } from '@pokemon-resources/consts/NationalD
 import { PKM } from '@pokemon-files/pkm/PKM'
 
 import { MetadataSummaryLookup, SpeciesLookup, Stat, Stats as StatsWasm } from '@pkm-rs/pkg'
+import { PK1, PK2 } from '@pokemon-files/pkm'
 import {
   AllPKMs,
   PKMWithDVs,
@@ -23,7 +24,7 @@ export interface PKMWithStandardStatCalc
 export interface PKMWithGameBoyStats extends AllPKMs, PKMWithDVs, PKMWithGameBoyEVs {}
 
 export function getStats(mon: PKM): Stats {
-  if (mon.format === 'PK1' || mon.format === 'PK2') {
+  if (mon instanceof PK1 || mon instanceof PK2) {
     return getGameBoyPKMStats(mon)
   }
 

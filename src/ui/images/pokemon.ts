@@ -1,4 +1,9 @@
-import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
+import {
+  displayIndexAdder,
+  isBattleFormeItem,
+  isMegaStone,
+  PkmOrOhpkmFormat,
+} from '@openhome-core/pkm/util'
 import { toGen3RRPokemonIndex } from '@openhome-core/save/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from '@openhome-core/save/radicalred/conversion/RadicalRedSprites'
 import { UBSprites } from '@openhome-core/save/unbound/conversion/UnboundSprites'
@@ -15,7 +20,7 @@ import { isRomHackFormat, MonFormat } from '../../core/pkm/interfaces'
 import { getLumiFormIndexByExtraFormIndex } from '../../core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import { toGen3UBPokemonIndex } from '../../core/save/unbound/conversion/Gen3UBPokemonIndex'
 
-export const fileToSpriteFolder: Record<MonFormat | 'OHPKM', string> = {
+export const fileToSpriteFolder: Record<PkmOrOhpkmFormat, string> = {
   PK1: 'gen1',
   PK2: 'gen2',
   PK3: 'gen3',
@@ -33,6 +38,7 @@ export const fileToSpriteFolder: Record<MonFormat | 'OHPKM', string> = {
   PB8: 'home',
   PB8LUMI: 'home',
   PK9: 'gen9',
+  PK9Compass: 'gen9',
   PA9: 'home',
   OHPKM: 'home',
 }

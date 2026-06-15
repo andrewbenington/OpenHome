@@ -1,3 +1,4 @@
+use crate::format::PkmFormat;
 use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
@@ -45,6 +46,7 @@ pub enum Tag {
     Pk3Rr = 0xfffe,
     Pk3Ub = 0xfffd,
     Pb8Lumi = 0xfffc,
+    Pk9Compass = 0xfffb,
 }
 
 impl Tag {
@@ -75,11 +77,37 @@ impl TryFrom<u16> for Tag {
             0xfffe => Ok(Self::Pk3Rr),
             0xfffd => Ok(Self::Pk3Ub),
             0xfffc => Ok(Self::Pb8Lumi),
+            0xfffb => Ok(Self::Pk9Compass),
 
             other => Err(Error::TagError {
                 tag_type: "OriginalBackup",
                 value: other,
             }),
+        }
+    }
+}
+
+impl From<PkmFormat> for Option<Tag> {
+    fn from(value: PkmFormat) -> Self {
+        match value {
+            PkmFormat::PK1 => Some(Tag::Pk1),
+            PkmFormat::PK2 => Some(Tag::Pk2),
+            PkmFormat::PK3 => Some(Tag::Pk3),
+            PkmFormat::ColoPkm | PkmFormat::XdPkm => None,
+            PkmFormat::PK4 => Some(Tag::Pk4),
+            PkmFormat::PK5 => Some(Tag::Pk5),
+            PkmFormat::PK6 => Some(Tag::Pk6),
+            PkmFormat::PK7 => Some(Tag::Pk7),
+            PkmFormat::PB7 => Some(Tag::Pb7),
+            PkmFormat::PK8 => Some(Tag::Pk8),
+            PkmFormat::PA8 => Some(Tag::Pa8),
+            PkmFormat::PB8 => Some(Tag::Pb8),
+            PkmFormat::PK9 => Some(Tag::Pk9),
+            PkmFormat::PA9 => Some(Tag::Pa9),
+            PkmFormat::PK3RR => Some(Tag::Pk3Rr),
+            PkmFormat::PK3UB => Some(Tag::Pk3Ub),
+            PkmFormat::PB8LUMI => Some(Tag::Pb8Lumi),
+            PkmFormat::PK9Compass => Some(Tag::Pk9Compass),
         }
     }
 }
@@ -104,6 +132,7 @@ impl Tag {
             Self::Pk3Rr => PK3CFRU_PARTY_SIZE,
             Self::Pk3Ub => PK3CFRU_PARTY_SIZE,
             Self::Pb8Lumi => PB8LUMI_SIZE,
+            Self::Pk9Compass => PK9_SIZE,
         }
     }
 }
@@ -127,6 +156,7 @@ pub enum StoredPkmBytes {
     Pk3Rr([u8; PK3CFRU_PARTY_SIZE]),
     Pk3Ub([u8; PK3CFRU_PARTY_SIZE]),
     Pb8Lumi([u8; PB8_SIZE]),
+    Pk9Compass([u8; PK9_SIZE]),
 }
 
 const LENGTH_CHECKED_MESSAGE: &str = "data length checked above";
@@ -151,6 +181,7 @@ impl StoredPkmBytes {
             Self::Pk3Rr(bytes) => bytes,
             Self::Pk3Ub(bytes) => bytes,
             Self::Pb8Lumi(bytes) => bytes,
+            Self::Pk9Compass(bytes) => bytes,
         };
         bytes
     }
@@ -174,6 +205,7 @@ impl StoredPkmBytes {
             Self::Pk3Rr(_) => Tag::Pk3Rr,
             Self::Pk3Ub(_) => Tag::Pk3Ub,
             Self::Pb8Lumi(_) => Tag::Pb8Lumi,
+            Self::Pk9Compass(_) => Tag::Pk9Compass,
         }
     }
 
@@ -204,6 +236,7 @@ impl StoredPkmBytes {
             Tag::Pk3Rr => Ok(Self::Pk3Rr(copy_to_sized_array(data))),
             Tag::Pk3Ub => Ok(Self::Pk3Ub(copy_to_sized_array(data))),
             Tag::Pb8Lumi => Ok(Self::Pb8Lumi(copy_to_sized_array(data))),
+            Tag::Pk9Compass => Ok(Self::Pk9Compass(copy_to_sized_array(data))),
         }
     }
 

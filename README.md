@@ -79,6 +79,7 @@ PKM and save files for the following ROM hacks are supported:
 - Pokémon Radical Red
 - Pokémon Unbound
 - Pokémon Luminescent Platinum
+- Pokémon Compass
 
 Forms exclusive to these ROM hacks can be moved into OpenHome and save files of other ROM hacks that support those forms. This includes forms like Stitched Gengar, Balloon Pikachu, and Seviian forms. Support for these forms is new and may have some bugs.
 
@@ -121,6 +122,8 @@ The following resources are sourced directly from the PKHeX codebase:
 Credit to the [Radical Red Team](https://www.pokecommunity.com/threads/pok%C3%A9mon-radical-red-version-4-1-released-gen-9-dlc-pokemon-character-customization-now-available.437688/) for the Radical Red logo, as well as the Pokémon sprites.
 
 Credit to [Team Luminescent](https://luminescent.team/) for the PKLumiHeX program, which provided critical information about the save file structure, and for the Luminescent Platinum logo.
+
+Credit to the [Pokémon Compass](https://www.nexusmods.com/pokemonscarletandviolet/mods/21) team for the game logo, as well as [PKCompassHeX](https://github.com/mtxCore/PKCompassHeX) for information on Compass save block keys.
 
 Pokémon Home extra form photoshops were created by [PkmnHomeIcons](https://github.com/nileplumb/PkmnHomeIcons). This includes Stitched Gengar, the Clone Pokémon, and the extra Pikachu forms.
 
