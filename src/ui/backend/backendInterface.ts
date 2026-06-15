@@ -7,6 +7,8 @@ import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
+import { Dayjs } from 'dayjs'
+import { LogFilter } from '../pages/logs'
 import { ConvertStrategies } from '../state/convert-strategies/ConvertStrategiesProvider'
 
 export type AppState = {
@@ -115,8 +117,11 @@ export default interface BackendInterface {
   setTheme(appTheme: AppTheme): Promise<Errorable<null>>
   saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Errorable<null>>
   emitMenuEvent: (menuEventId: string) => Promise<Errorable<null>>
-  getLogs(): Promise<Errorable<LogEntry[]>>
+
+  /* logging */
+  getLogs(filter: LogFilter): Promise<Errorable<LogEntry[]>>
   log(level: LogLevel, message: string, context?: Record<string, unknown>): Promise<Errorable<void>>
+  clearLogsForDate(clearFor: Dayjs): Promise<Errorable<null>>
   onNewLog: (callback: (notification: NewLogNotification) => void) => () => void
 
   /* plugins */

@@ -67,6 +67,12 @@ const DummyBackend: BackendInterface = {
   saveLocalFile: ERROR_NO_BACKEND,
   emitMenuEvent: ERROR_NO_BACKEND,
 
+  /* logging */
+  getLogs: ERROR_NO_BACKEND,
+  log: ERROR_NO_BACKEND,
+  onNewLog: EMPTY_WITH_CLEANUP,
+  clearLogsForDate: ERROR_NO_BACKEND,
+
   /* data directory */
   promptChangeDataDir: ERROR_NO_BACKEND,
   getDataDirPath: ERROR_NO_BACKEND,
@@ -78,9 +84,6 @@ const DummyBackend: BackendInterface = {
   downloadPlugin: ERROR_NO_BACKEND,
   loadPluginCode: ERROR_NO_BACKEND,
   deletePlugin: ERROR_NO_BACKEND,
-  getLogs: ERROR_NO_BACKEND,
-  log: ERROR_NO_BACKEND,
-  onNewLog: EMPTY_WITH_CLEANUP,
 }
 
 export default DummyBackend

@@ -7,6 +7,7 @@ import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { getDefaultConvertStrategy } from '@pkm-rs/pkg'
 import { invoke, InvokeArgs, InvokeOptions } from '@tauri-apps/api/core'
+import { LogFilter } from 'src/ui/pages/logs'
 import { ConvertStrategies } from 'src/ui/state/convert-strategies/ConvertStrategiesProvider'
 import { AppState, ImageResponse, LogEntry, LogLevel, StoredLookups } from '../backendInterface'
 import { RustResult } from './types'
@@ -41,6 +42,11 @@ if (!('fromBase64' in Uint8Array)) {
 const ZERO_UUID = '00000000-0000-0000-0000-000000000000'
 
 type RustUnitResultByString = Record<string, RustResult<null, string>>
+
+export type LogFilterIpc = Omit<LogFilter, 'start' | 'end'> & {
+  start_epoch_seconds: number
+  end_epoch_seconds: number
+}
 
 type OhTauriApi = {
   get_state(): AppState
@@ -87,8 +93,9 @@ type OhTauriApi = {
   rollback_transaction(): null
   commit_transaction(): null
 
-  get_logs_today(): LogEntry[]
+  get_logs_today(filter: LogFilterIpc): LogEntry[]
   log(level: LogLevel, message: string, fields?: Record<string, unknown>): void
+  clear_logs_for_date(epochSeconds: number): null
 }
 
 type OhCommand = keyof OhTauriApi
@@ -255,12 +262,16 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('open_file_location', { filePath })
   },
 
-  get_logs_today() {
-    return invokeAndCatch('get_logs_today')
+  get_logs_today(filter: LogFilterIpc) {
+    return invokeAndCatch('get_logs_today', { filter })
   },
 
   log(level: LogLevel, message: string, context?: Record<string, unknown | undefined>) {
     return invokeAndCatch('log', { entry: { level, message, context } })
+  },
+
+  clear_logs_for_date(epochSeconds: number) {
+    return invokeAndCatch('clear_logs_for_date', { epochSeconds })
   },
 }
 

@@ -8,7 +8,7 @@
   --top-bar-height: 1.2rem;
   --sidebar-width: 22rem;
 
-  --timestamp-width: 6rem;
+  --timestamp-width: 9rem;
   --log-event-width: 8rem;
   --context-button-width: 6rem;
 
@@ -155,6 +155,7 @@
 
 .log-message {
   flex: 1;
+  overflow: hidden;
 }
 
 .log-message-empty {

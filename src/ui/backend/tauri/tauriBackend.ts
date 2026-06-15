@@ -18,8 +18,9 @@ import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
 import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
-import dayjs from 'dayjs'
-import { Commands, StoredBankDataSerialized } from './tauriCommands'
+import dayjs, { Dayjs } from 'dayjs'
+import { LogFilter } from 'src/ui/pages/logs'
+import { Commands, LogFilterIpc, StoredBankDataSerialized } from './tauriCommands'
 import { isRustErr } from './types'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
@@ -249,8 +250,19 @@ export const TauriBackend: BackendInterface = {
   downloadPlugin: Commands.download_plugin,
   loadPluginCode: Commands.load_plugin_code,
   deletePlugin: Commands.delete_plugin,
-  getLogs: Commands.get_logs_today,
+  getLogs: (filter: LogFilter) => {
+    const { start, end, ...otherParams } = filter
+    const ipcFilter: LogFilterIpc = {
+      start_epoch_seconds: start.unix(),
+      end_epoch_seconds: end.unix(),
+      ...otherParams,
+    }
+    return Commands.get_logs_today(ipcFilter)
+  },
   log: Commands.log,
+  clearLogsForDate: (forDate: Dayjs) => {
+    return Commands.clear_logs_for_date(forDate.unix())
+  },
 
   registerListeners: (listeners) => {
     const unlistenPromises: Promise<UnlistenFn>[] = [

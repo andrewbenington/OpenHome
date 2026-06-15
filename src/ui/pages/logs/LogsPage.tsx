@@ -1,14 +1,13 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Option, R } from '@openhome-core/util/functional'
+import { Option } from '@openhome-core/util/functional'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { cssClass } from '@openhome-ui/util/style'
 import { CheckboxGroup, Text, TextField } from '@radix-ui/themes'
 import dayjs from 'dayjs'
-import { CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { BackendContext } from 'src/ui/backend/backendContext'
+import { CSSProperties, useRef, useState } from 'react'
 import { LogEntry, LogLevel } from 'src/ui/backend/backendInterface'
 import { Dialog } from 'src/ui/components/dialog/Dialog'
 import { ExpandIcon, FilterIcon } from 'src/ui/components/Icons'
@@ -16,15 +15,22 @@ import { InfoGrid } from 'src/ui/components/InfoGrid'
 import MiniButton from 'src/ui/components/MiniButton'
 import { Popover } from 'src/ui/components/popover/Popover'
 import ToggleButton from 'src/ui/components/ToggleButton'
-import useDebounce from 'src/ui/hooks/useDebounce'
 import useSimpleVirtualizer from 'src/ui/hooks/useSimpleVirtualizer'
-import './Logs.css'
+import { LOG_LEVELS, useTodayLogs } from '.'
+import './LogsPage.css'
 
-const LOG_LEVELS: readonly LogLevel[] = Object.freeze(['ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'])
-
-export default function Logs() {
-  const { loading, error, logs, filteredLogs, filterText, setFilterText, levels, setLevels } =
-    useTodayLogs()
+export default function LogsPage() {
+  const {
+    loading,
+    error,
+    logs,
+    filteredLogs,
+    filterText,
+    setFilterText,
+    levels,
+    setLevels,
+    clearLogs,
+  } = useTodayLogs()
   const [selectedMon, setSelectedMon] = useState<OHPKM>()
   const ohpkmStore = useOhpkmStore()
   const [filtersOpen, setFiltersOpen] = useState(false)
@@ -59,6 +65,7 @@ export default function Logs() {
       <div className="logs-page dark-scrollbar">
         <div className="logs-header">
           <h1 className="pokedex-header-title">OpenHome Logs</h1>
+          <button onClick={clearLogs}>Clear Logs</button>
           <div style={{ flex: 1 }} />
           <Text>
             <b>Log count:</b> {logs.length}
@@ -149,7 +156,7 @@ function LogLine(props: LogLineProps) {
 
   return (
     <div className="log-line" key={timestamp} style={style}>
-      <span className="log-timestamp">{dayjs(timestamp).format('LTS')}</span>
+      <span className="log-timestamp">{dayjs(timestamp).format('M/D/YY h:mm A')}</span>
       <span className={`log-level log-level-${level.toLowerCase()}`}>{level}</span>
       {event && <span className="log-event">{event}</span>}
       <span
@@ -170,73 +177,26 @@ function LogLine(props: LogLineProps) {
   )
 }
 
-function useTodayLogs() {
-  const backend = useContext(BackendContext)
-  const [logs, setLogs] = useState<LogEntry[]>()
-  const { levels, setLevels, filterText, setFilterText } = useFilter(logs ?? [])
+const NON_MESSAGE_WIDTHS = [
+  '--navigation-sidebar-width',
+  '--timestamp-width',
+  '--log-level-width',
+  '--log-event-width',
+  '--context-button-width',
+]
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string>()
+function calculateExcludedWidthRem() {
+  return (
+    NON_MESSAGE_WIDTHS.reduce((sum, variable) => {
+      const logsPage = document.getElementsByClassName('logs-page')?.[0]
+      if (!logsPage) return 0
 
-  const getLogs = useCallback(() => {
-    setLoading(true)
-    backend
-      .getLogs()
-      .then(R.match(setLogs, setError))
-      .finally(() => setLoading(false))
-  }, [backend])
+      const style = getComputedStyle(logsPage)
 
-  const debouncedGetLogs = useDebounce(getLogs, 300)
-  backend.onNewLog((_notification) => {
-    debouncedGetLogs()
-  })
-
-  useEffect(() => {
-    if (logs === undefined) {
-      getLogs()
-    }
-  }, [getLogs, logs])
-
-  if (logs) {
-    const filteredLogs = logs.filter(
-      (log) =>
-        (!filterText ||
-          log.message.toLocaleLowerCase().includes(filterText?.toLocaleLowerCase())) &&
-        levels.has(log.level as LogLevel)
-    )
-
-    return {
-      logs,
-      filteredLogs,
-      filterText,
-      setFilterText,
-      levels,
-      setLevels,
-      loading: false,
-      error: undefined,
-    } as const
-  } else {
-    return { logs: undefined, loading, error } as const
-  }
-}
-
-function useFilter(logs: LogEntry[]) {
-  const [levels, setLevels] = useState(new Set(LOG_LEVELS))
-  const [filterText, setFilterText] = useState('')
-
-  const filteredLogs = logs.filter(
-    (log) =>
-      (!filterText || log.message.toLocaleLowerCase().includes(filterText?.toLocaleLowerCase())) &&
-      levels.has(log.level as LogLevel)
+      return sum + parseFloat(style.getPropertyValue(variable)?.slice(0, -3))
+    }, 0) +
+    (NON_MESSAGE_WIDTHS.length - 1) * 0.5
   )
-
-  return {
-    levels,
-    setLevels,
-    filterText,
-    setFilterText,
-    filteredLogs,
-  }
 }
 
 function estimateLines(text: string, containerWidth: number, fontSize: number): number {
@@ -269,26 +229,4 @@ function estimateHeight(
 
   const baseHeightNoPadding = fontSize
   return baseHeightNoPadding + (fontSize * lineCount - 1)
-}
-
-const NON_MESSAGE_WIDTHS = [
-  '--navigation-sidebar-width',
-  '--timestamp-width',
-  '--log-level-width',
-  '--log-event-width',
-  '--context-button-width',
-]
-
-function calculateExcludedWidthRem() {
-  return (
-    NON_MESSAGE_WIDTHS.reduce((sum, variable) => {
-      const logsPage = document.getElementsByClassName('logs-page')?.[0]
-      if (!logsPage) return 0
-
-      const style = getComputedStyle(logsPage)
-
-      return sum + parseFloat(style.getPropertyValue(variable)?.slice(0, -3))
-    }, 0) +
-    (NON_MESSAGE_WIDTHS.length - 1) * 0.5
-  )
 }

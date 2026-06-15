@@ -18,19 +18,18 @@ use dialog::DialogBox;
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
 pub fn run_app_startup(app: &App) -> Result<Vec<versioning::UpdateFeatures>> {
-    let handle = app.handle();
-
-    let handle2 = handle.clone();
+    let handle = app.handle().clone();
     logging::init_logging(
-        &Path::join(&tauri::Manager::path(handle).app_data_dir()?, LOGS_DIR),
+        &Path::join(&tauri::Manager::path(&handle).app_data_dir()?, LOGS_DIR),
         Some(move |event: logging::NewLogNotification| {
-            let result = handle2.emit("tracing::log", event);
+            let result = handle.emit("tracing::log", event);
             if let Err(err) = result {
                 tracing::error!("{err}");
             }
         }),
     );
 
+    let handle = app.handle();
     let update_features: Vec<versioning::UpdateFeatures> =
         match versioning::handle_updates_get_features(handle, false) {
             Err(error) => match error {

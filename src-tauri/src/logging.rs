@@ -1,13 +1,11 @@
 use std::fmt::Display;
 use std::str::FromStr;
 
-use crate::Result;
-
+use crate::data_controller::{DataController, DataDir};
+use crate::{Error, Result};
+use chrono::{DateTime, Utc};
 use tauri::AppHandle;
 use tracing::Subscriber;
-
-use crate::data_controller::{DataController, DataDir};
-use chrono::Utc;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::fmt::format::FmtSpan;
 use tracing_subscriber::layer::SubscriberExt;
@@ -180,21 +178,76 @@ impl LogEntry {
     }
 }
 
+fn log_file_path(date: DateTime<Utc>) -> String {
+    format!("app.log.{}", date.format("%Y-%m-%d"))
+}
+
+fn try_build_datetime_utc(epoch_seconds: i64) -> Result<DateTime<Utc>> {
+    DateTime::from_timestamp(epoch_seconds, 0)
+        .map(|dt| dt.with_timezone(&Utc))
+        .ok_or(Error::other(&format!(
+            "invalid epoch_seconds: {epoch_seconds}"
+        )))
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+pub struct LogFilter {
+    start_epoch_seconds: i64,
+    end_epoch_seconds: i64,
+    ohpkm_id: Option<String>,
+}
+
+impl LogFilter {
+    fn applies_to(&self, log_entry: &LogEntry) -> bool {
+        if let Some(filter_ohpkm_id) = &self.ohpkm_id
+            && log_entry
+                .ohpkm_id
+                .as_ref()
+                .is_none_or(|log_ohpkm_id| filter_ohpkm_id != log_ohpkm_id)
+        {
+            return false;
+        }
+
+        let Ok(timestamp) = log_entry.timestamp.parse::<DateTime<Utc>>() else {
+            return false;
+        };
+
+        if let Ok(start) = try_build_datetime_utc(self.start_epoch_seconds)
+            && timestamp < start
+        {
+            return false;
+        }
+
+        if let Ok(end) = try_build_datetime_utc(self.end_epoch_seconds)
+            && timestamp > end
+        {
+            return false;
+        }
+
+        true
+    }
+}
+
 #[tauri::command]
-pub fn get_logs_today(app: AppHandle) -> Result<Vec<LogEntry>> {
-    let content = app.read_file_text(
-        DataDir::Logs,
-        format!("app.log.{}", Utc::now().format("%Y-%m-%d")),
-    )?;
+pub fn get_logs_today(app: AppHandle, filter: LogFilter) -> Result<Vec<LogEntry>> {
+    println!("{filter:?}");
+    let content = app.read_file_text(DataDir::Logs, log_file_path(Utc::now()))?;
 
     let entries = content
         .lines()
         .rev() // newest first
-        .filter_map(|line| serde_json::from_str::<serde_json::Value>(line).ok())
+        .filter_map(|log_entry| serde_json::from_str::<serde_json::Value>(log_entry).ok())
         .filter_map(LogEntry::from_json)
+        .filter(|log_entry| filter.applies_to(log_entry))
         .collect();
 
     Ok(entries)
+}
+
+#[tauri::command]
+pub fn clear_logs_for_date(app: AppHandle, epoch_seconds: i64) -> Result<()> {
+    let datetime = try_build_datetime_utc(epoch_seconds)?;
+    app.truncate_file(DataDir::Logs, log_file_path(datetime))
 }
 
 fn option_null_or_empty(value: &Option<serde_json::Value>) -> bool {
