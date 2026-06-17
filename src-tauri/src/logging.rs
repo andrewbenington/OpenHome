@@ -3,7 +3,8 @@ use std::str::FromStr;
 
 use crate::data_controller::{DataController, DataDir};
 use crate::{Error, Result};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, Utc};
+use serde::Serialize;
 use tauri::AppHandle;
 use tracing::Subscriber;
 use tracing_subscriber::EnvFilter;
@@ -50,7 +51,7 @@ where
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum LogLevel {
     #[serde(alias = "trace")]
@@ -106,7 +107,7 @@ impl From<LogLevel> for tracing::Level {
     }
 }
 
-#[derive(serde::Serialize)]
+#[derive(Debug, serde::Serialize, Clone)]
 pub struct LogEntry {
     pub timestamp: String,
     pub level: LogLevel,
@@ -178,7 +179,7 @@ impl LogEntry {
     }
 }
 
-fn log_file_path(date: DateTime<Utc>) -> String {
+fn log_file_path(date: NaiveDate) -> String {
     format!("app.log.{}", date.format("%Y-%m-%d"))
 }
 
@@ -191,10 +192,29 @@ fn try_build_datetime_utc(epoch_seconds: i64) -> Result<DateTime<Utc>> {
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
-pub struct LogFilter {
+pub struct LogFilterJs {
     start_epoch_seconds: i64,
     end_epoch_seconds: i64,
     ohpkm_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct LogFilter {
+    start: chrono::DateTime<Utc>,
+    end: chrono::DateTime<Utc>,
+    ohpkm_id: Option<String>,
+}
+
+impl TryFrom<LogFilterJs> for LogFilter {
+    type Error = crate::Error;
+
+    fn try_from(value: LogFilterJs) -> std::prelude::v1::Result<Self, Self::Error> {
+        Ok(Self {
+            start: try_build_datetime_utc(value.start_epoch_seconds)?,
+            end: try_build_datetime_utc(value.end_epoch_seconds)?,
+            ohpkm_id: value.ohpkm_id,
+        })
+    }
 }
 
 impl LogFilter {
@@ -212,42 +232,83 @@ impl LogFilter {
             return false;
         };
 
-        if let Ok(start) = try_build_datetime_utc(self.start_epoch_seconds)
-            && timestamp < start
-        {
-            return false;
-        }
-
-        if let Ok(end) = try_build_datetime_utc(self.end_epoch_seconds)
-            && timestamp > end
-        {
+        if timestamp < self.start || timestamp > self.end {
             return false;
         }
 
         true
     }
+
+    fn advanced_one_day(&self) -> Self {
+        Self {
+            start: self.start - chrono::Duration::days(1),
+            end: self.start,
+            ohpkm_id: self.ohpkm_id.clone(),
+        }
+    }
+}
+
+fn load_file_logs(
+    data_controller: &impl DataController,
+    filter: &LogFilter,
+    date: chrono::NaiveDate,
+) -> Option<Vec<LogEntry>> {
+    let file_text = data_controller
+        .read_file_text(DataDir::Logs, log_file_path(date))
+        .ok()?;
+    Some(
+        file_text
+            .lines()
+            .rev()
+            .filter_map(|log_entry| serde_json::from_str::<serde_json::Value>(log_entry).ok())
+            .filter_map(LogEntry::from_json)
+            .filter(|log_entry| filter.applies_to(log_entry))
+            .collect(),
+    )
+}
+
+fn load_logs(data_controller: &impl DataController, filter: &LogFilter) -> Result<Vec<LogEntry>> {
+    let mut logs = Vec::<LogEntry>::new();
+    let mut current_timestamp = filter.end.date_naive();
+    while current_timestamp >= filter.start.date_naive() {
+        if let Some(file_logs) = load_file_logs(data_controller, filter, current_timestamp) {
+            logs.extend_from_slice(&file_logs);
+        }
+        current_timestamp -= chrono::Duration::days(1);
+    }
+
+    Ok(logs)
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct LogsResponse {
+    current: LogFilter,
+    next: LogFilter,
+    remaining_file_lines: Vec<LogEntry>,
+}
+
+impl LogsResponse {
+    pub fn fetch(data_controller: &impl DataController, filter: LogFilter) -> Result<Self> {
+        let next = filter.advanced_one_day();
+        load_logs(data_controller, &filter).map(|remaining_file_lines| Self {
+            current: filter,
+            next,
+            remaining_file_lines,
+        })
+    }
 }
 
 #[tauri::command]
-pub fn get_logs_today(app: AppHandle, filter: LogFilter) -> Result<Vec<LogEntry>> {
-    println!("{filter:?}");
-    let content = app.read_file_text(DataDir::Logs, log_file_path(Utc::now()))?;
+pub fn get_logs_today(app: AppHandle, filter: LogFilterJs) -> Result<LogsResponse> {
+    let filter = LogFilter::try_from(filter)?;
 
-    let entries = content
-        .lines()
-        .rev() // newest first
-        .filter_map(|log_entry| serde_json::from_str::<serde_json::Value>(log_entry).ok())
-        .filter_map(LogEntry::from_json)
-        .filter(|log_entry| filter.applies_to(log_entry))
-        .collect();
-
-    Ok(entries)
+    LogsResponse::fetch(&app, filter)
 }
 
 #[tauri::command]
 pub fn clear_logs_for_date(app: AppHandle, epoch_seconds: i64) -> Result<()> {
     let datetime = try_build_datetime_utc(epoch_seconds)?;
-    app.truncate_file(DataDir::Logs, log_file_path(datetime))
+    app.truncate_file(DataDir::Logs, log_file_path(datetime.date_naive()))
 }
 
 fn option_null_or_empty(value: &Option<serde_json::Value>) -> bool {

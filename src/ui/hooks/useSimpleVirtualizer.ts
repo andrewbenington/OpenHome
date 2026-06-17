@@ -15,6 +15,7 @@ export default function useSimpleVirtualizer(
     getScrollElement: () => scrollRef.current,
     estimateSize: (index) => estimateSize(index, baseFontSize),
     overscan: 100,
+    directDomUpdates: true,
   })
 
   useEffect(() => {

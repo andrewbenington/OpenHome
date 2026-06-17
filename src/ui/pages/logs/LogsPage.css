@@ -25,6 +25,7 @@
 .logs-container {
   height: 100%;
   overflow-y: auto;
+  overscroll-behavior: none;
   background-color: var(--color-gray-100);
 }
 
@@ -168,11 +169,13 @@
   border: none;
 }
 
-.log-filter-popover {
-  width: fit-content;
-  box-sizing: border-box;
-  padding: var(--padding-radius-sm-lg) calc(1.6 * var(--padding-radius-sm-lg))
-    var(--padding-radius-sm-lg) var(--padding-radius-sm-lg);
+.logs-footer {
+  display: grid;
+  font-family: monospace;
+}
+
+.load-more-logs-button {
+  border-radius: 0 !important;
 }
 
 .rt-CheckboxGroupItem {

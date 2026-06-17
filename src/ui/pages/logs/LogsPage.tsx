@@ -5,10 +5,10 @@ import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { cssClass } from '@openhome-ui/util/style'
-import { CheckboxGroup, Text, TextField } from '@radix-ui/themes'
-import dayjs from 'dayjs'
+import { Button, CheckboxGroup, Text, TextField } from '@radix-ui/themes'
 import { CSSProperties, useRef, useState } from 'react'
 import { LogEntry, LogLevel } from 'src/ui/backend/backendInterface'
+import { DevDataDisplay } from 'src/ui/components/DevDataDisplay'
 import { Dialog } from 'src/ui/components/dialog/Dialog'
 import { ExpandIcon, FilterIcon } from 'src/ui/components/Icons'
 import { InfoGrid } from 'src/ui/components/InfoGrid'
@@ -35,6 +35,9 @@ export default function LogsPage(props: LogsPageProps) {
     levels,
     setLevels,
     clearLogs,
+    resetToToday,
+    next,
+    loadNext,
   } = useTodayLogs(openhomeIdFilter)
   const [selectedMon, setSelectedMon] = useState<OHPKM>()
   const ohpkmStore = useOhpkmStore()
@@ -44,7 +47,7 @@ export default function LogsPage(props: LogsPageProps) {
   const [displayedLog, setDisplayedLog] = useState<LogEntry>()
 
   const virtualizer = useSimpleVirtualizer(
-    filteredLogs?.length ?? 0,
+    (filteredLogs?.length ?? 0) + 1,
     (logIndex: number, baseFontSize: number) =>
       estimateHeight(
         filteredLogs?.[logIndex],
@@ -70,10 +73,12 @@ export default function LogsPage(props: LogsPageProps) {
       <div className="logs-page dark-scrollbar">
         <div className="logs-header">
           <h1 className="pokedex-header-title">OpenHome Logs</h1>
-          <button onClick={clearLogs}>Clear Logs</button>
+          <Button onClick={clearLogs}>Clear Logs</Button>
+          <Button onClick={resetToToday}>Reset to Today</Button>
           <div style={{ flex: 1 }} />
+          <DevDataDisplay data={next} />
           <Text className="hide-small-width">
-            <b>Log count:</b> {logs.length}
+            <b>Log count:</b> {logs.length} {String(loading)}
           </Text>
           <Popover.Root open={filtersOpen} onOpenChange={(v) => setFiltersOpen(v)}>
             <Popover.Trigger
@@ -117,6 +122,21 @@ export default function LogsPage(props: LogsPageProps) {
         <div ref={scrollRef} className="logs-container">
           <div className="logs-scroll" style={{ height: virtualizer.getTotalSize() }}>
             {virtualizer.getVirtualItems().map((virtualRow) => {
+              if (virtualRow.index === filteredLogs.length) {
+                return (
+                  <div
+                    key="load-more"
+                    className="logs-footer"
+                    style={{
+                      transform: `translateY(${virtualRow.start}px)`,
+                    }}
+                  >
+                    <Button className="load-more-logs-button" onClick={loadNext} loading={loading}>
+                      More...
+                    </Button>
+                  </div>
+                )
+              }
               const log = filteredLogs[virtualRow.index]
               return (
                 <LogLine
@@ -162,8 +182,8 @@ function LogLine(props: LogLineProps) {
   const mon = useOhpkmStore().getById(ohpkm_id ?? '')
 
   return (
-    <div className="log-line" key={timestamp} style={style}>
-      <span className="log-timestamp">{dayjs(timestamp).format('M/D/YY h:mm A')}</span>
+    <div className="log-line" key={timestamp.toISOString()} style={style}>
+      <span className="log-timestamp">{timestamp.format('M/D/YY h:mm A')}</span>
       <span className={`log-level log-level-${level.toLowerCase()}`}>{level}</span>
       {event && <span className="log-event">{event}</span>}
       <span

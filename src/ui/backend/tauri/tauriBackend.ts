@@ -8,6 +8,7 @@ import BackendInterface, {
   MenuEvent,
   NewLogNotification,
   OhpkmStore,
+  parseLogs,
   StoredLookups,
 } from '@openhome-ui/backend/backendInterface'
 import { defaultSettings, Settings } from '@openhome-ui/state/appInfo'
@@ -257,7 +258,7 @@ export const TauriBackend: BackendInterface = {
       end_epoch_seconds: end.unix(),
       ...otherParams,
     }
-    return Commands.get_logs_today(ipcFilter)
+    return Commands.get_logs_today(ipcFilter).then(R.map(parseLogs))
   },
   log: Commands.log,
   clearLogsForDate: (forDate: Dayjs) => {

@@ -9,7 +9,13 @@ import { getDefaultConvertStrategy } from '@pkm-rs/pkg'
 import { invoke, InvokeArgs, InvokeOptions } from '@tauri-apps/api/core'
 import { LogFilter } from 'src/ui/pages/logs'
 import { ConvertStrategies } from 'src/ui/state/convert-strategies/ConvertStrategiesProvider'
-import { AppState, ImageResponse, LogEntry, LogLevel, StoredLookups } from '../backendInterface'
+import {
+  AppState,
+  ImageResponse,
+  LogLevel,
+  LogsResponseUnparsed,
+  StoredLookups,
+} from '../backendInterface'
 import { RustResult } from './types'
 
 export type StringToBytes = Record<string, Uint8Array>
@@ -93,7 +99,7 @@ type OhTauriApi = {
   rollback_transaction(): null
   commit_transaction(): null
 
-  get_logs_today(filter: LogFilterIpc): LogEntry[]
+  get_logs_today(filter: LogFilterIpc): LogsResponseUnparsed
   log(level: LogLevel, message: string, fields?: Record<string, unknown>): void
   clear_logs_for_date(epochSeconds: number): null
 }
