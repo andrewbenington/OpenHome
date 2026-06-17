@@ -67,10 +67,9 @@ export function useTodayLogs(openhomeIdFilter?: OhpkmIdentifier) {
   )
 
   const clearLogs = useCallback(() => {
-    const today = dayjs()
     setLoading(true)
     backend
-      .clearLogsForDate(today)
+      .clearLogsForRange(current.start, current.end)
       .then(R.mapErr(setError))
       .finally(async () => {
         await getLogs(current)

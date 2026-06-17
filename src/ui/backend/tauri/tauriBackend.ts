@@ -261,8 +261,8 @@ export const TauriBackend: BackendInterface = {
     return Commands.get_logs_today(ipcFilter).then(R.map(parseLogs))
   },
   log: Commands.log,
-  clearLogsForDate: (forDate: Dayjs) => {
-    return Commands.clear_logs_for_date(forDate.unix())
+  clearLogsForRange: (start: Dayjs, end: Dayjs) => {
+    return Commands.clear_logs_for_range(start.unix(), end.unix())
   },
 
   registerListeners: (listeners) => {

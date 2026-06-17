@@ -173,7 +173,7 @@ export default interface BackendInterface {
   /* logging */
   getLogs(filter: LogFilter): Promise<Errorable<LogsResponse>>
   log(level: LogLevel, message: string, context?: Record<string, unknown>): Promise<Errorable<void>>
-  clearLogsForDate(clearFor: Dayjs): Promise<Errorable<null>>
+  clearLogsForRange(start: Dayjs, end: Dayjs): Promise<Errorable<null>>
   onNewLog: (callback: (notification: NewLogNotification) => void) => () => void
 
   /* plugins */

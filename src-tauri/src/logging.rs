@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::io::Write;
 use std::str::FromStr;
 
 use crate::data_controller::{DataController, DataDir};
@@ -177,6 +178,12 @@ impl LogEntry {
             ohpkm_id,
         })
     }
+
+    pub fn from_json_str(v: &str) -> Option<Self> {
+        serde_json::Value::from_str(v)
+            .ok()
+            .and_then(Self::from_json)
+    }
 }
 
 fn log_file_path(date: NaiveDate) -> String {
@@ -248,6 +255,25 @@ impl LogFilter {
     }
 }
 
+enum Direction {
+    Normal,
+    // Reverse,
+}
+
+fn load_file_lines(
+    data_controller: &impl DataController,
+    date: chrono::NaiveDate,
+    direction: Direction,
+) -> Option<Vec<String>> {
+    data_controller
+        .read_file_text(DataDir::Logs, log_file_path(date))
+        .ok()
+        .map(|file_text| match direction {
+            Direction::Normal => file_text.lines().map(&str::to_owned).collect(),
+            // Direction::Reverse => file_text.lines().rev().map(&str::to_owned).collect(),
+        })
+}
+
 fn load_file_logs(
     data_controller: &impl DataController,
     filter: &LogFilter,
@@ -260,8 +286,7 @@ fn load_file_logs(
         file_text
             .lines()
             .rev()
-            .filter_map(|log_entry| serde_json::from_str::<serde_json::Value>(log_entry).ok())
-            .filter_map(LogEntry::from_json)
+            .filter_map(LogEntry::from_json_str)
             .filter(|log_entry| filter.applies_to(log_entry))
             .collect(),
     )
@@ -296,19 +321,6 @@ impl LogsResponse {
             remaining_file_lines,
         })
     }
-}
-
-#[tauri::command]
-pub fn get_logs_today(app: AppHandle, filter: LogFilterJs) -> Result<LogsResponse> {
-    let filter = LogFilter::try_from(filter)?;
-
-    LogsResponse::fetch(&app, filter)
-}
-
-#[tauri::command]
-pub fn clear_logs_for_date(app: AppHandle, epoch_seconds: i64) -> Result<()> {
-    let datetime = try_build_datetime_utc(epoch_seconds)?;
-    app.truncate_file(DataDir::Logs, log_file_path(datetime.date_naive()))
 }
 
 fn option_null_or_empty(value: &Option<serde_json::Value>) -> bool {
@@ -378,6 +390,108 @@ impl Display for FrontendLogError {
     }
 }
 
+#[derive(serde::Serialize, Clone, Copy)]
+pub struct NewLogNotification {
+    level: LogLevel,
+    timestamp_unix: i64,
+}
+
+impl NewLogNotification {
+    pub fn now(level: &tracing::Level) -> Self {
+        Self {
+            level: level.into(),
+            timestamp_unix: Utc::now().timestamp(),
+        }
+    }
+}
+
+struct LogNotificationCallback<F>(F)
+where
+    F: Fn(NewLogNotification) + Send + Sync + 'static;
+
+impl<S, F> tracing_subscriber::Layer<S> for LogNotificationCallback<F>
+where
+    S: Subscriber,
+    F: Fn(NewLogNotification) + Send + Sync + 'static,
+{
+    fn on_event(
+        &self,
+        event: &tracing::Event<'_>,
+        _ctx: tracing_subscriber::layer::Context<'_, S>,
+    ) {
+        (self.0)(NewLogNotification::now(event.metadata().level()))
+    }
+}
+
+#[tauri::command]
+pub fn get_logs_today(app: AppHandle, filter: LogFilterJs) -> Result<LogsResponse> {
+    let filter = LogFilter::try_from(filter)?;
+
+    LogsResponse::fetch(&app, filter)
+}
+
+fn date_range_inclusive(start: NaiveDate, end: NaiveDate) -> impl Iterator<Item = NaiveDate> {
+    std::iter::successors(Some(start), |d| d.checked_add_days(chrono::Days::new(1)))
+        .take_while(move |d| *d <= end)
+}
+
+#[tauri::command]
+pub fn clear_logs_for_range(
+    app: AppHandle,
+    start_epoch_seconds: i64,
+    end_epoch_seconds: i64,
+) -> Result<()> {
+    let start = try_build_datetime_utc(start_epoch_seconds)?;
+    let start_date = start.date_naive();
+
+    let end = try_build_datetime_utc(end_epoch_seconds)?;
+    let end_date = start.date_naive();
+
+    let today = Utc::now().date_naive();
+
+    for date in date_range_inclusive(start.date_naive(), end.date_naive()) {
+        let file_path = log_file_path(date);
+        let mut file = match app.open_file_for_writing(DataDir::Logs, &file_path) {
+            Ok(file) => file,
+            Err(Error::FileMissing { .. }) => continue,
+            Err(err) => return Err(err),
+        };
+
+        if date == today {
+            file.set_len(0)
+                .map_err(|e| Error::file_write(&file_path, e))?;
+            continue;
+        } else if date > start_date && date < end_date {
+            app.delete_file(DataDir::Logs, log_file_path(date))?;
+            continue;
+        }
+
+        let Some(file_lines) = load_file_lines(&app, date, Direction::Normal) else {
+            continue;
+        };
+
+        let lines_in_range: Vec<String> = file_lines
+            .into_iter()
+            .filter(|line| {
+                LogEntry::from_json_str(line).is_none_or(|log| {
+                    log.timestamp
+                        .parse()
+                        .is_ok_and(|timestamp: DateTime<Utc>| (start..end).contains(&timestamp))
+                })
+            })
+            .collect();
+
+        if lines_in_range.is_empty() {
+            app.delete_file(DataDir::Logs, log_file_path(date))?;
+        } else {
+            file.write_all(lines_in_range.join("\n").as_bytes())
+                .map_err(|e| Error::file_write(&file_path, e))?;
+        }
+    }
+
+    Ok(())
+}
+
 #[tauri::command]
 pub fn log(entry: JsLogEntry) {
     let mut context = entry.context.unwrap_or(serde_json::Value::Null);
@@ -428,38 +542,5 @@ pub fn log(entry: JsLogEntry) {
         LogLevel::Info => tracing::info!(event, ohpkm_id, context, "{}", message),
         LogLevel::Debug => tracing::debug!(event, ohpkm_id, context, "{}", message),
         LogLevel::Trace => tracing::trace!(event, ohpkm_id, context, "{}", message),
-    }
-}
-
-#[derive(serde::Serialize, Clone, Copy)]
-pub struct NewLogNotification {
-    level: LogLevel,
-    timestamp_unix: i64,
-}
-
-impl NewLogNotification {
-    pub fn now(level: &tracing::Level) -> Self {
-        Self {
-            level: level.into(),
-            timestamp_unix: Utc::now().timestamp(),
-        }
-    }
-}
-
-struct LogNotificationCallback<F>(F)
-where
-    F: Fn(NewLogNotification) + Send + Sync + 'static;
-
-impl<S, F> tracing_subscriber::Layer<S> for LogNotificationCallback<F>
-where
-    S: Subscriber,
-    F: Fn(NewLogNotification) + Send + Sync + 'static,
-{
-    fn on_event(
-        &self,
-        event: &tracing::Event<'_>,
-        _ctx: tracing_subscriber::layer::Context<'_, S>,
-    ) {
-        (self.0)(NewLogNotification::now(event.metadata().level()))
     }
 }

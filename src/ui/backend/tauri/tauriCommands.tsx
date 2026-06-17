@@ -101,7 +101,7 @@ type OhTauriApi = {
 
   get_logs_today(filter: LogFilterIpc): LogsResponseUnparsed
   log(level: LogLevel, message: string, fields?: Record<string, unknown>): void
-  clear_logs_for_date(epochSeconds: number): null
+  clear_logs_for_range(startEpochSeconds: number, endEpochSeconds: number): null
 }
 
 type OhCommand = keyof OhTauriApi
@@ -276,8 +276,8 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('log', { entry: { level, message, context } })
   },
 
-  clear_logs_for_date(epochSeconds: number) {
-    return invokeAndCatch('clear_logs_for_date', { epochSeconds })
+  clear_logs_for_range(startEpochSeconds: number, endEpochSeconds: number) {
+    return invokeAndCatch('clear_logs_for_range', { startEpochSeconds, endEpochSeconds })
   },
 }
 

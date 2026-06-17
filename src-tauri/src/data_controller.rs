@@ -72,11 +72,18 @@ pub trait DataController {
         read_file_text(self.absolute_dir_path(dir)?.join(relative_path))
     }
 
-    fn truncate_file<P>(&self, dir: DataDir, relative_path: P) -> Result<()>
+    fn delete_file<P>(&self, dir: DataDir, relative_path: P) -> Result<()>
     where
         P: AsRef<Path>,
     {
-        truncate_file(self.absolute_dir_path(dir)?.join(relative_path))
+        delete_file(self.absolute_dir_path(dir)?.join(relative_path))
+    }
+
+    fn open_file_for_writing<P>(&self, dir: DataDir, relative_path: P) -> Result<fs::File>
+    where
+        P: AsRef<Path>,
+    {
+        open_file_for_writing(self.absolute_dir_path(dir)?.join(relative_path))
     }
 
     fn read_file_json_if_exists<P, T>(&self, dir: DataDir, relative_path: P) -> Option<Result<T>>
@@ -222,7 +229,7 @@ where
     fs::write(&full_path, contents).map_err(|err| Error::file_access(&full_path, err))
 }
 
-fn truncate_file<P>(full_path: P) -> Result<()>
+fn delete_file<P>(full_path: P) -> Result<()>
 where
     P: AsRef<Path>,
 {
@@ -230,5 +237,16 @@ where
         return Err(Error::file_missing(full_path.as_ref()));
     }
 
-    fs::write(&full_path, "").map_err(|err| Error::file_access(&full_path, err))
+    fs::remove_file(&full_path).map_err(|err| Error::file_access(&full_path, err))
+}
+
+fn open_file_for_writing<P>(full_path: P) -> Result<fs::File>
+where
+    P: AsRef<Path>,
+{
+    if !Path::exists(full_path.as_ref()) {
+        return Err(Error::file_missing(full_path.as_ref()));
+    }
+
+    fs::File::create(&full_path).map_err(|err| Error::file_access(&full_path, err))
 }

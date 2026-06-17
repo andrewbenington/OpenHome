@@ -71,7 +71,7 @@ const DummyBackend: BackendInterface = {
   getLogs: ERROR_NO_BACKEND,
   log: ERROR_NO_BACKEND,
   onNewLog: EMPTY_WITH_CLEANUP,
-  clearLogsForDate: ERROR_NO_BACKEND,
+  clearLogsForRange: ERROR_NO_BACKEND,
 
   /* data directory */
   promptChangeDataDir: ERROR_NO_BACKEND,
