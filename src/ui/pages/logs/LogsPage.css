@@ -295,7 +295,7 @@
 }
 
 .logs-filter-popover {
-  color: var(--accent-contrast);
+  color: var(--color-text-contrast);
   width: fit-content;
   gap: 0.5rem;
 
