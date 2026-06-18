@@ -58,7 +58,7 @@ export function PokedexGames(props: PokedexGamesProps) {
         ) && (
           <Card
             className="compatible-game-card"
-            key={origin}
+            key="champions"
             style={{
               backgroundColor: OriginGames.championsColor(),
               '--card-background-color': OriginGames.championsColor(),
@@ -84,7 +84,7 @@ export function PokedexGames(props: PokedexGamesProps) {
           .map((saveType) => (
             <Card
               className="compatible-game-card"
-              key={origin}
+              key={saveType.saveTypeID}
               style={{
                 backgroundColor: OriginGames.pluginColor(saveType.getPluginIdentifier()),
                 '--card-background-color': OriginGames.pluginColor(saveType.getPluginIdentifier()),

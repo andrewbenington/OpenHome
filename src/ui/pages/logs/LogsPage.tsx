@@ -1,3 +1,4 @@
+import { Input, Separator } from '@base-ui/react'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Option } from '@openhome-core/util/functional'
@@ -5,10 +6,10 @@ import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { cssClass } from '@openhome-ui/util/style'
-import { Button, CheckboxGroup, Text, TextField } from '@radix-ui/themes'
-import { CSSProperties, useRef, useState } from 'react'
+import { CheckboxGroup, Spinner, Text, TextField, Tooltip } from '@radix-ui/themes'
+import dayjs from 'dayjs'
+import { CSSProperties, useMemo, useRef, useState } from 'react'
 import { LogEntry, LogLevel } from 'src/ui/backend/backendInterface'
-import { DevDataDisplay } from 'src/ui/components/DevDataDisplay'
 import { Dialog } from 'src/ui/components/dialog/Dialog'
 import { ExpandIcon, FilterIcon } from 'src/ui/components/Icons'
 import { InfoGrid } from 'src/ui/components/InfoGrid'
@@ -16,8 +17,11 @@ import MiniButton from 'src/ui/components/MiniButton'
 import { Popover } from 'src/ui/components/popover/Popover'
 import ToggleButton from 'src/ui/components/ToggleButton'
 import useSimpleVirtualizer from 'src/ui/hooks/useSimpleVirtualizer'
-import { LOG_LEVELS, useTodayLogs } from '.'
+import { LOG_LEVELS, LogController, useLogController } from '.'
 import './LogsPage.css'
+
+const TIMESTAMP_DISPLAY = 'M/D/YY h:mm A'
+const DATETIME_INPUT = 'YYYY-MM-DDTHH:mm'
 
 export type LogsPageProps = {
   openhomeIdFilter?: OhpkmIdentifier
@@ -25,23 +29,10 @@ export type LogsPageProps = {
 
 export default function LogsPage(props: LogsPageProps) {
   const { openhomeIdFilter } = props
-  const {
-    loading,
-    error,
-    logs,
-    filteredLogs,
-    filterText,
-    setFilterText,
-    levels,
-    setLevels,
-    clearLogs,
-    resetToToday,
-    next,
-    loadNext,
-  } = useTodayLogs(openhomeIdFilter)
+  const logController = useLogController(openhomeIdFilter)
+  const { loading, error, logs, filteredLogs } = logController
   const [selectedMon, setSelectedMon] = useState<OHPKM>()
   const ohpkmStore = useOhpkmStore()
-  const [filtersOpen, setFiltersOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const [observing, setObserving] = useState(false)
   const [displayedLog, setDisplayedLog] = useState<LogEntry>()
@@ -69,52 +60,33 @@ export default function LogsPage(props: LogsPageProps) {
   }
 
   if (logs) {
+    const { filterText, setFilterText, clearLogs, resetToToday, loadNext, current, next } =
+      logController
     return (
       <div className="logs-page dark-scrollbar">
         <div className="logs-header">
-          <h1 className="pokedex-header-title">OpenHome Logs</h1>
-          <Button onClick={clearLogs}>Clear Logs</Button>
-          <Button onClick={resetToToday}>Reset to Today</Button>
+          <h1 className="pokedex-header-title">
+            {openhomeIdFilter ? 'Pokémon Logs' : 'OpenHome Logs'}
+          </h1>
+          {!openhomeIdFilter && (
+            <button className="button-raised" onClick={clearLogs}>
+              Delete Loaded Logs
+            </button>
+          )}
+          <button className="button-raised" onClick={resetToToday}>
+            Reset to Today
+          </button>
           <div style={{ flex: 1 }} />
-          <DevDataDisplay data={next} />
           <Text className="hide-small-width">
-            <b>Log count:</b> {logs.length} {String(loading)}
+            <b>Log count:</b> {logs.length}
           </Text>
-          <Popover.Root open={filtersOpen} onOpenChange={(v) => setFiltersOpen(v)}>
-            <Popover.Trigger
-              render={(props) => (
-                <ToggleButton
-                  icon={FilterIcon}
-                  state={filtersOpen}
-                  setState={setFiltersOpen}
-                  toggledClassName="filter-button-toggled"
-                  untoggledClassName="filter-button-untoggled"
-                  {...props}
-                />
-              )}
-            />
-            <Popover.Portal>
-              <Popover.Positioner sideOffset={8}>
-                <Popover.Popup className="logs-filter-popover">
-                  <CheckboxGroup.Root
-                    value={Array.from(levels)}
-                    onValueChange={(value) => setLevels(new Set(value as LogLevel[]))}
-                  >
-                    {LOG_LEVELS.map((level) => (
-                      <CheckboxGroup.Item key={level} value={level}>
-                        <span className={`log-level log-level-${level.toLowerCase()}`}>
-                          {level}
-                        </span>
-                      </CheckboxGroup.Item>
-                    ))}
-                  </CheckboxGroup.Root>
-                </Popover.Popup>
-              </Popover.Positioner>
-            </Popover.Portal>
-          </Popover.Root>
+          <FilterPopover
+            key={`${current.start.toISOString()}-${current.end.toISOString()}`}
+            logController={logController}
+          />
           <TextField.Root
             className="pokedex-filter-field"
-            placeholder="Search..."
+            placeholder="Filter Text..."
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
           />
@@ -131,9 +103,13 @@ export default function LogsPage(props: LogsPageProps) {
                       transform: `translateY(${virtualRow.start}px)`,
                     }}
                   >
-                    <Button className="load-more-logs-button" onClick={loadNext} loading={loading}>
-                      More...
-                    </Button>
+                    <button className="load-more-logs-button" onClick={loadNext}>
+                      {loading ? (
+                        <Spinner />
+                      ) : (
+                        `Load ${next?.start.format(TIMESTAMP_DISPLAY)} - ${next?.end.format(TIMESTAMP_DISPLAY)}...`
+                      )}
+                    </button>
                   </div>
                 )
               }
@@ -168,6 +144,136 @@ export default function LogsPage(props: LogsPageProps) {
   return <div>{loading ? 'Loading' : error} </div>
 }
 
+type FilterPopoverProps = {
+  logController: LogController
+}
+
+function FilterPopover(props: FilterPopoverProps) {
+  const { levels, setLevels, current, loadRange } = props.logController
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [startInputValue, setStartInputValue] = useState<string>(
+    current.start.format(DATETIME_INPUT)
+  )
+  const [endInputValue, setEndInputValue] = useState<string>(current.end.format(DATETIME_INPUT))
+  const startInput = useRef<HTMLInputElement>(null)
+  const [startInputValid, setStartInputValid] = useState(true)
+  const [endInputValid, setEndInputValid] = useState(true)
+
+  const startInputValueParsed = dayjs(startInputValue)
+  const endInputValueParsed = dayjs(endInputValue)
+
+  const validationMessage = useMemo(() => {
+    if (!startInputValid) return `Start is invalid`
+    if (!endInputValid) return `End is invalid`
+    const startInputValueParsed = dayjs(startInputValue)
+    const endInputValueParsed = dayjs(endInputValue)
+
+    if (!startInputValueParsed.isBefore(endInputValueParsed)) {
+      return 'Start must be before end'
+    }
+
+    if (endInputValueParsed.diff(startInputValueParsed, 'days') > 7) {
+      return 'End must be no more than 7 days after start'
+    }
+  }, [startInputValid, endInputValid, startInputValue, endInputValue])
+
+  function resetStart() {
+    setStartInputValue(current.start.format(DATETIME_INPUT))
+    setStartInputValid(true)
+  }
+
+  function resetEnd() {
+    setEndInputValue(current.end.format(DATETIME_INPUT))
+    setEndInputValid(true)
+  }
+
+  const loadLogsButton = (
+    <button
+      className="button-raised"
+      disabled={validationMessage !== undefined}
+      onClick={() => loadRange(startInputValueParsed, endInputValueParsed)}
+    >
+      Load Logs in Range
+    </button>
+  )
+
+  return (
+    <Popover.Root open={filtersOpen} onOpenChange={(v) => setFiltersOpen(v)}>
+      <Popover.Trigger
+        render={(props) => (
+          <ToggleButton
+            icon={FilterIcon}
+            state={filtersOpen}
+            setState={setFiltersOpen}
+            toggledClassName="filter-button-toggled"
+            untoggledClassName="filter-button-untoggled"
+            {...props}
+          />
+        )}
+      />
+      <Popover.Portal container={document.getElementById('app-container')}>
+        <Popover.Positioner sideOffset={8}>
+          <Popover.Popup className="logs-filter-popover">
+            <CheckboxGroup.Root
+              value={Array.from(levels)}
+              onValueChange={(value) => setLevels(new Set(value as LogLevel[]))}
+            >
+              {LOG_LEVELS.map((level) => (
+                <span
+                  key={level}
+                  className={`log-level log-level-toggle log-level-${level.toLowerCase()}`}
+                >
+                  <CheckboxGroup.Item value={level}>{level}</CheckboxGroup.Item>
+                </span>
+              ))}
+            </CheckboxGroup.Root>
+            <Separator
+              style={{ width: '100%', backgroundColor: 'var(--color-border-light)', height: 1 }}
+            />
+            <fieldset>
+              <h3>Log Range</h3>
+              <label className="log-range-label">
+                <div>Start:</div>
+                <Input
+                  ref={startInput}
+                  type="datetime-local"
+                  value={startInputValue}
+                  onChange={(e) => {
+                    setStartInputValue(e.target.value)
+                    setStartInputValid(e.target.validity.valid)
+                  }}
+                />
+                <button className="button-raised" onClick={resetStart}>
+                  Reset
+                </button>
+              </label>
+              <label className="log-range-label">
+                <div>End:</div>
+                <Input
+                  type="datetime-local"
+                  value={endInputValue}
+                  onChange={(e) => {
+                    setEndInputValue(e.target.value)
+                    setEndInputValid(e.target.validity.valid)
+                  }}
+                />
+                <button className="button-raised" onClick={resetEnd}>
+                  Reset
+                </button>
+              </label>
+              {validationMessage ? (
+                <Tooltip content={validationMessage}>{loadLogsButton}</Tooltip>
+              ) : (
+                loadLogsButton
+              )}
+            </fieldset>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
+  )
+}
+
 type LogLineProps = {
   log: LogEntry
   ohpkmButton: boolean
@@ -183,7 +289,7 @@ function LogLine(props: LogLineProps) {
 
   return (
     <div className="log-line" key={timestamp.toISOString()} style={style}>
-      <span className="log-timestamp">{timestamp.format('M/D/YY h:mm A')}</span>
+      <span className="log-timestamp">{timestamp.format(TIMESTAMP_DISPLAY)}</span>
       <span className={`log-level log-level-${level.toLowerCase()}`}>{level}</span>
       {event && <span className="log-event">{event}</span>}
       <span

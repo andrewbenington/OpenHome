@@ -1,6 +1,6 @@
 import { R } from '@openhome-core/util/functional'
 import dayjs, { Dayjs } from 'dayjs'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from 'react'
 import { OhpkmIdentifier } from 'src/core/pkm/Lookup'
 import { BackendContext } from 'src/ui/backend/backendContext'
 import { LogEntry, LogLevel, LogsResponse } from 'src/ui/backend/backendInterface'
@@ -23,15 +23,14 @@ export type LogFilter = {
 function defaultLogFilter(ohpkm_id?: OhpkmIdentifier): LogFilter {
   const today = dayjs()
   const yesterday = today.add(-2, 'day')
-
-  return {
-    start: yesterday,
-    end: today,
-    ohpkm_id,
-  }
+  return logFilterForRange(yesterday, today, ohpkm_id)
 }
 
-export function useTodayLogs(openhomeIdFilter?: OhpkmIdentifier) {
+function logFilterForRange(start: Dayjs, end: Dayjs, ohpkm_id?: OhpkmIdentifier): LogFilter {
+  return { start, end, ohpkm_id }
+}
+
+export function useLogController(openhomeIdFilter?: OhpkmIdentifier) {
   const backend = useContext(BackendContext)
   const [logs, setLogs] = useState<LogEntry[]>()
   const [current, setCurrent] = useState<LogFilter>(defaultLogFilter(openhomeIdFilter))
@@ -42,14 +41,14 @@ export function useTodayLogs(openhomeIdFilter?: OhpkmIdentifier) {
   const [error, setError] = useState<string>()
 
   const getLogs = useCallback(
-    async (filter: LogFilter) => {
+    async (filter: LogFilter, clearExisting?: boolean) => {
       setLoading(true)
       await backend
         .getLogs(filter)
         .then(
           R.match(
             (response: LogsResponse) => {
-              if (response.current.end <= current.start) {
+              if (response.current.end <= current.start && !clearExisting) {
                 setLogs([...(logs ?? []), ...response.remaining_file_lines])
                 setCurrent({ ...response.current, start: response.current.start, end: current.end })
               } else {
@@ -101,12 +100,23 @@ export function useTodayLogs(openhomeIdFilter?: OhpkmIdentifier) {
   }, [getLogs, next])
 
   const resetToToday = useCallback(async () => {
-    const todayCurrent = defaultLogFilter()
+    const todayCurrent = defaultLogFilter(openhomeIdFilter)
     setLogs([])
     setCurrent(todayCurrent)
     setNext(undefined)
     await getLogs(todayCurrent)
-  }, [getLogs])
+  }, [getLogs, openhomeIdFilter])
+
+  const loadRange = useCallback(
+    async (start: Dayjs, end: Dayjs) => {
+      const rangeCurrent = logFilterForRange(start, end, openhomeIdFilter)
+      setLogs([])
+      setCurrent(rangeCurrent)
+      setNext(undefined)
+      await getLogs(rangeCurrent, true)
+    },
+    [getLogs, openhomeIdFilter]
+  )
 
   if (logs && !error) {
     const filteredLogs = logs.filter(
@@ -116,7 +126,7 @@ export function useTodayLogs(openhomeIdFilter?: OhpkmIdentifier) {
         levels.has(log.level as LogLevel)
     )
 
-    return {
+    const controller: LogController = {
       logs,
       filteredLogs,
       filterText,
@@ -124,15 +134,36 @@ export function useTodayLogs(openhomeIdFilter?: OhpkmIdentifier) {
       levels,
       setLevels,
       clearLogs,
+      current,
       next,
       loadNext,
+      loadRange,
       resetToToday,
       loading,
       error: undefined,
-    } as const
+    }
+
+    return controller
   } else {
-    return { logs: undefined, loading, error } as const
+    return { logs: undefined, filteredLogs: undefined, loading, error } as const
   }
+}
+
+export type LogController = {
+  readonly logs: LogEntry[]
+  readonly filteredLogs: LogEntry[]
+  readonly filterText: string
+  readonly setFilterText: Dispatch<SetStateAction<string>>
+  readonly levels: Set<LogLevel>
+  readonly setLevels: Dispatch<SetStateAction<Set<LogLevel>>>
+  readonly clearLogs: () => void
+  readonly current: LogFilter
+  readonly loadRange: (start: Dayjs, end: Dayjs) => Promise<void>
+  readonly next: LogFilter | undefined
+  readonly loadNext: () => Promise<void>
+  readonly resetToToday: () => Promise<void>
+  readonly loading: boolean
+  readonly error: undefined
 }
 
 function useFilter(logs: LogEntry[]) {
