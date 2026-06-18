@@ -179,6 +179,7 @@ pub fn run() {
             state::synced_state::save_synced_state,
             logging::get_logs_today,
             logging::log,
+            logging::clear_logs_for_range,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

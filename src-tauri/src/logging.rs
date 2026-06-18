@@ -1,13 +1,13 @@
 use std::fmt::Display;
+use std::io::Write;
 use std::str::FromStr;
 
-use crate::Result;
-
+use crate::data_controller::{DataController, DataDir};
+use crate::{Error, Result};
+use chrono::{DateTime, NaiveDate, Utc};
+use serde::Serialize;
 use tauri::AppHandle;
 use tracing::Subscriber;
-
-use crate::data_controller::{DataController, DataDir};
-use chrono::Utc;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::fmt::format::FmtSpan;
 use tracing_subscriber::layer::SubscriberExt;
@@ -52,7 +52,7 @@ where
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum LogLevel {
     #[serde(alias = "trace")]
@@ -108,7 +108,7 @@ impl From<LogLevel> for tracing::Level {
     }
 }
 
-#[derive(serde::Serialize)]
+#[derive(Debug, serde::Serialize, Clone)]
 pub struct LogEntry {
     pub timestamp: String,
     pub level: LogLevel,
@@ -178,23 +178,149 @@ impl LogEntry {
             ohpkm_id,
         })
     }
+
+    pub fn from_json_str(v: &str) -> Option<Self> {
+        serde_json::Value::from_str(v)
+            .ok()
+            .and_then(Self::from_json)
+    }
 }
 
-#[tauri::command]
-pub fn get_logs_today(app: AppHandle) -> Result<Vec<LogEntry>> {
-    let content = app.read_file_text(
-        DataDir::Logs,
-        format!("app.log.{}", Utc::now().format("%Y-%m-%d")),
-    )?;
+fn log_file_path(date: NaiveDate) -> String {
+    format!("app.log.{}", date.format("%Y-%m-%d"))
+}
 
-    let entries = content
-        .lines()
-        .rev() // newest first
-        .filter_map(|line| serde_json::from_str::<serde_json::Value>(line).ok())
-        .filter_map(LogEntry::from_json)
-        .collect();
+fn try_build_datetime_utc(epoch_seconds: i64) -> Result<DateTime<Utc>> {
+    DateTime::from_timestamp(epoch_seconds, 0)
+        .map(|dt| dt.with_timezone(&Utc))
+        .ok_or(Error::other(&format!(
+            "invalid epoch_seconds: {epoch_seconds}"
+        )))
+}
 
-    Ok(entries)
+#[derive(Debug, Clone, serde::Deserialize)]
+pub struct LogFilterJs {
+    start_epoch_seconds: i64,
+    end_epoch_seconds: i64,
+    ohpkm_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct LogFilter {
+    start: chrono::DateTime<Utc>,
+    end: chrono::DateTime<Utc>,
+    ohpkm_id: Option<String>,
+}
+
+impl TryFrom<LogFilterJs> for LogFilter {
+    type Error = crate::Error;
+
+    fn try_from(value: LogFilterJs) -> std::prelude::v1::Result<Self, Self::Error> {
+        Ok(Self {
+            start: try_build_datetime_utc(value.start_epoch_seconds)?,
+            end: try_build_datetime_utc(value.end_epoch_seconds)?,
+            ohpkm_id: value.ohpkm_id,
+        })
+    }
+}
+
+impl LogFilter {
+    fn applies_to(&self, log_entry: &LogEntry) -> bool {
+        if let Some(filter_ohpkm_id) = &self.ohpkm_id
+            && log_entry
+                .ohpkm_id
+                .as_ref()
+                .is_none_or(|log_ohpkm_id| filter_ohpkm_id != log_ohpkm_id)
+        {
+            return false;
+        }
+
+        let Ok(timestamp) = log_entry.timestamp.parse::<DateTime<Utc>>() else {
+            return false;
+        };
+
+        if timestamp < self.start || timestamp > self.end {
+            return false;
+        }
+
+        true
+    }
+
+    fn advanced_one_day(&self) -> Self {
+        Self {
+            start: self.start - chrono::Duration::days(1),
+            end: self.start,
+            ohpkm_id: self.ohpkm_id.clone(),
+        }
+    }
+}
+
+enum Direction {
+    Normal,
+    // Reverse,
+}
+
+fn load_file_lines(
+    data_controller: &impl DataController,
+    date: chrono::NaiveDate,
+    direction: Direction,
+) -> Option<Vec<String>> {
+    data_controller
+        .read_file_text(DataDir::Logs, log_file_path(date))
+        .ok()
+        .map(|file_text| match direction {
+            Direction::Normal => file_text.lines().map(&str::to_owned).collect(),
+            // Direction::Reverse => file_text.lines().rev().map(&str::to_owned).collect(),
+        })
+}
+
+fn load_file_logs(
+    data_controller: &impl DataController,
+    filter: &LogFilter,
+    date: chrono::NaiveDate,
+) -> Option<Vec<LogEntry>> {
+    let file_text = data_controller
+        .read_file_text(DataDir::Logs, log_file_path(date))
+        .ok()?;
+    Some(
+        file_text
+            .lines()
+            .rev()
+            .filter_map(LogEntry::from_json_str)
+            .filter(|log_entry| filter.applies_to(log_entry))
+            .collect(),
+    )
+}
+
+fn load_logs(data_controller: &impl DataController, filter: &LogFilter) -> Result<Vec<LogEntry>> {
+    let mut logs = Vec::<LogEntry>::new();
+    let mut current_timestamp = filter.end.date_naive();
+    while current_timestamp >= filter.start.date_naive() {
+        if let Some(file_logs) = load_file_logs(data_controller, filter, current_timestamp) {
+            logs.extend_from_slice(&file_logs);
+        }
+        current_timestamp -= chrono::Duration::days(1);
+    }
+
+    Ok(logs)
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct LogsResponse {
+    current: LogFilter,
+    next: LogFilter,
+    remaining_file_lines: Vec<LogEntry>,
+}
+
+impl LogsResponse {
+    pub fn fetch(data_controller: &impl DataController, filter: LogFilter) -> Result<Self> {
+        let next = filter.advanced_one_day();
+        load_logs(data_controller, &filter).map(|remaining_file_lines| Self {
+            current: filter,
+            next,
+            remaining_file_lines,
+        })
+    }
 }
 
 fn option_null_or_empty(value: &Option<serde_json::Value>) -> bool {
@@ -264,6 +390,108 @@ impl Display for FrontendLogError {
     }
 }
 
+#[derive(serde::Serialize, Clone, Copy)]
+pub struct NewLogNotification {
+    level: LogLevel,
+    timestamp_unix: i64,
+}
+
+impl NewLogNotification {
+    pub fn now(level: &tracing::Level) -> Self {
+        Self {
+            level: level.into(),
+            timestamp_unix: Utc::now().timestamp(),
+        }
+    }
+}
+
+struct LogNotificationCallback<F>(F)
+where
+    F: Fn(NewLogNotification) + Send + Sync + 'static;
+
+impl<S, F> tracing_subscriber::Layer<S> for LogNotificationCallback<F>
+where
+    S: Subscriber,
+    F: Fn(NewLogNotification) + Send + Sync + 'static,
+{
+    fn on_event(
+        &self,
+        event: &tracing::Event<'_>,
+        _ctx: tracing_subscriber::layer::Context<'_, S>,
+    ) {
+        (self.0)(NewLogNotification::now(event.metadata().level()))
+    }
+}
+
+#[tauri::command]
+pub fn get_logs_today(app: AppHandle, filter: LogFilterJs) -> Result<LogsResponse> {
+    let filter = LogFilter::try_from(filter)?;
+
+    LogsResponse::fetch(&app, filter)
+}
+
+fn date_range_inclusive(start: NaiveDate, end: NaiveDate) -> impl Iterator<Item = NaiveDate> {
+    std::iter::successors(Some(start), |d| d.checked_add_days(chrono::Days::new(1)))
+        .take_while(move |d| *d <= end)
+}
+
+#[tauri::command]
+pub fn clear_logs_for_range(
+    app: AppHandle,
+    start_epoch_seconds: i64,
+    end_epoch_seconds: i64,
+) -> Result<()> {
+    let start = try_build_datetime_utc(start_epoch_seconds)?;
+    let start_date = start.date_naive();
+
+    let end = try_build_datetime_utc(end_epoch_seconds)?;
+    let end_date = start.date_naive();
+
+    let today = Utc::now().date_naive();
+
+    for date in date_range_inclusive(start.date_naive(), end.date_naive()) {
+        let file_path = log_file_path(date);
+        let mut file = match app.open_file_for_writing(DataDir::Logs, &file_path) {
+            Ok(file) => file,
+            Err(Error::FileMissing { .. }) => continue,
+            Err(err) => return Err(err),
+        };
+
+        if date == today {
+            file.set_len(0)
+                .map_err(|e| Error::file_write(&file_path, e))?;
+            continue;
+        } else if date > start_date && date < end_date {
+            app.delete_file(DataDir::Logs, log_file_path(date))?;
+            continue;
+        }
+
+        let Some(file_lines) = load_file_lines(&app, date, Direction::Normal) else {
+            continue;
+        };
+
+        let lines_in_range: Vec<String> = file_lines
+            .into_iter()
+            .filter(|line| {
+                LogEntry::from_json_str(line).is_none_or(|log| {
+                    log.timestamp
+                        .parse()
+                        .is_ok_and(|timestamp: DateTime<Utc>| (start..end).contains(&timestamp))
+                })
+            })
+            .collect();
+
+        if lines_in_range.is_empty() {
+            app.delete_file(DataDir::Logs, log_file_path(date))?;
+        } else {
+            file.write_all(lines_in_range.join("\n").as_bytes())
+                .map_err(|e| Error::file_write(&file_path, e))?;
+        }
+    }
+
+    Ok(())
+}
+
 #[tauri::command]
 pub fn log(entry: JsLogEntry) {
     let mut context = entry.context.unwrap_or(serde_json::Value::Null);
@@ -314,38 +542,5 @@ pub fn log(entry: JsLogEntry) {
         LogLevel::Info => tracing::info!(event, ohpkm_id, context, "{}", message),
         LogLevel::Debug => tracing::debug!(event, ohpkm_id, context, "{}", message),
         LogLevel::Trace => tracing::trace!(event, ohpkm_id, context, "{}", message),
-    }
-}
-
-#[derive(serde::Serialize, Clone, Copy)]
-pub struct NewLogNotification {
-    level: LogLevel,
-    timestamp_unix: i64,
-}
-
-impl NewLogNotification {
-    pub fn now(level: &tracing::Level) -> Self {
-        Self {
-            level: level.into(),
-            timestamp_unix: Utc::now().timestamp(),
-        }
-    }
-}
-
-struct LogNotificationCallback<F>(F)
-where
-    F: Fn(NewLogNotification) + Send + Sync + 'static;
-
-impl<S, F> tracing_subscriber::Layer<S> for LogNotificationCallback<F>
-where
-    S: Subscriber,
-    F: Fn(NewLogNotification) + Send + Sync + 'static,
-{
-    fn on_event(
-        &self,
-        event: &tracing::Event<'_>,
-        _ctx: tracing_subscriber::layer::Context<'_, S>,
-    ) {
-        (self.0)(NewLogNotification::now(event.metadata().level()))
     }
 }

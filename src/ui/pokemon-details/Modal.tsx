@@ -18,6 +18,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
 import { GameIndicator } from '../components/pokemon/indicator/GameIndicator'
 import PokemonIcon from '../components/PokemonIcon'
+import LogsPage from '../pages/logs/LogsPage'
 import { useConvertStrategies } from '../state/convert-strategies'
 import './style.css'
 import DisplayTab from './tabs/DisplayTab'
@@ -203,6 +204,7 @@ const PokemonDetailsModal = (props: {
                     <SideTabs.Tab value="notes">Notes</SideTabs.Tab>
                     <SideTabs.Tab value="display">Display</SideTabs.Tab>
                     <SideTabs.Tab value="recent-save">Recent Save</SideTabs.Tab>
+                    <SideTabs.Tab value="logs">Logs</SideTabs.Tab>
                   </>
                 )}
                 <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
@@ -248,6 +250,9 @@ const PokemonDetailsModal = (props: {
                     </SideTabs.Panel>
                     <SideTabs.Panel value="recent-save">
                       <RecentSaveTab mon={mon} />
+                    </SideTabs.Panel>
+                    <SideTabs.Panel value="logs">
+                      <LogsPage openhomeIdFilter={mon.openhomeId} />
                     </SideTabs.Panel>
                   </>
                 )}
