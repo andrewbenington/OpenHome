@@ -1,7 +1,7 @@
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::ribbons::Gen3Ribbon;
 use pkm_rs_resources::{items::ItemGen3, lookup};
-use pkm_rs_types::{AbilityNumber, Generation, Stats16Le};
+use pkm_rs_types::{AbilityNumber, Generation, PokeDate, Stats16Le};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
@@ -16,12 +16,14 @@ use crate::{gen3, ohpkm, util::personality_value};
 impl OhpkmConvert for Pk3 {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
         let form_metadata = self.get_forme_metadata();
+
         let ability_index_unchecked = form_metadata.get_ability(self.ability_num.into());
         let ability_index = if ability_index_unchecked.to_u16() > PK3_MAX_ABILITY {
             form_metadata.get_ability(AbilityNumber::First)
         } else {
             ability_index_unchecked
         };
+
         let ability_num = if ability_index != ability_index_unchecked {
             AbilityNumber::First
         } else {
@@ -33,6 +35,18 @@ impl OhpkmConvert for Pk3 {
             self.trainer_id,
             self.secret_id,
         );
+
+        let species_name =
+            lookup::species_name(self.pokemon_index.to_national_dex(), self.language);
+
+        let is_nicknamed = !species_name.eq_ignore_ascii_case(&self.nickname.to_string());
+
+        // If the pokémon is not nicknamed, use species name to avoid ALL CAPS NAME
+        let adjusted_nickname: String = if is_nicknamed {
+            self.nickname.convert_to_string()
+        } else {
+            species_name.to_owned()
+        };
 
         ohpkm::v2_sections::MainDataV2 {
             personality_value: adjusted_pid,
@@ -65,14 +79,10 @@ impl OhpkmConvert for Pk3 {
             moves: self
                 .moves
                 .to_pp_adjusted(MetadataSource::Emerald, ohpkm::MOVE_METADATA_SOURCE),
-            nickname: self.nickname.to_string().into(),
+            nickname: adjusted_nickname.into(),
             ivs: self.ivs,
             is_egg: self.is_egg,
-            is_nicknamed: !lookup::species_name(
-                self.pokemon_index.to_national_dex(),
-                self.language,
-            )
-            .eq_ignore_ascii_case(&self.nickname.to_string()),
+            is_nicknamed,
             game_of_origin: self.game_of_origin,
             language: self.language,
             trainer_name: self.trainer_name.to_string().into(),
@@ -80,6 +90,7 @@ impl OhpkmConvert for Pk3 {
             ball: self.ball,
             met_location_index: self.met_location_index as u16,
             met_level: self.met_level,
+            met_date: PokeDate::today(),
             trainer_gender: self.trainer_gender,
             ..Default::default()
         }

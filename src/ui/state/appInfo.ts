@@ -1,14 +1,14 @@
 import { BW2SAV } from '@openhome-core/save/BW2SAV'
 import { BWSAV } from '@openhome-core/save/BWSAV'
+import { CompassSave } from '@openhome-core/save/compass/CompassSave'
 import { DPSAV } from '@openhome-core/save/DPSAV'
 import { G1SAV } from '@openhome-core/save/G1SAV'
 import { G2SAV } from '@openhome-core/save/G2SAV'
 import { G3SAV } from '@openhome-core/save/G3SAV'
-import { BDSPSAV } from '@openhome-core/save/Gen89/BDSPSAV'
-import { LASAV } from '@openhome-core/save/Gen89/LASAV'
-import { SVSAV } from '@openhome-core/save/Gen89/SVSAV'
-import { SwShSAV } from '@openhome-core/save/Gen89/SwShSAV'
+import { Gen7AlolaSave } from '@openhome-core/save/Gen7AlolaSave'
+import { SwordShieldSave } from '@openhome-core/save/Gen89/SwordShieldSave'
 import { HGSSSAV } from '@openhome-core/save/HGSSSAV'
+import { OfficialSAV } from '@openhome-core/save/interfaces'
 import { LGPESAV } from '@openhome-core/save/LGPESAV'
 import { G8LumiSAV } from '@openhome-core/save/luminescentplatinum/G8LUMISAV'
 import { ORASSAV } from '@openhome-core/save/ORASSAV'
@@ -17,13 +17,14 @@ import { G3RRSAV } from '@openhome-core/save/radicalred/G3RRSAV'
 import { G3UBSAV } from '@openhome-core/save/unbound/G3UBSAV'
 import { PluginSaveClass, SAVClass } from '@openhome-core/save/util'
 import { XYSAV } from '@openhome-core/save/XYSAV'
+import { MonDisplayState } from '@openhome-ui/hooks/useMonDisplay'
 import { SaveViewMode } from '@openhome-ui/saves/util'
+import { updateStyleForUiScale } from '@openhome-ui/util/style'
 import { Dispatch, Reducer, createContext } from 'react'
-import { Gen7AlolaSave } from '../../core/save/Gen7AlolaSave'
-import { ZASAV } from '../../core/save/Gen89/ZASAV'
-import { OfficialSAV } from '../../core/save/interfaces'
-import { MonDisplayState } from '../hooks/useMonDisplay'
-import { updateStyleForUiScale } from '../util/style'
+import { BdspSave } from 'src/core/save/Gen89/BdspSave'
+import { LegendsArceusSave } from 'src/core/save/Gen89/LegendsArceus'
+import { LegendsZaSave } from 'src/core/save/Gen89/LegendsZaSave'
+import { ScarletVioletSave } from 'src/core/save/Gen89/ScarletVioletSave'
 
 export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
@@ -38,13 +39,13 @@ export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   ORASSAV,
   Gen7AlolaSave,
   LGPESAV,
-  SwShSAV,
-  BDSPSAV,
-  LASAV,
-  SVSAV,
-  ZASAV,
+  SwordShieldSave,
+  BdspSave,
+  LegendsArceusSave,
+  ScarletVioletSave,
+  LegendsZaSave,
 ]
-const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV]
+const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV, CompassSave]
 
 export function initialMonDisplayState() {
   return {

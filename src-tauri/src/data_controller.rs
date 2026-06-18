@@ -7,12 +7,14 @@ use crate::startup_config::StartupConfigState;
 const STORAGE_DIR_NAME: &str = "storage";
 pub const MONS_V2_DIR: &str = "mons_v2";
 const PLUGINS_DIR_NAME: &str = "plugins";
+const LOG_DIR_NAME: &str = "logs";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DataDir {
     Storage,
     Plugins,
     OpenHomeRoot,
+    Logs,
 }
 
 impl DataDir {
@@ -20,6 +22,7 @@ impl DataDir {
         match self {
             DataDir::Storage => Some(STORAGE_DIR_NAME),
             DataDir::Plugins => Some(PLUGINS_DIR_NAME),
+            DataDir::Logs => Some(LOG_DIR_NAME),
             DataDir::OpenHomeRoot => None,
         }
     }
@@ -67,6 +70,20 @@ pub trait DataController {
         P: AsRef<Path>,
     {
         read_file_text(self.absolute_dir_path(dir)?.join(relative_path))
+    }
+
+    fn delete_file<P>(&self, dir: DataDir, relative_path: P) -> Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        delete_file(self.absolute_dir_path(dir)?.join(relative_path))
+    }
+
+    fn open_file_for_writing<P>(&self, dir: DataDir, relative_path: P) -> Result<fs::File>
+    where
+        P: AsRef<Path>,
+    {
+        open_file_for_writing(self.absolute_dir_path(dir)?.join(relative_path))
     }
 
     fn read_file_json_if_exists<P, T>(&self, dir: DataDir, relative_path: P) -> Option<Result<T>>
@@ -204,10 +221,32 @@ where
     write_file_contents(path, text)
 }
 
-fn write_file_contents<P, C>(path: P, contents: C) -> Result<()>
+fn write_file_contents<P, C>(full_path: P, contents: C) -> Result<()>
 where
     P: AsRef<Path>,
     C: AsRef<[u8]>,
 {
-    fs::write(&path, contents).map_err(|err| Error::file_access(&path, err))
+    fs::write(&full_path, contents).map_err(|err| Error::file_access(&full_path, err))
+}
+
+fn delete_file<P>(full_path: P) -> Result<()>
+where
+    P: AsRef<Path>,
+{
+    if !Path::exists(full_path.as_ref()) {
+        return Err(Error::file_missing(full_path.as_ref()));
+    }
+
+    fs::remove_file(&full_path).map_err(|err| Error::file_access(&full_path, err))
+}
+
+fn open_file_for_writing<P>(full_path: P) -> Result<fs::File>
+where
+    P: AsRef<Path>,
+{
+    if !Path::exists(full_path.as_ref()) {
+        return Err(Error::file_missing(full_path.as_ref()));
+    }
+
+    fs::File::create(&full_path).map_err(|err| Error::file_access(&full_path, err))
 }

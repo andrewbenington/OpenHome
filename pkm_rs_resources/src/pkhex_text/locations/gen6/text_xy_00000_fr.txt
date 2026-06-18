@@ -1,0 +1,355 @@
+﻿－－－－－－－－－－
+
+Endroit Mystérieux
+
+Endroit Lointain
+
+Bourg Croquis
+
+Route 1
+Sentier Croquis
+Quarellis
+
+Route 2
+Chemin Progrès
+Forêt de Neuvartault
+
+Route 3
+Chemin Ouvert
+Neuvartault
+
+Route 4
+Route Fleurie
+Illumis
+
+Tour Prismatique
+
+Labos Lysandre
+
+Route 5
+Chemin du Versant
+Fort-Vanitas
+
+Fort de Vanitas
+
+Route 6
+Allée du Palais
+Palais Chaydeuvre
+
+Route 7
+Chemin des Berges
+Relifac-le-Haut
+
+Route 8
+Falaise Muraille
+Roche-sur-Gliffe
+
+Route 9
+Piste Piquante
+Château de Combat
+
+Route 10
+Route Menhir
+Cromlac’h
+
+Route 11
+Chemin Miroir
+Grotte Miroitante
+
+Yantreizh
+
+Tour Maîtrise
+
+Route 12
+Chemin Fourrage
+Port Tempères
+
+Route 13
+Steppe d’Illumis
+Route 14
+Laie Romant-ss-Bois
+Romant-sous-Bois
+
+Usine de Poké Balls
+
+Route 15
+Chemin Brun
+La Frescale
+
+Route 16
+Chemin Tristesse
+[~ 80]
+[~ 81]
+Caverne Gelée
+
+Route 17
+Route Mammochon
+Flusselles
+
+Route 18
+Chemin des Gorges
+Mozheim
+
+Route 19
+Chemin du Val
+Auffrac-les-Congères
+
+Route 20
+Bois du Dédale
+Village Pokémon
+
+Route 21
+Chemin Final
+Route 22
+Chemin Détour
+Route Victoire
+
+Ligue Pokémon
+
+Batisques
+
+Maison de Combat
+
+Baie Azur
+
+Porte de La Frescale
+
+Porte de Mozheim
+
+Porte de R. s/Gliffe
+
+Porte d’Illumis
+
+Porte de Yantreizh
+
+Porte de P. Tempères
+
+Porte de Romant
+
+Porte de Flusselles
+
+Porte d’Auffrac
+
+Grotte Étincelante
+
+Cave Connecterre
+Antre Nosferapti
+Centrale de Kalos
+
+Repaire Team Flare
+
+Grotte Coda
+
+Hôtel Désolation
+
+Chambre Néant
+
+Antre Néréen
+
+Safari des Amis
+
+Chambre du Brasier
+
+Chambre du Barrage
+
+Chambre de l’Alliage
+
+Chambre de la Guivre
+
+Chambre de l’Éclat
+
+Porte de la Ligue
+
+Gare d’Illumis
+
+Gare de Batisques
+
+Aquarium R. s/Gliffe
+
+Grotte Inconnue
+
+Bourg-en-Vol
+
+Rosyères
+
+Myokara
+
+Vermilava
+
+Autéquia
+
+Vergazon
+
+Pacifiville
+
+Clémenti-Ville
+
+Poivressel
+
+Lavandia
+
+Mérouville
+
+Cimetronelle
+
+Nénucrique
+
+Algatia
+
+Atalanopolis
+
+Éternara
+
+Ligue Pokémon
+
+Route 101
+
+Route 102
+
+Route 103
+
+Route 104
+
+Chenal 105
+
+Chenal 106
+
+Chenal 107
+
+Chenal 108
+
+Chenal 109
+
+Route 110
+
+Route 111
+
+Route 112
+
+Route 113
+
+Route 114
+
+Route 115
+
+Route 116
+
+Route 117
+
+Route 118
+
+Route 119
+
+Route 120
+
+Route 121
+
+Chenal 122
+
+Route 123
+
+Chenal 124
+
+Chenal 125
+
+Chenal 126
+
+Chenal 127
+
+Chenal 128
+
+Chenal 129
+
+Chenal 130
+
+Chenal 131
+
+Chenal 132
+
+Chenal 133
+
+Chenal 134
+
+Site Météore
+
+Tunnel Mérazon
+
+???
+
+Ruines Désert
+
+Grotte Granite
+
+Bois Clémenti
+
+Mont Chimnée
+
+Sentier Sinuroc
+
+Chemin Ardent
+
+Mont Mémoria
+
+Planque Aqua
+
+Caverne Fondmer
+
+Grotte Origine
+
+Route Victoire
+
+Grotte Tréfonds
+
+New Lavandia
+
+Lavandia Sea
+
+Grotte de l’Îlot
+
+Tombeau Antique
+
+Sanctuaire
+
+Grotte Zénith
+
+Planque Magma
+
+Pilier Céleste
+
+Atoll de Combat
+
+Île du Sud
+
+Le Marina
+
+Parc Safari
+
+Forêt Mirage
+
+Grotte Mirage
+
+Île Mirage
+
+Mont Mirage
+
+Forêt Impénétrable
+
+Plaine Sans Nom
+
+Grotte Oubliée
+
+Grotte Évanescente
+
+Gouffre Informe
+
+Île de l’Arc
+
+Îlot Secret
+
+Grand Ciel
+
+Plage Secrète
+
+Champ Fleuri Secret
+
+Base Secrète

@@ -58,35 +58,6 @@ export default function App() {
   )
 }
 
-function buildKeyboardHandler(backend: BackendInterface) {
-  return (e: KeyboardEvent) => {
-    if (!e.ctrlKey) return
-    switch (e.key) {
-      case 'o':
-        backend.emitMenuEvent('open')
-        return
-      case 's':
-        backend.emitMenuEvent('save')
-        return
-      case 't':
-        backend.emitMenuEvent('reset')
-        return
-      case 'd':
-        backend.emitMenuEvent('open-appdata')
-        return
-      case 'q':
-        backend.emitMenuEvent('exit')
-        return
-      case 'u':
-        backend.emitMenuEvent('check-updates')
-        return
-      case 'g':
-        backend.emitMenuEvent('visit-github')
-        return
-    }
-  }
-}
-
 function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
   const [dragState, setDragState] = useState<DragMonState>(emptyDragState())
@@ -140,11 +111,13 @@ function AppWithBackend() {
   useEffect(() => {
     // returns a function to stop listening
     const stopListening = backend.onMenuEvents({
-      zoom_in: () =>
+      zoom_in: () => {
+        patchConsole(backend)
         appInfoDispatch({
           type: 'set_zoom_level',
           payload: Math.min(appInfoState.settings.zoomLevel + ZOOM_CHANGE_PCT, ZOOM_MAX_PCT),
-        }),
+        })
+      },
       zoom_out: () =>
         appInfoDispatch({
           type: 'set_zoom_level',
@@ -165,6 +138,10 @@ function AppWithBackend() {
       .concat(appInfoState.extraSaveTypes)
       .filter((saveType) => appInfoState.settings.enabledSaveTypes[saveType.saveTypeID])
   }, [appInfoState])
+
+  useEffect(() => {
+    patchConsole(backend)
+  }, [backend])
 
   return (
     <BanksAndBoxesProvider>
@@ -203,4 +180,94 @@ function AppWithBackend() {
       </AppInfoContext.Provider>
     </BanksAndBoxesProvider>
   )
+}
+
+const webConsole = { ...console }
+
+function patchConsole(backend: BackendInterface) {
+  const levels = [
+    ['log', 'INFO'],
+    ['info', 'INFO'],
+    ['warn', 'WARN'],
+    ['error', 'ERROR'],
+    ['debug', 'DEBUG'],
+  ] as const
+
+  for (const [method, level] of levels) {
+    // eslint-disable-next-line no-console
+    console[method] = (...args: unknown[]) => {
+      if (args?.[0] === 'CONSOLE_ONLY') {
+        webConsole[method](...args.slice(1))
+        return
+      }
+      // send message to web console as well
+      webConsole[method](...args)
+
+      // skip first line (this function)
+      const stack = new Error().stack?.split('\n').slice(1)
+      const callsite = stack?.[0]
+
+      if (args.length > 0 && typeof args[0] === 'object' && args[0] !== null) {
+        const context = args[0] as Record<string, unknown>
+        context['callsite'] = callsite
+        backend.log(level, serializeArg(args.at(1)), JSON.parse(JSON.stringify(context)))
+      } else {
+        const message = formatWithPlaceholders(args)
+        backend.log(level, message, { callsite })
+      }
+    }
+  }
+}
+
+// attempts to fill log placeholders with args like the web console does
+function formatWithPlaceholders(args: unknown[]): string {
+  if (typeof args[0] !== 'string' || !args[0].includes('%')) {
+    return args.map(serializeArg).join(' ')
+  }
+
+  let i = 1
+  const formatted = args[0].replace(/%[sdifoO]/g, (token) => {
+    if (i >= args.length) return token
+    const val = args[i++]
+    if (token === '%d' || token === '%i') return String(Number(val))
+    if (token === '%f') return String(parseFloat(String(val)))
+    if (token === '%o' || token === '%O') return JSON.stringify(val)
+    return String(val) // %s
+  })
+
+  // append any remaining args that weren't consumed
+  return [formatted, ...args.slice(i).map(serializeArg)].join(' ')
+}
+
+function serializeArg(arg: unknown): string {
+  return typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+}
+
+function buildKeyboardHandler(backend: BackendInterface) {
+  return (e: KeyboardEvent) => {
+    if (!e.ctrlKey) return
+    switch (e.key) {
+      case 'o':
+        backend.emitMenuEvent('open')
+        return
+      case 's':
+        backend.emitMenuEvent('save')
+        return
+      case 't':
+        backend.emitMenuEvent('reset')
+        return
+      case 'd':
+        backend.emitMenuEvent('open-appdata')
+        return
+      case 'q':
+        backend.emitMenuEvent('exit')
+        return
+      case 'u':
+        backend.emitMenuEvent('check-updates')
+        return
+      case 'g':
+        backend.emitMenuEvent('visit-github')
+        return
+    }
+  }
 }

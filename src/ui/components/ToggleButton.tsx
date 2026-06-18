@@ -1,5 +1,7 @@
 import { Button, Tooltip } from '@radix-ui/themes'
+import { ComponentProps } from 'react'
 import { IconType } from 'react-icons'
+import { cssClass } from '../util/style'
 
 export type ToggleButtonProps = {
   state: boolean
@@ -9,10 +11,13 @@ export type ToggleButtonProps = {
   disabled?: boolean
   onSet?: () => void
   onUnset?: () => void
-}
+  toggledClassName?: string
+  untoggledClassName?: string
+} & Omit<ComponentProps<'button'>, 'color'>
 
 export default function ToggleButton(props: ToggleButtonProps) {
   const {
+    className,
     state: isToggled,
     setState: setIsToggled,
     icon: Icon,
@@ -20,11 +25,19 @@ export default function ToggleButton(props: ToggleButtonProps) {
     disabled,
     onSet,
     onUnset,
+    toggledClassName,
+    untoggledClassName,
+    ...buttonProps
   } = props
 
   const button = (
     <Button
-      className="mini-button"
+      className={cssClass('mini-button')
+        .with(className)
+        .with(toggledClassName)
+        .if(isToggled)
+        .else(untoggledClassName)
+        .build()}
       variant={isToggled ? 'solid' : 'outline'}
       color={isToggled ? undefined : 'gray'}
       disabled={disabled}
@@ -36,6 +49,7 @@ export default function ToggleButton(props: ToggleButtonProps) {
         }
         setIsToggled(!isToggled)
       }}
+      {...buttonProps}
     >
       <Icon />
     </Button>

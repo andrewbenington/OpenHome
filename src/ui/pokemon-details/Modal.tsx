@@ -10,6 +10,7 @@ import { ArrowLeftIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
+import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
 import { isRomHackFormat } from '@pokemon-files/pkm/PKM'
 import { FileSchemas } from '@pokemon-files/schema'
 import { Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
@@ -17,6 +18,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
 import { GameIndicator } from '../components/pokemon/indicator/GameIndicator'
 import PokemonIcon from '../components/PokemonIcon'
+import LogsPage from '../pages/logs/LogsPage'
 import { useConvertStrategies } from '../state/convert-strategies'
 import './style.css'
 import DisplayTab from './tabs/DisplayTab'
@@ -115,7 +117,7 @@ const PokemonDetailsModal = (props: {
     }
   }
 
-  function switchFormat(newFormat: string) {
+  function switchFormat(newFormat: PkmFormat | 'OHPKM') {
     if (!mon) return
     if (mon.format === newFormat) {
       setDisplayMon(mon)
@@ -202,6 +204,7 @@ const PokemonDetailsModal = (props: {
                     <SideTabs.Tab value="notes">Notes</SideTabs.Tab>
                     <SideTabs.Tab value="display">Display</SideTabs.Tab>
                     <SideTabs.Tab value="recent-save">Recent Save</SideTabs.Tab>
+                    <SideTabs.Tab value="logs">Logs</SideTabs.Tab>
                   </>
                 )}
                 <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
@@ -247,6 +250,9 @@ const PokemonDetailsModal = (props: {
                     </SideTabs.Panel>
                     <SideTabs.Panel value="recent-save">
                       <RecentSaveTab mon={mon} />
+                    </SideTabs.Panel>
+                    <SideTabs.Panel value="logs">
+                      <LogsPage openhomeIdFilter={mon.openhomeId} />
                     </SideTabs.Panel>
                   </>
                 )}

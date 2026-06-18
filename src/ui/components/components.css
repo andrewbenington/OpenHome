@@ -1,8 +1,8 @@
 .pokemon-icon-container {
   position: relative;
   transform: translate(0, 0);
-  width: fit-content;
-  height: fit-content;
+  width: inherit;
+  height: inherit;
 }
 
 .pokemon-icon-tags {
@@ -175,6 +175,11 @@
   padding: 0 1.5rem 0 var(--padding-radius-sm-lg);
   height: var(--height-mini-button);
   width: 0;
+}
+
+.black-select-arrow {
+  background: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path fill="black" d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>')
+    100% 50% no-repeat transparent;
 }
 
 .datagrid {

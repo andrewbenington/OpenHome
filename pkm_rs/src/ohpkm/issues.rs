@@ -1,8 +1,9 @@
 use pkm_rs_resources::{abilities::AbilityIndexBounded, species::GenderRatio};
 use pkm_rs_types::{AbilityNumber, Gender};
+use serde::Serialize;
 use std::fmt::Display;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub enum OhpkmIssue {
     SpeciesNameCorrupted {
         corrupted: String,

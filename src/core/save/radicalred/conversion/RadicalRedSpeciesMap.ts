@@ -4953,11 +4953,11 @@ export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | nul
   },
   '1234': {
     nationalDex: 128,
-    formIndex: 0,
+    formIndex: 1,
   },
   '1235': {
     nationalDex: 128,
-    formIndex: 0,
+    formIndex: 2,
   },
   '1236': {
     nationalDex: 68,
@@ -4980,7 +4980,7 @@ export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | nul
   },
   '1240': {
     nationalDex: 128,
-    formIndex: 0,
+    formIndex: 3,
   },
   '1241': {
     nationalDex: 143,

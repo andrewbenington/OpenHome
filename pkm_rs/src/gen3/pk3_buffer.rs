@@ -10,7 +10,7 @@ use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveSlots, PpUpStorage};
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
 use pkm_rs_types::{
-    BinaryGender, ContestStats, MarkingsFourShapes, OriginGame, SimpleAbilityNumber, Stats8,
+    BinaryGender, ContestStats, Ivs, MarkingsFourShapes, OriginGame, SimpleAbilityNumber, Stats8,
 };
 use pkm_rs_types::{Language, Stats16Le};
 use pkm_rs_types::{read_u16_le, read_u32_le};
@@ -80,6 +80,11 @@ impl<'a> Pk3Buffer<&'a [u8]> {
 
     pub fn party_span(span: &'a [u8]) -> Self {
         assert_eq!(span.len(), super::PARTY_SIZE);
+        Self(span)
+    }
+
+    pub fn box_or_party_span(span: &'a [u8]) -> Self {
+        debug_assert!(span.len() == super::PARTY_SIZE || span.len() == super::BOX_SIZE);
         Self(span)
     }
 }
@@ -194,6 +199,10 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         self.get_u16_le(Offset::SecretId)
     }
 
+    pub fn trainer_and_secret_id(&self) -> u32 {
+        self.get_u32_le(Offset::TrainerId)
+    }
+
     pub fn is_bad_egg(&self) -> bool {
         self.get_flag(Offset::Flags0x13, 0)
     }
@@ -282,8 +291,8 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         self.get_array(Offset::IvsEggAbility)
     }
 
-    pub fn ivs(&self) -> Stats8 {
-        Stats8::from_30_bits(self.ivs_egg_ability_raw())
+    pub fn ivs(&self) -> Ivs {
+        Ivs::from_30_bits(self.ivs_egg_ability_raw())
     }
 
     pub fn is_egg_flag_2(&self) -> bool {
@@ -490,7 +499,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
         );
     }
 
-    pub fn set_ivs(&mut self, v: &Stats8) {
+    pub fn set_ivs(&mut self, v: &Ivs) {
         v.write_30_bits(self.bytes_mut(), Offset::IvsEggAbility as usize);
     }
 
@@ -588,6 +597,24 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
 // ==================================================================
 // Trait impls
 // ==================================================================
+
+use crate::encryption::{BlockEncrypt, Blocks};
+
+impl<S: AsRef<[u8]>> BlockEncrypt for Pk3Buffer<S> {
+    const BLOCKS_TYPE: Blocks = Blocks::Gen3;
+
+    fn get_personality_value(&self) -> u32 {
+        self.personality_value()
+    }
+
+    fn get_encryption_constant(&self) -> u32 {
+        self.personality_value() ^ self.trainer_and_secret_id()
+    }
+
+    fn to_bytes(&self) -> Vec<u8> {
+        self.0.as_ref().to_vec()
+    }
+}
 
 impl<S: AsRef<[u8]>> AsBytes for Pk3Buffer<S> {
     fn as_bytes(&self) -> &[u8] {

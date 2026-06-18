@@ -4,6 +4,7 @@ import {
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from '@openhome-core/pkm/Lookup'
+import { getLocationStringOrOrigin } from '@openhome-core/pkm/MetLocation'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   getHiddenPowerGen2,
@@ -18,7 +19,7 @@ import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import useIsDev from '@openhome-ui/hooks/isDev'
-import { genderFromBool, Generation, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
+import { genderFromBool, Generation, Language, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
 import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
 import {
   AllPKMFields,
@@ -42,7 +43,6 @@ import {
 } from '@pokemon-resources/consts/TransferRestrictions'
 import {
   BDSPTMMoveIndexes,
-  getLocationStringOrOrigin,
   LATutorMoveIndexes,
   Moves,
   SVTMMoveIndexes,
@@ -88,7 +88,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           value={
             mon.metLocationIndex === undefined
               ? '(not present)'
-              : `${getLocationStringOrOrigin(mon.gameOfOrigin, mon.metLocationIndex, mon.format)} (${mon.metLocationIndex})`
+              : `${getLocationStringOrOrigin(mon.gameOfOrigin, mon.metLocationIndex, mon.format, Language.English)} (${mon.metLocationIndex})` // todo: i18n
           }
         />
         {mon.encryptionConstant !== undefined && (
@@ -179,6 +179,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         {mon.abilityNum !== undefined && (
           <AttributeRow label="Ability Number" value={mon.abilityNum} />
         )}
+        {mon.level !== undefined && <AttributeRow label="Stored Level" value={mon.level} />}
         {mon.formArgument !== undefined && mon.dexNum === NationalDex.Alcremie && (
           <AttributeRow label="Sweet" value={SWEETS[mon.formArgument]} />
         )}

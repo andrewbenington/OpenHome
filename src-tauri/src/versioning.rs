@@ -3,6 +3,7 @@ use semver::Version;
 use serde::Serialize;
 use std::{fs, path::PathBuf};
 use strum::{self, EnumIter, IntoEnumIterator};
+use tracing::{debug, info};
 
 use crate::data_controller::{DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
@@ -59,8 +60,8 @@ pub fn handle_updates_get_features(
 
     let last_used_version = get_version_last_used(app_handle)?;
     match last_used_version {
-        Some(ref from_file) => println!("User last used OpenHome version {from_file}"),
-        None => println!("User last used OpenHome version 1.4.13 or earlier"),
+        Some(ref from_file) => info!("User last used OpenHome version {from_file}"),
+        None => info!("User last used OpenHome version 1.4.13 or earlier"),
     }
 
     let last_version_or_1_4_13 = match last_used_version {
@@ -83,22 +84,26 @@ pub fn handle_updates_get_features(
     let mut all_update_features: Vec<UpdateFeatures> = vec![];
 
     if current_version == last_used_semver && !cfg!(debug_assertions) {
-        println!("Version has not changed since last launch")
+        info!("Version has not changed since last launch")
     } else {
         if last_used_semver != current_version {
-            println!(
+            info!(
                 "This version ({current_version}) is newer than last used version ({last_used_semver})"
             );
         }
         let significant_updates = get_significant_updates(last_used_semver, current_version);
-        println!("Significant update: {significant_updates:?}");
+        if significant_updates.is_empty() {
+            debug!("No significant updates since last launch");
+        } else {
+            info!("Significant updates: {significant_updates:?}");
+        }
 
         let mut prev_o: Option<UpdateFeatures> = None;
 
         for update in significant_updates {
-            println!("Running migration for {update}...");
+            info!("Running migration for {update}...");
             update.do_migration(app_handle)?;
-            println!("Migration complete");
+            info!("Migration complete");
 
             if last_used_version.is_none() {
                 // don't display new features if user is new to OpenHome
@@ -155,6 +160,7 @@ pub enum SignificantUpdate {
     V1_11_2,
     V1_11_3,
     V1_11_4,
+    V1_12_0,
 }
 
 impl SignificantUpdate {
@@ -180,6 +186,7 @@ impl SignificantUpdate {
             Self::V1_11_2 => Version::parse("1.11.2").unwrap(),
             Self::V1_11_3 => Version::parse("1.11.3").unwrap(),
             Self::V1_11_4 => Version::parse("1.11.4").unwrap(),
+            Self::V1_12_0 => Version::parse("1.12.0").unwrap(),
         }
     }
 
@@ -265,6 +272,11 @@ impl SignificantUpdate {
             ]),
             Self::V1_11_4 => Some(vec![
                 "Fixed a bug causing changes in Alola games to not be tracked.",
+            ]),
+            Self::V1_12_0 => Some(vec![
+                "Added support for Pokémon Compass.",
+                "Added structured logging and a new tab to view logs.",
+                "The Pokémon details modal has a tab for Pokémon-specific logs, including when fields are updated.",
             ]),
             _ => None,
         }

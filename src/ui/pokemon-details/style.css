@@ -3,7 +3,7 @@
   --footer-height: 1.6rem;
 
   width: fit-content;
-  min-width: min(90vw, 60rem);
+  min-width: min(90vw, 70rem);
   max-width: 90vw;
 
   height: calc(var(--content-height) + var(--footer-height));

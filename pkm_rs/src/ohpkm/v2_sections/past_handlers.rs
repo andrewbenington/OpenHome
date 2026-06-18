@@ -95,14 +95,28 @@ impl PastHandlerDataV2 {
         self.gender == gender && self.name == *name && self.origin_game.is_none()
     }
 
-    pub fn update_from(&mut self, other: &TrainerData, plugin: Option<String>) {
-        self.id = NonZeroU16::new(other.id);
-        self.secret_id = NonZeroU16::new(other.secret_id);
-        self.friendship = other.friendship;
-        self.memory = other.memory;
-        self.affection = other.affection;
-        self.origin_game = other.origin_game;
-        self.origin_plugin = plugin;
+    // returns whether a change was made
+    pub fn update_from(&mut self, other: &TrainerData, plugin: Option<String>) -> bool {
+        if self.id.is_none_or(|v| v.get() != other.id)
+            || self.secret_id.is_none_or(|v| v.get() != other.secret_id)
+            || self.friendship != other.friendship
+            || self.memory != other.memory
+            || self.affection != other.affection
+            || self.origin_game != other.origin_game
+            || self.origin_plugin != plugin
+        {
+            self.id = NonZeroU16::new(other.id);
+            self.secret_id = NonZeroU16::new(other.secret_id);
+            self.friendship = other.friendship;
+            self.memory = other.memory;
+            self.affection = other.affection;
+            self.origin_game = other.origin_game;
+            self.origin_plugin = plugin;
+
+            true
+        } else {
+            false
+        }
     }
 }
 

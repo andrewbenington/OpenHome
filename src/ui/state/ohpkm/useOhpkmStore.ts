@@ -39,8 +39,6 @@ export type OhpkmStore = {
 // FALSE IN PRODUCTION
 const FORCE_MISSED_LOOKUP = false
 
-export type OhpkmLookup = (id: string) => OHPKM | undefined
-
 export function useOhpkmStore(): OhpkmStore {
   const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
   const { defaultConvertStrategy } = useConvertStrategies()
@@ -199,6 +197,7 @@ export function useOhpkmStore(): OhpkmStore {
         case 'PB8':
         case 'PB8LUMI':
         case 'PK9':
+        case 'PK9Compass':
         case 'PA9': {
           const homeIdentifier = getMonFileIdentifier(mon)
           if (!homeIdentifier) {

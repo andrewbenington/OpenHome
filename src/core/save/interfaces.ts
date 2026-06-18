@@ -300,7 +300,7 @@ export function getSaveRef(save: SAV): SaveRef {
     valid: true,
   }
 }
-export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum'
+export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum' | 'compass'
 export type GameNameType = 'short' | 'full'
 
 export function pluginGameName(identifier: PluginIdentifier, type = 'full'): string {
@@ -311,6 +311,8 @@ export function pluginGameName(identifier: PluginIdentifier, type = 'full'): str
       return 'Unbound'
     case 'luminescent_platinum':
       return type === 'full' ? 'Luminescent Platinum' : 'Lumi. Platinum'
+    case 'compass':
+      return 'Compass'
     default:
       return 'Unknown Plugin'
   }
@@ -323,6 +325,8 @@ export function pluginOriginMarkPath(identifier: PluginIdentifier): string | und
       return '/icons/gba.png'
     case 'luminescent_platinum':
       return '/origin_marks/Bdsp.png'
+    case 'compass':
+      return '/origin_marks/Tera.png'
     default:
       return undefined
   }

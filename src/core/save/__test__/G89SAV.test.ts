@@ -7,8 +7,8 @@ import { beforeAll, describe, expect, test } from 'vitest'
 import { PKMInterface } from '../../pkm/interfaces'
 import { SCBoolBlock, SCObjectBlock, writeSCBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
-import { LASAV } from '../Gen89/LASAV'
-import { SwShSAV } from '../Gen89/SwShSAV'
+import { LegendsArceusSave } from '../Gen89/LegendsArceus'
+import { SwordShieldSave } from '../Gen89/SwordShieldSave'
 import { PathData } from '../util/path'
 import { initializeWasm } from './init'
 
@@ -40,8 +40,8 @@ const arceusPath = {
 
 describe('gen 8 save files', () => {
   let saveBytes: Uint8Array
-  let swordSave: SwShSAV
-  let arceusSave: LASAV
+  let swordSave: SwordShieldSave
+  let arceusSave: LegendsArceusSave
   let magmortar: PK4
 
   beforeAll(() => {
@@ -49,13 +49,13 @@ describe('gen 8 save files', () => {
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
-    swordSave = new SwShSAV(swordPath, saveBytes)
+    swordSave = new SwordShieldSave(swordPath, saveBytes)
 
     savePath = saveTestFilePath('legendsarceus')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
-    arceusSave = new LASAV(arceusPath, saveBytes)
+    arceusSave = new LegendsArceusSave(arceusPath, saveBytes)
 
     const monPath = pkmTestFilePath('pk4', 'magmortar.pkm')
     const monBytes = new Uint8Array(readFileSync(monPath))
@@ -134,7 +134,7 @@ describe('gen 8 save files', () => {
     const reencrypted = SwishCrypto.encrypt(swordSave.scBlocks, swordSave.bytes.length)
 
     expect(SwishCrypto.getIsHashValid(reencrypted)).toBe(true)
-    const decrypted = new SwShSAV(swordPath, reencrypted)
+    const decrypted = new SwordShieldSave(swordPath, reencrypted)
 
     expect(decrypted.name).toBe(swordSave.name)
 
@@ -158,7 +158,7 @@ describe('gen 8 save files', () => {
     swordSave.updatedBoxSlots.push({ box: 1, boxSlot: 3 })
 
     swordSave.prepareForSaving()
-    const modified = new SwShSAV(swordPath, swordSave.bytes)
+    const modified = new SwordShieldSave(swordPath, swordSave.bytes)
     const modifiedFlapple = modified.boxes[1].boxSlots[3]
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
@@ -178,7 +178,7 @@ describe('gen 8 save files', () => {
     swordSave.updatedBoxSlots.push({ box: 1, boxSlot: 3 })
 
     swordSave.prepareForSaving()
-    const modified = new SwShSAV(swordPath, swordSave.bytes)
+    const modified = new SwordShieldSave(swordPath, swordSave.bytes)
     const modifiedFlapple = modified.boxes[1].boxSlots[3]
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
@@ -203,7 +203,7 @@ describe('gen 8 save files', () => {
     arceusSave.updatedBoxSlots.push({ box: 2, boxSlot: 8 })
 
     arceusSave.prepareForSaving()
-    const modified = new LASAV(arceusPath, arceusSave.bytes)
+    const modified = new LegendsArceusSave(arceusPath, arceusSave.bytes)
     const modifiedDecidueye = modified.boxes[13].boxSlots[1]
 
     expect(modifiedDecidueye?.nickname).toBe('NEW NAME')

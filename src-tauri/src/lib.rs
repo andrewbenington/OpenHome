@@ -2,6 +2,7 @@ mod commands;
 mod data_controller;
 mod deprecated;
 mod error;
+mod logging;
 mod menu;
 mod pkm_storage;
 mod plugin;
@@ -15,7 +16,9 @@ mod versioning;
 use std::env;
 use tauri::Manager;
 
-use crate::{error::Error, state::synced_state::AllSyncedState};
+pub use crate::error::{Error, Result};
+
+use crate::state::synced_state::AllSyncedState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -174,6 +177,9 @@ pub fn run() {
             state::rollback_transaction,
             state::commit_transaction,
             state::synced_state::save_synced_state,
+            logging::get_logs_today,
+            logging::log,
+            logging::clear_logs_for_range,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

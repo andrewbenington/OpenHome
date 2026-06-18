@@ -1,5 +1,6 @@
-use super::Pk7;
+use super::{Pk7, Pk7Buffer};
 use crate::encryption;
+use crate::encryption::BlockEncrypt;
 use crate::log;
 use crate::result::{Error, Result};
 use crate::traits::{PkmBytes, SaveData};
@@ -184,9 +185,9 @@ impl SaveData for Gen7AlolaSave {
     fn set_mon_at(&mut self, box_num: usize, offset: usize, mut mon: Option<Pk7>) {
         let mon_bytes = if let Some(mon) = &mut mon {
             mon.refresh_checksum();
-            let bytes = mon.to_box_bytes();
+            let unencrypted_bytes = mon.to_box_bytes();
 
-            encryption::decrypt_pkm_bytes_gen_6_7(&encryption::shuffle_blocks_gen_6_7(&bytes))
+            Pk7Buffer::box_span(&unencrypted_bytes).to_encrypted_bytes()
         } else {
             Pk7::empty_box_slot_bytes(&self.get_trainer_data().trainer_name)
         };
@@ -265,10 +266,9 @@ impl Gen7AlolaSave {
     fn get_mon_bytes_decrypted(&self, box_num: usize, offset: usize) -> Vec<u8> {
         let box_offset = self.save_type.box_data_offset() + BOX_SLOTS * Pk7::BOX_SIZE * box_num;
         let mon_offset = box_offset + offset * Pk7::BOX_SIZE;
-        let decrypted_bytes = encryption::decrypt_pkm_bytes_gen_6_7(
-            &self.bytes[mon_offset..mon_offset + Pk7::BOX_SIZE],
-        );
-        encryption::unshuffle_blocks_gen_6_7(&decrypted_bytes)
+
+        Pk7Buffer::box_span(&self.bytes[mon_offset..mon_offset + Pk7::BOX_SIZE])
+            .to_decrypted_bytes()
     }
 }
 

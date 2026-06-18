@@ -1,4 +1,4 @@
-use pkm_rs_types::{Stats, Stats16Le};
+use pkm_rs_types::{HyperTraining, Stats, Stats16Le};
 
 use crate::{
     metadata_source::MetadataSource,
@@ -7,25 +7,96 @@ use crate::{
     stats::Stat,
 };
 
-pub fn calculate_stats_modern<I: Stats, E: Stats>(
+struct DeFactoIvs<I: Stats> {
+    ivs: I,
+    hyper_training: HyperTraining,
+}
+
+const MAX_IV: u16 = 31;
+
+impl<I: Stats> DeFactoIvs<I> {
+    fn new(ivs: I, hyper_training: Option<HyperTraining>) -> Self {
+        Self {
+            ivs,
+            hyper_training: hyper_training.unwrap_or_default(),
+        }
+    }
+
+    fn get_hp(&self) -> u16 {
+        if self.hyper_training.hp {
+            MAX_IV
+        } else {
+            self.ivs.get_hp()
+        }
+    }
+
+    fn get_atk(&self) -> u16 {
+        if self.hyper_training.atk {
+            MAX_IV
+        } else {
+            self.ivs.get_atk()
+        }
+    }
+
+    fn get_def(&self) -> u16 {
+        if self.hyper_training.def {
+            MAX_IV
+        } else {
+            self.ivs.get_def()
+        }
+    }
+
+    fn get_spa(&self) -> u16 {
+        if self.hyper_training.spa {
+            MAX_IV
+        } else {
+            self.ivs.get_spa()
+        }
+    }
+
+    fn get_spd(&self) -> u16 {
+        if self.hyper_training.spd {
+            MAX_IV
+        } else {
+            self.ivs.get_spd()
+        }
+    }
+
+    fn get_spe(&self) -> u16 {
+        if self.hyper_training.spe {
+            MAX_IV
+        } else {
+            self.ivs.get_spe()
+        }
+    }
+}
+
+pub fn calculate_stats_modern<I: Stats + Copy, E: Stats>(
     metadata_source: MetadataSource,
     species_and_form: SpeciesAndForm,
     ivs: &I,
     evs: &E,
     level: u8,
     nature: &'static NatureMetadata,
+    hyper_training: Option<HyperTraining>,
 ) -> Option<Stats16Le> {
     let Some(BaseStats::Modern(stats8)) = species_and_form.get_base_stats_from(metadata_source)
     else {
         return None;
     };
 
+    let de_facto_ivs = DeFactoIvs::new(*ivs, hyper_training);
     let base_stats = Stats16Le::from(stats8);
     Some(Stats16Le {
-        hp: calculate_hp_modern(base_stats, ivs, evs, level as u16),
+        hp: calculate_hp_modern(
+            base_stats,
+            de_facto_ivs.get_hp(),
+            evs.get_hp(),
+            level as u16,
+        ),
         atk: calculate_stat_modern(
             base_stats.atk,
-            ivs.get_atk(),
+            de_facto_ivs.get_atk(),
             evs.get_atk(),
             level as u16,
             nature,
@@ -33,7 +104,7 @@ pub fn calculate_stats_modern<I: Stats, E: Stats>(
         ),
         def: calculate_stat_modern(
             base_stats.def,
-            ivs.get_def(),
+            de_facto_ivs.get_def(),
             evs.get_def(),
             level as u16,
             nature,
@@ -41,7 +112,7 @@ pub fn calculate_stats_modern<I: Stats, E: Stats>(
         ),
         spa: calculate_stat_modern(
             base_stats.spa,
-            ivs.get_spa(),
+            de_facto_ivs.get_spa(),
             evs.get_spa(),
             level as u16,
             nature,
@@ -49,7 +120,7 @@ pub fn calculate_stats_modern<I: Stats, E: Stats>(
         ),
         spd: calculate_stat_modern(
             base_stats.spd,
-            ivs.get_spd(),
+            de_facto_ivs.get_spd(),
             evs.get_spd(),
             level as u16,
             nature,
@@ -57,7 +128,7 @@ pub fn calculate_stats_modern<I: Stats, E: Stats>(
         ),
         spe: calculate_stat_modern(
             base_stats.spe,
-            ivs.get_spe(),
+            de_facto_ivs.get_spe(),
             evs.get_spe(),
             level as u16,
             nature,
@@ -66,19 +137,14 @@ pub fn calculate_stats_modern<I: Stats, E: Stats>(
     })
 }
 
-pub fn calculate_hp_modern<I: Stats, E: Stats>(
-    base_stats: Stats16Le,
-    ivs: &I,
-    evs: &E,
-    level: u16,
-) -> u16 {
-    let level_factor = 2 * base_stats.hp + ivs.get_hp() + evs.get_hp().div_euclid(4);
+pub const fn calculate_hp_modern(base_stats: Stats16Le, hp_iv: u16, hp_ev: u16, level: u16) -> u16 {
+    let level_factor = 2 * base_stats.hp + hp_iv + hp_ev.div_euclid(4);
     let numerator = level_factor * level;
 
     (numerator / 100) + level + 10
 }
 
-pub fn calculate_stat_modern(
+pub const fn calculate_stat_modern(
     base_stat: u16,
     iv: u16,
     ev: u16,

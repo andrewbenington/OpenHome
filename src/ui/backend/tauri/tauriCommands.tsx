@@ -5,11 +5,18 @@ import { JSONArray, JSONObject, JSONValue, SaveRef } from '@openhome-core/util/t
 import { AppTheme } from '@openhome-ui/state/appInfo'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { invoke, InvokeArgs, InvokeOptions } from '@tauri-apps/api/core'
-import { ConvertStrategies } from 'src/ui/state/convert-strategies/ConvertStrategiesProvider'
-import { AppState, ImageResponse, StoredLookups } from '../backendInterface'
-import { RustResult } from './types'
 import { getDefaultConvertStrategy } from '@pkm-rs/pkg'
+import { invoke, InvokeArgs, InvokeOptions } from '@tauri-apps/api/core'
+import { LogFilter } from 'src/ui/pages/logs'
+import { ConvertStrategies } from 'src/ui/state/convert-strategies/ConvertStrategiesProvider'
+import {
+  AppState,
+  ImageResponse,
+  LogLevel,
+  LogsResponseUnparsed,
+  StoredLookups,
+} from '../backendInterface'
+import { RustResult } from './types'
 
 export type StringToBytes = Record<string, Uint8Array>
 export type StringToB64 = Record<string, string>
@@ -41,6 +48,11 @@ if (!('fromBase64' in Uint8Array)) {
 const ZERO_UUID = '00000000-0000-0000-0000-000000000000'
 
 type RustUnitResultByString = Record<string, RustResult<null, string>>
+
+export type LogFilterIpc = Omit<LogFilter, 'start' | 'end'> & {
+  start_epoch_seconds: number
+  end_epoch_seconds: number
+}
 
 type OhTauriApi = {
   get_state(): AppState
@@ -86,6 +98,10 @@ type OhTauriApi = {
   start_transaction(): null
   rollback_transaction(): null
   commit_transaction(): null
+
+  get_logs_today(filter: LogFilterIpc): LogsResponseUnparsed
+  log(level: LogLevel, message: string, fields?: Record<string, unknown>): void
+  clear_logs_for_range(startEpochSeconds: number, endEpochSeconds: number): null
 }
 
 type OhCommand = keyof OhTauriApi
@@ -250,6 +266,18 @@ export const Commands: OhTauriApiNoThrow = {
 
   open_file_location(filePath: string) {
     return invokeAndCatch('open_file_location', { filePath })
+  },
+
+  get_logs_today(filter: LogFilterIpc) {
+    return invokeAndCatch('get_logs_today', { filter })
+  },
+
+  log(level: LogLevel, message: string, context?: Record<string, unknown | undefined>) {
+    return invokeAndCatch('log', { entry: { level, message, context } })
+  },
+
+  clear_logs_for_range(startEpochSeconds: number, endEpochSeconds: number) {
+    return invokeAndCatch('clear_logs_for_range', { startEpochSeconds, endEpochSeconds })
   },
 }
 

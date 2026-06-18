@@ -1,4 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { getLocationString, getLocationStringOrOrigin } from '@openhome-core/pkm/MetLocation'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getCharacteristic, getMoveMaxPP } from '@openhome-core/pkm/util'
 import { getPluginIdentifier } from '@openhome-core/save/util'
@@ -7,12 +8,8 @@ import MoveCard from '@openhome-ui/components/pokemon/MoveCard'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getBallIconPath } from '@openhome-ui/images/items'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
-import { Languages, OriginGames } from '@pkm-rs/pkg'
-import {
-  getLocationString,
-  getLocationStringOrOrigin,
-  RibbonTitles,
-} from '@pokemon-resources/index'
+import { Language, Languages, OriginGames } from '@pkm-rs/pkg'
+import { RibbonTitles } from '@pokemon-resources/index'
 import { Badge, Flex, Grid } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import './MetDataMovesTab.css'
@@ -29,7 +26,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
     }
     return `Egg received on ${mon.eggDate.month}/${mon.eggDate.day}/${
       mon.eggDate.year
-    } ${getLocationString(mon.gameOfOrigin, mon.eggLocationIndex, mon.format, true)}.`
+    } ${getLocationString(mon.gameOfOrigin, mon.eggLocationIndex, mon.format, Language.English, true)}.` // todo: i18n
   }, [mon])
 
   const metMessage = useMemo(() => {
@@ -62,7 +59,8 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
         const location = getLocationStringOrOrigin(
           mon.gameOfOrigin,
           mon.metLocationIndex,
-          mon.format
+          mon.format,
+          Language.English
         )
 
         message += ` ${location}`

@@ -1,0 +1,151 @@
+{
+  "encryption_constant": 2696695246,
+  "sanity": 0,
+  "checksum": 14200,
+  "species_and_form": {
+    "national_dex": 626,
+    "form_index": 0
+  },
+  "held_item_index": 0,
+  "trainer_id": 30756,
+  "secret_id": 45312,
+  "exp": 216000,
+  "ability_index": "Reckless",
+  "ability_num": "First",
+  "markings": {
+    "circle": "unset",
+    "square": "unset",
+    "triangle": "unset",
+    "heart": "unset",
+    "star": "unset",
+    "diamond": "unset"
+  },
+  "personality_value": 2130163667,
+  "nature": "Hasty",
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus_byte": 0,
+  "ribbons": [],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "form_argument": 0,
+  "nickname": "Bouffalant",
+  "nickname_trash": "42006F0075006600660061006C0061006E007400000000000000",
+  "moves": [
+    {
+      "move_index": "Head Charge",
+      "pp": 15,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Swords Dance",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Megahorn",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Giga Impact",
+      "pp": 5,
+      "pp_ups": 0
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "ivs": {
+    "hp": 14,
+    "atk": 1,
+    "def": 29,
+    "spa": 15,
+    "spd": 17,
+    "spe": 14
+  },
+  "is_egg": false,
+  "is_nicknamed": false,
+  "handler_name": "",
+  "handler_gender": "Male",
+  "is_current_handler": false,
+  "handler_friendship": 0,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "handler_id": 0,
+  "handler_language": "None",
+  "fullness": 0,
+  "enjoyment": 0,
+  "trainer_name": "RoC",
+  "trainer_friendship": 50,
+  "trainer_memory": {
+    "intensity": 1,
+    "memory": 1,
+    "feeling": 12,
+    "textVariables": 50
+  },
+  "egg_date": null,
+  "met_date": "6/19/2020",
+  "egg_location_index": 0,
+  "met_location_index": 166,
+  "ball": "Ultra",
+  "met_level": 60,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": false,
+    "atk": false,
+    "def": false,
+    "spa": false,
+    "spd": false,
+    "spe": false
+  },
+  "game_of_origin": "Sword",
+  "game_of_origin_battle": null,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 60,
+  "stats": {
+    "hp": 192,
+    "atk": 137,
+    "def": 122,
+    "spa": 62,
+    "spd": 129,
+    "spe": 86
+  },
+  "level": 60,
+  "palma": 0,
+  "affixed_ribbon": null,
+  "height_scalar": 179,
+  "weight_scalar": 125,
+  "mint_nature": "Hasty",
+  "dynamax_level": 0,
+  "is_favorite": false,
+  "sociability": 0,
+  "home_tracker": null,
+  "tr_flags_swsh": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "can_gigantamax": false,
+  "current_hp": 192
+}

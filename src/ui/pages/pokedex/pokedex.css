@@ -4,7 +4,7 @@
     rgba(0, 0, 0, 0.15) 0px -2.25rem 2rem 0px inset, rgba(0, 0, 0, 0.1) 0px -5rem 5rem 0px inset,
     rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px,
     rgba(0, 0, 0, 0.09) 0px 8px 4px;
-  --top-bar-height: calc(1.1rem + 2 * var(--padding-radius-sm-lg));
+  --top-bar-height: 1.2rem;
   --sidebar-width: 22rem;
 
   height: 100%;
@@ -57,12 +57,12 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  background-color: var(--accent-9);
+  background-color: var(--color-header);
   box-shadow:
     rgba(0, 0, 0, 0.07) 0px 1px 1px,
     rgba(0, 0, 0, 0.07) 0px 2px 2px,
     rgba(0, 0, 0, 0.07) 0px 4px 4px,
-    rgba(0, 0, 0, 0.07) 0px 8px 8px,
+    rgba(0, 0, 0, 0.03) 0px 8px 8px,
     rgba(0, 0, 0, 0.07) 0px 16px 16px;
   color: var(--accent-contrast);
   gap: 1.5rem;
@@ -74,12 +74,13 @@
 }
 
 .pokedex-header-title {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
 
 .pokedex-filter-field {
   margin: 0;
   width: calc(var(--sidebar-width) - var(--padding-radius-sm-lg));
+  height: 1.5rem;
 }
 
 .pokedex-body {
@@ -169,7 +170,7 @@
 }
 
 .pokedex-tab-selected {
-  background-color: var(--accent-9);
+  background-color: var(--color-header);
   color: var(--accent-contrast);
   height: 2.5rem;
   z-index: 1;

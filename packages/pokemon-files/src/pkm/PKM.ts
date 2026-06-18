@@ -1,9 +1,10 @@
-import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import PK3RR from '@openhome-core/save/radicalred/PK3RR'
 import PK3UB from '@openhome-core/save/unbound/PK3UB'
-import { ConvertStrategy } from '@pkm-rs/pkg'
+import { ConvertStrategy, PkmFormat } from '@pkm-rs/pkg'
+import PK9Compass from 'src/core/save/compass/PK9Compass'
 import COLOPKM from './COLOPKM'
 import PA8 from './PA8'
 import PA9 from './PA9'
@@ -38,12 +39,19 @@ export type PKM =
   | PA9
   | PK7
 
-export type RomHackPKM = PK3RR | PK3UB | PB8LUMI
+export const WasmPkmFormats = [PK3, PK7, PK8]
+export type WasmPkmFormat = InstanceType<(typeof WasmPkmFormats)[number]>
+
+export function isWasmFormat(pkm: PKMInterface): pkm is WasmPkmFormat {
+  return WasmPkmFormats.some((P) => pkm instanceof P)
+}
+
+export type RomHackPKM = PK3RR | PK3UB | PB8LUMI | PK9Compass
 
 export type PkmClass<P extends PKMInterface> = {
   fromBytes(bytes: ArrayBuffer, encrypted?: boolean): P
   fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
-  getFormat(): MonFormat
+  getFormat(): PkmFormat
 }
 
 export type PkmConstructorOptions =

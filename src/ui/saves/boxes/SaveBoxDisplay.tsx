@@ -18,7 +18,7 @@ import { Button, Dialog, Flex, Grid, Separator } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
-import { includeClass } from '../../util/style'
+import { cssClass } from '../../util/style'
 import { useBoxNavigator } from '../util'
 import ArrowButton from './ArrowButton'
 import BoxCell from './BoxCell'
@@ -144,7 +144,9 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   return save && save.currentPCBox !== undefined ? (
     <>
       <Flex direction="column" width="100%">
-        <div className={includeClass('box-card').with('box-card-disabled').if(allCellsDisabled)}>
+        <div
+          className={cssClass('box-card').with('box-card-disabled').if(allCellsDisabled).build()}
+        >
           <SaveHeader save={save} setDetailsModal={setDetailsModal} />
           <Separator />
           <div className="box-navigation pad-x-sm-lg">

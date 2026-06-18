@@ -140,13 +140,15 @@ pub struct NatureMetadata {
 }
 
 impl NatureMetadata {
-    pub fn multiplier_for(&self, stat: Stat) -> f32 {
+    pub const fn multiplier_for(&self, stat: Stat) -> f32 {
         match &self.stats {
             None => 1.0,
             Some(stat_changes) => {
-                if stat_changes.increase == stat {
+                // casts necessary for const fn
+                let stat = stat as usize;
+                if stat_changes.increase as usize == stat {
                     1.1
-                } else if stat_changes.decrease == stat {
+                } else if stat_changes.decrease as usize == stat {
                     0.9
                 } else {
                     1.0
