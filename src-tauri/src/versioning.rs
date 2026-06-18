@@ -160,6 +160,7 @@ pub enum SignificantUpdate {
     V1_11_2,
     V1_11_3,
     V1_11_4,
+    V1_12_0,
 }
 
 impl SignificantUpdate {
@@ -185,6 +186,7 @@ impl SignificantUpdate {
             Self::V1_11_2 => Version::parse("1.11.2").unwrap(),
             Self::V1_11_3 => Version::parse("1.11.3").unwrap(),
             Self::V1_11_4 => Version::parse("1.11.4").unwrap(),
+            Self::V1_12_0 => Version::parse("1.12.0").unwrap(),
         }
     }
 
@@ -270,6 +272,11 @@ impl SignificantUpdate {
             ]),
             Self::V1_11_4 => Some(vec![
                 "Fixed a bug causing changes in Alola games to not be tracked.",
+            ]),
+            Self::V1_12_0 => Some(vec![
+                "Added support for Pokémon Compass.",
+                "Added structured logging and a new tab to view logs.",
+                "The Pokémon details modal has a tab for Pokémon-specific logs, including when fields are updated.",
             ]),
             _ => None,
         }

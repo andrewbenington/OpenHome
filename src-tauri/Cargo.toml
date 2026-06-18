@@ -1,6 +1,6 @@
 [package]
 name = "OpenHome"
-version = "1.11.4"
+version = "1.12.0"
 description = "A tool for moving Pokémon between game saves"
 authors = ["Andrew Benington"]
 edition = "2024"
