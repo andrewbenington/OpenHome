@@ -13,6 +13,13 @@ import {
   getHiddenPowerType,
 } from '@openhome-core/pkm/util'
 import { AllPKMFields } from '@openhome-core/pkm/util/pkmInterface'
+import {
+  BDSPTMMoveIndexes,
+  LATutorMoveIndexes,
+  Moves,
+  SVTMMoveIndexes,
+  SwShTRMoveIndexes,
+} from '@openhome-core/pokemon-resources'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import {
   getDisplayID,
@@ -41,13 +48,6 @@ import {
   SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
 } from '@pokemon-resources/consts/TransferRestrictions'
-import {
-  BDSPTMMoveIndexes,
-  LATutorMoveIndexes,
-  Moves,
-  SVTMMoveIndexes,
-  SwShTRMoveIndexes,
-} from '@pokemon-resources/index'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
 

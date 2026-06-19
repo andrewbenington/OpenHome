@@ -1,5 +1,5 @@
+import { Gen3ContestRibbons } from '@openhome-core/pokemon-resources'
 import { Gen3Ribbon } from '@pkm-rs/pkg'
-import { Gen3ContestRibbons } from '@pokemon-resources/index'
 import { uIntFromBufferBits, uIntToBufferBits } from '../../util/byteLogic'
 
 export function gen3ContestRibbonsFromBuffer(

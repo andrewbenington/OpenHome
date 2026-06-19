@@ -1,4 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { ModernRibbons } from '@openhome-core/pokemon-resources'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,
@@ -15,7 +16,6 @@ import {
   SpeciesLookup,
   TrainerMemory,
 } from '@pkm-rs/pkg'
-import { ModernRibbons } from '@pokemon-resources/index'
 import * as byteLogic from '../util/byteLogic'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'

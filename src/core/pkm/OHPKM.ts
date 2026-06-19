@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { isWasmFormat, WasmPkmFormat } from '@openhome-core/pkm/PKM'
+import { Gen34ContestRibbons, Gen34TowerRibbons } from '@openhome-core/pokemon-resources'
 import { getHeightCalculated, getWeightCalculated } from '@openhome-core/util'
 import { intersection, Option, unique } from '@openhome-core/util/functional'
 import {
@@ -33,7 +34,6 @@ import {
   updatePidIfWouldBecomeShinyGen345,
 } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { Gen34ContestRibbons, Gen34TowerRibbons } from '@pokemon-resources/index'
 import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'

@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { PKM, PkmClass } from '@openhome-core/pkm/PKM'
+import { Moves } from '@openhome-core/pokemon-resources'
 import { filterUndefined } from '@openhome-core/util/sort'
 import {
   Gender,
@@ -12,7 +13,6 @@ import {
   PkmFormats,
 } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { Moves } from '@pokemon-resources/index'
 import Prando from 'prando'
 import { AllPKMFields } from '../pkm/util/pkmInterface'
 import { FourMoves } from './types'

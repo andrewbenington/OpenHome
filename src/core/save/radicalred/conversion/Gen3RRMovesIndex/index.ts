@@ -1,5 +1,5 @@
+import { Moves } from '@openhome-core/pokemon-resources'
 import { Option } from '@openhome-core/util/functional'
-import { Moves } from '@pokemon-resources/index'
 import { NationalToRRMap } from './NationalToRRMap'
 import { RRToNationalMap } from './RRToNationalMap'
 

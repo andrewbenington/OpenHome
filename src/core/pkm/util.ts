@@ -1,4 +1,14 @@
 import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
+import {
+  AttackCharacteristics,
+  DefenseCharacteristics,
+  HPCharacteristics,
+  HPCharacteristicsPre6,
+  Moves,
+  SpecialAtkCharacteristics,
+  SpecialDefCharacteristics,
+  SpeedCharacteristics,
+} from '@openhome-core/pokemon-resources'
 import { FourMoves, Stats } from '@openhome-core/util/types'
 import {
   AbilityIndex,
@@ -17,16 +27,6 @@ import {
 } from '@pkm-rs/pkg'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import {
-  AttackCharacteristics,
-  DefenseCharacteristics,
-  HPCharacteristics,
-  HPCharacteristicsPre6,
-  Moves,
-  SpecialAtkCharacteristics,
-  SpecialDefCharacteristics,
-  SpeedCharacteristics,
-} from '@pokemon-resources/index'
 import Prando from 'prando'
 
 export const getAbilityFromNumber = (

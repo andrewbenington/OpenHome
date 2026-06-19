@@ -1,4 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { ModernRibbons } from '@openhome-core/pokemon-resources'
 import { Option } from '@openhome-core/util/functional'
 import { FourMoves, PKMDate } from '@openhome-core/util/types'
 import {
@@ -20,7 +21,6 @@ import {
   Stats16Le,
   TrainerMemory,
 } from '@pkm-rs/pkg'
-import { ModernRibbons } from '@pokemon-resources/index'
 import { PkmConstructorOptions } from './PKM'
 import {
   binaryGenderFromBool,
