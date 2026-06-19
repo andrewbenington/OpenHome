@@ -6,7 +6,7 @@ import {
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
-import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
+import { readGen4StringFromBytes } from '@openhome-core/util'
 import { ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'
@@ -96,7 +96,11 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     }
 
     for (let box = 0; box < 18; box++) {
-      const boxLabel = gen4StringToUTF(this.bytes, this.boxNamesOffset + 40 * box, 20)
+      const boxLabel = readGen4StringFromBytes(
+        new DataView(this.bytes.buffer),
+        this.boxNamesOffset + 40 * box,
+        20
+      )
 
       this.boxes[box] = new Box(boxLabel, 30)
     }

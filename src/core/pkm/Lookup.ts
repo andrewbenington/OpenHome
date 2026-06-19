@@ -2,10 +2,11 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { dvsFromIVs, getBaseMon } from '@openhome-core/pkm/util'
 import { Option } from '@openhome-core/util/functional'
+import { readGameBoyStringFromBytes } from '@openhome-core/util/stringConversion'
 import { PKMFormeRef } from '@openhome-core/util/types'
 import { MetadataSummaryLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { gen12StringToUTF, utf16StringToGen12 } from '../save/util/Strings'
 import { bytesToString } from '../save/util/byteLogic'
+import { utf16StringToGen12 } from './util/'
 
 export type OhpkmIdentifier = string
 
@@ -57,7 +58,9 @@ export const getMonGen12Identifier = (mon: PKMInterface): Option<Gen12Identifier
     dvs = dvsFromIVs(ivs, mon.isShiny())
   }
 
-  const convertedTrainerName = gen12StringToUTF(utf16StringToGen12(mon.trainerName, 8, true), 0, 8)
+  const gen12Bytes = utf16StringToGen12(mon.trainerName, 8, true)
+  const dataView = new DataView(gen12Bytes.buffer)
+  const convertedTrainerName = readGameBoyStringFromBytes(dataView, 0, 8)
   const baseMon = getBaseMon(mon.dexNum, mon.formNum)
   let tid = mon.trainerID
 

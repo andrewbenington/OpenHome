@@ -2,8 +2,8 @@ import { PK4 } from '@openhome-core/pkm'
 import { Item } from '@openhome-core/resources/consts/Items'
 import { HGSS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { bytesToUint16LittleEndian } from '@openhome-core/save/util/byteLogic'
-import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { readGen4StringFromBytes } from '@openhome-core/util/stringConversion'
 import { ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { G4SAV } from './G4SAV'
 import { hasDesamumeFooter } from './util'
@@ -70,7 +70,7 @@ export class HGSSSAV extends G4SAV {
 
     this.currentSaveBoxStartOffset = this.currentSaveStorageBlockOffset
     this.boxNamesOffset = this.currentSaveStorageBlockOffset + HGSSSAV.BOX_NAMES_OFFSET
-    this.name = gen4StringToUTF(bytes, HGSSSAV.TRAINER_NAME_OFFSET, 8)
+    this.name = readGen4StringFromBytes(new DataView(bytes.buffer), HGSSSAV.TRAINER_NAME_OFFSET, 8)
     this.tid = bytesToUint16LittleEndian(bytes, HGSSSAV.TRAINER_ID_OFFSET)
     this.sid = bytesToUint16LittleEndian(bytes, HGSSSAV.TRAINER_ID_OFFSET + 2)
     this.displayID = this.tid.toString().padStart(5, '0')
