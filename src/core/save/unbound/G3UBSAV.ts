@@ -1,6 +1,6 @@
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
 import { ConvertStrategy, ExtraFormIndex, ItemUnbound, unboundSupportsExtraForm } from '@pkm-rs/pkg'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { GEN3_SIGNATURE_OFFSET } from '../G3SAV'

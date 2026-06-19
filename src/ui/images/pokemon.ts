@@ -5,6 +5,8 @@ import {
   isMegaStone,
   PkmOrOhpkmFormat,
 } from '@openhome-core/pkm/util'
+import { BLOOD_MOON, SWEETS } from '@openhome-core/resources/consts/Forms'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { getLumiFormIndexByExtraFormIndex } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import { toGen3RRPokemonIndex } from '@openhome-core/save/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from '@openhome-core/save/radicalred/conversion/RadicalRedSprites'
@@ -17,8 +19,6 @@ import {
   isSeviiForm,
   MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
-import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Forms'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 
 export const fileToSpriteFolder: Record<PkmOrOhpkmFormat, string> = {
   PK1: 'gen1',

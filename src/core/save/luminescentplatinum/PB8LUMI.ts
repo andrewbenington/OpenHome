@@ -1,4 +1,6 @@
+import { PB8 } from '@openhome-core/pkm'
 import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
+import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
 import { Option } from '@openhome-core/util/functional'
 import {
   ConvertStrategy,
@@ -6,8 +8,6 @@ import {
   luminescentSupportsExtraForm,
   OriginGames,
 } from '@pkm-rs/pkg'
-import { PB8 } from '@pokemon-files/pkm'
-import { PkmConstructorOptions } from '../../../../packages/pokemon-files/src/pkm/PKM'
 import { OHPKM } from '../../pkm/OHPKM'
 import { PluginIdentifier } from '../interfaces'
 import { getLumiCustomForm as getLumiExtraFormIndex } from './conversion/LuminescentPlatinumFormMap'

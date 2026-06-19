@@ -1,3 +1,4 @@
+import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import BoxIcons from '@openhome-ui/images/BoxIcons.webp'
@@ -11,7 +12,6 @@ import {
   Generation,
   MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
-import { CHAMPS_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
 import { useMonDisplay } from '../hooks/useMonDisplay'
 import useBoxIconImage from '../pokemon-details/useBoxIconImage'

@@ -1,3 +1,6 @@
+import PK7 from '@openhome-core/pkm/PK7'
+import { Item } from '@openhome-core/resources//consts/Items'
+import { USUM_TRANSFER_RESTRICTIONS } from '@openhome-core/resources//consts/TransferRestrictions'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -5,9 +8,6 @@ import {
   OriginGame,
   Pk7 as Pk7Wasm,
 } from '@pkm-rs/pkg'
-import PK7 from '../../../packages/pokemon-files/src/pkm/PK7'
-import { Item } from '../../../packages/pokemon-resources/src/consts/Items'
-import { USUM_TRANSFER_RESTRICTIONS } from '../../../packages/pokemon-resources/src/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'
 import { Box, BoxAndSlot, WasmOfficialSave } from './interfaces'

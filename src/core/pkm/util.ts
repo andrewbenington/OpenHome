@@ -1,5 +1,18 @@
 import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
+  AttackCharacteristics,
+  DefenseCharacteristics,
+  HPCharacteristics,
+  HPCharacteristicsPre6,
+  Moves,
+  SpecialAtkCharacteristics,
+  SpecialDefCharacteristics,
+  SpeedCharacteristics,
+} from '@openhome-core/resources'
+import { Item } from '@openhome-core/resources/consts/Items'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import { FourMoves, Stats } from '@openhome-core/util/types'
+import {
   AbilityIndex,
   AbilityNumber,
   currentMetadataReader,
@@ -14,19 +27,6 @@ import {
   SpeciesAndForm,
   StatsPreSplit,
 } from '@pkm-rs/pkg'
-import { FourMoves, Stats } from '@pokemon-files/util'
-import { Item } from '@pokemon-resources/consts/Items'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import {
-  AttackCharacteristics,
-  DefenseCharacteristics,
-  HPCharacteristics,
-  HPCharacteristicsPre6,
-  Moves,
-  SpecialAtkCharacteristics,
-  SpecialDefCharacteristics,
-  SpeedCharacteristics,
-} from '@pokemon-resources/index'
 import Prando from 'prando'
 
 export const getAbilityFromNumber = (

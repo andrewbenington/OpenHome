@@ -1,7 +1,7 @@
+import { PA8, PA9, PB8, PK8, PK9 } from '@openhome-core/pkm'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Option } from '@openhome-core/util/functional'
 import { ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
-import { PA8, PA9, PB8, PK8, PK9 } from '@pokemon-files/pkm'
 import {
   SCArrayBlock,
   SCBlock,

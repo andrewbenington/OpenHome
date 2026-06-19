@@ -1,5 +1,5 @@
+import { PK5 } from '@openhome-core/pkm'
 import { ConvertStrategies } from '@pkm-rs/pkg/pkm_rs'
-import { PK5 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
 import path from 'path'

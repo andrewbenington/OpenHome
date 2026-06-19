@@ -1,0 +1,304 @@
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { Gen3ContestRibbons, Gen3StandardRibbons } from '@openhome-core/resources'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import { FourMoves } from '@openhome-core/util/types'
+import {
+  AbilityNumber,
+  Ball,
+  ContestStats,
+  ConvertStrategy,
+  Gen3Ribbon,
+  ItemGen3,
+  Language,
+  Languages,
+  MarkingsFourShapes,
+  MetadataSummaryLookup,
+  NatureIndex,
+  SpeciesLookup,
+} from '@pkm-rs/pkg'
+import * as byteLogic from '../util/byteLogic'
+import * as stringLogic from '../util/stringConversion'
+import * as types from '../util/types'
+import { MoveFilter } from '../util/util'
+import { PkmConverter } from './conversion/converter'
+import { PkmConstructorOptions } from './PKM'
+import {
+  filterRibbons,
+  gen3ContestRibbonsFromBytes,
+  gen3ContestRibbonsToBytes,
+} from './util/ribbonLogic'
+import { getStats } from './util/statCalc'
+
+export default class XDPKM {
+  static getFormat() {
+    return 'XDPKM' as const
+  }
+  format: 'XDPKM' = 'XDPKM'
+  static getBoxSize() {
+    return 196
+  }
+  dexNum: number
+  heldItemIndexGen3?: ItemGen3
+  currentHP: number
+  trainerFriendship: number
+  metLocationIndex: number
+  metLevel: number
+  ball: number
+  trainerGender: boolean
+  statLevel: number
+  pokerusByte: number
+  markings: MarkingsFourShapes
+  isEgg: boolean
+  exp: number
+  secretID: number
+  trainerID: number
+  personalityValue: number
+  isFatefulEncounter: boolean
+  gameOfOrigin: number
+  language: Language
+  trainerName: string
+  nickname: string
+  moves: FourMoves
+  movePP: FourMoves
+  movePPUps: FourMoves
+  evs: types.Stats
+  ivs: types.Stats
+  contest: ContestStats
+  shadowID: number
+  ribbons: Gen3Ribbon[]
+
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
+    if (arg instanceof ArrayBuffer) {
+      const buffer = arg
+      const dataView = new DataView(buffer)
+      this.dexNum = dataView.getUint16(0x0, false)
+      this.heldItemIndexGen3 = ItemGen3.fromIndex(dataView.getUint16(0x2, false))
+      this.currentHP = dataView.getUint16(0x4, false)
+      this.trainerFriendship = dataView.getUint16(0x6, false)
+      this.metLocationIndex = dataView.getUint16(0x8, false)
+      this.metLevel = dataView.getUint8(0xe)
+      this.ball = dataView.getUint8(0xf)
+      this.trainerGender = byteLogic.getFlag(dataView, 0x10, 1)
+      this.statLevel = dataView.getUint8(0x11)
+      this.pokerusByte = dataView.getUint8(0x13)
+      this.markings = types.markingsFourShapesFromBytes(dataView, 0x14)
+      this.isEgg = byteLogic.getFlag(dataView, 0x1d, 7)
+      this.exp = dataView.getUint32(0x20, false)
+      this.secretID = dataView.getUint16(0x24, false)
+      this.trainerID = dataView.getUint16(0x26, false)
+      this.personalityValue = dataView.getUint32(0x28, false)
+      this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x33, 0)
+      this.gameOfOrigin = dataView.getUint8(0x34)
+      this.language = Languages.fromByteOrNoneGcn(dataView.getUint8(0x37))
+      this.trainerName = stringLogic.utf16BytesToString(buffer, 0x38, 11)
+      this.nickname = stringLogic.utf16BytesToString(buffer, 0x4e, 11)
+      this.moves = [
+        dataView.getUint16(0x80, false),
+        dataView.getUint16(0x82, false),
+        dataView.getUint16(0x84, false),
+        dataView.getUint16(0x86, false),
+      ]
+      this.movePP = [
+        dataView.getUint8(0x82),
+        dataView.getUint8(0x83),
+        dataView.getUint8(0x84),
+        dataView.getUint8(0x85),
+      ]
+      this.movePPUps = [
+        dataView.getUint8(0x83),
+        dataView.getUint8(0x84),
+        dataView.getUint8(0x85),
+        dataView.getUint8(0x86),
+      ]
+      this.evs = types.readStatsFromBytesU8(dataView, 0x9d)
+      this.ivs = types.readStatsFromBytesU8(dataView, 0xa9)
+      this.contest = types.readContestStatsFromBytes(dataView, 0xae)
+      this.shadowID = dataView.getUint16(0xba, false)
+      this.ribbons = gen3ContestRibbonsFromBytes(dataView, 0xb3).concat(
+        byteLogic.getFlagIndexes(dataView, 0x7c, 15, 12).map((index) => Gen3StandardRibbons[index])
+      )
+    } else {
+      const other = arg
+      const converter = new PkmConverter('XDPKM', options.strategy)
+      const metData = converter.metData(other)
+
+      this.dexNum = other.dexNum
+      this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
+      this.currentHP = other.currentHP
+      this.trainerFriendship = other.trainerFriendship
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
+      this.metLevel = other.metLevel
+      if (other.ball && XDPKM.maxValidBall() >= other.ball) {
+        this.ball = other.ball
+      } else {
+        this.ball = Ball.Poke
+      }
+      this.trainerGender = other.trainerGender
+      this.pokerusByte = other.pokerusByte
+      this.markings = types.markingsFourShapesFromOther(other.markings)
+      this.isEgg = other.isEgg
+      this.exp = other.exp
+      this.secretID = other.secretID
+      this.trainerID = other.trainerID
+      this.personalityValue = other.personalityValue
+      this.isFatefulEncounter = other.isFatefulEncounter
+      this.language = other.language
+      this.trainerName = other.trainerName
+      this.nickname = converter.nickname(other)
+
+      const moveFilter = MoveFilter.fromPkmClass(XDPKM)
+      this.moves = moveFilter.moves(other)
+      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePPUps = moveFilter.movePpUps(other)
+
+      this.evs = other.evs
+      this.ivs = converter.ivs(other)
+      this.contest = other.contest
+      this.shadowID = 0
+      this.ribbons = filterRibbons(other.ribbons, [
+        Gen3ContestRibbons,
+        Gen3StandardRibbons,
+      ]) as Gen3Ribbon[]
+      this.statLevel = this.speciesMetadata?.calculateLevel(this.exp) ?? 1
+    }
+  }
+
+  static fromBytes(buffer: ArrayBuffer): XDPKM {
+    return new XDPKM(buffer, { encrypted: false })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): XDPKM {
+    return new XDPKM(ohpkm, { strategy })
+  }
+
+  toBytes(): ArrayBuffer {
+    const buffer = new ArrayBuffer(196)
+    const dataView = new DataView(buffer)
+
+    dataView.setUint16(0x0, this.dexNum, false)
+    dataView.setUint16(0x2, this.heldItemIndex, false)
+    dataView.setUint16(0x4, this.currentHP, false)
+    dataView.setUint16(0x6, this.trainerFriendship, false)
+    dataView.setUint16(0x8, this.metLocationIndex, false)
+    dataView.setUint8(0xe, this.metLevel)
+    dataView.setUint8(0xf, this.ball)
+    byteLogic.setFlag(dataView, 0x10, 1, this.trainerGender)
+    dataView.setUint8(0x11, this.statLevel)
+    dataView.setUint8(0x13, this.pokerusByte)
+    types.markingsFourShapesToBytes(dataView, 0x14, this.markings)
+    byteLogic.setFlag(dataView, 0x1d, 7, this.isEgg)
+    dataView.setUint32(0x20, this.exp, false)
+    dataView.setUint16(0x24, this.secretID, false)
+    dataView.setUint16(0x26, this.trainerID, false)
+    dataView.setUint32(0x28, this.personalityValue, false)
+    byteLogic.setFlag(dataView, 0x33, 0, this.isFatefulEncounter)
+    dataView.setUint8(0x34, this.gameOfOrigin)
+    dataView.setUint8(0x37, Languages.toGcnByte(this.language))
+    stringLogic.writeUTF16StringToBytes(dataView, this.trainerName, 0x38, 11)
+    stringLogic.writeUTF16StringToBytes(dataView, this.nickname, 0x4e, 11)
+    for (let i = 0; i < 4; i++) {
+      dataView.setUint16(0x80 + i * 2, this.moves[i], false)
+    }
+
+    for (let i = 0; i < 4; i++) {
+      dataView.setUint8(0x82 + i, this.movePP[i])
+    }
+
+    for (let i = 0; i < 4; i++) {
+      dataView.setUint8(0x83 + i, this.movePPUps[i])
+    }
+    types.writeStatsToBytesU8(dataView, 0x9d, this.evs)
+    types.writeStatsToBytesU8(dataView, 0xa9, this.ivs)
+    types.writeContestStatsToBytes(dataView, 0xae, this.contest)
+    dataView.setUint16(0xba, this.shadowID, false)
+    gen3ContestRibbonsToBytes(dataView, 0xb3, this.ribbons)
+    byteLogic.setFlagIndexes(
+      dataView,
+      0x7c,
+      15,
+      this.ribbons
+        .map((ribbon) => Gen3StandardRibbons.indexOf(ribbon))
+        .filter((index) => index > -1 && index < 12)
+    )
+    return buffer
+  }
+
+  public getStats() {
+    return getStats(this)
+  }
+
+  public get gender() {
+    return this.metadata?.genderFromPid(this.personalityValue)
+  }
+
+  public get heldItemIndex() {
+    return this.heldItemIndexGen3?.toModern()?.index ?? 0
+  }
+
+  public get heldItemName() {
+    return this.heldItemIndexGen3?.name ?? 'None'
+  }
+
+  public get nature() {
+    return NatureIndex.newFromPid(this.personalityValue)
+  }
+
+  public get abilityNum() {
+    return this.personalityValue & 1 ? AbilityNumber.Second : AbilityNumber.First
+  }
+
+  public get ability() {
+    return this.metadata?.abilityByNumGen3(this.abilityNum)
+  }
+
+  public get formNum() {
+    if (this.dexNum === NationalDex.Unown) {
+      let letterValue = (this.personalityValue >> 24) & 0x3
+      letterValue = ((this.personalityValue >> 16) & 0x3) | (letterValue << 2)
+      letterValue = ((this.personalityValue >> 8) & 0x3) | (letterValue << 2)
+      letterValue = (this.personalityValue & 0x3) | (letterValue << 2)
+      return letterValue % 28
+    }
+    return 0
+  }
+
+  public getLevel() {
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
+  }
+
+  isShiny() {
+    return (
+      (this.trainerID ^
+        this.secretID ^
+        (this.personalityValue & 0xffff) ^
+        ((this.personalityValue >> 16) & 0xffff)) <
+      8
+    )
+  }
+
+  isSquareShiny() {
+    return !(
+      this.trainerID ^
+      this.secretID ^
+      (this.personalityValue & 0xffff) ^
+      ((this.personalityValue >> 16) & 0xffff)
+    )
+  }
+
+  public get metadata() {
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
+  }
+
+  public get speciesMetadata() {
+    return SpeciesLookup(this.dexNum)
+  }
+
+  static maxValidMove() {
+    return 354
+  }
+
+  static maxValidBall() {
+    return 12
+  }
+}

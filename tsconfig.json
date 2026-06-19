@@ -21,14 +21,14 @@
       "@openhome-core/*": [
         "./src/core/*"
       ],
-      "@pokemon-files/*": [
-        "./packages/pokemon-files/src/*"
-      ],
-      "@pokemon-resources/*": [
-        "./packages/pokemon-resources/src/*"
+      "@openhome-core/resources/*": [
+        "./src/core/resources/*"
       ],
       "@pkm-rs/*": [
         "./pkm_rs/*"
+      ],
+      "@pkm-rs": [
+        "./pkm_rs"
       ]
     },
     "typeRoots": ["./src/types", "./node_modules/@types"],

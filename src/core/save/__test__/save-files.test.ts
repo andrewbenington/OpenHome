@@ -1,7 +1,7 @@
+import { PK7 } from '@openhome-core/pkm'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { R } from '@openhome-core/util/functional'
 import { ConvertStrategies } from '@pkm-rs/pkg'
-import { PK7 } from '@pokemon-files/pkm'
 import { fail } from 'assert'
 import fs, { readFileSync } from 'fs'
 import path from 'path'

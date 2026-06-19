@@ -1,5 +1,5 @@
+import { Moves } from '@openhome-core/resources'
 import { Gen3RRMoves } from '@openhome-core/save/radicalred/conversion/Gen3RRMovesIndex'
-import { Moves } from '@pokemon-resources/index'
 import { writeFileSync } from 'fs'
 
 const NationalMoves = Moves

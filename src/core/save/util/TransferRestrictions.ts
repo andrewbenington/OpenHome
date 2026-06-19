@@ -1,4 +1,3 @@
-import { ExtraFormIndex } from '@pkm-rs/pkg'
 import {
   BASE,
   BLOOD_MOON,
@@ -6,8 +5,9 @@ import {
   LGP_STARTER,
   MAROWAK_ALOLA_TOTEM,
   SPIKY_EAR,
-} from '@pokemon-resources/consts/Forms'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+} from '@openhome-core/resources/consts/Forms'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import { ExtraFormIndex } from '@pkm-rs/pkg'
 
 interface FormRestrictions {
   [dexNum: number]: number[] | undefined

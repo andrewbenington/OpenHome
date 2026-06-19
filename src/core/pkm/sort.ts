@@ -1,7 +1,7 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { PKM } from '@openhome-core/pkm/PKM'
+import { getDisplayID } from '@openhome-core/util/util'
 import { Ball, Gender } from '@pkm-rs/pkg'
-import { PKM } from '@pokemon-files/pkm/PKM'
-import { getDisplayID } from '@pokemon-files/util/util'
 import dayjs from 'dayjs'
 import { getBaseMon } from './util'
 

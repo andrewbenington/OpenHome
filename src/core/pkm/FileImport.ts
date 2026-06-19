@@ -1,10 +1,3 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
-import PK3RR from '@openhome-core/save/radicalred/PK3RR'
-import PK3UB from '@openhome-core/save/unbound/PK3UB'
-import { AnyPkmClass, SavePkmClass } from '@openhome-core/save/util'
-import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
 import {
   COLOPKM,
   PA8,
@@ -21,7 +14,14 @@ import {
   PK8,
   PK9,
   XDPKM,
-} from '@pokemon-files/pkm'
+} from '@openhome-core/pkm'
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
+import PK3RR from '@openhome-core/save/radicalred/PK3RR'
+import PK3UB from '@openhome-core/save/unbound/PK3UB'
+import { AnyPkmClass, SavePkmClass } from '@openhome-core/save/util'
+import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
 import PK9Compass from '../save/compass/PK9Compass'
 import { isPkmFormat, PkmOrOhpkmFormat } from './util'
 

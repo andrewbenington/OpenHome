@@ -1,6 +1,6 @@
+import { PK3 } from '@openhome-core/pkm'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { ConvertStrategies, ConvertStrategy } from '@pkm-rs/pkg'
-import { PK3 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
 import path from 'path'

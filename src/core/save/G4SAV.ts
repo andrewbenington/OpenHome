@@ -1,3 +1,5 @@
+import { PK4 } from '@openhome-core/pkm'
+import * as encryption from '@openhome-core/pkm/util/encryption'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
 import {
   bytesToUint16LittleEndian,
@@ -6,8 +8,6 @@ import {
 } from '@openhome-core/save/util/byteLogic'
 import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
-import { PK4 } from '@pokemon-files/pkm'
-import * as encryption from '@pokemon-files/util/encryption'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'

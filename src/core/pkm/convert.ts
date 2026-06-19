@@ -1,5 +1,5 @@
+import { PKMDate } from '@openhome-core/util/types'
 import * as PkmWasm from '@pkm-rs/pkg'
-import { PKMDate } from '@pokemon-files/util'
 
 export function convertPokeDate(date: PkmWasm.PokeDate): PKMDate {
   return {

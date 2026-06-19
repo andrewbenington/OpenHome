@@ -1,9 +1,9 @@
 import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import PK9 from '@openhome-core/pkm/PK9'
+import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
+import { getStats } from '@openhome-core/pkm/util/statCalc'
 import { ConvertStrategy, OriginGames, PkmFormat } from '@pkm-rs/pkg'
-import PK9 from '@pokemon-files/pkm/PK9'
-import { PkmConstructorOptions } from '@pokemon-files/pkm/PKM'
-import { getStats } from '@pokemon-files/util/statCalc'
 import { PluginIdentifier } from '../interfaces'
 
 const COMPASS_PLUGIN_ID = 'compass'

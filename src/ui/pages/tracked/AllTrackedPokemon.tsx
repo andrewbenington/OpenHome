@@ -1,5 +1,6 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { Moves } from '@openhome-core/resources/moves'
 import { SAV } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import {
@@ -31,7 +32,6 @@ import {
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Language, Lookup, OriginGames } from '@pkm-rs/pkg'
-import { Moves } from '@pokemon-resources/moves'
 import { useCallback, useRef, useState } from 'react'
 import { SelectColumn } from 'react-data-grid'
 import { useNavigate } from 'react-router'

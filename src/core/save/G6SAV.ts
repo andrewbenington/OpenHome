@@ -1,15 +1,15 @@
+import { PK6 } from '@openhome-core/pkm'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
 import {
   bytesToUint16LittleEndian,
   uint16ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
-import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConverter'
 import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
-import { PK6 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
+import { utf16BytesToString } from './util/Strings'
 
 const BOX_NAMES_OFFSET: number = 0x04400
 const BOX_SIZE: number = 232 * 30

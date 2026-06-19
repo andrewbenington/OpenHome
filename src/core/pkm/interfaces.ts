@@ -1,7 +1,8 @@
+import { PKM, RomHackPKM } from '@openhome-core/pkm/PKM'
+import { Stats } from '@openhome-core/util/types'
 import { FormMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
-import { PKM, RomHackPKM } from '@pokemon-files/pkm/PKM'
-import { AllPKMFields, Stats } from '@pokemon-files/util'
 import { PluginIdentifier } from '../save/interfaces'
+import { AllPKMFields } from './util/pkmInterface'
 
 // pluginIdentifier for a given plugin format is the plugin origin associated with that format. It is functionally a static field, but is an instance field to allow access from an instance of the class
 

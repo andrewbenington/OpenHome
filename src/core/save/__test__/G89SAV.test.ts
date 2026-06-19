@@ -1,6 +1,6 @@
+import { PA8, PK4, PK8 } from '@openhome-core/pkm'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Ball, ConvertStrategies, OriginGame } from '@pkm-rs/pkg'
-import { PA8, PK4, PK8 } from '@pokemon-files/pkm'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'

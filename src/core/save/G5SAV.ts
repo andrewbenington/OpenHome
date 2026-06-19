@@ -1,3 +1,4 @@
+import { PK5 } from '@openhome-core/pkm'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
 import {
   bytesToUint16LittleEndian,
@@ -7,7 +8,6 @@ import {
 import { gen5StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { Option, unique } from '@openhome-core/util/functional'
 import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
-import { PK5 } from '@pokemon-files/pkm'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { hasDesamumeFooter, LookupType } from './util'

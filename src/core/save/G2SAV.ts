@@ -1,3 +1,7 @@
+import { PK2 } from '@openhome-core/pkm'
+import { EXCLAMATION } from '@openhome-core/resources/consts/Forms'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import { GEN2_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
 import { Option, unique } from '@openhome-core/util/functional'
@@ -9,10 +13,6 @@ import {
   Language,
   OriginGame,
 } from '@pkm-rs/pkg'
-import { PK2 } from '@pokemon-files/pkm'
-import { EXCLAMATION } from '@pokemon-resources/consts/Forms'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { GEN2_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'

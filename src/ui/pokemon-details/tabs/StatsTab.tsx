@@ -1,15 +1,15 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import SheenStars from '@openhome-ui/components/pokemon/SheenStars'
-import StatsTable from '@openhome-ui/components/pokemon/StatsTable'
-import { colorIsDark } from '@openhome-ui/util/color'
-import { Stats as PkmRsStats, StatsPreSplit } from '@pkm-rs/pkg'
-import { isContestStats, isStandardStats, isStatsPreSplit, Stats } from '@pokemon-files/util'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   LA_TRANSFER_RESTRICTIONS,
   LGPE_TRANSFER_RESTRICTIONS,
-} from '@pokemon-resources/consts/TransferRestrictions'
+} from '@openhome-core/resources/consts/TransferRestrictions'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { isContestStats, isStandardStats, isStatsPreSplit, Stats } from '@openhome-core/util/types'
+import SheenStars from '@openhome-ui/components/pokemon/SheenStars'
+import StatsTable from '@openhome-ui/components/pokemon/StatsTable'
+import { colorIsDark } from '@openhome-ui/util/color'
+import { Stats as PkmRsStats, StatsPreSplit } from '@pkm-rs/pkg'
 import { Select } from '@radix-ui/themes'
 import {
   ChartDataset,

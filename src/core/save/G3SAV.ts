@@ -1,3 +1,6 @@
+import { PK3 } from '@openhome-core/pkm'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import { GEN3_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -13,9 +16,6 @@ import {
   Language,
   OriginGame,
 } from '@pkm-rs/pkg'
-import { PK3 } from '@pokemon-files/pkm'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'
 import { filterUndefined } from '../util/sort'
