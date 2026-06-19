@@ -452,3 +452,7 @@ fn format_byte_range_differences(diffs: &[ByteRange], actual: &[u8], expected: &
 pub trait PkhexJson {
     fn to_pkhex_json_value(&self) -> Result<serde_json::Value, serde_json::Error>;
 }
+
+pub fn bytes_to_hex_string(bytes: &[u8]) -> String {
+    num::BigInt::from_bytes_be(num::bigint::Sign::Plus, bytes).to_str_radix(16)
+}

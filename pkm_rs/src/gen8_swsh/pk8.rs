@@ -794,4 +794,34 @@ mod test {
 
         Ok(())
     }
+
+    const CINDERACE_ENCRYPTED_BYTES_HEX: &str = "4864a28700008274311293404d71e90c70b5b4855c574d23a289c75541ad006eaf9666ee6fcc6fdb9c2bdae7c44eacbe48264ee13240d61a52203515337cb5051e95e7b472c8c34226559b9824097f7ea1da855aa4d7a6ca6a50ed1e5c6f2df0755f6a873d9170f133666ba75b1dab107e6c24df6aa4630147eeae002a2c58381ad1632f7f10480d2edbb5445ef022ba0c3b1dbd8dbc4678775a8a719d5668614041bba097d3bbbec3a5160df5e04b26d71caa3253fcaa0aee0573d96672cea0a07fdb872c593940e1fc849965f95aa1974d44fe415b329e6d9c70e559ea1659e6755fd9e36484ee4a2c230f218a20134a2fa4ee1a3cc046f722ad16ef08ec7bfcd67c624d4d9d58cf665dafe06aae792d1de9730cbd75507aeb02734c412a94898528578b4bc54f6e91f4661ba6034cb13bd829e706b059f3630174469c51e9e21fe4e506cd7df70712d2416270530c21b42185e6574d23";
+
+    #[test]
+    fn encrypted_bytes_match_expected_cinderace() -> TestResult<()> {
+        let path = PathBuf::from("pk8").join("cinderace-mint-nature.pk8");
+        let mon = tests::pkm_from_file::<Pk8>(&path)?.0;
+
+        let encrypted_bytes = mon.to_box_bytes_encrypted();
+        let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
+
+        assert_eq!(encrypted_hex_str, CINDERACE_ENCRYPTED_BYTES_HEX);
+
+        Ok(())
+    }
+
+    const MR_MIME_ENCRYPTED_BYTES_HEX: &str = "3054f46800001f80b46eb9965768ce49a2294fea3d7122426aa817d66c6778704e581d0d304d307a2b7cf5039e8f2a70a259441d4d231c689dae851ad01add04236609d549137b4720563f83656a18e0580e350e88df0ea968c15e3b491459b0fab695ae20a03673fbad61085eab0630ffaf7aa45c457872b6ce8bbcf7e9e73d82a839f33bea007a48a2648b5dac84858beaaecfeef61c144999366e4dbb58b8b883b0cc5d13bdc2988ee3985666cd54f6a3cc17cee99ccfd38ac8fc02efbe00da4aaec47eb80eaf92de65f401d607706d487d2c20b651eabc7f8080e77c5fc6648935561042cda822d2cec795e66617beb68d7649e8a5b90f9bec0fd95ce90e1324f77a6a332337bc62aff7028bbc090b0e5ca7444f83b6ec15be493b930056e528853d63566f0949ff5eed5e45fa93f17efa44784d858cba0c03ed68d9f08d169f154af9c3d109e36ed0963e1083f8384a19ea97712042";
+
+    #[test]
+    fn encrypted_bytes_match_expected_mr_mime() -> TestResult<()> {
+        let path = PathBuf::from("pk8").join("mr-mime-galar.pk8");
+        let mon = tests::pkm_from_file::<Pk8>(&path)?.0;
+
+        let encrypted_bytes = mon.to_box_bytes_encrypted();
+        let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
+
+        assert_eq!(encrypted_hex_str, MR_MIME_ENCRYPTED_BYTES_HEX);
+
+        Ok(())
+    }
 }
