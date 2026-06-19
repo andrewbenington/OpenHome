@@ -97,7 +97,7 @@ make start
 ```
 
 For Steam Deck users, there is also a helper script that automates building:  
-`./makesteamdeck.sh`
+`./scripts/makesteamdeck.sh`
 
 ## Run the built app
 
