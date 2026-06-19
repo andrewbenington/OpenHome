@@ -368,13 +368,13 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn from_encrypted_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_encrypted_bytes(bytes.into_boxed_slice()).map_err(error_to_js)
+    pub fn from_encrypted_byte_vector(bytes: Box<[u8]>) -> core::result::Result<Pk3, JsValue> {
+        Pk3::from_encrypted_bytes(bytes).map_err(error_to_js)
     }
 
     #[wasm_bindgen(js_name = fromSlotBytes)]
-    pub fn from_slot_byte_vector(bytes: Vec<u8>) -> core::result::Result<Option<Pk3>, JsValue> {
-        Self::from_slot_bytes(bytes.into_boxed_slice()).map_err(error_to_js)
+    pub fn from_slot_byte_vector(bytes: Box<[u8]>) -> core::result::Result<Option<Pk3>, JsValue> {
+        Self::from_slot_bytes(bytes).map_err(error_to_js)
     }
 
     #[wasm_bindgen(js_name = toBoxBytes)]

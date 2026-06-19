@@ -183,7 +183,7 @@ impl BlockCrypto {
     }
 
     pub fn to_encrypted_bytes(self, bytes: &[u8]) -> Box<[u8]> {
-        let mut cloned = bytes.to_owned().into_boxed_slice();
+        let mut cloned = Box::from(bytes);
         self.encrypt(&mut cloned);
 
         cloned
@@ -195,7 +195,7 @@ impl BlockCrypto {
     }
 
     pub fn to_decrypted_bytes(self, bytes: &[u8]) -> Box<[u8]> {
-        let mut cloned = bytes.to_owned().into_boxed_slice();
+        let mut cloned = Box::from(bytes);
         self.decrypt(&mut cloned);
 
         cloned
