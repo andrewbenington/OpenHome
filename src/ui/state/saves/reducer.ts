@@ -1,9 +1,9 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SAV, SaveIdentifier, saveToStringIdentifier } from '@openhome-core/save/interfaces'
+import { SAVClass } from '@openhome-core/save/util'
 import { Option } from '@openhome-core/util/functional'
 import { createContext, Dispatch, Reducer } from 'react'
-import { SAVClass } from '../../../core/save/util'
 
 export type OpenSave = {
   index: number

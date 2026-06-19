@@ -1,4 +1,4 @@
-import { R } from '../../core/util/functional'
+import { R } from '@openhome-core/util/functional'
 import BackendInterface from './backendInterface'
 
 const ERROR_NO_BACKEND = async () => R.Err('no backend in use')

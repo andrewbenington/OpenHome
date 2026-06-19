@@ -1,8 +1,8 @@
 // import userEvent from '@testing-library/user-event'
+import { SimpleOpenHomeBox, StoredBankData } from '@openhome-core/save/util/storage'
+import { range } from '@openhome-core/util/functional'
 import { v4 as UuidV4 } from 'uuid'
 import { assert, describe, expect, test } from 'vitest'
-import { SimpleOpenHomeBox, StoredBankData } from '../../../core/save/util/storage'
-import { range } from '../../../core/util/functional'
 import { BoxMap, createBanksAndBoxesStore } from './store'
 
 function buildTestStoredState(): StoredBankData {

@@ -1,11 +1,14 @@
+import { isRomHackFormat, MonFormat } from '@openhome-core/pkm/interfaces'
 import {
   displayIndexAdder,
   isBattleFormeItem,
   isMegaStone,
   PkmOrOhpkmFormat,
 } from '@openhome-core/pkm/util'
+import { getLumiFormIndexByExtraFormIndex } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import { toGen3RRPokemonIndex } from '@openhome-core/save/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from '@openhome-core/save/radicalred/conversion/RadicalRedSprites'
+import { toGen3UBPokemonIndex } from '@openhome-core/save/unbound/conversion/Gen3UBPokemonIndex'
 import { UBSprites } from '@openhome-core/save/unbound/conversion/UnboundSprites'
 import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
 import {
@@ -16,9 +19,6 @@ import {
 } from '@pkm-rs/pkg'
 import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Forms'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { isRomHackFormat, MonFormat } from '../../core/pkm/interfaces'
-import { getLumiFormIndexByExtraFormIndex } from '../../core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
-import { toGen3UBPokemonIndex } from '../../core/save/unbound/conversion/Gen3UBPokemonIndex'
 
 export const fileToSpriteFolder: Record<PkmOrOhpkmFormat, string> = {
   PK1: 'gen1',

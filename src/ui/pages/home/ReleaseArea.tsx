@@ -1,9 +1,9 @@
+import { filterUndefined } from '@openhome-core/util/sort'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import DroppableSpace from '@openhome-ui/saves/boxes/DroppableSpace'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import { filterUndefined } from '../../../core/util/sort'
 import { useOhpkmStore } from '../../state/ohpkm'
 
 export default function ReleaseArea() {
