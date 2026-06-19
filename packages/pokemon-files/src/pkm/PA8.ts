@@ -1,3 +1,4 @@
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Option } from '@openhome-core/util/functional'
 import {
   AbilityIndex,
@@ -14,7 +15,6 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
-import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'
