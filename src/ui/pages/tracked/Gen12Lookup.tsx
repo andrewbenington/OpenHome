@@ -1,12 +1,12 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { gameOrPluginSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
+import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import { useLookups } from '@openhome-ui/state/lookups/useLookups'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGames } from '@pkm-rs/pkg'
-import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
 
 type G12LookupRow = {
   gen12ID: string

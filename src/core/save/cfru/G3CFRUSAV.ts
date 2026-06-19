@@ -5,8 +5,8 @@ import {
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
 } from '@openhome-core/save/util/byteLogic'
+import { Option } from '@openhome-core/util/functional'
 import { Gen3Strings, Gender, Language, OriginGame } from '@pkm-rs/pkg'
-import { Option } from 'src/core/util/functional'
 import { Box, BoxAndSlot, PluginIdentifier, PluginSAV } from '../interfaces'
 import { LookupType } from '../util'
 import { PathData } from '../util/path'

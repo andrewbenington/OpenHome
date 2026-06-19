@@ -1,3 +1,4 @@
+import { PkmOrOhpkmFormat } from '@openhome-core/pkm/util'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { MonTag } from '@openhome-ui/util/tags'
 import {
@@ -14,7 +15,6 @@ import {
   StatsPreSplit,
   TrainerMemory,
 } from '@pkm-rs/pkg'
-import { PkmOrOhpkmFormat } from 'src/core/pkm/util'
 import * as types from './types'
 import { Markings } from './types'
 

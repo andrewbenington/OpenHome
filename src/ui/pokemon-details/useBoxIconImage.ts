@@ -1,9 +1,9 @@
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getSpriteName } from '@openhome-ui/images/pokemon'
+import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
 import { ExtraFormIndex, extraFormSpriteName, MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import { isRestricted } from 'src/core/save/util/TransferRestrictions'
-import { MonSpriteData } from 'src/ui/state/plugin/reducer'
 import {
   ETERNAL_FLOWER,
   LGE_STARTER,

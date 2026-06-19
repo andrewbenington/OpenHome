@@ -1,10 +1,10 @@
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
+import { OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin/reducer'
 import { Badge } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo } from 'react'
 import { MdDelete } from 'react-icons/md'
-import { OpenHomePlugin, PluginContext } from 'src/ui/state/plugin/reducer'
 import { CURRENT_PLUGIN_API_VERSION } from './Plugins'
 import './style.css'
 

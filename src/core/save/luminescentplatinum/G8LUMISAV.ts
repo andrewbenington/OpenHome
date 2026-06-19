@@ -8,7 +8,7 @@ import {
 } from '@pkm-rs/pkg'
 import { utf16BytesToString } from '@pokemon-files/util'
 
-import { Option } from 'src/core/util/functional'
+import { Option } from '@openhome-core/util/functional'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, BoxAndSlot, PluginSAV, SlotMetadata } from '../interfaces'

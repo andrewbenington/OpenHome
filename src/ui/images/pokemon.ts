@@ -7,6 +7,7 @@ import {
 import { toGen3RRPokemonIndex } from '@openhome-core/save/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from '@openhome-core/save/radicalred/conversion/RadicalRedSprites'
 import { UBSprites } from '@openhome-core/save/unbound/conversion/UnboundSprites'
+import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
 import {
   ExtraFormIndex,
   extraFormSpriteName,
@@ -15,7 +16,6 @@ import {
 } from '@pkm-rs/pkg'
 import { BLOOD_MOON, SWEETS } from '@pokemon-resources/consts/Forms'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { MonSpriteData } from 'src/ui/state/plugin/reducer'
 import { isRomHackFormat, MonFormat } from '../../core/pkm/interfaces'
 import { getLumiFormIndexByExtraFormIndex } from '../../core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
 import { toGen3UBPokemonIndex } from '../../core/save/unbound/conversion/Gen3UBPokemonIndex'

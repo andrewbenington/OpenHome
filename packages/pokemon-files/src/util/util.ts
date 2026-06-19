@@ -4,6 +4,7 @@ import Prando from 'prando'
 
 import { PKM, PkmClass } from '@pokemon-files/pkm/PKM'
 
+import { filterUndefined } from '@openhome-core/util/sort'
 import {
   Gender,
   Generation,
@@ -14,7 +15,6 @@ import {
   PkmFormat,
   PkmFormats,
 } from '@pkm-rs/pkg'
-import { filterUndefined } from 'src/core/util/sort'
 import { PKMInterface } from '../../../../src/core/pkm/interfaces'
 import { AllPKMFields, FourMoves } from './pkmInterface'
 

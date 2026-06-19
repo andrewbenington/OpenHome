@@ -1,5 +1,5 @@
-import { colorIsDark } from 'src/ui/util/color'
-import { cssClass } from 'src/ui/util/style'
+import { colorIsDark } from '@openhome-ui/util/color'
+import { cssClass } from '@openhome-ui/util/style'
 import { Indicator } from './Indicator'
 
 export type ImageIndicatorProps = {

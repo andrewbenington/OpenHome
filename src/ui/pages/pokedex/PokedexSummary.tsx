@@ -1,5 +1,6 @@
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
+import { Pokedex } from '@openhome-ui/util/pokedex'
 import {
   ExtraFormMetadata,
   FormMetadata,
@@ -12,7 +13,6 @@ import {
   metadataReaderFor,
 } from '@pkm-rs/pkg'
 import { Card, Flex, Separator, Text } from '@radix-ui/themes'
-import { Pokedex } from 'src/ui/util/pokedex'
 import BaseStatsChart from './BaseStatsChart'
 import EvolutionFamily from './EvolutionFamily'
 import { MOST_CURRENT_SOURCE, MostCurrentSource } from './PokedexPage'

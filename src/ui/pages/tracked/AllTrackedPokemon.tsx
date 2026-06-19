@@ -18,8 +18,12 @@ import {
   OpenHomeCtxMenu,
   Separator,
 } from '@openhome-ui/components/context-menu'
+import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
+import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
+import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
+import { getPublicImageURL } from '@openhome-ui/images/images'
 import {
   BankBoxCoordinates,
   useBanksAndBoxes,
@@ -31,10 +35,6 @@ import { Moves } from '@pokemon-resources/moves'
 import { useCallback, useRef, useState } from 'react'
 import { SelectColumn } from 'react-data-grid'
 import { useNavigate } from 'react-router'
-import GenderIcon from 'src/ui/components/pokemon/GenderIcon'
-import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
-import TypeIcon from 'src/ui/components/pokemon/TypeIcon'
-import { getPublicImageURL } from 'src/ui/images/images'
 import './style.css'
 
 export type AllTrackedPokemonProps = {

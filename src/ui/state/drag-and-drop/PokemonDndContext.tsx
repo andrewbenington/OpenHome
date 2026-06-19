@@ -7,15 +7,15 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
+import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { monSupportedBySave } from '@openhome-core/save/util'
+import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
 import { isMonLocation, MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { Badge } from '@radix-ui/themes'
 import { ReactNode, useCallback, useState } from 'react'
-import { displayIndexAdder, isBattleFormeItem, isMegaStone } from 'src/core/pkm/util'
-import PokemonIcon from 'src/ui/components/PokemonIcon'
 import { DragPayload, locationKey } from '.'
 import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import useDragAndDrop from './useDragAndDrop'

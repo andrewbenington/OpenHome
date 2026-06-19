@@ -1,10 +1,10 @@
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
+import useSimpleVirtualizer from '@openhome-ui/hooks/useSimpleVirtualizer'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { Pokedex } from '@openhome-ui/util/pokedex'
+import { cssClass } from '@openhome-ui/util/style'
 import { all_species_data, FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
 import { CSSProperties, useEffect, useMemo, useRef } from 'react'
-import useSimpleVirtualizer from 'src/ui/hooks/useSimpleVirtualizer'
-import { cssClass } from 'src/ui/util/style'
 import './PokedexSidebar.css'
 import { getHighestFormeStatus, StatusIndices } from './util'
 

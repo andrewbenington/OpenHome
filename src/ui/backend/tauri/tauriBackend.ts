@@ -11,6 +11,7 @@ import BackendInterface, {
   parseLogs,
   StoredLookups,
 } from '@openhome-ui/backend/backendInterface'
+import { LogFilter } from '@openhome-ui/pages/logs'
 import { defaultSettings, Settings } from '@openhome-ui/state/appInfo'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import { path } from '@tauri-apps/api'
@@ -20,7 +21,6 @@ import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
 import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs, { Dayjs } from 'dayjs'
-import { LogFilter } from 'src/ui/pages/logs'
 import { Commands, LogFilterIpc, StoredBankDataSerialized } from './tauriCommands'
 import { isRustErr } from './types'
 

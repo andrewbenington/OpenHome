@@ -1,5 +1,7 @@
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { Option } from '@openhome-core/util/functional'
 import {
   ContestStats,
   ConvertStrategies,
@@ -11,8 +13,6 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { FourMoves } from '@pokemon-files/util'
-import { PKMInterface } from 'src/core/pkm/interfaces'
-import { Option } from 'src/core/util/functional'
 import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import * as encryption from '../util/encryption'
 import * as jsTypes from '../util/types'

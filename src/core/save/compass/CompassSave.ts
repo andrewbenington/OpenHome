@@ -7,6 +7,7 @@ import {
 } from '@openhome-core/save/encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '@openhome-core/save/encryption/SwishCrypto/SwishCrypto'
 import { BoxNamesBlock } from '@openhome-core/save/Gen89/BoxNamesBlock'
+import { G89BlockName } from '@openhome-core/save/Gen89/Gen8Gen9Save'
 import { Box, BoxAndSlot, PluginSAV, SlotMetadata } from '@openhome-core/save/interfaces'
 import { emptyPathData, PathData } from '@openhome-core/save/util/path'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
@@ -19,7 +20,6 @@ import {
   SV_TRANSFER_RESTRICTIONS_ID,
   SV_TRANSFER_RESTRICTIONS_TM,
 } from '@pokemon-resources/consts/TransferRestrictions'
-import { G89BlockName } from 'src/core/save/Gen89/Gen8Gen9Save'
 import PK9Compass from './PK9Compass'
 
 const SAVE_SIZE_BYTES_MIN = 0x31626f
