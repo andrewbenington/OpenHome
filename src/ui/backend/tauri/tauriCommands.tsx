@@ -29,22 +29,6 @@ function invokeAndCatch<C extends OhCommand>(
   return R.tryPromise(invoke(cmd, args, options))
 }
 
-// remove this after node 25 is lts
-if (!('fromBase64' in Uint8Array)) {
-  // @ts-expect-error – intentionally adding this static constructor because it is relatively new to javascript
-  Uint8Array.fromBase64 = function (base64: string): Uint8Array {
-    const binary = atob(base64)
-    const len = binary.length
-    const bytes = new Uint8Array(len)
-
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binary.charCodeAt(i)
-    }
-
-    return bytes
-  }
-}
-
 const ZERO_UUID = '00000000-0000-0000-0000-000000000000'
 
 type RustUnitResultByString = Record<string, RustResult<null, string>>

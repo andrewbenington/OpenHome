@@ -17,6 +17,9 @@
     "url": "git+https://github.com/andrewbenington/OpenHome.git"
   },
   "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=25"
+  },
   "license": "GPL-3.0-only",
   "author": {
     "name": "Andrew Benington",
