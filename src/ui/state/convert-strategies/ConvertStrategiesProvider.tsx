@@ -5,7 +5,7 @@ import { PropsWithChildren, useContext } from 'react'
 import { ConversionSettingsContext } from '.'
 import SyncedStateProvider from '../synced-state/SyncedStateProvider'
 
-export type NamedStrategy = {
+type NamedStrategy = {
   name: string
   strategy: ConvertStrategy
 }

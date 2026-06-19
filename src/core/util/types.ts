@@ -1,6 +1,5 @@
 import { PathData } from '@openhome-core/save/util/path'
-import { Gender, OriginGame } from '@pkm-rs/pkg'
-import { CSSProperties } from 'react'
+import { Gender, OriginGame, Stats16Le } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../save/interfaces'
 
 export type Type =
@@ -56,9 +55,6 @@ export interface JSONObject extends Record<string, JSONValue> {}
 
 export interface JSONArray extends Array<JSONValue> {}
 
-type CSSVariable = `--${string}`
-export type CSSWithVariables = CSSProperties & Record<CSSVariable, string | undefined>
-
 export function displayGender(gender: Gender): string {
   switch (gender) {
     case Gender.Male:
@@ -109,14 +105,7 @@ export function writePKMDateToBytes(dataView: DataView, offset: number, date: PK
   dataView.setUint8(offset + 2, date ? date.day : 0)
 }
 
-export interface Stats {
-  hp: number
-  atk: number
-  def: number
-  spa: number
-  spd: number
-  spe: number
-}
+export type Stats = Stats16Le
 
 export function isStandardStats(stats?: object): stats is Stats {
   return (
@@ -282,11 +271,9 @@ export function writeContestStatsToBytes(dataView: DataView, offset: number, val
   dataView.setUint8(offset + 5, value.sheen)
 }
 
-export type MarkingShapePreGen6 = 'circle' | 'square' | 'triangle' | 'heart'
-export type MarkingShape = MarkingShapePreGen6 | 'star' | 'diamond'
+export type MarkingShape = 'circle' | 'square' | 'triangle' | 'heart' | 'star' | 'diamond'
 
 export type MarkingColorValue = 'unset' | 'blue' | 'red'
-// export type MarkingsSixShapesWithColor = Record<MarkingShape, MarkingColorValue>
 
 export type Markings = MarkingsFourShapes | MarkingsSixShapes | MarkingsSixShapesColors
 
@@ -361,7 +348,7 @@ export function markingsSixShapesNoColorToBytes(
   setFlag(dataView, offset, 5, value.diamond)
 }
 
-export function twoColorMarkingFromInt(value: number): MarkingColorValue {
+function twoColorMarkingFromInt(value: number): MarkingColorValue {
   switch (value) {
     case 1:
       return 'blue'
@@ -372,7 +359,7 @@ export function twoColorMarkingFromInt(value: number): MarkingColorValue {
   }
 }
 
-export function twoColorMarkingToInt(marking: MarkingColorValue): number {
+function twoColorMarkingToInt(marking: MarkingColorValue): number {
   switch (marking) {
     case 'blue':
       return 1
@@ -423,7 +410,7 @@ export function markingsSixShapesNoColorFromOther(other?: Markings): MarkingsSix
   }
 }
 
-export function markingColorValueFromOther(marking: boolean | MarkingColorValue) {
+function markingColorValueFromOther(marking: boolean | MarkingColorValue) {
   switch (marking) {
     case true:
       return 'blue'
@@ -614,7 +601,5 @@ export function writeGeolocationToBytes(dataView: DataView, offset: number, valu
   dataView.setUint8(offset, value.region)
   dataView.setUint8(offset + 1, value.country)
 }
-
-export type Stat = keyof Stats
 
 export type FourMoves = [number, number, number, number]

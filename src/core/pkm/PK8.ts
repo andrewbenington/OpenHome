@@ -1,7 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
 import { Option } from '@openhome-core/util/functional'
-import { FourMoves, PKMDate } from '@openhome-core/util/types'
+import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   ContestStats,
@@ -15,10 +15,9 @@ import {
   ModernRibbon,
   NatureIndex,
   OriginGame,
-  Pk8 as Pk8Wasm,
+  Pk8Wasm,
   PokeDate,
   SpeciesLookup,
-  Stats16Le,
   TrainerMemory,
 } from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from './PKM'
@@ -191,7 +190,7 @@ export default class PK8 {
   get evs() {
     return this.inner.evs
   }
-  set evs(value: Stats16Le) {
+  set evs(value: Stats) {
     this.inner.evs = value
   }
 
@@ -312,7 +311,7 @@ export default class PK8 {
   get ivs() {
     return this.inner.ivs
   }
-  set ivs(value: Stats16Le) {
+  set ivs(value: Stats) {
     this.inner.ivs = value
   }
 

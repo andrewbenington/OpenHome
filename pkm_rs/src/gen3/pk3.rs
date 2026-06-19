@@ -40,7 +40,7 @@ use serde::{Serialize, Serializer};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Pk3Wasm))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny8192)]
 #[serde(remote = "Self")]
@@ -346,7 +346,7 @@ fn error_to_js(e: Error) -> JsValue {
 }
 
 #[cfg(feature = "wasm")]
-#[wasm_bindgen]
+#[wasm_bindgen(js_class = Pk3Wasm)]
 #[allow(clippy::missing_const_for_fn)]
 impl Pk3 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]

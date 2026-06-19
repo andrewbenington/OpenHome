@@ -1,11 +1,13 @@
 import { ExtraFormIndex } from '@pkm-rs/pkg'
 import {
   CfruSpeciesAndForm,
+  fromGen3CRFUPokemonIndex,
   makeExtraFormToGameMap,
   makeNationalDexToGameMap,
+  toGen3CRFUPokemonIndex,
 } from '../../cfru/conversion/util'
 
-export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
+const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   '0': {
     nationalDex: 0,
     formIndex: 0,
@@ -5561,5 +5563,23 @@ export const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | nul
   },
 }
 
-export const NationalDexToRadicalRedMap = makeNationalDexToGameMap(RadicalRedToNationalDexMap)
-export const ExtraFormToRadicalRedMap = makeExtraFormToGameMap(RadicalRedToNationalDexMap)
+const NationalDexToRadicalRedMap = makeNationalDexToGameMap(RadicalRedToNationalDexMap)
+const ExtraFormToRadicalRedMap = makeExtraFormToGameMap(RadicalRedToNationalDexMap)
+
+export function toRadicalRedPokemonIndex(
+  nationalDexNumber: number,
+  formIndex: number,
+  extraFormIndex?: number
+) {
+  return extraFormIndex
+    ? ExtraFormToRadicalRedMap.get(extraFormIndex)
+    : toGen3CRFUPokemonIndex(nationalDexNumber, formIndex, NationalDexToRadicalRedMap)
+}
+
+export function radicalRedIndexLookup(radicalRedIndex: number) {
+  return fromGen3CRFUPokemonIndex(
+    radicalRedIndex,
+    RadicalRedToNationalDexMap,
+    'Pokemon Radical Red'
+  )
+}

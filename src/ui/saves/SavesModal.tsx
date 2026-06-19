@@ -1,4 +1,3 @@
-import { SAVClass } from '@openhome-core/save/util'
 import { PathData } from '@openhome-core/save/util/path'
 import { R } from '@openhome-core/util/functional'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
@@ -19,12 +18,6 @@ import { SaveViewMode } from './util'
 interface SavesModalProps {
   open?: boolean
   onClose: () => void
-}
-
-export type AmbiguousOpenState = {
-  possibleSaveTypes: SAVClass[]
-  filePath: PathData
-  fileBytes: Uint8Array
 }
 
 function saveErrorTitle(errorType: SaveErrorType): string {

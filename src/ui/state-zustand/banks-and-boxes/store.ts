@@ -25,10 +25,6 @@ export interface BankBoxCoordinates {
   boxSlot: number
 }
 
-export function bankBoxCoordinates(bank: number, box: number, boxSlot: number): BankBoxCoordinates {
-  return { bank, box, boxSlot }
-}
-
 export type AddBoxLocation = 'start' | 'end' | ['before', number] | ['after', number]
 
 type ReverseLookup = Map<OhpkmIdentifier, BankBoxCoordinates>
@@ -312,7 +308,7 @@ function rebuildBoxMapUsingIndices(boxes: BoxMap): BoxMap {
   )
 }
 
-export function boxMapFromOrdered(boxesInOrder: SimpleOpenHomeBox[]): BoxMap {
+function boxMapFromOrdered(boxesInOrder: SimpleOpenHomeBox[]): BoxMap {
   return new Map(boxesInOrder.map((box, index) => [index, { ...box, index }] as const))
 }
 
@@ -641,5 +637,3 @@ export function useBanksAndBoxes() {
     firstHomeBoxEmptySlot,
   }
 }
-
-export type BanksAndBoxesConroller = ReturnType<typeof useBanksAndBoxes>

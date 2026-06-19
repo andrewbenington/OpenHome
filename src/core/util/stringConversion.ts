@@ -1,10 +1,9 @@
 import Gen4ToUTFMap from './gen4ToUTFMap'
 import UTFToGen4Map from './utfToGen4Map'
 
-export const G1_TERMINATOR = 0x50
-export const G1_TRADE_OT = 0x5d
+const G1_TERMINATOR = 0x50
 
-export const GBStringDict: { [key: number]: string } = {
+const GBStringDict: { [key: number]: string } = {
   0x7f: ' ',
   0x80: 'A',
   0x81: 'B',
@@ -121,6 +120,37 @@ export const GBStringDict: { [key: number]: string } = {
   0xfd: '7',
   0xfe: '8',
   0xff: '9',
+}
+
+/**
+ * Convert string to Gen 1/Gen 2 encoded bytes. Uses a proprietary encoding,
+ * terminated with 0xff character. Characters not in Gen 3 character
+ * set will be replaced with '?'
+ * @param str the string to encode
+ * @param length character length of string
+ * @param terminate include 0x50 at the end
+ * @returns UInt8Array of Gen 1/2 bytes
+ */
+export const utf16StringToGen12 = (str: string, length: number, terminate: boolean) => {
+  const bufView = new Uint8Array(length)
+
+  for (let i = 0; i < Math.min(str.length, length); i++) {
+    const gen12DictEntry = Object.entries(GBStringDict).find(([, val]) => val === str.charAt(i))
+
+    if (str.charCodeAt(i) === 0) {
+      break
+    } else if (!gen12DictEntry) {
+      bufView[i] = 0xe6
+    } else {
+      bufView[i] = parseInt(gen12DictEntry[0])
+    }
+  }
+  if (terminate) {
+    const terminalIndex = Math.min(str.length, length - 1)
+
+    bufView[terminalIndex] = G1_TERMINATOR
+  }
+  return bufView
 }
 
 /**
@@ -299,7 +329,7 @@ export const writeGen5StringToBytes = (
  * @returns string of decoded utf-16 bytes
  */
 export const utf16BytesToString = (
-  bytes: ArrayBuffer,
+  bytes: ArrayBufferLike,
   offset: number,
   length: number,
   littleEndian: boolean = true

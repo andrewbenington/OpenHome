@@ -6,7 +6,7 @@ import {
   ExtraFormIndex,
   Gen7AlolaSaveRust,
   OriginGame,
-  Pk7 as Pk7Wasm,
+  Pk7Wasm,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'

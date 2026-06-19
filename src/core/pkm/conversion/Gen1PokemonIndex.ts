@@ -1,4 +1,4 @@
-export const fromGen1PokemonIndexMap: { [key: number]: number } = {
+const fromGen1PokemonIndexMap: { [key: number]: number } = {
   0: 0,
   1: 112,
   2: 115,
@@ -160,7 +160,7 @@ export function fromGen1PokemonIndex(key: number): number {
   return key
 }
 
-export const toGen1PokemonIndexMap: { [key: number]: number } = {
+const toGen1PokemonIndexMap: { [key: number]: number } = {
   0: 0,
   112: 1,
   115: 2,

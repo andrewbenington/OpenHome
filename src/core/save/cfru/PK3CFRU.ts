@@ -77,7 +77,7 @@ const CFRU_BALLS: Ball[] = [
   Ball.Dream,
 ]
 
-export abstract class PK3CFRU implements PluginPKMInterface {
+export default abstract class PK3CFRU implements PluginPKMInterface {
   // static getFormat() {
   //   return 'PK3RR'
   // }
@@ -522,5 +522,3 @@ function unownFormFromPid(pid: number) {
 
   return letterValue % 28
 }
-
-export default PK3CFRU

@@ -40,7 +40,7 @@ export const LgpeStarters: FormRestrictions = {
   [NationalDex.Eevee]: [LGE_STARTER],
 }
 
-export const AlolanForms: FormRestrictions = {
+const AlolanForms: FormRestrictions = {
   [NationalDex.Rattata]: [1],
   [NationalDex.Raticate]: [1],
   [NationalDex.Raichu]: [1],
@@ -61,7 +61,7 @@ export const AlolanForms: FormRestrictions = {
   [NationalDex.Marowak]: [1, MAROWAK_ALOLA_TOTEM],
 }
 
-export const GalarianForms: FormRestrictions = {
+const GalarianForms: FormRestrictions = {
   [NationalDex.Meowth]: [2],
   [NationalDex.Ponyta]: [1],
   [NationalDex.Rapidash]: [1],

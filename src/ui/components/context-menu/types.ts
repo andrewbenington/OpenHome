@@ -68,7 +68,7 @@ export class Item implements CtxMenuElementBuilder {
   }
 }
 
-export function contentIsLabel(content: ElementContent): content is { label: string } {
+function contentIsLabel(content: ElementContent): content is { label: string } {
   return 'label' in content
 }
 
@@ -121,7 +121,7 @@ export class Label implements CtxMenuElementBuilder {
 
 //* SEPARATOR *//
 
-export const SeparatorData = Object.freeze({ __cm_type_tag: 'separator' })
+const SeparatorData = Object.freeze({ __cm_type_tag: 'separator' })
 
 type Separator = typeof SeparatorData
 

@@ -91,7 +91,7 @@ export function fileTypeFromStringNonOhpkm(type: PkmFormat): SavePkmClass | unde
   }
 }
 
-export function fileTypeFromString(type: PkmOrOhpkmFormat): AnyPkmClass | undefined {
+function fileTypeFromString(type: PkmOrOhpkmFormat): AnyPkmClass | undefined {
   if (type === 'OHPKM') {
     return OHPKM
   }

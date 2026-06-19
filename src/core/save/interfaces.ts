@@ -42,7 +42,7 @@ export type SaveWriter = {
   filepath: string
 }
 
-export interface BaseSAV<P extends PKMInterface = PKMInterface> {
+interface BaseSAV<P extends PKMInterface = PKMInterface> {
   origin: OriginGame
 
   boxRows: number
@@ -301,7 +301,6 @@ export function getSaveRef(save: SAV): SaveRef {
   }
 }
 export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum' | 'compass'
-export type GameNameType = 'short' | 'full'
 
 export function pluginGameName(identifier: PluginIdentifier, type = 'full'): string {
   switch (identifier) {
@@ -331,9 +330,9 @@ export function pluginOriginMarkPath(identifier: PluginIdentifier): string | und
       return undefined
   }
 }
-export const Delimiter = '$' as const
+const Delimiter = '$' as const
 
-export type Delim = typeof Delimiter
+type Delim = typeof Delimiter
 
 type OfficialSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}`
 

@@ -22,7 +22,7 @@ const getBackgroundDetails = (disabled?: boolean) => {
   }
 }
 
-export interface DraggableMonProps {
+interface DraggableMonProps {
   onClick: () => void
   disabled?: boolean
   mon: PKMInterface

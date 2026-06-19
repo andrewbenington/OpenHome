@@ -3,7 +3,7 @@ import { Option } from '@openhome-core/util/functional'
 import { CFRUToNationalMap } from './CFRUToNationalMap'
 import { NationalToCFRUMap } from './NationalToCFRUMap'
 
-export const Gen3CFRUMoves = [
+const Gen3CFRUMoves = [
   'None',
   'Pound',
   'Karate Chop',

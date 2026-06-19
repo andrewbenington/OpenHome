@@ -18,7 +18,7 @@ import {
 } from '../backendInterface'
 import { RustResult } from './types'
 
-export type StringToBytes = Record<string, Uint8Array>
+type StringToBytes = Record<string, Uint8Array>
 export type StringToB64 = Record<string, string>
 
 function invokeAndCatch<C extends OhCommand>(
@@ -286,7 +286,7 @@ export type StoredBankDataSerialized = {
   current_bank: number
 }
 
-export type OpenHomeBankSerialized = {
+type OpenHomeBankSerialized = {
   id: string
   index: number
   name: string | undefined
@@ -294,7 +294,7 @@ export type OpenHomeBankSerialized = {
   current_box: number
 }
 
-export type OpenHomeBoxSerialized = {
+type OpenHomeBoxSerialized = {
   id: string
   index: number
   name: string | null

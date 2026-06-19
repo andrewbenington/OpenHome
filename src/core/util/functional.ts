@@ -1,4 +1,4 @@
-export type PartitionedResults<A, E> = { successes: A[]; failures: E[] }
+type PartitionedResults<A, E> = { successes: A[]; failures: E[] }
 
 export function partitionResults<A, E>(results: Result<A, E>[]) {
   const acc: PartitionedResults<A, E> = {
@@ -22,10 +22,6 @@ export function range(startOrSize: number, end?: number) {
   return end ? [...Array(end).keys()].slice(startOrSize) : [...Array(startOrSize).keys()]
 }
 
-export function matches<T>(value: T) {
-  return (other: T | undefined) => other === value
-}
-
 export function unique<T>(items: T[] | undefined): T[] {
   return Array.from(new Set(items))
 }
@@ -42,11 +38,6 @@ if (!Set.prototype.union) {
     }
     return r
   }
-}
-export function union<T>(first: T[] | undefined, second: T[]): T[] {
-  const set1 = new Set(first)
-  const set2 = new Set(second)
-  return Array.from(set1.union(set2))
 }
 
 // remove this after ES2025 is lts

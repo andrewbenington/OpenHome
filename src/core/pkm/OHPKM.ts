@@ -38,7 +38,6 @@ import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { PluginIdentifier, SAV } from '../save/interfaces'
-import { convertPokeDate, convertPokeDateOptional } from './convert'
 import { isEvolution } from './Lookup'
 import {
   adjustMovePPBetweenFormats,
@@ -49,6 +48,7 @@ import {
 } from './util'
 import { AllPKMFields } from './util/pkmInterface'
 import { getStandardPKMStats } from './util/statCalc'
+import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getFormat() {
@@ -943,7 +943,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 }
 
-export function monFormatToOriginalDataTag(format: PkmFormat): Option<Tag> {
+function monFormatToOriginalDataTag(format: PkmFormat): Option<Tag> {
   switch (format) {
     case 'PK1':
       return Tag.Pk1
@@ -1136,7 +1136,7 @@ function deepEqual(first?: object, second?: object): boolean {
 
 type IndexableObject = object & Record<string, any>
 
-export function objectsEqual(object1: IndexableObject, object2: IndexableObject) {
+function objectsEqual(object1: IndexableObject, object2: IndexableObject) {
   if (object1 === null || object2 === null) {
     return object1 === object2
   }

@@ -139,13 +139,6 @@ export const shuffleBlocksGen3 = (bytes: ArrayBuffer) => {
   return shuffleBlocks(bytes, shiftValue, GEN3_BLOCK_SIZE, GEN3_BLOCKS_OFFSET)
 }
 
-export const unshuffleBlocksGen3 = (bytes: ArrayBuffer) => {
-  const personalityValue = new DataView(bytes).getUint32(0, true)
-  const shiftValue = personalityValue % 24
-
-  return unshuffleBlocks(bytes, shiftValue, GEN3_BLOCK_SIZE, GEN3_BLOCKS_OFFSET)
-}
-
 export const decryptByteArrayGen3 = (bytes: ArrayBuffer) => {
   const encryptedDV = new DataView(bytes)
   const unencryptedDV = new DataView(bytes)

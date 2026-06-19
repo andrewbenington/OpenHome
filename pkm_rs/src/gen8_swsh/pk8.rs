@@ -39,7 +39,7 @@ use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::RandomizeAndFix;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "Pk8Wasm"))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct Pk8 {
@@ -405,7 +405,7 @@ fn error_to_js(e: Error) -> JsValue {
 }
 
 #[cfg(feature = "wasm")]
-#[wasm_bindgen]
+#[wasm_bindgen(js_class = "Pk8Wasm")]
 #[allow(clippy::missing_const_for_fn)]
 impl Pk8 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]

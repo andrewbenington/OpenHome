@@ -1,5 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
+import * as byteLogic from '@openhome-core/util/byteLogic'
 import { Option } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
@@ -16,7 +17,6 @@ import {
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import * as byteLogic from '../util/byteLogic'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { getHeightCalculated, getWeightCalculated, MoveFilter } from '../util/util'
@@ -543,7 +543,7 @@ export default class PA8 {
   }
 }
 
-export const LA_VALID_MOVES = [
+const LA_VALID_MOVES = [
   7, 8, 9, 14, 16, 33, 38, 40, 42, 44, 52, 53, 56, 58, 59, 63, 71, 77, 78, 79, 80, 84, 85, 86, 87,
   93, 94, 95, 98, 100, 102, 105, 116, 120, 126, 129, 135, 139, 141, 145, 147, 150, 151, 156, 157,
   161, 163, 165, 172, 181, 183, 188, 189, 190, 191, 196, 200, 205, 206, 209, 224, 231, 237, 239,

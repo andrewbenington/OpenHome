@@ -1,9 +1,10 @@
 import { PK1, toGen1PokemonIndex } from '@openhome-core/pkm'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
-import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome-core/save/util/byteLogic'
-import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
+import { readGameBoyStringFromBytes } from '@openhome-core/util'
+import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome-core/util/byteLogic'
 import { Option, range, unique } from '@openhome-core/util/functional'
+import { utf16StringToGen12 } from '@openhome-core/util/stringConversion'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -18,6 +19,7 @@ import { LookupType } from './util'
 import { PathData } from './util/path'
 
 const SAVE_SIZE_BYTES = 0x8000
+const TRAINER_NAME_SIZE = 11
 
 export class G1SAV extends OfficialSAV<PK1> {
   static pkmType = PK1
@@ -69,10 +71,12 @@ export class G1SAV extends OfficialSAV<PK1> {
   constructor(path: PathData, bytes: Uint8Array) {
     super()
     this.bytes = bytes
+    const dataView = new DataView(this.bytes.buffer)
+
     this.filePath = path
     this.tid = bytesToUint16BigEndian(this.bytes, 0x2605)
     this.displayID = this.tid.toString().padStart(5, '0')
-    this.name = gen12StringToUTF(this.bytes, 0x2598, 11)
+    this.name = readGameBoyStringFromBytes(dataView, 0x2598, 11)
 
     this.currentPCBox = this.bytes[this.CURRENT_BOX_NUM_OFFSET] & 0x7f
     this.boxes = new Array(this.NUM_BOXES)
@@ -123,15 +127,15 @@ export class G1SAV extends OfficialSAV<PK1> {
               ).buffer
             )
 
-            mon.trainerName = gen12StringToUTF(
-              this.bytes,
-              boxByteOffset + this.BOX_OT_OFFSET + monIndex * 11,
-              11
+            mon.trainerName = readGameBoyStringFromBytes(
+              dataView,
+              boxByteOffset + this.BOX_OT_OFFSET + monIndex * TRAINER_NAME_SIZE,
+              TRAINER_NAME_SIZE
             )
-            mon.nickname = gen12StringToUTF(
-              this.bytes,
-              boxByteOffset + this.BOX_NICKNAME_OFFSET + monIndex * 11,
-              11
+            mon.nickname = readGameBoyStringFromBytes(
+              dataView,
+              boxByteOffset + this.BOX_NICKNAME_OFFSET + monIndex * TRAINER_NAME_SIZE,
+              TRAINER_NAME_SIZE
             )
             mon.gameOfOrigin = this.origin
             mon.language = Language.English
@@ -170,13 +174,19 @@ export class G1SAV extends OfficialSAV<PK1> {
             boxByteOffset + this.BOX_PKM_OFFSET + numMons * this.BOX_PKM_SIZE
           )
           // set the mon's OT name in the box
-          const trainerNameBuffer = utf16StringToGen12(boxMon.trainerName, 11, true)
+          const trainerNameBuffer = utf16StringToGen12(boxMon.trainerName, TRAINER_NAME_SIZE, true)
 
-          this.bytes.set(trainerNameBuffer, boxByteOffset + this.BOX_OT_OFFSET + numMons * 11)
+          this.bytes.set(
+            trainerNameBuffer,
+            boxByteOffset + this.BOX_OT_OFFSET + numMons * TRAINER_NAME_SIZE
+          )
           // set the mon's nickname in the box
-          const nicknameBuffer = utf16StringToGen12(boxMon.nickname, 11, true)
+          const nicknameBuffer = utf16StringToGen12(boxMon.nickname, TRAINER_NAME_SIZE, true)
 
-          this.bytes.set(nicknameBuffer, boxByteOffset + this.BOX_NICKNAME_OFFSET + numMons * 11)
+          this.bytes.set(
+            nicknameBuffer,
+            boxByteOffset + this.BOX_NICKNAME_OFFSET + numMons * TRAINER_NAME_SIZE
+          )
           numMons++
         }
       })
@@ -192,13 +202,13 @@ export class G1SAV extends OfficialSAV<PK1> {
         )
         // set all OT names to all 0s
         this.bytes.set(
-          new Uint8Array(11 * remainingSlots),
-          boxByteOffset + this.BOX_OT_OFFSET + numMons * 11
+          new Uint8Array(TRAINER_NAME_SIZE * remainingSlots),
+          boxByteOffset + this.BOX_OT_OFFSET + numMons * TRAINER_NAME_SIZE
         )
         // set all nicknames to all 0s
         this.bytes.set(
-          new Uint8Array(11 * remainingSlots),
-          boxByteOffset + this.BOX_NICKNAME_OFFSET + numMons * 11
+          new Uint8Array(TRAINER_NAME_SIZE * remainingSlots),
+          boxByteOffset + this.BOX_NICKNAME_OFFSET + numMons * TRAINER_NAME_SIZE
         )
       }
       // set all dex numbers to 0xFF or add terminator
