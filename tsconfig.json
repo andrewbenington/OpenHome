@@ -22,13 +22,16 @@
         "./src/core/*"
       ],
       "@pokemon-files/*": [
-        "./packages/pokemon-files/src/*"
+        "./src/core/pokemon-files/src/*"
       ],
       "@pokemon-resources/*": [
-        "./packages/pokemon-resources/src/*"
+        "./src/core/pokemon-resources/src/*"
       ],
       "@pkm-rs/*": [
         "./pkm_rs/*"
+      ],
+      "@pkm-rs": [
+        "./pkm_rs"
       ]
     },
     "typeRoots": ["./src/types", "./node_modules/@types"],

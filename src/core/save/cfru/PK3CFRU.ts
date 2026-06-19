@@ -15,6 +15,7 @@ import {
   PkmFormat,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { PkmConverter } from '@pokemon-files/conversion/converter'
 import { PkmConstructorOptions } from '@pokemon-files/pkm/PKM'
 import {
   FourMoves,
@@ -35,7 +36,6 @@ import {
   write30BitIVsToBytes,
   writeStatsToBytesU8,
 } from '@pokemon-files/util'
-import { PkmConverter } from '../../../../packages/pokemon-files/src/conversion/converter'
 import { OHPKM } from '../../pkm/OHPKM'
 import { Option } from '../../util/functional'
 import { PluginIdentifier } from '../interfaces'

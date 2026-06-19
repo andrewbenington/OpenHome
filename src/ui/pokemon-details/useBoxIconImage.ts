@@ -3,13 +3,9 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getSpriteName } from '@openhome-ui/images/pokemon'
 import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
 import { ExtraFormIndex, extraFormSpriteName, MetadataSummaryLookup } from '@pkm-rs/pkg'
+import { ETERNAL_FLOWER, LGE_STARTER, SPIKY_EAR } from '@pokemon-resources//consts/Forms'
+import { NationalDex } from '@pokemon-resources//consts/NationalDex'
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
-import {
-  ETERNAL_FLOWER,
-  LGE_STARTER,
-  SPIKY_EAR,
-} from '../../../packages/pokemon-resources/src/consts/Forms'
-import { NationalDex } from '../../../packages/pokemon-resources/src/consts/NationalDex'
 import useMonSprite from './useMonSprite'
 
 export const FormsUsingImages: Map<number, number[]> = new Map([

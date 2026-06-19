@@ -16,7 +16,6 @@ import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/Tra
 import { Option, R, range } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import { ExtraFormIndex, GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { useCallback, useContext, useMemo, useState } from 'react'
 import {
   BDSP_TRANSFER_RESTRICTIONS,
   BW2_TRANSFER_RESTRICTIONS,
@@ -30,7 +29,8 @@ import {
   SV_TRANSFER_RESTRICTIONS_ID,
   SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
-} from '../../../../packages/pokemon-resources/src/consts/TransferRestrictions'
+} from '@pokemon-resources//consts/TransferRestrictions'
+import { useCallback, useContext, useMemo, useState } from 'react'
 import { BackendContext } from '../../backend/backendContext'
 import useDisplayError from '../../hooks/displayError'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'

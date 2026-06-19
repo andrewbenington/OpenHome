@@ -7,7 +7,7 @@ import {
   OriginGames,
 } from '@pkm-rs/pkg'
 import { PB8 } from '@pokemon-files/pkm'
-import { PkmConstructorOptions } from '../../../../packages/pokemon-files/src/pkm/PKM'
+import { PkmConstructorOptions } from '@pokemon-files/pkm/PKM'
 import { OHPKM } from '../../pkm/OHPKM'
 import { PluginIdentifier } from '../interfaces'
 import { getLumiCustomForm as getLumiExtraFormIndex } from './conversion/LuminescentPlatinumFormMap'

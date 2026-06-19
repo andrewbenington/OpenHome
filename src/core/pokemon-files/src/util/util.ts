@@ -213,6 +213,7 @@ export function adjustPpForFormat(
 }
 
 type AllowedMoveIndices = number[]
+
 type PkmClassWithMoveLimit<P extends PKMInterface> = PkmClass<P> & { maxValidMove: () => number }
 
 export class MoveFilter<P extends PKMInterface> {
