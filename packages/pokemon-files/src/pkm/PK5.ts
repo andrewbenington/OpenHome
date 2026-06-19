@@ -1,5 +1,3 @@
-import { Gen4Ribbons } from '@pokemon-resources/index'
-
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   AbilityIndex,
@@ -16,6 +14,7 @@ import {
   OriginGames,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
+import { Gen4Ribbons } from '@pokemon-resources/index'
 import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'

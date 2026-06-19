@@ -1,4 +1,7 @@
 import { Option } from '@openhome-core/util/functional'
+import { Moves } from '@pokemon-resources/index'
+import { NationalToRRMap } from './NationalToRRMap'
+import { RRToNationalMap } from './RRToNationalMap'
 
 export const Gen3RRMoves = [
   'None',
@@ -1004,11 +1007,6 @@ export const Gen3RRMoves = [
   'One Blow',
   'One Blow',
 ]
-
-import { Moves } from '@pokemon-resources/index'
-import { NationalToRRMap } from './NationalToRRMap'
-import { RRToNationalMap } from './RRToNationalMap'
-
 // const dne_moves = [89, 538, 526, 659]
 
 export function fromGen3RRMoveIndex(rrIndex: number): Option<number> {

@@ -1,7 +1,6 @@
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
 import { ItemRadicalRed, PkmFormat } from '@pkm-rs/pkg'
 import PK3CFRU from '../cfru/PK3CFRU'
-
 import {
   CfruSpeciesAndForm,
   fromGen3CRFUPokemonIndex,
