@@ -4,7 +4,7 @@ import {
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '@openhome-core/save/util/byteLogic'
+} from '@openhome-core/util/byteLogic'
 import { Option } from '@openhome-core/util/functional'
 import { Gen3Strings, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { Box, BoxAndSlot, PluginIdentifier, PluginSAV } from '../interfaces'

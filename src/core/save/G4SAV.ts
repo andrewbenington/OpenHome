@@ -1,12 +1,12 @@
 import { PK4 } from '@openhome-core/pkm'
 import * as encryption from '@openhome-core/pkm/util/encryption'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
+import { readGen4StringFromBytes } from '@openhome-core/util'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
-} from '@openhome-core/save/util/byteLogic'
-import { readGen4StringFromBytes } from '@openhome-core/util'
+} from '@openhome-core/util/byteLogic'
 import { ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'

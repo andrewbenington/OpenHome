@@ -38,7 +38,6 @@ import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { PluginIdentifier, SAV } from '../save/interfaces'
-import { convertPokeDate, convertPokeDateOptional } from './convert'
 import { isEvolution } from './Lookup'
 import {
   adjustMovePPBetweenFormats,
@@ -49,6 +48,7 @@ import {
 } from './util'
 import { AllPKMFields } from './util/pkmInterface'
 import { getStandardPKMStats } from './util/statCalc'
+import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getFormat() {

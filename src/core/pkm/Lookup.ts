@@ -2,11 +2,12 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { dvsFromIVs, getBaseMon } from '@openhome-core/pkm/util'
 import { Option } from '@openhome-core/util/functional'
-import { readGameBoyStringFromBytes } from '@openhome-core/util/stringConversion'
+import {
+  readGameBoyStringFromBytes,
+  utf16StringToGen12,
+} from '@openhome-core/util/stringConversion'
 import { PKMFormeRef } from '@openhome-core/util/types'
 import { MetadataSummaryLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { bytesToString } from '../save/util/byteLogic'
-import { utf16StringToGen12 } from './util/'
 
 export type OhpkmIdentifier = string
 
@@ -33,6 +34,10 @@ type HomeIdentifierDerivableMon = {
   secretID: number
   personalityValue: number
   gameOfOrigin: OriginGame
+}
+
+const bytesToString = (value: number, numBytes: number) => {
+  return value.toString(16).padStart(numBytes * 2, '0')
 }
 
 export function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentifier {

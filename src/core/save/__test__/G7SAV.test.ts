@@ -1,10 +1,10 @@
+import { get16BitChecksumLittleEndian } from '@openhome-core/util/byteLogic'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { SignMemeDataInPlace, SignWithMemeCrypto } from '../encryption/Encryption'
 import { bytesBeHexString, MemeKey, pokedexAndSaveFileMemeKey } from '../encryption/MemeKey'
 import { Gen7AlolaSave } from '../Gen7AlolaSave'
-import { get16BitChecksumLittleEndian } from '../util/byteLogic'
 import { PathData } from '../util/path'
 import { initializeWasm } from './init'
 

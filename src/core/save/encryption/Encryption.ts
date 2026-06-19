@@ -1,12 +1,12 @@
 import { SIZE_SM, SIZE_USUM } from '@openhome-core/save/util'
-import { lib as cryptolib, MD5, SHA1, SHA256 } from 'crypto-js'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
   wordsToUint8Array,
-} from '../util/byteLogic'
+} from '@openhome-core/util/byteLogic'
+import { lib as cryptolib, MD5, SHA1, SHA256 } from 'crypto-js'
 import { MemeKey, pokedexAndSaveFileMemeKey, SIGNATURE_LENGTH } from './MemeKey'
 
 const GEN3_BLOCKS_OFFSET = 0x20

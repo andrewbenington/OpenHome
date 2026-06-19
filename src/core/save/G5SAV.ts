@@ -1,11 +1,11 @@
 import { PK5 } from '@openhome-core/pkm'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
+import { readGen5StringFromBytes } from '@openhome-core/util'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
-} from '@openhome-core/save/util/byteLogic'
-import { readGen5StringFromBytes } from '@openhome-core/util'
+} from '@openhome-core/util/byteLogic'
 import { Option, unique } from '@openhome-core/util/functional'
 import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'

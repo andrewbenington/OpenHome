@@ -1,11 +1,11 @@
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
+import { bytesToUint32LittleEndian } from '@openhome-core/util/byteLogic'
 import { ConvertStrategy, ExtraFormIndex, ItemUnbound, unboundSupportsExtraForm } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
 import { GEN3_SIGNATURE_OFFSET } from '../G3SAV'
 import { SlotMetadata } from '../interfaces'
-import { bytesToUint32LittleEndian } from '../util/byteLogic'
 import { PathData } from '../util/path'
 import PK3UB from './PK3UB'
 

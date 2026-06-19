@@ -1,6 +1,6 @@
 import { Gen3ContestRibbons } from '@openhome-core/resources'
+import { uIntFromBufferBits, uIntToBufferBits } from '@openhome-core/util/byteLogic'
 import { Gen3Ribbon } from '@pkm-rs/pkg'
-import { uIntFromBufferBits, uIntToBufferBits } from '../../util/byteLogic'
 
 export function gen3ContestRibbonsFromBuffer(
   dataView: DataView,

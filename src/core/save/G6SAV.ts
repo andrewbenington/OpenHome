@@ -1,10 +1,7 @@
 import { PK6 } from '@openhome-core/pkm'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
-import {
-  bytesToUint16LittleEndian,
-  uint16ToBytesLittleEndian,
-} from '@openhome-core/save/util/byteLogic'
 import { utf16BytesToString } from '@openhome-core/util'
+import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '@openhome-core/util/byteLogic'
 import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'

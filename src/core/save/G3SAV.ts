@@ -6,7 +6,7 @@ import {
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '@openhome-core/save/util/byteLogic'
+} from '@openhome-core/util/byteLogic'
 import {
   ConvertStrategy,
   ExtraFormIndex,

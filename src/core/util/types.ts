@@ -361,7 +361,7 @@ export function markingsSixShapesNoColorToBytes(
   setFlag(dataView, offset, 5, value.diamond)
 }
 
-export function twoColorMarkingFromInt(value: number): MarkingColorValue {
+function twoColorMarkingFromInt(value: number): MarkingColorValue {
   switch (value) {
     case 1:
       return 'blue'
@@ -372,7 +372,7 @@ export function twoColorMarkingFromInt(value: number): MarkingColorValue {
   }
 }
 
-export function twoColorMarkingToInt(marking: MarkingColorValue): number {
+function twoColorMarkingToInt(marking: MarkingColorValue): number {
   switch (marking) {
     case 'blue':
       return 1

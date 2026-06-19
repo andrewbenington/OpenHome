@@ -2,7 +2,7 @@ import { PK2 } from '@openhome-core/pkm'
 import { EXCLAMATION } from '@openhome-core/resources/consts/Forms'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
-import { get8BitChecksum } from '@openhome-core/save/util/byteLogic'
+import { get8BitChecksum } from '@openhome-core/util/byteLogic'
 import { Option, unique } from '@openhome-core/util/functional'
 import {
   readGameBoyStringFromBytes,

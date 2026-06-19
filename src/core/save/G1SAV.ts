@@ -1,8 +1,8 @@
 import { PK1, toGen1PokemonIndex } from '@openhome-core/pkm'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
-import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { readGameBoyStringFromBytes } from '@openhome-core/util'
+import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome-core/util/byteLogic'
 import { Option, range, unique } from '@openhome-core/util/functional'
 import { utf16StringToGen12 } from '@openhome-core/util/stringConversion'
 import {

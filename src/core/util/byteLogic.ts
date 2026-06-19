@@ -8,6 +8,10 @@ const bytesToNumberBigEndian = (bytes: Uint8Array) => {
   return value
 }
 
+const bytesToNumberLittleEndian = (bytes: Uint8Array) => {
+  return bytesToNumberBigEndian(bytes.reverse())
+}
+
 export const bytesToInt32BigEndian = (bytes: Uint8Array, index: number) => {
   const unsigned = bytesToNumberBigEndian(bytes.slice(index, index + 4))
 
@@ -16,10 +20,6 @@ export const bytesToInt32BigEndian = (bytes: Uint8Array, index: number) => {
   }
 
   return -(~(unsigned - 1) & 0xffffffff)
-}
-
-export const uint16ToBytesBigEndian = (value: number): Uint8Array => {
-  return Uint8Array.from([(value >> 8) & 0xff, value & 0xff])
 }
 
 export const uint24ToBytesBigEndian = (value: number): Uint8Array => {
@@ -33,6 +33,22 @@ export const uint32ToBytesLittleEndian = (value: number): Uint8Array => {
     (value >> 16) & 0xff,
     (value >> 24) & 0xff,
   ])
+}
+
+export const bytesToUint16LittleEndian = (bytes: Uint8Array, index: number) => {
+  return bytesToNumberLittleEndian(bytes.slice(index, index + 2))
+}
+
+export const bytesToUint32LittleEndian = (bytes: Uint8Array, index: number) => {
+  return bytesToNumberLittleEndian(bytes.slice(index, index + 4))
+}
+
+export const bytesToUint16BigEndian = (bytes: Uint8Array, index: number) => {
+  return bytesToNumberBigEndian(bytes.slice(index, index + 2))
+}
+
+export const uint16ToBytesLittleEndian = (value: number): Uint8Array => {
+  return Uint8Array.from([value & 0xff, (value >> 8) & 0xff])
 }
 
 export const setFlag = (dataView: DataView, offset: number, index: number, value: boolean) => {
@@ -215,4 +231,46 @@ export function getFlagsInRange(dataView: DataView, offset: number, size: number
   }
 
   return flags
+}
+
+export const get8BitChecksum = (bytes: Uint8Array, start: number, end: number) => {
+  let checksum = 0
+
+  for (let i = start; i <= end; i += 1) {
+    checksum += bytes[i]
+    checksum = checksum & 0xff
+  }
+  return checksum
+}
+
+export const get16BitChecksumLittleEndian = (
+  bytes: ArrayBufferLike,
+  start: number,
+  end: number
+) => {
+  let checksum = 0
+
+  for (let i = start; i < end; i += 2) {
+    const nextVal = bytesToUint16LittleEndian(new Uint8Array(bytes), i)
+
+    checksum = (checksum + nextVal) & 0xffff
+  }
+  return checksum
+}
+
+export function wordsToUint8Array(words: number[], sigBytes: number) {
+  const byteArray = new Uint8Array(sigBytes)
+  let byteIndex = 0
+
+  for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
+    let word = words[wordIndex]
+
+    for (let byteOffset = 3; byteOffset >= 0; byteOffset--) {
+      if (byteIndex < sigBytes) {
+        byteArray[byteIndex++] = (word >> (8 * byteOffset)) & 0xff
+      }
+    }
+  }
+
+  return byteArray
 }
