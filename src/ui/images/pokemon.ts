@@ -8,8 +8,8 @@ import {
 import { BLOOD_MOON, SWEETS } from '@openhome-core/resources/consts/Forms'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { getLumiFormIndexByExtraFormIndex } from '@openhome-core/save/luminescentplatinum/conversion/LuminescentPlatinumFormMap'
-import { toGen3RRPokemonIndex } from '@openhome-core/save/radicalred/conversion/Gen3RRPokemonIndex'
 import { RRSprites } from '@openhome-core/save/radicalred/conversion/RadicalRedSprites'
+import { toRadicalRedPokemonIndex } from '@openhome-core/save/radicalred/conversion/species'
 import { toGen3UBPokemonIndex } from '@openhome-core/save/unbound/conversion/Gen3UBPokemonIndex'
 import { UBSprites } from '@openhome-core/save/unbound/conversion/UnboundSprites'
 import { MonSpriteData } from '@openhome-ui/state/plugin/reducer'
@@ -20,7 +20,7 @@ import {
   MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
 
-export const fileToSpriteFolder: Record<PkmOrOhpkmFormat, string> = {
+const fileToSpriteFolder: Record<PkmOrOhpkmFormat, string> = {
   PK1: 'gen1',
   PK2: 'gen2',
   PK3: 'gen3',
@@ -99,7 +99,7 @@ export function getSpriteName(mon: MonSpriteData): string {
   return spriteName
 }
 
-export function getRomHackSpritePath(mon: MonSpriteData) {
+function getRomHackSpritePath(mon: MonSpriteData) {
   const spriteName = getSpriteName(mon)
   const monFormat = mon.format
   let spriteFolder = fileToSpriteFolder[monFormat as MonFormat]
@@ -111,14 +111,15 @@ export function getRomHackSpritePath(mon: MonSpriteData) {
     if (mon.dexNum === NationalDex.Terapagos) {
       return 'sprites/home/terapagos-terastal.png'
     }
-    let gen3RRname = RRSprites[toGen3RRPokemonIndex(mon.dexNum, mon.formNum, mon.extraFormIndex)]
+
+    const radicalRedIndex = toRadicalRedPokemonIndex(mon.dexNum, mon.formNum, mon.extraFormIndex)
+    let gen3RRname = radicalRedIndex !== undefined ? RRSprites[radicalRedIndex] : undefined
 
     if (!gen3RRname) {
       console.error(`missing Radical Red sprite for ${spriteName}`)
       return `sprites/home/${spriteName}.png`
     }
 
-    if (gen3RRname.length === 0) return gen3RRname
     gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
     return `sprites/${spriteFolder}/${gen3RRname}`
   } else if (monFormat === 'PK3UB') {
@@ -153,7 +154,7 @@ export function getRomHackSpritePath(mon: MonSpriteData) {
   }${spriteName}.${extension}`
 }
 
-export const getAlwaysUsedSpritePath = (
+const getAlwaysUsedSpritePath = (
   dexNum: number,
   formNum?: number,
   extraFormIndex?: ExtraFormIndex
@@ -163,7 +164,11 @@ export const getAlwaysUsedSpritePath = (
     isSeviiForm(extraFormIndex) &&
     extraFormIndex !== ExtraFormIndex.MantykeSevii
   ) {
-    let gen3RRname = RRSprites[toGen3RRPokemonIndex(dexNum, formNum ?? 0, extraFormIndex)]
+    const radicalRedIndex = toRadicalRedPokemonIndex(dexNum, formNum ?? 0, extraFormIndex)
+    let gen3RRname = radicalRedIndex !== undefined ? RRSprites[radicalRedIndex] : undefined
+
+    if (!gen3RRname) return undefined
+
     gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
     return `sprites/rr/${gen3RRname}`
   }

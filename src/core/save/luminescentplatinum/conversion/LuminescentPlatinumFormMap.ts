@@ -21,7 +21,7 @@ export type CustomFormInfo = {
  * These entries map:
  *   Pokédex number → form index → custom form metadata
  */
-export const LUMI_CUSTOM_FORMS: Record<number, Record<number, CustomFormInfo>> = {
+const LUMI_CUSTOM_FORMS: Record<number, Record<number, CustomFormInfo>> = {
   // Venusaur (Dex 3)
   3: {
     1: { name: 'Mega Venusaur', fallbackForm: 1 },

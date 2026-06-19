@@ -176,7 +176,3 @@ export const SavesContext = createContext<SavesContextValue>({
   allOpenSaves: [],
   promptDisambiguation: async () => undefined,
 })
-
-export function saveFromIdentifier(state: OpenSavesState, identifier: SaveIdentifier): Option<SAV> {
-  return state.openSaves[identifier]?.save
-}

@@ -98,7 +98,7 @@ type IfState = {
   build: BuildFunction
 }
 
-export function joinCssClasses(...classes: Option<string>[]) {
+function joinCssClasses(...classes: Option<string>[]) {
   return classes.filter(Boolean).join(' ')
 }
 

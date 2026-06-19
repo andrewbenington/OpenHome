@@ -1,6 +1,6 @@
 import { Filter } from '@openhome-ui/util/filter'
-import { createContext, useContext } from 'react'
-import { AppInfoContext, initialMonDisplayState } from '../state/appInfo'
+import { useContext } from 'react'
+import { AppInfoContext } from '../state/appInfo'
 
 export type MonDisplayState = {
   filter: Filter
@@ -11,10 +11,6 @@ export type MonDisplayState = {
   showTags: boolean
   showBackgroundColor: boolean
 }
-
-export const MonDisplayContext = createContext<[MonDisplayState, (state: MonDisplayState) => void]>(
-  [initialMonDisplayState(), () => null]
-)
 
 export function useMonDisplay() {
   const [{ settings }, dispatchAppInfo] = useContext(AppInfoContext)

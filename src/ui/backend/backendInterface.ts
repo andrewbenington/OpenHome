@@ -33,7 +33,7 @@ export type PluginDownloadProgress = {
   progress: number
 }
 
-export type LogEntryUnparsed = {
+type LogEntryUnparsed = {
   timestamp: string
   level: string
   target?: string
@@ -61,7 +61,7 @@ type LogFilterUnparsed = {
   ohpkm_id?: string
 }
 
-export function parseLog(unparsed: LogEntryUnparsed): LogEntry {
+function parseLog(unparsed: LogEntryUnparsed): LogEntry {
   return {
     ...unparsed,
     timestamp: dayjs(unparsed.timestamp),
@@ -89,7 +89,7 @@ export function parseLogs(unparsed: LogsResponseUnparsed): LogsResponse {
   }
 }
 
-export function parseFilter(unparsed: LogFilterUnparsed): LogFilter {
+function parseFilter(unparsed: LogFilterUnparsed): LogFilter {
   return {
     ...unparsed,
     start: dayjs(unparsed.start),

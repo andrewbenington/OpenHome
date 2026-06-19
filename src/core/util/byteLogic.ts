@@ -12,16 +12,6 @@ const bytesToNumberLittleEndian = (bytes: Uint8Array) => {
   return bytesToNumberBigEndian(bytes.reverse())
 }
 
-export const bytesToInt32BigEndian = (bytes: Uint8Array, index: number) => {
-  const unsigned = bytesToNumberBigEndian(bytes.slice(index, index + 4))
-
-  if (!(bytes[index] & 0b10000000)) {
-    return unsigned
-  }
-
-  return -(~(unsigned - 1) & 0xffffffff)
-}
-
 export const uint24ToBytesBigEndian = (value: number): Uint8Array => {
   return Uint8Array.from([(value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff])
 }
@@ -256,21 +246,4 @@ export const get16BitChecksumLittleEndian = (
     checksum = (checksum + nextVal) & 0xffff
   }
   return checksum
-}
-
-export function wordsToUint8Array(words: number[], sigBytes: number) {
-  const byteArray = new Uint8Array(sigBytes)
-  let byteIndex = 0
-
-  for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
-    let word = words[wordIndex]
-
-    for (let byteOffset = 3; byteOffset >= 0; byteOffset--) {
-      if (byteIndex < sigBytes) {
-        byteArray[byteIndex++] = (word >> (8 * byteOffset)) & 0xff
-      }
-    }
-  }
-
-  return byteArray
 }

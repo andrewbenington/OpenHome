@@ -68,7 +68,7 @@ export class Item implements CtxMenuElementBuilder {
   }
 }
 
-export function contentIsLabel(content: ElementContent): content is { label: string } {
+function contentIsLabel(content: ElementContent): content is { label: string } {
   return 'label' in content
 }
 

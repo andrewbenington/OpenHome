@@ -1,45 +1,5 @@
 import { Gen3ContestRibbons } from '@openhome-core/resources'
-import { uIntFromBufferBits, uIntToBufferBits } from '@openhome-core/util/byteLogic'
 import { Gen3Ribbon } from '@pkm-rs/pkg'
-
-export function gen3ContestRibbonsFromBuffer(
-  dataView: DataView,
-  byteOffset: number,
-  bitOffset: number
-): Gen3Ribbon[] {
-  const ribbons: Gen3Ribbon[] = []
-  const coolRibbonsNum = uIntFromBufferBits(dataView, byteOffset, bitOffset, 3)
-
-  for (let i = 0; i < coolRibbonsNum; i++) {
-    ribbons.push(Gen3ContestRibbons[i])
-  }
-
-  const beautyRibbonsNum = uIntFromBufferBits(dataView, byteOffset, bitOffset + 3, 3)
-
-  for (let i = 0; i < beautyRibbonsNum; i++) {
-    ribbons.push(Gen3ContestRibbons[i + 4])
-  }
-
-  const cuteRibbonsNum = uIntFromBufferBits(dataView, byteOffset, bitOffset + 6, 3)
-
-  for (let i = 0; i < cuteRibbonsNum; i++) {
-    ribbons.push(Gen3ContestRibbons[i + 8])
-  }
-
-  const smartRibbonsNum = uIntFromBufferBits(dataView, byteOffset, bitOffset + 9, 3)
-
-  for (let i = 0; i < smartRibbonsNum; i++) {
-    ribbons.push(Gen3ContestRibbons[i + 12])
-  }
-
-  const toughRibbonsNum = uIntFromBufferBits(dataView, byteOffset, bitOffset + 12, 3)
-
-  for (let i = 0; i < toughRibbonsNum; i++) {
-    ribbons.push(Gen3ContestRibbons[i + 16])
-  }
-
-  return ribbons
-}
 
 export function gen3ContestRibbonsFromBytes(dataView: DataView, byteOffset: number): Gen3Ribbon[] {
   const ribbons: Gen3Ribbon[] = []
@@ -74,63 +34,6 @@ export function gen3ContestRibbonsFromBytes(dataView: DataView, byteOffset: numb
   }
 
   return ribbons
-}
-
-export function gen3ContestRibbonsToBuffer(
-  dataView: DataView,
-  byteOffset: number,
-  bitOffset: number,
-  ribbons: Gen3Ribbon[]
-) {
-  let maxCoolRibbon = 0
-  let maxBeautyRibbon = 0
-  let maxCuteRibbon = 0
-  let maxSmartRibbon = 0
-  let maxToughRibbon = 0
-
-  ribbons.forEach((ribbon) => {
-    if (Gen3ContestRibbons.includes(ribbon)) {
-      let ribbonVal = 0
-      const [ribbonCategory, ribbonLevel] = ribbon.split(' ')
-
-      switch (ribbonLevel) {
-        case '(Hoenn)':
-          ribbonVal = 1
-          break
-        case 'Super':
-          ribbonVal = 2
-          break
-        case 'Hyper':
-          ribbonVal = 3
-          break
-        case 'Master':
-          ribbonVal = 4
-      }
-
-      switch (ribbonCategory) {
-        case 'Cool':
-          maxCoolRibbon = Math.max(maxCoolRibbon, ribbonVal)
-          break
-        case 'Beauty':
-          maxBeautyRibbon = Math.max(maxBeautyRibbon, ribbonVal)
-          break
-        case 'Cute':
-          maxCuteRibbon = Math.max(maxCuteRibbon, ribbonVal)
-          break
-        case 'Smart':
-          maxSmartRibbon = Math.max(maxSmartRibbon, ribbonVal)
-          break
-        case 'Tough':
-          maxToughRibbon = Math.max(maxToughRibbon, ribbonVal)
-          break
-      }
-    }
-  })
-  uIntToBufferBits(dataView, maxCoolRibbon, byteOffset, bitOffset, 3)
-  uIntToBufferBits(dataView, maxBeautyRibbon, byteOffset, bitOffset + 3, 3)
-  uIntToBufferBits(dataView, maxCuteRibbon, byteOffset, bitOffset + 6, 3)
-  uIntToBufferBits(dataView, maxSmartRibbon, byteOffset, bitOffset + 9, 3)
-  uIntToBufferBits(dataView, maxToughRibbon, byteOffset, bitOffset + 12, 3)
 }
 
 export function gen3ContestRibbonsToBytes(

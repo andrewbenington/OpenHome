@@ -5,11 +5,9 @@ import { PluginSAV, SAV } from '../interfaces'
 import { PathData } from './path'
 import { TransferRestrictions } from './TransferRestrictions'
 
-export const SIZE_SM = 0x6be00
-export const SIZE_USUM = 0x6cc00
 export type LookupType = 'gen12' | 'gen345'
 
-export const DESAMUME_FOOTER_START =
+const DESAMUME_FOOTER_START =
   '|<--Snip above here to create a raw sav by excluding this DeSmuME savedata footer:'
 
 export interface SavePkmClass {
@@ -36,8 +34,6 @@ export interface PluginSaveClass<S extends PluginSAV = PluginSAV> extends SAVCla
   transferRestrictions: TransferRestrictions
   getPluginIdentifier: () => string
 }
-
-export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never
 
 export function supportsMon(
   saveType: SAVClass,

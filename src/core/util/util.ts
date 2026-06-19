@@ -17,14 +17,6 @@ import Prando from 'prando'
 import { AllPKMFields } from '../pkm/util/pkmInterface'
 import { FourMoves } from './types'
 
-export function getGen3MiscFlags(pokemon: PKMInterface): number {
-  if ('isEgg' in pokemon && pokemon.isEgg) {
-    return 0b0110
-  }
-
-  return 0b0010
-}
-
 export function getDisplayID(pokemon: PKM): string {
   if (
     !('gameOfOrigin' in pokemon) ||
@@ -43,7 +35,7 @@ export function getDisplayID(pokemon: PKM): string {
 const getIsShinyPreGen6 = (trainerID: number, secretID: number, personalityValue: number) =>
   (trainerID ^ secretID ^ ((personalityValue >> 16) & 0xffff) ^ (personalityValue & 0xffff)) < 8
 
-export const getUnownLetterGen3 = (personalityValue: number) => {
+const getUnownLetterGen3 = (personalityValue: number) => {
   let letterValue = (personalityValue >> 24) & 0x3
 
   letterValue = ((personalityValue >> 16) & 0x3) | (letterValue << 2)
@@ -137,7 +129,7 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
   return personalityValue
 }
 
-export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
+const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
   const move = Moves[moveIndex]
 
   if (!move) return undefined
@@ -197,7 +189,7 @@ export const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
   return baseMaxPP + Math.floor(ppUps * (baseMaxPP / 5))
 }
 
-export function adjustPpForFormat(
+function adjustPpForFormat(
   sourceFormat: string,
   moves: FourMoves,
   currentPp: FourMoves,

@@ -38,8 +38,6 @@ export const Gen3ContestRibbons: Gen3Ribbon[] = [
   'Tough Master (Hoenn)',
 ]
 
-export const Gen3Ribbons = [...Gen3ContestRibbons, ...Gen3StandardRibbons]
-
 export const Gen34TowerRibbons = [
   'Winning',
   'Victory',

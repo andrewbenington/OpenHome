@@ -40,7 +40,7 @@ const bytesToString = (value: number, numBytes: number) => {
   return value.toString(16).padStart(numBytes * 2, '0')
 }
 
-export function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentifier {
+function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentifier {
   const baseMon = getBaseMon(mon.dexNum, mon.formNum)
 
   if (!baseMon) {

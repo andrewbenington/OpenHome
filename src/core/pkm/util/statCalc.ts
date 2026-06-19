@@ -13,13 +13,12 @@ import {
   SpeciesData,
 } from './interfaces'
 
-export interface PKMWithStandardStats
-  extends AllPKMs, PKMWithModernIVs, PKMWithModernEVs, PKMWithNature {}
+interface PKMWithStandardStats extends AllPKMs, PKMWithModernIVs, PKMWithModernEVs, PKMWithNature {}
 
-export interface PKMWithStandardStatCalc
+interface PKMWithStandardStatCalc
   extends SpeciesData, PKMWithModernIVs, PKMWithModernEVs, PKMWithNature {}
 
-export interface PKMWithGameBoyStats extends AllPKMs, PKMWithDVs, PKMWithGameBoyEVs {}
+interface PKMWithGameBoyStats extends AllPKMs, PKMWithDVs, PKMWithGameBoyEVs {}
 
 export function getStats(mon: PKM): Stats {
   if (mon instanceof PK1 || mon instanceof PK2) {
@@ -55,7 +54,7 @@ export const getStandardPKMStats = (mon: PKMWithStandardStats): Stats => {
 }
 
 // TODO: game boy stat calculation
-export const getGameBoyPKMStats = (mon: PKMWithGameBoyStats): Stats => {
+const getGameBoyPKMStats = (mon: PKMWithGameBoyStats): Stats => {
   if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return {
       hp: 0,
@@ -78,7 +77,7 @@ export const getGameBoyPKMStats = (mon: PKMWithGameBoyStats): Stats => {
   }
 }
 
-export const getStatGen3Onward = (mon: PKMWithStandardStatCalc, stat: Stat, level: number) => {
+const getStatGen3Onward = (mon: PKMWithStandardStatCalc, stat: Stat, level: number) => {
   if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return 0
   }
@@ -101,7 +100,7 @@ export const getStatGen3Onward = (mon: PKMWithStandardStatCalc, stat: Stat, leve
   return 0
 }
 
-export const getHPGen3Onward = (mon: PKMWithStandardStatCalc, level: number) => {
+const getHPGen3Onward = (mon: PKMWithStandardStatCalc, level: number) => {
   if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
     return 0
   }

@@ -254,7 +254,7 @@ export function useOhpkmStore(): OhpkmStore {
 
 export type IdentifierNotPresentError = { identifier: OhpkmIdentifier }
 
-export function IdentifierNotPresent(identifier: OhpkmIdentifier): IdentifierNotPresentError {
+function IdentifierNotPresent(identifier: OhpkmIdentifier): IdentifierNotPresentError {
   return { identifier }
 }
 export const OhpkmStoreContext = createContext<

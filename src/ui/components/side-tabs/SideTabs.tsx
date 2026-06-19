@@ -4,7 +4,7 @@ import { HTMLAttributes, useContext, useState } from 'react'
 import { SideTabsContext } from './SideTabsContext'
 import './style.css'
 
-export type SideTabsProps = {
+type SideTabsProps = {
   value?: Option<string>
   onValueChange?: (value: Option<string>) => void
   defaultValue?: Option<string>

@@ -943,7 +943,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 }
 
-export function monFormatToOriginalDataTag(format: PkmFormat): Option<Tag> {
+function monFormatToOriginalDataTag(format: PkmFormat): Option<Tag> {
   switch (format) {
     case 'PK1':
       return Tag.Pk1
@@ -1136,7 +1136,7 @@ function deepEqual(first?: object, second?: object): boolean {
 
 type IndexableObject = object & Record<string, any>
 
-export function objectsEqual(object1: IndexableObject, object2: IndexableObject) {
+function objectsEqual(object1: IndexableObject, object2: IndexableObject) {
   if (object1 === null || object2 === null) {
     return object1 === object2
   }

@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js'
 
-export const SIGNATURE_LENGTH = 0x60
+const SIGNATURE_LENGTH = 0x60
 const AES_CHUNK_LENGTH = 0x10
 
 function wordArrayToUint8Array(wordArray: CryptoJS.lib.WordArray): Uint8Array {
@@ -196,7 +196,7 @@ function truncByte(val: number): number {
   return val & 0xff
 }
 
-export function bytesToBigIntBE(bytes: Uint8Array) {
+function bytesToBigIntBE(bytes: Uint8Array) {
   let result = 0n
 
   for (const byte of bytes) {

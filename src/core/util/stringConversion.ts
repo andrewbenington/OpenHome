@@ -1,10 +1,9 @@
 import Gen4ToUTFMap from './gen4ToUTFMap'
 import UTFToGen4Map from './utfToGen4Map'
 
-export const G1_TERMINATOR = 0x50
-export const G1_TRADE_OT = 0x5d
+const G1_TERMINATOR = 0x50
 
-export const GBStringDict: { [key: number]: string } = {
+const GBStringDict: { [key: number]: string } = {
   0x7f: ' ',
   0x80: 'A',
   0x81: 'B',

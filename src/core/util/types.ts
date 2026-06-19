@@ -1,6 +1,5 @@
 import { PathData } from '@openhome-core/save/util/path'
 import { Gender, OriginGame } from '@pkm-rs/pkg'
-import { CSSProperties } from 'react'
 import { PluginIdentifier } from '../save/interfaces'
 
 export type Type =
@@ -55,9 +54,6 @@ export type JSONValue = string | number | boolean | null | undefined | JSONArray
 export interface JSONObject extends Record<string, JSONValue> {}
 
 export interface JSONArray extends Array<JSONValue> {}
-
-type CSSVariable = `--${string}`
-export type CSSWithVariables = CSSProperties & Record<CSSVariable, string | undefined>
 
 export function displayGender(gender: Gender): string {
   switch (gender) {
@@ -282,11 +278,9 @@ export function writeContestStatsToBytes(dataView: DataView, offset: number, val
   dataView.setUint8(offset + 5, value.sheen)
 }
 
-export type MarkingShapePreGen6 = 'circle' | 'square' | 'triangle' | 'heart'
-export type MarkingShape = MarkingShapePreGen6 | 'star' | 'diamond'
+export type MarkingShape = 'circle' | 'square' | 'triangle' | 'heart' | 'star' | 'diamond'
 
 export type MarkingColorValue = 'unset' | 'blue' | 'red'
-// export type MarkingsSixShapesWithColor = Record<MarkingShape, MarkingColorValue>
 
 export type Markings = MarkingsFourShapes | MarkingsSixShapes | MarkingsSixShapesColors
 
@@ -423,7 +417,7 @@ export function markingsSixShapesNoColorFromOther(other?: Markings): MarkingsSix
   }
 }
 
-export function markingColorValueFromOther(marking: boolean | MarkingColorValue) {
+function markingColorValueFromOther(marking: boolean | MarkingColorValue) {
   switch (marking) {
     case true:
       return 'blue'

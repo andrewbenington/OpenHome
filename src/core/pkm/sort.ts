@@ -28,7 +28,7 @@ export const SortTypes = [
 
 export type SortType = (typeof SortTypes)[number]
 
-export type PkmSorter = (a: PKMInterface, b: PKMInterface) => number
+type PkmSorter = (a: PKMInterface, b: PKMInterface) => number
 
 type MonTagLike = { label: string; color?: string; icon?: string }
 

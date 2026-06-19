@@ -285,13 +285,6 @@ const TransactionCommit: (message: string) => SaveError = (message: string) => (
   message,
 })
 
-export const IdentifierNotTracked: (identifier: OhpkmIdentifier) => SaveError = (
-  identifier: OhpkmIdentifier
-) => ({
-  _SaveErrorType: 'IdentifierNotTracked',
-  identifier,
-})
-
 const SaveItemBagData: (message: string) => SaveError = (message: string) => ({
   _SaveErrorType: 'SaveItemBagData',
   message,

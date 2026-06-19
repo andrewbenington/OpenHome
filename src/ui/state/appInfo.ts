@@ -47,7 +47,7 @@ export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
 ]
 const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV, CompassSave]
 
-export function initialMonDisplayState() {
+function initialMonDisplayState() {
   return {
     filter: {},
     topRightIndicator: null,
