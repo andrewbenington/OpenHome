@@ -9,7 +9,7 @@ import {
   MarkingsFourShapes,
   MetadataSummaryLookup,
   OriginGame,
-  Pk3 as Pk3Wasm,
+  Pk3Wasm,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { FourMoves, Stats, ToBytesOptions } from '../util/types'

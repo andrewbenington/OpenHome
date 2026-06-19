@@ -13,7 +13,7 @@ import {
   MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
-  Pk7 as Pk7Wasm,
+  Pk7Wasm,
   PokeDate,
   SpeciesLookup,
   TrainerMemory,

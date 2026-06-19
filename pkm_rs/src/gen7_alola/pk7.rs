@@ -35,7 +35,7 @@ use pkm_rs_resources::abilities::AbilityIndexWasm;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Pk7Wasm))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct Pk7 {
@@ -405,7 +405,7 @@ impl HasSpeciesAndForm for Pk7 {
 }
 
 #[cfg(feature = "wasm")]
-#[wasm_bindgen]
+#[wasm_bindgen(js_class = Pk7Wasm)]
 #[allow(clippy::missing_const_for_fn)]
 impl Pk7 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]

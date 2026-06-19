@@ -1,8 +1,8 @@
 import { PK1, PK2 } from '@openhome-core/pkm'
 import { PKM } from '@openhome-core/pkm/PKM'
 import { NationalDex, NationalDexMax } from '@openhome-core/resources/consts/NationalDex'
-import { MetadataSummaryLookup, SpeciesLookup, Stat, Stats as StatsWasm } from '@pkm-rs/pkg'
-import { StatAbbr, Stats } from '../../util/types'
+import { MetadataSummaryLookup, SpeciesLookup, Stat, StatAbbr } from '@pkm-rs/pkg'
+import { Stats } from '../../util/types'
 import {
   AllPKMs,
   PKMWithDVs,
@@ -85,7 +85,7 @@ const getStatGen3Onward = (mon: PKMWithStandardStatCalc, stat: Stat, level: numb
   const natureMultiplier = mon.nature.multiplierFor(stat)
 
   const metadata = MetadataSummaryLookup(mon.dexNum, mon.formNum)
-  const statAbbr = StatsWasm.abbrLower(stat) as StatAbbr
+  const statAbbr = StatAbbr.getLower(stat) as keyof Stats
 
   if (metadata) {
     const baseStat = metadata.getBaseStat(stat)

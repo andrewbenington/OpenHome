@@ -9,7 +9,7 @@ import { isContestStats, isStandardStats, isStatsPreSplit, Stats } from '@openho
 import SheenStars from '@openhome-ui/components/pokemon/SheenStars'
 import StatsTable from '@openhome-ui/components/pokemon/StatsTable'
 import { colorIsDark } from '@openhome-ui/util/color'
-import { Stats as PkmRsStats, StatsPreSplit } from '@pkm-rs/pkg'
+import { StatAbbr, StatsPreSplit } from '@pkm-rs/pkg'
 import { Select } from '@radix-ui/themes'
 import {
   ChartDataset,
@@ -305,7 +305,7 @@ function labelTextCallback(mon: PKMInterface, display: DisplayType) {
       return label
     }
 
-    const stat = PkmRsStats.fromAbbr(label)
+    const stat = StatAbbr.toStat(label)
     const activeNature = mon.statNature ?? mon.nature
     if (!stat || !activeNature) {
       return label
