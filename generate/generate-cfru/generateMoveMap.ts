@@ -1,4 +1,4 @@
-import { Moves } from '@openhome-core/pokemon-resources'
+import { Moves } from '@openhome-core/resources'
 import { Gen3RRMoves } from '@openhome-core/save/radicalred/conversion/Gen3RRMovesIndex'
 import { writeFileSync } from 'fs'
 

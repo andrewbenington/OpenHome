@@ -1,4 +1,4 @@
-import { Moves } from '@openhome-core/pokemon-resources'
+import { Moves } from '@openhome-core/resources'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import { colorForType, contrastColorForType } from '@openhome-ui/util/color'
 import { cssClass } from '@openhome-ui/util/style'

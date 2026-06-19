@@ -1,4 +1,4 @@
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 export const ShadowIDsColosseum: Record<number, number> = {
   [NationalDex.Makuhita]: 1,
   [NationalDex.Bayleef]: 2,

@@ -1,5 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Gen3ContestRibbons, Gen3StandardRibbons } from '@openhome-core/pokemon-resources'
+import { Gen3ContestRibbons, Gen3StandardRibbons } from '@openhome-core/resources'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityNumber,
@@ -15,7 +16,6 @@ import {
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import * as byteLogic from '../util/byteLogic'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'

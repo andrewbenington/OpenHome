@@ -19,7 +19,20 @@ import {
   Moves,
   SVTMMoveIndexes,
   SwShTRMoveIndexes,
-} from '@openhome-core/pokemon-resources'
+} from '@openhome-core/resources'
+import { Countries } from '@openhome-core/resources/consts/Countries'
+import { EncounterTypes } from '@openhome-core/resources/consts/EncounterTypes'
+import { SWEETS } from '@openhome-core/resources/consts/Forms'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import {
+  GEN2_TRANSFER_RESTRICTIONS,
+  HGSS_TRANSFER_RESTRICTIONS,
+  LA_TRANSFER_RESTRICTIONS,
+  ORAS_TRANSFER_RESTRICTIONS,
+  SV_TRANSFER_RESTRICTIONS_ID,
+  SWSH_TRANSFER_RESTRICTIONS_CT,
+  USUM_TRANSFER_RESTRICTIONS,
+} from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import {
   getDisplayID,
@@ -35,19 +48,6 @@ import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import useIsDev from '@openhome-ui/hooks/isDev'
 import { genderFromBool, Generation, Language, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
-import { Countries } from '@pokemon-resources/consts/Countries'
-import { EncounterTypes } from '@pokemon-resources/consts/EncounterTypes'
-import { SWEETS } from '@pokemon-resources/consts/Forms'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import {
-  GEN2_TRANSFER_RESTRICTIONS,
-  HGSS_TRANSFER_RESTRICTIONS,
-  LA_TRANSFER_RESTRICTIONS,
-  ORAS_TRANSFER_RESTRICTIONS,
-  SV_TRANSFER_RESTRICTIONS_ID,
-  SWSH_TRANSFER_RESTRICTIONS_CT,
-  USUM_TRANSFER_RESTRICTIONS,
-} from '@pokemon-resources/consts/TransferRestrictions'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
 

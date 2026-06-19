@@ -1,3 +1,4 @@
+import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import {
@@ -8,7 +9,6 @@ import {
   OriginGames,
   orasFormIndexIfSupported,
 } from '@pkm-rs/pkg'
-import { CHAMPS_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { Card, Flex } from '@radix-ui/themes'
 import { useContext } from 'react'
 import { isExtraFormMetadata } from './util'

@@ -1,7 +1,7 @@
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { ImageResponse } from '@openhome-ui/backend/backendInterface'
 import { OpenHomePlugin } from '@openhome-ui/state/plugin/reducer'
 import { MetadataSummaryLookup, SpeciesLookup } from '@pkm-rs/pkg'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 
 type PluginBuilder = (
   metadataLookup: typeof MetadataSummaryLookup,

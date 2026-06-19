@@ -1,4 +1,5 @@
 import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@openhome-core/pkm'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import { Stats } from '@openhome-core/util/types'
 import {
@@ -10,7 +11,6 @@ import {
   OriginGame,
   SpeciesAndForm,
 } from '@pkm-rs/pkg'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import fs from 'fs'
 import path from 'path'
 import { assert, beforeAll, describe, expect, test } from 'vitest'

@@ -1,4 +1,4 @@
-import { teraTypeStringFromIndex } from '@openhome-core/pokemon-resources'
+import { teraTypeStringFromIndex } from '@openhome-core/resources'
 import { getPublicImageURL, getTypeIconPath } from '@openhome-ui/images/images'
 import { PkmType } from '@pkm-rs/pkg'
 import './style.css'

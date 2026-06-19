@@ -1,3 +1,4 @@
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
   CapAndStarterPikachus,
   CapPikachus,
@@ -11,7 +12,6 @@ import {
 } from '@openhome-core/save/util/TransferRestrictions'
 import { range } from '@openhome-core/util/functional'
 import { orasFormIndexIfSupported } from '@pkm-rs/pkg'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import {
   BLOOD_MOON,
   COMPLETE,

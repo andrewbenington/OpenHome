@@ -21,11 +21,8 @@
       "@openhome-core/*": [
         "./src/core/*"
       ],
-      "@pokemon-files/*": [
-        "./src/core/pokemon-files/src/*"
-      ],
-      "@pokemon-resources/*": [
-        "./src/core/pokemon-resources/*"
+      "@openhome-core/resources/*": [
+        "./src/core/resources/*"
       ],
       "@pkm-rs/*": [
         "./pkm_rs/*"

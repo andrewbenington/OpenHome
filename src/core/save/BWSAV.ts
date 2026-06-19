@@ -1,7 +1,7 @@
+import { Item } from '@openhome-core/resources/consts/Items'
+import { BW_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
-import { Item } from '@pokemon-resources/consts/Items'
-import { BW_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { G5SAV } from './G5SAV'
 import { hasDesamumeFooter } from './util'
 

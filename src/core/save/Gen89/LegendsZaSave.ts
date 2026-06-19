@@ -1,12 +1,12 @@
 import { PA9 } from '@openhome-core/pkm'
-import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { utf16BytesToString } from '@openhome-core/util/stringConversion'
-import { ConvertStrategy, ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
-import { Item } from '@pokemon-resources/consts/Items'
+import { Item } from '@openhome-core/resources/consts/Items'
 import {
   ZA_TRANSFER_RESTRICTIONS_BASE,
   ZA_TRANSFER_RESTRICTIONS_MD,
-} from '@pokemon-resources/consts/TransferRestrictions'
+} from '@openhome-core/resources/consts/TransferRestrictions'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { utf16BytesToString } from '@openhome-core/util/stringConversion'
+import { ConvertStrategy, ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'

@@ -7,15 +7,6 @@ import {
   getMonGen345Identifier,
   OhpkmIdentifier,
 } from '@openhome-core/pkm/Lookup'
-import { BoxAndSlot, SAV } from '@openhome-core/save/interfaces'
-import { LP_TRANSFER_RESTRICTIONS } from '@openhome-core/save/luminescentplatinum/G8LUMISAV'
-import { RR_TRANSFER_RESTRICTIONS } from '@openhome-core/save/radicalred/G3RRSAV'
-import { UB_TRANSFER_RESTRICTIONS } from '@openhome-core/save/unbound/G3UBSAV'
-import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
-import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
-import { Option, R, range } from '@openhome-core/util/functional'
-import { SaveRef } from '@openhome-core/util/types'
-import { ExtraFormIndex, GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import {
   BDSP_TRANSFER_RESTRICTIONS,
   BW2_TRANSFER_RESTRICTIONS,
@@ -29,7 +20,16 @@ import {
   SV_TRANSFER_RESTRICTIONS_ID,
   SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
-} from '@pokemon-resources//consts/TransferRestrictions'
+} from '@openhome-core/resources//consts/TransferRestrictions'
+import { BoxAndSlot, SAV } from '@openhome-core/save/interfaces'
+import { LP_TRANSFER_RESTRICTIONS } from '@openhome-core/save/luminescentplatinum/G8LUMISAV'
+import { RR_TRANSFER_RESTRICTIONS } from '@openhome-core/save/radicalred/G3RRSAV'
+import { UB_TRANSFER_RESTRICTIONS } from '@openhome-core/save/unbound/G3UBSAV'
+import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
+import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
+import { Option, R, range } from '@openhome-core/util/functional'
+import { SaveRef } from '@openhome-core/util/types'
+import { ExtraFormIndex, GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { BackendContext } from '../../backend/backendContext'
 import useDisplayError from '../../hooks/displayError'

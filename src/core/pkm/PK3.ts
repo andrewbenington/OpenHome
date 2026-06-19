@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { Option } from '@openhome-core/util/functional'
 import {
   ContestStats,
@@ -11,7 +12,6 @@ import {
   Pk3 as Pk3Wasm,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { FourMoves, Stats, ToBytesOptions } from '../util/types'
 import { PkmConstructorOptions } from './PKM'
 import * as encryption from './util/encryption'

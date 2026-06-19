@@ -1,4 +1,11 @@
 import { PK8 } from '@openhome-core/pkm'
+import { Item } from '@openhome-core/resources/consts/Items'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import {
+  SWSH_TRANSFER_RESTRICTIONS_BASE,
+  SWSH_TRANSFER_RESTRICTIONS_CT,
+  SWSH_TRANSFER_RESTRICTIONS_IOA,
+} from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
@@ -12,13 +19,6 @@ import {
   Pk8,
   Pk8 as Pk8Wasm,
 } from '@pkm-rs/pkg'
-import { Item } from '@pokemon-resources/consts/Items'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import {
-  SWSH_TRANSFER_RESTRICTIONS_BASE,
-  SWSH_TRANSFER_RESTRICTIONS_CT,
-  SWSH_TRANSFER_RESTRICTIONS_IOA,
-} from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../../pkm/OHPKM'
 import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'

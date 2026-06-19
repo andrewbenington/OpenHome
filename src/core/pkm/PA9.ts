@@ -1,5 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { ModernRibbons } from '@openhome-core/pokemon-resources'
+import { ModernRibbons } from '@openhome-core/resources'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,

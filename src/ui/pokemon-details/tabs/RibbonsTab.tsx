@@ -1,7 +1,7 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { Gen9Ribbons } from '@openhome-core/resources/consts/Ribbons'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getRibbonSpritePath } from '@openhome-ui/images/ribbons'
-import { Gen9Ribbons } from '@pokemon-resources/consts/Ribbons'
 import { Tooltip } from '@radix-ui/themes'
 import './RibbonsTab.css'
 

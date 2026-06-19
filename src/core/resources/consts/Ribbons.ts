@@ -1,4 +1,4 @@
-import { Gen34ContestRibbons, Gen34TowerRibbons } from '@openhome-core/pokemon-resources'
+import { Gen34ContestRibbons, Gen34TowerRibbons } from '@openhome-core/resources'
 
 export const Gen9Ribbons = [
   'Kalos Champion',

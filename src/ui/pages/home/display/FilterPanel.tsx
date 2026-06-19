@@ -1,4 +1,5 @@
-import { Types } from '@openhome-core/pokemon-resources'
+import { Types } from '@openhome-core/resources'
+import { OpenHomeRibbons } from '@openhome-core/resources/consts/Ribbons'
 import { stringSorter } from '@openhome-core/util/sort'
 import { displayGender } from '@openhome-core/util/types'
 import { useMonDisplay } from '@openhome-ui/hooks/useMonDisplay'
@@ -22,7 +23,6 @@ import {
   OriginGameWithData,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { OpenHomeRibbons } from '@pokemon-resources/consts/Ribbons'
 import { Button } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import GenderIcon from '../../../components/pokemon/GenderIcon'

@@ -1,6 +1,6 @@
+import { NationalDex } from '@openhome-core/resources//consts/NationalDex'
 import { OFFICIAL_SAVE_TYPES } from '@openhome-ui/state/appInfo'
 import { ExtraFormIndex } from '@pkm-rs/pkg'
-import { NationalDex } from '@pokemon-resources//consts/NationalDex'
 import { describe, expect, test } from 'vitest'
 import { supportsMon } from '..'
 import { G8LumiSAV } from '../../luminescentplatinum/G8LUMISAV'

@@ -1,5 +1,5 @@
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { FormMetadata, MetadataSummaryLookup } from '@pkm-rs/pkg'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { assert, beforeAll, describe, expect, test } from 'vitest'
 import { initializeWasm } from './init'
 

@@ -1,4 +1,10 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { Item } from '@openhome-core/resources/consts/Items'
+import {
+  SV_TRANSFER_RESTRICTIONS_BASE,
+  SV_TRANSFER_RESTRICTIONS_ID,
+  SV_TRANSFER_RESTRICTIONS_TM,
+} from '@openhome-core/resources/consts/TransferRestrictions'
 import {
   SCArrayBlock,
   SCBlock,
@@ -14,12 +20,6 @@ import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Option } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import { ConvertStrategy, ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
-import { Item } from '@pokemon-resources/consts/Items'
-import {
-  SV_TRANSFER_RESTRICTIONS_BASE,
-  SV_TRANSFER_RESTRICTIONS_ID,
-  SV_TRANSFER_RESTRICTIONS_TM,
-} from '@pokemon-resources/consts/TransferRestrictions'
 import PK9Compass from './PK9Compass'
 
 const SAVE_SIZE_BYTES_MIN = 0x31626f

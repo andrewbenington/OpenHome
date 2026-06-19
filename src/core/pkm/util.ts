@@ -8,7 +8,9 @@ import {
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
   SpeedCharacteristics,
-} from '@openhome-core/pokemon-resources'
+} from '@openhome-core/resources'
+import { Item } from '@openhome-core/resources/consts/Items'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { FourMoves, Stats } from '@openhome-core/util/types'
 import {
   AbilityIndex,
@@ -25,8 +27,6 @@ import {
   SpeciesAndForm,
   StatsPreSplit,
 } from '@pkm-rs/pkg'
-import { Item } from '@pokemon-resources/consts/Items'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import Prando from 'prando'
 
 export const getAbilityFromNumber = (

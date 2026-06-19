@@ -1,4 +1,6 @@
 import { PK1, toGen1PokemonIndex } from '@openhome-core/pkm'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import { GEN1_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
 import { Option, range, unique } from '@openhome-core/util/functional'
@@ -10,8 +12,6 @@ import {
   Language,
   OriginGame,
 } from '@pkm-rs/pkg'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { GEN1_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'

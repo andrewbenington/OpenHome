@@ -1,4 +1,4 @@
-import { Moves } from '@openhome-core/pokemon-resources'
+import { Moves } from '@openhome-core/resources'
 import { Option } from '@openhome-core/util/functional'
 import { CFRUToNationalMap } from './CFRUToNationalMap'
 import { NationalToCFRUMap } from './NationalToCFRUMap'
