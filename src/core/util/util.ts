@@ -1,4 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { PKM, PkmClass } from '@openhome-core/pkm/PKM'
 import { filterUndefined } from '@openhome-core/util/sort'
 import {
   Gender,
@@ -10,11 +11,11 @@ import {
   PkmFormat,
   PkmFormats,
 } from '@pkm-rs/pkg'
-import { PKM, PkmClass } from '@pokemon-files/pkm/PKM'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Moves } from '@pokemon-resources/index'
 import Prando from 'prando'
-import { AllPKMFields, FourMoves } from './pkmInterface'
+import { AllPKMFields } from '../pkm/util/pkmInterface'
+import { FourMoves } from './types'
 
 export function getGen3MiscFlags(pokemon: PKMInterface): number {
   if ('isEgg' in pokemon && pokemon.isEgg) {

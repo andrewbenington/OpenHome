@@ -15,10 +15,8 @@ import {
   StatsPreSplit,
   TrainerMemory,
 } from '@pkm-rs/pkg'
-import * as types from './types'
-import { Markings } from './types'
-
-export type FourMoves = [number, number, number, number]
+import * as types from '../../util/types'
+import { FourMoves, Markings } from '../../util/types'
 
 export interface AllPKMFields {
   format: PkmOrOhpkmFormat

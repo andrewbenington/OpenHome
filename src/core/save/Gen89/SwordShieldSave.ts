@@ -1,4 +1,6 @@
+import { PK8 } from '@openhome-core/pkm'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -10,8 +12,6 @@ import {
   Pk8,
   Pk8 as Pk8Wasm,
 } from '@pkm-rs/pkg'
-import { PK8 } from '@pokemon-files/pkm'
-import { utf16BytesToString } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import {

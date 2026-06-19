@@ -1,5 +1,15 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { isWasmFormat, WasmPkmFormat } from '@openhome-core/pkm/PKM'
+import { getHeightCalculated, getWeightCalculated } from '@openhome-core/util'
 import { intersection, Option, unique } from '@openhome-core/util/functional'
+import {
+  FourMoves,
+  MarkingShape,
+  markingsHaveColor,
+  markingsSixShapesWithColorFromOther,
+  PKMDate,
+  Stats,
+} from '@openhome-core/util/types'
 import {
   AbilityIndex,
   AbilityNumber,
@@ -22,18 +32,6 @@ import {
   TrainerMemory,
   updatePidIfWouldBecomeShinyGen345,
 } from '@pkm-rs/pkg'
-import { isWasmFormat, WasmPkmFormat } from '@pokemon-files/pkm/PKM'
-import {
-  AllPKMFields,
-  FourMoves,
-  getHeightCalculated,
-  getStandardPKMStats,
-  getWeightCalculated,
-  MarkingShape,
-  markingsHaveColor,
-  Stats,
-} from '@pokemon-files/util'
-import * as jsTypes from '@pokemon-files/util/types'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen34ContestRibbons, Gen34TowerRibbons } from '@pokemon-resources/index'
 import dayjs, { Dayjs } from 'dayjs'
@@ -49,6 +47,8 @@ import {
   getPrevos,
   ivsFromDVs,
 } from './util'
+import { AllPKMFields } from './util/pkmInterface'
+import { getStandardPKMStats } from './util/statCalc'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getFormat() {
@@ -161,7 +161,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       }
 
       this.ball = other.ball !== undefined ? other.ball : Ball.Poke
-      this.markings = jsTypes.markingsSixShapesWithColorFromOther(other.markings)
+      this.markings = markingsSixShapesWithColorFromOther(other.markings)
 
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.metLevel = other.metLevel ?? 0
@@ -424,7 +424,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   get eggDate() {
     return convertPokeDateOptional(this.eggDateWasm)
   }
-  set eggDate(value: jsTypes.PKMDate | undefined) {
+  set eggDate(value: PKMDate | undefined) {
     if (value) {
       this.eggDateWasm = new PokeDate(value.year, value.month, value.day)
     } else {
@@ -435,7 +435,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   get metDate() {
     return convertPokeDate(this.metDateWasm)
   }
-  set metDate(value: jsTypes.PKMDate) {
+  set metDate(value: PKMDate) {
     this.metDateWasm = new PokeDate(value.year, value.month, value.day)
   }
 

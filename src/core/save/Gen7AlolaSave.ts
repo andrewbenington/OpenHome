@@ -1,3 +1,4 @@
+import PK7 from '@openhome-core/pkm/PK7'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -5,7 +6,6 @@ import {
   OriginGame,
   Pk7 as Pk7Wasm,
 } from '@pkm-rs/pkg'
-import PK7 from '@pokemon-files/pkm/PK7'
 import { Item } from '@pokemon-resources//consts/Items'
 import { USUM_TRANSFER_RESTRICTIONS } from '@pokemon-resources//consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'

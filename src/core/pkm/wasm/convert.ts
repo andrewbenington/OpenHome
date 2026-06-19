@@ -1,5 +1,5 @@
+import { PKMDate } from '@openhome-core/util/types'
 import { BinaryGender, PokeDate } from '@pkm-rs/pkg/pkm_rs'
-import { PKMDate } from '../../util'
 
 export function convertPokeDate(date: PokeDate): PKMDate {
   return {

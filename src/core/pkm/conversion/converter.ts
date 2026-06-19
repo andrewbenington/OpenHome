@@ -1,12 +1,12 @@
 import { MonFormat } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { Stats } from '@openhome-core/util/types'
 import {
   ConvertStrategies,
   ConvertStrategy,
   MetData,
   PkmConverter as PkmConverterWasm,
 } from '@pkm-rs/pkg'
-import { Stats } from '@pokemon-files/util'
 
 export class PkmConverter {
   format: MonFormat

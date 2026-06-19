@@ -1,27 +1,30 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Option } from '@openhome-core/util/functional'
+import { ModernRibbons } from '@openhome-core/pokemon-resources/src'
+import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   ContestStats,
   ConvertStrategies,
   ConvertStrategy,
+  Geolocations,
   HyperTraining,
   Item,
-  Language,
   MarkingsSixShapesColors,
   MetadataSummaryLookup,
-  ModernRibbon,
   NatureIndex,
   OriginGame,
-  Pk8 as Pk8Wasm,
+  Pk7 as Pk7Wasm,
   PokeDate,
   SpeciesLookup,
-  Stats16Le,
   TrainerMemory,
 } from '@pkm-rs/pkg'
-import { FourMoves, PKMDate } from '@pokemon-files/util'
-import { ModernRibbons } from '@pokemon-resources/index'
 import { PkmConstructorOptions } from './PKM'
+import {
+  decryptByteArrayGen67,
+  get16BitChecksumLittleEndian,
+  shuffleBlocksGen67,
+} from './util/encryption'
+import { getStats } from './util/statCalc'
 import {
   binaryGenderFromBool,
   binaryGenderToBool,
@@ -29,24 +32,24 @@ import {
   convertPokeDateOptional,
 } from './wasm/convert'
 
-export default class PK8 {
+export class PK7 {
   static getFormat() {
-    return 'PK8' as const
+    return 'PK7' as const
   }
-  format = 'PK8' as const
+  format = 'PK7' as const
 
   static getBoxSize() {
-    return 344
+    return 232
   }
-  inner: Pk8Wasm
+  inner: Pk7Wasm
 
-  constructor(arg: OHPKM | Pk8Wasm, options: PkmConstructorOptions) {
-    if (arg instanceof Pk8Wasm) {
+  constructor(arg: OHPKM | Pk7Wasm, options: PkmConstructorOptions) {
+    if (arg instanceof Pk7Wasm) {
       this.inner = arg
     } else {
       const ohpkmBytes = new Uint8Array(arg.toBytes())
 
-      this.inner = Pk8Wasm.fromOhpkmBytes(
+      this.inner = Pk7Wasm.fromOhpkmBytes(
         ohpkmBytes,
         options.strategy || ConvertStrategies.getDefault()
       )
@@ -60,19 +63,16 @@ export default class PK8 {
     this.inner.encryption_constant = value
   }
 
-  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK8 {
-    const byteArray = new Uint8Array(buffer)
-    return PK8.fromWasm(
-      encrypted ? Pk8Wasm.fromEncryptedBytes(byteArray) : Pk8Wasm.fromBytes(byteArray)
-    )
+  static fromBytes(buffer: ArrayBuffer, _encrypted?: boolean): PK7 {
+    return PK7.fromWasm(Pk7Wasm.fromBytes(new Uint8Array(buffer)))
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK8 {
-    return new PK8(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK7 {
+    return new PK7(ohpkm, { strategy })
   }
 
-  private static fromWasm(pk8: Pk8Wasm): PK8 {
-    return new PK8(pk8, {})
+  static fromWasm(pk7: Pk7Wasm): PK7 {
+    return new PK7(pk7, {})
   }
 
   get sanity() {
@@ -135,13 +135,6 @@ export default class PK8 {
     this.inner.ability_num = value
   }
 
-  get canGigantamax() {
-    return this.inner.can_gigantamax
-  }
-  set canGigantamax(value: boolean) {
-    this.inner.can_gigantamax = value
-  }
-
   get markings() {
     return this.inner.markings
   }
@@ -161,13 +154,6 @@ export default class PK8 {
   }
   set nature(value: NatureIndex) {
     this.inner.nature = value.copy()
-  }
-
-  get statNature() {
-    return this.inner.mint_nature.copy()
-  }
-  set statNature(value: NatureIndex) {
-    this.inner.mint_nature = value.copy()
   }
 
   get isFatefulEncounter() {
@@ -191,7 +177,7 @@ export default class PK8 {
   get evs() {
     return this.inner.evs
   }
-  set evs(value: Stats16Le) {
+  set evs(value: Stats) {
     this.inner.evs = value
   }
 
@@ -202,11 +188,25 @@ export default class PK8 {
     this.inner.contest = value
   }
 
+  get resortEventStatus() {
+    return this.inner.resort_event_status
+  }
+  set resortEventStatus(value: number) {
+    this.inner.resort_event_status = value
+  }
+
   get pokerusByte() {
     return this.inner.pokerus_byte
   }
   set pokerusByte(value: number) {
     this.inner.pokerus_byte = value
+  }
+
+  get superTrainingFlags() {
+    return this.inner.super_training_flags
+  }
+  set superTrainingFlags(value: number) {
+    this.inner.super_training_flags = value
   }
 
   get contestMemoryCount() {
@@ -223,25 +223,11 @@ export default class PK8 {
     this.inner.battle_memory_count = value
   }
 
-  get sociability() {
-    return this.inner.sociability
+  get superTrainingDistFlags() {
+    return this.inner.super_training_dist_flags
   }
-  set sociability(value: number) {
-    this.inner.sociability = value
-  }
-
-  get heightScalar() {
-    return this.inner.height_scalar
-  }
-  set heightScalar(value: number) {
-    this.inner.height_scalar = value
-  }
-
-  get weightScalar() {
-    return this.inner.weight_scalar
-  }
-  set weightScalar(value: number) {
-    this.inner.weight_scalar = value
+  set superTrainingDistFlags(value: number) {
+    this.inner.super_training_dist_flags = value
   }
 
   get formArgument() {
@@ -261,7 +247,7 @@ export default class PK8 {
   get moves() {
     const moves = Array.from(this.inner.move_indices)
     if (moves.length !== 4) {
-      throw new Error(`PK8 WASM struct has move array length of ${moves.length} (expected 4)`)
+      throw new Error(`PK7 WASM struct has move array length of ${moves.length} (expected 4)`)
     }
 
     return moves as FourMoves
@@ -273,7 +259,7 @@ export default class PK8 {
   get movePP() {
     const movePP = Array.from(this.inner.move_pp)
     if (movePP.length !== 4) {
-      throw new Error(`PK8 WASM struct has move PP array length of ${movePP.length} (expected 4)`)
+      throw new Error(`PK7 WASM struct has move PP array length of ${movePP.length} (expected 4)`)
     }
 
     return movePP as FourMoves
@@ -286,7 +272,7 @@ export default class PK8 {
     const movePPUps = Array.from(this.inner.move_pp_ups)
     if (movePPUps.length !== 4) {
       throw new Error(
-        `PK8 WASM struct has move PP up array length of ${movePPUps.length} (expected 4)`
+        `PK7 WASM struct has move PP up array length of ${movePPUps.length} (expected 4)`
       )
     }
 
@@ -300,7 +286,7 @@ export default class PK8 {
     const relearnMoves = Array.from(this.inner.move_pp_ups)
     if (relearnMoves.length !== 4) {
       throw new Error(
-        `PK8 WASM struct has relearn move array length of ${relearnMoves.length} (expected 4)`
+        `PK7 WASM struct has relearn move array length of ${relearnMoves.length} (expected 4)`
       )
     }
     return relearnMoves as FourMoves
@@ -309,10 +295,24 @@ export default class PK8 {
     this.inner.relearn_move_indices = new Uint16Array(value)
   }
 
+  get secretSuperTrainingUnlocked() {
+    return this.inner.secret_super_training_unlocked
+  }
+  set secretSuperTrainingUnlocked(value: boolean) {
+    this.inner.secret_super_training_unlocked = value
+  }
+
+  get secretSuperTrainingComplete() {
+    return this.inner.secret_super_training_complete
+  }
+  set secretSuperTrainingComplete(value: boolean) {
+    this.inner.secret_super_training_complete = value
+  }
+
   get ivs() {
     return this.inner.ivs
   }
-  set ivs(value: Stats16Le) {
+  set ivs(value: Stats) {
     this.inner.ivs = value
   }
 
@@ -330,20 +330,6 @@ export default class PK8 {
     this.inner.is_nicknamed = value
   }
 
-  get dynamaxLevel() {
-    return this.inner.dynamax_level
-  }
-  set dynamaxLevel(value: number) {
-    this.inner.dynamax_level = value
-  }
-
-  get palma() {
-    return this.inner.palma
-  }
-  set palma(value: number) {
-    this.inner.palma = value
-  }
-
   get handlerName() {
     return this.inner.handler_name
   }
@@ -358,13 +344,6 @@ export default class PK8 {
     this.inner.handler_gender = binaryGenderFromBool(value)
   }
 
-  get handlerLanguage() {
-    return this.inner.handler_language
-  }
-  set handlerLanguage(value: Option<Language>) {
-    this.inner.handler_language = value
-  }
-
   get isCurrentHandler() {
     return this.inner.is_current_handler
   }
@@ -372,11 +351,25 @@ export default class PK8 {
     this.inner.is_current_handler = value
   }
 
+  get geolocations() {
+    return this.inner.geolocations
+  }
+  set geolocations(value: Geolocations) {
+    this.inner.geolocations = value
+  }
+
   get handlerFriendship() {
     return this.inner.handler_friendship
   }
   set handlerFriendship(value: number) {
     this.inner.handler_friendship = value
+  }
+
+  get handlerAffection() {
+    return this.inner.handler_affection
+  }
+  set handlerAffection(value: number) {
+    this.inner.handler_affection = value
   }
 
   get fullness() {
@@ -405,6 +398,13 @@ export default class PK8 {
   }
   set trainerFriendship(value: number) {
     this.inner.trainer_friendship = value
+  }
+
+  get trainerAffection() {
+    return this.inner.trainer_affection
+  }
+  set trainerAffection(value: number) {
+    this.inner.trainer_affection = value
   }
 
   get eggDate() {
@@ -468,11 +468,25 @@ export default class PK8 {
     this.inner.game_of_origin = value
   }
 
-  get gameOfOriginBattle() {
-    return this.inner.game_of_origin_battle
+  get country() {
+    return this.inner.country
   }
-  set gameOfOriginBattle(value: Option<OriginGame>) {
-    this.inner.game_of_origin_battle = value
+  set country(value: number) {
+    this.inner.country = value
+  }
+
+  get region() {
+    return this.inner.region
+  }
+  set region(value: number) {
+    this.inner.region = value
+  }
+
+  get consoleRegion() {
+    return this.inner.console_region
+  }
+  set consoleRegion(value: number) {
+    this.inner.console_region = value
   }
 
   get language() {
@@ -507,13 +521,6 @@ export default class PK8 {
     )
   }
 
-  get affixedRibbon() {
-    return this.inner.affixed_ribbon
-  }
-  set affixedRibbon(value: Option<ModernRibbon>) {
-    this.inner.affixed_ribbon = value
-  }
-
   get handlerMemory() {
     return this.inner.handler_memory
   }
@@ -535,24 +542,12 @@ export default class PK8 {
     this.inner.trainer_gender = binaryGenderFromBool(value)
   }
 
-  get trFlagsSwSh() {
-    return this.inner.trFlagsSwSh
-  }
-
-  get homeTracker() {
-    return this.inner.home_tracker
-  }
-  set homeTracker(value: Option<bigint>) {
-    this.inner.home_tracker = value
-  }
-
   public getStats() {
-    return this.inner.calculateStats()
+    return getStats(this)
   }
 
-  // stored stats
-  public get stats() {
-    return this.inner.stats
+  public recalculateStats() {
+    this.inner.recalculateStats()
   }
 
   public get abilityName() {
@@ -564,11 +559,7 @@ export default class PK8 {
   }
 
   public calculateChecksum() {
-    return this.inner.calculateChecksum()
-  }
-
-  public recalculateStats() {
-    this.inner.recalculateStats()
+    return get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0xe8)
   }
 
   public toBytes() {
@@ -580,11 +571,12 @@ export default class PK8 {
   }
 
   public toPCBytes() {
-    return this.inner.toBoxBytesEncrypted()
+    const shuffledBytes = shuffleBlocksGen67(this.toBytes())
+    return decryptByteArrayGen67(shuffledBytes)
   }
 
   public getLevel() {
-    return this.inner.calculateLevel()
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
 
   isShiny() {
@@ -615,10 +607,12 @@ export default class PK8 {
   }
 
   static maxValidMove() {
-    return 826
+    return 728
   }
 
   static maxValidBall() {
     return 26
   }
 }
+
+export default PK7

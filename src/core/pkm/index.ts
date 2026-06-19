@@ -13,3 +13,7 @@ export { default as PK7 } from './PK7'
 export { default as PK8 } from './PK8'
 export { default as PK9 } from './PK9'
 export { default as XDPKM } from './XDPKM'
+
+export * from './conversion'
+export * from './schema'
+export * from './util'

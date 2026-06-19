@@ -1,6 +1,8 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { PKM } from '@openhome-core/pkm/PKM'
 import { getTypes } from '@openhome-core/pkm/util'
+import { getDisplayID } from '@openhome-core/util'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import AttributeTag from '@openhome-ui/components/AttributeTag'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -19,8 +21,6 @@ import {
   MetadataSummaryLookup,
   OriginGames,
 } from '@pkm-rs/pkg'
-import { PKM } from '@pokemon-files/pkm/PKM'
-import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Button, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { TagIcon } from '../../components/TagIcon'

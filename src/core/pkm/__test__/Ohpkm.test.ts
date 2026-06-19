@@ -1,4 +1,6 @@
+import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@openhome-core/pkm'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
+import { Stats } from '@openhome-core/util/types'
 import {
   ConvertStrategies,
   ConvertStrategy,
@@ -8,8 +10,6 @@ import {
   OriginGame,
   SpeciesAndForm,
 } from '@pkm-rs/pkg'
-import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@pokemon-files/pkm'
-import { Stats } from '@pokemon-files/util'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import fs from 'fs'
 import path from 'path'

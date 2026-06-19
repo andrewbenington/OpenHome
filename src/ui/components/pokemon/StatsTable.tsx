@@ -1,5 +1,5 @@
+import { Stats } from '@openhome-core/util/types'
 import { ContestStats, StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
-import { Stats } from '@pokemon-files/'
 import { Table } from '@radix-ui/themes'
 
 type StatsTableStandardProps = {

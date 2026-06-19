@@ -11,12 +11,10 @@ import {
   Pk3 as Pk3Wasm,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { FourMoves } from '@pokemon-files/util'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import * as encryption from '../util/encryption'
-import * as jsTypes from '../util/types'
-import * as types from '../util/types'
+import { FourMoves, Stats, ToBytesOptions } from '../util/types'
 import { PkmConstructorOptions } from './PKM'
+import * as encryption from './util/encryption'
 import { binaryGenderFromBool, binaryGenderToBool } from './wasm/convert'
 
 export default class PK3 implements PKMInterface {
@@ -59,7 +57,7 @@ export default class PK3 implements PKMInterface {
     return new PK3(pk3, {})
   }
 
-  toBytes(options?: types.ToBytesOptions): ArrayBuffer {
+  toBytes(options?: ToBytesOptions): ArrayBuffer {
     return options?.includeExtraFields
       ? (this.inner.toPartyBytes().buffer as ArrayBuffer)
       : (this.inner.toBoxBytes().buffer as ArrayBuffer)
@@ -168,7 +166,7 @@ export default class PK3 implements PKMInterface {
   get evs() {
     return this.inner.evs
   }
-  set evs(value: jsTypes.Stats) {
+  set evs(value: Stats) {
     this.inner.evs = value
   }
 
@@ -234,7 +232,7 @@ export default class PK3 implements PKMInterface {
   get ivs() {
     return this.inner.ivs
   }
-  set ivs(value: jsTypes.Stats) {
+  set ivs(value: Stats) {
     this.inner.ivs = value
   }
 

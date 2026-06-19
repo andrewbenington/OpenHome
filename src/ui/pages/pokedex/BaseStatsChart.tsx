@@ -1,3 +1,5 @@
+import { Stats } from '@openhome-core/util/types'
+import StatsTable from '@openhome-ui/components/pokemon/StatsTable'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import { BaseStats, StatsPreSplit } from '@pkm-rs/pkg'
 import { Text } from '@radix-ui/themes'
@@ -11,8 +13,6 @@ import {
   Tooltip,
 } from 'chart.js'
 import { Radar } from 'react-chartjs-2'
-import StatsTable from '../../components/pokemon/StatsTable'
-import { Stats } from '@pokemon-files/util'
 
 export type BaseStatsChartProps = {
   stats: BaseStats

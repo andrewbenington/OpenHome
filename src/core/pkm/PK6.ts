@@ -1,4 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   Ball,
@@ -17,18 +18,17 @@ import {
   SpeciesLookup,
   TrainerMemory,
 } from '@pkm-rs/pkg'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { ModernRibbons } from '@pokemon-resources/index'
-import { NationalDex } from '../../../pokemon-resources/src/consts/NationalDex'
-import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
-import * as encryption from '../util/encryption'
-import { FourMoves } from '../util/pkmInterface'
-import { filterRibbons } from '../util/ribbonLogic'
-import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
+import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
+import * as encryption from './util/encryption'
+import { filterRibbons } from './util/ribbonLogic'
+import { getStats } from './util/statCalc'
 
 export default class PK6 {
   static getFormat() {

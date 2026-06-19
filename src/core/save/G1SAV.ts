@@ -1,3 +1,4 @@
+import { PK1, toGen1PokemonIndex } from '@openhome-core/pkm'
 import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome-core/save/util/byteLogic'
 import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
 import { Option, range, unique } from '@openhome-core/util/functional'
@@ -9,8 +10,6 @@ import {
   Language,
   OriginGame,
 } from '@pkm-rs/pkg'
-import * as conversion from '@pokemon-files/conversion'
-import { PK1 } from '@pokemon-files/pkm'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
@@ -164,7 +163,7 @@ export class G1SAV extends OfficialSAV<PK1> {
       box.boxSlots.forEach((boxMon) => {
         if (boxMon) {
           // set the mon's dex number in the box
-          this.bytes[boxByteOffset + 1 + numMons] = conversion.toGen1PokemonIndex(boxMon.dexNum)
+          this.bytes[boxByteOffset + 1 + numMons] = toGen1PokemonIndex(boxMon.dexNum)
           // set the mon's data in the box
           this.bytes.set(
             new Uint8Array(boxMon.toBytes()),

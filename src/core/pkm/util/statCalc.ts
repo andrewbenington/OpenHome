@@ -1,7 +1,8 @@
+import { PK1, PK2 } from '@openhome-core/pkm'
+import { PKM } from '@openhome-core/pkm/PKM'
 import { MetadataSummaryLookup, SpeciesLookup, Stat, Stats as StatsWasm } from '@pkm-rs/pkg'
-import { PK1, PK2 } from '@pokemon-files/pkm'
-import { PKM } from '@pokemon-files/pkm/PKM'
 import { NationalDex, NationalDexMax } from '@pokemon-resources/consts/NationalDex'
+import { StatAbbr, Stats } from '../../util/types'
 import {
   AllPKMs,
   PKMWithDVs,
@@ -11,7 +12,6 @@ import {
   PKMWithNature,
   SpeciesData,
 } from './interfaces'
-import { StatAbbr, Stats } from './types'
 
 export interface PKMWithStandardStats
   extends AllPKMs, PKMWithModernIVs, PKMWithModernEVs, PKMWithNature {}

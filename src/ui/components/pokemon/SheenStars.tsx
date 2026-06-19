@@ -1,7 +1,7 @@
+import { COLOPKM, PK3, XDPKM } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { range } from '@openhome-core/util/functional'
 import { getPublicImageURL } from '@openhome-ui/images/images'
-import { COLOPKM, PK3, XDPKM } from '@pokemon-files/pkm'
 
 interface SheenStarsProps {
   mon: PKMInterface

@@ -1,4 +1,4 @@
-import { utf16BytesToString } from '@pokemon-files/util'
+import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import { SCArrayBlock } from '../encryption/SwishCrypto/SCBlock'
 
 const BOX_COUNT = 32

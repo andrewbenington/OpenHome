@@ -1,6 +1,6 @@
 import { Gen3Ribbon } from '@pkm-rs/pkg'
 import { Gen3ContestRibbons } from '@pokemon-resources/index'
-import { uIntFromBufferBits, uIntToBufferBits } from './byteLogic'
+import { uIntFromBufferBits, uIntToBufferBits } from '../../util/byteLogic'
 
 export function gen3ContestRibbonsFromBuffer(
   dataView: DataView,

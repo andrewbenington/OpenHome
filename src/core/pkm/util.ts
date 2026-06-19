@@ -1,4 +1,5 @@
 import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
+import { FourMoves, Stats } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   AbilityNumber,
@@ -14,7 +15,6 @@ import {
   SpeciesAndForm,
   StatsPreSplit,
 } from '@pkm-rs/pkg'
-import { FourMoves, Stats } from '@pokemon-files/util'
 import { Item } from '@pokemon-resources/consts/Items'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import {

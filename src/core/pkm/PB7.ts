@@ -12,15 +12,15 @@ import {
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { PkmConverter } from '../conversion/converter'
-import { FourMoves } from '../util'
 import * as byteLogic from '../util/byteLogic'
-import * as encryption from '../util/encryption'
-import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
+import { FourMoves } from '../util/types'
 import { getHeightCalculated, getWeightCalculated, MoveFilter } from '../util/util'
+import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
+import * as encryption from './util/encryption'
+import { getStats } from './util/statCalc'
 
 export default class PB7 {
   static getFormat() {

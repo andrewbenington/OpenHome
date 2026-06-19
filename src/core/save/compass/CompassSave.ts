@@ -12,8 +12,8 @@ import { Box, BoxAndSlot, PluginSAV, SlotMetadata } from '@openhome-core/save/in
 import { emptyPathData, PathData } from '@openhome-core/save/util/path'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Option } from '@openhome-core/util/functional'
+import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import { ConvertStrategy, ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
-import { utf16BytesToString } from '@pokemon-files/index'
 import { Item } from '@pokemon-resources/consts/Items'
 import {
   SV_TRANSFER_RESTRICTIONS_BASE,

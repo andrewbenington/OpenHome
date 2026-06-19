@@ -1,39 +1,42 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   Ball,
   ContestStats,
   ConvertStrategy,
-  Generation,
+  Gender,
   Item,
   Language,
   Languages,
   MarkingsSixShapes,
   MetadataSummaryLookup,
   NatureIndex,
-  OriginGames,
+  ShinyLeaves,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { Gen4Ribbons } from '@pokemon-resources/index'
-import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
-import * as encryption from '../util/encryption'
-import { FourMoves } from '../util/pkmInterface'
-import { filterRibbons } from '../util/ribbonLogic'
-import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { generatePersonalityValuePreservingAttributes, MoveFilter } from '../util/util'
+import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
+import * as encryption from './util/encryption'
+import { filterRibbons } from './util/ribbonLogic'
+import { getStats } from './util/statCalc'
 
-export default class PK5 {
+const DP_FARAWAY_PLACE = 0xbba
+
+function validDPLocation(index: number): boolean {
+  return index >= 0x0070 && index < 2000
+}
+
+export default class PK4 {
   static getFormat() {
-    return 'PK5' as const
+    return 'PK4' as const
   }
-  format: 'PK5' = 'PK5'
-  static getBoxSize() {
-    return 136
-  }
+  format: 'PK4' = 'PK4'
   personalityValue: number
   dexNum: number
   heldItemIndex: number
@@ -52,27 +55,32 @@ export default class PK5 {
   ivs: types.Stats
   isEgg: boolean
   isNicknamed: boolean
-  gender: number
+  gender: Gender
   formNum: number
-  nature: NatureIndex
-  isNsPokemon: boolean
+  shinyLeavesInner: ShinyLeaves = new ShinyLeaves()
   gameOfOrigin: number
   eggDate: types.PKMDate | undefined
   metDate: types.PKMDate | undefined
-  eggLocationIndex: number
-  metLocationIndex: number
   pokerusByte: number
   ball: number
+  ballDPPt: number
+  ballHGSS: number
   metLevel: number
   encounterType: number
-  pokeStarFame: number
+  performance: number
   statusCondition: number
   currentHP: number
+  eggLocationIndex: number
+  metLocationIndex: number
+  eggLocationIndexDP: number
+  eggLocationIndexPtHGSS: number
+  metLocationIndexDP: number
+  metLocationIndexPtHGSS: number
   ribbons: string[]
-  isFatefulEncounter: boolean
   nickname: string
   trainerName: string
   trainerGender: boolean
+  isFatefulEncounter: boolean
   checksum: number = 0
   originalBytes?: ArrayBuffer
 
@@ -126,18 +134,18 @@ export default class PK5 {
       this.isNicknamed = byteLogic.getFlag(dataView, 0x38, 31)
       this.gender = byteLogic.uIntFromBufferBits(dataView, 0x40, 1, 2, true)
       this.formNum = byteLogic.uIntFromBufferBits(dataView, 0x40, 3, 5, true)
-      this.nature = new NatureIndex(dataView.getUint8(0x41))
-      this.isNsPokemon = byteLogic.getFlag(dataView, 0x42, 1)
+      this.shinyLeaves = ShinyLeaves.fromByte(dataView.getUint8(0x41))
+
       this.gameOfOrigin = dataView.getUint8(0x5f)
       this.eggDate = types.pkmDateFromBytes(dataView, 0x78)
       this.metDate = types.pkmDateFromBytes(dataView, 0x7b)
-      this.eggLocationIndex = dataView.getUint16(0x7e, true)
-      this.metLocationIndex = dataView.getUint16(0x80, true)
       this.pokerusByte = dataView.getUint8(0x82)
-      this.ball = dataView.getUint8(0x83)
+      this.ballDPPt = dataView.getUint8(0x83)
+      this.ballHGSS = dataView.getUint8(0x86)
+      this.ball = Math.max(this.ballDPPt, this.ballHGSS)
       this.metLevel = dataView.getUint8(0x84)
       this.encounterType = dataView.getUint8(0x85)
-      this.pokeStarFame = dataView.getUint8(0x87)
+      this.performance = dataView.getUint8(0x87)
       if (dataView.byteLength >= 236) {
         this.statusCondition = dataView.getUint8(0x88)
       } else {
@@ -150,6 +158,22 @@ export default class PK5 {
         this.currentHP = 0
       }
 
+      this.eggLocationIndexDP = dataView.getUint16(0x7e, true)
+      this.eggLocationIndexPtHGSS = dataView.getUint16(0x44, true)
+      if (this.eggLocationIndexDP === DP_FARAWAY_PLACE && this.eggLocationIndexPtHGSS > 0) {
+        this.eggLocationIndex = this.eggLocationIndexPtHGSS
+      } else {
+        this.eggLocationIndex = this.eggLocationIndexDP
+      }
+
+      this.metLocationIndexDP = dataView.getUint16(0x80, true)
+      this.metLocationIndexPtHGSS = dataView.getUint16(0x46, true)
+      if (this.metLocationIndexDP === DP_FARAWAY_PLACE && this.metLocationIndexPtHGSS > 0) {
+        this.metLocationIndex = this.metLocationIndexPtHGSS
+      } else {
+        this.metLocationIndex = this.metLocationIndexDP
+      }
+
       this.ribbons = byteLogic
         .getFlagIndexes(dataView, 0x24, 0, 28)
         .map((index) => Gen4Ribbons[index])
@@ -159,82 +183,130 @@ export default class PK5 {
         .concat(
           byteLogic.getFlagIndexes(dataView, 0x60, 0, 20).map((index) => Gen4Ribbons[index + 60])
         )
-      this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x40, 0)
-      this.nickname = stringLogic.readGen5StringFromBytes(dataView, 0x48, 12)
-      this.trainerName = stringLogic.readGen5StringFromBytes(dataView, 0x68, 8)
+      this.nickname = stringLogic.readGen4StringFromBytes(dataView, 0x48, 12)
+      this.trainerName = stringLogic.readGen4StringFromBytes(dataView, 0x68, 8)
       this.trainerGender = byteLogic.getFlag(dataView, 0x84, 7)
+      this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x40, 0)
       this.checksum = dataView.getUint16(0x6, true)
     } else {
       const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
       const metData = converter.metData(other)
 
-      // because this PID modification function assumes you want to preserve nature, which is not
-      // derived from PID in gen 5, this is a carveout to ensure that the original PID is preserved
-      // if the OHPKM is from gen 5 originally.
-      if (OriginGames.generation(other.gameOfOrigin) === Generation.G5) {
-        this.personalityValue = other.personalityValue
-      } else {
-        this.personalityValue = generatePersonalityValuePreservingAttributes(other)
-      }
-
+      this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
       this.dexNum = other.dexNum
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
       this.exp = other.exp
-      this.trainerFriendship = other.trainerFriendship
+      this.trainerFriendship = other.trainerFriendship ?? 0
       this.ability = other.ability
-      this.markings = types.markingsSixShapesNoColorFromOther(other.markings)
+      this.markings = types.markingsSixShapesNoColorFromOther(other.markings) ?? {
+        circle: false,
+        triangle: false,
+        square: false,
+        heart: false,
+        star: false,
+        diamond: false,
+      }
       this.language = other.language
-      this.evs = other.evs
-      this.contest = other.contest
+      this.evs = other.evs ?? {
+        hp: 0,
+        atk: 0,
+        def: 0,
+        spe: 0,
+        spa: 0,
+        spd: 0,
+      }
+      this.contest = other.contest ?? {
+        cool: 0,
+        beauty: 0,
+        cute: 0,
+        smart: 0,
+        tough: 0,
+        sheen: 0,
+      }
 
-      const moveFilter = MoveFilter.fromPkmClass(PK5)
+      const moveFilter = MoveFilter.fromPkmClass(PK4)
       this.moves = moveFilter.moves(other)
       this.movePP = moveFilter.movePp(other, this.format)
       this.movePPUps = moveFilter.movePpUps(other)
 
       this.ivs = converter.ivs(other)
-      this.isEgg = other.isEgg
-      this.isNicknamed = other.isNicknamed
-      this.gender = other.gender
+      this.isEgg = other.isEgg ?? false
+      this.isNicknamed = other.isNicknamed ?? false
+      this.gender =
+        other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
       this.formNum = other.formNum
-      this.nature = other.nature
-      this.isNsPokemon = other.isNsPokemon ?? false
-      this.eggDate = other.eggDate
-      this.metDate = other.metDate
-      this.eggLocationIndex = other.eggLocationIndex ?? 0
+      this.shinyLeaves = other.shinyLeaves?.clone() ?? new ShinyLeaves()
+      this.gameOfOrigin = other.gameOfOrigin
+      this.eggDate = other.eggDate ?? {
+        month: new Date().getMonth(),
+        day: new Date().getDate(),
+        year: new Date().getFullYear(),
+      }
+      this.metDate = other.metDate ?? {
+        month: new Date().getMonth(),
+        day: new Date().getDate(),
+        year: new Date().getFullYear(),
+      }
+      this.pokerusByte = other.pokerusByte ?? 0
 
-      this.gameOfOrigin = metData.gameOfOrigin
-      this.metLocationIndex = metData.locationIndex
-      this.pokerusByte = other.pokerusByte
-      if (other.ball && PK5.maxValidBall() >= other.ball) {
+      if (other.ball && PK4.maxValidBall() >= other.ball) {
         this.ball = other.ball
+        if (other.ball <= Ball.Cherish) {
+          this.ballDPPt = other.ball
+          this.ballHGSS = 0
+        } else {
+          this.ballDPPt = Ball.Poke
+          this.ballHGSS = other.ball
+        }
       } else {
         this.ball = Ball.Poke
+        this.ballDPPt = Ball.Poke
+        this.ballHGSS = 0
       }
 
       this.metLevel = other.metLevel
       this.encounterType = other.encounterType ?? 0
-      this.pokeStarFame = other.pokeStarFame ?? 0
+      this.performance = other.performance ?? 0
       this.statusCondition = 0
       this.currentHP = other.currentHP ?? 0
-      this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '')
-      this.isFatefulEncounter = other.isFatefulEncounter ?? false
+
+      if (other.eggLocationIndex) {
+        this.eggLocationIndexDP = validDPLocation(other.eggLocationIndex)
+          ? other.eggLocationIndex
+          : DP_FARAWAY_PLACE
+        this.eggLocationIndexPtHGSS = other.eggLocationIndex
+        this.eggLocationIndex = other.eggLocationIndex
+      } else {
+        this.eggLocationIndex = 0
+        this.eggLocationIndexDP = 0
+        this.eggLocationIndexPtHGSS = 0
+      }
+
+      this.metLocationIndexDP = converter.metLocationIndexDiamondPearl(other)
+      this.metLocationIndexPtHGSS = converter.metLocationIndexPlatinumHgss(other)
+      this.metLocationIndex = metData.locationIndex
+
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLevel = other.metLevel
+
+      this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '') ?? []
       this.nickname = converter.nickname(other)
       this.trainerName = other.trainerName
       this.trainerGender = other.trainerGender
+      this.isFatefulEncounter = other.isFatefulEncounter ?? false
     }
     this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
   }
 
-  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK5 {
-    return new PK5(buffer, { encrypted })
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK4 {
+    return new PK4(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK5 {
-    return new PK5(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK4 {
+    return new PK4(ohpkm, { strategy })
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {
@@ -270,19 +342,17 @@ export default class PK5 {
     byteLogic.setFlag(dataView, 0x38, 30, this.isEgg)
     byteLogic.setFlag(dataView, 0x38, 31, this.isNicknamed)
     byteLogic.uIntToBufferBits(dataView, this.gender, 64, 1, 2, true)
-    byteLogic.uIntToBufferBits(dataView, this.formNum, 64, 3, 5, true)
-    dataView.setUint8(0x41, this.nature.index)
-    byteLogic.setFlag(dataView, 0x42, 1, this.isNsPokemon)
+    byteLogic.uIntToBufferBits(dataView, this.formNum, 0x40, 3, 5, true)
+    dataView.setUint8(0x41, this.shinyLeaves.toByte())
     dataView.setUint8(0x5f, this.gameOfOrigin)
     types.writePKMDateToBytes(dataView, 0x78, this.eggDate)
     types.writePKMDateToBytes(dataView, 0x7b, this.metDate)
-    dataView.setUint16(0x7e, this.eggLocationIndex, true)
-    dataView.setUint16(0x80, this.metLocationIndex, true)
     dataView.setUint8(0x82, this.pokerusByte)
-    dataView.setUint8(0x83, this.ball)
+    dataView.setUint8(0x83, this.ballDPPt)
+    dataView.setUint8(0x86, this.ballHGSS)
     dataView.setUint8(0x84, this.metLevel)
     dataView.setUint8(0x85, this.encounterType)
-    dataView.setUint8(0x87, this.pokeStarFame)
+    dataView.setUint8(0x87, this.performance)
     if (options?.includeExtraFields) {
       dataView.setUint8(0x88, this.statusCondition)
     }
@@ -291,6 +361,10 @@ export default class PK5 {
       dataView.setUint8(0x8e, this.currentHP)
     }
 
+    dataView.setUint16(0x7e, this.eggLocationIndexDP, true)
+    dataView.setUint16(0x80, this.metLocationIndexDP, true)
+    dataView.setUint16(0x44, this.eggLocationIndexPtHGSS, true)
+    dataView.setUint16(0x46, this.metLocationIndexPtHGSS, true)
     byteLogic.setFlagIndexes(
       dataView,
       0x24,
@@ -315,10 +389,10 @@ export default class PK5 {
         .map((ribbon) => Gen4Ribbons.indexOf(ribbon) - 60)
         .filter((index) => index > -1 && index < 20)
     )
-    byteLogic.setFlag(dataView, 0x40, 0, this.isFatefulEncounter)
-    stringLogic.writeGen5StringToBytes(dataView, this.nickname, 0x48, 12)
-    stringLogic.writeGen5StringToBytes(dataView, this.trainerName, 0x68, 8)
+    stringLogic.writeGen4StringToBytes(dataView, this.nickname, 0x48, 24)
+    stringLogic.writeGen4StringToBytes(dataView, this.trainerName, 0x68, 16)
     byteLogic.setFlag(dataView, 0x84, 7, this.trainerGender)
+    byteLogic.setFlag(dataView, 0x40, 0, this.isFatefulEncounter)
     dataView.setUint16(0x6, this.checksum, true)
     return buffer
   }
@@ -331,8 +405,12 @@ export default class PK5 {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
   }
 
+  public get nature() {
+    return NatureIndex.newFromPid(this.personalityValue)
+  }
+
   public get abilityNum() {
-    return ((this.personalityValue >> 16) & 1) + 1
+    return ((this.personalityValue >> 0) & 1) + 1
   }
 
   public calculateChecksum() {
@@ -340,7 +418,7 @@ export default class PK5 {
   }
 
   public refreshChecksum() {
-    this.checksum = encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x87)
+    this.checksum = this.calculateChecksum()
   }
 
   public toPCBytes() {
@@ -351,6 +429,14 @@ export default class PK5 {
 
   public getLevel() {
     return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
+  }
+
+  public get shinyLeaves() {
+    return this.shinyLeavesInner.clone()
+  }
+
+  public set shinyLeaves(other: ShinyLeaves) {
+    this.shinyLeavesInner = other.clone()
   }
 
   isShiny() {
@@ -381,10 +467,10 @@ export default class PK5 {
   }
 
   static maxValidMove() {
-    return 559
+    return 467
   }
 
   static maxValidBall() {
-    return 25
+    return 24
   }
 }

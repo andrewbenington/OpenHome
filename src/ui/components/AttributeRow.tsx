@@ -1,4 +1,4 @@
-import { PKMDate } from '@pokemon-files/util'
+import { PKMDate } from '@openhome-core/util/types'
 import dayjs from 'dayjs'
 
 export type AttributeRowValue = string | number | PKMDate | undefined

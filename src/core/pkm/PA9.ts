@@ -1,4 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   Ball,
@@ -15,17 +16,16 @@ import {
   TrainerMemory,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/index'
-import * as conversion from '../conversion'
-import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
-import * as encryption from '../util/encryption'
-import { FourMoves } from '../util/pkmInterface'
-import { filterRibbons } from '../util/ribbonLogic'
-import { getStats } from '../util/statCalc'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'
+import * as conversion from './conversion'
+import { PkmConverter } from './conversion/converter'
 import { PkmConstructorOptions } from './PKM'
+import * as encryption from './util/encryption'
+import { filterRibbons } from './util/ribbonLogic'
+import { getStats } from './util/statCalc'
 
 export default class PA9 {
   static getFormat() {

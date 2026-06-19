@@ -1,3 +1,4 @@
+import { PK3, PK4, PK5 } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   getMonFileIdentifier,
@@ -11,7 +12,14 @@ import {
   getHiddenPowerPower,
   getHiddenPowerType,
 } from '@openhome-core/pkm/util'
+import { AllPKMFields } from '@openhome-core/pkm/util/pkmInterface'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import {
+  getDisplayID,
+  getFlagsInRange,
+  getHeightCalculated,
+  getWeightCalculated,
+} from '@openhome-core/util'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import AttributeRowExpand from '@openhome-ui/components/AttributeRowExpand'
 import DynamaxLevel from '@openhome-ui/components/pokemon/DynamaxLevel'
@@ -20,14 +28,6 @@ import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import useIsDev from '@openhome-ui/hooks/isDev'
 import { genderFromBool, Generation, Language, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
-import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
-import {
-  AllPKMFields,
-  getDisplayID,
-  getFlagsInRange,
-  getHeightCalculated,
-  getWeightCalculated,
-} from '@pokemon-files/util'
 import { Countries } from '@pokemon-resources/consts/Countries'
 import { EncounterTypes } from '@pokemon-resources/consts/EncounterTypes'
 import { SWEETS } from '@pokemon-resources/consts/Forms'
