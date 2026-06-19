@@ -66,7 +66,7 @@ impl From<Offset> for usize {
 pub type Pk3BufferRef<'a> = Pk3Buffer<&'a [u8]>;
 pub type Pk3BufferMut<'a> = Pk3Buffer<&'a mut [u8]>;
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 pub struct Pk3Buffer<S: AsRef<[u8]>>(S);
 
 // ------------------------------------------------------------------

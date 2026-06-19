@@ -219,7 +219,10 @@ impl Pk3 {
     }
 
     pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
-        Pk3Buffer::box_span(&self.to_box_bytes()).encrypted_copy()
+        let mut bytes = self.to_box_bytes();
+        Pk3Buffer::box_span_mut(&mut bytes).encrypt();
+
+        bytes
     }
 
     pub fn get_national_dex(&self) -> NatDexIndex {

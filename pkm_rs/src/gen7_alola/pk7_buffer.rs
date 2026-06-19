@@ -107,7 +107,7 @@ impl From<Offset> for usize {
 
 pub type Pk7BufferMut<'a> = Pk7Buffer<&'a mut [u8]>;
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 pub struct Pk7Buffer<S: AsRef<[u8]>>(S);
 
 // ------------------------------------------------------------------
