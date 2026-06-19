@@ -299,7 +299,7 @@ export const writeGen5StringToBytes = (
  * @returns string of decoded utf-16 bytes
  */
 export const utf16BytesToString = (
-  bytes: ArrayBuffer,
+  bytes: ArrayBufferLike,
   offset: number,
   length: number,
   littleEndian: boolean = true
