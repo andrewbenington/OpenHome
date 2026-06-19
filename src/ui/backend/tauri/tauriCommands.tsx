@@ -18,7 +18,7 @@ import {
 } from '../backendInterface'
 import { RustResult } from './types'
 
-export type StringToBytes = Record<string, Uint8Array>
+type StringToBytes = Record<string, Uint8Array>
 export type StringToB64 = Record<string, string>
 
 function invokeAndCatch<C extends OhCommand>(

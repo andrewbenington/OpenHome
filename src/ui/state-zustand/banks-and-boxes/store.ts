@@ -637,5 +637,3 @@ export function useBanksAndBoxes() {
     firstHomeBoxEmptySlot,
   }
 }
-
-export type BanksAndBoxesConroller = ReturnType<typeof useBanksAndBoxes>

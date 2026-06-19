@@ -121,7 +121,7 @@ export class Label implements CtxMenuElementBuilder {
 
 //* SEPARATOR *//
 
-export const SeparatorData = Object.freeze({ __cm_type_tag: 'separator' })
+const SeparatorData = Object.freeze({ __cm_type_tag: 'separator' })
 
 type Separator = typeof SeparatorData
 

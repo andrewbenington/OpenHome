@@ -2,7 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { SAV } from '@openhome-core/save/interfaces'
 import { Dispatch, Reducer, createContext } from 'react'
 
-export type DragSource = {
+type DragSource = {
   save: SAV
   box: number
   boxPos: number

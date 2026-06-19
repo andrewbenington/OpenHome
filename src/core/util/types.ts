@@ -609,6 +609,4 @@ export function writeGeolocationToBytes(dataView: DataView, offset: number, valu
   dataView.setUint8(offset + 1, value.country)
 }
 
-export type Stat = keyof Stats
-
 export type FourMoves = [number, number, number, number]

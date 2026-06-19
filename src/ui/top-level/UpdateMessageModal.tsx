@@ -3,10 +3,6 @@ import { Heading, ScrollArea } from '@radix-ui/themes'
 import { useState } from 'react'
 import { Dialog } from '../components/dialog/Dialog'
 
-export type UpdateMessageModalProps = {
-  version: string
-}
-
 export default function UpdateMessageModal() {
   const [acknowledged, setAcknowledged] = useState(false)
   const appState = useTransactionState()

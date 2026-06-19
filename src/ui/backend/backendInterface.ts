@@ -18,7 +18,7 @@ export type AppState = {
   new_features_since_update: UpdateFeatures[]
 }
 
-export type UpdateFeatures = {
+type UpdateFeatures = {
   version: string
   feature_messages: string[]
 }
@@ -26,11 +26,6 @@ export type UpdateFeatures = {
 export type ImageResponse = {
   base64: string
   extension: string
-}
-
-export type PluginDownloadProgress = {
-  pluginId: string
-  progress: number
 }
 
 type LogEntryUnparsed = {
@@ -194,7 +189,7 @@ export type NewLogNotification = {
   timestamp_unix: number
 }
 
-export interface BackendListeners {
+interface BackendListeners {
   onMenuEvent: (event: MenuEvent) => void
   onLookupsUpdate: (updated_lookups: StoredLookups) => void
   onStateUpdate: Record<string, <State>(updated_state: State) => void>

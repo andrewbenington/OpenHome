@@ -36,7 +36,8 @@ export type DragPayload =
 export type DragMode = 'mon' | 'item'
 
 type ListenerMap = Map<UniqueIdentifier, Listener>
-export type Listener = () => void
+
+type Listener = () => void
 
 export function locationKey(location: MonLocation): string {
   if (location.isHome) {
