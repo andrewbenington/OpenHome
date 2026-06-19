@@ -1,9 +1,5 @@
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { Moves } from '@pokemon-resources/index'
-import Prando from 'prando'
-
-import { PKM, PkmClass } from '@pokemon-files/pkm/PKM'
-
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { filterUndefined } from '@openhome-core/util/sort'
 import {
   Gender,
   Generation,
@@ -14,8 +10,10 @@ import {
   PkmFormat,
   PkmFormats,
 } from '@pkm-rs/pkg'
-import { filterUndefined } from 'src/core/util/sort'
-import { PKMInterface } from '../../../../src/core/pkm/interfaces'
+import { PKM, PkmClass } from '@pokemon-files/pkm/PKM'
+import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import { Moves } from '@pokemon-resources/index'
+import Prando from 'prando'
 import { AllPKMFields, FourMoves } from './pkmInterface'
 
 export function getGen3MiscFlags(pokemon: PKMInterface): number {

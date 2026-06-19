@@ -1,6 +1,6 @@
+import { R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { useContext, useEffect, useState } from 'react'
-import { R } from '../../core/util/functional'
 
 export default function useIsDev(): boolean {
   const [isDev, setIsDev] = useState<boolean>(false)

@@ -1,3 +1,4 @@
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   AbilityIndex,
   Ball,
@@ -14,7 +15,6 @@ import {
   TrainerMemory,
 } from '@pkm-rs/pkg'
 import { ModernRibbons } from '@pokemon-resources/other'
-import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
 import * as encryption from '../util/encryption'

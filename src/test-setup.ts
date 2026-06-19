@@ -1,10 +1,9 @@
+import init from '@pkm-rs/pkg'
 import '@testing-library/jest-dom/vitest'
 import fs from 'fs'
 import { enableMapSet } from 'immer'
 import path from 'path'
 import { beforeAll, vi } from 'vitest'
-
-import init from '@pkm-rs/pkg'
 
 vi.mock('zustand') // auto-mocking zustand store functions
 enableMapSet()

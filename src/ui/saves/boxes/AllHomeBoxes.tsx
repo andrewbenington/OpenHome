@@ -15,6 +15,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { SortTypes } from '@openhome-core/pkm/sort'
+import { SimpleOpenHomeBox } from '@openhome-core/save/util/storage'
 import { Option, range } from '@openhome-core/util/functional'
 import { filterUndefined, numericSorter } from '@openhome-core/util/sort'
 import {
@@ -25,10 +26,9 @@ import {
 } from '@openhome-ui/components/context-menu'
 import { RemoveIcon } from '@openhome-ui/components/Icons'
 import { MonLocation } from '@openhome-ui/state/saves'
+import { cssClass } from '@openhome-ui/util/style'
 import { Button, Flex, Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
-import { cssClass } from 'src/ui/util/style'
-import { SimpleOpenHomeBox } from '../../../core/save/util/storage'
 import {
   boxNameOrDefault,
   OPENHOME_BOX_COLUMNS,

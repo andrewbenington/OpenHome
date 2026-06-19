@@ -1,7 +1,6 @@
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
 import { ItemUnbound, PkmFormat } from '@pkm-rs/pkg'
 import PK3CFRU from '../cfru/PK3CFRU'
-
 import { fromGen3CFRUMoveIndex, toGen3CFRUMoveIndex } from '../cfru/conversion/Gen3CFRUMovesIndex'
 import { CFRUToNationalMap } from '../cfru/conversion/Gen3CFRUMovesIndex/CFRUToNationalMap'
 import { CfruSpeciesAndForm, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'

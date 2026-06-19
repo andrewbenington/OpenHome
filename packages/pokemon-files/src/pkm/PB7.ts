@@ -1,3 +1,4 @@
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   AbilityIndex,
   Ball,
@@ -11,7 +12,6 @@ import {
   NatureIndex,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import { PkmConverter } from '../conversion/converter'
 import { FourMoves } from '../util'
 import * as byteLogic from '../util/byteLogic'

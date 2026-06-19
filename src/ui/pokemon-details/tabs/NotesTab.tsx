@@ -1,8 +1,8 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import useDebounce from '@openhome-ui/hooks/useDebounce'
 import { useSaves } from '@openhome-ui/state/saves'
 import { TextArea } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
-import useDebounce from 'src/ui/hooks/useDebounce'
 
 export default function NotesDisplay(props: { mon: OHPKM }) {
   const { mon } = props

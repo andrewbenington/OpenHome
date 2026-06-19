@@ -1,3 +1,4 @@
+import { MonFormat } from '@openhome-core/pkm/interfaces'
 import {
   formatMatchesOrigin,
   Language,
@@ -6,8 +7,6 @@ import {
   OriginGames,
   PkmFormat,
 } from '@pkm-rs/pkg'
-
-import { MonFormat } from '@openhome-core/pkm/interfaces'
 
 export function getLocationStringOrOrigin(
   game: OriginGame,

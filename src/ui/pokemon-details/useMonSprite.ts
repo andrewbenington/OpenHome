@@ -4,9 +4,9 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getPokemonSpritePath } from '@openhome-ui/images/pokemon'
+import { MonSpriteData, PluginContext } from '@openhome-ui/state/plugin/reducer'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { useContext, useEffect, useState } from 'react'
-import { MonSpriteData, PluginContext } from 'src/ui/state/plugin/reducer'
 
 type MonSpriteResult =
   | { loading: true; path?: undefined; errorMessage?: undefined; severity?: undefined }

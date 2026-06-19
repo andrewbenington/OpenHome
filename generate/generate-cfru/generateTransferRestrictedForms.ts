@@ -1,5 +1,5 @@
+import { RadicalRedToNationalDexMap } from '@openhome-core/SAVTypes/radicalred/conversion/RadicalRedSpeciesMap'
 import { PokemonData } from 'pokemon-species-data'
-import { RadicalRedToNationalDexMap } from '../../src/core/SAVTypes/radicalred/conversion/RadicalRedSpeciesMap'
 import { TransferRestrictions } from '../../src/types/TransferRestrictions'
 
 const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {

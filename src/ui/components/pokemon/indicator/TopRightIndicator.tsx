@@ -1,5 +1,5 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
-import { PKMInterface } from '../../../../core/pkm/interfaces'
 import { TopRightIndicatorType } from '../../../hooks/useMonDisplay'
 import { getPublicImageURL } from '../../../images/images'
 import { BallsImageList } from '../../../images/items'

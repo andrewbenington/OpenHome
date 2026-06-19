@@ -1,5 +1,5 @@
-import { Option } from 'src/core/util/functional'
-import { filterUndefined } from '../../core/util/sort'
+import { Option } from '@openhome-core/util/functional'
+import { filterUndefined } from '@openhome-core/util/sort'
 
 export function hiddenIf(condition: boolean | undefined) {
   return condition ? 'hidden' : undefined

@@ -3,6 +3,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import useMonSprite from '@openhome-ui/pokemon-details/useMonSprite'
 import { usePokedex } from '@openhome-ui/state/pokedex'
 import { Pokedex } from '@openhome-ui/util/pokedex'
+import { cssClass } from '@openhome-ui/util/style'
 import {
   allMetadataSources,
   extraFormMetadata,
@@ -25,7 +26,6 @@ import {
   TextField,
 } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
-import { cssClass } from 'src/ui/util/style'
 import './pokedex.css'
 import { PokedexGames } from './PokedexGames'
 import PokedexLearnset from './PokedexLearnset'

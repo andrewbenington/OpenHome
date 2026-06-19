@@ -1,4 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { DevDataDisplay } from '@openhome-ui/components/DevDataDisplay'
 import { InfoGrid } from '@openhome-ui/components/InfoGrid'
 import { useTransactionState } from '@openhome-ui/state/app-state'
@@ -8,7 +9,6 @@ import { ItemBagContext, ItemBagState } from '@openhome-ui/state/items'
 import { Item, Lookup, OriginGames, SpeciesLookup } from '@pkm-rs/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import { useContext } from 'react'
-import { OHPKM } from 'src/core/pkm/OHPKM'
 import { useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '../state/ohpkm'
 

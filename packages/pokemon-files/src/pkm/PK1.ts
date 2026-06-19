@@ -1,3 +1,4 @@
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   ConvertStrategy,
   Generation,
@@ -9,8 +10,6 @@ import {
   SpeciesLookup,
   StatsPreSplit,
 } from '@pkm-rs/pkg'
-
-import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import * as conversion from '../conversion'
 import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'

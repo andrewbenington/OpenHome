@@ -1,3 +1,4 @@
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   AbilityNumber,
   Ball,
@@ -14,7 +15,6 @@ import {
 } from '@pkm-rs/pkg'
 import { NationalDex } from '@pokemon-resources/consts/NationalDex'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@pokemon-resources/index'
-import { OHPKM } from '../../../../src/core/pkm/OHPKM'
 import { PkmConverter } from '../conversion/converter'
 import * as byteLogic from '../util/byteLogic'
 import { FourMoves } from '../util/pkmInterface'

@@ -1,3 +1,5 @@
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import {
   ExtraFormMetadata,
   FormMetadata,
@@ -9,8 +11,6 @@ import {
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { Card, Flex } from '@radix-ui/themes'
 import { useContext } from 'react'
-import { isRestricted } from 'src/core/save/util/TransferRestrictions'
-import { AppInfoContext } from 'src/ui/state/appInfo'
 import { isExtraFormMetadata } from './util'
 
 interface PokedexGamesProps {

@@ -1,6 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SCBlock, SCObjectBlock } from '@openhome-core/save/encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '@openhome-core/save/encryption/SwishCrypto/SwishCrypto'
+import { G89BlockName, Gen8Gen9Save } from '@openhome-core/save/Gen89/Gen8Gen9Save'
 import { emptyPathData, PathData } from '@openhome-core/save/util/path'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { ConvertStrategy, ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
@@ -12,7 +13,6 @@ import {
   SV_TRANSFER_RESTRICTIONS_ID,
   SV_TRANSFER_RESTRICTIONS_TM,
 } from '@pokemon-resources/consts/TransferRestrictions'
-import { G89BlockName, Gen8Gen9Save } from 'src/core/save/Gen89/Gen8Gen9Save'
 
 const SAVE_SIZE_BYTES_MIN = 0x31626f
 const SAVE_SIZE_BYTES_MAX = 0x43c000

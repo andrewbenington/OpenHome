@@ -1,6 +1,6 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import React, { ReactNode } from 'react'
-import { PKMInterface } from '../../../core/pkm/interfaces'
 import PokemonIcon from '../PokemonIcon'
 
 export type Element = ItemData | Separator | LabelData | SubmenuData | CheckboxData

@@ -1,7 +1,6 @@
+import { Errorable, R } from '@openhome-core/util/functional'
 import { StoredLookups } from '@openhome-ui/backend/backendInterface'
 import { createContext, useContext } from 'react'
-
-import { Errorable, R } from '@openhome-core/util/functional'
 
 export function useLookups() {
   const [lookups, updateLookups] = useContext(LookupsContext)

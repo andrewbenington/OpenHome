@@ -1,3 +1,5 @@
+import { R } from '@openhome-core/util/functional'
+import { stringSorter } from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { AppInfoContext, AppTheme } from '@openhome-ui/state/appInfo'
 import {
@@ -13,8 +15,6 @@ import {
 import { Flex, RadioGroup, Select, Separator } from '@radix-ui/themes'
 import { ReactNode, useContext, useEffect, useState } from 'react'
 import { Route, Routes } from 'react-router'
-import { R } from 'src/core/util/functional'
-import { stringSorter } from 'src/core/util/sort'
 import PromptDialog from '../components/dialog/PromptDialog'
 import SideTabs from '../components/side-tabs/SideTabs'
 import useDisplayError from '../hooks/displayError'
