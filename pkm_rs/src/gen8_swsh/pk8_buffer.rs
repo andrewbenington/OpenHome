@@ -1,5 +1,6 @@
 use super::{Pk8AbilityIndex, Pk8SpeciesAndForm};
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
+use crate::encryption::BlockCrypto;
 use crate::result::{Error, Result};
 use crate::traits::OhpkmByte;
 use crate::traits::bytes::{AsBytes, AsBytesMut};
@@ -100,7 +101,6 @@ impl From<Offset> for usize {
 //   Pk8BufferMut<'a>  = Pk8Buffer<&'a mut [u8]>   — read + write
 // ---------------------------------------------------------------------------
 
-pub type Pk8BufferRef<'a> = Pk8Buffer<&'a [u8]>;
 pub type Pk8BufferMut<'a> = Pk8Buffer<&'a mut [u8]>;
 
 #[derive(Default)]
@@ -625,6 +625,22 @@ impl<S: AsRef<[u8]>> Pk8Buffer<S> {
     pub fn current_hp(&self) -> u16 {
         self.get_u16_le(Offset::CurrentHp)
     }
+
+    // ------------------------------------------------------------------
+    // Encryption
+    // ------------------------------------------------------------------
+
+    fn block_crypto(&self) -> BlockCrypto {
+        BlockCrypto::gen89(self.encryption_constant())
+    }
+
+    pub fn encrypted_copy(&self) -> Box<[u8]> {
+        self.block_crypto().to_encrypted_bytes(self.0.as_ref())
+    }
+
+    pub fn decrypted_copy(&self) -> Box<[u8]> {
+        self.block_crypto().to_decrypted_bytes(self.0.as_ref())
+    }
 }
 
 // ==================================================================
@@ -1047,29 +1063,35 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk8Buffer<S> {
     pub fn set_current_hp(&mut self, v: u16) {
         self.set_u16_le(Offset::CurrentHp, v);
     }
+
+    // ------------------------------------------------------------------
+    // Encryption
+    // ------------------------------------------------------------------
+
+    pub fn encrypt(&mut self) {
+        self.block_crypto().encrypt(self.0.as_mut());
+    }
+
+    pub fn decrypt(&mut self) {
+        self.block_crypto().decrypt(self.0.as_mut());
+    }
+
+    pub fn encrypted(&mut self) -> &mut Self {
+        self.block_crypto().encrypt(self.0.as_mut());
+
+        self
+    }
+
+    pub fn decrypted(&mut self) -> &mut Self {
+        self.block_crypto().decrypt(self.0.as_mut());
+
+        self
+    }
 }
 
 // ==================================================================
 // Trait impls
 // ==================================================================
-
-use crate::encryption::{BlockEncrypt, Blocks};
-
-impl<S: AsRef<[u8]>> BlockEncrypt for Pk8Buffer<S> {
-    const BLOCKS_TYPE: Blocks = Blocks::Gen89;
-
-    fn get_personality_value(&self) -> u32 {
-        self.personality_value()
-    }
-
-    fn get_encryption_constant(&self) -> u32 {
-        self.encryption_constant()
-    }
-
-    fn to_bytes(&self) -> Vec<u8> {
-        self.0.as_ref().to_vec()
-    }
-}
 
 impl<S: AsRef<[u8]>> AsBytes for Pk8Buffer<S> {
     fn as_bytes(&self) -> &[u8] {

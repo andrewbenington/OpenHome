@@ -1,9 +1,8 @@
 use super::{Pk7, Pk7Buffer};
 use crate::encryption;
-use crate::encryption::BlockEncrypt;
 use crate::log;
 use crate::result::{Error, Result};
-use crate::traits::{PkmBytes, SaveData};
+use crate::traits::{AsBytes, PkmBytes, SaveData};
 use crate::util;
 
 use pkm_rs_types::BinaryGender;
@@ -185,9 +184,10 @@ impl SaveData for Gen7AlolaSave {
     fn set_mon_at(&mut self, box_num: usize, offset: usize, mut mon: Option<Pk7>) {
         let mon_bytes = if let Some(mon) = &mut mon {
             mon.refresh_checksum();
-            let unencrypted_bytes = mon.to_box_bytes();
+            let mut bytes = mon.to_box_bytes();
+            Pk7Buffer::box_span_mut(&mut bytes).decrypt();
 
-            Pk7Buffer::box_span(&unencrypted_bytes).to_encrypted_bytes()
+            bytes
         } else {
             Pk7::empty_box_slot_bytes(&self.get_trainer_data().trainer_name)
         };
@@ -267,8 +267,12 @@ impl Gen7AlolaSave {
         let box_offset = self.save_type.box_data_offset() + BOX_SLOTS * Pk7::BOX_SIZE * box_num;
         let mon_offset = box_offset + offset * Pk7::BOX_SIZE;
 
-        Pk7Buffer::box_span(&self.bytes[mon_offset..mon_offset + Pk7::BOX_SIZE])
-            .to_decrypted_bytes()
+        let mut mon_bytes = self.bytes[mon_offset..mon_offset + Pk7::BOX_SIZE].to_owned();
+        let mut buffer = Pk7Buffer::box_span_mut(&mut mon_bytes);
+
+        buffer.decrypt();
+
+        buffer.as_bytes().to_vec()
     }
 }
 
@@ -437,7 +441,7 @@ mod tests {
     use std::path::Path;
 
     use crate::checksum::Checksum;
-    use crate::gen7_alola::pk7_buffer::Pk7BufferRef;
+    use crate::gen7_alola::pk7_buffer::Pk7Buffer;
     use crate::result::Result;
     use crate::tests::save_bytes_from_file;
 
@@ -488,7 +492,7 @@ mod tests {
         for box_num in 0..Gen7AlolaSave::box_count() {
             for slot in 0..Gen7AlolaSave::box_slots() {
                 let mon_bytes = save.get_mon_bytes_decrypted(box_num, slot);
-                let buffer = Pk7BufferRef::box_span(&mon_bytes);
+                let buffer = Pk7Buffer::box_span(&mon_bytes);
                 if buffer.checksum() != buffer.calculate_checksum() {
                     return Err(Error::other(&format!(
                         "Invalid checksum for mon at box {box_num}, slot {slot}: expected {:#06x}, got {:#06x}",

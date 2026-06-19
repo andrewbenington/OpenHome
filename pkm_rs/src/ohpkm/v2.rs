@@ -3535,16 +3535,8 @@ impl PkmBytes for OhpkmV2 {
         dest.copy_from_slice(&bytes);
     }
 
-    fn write_party_bytes(&self, dest: &mut [u8]) {
-        self.write_box_bytes(dest)
-    }
-
-    fn to_box_bytes(&self) -> Vec<u8> {
-        self.to_bytes()
-    }
-
-    fn to_party_bytes(&self) -> Vec<u8> {
-        self.to_box_bytes()
+    fn to_box_bytes(&self) -> Box<[u8]> {
+        self.to_bytes().into_boxed_slice()
     }
 }
 

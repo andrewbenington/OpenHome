@@ -1,8 +1,7 @@
 use super::Pk8Buffer;
-use super::pk8_buffer::{Pk8BufferMut, Pk8BufferRef};
+use super::pk8_buffer::Pk8BufferMut;
 use super::{Pk8AbilityIndex, Pk8SpeciesAndForm};
 use crate::checksum::{Checksum, RefreshChecksum};
-use crate::encryption::BlockEncrypt;
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
@@ -129,7 +128,7 @@ impl Pk8 {
     // Deserialise from a Pk8Buffer (the single source of all byte offsets)
     // ------------------------------------------------------------------
 
-    pub fn from_buffer(buf: &Pk8BufferRef) -> Result<Self> {
+    pub fn from_buffer<S: AsRef<[u8]>>(buf: &Pk8Buffer<S>) -> Result<Self> {
         let home_tracker_raw = buf.home_tracker_raw();
         let mut mon = Pk8 {
             encryption_constant: buf.encryption_constant(),
@@ -301,12 +300,15 @@ impl Pk8 {
         }
     }
 
-    pub fn from_encrypted_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::from_bytes(&Pk8Buffer::new(bytes).to_decrypted_bytes())
+    pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
+        Self::from_buffer(Pk8Buffer::new_mut(&mut bytes).decrypted())
     }
 
-    pub fn to_box_bytes_encrypted(self) -> Vec<u8> {
-        Pk8Buffer::new(&self.to_box_bytes()).to_encrypted_bytes()
+    pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
+        let mut bytes = self.to_box_bytes();
+        Pk8Buffer::new_mut(&mut bytes).encrypt();
+
+        bytes
     }
 
     pub fn calculate_checksum(&self) -> u16 {
@@ -345,20 +347,21 @@ impl Pk8 {
         super::MOVE_DATA_OFFSETS
     }
 
-    pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Vec<u8> {
-        let mut bytes = [0; Self::BOX_SIZE];
-        let mut buffer = Pk8BufferMut::new_mut(&mut bytes);
+    pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        let mut buffer = Pk8BufferMut::new_mut(bytes.as_mut_slice());
 
         buffer.set_handler_name(trainer_name);
         buffer.set_is_current_handler(true);
         buffer.refresh_checksum();
 
-        buffer.to_encrypted_bytes()
+        bytes
     }
 
     pub fn is_empty_slot(bytes: &[u8]) -> bool {
-        let decrypted = Pk8Buffer::new(bytes).to_decrypted_bytes();
-        let buffer = Pk8Buffer::new(&decrypted);
+        let mut owned = bytes.to_owned();
+        let mut buffer = Pk8Buffer::new_mut(&mut owned);
+        buffer.decrypt();
 
         buffer.species_ndex() == 0
     }
@@ -376,11 +379,11 @@ impl PkmBytes for Pk8 {
         self.write_to_box_buffer(&mut Pk8BufferMut::new_mut(bytes))
     }
 
-    fn to_box_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes);
+    fn to_box_bytes(&self) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        self.write_box_bytes(bytes.as_mut_slice());
 
-        Vec::from(bytes)
+        bytes
     }
 }
 
@@ -423,12 +426,12 @@ impl Pk8 {
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn from_encrypted_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk8, JsValue> {
-        Pk8::from_encrypted_bytes(&bytes).map_err(error_to_js)
+    pub fn from_encrypted_byte_vector(bytes: Box<[u8]>) -> core::result::Result<Pk8, JsValue> {
+        Pk8::from_encrypted_bytes(bytes).map_err(error_to_js)
     }
 
     #[wasm_bindgen(js_name = toBytes)]
-    pub fn get_bytes_wasm(&self) -> Vec<u8> {
+    pub fn get_bytes_wasm(&self) -> Box<[u8]> {
         self.to_box_bytes()
     }
 
@@ -570,7 +573,7 @@ impl Pk8 {
     }
 
     #[wasm_bindgen(js_name = emptyBoxSlotBytes)]
-    pub fn empty_box_slot_bytes_js(trainer_name: &str) -> Vec<u8> {
+    pub fn empty_box_slot_bytes_js(trainer_name: &str) -> Box<[u8]> {
         Self::empty_box_slot_bytes(&trainer_name.into())
     }
 
@@ -595,7 +598,7 @@ impl Pk8 {
     }
 
     #[wasm_bindgen(js_name = toBoxBytesEncrypted)]
-    pub fn to_box_bytes_encrypted_js(&self) -> Vec<u8> {
+    pub fn to_box_bytes_encrypted_js(&self) -> Box<[u8]> {
         self.to_box_bytes_encrypted()
     }
 }
@@ -640,7 +643,7 @@ mod test {
     use crate::checksum::Checksum;
     use crate::convert_strategy::ConvertStrategy;
     use crate::gen8_swsh::Pk8;
-    use crate::gen8_swsh::pk8_buffer::{Pk8Buffer, Pk8BufferRef};
+    use crate::gen8_swsh::pk8_buffer::Pk8Buffer;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
     use crate::result::Error;
@@ -760,7 +763,7 @@ mod test {
     #[test]
     fn empty_slot_checksum() -> TestResult<()> {
         let empty_slot = Pk8::empty_box_slot_bytes(&"RoC".into());
-        let checksum = Pk8BufferRef::new(&empty_slot).checksum();
+        let checksum = Pk8Buffer::new(&empty_slot).checksum();
         if checksum == 0 {
             return Err(Error::other("Empty slot checksum should be non-zero").into());
         }

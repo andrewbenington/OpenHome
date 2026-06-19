@@ -475,14 +475,14 @@ impl PkmBytes for OhpkmV1 {
         self.write_box_bytes(bytes)
     }
 
-    fn to_box_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes);
+    fn to_box_bytes(&self) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        self.write_box_bytes(bytes.as_mut_slice());
 
-        Vec::from(bytes)
+        bytes
     }
 
-    fn to_party_bytes(&self) -> Vec<u8> {
+    fn to_party_bytes(&self) -> Box<[u8]> {
         self.to_box_bytes()
     }
 }
