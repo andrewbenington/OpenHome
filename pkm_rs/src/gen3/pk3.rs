@@ -149,11 +149,11 @@ impl Pk3 {
         Ok(mon)
     }
 
-    pub fn from_slot_bytes(bytes: Box<[u8]>) -> Result<Option<Self>> {
+    pub fn from_slot_bytes(bytes: &mut [u8]) -> Result<Option<Self>> {
         let size = bytes.len();
         let buffer = match size {
-            Self::BOX_SIZE => Pk3Buffer::box_span(&bytes),
-            Self::PARTY_SIZE => Pk3Buffer::party_span(&bytes),
+            Self::BOX_SIZE => Pk3Buffer::box_span(bytes),
+            Self::PARTY_SIZE => Pk3Buffer::party_span(bytes),
             _ => return Err(Error::buffer_size(Self::BOX_SIZE, size)),
         };
 
@@ -214,8 +214,8 @@ impl Pk3 {
         }
     }
 
-    pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
-        Self::from_buffer(Pk3Buffer::box_or_party_span_mut(&mut bytes).decrypted())
+    pub fn from_encrypted_bytes(bytes: &mut [u8]) -> Result<Self> {
+        Self::from_buffer(Pk3Buffer::box_or_party_span_mut(bytes).decrypted())
     }
 
     pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
@@ -345,10 +345,6 @@ impl HasSpeciesAndForm for Pk3 {
     }
 }
 
-fn error_to_js(e: Error) -> JsValue {
-    JsValue::from_str(&e.to_string())
-}
-
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_class = Pk3Wasm)]
 #[allow(clippy::missing_const_for_fn)]
@@ -358,23 +354,23 @@ impl Pk3 {
         bytes: Vec<u8>,
         strategy: ConvertStrategy,
     ) -> core::result::Result<Pk3, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(error_to_js)?;
+        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(crate::util::error_to_js)?;
         Ok(Pk3::from_ohpkm(&ohpkm, strategy))
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
     pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_bytes(&bytes).map_err(error_to_js)
+        Pk3::from_bytes(&bytes).map_err(crate::util::error_to_js)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn from_encrypted_byte_vector(bytes: Box<[u8]>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_encrypted_bytes(bytes).map_err(error_to_js)
+    pub fn take_from_encrypted_bytes(mut bytes: Box<[u8]>) -> core::result::Result<Pk3, JsValue> {
+        Pk3::from_encrypted_bytes(&mut bytes).map_err(crate::util::error_to_js)
     }
 
     #[wasm_bindgen(js_name = fromSlotBytes)]
-    pub fn from_slot_byte_vector(bytes: Box<[u8]>) -> core::result::Result<Option<Pk3>, JsValue> {
-        Self::from_slot_bytes(bytes).map_err(error_to_js)
+    pub fn from_slot_bytes_js(mut bytes: Box<[u8]>) -> core::result::Result<Option<Pk3>, JsValue> {
+        Self::from_slot_bytes(&mut bytes).map_err(crate::util::error_to_js)
     }
 
     #[wasm_bindgen(js_name = toBoxBytes)]

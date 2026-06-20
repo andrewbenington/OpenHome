@@ -300,8 +300,8 @@ impl Pk8 {
         }
     }
 
-    pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
-        Self::from_buffer(Pk8Buffer::new_mut(&mut bytes).decrypted())
+    pub fn from_encrypted_bytes(bytes: &mut [u8]) -> Result<Self> {
+        Self::from_buffer(Pk8Buffer::new_mut(bytes).decrypted())
     }
 
     pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
@@ -403,10 +403,6 @@ impl HasSpeciesAndForm for Pk8 {
     }
 }
 
-fn error_to_js(e: Error) -> JsValue {
-    JsValue::from_str(&e.to_string())
-}
-
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_class = "Pk8Wasm")]
 #[allow(clippy::missing_const_for_fn)]
@@ -426,12 +422,12 @@ impl Pk8 {
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn from_encrypted_byte_vector(bytes: Box<[u8]>) -> core::result::Result<Pk8, JsValue> {
-        Pk8::from_encrypted_bytes(bytes).map_err(error_to_js)
+    pub fn take_from_encrypted_bytes(mut bytes: Box<[u8]>) -> core::result::Result<Pk8, JsValue> {
+        Pk8::from_encrypted_bytes(&mut bytes).map_err(crate::util::error_to_js)
     }
 
     #[wasm_bindgen(js_name = toBytes)]
-    pub fn get_bytes_wasm(&self) -> Box<[u8]> {
+    pub fn to_bytes_js(&self) -> Box<[u8]> {
         self.to_box_bytes()
     }
 

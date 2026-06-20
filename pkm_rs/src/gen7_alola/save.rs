@@ -2,7 +2,7 @@ use super::{Pk7, Pk7Buffer};
 use crate::encryption;
 use crate::log;
 use crate::result::{Error, Result};
-use crate::traits::{AsBytes, PkmBytes, SaveData};
+use crate::traits::PkmBytes;
 use crate::util;
 
 use pkm_rs_types::BinaryGender;
@@ -40,8 +40,6 @@ const USUM_PC_CHECKSUM_OFFSET: usize = USUM_SIZE_BYTES - 0x200 + 0x14 + (14 * 8)
 #[cfg(feature = "wasm")]
 const SM_PC_CHECKSUM_OFFSET: usize = SM_SIZE_BYTES - 0x200 + 0x14 + (14 * 8) + 6;
 
-const SINGLE_BOX_SIZE_BYTES: usize = BOX_SLOTS * Pk7::BOX_SIZE;
-
 #[derive(Serialize, Debug)]
 enum SaveType {
     SunMoon,
@@ -70,6 +68,11 @@ impl SaveType {
         }
     }
 
+    const fn mon_byte_offset(&self, box_num: usize, box_slot: usize) -> usize {
+        let box_offset = self.box_data_offset() + BOX_SLOTS * Pk7::BOX_SIZE * box_num;
+        box_offset + box_slot * Pk7::BOX_SIZE
+    }
+
     const fn pc_checksum_offset(&self) -> usize {
         match self {
             SaveType::SunMoon => SM_PC_CHECKSUM_OFFSET,
@@ -90,12 +93,12 @@ impl SaveType {
 pub struct Gen7AlolaSave {
     save_type: SaveType,
     #[serde(skip_serializing)]
-    bytes: Vec<u8>,
+    bytes: Box<[u8]>,
     size: usize,
 }
 
 impl Gen7AlolaSave {
-    fn from_byte(bytes: &[u8], save_type: SaveType) -> Result<Self> {
+    fn from_bytes_for_type(bytes: &[u8], save_type: SaveType) -> Result<Self> {
         if bytes.len() < save_type.file_size_bytes() {
             Err(Error::buffer_size_with_source(
                 "gen 7 alola save file",
@@ -105,22 +108,22 @@ impl Gen7AlolaSave {
         } else {
             Ok(Self {
                 save_type,
-                bytes: bytes.to_vec(),
+                bytes: bytes.into(),
                 size: bytes.len(),
             })
         }
     }
 
     pub fn from_bytes_sunmoon(bytes: &[u8]) -> Result<Self> {
-        Self::from_byte(bytes, SaveType::SunMoon)
+        Self::from_bytes_for_type(bytes, SaveType::SunMoon)
     }
 
     pub fn from_bytes_ultra(bytes: &[u8]) -> Result<Self> {
-        Self::from_byte(bytes, SaveType::UltraSunMoon)
+        Self::from_bytes_for_type(bytes, SaveType::UltraSunMoon)
     }
 
     #[cfg(feature = "wasm")]
-    pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
+    pub fn prepare_bytes_for_saving(&self) -> Box<[u8]> {
         let mut bytes = self.bytes.clone();
 
         let pc_checksum_offset = self.save_type.pc_checksum_offset();
@@ -143,10 +146,23 @@ impl Gen7AlolaSave {
                 .unwrap(),
         )
     }
-}
 
-impl SaveData for Gen7AlolaSave {
-    type PkmType = Pk7;
+    fn copy_pokemon_bytes_to(&mut self, box_num: usize, box_slot: usize, data: &[u8]) {
+        let byte_offset = self.save_type.mon_byte_offset(box_num, box_slot);
+        self.bytes[byte_offset..byte_offset + Pk7::BOX_SIZE].copy_from_slice(data);
+    }
+
+    fn pokemon_bytes_raw(&self, box_num: usize, box_slot: usize) -> &[u8] {
+        let byte_offset = self.save_type.mon_byte_offset(box_num, box_slot);
+        &self.bytes[byte_offset..byte_offset + Pk7::BOX_SIZE]
+    }
+
+    fn get_mon_bytes_decrypted(&self, box_num: usize, box_slot: usize) -> Box<[u8]> {
+        let mut copied_bytes = Box::from(self.pokemon_bytes_raw(box_num, box_slot));
+        Pk7Buffer::box_span_mut(&mut copied_bytes).decrypt();
+
+        copied_bytes
+    }
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         match bytes.len() {
@@ -160,28 +176,28 @@ impl SaveData for Gen7AlolaSave {
         }
     }
 
-    fn get_decrypted_mon_bytes(&self, box_num: usize, offset: usize) -> Vec<u8> {
-        self.get_mon_bytes_decrypted(box_num, offset)
+    fn get_decrypted_mon_bytes(&self, box_num: usize, box_slot: usize) -> Box<[u8]> {
+        self.get_mon_bytes_decrypted(box_num, box_slot)
     }
 
-    fn get_mon_at(&self, box_num: usize, offset: usize) -> Option<Pk7> {
-        if box_num >= Self::box_count() || offset >= Self::box_slots() {
+    fn get_mon_at(&self, box_num: usize, box_slot: usize) -> Option<Pk7> {
+        if box_num >= Self::box_count() || box_slot >= Self::box_slots() {
             return None;
         }
 
-        let decrypted_bytes = self.get_decrypted_mon_bytes(box_num, offset);
+        let decrypted_bytes = self.get_decrypted_mon_bytes(box_num, box_slot);
         let national_dex = read_u16_le!(decrypted_bytes, 8);
 
         if national_dex > 0 {
             Pk7::from_bytes(&decrypted_bytes)
-                .inspect_err(|err| log!("malformed pkm at box {box_num}, slot {offset}: {err}"))
+                .inspect_err(|err| log!("malformed pkm at box {box_num}, slot {box_slot}: {err}"))
                 .ok()
         } else {
             None
         }
     }
 
-    fn set_mon_at(&mut self, box_num: usize, offset: usize, mut mon: Option<Pk7>) {
+    fn set_mon_at(&mut self, box_num: usize, box_slot: usize, mut mon: Option<Pk7>) {
         let mon_bytes = if let Some(mon) = &mut mon {
             mon.refresh_checksum();
             let mut bytes = mon.to_box_bytes();
@@ -193,9 +209,7 @@ impl SaveData for Gen7AlolaSave {
         };
 
         // write bytes to box slot
-        let box_offset = self.save_type.box_data_offset() + box_num * SINGLE_BOX_SIZE_BYTES;
-        let mon_offset = box_offset + offset * Pk7::BOX_SIZE;
-        self.bytes[mon_offset..mon_offset + Pk7::BOX_SIZE].copy_from_slice(&mon_bytes);
+        self.copy_pokemon_bytes_to(box_num, box_slot, &mon_bytes);
 
         // refresh pc checksum
         let checksum_offset = self.save_type.pc_checksum_offset();
@@ -208,29 +222,17 @@ impl SaveData for Gen7AlolaSave {
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
         strategy: crate::convert_strategy::ConvertStrategy,
-    ) -> Self::PkmType {
+    ) -> Pk7 {
         use crate::ohpkm::OhpkmConvert;
         Pk7::from_ohpkm(&ohpkm, strategy)
     }
 
-    fn box_rows() -> usize {
-        BOX_ROWS
-    }
-
-    fn box_cols() -> usize {
-        BOX_COLS
-    }
-
-    fn box_slots() -> usize {
+    const fn box_slots() -> usize {
         BOX_SLOTS
     }
 
-    fn box_count() -> usize {
+    const fn box_count() -> usize {
         BOX_COUNT
-    }
-
-    fn max_box_count() -> usize {
-        32
     }
 
     fn current_pc_box_idx(&self) -> usize {
@@ -241,7 +243,7 @@ impl SaveData for Gen7AlolaSave {
         }
     }
 
-    fn is_save(bytes: &[u8]) -> bool {
+    const fn is_save(bytes: &[u8]) -> bool {
         bytes.len() == SM_SIZE_BYTES || bytes.len() == USUM_SIZE_BYTES
     }
 
@@ -250,29 +252,11 @@ impl SaveData for Gen7AlolaSave {
         crate::util::six_digit_trainer_display(trainer_data.trainer_id, trainer_data.secret_id)
     }
 
-    fn game_of_origin(&self) -> Option<OriginGame> {
-        Some(OriginGame::from(self.get_trainer_data().game_code))
-    }
-
-    fn includes_origin(origin: OriginGame) -> bool {
+    const fn includes_origin(origin: OriginGame) -> bool {
         matches!(
             origin,
             OriginGame::Sun | OriginGame::Moon | OriginGame::UltraSun | OriginGame::UltraMoon
         )
-    }
-}
-
-impl Gen7AlolaSave {
-    fn get_mon_bytes_decrypted(&self, box_num: usize, offset: usize) -> Vec<u8> {
-        let box_offset = self.save_type.box_data_offset() + BOX_SLOTS * Pk7::BOX_SIZE * box_num;
-        let mon_offset = box_offset + offset * Pk7::BOX_SIZE;
-
-        let mut mon_bytes = self.bytes[mon_offset..mon_offset + Pk7::BOX_SIZE].to_owned();
-        let mut buffer = Pk7Buffer::box_span_mut(&mut mon_bytes);
-
-        buffer.decrypt();
-
-        buffer.as_bytes().to_vec()
     }
 }
 
@@ -281,13 +265,13 @@ impl Gen7AlolaSave {
 #[allow(clippy::missing_const_for_fn)]
 impl Gen7AlolaSave {
     #[wasm_bindgen(js_name = getMonAt)]
-    pub fn get_mon_at_wasm(&self, box_num: usize, offset: usize) -> Option<Pk7> {
-        self.get_mon_at(box_num, offset)
+    pub fn get_mon_at_wasm(&self, box_num: usize, box_slot: usize) -> Option<Pk7> {
+        self.get_mon_at(box_num, box_slot)
     }
 
     #[wasm_bindgen(js_name = setMonAt)]
-    pub fn set_mon_at_wasm(&mut self, box_num: usize, offset: usize, mon: Option<Pk7>) {
-        self.set_mon_at(box_num, offset, mon)
+    pub fn set_mon_at_wasm(&mut self, box_num: usize, box_slot: usize, mon: Option<Pk7>) {
+        self.set_mon_at(box_num, box_slot, mon)
     }
 
     #[wasm_bindgen(js_name = convertOhpkm)]
@@ -300,7 +284,7 @@ impl Gen7AlolaSave {
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> Result<Self> {
+    pub fn from_bytes_js(bytes: Box<[u8]>) -> Result<Self> {
         Self::from_bytes(&bytes)
     }
 
@@ -340,17 +324,17 @@ impl Gen7AlolaSave {
     }
 
     #[wasm_bindgen(getter = MAX_BOX_COUNT)]
-    pub fn max_box_count() -> usize {
+    pub fn max_box_count_js() -> usize {
         BOX_COUNT
     }
 
     #[wasm_bindgen(getter = BOX_ROWS)]
-    pub fn box_rows() -> usize {
+    pub fn box_rows_js() -> usize {
         BOX_ROWS
     }
 
     #[wasm_bindgen(getter = BOX_COLS)]
-    pub fn box_cols() -> usize {
+    pub fn box_cols_js() -> usize {
         BOX_COLS
     }
 
@@ -360,8 +344,8 @@ impl Gen7AlolaSave {
     }
 
     #[wasm_bindgen(getter = currentPcBoxIdx)]
-    pub fn current_pc_box_idx(&self) -> usize {
-        SaveData::current_pc_box_idx(self)
+    pub fn current_pc_box_idx_js(&self) -> usize {
+        self.current_pc_box_idx()
     }
 
     #[wasm_bindgen(getter = gameOfOrigin)]
@@ -385,7 +369,7 @@ impl Gen7AlolaSave {
     }
 
     #[wasm_bindgen(js_name = prepareBytesForSaving)]
-    pub fn prepare_bytes_for_saving_wasm(&self) -> Vec<u8> {
+    pub fn prepare_bytes_for_saving_wasm(&self) -> Box<[u8]> {
         self.prepare_bytes_for_saving()
     }
 }
