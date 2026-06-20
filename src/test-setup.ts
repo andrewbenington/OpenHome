@@ -8,6 +8,15 @@ import { beforeAll, vi } from 'vitest'
 vi.mock('zustand') // auto-mocking zustand store functions
 enableMapSet()
 
+// remove when ES2025 is supported
+if (!Uint8Array.prototype.toHex) {
+  Uint8Array.prototype.toHex = function () {
+    return Array.from(this)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+  }
+}
+
 beforeAll(async () => {
   const wasmPath = path.resolve(__dirname, '../pkm_rs/pkg/pkm_rs_bg.wasm')
   const wasmBytes = fs.readFileSync(wasmPath)
