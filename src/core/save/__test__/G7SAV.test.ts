@@ -1,7 +1,8 @@
+import { PK7 } from '@openhome-core/pkm'
 import { get16BitChecksumLittleEndian } from '@openhome-core/util/byteLogic'
 import { readFileSync } from 'fs'
 import path from 'path'
-import { beforeAll, describe, expect, test } from 'vitest'
+import { assert, beforeAll, describe, expect, test } from 'vitest'
 import { MemeKey, pokedexAndSaveFileMemeKey } from '../encryption/MemeKey'
 import { Gen7AlolaSave } from '../Gen7AlolaSave'
 import { PathData } from '../util/path'
@@ -38,7 +39,17 @@ describe('gen 7 save files', () => {
   })
 
   test('first mon is as expected', () => {
-    expect(ultraSunSave.boxes[0].boxSlots[0]?.nickname === 'Bulbasaur')
+    expect(ultraSunSave.getMonAt(0, 0)?.nickname === 'Bulbasaur')
+  })
+
+  test("wasm decryption doesn't modify original bytes", () => {
+    const bulbasaurBytes = ultraSunSave.getMonAt(0, 0)?.toPCBytes()
+    assert(bulbasaurBytes !== undefined)
+
+    const firstPull = PK7.fromBytes(bulbasaurBytes, true)
+    const secondPull = PK7.fromBytes(bulbasaurBytes, true)
+
+    expect(firstPull.calculateChecksum()).toBe(secondPull.calculateChecksum())
   })
 })
 

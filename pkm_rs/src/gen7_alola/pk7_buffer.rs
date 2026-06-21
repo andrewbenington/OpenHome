@@ -1,6 +1,6 @@
 use super::{Pk7AbilityIndex, Pk7SpeciesAndForm};
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
-use crate::encryption::BlockEncrypt;
+use crate::encryption::BlockCrypto;
 use crate::result::{Error, Result};
 use crate::traits::bytes::{AsBytes, AsBytesMut};
 use crate::util;
@@ -105,10 +105,9 @@ impl From<Offset> for usize {
 //   Pk7BufferMut<'a>  = Pk7Buffer<&'a mut [u8]>   — read + write
 // ---------------------------------------------------------------------------
 
-pub type Pk7BufferRef<'a> = Pk7Buffer<&'a [u8]>;
 pub type Pk7BufferMut<'a> = Pk7Buffer<&'a mut [u8]>;
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 pub struct Pk7Buffer<S: AsRef<[u8]>>(S);
 
 // ------------------------------------------------------------------
@@ -144,6 +143,11 @@ impl<'a> Pk7Buffer<&'a mut [u8]> {
 
     pub fn party_span_mut(span: &'a mut [u8]) -> Self {
         assert_eq!(span.len(), super::PARTY_SIZE);
+        Self(span)
+    }
+
+    pub fn box_or_party_span_mut(span: &'a mut [u8]) -> Self {
+        debug_assert!(span.len() == super::PARTY_SIZE || span.len() == super::BOX_SIZE);
         Self(span)
     }
 }
@@ -630,6 +634,22 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     pub fn stats(&self) -> Stats16Le {
         Stats16Le::from_bytes(self.stats_raw())
     }
+
+    // ------------------------------------------------------------------
+    // Encryption
+    // ------------------------------------------------------------------
+
+    fn block_crypto(&self) -> BlockCrypto {
+        BlockCrypto::gen67(self.encryption_constant())
+    }
+
+    pub fn encrypted_copy(&self) -> Box<[u8]> {
+        self.block_crypto().to_encrypted_bytes(self.0.as_ref())
+    }
+
+    pub fn decrypted_copy(&self) -> Box<[u8]> {
+        self.block_crypto().to_decrypted_bytes(self.0.as_ref())
+    }
 }
 
 // ==================================================================
@@ -1049,29 +1069,35 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
     pub fn set_stats(&mut self, v: Stats16Le) {
         self.set_stats_raw(v.to_bytes());
     }
+
+    // ------------------------------------------------------------------
+    // Encryption
+    // ------------------------------------------------------------------
+
+    pub fn encrypt(&mut self) {
+        self.block_crypto().encrypt(self.0.as_mut());
+    }
+
+    pub fn decrypt(&mut self) {
+        self.block_crypto().decrypt(self.0.as_mut());
+    }
+
+    pub fn encrypted(&mut self) -> &mut Self {
+        self.block_crypto().encrypt(self.0.as_mut());
+
+        self
+    }
+
+    pub fn decrypted(&mut self) -> &mut Self {
+        self.block_crypto().decrypt(self.0.as_mut());
+
+        self
+    }
 }
 
 // ==================================================================
 // Trait impls
 // ==================================================================
-
-use crate::encryption::Blocks;
-
-impl<S: AsRef<[u8]>> BlockEncrypt for Pk7Buffer<S> {
-    const BLOCKS_TYPE: Blocks = Blocks::Gen67;
-
-    fn get_personality_value(&self) -> u32 {
-        self.personality_value()
-    }
-
-    fn get_encryption_constant(&self) -> u32 {
-        self.encryption_constant()
-    }
-
-    fn to_bytes(&self) -> Vec<u8> {
-        self.0.as_ref().to_vec()
-    }
-}
 
 impl<S: AsRef<[u8]>> AsBytes for Pk7Buffer<S> {
     fn as_bytes(&self) -> &[u8] {

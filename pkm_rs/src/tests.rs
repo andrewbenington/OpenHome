@@ -1,25 +1,15 @@
-#[cfg(test)]
 use assert_json_diff::{CompareMode, Config, assert_json_matches_no_panic};
 
-#[cfg(test)]
 use crate::convert_strategy::ConvertStrategy;
-#[cfg(test)]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
-#[cfg(test)]
 use crate::result::Error;
-#[cfg(test)]
 use crate::traits::Pkm;
 use std::fmt::{Debug, Display};
-#[cfg(test)]
 use std::fs::File;
-#[cfg(test)]
 use std::io::Read;
-#[cfg(test)]
 use std::ops::RangeInclusive;
-#[cfg(test)]
 use std::path::{Path, PathBuf};
 
-#[cfg(test)]
 pub fn save_bytes_from_file(filename: &Path) -> crate::result::Result<Vec<u8>> {
     let mut filename = filename.to_path_buf();
 
@@ -37,7 +27,6 @@ pub fn save_bytes_from_file(filename: &Path) -> crate::result::Result<Vec<u8>> {
     Ok(contents)
 }
 
-#[cfg(test)]
 pub fn pkm_from_file<PKM: Pkm>(filename: &Path) -> crate::result::Result<(PKM, Vec<u8>)> {
     let mut filename = filename.to_path_buf();
 
@@ -57,7 +46,6 @@ pub fn pkm_from_file<PKM: Pkm>(filename: &Path) -> crate::result::Result<(PKM, V
     Ok((pkm, contents))
 }
 
-#[cfg(test)]
 pub fn to_from_bytes_all_in_dir<PKM: Pkm>(dir: &Path) -> TestResult<()> {
     use std::fs;
 
@@ -79,7 +67,6 @@ pub fn to_from_bytes_all_in_dir<PKM: Pkm>(dir: &Path) -> TestResult<()> {
     Ok(())
 }
 
-#[cfg(test)]
 pub fn from_to_ohpkm_all_in_dir<PKM: OhpkmConvert>() -> TestResult<()> {
     use std::fs;
 
@@ -102,7 +89,6 @@ pub fn from_to_ohpkm_all_in_dir<PKM: OhpkmConvert>() -> TestResult<()> {
     Ok(())
 }
 
-#[cfg(test)]
 pub fn to_from_ohpkm_all_in_dir<PKM: OhpkmConvert>(dir: &Path) -> TestResult<()> {
     use std::fs;
 
@@ -124,7 +110,6 @@ pub fn to_from_ohpkm_all_in_dir<PKM: OhpkmConvert>(dir: &Path) -> TestResult<()>
     Ok(())
 }
 
-#[cfg(test)]
 pub fn ensure_ranges_match(
     actual: &[u8],
     expected: &[u8],
@@ -138,7 +123,6 @@ pub fn ensure_ranges_match(
     }
 }
 
-#[cfg(test)]
 fn find_differing_ranges(actual: &[u8], expected: &[u8]) -> Option<Vec<ByteRange>> {
     let mut differences: Vec<ByteRange> = Vec::new();
 
@@ -162,14 +146,12 @@ fn find_differing_ranges(actual: &[u8], expected: &[u8]) -> Option<Vec<ByteRange
     }
 }
 
-#[cfg(test)]
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct ByteRange {
     start_idx: usize,
     end_idx: usize,
 }
 
-#[cfg(test)]
 impl ByteRange {
     pub const fn new_at(at: usize) -> Self {
         Self {
@@ -187,13 +169,11 @@ impl ByteRange {
     }
 }
 
-#[cfg(test)]
 fn u8_slice_to_hex_string(slice: &[u8]) -> String {
     let hexes: Vec<String> = slice.iter().map(|b| format!("0x{:02x}", b)).collect();
     format!("[{}]", hexes.join(", "))
 }
 
-#[cfg(test)]
 fn find_inconsistencies_from_file<PKM: Pkm>(path: &Path) -> TestResult<()> {
     let result = pkm_from_file::<PKM>(path);
     let (mon, file_bytes) = result.unwrap_or_else(|e| panic!("could not load {path:?}: {e}"));
@@ -214,7 +194,6 @@ fn find_inconsistencies_from_file<PKM: Pkm>(path: &Path) -> TestResult<()> {
 }
 
 #[cfg(feature = "randomize")]
-#[cfg(test)]
 pub fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> TestResult<()> {
     let expected = mon.to_box_bytes();
     println!("to bytes: {}", u8_slice_to_hex_string(&expected));
@@ -234,7 +213,6 @@ pub fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> TestResult<()> 
     }
 }
 
-#[cfg(test)]
 fn find_inconsistencies_from_to_ohpkm<PKM: OhpkmConvert>(
     mon: OhpkmV2,
     path: Option<PathBuf>,
@@ -251,19 +229,17 @@ fn find_inconsistencies_from_to_ohpkm<PKM: OhpkmConvert>(
     ensure_ranges_match(&actual, &expected, path)
 }
 
-#[cfg(test)]
 fn find_inconsistencies_to_from_ohpkm<PKM: OhpkmConvert>(
     mon: PKM,
     path: Option<PathBuf>,
 ) -> TestResult<()> {
     let expected = mon.to_party_bytes();
     let ohpkm = OhpkmV2::convert_with_backup(&mon, &expected)?;
-    let actual: Vec<u8> = PKM::from_ohpkm(&ohpkm, ConvertStrategy::default()).to_party_bytes();
+    let actual: Box<[u8]> = PKM::from_ohpkm(&ohpkm, ConvertStrategy::default()).to_party_bytes();
 
     ensure_ranges_match(&actual, &expected, path)
 }
 
-#[cfg(test)]
 pub fn compare_pkhex_json_all_in_dir<PKM: Pkm + PkhexJson>(dir: &Path) -> TestResult<()> {
     use std::fs;
 
@@ -287,7 +263,6 @@ pub fn compare_pkhex_json_all_in_dir<PKM: Pkm + PkhexJson>(dir: &Path) -> TestRe
     Ok(())
 }
 
-#[cfg(test)]
 pub fn compare_pkhex_json<PKM: Pkm + PkhexJson>(pkm_path: &Path) -> TestResult<()> {
     let mon = pkm_from_file::<PKM>(pkm_path)?.0;
 
@@ -322,9 +297,6 @@ pub fn compare_pkhex_json<PKM: Pkm + PkhexJson>(pkm_path: &Path) -> TestResult<(
     Ok(())
 }
 
-// test command: cargo test --package pkm_rs --lib -- gen7_alola::pk7::test::compare_golden_json --exact --nocapture
-
-#[cfg(test)]
 pub struct TestErrorWithSeed {
     pub seed: u64,
     pub error: TestError,
@@ -336,7 +308,6 @@ impl Debug for TestErrorWithSeed {
     }
 }
 
-#[cfg(test)]
 pub enum TestError {
     PkmRs(crate::result::Error),
     Diff(DiffError),
@@ -365,7 +336,6 @@ impl From<DiffError> for TestError {
 
 pub type TestResult<T> = std::result::Result<T, TestError>;
 
-#[cfg(test)]
 pub struct DiffError {
     differences: Vec<ByteRange>,
     actual: Vec<u8>,
@@ -429,7 +399,6 @@ impl Display for TestError {
     }
 }
 
-#[cfg(test)]
 fn format_byte_range_differences(diffs: &[ByteRange], actual: &[u8], expected: &[u8]) -> String {
     let mut output = String::new();
     for diff in diffs {
@@ -448,7 +417,10 @@ fn format_byte_range_differences(diffs: &[ByteRange], actual: &[u8], expected: &
     output
 }
 
-#[cfg(test)]
 pub trait PkhexJson {
     fn to_pkhex_json_value(&self) -> Result<serde_json::Value, serde_json::Error>;
+}
+
+pub fn bytes_to_hex_string(bytes: &[u8]) -> String {
+    num::BigInt::from_bytes_be(num::bigint::Sign::Plus, bytes).to_str_radix(16)
 }

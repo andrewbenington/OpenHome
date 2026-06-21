@@ -1,8 +1,7 @@
 use super::Pk7Buffer;
-use super::pk7_buffer::{Pk7BufferMut, Pk7BufferRef};
+use super::pk7_buffer::Pk7BufferMut;
 use super::{Pk7AbilityIndex, Pk7SpeciesAndForm};
 use crate::checksum::{Checksum, RefreshChecksum};
-use crate::encryption::BlockEncrypt;
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
@@ -125,7 +124,7 @@ impl Pk7 {
     // Deserialise from a Pk7Buffer (the single source of all byte offsets)
     // ------------------------------------------------------------------
 
-    pub fn from_buffer(buf: &Pk7BufferRef) -> Result<Self> {
+    pub fn from_buffer<S: AsRef<[u8]>>(buf: &Pk7Buffer<S>) -> Result<Self> {
         let mut mon = Pk7 {
             encryption_constant: buf.encryption_constant(),
             sanity: buf.sanity(),
@@ -292,12 +291,15 @@ impl Pk7 {
         }
     }
 
-    pub fn from_encrypted_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::from_bytes(&Pk7Buffer::box_or_party_span(bytes).to_decrypted_bytes())
+    pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
+        Self::from_buffer(Pk7Buffer::box_or_party_span_mut(&mut bytes).decrypted())
     }
 
-    pub fn to_box_bytes_encrypted(self) -> Vec<u8> {
-        Pk7Buffer::box_span(&self.to_box_bytes()).to_encrypted_bytes()
+    pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
+        let mut bytes = self.to_box_bytes();
+        Pk7Buffer::box_span_mut(&mut bytes).encrypt();
+
+        bytes
     }
 
     pub fn calculate_checksum(&self) -> u16 {
@@ -336,20 +338,23 @@ impl Pk7 {
         super::MOVE_DATA_OFFSETS
     }
 
-    pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Vec<u8> {
-        let mut bytes = [0; Self::BOX_SIZE];
-        let mut buffer = Pk7BufferMut::box_span_mut(&mut bytes);
+    pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        let mut buffer = Pk7BufferMut::box_span_mut(bytes.as_mut_slice());
 
         buffer.set_handler_name(trainer_name);
         buffer.set_is_current_handler(true);
         buffer.refresh_checksum();
 
-        buffer.to_encrypted_bytes()
+        buffer.encrypt();
+
+        bytes
     }
 
     pub fn is_empty_slot(bytes: &[u8]) -> bool {
-        let decrypted = Pk7Buffer::box_span(bytes).to_decrypted_bytes();
-        let buffer = Pk7BufferRef::box_span(&decrypted);
+        let mut owned = bytes.to_owned();
+        let mut buffer = Pk7Buffer::box_span_mut(&mut owned);
+        buffer.decrypt();
 
         buffer.species_ndex() == 0
     }
@@ -373,18 +378,18 @@ impl PkmBytes for Pk7 {
         self.write_to_party_buffer(&mut buffer);
     }
 
-    fn to_box_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes);
+    fn to_box_bytes(&self) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        self.write_box_bytes(bytes.as_mut_slice());
 
-        Vec::from(bytes)
+        bytes
     }
 
-    fn to_party_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; Self::PARTY_SIZE];
-        self.write_party_bytes(&mut bytes);
+    fn to_party_bytes(&self) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::PARTY_SIZE]);
+        self.write_party_bytes(bytes.as_mut_slice());
 
-        Vec::from(bytes)
+        bytes
     }
 }
 
@@ -417,13 +422,18 @@ impl Pk7 {
         Ok(Pk7::from_ohpkm(&ohpkm, strategy))
     }
 
-    #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk7, JsValue> {
-        Pk7::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+    #[wasm_bindgen(js_name = fromDecryptedBytes)]
+    pub fn from_bytes_js(bytes: Box<[u8]>) -> core::result::Result<Pk7, JsValue> {
+        Pk7::from_bytes(&bytes).map_err(crate::util::error_to_js)
+    }
+
+    #[wasm_bindgen(js_name = fromEncryptedBytes)]
+    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Pk7, JsValue> {
+        Pk7::from_encrypted_bytes(bytes).map_err(crate::util::error_to_js)
     }
 
     #[wasm_bindgen(js_name = toBytes)]
-    pub fn get_bytes_wasm(&self) -> Vec<u8> {
+    pub fn get_bytes_wasm(&self) -> Box<[u8]> {
         self.to_box_bytes()
     }
 
@@ -609,7 +619,7 @@ mod test {
 
     use crate::convert_strategy::ConvertStrategy;
     use crate::gen7_alola::Pk7;
-    use crate::gen7_alola::pk7_buffer::Pk7BufferRef;
+    use crate::gen7_alola::pk7_buffer::Pk7Buffer;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
     use crate::result::Error;
@@ -724,13 +734,28 @@ mod test {
     #[test]
     fn empty_slot_checksum() -> TestResult<()> {
         let empty_slot = Pk7::empty_box_slot_bytes(&"RoC".into());
-        if Pk7BufferRef::box_span(&empty_slot).checksum() != 0x0204 {
+        if Pk7Buffer::box_span(&empty_slot).checksum() != 0x0204 {
             return Err(Error::other(&format!(
                 "Empty slot checksum should be 0x0204; received {:#06x}",
-                Pk7BufferRef::box_span(&empty_slot).checksum()
+                Pk7Buffer::box_span(&empty_slot).checksum()
             ))
             .into());
         }
+        Ok(())
+    }
+
+    const LYCANROC_ENCRYPTED_BYTES_HEX: &str = "46b5261b000034558854d9175f75d4867d2c35edcaad2fb725c21bdbde411d0c3a219f5425e8407615970cdaa2333d6af8fe0544f39714db0fd9b6e2fc16435f80a10ce841891d669619ef0e9c2eda9fdb780cb3e97d7c3985b858283fae77dbfd705a99c39c94ff4df68176ed33eece7aad275b586c1d81a1d3333602b85e6e77163c6c7e6905fa95cc219becc09b136bafe58bfe8d77327551d35e85eae6c5adc3e95503df2c60401e73e17ebc348d6ae22fd24cfbf5c2671e42daead18cd923e6408a537ec3fc136855986f4ac0f1d741480cf38be75d1d71a1d26bdbb87d2919dcc6b479c80d";
+
+    #[test]
+    fn encrypted_bytes_match_expected() -> TestResult<()> {
+        let path = PathBuf::from("pk7").join("lycanroc-alola-champion.pk7");
+        let mon = tests::pkm_from_file::<Pk7>(&path)?.0;
+
+        let encrypted_bytes = mon.to_box_bytes_encrypted();
+        let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
+
+        assert_eq!(encrypted_hex_str, LYCANROC_ENCRYPTED_BYTES_HEX);
+
         Ok(())
     }
 }

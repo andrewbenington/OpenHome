@@ -63,8 +63,12 @@ export default class PK7 {
     this.inner.encryption_constant = value
   }
 
-  static fromBytes(buffer: ArrayBuffer, _encrypted?: boolean): PK7 {
-    return PK7.fromWasm(Pk7Wasm.fromBytes(new Uint8Array(buffer)))
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK7 {
+    return PK7.fromWasm(
+      encrypted
+        ? Pk7Wasm.fromEncryptedBytes(new Uint8Array(buffer))
+        : Pk7Wasm.fromDecryptedBytes(new Uint8Array(buffer))
+    )
   }
 
   static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK7 {

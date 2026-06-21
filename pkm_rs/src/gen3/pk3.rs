@@ -2,7 +2,6 @@ use super::Pk3Buffer;
 use crate::checksum::{Checksum, RefreshChecksum};
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::ConvertStrategy;
-use crate::encryption::BlockEncrypt;
 use crate::gen3::Gen3PokemonIndex;
 use crate::gen3::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
 #[cfg(feature = "wasm")]
@@ -98,7 +97,7 @@ impl Pk3 {
     // Deserialise from a Pk3Buffer (byte slice wrapper with field accessors)
     // ------------------------------------------------------------------
 
-    pub fn from_buffer(buf: &Pk3BufferRef) -> Result<Self> {
+    pub fn from_buffer<S: AsRef<[u8]>>(buf: &Pk3Buffer<S>) -> Result<Self> {
         let pokemon_index = Gen3PokemonIndex::new(buf.gen3_species_index())?;
         let personality_value = buf.personality_value();
         let language = buf.language()?;
@@ -150,18 +149,18 @@ impl Pk3 {
         Ok(mon)
     }
 
-    pub fn from_slot_bytes(bytes: &[u8]) -> Result<Option<Self>> {
+    pub fn from_slot_bytes(mut bytes: Box<[u8]>) -> Result<Option<Self>> {
         let size = bytes.len();
         let buffer = match size {
-            Self::BOX_SIZE => Pk3Buffer::box_span(bytes),
-            Self::PARTY_SIZE => Pk3Buffer::party_span(bytes),
+            Self::BOX_SIZE => Pk3Buffer::box_span(&bytes),
+            Self::PARTY_SIZE => Pk3Buffer::party_span(&bytes),
             _ => return Err(Error::buffer_size(Self::BOX_SIZE, size)),
         };
 
         if buffer.gen3_species_index() == 0 {
             Ok(None)
         } else {
-            Self::from_encrypted_bytes(bytes).map(Some)
+            Self::from_encrypted_bytes(&mut bytes).map(Some)
         }
     }
 
@@ -215,12 +214,15 @@ impl Pk3 {
         }
     }
 
-    pub fn from_encrypted_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::from_bytes(&Pk3Buffer::box_or_party_span(bytes).to_decrypted_bytes())
+    pub fn from_encrypted_bytes(bytes: &mut [u8]) -> Result<Self> {
+        Self::from_buffer(Pk3Buffer::box_or_party_span_mut(bytes).decrypted())
     }
 
-    pub fn to_box_bytes_encrypted(self) -> Vec<u8> {
-        Pk3Buffer::box_span(&self.to_box_bytes()).to_encrypted_bytes()
+    pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
+        let mut bytes = self.to_box_bytes();
+        Pk3Buffer::box_span_mut(&mut bytes).encrypt();
+
+        bytes
     }
 
     pub fn get_national_dex(&self) -> NatDexIndex {
@@ -273,9 +275,11 @@ impl Pk3 {
     }
 
     pub fn is_empty_slot(bytes: &[u8]) -> bool {
-        let decrypted = &Pk3Buffer::box_span(bytes).to_decrypted_bytes();
-        let buffer = Pk3BufferRef::box_span(decrypted);
-        buffer.gen3_species_index() == 0
+        let mut owned = bytes.to_owned();
+        Pk3Buffer::box_span_mut(&mut owned)
+            .decrypted()
+            .gen3_species_index()
+            == 0
     }
 
     pub fn modern_held_item(&self) -> Option<Item> {
@@ -310,18 +314,18 @@ impl PkmBytes for Pk3 {
         self.write_to_party_buffer(&mut buffer);
     }
 
-    fn to_box_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes);
+    fn to_box_bytes(&self) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        self.write_box_bytes(bytes.as_mut_slice());
 
-        Vec::from(bytes)
+        bytes
     }
 
-    fn to_party_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; Self::PARTY_SIZE];
-        self.write_party_bytes(&mut bytes);
+    fn to_party_bytes(&self) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::PARTY_SIZE]);
+        self.write_party_bytes(bytes.as_mut_slice());
 
-        Vec::from(bytes)
+        bytes
     }
 }
 
@@ -341,10 +345,6 @@ impl HasSpeciesAndForm for Pk3 {
     }
 }
 
-fn error_to_js(e: Error) -> JsValue {
-    JsValue::from_str(&e.to_string())
-}
-
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_class = Pk3Wasm)]
 #[allow(clippy::missing_const_for_fn)]
@@ -354,32 +354,32 @@ impl Pk3 {
         bytes: Vec<u8>,
         strategy: ConvertStrategy,
     ) -> core::result::Result<Pk3, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(error_to_js)?;
+        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(crate::util::error_to_js)?;
         Ok(Pk3::from_ohpkm(&ohpkm, strategy))
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
     pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_bytes(&bytes).map_err(error_to_js)
+        Pk3::from_bytes(&bytes).map_err(crate::util::error_to_js)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn from_encrypted_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_encrypted_bytes(&bytes).map_err(error_to_js)
+    pub fn take_from_encrypted_bytes(mut bytes: Box<[u8]>) -> core::result::Result<Pk3, JsValue> {
+        Pk3::from_encrypted_bytes(&mut bytes).map_err(crate::util::error_to_js)
     }
 
     #[wasm_bindgen(js_name = fromSlotBytes)]
-    pub fn from_slot_byte_vector(bytes: Vec<u8>) -> core::result::Result<Option<Pk3>, JsValue> {
-        Self::from_slot_bytes(&bytes).map_err(error_to_js)
+    pub fn from_slot_bytes_js(bytes: Box<[u8]>) -> core::result::Result<Option<Pk3>, JsValue> {
+        Self::from_slot_bytes(bytes).map_err(crate::util::error_to_js)
     }
 
     #[wasm_bindgen(js_name = toBoxBytes)]
-    pub fn to_box_bytes_wasm(&self) -> Vec<u8> {
+    pub fn to_box_bytes_wasm(&self) -> Box<[u8]> {
         self.to_box_bytes()
     }
 
     #[wasm_bindgen(js_name = toPartyBytes)]
-    pub fn to_party_bytes_wasm(&self) -> Vec<u8> {
+    pub fn to_party_bytes_wasm(&self) -> Box<[u8]> {
         self.to_party_bytes()
     }
 
@@ -785,6 +785,35 @@ mod test {
         let pk3 = Pk3::from_ohpkm(&mon, ConvertStrategy::default());
 
         assert_eq!(mon.nature(), pk3.nature());
+
+        Ok(())
+    }
+
+    const BLAZIKEN_ENCRYPTED_BYTES_HEX: &str = "afe6de82a28827bdbcc6bbd4c3c5bfc8ff000202cce3bdffffffff007b690000416fbe3e266fa03f2d76e92f176f2e3f1942e93ff291f93f0d7e7c1e663cdb2c0deef13f0b92f9c30d6ef93f0d6ef93f";
+    const JIRACHI_ENCRYPTED_BYTES_HEX: &str = "b010a7414b4e0000c4c3ccbbbdc2c3ff08700202d1c3cdc2c7c5cc00920c0000fb5ea741fb5ea741fb5ea741fba1a260d21fcf68fb5ea741625f0e41675ea741fb3aa741ea5ffa41675ea741f147ad41";
+
+    #[test]
+    fn encrypted_bytes_match_expected_blaziken() -> TestResult<()> {
+        let path = PathBuf::from("pk3").join("blaziken.pkm");
+        let mon = tests::pkm_from_file::<Pk3>(&path)?.0;
+
+        let encrypted_bytes = mon.to_box_bytes_encrypted();
+        let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
+
+        assert_eq!(encrypted_hex_str, BLAZIKEN_ENCRYPTED_BYTES_HEX);
+
+        Ok(())
+    }
+
+    #[test]
+    fn encrypted_bytes_match_expected_jirachi() -> TestResult<()> {
+        let path = PathBuf::from("pk3").join("jirachi-garbage.pkm");
+        let mon = tests::pkm_from_file::<Pk3>(&path)?.0;
+
+        let encrypted_bytes = mon.to_box_bytes_encrypted();
+        let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
+
+        assert_eq!(encrypted_hex_str, JIRACHI_ENCRYPTED_BYTES_HEX);
 
         Ok(())
     }

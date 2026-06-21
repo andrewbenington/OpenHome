@@ -1,4 +1,5 @@
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
+use crate::encryption::BlockCrypto;
 use crate::result::Result;
 use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
 use crate::traits::bytes::{AsBytes, AsBytesMut};
@@ -65,7 +66,7 @@ impl From<Offset> for usize {
 pub type Pk3BufferRef<'a> = Pk3Buffer<&'a [u8]>;
 pub type Pk3BufferMut<'a> = Pk3Buffer<&'a mut [u8]>;
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 pub struct Pk3Buffer<S: AsRef<[u8]>>(S);
 
 // ------------------------------------------------------------------
@@ -101,6 +102,11 @@ impl<'a> Pk3Buffer<&'a mut [u8]> {
 
     pub fn party_span_mut(span: &'a mut [u8]) -> Self {
         assert_eq!(span.len(), super::PARTY_SIZE);
+        Self(span)
+    }
+
+    pub fn box_or_party_span_mut(span: &'a mut [u8]) -> Self {
+        debug_assert!(span.len() == super::PARTY_SIZE || span.len() == super::BOX_SIZE);
         Self(span)
     }
 }
@@ -378,6 +384,22 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
     pub fn stats(&self) -> Stats16Le {
         Stats16Le::from_bytes(self.stats_raw())
     }
+
+    // ------------------------------------------------------------------
+    // Encryption
+    // ------------------------------------------------------------------
+
+    fn block_crypto(&self) -> BlockCrypto {
+        BlockCrypto::gen3(self.personality_value(), self.trainer_and_secret_id())
+    }
+
+    pub fn encrypted_copy(&self) -> Box<[u8]> {
+        self.block_crypto().to_encrypted_bytes(self.0.as_ref())
+    }
+
+    pub fn decrypted_copy(&self) -> Box<[u8]> {
+        self.block_crypto().to_decrypted_bytes(self.0.as_ref())
+    }
 }
 
 // ==================================================================
@@ -592,29 +614,35 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
     pub fn set_stats(&mut self, v: Stats16Le) {
         self.set_stats_raw(v.to_bytes());
     }
+
+    // ------------------------------------------------------------------
+    // Encryption
+    // ------------------------------------------------------------------
+
+    pub fn encrypt(&mut self) {
+        self.block_crypto().encrypt(self.0.as_mut());
+    }
+
+    pub fn decrypt(&mut self) {
+        self.block_crypto().decrypt(self.0.as_mut());
+    }
+
+    pub fn encrypted(&mut self) -> &mut Self {
+        self.block_crypto().encrypt(self.0.as_mut());
+
+        self
+    }
+
+    pub fn decrypted(&mut self) -> &mut Self {
+        self.block_crypto().decrypt(self.0.as_mut());
+
+        self
+    }
 }
 
 // ==================================================================
 // Trait impls
 // ==================================================================
-
-use crate::encryption::{BlockEncrypt, Blocks};
-
-impl<S: AsRef<[u8]>> BlockEncrypt for Pk3Buffer<S> {
-    const BLOCKS_TYPE: Blocks = Blocks::Gen3;
-
-    fn get_personality_value(&self) -> u32 {
-        self.personality_value()
-    }
-
-    fn get_encryption_constant(&self) -> u32 {
-        self.personality_value() ^ self.trainer_and_secret_id()
-    }
-
-    fn to_bytes(&self) -> Vec<u8> {
-        self.0.as_ref().to_vec()
-    }
-}
 
 impl<S: AsRef<[u8]>> AsBytes for Pk3Buffer<S> {
     fn as_bytes(&self) -> &[u8] {
