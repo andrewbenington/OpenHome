@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/andrewbenington/OpenHome.git"
   },
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@11.8.0",
   "engines": {
     "node": ">=25"
   },
