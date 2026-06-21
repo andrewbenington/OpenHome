@@ -300,8 +300,8 @@ impl Pk8 {
         }
     }
 
-    pub fn from_encrypted_bytes(bytes: &mut [u8]) -> Result<Self> {
-        Self::from_buffer(Pk8Buffer::new_mut(bytes).decrypted())
+    pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
+        Self::from_buffer(Pk8Buffer::new_mut(&mut bytes).decrypted())
     }
 
     pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
@@ -422,8 +422,8 @@ impl Pk8 {
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn take_from_encrypted_bytes(mut bytes: Box<[u8]>) -> core::result::Result<Pk8, JsValue> {
-        Pk8::from_encrypted_bytes(&mut bytes).map_err(crate::util::error_to_js)
+    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Pk8, JsValue> {
+        Pk8::from_encrypted_bytes(bytes).map_err(crate::util::error_to_js)
     }
 
     #[wasm_bindgen(js_name = toBytes)]

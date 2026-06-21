@@ -291,8 +291,8 @@ impl Pk7 {
         }
     }
 
-    pub fn from_encrypted_bytes(bytes: &mut [u8]) -> Result<Self> {
-        Self::from_buffer(Pk7Buffer::box_or_party_span_mut(bytes).decrypted())
+    pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
+        Self::from_buffer(Pk7Buffer::box_or_party_span_mut(&mut bytes).decrypted())
     }
 
     pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
@@ -428,8 +428,8 @@ impl Pk7 {
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn take_from_encrypted_bytes(mut bytes: Box<[u8]>) -> core::result::Result<Pk7, JsValue> {
-        Pk7::from_encrypted_bytes(&mut bytes).map_err(crate::util::error_to_js)
+    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Pk7, JsValue> {
+        Pk7::from_encrypted_bytes(bytes).map_err(crate::util::error_to_js)
     }
 
     #[wasm_bindgen(js_name = toBytes)]

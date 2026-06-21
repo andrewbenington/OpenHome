@@ -149,18 +149,18 @@ impl Pk3 {
         Ok(mon)
     }
 
-    pub fn from_slot_bytes(bytes: &mut [u8]) -> Result<Option<Self>> {
+    pub fn from_slot_bytes(mut bytes: Box<[u8]>) -> Result<Option<Self>> {
         let size = bytes.len();
         let buffer = match size {
-            Self::BOX_SIZE => Pk3Buffer::box_span(bytes),
-            Self::PARTY_SIZE => Pk3Buffer::party_span(bytes),
+            Self::BOX_SIZE => Pk3Buffer::box_span(&bytes),
+            Self::PARTY_SIZE => Pk3Buffer::party_span(&bytes),
             _ => return Err(Error::buffer_size(Self::BOX_SIZE, size)),
         };
 
         if buffer.gen3_species_index() == 0 {
             Ok(None)
         } else {
-            Self::from_encrypted_bytes(bytes).map(Some)
+            Self::from_encrypted_bytes(&mut bytes).map(Some)
         }
     }
 
@@ -369,8 +369,8 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(js_name = fromSlotBytes)]
-    pub fn from_slot_bytes_js(mut bytes: Box<[u8]>) -> core::result::Result<Option<Pk3>, JsValue> {
-        Self::from_slot_bytes(&mut bytes).map_err(crate::util::error_to_js)
+    pub fn from_slot_bytes_js(bytes: Box<[u8]>) -> core::result::Result<Option<Pk3>, JsValue> {
+        Self::from_slot_bytes(bytes).map_err(crate::util::error_to_js)
     }
 
     #[wasm_bindgen(js_name = toBoxBytes)]
