@@ -127,6 +127,7 @@ export function useOpenHomeBoxNavigator() {
   }
 
   function navigatePrev() {
+    console.log({ currentIndex })
     if (currentIndex === undefined) return
     const currentBox = getCurrentBox()
     for (
@@ -140,7 +141,10 @@ export function useOpenHomeBoxNavigator() {
         break
       }
     }
+    console.log({ currentIndex })
   }
+
+  console.log(currentIndex, 'before return')
 
   return {
     currentIndex,

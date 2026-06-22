@@ -1,5 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SAV } from '@openhome-core/save/interfaces'
 import { numericSorter } from '@openhome-core/util/sort'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
@@ -68,7 +68,11 @@ export default function TrackedPokemonPage() {
       ]}
     >
       <ManageDialog onClose={clearFindingState} />
-      <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
+      <PokemonDetailsModal
+        key={selectedMon ? getMonFileIdentifier(selectedMon) : ''}
+        mon={selectedMon}
+        onClose={() => setSelectedMon(undefined)}
+      />
       {findingSaveState && (
         <FindingSaveDialog state={findingSaveState} onClose={clearFindingState} />
       )}
