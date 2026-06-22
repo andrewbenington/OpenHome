@@ -5,6 +5,7 @@ import { numericSorter } from '@openhome-core/util/sort'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import MessageRibbon from '@openhome-ui/components/MessageRibbon'
 import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
+import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import { usePathSegment } from '@openhome-ui/hooks/routing'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
@@ -39,6 +40,42 @@ export default function TrackedPokemonPage() {
   )
 
   return (
+    <SideTabNavigation
+      defaultTab="all"
+      parentPathSegment="manage"
+      routes={[
+        {
+          uniqueKey: 'all',
+          display: 'All Pokémon',
+          component: (
+            <AllTrackedPokemon
+              onSelectMon={setSelectedMon}
+              findSaveForMon={findSaveForMon}
+              findSavesForAllMons={findSavesForAllMons}
+            />
+          ),
+        },
+        {
+          uniqueKey: 'gen12',
+          display: 'Gen 1/2 IDs',
+          component: <Gen12Lookup onSelectMon={setSelectedMon} />,
+        },
+        {
+          uniqueKey: 'gen345',
+          display: 'Gen 3/4/5 IDs',
+          component: <Gen345Lookup onSelectMon={setSelectedMon} />,
+        },
+      ]}
+    >
+      <ManageDialog onClose={clearFindingState} />
+      <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
+      {findingSaveState && (
+        <FindingSaveDialog state={findingSaveState} onClose={clearFindingState} />
+      )}
+    </SideTabNavigation>
+  )
+
+  return (
     <SideTabs.Root value={currentSegment} onValueChange={setCurrentSegment}>
       <SideTabs.TabList>
         <SideTabs.Tab value="all"> All Pokémon</SideTabs.Tab>
@@ -53,10 +90,6 @@ export default function TrackedPokemonPage() {
         <Route path="gen12" element={<Gen12Lookup onSelectMon={setSelectedMon} />} />
         <Route path="gen345" element={<Gen345Lookup onSelectMon={setSelectedMon} />} />
       </Routes>
-      <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
-      {findingSaveState && (
-        <FindingSaveDialog state={findingSaveState} onClose={clearFindingState} />
-      )}
     </SideTabs.Root>
   )
 }
