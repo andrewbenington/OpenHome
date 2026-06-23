@@ -6,7 +6,7 @@ import DebugOnly from './components/DebugOnly'
 import { AppTabIconsActive, AppTabIconsInactive } from './components/Icons'
 import { Tabs } from './components/Tabs'
 import AppStateDisplay from './pages/AppStateDisplay'
-import ComponentDebugDisplay from './pages/ComponentDebugDisplay'
+import DebugDisplay from './pages/DebugDisplay'
 import Home from './pages/home/Home'
 import LogsPage from './pages/logs/LogsPage'
 import PluginsPage from './pages/plugins/Plugins'
@@ -97,7 +97,7 @@ export default function AppTabs() {
               <Route path="/settings/*" element={<Settings />} />
               <DebugOnly>
                 <Route path="/state" element={<AppStateDisplay />} />
-                <Route path="/component-debug" element={<ComponentDebugDisplay />} />
+                <Route path="/component-debug" element={<DebugDisplay />} />
               </DebugOnly>
             </Routes>
             <DebugOnly>
