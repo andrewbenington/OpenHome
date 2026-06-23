@@ -1,10 +1,10 @@
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { R } from '@openhome-core/util/functional'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import BoxIcons from '@openhome-ui/images/BoxIcons.webp'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getItemIconPath } from '@openhome-ui/images/items'
-import { FormsUsingImages } from '@openhome-ui/pokemon-details/useBoxIconImage'
 import {
   ExtraFormIndex,
   extraFormSpriteName,
@@ -12,9 +12,9 @@ import {
   Generation,
   MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
-import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
+import { HTMLAttributes, MouseEventHandler, ReactNode, useState } from 'react'
 import { useMonDisplay } from '../hooks/monDisplay'
-import useBoxIconImage from '../pokemon-details/useBoxIconImage'
+import { boxIconImagePath, FormsUsingImages } from '../pokemon-details/useBoxIconImage'
 import { classNames, grayscaleIf } from '../util/style'
 import { MonTag } from '../util/tags'
 import { TagIcon } from './TagIcon'
@@ -172,25 +172,39 @@ interface PokemonIconUsingImageProps {
   onClick?: MouseEventHandler
 }
 
+const DEFAULT_BOX_ICON = `/items/index/0000.png`
+
 function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
   const { dexNumber, formeNumber, extraFormIndex, silhouette, onClick } = props
+  const [spritePath, setSpritePath] = useState(DEFAULT_BOX_ICON)
+  const [imageLoadFailed, setImageLoadFailed] = useState(false)
 
   const isDarkMode = useIsDarkMode()
 
-  const spriteResult = useBoxIconImage({
-    dexNum: dexNumber,
-    formNum: formeNumber ?? 0,
-    format: 'OHPKM',
-    extraFormIndex,
-    isShiny: props.isShiny,
-  })
+  if (spritePath === DEFAULT_BOX_ICON && !imageLoadFailed) {
+    const spriteResult = boxIconImagePath({
+      dexNum: dexNumber,
+      formNum: formeNumber ?? 0,
+      format: 'OHPKM',
+      extraFormIndex,
+      isShiny: props.isShiny,
+    })
+    R.match(
+      (path: string) => {
+        setSpritePath(getPublicImageURL(path))
+      },
+      (err: string) => {
+        console.error(err)
+      }
+    )(spriteResult)
+  }
 
   return (
     <img
       className="pokemon-icon-img"
       alt="pokemon sprite"
       draggable={false}
-      src={spriteResult.path}
+      src={spritePath}
       style={{
         imageRendering: 'pixelated',
         filter: silhouette
@@ -200,6 +214,14 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
           : undefined,
       }}
       onClick={onClick}
+      onError={() => {
+        console.error({
+          event: 'box-sprite-image-error',
+          url: spritePath,
+        })
+        setImageLoadFailed(true)
+        setSpritePath(DEFAULT_BOX_ICON)
+      }}
     />
   )
 }

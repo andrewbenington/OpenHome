@@ -206,7 +206,6 @@ def download_sprite_variants_bulbagarden(form: PokemonForm, game, folder, includ
     extension = ".gif" if "anim" in game else ".png"
 
     for sprite_name in [form.sprite_name]:
-        print(f"sprite_name: {sprite_name}")
         filename = sprite_name + extension
         filename = filename.replace("png", "webp")
 

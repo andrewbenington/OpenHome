@@ -239,7 +239,7 @@ class PokemonForm(BaseModel):
         if game == 'champions':
             if forme_name == "-Super":
                 forme_name = "-Jumbo"
-            elif forme_name == "-Masterpiece":
+            elif forme_name == "-Masterpiece" or "-Busted" in forme_name:
                 forme_name = ""
         
         shiny_suffix = " shiny" if is_shiny else ""
