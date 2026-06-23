@@ -28,12 +28,12 @@ export default function Settings() {
       parentPathSegment="settings"
       routes={[
         {
-          uniqueKey: 'general',
+          route: 'general',
           display: 'General',
           component: <GeneralSettings />,
         },
         {
-          uniqueKey: 'conversion',
+          route: 'conversion',
           display: 'PKM Conversion',
           component: <PKMConversion />,
         },

@@ -104,7 +104,7 @@ const DraggableMon = (props: DraggableMonProps) => {
     >
       <PokemonIcon
         dexNumber={mon.dexNum}
-        formeNumber={formeNumber}
+        formIndex={formeNumber}
         isShiny={showShiny && mon.isShiny()}
         isEgg={mon.isEgg}
         heldItemIndex={

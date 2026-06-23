@@ -45,7 +45,7 @@ export default function TrackedPokemonPage() {
       parentPathSegment="manage"
       routes={[
         {
-          uniqueKey: 'all',
+          route: 'all',
           display: 'All Pokémon',
           component: (
             <AllTrackedPokemon
@@ -56,12 +56,12 @@ export default function TrackedPokemonPage() {
           ),
         },
         {
-          uniqueKey: 'gen12',
+          route: 'gen12',
           display: 'Gen 1/2 IDs',
           component: <Gen12Lookup onSelectMon={setSelectedMon} />,
         },
         {
-          uniqueKey: 'gen345',
+          route: 'gen345',
           display: 'Gen 3/4/5 IDs',
           component: <Gen345Lookup onSelectMon={setSelectedMon} />,
         },

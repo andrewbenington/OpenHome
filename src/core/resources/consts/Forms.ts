@@ -27,6 +27,7 @@ export const GRENINJA_ASH = 2
 
 export const BASE = 0
 export const GALAR = 1
+export const HISUI = 1
 
 export const MAROWAK_ALOLA_TOTEM = 2
 

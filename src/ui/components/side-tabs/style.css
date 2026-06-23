@@ -22,6 +22,7 @@
   height: 100%;
   overflow-y: auto;
   height: initial;
+  width: 0;
 
   ::-webkit-scrollbar-thumb {
     border-radius: var(--border-radius-sm);

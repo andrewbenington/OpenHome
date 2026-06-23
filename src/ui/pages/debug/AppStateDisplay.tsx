@@ -9,8 +9,8 @@ import { ItemBagContext, ItemBagState } from '@openhome-ui/state/items'
 import { Item, Lookup, OriginGames, SpeciesLookup } from '@pkm-rs/pkg'
 import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
 import { useContext } from 'react'
-import { useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
-import { useOhpkmStore } from '../state/ohpkm'
+import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
+import { useOhpkmStore } from '../../state/ohpkm'
 
 export default function AppStateDisplay() {
   const transactionState = useTransactionState()

@@ -207,7 +207,7 @@ function useColumns(
         <button onClick={() => onSelectMon(value)} className="mon-icon-button">
           <PokemonIcon
             dexNumber={value.dexNum}
-            formeNumber={value.formNum}
+            formIndex={value.formNum}
             style={{ width: '2rem', height: '2rem' }}
           />
         </button>

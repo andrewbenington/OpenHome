@@ -1,6 +1,6 @@
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { R } from '@openhome-core/util/functional'
+import { Option, R } from '@openhome-core/util/functional'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import BoxIcons from '@openhome-ui/images/BoxIcons.webp'
 import { getPublicImageURL } from '@openhome-ui/images/images'
@@ -22,7 +22,7 @@ import './components.css'
 
 export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   dexNumber: number
-  formeNumber?: number
+  formIndex?: number
   isShiny?: boolean
   isEgg?: boolean
   heldItemIndex?: number
@@ -46,10 +46,31 @@ function getBackgroundPosition(formeMetadata?: FormMetadata, isEgg?: boolean) {
   return `${(x / 35) * 100}% ${(y / 36) * 100}%`
 }
 
+type IconType = 'spritesheet' | 'image'
+
+function iconType(
+  dexNumber: number,
+  formIndex: number,
+  extraFormIndex: Option<ExtraFormIndex>
+): IconType {
+  const formeMetadata = MetadataSummaryLookup(dexNumber, formIndex ?? 0)
+  const inChampions = !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, dexNumber, formIndex)
+  const isGen9Mega = formeMetadata?.isMega && formeMetadata.introducedGen === Generation.G9
+  const extraFormWithSprite = Boolean(extraFormIndex && extraFormSpriteName(extraFormIndex))
+
+  const shouldUseImage =
+    inChampions ||
+    isGen9Mega ||
+    extraFormWithSprite ||
+    FormsUsingImages.get(dexNumber)?.includes(formIndex ?? 0)
+
+  return shouldUseImage ? 'image' : 'spritesheet'
+}
+
 export default function PokemonIcon(props: PokemonIconProps) {
   const {
     dexNumber,
-    formeNumber,
+    formIndex,
     isShiny,
     heldItemIndex,
     onlyItem,
@@ -65,35 +86,34 @@ export default function PokemonIcon(props: PokemonIconProps) {
   } = props
   const { showNotesIndicator, showTags } = useMonDisplay()
 
-  const formeMetadata = MetadataSummaryLookup(dexNumber, formeNumber ?? 0)
+  let monImage = null
 
-  const inChampions = !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
-  const isGen9Mega = formeMetadata?.isMega && formeMetadata.introducedGen === Generation.G9
-  const extraFormWithSprite = Boolean(extraFormIndex && extraFormSpriteName(extraFormIndex))
-
-  const shouldUseImage =
-    inChampions ||
-    isGen9Mega ||
-    extraFormWithSprite ||
-    FormsUsingImages.get(dexNumber)?.includes(formeNumber ?? 0)
-
-  const monImage = shouldUseImage ? (
-    <PokemonIconUsingImage
-      dexNumber={dexNumber}
-      formeNumber={formeNumber}
-      extraFormIndex={extraFormIndex}
-      silhouette={silhouette}
-      onClick={onClick}
-      isShiny={isShiny}
-    />
-  ) : formeMetadata ? (
-    <PokemonIconUsingSheet
-      formeMetadata={formeMetadata}
-      isEgg={isEgg}
-      silhouette={silhouette}
-      onClick={onClick}
-    />
-  ) : null
+  switch (iconType(dexNumber, formIndex ?? 0, extraFormIndex)) {
+    case 'image': {
+      monImage = (
+        <PokemonIconUsingImage
+          dexNumber={dexNumber}
+          formeNumber={formIndex}
+          extraFormIndex={extraFormIndex}
+          silhouette={silhouette}
+          onClick={onClick}
+          isShiny={isShiny}
+        />
+      )
+      break
+    }
+    case 'spritesheet':
+      const formeMetadata = MetadataSummaryLookup(dexNumber, formIndex ?? 0)
+      monImage = formeMetadata ? (
+        <PokemonIconUsingSheet
+          formeMetadata={formeMetadata}
+          isEgg={isEgg}
+          silhouette={silhouette}
+          onClick={onClick}
+        />
+      ) : null
+      break
+  }
 
   return (
     <div className={classNames('pokemon-icon-container', grayscaleIf(grayedOut))} style={style}>

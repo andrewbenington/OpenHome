@@ -101,7 +101,7 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
             <Flex gap="1" align="center" minWidth="7rem">
               <PokemonIcon
                 dexNumber={mon.dexNum}
-                formeNumber={mon.formNum}
+                formIndex={mon.formNum}
                 style={{ width: '1rem', height: '1rem' }}
               />
               {mon.nickname}

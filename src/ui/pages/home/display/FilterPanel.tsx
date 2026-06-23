@@ -172,7 +172,7 @@ export default function FilterPanel() {
               currentForme && (
                 <PokemonIcon
                   dexNumber={filter.dexNumber}
-                  formeNumber={currentForme.formIndex}
+                  formIndex={currentForme.formIndex}
                   style={{ width: ICON_SIZE, height: ICON_SIZE }}
                 />
               )
