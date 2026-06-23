@@ -1,0 +1,1 @@
+cd generate && uv run downloadAllMonSprites.py

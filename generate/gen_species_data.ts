@@ -154,7 +154,6 @@ function falseIfUndef(input?: boolean): boolean {
 
 function convertForm(natDexIndex: number, form: Form): string {
   return `FormMetadata {
-    species_name: "${form.name}",
     national_dex: unsafe { NatDexIndex::new_unchecked(${natDexIndex}) },
     form_name: "${form.formName}",
     form_index: ${form.formNumber},
@@ -169,14 +168,12 @@ function convertForm(natDexIndex: number, form: Form): string {
     is_gmax: ${falseIfUndef(form.isGMax)},
     is_battle_only: ${falseIfUndef(form.isBattleOnly)},
     is_cosmetic: ${falseIfUndef(form.cosmeticForm)},
-    types: (PkmType::${form.types[0]}, ${optionalToRust(form.types[1], pkmTypeToRust)}),
     gender_ratio: GenderRatio::${form.genderRatio},
-    base_stats: ${statsToRust(form.baseStats)},
     abilities: (
-      unsafe { AbilityIndex::new_unchecked(${form.ability1}) },
-      unsafe { AbilityIndex::new_unchecked(${form.ability2 ?? form.ability1}) },
+      unsafe { AbilityIndexBounded::new_unchecked(${form.ability1}) },
+      unsafe { AbilityIndexBounded::new_unchecked(${form.ability2 ?? form.ability1}) },
     ),
-    hidden_ability: ${optionalToRust(form.abilityH, (val: number) => `unsafe { AbilityIndex::new_unchecked(${val}) }`)},
+    hidden_ability: ${optionalToRust(form.abilityH, (val: number) => `unsafe { AbilityIndexBounded::new_unchecked(${val}) }`)},
     base_height: ${form.height},
     base_weight: ${form.weight},
     evolutions: ${evolutionsToRust(form.evos)},
@@ -196,7 +193,6 @@ function convertForm(natDexIndex: number, form: Form): string {
 
 function convertSpecies(species: Species): string {
   return `SpeciesMetadata {
-    name: "${species.name}",
     national_dex: unsafe { NatDexIndex::new_unchecked(${species.nationalDex}) },
     level_up_type: ${levelUpTypeToRust(species.levelUpType)},
     forms: &[${species.forms.map((form) => convertForm(species.nationalDex, form)).join(',')}]
@@ -308,12 +304,12 @@ async function main() {
   const allSpecies: Species[] = await getAllSpeciesAndForms()
 
   let output = `
-use crate::abilities::AbilityIndex;
+use crate::abilities::AbilityIndexBounded;
 use crate::species::{
     EggGroup, FormMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, NatDexIndex, SpeciesAndForm,
     SpeciesMetadata,
 };
-use pkm_rs_types::{Generation, PkmType, GameSetting, Stats16Le};
+use pkm_rs_types::{Generation, GameSetting};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;

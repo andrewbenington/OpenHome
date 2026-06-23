@@ -105,10 +105,8 @@ generate: generate/out/generate.js
 .PHONY: gen-wasm
 gen-wasm:
 # 	@node generate/gen_ribbons.ts
-# 	@cd pkm_rs_resources && node generate/gen_abilities.ts
-	@cd generate
-	@pnpm i
-# 	@cd pkm_rs_resources && ts-node generate/gen_abilities.ts
+# 	@ts-node generate/gen_abilities.ts
+	@ts-node generate/gen_abilities.ts
 	@ts-node generate/gen_items.ts
 	@ts-node generate/gen_moves.ts
 	@ts-node generate/gen_species_data.ts
