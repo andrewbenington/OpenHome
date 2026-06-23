@@ -15,7 +15,7 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
 import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
 import { Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
-import { useCallback, useContext, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
 import { GameIndicator } from '../components/pokemon/indicator/GameIndicator'
 import PokemonIcon from '../components/PokemonIcon'
@@ -55,49 +55,49 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
     setBoxIndicatorTimeout(timeout)
   }, [boxIndicatorTimeout])
 
-  console.log({ navigateLeft, navigateRight })
-
-  const navigateLeftWithIndicator = () =>
-    navigateLeft
-      ? () => {
-          navigateLeft()
-          showTemporaryBoxIndicator()
-        }
-      : undefined
-
-  const navigateRightWithIndicator = () =>
-    navigateRight
-      ? () => {
-          console.log('right')
-          navigateRight()
-          showTemporaryBoxIndicator()
-        }
-      : () => {
-          console.log('navigateRight does not exist')
-        }
-
-  function handleArrows(e: React.KeyboardEvent<HTMLDivElement>) {
-    console.log(e.type)
-    if (e.key === 'ArrowLeft') {
-      navigateLeft?.()
-    } else if (e.key === 'ArrowRight') {
-      navigateRight?.()
+  const navigateLeftWithIndicator = useCallback(() => {
+    if (navigateLeft) {
+      navigateLeft()
+      showTemporaryBoxIndicator()
     }
-  }
+  }, [navigateLeft, showTemporaryBoxIndicator])
+
+  const navigateRightWithIndicator = useCallback(() => {
+    if (navigateRight) {
+      navigateRight()
+      showTemporaryBoxIndicator()
+    }
+  }, [navigateRight, showTemporaryBoxIndicator])
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        e.stopPropagation()
+        navigateLeftWithIndicator?.()
+      } else if (e.key === 'ArrowRight') {
+        e.stopPropagation()
+        navigateRightWithIndicator?.()
+      }
+    }
+    window.addEventListener('keydown', handler, true) // true = capture
+    return () => window.removeEventListener('keydown', handler, true)
+  }, [navigateLeftWithIndicator, navigateRightWithIndicator])
 
   if (!mon) return null
 
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose?.()}>
-      <Dialog.Portal onKeyDown={handleArrows}>
+      <Dialog.Portal>
         <Dialog.Backdrop />
-        <Dialog.Popup className="pokemon-modal" onKeyDown={handleArrows}>
+        <Dialog.Popup className="pokemon-modal">
           <VisuallyHidden>
             <Dialog.Title>Pokémon Details</Dialog.Title>
             <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
           </VisuallyHidden>
-          <ModalContents mon={mon} key={getMonFileIdentifier(mon)} />
-          <div className="modal-footer" onKeyDown={handleArrows}>
+          <Fallback>
+            <ModalContents mon={mon} key={getMonFileIdentifier(mon)} />
+          </Fallback>
+          <div className="modal-footer">
             <Flex gap="1" align="center" minWidth="7rem">
               <PokemonIcon
                 dexNumber={mon.dexNum}
@@ -124,12 +124,12 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
             )}
           </div>
         </Dialog.Popup>
-        {navigateLeftWithIndicator && (
+        {navigateLeft && (
           <button className="modal-arrow modal-arrow-left" onClick={navigateLeftWithIndicator}>
             <ArrowLeftIcon />
           </button>
         )}
-        {navigateRightWithIndicator && (
+        {navigateRight && (
           <button className="modal-arrow modal-arrow-right" onClick={navigateRightWithIndicator}>
             <ArrowRightIcon />
           </button>
