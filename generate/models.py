@@ -222,7 +222,7 @@ class PokemonForm(BaseModel):
             forme_name = forme_name[1:2]
         elif forme_name == "-La Reine":
             forme_name = "-La_Reine"
-        elif "_Cream" in forme_name or "Caramel_Swirl" in forme_name or "Rainbow_Swirl" in forme_name:
+        elif ("_Cream" in forme_name or "Caramel_Swirl" in forme_name or "Rainbow_Swirl" in forme_name) and game != "champions" :
             forme_name = forme_name[:-6]
         elif self.name == "Tauros-Paldea":
             forme_name = "-Paldea_Combat"
@@ -234,6 +234,12 @@ class PokemonForm(BaseModel):
             forme_name = "-Mega"
         elif is_female:
             forme_name = "-Female"
+
+        if game == 'champions':
+            if forme_name == "-Super":
+                forme_name = "-Jumbo"
+            elif forme_name == "-Masterpiece":
+                forme_name = ""
         
         shiny_suffix = " shiny" if is_shiny else ""
 
