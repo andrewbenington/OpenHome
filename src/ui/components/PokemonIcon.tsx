@@ -13,7 +13,7 @@ import {
   MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
 import { HTMLAttributes, MouseEventHandler, ReactNode } from 'react'
-import { useMonDisplay } from '../hooks/useMonDisplay'
+import { useMonDisplay } from '../hooks/monDisplay'
 import useBoxIconImage from '../pokemon-details/useBoxIconImage'
 import { classNames, grayscaleIf } from '../util/style'
 import { MonTag } from '../util/tags'

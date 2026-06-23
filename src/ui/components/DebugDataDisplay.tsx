@@ -1,17 +1,17 @@
 import { CSSProperties, useState } from 'react'
 import { IconType } from 'react-icons'
 import { MdDataObject } from 'react-icons/md'
-import MiniButton, { MiniButtonProps } from '../components/MiniButton'
 import { InfoGrid } from './InfoGrid'
+import MiniButton, { MiniButtonProps } from './MiniButton'
 import { Dialog } from './dialog/Dialog'
 
-type DevDataDisplayProps = {
+type DebugDataDisplayProps = {
   data?: object
   icon?: IconType
   style?: CSSProperties
 } & MiniButtonProps
 
-export function DevDataDisplay(props: DevDataDisplayProps) {
+export function DebugDataDisplay(props: DebugDataDisplayProps) {
   const [debugModal, setDebugModal] = useState(false)
 
   return (

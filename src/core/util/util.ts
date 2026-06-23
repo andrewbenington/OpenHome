@@ -318,3 +318,7 @@ export function getWeightCalculated(mon: AllPKMFields) {
   const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)
   return formeMetadata.baseWeight * 10 * deviation
 }
+
+export function mapToObject<T>(m: Map<string | number, T>): Record<string, T> {
+  return Object.fromEntries(Array.from(m.entries()))
+}

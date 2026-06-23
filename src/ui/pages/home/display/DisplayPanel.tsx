@@ -3,7 +3,7 @@ import {
   TopRightIndicatorType,
   TopRightIndicatorTypes,
   useMonDisplay,
-} from '../../../hooks/useMonDisplay'
+} from '../../../hooks/monDisplay'
 
 export default function DisplayPanel() {
   const displayState = useMonDisplay()

@@ -11,7 +11,7 @@ import {
 } from '@openhome-ui/components/context-menu'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { useMonDisplay } from '@openhome-ui/hooks/useMonDisplay'
+import { useMonDisplay } from '@openhome-ui/hooks/monDisplay'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'

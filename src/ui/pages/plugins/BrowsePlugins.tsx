@@ -1,8 +1,8 @@
 import { R } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
+import DebugOnly from '@openhome-ui/components/DebugOnly'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import useIsDev from '@openhome-ui/hooks/isDev'
 import { OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin/reducer'
 import { loadPlugin, PluginMetadata } from '@openhome-ui/util/plugin'
 import { Badge, Flex, Progress, Spinner, Switch } from '@radix-ui/themes'
@@ -24,7 +24,6 @@ export default function BrowsePlugins() {
     setUseDevRepo,
     loadInstalled,
   } = useContext(PluginContext)
-  const isDev = useIsDev()
 
   return loading ? (
     <Flex direction="column" justify="center" height="100%">
@@ -32,7 +31,7 @@ export default function BrowsePlugins() {
     </Flex>
   ) : (
     <div className="plugin-page-content">
-      {isDev && (
+      <DebugOnly>
         <label className="flex-row">
           <Switch
             checked={useDevRepo}
@@ -43,7 +42,7 @@ export default function BrowsePlugins() {
           />
           Use Local Repo
         </label>
-      )}
+      </DebugOnly>
       <div className="plugin-page-cards">
         {availablePlugins &&
           Object.entries(availablePlugins).map(([name, location]) => (

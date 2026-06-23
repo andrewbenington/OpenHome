@@ -570,7 +570,7 @@ export function useBanksAndBoxes() {
 
     for (let i = 0; i < ids.length; i += OPENHOME_BOX_SLOTS) {
       const identifiers: BoxMonIdentifiers = new Map()
-      for (let slot = 0; slot < OPENHOME_BOX_SLOTS; slot++) {
+      for (let slot = 0; slot < OPENHOME_BOX_SLOTS && i + slot < ids.length; slot++) {
         identifiers.set(slot, ids[i + slot])
       }
       addBoxCurrentBank('end', boxName, identifiers)

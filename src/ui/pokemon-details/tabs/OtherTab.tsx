@@ -42,11 +42,11 @@ import {
 } from '@openhome-core/util'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import AttributeRowExpand from '@openhome-ui/components/AttributeRowExpand'
+import DebugOnly from '@openhome-ui/components/DebugOnly'
 import DynamaxLevel from '@openhome-ui/components/pokemon/DynamaxLevel'
 import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
-import useIsDev from '@openhome-ui/hooks/isDev'
 import { genderFromBool, Generation, Language, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
@@ -56,7 +56,6 @@ const CM_TO_IN = 0.3937008
 
 const OtherDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
-  const isDev = useIsDev()
 
   const heightCalculated = getHeightCalculated(mon)
   const weightCalculated = getWeightCalculated(mon)
@@ -365,22 +364,22 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               label="Height (Absolute)"
               value={`${Math.floor((mon.heightAbsolute * CM_TO_IN) / 12)}'${Math.round((mon.heightAbsolute * CM_TO_IN) % 12)}" • ${mon.heightAbsolute.toPrecision(5)} cm`}
             />
-            {isDev && (
+            <DebugOnly>
               <AttributeRow
                 label="Height (Calculated)"
                 value={`${Math.floor((heightCalculated * CM_TO_IN) / 12)}'${Math.round((heightCalculated * CM_TO_IN) % 12)}" • ${heightCalculated.toPrecision(5)} cm`}
               />
-            )}
+            </DebugOnly>
             <AttributeRow
               label="Weight (Absolute)"
               value={`${(mon.weightAbsolute * HG_TO_LB).toPrecision(5)} lb • ${(mon.weightAbsolute / 10).toPrecision(5)} kg`}
             />
-            {isDev && (
+            <DebugOnly>
               <AttributeRow
                 label="Weight (Calculated)"
                 value={`${(weightCalculated * HG_TO_LB).toPrecision(5)} lb • ${(weightCalculated / 10).toPrecision(5)} kg`}
               />
-            )}
+            </DebugOnly>
           </>
         )}
         {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) && (

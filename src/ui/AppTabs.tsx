@@ -1,8 +1,8 @@
 import { Separator } from '@base-ui/react/separator'
-import useIsDev from '@openhome-ui/hooks/isDev'
 import { Badge, Box, Flex, ThemePanel } from '@radix-ui/themes'
 import { PropsWithChildren, useContext } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
+import DebugOnly from './components/DebugOnly'
 import { AppTabIconsActive, AppTabIconsInactive } from './components/Icons'
 import { Tabs } from './components/Tabs'
 import AppStateDisplay from './pages/AppStateDisplay'
@@ -17,8 +17,6 @@ import TrackedPokemonPage from './pages/tracked/TrackedPokemonPage'
 import { PluginContext } from './state/plugin/reducer'
 
 export default function AppTabs() {
-  const isDev = useIsDev()
-
   const tab = useLocation().pathname.split('/')[1] || 'home'
   const navigate = useNavigate()
   const { outdatedPluginCount } = useContext(PluginContext)
@@ -71,20 +69,18 @@ export default function AppTabs() {
             <AppTabIconsInactive.Settings />
             Settings
           </Tabs.Tab>
-          {isDev && (
-            <>
-              <Tabs.Tab value="state">
-                <AppTabIconsActive.AppState />
-                <AppTabIconsInactive.AppState />
-                App State
-              </Tabs.Tab>
-              <Tabs.Tab value="component-debug">
-                <AppTabIconsActive.ComponentDebug />
-                <AppTabIconsInactive.ComponentDebug />
-                Visual Debug
-              </Tabs.Tab>
-            </>
-          )}
+          <DebugOnly>
+            <Tabs.Tab value="state">
+              <AppTabIconsActive.AppState />
+              <AppTabIconsInactive.AppState />
+              App State
+            </Tabs.Tab>
+            <Tabs.Tab value="component-debug">
+              <AppTabIconsActive.ComponentDebug />
+              <AppTabIconsInactive.ComponentDebug />
+              Visual Debug
+            </Tabs.Tab>
+          </DebugOnly>
           <Tabs.Indicator />
         </Tabs.IconList>
         <Separator className="Separator" orientation="vertical" />
@@ -99,23 +95,19 @@ export default function AppTabs() {
               <Route path="/plugins/*" element={<PluginsPage />} />
               <Route path="/logs/*" element={<LogsPage />} />
               <Route path="/settings/*" element={<Settings />} />
-              {isDev && (
-                <>
-                  <Route path="/state" element={<AppStateDisplay />} />
-                  <Route path="/component-debug" element={<ComponentDebugDisplay />} />
-                </>
-              )}
+              <DebugOnly>
+                <Route path="/state" element={<AppStateDisplay />} />
+                <Route path="/component-debug" element={<ComponentDebugDisplay />} />
+              </DebugOnly>
             </Routes>
-            {isDev && (
-              <>
-                <Tabs.Panel value="state">
-                  <AppStateDisplay />
-                </Tabs.Panel>
-                <Tabs.Panel value="theme">
-                  <ThemePanel />
-                </Tabs.Panel>
-              </>
-            )}
+            <DebugOnly>
+              <Tabs.Panel value="state">
+                <AppStateDisplay />
+              </Tabs.Panel>
+              <Tabs.Panel value="theme">
+                <ThemePanel />
+              </Tabs.Panel>
+            </DebugOnly>
           </div>
         </Box>
       </Flex>

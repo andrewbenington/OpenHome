@@ -1,6 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
-import { TopRightIndicatorType } from '../../../hooks/useMonDisplay'
+import { TopRightIndicatorType } from '../../../hooks/monDisplay'
 import { getPublicImageURL } from '../../../images/images'
 import { BallsImageList } from '../../../images/items'
 import GenderIcon from '../GenderIcon'
