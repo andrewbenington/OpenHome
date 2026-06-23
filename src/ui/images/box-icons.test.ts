@@ -39,7 +39,7 @@ test('all box icons are present', () => {
   expect(missingSprites).toStrictEqual([])
 })
 
-// test('all box icons are present', () => {
+// test('all home sprites are present', () => {
 //   const allFormData = all_species_data()
 //   const projectRoot = process.cwd()
 
@@ -62,5 +62,5 @@ test('all box icons are present', () => {
 //     }
 //   }
 
-//   expect(missingSprites).toBe([])
+//   expect(missingSprites).toStrictEqual([])
 // })
