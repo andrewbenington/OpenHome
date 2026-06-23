@@ -2,6 +2,7 @@ import sqlite3
 
 from models import PokemonForm, SpeciesRow, SpeciesWithForms
 
+
 def get_species_forms(conn: sqlite3.Connection, natdex: int):
     cursor = conn.cursor()
     cursor.execute(f"SELECT * FROM form WHERE national_dex = {natdex}")
