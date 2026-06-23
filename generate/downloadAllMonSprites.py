@@ -172,8 +172,8 @@ def download_all_sprites(form: PokemonForm):
     # elif form.national_dex <= 809 and not excludeFormGen7(form: PokemonForm):
     #     download_sprite_variants_pokemon_db(
     #         form.national_dex, form.form_index, form_name, "ultra-sun-ultra-moon", "gen7", form.national_dex != 133)
-    # if form.national_dex <= 1025 and form.has_home_sprite():
-    #     download_sprite_variants_bulbagarden(form, "home", "box")
+    if form.national_dex <= 1025 and form.has_home_sprite():
+        download_sprite_variants_bulbagarden(form, "home", "home")
     if form.has_home_sprite() and form.national_dex in IN_CHAMPIONS:
         download_sprite_variants_bulbagarden(form, "champions", "box")
     # if dex_number <= 724 and not excludeFormLA(form: PokemonForm):

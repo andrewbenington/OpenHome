@@ -234,6 +234,7 @@ class PokemonForm(BaseModel):
             forme_name = "-Mega"
         elif is_female:
             forme_name = "-Female"
+        
 
         if game == 'champions':
             if forme_name == "-Super":
@@ -242,6 +243,10 @@ class PokemonForm(BaseModel):
                 forme_name = ""
         
         shiny_suffix = " shiny" if is_shiny else ""
+
+        if game == 'home' and "Vivillon" in self.name:
+            forme_name = forme_name[1:4]
+            shiny_suffix = "_s" if is_shiny else ""
 
         game_str = "Menu_CP_" if game == "champions" else "HOME"
 
