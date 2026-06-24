@@ -106,7 +106,7 @@ export class Label implements CtxMenuElementBuilder {
         null,
         React.createElement(PokemonIcon, {
           dexNumber: mon.dexNum,
-          formeNumber: mon.formNum,
+          formIndex: mon.formNum,
           style: { width: '1.5rem', height: '1.5rem', marginRight: '0.25rem' },
         }),
         mon.nickname

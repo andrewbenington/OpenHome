@@ -302,7 +302,7 @@ function LogLine(props: LogLineProps) {
       </span>
       {ohpkm_id && ohpkmButton && onOhpkmClick && mon && (
         <button className="log-ohpkm-button" onClick={() => onOhpkmClick(ohpkm_id)}>
-          <PokemonIcon dexNumber={mon.dexNum} formeNumber={mon.formNum} />
+          <PokemonIcon dexNumber={mon.dexNum} formIndex={mon.formNum} />
         </button>
       )}
       <MiniButton onClick={onDetailsClick} icon={ExpandIcon} />

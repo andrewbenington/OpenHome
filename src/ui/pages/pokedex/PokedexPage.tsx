@@ -169,7 +169,7 @@ function PokedexDetails({
             {imageError ? (
               <PokemonIcon
                 dexNumber={species.nationalDex}
-                formeNumber={selectedForm.formIndex}
+                formIndex={selectedForm.formIndex}
                 style={{ width: '90%', height: 0, paddingBottom: '90%' }}
                 silhouette={!selectedFormCaught}
               />
@@ -212,7 +212,7 @@ function PokedexDetails({
               >
                 <TooltipPokemonIcon
                   dexNumber={species.nationalDex}
-                  formeNumber={form.formIndex}
+                  formIndex={form.formIndex}
                   style={{ width: '3rem', height: '3rem' }}
                   silhouette={
                     !getFormeStatus(pokedex, species.nationalDex, form.formIndex)?.includes(
@@ -240,7 +240,7 @@ function PokedexDetails({
               >
                 <TooltipPokemonIcon
                   dexNumber={species.nationalDex}
-                  formeNumber={0}
+                  formIndex={0}
                   extraFormIndex={form}
                   style={{ width: '3rem', height: '3rem' }}
                   silhouette={!getFormeStatus(pokedex, species.nationalDex, 0)?.includes('Caught')}

@@ -69,7 +69,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           ) : (
             <PokemonIcon
               dexNumber={mon.dexNum}
-              formeNumber={mon.formNum}
+              formIndex={mon.formNum}
               style={{
                 width: '60%',
                 height: '90%',

@@ -68,7 +68,7 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
 
   const extraFormSprite = mon.extraFormIndex ? extraFormSpriteName(mon.extraFormIndex) : undefined
 
-  const spriteName = extraFormSprite ?? getSpriteName(mon)
+  const spriteName = extraFormSprite ?? getSpriteName(mon, monFormat)
 
   if (extraFormSprite) {
     spriteFolder = 'extra'
@@ -86,21 +86,20 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
   }${spriteName}.${extension}`
 }
 
-export function getSpriteName(mon: MonSpriteData): string {
+export function getSpriteName(mon: MonSpriteData, format?: string): string {
   const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formNum)
+  if (!formeMetadata) return ''
   let spriteName = formeMetadata?.sprite ?? ''
 
-  const female = mon.isFemale ? '-f' : ''
   if (mon.dexNum === NationalDex.Alcremie) {
-    spriteName = `${
-      formeMetadata?.formeName?.toLowerCase() ?? 'alcremie-vanilla-cream'
-    }-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}${female}`
+    if (format === 'PK9' || format === 'PK9Compass') return spriteName
+    spriteName = `${spriteName}-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
   }
   return spriteName
 }
 
 function getRomHackSpritePath(mon: MonSpriteData) {
-  const spriteName = getSpriteName(mon)
+  const spriteName = getSpriteName(mon, mon.format)
   const monFormat = mon.format
   let spriteFolder = fileToSpriteFolder[monFormat as MonFormat]
 

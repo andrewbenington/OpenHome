@@ -1,12 +1,12 @@
 import { Separator } from '@base-ui/react/separator'
-import { Badge, Box, Flex, ThemePanel } from '@radix-ui/themes'
+import { Badge, Box, Flex } from '@radix-ui/themes'
 import { PropsWithChildren, useContext } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
 import DebugOnly from './components/DebugOnly'
+import Fallback from './components/Fallback'
 import { AppTabIconsActive, AppTabIconsInactive } from './components/Icons'
 import { Tabs } from './components/Tabs'
-import AppStateDisplay from './pages/AppStateDisplay'
-import DebugDisplay from './pages/DebugDisplay'
+import DebugDisplay from './pages/debug/DebugDisplay'
 import Home from './pages/home/Home'
 import LogsPage from './pages/logs/LogsPage'
 import PluginsPage from './pages/plugins/Plugins'
@@ -18,10 +18,11 @@ import { PluginContext } from './state/plugin/reducer'
 
 export default function AppTabs() {
   const tab = useLocation().pathname.split('/')[1] || 'home'
-  const navigate = useNavigate()
   const { outdatedPluginCount } = useContext(PluginContext)
 
   const homeElement = <Home />
+
+  const navigate = useNavigate()
 
   return (
     <Tabs.Root
@@ -75,10 +76,10 @@ export default function AppTabs() {
               <AppTabIconsInactive.AppState />
               App State
             </Tabs.Tab>
-            <Tabs.Tab value="component-debug">
+            <Tabs.Tab value="debug">
               <AppTabIconsActive.ComponentDebug />
               <AppTabIconsInactive.ComponentDebug />
-              Visual Debug
+              Debug
             </Tabs.Tab>
           </DebugOnly>
           <Tabs.Indicator />
@@ -86,28 +87,19 @@ export default function AppTabs() {
         <Separator className="Separator" orientation="vertical" />
         <Box style={{ flex: 1, width: '100%', height: '100%', overflowY: 'hidden' }}>
           <div style={{ height: '100%' }}>
-            <Routes>
-              <Route index path="/" element={homeElement} />
-              <Route path="/home" element={homeElement} />
-              <Route path="/manage/*" element={<TrackedPokemonPage />} />
-              <Route path="/sort" element={<SortPokemon />} />
-              <Route path="/pokedex" element={<PokedexPage />} />
-              <Route path="/plugins/*" element={<PluginsPage />} />
-              <Route path="/logs/*" element={<LogsPage />} />
-              <Route path="/settings/*" element={<Settings />} />
-              <DebugOnly>
-                <Route path="/state" element={<AppStateDisplay />} />
-                <Route path="/component-debug" element={<DebugDisplay />} />
-              </DebugOnly>
-            </Routes>
-            <DebugOnly>
-              <Tabs.Panel value="state">
-                <AppStateDisplay />
-              </Tabs.Panel>
-              <Tabs.Panel value="theme">
-                <ThemePanel />
-              </Tabs.Panel>
-            </DebugOnly>
+            <Fallback>
+              <Routes>
+                <Route index path="/" element={homeElement} />
+                <Route path="/home" element={homeElement} />
+                <Route path="/manage/*" element={<TrackedPokemonPage />} />
+                <Route path="/sort" element={<SortPokemon />} />
+                <Route path="/pokedex" element={<PokedexPage />} />
+                <Route path="/plugins/*" element={<PluginsPage />} />
+                <Route path="/logs/*" element={<LogsPage />} />
+                <Route path="/settings/*" element={<Settings />} />
+                <Route path="/debug/*" element={<DebugDisplay />} />
+              </Routes>
+            </Fallback>
           </div>
         </Box>
       </Flex>

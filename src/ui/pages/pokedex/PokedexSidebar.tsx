@@ -121,7 +121,7 @@ function PokedexSidebarButton({ pokedex, species, onClick, selected, style }: Po
       <div className="pokedex-icon-container">
         <PokemonIcon
           dexNumber={species.nationalDex}
-          formeNumber={formIndex}
+          formIndex={formIndex}
           silhouette={!isSeen}
           grayedOut={!isCaught}
         />

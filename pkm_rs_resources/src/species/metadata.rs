@@ -31354,7 +31354,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-icy snow",
                 sprite_index: (0, 24),
             },
             FormMetadata {
@@ -31384,7 +31384,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-polar",
                 sprite_index: (1, 24),
             },
             FormMetadata {
@@ -31414,7 +31414,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-tundra",
                 sprite_index: (2, 24),
             },
             FormMetadata {
@@ -31444,7 +31444,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-continental",
                 sprite_index: (3, 24),
             },
             FormMetadata {
@@ -31474,7 +31474,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-garden",
                 sprite_index: (4, 24),
             },
             FormMetadata {
@@ -31504,7 +31504,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-elegant",
                 sprite_index: (5, 24),
             },
             FormMetadata {
@@ -31534,7 +31534,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-meadow",
                 sprite_index: (6, 24),
             },
             FormMetadata {
@@ -31564,7 +31564,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-modern",
                 sprite_index: (7, 24),
             },
             FormMetadata {
@@ -31594,7 +31594,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-marine",
                 sprite_index: (8, 24),
             },
             FormMetadata {
@@ -31624,7 +31624,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-archipelago",
                 sprite_index: (9, 24),
             },
             FormMetadata {
@@ -31654,7 +31654,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-high-plains",
                 sprite_index: (10, 24),
             },
             FormMetadata {
@@ -31684,7 +31684,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-sandstorm",
                 sprite_index: (11, 24),
             },
             FormMetadata {
@@ -31714,7 +31714,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-river",
                 sprite_index: (12, 24),
             },
             FormMetadata {
@@ -31744,7 +31744,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-monsoon",
                 sprite_index: (13, 24),
             },
             FormMetadata {
@@ -31774,7 +31774,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-savanna",
                 sprite_index: (14, 24),
             },
             FormMetadata {
@@ -31804,7 +31804,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-sun",
                 sprite_index: (15, 24),
             },
             FormMetadata {
@@ -31834,7 +31834,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-ocean",
                 sprite_index: (16, 24),
             },
             FormMetadata {
@@ -31864,7 +31864,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-jungle",
                 sprite_index: (17, 24),
             },
             FormMetadata {
