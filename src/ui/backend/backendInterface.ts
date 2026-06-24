@@ -12,10 +12,14 @@ import { LogFilter } from '../pages/logs'
 import { ConvertStrategies } from '../state/convert-strategies/ConvertStrategiesProvider'
 
 export type AppState = {
-  open_transaction: boolean
-  temp_files: string[]
   is_dev: boolean
   new_features_since_update: UpdateFeatures[]
+  transaction: TransactionState
+}
+
+type TransactionState = {
+  open_transaction: boolean
+  temp_files: string[]
 }
 
 type UpdateFeatures = {

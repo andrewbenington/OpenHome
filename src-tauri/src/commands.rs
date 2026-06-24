@@ -68,7 +68,10 @@ pub fn write_file_bytes(
     absolute_path: &Path,
     bytes: Vec<u8>,
 ) -> Result<()> {
-    state.lock()?.write_file_bytes_temped(absolute_path, bytes)
+    state
+        .lock()?
+        .transaction_mut()
+        .write_file_bytes_temped(absolute_path, bytes)
 }
 
 #[tauri::command]
