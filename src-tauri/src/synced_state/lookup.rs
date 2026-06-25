@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::data_controller::{DataController, DataDir};
 use crate::error::Result;
-use crate::state::synced_state::{self, AllSyncedState};
+use crate::synced_state;
 
 type IdentifierLookup = HashMap<String, String>;
 
@@ -35,9 +35,10 @@ impl LookupState {
 }
 
 impl synced_state::SyncedState for LookupState {
+    type Action = Self;
     const ID: &'static str = "lookups";
 
-    fn union_with(&mut self, other: Self) {
+    fn update(&mut self, other: Self::Action) {
         other.gen_12.into_iter().for_each(|(k, v)| {
             self.gen_12.insert(k, v);
         });
@@ -45,29 +46,35 @@ impl synced_state::SyncedState for LookupState {
             self.gen_345.insert(k, v);
         });
     }
+
+    fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
+        self
+    }
 }
 
 #[tauri::command]
-pub fn get_lookups(synced_state: tauri::State<'_, AllSyncedState>) -> Result<LookupState> {
+pub fn get_lookups(
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+) -> Result<LookupState> {
     synced_state.clone_lookups()
 }
 
 #[tauri::command]
 pub fn add_to_lookups(
     app_handle: tauri::AppHandle,
-    synced_state: tauri::State<'_, AllSyncedState>,
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
     new_entries: LookupState,
 ) -> Result<()> {
     synced_state
         .lock()?
         .lookups
-        .union_with(&app_handle, new_entries)
+        .update(&app_handle, new_entries)
 }
 
 #[tauri::command]
 pub fn remove_dangling(
     app_handle: tauri::AppHandle,
-    synced_state: tauri::State<'_, AllSyncedState>,
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
 ) -> Result<()> {
     // definitely unnecessary clones here
     let mut synced_state = synced_state.lock()?;

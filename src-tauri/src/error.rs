@@ -4,35 +4,41 @@ use std::{fmt::Display, path::PathBuf};
 use semver::Version;
 use serde::{Serialize, Serializer};
 
+type SourceError = Box<dyn std::error::Error>;
+
 #[derive(Debug)]
 pub enum Error {
     DataFolderAccess {
-        source: Box<dyn std::error::Error>,
+        source: SourceError,
     },
     FileAccess {
         path: PathBuf,
-        source: Box<dyn std::error::Error>,
+        source: SourceError,
     },
     FileDownload {
         url: String,
-        source: Box<dyn std::error::Error>,
+        source: SourceError,
     },
     FileMalformed {
         path: PathBuf,
-        source: Box<dyn std::error::Error>,
+        source: SourceError,
     },
     FileWrite {
         path: PathBuf,
-        source: Box<dyn std::error::Error>,
+        source: SourceError,
     },
-    FileWrites(Vec<(PathBuf, Box<dyn std::error::Error>)>),
+    FileWrites(Vec<(PathBuf, SourceError)>),
     FileMissing {
         path: PathBuf,
     },
     MutexFailure,
     TransactionOpen,
+    UnexpectedCondition {
+        context: String,
+        source: Option<SourceError>,
+    },
     WindowAccess {
-        source: Option<Box<dyn std::error::Error>>,
+        source: Option<SourceError>,
     },
     OutdatedVersion {
         last_opened: Version,
@@ -40,78 +46,95 @@ pub enum Error {
     },
     Other {
         context: String,
-        source: Option<Box<dyn std::error::Error>>,
+        source: Option<SourceError>,
     },
     Tauri(tauri::Error),
 }
 
 impl Error {
-    pub fn data_folder<E: std::error::Error + 'static>(source: E) -> Error {
-        Error::DataFolderAccess {
+    pub fn data_folder<E: std::error::Error + 'static>(source: E) -> Self {
+        Self::DataFolderAccess {
             source: Box::new(source),
         }
     }
 
-    pub fn file_access<P, E: std::error::Error + 'static>(path: &P, source: E) -> Error
+    pub fn file_access<P, E: std::error::Error + 'static>(path: &P, source: E) -> Self
     where
         P: AsRef<Path>,
     {
-        Error::FileAccess {
+        Self::FileAccess {
             path: path.as_ref().to_path_buf(),
             source: Box::new(source),
         }
     }
 
-    pub fn file_download<E: std::error::Error + 'static>(url: &str, source: E) -> Error {
-        Error::FileDownload {
+    pub fn file_download<E: std::error::Error + 'static>(url: &str, source: E) -> Self {
+        Self::FileDownload {
             url: url.to_owned(),
             source: Box::new(source),
         }
     }
 
-    pub fn file_malformed<P, E: std::error::Error + 'static>(path: &P, source: E) -> Error
+    pub fn file_malformed<P, E: std::error::Error + 'static>(path: &P, source: E) -> Self
     where
         P: AsRef<Path>,
     {
-        Error::FileMalformed {
+        Self::FileMalformed {
             path: path.as_ref().to_path_buf(),
             source: Box::new(source),
         }
     }
 
-    pub fn file_missing(path: &Path) -> Error {
-        Error::FileMissing {
+    pub fn file_missing(path: &Path) -> Self {
+        Self::FileMissing {
             path: path.to_path_buf(),
         }
     }
 
-    pub fn file_write<P, E: std::error::Error + 'static>(path: &P, source: E) -> Error
+    pub fn file_write<P, E: std::error::Error + 'static>(path: &P, source: E) -> Self
     where
         P: AsRef<Path>,
     {
-        Error::FileWrite {
+        Self::FileWrite {
             path: path.as_ref().to_path_buf(),
             source: Box::new(source),
         }
     }
 
-    pub fn outdated_version(last_opened: Version, this_version: Version) -> Error {
-        Error::OutdatedVersion {
+    pub fn outdated_version(last_opened: Version, this_version: Version) -> Self {
+        Self::OutdatedVersion {
             last_opened,
             this_version,
         }
     }
 
-    pub fn other(context: &str) -> Error {
-        Error::Other {
+    pub fn other(context: &str) -> Self {
+        Self::Other {
             context: context.to_owned(),
             source: None,
         }
     }
 
-    pub fn other_with_source<E: std::error::Error + 'static>(context: &str, source: E) -> Error {
-        Error::Other {
+    pub fn other_with_source<E: std::error::Error + 'static>(context: &str, source: E) -> Self {
+        Self::Other {
             context: context.to_owned(),
+            source: Some(Box::new(source)),
+        }
+    }
+
+    pub fn unexpeted_condition(context: String) -> Self {
+        Self::UnexpectedCondition {
+            context,
+            source: None,
+        }
+    }
+
+    pub fn unexpeted_condition_with_source<E: std::error::Error + 'static>(
+        context: String,
+        source: E,
+    ) -> Self {
+        Self::UnexpectedCondition {
+            context,
             source: Some(Box::new(source)),
         }
     }
@@ -173,6 +196,13 @@ impl Display for Error {
             },
             Self::Tauri(source) => {
                 format!("Tauri error: ({source})")
+            }
+            Self::UnexpectedCondition { context, source } => {
+                let source_str = source
+                    .as_ref()
+                    .map(|msg| format!(": {msg}"))
+                    .unwrap_or_default();
+                format!("UNEXPECTED CONDITION - {context}{source_str}'")
             }
         };
 
