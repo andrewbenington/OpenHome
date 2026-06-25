@@ -3,7 +3,7 @@ use std::ops::Deref;
 use std::sync::Mutex;
 
 use serde::Serialize;
-use tauri::{Emitter, Manager};
+use tauri::Emitter;
 
 use crate::data_controller;
 use crate::error::{Error, Result};
@@ -169,7 +169,7 @@ pub fn save_synced_state(
 
 #[tauri::command]
 pub fn update_synced_state(
-    synced_state: &mut tauri::State<'_, AllSyncedState>,
+    synced_state: tauri::State<'_, AllSyncedState>,
     state_identifier: &str,
     action: serde_json::Value,
 ) -> Result<()> {
