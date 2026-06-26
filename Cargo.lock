@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "OpenHome"
-version = "1.12.0"
+version = "1.12.1"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -2782,7 +2782,7 @@ checksum = "19f132c84eca552bf34cab8ec81f1c1dcc229b811638f9d283dceabe58c5569e"
 
 [[package]]
 name = "pkm_rs"
-version = "1.12.0"
+version = "1.12.1"
 dependencies = [
  "aes",
  "arbitrary-int",
@@ -2810,7 +2810,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_derive"
-version = "1.12.0"
+version = "1.12.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2819,7 +2819,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_resources"
-version = "1.12.0"
+version = "1.12.1"
 dependencies = [
  "arbitrary-int",
  "getrandom 0.4.3",
@@ -2839,7 +2839,7 @@ dependencies = [
 
 [[package]]
 name = "pkm_rs_types"
-version = "1.12.0"
+version = "1.12.1"
 dependencies = [
  "arbitrary-int",
  "chrono",

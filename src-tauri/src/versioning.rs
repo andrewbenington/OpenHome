@@ -161,6 +161,7 @@ pub enum SignificantUpdate {
     V1_11_3,
     V1_11_4,
     V1_12_0,
+    V1_12_1,
 }
 
 impl SignificantUpdate {
@@ -187,6 +188,7 @@ impl SignificantUpdate {
             Self::V1_11_3 => Version::parse("1.11.3").unwrap(),
             Self::V1_11_4 => Version::parse("1.11.4").unwrap(),
             Self::V1_12_0 => Version::parse("1.12.0").unwrap(),
+            Self::V1_12_1 => Version::parse("1.12.1").unwrap(),
         }
     }
 
@@ -277,6 +279,11 @@ impl SignificantUpdate {
                 "Added support for Pokémon Compass.",
                 "Added structured logging and a new tab to view logs.",
                 "The Pokémon details modal has a tab for Pokémon-specific logs, including when fields are updated.",
+            ]),
+            Self::V1_12_1 => Some(vec![
+                "Abilities for mega evolutions added in Pokémon Champions v1.10.0 have been added.",
+                "Missing box icons and Home sprites have been fixed.",
+                "Vivillon and Alcremie now have the correct box icons and Home sprites for their forms.",
             ]),
             _ => None,
         }
