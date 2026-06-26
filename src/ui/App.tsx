@@ -35,6 +35,8 @@ const ZOOM_CHANGE_PCT = 5
 const ZOOM_MIN_PCT = 50
 const ZOOM_MAX_PCT = 160
 
+const REDIRECT_WEB_CONSOLE = false
+
 export default function App() {
   const isDarkMode = useIsDarkMode()
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
@@ -184,6 +186,7 @@ function AppWithBackend() {
 const webConsole = { ...console }
 
 function patchConsole(backend: BackendInterface) {
+  if (!REDIRECT_WEB_CONSOLE) return
   const levels = [
     ['log', 'INFO'],
     ['info', 'INFO'],
