@@ -930,7 +930,7 @@ export type SaveError =
 
 export type SaveErrorType = SaveError['type']
 
-export function pokedexSeenFromSave(saveFile: SAV) {
+function pokedexSeenFromSave(saveFile: SAV) {
   const pokedexUpdates: PokedexUpdate[] = []
 
   for (const mon of saveFile.getAllMons()) {

@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { IconType } from 'react-icons'
 import { MdDataArray } from 'react-icons/md'
 import { cssClass } from '../util/style'
@@ -12,7 +11,7 @@ export type MiniButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 export default function MiniButton(props: MiniButtonProps) {
   const { icon, style, label, ...buttonProps } = props
 
-  const Icon = useMemo(() => icon ?? MdDataArray, [icon])
+  const Icon = icon ?? MdDataArray
 
   return (
     <button

@@ -53,9 +53,4 @@ export const ConversionSettingsContext = createContext<
   async () => R.Err('Uninitialized'),
 ])
 
-export const DEFAULT_CONVERT_STRATEGY: ConvertStrategy = {
-  'nickname.capitalization': 'GameDefault',
-  'metData.originAndLocation': 'UseLocationNameMatch',
-}
-
 export type ConvertStrategyKey = keyof ConvertStrategy

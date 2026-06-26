@@ -1,7 +1,5 @@
 import { PkmType, PkmTypes } from '@pkm-rs/pkg'
 
-export type TeraType = PkmType | 'Stellar'
-
 export const Types: PkmType[] = [
   'Normal',
   'Fighting',

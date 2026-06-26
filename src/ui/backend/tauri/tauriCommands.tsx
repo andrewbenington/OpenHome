@@ -18,7 +18,7 @@ import {
 } from '../backendInterface'
 import { RustResult } from './types'
 
-export type StringToBytes = Record<string, Uint8Array>
+type StringToBytes = Record<string, Uint8Array>
 export type StringToB64 = Record<string, string>
 
 function invokeAndCatch<C extends OhCommand>(
@@ -27,22 +27,6 @@ function invokeAndCatch<C extends OhCommand>(
   options?: InvokeOptions
 ): Promise<Errorable<OhCommandResult<C>>> {
   return R.tryPromise(invoke(cmd, args, options))
-}
-
-// remove this after node 25 is lts
-if (!('fromBase64' in Uint8Array)) {
-  // @ts-expect-error – intentionally adding this static constructor because it is relatively new to javascript
-  Uint8Array.fromBase64 = function (base64: string): Uint8Array {
-    const binary = atob(base64)
-    const len = binary.length
-    const bytes = new Uint8Array(len)
-
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binary.charCodeAt(i)
-    }
-
-    return bytes
-  }
 }
 
 const ZERO_UUID = '00000000-0000-0000-0000-000000000000'
@@ -286,7 +270,7 @@ export type StoredBankDataSerialized = {
   current_bank: number
 }
 
-export type OpenHomeBankSerialized = {
+type OpenHomeBankSerialized = {
   id: string
   index: number
   name: string | undefined
@@ -294,7 +278,7 @@ export type OpenHomeBankSerialized = {
   current_box: number
 }
 
-export type OpenHomeBoxSerialized = {
+type OpenHomeBoxSerialized = {
   id: string
   index: number
   name: string | null

@@ -2,9 +2,12 @@ import { PK2 } from '@openhome-core/pkm'
 import { EXCLAMATION } from '@openhome-core/resources/consts/Forms'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
-import { get8BitChecksum } from '@openhome-core/save/util/byteLogic'
-import { gen12StringToUTF, utf16StringToGen12 } from '@openhome-core/save/util/Strings'
+import { get8BitChecksum } from '@openhome-core/util/byteLogic'
 import { Option, unique } from '@openhome-core/util/functional'
+import {
+  readGameBoyStringFromBytes,
+  utf16StringToGen12,
+} from '@openhome-core/util/stringConversion'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -21,6 +24,7 @@ import { emptyPathData, PathData } from './util/path'
 const CURRENT_BOX_OFFSET_GS_INTL = 0x2724
 const CURRENT_BOX_OFFSET_C_INTL = 0x2700
 const MIN_SAVE_SIZE_BYTES = 0x8000
+const TRAINER_NAME_SIZE = 11
 
 export class G2SAV extends OfficialSAV<PK2> {
   static pkmType = PK2
@@ -57,12 +61,13 @@ export class G2SAV extends OfficialSAV<PK2> {
 
   constructor(path: PathData, bytes: Uint8Array) {
     super()
-    const dataView = new DataView(bytes.buffer)
     this.bytes = bytes
+    const dataView = new DataView(this.bytes.buffer)
+
     this.filePath = path
     this.tid = dataView.getInt16(0x2009)
     this.displayID = this.tid.toString().padStart(5, '0')
-    this.name = gen12StringToUTF(this.bytes, 0x200b, 11)
+    this.name = readGameBoyStringFromBytes(dataView, 0x200b, TRAINER_NAME_SIZE)
     this.boxOffsets = [
       0x4000, 0x4450, 0x48a0, 0x4cf0, 0x5140, 0x5590, 0x59e0, 0x6000, 0x6450, 0x68a0, 0x6cf0,
       0x7140, 0x7590, 0x79e0,
@@ -100,21 +105,21 @@ export class G2SAV extends OfficialSAV<PK2> {
           ).buffer
         )
 
-        mon.trainerName = gen12StringToUTF(
-          this.bytes,
-          offset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + monIndex * 11,
-          11
+        mon.trainerName = readGameBoyStringFromBytes(
+          dataView,
+          offset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + monIndex * TRAINER_NAME_SIZE,
+          TRAINER_NAME_SIZE
         )
-        mon.nickname = gen12StringToUTF(
-          this.bytes,
+        mon.nickname = readGameBoyStringFromBytes(
+          dataView,
           offset +
             1 +
             pokemonPerBox +
             1 +
             pokemonPerBox * 0x20 +
-            pokemonPerBox * 11 +
-            monIndex * 11,
-          11
+            pokemonPerBox * TRAINER_NAME_SIZE +
+            monIndex * TRAINER_NAME_SIZE,
+          TRAINER_NAME_SIZE
         )
         mon.gameOfOrigin = mon.metLevel ? OriginGame.Crystal : this.origin
         mon.language = Language.English
@@ -143,14 +148,19 @@ export class G2SAV extends OfficialSAV<PK2> {
             boxByteOffset + 1 + pokemonPerBox + 1 + numMons * 0x20
           )
           // set the mon's OT name in the box
-          const trainerNameBuffer = utf16StringToGen12(boxMon.trainerName, 11, true)
+          const trainerNameBuffer = utf16StringToGen12(boxMon.trainerName, TRAINER_NAME_SIZE, true)
 
           this.bytes.set(
             trainerNameBuffer,
-            boxByteOffset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + numMons * 11
+            boxByteOffset +
+              1 +
+              pokemonPerBox +
+              1 +
+              pokemonPerBox * 0x20 +
+              numMons * TRAINER_NAME_SIZE
           )
           // set the mon's nickname in the box
-          const nicknameBuffer = utf16StringToGen12(boxMon.nickname, 11, true)
+          const nicknameBuffer = utf16StringToGen12(boxMon.nickname, TRAINER_NAME_SIZE, true)
 
           this.bytes.set(
             nicknameBuffer,
@@ -159,8 +169,8 @@ export class G2SAV extends OfficialSAV<PK2> {
               pokemonPerBox +
               1 +
               pokemonPerBox * 0x20 +
-              pokemonPerBox * 11 +
-              numMons * 11
+              pokemonPerBox * TRAINER_NAME_SIZE +
+              numMons * TRAINER_NAME_SIZE
           )
           numMons++
         }
@@ -178,19 +188,19 @@ export class G2SAV extends OfficialSAV<PK2> {
         )
         // set all OT names to all 0s
         this.bytes.set(
-          new Uint8Array(11 * remainingSlots),
-          boxByteOffset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + numMons * 11
+          new Uint8Array(TRAINER_NAME_SIZE * remainingSlots),
+          boxByteOffset + 1 + pokemonPerBox + 1 + pokemonPerBox * 0x20 + numMons * TRAINER_NAME_SIZE
         )
         // set all nicknames to all 0s
         this.bytes.set(
-          new Uint8Array(11 * remainingSlots),
+          new Uint8Array(TRAINER_NAME_SIZE * remainingSlots),
           boxByteOffset +
             1 +
             pokemonPerBox +
             1 +
             pokemonPerBox * 0x20 +
-            pokemonPerBox * 11 +
-            numMons * 11
+            pokemonPerBox * TRAINER_NAME_SIZE +
+            numMons * TRAINER_NAME_SIZE
         )
       }
       // add terminator

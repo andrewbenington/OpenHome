@@ -13,7 +13,7 @@ import PK8Schema from './PK8.json'
 import PK9Schema from './PK9.json'
 import XDPKMSchema from './XDPKM.json'
 
-export type SchemaField = {
+type SchemaField = {
   name?: string
   type?: string
   byteOffset?: number

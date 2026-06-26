@@ -1,8 +1,6 @@
 import { Dialog as BaseUiDialog } from '@base-ui/react/dialog'
 import styles from './Dialog.module.css'
 
-export const FORCE_DIALOG_FOR_TESTING = false
-
 export type DialogContainerProps = React.ComponentProps<typeof BaseUiDialog.Popup> &
   Pick<React.ComponentProps<typeof BaseUiDialog.Root>, 'open' | 'onOpenChange'>
 

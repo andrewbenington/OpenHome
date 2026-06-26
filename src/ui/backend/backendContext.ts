@@ -1,12 +1,8 @@
 import { SaveWriter } from '@openhome-core/save/interfaces'
 import { Errorable, R } from '@openhome-core/util/functional'
-import { createContext, PropsWithChildren } from 'react'
+import { createContext } from 'react'
 import BackendInterface from './backendInterface'
 import DummyBackend from './dummyBackend'
-
-export type BackendProviderProps = {
-  backend: BackendInterface
-} & PropsWithChildren
 
 function addHelpersToBackend(backend: BackendInterface): BackendWithHelpersInterface {
   return {

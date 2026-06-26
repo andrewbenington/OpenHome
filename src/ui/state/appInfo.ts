@@ -21,7 +21,7 @@ import { G3RRSAV } from '@openhome-core/save/radicalred/G3RRSAV'
 import { G3UBSAV } from '@openhome-core/save/unbound/G3UBSAV'
 import { PluginSaveClass, SAVClass } from '@openhome-core/save/util'
 import { XYSAV } from '@openhome-core/save/XYSAV'
-import { MonDisplayState } from '@openhome-ui/hooks/useMonDisplay'
+import { MonDisplayState } from '@openhome-ui/hooks/monDisplay'
 import { SaveViewMode } from '@openhome-ui/saves/util'
 import { updateStyleForUiScale } from '@openhome-ui/util/style'
 import { Dispatch, Reducer, createContext } from 'react'
@@ -47,7 +47,7 @@ export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
 ]
 const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV, CompassSave]
 
-export function initialMonDisplayState() {
+function initialMonDisplayState() {
   return {
     filter: {},
     topRightIndicator: null,

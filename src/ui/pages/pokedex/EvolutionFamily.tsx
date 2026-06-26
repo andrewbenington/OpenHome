@@ -103,7 +103,7 @@ function EvolutionLine({ nationalDex, formNumber, pokedex, onClick }: EvolutionF
         </Flex>
         <TooltipPokemonIcon
           dexNumber={nationalDex}
-          formeNumber={formNumber}
+          formIndex={formNumber}
           silhouette={!getFormeStatus(pokedex, nationalDex, formNumber)?.includes('Caught')}
           onClick={() => onClick?.(nationalDex, formNumber)}
         />
@@ -134,7 +134,7 @@ function EvolutionLine({ nationalDex, formNumber, pokedex, onClick }: EvolutionF
     <Flex align="center" gap="2">
       <TooltipPokemonIcon
         dexNumber={nationalDex}
-        formeNumber={formNumber}
+        formIndex={formNumber}
         silhouette={!getFormeStatus(pokedex, nationalDex, formNumber)?.includes('Caught')}
         onClick={() => onClick?.(nationalDex, formNumber)}
       />
@@ -151,7 +151,7 @@ function EvolutionLine({ nationalDex, formNumber, pokedex, onClick }: EvolutionF
               />
               <TooltipPokemonIcon
                 dexNumber={nationalDex}
-                formeNumber={mega.megaForme.formIndex}
+                formIndex={mega.megaForme.formIndex}
                 silhouette={
                   !getFormeStatus(pokedex, nationalDex, mega.megaForme.formIndex)?.includes(
                     'Caught'

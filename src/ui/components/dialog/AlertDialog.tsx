@@ -1,8 +1,6 @@
 import { AlertDialog as BaseUiAlertDialog } from '@base-ui/react/alert-dialog'
 import styles from './Dialog.module.css'
 
-export const FORCE_DIALOG_FOR_TESTING = false
-
 export type AlertDialogContainerProps = React.ComponentProps<typeof BaseUiAlertDialog.Popup> &
   Pick<React.ComponentProps<typeof BaseUiAlertDialog.Root>, 'open' | 'onOpenChange'>
 

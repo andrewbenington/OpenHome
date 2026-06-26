@@ -1,0 +1,94 @@
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { DebugDataDisplay } from '@openhome-ui/components/DebugDataDisplay'
+import { InfoGrid } from '@openhome-ui/components/InfoGrid'
+import { useTransactionState } from '@openhome-ui/state/app-state'
+import { AppInfoContext, AppInfoState } from '@openhome-ui/state/appInfo'
+import { ErrorContext } from '@openhome-ui/state/error'
+import { ItemBagContext, ItemBagState } from '@openhome-ui/state/items'
+import { Item, Lookup, OriginGames, SpeciesLookup } from '@pkm-rs/pkg'
+import { Card, Flex, Heading, Separator } from '@radix-ui/themes'
+import { useContext } from 'react'
+import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
+import { useOhpkmStore } from '../../state/ohpkm'
+
+export default function AppStateDisplay() {
+  const transactionState = useTransactionState()
+  const [appInfoState] = useContext(AppInfoContext)
+  const [errorState, dispatchErrorState] = useContext(ErrorContext)
+  const [bagState] = useContext(ItemBagContext)
+  const ohpkmStore = useOhpkmStore()
+
+  return (
+    <Flex direction="column">
+      <Card style={{ margin: 8 }}>
+        <Flex direction="column" gap="2">
+          <Heading size="4">Backend Transaction State</Heading>
+          <Separator style={{ width: '100%', color: 'inherit' }} />
+          <InfoGrid data={transactionState ?? {}} />
+        </Flex>
+      </Card>
+      <Card className="flex-row" style={{ margin: 8, gap: 8 }}>
+        <DebugDataDisplay data={appInfoDisplay(appInfoState)} label="App Info State" />
+        <DebugDataDisplay data={useBanksAndBoxesDisplay()} label="Saves/Mons State" />
+        <DebugDataDisplay data={ohpkmStoreDisplay(ohpkmStore.byId)} label="OHPKM Store" />
+        <DebugDataDisplay data={bagDisplay(bagState)} label="Bag State" />
+        <DebugDataDisplay data={errorState} label="Error State" />
+        <button
+          onClick={() =>
+            dispatchErrorState({
+              type: 'set_message',
+              payload: { title: 'Test Error Title', messages: ['Message 1', 'Message 2'] },
+            })
+          }
+        >
+          Test Error
+        </button>
+      </Card>
+    </Flex>
+  )
+}
+
+function appInfoDisplay(state: AppInfoState) {
+  return {
+    settings: state.settings,
+    officialSaveTypes: state.officialSaveTypes.map((saveType) => saveType.name),
+  }
+}
+
+function useBanksAndBoxesDisplay() {
+  const { banks } = useBanksAndBoxes()
+  return {
+    Banks: banks.map((bank) => ({
+      name: bank.name,
+      index: bank.index,
+    })),
+  }
+}
+
+function ohpkmStoreDisplay(state: Record<string, OHPKM>) {
+  return Object.fromEntries(Object.entries(state).map(([key, val]) => [key, monDisplay(val)]))
+}
+
+function monDisplay(mon: PKMInterface) {
+  const species = SpeciesLookup(mon.dexNum)
+
+  return {
+    species: Lookup.speciesName(mon.dexNum, mon.language),
+    form: species?.forms[mon.formNum ?? 0].formeName,
+    nickname: mon.nickname,
+    origin: mon.gameOfOrigin ? `Pokémon ${OriginGames.gameNameFull(mon.gameOfOrigin)}` : undefined,
+  }
+}
+
+function bagDisplay(state: ItemBagState) {
+  return {
+    Loaded: state.loaded,
+    Modified: state.modified,
+    Error: state.error ?? 'None',
+    Items: Object.entries(state.itemCounts).map(([indexStr, qty]) => ({
+      name: Item.fromIndex(parseInt(indexStr)),
+      qty,
+    })),
+  }
+}

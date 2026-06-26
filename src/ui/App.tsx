@@ -6,8 +6,8 @@ import BackendInterface from '@openhome-ui/backend/backendInterface'
 import { BackendProvider } from '@openhome-ui/backend/backendProvider'
 import { TauriBackend } from '@openhome-ui/backend/tauri/tauriBackend'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
+import useDebounce from '@openhome-ui/hooks/debounce'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import useDebounce from '@openhome-ui/hooks/useDebounce'
 import { TransactionStateProvider } from '@openhome-ui/state/app-state'
 import {
   AppInfoContext,
@@ -112,7 +112,6 @@ function AppWithBackend() {
     // returns a function to stop listening
     const stopListening = backend.onMenuEvents({
       zoom_in: () => {
-        patchConsole(backend)
         appInfoDispatch({
           type: 'set_zoom_level',
           payload: Math.min(appInfoState.settings.zoomLevel + ZOOM_CHANGE_PCT, ZOOM_MAX_PCT),

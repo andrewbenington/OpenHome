@@ -68,7 +68,7 @@ export class Item implements CtxMenuElementBuilder {
   }
 }
 
-export function contentIsLabel(content: ElementContent): content is { label: string } {
+function contentIsLabel(content: ElementContent): content is { label: string } {
   return 'label' in content
 }
 
@@ -106,7 +106,7 @@ export class Label implements CtxMenuElementBuilder {
         null,
         React.createElement(PokemonIcon, {
           dexNumber: mon.dexNum,
-          formeNumber: mon.formNum,
+          formIndex: mon.formNum,
           style: { width: '1.5rem', height: '1.5rem', marginRight: '0.25rem' },
         }),
         mon.nickname
@@ -121,7 +121,7 @@ export class Label implements CtxMenuElementBuilder {
 
 //* SEPARATOR *//
 
-export const SeparatorData = Object.freeze({ __cm_type_tag: 'separator' })
+const SeparatorData = Object.freeze({ __cm_type_tag: 'separator' })
 
 type Separator = typeof SeparatorData
 

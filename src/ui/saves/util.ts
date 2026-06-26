@@ -75,7 +75,7 @@ export function filterEmpty<T>(value: T | null | undefined): value is T {
   return value !== null && value !== undefined
 }
 
-export function getNextFullSlotBoxWrapping(save: SAV, boxNum: number, boxSlot: number): number {
+function getNextFullSlotBoxWrapping(save: SAV, boxNum: number, boxSlot: number): number {
   let peekSlot = boxSlot
   function slotIsEmpty(index: number) {
     return save.getMonAt(boxNum, index) === undefined
@@ -88,7 +88,7 @@ export function getNextFullSlotBoxWrapping(save: SAV, boxNum: number, boxSlot: n
   return peekSlot
 }
 
-export function getPrevFullSlotBoxWrapping(save: SAV, boxNum: number, boxSlot: number): number {
+function getPrevFullSlotBoxWrapping(save: SAV, boxNum: number, boxSlot: number): number {
   let peekSlot = boxSlot
   function slotIsEmpty(index: number) {
     return save.getMonAt(boxNum, index) === undefined

@@ -6,7 +6,7 @@ import {
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '@openhome-core/save/util/byteLogic'
+} from '@openhome-core/util/byteLogic'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -23,9 +23,9 @@ import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
 import { emptyPathData, PathData } from './util/path'
 
-export const SAVE_SIZE_BYTES = 0x20000
-export const EMERALD_SECURITY_OFFSET = 0xac
-export const EMERALD_SECURITY_COPY_OFFSET = 0x01f4
+const SAVE_SIZE_BYTES = 0x20000
+const EMERALD_SECURITY_OFFSET = 0xac
+const EMERALD_SECURITY_COPY_OFFSET = 0x01f4
 export const FRLG_SECURITY_OFFSET = 0x0af8
 export const FRLG_SECURITY_COPY_OFFSET = 0x0f20
 export const GEN3_SIGNATURE_OFFSET = 0x0ff8

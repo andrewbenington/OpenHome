@@ -1,9 +1,9 @@
 import { PK4 } from '@openhome-core/pkm'
 import { Item } from '@openhome-core/resources/consts/Items'
 import { PT_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
-import { bytesToUint16LittleEndian } from '@openhome-core/save/util/byteLogic'
-import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { bytesToUint16LittleEndian } from '@openhome-core/util/byteLogic'
+import { readGen4StringFromBytes } from '@openhome-core/util/stringConversion'
 import { ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { G4SAV } from './G4SAV'
 import { hasDesamumeFooter } from './util'
@@ -68,7 +68,7 @@ export class PtSAV extends G4SAV {
     }
     this.currentSaveBoxStartOffset = this.currentSaveStorageBlockOffset + 4
     this.boxNamesOffset = this.currentSaveStorageBlockOffset + PtSAV.BOX_NAMES_OFFSET
-    this.name = gen4StringToUTF(bytes, PtSAV.TRAINER_NAME_OFFSET, 8)
+    this.name = readGen4StringFromBytes(new DataView(bytes.buffer), PtSAV.TRAINER_NAME_OFFSET, 8)
     this.tid = bytesToUint16LittleEndian(bytes, PtSAV.TRAINER_ID_OFFSET)
     this.sid = bytesToUint16LittleEndian(bytes, PtSAV.TRAINER_ID_OFFSET + 2)
     this.displayID = this.tid.toString().padStart(5, '0')

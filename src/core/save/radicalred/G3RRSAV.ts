@@ -1,4 +1,5 @@
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
+import { bytesToUint32LittleEndian } from '@openhome-core/util/byteLogic'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -14,7 +15,6 @@ import {
   GEN3_SIGNATURE_OFFSET,
 } from '../G3SAV'
 import { SlotMetadata } from '../interfaces'
-import { bytesToUint32LittleEndian } from '../util/byteLogic'
 import { PathData } from '../util/path'
 import { RRExcludedForms, RRTransferMon } from './conversion/RRTransferMons'
 import PK3RR from './PK3RR'

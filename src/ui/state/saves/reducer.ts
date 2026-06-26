@@ -5,7 +5,7 @@ import { SAVClass } from '@openhome-core/save/util'
 import { Option } from '@openhome-core/util/functional'
 import { createContext, Dispatch, Reducer } from 'react'
 
-export type OpenSave = {
+type OpenSave = {
   index: number
   save: SAV
 }
@@ -176,7 +176,3 @@ export const SavesContext = createContext<SavesContextValue>({
   allOpenSaves: [],
   promptDisambiguation: async () => undefined,
 })
-
-export function saveFromIdentifier(state: OpenSavesState, identifier: SaveIdentifier): Option<SAV> {
-  return state.openSaves[identifier]?.save
-}

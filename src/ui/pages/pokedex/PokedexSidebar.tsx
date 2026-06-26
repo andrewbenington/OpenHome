@@ -1,5 +1,5 @@
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
-import useSimpleVirtualizer from '@openhome-ui/hooks/useSimpleVirtualizer'
+import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import { cssClass } from '@openhome-ui/util/style'
@@ -121,7 +121,7 @@ function PokedexSidebarButton({ pokedex, species, onClick, selected, style }: Po
       <div className="pokedex-icon-container">
         <PokemonIcon
           dexNumber={species.nationalDex}
-          formeNumber={formIndex}
+          formIndex={formIndex}
           silhouette={!isSeen}
           grayedOut={!isCaught}
         />

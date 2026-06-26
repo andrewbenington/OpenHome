@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
 import { fileURLToPath, URL } from 'url'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   test: {
@@ -9,6 +9,7 @@ export default defineConfig({
     setupFiles: ['src/test-setup.ts'],
     hideSkippedTests: true,
   },
+
   resolve: {
     alias: {
       src: fileURLToPath(new URL('./src', import.meta.url)),

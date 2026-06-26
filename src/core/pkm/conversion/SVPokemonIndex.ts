@@ -1,4 +1,4 @@
-export const fromSVPokemonIndexMap: { [key: number]: number } = {
+const fromSVPokemonIndexMap: { [key: number]: number } = {
   917: 982,
   918: 917,
   919: 918,
@@ -114,7 +114,7 @@ export function fromSVPokemonIndex(key: number): number {
   return key
 }
 
-export const toSVPokemonIndexMap: { [key: number]: number } = {
+const toSVPokemonIndexMap: { [key: number]: number } = {
   982: 917,
   917: 918,
   918: 919,

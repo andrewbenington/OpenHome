@@ -35,7 +35,7 @@ export default function Gen12Lookup({ onSelectMon }: Gen12LookupProps) {
           >
             <PokemonIcon
               dexNumber={value.homeMon.dexNum}
-              formeNumber={value.homeMon.formNum}
+              formIndex={value.homeMon.formNum}
               style={{ width: 30, height: 30 }}
             />
           </button>

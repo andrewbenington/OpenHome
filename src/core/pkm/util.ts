@@ -87,38 +87,6 @@ export const generateIVs = (prng: Prando) => {
   }
 }
 
-export const generateDVs = (prng: Prando, isShiny: boolean) => {
-  if (isShiny) {
-    let atkDV = prng.nextInt(0, 15)
-
-    if ((atkDV & 0b11) === 0b01) {
-      atkDV += 1
-    } else if (atkDV % 4 === 0) {
-      atkDV += 2
-    }
-    const hpDV = (atkDV & 1) << 3
-
-    return {
-      hp: hpDV,
-      atk: atkDV,
-      def: 10,
-      spc: 10,
-      spe: 10,
-    }
-  }
-  return {
-    hp: prng.nextInt(0, 15),
-    atk: prng.nextInt(0, 15),
-    def: prng.nextInt(0, 15),
-    spc: prng.nextInt(0, 15),
-    spe: prng.nextInt(0, 15),
-  }
-}
-
-export const generatePersonalityValue = () => {
-  return Math.floor(Math.random() * 2 ** 32)
-}
-
 // recursively returns pre-evolution. if provided a mega form, returns the first pre-evolution
 // of the base form.
 export const getBaseMon = (dexNum: number, form?: number) => {

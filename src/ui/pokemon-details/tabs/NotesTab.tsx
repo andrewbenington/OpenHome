@@ -1,5 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import useDebounce from '@openhome-ui/hooks/useDebounce'
+import useDebounce from '@openhome-ui/hooks/debounce'
 import { useSaves } from '@openhome-ui/state/saves'
 import { TextArea } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'

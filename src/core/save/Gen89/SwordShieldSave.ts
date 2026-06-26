@@ -16,8 +16,7 @@ import {
   Languages,
   Lookup,
   OriginGame,
-  Pk8,
-  Pk8 as Pk8Wasm,
+  Pk8Wasm,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
@@ -71,7 +70,7 @@ export class SwordShieldSave extends Gen8Gen9Save<PK8> {
   }
 
   emptyBoxSlotBytes() {
-    return Pk8.emptyBoxSlotBytes(this.name)
+    return Pk8Wasm.emptyBoxSlotBytes(this.name)
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {

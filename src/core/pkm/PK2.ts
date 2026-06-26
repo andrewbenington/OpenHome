@@ -1,5 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import * as byteLogic from '@openhome-core/util/byteLogic'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   ConvertStrategy,
@@ -11,7 +12,6 @@ import {
   SpeciesLookup,
   StatsPreSplit,
 } from '@pkm-rs/pkg'
-import * as byteLogic from '../util/byteLogic'
 import * as stringLogic from '../util/stringConversion'
 import * as types from '../util/types'
 import { MoveFilter } from '../util/util'

@@ -1,4 +1,4 @@
-export type PartitionedResults<A, E> = { successes: A[]; failures: E[] }
+type PartitionedResults<A, E> = { successes: A[]; failures: E[] }
 
 export function partitionResults<A, E>(results: Result<A, E>[]) {
   const acc: PartitionedResults<A, E> = {
@@ -22,55 +22,14 @@ export function range(startOrSize: number, end?: number) {
   return end ? [...Array(end).keys()].slice(startOrSize) : [...Array(startOrSize).keys()]
 }
 
-export function matches<T>(value: T) {
-  return (other: T | undefined) => other === value
-}
-
 export function unique<T>(items: T[] | undefined): T[] {
   return Array.from(new Set(items))
-}
-
-// remove this after ES2025 is lts
-if (!Set.prototype.union) {
-  Set.prototype.union = function (other) {
-    const r = new Set(this)
-    const it = other.keys()
-    let next = it.next()
-    while (!next.done) {
-      r.add(next.value)
-      next = it.next()
-    }
-    return r
-  }
-}
-export function union<T>(first: T[] | undefined, second: T[]): T[] {
-  const set1 = new Set(first)
-  const set2 = new Set(second)
-  return Array.from(set1.union(set2))
-}
-
-// remove this after ES2025 is lts
-if (!Set.prototype.intersection) {
-  Set.prototype.intersection = function (other) {
-    const r = new Set()
-    for (const v of this) if (other.has(v)) r.add(v)
-    return r
-  }
 }
 
 export function intersection<T>(first: T[] | undefined, second: T[]): T[] {
   const set1 = new Set(first)
   const set2 = new Set(second)
   return Array.from(set1.intersection(set2))
-}
-
-// remove this after ES2025 is lts
-if (!Set.prototype.difference) {
-  Set.prototype.difference = function (other) {
-    const r = new Set()
-    for (const v of this) if (!other.has(v)) r.add(v)
-    return r
-  }
 }
 
 export function difference<T>(first: T[] | undefined, second: T[]): T[] {

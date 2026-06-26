@@ -1,8 +1,7 @@
 use super::Pk8Buffer;
-use super::pk8_buffer::{Pk8BufferMut, Pk8BufferRef};
+use super::pk8_buffer::Pk8BufferMut;
 use super::{Pk8AbilityIndex, Pk8SpeciesAndForm};
 use crate::checksum::{Checksum, RefreshChecksum};
-use crate::encryption::BlockEncrypt;
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
@@ -39,7 +38,7 @@ use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::RandomizeAndFix;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "Pk8Wasm"))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct Pk8 {
@@ -129,7 +128,7 @@ impl Pk8 {
     // Deserialise from a Pk8Buffer (the single source of all byte offsets)
     // ------------------------------------------------------------------
 
-    pub fn from_buffer(buf: &Pk8BufferRef) -> Result<Self> {
+    pub fn from_buffer<S: AsRef<[u8]>>(buf: &Pk8Buffer<S>) -> Result<Self> {
         let home_tracker_raw = buf.home_tracker_raw();
         let mut mon = Pk8 {
             encryption_constant: buf.encryption_constant(),
@@ -301,12 +300,15 @@ impl Pk8 {
         }
     }
 
-    pub fn from_encrypted_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::from_bytes(&Pk8Buffer::new(bytes).to_decrypted_bytes())
+    pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
+        Self::from_buffer(Pk8Buffer::new_mut(&mut bytes).decrypted())
     }
 
-    pub fn to_box_bytes_encrypted(self) -> Vec<u8> {
-        Pk8Buffer::new(&self.to_box_bytes()).to_encrypted_bytes()
+    pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
+        let mut bytes = self.to_box_bytes();
+        Pk8Buffer::new_mut(&mut bytes).encrypt();
+
+        bytes
     }
 
     pub fn calculate_checksum(&self) -> u16 {
@@ -345,20 +347,21 @@ impl Pk8 {
         super::MOVE_DATA_OFFSETS
     }
 
-    pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Vec<u8> {
-        let mut bytes = [0; Self::BOX_SIZE];
-        let mut buffer = Pk8BufferMut::new_mut(&mut bytes);
+    pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        let mut buffer = Pk8BufferMut::new_mut(bytes.as_mut_slice());
 
         buffer.set_handler_name(trainer_name);
         buffer.set_is_current_handler(true);
         buffer.refresh_checksum();
 
-        buffer.to_encrypted_bytes()
+        bytes
     }
 
     pub fn is_empty_slot(bytes: &[u8]) -> bool {
-        let decrypted = Pk8Buffer::new(bytes).to_decrypted_bytes();
-        let buffer = Pk8Buffer::new(&decrypted);
+        let mut owned = bytes.to_owned();
+        let mut buffer = Pk8Buffer::new_mut(&mut owned);
+        buffer.decrypt();
 
         buffer.species_ndex() == 0
     }
@@ -376,11 +379,11 @@ impl PkmBytes for Pk8 {
         self.write_to_box_buffer(&mut Pk8BufferMut::new_mut(bytes))
     }
 
-    fn to_box_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes);
+    fn to_box_bytes(&self) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        self.write_box_bytes(bytes.as_mut_slice());
 
-        Vec::from(bytes)
+        bytes
     }
 }
 
@@ -400,12 +403,8 @@ impl HasSpeciesAndForm for Pk8 {
     }
 }
 
-fn error_to_js(e: Error) -> JsValue {
-    JsValue::from_str(&e.to_string())
-}
-
 #[cfg(feature = "wasm")]
-#[wasm_bindgen]
+#[wasm_bindgen(js_class = "Pk8Wasm")]
 #[allow(clippy::missing_const_for_fn)]
 impl Pk8 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
@@ -423,12 +422,12 @@ impl Pk8 {
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
-    pub fn from_encrypted_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk8, JsValue> {
-        Pk8::from_encrypted_bytes(&bytes).map_err(error_to_js)
+    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Pk8, JsValue> {
+        Pk8::from_encrypted_bytes(bytes).map_err(crate::util::error_to_js)
     }
 
     #[wasm_bindgen(js_name = toBytes)]
-    pub fn get_bytes_wasm(&self) -> Vec<u8> {
+    pub fn to_bytes_js(&self) -> Box<[u8]> {
         self.to_box_bytes()
     }
 
@@ -570,7 +569,7 @@ impl Pk8 {
     }
 
     #[wasm_bindgen(js_name = emptyBoxSlotBytes)]
-    pub fn empty_box_slot_bytes_js(trainer_name: &str) -> Vec<u8> {
+    pub fn empty_box_slot_bytes_js(trainer_name: &str) -> Box<[u8]> {
         Self::empty_box_slot_bytes(&trainer_name.into())
     }
 
@@ -595,7 +594,7 @@ impl Pk8 {
     }
 
     #[wasm_bindgen(js_name = toBoxBytesEncrypted)]
-    pub fn to_box_bytes_encrypted_js(&self) -> Vec<u8> {
+    pub fn to_box_bytes_encrypted_js(&self) -> Box<[u8]> {
         self.to_box_bytes_encrypted()
     }
 }
@@ -640,7 +639,7 @@ mod test {
     use crate::checksum::Checksum;
     use crate::convert_strategy::ConvertStrategy;
     use crate::gen8_swsh::Pk8;
-    use crate::gen8_swsh::pk8_buffer::{Pk8Buffer, Pk8BufferRef};
+    use crate::gen8_swsh::pk8_buffer::Pk8Buffer;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
     use crate::result::Error;
@@ -760,7 +759,7 @@ mod test {
     #[test]
     fn empty_slot_checksum() -> TestResult<()> {
         let empty_slot = Pk8::empty_box_slot_bytes(&"RoC".into());
-        let checksum = Pk8BufferRef::new(&empty_slot).checksum();
+        let checksum = Pk8Buffer::new(&empty_slot).checksum();
         if checksum == 0 {
             return Err(Error::other("Empty slot checksum should be non-zero").into());
         }
@@ -791,6 +790,36 @@ mod test {
                 spe: 337
             }
         );
+
+        Ok(())
+    }
+
+    const CINDERACE_ENCRYPTED_BYTES_HEX: &str = "4864a28700008274311293404d71e90c70b5b4855c574d23a289c75541ad006eaf9666ee6fcc6fdb9c2bdae7c44eacbe48264ee13240d61a52203515337cb5051e95e7b472c8c34226559b9824097f7ea1da855aa4d7a6ca6a50ed1e5c6f2df0755f6a873d9170f133666ba75b1dab107e6c24df6aa4630147eeae002a2c58381ad1632f7f10480d2edbb5445ef022ba0c3b1dbd8dbc4678775a8a719d5668614041bba097d3bbbec3a5160df5e04b26d71caa3253fcaa0aee0573d96672cea0a07fdb872c593940e1fc849965f95aa1974d44fe415b329e6d9c70e559ea1659e6755fd9e36484ee4a2c230f218a20134a2fa4ee1a3cc046f722ad16ef08ec7bfcd67c624d4d9d58cf665dafe06aae792d1de9730cbd75507aeb02734c412a94898528578b4bc54f6e91f4661ba6034cb13bd829e706b059f3630174469c51e9e21fe4e506cd7df70712d2416270530c21b42185e6574d23";
+
+    #[test]
+    fn encrypted_bytes_match_expected_cinderace() -> TestResult<()> {
+        let path = PathBuf::from("pk8").join("cinderace-mint-nature.pk8");
+        let mon = tests::pkm_from_file::<Pk8>(&path)?.0;
+
+        let encrypted_bytes = mon.to_box_bytes_encrypted();
+        let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
+
+        assert_eq!(encrypted_hex_str, CINDERACE_ENCRYPTED_BYTES_HEX);
+
+        Ok(())
+    }
+
+    const MR_MIME_ENCRYPTED_BYTES_HEX: &str = "3054f46800001f80b46eb9965768ce49a2294fea3d7122426aa817d66c6778704e581d0d304d307a2b7cf5039e8f2a70a259441d4d231c689dae851ad01add04236609d549137b4720563f83656a18e0580e350e88df0ea968c15e3b491459b0fab695ae20a03673fbad61085eab0630ffaf7aa45c457872b6ce8bbcf7e9e73d82a839f33bea007a48a2648b5dac84858beaaecfeef61c144999366e4dbb58b8b883b0cc5d13bdc2988ee3985666cd54f6a3cc17cee99ccfd38ac8fc02efbe00da4aaec47eb80eaf92de65f401d607706d487d2c20b651eabc7f8080e77c5fc6648935561042cda822d2cec795e66617beb68d7649e8a5b90f9bec0fd95ce90e1324f77a6a332337bc62aff7028bbc090b0e5ca7444f83b6ec15be493b930056e528853d63566f0949ff5eed5e45fa93f17efa44784d858cba0c03ed68d9f08d169f154af9c3d109e36ed0963e1083f8384a19ea97712042";
+
+    #[test]
+    fn encrypted_bytes_match_expected_mr_mime() -> TestResult<()> {
+        let path = PathBuf::from("pk8").join("mr-mime-galar.pk8");
+        let mon = tests::pkm_from_file::<Pk8>(&path)?.0;
+
+        let encrypted_bytes = mon.to_box_bytes_encrypted();
+        let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
+
+        assert_eq!(encrypted_hex_str, MR_MIME_ENCRYPTED_BYTES_HEX);
 
         Ok(())
     }

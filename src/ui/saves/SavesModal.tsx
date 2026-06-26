@@ -1,4 +1,3 @@
-import { SAVClass } from '@openhome-core/save/util'
 import { PathData } from '@openhome-core/save/util/path'
 import { R } from '@openhome-core/util/functional'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
@@ -9,8 +8,8 @@ import { SaveError, SaveErrorType, useSaves } from '@openhome-ui/state/saves'
 import { Button, Flex, Slider } from '@radix-ui/themes'
 import { useCallback, useContext, useState } from 'react'
 import 'react-data-grid/lib/styles.css'
+import useDebounce from '../hooks/debounce'
 import useDisplayError from '../hooks/displayError'
-import useDebounce from '../hooks/useDebounce'
 import RecentSaves from './RecentSaves'
 import SaveFolders from './SaveFolders'
 import SuggestedSaves from './SuggestedSaves'
@@ -19,12 +18,6 @@ import { SaveViewMode } from './util'
 interface SavesModalProps {
   open?: boolean
   onClose: () => void
-}
-
-export type AmbiguousOpenState = {
-  possibleSaveTypes: SAVClass[]
-  filePath: PathData
-  fileBytes: Uint8Array
 }
 
 function saveErrorTitle(errorType: SaveErrorType): string {

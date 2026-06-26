@@ -1,5 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { ModernRibbons } from '@openhome-core/resources/'
+import { ModernRibbons } from '@openhome-core/resources'
 import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
 import {
   AbilityIndex,
@@ -13,7 +13,7 @@ import {
   MetadataSummaryLookup,
   NatureIndex,
   OriginGame,
-  Pk7 as Pk7Wasm,
+  Pk7Wasm,
   PokeDate,
   SpeciesLookup,
   TrainerMemory,
@@ -32,7 +32,7 @@ import {
   convertPokeDateOptional,
 } from './wasm/convert'
 
-export class PK7 {
+export default class PK7 {
   static getFormat() {
     return 'PK7' as const
   }
@@ -63,8 +63,12 @@ export class PK7 {
     this.inner.encryption_constant = value
   }
 
-  static fromBytes(buffer: ArrayBuffer, _encrypted?: boolean): PK7 {
-    return PK7.fromWasm(Pk7Wasm.fromBytes(new Uint8Array(buffer)))
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK7 {
+    return PK7.fromWasm(
+      encrypted
+        ? Pk7Wasm.fromEncryptedBytes(new Uint8Array(buffer))
+        : Pk7Wasm.fromDecryptedBytes(new Uint8Array(buffer))
+    )
   }
 
   static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK7 {
@@ -614,5 +618,3 @@ export class PK7 {
     return 26
   }
 }
-
-export default PK7

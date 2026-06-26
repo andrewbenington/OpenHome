@@ -1,6 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { TagIcon } from '@openhome-ui/components/TagIcon'
-import useDebounce from '@openhome-ui/hooks/useDebounce'
+import useDebounce from '@openhome-ui/hooks/debounce'
 import { useSaves } from '@openhome-ui/state/saves'
 import { DISPLAY_COLOR_PRESETS, MonTag, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Badge, Button, Flex, Grid, Text, TextField } from '@radix-ui/themes'

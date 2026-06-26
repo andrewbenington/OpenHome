@@ -1,15 +1,12 @@
 import { PK6 } from '@openhome-core/pkm'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
-import {
-  bytesToUint16LittleEndian,
-  uint16ToBytesLittleEndian,
-} from '@openhome-core/save/util/byteLogic'
+import { utf16BytesToString } from '@openhome-core/util'
+import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '@openhome-core/util/byteLogic'
 import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
-import { utf16BytesToString } from './util/Strings'
 
 const BOX_NAMES_OFFSET: number = 0x04400
 const BOX_SIZE: number = 232 * 30
@@ -60,7 +57,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
     super()
     this.bytes = bytes
     this.filePath = path
-    this.name = utf16BytesToString(this.bytes, this.trainerDataOffset + 72, 0x10)
+    this.name = utf16BytesToString(bytes.buffer, this.trainerDataOffset + 72, 0x10)
     this.tid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset)
     this.sid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 2)
     this.currentPCBox = this.bytes[0]
@@ -70,7 +67,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
 
     this.boxes = Array(31)
     for (let box = 0; box < 31; box++) {
-      const boxName = utf16BytesToString(this.bytes, BOX_NAMES_OFFSET + 34 * box, 17)
+      const boxName = utf16BytesToString(this.bytes.buffer, BOX_NAMES_OFFSET + 34 * box, 17)
 
       this.boxes[box] = new Box(boxName, 30)
     }

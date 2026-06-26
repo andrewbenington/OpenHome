@@ -10,13 +10,13 @@ license = "GPL-3.0+"
 pkm_rs_derive = {path = "../pkm_rs_derive"}
 serde = { version = "1.0.228", features = ["derive"] }
 static_assertions = "1.1.0"
-wasm-bindgen = { version = "0.2.122", optional = true }
-js-sys = { version = "0.3.99", optional = true }
+wasm-bindgen = { version = "0.2.125", optional = true }
+js-sys = { version = "0.3.102", optional = true }
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
-getrandom = { version = "0.4.2", features = ["wasm_js"] }
+getrandom = { version = "0.4.3", features = ["wasm_js"] }
 strum = "0.28.0"
 strum_macros = "0.28.0"
-time = "0.3.47"
+time = "0.3.49"
 arbitrary-int = "2.1.1"
 rand = { version = "0.10.1", optional = true }
 tsify = "0.5.6"

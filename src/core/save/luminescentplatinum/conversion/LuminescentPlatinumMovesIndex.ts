@@ -10,7 +10,7 @@ export const LUMI_MAX_MOVE_ID = 919
 
 // Moves intentionally excluded by Luminescent Platinum (Z-Moves and Max Moves)
 // Stored in a Set for constant-time lookup when validating moves
-export const UNUSED_IN_LUMI = new Set([
+const UNUSED_IN_LUMI = new Set([
   // Z-Moves
   622, 623, 624, 625, 626, 627, 628, 629, 630, 631, 632, 633, 634, 635, 636, 637, 638, 639, 640,
   641, 642, 643, 644, 645, 646, 647, 648, 649, 650, 651, 652, 653, 654, 655, 656, 657, 658, 671,

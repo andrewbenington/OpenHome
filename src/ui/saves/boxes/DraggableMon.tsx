@@ -6,7 +6,7 @@ import { MonWithLocation } from '@openhome-ui/state/saves'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { CSSProperties, useMemo } from 'react'
 import PokemonIcon from '../../components/PokemonIcon'
-import { TopRightIndicatorType } from '../../hooks/useMonDisplay'
+import { TopRightIndicatorType } from '../../hooks/monDisplay'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { MonTag } from '../../util/tags'
 
@@ -22,7 +22,7 @@ const getBackgroundDetails = (disabled?: boolean) => {
   }
 }
 
-export interface DraggableMonProps {
+interface DraggableMonProps {
   onClick: () => void
   disabled?: boolean
   mon: PKMInterface
@@ -104,7 +104,7 @@ const DraggableMon = (props: DraggableMonProps) => {
     >
       <PokemonIcon
         dexNumber={mon.dexNum}
-        formeNumber={formeNumber}
+        formIndex={formeNumber}
         isShiny={showShiny && mon.isShiny()}
         isEgg={mon.isEgg}
         heldItemIndex={

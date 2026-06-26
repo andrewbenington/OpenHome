@@ -10,7 +10,7 @@ import MiniButton from '@openhome-ui/components/MiniButton'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { Popover } from '@openhome-ui/components/popover/Popover'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
-import useSimpleVirtualizer from '@openhome-ui/hooks/useSimpleVirtualizer'
+import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { cssClass } from '@openhome-ui/util/style'
@@ -302,7 +302,7 @@ function LogLine(props: LogLineProps) {
       </span>
       {ohpkm_id && ohpkmButton && onOhpkmClick && mon && (
         <button className="log-ohpkm-button" onClick={() => onOhpkmClick(ohpkm_id)}>
-          <PokemonIcon dexNumber={mon.dexNum} formeNumber={mon.formNum} />
+          <PokemonIcon dexNumber={mon.dexNum} formIndex={mon.formNum} />
         </button>
       )}
       <MiniButton onClick={onDetailsClick} icon={ExpandIcon} />

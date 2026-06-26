@@ -18,7 +18,7 @@ export type AppState = {
   new_features_since_update: UpdateFeatures[]
 }
 
-export type UpdateFeatures = {
+type UpdateFeatures = {
   version: string
   feature_messages: string[]
 }
@@ -28,12 +28,7 @@ export type ImageResponse = {
   extension: string
 }
 
-export type PluginDownloadProgress = {
-  pluginId: string
-  progress: number
-}
-
-export type LogEntryUnparsed = {
+type LogEntryUnparsed = {
   timestamp: string
   level: string
   target?: string
@@ -61,7 +56,7 @@ type LogFilterUnparsed = {
   ohpkm_id?: string
 }
 
-export function parseLog(unparsed: LogEntryUnparsed): LogEntry {
+function parseLog(unparsed: LogEntryUnparsed): LogEntry {
   return {
     ...unparsed,
     timestamp: dayjs(unparsed.timestamp),
@@ -89,7 +84,7 @@ export function parseLogs(unparsed: LogsResponseUnparsed): LogsResponse {
   }
 }
 
-export function parseFilter(unparsed: LogFilterUnparsed): LogFilter {
+function parseFilter(unparsed: LogFilterUnparsed): LogFilter {
   return {
     ...unparsed,
     start: dayjs(unparsed.start),
@@ -194,7 +189,7 @@ export type NewLogNotification = {
   timestamp_unix: number
 }
 
-export interface BackendListeners {
+interface BackendListeners {
   onMenuEvent: (event: MenuEvent) => void
   onLookupsUpdate: (updated_lookups: StoredLookups) => void
   onStateUpdate: Record<string, <State>(updated_state: State) => void>

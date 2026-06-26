@@ -256,7 +256,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
             <div style={{ width: '100%', height: '100%', position: 'relative' }}>
               <PokemonIcon
                 dexNumber={dragState.payload?.monData.mon.dexNum ?? 0}
-                formeNumber={formeNumber}
+                formIndex={formeNumber}
                 isShiny={dragState.payload?.monData.mon.isShiny()}
                 heldItemIndex={dragState.payload?.monData.mon.heldItemIndex}
                 onlyItem={
