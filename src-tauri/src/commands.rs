@@ -1,6 +1,7 @@
 use crate::data_controller::{DataController, DataDir};
 use crate::error::{Error, Result};
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloaded_plugins};
+use crate::saves::{Citra, Desmume, Gambatte, Mgba, SaveFileSearch};
 use crate::state::{AppState, AppStateInner};
 use crate::util::ImageResponse;
 use crate::{menu, saves, util};
@@ -63,13 +64,13 @@ pub fn get_storage_file_json(
 }
 
 #[tauri::command]
-pub fn find_suggested_saves(
+pub async fn find_suggested_saves(
     app_handle: tauri::AppHandle,
     save_folders: Vec<PathBuf>,
-) -> core::result::Result<saves::PossibleSaves, String> {
+) -> Result<saves::PossibleSaves> {
     let mut possible_saves = saves::PossibleSaves {
         citra: Vec::new(),
-        desamume: Vec::new(),
+        desmume: Vec::new(),
         open_emu: Vec::new(),
     };
 
@@ -83,35 +84,57 @@ pub fn find_suggested_saves(
     {
         possible_saves
             .citra
-            .extend(saves::recursively_find_citra_saves(&citra_dir, 0)?);
+            .extend(Citra::recursively_find_saves(&citra_dir)?);
     }
 
     // Iterate over user-provided save folders
     for folder in save_folders {
         if folder.exists() {
-            let citra_saves = saves::recursively_find_citra_saves(&folder, 0)?;
-            possible_saves.citra.extend(citra_saves);
+            let folder_path = folder.to_string_lossy().into_owned();
 
-            let mgba_saves = saves::recursively_find_mgba_saves(&folder, 0).unwrap_or_default();
-            let gambatte_saves = saves::recursively_find_gambatte_saves(&folder, 0)?;
+            tracing::info!("checking saves in folder {folder_path}");
+            let result = tokio::task::spawn_blocking(move || {
+                get_possible_saves(&folder).map_err(|e| e.to_string())
+            })
+            .await
+            .map_err(|e| {
+                Error::other_with_source("tokio task failed in find_suggested_saves", e)
+            })?;
+            tracing::info!("finished checking");
 
-            possible_saves.open_emu.extend(mgba_saves);
-            possible_saves.open_emu.extend(gambatte_saves);
-
-            let desamume_saves = saves::recursively_find_desamume_saves(&folder, 0)?;
-            possible_saves.desamume.extend(desamume_saves);
+            match result {
+                Ok(newly_found) => possible_saves.add_all(newly_found),
+                Err(e) => {
+                    tracing::error!("failed to check saves in folder {folder_path}: {e}");
+                    continue;
+                }
+            };
         } else {
-            println!(
-                "Folder doesnt exist: {}",
-                folder.to_str().unwrap_or("(no path)")
-            )
+            return Err(Error::file_missing(&folder));
         }
     }
 
-    // Deduplicate paths
-    possible_saves.citra = util::dedupe_paths(possible_saves.citra);
-    possible_saves.open_emu = util::dedupe_paths(possible_saves.open_emu);
-    possible_saves.desamume = util::dedupe_paths(possible_saves.desamume);
+    Ok(possible_saves)
+}
+
+fn get_possible_saves(folder: &PathBuf) -> Result<saves::PossibleSaves> {
+    let mut possible_saves = saves::PossibleSaves {
+        citra: Vec::new(),
+        desmume: Vec::new(),
+        open_emu: Vec::new(),
+    };
+
+    let citra_saves = Citra::recursively_find_saves(folder)?;
+    possible_saves.citra.extend(citra_saves);
+
+    let mgba_saves = Mgba::recursively_find_saves(folder)?;
+    let gambatte_saves = Gambatte::recursively_find_saves(folder)?;
+
+    possible_saves.open_emu.extend(mgba_saves);
+    possible_saves.open_emu.extend(gambatte_saves);
+
+    let desmume_saves = Desmume::recursively_find_saves(folder)?;
+    possible_saves.desmume.extend(desmume_saves);
 
     Ok(possible_saves)
 }

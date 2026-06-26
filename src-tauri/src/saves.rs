@@ -1,6 +1,9 @@
 use crate::data_controller::{DataController, DataDir};
 use crate::util;
+use crate::{Error, Result};
+use core::fmt;
 use std::collections::HashMap;
+use std::ffi::OsStr;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
@@ -10,114 +13,148 @@ const RECENT_SAVES_FILENAME: &str = "recent_saves.json";
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct PossibleSaves {
     pub citra: Vec<util::PathData>,
-    pub desamume: Vec<util::PathData>,
+    pub desmume: Vec<util::PathData>,
     pub open_emu: Vec<util::PathData>,
 }
+impl PossibleSaves {
+    pub fn add_all(&mut self, other: Self) {
+        self.citra.extend(other.citra);
+        util::dedupe_paths(&mut self.citra);
 
-const MAX_SEARCH_DEPTH: usize = 2;
+        self.desmume.extend(other.desmume);
+        util::dedupe_paths(&mut self.desmume);
 
-pub fn recursively_find_desamume_saves(
-    current_path: &Path,
-    depth: usize,
-) -> core::result::Result<Vec<util::PathData>, String> {
-    if depth >= MAX_SEARCH_DEPTH {
-        return Ok(Vec::new());
+        self.open_emu.extend(other.open_emu);
+        util::dedupe_paths(&mut self.open_emu)
     }
-
-    let mut found_saves = Vec::new();
-    let inner_directory_paths = get_inner_directories(current_path);
-
-    for path in inner_directory_paths {
-        if path.ends_with("Battery Saves") || path.ends_with("Battery") {
-            found_saves.extend(
-                get_inner_files_with_extension(&path, "dsv")
-                    .into_iter()
-                    .map(|path| util::parse_path_data(&path)),
-            );
-        } else {
-            found_saves.extend(recursively_find_desamume_saves(&path, depth + 1)?);
-        }
-    }
-
-    Ok(found_saves)
 }
 
-pub fn recursively_find_gambatte_saves(
-    current_path: &Path,
-    depth: usize,
-) -> core::result::Result<Vec<util::PathData>, String> {
-    if depth >= MAX_SEARCH_DEPTH {
-        return Ok(vec![]);
-    }
+pub trait SaveFileSearch: Default + fmt::Debug {
+    fn should_search_in_dir(dir_path: &Path) -> bool;
+    fn file_is_possible_match(dir_path: &Path) -> bool;
 
-    let mut found_saves = Vec::new();
-    let inner_directory_paths = get_inner_directories(current_path);
+    fn recursively_find_saves(path: &PathBuf) -> Result<Vec<util::PathData>> {
+        let mut found_saves = Vec::<util::PathData>::new();
 
-    for path in inner_directory_paths {
-        if path.ends_with("Battery Saves") {
-            found_saves.extend(
-                get_inner_files_with_extensions(&path, &["sav", "rtc"])
-                    .into_iter()
-                    .map(|path| util::parse_path_data(&path)),
-            );
-        } else {
-            found_saves.extend(recursively_find_gambatte_saves(&path, depth + 1)?);
-        }
-    }
-
-    Ok(found_saves)
-}
-
-pub fn recursively_find_mgba_saves(
-    current_path: &Path,
-    depth: usize,
-) -> Option<Vec<util::PathData>> {
-    if depth >= MAX_SEARCH_DEPTH {
-        return None;
-    }
-
-    let mut found_saves = Vec::new();
-    let inner_directory_paths = get_inner_directories(current_path);
-
-    for path in inner_directory_paths {
-        if path.ends_with("Battery Saves") {
-            found_saves.extend(
-                get_inner_files_with_extension(&path, "sav")
-                    .into_iter()
-                    .map(|path| util::parse_path_data(&path)),
-            );
-        } else {
-            found_saves.extend(recursively_find_mgba_saves(&path, depth + 1)?);
-        }
-    }
-
-    Some(found_saves)
-}
-
-pub fn recursively_find_citra_saves(
-    path: &PathBuf,
-    depth: usize,
-) -> core::result::Result<Vec<util::PathData>, String> {
-    if depth >= MAX_SEARCH_DEPTH {
-        return Ok(vec![]);
-    }
-
-    let mut found_saves = Vec::new();
-    if path.is_dir() {
-        let entries = fs::read_dir(path).map_err(|e| e.to_string())?;
-        for entry in entries {
-            let entry = entry.map_err(|e| e.to_string())?;
-            let entry_path = entry.path();
-
-            if entry_path.is_dir() {
-                found_saves.extend(recursively_find_citra_saves(&entry_path, depth + 1)?);
-            } else if entry_path.ends_with("main") {
-                found_saves.push(util::parse_path_data(&entry_path));
+        for entry in fs::read_dir(path)
+            .map_err(|e| Error::file_access(path, e))?
+            .flatten()
+        {
+            let entry_path = &entry.path();
+            if Self::should_search_in_dir(entry_path) {
+                // tracing::debug!("{:#?}: searching in {entry_path:?}", Self::default());
+                found_saves.extend(Self::recursively_find_saves(entry_path)?)
+            } else if Self::file_is_possible_match(entry_path) {
+                // tracing::info!("{:#?}: MATCH - {entry_path:?}", Self::default());
+                found_saves.push(util::parse_path_data(entry_path));
+            } else {
+                // tracing::debug!("{:#?}: not a match - {entry_path:?}", Self::default());
             }
         }
+
+        Ok(found_saves)
+    }
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct Gambatte;
+
+impl SaveFileSearch for Gambatte {
+    fn should_search_in_dir(dir_path: &Path) -> bool {
+        dir_path.is_dir()
+            && dir_path.file_name().is_some_and(|dir_name| {
+                is_one_of(dir_name, ["Battery", "Battery Saves", "Gambatte"])
+            })
     }
 
-    Ok(found_saves)
+    fn file_is_possible_match(dir_path: &Path) -> bool {
+        dir_path.is_file()
+            && dir_path
+                .extension()
+                .is_some_and(|ext| is_one_of(ext, ["sav", "rtc"]))
+    }
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct Desmume;
+
+impl SaveFileSearch for Desmume {
+    fn should_search_in_dir(dir_path: &Path) -> bool {
+        dir_path.is_dir()
+            && dir_path.file_name().is_some_and(|dir_name| {
+                is_one_of(dir_name, ["Battery", "Battery Saves", "DeSmuME"])
+            })
+    }
+
+    fn file_is_possible_match(dir_path: &Path) -> bool {
+        dir_path.is_file()
+            && dir_path
+                .extension()
+                .is_some_and(|ext| ext.eq_ignore_ascii_case("dsv"))
+    }
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct Mgba;
+
+impl SaveFileSearch for Mgba {
+    fn should_search_in_dir(dir_path: &Path) -> bool {
+        dir_path.is_dir()
+            && dir_path
+                .file_name()
+                .is_some_and(|dir_name| is_one_of(dir_name, ["Battery", "Battery Saves", "mGBA"]))
+    }
+
+    fn file_is_possible_match(dir_path: &Path) -> bool {
+        dir_path.is_file()
+            && dir_path
+                .extension()
+                .is_some_and(|ext| ext.eq_ignore_ascii_case("sav"))
+    }
+}
+
+// const RE_8_DIGIT_HEX: Regex = Regex::new("^[A-Fa-f0-9]{8}$").expect("RE_8_DIGIT_HEX is valid");
+fn is_8_digit_hex(os_str: &OsStr) -> bool {
+    os_str.is_ascii()
+        && os_str.to_str().is_some_and(|s| {
+            s.is_ascii() && s.len() == 8 && s.chars().all(|c| c.is_ascii_hexdigit())
+        })
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct Citra;
+
+impl SaveFileSearch for Citra {
+    fn should_search_in_dir(dir_path: &Path) -> bool {
+        dir_path.is_dir()
+            && dir_path.file_name().is_some_and(|dir_name| {
+                is_one_of(
+                    dir_name,
+                    [
+                        "citra-emu",
+                        "citra",
+                        "sdmc",
+                        "Nintendo 3DS",
+                        "00000000000000000000000000000000",
+                        "title",
+                        "data",
+                    ],
+                ) || is_8_digit_hex(dir_name)
+            })
+    }
+
+    fn file_is_possible_match(dir_path: &Path) -> bool {
+        dir_path.is_file()
+            && dir_path
+                .file_name()
+                .is_some_and(|n| n.eq_ignore_ascii_case("main"))
+    }
+}
+
+fn is_one_of(os_str: &OsStr, possibilities: impl IntoIterator<Item = &'static str>) -> bool {
+    possibilities
+        .into_iter()
+        .any(|s| os_str.eq_ignore_ascii_case(s))
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -197,67 +234,3 @@ fn get_modified_time_ms(path: &Path) -> Option<f64> {
         .and_then(|st| st.duration_since(UNIX_EPOCH).ok())
         .map(|dur| dur.as_millis() as f64)
 }
-
-fn get_inner_directories(dir_path: &Path) -> Vec<PathBuf> {
-    let Ok(dir_entries) = fs::read_dir(dir_path) else {
-        return Vec::new();
-    };
-
-    dir_entries
-        .filter_map(|entry| entry.ok())
-        .map(|entry| entry.path())
-        .filter(|path| path.is_dir())
-        .collect()
-}
-
-fn get_inner_files_with_extension(dir_path: &Path, extension: &str) -> Vec<PathBuf> {
-    let Ok(dir_entries) = fs::read_dir(dir_path) else {
-        return Vec::new();
-    };
-
-    dir_entries
-        .filter_map(|entry| entry.ok())
-        .map(|entry| entry.path())
-        .filter(|path| {
-            !path.is_dir()
-                && path
-                    .extension()
-                    .is_some_and(|ext| ext.to_str().is_some_and(|ext| ext == extension))
-        })
-        .collect()
-}
-
-fn get_inner_files_with_extensions(dir_path: &Path, extensions: &[&str]) -> Vec<PathBuf> {
-    let Ok(dir_entries) = fs::read_dir(dir_path) else {
-        return Vec::new();
-    };
-
-    dir_entries
-        .filter_map(|entry| entry.ok())
-        .map(|entry| entry.path())
-        .filter(|path| {
-            !path.is_dir()
-                && path
-                    .extension()
-                    .is_some_and(|ext| ext.to_str().is_some_and(|ext| extensions.contains(&ext)))
-        })
-        .collect()
-}
-
-// #[derive(Serialize)]
-// pub enum SaveDetect {
-//     NotRecognized,
-//     OneMatch(SaveType),
-//     MultipleMatches(Vec<SaveType>),
-// }
-
-// pub fn detect_from_path(path: &Path) -> Result<SaveDetect> {
-//     let bytes = util::read_file_bytes(path)?;
-//     let possible_save_types = SaveType::detect_from_bytes(&bytes);
-
-//     Ok(match possible_save_types.len() {
-//         0 => SaveDetect::NotRecognized,
-//         1 => SaveDetect::OneMatch(possible_save_types[0]),
-//         2.. => SaveDetect::MultipleMatches(possible_save_types),
-//     })
-// }

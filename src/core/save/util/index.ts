@@ -7,7 +7,7 @@ import { TransferRestrictions } from './TransferRestrictions'
 
 export type LookupType = 'gen12' | 'gen345'
 
-const DESAMUME_FOOTER_START =
+const DESMUME_FOOTER_START =
   '|<--Snip above here to create a raw sav by excluding this DeSmuME savedata footer:'
 
 export interface SavePkmClass {
@@ -61,8 +61,8 @@ export function getPluginIdentifier(saveType: SAVClass | undefined): string | un
   return saveType?.getPluginIdentifier?.()
 }
 
-export function hasDesamumeFooter(bytes: Uint8Array, expectedOffset: number): boolean {
+export function hasDesmumeFooter(bytes: Uint8Array, expectedOffset: number): boolean {
   const possibleFooter = new TextDecoder().decode(bytes.slice(expectedOffset))
 
-  return possibleFooter.startsWith(DESAMUME_FOOTER_START)
+  return possibleFooter.startsWith(DESMUME_FOOTER_START)
 }

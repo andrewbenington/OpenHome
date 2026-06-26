@@ -1,4 +1,4 @@
-import { buildUnknownSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
+import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
 import { R } from '@openhome-core/util/functional'
 import { SortableColumn } from '@openhome-core/util/sort'
@@ -33,30 +33,15 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     [displayError]
   )
 
-  const loadPossibleSaveTypes = useCallback(
-    async (savePath: PathData) => {
-      const response = await backend.loadSaveFile(savePath)
-
-      if (R.isOk(response)) {
-        const { fileBytes } = response.value
-        return getPossibleSaveTypes(fileBytes, getEnabledSaveTypes())
-      }
-      return undefined
-    },
-    [backend, getEnabledSaveTypes]
-  )
-
   const loadSaveData = useCallback(
-    async (savePath: PathData) => {
-      const response = await backend.loadSaveFile(savePath)
-
-      if (R.isOk(response)) {
-        const { fileBytes } = response.value
-
-        return buildUnknownSaveFile(savePath, fileBytes, getEnabledSaveTypes())
-      }
-      return undefined
-    },
+    async (savePath: PathData) =>
+      backend
+        .loadSaveFile(savePath)
+        .then(
+          R.flatMap((response) =>
+            buildUnknownSaveFile(savePath, response.fileBytes, getEnabledSaveTypes())
+          )
+        ),
     [backend, getEnabledSaveTypes]
   )
 
@@ -68,14 +53,20 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
           console.debug(possibleSaves)
           const allPaths = (possibleSaves?.citra ?? [])
             .concat(possibleSaves?.open_emu ?? [])
-            .concat(possibleSaves?.desamume ?? [])
+            .concat(possibleSaves?.desmume ?? [])
 
           if (allPaths.length > 0) {
-            const saveSuggestions: SaveSuggestion[] = allPaths.map((path) => {
-              const saveResult = loadSaveData(path)
-                .then((value) => (value ? value : R.Err('Failed to build save file')))
-                .then(R.flatMap((save) => (save ? R.Ok(save) : R.Err('Failed to build save file'))))
-              return { loadingSave: saveResult, filePath: path }
+            const saveSuggestions: SaveSuggestion[] = allPaths.map((filePath) => {
+              const loadingSave = loadSaveData(filePath)
+                .then((loadSaveResult) =>
+                  loadSaveResult ? loadSaveResult : R.Err('Failed to build save file')
+                )
+                .then(
+                  R.flatMap((saveFile) =>
+                    saveFile ? R.Ok(saveFile) : R.Err('Failed to build save file')
+                  )
+                )
+              return { loadingSave, filePath }
             })
 
             setSuggestedSaves(saveSuggestions)
@@ -84,7 +75,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
         async (err) => handleError('Error getting suggested saves', err)
       )
     )
-  }, [backend, error, handleError, loadPossibleSaveTypes, loadSaveData, suggestedSaves])
+  }, [backend, error, handleError, loadSaveData, suggestedSaves])
 
   const columns: SortableColumn<SaveSuggestion>[] = [
     // {

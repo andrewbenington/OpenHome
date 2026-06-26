@@ -35,7 +35,7 @@ const ZOOM_CHANGE_PCT = 5
 const ZOOM_MIN_PCT = 50
 const ZOOM_MAX_PCT = 160
 
-const REDIRECT_WEB_CONSOLE = false
+const REDIRECT_WEB_CONSOLE = true
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
