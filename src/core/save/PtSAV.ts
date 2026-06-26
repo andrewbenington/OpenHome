@@ -1,13 +1,10 @@
-import {
-  bytesToUint16LittleEndian,
-  bytesToUint32LittleEndian,
-} from '@openhome-core/save/util/byteLogic'
-import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
+import { PK4 } from '@openhome-core/pkm'
+import { Item } from '@openhome-core/resources/consts/Items'
+import { PT_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Gender, OriginGame } from '@pkm-rs/pkg'
-import { PK4 } from '@pokemon-files/pkm'
-import { Item } from '@pokemon-resources/consts/Items'
-import { PT_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { bytesToUint16LittleEndian } from '@openhome-core/util/byteLogic'
+import { readGen4StringFromBytes } from '@openhome-core/util/stringConversion'
+import { ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { G4SAV } from './G4SAV'
 import { hasDesamumeFooter } from './util'
 import { PathData } from './util/path'
@@ -55,15 +52,23 @@ export class PtSAV extends G4SAV {
     super(path, bytes)
     // current storage block could be either the first or second one,
     // depending on save count
+    const firstBlockSaveCount = this.getCurrentSaveCount(
+      PtSAV.STORAGE_BLOCK_OFFSET,
+      PtSAV.STORAGE_BLOCK_SIZE
+    )
+    const secondBlockSaveCount = this.getCurrentSaveCount(
+      PtSAV.STORAGE_BLOCK_OFFSET + 0x40000,
+      PtSAV.STORAGE_BLOCK_SIZE
+    )
     if (
-      this.getCurrentSaveCount(PtSAV.STORAGE_BLOCK_OFFSET, PtSAV.STORAGE_BLOCK_SIZE) <
-      this.getCurrentSaveCount(PtSAV.STORAGE_BLOCK_OFFSET + 0x40000, PtSAV.STORAGE_BLOCK_SIZE)
+      secondBlockSaveCount !== undefined &&
+      (firstBlockSaveCount === undefined || secondBlockSaveCount > firstBlockSaveCount)
     ) {
       this.currentSaveStorageBlockOffset += 0x40000
     }
     this.currentSaveBoxStartOffset = this.currentSaveStorageBlockOffset + 4
     this.boxNamesOffset = this.currentSaveStorageBlockOffset + PtSAV.BOX_NAMES_OFFSET
-    this.name = gen4StringToUTF(bytes, PtSAV.TRAINER_NAME_OFFSET, 8)
+    this.name = readGen4StringFromBytes(new DataView(bytes.buffer), PtSAV.TRAINER_NAME_OFFSET, 8)
     this.tid = bytesToUint16LittleEndian(bytes, PtSAV.TRAINER_ID_OFFSET)
     this.sid = bytesToUint16LittleEndian(bytes, PtSAV.TRAINER_ID_OFFSET + 2)
     this.displayID = this.tid.toString().padStart(5, '0')
@@ -71,12 +76,8 @@ export class PtSAV extends G4SAV {
     this.buildBoxes()
   }
 
-  getCurrentSaveCount(blockOffset: number, blockSize: number) {
-    return bytesToUint32LittleEndian(this.bytes, blockOffset + blockSize - this.footerSize)
-  }
-
-  supportsMon(dexNumber: number, formeNumber: number) {
-    return !isRestricted(PT_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(PT_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {
@@ -98,5 +99,9 @@ export class PtSAV extends G4SAV {
 
   static includesOrigin(origin: OriginGame) {
     return origin === OriginGame.Platinum
+  }
+
+  get language(): Language {
+    return this.bytes[PtSAV.TRAINER_ID_OFFSET + 0x19]
   }
 }

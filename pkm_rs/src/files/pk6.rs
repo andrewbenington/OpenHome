@@ -1,0 +1,394 @@
+use crate::read_move_index;
+use crate::result::{Error, Result};
+use crate::traits::IsShiny4096;
+use crate::{HasSpeciesAndForm, PkmBytes, util};
+
+use pkm_rs_resources::abilities::AbilityIndex;
+use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::moves::MoveIndex;
+use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
+use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
+use pkm_rs_types::strings::SizedUtf16String;
+use pkm_rs_types::{
+    BinaryGender, ContestStats, MarkingsSixShapes, OriginGame, Stats8, Stats16Le, read_u16_le,
+    read_u32_le,
+};
+use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
+
+use serde::Serialize;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
+pub struct Pk6 {
+    pub encryption_constant: u32,
+    pub sanity: u16,
+    pub checksum: u16,
+    pub species_and_form: SpeciesAndForm,
+    pub held_item_index: u16,
+    pub trainer_id: u16,
+    pub secret_id: u16,
+    pub exp: u32,
+    pub ability_index: AbilityIndex,
+    pub ability_num: u8,
+    pub training_bag_hits: u8,
+    pub training_bag: u8,
+    pub personality_value: u32,
+    pub nature: NatureIndex,
+    pub gender: Gender,
+    pub evs: Stats8,
+    pub contest: ContestStats,
+    pub markings: MarkingsSixShapes,
+    pub pokerus_byte: u8,
+    pub super_training_flags: u32,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub ribbons: ModernRibbonSet<6, MAX_RIBBON_GEN6>,
+    pub contest_memory_count: u8,
+    pub battle_memory_count: u8,
+    pub super_training_dist_flags: u8,
+    pub form_argument: u32,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub nickname: SizedUtf16String<26>,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub moves: [MoveIndex; 4],
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub move_pp: [u8; 4],
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub move_pp_ups: [u8; 4],
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub relearn_moves: [MoveIndex; 4],
+    pub secret_super_training_unlocked: bool,
+    pub secret_super_training_complete: bool,
+    pub ivs: Stats8,
+    pub is_egg: bool,
+    pub is_nicknamed: bool,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub handler_name: SizedUtf16String<26>,
+    pub handler_gender: bool,
+    pub is_current_handler: bool,
+    pub geolocations: Geolocations,
+    pub handler_friendship: u8,
+    pub handler_affection: u8,
+    pub handler_memory: TrainerMemory,
+    pub trainer_memory: TrainerMemory,
+    pub fullness: u8,
+    pub enjoyment: u8,
+    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
+    pub trainer_name: SizedUtf16String<26>,
+    pub trainer_friendship: u8,
+    pub trainer_affection: u8,
+    pub egg_date: Option<PokeDate>,
+    pub met_date: PokeDate,
+    pub egg_location_index: u16,
+    pub met_location_index: u16,
+    pub ball: Ball,
+    pub met_level: u8,
+    pub encounter_type: u8,
+    pub game_of_origin: OriginGame,
+    pub country: u8,
+    pub region: u8,
+    pub console_region: u8,
+    pub language_index: u8,
+    pub is_fateful_encounter: bool,
+    pub trainer_gender: BinaryGender,
+    pub status_condition: u32,
+    pub stat_level: u8,
+    pub form_argument_remain: u8,
+    pub form_argument_elapsed: u8,
+    pub current_hp: u16,
+    pub stats: Stats16Le,
+}
+
+const MAX_RIBBON_GEN6: usize = ModernRibbon::ToughnessMaster as usize;
+
+impl Pk6 {
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        let size = bytes.len();
+        if size < Pk6::BOX_SIZE {
+            return Err(Error::buffer_size(Pk6::BOX_SIZE, size));
+        }
+
+        // try_into() will always succeed thanks to the length check
+        let mon = Pk6 {
+            encryption_constant: read_u32_le!(bytes, 0),
+            sanity: read_u16_le!(bytes, 4),
+            checksum: read_u16_le!(bytes, 6),
+            species_and_form: SpeciesAndForm::new(
+                read_u16_le!(bytes, 8),
+                util::read_uint5_from_bits(bytes[29], 3).into(),
+            )?,
+            held_item_index: read_u16_le!(bytes, 10),
+            trainer_id: read_u16_le!(bytes, 12),
+            secret_id: read_u16_le!(bytes, 14),
+            exp: read_u32_le!(bytes, 16),
+            ability_index: AbilityIndex::try_from(bytes[20])?,
+            ability_num: bytes[21],
+            training_bag_hits: bytes[22],
+            training_bag: bytes[23],
+            personality_value: read_u32_le!(bytes, 24),
+            nature: NatureIndex::try_from(bytes[28])?,
+            gender: Gender::from_bits_1_2(bytes[29]),
+            evs: Stats8::from_bytes(bytes[30..36].try_into().unwrap()),
+            contest: ContestStats::from_bytes(bytes[36..42].try_into().unwrap()),
+            markings: MarkingsSixShapes::from_byte(bytes[42]),
+            pokerus_byte: bytes[43],
+            super_training_flags: read_u32_le!(bytes, 44),
+            ribbons: ModernRibbonSet::from_bytes(bytes[48..54].try_into().unwrap()),
+            contest_memory_count: bytes[56],
+            battle_memory_count: bytes[57],
+            super_training_dist_flags: bytes[58],
+            form_argument: read_u32_le!(bytes, 60),
+            nickname: SizedUtf16String::<26>::from_bytes(bytes[64..90].try_into().unwrap()),
+            moves: [
+                read_move_index!(bytes, 90),
+                read_move_index!(bytes, 92),
+                read_move_index!(bytes, 94),
+                read_move_index!(bytes, 96),
+            ],
+            move_pp: [bytes[98], bytes[99], bytes[100], bytes[101]],
+            move_pp_ups: [bytes[102], bytes[103], bytes[104], bytes[105]],
+            relearn_moves: [
+                read_move_index!(bytes, 106),
+                read_move_index!(bytes, 108),
+                read_move_index!(bytes, 110),
+                read_move_index!(bytes, 112),
+            ],
+            secret_super_training_unlocked: util::get_flag(bytes, 114, 1),
+            secret_super_training_complete: util::get_flag(bytes, 114, 2),
+            ivs: Stats8::from_30_bits(bytes[116..120].try_into().unwrap()),
+            is_egg: util::get_flag(bytes, 116, 30),
+            is_nicknamed: util::get_flag(bytes, 116, 31),
+            handler_name: SizedUtf16String::<26>::from_bytes(bytes[120..146].try_into().unwrap()),
+            handler_gender: util::get_flag(bytes, 146, 0),
+            is_current_handler: util::get_flag(bytes, 147, 0),
+            geolocations: Geolocations::from_bytes(bytes[148..158].try_into().unwrap()),
+            handler_friendship: bytes[162],
+            handler_affection: bytes[163],
+            handler_memory: TrainerMemory {
+                intensity: bytes[164],
+                memory: bytes[165],
+                feeling: bytes[166],
+                text_variable: read_u16_le!(bytes, 168),
+            },
+            fullness: bytes[174],
+            enjoyment: bytes[175],
+            trainer_name: SizedUtf16String::<26>::from_bytes(bytes[176..202].try_into().unwrap()),
+            trainer_friendship: bytes[202],
+            trainer_affection: bytes[203],
+            trainer_memory: TrainerMemory {
+                intensity: bytes[204],
+                memory: bytes[205],
+                text_variable: read_u16_le!(bytes, 206),
+                feeling: bytes[208],
+            },
+            egg_date: PokeDate::from_bytes_optional(bytes[209..212].try_into().unwrap()),
+            met_date: PokeDate::from_bytes(bytes[212..215].try_into().unwrap()),
+            egg_location_index: read_u16_le!(bytes, 216),
+            met_location_index: read_u16_le!(bytes, 218),
+            ball: Ball::from(bytes[220]),
+            met_level: bytes[221],
+            encounter_type: bytes[222],
+            game_of_origin: OriginGame::from(bytes[223]),
+            country: bytes[224],
+            region: bytes[225],
+            console_region: bytes[226],
+            language_index: bytes[227],
+            is_fateful_encounter: util::get_flag(bytes, 29, 0),
+            trainer_gender: util::get_flag(bytes, 221, 7).into(),
+            status_condition: if bytes.len() > Self::BOX_SIZE {
+                read_u32_le!(bytes, 232)
+            } else {
+                0
+            },
+            stat_level: if bytes.len() > Self::BOX_SIZE {
+                bytes[237]
+            } else {
+                0
+            },
+            form_argument_remain: if bytes.len() > Self::BOX_SIZE {
+                bytes[238]
+            } else {
+                0
+            },
+            form_argument_elapsed: if bytes.len() > Self::BOX_SIZE {
+                bytes[239]
+            } else {
+                0
+            },
+            current_hp: if bytes.len() > Self::BOX_SIZE {
+                read_u16_le!(bytes, 240)
+            } else {
+                0
+            },
+            stats: if bytes.len() > Self::BOX_SIZE {
+                Stats16Le::from_bytes(bytes[242..254].try_into().unwrap())
+            } else {
+                Stats16Le::default()
+            },
+        };
+        Ok(mon)
+    }
+}
+
+impl PkmBytes for Pk6 {
+    const BOX_SIZE: usize = 232;
+    const PARTY_SIZE: usize = 260;
+
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        Self::from_bytes(bytes)
+    }
+
+    fn write_box_bytes(&self, bytes: &mut [u8]) {
+        bytes[0..4].copy_from_slice(&self.encryption_constant.to_le_bytes());
+        bytes[4..6].copy_from_slice(&self.sanity.to_le_bytes());
+        bytes[6..8].copy_from_slice(&self.checksum.to_le_bytes());
+        bytes[8..10].copy_from_slice(&self.species_and_form.get_ndex().to_le_bytes());
+        bytes[10..12].copy_from_slice(&self.held_item_index.to_le_bytes());
+        bytes[12..14].copy_from_slice(&self.trainer_id.to_le_bytes());
+        bytes[14..16].copy_from_slice(&self.secret_id.to_le_bytes());
+        bytes[16..20].copy_from_slice(&self.exp.to_le_bytes());
+        bytes[20] = self.ability_index.into();
+        bytes[21] = self.ability_num;
+        bytes[22] = self.training_bag_hits;
+        bytes[23] = self.training_bag;
+        bytes[24..28].copy_from_slice(&self.personality_value.to_le_bytes());
+        bytes[28] = self.nature.to_byte();
+
+        self.gender.set_bits_1_2(&mut bytes[29]);
+        util::set_flag(bytes, 29, 0, self.is_fateful_encounter);
+        util::write_uint5_to_bits(
+            self.species_and_form.get_forme_index() as u8,
+            &mut bytes[29],
+            3,
+        );
+
+        bytes[30..36].copy_from_slice(&self.evs.to_bytes());
+        bytes[36..42].copy_from_slice(&self.contest.to_bytes());
+        bytes[42] = self.markings.to_byte();
+        bytes[43] = self.pokerus_byte;
+        bytes[44..48].copy_from_slice(&self.super_training_flags.to_le_bytes());
+        bytes[48..54].copy_from_slice(&self.ribbons.to_bytes());
+
+        // 55 unused
+
+        bytes[56] = self.contest_memory_count;
+        bytes[57] = self.battle_memory_count;
+        bytes[58] = self.super_training_dist_flags;
+        bytes[60..64].copy_from_slice(&self.form_argument.to_le_bytes());
+        bytes[64..90].copy_from_slice(&self.nickname);
+
+        bytes[90..92].copy_from_slice(&self.moves[0].to_le_bytes());
+        bytes[92..94].copy_from_slice(&self.moves[1].to_le_bytes());
+        bytes[94..96].copy_from_slice(&self.moves[2].to_le_bytes());
+        bytes[96..98].copy_from_slice(&self.moves[3].to_le_bytes());
+
+        bytes[98] = self.move_pp[0];
+        bytes[99] = self.move_pp[1];
+        bytes[100] = self.move_pp[2];
+        bytes[101] = self.move_pp[3];
+
+        bytes[102] = self.move_pp_ups[0];
+        bytes[103] = self.move_pp_ups[1];
+        bytes[104] = self.move_pp_ups[2];
+        bytes[105] = self.move_pp_ups[3];
+
+        bytes[106..108].copy_from_slice(&self.relearn_moves[0].to_le_bytes());
+        bytes[108..110].copy_from_slice(&self.relearn_moves[1].to_le_bytes());
+        bytes[110..112].copy_from_slice(&self.relearn_moves[2].to_le_bytes());
+        bytes[112..114].copy_from_slice(&self.relearn_moves[3].to_le_bytes());
+
+        util::set_flag(bytes, 114, 1, self.secret_super_training_unlocked);
+        util::set_flag(bytes, 114, 2, self.secret_super_training_complete);
+
+        self.ivs.write_30_bits(bytes, 116);
+        util::set_flag(bytes, 116, 30, self.is_egg);
+        util::set_flag(bytes, 116, 31, self.is_nicknamed);
+
+        bytes[120..146].copy_from_slice(&self.handler_name);
+        util::set_flag(bytes, 146, 0, self.handler_gender);
+        util::set_flag(bytes, 147, 0, self.is_current_handler);
+        bytes[148..158].copy_from_slice(&self.geolocations.to_bytes());
+
+        // 157..161 unused
+
+        bytes[162] = self.handler_friendship;
+        bytes[163] = self.handler_affection;
+        bytes[164] = self.handler_memory.intensity;
+        bytes[165] = self.handler_memory.memory;
+        bytes[166] = self.handler_memory.feeling;
+        bytes[168..170].copy_from_slice(&self.handler_memory.text_variable.to_le_bytes());
+
+        // 170..173 unused
+
+        bytes[174] = self.fullness;
+        bytes[175] = self.enjoyment;
+        bytes[176..202].copy_from_slice(&self.trainer_name);
+        bytes[202] = self.trainer_friendship;
+        bytes[203] = self.trainer_affection;
+        bytes[204] = self.trainer_memory.intensity;
+        bytes[205] = self.trainer_memory.memory;
+        bytes[206..208].copy_from_slice(&self.trainer_memory.text_variable.to_le_bytes());
+        bytes[208] = self.trainer_memory.feeling;
+
+        bytes[209..212].copy_from_slice(&PokeDate::to_bytes_optional(self.egg_date));
+        bytes[212..215].copy_from_slice(&self.met_date.to_bytes());
+        bytes[216..218].copy_from_slice(&self.egg_location_index.to_le_bytes());
+        bytes[218..220].copy_from_slice(&self.met_location_index.to_le_bytes());
+
+        bytes[220] = self.ball as u8;
+        bytes[221] = self.met_level;
+        util::set_flag(bytes, 221, 7, self.trainer_gender);
+        bytes[222] = self.encounter_type;
+        bytes[223] = self.game_of_origin as u8;
+        bytes[224] = self.country;
+        bytes[225] = self.region;
+        bytes[226] = self.console_region;
+        bytes[227] = self.language_index;
+    }
+
+    fn write_party_bytes(&self, bytes: &mut [u8]) {
+        self.write_box_bytes(bytes);
+        bytes[232..236].copy_from_slice(&self.status_condition.to_le_bytes());
+        bytes[237] = self.stat_level;
+        bytes[238] = self.form_argument_remain;
+        bytes[239] = self.form_argument_elapsed;
+        bytes[240..242].copy_from_slice(&self.current_hp.to_le_bytes());
+        bytes[242..254].copy_from_slice(&self.stats.to_bytes());
+    }
+
+    fn to_box_bytes(&self) -> Vec<u8> {
+        let mut bytes = [0; Self::BOX_SIZE];
+        self.write_box_bytes(&mut bytes);
+
+        Vec::from(bytes)
+    }
+
+    fn to_party_bytes(&self) -> Vec<u8> {
+        let mut bytes = [0; Self::PARTY_SIZE];
+        self.write_party_bytes(&mut bytes);
+
+        Vec::from(bytes)
+    }
+}
+
+impl HasSpeciesAndForm for Pk6 {
+    fn get_species_metadata(&self) -> &'static SpeciesMetadata {
+        self.species_and_form.get_species_metadata()
+    }
+
+    fn get_forme_metadata(&self) -> &'static FormMetadata {
+        self.species_and_form.get_forme_metadata()
+    }
+
+    fn calculate_level(&self) -> u8 {
+        self.get_species_metadata()
+            .level_up_type
+            .calculate_level(self.exp)
+    }
+}

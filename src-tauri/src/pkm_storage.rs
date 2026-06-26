@@ -3,7 +3,10 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{error::Result, util};
+use crate::data_controller::{DataController, DataDir};
+use crate::error::Result;
+
+const BANKS_FILENAME: &str = "banks.json";
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct StoredBankData {
@@ -104,11 +107,11 @@ impl Box {
 }
 
 pub type BoxIdentifiers = HashMap<u8, String>;
-pub type FilenameToBytesMap = HashMap<String, Vec<u8>>;
 
 #[tauri::command]
 pub fn load_banks(app_handle: tauri::AppHandle) -> Result<StoredBankData> {
-    let mut storage: StoredBankData = util::get_storage_file_json(&app_handle, "banks.json")?;
+    let mut storage: StoredBankData =
+        app_handle.read_or_create_default_json_file(DataDir::Storage, BANKS_FILENAME)?;
     if storage.banks.is_empty() {
         storage = StoredBankData::create_with_default_bank();
     }
@@ -123,5 +126,5 @@ pub fn write_banks(app_handle: tauri::AppHandle, mut bank_data: StoredBankData) 
     bank_data.order_boxes_by_indices();
     bank_data.reset_box_indices();
 
-    util::write_storage_file_json(&app_handle, "banks.json", &bank_data)
+    app_handle.write_file_json(DataDir::Storage, BANKS_FILENAME, &bank_data)
 }

@@ -1,5 +1,5 @@
+use crate::data_controller::{DataController, DataDir};
 use crate::error::{Error, Result};
-use crate::pkm_storage::FilenameToBytesMap;
 use crate::plugin::{self, PluginMetadata, PluginMetadataWithIcon, list_downloaded_plugins};
 use crate::state::{AppState, AppStateInner};
 use crate::util::ImageResponse;
@@ -37,60 +37,6 @@ pub fn get_file_created(absolute_path: PathBuf) -> Result<Option<u128>> {
 }
 
 #[tauri::command]
-pub fn get_ohpkm_files(app_handle: tauri::AppHandle) -> Result<FilenameToBytesMap> {
-    let mons_path = util::prepend_appdata_storage_to_path(&app_handle, "mons_v2")?;
-    let mon_files = fs::read_dir(&mons_path).map_err(|e| Error::file_access(&mons_path, e))?;
-
-    let mut map = HashMap::new();
-    for mon_file_os_str in mon_files.flatten() {
-        let path = mon_file_os_str.path();
-        if !path
-            .extension()
-            .is_some_and(|ext| ext.eq_ignore_ascii_case("ohpkm"))
-        {
-            continue;
-        }
-
-        if let Ok(mon_bytes) = util::read_file_bytes(path) {
-            let mon_filename = mon_file_os_str.file_name().to_string_lossy().into_owned();
-            map.insert(mon_filename, mon_bytes);
-        }
-    }
-
-    Ok(map)
-}
-
-#[tauri::command]
-pub fn delete_storage_files(
-    app_handle: tauri::AppHandle,
-    relative_paths: Vec<PathBuf>,
-) -> HashMap<PathBuf, Result<()>> {
-    let mut result = HashMap::new();
-    for relative_path in relative_paths {
-        let full_path_r = util::prepend_appdata_storage_to_path(&app_handle, &relative_path);
-
-        result.insert(
-            relative_path.clone(),
-            full_path_r.and_then(|fp| {
-                fs::remove_file(fp).map_err(|e| Error::file_access(&relative_path, e))
-            }),
-        );
-    }
-
-    result
-}
-
-#[tauri::command]
-pub fn write_storage_file_bytes(
-    app_handle: tauri::AppHandle,
-    relative_path: PathBuf,
-    bytes: Vec<u8>,
-) -> Result<()> {
-    let full_path = util::prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
-    util::write_file_contents(full_path, bytes)
-}
-
-#[tauri::command]
 pub fn write_storage_file_json(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
@@ -104,7 +50,7 @@ fn write_storage_file_text(
     relative_path: PathBuf,
     text: String,
 ) -> Result<()> {
-    let full_path = util::prepend_appdata_storage_to_path(&app_handle, &relative_path)?;
+    let full_path = app_handle.absolute_path(DataDir::Storage, relative_path)?;
     util::write_file_contents(full_path, text)
 }
 
@@ -113,7 +59,7 @@ pub fn get_storage_file_json(
     app_handle: tauri::AppHandle,
     relative_path: PathBuf,
 ) -> Result<Value> {
-    util::get_storage_file_json(&app_handle, &relative_path)
+    app_handle.read_file_json(DataDir::Storage, &relative_path)
 }
 
 #[tauri::command]
@@ -208,7 +154,7 @@ pub fn set_app_theme(
 pub fn validate_recent_saves(
     app_handle: tauri::AppHandle,
 ) -> core::result::Result<HashMap<String, saves::SaveRef>, String> {
-    saves::get_recent_saves(app_handle)
+    saves::get_recent_saves(&app_handle)
 }
 
 #[tauri::command]
@@ -245,23 +191,19 @@ pub fn list_installed_plugins(app_handle: tauri::AppHandle) -> Result<Vec<Plugin
 
 #[tauri::command]
 pub fn load_plugin_code(app_handle: tauri::AppHandle, plugin_id: String) -> Result<String> {
-    let relative_path = &PathBuf::from("plugins")
-        .join(plugin_id)
-        .join("dist")
-        .join("index.js");
-
-    util::get_appdata_file_text(&app_handle, relative_path)
+    let relative_path = &PathBuf::from(plugin_id).join("dist").join("index.js");
+    app_handle.read_file_text(DataDir::Plugins, relative_path)
 }
 
 #[tauri::command]
 pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> Result<()> {
-    let plugins_dir = util::prepend_appdata_to_path(&app_handle, "plugins")?;
-    let plugin_dir = plugins_dir.join(&plugin_id);
-
+    let plugin_dir = app_handle
+        .absolute_dir_path(DataDir::Plugins)?
+        .join(&plugin_id);
     util::delete_directory(&plugin_dir)
 }
 
 #[tauri::command]
-pub fn handle_windows_accellerator(app_handle: tauri::AppHandle, menu_event_id: String) {
+pub fn handle_windows_accelerator(app_handle: tauri::AppHandle, menu_event_id: String) {
     menu::handle_menu_event_id(&app_handle, menu_event_id.as_ref());
 }

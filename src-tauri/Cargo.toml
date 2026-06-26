@@ -1,6 +1,6 @@
 [package]
 name = "OpenHome"
-version = "1.9.2"
+version = "1.12.1"
 description = "A tool for moving Pokémon between game saves"
 authors = ["Andrew Benington"]
 edition = "2024"
@@ -13,33 +13,35 @@ edition = "2024"
 name = "openhome_lib"
 crate-type = ["cdylib", "rlib"]
 
-[profile.release]
-panic = "abort" # Strip expensive panic clean-up logic
-codegen-units = 1 # Compile crates one after another so the compiler can optimize better
-lto = true # Enables link to optimizations
-opt-level = "s" # Optimize for binary size
-strip = true # Remove debug symbols
-
 [build-dependencies]
-tauri-build = { version = "2.5.5", features = [] }
+tauri-build = { version = "2.6.3", features = [] }
 
 [dependencies]
 pkm_rs = {path = "../pkm_rs"}
-tauri = { version = "2.10.2", features = [] }
+pkm_rs_derive = {path = "../pkm_rs_derive"}
+tauri = { version = "2.11.3", features = [] }
 tauri-plugin-shell = "2.3.5"
 serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.149"
+serde_json = "1.0.150"
 tauri-plugin-os = "2.3.2"
-tauri-plugin-dialog = "2.6.0"
-tauri-plugin-fs = "2.4.5"
-reqwest = { version = "0.13.2" }
+tauri-plugin-dialog = "2.7.1"
+tauri-plugin-fs = "2.5.1"
+reqwest = { version = "0.13.4", features = [] }
 base64 = "0.22.1"
-zip = "8.1.0"
+zip = "8.6.0"
 static_assertions = "1.1.0"
-bytes = "1.11.1"
-semver = "1.0.27"
+sha2 = "0.11.0"
+num = "0.4.3"
+toml = "1.1.2"
+bytes = "1.12.0"
+semver = "1.0.28"
 strum = { version = "0.28.0", features = ["derive"] }
-uuid = { version = "1.21.0", features = ["v4"] }
+uuid = { version = "1.23.3", features = ["v4"] }
+tauri-plugin-process = "2"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
+tracing-appender = "0.2.5"
+chrono = { version = "0.4.45", features = ["serde"] }
 dirs = "6.0.0"
 glob = "0.3.3"
 

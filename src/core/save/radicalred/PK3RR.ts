@@ -1,20 +1,13 @@
-import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
-import { ItemRadicalRed } from '@pkm-rs/pkg'
-import PK3CFRU, { CFRUToNationalDexEntry } from '../cfru/PK3CFRU'
-
-import { fromGen3CRFUPokemonIndex, toGen3CRFUPokemonIndex } from '../cfru/conversion/util'
+import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
+import { ItemRadicalRed, PkmFormat } from '@pkm-rs/pkg'
+import PK3CFRU from '../cfru/PK3CFRU'
+import { CfruSpeciesAndForm } from '../cfru/conversion/util'
 import { PluginIdentifier } from '../interfaces'
 import { fromGen3RRMoveIndex, toGen3RRMoveIndex } from './conversion/Gen3RRMovesIndex'
 import { RRToNationalMap } from './conversion/Gen3RRMovesIndex/RRToNationalMap'
-import {
-  NationalDexToRadicalRedMap,
-  RadicalRedToNationalDexMap,
-} from './conversion/RadicalRedSpeciesMap'
+import { radicalRedIndexLookup, toRadicalRedPokemonIndex } from './conversion/species'
 
-const FAKEMON_INDEXES = [
-  1186, 1200, 1274, 1275, 1276, 1277, 1278, 1279, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289,
-  1290, 1291, 1292, 1293, 1294, 1375,
-]
+const CHILLET_INDEX = 1375
 
 const VALID_MOVE_INDICES_RR = Object.values(RRToNationalMap).filter((index) => index > 0)
 
@@ -24,8 +17,12 @@ export default class PK3RR extends PK3CFRU implements PluginPKMInterface {
 
   selectColor = '#660000'
 
-  static getName() {
-    return 'PK3RR'
+  static getFormat() {
+    return 'PK3RR' as const
+  }
+
+  getMonFormat(): PkmFormat {
+    return 'PK3RR' as const
   }
 
   get heldItemIndex(): number {
@@ -52,19 +49,23 @@ export default class PK3RR extends PK3CFRU implements PluginPKMInterface {
     return VALID_MOVE_INDICES_RR
   }
 
-  monFromGameIndex(gameIndex: number): CFRUToNationalDexEntry {
-    return fromGen3CRFUPokemonIndex(gameIndex, RadicalRedToNationalDexMap, 'Pokemon Radical Red')
+  monFromGameIndex(gameIndex: number): CfruSpeciesAndForm {
+    return radicalRedIndexLookup(gameIndex)
   }
 
-  monToGameIndex(nationalDexNumber: number, formIndex: number): number {
-    return toGen3CRFUPokemonIndex(nationalDexNumber, formIndex, NationalDexToRadicalRedMap)
+  monToGameIndex(nationalDexNumber: number, formIndex: number, extraFormIndex?: number): number {
+    return toRadicalRedPokemonIndex(nationalDexNumber, formIndex, extraFormIndex) ?? -1
   }
 
   indexIsFakemon(speciesIndex: number): boolean {
-    return FAKEMON_INDEXES.includes(speciesIndex)
+    return speciesIndex === CHILLET_INDEX
   }
 
   getPluginIdentifier(): PluginIdentifier {
     return 'radical_red'
+  }
+
+  getFormat(): RomHackFormat {
+    return 'PK3RR'
   }
 }

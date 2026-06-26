@@ -1,18 +1,28 @@
-import { fileTypeFromString } from '@openhome-core/pkm/FileImport'
+import { fileTypeFromStringNonOhpkm } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
+import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
+import { isRomHackFormat } from '@openhome-core/pkm/PKM'
+import { FileSchemas } from '@openhome-core/pkm/schema'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
 import FileTypeSelect from '@openhome-ui/components/FileTypeSelect'
 import HexDisplay from '@openhome-ui/components/HexDisplay'
 import { ArrowLeftIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
+import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
-import { FileSchemas } from '@pokemon-files/schema'
-import { Dialog, Flex, VisuallyHidden } from '@radix-ui/themes'
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
+import { Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
+import { GameIndicator } from '../components/pokemon/indicator/GameIndicator'
+import PokemonIcon from '../components/PokemonIcon'
+import LogsPage from '../pages/logs/LogsPage'
+import { useConvertStrategies } from '../state/convert-strategies'
 import './style.css'
+import DisplayTab from './tabs/DisplayTab'
 import MetDataMovesTab from './tabs/MetDataMovesTab'
 import NotesDisplay from './tabs/NotesTab'
 import OtherDisplay from './tabs/OtherTab'
@@ -22,26 +32,18 @@ import StatsDisplay from './tabs/StatsTab'
 import SummaryDisplay from './tabs/SummaryTab'
 import TrainersDisplay from './tabs/TrainersTab'
 
-const PokemonDetailsModal = (props: {
+export type PokemonDetailsModalProps = {
   mon?: PKMInterface
   onClose?: () => void
   navigateLeft?: () => void
   navigateRight?: () => void
   boxIndicatorProps?: MiniBoxIndicatorProps
-}) => {
-  const {
-    mon,
-    onClose,
-    navigateLeft: navigateLeftProp,
-    navigateRight: navigateRightProp,
-    boxIndicatorProps,
-  } = props
-  const [displayMon, setDisplayMon] = useState(mon)
+}
+
+export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
+  const { mon, onClose, navigateLeft, navigateRight, boxIndicatorProps } = props
   const [boxIndicatorVisible, setBoxIndicatorVisible] = useState(false)
   const [boxIndicatorTimeout, setBoxIndicatorTimeout] = useState<NodeJS.Timeout>()
-  const backend = useContext(BackendContext)
-
-  useEffect(() => setDisplayMon(mon), [mon])
 
   const showTemporaryBoxIndicator = useCallback(() => {
     setBoxIndicatorVisible(true)
@@ -53,171 +55,82 @@ const PokemonDetailsModal = (props: {
     setBoxIndicatorTimeout(timeout)
   }, [boxIndicatorTimeout])
 
-  const navigateLeft = useMemo(
-    () =>
-      navigateLeftProp
-        ? () => {
-            navigateLeftProp()
-            showTemporaryBoxIndicator()
-          }
-        : undefined,
-    [showTemporaryBoxIndicator, navigateLeftProp]
-  )
+  const navigateLeftWithIndicator = useCallback(() => {
+    if (navigateLeft) {
+      navigateLeft()
+      showTemporaryBoxIndicator()
+    }
+  }, [navigateLeft, showTemporaryBoxIndicator])
 
-  const navigateRight = useMemo(
-    () =>
-      navigateRightProp
-        ? () => {
-            navigateRightProp()
-            showTemporaryBoxIndicator()
-          }
-        : undefined,
-    [showTemporaryBoxIndicator, navigateRightProp]
-  )
+  const navigateRightWithIndicator = useCallback(() => {
+    if (navigateRight) {
+      navigateRight()
+      showTemporaryBoxIndicator()
+    }
+  }, [navigateRight, showTemporaryBoxIndicator])
 
-  const handleArrows = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') {
-        navigateLeft?.()
+        e.stopPropagation()
+        navigateLeftWithIndicator?.()
       } else if (e.key === 'ArrowRight') {
-        navigateRight?.()
+        e.stopPropagation()
+        navigateRightWithIndicator?.()
       }
-    },
-    [navigateLeft, navigateRight]
-  )
+    }
+    window.addEventListener('keydown', handler, true) // true = capture
+    return () => window.removeEventListener('keydown', handler, true)
+  }, [navigateLeftWithIndicator, navigateRightWithIndicator])
+
+  if (!mon) return null
 
   return (
-    <Dialog.Root open={!!(mon && displayMon)} onOpenChange={(open) => !open && onClose?.()}>
-      <Dialog.Content
-        onKeyDown={handleArrows}
-        minWidth="800px"
-        maxWidth="80%"
-        width="fit-content"
-        style={{
-          position: 'inherit',
-          overflow: 'hidden',
-          height: 'fit-content',
-          padding: 0,
-          borderRadius: 4,
-        }}
-      >
-        <VisuallyHidden>
-          <Dialog.Title>Pokémon Details</Dialog.Title>
-          <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
-        </VisuallyHidden>
-        {mon && displayMon && (
-          <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary">
-            <SideTabs.TabList>
-              <Flex direction="row" gap="2" mb="1">
-                <FileTypeSelect
-                  baseFormat={mon.format}
-                  currentFormat={displayMon.format}
-                  color={displayMon.selectColor}
-                  formData={mon}
-                  onChange={(newFormat) => {
-                    if (mon.format === newFormat) {
-                      setDisplayMon(mon)
-                      return
-                    }
-                    if (newFormat === 'OHPKM') {
-                      setDisplayMon(mon instanceof OHPKM ? mon : new OHPKM(mon))
-                      return
-                    }
-                    const P = fileTypeFromString(newFormat)
-
-                    if (!P) {
-                      throw `Invalid filetype: ${P}`
-                    }
-                    if (mon instanceof OHPKM) {
-                      setDisplayMon(new P(mon as any))
-                    } else {
-                      setDisplayMon(new P(new OHPKM(mon) as any))
-                    }
-                  }}
-                />
-                <button
-                  style={{ padding: '4px 6px 2px 6px' }}
-                  onClick={() => {
-                    displayMon.refreshChecksum?.()
-                    backend.saveLocalFile(
-                      new Uint8Array(displayMon.toBytes()),
-                      `${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`
-                    )
-                  }}
-                >
-                  <MdDownload style={{ color: 'white' }} />
-                </button>
-              </Flex>
-              <SideTabs.Tab value="summary">Summary</SideTabs.Tab>
-              <SideTabs.Tab value="moves_met_data">Moves/Met Data</SideTabs.Tab>
-              <SideTabs.Tab value="stats">Stats</SideTabs.Tab>
-              <SideTabs.Tab value="ribbons">Ribbons</SideTabs.Tab>
-              <SideTabs.Tab value="other">Other</SideTabs.Tab>
-              {mon instanceof OHPKM && (
-                <>
-                  <SideTabs.Tab value="trainers">Trainers</SideTabs.Tab>
-                  <SideTabs.Tab value="notes">Notes</SideTabs.Tab>
-                  <SideTabs.Tab value="recent-save">Recent Save</SideTabs.Tab>
-                </>
-              )}
-              <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
-            </SideTabs.TabList>
-            <Fallback>
-              <SideTabs.Panel value="summary">
-                <SummaryDisplay mon={displayMon} />
-              </SideTabs.Panel>
-              <SideTabs.Panel value="moves_met_data">
-                <MetDataMovesTab mon={displayMon} />
-              </SideTabs.Panel>
-              <SideTabs.Panel value="stats">
-                <StatsDisplay mon={displayMon} />
-              </SideTabs.Panel>
-              <SideTabs.Panel value="ribbons">
-                <RibbonsDisplay mon={displayMon} />
-              </SideTabs.Panel>
-              <SideTabs.Panel value="other">
-                <OtherDisplay mon={displayMon} />
-              </SideTabs.Panel>
-              {mon instanceof OHPKM && (
-                <>
-                  <SideTabs.Panel value="trainers">
-                    <TrainersDisplay mon={mon} />
-                  </SideTabs.Panel>
-                  <SideTabs.Panel value="notes">
-                    <NotesDisplay mon={mon} />
-                  </SideTabs.Panel>
-                  <SideTabs.Panel value="recent-save">
-                    <RecentSaveTab mon={mon} />
-                  </SideTabs.Panel>
-                </>
-              )}
-              <SideTabs.Panel value="raw">
-                <Fallback>
-                  <HexDisplay
-                    data={
-                      new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))
-                      // displayMon.originalBytes
-                      //   ? displayMon.originalBytes
-                      //   : new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))
-                    }
-                    format={
-                      displayMon.pluginIdentifier
-                        ? undefined
-                        : (displayMon.format as keyof typeof FileSchemas | 'OHPKM')
-                    }
-                  />
-                </Fallback>
-              </SideTabs.Panel>
-            </Fallback>
-          </SideTabs.Root>
-        )}
+    <Dialog.Root open onOpenChange={(open) => !open && onClose?.()}>
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Popup className="pokemon-modal">
+          <VisuallyHidden>
+            <Dialog.Title>Pokémon Details</Dialog.Title>
+            <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
+          </VisuallyHidden>
+          <Fallback>
+            <ModalContents mon={mon} key={getMonFileIdentifier(mon)} />
+          </Fallback>
+          <div className="modal-footer">
+            <Flex gap="1" align="center" minWidth="7rem">
+              <PokemonIcon
+                dexNumber={mon.dexNum}
+                formIndex={mon.formNum}
+                style={{ width: '1rem', height: '1rem' }}
+              />
+              {mon.nickname}
+            </Flex>
+            <Flex gap="1" align="center" minWidth="5rem">
+              <GameIndicator
+                originGame={mon.gameOfOrigin}
+                plugin={mon.pluginOrigin}
+                style={{ minWidth: 15, height: 15 }}
+              />
+              {mon.trainerName}
+            </Flex>
+            {mon.personalityValue && (
+              <code>PID {mon.personalityValue.toString(16).padStart(8, '0')}</code>
+            )}
+            <div>Level {mon.getLevel()}</div>
+            <div style={{ flex: 1 }} />
+            {mon instanceof OHPKM && (
+              <div>Tracked since {mon.startedTrackingTimestamp?.format('MMMM D, YYYY')}</div>
+            )}
+          </div>
+        </Dialog.Popup>
         {navigateLeft && (
-          <button className="modal-arrow modal-arrow-left" onClick={navigateLeft}>
+          <button className="modal-arrow modal-arrow-left" onClick={navigateLeftWithIndicator}>
             <ArrowLeftIcon />
           </button>
         )}
         {navigateRight && (
-          <button className="modal-arrow modal-arrow-right" onClick={navigateRight}>
+          <button className="modal-arrow modal-arrow-right" onClick={navigateRightWithIndicator}>
             <ArrowRightIcon />
           </button>
         )}
@@ -229,9 +142,180 @@ const PokemonDetailsModal = (props: {
             <MiniBoxIndicator {...boxIndicatorProps} />
           </div>
         )}
-      </Dialog.Content>
+      </Dialog.Portal>
     </Dialog.Root>
   )
 }
 
-export default PokemonDetailsModal
+type ModalContentsProps = {
+  mon: PKMInterface
+}
+
+function ModalContents(props: ModalContentsProps) {
+  const { mon } = props
+  const [displayMon, setDisplayMon] = useState(mon)
+  const [isOriginal, setIsOriginal] = useState(false)
+  const { defaultConvertStrategy } = useConvertStrategies()
+  const backend = useContext(BackendContext)
+  const displayError = useDisplayError()
+
+  function updateIsOriginal(isOriginal: boolean) {
+    setIsOriginal(isOriginal)
+    if (isOriginal && mon instanceof OHPKM && mon.originalData) {
+      if (isOriginal && mon.originalData) {
+        const O = fileTypeFromStringNonOhpkm(originalDataTagToMonFormat(mon.originalData.tag))
+        if (O) {
+          setDisplayMon(O.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
+          return
+        }
+      }
+      switchFormat(originalDataTagToMonFormat(mon.originalData.tag))
+    } else if (mon) {
+      switchFormat(mon.format)
+    }
+  }
+
+  function switchFormat(newFormat: PkmFormat | 'OHPKM') {
+    if (!mon) return
+    if (mon.format === newFormat) {
+      setDisplayMon(mon)
+      return
+    }
+
+    if (newFormat === 'OHPKM') {
+      setDisplayMon(mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon))
+      return
+    }
+
+    const P = fileTypeFromStringNonOhpkm(newFormat)
+
+    if (!P) {
+      throw `Invalid filetype: ${P}`
+    }
+
+    try {
+      if (mon instanceof OHPKM) {
+        if (
+          isOriginal &&
+          mon.originalData &&
+          originalDataTagToMonFormat(mon.originalData.tag) === newFormat
+        ) {
+          const O =
+            fileTypeFromStringNonOhpkm(originalDataTagToMonFormat(mon.originalData.tag)) ?? P
+          setDisplayMon(O.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
+        } else {
+          setDisplayMon(P.fromOhpkm(mon, defaultConvertStrategy))
+        }
+      } else {
+        setDisplayMon(P.fromOhpkm(OHPKM.fromMonUnknownSave(mon), defaultConvertStrategy))
+      }
+    } catch (e) {
+      console.error(e)
+      displayError(`Error converting to ${P.getFormat()}`, `${e}`)
+    }
+  }
+
+  return (
+    <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary">
+      <SideTabs.TabList>
+        <Flex direction="row" gap="var(--padding-radius-sm-lg">
+          <FileTypeSelect
+            baseFormat={mon.format}
+            currentFormat={displayMon.format}
+            color={displayMon.selectColor}
+            formData={mon}
+            disabled={isOriginal}
+            onChange={switchFormat}
+          />
+          <button
+            className="mini-button"
+            onClick={() => {
+              displayMon.refreshChecksum?.()
+              backend.saveLocalFile(
+                new Uint8Array(displayMon.toBytes()),
+                `${displayMon.nickname}.${displayMon.format.toLocaleLowerCase()}`
+              )
+            }}
+          >
+            <MdDownload style={{ color: 'white' }} />
+          </button>
+        </Flex>
+        <SideTabs.Tab value="summary">Summary</SideTabs.Tab>
+        <SideTabs.Tab value="moves_met_data">Moves/Met Data</SideTabs.Tab>
+        <SideTabs.Tab value="stats">Stats</SideTabs.Tab>
+        <SideTabs.Tab value="ribbons">Ribbons</SideTabs.Tab>
+        <SideTabs.Tab value="other">Other</SideTabs.Tab>
+        {mon instanceof OHPKM && (
+          <>
+            <SideTabs.Tab value="trainers">Trainers</SideTabs.Tab>
+            <SideTabs.Tab value="notes">Notes</SideTabs.Tab>
+            <SideTabs.Tab value="display">Display</SideTabs.Tab>
+            <SideTabs.Tab value="recent-save">Recent Save</SideTabs.Tab>
+            <SideTabs.Tab value="logs">Logs</SideTabs.Tab>
+          </>
+        )}
+        <SideTabs.Tab value="raw">Raw</SideTabs.Tab>
+        <div style={{ flex: 1 }} />
+        {(isOriginal || (mon instanceof OHPKM && mon.originalData)) && (
+          <Flex className="original-data-switch" align="center" gap="2">
+            <Switch
+              radius="full"
+              size="1"
+              checked={isOriginal}
+              onCheckedChange={updateIsOriginal}
+            />
+            Show Original
+          </Flex>
+        )}
+      </SideTabs.TabList>
+      <Fallback>
+        <SideTabs.Panel value="summary">
+          <SummaryDisplay mon={displayMon} />
+        </SideTabs.Panel>
+        <SideTabs.Panel value="moves_met_data">
+          <MetDataMovesTab mon={displayMon} />
+        </SideTabs.Panel>
+        <SideTabs.Panel value="stats">
+          <StatsDisplay mon={displayMon} />
+        </SideTabs.Panel>
+        <SideTabs.Panel value="ribbons">
+          <RibbonsDisplay mon={displayMon} />
+        </SideTabs.Panel>
+        <SideTabs.Panel value="other">
+          <OtherDisplay mon={displayMon} />
+        </SideTabs.Panel>
+        {mon instanceof OHPKM && (
+          <>
+            <SideTabs.Panel value="trainers">
+              <TrainersDisplay mon={mon} />
+            </SideTabs.Panel>
+            <SideTabs.Panel value="notes">
+              <NotesDisplay mon={mon} />
+            </SideTabs.Panel>
+            <SideTabs.Panel value="display">
+              <DisplayTab mon={mon} key={mon.openhomeId} />
+            </SideTabs.Panel>
+            <SideTabs.Panel value="recent-save">
+              <RecentSaveTab mon={mon} />
+            </SideTabs.Panel>
+            <SideTabs.Panel value="logs">
+              <LogsPage openhomeIdFilter={mon.openhomeId} />
+            </SideTabs.Panel>
+          </>
+        )}
+        <SideTabs.Panel value="raw">
+          <Fallback>
+            <HexDisplay
+              data={new Uint8Array(displayMon.toBytes({ includeExtraFields: true }))}
+              format={
+                isRomHackFormat(displayMon.format)
+                  ? undefined
+                  : (displayMon.format as keyof typeof FileSchemas | 'OHPKM')
+              }
+            />
+          </Fallback>
+        </SideTabs.Panel>
+      </Fallback>
+    </SideTabs.Root>
+  )
+}

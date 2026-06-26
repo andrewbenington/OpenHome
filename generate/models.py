@@ -1,10 +1,11 @@
 
-from enum import Enum
 import re
+from enum import Enum
 from typing import Optional
 
+import requests
+from bs4 import BeautifulSoup
 from pydantic import BaseModel, Field
-
 
 
 class PokemonType(str, Enum):
@@ -208,6 +209,78 @@ class PokemonForm(BaseModel):
         female_tag = '-female' if is_female and form_name in female_stats else ('-f' if is_female else '')
         return f"https://img.pokemondb.net/sprites/{game}/{shininess}/{form_name}{female_tag}{extension}"
     
+    def bulbagarden_sprite_url(self, is_shiny: bool, game: str, is_female=False) -> str | None:
+        # if self.introduced_gen != 9 or not self.is_mega:
+        #     return None
+        segments = self.name.split("-")
+        forme_name = "-" + "_".join(segments[1:]).replace("%", "_Percent").replace("keball", "ké_Ball").replace("Paldea_Fire", "Paldea_Blaze").replace("Paldea_Water", "Paldea_Aqua").replace("_Striped", "").replace(" ", "_")
+        if "Totem" in forme_name:
+            return ""
+        if forme_name in ["-Meadow", "-Four"]:
+            forme_name = ""
+        elif "Pikachu-" in self.name:
+            forme_name = forme_name[1:2]
+        elif forme_name == "-La Reine":
+            forme_name = "-La_Reine"
+        elif ("_Cream" in forme_name or "Caramel_Swirl" in forme_name or "Rainbow_Swirl" in forme_name) and game != "champions" :
+            forme_name = forme_name[:-6]
+        elif self.name == "Tauros-Paldea":
+            forme_name = "-Paldea_Combat"
+        elif forme_name == "-Galar_Zen":
+            forme_name = "GZ"
+        elif forme_name == "-Original":
+            forme_name = "-Original_Color"
+        elif forme_name == "-Male_Mega" or  forme_name == "-Female_Mega":
+            forme_name = "-Mega"
+        elif is_female:
+            forme_name = "-Female"
+        
+
+        if game == 'champions':
+            if forme_name == "-Super":
+                forme_name = "-Jumbo"
+            elif forme_name == "-Masterpiece" or "-Busted" in forme_name:
+                forme_name = ""
+        
+        shiny_suffix = " shiny" if is_shiny else ""
+
+        if game == 'home' and "Vivillon" in self.name:
+            forme_name = forme_name[1:4]
+            shiny_suffix = "_s" if is_shiny else ""
+
+        game_str = "Menu_CP_" if game == "champions" else "HOME"
+
+        form_suffix = "" if self.form_index == 0 and not (self.national_dex == 666 or self.national_dex == 671 or is_female) else forme_name
+
+        bulbaFilePage = f'https://archives.bulbagarden.net/wiki/File:{game_str}{str(self.national_dex).zfill(4)}{form_suffix}{shiny_suffix}.png'
+
+        return self.bulbagarden_image_url_from_page(bulbaFilePage)
+        
+    
+    @staticmethod
+    def bulbagarden_image_url_from_page(url: str):
+        # Send an HTTP request to the URL and get the page content
+        response = requests.get(url)
+        page_content = response.text
+
+        # Create a BeautifulSoup object to parse the page content
+        soup = BeautifulSoup(page_content, "html.parser")
+
+        # Find the first image whose alt attribute starts with "File:"
+        target_img = None
+
+        for img in soup.find_all('img'):
+            alt_text = img.get('alt')
+            if alt_text and str(alt_text).startswith('File:'):
+                target_img = img
+                break
+
+        # If a matching image is found, download it
+        if target_img:
+            return str(target_img.get('src'))
+        
+        print(f"no image found for {url}")
+
     def gen3_form(self) -> str | None:
         if self.form_index > 0 or self.national_dex == 201:
             return self.name.split('-')[1]
@@ -299,10 +372,7 @@ class PokemonForm(BaseModel):
         if self.national_dex == NatDex.PICHU and self.form_index == SPIKY_EAR_PICHU:
             return False
         
-        if self.name == "Floette-Eternal":
-            return False
-        
-        return self.regional == "Paldea"
+        return True
 
     def separate_female_sprite(self):
         return self.national_dex in GENDER_DIFFERENCES
@@ -654,7 +724,7 @@ GENDER_DIFFERENCES = [
     257, 267, 269, 272, 274, 275, 307, 308, 315, 316, 317, 322, 323, 332, 350,
     369, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 407, 415, 417, 418,
     419, 424, 443, 444, 445, 449, 450, 453, 454, 456, 457, 459, 460, 461, 464,
-    465, 473, 521, 592, 593, 668]
+    465, 473, 521, 592, 593, 668, 902]
 
 
 FIRST_FORM_ONLY_456 = [

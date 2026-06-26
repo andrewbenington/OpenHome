@@ -1,12 +1,11 @@
 use base64::Engine;
 use base64::engine::general_purpose;
+use std::collections::HashSet;
 use std::fs;
 use std::hash::{Hash, Hasher};
 use std::io::Cursor;
 use std::path::Path;
 use std::process::Command;
-use std::{collections::HashSet, path::PathBuf};
-use tauri::Manager;
 use zip::ZipArchive;
 
 use crate::error::{Error, Result};
@@ -70,64 +69,12 @@ pub fn parse_path_data(path: &Path) -> PathData {
     }
 }
 
-pub fn prepend_appdata_to_path<P>(app_handle: &tauri::AppHandle, path: P) -> Result<PathBuf>
-where
-    P: AsRef<Path>,
-{
-    app_handle
-        .path()
-        .app_data_dir()
-        .map(|appdata| appdata.join(path))
-        .map_err(Error::appdata)
-}
-
-pub fn get_storage_path(app_handle: &tauri::AppHandle) -> Result<PathBuf> {
-    prepend_appdata_to_path(app_handle, "storage")
-}
-
-pub fn prepend_appdata_storage_to_path<P>(app_handle: &tauri::AppHandle, path: P) -> Result<PathBuf>
-where
-    P: AsRef<Path>,
-{
-    get_storage_path(app_handle).map(|storage| storage.join(path))
-}
-
-pub fn get_appdata_file_text(
-    app_handle: &tauri::AppHandle,
-    relative_path: &Path,
-) -> Result<String> {
-    let full_path = prepend_appdata_to_path(app_handle, relative_path)?;
-    read_file_text(&full_path)
-}
-
 pub fn write_file_contents<P, C>(path: P, contents: C) -> Result<()>
 where
     P: AsRef<Path>,
     C: AsRef<[u8]>,
 {
     fs::write(&path, contents).map_err(|err| Error::file_access(&path, err))
-}
-
-pub fn write_file_json<P, V>(path: P, value: V) -> Result<()>
-where
-    P: AsRef<Path>,
-    V: serde::ser::Serialize,
-{
-    let text = serde_json::to_string(&value).map_err(|err| Error::file_malformed(&path, err))?;
-    write_file_contents(path, text)
-}
-
-pub fn write_storage_file_json<P, V>(
-    app_handle: &tauri::AppHandle,
-    relative_path: P,
-    value: V,
-) -> Result<()>
-where
-    P: AsRef<Path>,
-    V: serde::ser::Serialize,
-{
-    let full_path = prepend_appdata_storage_to_path(app_handle, relative_path)?;
-    write_file_json(&full_path, value)
 }
 
 pub fn create_directory<P>(path: P) -> Result<()>
@@ -144,47 +91,13 @@ where
     fs::read(&path).map_err(|err| Error::file_access(&path, err))
 }
 
-pub fn read_file_text(full_path: &Path) -> Result<String> {
-    if !full_path.exists() {
-        return Err(Error::file_missing(full_path));
-    }
-
-    fs::read_to_string(full_path).map_err(|e| Error::file_malformed(&full_path, e))
-}
-
-pub fn read_file_json<T>(full_path: &Path) -> Result<T>
-where
-    T: serde::de::DeserializeOwned,
-{
-    if !full_path.exists() {
-        return Err(Error::file_missing(full_path));
-    }
-    let json_str = read_file_text(full_path)?;
-    serde_json::from_str(&json_str).map_err(|e| Error::file_malformed(&full_path, e))
-}
-
-pub fn get_storage_file_json<P, T>(app_handle: &tauri::AppHandle, relative_path: P) -> Result<T>
-where
-    P: AsRef<Path>,
-    T: serde::de::DeserializeOwned,
-{
-    let full_path = prepend_appdata_storage_to_path(app_handle, relative_path)?;
-    read_file_json(&full_path)
-}
-
-pub fn get_appdata_dir(app_handle: &tauri::AppHandle) -> Result<PathBuf> {
-    app_handle.path().app_data_dir().map_err(Error::appdata)
-}
-
 pub fn dedupe_paths(paths: Vec<PathData>) -> Vec<PathData> {
     let set: HashSet<PathData> = paths.into_iter().collect();
     set.into_iter().collect()
 }
 
 pub async fn download_text_file(url: &str) -> Result<String> {
-    let response = reqwest::Client::new()
-        .get(url)
-        .send()
+    let response = reqwest::get(url)
         .await
         .map_err(|err| Error::file_download(url, err))?;
 
@@ -195,9 +108,7 @@ pub async fn download_text_file(url: &str) -> Result<String> {
 }
 
 pub async fn download_binary_file(url: &str) -> Result<bytes::Bytes> {
-    let response = reqwest::Client::new()
-        .get(url)
-        .send()
+    let response = reqwest::get(url)
         .await
         .map_err(|err| Error::file_download(url, err))?;
 

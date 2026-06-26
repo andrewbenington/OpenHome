@@ -1,18 +1,12 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
-import {
-  gameOrPluginSorter,
-  multiSorter,
-  numericSorter,
-  SortableColumn,
-  stringSorter,
-} from '@openhome-core/util/sort'
-import { OriginGameIndicator } from '@openhome-ui/components/pokemon/indicator/OriginGame'
+import { gameOrPluginSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
+import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
+import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
+import { useLookups } from '@openhome-ui/state/lookups/useLookups'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { MetadataLookup, OriginGames } from '@pkm-rs/pkg'
-import SortableDataGrid from 'src/ui/components/SortableDataGrid'
-import { useLookups } from 'src/ui/state/lookups/useLookups'
+import { OriginGames } from '@pkm-rs/pkg'
 
 type G345LookupRow = {
   gen345ID: string
@@ -41,7 +35,7 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
           >
             <PokemonIcon
               dexNumber={value.homeMon.dexNum}
-              formeNumber={value.homeMon.formeNum}
+              formIndex={value.homeMon.formNum}
               style={{ width: 30, height: 30 }}
             />
           </button>
@@ -53,37 +47,14 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
       name: 'Original Game',
       width: '10rem',
       renderValue: (value) => (
-        <div className="flex-row-centered">
-          <OriginGameIndicator
-            originGame={value.homeMon?.gameOfOrigin}
-            plugin={value.homeMon?.pluginOrigin as PluginIdentifier}
-            withName
-          />
-        </div>
-      ),
-      cellClass: 'centered-cell',
-      sortFunction: multiSorter(
-        numericSorter((value) => value.homeMon?.dexNum),
-        numericSorter((value) => value.homeMon?.formeNum)
-      ),
-      getFilterValue: (value) =>
-        (value.homeMon &&
-          MetadataLookup(value.homeMon.dexNum, value.homeMon.formeNum)?.speciesName) ||
-        'Unknown',
-    },
-    {
-      key: 'game',
-      name: 'Original Game',
-      width: '10rem',
-      renderValue: (value) => (
-        <OriginGameIndicator
+        <GameIndicator
           originGame={value.homeMon?.gameOfOrigin}
           plugin={value.homeMon?.pluginOrigin as PluginIdentifier}
           withName
         />
       ),
       getFilterValue: (val) =>
-        val.homeMon ? OriginGames.gameName(val.homeMon.gameOfOrigin) : '(Unknown)',
+        val.homeMon ? OriginGames.gameNameFull(val.homeMon.gameOfOrigin) : '(Unknown)',
       sortFunction: gameOrPluginSorter(
         (val) => val.homeMon?.gameOfOrigin,
         (val) => val.homeMon?.pluginOrigin

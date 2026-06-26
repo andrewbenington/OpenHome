@@ -1,5 +1,6 @@
+import { PK3 } from '@openhome-core/pkm'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
-import { PK3 } from '@pokemon-files/pkm'
+import { ConvertStrategies, ConvertStrategy } from '@pkm-rs/pkg'
 import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
 import path from 'path'
@@ -12,28 +13,42 @@ import { initializeWasm } from './init'
 beforeAll(initializeWasm)
 
 var blazikenOhpkm: OHPKM
+var blazikenPk3Bytes: Uint8Array
 var blazikenPk3: PK3
-var slowpokeOhpkm: OHPKM
+var slowbroOhpkm: OHPKM
+
+function pkmTestFilePath(dir: string, filename: string): string {
+  return path.join(__dirname, 'pkm-files', dir, filename)
+}
 
 beforeAll(() => {
   blazikenOhpkm = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'blaziken.ohpkm'))),
-    'OhpkmV2'
+    new Uint8Array(fs.readFileSync(pkmTestFilePath('ohpkm', 'blaziken.ohpkm'))),
+    'OHPKM'
   ) as OHPKM
 
-  blazikenPk3 = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm'))),
-    'PK3'
-  ) as PK3
+  blazikenPk3Bytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pk3', 'blaziken.pkm')))
+  blazikenPk3 = bytesToPKM(blazikenPk3Bytes, 'PK3') as PK3
 
-  slowpokeOhpkm = bytesToPKM(
-    new Uint8Array(fs.readFileSync(path.join(__dirname, './PKMFiles/OhpkmV2', 'slowbro.ohpkm'))),
-    'OhpkmV2'
+  slowbroOhpkm = bytesToPKM(
+    new Uint8Array(fs.readFileSync(pkmTestFilePath('ohpkm', 'slowbro.ohpkm'))),
+    'OHPKM'
   ) as OHPKM
 })
 
+test('blaziken bytes', () => {
+  const BLAZIKEN_ENCRYPTED_BYTES =
+    'afe6de82a28827bdbcc6bbd4c3c5bfc8ff000202cce3bdffffffff007b690000416fbe3e266fa03f2d76e92f176f2e3f1942e93ff291f93f0d7e7c1e663cdb2c0deef13f0b92f9c30d6ef93f0d6ef93f'
+
+  const file = pkmTestFilePath('pk3', 'blaziken.pkm')
+  const bytes = new Uint8Array(fs.readFileSync(file))
+  const mon = PK3.fromBytes(bytes.buffer)
+
+  expect(mon.toPCBytes()).toStrictEqual(Uint8Array.fromHex(BLAZIKEN_ENCRYPTED_BYTES).buffer)
+})
+
 test('gen 3 stat calculations', () => {
-  const file = path.join(__dirname, './PKMFiles/Gen3', 'blaziken.pkm')
+  const file = pkmTestFilePath('pk3', 'blaziken.pkm')
   const fileBytes = fs.readFileSync(file)
   const bytes = new Uint8Array(fileBytes)
   const mon = bytesToPKM(bytes, 'pkm')
@@ -49,7 +64,7 @@ test('gen 3 stat calculations', () => {
 })
 
 test('gen 3 EVs are updated', () => {
-  const emeraldPKM = new PK3(blazikenOhpkm)
+  const emeraldPKM = PK3.fromOhpkm(blazikenOhpkm, ConvertStrategies.getDefault())
 
   // mimicking ev reduction berries and ev gain
   emeraldPKM.evs = {
@@ -72,18 +87,20 @@ test('gen 3 EVs are updated', () => {
 })
 
 test('gen 3 ribbons are updated', () => {
-  const emeraldPKM = new PK3(blazikenOhpkm)
+  const emeraldPKM = PK3.fromOhpkm(blazikenOhpkm, ConvertStrategies.getDefault())
 
   // gaining Gen 3 ribbons
   emeraldPKM.ribbons = [
     ...emeraldPKM.ribbons,
     'Cool (Hoenn)',
-    'Cool Super',
-    'Cool Hyper',
+    'Cool Super (Hoenn)',
+    'Cool Hyper (Hoenn)',
     'Cool Master (Hoenn)',
     'Winning',
   ]
+
   blazikenOhpkm.syncWithGameData(emeraldPKM)
+
   expect(blazikenOhpkm.ribbons).toContain('Cool Master (Hoenn)')
   expect(blazikenOhpkm.ribbons).toContain('Winning')
   expect(blazikenOhpkm.ribbons).toContain('Effort')
@@ -91,7 +108,7 @@ test('gen 3 ribbons are updated', () => {
 })
 
 test('gen 3 contest stats are updated', () => {
-  const emeraldPKM = new PK3(blazikenOhpkm)
+  const emeraldPKM = PK3.fromOhpkm(blazikenOhpkm, ConvertStrategies.getDefault())
 
   // gaining cool contest points
   emeraldPKM.contest = {
@@ -114,36 +131,47 @@ test('gen 3 contest stats are updated', () => {
 })
 
 test('gen 3 conversion to OHPKM and back is lossless', () => {
-  const ohPKM = new OHPKM(blazikenPk3)
+  const ohPKM = OHPKM.fromMonUnknownSave(blazikenPk3)
   // gaining cool contest points
-  const gen3PKM = new PK3(ohPKM)
+  const gen3PKM = PK3.fromOhpkm(ohPKM, ConvertStrategies.getDefault())
 
   expect(blazikenPk3.toBytes()).toEqual(gen3PKM.toBytes())
 })
 
 test('pk3 and ohpkm have the same gen345Lookup key', () => {
-  const ohPKM = new OHPKM(blazikenPk3)
+  const ohPKM = OHPKM.fromMonUnknownSave(blazikenPk3)
 
   expect(getMonGen345Identifier(ohPKM)).toEqual(getMonGen345Identifier(blazikenPk3))
 })
 
-test('gen 6+ nickname accuracy', () => {
-  const converted = new PK3(slowpokeOhpkm)
+test('gen 3 nickname converted', () => {
+  const gameDefaultStrategy: ConvertStrategy = {
+    ...ConvertStrategies.getDefault(),
+    'nickname.capitalization': 'GameDefault',
+  }
+  const converted = PK3.fromOhpkm(slowbroOhpkm, gameDefaultStrategy)
 
-  expect(converted.nickname).toBe(slowpokeOhpkm.nickname)
+  expect(converted.nickname).toBe('SLOWBRO')
 })
 
-test('gen 6+ shiny accuracy', () => {
-  const converted = new PK3(slowpokeOhpkm)
-
-  if (!slowpokeOhpkm.personalityValue) {
-    throw Error('mon has no personality value')
+test('gen 3 nickname capitalization override', () => {
+  const modernStrategy: ConvertStrategy = {
+    ...ConvertStrategies.getDefault(),
+    'nickname.capitalization': 'Modern',
   }
-  expect(converted.isShiny()).toBe(slowpokeOhpkm.isShiny())
+  const converted = PK3.fromOhpkm(slowbroOhpkm, modernStrategy)
+
+  expect(converted.nickname).toBe('Slowbro')
+})
+
+test('gen 3 shiny accuracy', () => {
+  const converted = PK3.fromOhpkm(slowbroOhpkm, ConvertStrategies.getDefault())
+
+  expect(converted.isShiny()).toBe(slowbroOhpkm.isShiny())
 })
 
 test('gen 6+ nature accuracy', () => {
-  const converted = new PK3(slowpokeOhpkm)
+  const converted = PK3.fromOhpkm(slowbroOhpkm, ConvertStrategies.getDefault())
 
-  expect(converted.nature.index).toEqual(slowpokeOhpkm.nature.index)
+  expect(converted.nature.index).toEqual(slowbroOhpkm.nature.index)
 })

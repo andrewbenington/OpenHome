@@ -1,4 +1,4 @@
-import { partitionResults, R } from '@openhome-core/util/functional'
+import { R } from '@openhome-core/util/functional'
 import '@openhome-ui/App.css'
 import AppTabs from '@openhome-ui/AppTabs'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
@@ -6,9 +6,9 @@ import BackendInterface from '@openhome-ui/backend/backendInterface'
 import { BackendProvider } from '@openhome-ui/backend/backendProvider'
 import { TauriBackend } from '@openhome-ui/backend/tauri/tauriBackend'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
+import useDebounce from '@openhome-ui/hooks/debounce'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import useDebounce from '@openhome-ui/hooks/useDebounce'
-import { AppStateProvider } from '@openhome-ui/state/app-state'
+import { TransactionStateProvider } from '@openhome-ui/state/app-state'
 import {
   AppInfoContext,
   appInfoInitialState,
@@ -22,14 +22,18 @@ import { ItemBagContext, itemBagReducer } from '@openhome-ui/state/items'
 import { LookupsProvider } from '@openhome-ui/state/lookups'
 import { MouseContext, mouseReducer } from '@openhome-ui/state/mouse'
 import { OhpkmStoreProvider } from '@openhome-ui/state/ohpkm'
-import { PluginContext, pluginReducer } from '@openhome-ui/state/plugin'
 import { SavesProvider } from '@openhome-ui/state/saves'
-import AutoScanToast from '@openhome-ui/top-level/AutoScanToast'
 import ErrorMessageModal from '@openhome-ui/top-level/ErrorMessageModal'
 import UpdateMessageModal from '@openhome-ui/top-level/UpdateMessageModal'
-import { loadPlugin } from '@openhome-ui/util/plugin'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
+import BanksAndBoxesProvider from './state-zustand/banks-and-boxes/Provider'
+import ConvertStrategiesProvider from './state/convert-strategies/ConvertStrategiesProvider'
+import PluginsProvider from './state/plugin/PluginProvider'
+
+const ZOOM_CHANGE_PCT = 5
+const ZOOM_MIN_PCT = 50
+const ZOOM_MAX_PCT = 160
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
@@ -43,49 +47,21 @@ export default function App() {
       style={{ background: 'var(--background-gradient)' }}
       radius="small"
     >
-      <BackendProvider backend={TauriBackend}>
-        <ErrorContext.Provider value={[errorState, errorDispatch]}>
-          <AppWithBackend />
-        </ErrorContext.Provider>
-      </BackendProvider>
+      <div id="app-container" className="root">
+        <BackendProvider backend={TauriBackend}>
+          <ErrorContext.Provider value={[errorState, errorDispatch]}>
+            <AppWithBackend />
+          </ErrorContext.Provider>
+        </BackendProvider>
+      </div>
     </Theme>
   )
-}
-
-function buildKeyboardHandler(backend: BackendInterface) {
-  return (e: KeyboardEvent) => {
-    if (!e.ctrlKey) return
-    switch (e.key) {
-      case 'o':
-        backend.emitMenuEvent('open')
-        return
-      case 's':
-        backend.emitMenuEvent('save')
-        return
-      case 't':
-        backend.emitMenuEvent('reset')
-        return
-      case 'd':
-        backend.emitMenuEvent('open-appdata')
-        return
-      case 'q':
-        backend.emitMenuEvent('exit')
-        return
-      case 'u':
-        backend.emitMenuEvent('check-updates')
-        return
-      case 'g':
-        backend.emitMenuEvent('visit-github')
-        return
-    }
-  }
 }
 
 function AppWithBackend() {
   const [mouseState, mouseDispatch] = useReducer(mouseReducer, { shift: false })
   const [dragState, setDragState] = useState<DragMonState>(emptyDragState())
   const [appInfoState, appInfoDispatch] = useReducer(appInfoReducer, appInfoInitialState)
-  const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
   const [settingsLoading, setSettingsLoading] = useState(false)
   const [bagState, bagDispatch] = useReducer(itemBagReducer, {
     itemCounts: {},
@@ -132,80 +108,165 @@ function AppWithBackend() {
     debouncedUpdateSettings(backend, appInfoState.settings)
   }, [backend, appInfoState.settings, appInfoState.settingsLoaded, debouncedUpdateSettings])
 
+  useEffect(() => {
+    // returns a function to stop listening
+    const stopListening = backend.onMenuEvents({
+      zoom_in: () => {
+        appInfoDispatch({
+          type: 'set_zoom_level',
+          payload: Math.min(appInfoState.settings.zoomLevel + ZOOM_CHANGE_PCT, ZOOM_MAX_PCT),
+        })
+      },
+      zoom_out: () =>
+        appInfoDispatch({
+          type: 'set_zoom_level',
+          payload: Math.max(appInfoState.settings.zoomLevel - ZOOM_CHANGE_PCT, ZOOM_MIN_PCT),
+        }),
+      reset_zoom: () => appInfoDispatch((() => ({ type: 'set_zoom_level', payload: 100 }))()),
+    })
+
+    // the "stop listening" function should be called when the effect returns,
+    // otherwise duplicate listeners will exist
+    return () => {
+      stopListening()
+    }
+  }, [appInfoState.settings.zoomLevel, backend])
+
   const getEnabledSaveTypes = useCallback(() => {
-    return appInfoState.extraSaveTypes
-      .concat(appInfoState.officialSaveTypes)
+    return appInfoState.officialSaveTypes
+      .concat(appInfoState.extraSaveTypes)
       .filter((saveType) => appInfoState.settings.enabledSaveTypes[saveType.saveTypeID])
   }, [appInfoState])
 
   useEffect(() => {
-    if (pluginState.loaded || !appInfoState.settingsLoaded) return
-    backend.listInstalledPlugins().then(
-      R.match(
-        (plugins) => {
-          const promises = plugins
-            .filter((plugin) => appInfoState.settings.enabledPlugins[plugin.id])
-            .map((plugin) => backend.loadPluginCode(plugin.id))
-
-          Promise.all(promises).then((results) => {
-            const { failures, successes } = partitionResults(results)
-
-            if (failures.length) {
-              displayError('Some Plugins Failed to Load', failures)
-            }
-
-            const plugins = successes.map(loadPlugin)
-
-            pluginDispatch({ type: 'register_plugins', payload: plugins })
-            pluginDispatch({ type: 'set_loaded', payload: true })
-          })
-        },
-        (err) => {
-          pluginDispatch({ type: 'set_loaded', payload: true })
-          displayError('Error Getting Installed Plugins', err)
-        }
-      )
-    )
-  }, [
-    backend,
-    displayError,
-    pluginState,
-    appInfoState.settingsLoaded,
-    appInfoState.settings.enabledPlugins,
-  ])
+    patchConsole(backend)
+  }, [backend])
 
   return (
-    <PluginContext.Provider value={[pluginState, pluginDispatch]}>
+    <BanksAndBoxesProvider>
       <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
-        <AppStateProvider>
-          <MouseContext.Provider value={[mouseState, mouseDispatch]}>
-            <LookupsProvider>
-              <OhpkmStoreProvider>
-                <ItemBagContext.Provider value={[bagState, bagDispatch]}>
-                  <SavesProvider>
-                    <DragMonContext.Provider value={[dragState, setDragState]}>
-                      <PokemonDndContext>
-                        {settingsLoading ? (
-                          <Flex width="100%" height="100vh" align="center" justify="center">
-                            <Text size="9" weight="bold">
-                              OpenHome
-                            </Text>
-                          </Flex>
-                        ) : (
-                          <AppTabs />
-                        )}
-                        <ErrorMessageModal />
-                        <UpdateMessageModal />
-                        <AutoScanToast />
-                      </PokemonDndContext>
-                    </DragMonContext.Provider>
-                  </SavesProvider>
-                </ItemBagContext.Provider>
-              </OhpkmStoreProvider>
-            </LookupsProvider>
-          </MouseContext.Provider>
-        </AppStateProvider>
+        <PluginsProvider>
+          <TransactionStateProvider>
+            <MouseContext.Provider value={[mouseState, mouseDispatch]}>
+              <LookupsProvider>
+                <ConvertStrategiesProvider>
+                  <OhpkmStoreProvider>
+                    <ItemBagContext.Provider value={[bagState, bagDispatch]}>
+                      <SavesProvider>
+                        <DragMonContext.Provider value={[dragState, setDragState]}>
+                          <PokemonDndContext>
+                            {settingsLoading ? (
+                              <Flex width="100%" height="100vh" align="center" justify="center">
+                                <Text size="9" weight="bold">
+                                  OpenHome
+                                </Text>
+                              </Flex>
+                            ) : (
+                              <AppTabs />
+                            )}
+                            <ErrorMessageModal />
+                            <UpdateMessageModal />
+                          </PokemonDndContext>
+                        </DragMonContext.Provider>
+                      </SavesProvider>
+                    </ItemBagContext.Provider>
+                  </OhpkmStoreProvider>
+                </ConvertStrategiesProvider>
+              </LookupsProvider>
+            </MouseContext.Provider>
+          </TransactionStateProvider>
+        </PluginsProvider>
       </AppInfoContext.Provider>
-    </PluginContext.Provider>
+    </BanksAndBoxesProvider>
   )
+}
+
+const webConsole = { ...console }
+
+function patchConsole(backend: BackendInterface) {
+  const levels = [
+    ['log', 'INFO'],
+    ['info', 'INFO'],
+    ['warn', 'WARN'],
+    ['error', 'ERROR'],
+    ['debug', 'DEBUG'],
+  ] as const
+
+  for (const [method, level] of levels) {
+    // eslint-disable-next-line no-console
+    console[method] = (...args: unknown[]) => {
+      if (args?.[0] === 'CONSOLE_ONLY') {
+        webConsole[method](...args.slice(1))
+        return
+      }
+      // send message to web console as well
+      webConsole[method](...args)
+
+      // skip first line (this function)
+      const stack = new Error().stack?.split('\n').slice(1)
+      const callsite = stack?.[0]
+
+      if (args.length > 0 && typeof args[0] === 'object' && args[0] !== null) {
+        const context = args[0] as Record<string, unknown>
+        context['callsite'] = callsite
+        backend.log(level, serializeArg(args.at(1)), JSON.parse(JSON.stringify(context)))
+      } else {
+        const message = formatWithPlaceholders(args)
+        backend.log(level, message, { callsite })
+      }
+    }
+  }
+}
+
+// attempts to fill log placeholders with args like the web console does
+function formatWithPlaceholders(args: unknown[]): string {
+  if (typeof args[0] !== 'string' || !args[0].includes('%')) {
+    return args.map(serializeArg).join(' ')
+  }
+
+  let i = 1
+  const formatted = args[0].replace(/%[sdifoO]/g, (token) => {
+    if (i >= args.length) return token
+    const val = args[i++]
+    if (token === '%d' || token === '%i') return String(Number(val))
+    if (token === '%f') return String(parseFloat(String(val)))
+    if (token === '%o' || token === '%O') return JSON.stringify(val)
+    return String(val) // %s
+  })
+
+  // append any remaining args that weren't consumed
+  return [formatted, ...args.slice(i).map(serializeArg)].join(' ')
+}
+
+function serializeArg(arg: unknown): string {
+  return typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+}
+
+function buildKeyboardHandler(backend: BackendInterface) {
+  return (e: KeyboardEvent) => {
+    if (!e.ctrlKey) return
+    switch (e.key) {
+      case 'o':
+        backend.emitMenuEvent('open')
+        return
+      case 's':
+        backend.emitMenuEvent('save')
+        return
+      case 't':
+        backend.emitMenuEvent('reset')
+        return
+      case 'd':
+        backend.emitMenuEvent('open-appdata')
+        return
+      case 'q':
+        backend.emitMenuEvent('exit')
+        return
+      case 'u':
+        backend.emitMenuEvent('check-updates')
+        return
+      case 'g':
+        backend.emitMenuEvent('visit-github')
+        return
+    }
+  }
 }

@@ -1,8 +1,24 @@
+use std::num::TryFromIntError;
+
 use crate::util::bit_is_set;
 use pkm_rs_derive::Stats;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+
+#[cfg(feature = "wasm")]
+use tsify::Tsify;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+pub enum Stat {
+    Hp,
+    Atk,
+    Def,
+    Spa,
+    Spd,
+    Spe,
+}
 
 pub trait Stats: Sized {
     fn get_hp(&self) -> u16;
@@ -13,8 +29,8 @@ pub trait Stats: Sized {
     fn get_spe(&self) -> u16;
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy, Stats)]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Copy, Stats, PartialEq, Eq)]
 pub struct Stats8 {
     pub hp: u8,
     pub atk: u8,
@@ -25,6 +41,17 @@ pub struct Stats8 {
 }
 
 impl Stats8 {
+    pub const fn new(hp: u8, atk: u8, def: u8, spa: u8, spd: u8, spe: u8) -> Self {
+        Stats8 {
+            hp,
+            atk,
+            def,
+            spa,
+            spd,
+            spe,
+        }
+    }
+
     pub const fn from_bytes(bytes: [u8; 6]) -> Self {
         Stats8 {
             hp: bytes[0],
@@ -40,36 +67,15 @@ impl Stats8 {
         [self.hp, self.atk, self.def, self.spe, self.spa, self.spd]
     }
 
-    pub fn from_30_bits(bytes: [u8; 4]) -> Self {
-        let iv_bytes = u32::from_le_bytes(bytes);
-        Stats8 {
-            hp: (iv_bytes & 0x1f).try_into().unwrap(),
-            atk: ((iv_bytes >> 5) & 0x1f).try_into().unwrap(),
-            def: ((iv_bytes >> 10) & 0x1f).try_into().unwrap(),
-            spe: ((iv_bytes >> 15) & 0x1f).try_into().unwrap(),
-            spa: ((iv_bytes >> 20) & 0x1f).try_into().unwrap(),
-            spd: ((iv_bytes >> 25) & 0x1f).try_into().unwrap(),
-        }
-    }
-
-    pub fn write_30_bits(&self, bytes: &mut [u8], byte_offset: usize) {
-        let current_val =
-            u32::from_le_bytes(bytes[byte_offset..byte_offset + 4].try_into().unwrap());
-        let mut numeric_val: u32 = self.spd as u32;
-        numeric_val <<= 5;
-        numeric_val |= self.spa as u32;
-        numeric_val <<= 5;
-        numeric_val |= self.spe as u32;
-        numeric_val <<= 5;
-        numeric_val |= self.def as u32;
-        numeric_val <<= 5;
-        numeric_val |= self.atk as u32;
-        numeric_val <<= 5;
-        numeric_val |= self.hp as u32;
-
-        numeric_val |= current_val & (0b11 << 30);
-
-        bytes[byte_offset..byte_offset + 4].copy_from_slice(&numeric_val.to_le_bytes());
+    pub fn to_ivs_capped(self) -> Ivs {
+        Ivs(Self {
+            hp: self.hp.min(31),
+            atk: self.atk.min(31),
+            def: self.def.min(31),
+            spa: self.spa.min(31),
+            spd: self.spd.min(31),
+            spe: self.spe.min(31),
+        })
     }
 
     const fn gv_from_iv(iv: u8) -> u8 {
@@ -120,33 +126,134 @@ impl Stats8 {
             }
         }
     }
-}
 
-#[wasm_bindgen]
-#[cfg(feature = "wasm")]
-impl Stats8 {
-    #[wasm_bindgen(constructor)]
-    #[allow(clippy::missing_const_for_fn)]
-    pub fn new(hp: u8, atk: u8, def: u8, spa: u8, spd: u8, spe: u8) -> Self {
-        Stats8 {
-            hp,
-            atk,
-            def,
-            spa,
-            spd,
-            spe,
+    pub const fn get(&self, stat: Stat) -> u8 {
+        match stat {
+            Stat::Hp => self.hp,
+            Stat::Atk => self.atk,
+            Stat::Def => self.def,
+            Stat::Spa => self.spa,
+            Stat::Spd => self.spd,
+            Stat::Spe => self.spe,
         }
     }
 
-    // ensure TypeScript doesn't allow Stats8 and Stats16Le to be confused
-    #[wasm_bindgen(getter = stats8)]
-    pub fn rust_type_name(&self) -> bool {
-        true
+    pub const fn set(&mut self, stat: Stat, value: u8) {
+        match stat {
+            Stat::Hp => self.hp = value,
+            Stat::Atk => self.atk = value,
+            Stat::Def => self.def = value,
+            Stat::Spa => self.spa = value,
+            Stat::Spd => self.spd = value,
+            Stat::Spe => self.spe = value,
+        }
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy, Stats)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
+pub struct Ivs(Stats8);
+
+impl Ivs {
+    pub fn from_30_bits(bytes: [u8; 4]) -> Self {
+        let iv_bytes = u32::from_le_bytes(bytes);
+        Self(Stats8 {
+            hp: (iv_bytes & 0x1f).try_into().unwrap(),
+            atk: ((iv_bytes >> 5) & 0x1f).try_into().unwrap(),
+            def: ((iv_bytes >> 10) & 0x1f).try_into().unwrap(),
+            spe: ((iv_bytes >> 15) & 0x1f).try_into().unwrap(),
+            spa: ((iv_bytes >> 20) & 0x1f).try_into().unwrap(),
+            spd: ((iv_bytes >> 25) & 0x1f).try_into().unwrap(),
+        })
+    }
+
+    pub fn from_u30(ivs_u30: arbitrary_int::u30) -> Self {
+        let ivs_u32 = ivs_u30.value();
+        Self(Stats8 {
+            hp: (ivs_u32 & 0x1f).try_into().unwrap(),
+            atk: ((ivs_u32 >> 5) & 0x1f).try_into().unwrap(),
+            def: ((ivs_u32 >> 10) & 0x1f).try_into().unwrap(),
+            spe: ((ivs_u32 >> 15) & 0x1f).try_into().unwrap(),
+            spa: ((ivs_u32 >> 20) & 0x1f).try_into().unwrap(),
+            spd: ((ivs_u32 >> 25) & 0x1f).try_into().unwrap(),
+        })
+    }
+
+    pub fn write_30_bits(&self, bytes: &mut [u8], byte_offset: usize) {
+        let current_val =
+            u32::from_le_bytes(bytes[byte_offset..byte_offset + 4].try_into().unwrap());
+        let mut numeric_val: u32 = self.0.spd as u32;
+        numeric_val <<= 5;
+        numeric_val |= self.0.spa as u32;
+        numeric_val <<= 5;
+        numeric_val |= self.0.spe as u32;
+        numeric_val <<= 5;
+        numeric_val |= self.0.def as u32;
+        numeric_val <<= 5;
+        numeric_val |= self.0.atk as u32;
+        numeric_val <<= 5;
+        numeric_val |= self.0.hp as u32;
+
+        numeric_val |= current_val & (0b11 << 30);
+
+        bytes[byte_offset..byte_offset + 4].copy_from_slice(&numeric_val.to_le_bytes());
+    }
+
+    pub fn set(&mut self, stat: Stat, value: u8) {
+        self.0.set(stat, value.min(31))
+    }
+}
+
+impl From<Ivs> for Stats8 {
+    fn from(value: Ivs) -> Self {
+        value.0
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for Ivs {
+    fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
+        use rand::RngExt;
+        Self(Stats8 {
+            hp: rng.random_range(0..=31),
+            atk: rng.random_range(0..=31),
+            def: rng.random_range(0..=31),
+            spa: rng.random_range(0..=31),
+            spd: rng.random_range(0..=31),
+            spe: rng.random_range(0..=31),
+        })
+    }
+}
+
+impl Stats for Ivs {
+    fn get_hp(&self) -> u16 {
+        self.0.hp as u16
+    }
+
+    fn get_atk(&self) -> u16 {
+        self.0.atk as u16
+    }
+
+    fn get_def(&self) -> u16 {
+        self.0.def as u16
+    }
+
+    fn get_spa(&self) -> u16 {
+        self.0.spa as u16
+    }
+
+    fn get_spd(&self) -> u16 {
+        self.0.spd as u16
+    }
+
+    fn get_spe(&self) -> u16 {
+        self.0.spe as u16
+    }
+}
+
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[cfg_attr(feature = "wasm", derive(Tsify))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
 pub struct Stats16Le {
     pub hp: u16,
     pub atk: u16,
@@ -154,10 +261,6 @@ pub struct Stats16Le {
     pub spa: u16,
     pub spd: u16,
     pub spe: u16,
-}
-
-fn u16_le_slice_to_u8<const N: usize>(slice: [u16; N]) -> Vec<u8> {
-    slice.into_iter().flat_map(u16::to_le_bytes).collect()
 }
 
 impl Stats16Le {
@@ -188,33 +291,96 @@ impl Stats16Le {
             .try_into()
             .unwrap()
     }
-}
 
-#[wasm_bindgen]
-#[cfg(feature = "wasm")]
-impl Stats16Le {
-    #[wasm_bindgen(constructor)]
-    #[allow(clippy::missing_const_for_fn)]
-    pub fn new_from_js(hp: u16, atk: u16, def: u16, spa: u16, spd: u16, spe: u16) -> Self {
-        Stats16Le {
-            hp,
-            atk,
-            def,
-            spa,
-            spd,
-            spe,
+    pub fn to_stats8_truncated(self) -> Stats8 {
+        Stats8 {
+            hp: u8::try_from(self.hp).unwrap_or(u8::MAX),
+            atk: u8::try_from(self.atk).unwrap_or(u8::MAX),
+            def: u8::try_from(self.def).unwrap_or(u8::MAX),
+            spa: u8::try_from(self.spa).unwrap_or(u8::MAX),
+            spd: u8::try_from(self.spd).unwrap_or(u8::MAX),
+            spe: u8::try_from(self.spe).unwrap_or(u8::MAX),
         }
     }
 
-    // ensure TypeScript doesn't allow Stats8 and Stats16Le to be confused
-    #[wasm_bindgen(getter = stats16Le)]
-    pub fn rust_type_name(&self) -> bool {
-        true
+    pub fn to_ivs_capped(self) -> Ivs {
+        Ivs(Stats8 {
+            hp: self.hp.min(31) as u8,
+            atk: self.atk.min(31) as u8,
+            def: self.def.min(31) as u8,
+            spa: self.spa.min(31) as u8,
+            spd: self.spd.min(31) as u8,
+            spe: self.spe.min(31) as u8,
+        })
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
+impl From<Stats8> for Stats16Le {
+    fn from(value: Stats8) -> Self {
+        Self {
+            hp: value.hp as u16,
+            atk: value.atk as u16,
+            def: value.def as u16,
+            spa: value.spa as u16,
+            spd: value.spd as u16,
+            spe: value.spe as u16,
+        }
+    }
+}
+
+impl From<Ivs> for Stats16Le {
+    fn from(value: Ivs) -> Self {
+        Self {
+            hp: value.0.hp as u16,
+            atk: value.0.atk as u16,
+            def: value.0.def as u16,
+            spa: value.0.spa as u16,
+            spd: value.0.spd as u16,
+            spe: value.0.spe as u16,
+        }
+    }
+}
+
+impl TryFrom<Stats16Le> for Stats8 {
+    type Error = TryFromIntError;
+
+    fn try_from(value: Stats16Le) -> Result<Self, Self::Error> {
+        Ok(Self {
+            hp: value.hp.try_into()?,
+            atk: value.atk.try_into()?,
+            def: value.def.try_into()?,
+            spa: value.spa.try_into()?,
+            spd: value.spd.try_into()?,
+            spe: value.spe.try_into()?,
+        })
+    }
+}
+
+impl IntoIterator for Stats8 {
+    type Item = (Stat, u8);
+    type IntoIter = std::array::IntoIter<(Stat, u8), 6>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        [
+            (Stat::Hp, self.hp),
+            (Stat::Atk, self.atk),
+            (Stat::Def, self.def),
+            (Stat::Spa, self.spa),
+            (Stat::Spd, self.spd),
+            (Stat::Spe, self.spe),
+        ]
+        .into_iter()
+    }
+}
+
+fn u16_le_slice_to_u8<const N: usize>(slice: [u16; N]) -> Vec<u8> {
+    slice.into_iter().flat_map(u16::to_le_bytes).collect()
+}
+
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Default, Serialize, Clone, Copy, PartialEq, Eq)]
 pub struct HyperTraining {
     pub hp: bool,
     pub atk: bool,
@@ -244,27 +410,51 @@ impl HyperTraining {
             | ((self.spd as u8) << 4)
             | ((self.spe as u8) << 5)
     }
-}
 
-#[wasm_bindgen]
-#[cfg(feature = "wasm")]
-impl HyperTraining {
-    #[wasm_bindgen(constructor)]
-    #[allow(clippy::missing_const_for_fn)]
-    pub fn new(hp: bool, atk: bool, def: bool, spa: bool, spd: bool, spe: bool) -> Self {
-        HyperTraining {
-            hp,
-            atk,
-            def,
-            spa,
-            spd,
-            spe,
+    pub const fn by_stat(self, stat: Stat) -> bool {
+        match stat {
+            Stat::Hp => self.hp,
+            Stat::Atk => self.atk,
+            Stat::Def => self.def,
+            Stat::Spa => self.spa,
+            Stat::Spd => self.spd,
+            Stat::Spe => self.spe,
+        }
+    }
+
+    pub const fn all() -> Self {
+        Self {
+            hp: true,
+            atk: true,
+            def: true,
+            spa: true,
+            spd: true,
+            spe: true,
         }
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
+impl IntoIterator for HyperTraining {
+    type Item = (Stat, bool);
+    type IntoIter = std::array::IntoIter<(Stat, bool), 6>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        [
+            (Stat::Hp, self.hp),
+            (Stat::Atk, self.atk),
+            (Stat::Def, self.def),
+            (Stat::Spa, self.spa),
+            (Stat::Spd, self.spd),
+            (Stat::Spe, self.spe),
+        ]
+        .into_iter()
+    }
+}
+
+#[cfg_attr(feature = "wasm", derive(Tsify))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 pub struct StatsPreSplit {
     pub hp: u16,
     pub atk: u16,
@@ -274,7 +464,17 @@ pub struct StatsPreSplit {
 }
 
 impl StatsPreSplit {
-    pub fn from_bytes(bytes: [u8; 10]) -> Self {
+    pub const fn from_bytes_u8(bytes: [u8; 5]) -> Self {
+        Self {
+            hp: bytes[0] as u16,
+            atk: bytes[1] as u16,
+            def: bytes[2] as u16,
+            spe: bytes[3] as u16,
+            spc: bytes[4] as u16,
+        }
+    }
+
+    pub fn from_bytes_u16_le(bytes: [u8; 10]) -> Self {
         Self {
             hp: u16::from_le_bytes(bytes[0..2].try_into().unwrap()),
             atk: u16::from_le_bytes(bytes[2..4].try_into().unwrap()),
@@ -317,21 +517,21 @@ impl StatsPreSplit {
         self.hp == 0 && self.atk == 0 && self.def == 0 && self.spc == 0 && self.spe == 0
     }
 
-    pub const fn dvs_from_ivs_lossy(ivs: &Stats8) -> Self {
+    pub const fn dvs_from_ivs_lossy(ivs: &Ivs) -> Self {
         Self {
-            hp: dv_from_iv(ivs.hp),
-            atk: dv_from_iv(ivs.atk),
-            def: dv_from_iv(ivs.def),
-            spc: dv_from_iv((ivs.spa + ivs.spd) / 2),
-            spe: dv_from_iv(ivs.spe),
+            hp: dv_from_iv(ivs.0.hp),
+            atk: dv_from_iv(ivs.0.atk),
+            def: dv_from_iv(ivs.0.def),
+            spc: dv_from_iv((ivs.0.spa + ivs.0.spd) / 2),
+            spe: dv_from_iv(ivs.0.spe),
         }
     }
 
-    pub const fn shiny_dvs_from_ivs(ivs: &Stats8) -> Self {
-        let mut atk = (ivs.atk - 1).div_ceil(2) as u16;
+    pub const fn shiny_dvs_from_ivs(ivs: &Ivs) -> Self {
+        let mut atk = (ivs.0.atk - 1).div_ceil(2) as u16;
         if atk & 0b11 == 0b01 {
             atk += 1;
-        } else if atk % 4 == 0 {
+        } else if atk.is_multiple_of(4) {
             atk += 2
         }
 
@@ -358,23 +558,9 @@ const fn dv_from_iv(iv: u8) -> u16 {
     ((iv - 1) / 2) as u16
 }
 
-#[wasm_bindgen]
-#[cfg(feature = "wasm")]
-impl StatsPreSplit {
-    #[wasm_bindgen(constructor)]
-    #[allow(clippy::missing_const_for_fn)]
-    pub fn new(hp: u16, atk: u16, def: u16, spc: u16, spe: u16) -> Self {
-        Self {
-            hp,
-            atk,
-            def,
-            spc,
-            spe,
-        }
-    }
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct ContestStats {
     pub cool: u8,
@@ -409,19 +595,13 @@ impl ContestStats {
     }
 }
 
-#[allow(clippy::missing_const_for_fn)]
-#[wasm_bindgen]
-#[cfg(feature = "wasm")]
-impl ContestStats {
-    #[wasm_bindgen(constructor)]
-    pub fn new(cool: u8, beauty: u8, cute: u8, smart: u8, tough: u8, sheen: u8) -> Self {
-        ContestStats {
-            cool,
-            beauty,
-            cute,
-            smart,
-            tough,
-            sheen,
-        }
-    }
+#[cfg_attr(feature = "randomize", derive(Randomize))]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum ContestStat {
+    Cool,
+    Beauty,
+    Cute,
+    Smart,
+    Tough,
 }

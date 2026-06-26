@@ -1,17 +1,17 @@
-import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Option, R, range } from '@openhome-core/util/functional'
-import { filterUndefined } from '@openhome-core/util/sort'
+import { SAVClass } from '@openhome-core/save/util'
+import { Option, R, range, Result } from '@openhome-core/util/functional'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { Dialog } from '@openhome-ui/components/dialog/Dialog'
+import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
-import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { Button, Callout, Dialog, Flex, Separator } from '@radix-ui/themes'
+import { Button, Callout, Flex } from '@radix-ui/themes'
 import { ReactNode, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { OpenHomeBanks } from 'src/core/save/HomeData'
-import { SAVClass } from 'src/core/save/util'
-import { Result } from 'src/core/util/functional'
+import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
+import { useConvertStrategies } from '../convert-strategies'
 import { ItemBagContext } from '../items/reducer'
 import { useOhpkmStore } from '../ohpkm'
 import { openSavesReducer, SavesContext } from './reducer'
@@ -25,15 +25,20 @@ type SaveTypeCallback = (saveType?: SAVClass | PromiseLike<SAVClass>) => void
 export default function SavesProvider({ children }: SavesProviderProps) {
   const backend = useContext(BackendContext)
   const [itemBagState, bagDispatch] = useContext(ItemBagContext)
+  const [releaseWarningDisplayed, setReleaseWarningDisplayed] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [changesSavedDisplayed, setChangesSavedDisplayed] = useState(false)
   const displayError = useDisplayError()
   const [openSavesState, openSavesDispatch] = useReducer(openSavesReducer, {
     monsToRelease: [],
     openSaves: {},
   })
+  const { defaultConvertStrategy } = useConvertStrategies()
   const disambiguationResolver = useRef<Option<SaveTypeCallback>>(undefined)
   const [disambiguationSaveTypes, setDisambiguationSaveTypes] = useState<Option<SAVClass[]>>()
   const navigate = useNavigate()
   const ohpkmStore = useOhpkmStore()
+  const { reloadBankStore } = useBanksAndBoxes()
 
   const promptDisambiguation = useCallback(async (possibleSaveTypes: SAVClass[]) => {
     setDisambiguationSaveTypes(possibleSaveTypes)
@@ -44,115 +49,110 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   }, [])
 
   const allOpenSaves = Object.values(openSavesState.openSaves)
-    .filter((data) => !!data)
-    .filter((data) => !(data.save instanceof OpenHomeBanks))
     .sort((a, b) => a.index - b.index)
     .map((data) => data.save)
 
-  const loadAllHomeData = useCallback(async () => {
-    if (openSavesState.error) return
-    await backend.loadHomeBanks().then(
-      R.match(
-        (banks) => openSavesDispatch({ type: 'load_home_banks', payload: { banks } }),
-        (err) => {
-          displayError('Error Loading OpenHome Data', err)
-          openSavesDispatch({ type: 'set_error', payload: err })
-        }
-      )
-    )
-  }, [backend, displayError, openSavesDispatch, openSavesState.error])
+  const saveChanges = useCallback(
+    async (releaseWarningAccepted: boolean): Promise<Result<null, SaveError[]>> => {
+      if (saving) return R.Ok(null)
 
-  const saveChanges = useCallback(async (): Promise<Result<null, SaveError[]>> => {
-    if (!openSavesState.homeData) return R.Err([HomeDataNotLoaded])
-
-    const result = await backend.startTransaction()
-
-    if (R.isErr(result)) {
-      displayError('Error Starting Save Transaction', result.err)
-      return R.Err([TransactionStart(result.err)])
-    }
-
-    // Write appropriate trainer data to handler fields
-    for (const save of allOpenSaves) {
-      save.boxes.forEach((box) => {
-        for (const boxSlot of range(box.boxSlots.length)) {
-          const data = box.boxSlots[boxSlot]
-          if (!data) continue
-
-          const tracked = ohpkmStore.loadIfTracked(data)
-          if (!tracked) continue
-
-          tracked.tradeToSave(save)
-          box.boxSlots[boxSlot] = save.convertOhpkm(tracked)
-        }
-      })
-    }
-
-    const saveWriters = allOpenSaves.map((save) => save.prepareWriter())
-
-    const promises = [
-      backend.writeAllSaveFiles(saveWriters),
-      backend.writeHomeBanks({
-        banks: openSavesState.homeData.banks.map((bank) => bank.toSimple()),
-        current_bank: openSavesState.homeData.currentBankIndex,
-      }),
-      backend.deleteHomeMons(
-        openSavesState.monsToRelease
-          .filter((mon) => mon instanceof OHPKM)
-          .map(getMonFileIdentifier)
-          .filter(filterUndefined)
-      ),
-    ]
-
-    if (itemBagState.modified) {
-      const saveBagResult = await backend.saveItemBag(itemBagState.itemCounts)
-      if (R.isErr(saveBagResult)) {
-        displayError('Error Saving Bag', saveBagResult.err)
-        await backend.rollbackTransaction()
-        return R.Err([SaveItemBagData(saveBagResult.err)])
+      const shouldReleasePokemon = openSavesState.monsToRelease.length > 0
+      if (shouldReleasePokemon && !releaseWarningAccepted) {
+        setReleaseWarningDisplayed(true)
+        return R.Ok(null)
       }
-      bagDispatch({ type: 'clear_modified' })
-    }
 
-    const results = (await Promise.all(promises)).flat()
-    const errors = results.filter(R.isErr).map((r) => r.err)
+      setSaving(true)
+      const result = await backend.startTransaction()
 
-    if (errors.length) {
-      displayError('Error Saving', errors)
-      backend.rollbackTransaction()
-      return R.Err(errors.map(BackendSaveError))
-    }
+      if (R.isErr(result)) {
+        displayError('Error Starting Save Transaction', result.err)
+        setSaving(false)
+        return R.Err([TransactionStart(result.err)])
+      }
 
-    const syncedStateResult = await backend.saveSyncedState()
-    if (R.isErr(syncedStateResult)) {
-      displayError('Error Saving', syncedStateResult.err)
-      return R.Err([BackendSaveError(syncedStateResult.err)])
-    }
+      // Write appropriate trainer data to handler fields
+      for (const save of allOpenSaves) {
+        for (const boxNum of range(save.getBoxCount())) {
+          for (const boxSlot of range(save.boxSlotCount)) {
+            const data = save.getMonAt(boxNum, boxSlot)
+            if (!data) continue
 
-    const commitResult = await backend.commitTransaction()
-    if (R.isErr(commitResult)) {
-      return R.Err([TransactionCommit(commitResult.err)])
-    }
+            const trackedData = ohpkmStore.loadIfTracked(data)
+            if (!trackedData) continue
 
-    openSavesDispatch({ type: 'clear_updated_box_slots' })
-    openSavesDispatch({ type: 'clear_mons_to_release' })
+            trackedData.tradeToSave(save)
+            save.setMonAt(boxNum, boxSlot, save.convertOhpkm(trackedData, defaultConvertStrategy))
+          }
+        }
+      }
 
-    await loadAllHomeData()
+      const saveWriters = allOpenSaves.map((save) => save.prepareWriter())
 
-    return R.Ok(null)
-  }, [
-    ,
-    openSavesState.homeData,
-    openSavesState.monsToRelease,
-    backend,
-    allOpenSaves,
-    itemBagState.modified,
-    itemBagState.itemCounts,
-    loadAllHomeData,
-    displayError,
-    ohpkmStore,
-    bagDispatch,
-  ])
+      const promises = [
+        backend.writeAllSaveFiles(saveWriters),
+        backend.deleteHomeMons(
+          openSavesState.monsToRelease.filter(
+            (monOrIdentifier) => typeof monOrIdentifier === 'string'
+          )
+        ),
+      ]
+
+      if (itemBagState.modified) {
+        const saveBagResult = await backend.saveItemBag(itemBagState.itemCounts)
+        if (R.isErr(saveBagResult)) {
+          displayError('Error Saving Bag', saveBagResult.err)
+          await backend.rollbackTransaction()
+          setSaving(false)
+          return R.Err([SaveItemBagData(saveBagResult.err)])
+        }
+        bagDispatch({ type: 'clear_modified' })
+      }
+
+      const results = (await Promise.all(promises)).flat()
+      const errors = results.filter(R.isErr).map((r) => r.err)
+
+      if (errors.length) {
+        displayError('Error Saving', errors)
+        backend.rollbackTransaction()
+        setSaving(false)
+        return R.Err(errors.map(BackendSaveError))
+      }
+
+      const syncedStateResult = await backend.saveSyncedState()
+      if (R.isErr(syncedStateResult)) {
+        displayError('Error Saving', syncedStateResult.err)
+        setSaving(false)
+        return R.Err([BackendSaveError(syncedStateResult.err)])
+      }
+
+      const commitResult = await backend.commitTransaction()
+      if (R.isErr(commitResult)) {
+        setSaving(false)
+        return R.Err([TransactionCommit(commitResult.err)])
+      }
+
+      openSavesDispatch({ type: 'clear_updated_box_slots' })
+      openSavesDispatch({ type: 'clear_mons_to_release' })
+
+      setChangesSavedDisplayed(true)
+
+      setSaving(false)
+      return R.Ok(null)
+    },
+    [
+      saving,
+      backend,
+      allOpenSaves,
+      openSavesState.monsToRelease,
+      itemBagState.modified,
+      itemBagState.itemCounts,
+      displayError,
+      ohpkmStore,
+      defaultConvertStrategy,
+      bagDispatch,
+    ]
+  )
 
   // load bag
   useEffect(() => {
@@ -172,11 +172,11 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = backend.registerListeners({
-      onSave: saveChanges,
-      onReset: () => {
+    const stopListening = backend.onMenuEvents({
+      save: () => saveChanges(false),
+      reset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
-        loadAllHomeData()
+        reloadBankStore()
         openSavesDispatch({ type: 'close_all_saves' })
       },
     })
@@ -186,13 +186,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     return () => {
       stopListening()
     }
-  }, [backend, saveChanges, openSavesDispatch, loadAllHomeData, bagDispatch])
-
-  useEffect(() => {
-    if (!openSavesState.homeData) {
-      loadAllHomeData()
-    }
-  }, [loadAllHomeData, openSavesState.homeData])
+  }, [backend, saveChanges, openSavesDispatch, bagDispatch, reloadBankStore])
 
   if (openSavesState.error) {
     return (
@@ -205,26 +199,35 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     )
   }
 
-  if (!openSavesState.homeData) {
-    return <LoadingIndicator message="Loading OpenHome boxes..." />
+  function hideReleaseWarning() {
+    setReleaseWarningDisplayed(false)
+  }
+
+  async function saveChangesReleaseConfirmed() {
+    await saveChanges(true)
+    hideReleaseWarning()
+  }
+
+  function dismissSavedMessage() {
+    setChangesSavedDisplayed(false)
   }
 
   return (
     <>
-      <SavesContext.Provider
+      <SavesContext
         value={{
           openSavesState,
           openSavesDispatch,
           allOpenSaves: Object.values(openSavesState.openSaves)
             .filter((data) => !!data)
-            .filter((data) => !(data.save instanceof OpenHomeBanks))
             .sort((a, b) => a.index - b.index)
             .map((data) => data.save),
           promptDisambiguation,
         }}
       >
+        <div />
         {children}
-      </SavesContext.Provider>
+      </SavesContext>
       <SaveDisambiguationDialog
         open={Boolean(disambiguationSaveTypes)}
         saveTypes={disambiguationSaveTypes}
@@ -234,14 +237,35 @@ export default function SavesProvider({ children }: SavesProviderProps) {
           navigate('/home')
         }}
       />
+      <PromptDialog
+        title={`Release ${openSavesState.monsToRelease.length} Pokémon`}
+        open={releaseWarningDisplayed}
+        description={`Are you sure you want to release ${openSavesState.monsToRelease.length} Pokémon? This will permanently delete each Pokémon and its associated tracking data. This action cannot be undone.`}
+        actions={[
+          { uniqueLabel: 'Cancel', action: hideReleaseWarning, type: 'cancel' },
+          {
+            uniqueLabel: `Release ${openSavesState.monsToRelease.length} Pokémon`,
+            action: saveChangesReleaseConfirmed,
+            type: 'destructive',
+          },
+        ]}
+      />
+      <PromptDialog
+        title={saving ? 'Saving Changes...' : 'Changes Saved'}
+        open={changesSavedDisplayed || saving}
+        onClose={dismissSavedMessage}
+        description={
+          saving
+            ? 'Saving changes...'
+            : 'All changes to boxes, save files, Pokédex, and settings have been saved.'
+        }
+        actions={[{ uniqueLabel: 'Ok', action: dismissSavedMessage }]}
+      />
     </>
   )
 }
 
-const HomeDataNotLoaded = Object.freeze({ _SaveErrorType: 'HomeDataNotLoaded' })
-
 type SaveError =
-  | { _SaveErrorType: 'HomeDataNotLoaded' }
   | { _SaveErrorType: 'TransactionStart'; message: string }
   | { _SaveErrorType: 'TransactionCommit'; message: string }
   | { _SaveErrorType: 'IdentifierNotTracked'; identifier: OhpkmIdentifier }
@@ -259,13 +283,6 @@ const TransactionStart: (message: string) => SaveError = (message: string) => ({
 const TransactionCommit: (message: string) => SaveError = (message: string) => ({
   _SaveErrorType: 'TransactionCommit',
   message,
-})
-
-export const IdentifierNotTracked: (identifier: OhpkmIdentifier) => SaveError = (
-  identifier: OhpkmIdentifier
-) => ({
-  _SaveErrorType: 'IdentifierNotTracked',
-  identifier,
 })
 
 const SaveItemBagData: (message: string) => SaveError = (message: string) => ({
@@ -286,38 +303,23 @@ interface SaveDisambiguationDialogProps {
 
 function SaveDisambiguationDialog({ open, saveTypes, onSelect }: SaveDisambiguationDialogProps) {
   return (
-    <Dialog.Root open={open} onOpenChange={(open) => !open && onSelect?.()}>
-      <Dialog.Content
-        width="300px"
-        style={{
-          padding: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 8,
-        }}
-      >
-        <Dialog.Title mt="2" mb="0">
-          Ambiguous Save Type
-        </Dialog.Title>
-        <Separator style={{ width: '100%' }} />
-        <Dialog.Description>Select a save type to proceed:</Dialog.Description>
-        <Flex gap="1" mt="1" direction="column">
-          {saveTypes?.map((saveType) => (
-            <Button
-              key={saveType.saveTypeID}
-              onClick={() => onSelect?.(saveType)}
-              style={{ width: '100%', minHeight: 36, height: 'fit-content' }}
-            >
-              {saveType.saveTypeName}
-            </Button>
-          ))}
-        </Flex>
-        <Dialog.Close>
-          <Button variant="outline" color="gray">
-            Cancel
+    <Dialog.Container open={open} onOpenChange={(open) => !open && onSelect?.()}>
+      <Dialog.Title>Ambiguous Save Type</Dialog.Title>
+      <Dialog.Description>Select a save type to proceed:</Dialog.Description>
+      <Flex gap="1" mt="1" direction="column">
+        {saveTypes?.map((saveType) => (
+          <Button
+            key={saveType.saveTypeID}
+            onClick={() => onSelect?.(saveType)}
+            style={{ width: '100%', minHeight: 36, height: 'fit-content' }}
+          >
+            {saveType.saveTypeName}
           </Button>
-        </Dialog.Close>
-      </Dialog.Content>
-    </Dialog.Root>
+        ))}
+      </Flex>
+      <Dialog.Actions>
+        <Dialog.Close>Cancel</Dialog.Close>
+      </Dialog.Actions>
+    </Dialog.Container>
   )
 }

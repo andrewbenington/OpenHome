@@ -1,37 +1,29 @@
+import { PK3, PK4, PK5 } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from '@openhome-core/pkm/Lookup'
+import { getLocationStringOrOrigin } from '@openhome-core/pkm/MetLocation'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   getHiddenPowerGen2,
   getHiddenPowerPower,
   getHiddenPowerType,
 } from '@openhome-core/pkm/util'
-import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import AttributeRow from '@openhome-ui/components/AttributeRow'
-import AttributeRowExpand from '@openhome-ui/components/AttributeRowExpand'
-import DynamaxLevel from '@openhome-ui/components/pokemon/DynamaxLevel'
-import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
-import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
-import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
-import useIsDev from '@openhome-ui/hooks/isDev'
-import { genderFromBool, Generation, OriginGames } from '@pkm-rs/pkg'
-import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
+import { AllPKMFields } from '@openhome-core/pkm/util/pkmInterface'
 import {
-  AllPKMFields,
-  getDisplayID,
-  getFlagsInRange,
-  getHeightCalculated,
-  getWeightCalculated,
-  StatsPreSplit,
-} from '@pokemon-files/util'
-import { Countries } from '@pokemon-resources/consts/Countries'
-import { EncounterTypes } from '@pokemon-resources/consts/EncounterTypes'
-import { SWEETS } from '@pokemon-resources/consts/Formes'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+  BDSPTMMoveIndexes,
+  LATutorMoveIndexes,
+  Moves,
+  SVTMMoveIndexes,
+  SwShTRMoveIndexes,
+} from '@openhome-core/resources'
+import { Countries } from '@openhome-core/resources/consts/Countries'
+import { EncounterTypes } from '@openhome-core/resources/consts/EncounterTypes'
+import { SWEETS } from '@openhome-core/resources/consts/Forms'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
@@ -40,23 +32,30 @@ import {
   SV_TRANSFER_RESTRICTIONS_ID,
   SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
-} from '@pokemon-resources/consts/TransferRestrictions'
+} from '@openhome-core/resources/consts/TransferRestrictions'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import {
-  BDSPTMMoveIndexes,
-  LATutorMoveIndexes,
-  Moves,
-  SVTMMoveIndexes,
-  SwShTRMoveIndexes,
-} from '@pokemon-resources/index'
+  getDisplayID,
+  getFlagsInRange,
+  getHeightCalculated,
+  getWeightCalculated,
+} from '@openhome-core/util'
+import AttributeRow from '@openhome-ui/components/AttributeRow'
+import AttributeRowExpand from '@openhome-ui/components/AttributeRowExpand'
+import DebugOnly from '@openhome-ui/components/DebugOnly'
+import DynamaxLevel from '@openhome-ui/components/pokemon/DynamaxLevel'
+import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
+import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
+import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
+import { genderFromBool, Generation, Language, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
 
-const HG_TO_LB = 0.2204623
-const CM_TO_IN = 0.3937008
+const HECTOGRAMS_TO_POUNDS = 0.2204623
+const CENTIMETERS_TO_INCHES = 0.3937008
 
 const OtherDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
-  const isDev = useIsDev()
 
   const heightCalculated = getHeightCalculated(mon)
   const weightCalculated = getWeightCalculated(mon)
@@ -82,11 +81,27 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <code>{u32Display(mon.encryptionConstant)}</code>
           </AttributeRow>
         )}
+        <AttributeRow label="Origin Game" value={OriginGames.gameNameFull(mon.gameOfOrigin)} />
+        <AttributeRow
+          label="Met Location"
+          value={
+            mon.metLocationIndex === undefined
+              ? '(not present)'
+              : `${getLocationStringOrOrigin(mon.gameOfOrigin, mon.metLocationIndex, mon.format, Language.English)} (${mon.metLocationIndex})` // todo: i18n
+          }
+        />
         {mon.encryptionConstant !== undefined && (
           <AttributeRow label="Shift Value">
             <code>{(mon.encryptionConstant & 0x3e000) >> (0xd % 24)}</code>
           </AttributeRow>
         )}
+        <AttributeRow label="Current Handler:">
+          {mon.isCurrentHandler ? (
+            (mon.handlerName ?? 'Unknown') + ' (not OT)'
+          ) : (
+            <b>{mon.trainerName + ' (OT)'}</b>
+          )}
+        </AttributeRow>
         <AttributeRowExpand
           summary="Original Trainer"
           value={
@@ -97,6 +112,9 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           }
         >
           <AttributeRow label="ID" value={getDisplayID(mon as any)} indent={10} />
+          <AttributeRow label="Actual ID" indent={10}>
+            <code>{`${u16Display(mon.trainerID)}`}</code>
+          </AttributeRow>
           {mon.secretID !== undefined && (
             <AttributeRow label="Secret ID" indent={10}>
               <code>{`${u16Display(mon.secretID)}`}</code>
@@ -107,6 +125,25 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           )}
           {!!mon.trainerAffection && (
             <AttributeRow label="Affection" value={mon.trainerAffection.toString()} indent={10} />
+          )}
+        </AttributeRowExpand>
+        <AttributeRowExpand
+          summary="Last Handler"
+          value={
+            <Flex gap="1">
+              {mon.handlerName ?? '(empty)'}
+              <GenderIcon gender={genderFromBool(mon.handlerGender ?? false)} />
+            </Flex>
+          }
+        >
+          <AttributeRow label="Handler ID" indent={10}>
+            <code>{`${u16Display(mon.handlerID ?? 0)}`}</code>
+          </AttributeRow>
+          {!!mon.handlerFriendship && (
+            <AttributeRow label="Friendship" value={mon.handlerFriendship.toString()} indent={10} />
+          )}
+          {!!mon.handlerAffection && (
+            <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
           )}
         </AttributeRowExpand>
         {mon instanceof OHPKM && (
@@ -135,6 +172,13 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             }
           />
         )}
+        {mon instanceof OHPKM && (
+          <AttributeRow label="Ability Number From PID" value={mon.abilityNumFromPidGen34()} />
+        )}
+        {mon.abilityNum !== undefined && (
+          <AttributeRow label="Ability Number" value={mon.abilityNum} />
+        )}
+        {mon.level !== undefined && <AttributeRow label="Stored Level" value={mon.level} />}
         {mon.formArgument !== undefined && mon.dexNum === NationalDex.Alcremie && (
           <AttributeRow label="Sweet" value={SWEETS[mon.formArgument]} />
         )}
@@ -161,12 +205,17 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <AttributeRow label="Gen 4 Encounter Type" value={EncounterTypes[mon.encounterType]} />
           )}
         {mon.shinyLeaves !== undefined &&
-          !isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && (
+          !isRestricted(
+            HGSS_TRANSFER_RESTRICTIONS,
+            mon.dexNum,
+            mon.formNum,
+            mon.extraFormIndex
+          ) && (
             <AttributeRow label="Shiny Leaves">
               <ShinyLeavesDisplay leaves={mon.shinyLeaves} />
             </AttributeRow>
           )}
-        {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(USUM_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.geolocations &&
           mon.geolocations[0].country > 0 && (
             <AttributeRowExpand
@@ -184,7 +233,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               )}
             </AttributeRowExpand>
           )}
-        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(
+          SWSH_TRANSFER_RESTRICTIONS_CT,
+          mon.dexNum,
+          mon.formNum,
+          mon.extraFormIndex
+        ) &&
           mon.trFlagsSwSh &&
           getFlagsInArrayRange(mon.trFlagsSwSh, 0, 14).length > 0 && (
             <AttributeRowExpand
@@ -198,7 +252,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               ))}
             </AttributeRowExpand>
           )}
-        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.tmFlagsBDSP &&
           getFlagsInArrayRange(mon.tmFlagsBDSP, 0, 14).length > 0 && (
             <AttributeRowExpand
@@ -212,7 +266,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               ))}
             </AttributeRowExpand>
           )}
-        {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.tutorFlagsLA &&
           getFlagsInArrayRange(mon.tutorFlagsLA, 0, 8).length > 0 && (
             <AttributeRowExpand
@@ -227,7 +281,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             </AttributeRowExpand>
           )}
 
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.tmFlagsSV &&
           getFlagsInArrayRange(mon.tmFlagsSV, 0, 22).length > 0 && (
             <AttributeRowExpand
@@ -242,8 +296,13 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             </AttributeRowExpand>
           )}
 
-        {(!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) ||
-          !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) &&
+        {(!isRestricted(
+          SWSH_TRANSFER_RESTRICTIONS_CT,
+          mon.dexNum,
+          mon.formNum,
+          mon.extraFormIndex
+        ) ||
+          !isRestricted(ORAS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex)) &&
           mon.trainerMemory && (
             <AttributeRowExpand summary="Trainer Memory" value={mon.trainerName}>
               <AttributeRow
@@ -266,7 +325,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               </AttributeRow>
             </AttributeRowExpand>
           )}
-        {!isRestricted(SWSH_TRANSFER_RESTRICTIONS_CT, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(
+          SWSH_TRANSFER_RESTRICTIONS_CT,
+          mon.dexNum,
+          mon.formNum,
+          mon.extraFormIndex
+        ) &&
           mon.dynamaxLevel !== undefined && (
             <>
               <AttributeRow label="Dynamax">
@@ -281,9 +345,9 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               )}
             </>
           )}
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           hasTeraTypes(mon) && <TeraTypeData mon={mon} />}
-        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(SV_TRANSFER_RESTRICTIONS_ID, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           mon.obedienceLevel !== undefined && (
             <AttributeRow label="Obedience" value={mon.obedienceLevel.toString()} />
           )}
@@ -298,33 +362,33 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           <>
             <AttributeRow
               label="Height (Absolute)"
-              value={`${Math.floor((mon.heightAbsolute * CM_TO_IN) / 12)}'${Math.round((mon.heightAbsolute * CM_TO_IN) % 12)}" • ${mon.heightAbsolute.toPrecision(5)} cm`}
+              value={`${Math.floor((mon.heightAbsolute * CENTIMETERS_TO_INCHES) / 12)}'${Math.round((mon.heightAbsolute * CENTIMETERS_TO_INCHES) % 12)}" • ${mon.heightAbsolute.toPrecision(5)} cm`}
             />
-            {isDev && (
+            <DebugOnly>
               <AttributeRow
                 label="Height (Calculated)"
-                value={`${Math.floor((heightCalculated * CM_TO_IN) / 12)}'${Math.round((heightCalculated * CM_TO_IN) % 12)}" • ${heightCalculated.toPrecision(5)} cm`}
+                value={`${Math.floor((heightCalculated * CENTIMETERS_TO_INCHES) / 12)}'${Math.round((heightCalculated * CENTIMETERS_TO_INCHES) % 12)}" • ${heightCalculated.toPrecision(5)} cm`}
               />
-            )}
+            </DebugOnly>
             <AttributeRow
               label="Weight (Absolute)"
-              value={`${(mon.weightAbsolute * HG_TO_LB).toPrecision(5)} lb • ${(mon.weightAbsolute / 10).toPrecision(5)} kg`}
+              value={`${(mon.weightAbsolute * HECTOGRAMS_TO_POUNDS).toPrecision(5)} lb • ${(mon.weightAbsolute / 10).toPrecision(5)} kg`}
             />
-            {isDev && (
+            <DebugOnly>
               <AttributeRow
                 label="Weight (Calculated)"
-                value={`${(weightCalculated * HG_TO_LB).toPrecision(5)} lb • ${(weightCalculated / 10).toPrecision(5)} kg`}
+                value={`${(weightCalculated * HECTOGRAMS_TO_POUNDS).toPrecision(5)} lb • ${(weightCalculated / 10).toPrecision(5)} kg`}
               />
-            )}
+            </DebugOnly>
           </>
         )}
-        {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) && (
+        {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) && (
           <AttributeRow
             label="Gen 1/2 ID"
             value={getMonGen12Identifier(mon as PKMInterface & { dvs: StatsPreSplit })}
           />
         )}
-        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum) &&
+        {!isRestricted(HGSS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) &&
           (mon instanceof PK3 ||
             mon instanceof PK4 ||
             mon instanceof PK5 ||
@@ -335,14 +399,14 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         {mon.formArgument !== undefined && (
           <AttributeRow label="Form Argument" value={mon.formArgument.toString()} />
         )}
-        {mon.checksum !== undefined && mon.calcChecksum && (
+        {mon.checksum !== undefined && mon.calculateChecksum && (
           <>
             <AttributeRow label="Checksum">
               <code>{u16Display(mon.checksum)}</code>
             </AttributeRow>
-            {'calcChecksum' in mon && (
+            {'calculateChecksum' in mon && (
               <AttributeRow label="Calced Checksum">
-                <code>{u16Display(mon.calcChecksum())}</code>
+                <code>{u16Display(mon.calculateChecksum())}</code>
               </AttributeRow>
             )}
           </>
@@ -368,11 +432,16 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         )}
         {mon.eggDate && <AttributeRow label="Hatch Date" value={mon.eggDate} />}
         <AttributeRow label="Egg Location Index" value={mon.eggLocationIndex} />
-        <AttributeRow label="Gender" value={mon.gender} />
+        <AttributeRow label="Plugin Origin" value={mon.pluginOrigin} />
+        <AttributeRow label="Extra Form Index" value={mon.extraFormIndex} />
         <AttributeRow label="Is Egg" value={String(Boolean(mon.isEgg))} />
         <AttributeRow label="Is Nicknamed" value={String(Boolean(mon.isNicknamed))} />
         <AttributeRow label="Is Favorite" value={String(Boolean(mon.favorite))} />
         <AttributeRow label="Is Shadow" value={String(Boolean(mon.isShadow))} />
+        {mon.extraDisplayFields &&
+          Object.entries(mon.extraDisplayFields()).map(([label, value]) => (
+            <AttributeRow key={`extra_field_${label}`} label={label} value={String(value)} />
+          ))}
       </Flex>
     </div>
   )
@@ -459,26 +528,15 @@ function HiddenPowerDisplay(props: { mon: AllPKMFields }) {
 }
 
 function u16Display(val: number) {
-  return `${hexStr(val, 4)} (${val})`
+  return `${hexStrLittleEndian(val, 4)} (${val})`
 }
 
 function u32Display(val: number) {
-  return `${hexStr(val, 8)} (${val})`
+  return `${hexStrLittleEndian(val, 8)} (${val})`
 }
 
-function hexStr(val: number, digits: number) {
-  return '0x' + changeEndianness(val.toString(16).toUpperCase().padStart(digits, '0'))
-}
-
-const changeEndianness = (hex: string) => {
-  const result = []
-  let len = hex.length - 2
-
-  while (len >= 0) {
-    result.push(hex.substr(len, 2))
-    len -= 2
-  }
-  return result.join('')
+function hexStrLittleEndian(val: number, digits: number) {
+  return '0x' + val.toString(16).toUpperCase().padStart(digits, '0')
 }
 
 function getFlagsInArrayRange(bytes: Uint8Array, offset: number, size: number) {

@@ -1,13 +1,19 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { Box, SAV } from '@openhome-core/save/interfaces'
+import {
+  pluginGameName,
+  PluginIdentifier,
+  pluginOriginMarkPath,
+  SAV,
+} from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
-import { filterUndefined } from '@openhome-core/util/sort'
 import { SaveRef } from '@openhome-core/util/types'
 import BackendInterface from '@openhome-ui/backend/backendInterface'
-import { CtxMenuElementBuilder, ItemBuilder } from '@openhome-ui/components/context-menu/types'
+import { CtxMenuElementBuilder, Item } from '@openhome-ui/components/context-menu/types'
 import { OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
-import { OpenHomeBanks, OpenHomeBox } from 'src/core/save/HomeData'
+import { useState } from 'react'
+import { getOriginIconPath } from '../images/game'
+import { OPENHOME_BOX_SLOTS, useBanksAndBoxes } from '../state-zustand/banks-and-boxes/store'
+import { useOhpkmStore } from '../state/ohpkm'
 
 export type SaveViewMode = 'card' | 'grid'
 
@@ -69,98 +75,100 @@ export function filterEmpty<T>(value: T | null | undefined): value is T {
   return value !== null && value !== undefined
 }
 
-/**
- *
- * Iterates through the box, updating the index with 'incrementFunction'. Returns
- * undefined if the first non-empty slot is at 'index', otherwise returns the index of the
- * first non-empty box slot
- */
-export function getFollowingMon(
-  currentBox: Box<PKMInterface> | OpenHomeBox,
-  incrementFunction: (index: number) => number,
-  index: number
-) {
-  let prevIndex = index
-
+function getNextFullSlotBoxWrapping(save: SAV, boxNum: number, boxSlot: number): number {
+  let peekSlot = boxSlot
   function slotIsEmpty(index: number) {
-    if (currentBox instanceof OpenHomeBox) {
-      return currentBox.slotIsEmpty(index)
-    } else {
-      return currentBox.boxSlots[prevIndex] === undefined
-    }
+    return save.getMonAt(boxNum, index) === undefined
   }
 
   do {
-    prevIndex = incrementFunction(prevIndex)
-  } while (prevIndex !== index && slotIsEmpty(prevIndex))
+    peekSlot = (peekSlot + 1) % save.boxSlotCount
+  } while (peekSlot !== boxSlot && slotIsEmpty(peekSlot))
 
-  if (prevIndex !== index) {
-    return prevIndex
+  return peekSlot
+}
+
+function getPrevFullSlotBoxWrapping(save: SAV, boxNum: number, boxSlot: number): number {
+  let peekSlot = boxSlot
+  function slotIsEmpty(index: number) {
+    return save.getMonAt(boxNum, index) === undefined
+  }
+
+  do {
+    peekSlot = moduloUnderflowWrap(peekSlot - 1, save.boxSlotCount)
+  } while (peekSlot !== boxSlot && slotIsEmpty(peekSlot))
+
+  return peekSlot
+}
+
+function moduloUnderflowWrap(a: number, b: number): number {
+  return ((a % b) + b) % b
+}
+
+export function useOpenHomeBoxNavigator() {
+  const { getCurrentBox } = useBanksAndBoxes()
+  const ohpkmStore = useOhpkmStore()
+  const [currentIndex, setCurrentIndex] = useState<number>()
+
+  function navigateNext() {
+    if (currentIndex === undefined) return
+    const currentBox = getCurrentBox()
+    for (
+      let i = (currentIndex + 1) % OPENHOME_BOX_SLOTS;
+      i !== currentIndex;
+      i = (i + 1) % OPENHOME_BOX_SLOTS
+    ) {
+      const identifier = currentBox.identifiers.get(i)
+      if (identifier && ohpkmStore.monIsStored(identifier)) {
+        setCurrentIndex(i)
+        break
+      }
+    }
+  }
+
+  function navigatePrev() {
+    if (currentIndex === undefined) return
+    const currentBox = getCurrentBox()
+    for (
+      let i = moduloUnderflowWrap(currentIndex - 1, OPENHOME_BOX_SLOTS);
+      i !== currentIndex;
+      i = moduloUnderflowWrap(i - 1, OPENHOME_BOX_SLOTS)
+    ) {
+      const identifier = currentBox.identifiers.get(i)
+      if (identifier && ohpkmStore.monIsStored(identifier)) {
+        setCurrentIndex(i)
+        break
+      }
+    }
+  }
+
+  return {
+    currentIndex,
+    setCurrentIndex,
+    navigatePrev,
+    navigateNext,
   }
 }
 
-export function buildNavigator(
-  incrementFunction: (index: number) => number,
-  save: SAV | OpenHomeBanks,
-  currentIndex?: number,
-  callback?: (index?: number) => void
-) {
-  if (currentIndex === undefined) return undefined
-  const currentBox =
-    save instanceof OpenHomeBanks
-      ? save.getCurrentBox()
-      : save.currentPCBox < save.boxes.length
-        ? save.boxes[save.currentPCBox]
-        : undefined
+export function useBoxNavigator(save: SAV, boxNum: number, boxSlot: Option<number>) {
+  const [currentSlot, setCurrentSlot] = useState<Option<number>>(boxSlot)
 
-  const nonEmptySlots =
-    currentBox instanceof OpenHomeBox
-      ? currentBox.allContainedMons().length
-      : (currentBox?.boxSlots.filter(filterUndefined).length ?? 0)
-
-  if (currentBox === undefined || nonEmptySlots < 2) {
-    return undefined
+  function navigateNext() {
+    if (currentSlot === undefined) return
+    setCurrentSlot(getNextFullSlotBoxWrapping(save, boxNum, currentSlot))
   }
 
-  return callback
-    ? () => callback(getFollowingMon(currentBox, incrementFunction, currentIndex))
-    : () => getFollowingMon(currentBox, incrementFunction, currentIndex)
-}
+  function navigatePrev() {
+    if (currentSlot === undefined) return
+    setCurrentSlot(getPrevFullSlotBoxWrapping(save, boxNum, currentSlot))
+  }
 
-/**
- *
- * If there are at least two Pokémon in the save's current box, returns a function
- * that gives the next index of a Pokémon (wrapping end to start if necessary).
- * Otherwise returns undefined
- */
-export function buildForwardNavigator(
-  save: SAV | OpenHomeBanks,
-  currentIndex?: number,
-  callback?: (index?: number) => void
-) {
-  if (!save || currentIndex === undefined) return undefined
-
-  const boxSize = save.boxColumns * save.boxRows
-  const getNext = (index: number) => (index + 1) % boxSize
-
-  return buildNavigator(getNext, save, currentIndex, callback)
-}
-
-/**
- *
- * If there are at least two Pokémon in the save's current box, returns a function
- * that gives the previous index of a Pokémon (wrapping start to end if necessary).
- * Otherwise returns undefined
- */
-export function buildBackwardNavigator(
-  save: SAV | OpenHomeBanks,
-  index?: number,
-  callback?: (index?: number) => void
-) {
-  const boxSize = save.boxColumns * save.boxRows
-  const getPrevious = (index: number) => (index === 0 ? boxSize - 1 : index - 1)
-
-  return buildNavigator(getPrevious, save, index, callback)
+  return {
+    currentSlot,
+    setCurrentSlot,
+    navigateNext,
+    navigatePrev,
+  }
 }
 
 export function buildRecentSaveContextElements(
@@ -170,10 +178,36 @@ export function buildRecentSaveContextElements(
 ): Option<CtxMenuElementBuilder>[] {
   return [
     removeRecentSave
-      ? ItemBuilder.fromLabel('Remove Save').withAction(() => removeRecentSave(save.filePath.raw))
+      ? Item.label('Remove Save').action(() => removeRecentSave(save.filePath.raw))
       : undefined,
-    ItemBuilder.fromLabel(
+    Item.label(
       `Reveal in ${backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
-    ).withAction(() => backend.openDirectory(save.filePath.dir)),
+    ).action(() => backend.openDirectory(save.filePath.dir)),
   ]
+}
+
+export type GameOrPluginDetails = {
+  shortName: string
+  markIconPath: Option<string>
+  backgroundColor: string
+}
+
+export function getDetailsOfficialSave(originGame: number): GameOrPluginDetails {
+  const gameMetadata = OriginGames.getMetadata(originGame)
+  const markImage = getOriginIconPath(gameMetadata)
+  const backgroundColor = OriginGames.color(originGame)
+
+  return {
+    shortName: OriginGames.gameNameShort(originGame),
+    markIconPath: markImage,
+    backgroundColor,
+  }
+}
+
+export function getDetailsPluginSave(pluginId: PluginIdentifier): GameOrPluginDetails {
+  return {
+    shortName: pluginGameName(pluginId, 'short'),
+    markIconPath: pluginOriginMarkPath(pluginId),
+    backgroundColor: OriginGames.pluginColor(pluginId),
+  }
 }

@@ -11,36 +11,27 @@
     ],
     "module": "ESNext",
     "skipLibCheck": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "paths": {
-      "src/*": [
-        "./src/*"
-      ],
-      "src/types/*": [
-        "./src/types/*"
-      ],
-      "src/consts/*": [
-        "./src/consts/*"
-      ],
-      "util/*": [
-        "./util/*"
-      ],
       "@openhome-ui/*": [
         "./src/ui/*"
       ],
       "@openhome-core/*": [
         "./src/core/*"
       ],
-      "@pokemon-files/*": [
-        "./packages/pokemon-files/src/*"
-      ],
-      "@pokemon-resources/*": [
-        "./packages/pokemon-resources/src/*"
+      "@openhome-core/resources/*": [
+        "./src/core/resources/*"
       ],
       "@pkm-rs/*": [
         "./pkm_rs/*"
+      ],
+      "@pkm-rs": [
+        "./pkm_rs"
       ]
     },
+    "typeRoots": ["./src/types", "./node_modules/@types"],
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -57,6 +48,10 @@
     "src",
     "packages",
     "generate/_rename.js",
-    "generate/generate-cfru/generateMoveMap.ts"
+    "generate/generateMoveMap.ts",
+    "src-tauri/pokemon-wasm",
+    "generate/generate-cfru/generateMoveMap.ts",
+    "src/types/pkm-resources-types.d.ts",
+    "__mocks__"
   ]
 }

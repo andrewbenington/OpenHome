@@ -1,3 +1,13 @@
+import {
+  booleanSorter,
+  dayjsSorter,
+  numericSorter,
+  SortableColumn,
+  SortableValue,
+  Sorter,
+  SortType,
+  stringSorter,
+} from '@openhome-core/util/sort'
 import { Flex } from '@radix-ui/themes'
 import { isDayjs } from 'dayjs'
 import { ReactNode, useMemo, useRef, useState, type RefAttributes } from 'react'
@@ -11,24 +21,7 @@ import {
   type SortColumn,
 } from 'react-data-grid'
 import 'react-data-grid/lib/styles.css'
-import {
-  booleanSorter,
-  dayjsSorter,
-  numericSorter,
-  SortableColumn,
-  SortableValue,
-  Sorter,
-  SortType,
-  stringSorter,
-} from 'src/core/util/sort'
-import {
-  CheckboxBuilder,
-  ItemBuilder,
-  LabelBuilder,
-  OpenHomeCtxMenu,
-  SeparatorBuilder,
-  SubmenuBuilder,
-} from './context-menu'
+import { Checkbox, Item, Label, OpenHomeCtxMenu, Separator, Submenu } from './context-menu'
 import { DropdownArrowIcon, FilterIcon } from './Icons'
 import './style.css'
 
@@ -328,21 +321,21 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
 
   const headerCtxMenuBuilders = useMemo(
     () => [
-      LabelBuilder.fromComponent(column.name),
-      SeparatorBuilder,
+      Label.component(column.name),
+      Separator,
       getFilterValue
-        ? SubmenuBuilder.fromLabel('Filter...')
-            .withBuilder(
-              ItemBuilder.fromLabel(activeFilter ? 'Select All' : 'Deselect All').withAction(() =>
+        ? Submenu.label('Filter...')
+            .with(
+              Item.label(activeFilter ? 'Select All' : 'Deselect All').action(() =>
                 setFilters({
                   ...filters,
                   [columnKey]: activeFilter ? undefined : [],
                 })
               )
             )
-            .withBuilders(
-              filterValues.toSorted(filterDropdownSorter).map((filterValue) =>
-                CheckboxBuilder.fromLabel(filterValue)
+            .with(
+              ...filterValues.toSorted(filterDropdownSorter).map((filterValue) =>
+                Checkbox.label(filterValue)
                   .handleValueChanged(() => {
                     if (columnFilter === undefined) {
                       setFilters({
@@ -369,15 +362,13 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
               )
             )
         : undefined,
-      getFilterValue
-        ? ItemBuilder.fromLabel('Clear Filters').withAction(() => setFilters({}))
-        : undefined,
-      getFilterValue ? SeparatorBuilder : undefined,
-      SubmenuBuilder.fromLabel('Show/Hide Columns').withBuilders(
-        columns
+      getFilterValue ? Item.label('Clear Filters').action(() => setFilters({})) : undefined,
+      getFilterValue ? Separator : undefined,
+      Submenu.label('Show/Hide Columns').with(
+        ...columns
           .filter((col) => !!col.name)
           .map((col) =>
-            CheckboxBuilder.fromComponent(col.name)
+            Checkbox.component(col.name)
               .handleValueChanged(() => {
                 if (visibleColumnKeys.has(col.key)) {
                   if (visibleColumnKeys.size > 1) {
@@ -390,7 +381,7 @@ function HeaderWithContextMenu<R extends Record<string, unknown>>({
               .handleIsChecked(() => visibleColumnKeys.has(col.key))
           )
       ),
-      ItemBuilder.fromLabel('Reset to Default').withAction(() =>
+      Item.label('Reset to Default').action(() =>
         setHiddenColumns(columns.filter((c) => c.hideByDefault).map((c) => c.key))
       ),
     ],

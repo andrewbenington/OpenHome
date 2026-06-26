@@ -1,13 +1,17 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
-import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
+import { SaveFolder, SimpleOpenHomeBox, StoredBankData } from '@openhome-core/save/util/storage'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { JSONObject, LoadSaveResponse, SaveRef } from '@openhome-core/util/types'
 import BackendInterface, {
   BankOrBoxChange,
+  MenuEvent,
+  NewLogNotification,
   OhpkmStore,
+  parseLogs,
   StoredLookups,
 } from '@openhome-ui/backend/backendInterface'
+import { LogFilter } from '@openhome-ui/pages/logs'
 import { defaultSettings, Settings } from '@openhome-ui/state/appInfo'
 import { Pokedex } from '@openhome-ui/util/pokedex'
 import { path } from '@tauri-apps/api'
@@ -16,8 +20,8 @@ import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
 import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
-import dayjs from 'dayjs'
-import { Commands, StoredBankDataSerialized } from './tauriInvoker'
+import dayjs, { Dayjs } from 'dayjs'
+import { Commands, LogFilterIpc, StoredBankDataSerialized } from './tauriCommands'
 import { isRustErr } from './types'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
@@ -50,7 +54,7 @@ export const TauriBackend: BackendInterface = {
         Object.fromEntries(
           Object.entries(b64ByIdentifier).map(([identifier, b64String]) => [
             identifier,
-            new OHPKM(Uint8Array.fromBase64(b64String)),
+            OHPKM.fromBytes(Uint8Array.fromBase64(b64String).buffer),
           ])
         )
       )
@@ -65,8 +69,7 @@ export const TauriBackend: BackendInterface = {
     )
   },
   deleteHomeMons: async function (identifiers: string[]): Promise<Errorable<null>> {
-    const monFilePaths = identifiers.map((identifier) => `mons/${identifier}.ohpkm`)
-    return Commands.delete_storage_files(monFilePaths).then(
+    return Commands.permanently_delete_ohpkms(identifiers).then(
       R.map((deletionResults) => {
         for (const [file, result] of Object.entries(deletionResults)) {
           if (isRustErr(result)) {
@@ -77,6 +80,11 @@ export const TauriBackend: BackendInterface = {
       })
     )
   },
+
+  /* prompt user to select new data directory location */
+  promptChangeDataDir: Commands.change_data_dir,
+  /* get the current data directory path */
+  getDataDirPath: Commands.get_data_dir_path,
 
   /* write synced state to disk during save */
   saveSyncedState: Commands.save_synced_state,
@@ -112,7 +120,7 @@ export const TauriBackend: BackendInterface = {
     return filePath ? Commands.write_file_bytes(filePath, bytes) : R.Ok(null)
   },
 
-  // /* game save management */
+  /* game save management */
   getRecentSaves: Commands.validate_recent_saves,
   addRecentSave: (saveRef: SaveRef): Promise<Errorable<null>> =>
     Commands.get_storage_file_json('recent_saves.json').then(
@@ -218,7 +226,8 @@ export const TauriBackend: BackendInterface = {
     return R.Ok(path ?? undefined)
   },
   getResourcesPath: path.resourceDir,
-  getPluginPath: async (pluginId: string) => `${await path.appDataDir()}/plugins/${pluginId}`,
+  getPluginPath: async (pluginId: string) =>
+    Commands.get_data_dir_path().then(R.map((dataDirPath) => `${dataDirPath}/plugins/${pluginId}`)),
   openDirectory: Commands.open_directory,
   openFileLocation: Commands.open_file_location,
   getPlatform: platform,
@@ -232,14 +241,29 @@ export const TauriBackend: BackendInterface = {
     ),
   updateSettings: async (settings: Settings) =>
     Commands.write_storage_file_json('settings.json', settings as unknown as JSONObject),
+  getConvertStrategies: Commands.get_convert_strategies,
+  updateConvertStrategies: Commands.update_convert_strategies,
   setTheme: Commands.set_app_theme,
-  emitMenuEvent: Commands.handle_windows_accellerator,
+  emitMenuEvent: Commands.handle_windows_accelerator,
 
   getImageData: Commands.get_image_data,
   listInstalledPlugins: Commands.list_installed_plugins,
   downloadPlugin: Commands.download_plugin,
   loadPluginCode: Commands.load_plugin_code,
   deletePlugin: Commands.delete_plugin,
+  getLogs: (filter: LogFilter) => {
+    const { start, end, ...otherParams } = filter
+    const ipcFilter: LogFilterIpc = {
+      start_epoch_seconds: start.unix(),
+      end_epoch_seconds: end.unix(),
+      ...otherParams,
+    }
+    return Commands.get_logs_today(ipcFilter).then(R.map(parseLogs))
+  },
+  log: Commands.log,
+  clearLogsForRange: (start: Dayjs, end: Dayjs) => {
+    return Commands.clear_logs_for_range(start.unix(), end.unix())
+  },
 
   registerListeners: (listeners) => {
     const unlistenPromises: Promise<UnlistenFn>[] = [
@@ -283,15 +307,6 @@ export const TauriBackend: BackendInterface = {
       }),
     ]
 
-    if (listeners.onSave) {
-      unlistenPromises.push(listen('save', listeners.onSave))
-    }
-    if (listeners.onReset) {
-      unlistenPromises.push(listen('reset', listeners.onReset))
-    }
-    if (listeners.onOpen) {
-      unlistenPromises.push(listen('open', listeners.onOpen))
-    }
     if (listeners.onStateUpdate) {
       for (const [stateType, listener] of Object.entries(listeners.onStateUpdate)) {
         unlistenPromises.push(
@@ -338,6 +353,35 @@ export const TauriBackend: BackendInterface = {
         }
       })
   },
+  onMenuEvent: (event: MenuEvent, callback: () => void) => {
+    const unlistenPromise = listen(event, callback)
+
+    return () => unlistenPromise.then((unlistenFunction) => unlistenFunction())
+  },
+  onMenuEvents: (eventsAndCallbacks: Partial<Record<MenuEvent, () => void>>) => {
+    const unlistenPromises: Promise<UnlistenFn>[] = []
+    for (const [event, callback] of Object.entries(eventsAndCallbacks)) {
+      unlistenPromises.push(listen(event, callback))
+    }
+
+    return () =>
+      Promise.all(unlistenPromises).then((unlistenFunctions) => {
+        for (const unlistenFunction of unlistenFunctions) {
+          try {
+            unlistenFunction()
+          } catch (e) {
+            console.error(e)
+          }
+        }
+      })
+  },
+  onNewLog: (callback: (notification: NewLogNotification) => void) => {
+    const unlistenPromise = listen('tracing::log', (event) =>
+      callback(event.payload as NewLogNotification)
+    )
+
+    return () => unlistenPromise.then((unlistenFunction) => unlistenFunction())
+  },
 }
 
 function deserializeBankData(data: StoredBankDataSerialized): StoredBankData {
@@ -345,14 +389,19 @@ function deserializeBankData(data: StoredBankDataSerialized): StoredBankData {
     ...data,
     banks: data.banks.map((bank) => ({
       ...bank,
-      boxes: bank.boxes.map((box) => ({
-        ...box,
-        identifiers: new Map(
-          Object.entries(box.identifiers).map(
-            ([indexStr, identifier]) => [parseInt(indexStr), identifier] as const
-          )
-        ),
-      })),
+      boxes: new Map(
+        bank.boxes.map((box) => {
+          const simpleBox: SimpleOpenHomeBox = {
+            ...box,
+            identifiers: new Map(
+              Object.entries(box.identifiers).map(
+                ([indexStr, identifier]) => [parseInt(indexStr), identifier] as const
+              )
+            ),
+          }
+          return [box.index, simpleBox] as const
+        })
+      ),
     })),
   }
 }
@@ -362,7 +411,7 @@ function serializeBankData(data: StoredBankData): StoredBankDataSerialized {
     ...data,
     banks: data.banks.map((bank) => ({
       ...bank,
-      boxes: bank.boxes.map((box) => ({
+      boxes: Array.from(bank.boxes.values()).map((box) => ({
         ...box,
         identifiers: Object.fromEntries(box.identifiers.entries()),
       })),

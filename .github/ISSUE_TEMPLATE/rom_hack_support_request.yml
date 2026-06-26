@@ -1,0 +1,36 @@
+name: 'ROM Hack Support Request'
+description: 'Request support for a ROM hack or other fangame.'
+title: '[ADD SUPPORT] (enter the name of the hack/game here)'
+labels: ['enhancement', 'rom hack support']
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a ROM hack to support! Adding support to a new game takes a lot of work, so the more documentation and information you include here the more likely it is that support will be added. Please only include one ROM hack per GitHub issue, and feel free to make multiple issues if you have multiple ROM hacks to support.
+
+  - type: textarea
+    id: name_desc
+    attributes:
+      label: 'ROM Hack Name + Summary'
+      description: 'Please provide the name of the ROM hack, the official game it is based on (if any), and a short description.'
+
+    validations:
+      required: true
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: 'Link to ROM hack resources'
+      description: 'Please list links to any sites, wikis, Google docs, etc that provide information on this ROM hack'
+
+    validations:
+      required: true
+
+  - type: textarea
+    id: code
+    attributes:
+      label: 'Code/Developer Resources'
+      description: 'Please enter links to any code repositories, technical documentation, and/or other developer resources related to the ROM hack. While this is not required, I am more likely to implement support if developer resources are provided'
+      placeholder: 'For example: ROM hack source code GitHub repos, PKHeX plugin GitHub repos, technical wiki pages.'

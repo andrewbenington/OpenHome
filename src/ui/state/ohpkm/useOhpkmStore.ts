@@ -1,16 +1,19 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
-import { createContext, useCallback, useContext } from 'react'
-import { OhpkmStoreData } from '.'
-import { MonFormat, PKMInterface } from '../../../core/pkm/interfaces'
+import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
   OhpkmIdentifier,
-} from '../../../core/pkm/Lookup'
-import { SAV } from '../../../core/save/interfaces'
-import { SAVClass } from '../../../core/save/util'
+} from '@openhome-core/pkm/Lookup'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { SAV } from '@openhome-core/save/interfaces'
+import { SAVClass } from '@openhome-core/save/util'
+import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
+import { OriginGames } from '@pkm-rs/pkg/pkm_rs'
+import dayjs from 'dayjs'
+import { createContext, useCallback, useContext } from 'react'
+import { OhpkmStoreData } from '.'
+import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
 
 export type OhpkmStore = {
@@ -33,10 +36,12 @@ export type OhpkmStore = {
   ) => OHPKM
 }
 
-export type OhpkmLookup = (id: string) => OHPKM | undefined
+// FALSE IN PRODUCTION
+const FORCE_MISSED_LOOKUP = false
 
 export function useOhpkmStore(): OhpkmStore {
   const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
+  const { defaultConvertStrategy } = useConvertStrategies()
   const { lookups, updateLookups } = useLookups()
   const { gen12: gen12Lookup, gen345: gen345Lookup } = lookups
 
@@ -102,7 +107,10 @@ export function useOhpkmStore(): OhpkmStore {
           gen12: { ...lookups.gen12, [gen12Identifier]: ohpkmIdentifier },
         })
       } else if (lookupType === 'gen345') {
-        const gen345Identifier = getMonGen345Identifier(ohpkm)
+        // If original generation, keep the original PID
+        const isOriginalGen =
+          OriginGames.generation(ohpkm.gameOfOrigin) === OriginGames.generation(save.origin)
+        const gen345Identifier = getMonGen345Identifier(ohpkm, isOriginalGen)
         if (!gen345Identifier) {
           throw Error(`could not build gen 3/4/5 identifier for mon ${ohpkmIdentifier}`)
         }
@@ -121,14 +129,17 @@ export function useOhpkmStore(): OhpkmStore {
       handleLookupsUpdate(ohpkm, save)
       insertOrUpdate(ohpkm)
 
-      return save.convertOhpkm(ohpkm)
+      return save.convertOhpkm(ohpkm, defaultConvertStrategy)
     },
-    [handleLookupsUpdate, insertOrUpdate]
+    [defaultConvertStrategy, handleLookupsUpdate, insertOrUpdate]
   )
 
   const startTrackingNewMon = useCallback(
     <P extends PKMInterface>(mon: P, sourceSave: Option<SAV<P>>, destSave: Option<SAV>) => {
-      const ohpkm = sourceSave ? OHPKM.fromMonInSave(mon, sourceSave) : new OHPKM(mon)
+      const ohpkm = sourceSave
+        ? OHPKM.fromMonInSave(mon, sourceSave)
+        : OHPKM.fromMonUnknownSave(mon)
+      ohpkm.startedTrackingTimestamp = dayjs()
       if (destSave) {
         handleLookupsUpdate(ohpkm, destSave)
       }
@@ -142,6 +153,7 @@ export function useOhpkmStore(): OhpkmStore {
 
   const loadIfTracked = useCallback(
     (mon: PKMInterface): Option<OHPKM> => {
+      if (FORCE_MISSED_LOOKUP) return undefined
       const format: MonFormat = mon.format as MonFormat
       switch (format) {
         case 'PK1':
@@ -183,7 +195,9 @@ export function useOhpkmStore(): OhpkmStore {
         case 'PK8':
         case 'PA8':
         case 'PB8':
+        case 'PB8LUMI':
         case 'PK9':
+        case 'PK9Compass':
         case 'PA9': {
           const homeIdentifier = getMonFileIdentifier(mon)
           if (!homeIdentifier) {
@@ -192,7 +206,12 @@ export function useOhpkmStore(): OhpkmStore {
             )
           }
 
-          return ohpkmStore[homeIdentifier]
+          // because the game of origin may have been changed for legality reasons, we need to ignore the origin when looking up in the store
+          const homeIdentifierNoOrigin = homeIdentifier.split('-').slice(0, -1).join('-')
+
+          return Object.entries(ohpkmStore).find(([id, _]) =>
+            id.startsWith(homeIdentifierNoOrigin)
+          )?.[1]
         }
         default:
           // use type system to enforce exhaustiveness

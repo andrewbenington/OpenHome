@@ -1,3 +1,4 @@
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
@@ -6,6 +7,9 @@ import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
+import dayjs, { Dayjs } from 'dayjs'
+import { LogFilter } from '../pages/logs'
+import { ConvertStrategies } from '../state/convert-strategies/ConvertStrategiesProvider'
 
 export type AppState = {
   open_transaction: boolean
@@ -14,7 +18,7 @@ export type AppState = {
   new_features_since_update: UpdateFeatures[]
 }
 
-export type UpdateFeatures = {
+type UpdateFeatures = {
   version: string
   feature_messages: string[]
 }
@@ -24,10 +28,70 @@ export type ImageResponse = {
   extension: string
 }
 
-export type PluginDownloadProgress = {
-  pluginId: string
-  progress: number
+type LogEntryUnparsed = {
+  timestamp: string
+  level: string
+  target?: string
+  message: string
+  event?: string
+  fields?: Record<string, unknown>
+  context?: Record<string, unknown>
+  ohpkm_id?: OhpkmIdentifier
 }
+
+export type LogEntry = {
+  timestamp: Dayjs
+  level: string
+  target?: string
+  message: string
+  event?: string
+  fields?: Record<string, unknown>
+  context?: Record<string, unknown>
+  ohpkm_id?: OhpkmIdentifier
+}
+
+type LogFilterUnparsed = {
+  start: string
+  end: string
+  ohpkm_id?: string
+}
+
+function parseLog(unparsed: LogEntryUnparsed): LogEntry {
+  return {
+    ...unparsed,
+    timestamp: dayjs(unparsed.timestamp),
+  }
+}
+
+export type LogsResponseUnparsed = {
+  current: LogFilterUnparsed
+  next: LogFilterUnparsed
+  remaining_file_lines: LogEntryUnparsed[]
+}
+
+export type LogsResponse = {
+  current: LogFilter
+  next: LogFilter
+  remaining_file_lines: LogEntry[]
+}
+
+export function parseLogs(unparsed: LogsResponseUnparsed): LogsResponse {
+  return {
+    ...unparsed,
+    current: parseFilter(unparsed.current),
+    next: parseFilter(unparsed.next),
+    remaining_file_lines: unparsed.remaining_file_lines.map(parseLog),
+  }
+}
+
+function parseFilter(unparsed: LogFilterUnparsed): LogFilter {
+  return {
+    ...unparsed,
+    start: dayjs(unparsed.start),
+    end: dayjs(unparsed.end),
+  }
+}
+export type LogLevel = 'ERROR' | 'WARN' | 'INFO' | 'DEBUG' | 'TRACE'
 
 export type StoredLookups = { gen12: LookupMap; gen345: LookupMap }
 
@@ -43,6 +107,11 @@ export default interface BackendInterface {
   loadOhpkmStore: () => Promise<Errorable<OhpkmStore>>
   addToOhpkmStore: (updates: OhpkmStore) => Promise<Errorable<null>>
   deleteHomeMons: (identifiers: string[]) => Promise<Errorable<null>>
+
+  /* prompt user to select new data directory location */
+  promptChangeDataDir: () => Promise<Errorable<null>>
+  /* get the current data directory path */
+  getDataDirPath: () => Promise<Errorable<string>>
 
   /* write synced state to disk during save */
   saveSyncedState: () => Promise<Errorable<void>>
@@ -85,17 +154,27 @@ export default interface BackendInterface {
   openFileLocation: (filePath: string) => Promise<Errorable<null>>
   getPlatform: () => string
   registerListeners: (listeners: Partial<BackendListeners>) => () => void
+  onMenuEvent: (event: MenuEvent, listener: () => void) => () => void
+  onMenuEvents: (eventsAndCallbacks: Partial<Record<MenuEvent, () => void>>) => () => void
   getState: () => Promise<Errorable<AppState>>
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>
+  getConvertStrategies: () => Promise<Errorable<ConvertStrategies>>
+  updateConvertStrategies: (strategies: ConvertStrategies) => Promise<Errorable<null>>
   setTheme(appTheme: AppTheme): Promise<Errorable<null>>
   saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Errorable<null>>
   emitMenuEvent: (menuEventId: string) => Promise<Errorable<null>>
 
+  /* logging */
+  getLogs(filter: LogFilter): Promise<Errorable<LogsResponse>>
+  log(level: LogLevel, message: string, context?: Record<string, unknown>): Promise<Errorable<void>>
+  clearLogsForRange(start: Dayjs, end: Dayjs): Promise<Errorable<null>>
+  onNewLog: (callback: (notification: NewLogNotification) => void) => () => void
+
   /* plugins */
   getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>
   listInstalledPlugins: () => Promise<Errorable<PluginMetadataWithIcon[]>>
-  getPluginPath: (pluginId: string) => Promise<string>
+  getPluginPath: (pluginId: string) => Promise<Errorable<string>>
   downloadPlugin(remoteUrl: string): Promise<Errorable<string>>
   loadPluginCode(pluginId: string): Promise<Errorable<string>>
   deletePlugin(pluginId: string): Promise<Errorable<string>>
@@ -103,10 +182,15 @@ export default interface BackendInterface {
 
 export type BankOrBoxChange = { bank: number; box: number }
 
-export interface BackendListeners {
-  onSave: () => void
-  onReset: () => void
-  onOpen: () => void
+export type MenuEvent = 'save' | 'reset' | 'open' | 'zoom_in' | 'zoom_out' | 'reset_zoom'
+
+export type NewLogNotification = {
+  level: LogLevel
+  timestamp_unix: number
+}
+
+interface BackendListeners {
+  onMenuEvent: (event: MenuEvent) => void
   onLookupsUpdate: (updated_lookups: StoredLookups) => void
   onStateUpdate: Record<string, <State>(updated_state: State) => void>
   onPokedexUpdate: (updated_pokedex: Pokedex) => void

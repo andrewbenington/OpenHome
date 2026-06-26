@@ -1,5 +1,12 @@
-import { GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { useCallback, useContext, useMemo, useState } from 'react'
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import {
+  Gen12Identifier,
+  Gen345Identifier,
+  getMonFileIdentifier,
+  getMonGen12Identifier,
+  getMonGen345Identifier,
+  OhpkmIdentifier,
+} from '@openhome-core/pkm/Lookup'
 import {
   BDSP_TRANSFER_RESTRICTIONS,
   BW2_TRANSFER_RESTRICTIONS,
@@ -13,34 +20,27 @@ import {
   SV_TRANSFER_RESTRICTIONS_ID,
   SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
-} from '../../../../packages/pokemon-resources/src/consts/TransferRestrictions'
-import { PKMInterface } from '../../../core/pkm/interfaces'
-import {
-  Gen12Identifier,
-  Gen345Identifier,
-  getMonFileIdentifier,
-  getMonGen12Identifier,
-  getMonGen345Identifier,
-  OhpkmIdentifier,
-} from '../../../core/pkm/Lookup'
-import { BoxAndSlot, SAV } from '../../../core/save/interfaces'
-import { RR_TRANSFER_RESTRICTIONS } from '../../../core/save/radicalred/G3RRSAV'
-import { UB_TRANSFER_RESTRICTIONS } from '../../../core/save/unbound/G3UBSAV'
-import { buildUnknownSaveFile } from '../../../core/save/util/load'
-import { isRestricted, TransferRestrictions } from '../../../core/save/util/TransferRestrictions'
-import { Option, R, range } from '../../../core/util/functional'
-import { filterUndefined } from '../../../core/util/sort'
-import { SaveRef } from '../../../core/util/types'
+} from '@openhome-core/resources//consts/TransferRestrictions'
+import { BoxAndSlot, SAV } from '@openhome-core/save/interfaces'
+import { LP_TRANSFER_RESTRICTIONS } from '@openhome-core/save/luminescentplatinum/G8LUMISAV'
+import { RR_TRANSFER_RESTRICTIONS } from '@openhome-core/save/radicalred/G3RRSAV'
+import { UB_TRANSFER_RESTRICTIONS } from '@openhome-core/save/unbound/G3UBSAV'
+import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
+import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
+import { Option, R, range } from '@openhome-core/util/functional'
+import { SaveRef } from '@openhome-core/util/types'
+import { ExtraFormIndex, GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import { useCallback, useContext, useMemo, useState } from 'react'
 import { BackendContext } from '../../backend/backendContext'
 import useDisplayError from '../../hooks/displayError'
+import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { AppInfoContext } from '../../state/appInfo'
 import { useLookups } from '../../state/lookups'
 import { OhpkmStoreData, useOhpkmStore } from '../../state/ohpkm'
-import { useSaves } from '../../state/saves'
 
 export function useManageTracked() {
   const ohpkmStore = useOhpkmStore()
-  const { homeData } = useSaves()
+  const { findHomeLocation } = useBanksAndBoxes()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { lookups } = useLookups()
   const backend = useContext(BackendContext)
@@ -67,7 +67,7 @@ export function useManageTracked() {
       const savePaths = await backend.getRecentSaves().then(
         R.map((saves) =>
           Object.values(saves)
-            .filter((s) => monPossiblySupported(mon.dexNum, mon.formeNum, s))
+            .filter((s) => monPossiblySupported(mon.dexNum, mon.formNum, s, mon.extraFormIndex))
             .map((s) => s.filePath)
         )
       )
@@ -160,7 +160,7 @@ export function useManageTracked() {
 
     const allStoredById = ohpkmStore.byId
     const allStoredIdsNotInBoxes = new Set(
-      Object.keys(allStoredById).filter((id) => homeData.findIfPresent(id) === undefined)
+      Object.keys(allStoredById).filter((id) => findHomeLocation(id) === undefined)
     )
     const totalMons = allStoredIdsNotInBoxes.size
     let foundMonIds = new Set<string>()
@@ -197,7 +197,7 @@ export function useManageTracked() {
       }
 
       const save = result.value
-      for (const saveMon of save.boxes.flatMap((b) => b.boxSlots).filter(filterUndefined)) {
+      for (const saveMon of save.getAllMons()) {
         let saveMonId: Option<OhpkmIdentifier> = undefined
 
         switch (save.lookupType) {
@@ -250,7 +250,15 @@ export function useManageTracked() {
       totalMons,
       missingMonIds: allMissingIdsNotInBoxes,
     })
-  }, [backend, displayError, enabledSaveTypes, homeData, lookups.gen12, lookups.gen345, ohpkmStore])
+  }, [
+    backend,
+    displayError,
+    enabledSaveTypes,
+    findHomeLocation,
+    lookups.gen12,
+    lookups.gen345,
+    ohpkmStore,
+  ])
 
   return {
     findSaveForMon,
@@ -284,17 +292,24 @@ export type FindingSavesForAllState =
   | { type: 'complete'; foundMons: number; totalMons: number; missingMonIds: OhpkmIdentifier[] }
   | { type: 'error'; error: string }
 
-function monPossiblySupported(dexNumber: number, formeNumber: number, saveRef: SaveRef) {
+function monPossiblySupported(
+  dexNumber: number,
+  formeNumber: number,
+  saveRef: SaveRef,
+  extraFormIndex?: ExtraFormIndex
+) {
   if (saveRef.game === null) return false
 
   function isSupported(restrictions: TransferRestrictions) {
-    return !isRestricted(restrictions, dexNumber, formeNumber)
+    return !isRestricted(restrictions, dexNumber, formeNumber, extraFormIndex)
   }
 
   if (saveRef.pluginIdentifier === 'radical_red') {
     return isSupported(RR_TRANSFER_RESTRICTIONS)
   } else if (saveRef.pluginIdentifier === 'unbound') {
     return isSupported(UB_TRANSFER_RESTRICTIONS)
+  } else if (saveRef.pluginIdentifier === 'luminescent_platinum') {
+    return isSupported(LP_TRANSFER_RESTRICTIONS)
   }
 
   switch (OriginGames.generation(saveRef.game)) {
@@ -328,10 +343,9 @@ function monPossiblySupported(dexNumber: number, formeNumber: number, saveRef: S
 }
 
 function searchSaveForMon(save: SAV, id: OhpkmIdentifier): Option<SaveSearchResult> {
-  for (const boxIndex of range(save.boxes.length)) {
-    const box = save.boxes[boxIndex]
-    for (const boxSlot of range(box.boxSlots.length)) {
-      const mon = box.boxSlots[boxSlot]
+  for (const boxIndex of range(save.getBoxCount())) {
+    for (const boxSlot of range(save.boxSlotCount)) {
+      const mon = save.getMonAt(boxIndex, boxSlot)
       if (mon && getMonFileIdentifier(mon) === id) {
         return {
           match: mon,
@@ -343,10 +357,9 @@ function searchSaveForMon(save: SAV, id: OhpkmIdentifier): Option<SaveSearchResu
 }
 
 function searchSaveForMonGen12(save: SAV, id: Gen12Identifier): Option<SaveSearchResult> {
-  for (const boxIndex of range(save.boxes.length)) {
-    const box = save.boxes[boxIndex]
-    for (const boxSlot of range(box.boxSlots.length)) {
-      const mon = box.boxSlots[boxSlot]
+  for (const boxIndex of range(save.getBoxCount())) {
+    for (const boxSlot of range(save.boxSlotCount)) {
+      const mon = save.getMonAt(boxIndex, boxSlot)
       if (mon && getMonGen12Identifier(mon) === id) {
         return {
           match: mon,
@@ -358,10 +371,9 @@ function searchSaveForMonGen12(save: SAV, id: Gen12Identifier): Option<SaveSearc
 }
 
 function searchSaveForMonGen345(save: SAV, id: Gen345Identifier): Option<SaveSearchResult> {
-  for (const boxIndex of range(save.boxes.length)) {
-    const box = save.boxes[boxIndex]
-    for (const boxSlot of range(box.boxSlots.length)) {
-      const mon = box.boxSlots[boxSlot]
+  for (const boxIndex of range(save.getBoxCount())) {
+    for (const boxSlot of range(save.boxSlotCount)) {
+      const mon = save.getMonAt(boxIndex, boxSlot)
       if (mon && getMonGen345Identifier(mon) === id) {
         return {
           match: mon,

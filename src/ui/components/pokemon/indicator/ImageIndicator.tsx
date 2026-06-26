@@ -1,5 +1,5 @@
-import { colorIsDark } from 'src/ui/util/color'
-import { includeClass } from 'src/ui/util/style'
+import { colorIsDark } from '@openhome-ui/util/color'
+import { cssClass } from '@openhome-ui/util/style'
 import { Indicator } from './Indicator'
 
 export type ImageIndicatorProps = {
@@ -7,19 +7,22 @@ export type ImageIndicatorProps = {
   src: string
   backgroundColor: string
   text?: string
+  style?: React.CSSProperties
 }
 
-export function ImageIndicator({ tooltip, src, backgroundColor, text }: ImageIndicatorProps) {
+export function ImageIndicator(props: ImageIndicatorProps) {
+  const { tooltip, src, backgroundColor, text, style } = props
   const filterClass = colorIsDark(backgroundColor) ? 'white-filter' : 'black-filter'
   return (
     <Indicator
-      className={includeClass('image-indicator-with-text').if(Boolean(text))}
+      className={cssClass('image-indicator-with-text').if(text).build()}
       tooltip={tooltip}
       backgroundColor={backgroundColor}
+      style={style}
     >
       <img
         className={filterClass}
-        style={{ maxHeight: 15, maxWidth: 15 }}
+        style={{ maxHeight: '1rem', maxWidth: '1rem' }}
         draggable={false}
         src={src}
       />

@@ -88,7 +88,6 @@ impl Serialize for Item {
 #[derive(Clone, Copy)]
 pub struct ItemMetadata {
     pub id: usize,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub(crate) name: &'static str,
 }
 
@@ -106,7 +105,6 @@ impl ItemMetadata {
 pub struct ItemMetadataPastGen {
     pub id: usize,
     pub modern_id: Option<usize>,
-    #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub(crate) name: &'static str,
 }
 
@@ -325,5 +323,14 @@ impl ItemGen3 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = fromModern))]
     pub fn from_modern_js(modern_index: u16) -> Option<Self> {
         Self::from_modern_index(modern_index)
+    }
+}
+
+impl Serialize for ItemGen3 {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.0.serialize(serializer)
     }
 }

@@ -68,6 +68,53 @@ pub fn read_uint5_from_bits(byte: u8, bit_offset: u8) -> u8 {
     (byte & bit_mask) >> bit_offset
 }
 
+pub const fn pid_upper_lower(pid: u32) -> (u16, u16) {
+    (((pid >> 16) & 0xffff) as u16, (pid & 0xffff) as u16)
+}
+
+pub const fn shiny_xor_value(pid: u32, trainer_id: u16, secret_id: u16) -> u16 {
+    let (pid_upper, pid_lower) = pid_upper_lower(pid);
+    pid_upper ^ pid_lower ^ trainer_id ^ secret_id
+}
+
+// find and replace
+// u16::from_le_bytes\(bytes\[(\d+)\.\.\d+\]\.try_into\(\).unwrap\(\)\)
+// read_u16_le!(bytes, $1)
+#[macro_export]
+macro_rules! read_u16_le {
+    ($bytes:expr, $start:expr) => {
+        u16::from_le_bytes([$bytes[$start], $bytes[$start + 1]])
+    };
+}
+
+#[macro_export]
+macro_rules! read_u32_le {
+    ($bytes:expr, $start:expr) => {
+        u32::from_le_bytes([
+            $bytes[$start],
+            $bytes[$start + 1],
+            $bytes[$start + 2],
+            $bytes[$start + 3],
+        ])
+    };
+}
+
+#[macro_export]
+macro_rules! read_u64_le {
+    ($bytes:expr, $start:expr) => {
+        u64::from_le_bytes([
+            $bytes[$start],
+            $bytes[$start + 1],
+            $bytes[$start + 2],
+            $bytes[$start + 3],
+            $bytes[$start + 4],
+            $bytes[$start + 5],
+            $bytes[$start + 6],
+            $bytes[$start + 7],
+        ])
+    };
+}
+
 mod test {
 
     #[test]

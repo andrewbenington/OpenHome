@@ -1,47 +1,52 @@
 .plugin-display {
-  width: 200px;
-  height: 200px;
+  width: 15rem;
+  height: 15rem;
   position: relative;
   background-color: #fff6;
-  border-radius: 8px;
+  border-radius: var(--border-radius-lg);
   border-width: 0px;
   overflow: hidden;
 }
 
 .plugin-icon {
   image-rendering: pixelated;
-  width: 180px;
-  height: 180px;
+  width: 11rem;
+  height: 11rem;
   position: absolute;
-  bottom: 0;
-  left: 0;
+  top: 50%;
+  left: 50%;
+  translate: -50% -45%;
   object-fit: contain;
 }
 
 .status-chip {
   position: absolute !important;
-  bottom: 6px;
-  right: 6px;
+  bottom: var(--padding-radius-sm-lg);
+  right: var(--padding-radius-sm-lg);
   height: fit-content;
+  border: var(--soft-border);
 }
 
 .name-chip {
+  --version-badge-height: calc(1rem + 2 * var(--padding-radius-xs-sm));
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   display: flex;
-  padding: 8px 8px;
+  padding: var(--padding-radius-sm-lg);
   font-weight: bold;
   color: #000;
   background-color: #eff;
+  height: var(--version-badge-height);
 }
 
 .version-badge {
   position: absolute;
-  right: 6px;
-  top: 6px;
+  right: var(--padding-radius-sm-lg);
+  top: var(--padding-radius-sm-lg);
   font-weight: bold;
+  height: var(--version-badge-height);
 }
 
 .plugin-progress {
@@ -64,16 +69,37 @@
 
 .delete-icon {
   position: absolute;
-  bottom: 4px;
-  left: 4px;
+  bottom: var(--padding-radius-sm-lg);
+  left: var(--padding-radius-sm-lg);
   cursor: pointer;
-  background-color: transparent;
+  background-color: var(--color-destructive);
+  font-size: 1rem;
   transition: background-color 0.08s;
-  color: #aa0000;
-  border-radius: 16px;
-  padding: 4px;
+  color: white;
+  border-radius: var(--border-radius-sm);
+  padding: var(--padding-radius-xs-sm);
+  border: var(--soft-border);
+  display: grid;
+  align-items: center;
+  justify-content: center;
 }
 
 .delete-icon:hover {
   background-color: #6666;
+}
+
+.plugin-page-content {
+  padding: var(--padding-radius-sm-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-radius-sm-lg);
+}
+
+.plugin-page-cards {
+  gap: var(--padding-radius-sm-lg);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  height: fit-content;
 }

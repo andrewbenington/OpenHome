@@ -1,5 +1,5 @@
+import { RadicalRedToNationalDexMap } from '@openhome-core/SAVTypes/radicalred/conversion/RadicalRedSpeciesMap'
 import { PokemonData } from 'pokemon-species-data'
-import { RadicalRedToNationalDexMap } from '../../src/core/SAVTypes/radicalred/conversion/RadicalRedSpeciesMap'
 import { TransferRestrictions } from '../../src/types/TransferRestrictions'
 
 const RR_TRANSFER_RESTRICTIONS: TransferRestrictions = {
@@ -28,7 +28,7 @@ for (const [key, mapEntry] of Object.entries(RadicalRedToNationalDexMap)) {
   const dbEntry = PokemonData[dexNum]
 
   if (dbEntry) {
-    const allForms = dbEntry.formes.map((forme) => forme.formeNumber)
+    const allForms = dbEntry.forms.map((forme) => forme.formeNumber)
 
     const supportedForms = supportedFormsMap[dexNum] || new Set()
     const unsupportedForms = allForms.filter((formeNumber) => !supportedForms.has(formeNumber))

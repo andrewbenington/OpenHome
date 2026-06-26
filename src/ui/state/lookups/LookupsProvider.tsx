@@ -1,6 +1,10 @@
 import { StoredLookups } from '@openhome-ui/backend/backendInterface'
+import {
+  RustStateProvider,
+  SyncedStateController,
+  useSyncedState,
+} from '@openhome-ui/state/synced-state'
 import { PropsWithChildren, useCallback, useContext } from 'react'
-import { RustStateProvider, SyncedStateController, useSyncedState } from 'src/ui/state/synced-state'
 import { BackendContext } from '../../backend/backendContext'
 import { LookupsContext } from './useLookups'
 

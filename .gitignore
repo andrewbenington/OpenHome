@@ -2,6 +2,7 @@
 /node_modules
 /pkm_rs_resources/generate/node_modules
 /pkm_rs/generate/node_modules
+/generate/node_modules
 
 /.pnp
 .pnp.js
@@ -42,6 +43,9 @@ planning.md
 # generated
 src/consts/JSON/version.json
 src-tauri/gen
+src-tauri/generate/node_modules
+src-tauri/target
+pkm_rs_derive/target
 src-tauri/target
 target/
 
@@ -50,4 +54,5 @@ target/
 *.sublime-workspace
 *.sublime-project
 *.wakatime-project
-.idea
+.idea/
+.zed/

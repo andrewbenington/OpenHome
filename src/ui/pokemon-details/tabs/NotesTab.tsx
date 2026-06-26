@@ -1,8 +1,8 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import useDebounce from '@openhome-ui/hooks/debounce'
 import { useSaves } from '@openhome-ui/state/saves'
 import { TextArea } from '@radix-ui/themes'
 import { useEffect, useState } from 'react'
-import useDebounce from 'src/ui/hooks/useDebounce'
 
 export default function NotesDisplay(props: { mon: OHPKM }) {
   const { mon } = props
@@ -14,7 +14,7 @@ export default function NotesDisplay(props: { mon: OHPKM }) {
   }, [mon])
 
   const debouncedNotesUpdate = useDebounce((notes: string) => {
-    updateMonNotes(mon.openhomeId, notes)
+    updateMonNotes(mon.openhomeId, notes || undefined)
   }, 500)
 
   return (

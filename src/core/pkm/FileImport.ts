@@ -1,8 +1,3 @@
-import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import PK3RR from '@openhome-core/save/radicalred/PK3RR'
-import PK3UB from '@openhome-core/save/unbound/PK3UB'
-import { AnyPkmClass, SavePkmClass } from '@openhome-core/save/util'
 import {
   COLOPKM,
   PA8,
@@ -19,7 +14,16 @@ import {
   PK8,
   PK9,
   XDPKM,
-} from '@pokemon-files/pkm'
+} from '@openhome-core/pkm'
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
+import PK3RR from '@openhome-core/save/radicalred/PK3RR'
+import PK3UB from '@openhome-core/save/unbound/PK3UB'
+import { AnyPkmClass, SavePkmClass } from '@openhome-core/save/util'
+import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
+import PK9Compass from '../save/compass/PK9Compass'
+import { isPkmFormat, PkmOrOhpkmFormat } from './util'
 
 function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {
   switch (bytes.length) {
@@ -43,8 +47,9 @@ function fileTypeFromBytes(bytes: Uint8Array): SavePkmClass | undefined {
   }
 }
 
-export function fileTypeFromString(type: string): AnyPkmClass | undefined {
-  switch (type) {
+export function fileTypeFromStringNonOhpkm(type: PkmFormat): SavePkmClass | undefined {
+  const typeUpper = type.toUpperCase() as Uppercase<PkmFormat>
+  switch (typeUpper) {
     case 'PK1':
       return PK1
     case 'PK2':
@@ -75,15 +80,22 @@ export function fileTypeFromString(type: string): AnyPkmClass | undefined {
       return PA8
     case 'PB8':
       return PB8
+    case 'PB8LUMI':
+      return PB8LUMI
     case 'PK9':
       return PK9
+    case 'PK9COMPASS':
+      return PK9Compass
     case 'PA9':
       return PA9
-    case 'OhpkmV2':
-      return OHPKM
-    default:
-      return undefined
   }
+}
+
+function fileTypeFromString(type: PkmOrOhpkmFormat): AnyPkmClass | undefined {
+  if (type === 'OHPKM') {
+    return OHPKM
+  }
+  return fileTypeFromStringNonOhpkm(type)
 }
 
 export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMInterface => {
@@ -91,9 +103,12 @@ export const bytesToPKM = (bytes: Uint8Array, extension: string): PKMInterface =
 
   if (extension === '' || extension.toUpperCase() === 'PKM') {
     T = fileTypeFromBytes(new Uint8Array(bytes))
-  } else {
+  } else if (isPkmFormat(extension) || extension === 'OHPKM') {
     T = fileTypeFromString(extension)
+  } else {
+    console.error(`unknown pkm extension: ${extension}`)
   }
+
   if (!T) {
     throw `Unrecognized file`
   }

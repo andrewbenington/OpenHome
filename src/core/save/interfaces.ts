@@ -1,10 +1,19 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { Option } from '@openhome-core/util/functional'
+import { Option, range } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
-import { Gender, getPluginColor, OriginGame, OriginGames } from '@pkm-rs/pkg'
+import {
+  ConvertStrategy,
+  ExtraFormIndex,
+  Gender,
+  Language,
+  OriginGame,
+  OriginGames,
+} from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
+import { filterUndefined } from '../util/sort'
 import { LookupType, SAVClass } from './util'
 import { PathData } from './util/path'
+import { TransferRestrictions } from './util/TransferRestrictions'
 
 type SparseArray<T> = (T | undefined)[]
 export class Box<P extends PKMInterface> {
@@ -33,7 +42,7 @@ export type SaveWriter = {
   filepath: string
 }
 
-export interface BaseSAV<P extends PKMInterface = PKMInterface> {
+interface BaseSAV<P extends PKMInterface = PKMInterface> {
   origin: OriginGame
 
   boxRows: number
@@ -49,7 +58,8 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   displayID: string
 
   currentPCBox: number
-  boxes: Array<Box<P>>
+  // boxes: Array<Box<P>>
+  getBoxCount(): number
 
   invalid: boolean
   tooEarlyToOpen: boolean
@@ -58,8 +68,10 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
 
   isPlugin: boolean
 
-  getCurrentBox: () => Box<P>
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata
+  getMonAt(boxNum: number, boxSlot: number): Option<P>
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
+  getAllMons(): Readonly<P>[]
 
   supportsMon: (dexNumber: number, formeNumber: number) => boolean
   supportsItem: (itemIndex: number) => boolean
@@ -67,7 +79,7 @@ export interface BaseSAV<P extends PKMInterface = PKMInterface> {
   prepareWriter: () => SaveWriter
 
   getDisplayData(): Record<string, string | number | undefined> | undefined
-  convertOhpkm(ohpkm: OHPKM): P
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
 }
 
 export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
@@ -81,18 +93,18 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract tid: number
   abstract sid?: number | undefined
   abstract trainerGender: Gender
+  abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number
-  abstract boxes: Box<P>[]
+  abstract boxes: Readonly<Box<P>>[]
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
   abstract updatedBoxSlots: BoxAndSlot[]
-  abstract getCurrentBox(): Box<P>
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
   abstract supportsItem(itemIndex: number): boolean
   abstract prepareForSaving(): void
-  abstract convertOhpkm(ohpkm: OHPKM): P
+  abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -115,8 +127,23 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
 
   getSlotMetadata?: (boxNum: number, boxSlot: number) => SlotMetadata = undefined
 
-  get gameName(): string {
-    return OriginGames.gameName(this.origin)
+  abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
+  abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
+
+  getBoxCount(): number {
+    return this.boxes.length
+  }
+
+  getAllMons(): Readonly<P>[] {
+    return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
+  }
+
+  get gameNameFull(): string {
+    return OriginGames.gameNameFull(this.origin)
+  }
+
+  get gameNameShort(): string {
+    return OriginGames.gameNameShort(this.origin)
   }
 
   get gameColor(): string {
@@ -134,9 +161,35 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   get lookupType(): Option<LookupType> {
     return (this.constructor as SAVClass).lookupType
   }
+
+  get boxSlotCount(): number {
+    return this.boxRows * this.boxColumns
+  }
+
+  getBoxMonCount(boxNum: number): number {
+    const box = this.boxes[boxNum]
+    if (!box) return 0
+    return box.boxSlots.filter(filterUndefined).length
+  }
+
+  getFirstNonEmptySlotAfter(boxNum: number, boxSlot: number): number | undefined {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    for (let i = boxSlot + 1; i < box.boxSlots.length; i++) {
+      if (box.boxSlots[i] !== undefined) {
+        return i
+      }
+    }
+    return undefined
+  }
+
+  getBoxName(boxNum: number): string | undefined {
+    return this.boxes[boxNum]?.name
+  }
 }
 
 export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
+  abstract transferRestrictions: TransferRestrictions
   abstract origin: OriginGame
   abstract boxRows: number
   abstract boxColumns: number
@@ -147,19 +200,23 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract tid: number
   abstract sid?: number | undefined
   abstract trainerGender: Gender
+  abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number
-  abstract boxes: Box<P>[]
+  abstract boxes: Readonly<Box<P>>[]
   abstract bytes: Uint8Array<ArrayBufferLike>
   abstract invalid: boolean
   abstract tooEarlyToOpen: boolean
   abstract updatedBoxSlots: BoxAndSlot[]
-  abstract getCurrentBox(): Box<P>
-  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract supportsMon(
+    dexNumber: number,
+    formeNumber: number,
+    extraFormIndex?: ExtraFormIndex
+  ): boolean
   abstract supportsItem(itemIndex: number): boolean
   abstract getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined
   abstract prepareForSaving(): void
-  abstract convertOhpkm(ohpkm: OHPKM): P
+  abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -181,12 +238,16 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   abstract pluginIdentifier: PluginIdentifier
 
-  get gameName(): string {
+  get gameNameFull(): string {
     return pluginGameName(this.pluginIdentifier)
   }
 
+  get gameNameShort(): string {
+    return pluginGameName(this.pluginIdentifier, 'short')
+  }
+
   get gameColor(): string {
-    return getPluginColor(this.pluginIdentifier)
+    return OriginGames.pluginColor(this.pluginIdentifier)
   }
 
   get gameLogoPath(): string {
@@ -199,6 +260,31 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
 
   get lookupType(): Option<LookupType> {
     return (this.constructor as SAVClass).lookupType
+  }
+
+  abstract getMonAt(boxNum: number, boxSlot: number): Option<P>
+  abstract setMonAt(boxNum: number, boxSlot: number, mon: Option<P>): void
+
+  getBoxCount(): number {
+    return this.boxes.length
+  }
+
+  getAllMons(): Readonly<P>[] {
+    return this.boxes.flatMap((box) => box.boxSlots.filter(filterUndefined))
+  }
+
+  getBoxName(boxNum: number): string | undefined {
+    return this.boxes[boxNum]?.name
+  }
+
+  getBoxMonCount(boxNum: number): number {
+    const box = this.boxes[boxNum]
+    if (!box) return 0
+    return box.boxSlots.filter(filterUndefined).length
+  }
+
+  get boxSlotCount(): number {
+    return this.boxRows * this.boxColumns
   }
 }
 
@@ -214,14 +300,20 @@ export function getSaveRef(save: SAV): SaveRef {
     valid: true,
   }
 }
-export type PluginIdentifier = 'radical_red' | 'unbound'
+export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum' | 'compass'
 
-export function pluginGameName(identifier: PluginIdentifier): string {
+export function pluginGameName(identifier: PluginIdentifier, type = 'full'): string {
   switch (identifier) {
     case 'radical_red':
       return 'Radical Red'
     case 'unbound':
       return 'Unbound'
+    case 'luminescent_platinum':
+      return type === 'full' ? 'Luminescent Platinum' : 'Lumi. Platinum'
+    case 'compass':
+      return 'Compass'
+    default:
+      return 'Unknown Plugin'
   }
 }
 
@@ -230,11 +322,17 @@ export function pluginOriginMarkPath(identifier: PluginIdentifier): string | und
     case 'radical_red':
     case 'unbound':
       return '/icons/gba.png'
+    case 'luminescent_platinum':
+      return '/origin_marks/Bdsp.png'
+    case 'compass':
+      return '/origin_marks/Tera.png'
+    default:
+      return undefined
   }
 }
-export const Delimiter = '$' as const
+const Delimiter = '$' as const
 
-export type Delim = typeof Delimiter
+type Delim = typeof Delimiter
 
 type OfficialSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}`
 
@@ -246,4 +344,81 @@ export function saveToStringIdentifier(save: SAV): SaveIdentifier {
   return save.pluginIdentifier
     ? `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}${Delimiter}${save.pluginIdentifier}`
     : `${save.origin}${Delimiter}${save.tid}${Delimiter}${save.sid ?? 0}`
+}
+
+export interface WasmSaveInner<P> {
+  gameOfOrigin: OriginGame
+  language?: Language
+  secretId: number
+  trainerGender: number
+  trainerId: number
+  trainerName: string
+  displayId: string
+  currentPcBoxIdx: number
+  prepareBytesForSaving(): Uint8Array
+
+  getMonAt(box_num: number, offset: number): Option<P>
+  setMonAt(box_num: number, offset: number, mon?: P | null): void
+}
+
+export abstract class WasmOfficialSave<P extends PKMInterface, WasmP> extends OfficialSAV<P> {
+  inner: WasmSaveInner<WasmP>
+
+  constructor(inner: WasmSaveInner<WasmP>) {
+    super()
+    this.inner = inner
+  }
+
+  get name() {
+    return this.inner.trainerName
+  }
+
+  get tid() {
+    return this.inner.trainerId
+  }
+
+  get sid() {
+    return this.inner.secretId
+  }
+
+  get displayID() {
+    return this.inner.displayId
+  }
+
+  get trainerGender() {
+    return this.inner.trainerGender
+  }
+
+  getCurrentPCBox() {
+    return this.inner.currentPcBoxIdx
+  }
+
+  get origin() {
+    return this.inner.gameOfOrigin
+  }
+
+  get language() {
+    return this.inner.language
+  }
+
+  abstract monFromWasm(wasmMon: WasmP): P
+
+  abstract MAX_BOX_COUNT: number
+  abstract SLOTS_PER_BOX: number
+
+  getMonAt(boxNum: number, boxSlot: number): Option<P> {
+    const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
+    return wasmMon ? this.monFromWasm(wasmMon) : undefined
+  }
+
+  getAllMons() {
+    return range(this.MAX_BOX_COUNT)
+      .flatMap((boxIndex) => range(this.SLOTS_PER_BOX).map((boxSlot) => ({ boxIndex, boxSlot })))
+      .map(({ boxIndex, boxSlot }) => this.getMonAt(boxIndex, boxSlot))
+      .filter(filterUndefined)
+  }
+
+  prepareForSaving(): Uint8Array {
+    return this.inner.prepareBytesForSaving()
+  }
 }

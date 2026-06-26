@@ -1,19 +1,23 @@
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
-import { ItemUnbound } from '@pkm-rs/pkg'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+import { bytesToUint32LittleEndian } from '@openhome-core/util/byteLogic'
+import { ConvertStrategy, ExtraFormIndex, ItemUnbound, unboundSupportsExtraForm } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
+import { GEN3_SIGNATURE_OFFSET } from '../G3SAV'
 import { SlotMetadata } from '../interfaces'
-import { bytesToUint32LittleEndian } from '../util/byteLogic'
 import { PathData } from '../util/path'
 import PK3UB from './PK3UB'
 
 export const UB_TRANSFER_RESTRICTIONS: TransferRestrictions = {
   maxDexNum: NationalDex.Enamorus,
+  supportsExtraForm: unboundSupportsExtraForm,
 }
 
 export class G3UBSAV extends G3CFRUSAV<PK3UB> {
   static transferRestrictions: TransferRestrictions = UB_TRANSFER_RESTRICTIONS
+
+  transferRestrictions: TransferRestrictions = G3UBSAV.transferRestrictions
 
   pluginIdentifier = 'unbound' as const
 
@@ -21,12 +25,16 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> {
   static saveTypeName = 'Pokémon Unbound'
   static saveTypeID = 'G3UBSAV'
 
-  convertOhpkm(ohpkm: OHPKM): PK3UB {
-    return new PK3UB(ohpkm)
+  getBoxCount() {
+    return 18
   }
 
-  supportsMon(dexNumber: number, formeNumber: number) {
-    return !isRestricted(UB_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3UB {
+    return PK3UB.fromOhpkm(ohpkm, strategy)
+  }
+
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(UB_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {
@@ -37,7 +45,7 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> {
     return 'unbound'
   }
 
-  get gameName() {
+  get gameNameFull() {
     return 'Unbound'
   }
 
@@ -55,7 +63,7 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> {
     const firstSectionBytesIndex = findFirstSectionOffset(bytes)
     const firstSectionBytes = bytes.slice(firstSectionBytesIndex, firstSectionBytesIndex + 0x1000)
 
-    const signature = bytesToUint32LittleEndian(firstSectionBytes, 0x0ff8)
+    const signature = bytesToUint32LittleEndian(firstSectionBytes, GEN3_SIGNATURE_OFFSET)
 
     // from unbound cloud
     // https://github.com/Skeli789/Unbound-Cloud/blob/a5d966b74b865f51fef608e19ca63e0e51593f5e/server/src/Defines.py#L25C1-L26C1

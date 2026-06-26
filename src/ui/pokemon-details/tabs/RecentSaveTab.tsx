@@ -1,7 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { OriginGames } from '@pkm-rs/pkg'
-import { Button, Card, Flex, Text } from '@radix-ui/themes'
+import { Button, Flex } from '@radix-ui/themes'
 import { useContext } from 'react'
 
 export default function RecentSaveTab(props: { mon: OHPKM }) {
@@ -16,7 +16,7 @@ export default function RecentSaveTab(props: { mon: OHPKM }) {
 
   return (
     <Flex direction="column" p="2">
-      <Card style={{ padding: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div className="pokemon-modal-card">
         <Flex align="center">
           <Flex direction="column">
             <div>
@@ -26,12 +26,12 @@ export default function RecentSaveTab(props: { mon: OHPKM }) {
           <div style={{ flex: 1 }} />
           <img
             draggable={false}
-            alt={`${OriginGames.gameName(mon.mostRecentSaveWasm.game)} logo`}
+            alt={`${OriginGames.gameNameFull(mon.mostRecentSaveWasm.game)} logo`}
             src={OriginGames.logoPath(mon.mostRecentSaveWasm.game)}
             style={{ height: 32 }}
           />
         </Flex>
-        <Text>{filePath}</Text>
+        <p className="limit-text-width">{filePath}</p>
         <Flex justify="end">
           <Button
             size="1"
@@ -41,7 +41,7 @@ export default function RecentSaveTab(props: { mon: OHPKM }) {
             Open File Location
           </Button>
         </Flex>
-      </Card>
+      </div>
     </Flex>
   )
 }

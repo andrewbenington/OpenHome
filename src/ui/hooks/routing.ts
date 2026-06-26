@@ -1,5 +1,5 @@
+import { Option } from '@openhome-core/util/functional'
 import { useLocation, useNavigate } from 'react-router'
-import { Option } from '../../core/util/functional'
 
 export function usePathSegment(parent: string, defaultVal: string) {
   const navigate = useNavigate()

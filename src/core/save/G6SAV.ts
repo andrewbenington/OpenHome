@@ -1,12 +1,10 @@
+import { PK6 } from '@openhome-core/pkm'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
-import {
-  bytesToUint16LittleEndian,
-  uint16ToBytesLittleEndian,
-} from '@openhome-core/save/util/byteLogic'
-import { utf16BytesToString } from '@openhome-core/save/util/Strings/StringConverter'
-import { Gender, OriginGame } from '@pkm-rs/pkg'
-import { PK6 } from '@pokemon-files/pkm'
+import { utf16BytesToString } from '@openhome-core/util'
+import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '@openhome-core/util/byteLogic'
+import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
+import { Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
 
@@ -59,7 +57,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
     super()
     this.bytes = bytes
     this.filePath = path
-    this.name = utf16BytesToString(this.bytes, this.trainerDataOffset + 72, 0x10)
+    this.name = utf16BytesToString(bytes.buffer, this.trainerDataOffset + 72, 0x10)
     this.tid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset)
     this.sid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 2)
     this.currentPCBox = this.bytes[0]
@@ -69,7 +67,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
 
     this.boxes = Array(31)
     for (let box = 0; box < 31; box++) {
-      const boxName = utf16BytesToString(this.bytes, BOX_NAMES_OFFSET + 34 * box, 17)
+      const boxName = utf16BytesToString(this.bytes.buffer, BOX_NAMES_OFFSET + 34 * box, 17)
 
       this.boxes[box] = new Box(boxName, 30)
     }
@@ -80,7 +78,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
           const startByte = this.getPcOffset() + BOX_SIZE * box + 232 * monIndex
           const endByte = this.getPcOffset() + BOX_SIZE * box + 232 * (monIndex + 1)
           const monData = bytes.slice(startByte, endByte)
-          const mon = new PK6(monData.buffer, true)
+          const mon = PK6.fromBytes(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
             this.boxes[box].boxSlots[monIndex] = mon
@@ -109,7 +107,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
           console.error(e)
         }
       } else {
-        const mon = new PK6(new Uint8Array(232).buffer)
+        const mon = PK6.fromBytes(new Uint8Array(232).buffer)
 
         this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
       }
@@ -117,17 +115,33 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
     this.bytes.set(uint16ToBytesLittleEndian(this.calculatePcChecksum()), this.pcChecksumOffset)
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK6 {
-    return new PK6(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK6 {
+    return PK6.fromOhpkm(ohpkm, strategy)
   }
 
-  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract supportsMon(
+    dexNumber: number,
+    formeNumber: number,
+    extraFormIndex?: ExtraFormIndex
+  ): boolean
 
   calculatePcChecksum(): number {
     return CRC16_CCITT(this.bytes, this.getPcOffset(), this.pcDataSize)
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK6>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
+  }
+
+  get language(): Language {
+    return this.bytes[this.trainerDataOffset + 0x2d]
   }
 }

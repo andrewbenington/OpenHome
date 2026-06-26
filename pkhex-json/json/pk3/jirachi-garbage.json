@@ -1,0 +1,92 @@
+{
+  "sanity": 0,
+  "checksum": 3218,
+  "pokemon_index": 409,
+  "held_item_index": 169,
+  "trainer_id": 20043,
+  "secret_id": 0,
+  "exp": 156,
+  "has_species_data": true,
+  "is_bad_egg": false,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 1101467824,
+  "is_fateful_encounter": false,
+  "gender": "Genderless",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus_byte": 0,
+  "ribbons": [],
+  "nickname": "JIRACHI",
+  "nickname_trash": "C4C3CCBBBDC2C3FF0870",
+  "moves": [
+    {
+      "move_index": "Wish",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Confusion",
+      "pp": 25,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Rest",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "\u003Cempty\u003E",
+      "pp": 0,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 9,
+    "atk": 9,
+    "def": 16,
+    "spa": 22,
+    "spd": 20,
+    "spe": 16
+  },
+  "is_egg": false,
+  "trainer_name": "WISHMKR",
+  "trainer_friendship": 100,
+  "met_location_index": 255,
+  "ball": "Pok\u00E9",
+  "met_level": 5,
+  "trainer_gender": "Male",
+  "game_of_origin": "Ruby",
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 5,
+  "current_hp": 25,
+  "stats": {
+    "hp": 25,
+    "atk": 15,
+    "def": 15,
+    "spa": 16,
+    "spd": 16,
+    "spe": 15
+  },
+  "level": 5
+}

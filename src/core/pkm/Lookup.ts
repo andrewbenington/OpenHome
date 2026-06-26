@@ -2,11 +2,12 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { dvsFromIVs, getBaseMon } from '@openhome-core/pkm/util'
 import { Option } from '@openhome-core/util/functional'
+import {
+  readGameBoyStringFromBytes,
+  utf16StringToGen12,
+} from '@openhome-core/util/stringConversion'
 import { PKMFormeRef } from '@openhome-core/util/types'
-import { MetadataLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
-import { generatePersonalityValuePreservingAttributes } from '@pokemon-files/util'
-import { gen12StringToUTF, utf16StringToGen12 } from '../save/util/Strings'
-import { bytesToString } from '../save/util/byteLogic'
+import { MetadataSummaryLookup, OriginGame, OriginGames } from '@pkm-rs/pkg'
 
 export type OhpkmIdentifier = string
 
@@ -28,18 +29,22 @@ export const getMonFileIdentifier = (mon: PKMInterface): OhpkmIdentifier | undef
 
 type HomeIdentifierDerivableMon = {
   dexNum: number
-  formeNum: number
+  formNum: number
   trainerID: number
   secretID: number
   personalityValue: number
   gameOfOrigin: OriginGame
 }
 
-export function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentifier {
-  const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
+const bytesToString = (value: number, numBytes: number) => {
+  return value.toString(16).padStart(numBytes * 2, '0')
+}
+
+function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentifier {
+  const baseMon = getBaseMon(mon.dexNum, mon.formNum)
 
   if (!baseMon) {
-    throw Error(`Invalid dex/forme: ${mon.dexNum} / ${mon.formeNum}`)
+    throw Error(`Invalid dex/form: ${mon.dexNum} / ${mon.formNum}`)
   }
 
   return `${baseMon.nationalDex.toString().padStart(4, '0')}-${bytesToString(
@@ -58,8 +63,10 @@ export const getMonGen12Identifier = (mon: PKMInterface): Option<Gen12Identifier
     dvs = dvsFromIVs(ivs, mon.isShiny())
   }
 
-  const convertedTrainerName = gen12StringToUTF(utf16StringToGen12(mon.trainerName, 8, true), 0, 8)
-  const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
+  const gen12Bytes = utf16StringToGen12(mon.trainerName, 8, true)
+  const dataView = new DataView(gen12Bytes.buffer)
+  const convertedTrainerName = readGameBoyStringFromBytes(dataView, 0, 8)
+  const baseMon = getBaseMon(mon.dexNum, mon.formNum)
   let tid = mon.trainerID
 
   if (mon instanceof OHPKM && !OriginGames.isGameboy(mon.gameOfOrigin)) {
@@ -77,24 +84,26 @@ export const getMonGen12Identifier = (mon: PKMInterface): Option<Gen12Identifier
 }
 
 export type Gen345Identifier = string
-export const getMonGen345Identifier = (mon: PKMInterface): Option<Gen345Identifier> => {
-  const baseMon = getBaseMon(mon.dexNum, mon.formeNum)
+export const getMonGen345Identifier = (
+  mon: PKMInterface,
+  keepOriginalPid: boolean = false
+): Option<Gen345Identifier> => {
+  const baseMon = getBaseMon(mon.dexNum, mon.formNum)
 
   try {
-    const ohpkm = new OHPKM(mon)
     let pk3CompatiblePID
 
-    if (mon instanceof OHPKM) {
+    if (mon instanceof OHPKM && !keepOriginalPid) {
       // Get the personality value that will be generated
-      pk3CompatiblePID = generatePersonalityValuePreservingAttributes(mon)
+      pk3CompatiblePID = mon.generatePk3CompatiblePid()
     } else if (mon.personalityValue !== undefined) {
       pk3CompatiblePID = mon.personalityValue
     } else {
       return undefined
     }
 
-    const trainerId = ohpkm.trainerID
-    const secretId = ohpkm.secretID
+    const trainerId = mon.trainerID
+    const secretId = mon.secretID
 
     if (baseMon) {
       return `${baseMon.nationalDex.toString().padStart(4, '0')}-${bytesToString(
@@ -109,21 +118,21 @@ export const getMonGen345Identifier = (mon: PKMInterface): Option<Gen345Identifi
 }
 
 export function isEvolution(prevo: PKMFormeRef, possibleEvo: PKMFormeRef): boolean {
-  const prevoForme = MetadataLookup(prevo.dexNum, prevo.formeNum)
-  const possibleEvoForme = MetadataLookup(possibleEvo.dexNum, possibleEvo.formeNum)
+  const prevoForme = MetadataSummaryLookup(prevo.dexNum, prevo.formNum)
+  const possibleEvoForme = MetadataSummaryLookup(possibleEvo.dexNum, possibleEvo.formNum)
 
   if (!prevoForme || !possibleEvoForme) return false
 
   if (
     prevoForme.evolutions.some(
-      (evo) => evo.nationalDex === possibleEvo.dexNum && evo.formeIndex === possibleEvo.formeNum
+      (evo) => evo.nationalDex === possibleEvo.dexNum && evo.formIndex === possibleEvo.formNum
     )
   ) {
     return true
   }
 
   for (const evo of prevoForme.evolutions) {
-    if (isEvolution(prevo, { dexNum: evo.nationalDex, formeNum: evo.formeIndex })) {
+    if (isEvolution(prevo, { dexNum: evo.nationalDex, formNum: evo.formIndex })) {
       return true
     }
   }

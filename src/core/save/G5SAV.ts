@@ -1,13 +1,13 @@
+import { PK5 } from '@openhome-core/pkm'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
+import { readGen5StringFromBytes } from '@openhome-core/util'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
-} from '@openhome-core/save/util/byteLogic'
-import { gen5StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
-import { unique } from '@openhome-core/util/functional'
-import { Gender, OriginGame } from '@pkm-rs/pkg'
-import { PK5 } from '@pokemon-files/pkm'
+} from '@openhome-core/util/byteLogic'
+import { Option, unique } from '@openhome-core/util/functional'
+import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { hasDesamumeFooter, LookupType } from './util'
@@ -65,6 +65,8 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
   constructor(path: PathData, bytes: Uint8Array) {
     super()
     this.bytes = bytes
+    const dataView = new DataView(this.bytes.buffer)
+
     this.filePath = path
     this.boxes = new Array(G5SAV.BOX_COUNT)
 
@@ -73,7 +75,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
       return
     }
 
-    this.name = gen5StringToUTF(this.bytes, this.trainerDataOffset + 0x04, 0x10)
+    this.name = readGen5StringFromBytes(dataView, this.trainerDataOffset + 0x04, 0x10)
     this.tid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 0x14)
     this.sid = bytesToUint16LittleEndian(this.bytes, this.trainerDataOffset + 0x16)
     this.currentPCBox = this.bytes[0]
@@ -87,7 +89,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
       this.checksumMirrorsChecksumOffset = 0x25fa2
     }
     for (let box = 0; box < 24; box++) {
-      const boxName = gen5StringToUTF(this.bytes, BOX_NAMES_OFFSET + 40 * box, 20)
+      const boxName = readGen5StringFromBytes(dataView, BOX_NAMES_OFFSET + 40 * box, 20)
 
       this.boxes[box] = new Box(boxName, 30)
     }
@@ -98,7 +100,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
           const startByte = PC_OFFSET + BOX_SIZE * box + 136 * monIndex
           const endByte = PC_OFFSET + BOX_SIZE * box + 136 * (monIndex + 1)
           const monData = bytes.slice(startByte, endByte)
-          const mon = new PK5(monData.buffer, true)
+          const mon = PK5.fromBytes(monData.buffer, true)
 
           if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
             this.boxes[box].boxSlots[monIndex] = mon
@@ -168,15 +170,15 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     this.updateMirrorsChecksum()
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK5 {
-    return new PK5(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK5 {
+    return PK5.fromOhpkm(ohpkm, strategy)
   }
 
-  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
-
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
+  abstract supportsMon(
+    dexNumber: number,
+    formeNumber: number,
+    extraFormIndex?: ExtraFormIndex
+  ): boolean
 
   static gen4ValidDateAndSize(bytes: Uint8Array, offset: number) {
     const size = bytesToUint32LittleEndian(bytes, offset - 0xc)
@@ -203,5 +205,21 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     const g5Origin = bytes[G5SAV.originOffset]
 
     return g5Origin >= OriginGame.White && g5Origin <= OriginGame.Black2
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK5>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
+  }
+
+  get language(): Language {
+    return this.bytes[this.trainerDataOffset + 0x1e]
   }
 }

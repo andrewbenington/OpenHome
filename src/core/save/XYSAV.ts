@@ -1,7 +1,7 @@
+import { Item } from '@openhome-core/resources/consts/Items'
+import { XY_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { OriginGame } from '@pkm-rs/pkg'
-import { Item } from '@pokemon-resources/consts/Items'
-import { XY_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
 import { G6SAV } from './G6SAV'
 import { PathData } from './util/path'
 
@@ -24,8 +24,8 @@ export class XYSAV extends G6SAV {
     return PC_CHECKSUM_OFFSET
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
-    return !isRestricted(XY_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(XY_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

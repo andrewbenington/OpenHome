@@ -8,26 +8,34 @@ import {
 } from '@dnd-kit/core'
 import { restrictToParentElement } from '@dnd-kit/modifiers'
 import {
-  SortableContext,
   rectSortingStrategy,
+  SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { SortTypes } from '@openhome-core/pkm/sort'
-import { range } from '@openhome-core/util/functional'
-import { filterUndefined } from '@openhome-core/util/sort'
+import { SimpleOpenHomeBox } from '@openhome-core/save/util/storage'
+import { Option, range } from '@openhome-core/util/functional'
+import { filterUndefined, numericSorter } from '@openhome-core/util/sort'
 import {
   CtxMenuElementBuilder,
-  ItemBuilder,
+  Item,
   OpenHomeCtxMenu,
-  SubmenuBuilder,
+  Submenu,
 } from '@openhome-ui/components/context-menu'
 import { RemoveIcon } from '@openhome-ui/components/Icons'
-import { SavesAndBanksManager, useSaves } from '@openhome-ui/state/saves'
+import { MonLocation } from '@openhome-ui/state/saves'
+import { cssClass } from '@openhome-ui/util/style'
 import { Button, Flex, Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
-import { OpenHomeBanks, OpenHomeBox } from 'src/core/save/HomeData'
+import {
+  boxNameOrDefault,
+  OPENHOME_BOX_COLUMNS,
+  OPENHOME_BOX_ROWS,
+  OPENHOME_BOX_SLOTS,
+  useBanksAndBoxes,
+} from '../../state-zustand/banks-and-boxes/store'
 import DroppableSpace from './DroppableSpace'
 
 export default function AllHomeBoxes(props: {
@@ -37,15 +45,13 @@ export default function AllHomeBoxes(props: {
   debugMode?: boolean
 }) {
   const { onBoxSelect, moving, deleting, debugMode } = props
-  const savesAndBanks = useSaves()
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
-
-  const { homeData } = savesAndBanks
+  const { indexOfBoxIdCurrentBank, getCurrentBank, reorderBoxesCurrentBank } = useBanksAndBoxes()
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
@@ -55,8 +61,8 @@ export default function AllHomeBoxes(props: {
     const activeId = active.id.toString()
     const overId = over.id.toString()
 
-    const activeIndex = homeData.getCurrentBank().indexOfBoxId(activeId)
-    const overIndex = homeData.getCurrentBank().indexOfBoxId(overId)
+    const activeIndex = indexOfBoxIdCurrentBank(activeId)
+    const overIndex = indexOfBoxIdCurrentBank(overId)
 
     if (activeIndex === undefined || overIndex === undefined) {
       return
@@ -65,17 +71,21 @@ export default function AllHomeBoxes(props: {
     const newOrderIndices = calculateNewBoxOrder(
       activeIndex,
       overIndex,
-      homeData.getCurrentBank().boxCount()
+      getCurrentBank().boxes.size
     )
     const newOrderIds = newOrderIndices
-      .map((index) => homeData.getCurrentBankBoxes().find((box) => box.index === index)?.id)
+      .map((index) => getCurrentBank().boxes.get(index)?.id)
       .filter(filterUndefined)
 
-    savesAndBanks.reorderBoxesCurrentBank(newOrderIds)
+    reorderBoxesCurrentBank(newOrderIds)
   }
 
+  const currentBoxesOrdered = Array.from(getCurrentBank().boxes.values()).toSorted(
+    numericSorter((box) => box.index)
+  )
+
   return (
-    <OpenHomeCtxMenu elements={getBankContextActions(savesAndBanks)}>
+    <OpenHomeCtxMenu elements={useSaveContextActions()}>
       <Grid columns="6" gap="1" overflowY="auto" maxHeight="80%">
         {moving ? (
           <DndContext
@@ -84,31 +94,29 @@ export default function AllHomeBoxes(props: {
             modifiers={[restrictToParentElement]}
           >
             <SortableContext
-              items={homeData.getCurrentBankBoxes().map((box) => box.id) ?? []}
+              items={currentBoxesOrdered.map((box) => box.id) ?? []}
               strategy={rectSortingStrategy}
             >
-              {homeData.getCurrentBankBoxes().map((box, boxIndex) => (
+              {currentBoxesOrdered.map((box) => (
                 <DraggableBoxOverview
                   key={box.id}
                   box={box}
-                  onBoxSelect={() => onBoxSelect(boxIndex)}
+                  onBoxSelect={() => onBoxSelect(box.index)}
                   debugMode={debugMode}
                 />
               ))}
             </SortableContext>
           </DndContext>
         ) : (
-          homeData
-            .getCurrentBankBoxes()
-            .map((box, boxIndex) => (
-              <ClickableBoxOverview
-                key={box.id}
-                box={box}
-                onBoxSelect={() => onBoxSelect(boxIndex)}
-                debugMode={debugMode}
-                deleting={deleting}
-              />
-            ))
+          currentBoxesOrdered.map((box) => (
+            <ClickableBoxOverview
+              key={box.id}
+              box={box}
+              onBoxSelect={() => onBoxSelect(box.index)}
+              debugMode={debugMode}
+              deleting={deleting}
+            />
+          ))
         )}
       </Grid>
     </OpenHomeCtxMenu>
@@ -116,26 +124,38 @@ export default function AllHomeBoxes(props: {
 }
 
 type BoxOverviewProps = {
-  box: Readonly<OpenHomeBox>
+  box: SimpleOpenHomeBox
   onBoxSelect: () => void
   debugMode?: boolean
   deleting?: boolean
 }
 
 function ClickableBoxOverview({ box, onBoxSelect, debugMode, deleting }: BoxOverviewProps) {
-  const savesAndBanks = useSaves()
+  const { getCurrentBank, firstHomeBoxEmptySlot, deleteBoxCurrentBank } = useBanksAndBoxes()
 
-  const firstOpenIndex = box.firstEmptyIndex()
+  const firstOpenIndex = firstHomeBoxEmptySlot(box.index)
+
+  const boxHasMons = box.identifiers.size > 0
+
+  const firstOpenLocation: Option<MonLocation> =
+    firstOpenIndex !== undefined
+      ? {
+          bank: getCurrentBank().index,
+          box: box.index,
+          boxSlot: firstOpenIndex,
+          isHome: true,
+        }
+      : undefined
 
   return (
     <DroppableSpace
       dropID={`box-${box.id}`}
-      key={box.nameOrDefault()}
-      dropData={savesAndBanks.homeData.firstEmptyBoxSlotCurrentBank(box.index)}
+      key={boxNameOrDefault(box)}
+      dropData={firstOpenLocation}
       disabled={firstOpenIndex === undefined}
       style={{ justifyContent: undefined }}
     >
-      <OpenHomeCtxMenu sections={getBoxContextActions(savesAndBanks, box)}>
+      <OpenHomeCtxMenu sections={useBoxContextActions(box)}>
         <div className="box-overview-container">
           <Button
             className="box-overview-button"
@@ -149,13 +169,13 @@ function ClickableBoxOverview({ box, onBoxSelect, debugMode, deleting }: BoxOver
             <Button
               className="mini-button home-box-delete-button"
               style={{
-                backgroundColor: box.containsMons() ? 'var(--gray-6)' : undefined,
+                backgroundColor: boxHasMons ? 'var(--gray-6)' : undefined,
               }}
               variant="solid"
               color="red"
               radius="full"
-              disabled={box.containsMons()}
-              onClick={() => savesAndBanks.deleteBoxCurrentBank(box.id, box.index)}
+              disabled={boxHasMons}
+              onClick={() => deleteBoxCurrentBank(box.id)}
             >
               <RemoveIcon />
             </Button>
@@ -169,7 +189,6 @@ function ClickableBoxOverview({ box, onBoxSelect, debugMode, deleting }: BoxOver
 function DraggableBoxOverview({ box, debugMode }: BoxOverviewProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging, active } =
     useSortable({ id: box.id })
-  const savesAndBanks = useSaves()
 
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -177,10 +196,12 @@ function DraggableBoxOverview({ box, debugMode }: BoxOverviewProps) {
     zIndex: isDragging ? 1000 : undefined,
   }
 
+  const actions = useBoxContextActions(box)
+
   if (!box) return <div />
 
   return (
-    <OpenHomeCtxMenu sections={getBoxContextActions(savesAndBanks, box)}>
+    <OpenHomeCtxMenu sections={actions}>
       <div
         ref={setNodeRef}
         className="box-overview-container"
@@ -201,30 +222,43 @@ function DraggableBoxOverview({ box, debugMode }: BoxOverviewProps) {
 }
 
 type BoxMonIconsProps = {
-  box: Readonly<OpenHomeBox>
+  box: SimpleOpenHomeBox
   debugMode?: boolean
 }
 
 function BoxWithMons({ box, debugMode }: BoxMonIconsProps) {
+  const boxName = boxNameOrDefault(box)
+  const allSlotsFull = box.identifiers.size === OPENHOME_BOX_SLOTS
+
   return (
     <Flex direction="column" width="100%" height="100%">
       <div className="box-icon-mon-container">
-        {range(OpenHomeBanks.BOX_COLUMNS).map((i) => (
+        {range(OPENHOME_BOX_COLUMNS).map((i) => (
           <div className="box-icon-mon-col" key={`pos-display-col-${i}`}>
-            {range(OpenHomeBanks.BOX_ROWS).map((j) => (
-              <div
-                className={`box-icon-mon-indicator ${box.slotIsEmpty(j * OpenHomeBanks.BOX_COLUMNS + i) ? 'box-icon-mon-empty' : ''}`}
-                key={`pos-display-cell-${i}-${j}`}
-              />
-            ))}
+            {range(OPENHOME_BOX_ROWS).map((j) => {
+              const slotIsEmpty = !box.identifiers.has(j * OPENHOME_BOX_COLUMNS + i)
+              return (
+                <div
+                  className={cssClass('box-icon-mon-indicator')
+                    .with('box-icon-mon-empty')
+                    .if(slotIsEmpty)
+                    .build()}
+                  key={`pos-display-cell-${i}-${j}`}
+                />
+              )
+            })}
           </div>
         ))}
       </div>
-      <div
-        className="box-overview-title-container"
-        style={fontStyleFromStringLength(box.nameOrDefault())}
-      >
-        <div className="box-overview-title">{box.nameOrDefault()}</div>
+      <div className="box-overview-title-container" style={fontStyleFromStringLength(boxName)}>
+        <div
+          className={cssClass('box-overview-title')
+            .with('box-overview-title-full')
+            .if(allSlotsFull)
+            .build()}
+        >
+          {boxName}
+        </div>
       </div>
       {debugMode && (
         <div style={{ fontWeight: 'lighter' }}>
@@ -260,62 +294,51 @@ function calculateNewBoxOrder(movedFromIndex: number, movedIntoIndex: number, bo
   return newOrder
 }
 
-function getBankContextActions(savesAndBanks: SavesAndBanksManager) {
+function useSaveContextActions() {
+  const { sortAllHomeBoxes, addBoxCurrentBank } = useBanksAndBoxes()
   return [
-    SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
-      SortTypes.map((sortType) =>
-        ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
-          savesAndBanks.sortAllHomeBoxes(sortType)
-        )
+    Submenu.label('Sort all boxes...').with(
+      ...SortTypes.map((sortType) =>
+        Item.label(`By ${sortType}`).action(() => sortAllHomeBoxes(sortType))
       )
     ),
-    SubmenuBuilder.fromLabel('Add Box...').withBuilders([
-      ItemBuilder.fromLabel('Beginning').withAction(() => savesAndBanks.addBoxCurrentBank('start')),
-      ItemBuilder.fromLabel('End').withAction(() => savesAndBanks.addBoxCurrentBank('end')),
-    ]),
+    Submenu.label('Add Box...').with(
+      Item.label('Beginning').action(() => addBoxCurrentBank('start')),
+      Item.label('End').action(() => addBoxCurrentBank('end'))
+    ),
   ]
 }
 
-function getBoxContextActions(
-  savesAndBanks: SavesAndBanksManager,
-  box: Readonly<OpenHomeBox>
-): CtxMenuElementBuilder[][] {
+function useBoxContextActions(box: SimpleOpenHomeBox): CtxMenuElementBuilder[][] {
+  const { sortHomeBox, sortAllHomeBoxes, deleteBoxCurrentBank, addBoxCurrentBank } =
+    useBanksAndBoxes()
+
+  const boxIsEmpty = box.identifiers.size === 0
   const boxActions = [
-    ItemBuilder.fromLabel('Remove duplicates from this box')
-      .withAction(() => savesAndBanks.removeDupesFromHomeBox(box.index))
-      .withDisabled(!box.containsMons()),
-    SubmenuBuilder.fromLabel('Sort this box...')
-      .withBuilders(
-        SortTypes.map((sortType) =>
-          ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
-            savesAndBanks.sortHomeBox(box.index, sortType)
-          )
+    Submenu.label('Sort this box...')
+      .with(
+        ...SortTypes.map((sortType) =>
+          Item.label(`By ${sortType}`).action(() => sortHomeBox(box.index, sortType))
         )
       )
-      .withDisabled(!box.containsMons()),
-    SubmenuBuilder.fromLabel('Sort all boxes...').withBuilders(
-      SortTypes.map((sortType) =>
-        ItemBuilder.fromLabel(`By ${sortType}`).withAction(() =>
-          savesAndBanks.sortAllHomeBoxes(sortType)
-        )
+      .disabled(boxIsEmpty),
+    Submenu.label('Sort all boxes...').with(
+      ...SortTypes.map((sortType) =>
+        Item.label(`By ${sortType}`).action(() => sortAllHomeBoxes(sortType))
       )
     ),
-    ItemBuilder.fromLabel('Delete Box')
-      .withAction(() => savesAndBanks.deleteBoxCurrentBank(box.id, box.index))
-      .withDisabled(box.containsMons()),
+    Item.label('Delete Box')
+      .action(() => deleteBoxCurrentBank(box.id))
+      .disabled(!boxIsEmpty),
   ]
 
   const addBoxActions = [
-    SubmenuBuilder.fromLabel('Add Box...').withBuilders([
-      ItemBuilder.fromLabel('Before').withAction(() =>
-        savesAndBanks.addBoxCurrentBank(['before', box.index])
-      ),
-      ItemBuilder.fromLabel('After').withAction(() =>
-        savesAndBanks.addBoxCurrentBank(['after', box.index])
-      ),
-      ItemBuilder.fromLabel('Beginning').withAction(() => savesAndBanks.addBoxCurrentBank('start')),
-      ItemBuilder.fromLabel('End').withAction(() => savesAndBanks.addBoxCurrentBank('end')),
-    ]),
+    Submenu.label('Add Box...').with(
+      Item.label('Before').action(() => addBoxCurrentBank(['before', box.index])),
+      Item.label('After').action(() => addBoxCurrentBank(['after', box.index])),
+      Item.label('Beginning').action(() => addBoxCurrentBank('start')),
+      Item.label('End').action(() => addBoxCurrentBank('end'))
+    ),
   ]
 
   return [boxActions, addBoxActions]

@@ -1,7 +1,6 @@
 {
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "typescript.preferences.importModuleSpecifier": "relative",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit",
@@ -13,7 +12,13 @@
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.fixAll": "never",
+      "source.fixAll.eslint": "explicit",
+      "source.removeUnusedImports": "explicit"
+    }
   },
   "[css]": {
     "editor.formatOnSave": true
@@ -49,11 +54,14 @@
     "unspecified-properties-position": "bottomAlphabetical"
   },
   "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.linkedProjects": [
+    "${workspaceFolder}/Cargo.toml",
+    "${workspaceFolder}/pkm_rs/Cargo.toml"
+  ],
   "editor.inlayHints.enabled": "off",
   "editor.tabSize": 2,
-  "rust-analyzer.cargo.features": ["pkm_rs/wasm"],
+  "rust-analyzer.cargo.features": "all",
   "css.completion.completePropertyWithSemicolon": false,
   "rust-analyzer.cargo.targetDir": true,
-  "python.defaultInterpreterPath": "generate/.venv/bin/python",
-  "python.terminal.activateEnvironment": true
+  "python.terminal.activateEnvironment": false
 }

@@ -1,20 +1,19 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { OriginGame } from '@pkm-rs/pkg'
-import { SAV } from '../interfaces'
+import { ConvertStrategy, ExtraFormIndex, OriginGame, PkmFormat } from '@pkm-rs/pkg'
+import { PluginSAV, SAV } from '../interfaces'
 import { PathData } from './path'
+import { TransferRestrictions } from './TransferRestrictions'
 
-export const SIZE_SM = 0x6be00
-export const SIZE_USUM = 0x6cc00
 export type LookupType = 'gen12' | 'gen345'
 
-export const DESAMUME_FOOTER_START =
+const DESAMUME_FOOTER_START =
   '|<--Snip above here to create a raw sav by excluding this DeSmuME savedata footer:'
 
 export interface SavePkmClass {
-  new (arg: ArrayBuffer | PKMInterface, encrypted?: boolean): PKMInterface
   fromBytes(bytes: ArrayBuffer): PKMInterface
-  getName(): string
+  fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PKMInterface
+  getFormat(): PkmFormat
 }
 
 export type AnyPkmClass = SavePkmClass | typeof OHPKM
@@ -31,10 +30,31 @@ export interface SAVClass<S extends SAV = SAV> {
   getPluginIdentifier?: () => string
 }
 
-export type PKMTypeOf<Type> = Type extends SAV<infer X> ? X : never
+export interface PluginSaveClass<S extends PluginSAV = PluginSAV> extends SAVClass<S> {
+  transferRestrictions: TransferRestrictions
+  getPluginIdentifier: () => string
+}
 
-export function supportsMon(saveType: SAVClass, dexNumber: number, formeNumber: number): boolean {
-  return saveType.prototype.supportsMon(dexNumber, formeNumber)
+export function supportsMon(
+  saveType: SAVClass,
+  dexNumber: number,
+  formeNumber: number,
+  extraFormIndex?: ExtraFormIndex
+): boolean {
+  return saveType.prototype.supportsMon(dexNumber, formeNumber, extraFormIndex)
+}
+
+export function monSupportedBySaveType(
+  saveType: SAVClass | undefined,
+  mon?: PKMInterface
+): boolean {
+  if (!saveType || !mon) return false
+  return supportsMon(saveType, mon.dexNum, mon.formNum, mon.extraFormIndex)
+}
+
+export function monSupportedBySave(save?: SAV, mon?: PKMInterface): boolean {
+  if (!save || !mon) return false
+  return save.supportsMon(mon.dexNum, mon.formNum, mon.extraFormIndex)
 }
 
 export function getPluginIdentifier(saveType: SAVClass | undefined): string | undefined {

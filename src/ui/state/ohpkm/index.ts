@@ -1,4 +1,4 @@
-import { OHPKM } from '../../../core/pkm/OHPKM'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 
 export { default as OhpkmStoreProvider } from './OhpkmStoreProvider'
 export * from './useOhpkmStore'

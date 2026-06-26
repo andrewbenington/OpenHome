@@ -166,6 +166,11 @@ async function generateGen3() {
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
+
 pub const ITEM_MAX_GEN3: usize = ${allItems.length};
 
 #[allow(clippy::missing_const_for_fn)]
@@ -189,6 +194,14 @@ impl ItemGen3 {
   }
   output += ` _ => None,
          }
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for ItemGen3 {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        Self::new(rng.random_range(1..=ITEM_MAX_GEN3) as u16)
+            .expect("all indices 1..ITEM_MAX_GEN3 are valid item indices")
     }
 }
 

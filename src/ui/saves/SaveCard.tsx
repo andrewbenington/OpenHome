@@ -3,7 +3,7 @@ import { BackendContext } from '@openhome-ui/backend/backendContext'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import { Generation, getPluginColor, OriginGames } from '@pkm-rs/pkg'
+import { OriginGames } from '@pkm-rs/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo, useState } from 'react'
 import { classNames, grayscaleIf } from '../util/style'
@@ -26,16 +26,11 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
   const displayError = useDisplayError()
   const backend = useContext(BackendContext)
 
-  const isGameBoy = useMemo(() => {
-    return save.game
-      ? OriginGames.generation(save.game) === Generation.G1 ||
-          OriginGames.generation(save.game) === Generation.G2
-      : false
-  }, [save.game])
+  const isGameBoy = save.game && OriginGames.isGameboy(save.game)
 
   const backgroundColor = useMemo(() => {
     return save.pluginIdentifier
-      ? getPluginColor(save.pluginIdentifier)
+      ? OriginGames.pluginColor(save.pluginIdentifier)
       : OriginGames.color(save.game ?? 0)
   }, [save.game, save.pluginIdentifier])
 
@@ -56,7 +51,7 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
           }}
           onClick={onOpen}
         >
-          <Flex direction="row" width="100%" justify="start" style={{ padding: 8 }} gap="2">
+          <Flex direction="row" width="100%" justify="start" gap="2">
             {size >= standardViewMinSize && (
               <Badge variant="solid" size="3">
                 <b>{save.trainerName}</b>
@@ -97,12 +92,12 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
         {!save.valid && (
           <div className="save-grid-error-button-container">
             <button
-              className="save-grid-error-button"
+              className="save-grid-button save-grid-error-button"
               onClick={() =>
                 displayError('Invalid Save', 'File is missing, renamed, or inaccessbile')
               }
             >
-              <ErrorIcon style={{ width: 20 }} />
+              <ErrorIcon />
             </button>
           </div>
         )}

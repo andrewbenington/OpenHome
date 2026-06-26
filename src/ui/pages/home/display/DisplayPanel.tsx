@@ -3,7 +3,7 @@ import {
   TopRightIndicatorType,
   TopRightIndicatorTypes,
   useMonDisplay,
-} from '../../../hooks/useMonDisplay'
+} from '../../../hooks/monDisplay'
 
 export default function DisplayPanel() {
   const displayState = useMonDisplay()
@@ -45,6 +45,30 @@ export default function DisplayPanel() {
             onCheckedChange={displayState.setShowItem}
           />
           Show Items
+        </Flex>
+        <Flex align="center" gap="2">
+          <Switch
+            size="1"
+            checked={displayState.showNotesIndicator}
+            onCheckedChange={displayState.setShowNotesIndicator}
+          />
+          Show Notes Indicator
+        </Flex>
+        <Flex align="center" gap="2">
+          <Switch
+            size="1"
+            checked={displayState.showTags}
+            onCheckedChange={displayState.setShowTags}
+          />
+          Show Tags
+        </Flex>
+        <Flex align="center" gap="2">
+          <Switch
+            size="1"
+            checked={displayState.showBackgroundColor}
+            onCheckedChange={displayState.setShowBackgroundColor}
+          />
+          Show Background Color
         </Flex>
       </Flex>
     </div>

@@ -1,10 +1,11 @@
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
+import useSimpleVirtualizer from '@openhome-ui/hooks/simpleVirtualizer'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { Pokedex } from '@openhome-ui/util/pokedex'
-import { all_species_data, FormeMetadata, SpeciesMetadata } from '@pkm-rs/pkg'
-import { useVirtualizer } from '@tanstack/react-virtual'
+import { cssClass } from '@openhome-ui/util/style'
+import { all_species_data, FormMetadata, Language, Lookup, SpeciesMetadata } from '@pkm-rs/pkg'
 import { CSSProperties, useEffect, useMemo, useRef } from 'react'
-import './style.css'
+import './PokedexSidebar.css'
 import { getHighestFormeStatus, StatusIndices } from './util'
 
 export type PokedexSidebarProps = {
@@ -12,11 +13,17 @@ export type PokedexSidebarProps = {
   pokedex: Pokedex
   selectedSpecies?: SpeciesMetadata
   setSelectedSpecies: (species: SpeciesMetadata) => void
-  setSelectedForme: (forme: FormeMetadata) => void
+  setSelectedForm: (form: FormMetadata) => void
 }
 
 export default function PokedexSidebar(props: PokedexSidebarProps) {
-  const { filter, selectedSpecies, setSelectedSpecies, setSelectedForme, pokedex } = props
+  const {
+    filter,
+    selectedSpecies,
+    setSelectedSpecies,
+    setSelectedForm: setSelectedForme,
+    pokedex,
+  } = props
 
   const ALL_SPECIES_DATA = useMemo(() => all_species_data(), [])
 
@@ -25,20 +32,20 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
   const filteredSpecies = useMemo(
     () =>
       Object.values(ALL_SPECIES_DATA).filter(
-        (mon) => !filter || mon.name.toUpperCase().startsWith(filter?.trim().toUpperCase())
+        (mon) =>
+          !filter ||
+          Lookup.speciesName(mon.nationalDex, Language.English)
+            .toUpperCase()
+            .startsWith(filter?.trim().toUpperCase())
       ),
     [ALL_SPECIES_DATA, filter]
   )
 
-  const virtualizer = useVirtualizer({
-    count: filteredSpecies.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 32,
-    overscan: 5,
-    gap: 8,
-    paddingStart: 8,
-    paddingEnd: 8,
-  })
+  const virtualizer = useSimpleVirtualizer(
+    filteredSpecies.length,
+    (_, baseFontSize) => baseFontSize * 3,
+    parentRef
+  )
 
   useEffect(() => {
     if (selectedSpecies) {
@@ -51,9 +58,9 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
 
   return (
     <div ref={parentRef} className="pokedex-sidebar">
-      <div style={{ height: virtualizer.getTotalSize(), width: '100%', position: 'relative' }}>
+      <div className="pokedex-sidebar-inner" style={{ height: virtualizer.getTotalSize() }}>
         {virtualizer.getVirtualItems().map((virtualRow) => (
-          <PokedexTab
+          <PokedexSidebarButton
             key={virtualRow.index}
             pokedex={pokedex}
             species={filteredSpecies[virtualRow.index]}
@@ -64,17 +71,13 @@ export default function PokedexSidebar(props: PokedexSidebarProps) {
                 filteredSpecies[virtualRow.index]
               )
 
-              setSelectedForme(filteredSpecies[virtualRow.index].formes[caughtFormeIndex])
+              setSelectedForme(filteredSpecies[virtualRow.index].forms[caughtFormeIndex])
               virtualizer.scrollToIndex(virtualRow.index, { behavior: 'smooth', align: 'center' })
             }}
             selected={
               selectedSpecies?.nationalDex === filteredSpecies[virtualRow.index].nationalDex
             }
             style={{
-              // height: `${virtualRow.size}px`,
-              position: 'absolute',
-              top: 0,
-              left: 0,
               height: `${virtualRow.size}px`,
               transform: `translateY(${virtualRow.start}px)`,
             }}
@@ -94,8 +97,8 @@ type PokedexTabProps = {
   style?: CSSProperties
 }
 
-function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabProps) {
-  const [formeIndex, maxStatus] = useMemo(() => {
+function PokedexSidebarButton({ pokedex, species, onClick, selected, style }: PokedexTabProps) {
+  const [formIndex, maxStatus] = useMemo(() => {
     return getHighestFormeStatus(pokedex, species)
   }, [pokedex, species])
 
@@ -104,35 +107,31 @@ function PokedexTab({ pokedex, species, onClick, selected, style }: PokedexTabPr
 
   return (
     <button
-      className="pokedex-tab"
+      className={cssClass('pokedex-sidebar-button')
+        .with('pokedex-sidebar-button-selected')
+        .if(selected)
+        .with('pokedex-sidebar-button-caught')
+        .if(isCaught)
+        .build()}
       key={species.nationalDex}
       onClick={onClick}
-      style={{
-        backgroundColor: selected
-          ? 'var(--accent-10)'
-          : isCaught
-            ? 'var(--accent-6)'
-            : 'var(--gray-7',
-        fontWeight: isCaught ? 'bold' : 'normal',
-        ...style,
-      }}
+      style={style}
     >
       {/* pokedex-icon-container must be on an outer element for unknown reasons */}
       <div className="pokedex-icon-container">
         <PokemonIcon
           dexNumber={species.nationalDex}
-          formeNumber={formeIndex}
+          formIndex={formIndex}
           silhouette={!isSeen}
           grayedOut={!isCaught}
-          style={{ minWidth: 32, height: 36 }} // leave this alone
         />
       </div>
-      {species.nationalDex}. {species.name}
+      {species.nationalDex}. {Lookup.speciesName(species.nationalDex, Language.English)}
       <div style={{ flex: 1 }} />
       {maxStatus === 'ShinyCaught' && (
         <img
+          className="pokedex-sidebar-shiny-icon"
           alt="shiny icon"
-          style={{ width: 26, height: 26, marginRight: 5 }}
           draggable={false}
           src={getPublicImageURL('icons/Shiny.png')}
         />

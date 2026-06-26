@@ -1,15 +1,19 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { SAV } from '@openhome-core/save/interfaces'
+import { numericSorter } from '@openhome-core/util/sort'
+import { Dialog } from '@openhome-ui/components/dialog/Dialog'
+import MessageRibbon from '@openhome-ui/components/MessageRibbon'
+import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
+import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
+import { usePathSegment } from '@openhome-ui/hooks/routing'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
-import { Button, Dialog, DropdownMenu, Flex, Inset, Separator } from '@radix-ui/themes'
+import { useSaves } from '@openhome-ui/state/saves'
+import { Button, DropdownMenu, Flex } from '@radix-ui/themes'
 import { PropsWithChildren, ReactNode, useState } from 'react'
 import { Route, Routes, useNavigate } from 'react-router'
-import { OhpkmIdentifier } from 'src/core/pkm/Lookup'
-import { SAV } from 'src/core/save/interfaces'
-import MessageRibbon from 'src/ui/components/MessageRibbon'
-import { OriginGameIndicator } from 'src/ui/components/pokemon/indicator/OriginGame'
-import { usePathSegment } from 'src/ui/hooks/routing'
-import { useSaves } from 'src/ui/state/saves'
+import { boxNameOrDefault, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import AllTrackedPokemon from './AllTrackedPokemon'
 import Gen12Lookup from './Gen12Lookup'
 import Gen345Lookup from './Gen345Lookup'
@@ -36,6 +40,42 @@ export default function TrackedPokemonPage() {
   )
 
   return (
+    <SideTabNavigation
+      defaultTab="all"
+      parentPathSegment="manage"
+      routes={[
+        {
+          route: 'all',
+          display: 'All Pokémon',
+          component: (
+            <AllTrackedPokemon
+              onSelectMon={setSelectedMon}
+              findSaveForMon={findSaveForMon}
+              findSavesForAllMons={findSavesForAllMons}
+            />
+          ),
+        },
+        {
+          route: 'gen12',
+          display: 'Gen 1/2 IDs',
+          component: <Gen12Lookup onSelectMon={setSelectedMon} />,
+        },
+        {
+          route: 'gen345',
+          display: 'Gen 3/4/5 IDs',
+          component: <Gen345Lookup onSelectMon={setSelectedMon} />,
+        },
+      ]}
+    >
+      <ManageDialog onClose={clearFindingState} />
+      <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
+      {findingSaveState && (
+        <FindingSaveDialog state={findingSaveState} onClose={clearFindingState} />
+      )}
+    </SideTabNavigation>
+  )
+
+  return (
     <SideTabs.Root value={currentSegment} onValueChange={setCurrentSegment}>
       <SideTabs.TabList>
         <SideTabs.Tab value="all"> All Pokémon</SideTabs.Tab>
@@ -50,10 +90,6 @@ export default function TrackedPokemonPage() {
         <Route path="gen12" element={<Gen12Lookup onSelectMon={setSelectedMon} />} />
         <Route path="gen345" element={<Gen345Lookup onSelectMon={setSelectedMon} />} />
       </Routes>
-      <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
-      {findingSaveState && (
-        <FindingSaveDialog state={findingSaveState} onClose={clearFindingState} />
-      )}
     </SideTabs.Root>
   )
 }
@@ -72,33 +108,29 @@ function ManageDialog(props: { onClose: () => void }) {
   return (
     <>
       <Dialog.Root onOpenChange={(o) => !o && onClose()}>
-        <Dialog.Trigger>
-          <Button size="1">Manage...</Button>
-        </Dialog.Trigger>
-        <Dialog.Content maxWidth="800px">
-          <Flex direction="column" className="find-save-dialog-body" gap="2">
-            <Dialog.Title mb="0">
-              Tracked Pokémon Management Actions
-              <Inset side="x" mt="2">
-                <Separator />
-              </Inset>
-            </Dialog.Title>
-            {findingSaveState ? (
-              <DialogBody state={findingSaveState} onClose={clearFindingState} />
-            ) : (
-              <Flex justify="between" gap="4">
-                <Button size="1" onClick={runDetectRecover} loading={loading}>
-                  Detect and Recover Missing
-                </Button>
-                <p>
-                  For all tracked Pokémon, find those that are not present in your OpenHome banks or
-                  in any of your tracked save files. You will be given the option to recover them
-                  all to a new box.
-                </p>
-              </Flex>
-            )}
-          </Flex>
-        </Dialog.Content>
+        <Dialog.Trigger>Manage...</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Backdrop />
+          <Dialog.Popup style={{ width: '50rem' }}>
+            <Flex direction="column" className="find-save-dialog-body" gap="2">
+              <Dialog.Title>Tracked Pokémon Management Actions</Dialog.Title>
+              {findingSaveState ? (
+                <DialogBody state={findingSaveState} onClose={clearFindingState} />
+              ) : (
+                <Flex justify="between" gap="4">
+                  <Button size="1" onClick={runDetectRecover} loading={loading}>
+                    Detect and Recover Missing
+                  </Button>
+                  <p>
+                    For all tracked Pokémon, find those that are not present in your OpenHome banks
+                    or in any of your tracked save files. You will be given the option to recover
+                    them all to a new box.
+                  </p>
+                </Flex>
+              )}
+            </Flex>
+          </Dialog.Popup>
+        </Dialog.Portal>
       </Dialog.Root>
     </>
   )
@@ -114,22 +146,15 @@ function FindingSaveDialog(props: FindingSaveDialogProps) {
   const summary = stateSummary(state)
   const summaryNode = typeof summary === 'string' ? <h4>{summary}</h4> : summary
   return (
-    <Dialog.Root open={Boolean(state)} onOpenChange={(o) => !o && onClose()}>
-      <Dialog.Content>
-        <Flex direction="column" flexGrow="1" height="100%">
-          <Dialog.Title>
-            Searching Saves for Pokémon
-            <Inset side="x" mt="2">
-              <Separator />
-            </Inset>
-          </Dialog.Title>
-          <Flex className="find-save-dialog-body" direction="column" gap="3">
-            {summaryNode}
-            <DialogBody state={state} onClose={onClose} />
-          </Flex>
+    <Dialog.Container open={Boolean(state)} onOpenChange={(o) => !o && onClose()}>
+      <Flex direction="column" flexGrow="1" height="100%">
+        <Dialog.Title>Searching Saves for Pokémon</Dialog.Title>
+        <Flex className="find-save-dialog-body" direction="column" gap="3">
+          {summaryNode}
+          <DialogBody state={state} onClose={onClose} />
         </Flex>
-      </Dialog.Content>
-    </Dialog.Root>
+      </Flex>
+    </Dialog.Container>
   )
 }
 
@@ -194,8 +219,10 @@ interface ForOneStateBodyProps {
 function ForOneStateBody(props: ForOneStateBodyProps) {
   const { state, onClose } = props
   const saves = useSaves()
+  const { switchBoxCurrentBank } = useBanksAndBoxes()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const { getCurrentBank } = useBanksAndBoxes()
 
   function openSaveAndNavToHome(save: SAV) {
     saves.addSave(save)
@@ -209,7 +236,7 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
 
     setLoading(true)
     saves.recoverMonToBox(state.id, boxIndex)
-    saves.homeBoxSetCurrent(boxIndex)
+    switchBoxCurrentBank(boxIndex)
     navigate('/home')
   }
 
@@ -226,7 +253,7 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
         <Flex direction="column" gap="2" ml="4">
           <Flex gap="1" align="center">
             <div className="fixed-width-label">Game:</div>
-            <OriginGameIndicator
+            <GameIndicator
               originGame={state.save.origin}
               plugin={state.save.pluginIdentifier}
               withName
@@ -265,12 +292,11 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
                 </Button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Content side="right" size="2">
-                {saves.homeData
-                  .getCurrentBank()
-                  .getBoxes()
+                {Array.from(getCurrentBank().boxes.values())
+                  .toSorted(numericSorter((box) => box.index))
                   .map((homeBox) => (
                     <DropdownMenu.Item key={homeBox.id} onClick={() => recoverToBox(homeBox.index)}>
-                      {homeBox.nameOrDefault()}
+                      {boxNameOrDefault(homeBox)}
                     </DropdownMenu.Item>
                   ))}
               </DropdownMenu.Content>
@@ -295,14 +321,14 @@ interface ForAllStateBodyProps {
 function ForAllStateBody(props: ForAllStateBodyProps) {
   const { state, onClose } = props
   const [loading, setLoading] = useState(false)
-  const saves = useSaves()
+  const { addBoxesWithIds, switchBoxCurrentBank } = useBanksAndBoxes()
   const navigate = useNavigate()
 
   function recoverMons(ids: OhpkmIdentifier[]) {
     setLoading(true)
-    const firstNewBoxIndex = saves.newBoxesWithIds(ids, 'Recovered Pokémon')
+    const firstNewBoxIndex = addBoxesWithIds(ids, 'Recovered Pokémon')
     if (firstNewBoxIndex !== undefined) {
-      saves.homeBoxSetCurrent(firstNewBoxIndex)
+      switchBoxCurrentBank(firstNewBoxIndex)
     }
     navigate('/home')?.then(() => setLoading(false))
   }
@@ -314,7 +340,7 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
         <Flex direction="column" gap="2">
           <Flex gap="1" align="center">
             <p className="fixed-width-label">Game:</p>
-            <OriginGameIndicator
+            <GameIndicator
               originGame={state.currentSaveRef.game}
               plugin={state.currentSaveRef.pluginIdentifier}
               withName

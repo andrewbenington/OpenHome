@@ -1,7 +1,7 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { PKM } from '@openhome-core/pkm/PKM'
+import { getDisplayID } from '@openhome-core/util/util'
 import { Ball, Gender } from '@pkm-rs/pkg'
-import { PKM } from '@pokemon-files/pkm/PKM'
-import { getDisplayID } from '@pokemon-files/util/util'
 import dayjs from 'dayjs'
 import { getBaseMon } from './util'
 
@@ -20,11 +20,35 @@ export const SortTypes = [
   'Held Item',
   'Is Egg',
   'Shiny Leaves',
+  'Display Color',
+  'First Tag',
+  'Tag Count',
+  'Has Notes',
 ]
 
 export type SortType = (typeof SortTypes)[number]
 
-export type PkmSorter = (a: PKMInterface, b: PKMInterface) => number
+type PkmSorter = (a: PKMInterface, b: PKMInterface) => number
+
+type MonTagLike = { label: string; color?: string; icon?: string }
+
+type MonWithManagementData = PKMInterface & {
+  tags?: MonTagLike[]
+  notes?: string
+  displayColor?: string
+}
+
+function monTags(mon: PKMInterface): MonTagLike[] {
+  return (mon as MonWithManagementData).tags ?? []
+}
+
+function monNotes(mon: PKMInterface): string | undefined {
+  return (mon as MonWithManagementData).notes
+}
+
+function monDisplayColor(mon: PKMInterface): string {
+  return (mon as MonWithManagementData).displayColor ?? ''
+}
 
 function chain(sorters: PkmSorter[]): PkmSorter {
   return (a: PKMInterface, b: PKMInterface) => {
@@ -42,13 +66,13 @@ function sortByDexNum(a: PKMInterface, b: PKMInterface) {
   return a.dexNum - b.dexNum
 }
 
-function sortByFormeNum(a: PKMInterface, b: PKMInterface) {
-  return (a.formeNum ?? 0) - (b.formeNum ?? 0)
+function sortByFormIndex(a: PKMInterface, b: PKMInterface) {
+  return (a.formNum ?? 0) - (b.formNum ?? 0)
 }
 
 function sortByBaseMon(a: PKMInterface, b: PKMInterface) {
-  const nationalDexA = getBaseMon(a.dexNum, a.formeNum)?.nationalDex ?? 0
-  const nationalDexB = getBaseMon(b.dexNum, b.formeNum)?.nationalDex ?? 0
+  const nationalDexA = getBaseMon(a.dexNum, a.formNum)?.nationalDex ?? 0
+  const nationalDexB = getBaseMon(b.dexNum, b.formNum)?.nationalDex ?? 0
   return nationalDexA - nationalDexB
 }
 
@@ -108,9 +132,9 @@ export function getSortFunction(
     case 'Level':
       return (a, b) => b.getLevel() - a.getLevel()
     case 'Species':
-      return chain([sortByDexNum, sortByFormeNum])
+      return chain([sortByDexNum, sortByFormIndex])
     case 'Species Family':
-      return chain([sortByBaseMon, sortByDexNum, sortByFormeNum])
+      return chain([sortByBaseMon, sortByDexNum, sortByFormIndex])
     case 'Gender':
       return (a, b) => (a.gender ?? Gender.Genderless) - (b.gender ?? Gender.Genderless)
     case 'Origin':
@@ -133,6 +157,28 @@ export function getSortFunction(
         (a.shinyLeaves?.hasCrown() ? 6 : (a.shinyLeaves?.count() ?? 0))
     case 'Held Item':
       return sortByHeldItem
+    case 'First Tag':
+      return (a, b) => {
+        const getFirstTag = (mon: PKMInterface) => {
+          return monTags(mon)[0]?.label ?? ''
+        }
+        return getFirstTag(a).localeCompare(getFirstTag(b))
+      }
+    case 'Tag Count':
+      return (a, b) => {
+        const getTagCount = (mon: PKMInterface) => monTags(mon).length
+        return getTagCount(b) - getTagCount(a)
+      }
+    case 'Has Notes':
+      return (a, b) => {
+        const hasNotes = (mon: PKMInterface) => {
+          const notes = monNotes(mon)
+          return typeof notes === 'string' && notes.trim().length > 0
+        }
+        return Number(hasNotes(b)) - Number(hasNotes(a))
+      }
+    case 'Display Color':
+      return (a, b) => monDisplayColor(a).localeCompare(monDisplayColor(b))
     default:
       return () => {
         console.error('unrecognized sort term:', sortStr)

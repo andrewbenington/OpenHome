@@ -1,30 +1,32 @@
 import { BW2SAV } from '@openhome-core/save/BW2SAV'
 import { BWSAV } from '@openhome-core/save/BWSAV'
+import { CompassSave } from '@openhome-core/save/compass/CompassSave'
 import { DPSAV } from '@openhome-core/save/DPSAV'
 import { G1SAV } from '@openhome-core/save/G1SAV'
 import { G2SAV } from '@openhome-core/save/G2SAV'
 import { G3SAV } from '@openhome-core/save/G3SAV'
-import { BDSPSAV } from '@openhome-core/save/Gen89/BDSPSAV'
-import { LASAV } from '@openhome-core/save/Gen89/LASAV'
-import { SVSAV } from '@openhome-core/save/Gen89/SVSAV'
-import { SwShSAV } from '@openhome-core/save/Gen89/SwShSAV'
+import { Gen7AlolaSave } from '@openhome-core/save/Gen7AlolaSave'
+import { BdspSave } from '@openhome-core/save/Gen89/BdspSave'
+import { LegendsArceusSave } from '@openhome-core/save/Gen89/LegendsArceus'
+import { LegendsZaSave } from '@openhome-core/save/Gen89/LegendsZaSave'
+import { ScarletVioletSave } from '@openhome-core/save/Gen89/ScarletVioletSave'
+import { SwordShieldSave } from '@openhome-core/save/Gen89/SwordShieldSave'
 import { HGSSSAV } from '@openhome-core/save/HGSSSAV'
+import { OfficialSAV } from '@openhome-core/save/interfaces'
 import { LGPESAV } from '@openhome-core/save/LGPESAV'
+import { G8LumiSAV } from '@openhome-core/save/luminescentplatinum/G8LUMISAV'
 import { ORASSAV } from '@openhome-core/save/ORASSAV'
 import { PtSAV } from '@openhome-core/save/PtSAV'
 import { G3RRSAV } from '@openhome-core/save/radicalred/G3RRSAV'
-import { SMSAV } from '@openhome-core/save/SMSAV'
 import { G3UBSAV } from '@openhome-core/save/unbound/G3UBSAV'
-import { USUMSAV } from '@openhome-core/save/USUMSAV'
-import { SAVClass } from '@openhome-core/save/util'
+import { PluginSaveClass, SAVClass } from '@openhome-core/save/util'
 import { XYSAV } from '@openhome-core/save/XYSAV'
+import { MonDisplayState } from '@openhome-ui/hooks/monDisplay'
 import { SaveViewMode } from '@openhome-ui/saves/util'
+import { updateStyleForUiScale } from '@openhome-ui/util/style'
 import { Dispatch, Reducer, createContext } from 'react'
-import { ZASAV } from '../../core/save/Gen89/ZASAV'
-import { OfficialSAV } from '../../core/save/interfaces'
-import { MonDisplayState } from '../hooks/useMonDisplay'
 
-const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
+export const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   G1SAV,
   G2SAV,
   G3SAV,
@@ -35,19 +37,26 @@ const OFFICIAL_SAVE_TYPES: SAVClass<OfficialSAV>[] = [
   BW2SAV,
   XYSAV,
   ORASSAV,
-  SMSAV,
-  USUMSAV,
+  Gen7AlolaSave,
   LGPESAV,
-  SwShSAV,
-  BDSPSAV,
-  LASAV,
-  SVSAV,
-  ZASAV,
+  SwordShieldSave,
+  BdspSave,
+  LegendsArceusSave,
+  ScarletVioletSave,
+  LegendsZaSave,
 ]
-const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV]
+const EXTRA_SAVE_TYPES = [G3RRSAV, G3UBSAV, G8LumiSAV, CompassSave]
 
-export function initialMonDisplayState() {
-  return { filter: {}, topRightIndicator: null, showShiny: true, showItem: true }
+function initialMonDisplayState() {
+  return {
+    filter: {},
+    topRightIndicator: null,
+    showShiny: true,
+    showItem: true,
+    showNotesIndicator: true,
+    showTags: true,
+    showBackgroundColor: true,
+  }
 }
 
 export const defaultSettings: Settings = {
@@ -60,6 +69,7 @@ export const defaultSettings: Settings = {
   monDisplayState: initialMonDisplayState(),
   appTheme: 'system',
   autoScanOnStartup: true,
+  zoomLevel: 100,
 }
 
 export type AppTheme = 'light' | 'dark' | 'system'
@@ -72,13 +82,14 @@ export type Settings = {
   monDisplayState: MonDisplayState
   appTheme: AppTheme
   autoScanOnStartup: boolean
+  zoomLevel: number
 }
 
 export type AppInfoState = {
   settings: Settings
   settingsLoaded: boolean
   officialSaveTypes: SAVClass[]
-  extraSaveTypes: SAVClass[]
+  extraSaveTypes: PluginSaveClass[]
   error?: string
 }
 
@@ -118,6 +129,10 @@ export type AppInfoAction =
       payload: boolean
     }
   | { type: 'set_mon_display_state'; payload: MonDisplayState }
+  | {
+      type: 'set_zoom_level'
+      payload: number
+    }
   | {
       type: 'set_error'
       payload: string | undefined
@@ -164,11 +179,13 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
         }
       })
 
-      state.officialSaveTypes.forEach((st) => {
+      state.extraSaveTypes.forEach((st) => {
         if (!(st.saveTypeID in enabled)) {
           enabled[st.saveTypeID] = true
         }
       })
+
+      updateStyleForUiScale(payload.zoomLevel)
 
       return { ...state, settings: { ...payload, enabledSaveTypes: enabled }, settingsLoaded: true }
     }
@@ -192,6 +209,10 @@ export const appInfoReducer: Reducer<AppInfoState, AppInfoAction> = (
     }
     case 'set_auto_scan': {
       return { ...state, settings: { ...state.settings, autoScanOnStartup: payload } }
+    }
+    case 'set_zoom_level': {
+      updateStyleForUiScale(payload)
+      return { ...state, settings: { ...state.settings, zoomLevel: payload } }
     }
     case 'set_error': {
       return { ...state, error: payload }

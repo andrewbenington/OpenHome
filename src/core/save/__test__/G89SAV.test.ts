@@ -1,18 +1,26 @@
+import { PA8, PK4, PK8 } from '@openhome-core/pkm'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Ball, OriginGame } from '@pkm-rs/pkg'
-import { PA8, PK4, PK8 } from '@pokemon-files/pkm'
+import { Ball, ConvertStrategies, OriginGame } from '@pkm-rs/pkg'
 import { readFileSync } from 'fs'
-import { resolve } from 'path'
+import path from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { PKMInterface } from '../../pkm/interfaces'
 import { SCBoolBlock, SCObjectBlock, writeSCBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
-import { LASAV } from '../Gen89/LASAV'
-import { SwShSAV } from '../Gen89/SwShSAV'
+import { LegendsArceusSave } from '../Gen89/LegendsArceus'
+import { SwordShieldSave } from '../Gen89/SwordShieldSave'
 import { PathData } from '../util/path'
 import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
+
+function pkmTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'pkm-files', ...pathElements)
+}
+
+function saveTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'save-files', ...pathElements)
+}
 
 const swordPath: PathData = {
   raw: 'save-files/sword',
@@ -32,27 +40,27 @@ const arceusPath = {
 
 describe('gen 8 save files', () => {
   let saveBytes: Uint8Array
-  let swordSave: SwShSAV
-  let arceusSave: LASAV
+  let swordSave: SwordShieldSave
+  let arceusSave: LegendsArceusSave
   let magmortar: PK4
 
   beforeAll(() => {
-    let savePath = resolve(__dirname, 'save-files/sword')
+    let savePath = saveTestFilePath('sword')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
-    swordSave = new SwShSAV(swordPath, saveBytes)
+    swordSave = new SwordShieldSave(swordPath, saveBytes)
 
-    savePath = resolve(__dirname, 'save-files/legendsarceus')
+    savePath = saveTestFilePath('legendsarceus')
 
     saveBytes = new Uint8Array(readFileSync(savePath))
 
-    arceusSave = new LASAV(arceusPath, saveBytes)
+    arceusSave = new LegendsArceusSave(arceusPath, saveBytes)
 
-    const monPath = resolve('src/core/pkm/__test__/PKMFiles/Gen4/magmortar.pkm')
+    const monPath = pkmTestFilePath('pk4', 'magmortar.pkm')
     const monBytes = new Uint8Array(readFileSync(monPath))
 
-    magmortar = new PK4(monBytes.buffer)
+    magmortar = PK4.fromBytes(monBytes.buffer)
   })
 
   test('sword/shield hash matches', () => {
@@ -126,7 +134,7 @@ describe('gen 8 save files', () => {
     const reencrypted = SwishCrypto.encrypt(swordSave.scBlocks, swordSave.bytes.length)
 
     expect(SwishCrypto.getIsHashValid(reencrypted)).toBe(true)
-    const decrypted = new SwShSAV(swordPath, reencrypted)
+    const decrypted = new SwordShieldSave(swordPath, reencrypted)
 
     expect(decrypted.name).toBe(swordSave.name)
 
@@ -143,14 +151,14 @@ describe('gen 8 save files', () => {
       throw new Error('Expected mon not found')
     }
 
-    const ohpkm = new OHPKM(mon)
+    const ohpkm = OHPKM.fromMonInSave(mon, swordSave)
 
     ohpkm.nickname = 'NEW NAME'
     swordSave.boxes[1].boxSlots[3] = convertToPk8(ohpkm)
     swordSave.updatedBoxSlots.push({ box: 1, boxSlot: 3 })
 
     swordSave.prepareForSaving()
-    const modified = new SwShSAV(swordPath, swordSave.bytes)
+    const modified = new SwordShieldSave(swordPath, swordSave.bytes)
     const modifiedFlapple = modified.boxes[1].boxSlots[3]
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
@@ -163,14 +171,14 @@ describe('gen 8 save files', () => {
       throw new Error('Expected mon not found')
     }
 
-    const ohpkm = new OHPKM(mon)
+    const ohpkm = OHPKM.fromMonInSave(mon, swordSave)
 
     ohpkm.nickname = 'NEW NAME'
     swordSave.boxes[1].boxSlots[3] = convertToPk8(ohpkm)
     swordSave.updatedBoxSlots.push({ box: 1, boxSlot: 3 })
 
     swordSave.prepareForSaving()
-    const modified = new SwShSAV(swordPath, swordSave.bytes)
+    const modified = new SwordShieldSave(swordPath, swordSave.bytes)
     const modifiedFlapple = modified.boxes[1].boxSlots[3]
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
@@ -185,7 +193,7 @@ describe('gen 8 save files', () => {
     }
     expect(mon.nickname).toBe('Decidueye')
 
-    const ohpkm = new OHPKM(mon)
+    const ohpkm = OHPKM.fromMonInSave(mon, arceusSave)
 
     ohpkm.nickname = 'NEW NAME'
     arceusSave.boxes[13].boxSlots[1] = convertToPa8(ohpkm)
@@ -195,7 +203,7 @@ describe('gen 8 save files', () => {
     arceusSave.updatedBoxSlots.push({ box: 2, boxSlot: 8 })
 
     arceusSave.prepareForSaving()
-    const modified = new LASAV(arceusPath, arceusSave.bytes)
+    const modified = new LegendsArceusSave(arceusPath, arceusSave.bytes)
     const modifiedDecidueye = modified.boxes[13].boxSlots[1]
 
     expect(modifiedDecidueye?.nickname).toBe('NEW NAME')
@@ -203,7 +211,7 @@ describe('gen 8 save files', () => {
 
     const modifiedMagmortar = modified.boxes[2].boxSlots[8]
 
-    expect(modifiedMagmortar?.nickname).toBe('MAGMORTAR')
+    expect(modifiedMagmortar?.nickname).toBe('Magmortar')
   })
 })
 
@@ -216,9 +224,13 @@ function toHexString(byteArray: Uint8Array) {
 }
 
 function convertToPk8(mon: PKMInterface) {
-  return mon instanceof OHPKM ? new PK8(mon) : new PK8(new OHPKM(mon))
+  return mon instanceof OHPKM
+    ? PK8.fromOhpkm(mon, ConvertStrategies.getDefault())
+    : PK8.fromOhpkm(OHPKM.fromMonUnknownSave(mon), ConvertStrategies.getDefault())
 }
 
 function convertToPa8(mon: PKMInterface) {
-  return mon instanceof OHPKM ? new PA8(mon) : new PA8(new OHPKM(mon))
+  return mon instanceof OHPKM
+    ? PA8.fromOhpkm(mon, ConvertStrategies.getDefault())
+    : PA8.fromOhpkm(OHPKM.fromMonUnknownSave(mon), ConvertStrategies.getDefault())
 }

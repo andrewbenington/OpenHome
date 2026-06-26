@@ -14,7 +14,7 @@ export type SimpleOpenHomeBank = {
   id: string
   index: number
   name: string | undefined
-  boxes: SimpleOpenHomeBox[]
+  boxes: Map<number, SimpleOpenHomeBox>
   current_box: number
 }
 
@@ -26,7 +26,3 @@ export type SimpleOpenHomeBox = {
 }
 
 export type BoxMonIdentifiers = Map<number, OhpkmIdentifier>
-
-export function getBankName(bank: SimpleOpenHomeBank): string {
-  return bank.name ?? `Bank ${bank.index + 1}`
-}

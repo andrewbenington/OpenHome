@@ -10,13 +10,15 @@ export default defineConfig(async () => ({
   optimizeDeps: {
     include: ['@tauri-apps/plugin-dialog'],
   },
+  target: 'es2025',
   resolve: {
     alias: {
       src: fileURLToPath(new URL('./src', import.meta.url)),
       '@openhome-core': fileURLToPath(new URL('./src/core', import.meta.url)),
       '@openhome-ui': fileURLToPath(new URL('./src/ui', import.meta.url)),
       '@pokemon-files': fileURLToPath(new URL('./packages/pokemon-files/src', import.meta.url)),
-      '@pokemon-resources': fileURLToPath(
+      '@pokemon-wasm': fileURLToPath(new URL('./packages/pokemon-wasm/pkg', import.meta.url)),
+      '@openhome-core/resources': fileURLToPath(
         new URL('./packages/pokemon-resources/src', import.meta.url)
       ),
       '@pkm-rs': fileURLToPath(new URL('./pkm_rs', import.meta.url)),

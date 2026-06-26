@@ -1,17 +1,18 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { getLocationString, getLocationStringOrOrigin } from '@openhome-core/pkm/MetLocation'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getCharacteristic, getMoveMaxPP } from '@openhome-core/pkm/util'
+import { RibbonTitles } from '@openhome-core/resources'
 import { getPluginIdentifier } from '@openhome-core/save/util'
 import Markings from '@openhome-ui/components/pokemon/Markings'
 import MoveCard from '@openhome-ui/components/pokemon/MoveCard'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getBallIconPath } from '@openhome-ui/images/items'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
-import { OriginGames } from '@pkm-rs/pkg'
-import { getLocationString, RibbonTitles } from '@pokemon-resources/index'
-import { Badge, Flex } from '@radix-ui/themes'
+import { Language, Languages, OriginGames } from '@pkm-rs/pkg'
+import { Badge, Flex, Grid } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
-import './style.css'
+import './MetDataMovesTab.css'
 
 const metTimesOfDay = ['in the morning', 'during the daytime', 'in the evening']
 
@@ -25,7 +26,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
     }
     return `Egg received on ${mon.eggDate.month}/${mon.eggDate.day}/${
       mon.eggDate.year
-    } ${getLocationString(mon.gameOfOrigin, mon.eggLocationIndex, mon.format, true)}.`
+    } ${getLocationString(mon.gameOfOrigin, mon.eggLocationIndex, mon.format, Language.English, true)}.` // todo: i18n
   }, [mon])
 
   const metMessage = useMemo(() => {
@@ -43,7 +44,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
       if (pluginSaveType) {
         message += ` in ${pluginSaveType.saveTypeName}`
       } else {
-        message += ` in ${OriginGames.gameName(mon.gameOfOrigin) ?? '(unknown game)'}`
+        message += ` in ${OriginGames.gameNameFull(mon.gameOfOrigin) ?? '(unknown game)'}`
       }
     }
 
@@ -54,9 +55,24 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
       message += ` on ${mon.metDate.month}/${mon.metDate.day}/${mon.metDate.year}`
     }
     if (mon.gameOfOrigin && mon.metLocationIndex) {
-      const location = getLocationString(mon.gameOfOrigin, mon.metLocationIndex, mon.format)
+      try {
+        const location = getLocationStringOrOrigin(
+          mon.gameOfOrigin,
+          mon.metLocationIndex,
+          mon.format,
+          Language.English
+        )
 
-      message += ` ${location}`
+        message += ` ${location}`
+      } catch (e) {
+        console.error('Error getting location string', {
+          error: e,
+          game: mon.gameOfOrigin,
+          index: mon.metLocationIndex,
+          format: mon.format,
+        })
+        message += ' at an unknown location'
+      }
     }
 
     if ('isFatefulEncounter' in mon && mon.isFatefulEncounter) {
@@ -86,12 +102,16 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
     return message
   }, [mon])
 
+  // rom hack origin mons will all have an "official origin game" that corresponds to the rom hack's base game. The origin mark will use that base game.
   const markImage = mon.gameOfOrigin ? OriginGames.markPath(mon.gameOfOrigin) : undefined
 
   return (
-    <Flex direction="column" ml="4" mr="4" mt="2" height="calc(100% - 24px)">
-      <Flex direction="row" style={{ flex: 1 }}>
-        <div style={{ flex: 1 }}>
+    <Flex className="pokemon-modal-content" direction="column" height="100%">
+      <div
+        className="pokemon-modal-card"
+        style={{ display: 'flex', flexDirection: 'row', flex: 1 }}
+      >
+        <div className="met-data-left-side">
           <Flex direction="row" gap="1" align="center">
             {'ball' in mon && mon.ball ? (
               <img
@@ -103,27 +123,23 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
             ) : (
               <div />
             )}
-            <p style={{ fontWeight: 'bold' }}>
+            <p className="pokemon-nickname">
               {mon.nickname}
               {'affixedRibbon' in mon && mon.affixedRibbon
                 ? ` ${RibbonTitles[mon.affixedRibbon]}`
                 : ''}
             </p>
             <Badge variant="solid" color="gray" ml="2" size="1">
-              {mon.languageString}
+              {Languages.stringFromByte(mon.language)}
             </Badge>
           </Flex>
-          {eggMessage ? <p>{eggMessage}</p> : <div />}
-          <p>{metMessage}</p>
-          {/* check for undefined because 0 nature is Hardy */}
-          {'nature' in mon ? (
-            <div>
-              <p>{natureMessage}</p>
-              <p>{getCharacteristic(mon as any)}</p>
-            </div>
-          ) : (
-            <div />
-          )}
+          <div className="met-data-text">
+            {eggMessage && <p>{eggMessage}</p>}
+            <p>{metMessage}</p>
+            {/* check for undefined because 0 nature is Hardy */}
+            {natureMessage && <p>{natureMessage}</p>}
+            <p>{getCharacteristic(mon)}.</p>
+          </div>
         </div>
         <Flex direction="column">
           <div className="game-container">
@@ -131,7 +147,7 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
               <img
                 className="game-image"
                 draggable={false}
-                alt={`${mon.pluginOrigin ?? OriginGames.gameName(mon.gameOfOrigin)} logo`}
+                alt={`${mon.pluginOrigin ?? OriginGames.gameNameFull(mon.gameOfOrigin)} logo`}
                 src={
                   mon.pluginOrigin
                     ? `logos/${mon.pluginOrigin}.png`
@@ -151,32 +167,31 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
             <div />
           )}
         </Flex>
+      </div>
+      <Flex direction="row" justify="center">
+        <Grid columns="repeat(2, 1fr)" gap="2" maxWidth="40rem" minWidth="30rem">
+          <MoveCard
+            move={mon.moves[0]}
+            movePP={mon.moves[0] ? mon.movePP[0] : undefined}
+            maxPP={getMoveMaxPP(mon.moves[0], mon.format, mon.movePPUps[0])}
+          />
+          <MoveCard
+            move={mon.moves[1]}
+            movePP={mon.moves[1] ? mon.movePP[1] : undefined}
+            maxPP={getMoveMaxPP(mon.moves[1], mon.format, mon.movePPUps[1])}
+          />
+          <MoveCard
+            move={mon.moves[2]}
+            movePP={mon.moves[2] ? mon.movePP[2] : undefined}
+            maxPP={getMoveMaxPP(mon.moves[2], mon.format, mon.movePPUps[2])}
+          />
+          <MoveCard
+            move={mon.moves[3]}
+            movePP={mon.moves[3] ? mon.movePP[3] : undefined}
+            maxPP={getMoveMaxPP(mon.moves[3], mon.format, mon.movePPUps[3])}
+          />
+        </Grid>
       </Flex>
-      <div style={{ flex: 1 }} />
-      <div className="center-flex">
-        <MoveCard
-          move={mon.moves[0]}
-          movePP={mon.moves[0] ? mon.movePP[0] : undefined}
-          maxPP={getMoveMaxPP(mon.moves[0], mon.format, mon.movePPUps[0])}
-        />
-        <MoveCard
-          move={mon.moves[1]}
-          movePP={mon.moves[1] ? mon.movePP[1] : undefined}
-          maxPP={getMoveMaxPP(mon.moves[1], mon.format, mon.movePPUps[1])}
-        />
-      </div>
-      <div className="center-flex">
-        <MoveCard
-          move={mon.moves[2]}
-          movePP={mon.moves[2] ? mon.movePP[2] : undefined}
-          maxPP={getMoveMaxPP(mon.moves[2], mon.format, mon.movePPUps[2])}
-        />
-        <MoveCard
-          move={mon.moves[3]}
-          movePP={mon.moves[3] ? mon.movePP[3] : undefined}
-          maxPP={getMoveMaxPP(mon.moves[3], mon.format, mon.movePPUps[3])}
-        />
-      </div>
     </Flex>
   )
 }

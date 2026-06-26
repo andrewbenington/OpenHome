@@ -1,0 +1,92 @@
+{
+  "sanity": 0,
+  "checksum": 49033,
+  "pokemon_index": 305,
+  "held_item_index": 183,
+  "trainer_id": 34978,
+  "secret_id": 48423,
+  "exp": 1059860,
+  "has_species_data": true,
+  "is_bad_egg": false,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 4267281127,
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 252,
+    "atk": 252,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 6
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus_byte": 0,
+  "ribbons": ["Champion"],
+  "nickname": "SWELLOW",
+  "nickname_trash": "CDD1BFC6C6C9D1FF0000",
+  "moves": [
+    {
+      "move_index": "Aerial Ace",
+      "pp": 32,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Fly",
+      "pp": 24,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Secret Power",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Steel Wing",
+      "pp": 40,
+      "pp_ups": 3
+    }
+  ],
+  "ivs": {
+    "hp": 12,
+    "atk": 10,
+    "def": 29,
+    "spa": 21,
+    "spd": 24,
+    "spe": 20
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_friendship": 255,
+  "met_location_index": 19,
+  "ball": "Ultra",
+  "met_level": 4,
+  "trainer_gender": "Male",
+  "game_of_origin": "Emerald",
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 100,
+  "current_hp": 305,
+  "stats": {
+    "hp": 305,
+    "atk": 272,
+    "def": 154,
+    "spa": 126,
+    "spd": 129,
+    "spe": 248
+  },
+  "level": 100
+}

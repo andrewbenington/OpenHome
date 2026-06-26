@@ -1,16 +1,20 @@
+import { PK4 } from '@openhome-core/pkm'
+import * as encryption from '@openhome-core/pkm/util/encryption'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
+import { readGen4StringFromBytes } from '@openhome-core/util'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
-} from '@openhome-core/save/util/byteLogic'
-import { gen4StringToUTF } from '@openhome-core/save/util/Strings/StringConverter'
-import { OriginGame } from '@pkm-rs/pkg'
-import { PK4 } from '@pokemon-files/pkm'
+} from '@openhome-core/util/byteLogic'
+import { ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
+import { Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
 import { PathData } from './util/path'
+
+const PKM_BOX_SIZE = 136
 
 export abstract class G4SAV extends OfficialSAV<PK4> {
   static BOX_COUNT = 18
@@ -32,6 +36,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
   abstract tid: number
   abstract sid: number
   abstract displayID: string
+  abstract language: Language
 
   currentPCBox: number = 0 // TODO: Gen 4 current box
 
@@ -66,7 +71,22 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
       this.origin = OriginGame.Diamond
       return
     }
-    this.origin = bytes[0x80]
+    const possibleOrigin = bytes[0x80]
+    if (G4SAV.includesOrigin(possibleOrigin)) {
+      this.origin = possibleOrigin
+    } else {
+      this.origin = 0
+    }
+  }
+
+  getCurrentSaveCount(blockOffset: number, blockSize: number): Option<number> {
+    const storedCount = bytesToUint32LittleEndian(
+      this.bytes,
+      blockOffset + blockSize - this.footerSize
+    )
+
+    // if the game has only been saved once, the second block will be full of 0xffffffff, so we return -1 to indicate it has never been saved before
+    return storedCount === 0xffffffff ? undefined : storedCount
   }
 
   buildBoxes() {
@@ -76,7 +96,11 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     }
 
     for (let box = 0; box < 18; box++) {
-      const boxLabel = gen4StringToUTF(this.bytes, this.boxNamesOffset + 40 * box, 20)
+      const boxLabel = readGen4StringFromBytes(
+        new DataView(this.bytes.buffer),
+        this.boxNamesOffset + 40 * box,
+        20
+      )
 
       this.boxes[box] = new Box(boxLabel, 30)
     }
@@ -84,12 +108,10 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     for (let box = 0; box < 18; box++) {
       for (let monIndex = 0; monIndex < 30; monIndex++) {
         try {
-          const startByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * monIndex
-          const endByte = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * (monIndex + 1)
-          const monData = this.bytes.slice(startByte, endByte)
-          const mon = new PK4(monData.buffer, true)
+          const monData = this.getMonBytesAt(box, monIndex)
+          const mon = PK4.fromBytes(monData, true)
 
-          if (mon.dexNum !== 0 && mon.gameOfOrigin !== 0) {
+          if (!this.slotIsEmpty(box, monIndex)) {
             // set game origin if origin missing and matching mon is found; necessary for diamond/pearl
             if (
               this.origin === 0 &&
@@ -106,6 +128,24 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
         }
       }
     }
+
+    if (this.origin === 0) {
+      this.origin = this.filePath.raw.toLocaleLowerCase().includes('pearl')
+        ? OriginGame.Pearl
+        : OriginGame.Diamond
+    }
+  }
+
+  getMonBytesAt(box: number, boxSlot: number): ArrayBuffer {
+    const startByte = this.currentSaveBoxStartOffset + this.boxSize * box + PKM_BOX_SIZE * boxSlot
+    const endByte =
+      this.currentSaveBoxStartOffset + this.boxSize * box + PKM_BOX_SIZE * (boxSlot + 1)
+    return this.bytes.slice(startByte, endByte).buffer
+  }
+
+  slotIsEmpty(box: number, boxSlot: number): boolean {
+    const mon = PK4.fromBytes(this.getMonBytesAt(box, boxSlot), true)
+    return mon.dexNum === 0
   }
 
   getStorageChecksum() {
@@ -132,7 +172,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     this.updatedBoxSlots.forEach(({ box, boxSlot: index }) => {
       const mon = this.boxes[box].boxSlots[index]
 
-      const writeIndex = this.currentSaveBoxStartOffset + this.boxSize * box + 136 * index
+      const writeIndex = this.currentSaveBoxStartOffset + this.boxSize * box + PKM_BOX_SIZE * index
 
       // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
@@ -146,21 +186,26 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
           console.error(`G4SAV.prepareForSaving: ${e}`)
         }
       } else {
-        this.bytes.set(EMPTY_SLOT_BYTES, writeIndex)
+        this.bytes.set(G4SAV.emptySlotBytes(), writeIndex)
       }
     })
     this.updateStorageChecksum()
   }
 
-  convertOhpkm(ohpkm: OHPKM): PK4 {
-    return new PK4(ohpkm)
+  static emptySlotBytes(): Uint8Array<ArrayBuffer> {
+    const shuffledBytes = encryption.shuffleBlocksGen45(emptySlotBytes().buffer)
+    return new Uint8Array(encryption.decryptByteArrayGen45(shuffledBytes))
   }
 
-  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
-
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK4 {
+    return PK4.fromOhpkm(ohpkm, strategy)
   }
+
+  abstract supportsMon(
+    dexNumber: number,
+    formeNumber: number,
+    extraFormIndex?: ExtraFormIndex
+  ): boolean
 
   static saveTypeAbbreviation = 'DPPt/HGSS'
   static saveTypeName = 'Pokémon Diamond/Pearl/Platinum/HeartGold/SoulSilver'
@@ -185,15 +230,19 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
       (origin >= OriginGame.HeartGold && origin <= OriginGame.SoulSilver)
     )
   }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PK4>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
+  }
 }
 
-const EMPTY_SLOT_BYTES = new Uint8Array([
-  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-  0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x88, 0x1, 0x88, 0x1,
-  0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1,
-  0x88, 0x1, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1,
-  0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0x88, 0x1, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-  0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-])
+// return new array so mutations don't happen
+const emptySlotBytes = () => new Uint8Array(136)

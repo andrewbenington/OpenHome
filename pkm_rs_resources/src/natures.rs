@@ -1,9 +1,14 @@
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
-
 use serde::{Serialize, Serializer};
 
 use crate::{Error, stats::Stat};
+
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
+
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
@@ -21,6 +26,7 @@ impl NatureIndex {
     }
 }
 
+#[cfg(feature = "wasm")]
 const SERIOUS_INDEX: u8 = 12;
 
 #[wasm_bindgen]
@@ -114,6 +120,13 @@ impl From<NatureIndex> for u8 {
     }
 }
 
+#[cfg(feature = "randomize")]
+impl Randomize for NatureIndex {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        NatureIndex(rng.random_range(0..ALL_NATURES.len()) as u8)
+    }
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Copy)]
 pub struct NatureStatData {
@@ -122,18 +135,20 @@ pub struct NatureStatData {
 }
 
 pub struct NatureMetadata {
-    name: &'static str,
+    pub name: &'static str,
     stats: Option<NatureStatData>,
 }
 
 impl NatureMetadata {
-    pub fn multiplier_for(&self, stat: Stat) -> f32 {
+    pub const fn multiplier_for(&self, stat: Stat) -> f32 {
         match &self.stats {
             None => 1.0,
             Some(stat_changes) => {
-                if stat_changes.increase == stat {
+                // casts necessary for const fn
+                let stat = stat as usize;
+                if stat_changes.increase as usize == stat {
                     1.1
-                } else if stat_changes.decrease == stat {
+                } else if stat_changes.decrease as usize == stat {
                     0.9
                 } else {
                     1.0

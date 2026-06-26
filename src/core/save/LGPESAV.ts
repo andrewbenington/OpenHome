@@ -1,15 +1,16 @@
+import { PB7 } from '@openhome-core/pkm'
+import { LGE_STARTER, LGP_STARTER } from '@openhome-core/resources/consts/Forms'
+import { Item } from '@openhome-core/resources/consts/Items'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import { LGPE_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Gender, OriginGame } from '@pkm-rs/pkg'
-import { PB7 } from '@pokemon-files/pkm'
-import { utf16BytesToString } from '@pokemon-files/util'
-import { LGE_STARTER, LGP_STARTER } from '@pokemon-resources/consts/Formes'
-import { Item } from '@pokemon-resources/consts/Items'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { LGPE_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
+import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '@openhome-core/util/byteLogic'
+import { utf16BytesToString } from '@openhome-core/util/stringConversion'
+import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
+import { Option } from '../util/functional'
 import { CRC16_NoInvert } from './encryption/Encryption'
 import { Box, BoxAndSlot, OfficialSAV, SlotMetadata } from './interfaces'
-import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from './util/byteLogic'
 import { PathData } from './util/path'
 
 const PC_OFFSET = 0x5c00
@@ -107,7 +108,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
         const displayBoxNum = Math.floor(monIndex / 30)
         const displayBoxSlot = monIndex % 30
 
-        if (mon !== null) {
+        if (mon !== null && mon.dexNum !== 0) {
           this.boxes[displayBoxNum].boxSlots[displayBoxSlot] = mon
         }
       } catch (e) {
@@ -178,17 +179,20 @@ export class LGPESAV extends OfficialSAV<PB7> {
     return nextEmptyIndex
   }
 
-  convertOhpkm(ohpkm: OHPKM): PB7 {
-    return new PB7(ohpkm)
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB7 {
+    return PB7.fromOhpkm(ohpkm, strategy)
   }
 
   getMonAtIndex(monIndex: number) {
     const startByte = PC_OFFSET + MON_BYTE_SIZE * monIndex
     const endByte = PC_OFFSET + MON_BYTE_SIZE * (monIndex + 1)
     const monBytes = this.bytes.slice(startByte, endByte)
-    const mon = new PB7(monBytes.buffer, true)
+    const mon = PB7.fromBytes(monBytes.buffer, true)
 
-    if (mon.checksum === EMPTY_SLOT_CHECKSUM && mon.encryptionConstant === 0) {
+    if (
+      mon.dexNum === 0 ||
+      (mon.checksum === EMPTY_SLOT_CHECKSUM && mon.encryptionConstant === 0)
+    ) {
       return null
     }
 
@@ -198,7 +202,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
   writeMonAtIndex(mon: PB7 | null, monIndex: number) {
     if (mon === null) {
       // empty slot representation
-      mon = new PB7(new Uint8Array(MON_BYTE_SIZE).buffer)
+      mon = PB7.fromBytes(new Uint8Array(MON_BYTE_SIZE).buffer)
     }
 
     mon.refreshChecksum()
@@ -211,7 +215,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
   static writeMonToStorageBytesAtIndex(bytes: Uint8Array, mon: PB7 | null, monIndex: number) {
     if (mon === null) {
       // empty slot representation
-      mon = new PB7(new Uint8Array(MON_BYTE_SIZE).buffer)
+      mon = PB7.fromBytes(new Uint8Array(MON_BYTE_SIZE).buffer)
     }
 
     mon.refreshChecksum()
@@ -231,8 +235,8 @@ export class LGPESAV extends OfficialSAV<PB7> {
     return null
   }
 
-  supportsMon(dexNumber: number, formeNumber: number): boolean {
-    return !isRestricted(LGPE_TRANSFER_RESTRICTIONS, dexNumber, formeNumber)
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(LGPE_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {
@@ -259,8 +263,8 @@ export class LGPESAV extends OfficialSAV<PB7> {
     const mon = this.boxes[boxNum].boxSlots[boxSlot]
 
     if (
-      (mon?.dexNum === NationalDex.Pikachu && mon.formeNum === LGP_STARTER) ||
-      (mon?.dexNum === NationalDex.Eevee && mon.formeNum === LGE_STARTER)
+      (mon?.dexNum === NationalDex.Pikachu && mon.formNum === LGP_STARTER) ||
+      (mon?.dexNum === NationalDex.Eevee && mon.formNum === LGE_STARTER)
     ) {
       return {
         isDisabled: true,
@@ -291,10 +295,6 @@ export class LGPESAV extends OfficialSAV<PB7> {
     return dataView.getUint16(POKE_LIST_HEADER_CHECKSUM_OFFSET, true)
   }
 
-  getCurrentBox() {
-    return this.boxes[this.currentPCBox]
-  }
-
   getDisplayData() {
     return {
       'Stored PC Checksum': displayChecksum(this.getStoredPcChecksum()),
@@ -304,6 +304,22 @@ export class LGPESAV extends OfficialSAV<PB7> {
       'Party Indices': this.pokeListHeader.partyIndices.join(', '),
       'Box Count': this.pokeListHeader.boxCount,
     }
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PB7>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
+  }
+
+  get language(): Language {
+    return this.bytes[this.trainerDataOffset + 0x35]
   }
 }
 

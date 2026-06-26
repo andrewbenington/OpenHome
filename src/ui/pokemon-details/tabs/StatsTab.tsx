@@ -1,15 +1,15 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import SheenStars from '@openhome-ui/components/pokemon/SheenStars'
-import StatsTable from '@openhome-ui/components/pokemon/StatsTable'
-import { colorIsDark } from '@openhome-ui/util/color'
-import { Stats as PkmRsStats, StatsPreSplit } from '@pkm-rs/pkg'
-import { isContestStats, isStandardStats, isStatsPreSplit, Stats } from '@pokemon-files/util'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   LA_TRANSFER_RESTRICTIONS,
   LGPE_TRANSFER_RESTRICTIONS,
-} from '@pokemon-resources/consts/TransferRestrictions'
+} from '@openhome-core/resources/consts/TransferRestrictions'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { isContestStats, isStandardStats, isStatsPreSplit, Stats } from '@openhome-core/util/types'
+import SheenStars from '@openhome-ui/components/pokemon/SheenStars'
+import StatsTable from '@openhome-ui/components/pokemon/StatsTable'
+import { colorIsDark } from '@openhome-ui/util/color'
+import { StatAbbr, StatsPreSplit } from '@pkm-rs/pkg'
 import { Select } from '@radix-ui/themes'
 import {
   ChartDataset,
@@ -24,6 +24,7 @@ import {
 } from 'chart.js'
 import { useEffect, useMemo, useState } from 'react'
 import { Radar } from 'react-chartjs-2'
+import './StatsTab.css'
 
 function getMaxValue(stat: string, evType?: string): number | undefined {
   switch (stat) {
@@ -72,14 +73,23 @@ export default function StatsDisplay(props: { mon: PKMInterface }) {
     if (mon.ivs) {
       items.push(createMenuItem('IVs'))
     }
-    if (mon.dvs && !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) {
+    if (
+      mon.dvs &&
+      !isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex)
+    ) {
       items.push(createMenuItem('DVs'))
     }
     items.push(createMenuItem('EVs'))
-    if ('avs' in mon && !isRestricted(LGPE_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) {
+    if (
+      'avs' in mon &&
+      !isRestricted(LGPE_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex)
+    ) {
       items.push(createMenuItem('AVs'))
     }
-    if ('gvs' in mon && !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formeNum)) {
+    if (
+      'gvs' in mon &&
+      !isRestricted(LA_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex)
+    ) {
       items.push(createMenuItem('GVs'))
     }
     if (mon.contest) {
@@ -295,14 +305,15 @@ function labelTextCallback(mon: PKMInterface, display: DisplayType) {
       return label
     }
 
-    const stat = PkmRsStats.fromAbbr(label)
-    if (!stat || !mon.nature) {
+    const stat = StatAbbr.toStat(label)
+    const activeNature = mon.statNature ?? mon.nature
+    if (!stat || !activeNature) {
       return label
     }
 
-    if (mon.nature.stats?.decrease === stat) {
+    if (activeNature.stats?.decrease === stat) {
       return `${label}▼`
-    } else if (mon.nature.stats?.increase === stat) {
+    } else if (activeNature.stats?.increase === stat) {
       return `${label}▲`
     } else {
       return `${label}`

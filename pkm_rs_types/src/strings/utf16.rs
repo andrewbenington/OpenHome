@@ -1,12 +1,40 @@
+use serde::Serialize;
 use std::{fmt::Display, ops::Deref};
 
-use serde::Serialize;
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "randomize")]
+use rand::{
+    RngExt,
+    distr::{Alphanumeric, SampleString},
+};
+
+#[cfg(feature = "wasm")]
+use wasm_bindgen::JsValue;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::convert::*;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::describe::*;
 
 const TERMINATOR: u16 = 0x0000;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SizedUtf16String<const N: usize> {
     raw_le: [u8; N],
+}
+
+impl<const N: usize> SizedUtf16String<N> {
+    pub const fn from_bytes(bytes: [u8; N]) -> Self {
+        SizedUtf16String { raw_le: bytes }
+    }
+
+    pub const fn bytes(&self) -> [u8; N] {
+        self.raw_le
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self[0] == 0 && self[1] == 0
+    }
 }
 
 impl<const N: usize> From<&str> for SizedUtf16String<N> {
@@ -28,10 +56,16 @@ impl<const N: usize> From<String> for SizedUtf16String<N> {
     }
 }
 
+impl<const N: usize> From<&SizedUtf16String<N>> for String {
+    fn from(value: &SizedUtf16String<N>) -> Self {
+        let u16_values = u8_slice_to_u16_le(&value.raw_le);
+        String::from_utf16_lossy(&u16_values)
+    }
+}
+
 impl<const N: usize> Display for SizedUtf16String<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let u16_values = u8_slice_to_u16_le(&self.raw_le);
-        write!(f, "{}", String::from_utf16_lossy(&u16_values))
+        String::from(self).fmt(f)
     }
 }
 
@@ -50,25 +84,46 @@ impl<const N: usize> Serialize for SizedUtf16String<N> {
     }
 }
 
-impl<const N: usize> SizedUtf16String<N> {
-    pub const fn from_bytes(bytes: [u8; N]) -> Self {
-        SizedUtf16String { raw_le: bytes }
-    }
-
-    pub const fn bytes(&self) -> [u8; N] {
-        self.raw_le
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self[0] == 0 && self[1] == 0
-    }
-}
-
 impl<const N: usize> Deref for SizedUtf16String<N> {
     type Target = [u8];
 
     fn deref(&self) -> &[u8] {
         &self.raw_le
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl<const N: usize> Randomize for SizedUtf16String<N> {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        let length: usize = rng.random_range(0..N);
+        let utf8: String = Alphanumeric.sample_string(rng, length);
+        Self::from(utf8)
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl<const N: usize> WasmDescribe for SizedUtf16String<N> {
+    fn describe() {
+        js_sys::JsString::describe()
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl<const N: usize> IntoWasmAbi for SizedUtf16String<N> {
+    type Abi = <js_sys::JsString as IntoWasmAbi>::Abi;
+
+    fn into_abi(self) -> Self::Abi {
+        JsValue::from_str(&self.to_string()).into_abi()
+    }
+}
+
+#[cfg(feature = "wasm")]
+impl<const N: usize> FromWasmAbi for SizedUtf16String<N> {
+    type Abi = <js_sys::JsString as IntoWasmAbi>::Abi;
+
+    unsafe fn from_abi(js: Self::Abi) -> Self {
+        let val = unsafe { JsValue::from_abi(js) };
+        Self::from(val.as_string().unwrap_or_default())
     }
 }
 

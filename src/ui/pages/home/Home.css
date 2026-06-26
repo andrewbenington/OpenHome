@@ -20,13 +20,13 @@
 }
 
 .save-file-column {
-  padding: 8px 4px 8px 8px;
+  padding: var(--padding-radius-sm-lg) 0 var(--padding-radius-sm-lg) var(--padding-radius-sm-lg);
+  gap: var(--padding-radius-sm-lg);
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 280px !important;
-  min-width: 280px;
+  width: 20rem;
 }
 
 .save-file-stack {
@@ -34,23 +34,46 @@
 }
 
 .home-box-column {
-  padding: 8px 12px 8px 4px;
+  padding: var(--padding-radius-sm-lg) 0px;
   display: flex;
   flex-direction: column;
-  justify-content: start;
+  justify-content: center;
   align-items: center;
   flex: 1;
-  min-width: 480px;
-  max-width: 600px;
   margin-left: auto;
+  margin-right: auto;
+  min-width: 45rem;
+  max-width: 45rem;
+  box-sizing: content-box;
+  overflow-y: auto;
 }
 
 .right-column {
-  padding: 8px 8px 8px 4px;
+  padding: var(--padding-radius-sm-lg);
   display: flex;
   flex-direction: column;
-  width: 300px;
-  margin-left: auto;
+  width: 18rem;
+}
+
+.right-column-card {
+  min-height: 50%;
+  max-height: 60%;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.right-column-tabs {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.right-column-tab-list {
+  overflow-x: visible;
+  font-size: var(--font-size-standard);
 }
 
 .release-icon-container {
@@ -63,7 +86,7 @@
   position: relative;
   border: none;
   flex: 1;
-  border-radius: 3px;
+  border-radius: var(--border-radius-lg);
 }
 
 .drop-area-text {
@@ -75,5 +98,6 @@
   align-items: center;
   font-weight: bold;
   cursor: default;
-  height: 26px;
+  height: 1.75rem;
+  border-top-left-radius: var(--border-radius-lg);
 }

@@ -1,19 +1,22 @@
+import { classNames } from '@openhome-ui/util/style'
 import { Badge, Tooltip } from '@radix-ui/themes'
 import { PropsWithChildren } from 'react'
-import { classNames } from 'src/ui/util/style'
 
 export type IndicatorProps = {
   className?: string
   tooltip?: string
   backgroundColor: string
+  style?: React.CSSProperties
 } & PropsWithChildren
 
-export function Indicator({ className, tooltip, backgroundColor, children }: IndicatorProps) {
+export function Indicator(props: IndicatorProps) {
+  const { className, tooltip, backgroundColor, children, style } = props
+
   const badgeElement = (
     <Badge
       className={classNames('indicator', className)}
       size="1"
-      style={{ backgroundColor }}
+      style={{ backgroundColor, ...style }}
       variant="solid"
     >
       {children}

@@ -5,9 +5,44 @@
   margin-right: 8px;
 }
 
+.filter-panel {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
+  height: 100%;
+
+  --icon-size: 18px;
+}
+
 .filter-icon {
   width: 24px;
   height: 24px;
+}
+
+.filter-fields-scroller {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  box-sizing: border-box;
+  flex-shrink: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.clear-filters-button {
+  margin: 8px 8px 0px 8px;
+}
+
+.filter-icon {
+  width: var(--icon-size);
+  height: var(--icon-size);
+}
+
+.color-circle {
+  border-radius: 50%;
+  display: inline-block;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -1,10 +1,11 @@
+import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { range } from '@openhome-core/util/functional'
-import { CSSWithVariables } from '@openhome-core/util/types'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
-import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import useDisplayError from '@openhome-ui/hooks/displayError'
+import FilterPanel from '@openhome-ui/pages/home/display/FilterPanel'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
 import BankHeader from '@openhome-ui/saves/BankHeader'
 import HomeBoxDisplay from '@openhome-ui/saves/boxes/HomeBoxDisplay'
@@ -12,11 +13,9 @@ import OpenSaveDisplay from '@openhome-ui/saves/boxes/SaveBoxDisplay'
 import ItemBag from '@openhome-ui/saves/ItemBag'
 import SavesModal from '@openhome-ui/saves/SavesModal'
 import { useSaves } from '@openhome-ui/state/saves'
-import { Badge, Button, Card, Flex, Tabs } from '@radix-ui/themes'
+import { Button, Card, Flex, Tabs } from '@radix-ui/themes'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
-import FilterPanel from 'src/ui/pages/home/display/FilterPanel'
-import { bytesToPKM } from '../../../core/pkm/FileImport'
 import DisplayPanel from './display/DisplayPanel'
 import './Home.css'
 import ReleaseArea from './ReleaseArea'
@@ -30,9 +29,7 @@ const Home = () => {
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = backend.registerListeners({
-      onOpen: () => setOpenSaveDialog(true),
-    })
+    const stopListening = backend.onMenuEvent('open', () => setOpenSaveDialog(true))
 
     // the "stop listening" function should be called when the effect returns,
     // otherwise duplicate listeners will exist
@@ -51,7 +48,7 @@ const Home = () => {
 
         try {
           if (extension.toUpperCase() === 'OHPKM') {
-            mon = new OHPKM(new Uint8Array(buffer))
+            mon = OHPKM.fromBytes(buffer)
           } else {
             mon = bytesToPKM(new Uint8Array(buffer), extension.toUpperCase())
           }
@@ -68,15 +65,9 @@ const Home = () => {
     [displayError]
   )
 
-  const tabStyle: CSSWithVariables = {
-    '--tab-padding-x': '6px',
-    '--tab-inner-padding-y': '2px',
-    '--tab-height': '32px',
-  }
-
   return (
     <Flex direction="row" style={{ height: '100%' }}>
-      <Flex className="save-file-column" gap="3">
+      <Flex className="save-file-column">
         {range(savesAndBanks.allOpenSaves.length).map((i) => (
           <OpenSaveDisplay key={`save_display_${i}`} saveIndex={i} />
         ))}
@@ -87,34 +78,25 @@ const Home = () => {
       </Flex>
       <div className="home-box-column">
         <BankHeader />
-        <Flex
-          direction="row"
-          width="100%"
-          maxWidth="600px"
-          minWidth="480px"
-          height="0"
-          flexGrow="1"
-        >
+        <Flex direction="row" width="100%" height="0" flexGrow="1">
           <HomeBoxDisplay />
         </Flex>
       </div>
       <Flex gap="2" className="right-column" direction="column">
-        <Card style={{ minHeight: '50%', maxHeight: '60%', padding: 0, contain: 'none' }}>
-          <Tabs.Root style={{ flex: 1, height: '100%' }} defaultValue="filter">
-            <Tabs.List size="2" style={tabStyle}>
+        <Card className="right-column-card">
+          <Tabs.Root className="right-column-tabs" defaultValue="filter">
+            <Tabs.List size="1" className="right-column-tab-list">
               <Tabs.Trigger value="filter">Filter</Tabs.Trigger>
               <Tabs.Trigger value="display">Display</Tabs.Trigger>
-              <Tabs.Trigger value="bag">
-                Item Bag <Badge style={{ marginLeft: 4, marginRight: -4 }}>BETA</Badge>
-              </Tabs.Trigger>
+              <Tabs.Trigger value="bag">Item Bag</Tabs.Trigger>
             </Tabs.List>
-            <Tabs.Content value="filter" style={{ flexGrow: 1 }}>
+            <Tabs.Content value="filter">
               <FilterPanel />
             </Tabs.Content>
             <Tabs.Content value="display" style={{ flexGrow: 1 }}>
               <DisplayPanel />
             </Tabs.Content>
-            <Tabs.Content value="bag" style={{ maxHeight: 'calc(100% - 32px)', overflow: 'auto' }}>
+            <Tabs.Content value="bag" style={{ overflow: 'auto' }}>
               <ItemBag />
             </Tabs.Content>
           </Tabs.Root>
@@ -128,9 +110,11 @@ const Home = () => {
 
         <ReleaseArea />
       </Flex>
-      <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
-      {/* force icons sprite sheet to stay loaded */}
-      <PokemonIcon dexNumber={0} />
+      <PokemonDetailsModal
+        key={selectedMon ? getMonFileIdentifier(selectedMon) : ''}
+        mon={selectedMon}
+        onClose={() => setSelectedMon(undefined)}
+      />
       <SavesModal open={openSaveDialog} onClose={() => setOpenSaveDialog(false)} />
     </Flex>
   )
