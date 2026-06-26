@@ -4,14 +4,6 @@ VERSION=1.12.1
 help: # Display this help.
 	@awk 'BEGIN {FS = ":.*#"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?#/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^#@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-.PHONY: build-mac-arm
-build-mac-arm:
-	@npx tauri build --target aarch64-apple-darwin
-
-.PHONY: build-mac-intel
-build-mac-intel:
-	@npx tauri build --target x86_64-apple-darwin
-
 .PHONY: wasm-compile
 wasm-compile:
 	@pnpm i
@@ -21,14 +13,6 @@ wasm-compile:
 start: ensure-dependencies
 	@pnpm i
 	@pnpm tauri dev
-
-.PHONY: build-appimage
-build-appimage:
-	@npx tauri build -b appimage
-
-.PHONY: bundle-appimage
-bundle-appimage:
-	@npx tauri bundle -b appimage
 
 .PHONY: preview
 preview:
@@ -40,7 +24,11 @@ lint:
 
 .PHONY: clean
 clean:
-	@rm -rf src-tauri/target
+	@cargo clean
+	@rm -rf node_modules
+	@cd generate && rm -rf node_modules && rm -rf .venv && rm -rf __pycache__
+	@cd generate/scrape-assets && rm -rf node_modules && rm -rf .venv && rm -rf __pycache__
+	@cd pkhex-json && dotnet clean
 
 .PHONY: check
 check: wasm-compile
@@ -88,9 +76,32 @@ set-version:
 	@pnpm version $(VERSION) --no-git-tag-version --allow-same-version 
 	@pnpm i
 
+.PHONY: build-appimage
+build-appimage:
+	@npx tauri build -b appimage
+
+.PHONY: bundle-appimage
+bundle-appimage:
+	@npx tauri bundle -b appimage
+
+.PHONY: build-mac-arm
+build-mac-arm:
+	@npx tauri build --target aarch64-apple-darwin
+
+.PHONY: build-mac-intel
+build-mac-intel:
+	@npx tauri build --target x86_64-apple-darwin
+
+.PHONY: release-mac-arm
+release-mac-arm: build-mac-arm
+	@source .env && ./scripts/upload-bin.sh $(shell pwd)/target/aarch64-apple-darwin/release/bundle/dmg OpenHome
+
+.PHONY: release-mac-intel
+release-mac-intel: build-mac-intel
+	@source .env && ./scripts/upload-bin.sh $(shell pwd)/target/x86_64-apple-darwin/release/bundle/dmg OpenHome
+
 .PHONY: release-mac
-release-mac:
-	@source .env && npm run release-mac
+release-mac: release-mac-arm release-mac-intel
 
 generate/out/generate.js: generate/generate.ts generate/syncPKHexResources.ts generate/enums.ts generate/parseFunctions/*
 	@echo "compiling generate/*.ts..."
@@ -124,12 +135,6 @@ test-pkhex-json:
 generate/out/syncPKHexResources.js: generate/syncPKHexResources.ts
 	@echo "compiling generate/syncPKHexResources.ts..."
 	@cd generate && tsc
-
-.PHONY: sync-resources
-sync-resources: generate/out
-	@echo "syncing PKHex resources..."
-	@node ./generate/out/syncPKHexResources.js
-	@echo "syncing finished"
 
 .PHONY: download-item-sprites
 download-item-sprites:
