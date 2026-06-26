@@ -1,10 +1,10 @@
+import { BackendContext } from '@openhome-core/backend/backendContext'
 import { StoredBankData } from '@openhome-core/save/util/storage'
 import { R } from '@openhome-core/util/functional'
+import { ErrorIcon } from '@openhome-ui/components/Icons'
+import LoadingIndicator from '@openhome-ui/components/LoadingIndicator'
 import { Callout } from '@radix-ui/themes'
 import { PropsWithChildren, useCallback, useContext, useState } from 'react'
-import { BackendContext } from '../../backend/backendContext'
-import { ErrorIcon } from '../../components/Icons'
-import LoadingIndicator from '../../components/LoadingIndicator'
 import { BanksAndBoxesStoreContext, createBanksAndBoxesStore } from './store'
 
 type InnerProviderProps = {

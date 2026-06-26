@@ -1,4 +1,4 @@
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { BackendContext } from '@openhome-core/backend/backendContext'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin/reducer'

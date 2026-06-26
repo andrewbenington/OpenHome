@@ -1,5 +1,5 @@
-import { ETERNAL_FLOWER, LGE_STARTER, SPIKY_EAR } from '@openhome-core/resources//consts/Forms'
-import { NationalDex } from '@openhome-core/resources//consts/NationalDex'
+import { ETERNAL_FLOWER, LGE_STARTER, SPIKY_EAR } from '@openhome-core/resources/consts/Forms'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { R, Result } from '@openhome-core/util/functional'
