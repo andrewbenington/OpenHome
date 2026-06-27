@@ -17,8 +17,8 @@ pub fn get_state(state: tauri::State<'_, AppState>) -> Result<AppStateInner> {
 }
 
 #[tauri::command]
-pub fn get_file_bytes(absolute_path: PathBuf) -> Result<Vec<u8>> {
-    util::read_file_bytes(absolute_path)
+pub fn get_file_bytes(absolute_path: PathBuf) -> Result<tauri::ipc::Response> {
+    util::read_file_bytes(absolute_path).map(tauri::ipc::Response::new)
 }
 
 #[tauri::command]
