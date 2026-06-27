@@ -46,8 +46,8 @@ impl NatureIndex {
         }
     }
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "newFromPid"))]
-    pub fn new_from_pid(val: u32) -> NatureIndex {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "newFromModulo"))]
+    pub fn new_from_modulo(val: u32) -> NatureIndex {
         Self((val % (NATURE_COUNT as u32)) as u8)
     }
 

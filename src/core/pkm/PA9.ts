@@ -231,7 +231,7 @@ export default class PA9 {
       }
       this.personalityValue = other.personalityValue ?? 0
       this.nature = other.nature
-      this.statNature = other.statNature ?? NatureIndex.newFromPid(this.personalityValue)
+      this.statNature = other.statNature ?? NatureIndex.newFromModulo(this.personalityValue)
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
       this.gender = other.gender ?? 0
       this.isAlpha = other.isAlpha ?? false

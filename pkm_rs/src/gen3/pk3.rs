@@ -245,7 +245,7 @@ impl Pk3 {
     }
 
     pub fn nature(&self) -> NatureIndex {
-        NatureIndex::new_from_pid(self.personality_value)
+        NatureIndex::new_from_modulo(self.personality_value)
     }
 
     pub fn species_and_form(&self) -> SpeciesAndForm {
