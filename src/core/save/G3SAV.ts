@@ -371,7 +371,8 @@ export class G3SAV extends OfficialSAV<PK3> {
         return true
       }
       return save.primarySave.securityKey > 0 && save.primarySave.signature === GEN3_SIGNATURE
-    } catch {
+    } catch (e) {
+      console.error(e)
       return false
     }
   }
