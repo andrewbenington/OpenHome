@@ -237,7 +237,7 @@ export default class COLOPKM {
   }
 
   public get nature() {
-    return NatureIndex.newFromPid(this.personalityValue)
+    return NatureIndex.newFromModulo(this.personalityValue)
   }
 
   public get abilityNum() {
