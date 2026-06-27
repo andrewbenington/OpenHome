@@ -15,7 +15,7 @@ export const buildUnknownSaveFile = (
   filePath: PathData,
   fileBytes: Uint8Array,
   supportedSaveTypes: SAVClass[]
-): Errorable<SAV | undefined> => {
+): Errorable<SAV> => {
   const saveTypes = getPossibleSaveTypes(fileBytes, supportedSaveTypes)
 
   if (saveTypes.length > 1) {
@@ -23,12 +23,13 @@ export const buildUnknownSaveFile = (
       'Could not distinguish between multiple possible save types: ' +
         saveTypes.map((st) => st.saveTypeName).join(', ')
     )
-  } else if (saveTypes.length === 0) {
-    return R.Err('Could not detect save type')
   }
-  const saveType = saveTypes[0]
 
-  if (!saveType) return R.Ok(undefined)
+  const saveType = saveTypes.at(0)
+
+  if (!saveType) {
+    return R.Err(`Could not detect save type: ${filePath.raw}`)
+  }
 
   return buildSaveFile(filePath, fileBytes, saveType)
 }
@@ -37,7 +38,7 @@ export const buildSaveFile = (
   filePath: PathData,
   fileBytes: Uint8Array,
   saveType: SAVClass
-): Errorable<SAV | undefined> => {
+): Errorable<SAV> => {
   try {
     const saveFile = new saveType(filePath, fileBytes)
     return R.Ok(saveFile)

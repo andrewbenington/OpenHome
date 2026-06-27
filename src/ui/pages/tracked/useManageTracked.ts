@@ -101,9 +101,6 @@ export function useManageTracked() {
         if (R.isErr(saveFile)) {
           console.error(`could not build save file ${savePath.raw}: ${saveFile.err}`)
           continue
-        } else if (!saveFile.value) {
-          console.error(`could not build save file ${savePath.raw}: result is undefined`)
-          continue
         }
 
         let searchResult: Option<SaveSearchResult>
@@ -191,8 +188,6 @@ export function useManageTracked() {
 
       if (R.isErr(result)) {
         console.error(`could not build save file ${savePath.raw}: ${result.err}`)
-        continue
-      } else if (!result.value) {
         continue
       }
 

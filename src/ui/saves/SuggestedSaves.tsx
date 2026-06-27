@@ -50,23 +50,13 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     backend.findSuggestedSaves().then(
       R.match(
         async (possibleSaves) => {
-          console.debug(possibleSaves)
-          const allPaths = (possibleSaves?.citra ?? [])
-            .concat(possibleSaves?.open_emu ?? [])
-            .concat(possibleSaves?.desmume ?? [])
+          const allPaths = (possibleSaves.citra ?? [])
+            .concat(possibleSaves.open_emu ?? [])
+            .concat(possibleSaves.desmume ?? [])
 
           if (allPaths.length > 0) {
             const saveSuggestions: SaveSuggestion[] = allPaths.map((filePath) => {
-              const loadingSave = loadSaveData(filePath)
-                .then((loadSaveResult) =>
-                  loadSaveResult ? loadSaveResult : R.Err('Failed to build save file')
-                )
-                .then(
-                  R.flatMap((saveFile) =>
-                    saveFile ? R.Ok(saveFile) : R.Err('Failed to build save file')
-                  )
-                )
-              return { loadingSave, filePath }
+              return { loadingSave: loadSaveData(filePath), filePath }
             })
 
             setSuggestedSaves(saveSuggestions)
