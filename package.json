@@ -61,6 +61,7 @@
     "@tauri-apps/plugin-dialog": "^2.7.1",
     "@tauri-apps/plugin-fs": "^2.5.1",
     "@tauri-apps/plugin-os": "^2.3.2",
+    "@tauri-apps/plugin-window-state": "~2.4.1",
     "chart.js": "^4.5.1",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.21",
