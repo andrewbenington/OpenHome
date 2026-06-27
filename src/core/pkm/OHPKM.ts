@@ -1,10 +1,21 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { isWasmFormat, WasmPkmFormat } from '@openhome-core/pkm/PKM'
+import { Gen34ContestRibbons, Gen34TowerRibbons } from '@openhome-core/resources'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import { getHeightCalculated, getWeightCalculated } from '@openhome-core/util'
 import { intersection, Option, unique } from '@openhome-core/util/functional'
+import {
+  FourMoves,
+  MarkingShape,
+  markingsHaveColor,
+  markingsSixShapesWithColorFromOther,
+  PKMDate,
+  Stats,
+} from '@openhome-core/util/types'
 import {
   AbilityIndex,
   AbilityNumber,
   Ball,
-  ExtraFormIndex,
   Gender,
   generatePk3CompatiblePid,
   Item,
@@ -12,6 +23,8 @@ import {
   Lookup,
   MetadataSummaryLookup,
   NatureIndex,
+  OriginGames,
+  PkmFormat,
   PokeDate,
   ShinyLeaves,
   SpeciesAndForm,
@@ -21,25 +34,10 @@ import {
   TrainerMemory,
   updatePidIfWouldBecomeShinyGen345,
 } from '@pkm-rs/pkg'
-import { PK3, PK7 } from '@pokemon-files/pkm'
-import {
-  AllPKMFields,
-  FourMoves,
-  getHeightCalculated,
-  getStandardPKMStats,
-  getWeightCalculated,
-  MarkingShape,
-  markingsHaveColor,
-  Stats,
-} from '@pokemon-files/util'
-import * as jsTypes from '@pokemon-files/util/types'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { Gen34ContestRibbons, Gen34TowerRibbons } from '@pokemon-resources/index'
 import dayjs, { Dayjs } from 'dayjs'
 import Prando from 'prando'
 import { OhpkmV2 as OhpkmV2Wasm } from '../../../pkm_rs/pkg'
 import { PluginIdentifier, SAV } from '../save/interfaces'
-import { convertPokeDate, convertPokeDateOptional } from './convert'
 import { isEvolution } from './Lookup'
 import {
   adjustMovePPBetweenFormats,
@@ -48,6 +46,9 @@ import {
   getPrevos,
   ivsFromDVs,
 } from './util'
+import { AllPKMFields } from './util/pkmInterface'
+import { getStandardPKMStats } from './util/statCalc'
+import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
 export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   static getFormat() {
@@ -95,7 +96,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
 
-      this.SpeciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
+      this.speciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
       this.extraFormIndex = other.extraFormIndex
 
       if (other.personalityValue === undefined) {
@@ -141,13 +142,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
             ? this.metadata?.genderFromAtkDv(other.dvs.atk)
             : this.metadata?.genderFromPid(this.personalityValue)) ??
           Gender.Genderless
+        this.nature = other.nature ?? NatureIndex.newFromModulo(other.exp)
       } else {
         this.abilityNum = other.abilityNum ?? 0
         this.gender =
           other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
+        this.nature = other.nature ?? NatureIndex.newFromModulo(this.personalityValue)
       }
-
-      this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
 
       this.ivs = other.ivs ?? (other.dvs !== undefined ? ivsFromDVs(other.dvs) : generateIVs(prng))
 
@@ -160,7 +161,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       }
 
       this.ball = other.ball !== undefined ? other.ball : Ball.Poke
-      this.markings = jsTypes.markingsSixShapesWithColorFromOther(other.markings)
+      this.markings = markingsSixShapesWithColorFromOther(other.markings)
 
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.metLevel = other.metLevel ?? 0
@@ -278,7 +279,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.handlerLanguage = other.handlerLanguage ?? 0
       this.statNature = other.statNature !== undefined ? other.statNature : this.nature
       this.affixedRibbon = other.affixedRibbon
-      this.homeTracker = other.homeTracker ?? new Uint8Array(8)
+      this.homeTracker = other.homeTracker ?? undefined
 
       if (other.obedienceLevel !== undefined) {
         this.obedienceLevel = other.obedienceLevel
@@ -322,7 +323,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.tmFlagsSV = other.tmFlagsSV
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
 
-      if (other.originalBytes) {
+      if (other.originalBytes && other.format !== 'OHPKM') {
         const tag = monFormatToOriginalDataTag(other.format)
         if (tag) {
           try {
@@ -336,9 +337,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
           )
         }
       }
-    }
-    if (this.openhomeId === '0004-d889ca57-401aab08-30') {
-      this.extraFormIndex = ExtraFormIndex.CharizardClone
     }
   }
 
@@ -356,8 +354,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   static fromMonUnknownSave(mon: PKMInterface): OHPKM {
-    const ohpkm =
-      mon instanceof PK3 || mon instanceof PK7 ? OHPKM.fromWasmImpl(mon) : new OHPKM(mon)
+    const ohpkm = isWasmFormat(mon) ? OHPKM.fromWasmImpl(mon) : new OHPKM(mon)
 
     return ohpkm
   }
@@ -367,14 +364,14 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return OHPKM.fromBytes(bytes.buffer)
   }
 
-  private static fromWasmImpl(mon: PK3 | PK7): OHPKM {
+  private static fromWasmImpl(mon: WasmPkmFormat): OHPKM {
     return new OHPKM(mon.inner.toOhpkm().toByteArray())
   }
 
   // getters / setters
 
   get dexNum() {
-    return this.SpeciesAndForm.nationalDex
+    return this.speciesAndForm.nationalDex
   }
 
   get ability() {
@@ -385,7 +382,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   get formNum() {
-    return this.SpeciesAndForm.formIndex
+    return this.speciesAndForm.formIndex
   }
 
   get moves() {
@@ -427,7 +424,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   get eggDate() {
     return convertPokeDateOptional(this.eggDateWasm)
   }
-  set eggDate(value: jsTypes.PKMDate | undefined) {
+  set eggDate(value: PKMDate | undefined) {
     if (value) {
       this.eggDateWasm = new PokeDate(value.year, value.month, value.day)
     } else {
@@ -438,7 +435,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   get metDate() {
     return convertPokeDate(this.metDateWasm)
   }
-  set metDate(value: jsTypes.PKMDate) {
+  set metDate(value: PKMDate) {
     this.metDateWasm = new PokeDate(value.year, value.month, value.day)
   }
 
@@ -506,13 +503,17 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return this.isSquareShinyWasm()
   }
 
+  public clone() {
+    return new OHPKM(this.toByteArray())
+  }
+
   public updateTrainerData(
     save: SAV,
     friendship: number,
     affection: number,
     memory?: TrainerMemory
-  ) {
-    this.registerHandler(
+  ): boolean {
+    return this.registerHandler(
       new TrainerData(
         save.tid,
         save.sid ?? 0,
@@ -540,6 +541,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.tradeToSaveWasm(save.origin)
 
     const isOriginalSave = this.isFrom(save)
+    console.debug(
+      { isOriginalSave, ohpkm_id: this.openhomeId, event: 'trade_to_save' },
+      'Traded Pokémon to save file'
+    )
     this.isCurrentHandler = !isOriginalSave
     if (isOriginalSave) {
       this.handlerName = ''
@@ -557,12 +562,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     const existingTrainerData = this.findKnownHandler(save.tid, save.sid ?? 0, save.origin)
 
     if (existingTrainerData) {
-      this.handlerAffection = existingTrainerData.affection
-      this.handlerFriendship = existingTrainerData.friendship
-      this.handlerMemory = existingTrainerData.memory
-      this.handlerId = existingTrainerData.id ?? 0
-      this.handlerLanguage = existingTrainerData.language ?? 0
-      this.handlerGender = existingTrainerData.gender === Gender.Female
+      this.updateTrainerData(
+        save,
+        existingTrainerData.friendship,
+        existingTrainerData.affection,
+        existingTrainerData.memory
+      )
     } else {
       this.handlerFriendship = 70 // TODO: PER-FORM BASE FRIENDSHIP
       this.updateTrainerData(save, 70, 0)
@@ -592,27 +597,41 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   public get speciesMetadata() {
     return SpeciesLookup(this.dexNum)
   }
-
   public syncWithGameData(other: PKMInterface, save?: SAV) {
-    console.debug(
-      { event: 'sync_with_game_data', ohpkm_id: this.openhomeId },
-      `syncing ${this.nickname} with game data`
-    )
+    const updates: SyncUpdate[] = []
 
-    this.exp = other.exp
+    if (other.exp !== this.exp) {
+      updates.push(syncUpdate('experience', this.exp, other.exp))
+      this.exp = other.exp
+    }
 
-    this.moves = other.moves
-    this.movePP = adjustMovePPBetweenFormats(this, other)
-    this.movePPUps = other.movePPUps
+    if (!arraysEqual(this.moves, other.moves)) {
+      updates.push(syncUpdate('moves', this.moves, other.moves))
+      this.moves = other.moves
+    }
+    if (!arraysEqual(this.movePP, other.movePP)) {
+      updates.push(syncUpdate('move PP', this.movePP, other.movePP))
+      this.movePP = adjustMovePPBetweenFormats(this, other)
+    }
+    if (!arraysEqual(this.movePPUps, other.movePPUps)) {
+      updates.push(syncUpdate('move PP ups', this.movePPUps, other.movePPUps))
+      this.movePPUps = other.movePPUps
+    }
 
-    if (this.dexNum !== other.dexNum && isEvolution(this, other)) {
-      this.SpeciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
+    const hasEvolved = this.dexNum !== other.dexNum && isEvolution(this, other)
+    const changedForm =
+      this.dexNum === other.dexNum &&
+      (this.formNum !== other.formNum || this.extraFormIndex !== other.extraFormIndex)
+
+    if (hasEvolved || changedForm) {
+      this.speciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
       this.extraFormIndex = other.extraFormIndex
     }
 
-    if (this.dexNum === other.dexNum || isEvolution(this, other)) {
-      this.SpeciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
-      this.extraFormIndex = other.extraFormIndex
+    if (hasEvolved) {
+      updates.push(syncUpdateMessage(`${this.nickname} evolved!`, this.movePPUps, other.movePPUps))
+    } else if (changedForm) {
+      updates.push(syncUpdate(`${this.nickname} changed form!`, this.movePPUps, other.movePPUps))
     }
 
     // Don't update nickname if the only difference is that it's a truncated version of the original
@@ -621,6 +640,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       other.nickname !== this.nickname.slice(0, 10) &&
       !isPrevoOrCurrentSpeciesName(this.dexNum, this.formNum, other.nickname, this.language)
     ) {
+      updates.push(syncUpdate('nickname', this.nickname, other.nickname))
       this.nickname = other.nickname
     }
 
@@ -628,8 +648,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.nickname = Lookup.speciesName(this.dexNum, this.language)
     }
 
-    this.heldItemIndex = other.heldItemIndex
+    if (this.heldItemIndex !== other.heldItemIndex) {
+      updates.push(syncUpdate('held item', this.heldItemIndex, other.heldItemIndex))
+      this.heldItemIndex = other.heldItemIndex
+    }
+
     if (
+      other.format !== 'OHPKM' && // for type checking
       FORMATS_ALLOWING_ABILITY_CHANGE.includes(other.format) &&
       other.ability &&
       !FORMATS_WITHOUT_ABILITIES.includes(other.format)
@@ -641,36 +666,54 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         this.ability?.index !== this.metadata?.hiddenAbility?.index ||
         !FORMATS_WITHOUT_HIDDEN_ABILITIES.includes(other.format)
       ) {
-        this.ability = other.ability
-        if (other.abilityNum) {
+        if (this.ability?.index !== other.ability.index) {
+          updates.push(syncUpdate('ability', this.ability.index, other.ability.index))
+          this.ability = other.ability
+        }
+        if (other.abilityNum && this.abilityNum !== other.abilityNum) {
+          updates.push(syncUpdate('ability number', this.abilityNum, other.abilityNum))
           this.abilityNum = other.abilityNum
         }
       }
     }
 
-    if (other.avs) {
+    if (other.avs && !deepEqual(this.avs, other.avs)) {
+      updates.push(syncUpdate('AVs', this.avs, other.avs))
       this.avs = other.avs
     }
-    if (other.evs) {
+
+    if (other.evs && !deepEqual(this.evs, other.evs)) {
+      updates.push(syncUpdate('EVs', this.evs, other.evs))
       this.evs = other.evs
     }
-    if (other.evsG12) {
+    if (other.evsG12 && !deepEqual(this.evsG12, other.evsG12)) {
+      updates.push(syncUpdate('EVs (gen 1-2)', this.evsG12, other.evsG12))
       this.evsG12 = other.evsG12
     }
-    if (other.hyperTraining) {
+    if (other.hyperTraining && !deepEqual(this.hyperTraining, other.hyperTraining)) {
+      updates.push(syncUpdate('hyper training', this.hyperTraining, other.hyperTraining))
       this.hyperTraining = other.hyperTraining
     }
 
+    const prevRibbons = this.ribbons
     this.ribbons = unique([...this.ribbons, ...(other.ribbons ?? [])])
-    if (other.contest) {
+    if (!arraysEqual(prevRibbons, this.ribbons)) {
+      updates.push(syncUpdate('ribbons', prevRibbons, this.ribbons))
+    }
+
+    if (other.contest && !deepEqual(this.contest, other.contest)) {
+      updates.push(syncUpdate('contest stats', this.contest, other.contest))
       this.contest = other.contest
     }
 
     const otherMarkings = other.markings
-
     if (otherMarkings && markingsHaveColor(otherMarkings)) {
-      this.markings = otherMarkings
+      if (!deepEqual(this.markings, otherMarkings)) {
+        updates.push(syncUpdate('markings', this.markings, otherMarkings))
+        this.markings = otherMarkings
+      }
     } else if (otherMarkings) {
+      const prevMarkings = { ...this.markings }
       for (const [markingType, markingVal] of Object.entries(otherMarkings)) {
         if (markingVal && this.markings[markingType as MarkingShape] === null) {
           this.markings[markingType as MarkingShape] = 'blue'
@@ -678,17 +721,19 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
           this.markings[markingType as MarkingShape] = 'unset'
         }
       }
+      if (!deepEqual(prevMarkings, this.markings)) {
+        updates.push(syncUpdate('markings', prevMarkings, this.markings))
+      }
     }
 
     // memory ribbons need to be updated if new ribbons were earned to add to the count
     const contestRibbons = intersection(this.ribbons, Gen34ContestRibbons)
-
     this.contestMemoryCount = Math.max(contestRibbons.length, this.contestMemoryCount)
     const battleRibbons = intersection(this.ribbons, Gen34TowerRibbons)
-
     this.battleMemoryCount = Math.max(battleRibbons.length, this.battleMemoryCount)
 
-    if (other.pokerusByte) {
+    if (other.pokerusByte && this.pokerusByte !== other.pokerusByte) {
+      updates.push(syncUpdate('pokerusByte', this.pokerusByte, other.pokerusByte))
       this.pokerusByte = other.pokerusByte
     }
 
@@ -696,102 +741,193 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.setRecentSave(save)
     }
 
-    const shouldUpdateOriginalTrainer = save
+    const saveIsOriginalGame = save
       ? save.tid === this.trainerID && (!save.sid || save.sid === this.secretID)
       : true
 
-    if (shouldUpdateOriginalTrainer) {
+    if (saveIsOriginalGame) {
       // The updated data is from this mon's game/trainer, so the OT fields will be updated
-      if (other.trainerFriendship) {
+      if (other.trainerFriendship && this.trainerFriendship !== other.trainerFriendship) {
+        updates.push(
+          syncUpdate('trainerFriendship', this.trainerFriendship, other.trainerFriendship)
+        )
         this.trainerFriendship = other.trainerFriendship
       }
-      if (other.trainerMemory) {
+
+      if (other.trainerMemory && !deepEqual(this.trainerMemory, other.trainerMemory)) {
+        updates.push(syncUpdate('trainerMemory', this.trainerMemory, other.trainerMemory))
         this.trainerMemory = other.trainerMemory
       }
-      if (other.trainerAffection) {
+
+      if (other.trainerAffection && this.trainerAffection !== other.trainerAffection) {
+        updates.push(syncUpdate('trainerAffection', this.trainerAffection, other.trainerAffection))
         this.trainerAffection = other.trainerAffection
       }
     } else if (save) {
       // The updated data is not the original game/trainer, so the appropriate data is stored in "handler" fields
-      this.updateTrainerData(
-        save,
-        other.handlerFriendship ?? 70, // TODO: USE BASE FRIENDSHIP
-        other.handlerAffection ?? 0,
-        other.handlerMemory
-      )
+      if (
+        this.updateTrainerData(
+          save,
+          other.handlerFriendship ?? 70,
+          other.handlerAffection ?? 0,
+          other.handlerMemory
+        )
+      ) {
+        updates.push(
+          syncUpdateMessage(
+            `Handler data updated for ${save.name} in ${OriginGames.gameNameFull(save.origin)}`,
+            this.handlerId,
+            save.tid
+          )
+        )
+      }
     }
 
-    if (other.shinyLeaves) {
+    if (other.shinyLeaves && !deepEqual(this.shinyLeaves, other.shinyLeaves)) {
+      updates.push(syncUpdate('shinyLeaves', this.shinyLeaves, other.shinyLeaves))
       this.shinyLeaves = other.shinyLeaves.clone()
     }
-    if (other.performance) {
+    if (other.performance && this.performance !== other.performance) {
+      updates.push(syncUpdate('performance', this.performance, other.performance))
       this.performance = other.performance
     }
 
-    if (other.pokeStarFame) {
+    if (other.pokeStarFame && this.pokeStarFame !== other.pokeStarFame) {
+      updates.push(syncUpdate('pokeStarFame', this.pokeStarFame, other.pokeStarFame))
       this.pokeStarFame = other.pokeStarFame
     }
 
-    if (other.superTrainingFlags) {
+    if (other.superTrainingFlags && this.superTrainingFlags !== other.superTrainingFlags) {
+      updates.push(
+        syncUpdate('superTrainingFlags', this.superTrainingFlags, other.superTrainingFlags)
+      )
       this.superTrainingFlags = other.superTrainingFlags
     }
-    if (other.superTrainingDistFlags) {
+
+    if (
+      other.superTrainingDistFlags &&
+      this.superTrainingDistFlags !== other.superTrainingDistFlags
+    ) {
+      updates.push(
+        syncUpdate(
+          'superTrainingDistFlags',
+          this.superTrainingDistFlags,
+          other.superTrainingDistFlags
+        )
+      )
       this.superTrainingDistFlags = other.superTrainingDistFlags
     }
-    if (other.secretSuperTrainingUnlocked) {
+
+    if (
+      other.secretSuperTrainingUnlocked &&
+      this.secretSuperTrainingUnlocked !== other.secretSuperTrainingUnlocked
+    ) {
+      updates.push(
+        syncUpdate(
+          'secretSuperTrainingUnlocked',
+          this.secretSuperTrainingUnlocked,
+          other.secretSuperTrainingUnlocked
+        )
+      )
       this.secretSuperTrainingUnlocked = other.secretSuperTrainingUnlocked
     }
-    if (other.secretSuperTrainingComplete) {
+
+    if (
+      other.secretSuperTrainingComplete &&
+      this.secretSuperTrainingComplete !== other.secretSuperTrainingComplete
+    ) {
+      updates.push(
+        syncUpdate(
+          'secretSuperTrainingComplete',
+          this.secretSuperTrainingComplete,
+          other.secretSuperTrainingComplete
+        )
+      )
       this.secretSuperTrainingComplete = other.secretSuperTrainingComplete
     }
-    if (other.trainingBagHits) {
+
+    if (other.trainingBagHits && this.trainingBagHits !== other.trainingBagHits) {
+      updates.push(syncUpdate('trainingBagHits', this.trainingBagHits, other.trainingBagHits))
       this.trainingBagHits = other.trainingBagHits
     }
-    if (other.trainingBag) {
+
+    if (other.trainingBag && this.trainingBag !== other.trainingBag) {
+      updates.push(syncUpdate('trainingBag', this.trainingBag, other.trainingBag))
       this.trainingBag = other.trainingBag
     }
 
-    if (other.country) {
+    if (other.country && this.country !== other.country) {
+      updates.push(syncUpdate('country', this.country, other.country))
       this.country = other.country
     }
-    if (other.region) {
+
+    if (other.region && this.region !== other.region) {
+      updates.push(syncUpdate('region', this.region, other.region))
       this.region = other.region
     }
-    if (other.consoleRegion) {
+
+    if (other.consoleRegion && this.consoleRegion !== other.consoleRegion) {
+      updates.push(syncUpdate('consoleRegion', this.consoleRegion, other.consoleRegion))
       this.consoleRegion = other.consoleRegion
     }
-    if (other.formArgument) {
+
+    if (other.formArgument && this.formArgument !== other.formArgument) {
+      updates.push(syncUpdate('formArgument', this.formArgument, other.formArgument))
       this.formArgument = other.formArgument
     }
-    if (other.geolocations) {
+
+    if (other.geolocations && !deepEqual(this.geolocations, other.geolocations)) {
+      updates.push(syncUpdate('geolocations', this.geolocations, other.geolocations))
       this.geolocations = other.geolocations
     }
 
-    if (other.statNature !== undefined) {
+    if (other.statNature !== undefined && this.statNature.index !== other.statNature.index) {
+      updates.push(syncUpdate('statNature', this.statNature.index, other.statNature.index))
       this.statNature = other.statNature
     }
-    if (other.gameOfOriginBattle !== undefined) {
-      this.gameOfOriginBattle = other.gameOfOriginBattle
+
+    const otherGameOfOriginBattle = other.gameOfOriginBattle || undefined
+    if (
+      other.gameOfOriginBattle !== undefined &&
+      this.gameOfOriginBattle !== otherGameOfOriginBattle
+    ) {
+      updates.push(
+        syncUpdate('gameOfOriginBattle', this.gameOfOriginBattle, otherGameOfOriginBattle)
+      )
+      this.gameOfOriginBattle = otherGameOfOriginBattle
     }
 
-    if (other.teraTypeOverride !== undefined) {
+    if (other.teraTypeOverride !== undefined && this.teraTypeOverride !== other.teraTypeOverride) {
+      updates.push(syncUpdate('teraTypeOverride', this.teraTypeOverride, other.teraTypeOverride))
       this.teraTypeOverride = other.teraTypeOverride
     }
-    if (other.trFlagsSwSh !== undefined) {
+
+    if (other.trFlagsSwSh !== undefined && !arraysEqual(this.trFlagsSwSh, other.trFlagsSwSh)) {
+      updates.push(syncUpdate('trFlagsSwSh', this.trFlagsSwSh, other.trFlagsSwSh))
       this.trFlagsSwSh = other.trFlagsSwSh
     }
-    if (other.tmFlagsBDSP !== undefined) {
+
+    if (other.tmFlagsBDSP !== undefined && !arraysEqual(this.tmFlagsBDSP, other.tmFlagsBDSP)) {
+      updates.push(syncUpdate('tmFlagsBDSP', this.tmFlagsBDSP, other.tmFlagsBDSP))
       this.tmFlagsBDSP = other.tmFlagsBDSP
     }
-    if (other.tmFlagsSV !== undefined) {
+
+    if (other.tmFlagsSV !== undefined && !arraysEqual(this.tmFlagsSV, other.tmFlagsSV)) {
+      updates.push(syncUpdate('tmFlagsSV', this.tmFlagsSV, other.tmFlagsSV))
       this.tmFlagsSV = other.tmFlagsSV
     }
-    if (other.tmFlagsSVDLC !== undefined) {
+
+    if (other.tmFlagsSVDLC !== undefined && !arraysEqual(this.tmFlagsSVDLC, other.tmFlagsSVDLC)) {
+      updates.push(syncUpdate('tmFlagsSVDLC', this.tmFlagsSVDLC, other.tmFlagsSVDLC))
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
     }
-    if (other.obedienceLevel !== undefined) {
+
+    if (other.obedienceLevel !== undefined && this.obedienceLevel !== other.obedienceLevel) {
+      updates.push(syncUpdate('obedienceLevel', this.obedienceLevel, other.obedienceLevel))
       this.obedienceLevel = other.obedienceLevel
     }
+
+    return updates
   }
 
   abilityNumFromPidGen34(): AbilityNumber {
@@ -807,7 +943,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 }
 
-export function monFormatToOriginalDataTag(format: string): Option<Tag> {
+function monFormatToOriginalDataTag(format: PkmFormat): Option<Tag> {
   switch (format) {
     case 'PK1':
       return Tag.Pk1
@@ -841,10 +977,19 @@ export function monFormatToOriginalDataTag(format: string): Option<Tag> {
       return Tag.Pk3Ub
     case 'PB8LUMI':
       return Tag.Pb8Lumi
+    case 'PK9Compass':
+      return Tag.Pk9Compass
+    case 'COLOPKM':
+    case 'XDPKM':
+      return undefined
+    default:
+      // use type system to enforce exhaustiveness
+      const _exhaustiveCheck: never = format
+      throw Error(`unrecognized format: ${format}`)
   }
 }
 
-export function originalDataTagToMonFormat(tag: Tag): string {
+export function originalDataTagToMonFormat(tag: Tag): PkmFormat {
   switch (tag) {
     case Tag.Pk1:
       return 'PK1'
@@ -878,12 +1023,20 @@ export function originalDataTagToMonFormat(tag: Tag): string {
       return 'PK3RR'
     case Tag.Pk3Ub:
       return 'PK3UB'
+    case Tag.Pk3Ub:
+      return 'PK3UB'
+    case Tag.Pk9Compass:
+      return 'PK9Compass'
+    default:
+      // use type system to enforce exhaustiveness
+      const _exhaustiveCheck: never = tag
+      throw Error(`unrecognized tag: ${tag}`)
   }
 }
 
-const FORMATS_WITHOUT_ABILITIES = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
+const FORMATS_WITHOUT_ABILITIES: PkmFormat[] = ['PK1', 'PK2', 'PB7', 'PA8', 'PA9']
 
-const FORMATS_ALLOWING_ABILITY_CHANGE = [
+const FORMATS_ALLOWING_ABILITY_CHANGE: PkmFormat[] = [
   'PK3RR',
   'PK3UB',
   'PK6',
@@ -894,9 +1047,10 @@ const FORMATS_ALLOWING_ABILITY_CHANGE = [
   'PK9',
   'PA9',
   'PB8LUMI',
+  'PK9Compass',
 ]
 
-const FORMATS_WITHOUT_HIDDEN_ABILITIES = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
+const FORMATS_WITHOUT_HIDDEN_ABILITIES: PkmFormat[] = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
 
 function isPrevoOrCurrentSpeciesName(
   dexNum: number,
@@ -913,4 +1067,98 @@ function isPrevoOrCurrentSpeciesName(
     }
   }
   return false
+}
+
+type UpdatableType = string | number | bigint | object | boolean
+
+type SyncUpdate = {
+  field?: string
+  message?: string
+  prevValue?: UpdatableType
+  newValue?: UpdatableType
+}
+
+function syncUpdate(
+  field: string,
+  prevValue?: UpdatableType,
+  newValue?: UpdatableType
+): SyncUpdate {
+  return {
+    field,
+    prevValue,
+    newValue,
+  }
+}
+
+function syncUpdateMessage(
+  message: string,
+  prevValue?: UpdatableType,
+  newValue?: UpdatableType
+): SyncUpdate {
+  return {
+    message,
+    prevValue,
+    newValue,
+  }
+}
+
+function arraysEqual<T>(first?: T[] | Uint8Array, second?: T[] | Uint8Array): boolean {
+  if (first === undefined || second === undefined) {
+    return first === second
+  }
+  return (
+    first.length === second.length &&
+    first.every((item, i) => {
+      if (isObject(item) && isObject(second[i])) {
+        return deepEqual(item, second[i])
+      } else {
+        return item === second[i]
+      }
+    })
+  )
+}
+
+function deepEqual(first?: object, second?: object): boolean {
+  if (first === undefined || second === undefined) {
+    return first === second
+  }
+
+  if (Array.isArray(first) && Array.isArray(second)) {
+    return arraysEqual(first, second)
+  }
+
+  if (isObject(first) && isObject(second)) {
+    return objectsEqual(first, second)
+  }
+
+  return first === second
+}
+
+type IndexableObject = object & Record<string, any>
+
+function objectsEqual(object1: IndexableObject, object2: IndexableObject) {
+  if (object1 === null || object2 === null) {
+    return object1 === object2
+  }
+
+  const objKeys1 = Object.keys(object1)
+  const objKeys2 = Object.keys(object2)
+
+  if (objKeys1.length !== objKeys2.length) return false
+
+  for (const key of objKeys1) {
+    const value1 = object1[key]
+    const value2 = object2[key]
+
+    const isObjects = isObject(value1) && isObject(value2)
+
+    if ((isObjects && !deepEqual(value1, value2)) || (!isObjects && value1 !== value2)) {
+      return false
+    }
+  }
+  return true
+}
+
+function isObject(object: unknown): object is IndexableObject {
+  return object !== null && typeof object === 'object'
 }

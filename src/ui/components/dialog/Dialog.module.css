@@ -107,6 +107,8 @@
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.9);
   }
+
+  filter: brightness(calc(1 - var(--nested-dialogs) * 0.5));
 }
 
 .ModalPopup {

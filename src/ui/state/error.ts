@@ -1,6 +1,6 @@
 import { Dispatch, Reducer, createContext } from 'react'
 
-export type ErrorMessageData = { title: string; messages: string[] }
+type ErrorMessageData = { title: string; messages: string[] }
 
 export type ErrorState = { messageData?: ErrorMessageData }
 export type ErrorAction =

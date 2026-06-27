@@ -2,16 +2,23 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { PossibleSaves } from '@openhome-core/save/util/path'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { JSONArray, JSONObject, JSONValue, SaveRef } from '@openhome-core/util/types'
+import { LogFilter } from '@openhome-ui/pages/logs'
 import { AppTheme } from '@openhome-ui/state/appInfo'
+import { ConvertStrategies } from '@openhome-ui/state/convert-strategies/ConvertStrategiesProvider'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { getDefaultConvertStrategy } from '@pkm-rs/pkg'
 import { invoke, InvokeArgs, InvokeOptions } from '@tauri-apps/api/core'
-import { ConvertStrategies } from 'src/ui/state/convert-strategies/ConvertStrategiesProvider'
-import { AppState, ImageResponse, LogEntry, LogLevel, StoredLookups } from '../backendInterface'
+import {
+  AppState,
+  ImageResponse,
+  LogLevel,
+  LogsResponseUnparsed,
+  StoredLookups,
+} from '../backendInterface'
 import { RustResult } from './types'
 
-export type StringToBytes = Record<string, Uint8Array>
+type StringToBytes = Record<string, Uint8Array>
 export type StringToB64 = Record<string, string>
 
 function invokeAndCatch<C extends OhCommand>(
@@ -22,25 +29,14 @@ function invokeAndCatch<C extends OhCommand>(
   return R.tryPromise(invoke(cmd, args, options))
 }
 
-// remove this after node 25 is lts
-if (!('fromBase64' in Uint8Array)) {
-  // @ts-expect-error – intentionally adding this static constructor because it is relatively new to javascript
-  Uint8Array.fromBase64 = function (base64: string): Uint8Array {
-    const binary = atob(base64)
-    const len = binary.length
-    const bytes = new Uint8Array(len)
-
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binary.charCodeAt(i)
-    }
-
-    return bytes
-  }
-}
-
 const ZERO_UUID = '00000000-0000-0000-0000-000000000000'
 
 type RustUnitResultByString = Record<string, RustResult<null, string>>
+
+export type LogFilterIpc = Omit<LogFilter, 'start' | 'end'> & {
+  start_epoch_seconds: number
+  end_epoch_seconds: number
+}
 
 type OhTauriApi = {
   get_state(): AppState
@@ -87,8 +83,9 @@ type OhTauriApi = {
   rollback_transaction(): null
   commit_transaction(): null
 
-  get_logs_today(): LogEntry[]
+  get_logs_today(filter: LogFilterIpc): LogsResponseUnparsed
   log(level: LogLevel, message: string, fields?: Record<string, unknown>): void
+  clear_logs_for_range(startEpochSeconds: number, endEpochSeconds: number): null
 }
 
 type OhCommand = keyof OhTauriApi
@@ -255,12 +252,16 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('open_file_location', { filePath })
   },
 
-  get_logs_today() {
-    return invokeAndCatch('get_logs_today')
+  get_logs_today(filter: LogFilterIpc) {
+    return invokeAndCatch('get_logs_today', { filter })
   },
 
   log(level: LogLevel, message: string, context?: Record<string, unknown | undefined>) {
     return invokeAndCatch('log', { entry: { level, message, context } })
+  },
+
+  clear_logs_for_range(startEpochSeconds: number, endEpochSeconds: number) {
+    return invokeAndCatch('clear_logs_for_range', { startEpochSeconds, endEpochSeconds })
   },
 }
 
@@ -269,7 +270,7 @@ export type StoredBankDataSerialized = {
   current_bank: number
 }
 
-export type OpenHomeBankSerialized = {
+type OpenHomeBankSerialized = {
   id: string
   index: number
   name: string | undefined
@@ -277,7 +278,7 @@ export type OpenHomeBankSerialized = {
   current_box: number
 }
 
-export type OpenHomeBoxSerialized = {
+type OpenHomeBoxSerialized = {
   id: string
   index: number
   name: string | null

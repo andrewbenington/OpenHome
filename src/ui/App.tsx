@@ -6,8 +6,8 @@ import BackendInterface from '@openhome-ui/backend/backendInterface'
 import { BackendProvider } from '@openhome-ui/backend/backendProvider'
 import { TauriBackend } from '@openhome-ui/backend/tauri/tauriBackend'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
+import useDebounce from '@openhome-ui/hooks/debounce'
 import useDisplayError from '@openhome-ui/hooks/displayError'
-import useDebounce from '@openhome-ui/hooks/useDebounce'
 import { TransactionStateProvider } from '@openhome-ui/state/app-state'
 import {
   AppInfoContext,
@@ -34,6 +34,8 @@ import PluginsProvider from './state/plugin/PluginProvider'
 const ZOOM_CHANGE_PCT = 5
 const ZOOM_MIN_PCT = 50
 const ZOOM_MAX_PCT = 160
+
+const REDIRECT_WEB_CONSOLE = true
 
 export default function App() {
   const isDarkMode = useIsDarkMode()
@@ -112,9 +114,6 @@ function AppWithBackend() {
     // returns a function to stop listening
     const stopListening = backend.onMenuEvents({
       zoom_in: () => {
-        console.info('patching...')
-        patchConsole(backend)
-        console.info('patched')
         appInfoDispatch({
           type: 'set_zoom_level',
           payload: Math.min(appInfoState.settings.zoomLevel + ZOOM_CHANGE_PCT, ZOOM_MAX_PCT),
@@ -187,33 +186,59 @@ function AppWithBackend() {
 const webConsole = { ...console }
 
 function patchConsole(backend: BackendInterface) {
+  if (!REDIRECT_WEB_CONSOLE) return
   const levels = [
-    ['log', 'info'],
-    ['info', 'info'],
-    ['warn', 'warn'],
-    ['error', 'error'],
-    ['debug', 'debug'],
+    ['log', 'INFO'],
+    ['info', 'INFO'],
+    ['warn', 'WARN'],
+    ['error', 'ERROR'],
+    ['debug', 'DEBUG'],
   ] as const
 
   for (const [method, level] of levels) {
     // eslint-disable-next-line no-console
     console[method] = (...args: unknown[]) => {
+      if (args?.[0] === 'CONSOLE_ONLY') {
+        webConsole[method](...args.slice(1))
+        return
+      }
       // send message to web console as well
       webConsole[method](...args)
 
-      // remove this function from the stack trace
-      const stack = new Error().stack?.split('\n').slice(1).join('\n')
+      // skip first line (this function)
+      const stack = new Error().stack?.split('\n').slice(1)
+      const callsite = stack?.[0]
 
       if (args.length > 0 && typeof args[0] === 'object' && args[0] !== null) {
         const context = args[0] as Record<string, unknown>
-        context['stack'] = stack
+        context['callsite'] = callsite
         backend.log(level, serializeArg(args.at(1)), JSON.parse(JSON.stringify(context)))
       } else {
-        const message = args.map(serializeArg).join(' ')
-        backend.log(level, message, { stack })
+        const message = formatWithPlaceholders(args)
+        backend.log(level, message, { callsite })
       }
     }
   }
+}
+
+// attempts to fill log placeholders with args like the web console does
+function formatWithPlaceholders(args: unknown[]): string {
+  if (typeof args[0] !== 'string' || !args[0].includes('%')) {
+    return args.map(serializeArg).join(' ')
+  }
+
+  let i = 1
+  const formatted = args[0].replace(/%[sdifoO]/g, (token) => {
+    if (i >= args.length) return token
+    const val = args[i++]
+    if (token === '%d' || token === '%i') return String(Number(val))
+    if (token === '%f') return String(parseFloat(String(val)))
+    if (token === '%o' || token === '%O') return JSON.stringify(val)
+    return String(val) // %s
+  })
+
+  // append any remaining args that weren't consumed
+  return [formatted, ...args.slice(i).map(serializeArg)].join(' ')
 }
 
 function serializeArg(arg: unknown): string {

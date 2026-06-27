@@ -20,6 +20,6 @@ export function splitPath(path: PathData) {
 
 export type PossibleSaves = {
   citra?: PathData[]
-  desamume?: PathData[]
+  desmume?: PathData[]
   open_emu?: PathData[]
 }

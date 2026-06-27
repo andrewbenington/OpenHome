@@ -1,6 +1,6 @@
+import { PK3 } from '@openhome-core/pkm'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { ConvertStrategies, ConvertStrategy } from '@pkm-rs/pkg'
-import { PK3 } from '@pokemon-files/pkm'
 import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
 import path from 'path'
@@ -13,6 +13,7 @@ import { initializeWasm } from './init'
 beforeAll(initializeWasm)
 
 var blazikenOhpkm: OHPKM
+var blazikenPk3Bytes: Uint8Array
 var blazikenPk3: PK3
 var slowbroOhpkm: OHPKM
 
@@ -26,15 +27,24 @@ beforeAll(() => {
     'OHPKM'
   ) as OHPKM
 
-  blazikenPk3 = bytesToPKM(
-    new Uint8Array(fs.readFileSync(pkmTestFilePath('pk3', 'blaziken.pkm'))),
-    'PK3'
-  ) as PK3
+  blazikenPk3Bytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pk3', 'blaziken.pkm')))
+  blazikenPk3 = bytesToPKM(blazikenPk3Bytes, 'PK3') as PK3
 
   slowbroOhpkm = bytesToPKM(
     new Uint8Array(fs.readFileSync(pkmTestFilePath('ohpkm', 'slowbro.ohpkm'))),
     'OHPKM'
   ) as OHPKM
+})
+
+test('blaziken bytes', () => {
+  const BLAZIKEN_ENCRYPTED_BYTES =
+    'afe6de82a28827bdbcc6bbd4c3c5bfc8ff000202cce3bdffffffff007b690000416fbe3e266fa03f2d76e92f176f2e3f1942e93ff291f93f0d7e7c1e663cdb2c0deef13f0b92f9c30d6ef93f0d6ef93f'
+
+  const file = pkmTestFilePath('pk3', 'blaziken.pkm')
+  const bytes = new Uint8Array(fs.readFileSync(file))
+  const mon = PK3.fromBytes(bytes.buffer)
+
+  expect(mon.toPCBytes()).toStrictEqual(Uint8Array.fromHex(BLAZIKEN_ENCRYPTED_BYTES).buffer)
 })
 
 test('gen 3 stat calculations', () => {

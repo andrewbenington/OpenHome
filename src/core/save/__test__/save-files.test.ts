@@ -1,10 +1,10 @@
+import { PK7 } from '@openhome-core/pkm'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { R } from '@openhome-core/util/functional'
 import { ConvertStrategies } from '@pkm-rs/pkg'
-import { PK7 } from '@pokemon-files/pkm'
 import { fail } from 'assert'
 import fs, { readFileSync } from 'fs'
 import path from 'path'
-import { OHPKM } from 'src/core/pkm/OHPKM'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { BW2SAV } from '../BW2SAV'
 import { BWSAV } from '../BWSAV'
@@ -13,8 +13,8 @@ import { G1SAV } from '../G1SAV'
 import { G2SAV } from '../G2SAV'
 import { G3SAV } from '../G3SAV'
 import { Gen7AlolaSave } from '../Gen7AlolaSave'
-import { LASAV } from '../Gen89/LASAV'
-import { SwShSAV } from '../Gen89/SwShSAV'
+import { LegendsArceusSave } from '../Gen89/LegendsArceus'
+import { SwordShieldSave } from '../Gen89/SwordShieldSave'
 import { HGSSSAV } from '../HGSSSAV'
 import { ORASSAV } from '../ORASSAV'
 import { PtSAV } from '../PtSAV'
@@ -60,8 +60,8 @@ const allSaveTypes = [
   XYSAV,
   ORASSAV,
   Gen7AlolaSave,
-  SwShSAV,
-  LASAV,
+  SwordShieldSave,
+  LegendsArceusSave,
 ]
 
 describe('Save file detection - single possibility', () => {
@@ -79,7 +79,7 @@ describe('Save file detection - single possibility', () => {
 
       const saveFile = result.value
 
-      expect(saveFile?.gameNameFull).toBe(gameName)
+      expect(saveFile.gameNameFull).toBe(gameName)
     })
   }
 })

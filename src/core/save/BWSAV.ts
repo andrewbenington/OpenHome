@@ -1,9 +1,9 @@
+import { Item } from '@openhome-core/resources/consts/Items'
+import { BW_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { ExtraFormIndex, OriginGame } from '@pkm-rs/pkg'
-import { Item } from '@pokemon-resources/consts/Items'
-import { BW_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { G5SAV } from './G5SAV'
-import { hasDesamumeFooter } from './util'
+import { hasDesmumeFooter } from './util'
 
 export class BWSAV extends G5SAV {
   static transferRestrictions = BW_TRANSFER_RESTRICTIONS
@@ -21,7 +21,7 @@ export class BWSAV extends G5SAV {
       return false
     }
     if (bytes.length > G5SAV.SAVE_SIZE_BYTES) {
-      if (!hasDesamumeFooter(bytes, G5SAV.SAVE_SIZE_BYTES)) {
+      if (!hasDesmumeFooter(bytes, G5SAV.SAVE_SIZE_BYTES)) {
         return false
       }
     }

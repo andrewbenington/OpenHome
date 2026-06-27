@@ -11,7 +11,7 @@
 .IconList {
   --icon-list-padding: 0.3rem;
   padding-top: var(--icon-list-padding);
-  width: 3rem;
+  width: var(--navigation-sidebar-width);
 
   .Tab {
     display: flex;
@@ -93,13 +93,17 @@
   height: calc(var(--active-tab-height) + 0.2rem);
   width: calc(100% - (var(--icon-list-padding) * 2));
   border-radius: var(--border-radius-lg);
-  background-color: var(--color-gray-200);
-  box-shadow:
-    var(--color-gray-300) 0px 0px 0px 1px,
-    var(--color-gray-500) 0px 0px 0px 1px inset;
+  background-color: var(--color-gray-50);
+  box-shadow: var(--color-gray-300) 0px 0px 0px 1px inset;
   transition-property: translate, height;
   transition-duration: 200ms;
   transition-timing-function: ease-in-out;
+}
+
+@media (prefers-color-scheme: dark) {
+  .Indicator {
+    background-color: var(--color-gray-200);
+  }
 }
 
 .Panel {

@@ -1,5 +1,6 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { Moves } from '@openhome-core/resources/moves'
 import { SAV } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import {
@@ -18,8 +19,12 @@ import {
   OpenHomeCtxMenu,
   Separator,
 } from '@openhome-ui/components/context-menu'
+import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
+import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
+import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
+import { getPublicImageURL } from '@openhome-ui/images/images'
 import {
   BankBoxCoordinates,
   useBanksAndBoxes,
@@ -27,14 +32,9 @@ import {
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Language, Lookup, OriginGames } from '@pkm-rs/pkg'
-import { Moves } from '@pokemon-resources/moves'
 import { useCallback, useRef, useState } from 'react'
 import { SelectColumn } from 'react-data-grid'
 import { useNavigate } from 'react-router'
-import GenderIcon from 'src/ui/components/pokemon/GenderIcon'
-import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
-import TypeIcon from 'src/ui/components/pokemon/TypeIcon'
-import { getPublicImageURL } from 'src/ui/images/images'
 import './style.css'
 
 export type AllTrackedPokemonProps = {
@@ -207,7 +207,7 @@ function useColumns(
         <button onClick={() => onSelectMon(value)} className="mon-icon-button">
           <PokemonIcon
             dexNumber={value.dexNum}
-            formeNumber={value.formNum}
+            formIndex={value.formNum}
             style={{ width: '2rem', height: '2rem' }}
           />
         </button>

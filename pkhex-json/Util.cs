@@ -274,6 +274,13 @@ public static partial class Util
     return strings.balllist.GetValue(pk.Ball).ToString().Replace(" Ball", "").Replace("Poke", "Poké");
   }
 
+  public static object FormatAffixedRibbon(sbyte ribbon, GameStrings strings)
+  {
+    Console.WriteLine("ribbon value: " + ribbon);
+    Console.WriteLine("min ribbon value: " + sbyte.MinValue);
+    return ribbon == -1 ? null : strings.ribbons.GetValue(ribbon);
+  }
+
   [GeneratedRegex(@"(?=[A-Z])")]
   private static partial Regex RibbonRegex();
 }

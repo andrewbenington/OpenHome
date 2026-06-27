@@ -1,0 +1,16 @@
+.content-card-outer {
+  max-height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+
+  padding: var(--padding-radius-sm-lg);
+}
+
+.content-card-inner {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem;
+  background-color: var(--color-panel);
+  border-radius: var(--padding-radius-sm-lg);
+}

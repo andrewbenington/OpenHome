@@ -10,9 +10,9 @@ type PromptDialogProps = {
   onClose?: () => void
 }
 
-export type PromptDialogActionType = 'cancel' | 'destructive'
+type PromptDialogActionType = 'cancel' | 'destructive'
 
-export type PromptDialogAction = {
+type PromptDialogAction = {
   uniqueLabel: string
   action: (() => void) | (() => Promise<void>)
   type?: PromptDialogActionType

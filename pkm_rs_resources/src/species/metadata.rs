@@ -1529,8 +1529,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(9) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(9)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(226) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(226)
                 }),
                 hidden_ability: None,
                 base_height: 12,
@@ -1559,8 +1559,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(9) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(9)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(99) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(99)
                 }),
                 hidden_ability: None,
                 base_height: 10,
@@ -1717,7 +1717,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         level_up_type: LevelUpType::MediumSlow,
         forms: &[FormMetadata {
             national_dex: unsafe { NatDexIndex::new_unchecked(29) },
-            form_name: "Nidoran♀",
+            form_name: "Nidoran-F",
             form_index: 0,
             is_base_form: true,
             is_mega: false,
@@ -1819,7 +1819,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
         level_up_type: LevelUpType::MediumSlow,
         forms: &[FormMetadata {
             national_dex: unsafe { NatDexIndex::new_unchecked(32) },
-            form_name: "Nidoran♂",
+            form_name: "Nidoran-M",
             form_index: 0,
             is_base_form: true,
             is_mega: false,
@@ -1998,8 +1998,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::M1ToF3,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(56) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(56)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(156) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(156)
                 }),
                 hidden_ability: None,
                 base_height: 17,
@@ -3548,8 +3548,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(34) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(34)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(215) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(215)
                 }),
                 hidden_ability: None,
                 base_height: 45,
@@ -5906,8 +5906,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Genderless,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(74) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(74)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(37) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(37)
                 }),
                 hidden_ability: None,
                 base_height: 23,
@@ -7261,8 +7261,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(39) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(39)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(136) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(136)
                 }),
                 hidden_ability: None,
                 base_height: 22,
@@ -7537,8 +7537,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::M7ToF1,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(65) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(65)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(315) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(315)
                 }),
                 hidden_ability: None,
                 base_height: 24,
@@ -7810,8 +7810,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::M7ToF1,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(67) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(67)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(312) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(312)
                 }),
                 hidden_ability: None,
                 base_height: 23,
@@ -11269,8 +11269,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(51) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(51)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(242) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(242)
                 }),
                 hidden_ability: None,
                 base_height: 17,
@@ -18285,8 +18285,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(22) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(22)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(126) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(126)
                 }),
                 hidden_ability: None,
                 base_height: 19,
@@ -21517,8 +21517,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::AllFemale,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(81) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(81)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(117) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(117)
                 }),
                 hidden_ability: None,
                 base_height: 26,
@@ -23192,8 +23192,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::M7ToF1,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(66) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(66)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(104) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(104)
                 }),
                 hidden_ability: None,
                 base_height: 18,
@@ -24281,8 +24281,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(146) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(146)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(311) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(311)
                 }),
                 hidden_ability: None,
                 base_height: 9,
@@ -24861,8 +24861,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(38) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(38)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(75) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(75)
                 }),
                 hidden_ability: None,
                 base_height: 32,
@@ -25628,8 +25628,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(61) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(61)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(22) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(22)
                 }),
                 hidden_ability: None,
                 base_height: 11,
@@ -27439,8 +27439,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(26) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(26)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(313) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(313)
                 }),
                 hidden_ability: None,
                 base_height: 30,
@@ -27644,8 +27644,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(18) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(18)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(151) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(151)
                 }),
                 hidden_ability: None,
                 base_height: 25,
@@ -28187,8 +28187,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Genderless,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(89) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(89)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(260) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(260)
                 }),
                 hidden_ability: None,
                 base_height: 28,
@@ -29586,8 +29586,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::M7ToF1,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(65) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(65)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(171) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(171)
                 }),
                 hidden_ability: None,
                 base_height: 16,
@@ -29723,8 +29723,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::M7ToF1,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(66) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(66)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(26) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(26)
                 }),
                 hidden_ability: None,
                 base_height: 15,
@@ -29920,8 +29920,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::M7ToF1,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(67) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(67)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(168) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(168)
                 }),
                 hidden_ability: None,
                 base_height: 15,
@@ -31354,7 +31354,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-icy snow",
                 sprite_index: (0, 24),
             },
             FormMetadata {
@@ -31384,7 +31384,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-polar",
                 sprite_index: (1, 24),
             },
             FormMetadata {
@@ -31414,7 +31414,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-tundra",
                 sprite_index: (2, 24),
             },
             FormMetadata {
@@ -31444,7 +31444,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-continental",
                 sprite_index: (3, 24),
             },
             FormMetadata {
@@ -31474,7 +31474,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-garden",
                 sprite_index: (4, 24),
             },
             FormMetadata {
@@ -31504,7 +31504,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-elegant",
                 sprite_index: (5, 24),
             },
             FormMetadata {
@@ -31534,7 +31534,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-meadow",
                 sprite_index: (6, 24),
             },
             FormMetadata {
@@ -31564,7 +31564,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-modern",
                 sprite_index: (7, 24),
             },
             FormMetadata {
@@ -31594,7 +31594,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-marine",
                 sprite_index: (8, 24),
             },
             FormMetadata {
@@ -31624,7 +31624,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-archipelago",
                 sprite_index: (9, 24),
             },
             FormMetadata {
@@ -31654,7 +31654,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-high-plains",
                 sprite_index: (10, 24),
             },
             FormMetadata {
@@ -31684,7 +31684,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-sandstorm",
                 sprite_index: (11, 24),
             },
             FormMetadata {
@@ -31714,7 +31714,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-river",
                 sprite_index: (12, 24),
             },
             FormMetadata {
@@ -31744,7 +31744,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-monsoon",
                 sprite_index: (13, 24),
             },
             FormMetadata {
@@ -31774,7 +31774,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-savanna",
                 sprite_index: (14, 24),
             },
             FormMetadata {
@@ -31804,7 +31804,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-sun",
                 sprite_index: (15, 24),
             },
             FormMetadata {
@@ -31834,7 +31834,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-ocean",
                 sprite_index: (16, 24),
             },
             FormMetadata {
@@ -31864,7 +31864,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_ultra_beast: false,
                 is_paradox: false,
                 regional: None,
-                sprite: "vivillon",
+                sprite: "vivillon-jungle",
                 sprite_index: (17, 24),
             },
             FormMetadata {
@@ -32011,8 +32011,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::M1ToF7,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(79) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(79)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(316) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(316)
                 }),
                 hidden_ability: None,
                 base_height: 15,
@@ -32386,8 +32386,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::AllFemale,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(166) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(166)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(187) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(187)
                 }),
                 hidden_ability: None,
                 base_height: 2,
@@ -33122,8 +33122,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(51) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(51)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(36) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(36)
                 }),
                 hidden_ability: None,
                 base_height: 8,
@@ -33152,8 +33152,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(51) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(51)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(36) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(36)
                 }),
                 hidden_ability: None,
                 base_height: 8,
@@ -33731,8 +33731,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(38) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(38)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(144) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(144)
                 }),
                 hidden_ability: None,
                 base_height: 21,
@@ -34106,8 +34106,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(7) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(7)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(99) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(99)
                 }),
                 hidden_ability: None,
                 base_height: 10,
@@ -36103,8 +36103,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(52) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(52)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(89) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(89)
                 }),
                 hidden_ability: None,
                 base_height: 19,
@@ -42669,8 +42669,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Genderless,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(4) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(4)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(128) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(128)
                 }),
                 hidden_ability: None,
                 base_height: 16,
@@ -46070,8 +46070,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(34) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(34)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(318) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(318)
                 }),
                 hidden_ability: None,
                 base_height: 12,
@@ -46749,8 +46749,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [
                 is_battle_only: true,
                 is_cosmetic: false,
                 gender_ratio: GenderRatio::Equal,
-                abilities: (unsafe { AbilityIndexBounded::new_unchecked(295) }, unsafe {
-                    AbilityIndexBounded::new_unchecked(295)
+                abilities: (unsafe { AbilityIndexBounded::new_unchecked(91) }, unsafe {
+                    AbilityIndexBounded::new_unchecked(91)
                 }),
                 hidden_ability: None,
                 base_height: 28,

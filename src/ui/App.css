@@ -34,6 +34,10 @@
 
   --box-slot-side: 2.5rem;
   --box-slot-size: 4rem;
+
+  --navigation-sidebar-width: 3rem;
+
+  --log-level-width: 3.5rem;
 }
 
 :root {
@@ -64,17 +68,21 @@
   --primitive-red-light: oklch(65.953% 0.21938 25.564);
   --primitive-red-dark: oklch(80% 55% 31deg);
 
-  --color-gray-50: oklch(98% 0.25% 264deg);
-  --color-gray-100: oklch(95% 0.5% 264deg / 90%);
-  --color-gray-200: oklch(93% 0.875% 264deg / 85%);
-  --color-gray-300: oklch(92% 1.125% 264deg / 80%);
-  --color-gray-400: oklch(82% 1% 264deg / 80%);
-  --color-gray-500: oklch(12% 7.5% 264deg / 50%);
-  --color-gray-600: oklch(12% 7% 264deg / 67%);
-  --color-gray-700: oklch(12% 6% 264deg / 77%);
-  --color-gray-800: oklch(12% 5% 264deg / 85%);
-  --color-gray-900: oklch(12% 5% 264deg / 90%);
-  --color-gray-950: oklch(12% 5% 264deg / 95%);
+  --color-gray-50: #f0f0f0;
+  --color-gray-100: #d8d8d8;
+  --color-gray-200: #c0c0c0;
+  --color-gray-300: #a8a8a8;
+  --color-gray-400: #909090;
+  --color-gray-500: #787878;
+  --color-gray-600: #606060;
+  --color-gray-700: #484848;
+  --color-gray-800: #303030;
+  --color-gray-900: #181818;
+  --color-gray-950: #000000;
+
+  --color-text-contrast: black;
+  --red-9: color(display-p3 0.83 0.329 0.324);
+  --color-header: var(--red-9);
 
   --color-border-light: var(--color-gray-400);
   --color-translucent-light: #ccc8;
@@ -84,17 +92,20 @@
   @media (prefers-color-scheme: dark) {
     --color-blue: oklch(69% 50% 264deg);
     --color-red: oklch(80% 55% 31deg);
-    --color-gray-50: oklch(17% 0.25% 264deg);
-    --color-gray-100: oklch(28% 0.75% 264deg / 65%);
-    --color-gray-200: oklch(29% 0.75% 264deg / 80%);
-    --color-gray-300: oklch(35% 0.75% 264deg / 80%);
-    --color-gray-400: oklch(47% 0.875% 264deg / 80%);
-    --color-gray-500: oklch(64% 1% 264deg / 80%);
-    --color-gray-600: oklch(82% 1% 264deg / 80%);
-    --color-gray-700: oklch(92% 1.125% 264deg / 80%);
-    --color-gray-800: oklch(93% 0.875% 264deg / 85%);
-    --color-gray-900: oklch(95% 0.5% 264deg / 90%);
-    --color-gray-950: oklch(94% 0.375% 264deg / 95%);
+    --color-gray-50: #000000;
+    --color-gray-100: #181818;
+    --color-gray-200: #303030;
+    --color-gray-300: #484848;
+    --color-gray-400: #606060;
+    --color-gray-500: #787878;
+    --color-gray-600: #909090;
+    --color-gray-700: #a8a8a8;
+    --color-gray-800: #c0c0c0;
+    --color-gray-900: #d8d8d8;
+    --color-gray-950: #f0f0f0;
+
+    --color-text-contrast: white;
+    --color-header: oklch(49.542% 0.14926 21.557);
   }
 }
 
@@ -445,6 +456,15 @@ label {
   }
 }
 
+.mini-button-icon-only {
+  width: auto;
+  padding: 0;
+
+  display: grid;
+  align-items: center;
+  justify-content: center;
+}
+
 svg {
   height: 1rem;
   width: 1rem;
@@ -492,8 +512,8 @@ svg {
   box-shadow: 0 0 0 1px
     color-mix(in oklab, color(display-p3 1 1 1 / 0.134), color(display-p3 0.192 0.192 0.192) 25%);
 }
-
-.panel-lg-radius > ::-webkit-scrollbar-thumb {
+.panel-lg-radius > ::-webkit-scrollbar-thumb,
+.dark-scrollbar > ::-webkit-scrollbar-thumb {
   background-color: var(--dark-scrollbar);
 }
 

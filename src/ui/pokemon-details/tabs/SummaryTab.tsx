@@ -1,5 +1,8 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { PKM } from '@openhome-core/pkm/PKM'
 import { getTypes } from '@openhome-core/pkm/util'
+import { getDisplayID } from '@openhome-core/util'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import AttributeTag from '@openhome-ui/components/AttributeTag'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -8,6 +11,7 @@ import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
+import { useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark, SHADOW_TYPE_COLOR } from '@openhome-ui/util/color'
 import {
   AbilityNumber,
@@ -17,12 +21,8 @@ import {
   MetadataSummaryLookup,
   OriginGames,
 } from '@pkm-rs/pkg'
-import { PKM } from '@pokemon-files/pkm/PKM'
-import { getDisplayID } from '@pokemon-files/util'
 import { Badge, Button, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import { OHPKM } from 'src/core/pkm/OHPKM'
-import { useSaves } from 'src/ui/state/saves'
 import { TagIcon } from '../../components/TagIcon'
 import useMonSprite from '../useMonSprite'
 import './SummaryTab.css'
@@ -69,7 +69,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           ) : (
             <PokemonIcon
               dexNumber={mon.dexNum}
-              formeNumber={mon.formNum}
+              formIndex={mon.formNum}
               style={{
                 width: '60%',
                 height: '90%',

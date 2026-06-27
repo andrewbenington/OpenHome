@@ -94,7 +94,10 @@ export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCar
             <button
               className="save-grid-button save-grid-error-button"
               onClick={() =>
-                displayError('Invalid Save', 'File is missing, renamed, or inaccessbile')
+                displayError(
+                  'Invalid Save',
+                  'File is missing, renamed, or inaccessbile: ' + save.filePath.raw
+                )
               }
             >
               <ErrorIcon />

@@ -1,4 +1,9 @@
-export const Gen3CFRUMoves = [
+import { Moves } from '@openhome-core/resources'
+import { Option } from '@openhome-core/util/functional'
+import { CFRUToNationalMap } from './CFRUToNationalMap'
+import { NationalToCFRUMap } from './NationalToCFRUMap'
+
+const Gen3CFRUMoves = [
   'None',
   'Pound',
   'Karate Chop',
@@ -1002,11 +1007,6 @@ export const Gen3CFRUMoves = [
   'One Blow',
   'One Blow',
 ]
-
-import { Option } from '@openhome-core/util/functional'
-import { Moves } from '@pokemon-resources/index'
-import { CFRUToNationalMap } from './CFRUToNationalMap'
-import { NationalToCFRUMap } from './NationalToCFRUMap'
 
 // const dne_moves = [89, 538, 526, 659]
 

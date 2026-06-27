@@ -1,6 +1,6 @@
+import { Errorable } from '@openhome-core/util/functional'
 import { Callout } from '@radix-ui/themes'
 import { Context, ReactNode, useMemo } from 'react'
-import { Errorable } from '../../../core/util/functional'
 import { ErrorIcon } from '../../components/Icons'
 import LoadingIndicator from '../../components/LoadingIndicator'
 import { RustStateManager } from './useSyncedState'

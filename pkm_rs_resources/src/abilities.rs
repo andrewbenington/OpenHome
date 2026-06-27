@@ -293,7 +293,7 @@ impl AbilityMetadata {
     }
 }
 
-pub const ABILITY_MAX: usize = 310;
+pub const ABILITY_MAX: usize = 318;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getAllAbilities"))]
 #[allow(clippy::missing_const_for_fn)]
@@ -1541,5 +1541,37 @@ pub static ALL_ABILITIES: [&AbilityMetadata; ABILITY_MAX] = [
     &AbilityMetadata {
         id: 310,
         name: "Poison Puppeteer",
+    },
+    &AbilityMetadata {
+        id: 311,
+        name: "Piercing Drill",
+    },
+    &AbilityMetadata {
+        id: 312,
+        name: "Dragonize",
+    },
+    &AbilityMetadata {
+        id: 313,
+        name: "Eelevate",
+    },
+    &AbilityMetadata {
+        id: 314,
+        name: "(Ability 314)",
+    },
+    &AbilityMetadata {
+        id: 315,
+        name: "Mega Sol",
+    },
+    &AbilityMetadata {
+        id: 316,
+        name: "Fire Mane",
+    },
+    &AbilityMetadata {
+        id: 317,
+        name: "(Ability 317)",
+    },
+    &AbilityMetadata {
+        id: 318,
+        name: "Spicy Spray",
     },
 ];

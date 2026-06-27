@@ -1,3 +1,6 @@
+import { CHAMPS_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import {
   ExtraFormMetadata,
   FormMetadata,
@@ -6,11 +9,8 @@ import {
   OriginGames,
   orasFormIndexIfSupported,
 } from '@pkm-rs/pkg'
-import { CHAMPS_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { Card, Flex } from '@radix-ui/themes'
 import { useContext } from 'react'
-import { isRestricted } from 'src/core/save/util/TransferRestrictions'
-import { AppInfoContext } from 'src/ui/state/appInfo'
 import { isExtraFormMetadata } from './util'
 
 interface PokedexGamesProps {
@@ -58,7 +58,7 @@ export function PokedexGames(props: PokedexGamesProps) {
         ) && (
           <Card
             className="compatible-game-card"
-            key={origin}
+            key="champions"
             style={{
               backgroundColor: OriginGames.championsColor(),
               '--card-background-color': OriginGames.championsColor(),
@@ -84,7 +84,7 @@ export function PokedexGames(props: PokedexGamesProps) {
           .map((saveType) => (
             <Card
               className="compatible-game-card"
-              key={origin}
+              key={saveType.saveTypeID}
               style={{
                 backgroundColor: OriginGames.pluginColor(saveType.getPluginIdentifier()),
                 '--card-background-color': OriginGames.pluginColor(saveType.getPluginIdentifier()),

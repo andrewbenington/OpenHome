@@ -1,12 +1,9 @@
 use super::Pk7Buffer;
+use super::pk7_buffer::Pk7BufferMut;
+use super::{Pk7AbilityIndex, Pk7SpeciesAndForm};
 use crate::checksum::{Checksum, RefreshChecksum};
-#[cfg(feature = "wasm")]
-use crate::convert_strategy::ConvertStrategy;
-use crate::encryption;
-use crate::gen7_alola::pk7_buffer::{Pk7BufferMut, Pk7BufferRef};
-use crate::gen7_alola::{Pk7AbilityIndex, Pk7SpeciesAndForm};
 use crate::result::{Error, Result};
-use crate::traits::{AsBytesMut, ModernEvs};
+use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
 
 use pkm_rs_derive::IsShiny4096;
@@ -20,8 +17,8 @@ use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
-    AbilityNumber, BinaryGender, ContestStats, HyperTraining, Language, MarkingsSixShapesColors,
-    OriginGame, Stats8, Stats16Le,
+    AbilityNumber, BinaryGender, ContestStats, HyperTraining, Ivs, Language,
+    MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
 };
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
@@ -37,7 +34,7 @@ use pkm_rs_resources::abilities::AbilityIndexWasm;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = Pk7Wasm))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct Pk7 {
@@ -78,7 +75,7 @@ pub struct Pk7 {
     pub secret_super_training_unlocked: bool,
     pub secret_super_training_complete: bool,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub ivs: Stats8,
+    pub ivs: Ivs,
     pub is_egg: bool,
     pub is_nicknamed: bool,
     pub handler_name: SizedUtf16String<26>,
@@ -127,7 +124,7 @@ impl Pk7 {
     // Deserialise from a Pk7Buffer (the single source of all byte offsets)
     // ------------------------------------------------------------------
 
-    pub fn from_buffer(buf: &Pk7BufferRef) -> Result<Self> {
+    pub fn from_buffer<S: AsRef<[u8]>>(buf: &Pk7Buffer<S>) -> Result<Self> {
         let mut mon = Pk7 {
             encryption_constant: buf.encryption_constant(),
             sanity: buf.sanity(),
@@ -294,21 +291,21 @@ impl Pk7 {
         }
     }
 
-    pub fn from_encryped_bytes(bytes: &[u8]) -> Result<Self> {
-        let decrypted = encryption::decrypt_pkm_bytes_gen_6_7(bytes);
-        let unshuffled = encryption::unshuffle_blocks_gen_6_7(&decrypted);
-        Self::from_bytes(&unshuffled)
+    pub fn from_encrypted_bytes(mut bytes: Box<[u8]>) -> Result<Self> {
+        Self::from_buffer(Pk7Buffer::box_or_party_span_mut(&mut bytes).decrypted())
     }
 
-    pub fn to_box_bytes_encrypted(self) -> Vec<u8> {
-        let shuffled = encryption::shuffle_blocks_gen_6_7(&self.to_box_bytes());
-        encryption::decrypt_pkm_bytes_gen_6_7(&shuffled)
+    pub fn to_box_bytes_encrypted(self) -> Box<[u8]> {
+        let mut bytes = self.to_box_bytes();
+        Pk7Buffer::box_span_mut(&mut bytes).encrypt();
+
+        bytes
     }
 
     pub fn calculate_checksum(&self) -> u16 {
         let mut bytes = [0u8; Self::BOX_SIZE];
         self.write_box_bytes(&mut bytes);
-        Pk7BufferRef::box_span(&bytes).calculate_checksum()
+        Pk7Buffer::box_span(&bytes).calculate_checksum()
     }
 
     pub fn refresh_checksum(&mut self) {
@@ -323,6 +320,7 @@ impl Pk7 {
             &self.evs,
             self.calculate_level(),
             self.nature.get_metadata(),
+            Some(self.hyper_training),
         )
         .unwrap_or_else(|| {
             panic!(
@@ -332,26 +330,31 @@ impl Pk7 {
         })
     }
 
+    pub fn recalculate_stats(&mut self) {
+        self.stats = self.calculate_stats();
+    }
+
     pub const fn move_data_offsets() -> MoveDataOffsets {
         super::MOVE_DATA_OFFSETS
     }
 
-    pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Vec<u8> {
-        let mut bytes = [0; Self::BOX_SIZE];
-        let mut buffer = Pk7BufferMut::box_span_mut(&mut bytes);
+    pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        let mut buffer = Pk7BufferMut::box_span_mut(bytes.as_mut_slice());
 
         buffer.set_handler_name(trainer_name);
         buffer.set_is_current_handler(true);
         buffer.refresh_checksum();
 
-        let bytes = buffer.as_bytes_mut();
-        encryption::decrypt_pkm_bytes_gen_6_7(&encryption::shuffle_blocks_gen_6_7(bytes))
+        buffer.encrypt();
+
+        bytes
     }
 
     pub fn is_empty_slot(bytes: &[u8]) -> bool {
-        let decrypted = encryption::decrypt_pkm_bytes_gen_6_7(bytes);
-        let unshuffled = encryption::unshuffle_blocks_gen_6_7(&decrypted);
-        let buffer = Pk7BufferRef::box_span(&unshuffled);
+        let mut owned = bytes.to_owned();
+        let mut buffer = Pk7Buffer::box_span_mut(&mut owned);
+        buffer.decrypt();
 
         buffer.species_ndex() == 0
     }
@@ -375,18 +378,18 @@ impl PkmBytes for Pk7 {
         self.write_to_party_buffer(&mut buffer);
     }
 
-    fn to_box_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; Self::BOX_SIZE];
-        self.write_box_bytes(&mut bytes);
+    fn to_box_bytes(&self) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
+        self.write_box_bytes(bytes.as_mut_slice());
 
-        Vec::from(bytes)
+        bytes
     }
 
-    fn to_party_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0; Self::PARTY_SIZE];
-        self.write_party_bytes(&mut bytes);
+    fn to_party_bytes(&self) -> Box<[u8]> {
+        let mut bytes = Box::new([0u8; Self::PARTY_SIZE]);
+        self.write_party_bytes(bytes.as_mut_slice());
 
-        Vec::from(bytes)
+        bytes
     }
 }
 
@@ -407,25 +410,30 @@ impl HasSpeciesAndForm for Pk7 {
 }
 
 #[cfg(feature = "wasm")]
-#[wasm_bindgen]
+#[wasm_bindgen(js_class = Pk7Wasm)]
 #[allow(clippy::missing_const_for_fn)]
 impl Pk7 {
     #[wasm_bindgen(js_name = fromOhpkmBytes)]
     pub fn from_ohpkm_bytes(
         bytes: Vec<u8>,
-        strategy: ConvertStrategy,
+        strategy: crate::convert_strategy::ConvertStrategy,
     ) -> core::result::Result<Pk7, JsValue> {
         let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
         Ok(Pk7::from_ohpkm(&ohpkm, strategy))
     }
 
-    #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk7, JsValue> {
-        Pk7::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+    #[wasm_bindgen(js_name = fromDecryptedBytes)]
+    pub fn from_bytes_js(bytes: Box<[u8]>) -> core::result::Result<Pk7, JsValue> {
+        Pk7::from_bytes(&bytes).map_err(crate::util::error_to_js)
+    }
+
+    #[wasm_bindgen(js_name = fromEncryptedBytes)]
+    pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Pk7, JsValue> {
+        Pk7::from_encrypted_bytes(bytes).map_err(crate::util::error_to_js)
     }
 
     #[wasm_bindgen(js_name = toBytes)]
-    pub fn get_bytes_wasm(&self) -> Vec<u8> {
+    pub fn get_bytes_wasm(&self) -> Box<[u8]> {
         self.to_box_bytes()
     }
 
@@ -548,7 +556,7 @@ impl Pk7 {
 
     #[wasm_bindgen(setter = ivs)]
     pub fn set_ivs_js(&mut self, v: Stats16Le) {
-        self.ivs = v.to_stats8_truncated()
+        self.ivs = v.to_ivs_capped()
     }
 
     #[wasm_bindgen(js_name = toOhpkm)]
@@ -559,6 +567,26 @@ impl Pk7 {
     #[wasm_bindgen(js_name = isEmptySlot)]
     pub fn is_empty_slot_wasm(bytes: Vec<u8>) -> bool {
         Self::is_empty_slot(&bytes)
+    }
+
+    #[wasm_bindgen(js_name = calculateChecksum)]
+    pub fn calculate_checksum_js(&self) -> u16 {
+        self.calculate_checksum()
+    }
+
+    #[wasm_bindgen(js_name = calculateLevel)]
+    pub fn calculate_level_js(&self) -> u8 {
+        self.calculate_level()
+    }
+
+    #[wasm_bindgen(js_name = calculateStats)]
+    pub fn calculate_stats_js(&self) -> Stats16Le {
+        self.calculate_stats()
+    }
+
+    #[wasm_bindgen(js_name = recalculateStats)]
+    pub fn recalculate_stats_js(&mut self) {
+        self.recalculate_stats()
     }
 }
 
@@ -591,7 +619,7 @@ mod test {
 
     use crate::convert_strategy::ConvertStrategy;
     use crate::gen7_alola::Pk7;
-    use crate::gen7_alola::pk7_buffer::Pk7BufferRef;
+    use crate::gen7_alola::pk7_buffer::Pk7Buffer;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
     use crate::result::Error;
@@ -706,13 +734,28 @@ mod test {
     #[test]
     fn empty_slot_checksum() -> TestResult<()> {
         let empty_slot = Pk7::empty_box_slot_bytes(&"RoC".into());
-        if Pk7BufferRef::box_span(&empty_slot).checksum() != 0x0204 {
+        if Pk7Buffer::box_span(&empty_slot).checksum() != 0x0204 {
             return Err(Error::other(&format!(
                 "Empty slot checksum should be 0x0204; received {:#06x}",
-                Pk7BufferRef::box_span(&empty_slot).checksum()
+                Pk7Buffer::box_span(&empty_slot).checksum()
             ))
             .into());
         }
+        Ok(())
+    }
+
+    const LYCANROC_ENCRYPTED_BYTES_HEX: &str = "46b5261b000034558854d9175f75d4867d2c35edcaad2fb725c21bdbde411d0c3a219f5425e8407615970cdaa2333d6af8fe0544f39714db0fd9b6e2fc16435f80a10ce841891d669619ef0e9c2eda9fdb780cb3e97d7c3985b858283fae77dbfd705a99c39c94ff4df68176ed33eece7aad275b586c1d81a1d3333602b85e6e77163c6c7e6905fa95cc219becc09b136bafe58bfe8d77327551d35e85eae6c5adc3e95503df2c60401e73e17ebc348d6ae22fd24cfbf5c2671e42daead18cd923e6408a537ec3fc136855986f4ac0f1d741480cf38be75d1d71a1d26bdbb87d2919dcc6b479c80d";
+
+    #[test]
+    fn encrypted_bytes_match_expected() -> TestResult<()> {
+        let path = PathBuf::from("pk7").join("lycanroc-alola-champion.pk7");
+        let mon = tests::pkm_from_file::<Pk7>(&path)?.0;
+
+        let encrypted_bytes = mon.to_box_bytes_encrypted();
+        let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
+
+        assert_eq!(encrypted_hex_str, LYCANROC_ENCRYPTED_BYTES_HEX);
+
         Ok(())
     }
 }

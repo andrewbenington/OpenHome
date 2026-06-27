@@ -1,9 +1,12 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { PkmOrOhpkmFormat } from '@openhome-core/pkm/util'
 import { monSupportedBySaveType } from '@openhome-core/save/util'
 import { unique } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useContext, useMemo } from 'react'
+import { colorIsDark } from '../util/color'
+import { cssClass } from '../util/style'
 
 const fileTypeColors: Record<string, string> = {
   OHPKM: '#748fcd',
@@ -30,7 +33,7 @@ interface FileTypeSelectProps {
   currentFormat: string
   color?: string
   formData: PKMInterface
-  onChange: (selectedFormat: string) => void
+  onChange: (selectedFormat: PkmOrOhpkmFormat) => void
   disabled?: boolean
 }
 
@@ -48,14 +51,21 @@ const FileTypeSelect = (props: FileTypeSelectProps) => {
     return supportedFormats
   }, [formData, getEnabledSaveTypes])
 
+  const backgroundColor = color ?? fileTypeColors[currentFormat]
+  const gameColorIsDark = colorIsDark(backgroundColor)
+
   return (
     <select
-      className="file-type-select"
+      className={cssClass('file-type-select')
+        .with('black-select-arrow')
+        .if(!gameColorIsDark)
+        .build()}
       value={currentFormat}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => onChange(e.target.value as PkmOrOhpkmFormat)}
       style={{
         backgroundColor: color ?? fileTypeColors[currentFormat],
         backgroundImage: props.disabled ? 'none' : undefined,
+        color: gameColorIsDark ? 'white' : 'black',
       }}
       disabled={props.disabled}
     >

@@ -7,6 +7,8 @@ import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
+import dayjs, { Dayjs } from 'dayjs'
+import { LogFilter } from '../pages/logs'
 import { ConvertStrategies } from '../state/convert-strategies/ConvertStrategiesProvider'
 
 export type AppState = {
@@ -16,7 +18,7 @@ export type AppState = {
   new_features_since_update: UpdateFeatures[]
 }
 
-export type UpdateFeatures = {
+type UpdateFeatures = {
   version: string
   feature_messages: string[]
 }
@@ -26,12 +28,7 @@ export type ImageResponse = {
   extension: string
 }
 
-export type PluginDownloadProgress = {
-  pluginId: string
-  progress: number
-}
-
-export type LogEntry = {
+type LogEntryUnparsed = {
   timestamp: string
   level: string
   target?: string
@@ -42,7 +39,59 @@ export type LogEntry = {
   ohpkm_id?: OhpkmIdentifier
 }
 
-export type LogLevel = 'error' | 'warn' | 'info' | 'debug' | 'trace'
+export type LogEntry = {
+  timestamp: Dayjs
+  level: string
+  target?: string
+  message: string
+  event?: string
+  fields?: Record<string, unknown>
+  context?: Record<string, unknown>
+  ohpkm_id?: OhpkmIdentifier
+}
+
+type LogFilterUnparsed = {
+  start: string
+  end: string
+  ohpkm_id?: string
+}
+
+function parseLog(unparsed: LogEntryUnparsed): LogEntry {
+  return {
+    ...unparsed,
+    timestamp: dayjs(unparsed.timestamp),
+  }
+}
+
+export type LogsResponseUnparsed = {
+  current: LogFilterUnparsed
+  next: LogFilterUnparsed
+  remaining_file_lines: LogEntryUnparsed[]
+}
+
+export type LogsResponse = {
+  current: LogFilter
+  next: LogFilter
+  remaining_file_lines: LogEntry[]
+}
+
+export function parseLogs(unparsed: LogsResponseUnparsed): LogsResponse {
+  return {
+    ...unparsed,
+    current: parseFilter(unparsed.current),
+    next: parseFilter(unparsed.next),
+    remaining_file_lines: unparsed.remaining_file_lines.map(parseLog),
+  }
+}
+
+function parseFilter(unparsed: LogFilterUnparsed): LogFilter {
+  return {
+    ...unparsed,
+    start: dayjs(unparsed.start),
+    end: dayjs(unparsed.end),
+  }
+}
+export type LogLevel = 'ERROR' | 'WARN' | 'INFO' | 'DEBUG' | 'TRACE'
 
 export type StoredLookups = { gen12: LookupMap; gen345: LookupMap }
 
@@ -118,6 +167,12 @@ export default interface BackendInterface {
   getLogs(): Promise<Errorable<LogEntry[]>>
   log(level: LogLevel, message: string, context?: Record<string, unknown>): Promise<Errorable<void>>
 
+  /* logging */
+  getLogs(filter: LogFilter): Promise<Errorable<LogsResponse>>
+  log(level: LogLevel, message: string, context?: Record<string, unknown>): Promise<Errorable<void>>
+  clearLogsForRange(start: Dayjs, end: Dayjs): Promise<Errorable<null>>
+  onNewLog: (callback: (notification: NewLogNotification) => void) => () => void
+
   /* plugins */
   getImageData: (absolutePath: string) => Promise<Errorable<ImageResponse>>
   listInstalledPlugins: () => Promise<Errorable<PluginMetadataWithIcon[]>>
@@ -131,7 +186,12 @@ export type BankOrBoxChange = { bank: number; box: number }
 
 export type MenuEvent = 'save' | 'reset' | 'open' | 'zoom_in' | 'zoom_out' | 'reset_zoom'
 
-export interface BackendListeners {
+export type NewLogNotification = {
+  level: LogLevel
+  timestamp_unix: number
+}
+
+interface BackendListeners {
   onMenuEvent: (event: MenuEvent) => void
   onLookupsUpdate: (updated_lookups: StoredLookups) => void
   onStateUpdate: Record<string, <State>(updated_state: State) => void>

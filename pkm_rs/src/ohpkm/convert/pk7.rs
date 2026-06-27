@@ -1,3 +1,4 @@
+use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
 use pkm_rs_types::{AbilityNumber, Stats16Le};
 
@@ -171,7 +172,11 @@ impl OhpkmConvert for Pk7 {
             met_date: ohpkm.met_date(),
             egg_location_index: ohpkm.egg_location_index().unwrap_or(0),
             met_location_index: met_data.location_index,
-            ball: ohpkm.ball(),
+            ball: if ohpkm.ball() <= Ball::Beast {
+                ohpkm.ball()
+            } else {
+                Ball::Poke
+            },
             met_level: ohpkm.met_level(),
             trainer_gender: ohpkm.trainer_gender(),
             hyper_training: ohpkm.hyper_training(),

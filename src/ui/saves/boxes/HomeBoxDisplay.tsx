@@ -3,9 +3,12 @@ import { getMonFileIdentifier, OhpkmIdentifier } from '@openhome-core/pkm/Lookup
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { monSupportedBySave } from '@openhome-core/save/util'
+import { mapToObject } from '@openhome-core/util'
 import { R, range } from '@openhome-core/util/functional'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { Item, Submenu } from '@openhome-ui/components/context-menu/types'
+import { DebugDataDisplay } from '@openhome-ui/components/DebugDataDisplay'
+import DebugOnly from '@openhome-ui/components/DebugOnly'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import {
   AddIcon,
@@ -17,7 +20,6 @@ import {
   SelectIcon,
 } from '@openhome-ui/components/Icons'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
-import useIsDev from '@openhome-ui/hooks/isDev'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
@@ -63,7 +65,6 @@ export default function HomeBoxDisplay() {
   const [deleting, setDeleting] = useState(false)
   const [viewMode, setViewMode] = useState<BoxViewMode>('one')
   const [editingBoxName, setEditingBoxName] = useState('')
-  const isDev = useIsDev()
   const [debugMode, setDebugMode] = useState(false)
   const { dragState, toggleMultiSelect } = useDragAndDrop()
   const {
@@ -141,6 +142,9 @@ export default function HomeBoxDisplay() {
             disabled={editing}
           />
           <Flex gap="1">
+            <DebugDataDisplay
+              data={{ ...currentBox, identifiers: mapToObject(currentBox.identifiers) }}
+            />
             {viewMode === 'one' ? (
               <>
                 <ToggleButton
@@ -162,7 +166,9 @@ export default function HomeBoxDisplay() {
               </>
             ) : (
               <>
-                {isDev && <ToggleButton state={debugMode} setState={setDebugMode} icon={DevIcon} />}
+                <DebugOnly>
+                  <ToggleButton state={debugMode} setState={setDebugMode} icon={DevIcon} />
+                </DebugOnly>
                 <Tooltip content="Add box to end">
                   <Button
                     className="mini-button"

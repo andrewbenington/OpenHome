@@ -1,36 +1,29 @@
+import { PK3, PK4, PK5 } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
 } from '@openhome-core/pkm/Lookup'
+import { getLocationStringOrOrigin } from '@openhome-core/pkm/MetLocation'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import {
   getHiddenPowerGen2,
   getHiddenPowerPower,
   getHiddenPowerType,
 } from '@openhome-core/pkm/util'
-import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import AttributeRow from '@openhome-ui/components/AttributeRow'
-import AttributeRowExpand from '@openhome-ui/components/AttributeRowExpand'
-import DynamaxLevel from '@openhome-ui/components/pokemon/DynamaxLevel'
-import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
-import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
-import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
-import useIsDev from '@openhome-ui/hooks/isDev'
-import { genderFromBool, Generation, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
-import { PK3, PK4, PK5 } from '@pokemon-files/pkm'
+import { AllPKMFields } from '@openhome-core/pkm/util/pkmInterface'
 import {
-  AllPKMFields,
-  getDisplayID,
-  getFlagsInRange,
-  getHeightCalculated,
-  getWeightCalculated,
-} from '@pokemon-files/util'
-import { Countries } from '@pokemon-resources/consts/Countries'
-import { EncounterTypes } from '@pokemon-resources/consts/EncounterTypes'
-import { SWEETS } from '@pokemon-resources/consts/Forms'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+  BDSPTMMoveIndexes,
+  LATutorMoveIndexes,
+  Moves,
+  SVTMMoveIndexes,
+  SwShTRMoveIndexes,
+} from '@openhome-core/resources'
+import { Countries } from '@openhome-core/resources/consts/Countries'
+import { EncounterTypes } from '@openhome-core/resources/consts/EncounterTypes'
+import { SWEETS } from '@openhome-core/resources/consts/Forms'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
   GEN2_TRANSFER_RESTRICTIONS,
   HGSS_TRANSFER_RESTRICTIONS,
@@ -39,24 +32,30 @@ import {
   SV_TRANSFER_RESTRICTIONS_ID,
   SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
-} from '@pokemon-resources/consts/TransferRestrictions'
+} from '@openhome-core/resources/consts/TransferRestrictions'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import {
-  BDSPTMMoveIndexes,
-  getLocationStringOrOrigin,
-  LATutorMoveIndexes,
-  Moves,
-  SVTMMoveIndexes,
-  SwShTRMoveIndexes,
-} from '@pokemon-resources/index'
+  getDisplayID,
+  getFlagsInRange,
+  getHeightCalculated,
+  getWeightCalculated,
+} from '@openhome-core/util'
+import AttributeRow from '@openhome-ui/components/AttributeRow'
+import AttributeRowExpand from '@openhome-ui/components/AttributeRowExpand'
+import DebugOnly from '@openhome-ui/components/DebugOnly'
+import DynamaxLevel from '@openhome-ui/components/pokemon/DynamaxLevel'
+import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
+import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
+import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
+import { genderFromBool, Generation, Language, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
 
-const HG_TO_LB = 0.2204623
-const CM_TO_IN = 0.3937008
+const HECTOGRAMS_TO_POUNDS = 0.2204623
+const CENTIMETERS_TO_INCHES = 0.3937008
 
 const OtherDisplay = (props: { mon: PKMInterface }) => {
   const { mon } = props
-  const isDev = useIsDev()
 
   const heightCalculated = getHeightCalculated(mon)
   const weightCalculated = getWeightCalculated(mon)
@@ -88,7 +87,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           value={
             mon.metLocationIndex === undefined
               ? '(not present)'
-              : `${getLocationStringOrOrigin(mon.gameOfOrigin, mon.metLocationIndex, mon.format)} (${mon.metLocationIndex})`
+              : `${getLocationStringOrOrigin(mon.gameOfOrigin, mon.metLocationIndex, mon.format, Language.English)} (${mon.metLocationIndex})` // todo: i18n
           }
         />
         {mon.encryptionConstant !== undefined && (
@@ -179,6 +178,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
         {mon.abilityNum !== undefined && (
           <AttributeRow label="Ability Number" value={mon.abilityNum} />
         )}
+        {mon.level !== undefined && <AttributeRow label="Stored Level" value={mon.level} />}
         {mon.formArgument !== undefined && mon.dexNum === NationalDex.Alcremie && (
           <AttributeRow label="Sweet" value={SWEETS[mon.formArgument]} />
         )}
@@ -362,24 +362,24 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           <>
             <AttributeRow
               label="Height (Absolute)"
-              value={`${Math.floor((mon.heightAbsolute * CM_TO_IN) / 12)}'${Math.round((mon.heightAbsolute * CM_TO_IN) % 12)}" • ${mon.heightAbsolute.toPrecision(5)} cm`}
+              value={`${Math.floor((mon.heightAbsolute * CENTIMETERS_TO_INCHES) / 12)}'${Math.round((mon.heightAbsolute * CENTIMETERS_TO_INCHES) % 12)}" • ${mon.heightAbsolute.toPrecision(5)} cm`}
             />
-            {isDev && (
+            <DebugOnly>
               <AttributeRow
                 label="Height (Calculated)"
-                value={`${Math.floor((heightCalculated * CM_TO_IN) / 12)}'${Math.round((heightCalculated * CM_TO_IN) % 12)}" • ${heightCalculated.toPrecision(5)} cm`}
+                value={`${Math.floor((heightCalculated * CENTIMETERS_TO_INCHES) / 12)}'${Math.round((heightCalculated * CENTIMETERS_TO_INCHES) % 12)}" • ${heightCalculated.toPrecision(5)} cm`}
               />
-            )}
+            </DebugOnly>
             <AttributeRow
               label="Weight (Absolute)"
-              value={`${(mon.weightAbsolute * HG_TO_LB).toPrecision(5)} lb • ${(mon.weightAbsolute / 10).toPrecision(5)} kg`}
+              value={`${(mon.weightAbsolute * HECTOGRAMS_TO_POUNDS).toPrecision(5)} lb • ${(mon.weightAbsolute / 10).toPrecision(5)} kg`}
             />
-            {isDev && (
+            <DebugOnly>
               <AttributeRow
                 label="Weight (Calculated)"
-                value={`${(weightCalculated * HG_TO_LB).toPrecision(5)} lb • ${(weightCalculated / 10).toPrecision(5)} kg`}
+                value={`${(weightCalculated * HECTOGRAMS_TO_POUNDS).toPrecision(5)} lb • ${(weightCalculated / 10).toPrecision(5)} kg`}
               />
-            )}
+            </DebugOnly>
           </>
         )}
         {!isRestricted(GEN2_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum, mon.extraFormIndex) && (

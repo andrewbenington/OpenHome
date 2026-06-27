@@ -36,7 +36,8 @@ export type DragPayload =
 export type DragMode = 'mon' | 'item'
 
 type ListenerMap = Map<UniqueIdentifier, Listener>
-export type Listener = () => void
+
+type Listener = () => void
 
 export function locationKey(location: MonLocation): string {
   if (location.isHome) {
@@ -44,18 +45,4 @@ export function locationKey(location: MonLocation): string {
   }
 
   return `save:${location.saveIdentifier}:${location.box}:${location.boxSlot}`
-}
-
-/**
- * Helper to check if two MonLocations are equal
- */
-export function locationsEqual(a: MonLocation, b: MonLocation): boolean {
-  if (a.isHome !== b.isHome) return false
-  if (a.isHome && b.isHome) {
-    return a.bank === b.bank && a.box === b.box && a.boxSlot === b.boxSlot
-  }
-  if (!a.isHome && !b.isHome) {
-    return a.saveIdentifier === b.saveIdentifier && a.box === b.box && a.boxSlot === b.boxSlot
-  }
-  return false
 }

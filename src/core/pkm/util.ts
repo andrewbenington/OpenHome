@@ -1,21 +1,5 @@
 import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
-  AbilityIndex,
-  AbilityNumber,
-  currentMetadataReader,
-  extraFormTypeOverride,
-  FormMetadata,
-  metadataReaderFor,
-  MetadataSource,
-  MetadataSummaryLookup,
-  PkmType,
-  SpeciesAndForm,
-  StatsPreSplit,
-} from '@pkm-rs/pkg'
-import { FourMoves, Stats } from '@pokemon-files/util'
-import { Item } from '@pokemon-resources/consts/Items'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import {
   AttackCharacteristics,
   DefenseCharacteristics,
   HPCharacteristics,
@@ -24,7 +8,25 @@ import {
   SpecialAtkCharacteristics,
   SpecialDefCharacteristics,
   SpeedCharacteristics,
-} from '@pokemon-resources/index'
+} from '@openhome-core/resources'
+import { Item } from '@openhome-core/resources/consts/Items'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import { FourMoves, Stats } from '@openhome-core/util/types'
+import {
+  AbilityIndex,
+  AbilityNumber,
+  currentMetadataReader,
+  extraFormTypeOverride,
+  FormMetadata,
+  metadataReaderFor,
+  MetadataSource,
+  MetadataSummaryLookup,
+  PkmFormat,
+  PkmFormats,
+  PkmType,
+  SpeciesAndForm,
+  StatsPreSplit,
+} from '@pkm-rs/pkg'
 import Prando from 'prando'
 
 export const getAbilityFromNumber = (
@@ -83,38 +85,6 @@ export const generateIVs = (prng: Prando) => {
     spd: prng.nextInt(0, 31),
     spe: prng.nextInt(0, 31),
   }
-}
-
-export const generateDVs = (prng: Prando, isShiny: boolean) => {
-  if (isShiny) {
-    let atkDV = prng.nextInt(0, 15)
-
-    if ((atkDV & 0b11) === 0b01) {
-      atkDV += 1
-    } else if (atkDV % 4 === 0) {
-      atkDV += 2
-    }
-    const hpDV = (atkDV & 1) << 3
-
-    return {
-      hp: hpDV,
-      atk: atkDV,
-      def: 10,
-      spc: 10,
-      spe: 10,
-    }
-  }
-  return {
-    hp: prng.nextInt(0, 15),
-    atk: prng.nextInt(0, 15),
-    def: prng.nextInt(0, 15),
-    spc: prng.nextInt(0, 15),
-    spe: prng.nextInt(0, 15),
-  }
-}
-
-export const generatePersonalityValue = () => {
-  return Math.floor(Math.random() * 2 ** 32)
 }
 
 // recursively returns pre-evolution. if provided a mega form, returns the first pre-evolution
@@ -203,6 +173,7 @@ function MetadataSourceByFormat(format: MonFormat): MetadataSource {
     case 'PK9':
     case 'PK3RR':
     case 'PK3UB':
+    case 'PK9Compass':
       return MetadataSource.ScarletViolet
     case 'PA9':
       return MetadataSource.LegendsZa
@@ -431,3 +402,9 @@ export function displayIndexAdder(itemIndex?: number) {
   }
   return (x: number) => x + 1
 }
+
+export function isPkmFormat(value: string): value is PkmFormat {
+  return PkmFormats.all().includes(value as unknown as PkmFormat)
+}
+
+export type PkmOrOhpkmFormat = PkmFormat | 'OHPKM'

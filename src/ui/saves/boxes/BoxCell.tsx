@@ -9,7 +9,9 @@ import {
   OpenHomeCtxMenu,
   Submenu,
 } from '@openhome-ui/components/context-menu'
+import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useMonDisplay } from '@openhome-ui/hooks/monDisplay'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
@@ -17,8 +19,6 @@ import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Lookup } from '@pkm-rs/pkg'
 import { Flex, TextField } from '@radix-ui/themes'
 import { useCallback, useContext, useMemo, useState } from 'react'
-import { Dialog } from 'src/ui/components/dialog/Dialog'
-import { useMonDisplay } from 'src/ui/hooks/useMonDisplay'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'

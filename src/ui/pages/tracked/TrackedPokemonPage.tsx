@@ -1,17 +1,18 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { SAV } from '@openhome-core/save/interfaces'
+import { numericSorter } from '@openhome-core/util/sort'
+import { Dialog } from '@openhome-ui/components/dialog/Dialog'
+import MessageRibbon from '@openhome-ui/components/MessageRibbon'
+import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
+import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
+import { usePathSegment } from '@openhome-ui/hooks/routing'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
+import { useSaves } from '@openhome-ui/state/saves'
 import { Button, DropdownMenu, Flex } from '@radix-ui/themes'
 import { PropsWithChildren, ReactNode, useState } from 'react'
 import { Route, Routes, useNavigate } from 'react-router'
-import { OhpkmIdentifier } from 'src/core/pkm/Lookup'
-import { SAV } from 'src/core/save/interfaces'
-import { Dialog } from 'src/ui/components/dialog/Dialog'
-import MessageRibbon from 'src/ui/components/MessageRibbon'
-import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
-import { usePathSegment } from 'src/ui/hooks/routing'
-import { useSaves } from 'src/ui/state/saves'
-import { numericSorter } from '../../../core/util/sort'
 import { boxNameOrDefault, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import AllTrackedPokemon from './AllTrackedPokemon'
 import Gen12Lookup from './Gen12Lookup'
@@ -39,6 +40,42 @@ export default function TrackedPokemonPage() {
   )
 
   return (
+    <SideTabNavigation
+      defaultTab="all"
+      parentPathSegment="manage"
+      routes={[
+        {
+          route: 'all',
+          display: 'All Pokémon',
+          component: (
+            <AllTrackedPokemon
+              onSelectMon={setSelectedMon}
+              findSaveForMon={findSaveForMon}
+              findSavesForAllMons={findSavesForAllMons}
+            />
+          ),
+        },
+        {
+          route: 'gen12',
+          display: 'Gen 1/2 IDs',
+          component: <Gen12Lookup onSelectMon={setSelectedMon} />,
+        },
+        {
+          route: 'gen345',
+          display: 'Gen 3/4/5 IDs',
+          component: <Gen345Lookup onSelectMon={setSelectedMon} />,
+        },
+      ]}
+    >
+      <ManageDialog onClose={clearFindingState} />
+      <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
+      {findingSaveState && (
+        <FindingSaveDialog state={findingSaveState} onClose={clearFindingState} />
+      )}
+    </SideTabNavigation>
+  )
+
+  return (
     <SideTabs.Root value={currentSegment} onValueChange={setCurrentSegment}>
       <SideTabs.TabList>
         <SideTabs.Tab value="all"> All Pokémon</SideTabs.Tab>
@@ -53,10 +90,6 @@ export default function TrackedPokemonPage() {
         <Route path="gen12" element={<Gen12Lookup onSelectMon={setSelectedMon} />} />
         <Route path="gen345" element={<Gen345Lookup onSelectMon={setSelectedMon} />} />
       </Routes>
-      <PokemonDetailsModal mon={selectedMon} onClose={() => setSelectedMon(undefined)} />
-      {findingSaveState && (
-        <FindingSaveDialog state={findingSaveState} onClose={clearFindingState} />
-      )}
     </SideTabs.Root>
   )
 }

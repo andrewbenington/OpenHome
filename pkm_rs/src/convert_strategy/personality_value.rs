@@ -22,12 +22,12 @@ impl NatureStrategy {
     fn relevant_nature(&self, mon: &OhpkmV2) -> NatureIndex {
         match self {
             NatureStrategy::KeepOriginalNature => mon.nature(),
-            NatureStrategy::KeepMintNature => mon.stat_nature(),
+            NatureStrategy::KeepMintNature => mon.mint_nature(),
         }
     }
 
     fn is_satisfied(&self, pid: u32, mon: &OhpkmV2) -> bool {
-        NatureIndex::new_from_pid(pid) == self.relevant_nature(mon)
+        NatureIndex::new_from_modulo(pid) == self.relevant_nature(mon)
     }
 }
 
@@ -215,7 +215,7 @@ mod test {
         let new_pid = strategy.get_modified_pid(&mon);
 
         let modest = NatureIndex::new_js(15);
-        assert_eq!(NatureIndex::new_from_pid(new_pid), modest);
+        assert_eq!(NatureIndex::new_from_modulo(new_pid), modest);
 
         Ok(())
     }
@@ -235,7 +235,7 @@ mod test {
         let new_pid = strategy.get_modified_pid(&mon);
 
         let mild = NatureIndex::new_js(16);
-        assert_eq!(NatureIndex::new_from_pid(new_pid), mild);
+        assert_eq!(NatureIndex::new_from_modulo(new_pid), mild);
 
         Ok(())
     }
@@ -255,7 +255,7 @@ mod test {
         let new_pid = strategy.get_modified_pid(&mon);
 
         assert!(pkm_rs_types::shiny_xor_value(new_pid, mon.trainer_id(), mon.secret_id()) < 8);
-        assert_eq!(NatureIndex::new_from_pid(new_pid), mon.nature());
+        assert_eq!(NatureIndex::new_from_modulo(new_pid), mon.nature());
         assert_eq!(
             mon.get_forme_metadata().gender_from_pid(new_pid),
             mon.gender()
@@ -279,7 +279,7 @@ mod test {
         let new_pid = strategy.get_modified_pid(&mon);
 
         assert!(pkm_rs_types::shiny_xor_value(new_pid, mon.trainer_id(), mon.secret_id()) >= 8);
-        assert_eq!(NatureIndex::new_from_pid(new_pid), mon.nature());
+        assert_eq!(NatureIndex::new_from_modulo(new_pid), mon.nature());
         assert_eq!(
             mon.get_forme_metadata().gender_from_pid(new_pid),
             mon.gender()

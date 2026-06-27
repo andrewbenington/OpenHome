@@ -1,9 +1,12 @@
+import { PK3 } from '@openhome-core/pkm'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import { GEN3_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
   uint32ToBytesLittleEndian,
-} from '@openhome-core/save/util/byteLogic'
+} from '@openhome-core/util/byteLogic'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -13,9 +16,6 @@ import {
   Language,
   OriginGame,
 } from '@pkm-rs/pkg'
-import { PK3 } from '@pokemon-files/pkm'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
-import { GEN3_TRANSFER_RESTRICTIONS } from '@pokemon-resources/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'
 import { filterUndefined } from '../util/sort'
@@ -23,9 +23,9 @@ import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
 import { emptyPathData, PathData } from './util/path'
 
-export const SAVE_SIZE_BYTES = 0x20000
-export const EMERALD_SECURITY_OFFSET = 0xac
-export const EMERALD_SECURITY_COPY_OFFSET = 0x01f4
+const SAVE_SIZE_BYTES = 0x20000
+const EMERALD_SECURITY_OFFSET = 0xac
+const EMERALD_SECURITY_COPY_OFFSET = 0x01f4
 export const FRLG_SECURITY_OFFSET = 0x0af8
 export const FRLG_SECURITY_COPY_OFFSET = 0x0f20
 export const GEN3_SIGNATURE_OFFSET = 0x0ff8
@@ -179,7 +179,7 @@ export class G3SaveBackup {
         const buffer = this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80).buffer
         box.boxSlots[slot] = PK3.fromSlotBytes(buffer)
       } catch (e) {
-        throw Error(
+        console.error(
           `File does has invalid Pokémon data at box ${Math.floor(i / 30)}/slot ${slot}: ${e}`
         )
       }
@@ -371,7 +371,8 @@ export class G3SAV extends OfficialSAV<PK3> {
         return true
       }
       return save.primarySave.securityKey > 0 && save.primarySave.signature === GEN3_SIGNATURE
-    } catch {
+    } catch (e) {
+      console.error(e)
       return false
     }
   }

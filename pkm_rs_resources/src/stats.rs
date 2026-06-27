@@ -41,18 +41,18 @@ impl Display for Stat {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-pub struct Stats;
+pub struct StatAbbr;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[allow(clippy::missing_const_for_fn)]
-impl Stats {
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "abbrLower"))]
-    pub fn abbr_lower(stat: Stat) -> String {
+impl StatAbbr {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getLower"))]
+    pub fn get_lower(stat: Stat) -> String {
         stat.abbr().to_lowercase()
     }
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "fromAbbr"))]
-    pub fn from_abbr(abbr: &str) -> Option<Stat> {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "toStat"))]
+    pub fn to_stat(abbr: &str) -> Option<Stat> {
         match abbr {
             "HP" => Some(Stat::HP),
             "Atk" => Some(Stat::Attack),

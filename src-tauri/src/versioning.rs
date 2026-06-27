@@ -3,7 +3,7 @@ use semver::Version;
 use serde::Serialize;
 use std::{fs, path::PathBuf};
 use strum::{self, EnumIter, IntoEnumIterator};
-use tracing::info;
+use tracing::{debug, info};
 
 use crate::data_controller::{DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
@@ -92,7 +92,11 @@ pub fn handle_updates_get_features(
             );
         }
         let significant_updates = get_significant_updates(last_used_semver, current_version);
-        info!("Significant update: {significant_updates:?}");
+        if significant_updates.is_empty() {
+            debug!("No significant updates since last launch");
+        } else {
+            info!("Significant updates: {significant_updates:?}");
+        }
 
         let mut prev_o: Option<UpdateFeatures> = None;
 
@@ -155,6 +159,9 @@ pub enum SignificantUpdate {
     V1_11_1,
     V1_11_2,
     V1_11_3,
+    V1_11_4,
+    V1_12_0,
+    V1_12_1,
 }
 
 impl SignificantUpdate {
@@ -179,6 +186,9 @@ impl SignificantUpdate {
             Self::V1_11_1 => Version::parse("1.11.1").unwrap(),
             Self::V1_11_2 => Version::parse("1.11.2").unwrap(),
             Self::V1_11_3 => Version::parse("1.11.3").unwrap(),
+            Self::V1_11_4 => Version::parse("1.11.4").unwrap(),
+            Self::V1_12_0 => Version::parse("1.12.0").unwrap(),
+            Self::V1_12_1 => Version::parse("1.12.1").unwrap(),
         }
     }
 
@@ -261,6 +271,19 @@ impl SignificantUpdate {
             Self::V1_11_3 => Some(vec![
                 "Various bugs relating to PID conversion have been fixed.",
                 "Image plugins no longer break after changing the data directory.",
+            ]),
+            Self::V1_11_4 => Some(vec![
+                "Fixed a bug causing changes in Alola games to not be tracked.",
+            ]),
+            Self::V1_12_0 => Some(vec![
+                "Added support for Pokémon Compass.",
+                "Added structured logging and a new tab to view logs.",
+                "The Pokémon details modal has a tab for Pokémon-specific logs, including when fields are updated.",
+            ]),
+            Self::V1_12_1 => Some(vec![
+                "Abilities for mega evolutions added in Pokémon Champions v1.10.0 have been added.",
+                "Missing box icons and Home sprites have been fixed.",
+                "Vivillon and Alcremie now have the correct box icons and Home sprites for their forms.",
             ]),
             _ => None,
         }

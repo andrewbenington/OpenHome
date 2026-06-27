@@ -1,6 +1,6 @@
+import MoveCard from '@openhome-ui/components/pokemon/MoveCard'
 import { FormMetadata, MetadataSource } from '@pkm-rs/pkg'
 import { Flex, Text } from '@radix-ui/themes'
-import MoveCard from 'src/ui/components/pokemon/MoveCard'
 import './PokedexLearnset.css'
 import { MOST_CURRENT_SOURCE, MostCurrentSource } from './PokedexPage'
 

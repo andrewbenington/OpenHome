@@ -46,8 +46,8 @@ impl NatureIndex {
         }
     }
 
-    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "newFromPid"))]
-    pub fn new_from_pid(val: u32) -> NatureIndex {
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "newFromModulo"))]
+    pub fn new_from_modulo(val: u32) -> NatureIndex {
         Self((val % (NATURE_COUNT as u32)) as u8)
     }
 
@@ -140,13 +140,15 @@ pub struct NatureMetadata {
 }
 
 impl NatureMetadata {
-    pub fn multiplier_for(&self, stat: Stat) -> f32 {
+    pub const fn multiplier_for(&self, stat: Stat) -> f32 {
         match &self.stats {
             None => 1.0,
             Some(stat_changes) => {
-                if stat_changes.increase == stat {
+                // casts necessary for const fn
+                let stat = stat as usize;
+                if stat_changes.increase as usize == stat {
                     1.1
-                } else if stat_changes.decrease == stat {
+                } else if stat_changes.decrease as usize == stat {
                     0.9
                 } else {
                     1.0

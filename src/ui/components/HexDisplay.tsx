@@ -1,5 +1,5 @@
+import { FileSchemas } from '@openhome-core/pkm/schema'
 import { range } from '@openhome-core/util/functional'
-import { FileSchemas } from '@pokemon-files/schema'
 import { Flex, Grid } from '@radix-ui/themes'
 import { useMemo, useState } from 'react'
 import './components.css'

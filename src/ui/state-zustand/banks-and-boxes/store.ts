@@ -1,17 +1,17 @@
-import { Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
-import { createContext, useCallback, useContext, useEffect } from 'react'
-import { v4 as UuidV4 } from 'uuid'
-import { create, StateCreator, StoreApi, UseBoundStore } from 'zustand'
-import { immer } from 'zustand/middleware/immer'
-import { OhpkmIdentifier } from '../../../core/pkm/Lookup'
-import { getSortFunctionNullable } from '../../../core/pkm/sort'
+import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
+import { getSortFunctionNullable } from '@openhome-core/pkm/sort'
 import {
   BoxMonIdentifiers,
   SimpleOpenHomeBank,
   SimpleOpenHomeBox,
   StoredBankData,
-} from '../../../core/save/util/storage'
-import { numericSorter } from '../../../core/util/sort'
+} from '@openhome-core/save/util/storage'
+import { Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
+import { numericSorter } from '@openhome-core/util/sort'
+import { createContext, useCallback, useContext, useEffect } from 'react'
+import { v4 as UuidV4 } from 'uuid'
+import { create, StateCreator, StoreApi, UseBoundStore } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 import { BackendContext } from '../../backend/backendContext'
 import { IdentifierNotPresentError, useOhpkmStore } from '../../state/ohpkm'
 
@@ -23,10 +23,6 @@ export interface BankBoxCoordinates {
   bank: number
   box: number
   boxSlot: number
-}
-
-export function bankBoxCoordinates(bank: number, box: number, boxSlot: number): BankBoxCoordinates {
-  return { bank, box, boxSlot }
 }
 
 export type AddBoxLocation = 'start' | 'end' | ['before', number] | ['after', number]
@@ -312,7 +308,7 @@ function rebuildBoxMapUsingIndices(boxes: BoxMap): BoxMap {
   )
 }
 
-export function boxMapFromOrdered(boxesInOrder: SimpleOpenHomeBox[]): BoxMap {
+function boxMapFromOrdered(boxesInOrder: SimpleOpenHomeBox[]): BoxMap {
   return new Map(boxesInOrder.map((box, index) => [index, { ...box, index }] as const))
 }
 
@@ -574,7 +570,7 @@ export function useBanksAndBoxes() {
 
     for (let i = 0; i < ids.length; i += OPENHOME_BOX_SLOTS) {
       const identifiers: BoxMonIdentifiers = new Map()
-      for (let slot = 0; slot < OPENHOME_BOX_SLOTS; slot++) {
+      for (let slot = 0; slot < OPENHOME_BOX_SLOTS && i + slot < ids.length; slot++) {
         identifiers.set(slot, ids[i + slot])
       }
       addBoxCurrentBank('end', boxName, identifiers)
@@ -641,5 +637,3 @@ export function useBanksAndBoxes() {
     firstHomeBoxEmptySlot,
   }
 }
-
-export type BanksAndBoxesConroller = ReturnType<typeof useBanksAndBoxes>

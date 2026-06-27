@@ -1,0 +1,324 @@
+import { PB8 } from '@openhome-core/pkm'
+import { Item } from '@openhome-core/resources/consts/Items'
+import { BDSP_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
+import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { Option } from '@openhome-core/util/functional'
+import { utf16BytesToString } from '@openhome-core/util/stringConversion'
+import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
+import { OHPKM } from '../../pkm/OHPKM'
+import { md5Digest } from '../encryption/Encryption'
+import { Box, BoxAndSlot, OfficialSAV } from '../interfaces'
+import {
+  LUMI_1_1_VERSION_IDENTIFIER,
+  LUMI_1_3_VERSION_IDENTIFIER,
+  LUMI_1_3RV1_VERSION_IDENTIFIER,
+} from '../luminescentplatinum/G8LUMISAV'
+import { PathData } from '../util/path'
+
+const SAVE_SIZE_BYTES_MIN = 900000
+const SAVE_SIZE_BYTES_MAX = 1000000
+const BOX_COUNT = 40
+const BOX_NAME_LENGTH = 0x22
+const BOX_MONS_OFFSET = 0x14ef4
+
+const HASH_OFFSET = 0xe9818
+
+const BDSP_1_0_VERSION_IDENTIFIER = 0x25
+const BDSP_1_1_VERSION_IDENTIFIER = 0x2c
+const BDSP_1_2_VERSION_IDENTIFIER = 0x32
+const BDSP_1_3_VERSION_IDENTIFIER = 0x34
+
+export type BDSP_SAVE_REVISION = '1.0' | '1.1' | '1.2' | '1.3'
+
+export class BdspSave extends OfficialSAV<PB8> {
+  static boxSizeBytes = PB8.getBoxSize() * 30
+  static pkmType = PB8
+  static saveTypeAbbreviation = 'BDSP'
+  static saveTypeName = 'Pokémon Brilliant Diamond/Shining Pearl'
+  static saveTypeID = 'BDSPSAV'
+
+  filePath: PathData
+  fileCreated?: Date
+
+  origin: OriginGame
+  isPlugin = false as const
+
+  boxRows = 5
+  boxColumns = 6
+
+  money: number = 0
+  name: string = ''
+  tid: number = 0
+  sid: number = 0
+  displayID: string = ''
+
+  currentPCBox: number = 0 // TODO: current box
+
+  bytes: Uint8Array
+
+  invalid: boolean = false
+  tooEarlyToOpen: boolean = false
+
+  myStatusBlock: MyStatusBlock
+  configBlock: ConfigBlock
+  boxes: Box<PB8>[] = []
+
+  updatedBoxSlots: BoxAndSlot[] = []
+
+  constructor(path: PathData, bytes: Uint8Array) {
+    super()
+    this.bytes = bytes
+    this.filePath = path
+
+    this.myStatusBlock = new MyStatusBlock(bytes)
+    this.configBlock = new ConfigBlock(bytes)
+
+    this.name = this.myStatusBlock.getName()
+    const fullTrainerID = this.myStatusBlock.getFullID()
+
+    this.tid = fullTrainerID % 1000000
+    this.sid = this.myStatusBlock.getSID()
+    this.displayID = this.tid.toString().padStart(6, '0')
+    this.origin = this.myStatusBlock.getGame()
+
+    const boxNamesBlock = new BoxLayoutBDSP(this.bytes)
+
+    this.boxes = Array(this.getBoxCount())
+    for (let box = 0; box < this.getBoxCount(); box++) {
+      const boxName = boxNamesBlock.getBoxName(box) || `Box ${box + 1}`
+
+      this.boxes[box] = new Box(boxName, 30)
+    }
+
+    for (let box = 0; box < this.getBoxCount(); box++) {
+      for (let monIndex = 0; monIndex < 30; monIndex++) {
+        try {
+          const startByte =
+            BOX_MONS_OFFSET + this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * monIndex
+          const endByte = startByte + this.getMonBoxSizeBytes()
+          const monData = (bytes.buffer as ArrayBuffer).slice(startByte, endByte)
+          const mon = this.buildPKM(monData, true)
+
+          if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
+            this.boxes[box].boxSlots[monIndex] = mon
+          }
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    }
+  }
+
+  getSaveRevision(): BDSP_SAVE_REVISION {
+    const dataView = new DataView(this.bytes.buffer)
+    const versionIdentifier = dataView.getUint8(0)
+
+    switch (versionIdentifier) {
+      case BDSP_1_0_VERSION_IDENTIFIER:
+        return '1.0'
+      case BDSP_1_1_VERSION_IDENTIFIER:
+        return '1.1'
+      case BDSP_1_2_VERSION_IDENTIFIER:
+        return '1.2'
+      case BDSP_1_3_VERSION_IDENTIFIER:
+        return '1.3'
+      default:
+        throw new Error(`BDSP save has invalid version identifier: ${versionIdentifier}`)
+    }
+  }
+
+  getPluginIdentifier() {
+    return undefined
+  }
+
+  getBoxCount = () => BOX_COUNT
+
+  buildPKM(bytes: ArrayBuffer, encrypted: boolean): PB8 {
+    return PB8.fromBytes(bytes, encrypted)
+  }
+
+  getMonBoxSizeBytes(): number {
+    return PB8.getBoxSize()
+  }
+
+  getBoxSizeBytes(): number {
+    return BdspSave.boxSizeBytes
+  }
+
+  prepareForSaving() {
+    this.updatedBoxSlots.forEach(({ box, boxSlot: monIndex }) => {
+      const mon = this.boxes[box].boxSlots[monIndex]
+
+      const writeIndex =
+        BOX_MONS_OFFSET + this.getBoxSizeBytes() * box + this.getMonBoxSizeBytes() * monIndex
+
+      // mon will be undefined if pokemon was moved from this slot
+      // and the slot was left empty
+      if (mon) {
+        try {
+          if (mon?.gameOfOrigin && mon?.dexNum) {
+            mon.refreshChecksum()
+            this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
+          }
+        } catch (e) {
+          console.error(e)
+        }
+      } else {
+        const mon = PB8.fromBytes(new Uint8Array(PB8.getBoxSize()).buffer)
+
+        this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
+      }
+    })
+    this.bytes.set(this.calculateChecksumBytes(), HASH_OFFSET)
+  }
+
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB8 {
+    return PB8.fromOhpkm(ohpkm, strategy)
+  }
+
+  calculateChecksumBytes() {
+    const bytesCopy = copyByteArray(this.bytes)
+
+    bytesCopy.fill(0, HASH_OFFSET, HASH_OFFSET + 16)
+    return md5Digest(bytesCopy)
+  }
+
+  calculateChecksumStr() {
+    return uint8ArrayToBase64(this.calculateChecksumBytes())
+  }
+
+  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(BDSP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
+  }
+
+  supportsItem(itemIndex: number) {
+    return itemIndex <= Item.DsSounds
+  }
+
+  getDisplayData() {
+    return {
+      'Player Character': this.myStatusBlock.getGender() ? 'Dawn' : 'Lucas',
+      'Save Version': this.getSaveRevision(),
+      'Calculated Checksum': this.calculateChecksumStr(),
+    }
+  }
+
+  static fileIsSave(bytes: Uint8Array): boolean {
+    if (bytes.length < SAVE_SIZE_BYTES_MIN || bytes.length > SAVE_SIZE_BYTES_MAX) {
+      return false
+    }
+
+    const dataView = new DataView(bytes.buffer)
+
+    const luminescentPlatinumVersion = dataView.getUint16(0, true)
+    if (
+      luminescentPlatinumVersion === LUMI_1_1_VERSION_IDENTIFIER ||
+      luminescentPlatinumVersion === LUMI_1_3_VERSION_IDENTIFIER ||
+      luminescentPlatinumVersion === LUMI_1_3RV1_VERSION_IDENTIFIER
+    ) {
+      return false
+    }
+
+    const versionIdentifier = dataView.getUint8(0)
+
+    return (
+      versionIdentifier === BDSP_1_0_VERSION_IDENTIFIER ||
+      versionIdentifier === BDSP_1_1_VERSION_IDENTIFIER ||
+      versionIdentifier === BDSP_1_2_VERSION_IDENTIFIER ||
+      versionIdentifier === BDSP_1_3_VERSION_IDENTIFIER
+    )
+  }
+
+  static includesOrigin(origin: OriginGame) {
+    return origin === OriginGame.BrilliantDiamond || origin === OriginGame.ShiningPearl
+  }
+
+  get trainerGender() {
+    return this.myStatusBlock.getGender() ? Gender.Female : Gender.Male
+  }
+
+  getMonAt(boxNum: number, boxSlot: number) {
+    const box = this.boxes[boxNum]
+    if (!box) return undefined
+    return box.boxSlots[boxSlot]
+  }
+
+  setMonAt(boxNum: number, boxSlot: number, mon: Option<PB8>): void {
+    const box = this.boxes[boxNum]
+    if (!box) return
+    box.boxSlots[boxSlot] = mon
+  }
+
+  get language() {
+    return this.configBlock.getLanguage()
+  }
+}
+
+class BoxLayoutBDSP {
+  dataView: DataView<ArrayBuffer>
+
+  constructor(saveBytes: Uint8Array) {
+    this.dataView = new DataView(saveBytes.slice(0x148aa, 0x148aa + 0x64a).buffer)
+  }
+
+  public getBoxName(index: number): string {
+    if (index >= BOX_COUNT) {
+      throw Error('Attempting to get box name at index past BOX_COUNT')
+    }
+    return utf16BytesToString(this.dataView.buffer, index * BOX_NAME_LENGTH, BOX_NAME_LENGTH)
+  }
+
+  public getCurrentBox(): number {
+    return this.dataView.getUint8(0x61e)
+  }
+}
+
+class MyStatusBlock {
+  dataView: DataView<ArrayBuffer>
+
+  constructor(saveBytes: Uint8Array) {
+    this.dataView = new DataView(saveBytes.slice(0x79bb4, 0x79bb4 + 0x50).buffer)
+  }
+
+  public getName(): string {
+    return utf16BytesToString(this.dataView.buffer, 0, 24)
+  }
+  public getFullID(): number {
+    return this.dataView.getUint32(0x1c, true)
+  }
+  public getSID(): number {
+    return this.dataView.getUint16(0x1e, true)
+  }
+  public getGender(): boolean {
+    return !(this.dataView.getUint8(0x24) & 1)
+  }
+  public getGame(): OriginGame {
+    const origin = this.dataView.getUint8(0x2b)
+
+    return origin === 0 ? OriginGame.BrilliantDiamond : OriginGame.ShiningPearl
+  }
+}
+
+class ConfigBlock {
+  dataView: DataView<ArrayBuffer>
+
+  constructor(saveBytes: Uint8Array) {
+    this.dataView = new DataView(saveBytes.slice(0x79b74, 0x79b74 + 0x40).buffer)
+  }
+
+  public getLanguage(): Language {
+    return this.dataView.getUint32(0x04, true)
+  }
+}
+
+function uint8ArrayToBase64(uint8Array: Uint8Array) {
+  return btoa(String.fromCharCode(...uint8Array))
+}
+
+function copyByteArray(bytes: Uint8Array): Uint8Array {
+  const bufferCopy = new ArrayBuffer(bytes.length)
+  const arrayCopy = new Uint8Array(bufferCopy)
+
+  arrayCopy.set(new Uint8Array(bytes))
+  return arrayCopy
+}

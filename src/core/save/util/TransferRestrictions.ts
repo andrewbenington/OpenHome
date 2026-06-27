@@ -1,4 +1,3 @@
-import { ExtraFormIndex } from '@pkm-rs/pkg'
 import {
   BASE,
   BLOOD_MOON,
@@ -6,8 +5,9 @@ import {
   LGP_STARTER,
   MAROWAK_ALOLA_TOTEM,
   SPIKY_EAR,
-} from '@pokemon-resources/consts/Forms'
-import { NationalDex } from '@pokemon-resources/consts/NationalDex'
+} from '@openhome-core/resources/consts/Forms'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import { ExtraFormIndex } from '@pkm-rs/pkg'
 
 interface FormRestrictions {
   [dexNum: number]: number[] | undefined
@@ -40,7 +40,7 @@ export const LgpeStarters: FormRestrictions = {
   [NationalDex.Eevee]: [LGE_STARTER],
 }
 
-export const AlolanForms: FormRestrictions = {
+const AlolanForms: FormRestrictions = {
   [NationalDex.Rattata]: [1],
   [NationalDex.Raticate]: [1],
   [NationalDex.Raichu]: [1],
@@ -61,7 +61,7 @@ export const AlolanForms: FormRestrictions = {
   [NationalDex.Marowak]: [1, MAROWAK_ALOLA_TOTEM],
 }
 
-export const GalarianForms: FormRestrictions = {
+const GalarianForms: FormRestrictions = {
   [NationalDex.Meowth]: [2],
   [NationalDex.Ponyta]: [1],
   [NationalDex.Rapidash]: [1],

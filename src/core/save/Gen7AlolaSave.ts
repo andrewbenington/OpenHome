@@ -1,13 +1,13 @@
+import PK7 from '@openhome-core/pkm/PK7'
+import { Item } from '@openhome-core/resources//consts/Items'
+import { USUM_TRANSFER_RESTRICTIONS } from '@openhome-core/resources//consts/TransferRestrictions'
 import {
   ConvertStrategy,
   ExtraFormIndex,
   Gen7AlolaSaveRust,
   OriginGame,
-  Pk7 as Pk7Wasm,
+  Pk7Wasm,
 } from '@pkm-rs/pkg'
-import PK7 from '../../../packages/pokemon-files/src/pkm/PK7'
-import { Item } from '../../../packages/pokemon-resources/src/consts/Items'
-import { USUM_TRANSFER_RESTRICTIONS } from '../../../packages/pokemon-resources/src/consts/TransferRestrictions'
 import { OHPKM } from '../pkm/OHPKM'
 import { Option } from '../util/functional'
 import { Box, BoxAndSlot, WasmOfficialSave } from './interfaces'
@@ -18,6 +18,9 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm> {
   static pkmType = PK7
   static saveTypeAbbreviation = 'SM/USUM'
   static saveTypeID = 'SM/USUM'
+
+  MAX_BOX_COUNT: number = Gen7AlolaSaveRust.MAX_BOX_COUNT
+  SLOTS_PER_BOX: number = Gen7AlolaSaveRust.SLOTS_PER_BOX
 
   filePath: PathData
   fileCreated?: Date

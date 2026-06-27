@@ -5,18 +5,18 @@ import { SAV } from '@openhome-core/save/interfaces'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import { ClearIcon, ErrorIcon } from '@openhome-ui/components/Icons'
+import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
+import { Typeahead } from '@openhome-ui/components/typeahead'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
 import SavesModal from '@openhome-ui/saves/SavesModal'
+import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves/util'
 import { useSaves } from '@openhome-ui/state/saves'
 import { HomeMonLocation, SaveMonLocation } from '@openhome-ui/state/saves/reducer'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Badge, Button, Callout, Flex } from '@radix-ui/themes'
 import { useCallback, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
-import { GameIndicator } from 'src/ui/components/pokemon/indicator/GameIndicator'
-import { Typeahead } from 'src/ui/components/typeahead'
-import { getDetailsOfficialSave, getDetailsPluginSave } from 'src/ui/saves/util'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { useOhpkmStore } from '../../state/ohpkm'
 import './SortPokemon.css'
@@ -201,7 +201,7 @@ export default function SortPokemon() {
           >
             <PokemonIcon
               dexNumber={monWithSave.mon.dexNum}
-              formeNumber={monWithSave.mon.formNum}
+              formIndex={monWithSave.mon.formNum}
               isEgg={monWithSave.mon.isEgg}
               isShiny={monWithSave.mon.isShiny()}
               style={{ width: '80%', height: '80%' }}

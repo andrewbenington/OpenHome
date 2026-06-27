@@ -1,4 +1,27 @@
+import { getMoveMaxPP } from '@openhome-core/pkm'
+import { PkmConverter } from '@openhome-core/pkm/conversion/converter'
 import { PluginPKMInterface, RomHackFormat } from '@openhome-core/pkm/interfaces'
+import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
+import { getStandardPKMStats } from '@openhome-core/pkm/util/index'
+import {
+  generatePersonalityValuePreservingAttributes,
+  getFlag,
+  MoveFilter,
+  setFlag,
+  uIntFromBufferBits,
+  uIntToBufferBits,
+} from '@openhome-core/util'
+import {
+  FourMoves,
+  markingsFourShapesFromBytes,
+  markingsFourShapesFromOther,
+  markingsFourShapesToBytes,
+  read30BitIVsFromBytes,
+  readStatsFromBytesU8,
+  Stats,
+  write30BitIVsToBytes,
+  writeStatsToBytesU8,
+} from '@openhome-core/util/types'
 import {
   AbilityNumber,
   Ball,
@@ -15,27 +38,6 @@ import {
   PkmFormat,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { PkmConstructorOptions } from '@pokemon-files/pkm/PKM'
-import {
-  FourMoves,
-  generatePersonalityValuePreservingAttributes,
-  getFlag,
-  getMoveMaxPP,
-  getStandardPKMStats,
-  markingsFourShapesFromBytes,
-  markingsFourShapesFromOther,
-  markingsFourShapesToBytes,
-  MoveFilter,
-  read30BitIVsFromBytes,
-  readStatsFromBytesU8,
-  setFlag,
-  Stats,
-  uIntFromBufferBits,
-  uIntToBufferBits,
-  write30BitIVsToBytes,
-  writeStatsToBytesU8,
-} from '@pokemon-files/util'
-import { PkmConverter } from '../../../../packages/pokemon-files/src/conversion/converter'
 import { OHPKM } from '../../pkm/OHPKM'
 import { Option } from '../../util/functional'
 import { PluginIdentifier } from '../interfaces'
@@ -75,7 +77,7 @@ const CFRU_BALLS: Ball[] = [
   Ball.Dream,
 ]
 
-export abstract class PK3CFRU implements PluginPKMInterface {
+export default abstract class PK3CFRU implements PluginPKMInterface {
   // static getFormat() {
   //   return 'PK3RR'
   // }
@@ -440,7 +442,7 @@ export abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get nature() {
-    return NatureIndex.newFromPid(this.personalityValue)
+    return NatureIndex.newFromModulo(this.personalityValue)
   }
 
   public get abilityNum() {
@@ -520,5 +522,3 @@ function unownFormFromPid(pid: number) {
 
   return letterValue % 28
 }
-
-export default PK3CFRU

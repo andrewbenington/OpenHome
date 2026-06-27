@@ -17,8 +17,8 @@ pub fn get_state(state: tauri::State<'_, AppState>) -> Result<AppStateInner> {
 }
 
 #[tauri::command]
-pub fn get_file_bytes(absolute_path: PathBuf) -> Result<Vec<u8>> {
-    util::read_file_bytes(absolute_path)
+pub fn get_file_bytes(absolute_path: PathBuf) -> Result<tauri::ipc::Response> {
+    util::read_file_bytes(absolute_path).map(tauri::ipc::Response::new)
 }
 
 #[tauri::command]
@@ -60,60 +60,6 @@ pub fn get_storage_file_json(
     relative_path: PathBuf,
 ) -> Result<Value> {
     app_handle.read_file_json(DataDir::Storage, &relative_path)
-}
-
-#[tauri::command]
-pub fn find_suggested_saves(
-    app_handle: tauri::AppHandle,
-    save_folders: Vec<PathBuf>,
-) -> core::result::Result<saves::PossibleSaves, String> {
-    let mut possible_saves = saves::PossibleSaves {
-        citra: Vec::new(),
-        desamume: Vec::new(),
-        open_emu: Vec::new(),
-    };
-
-    let citra_dir_r = app_handle
-        .path()
-        .home_dir()
-        .map(|home| home.join(".local/share/citra-emu/sdmc/Nintendo 3DS"));
-
-    if let Ok(citra_dir) = citra_dir_r
-        && citra_dir.exists()
-    {
-        possible_saves
-            .citra
-            .extend(saves::recursively_find_citra_saves(&citra_dir, 0)?);
-    }
-
-    // Iterate over user-provided save folders
-    for folder in save_folders {
-        if folder.exists() {
-            let citra_saves = saves::recursively_find_citra_saves(&folder, 0)?;
-            possible_saves.citra.extend(citra_saves);
-
-            let mgba_saves = saves::recursively_find_mgba_saves(&folder, 0).unwrap_or_default();
-            let gambatte_saves = saves::recursively_find_gambatte_saves(&folder, 0)?;
-
-            possible_saves.open_emu.extend(mgba_saves);
-            possible_saves.open_emu.extend(gambatte_saves);
-
-            let desamume_saves = saves::recursively_find_desamume_saves(&folder, 0)?;
-            possible_saves.desamume.extend(desamume_saves);
-        } else {
-            println!(
-                "Folder doesnt exist: {}",
-                folder.to_str().unwrap_or("(no path)")
-            )
-        }
-    }
-
-    // Deduplicate paths
-    possible_saves.citra = util::dedupe_paths(possible_saves.citra);
-    possible_saves.open_emu = util::dedupe_paths(possible_saves.open_emu);
-    possible_saves.desamume = util::dedupe_paths(possible_saves.desamume);
-
-    Ok(possible_saves)
 }
 
 #[tauri::command]

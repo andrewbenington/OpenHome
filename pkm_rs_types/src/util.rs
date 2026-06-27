@@ -77,6 +77,16 @@ pub const fn shiny_xor_value(pid: u32, trainer_id: u16, secret_id: u16) -> u16 {
     pid_upper ^ pid_lower ^ trainer_id ^ secret_id
 }
 
+// find and replace
+// u16::from_le_bytes\(bytes\[(\d+)\.\.\d+\]\.try_into\(\).unwrap\(\)\)
+// read_u16_le!(bytes, $1)
+#[macro_export]
+macro_rules! read_u16_le {
+    ($bytes:expr, $start:expr) => {
+        u16::from_le_bytes([$bytes[$start], $bytes[$start + 1]])
+    };
+}
+
 #[macro_export]
 macro_rules! read_u32_le {
     ($bytes:expr, $start:expr) => {
@@ -89,13 +99,19 @@ macro_rules! read_u32_le {
     };
 }
 
-// find and replace
-// u16::from_le_bytes\(bytes\[(\d+)\.\.\d+\]\.try_into\(\).unwrap\(\)\)
-// read_u16_le!(bytes, $1)
 #[macro_export]
-macro_rules! read_u16_le {
+macro_rules! read_u64_le {
     ($bytes:expr, $start:expr) => {
-        u16::from_le_bytes([$bytes[$start], $bytes[$start + 1]])
+        u64::from_le_bytes([
+            $bytes[$start],
+            $bytes[$start + 1],
+            $bytes[$start + 2],
+            $bytes[$start + 3],
+            $bytes[$start + 4],
+            $bytes[$start + 5],
+            $bytes[$start + 6],
+            $bytes[$start + 7],
+        ])
     };
 }
 

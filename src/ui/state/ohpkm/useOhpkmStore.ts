@@ -1,18 +1,18 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
-import { OriginGames } from '@pkm-rs/pkg/pkm_rs'
-import dayjs from 'dayjs'
-import { createContext, useCallback, useContext } from 'react'
-import { OhpkmStoreData } from '.'
-import { MonFormat, PKMInterface } from '../../../core/pkm/interfaces'
+import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
   getMonGen345Identifier,
   OhpkmIdentifier,
-} from '../../../core/pkm/Lookup'
-import { SAV } from '../../../core/save/interfaces'
-import { SAVClass } from '../../../core/save/util'
+} from '@openhome-core/pkm/Lookup'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { SAV } from '@openhome-core/save/interfaces'
+import { SAVClass } from '@openhome-core/save/util'
+import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
+import { OriginGames } from '@pkm-rs/pkg/pkm_rs'
+import dayjs from 'dayjs'
+import { createContext, useCallback, useContext } from 'react'
+import { OhpkmStoreData } from '.'
 import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
 
@@ -197,6 +197,7 @@ export function useOhpkmStore(): OhpkmStore {
         case 'PB8':
         case 'PB8LUMI':
         case 'PK9':
+        case 'PK9Compass':
         case 'PA9': {
           const homeIdentifier = getMonFileIdentifier(mon)
           if (!homeIdentifier) {
@@ -253,7 +254,7 @@ export function useOhpkmStore(): OhpkmStore {
 
 export type IdentifierNotPresentError = { identifier: OhpkmIdentifier }
 
-export function IdentifierNotPresent(identifier: OhpkmIdentifier): IdentifierNotPresentError {
+function IdentifierNotPresent(identifier: OhpkmIdentifier): IdentifierNotPresentError {
   return { identifier }
 }
 export const OhpkmStoreContext = createContext<

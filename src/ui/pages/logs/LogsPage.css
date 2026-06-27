@@ -1,0 +1,331 @@
+.logs-page {
+  --header-size: 2rem;
+  --top-bar-height: 1.2rem;
+  --sidebar-width: 22rem;
+
+  --timestamp-width: 9rem;
+  --log-event-width: 8rem;
+  --context-button-width: 6rem;
+
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-size: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  min-width: 40rem;
+}
+
+.logs-container {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: none;
+  background-color: var(--color-gray-100);
+}
+
+.logs-scroll {
+  width: 100%;
+  position: relative;
+}
+
+.logs-header {
+  height: var(--top-bar-height);
+  padding: var(--padding-radius-sm-lg);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: var(--color-header);
+  border-bottom: var(--soft-border);
+  color: var(--accent-contrast);
+  gap: 1rem;
+  z-index: 0;
+  position: sticky;
+  top: 0;
+
+  input {
+    width: 22rem;
+    background-color: var(--accent-5);
+  }
+}
+
+.button-raised {
+  height: var(--height-mini-button);
+
+  color: var(--color-gray-900);
+  border: 0;
+
+  background: none;
+
+  cursor: pointer;
+  font-size: 0.9rem;
+
+  color: var(--color-text-contrast);
+  position: relative;
+
+  display: flex;
+  direction: row;
+  align-items: center;
+
+  padding: 0 0.5rem;
+}
+
+.button-raised:disabled {
+  opacity: 0.5;
+  color: var(--color-gray-700);
+  cursor: not-allowed;
+}
+
+.button-raised:disabled::before {
+  opacity: 0.3;
+}
+
+.button-raised::before {
+  --button-background:
+    linear-gradient(180deg, var(--color-gray-600), var(--color-gray-400) 100%),
+    var(--color-gray-200);
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+
+  box-shadow:
+    inset 0 0 4px 1rem var(--color-gray-100),
+    inset 0 0 2px 0.1rem var(--color-gray-200);
+  background: var(--button-background);
+
+  z-index: -1;
+}
+
+.button-raised:not(:disabled)::after {
+  --button-background:
+    linear-gradient(180deg, var(--color-gray-200), var(--color-gray-300) 100%),
+    var(--color-gray-400);
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: var(--button-background);
+
+  border-radius: inherit;
+  padding: 0;
+  opacity: 0;
+  transition: all 0.1s ease-out;
+}
+
+@media (prefers-color-scheme: dark) {
+  .button-raised::before {
+    --button-background:
+      linear-gradient(180deg, var(--color-gray-700), var(--color-gray-500) 100%),
+      var(--color-gray-800);
+
+    box-shadow: inset 0 0 0.3rem var(--color-gray-400);
+  }
+
+  .button-raised:after {
+    --button-background:
+      linear-gradient(180deg, var(--color-gray-500), var(--color-gray-300) 100%),
+      var(--color-gray-200);
+  }
+}
+
+.button-raised:hover::after {
+  opacity: 0.2;
+}
+
+.button-raised:active::after {
+  opacity: 0.4;
+}
+
+.log-line {
+  font-family: monospace;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.5rem;
+  box-sizing: border-box;
+  font-size: 0.8rem;
+  height: 1.6rem;
+  min-height: fit-content;
+  border-bottom: 0.5px solid var(--color-gray-400);
+  position: absolute;
+
+  .log-context-button {
+    width: var(--context-button-width);
+  }
+
+  & button {
+    height: 1.4rem;
+  }
+}
+
+.log-line:nth-child(odd) {
+  background-color: var(--color-gray-100);
+}
+
+.log-line:nth-child(even) {
+  background-color: var(--color-gray-50);
+}
+
+.log-level-trace {
+  background-color: rgb(229, 207, 230);
+  color: rgb(120, 120, 120);
+}
+
+.log-level-debug {
+  background-color: rgb(188, 236, 200);
+  color: rgb(62, 62, 62);
+}
+
+.log-level-info {
+  background-color: rgb(188, 190, 236);
+  color: rgb(62, 62, 62);
+}
+
+.log-level-warn {
+  background-color: rgb(237, 179, 141);
+  color: black;
+}
+
+.log-level-error {
+  background-color: rgb(250, 50, 27);
+  color: white;
+}
+
+.log-level {
+  font-size: 0.8rem;
+  min-width: var(--log-level-width);
+  border-radius: 3px;
+  text-align: center;
+  font-weight: bold;
+  margin: 0 0.25rem;
+  display: block;
+}
+
+.log-level-toggle {
+  padding: 0.15rem 0.25rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.log-event {
+  font-size: 0.8rem;
+  min-width: var(--log-event-width);
+  border-radius: 3px;
+  text-align: center;
+  font-weight: bold;
+  margin: 0 0.25rem;
+  display: block;
+  background-color: var(--accent-6);
+}
+
+.log-timestamp {
+  font-style: italic;
+  color: var(--color-gray-800);
+  font-family: monospace;
+  font-size: 0.9rem;
+  text-align: end;
+  width: var(--timestamp-width);
+}
+
+.log-message {
+  flex: 1;
+  overflow: hidden;
+}
+
+.log-message-empty {
+  color: #888;
+}
+
+.log-ohpkm-button {
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
+}
+
+.logs-footer {
+  display: grid;
+  font-family: monospace;
+}
+
+.load-more-logs-button {
+  border-radius: 0;
+  background-color: var(--color-header);
+  display: grid;
+  justify-content: center;
+}
+
+.rt-CheckboxGroupRoot {
+  display: flex;
+  flex-direction: row;
+  column-gap: 0.5rem;
+}
+
+.rt-CheckboxGroupItem {
+  display: inline-flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 0.25rem;
+}
+
+.filter-button-toggled {
+  background-color: white !important;
+  color: black;
+}
+
+.filter-button-untoggled {
+  color: white;
+  box-shadow: inset 0 0 0 1px white;
+}
+
+@media only screen and (max-width: 62rem) {
+  .hide-small-width {
+    display: none;
+  }
+}
+
+.logs-filter-popover {
+  color: var(--color-text-contrast);
+  width: fit-content;
+  gap: 0.5rem;
+
+  fieldset {
+    padding: 0;
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  label:not(.rt-CheckboxGroupItem) {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+  }
+
+  button {
+    z-index: 1;
+    width: fit-content;
+  }
+}
+
+.log-range-label {
+  gap: 0.5rem;
+}
+
+.log-range-label :first-child {
+  width: 4rem;
+  font-weight: bold;
+  text-align: end;
+  margin-right: 0.5rem;
+}

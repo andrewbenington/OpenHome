@@ -1,5 +1,9 @@
+import { Types } from '@openhome-core/resources'
+import { OpenHomeRibbons } from '@openhome-core/resources/consts/Ribbons'
 import { stringSorter } from '@openhome-core/util/sort'
 import { displayGender } from '@openhome-core/util/types'
+import { useMonDisplay } from '@openhome-ui/hooks/monDisplay'
+import { getOriginIconPath } from '@openhome-ui/images/game'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { getRibbonSpritePath } from '@openhome-ui/images/ribbons'
@@ -19,12 +23,8 @@ import {
   OriginGameWithData,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
-import { OpenHomeRibbons } from '@pokemon-resources/consts/Ribbons'
-import { Types } from '@pokemon-resources/index'
 import { Button } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import { useMonDisplay } from 'src/ui/hooks/useMonDisplay'
-import { getOriginIconPath } from 'src/ui/images/game'
 import GenderIcon from '../../../components/pokemon/GenderIcon'
 import TypeIcon from '../../../components/pokemon/TypeIcon'
 import PokemonIcon from '../../../components/PokemonIcon'
@@ -172,7 +172,7 @@ export default function FilterPanel() {
               currentForme && (
                 <PokemonIcon
                   dexNumber={filter.dexNumber}
-                  formeNumber={currentForme.formIndex}
+                  formIndex={currentForme.formIndex}
                   style={{ width: ICON_SIZE, height: ICON_SIZE }}
                 />
               )

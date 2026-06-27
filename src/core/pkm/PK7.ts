@@ -1,0 +1,620 @@
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { ModernRibbons } from '@openhome-core/resources'
+import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
+import {
+  AbilityIndex,
+  ContestStats,
+  ConvertStrategies,
+  ConvertStrategy,
+  Geolocations,
+  HyperTraining,
+  Item,
+  MarkingsSixShapesColors,
+  MetadataSummaryLookup,
+  NatureIndex,
+  OriginGame,
+  Pk7Wasm,
+  PokeDate,
+  SpeciesLookup,
+  TrainerMemory,
+} from '@pkm-rs/pkg'
+import { PkmConstructorOptions } from './PKM'
+import {
+  decryptByteArrayGen67,
+  get16BitChecksumLittleEndian,
+  shuffleBlocksGen67,
+} from './util/encryption'
+import { getStats } from './util/statCalc'
+import {
+  binaryGenderFromBool,
+  binaryGenderToBool,
+  convertPokeDate,
+  convertPokeDateOptional,
+} from './wasm/convert'
+
+export default class PK7 {
+  static getFormat() {
+    return 'PK7' as const
+  }
+  format = 'PK7' as const
+
+  static getBoxSize() {
+    return 232
+  }
+  inner: Pk7Wasm
+
+  constructor(arg: OHPKM | Pk7Wasm, options: PkmConstructorOptions) {
+    if (arg instanceof Pk7Wasm) {
+      this.inner = arg
+    } else {
+      const ohpkmBytes = new Uint8Array(arg.toBytes())
+
+      this.inner = Pk7Wasm.fromOhpkmBytes(
+        ohpkmBytes,
+        options.strategy || ConvertStrategies.getDefault()
+      )
+    }
+  }
+
+  get encryptionConstant() {
+    return this.inner.encryption_constant
+  }
+  set encryptionConstant(value: number) {
+    this.inner.encryption_constant = value
+  }
+
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK7 {
+    return PK7.fromWasm(
+      encrypted
+        ? Pk7Wasm.fromEncryptedBytes(new Uint8Array(buffer))
+        : Pk7Wasm.fromDecryptedBytes(new Uint8Array(buffer))
+    )
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK7 {
+    return new PK7(ohpkm, { strategy })
+  }
+
+  static fromWasm(pk7: Pk7Wasm): PK7 {
+    return new PK7(pk7, {})
+  }
+
+  get sanity() {
+    return this.inner.sanity
+  }
+  set sanity(value: number) {
+    this.inner.sanity = value
+  }
+
+  get checksum() {
+    return this.inner.checksum
+  }
+  set checksum(value: number) {
+    this.inner.checksum = value
+  }
+
+  get dexNum() {
+    return this.inner.nationalDex
+  }
+
+  get heldItemIndex() {
+    return this.inner.held_item_index
+  }
+  set heldItemIndex(value: number) {
+    this.inner.held_item_index = value
+  }
+
+  get trainerID() {
+    return this.inner.trainer_id
+  }
+  set trainerID(value: number) {
+    this.inner.trainer_id = value
+  }
+
+  get secretID() {
+    return this.inner.secret_id
+  }
+  set secretID(value: number) {
+    this.inner.secret_id = value
+  }
+
+  get exp() {
+    return this.inner.exp
+  }
+  set exp(value: number) {
+    this.inner.exp = value
+  }
+
+  get ability() {
+    return this.inner.abilityIndex
+  }
+  set ability(value: AbilityIndex) {
+    this.inner.abilityIndex = AbilityIndex.fromIndex(value.index) || value
+  }
+
+  get abilityNum() {
+    return this.inner.ability_num
+  }
+  set abilityNum(value: number) {
+    this.inner.ability_num = value
+  }
+
+  get markings() {
+    return this.inner.markings
+  }
+  set markings(value: MarkingsSixShapesColors) {
+    this.inner.markings = value
+  }
+
+  get personalityValue() {
+    return this.inner.personality_value
+  }
+  set personalityValue(value: number) {
+    this.inner.personality_value = value
+  }
+
+  get nature() {
+    return this.inner.nature.copy()
+  }
+  set nature(value: NatureIndex) {
+    this.inner.nature = value.copy()
+  }
+
+  get isFatefulEncounter() {
+    return this.inner.is_fateful_encounter
+  }
+  set isFatefulEncounter(value: boolean) {
+    this.inner.is_fateful_encounter = value
+  }
+
+  get gender() {
+    return this.inner.gender
+  }
+  set gender(value: number) {
+    this.inner.gender = value
+  }
+
+  get formNum() {
+    return this.inner.formIndex
+  }
+
+  get evs() {
+    return this.inner.evs
+  }
+  set evs(value: Stats) {
+    this.inner.evs = value
+  }
+
+  get contest() {
+    return this.inner.contest
+  }
+  set contest(value: ContestStats) {
+    this.inner.contest = value
+  }
+
+  get resortEventStatus() {
+    return this.inner.resort_event_status
+  }
+  set resortEventStatus(value: number) {
+    this.inner.resort_event_status = value
+  }
+
+  get pokerusByte() {
+    return this.inner.pokerus_byte
+  }
+  set pokerusByte(value: number) {
+    this.inner.pokerus_byte = value
+  }
+
+  get superTrainingFlags() {
+    return this.inner.super_training_flags
+  }
+  set superTrainingFlags(value: number) {
+    this.inner.super_training_flags = value
+  }
+
+  get contestMemoryCount() {
+    return this.inner.contest_memory_count
+  }
+  set contestMemoryCount(value: number) {
+    this.inner.contest_memory_count = value
+  }
+
+  get battleMemoryCount() {
+    return this.inner.battle_memory_count
+  }
+  set battleMemoryCount(value: number) {
+    this.inner.battle_memory_count = value
+  }
+
+  get superTrainingDistFlags() {
+    return this.inner.super_training_dist_flags
+  }
+  set superTrainingDistFlags(value: number) {
+    this.inner.super_training_dist_flags = value
+  }
+
+  get formArgument() {
+    return this.inner.form_argument
+  }
+  set formArgument(value: number) {
+    this.inner.form_argument = value
+  }
+
+  get nickname() {
+    return this.inner.nickname
+  }
+  set nickname(value: string) {
+    this.inner.nickname = value
+  }
+
+  get moves() {
+    const moves = Array.from(this.inner.move_indices)
+    if (moves.length !== 4) {
+      throw new Error(`PK7 WASM struct has move array length of ${moves.length} (expected 4)`)
+    }
+
+    return moves as FourMoves
+  }
+  set moves(value: FourMoves) {
+    this.inner.move_indices = new Uint16Array(value)
+  }
+
+  get movePP() {
+    const movePP = Array.from(this.inner.move_pp)
+    if (movePP.length !== 4) {
+      throw new Error(`PK7 WASM struct has move PP array length of ${movePP.length} (expected 4)`)
+    }
+
+    return movePP as FourMoves
+  }
+  set movePP(value: FourMoves) {
+    this.inner.move_pp = new Uint8Array(value)
+  }
+
+  get movePPUps() {
+    const movePPUps = Array.from(this.inner.move_pp_ups)
+    if (movePPUps.length !== 4) {
+      throw new Error(
+        `PK7 WASM struct has move PP up array length of ${movePPUps.length} (expected 4)`
+      )
+    }
+
+    return movePPUps as FourMoves
+  }
+  set movePPUps(value: FourMoves) {
+    this.inner.move_pp_ups = new Uint8Array(value)
+  }
+
+  get relearnMoves() {
+    const relearnMoves = Array.from(this.inner.move_pp_ups)
+    if (relearnMoves.length !== 4) {
+      throw new Error(
+        `PK7 WASM struct has relearn move array length of ${relearnMoves.length} (expected 4)`
+      )
+    }
+    return relearnMoves as FourMoves
+  }
+  set relearnMoves(value: FourMoves) {
+    this.inner.relearn_move_indices = new Uint16Array(value)
+  }
+
+  get secretSuperTrainingUnlocked() {
+    return this.inner.secret_super_training_unlocked
+  }
+  set secretSuperTrainingUnlocked(value: boolean) {
+    this.inner.secret_super_training_unlocked = value
+  }
+
+  get secretSuperTrainingComplete() {
+    return this.inner.secret_super_training_complete
+  }
+  set secretSuperTrainingComplete(value: boolean) {
+    this.inner.secret_super_training_complete = value
+  }
+
+  get ivs() {
+    return this.inner.ivs
+  }
+  set ivs(value: Stats) {
+    this.inner.ivs = value
+  }
+
+  get isEgg() {
+    return this.inner.is_egg
+  }
+  set isEgg(value: boolean) {
+    this.inner.is_egg = value
+  }
+
+  get isNicknamed() {
+    return this.inner.is_nicknamed
+  }
+  set isNicknamed(value: boolean) {
+    this.inner.is_nicknamed = value
+  }
+
+  get handlerName() {
+    return this.inner.handler_name
+  }
+  set handlerName(value: string) {
+    this.inner.handler_name = value
+  }
+
+  get handlerGender() {
+    return binaryGenderToBool(this.inner.handler_gender)
+  }
+  set handlerGender(value: boolean) {
+    this.inner.handler_gender = binaryGenderFromBool(value)
+  }
+
+  get isCurrentHandler() {
+    return this.inner.is_current_handler
+  }
+  set isCurrentHandler(value: boolean) {
+    this.inner.is_current_handler = value
+  }
+
+  get geolocations() {
+    return this.inner.geolocations
+  }
+  set geolocations(value: Geolocations) {
+    this.inner.geolocations = value
+  }
+
+  get handlerFriendship() {
+    return this.inner.handler_friendship
+  }
+  set handlerFriendship(value: number) {
+    this.inner.handler_friendship = value
+  }
+
+  get handlerAffection() {
+    return this.inner.handler_affection
+  }
+  set handlerAffection(value: number) {
+    this.inner.handler_affection = value
+  }
+
+  get fullness() {
+    return this.inner.fullness
+  }
+  set fullness(value: number) {
+    this.inner.fullness = value
+  }
+
+  get enjoyment() {
+    return this.inner.enjoyment
+  }
+  set enjoyment(value: number) {
+    this.inner.enjoyment = value
+  }
+
+  get trainerName() {
+    return this.inner.trainer_name
+  }
+  set trainerName(value: string) {
+    this.inner.trainer_name = value
+  }
+
+  get trainerFriendship() {
+    return this.inner.trainer_friendship
+  }
+  set trainerFriendship(value: number) {
+    this.inner.trainer_friendship = value
+  }
+
+  get trainerAffection() {
+    return this.inner.trainer_affection
+  }
+  set trainerAffection(value: number) {
+    this.inner.trainer_affection = value
+  }
+
+  get eggDate() {
+    return convertPokeDateOptional(this.inner.egg_date)
+  }
+
+  set eggDate(value: PKMDate | undefined) {
+    if (value) {
+      this.inner.egg_date = new PokeDate(value.year, value.month, value.day)
+    } else {
+      this.inner.egg_date = undefined
+    }
+  }
+
+  get metDate() {
+    return convertPokeDate(this.inner.met_date)
+  }
+  set metDate(value: PKMDate) {
+    this.inner.met_date = new PokeDate(value.year, value.month, value.day)
+  }
+
+  get eggLocationIndex() {
+    return this.inner.egg_location_index
+  }
+  set eggLocationIndex(value: number) {
+    this.inner.egg_location_index = value
+  }
+
+  get metLocationIndex() {
+    return this.inner.met_location_index
+  }
+  set metLocationIndex(value: number) {
+    this.inner.met_location_index = value
+  }
+
+  get ball() {
+    return this.inner.ball
+  }
+  set ball(value: number) {
+    this.inner.ball = value
+  }
+
+  get metLevel() {
+    return this.inner.met_level
+  }
+  set metLevel(value: number) {
+    this.inner.met_level = value
+  }
+
+  get hyperTraining() {
+    return this.inner.hyper_training
+  }
+  set hyperTraining(value: HyperTraining) {
+    this.inner.hyper_training = value
+  }
+
+  get gameOfOrigin() {
+    return this.inner.game_of_origin
+  }
+  set gameOfOrigin(value: OriginGame) {
+    this.inner.game_of_origin = value
+  }
+
+  get country() {
+    return this.inner.country
+  }
+  set country(value: number) {
+    this.inner.country = value
+  }
+
+  get region() {
+    return this.inner.region
+  }
+  set region(value: number) {
+    this.inner.region = value
+  }
+
+  get consoleRegion() {
+    return this.inner.console_region
+  }
+  set consoleRegion(value: number) {
+    this.inner.console_region = value
+  }
+
+  get language() {
+    return this.inner.language
+  }
+  set language(value: number) {
+    this.inner.language = value
+  }
+
+  get statusCondition() {
+    return this.inner.status_condition
+  }
+  set statusCondition(value: number) {
+    this.inner.status_condition = value
+  }
+
+  get currentHP() {
+    return this.inner.current_hp
+  }
+  set currentHP(value: number) {
+    this.inner.current_hp = value
+  }
+
+  get ribbons() {
+    return this.inner.ribbons.map((ribbonName) =>
+      ribbonName.endsWith('Ribbon') ? ribbonName.substring(0, ribbonName.length - 7) : ribbonName
+    )
+  }
+  set ribbons(ribbonNames: string[]) {
+    this.inner.ribbon_indices = new Uint32Array(
+      ribbonNames.map((name) => ModernRibbons.indexOf(name)).filter((idx) => idx !== -1)
+    )
+  }
+
+  get handlerMemory() {
+    return this.inner.handler_memory
+  }
+  set handlerMemory(value: TrainerMemory) {
+    this.inner.handler_memory = value
+  }
+
+  get trainerMemory() {
+    return this.inner.trainer_memory
+  }
+  set trainerMemory(value: TrainerMemory) {
+    this.inner.trainer_memory = value
+  }
+
+  get trainerGender() {
+    return binaryGenderToBool(this.inner.trainer_gender)
+  }
+  set trainerGender(value: boolean) {
+    this.inner.trainer_gender = binaryGenderFromBool(value)
+  }
+
+  public getStats() {
+    return getStats(this)
+  }
+
+  public recalculateStats() {
+    this.inner.recalculateStats()
+  }
+
+  public get abilityName() {
+    return this.inner.abilityIndex.name
+  }
+
+  public get heldItemName() {
+    return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
+  }
+
+  public calculateChecksum() {
+    return get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0xe8)
+  }
+
+  public toBytes() {
+    return this.inner.toBytes().buffer as ArrayBuffer
+  }
+
+  public refreshChecksum() {
+    this.checksum = this.calculateChecksum()
+  }
+
+  public toPCBytes() {
+    const shuffledBytes = shuffleBlocksGen67(this.toBytes())
+    return decryptByteArrayGen67(shuffledBytes)
+  }
+
+  public getLevel() {
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
+  }
+
+  isShiny() {
+    return (
+      (this.trainerID ^
+        this.secretID ^
+        (this.personalityValue & 0xffff) ^
+        ((this.personalityValue >> 16) & 0xffff)) <
+      16
+    )
+  }
+
+  isSquareShiny() {
+    return !(
+      this.trainerID ^
+      this.secretID ^
+      (this.personalityValue & 0xffff) ^
+      ((this.personalityValue >> 16) & 0xffff)
+    )
+  }
+
+  public get metadata() {
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
+  }
+
+  public get speciesMetadata() {
+    return SpeciesLookup(this.dexNum)
+  }
+
+  static maxValidMove() {
+    return 728
+  }
+
+  static maxValidBall() {
+    return 26
+  }
+}

@@ -133,13 +133,12 @@ pub fn create_menu(app: &App) -> core::result::Result<Menu<Wry>, Box<dyn std::er
     Ok(menu)
 }
 
+// Use the command line to show the file/directory in the operating system's default file explorer
 fn command_open(target: &str) {
-    let child = Command::new(OPEN_CMD)
-        .arg(target) // <- Specify the directory you'd like to open.
-        .spawn();
+    let child = Command::new(OPEN_CMD).arg(target).spawn();
 
     if let Err(err) = child {
-        println!("{}", err)
+        tracing::error!("{err}")
     }
 }
 

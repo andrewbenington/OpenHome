@@ -1,8 +1,8 @@
+import { Moves } from '@openhome-core/resources'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import { colorForType, contrastColorForType } from '@openhome-ui/util/color'
+import { cssClass } from '@openhome-ui/util/style'
 import { PkmType, PkmTypes } from '@pkm-rs/pkg'
-import { Moves } from '@pokemon-resources/index'
-import { cssClass } from 'src/ui/util/style'
 import './style.css'
 
 interface MoveCardProps {

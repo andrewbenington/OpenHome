@@ -520,6 +520,12 @@ impl From<arbitrary_int::u4> for OriginGame {
     }
 }
 
+impl AsRef<str> for OriginGame {
+    fn as_ref(&self) -> &str {
+        self.game_name_full()
+    }
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct OriginGames;
 
@@ -630,6 +636,11 @@ impl OriginGames {
         OriginGame::from(value).is_bdsp()
     }
 
+    #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isSwSh"))]
+    pub fn is_swsh(value: u8) -> bool {
+        OriginGame::from(value).is_swsh()
+    }
+
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "isScarletViolet"))]
     pub fn is_scarlet_violet(value: u8) -> bool {
         OriginGame::from(value).is_scarlet_violet()
@@ -641,6 +652,7 @@ pub fn plugin_color(plugin_identifier: &str) -> &'static str {
         "unbound" => "#C127FE",
         "radical_red" => "#660000",
         "luminescent_platinum" => "#25C2A0",
+        "compass" => "#FDF351",
         _ => "#666666",
     }
 }

@@ -1,18 +1,20 @@
+import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@openhome-core/pkm'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
+import { Stats } from '@openhome-core/util/types'
 import {
   ConvertStrategies,
   ConvertStrategy,
   ExtraFormIndex,
   HyperTraining,
+  Language,
   OriginGame,
+  SpeciesAndForm,
 } from '@pkm-rs/pkg'
-import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@pokemon-files/pkm'
-import { Stats } from '@pokemon-files/util'
-import { getFormatLocationString } from '@pokemon-resources/locations'
 import fs from 'fs'
 import path from 'path'
 import { assert, beforeAll, describe, expect, test } from 'vitest'
-import { NationalDex } from '../../../../packages/pokemon-resources/src/consts/NationalDex'
+import { getFormatLocationString } from '../MetLocation'
 import { OHPKM } from '../OHPKM'
 import { initializeWasm } from './init'
 
@@ -134,9 +136,11 @@ describe('evolution and form change update ohpkm', async () => {
     expect(mrMimeOhpkm.formNum).toEqual(1)
 
     // simulate evolution
-    const mrRime = mrMimeGalarPk8
-    mrRime.dexNum = NationalDex.MrRime
-    mrRime.formNum = 0
+    const mrRime = mrMimeOhpkm
+    const mrRimeSpeciesForm = SpeciesAndForm.tryNew(NationalDex.MrRime, 0)
+    assert(mrRimeSpeciesForm !== undefined)
+
+    mrRime.speciesAndForm = mrRimeSpeciesForm
 
     mrMimeOhpkm.syncWithGameData(mrRime)
     expect(mrMimeOhpkm.dexNum).toEqual(NationalDex.MrRime)
@@ -340,7 +344,7 @@ describe('OHPKM conversion strategies', () => {
       'Alpha Sapphire converted to Sapphire in PK4 (location match strategy)'
     ).toEqual(OriginGame.Sapphire)
     expect(
-      getFormatLocationString(pk4.metLocationIndex, 'PK4'),
+      getFormatLocationString(pk4.metLocationIndex, 'PK4', Language.English),
       'Alpha Sapphire -> PK4 location is Hoenn with location match strategy'
     ).toContain('Hoenn')
 
@@ -350,7 +354,7 @@ describe('OHPKM conversion strategies', () => {
       'Alpha Sapphire converted to Sapphire in PK4 (legality strategy)'
     ).toEqual(OriginGame.Sapphire)
     expect(
-      getFormatLocationString(pk4.metLocationIndex, 'PK4'),
+      getFormatLocationString(pk4.metLocationIndex, 'PK4', Language.English),
       'Alpha Sapphire -> PK4 location is Pal Park with legality strategy'
     ).toContain('Pal Park')
   })
@@ -365,7 +369,7 @@ describe('OHPKM conversion strategies', () => {
       OriginGame.Diamond
     )
     expect(
-      getFormatLocationString(pk4.metLocationIndex, 'PK4'),
+      getFormatLocationString(pk4.metLocationIndex, 'PK4', Language.English),
       'Diamond -> Original location preserved with legality strategy'
     ).toContain('Jubilife City')
 
@@ -374,7 +378,7 @@ describe('OHPKM conversion strategies', () => {
       OriginGame.Diamond
     )
     expect(
-      getFormatLocationString(pk4.metLocationIndex, 'PK4'),
+      getFormatLocationString(pk4.metLocationIndex, 'PK4', Language.English),
       'Diamond -> Original location preserved with location match strategy'
     ).toContain('Jubilife City')
   })
@@ -398,7 +402,7 @@ describe('OHPKM conversion strategies', () => {
       OriginGame.OmegaRuby
     )
     expect(
-      getFormatLocationString(pk7.metLocationIndex, 'PK7'),
+      getFormatLocationString(pk7.metLocationIndex, 'PK7', Language.English),
       'Omega Ruby -> PK7 location index is Hoenn with location match strategy'
     ).toContain('Hoenn')
   })

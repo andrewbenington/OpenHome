@@ -1,12 +1,11 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { SAV } from '@openhome-core/save/interfaces'
+import { SAV, SaveIdentifier, saveToStringIdentifier } from '@openhome-core/save/interfaces'
+import { SAVClass } from '@openhome-core/save/util'
 import { Option } from '@openhome-core/util/functional'
 import { createContext, Dispatch, Reducer } from 'react'
-import { SaveIdentifier, saveToStringIdentifier } from 'src/core/save/interfaces'
-import { SAVClass } from '../../../core/save/util'
 
-export type OpenSave = {
+type OpenSave = {
   index: number
   save: SAV
 }
@@ -177,7 +176,3 @@ export const SavesContext = createContext<SavesContextValue>({
   allOpenSaves: [],
   promptDisambiguation: async () => undefined,
 })
-
-export function saveFromIdentifier(state: OpenSavesState, identifier: SaveIdentifier): Option<SAV> {
-  return state.openSaves[identifier]?.save
-}

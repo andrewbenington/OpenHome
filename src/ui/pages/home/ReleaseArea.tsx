@@ -1,9 +1,9 @@
+import { filterUndefined } from '@openhome-core/util/sort'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import DroppableSpace from '@openhome-ui/saves/boxes/DroppableSpace'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
-import { filterUndefined } from '../../../core/util/sort'
 import { useOhpkmStore } from '../../state/ohpkm'
 
 export default function ReleaseArea() {
@@ -31,7 +31,7 @@ export default function ReleaseArea() {
             <PokemonIcon
               key={`delete_mon_${i}`}
               dexNumber={mon.dexNum}
-              formeNumber={mon.formNum}
+              formIndex={mon.formNum}
               style={{ height: 32, width: 32 }}
             />
           ))}

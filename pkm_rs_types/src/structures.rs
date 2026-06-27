@@ -1,4 +1,5 @@
 use arbitrary_int::u3;
+use chrono::Datelike;
 use serde::{Deserialize, Serialize, Serializer};
 
 use strum_macros::{Display, EnumString};
@@ -242,7 +243,7 @@ impl<const N: usize, FLAG: Copy + Into<usize>> Serialize for FlagSet<N, FLAG>
 where
     FLAG: Serialize,
 {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -386,6 +387,15 @@ impl PokeDate {
             None => [0, 0, 0],
         }
     }
+
+    pub fn today() -> Self {
+        let today = chrono::Local::now();
+        Self {
+            year_minus_2000: (today.year() - 2000).max(0) as u8,
+            month: today.month() as u8,
+            day: today.day() as u8,
+        }
+    }
 }
 
 #[cfg(feature = "randomize")]
@@ -435,7 +445,7 @@ impl PokeDate {
 }
 
 impl Serialize for PokeDate {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -451,6 +461,9 @@ impl Serialize for PokeDate {
         }
     }
 }
+
+pub const SWITCH_TRAINER_MEMORY_SIZE: usize = 6;
+pub const SWITCH_HANDLER_MEMORY_SIZE: usize = 5;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Serialize, Clone)]
@@ -506,7 +519,7 @@ impl TrainerData {
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Clone, Copy, Default, Serialize)]
+#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq, Eq)]
 pub struct TrainerMemory {
     pub intensity: u8,
     pub memory: u8,
@@ -537,7 +550,7 @@ impl TrainerMemory {
         bytes
     }
 
-    pub fn from_bytes_switch_trainer(bytes: &[u8; 6]) -> Self {
+    pub fn from_bytes_switch_trainer(bytes: &[u8; SWITCH_TRAINER_MEMORY_SIZE]) -> Self {
         Self {
             intensity: bytes[0],
             memory: bytes[1],
@@ -546,7 +559,7 @@ impl TrainerMemory {
         }
     }
 
-    pub fn to_bytes_switch_trainer(&self) -> [u8; 6] {
+    pub fn to_bytes_switch_trainer(&self) -> [u8; SWITCH_TRAINER_MEMORY_SIZE] {
         let mut bytes = [0u8; 6];
 
         bytes[0] = self.intensity;
@@ -557,7 +570,7 @@ impl TrainerMemory {
         bytes
     }
 
-    pub fn from_bytes_switch_handler(bytes: &[u8; 5]) -> Self {
+    pub fn from_bytes_switch_handler(bytes: &[u8; SWITCH_HANDLER_MEMORY_SIZE]) -> Self {
         Self {
             intensity: bytes[0],
             memory: bytes[1],
@@ -566,8 +579,8 @@ impl TrainerMemory {
         }
     }
 
-    pub fn to_bytes_switch_handler(&self) -> [u8; 5] {
-        let mut bytes = [0u8; 5];
+    pub fn to_bytes_switch_handler(&self) -> [u8; SWITCH_HANDLER_MEMORY_SIZE] {
+        let mut bytes = [0u8; SWITCH_HANDLER_MEMORY_SIZE];
 
         bytes[0] = self.intensity;
         bytes[1] = self.memory;
@@ -675,7 +688,7 @@ impl ShinyLeaves {
 
 #[cfg(feature = "wasm")]
 impl Serialize for ShinyLeaves {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -866,7 +879,7 @@ impl AbilityNumber {
 impl TryFrom<u3> for AbilityNumber {
     type Error = InvalidAbilityNumber;
 
-    fn try_from(value: u3) -> Result<Self, InvalidAbilityNumber> {
+    fn try_from(value: u3) -> core::result::Result<Self, InvalidAbilityNumber> {
         match value.value() {
             1 => Ok(Self::First),
             2 => Ok(Self::Second),

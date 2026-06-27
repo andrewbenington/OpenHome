@@ -1,5 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { Option } from '@openhome-core/util/functional'
+import { Option, range } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import {
   ConvertStrategy,
@@ -42,7 +42,7 @@ export type SaveWriter = {
   filepath: string
 }
 
-export interface BaseSAV<P extends PKMInterface = PKMInterface> {
+interface BaseSAV<P extends PKMInterface = PKMInterface> {
   origin: OriginGame
 
   boxRows: number
@@ -300,8 +300,7 @@ export function getSaveRef(save: SAV): SaveRef {
     valid: true,
   }
 }
-export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum'
-export type GameNameType = 'short' | 'full'
+export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum' | 'compass'
 
 export function pluginGameName(identifier: PluginIdentifier, type = 'full'): string {
   switch (identifier) {
@@ -311,6 +310,8 @@ export function pluginGameName(identifier: PluginIdentifier, type = 'full'): str
       return 'Unbound'
     case 'luminescent_platinum':
       return type === 'full' ? 'Luminescent Platinum' : 'Lumi. Platinum'
+    case 'compass':
+      return 'Compass'
     default:
       return 'Unknown Plugin'
   }
@@ -323,13 +324,15 @@ export function pluginOriginMarkPath(identifier: PluginIdentifier): string | und
       return '/icons/gba.png'
     case 'luminescent_platinum':
       return '/origin_marks/Bdsp.png'
+    case 'compass':
+      return '/origin_marks/Tera.png'
     default:
       return undefined
   }
 }
-export const Delimiter = '$' as const
+const Delimiter = '$' as const
 
-export type Delim = typeof Delimiter
+type Delim = typeof Delimiter
 
 type OfficialSaveIdentifier = `${OriginGame}${Delim}${number}${Delim}${number}`
 
@@ -400,9 +403,19 @@ export abstract class WasmOfficialSave<P extends PKMInterface, WasmP> extends Of
 
   abstract monFromWasm(wasmMon: WasmP): P
 
+  abstract MAX_BOX_COUNT: number
+  abstract SLOTS_PER_BOX: number
+
   getMonAt(boxNum: number, boxSlot: number): Option<P> {
     const wasmMon = this.inner.getMonAt(boxNum, boxSlot)
     return wasmMon ? this.monFromWasm(wasmMon) : undefined
+  }
+
+  getAllMons() {
+    return range(this.MAX_BOX_COUNT)
+      .flatMap((boxIndex) => range(this.SLOTS_PER_BOX).map((boxSlot) => ({ boxIndex, boxSlot })))
+      .map(({ boxIndex, boxSlot }) => this.getMonAt(boxIndex, boxSlot))
+      .filter(filterUndefined)
   }
 
   prepareForSaving(): Uint8Array {

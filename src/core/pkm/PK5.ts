@@ -1,0 +1,390 @@
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { Gen4Ribbons } from '@openhome-core/resources'
+import * as byteLogic from '@openhome-core/util/byteLogic'
+import { FourMoves } from '@openhome-core/util/types'
+import {
+  AbilityIndex,
+  Ball,
+  ContestStats,
+  ConvertStrategy,
+  Generation,
+  Item,
+  Language,
+  Languages,
+  MarkingsSixShapes,
+  MetadataSummaryLookup,
+  NatureIndex,
+  OriginGames,
+  SpeciesLookup,
+} from '@pkm-rs/pkg'
+import * as stringLogic from '../util/stringConversion'
+import * as types from '../util/types'
+import { generatePersonalityValuePreservingAttributes, MoveFilter } from '../util/util'
+import { PkmConverter } from './conversion/converter'
+import { PkmConstructorOptions } from './PKM'
+import * as encryption from './util/encryption'
+import { filterRibbons } from './util/ribbonLogic'
+import { getStats } from './util/statCalc'
+
+export default class PK5 {
+  static getFormat() {
+    return 'PK5' as const
+  }
+  format: 'PK5' = 'PK5'
+  static getBoxSize() {
+    return 136
+  }
+  personalityValue: number
+  dexNum: number
+  heldItemIndex: number
+  trainerID: number
+  secretID: number
+  exp: number
+  trainerFriendship: number
+  ability?: AbilityIndex
+  markings: MarkingsSixShapes
+  language: Language
+  evs: types.Stats
+  contest: ContestStats
+  moves: FourMoves
+  movePP: FourMoves
+  movePPUps: FourMoves
+  ivs: types.Stats
+  isEgg: boolean
+  isNicknamed: boolean
+  gender: number
+  formNum: number
+  nature: NatureIndex
+  isNsPokemon: boolean
+  gameOfOrigin: number
+  eggDate: types.PKMDate | undefined
+  metDate: types.PKMDate | undefined
+  eggLocationIndex: number
+  metLocationIndex: number
+  pokerusByte: number
+  ball: number
+  metLevel: number
+  encounterType: number
+  pokeStarFame: number
+  statusCondition: number
+  currentHP: number
+  ribbons: string[]
+  isFatefulEncounter: boolean
+  nickname: string
+  trainerName: string
+  trainerGender: boolean
+  checksum: number = 0
+  originalBytes?: ArrayBuffer
+
+  constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
+    const { encrypted } = options
+    if (arg instanceof ArrayBuffer) {
+      let buffer = arg
+
+      if (encrypted) {
+        const unencryptedBytes = encryption.decryptByteArrayGen45(buffer)
+        const unshuffledBytes = encryption.unshuffleBlocksGen45(unencryptedBytes)
+
+        buffer = unshuffledBytes
+      }
+
+      const dataView = new DataView(buffer)
+      this.originalBytes = buffer
+
+      this.personalityValue = dataView.getUint32(0x0, true)
+      this.dexNum = dataView.getUint16(0x8, true)
+      this.heldItemIndex = dataView.getUint16(0xa, true)
+      this.trainerID = dataView.getUint16(0xc, true)
+      this.secretID = dataView.getUint16(0xe, true)
+      this.exp = dataView.getUint32(0x10, true)
+      this.trainerFriendship = dataView.getUint8(0x14)
+      this.ability = AbilityIndex.fromIndex(dataView.getUint8(0x15))
+      this.markings = types.markingsSixShapesNoColorFromBytes(dataView, 0x16)
+      this.language = Languages.fromByteOrNone(dataView.getUint8(0x17))
+      this.evs = types.readStatsFromBytesU8(dataView, 0x18)
+      this.contest = types.readContestStatsFromBytes(dataView, 0x1e)
+      this.moves = [
+        dataView.getUint16(0x28, true),
+        dataView.getUint16(0x2a, true),
+        dataView.getUint16(0x2c, true),
+        dataView.getUint16(0x2e, true),
+      ]
+      this.movePP = [
+        dataView.getUint8(0x30),
+        dataView.getUint8(0x31),
+        dataView.getUint8(0x32),
+        dataView.getUint8(0x33),
+      ]
+      this.movePPUps = [
+        dataView.getUint8(0x34),
+        dataView.getUint8(0x35),
+        dataView.getUint8(0x36),
+        dataView.getUint8(0x37),
+      ]
+      this.ivs = types.read30BitIVsFromBytes(dataView, 0x38)
+      this.isEgg = byteLogic.getFlag(dataView, 0x38, 30)
+      this.isNicknamed = byteLogic.getFlag(dataView, 0x38, 31)
+      this.gender = byteLogic.uIntFromBufferBits(dataView, 0x40, 1, 2, true)
+      this.formNum = byteLogic.uIntFromBufferBits(dataView, 0x40, 3, 5, true)
+      this.nature = new NatureIndex(dataView.getUint8(0x41))
+      this.isNsPokemon = byteLogic.getFlag(dataView, 0x42, 1)
+      this.gameOfOrigin = dataView.getUint8(0x5f)
+      this.eggDate = types.pkmDateFromBytes(dataView, 0x78)
+      this.metDate = types.pkmDateFromBytes(dataView, 0x7b)
+      this.eggLocationIndex = dataView.getUint16(0x7e, true)
+      this.metLocationIndex = dataView.getUint16(0x80, true)
+      this.pokerusByte = dataView.getUint8(0x82)
+      this.ball = dataView.getUint8(0x83)
+      this.metLevel = dataView.getUint8(0x84)
+      this.encounterType = dataView.getUint8(0x85)
+      this.pokeStarFame = dataView.getUint8(0x87)
+      if (dataView.byteLength >= 236) {
+        this.statusCondition = dataView.getUint8(0x88)
+      } else {
+        this.statusCondition = 0
+      }
+
+      if (dataView.byteLength >= 236) {
+        this.currentHP = dataView.getUint8(0x8e)
+      } else {
+        this.currentHP = 0
+      }
+
+      this.ribbons = byteLogic
+        .getFlagIndexes(dataView, 0x24, 0, 28)
+        .map((index) => Gen4Ribbons[index])
+        .concat(
+          byteLogic.getFlagIndexes(dataView, 0x3c, 0, 32).map((index) => Gen4Ribbons[index + 28])
+        )
+        .concat(
+          byteLogic.getFlagIndexes(dataView, 0x60, 0, 20).map((index) => Gen4Ribbons[index + 60])
+        )
+      this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x40, 0)
+      this.nickname = stringLogic.readGen5StringFromBytes(dataView, 0x48, 12)
+      this.trainerName = stringLogic.readGen5StringFromBytes(dataView, 0x68, 8)
+      this.trainerGender = byteLogic.getFlag(dataView, 0x84, 7)
+      this.checksum = dataView.getUint16(0x6, true)
+    } else {
+      const converter = new PkmConverter(this.format, options.strategy)
+      const other = arg
+      const metData = converter.metData(other)
+
+      // because this PID modification function assumes you want to preserve nature, which is not
+      // derived from PID in gen 5, this is a carveout to ensure that the original PID is preserved
+      // if the OHPKM is from gen 5 originally.
+      if (OriginGames.generation(other.gameOfOrigin) === Generation.G5) {
+        this.personalityValue = other.personalityValue
+      } else {
+        this.personalityValue = generatePersonalityValuePreservingAttributes(other)
+      }
+
+      this.dexNum = other.dexNum
+      this.heldItemIndex = other.heldItemIndex
+      this.trainerID = other.trainerID
+      this.secretID = other.secretID
+      this.exp = other.exp
+      this.trainerFriendship = other.trainerFriendship
+      this.ability = other.ability
+      this.markings = types.markingsSixShapesNoColorFromOther(other.markings)
+      this.language = other.language
+      this.evs = other.evs
+      this.contest = other.contest
+
+      const moveFilter = MoveFilter.fromPkmClass(PK5)
+      this.moves = moveFilter.moves(other)
+      this.movePP = moveFilter.movePp(other, this.format)
+      this.movePPUps = moveFilter.movePpUps(other)
+
+      this.ivs = converter.ivs(other)
+      this.isEgg = other.isEgg
+      this.isNicknamed = other.isNicknamed
+      this.gender = other.gender
+      this.formNum = other.formNum
+      this.nature = other.nature
+      this.isNsPokemon = other.isNsPokemon ?? false
+      this.eggDate = other.eggDate
+      this.metDate = other.metDate
+      this.eggLocationIndex = other.eggLocationIndex ?? 0
+
+      this.gameOfOrigin = metData.gameOfOrigin
+      this.metLocationIndex = metData.locationIndex
+      this.pokerusByte = other.pokerusByte
+      if (other.ball && PK5.maxValidBall() >= other.ball) {
+        this.ball = other.ball
+      } else {
+        this.ball = Ball.Poke
+      }
+
+      this.metLevel = other.metLevel
+      this.encounterType = other.encounterType ?? 0
+      this.pokeStarFame = other.pokeStarFame ?? 0
+      this.statusCondition = 0
+      this.currentHP = other.currentHP ?? 0
+      this.ribbons = filterRibbons(other.ribbons ?? [], [Gen4Ribbons], '')
+      this.isFatefulEncounter = other.isFatefulEncounter ?? false
+      this.nickname = converter.nickname(other)
+      this.trainerName = other.trainerName
+      this.trainerGender = other.trainerGender
+    }
+    this.checksum = this.calculateChecksum() // MUST GO AFTER ALL FIELDS ARE INITIALIZED
+  }
+
+  static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK5 {
+    return new PK5(buffer, { encrypted })
+  }
+
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK5 {
+    return new PK5(ohpkm, { strategy })
+  }
+
+  toBytes(options?: types.ToBytesOptions): ArrayBuffer {
+    const buffer = new ArrayBuffer(options?.includeExtraFields ? 236 : 136)
+    const dataView = new DataView(buffer)
+
+    dataView.setUint32(0x0, this.personalityValue, true)
+    dataView.setUint16(0x4, 0, true) // sanity bytes
+    dataView.setUint16(0x8, this.dexNum, true)
+    dataView.setUint16(0xa, this.heldItemIndex, true)
+    dataView.setUint16(0xc, this.trainerID, true)
+    dataView.setUint16(0xe, this.secretID, true)
+    dataView.setUint32(0x10, this.exp, true)
+    dataView.setUint8(0x14, this.trainerFriendship)
+    dataView.setUint8(0x15, this.ability?.index ?? 0)
+    types.markingsSixShapesNoColorToBytes(dataView, 0x16, this.markings)
+    dataView.setUint8(0x17, this.language)
+    types.writeStatsToBytesU8(dataView, 0x18, this.evs)
+    types.writeContestStatsToBytes(dataView, 0x1e, this.contest)
+    for (let i = 0; i < 4; i++) {
+      dataView.setUint16(0x28 + i * 2, this.moves[i], true)
+    }
+
+    for (let i = 0; i < 4; i++) {
+      dataView.setUint8(0x30 + i, this.movePP[i])
+    }
+
+    for (let i = 0; i < 4; i++) {
+      dataView.setUint8(0x34 + i, this.movePPUps[i])
+    }
+
+    types.write30BitIVsToBytes(dataView, 0x38, this.ivs)
+    byteLogic.setFlag(dataView, 0x38, 30, this.isEgg)
+    byteLogic.setFlag(dataView, 0x38, 31, this.isNicknamed)
+    byteLogic.uIntToBufferBits(dataView, this.gender, 64, 1, 2, true)
+    byteLogic.uIntToBufferBits(dataView, this.formNum, 64, 3, 5, true)
+    dataView.setUint8(0x41, this.nature.index)
+    byteLogic.setFlag(dataView, 0x42, 1, this.isNsPokemon)
+    dataView.setUint8(0x5f, this.gameOfOrigin)
+    types.writePKMDateToBytes(dataView, 0x78, this.eggDate)
+    types.writePKMDateToBytes(dataView, 0x7b, this.metDate)
+    dataView.setUint16(0x7e, this.eggLocationIndex, true)
+    dataView.setUint16(0x80, this.metLocationIndex, true)
+    dataView.setUint8(0x82, this.pokerusByte)
+    dataView.setUint8(0x83, this.ball)
+    dataView.setUint8(0x84, this.metLevel)
+    dataView.setUint8(0x85, this.encounterType)
+    dataView.setUint8(0x87, this.pokeStarFame)
+    if (options?.includeExtraFields) {
+      dataView.setUint8(0x88, this.statusCondition)
+    }
+
+    if (options?.includeExtraFields) {
+      dataView.setUint8(0x8e, this.currentHP)
+    }
+
+    byteLogic.setFlagIndexes(
+      dataView,
+      0x24,
+      0,
+      this.ribbons
+        .map((ribbon) => Gen4Ribbons.indexOf(ribbon))
+        .filter((index) => index > -1 && index < 28)
+    )
+    byteLogic.setFlagIndexes(
+      dataView,
+      0x3c,
+      0,
+      this.ribbons
+        .map((ribbon) => Gen4Ribbons.indexOf(ribbon) - 28)
+        .filter((index) => index > -1 && index < 32)
+    )
+    byteLogic.setFlagIndexes(
+      dataView,
+      0x60,
+      0,
+      this.ribbons
+        .map((ribbon) => Gen4Ribbons.indexOf(ribbon) - 60)
+        .filter((index) => index > -1 && index < 20)
+    )
+    byteLogic.setFlag(dataView, 0x40, 0, this.isFatefulEncounter)
+    stringLogic.writeGen5StringToBytes(dataView, this.nickname, 0x48, 12)
+    stringLogic.writeGen5StringToBytes(dataView, this.trainerName, 0x68, 8)
+    byteLogic.setFlag(dataView, 0x84, 7, this.trainerGender)
+    dataView.setUint16(0x6, this.checksum, true)
+    return buffer
+  }
+
+  public getStats() {
+    return getStats(this)
+  }
+
+  public get heldItemName() {
+    return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
+  }
+
+  public get abilityNum() {
+    return ((this.personalityValue >> 16) & 1) + 1
+  }
+
+  public calculateChecksum() {
+    return encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x87)
+  }
+
+  public refreshChecksum() {
+    this.checksum = encryption.get16BitChecksumLittleEndian(this.toBytes(), 0x08, 0x87)
+  }
+
+  public toPCBytes() {
+    const shuffledBytes = encryption.shuffleBlocksGen45(this.toBytes())
+
+    return encryption.decryptByteArrayGen45(shuffledBytes)
+  }
+
+  public getLevel() {
+    return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
+  }
+
+  isShiny() {
+    return (
+      (this.trainerID ^
+        this.secretID ^
+        (this.personalityValue & 0xffff) ^
+        ((this.personalityValue >> 16) & 0xffff)) <
+      8
+    )
+  }
+
+  isSquareShiny() {
+    return !(
+      this.trainerID ^
+      this.secretID ^
+      (this.personalityValue & 0xffff) ^
+      ((this.personalityValue >> 16) & 0xffff)
+    )
+  }
+
+  public get metadata() {
+    return MetadataSummaryLookup(this.dexNum, this.formNum)
+  }
+
+  public get speciesMetadata() {
+    return SpeciesLookup(this.dexNum)
+  }
+
+  static maxValidMove() {
+    return 559
+  }
+
+  static maxValidBall() {
+    return 25
+  }
+}

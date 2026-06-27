@@ -1,6 +1,6 @@
+import { classNames } from '@openhome-ui/util/style'
 import { Badge, Tooltip } from '@radix-ui/themes'
 import { PropsWithChildren } from 'react'
-import { classNames } from 'src/ui/util/style'
 
 export type IndicatorProps = {
   className?: string

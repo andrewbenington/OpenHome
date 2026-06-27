@@ -4,7 +4,7 @@ import { HTMLAttributes, useContext, useState } from 'react'
 import { SideTabsContext } from './SideTabsContext'
 import './style.css'
 
-export type SideTabsProps = {
+type SideTabsProps = {
   value?: Option<string>
   onValueChange?: (value: Option<string>) => void
   defaultValue?: Option<string>
@@ -34,7 +34,7 @@ function SideTabsRoot(props: SideTabsProps) {
   )
 }
 
-export type SideTabProps = {
+type SideTabProps = {
   value: Option<string>
   children: React.ReactNode
 }
@@ -53,7 +53,7 @@ function SideTab(props: SideTabProps) {
   )
 }
 
-export type SideTabListProps = {
+type SideTabListProps = {
   children: React.ReactNode
 }
 
@@ -63,7 +63,7 @@ function SideTabList(props: SideTabListProps) {
   return <div className="side-tab-list">{children}</div>
 }
 
-export type SideTabPanelProps = {
+type SideTabPanelProps = {
   value: Option<string>
   children: React.ReactNode
 }
