@@ -180,9 +180,11 @@ export function buildRecentSaveContextElements(
     removeRecentSave
       ? Item.label('Remove Save').action(() => removeRecentSave(save.filePath.raw))
       : undefined,
-    Item.label(
-      `Reveal in ${backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
-    ).action(() => backend.openDirectory(save.filePath.dir)),
+    save.valid
+      ? Item.label(
+          `Reveal in ${backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
+        ).action(() => backend.openDirectory(save.filePath.dir))
+      : undefined,
   ]
 }
 

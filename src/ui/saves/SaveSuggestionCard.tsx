@@ -58,18 +58,19 @@ export default function SaveSuggestionCard(props: SaveSuggestionCardProps) {
             backgroundColor: 'gray',
           }}
         >
-          <Spinner />
+          {error ? (
+            <div className="suggested-save-grid-error-button-container">
+              <button
+                className="save-grid-button save-grid-error-button"
+                onClick={() => displayError('Invalid Save', error)}
+              >
+                <ErrorIcon />
+              </button>
+            </div>
+          ) : (
+            <Spinner />
+          )}
         </div>
-        {error && (
-          <div className="save-grid-error-button-container">
-            <button
-              className="save-grid-button save-grid-error-button"
-              onClick={() => displayError('Invalid Save', error)}
-            >
-              <ErrorIcon />
-            </button>
-          </div>
-        )}
       </div>
     </OpenHomeCtxMenu>
   )
