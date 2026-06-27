@@ -46,7 +46,7 @@ export function stringSorter<T>(func: (val: T) => string | undefined | null) {
   }
 }
 
-export function numericSorter<T>(func: (val: T) => number | undefined) {
+export function numericSorter<T, N extends number = number>(func: (val: T) => N | undefined) {
   return (a: T, b: T) => {
     const numA = func(a) ?? Number.POSITIVE_INFINITY
     const numB = func(b) ?? Number.POSITIVE_INFINITY
