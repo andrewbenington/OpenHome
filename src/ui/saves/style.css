@@ -76,6 +76,13 @@
   justify-content: center;
 }
 
+.suggested-save-grid-error-button-container {
+  width: 100%;
+  margin: auto;
+  display: grid;
+  justify-content: center;
+}
+
 .save-grid-error-button {
   background-color: rgb(213, 18, 18);
   color: white;
@@ -85,7 +92,7 @@
 }
 
 .save-grid-button {
-  height: 1.25rem;
+  height: 2rem;
   width: 3.5rem;
   font-size: 0.8rem;
   padding: 0;
