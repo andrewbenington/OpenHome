@@ -9,6 +9,7 @@ import {
   ExtraFormIndex,
   extraFormSpriteName,
   FormMetadata,
+  Gender,
   Generation,
   MetadataSummaryLookup,
 } from '@pkm-rs/pkg'
@@ -24,6 +25,7 @@ export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
   nationalDex: number
   formIndex?: number
   isShiny?: boolean
+  gender?: Gender
   isEgg?: boolean
   heldItemIndex?: number
   onlyItem?: boolean
@@ -68,8 +70,10 @@ function iconType(
 }
 
 export default function PokemonIcon(props: PokemonIconProps) {
-  const { nationalDex, formIndex, isShiny, heldItemIndex, onlyItem, silhouette, isEgg } = props
-  const { grayedOut, topRightIndicator, tags, hasNotes, style, onClick, extraFormIndex } = props
+  const { nationalDex, formIndex, extraFormIndex } = props
+  const { isShiny, gender, heldItemIndex, isEgg, tags, hasNotes } = props
+  const { grayedOut, topRightIndicator, style, onClick, onlyItem, silhouette } = props
+
   const { showNotesIndicator, showTags } = useMonDisplay()
 
   let monImage = null
@@ -84,6 +88,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
           silhouette={silhouette}
           onClick={onClick}
           isShiny={isShiny}
+          gender={gender}
         />
       )
       break
@@ -178,6 +183,7 @@ interface PokemonIconUsingImageProps {
   extraFormIndex?: number
   silhouette?: boolean
   isShiny?: boolean
+  gender?: Gender
   onClick?: MouseEventHandler
 }
 
@@ -197,7 +203,9 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
       format: 'OHPKM',
       extraFormIndex,
       isShiny: props.isShiny,
+      isFemale: props.gender === Gender.Female,
     })
+
     R.match(
       (path: string) => {
         setSpritePath(getPublicImageURL(path))
