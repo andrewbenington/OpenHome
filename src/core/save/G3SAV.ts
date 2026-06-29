@@ -179,7 +179,7 @@ export class G3SaveBackup {
         const buffer = this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80).buffer
         box.boxSlots[slot] = PK3.fromSlotBytes(buffer)
       } catch (e) {
-        throw Error(
+        console.error(
           `File does has invalid Pokémon data at box ${Math.floor(i / 30)}/slot ${slot}: ${e}`
         )
       }
@@ -371,7 +371,8 @@ export class G3SAV extends OfficialSAV<PK3> {
         return true
       }
       return save.primarySave.securityKey > 0 && save.primarySave.signature === GEN3_SIGNATURE
-    } catch {
+    } catch (e) {
+      console.error(e)
       return false
     }
   }

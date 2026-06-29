@@ -442,7 +442,7 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get nature() {
-    return NatureIndex.newFromPid(this.personalityValue)
+    return NatureIndex.newFromModulo(this.personalityValue)
   }
 
   public get abilityNum() {

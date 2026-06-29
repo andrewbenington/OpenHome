@@ -10,7 +10,7 @@ import { Option, unique } from '@openhome-core/util/functional'
 import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
-import { hasDesamumeFooter, LookupType } from './util'
+import { hasDesmumeFooter, LookupType } from './util'
 import { PathData } from './util/path'
 
 const PC_OFFSET = 0x400
@@ -197,7 +197,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
       return false
     }
     if (bytes.length > G5SAV.SAVE_SIZE_BYTES) {
-      if (!hasDesamumeFooter(bytes, G5SAV.SAVE_SIZE_BYTES)) {
+      if (!hasDesmumeFooter(bytes, G5SAV.SAVE_SIZE_BYTES)) {
         return false
       }
     }

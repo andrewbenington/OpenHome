@@ -1,23 +1,19 @@
-import { getSaveRef, SAV } from '@openhome-core/save/interfaces'
 import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
 import { R } from '@openhome-core/util/functional'
-import {
-  filterUndefined,
-  numericSorter,
-  SortableColumn,
-  stringSorter,
-} from '@openhome-core/util/sort'
+import { numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { ErrorIcon } from '@openhome-ui/components/Icons'
+import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useSaves } from '@openhome-ui/state/saves'
-import { Flex } from '@radix-ui/themes'
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { GameIndicator } from '../components/pokemon/indicator/GameIndicator'
-import SaveCard from './SaveCard'
-import { filterEmpty, SaveViewMode } from './util'
+import { Flex, Spinner } from '@radix-ui/themes'
+import { useCallback, useContext, useEffect, useState } from 'react'
+import SaveSuggestionCard from './SaveSuggestionCard'
+import { isLoaded, LoadingSaveSuggestion, SaveSuggestion } from './suggestions'
+import { SaveViewMode } from './util'
 
 interface SaveFileSelectorProps {
   onOpen: (path: PathData) => void
@@ -29,8 +25,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const { onOpen, view, cardSize } = props
   const backend = useContext(BackendContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
-  const [suggestedSaves, setSuggestedSaves] = useState<SAV[]>()
-  const savesAndBanks = useSaves()
+  const [suggestions, setSuggestions] = useState<(SaveSuggestion | LoadingSaveSuggestion)[]>()
   const [error, setError] = useState(false)
   const displayError = useDisplayError()
 
@@ -42,98 +37,133 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
     [displayError]
   )
 
-  const openSavePaths = useMemo(
-    () => Object.fromEntries(savesAndBanks.allOpenSaves.map((save) => [save.filePath.raw, true])),
-    [savesAndBanks.allOpenSaves]
-  )
-
   const loadSaveData = useCallback(
-    async (savePath: PathData) => {
-      const response = await backend.loadSaveFile(savePath)
-
-      if (R.isOk(response)) {
-        const { fileBytes } = response.value
-
-        return buildUnknownSaveFile(savePath, fileBytes, getEnabledSaveTypes())
-      }
-      return undefined
-    },
+    async (savePath: PathData) =>
+      backend
+        .loadSaveFile(savePath)
+        .then(
+          R.flatMap((response) =>
+            buildUnknownSaveFile(savePath, response.fileBytes, getEnabledSaveTypes())
+          )
+        ),
     [backend, getEnabledSaveTypes]
   )
 
   useEffect(() => {
-    if (error || suggestedSaves) return
+    if (error || suggestions) return
     backend.findSuggestedSaves().then(
       R.match(
         async (possibleSaves) => {
-          const allPaths = (possibleSaves?.citra ?? [])
-            .concat(possibleSaves?.open_emu ?? [])
-            .concat(possibleSaves?.desamume ?? [])
+          const allPaths = (possibleSaves.citra ?? [])
+            .concat(possibleSaves.open_emu ?? [])
+            .concat(possibleSaves.desmume ?? [])
 
           if (allPaths.length > 0) {
-            const saves = (await Promise.all(allPaths.map((path) => loadSaveData(path)))).filter(
-              filterEmpty
-            )
+            const saveSuggestions: LoadingSaveSuggestion[] = allPaths.map((filePath) => {
+              return { loadingSave: loadSaveData(filePath), filePath }
+            })
 
-            saves.filter(R.isErr).forEach((s) => console.warn(`Suggested save error: ${s.err}`))
-
-            setSuggestedSaves(
-              saves
-                .filter(R.isOk)
-                .map((s) => s.value)
-                .filter(filterUndefined)
-            )
+            setSuggestions(saveSuggestions)
           }
         },
         async (err) => handleError('Error getting suggested saves', err)
       )
     )
-  }, [backend, error, handleError, loadSaveData, suggestedSaves])
+  }, [backend, error, handleError, loadSaveData, suggestions])
 
-  const columns: SortableColumn<SAV>[] = [
+  suggestions?.forEach((suggestion, i) => {
+    if (!isLoaded(suggestion)) {
+      suggestion.loadingSave.then((loaded) => {
+        suggestions[i] = {
+          save: loaded,
+          filePath: suggestions[i].filePath,
+        }
+        setSuggestions([...suggestions])
+      })
+    }
+  })
+
+  const openSavePaths = new Set(useSaves().allOpenSaves.map((save) => save.filePath.raw))
+
+  const columns: SortableColumn<SaveSuggestion | LoadingSaveSuggestion>[] = [
     {
       key: 'open',
       name: 'Open',
       width: '5rem',
 
-      renderCell: (params) => (
-        <button
-          className="save-grid-button"
-          onClick={(e) => {
-            e.preventDefault()
-            onOpen(params.row.filePath)
-          }}
-          disabled={params.row.filePath.raw in openSavePaths}
-          title={params.row.filePath.raw in openSavePaths ? 'Save is already open' : undefined}
-        >
-          Open
-        </button>
-      ),
+      renderValue: (suggestion) => {
+        if (!isLoaded(suggestion)) return <Spinner />
+
+        const save = suggestion.save
+        if (R.isErr(save)) {
+          return (
+            <button
+              className="save-grid-button save-grid-error-button"
+              onClick={() => displayError('Invalid Save', save.err)}
+            >
+              <ErrorIcon />
+            </button>
+          )
+        }
+
+        return (
+          <button
+            className="save-grid-button"
+            onClick={(e) => {
+              e.preventDefault()
+              onOpen(suggestion.filePath)
+            }}
+            disabled={openSavePaths.has(suggestion.filePath.raw)}
+            title={openSavePaths.has(suggestion.filePath.raw) ? 'Save is already open' : undefined}
+          >
+            Open
+          </button>
+        )
+      },
       cellClass: 'centered-cell',
     },
     {
       key: 'game',
       name: 'Game',
       width: '8rem',
-      renderValue: (value) => (
+      renderValue: (suggestion) => (
         <div className="flex-row-centered">
-          <GameIndicator
-            originGame={value.origin}
-            plugin={value.pluginIdentifier}
-            withName
-            tooltip={value.filePath.raw}
-          />
+          {isLoaded(suggestion) ? (
+            R.isOk(suggestion.save) ? (
+              <GameIndicator
+                originGame={suggestion.save.value.origin}
+                plugin={suggestion.save.value.pluginIdentifier}
+                withName
+                tooltip={suggestion.filePath.raw}
+              />
+            ) : null
+          ) : (
+            <Spinner />
+          )}
         </div>
       ),
-      sortFunction: numericSorter((val) => val.origin),
+      sortFunction: numericSorter((suggestion) =>
+        isLoaded(suggestion) && R.isOk(suggestion.save) ? suggestion.save.value.origin : undefined
+      ),
       cellClass: 'centered-cell',
     },
     {
       key: 'trainerDetails',
       name: 'Trainer',
       width: '10rem',
-      renderValue: (params) => `${params.name} (${params.tid})`,
-      sortFunction: stringSorter((save) => `${save.name} (${save.tid})`),
+      renderValue: (suggestion) =>
+        isLoaded(suggestion) ? (
+          R.isOk(suggestion.save) ? (
+            `${suggestion.save.value.name} (${suggestion.save.value.tid})`
+          ) : null
+        ) : (
+          <Spinner />
+        ),
+      sortFunction: stringSorter((suggestion) =>
+        isLoaded(suggestion) && R.isOk(suggestion.save)
+          ? `${suggestion.save.value.name} (${suggestion.save.value.tid})`
+          : null
+      ),
     },
     {
       key: 'filePath',
@@ -161,14 +191,18 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
   ]
 
   return view === 'grid' ? (
-    <SortableDataGrid rows={suggestedSaves ?? []} columns={columns} />
+    <SortableDataGrid
+      rows={suggestions ?? []}
+      columns={columns}
+      key={suggestions?.map((suggestion) => isLoaded(suggestion)).join(',')}
+    />
   ) : (
     <Flex wrap="wrap" direction="row" justify="center" m="4" gap="2">
-      {suggestedSaves?.map((save) => (
-        <SaveCard
-          key={save.filePath.raw}
-          save={getSaveRef(save)}
-          onOpen={() => onOpen(save.filePath)}
+      {suggestions?.map((suggestion) => (
+        <SaveSuggestionCard
+          key={suggestion.filePath.raw}
+          suggestion={suggestion}
+          onOpen={() => onOpen(suggestion.filePath)}
           size={cardSize}
         />
       ))}

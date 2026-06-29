@@ -23,6 +23,7 @@ use crate::state::synced_state::AllSyncedState;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
@@ -149,7 +150,6 @@ pub fn run() {
             commands::get_storage_file_json,
             commands::write_storage_file_json,
             commands::write_file_bytes,
-            commands::find_suggested_saves,
             commands::set_app_theme,
             commands::validate_recent_saves,
             commands::download_plugin,
@@ -159,6 +159,7 @@ pub fn run() {
             commands::handle_windows_accelerator,
             commands::open_directory,
             commands::open_file_location,
+            saves::find_suggested_saves,
             startup_config::get_data_dir_path,
             startup_config::change_data_dir,
             pkm_storage::load_banks,

@@ -6,7 +6,7 @@ import { bytesToUint16LittleEndian } from '@openhome-core/util/byteLogic'
 import { readGen4StringFromBytes } from '@openhome-core/util/stringConversion'
 import { ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { G4SAV } from './G4SAV'
-import { hasDesamumeFooter } from './util'
+import { hasDesmumeFooter } from './util'
 import { PathData } from './util/path'
 
 export class PtSAV extends G4SAV {
@@ -89,7 +89,7 @@ export class PtSAV extends G4SAV {
       return false
     }
     if (bytes.length > G4SAV.SAVE_SIZE_BYTES) {
-      if (!hasDesamumeFooter(bytes, G4SAV.SAVE_SIZE_BYTES)) {
+      if (!hasDesmumeFooter(bytes, G4SAV.SAVE_SIZE_BYTES)) {
         return false
       }
     }

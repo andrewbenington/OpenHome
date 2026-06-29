@@ -91,9 +91,9 @@ where
     fs::read(&path).map_err(|err| Error::file_access(&path, err))
 }
 
-pub fn dedupe_paths(paths: Vec<PathData>) -> Vec<PathData> {
-    let set: HashSet<PathData> = paths.into_iter().collect();
-    set.into_iter().collect()
+pub fn dedupe_paths(paths: &mut Vec<PathData>) {
+    let set: HashSet<PathData> = paths.drain(..).collect();
+    *paths = set.into_iter().collect()
 }
 
 pub async fn download_text_file(url: &str) -> Result<String> {

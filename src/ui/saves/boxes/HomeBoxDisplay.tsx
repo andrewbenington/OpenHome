@@ -382,10 +382,13 @@ function SingleBoxMonDisplay() {
                 isHome: true,
               }
 
+              // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
+              const uniqueKey = `${currentBoxIndex}-${index}-${identifier}`
+
               const result = identifier ? ohpkmStore.tryLoadFromId(identifier) : undefined
               if (result && R.isErr(result)) {
                 return (
-                  <Tooltip key={`${currentBoxIndex}-${index}`} content={identifier}>
+                  <Tooltip key={uniqueKey} content={identifier}>
                     <Button
                       className="box-slot-missing-id"
                       radius="full"
@@ -404,7 +407,7 @@ function SingleBoxMonDisplay() {
 
               return (
                 <BoxCell
-                  key={`${currentBoxIndex}-${index}`}
+                  key={uniqueKey}
                   onClick={() => setSelectedIndex(index)}
                   dragID={`home_${currentBoxIndex}_${index}`}
                   location={thisLocation}

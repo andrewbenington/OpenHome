@@ -76,7 +76,7 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
   let i = 0
   while (i < 0x10000) {
     const newGender = metadata.genderFromPid(Number(newPersonalityValue))
-    const newNature = NatureIndex.newFromPid(Number(newPersonalityValue))
+    const newNature = NatureIndex.newFromModulo(Number(newPersonalityValue))
 
     function getInconsistancy(): string | null {
       if (shouldCheckUnown && getUnownLetterGen3(Number(newPersonalityValue)) !== mon.formNum) {

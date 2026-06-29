@@ -142,13 +142,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
             ? this.metadata?.genderFromAtkDv(other.dvs.atk)
             : this.metadata?.genderFromPid(this.personalityValue)) ??
           Gender.Genderless
+        this.nature = other.nature ?? NatureIndex.newFromModulo(other.exp)
       } else {
         this.abilityNum = other.abilityNum ?? 0
         this.gender =
           other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
+        this.nature = other.nature ?? NatureIndex.newFromModulo(this.personalityValue)
       }
-
-      this.nature = other.nature ?? NatureIndex.newFromPid(this.personalityValue)
 
       this.ivs = other.ivs ?? (other.dvs !== undefined ? ivsFromDVs(other.dvs) : generateIVs(prng))
 

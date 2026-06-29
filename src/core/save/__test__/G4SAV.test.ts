@@ -35,10 +35,6 @@ describe('Platinum save file read/write', async () => {
     if (!R.isOk(result)) {
       fail(`Failed to build save file: ${result.err}`)
     }
-
-    if (result.value === undefined) {
-      fail(`Failed to build save file: got undefined`)
-    }
   })
 
   test('save has expected trainer name', () => {
@@ -124,10 +120,6 @@ describe('Pearl save file read/write', async () => {
 
     if (!R.isOk(result)) {
       fail(`Failed to build save file: ${result.err}`)
-    }
-
-    if (result.value === undefined) {
-      fail(`Failed to build save file: got undefined`)
     }
   })
 
@@ -215,10 +207,6 @@ describe('HeartGold save file read/write', async () => {
 
     if (!R.isOk(result)) {
       fail(`Failed to build save file: ${result.err}`)
-    }
-
-    if (result.value === undefined) {
-      fail(`Failed to build save file: got undefined`)
     }
   })
 
