@@ -8,11 +8,13 @@ use crate::error::{Error, Result};
 use crate::state::PokedexState;
 use crate::versioning::UpdateFeatures;
 
-fn without_tmp_extension(mut path: PathBuf) -> PathBuf {
-    if path.extension().is_some_and(|ext| ext == ".tmp") {
-        path.set_extension("");
+fn without_tmp_extension(path: &Path) -> PathBuf {
+    let mut without_tmp = PathBuf::from(path);
+    if without_tmp.extension().is_some_and(|ext| ext == "tmp") {
+        without_tmp.set_extension("");
     }
-    path
+
+    without_tmp
 }
 
 #[derive(Serialize)]
@@ -83,11 +85,13 @@ impl AppStateInner {
 
         // overwrite original files with the .tmp versions, deleting the temps
         for temp_file_path in self.temp_files.iter() {
-            fs::rename(
-                temp_file_path,
-                without_tmp_extension(temp_file_path.clone()),
-            )
-            .map_err(|err| Error::file_access(temp_file_path, err))?;
+            let path_without_tmp = without_tmp_extension(temp_file_path);
+            fs::rename(temp_file_path, &path_without_tmp)
+                .map_err(|err| Error::file_access(temp_file_path, err))?;
+            tracing::debug!(
+                "file updated successfully: {}",
+                path_without_tmp.to_string_lossy()
+            );
         }
 
         self.open_transaction = false;
