@@ -162,6 +162,7 @@ pub enum SignificantUpdate {
     V1_11_4,
     V1_12_0,
     V1_12_1,
+    V1_12_2,
 }
 
 impl SignificantUpdate {
@@ -189,6 +190,7 @@ impl SignificantUpdate {
             Self::V1_11_4 => Version::parse("1.11.4").unwrap(),
             Self::V1_12_0 => Version::parse("1.12.0").unwrap(),
             Self::V1_12_1 => Version::parse("1.12.1").unwrap(),
+            Self::V1_12_2 => Version::parse("1.12.2").unwrap(),
         }
     }
 
@@ -284,6 +286,11 @@ impl SignificantUpdate {
                 "Abilities for mega evolutions added in Pokémon Champions v1.10.0 have been added.",
                 "Missing box icons and Home sprites have been fixed.",
                 "Vivillon and Alcremie now have the correct box icons and Home sprites for their forms.",
+            ]),
+            Self::V1_12_2 => Some(vec![
+                "Files now write correctly again.",
+                "Window position + size should now persist between app launches.",
+                "Natures are now generated correctly for gen 1 + 2 Pokémon.",
             ]),
             _ => None,
         }
