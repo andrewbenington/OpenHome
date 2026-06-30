@@ -1,6 +1,6 @@
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { Option, R } from '@openhome-core/util/functional'
-import { BackendWithHelpersInterface } from '@openhome-ui/backend/backendContext'
+import BackendInterface from '@openhome-ui/backend/backendInterface'
 import useBackend from '@openhome-ui/backend/useBackend'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
@@ -144,7 +144,7 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
 export async function getPluginSprite(
   plugin: OpenHomePlugin,
   spritePath: string,
-  backend: BackendWithHelpersInterface
+  backend: BackendInterface
 ): Promise<MonSpriteResult> {
   return backend
     .getPluginPath(plugin.id)

@@ -1,8 +1,4 @@
-import { R } from '@openhome-core/util/functional'
+import { createContext } from 'react'
 import BackendInterface from './backendInterface'
-import { TauriBackend } from './tauri/backend'
 
-export const AppBackend: BackendInterface = R.expect(
-  await TauriBackend.start(),
-  (error) => `error starting Tauri backend: ${error}`
-)
+export const BackendContext = createContext<BackendInterface | null>(null)

@@ -2,7 +2,6 @@ import { R } from '@openhome-core/util/functional'
 import '@openhome-ui/App.css'
 import AppTabs from '@openhome-ui/AppTabs'
 import BackendInterface from '@openhome-ui/backend/backendInterface'
-import { BackendProvider } from '@openhome-ui/backend/backendProvider'
 import { TauriBackend } from '@openhome-ui/backend/tauri/backend'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import useDebounce from '@openhome-ui/hooks/debounce'
@@ -26,6 +25,7 @@ import ErrorMessageModal from '@openhome-ui/top-level/ErrorMessageModal'
 import UpdateMessageModal from '@openhome-ui/top-level/UpdateMessageModal'
 import { Flex, Text, Theme } from '@radix-ui/themes'
 import { useCallback, useEffect, useReducer, useState } from 'react'
+import { BackendContext } from './backend'
 import useBackend from './backend/useBackend'
 import BanksAndBoxesProvider from './state-zustand/banks-and-boxes/Provider'
 import ConvertStrategiesProvider from './state/convert-strategies/ConvertStrategiesProvider'
@@ -68,11 +68,11 @@ export default function App() {
       radius="small"
     >
       <div id="app-container" className="root">
-        <BackendProvider backend={backend}>
+        <BackendContext value={backend}>
           <ErrorContext value={[errorState, errorDispatch]}>
             <AppWithBackend />
           </ErrorContext>
-        </BackendProvider>
+        </BackendContext>
       </div>
     </Theme>
   )
