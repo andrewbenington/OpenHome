@@ -1,5 +1,5 @@
 import { R } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import { AppState as TransactionState } from '@openhome-ui/backend/backendInterface'
 import { createContext, useContext, useEffect, useState } from 'react'
 
@@ -32,14 +32,12 @@ export function usePossiblyLoadedTxState(): PossiblyLoadedTransactionState {
   const [transactionState, setTransactionState] = useState<TransactionState>()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
-  const backend = useContext(BackendContext)
 
   useEffect(() => {
     if (loading || error || transactionState) return
 
     setLoading(true)
-    backend
-      .getState()
+    AppBackend.getState()
       .then(
         R.match(
           (state) => {
@@ -59,7 +57,7 @@ export function usePossiblyLoadedTxState(): PossiblyLoadedTransactionState {
       .finally(() => {
         setLoading(false)
       })
-  }, [backend, error, loading, transactionState])
+  }, [error, loading, transactionState])
 
   if (!transactionState) {
     return { error, loaded: false }

@@ -1,7 +1,7 @@
-import { BackendContext } from '@openhome-ui/backend/backendContext'
-import { SyncedStateController, useSyncedState } from '@openhome-ui/state/synced-state'
+import { AppBackend } from '@openhome-ui/backend'
+import { useSyncedState } from '@openhome-ui/state/synced-state'
 import { ConvertStrategy } from '@pkm-rs/pkg'
-import { PropsWithChildren, useContext } from 'react'
+import { PropsWithChildren } from 'react'
 import { ConversionSettingsContext } from '.'
 import SyncedStateProvider from '../synced-state/SyncedStateProvider'
 
@@ -16,7 +16,12 @@ export type ConvertStrategies = {
 }
 
 function useConvertStrategiesTauri() {
-  return useSyncedState(useSyncedConvertState())
+  return useSyncedState({
+    identifier: 'convert_strategies',
+    stateGetter: AppBackend.getConvertStrategies,
+    stateReducer,
+    stateUpdater: AppBackend.updateConvertStrategies,
+  })
 }
 
 export default function ConvertStrategiesProvider({ children }: PropsWithChildren) {
@@ -33,18 +38,4 @@ export default function ConvertStrategiesProvider({ children }: PropsWithChildre
 
 function stateReducer(prev: ConvertStrategies, updated: ConvertStrategies): ConvertStrategies {
   return { ...prev, ...updated }
-}
-
-function useSyncedConvertState(): SyncedStateController<ConvertStrategies> {
-  const backend = useContext(BackendContext)
-
-  const stateGetter = backend.getConvertStrategies
-  const stateUpdater = backend.updateConvertStrategies
-
-  return {
-    identifier: 'convert_strategies',
-    stateGetter,
-    stateReducer,
-    stateUpdater,
-  }
 }

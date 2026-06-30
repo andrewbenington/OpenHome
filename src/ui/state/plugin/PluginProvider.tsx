@@ -1,5 +1,5 @@
 import { partitionResults, R } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { GITHUB_REPO, LOCAL_REPO } from '@openhome-ui/pages/plugins/BrowsePlugins'
 import { CURRENT_PLUGIN_API_VERSION } from '@openhome-ui/pages/plugins/Plugins'
@@ -21,7 +21,6 @@ export default function PluginsProvider({ children }: PropsWithChildren) {
 }
 
 function usePlugins() {
-  const backend = useContext(BackendContext)
   const [appInfoState] = useContext(AppInfoContext)
   const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
   const displayError = useDisplayError()
@@ -33,12 +32,12 @@ function usePlugins() {
 
   useEffect(() => {
     if (pluginState.loaded || !appInfoState.settingsLoaded) return
-    backend.listInstalledPlugins().then(
+    AppBackend.listInstalledPlugins().then(
       R.match(
         (plugins) => {
           const promises = plugins
             .filter((plugin) => appInfoState.settings.enabledPlugins[plugin.id])
-            .map((plugin) => ({ ...plugin, ...backend.loadPluginCode(plugin.id) }))
+            .map((plugin) => ({ ...plugin, ...AppBackend.loadPluginCode(plugin.id) }))
 
           Promise.all(promises).then((results) => {
             const { failures, successes } = partitionResults(results)
@@ -59,17 +58,11 @@ function usePlugins() {
         }
       )
     )
-  }, [
-    backend,
-    displayError,
-    pluginState,
-    appInfoState.settingsLoaded,
-    appInfoState.settings.enabledPlugins,
-  ])
+  }, [displayError, pluginState, appInfoState.settingsLoaded, appInfoState.settings.enabledPlugins])
 
   useEffect(() => {
-    backend.updateSettings(appInfoState.settings).catch(console.error)
-  }, [appInfoState.settings, backend])
+    AppBackend.updateSettings(appInfoState.settings).catch(console.error)
+  }, [appInfoState.settings])
 
   useEffect(() => {
     setLoading(true)
@@ -95,10 +88,10 @@ function usePlugins() {
 
   const loadInstalled = useCallback(
     async () =>
-      backend.listInstalledPlugins().then(
+      AppBackend.listInstalledPlugins().then(
         R.match(
           (plugins) => {
-            const promises = plugins.map((plugin) => backend.loadPluginCode(plugin.id))
+            const promises = plugins.map((plugin) => AppBackend.loadPluginCode(plugin.id))
 
             const metadataById = Object.groupBy(plugins, (p) => p.id)
 
@@ -123,7 +116,7 @@ function usePlugins() {
           }
         )
       ),
-    [backend, displayError]
+    [displayError]
   )
 
   useEffect(() => {

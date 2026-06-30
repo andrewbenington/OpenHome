@@ -1,10 +1,7 @@
 import { R } from '@openhome-core/util/functional'
 import '@openhome-ui/App.css'
 import AppTabs from '@openhome-ui/AppTabs'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
 import BackendInterface from '@openhome-ui/backend/backendInterface'
-import { BackendProvider } from '@openhome-ui/backend/backendProvider'
-import { TauriBackend } from '@openhome-ui/backend/tauri/tauriBackend'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import useDebounce from '@openhome-ui/hooks/debounce'
 import useDisplayError from '@openhome-ui/hooks/displayError'
@@ -26,7 +23,8 @@ import { SavesProvider } from '@openhome-ui/state/saves'
 import ErrorMessageModal from '@openhome-ui/top-level/ErrorMessageModal'
 import UpdateMessageModal from '@openhome-ui/top-level/UpdateMessageModal'
 import { Flex, Text, Theme } from '@radix-ui/themes'
-import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
+import { useCallback, useEffect, useReducer, useState } from 'react'
+import { AppBackend } from './backend'
 import BanksAndBoxesProvider from './state-zustand/banks-and-boxes/Provider'
 import ConvertStrategiesProvider from './state/convert-strategies/ConvertStrategiesProvider'
 import PluginsProvider from './state/plugin/PluginProvider'
@@ -50,11 +48,9 @@ export default function App() {
       radius="small"
     >
       <div id="app-container" className="root">
-        <BackendProvider backend={TauriBackend}>
-          <ErrorContext.Provider value={[errorState, errorDispatch]}>
-            <AppWithBackend />
-          </ErrorContext.Provider>
-        </BackendProvider>
+        <ErrorContext.Provider value={[errorState, errorDispatch]}>
+          <AppWithBackend />
+        </ErrorContext.Provider>
       </div>
     </Theme>
   )
@@ -71,7 +67,6 @@ function AppWithBackend() {
     loaded: false,
   })
 
-  const backend = useContext(BackendContext)
   const displayError = useDisplayError()
 
   const debouncedUpdateSettings = useDebounce((backend: BackendInterface, settings: Settings) => {
@@ -83,8 +78,7 @@ function AppWithBackend() {
     if (appInfoState.error) {
       return
     }
-    backend
-      .getSettings()
+    AppBackend.getSettings()
       .then(
         R.match(
           async (settings) => appInfoDispatch({ type: 'load_settings', payload: settings }),
@@ -92,27 +86,27 @@ function AppWithBackend() {
         )
       )
       .finally(() => setSettingsLoading(false))
-  }, [appInfoState.error, backend, displayError])
+  }, [appInfoState.error, displayError])
 
   // only on app start
   useEffect(() => {
-    if (backend.getPlatform() !== 'windows') return
-    const handler = buildKeyboardHandler(backend)
+    if (AppBackend.getPlatform() !== 'windows') return
+    const handler = buildKeyboardHandler(AppBackend)
 
     window.addEventListener('keydown', handler)
     return () => {
       window.removeEventListener('keydown', handler)
     }
-  }, [backend])
+  }, [])
 
   useEffect(() => {
     if (!appInfoState.settingsLoaded) return
-    debouncedUpdateSettings(backend, appInfoState.settings)
-  }, [backend, appInfoState.settings, appInfoState.settingsLoaded, debouncedUpdateSettings])
+    debouncedUpdateSettings(AppBackend, appInfoState.settings)
+  }, [appInfoState.settings, appInfoState.settingsLoaded, debouncedUpdateSettings])
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = backend.onMenuEvents({
+    const stopListening = AppBackend.onMenuEvents({
       zoom_in: () => {
         appInfoDispatch({
           type: 'set_zoom_level',
@@ -132,17 +126,13 @@ function AppWithBackend() {
     return () => {
       stopListening()
     }
-  }, [appInfoState.settings.zoomLevel, backend])
+  }, [appInfoState.settings.zoomLevel])
 
   const getEnabledSaveTypes = useCallback(() => {
     return appInfoState.officialSaveTypes
       .concat(appInfoState.extraSaveTypes)
       .filter((saveType) => appInfoState.settings.enabledSaveTypes[saveType.saveTypeID])
   }, [appInfoState])
-
-  useEffect(() => {
-    patchConsole(backend)
-  }, [backend])
 
   return (
     <BanksAndBoxesProvider>
@@ -220,6 +210,7 @@ function patchConsole(backend: BackendInterface) {
     }
   }
 }
+patchConsole(AppBackend)
 
 // attempts to fill log placeholders with args like the web console does
 function formatWithPlaceholders(args: unknown[]): string {

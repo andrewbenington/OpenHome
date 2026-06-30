@@ -1,6 +1,6 @@
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { Option, R } from '@openhome-core/util/functional'
-import { BackendContext, BackendWithHelpersInterface } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getPokemonSpritePath } from '@openhome-ui/images/pokemon'
@@ -58,7 +58,6 @@ type MonSpriteResult =
 
 export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
   const { enabledPlugins } = useContext(PluginContext)
-  const backend = useContext(BackendContext)
   const [spriteResult, setSpriteResult] = useState<MonSpriteResult>({ loading: true })
   const displayError = useDisplayError()
 
@@ -97,11 +96,10 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
         return
       case 'plugin':
         const { plugin, spritePath } = result
-        backend
-          .getPluginPath(plugin.id)
+        AppBackend.getPluginPath(plugin.id)
           .then(
             R.asyncFlatMap((pluginPath: string) =>
-              backend.getImageData(`${pluginPath}/${spritePath}`)
+              AppBackend.getImageData(`${pluginPath}/${spritePath}`)
             )
           )
           .then(
@@ -129,7 +127,6 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
   }, [
     mon.format,
     enabledPlugins,
-    backend,
     displayError,
     spriteResult.path,
     spriteResult.errorMessage,
@@ -142,13 +139,11 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
 
 export async function getPluginSprite(
   plugin: OpenHomePlugin,
-  spritePath: string,
-  backend: BackendWithHelpersInterface
+  spritePath: string
 ): Promise<MonSpriteResult> {
-  return backend
-    .getPluginPath(plugin.id)
+  return AppBackend.getPluginPath(plugin.id)
     .then(
-      R.asyncFlatMap((pluginPath: string) => backend.getImageData(`${pluginPath}/${spritePath}`))
+      R.asyncFlatMap((pluginPath: string) => AppBackend.getImageData(`${pluginPath}/${spritePath}`))
     )
     .then(
       R.match(

@@ -7,7 +7,7 @@ import { monSupportedBySave, SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
 import { Option, R, Result } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import {
   OPENHOME_BOX_SLOTS,
   useBanksAndBoxes,
@@ -72,7 +72,6 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
 
 export function useSaves(): SavesAndBanksManager {
   const ohpkmStore = useOhpkmStore()
-  const backend = useContext(BackendContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { openSavesState, openSavesDispatch, allOpenSaves, promptDisambiguation } =
     useContext(SavesContext)
@@ -336,8 +335,8 @@ export function useSaves(): SavesAndBanksManager {
 
   const addSave = useCallback(
     async (save: SAV) => {
-      await backend.addRecentSave(getSaveRef(save))
-      const result = await backend.registerInPokedex(pokedexSeenFromSave(save))
+      await AppBackend.addRecentSave(getSaveRef(save))
+      const result = await AppBackend.registerInPokedex(pokedexSeenFromSave(save))
       if (R.isErr(result)) {
         console.error('Error registering pokedex entries from save:', result.err)
       }
@@ -366,7 +365,7 @@ export function useSaves(): SavesAndBanksManager {
           const updates = trackedData.syncWithGameData(mon, save)
 
           if (updates.length > 0) {
-            backend.log('DEBUG', `synced ${mon.nickname} with game data`, {
+            AppBackend.log('DEBUG', `synced ${mon.nickname} with game data`, {
               ohpkm_id: trackedData.openhomeId,
               event: 'game_data_sync',
               updates,
@@ -374,7 +373,7 @@ export function useSaves(): SavesAndBanksManager {
           }
 
           for (const update of updates) {
-            backend.log(
+            AppBackend.log(
               'INFO',
               `${mon.nickname}: ${update.message ?? `Updated ${update.field} from ${JSON.stringify(update.prevValue)} to ${JSON.stringify(update.newValue)}`}`,
               {
@@ -392,14 +391,14 @@ export function useSaves(): SavesAndBanksManager {
       ohpkmStore.insertOrUpdateAll(toUpdate)
       openSavesDispatch({ type: 'add_save', payload: save })
     },
-    [backend, openSavesDispatch, ohpkmStore]
+    [openSavesDispatch, ohpkmStore]
   )
 
   const buildAndOpenSave = useCallback(
     async (filePath?: PathData): Promise<Result<Option<SAV>, SaveError>> => {
       if (!filePath) {
         filePickerOpen.current = true
-        const result = await backend.pickFile()
+        const result = await AppBackend.pickFile()
         filePickerOpen.current = false
 
         if (R.isErr(result)) {
@@ -413,7 +412,7 @@ export function useSaves(): SavesAndBanksManager {
         return R.Err({ type: 'ALREADY_OPEN' })
       }
 
-      const bytesResult = await backend.loadSaveFile(filePath)
+      const bytesResult = await AppBackend.loadSaveFile(filePath)
       if (R.isErr(bytesResult)) {
         return R.Err({ type: 'READ_FILE', cause: bytesResult.err })
       }
@@ -454,7 +453,7 @@ export function useSaves(): SavesAndBanksManager {
         return R.Ok(saveFile)
       }
     },
-    [addSave, allOpenSaves, backend, getEnabledSaveTypes, promptDisambiguation]
+    [addSave, allOpenSaves, getEnabledSaveTypes, promptDisambiguation]
   )
 
   const removeSave = useCallback(

@@ -2,7 +2,7 @@ import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
 import { R } from '@openhome-core/util/functional'
 import { numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
@@ -23,7 +23,6 @@ interface SaveFileSelectorProps {
 
 export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const { onOpen, view, cardSize } = props
-  const backend = useContext(BackendContext)
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestions, setSuggestions] = useState<(SaveSuggestion | LoadingSaveSuggestion)[]>()
   const [error, setError] = useState(false)
@@ -39,19 +38,17 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
 
   const loadSaveData = useCallback(
     async (savePath: PathData) =>
-      backend
-        .loadSaveFile(savePath)
-        .then(
-          R.flatMap((response) =>
-            buildUnknownSaveFile(savePath, response.fileBytes, getEnabledSaveTypes())
-          )
-        ),
-    [backend, getEnabledSaveTypes]
+      AppBackend.loadSaveFile(savePath).then(
+        R.flatMap((response) =>
+          buildUnknownSaveFile(savePath, response.fileBytes, getEnabledSaveTypes())
+        )
+      ),
+    [getEnabledSaveTypes]
   )
 
   useEffect(() => {
     if (error || suggestions) return
-    backend.findSuggestedSaves().then(
+    AppBackend.findSuggestedSaves().then(
       R.match(
         async (possibleSaves) => {
           const allPaths = (possibleSaves.citra ?? [])
@@ -69,7 +66,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
         async (err) => handleError('Error getting suggested saves', err)
       )
     )
-  }, [backend, error, handleError, loadSaveData, suggestions])
+  }, [error, handleError, loadSaveData, suggestions])
 
   suggestions?.forEach((suggestion, i) => {
     if (!isLoaded(suggestion)) {

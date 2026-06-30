@@ -1,6 +1,6 @@
 import { R } from '@openhome-core/util/functional'
 import { stringSorter } from '@openhome-core/util/sort'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import ContentCard from '@openhome-ui/components/ContentCard'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import { AppInfoContext, AppTheme } from '@openhome-ui/state/appInfo'
@@ -44,17 +44,16 @@ export default function Settings() {
 
 function GeneralSettings() {
   const [appInfoState, dispatchAppInfoState] = useContext(AppInfoContext)
-  const backend = useContext(BackendContext)
   const [dataDirPath, setDataDirPath] = useState<string>()
   const displayError = useDisplayError()
 
   useEffect(() => {
-    backend.getDataDirPath().then(R.match((value) => setDataDirPath(value), console.error))
-  }, [backend, displayError])
+    AppBackend.getDataDirPath().then(R.match((value) => setDataDirPath(value), console.error))
+  }, [displayError])
 
   useEffect(() => {
-    backend.updateSettings(appInfoState.settings).catch(console.error)
-  }, [appInfoState.settings, backend])
+    AppBackend.updateSettings(appInfoState.settings).catch(console.error)
+  }, [appInfoState.settings])
 
   return (
     <ContentCard>
@@ -84,7 +83,7 @@ function GeneralSettings() {
           <RadioGroup.Root
             onValueChange={(newValue: AppTheme) => {
               if (!newValue) return
-              backend.setTheme(newValue)
+              AppBackend.setTheme(newValue)
               dispatchAppInfoState({ type: 'set_app_theme', payload: newValue })
             }}
             value={appInfoState.settings.appTheme}
@@ -114,9 +113,9 @@ function GeneralSettings() {
                   {
                     uniqueLabel: 'Select New Directory...',
                     action: () => {
-                      backend
-                        .promptChangeDataDir()
-                        .then(R.mapErr((err) => displayError('Error changing data directory', err)))
+                      AppBackend.promptChangeDataDir().then(
+                        R.mapErr((err) => displayError('Error changing data directory', err))
+                      )
                     },
                     type: 'destructive',
                   },

@@ -29,9 +29,9 @@ import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
 import { Option, R, range } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
+import { AppBackend } from '@openhome-ui/backend'
 import { ExtraFormIndex, GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { useCallback, useContext, useMemo, useState } from 'react'
-import { BackendContext } from '../../backend/backendContext'
 import useDisplayError from '../../hooks/displayError'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import { AppInfoContext } from '../../state/appInfo'
@@ -43,7 +43,6 @@ export function useManageTracked() {
   const { findHomeLocation } = useBanksAndBoxes()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { lookups } = useLookups()
-  const backend = useContext(BackendContext)
   const displayError = useDisplayError()
   const [findingSaveState, setFindingSaveState] = useState<FindingSavesState>()
 
@@ -64,7 +63,7 @@ export function useManageTracked() {
       }
 
       setState({ type: 'getting_recent_saves', id: identifier })
-      const savePaths = await backend.getRecentSaves().then(
+      const savePaths = await AppBackend.getRecentSaves().then(
         R.map((saves) =>
           Object.values(saves)
             .filter((s) => monPossiblySupported(mon.dexNum, mon.formNum, s, mon.extraFormIndex))
@@ -86,7 +85,7 @@ export function useManageTracked() {
           totalSaves: savePaths.value.length,
         })
 
-        const saveFileBytes = await backend.loadSaveFile(savePath)
+        const saveFileBytes = await AppBackend.loadSaveFile(savePath)
         if (R.isErr(saveFileBytes)) {
           console.error(`could not open save file ${savePath.raw}: ${saveFileBytes.err}`)
           continue
@@ -140,7 +139,7 @@ export function useManageTracked() {
 
       setState({ type: 'not_found', id: identifier })
     },
-    [backend, displayError, enabledSaveTypes, lookups.gen12, lookups.gen345, ohpkmStore]
+    [displayError, enabledSaveTypes, lookups.gen12, lookups.gen345, ohpkmStore]
   )
 
   const findSavesForAllMons = useCallback(async () => {
@@ -148,7 +147,7 @@ export function useManageTracked() {
       setFindingSaveState({ type: 'finding_all', state })
     }
 
-    const result = await backend.getRecentSaves().then(R.map((saves) => Object.values(saves)))
+    const result = await AppBackend.getRecentSaves().then(R.map((saves) => Object.values(saves)))
 
     if (R.isErr(result)) {
       displayError('Get Recent Saves', result.err)
@@ -178,7 +177,7 @@ export function useManageTracked() {
 
       const savePath = saveRef.filePath
 
-      const saveFileBytes = await backend.loadSaveFile(savePath)
+      const saveFileBytes = await AppBackend.loadSaveFile(savePath)
       if (R.isErr(saveFileBytes)) {
         console.error(`could not open save file ${savePath.raw}: ${saveFileBytes.err}`)
         continue
@@ -245,15 +244,7 @@ export function useManageTracked() {
       totalMons,
       missingMonIds: allMissingIdsNotInBoxes,
     })
-  }, [
-    backend,
-    displayError,
-    enabledSaveTypes,
-    findHomeLocation,
-    lookups.gen12,
-    lookups.gen345,
-    ohpkmStore,
-  ])
+  }, [displayError, enabledSaveTypes, findHomeLocation, lookups.gen12, lookups.gen345, ohpkmStore])
 
   return {
     findSaveForMon,

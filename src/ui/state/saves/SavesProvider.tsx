@@ -2,7 +2,7 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAVClass } from '@openhome-core/save/util'
 import { Option, R, range, Result } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -23,7 +23,6 @@ export type SavesProviderProps = {
 type SaveTypeCallback = (saveType?: SAVClass | PromiseLike<SAVClass>) => void
 
 export default function SavesProvider({ children }: SavesProviderProps) {
-  const backend = useContext(BackendContext)
   const [itemBagState, bagDispatch] = useContext(ItemBagContext)
   const [releaseWarningDisplayed, setReleaseWarningDisplayed] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -63,7 +62,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       }
 
       setSaving(true)
-      const result = await backend.startTransaction()
+      const result = await AppBackend.startTransaction()
 
       if (R.isErr(result)) {
         displayError('Error Starting Save Transaction', result.err)
@@ -90,8 +89,8 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       const saveWriters = allOpenSaves.map((save) => save.prepareWriter())
 
       const promises = [
-        backend.writeAllSaveFiles(saveWriters),
-        backend.deleteHomeMons(
+        AppBackend.writeAllSaveFiles(saveWriters),
+        AppBackend.deleteHomeMons(
           openSavesState.monsToRelease.filter(
             (monOrIdentifier) => typeof monOrIdentifier === 'string'
           )
@@ -99,10 +98,10 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       ]
 
       if (itemBagState.modified) {
-        const saveBagResult = await backend.saveItemBag(itemBagState.itemCounts)
+        const saveBagResult = await AppBackend.saveItemBag(itemBagState.itemCounts)
         if (R.isErr(saveBagResult)) {
           displayError('Error Saving Bag', saveBagResult.err)
-          await backend.rollbackTransaction()
+          await AppBackend.rollbackTransaction()
           setSaving(false)
           return R.Err([SaveItemBagData(saveBagResult.err)])
         }
@@ -114,19 +113,19 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
       if (errors.length) {
         displayError('Error Saving', errors)
-        backend.rollbackTransaction()
+        AppBackend.rollbackTransaction()
         setSaving(false)
         return R.Err(errors.map(BackendSaveError))
       }
 
-      const syncedStateResult = await backend.saveSyncedState()
+      const syncedStateResult = await AppBackend.saveSyncedState()
       if (R.isErr(syncedStateResult)) {
         displayError('Error Saving', syncedStateResult.err)
         setSaving(false)
         return R.Err([BackendSaveError(syncedStateResult.err)])
       }
 
-      const commitResult = await backend.commitTransaction()
+      const commitResult = await AppBackend.commitTransaction()
       if (R.isErr(commitResult)) {
         setSaving(false)
         return R.Err([TransactionCommit(commitResult.err)])
@@ -142,7 +141,6 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     },
     [
       saving,
-      backend,
       allOpenSaves,
       openSavesState.monsToRelease,
       itemBagState.modified,
@@ -157,7 +155,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
   // load bag
   useEffect(() => {
     if (!itemBagState.loaded && !itemBagState.error) {
-      backend.loadItemBag().then(
+      AppBackend.loadItemBag().then(
         R.match(
           (bagObj) => {
             bagDispatch({ type: 'load_item_bag', payload: bagObj })
@@ -168,11 +166,11 @@ export default function SavesProvider({ children }: SavesProviderProps) {
         )
       )
     }
-  }, [backend, itemBagState.loaded, itemBagState.error, bagDispatch])
+  }, [itemBagState.loaded, itemBagState.error, bagDispatch])
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = backend.onMenuEvents({
+    const stopListening = AppBackend.onMenuEvents({
       save: () => saveChanges(false),
       reset: () => {
         openSavesDispatch({ type: 'clear_mons_to_release' })
@@ -186,7 +184,7 @@ export default function SavesProvider({ children }: SavesProviderProps) {
     return () => {
       stopListening()
     }
-  }, [backend, saveChanges, openSavesDispatch, bagDispatch, reloadBankStore])
+  }, [saveChanges, openSavesDispatch, bagDispatch, reloadBankStore])
 
   if (openSavesState.error) {
     return (

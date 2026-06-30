@@ -8,11 +8,11 @@ import {
 } from '@openhome-core/save/util/storage'
 import { Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
 import { numericSorter } from '@openhome-core/util/sort'
+import { AppBackend } from '@openhome-ui/backend'
 import { createContext, useCallback, useContext, useEffect } from 'react'
 import { v4 as UuidV4 } from 'uuid'
 import { create, StateCreator, StoreApi, UseBoundStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { BackendContext } from '../../backend/backendContext'
 import { IdentifierNotPresentError, useOhpkmStore } from '../../state/ohpkm'
 
 export const OPENHOME_BOX_ROWS = 10
@@ -440,7 +440,6 @@ const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) =
 
 export function useBanksAndBoxes() {
   const store = useContext(BanksAndBoxesStoreContext)
-  const backend = useContext(BackendContext)
   const ohpkmStore = useOhpkmStore()
 
   if (!store) {
@@ -580,23 +579,23 @@ export function useBanksAndBoxes() {
   }
 
   const saveChanges = useCallback(async () => {
-    await backend.writeHomeBanks({
+    await AppBackend.writeHomeBanks({
       banks,
       current_bank: getCurrentBank().index,
     })
     await reloadBankStore()
-  }, [backend, banks, getCurrentBank, reloadBankStore])
+  }, [banks, getCurrentBank, reloadBankStore])
 
   useEffect(() => {
     // returns a function to stop listening
-    const stopListening = backend.onMenuEvent('save', saveChanges)
+    const stopListening = AppBackend.onMenuEvent('save', saveChanges)
 
     // the "stop listening" function should be called when the effect returns,
     // otherwise duplicate listeners will exist
     return () => {
       stopListening()
     }
-  }, [backend, saveChanges, reloadBankStore])
+  }, [saveChanges, reloadBankStore])
 
   return {
     saveChanges,

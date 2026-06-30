@@ -1,6 +1,6 @@
 import { Errorable, Option, R } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { AppBackend } from '@openhome-ui/backend'
+import { useCallback, useEffect, useState } from 'react'
 
 type StateConverter<State, RustState> = [State] extends [RustState]
   ? { convertRustState?: undefined } // rust state is the same type as typescript state
@@ -29,7 +29,6 @@ export function useSyncedState<State, RustState = State>(
   const [stateCache, setStateCache] = useState<State>()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
-  const backend = useContext(BackendContext)
 
   const { identifier, stateGetter, stateReducer, stateUpdater, convertRustState, onLoaded } =
     controller
@@ -43,7 +42,7 @@ export function useSyncedState<State, RustState = State>(
   )
 
   useEffect(() => {
-    const stopListening = backend.registerListeners({
+    const stopListening = AppBackend.registerListeners({
       onStateUpdate: {
         [identifier]: (updatedState) => {
           const transformedResponse = convertRustState
@@ -57,7 +56,7 @@ export function useSyncedState<State, RustState = State>(
     return () => {
       stopListening()
     }
-  }, [backend, convertRustState, identifier])
+  }, [convertRustState, identifier])
 
   const loadAndCacheState = useCallback(async () => {
     stateGetter()

@@ -1,12 +1,10 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Button, Flex } from '@radix-ui/themes'
-import { useContext } from 'react'
 
 export default function RecentSaveTab(props: { mon: OHPKM }) {
   const { mon } = props
-  const backend = useContext(BackendContext)
 
   if (!mon.mostRecentSaveWasm) {
     return <div style={{ padding: 8 }}>No recent save data available.</div>
@@ -36,7 +34,7 @@ export default function RecentSaveTab(props: { mon: OHPKM }) {
           <Button
             size="1"
             style={{ width: 'fit-content' }}
-            onClick={() => backend.openFileLocation(filePath)}
+            onClick={() => AppBackend.openFileLocation(filePath)}
           >
             Open File Location
           </Button>

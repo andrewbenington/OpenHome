@@ -1,11 +1,11 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import { SyncedStateController, useSyncedState } from '@openhome-ui/state/synced-state'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { PropsWithChildren, useCallback, useContext } from 'react'
+import { PropsWithChildren } from 'react'
 import { OhpkmStoreContext, OhpkmStoreData } from '.'
-import { StringToB64 } from '../../backend/tauri/tauriCommands'
+import { StringToB64 } from '../../backend/tauri/commands'
 import SyncedStateProvider from '../synced-state/SyncedStateProvider'
 
 function useOhpkmStoreTauri() {
@@ -38,22 +38,17 @@ function stateReducer(prev: OhpkmStoreData, updated: OhpkmStoreData): OhpkmStore
 }
 
 function useSyncedOhpkmState(): SyncedStateController<OhpkmStoreData, StringToB64> {
-  const backend = useContext(BackendContext)
+  const stateGetter = AppBackend.loadOhpkmStore
+  const stateUpdater = AppBackend.addToOhpkmStore
+  const updatePokedexAndFixOhpkms = async (data: OhpkmStoreData) => {
+    const pokedexUpdates: PokedexUpdate[] = []
 
-  const stateGetter = backend.loadOhpkmStore
-  const stateUpdater = backend.addToOhpkmStore
-  const updatePokedexAndFixOhpkms = useCallback(
-    async (data: OhpkmStoreData) => {
-      const pokedexUpdates: PokedexUpdate[] = []
+    for (const [, mon] of Object.entries(data)) {
+      pokedexUpdates.push(...getPokedexUpdates(mon))
+    }
 
-      for (const [, mon] of Object.entries(data)) {
-        pokedexUpdates.push(...getPokedexUpdates(mon))
-      }
-
-      backend.registerInPokedex(pokedexUpdates)
-    },
-    [backend]
-  )
+    AppBackend.registerInPokedex(pokedexUpdates)
+  }
 
   return {
     identifier: 'ohpkm_store',

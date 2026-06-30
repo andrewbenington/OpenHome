@@ -4,7 +4,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { range } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
 import Fallback from '@openhome-ui/components/Fallback'
@@ -269,14 +269,13 @@ type SaveHeaderProps = { save: SAV; setDetailsModal: (open: boolean) => void }
 
 function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
   const savesManager = useSaves()
-  const backend = useContext(BackendContext)
 
   const currentBoxMonCount = save.getBoxMonCount(save.currentPCBox)
   const totalMonCount = save.getAllMons().length
 
   const contextElements = [
     Item.label('Details...').action(() => setDetailsModal(true)),
-    Item.label('Open file location').action(() => backend.openDirectory(save.filePath.dir)),
+    Item.label('Open file location').action(() => AppBackend.openDirectory(save.filePath.dir)),
     Submenu.label('Move to Bank...')
       .with(
         Item.label(`This Box (${currentBoxMonCount})`).action(() => {

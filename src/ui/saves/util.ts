@@ -6,7 +6,7 @@ import {
 } from '@openhome-core/save/interfaces'
 import { Option } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
-import BackendInterface from '@openhome-ui/backend/backendInterface'
+import { AppBackend } from '@openhome-ui/backend'
 import { CtxMenuElementBuilder, Item } from '@openhome-ui/components/context-menu/types'
 import { OriginGames } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
@@ -173,7 +173,6 @@ export function useBoxNavigator(save: SAV, boxNum: number, boxSlot: Option<numbe
 
 export function buildRecentSaveContextElements(
   save: SaveRef,
-  backend: BackendInterface,
   removeRecentSave?: (path: string) => void
 ): Option<CtxMenuElementBuilder>[] {
   return [
@@ -182,8 +181,8 @@ export function buildRecentSaveContextElements(
       : undefined,
     save.valid
       ? Item.label(
-          `Reveal in ${backend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
-        ).action(() => backend.openDirectory(save.filePath.dir))
+          `Reveal in ${AppBackend.getPlatform() === 'macos' ? 'Finder' : 'File Explorer'}`
+        ).action(() => AppBackend.openDirectory(save.filePath.dir))
       : undefined,
   ]
 }

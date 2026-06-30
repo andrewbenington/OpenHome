@@ -189,7 +189,7 @@ export type NewLogNotification = {
   timestamp_unix: number
 }
 
-interface BackendListeners {
+export interface BackendListeners {
   onMenuEvent: (event: MenuEvent) => void
   onLookupsUpdate: (updated_lookups: StoredLookups) => void
   onStateUpdate: Record<string, <State>(updated_state: State) => void>

@@ -9,7 +9,7 @@ import {
   stringSorter,
 } from '@openhome-core/util/sort'
 import { SaveRef } from '@openhome-core/util/types'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
@@ -31,7 +31,6 @@ interface SaveFileSelectorProps {
 
 export default function RecentSaves(props: SaveFileSelectorProps) {
   const { onOpen, view, cardSize } = props
-  const backend = useContext(BackendContext)
   const [recentSaves, setRecentSaves] = useState<Record<string, SaveRef>>()
   const savesAndBanks = useSaves()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
@@ -43,7 +42,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   )
 
   const getRecentSaves = useCallback(() => {
-    backend.getRecentSaves().then(
+    AppBackend.getRecentSaves().then(
       R.match(
         (recents) => {
           const extraSaveIdentifiers = getEnabledSaveTypes()
@@ -64,11 +63,11 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         }
       )
     )
-  }, [backend, displayError, getEnabledSaveTypes])
+  }, [displayError, getEnabledSaveTypes])
 
   const removeRecentSave = useCallback(
     (path: string) =>
-      backend.removeRecentSave(path).then(
+      AppBackend.removeRecentSave(path).then(
         R.match(
           async () => getRecentSaves(),
           async (err) => {
@@ -76,7 +75,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
           }
         )
       ),
-    [backend, getRecentSaves, displayError]
+    [getRecentSaves, displayError]
   )
 
   useEffect(() => {
@@ -183,8 +182,8 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
   )
 
   const recentSaveContextElements = useCallback(
-    (saveRef: SaveRef) => buildRecentSaveContextElements(saveRef, backend, removeRecentSave),
-    [backend, removeRecentSave]
+    (saveRef: SaveRef) => buildRecentSaveContextElements(saveRef, removeRecentSave),
+    [removeRecentSave]
   )
 
   const modifiedColumns = useMemo(
@@ -255,7 +254,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         .map((save) => (
           <OpenHomeCtxMenu
             key={save.filePath.raw}
-            elements={buildRecentSaveContextElements(save, backend, removeRecentSave)}
+            elements={buildRecentSaveContextElements(save, removeRecentSave)}
           >
             <SaveCard
               save={save}

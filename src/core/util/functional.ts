@@ -104,6 +104,18 @@ export type Ok<T> = {
   readonly value: T
 }
 
+function expect<T, E>(result: Result<T, E>, message: string | ((error: E) => string)): T {
+  if (R.isOk(result)) {
+    return result.value
+  }
+
+  if (typeof message === 'string') {
+    throw new Error(message)
+  } else {
+    throw new Error(message(result.err))
+  }
+}
+
 export type Result<T, E> = Ok<T> | Err<E>
 
 export const R = {
@@ -118,4 +130,5 @@ export const R = {
   isOk,
   isErr,
   tryPromise,
+  expect,
 }

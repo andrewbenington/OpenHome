@@ -1,10 +1,10 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { R } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import { LogEntry, LogLevel, LogsResponse } from '@openhome-ui/backend/backendInterface'
 import useDebounce from '@openhome-ui/hooks/debounce'
 import dayjs, { Dayjs } from 'dayjs'
-import { Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
 
 export const LOG_LEVELS: readonly LogLevel[] = Object.freeze([
   'ERROR',
@@ -31,7 +31,6 @@ function logFilterForRange(start: Dayjs, end: Dayjs, ohpkm_id?: OhpkmIdentifier)
 }
 
 export function useLogController(openhomeIdFilter?: OhpkmIdentifier) {
-  const backend = useContext(BackendContext)
   const [logs, setLogs] = useState<LogEntry[]>()
   const [current, setCurrent] = useState<LogFilter>(defaultLogFilter(openhomeIdFilter))
   const [next, setNext] = useState<LogFilter>()
@@ -43,8 +42,7 @@ export function useLogController(openhomeIdFilter?: OhpkmIdentifier) {
   const getLogs = useCallback(
     async (filter: LogFilter, clearExisting?: boolean) => {
       setLoading(true)
-      await backend
-        .getLogs(filter)
+      await AppBackend.getLogs(filter)
         .then(
           R.match(
             (response: LogsResponse) => {
@@ -62,29 +60,28 @@ export function useLogController(openhomeIdFilter?: OhpkmIdentifier) {
         )
         .finally(() => setLoading(false))
     },
-    [backend, logs, current]
+    [logs, current]
   )
 
   const clearLogs = useCallback(() => {
     setLoading(true)
-    backend
-      .clearLogsForRange(current.start, current.end)
+    AppBackend.clearLogsForRange(current.start, current.end)
       .then(R.mapErr(setError))
       .finally(async () => {
         await getLogs(current)
         setLoading(false)
       })
-  }, [backend, getLogs, current])
+  }, [getLogs, current])
 
   const debouncedGetLogs = useDebounce(getLogs, 300)
 
   useEffect(() => {
-    const cleanup = backend.onNewLog((_notification) => {
+    const cleanup = AppBackend.onNewLog((_notification) => {
       debouncedGetLogs(current)
     })
 
     return cleanup
-  }, [backend, debouncedGetLogs, current])
+  }, [debouncedGetLogs, current])
 
   useEffect(() => {
     if (logs === undefined) {

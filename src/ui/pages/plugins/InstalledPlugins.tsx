@@ -1,4 +1,4 @@
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin/reducer'
@@ -28,7 +28,6 @@ export default function InstalledPlugins() {
 function InstalledPluginCard(props: { metadata: OpenHomePlugin; onDelete: (id: string) => void }) {
   const { metadata, onDelete } = props
   const [{ settings }, dispatchAppInfoState] = useContext(AppInfoContext)
-  const backend = useContext(BackendContext)
   const displayError = useDisplayError()
 
   const outdated = metadata.api_version < CURRENT_PLUGIN_API_VERSION
@@ -76,7 +75,7 @@ function InstalledPluginCard(props: { metadata: OpenHomePlugin; onDelete: (id: s
         onClick={(e) => {
           // Prevent card click (enable/disable) when clicking the delete icon
           e.stopPropagation()
-          backend.deletePlugin(metadata.id).then(
+          AppBackend.deletePlugin(metadata.id).then(
             () => onDelete(metadata.id),
             (err) => displayError('Error Deleting Plugin', err)
           )

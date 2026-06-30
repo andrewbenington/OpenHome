@@ -1,5 +1,5 @@
 import { R } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import { AppBackend } from '@openhome-ui/backend'
 import DebugOnly from '@openhome-ui/components/DebugOnly'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
@@ -75,12 +75,11 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
   const displayError = useDisplayError()
   const { registerPlugin } = useContext(PluginContext)
   const [progressPercent, setProgressPercent] = useState<number>()
-  const backend = useContext(BackendContext)
 
   useEffect(() => {
     if (!metadata?.id) return
     // returns a function to stop listening
-    const stopListening = backend.registerListeners({
+    const stopListening = AppBackend.registerListeners({
       onPluginDownloadProgress: [
         metadata.id,
         (percent) => {
@@ -94,7 +93,7 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
     return () => {
       stopListening()
     }
-  }, [backend, metadata])
+  }, [metadata])
 
   useEffect(() => {
     if (error) return
@@ -120,8 +119,7 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
           return
         }
 
-        backend
-          .downloadPlugin(location)
+        AppBackend.downloadPlugin(location)
           .then(
             R.match(
               (code) => {
