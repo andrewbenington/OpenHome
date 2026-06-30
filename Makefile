@@ -147,6 +147,6 @@ download-item-sprites:
 schema:
 	@sqlite3 generate/pkm.db .schema > generate/schema.sql
 
-.PHONY: git-fix-pnpm:
+.PHONY: git-fix-pnpm
 git-fix-pnpm:
 	@pnpm i --merge-git-branch-lockfiles
