@@ -4,7 +4,9 @@ name: Deploy to GitHub Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ['main']
+    branches:
+      - main
+      - update-workflows
     paths:
       - docs/**
 
