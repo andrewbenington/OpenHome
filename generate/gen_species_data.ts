@@ -40,14 +40,7 @@ export function rustAbilityConstName(index: number, ability: string): string {
 type LevelUpType = 'Slow' | 'Medium Slow' | 'Medium Fast' | 'Fast' | 'Erratic' | 'Fluctuating'
 
 type GenderRatio =
-  | 'Genderless'
-  | 'AllMale'
-  | 'AllFemale'
-  | 'Equal'
-  | 'M1ToF7'
-  | 'M1ToF3'
-  | 'M7ToF1'
-  | 'M3ToF1'
+  'Genderless' | 'AllMale' | 'AllFemale' | 'Equal' | 'M1ToF7' | 'M1ToF3' | 'M7ToF1' | 'M3ToF1'
 
 type Species = {
   readonly name: string

@@ -27,8 +27,7 @@ export function findPluginSprite(
 }
 
 export type GetMonSpriteResult =
-  | { type: 'default'; path: string }
-  | ({ type: 'plugin' } & PluginSpriteResult)
+  { type: 'default'; path: string } | ({ type: 'plugin' } & PluginSpriteResult)
 
 export function getMonSprite(
   mon: MonSpriteData,
