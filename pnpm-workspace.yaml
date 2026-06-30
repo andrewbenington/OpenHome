@@ -9,3 +9,7 @@ onlyBuiltDependencies:
 overrides:
   ajv@<6.14.0: '>=6.14.0'
   minimatch@<10.2.1: '>=10.2.1'
+
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  - 'semver@6.3.1'
