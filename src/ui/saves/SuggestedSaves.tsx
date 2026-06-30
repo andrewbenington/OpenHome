@@ -2,7 +2,7 @@ import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
 import { R } from '@openhome-core/util/functional'
 import { numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import useBackend from '@openhome-ui/backend/useBackend'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
@@ -23,7 +23,7 @@ interface SaveFileSelectorProps {
 
 export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const { onOpen, view, cardSize } = props
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestions, setSuggestions] = useState<(SaveSuggestion | LoadingSaveSuggestion)[]>()
   const [error, setError] = useState(false)

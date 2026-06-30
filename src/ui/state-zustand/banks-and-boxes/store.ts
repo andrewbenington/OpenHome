@@ -8,11 +8,11 @@ import {
 } from '@openhome-core/save/util/storage'
 import { Option, partitionResults, R, range, Result } from '@openhome-core/util/functional'
 import { numericSorter } from '@openhome-core/util/sort'
+import useBackend from '@openhome-ui/backend/useBackend'
 import { createContext, useCallback, useContext, useEffect } from 'react'
 import { v4 as UuidV4 } from 'uuid'
 import { create, StateCreator, StoreApi, UseBoundStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { BackendContext } from '../../backend/backendContext'
 import { IdentifierNotPresentError, useOhpkmStore } from '../../state/ohpkm'
 
 export const OPENHOME_BOX_ROWS = 10
@@ -440,7 +440,7 @@ const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) =
 
 export function useBanksAndBoxes() {
   const store = useContext(BanksAndBoxesStoreContext)
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const ohpkmStore = useOhpkmStore()
 
   if (!store) {

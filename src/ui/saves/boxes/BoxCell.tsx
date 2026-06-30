@@ -1,7 +1,7 @@
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import useBackend from '@openhome-ui/backend/useBackend'
 import {
   CtxMenuElementBuilder,
   Item,
@@ -18,7 +18,7 @@ import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Lookup } from '@pkm-rs/pkg'
 import { Flex, TextField } from '@radix-ui/themes'
-import { useCallback, useContext, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
@@ -48,7 +48,7 @@ function BoxCell(props: BoxCellProps) {
   const { onClick, onDrop, disabled, disabledReason, mon, borderColor, dragID } = props
   const { location, isSelected, onToggleSelect, multiSelectEnabled } = props
   const { filter, topRightIndicator, showItem, showShiny } = useMonDisplay()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const displayError = useDisplayError()
   const {
     releaseMonAtLocation,

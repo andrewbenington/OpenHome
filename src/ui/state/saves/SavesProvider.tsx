@@ -2,7 +2,7 @@ import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAVClass } from '@openhome-core/save/util'
 import { Option, R, range, Result } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import useBackend from '@openhome-ui/backend/useBackend'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -23,7 +23,7 @@ export type SavesProviderProps = {
 type SaveTypeCallback = (saveType?: SAVClass | PromiseLike<SAVClass>) => void
 
 export default function SavesProvider({ children }: SavesProviderProps) {
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [itemBagState, bagDispatch] = useContext(ItemBagContext)
   const [releaseWarningDisplayed, setReleaseWarningDisplayed] = useState(false)
   const [saving, setSaving] = useState(false)

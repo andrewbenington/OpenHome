@@ -1,6 +1,6 @@
 import { Errorable, Option, R } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import useBackend from '@openhome-ui/backend/useBackend'
+import { useCallback, useEffect, useState } from 'react'
 
 type StateConverter<State, RustState> = [State] extends [RustState]
   ? { convertRustState?: undefined } // rust state is the same type as typescript state
@@ -29,7 +29,7 @@ export function useSyncedState<State, RustState = State>(
   const [stateCache, setStateCache] = useState<State>()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
 
   const { identifier, stateGetter, stateReducer, stateUpdater, convertRustState, onLoaded } =
     controller

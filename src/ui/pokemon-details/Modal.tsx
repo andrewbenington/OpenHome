@@ -4,7 +4,7 @@ import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
 import { isRomHackFormat } from '@openhome-core/pkm/PKM'
 import { FileSchemas } from '@openhome-core/pkm/schema'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import useBackend from '@openhome-ui/backend/useBackend'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
 import FileTypeSelect from '@openhome-ui/components/FileTypeSelect'
@@ -15,7 +15,7 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
 import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
 import { Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
 import { GameIndicator } from '../components/pokemon/indicator/GameIndicator'
 import PokemonIcon from '../components/PokemonIcon'
@@ -156,7 +156,7 @@ function ModalContents(props: ModalContentsProps) {
   const [displayMon, setDisplayMon] = useState(mon)
   const [isOriginal, setIsOriginal] = useState(false)
   const { defaultConvertStrategy } = useConvertStrategies()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const displayError = useDisplayError()
 
   function updateIsOriginal(isOriginal: boolean) {

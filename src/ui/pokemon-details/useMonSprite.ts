@@ -1,6 +1,7 @@
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { Option, R } from '@openhome-core/util/functional'
-import { BackendContext, BackendWithHelpersInterface } from '@openhome-ui/backend/backendContext'
+import { BackendWithHelpersInterface } from '@openhome-ui/backend/backendContext'
+import useBackend from '@openhome-ui/backend/useBackend'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getPokemonSpritePath } from '@openhome-ui/images/pokemon'
@@ -58,7 +59,7 @@ type MonSpriteResult =
 
 export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
   const { enabledPlugins } = useContext(PluginContext)
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [spriteResult, setSpriteResult] = useState<MonSpriteResult>({ loading: true })
   const displayError = useDisplayError()
 
