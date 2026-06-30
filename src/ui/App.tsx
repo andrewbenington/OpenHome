@@ -40,7 +40,7 @@ const REDIRECT_WEB_CONSOLE = true
 export default function App() {
   const isDarkMode = useIsDarkMode()
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
-  const [backend, setBackend] = useState<TauriBackend>()
+  const [backend, setBackend] = useState<BackendInterface>()
   const [backendLoading, setBackendLoading] = useState(false)
 
   if (!backendLoading && !backend) {
@@ -69,9 +69,9 @@ export default function App() {
     >
       <div id="app-container" className="root">
         <BackendProvider backend={backend}>
-          <ErrorContext.Provider value={[errorState, errorDispatch]}>
+          <ErrorContext value={[errorState, errorDispatch]}>
             <AppWithBackend />
-          </ErrorContext.Provider>
+          </ErrorContext>
         </BackendProvider>
       </div>
     </Theme>
@@ -164,16 +164,16 @@ function AppWithBackend() {
 
   return (
     <BanksAndBoxesProvider>
-      <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
+      <AppInfoContext value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
         <PluginsProvider>
           <TransactionStateProvider>
-            <MouseContext.Provider value={[mouseState, mouseDispatch]}>
+            <MouseContext value={[mouseState, mouseDispatch]}>
               <LookupsProvider>
                 <ConvertStrategiesProvider>
                   <OhpkmStoreProvider>
-                    <ItemBagContext.Provider value={[bagState, bagDispatch]}>
+                    <ItemBagContext value={[bagState, bagDispatch]}>
                       <SavesProvider>
-                        <DragMonContext.Provider value={[dragState, setDragState]}>
+                        <DragMonContext value={[dragState, setDragState]}>
                           <PokemonDndContext>
                             {settingsLoading ? (
                               <Flex width="100%" height="100vh" align="center" justify="center">
@@ -187,16 +187,16 @@ function AppWithBackend() {
                             <ErrorMessageModal />
                             <UpdateMessageModal />
                           </PokemonDndContext>
-                        </DragMonContext.Provider>
+                        </DragMonContext>
                       </SavesProvider>
-                    </ItemBagContext.Provider>
+                    </ItemBagContext>
                   </OhpkmStoreProvider>
                 </ConvertStrategiesProvider>
               </LookupsProvider>
-            </MouseContext.Provider>
+            </MouseContext>
           </TransactionStateProvider>
         </PluginsProvider>
-      </AppInfoContext.Provider>
+      </AppInfoContext>
     </BanksAndBoxesProvider>
   )
 }

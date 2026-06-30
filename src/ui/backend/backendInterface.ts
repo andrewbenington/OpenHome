@@ -1,5 +1,6 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
 import { Errorable } from '@openhome-core/util/functional'
@@ -127,6 +128,7 @@ export default interface BackendInterface {
   /* game saves */
   loadSaveFile: (filePath: PathData) => Promise<Errorable<LoadSaveResponse>>
   writeSaveFile: (path: string, bytes: Uint8Array) => Promise<Errorable<null>>
+  writeAllSaveFiles: (saveWriters: SaveWriter[]) => Promise<Errorable<null>[]>
 
   /* game save management */
   getRecentSaves: () => Promise<Errorable<Record<string, SaveRef>>>

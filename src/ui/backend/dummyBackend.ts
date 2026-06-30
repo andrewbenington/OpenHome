@@ -29,6 +29,7 @@ const DummyBackend: BackendInterface = {
   /* game saves */
   loadSaveFile: ERROR_NO_BACKEND,
   writeSaveFile: ERROR_NO_BACKEND,
+  writeAllSaveFiles: async () => [R.Err('no backend in use')],
 
   /* game save management */
   getRecentSaves: ERROR_NO_BACKEND,
