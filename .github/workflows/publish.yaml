@@ -1,12 +1,15 @@
-name: 'publish-linux'
+name: Build Binaries + Publish to Release
 
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - update-workflows
   workflow_dispatch:
 
 jobs:
-  publish-tauri:
+  build-publish-linux:
     permissions:
       contents: write
     strategy:
@@ -56,6 +59,66 @@ jobs:
 
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Install Frontend Dependencies
+        run: pnpm i --frozen-lockfile
+
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NO_STRIP: true
+        with:
+          tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
+          releaseName: 'OpenHome v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
+
+  build-publish-windows:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # - platform: 'macos-latest' # for Arm based macs (M1 and above).
+          #   args: '--target aarch64-apple-darwin'
+          # - platform: 'macos-latest' # for Intel based macs.
+          #   args: '--target x86_64-apple-darwin'
+          - platform: 'windows-latest'
+            target: 'x86_64-pc-windows-msvc'
+            args: ''
+          - platform: 'windows-latest'
+            target: 'aarch64-pc-windows-msvc'
+            args: '--target aarch64-pc-windows-msvc'
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install PNPM
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: 'pnpm'
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || matrix.platform == 'windows-latest' && matrix.target == 'aarch64-pc-windows-msvc' && 'aarch64-pc-windows-msvc' || matrix.platform == 'ubuntu-24.04-arm' && 'aarch64-unknown-linux-gnu' || '' }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target, ./pkm_rs -> target, ./pkm_rs -> target, ./pkm_rs_derive -> target, ./pkm_rs_resources -> target, ./pkm_rs_types -> target, . -> target'
+
+      - name: Install wasm-pack
+        run: cargo install wasm-pack
 
       - name: Install Frontend Dependencies
         run: pnpm i --frozen-lockfile
