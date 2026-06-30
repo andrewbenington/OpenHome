@@ -1,4 +1,4 @@
-VERSION=1.12.2
+VERSION=1.12.3
 
 .PHONY: help
 help: # Display this help.
