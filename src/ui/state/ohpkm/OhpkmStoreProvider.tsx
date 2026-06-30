@@ -5,7 +5,7 @@ import { SyncedStateController, useSyncedState } from '@openhome-ui/state/synced
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { PropsWithChildren, useCallback, useContext } from 'react'
 import { OhpkmStoreContext, OhpkmStoreData } from '.'
-import { StringToB64 } from '../../backend/tauri/tauriCommands'
+import { StringToB64 } from '../../backend/tauri/commands'
 import SyncedStateProvider from '../synced-state/SyncedStateProvider'
 
 function useOhpkmStoreTauri() {

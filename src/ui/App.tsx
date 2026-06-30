@@ -4,7 +4,7 @@ import AppTabs from '@openhome-ui/AppTabs'
 import { BackendContext } from '@openhome-ui/backend/backendContext'
 import BackendInterface from '@openhome-ui/backend/backendInterface'
 import { BackendProvider } from '@openhome-ui/backend/backendProvider'
-import { TauriBackend } from '@openhome-ui/backend/tauri/tauriBackend'
+import { TauriBackend } from '@openhome-ui/backend/tauri/backend'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import useDebounce from '@openhome-ui/hooks/debounce'
 import useDisplayError from '@openhome-ui/hooks/displayError'
@@ -40,6 +40,24 @@ const REDIRECT_WEB_CONSOLE = true
 export default function App() {
   const isDarkMode = useIsDarkMode()
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
+  const [backend, setBackend] = useState<TauriBackend>()
+  const [backendLoading, setBackendLoading] = useState(false)
+
+  if (!backendLoading && !backend) {
+    setBackendLoading(true)
+    TauriBackend.start().then(
+      R.match(
+        (tauriBackend) => setBackend(tauriBackend),
+        (err) =>
+          errorDispatch({
+            type: 'set_message',
+            payload: { title: 'Error starting backend', messages: [err] },
+          })
+      )
+    )
+  }
+
+  if (!backend) return null
 
   return (
     <Theme
@@ -50,7 +68,7 @@ export default function App() {
       radius="small"
     >
       <div id="app-container" className="root">
-        <BackendProvider backend={TauriBackend}>
+        <BackendProvider backend={backend}>
           <ErrorContext.Provider value={[errorState, errorDispatch]}>
             <AppWithBackend />
           </ErrorContext.Provider>
