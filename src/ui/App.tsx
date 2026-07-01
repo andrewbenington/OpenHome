@@ -40,24 +40,6 @@ const REDIRECT_WEB_CONSOLE = true
 export default function App() {
   const isDarkMode = useIsDarkMode()
   const [errorState, errorDispatch] = useReducer(errorReducer, {})
-  const [backend, setBackend] = useState<BackendInterface>()
-  const [backendLoading, setBackendLoading] = useState(false)
-
-  if (!backendLoading && !backend) {
-    setBackendLoading(true)
-    TauriBackend.start().then(
-      R.match(
-        (tauriBackend) => setBackend(tauriBackend),
-        (err) =>
-          errorDispatch({
-            type: 'set_message',
-            payload: { title: 'Error starting backend', messages: [err] },
-          })
-      )
-    )
-  }
-
-  if (!backend) return null
 
   return (
     <Theme
@@ -68,7 +50,7 @@ export default function App() {
       radius="small"
     >
       <div id="app-container" className="root">
-        <BackendContext value={backend}>
+        <BackendContext value={TauriBackend}>
           <ErrorContext value={[errorState, errorDispatch]}>
             <AppWithBackend />
           </ErrorContext>
