@@ -4,6 +4,14 @@ import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, SimpleOpenHomeBox, StoredBankData } from '@openhome-core/save/util/storage'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { JSONObject, LoadSaveResponse, SaveRef } from '@openhome-core/util/types'
+import BackendInterface, {
+  BankOrBoxChange,
+  MenuEvent,
+  NewLogNotification,
+  OhpkmStore,
+  parseLogs,
+  StoredLookups,
+} from '@openhome-ui/backend/backendInterface'
 import { LogFilter } from '@openhome-ui/pages/logs'
 import { defaultSettings, Settings } from '@openhome-ui/state/appInfo'
 import { Pokedex } from '@openhome-ui/util/pokedex'
@@ -14,18 +22,8 @@ import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
 import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs, { Dayjs } from 'dayjs'
-import BackendInterface, {
-  AppState,
-  BackendListeners,
-  BankOrBoxChange,
-  MenuEvent,
-  NewLogNotification,
-  OhpkmStore,
-  parseLogs,
-  StoredLookups,
-} from '../backendInterface'
-import { isRustErr } from '../tauri/types'
 import { Commands, LogFilterIpc, StoredBankDataSerialized } from './commands'
+import { isRustErr } from './types'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
   const filename = await path.basename(raw)
@@ -45,21 +43,13 @@ async function pathDataFromRaw(raw: string): Promise<PathData> {
 
 type OnDropEvent = Event<{ position: { x: number; y: number }; paths: string[] }>
 
-export class TauriBackend implements BackendInterface {
-  startupParameters: AppState
-
-  private constructor(startupParameters: AppState) {
-    this.startupParameters = startupParameters
-  }
-
-  static start = () => Commands.get_state().then(R.map((p) => new TauriBackend(p)))
-
+export const TauriBackend: BackendInterface = {
   /* past gen identifier lookups */
-  loadLookups = Commands.get_lookups
-  addToLookups = Commands.add_to_lookups
+  loadLookups: Commands.get_lookups,
+  addToLookups: Commands.add_to_lookups,
 
   /* ohpkm store */
-  loadOhpkmStore = async function (): Promise<Errorable<OhpkmStore>> {
+  loadOhpkmStore: async function (): Promise<Errorable<OhpkmStore>> {
     return Commands.get_ohpkm_store().then(
       R.map((b64ByIdentifier) =>
         Object.fromEntries(
@@ -70,16 +60,16 @@ export class TauriBackend implements BackendInterface {
         )
       )
     )
-  }
-  removeDangling = Commands.remove_dangling
-  addToOhpkmStore = function (updates: OhpkmStore): Promise<Errorable<null>> {
+  },
+  removeDangling: Commands.remove_dangling,
+  addToOhpkmStore: function (updates: OhpkmStore): Promise<Errorable<null>> {
     return Commands.add_to_ohpkm_store(
       Object.fromEntries(
         Object.entries(updates).map(([identifier, ohpkm]) => [identifier, ohpkm.toByteArray()])
       )
     )
-  }
-  deleteHomeMons = async function (identifiers: string[]): Promise<Errorable<null>> {
+  },
+  deleteHomeMons: async function (identifiers: string[]): Promise<Errorable<null>> {
     return Commands.permanently_delete_ohpkms(identifiers).then(
       R.map((deletionResults) => {
         for (const [file, result] of Object.entries(deletionResults)) {
@@ -90,26 +80,26 @@ export class TauriBackend implements BackendInterface {
         return null
       })
     )
-  }
+  },
 
   /* prompt user to select new data directory location */
-  promptChangeDataDir = Commands.change_data_dir
+  promptChangeDataDir: Commands.change_data_dir,
   /* get the current data directory path */
-  getDataDirPath = Commands.get_data_dir_path
+  getDataDirPath: Commands.get_data_dir_path,
 
   /* write synced state to disk during save */
-  saveSyncedState = Commands.save_synced_state
+  saveSyncedState: Commands.save_synced_state,
 
   /* pokedex */
-  loadPokedex = Commands.get_pokedex
-  registerInPokedex = Commands.update_pokedex
+  loadPokedex: Commands.get_pokedex,
+  registerInPokedex: Commands.update_pokedex,
 
   /* openhome boxes */
-  loadHomeBanks = () => Commands.load_banks().then(R.map(deserializeBankData))
-  writeHomeBanks = (bankData: StoredBankData) => Commands.write_banks(serializeBankData(bankData))
+  loadHomeBanks: () => Commands.load_banks().then(R.map(deserializeBankData)),
+  writeHomeBanks: (bankData: StoredBankData) => Commands.write_banks(serializeBankData(bankData)),
 
   /* game saves */
-  loadSaveFile = async (pathData: PathData): Promise<Errorable<LoadSaveResponse>> => {
+  loadSaveFile: async (pathData: PathData): Promise<Errorable<LoadSaveResponse>> => {
     const bytesResult = await Commands.get_file_bytes(pathData.raw)
     if (R.isErr(bytesResult)) {
       return bytesResult
@@ -123,22 +113,23 @@ export class TauriBackend implements BackendInterface {
       fileBytes: new Uint8Array(bytesResult.value),
       createdDate: new Date(timestampResult.value),
     })
-  }
-  writeSaveFile = Commands.write_file_bytes
-  writeAllSaveFiles = async (saveWriters: SaveWriter[]) =>
+  },
+  writeSaveFile: Commands.write_file_bytes,
+  writeAllSaveFiles: async (saveWriters: SaveWriter[]) =>
     Promise.all(
-      saveWriters.map((saveWriter) => this.writeSaveFile(saveWriter.filepath, saveWriter.bytes))
-    )
-
-  saveLocalFile = async (bytes: Uint8Array, suggestedName: string) => {
+      saveWriters.map((saveWriter) =>
+        Commands.write_file_bytes(saveWriter.filepath, saveWriter.bytes)
+      )
+    ),
+  saveLocalFile: async (bytes: Uint8Array, suggestedName: string) => {
     const defaultPath = await path.join(await path.downloadDir(), suggestedName)
     const filePath = await save({ defaultPath })
     return filePath ? Commands.write_file_bytes(filePath, bytes) : R.Ok(null)
-  }
+  },
 
   /* game save management */
-  getRecentSaves = Commands.validate_recent_saves
-  addRecentSave = (saveRef: SaveRef): Promise<Errorable<null>> =>
+  getRecentSaves: Commands.validate_recent_saves,
+  addRecentSave: (saveRef: SaveRef): Promise<Errorable<null>> =>
     Commands.get_storage_file_json('recent_saves.json').then(
       R.asyncFlatMap((recentSaves) => {
         if (Array.isArray(recentSaves)) {
@@ -150,8 +141,8 @@ export class TauriBackend implements BackendInterface {
         recentSaves[saveRef.filePath.raw] = { ...saveRef, lastOpened: dayjs().unix() * 1000 }
         return Commands.write_storage_file_json('recent_saves.json', recentSaves)
       })
-    )
-  removeRecentSave = (filePath: string): Promise<Errorable<null>> =>
+    ),
+  removeRecentSave: (filePath: string): Promise<Errorable<null>> =>
     Commands.get_storage_file_json('recent_saves.json').then(
       R.asyncFlatMap((recentSaves) => {
         if (Array.isArray(recentSaves)) {
@@ -163,8 +154,8 @@ export class TauriBackend implements BackendInterface {
         delete recentSaves[filePath]
         return Commands.write_storage_file_json('recent_saves.json', recentSaves)
       })
-    )
-  findSuggestedSaves = async (): Promise<Errorable<PossibleSaves>> =>
+    ),
+  findSuggestedSaves: async (): Promise<Errorable<PossibleSaves>> =>
     Commands.get_storage_file_json('save-folders.json').then(
       R.asyncFlatMap((saveFolders) => {
         if (!Array.isArray(saveFolders)) {
@@ -176,8 +167,8 @@ export class TauriBackend implements BackendInterface {
           (saveFolders as unknown as SaveFolder[]).map((folder) => folder.path)
         )
       })
-    )
-  getSaveFolders = async (): Promise<Errorable<SaveFolder[]>> =>
+    ),
+  getSaveFolders: async (): Promise<Errorable<SaveFolder[]>> =>
     Commands.get_storage_file_json('save-folders.json').then(
       R.flatMap((saveFolders) => {
         if (!Array.isArray(saveFolders)) {
@@ -185,8 +176,8 @@ export class TauriBackend implements BackendInterface {
         }
         return R.Ok(saveFolders as unknown as SaveFolder[])
       })
-    )
-  removeSaveFolder = async (pathToRemove: string): Promise<Errorable<null>> =>
+    ),
+  removeSaveFolder: async (pathToRemove: string): Promise<Errorable<null>> =>
     Commands.get_storage_file_json('save-folders.json').then(
       R.asyncFlatMap((fileContent) => {
         if (!Array.isArray(fileContent)) {
@@ -200,8 +191,8 @@ export class TauriBackend implements BackendInterface {
           saveFolders.filter((folder) => folder.path !== pathToRemove)
         )
       })
-    )
-  upsertSaveFolder = (folderPath: string, label: string): Promise<Errorable<null>> =>
+    ),
+  upsertSaveFolder: (folderPath: string, label: string): Promise<Errorable<null>> =>
     Commands.get_storage_file_json('save-folders.json').then(
       R.asyncFlatMap((fileContent) => {
         if (!Array.isArray(fileContent)) {
@@ -215,59 +206,59 @@ export class TauriBackend implements BackendInterface {
           { label, path: folderPath },
         ])
       })
-    )
+    ),
 
   /* bag */
-  loadItemBag = async () => {
+  loadItemBag: async () => {
     return (await Commands.get_storage_file_json('item-bag.json')) as Errorable<
       Record<string, number>
     >
-  }
+  },
 
-  saveItemBag = async (items: Record<string, number>) =>
-    Commands.write_storage_file_json('item-bag.json', items)
+  saveItemBag: async (items: Record<string, number>) =>
+    Commands.write_storage_file_json('item-bag.json', items),
   /* transactions */
-  startTransaction = Commands.start_transaction
-  commitTransaction = Commands.commit_transaction
-  rollbackTransaction = Commands.rollback_transaction
+  startTransaction: Commands.start_transaction,
+  commitTransaction: Commands.commit_transaction,
+  rollbackTransaction: Commands.rollback_transaction,
 
   /* application */
-  pickFile = async (): Promise<Errorable<PathData | undefined>> => {
+  pickFile: async (): Promise<Errorable<PathData | undefined>> => {
     const filePath = await fileDialog({ directory: false, title: 'Select File' })
     if (!filePath) return R.Ok(undefined)
     return R.Ok(await pathDataFromRaw(filePath))
-  }
-  pickFolder = async (): Promise<Errorable<string | undefined>> => {
+  },
+  pickFolder: async (): Promise<Errorable<string | undefined>> => {
     const path = await fileDialog({ directory: true, title: 'Select Folder' })
     return R.Ok(path ?? undefined)
-  }
-  getResourcesPath = path.resourceDir
-  getPluginPath = async (pluginId: string) =>
-    Commands.get_data_dir_path().then(R.map((dataDirPath) => `${dataDirPath}/plugins/${pluginId}`))
-  openDirectory = Commands.open_directory
-  openFileLocation = Commands.open_file_location
-  getPlatform = platform
-  getState = Commands.get_state
-  getSettings = async () =>
+  },
+  getResourcesPath: path.resourceDir,
+  getPluginPath: async (pluginId: string) =>
+    Commands.get_data_dir_path().then(R.map((dataDirPath) => `${dataDirPath}/plugins/${pluginId}`)),
+  openDirectory: Commands.open_directory,
+  openFileLocation: Commands.open_file_location,
+  getPlatform: platform,
+  getState: Commands.get_state,
+  getSettings: async () =>
     Commands.get_storage_file_json('settings.json').then(
       R.map((partialSettings) => ({
         ...defaultSettings,
         ...partialSettings,
       }))
-    )
-  updateSettings = async (settings: Settings) =>
-    Commands.write_storage_file_json('settings.json', settings as unknown as JSONObject)
-  getConvertStrategies = Commands.get_convert_strategies
-  updateConvertStrategies = Commands.update_convert_strategies
-  setTheme = Commands.set_app_theme
-  emitMenuEvent = Commands.handle_windows_accelerator
+    ),
+  updateSettings: async (settings: Settings) =>
+    Commands.write_storage_file_json('settings.json', settings as unknown as JSONObject),
+  getConvertStrategies: Commands.get_convert_strategies,
+  updateConvertStrategies: Commands.update_convert_strategies,
+  setTheme: Commands.set_app_theme,
+  emitMenuEvent: Commands.handle_windows_accelerator,
 
-  getImageData = Commands.get_image_data
-  listInstalledPlugins = Commands.list_installed_plugins
-  downloadPlugin = Commands.download_plugin
-  loadPluginCode = Commands.load_plugin_code
-  deletePlugin = Commands.delete_plugin
-  getLogs(filter: LogFilter) {
+  getImageData: Commands.get_image_data,
+  listInstalledPlugins: Commands.list_installed_plugins,
+  downloadPlugin: Commands.download_plugin,
+  loadPluginCode: Commands.load_plugin_code,
+  deletePlugin: Commands.delete_plugin,
+  getLogs: (filter: LogFilter) => {
     const { start, end, ...otherParams } = filter
     const ipcFilter: LogFilterIpc = {
       start_epoch_seconds: start.unix(),
@@ -275,13 +266,13 @@ export class TauriBackend implements BackendInterface {
       ...otherParams,
     }
     return Commands.get_logs_today(ipcFilter).then(R.map(parseLogs))
-  }
-  log = Commands.log
-  clearLogsForRange(start: Dayjs, end: Dayjs) {
+  },
+  log: Commands.log,
+  clearLogsForRange: (start: Dayjs, end: Dayjs) => {
     return Commands.clear_logs_for_range(start.unix(), end.unix())
-  }
+  },
 
-  registerListeners(listeners: Partial<BackendListeners>) {
+  registerListeners: (listeners) => {
     const unlistenPromises: Promise<UnlistenFn>[] = [
       listen('tauri://drag-drop', (e: OnDropEvent) => {
         const allFilesPromise: Promise<{
@@ -368,13 +359,13 @@ export class TauriBackend implements BackendInterface {
           }
         }
       })
-  }
-  onMenuEvent(event: MenuEvent, callback = () => {}) {
+  },
+  onMenuEvent: (event: MenuEvent, callback: () => void) => {
     const unlistenPromise = listen(event, callback)
 
     return () => unlistenPromise.then((unlistenFunction) => unlistenFunction())
-  }
-  onMenuEvents(eventsAndCallbacks: Partial<Record<MenuEvent, () => void>>) {
+  },
+  onMenuEvents: (eventsAndCallbacks: Partial<Record<MenuEvent, () => void>>) => {
     const unlistenPromises: Promise<UnlistenFn>[] = []
     for (const [event, callback] of Object.entries(eventsAndCallbacks)) {
       unlistenPromises.push(listen(event, callback))
@@ -390,16 +381,14 @@ export class TauriBackend implements BackendInterface {
           }
         }
       })
-  }
-  onNewLog(callback = (_notification: NewLogNotification) => {}) {
+  },
+  onNewLog: (callback: (notification: NewLogNotification) => void) => {
     const unlistenPromise = listen('tracing::log', (event) =>
       callback(event.payload as NewLogNotification)
     )
 
-    return () => {
-      unlistenPromise.then((unlistenFunction) => unlistenFunction())
-    }
-  }
+    return () => unlistenPromise.then((unlistenFunction) => unlistenFunction())
+  },
 }
 
 function deserializeBankData(data: StoredBankDataSerialized): StoredBankData {
