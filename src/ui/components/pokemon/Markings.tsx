@@ -5,11 +5,11 @@ import {
   markingsHaveColor,
   MarkingValue,
 } from '@openhome-core/util/types'
-import { useSaves } from '@openhome-ui/state/saves'
 
-type MarkingsProps = {
-  readonly markings: Markings
-} & ({ openhomeId: string; allowUpdate: true } | { openhomeId?: string; allowUpdate?: false })
+type MarkingsProps<M extends Markings> = {
+  readonly markings: M
+  onUpdate?: (newMarkings: M) => void
+}
 
 const getMarkingColorByNumber = (value: MarkingValue) => {
   if (value === 'blue' || value === true) return 'blue'
@@ -17,15 +17,13 @@ const getMarkingColorByNumber = (value: MarkingValue) => {
   return 'gray'
 }
 
-const MarkingsDisplay = (props: MarkingsProps) => {
-  const { markings, openhomeId, allowUpdate } = props
+const MarkingsDisplay = <M extends Markings>(props: MarkingsProps<M>) => {
+  const { markings, onUpdate } = props
 
-  const { updateMonMarkings } = useSaves()
-
-  const modifiedMarkings = { ...markings }
+  const modifiedMarkings = markings
 
   const cycleMarkingValue =
-    allowUpdate && markingsHaveColor(modifiedMarkings)
+    onUpdate && markingsHaveColor(modifiedMarkings)
       ? (shape: MarkingShape) => {
           if (modifiedMarkings[shape] === 'blue') {
             modifiedMarkings[shape] = 'red'
@@ -35,7 +33,7 @@ const MarkingsDisplay = (props: MarkingsProps) => {
             modifiedMarkings[shape] = 'blue'
           }
 
-          updateMonMarkings(openhomeId, modifiedMarkings)
+          onUpdate(modifiedMarkings)
         }
       : undefined
 

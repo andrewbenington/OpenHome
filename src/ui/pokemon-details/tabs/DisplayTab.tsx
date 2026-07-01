@@ -1,7 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { TagIcon } from '@openhome-ui/components/TagIcon'
 import useDebounce from '@openhome-ui/hooks/debounce'
-import { useSaves } from '@openhome-ui/state/saves'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { DISPLAY_COLOR_PRESETS, MonTag, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Badge, Button, Flex, Grid, Text, TextField } from '@radix-ui/themes'
 import { useState } from 'react'
@@ -34,7 +34,7 @@ export default function DisplayTab({ mon }: DisplayTabProps) {
   const [newTagColor, setNewTagColor] = useState('#888888')
   const [newTagIcon, setNewTagIcon] = useState<string>()
 
-  const { updateMonDisplayColor, updateMonTags } = useSaves()
+  const { updateMonDisplayColor, updateMonTags } = useOhpkmStore()
 
   const debouncedColorUpdate = useDebounce((color: string) => {
     updateMonDisplayColor(mon.openhomeId, color || undefined)

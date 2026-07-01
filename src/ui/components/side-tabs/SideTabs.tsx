@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { Option } from '@openhome-core/util/functional'
 import { HTMLAttributes, useContext, useState } from 'react'
+import { useSearchParams } from 'react-router'
 import { SideTabsContext } from './SideTabsContext'
 import './style.css'
 
@@ -8,12 +9,15 @@ type SideTabsProps = {
   value?: Option<string>
   onValueChange?: (value: Option<string>) => void
   defaultValue?: Option<string>
+  queryKey?: Option<string>
   children: React.ReactNode
 } & Omit<HTMLAttributes<HTMLDivElement>, 'value' | 'defaultValue'>
 
 function SideTabsRoot(props: SideTabsProps) {
-  const { className, value, onValueChange, defaultValue, children, ...otherProps } = props
-  const [controlledValue, setControllerdValue] = useState(defaultValue)
+  const { className, value, onValueChange, defaultValue, queryKey, children, ...otherProps } = props
+  const [searchParams, setSearchParams] = useSearchParams()
+  const storedTab = queryKey ? searchParams.get(queryKey) : undefined
+  const [controlledValue, setControlledValue] = useState(storedTab ?? defaultValue)
 
   const valueToUse = value !== undefined ? value : controlledValue
   const updateValue = (newValue: Option<string>) => {
@@ -21,16 +25,24 @@ function SideTabsRoot(props: SideTabsProps) {
       onValueChange(newValue)
     }
     if (value === undefined) {
-      setControllerdValue(newValue)
+      setControlledValue(newValue)
+    }
+    if (queryKey) {
+      if (newValue) {
+        searchParams.set(queryKey, newValue)
+      } else {
+        searchParams.delete(queryKey)
+      }
+      setSearchParams(searchParams)
     }
   }
 
   return (
-    <SideTabsContext.Provider value={[valueToUse, updateValue]}>
+    <SideTabsContext value={[valueToUse, updateValue, queryKey]}>
       <div className={`side-tabs ${className ?? ''}`} {...otherProps}>
         {children}
       </div>
-    </SideTabsContext.Provider>
+    </SideTabsContext>
   )
 }
 

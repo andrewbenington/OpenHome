@@ -383,7 +383,7 @@ function SingleBoxMonDisplay() {
               }
 
               // if underlying data changes but this key doesn't, the box cell will be stale and may not display the correct species
-              const uniqueKey = `${currentBoxIndex}-${index}-${identifier}`
+              let uniqueKey = `${currentBoxIndex}-${index}-${identifier}`
 
               const result = identifier ? ohpkmStore.tryLoadFromId(identifier) : undefined
               if (result && R.isErr(result)) {

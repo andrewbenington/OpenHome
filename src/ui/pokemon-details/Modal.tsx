@@ -1,6 +1,5 @@
 import { fileTypeFromStringNonOhpkm } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
 import { isRomHackFormat } from '@openhome-core/pkm/PKM'
 import { FileSchemas } from '@openhome-core/pkm/schema'
@@ -95,7 +94,7 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
             <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
           </VisuallyHidden>
           <Fallback>
-            <ModalContents mon={mon} key={getMonFileIdentifier(mon)} />
+            <ModalContents key={mon.calculateChecksum?.()} mon={mon} />
           </Fallback>
           <div className="modal-footer">
             <Flex gap="1" align="center" minWidth="7rem">
@@ -150,6 +149,8 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
 type ModalContentsProps = {
   mon: PKMInterface
 }
+
+const TAB_QUERY_KEY = 'pokemon-modal-tab'
 
 function ModalContents(props: ModalContentsProps) {
   const { mon } = props
@@ -216,7 +217,7 @@ function ModalContents(props: ModalContentsProps) {
   }
 
   return (
-    <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary">
+    <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary" queryKey={TAB_QUERY_KEY}>
       <SideTabs.TabList>
         <Flex direction="row" gap="var(--padding-radius-sm-lg">
           <FileTypeSelect
