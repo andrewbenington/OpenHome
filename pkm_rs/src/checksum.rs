@@ -1,13 +1,16 @@
 use std::num::Wrapping;
 
+#[cfg(feature = "wasm")]
 use crate::traits::{AsBytes, AsBytesMut};
 
+#[cfg(feature = "wasm")]
 pub trait ChecksumAlgorithm {
     type Output: Sized + Copy;
     fn calc_over_bytes(bytes: &[u8]) -> Self::Output;
     fn write_to_bytes(bytes: &mut [u8], value: Self::Output);
 }
 
+#[cfg(feature = "wasm")]
 pub trait Checksum: AsBytes {
     type A: ChecksumAlgorithm;
     const SPAN_START: usize;
@@ -18,6 +21,7 @@ pub trait Checksum: AsBytes {
     }
 }
 
+#[cfg(feature = "wasm")]
 pub trait RefreshChecksum: Checksum + AsBytesMut {
     const STORED_OFFSET: usize;
 
@@ -30,8 +34,10 @@ pub trait RefreshChecksum: Checksum + AsBytesMut {
     }
 }
 
+#[cfg(feature = "wasm")]
 pub struct ChecksumU16Le;
 
+#[cfg(feature = "wasm")]
 impl ChecksumAlgorithm for ChecksumU16Le {
     type Output = u16;
 
@@ -44,12 +50,31 @@ impl ChecksumAlgorithm for ChecksumU16Le {
     }
 }
 
+#[cfg(feature = "wasm")]
 pub fn checksum_u16_le(bytes: &[u8]) -> u16 {
     let wrapped_sum: Wrapping<u16> = bytes
         .chunks_exact(2)
         .map(|chunk| u16::from_le_bytes([chunk[0], chunk[1]]))
         .map(Wrapping)
         .sum();
+
+    wrapped_sum.0
+}
+
+pub fn checksum_u64_le(bytes: &[u8]) -> u64 {
+    let chunks = bytes.chunks_exact(8);
+    let remainder = chunks.remainder();
+
+    let mut wrapped_sum: Wrapping<u64> = chunks
+        .map(|chunk| u64::from_le_bytes(chunk.try_into().unwrap()))
+        .map(Wrapping)
+        .sum();
+
+    if !remainder.is_empty() {
+        let mut buf = [0u8; 8];
+        buf[..remainder.len()].copy_from_slice(remainder);
+        wrapped_sum += Wrapping(u64::from_le_bytes(buf));
+    }
 
     wrapped_sum.0
 }

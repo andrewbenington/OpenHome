@@ -1,12 +1,12 @@
-import { BackendContext } from '@openhome-core/backend/backendContext'
 import { StoredLookups } from '@openhome-core/backend/backendInterface'
+import useBackend from '@openhome-core/backend/useBackend'
 import { Option } from '@openhome-core/util/functional'
 import {
   RustStateProvider,
   SyncedStateController,
   useSyncedState,
 } from '@openhome-ui/state/synced-state'
-import { PropsWithChildren, useCallback, useContext } from 'react'
+import { PropsWithChildren, useCallback } from 'react'
 import { LookupsContext } from './useLookups'
 
 function useLookupsTauri() {
@@ -32,7 +32,7 @@ function stateReducer(prev: Option<StoredLookups>, updated: StoredLookups): Stor
 }
 
 function useSyncedLookupsState(): SyncedStateController<StoredLookups> {
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
 
   const stateUpdater = useCallback(
     (newEntries: StoredLookups) => {

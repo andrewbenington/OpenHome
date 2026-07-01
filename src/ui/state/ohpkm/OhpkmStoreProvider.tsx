@@ -1,11 +1,11 @@
-import { BackendContext } from '@openhome-core/backend/backendContext'
+import useBackend from '@openhome-core/backend/useBackend'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
-import { StringToB64 } from '@openhome-core/tauri/tauriCommands'
+import { StringToB64 } from '@openhome-core/tauri/commands'
 import { Option } from '@openhome-core/util/functional'
 import { SyncedStateController, useSyncedState } from '@openhome-ui/state/synced-state'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { PropsWithChildren, useCallback, useContext } from 'react'
+import { PropsWithChildren, useCallback } from 'react'
 import { OhpkmStoreContext, OhpkmStoreData } from '.'
 import SyncedStateProvider from '../synced-state/SyncedStateProvider'
 
@@ -39,7 +39,7 @@ function stateReducer(prev: Option<OhpkmStoreData>, updated: OhpkmStoreData): Oh
 }
 
 function useSyncedOhpkmState(): SyncedStateController<OhpkmStoreData, OhpkmStoreData, StringToB64> {
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
 
   const stateGetter = backend.loadOhpkmStore
   const stateUpdater = backend.addToOhpkmStore

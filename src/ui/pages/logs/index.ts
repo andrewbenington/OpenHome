@@ -1,10 +1,10 @@
-import { BackendContext } from '@openhome-core/backend/backendContext'
 import { LogEntry, LogLevel, LogsResponse } from '@openhome-core/backend/backendInterface'
+import useBackend from '@openhome-core/backend/useBackend'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { R } from '@openhome-core/util/functional'
 import useDebounce from '@openhome-ui/hooks/debounce'
 import dayjs, { Dayjs } from 'dayjs'
-import { Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
 
 export const LOG_LEVELS: readonly LogLevel[] = Object.freeze([
   'ERROR',
@@ -31,7 +31,7 @@ function logFilterForRange(start: Dayjs, end: Dayjs, ohpkm_id?: OhpkmIdentifier)
 }
 
 export function useLogController(openhomeIdFilter?: OhpkmIdentifier) {
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [logs, setLogs] = useState<LogEntry[]>()
   const [current, setCurrent] = useState<LogFilter>(defaultLogFilter(openhomeIdFilter))
   const [next, setNext] = useState<LogFilter>()

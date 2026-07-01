@@ -1,12 +1,11 @@
-import { BackendContext } from '@openhome-core/backend/backendContext'
+import useBackend from '@openhome-core/backend/useBackend'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Button, Flex } from '@radix-ui/themes'
-import { useContext } from 'react'
 
 export default function RecentSaveTab(props: { mon: OHPKM }) {
   const { mon } = props
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
 
   if (!mon.mostRecentSaveWasm) {
     return <div style={{ padding: 8 }}>No recent save data available.</div>

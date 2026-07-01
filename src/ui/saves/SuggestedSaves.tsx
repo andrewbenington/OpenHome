@@ -1,4 +1,4 @@
-import { BackendContext } from '@openhome-core/backend/backendContext'
+import useBackend from '@openhome-core/backend/useBackend'
 import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
 import { R } from '@openhome-core/util/functional'
@@ -23,7 +23,7 @@ interface SaveFileSelectorProps {
 
 export default function SuggestedSaves(props: SaveFileSelectorProps) {
   const { onOpen, view, cardSize } = props
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const [suggestions, setSuggestions] = useState<(SaveSuggestion | LoadingSaveSuggestion)[]>()
   const [error, setError] = useState(false)

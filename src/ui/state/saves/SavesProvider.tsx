@@ -1,4 +1,4 @@
-import { BackendContext } from '@openhome-core/backend/backendContext'
+import useBackend from '@openhome-core/backend/useBackend'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAVClass } from '@openhome-core/save/util'
@@ -23,7 +23,7 @@ export type SavesProviderProps = {
 type SaveTypeCallback = (saveType?: SAVClass | PromiseLike<SAVClass>) => void
 
 export default function SavesProvider({ children }: SavesProviderProps) {
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [itemBagState, bagDispatch] = useContext(ItemBagContext)
   const [releaseWarningDisplayed, setReleaseWarningDisplayed] = useState(false)
   const [saving, setSaving] = useState(false)

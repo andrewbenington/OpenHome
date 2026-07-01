@@ -1,4 +1,4 @@
-VERSION=1.12.1
+VERSION=1.12.4-x-workflow-tinkering-1
 
 .PHONY: help
 help: # Display this help.
@@ -146,3 +146,7 @@ download-item-sprites:
 .PHONY: schema
 schema:
 	@sqlite3 generate/pkm.db .schema > generate/schema.sql
+
+.PHONY: git-fix-pnpm
+git-fix-pnpm:
+	@pnpm i --merge-git-branch-lockfiles

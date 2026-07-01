@@ -1,4 +1,4 @@
-import { BackendContext } from '@openhome-core/backend/backendContext'
+import useBackend from '@openhome-core/backend/useBackend'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { getSortFunctionNullable } from '@openhome-core/pkm/sort'
 import {
@@ -440,7 +440,7 @@ const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(_store: S) =
 
 export function useBanksAndBoxes() {
   const store = useContext(BanksAndBoxesStoreContext)
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const ohpkmStore = useOhpkmStore()
 
   if (!store) {

@@ -1,4 +1,4 @@
-import { BackendContext } from '@openhome-core/backend/backendContext'
+import useBackend from '@openhome-core/backend/useBackend'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
@@ -173,10 +173,13 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   saveIdentifier: save.identifier,
                 }
                 const mon = save.getMonAt(location.box, location.boxSlot)
+                const uniqueKey = mon
+                  ? `${save.currentPCBox}-${index}-${mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
+                  : `${save.currentPCBox}-${index}`
                 return (
                   <BoxCell
+                    key={uniqueKey}
                     onClick={() => setSelectedIndex(index)}
-                    key={`${save.currentPCBox}-${index}-${mon?.encryptionConstant ?? mon?.personalityValue ?? mon?.nickname ?? 'empty'}`}
                     dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                     location={location}
                     disabled={
@@ -266,7 +269,7 @@ type SaveHeaderProps = { save: SAV; setDetailsModal: (open: boolean) => void }
 
 function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
   const savesManager = useSaves()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
 
   const currentBoxMonCount = save.getBoxMonCount(save.currentPCBox)
   const totalMonCount = save.getAllMons().length

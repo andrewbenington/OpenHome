@@ -32,8 +32,7 @@ export interface BoxAndSlot {
 }
 
 export type SlotMetadata =
-  | { isDisabled: true; disabledReason: string }
-  | { isDisabled: false; disabledReason?: undefined }
+  { isDisabled: true; disabledReason: string } | { isDisabled: false; disabledReason?: undefined }
 
 export type SAV<P extends PKMInterface = PKMInterface> = OfficialSAV<P> | PluginSAV<P>
 

@@ -1,4 +1,4 @@
-import { BackendContext } from '@openhome-core/backend/backendContext'
+import useBackend from '@openhome-core/backend/useBackend'
 import { R } from '@openhome-core/util/functional'
 import DebugOnly from '@openhome-ui/components/DebugOnly'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -75,7 +75,7 @@ function AvailablePluginCard(props: AvailablePluginCardProps) {
   const displayError = useDisplayError()
   const { registerPlugin } = useContext(PluginContext)
   const [progressPercent, setProgressPercent] = useState<number>()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
 
   useEffect(() => {
     if (!metadata?.id) return

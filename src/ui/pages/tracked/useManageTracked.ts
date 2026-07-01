@@ -1,4 +1,4 @@
-import { BackendContext } from '@openhome-core/backend/backendContext'
+import useBackend from '@openhome-core/backend/useBackend'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   Gen12Identifier,
@@ -43,7 +43,7 @@ export function useManageTracked() {
   const { findHomeLocation } = useBanksAndBoxes()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { lookups } = useLookups()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const displayError = useDisplayError()
   const [findingSaveState, setFindingSaveState] = useState<FindingSavesState>()
 

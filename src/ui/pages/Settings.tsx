@@ -1,4 +1,4 @@
-import { BackendContext } from '@openhome-core/backend/backendContext'
+import useBackend from '@openhome-core/backend/useBackend'
 import { R } from '@openhome-core/util/functional'
 import { stringSorter } from '@openhome-core/util/sort'
 import ContentCard from '@openhome-ui/components/ContentCard'
@@ -44,7 +44,7 @@ export default function Settings() {
 
 function GeneralSettings() {
   const [appInfoState, dispatchAppInfoState] = useContext(AppInfoContext)
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [dataDirPath, setDataDirPath] = useState<string>()
   const displayError = useDisplayError()
 

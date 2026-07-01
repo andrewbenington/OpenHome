@@ -6,7 +6,7 @@ import DroppableSpace from './boxes/DroppableSpace'
 import DraggableItem from './DraggableItem'
 
 export default function ItemBag() {
-  const itemCounts = useItemBag()
+  const { itemCounts } = useItemBag()
 
   return (
     <Flex direction="column" p="var(--padding-radius-sm-lg)">

@@ -1,8 +1,8 @@
-import { BackendContext } from '@openhome-core/backend/backendContext'
+import useBackend from '@openhome-core/backend/useBackend'
 import { Option } from '@openhome-core/util/functional'
 import { SyncedStateController, useSyncedState } from '@openhome-ui/state/synced-state'
 import { ConvertStrategy } from '@pkm-rs/pkg'
-import { PropsWithChildren, useContext } from 'react'
+import { PropsWithChildren } from 'react'
 import { ConversionSettingsContext } from '.'
 import SyncedStateProvider from '../synced-state/SyncedStateProvider'
 
@@ -40,7 +40,7 @@ function stateReducer(
 }
 
 function useSyncedConvertState(): SyncedStateController<ConvertStrategies> {
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
 
   const stateGetter = backend.getConvertStrategies
   const stateUpdater = backend.updateConvertStrategies

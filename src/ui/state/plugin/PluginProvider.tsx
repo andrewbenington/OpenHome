@@ -1,4 +1,4 @@
-import { BackendContext } from '@openhome-core/backend/backendContext'
+import useBackend from '@openhome-core/backend/useBackend'
 import { partitionResults, R } from '@openhome-core/util/functional'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { GITHUB_REPO, LOCAL_REPO } from '@openhome-ui/pages/plugins/BrowsePlugins'
@@ -21,7 +21,7 @@ export default function PluginsProvider({ children }: PropsWithChildren) {
 }
 
 function usePlugins() {
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [appInfoState] = useContext(AppInfoContext)
   const [pluginState, pluginDispatch] = useReducer(pluginReducer, { plugins: [], loaded: false })
   const displayError = useDisplayError()

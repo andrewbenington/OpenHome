@@ -1,4 +1,5 @@
-import { BackendContext, BackendWithHelpersInterface } from '@openhome-core/backend/backendContext'
+import BackendInterface from '@openhome-core/backend/backendInterface'
+import useBackend from '@openhome-core/backend/useBackend'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
 import { Option, R } from '@openhome-core/util/functional'
 import useDisplayError from '@openhome-ui/hooks/displayError'
@@ -27,8 +28,7 @@ export function findPluginSprite(
 }
 
 export type GetMonSpriteResult =
-  | { type: 'default'; path: string }
-  | ({ type: 'plugin' } & PluginSpriteResult)
+  { type: 'default'; path: string } | ({ type: 'plugin' } & PluginSpriteResult)
 
 export function getMonSprite(
   mon: MonSpriteData,
@@ -59,7 +59,7 @@ type MonSpriteResult =
 
 export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
   const { enabledPlugins } = useContext(PluginContext)
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [spriteResult, setSpriteResult] = useState<MonSpriteResult>({ loading: true })
   const displayError = useDisplayError()
 
@@ -144,7 +144,7 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
 export async function getPluginSprite(
   plugin: OpenHomePlugin,
   spritePath: string,
-  backend: BackendWithHelpersInterface
+  backend: BackendInterface
 ): Promise<MonSpriteResult> {
   return backend
     .getPluginPath(plugin.id)
