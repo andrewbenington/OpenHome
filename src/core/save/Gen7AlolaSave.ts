@@ -1,6 +1,6 @@
 import PK7 from '@openhome-core/pkm/PK7'
-import { Item } from '@openhome-core/resources//consts/Items'
-import { USUM_TRANSFER_RESTRICTIONS } from '@openhome-core/resources//consts/TransferRestrictions'
+import { Item } from '@openhome-core/resources/consts/Items'
+import { USUM_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import {
   ConvertStrategy,
   ExtraFormIndex,

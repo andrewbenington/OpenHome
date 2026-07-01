@@ -1,4 +1,4 @@
-import useBackend from '@openhome-ui/backend/useBackend'
+import useBackend from '@openhome-core/backend/useBackend'
 import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
 import { usePathSegment } from '@openhome-ui/hooks/routing'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'

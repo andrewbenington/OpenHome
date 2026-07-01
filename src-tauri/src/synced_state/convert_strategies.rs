@@ -8,7 +8,7 @@ use pkm_rs::convert_strategy::ConvertStrategy;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::state::synced_state::{self, SyncedState};
+use crate::synced_state;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct NamedStrategy {
@@ -26,16 +26,21 @@ pub struct ConvertStrategies {
 
 const JSON_FILENAME: &str = "convert_strategies.json";
 
-impl SyncedState for ConvertStrategies {
+impl synced_state::SyncedState for ConvertStrategies {
+    type Action = Self;
     const ID: &'static str = "convert_strategies";
 
-    fn union_with(&mut self, other: Self) {
-        for (key, value) in other.strategies_by_id {
+    fn update(&mut self, action: Self::Action) {
+        for (key, value) in action.strategies_by_id {
             self.strategies_by_id.insert(key, value);
         }
-        if let Some(id) = other.default_strategy_id {
+        if let Some(id) = action.default_strategy_id {
             self.default_strategy_id = Some(id);
         }
+    }
+
+    fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
+        self
     }
 }
 
@@ -65,5 +70,5 @@ pub fn update_convert_strategies(
     synced_state
         .lock()?
         .convert_strategies
-        .union_with(&app_handle, updates)
+        .update(&app_handle, updates)
 }

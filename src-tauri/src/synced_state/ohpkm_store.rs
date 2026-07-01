@@ -1,6 +1,7 @@
 use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
-use crate::{state::synced_state, util};
+use crate::synced_state;
+use crate::util;
 use base64::prelude::*;
 use pkm_rs::ohpkm::OhpkmV2;
 use serde::{Deserialize, Serialize};
@@ -113,13 +114,14 @@ impl OhpkmBytesStore {
 }
 
 impl synced_state::SyncedState for OhpkmBytesStore {
+    type Action = Self;
     const ID: &'static str = "ohpkm_store";
 
     fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
         self.to_b64_map()
     }
 
-    fn union_with(&mut self, other: Self) {
+    fn update(&mut self, other: Self) {
         other.0.into_iter().for_each(|(k, v)| {
             self.0.insert(k, v);
         });
@@ -142,7 +144,7 @@ pub fn add_to_ohpkm_store(
     synced_state
         .lock()?
         .ohpkm_store
-        .union_with(&app_handle, updates)
+        .update(&app_handle, updates)
 }
 
 type DeleteResultsById = HashMap<String, Result<()>>;

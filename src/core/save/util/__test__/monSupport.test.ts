@@ -1,4 +1,4 @@
-import { NationalDex } from '@openhome-core/resources//consts/NationalDex'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { OFFICIAL_SAVE_TYPES } from '@openhome-ui/state/appInfo'
 import { ExtraFormIndex } from '@pkm-rs/pkg'
 import { describe, expect, test } from 'vitest'

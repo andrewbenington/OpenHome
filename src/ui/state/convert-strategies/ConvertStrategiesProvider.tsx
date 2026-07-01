@@ -1,4 +1,5 @@
-import useBackend from '@openhome-ui/backend/useBackend'
+import useBackend from '@openhome-core/backend/useBackend'
+import { Option } from '@openhome-core/util/functional'
 import { SyncedStateController, useSyncedState } from '@openhome-ui/state/synced-state'
 import { ConvertStrategy } from '@pkm-rs/pkg'
 import { PropsWithChildren } from 'react'
@@ -31,7 +32,10 @@ export default function ConvertStrategiesProvider({ children }: PropsWithChildre
   )
 }
 
-function stateReducer(prev: ConvertStrategies, updated: ConvertStrategies): ConvertStrategies {
+function stateReducer(
+  prev: Option<ConvertStrategies>,
+  updated: ConvertStrategies
+): ConvertStrategies {
   return { ...prev, ...updated }
 }
 

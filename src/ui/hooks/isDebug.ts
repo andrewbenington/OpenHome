@@ -1,5 +1,5 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { R } from '@openhome-core/util/functional'
-import useBackend from '@openhome-ui/backend/useBackend'
 import { useEffect, useState } from 'react'
 
 export default function useIsDebug(): boolean {

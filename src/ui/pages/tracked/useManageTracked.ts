@@ -1,3 +1,4 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   Gen12Identifier,
@@ -20,7 +21,7 @@ import {
   SV_TRANSFER_RESTRICTIONS_ID,
   SWSH_TRANSFER_RESTRICTIONS_CT,
   USUM_TRANSFER_RESTRICTIONS,
-} from '@openhome-core/resources//consts/TransferRestrictions'
+} from '@openhome-core/resources/consts/TransferRestrictions'
 import { BoxAndSlot, SAV } from '@openhome-core/save/interfaces'
 import { LP_TRANSFER_RESTRICTIONS } from '@openhome-core/save/luminescentplatinum/G8LUMISAV'
 import { RR_TRANSFER_RESTRICTIONS } from '@openhome-core/save/radicalred/G3RRSAV'
@@ -29,14 +30,13 @@ import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
 import { Option, R, range } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
-import useBackend from '@openhome-ui/backend/useBackend'
+import useDisplayError from '@openhome-ui/hooks/displayError'
+import { useBanksAndBoxes } from '@openhome-ui/state-zustand/banks-and-boxes/store'
+import { AppInfoContext } from '@openhome-ui/state/appInfo'
+import { useLookups } from '@openhome-ui/state/lookups'
+import { OhpkmStoreData, useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { ExtraFormIndex, GameSetting, Generation, OriginGame, OriginGames } from '@pkm-rs/pkg'
 import { useCallback, useContext, useMemo, useState } from 'react'
-import useDisplayError from '../../hooks/displayError'
-import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
-import { AppInfoContext } from '../../state/appInfo'
-import { useLookups } from '../../state/lookups'
-import { OhpkmStoreData, useOhpkmStore } from '../../state/ohpkm'
 
 export function useManageTracked() {
   const ohpkmStore = useOhpkmStore()
