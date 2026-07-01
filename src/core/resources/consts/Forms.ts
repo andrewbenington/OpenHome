@@ -36,11 +36,11 @@ export const MEGA_Z = 2
 export const WORLD_CAP = 9
 
 export enum SWEETS {
-  'Strawberry' = 0,
-  'Berry' = 1,
-  'Love' = 2,
-  'Star' = 3,
-  'Clover' = 4,
-  'Flower' = 5,
-  'Ribbon' = 6,
+  Strawberry = 0,
+  Berry = 1,
+  Love = 2,
+  Star = 3,
+  Clover = 4,
+  Flower = 5,
+  Ribbon = 6,
 }

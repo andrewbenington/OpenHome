@@ -4,8 +4,7 @@ import { Pokedex } from '@openhome-ui/util/pokedex'
 import { useCallback, useContext, useEffect, useState } from 'react'
 
 export type PokedexManager = { getPokedex: () => Promise<Errorable<Pokedex>> } & (
-  | { loaded: true; pokedex: Pokedex }
-  | { loaded: false; pokedex: undefined }
+  { loaded: true; pokedex: Pokedex } | { loaded: false; pokedex: undefined }
 )
 
 export function usePokedex(): PokedexManager {
