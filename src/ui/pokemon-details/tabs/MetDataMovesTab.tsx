@@ -9,6 +9,7 @@ import MoveCard from '@openhome-ui/components/pokemon/MoveCard'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getBallIconPath } from '@openhome-ui/images/items'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { Language, Languages, OriginGames } from '@pkm-rs/pkg'
 import { Badge, Flex, Grid } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
@@ -19,6 +20,7 @@ const metTimesOfDay = ['in the morning', 'during the daytime', 'in the evening']
 const MetDataMovesTab = (props: { mon: PKMInterface }) => {
   const { mon } = props
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
+  const { updateMonMarkings } = useOhpkmStore()
 
   const eggMessage = useMemo(() => {
     if (!mon.eggLocationIndex || !mon.eggDate || !mon.gameOfOrigin) {
@@ -160,7 +162,10 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
             )}
           </div>
           {mon instanceof OHPKM ? (
-            <Markings markings={mon.markings} openhomeId={mon.openhomeId} allowUpdate />
+            <Markings
+              markings={mon.markings}
+              onUpdate={(newMarkings) => updateMonMarkings(mon.openhomeId, newMarkings)}
+            />
           ) : 'markings' in mon && mon.markings ? (
             <Markings markings={mon.markings} />
           ) : (

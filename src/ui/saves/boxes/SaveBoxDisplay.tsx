@@ -4,7 +4,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { range } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import useBackend from '@openhome-ui/backend/useBackend'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
 import Fallback from '@openhome-ui/components/Fallback'
@@ -174,7 +174,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 }
                 const mon = save.getMonAt(location.box, location.boxSlot)
                 const uniqueKey = mon
-                  ? `${mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
+                  ? `${save.currentPCBox}-${index}-${mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
                   : `${save.currentPCBox}-${index}`
                 return (
                   <BoxCell
@@ -269,7 +269,7 @@ type SaveHeaderProps = { save: SAV; setDetailsModal: (open: boolean) => void }
 
 function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
   const savesManager = useSaves()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
 
   const currentBoxMonCount = save.getBoxMonCount(save.currentPCBox)
   const totalMonCount = save.getAllMons().length

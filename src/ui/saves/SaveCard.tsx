@@ -1,11 +1,11 @@
 import { SaveRef } from '@openhome-core/util/types'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import useBackend from '@openhome-ui/backend/useBackend'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { OriginGames } from '@pkm-rs/pkg'
 import { Badge, Flex } from '@radix-ui/themes'
-import { useContext, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { classNames, grayscaleIf } from '../util/style'
 import './style.css'
 import { buildRecentSaveContextElements, formatTimeSince, logoFromSaveRef } from './util'
@@ -24,7 +24,7 @@ const standardViewMinSize = 180
 export default function SaveCard({ save, onOpen, onRemove, size = 240 }: SaveCardProps) {
   const [expanded, setExpanded] = useState(false)
   const displayError = useDisplayError()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
 
   const isGameBoy = save.game && OriginGames.isGameboy(save.game)
 

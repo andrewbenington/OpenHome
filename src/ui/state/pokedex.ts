@@ -1,7 +1,7 @@
 import { Errorable, R } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import useBackend from '@openhome-ui/backend/useBackend'
 import { Pokedex } from '@openhome-ui/util/pokedex'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export type PokedexManager = { getPokedex: () => Promise<Errorable<Pokedex>> } & (
   { loaded: true; pokedex: Pokedex } | { loaded: false; pokedex: undefined }
@@ -10,7 +10,7 @@ export type PokedexManager = { getPokedex: () => Promise<Errorable<Pokedex>> } &
 export function usePokedex(): PokedexManager {
   const [pokedexCache, setPokedexCache] = useState<Pokedex>()
   const [loading, setLoading] = useState(false)
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
 
   backend.registerListeners({
     onPokedexUpdate: setPokedexCache,

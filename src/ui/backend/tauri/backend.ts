@@ -1,4 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, SimpleOpenHomeBox, StoredBankData } from '@openhome-core/save/util/storage'
 import { Errorable, R } from '@openhome-core/util/functional'
@@ -21,7 +22,7 @@ import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
 import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs, { Dayjs } from 'dayjs'
-import { Commands, LogFilterIpc, StoredBankDataSerialized } from './tauriCommands'
+import { Commands, LogFilterIpc, StoredBankDataSerialized } from './commands'
 import { isRustErr } from './types'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
@@ -114,6 +115,12 @@ export const TauriBackend: BackendInterface = {
     })
   },
   writeSaveFile: Commands.write_file_bytes,
+  writeAllSaveFiles: async (saveWriters: SaveWriter[]) =>
+    Promise.all(
+      saveWriters.map((saveWriter) =>
+        Commands.write_file_bytes(saveWriter.filepath, saveWriter.bytes)
+      )
+    ),
   saveLocalFile: async (bytes: Uint8Array, suggestedName: string) => {
     const defaultPath = await path.join(await path.downloadDir(), suggestedName)
     const filePath = await save({ defaultPath })

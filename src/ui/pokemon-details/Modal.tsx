@@ -1,10 +1,9 @@
 import { fileTypeFromStringNonOhpkm } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
 import { isRomHackFormat } from '@openhome-core/pkm/PKM'
 import { FileSchemas } from '@openhome-core/pkm/schema'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import useBackend from '@openhome-ui/backend/useBackend'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
 import FileTypeSelect from '@openhome-ui/components/FileTypeSelect'
@@ -15,7 +14,7 @@ import useDisplayError from '@openhome-ui/hooks/displayError'
 import MiniBoxIndicator, { MiniBoxIndicatorProps } from '@openhome-ui/saves/boxes/MiniBoxIndicator'
 import { PkmFormat } from '@pkm-rs/pkg/pkm_rs'
 import { Flex, Switch, VisuallyHidden } from '@radix-ui/themes'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { MdDownload } from 'react-icons/md'
 import { GameIndicator } from '../components/pokemon/indicator/GameIndicator'
 import PokemonIcon from '../components/PokemonIcon'
@@ -95,7 +94,7 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
             <Dialog.Description>Detailed information about the selected Pokémon</Dialog.Description>
           </VisuallyHidden>
           <Fallback>
-            <ModalContents mon={mon} key={getMonFileIdentifier(mon)} />
+            <ModalContents key={mon.calculateChecksum?.()} mon={mon} />
           </Fallback>
           <div className="modal-footer">
             <Flex gap="1" align="center" minWidth="7rem">
@@ -151,12 +150,14 @@ type ModalContentsProps = {
   mon: PKMInterface
 }
 
+const TAB_QUERY_KEY = 'pokemon-modal-tab'
+
 function ModalContents(props: ModalContentsProps) {
   const { mon } = props
   const [displayMon, setDisplayMon] = useState(mon)
   const [isOriginal, setIsOriginal] = useState(false)
   const { defaultConvertStrategy } = useConvertStrategies()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const displayError = useDisplayError()
 
   function updateIsOriginal(isOriginal: boolean) {
@@ -216,7 +217,7 @@ function ModalContents(props: ModalContentsProps) {
   }
 
   return (
-    <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary">
+    <SideTabs.Root className="pokemon-modal-tabs" defaultValue="summary" queryKey={TAB_QUERY_KEY}>
       <SideTabs.TabList>
         <Flex direction="row" gap="var(--padding-radius-sm-lg">
           <FileTypeSelect

@@ -7,18 +7,18 @@ import { monSupportedBySave, SAVClass } from '@openhome-core/save/util'
 import { buildSaveFile, getPossibleSaveTypes } from '@openhome-core/save/util/load'
 import { PathData } from '@openhome-core/save/util/path'
 import { Option, R, Result } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import useBackend from '@openhome-ui/backend/useBackend'
 import {
   OPENHOME_BOX_SLOTS,
   useBanksAndBoxes,
 } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useConvertStrategies } from '@openhome-ui/state/convert-strategies'
-import { ItemBagContext } from '@openhome-ui/state/items'
+import { useItemBag } from '@openhome-ui/state/items'
 import { OhpkmStoreData } from '@openhome-ui/state/ohpkm'
 import { IdentifierNotPresentError, useOhpkmStore } from '@openhome-ui/state/ohpkm/useOhpkmStore'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { Item, Lookup, MarkingsSixShapesColors } from '@pkm-rs/pkg'
+import { Item } from '@pkm-rs/pkg'
 import { useCallback, useContext, useRef } from 'react'
 import {
   HomeMonLocation,
@@ -43,9 +43,6 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
 
   getMonAtLocation(location: MonLocation): PKMInterface | OHPKM | undefined
   setMonHeldItem(item: Item | undefined, location: MonLocation): void
-  setMonNickname(nickname: string, location: MonLocation): void
-  updateMonNotes(monId: string, notes: string | undefined): void
-  updateMonMarkings(monId: string, markings: MarkingsSixShapesColors): void
   moveMon(source: MonWithLocation, dest: MonLocation): void
   recoverMonToBox(id: OhpkmIdentifier, bankIndex: number): void
 
@@ -58,11 +55,6 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   moveSaveToBank(save: SAV): number
 
   // OHPKM modification
-  updateMonDisplayColor(monId: string, color: string | undefined): void
-  updateMonTags(
-    monId: string,
-    tags: { label: string; color: string; icon?: string }[] | undefined
-  ): void
   moveMonItemToBag: (monLocation: MonLocation) => void
   giveItemToMon: (monLocation: MonLocation, item: Item) => void
   revertMonAbility: (monId: OhpkmIdentifier) => void
@@ -72,14 +64,14 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
 
 export function useSaves(): SavesAndBanksManager {
   const ohpkmStore = useOhpkmStore()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { openSavesState, openSavesDispatch, allOpenSaves, promptDisambiguation } =
     useContext(SavesContext)
-  const [, bagDispatch] = useContext(ItemBagContext)
   const filePickerOpen = useRef(false)
   const banksAndBoxes = useBanksAndBoxes()
   const { defaultConvertStrategy } = useConvertStrategies()
+  const ItemBag = useItemBag()
 
   if (openSavesState.error) {
     throw new Error(`Error loading saves state: ${openSavesState.error}`)
@@ -520,71 +512,6 @@ export function useSaves(): SavesAndBanksManager {
     [ohpkmStore]
   )
 
-  const setMonNickname = useCallback(
-    (nickname: string, location: MonLocation) => {
-      let ohpkm: OHPKM
-      if (location.isHome) {
-        const identifier = getMonAtHomeLocation(location)
-        if (!identifier) return
-
-        const result = ohpkmStore.tryLoadFromId(identifier)
-        if (R.isErr(result)) return
-
-        ohpkm = result.value
-      } else {
-        const mon = getMonAtSaveLocation(location)
-        if (!mon) return
-
-        const save = saveFromIdentifier(location.saveIdentifier)
-        ohpkm = ohpkmStore.loadIfTracked(mon) ?? ohpkmStore.startTrackingNewMon(mon, save, save)
-
-        save.setMonAt(
-          location.box,
-          location.boxSlot,
-          save.convertOhpkm(ohpkm, defaultConvertStrategy)
-        )
-        save.updatedBoxSlots.push({ box: location.box, boxSlot: location.boxSlot })
-      }
-
-      ohpkm.nickname = nickname
-      ohpkm.isNicknamed = nickname !== Lookup.speciesName(ohpkm.dexNum, ohpkm.language)
-      ohpkmStore.insertOrUpdate(ohpkm)
-    },
-    [
-      getMonAtHomeLocation,
-      getMonAtSaveLocation,
-      ohpkmStore,
-      saveFromIdentifier,
-      defaultConvertStrategy,
-    ]
-  )
-
-  const updateMonNotes = useCallback(
-    (monId: string, notes: string | undefined) => {
-      const result = ohpkmStore.tryLoadFromId(monId)
-      if (R.isErr(result)) return result
-
-      const mon = result.value
-      mon.notes = notes
-
-      ohpkmStore.insertOrUpdate(mon)
-    },
-    [ohpkmStore]
-  )
-
-  const updateMonMarkings = useCallback(
-    (monId: string, markings: MarkingsSixShapesColors) => {
-      const result = ohpkmStore.tryLoadFromId(monId)
-      if (R.isErr(result)) return result
-
-      const mon = result.value
-      mon.markings = markings
-
-      ohpkmStore.insertOrUpdate(mon)
-    },
-    [ohpkmStore]
-  )
-
   function moveMon(source: MonLocation, dest: MonLocation) {
     if (source.isHome) {
       const sourceMonId = getMonAtHomeLocation(source)
@@ -808,40 +735,14 @@ export function useSaves(): SavesAndBanksManager {
     [banksAndBoxes, ohpkmStore]
   )
 
-  const updateMonDisplayColor = useCallback(
-    (monId: string, color: string | undefined) => {
-      const result = ohpkmStore.tryLoadFromId(monId)
-      if (R.isErr(result)) return result
-
-      const mon = result.value
-      mon.displayColor = color
-
-      ohpkmStore.insertOrUpdate(mon)
-    },
-    [ohpkmStore]
-  )
-
-  const updateMonTags = useCallback(
-    (monId: string, tags: { label: string; color: string; icon?: string }[] | undefined) => {
-      const result = ohpkmStore.tryLoadFromId(monId)
-      if (R.isErr(result)) return result
-
-      const mon = result.value
-      mon.setTags(tags ?? [])
-
-      ohpkmStore.insertOrUpdate(mon)
-    },
-    [ohpkmStore]
-  )
-
   const moveMonItemToBag = useCallback(
     (monLocation: MonLocation) => {
       const destMon = getMonAtLocation(monLocation)
       if (!destMon?.heldItemIndex) return
-      bagDispatch({ type: 'add_item', payload: { index: destMon.heldItemIndex, qty: 1 } })
+      ItemBag.addItem(destMon.heldItemIndex, 1)
       setMonHeldItem(undefined, monLocation)
     },
-    [setMonHeldItem, getMonAtLocation, bagDispatch]
+    [getMonAtLocation, ItemBag, setMonHeldItem]
   )
 
   const giveItemToMon = useCallback(
@@ -849,15 +750,15 @@ export function useSaves(): SavesAndBanksManager {
       const destMon = getMonAtLocation(monLocation)
       if (!destMon) return
 
-      bagDispatch({ type: 'remove_item', payload: { index: item.index, qty: 1 } })
+      ItemBag.removeItem(item.index, 1)
 
       // If already holding an item, move it to the bag
       if (destMon?.heldItemIndex !== undefined) {
-        bagDispatch({ type: 'add_item', payload: { index: destMon.heldItemIndex, qty: 1 } })
+        ItemBag.addItem(destMon.heldItemIndex, 1)
       }
       setMonHeldItem(item, monLocation)
     },
-    [setMonHeldItem, getMonAtLocation, bagDispatch]
+    [setMonHeldItem, getMonAtLocation, ItemBag]
   )
 
   return {
@@ -874,9 +775,6 @@ export function useSaves(): SavesAndBanksManager {
 
     getMonAtLocation,
     setMonHeldItem,
-    setMonNickname,
-    updateMonNotes,
-    updateMonMarkings,
     moveMon,
     recoverMonToBox,
 
@@ -889,8 +787,6 @@ export function useSaves(): SavesAndBanksManager {
     // Bulk operations
     moveBoxToBank,
     moveSaveToBank,
-    updateMonDisplayColor,
-    updateMonTags,
     moveMonItemToBag,
     giveItemToMon,
     revertMonAbility,

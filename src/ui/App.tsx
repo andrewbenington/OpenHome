@@ -1,10 +1,8 @@
 import { R } from '@openhome-core/util/functional'
 import '@openhome-ui/App.css'
 import AppTabs from '@openhome-ui/AppTabs'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
 import BackendInterface from '@openhome-ui/backend/backendInterface'
-import { BackendProvider } from '@openhome-ui/backend/backendProvider'
-import { TauriBackend } from '@openhome-ui/backend/tauri/tauriBackend'
+import { TauriBackend } from '@openhome-ui/backend/tauri/backend'
 import useIsDarkMode from '@openhome-ui/hooks/darkMode'
 import useDebounce from '@openhome-ui/hooks/debounce'
 import useDisplayError from '@openhome-ui/hooks/displayError'
@@ -26,7 +24,9 @@ import { SavesProvider } from '@openhome-ui/state/saves'
 import ErrorMessageModal from '@openhome-ui/top-level/ErrorMessageModal'
 import UpdateMessageModal from '@openhome-ui/top-level/UpdateMessageModal'
 import { Flex, Text, Theme } from '@radix-ui/themes'
-import { useCallback, useContext, useEffect, useReducer, useState } from 'react'
+import { useCallback, useEffect, useReducer, useState } from 'react'
+import { BackendContext } from './backend'
+import useBackend from './backend/useBackend'
 import BanksAndBoxesProvider from './state-zustand/banks-and-boxes/Provider'
 import ConvertStrategiesProvider from './state/convert-strategies/ConvertStrategiesProvider'
 import PluginsProvider from './state/plugin/PluginProvider'
@@ -50,11 +50,11 @@ export default function App() {
       radius="small"
     >
       <div id="app-container" className="root">
-        <BackendProvider backend={TauriBackend}>
-          <ErrorContext.Provider value={[errorState, errorDispatch]}>
+        <BackendContext value={TauriBackend}>
+          <ErrorContext value={[errorState, errorDispatch]}>
             <AppWithBackend />
-          </ErrorContext.Provider>
-        </BackendProvider>
+          </ErrorContext>
+        </BackendContext>
       </div>
     </Theme>
   )
@@ -71,7 +71,7 @@ function AppWithBackend() {
     loaded: false,
   })
 
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const displayError = useDisplayError()
 
   const debouncedUpdateSettings = useDebounce((backend: BackendInterface, settings: Settings) => {
@@ -146,16 +146,16 @@ function AppWithBackend() {
 
   return (
     <BanksAndBoxesProvider>
-      <AppInfoContext.Provider value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
+      <AppInfoContext value={[appInfoState, appInfoDispatch, getEnabledSaveTypes]}>
         <PluginsProvider>
           <TransactionStateProvider>
-            <MouseContext.Provider value={[mouseState, mouseDispatch]}>
+            <MouseContext value={[mouseState, mouseDispatch]}>
               <LookupsProvider>
                 <ConvertStrategiesProvider>
                   <OhpkmStoreProvider>
-                    <ItemBagContext.Provider value={[bagState, bagDispatch]}>
+                    <ItemBagContext value={[bagState, bagDispatch]}>
                       <SavesProvider>
-                        <DragMonContext.Provider value={[dragState, setDragState]}>
+                        <DragMonContext value={[dragState, setDragState]}>
                           <PokemonDndContext>
                             {settingsLoading ? (
                               <Flex width="100%" height="100vh" align="center" justify="center">
@@ -169,16 +169,16 @@ function AppWithBackend() {
                             <ErrorMessageModal />
                             <UpdateMessageModal />
                           </PokemonDndContext>
-                        </DragMonContext.Provider>
+                        </DragMonContext>
                       </SavesProvider>
-                    </ItemBagContext.Provider>
+                    </ItemBagContext>
                   </OhpkmStoreProvider>
                 </ConvertStrategiesProvider>
               </LookupsProvider>
-            </MouseContext.Provider>
+            </MouseContext>
           </TransactionStateProvider>
         </PluginsProvider>
-      </AppInfoContext.Provider>
+      </AppInfoContext>
     </BanksAndBoxesProvider>
   )
 }

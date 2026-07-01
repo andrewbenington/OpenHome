@@ -1,8 +1,8 @@
 import { StoredBankData } from '@openhome-core/save/util/storage'
 import { R } from '@openhome-core/util/functional'
+import useBackend from '@openhome-ui/backend/useBackend'
 import { Callout } from '@radix-ui/themes'
-import { PropsWithChildren, useCallback, useContext, useState } from 'react'
-import { BackendContext } from '../../backend/backendContext'
+import { PropsWithChildren, useCallback, useState } from 'react'
 import { ErrorIcon } from '../../components/Icons'
 import LoadingIndicator from '../../components/LoadingIndicator'
 import { BanksAndBoxesStoreContext, createBanksAndBoxesStore } from './store'
@@ -15,7 +15,7 @@ type InnerProviderProps = {
 export default function BanksAndBoxesProvider(props: PropsWithChildren) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [storedBanksAndBoxes, setStoredBanksAndBoxes] = useState<StoredBankData>()
 
   const loadAllHomeData = useCallback(async () => {
