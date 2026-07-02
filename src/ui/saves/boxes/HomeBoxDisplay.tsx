@@ -403,7 +403,7 @@ function SingleBoxMonDisplay() {
                 )
               }
 
-              const mon = result?.value
+              const mon = result?.data
 
               return (
                 <BoxCell

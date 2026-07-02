@@ -110,8 +110,8 @@ export const TauriBackend: BackendInterface = {
     }
     return R.Ok({
       path: pathData,
-      fileBytes: new Uint8Array(bytesResult.value),
-      createdDate: new Date(timestampResult.value),
+      fileBytes: new Uint8Array(bytesResult.data),
+      createdDate: new Date(timestampResult.data),
     })
   },
   writeSaveFile: Commands.write_file_bytes,

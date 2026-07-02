@@ -119,7 +119,7 @@ export default interface BackendInterface {
   getDataDirPath: () => Promise<Errorable<string>>
 
   /* write synced state to disk during save */
-  saveSyncedState: () => Promise<Errorable<void>>
+  saveSyncedState: () => Promise<Errorable<null>>
 
   /* past gen identifier lookups */
   loadPokedex: () => Promise<Errorable<Pokedex>>

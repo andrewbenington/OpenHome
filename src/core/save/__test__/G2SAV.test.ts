@@ -34,10 +34,10 @@ beforeAll(async () => {
   )
 
   if (R.isErr(result)) {
-    throw result.err
+    throw result.error
   }
 
-  crystalSaveFile = result.value as G2SAV
+  crystalSaveFile = result.data as G2SAV
 
   const slowpokeBytes = fs.readFileSync(pkmTestFilePath('ohpkm', 'slowbro.ohpkm'))
   slowbroOH = bytesToPKM(new Uint8Array(slowpokeBytes), 'OHPKM') as OHPKM
@@ -56,10 +56,10 @@ test('removing mon shifts others in box', () => {
   ])
 
   if (R.isErr(result1)) {
-    throw Error(result1.err)
+    throw Error(result1.error)
   }
 
-  const modifiedSaveFile1 = result1.value as G2SAV
+  const modifiedSaveFile1 = result1.data as G2SAV
 
   modifiedSaveFile1.boxes[9].boxSlots[0] = undefined
   modifiedSaveFile1.updatedBoxSlots.push({ box: 9, boxSlot: 0 })
@@ -70,10 +70,10 @@ test('removing mon shifts others in box', () => {
   ])
 
   if (R.isErr(result2)) {
-    throw Error(result2.err)
+    throw Error(result2.error)
   }
 
-  const modifiedSaveFile2 = result2.value as G2SAV
+  const modifiedSaveFile2 = result2.data as G2SAV
 
   expect(modifiedSaveFile2.boxes[9].boxSlots[0]?.nickname).toEqual('BELLOSSOM')
   expect(modifiedSaveFile2.boxes[9].boxSlots[18]?.nickname).toEqual('MISDREAVUS')
@@ -86,10 +86,10 @@ test('inserting mon works', () => {
   ])
 
   if (R.isErr(result1)) {
-    throw Error(result1.err)
+    throw Error(result1.error)
   }
 
-  const modifiedSaveFile1 = result1.value as G2SAV
+  const modifiedSaveFile1 = result1.data as G2SAV
 
   modifiedSaveFile1.boxes[13].boxSlots[17] = PK2.fromOhpkm(
     slowbroOH,
@@ -103,10 +103,10 @@ test('inserting mon works', () => {
   ])
 
   if (R.isErr(result2)) {
-    throw Error(result2.err)
+    throw Error(result2.error)
   }
 
-  const modifiedSaveFile2 = result2.value as G2SAV
+  const modifiedSaveFile2 = result2.data as G2SAV
 
   expect(modifiedSaveFile2.boxes[13].boxSlots[0]?.nickname).toEqual('UNOWN')
   expect(modifiedSaveFile2.boxes[13].boxSlots[16]?.nickname).toEqual('WIGGLYTUFF')
@@ -119,10 +119,10 @@ test('inserting mon with game capitalization gives correct nickname', () => {
   ])
 
   if (R.isErr(result1)) {
-    throw Error(result1.err)
+    throw Error(result1.error)
   }
 
-  const modifiedSaveFile1 = result1.value as G2SAV
+  const modifiedSaveFile1 = result1.data as G2SAV
 
   const modernStrategy: ConvertStrategy = {
     ...ConvertStrategies.getDefault(),
@@ -137,10 +137,10 @@ test('inserting mon with game capitalization gives correct nickname', () => {
   ])
 
   if (R.isErr(result2)) {
-    throw Error(result2.err)
+    throw Error(result2.error)
   }
 
-  const modifiedSaveFile2 = result2.value as G2SAV
+  const modifiedSaveFile2 = result2.data as G2SAV
 
   expect(modifiedSaveFile2.boxes[13].boxSlots[17]?.nickname).toEqual('Slowbro')
 })

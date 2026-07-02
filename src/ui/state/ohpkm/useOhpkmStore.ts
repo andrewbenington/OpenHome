@@ -171,7 +171,7 @@ export function useOhpkmStore(): OhpkmStore {
       const result = tryLoadFromId(monId)
       if (R.isErr(result)) return result
 
-      const mon = result.value
+      const mon = result.data
       mon.markings = { ...markings }
 
       insertOrUpdate(mon)
@@ -184,7 +184,7 @@ export function useOhpkmStore(): OhpkmStore {
       const result = tryLoadFromId(monId)
       if (R.isErr(result)) return result
 
-      const mon = result.value
+      const mon = result.data
       mon.notes = notes
 
       insertOrUpdate(mon)
@@ -197,7 +197,7 @@ export function useOhpkmStore(): OhpkmStore {
       const result = tryLoadFromId(monId)
       if (R.isErr(result)) return result
 
-      const mon = result.value
+      const mon = result.data
       mon.setTags(tags ?? [])
 
       insertOrUpdate(mon)
@@ -210,7 +210,7 @@ export function useOhpkmStore(): OhpkmStore {
       const result = tryLoadFromId(monId)
       if (R.isErr(result)) return result
 
-      const mon = result.value
+      const mon = result.data
       mon.displayColor = color
 
       insertOrUpdate(mon)
@@ -223,7 +223,7 @@ export function useOhpkmStore(): OhpkmStore {
       const result = tryLoadFromId(monId)
       if (R.isErr(result)) return result
 
-      const mon = result.value
+      const mon = result.data
       mon.nickname = nickname || Lookup.speciesName(mon.dexNum, mon.language)
 
       insertOrUpdate(mon)

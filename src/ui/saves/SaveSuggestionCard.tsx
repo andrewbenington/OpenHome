@@ -29,11 +29,11 @@ export default function SaveSuggestionCard(props: SaveSuggestionCardProps) {
 
   if (isLoaded(suggestion)) {
     if (R.isOk(suggestion.save)) {
-      if (!save) setSave(suggestion.save.value)
-      return <SaveCard save={getSaveRef(suggestion.save.value)} {...saveCardProps} />
+      if (!save) setSave(suggestion.save.data)
+      return <SaveCard save={getSaveRef(suggestion.save.data)} {...saveCardProps} />
     }
 
-    if (!error) setError(suggestion.save.err)
+    if (!error) setError(suggestion.save.error)
   } else {
     suggestion.loadingSave.then(
       R.match(

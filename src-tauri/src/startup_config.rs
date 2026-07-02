@@ -75,7 +75,7 @@ impl StartupConfig {
 
 #[tauri::command]
 #[specta::specta]
-pub async fn get_data_dir_path(
+pub fn get_data_dir_path(
     app_handle: tauri::AppHandle,
     startup_config_state: tauri::State<'_, StartupConfigState>,
 ) -> CommandResult<PathBuf> {

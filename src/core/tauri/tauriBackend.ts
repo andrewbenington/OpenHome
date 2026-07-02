@@ -22,8 +22,8 @@ import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
 import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs, { Dayjs } from 'dayjs'
+import { commands as SpectaCommands } from './commands'
 import { Commands, LogFilterIpc, StoredBankDataSerialized } from './commandsOld'
-import { isRustErr } from './types'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
   const filename = await path.basename(raw)
@@ -45,8 +45,8 @@ type OnDropEvent = Event<{ position: { x: number; y: number }; paths: string[] }
 
 export const TauriBackend: BackendInterface = {
   /* past gen identifier lookups */
-  loadLookups: Commands.get_lookups,
-  addToLookups: Commands.add_to_lookups,
+  loadLookups: SpectaCommands.getLookups,
+  addToLookups: SpectaCommands.addToLookups,
 
   /* ohpkm store */
   loadOhpkmStore: async function (): Promise<Errorable<OhpkmStore>> {
@@ -61,7 +61,7 @@ export const TauriBackend: BackendInterface = {
       )
     )
   },
-  removeDangling: Commands.remove_dangling,
+  removeDangling: SpectaCommands.removeDangling,
   addToOhpkmStore: function (updates: OhpkmStore): Promise<Errorable<null>> {
     return Commands.add_to_ohpkm_store(
       Object.fromEntries(
@@ -70,11 +70,11 @@ export const TauriBackend: BackendInterface = {
     )
   },
   deleteHomeMons: async function (identifiers: string[]): Promise<Errorable<null>> {
-    return Commands.permanently_delete_ohpkms(identifiers).then(
+    return SpectaCommands.permanentlyDeleteOhpkms(identifiers).then(
       R.map((deletionResults) => {
-        for (const [file, result] of Object.entries(deletionResults)) {
-          if (isRustErr(result)) {
-            console.error(`Could not delete ${file}: ${result.Err}`)
+        for (const [file, error] of Object.entries(deletionResults)) {
+          if (error) {
+            console.error(`Could not delete ${file}: ${error}`)
           }
         }
         return null
@@ -85,14 +85,14 @@ export const TauriBackend: BackendInterface = {
   /* prompt user to select new data directory location */
   promptChangeDataDir: Commands.change_data_dir,
   /* get the current data directory path */
-  getDataDirPath: Commands.get_data_dir_path,
+  getDataDirPath: SpectaCommands.getDataDirPath,
 
   /* write synced state to disk during save */
-  saveSyncedState: Commands.save_synced_state,
+  saveSyncedState: SpectaCommands.saveSyncedState,
 
   /* pokedex */
   loadPokedex: Commands.get_pokedex,
-  registerInPokedex: Commands.update_pokedex,
+  registerInPokedex: SpectaCommands.updatePokedex,
 
   /* openhome boxes */
   loadHomeBanks: () => Commands.load_banks().then(R.map(deserializeBankData)),
@@ -110,8 +110,8 @@ export const TauriBackend: BackendInterface = {
     }
     return R.Ok({
       path: pathData,
-      fileBytes: new Uint8Array(bytesResult.value),
-      createdDate: new Date(timestampResult.value),
+      fileBytes: new Uint8Array(bytesResult.data),
+      createdDate: new Date(timestampResult.data),
     })
   },
   writeSaveFile: Commands.write_file_bytes,
