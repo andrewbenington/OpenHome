@@ -25,6 +25,58 @@ use crate::synced_state::ohpkm_store::OhpkmBytesStore;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let builder =
+        tauri_specta::Builder::<tauri::Wry>::new().commands(tauri_specta::collect_commands![
+            commands::get_state,
+            // commands::get_file_bytes,
+            commands::get_file_created,
+            commands::get_image_data,
+            // commands::get_storage_file_json,
+            // commands::write_storage_file_json,
+            commands::write_file_bytes,
+            commands::set_app_theme,
+            commands::validate_recent_saves,
+            commands::download_plugin,
+            commands::list_installed_plugins,
+            commands::load_plugin_code,
+            commands::delete_plugin,
+            commands::handle_windows_accelerator,
+            commands::open_directory,
+            commands::open_file_location,
+            saves::find_suggested_saves,
+            startup_config::get_data_dir_path,
+            startup_config::change_data_dir,
+            pkm_storage::load_banks,
+            pkm_storage::write_banks,
+            state::get_pokedex,
+            state::update_pokedex,
+            state::start_transaction,
+            state::rollback_transaction,
+            state::commit_transaction,
+            synced_state::save_synced_state,
+            synced_state::update_synced_state,
+            synced_state::convert_strategies::get_convert_strategies,
+            synced_state::convert_strategies::update_convert_strategies,
+            synced_state::lookup::get_lookups,
+            synced_state::lookup::add_to_lookups,
+            synced_state::lookup::remove_dangling,
+            synced_state::ohpkm_store::get_ohpkm_store,
+            synced_state::ohpkm_store::permanently_delete_ohpkms,
+            synced_state::ohpkm_store::add_to_ohpkm_store,
+            logging::get_logs_today,
+            logging::log,
+            logging::clear_logs_for_range,
+        ]);
+
+    #[cfg(debug_assertions)]
+    builder
+        .export(
+            specta_typescript::Typescript::default()
+                .bigint(specta_typescript::BigIntExportBehavior::Number),
+            "../src/core/tauri/commands.ts",
+        )
+        .expect("Failed to export typescript bindings");
+
     tauri::Builder::default()
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_process::init())
@@ -176,16 +228,6 @@ pub fn run() {
             state::start_transaction,
             state::rollback_transaction,
             state::commit_transaction,
-            synced_state::save_synced_state,
-            synced_state::update_synced_state,
-            synced_state::convert_strategies::get_convert_strategies,
-            synced_state::convert_strategies::update_convert_strategies,
-            synced_state::lookup::get_lookups,
-            synced_state::lookup::add_to_lookups,
-            synced_state::lookup::remove_dangling,
-            synced_state::ohpkm_store::get_ohpkm_store,
-            synced_state::ohpkm_store::permanently_delete_ohpkms,
-            synced_state::ohpkm_store::add_to_ohpkm_store,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

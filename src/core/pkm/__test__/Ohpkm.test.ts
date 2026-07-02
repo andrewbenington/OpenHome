@@ -262,10 +262,10 @@ describe('move filter', () => {
 describe('OHPKM conversion strategies', () => {
   test('hyper training conversion strategy', () => {
     const PERFECT_IVS_STRATEGY: ConvertStrategy = {
-      'ivs.maxIfHyperTrained': true,
+      ivs__maxIfHyperTrained: true,
     }
     const IGNORE_HYPER_TRAINING_STRATEGY: ConvertStrategy = {
-      'ivs.maxIfHyperTrained': false,
+      ivs__maxIfHyperTrained: false,
     }
     const ORIGINAL_IVS = { hp: 10, atk: 10, def: 10, spa: 10, spd: 10, spe: 10 }
     const HYPER_TRAINING = { hp: true, atk: false, def: true, spa: false, spd: true, spe: false }
@@ -307,10 +307,10 @@ describe('OHPKM conversion strategies', () => {
 
   test('nickname capitalization conversion strategy', () => {
     const GAME_DEFAULT_STRATEGY: ConvertStrategy = {
-      'nickname.capitalization': 'GameDefault',
+      nickname__capitalization: 'GameDefault',
     }
     const MODERN_STRATEGY: ConvertStrategy = {
-      'nickname.capitalization': 'Modern',
+      nickname__capitalization: 'Modern',
     }
 
     const original = OHPKM.defaultWithSpecies(NationalDex.Pikachu, 0)
@@ -328,10 +328,10 @@ describe('OHPKM conversion strategies', () => {
   })
 
   const LEGALITY_STRATEGY: ConvertStrategy = {
-    'metData.originAndLocation': 'MaximizeLegality',
+    metData__originAndLocation: 'MaximizeLegality',
   }
   const LOCATION_MATCH_STRATEGY: ConvertStrategy = {
-    'metData.originAndLocation': 'UseLocationNameMatch',
+    metData__originAndLocation: 'UseLocationNameMatch',
   }
 
   test('met data conversion strategy', () => {

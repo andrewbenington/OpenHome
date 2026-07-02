@@ -114,7 +114,7 @@ test('inserting mon with game capitalization gives correct nickname', () => {
 
   const modernStrategy: ConvertStrategy = {
     ...ConvertStrategies.getDefault(),
-    'nickname.capitalization': 'Modern',
+    nickname__capitalization: 'Modern',
   }
   modifiedSaveFile1.boxes[7].boxSlots[11] = PK1.fromOhpkm(slowbroOH, modernStrategy)
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, boxSlot: 0 })

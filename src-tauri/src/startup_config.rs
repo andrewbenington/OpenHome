@@ -8,6 +8,7 @@ use std::sync::Mutex;
 use tauri::Manager;
 use tauri_plugin_dialog::DialogExt;
 
+use crate::commands::CommandResult;
 use crate::data_controller::DataController;
 use crate::data_controller::read_file_json;
 use crate::data_controller::write_file_json;
@@ -73,10 +74,11 @@ impl StartupConfig {
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn get_data_dir_path(
     app_handle: tauri::AppHandle,
     startup_config_state: tauri::State<'_, StartupConfigState>,
-) -> Result<PathBuf> {
+) -> CommandResult<PathBuf> {
     let state = startup_config_state.lock()?;
     Ok(state
         .get_data_dir_path()
@@ -84,10 +86,11 @@ pub async fn get_data_dir_path(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn change_data_dir(
     app_handle: tauri::AppHandle,
     startup_config_state: tauri::State<'_, StartupConfigState>,
-) -> Result<()> {
+) -> CommandResult<()> {
     let Some(selected_dir) = app_handle
         .dialog()
         .file()
@@ -104,7 +107,8 @@ pub async fn change_data_dir(
     if !is_dir_empty_ignore_ds_store(selected_dir)? {
         return Err(Error::other(
             "Selected directory is not empty. Please select an empty directory.",
-        ));
+        )
+        .into());
     }
 
     let current_data_dir = app_handle.get_data_folder()?;

@@ -11,8 +11,20 @@ use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 use tauri::Manager;
 
+#[derive(serde::Serialize, serde::Deserialize, specta::Type)]
+pub struct CommandError(String);
+
+pub type CommandResult<T> = core::result::Result<T, CommandError>;
+
+impl<T: ToString> From<T> for CommandError {
+    fn from(value: T) -> Self {
+        Self(value.to_string())
+    }
+}
+
 #[tauri::command]
-pub fn get_state(state: tauri::State<'_, AppState>) -> Result<AppStateInner> {
+#[specta::specta]
+pub fn get_state(state: tauri::State<'_, AppState>) -> CommandResult<AppStateInner> {
     Ok(state.lock()?.clone())
 }
 
@@ -22,7 +34,8 @@ pub fn get_file_bytes(absolute_path: PathBuf) -> Result<tauri::ipc::Response> {
 }
 
 #[tauri::command]
-pub fn get_file_created(absolute_path: PathBuf) -> Result<Option<u128>> {
+#[specta::specta]
+pub fn get_file_created(absolute_path: PathBuf) -> CommandResult<Option<u128>> {
     let metadata =
         fs::metadata(&absolute_path).map_err(|e| Error::file_access(&absolute_path, e))?;
 
@@ -63,18 +76,20 @@ pub fn get_storage_file_json(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn write_file_bytes(
     state: tauri::State<'_, AppState>,
-    absolute_path: &Path,
+    absolute_path: &str,
     bytes: Vec<u8>,
-) -> Result<()> {
-    state
+) -> CommandResult<()> {
+    Ok(state
         .lock()?
         .transaction_mut()
-        .write_file_bytes_temped(absolute_path, bytes)
+        .write_file_bytes_temped(absolute_path, bytes)?)
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn set_app_theme(
     app_handle: tauri::AppHandle,
     app_theme: String,
@@ -100,59 +115,73 @@ pub fn set_app_theme(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn validate_recent_saves(
     app_handle: tauri::AppHandle,
-) -> core::result::Result<HashMap<String, saves::SaveRef>, String> {
-    saves::get_recent_saves(&app_handle)
+) -> CommandResult<HashMap<String, saves::SaveRef>> {
+    Ok(saves::get_recent_saves(&app_handle)?)
 }
 
 #[tauri::command]
-pub fn get_image_data(absolute_path: String) -> Result<ImageResponse> {
-    util::get_image_data(&PathBuf::from(absolute_path))
+#[specta::specta]
+pub fn get_image_data(absolute_path: String) -> CommandResult<ImageResponse> {
+    Ok(util::get_image_data(&PathBuf::from(absolute_path))?)
 }
 
 #[tauri::command]
-pub fn open_directory(absolute_path: String) -> Result<()> {
-    util::open_directory(&PathBuf::from(absolute_path))
+#[specta::specta]
+pub fn open_directory(absolute_path: String) -> CommandResult<()> {
+    Ok(util::open_directory(&PathBuf::from(absolute_path))?)
 }
 
 #[tauri::command]
-pub fn open_file_location(file_path: String) -> Result<()> {
+#[specta::specta]
+pub fn open_file_location(file_path: String) -> CommandResult<()> {
     let Some(parent_dir) = Path::new(&file_path).parent() else {
-        return Err(Error::other("File has no parent directory"));
+        return Err(Error::other("File has no parent directory").into());
     };
-    util::open_directory(parent_dir)
+    Ok(util::open_directory(parent_dir)?)
 }
 
 #[tauri::command]
-pub async fn download_plugin(app_handle: tauri::AppHandle, remote_url: String) -> Result<String> {
+#[specta::specta]
+pub async fn download_plugin(
+    app_handle: tauri::AppHandle,
+    remote_url: String,
+) -> CommandResult<String> {
     let metadata_url = format!("{remote_url}/plugin.json");
 
     let plugin_metadata: PluginMetadata = util::download_json_file(&metadata_url).await?;
 
-    plugin::download_async(app_handle, remote_url, plugin_metadata).await
+    Ok(plugin::download_async(app_handle, remote_url, plugin_metadata).await?)
 }
 
 #[tauri::command]
-pub fn list_installed_plugins(app_handle: tauri::AppHandle) -> Result<Vec<PluginMetadataWithIcon>> {
-    list_downloaded_plugins(&app_handle)
+#[specta::specta]
+pub fn list_installed_plugins(
+    app_handle: tauri::AppHandle,
+) -> CommandResult<Vec<PluginMetadataWithIcon>> {
+    Ok(list_downloaded_plugins(&app_handle)?)
 }
 
 #[tauri::command]
-pub fn load_plugin_code(app_handle: tauri::AppHandle, plugin_id: String) -> Result<String> {
+#[specta::specta]
+pub fn load_plugin_code(app_handle: tauri::AppHandle, plugin_id: String) -> CommandResult<String> {
     let relative_path = &PathBuf::from(plugin_id).join("dist").join("index.js");
-    app_handle.read_file_text(DataDir::Plugins, relative_path)
+    Ok(app_handle.read_file_text(DataDir::Plugins, relative_path)?)
 }
 
 #[tauri::command]
-pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> Result<()> {
+#[specta::specta]
+pub fn delete_plugin(app_handle: tauri::AppHandle, plugin_id: String) -> CommandResult<()> {
     let plugin_dir = app_handle
         .absolute_dir_path(DataDir::Plugins)?
         .join(&plugin_id);
-    util::delete_directory(&plugin_dir)
+    Ok(util::delete_directory(&plugin_dir)?)
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn handle_windows_accelerator(app_handle: tauri::AppHandle, menu_event_id: String) {
     menu::handle_menu_event_id(&app_handle, menu_event_id.as_ref());
 }

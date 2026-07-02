@@ -2,6 +2,7 @@ use std::fmt::Display;
 use std::io::Write;
 use std::str::FromStr;
 
+use crate::commands::CommandResult;
 use crate::data_controller::{DataController, DataDir};
 use crate::{Error, Result};
 use chrono::{DateTime, NaiveDate, Utc};
@@ -52,7 +53,7 @@ where
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum LogLevel {
     #[serde(alias = "trace")]
@@ -108,7 +109,7 @@ impl From<LogLevel> for tracing::Level {
     }
 }
 
-#[derive(Debug, serde::Serialize, Clone)]
+#[derive(Debug, serde::Serialize, Clone, specta::Type)]
 pub struct LogEntry {
     pub timestamp: String,
     pub level: LogLevel,
@@ -198,14 +199,14 @@ fn try_build_datetime_utc(epoch_seconds: i64) -> Result<DateTime<Utc>> {
         )))
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, specta::Type)]
 pub struct LogFilterJs {
     start_epoch_seconds: i64,
     end_epoch_seconds: i64,
     ohpkm_id: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, specta::Type)]
 pub struct LogFilter {
     start: chrono::DateTime<Utc>,
     end: chrono::DateTime<Utc>,
@@ -305,7 +306,7 @@ fn load_logs(data_controller: &impl DataController, filter: &LogFilter) -> Resul
     Ok(logs)
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, specta::Type)]
 pub struct LogsResponse {
     current: LogFilter,
     next: LogFilter,
@@ -363,7 +364,7 @@ impl PopString for Option<serde_json::Value> {
     }
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, specta::Type)]
 pub struct JsLogEntry {
     level: LogLevel,
     message: String,
@@ -424,10 +425,11 @@ where
 }
 
 #[tauri::command]
-pub fn get_logs_today(app: AppHandle, filter: LogFilterJs) -> Result<LogsResponse> {
+#[specta::specta]
+pub fn get_logs_today(app: AppHandle, filter: LogFilterJs) -> CommandResult<LogsResponse> {
     let filter = LogFilter::try_from(filter)?;
 
-    LogsResponse::fetch(&app, filter)
+    Ok(LogsResponse::fetch(&app, filter)?)
 }
 
 fn date_range_inclusive(start: NaiveDate, end: NaiveDate) -> impl Iterator<Item = NaiveDate> {
@@ -436,11 +438,12 @@ fn date_range_inclusive(start: NaiveDate, end: NaiveDate) -> impl Iterator<Item 
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn clear_logs_for_range(
     app: AppHandle,
     start_epoch_seconds: i64,
     end_epoch_seconds: i64,
-) -> Result<()> {
+) -> CommandResult<()> {
     let start = try_build_datetime_utc(start_epoch_seconds)?;
     let start_date = start.date_naive();
 
@@ -454,7 +457,7 @@ pub fn clear_logs_for_range(
         let mut file = match app.open_file_for_writing(DataDir::Logs, &file_path) {
             Ok(file) => file,
             Err(Error::FileMissing { .. }) => continue,
-            Err(err) => return Err(err),
+            Err(err) => return Err(err.into()),
         };
 
         if date == today {
@@ -493,6 +496,7 @@ pub fn clear_logs_for_range(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn log(entry: JsLogEntry) {
     let mut context = entry.context.unwrap_or(serde_json::Value::Null);
 

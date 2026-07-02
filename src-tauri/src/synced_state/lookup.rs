@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
+use crate::commands::{CommandError, CommandResult};
 use crate::data_controller::{DataController, DataDir};
 use crate::error::Result;
 use crate::synced_state;
@@ -11,7 +12,7 @@ type IdentifierLookup = HashMap<String, String>;
 pub const GEN12_FILENAME: &str = "gen12_lookup.json";
 pub const GEN345_FILENAME: &str = "gen345_lookup.json";
 
-#[derive(Default, Debug, Serialize, Deserialize, Clone)]
+#[derive(Default, Debug, Serialize, Deserialize, Clone, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct LookupState {
     gen_12: IdentifierLookup,
@@ -53,44 +54,51 @@ impl synced_state::SyncedState for LookupState {
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn get_lookups(
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
-) -> Result<LookupState> {
-    synced_state.clone_lookups()
+) -> CommandResult<LookupState> {
+    Ok(synced_state.clone_lookups()?)
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn add_to_lookups(
     app_handle: tauri::AppHandle,
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
     new_entries: LookupState,
-) -> Result<()> {
+) -> CommandResult<()> {
     synced_state
         .lock()?
         .lookups
         .update(&app_handle, new_entries)
+        .map_err(CommandError::from)
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn remove_dangling(
     app_handle: tauri::AppHandle,
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
-) -> Result<()> {
+) -> CommandResult<()> {
     // definitely unnecessary clones here
     let mut synced_state = synced_state.lock()?;
     let ohpkm_store = synced_state.ohpkm_store.read().clone();
 
-    synced_state.lookups.replace(&app_handle, |l| {
-        let LookupState { gen_12, gen_345 } = l.clone();
-        LookupState {
-            gen_12: gen_12
-                .into_iter()
-                .filter(|(_, openhome_id)| ohpkm_store.includes(openhome_id))
-                .collect(),
-            gen_345: gen_345
-                .into_iter()
-                .filter(|(_, openhome_id)| ohpkm_store.includes(openhome_id))
-                .collect(),
-        }
-    })
+    synced_state
+        .lookups
+        .replace(&app_handle, |l| {
+            let LookupState { gen_12, gen_345 } = l.clone();
+            LookupState {
+                gen_12: gen_12
+                    .into_iter()
+                    .filter(|(_, openhome_id)| ohpkm_store.includes(openhome_id))
+                    .collect(),
+                gen_345: gen_345
+                    .into_iter()
+                    .filter(|(_, openhome_id)| ohpkm_store.includes(openhome_id))
+                    .collect(),
+            }
+        })
+        .map_err(CommandError::from)
 }

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
+    commands::{CommandError, CommandResult},
     data_controller::{DataController, DataDir},
     error::Result,
 };
@@ -10,7 +11,7 @@ use uuid::Uuid;
 
 use crate::synced_state;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
 struct NamedStrategy {
     name: String,
     strategy: ConvertStrategy,
@@ -18,7 +19,7 @@ struct NamedStrategy {
 
 type StrategiesById = HashMap<Uuid, NamedStrategy>;
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, specta::Type)]
 pub struct ConvertStrategies {
     strategies_by_id: StrategiesById,
     default_strategy_id: Option<Uuid>,
@@ -55,20 +56,25 @@ impl ConvertStrategies {
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn get_convert_strategies(
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
-) -> Result<ConvertStrategies> {
-    synced_state.get_convert_strategies()
+) -> CommandResult<ConvertStrategies> {
+    synced_state
+        .get_convert_strategies()
+        .map_err(CommandError::from)
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn update_convert_strategies(
     app_handle: tauri::AppHandle,
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
     updates: ConvertStrategies,
-) -> Result<()> {
+) -> CommandResult<()> {
     synced_state
         .lock()?
         .convert_strategies
         .update(&app_handle, updates)
+        .map_err(CommandError::from)
 }

@@ -1,7 +1,7 @@
 import useBackend from '@openhome-core/backend/useBackend'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
-import { StringToB64 } from '@openhome-core/tauri/commands'
+import { StringToB64 } from '@openhome-core/tauri/commandsOld'
 import { Option } from '@openhome-core/util/functional'
 import { SyncedStateController, useSyncedState } from '@openhome-ui/state/synced-state'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'

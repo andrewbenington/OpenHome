@@ -298,7 +298,7 @@ impl SignificantUpdate {
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, specta::Type)]
 pub struct UpdateFeatures {
     version: String,
     feature_messages: Vec<&'static str>,
