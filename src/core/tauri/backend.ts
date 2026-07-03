@@ -22,7 +22,7 @@ import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
 import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs, { Dayjs } from 'dayjs'
-import { Commands, LogFilterIpc, StoredBankDataSerialized } from './commandsOld'
+import { Commands, LogFilterIpc, StoredBankDataSerialized } from './commands'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
   const filename = await path.basename(raw)
