@@ -11,10 +11,11 @@ import { SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, SimpleOpenHomeBox, StoredBankData } from '@openhome-core/save/util/storage'
 import { Errorable, R } from '@openhome-core/util/functional'
+import { filterUndefined } from '@openhome-core/util/sort'
 import { JSONObject, LoadSaveResponse, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
 import { defaultSettings, Settings } from '@openhome-ui/state/appInfo'
-import { Pokedex } from '@openhome-ui/util/pokedex'
+import { Pokedex, PokedexEntry } from '@openhome-ui/util/pokedex'
 import { path } from '@tauri-apps/api'
 import { Event, listen, UnlistenFn } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
@@ -40,11 +41,27 @@ async function pathDataFromRaw(raw: string): Promise<PathData> {
   return pathData
 }
 
+function filterUndefinedValues(obj: Partial<Record<string, string>>) {
+  return Object.fromEntries(
+    Object.entries(obj)
+      .map(([key, value]) => (value ? ([key, value] as const) : undefined))
+      .filter(filterUndefined)
+  )
+}
+
+const ZERO_UUID = '00000000-0000-0000-0000-000000000000'
+
 type OnDropEvent = Event<{ position: { x: number; y: number }; paths: string[] }>
 
 export const TauriBackend: BackendInterface = {
   /* past gen identifier lookups */
-  loadLookups: Commands.getLookups,
+  loadLookups: () =>
+    Commands.getLookups().then(
+      R.map((state) => ({
+        gen12: filterUndefinedValues(state.gen12),
+        gen345: filterUndefinedValues(state.gen345),
+      }))
+    ),
   addToLookups: Commands.addToLookups,
 
   /* ohpkm store */
@@ -90,7 +107,12 @@ export const TauriBackend: BackendInterface = {
   saveSyncedState: Commands.saveSyncedState,
 
   /* pokedex */
-  loadPokedex: Commands.getPokedex,
+  loadPokedex: () =>
+    Commands.getPokedex().then(
+      R.map((pokedex) => ({
+        byDexNumber: pokedex.byDexNumber as { [x: number]: PokedexEntry },
+      }))
+    ),
   registerInPokedex: Commands.updatePokedex,
 
   /* openhome boxes */
@@ -128,7 +150,13 @@ export const TauriBackend: BackendInterface = {
   },
 
   /* game save management */
-  getRecentSaves: Commands.validateRecentSaves,
+  getRecentSaves: () =>
+    Commands.validateRecentSaves().then(
+      R.map((entries) => {
+        const saves: Record<string, SaveRef> = Object.fromEntries(entries)
+        return saves
+      })
+    ),
   addRecentSave: (saveRef: SaveRef): Promise<Errorable<null>> =>
     Commands.get_storage_file_json('recent_saves.json').then(
       R.asyncFlatMap((recentSaves) => {
@@ -248,7 +276,13 @@ export const TauriBackend: BackendInterface = {
     ),
   updateSettings: async (settings: Settings) =>
     Commands.write_storage_file_json('settings.json', settings as unknown as JSONObject),
-  getConvertStrategies: Commands.getConvertStrategies,
+  getConvertStrategies: () =>
+    Commands.getConvertStrategies().then(
+      R.map((strategyEntries) => ({
+        strategies_by_id: Object.fromEntries(strategyEntries.ids_and_strategies),
+        default_strategy_id: strategyEntries.default_strategy_id,
+      }))
+    ),
   updateConvertStrategies: Commands.updateConvertStrategies,
   setTheme: Commands.setAppTheme,
   emitMenuEvent: Commands.handleWindowsAccelerator,
@@ -394,16 +428,22 @@ export const TauriBackend: BackendInterface = {
 function deserializeBankData(data: StoredBankDataSerialized): StoredBankData {
   return {
     ...data,
+    current_bank: data.current_bank ?? 0,
     banks: data.banks.map((bank) => ({
       ...bank,
+      id: bank.id ?? ZERO_UUID,
+      current_box: bank.current_box ?? 0,
       boxes: new Map(
         bank.boxes.map((box) => {
           const simpleBox: SimpleOpenHomeBox = {
             ...box,
+            id: box.id ?? ZERO_UUID,
             identifiers: new Map(
-              Object.entries(box.identifiers).map(
-                ([indexStr, identifier]) => [parseInt(indexStr), identifier] as const
-              )
+              Object.entries(box.identifiers)
+                .map(([indexStr, identifier]) =>
+                  identifier ? ([parseInt(indexStr), identifier] as const) : undefined
+                )
+                .filter(filterUndefined)
             ),
           }
           return [box.index, simpleBox] as const

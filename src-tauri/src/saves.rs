@@ -171,7 +171,7 @@ pub struct SaveRef {
     pub last_opened: Option<f64>,
     pub last_modified: Option<f64>,
     pub valid: bool,
-    pub plugin_identifier: Option<String>,
+    pub plugin_identifier: Option<pkm_rs::PluginIdentifier>,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -190,18 +190,19 @@ pub struct StoredSaveRef {
     #[serde(rename = "trainerID")]
     pub trainer_id: Option<String>,
     pub last_opened: Option<f64>,
-    pub plugin_identifier: Option<String>,
+    pub plugin_identifier: Option<pkm_rs::PluginIdentifier>,
 }
+
+type RawSavePath = String;
 
 pub fn get_recent_saves(
     data_controller: &impl DataController,
-) -> core::result::Result<HashMap<String, SaveRef>, String> {
+) -> core::result::Result<Vec<(RawSavePath, SaveRef)>, String> {
     let recent_saves: HashMap<String, StoredSaveRef> = data_controller
         .read_or_create_default_json_file(DataDir::Storage, RECENT_SAVES_FILENAME)
         .map_err(|e| format!("Error getting settings: {}", e))?;
 
-    let mut validated_recents: HashMap<String, SaveRef> = HashMap::new();
-    for (raw, save) in recent_saves {
+    let paths_and_saves = recent_saves.into_iter().map(|(raw, save)| {
         let path = Path::new(&raw);
         let game_u32 = match save.game {
             None => 0,
@@ -210,8 +211,7 @@ pub fn get_recent_saves(
                 StringOrU32::U32(num) => num,
             },
         };
-
-        validated_recents.insert(
+        (
             raw.to_owned(),
             SaveRef {
                 file_path: save.file_path,
@@ -223,10 +223,10 @@ pub fn get_recent_saves(
                 valid: path.exists(),
                 plugin_identifier: save.plugin_identifier,
             },
-        );
-    }
+        )
+    });
 
-    Ok(validated_recents)
+    Ok(paths_and_saves.collect())
 }
 
 fn get_modified_time_ms(path: &Path) -> Option<f64> {

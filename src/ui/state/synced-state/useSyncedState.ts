@@ -12,7 +12,7 @@ export type SyncedStateController<State, Action = State, RustState = State> = {
   identifier: string
   stateGetter: () => Promise<Errorable<State>>
   stateReducer: (prev: Option<State>, action: Action) => State
-  stateUpdater: (updated: State) => Promise<Errorable<null>>
+  stateUpdater: (action: State) => Promise<Errorable<null>>
   onLoaded?: (data: State) => void
 } & StateConverter<State, RustState>
 

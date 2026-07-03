@@ -141,7 +141,6 @@ pub fn settings_schema_js() -> SettingsSchemaWrapper {
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
-#[serde(default)]
 pub struct ConvertStrategy {
     #[serde(rename = "nickname__capitalization")]
     pub nickname_capitalization: NicknameCapitalization,

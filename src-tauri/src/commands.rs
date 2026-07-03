@@ -5,7 +5,6 @@ use crate::state::{AppState, AppStateInner};
 use crate::util::ImageResponse;
 use crate::{menu, saves, util};
 use serde_json::Value;
-use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
@@ -118,7 +117,7 @@ pub fn set_app_theme(
 #[specta::specta]
 pub fn validate_recent_saves(
     app_handle: tauri::AppHandle,
-) -> CommandResult<HashMap<String, saves::SaveRef>> {
+) -> CommandResult<Vec<(String, saves::SaveRef)>> {
     Ok(saves::get_recent_saves(&app_handle)?)
 }
 

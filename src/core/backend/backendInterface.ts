@@ -3,6 +3,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
+import { ConvertStrategyEntries, JsonValue } from '@openhome-core/tauri/spectaCommands'
 import { Errorable } from '@openhome-core/util/functional'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
@@ -11,7 +12,6 @@ import { ConvertStrategies } from '@openhome-ui/state/convert-strategies/Convert
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 import dayjs, { Dayjs } from 'dayjs'
-import { JsonValue } from '../../types/tauri-backend'
 
 export type AppState = {
   is_dev: boolean
@@ -174,7 +174,7 @@ export default interface BackendInterface {
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>
   getConvertStrategies: () => Promise<Errorable<ConvertStrategies>>
-  updateConvertStrategies: (strategies: ConvertStrategies) => Promise<Errorable<null>>
+  updateConvertStrategies: (strategies: ConvertStrategyEntries) => Promise<Errorable<null>>
   setTheme(appTheme: AppTheme): Promise<Errorable<null>>
   saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Errorable<null>>
   emitMenuEvent: (menuEventId: string) => Promise<void>

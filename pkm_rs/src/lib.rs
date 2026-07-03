@@ -16,11 +16,13 @@ pub mod gen8_swsh;
 pub mod location;
 pub mod ohpkm;
 pub mod result;
-// pub mod rom_hacks;
+pub mod rom_hacks;
 pub mod sectioned_data;
 #[cfg(test)]
 pub mod tests;
 pub mod traits;
+
+pub use rom_hacks::PluginIdentifier;
 
 #[cfg(feature = "wasm")]
 pub use strings::Gen3Strings;

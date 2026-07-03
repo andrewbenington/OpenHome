@@ -43,9 +43,7 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async validateRecentSaves(): Promise<
-    Result<Partial<{ [key in string]: SaveRef }>, CommandError>
-  > {
+  async validateRecentSaves(): Promise<Result<[string, SaveRef][], CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('validate_recent_saves') }
     } catch (e) {
@@ -206,7 +204,7 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async getConvertStrategies(): Promise<Result<ConvertStrategies, CommandError>> {
+  async getConvertStrategies(): Promise<Result<ConvertStrategyEntries, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('get_convert_strategies') }
     } catch (e) {
@@ -214,7 +212,9 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async updateConvertStrategies(updates: ConvertStrategies): Promise<Result<null, CommandError>> {
+  async updateConvertStrategies(
+    updates: ConvertStrategyEntries
+  ): Promise<Result<null, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('update_convert_strategies', { updates }) }
     } catch (e) {
@@ -316,10 +316,6 @@ export type Box = {
   identifiers: Partial<{ [key in number]: string }>
 }
 export type CommandError = string
-export type ConvertStrategies = {
-  strategies_by_id: Partial<{ [key in string]: NamedStrategy }>
-  default_strategy_id: string | null
-}
 export type ConvertStrategy = {
   nickname__capitalization: NicknameCapitalization
   metData__originAndLocation: MetDataStrategy
@@ -328,6 +324,10 @@ export type ConvertStrategy = {
   personalityValue__preserveGender: boolean
   personalityValue__preserveNature: NatureStrategy
   personalityValue__preserveUnownForm: boolean
+}
+export type ConvertStrategyEntries = {
+  ids_and_strategies: [string, NamedStrategy][]
+  default_strategy_id: string
 }
 export type ImageResponse = { base64: string; extension: string }
 export type JsonValue =
@@ -360,6 +360,7 @@ export type NamedStrategy = { name: string; strategy: ConvertStrategy }
 export type NatureStrategy = 'KeepOriginalNature' | 'KeepMintNature'
 export type NicknameCapitalization = 'GameDefault' | 'Modern'
 export type PathData = { raw: string; name: string; dir: string; ext: string; separator: string }
+export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum' | 'compass'
 export type PluginMetadataWithIcon = {
   id: string
   name: string
@@ -380,7 +381,7 @@ export type SaveRef = {
   lastOpened: number | null
   lastModified: number | null
   valid: boolean
-  pluginIdentifier: string | null
+  pluginIdentifier: PluginIdentifier | null
 }
 export type StoredBankData = { banks: Bank[]; current_bank?: number }
 export type TransactionState = { open_transaction: boolean; temp_files: string[] }
@@ -388,7 +389,7 @@ export type UpdateFeatures = { version: string; feature_messages: string[] }
 
 /** tauri-specta globals **/
 
-import { invoke as TAURI_INVOKE, Channel as TAURI_CHANNEL } from '@tauri-apps/api/core'
+import { invoke as TAURI_INVOKE } from '@tauri-apps/api/core'
 import * as TAURI_API_EVENT from '@tauri-apps/api/event'
 import { type WebviewWindow as __WebviewWindow__ } from '@tauri-apps/api/webviewWindow'
 

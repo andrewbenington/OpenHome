@@ -65,20 +65,20 @@ export const Commands: OhTauriApiNoThrow = {
 
 export type StoredBankDataSerialized = {
   banks: OpenHomeBankSerialized[]
-  current_bank: number
+  current_bank?: number
 }
 
 type OpenHomeBankSerialized = {
-  id: string
+  id?: string
   index: number
-  name: string | undefined
+  name: string | null
   boxes: OpenHomeBoxSerialized[]
-  current_box: number
+  current_box?: number
 }
 
 type OpenHomeBoxSerialized = {
-  id: string
+  id?: string
   index: number
   name: string | null
-  identifiers: Record<number, string>
+  identifiers: Record<number, string | undefined>
 }

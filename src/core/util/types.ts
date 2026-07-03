@@ -36,7 +36,7 @@ export interface SaveRef extends Partial<JSONObject> {
   pluginIdentifier: PluginIdentifier | null
 }
 
-export type LookupMap = Partial<Record<string, string>>
+export type LookupMap = Record<string, string>
 
 export type LoadSaveResponse = {
   path: PathData

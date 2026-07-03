@@ -6,6 +6,7 @@ import {
   ConvertStrategies,
   ConvertStrategy,
   ExtraFormIndex,
+  getDefaultConvertStrategy,
   HyperTraining,
   Language,
   OriginGame,
@@ -262,9 +263,11 @@ describe('move filter', () => {
 describe('OHPKM conversion strategies', () => {
   test('hyper training conversion strategy', () => {
     const PERFECT_IVS_STRATEGY: ConvertStrategy = {
+      ...getDefaultConvertStrategy(),
       ivs__maxIfHyperTrained: true,
     }
     const IGNORE_HYPER_TRAINING_STRATEGY: ConvertStrategy = {
+      ...getDefaultConvertStrategy(),
       ivs__maxIfHyperTrained: false,
     }
     const ORIGINAL_IVS = { hp: 10, atk: 10, def: 10, spa: 10, spd: 10, spe: 10 }
@@ -307,9 +310,11 @@ describe('OHPKM conversion strategies', () => {
 
   test('nickname capitalization conversion strategy', () => {
     const GAME_DEFAULT_STRATEGY: ConvertStrategy = {
+      ...getDefaultConvertStrategy(),
       nickname__capitalization: 'GameDefault',
     }
     const MODERN_STRATEGY: ConvertStrategy = {
+      ...getDefaultConvertStrategy(),
       nickname__capitalization: 'Modern',
     }
 
@@ -328,9 +333,11 @@ describe('OHPKM conversion strategies', () => {
   })
 
   const LEGALITY_STRATEGY: ConvertStrategy = {
+    ...getDefaultConvertStrategy(),
     metData__originAndLocation: 'MaximizeLegality',
   }
   const LOCATION_MATCH_STRATEGY: ConvertStrategy = {
+    ...getDefaultConvertStrategy(),
     metData__originAndLocation: 'UseLocationNameMatch',
   }
 

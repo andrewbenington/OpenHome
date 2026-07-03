@@ -1,3 +1,4 @@
+import { ConvertStrategyEntries } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { ConvertStrategy } from '@pkm-rs/pkg'
 import { createContext, useContext } from 'react'
@@ -7,7 +8,7 @@ const ZERO_UUID = '00000000-0000-0000-0000-000000000000'
 
 export type ConvertStrategiesController = {
   convertStrategies: ConvertStrategies
-  updateConvertStrategies: (updated: ConvertStrategies) => Promise<Errorable<null>>
+  updateConvertStrategies: (action: ConvertStrategyEntries) => Promise<Errorable<null>>
   defaultConvertStrategy: ConvertStrategy
   updateDefaultConvertStrategy: (updatedStrategy: Partial<ConvertStrategy>) => Promise<void>
 }
@@ -28,10 +29,10 @@ export function useConvertStrategies(): ConvertStrategiesController {
     }
     await updateConvertStrategies({
       ...convertStrategies,
-      strategies_by_id: {
+      ids_and_strategies: Object.entries({
         ...convertStrategies.strategies_by_id,
         [convertStrategies.default_strategy_id]: newDefault,
-      },
+      }).filter(([_, v]) => v !== undefined),
     })
   }
 
@@ -44,7 +45,7 @@ export function useConvertStrategies(): ConvertStrategiesController {
 }
 
 export const ConversionSettingsContext = createContext<
-  [ConvertStrategies, (updated: ConvertStrategies) => Promise<Errorable<null>>]
+  [ConvertStrategies, (action: ConvertStrategyEntries) => Promise<Errorable<null>>]
 >([
   {
     strategies_by_id: {},

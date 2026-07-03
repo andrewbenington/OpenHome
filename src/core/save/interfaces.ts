@@ -1,4 +1,5 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { PluginIdentifier as RustPluginIdentifier } from '@openhome-core/tauri/spectaCommands'
 import { Option, range } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import {
@@ -299,8 +300,7 @@ export function getSaveRef(save: SAV): SaveRef {
     valid: true,
   }
 }
-export type PluginIdentifier = 'radical_red' | 'unbound' | 'luminescent_platinum' | 'compass'
-
+export type PluginIdentifier = RustPluginIdentifier
 export function pluginGameName(identifier: PluginIdentifier, type = 'full'): string {
   switch (identifier) {
     case 'radical_red':
