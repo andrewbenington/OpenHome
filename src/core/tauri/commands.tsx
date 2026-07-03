@@ -1,7 +1,6 @@
 import { LogLevel } from '@openhome-core/backend/backendInterface'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { JSONArray, JSONObject, JSONValue } from '@openhome-core/util/types'
-import { LogFilter } from '@openhome-ui/pages/logs'
 import { invoke, InvokeArgs, InvokeOptions } from '@tauri-apps/api/core'
 import { commands as SpectaCommands } from './spectaCommands'
 
@@ -14,11 +13,6 @@ function invokeAndCatch<C extends OhCommand>(
   options?: InvokeOptions
 ): Promise<Errorable<OhCommandResult<C>>> {
   return R.tryPromise(invoke(cmd, args, options))
-}
-
-export type LogFilterIpc = Omit<LogFilter, 'start' | 'end'> & {
-  start_epoch_seconds: number
-  end_epoch_seconds: number
 }
 
 type OhTauriApi = {
@@ -61,24 +55,4 @@ export const Commands: OhTauriApiNoThrow = {
   log(level: LogLevel, message: string, context?: Record<string, unknown | undefined>) {
     return invokeAndCatch('log', { entry: { level, message, context } })
   },
-}
-
-export type StoredBankDataSerialized = {
-  banks: OpenHomeBankSerialized[]
-  current_bank?: number
-}
-
-type OpenHomeBankSerialized = {
-  id?: string
-  index: number
-  name: string | null
-  boxes: OpenHomeBoxSerialized[]
-  current_box?: number
-}
-
-type OpenHomeBoxSerialized = {
-  id?: string
-  index: number
-  name: string | null
-  identifiers: Record<number, string | undefined>
 }

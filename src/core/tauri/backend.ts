@@ -24,11 +24,13 @@ import { open as fileDialog, save } from '@tauri-apps/plugin-dialog'
 import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs, { Dayjs } from 'dayjs'
-import { Commands, LogFilterIpc, StoredBankDataSerialized } from './commands'
+import { Commands } from './commands'
 import {
   LogEntry as LogEntryRust,
+  LogFilterJs,
   LogFilter as LogFilterRust,
   LogsResponse as LogsResponseRust,
+  StoredBankData as StoredBankDataRust,
 } from './spectaCommands'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
@@ -300,7 +302,7 @@ export const TauriBackend: BackendInterface = {
   deletePlugin: Commands.deletePlugin,
   getLogs: (filter: LogFilter) => {
     const { start, end, ...otherParams } = filter
-    const ipcFilter: LogFilterIpc = {
+    const ipcFilter: LogFilterJs = {
       start_epoch_seconds: start.unix(),
       end_epoch_seconds: end.unix(),
       ...otherParams,
@@ -431,7 +433,7 @@ export const TauriBackend: BackendInterface = {
   },
 }
 
-function deserializeBankData(data: StoredBankDataSerialized): StoredBankData {
+function deserializeBankData(data: StoredBankDataRust): StoredBankData {
   return {
     ...data,
     current_bank: data.current_bank ?? 0,
@@ -459,7 +461,7 @@ function deserializeBankData(data: StoredBankDataSerialized): StoredBankData {
   }
 }
 
-function serializeBankData(data: StoredBankData): StoredBankDataSerialized {
+function serializeBankData(data: StoredBankData): StoredBankDataRust {
   return {
     ...data,
     banks: data.banks.map((bank) => ({
