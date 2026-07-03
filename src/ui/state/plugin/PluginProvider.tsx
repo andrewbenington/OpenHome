@@ -1,5 +1,5 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { partitionResults, R } from '@openhome-core/util/functional'
-import useBackend from '@openhome-ui/backend/useBackend'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { GITHUB_REPO, LOCAL_REPO } from '@openhome-ui/pages/plugins/BrowsePlugins'
 import { CURRENT_PLUGIN_API_VERSION } from '@openhome-ui/pages/plugins/Plugins'

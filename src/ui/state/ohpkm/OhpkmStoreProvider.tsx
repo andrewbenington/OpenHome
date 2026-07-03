@@ -1,11 +1,12 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
-import useBackend from '@openhome-ui/backend/useBackend'
+import { StringToB64 } from '@openhome-core/tauri/commands'
+import { Option } from '@openhome-core/util/functional'
 import { SyncedStateController, useSyncedState } from '@openhome-ui/state/synced-state'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { PropsWithChildren, useCallback } from 'react'
 import { OhpkmStoreContext, OhpkmStoreData } from '.'
-import { StringToB64 } from '../../backend/tauri/commands'
 import SyncedStateProvider from '../synced-state/SyncedStateProvider'
 
 function useOhpkmStoreTauri() {
@@ -33,11 +34,11 @@ function loadOhpkmFromB64(response: StringToB64): OhpkmStoreData {
   )
 }
 
-function stateReducer(prev: OhpkmStoreData, updated: OhpkmStoreData): OhpkmStoreData {
+function stateReducer(prev: Option<OhpkmStoreData>, updated: OhpkmStoreData): OhpkmStoreData {
   return { ...prev, ...updated }
 }
 
-function useSyncedOhpkmState(): SyncedStateController<OhpkmStoreData, StringToB64> {
+function useSyncedOhpkmState(): SyncedStateController<OhpkmStoreData, OhpkmStoreData, StringToB64> {
   const backend = useBackend()
 
   const stateGetter = backend.loadOhpkmStore

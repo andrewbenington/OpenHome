@@ -7,14 +7,20 @@ use tauri::Emitter;
 
 use crate::data_controller;
 use crate::error::{Error, Result};
-use crate::state::{ConvertStrategies, LookupState, OhpkmBytesStore};
+
+pub mod convert_strategies;
+pub mod lookup;
+pub mod ohpkm_store;
+
+use convert_strategies::ConvertStrategies;
+use lookup::LookupState;
+use ohpkm_store::OhpkmBytesStore;
 
 pub trait SyncedState: Clone + Serialize + tauri::ipc::IpcResponse {
+    type Action: Clone + Serialize + tauri::ipc::IpcResponse + serde::de::DeserializeOwned;
     const ID: &'static str;
-    fn union_with(&mut self, other: Self);
-    fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
-        self
-    }
+    fn update(&mut self, action: Self::Action);
+    fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse;
 }
 
 /// SyncedStateWrapper wraps state synced with the React frontend. All mutations
@@ -38,8 +44,8 @@ impl<State: SyncedState> SyncedStateWrapper<State> {
 
     /// Safe to use even if called twice in one hook cycle. Better, debounced frontend code would probably eliminate
     /// that concern.
-    pub fn union_with(&mut self, app_handle: &tauri::AppHandle, new_data: State) -> Result<()> {
-        self.0.union_with(new_data);
+    pub fn update(&mut self, app_handle: &tauri::AppHandle, action: State::Action) -> Result<()> {
+        self.0.update(action);
         self.emit_update(app_handle)
     }
 
@@ -95,6 +101,54 @@ impl AllSyncedState {
         locked.lookups.0.write_to_files(data_controller)?;
         locked.convert_strategies.0.write_to_files(data_controller)
     }
+
+    fn update_from_frontend(
+        &self,
+        state_identifier: &str,
+        action: serde_json::Value,
+    ) -> Result<()> {
+        match state_identifier {
+            ConvertStrategies::ID => {
+                let action: <ConvertStrategies as SyncedState>::Action =
+                    serde_json::from_value(action).map_err(|e| {
+                        Error::unexpeted_condition_with_source(
+                            "update_from_frontend: invalid ConvertStrategies action received"
+                                .to_owned(),
+                            e,
+                        )
+                    })?;
+                self.lock()?.convert_strategies.0.update(action);
+            }
+            LookupState::ID => {
+                let action: <LookupState as SyncedState>::Action = serde_json::from_value(action)
+                    .map_err(|e| {
+                    Error::unexpeted_condition_with_source(
+                        "update_from_frontend: invalid LookupState action received".to_owned(),
+                        e,
+                    )
+                })?;
+                self.lock()?.lookups.0.update(action);
+            }
+            OhpkmBytesStore::ID => {
+                let action: <OhpkmBytesStore as SyncedState>::Action =
+                    serde_json::from_value(action).map_err(|e| {
+                        Error::unexpeted_condition_with_source(
+                            "update_from_frontend: invalid OhpkmBytesStore action received"
+                                .to_owned(),
+                            e,
+                        )
+                    })?;
+                self.lock()?.ohpkm_store.0.update(action);
+            }
+            _ => {
+                return Err(Error::unexpeted_condition(format!(
+                    "update_from_frontend: invalid state identifier received - '{state_identifier}'"
+                )));
+            }
+        }
+
+        Ok(())
+    }
 }
 
 impl Deref for AllSyncedState {
@@ -111,4 +165,13 @@ pub fn save_synced_state(
     synced_state: tauri::State<'_, AllSyncedState>,
 ) -> Result<()> {
     synced_state.save_to_files(&app_handle)
+}
+
+#[tauri::command]
+pub fn update_synced_state(
+    synced_state: tauri::State<'_, AllSyncedState>,
+    state_identifier: &str,
+    action: serde_json::Value,
+) -> Result<()> {
+    synced_state.update_from_frontend(state_identifier, action)
 }

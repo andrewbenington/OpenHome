@@ -10,6 +10,7 @@ mod saves;
 mod startup;
 mod startup_config;
 mod state;
+mod synced_state;
 mod util;
 mod versioning;
 
@@ -17,8 +18,10 @@ use std::env;
 use tauri::Manager;
 
 pub use crate::error::{Error, Result};
-
-use crate::state::synced_state::AllSyncedState;
+use crate::synced_state::AllSyncedState;
+use crate::synced_state::convert_strategies::ConvertStrategies;
+use crate::synced_state::lookup::LookupState;
+use crate::synced_state::ohpkm_store::OhpkmBytesStore;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -61,7 +64,7 @@ pub fn run() {
                 std::process::exit(1);
             };
 
-            let ohpkm_store = match state::OhpkmBytesStore::load_from_mons_v2(app.handle()) {
+            let ohpkm_store = match OhpkmBytesStore::load_from_mons_v2(app.handle()) {
                 Ok(state) => state,
                 Err(err) => {
                     util::show_error_dialog(
@@ -75,7 +78,7 @@ pub fn run() {
                 }
             };
 
-            let lookup_state = match state::LookupState::load_from_storage(app.handle()) {
+            let lookup_state = match LookupState::load_from_storage(app.handle()) {
                 Ok(lookup) => lookup,
                 Err(err) => {
                     util::show_error_dialog(
@@ -89,20 +92,19 @@ pub fn run() {
                 }
             };
 
-            let conversion_settings =
-                match state::ConvertStrategies::load_from_storage(app.handle()) {
-                    Ok(settings) => settings,
-                    Err(err) => {
-                        util::show_error_dialog(
-                            app,
-                            err.to_string(),
-                            "OpenHome Failed to Launch - Cannot Open Conversion Settings",
-                        );
+            let conversion_settings = match ConvertStrategies::load_from_storage(app.handle()) {
+                Ok(settings) => settings,
+                Err(err) => {
+                    util::show_error_dialog(
+                        app,
+                        err.to_string(),
+                        "OpenHome Failed to Launch - Cannot Open Conversion Settings",
+                    );
 
-                        app.handle().exit(1);
-                        std::process::exit(1);
-                    }
-                };
+                    app.handle().exit(1);
+                    std::process::exit(1);
+                }
+            };
 
             let synced_state =
                 AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
@@ -162,25 +164,28 @@ pub fn run() {
             saves::find_suggested_saves,
             startup_config::get_data_dir_path,
             startup_config::change_data_dir,
-            pkm_storage::load_banks,
-            pkm_storage::write_banks,
-            state::get_lookups,
-            state::add_to_lookups,
-            state::get_ohpkm_store,
-            state::permanently_delete_ohpkms,
-            state::remove_dangling,
-            state::add_to_ohpkm_store,
-            state::get_pokedex,
-            state::update_pokedex,
-            state::get_convert_strategies,
-            state::update_convert_strategies,
-            state::start_transaction,
-            state::rollback_transaction,
-            state::commit_transaction,
-            state::synced_state::save_synced_state,
             logging::get_logs_today,
             logging::log,
             logging::clear_logs_for_range,
+            pkm_storage::load_banks,
+            pkm_storage::write_banks,
+            startup_config::get_data_dir_path,
+            startup_config::change_data_dir,
+            state::get_pokedex,
+            state::update_pokedex,
+            state::start_transaction,
+            state::rollback_transaction,
+            state::commit_transaction,
+            synced_state::save_synced_state,
+            synced_state::update_synced_state,
+            synced_state::convert_strategies::get_convert_strategies,
+            synced_state::convert_strategies::update_convert_strategies,
+            synced_state::lookup::get_lookups,
+            synced_state::lookup::add_to_lookups,
+            synced_state::lookup::remove_dangling,
+            synced_state::ohpkm_store::get_ohpkm_store,
+            synced_state::ohpkm_store::permanently_delete_ohpkms,
+            synced_state::ohpkm_store::add_to_ohpkm_store,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

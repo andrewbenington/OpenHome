@@ -5,18 +5,22 @@ import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
 import { Errorable } from '@openhome-core/util/functional'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
+import { LogFilter } from '@openhome-ui/pages/logs'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
+import { ConvertStrategies } from '@openhome-ui/state/convert-strategies/ConvertStrategiesProvider'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 import dayjs, { Dayjs } from 'dayjs'
-import { LogFilter } from '../pages/logs'
-import { ConvertStrategies } from '../state/convert-strategies/ConvertStrategiesProvider'
 
 export type AppState = {
-  open_transaction: boolean
-  temp_files: string[]
   is_dev: boolean
   new_features_since_update: UpdateFeatures[]
+  transaction: TransactionState
+}
+
+type TransactionState = {
+  open_transaction: boolean
+  temp_files: string[]
 }
 
 type UpdateFeatures = {

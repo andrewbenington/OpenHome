@@ -38,10 +38,9 @@ impl Deref for AppState {
 
 #[derive(Default, Serialize, Clone)]
 pub struct AppStateInner {
-    open_transaction: bool,
-    temp_files: Vec<PathBuf>,
     is_dev: bool,
     new_features_since_update: Vec<UpdateFeatures>,
+    transaction: TransactionState,
 }
 
 impl AppStateInner {
@@ -53,6 +52,18 @@ impl AppStateInner {
         }
     }
 
+    pub fn transaction_mut(&mut self) -> &mut TransactionState {
+        &mut self.transaction
+    }
+}
+
+#[derive(Default, Serialize, Clone)]
+pub struct TransactionState {
+    open_transaction: bool,
+    temp_files: Vec<PathBuf>,
+}
+
+impl TransactionState {
     pub fn start_transaction(&mut self) -> Result<()> {
         if self.open_transaction {
             Err(Error::TransactionOpen)
@@ -112,12 +123,12 @@ impl AppStateInner {
 
 #[tauri::command]
 pub fn start_transaction(state: tauri::State<'_, AppState>) -> Result<()> {
-    state.lock()?.start_transaction()
+    state.lock()?.transaction.start_transaction()
 }
 
 #[tauri::command]
 pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> Result<()> {
-    state.lock()?.rollback_transaction()
+    state.lock()?.transaction.rollback_transaction()
 }
 
 #[tauri::command]
@@ -126,6 +137,6 @@ pub fn commit_transaction(
     app_state: tauri::State<'_, AppState>,
     pokedex_state: tauri::State<'_, PokedexState>,
 ) -> Result<()> {
-    app_state.lock()?.commit_transaction()?;
+    app_state.lock()?.transaction.commit_transaction()?;
     pokedex_state.lock()?.write_to_storage(&app_handle)
 }

@@ -7,9 +7,11 @@ export default function UpdateMessageModal() {
   const [acknowledged, setAcknowledged] = useState(false)
   const appState = useTransactionState()
 
+  const newFeatures = appState.new_features_since_update
+
   return (
     <Dialog.Container
-      open={!acknowledged && appState.new_features_since_update.length > 0}
+      open={!acknowledged && newFeatures.length > 0}
       onOpenChange={(open) => {
         if (!open) setAcknowledged(true)
       }}
@@ -17,7 +19,7 @@ export default function UpdateMessageModal() {
     >
       <Dialog.Title>OpenHome has been updated!</Dialog.Title>
       <ScrollArea>
-        {appState.new_features_since_update.toReversed().map(({ version, feature_messages }) => (
+        {newFeatures.toReversed().map(({ version, feature_messages }) => (
           <div key={version} style={{ marginTop: 8 }}>
             <Heading size="3">New in {version}:</Heading>
             <ul style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

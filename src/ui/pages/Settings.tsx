@@ -1,6 +1,6 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { R } from '@openhome-core/util/functional'
 import { stringSorter } from '@openhome-core/util/sort'
-import useBackend from '@openhome-ui/backend/useBackend'
 import ContentCard from '@openhome-ui/components/ContentCard'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import { AppInfoContext, AppTheme } from '@openhome-ui/state/appInfo'
