@@ -5,6 +5,7 @@ import prettierRecommended from 'eslint-plugin-prettier/recommended'
 import reactEslint from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import unusedImports from 'eslint-plugin-unused-imports'
 
 export default [
   prettierRecommended,
@@ -13,6 +14,7 @@ export default [
       '@stylistic': stylistic,
       '@stylistic/ts': stylistic,
       '@typescript-eslint': typescriptEslint,
+      'unused-imports': unusedImports,
       'react-refresh': reactRefresh,
       'react-hooks': reactHooks,
       react: reactEslint,
@@ -24,13 +26,12 @@ export default [
     rules: {
       'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
       '@typescript-eslint/no-non-null-assertion': 'error',
-      '@typescript-eslint/no-unused-vars': [
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'unused-imports/no-unused-imports': 'warn',
+      'unused-imports/no-unused-vars': [
         'warn',
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-          caughtErrorsIgnorePattern: '^_',
-        },
+        { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
       ],
       'no-console': ['warn', { allow: ['debug', 'info', 'warn', 'error', 'assert'] }],
       eqeqeq: 'error',

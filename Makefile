@@ -39,7 +39,7 @@ check: wasm-compile
 .PHONY: test
 test: ensure-dependencies
 	@pnpm run test
-	@pnpm run format
+	@npx eslint --fix ./src/core/tauri/spectaCommands.ts
 
 .PHONY: check-rs
 check-rs:
@@ -124,7 +124,7 @@ gen-wasm:
 .PHONY: gen-tauri-commands
 gen-tauri-commands:
 	@cargo test --package OpenHome --lib -- tests::export_typescript_bindings --exact --nocapture --include-ignored
-	@pnpm format
+	@npx eslint --fix ./src/core/tauri/spectaCommands.ts
 
 .PHONY: pkhex-json
 pkhex-json:

@@ -389,7 +389,7 @@ export type UpdateFeatures = { version: string; feature_messages: string[] }
 
 /** tauri-specta globals **/
 
-import { invoke as TAURI_INVOKE, Channel as TAURI_CHANNEL } from '@tauri-apps/api/core'
+import { invoke as TAURI_INVOKE } from '@tauri-apps/api/core'
 import * as TAURI_API_EVENT from '@tauri-apps/api/event'
 import { type WebviewWindow as __WebviewWindow__ } from '@tauri-apps/api/webviewWindow'
 
