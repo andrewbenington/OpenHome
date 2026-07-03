@@ -1,6 +1,7 @@
 mod checksum;
 #[cfg(feature = "wasm")]
 mod encryption;
+mod rom_hacks;
 mod strings;
 mod util;
 
@@ -16,7 +17,6 @@ pub mod gen8_swsh;
 pub mod location;
 pub mod ohpkm;
 pub mod result;
-pub mod rom_hacks;
 pub mod sectioned_data;
 #[cfg(test)]
 pub mod tests;
