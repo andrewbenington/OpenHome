@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Mutex;
 
@@ -85,8 +84,8 @@ impl AllSyncedState {
         Ok(self.lock()?.lookups.0.clone())
     }
 
-    pub fn ohpkm_store_b64(&self) -> Result<HashMap<String, String>> {
-        Ok(self.lock()?.ohpkm_store.0.to_b64_map())
+    pub fn ohpkm_store_b64(&self) -> Result<Vec<(String, String)>> {
+        Ok(self.lock()?.ohpkm_store.0.to_b64_entries())
     }
 
     pub fn get_convert_strategies(&self) -> Result<ConvertStrategies> {

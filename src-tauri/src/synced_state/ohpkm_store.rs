@@ -105,6 +105,14 @@ impl OhpkmBytesStore {
         output
     }
 
+    pub fn to_b64_entries(&self) -> Vec<(String, String)> {
+        self.0
+            .clone()
+            .into_iter()
+            .map(|(k, v)| (k, BASE64_STANDARD.encode(v)))
+            .collect()
+    }
+
     pub fn includes(&self, identifier: &str) -> bool {
         self.0.contains_key(identifier)
     }
@@ -133,7 +141,7 @@ impl synced_state::SyncedState for OhpkmBytesStore {
 #[specta::specta]
 pub fn get_ohpkm_store(
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
-) -> CommandResult<HashMap<String, String>> {
+) -> CommandResult<Vec<(String, String)>> {
     Ok(synced_state.ohpkm_store_b64()?)
 }
 

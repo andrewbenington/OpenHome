@@ -23,7 +23,6 @@ import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs, { Dayjs } from 'dayjs'
 import { Commands, LogFilterIpc, StoredBankDataSerialized } from './commandsOld'
-import { isRustErr } from './types'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
   const filename = await path.basename(raw)
@@ -45,15 +44,15 @@ type OnDropEvent = Event<{ position: { x: number; y: number }; paths: string[] }
 
 export const TauriBackend: BackendInterface = {
   /* past gen identifier lookups */
-  loadLookups: Commands.get_lookups,
-  addToLookups: Commands.add_to_lookups,
+  loadLookups: Commands.getLookups,
+  addToLookups: Commands.addToLookups,
 
   /* ohpkm store */
   loadOhpkmStore: async function (): Promise<Errorable<OhpkmStore>> {
-    return Commands.get_ohpkm_store().then(
+    return Commands.getOhpkmStore().then(
       R.map((b64ByIdentifier) =>
         Object.fromEntries(
-          Object.entries(b64ByIdentifier).map(([identifier, b64String]) => [
+          b64ByIdentifier.map(([identifier, b64String]) => [
             identifier,
             OHPKM.fromBytes(Uint8Array.fromBase64(b64String).buffer),
           ])
@@ -61,7 +60,7 @@ export const TauriBackend: BackendInterface = {
       )
     )
   },
-  removeDangling: Commands.remove_dangling,
+  removeDangling: Commands.removeDangling,
   addToOhpkmStore: function (updates: OhpkmStore): Promise<Errorable<null>> {
     return Commands.add_to_ohpkm_store(
       Object.fromEntries(
@@ -70,11 +69,11 @@ export const TauriBackend: BackendInterface = {
     )
   },
   deleteHomeMons: async function (identifiers: string[]): Promise<Errorable<null>> {
-    return Commands.permanently_delete_ohpkms(identifiers).then(
+    return Commands.permanentlyDeleteOhpkms(identifiers).then(
       R.map((deletionResults) => {
-        for (const [file, result] of Object.entries(deletionResults)) {
-          if (isRustErr(result)) {
-            console.error(`Could not delete ${file}: ${result.Err}`)
+        for (const [file, error] of Object.entries(deletionResults)) {
+          if (error) {
+            console.error(`Could not delete ${file}: ${error}`)
           }
         }
         return null
@@ -83,20 +82,20 @@ export const TauriBackend: BackendInterface = {
   },
 
   /* prompt user to select new data directory location */
-  promptChangeDataDir: Commands.change_data_dir,
+  promptChangeDataDir: Commands.changeDataDir,
   /* get the current data directory path */
-  getDataDirPath: Commands.get_data_dir_path,
+  getDataDirPath: Commands.getDataDirPath,
 
   /* write synced state to disk during save */
-  saveSyncedState: Commands.save_synced_state,
+  saveSyncedState: Commands.saveSyncedState,
 
   /* pokedex */
-  loadPokedex: Commands.get_pokedex,
-  registerInPokedex: Commands.update_pokedex,
+  loadPokedex: Commands.getPokedex,
+  registerInPokedex: Commands.updatePokedex,
 
   /* openhome boxes */
-  loadHomeBanks: () => Commands.load_banks().then(R.map(deserializeBankData)),
-  writeHomeBanks: (bankData: StoredBankData) => Commands.write_banks(serializeBankData(bankData)),
+  loadHomeBanks: () => Commands.loadBanks().then(R.map(deserializeBankData)),
+  writeHomeBanks: (bankData: StoredBankData) => Commands.writeBanks(serializeBankData(bankData)),
 
   /* game saves */
   loadSaveFile: async (pathData: PathData): Promise<Errorable<LoadSaveResponse>> => {
@@ -104,31 +103,32 @@ export const TauriBackend: BackendInterface = {
     if (R.isErr(bytesResult)) {
       return bytesResult
     }
-    const timestampResult = await Commands.get_file_created(pathData.raw)
+    const timestampResult = await Commands.getFileCreated(pathData.raw)
     if (R.isErr(timestampResult)) {
       return timestampResult
     }
     return R.Ok({
       path: pathData,
       fileBytes: new Uint8Array(bytesResult.data),
-      createdDate: new Date(timestampResult.data),
+      createdDate: timestampResult.data ? new Date(timestampResult.data) : undefined,
     })
   },
-  writeSaveFile: Commands.write_file_bytes,
+  writeSaveFile: async (path: string, bytes: Uint8Array) =>
+    Commands.writeFileBytes(path, Array.from(bytes)),
   writeAllSaveFiles: async (saveWriters: SaveWriter[]) =>
     Promise.all(
       saveWriters.map((saveWriter) =>
-        Commands.write_file_bytes(saveWriter.filepath, saveWriter.bytes)
+        Commands.writeFileBytes(saveWriter.filepath, Array.from(saveWriter.bytes))
       )
     ),
   saveLocalFile: async (bytes: Uint8Array, suggestedName: string) => {
     const defaultPath = await path.join(await path.downloadDir(), suggestedName)
     const filePath = await save({ defaultPath })
-    return filePath ? Commands.write_file_bytes(filePath, bytes) : R.Ok(null)
+    return filePath ? Commands.writeFileBytes(filePath, Array.from(bytes)) : R.Ok(null)
   },
 
   /* game save management */
-  getRecentSaves: Commands.validate_recent_saves,
+  getRecentSaves: Commands.validateRecentSaves,
   addRecentSave: (saveRef: SaveRef): Promise<Errorable<null>> =>
     Commands.get_storage_file_json('recent_saves.json').then(
       R.asyncFlatMap((recentSaves) => {
@@ -163,7 +163,7 @@ export const TauriBackend: BackendInterface = {
             R.Err('save-folders.json is malformed (expecting object, received array)')
           )
         }
-        return Commands.find_suggested_saves(
+        return Commands.findSuggestedSaves(
           (saveFolders as unknown as SaveFolder[]).map((folder) => folder.path)
         )
       })
@@ -218,9 +218,9 @@ export const TauriBackend: BackendInterface = {
   saveItemBag: async (items: Record<string, number>) =>
     Commands.write_storage_file_json('item-bag.json', items),
   /* transactions */
-  startTransaction: Commands.start_transaction,
-  commitTransaction: Commands.commit_transaction,
-  rollbackTransaction: Commands.rollback_transaction,
+  startTransaction: Commands.startTransaction,
+  commitTransaction: Commands.commitTransaction,
+  rollbackTransaction: Commands.rollbackTransaction,
 
   /* application */
   pickFile: async (): Promise<Errorable<PathData | undefined>> => {
@@ -234,11 +234,11 @@ export const TauriBackend: BackendInterface = {
   },
   getResourcesPath: path.resourceDir,
   getPluginPath: async (pluginId: string) =>
-    Commands.get_data_dir_path().then(R.map((dataDirPath) => `${dataDirPath}/plugins/${pluginId}`)),
-  openDirectory: Commands.open_directory,
-  openFileLocation: Commands.open_file_location,
+    Commands.getDataDirPath().then(R.map((dataDirPath) => `${dataDirPath}/plugins/${pluginId}`)),
+  openDirectory: Commands.openDirectory,
+  openFileLocation: Commands.openFileLocation,
   getPlatform: platform,
-  getState: Commands.get_state,
+  getState: Commands.getState,
   getSettings: async () =>
     Commands.get_storage_file_json('settings.json').then(
       R.map((partialSettings) => ({
@@ -248,16 +248,16 @@ export const TauriBackend: BackendInterface = {
     ),
   updateSettings: async (settings: Settings) =>
     Commands.write_storage_file_json('settings.json', settings as unknown as JSONObject),
-  getConvertStrategies: Commands.get_convert_strategies,
-  updateConvertStrategies: Commands.update_convert_strategies,
-  setTheme: Commands.set_app_theme,
-  emitMenuEvent: Commands.handle_windows_accelerator,
+  getConvertStrategies: Commands.getConvertStrategies,
+  updateConvertStrategies: Commands.updateConvertStrategies,
+  setTheme: Commands.setAppTheme,
+  emitMenuEvent: Commands.handleWindowsAccelerator,
 
-  getImageData: Commands.get_image_data,
-  listInstalledPlugins: Commands.list_installed_plugins,
-  downloadPlugin: Commands.download_plugin,
-  loadPluginCode: Commands.load_plugin_code,
-  deletePlugin: Commands.delete_plugin,
+  getImageData: Commands.getImageData,
+  listInstalledPlugins: Commands.listInstalledPlugins,
+  downloadPlugin: Commands.downloadPlugin,
+  loadPluginCode: Commands.loadPluginCode,
+  deletePlugin: Commands.deletePlugin,
   getLogs: (filter: LogFilter) => {
     const { start, end, ...otherParams } = filter
     const ipcFilter: LogFilterIpc = {
@@ -265,11 +265,11 @@ export const TauriBackend: BackendInterface = {
       end_epoch_seconds: end.unix(),
       ...otherParams,
     }
-    return Commands.get_logs_today(ipcFilter).then(R.map(parseLogs))
+    return Commands.getLogsToday(ipcFilter).then(R.map(parseLogs))
   },
   log: Commands.log,
   clearLogsForRange: (start: Dayjs, end: Dayjs) => {
-    return Commands.clear_logs_for_range(start.unix(), end.unix())
+    return Commands.clearLogsForRange(start.unix(), end.unix())
   },
 
   registerListeners: (listeners) => {

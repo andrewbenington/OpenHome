@@ -1,22 +1,9 @@
-import {
-  AppState,
-  ImageResponse,
-  LogLevel,
-  LogsResponseUnparsed,
-  StoredLookups,
-} from '@openhome-core/backend/backendInterface'
-import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
-import { PossibleSaves } from '@openhome-core/save/util/path'
+import { LogLevel } from '@openhome-core/backend/backendInterface'
 import { Errorable, R } from '@openhome-core/util/functional'
-import { JSONArray, JSONObject, JSONValue, SaveRef } from '@openhome-core/util/types'
+import { JSONArray, JSONObject, JSONValue } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
-import { AppTheme } from '@openhome-ui/state/appInfo'
-import { ConvertStrategies } from '@openhome-ui/state/convert-strategies/ConvertStrategiesProvider'
-import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
-import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
-import { getDefaultConvertStrategy } from '@pkm-rs/pkg'
 import { invoke, InvokeArgs, InvokeOptions } from '@tauri-apps/api/core'
-import { RustResult } from './types'
+import { commands as SpectaCommands } from './spectaCommands'
 
 type StringToBytes = Record<string, Uint8Array>
 export type StringToB64 = Record<string, string>
@@ -29,63 +16,17 @@ function invokeAndCatch<C extends OhCommand>(
   return R.tryPromise(invoke(cmd, args, options))
 }
 
-const ZERO_UUID = '00000000-0000-0000-0000-000000000000'
-
-type RustUnitResultByString = Record<string, RustResult<null, string>>
-
 export type LogFilterIpc = Omit<LogFilter, 'start' | 'end'> & {
   start_epoch_seconds: number
   end_epoch_seconds: number
 }
 
 type OhTauriApi = {
-  get_state(): AppState
-  save_synced_state(): void
   get_file_bytes(absolutePath: string): number[]
-  get_file_created(absolutePath: string): number
   write_storage_file_json(relativePath: string, value: JSONValue): null
   get_storage_file_json(relativePath: string): JSONObject | JSONArray
-  find_suggested_saves(saveFolders: string[]): PossibleSaves
-  write_file_bytes(absolutePath: string, bytes: Uint8Array): null
-  set_app_theme(appTheme: AppTheme): null
-  validate_recent_saves(): Record<string, SaveRef>
-  get_image_data(absolutePath: string): ImageResponse
-  open_directory(absolutePath: string): null
-  open_file_location(filePath: string): null
-  download_plugin(remoteUrl: string): string
-  list_installed_plugins(): PluginMetadataWithIcon[]
-  load_plugin_code(pluginId: string): string
-  delete_plugin(pluginId: string): string
-  handle_windows_accelerator(menuEventId: string): null
-
-  permanently_delete_ohpkms(identifiers: OhpkmIdentifier[]): RustUnitResultByString
-
-  change_data_dir(): null
-  get_data_dir_path(): string
-
-  load_banks(): StoredBankDataSerialized
-  write_banks(bankData: StoredBankDataSerialized): null
-
-  get_lookups(): StoredLookups
-  add_to_lookups(newEntries: StoredLookups): null
-  remove_dangling(): null
-
-  get_ohpkm_store(): StringToB64
   add_to_ohpkm_store(updates: StringToBytes): null
-
-  get_pokedex(): Pokedex
-  update_pokedex(updates: PokedexUpdate[]): null
-
-  get_convert_strategies(): ConvertStrategies
-  update_convert_strategies(updates: ConvertStrategies): null
-
-  start_transaction(): null
-  rollback_transaction(): null
-  commit_transaction(): null
-
-  get_logs_today(filter: LogFilterIpc): LogsResponseUnparsed
   log(level: LogLevel, message: string, fields?: Record<string, unknown>): void
-  clear_logs_for_range(startEpochSeconds: number, endEpochSeconds: number): null
 }
 
 type OhCommand = keyof OhTauriApi
@@ -96,76 +37,17 @@ type OhCommandResult<C extends OhCommand> = ReturnType<OhTauriApi[C]>
 
 type OhTauriApiNoThrow = {
   [C in OhCommand]: (...args: OhCommandArgs<C>) => Promise<Errorable<OhCommandResult<C>>>
-}
+} & typeof SpectaCommands
 
 export const Commands: OhTauriApiNoThrow = {
-  get_state() {
-    return invokeAndCatch('get_state')
-  },
-
-  save_synced_state() {
-    return invokeAndCatch('save_synced_state')
-  },
+  ...SpectaCommands,
 
   get_file_bytes(absolutePath: string) {
     return invokeAndCatch('get_file_bytes', { absolutePath })
   },
 
-  get_file_created(absolutePath: string) {
-    return invokeAndCatch('get_file_created', { absolutePath })
-  },
-
-  get_lookups() {
-    return invokeAndCatch('get_lookups')
-  },
-
-  add_to_lookups(newEntries: StoredLookups) {
-    return invokeAndCatch('add_to_lookups', { newEntries })
-  },
-
-  remove_dangling() {
-    return invokeAndCatch('remove_dangling')
-  },
-
-  get_ohpkm_store() {
-    return invokeAndCatch('get_ohpkm_store')
-  },
-
-  permanently_delete_ohpkms(identifiers: OhpkmIdentifier[]) {
-    return invokeAndCatch('permanently_delete_ohpkms', { openhomeIds: identifiers })
-  },
-
   add_to_ohpkm_store(updates: StringToBytes): Promise<Errorable<null>> {
     return invokeAndCatch('add_to_ohpkm_store', { updates })
-  },
-
-  get_pokedex() {
-    return invokeAndCatch('get_pokedex')
-  },
-
-  update_pokedex(updates: PokedexUpdate[]) {
-    return invokeAndCatch('update_pokedex', { updates })
-  },
-
-  get_convert_strategies() {
-    return invokeAndCatch('get_convert_strategies').then(
-      R.map((strategies) => {
-        return ZERO_UUID in strategies.strategies_by_id
-          ? strategies
-          : {
-              ...strategies,
-              strategies_by_id: {
-                ...strategies.strategies_by_id,
-                [ZERO_UUID]: { name: 'Default', strategy: getDefaultConvertStrategy() },
-              },
-              default_strategy_id: ZERO_UUID,
-            }
-      })
-    )
-  },
-
-  update_convert_strategies(updates: ConvertStrategies) {
-    return invokeAndCatch('update_convert_strategies', { updates })
   },
 
   get_storage_file_json(relativePath: string) {
@@ -176,92 +58,8 @@ export const Commands: OhTauriApiNoThrow = {
     return invokeAndCatch('write_storage_file_json', { relativePath, data })
   },
 
-  change_data_dir() {
-    return invokeAndCatch('change_data_dir')
-  },
-
-  get_data_dir_path() {
-    return invokeAndCatch('get_data_dir_path')
-  },
-
-  load_banks() {
-    return invokeAndCatch('load_banks')
-  },
-
-  write_banks(bankData: StoredBankDataSerialized) {
-    return invokeAndCatch('write_banks', { bankData })
-  },
-
-  write_file_bytes(absolutePath: string, bytes: Uint8Array) {
-    return invokeAndCatch('write_file_bytes', { absolutePath, bytes })
-  },
-
-  start_transaction() {
-    return invokeAndCatch('start_transaction')
-  },
-
-  rollback_transaction() {
-    return invokeAndCatch('rollback_transaction')
-  },
-
-  commit_transaction() {
-    return invokeAndCatch('commit_transaction')
-  },
-
-  find_suggested_saves(saveFolders: string[]) {
-    return invokeAndCatch('find_suggested_saves', { saveFolders })
-  },
-
-  set_app_theme(appTheme: AppTheme) {
-    return invokeAndCatch('set_app_theme', { appTheme })
-  },
-
-  validate_recent_saves() {
-    return invokeAndCatch('validate_recent_saves')
-  },
-
-  get_image_data(absolutePath: string) {
-    return invokeAndCatch('get_image_data', { absolutePath })
-  },
-
-  download_plugin(remoteUrl: string) {
-    return invokeAndCatch('download_plugin', { remoteUrl })
-  },
-
-  list_installed_plugins() {
-    return invokeAndCatch('list_installed_plugins')
-  },
-
-  load_plugin_code(pluginId: string) {
-    return invokeAndCatch('load_plugin_code', { pluginId })
-  },
-
-  delete_plugin(pluginId: string) {
-    return invokeAndCatch('delete_plugin', { pluginId })
-  },
-
-  handle_windows_accelerator(menuEventId: string) {
-    return invokeAndCatch('handle_windows_accelerator', { menuEventId })
-  },
-
-  open_directory(absolutePath: string) {
-    return invokeAndCatch('open_directory', { absolutePath })
-  },
-
-  open_file_location(filePath: string) {
-    return invokeAndCatch('open_file_location', { filePath })
-  },
-
-  get_logs_today(filter: LogFilterIpc) {
-    return invokeAndCatch('get_logs_today', { filter })
-  },
-
   log(level: LogLevel, message: string, context?: Record<string, unknown | undefined>) {
     return invokeAndCatch('log', { entry: { level, message, context } })
-  },
-
-  clear_logs_for_range(startEpochSeconds: number, endEpochSeconds: number) {
-    return invokeAndCatch('clear_logs_for_range', { startEpochSeconds, endEpochSeconds })
   },
 }
 

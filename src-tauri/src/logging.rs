@@ -113,6 +113,7 @@ impl From<LogLevel> for tracing::Level {
 pub struct LogEntry {
     pub timestamp: String,
     pub level: LogLevel,
+    #[specta(optional)]
     pub target: Option<String>,
     pub message: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -203,6 +204,8 @@ fn try_build_datetime_utc(epoch_seconds: i64) -> Result<DateTime<Utc>> {
 pub struct LogFilterJs {
     start_epoch_seconds: i64,
     end_epoch_seconds: i64,
+
+    #[specta(optional)]
     ohpkm_id: Option<String>,
 }
 
@@ -210,6 +213,8 @@ pub struct LogFilterJs {
 pub struct LogFilter {
     start: chrono::DateTime<Utc>,
     end: chrono::DateTime<Utc>,
+
+    #[specta(optional)]
     ohpkm_id: Option<String>,
 }
 
@@ -369,6 +374,7 @@ pub struct JsLogEntry {
     level: LogLevel,
     message: String,
     // any extra fields the frontend wants to attach
+    #[specta(optional)]
     context: Option<serde_json::Value>,
 }
 

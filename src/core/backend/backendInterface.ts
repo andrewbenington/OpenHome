@@ -11,6 +11,7 @@ import { ConvertStrategies } from '@openhome-ui/state/convert-strategies/Convert
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
 import dayjs, { Dayjs } from 'dayjs'
+import { JsonValue } from '../../types/tauri-backend'
 
 export type AppState = {
   is_dev: boolean
@@ -36,12 +37,12 @@ export type ImageResponse = {
 type LogEntryUnparsed = {
   timestamp: string
   level: string
-  target?: string
+  target?: string | null
   message: string
-  event?: string
-  fields?: Record<string, unknown>
-  context?: Record<string, unknown>
-  ohpkm_id?: OhpkmIdentifier
+  event?: string | null
+  fields?: JsonValue
+  context?: JsonValue
+  ohpkm_id?: OhpkmIdentifier | null
 }
 
 export type LogEntry = {
@@ -58,13 +59,19 @@ export type LogEntry = {
 type LogFilterUnparsed = {
   start: string
   end: string
-  ohpkm_id?: string
+  ohpkm_id?: string | null
 }
 
 function parseLog(unparsed: LogEntryUnparsed): LogEntry {
   return {
-    ...unparsed,
     timestamp: dayjs(unparsed.timestamp),
+    level: unparsed.level,
+    target: unparsed.target ?? undefined,
+    message: unparsed.message,
+    event: unparsed.event ?? undefined,
+    fields: typeof unparsed.fields === 'object' ? (unparsed ?? undefined) : undefined,
+    context: typeof unparsed.context === 'object' ? (unparsed ?? undefined) : undefined,
+    ohpkm_id: unparsed.ohpkm_id ?? undefined,
   }
 }
 
@@ -91,11 +98,12 @@ export function parseLogs(unparsed: LogsResponseUnparsed): LogsResponse {
 
 function parseFilter(unparsed: LogFilterUnparsed): LogFilter {
   return {
-    ...unparsed,
     start: dayjs(unparsed.start),
     end: dayjs(unparsed.end),
+    ohpkm_id: unparsed.ohpkm_id ?? undefined,
   }
 }
+
 export type LogLevel = 'ERROR' | 'WARN' | 'INFO' | 'DEBUG' | 'TRACE'
 
 export type StoredLookups = { gen12: LookupMap; gen345: LookupMap }
@@ -169,7 +177,7 @@ export default interface BackendInterface {
   updateConvertStrategies: (strategies: ConvertStrategies) => Promise<Errorable<null>>
   setTheme(appTheme: AppTheme): Promise<Errorable<null>>
   saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Errorable<null>>
-  emitMenuEvent: (menuEventId: string) => Promise<Errorable<null>>
+  emitMenuEvent: (menuEventId: string) => Promise<void>
 
   /* logging */
   getLogs(filter: LogFilter): Promise<Errorable<LogsResponse>>
@@ -183,7 +191,7 @@ export default interface BackendInterface {
   getPluginPath: (pluginId: string) => Promise<Errorable<string>>
   downloadPlugin(remoteUrl: string): Promise<Errorable<string>>
   loadPluginCode(pluginId: string): Promise<Errorable<string>>
-  deletePlugin(pluginId: string): Promise<Errorable<string>>
+  deletePlugin(pluginId: string): Promise<Errorable<null>>
 }
 
 export type BankOrBoxChange = { bank: number; box: number }
