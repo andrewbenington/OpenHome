@@ -1,9 +1,10 @@
 import BackendInterface, {
   BankOrBoxChange,
+  LogEntry,
+  LogsResponse,
   MenuEvent,
   NewLogNotification,
   OhpkmStore,
-  parseLogs,
   StoredLookups,
 } from '@openhome-core/backend/backendInterface'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
@@ -24,6 +25,11 @@ import { FileInfo, readFile, stat } from '@tauri-apps/plugin-fs'
 import { platform } from '@tauri-apps/plugin-os'
 import dayjs, { Dayjs } from 'dayjs'
 import { Commands, LogFilterIpc, StoredBankDataSerialized } from './commands'
+import {
+  LogEntry as LogEntryRust,
+  LogFilter as LogFilterRust,
+  LogsResponse as LogsResponseRust,
+} from './spectaCommands'
 
 async function pathDataFromRaw(raw: string): Promise<PathData> {
   const filename = await path.basename(raw)
@@ -463,5 +469,35 @@ function serializeBankData(data: StoredBankData): StoredBankDataSerialized {
         identifiers: Object.fromEntries(box.identifiers.entries()),
       })),
     })),
+  }
+}
+
+function parseLog(unparsed: LogEntryRust): LogEntry {
+  return {
+    timestamp: dayjs(unparsed.timestamp),
+    level: unparsed.level,
+    target: unparsed.target ?? undefined,
+    message: unparsed.message,
+    event: unparsed.event ?? undefined,
+    fields: typeof unparsed.fields === 'object' ? (unparsed ?? undefined) : undefined,
+    context: typeof unparsed.context === 'object' ? (unparsed ?? undefined) : undefined,
+    ohpkm_id: unparsed.ohpkm_id ?? undefined,
+  }
+}
+
+function parseLogs(unparsed: LogsResponseRust): LogsResponse {
+  return {
+    ...unparsed,
+    current: parseFilter(unparsed.current),
+    next: parseFilter(unparsed.next),
+    remaining_file_lines: unparsed.remaining_file_lines.map(parseLog),
+  }
+}
+
+function parseFilter(unparsed: LogFilterRust): LogFilter {
+  return {
+    start: dayjs(unparsed.start),
+    end: dayjs(unparsed.end),
+    ohpkm_id: unparsed.ohpkm_id ?? undefined,
   }
 }

@@ -3,7 +3,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
-import { ConvertStrategyEntries, JsonValue } from '@openhome-core/tauri/spectaCommands'
+import { ConvertStrategyEntries } from '@openhome-core/tauri/spectaCommands'
 import { Errorable } from '@openhome-core/util/functional'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
 import { LogFilter } from '@openhome-ui/pages/logs'
@@ -11,7 +11,7 @@ import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
 import { ConvertStrategies } from '@openhome-ui/state/convert-strategies/ConvertStrategiesProvider'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
-import dayjs, { Dayjs } from 'dayjs'
+import { Dayjs } from 'dayjs'
 
 export type AppState = {
   is_dev: boolean
@@ -34,17 +34,6 @@ export type ImageResponse = {
   extension: string
 }
 
-type LogEntryUnparsed = {
-  timestamp: string
-  level: string
-  target?: string | null
-  message: string
-  event?: string | null
-  fields?: JsonValue
-  context?: JsonValue
-  ohpkm_id?: OhpkmIdentifier | null
-}
-
 export type LogEntry = {
   timestamp: Dayjs
   level: string
@@ -56,52 +45,10 @@ export type LogEntry = {
   ohpkm_id?: OhpkmIdentifier
 }
 
-type LogFilterUnparsed = {
-  start: string
-  end: string
-  ohpkm_id?: string | null
-}
-
-function parseLog(unparsed: LogEntryUnparsed): LogEntry {
-  return {
-    timestamp: dayjs(unparsed.timestamp),
-    level: unparsed.level,
-    target: unparsed.target ?? undefined,
-    message: unparsed.message,
-    event: unparsed.event ?? undefined,
-    fields: typeof unparsed.fields === 'object' ? (unparsed ?? undefined) : undefined,
-    context: typeof unparsed.context === 'object' ? (unparsed ?? undefined) : undefined,
-    ohpkm_id: unparsed.ohpkm_id ?? undefined,
-  }
-}
-
-export type LogsResponseUnparsed = {
-  current: LogFilterUnparsed
-  next: LogFilterUnparsed
-  remaining_file_lines: LogEntryUnparsed[]
-}
-
 export type LogsResponse = {
   current: LogFilter
   next: LogFilter
   remaining_file_lines: LogEntry[]
-}
-
-export function parseLogs(unparsed: LogsResponseUnparsed): LogsResponse {
-  return {
-    ...unparsed,
-    current: parseFilter(unparsed.current),
-    next: parseFilter(unparsed.next),
-    remaining_file_lines: unparsed.remaining_file_lines.map(parseLog),
-  }
-}
-
-function parseFilter(unparsed: LogFilterUnparsed): LogFilter {
-  return {
-    start: dayjs(unparsed.start),
-    end: dayjs(unparsed.end),
-    ohpkm_id: unparsed.ohpkm_id ?? undefined,
-  }
 }
 
 export type LogLevel = 'ERROR' | 'WARN' | 'INFO' | 'DEBUG' | 'TRACE'

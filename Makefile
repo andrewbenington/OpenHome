@@ -39,6 +39,7 @@ check: wasm-compile
 .PHONY: test
 test: ensure-dependencies
 	@pnpm run test
+	@pnpm run format
 
 .PHONY: check-rs
 check-rs:
