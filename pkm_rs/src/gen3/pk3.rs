@@ -230,8 +230,15 @@ impl Pk3 {
     }
 
     pub fn is_nicknamed(&self) -> bool {
+        crate::log!(
+            "nickname: {}; species: {}, equal: {}",
+            self.nickname.to_string(),
+            lookup::species_name(self.get_national_dex(), self.language).to_uppercase(),
+            lookup::species_name(self.get_national_dex(), self.language).to_uppercase()
+                == self.nickname.to_string(),
+        );
         self.nickname.to_string()
-            == lookup::species_name(self.get_national_dex(), self.language).to_uppercase()
+            != lookup::species_name(self.get_national_dex(), self.language).to_uppercase()
     }
 
     pub fn calculate_checksum(&self) -> u16 {
@@ -591,6 +598,13 @@ impl PkhexJson for Pk3 {
                 .map(|b| format!("{:02X}", b))
                 .collect::<String>()
         );
+        value["trainer_name_trash"] = serde_json::json!(
+            self.trainer_name
+                .bytes()
+                .iter()
+                .map(|b| format!("{:02X}", b))
+                .collect::<String>()
+        );
         value["level"] = serde_json::json!(self.calculate_level());
 
         Ok(value)
@@ -606,6 +620,7 @@ mod test {
     use crate::gen3::pk3_buffer::Pk3BufferMut;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
+    use crate::strings::{Gen3Encoding, Gen3String};
     #[cfg(feature = "randomize")]
     use crate::tests::TestErrorWithSeed;
     use crate::tests::{self, TestResult};
@@ -692,6 +707,17 @@ mod test {
     fn checksum() -> TestResult<()> {
         let mon = tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("blaziken.pkm"))?.0;
         assert_eq!(mon.checksum, mon.calculate_checksum());
+
+        Ok(())
+    }
+
+    #[test]
+    fn is_nicknamed() -> TestResult<()> {
+        let mut mon = tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("blaziken.pkm"))?.0;
+        assert!(!mon.is_nicknamed());
+
+        mon.nickname = Gen3String::from_stringlike("renamed", Gen3Encoding::Int);
+        assert!(mon.is_nicknamed());
 
         Ok(())
     }
