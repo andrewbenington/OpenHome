@@ -163,6 +163,7 @@ pub enum SignificantUpdate {
     V1_12_0,
     V1_12_1,
     V1_12_3,
+    V1_12_4,
 }
 
 impl SignificantUpdate {
@@ -191,6 +192,7 @@ impl SignificantUpdate {
             Self::V1_12_0 => Version::parse("1.12.0").unwrap(),
             Self::V1_12_1 => Version::parse("1.12.1").unwrap(),
             Self::V1_12_3 => Version::parse("1.12.3").unwrap(),
+            Self::V1_12_4 => Version::parse("1.12.4").unwrap(),
         }
     }
 
@@ -292,6 +294,10 @@ impl SignificantUpdate {
                 "Files now write correctly again.",
                 "Window position + size should now persist between app launches.",
                 "Natures are now generated correctly for gen 1 + 2 Pokémon.",
+            ]),
+            Self::V1_12_4 => Some(vec![
+                "The \"is nicknamed\" flag is no longer reversed in gen 3.",
+                "Croagunk and Toxicroak are no longer erroneously restricted from Scarlet/Violet.",
             ]),
             _ => None,
         }
