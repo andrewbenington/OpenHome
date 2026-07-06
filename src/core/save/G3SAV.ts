@@ -180,7 +180,7 @@ export class G3SaveBackup {
         box.boxSlots[slot] = PK3.fromSlotBytes(buffer)
       } catch (e) {
         console.error(
-          `File does has invalid Pokémon data at box ${Math.floor(i / 30)}/slot ${slot}: ${e}`
+          `File has invalid Pokémon data at box ${Math.floor(i / 30)}/slot ${slot}: ${e}`
         )
       }
     }
