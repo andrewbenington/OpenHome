@@ -35,6 +35,7 @@ public static class Pk3Object
             ivs = Util.IVs(pk),
             is_egg = pk.IsEgg,
             trainer_name = pk.OriginalTrainerName,
+            trainer_name_trash = System.Convert.ToHexString(pk.OriginalTrainerTrash),
             trainer_friendship = pk.OriginalTrainerFriendship,
             met_location_index = pk.MetLocation,
             ball = Util.FormatBall(pk, strings),

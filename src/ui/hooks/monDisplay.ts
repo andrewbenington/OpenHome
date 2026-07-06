@@ -70,6 +70,7 @@ export const TopRightIndicatorTypes = [
   'Gender',
   'Origin Game',
   'Most Recent Save',
+  'Level',
   'EVs (Total)',
   'EV (HP)',
   'EV (Attack)',
