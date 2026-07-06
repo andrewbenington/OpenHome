@@ -23,12 +23,15 @@
   min-width: 1.25rem;
   height: 1.25rem;
   border-radius: var(--border-radius-xs);
+  outline: 1px solid black;
 }
 
 .numerical-indicator {
   font-size: 0.8rem;
   padding: var(--padding-radius-xs-sm);
   height: 1rem;
+  font-weight: bold;
+  color: black;
 }
 
 .image-indicator-with-text {

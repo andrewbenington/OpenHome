@@ -3453,13 +3453,7 @@ impl OhpkmV2 {
         trainer_name: String,
         save_path: String,
     ) {
-        self.most_recent_save = Some(MostRecentSave {
-            trainer_id,
-            secret_id,
-            game,
-            trainer_name: trainer_name.into(),
-            file_path: save_path,
-        })
+        self.set_recent_save(game, trainer_id, secret_id, trainer_name, save_path)
     }
 
     #[wasm_bindgen(js_name = getPresentSections)]
