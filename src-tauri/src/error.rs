@@ -247,4 +247,10 @@ impl From<tauri::Error> for Error {
     }
 }
 
+impl From<Error> for String {
+    fn from(value: Error) -> Self {
+        value.to_string()
+    }
+}
+
 pub type Result<T> = core::result::Result<T, Error>;

@@ -147,7 +147,7 @@ test('pk3 and ohpkm have the same gen345Lookup key', () => {
 test('gen 3 nickname converted', () => {
   const gameDefaultStrategy: ConvertStrategy = {
     ...ConvertStrategies.getDefault(),
-    'nickname.capitalization': 'GameDefault',
+    nickname__capitalization: 'GameDefault',
   }
   const converted = PK3.fromOhpkm(slowbroOhpkm, gameDefaultStrategy)
 
@@ -157,7 +157,7 @@ test('gen 3 nickname converted', () => {
 test('gen 3 nickname capitalization override', () => {
   const modernStrategy: ConvertStrategy = {
     ...ConvertStrategies.getDefault(),
-    'nickname.capitalization': 'Modern',
+    nickname__capitalization: 'Modern',
   }
   const converted = PK3.fromOhpkm(slowbroOhpkm, modernStrategy)
 

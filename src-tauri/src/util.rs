@@ -15,13 +15,13 @@ use dialog::DialogBox;
 #[cfg(not(target_os = "linux"))]
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, specta::Type)]
 pub struct ImageResponse {
     pub base64: String,
     pub extension: String,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, specta::Type)]
 pub struct PathData {
     pub raw: String,
     pub name: String,

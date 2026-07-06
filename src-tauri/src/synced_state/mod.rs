@@ -1,10 +1,10 @@
-use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Mutex;
 
 use serde::Serialize;
 use tauri::Emitter;
 
+use crate::commands::{CommandError, CommandResult};
 use crate::data_controller;
 use crate::error::{Error, Result};
 
@@ -84,8 +84,8 @@ impl AllSyncedState {
         Ok(self.lock()?.lookups.0.clone())
     }
 
-    pub fn ohpkm_store_b64(&self) -> Result<HashMap<String, String>> {
-        Ok(self.lock()?.ohpkm_store.0.to_b64_map())
+    pub fn ohpkm_store_b64(&self) -> Result<Vec<(String, String)>> {
+        Ok(self.lock()?.ohpkm_store.0.to_b64_entries())
     }
 
     pub fn get_convert_strategies(&self) -> Result<ConvertStrategies> {
@@ -160,18 +160,24 @@ impl Deref for AllSyncedState {
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn save_synced_state(
     app_handle: tauri::AppHandle,
     synced_state: tauri::State<'_, AllSyncedState>,
-) -> Result<()> {
-    synced_state.save_to_files(&app_handle)
+) -> CommandResult<()> {
+    synced_state
+        .save_to_files(&app_handle)
+        .map_err(CommandError::from)
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn update_synced_state(
     synced_state: tauri::State<'_, AllSyncedState>,
     state_identifier: &str,
     action: serde_json::Value,
-) -> Result<()> {
-    synced_state.update_from_frontend(state_identifier, action)
+) -> CommandResult<()> {
+    synced_state
+        .update_from_frontend(state_identifier, action)
+        .map_err(CommandError::from)
 }

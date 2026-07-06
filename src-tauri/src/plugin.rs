@@ -31,7 +31,7 @@ impl PluginMetadata {
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, specta::Type)]
 pub struct PluginMetadataWithIcon {
     pub id: String,
     pub name: String,

@@ -44,34 +44,34 @@ impl SettingType {
 // convention is enforced by construction rather than the type system.
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, specta::Type)]
 pub enum ConvertOption {
-    #[serde(rename = "nickname.capitalization")]
+    #[serde(rename = "nickname__capitalization")]
     NicknameCapitalization,
-    #[serde(rename = "metData.originAndLocation")]
+    #[serde(rename = "metData__originAndLocation")]
     MetDataOriginAndLocation,
-    #[serde(rename = "ivs.maxIfHyperTrained")]
+    #[serde(rename = "ivs__maxIfHyperTrained")]
     MaxIvIfHyperTrained,
-    #[serde(rename = "personalityValue.preserveShiny")]
+    #[serde(rename = "personalityValue__preserveShiny")]
     PreservePidShiny,
-    #[serde(rename = "personalityValue.preserveGender")]
+    #[serde(rename = "personalityValue__preserveGender")]
     PreservePidGender,
-    #[serde(rename = "personalityValue.preserveNature")]
+    #[serde(rename = "personalityValue__preserveNature")]
     PreservePidNature,
-    #[serde(rename = "personalityValue.preserveUnownForm")]
+    #[serde(rename = "personalityValue__preserveUnownForm")]
     PreservePidUnownForm,
 }
 
 impl Display for ConvertOption {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
-            Self::NicknameCapitalization => "nickname.capitalization",
-            Self::MetDataOriginAndLocation => "metData.originAndLocation",
-            Self::MaxIvIfHyperTrained => "ivs.maxIfHyperTrained",
-            Self::PreservePidShiny => "personalityValue.preserveShiny",
-            Self::PreservePidGender => "personalityValue.preserveGender",
-            Self::PreservePidNature => "personalityValue.preserveNature",
-            Self::PreservePidUnownForm => "personalityValue.preserveUnownForm",
+            Self::NicknameCapitalization => "nickname__capitalization",
+            Self::MetDataOriginAndLocation => "metData__originAndLocation",
+            Self::MaxIvIfHyperTrained => "ivs__maxIfHyperTrained",
+            Self::PreservePidShiny => "personalityValue__preserveShiny",
+            Self::PreservePidGender => "personalityValue__preserveGender",
+            Self::PreservePidNature => "personalityValue__preserveNature",
+            Self::PreservePidUnownForm => "personalityValue__preserveUnownForm",
         };
         write!(f, "{}", s)
     }
@@ -140,22 +140,21 @@ pub fn settings_schema_js() -> SettingsSchemaWrapper {
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(default)]
+#[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
 pub struct ConvertStrategy {
-    #[serde(rename = "nickname.capitalization")]
+    #[serde(rename = "nickname__capitalization")]
     pub nickname_capitalization: NicknameCapitalization,
-    #[serde(rename = "metData.originAndLocation")]
+    #[serde(rename = "metData__originAndLocation")]
     pub met_data_origin_location: MetDataStrategy,
-    #[serde(rename = "ivs.maxIfHyperTrained")]
+    #[serde(rename = "ivs__maxIfHyperTrained")]
     pub max_iv_if_hyper_trained: bool,
-    #[serde(rename = "personalityValue.preserveShiny")]
+    #[serde(rename = "personalityValue__preserveShiny")]
     pub preserve_pid_shiny: bool,
-    #[serde(rename = "personalityValue.preserveGender")]
+    #[serde(rename = "personalityValue__preserveGender")]
     pub preserve_pid_gender: bool,
-    #[serde(rename = "personalityValue.preserveNature")]
+    #[serde(rename = "personalityValue__preserveNature")]
     pub preserve_pid_nature: NatureStrategy,
-    #[serde(rename = "personalityValue.preserveUnownForm")]
+    #[serde(rename = "personalityValue__preserveUnownForm")]
     pub preserve_pid_unown_form: bool,
 }
 
@@ -263,7 +262,7 @@ impl ConvertStrategies {
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
-#[derive(Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize, specta::Type)]
 pub enum NicknameCapitalization {
     #[default]
     GameDefault,
@@ -272,7 +271,7 @@ pub enum NicknameCapitalization {
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
-#[derive(Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize, specta::Type)]
 pub enum MetDataStrategy {
     UseLocationNameMatch,
     #[default]

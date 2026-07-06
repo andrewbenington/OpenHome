@@ -99,7 +99,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
           return (
             <button
               className="save-grid-button save-grid-error-button"
-              onClick={() => displayError('Invalid Save', save.err)}
+              onClick={() => displayError('Invalid Save', save.error)}
             >
               <ErrorIcon />
             </button>
@@ -131,8 +131,8 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
           {isLoaded(suggestion) ? (
             R.isOk(suggestion.save) ? (
               <GameIndicator
-                originGame={suggestion.save.value.origin}
-                plugin={suggestion.save.value.pluginIdentifier}
+                originGame={suggestion.save.data.origin}
+                plugin={suggestion.save.data.pluginIdentifier}
                 withName
                 tooltip={suggestion.filePath.raw}
               />
@@ -143,7 +143,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
         </div>
       ),
       sortFunction: numericSorter((suggestion) =>
-        isLoaded(suggestion) && R.isOk(suggestion.save) ? suggestion.save.value.origin : undefined
+        isLoaded(suggestion) && R.isOk(suggestion.save) ? suggestion.save.data.origin : undefined
       ),
       cellClass: 'centered-cell',
     },
@@ -154,14 +154,14 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
       renderValue: (suggestion) =>
         isLoaded(suggestion) ? (
           R.isOk(suggestion.save) ? (
-            `${suggestion.save.value.name} (${suggestion.save.value.tid})`
+            `${suggestion.save.data.name} (${suggestion.save.data.tid})`
           ) : null
         ) : (
           <Spinner />
         ),
       sortFunction: stringSorter((suggestion) =>
         isLoaded(suggestion) && R.isOk(suggestion.save)
-          ? `${suggestion.save.value.name} (${suggestion.save.value.tid})`
+          ? `${suggestion.save.data.name} (${suggestion.save.data.tid})`
           : null
       ),
     },

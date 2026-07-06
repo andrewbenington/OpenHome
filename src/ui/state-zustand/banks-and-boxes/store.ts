@@ -43,13 +43,13 @@ export interface BanksAndBoxesState {
   getCurrentBank: () => SimpleOpenHomeBank
   getCurrentBankName: () => string
   getBankName: (bankIndex: number) => string
-  setCurrentBankName: (name: Option<string>) => void
+  setCurrentBankName: (name: string | null) => void
   overwriteBoxSlotsCurrentBank: (boxIndex: number, boxSlots: BoxMonIdentifiers) => void
   overwriteAllBoxSlotsCurrentBank: (boxSlotsByBoxIndex: Map<number, BoxMonIdentifiers>) => void
   getCurrentBox: () => SimpleOpenHomeBox
   setCurrentBox: (boxIndex: number) => void
   getBoxName: (bankIndex: number, boxIndex: number) => string
-  addBank: (name: Option<string>, boxCount: number) => void
+  addBank: (name: string | null, boxCount: number) => void
   switchToBank: (bankIndex: number) => void
   getAtLocation: (location: BankBoxCoordinates) => Option<OhpkmIdentifier>
   locationIsEmpty: (location: BankBoxCoordinates) => boolean
@@ -118,7 +118,7 @@ export const createBanksAndBoxesStore = (
         getCurrentBankName: (): string => {
           return bankNameOrDefault(readonlyState().getCurrentBank())
         },
-        setCurrentBankName: (name: Option<string>) =>
+        setCurrentBankName: (name: string | null) =>
           set((state) => {
             currentBankMutable(state).name = name
           }),
@@ -149,7 +149,7 @@ export const createBanksAndBoxesStore = (
         getBoxName: (bank: number, box: number): string => {
           return boxNameOrDefault(requireBox(readonlyState(), { bank, box }))
         },
-        addBank: (name: Option<string>, boxCount: number) =>
+        addBank: (name: string | null, boxCount: number) =>
           set((state) => {
             state.banks.push(buildNewBank(state, name, boxCount))
           }),
@@ -314,7 +314,7 @@ function boxMapFromOrdered(boxesInOrder: SimpleOpenHomeBox[]): BoxMap {
 
 function buildNewBank(
   state: BanksAndBoxesState,
-  name: Option<string>,
+  name: string | null,
   boxCount: number
 ): SimpleOpenHomeBank {
   return {

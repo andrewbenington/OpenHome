@@ -114,11 +114,11 @@ export function useSaves(): SavesAndBanksManager {
         if (!identifier) return undefined
         const monResult = ohpkmStore.tryLoadFromId(identifier)
         if (R.isErr(monResult)) {
-          console.error('COULD NOT FIND MON WITH IDENTIFIER: ' + monResult.err.identifier)
+          console.error('COULD NOT FIND MON WITH IDENTIFIER: ' + monResult.error.identifier)
           return undefined
         }
 
-        return monResult.value
+        return monResult.data
       }
     },
     [getMonAtHomeLocation, getMonAtSaveLocation, ohpkmStore]
@@ -168,7 +168,7 @@ export function useSaves(): SavesAndBanksManager {
         return monResult
       }
 
-      const ohpkm = monResult.value
+      const ohpkm = monResult.data
       const saveFormatMon = ohpkmStore.updateAndConvertForSave(ohpkm, save)
       const displacedMon = save.getMonAt(dest.box, dest.boxSlot)
       save.setMonAt(dest.box, dest.boxSlot, saveFormatMon)
@@ -331,7 +331,7 @@ export function useSaves(): SavesAndBanksManager {
       await backend.addRecentSave(getSaveRef(save))
       const result = await backend.registerInPokedex(pokedexSeenFromSave(save))
       if (R.isErr(result)) {
-        console.error('Error registering pokedex entries from save:', result.err)
+        console.error('Error registering pokedex entries from save:', result.error)
       }
       if (save.trainerGender !== undefined) {
         const allOhpkms = ohpkmStore.getAllStored()
@@ -395,10 +395,10 @@ export function useSaves(): SavesAndBanksManager {
         filePickerOpen.current = false
 
         if (R.isErr(result)) {
-          return R.Err({ type: 'SELECT_FILE', cause: result.err })
+          return R.Err({ type: 'SELECT_FILE', cause: result.error })
         }
-        if (!result.value) return R.Ok(undefined)
-        filePath = result.value
+        if (!result.data) return R.Ok(undefined)
+        filePath = result.data
       }
 
       if (allOpenSaves.some((other) => other.filePath.raw === filePath.raw)) {
@@ -407,10 +407,10 @@ export function useSaves(): SavesAndBanksManager {
 
       const bytesResult = await backend.loadSaveFile(filePath)
       if (R.isErr(bytesResult)) {
-        return R.Err({ type: 'READ_FILE', cause: bytesResult.err })
+        return R.Err({ type: 'READ_FILE', cause: bytesResult.error })
       }
 
-      const fileBytes = bytesResult.value.fileBytes
+      const fileBytes = bytesResult.data.fileBytes
 
       let saveTypes = getPossibleSaveTypes(fileBytes, getEnabledSaveTypes())
 
@@ -434,10 +434,10 @@ export function useSaves(): SavesAndBanksManager {
       if (R.isErr(result)) {
         return R.Err({
           type: 'BUILD_SAVE',
-          cause: result.err,
+          cause: result.error,
         })
       }
-      const saveFile = result.value
+      const saveFile = result.data
 
       if (!saveFile) {
         return R.Err({ type: 'UNRECOGNIZED' })
@@ -469,7 +469,7 @@ export function useSaves(): SavesAndBanksManager {
           return result
         }
 
-        ohpkm = result.value
+        ohpkm = result.data
       } else {
         const mon = getMonAtSaveLocation(location)
         if (!mon) return
@@ -504,7 +504,7 @@ export function useSaves(): SavesAndBanksManager {
       const result = ohpkmStore.tryLoadFromId(identifier)
       if (R.isErr(result)) return result
 
-      const mon = result.value
+      const mon = result.data
       mon.revertAbilityByNum()
 
       ohpkmStore.insertOrUpdate(mon)
@@ -526,7 +526,7 @@ export function useSaves(): SavesAndBanksManager {
           return result
         }
 
-        const displacedMon = result.value
+        const displacedMon = result.data
         moveMonToHome(dest.saveIdentifier, displacedMon, source)
       }
     } else if (!dest.isHome && source.saveIdentifier === dest.saveIdentifier) {

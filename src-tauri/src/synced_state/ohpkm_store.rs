@@ -1,3 +1,4 @@
+use crate::commands::CommandResult;
 use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
 use crate::synced_state;
@@ -12,7 +13,7 @@ use std::time::{Duration, UNIX_EPOCH};
 use std::{collections::HashMap, fs};
 use tracing::warn;
 
-#[derive(Default, Serialize, Deserialize, Clone)]
+#[derive(Default, Serialize, Deserialize, Clone, specta::Type)]
 pub struct OhpkmBytesStore(HashMap<String, Vec<u8>>);
 
 impl OhpkmBytesStore {
@@ -104,6 +105,14 @@ impl OhpkmBytesStore {
         output
     }
 
+    pub fn to_b64_entries(&self) -> Vec<(String, String)> {
+        self.0
+            .clone()
+            .into_iter()
+            .map(|(k, v)| (k, BASE64_STANDARD.encode(v)))
+            .collect()
+    }
+
     pub fn includes(&self, identifier: &str) -> bool {
         self.0.contains_key(identifier)
     }
@@ -129,32 +138,35 @@ impl synced_state::SyncedState for OhpkmBytesStore {
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn get_ohpkm_store(
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
-) -> Result<HashMap<String, String>> {
-    synced_state.ohpkm_store_b64()
+) -> CommandResult<Vec<(String, String)>> {
+    Ok(synced_state.ohpkm_store_b64()?)
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn add_to_ohpkm_store(
     app_handle: tauri::AppHandle,
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
     updates: OhpkmBytesStore,
-) -> Result<()> {
-    synced_state
+) -> CommandResult<()> {
+    Ok(synced_state
         .lock()?
         .ohpkm_store
-        .update(&app_handle, updates)
+        .update(&app_handle, updates)?)
 }
 
-type DeleteResultsById = HashMap<String, Result<()>>;
+type DeleteResultsById = HashMap<String, Option<String>>;
 
 #[tauri::command]
+#[specta::specta]
 pub fn permanently_delete_ohpkms(
     app_handle: tauri::AppHandle,
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
     openhome_ids: Vec<String>,
-) -> Result<DeleteResultsById> {
+) -> CommandResult<DeleteResultsById> {
     // first remove from the ohpkm store
     synced_state
         .lock()?
@@ -173,13 +185,13 @@ pub fn permanently_delete_ohpkms(
         let relative_path = Path::new(MONS_V2_DIR).join(format!("{identifier}.ohpkm"));
         match app_handle.absolute_path(DataDir::Storage, &relative_path) {
             Ok(full_path) => {
-                let deletion_result =
-                    fs::remove_file(full_path).map_err(|e| Error::file_access(&relative_path, e));
-                results.insert(identifier, deletion_result);
+                let deletion_result = fs::remove_file(full_path)
+                    .map_err(|e| Error::file_access(&relative_path, e).to_string());
+                results.insert(identifier, deletion_result.err());
             }
             Err(source_err) => {
                 let error = Error::file_access(&relative_path, source_err);
-                results.insert(identifier, Err(error));
+                results.insert(identifier, Some(error.to_string()));
             }
         };
     }

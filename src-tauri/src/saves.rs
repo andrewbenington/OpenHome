@@ -1,5 +1,6 @@
 use tauri::Manager;
 
+use crate::commands::CommandResult;
 use crate::data_controller::{DataController, DataDir};
 use crate::util;
 use crate::{Error, Result};
@@ -12,7 +13,7 @@ use std::time::UNIX_EPOCH;
 
 const RECENT_SAVES_FILENAME: &str = "recent_saves.json";
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, specta::Type)]
 pub struct PossibleSaves {
     pub citra: Vec<util::PathData>,
     pub desmume: Vec<util::PathData>,
@@ -159,7 +160,7 @@ fn is_one_of(os_str: &OsStr, possibilities: impl IntoIterator<Item = &'static st
         .any(|s| os_str.eq_ignore_ascii_case(s))
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct SaveRef {
     pub file_path: util::PathData,
@@ -170,7 +171,7 @@ pub struct SaveRef {
     pub last_opened: Option<f64>,
     pub last_modified: Option<f64>,
     pub valid: bool,
-    pub plugin_identifier: Option<String>,
+    pub plugin_identifier: Option<pkm_rs::PluginIdentifier>,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
@@ -189,18 +190,19 @@ pub struct StoredSaveRef {
     #[serde(rename = "trainerID")]
     pub trainer_id: Option<String>,
     pub last_opened: Option<f64>,
-    pub plugin_identifier: Option<String>,
+    pub plugin_identifier: Option<pkm_rs::PluginIdentifier>,
 }
+
+type RawSavePath = String;
 
 pub fn get_recent_saves(
     data_controller: &impl DataController,
-) -> core::result::Result<HashMap<String, SaveRef>, String> {
+) -> core::result::Result<Vec<(RawSavePath, SaveRef)>, String> {
     let recent_saves: HashMap<String, StoredSaveRef> = data_controller
         .read_or_create_default_json_file(DataDir::Storage, RECENT_SAVES_FILENAME)
         .map_err(|e| format!("Error getting settings: {}", e))?;
 
-    let mut validated_recents: HashMap<String, SaveRef> = HashMap::new();
-    for (raw, save) in recent_saves {
+    let paths_and_saves = recent_saves.into_iter().map(|(raw, save)| {
         let path = Path::new(&raw);
         let game_u32 = match save.game {
             None => 0,
@@ -209,8 +211,7 @@ pub fn get_recent_saves(
                 StringOrU32::U32(num) => num,
             },
         };
-
-        validated_recents.insert(
+        (
             raw.to_owned(),
             SaveRef {
                 file_path: save.file_path,
@@ -222,10 +223,10 @@ pub fn get_recent_saves(
                 valid: path.exists(),
                 plugin_identifier: save.plugin_identifier,
             },
-        );
-    }
+        )
+    });
 
-    Ok(validated_recents)
+    Ok(paths_and_saves.collect())
 }
 
 fn get_modified_time_ms(path: &Path) -> Option<f64> {
@@ -238,10 +239,11 @@ fn get_modified_time_ms(path: &Path) -> Option<f64> {
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn find_suggested_saves(
     app_handle: tauri::AppHandle,
-    save_folders: Vec<PathBuf>,
-) -> Result<PossibleSaves> {
+    save_folders: Vec<&str>,
+) -> CommandResult<PossibleSaves> {
     let mut possible_saves = PossibleSaves {
         citra: Vec::new(),
         desmume: Vec::new(),
@@ -262,13 +264,12 @@ pub async fn find_suggested_saves(
     }
 
     // Iterate over user-provided save folders
-    for folder in save_folders {
-        if folder.exists() {
-            let folder_path = folder.to_string_lossy().into_owned();
-
-            tracing::info!("checking saves in folder {folder_path}");
+    for folder_str in save_folders {
+        let folder_path = PathBuf::from(folder_str);
+        if folder_path.exists() {
+            tracing::info!("checking saves in folder {folder_str}");
             let result = tokio::task::spawn_blocking(move || {
-                get_possible_saves(&folder).map_err(|e| e.to_string())
+                get_possible_saves(&folder_path).map_err(|e| e.to_string())
             })
             .await
             .map_err(|e| {
@@ -279,12 +280,12 @@ pub async fn find_suggested_saves(
             match result {
                 Ok(newly_found) => possible_saves.add_all(newly_found),
                 Err(e) => {
-                    tracing::error!("failed to check saves in folder {folder_path}: {e}");
+                    tracing::error!("failed to check saves in folder {folder_str}: {e}");
                     continue;
                 }
             };
         } else {
-            return Err(Error::file_missing(&folder));
+            return Err(Error::file_missing(&folder_path).into());
         }
     }
 

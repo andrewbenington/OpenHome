@@ -13,7 +13,7 @@ export type StoredBankData = {
 export type SimpleOpenHomeBank = {
   id: string
   index: number
-  name: string | undefined
+  name: string | null
   boxes: Map<number, SimpleOpenHomeBox>
   current_box: number
 }

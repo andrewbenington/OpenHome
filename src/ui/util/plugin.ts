@@ -45,7 +45,5 @@ export interface PluginMetadataWithIcon {
   name: string
   version: string
   api_version: number
-  icon: string
-  assets: Record<string, string>
   icon_image: ImageResponse | null
 }

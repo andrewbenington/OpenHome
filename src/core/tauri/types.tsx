@@ -3,5 +3,5 @@ export type RustOk<T> = { Ok: T }
 export type RustErr<E> = { Err: E }
 
 export function isRustErr<T, E>(result: RustResult<T, E>): result is RustErr<E> {
-  return 'Err' in result
+  return 'error' in result || 'Err' in result
 }

@@ -39,6 +39,7 @@ check: wasm-compile
 .PHONY: test
 test: ensure-dependencies
 	@pnpm run test
+	@npx eslint --fix ./src/core/tauri/spectaCommands.ts
 
 .PHONY: check-rs
 check-rs:
@@ -108,10 +109,7 @@ generate/out/generate.js: generate/generate.ts generate/syncPKHexResources.ts ge
 	@cd generate && tsc
 
 .PHONY: generate
-generate: generate/out/generate.js
-	@echo "generating typescript..."
-	@node ./generate/out/generate.js Items text/items/PostGen4.txt items/PostGen4.ts
-	@npx prettier --log-level silent --write src/resources/gen*
+generate: gen-wasm gen-tauri-commands
 
 .PHONY: gen-wasm
 gen-wasm:
@@ -123,6 +121,11 @@ gen-wasm:
 	@ts-node generate/gen_species_data.ts
 	@cd pkm_rs_resources && cargo fmt
 
+.PHONY: gen-tauri-commands
+gen-tauri-commands:
+	@cargo test --package OpenHome --lib -- tests::export_typescript_bindings --exact --nocapture --include-ignored
+	@npx eslint --fix ./src/core/tauri/spectaCommands.ts
+
 .PHONY: pkhex-json
 pkhex-json:
 	@cd pkhex-json && dotnet run GeneratePkhexJson.cs
@@ -131,10 +134,6 @@ pkhex-json:
 .PHONY: test-pkhex-json
 test-pkhex-json:
 	@cargo test --package pkm_rs --lib --all-features -- compare_pkhex_json
-	
-generate/out/syncPKHexResources.js: generate/syncPKHexResources.ts
-	@echo "compiling generate/syncPKHexResources.ts..."
-	@cd generate && tsc
 
 .PHONY: download-item-sprites
 download-item-sprites:
