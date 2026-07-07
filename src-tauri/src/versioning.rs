@@ -164,36 +164,37 @@ pub enum SignificantUpdate {
     V1_12_1,
     V1_12_3,
     V1_12_4,
+    V1_13_0,
 }
 
 impl SignificantUpdate {
     pub fn version(&self) -> Version {
         match self {
-            Self::V1_5_0AlphaMultipleBanks => Version::parse("1.5.0-alpha-multiple-banks").unwrap(),
-            Self::V1_8_0AlphaOhpkmV2 => Version::parse("1.8.0-alpha-ohpkm-v2").unwrap(),
-            Self::V1_8_0AlphaFeatureMessages => {
-                Version::parse("1.8.0-x-alpha.1.feature-messages").unwrap()
-            }
-            Self::V1_8_1 => Version::parse("1.8.1").unwrap(),
-            Self::V1_8_2 => Version::parse("1.8.2").unwrap(),
-            Self::V1_9_0 => Version::parse("1.9.0").unwrap(),
-            Self::V1_9_1 => Version::parse("1.9.1").unwrap(),
-            Self::V1_9_2 => Version::parse("1.9.2").unwrap(),
-            Self::V1_10_0 => Version::parse("1.10.0").unwrap(),
-            Self::V1_10_1 => Version::parse("1.10.1").unwrap(),
-            Self::V1_10_2 => Version::parse("1.10.2").unwrap(),
-            Self::V1_10_3 => Version::parse("1.10.3").unwrap(),
-            Self::V1_10_5 => Version::parse("1.10.5").unwrap(),
-            Self::V1_11_0 => Version::parse("1.11.0").unwrap(),
-            Self::V1_11_1 => Version::parse("1.11.1").unwrap(),
-            Self::V1_11_2 => Version::parse("1.11.2").unwrap(),
-            Self::V1_11_3 => Version::parse("1.11.3").unwrap(),
-            Self::V1_11_4 => Version::parse("1.11.4").unwrap(),
-            Self::V1_12_0 => Version::parse("1.12.0").unwrap(),
-            Self::V1_12_1 => Version::parse("1.12.1").unwrap(),
-            Self::V1_12_3 => Version::parse("1.12.3").unwrap(),
-            Self::V1_12_4 => Version::parse("1.12.4").unwrap(),
+            Self::V1_5_0AlphaMultipleBanks => Version::parse("1.5.0-alpha-multiple-banks"),
+            Self::V1_8_0AlphaOhpkmV2 => Version::parse("1.8.0-alpha-ohpkm-v2"),
+            Self::V1_8_0AlphaFeatureMessages => Version::parse("1.8.0-x-alpha.1.feature-messages"),
+            Self::V1_8_1 => Version::parse("1.8.1"),
+            Self::V1_8_2 => Version::parse("1.8.2"),
+            Self::V1_9_0 => Version::parse("1.9.0"),
+            Self::V1_9_1 => Version::parse("1.9.1"),
+            Self::V1_9_2 => Version::parse("1.9.2"),
+            Self::V1_10_0 => Version::parse("1.10.0"),
+            Self::V1_10_1 => Version::parse("1.10.1"),
+            Self::V1_10_2 => Version::parse("1.10.2"),
+            Self::V1_10_3 => Version::parse("1.10.3"),
+            Self::V1_10_5 => Version::parse("1.10.5"),
+            Self::V1_11_0 => Version::parse("1.11.0"),
+            Self::V1_11_1 => Version::parse("1.11.1"),
+            Self::V1_11_2 => Version::parse("1.11.2"),
+            Self::V1_11_3 => Version::parse("1.11.3"),
+            Self::V1_11_4 => Version::parse("1.11.4"),
+            Self::V1_12_0 => Version::parse("1.12.0"),
+            Self::V1_12_1 => Version::parse("1.12.1"),
+            Self::V1_12_3 => Version::parse("1.12.3"),
+            Self::V1_12_4 => Version::parse("1.12.4"),
+            Self::V1_13_0 => Version::parse("1.13.0"),
         }
+        .expect("all versions are valid semver")
     }
 
     pub fn do_migration(&self, app_handle: &tauri::AppHandle) -> Result<()> {
@@ -298,6 +299,11 @@ impl SignificantUpdate {
             Self::V1_12_4 => Some(vec![
                 "The \"is nicknamed\" flag is no longer reversed in gen 3.",
                 "Croagunk and Toxicroak are no longer erroneously restricted from Scarlet/Violet.",
+            ]),
+            Self::V1_13_0 => Some(vec![
+                "Level can now be displayed in the top-right indicator",
+                "Top-right indicator is now color-coded based on its value and the max possible value",
+                "Fixed various species gender ratios. Affected Pokémon should have been fixed at startup.",
             ]),
             _ => None,
         }
