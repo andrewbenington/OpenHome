@@ -248,6 +248,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       <Fallback>
         <PokemonDetailsModal
           mon={selectedMon}
+          key={`${save.currentPCBox}-${selectedMon?.encryptionConstant ?? selectedMon?.personalityValue ?? JSON.stringify(selectedMon?.dvs)}-${selectedMon?.nickname}`}
           onClose={() => setSelectedIndex(undefined)}
           navigateRight={navigateRight}
           navigateLeft={navigateLeft}

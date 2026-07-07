@@ -32,6 +32,7 @@ function hasOpenHomeId(mon: PKMInterface): mon is MonWithOpenHomeId {
 }
 
 interface BoxCellProps {
+  title?: string
   onClick: () => void
   onDrop: (_: PKMInterface[]) => void
   disabled?: boolean
