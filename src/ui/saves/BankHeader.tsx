@@ -61,7 +61,7 @@ function removeNonDigits(input: string): string {
 
 function BankSelector(props: { disabled?: boolean }) {
   const { disabled } = props
-  const [newBankName, setNewBankName] = useState<string>()
+  const [newBankName, setNewBankName] = useState<string | null>(null)
   const [newBankBoxCount, setNewBankBoxCount] = useState('30')
   const [isOpen, setIsOpen] = useState(false)
   const { banks, switchToBank, addBank } = useBanksAndBoxes()
@@ -91,7 +91,7 @@ function BankSelector(props: { disabled?: boolean }) {
                   <TextField.Root
                     size="1"
                     placeholder={`Bank ${banks.length + 1}`}
-                    onChange={(e) => setNewBankName(e.target.value || undefined)}
+                    onChange={(e) => setNewBankName(e.target.value || null)}
                   />
                 </DataList.Value>
               </DataList.Item>

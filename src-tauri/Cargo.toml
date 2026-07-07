@@ -1,6 +1,6 @@
 [package]
 name = "OpenHome"
-version = "1.12.4"
+version = "1.13.0"
 description = "A tool for moving Pokémon between game saves"
 authors = ["Andrew Benington"]
 edition = "2024"
@@ -43,6 +43,9 @@ tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
 tracing-appender = "0.2.5"
 chrono = { version = "0.4.45", features = ["serde"] }
 tokio = "1.52.3"
+specta = { version = "=2.0.0-rc.22", features = ["chrono", "serde_json", "uuid" ] }
+specta-typescript = "0.0.9"
+tauri-specta = { version = "=2.0.0-rc.21", features = ["derive", "typescript"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 dialog = "0.3.0"

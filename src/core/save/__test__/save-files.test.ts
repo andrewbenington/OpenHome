@@ -74,10 +74,10 @@ describe('Save file detection - single possibility', () => {
       )
 
       if (R.isErr(result)) {
-        throw new Error(result.err)
+        throw new Error(result.error)
       }
 
-      const saveFile = result.value
+      const saveFile = result.data
 
       expect(saveFile.gameNameFull).toBe(gameName)
     })

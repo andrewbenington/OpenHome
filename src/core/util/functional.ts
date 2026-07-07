@@ -11,9 +11,9 @@ export function partitionResults<A, E>(results: Result<A, E>[]) {
 
 function partitionResultsRecursive<A, E>(acc: PartitionedResults<A, E>, result: Result<A, E>) {
   if (isErr(result)) {
-    acc.failures.push(result.err)
+    acc.failures.push(result.error)
   } else {
-    acc.successes.push(result.value)
+    acc.successes.push(result.data)
   }
   return acc
 }
@@ -43,43 +43,43 @@ export type Nullable<T> = T | null
 export type Errorable<T> = Result<T, string>
 
 function buildOk<T = never, E = never>(value: T): Result<T, E> {
-  return { _tag: 'Ok', value }
+  return { status: 'ok', data: value }
 }
 
 function buildErr<T = never, E = never>(err: E): Result<T, E> {
-  return { _tag: 'Err', err }
+  return { status: 'error', error: err }
 }
 
 function isOk<T>(result: Result<T, unknown>): result is Ok<T> {
-  return result._tag === 'Ok'
+  return result.status === 'ok'
 }
 
 function isErr<E>(result: Result<unknown, E>): result is Err<E> {
-  return result._tag === 'Err'
+  return result.status === 'error'
 }
 
 function map<T, E, U>(transform: (val: T) => U): (result: Result<T, E>) => Result<U, E> {
-  return (result) => (isOk(result) ? buildOk(transform(result.value)) : result)
+  return (result) => (isOk(result) ? buildOk(transform(result.data)) : result)
 }
 
 function mapErr<T, E, U>(transform: (val: E) => U): (result: Result<T, E>) => Result<T, U> {
-  return (result) => (isErr(result) ? buildErr(transform(result.err)) : result)
+  return (result) => (isErr(result) ? buildErr(transform(result.error)) : result)
 }
 
 function flatMap<T, E, U>(
   transform: (val: T) => Result<U, E>
 ): (result: Result<T, E>) => Result<U, E> {
-  return (result) => (isErr(result) ? result : transform(result.value))
+  return (result) => (isErr(result) ? result : transform(result.data))
 }
 
 function asyncFlatMap<T, E, U>(
   transform: (val: T) => Promise<Result<U, E>>
 ): (result: Result<T, E>) => Promise<Result<U, E>> {
-  return (result) => (isErr(result) ? Promise.resolve(result) : transform(result.value))
+  return (result) => (isErr(result) ? Promise.resolve(result) : transform(result.data))
 }
 
 function match<T, E, R>(onOk: (val: T) => R, onErr: (val: E) => R): (result: Result<T, E>) => R {
-  return (result) => (isOk(result) ? onOk(result.value) : onErr(result.err))
+  return (result) => (isOk(result) ? onOk(result.data) : onErr(result.error))
 }
 
 function fromNullable<E>(err: E): <T>(value: T | undefined) => Result<T, E> {
@@ -95,13 +95,13 @@ function tryPromise<T>(promise: Promise<T>): Promise<Result<T, string>> {
 }
 
 export type Err<E> = {
-  readonly _tag: 'Err'
-  readonly err: E
+  readonly status: 'error'
+  readonly error: E
 }
 
 export type Ok<T> = {
-  readonly _tag: 'Ok'
-  readonly value: T
+  readonly status: 'ok'
+  readonly data: T
 }
 
 export type Result<T, E> = Ok<T> | Err<E>

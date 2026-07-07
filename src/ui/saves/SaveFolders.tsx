@@ -1,16 +1,16 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { SaveFolder } from '@openhome-core/save/util/storage'
 import { R } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { AddFolderIcon, RemoveIcon } from '@openhome-ui/components/Icons'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { Button, Card, Flex } from '@radix-ui/themes'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Dialog } from '../components/dialog/Dialog'
 
 export default function SaveFolders() {
   const [saveFolders, setSaveFolders] = useState<SaveFolder[]>()
   const [pendingDirPath, setPendingDirPath] = useState<string>()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [error, setError] = useState(false)
   const displayError = useDisplayError()
 

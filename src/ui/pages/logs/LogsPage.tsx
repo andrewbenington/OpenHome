@@ -1,8 +1,8 @@
 import { Input, Separator } from '@base-ui/react'
+import { LogEntry, LogLevel } from '@openhome-core/backend/backendInterface'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Option } from '@openhome-core/util/functional'
-import { LogEntry, LogLevel } from '@openhome-ui/backend/backendInterface'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import { ExpandIcon, FilterIcon } from '@openhome-ui/components/Icons'
 import { InfoGrid } from '@openhome-ui/components/InfoGrid'
@@ -302,7 +302,11 @@ function LogLine(props: LogLineProps) {
       </span>
       {ohpkm_id && ohpkmButton && onOhpkmClick && mon && (
         <button className="log-ohpkm-button" onClick={() => onOhpkmClick(ohpkm_id)}>
-          <PokemonIcon dexNumber={mon.dexNum} formIndex={mon.formNum} />
+          <PokemonIcon
+            dexNumber={mon.dexNum}
+            formIndex={mon.formNum}
+            style={{ '--pokemon-icon-size': '1.5rem' }}
+          />
         </button>
       )}
       <MiniButton onClick={onDetailsClick} icon={ExpandIcon} />

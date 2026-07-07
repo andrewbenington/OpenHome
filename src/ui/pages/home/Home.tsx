@@ -1,9 +1,9 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { range } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import FilterPanel from '@openhome-ui/pages/home/display/FilterPanel'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
@@ -14,14 +14,14 @@ import ItemBag from '@openhome-ui/saves/ItemBag'
 import SavesModal from '@openhome-ui/saves/SavesModal'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Button, Card, Flex, Tabs } from '@radix-ui/themes'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { MdFileOpen } from 'react-icons/md'
 import DisplayPanel from './display/DisplayPanel'
 import './Home.css'
 import ReleaseArea from './ReleaseArea'
 
 const Home = () => {
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const [openSaveDialog, setOpenSaveDialog] = useState(false)
   const savesAndBanks = useSaves()

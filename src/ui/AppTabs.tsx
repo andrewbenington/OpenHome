@@ -1,11 +1,12 @@
 import { Separator } from '@base-ui/react/separator'
-import { Badge, Box, Flex } from '@radix-ui/themes'
+import { Badge, Box, Flex, ThemePanel } from '@radix-ui/themes'
 import { PropsWithChildren, useContext } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
 import DebugOnly from './components/DebugOnly'
-import Fallback from './components/Fallback'
 import { AppTabIconsActive, AppTabIconsInactive } from './components/Icons'
 import { Tabs } from './components/Tabs'
+import useIsDebug from './hooks/isDebug'
+import AppStateDisplay from './pages/debug/AppStateDisplay'
 import DebugDisplay from './pages/debug/DebugDisplay'
 import Home from './pages/home/Home'
 import LogsPage from './pages/logs/LogsPage'
@@ -87,19 +88,30 @@ export default function AppTabs() {
         <Separator className="Separator" orientation="vertical" />
         <Box style={{ flex: 1, width: '100%', height: '100%', overflowY: 'hidden' }}>
           <div style={{ height: '100%' }}>
-            <Fallback>
-              <Routes>
-                <Route index path="/" element={homeElement} />
-                <Route path="/home" element={homeElement} />
-                <Route path="/manage/*" element={<TrackedPokemonPage />} />
-                <Route path="/sort" element={<SortPokemon />} />
-                <Route path="/pokedex" element={<PokedexPage />} />
-                <Route path="/plugins/*" element={<PluginsPage />} />
-                <Route path="/logs/*" element={<LogsPage />} />
-                <Route path="/settings/*" element={<Settings />} />
-                <Route path="/debug/*" element={<DebugDisplay />} />
-              </Routes>
-            </Fallback>
+            <Routes>
+              <Route index path="/" element={homeElement} />
+              <Route path="/home" element={homeElement} />
+              <Route path="/manage/*" element={<TrackedPokemonPage />} />
+              <Route path="/sort" element={<SortPokemon />} />
+              <Route path="/pokedex" element={<PokedexPage />} />
+              <Route path="/plugins/*" element={<PluginsPage />} />
+              <Route path="/logs/*" element={<LogsPage />} />
+              <Route path="/settings/*" element={<Settings />} />
+              {useIsDebug() && (
+                <>
+                  <Route path="/state" element={<AppStateDisplay />} />
+                  <Route path="/component-debug" element={<DebugDisplay />} />
+                </>
+              )}
+            </Routes>
+            <DebugOnly>
+              <Tabs.Panel value="state">
+                <AppStateDisplay />
+              </Tabs.Panel>
+              <Tabs.Panel value="theme">
+                <ThemePanel />
+              </Tabs.Panel>
+            </DebugOnly>
           </div>
         </Box>
       </Flex>

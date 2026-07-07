@@ -9,7 +9,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
-import { OriginGames } from '@pkm-rs/pkg/pkm_rs'
+import { Lookup, MarkingsSixShapesColors, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
 import { createContext, useCallback, useContext } from 'react'
 import { OhpkmStoreData } from '.'
@@ -24,6 +24,26 @@ export type OhpkmStore = {
   monIsStored(id: string): boolean
   insertOrUpdate(mon: OHPKM): void
   insertOrUpdateAll(mons: OhpkmStoreData): Promise<Errorable<null>>
+  updateMonMarkings: (
+    monId: string,
+    markings: MarkingsSixShapesColors
+  ) => Option<Result<void, IdentifierNotPresentError>>
+  updateMonNotes: (
+    monId: string,
+    notes: Option<string>
+  ) => Option<Result<void, IdentifierNotPresentError>>
+  updateMonTags: (
+    monId: string,
+    tags: Option<{ label: string; color: string; icon?: string }[]>
+  ) => Option<Result<void, IdentifierNotPresentError>>
+  updateMonDisplayColor: (
+    monId: string,
+    color: Option<string>
+  ) => Option<Result<void, IdentifierNotPresentError>>
+  setMonNickname: (
+    monId: string,
+    nickname: Option<string>
+  ) => Option<Result<void, IdentifierNotPresentError>>
   getAllStored: () => OHPKM[]
   getIdIfTracked: (mon: PKMInterface) => Option<OhpkmIdentifier>
   loadIfTracked: <P extends PKMInterface>(mon: P) => Option<OHPKM>
@@ -34,6 +54,8 @@ export type OhpkmStore = {
     sourceSave: Option<SAV<P>>,
     destSave: Option<SAV>
   ) => OHPKM
+
+  replaceHeldItem: (mon: OHPKM) => number
 }
 
 // FALSE IN PRODUCTION
@@ -75,7 +97,7 @@ export function useOhpkmStore(): OhpkmStore {
 
   const insertOrUpdate = useCallback(
     (mon: OHPKM) => {
-      updateStore({ [mon.openhomeId]: mon })
+      updateStore({ [mon.openhomeId]: mon.clone() })
     },
     [updateStore]
   )
@@ -85,6 +107,16 @@ export function useOhpkmStore(): OhpkmStore {
       return updateStore(mons)
     },
     [updateStore]
+  )
+
+  const replaceHeldItem = useCallback(
+    (mon: OHPKM) => {
+      const replacedItem = mon.heldItemIndex
+      mon.heldItemIndex = 0
+      insertOrUpdate(mon)
+      return replacedItem
+    },
+    [insertOrUpdate]
   )
 
   const getAllStored = useCallback((): OHPKM[] => {
@@ -132,6 +164,71 @@ export function useOhpkmStore(): OhpkmStore {
       return save.convertOhpkm(ohpkm, defaultConvertStrategy)
     },
     [defaultConvertStrategy, handleLookupsUpdate, insertOrUpdate]
+  )
+
+  const updateMonMarkings = useCallback(
+    (monId: string, markings: MarkingsSixShapesColors) => {
+      const result = tryLoadFromId(monId)
+      if (R.isErr(result)) return result
+
+      const mon = result.data
+      mon.markings = { ...markings }
+
+      insertOrUpdate(mon)
+    },
+    [insertOrUpdate, tryLoadFromId]
+  )
+
+  const updateMonNotes = useCallback(
+    (monId: string, notes: string | undefined) => {
+      const result = tryLoadFromId(monId)
+      if (R.isErr(result)) return result
+
+      const mon = result.data
+      mon.notes = notes
+
+      insertOrUpdate(mon)
+    },
+    [insertOrUpdate, tryLoadFromId]
+  )
+
+  const updateMonTags = useCallback(
+    (monId: string, tags: { label: string; color: string; icon?: string }[] | undefined) => {
+      const result = tryLoadFromId(monId)
+      if (R.isErr(result)) return result
+
+      const mon = result.data
+      mon.setTags(tags ?? [])
+
+      insertOrUpdate(mon)
+    },
+    [insertOrUpdate, tryLoadFromId]
+  )
+
+  const updateMonDisplayColor = useCallback(
+    (monId: string, color: string | undefined) => {
+      const result = tryLoadFromId(monId)
+      if (R.isErr(result)) return result
+
+      const mon = result.data
+      mon.displayColor = color
+
+      insertOrUpdate(mon)
+    },
+    [insertOrUpdate, tryLoadFromId]
+  )
+
+  const setMonNickname = useCallback(
+    (monId: string, nickname: Option<string>) => {
+      const result = tryLoadFromId(monId)
+      if (R.isErr(result)) return result
+
+      const mon = result.data
+      mon.nickname = nickname || Lookup.speciesName(mon.dexNum, mon.language)
+
+      insertOrUpdate(mon)
+    },
+    [tryLoadFromId, insertOrUpdate]
   )
 
   const startTrackingNewMon = useCallback(
@@ -243,12 +340,21 @@ export function useOhpkmStore(): OhpkmStore {
     monIsStored,
     insertOrUpdate,
     insertOrUpdateAll,
+
+    updateMonMarkings,
+    updateMonNotes,
+    updateMonTags,
+    updateMonDisplayColor,
+    setMonNickname,
+
     getAllStored,
     updateAndConvertForSave,
     startTrackingNewMon,
     getIdIfTracked,
     loadIfTracked,
     monOrOhpkmIfTracked,
+
+    replaceHeldItem,
   }
 }
 

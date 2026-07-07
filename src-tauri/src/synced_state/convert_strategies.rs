@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
+    commands::{CommandError, CommandResult},
     data_controller::{DataController, DataDir},
     error::Result,
 };
@@ -8,9 +9,9 @@ use pkm_rs::convert_strategy::ConvertStrategy;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::state::synced_state::{self, SyncedState};
+use crate::synced_state;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
 struct NamedStrategy {
     name: String,
     strategy: ConvertStrategy,
@@ -18,7 +19,7 @@ struct NamedStrategy {
 
 type StrategiesById = HashMap<Uuid, NamedStrategy>;
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, specta::Type)]
 pub struct ConvertStrategies {
     strategies_by_id: StrategiesById,
     default_strategy_id: Option<Uuid>,
@@ -26,16 +27,19 @@ pub struct ConvertStrategies {
 
 const JSON_FILENAME: &str = "convert_strategies.json";
 
-impl SyncedState for ConvertStrategies {
+impl synced_state::SyncedState for ConvertStrategies {
+    type Action = ConvertStrategyEntries;
     const ID: &'static str = "convert_strategies";
 
-    fn union_with(&mut self, other: Self) {
-        for (key, value) in other.strategies_by_id {
+    fn update(&mut self, action: Self::Action) {
+        for (key, value) in action.ids_and_strategies {
             self.strategies_by_id.insert(key, value);
         }
-        if let Some(id) = other.default_strategy_id {
-            self.default_strategy_id = Some(id);
-        }
+        self.default_strategy_id = Some(action.default_strategy_id);
+    }
+
+    fn to_command_response(&self) -> impl Clone + Serialize + tauri::ipc::IpcResponse {
+        self
     }
 }
 
@@ -49,21 +53,36 @@ impl ConvertStrategies {
     }
 }
 
-#[tauri::command]
-pub fn get_convert_strategies(
-    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
-) -> Result<ConvertStrategies> {
-    synced_state.get_convert_strategies()
+#[derive(Debug, Default, Clone, Serialize, Deserialize, specta::Type)]
+pub struct ConvertStrategyEntries {
+    ids_and_strategies: Vec<(Uuid, NamedStrategy)>,
+    default_strategy_id: Uuid,
 }
 
 #[tauri::command]
+#[specta::specta]
+pub fn get_convert_strategies(
+    synced_state: tauri::State<'_, synced_state::AllSyncedState>,
+) -> CommandResult<ConvertStrategyEntries> {
+    synced_state
+        .get_convert_strategies()
+        .map(|strategies| ConvertStrategyEntries {
+            ids_and_strategies: strategies.strategies_by_id.into_iter().collect(),
+            default_strategy_id: strategies.default_strategy_id.unwrap_or_default(),
+        })
+        .map_err(CommandError::from)
+}
+
+#[tauri::command]
+#[specta::specta]
 pub fn update_convert_strategies(
     app_handle: tauri::AppHandle,
     synced_state: tauri::State<'_, synced_state::AllSyncedState>,
-    updates: ConvertStrategies,
-) -> Result<()> {
+    updates: ConvertStrategyEntries,
+) -> CommandResult<()> {
     synced_state
         .lock()?
         .convert_strategies
-        .union_with(&app_handle, updates)
+        .update(&app_handle, updates)
+        .map_err(CommandError::from)
 }

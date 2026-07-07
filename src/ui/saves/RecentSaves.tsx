@@ -1,3 +1,4 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { getPluginIdentifier } from '@openhome-core/save/util'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
@@ -9,7 +10,6 @@ import {
   stringSorter,
 } from '@openhome-core/util/sort'
 import { SaveRef } from '@openhome-core/util/types'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
@@ -31,7 +31,7 @@ interface SaveFileSelectorProps {
 
 export default function RecentSaves(props: SaveFileSelectorProps) {
   const { onOpen, view, cardSize } = props
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [recentSaves, setRecentSaves] = useState<Record<string, SaveRef>>()
   const savesAndBanks = useSaves()
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)

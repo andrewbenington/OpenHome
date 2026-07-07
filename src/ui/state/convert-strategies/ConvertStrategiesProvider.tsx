@@ -1,7 +1,9 @@
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import useBackend from '@openhome-core/backend/useBackend'
+import { ConvertStrategyEntries } from '@openhome-core/tauri/spectaCommands'
+import { Option } from '@openhome-core/util/functional'
 import { SyncedStateController, useSyncedState } from '@openhome-ui/state/synced-state'
 import { ConvertStrategy } from '@pkm-rs/pkg'
-import { PropsWithChildren, useContext } from 'react'
+import { PropsWithChildren } from 'react'
 import { ConversionSettingsContext } from '.'
 import SyncedStateProvider from '../synced-state/SyncedStateProvider'
 
@@ -31,20 +33,54 @@ export default function ConvertStrategiesProvider({ children }: PropsWithChildre
   )
 }
 
-function stateReducer(prev: ConvertStrategies, updated: ConvertStrategies): ConvertStrategies {
-  return { ...prev, ...updated }
+function stateReducer(
+  prev: Option<ConvertStrategies>,
+  action: ConvertStrategyEntries
+): ConvertStrategies {
+  let strategies_by_id = { ...prev?.strategies_by_id }
+  action.ids_and_strategies.forEach(([id, strategy]) => {
+    strategies_by_id[id] = strategy
+  })
+
+  return {
+    default_strategy_id: action.default_strategy_id,
+    strategies_by_id,
+  }
 }
 
-function useSyncedConvertState(): SyncedStateController<ConvertStrategies> {
-  const backend = useContext(BackendContext)
+function assembleEntries(entries: ConvertStrategyEntries) {
+  let strategies_by_id: {
+    [x: string]: NamedStrategy
+  } = {}
+  entries.ids_and_strategies.forEach(([id, strategy]) => {
+    strategies_by_id[id] = strategy
+  })
+
+  return {
+    default_strategy_id: entries.default_strategy_id,
+    strategies_by_id,
+  }
+}
+
+function useSyncedConvertState(): SyncedStateController<
+  ConvertStrategies,
+  ConvertStrategyEntries,
+  ConvertStrategyEntries
+> {
+  const backend = useBackend()
 
   const stateGetter = backend.getConvertStrategies
-  const stateUpdater = backend.updateConvertStrategies
+  const stateUpdater = (newState: ConvertStrategies) =>
+    backend.updateConvertStrategies({
+      ids_and_strategies: Object.entries(newState.strategies_by_id),
+      default_strategy_id: newState.default_strategy_id,
+    })
 
   return {
     identifier: 'convert_strategies',
     stateGetter,
     stateReducer,
     stateUpdater,
+    convertRustState: assembleEntries,
   }
 }

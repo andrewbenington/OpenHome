@@ -3,12 +3,12 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::commands::CommandResult;
 use crate::data_controller::{DataController, DataDir};
-use crate::error::Result;
 
 const BANKS_FILENAME: &str = "banks.json";
 
-#[derive(Default, Serialize, Deserialize, Clone)]
+#[derive(Default, Serialize, Deserialize, Clone, specta::Type)]
 pub struct StoredBankData {
     banks: Vec<Bank>,
     #[serde(default)]
@@ -46,7 +46,7 @@ fn default_id() -> Uuid {
     Uuid::new_v4()
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, specta::Type)]
 pub struct Bank {
     #[serde(default = "default_id")]
     id: Uuid,
@@ -87,7 +87,7 @@ impl Default for Bank {
     }
 }
 
-#[derive(Default, Serialize, Deserialize, Clone)]
+#[derive(Default, Serialize, Deserialize, Clone, specta::Type)]
 pub struct Box {
     #[serde(default = "default_id")]
     pub id: Uuid,
@@ -109,7 +109,8 @@ impl Box {
 pub type BoxIdentifiers = HashMap<u8, String>;
 
 #[tauri::command]
-pub fn load_banks(app_handle: tauri::AppHandle) -> Result<StoredBankData> {
+#[specta::specta]
+pub fn load_banks(app_handle: tauri::AppHandle) -> CommandResult<StoredBankData> {
     let mut storage: StoredBankData =
         app_handle.read_or_create_default_json_file(DataDir::Storage, BANKS_FILENAME)?;
     if storage.banks.is_empty() {
@@ -122,9 +123,13 @@ pub fn load_banks(app_handle: tauri::AppHandle) -> Result<StoredBankData> {
 }
 
 #[tauri::command]
-pub fn write_banks(app_handle: tauri::AppHandle, mut bank_data: StoredBankData) -> Result<()> {
+#[specta::specta]
+pub fn write_banks(
+    app_handle: tauri::AppHandle,
+    mut bank_data: StoredBankData,
+) -> CommandResult<()> {
     bank_data.order_boxes_by_indices();
     bank_data.reset_box_indices();
 
-    app_handle.write_file_json(DataDir::Storage, BANKS_FILENAME, &bank_data)
+    Ok(app_handle.write_file_json(DataDir::Storage, BANKS_FILENAME, &bank_data)?)
 }

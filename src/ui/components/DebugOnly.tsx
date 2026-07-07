@@ -6,5 +6,5 @@ export type DebugOnlyProps = {
 }
 
 export default function DebugOnly(props: DebugOnlyProps) {
-  return useIsDebug() ? <>{props.children}</> : null
+  return useIsDebug() ? props.children : undefined
 }

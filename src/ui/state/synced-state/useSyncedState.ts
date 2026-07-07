@@ -1,6 +1,6 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 type StateConverter<State, RustState> = [State] extends [RustState]
   ? { convertRustState?: undefined } // rust state is the same type as typescript state
@@ -8,36 +8,37 @@ type StateConverter<State, RustState> = [State] extends [RustState]
       convertRustState: (payload: RustState) => State
     }
 
-export type SyncedStateController<State, RustState = State> = {
+export type SyncedStateController<State, Action = State, RustState = State> = {
   identifier: string
   stateGetter: () => Promise<Errorable<State>>
-  stateReducer: (prev: State, updated: State) => State
-  stateUpdater: (updated: State) => Promise<Errorable<null>>
+  stateReducer: (prev: Option<State>, action: Action) => State
+  stateUpdater: (action: State) => Promise<Errorable<null>>
   onLoaded?: (data: State) => void
 } & StateConverter<State, RustState>
 
-export type RustStateManager<State> = {
-  updateState: (updated: State) => Promise<Errorable<null>>
+export type RustStateManager<State, Action = State> = {
+  updateState: (action: Action) => Promise<Errorable<null>>
 } & (
   | { loaded: true; state: State; error: undefined }
   | { loaded: false; state: undefined; error: Option<string> }
 )
 
-export function useSyncedState<State, RustState = State>(
-  controller: SyncedStateController<State, RustState>
-): RustStateManager<State> {
+export function useSyncedState<State, Action = State, RustState = State>(
+  controller: SyncedStateController<State, Action, RustState>
+): RustStateManager<State, Action> {
   const [stateCache, setStateCache] = useState<State>()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
 
   const { identifier, stateGetter, stateReducer, stateUpdater, convertRustState, onLoaded } =
     controller
 
   const updateState = useCallback(
-    async (updated: State) => {
-      if (stateCache) setStateCache(stateReducer(stateCache, updated))
-      return await stateUpdater(updated)
+    async (action: Action) => {
+      const updatedState = stateReducer(stateCache, action)
+      setStateCache(updatedState)
+      return await stateUpdater(updatedState)
     },
     [stateCache, stateReducer, stateUpdater]
   )

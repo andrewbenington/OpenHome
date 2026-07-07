@@ -5,14 +5,16 @@ import { ErrorIcon } from '../../components/Icons'
 import LoadingIndicator from '../../components/LoadingIndicator'
 import { RustStateManager } from './useSyncedState'
 
-export type SyncedStateProviderProps<State> = {
-  useStateManager: () => RustStateManager<State>
-  StateContext: Context<[State, (updated: State) => Promise<Errorable<null>>]>
+export type SyncedStateProviderProps<State, Action> = {
+  useStateManager: () => RustStateManager<State, Action>
+  StateContext: Context<[State, (updated: Action) => Promise<Errorable<null>>]>
   stateDescription: string
   children: ReactNode
 }
 
-export default function SyncedStateProvider<State>(props: SyncedStateProviderProps<State>) {
+export default function SyncedStateProvider<State, Action = State>(
+  props: SyncedStateProviderProps<State, Action>
+) {
   const { useStateManager, StateContext, stateDescription, children } = props
   const stateManager = useStateManager()
 

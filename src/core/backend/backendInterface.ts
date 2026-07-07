@@ -1,21 +1,27 @@
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { SaveWriter } from '@openhome-core/save/interfaces'
 import { PathData, PossibleSaves } from '@openhome-core/save/util/path'
 import { SaveFolder, StoredBankData } from '@openhome-core/save/util/storage'
+import { ConvertStrategyEntries } from '@openhome-core/tauri/spectaCommands'
 import { Errorable } from '@openhome-core/util/functional'
 import { LoadSaveResponse, LookupMap, SaveRef } from '@openhome-core/util/types'
+import { LogFilter } from '@openhome-ui/pages/logs'
 import { AppTheme, Settings } from '@openhome-ui/state/appInfo'
+import { ConvertStrategies } from '@openhome-ui/state/convert-strategies/ConvertStrategiesProvider'
 import { PluginMetadataWithIcon } from '@openhome-ui/util/plugin'
 import { Pokedex, PokedexUpdate } from '@openhome-ui/util/pokedex'
-import dayjs, { Dayjs } from 'dayjs'
-import { LogFilter } from '../pages/logs'
-import { ConvertStrategies } from '../state/convert-strategies/ConvertStrategiesProvider'
+import { Dayjs } from 'dayjs'
 
 export type AppState = {
-  open_transaction: boolean
-  temp_files: string[]
   is_dev: boolean
   new_features_since_update: UpdateFeatures[]
+  transaction: TransactionState
+}
+
+type TransactionState = {
+  open_transaction: boolean
+  temp_files: string[]
 }
 
 type UpdateFeatures = {
@@ -26,17 +32,6 @@ type UpdateFeatures = {
 export type ImageResponse = {
   base64: string
   extension: string
-}
-
-type LogEntryUnparsed = {
-  timestamp: string
-  level: string
-  target?: string
-  message: string
-  event?: string
-  fields?: Record<string, unknown>
-  context?: Record<string, unknown>
-  ohpkm_id?: OhpkmIdentifier
 }
 
 export type LogEntry = {
@@ -50,47 +45,12 @@ export type LogEntry = {
   ohpkm_id?: OhpkmIdentifier
 }
 
-type LogFilterUnparsed = {
-  start: string
-  end: string
-  ohpkm_id?: string
-}
-
-function parseLog(unparsed: LogEntryUnparsed): LogEntry {
-  return {
-    ...unparsed,
-    timestamp: dayjs(unparsed.timestamp),
-  }
-}
-
-export type LogsResponseUnparsed = {
-  current: LogFilterUnparsed
-  next: LogFilterUnparsed
-  remaining_file_lines: LogEntryUnparsed[]
-}
-
 export type LogsResponse = {
   current: LogFilter
   next: LogFilter
   remaining_file_lines: LogEntry[]
 }
 
-export function parseLogs(unparsed: LogsResponseUnparsed): LogsResponse {
-  return {
-    ...unparsed,
-    current: parseFilter(unparsed.current),
-    next: parseFilter(unparsed.next),
-    remaining_file_lines: unparsed.remaining_file_lines.map(parseLog),
-  }
-}
-
-function parseFilter(unparsed: LogFilterUnparsed): LogFilter {
-  return {
-    ...unparsed,
-    start: dayjs(unparsed.start),
-    end: dayjs(unparsed.end),
-  }
-}
 export type LogLevel = 'ERROR' | 'WARN' | 'INFO' | 'DEBUG' | 'TRACE'
 
 export type StoredLookups = { gen12: LookupMap; gen345: LookupMap }
@@ -114,7 +74,7 @@ export default interface BackendInterface {
   getDataDirPath: () => Promise<Errorable<string>>
 
   /* write synced state to disk during save */
-  saveSyncedState: () => Promise<Errorable<void>>
+  saveSyncedState: () => Promise<Errorable<null>>
 
   /* past gen identifier lookups */
   loadPokedex: () => Promise<Errorable<Pokedex>>
@@ -127,6 +87,7 @@ export default interface BackendInterface {
   /* game saves */
   loadSaveFile: (filePath: PathData) => Promise<Errorable<LoadSaveResponse>>
   writeSaveFile: (path: string, bytes: Uint8Array) => Promise<Errorable<null>>
+  writeAllSaveFiles: (saveWriters: SaveWriter[]) => Promise<Errorable<null>[]>
 
   /* game save management */
   getRecentSaves: () => Promise<Errorable<Record<string, SaveRef>>>
@@ -160,10 +121,10 @@ export default interface BackendInterface {
   getSettings: () => Promise<Errorable<Settings>>
   updateSettings: (settings: Settings) => Promise<Errorable<null>>
   getConvertStrategies: () => Promise<Errorable<ConvertStrategies>>
-  updateConvertStrategies: (strategies: ConvertStrategies) => Promise<Errorable<null>>
+  updateConvertStrategies: (strategies: ConvertStrategyEntries) => Promise<Errorable<null>>
   setTheme(appTheme: AppTheme): Promise<Errorable<null>>
   saveLocalFile: (bytes: Uint8Array, suggestedName: string) => Promise<Errorable<null>>
-  emitMenuEvent: (menuEventId: string) => Promise<Errorable<null>>
+  emitMenuEvent: (menuEventId: string) => Promise<void>
 
   /* logging */
   getLogs(filter: LogFilter): Promise<Errorable<LogsResponse>>
@@ -177,7 +138,7 @@ export default interface BackendInterface {
   getPluginPath: (pluginId: string) => Promise<Errorable<string>>
   downloadPlugin(remoteUrl: string): Promise<Errorable<string>>
   loadPluginCode(pluginId: string): Promise<Errorable<string>>
-  deletePlugin(pluginId: string): Promise<Errorable<string>>
+  deletePlugin(pluginId: string): Promise<Errorable<null>>
 }
 
 export type BankOrBoxChange = { bank: number; box: number }
@@ -189,7 +150,7 @@ export type NewLogNotification = {
   timestamp_unix: number
 }
 
-interface BackendListeners {
+export interface BackendListeners {
   onMenuEvent: (event: MenuEvent) => void
   onLookupsUpdate: (updated_lookups: StoredLookups) => void
   onStateUpdate: Record<string, <State>(updated_state: State) => void>

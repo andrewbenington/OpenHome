@@ -11,7 +11,7 @@ use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize, specta::Type)]
 pub enum NatureStrategy {
     KeepOriginalNature,
     #[default]

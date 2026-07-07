@@ -5,7 +5,7 @@ use tauri::{App, Emitter, Manager};
 use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
 use crate::error::{Error, Result};
 use crate::pkm_storage::StoredBankData;
-use crate::state::{GEN12_FILENAME, GEN345_FILENAME};
+use crate::synced_state::lookup::{GEN12_FILENAME, GEN345_FILENAME};
 use crate::versioning;
 use crate::{logging, util};
 

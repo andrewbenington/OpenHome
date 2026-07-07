@@ -10,6 +10,7 @@ mod saves;
 mod startup;
 mod startup_config;
 mod state;
+mod synced_state;
 mod util;
 mod versioning;
 
@@ -17,13 +18,66 @@ use std::env;
 use tauri::Manager;
 
 pub use crate::error::{Error, Result};
+use crate::synced_state::AllSyncedState;
+use crate::synced_state::convert_strategies::ConvertStrategies;
+use crate::synced_state::lookup::LookupState;
+use crate::synced_state::ohpkm_store::OhpkmBytesStore;
 
-use crate::state::synced_state::AllSyncedState;
+const RAW_HANDLER: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_handler![
+    commands::get_file_bytes,
+    commands::get_storage_file_json,
+    commands::write_storage_file_json,
+    synced_state::ohpkm_store::add_to_ohpkm_store,
+    logging::log,
+];
+
+pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
+    tauri_specta::Builder::<tauri::Wry>::new().commands(tauri_specta::collect_commands![
+        commands::get_state,
+        commands::get_file_created,
+        commands::get_image_data,
+        commands::write_file_bytes,
+        commands::set_app_theme,
+        commands::validate_recent_saves,
+        commands::download_plugin,
+        commands::list_installed_plugins,
+        commands::load_plugin_code,
+        commands::delete_plugin,
+        commands::handle_windows_accelerator,
+        commands::open_directory,
+        commands::open_file_location,
+        saves::find_suggested_saves,
+        startup_config::get_data_dir_path,
+        startup_config::change_data_dir,
+        pkm_storage::load_banks,
+        pkm_storage::write_banks,
+        state::get_pokedex,
+        state::update_pokedex,
+        state::start_transaction,
+        state::rollback_transaction,
+        state::commit_transaction,
+        synced_state::save_synced_state,
+        synced_state::update_synced_state,
+        synced_state::convert_strategies::get_convert_strategies,
+        synced_state::convert_strategies::update_convert_strategies,
+        synced_state::lookup::get_lookups,
+        synced_state::lookup::add_to_lookups,
+        synced_state::lookup::remove_dangling,
+        synced_state::ohpkm_store::get_ohpkm_store,
+        synced_state::ohpkm_store::permanently_delete_ohpkms,
+        logging::get_logs_today,
+        logging::clear_logs_for_range,
+    ])
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let specta_builder = specta_builder();
+
+    let specta_handler = specta_builder.invoke_handler();
+
     tauri::Builder::default()
-        .plugin(tauri_plugin_window_state::Builder::new().build())
+        // .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
@@ -31,11 +85,7 @@ pub fn run() {
                 match startup_config::StartupConfigState::load_or_create(app.handle()) {
                     Ok(state) => state,
                     Err(err) => {
-                        util::show_error_dialog(
-                            app,
-                            err.to_string(),
-                            "OpenHome Failed to Launch - Startup Config Error",
-                        );
+                        util::show_error_dialog(app, err, launch_error_msg("Startup Config"));
 
                         app.handle().exit(1);
                         std::process::exit(1);
@@ -49,11 +99,7 @@ pub fn run() {
                 match launch_error {
                     Error::OutdatedVersion { .. } => app.handle().exit(1),
                     _ => {
-                        util::show_error_dialog(
-                            app,
-                            launch_error.to_string(),
-                            "OpenHome Failed to Launch",
-                        );
+                        util::show_error_dialog(app, launch_error, "OpenHome Failed to Launch");
 
                         app.handle().exit(1);
                     }
@@ -61,48 +107,35 @@ pub fn run() {
                 std::process::exit(1);
             };
 
-            let ohpkm_store = match state::OhpkmBytesStore::load_from_mons_v2(app.handle()) {
+            let ohpkm_store = match OhpkmBytesStore::load_from_mons_v2(app.handle()) {
                 Ok(state) => state,
                 Err(err) => {
-                    util::show_error_dialog(
-                        app,
-                        err.to_string(),
-                        "OpenHome Failed to Launch - OHPKM load error",
-                    );
+                    util::show_error_dialog(app, err, launch_error_msg("OHPKM Load"));
 
                     app.handle().exit(1);
                     std::process::exit(1);
                 }
             };
 
-            let lookup_state = match state::LookupState::load_from_storage(app.handle()) {
+            let lookup_state = match LookupState::load_from_storage(app.handle()) {
                 Ok(lookup) => lookup,
                 Err(err) => {
-                    util::show_error_dialog(
-                        app,
-                        err.to_string(),
-                        "OpenHome Failed to Launch - Lookup File Error",
-                    );
+                    util::show_error_dialog(app, err, launch_error_msg("Lookup File"));
 
                     app.handle().exit(1);
                     std::process::exit(1);
                 }
             };
 
-            let conversion_settings =
-                match state::ConvertStrategies::load_from_storage(app.handle()) {
-                    Ok(settings) => settings,
-                    Err(err) => {
-                        util::show_error_dialog(
-                            app,
-                            err.to_string(),
-                            "OpenHome Failed to Launch - Cannot Open Conversion Settings",
-                        );
+            let conversion_settings = match ConvertStrategies::load_from_storage(app.handle()) {
+                Ok(settings) => settings,
+                Err(err) => {
+                    util::show_error_dialog(app, err, launch_error_msg("Conversion Settings"));
 
-                        app.handle().exit(1);
-                        std::process::exit(1);
-                    }
-                };
+                    app.handle().exit(1);
+                    std::process::exit(1);
+                }
+            };
 
             let synced_state =
                 AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
@@ -111,11 +144,7 @@ pub fn run() {
             let pokedex_state = match state::PokedexState::load_from_storage(app.handle()) {
                 Ok(pokedex) => pokedex,
                 Err(err) => {
-                    util::show_error_dialog(
-                        app,
-                        err.to_string(),
-                        "OpenHome Failed to Launch - Pokedex File Error",
-                    );
+                    util::show_error_dialog(app, err, launch_error_msg("Pokedex File"));
 
                     app.handle().exit(1);
                     std::process::exit(1);
@@ -142,46 +171,35 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![
-            commands::get_state,
-            commands::get_file_bytes,
-            commands::get_file_created,
-            commands::get_image_data,
-            commands::get_storage_file_json,
-            commands::write_storage_file_json,
-            commands::write_file_bytes,
-            commands::set_app_theme,
-            commands::validate_recent_saves,
-            commands::download_plugin,
-            commands::list_installed_plugins,
-            commands::load_plugin_code,
-            commands::delete_plugin,
-            commands::handle_windows_accelerator,
-            commands::open_directory,
-            commands::open_file_location,
-            saves::find_suggested_saves,
-            startup_config::get_data_dir_path,
-            startup_config::change_data_dir,
-            pkm_storage::load_banks,
-            pkm_storage::write_banks,
-            state::get_lookups,
-            state::add_to_lookups,
-            state::get_ohpkm_store,
-            state::permanently_delete_ohpkms,
-            state::remove_dangling,
-            state::add_to_ohpkm_store,
-            state::get_pokedex,
-            state::update_pokedex,
-            state::get_convert_strategies,
-            state::update_convert_strategies,
-            state::start_transaction,
-            state::rollback_transaction,
-            state::commit_transaction,
-            state::synced_state::save_synced_state,
-            logging::get_logs_today,
-            logging::log,
-            logging::clear_logs_for_range,
-        ])
+        .invoke_handler(move |invoke| match invoke.message.command() {
+            "get_file_bytes"
+            | "get_storage_file_json"
+            | "write_storage_file_json"
+            | "add_to_ohpkm_store"
+            | "log" => RAW_HANDLER(invoke),
+            _ => specta_handler(invoke),
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+fn launch_error_msg(error_category: &str) -> String {
+    format!("OpenHome Failed to Launch - {error_category} error")
+}
+
+// this can't be in a build.rs file because it depends on a non-const builder.
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn export_typescript_bindings() {
+        let specta_builder = super::specta_builder();
+
+        specta_builder
+            .export(
+                specta_typescript::Typescript::default()
+                    .bigint(specta_typescript::BigIntExportBehavior::Number),
+                "../src/core/tauri/spectaCommands.ts",
+            )
+            .expect("Failed to export typescript bindings");
+    }
 }

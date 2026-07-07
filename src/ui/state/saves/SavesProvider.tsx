@@ -1,8 +1,8 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAVClass } from '@openhome-core/save/util'
 import { Option, R, range, Result } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -23,7 +23,7 @@ export type SavesProviderProps = {
 type SaveTypeCallback = (saveType?: SAVClass | PromiseLike<SAVClass>) => void
 
 export default function SavesProvider({ children }: SavesProviderProps) {
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [itemBagState, bagDispatch] = useContext(ItemBagContext)
   const [releaseWarningDisplayed, setReleaseWarningDisplayed] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -66,9 +66,9 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       const result = await backend.startTransaction()
 
       if (R.isErr(result)) {
-        displayError('Error Starting Save Transaction', result.err)
+        displayError('Error Starting Save Transaction', result.error)
         setSaving(false)
-        return R.Err([TransactionStart(result.err)])
+        return R.Err([TransactionStart(result.error)])
       }
 
       // Write appropriate trainer data to handler fields
@@ -101,16 +101,16 @@ export default function SavesProvider({ children }: SavesProviderProps) {
       if (itemBagState.modified) {
         const saveBagResult = await backend.saveItemBag(itemBagState.itemCounts)
         if (R.isErr(saveBagResult)) {
-          displayError('Error Saving Bag', saveBagResult.err)
+          displayError('Error Saving Bag', saveBagResult.error)
           await backend.rollbackTransaction()
           setSaving(false)
-          return R.Err([SaveItemBagData(saveBagResult.err)])
+          return R.Err([SaveItemBagData(saveBagResult.error)])
         }
         bagDispatch({ type: 'clear_modified' })
       }
 
       const results = (await Promise.all(promises)).flat()
-      const errors = results.filter(R.isErr).map((r) => r.err)
+      const errors = results.filter(R.isErr).map((r) => r.error)
 
       if (errors.length) {
         displayError('Error Saving', errors)
@@ -121,15 +121,15 @@ export default function SavesProvider({ children }: SavesProviderProps) {
 
       const syncedStateResult = await backend.saveSyncedState()
       if (R.isErr(syncedStateResult)) {
-        displayError('Error Saving', syncedStateResult.err)
+        displayError('Error Saving', syncedStateResult.error)
         setSaving(false)
-        return R.Err([BackendSaveError(syncedStateResult.err)])
+        return R.Err([BackendSaveError(syncedStateResult.error)])
       }
 
       const commitResult = await backend.commitTransaction()
       if (R.isErr(commitResult)) {
         setSaving(false)
-        return R.Err([TransactionCommit(commitResult.err)])
+        return R.Err([TransactionCommit(commitResult.error)])
       }
 
       openSavesDispatch({ type: 'clear_updated_box_slots' })

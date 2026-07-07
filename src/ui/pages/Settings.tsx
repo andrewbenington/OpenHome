@@ -1,6 +1,6 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { R } from '@openhome-core/util/functional'
 import { stringSorter } from '@openhome-core/util/sort'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
 import ContentCard from '@openhome-ui/components/ContentCard'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import { AppInfoContext, AppTheme } from '@openhome-ui/state/appInfo'
@@ -44,7 +44,7 @@ export default function Settings() {
 
 function GeneralSettings() {
   const [appInfoState, dispatchAppInfoState] = useContext(AppInfoContext)
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const [dataDirPath, setDataDirPath] = useState<string>()
   const displayError = useDisplayError()
 

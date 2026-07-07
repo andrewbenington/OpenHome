@@ -68,22 +68,8 @@ function iconType(
 }
 
 export default function PokemonIcon(props: PokemonIconProps) {
-  const {
-    dexNumber,
-    formIndex,
-    isShiny,
-    heldItemIndex,
-    onlyItem,
-    grayedOut,
-    silhouette,
-    isEgg,
-    topRightIndicator,
-    tags,
-    hasNotes,
-    style,
-    onClick,
-    extraFormIndex,
-  } = props
+  const { dexNumber, formIndex, isShiny, heldItemIndex, onlyItem, silhouette, isEgg } = props
+  const { grayedOut, topRightIndicator, tags, hasNotes, style, onClick, extraFormIndex } = props
   const { showNotesIndicator, showTags } = useMonDisplay()
 
   let monImage = null
@@ -116,7 +102,10 @@ export default function PokemonIcon(props: PokemonIconProps) {
   }
 
   return (
-    <div className={classNames('pokemon-icon-container', grayscaleIf(grayedOut))} style={style}>
+    <div
+      className={classNames('pokemon-icon-container', grayscaleIf(grayedOut), 'flex-centered')}
+      style={style}
+    >
       {!onlyItem && monImage}
       {isShiny && (
         <img

@@ -1,7 +1,7 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "1.12.4",
+  "version": "1.13.0",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "pokemon",
@@ -98,6 +98,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
+    "eslint-plugin-unused-imports": "^4.4.1",
     "jsdom": "^29.1.1",
     "prettier": "^3.8.4",
     "react-dom": "^19.2.7",

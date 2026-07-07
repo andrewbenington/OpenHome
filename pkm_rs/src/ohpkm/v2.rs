@@ -1575,6 +1575,10 @@ impl OhpkmV2 {
             .map(|t| t.to_string())
             .collect()
     }
+
+    pub fn get_xor_checksum(&self) -> u64 {
+        crate::checksum::checksum_u64_le(&self.to_bytes())
+    }
 }
 
 impl OhpkmV2 {
@@ -3449,13 +3453,7 @@ impl OhpkmV2 {
         trainer_name: String,
         save_path: String,
     ) {
-        self.most_recent_save = Some(MostRecentSave {
-            trainer_id,
-            secret_id,
-            game,
-            trainer_name: trainer_name.into(),
-            file_path: save_path,
-        })
+        self.set_recent_save(game, trainer_id, secret_id, trainer_name, save_path)
     }
 
     #[wasm_bindgen(js_name = getPresentSections)]
@@ -3490,6 +3488,15 @@ impl OhpkmV2 {
     #[wasm_bindgen(js_name = revertAbilityByNum)]
     pub fn revert_ability_by_num_js(&mut self) {
         self.main_data.revert_ability_by_num()
+    }
+
+    #[wasm_bindgen(js_name = calculateChecksum)]
+    pub fn get_xor_checksum_u32_js(&self) -> u32 {
+        let checksum = crate::checksum::checksum_u64_le(&self.to_bytes());
+        let front = checksum as u32;
+        let back = (checksum >> u32::BITS) as u32;
+
+        front ^ back
     }
 }
 

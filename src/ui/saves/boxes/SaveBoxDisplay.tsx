@@ -1,10 +1,10 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { range } from '@openhome-core/util/functional'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
 import Fallback from '@openhome-ui/components/Fallback'
@@ -145,7 +145,13 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     <>
       <Flex direction="column" width="100%">
         <div
-          className={cssClass('box-card').with('box-card-disabled').if(allCellsDisabled).build()}
+          className={cssClass('save-box-card')
+            .with('save-box-card-disabled')
+            .if(allCellsDisabled)
+            .with('save-box-small')
+            .if(save.boxColumns === 5)
+            .else('save-box-standard')
+            .build()}
         >
           <SaveHeader save={save} setDetailsModal={setDetailsModal} />
           <Separator />
@@ -174,7 +180,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                 }
                 const mon = save.getMonAt(location.box, location.boxSlot)
                 const uniqueKey = mon
-                  ? `${mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
+                  ? `${save.currentPCBox}-${index}-${mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
                   : `${save.currentPCBox}-${index}`
                 return (
                   <BoxCell
@@ -242,6 +248,7 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       <Fallback>
         <PokemonDetailsModal
           mon={selectedMon}
+          key={`${save.currentPCBox}-${selectedMon?.encryptionConstant ?? selectedMon?.personalityValue ?? JSON.stringify(selectedMon?.dvs)}-${selectedMon?.nickname}`}
           onClose={() => setSelectedIndex(undefined)}
           navigateRight={navigateRight}
           navigateLeft={navigateLeft}
@@ -269,7 +276,7 @@ type SaveHeaderProps = { save: SAV; setDetailsModal: (open: boolean) => void }
 
 function SaveHeader({ save, setDetailsModal }: SaveHeaderProps) {
   const savesManager = useSaves()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
 
   const currentBoxMonCount = save.getBoxMonCount(save.currentPCBox)
   const totalMonCount = save.getAllMons().length

@@ -24,11 +24,11 @@ describe('G3SAV - Gen 3 Save File Read Test', async () => {
   )
 
   if (!R.isOk(result)) {
-    fail(`Failed to build save file: ${result.err}`)
+    fail(`Failed to build save file: ${result.error}`)
     return
   }
 
-  const emeraldSaveFile = result.value
+  const emeraldSaveFile = result.data
 
   if (emeraldSaveFile === undefined) {
     fail(`Failed to build save file: got undefined`)

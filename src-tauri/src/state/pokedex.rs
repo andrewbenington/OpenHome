@@ -3,8 +3,9 @@ use std::{cmp::max, collections::HashMap, ops::Deref, sync::Mutex};
 use serde::{Deserialize, Serialize};
 use tauri::Emitter;
 
+use crate::commands::CommandResult;
 use crate::data_controller::{DataController, DataDir, JsonDataReader};
-use crate::error::{Error, Result};
+use crate::error::Result;
 
 const POKEDEX_FILENAME: &str = "pokedex.json";
 
@@ -29,14 +30,16 @@ impl Deref for PokedexState {
 pub type DexNumber = u16;
 pub type FormeNumber = u16;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, specta::Type,
+)]
 pub enum PokedexStatus {
     Seen,
     Caught,
     ShinyCaught,
 }
 
-#[derive(Default, Debug, Serialize, Deserialize, Clone)]
+#[derive(Default, Debug, Serialize, Deserialize, Clone, specta::Type)]
 pub struct PokedexEntry {
     // for compatibility with v1.10.*; for v1.12.0 the only macro should be #[serde(alias = "formes")]
     #[serde(rename = "formes")]
@@ -58,7 +61,7 @@ impl PokedexEntry {
     }
 }
 
-#[derive(Default, Debug, Serialize, Deserialize, Clone)]
+#[derive(Default, Debug, Serialize, Deserialize, Clone, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Pokedex {
     by_dex_number: HashMap<DexNumber, PokedexEntry>,
@@ -93,7 +96,7 @@ impl Pokedex {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct PokedexUpdate {
     dex_number: DexNumber,
@@ -102,16 +105,18 @@ pub struct PokedexUpdate {
 }
 
 #[tauri::command]
-pub fn get_pokedex(pokedex_state: tauri::State<'_, PokedexState>) -> Result<Pokedex> {
+#[specta::specta]
+pub fn get_pokedex(pokedex_state: tauri::State<'_, PokedexState>) -> CommandResult<Pokedex> {
     Ok(pokedex_state.lock()?.clone())
 }
 
 #[tauri::command]
+#[specta::specta]
 pub fn update_pokedex(
     app_handle: tauri::AppHandle,
     pokedex_state: tauri::State<'_, PokedexState>,
     updates: Vec<PokedexUpdate>,
-) -> Result<()> {
+) -> CommandResult<()> {
     let mut pokedex = pokedex_state.lock()?;
     for update in updates {
         pokedex.register(update.dex_number, update.form_index, update.status);
@@ -119,7 +124,7 @@ pub fn update_pokedex(
 
     app_handle
         .emit("pokedex_update", pokedex.clone())
-        .map_err(|err| Error::other_with_source("Could not emit 'pokedex_update' to frontend", err))
+        .map_err(|err| format!("Could not emit 'pokedex_update' to frontend: {err}").into())
 }
 
 #[cfg(test)]

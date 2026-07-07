@@ -33,7 +33,7 @@ describe('Platinum save file read/write', async () => {
     )
 
     if (!R.isOk(result)) {
-      fail(`Failed to build save file: ${result.err}`)
+      fail(`Failed to build save file: ${result.error}`)
     }
   })
 
@@ -119,7 +119,7 @@ describe('Pearl save file read/write', async () => {
     )
 
     if (!R.isOk(result)) {
-      fail(`Failed to build save file: ${result.err}`)
+      fail(`Failed to build save file: ${result.error}`)
     }
   })
 
@@ -206,7 +206,7 @@ describe('HeartGold save file read/write', async () => {
     )
 
     if (!R.isOk(result)) {
-      fail(`Failed to build save file: ${result.err}`)
+      fail(`Failed to build save file: ${result.error}`)
     }
   })
 

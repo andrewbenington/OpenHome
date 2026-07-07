@@ -1,7 +1,8 @@
+import useBackend from '@openhome-core/backend/useBackend'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
-import { BackendContext } from '@openhome-ui/backend/backendContext'
 import {
   CtxMenuElementBuilder,
   Item,
@@ -12,13 +13,14 @@ import {
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { useMonDisplay } from '@openhome-ui/hooks/monDisplay'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { filterApplies } from '@openhome-ui/util/filter'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { DISPLAY_COLOR_PRESETS, TAG_PRESETS } from '@openhome-ui/util/tags'
 import { Lookup } from '@pkm-rs/pkg'
 import { Flex, TextField } from '@radix-ui/themes'
-import { useCallback, useContext, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import '../style.css'
 import DraggableMon from './DraggableMon'
 import DroppableSpace from './DroppableSpace'
@@ -30,6 +32,7 @@ function hasOpenHomeId(mon: PKMInterface): mon is MonWithOpenHomeId {
 }
 
 interface BoxCellProps {
+  title?: string
   onClick: () => void
   onDrop: (_: PKMInterface[]) => void
   disabled?: boolean
@@ -48,15 +51,10 @@ function BoxCell(props: BoxCellProps) {
   const { onClick, onDrop, disabled, disabledReason, mon, borderColor, dragID } = props
   const { location, isSelected, onToggleSelect, multiSelectEnabled } = props
   const { filter, topRightIndicator, showItem, showShiny } = useMonDisplay()
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const displayError = useDisplayError()
-  const {
-    releaseMonAtLocation,
-    moveMonItemToBag,
-    setMonNickname,
-    updateMonTags,
-    updateMonDisplayColor,
-  } = useSaves()
+  const { releaseMonAtLocation, moveMonItemToBag } = useSaves()
+  const { updateMonTags, updateMonDisplayColor, setMonNickname } = useOhpkmStore()
   const [renameOpen, setRenameOpen] = useState(false)
   const [renameValue, setRenameValue] = useState('')
   const { showBackgroundColor } = useMonDisplay()
@@ -125,10 +123,13 @@ function BoxCell(props: BoxCellProps) {
   }, [mon])
 
   const confirmRename = useCallback(() => {
-    if (!mon) return
-    setMonNickname(renameValue.trim() || Lookup.speciesName(mon.dexNum, mon.language), location)
+    if (!(mon instanceof OHPKM)) return
+    setMonNickname(
+      mon.openhomeId,
+      renameValue.trim() || Lookup.speciesName(mon.dexNum, mon.language)
+    )
     setRenameOpen(false)
-  }, [renameValue, location, setMonNickname, mon])
+  }, [renameValue, setMonNickname, mon])
 
   const tagSubmenu = useMemo(() => {
     if (!mon || !hasOpenHomeId(mon)) return undefined
@@ -209,12 +210,8 @@ function BoxCell(props: BoxCellProps) {
     <>
       <OpenHomeCtxMenu sections={[contextMenuItems, props.contextMenu]}>
         <div
+          className="box-cell"
           style={{
-            padding: 0,
-            width: '100%',
-            aspectRatio: 1,
-            borderRadius: 3,
-            borderWidth: 1,
             backgroundColor: cellBackgroundColor,
             borderColor: isSelected ? '#4ade80' : borderColor,
           }}
@@ -250,7 +247,7 @@ function BoxCell(props: BoxCellProps) {
           )}
         </div>
       </OpenHomeCtxMenu>
-      {mon && (
+      {mon instanceof OHPKM && (
         <Dialog.Container open={renameOpen} onOpenChange={setRenameOpen}>
           <Dialog.Title>Rename {mon.nickname}</Dialog.Title>
           <Dialog.Description>Enter a nickname for this Pokémon</Dialog.Description>

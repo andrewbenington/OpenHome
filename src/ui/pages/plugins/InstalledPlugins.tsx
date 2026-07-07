@@ -1,4 +1,4 @@
-import { BackendContext } from '@openhome-ui/backend/backendContext'
+import useBackend from '@openhome-core/backend/useBackend'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { OpenHomePlugin, PluginContext } from '@openhome-ui/state/plugin/reducer'
@@ -28,7 +28,7 @@ export default function InstalledPlugins() {
 function InstalledPluginCard(props: { metadata: OpenHomePlugin; onDelete: (id: string) => void }) {
   const { metadata, onDelete } = props
   const [{ settings }, dispatchAppInfoState] = useContext(AppInfoContext)
-  const backend = useContext(BackendContext)
+  const backend = useBackend()
   const displayError = useDisplayError()
 
   const outdated = metadata.api_version < CURRENT_PLUGIN_API_VERSION
