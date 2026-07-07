@@ -32,28 +32,56 @@
   background-color: #f55;
 }
 
-.box-card {
+.save-box-card {
+  --base-cell-size: 3rem;
+
   display: flex;
   flex-direction: column;
   border-radius: var(--border-radius-lg);
   background-color: var(--color-panel);
+  min-width: 100%;
+  max-width: fit-content;
 
   .rt-Separator {
     margin-bottom: var(--padding-radius-sm-lg);
   }
 }
 
-.box-grid {
-  aspect-ratio: 6 / 5;
+.save-box-small {
+  --box-cell-size: calc(var(--base-cell-size) * 6/5);
+}
+
+.save-box-standard {
+  --box-cell-size: var(--base-cell-size);
+}
+
+.box-cell {
+  padding: 0;
+  width: var(--box-cell-size);
+  height: var(--box-cell-size);
+  border-radius: 3px;
+  border-width: 1px;
   box-sizing: border-box;
-  width: 100%;
+}
+
+.box-grid {
+  box-sizing: border-box;
   padding: var(--padding-radius-sm-lg);
   gap: 0.2rem;
+  align-items: center;
+  margin: auto;
 }
 
 .home-box-grid {
-  aspect-ratio: 6 / 5;
+  --box-cell-size: 3.75rem;
+
+  /* aspect-ratio: 6 / 5; */
+  display: grid;
+  gap: 0.2rem;
   width: 100%;
+  min-width: fit-content;
+  grid-template-columns: repeat(12, minmax(var(--box-cell-size), 1fr));
+  min-height: fit-content;
 }
 
 .sort-mon-cell .pokemon-icon-container {
@@ -68,7 +96,7 @@
   height: 100%;
 }
 
-.box-card-disabled {
+.save-box-card-disabled {
   --card-background-color: #666;
 }
 

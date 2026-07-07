@@ -78,8 +78,8 @@ summary::-webkit-details-marker {
 
 .shiny-icon {
   position: absolute;
-  width: 40%;
-  height: 40%;
+  width: 1.25rem;
+  height: 1.25rem;
   left: var(--padding-radius-xs-sm);
   bottom: var(--padding-radius-xs-sm);
   z-index: 10;
@@ -87,25 +87,15 @@ summary::-webkit-details-marker {
   filter: drop-shadow(0px 0px 2px #4342427e);
 }
 
-.item-icon-1 {
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-
 .item-icon {
   --shadow-color: rgb(255, 255, 255);
   --shadow-size: 1px;
   --shadow-blur: 0px;
   position: absolute;
-  width: 45%;
-  height: 45%;
-  right: 0.1rem;
-  bottom: 0.1rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  right: 0.25rem;
+  bottom: 0.25rem;
   z-index: 2;
   pointer-events: none;
   filter: drop-shadow(var(--shadow-size) var(--shadow-size) var(--shadow-blur) var(--shadow-color))

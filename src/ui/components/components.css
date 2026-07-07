@@ -43,15 +43,16 @@
   background-size: 3600%;
   background-repeat: no-repeat;
   margin: auto;
-  height: 100%;
-  width: 100%;
+  width: var(--pokemon-icon-size);
+  aspect-ratio: 1;
   top: 0;
   object-fit: contain;
 }
 
 .pokemon-icon-img {
-  width: 100%;
-  height: 100%;
+  width: var(--pokemon-icon-size);
+  max-width: 100%;
+  aspect-ratio: 1;
 }
 
 .centered-cell {

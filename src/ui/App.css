@@ -32,8 +32,9 @@
   --font-size-standard: 1rem;
   --font-size-text: 0.9rem;
 
-  --box-slot-side: 2.5rem;
-  --box-slot-size: 4rem;
+  --pokemon-icon-size: 3rem;
+  --save-box-slot-size: 2.5rem;
+  --list-box-slot-size: 4rem;
 
   --navigation-sidebar-width: 3rem;
 
@@ -493,6 +494,14 @@ svg {
   display: flex;
   flex-direction: row;
   justify-content: center;
+}
+
+.flex-centered {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 .rdg-cell * {

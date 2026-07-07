@@ -145,7 +145,13 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
     <>
       <Flex direction="column" width="100%">
         <div
-          className={cssClass('box-card').with('box-card-disabled').if(allCellsDisabled).build()}
+          className={cssClass('save-box-card')
+            .with('save-box-card-disabled')
+            .if(allCellsDisabled)
+            .with('save-box-small')
+            .if(save.boxColumns === 5)
+            .else('save-box-standard')
+            .build()}
         >
           <SaveHeader save={save} setDetailsModal={setDetailsModal} />
           <Separator />

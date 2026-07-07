@@ -26,16 +26,7 @@ import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { HomeMonLocation, MonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
 import { Language, Lookup } from '@pkm-rs/pkg'
-import {
-  Button,
-  Card,
-  DropdownMenu,
-  Flex,
-  Grid,
-  Heading,
-  TextField,
-  Tooltip,
-} from '@radix-ui/themes'
+import { Button, Card, DropdownMenu, Flex, Heading, TextField, Tooltip } from '@radix-ui/themes'
 import { ToggleGroup } from 'radix-ui'
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
@@ -368,7 +359,7 @@ function SingleBoxMonDisplay() {
   return (
     <>
       <OpenHomeCtxMenu sections={[contextElements, [removeDupesItem]]}>
-        <Grid className="home-box-grid" columns={OPENHOME_BOX_COLUMNS.toString()} gap="1">
+        <div className="home-box-grid">
           {range(OPENHOME_BOX_SLOTS)
             .map((index: number) => currentBox.identifiers.get(index))
             .map((identifier, index) => {
@@ -428,7 +419,7 @@ function SingleBoxMonDisplay() {
                 />
               )
             })}
-        </Grid>
+        </div>
       </OpenHomeCtxMenu>
       <PokemonDetailsModal
         mon={selectedMon}

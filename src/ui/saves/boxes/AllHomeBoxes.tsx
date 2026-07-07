@@ -26,7 +26,7 @@ import {
 } from '@openhome-ui/components/context-menu'
 import { RemoveIcon } from '@openhome-ui/components/Icons'
 import { MonLocation } from '@openhome-ui/state/saves'
-import { cssClass } from '@openhome-ui/util/style'
+import { cssClass, CssRemSize } from '@openhome-ui/util/style'
 import { Button, Flex, Grid } from '@radix-ui/themes'
 import { CSSProperties } from 'react'
 import {
@@ -351,7 +351,7 @@ function fontStyleFromStringLength(value: string): CSSProperties {
   }
 }
 
-function fontSizeFromStringLength(length: number): `${number}rem` {
+function fontSizeFromStringLength(length: number): CssRemSize {
   if (length <= 10) {
     return '0.85rem'
   } else if (length <= 20) {

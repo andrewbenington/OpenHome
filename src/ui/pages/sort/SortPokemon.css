@@ -49,8 +49,8 @@
   align-items: center;
   justify-content: center;
 
-  width: var(--box-slot-size);
-  height: var(--box-slot-size);
+  width: var(--list-box-slot-size);
+  height: var(--list-box-slot-size);
 }
 
 .sort-mon-button {

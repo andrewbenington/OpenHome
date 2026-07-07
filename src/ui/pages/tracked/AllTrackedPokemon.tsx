@@ -205,11 +205,7 @@ function useColumns(
       frozen: true,
       renderValue: (value) => (
         <button onClick={() => onSelectMon(value)} className="mon-icon-button">
-          <PokemonIcon
-            dexNumber={value.dexNum}
-            formIndex={value.formNum}
-            style={{ width: '2rem', height: '2rem' }}
-          />
+          <PokemonIcon dexNumber={value.dexNum} formIndex={value.formNum} />
         </button>
       ),
       cellClass: 'centered-cell',

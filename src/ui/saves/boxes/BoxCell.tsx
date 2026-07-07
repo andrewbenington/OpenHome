@@ -209,12 +209,8 @@ function BoxCell(props: BoxCellProps) {
     <>
       <OpenHomeCtxMenu sections={[contextMenuItems, props.contextMenu]}>
         <div
+          className="box-cell"
           style={{
-            padding: 0,
-            width: '100%',
-            aspectRatio: 1,
-            borderRadius: 3,
-            borderWidth: 1,
             backgroundColor: cellBackgroundColor,
             borderColor: isSelected ? '#4ade80' : borderColor,
           }}

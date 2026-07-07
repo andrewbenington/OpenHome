@@ -1,6 +1,8 @@
 .mon-icon-button {
   padding: 0;
   background-color: transparent;
+
+  --pokemon-icon-size: 2rem;
 }
 
 .align-center {
@@ -24,6 +26,6 @@
 }
 
 .grid-shiny-icon {
-  width: 24px;
-  height: 24px;
+  width: 1.5rem;
+  height: 1.5rem;
 }

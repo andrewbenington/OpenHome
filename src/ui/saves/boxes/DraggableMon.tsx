@@ -84,15 +84,9 @@ const DraggableMon = (props: DraggableMonProps) => {
 
   const shouldHide = isDragging || (active && isSelected)
 
-  const style: CSSProperties = {
-    width: '100%',
-    height: '100%',
-    visibility: shouldHide && dragState.mode === 'mon' ? 'hidden' : undefined,
-  }
-
   return (
     <div
-      className="fill-parent"
+      className="fill-parent flex-centered"
       ref={setNodeRef}
       {...listeners}
       {...attributes}
@@ -110,7 +104,9 @@ const DraggableMon = (props: DraggableMonProps) => {
         heldItemIndex={
           showItem && (!isDragging || dragState.mode !== 'item') ? mon.heldItemIndex : undefined
         }
-        style={style}
+        style={{
+          visibility: shouldHide && dragState.mode === 'mon' ? 'hidden' : undefined,
+        }}
         grayedOut={disabled}
         topRightIndicator={topRightIndicatorComponent}
         extraFormIndex={mon.extraFormIndex}
