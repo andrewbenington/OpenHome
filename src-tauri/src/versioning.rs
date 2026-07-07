@@ -164,7 +164,7 @@ pub enum SignificantUpdate {
     V1_12_1,
     V1_12_3,
     V1_12_4,
-    V1_13_0,
+    V1_13_1,
 }
 
 impl SignificantUpdate {
@@ -192,7 +192,7 @@ impl SignificantUpdate {
             Self::V1_12_1 => Version::parse("1.12.1"),
             Self::V1_12_3 => Version::parse("1.12.3"),
             Self::V1_12_4 => Version::parse("1.12.4"),
-            Self::V1_13_0 => Version::parse("1.13.0"),
+            Self::V1_13_1 => Version::parse("1.13.1"),
         }
         .expect("all versions are valid semver")
     }
@@ -300,9 +300,10 @@ impl SignificantUpdate {
                 "The \"is nicknamed\" flag is no longer reversed in gen 3.",
                 "Croagunk and Toxicroak are no longer erroneously restricted from Scarlet/Violet.",
             ]),
-            Self::V1_13_0 => Some(vec![
+            Self::V1_13_1 => Some(vec![
                 "Level can now be displayed in the top-right indicator",
                 "Top-right indicator is now color-coded based on its value and the max possible value",
+                "Box cell size has been adjusted to make Pokémon icons more visible with indicators present.",
                 "Fixed various species gender ratios. Affected Pokémon should have been fixed at startup.",
             ]),
             _ => None,
