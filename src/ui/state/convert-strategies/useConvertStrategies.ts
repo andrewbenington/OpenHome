@@ -1,6 +1,7 @@
-import { ConvertStrategyEntries } from '@openhome-core/tauri/spectaCommands'
+import { ConvertStrategyEntries, NamedStrategy } from '@openhome-core/tauri/spectaCommands'
 import { Errorable, R } from '@openhome-core/util/functional'
-import { ConvertStrategy } from '@pkm-rs/pkg'
+import { filterUndefined } from '@openhome-core/util/sort'
+import { ConvertStrategy, getDefaultConvertStrategy } from '@pkm-rs/pkg'
 import { createContext, useContext } from 'react'
 import { ConvertStrategies } from './ConvertStrategiesProvider'
 
@@ -16,14 +17,15 @@ export type ConvertStrategiesController = {
 export function useConvertStrategies(): ConvertStrategiesController {
   const [convertStrategies, updateConvertStrategies] = useContext(ConversionSettingsContext)
   const defaultConvertStrategy =
-    convertStrategies.strategies_by_id[convertStrategies.default_strategy_id].strategy
+    convertStrategies.strategies_by_id[convertStrategies.default_strategy_id]?.strategy ??
+    getDefaultConvertStrategy()
 
   async function updateDefaultConvertStrategy(updatedStrategy: Partial<ConvertStrategy>) {
     const currentDefault = convertStrategies.strategies_by_id[convertStrategies.default_strategy_id]
-    const newDefault = {
-      ...currentDefault,
+    const newDefault: NamedStrategy = {
+      name: currentDefault?.name ?? 'Default',
       strategy: {
-        ...currentDefault.strategy,
+        ...(currentDefault?.strategy ?? getDefaultConvertStrategy()),
         ...updatedStrategy,
       },
     }
@@ -32,7 +34,9 @@ export function useConvertStrategies(): ConvertStrategiesController {
       ids_and_strategies: Object.entries({
         ...convertStrategies.strategies_by_id,
         [convertStrategies.default_strategy_id]: newDefault,
-      }).filter(([_, v]) => v !== undefined),
+      })
+        .map(([k, v]) => (v === undefined ? undefined : ([k, v] as [string, NamedStrategy])))
+        .filter(filterUndefined),
     })
   }
 

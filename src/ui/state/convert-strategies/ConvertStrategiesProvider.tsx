@@ -1,19 +1,14 @@
 import useBackend from '@openhome-core/backend/useBackend'
-import { ConvertStrategyEntries } from '@openhome-core/tauri/spectaCommands'
+import { ConvertStrategyEntries, NamedStrategy } from '@openhome-core/tauri/spectaCommands'
 import { Option } from '@openhome-core/util/functional'
+import { filterUndefined } from '@openhome-core/util/sort'
 import { SyncedStateController, useSyncedState } from '@openhome-ui/state/synced-state'
-import { ConvertStrategy } from '@pkm-rs/pkg'
 import { PropsWithChildren } from 'react'
 import { ConversionSettingsContext } from '.'
 import SyncedStateProvider from '../synced-state/SyncedStateProvider'
 
-type NamedStrategy = {
-  name: string
-  strategy: ConvertStrategy
-}
-
 export type ConvertStrategies = {
-  strategies_by_id: Record<string, NamedStrategy>
+  strategies_by_id: Partial<Record<string, NamedStrategy>>
   default_strategy_id: string
 }
 
@@ -72,7 +67,9 @@ function useSyncedConvertState(): SyncedStateController<
   const stateGetter = backend.getConvertStrategies
   const stateUpdater = (newState: ConvertStrategies) =>
     backend.updateConvertStrategies({
-      ids_and_strategies: Object.entries(newState.strategies_by_id),
+      ids_and_strategies: Object.entries(newState.strategies_by_id)
+        .map(([k, v]) => (v === undefined ? undefined : ([k, v] as [string, NamedStrategy])))
+        .filter(filterUndefined),
       default_strategy_id: newState.default_strategy_id,
     })
 
