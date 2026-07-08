@@ -160,6 +160,7 @@ const RibbonsImageMap: { [key: string]: string } = {
   'Multi Ability': 'ribbons/multi-ability.png',
   'Pair Ability': 'ribbons/pair-ability.png',
   'World Ability': 'ribbons/world-ability.png',
+  Partner: 'ribbons/partner.png',
 }
 
 export const getRibbonSpritePath = (ribbon: string): string => {

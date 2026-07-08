@@ -111,6 +111,7 @@ export const Gen9Ribbons = [
   'Alpha Mark',
   'Mightiest Mark',
   'Titan Mark',
+  'Partner',
 ]
 
 export const OpenHomeRibbons = Gen34TowerRibbons.concat(Gen34ContestRibbons).concat(Gen9Ribbons)

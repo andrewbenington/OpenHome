@@ -10,7 +10,7 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getBallIconPath } from '@openhome-ui/images/items'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
-import { Language, Languages, OriginGames } from '@pkm-rs/pkg'
+import { Language, Languages, ModernRibbon, OriginGames } from '@pkm-rs/pkg'
 import { Badge, Flex, Grid } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
 import './MetDataMovesTab.css'
@@ -115,21 +115,20 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
       >
         <div className="met-data-left-side">
           <Flex direction="row" gap="1" align="center">
-            {'ball' in mon && mon.ball ? (
+            {mon.ball && (
               <img
                 draggable={false}
                 alt="poke ball type"
                 style={{ width: 24, height: 24 }}
                 src={getPublicImageURL(getBallIconPath(mon.ball))}
               />
-            ) : (
-              <div />
             )}
             <p className="pokemon-nickname">
-              {mon.nickname}
-              {'affixedRibbon' in mon && mon.affixedRibbon
-                ? ` ${RibbonTitles[mon.affixedRibbon]}`
-                : ''}
+              {mon.affixedRibbon
+                ? mon.affixedRibbon === ModernRibbon.Partner
+                  ? `${mon.trainerName}'s ${mon.nickname}`
+                  : `${mon.nickname} ${RibbonTitles[mon.affixedRibbon]}`
+                : mon.nickname}
             </p>
             <Badge variant="solid" color="gray" ml="2" size="1">
               {Languages.stringFromByte(mon.language)}
@@ -138,7 +137,6 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
           <div className="met-data-text">
             {eggMessage && <p>{eggMessage}</p>}
             <p>{metMessage}</p>
-            {/* check for undefined because 0 nature is Hardy */}
             {natureMessage && <p>{natureMessage}</p>}
             <p>{getCharacteristic(mon)}.</p>
           </div>
