@@ -63,10 +63,13 @@ const RibbonsDisplay = (props: { mon: PKMInterface }) => {
               src={getRibbonImage(ribbon)}
               onDoubleClick={() => {
                 if (mon instanceof OHPKM) {
-                  ohpkmStore.updateMonAffixedRibbon(
-                    mon.openhomeId,
-                    mon.affixedRibbon === undefined ? ModernRibbons.indexOf(ribbon) : undefined
-                  )
+                  const ribbonIndex = ModernRibbons.indexOf(ribbon)
+                  if (ribbonIndex !== -1) {
+                    ohpkmStore.updateMonAffixedRibbon(
+                      mon.openhomeId,
+                      mon.affixedRibbon === ribbonIndex ? undefined : ribbonIndex
+                    )
+                  }
                 }
               }}
             />

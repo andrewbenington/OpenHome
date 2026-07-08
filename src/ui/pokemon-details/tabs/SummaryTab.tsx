@@ -13,8 +13,10 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark, SHADOW_TYPE_COLOR } from '@openhome-ui/util/color'
+import { formatTitleAndNickname } from '@openhome-ui/util/format'
 import {
   AbilityNumber,
+  Ball,
   extraFormDisplayName,
   genderFromBool,
   Languages,
@@ -91,17 +93,13 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           )}
         </div>
         <div className="nickname-row">
-          {mon.ball ? (
-            <img
-              draggable={false}
-              alt="poke ball type"
-              style={{ width: 24, height: 24 }}
-              src={BallsImageList[mon.ball]}
-            />
-          ) : (
-            <div />
-          )}
-          <div style={{ fontWeight: 'bold' }}>{mon.nickname}</div>
+          <img
+            draggable={false}
+            alt="poke ball type"
+            style={{ width: 24, height: 24 }}
+            src={BallsImageList[mon.ball ?? Ball.Poke]}
+          />
+          <div style={{ fontWeight: 'bold' }}>{formatTitleAndNickname(mon)}</div>
           <Badge variant="solid" color="gray" ml="2" size="1">
             {Languages.stringFromByte(mon.language)}
           </Badge>
