@@ -3,7 +3,7 @@
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/andrewbenington/OpenHome/total)
 ![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/andrewbenington/OpenHome/latest/total)
 
-[![Enforce Types + Linting](https://github.com/andrewbenington/OpenHome/actions/workflows/typecheck_lint.yaml/badge.svg)](https://github.com/andrewbenington/OpenHome/actions/workflows/typecheck_lint.yaml)
+[![Enforce Types + Linting](https://github.com/andrewbenington/OpenHome/actions/workflows/typecheck-lint.yaml/badge.svg)](https://github.com/andrewbenington/OpenHome/actions/workflows/typecheck-lint.yaml)
 ![GitHub top language](https://img.shields.io/github/languages/top/andrewbenington/OpenHome)
 ![GitHub language count](https://img.shields.io/github/languages/count/andrewbenington/OpenHome)
 ![GitHub contributors](https://img.shields.io/github/contributors/andrewbenington/OpenHome)
