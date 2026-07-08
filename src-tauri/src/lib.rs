@@ -77,7 +77,7 @@ pub fn run() {
     let specta_handler = specta_builder.invoke_handler();
 
     tauri::Builder::default()
-        // .plugin(tauri_plugin_window_state::Builder::new().build())
+        .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
