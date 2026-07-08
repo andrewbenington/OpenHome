@@ -211,7 +211,6 @@ export function useOhpkmStore(): OhpkmStore {
 
   const updateMonAffixedRibbon = useCallback(
     (monId: string, affixedRibbon: Option<ModernRibbon>) => {
-      console.log(affixedRibbon)
       const result = tryLoadFromId(monId)
       if (R.isErr(result)) return result
 
