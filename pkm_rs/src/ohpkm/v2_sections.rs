@@ -102,7 +102,9 @@ impl DataSection for ScarletVioletData {
         let mut bytes = [0u8; 37];
 
         bytes[0] = self.tera_type_original.to_byte();
-        bytes[1] = self.tera_type_override.map_or(0, TeraType::to_byte);
+        bytes[1] = self
+            .tera_type_override
+            .map_or(TeraType::NO_OVERRIDE, TeraType::to_byte);
         bytes[2..24].copy_from_slice(&self.tm_flags.to_bytes());
         bytes[24..37].copy_from_slice(&self.tm_flags_dlc.to_bytes());
 
