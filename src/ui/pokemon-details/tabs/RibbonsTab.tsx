@@ -1,11 +1,15 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { ModernRibbons } from '@openhome-core/resources'
 import { Gen9Ribbons } from '@openhome-core/resources/consts/Ribbons'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getRibbonSpritePath } from '@openhome-ui/images/ribbons'
+import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { Tooltip } from '@radix-ui/themes'
 import './RibbonsTab.css'
 
 const RibbonsDisplay = (props: { mon: PKMInterface }) => {
+  const ohpkmStore = useOhpkmStore()
   const { mon } = props
 
   if (!mon.ribbons || mon.ribbons.length === 0) {
@@ -57,6 +61,17 @@ const RibbonsDisplay = (props: { mon: PKMInterface }) => {
               key={ribbonDisplay}
               alt={ribbonDisplay}
               src={getRibbonImage(ribbon)}
+              onDoubleClick={() => {
+                if (mon instanceof OHPKM) {
+                  const ribbonIndex = ModernRibbons.indexOf(ribbon)
+                  if (ribbonIndex !== -1) {
+                    ohpkmStore.updateMonAffixedRibbon(
+                      mon.openhomeId,
+                      mon.affixedRibbon === ribbonIndex ? undefined : ribbonIndex
+                    )
+                  }
+                }
+              }}
             />
           </Tooltip>
         )

@@ -5,9 +5,9 @@
 }
 
 .ribbon {
-  width: 50px;
-  height: 50px;
-  border-width: 2px;
+  width: 3.58rem;
+  height: 3.58rem;
+  border: 2px solid transparent;
   image-rendering: pixelated;
 }
 
@@ -20,12 +20,12 @@
 }
 
 .affixed-ribbon {
-  width: 50px;
-  height: 50px;
+  width: 3.58rem;
+  height: 3.58rem;
   image-rendering: pixelated;
   background-color: #fff6;
   border-radius: 5px;
   border-width: 2px;
   border-style: solid;
-  border-color: white;
+  border: 2px solid white;
 }

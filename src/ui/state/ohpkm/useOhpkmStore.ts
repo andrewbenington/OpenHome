@@ -9,12 +9,14 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
 import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
-import { Lookup, MarkingsSixShapesColors, OriginGames } from '@pkm-rs/pkg/pkm_rs'
+import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
 import { createContext, useCallback, useContext } from 'react'
 import { OhpkmStoreData } from '.'
 import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
+
+type MonLookupResult = Option<Result<void, IdentifierNotPresentError>>
 
 export type OhpkmStore = {
   getById(id: string): OHPKM | undefined
@@ -24,26 +26,15 @@ export type OhpkmStore = {
   monIsStored(id: string): boolean
   insertOrUpdate(mon: OHPKM): void
   insertOrUpdateAll(mons: OhpkmStoreData): Promise<Errorable<null>>
-  updateMonMarkings: (
-    monId: string,
-    markings: MarkingsSixShapesColors
-  ) => Option<Result<void, IdentifierNotPresentError>>
-  updateMonNotes: (
-    monId: string,
-    notes: Option<string>
-  ) => Option<Result<void, IdentifierNotPresentError>>
+  updateMonMarkings: (monId: string, markings: MarkingsSixShapesColors) => MonLookupResult
+  updateMonNotes: (monId: string, notes: Option<string>) => MonLookupResult
   updateMonTags: (
     monId: string,
     tags: Option<{ label: string; color: string; icon?: string }[]>
-  ) => Option<Result<void, IdentifierNotPresentError>>
-  updateMonDisplayColor: (
-    monId: string,
-    color: Option<string>
-  ) => Option<Result<void, IdentifierNotPresentError>>
-  setMonNickname: (
-    monId: string,
-    nickname: Option<string>
-  ) => Option<Result<void, IdentifierNotPresentError>>
+  ) => MonLookupResult
+  updateMonDisplayColor: (monId: string, color: Option<string>) => MonLookupResult
+  updateMonAffixedRibbon: (monId: string, affixedRibbon: Option<ModernRibbon>) => MonLookupResult
+  setMonNickname: (monId: string, nickname: Option<string>) => MonLookupResult
   getAllStored: () => OHPKM[]
   getIdIfTracked: (mon: PKMInterface) => Option<OhpkmIdentifier>
   loadIfTracked: <P extends PKMInterface>(mon: P) => Option<OHPKM>
@@ -218,6 +209,19 @@ export function useOhpkmStore(): OhpkmStore {
     [insertOrUpdate, tryLoadFromId]
   )
 
+  const updateMonAffixedRibbon = useCallback(
+    (monId: string, affixedRibbon: Option<ModernRibbon>) => {
+      const result = tryLoadFromId(monId)
+      if (R.isErr(result)) return result
+
+      const mon = result.data
+      mon.affixedRibbon = affixedRibbon
+
+      insertOrUpdate(mon)
+    },
+    [insertOrUpdate, tryLoadFromId]
+  )
+
   const setMonNickname = useCallback(
     (monId: string, nickname: Option<string>) => {
       const result = tryLoadFromId(monId)
@@ -344,6 +348,7 @@ export function useOhpkmStore(): OhpkmStore {
     updateMonMarkings,
     updateMonNotes,
     updateMonTags,
+    updateMonAffixedRibbon,
     updateMonDisplayColor,
     setMonNickname,
 

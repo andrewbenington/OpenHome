@@ -1384,7 +1384,7 @@ impl OhpkmV2 {
     pub fn tera_type_override(&self) -> u8 {
         self.sv_data
             .and_then(|d| d.tera_type_override)
-            .map_or(19, TeraType::to_byte)
+            .map_or(TeraType::NO_OVERRIDE, TeraType::to_byte)
     }
 
     pub fn set_tera_type_override(&mut self, value: u8) {
@@ -3205,7 +3205,7 @@ impl OhpkmV2 {
     pub fn tera_type_override_js(&self) -> u8 {
         self.sv_data
             .and_then(|d| d.tera_type_override)
-            .map_or(19, TeraType::to_byte)
+            .map_or(TeraType::NO_OVERRIDE, TeraType::to_byte)
     }
 
     #[wasm_bindgen(setter = teraTypeOverride)]
