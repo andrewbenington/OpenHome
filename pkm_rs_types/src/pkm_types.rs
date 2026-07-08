@@ -176,6 +176,8 @@ pub enum TeraType {
 }
 
 impl TeraType {
+    pub const NO_OVERRIDE: u8 = 19;
+
     pub fn from_byte(byte: u8) -> Option<Self> {
         match byte {
             TERA_TYPE_STELLAR => Some(Self::Stellar),
