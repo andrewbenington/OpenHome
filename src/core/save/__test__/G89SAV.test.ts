@@ -101,7 +101,7 @@ describe('gen 8 save files', () => {
       blockType: 'object',
       raw: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]).buffer,
       key: 0xdeadbeef,
-      type: 0x57,
+      type: 'Object',
     }
 
     const buffer = new Uint8Array(60)
@@ -115,7 +115,7 @@ describe('gen 8 save files', () => {
       blockType: 'object',
       raw: new Uint8Array([5, 7, 5]).buffer,
       key: 0xefe00efe,
-      type: 0x69,
+      type: 'Object',
     }
 
     offset = writeSCBlock(block2, buffer, offset)
@@ -124,13 +124,13 @@ describe('gen 8 save files', () => {
     const block3: SCBoolBlock = {
       blockType: 'bool',
       key: 0xefe00efe,
-      type: 1,
+      type: { Scalar: 'Bool1' },
     }
 
     offset = writeSCBlock(block3, buffer, offset)
     expect(offset).toBe(34)
     expect(toBase64(buffer)).toBe(
-      '776t3ohO+0yPQmWoQ6X0SSP+DuDvmADcCG3+xqX+DuDv8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+      '776t3ttO+0yPQmWoQ6X0SSP+DuDv9QDcCG3+xqX+DuDv8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
     )
   })
 

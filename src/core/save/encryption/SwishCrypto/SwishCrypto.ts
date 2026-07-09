@@ -22,18 +22,18 @@ function cryptStaticXorpadBytes(data: Uint8Array): Uint8Array {
 }
 
 function rustBlockToJsBlock(rustBlock: Block): SCBlock {
-  if (rustBlock.block_type === 'Bool')
+  if (rustBlock.data === 'Bool')
     return { blockType: 'bool', key: rustBlock.key, type: rustBlock.type_id }
-  if ('Object' in rustBlock.block_type) {
+  if ('Object' in rustBlock.data) {
     return {
       blockType: 'object',
       key: rustBlock.key,
       type: rustBlock.type_id,
-      raw: rustBlock.block_type.Object.bytes.buffer,
+      raw: rustBlock.data.Object.bytes.buffer,
     }
   }
-  if ('Array' in rustBlock.block_type) {
-    const { bytes, subtype } = rustBlock.block_type.Array
+  if ('Array' in rustBlock.data) {
+    const { bytes, subtype } = rustBlock.data.Array
     return {
       blockType: 'array',
       key: rustBlock.key,
@@ -46,7 +46,7 @@ function rustBlockToJsBlock(rustBlock: Block): SCBlock {
     blockType: 'value',
     key: rustBlock.key,
     type: rustBlock.type_id,
-    raw: rustBlock.block_type.Value.bytes.buffer,
+    raw: rustBlock.data.Value.bytes.buffer,
   }
 }
 

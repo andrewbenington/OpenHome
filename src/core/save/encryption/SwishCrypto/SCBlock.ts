@@ -1,9 +1,15 @@
-import { ScalarTypeId, scalarTypeIndex, scalarTypeSize } from '@pkm-rs/pkg/pkm_rs'
+import {
+  BlockTypeId,
+  blockTypeIndex,
+  ScalarTypeId,
+  scalarTypeIndex,
+  scalarTypeSize,
+} from '@pkm-rs/pkg/pkm_rs'
 import { SCXorShift32 } from './SCXorShift32'
 
 export type SCBoolBlock = {
   key: number
-  type: number
+  type: BlockTypeId
   raw?: undefined
   subtype?: undefined
   blockType: 'bool'
@@ -11,7 +17,7 @@ export type SCBoolBlock = {
 
 export type SCObjectBlock = {
   key: number
-  type: number
+  type: BlockTypeId
   raw: ArrayBuffer
   subtype?: undefined
   blockType: 'object'
@@ -19,7 +25,7 @@ export type SCObjectBlock = {
 
 export type SCArrayBlock = {
   key: number
-  type: number
+  type: BlockTypeId
   raw: ArrayBuffer
   subtype: ScalarTypeId
   blockType: 'array'
@@ -27,7 +33,7 @@ export type SCArrayBlock = {
 
 export type SCValueBlock = {
   key: number
-  type: number
+  type: BlockTypeId
   raw: ArrayBuffer
   subtype?: undefined
   blockType: 'value'
@@ -46,7 +52,7 @@ export function writeSCBlock(block: SCBlock, bytes: Uint8Array, offset: number):
   // write type XORed
   const xk = new SCXorShift32(block.key)
   const next = xk.Next()
-  const typeXored = (block.type ^ next) & 0xff
+  const typeXored = (blockTypeIndex(block.type) ^ next) & 0xff
 
   dataView.setUint8(currentOffset, typeXored)
   currentOffset += 1

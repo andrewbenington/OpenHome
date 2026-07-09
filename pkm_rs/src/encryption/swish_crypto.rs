@@ -44,8 +44,8 @@ fn compute_hash(data: &[u8]) -> aes::cipher::Array<u8, <Sha256 as OutputSizeUser
 
 #[wasm_bindgen(js_name = hashIsValid)]
 pub fn hash_is_valid(data: &[u8]) -> bool {
-    let stored_hash = &data[data.len() - SIZE_HASH..data.len()];
-    let computed_hash = &compute_hash(&data[..data.len() - SIZE_HASH]);
+    let (payload, stored_hash) = data.split_at(data.len() - SIZE_HASH);
+    let computed_hash = &compute_hash(payload);
 
     stored_hash
         .iter()
@@ -62,9 +62,7 @@ pub fn compute_hash_js(data: &[u8]) -> Box<[u8]> {
 pub fn crypt_static_xor_pad_bytes(data: &[u8]) -> Box<[u8]> {
     let size = STATIC_XOR_PAD.len() - 1;
     let mut iterations_remaining = (data.len() - 1) / size;
-
     let mut after_xor = vec![0u8; data.len()];
-
     let mut current_pos = 0usize;
 
     loop {
@@ -84,7 +82,7 @@ pub fn crypt_static_xor_pad_bytes(data: &[u8]) -> Box<[u8]> {
     }
 
     for i in 0..(data.len() - current_pos) {
-        after_xor[i + current_pos] =
+        after_xor[current_pos + i] =
             data[current_pos + i] ^ STATIC_XOR_PAD[i % STATIC_XOR_PAD.len()]
     }
 
@@ -117,8 +115,8 @@ pub fn decrypt_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 pub struct Block {
     key: u32,
-    type_id: u8,
-    block_type: BlockType,
+    type_id: BlockTypeId,
+    data: BlockData,
 }
 
 type NewOffset = usize;
@@ -133,20 +131,15 @@ impl Block {
 
         let mut offset = offset + 4;
         let mut xor_shift = XorShift32::new(key);
-        let type_id = bytes[offset] ^ xor_shift.next();
+        let type_id = BlockTypeId::try_from(bytes[offset] ^ xor_shift.next())?;
 
         offset += 1;
 
-        match type_id {
-            1..=3 => Ok((
-                Self {
-                    key,
-                    type_id,
-                    block_type: BlockType::Bool,
-                },
-                offset,
-            )),
-            4 => {
+        let data = match type_id {
+            BlockTypeId::Scalar(
+                ScalarTypeId::Bool1 | ScalarTypeId::Bool2 | ScalarTypeId::Bool3,
+            ) => BlockData::Bool,
+            BlockTypeId::Object => {
                 let byte_count = (read_u32_le!(bytes, offset) ^ xor_shift.next_32()) as usize;
 
                 offset += 4;
@@ -158,16 +151,9 @@ impl Block {
                     *byte ^= xor_shift.next();
                 }
 
-                Ok((
-                    Self {
-                        key,
-                        type_id,
-                        block_type: BlockType::Object { bytes: slice },
-                    },
-                    offset,
-                ))
+                BlockData::Object { bytes: slice }
             }
-            5 => {
+            BlockTypeId::Array => {
                 let entry_count = (read_u32_le!(bytes, offset) ^ xor_shift.next_32()) as usize;
                 offset += 4;
 
@@ -183,23 +169,13 @@ impl Block {
                     *byte ^= xor_shift.next();
                 }
 
-                Ok((
-                    Self {
-                        key,
-                        type_id,
-                        block_type: BlockType::Array {
-                            bytes: slice,
-                            subtype,
-                        },
-                    },
-                    offset,
-                ))
+                BlockData::Array {
+                    bytes: slice,
+                    subtype,
+                }
             }
-            _ => {
-                let Some(type_size) = get_type_size(type_id) else {
-                    return Err(InvalidTypeId(type_id));
-                };
-
+            BlockTypeId::Scalar(scalar_type) => {
+                let type_size = scalar_type.byte_size();
                 let mut slice = bytes[offset..offset + type_size].to_vec();
                 offset += type_size;
 
@@ -207,21 +183,18 @@ impl Block {
                     *byte ^= xor_shift.next();
                 }
 
-                Ok((
-                    Self {
-                        key,
-                        type_id,
-                        block_type: BlockType::Value { bytes: slice },
-                    },
-                    offset,
-                ))
+                BlockData::Value { bytes: slice }
             }
-        }
+        };
+
+        let block = Block { key, type_id, data };
+
+        Ok((block, offset))
     }
 }
 
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-enum BlockType {
+enum BlockData {
     Bool,
     Object {
         #[serde(with = "serde_bytes")]
@@ -287,44 +260,42 @@ const fn xor_shift_advance(state: u32) -> u32 {
     state
 }
 
-const fn get_type_size(type_id: u8) -> Option<usize> {
-    match type_id {
-        3 => Some(1),  // Bool3
-        8 => Some(1),  // Byte
-        9 => Some(2),  // UInt16
-        10 => Some(4), // UInt32
-        11 => Some(8), // UInt64
+#[derive(Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+pub enum BlockTypeId {
+    Object,
+    Array,
+    Scalar(ScalarTypeId),
+}
 
-        12 => Some(1), // SByte
-        13 => Some(2), // Int16
-        14 => Some(4), // Int32
-        15 => Some(8), // Int64
-
-        16 => Some(4), // Single
-        17 => Some(8), // Double
-
-        _ => None,
+impl BlockTypeId {
+    pub const fn index(&self) -> u8 {
+        match self {
+            Self::Object => 4,
+            Self::Array => 5,
+            Self::Scalar(scalar) => *scalar as u8,
+        }
     }
 }
 
-// #[derive(Clone, Copy, PartialEq, Eq, serde::Serialize)]
-// pub enum BlockTypeId {
-//     Object,
-//     Array,
-//     Scalar(ScalarTypeId),
-// }
+impl TryFrom<u8> for BlockTypeId {
+    type Error = InvalidTypeId;
 
-// impl TryFrom<u8> for BlockTypeId {
-//     type Error = InvalidTypeId;
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            4 => Ok(Self::Object),
+            5 => Ok(Self::Array),
+            _ => Ok(Self::Scalar(value.try_into()?)),
+        }
+    }
+}
 
-//     fn try_from(value: u8) -> Result<Self, Self::Error> {
-//         match value {
-//             4 => Ok(Self::Object),
-//             5 => Ok(Self::Array),
-//             _ => Ok(Self::Scalar(value.try_into()?)),
-//         }
-//     }
-// }
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = blockTypeIndex)]
+#[allow(clippy::missing_const_for_fn)]
+pub fn block_type_index(type_id: BlockTypeId) -> u8 {
+    type_id.index()
+}
 
 #[derive(Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
