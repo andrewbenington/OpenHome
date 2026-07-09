@@ -2815,6 +2815,7 @@ dependencies = [
  "rand 0.10.1",
  "serde",
  "serde-wasm-bindgen",
+ "serde_bytes",
  "serde_json",
  "sha1",
  "sha2 0.11.0",
@@ -3590,6 +3591,16 @@ dependencies = [
  "js-sys",
  "serde",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "serde_bytes"
+version = "0.11.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a5d440709e79d88e51ac01c4b72fc6cb7314017bb7da9eeff678aa94c10e3ea8"
+dependencies = [
+ "serde",
+ "serde_core",
 ]
 
 [[package]]
@@ -4994,6 +5005,7 @@ checksum = "8ec5505497c87f1c050b4392d3f11b49a04537fcb9dc0da57bc0af168a6331f2"
 dependencies = [
  "gloo-utils",
  "serde",
+ "serde-wasm-bindgen",
  "serde_json",
  "tsify-macros",
  "wasm-bindgen",

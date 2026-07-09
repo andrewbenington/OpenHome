@@ -1,5 +1,6 @@
 import { PA8, PK4, PK8 } from '@openhome-core/pkm'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { toBase64 } from '@openhome-core/util'
 import { Ball, ConvertStrategies, OriginGame } from '@pkm-rs/pkg'
 import { readFileSync } from 'fs'
 import path from 'path'
@@ -74,7 +75,7 @@ describe('gen 8 save files', () => {
   test('SwishCrypto hash matches', () => {
     const valid = SwishCrypto.getIsHashValid(saveBytes)
 
-    expect(valid)
+    expect(valid).toBe(true)
   })
 
   test('sword data is correct', () => {
@@ -128,6 +129,9 @@ describe('gen 8 save files', () => {
 
     offset = writeSCBlock(block3, buffer, offset)
     expect(offset).toBe(34)
+    expect(toBase64(buffer)).toBe(
+      '776t3ohO+0yPQmWoQ6X0SSP+DuDvmADcCG3+xqX+DuDv8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+    )
   })
 
   test('reencrypt sword/shield', () => {

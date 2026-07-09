@@ -109,6 +109,7 @@ generate/out/generate.js: generate/generate.ts generate/syncPKHexResources.ts ge
 
 .PHONY: generate
 generate: gen-wasm gen-tauri-commands
+	@pnpm wasm-compile-dev
 
 .PHONY: gen-wasm
 gen-wasm:
