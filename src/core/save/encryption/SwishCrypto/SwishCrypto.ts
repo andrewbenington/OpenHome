@@ -9,14 +9,6 @@ import { SCBlock } from './SCBlock'
 
 const SIZE_HASH = 0x20
 
-export function computeHash(data: Uint8Array): Uint8Array {
-  return swishCryptoHash(data)
-}
-
-function getIsHashValid(data: Uint8Array) {
-  return hashIsValid(data)
-}
-
 function rustBlockToJsBlock(rustBlock: Block): SCBlock {
   if (rustBlock.data === 'Bool')
     return { blockType: 'bool', key: rustBlock.key, type: rustBlock.type_id }
@@ -81,8 +73,8 @@ function encrypt(blocks: SCBlock[], size: number): Uint8Array {
 
 export const SwishCrypto = {
   SIZE_HASH,
-  computeHash,
-  getIsHashValid,
+  computeHash: swishCryptoHash,
+  getIsHashValid: hashIsValid,
   decrypt,
   encrypt,
 }

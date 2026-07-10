@@ -15,8 +15,7 @@ const STATIC_XOR_PAD: [u8; 128] = [
     0xa4, 0x48, 0xb3, 0x50, 0x9e, 0x14, 0xa0, 0x52, 0xde, 0x7e, 0x10, 0x2b, 0x1b, 0x77, 0x6e, 0,
 ];
 
-#[wasm_bindgen(js_name = swishCryptoStaticXorPad)]
-pub fn crypt_static_xor_pad_bytes(data: &[u8]) -> Box<[u8]> {
+fn crypt_static_xor_pad_bytes(data: &[u8]) -> Box<[u8]> {
     let size = STATIC_XOR_PAD.len() - 1;
     let mut iterations_remaining = (data.len() - 1) / size;
     let mut after_xor = vec![0u8; data.len()];
@@ -46,7 +45,7 @@ pub fn crypt_static_xor_pad_bytes(data: &[u8]) -> Box<[u8]> {
     after_xor.into_boxed_slice()
 }
 
-pub fn read_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
+fn read_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
     let mut offset: usize = 0;
     let mut result = Vec::<Block>::new();
 
@@ -105,8 +104,7 @@ pub fn write_block(block: &Block, bytes: &mut [u8], offset: usize) -> usize {
     writer.current_offset()
 }
 
-// js: getDecryptedRawData
-pub fn write_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
+fn write_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
     let mut buffer = vec![0u8; size];
     let mut offset: usize = 0;
 
@@ -117,12 +115,7 @@ pub fn write_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
     buffer[..offset].to_vec()
 }
 
-#[wasm_bindgen(js_name = writeBlocks)]
-pub fn write_blocks_js(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
-    write_blocks(&blocks, size)
-}
-
-pub fn encrypt_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
+fn encrypt_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
     let encrypted_blocks = write_blocks(blocks, size);
     let mut encrypted_bytes = crypt_static_xor_pad_bytes(&encrypted_blocks).to_vec();
 
