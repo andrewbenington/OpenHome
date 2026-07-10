@@ -151,8 +151,7 @@ async function getLatestRelease(octokit: Octokit) {
   const releases = await octokit.paginate(octokit.rest.repos.listReleases, {
     owner: OWNER,
     repo: REPO,
-
-    per_page: 10,
+    per_page: 1,
   })
   console.log('  Retrieved')
   return releases[0]
@@ -190,7 +189,7 @@ async function main() {
       case 'publish':
         return await publishLatestRelease(octokit)
       case 'display-description':
-        console.log(await currentVersionPullRequestDescription(octokit))
+        console.log('\n' + (await currentVersionPullRequestDescription(octokit)))
     }
 
     return
