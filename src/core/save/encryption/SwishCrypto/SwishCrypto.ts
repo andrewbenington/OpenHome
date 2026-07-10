@@ -1,11 +1,11 @@
 import {
   Block,
   decryptBlocks,
+  encryptBlocks,
   hashIsValid,
   swishCryptoHash,
-  swishCryptoStaticXorPad,
 } from '@pkm-rs/pkg/pkm_rs'
-import { SCBlock, writeSCBlock } from './SCBlock'
+import { SCBlock } from './SCBlock'
 
 const SIZE_HASH = 0x20
 
@@ -15,10 +15,6 @@ export function computeHash(data: Uint8Array): Uint8Array {
 
 function getIsHashValid(data: Uint8Array) {
   return hashIsValid(data)
-}
-
-function cryptStaticXorpadBytes(data: Uint8Array): Uint8Array {
-  return swishCryptoStaticXorPad(data)
 }
 
 function rustBlockToJsBlock(rustBlock: Block): SCBlock {
@@ -50,30 +46,37 @@ function rustBlockToJsBlock(rustBlock: Block): SCBlock {
   }
 }
 
+function jsBlockToRustBlock(jsBlock: SCBlock): Block {
+  switch (jsBlock.blockType) {
+    case 'bool':
+      return { type_id: jsBlock.type, key: jsBlock.key, data: 'Bool' }
+    case 'object':
+      return {
+        type_id: jsBlock.type,
+        key: jsBlock.key,
+        data: { Object: { bytes: new Uint8Array(jsBlock.raw) } },
+      }
+    case 'array':
+      return {
+        type_id: jsBlock.type,
+        key: jsBlock.key,
+        data: { Array: { bytes: new Uint8Array(jsBlock.raw), subtype: jsBlock.subtype } },
+      }
+    case 'value':
+      return {
+        type_id: jsBlock.type,
+        key: jsBlock.key,
+        data: { Value: { bytes: new Uint8Array(jsBlock.raw) } },
+      }
+  }
+}
+
 function decrypt(data: Uint8Array): SCBlock[] {
   return decryptBlocks(data).map(rustBlockToJsBlock)
 }
 
-function getDecryptedRawData(blocks: SCBlock[], size: number): Uint8Array {
-  const buffer = new Uint8Array(size)
-  let offset = 0
-
-  for (const block of blocks) {
-    offset = writeSCBlock(block, buffer, offset)
-  }
-
-  return buffer.slice(0, offset)
-}
-
 function encrypt(blocks: SCBlock[], size: number): Uint8Array {
-  const rawBytes = getDecryptedRawData(blocks, size)
-  const xoredData = cryptStaticXorpadBytes(rawBytes)
-  const hash = computeHash(xoredData)
-  const encrypted = new Uint8Array(xoredData.length + hash.length)
-
-  encrypted.set(xoredData, 0)
-  encrypted.set(hash, xoredData.length)
-  return encrypted
+  return encryptBlocks(blocks.map(jsBlockToRustBlock), size)
 }
 
 export const SwishCrypto = {

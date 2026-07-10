@@ -18,7 +18,7 @@ const OUTRO_HASH_BYTES: [u8; 64] = [
     0xf1, 0x26, 0xe0, 0x03, 0x0a, 0xe6, 0x6f, 0xf6, 0x41, 0xbf, 0x7e, 0x59, 0xc2, 0xae, 0x55, 0xfd,
 ];
 
-fn compute_hash(data: &[u8]) -> aes::cipher::Array<u8, <Sha256 as OutputSizeUser>::OutputSize> {
+pub fn compute_hash(data: &[u8]) -> aes::cipher::Array<u8, <Sha256 as OutputSizeUser>::OutputSize> {
     let with_intro_outro: Box<[u8]> = INTRO_HASH_BYTES
         .into_iter()
         .chain(data.iter().copied())

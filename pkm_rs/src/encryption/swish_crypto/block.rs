@@ -2,6 +2,8 @@ use pkm_rs_types::read_u32_le;
 
 use wasm_bindgen::prelude::*;
 
+use crate::bytes::Writer;
+
 const STATIC_XOR_PAD: [u8; 128] = [
     0xa0, 0x92, 0xd1, 0x06, 0x07, 0xdb, 0x32, 0xa1, 0xae, 0x01, 0xf5, 0xc5, 0x1e, 0x84, 0x4f, 0xe3,
     0x53, 0xca, 0x37, 0xf4, 0xa7, 0xb0, 0x4d, 0xa0, 0x18, 0xb7, 0xc2, 0x97, 0xda, 0x5f, 0x53, 0x2b,
@@ -65,8 +67,80 @@ pub fn decrypt_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
     read_blocks(&data_after_xor)
 }
 
-#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
+fn write_block(block: &Block, bytes: &mut [u8], offset: usize) -> usize {
+    let mut writer = Writer::new(bytes, offset);
+
+    writer.write_u32(block.key);
+
+    let mut xor_shift_32 = XorShift32::new(block.key);
+
+    writer.write_u8(block.type_id.index() ^ xor_shift_32.next());
+
+    if let BlockData::Object { bytes } = &block.data {
+        let payload_size_xored = (bytes.len() as u32) ^ xor_shift_32.next_32();
+
+        writer.write_u32(payload_size_xored);
+    } else if let BlockData::Array { bytes, subtype } = &block.data {
+        let entry_count = bytes.len() / subtype.byte_size();
+        let entry_count_xored = (entry_count as u32) ^ xor_shift_32.next_32();
+
+        writer.write_u32(entry_count_xored);
+
+        let subtype_xored = (*subtype as u8) ^ xor_shift_32.next();
+        writer.write_u8(subtype_xored);
+    }
+
+    let payload = match &block.data {
+        BlockData::Bool => &Vec::new(),
+        BlockData::Object { bytes } => bytes,
+        BlockData::Array { bytes, .. } => bytes,
+        BlockData::Value { bytes } => bytes,
+    };
+
+    for byte in payload {
+        writer.write_u8(*byte ^ xor_shift_32.next());
+    }
+
+    writer.current_offset()
+}
+
+// js: getDecryptedRawData
+pub fn write_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
+    let mut buffer = vec![0u8; size];
+    let mut offset: usize = 0;
+
+    for block in blocks {
+        offset = write_block(block, &mut buffer, offset)
+    }
+
+    buffer[..offset].to_vec()
+}
+
+#[wasm_bindgen(js_name = writeBlocks)]
+pub fn write_blocks_js(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
+    write_blocks(&blocks, size)
+}
+
+pub fn encrypt_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
+    let encrypted_blocks = write_blocks(blocks, size);
+    let mut encrypted_bytes = crypt_static_xor_pad_bytes(&encrypted_blocks).to_vec();
+
+    let hash = super::hash::compute_hash(&encrypted_bytes);
+    encrypted_bytes.extend_from_slice(&hash);
+
+    encrypted_bytes
+}
+
+#[wasm_bindgen(js_name = encryptBlocks)]
+pub fn encrypt_blocks_js(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
+    encrypt_blocks(&blocks, size)
+}
+
+#[cfg_attr(
+    feature = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 pub struct Block {
     key: u32,
     type_id: BlockTypeId,
@@ -147,7 +221,11 @@ impl Block {
     }
 }
 
-#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
+#[cfg_attr(
+    feature = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 enum BlockData {
     Bool,
     Object {
