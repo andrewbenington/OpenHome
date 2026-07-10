@@ -67,7 +67,8 @@ pub fn decrypt_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
     read_blocks(&data_after_xor)
 }
 
-fn write_block(block: &Block, bytes: &mut [u8], offset: usize) -> usize {
+#[wasm_bindgen(js_name = writeBlock)]
+pub fn write_block(block: &Block, bytes: &mut [u8], offset: usize) -> usize {
     let mut writer = Writer::new(bytes, offset);
 
     writer.write_u32(block.key);

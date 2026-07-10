@@ -1,12 +1,11 @@
 import { PA8, PK4, PK8 } from '@openhome-core/pkm'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { toBase64, xorChecksum32BitLe } from '@openhome-core/util'
+import { xorChecksum32BitLe } from '@openhome-core/util'
 import { Ball, ConvertStrategies, OriginGame } from '@pkm-rs/pkg'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { PKMInterface } from '../../pkm/interfaces'
-import { SCBoolBlock, SCObjectBlock, writeSCBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { LegendsArceusSave } from '../Gen89/LegendsArceus'
 import { SwordShieldSave } from '../Gen89/SwordShieldSave'
@@ -101,44 +100,6 @@ describe('gen 8 save files', () => {
   test('arceus data is correct', () => {
     expect(arceusSave.origin).toBe(OriginGame.LegendsArceus)
     expect(arceusSave.currentPCBox).toBe(13)
-  })
-
-  test('write sc block', () => {
-    const block: SCObjectBlock = {
-      blockType: 'object',
-      raw: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]).buffer,
-      key: 0xdeadbeef,
-      type: 'Object',
-    }
-
-    const buffer = new Uint8Array(60)
-
-    let offset = 0
-
-    offset = writeSCBlock(block, buffer, offset)
-    expect(offset).toBe(17)
-
-    const block2: SCObjectBlock = {
-      blockType: 'object',
-      raw: new Uint8Array([5, 7, 5]).buffer,
-      key: 0xefe00efe,
-      type: 'Object',
-    }
-
-    offset = writeSCBlock(block2, buffer, offset)
-    expect(offset).toBe(29)
-
-    const block3: SCBoolBlock = {
-      blockType: 'bool',
-      key: 0xefe00efe,
-      type: { Scalar: 'Bool1' },
-    }
-
-    offset = writeSCBlock(block3, buffer, offset)
-    expect(offset).toBe(34)
-    expect(toBase64(buffer)).toBe(
-      '776t3ttO+0yPQmWoQ6X0SSP+DuDv9QDcCG3+xqX+DuDv8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
-    )
   })
 
   test('reencrypt sword/shield', () => {

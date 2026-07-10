@@ -46,7 +46,7 @@ function rustBlockToJsBlock(rustBlock: Block): SCBlock {
   }
 }
 
-function jsBlockToRustBlock(jsBlock: SCBlock): Block {
+export function jsBlockToRustBlock(jsBlock: SCBlock): Block {
   switch (jsBlock.blockType) {
     case 'bool':
       return { type_id: jsBlock.type, key: jsBlock.key, data: 'Bool' }
