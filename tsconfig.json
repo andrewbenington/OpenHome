@@ -52,6 +52,7 @@
     "src-tauri/pokemon-wasm",
     "generate/generate-cfru/generateMoveMap.ts",
     "src/types/pkm-resources-types.d.ts",
+    "scripts",
     "__mocks__"
   ]
 }
