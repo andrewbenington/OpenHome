@@ -1,6 +1,6 @@
 import { PA8, PK4, PK8 } from '@openhome-core/pkm'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { toBase64 } from '@openhome-core/util'
+import { toBase64, xorChecksum32BitLe } from '@openhome-core/util'
 import { Ball, ConvertStrategies, OriginGame } from '@pkm-rs/pkg'
 import { readFileSync } from 'fs'
 import path from 'path'
@@ -40,23 +40,24 @@ const arceusPath = {
 }
 
 describe('gen 8 save files', () => {
-  let saveBytes: Uint8Array
+  let swordSaveBytes: Uint8Array
   let swordSave: SwordShieldSave
+  let arceusSaveBytes: Uint8Array
   let arceusSave: LegendsArceusSave
   let magmortar: PK4
 
   beforeAll(() => {
     let savePath = saveTestFilePath('sword')
 
-    saveBytes = new Uint8Array(readFileSync(savePath))
+    swordSaveBytes = new Uint8Array(readFileSync(savePath))
 
-    swordSave = new SwordShieldSave(swordPath, saveBytes)
+    swordSave = new SwordShieldSave(swordPath, swordSaveBytes)
 
     savePath = saveTestFilePath('legendsarceus')
 
-    saveBytes = new Uint8Array(readFileSync(savePath))
+    arceusSaveBytes = new Uint8Array(readFileSync(savePath))
 
-    arceusSave = new LegendsArceusSave(arceusPath, saveBytes)
+    arceusSave = new LegendsArceusSave(arceusPath, arceusSaveBytes)
 
     const monPath = pkmTestFilePath('pk4', 'magmortar.pkm')
     const monBytes = new Uint8Array(readFileSync(monPath))
@@ -64,16 +65,22 @@ describe('gen 8 save files', () => {
     magmortar = PK4.fromBytes(monBytes.buffer)
   })
 
+  test('sword/shield writes back to identical bytes', () => {
+    expect(xorChecksum32BitLe(swordSave.prepareWriter().bytes)).toBe(
+      xorChecksum32BitLe(swordSaveBytes)
+    )
+  })
+
   test('sword/shield hash matches', () => {
-    const storedHash = saveBytes.slice(-SwishCrypto.SIZE_HASH)
-    const dataBeforeHash = saveBytes.slice(0, -SwishCrypto.SIZE_HASH)
+    const storedHash = swordSaveBytes.slice(-SwishCrypto.SIZE_HASH)
+    const dataBeforeHash = swordSaveBytes.slice(0, -SwishCrypto.SIZE_HASH)
     const computedHash = SwishCrypto.computeHash(dataBeforeHash)
 
     expect(toHexString(storedHash)).toEqual(toHexString(computedHash))
   })
 
   test('SwishCrypto hash matches', () => {
-    const valid = SwishCrypto.getIsHashValid(saveBytes)
+    const valid = SwishCrypto.getIsHashValid(swordSaveBytes)
 
     expect(valid).toBe(true)
   })
@@ -187,6 +194,12 @@ describe('gen 8 save files', () => {
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
     expect(SwishCrypto.getIsHashValid(swordSave.bytes)).toBe(true)
+  })
+
+  test('legends arceus writes back to identical bytes', () => {
+    expect(xorChecksum32BitLe(arceusSave.prepareWriter().bytes)).toBe(
+      xorChecksum32BitLe(arceusSaveBytes)
+    )
   })
 
   test('legends arceus save boxes', () => {

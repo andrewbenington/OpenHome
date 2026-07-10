@@ -2,7 +2,7 @@ import { PK1, toGen1PokemonIndex } from '@openhome-core/pkm'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { readGameBoyStringFromBytes } from '@openhome-core/util'
-import { bytesToUint16BigEndian, get8BitChecksum } from '@openhome-core/util/byteLogic'
+import { bytesToUint16BigEndian, xorChecksum8BitLe } from '@openhome-core/util/byteLogic'
 import { Option, range, unique } from '@openhome-core/util/functional'
 import { utf16StringToGen12 } from '@openhome-core/util/stringConversion'
 import {
@@ -221,7 +221,7 @@ export class G1SAV extends OfficialSAV<PK1> {
         boxChecksumOffset = 0x7a4d + boxNumber
       }
       const boxChecksum =
-        get8BitChecksum(this.bytes, boxByteOffset, boxByteOffset + this.BOX_SIZE) ^ 0xff
+        xorChecksum8BitLe(this.bytes, boxByteOffset, boxByteOffset + this.BOX_SIZE) ^ 0xff
 
       this.bytes[boxChecksumOffset] = boxChecksum
       if (boxNumber === this.currentPCBox) {
@@ -231,13 +231,13 @@ export class G1SAV extends OfficialSAV<PK1> {
         )
       }
     })
-    const bank2Checksum = get8BitChecksum(this.bytes, 0x4000, 0x5a4c) ^ 0xff
+    const bank2Checksum = xorChecksum8BitLe(this.bytes, 0x4000, 0x5a4c) ^ 0xff
 
     this.bytes[0x5a4c] = bank2Checksum
-    const bank3Checksum = get8BitChecksum(this.bytes, 0x6000, 0x7a4c) ^ 0xff
+    const bank3Checksum = xorChecksum8BitLe(this.bytes, 0x6000, 0x7a4c) ^ 0xff
 
     this.bytes[0x7a4c] = bank3Checksum
-    const wholeSaveChecksum = get8BitChecksum(this.bytes, 0x2598, 0x3521) ^ 0xff
+    const wholeSaveChecksum = xorChecksum8BitLe(this.bytes, 0x2598, 0x3521) ^ 0xff
 
     this.bytes[0x3523] = wholeSaveChecksum
   }
@@ -305,26 +305,26 @@ function areGoldSilverChecksumsValid(bytes: Uint8Array) {
 }
 
 function getGoldSilverInternationalChecksum1(bytes: Uint8Array) {
-  return get8BitChecksum(bytes, 0x2009, 0x2d68)
+  return xorChecksum8BitLe(bytes, 0x2009, 0x2d68)
 }
 
 function getGoldSilverInternationalChecksum2(bytes: Uint8Array) {
   let checksum = 0
 
-  checksum += get8BitChecksum(bytes, 0x15c7, 0x17ec)
-  checksum += get8BitChecksum(bytes, 0x3d96, 0x3f3f)
-  checksum += get8BitChecksum(bytes, 0x0c6b, 0x10e7)
-  checksum += get8BitChecksum(bytes, 0x7e39, 0x7e6c)
-  checksum += get8BitChecksum(bytes, 0x10e8, 0x15c6)
+  checksum += xorChecksum8BitLe(bytes, 0x15c7, 0x17ec)
+  checksum += xorChecksum8BitLe(bytes, 0x3d96, 0x3f3f)
+  checksum += xorChecksum8BitLe(bytes, 0x0c6b, 0x10e7)
+  checksum += xorChecksum8BitLe(bytes, 0x7e39, 0x7e6c)
+  checksum += xorChecksum8BitLe(bytes, 0x10e8, 0x15c6)
   return checksum & 0xff
 }
 
 function getCrystalInternationalChecksum1(bytes: Uint8Array) {
-  return get8BitChecksum(bytes, 0x2009, 0x2b82)
+  return xorChecksum8BitLe(bytes, 0x2009, 0x2b82)
 }
 
 function getCrystalInternationalChecksum2(bytes: Uint8Array) {
-  return get8BitChecksum(bytes, 0x1209, 0x1d82)
+  return xorChecksum8BitLe(bytes, 0x1209, 0x1d82)
 }
 
 function areCrystalInternationalChecksumsValid(bytes: Uint8Array) {

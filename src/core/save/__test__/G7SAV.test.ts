@@ -1,5 +1,5 @@
 import { PK7 } from '@openhome-core/pkm'
-import { get16BitChecksumLittleEndian } from '@openhome-core/util/byteLogic'
+import { xorChecksum16BitLe } from '@openhome-core/util/byteLogic'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { assert, beforeAll, describe, expect, test } from 'vitest'
@@ -78,7 +78,7 @@ describe('moon save file', () => {
 
   test('output of to_bytes doesnt change', () => {
     const writer = moonSav.prepareWriter()
-    expect(get16BitChecksumLittleEndian(writer.bytes.buffer, 0, writer.bytes.length)).toBe(0x3065)
+    expect(xorChecksum16BitLe(writer.bytes)).toBe(0x3065)
   })
 
   test('first mon is as expected', () => {

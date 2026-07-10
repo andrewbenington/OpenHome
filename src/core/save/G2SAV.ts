@@ -2,7 +2,7 @@ import { PK2 } from '@openhome-core/pkm'
 import { EXCLAMATION } from '@openhome-core/resources/consts/Forms'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
-import { get8BitChecksum } from '@openhome-core/util/byteLogic'
+import { xorChecksum8BitLe } from '@openhome-core/util/byteLogic'
 import { Option, unique } from '@openhome-core/util/functional'
 import {
   readGameBoyStringFromBytes,
@@ -238,26 +238,26 @@ export class G2SAV extends OfficialSAV<PK2> {
   }
 
   getGoldSilverInternationalChecksum1() {
-    return get8BitChecksum(this.bytes, 0x2009, 0x2d68)
+    return xorChecksum8BitLe(this.bytes, 0x2009, 0x2d68)
   }
 
   getGoldSilverInternationalChecksum2() {
     let checksum = 0
 
-    checksum += get8BitChecksum(this.bytes, 0x15c7, 0x17ec)
-    checksum += get8BitChecksum(this.bytes, 0x3d96, 0x3f3f)
-    checksum += get8BitChecksum(this.bytes, 0x0c6b, 0x10e7)
-    checksum += get8BitChecksum(this.bytes, 0x7e39, 0x7e6c)
-    checksum += get8BitChecksum(this.bytes, 0x10e8, 0x15c6)
+    checksum += xorChecksum8BitLe(this.bytes, 0x15c7, 0x17ec)
+    checksum += xorChecksum8BitLe(this.bytes, 0x3d96, 0x3f3f)
+    checksum += xorChecksum8BitLe(this.bytes, 0x0c6b, 0x10e7)
+    checksum += xorChecksum8BitLe(this.bytes, 0x7e39, 0x7e6c)
+    checksum += xorChecksum8BitLe(this.bytes, 0x10e8, 0x15c6)
     return checksum & 0xff
   }
 
   getCrystalInternationalChecksum1() {
-    return get8BitChecksum(this.bytes, 0x2009, 0x2b82)
+    return xorChecksum8BitLe(this.bytes, 0x2009, 0x2b82)
   }
 
   getCrystalInternationalChecksum2() {
-    return get8BitChecksum(this.bytes, 0x1209, 0x1d82)
+    return xorChecksum8BitLe(this.bytes, 0x1209, 0x1d82)
   }
 
   areCrystalInternationalChecksumsValid() {
