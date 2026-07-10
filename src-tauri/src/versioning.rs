@@ -165,6 +165,7 @@ pub enum SignificantUpdate {
     V1_12_3,
     V1_12_4,
     V1_13_1,
+    V1_13_2,
 }
 
 impl SignificantUpdate {
@@ -193,6 +194,7 @@ impl SignificantUpdate {
             Self::V1_12_3 => Version::parse("1.12.3"),
             Self::V1_12_4 => Version::parse("1.12.4"),
             Self::V1_13_1 => Version::parse("1.13.1"),
+            Self::V1_13_2 => Version::parse("1.13.2"),
         }
         .expect("all versions are valid semver")
     }
@@ -305,6 +307,12 @@ impl SignificantUpdate {
                 "Top-right indicator is now color-coded based on its value and the max possible value",
                 "Box cell size has been adjusted to make Pokémon icons more visible with indicators present.",
                 "Fixed various species gender ratios. Affected Pokémon should have been fixed at startup.",
+            ]),
+            Self::V1_13_2 => Some(vec![
+                "Ribbons can now be affixed/unaffixed by double-clicking on them in the Ribbons tab.",
+                "Fixed a bug preventing the Partner Ribbon from being sent to Scarlet/Violet.",
+                "Fixed a bug where Pokémon met at level 64 or higher would crash the app when being converted to a PK2.",
+                "Window state preservation has been restored.",
             ]),
             _ => None,
         }
