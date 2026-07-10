@@ -40,7 +40,7 @@
     "build": "pnpm run wasm-compile && pnpm vite build",
     "dev": "pnpm run wasm-compile-dev && pnpm vite",
     "tauri": "tauri",
-    "test-cargo": "cargo test --workspace --all-features  --tests",
+    "test-cargo": "cargo test --workspace --all-features --tests -- --skip export_typescript_bindings",
     "test-vite": "pnpm run wasm-compile-dev && vitest run",
     "test": "pnpm run test-cargo && pnpm run test-vite",
     "wasm-compile-dev": "wasm-pack build ./pkm_rs --target web -- --features wasm && node scripts/patch-types.mjs",

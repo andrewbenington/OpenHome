@@ -39,7 +39,6 @@ check: wasm-compile
 .PHONY: test
 test: ensure-dependencies
 	@pnpm run test
-	@npx eslint --fix ./src/core/tauri/spectaCommands.ts
 
 .PHONY: check-rs
 check-rs:
