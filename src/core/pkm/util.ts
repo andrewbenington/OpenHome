@@ -290,17 +290,17 @@ export function getCharacteristic(mon: PKMInterface) {
   }
   switch (determiningIV) {
     case 'hp':
-      return preGen6 ? HPCharacteristicsPre6[maxIV % 5] : HPCharacteristics[maxIV % 5]
+      return preGen6 ? HPCharacteristicsPre6[maxIV % 5] : HPCharacteristics[maxIV % 5] + '.'
     case 'atk':
-      return AttackCharacteristics[maxIV % 5]
+      return AttackCharacteristics[maxIV % 5] + '.'
     case 'def':
-      return DefenseCharacteristics[maxIV % 5]
+      return DefenseCharacteristics[maxIV % 5] + '.'
     case 'spa':
-      return SpecialAtkCharacteristics[maxIV % 5]
+      return SpecialAtkCharacteristics[maxIV % 5] + '.'
     case 'spd':
-      return SpecialDefCharacteristics[maxIV % 5]
+      return SpecialDefCharacteristics[maxIV % 5] + '.'
     default:
-      return SpeedCharacteristics[maxIV % 5]
+      return SpeedCharacteristics[maxIV % 5] + '.'
   }
 }
 

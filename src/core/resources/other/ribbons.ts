@@ -288,7 +288,7 @@ export const ModernRibbons = [
   'Alpha Mark',
   'Mightiest Mark',
   'Titan Mark',
-  'Partner Ribbon',
+  'Partner',
 ]
 
 export const RibbonTitles = [

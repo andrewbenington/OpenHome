@@ -209,7 +209,7 @@ export default class PK2 {
     dataView.setUint8(0x1b, this.trainerFriendship)
     dataView.setUint8(0x1c, this.pokerusByte)
     byteLogic.uIntToBufferBits(dataView, this.metTimeOfDay, 29, 6, 2, false)
-    byteLogic.uIntToBufferBits(dataView, this.metLevel, 29, 0, 6, false)
+    byteLogic.uIntToBufferBits(dataView, Math.min(63, this.metLevel), 29, 0, 6, false) // only met levels up to 63 can be stored in this 6-bit field
     byteLogic.uIntToBufferBits(dataView, this.metLocationIndex, 30, 0, 7, false)
     dataView.setUint8(0x1f, this.level)
     if (options?.includeExtraFields) {
