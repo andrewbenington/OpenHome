@@ -1,7 +1,7 @@
 use std::num::Wrapping;
 
 #[cfg(feature = "wasm")]
-use crate::traits::{AsBytes, AsBytesMut};
+use crate::bytes::{AsBytes, AsBytesMut};
 
 #[cfg(feature = "wasm")]
 pub trait ChecksumAlgorithm {

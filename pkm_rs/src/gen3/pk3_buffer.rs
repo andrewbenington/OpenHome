@@ -1,8 +1,8 @@
+use crate::bytes::{AsBytes, AsBytesMut};
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::encryption::BlockCrypto;
 use crate::result::Result;
 use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
-use crate::traits::bytes::{AsBytes, AsBytesMut};
 use crate::util;
 
 use arbitrary_int::u4;

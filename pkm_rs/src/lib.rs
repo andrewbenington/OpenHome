@@ -5,6 +5,7 @@ mod rom_hacks;
 mod strings;
 mod util;
 
+pub mod bytes;
 pub mod convert_strategy;
 pub mod format;
 #[cfg(feature = "wasm")]

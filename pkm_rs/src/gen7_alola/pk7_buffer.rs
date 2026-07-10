@@ -1,8 +1,8 @@
 use super::{Pk7AbilityIndex, Pk7SpeciesAndForm};
+use crate::bytes::{AsBytes, AsBytesMut};
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::encryption::BlockCrypto;
 use crate::result::{Error, Result};
-use crate::traits::bytes::{AsBytes, AsBytesMut};
 use crate::util;
 use arbitrary_int::u3;
 use arbitrary_int::u7;

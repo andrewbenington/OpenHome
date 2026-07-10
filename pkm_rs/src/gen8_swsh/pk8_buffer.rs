@@ -1,9 +1,9 @@
 use super::{Pk8AbilityIndex, Pk8SpeciesAndForm};
+use crate::bytes::{AsBytes, AsBytesMut};
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::encryption::BlockCrypto;
 use crate::result::{Error, Result};
 use crate::traits::OhpkmByte;
-use crate::traits::bytes::{AsBytes, AsBytesMut};
 use crate::util;
 use arbitrary_int::{u3, u7};
 use pkm_rs_resources::abilities::AbilityIndexWasm;
