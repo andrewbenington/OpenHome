@@ -1,8 +1,8 @@
-import { BlockTypeId, ScalarTypeId } from '@pkm-rs/pkg/pkm_rs'
+import { BlockType, ScalarType } from '@pkm-rs/pkg/pkm_rs'
 
 export type SCBoolBlock = {
   key: number
-  type: BlockTypeId
+  type: BlockType
   raw?: undefined
   subtype?: undefined
   blockType: 'bool'
@@ -10,7 +10,7 @@ export type SCBoolBlock = {
 
 export type SCObjectBlock = {
   key: number
-  type: BlockTypeId
+  type: BlockType
   raw: ArrayBuffer
   subtype?: undefined
   blockType: 'object'
@@ -18,15 +18,15 @@ export type SCObjectBlock = {
 
 export type SCArrayBlock = {
   key: number
-  type: BlockTypeId
+  type: BlockType
   raw: ArrayBuffer
-  subtype: ScalarTypeId
+  subtype: ScalarType
   blockType: 'array'
 }
 
 export type SCValueBlock = {
   key: number
-  type: BlockTypeId
+  type: BlockType
   raw: ArrayBuffer
   subtype?: undefined
   blockType: 'value'
