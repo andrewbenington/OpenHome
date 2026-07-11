@@ -2,7 +2,9 @@ use wasm_bindgen::prelude::*;
 
 use crate::bytes::{Reader, Writer};
 
-const STATIC_XOR_PAD: [u8; 128] = [
+const PAD_LENGTH: usize = 128;
+
+const STATIC_XOR_PAD: [u8; PAD_LENGTH] = [
     0xa0, 0x92, 0xd1, 0x06, 0x07, 0xdb, 0x32, 0xa1, 0xae, 0x01, 0xf5, 0xc5, 0x1e, 0x84, 0x4f, 0xe3,
     0x53, 0xca, 0x37, 0xf4, 0xa7, 0xb0, 0x4d, 0xa0, 0x18, 0xb7, 0xc2, 0x97, 0xda, 0x5f, 0x53, 0x2b,
     0x75, 0xfa, 0x48, 0x16, 0xf8, 0xd4, 0x8a, 0x6f, 0x61, 0x05, 0xf4, 0xe2, 0xfd, 0x04, 0xb5, 0xa3,
@@ -13,34 +15,25 @@ const STATIC_XOR_PAD: [u8; 128] = [
     0xa4, 0x48, 0xb3, 0x50, 0x9e, 0x14, 0xa0, 0x52, 0xde, 0x7e, 0x10, 0x2b, 0x1b, 0x77, 0x6e, 0,
 ];
 
-fn crypt_static_xor_pad_bytes(data: &[u8]) -> Box<[u8]> {
-    let size = STATIC_XOR_PAD.len() - 1;
-    let mut iterations_remaining = (data.len() - 1) / size;
+fn crypt_static_xor_pad_bytes(data: &[u8]) -> Vec<u8> {
     let mut after_xor = vec![0u8; data.len()];
+
     let mut current_pos = 0usize;
+    let iterations = (data.len() - 1) / (PAD_LENGTH - 1);
 
-    loop {
-        let current_slice = &mut data[current_pos..current_pos + STATIC_XOR_PAD.len()].to_vec();
-
-        for (val, pad) in current_slice.iter_mut().zip(STATIC_XOR_PAD) {
-            *val ^= pad
+    for _ in 0..iterations {
+        for i in 0..PAD_LENGTH {
+            after_xor[current_pos + i] = data[current_pos + i] ^ STATIC_XOR_PAD[i];
         }
 
-        after_xor[current_pos..current_pos + current_slice.len()].copy_from_slice(current_slice);
-        current_pos += size;
-        iterations_remaining -= 1;
-
-        if iterations_remaining == 0 {
-            break;
-        }
+        current_pos += PAD_LENGTH - 1;
     }
 
     for i in 0..(data.len() - current_pos) {
-        after_xor[current_pos + i] =
-            data[current_pos + i] ^ STATIC_XOR_PAD[i % STATIC_XOR_PAD.len()]
+        after_xor[current_pos + i] = data[current_pos + i] ^ STATIC_XOR_PAD[i % PAD_LENGTH]
     }
 
-    after_xor.into_boxed_slice()
+    after_xor
 }
 
 fn read_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
@@ -84,7 +77,7 @@ fn write_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
 
 fn encrypt_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
     let encrypted_blocks = write_blocks(blocks, size);
-    let mut encrypted_bytes = crypt_static_xor_pad_bytes(&encrypted_blocks).to_vec();
+    let mut encrypted_bytes = crypt_static_xor_pad_bytes(&encrypted_blocks);
 
     let hash = super::hash::compute_hash(&encrypted_bytes);
     encrypted_bytes.extend_from_slice(&hash);
