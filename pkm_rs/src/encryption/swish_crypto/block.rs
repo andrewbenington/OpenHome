@@ -49,7 +49,7 @@ fn read_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
 
 #[wasm_bindgen(js_name = decryptBlocks)]
 pub fn decrypt_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
-    let data_before_hash = &data[..data.len() - super::SIZE_HASH];
+    let data_before_hash = &data[..data.len() - super::HASH_SIZE];
     let data_after_xor = crypt_static_xor_pad_bytes(data_before_hash);
 
     read_blocks(&data_after_xor)

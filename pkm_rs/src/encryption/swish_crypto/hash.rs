@@ -30,7 +30,7 @@ pub fn compute_hash(data: &[u8]) -> aes::cipher::Array<u8, <Sha256 as OutputSize
 
 #[wasm_bindgen(js_name = hashIsValid)]
 pub fn hash_is_valid(data: &[u8]) -> bool {
-    let (payload, stored_hash) = data.split_at(data.len() - super::SIZE_HASH);
+    let (payload, stored_hash) = data.split_at(data.len() - super::HASH_SIZE);
     let computed_hash = &compute_hash(payload);
 
     stored_hash
