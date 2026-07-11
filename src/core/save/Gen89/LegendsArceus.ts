@@ -2,10 +2,22 @@ import { PA8 } from '@openhome-core/pkm'
 import { LA_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
-import { ConvertStrategy, ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
+import {
+  Block,
+  BlockType,
+  ConvertStrategy,
+  ExtraFormIndex,
+  Gender,
+  Languages,
+  OriginGame,
+} from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
-import { SCArrayBlock, SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
-import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
+import {
+  ArrayBlock,
+  blockIsType,
+  ObjectBlock,
+  SwishCrypto,
+} from '../encryption/SwishCrypto/SwishCrypto'
 import { PathData } from '../util/path'
 import { BoxNamesBlock } from './BoxNamesBlock'
 import { G89BlockName, Gen8Gen9Save } from './Gen8Gen9Save'
@@ -35,7 +47,7 @@ export class LegendsArceusSave extends Gen8Gen9Save<PA8> {
       }
     })
 
-    this.myStatusBlock = new MyStatusBlock(this.getBlockMust('MyStatus', 'object'))
+    this.myStatusBlock = new MyStatusBlock(this.getBlockMust('MyStatus', 'Object'))
     this.name = this.myStatusBlock.getName()
     this.tid = this.myStatusBlock.getTID()
     this.sid = this.myStatusBlock.getSID()
@@ -62,28 +74,28 @@ export class LegendsArceusSave extends Gen8Gen9Save<PA8> {
     return BlockKeys[blockName]
   }
 
-  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): SCBlock | undefined {
+  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): Block | undefined {
     const key = this.getBlockKey(blockName)
 
     return this.scBlocks.find((b) => b.key === key)
   }
 
-  getBlockMust<T extends SCBlock = SCBlock>(
+  getBlockMust<T extends Block = Block>(
     blockName: G89BlockName | keyof typeof BlockKeys,
-    type?: T['blockType']
+    type?: BlockType
   ): T {
     const block = this.getBlock(blockName)
 
     if (!block) {
       throw Error(`Missing block ${blockName}`)
     }
-    if (type && block.blockType !== type) {
-      throw Error(`Block ${blockName} is type ${block.blockType} (expected ${type})`)
+    if (type && !blockIsType(block, type)) {
+      throw Error(`Block ${blockName} has data ${JSON.stringify(block.data)}(expected ${type})`)
     }
     return block as T
   }
 
-  getBoxNamesBlock = () => new BoxNamesBlock(this.getBlockMust<SCArrayBlock>('BoxLayout', 'array'))
+  getBoxNamesBlock = () => new BoxNamesBlock(this.getBlockMust<ArrayBlock>('BoxLayout', 'Array'))
 
   getMonBoxSizeBytes(): number {
     return 360
@@ -154,8 +166,8 @@ const BlockKeys = {
 class MyStatusBlock {
   dataView: DataView<ArrayBuffer>
 
-  constructor(scBlock: SCObjectBlock) {
-    this.dataView = new DataView(scBlock.raw)
+  constructor(scBlock: ObjectBlock) {
+    this.dataView = new DataView(scBlock.data.Object.bytes.buffer)
   }
 
   public getName(): string {

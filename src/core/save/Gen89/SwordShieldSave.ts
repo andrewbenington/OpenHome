@@ -9,6 +9,8 @@ import {
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
+  Block,
+  BlockType,
   ConvertStrategy,
   ExtraFormIndex,
   Gender,
@@ -19,8 +21,7 @@ import {
   Pk8Wasm,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
-import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
-import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
+import { blockIsType, ObjectBlock, SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { PathData } from '../util/path'
 import { G89BlockName, Gen8Gen9Save } from './Gen8Gen9Save'
 
@@ -43,8 +44,8 @@ export class SwordShieldSave extends Gen8Gen9Save<PK8> {
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
 
-    this.myStatusBlock = new MyStatusBlock(this.getBlockMust('MyStatus', 'object'))
-    this.trainerCardBlock = new TrainerCardBlock(this.getBlockMust('TrainerCard', 'object'))
+    this.myStatusBlock = new MyStatusBlock(this.getBlockMust('MyStatus', 'Object'))
+    this.trainerCardBlock = new TrainerCardBlock(this.getBlockMust('TrainerCard', 'Object'))
     this.name = this.myStatusBlock.getName()
 
     this.tid = this.myStatusBlock.getTID()
@@ -77,23 +78,25 @@ export class SwordShieldSave extends Gen8Gen9Save<PK8> {
     return BlockKeys[blockName]
   }
 
-  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): SCBlock | undefined {
+  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): Block | undefined {
     const key = this.getBlockKey(blockName)
 
     return this.scBlocks.find((b) => b.key === key)
   }
 
-  getBlockMust<T extends SCBlock = SCBlock>(
+  getBlockMust<T extends Block = Block>(
     blockName: G89BlockName | keyof typeof BlockKeys,
-    type?: T['blockType']
+    type?: BlockType
   ): T {
     const block = this.getBlock(blockName)
 
     if (!block) {
       throw Error(`Missing block ${blockName}`)
     }
-    if (type && block.blockType !== type) {
-      throw Error(`Block ${blockName} is type ${block.blockType} (expected ${type})`)
+    if (type && !blockIsType(block, type)) {
+      throw Error(
+        `Block ${blockName} has data ${JSON.stringify(block.data)} (expected ${JSON.stringify(type)})`
+      )
     }
     return block as T
   }
@@ -215,8 +218,8 @@ const BlockKeys = {
 class TrainerCardBlock {
   dataView: DataView<ArrayBuffer>
 
-  constructor(scBlock: SCObjectBlock) {
-    this.dataView = new DataView(scBlock.raw)
+  constructor(scBlock: ObjectBlock) {
+    this.dataView = new DataView(scBlock.data.Object.bytes.buffer)
   }
 
   public getName(): string {
@@ -263,8 +266,8 @@ class TrainerCardBlock {
 class MyStatusBlock {
   dataView: DataView<ArrayBuffer>
 
-  constructor(scBlock: SCObjectBlock) {
-    this.dataView = new DataView(scBlock.raw)
+  constructor(scBlock: ObjectBlock) {
+    this.dataView = new DataView(scBlock.data.Object.bytes.buffer)
   }
 
   public getName(): string {

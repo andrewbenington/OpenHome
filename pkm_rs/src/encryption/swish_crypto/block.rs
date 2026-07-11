@@ -104,7 +104,6 @@ pub fn encrypt_blocks_js(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 pub struct Block {
     key: u32,
-    block_type: BlockType,
     data: BlockData,
 }
 
@@ -120,8 +119,19 @@ impl Block {
         let block_type = BlockType::try_from(reader.read_u8() ^ crypto_state.next_u8())?;
 
         let data = match block_type {
-            BlockType::Scalar(ScalarType::Bool1 | ScalarType::Bool2 | ScalarType::Bool3) => {
-                BlockData::Bool
+            BlockType::Scalar(ScalarType::Bool(bool_type)) => BlockData::Bool(bool_type),
+            BlockType::Scalar(ScalarType::Numeric(numeric_type)) => {
+                let type_size = numeric_type.byte_size();
+                let mut payload_bytes = reader.read_bytes(type_size);
+
+                for byte in payload_bytes.iter_mut() {
+                    *byte ^= crypto_state.next_u8();
+                }
+
+                BlockData::Value {
+                    dataype: numeric_type,
+                    bytes: payload_bytes,
+                }
             }
             BlockType::Object => {
                 let byte_count = (reader.read_u32() ^ crypto_state.next_32()) as usize;
@@ -151,25 +161,9 @@ impl Block {
                     subtype,
                 }
             }
-            BlockType::Scalar(scalar_type) => {
-                let type_size = scalar_type.byte_size();
-                let mut payload_bytes = reader.read_bytes(type_size);
-
-                for byte in payload_bytes.iter_mut() {
-                    *byte ^= crypto_state.next_u8();
-                }
-
-                BlockData::Value {
-                    bytes: payload_bytes,
-                }
-            }
         };
 
-        Ok(Self {
-            key,
-            block_type,
-            data,
-        })
+        Ok(Self { key, data })
     }
 
     fn write_encrypted(&self, writer: &mut Writer) -> usize {
@@ -177,7 +171,7 @@ impl Block {
 
         let mut crypto_state = SwishCrypto::new(self.key);
 
-        writer.write_u8(self.block_type.id() ^ crypto_state.next_u8());
+        writer.write_u8(self.data.type_id() ^ crypto_state.next_u8());
 
         if let BlockData::Object { bytes } = &self.data {
             let payload_size_xored = (bytes.len() as u32) ^ crypto_state.next_32();
@@ -189,15 +183,15 @@ impl Block {
 
             writer.write_u32(entry_count_xored);
 
-            let subtype_xored = (*subtype as u8) ^ crypto_state.next_u8();
+            let subtype_xored = subtype.id() ^ crypto_state.next_u8();
             writer.write_u8(subtype_xored);
         }
 
         let payload = match &self.data {
-            BlockData::Bool => &Vec::new(),
+            BlockData::Bool(..) => &Vec::new(),
             BlockData::Object { bytes } => bytes,
             BlockData::Array { bytes, .. } => bytes,
-            BlockData::Value { bytes } => bytes,
+            BlockData::Value { bytes, .. } => bytes,
         };
 
         for byte in payload {
@@ -213,8 +207,82 @@ impl Block {
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum BoolType {
+    Bool1,
+    Bool2,
+    Bool3,
+}
+
+impl BoolType {
+    pub const fn id(&self) -> u8 {
+        match self {
+            BoolType::Bool1 => 1,
+            BoolType::Bool2 => 2,
+            BoolType::Bool3 => 3,
+        }
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
+pub enum NumericType {
+    UInt8,
+    UInt16,
+    UInt32,
+    UInt64,
+
+    Int8,
+    Int16,
+    Int32,
+    Int64,
+
+    Float32,
+    Float64,
+}
+
+impl NumericType {
+    pub const fn id(&self) -> u8 {
+        match self {
+            Self::UInt8 => 8,
+            Self::UInt16 => 9,
+            Self::UInt32 => 10,
+            Self::UInt64 => 11,
+
+            Self::Int8 => 12,
+            Self::Int16 => 13,
+            Self::Int32 => 14,
+            Self::Int64 => 15,
+
+            Self::Float32 => 16,
+            Self::Float64 => 17,
+        }
+    }
+
+    pub const fn byte_size(&self) -> usize {
+        match self {
+            Self::UInt8 => 1,
+            Self::UInt16 => 2,
+            Self::UInt32 => 4,
+            Self::UInt64 => 8,
+
+            Self::Int8 => 1,
+            Self::Int16 => 2,
+            Self::Int32 => 4,
+            Self::Int64 => 8,
+
+            Self::Float32 => 4,
+            Self::Float64 => 8,
+        }
+    }
+}
+
+#[cfg_attr(
+    feature = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 enum BlockData {
-    Bool,
+    Bool(BoolType),
     Object {
         #[serde(with = "serde_bytes")]
         #[tsify(type = "Uint8Array<ArrayBuffer>")]
@@ -227,10 +295,22 @@ enum BlockData {
         subtype: ScalarType,
     },
     Value {
+        dataype: NumericType,
         #[serde(with = "serde_bytes")]
         #[tsify(type = "Uint8Array<ArrayBuffer>")]
         bytes: Vec<u8>,
     },
+}
+
+impl BlockData {
+    pub const fn type_id(&self) -> u8 {
+        match self {
+            Self::Object { .. } => 4,
+            Self::Array { .. } => 5,
+            Self::Bool(bool_type) => bool_type.id(),
+            Self::Value { dataype, .. } => dataype.id(),
+        }
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -293,7 +373,7 @@ impl BlockType {
         match self {
             Self::Object => 4,
             Self::Array => 5,
-            Self::Scalar(scalar) => *scalar as u8,
+            Self::Scalar(scalar) => scalar.id(),
         }
     }
 }
@@ -320,40 +400,22 @@ pub fn block_type_index(type_id: BlockType) -> u8 {
 #[derive(Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 pub enum ScalarType {
-    Bool1 = 1,
-    Bool2 = 2,
-    Bool3 = 3,
-
-    UInt8 = 8,
-    UInt16 = 9,
-    UInt32 = 10,
-    UInt64 = 11,
-
-    Int8 = 12,
-    Int16 = 13,
-    Int32 = 14,
-    Int64 = 15,
-
-    Float32 = 16,
-    Float64 = 17,
+    Bool(BoolType),
+    Numeric(NumericType),
 }
 
 impl ScalarType {
+    pub const fn id(&self) -> u8 {
+        match self {
+            Self::Bool(bool_type) => bool_type.id(),
+            Self::Numeric(numeric_type) => numeric_type.id(),
+        }
+    }
+
     pub const fn byte_size(&self) -> usize {
         match self {
-            Self::Bool1 | Self::Bool2 | Self::Bool3 => 1,
-            Self::UInt8 => 1,
-            Self::UInt16 => 2,
-            Self::UInt32 => 4,
-            Self::UInt64 => 8,
-
-            Self::Int8 => 1,
-            Self::Int16 => 2,
-            Self::Int32 => 4,
-            Self::Int64 => 8,
-
-            Self::Float32 => 4,
-            Self::Float64 => 8,
+            Self::Bool(..) => 1,
+            Self::Numeric(numeric_type) => numeric_type.byte_size(),
         }
     }
 }
@@ -369,7 +431,7 @@ pub fn scalar_type_size(type_id: ScalarType) -> usize {
 #[wasm_bindgen(js_name = scalarTypeIndex)]
 #[allow(clippy::missing_const_for_fn)]
 pub fn scalar_type_index(type_id: ScalarType) -> u8 {
-    type_id as u8
+    type_id.id()
 }
 
 impl TryFrom<u8> for ScalarType {
@@ -377,22 +439,22 @@ impl TryFrom<u8> for ScalarType {
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
-            1 => Ok(Self::Bool1),
-            2 => Ok(Self::Bool2),
-            3 => Ok(Self::Bool3),
+            1 => Ok(Self::Bool(BoolType::Bool1)),
+            2 => Ok(Self::Bool(BoolType::Bool2)),
+            3 => Ok(Self::Bool(BoolType::Bool3)),
 
-            8 => Ok(Self::UInt8),
-            9 => Ok(Self::UInt16),
-            10 => Ok(Self::UInt32),
-            11 => Ok(Self::UInt64),
+            8 => Ok(Self::Numeric(NumericType::UInt8)),
+            9 => Ok(Self::Numeric(NumericType::UInt16)),
+            10 => Ok(Self::Numeric(NumericType::UInt32)),
+            11 => Ok(Self::Numeric(NumericType::UInt64)),
 
-            12 => Ok(Self::Int8),
-            13 => Ok(Self::Int16),
-            14 => Ok(Self::Int32),
-            15 => Ok(Self::Int64),
+            12 => Ok(Self::Numeric(NumericType::Int8)),
+            13 => Ok(Self::Numeric(NumericType::Int16)),
+            14 => Ok(Self::Numeric(NumericType::Int32)),
+            15 => Ok(Self::Numeric(NumericType::Int64)),
 
-            16 => Ok(Self::Float32),
-            17 => Ok(Self::Float64),
+            16 => Ok(Self::Numeric(NumericType::Float32)),
+            17 => Ok(Self::Numeric(NumericType::Float64)),
 
             _ => Err(InvalidTypeId(value)),
         }

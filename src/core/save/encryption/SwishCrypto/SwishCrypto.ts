@@ -1,74 +1,21 @@
 import {
   Block,
+  BlockData,
+  BlockType,
   decryptBlocks,
   encryptBlocks,
   hashIsValid,
   swishCryptoHash,
 } from '@pkm-rs/pkg/pkm_rs'
-import { SCBlock } from './SCBlock'
 
 const SIZE_HASH = 0x20
 
-function rustBlockToJsBlock(rustBlock: Block): SCBlock {
-  if (rustBlock.data === 'Bool')
-    return { blockType: 'bool', key: rustBlock.key, type: rustBlock.block_type }
-  if ('Object' in rustBlock.data) {
-    return {
-      blockType: 'object',
-      key: rustBlock.key,
-      type: rustBlock.block_type,
-      raw: rustBlock.data.Object.bytes.buffer,
-    }
-  }
-  if ('Array' in rustBlock.data) {
-    const { bytes, subtype } = rustBlock.data.Array
-    return {
-      blockType: 'array',
-      key: rustBlock.key,
-      type: rustBlock.block_type,
-      raw: bytes.buffer,
-      subtype,
-    }
-  }
-  return {
-    blockType: 'value',
-    key: rustBlock.key,
-    type: rustBlock.block_type,
-    raw: rustBlock.data.Value.bytes.buffer,
-  }
+function decrypt(data: Uint8Array): Block[] {
+  return decryptBlocks(data)
 }
 
-export function jsBlockToRustBlock(jsBlock: SCBlock): Block {
-  switch (jsBlock.blockType) {
-    case 'bool':
-      return { block_type: jsBlock.type, key: jsBlock.key, data: 'Bool' }
-    case 'object':
-      return {
-        block_type: jsBlock.type,
-        key: jsBlock.key,
-        data: { Object: { bytes: new Uint8Array(jsBlock.raw) } },
-      }
-    case 'array':
-      return {
-        block_type: jsBlock.type,
-        key: jsBlock.key,
-        data: { Array: { bytes: new Uint8Array(jsBlock.raw), subtype: jsBlock.subtype } },
-      }
-    case 'value':
-      return {
-        block_type: jsBlock.type,
-        key: jsBlock.key,
-        data: { Value: { bytes: new Uint8Array(jsBlock.raw) } },
-      }
-  }
-}
-
-function decrypt(data: Uint8Array): SCBlock[] {
-  return decryptBlocks(data).map(rustBlockToJsBlock)
-}
-
-function encrypt(blocks: SCBlock[], size: number): Uint8Array {
-  return encryptBlocks(blocks.map(jsBlockToRustBlock), size)
+function encrypt(blocks: Block[], size: number): Uint8Array {
+  return encryptBlocks(blocks, size)
 }
 
 export const SwishCrypto = {
@@ -77,4 +24,46 @@ export const SwishCrypto = {
   getIsHashValid: hashIsValid,
   decrypt,
   encrypt,
+}
+
+export function blockIsType(block: Block, type: BlockType) {
+  if (type === 'Array') {
+    return 'Array' in block.data
+  } else if (type === 'Object') {
+    return 'Object' in block.data
+  } else if ('Bool' in block.data) {
+    return 'Bool' in type.Scalar && type.Scalar.Bool === block.data.Bool
+  } else if ('Value' in block.data) {
+    return 'Numeric' in type.Scalar && type.Scalar.Numeric === block.data.Value.dataype
+  }
+
+  return false
+}
+
+type KeysOfUnion<T> = T extends any ? keyof T : never
+
+type DataType = KeysOfUnion<BlockData>
+
+type DataOf<K extends DataType> = Extract<BlockData, Record<K, any>>[K]
+
+type BlockDataOf<K extends DataType> = Record<K, DataOf<K>>
+
+export type ObjectBlock = {
+  key: number
+  data: BlockDataOf<'Object'>
+}
+
+export type ArrayBlock = {
+  key: number
+  data: BlockDataOf<'Array'>
+}
+
+export type BoolBlock = {
+  key: number
+  data: BlockDataOf<'Bool'>
+}
+
+export type ValueBlock = {
+  key: number
+  data: BlockDataOf<'Value'>
 }
