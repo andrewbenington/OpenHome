@@ -1,7 +1,8 @@
+// PKHeX reference implementation: PKHeX.Core/Saves/Encryption/SwishCrypto/SwishCrypto.cs
+
 use wasm_bindgen::prelude::*;
 
 use crate::bytes::{Reader, Writer};
-
 const PAD_LENGTH: usize = 127;
 
 const STATIC_XOR_PAD: [u8; PAD_LENGTH] = [
@@ -15,10 +16,11 @@ const STATIC_XOR_PAD: [u8; PAD_LENGTH] = [
     0xa4, 0x48, 0xb3, 0x50, 0x9e, 0x14, 0xa0, 0x52, 0xde, 0x7e, 0x10, 0x2b, 0x1b, 0x77, 0x6e,
 ];
 
+// with compiler optimizations the iterator is erased completely (at least on x86)
 fn crypt_static_xor_pad_bytes(data: &[u8]) -> Vec<u8> {
     data.iter()
-        .enumerate()
-        .map(|(i, val)| val ^ STATIC_XOR_PAD[i % PAD_LENGTH])
+        .zip(STATIC_XOR_PAD.iter().cycle())
+        .map(|(val, pad)| val ^ pad)
         .collect()
 }
 
