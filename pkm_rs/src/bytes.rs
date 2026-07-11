@@ -1,3 +1,5 @@
+use pkm_rs_types::read_u32_le;
+
 // find and replace
 // MoveSlot::from_le_bytes\(bytes\[(\d+)\.\.\d+\]\.try_into\(\).unwrap\(\)\)
 // read_move_slot!(bytes, $1)
@@ -16,13 +18,56 @@ pub trait AsBytesMut {
     fn as_bytes_mut(&mut self) -> &mut [u8];
 }
 
+pub struct Reader<'a> {
+    bytes: &'a [u8],
+    current_offset: usize,
+}
+
+impl<'a> Reader<'a> {
+    pub const fn new(bytes: &'a [u8]) -> Self {
+        Self {
+            bytes,
+            current_offset: 0,
+        }
+    }
+
+    pub fn read_u8(&mut self) -> u8 {
+        let value = self.bytes[self.current_offset];
+        self.current_offset += 1;
+        value
+    }
+
+    pub fn read_u32(&mut self) -> u32 {
+        let value = read_u32_le!(self.bytes, self.current_offset);
+        self.current_offset += 4;
+        value
+    }
+
+    pub fn read_bytes(&mut self, length: usize) -> Vec<u8> {
+        let bytes = self.bytes[self.current_offset..self.current_offset + length].to_vec();
+        self.current_offset += length;
+        bytes
+    }
+
+    pub const fn current_offset(&self) -> usize {
+        self.current_offset
+    }
+}
+
 pub struct Writer<'a> {
     bytes: &'a mut [u8],
     current_offset: usize,
 }
 
 impl<'a> Writer<'a> {
-    pub const fn new(bytes: &'a mut [u8], offset: usize) -> Self {
+    pub const fn new(bytes: &'a mut [u8]) -> Self {
+        Self {
+            bytes,
+            current_offset: 0,
+        }
+    }
+
+    pub const fn at(bytes: &'a mut [u8], offset: usize) -> Self {
         Self {
             bytes,
             current_offset: offset,
@@ -42,5 +87,9 @@ impl<'a> Writer<'a> {
 
     pub const fn current_offset(&self) -> usize {
         self.current_offset
+    }
+
+    pub fn written_bytes(&self) -> Vec<u8> {
+        self.bytes[0..self.current_offset].to_vec()
     }
 }

@@ -11,12 +11,12 @@ const SIZE_HASH = 0x20
 
 function rustBlockToJsBlock(rustBlock: Block): SCBlock {
   if (rustBlock.data === 'Bool')
-    return { blockType: 'bool', key: rustBlock.key, type: rustBlock.type_id }
+    return { blockType: 'bool', key: rustBlock.key, type: rustBlock.block_type }
   if ('Object' in rustBlock.data) {
     return {
       blockType: 'object',
       key: rustBlock.key,
-      type: rustBlock.type_id,
+      type: rustBlock.block_type,
       raw: rustBlock.data.Object.bytes.buffer,
     }
   }
@@ -25,7 +25,7 @@ function rustBlockToJsBlock(rustBlock: Block): SCBlock {
     return {
       blockType: 'array',
       key: rustBlock.key,
-      type: rustBlock.type_id,
+      type: rustBlock.block_type,
       raw: bytes.buffer,
       subtype,
     }
@@ -33,7 +33,7 @@ function rustBlockToJsBlock(rustBlock: Block): SCBlock {
   return {
     blockType: 'value',
     key: rustBlock.key,
-    type: rustBlock.type_id,
+    type: rustBlock.block_type,
     raw: rustBlock.data.Value.bytes.buffer,
   }
 }
@@ -41,22 +41,22 @@ function rustBlockToJsBlock(rustBlock: Block): SCBlock {
 export function jsBlockToRustBlock(jsBlock: SCBlock): Block {
   switch (jsBlock.blockType) {
     case 'bool':
-      return { type_id: jsBlock.type, key: jsBlock.key, data: 'Bool' }
+      return { block_type: jsBlock.type, key: jsBlock.key, data: 'Bool' }
     case 'object':
       return {
-        type_id: jsBlock.type,
+        block_type: jsBlock.type,
         key: jsBlock.key,
         data: { Object: { bytes: new Uint8Array(jsBlock.raw) } },
       }
     case 'array':
       return {
-        type_id: jsBlock.type,
+        block_type: jsBlock.type,
         key: jsBlock.key,
         data: { Array: { bytes: new Uint8Array(jsBlock.raw), subtype: jsBlock.subtype } },
       }
     case 'value':
       return {
-        type_id: jsBlock.type,
+        block_type: jsBlock.type,
         key: jsBlock.key,
         data: { Value: { bytes: new Uint8Array(jsBlock.raw) } },
       }

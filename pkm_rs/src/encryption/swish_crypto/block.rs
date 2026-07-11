@@ -1,8 +1,6 @@
-use pkm_rs_types::read_u32_le;
-
 use wasm_bindgen::prelude::*;
 
-use crate::bytes::Writer;
+use crate::bytes::{Reader, Writer};
 
 const STATIC_XOR_PAD: [u8; 128] = [
     0xa0, 0x92, 0xd1, 0x06, 0x07, 0xdb, 0x32, 0xa1, 0xae, 0x01, 0xf5, 0xc5, 0x1e, 0x84, 0x4f, 0xe3,
@@ -46,13 +44,11 @@ fn crypt_static_xor_pad_bytes(data: &[u8]) -> Box<[u8]> {
 }
 
 fn read_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
-    let mut offset: usize = 0;
     let mut result = Vec::<Block>::new();
+    let mut reader = Reader::new(data);
 
-    while offset < data.len() {
-        let (block, new_offset) = Block::build(data, offset)?;
-        result.push(block);
-        offset = new_offset;
+    while reader.current_offset() < data.len() {
+        result.push(Block::read_encrypted(&mut reader)?);
     }
 
     Ok(result)
@@ -68,51 +64,22 @@ pub fn decrypt_blocks(data: &[u8]) -> Result<Vec<Block>, InvalidTypeId> {
 
 #[wasm_bindgen(js_name = writeBlock)]
 pub fn write_block(block: &Block, bytes: &mut [u8], offset: usize) -> usize {
-    let mut writer = Writer::new(bytes, offset);
-
-    writer.write_u32(block.key);
-
-    let mut xor_shift_32 = XorShift32::new(block.key);
-
-    writer.write_u8(block.type_id.index() ^ xor_shift_32.next());
-
-    if let BlockData::Object { bytes } = &block.data {
-        let payload_size_xored = (bytes.len() as u32) ^ xor_shift_32.next_32();
-
-        writer.write_u32(payload_size_xored);
-    } else if let BlockData::Array { bytes, subtype } = &block.data {
-        let entry_count = bytes.len() / subtype.byte_size();
-        let entry_count_xored = (entry_count as u32) ^ xor_shift_32.next_32();
-
-        writer.write_u32(entry_count_xored);
-
-        let subtype_xored = (*subtype as u8) ^ xor_shift_32.next();
-        writer.write_u8(subtype_xored);
-    }
-
-    let payload = match &block.data {
-        BlockData::Bool => &Vec::new(),
-        BlockData::Object { bytes } => bytes,
-        BlockData::Array { bytes, .. } => bytes,
-        BlockData::Value { bytes } => bytes,
-    };
-
-    for byte in payload {
-        writer.write_u8(*byte ^ xor_shift_32.next());
-    }
-
-    writer.current_offset()
+    let mut writer = Writer::at(bytes, offset);
+    block.write_encrypted(&mut writer)
 }
 
 fn write_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
     let mut buffer = vec![0u8; size];
-    let mut offset: usize = 0;
+    let mut writer = Writer::new(&mut buffer);
 
     for block in blocks {
-        offset = write_block(block, &mut buffer, offset)
+        block.write_encrypted(&mut writer);
     }
 
-    buffer[..offset].to_vec()
+    let written_size = writer.current_offset();
+    buffer.truncate(written_size);
+
+    buffer
 }
 
 fn encrypt_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
@@ -137,81 +104,107 @@ pub fn encrypt_blocks_js(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 pub struct Block {
     key: u32,
-    type_id: BlockTypeId,
+    block_type: BlockType,
     data: BlockData,
 }
-
-type NewOffset = usize;
 
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 pub struct InvalidTypeId(u8);
 
 impl Block {
-    fn build(bytes: &[u8], offset: usize) -> Result<(Self, NewOffset), InvalidTypeId> {
-        let key = read_u32_le!(bytes, offset);
+    fn read_encrypted(reader: &mut Reader) -> Result<Self, InvalidTypeId> {
+        let key = reader.read_u32();
 
-        let mut offset = offset + 4;
-        let mut xor_shift = XorShift32::new(key);
-        let type_id = BlockTypeId::try_from(bytes[offset] ^ xor_shift.next())?;
+        let mut crypto_state = SwishCrypto::new(key);
+        let block_type = BlockType::try_from(reader.read_u8() ^ crypto_state.next_u8())?;
 
-        offset += 1;
+        let data = match block_type {
+            BlockType::Scalar(ScalarType::Bool1 | ScalarType::Bool2 | ScalarType::Bool3) => {
+                BlockData::Bool
+            }
+            BlockType::Object => {
+                let byte_count = (reader.read_u32() ^ crypto_state.next_32()) as usize;
+                let mut payload_bytes = reader.read_bytes(byte_count);
 
-        let data = match type_id {
-            BlockTypeId::Scalar(
-                ScalarTypeId::Bool1 | ScalarTypeId::Bool2 | ScalarTypeId::Bool3,
-            ) => BlockData::Bool,
-            BlockTypeId::Object => {
-                let byte_count = (read_u32_le!(bytes, offset) ^ xor_shift.next_32()) as usize;
-
-                offset += 4;
-
-                let mut slice = bytes[offset..offset + byte_count].to_vec();
-                offset += byte_count;
-
-                for byte in slice.iter_mut() {
-                    *byte ^= xor_shift.next();
+                for byte in payload_bytes.iter_mut() {
+                    *byte ^= crypto_state.next_u8();
                 }
 
-                BlockData::Object { bytes: slice }
+                BlockData::Object {
+                    bytes: payload_bytes,
+                }
             }
-            BlockTypeId::Array => {
-                let entry_count = (read_u32_le!(bytes, offset) ^ xor_shift.next_32()) as usize;
-                offset += 4;
-
-                let subtype = ScalarTypeId::try_from(bytes[offset] ^ xor_shift.next())?;
-                offset += 1;
+            BlockType::Array => {
+                let entry_count = (reader.read_u32() ^ crypto_state.next_32()) as usize;
+                let subtype = ScalarType::try_from(reader.read_u8() ^ crypto_state.next_u8())?;
 
                 let byte_count = entry_count * subtype.byte_size();
+                let mut payload_bytes = reader.read_bytes(byte_count);
 
-                let mut slice = bytes[offset..offset + byte_count].to_vec();
-                offset += byte_count;
-
-                for byte in slice.iter_mut() {
-                    *byte ^= xor_shift.next();
+                for byte in payload_bytes.iter_mut() {
+                    *byte ^= crypto_state.next_u8();
                 }
 
                 BlockData::Array {
-                    bytes: slice,
+                    bytes: payload_bytes,
                     subtype,
                 }
             }
-            BlockTypeId::Scalar(scalar_type) => {
+            BlockType::Scalar(scalar_type) => {
                 let type_size = scalar_type.byte_size();
-                let mut slice = bytes[offset..offset + type_size].to_vec();
-                offset += type_size;
+                let mut payload_bytes = reader.read_bytes(type_size);
 
-                for byte in slice.iter_mut() {
-                    *byte ^= xor_shift.next();
+                for byte in payload_bytes.iter_mut() {
+                    *byte ^= crypto_state.next_u8();
                 }
 
-                BlockData::Value { bytes: slice }
+                BlockData::Value {
+                    bytes: payload_bytes,
+                }
             }
         };
 
-        let block = Block { key, type_id, data };
+        Ok(Self {
+            key,
+            block_type,
+            data,
+        })
+    }
 
-        Ok((block, offset))
+    fn write_encrypted(&self, writer: &mut Writer) -> usize {
+        writer.write_u32(self.key);
+
+        let mut crypto_state = SwishCrypto::new(self.key);
+
+        writer.write_u8(self.block_type.id() ^ crypto_state.next_u8());
+
+        if let BlockData::Object { bytes } = &self.data {
+            let payload_size_xored = (bytes.len() as u32) ^ crypto_state.next_32();
+
+            writer.write_u32(payload_size_xored);
+        } else if let BlockData::Array { bytes, subtype } = &self.data {
+            let entry_count = bytes.len() / subtype.byte_size();
+            let entry_count_xored = (entry_count as u32) ^ crypto_state.next_32();
+
+            writer.write_u32(entry_count_xored);
+
+            let subtype_xored = (*subtype as u8) ^ crypto_state.next_u8();
+            writer.write_u8(subtype_xored);
+        }
+
+        let payload = match &self.data {
+            BlockData::Bool => &Vec::new(),
+            BlockData::Object { bytes } => bytes,
+            BlockData::Array { bytes, .. } => bytes,
+            BlockData::Value { bytes } => bytes,
+        };
+
+        for byte in payload {
+            writer.write_u8(*byte ^ crypto_state.next_u8());
+        }
+
+        writer.current_offset()
     }
 }
 
@@ -231,7 +224,7 @@ enum BlockData {
         #[serde(with = "serde_bytes")]
         #[tsify(type = "Uint8Array<ArrayBuffer>")]
         bytes: Vec<u8>,
-        subtype: ScalarTypeId,
+        subtype: ScalarType,
     },
     Value {
         #[serde(with = "serde_bytes")]
@@ -240,12 +233,13 @@ enum BlockData {
     },
 }
 
-struct XorShift32 {
+#[derive(Clone, Copy)]
+struct SwishCrypto {
     counter: u32,
     state: u32,
 }
 
-impl XorShift32 {
+impl SwishCrypto {
     pub fn new(initial_state: u32) -> Self {
         let ones = initial_state.count_ones();
         let mut state = initial_state;
@@ -256,7 +250,7 @@ impl XorShift32 {
         Self { counter: 0, state }
     }
 
-    pub const fn next(&mut self) -> u8 {
+    pub const fn next_u8(&mut self) -> u8 {
         let result = (self.state >> (self.counter << 3)) as u8;
 
         if self.counter == 3 {
@@ -270,10 +264,10 @@ impl XorShift32 {
     }
 
     pub const fn next_32(&mut self) -> u32 {
-        (self.next() as u32)
-            | ((self.next() as u32) << 8)
-            | ((self.next() as u32) << 16)
-            | ((self.next() as u32) << 24)
+        (self.next_u8() as u32)
+            | ((self.next_u8() as u32) << 8)
+            | ((self.next_u8() as u32) << 16)
+            | ((self.next_u8() as u32) << 24)
     }
 }
 
@@ -288,14 +282,14 @@ const fn xor_shift_advance(state: u32) -> u32 {
 
 #[derive(Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-pub enum BlockTypeId {
+pub enum BlockType {
     Object,
     Array,
-    Scalar(ScalarTypeId),
+    Scalar(ScalarType),
 }
 
-impl BlockTypeId {
-    pub const fn index(&self) -> u8 {
+impl BlockType {
+    pub const fn id(&self) -> u8 {
         match self {
             Self::Object => 4,
             Self::Array => 5,
@@ -304,7 +298,7 @@ impl BlockTypeId {
     }
 }
 
-impl TryFrom<u8> for BlockTypeId {
+impl TryFrom<u8> for BlockType {
     type Error = InvalidTypeId;
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
@@ -319,13 +313,13 @@ impl TryFrom<u8> for BlockTypeId {
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = blockTypeIndex)]
 #[allow(clippy::missing_const_for_fn)]
-pub fn block_type_index(type_id: BlockTypeId) -> u8 {
-    type_id.index()
+pub fn block_type_index(type_id: BlockType) -> u8 {
+    type_id.id()
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-pub enum ScalarTypeId {
+pub enum ScalarType {
     Bool1 = 1,
     Bool2 = 2,
     Bool3 = 3,
@@ -344,7 +338,7 @@ pub enum ScalarTypeId {
     Float64 = 17,
 }
 
-impl ScalarTypeId {
+impl ScalarType {
     pub const fn byte_size(&self) -> usize {
         match self {
             Self::Bool1 | Self::Bool2 | Self::Bool3 => 1,
@@ -367,18 +361,18 @@ impl ScalarTypeId {
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = scalarTypeSize)]
 #[allow(clippy::missing_const_for_fn)]
-pub fn scalar_type_size(type_id: ScalarTypeId) -> usize {
+pub fn scalar_type_size(type_id: ScalarType) -> usize {
     type_id.byte_size()
 }
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = scalarTypeIndex)]
 #[allow(clippy::missing_const_for_fn)]
-pub fn scalar_type_index(type_id: ScalarTypeId) -> u8 {
+pub fn scalar_type_index(type_id: ScalarType) -> u8 {
     type_id as u8
 }
 
-impl TryFrom<u8> for ScalarTypeId {
+impl TryFrom<u8> for ScalarType {
     type Error = InvalidTypeId;
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
