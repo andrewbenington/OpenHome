@@ -64,12 +64,6 @@ describe('gen 8 save files', () => {
     magmortar = PK4.fromBytes(monBytes.buffer)
   })
 
-  test('sword/shield writes back to identical bytes', () => {
-    expect(xorChecksum32BitLe(swordSave.prepareWriter().bytes)).toBe(
-      xorChecksum32BitLe(swordSaveBytes)
-    )
-  })
-
   test('sword/shield hash matches', () => {
     const storedHash = swordSaveBytes.slice(-SwishCrypto.SIZE_HASH)
     const dataBeforeHash = swordSaveBytes.slice(0, -SwishCrypto.SIZE_HASH)

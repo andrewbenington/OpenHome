@@ -15,7 +15,6 @@ function decrypt(data: Uint8Array): Block[] {
 }
 
 function encrypt(blocks: Block[], size: number): Uint8Array {
-  console.log(blocks)
   return encryptBlocks(blocks, size)
 }
 

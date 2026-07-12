@@ -86,7 +86,7 @@ pub fn encrypt_blocks_js(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub struct Block {
     key: u32,
     data: BlockData,
@@ -220,7 +220,7 @@ impl From<InvalidTypeId> for Error {
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
 pub enum BoolType {
     Bool1,
     Bool2,
@@ -237,7 +237,9 @@ impl BoolType {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify, Hash,
+)]
 pub enum NumericType {
     UInt8,
     UInt16,
@@ -294,7 +296,7 @@ impl NumericType {
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub enum BlockData {
     Bool(BoolType),
     Object(ObjectBlock),
@@ -332,7 +334,7 @@ impl BlockData {
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub struct ObjectBlock {
     #[serde(with = "serde_bytes")]
     #[tsify(type = "Uint8Array<ArrayBuffer>")]
@@ -433,7 +435,9 @@ pub fn block_type_index(type_id: BlockType) -> u8 {
     type_id.id()
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify, Hash,
+)]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 pub enum ScalarType {
     Bool(BoolType),

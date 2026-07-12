@@ -43,11 +43,7 @@ impl SwordShieldSave {
         }
 
         let blocks = Blocks::from_vec(swish_crypto::decrypt_blocks(&bytes)?)?;
-        crate::log!(
-            "blocks: {}, bytes: {}",
-            swish_crypto::decrypt_blocks(&bytes)?.len(),
-            bytes.len()
-        );
+
         Ok(Self { bytes, blocks })
     }
 
@@ -596,33 +592,46 @@ impl BoxBlock {
 #[cfg(feature = "wasm")]
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
     use std::path::Path;
 
-    use crate::checksum::Checksum;
-    use crate::gen8_swsh::pk8_buffer::Pk8Buffer;
-    use crate::result::Result;
-    use crate::tests::save_bytes_from_file;
-
     use super::*;
+    use crate::tests;
 
     #[test]
-    fn test_sm_encryption() -> std::result::Result<(), Box<dyn std::error::Error>> {
-        use crate::checksum::{ChecksumAlgorithm, ChecksumU16Le};
+    fn blocks_identical_after_serde() -> std::result::Result<(), Box<dyn std::error::Error>> {
+        let save_path = Path::new("gen8-swsh").join("sword");
+        let save_bytes = tests::save_bytes_from_file(&save_path)?;
+        let block_vec = swish_crypto::decrypt_blocks(&save_bytes)?;
 
-        let sword_bytes = save_bytes_from_file(Path::new("sword"))?;
-        let block_vec = swish_crypto::decrypt_blocks(&sword_bytes)?;
+        let mut original_blocks_by_key: HashMap<u32, swish_crypto::Block> = HashMap::new();
+        for block in &block_vec {
+            original_blocks_by_key.insert(block.key(), block.clone());
+        }
+
         assert_eq!(block_vec.len(), 4741);
-        let save = SwordShieldSave::from_bytes(sword_bytes.into_boxed_slice())?;
-        // assert_eq!(save.calc_checksum(), 0xb28d);
-        //
-        let after_serialized_bytes = save.prepare_bytes_for_saving();
-        let reserialized = SwordShieldSave::from_bytes(after_serialized_bytes.into_boxed_slice())?;
-        // assert_eq!(reserialized.calc_checksum(), 0xb28d);
 
-        // assert_eq!(
-        //     ChecksumU16Le::calc_over_bytes(&after_serialized_bytes),
-        //     0x3065
-        // );
+        let save = SwordShieldSave::from_bytes(save_bytes.into_boxed_slice())?;
+
+        let after_serialized_bytes = save.prepare_bytes_for_saving();
+
+        let block_vec = swish_crypto::decrypt_blocks(&after_serialized_bytes)?;
+        for block in &block_vec {
+            let key = block.key();
+            let Some(original_block) = original_blocks_by_key.get(&key) else {
+                return Err(format!("Block missing for key {key}").into());
+            };
+
+            tests::assert_unchanged(
+                &block,
+                &original_block,
+                Some(tests::context(
+                    &format!("SwishCrypto block with key {key}"),
+                    &save_path,
+                )),
+            )?;
+        }
+
         Ok(())
     }
 

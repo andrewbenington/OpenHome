@@ -10,14 +10,19 @@ use std::io::Read;
 use std::ops::RangeInclusive;
 use std::path::{Path, PathBuf};
 
+fn saves_path() -> PathBuf {
+    Path::new("test-files").join("save-files")
+}
+
 pub fn save_bytes_from_file(filename: &Path) -> crate::result::Result<Vec<u8>> {
     let mut filename = filename.to_path_buf();
 
-    if !filename.starts_with(Path::new("test-files").join("save-files")) {
-        filename = Path::new("test-files").join("save-files").join(&filename);
+    if !filename.starts_with(saves_path()) {
+        filename = saves_path().join(&filename);
     }
 
-    let mut file = File::open(filename).map_err(|e| Error::other(&e.to_string()))?;
+    let mut file = File::open(&filename)
+        .map_err(|e| Error::other(&format!("error opening {filename:?}: {e}")))?;
 
     let mut contents = Vec::new();
     file.read_to_end(&mut contents)
@@ -27,11 +32,15 @@ pub fn save_bytes_from_file(filename: &Path) -> crate::result::Result<Vec<u8>> {
     Ok(contents)
 }
 
+fn pkm_path() -> PathBuf {
+    Path::new("test-files").join("pkm-files")
+}
+
 pub fn pkm_from_file<PKM: Pkm>(filename: &Path) -> crate::result::Result<(PKM, Vec<u8>)> {
     let mut filename = filename.to_path_buf();
 
-    if !filename.starts_with(Path::new("test-files").join("pkm-files")) {
-        filename = Path::new("test-files").join("pkm-files").join(&filename);
+    if !filename.starts_with(pkm_path()) {
+        filename = pkm_path().join(&filename);
     }
 
     let mut file = File::open(filename).map_err(|e| Error::other(&e.to_string()))?;
@@ -118,7 +127,9 @@ pub fn ensure_ranges_match(
     let differences = find_differing_ranges(actual, expected);
 
     match differences {
-        Some(diffs) => Err(DiffError::new(diffs, actual.to_vec(), expected.to_vec(), path).into()),
+        Some(diffs) => {
+            Err(ByteDiffError::new(diffs, actual.to_vec(), expected.to_vec(), path).into())
+        }
         None => Ok(()),
     }
 }
@@ -183,7 +194,7 @@ fn find_inconsistencies_from_file<PKM: Pkm>(path: &Path) -> TestResult<()> {
     let differences = find_differing_ranges(&actual, &file_bytes);
 
     match differences {
-        Some(diffs) => Err(TestError::Diff(DiffError::new(
+        Some(diffs) => Err(TestError::ByteDiff(ByteDiffError::new(
             diffs,
             actual.to_vec(),
             file_bytes.to_vec(),
@@ -203,7 +214,7 @@ pub fn find_inconsistencies_to_from_bytes<PKM: Pkm>(mon: PKM) -> TestResult<()> 
     let differences = find_differing_ranges(&actual, &expected);
 
     match differences {
-        Some(diffs) => Err(TestError::Diff(DiffError::new(
+        Some(diffs) => Err(TestError::ByteDiff(ByteDiffError::new(
             diffs,
             actual.to_vec(),
             expected.to_vec(),
@@ -310,15 +321,15 @@ impl Debug for TestErrorWithSeed {
 
 pub enum TestError {
     PkmRs(crate::result::Error),
-    Diff(DiffError),
+    ByteDiff(ByteDiffError),
+    UnexpectedChange(ValueChanged),
 }
+
+impl std::error::Error for TestError {}
 
 impl Debug for TestError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            TestError::PkmRs(e) => write!(f, "PkmRs error: {e}"),
-            TestError::Diff(e) => write!(f, "{e:?}"),
-        }
+        write!(f, "{self}")
     }
 }
 
@@ -328,22 +339,29 @@ impl From<crate::result::Error> for TestError {
     }
 }
 
-impl From<DiffError> for TestError {
-    fn from(value: DiffError) -> Self {
-        Self::Diff(value)
+impl Display for TestError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::PkmRs(e) => write!(f, "PkmRs error: {e}"),
+            Self::ByteDiff(e) => write!(f, "{e:?}"),
+            Self::UnexpectedChange(ValueChanged(context)) => match context {
+                Some(context) => write!(f, "Value changed unexpectedly: {context}"),
+                None => write!(f, "Value changed unexpectedly"),
+            },
+        }
     }
 }
 
 pub type TestResult<T> = std::result::Result<T, TestError>;
 
-pub struct DiffError {
+pub struct ByteDiffError {
     differences: Vec<ByteRange>,
     actual: Vec<u8>,
     expected: Vec<u8>,
     path: Option<PathBuf>,
 }
 
-impl DiffError {
+impl ByteDiffError {
     fn new(
         differences: Vec<ByteRange>,
         actual: Vec<u8>,
@@ -360,7 +378,13 @@ impl DiffError {
     }
 }
 
-impl Display for DiffError {
+impl From<ByteDiffError> for TestError {
+    fn from(value: ByteDiffError) -> Self {
+        Self::ByteDiff(value)
+    }
+}
+
+impl Display for ByteDiffError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let path_display = match &self.path {
             Some(path) => format!("\npath:\t {}", path.to_string_lossy()),
@@ -374,7 +398,7 @@ impl Display for DiffError {
     }
 }
 
-impl Debug for DiffError {
+impl Debug for ByteDiffError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let path_display = match &self.path {
             Some(path) => format!("\npath:\t {}", path.to_string_lossy()),
@@ -388,14 +412,61 @@ impl Debug for DiffError {
     }
 }
 
-impl std::error::Error for TestError {}
+pub fn calculate_hash<T: std::hash::Hash>(t: &T) -> u64 {
+    let mut s = std::hash::DefaultHasher::new();
+    t.hash(&mut s);
+    std::hash::Hasher::finish(&s)
+}
 
-impl Display for TestError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            TestError::PkmRs(e) => write!(f, "PkmRs error: {e}"),
-            TestError::Diff(e) => write!(f, "{e:?}"),
+pub struct TestContext {
+    description: Option<String>,
+    path: Option<PathBuf>,
+}
+
+impl TestContext {
+    pub fn new(desc: &str, path: &PathBuf) -> Self {
+        Self {
+            description: Some(desc.to_owned()),
+            path: Some(path.to_owned()),
         }
+    }
+}
+
+pub fn context(desc: &str, path: &PathBuf) -> TestContext {
+    TestContext {
+        description: Some(desc.to_owned()),
+        path: Some(path.to_owned()),
+    }
+}
+
+impl Display for TestContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match (&self.description, &self.path) {
+            (None, None) => f.write_str("(no context provided)"),
+            (None, Some(path)) => write!(f, "associated file: {path:?}"),
+            (Some(desc), None) => write!(f, "{desc}"),
+            (Some(desc), Some(path)) => write!(f, "{desc}; associated file: {path:?}"),
+        }
+    }
+}
+
+pub struct ValueChanged(Option<TestContext>);
+
+impl From<ValueChanged> for TestError {
+    fn from(value: ValueChanged) -> Self {
+        Self::UnexpectedChange(value)
+    }
+}
+
+pub fn assert_unchanged<T: std::hash::Hash>(
+    actual: &T,
+    expected: &T,
+    context: Option<TestContext>,
+) -> TestResult<()> {
+    if calculate_hash(actual) == calculate_hash(expected) {
+        Ok(())
+    } else {
+        Err(ValueChanged(context).into())
     }
 }
 
