@@ -368,7 +368,6 @@ impl ByteDiffError {
         expected: Vec<u8>,
         path: Option<PathBuf>,
     ) -> Self {
-        println!("path: {path:?}");
         Self {
             differences,
             actual,

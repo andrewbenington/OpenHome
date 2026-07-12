@@ -14,7 +14,7 @@ import { BoxAndSlot, WasmOfficialSave } from './interfaces'
 import { PathData } from './util/path'
 import { isRestricted } from './util/TransferRestrictions'
 
-export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm> {
+export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm, Gen7AlolaSaveRust> {
   static pkmType = PK7
   static saveTypeAbbreviation = 'SM/USUM'
   static saveTypeID = 'SM/USUM'

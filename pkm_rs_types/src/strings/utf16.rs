@@ -1,5 +1,6 @@
 use serde::Serialize;
-use std::{fmt::Display, ops::Deref};
+use std::fmt::{Display, Write};
+use std::ops::Deref;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -18,7 +19,7 @@ use wasm_bindgen::describe::*;
 
 const TERMINATOR: u16 = 0x0000;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct SizedUtf16String<const N: usize> {
     raw_le: [u8; N],
 }
@@ -98,6 +99,20 @@ impl<const N: usize> Deref for SizedUtf16String<N> {
 
     fn deref(&self) -> &[u8] {
         &self.raw_le
+    }
+}
+
+impl<const N: usize> std::fmt::Debug for SizedUtf16String<N> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut byte_string = String::from("0x");
+        for byte in self.raw_le {
+            write!(byte_string, "{:02X}", byte)?;
+        }
+
+        f.debug_tuple(&format!("SizedUtf16String<{N}>"))
+            .field(&self.to_string())
+            .field(&byte_string)
+            .finish()
     }
 }
 

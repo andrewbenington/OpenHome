@@ -122,6 +122,7 @@ describe('gen 8 save files', () => {
     ohpkm.nickname = 'NEW NAME'
     swordSave.setMonAt(1, 3, convertToPk8(ohpkm))
     swordSave.updatedBoxSlots.push({ box: 1, boxSlot: 3 })
+    expect(swordSave.getMonAt(1, 3)?.nickname).toBe('NEW NAME')
 
     swordSave.prepareForSaving()
     const modified = new SwordShieldSave(swordPath, swordSave.bytes)

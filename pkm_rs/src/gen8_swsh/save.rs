@@ -18,6 +18,7 @@ const MAX_BOX_COUNT: usize = 32;
 const BOX_ROWS: usize = 5;
 const BOX_COLS: usize = 6;
 const BOX_SLOTS: usize = BOX_ROWS * BOX_COLS;
+const BOX_NAME_LENGTH: usize = 34;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = SwordShieldSaveRust))]
 #[derive(Debug)]
@@ -59,6 +60,10 @@ impl SwordShieldSave {
         &mut self.blocks.pokemon_boxes
     }
 
+    fn box_name(&self, box_index: usize) -> Option<BoxName> {
+        self.blocks.box_layouts.get_box_name(box_index)
+    }
+
     pub fn trainer_name(&self) -> SizedUtf16String<{ MyStatusBlock::NAME_BYTE_LENGTH }> {
         self.my_status().trainer_name()
     }
@@ -89,18 +94,18 @@ impl SwordShieldSave {
         Some(copied_bytes)
     }
 
-    fn get_mon_at(&self, box_num: usize, box_slot: usize) -> Option<Pk8> {
-        if box_num >= Self::box_count() || box_slot >= Self::box_slots() {
+    fn get_mon_at(&self, box_index: usize, box_slot: usize) -> Option<Pk8> {
+        if box_index >= Self::box_count() || box_slot >= Self::box_slots() {
             return None;
         }
 
-        let decrypted_bytes = self.get_mon_bytes_decrypted(box_num, box_slot)?;
+        let decrypted_bytes = self.get_mon_bytes_decrypted(box_index, box_slot)?;
         let national_dex = Pk8Buffer::new(&decrypted_bytes).species_ndex();
 
         if national_dex > 0 {
             Pk8::from_bytes(&decrypted_bytes)
                 .inspect_err(|err| {
-                    crate::log!("malformed pkm at box {box_num}, slot {box_slot}: {err}")
+                    crate::log!("malformed pkm at box {box_index}, slot {box_slot}: {err}")
                 })
                 .ok()
         } else {
@@ -108,11 +113,11 @@ impl SwordShieldSave {
         }
     }
 
-    fn set_mon_at(&mut self, box_num: usize, box_slot: usize, mut mon: Option<Pk8>) {
+    fn set_mon_at(&mut self, box_index: usize, box_slot: usize, mut mon: Option<Pk8>) {
         let mon_bytes = if let Some(mon) = &mut mon {
             mon.refresh_checksum();
             let mut bytes = mon.to_box_bytes();
-            Pk8Buffer::new_mut(&mut bytes).decrypt();
+            Pk8Buffer::new_mut(&mut bytes).encrypt();
 
             bytes
         } else {
@@ -120,19 +125,12 @@ impl SwordShieldSave {
         };
 
         // write bytes to box slot
-        self.copy_pokemon_bytes_to(box_num, box_slot, &mon_bytes);
+        self.copy_pokemon_bytes_to(box_index, box_slot, &mon_bytes);
     }
 
     #[cfg(feature = "wasm")]
     pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
-        crate::log!(
-            "blocks: {}, bytes: {}",
-            self.blocks.to_vec().len(),
-            self.bytes.len()
-        );
-        let encrypted = swish_crypto::encrypt_blocks(&self.blocks.to_vec(), self.bytes.len());
-        crate::log!("encrypted byte length: {}", encrypted.len());
-        encrypted
+        swish_crypto::encrypt_blocks(&self.blocks.clone().into_vec(), self.bytes.len())
     }
 }
 
@@ -143,7 +141,7 @@ impl SaveData for SwordShieldSave {
         Self::from_bytes(bytes.to_owned().into_boxed_slice())
     }
 
-    fn get_decrypted_mon_bytes(&self, _box_num: usize, _offset: usize) -> Vec<u8> {
+    fn get_decrypted_mon_bytes(&self, _box_index: usize, _offset: usize) -> Vec<u8> {
         todo!()
     }
 
@@ -223,13 +221,18 @@ impl SaveData for SwordShieldSave {
 #[allow(clippy::missing_const_for_fn)]
 impl SwordShieldSave {
     #[wasm_bindgen(js_name = getMonAt)]
-    pub fn get_mon_at_wasm(&self, box_num: usize, offset: usize) -> Option<Pk8> {
-        self.get_mon_at(box_num, offset)
+    pub fn get_mon_at_wasm(&self, box_index: usize, offset: usize) -> Option<Pk8> {
+        self.get_mon_at(box_index, offset)
     }
 
     #[wasm_bindgen(js_name = setMonAt)]
-    pub fn set_mon_at_wasm(&mut self, box_num: usize, offset: usize, mon: Option<Pk8>) {
-        self.set_mon_at(box_num, offset, mon)
+    pub fn set_mon_at_wasm(&mut self, box_index: usize, offset: usize, mon: Option<Pk8>) {
+        self.set_mon_at(box_index, offset, mon)
+    }
+
+    #[wasm_bindgen(js_name = getBoxName)]
+    pub fn box_name_wasm(&mut self, box_index: usize) -> Option<String> {
+        self.box_name(box_index).map(|name| name.to_string())
     }
 
     #[wasm_bindgen(js_name = convertOhpkm)]
@@ -330,17 +333,13 @@ impl SwordShieldSave {
     pub fn prepare_bytes_for_saving_wasm(&self) -> Vec<u8> {
         self.prepare_bytes_for_saving()
     }
-
-    #[wasm_bindgen(js_name = boxesBlock)]
-    pub fn boxes_block_wasm(&self) -> swish_crypto::Block {
-        self.box_data().to_block()
-    }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Blocks {
     my_status: MyStatusBlock,
     pokemon_boxes: BoxBlock,
+    box_layouts: BoxLayout,
     other_blocks: Vec<swish_crypto::Block>,
 }
 
@@ -348,6 +347,7 @@ impl Blocks {
     fn from_vec(blocks: impl IntoIterator<Item = swish_crypto::Block>) -> Result<Self> {
         let mut my_status: Option<MyStatusBlock> = None;
         let mut pokemon_boxes: Option<BoxBlock> = None;
+        let mut box_layouts: Option<BoxLayout> = None;
         let mut other_blocks: Vec<swish_crypto::Block> = Vec::new();
 
         for block in blocks {
@@ -367,6 +367,19 @@ impl Blocks {
                     };
                     pokemon_boxes = Some(BoxBlock(object_block));
                 }
+                Some(BlockKey::BoxLayout) => {
+                    let block_data = block.into_data();
+                    let swish_crypto::BlockData::Array(array_block) = block_data else {
+                        return Err(Error::build_save(
+                            format!(
+                                "BoxLayout should be an array block, but was actually {:?}",
+                                block_data.block_type()
+                            ),
+                            None,
+                        ));
+                    };
+                    box_layouts = Some(BoxLayout(array_block));
+                }
                 _ => {
                     other_blocks.push(block);
                 }
@@ -381,18 +394,33 @@ impl Blocks {
             return Err(Error::build_save("missing Boxes block", None));
         };
 
+        let Some(box_layouts) = box_layouts else {
+            return Err(Error::build_save("missing BoxLayouts block", None));
+        };
+
         Ok(Self {
             my_status,
             pokemon_boxes,
+            box_layouts,
             other_blocks,
         })
     }
 
-    fn to_vec(&self) -> Vec<swish_crypto::Block> {
-        self.other_blocks
+    fn into_vec(self) -> Vec<swish_crypto::Block> {
+        let Self {
+            my_status,
+            pokemon_boxes,
+            box_layouts,
+            other_blocks,
+        } = self;
+        other_blocks
             .iter()
             .cloned()
-            .chain([self.my_status.to_block(), self.pokemon_boxes.to_block()])
+            .chain([
+                my_status.to_block(),
+                pokemon_boxes.into_block(),
+                box_layouts.into_block(),
+            ])
             .collect()
     }
 }
@@ -490,7 +518,7 @@ impl BlockKey {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct MyStatusBlock(swish_crypto::ObjectBlock);
 
 impl MyStatusBlock {
@@ -581,10 +609,38 @@ impl BoxBlock {
         Some(&mut self.0.bytes_mut()[start..start + Pk8::BOX_SIZE])
     }
 
-    fn to_block(&self) -> swish_crypto::Block {
+    fn into_block(self) -> swish_crypto::Block {
         swish_crypto::Block::new(
             BlockKey::Box.to_u32(),
-            swish_crypto::BlockData::Object(self.0.clone()),
+            swish_crypto::BlockData::Object(self.0),
+        )
+    }
+}
+
+type BoxName = SizedUtf16String<BOX_NAME_LENGTH>;
+
+#[derive(Debug, Clone)]
+struct BoxLayout(swish_crypto::ArrayBlock);
+
+impl BoxLayout {
+    fn get_box_name(&self, box_index: usize) -> Option<BoxName> {
+        if box_index >= MAX_BOX_COUNT {
+            return None;
+        }
+
+        let start = box_index * BOX_NAME_LENGTH;
+        let end = start + BOX_NAME_LENGTH;
+        let name_bytes: [u8; BOX_NAME_LENGTH] = self.0.bytes()[start..end]
+            .try_into()
+            .expect("end should be exactly BOX_NAME_LENGTH after start");
+
+        Some(SizedUtf16String::from_bytes(name_bytes))
+    }
+
+    fn into_block(self) -> swish_crypto::Block {
+        swish_crypto::Block::new(
+            BlockKey::BoxLayout.to_u32(),
+            swish_crypto::BlockData::Array(self.0),
         )
     }
 }
@@ -658,13 +714,13 @@ mod tests {
     //     let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
     //     let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
 
-    //     for box_num in 0..Gen7AlolaSave::box_count() {
+    //     for box_index in 0..Gen7AlolaSave::box_count() {
     //         for slot in 0..Gen7AlolaSave::box_slots() {
-    //             let mon_bytes = save.get_mon_bytes_decrypted(box_num, slot);
+    //             let mon_bytes = save.get_mon_bytes_decrypted(box_index, slot);
     //             let buffer = Pk8BufferRef::box_span(&mon_bytes);
     //             if buffer.checksum() != buffer.calculate_checksum() {
     //                 return Err(Error::other(&format!(
-    //                     "Invalid checksum for mon at box {box_num}, slot {slot}: expected {:#06x}, got {:#06x}",
+    //                     "Invalid checksum for mon at box {box_index}, slot {slot}: expected {:#06x}, got {:#06x}",
     //                     buffer.calculate_checksum(),
     //                     buffer.checksum()
     //                 )));

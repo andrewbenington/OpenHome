@@ -29,7 +29,7 @@ pub enum Error {
         received: usize,
     },
     BuildSave {
-        context: &'static str,
+        context: String,
         source: Option<Box<dyn core::error::Error>>,
     },
     CryptRange {
@@ -99,11 +99,11 @@ pub enum Error {
 }
 
 impl Error {
-    pub const fn build_save(
-        context: &'static str,
-        source: Option<Box<dyn core::error::Error>>,
-    ) -> Self {
-        Self::BuildSave { context, source }
+    pub fn build_save(context: impl ToString, source: Option<Box<dyn core::error::Error>>) -> Self {
+        Self::BuildSave {
+            context: context.to_string(),
+            source,
+        }
     }
 
     pub const fn form_index(species_and_form: SpeciesAndForm) -> Self {

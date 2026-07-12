@@ -147,10 +147,7 @@ impl Block {
                     *byte ^= crypto_state.next_u8();
                 }
 
-                BlockData::Array {
-                    bytes: payload_bytes,
-                    subtype,
-                }
+                BlockData::array(payload_bytes, subtype)
             }
         };
 
@@ -168,7 +165,7 @@ impl Block {
             let payload_size_xored = (bytes.len() as u32) ^ crypto_state.next_32();
 
             writer.write_u32(payload_size_xored);
-        } else if let BlockData::Array { bytes, subtype } = &self.data {
+        } else if let BlockData::Array(ArrayBlock { bytes, subtype }) = &self.data {
             let entry_count = bytes.len() / subtype.byte_size();
             let entry_count_xored = (entry_count as u32) ^ crypto_state.next_32();
 
@@ -181,7 +178,7 @@ impl Block {
         let payload = match &self.data {
             BlockData::Bool(..) => &Vec::new(),
             BlockData::Object(ObjectBlock { bytes }) => bytes,
-            BlockData::Array { bytes, .. } => bytes,
+            BlockData::Array(ArrayBlock { bytes, .. }) => bytes,
             BlockData::Value { bytes, .. } => bytes,
         };
 
@@ -211,7 +208,7 @@ impl std::error::Error for InvalidTypeId {}
 
 impl From<InvalidTypeId> for Error {
     fn from(value: InvalidTypeId) -> Self {
-        Error::build_save("Invalid block type id", Some(Box::new(value)))
+        Error::build_save("Invalid block type id".to_owned(), Some(Box::new(value)))
     }
 }
 
@@ -300,12 +297,7 @@ impl NumericType {
 pub enum BlockData {
     Bool(BoolType),
     Object(ObjectBlock),
-    Array {
-        #[serde(with = "serde_bytes")]
-        #[tsify(type = "Uint8Array<ArrayBuffer>")]
-        bytes: Vec<u8>,
-        subtype: ScalarType,
-    },
+    Array(ArrayBlock),
     Value {
         dataype: NumericType,
         #[serde(with = "serde_bytes")]
@@ -315,8 +307,23 @@ pub enum BlockData {
 }
 
 impl BlockData {
-    const fn object(bytes: Vec<u8>) -> Self {
+    pub const fn object(bytes: Vec<u8>) -> Self {
         Self::Object(ObjectBlock { bytes })
+    }
+
+    pub const fn array(bytes: Vec<u8>, subtype: ScalarType) -> Self {
+        Self::Array(ArrayBlock { bytes, subtype })
+    }
+
+    pub const fn block_type(&self) -> BlockType {
+        match self {
+            BlockData::Bool(bool_type) => BlockType::Scalar(ScalarType::Bool(*bool_type)),
+            BlockData::Object(_) => BlockType::Object,
+            BlockData::Array(_) => BlockType::Array,
+            BlockData::Value { dataype, bytes: _ } => {
+                BlockType::Scalar(ScalarType::Numeric(*dataype))
+            }
+        }
     }
 
     pub const fn type_id(&self) -> u8 {
@@ -342,6 +349,29 @@ pub struct ObjectBlock {
 }
 
 impl ObjectBlock {
+    pub fn bytes(&self) -> &[u8] {
+        &self.bytes
+    }
+
+    pub fn bytes_mut(&mut self) -> &mut [u8] {
+        &mut self.bytes
+    }
+}
+
+#[cfg_attr(
+    feature = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[derive(Debug, Clone, Hash)]
+pub struct ArrayBlock {
+    #[serde(with = "serde_bytes")]
+    #[tsify(type = "Uint8Array<ArrayBuffer>")]
+    bytes: Vec<u8>,
+    subtype: ScalarType,
+}
+
+impl ArrayBlock {
     pub fn bytes(&self) -> &[u8] {
         &self.bytes
     }
@@ -398,7 +428,7 @@ const fn xor_shift_advance(state: u32) -> u32 {
     state
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 pub enum BlockType {
     Object,

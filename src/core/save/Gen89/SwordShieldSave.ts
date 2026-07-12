@@ -38,7 +38,7 @@ const SAVE_SIZE_BYTES_MAX = 0x187800
 
 export type SWSH_SAVE_REVISION = 'Base Game' | 'Isle Of Armor' | 'Crown Tundra'
 
-export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm> {
+export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldSaveRust> {
   MAX_BOX_COUNT: number = SwordShieldSaveRust.MAX_BOX_COUNT
   SLOTS_PER_BOX: number = SwordShieldSaveRust.SLOTS_PER_BOX
 
@@ -158,6 +158,10 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm> {
 
   getBoxSlotGapBytes(): number {
     return 0
+  }
+
+  getBoxName(boxIndex: number) {
+    return this.inner.getBoxName(boxIndex)
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
