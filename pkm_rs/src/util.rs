@@ -46,10 +46,14 @@ impl BitSet for u8 {
 }
 
 #[cfg(feature = "wasm")]
-pub fn six_digit_trainer_display(trainer_id: u16, secret_id: u16) -> String {
+pub fn six_digit_trainer_id_from_parts(trainer_id: u16, secret_id: u16) -> String {
     let full_id: u32 = (secret_id as u32) << 16 | (trainer_id as u32);
+    six_digit_trainer_id_from_full(full_id)
+}
 
-    format!("{:0>6}", full_id % 1_000_000)
+#[cfg(feature = "wasm")]
+pub fn six_digit_trainer_id_from_full(tid_sid: u32) -> String {
+    format!("{:0>6}", tid_sid % 1_000_000)
 }
 
 pub const fn unown_form_from_pid_gen3(pid: u32) -> u8 {
@@ -92,7 +96,7 @@ mod test {
         let trainer_id = 0x7114;
         let secret_id = 0xb815;
         assert_eq!(
-            crate::util::six_digit_trainer_display(trainer_id, secret_id),
+            crate::util::six_digit_trainer_id_from_parts(trainer_id, secret_id),
             "412948"
         );
     }

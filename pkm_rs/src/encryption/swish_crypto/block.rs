@@ -2,7 +2,10 @@
 
 use wasm_bindgen::prelude::*;
 
-use crate::bytes::{Reader, Writer};
+use crate::{
+    bytes::{Reader, Writer},
+    result::Error,
+};
 const PAD_LENGTH: usize = 127;
 
 const STATIC_XOR_PAD: [u8; PAD_LENGTH] = [
@@ -63,7 +66,7 @@ fn write_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
     buffer
 }
 
-fn encrypt_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
+pub fn encrypt_blocks(blocks: &[Block], size: usize) -> Vec<u8> {
     let encrypted_blocks = write_blocks(blocks, size);
     let mut encrypted_bytes = crypt_static_xor_pad_bytes(&encrypted_blocks);
 
@@ -83,16 +86,25 @@ pub fn encrypt_blocks_js(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[derive(Debug)]
 pub struct Block {
     key: u32,
     data: BlockData,
 }
 
-#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
-pub struct InvalidTypeId(u8);
-
 impl Block {
+    pub const fn new(key: u32, data: BlockData) -> Self {
+        Self { key, data }
+    }
+
+    pub const fn key(&self) -> u32 {
+        self.key
+    }
+
+    pub fn into_data(self) -> BlockData {
+        self.data
+    }
+
     fn read_encrypted(reader: &mut Reader) -> Result<Self, InvalidTypeId> {
         let key = reader.read_u32();
 
@@ -122,9 +134,7 @@ impl Block {
                     *byte ^= crypto_state.next_u8();
                 }
 
-                BlockData::Object {
-                    bytes: payload_bytes,
-                }
+                BlockData::object(payload_bytes)
             }
             BlockType::Array => {
                 let entry_count = (reader.read_u32() ^ crypto_state.next_32()) as usize;
@@ -154,7 +164,7 @@ impl Block {
 
         writer.write_u8(self.data.type_id() ^ crypto_state.next_u8());
 
-        if let BlockData::Object { bytes } = &self.data {
+        if let BlockData::Object(ObjectBlock { bytes }) = &self.data {
             let payload_size_xored = (bytes.len() as u32) ^ crypto_state.next_32();
 
             writer.write_u32(payload_size_xored);
@@ -170,7 +180,7 @@ impl Block {
 
         let payload = match &self.data {
             BlockData::Bool(..) => &Vec::new(),
-            BlockData::Object { bytes } => bytes,
+            BlockData::Object(ObjectBlock { bytes }) => bytes,
             BlockData::Array { bytes, .. } => bytes,
             BlockData::Value { bytes, .. } => bytes,
         };
@@ -183,12 +193,34 @@ impl Block {
     }
 }
 
+#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
+#[derive(Debug)]
+pub struct InvalidTypeId(u8);
+
+impl std::fmt::Display for InvalidTypeId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!(
+            "swish crypto block has invalid type id: {}",
+            self.0
+        ))
+    }
+}
+
+impl std::error::Error for InvalidTypeId {}
+
+impl From<InvalidTypeId> for Error {
+    fn from(value: InvalidTypeId) -> Self {
+        Error::build_save("Invalid block type id", Some(Box::new(value)))
+    }
+}
+
 #[cfg_attr(
     feature = "wasm",
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum BoolType {
     Bool1,
     Bool2,
@@ -205,7 +237,7 @@ impl BoolType {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
 pub enum NumericType {
     UInt8,
     UInt16,
@@ -262,13 +294,10 @@ impl NumericType {
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-enum BlockData {
+#[derive(Debug)]
+pub enum BlockData {
     Bool(BoolType),
-    Object {
-        #[serde(with = "serde_bytes")]
-        #[tsify(type = "Uint8Array<ArrayBuffer>")]
-        bytes: Vec<u8>,
-    },
+    Object(ObjectBlock),
     Array {
         #[serde(with = "serde_bytes")]
         #[tsify(type = "Uint8Array<ArrayBuffer>")]
@@ -284,6 +313,10 @@ enum BlockData {
 }
 
 impl BlockData {
+    const fn object(bytes: Vec<u8>) -> Self {
+        Self::Object(ObjectBlock { bytes })
+    }
+
     pub const fn type_id(&self) -> u8 {
         match self {
             Self::Object { .. } => 4,
@@ -291,6 +324,28 @@ impl BlockData {
             Self::Bool(bool_type) => bool_type.id(),
             Self::Value { dataype, .. } => dataype.id(),
         }
+    }
+}
+
+#[cfg_attr(
+    feature = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[derive(Debug, Clone)]
+pub struct ObjectBlock {
+    #[serde(with = "serde_bytes")]
+    #[tsify(type = "Uint8Array<ArrayBuffer>")]
+    bytes: Vec<u8>,
+}
+
+impl ObjectBlock {
+    pub fn bytes(&self) -> &[u8] {
+        &self.bytes
+    }
+
+    pub fn bytes_mut(&mut self) -> &mut [u8] {
+        &mut self.bytes
     }
 }
 
@@ -380,6 +435,7 @@ pub fn block_type_index(type_id: BlockType) -> u8 {
 
 #[derive(Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
+#[derive(Debug)]
 pub enum ScalarType {
     Bool(BoolType),
     Numeric(NumericType),

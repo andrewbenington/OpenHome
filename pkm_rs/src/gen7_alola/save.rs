@@ -176,10 +176,6 @@ impl Gen7AlolaSave {
         }
     }
 
-    fn get_decrypted_mon_bytes(&self, box_num: usize, box_slot: usize) -> Box<[u8]> {
-        self.get_mon_bytes_decrypted(box_num, box_slot)
-    }
-
     fn get_mon_at(&self, box_num: usize, box_slot: usize) -> Result<Option<Pk7>> {
         if box_num >= Self::box_count() || box_slot >= Self::box_slots() {
             return Err(Error::Other(format!(
@@ -187,7 +183,7 @@ impl Gen7AlolaSave {
             )));
         }
 
-        let decrypted_bytes = self.get_decrypted_mon_bytes(box_num, box_slot);
+        let decrypted_bytes = self.get_mon_bytes_decrypted(box_num, box_slot);
         let national_dex = read_u16_le!(decrypted_bytes, 8);
 
         if national_dex > 0 {
@@ -248,7 +244,10 @@ impl Gen7AlolaSave {
 
     fn display_tid(&self) -> String {
         let trainer_data = self.get_trainer_data();
-        crate::util::six_digit_trainer_display(trainer_data.trainer_id, trainer_data.secret_id)
+        crate::util::six_digit_trainer_id_from_parts(
+            trainer_data.trainer_id,
+            trainer_data.secret_id,
+        )
     }
 
     const fn includes_origin(origin: OriginGame) -> bool {

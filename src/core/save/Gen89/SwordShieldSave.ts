@@ -19,6 +19,7 @@ import {
   Lookup,
   OriginGame,
   Pk8Wasm,
+  SwordShieldSaveRust,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { blockIsType, ObjectBlock, SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
@@ -37,21 +38,22 @@ export class SwordShieldSave extends Gen8Gen9Save<PK8> {
   static saveTypeName = 'Pokémon Sword/Shield'
   static saveTypeID = 'SwShSAV'
 
-  myStatusBlock: MyStatusBlock
+  inner: SwordShieldSaveRust
   trainerCardBlock: TrainerCardBlock
   origin: OriginGame
 
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
 
-    this.myStatusBlock = new MyStatusBlock(this.getBlockMust('MyStatus', 'Object'))
-    this.trainerCardBlock = new TrainerCardBlock(this.getBlockMust('TrainerCard', 'Object'))
-    this.name = this.myStatusBlock.getName()
+    this.inner = SwordShieldSaveRust.fromBytes(bytes)
 
-    this.tid = this.myStatusBlock.getTID()
-    this.sid = this.myStatusBlock.getSID()
-    this.displayID = this.myStatusBlock.getFullID().toString().slice(-6).padStart(6, '0')
-    this.origin = this.myStatusBlock.getGame()
+    this.trainerCardBlock = new TrainerCardBlock(this.getBlockMust('TrainerCard', 'Object'))
+    this.name = this.inner.trainerName
+
+    this.tid = this.inner.trainerId
+    this.sid = this.inner.secretId
+    this.displayID = this.inner.displayId
+    this.origin = this.inner.gameOfOrigin
   }
 
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK8 {
@@ -158,9 +160,9 @@ export class SwordShieldSave extends Gen8Gen9Save<PK8> {
     }
 
     return {
-      'Player Character': this.myStatusBlock.getGender() ? 'Gloria' : 'Victor',
+      'Player Character': this.inner.trainerGender ? 'Gloria' : 'Victor',
       'Save Version': this.getSaveRevision(),
-      Language: Languages.stringFromByte(this.myStatusBlock.getLanguage()),
+      Language: Languages.stringFromByte(this.inner.language),
       Pokédex: pokedexOwned,
       'Shiny Pokémon Found': this.trainerCardBlock.getShinyPokemonFound(),
       Starter: this.trainerCardBlock.getStarter(),
@@ -179,11 +181,11 @@ export class SwordShieldSave extends Gen8Gen9Save<PK8> {
   }
 
   get trainerGender(): Gender {
-    return this.myStatusBlock.getGender() ? Gender.Female : Gender.Male
+    return this.inner.trainerGender ? Gender.Female : Gender.Male
   }
 
   get language() {
-    return this.myStatusBlock.getLanguage()
+    return this.inner.language
   }
 }
 
@@ -260,35 +262,5 @@ class TrainerCardBlock {
     }
 
     return 'Not Selected'
-  }
-}
-
-class MyStatusBlock {
-  dataView: DataView<ArrayBuffer>
-
-  constructor(scBlock: ObjectBlock) {
-    this.dataView = new DataView(scBlock.data.Object.bytes.buffer)
-  }
-
-  public getName(): string {
-    return utf16BytesToString(this.dataView.buffer, 0xb0, 24)
-  }
-  public getLanguage(): number {
-    return this.dataView.getUint8(0xa7)
-  }
-  public getFullID(): number {
-    return this.dataView.getUint32(0xa0, true)
-  }
-  public getTID(): number {
-    return this.dataView.getUint16(0xa0, true)
-  }
-  public getSID(): number {
-    return this.dataView.getUint16(0xa2, true)
-  }
-  public getGame(): OriginGame {
-    return this.dataView.getUint8(0xa4)
-  }
-  public getGender(): boolean {
-    return !!(this.dataView.getUint8(0xa5) & 1)
   }
 }

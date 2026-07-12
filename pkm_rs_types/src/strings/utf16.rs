@@ -35,6 +35,15 @@ impl<const N: usize> SizedUtf16String<N> {
     pub fn is_empty(&self) -> bool {
         self[0] == 0 && self[1] == 0
     }
+
+    pub fn resize<const M: usize>(&mut self) -> SizedUtf16String<M> {
+        let mut raw_le = [0u8; M];
+        if M >= 2 {
+            raw_le[0..M - 2].copy_from_slice(&self.raw_le[0..N.min(M - 2)]);
+        }
+
+        SizedUtf16String { raw_le: [0u8; M] }
+    }
 }
 
 impl<const N: usize> From<&str> for SizedUtf16String<N> {

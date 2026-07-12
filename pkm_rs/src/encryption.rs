@@ -11,7 +11,7 @@ mod meme_crypto;
 pub use meme_crypto::MemeCrypto;
 
 #[cfg(feature = "wasm")]
-mod swish_crypto;
+pub mod swish_crypto;
 
 type ShuffleOrders = [[usize; BLOCK_COUNT]; SHUFFLE_ORDER_COUNT];
 

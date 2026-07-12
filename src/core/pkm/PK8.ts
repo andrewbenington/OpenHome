@@ -70,7 +70,7 @@ export default class PK8 {
     return new PK8(ohpkm, { strategy })
   }
 
-  private static fromWasm(pk8: Pk8Wasm): PK8 {
+  static fromWasm(pk8: Pk8Wasm): PK8 {
     return new PK8(pk8, {})
   }
 
