@@ -43,7 +43,11 @@ impl SwordShieldSave {
         }
 
         let blocks = Blocks::from_vec(swish_crypto::decrypt_blocks(&bytes)?)?;
-
+        crate::log!(
+            "blocks: {}, bytes: {}",
+            swish_crypto::decrypt_blocks(&bytes)?.len(),
+            bytes.len()
+        );
         Ok(Self { bytes, blocks })
     }
 
@@ -125,7 +129,14 @@ impl SwordShieldSave {
 
     #[cfg(feature = "wasm")]
     pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
-        todo!()
+        crate::log!(
+            "blocks: {}, bytes: {}",
+            self.blocks.to_vec().len(),
+            self.bytes.len()
+        );
+        let encrypted = swish_crypto::encrypt_blocks(&self.blocks.to_vec(), self.bytes.len());
+        crate::log!("encrypted byte length: {}", encrypted.len());
+        encrypted
     }
 }
 
@@ -326,7 +337,7 @@ impl SwordShieldSave {
 
     #[wasm_bindgen(js_name = boxesBlock)]
     pub fn boxes_block_wasm(&self) -> swish_crypto::Block {
-        self.box_data().clone().into_block()
+        self.box_data().to_block()
     }
 }
 
@@ -334,32 +345,36 @@ impl SwordShieldSave {
 struct Blocks {
     my_status: MyStatusBlock,
     pokemon_boxes: BoxBlock,
+    other_blocks: Vec<swish_crypto::Block>,
 }
 
 impl Blocks {
     fn from_vec(blocks: impl IntoIterator<Item = swish_crypto::Block>) -> Result<Self> {
         let mut my_status: Option<MyStatusBlock> = None;
         let mut pokemon_boxes: Option<BoxBlock> = None;
+        let mut other_blocks: Vec<swish_crypto::Block> = Vec::new();
 
         for block in blocks {
-            let Some(key) = BlockKey::try_from(block.key()) else {
-                continue;
+            match BlockKey::try_from(block.key()) {
+                Some(BlockKey::MyStatus) => {
+                    let swish_crypto::BlockData::Object(object_block) = block.into_data() else {
+                        return Err(Error::build_save(
+                            "MyStatus should be an object block",
+                            None,
+                        ));
+                    };
+                    my_status = Some(MyStatusBlock(object_block));
+                }
+                Some(BlockKey::Box) => {
+                    let swish_crypto::BlockData::Object(object_block) = block.into_data() else {
+                        return Err(Error::build_save("Boxes should be an object block", None));
+                    };
+                    pokemon_boxes = Some(BoxBlock(object_block));
+                }
+                _ => {
+                    other_blocks.push(block);
+                }
             };
-
-            if key == BlockKey::MyStatus {
-                let swish_crypto::BlockData::Object(object_block) = block.into_data() else {
-                    return Err(Error::build_save(
-                        "MyStatus should be an object block",
-                        None,
-                    ));
-                };
-                my_status = Some(MyStatusBlock(object_block));
-            } else if key == BlockKey::Box {
-                let swish_crypto::BlockData::Object(object_block) = block.into_data() else {
-                    return Err(Error::build_save("Boxes should be an object block", None));
-                };
-                pokemon_boxes = Some(BoxBlock(object_block));
-            }
         }
 
         let Some(my_status) = my_status else {
@@ -373,7 +388,16 @@ impl Blocks {
         Ok(Self {
             my_status,
             pokemon_boxes,
+            other_blocks,
         })
+    }
+
+    fn to_vec(&self) -> Vec<swish_crypto::Block> {
+        self.other_blocks
+            .iter()
+            .cloned()
+            .chain([self.my_status.to_block(), self.pokemon_boxes.to_block()])
+            .collect()
     }
 }
 
@@ -520,10 +544,10 @@ impl MyStatusBlock {
         BinaryGender::from(gender_raw == 1)
     }
 
-    fn into_block(self) -> swish_crypto::Block {
+    fn to_block(&self) -> swish_crypto::Block {
         swish_crypto::Block::new(
             BlockKey::MyStatus.to_u32(),
-            swish_crypto::BlockData::Object(self.0),
+            swish_crypto::BlockData::Object(self.0.clone()),
         )
     }
 }
@@ -561,81 +585,83 @@ impl BoxBlock {
         Some(&mut self.0.bytes_mut()[start..start + Pk8::BOX_SIZE])
     }
 
-    fn into_block(self) -> swish_crypto::Block {
+    fn to_block(&self) -> swish_crypto::Block {
         swish_crypto::Block::new(
             BlockKey::Box.to_u32(),
-            swish_crypto::BlockData::Object(self.0),
+            swish_crypto::BlockData::Object(self.0.clone()),
         )
     }
 }
 
-// #[cfg(feature = "wasm")]
-// #[cfg(test)]
-// mod tests {
-//     use std::path::Path;
+#[cfg(feature = "wasm")]
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
 
-//     use crate::checksum::Checksum;
-//     use crate::gen8_swsh::pk8_buffer::Pk8Buffer;
-//     use crate::result::Result;
-//     use crate::tests::save_bytes_from_file;
+    use crate::checksum::Checksum;
+    use crate::gen8_swsh::pk8_buffer::Pk8Buffer;
+    use crate::result::Result;
+    use crate::tests::save_bytes_from_file;
 
-//     use super::*;
+    use super::*;
 
-// #[test]
-// fn test_sm_encryption() -> std::result::Result<(), Box<dyn std::error::Error>> {
-//     use crate::checksum::{ChecksumAlgorithm, ChecksumU16Le};
+    #[test]
+    fn test_sm_encryption() -> std::result::Result<(), Box<dyn std::error::Error>> {
+        use crate::checksum::{ChecksumAlgorithm, ChecksumU16Le};
 
-//     let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
-//     let save = SwordShieldSave::from_bytes(&moon_bytes)?;
-//     assert_eq!(save.calc_checksum(), 0xb28d);
+        let sword_bytes = save_bytes_from_file(Path::new("sword"))?;
+        let block_vec = swish_crypto::decrypt_blocks(&sword_bytes)?;
+        assert_eq!(block_vec.len(), 4741);
+        let save = SwordShieldSave::from_bytes(sword_bytes.into_boxed_slice())?;
+        // assert_eq!(save.calc_checksum(), 0xb28d);
+        //
+        let after_serialized_bytes = save.prepare_bytes_for_saving();
+        let reserialized = SwordShieldSave::from_bytes(after_serialized_bytes.into_boxed_slice())?;
+        // assert_eq!(reserialized.calc_checksum(), 0xb28d);
 
-//     let after_serialized_bytes = save.prepare_bytes_for_saving();
-//     let reserialized = Gen7AlolaSave::from_bytes(&after_serialized_bytes)?;
-//     assert_eq!(reserialized.calc_checksum(), 0xb28d);
+        // assert_eq!(
+        //     ChecksumU16Le::calc_over_bytes(&after_serialized_bytes),
+        //     0x3065
+        // );
+        Ok(())
+    }
 
-//     assert_eq!(
-//         ChecksumU16Le::calc_over_bytes(&after_serialized_bytes),
-//         0x3065
-//     );
-//     Ok(())
-// }
+    // #[test]
+    // fn sm_save_calculate_checksum() -> Result<()> {
+    //     let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
+    //     let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
 
-// #[test]
-// fn sm_save_calculate_checksum() -> Result<()> {
-//     let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
-//     let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
+    //     assert_eq!(save.calc_checksum(), 0xb28d);
+    //     Ok(())
+    // }
 
-//     assert_eq!(save.calc_checksum(), 0xb28d);
-//     Ok(())
-// }
+    // #[test]
+    // fn usum_save_calculate_checksum() -> Result<()> {
+    //     let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("ultrasun"))?;
+    //     let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
 
-// #[test]
-// fn usum_save_calculate_checksum() -> Result<()> {
-//     let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("ultrasun"))?;
-//     let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
+    //     assert_eq!(save.calc_checksum(), 0x4d97);
+    //     Ok(())
+    // }
 
-//     assert_eq!(save.calc_checksum(), 0x4d97);
-//     Ok(())
-// }
+    // #[test]
+    // fn pkm_checksum_calculation_is_correct() -> Result<()> {
+    //     let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
+    //     let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
 
-// #[test]
-// fn pkm_checksum_calculation_is_correct() -> Result<()> {
-//     let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
-//     let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
-
-//     for box_num in 0..Gen7AlolaSave::box_count() {
-//         for slot in 0..Gen7AlolaSave::box_slots() {
-//             let mon_bytes = save.get_mon_bytes_decrypted(box_num, slot);
-//             let buffer = Pk8BufferRef::box_span(&mon_bytes);
-//             if buffer.checksum() != buffer.calculate_checksum() {
-//                 return Err(Error::other(&format!(
-//                     "Invalid checksum for mon at box {box_num}, slot {slot}: expected {:#06x}, got {:#06x}",
-//                     buffer.calculate_checksum(),
-//                     buffer.checksum()
-//                 )));
-//             }
-//         }
-//     }
-//     Ok(())
-// }
-// }
+    //     for box_num in 0..Gen7AlolaSave::box_count() {
+    //         for slot in 0..Gen7AlolaSave::box_slots() {
+    //             let mon_bytes = save.get_mon_bytes_decrypted(box_num, slot);
+    //             let buffer = Pk8BufferRef::box_span(&mon_bytes);
+    //             if buffer.checksum() != buffer.calculate_checksum() {
+    //                 return Err(Error::other(&format!(
+    //                     "Invalid checksum for mon at box {box_num}, slot {slot}: expected {:#06x}, got {:#06x}",
+    //                     buffer.calculate_checksum(),
+    //                     buffer.checksum()
+    //                 )));
+    //             }
+    //         }
+    //     }
+    //     Ok(())
+    // }
+}

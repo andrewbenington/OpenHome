@@ -362,6 +362,7 @@ export interface WasmSaveInner<P> {
 
 export abstract class WasmOfficialSave<P extends PKMInterface, WasmP> extends OfficialSAV<P> {
   inner: WasmSaveInner<WasmP>
+  boxes: Array<Box<P>> = []
 
   constructor(inner: WasmSaveInner<WasmP>) {
     super()

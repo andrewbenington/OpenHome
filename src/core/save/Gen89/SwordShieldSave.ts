@@ -7,6 +7,7 @@ import {
   SWSH_TRANSFER_RESTRICTIONS_IOA,
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { Option } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
   Block,
@@ -22,38 +23,69 @@ import {
   SwordShieldSaveRust,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
-import { blockIsType, ObjectBlock, SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
+import {
+  blockIsType,
+  ObjectBlock,
+  SwishCrypto,
+  ValueBlock,
+} from '../encryption/SwishCrypto/SwishCrypto'
+import { BoxAndSlot, WasmOfficialSave } from '../interfaces'
 import { PathData } from '../util/path'
-import { G89BlockName, Gen8Gen9Save } from './Gen8Gen9Save'
+import { G89BlockName } from './Gen8Gen9Save'
 
 const SAVE_SIZE_BYTES_MIN = 0x171500
 const SAVE_SIZE_BYTES_MAX = 0x187800
 
 export type SWSH_SAVE_REVISION = 'Base Game' | 'Isle Of Armor' | 'Crown Tundra'
 
-export class SwordShieldSave extends Gen8Gen9Save<PK8> {
+export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm> {
+  MAX_BOX_COUNT: number = SwordShieldSaveRust.MAX_BOX_COUNT
+  SLOTS_PER_BOX: number = SwordShieldSaveRust.SLOTS_PER_BOX
+
   static boxSizeBytes = PK8.getBoxSize() * 30
   static pkmType = PK8
   static saveTypeAbbreviation = 'SwSh'
   static saveTypeName = 'Pokémon Sword/Shield'
   static saveTypeID = 'SwShSAV'
 
-  inner: SwordShieldSaveRust
+  filePath: PathData
+  fileCreated?: Date
+
+  money: number = 0 // TODO: Gen 8 money
+
+  invalid = false
+  tooEarlyToOpen = false
+
+  updatedBoxSlots: BoxAndSlot[] = []
+
+  scBlocks: Block[]
+
   trainerCardBlock: TrainerCardBlock
-  origin: OriginGame
+  currentPCBox: number
 
   constructor(path: PathData, bytes: Uint8Array) {
-    super(path, bytes)
+    super(SwordShieldSaveRust.fromBytes(bytes))
+    this.scBlocks = SwishCrypto.decrypt(bytes)
+    this.filePath = path
 
-    this.inner = SwordShieldSaveRust.fromBytes(bytes)
-
+    const currentPCBlock = this.getBlockMust<ValueBlock>('CurrentBox', {
+      Scalar: { Numeric: 'UInt8' },
+    })
     this.trainerCardBlock = new TrainerCardBlock(this.getBlockMust('TrainerCard', 'Object'))
-    this.name = this.inner.trainerName
 
-    this.tid = this.inner.trainerId
-    this.sid = this.inner.secretId
-    this.displayID = this.inner.displayId
-    this.origin = this.inner.gameOfOrigin
+    this.currentPCBox = new DataView(currentPCBlock.data.Value.bytes.buffer).getUint8(0)
+  }
+
+  get bytes() {
+    return this.inner.prepareBytesForSaving()
+  }
+
+  get boxRows() {
+    return SwordShieldSaveRust.BOX_ROWS
+  }
+
+  get boxColumns() {
+    return SwordShieldSaveRust.BOX_COLS
   }
 
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK8 {
@@ -101,6 +133,19 @@ export class SwordShieldSave extends Gen8Gen9Save<PK8> {
       )
     }
     return block as T
+  }
+
+  getMonAt(boxIndex: number, boxSlot: number): PK8 | undefined {
+    let pk8Wasm = this.inner.getMonAt(boxIndex, boxSlot)
+    return pk8Wasm ? PK8.fromWasm(pk8Wasm) : undefined
+  }
+
+  setMonAt(boxIndex: number, boxSlot: number, mon: Option<PK8>): void {
+    this.inner.setMonAt(boxIndex, boxSlot, mon?.inner)
+  }
+
+  monFromWasm(wasmMon: Pk8Wasm): PK8 {
+    return PK8.fromWasm(wasmMon)
   }
 
   getMonBoxSizeBytes(): number {
@@ -162,7 +207,7 @@ export class SwordShieldSave extends Gen8Gen9Save<PK8> {
     return {
       'Player Character': this.inner.trainerGender ? 'Gloria' : 'Victor',
       'Save Version': this.getSaveRevision(),
-      Language: Languages.stringFromByte(this.inner.language),
+      Language: Languages.stringFromByte(this.inner.language || 0),
       Pokédex: pokedexOwned,
       'Shiny Pokémon Found': this.trainerCardBlock.getShinyPokemonFound(),
       Starter: this.trainerCardBlock.getStarter(),

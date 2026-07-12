@@ -82,7 +82,7 @@ describe('moon save file', () => {
   })
 
   test('first mon is as expected', () => {
-    expect(moonSav.boxes[0].boxSlots[0]?.nickname === 'Bulbasaur')
+    expect(moonSav.getMonAt(0, 0)?.nickname === 'Bulbasaur')
   })
 })
 

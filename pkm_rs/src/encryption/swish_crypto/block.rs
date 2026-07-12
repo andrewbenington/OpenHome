@@ -86,7 +86,7 @@ pub fn encrypt_blocks_js(blocks: Box<[Block]>, size: usize) -> Vec<u8> {
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Block {
     key: u32,
     data: BlockData,
@@ -294,7 +294,7 @@ impl NumericType {
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum BlockData {
     Bool(BoolType),
     Object(ObjectBlock),
@@ -433,9 +433,8 @@ pub fn block_type_index(type_id: BlockType) -> u8 {
     type_id.id()
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Debug)]
 pub enum ScalarType {
     Bool(BoolType),
     Numeric(NumericType),

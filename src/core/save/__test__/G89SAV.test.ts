@@ -87,9 +87,9 @@ describe('gen 8 save files', () => {
   test('sword data is correct', () => {
     expect(swordSave.origin).toBe(OriginGame.Sword)
     expect(swordSave.currentPCBox).toBe(15)
-    expect(swordSave.boxes[17].name).toBe('huevos sorpresa')
+    expect(swordSave.getBoxName(17)).toBe('huevos sorpresa')
 
-    const flapple = swordSave.boxes[1].boxSlots[3]
+    const flapple = swordSave.getMonAt(1, 3)
 
     expect(flapple?.nickname).toBe('Flapple')
     expect(flapple?.canGigantamax).toBe(true)
@@ -110,14 +110,14 @@ describe('gen 8 save files', () => {
 
     expect(decrypted.name).toBe(swordSave.name)
 
-    const flapple = decrypted.boxes[1].boxSlots[3]
+    const flapple = decrypted.getMonAt(1, 3)
 
     expect(flapple?.nickname).toBe('Flapple')
     expect(flapple?.canGigantamax).toBe(true)
     expect(flapple?.ball).toBe(Ball.Premier)
     expect(flapple?.getLevel()).toBe(100)
 
-    const mon = swordSave.boxes[1].boxSlots[3]
+    const mon = swordSave.getMonAt(1, 3)
 
     if (!mon) {
       throw new Error('Expected mon not found')
@@ -126,19 +126,18 @@ describe('gen 8 save files', () => {
     const ohpkm = OHPKM.fromMonInSave(mon, swordSave)
 
     ohpkm.nickname = 'NEW NAME'
-    swordSave.boxes[1].boxSlots[3] = convertToPk8(ohpkm)
+    swordSave.setMonAt(1, 3, convertToPk8(ohpkm))
     swordSave.updatedBoxSlots.push({ box: 1, boxSlot: 3 })
 
     swordSave.prepareForSaving()
     const modified = new SwordShieldSave(swordPath, swordSave.bytes)
-    const modifiedFlapple = modified.boxes[1].boxSlots[3]
+    const modifiedFlapple = modified.getMonAt(1, 3)
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
   })
 
   test('sword save boxes', () => {
-    const mon = swordSave.boxes[1].boxSlots[3]
-
+    const mon = swordSave.getMonAt(1, 3)
     if (!mon) {
       throw new Error('Expected mon not found')
     }
@@ -146,12 +145,12 @@ describe('gen 8 save files', () => {
     const ohpkm = OHPKM.fromMonInSave(mon, swordSave)
 
     ohpkm.nickname = 'NEW NAME'
-    swordSave.boxes[1].boxSlots[3] = convertToPk8(ohpkm)
+    swordSave.setMonAt(1, 3, convertToPk8(ohpkm))
     swordSave.updatedBoxSlots.push({ box: 1, boxSlot: 3 })
 
     swordSave.prepareForSaving()
     const modified = new SwordShieldSave(swordPath, swordSave.bytes)
-    const modifiedFlapple = modified.boxes[1].boxSlots[3]
+    const modifiedFlapple = modified.getMonAt(1, 3)
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
     expect(SwishCrypto.getIsHashValid(swordSave.bytes)).toBe(true)
@@ -164,7 +163,7 @@ describe('gen 8 save files', () => {
   })
 
   test('legends arceus save boxes', () => {
-    const mon = arceusSave.boxes[13].boxSlots[1]
+    const mon = arceusSave.getMonAt(13, 1)
 
     if (!mon) {
       throw new Error('Expected mon not found')
@@ -174,20 +173,20 @@ describe('gen 8 save files', () => {
     const ohpkm = OHPKM.fromMonInSave(mon, arceusSave)
 
     ohpkm.nickname = 'NEW NAME'
-    arceusSave.boxes[13].boxSlots[1] = convertToPa8(ohpkm)
+    arceusSave.setMonAt(13, 1, convertToPa8(ohpkm))
     arceusSave.updatedBoxSlots.push({ box: 13, boxSlot: 1 })
 
-    arceusSave.boxes[2].boxSlots[8] = convertToPa8(magmortar)
+    arceusSave.setMonAt(2, 8, convertToPa8(magmortar))
     arceusSave.updatedBoxSlots.push({ box: 2, boxSlot: 8 })
 
     arceusSave.prepareForSaving()
     const modified = new LegendsArceusSave(arceusPath, arceusSave.bytes)
-    const modifiedDecidueye = modified.boxes[13].boxSlots[1]
+    const modifiedDecidueye = modified.getMonAt(13, 1)
 
     expect(modifiedDecidueye?.nickname).toBe('NEW NAME')
     expect(SwishCrypto.getIsHashValid(arceusSave.bytes)).toBe(true)
 
-    const modifiedMagmortar = modified.boxes[2].boxSlots[8]
+    const modifiedMagmortar = modified.getMonAt(2, 8)
 
     expect(modifiedMagmortar?.nickname).toBe('Magmortar')
   })
