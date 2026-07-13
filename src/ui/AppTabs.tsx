@@ -3,6 +3,7 @@ import { Badge, Box, Flex, ThemePanel } from '@radix-ui/themes'
 import { PropsWithChildren, useContext } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
 import DebugOnly from './components/DebugOnly'
+import Fallback from './components/Fallback'
 import { AppTabIconsActive, AppTabIconsInactive } from './components/Icons'
 import { Tabs } from './components/Tabs'
 import useIsDebug from './hooks/isDebug'
@@ -26,96 +27,98 @@ export default function AppTabs() {
   const navigate = useNavigate()
 
   return (
-    <Tabs.Root
-      value={tab}
-      style={{ height: '100vh' }}
-      orientation="vertical"
-      onValueChange={(tab) => navigate(tab)}
-    >
-      <Flex style={{ height: '100vh' }}>
-        <Tabs.IconList className="tab-sidebar">
-          <Tabs.Tab value="home">
-            <AppTabIconsActive.Home />
-            <AppTabIconsInactive.Home />
-            Home
-          </Tabs.Tab>
-          <Tabs.Tab value="manage">
-            <AppTabIconsActive.Tracked />
-            <AppTabIconsInactive.Tracked />
-            Tracked
-          </Tabs.Tab>
-          <Tabs.Tab value="sort">
-            <AppTabIconsActive.List />
-            <AppTabIconsInactive.List />
-            List
-          </Tabs.Tab>
-          <Tabs.Tab value="pokedex">
-            <AppTabIconsActive.Pokedex />
-            <AppTabIconsInactive.Pokedex />
-            Pokédex
-          </Tabs.Tab>
-          <Tabs.Tab value="plugins">
-            <NotificationBadge count={outdatedPluginCount}>
-              <AppTabIconsActive.Plugins />
-              <AppTabIconsInactive.Plugins />
-              Sprite Plugins
-            </NotificationBadge>
-          </Tabs.Tab>
-          <Tabs.Tab value="logs">
-            <AppTabIconsActive.Logs />
-            <AppTabIconsInactive.Logs />
-            Logs
-          </Tabs.Tab>
-          <Tabs.Tab value="settings">
-            <AppTabIconsActive.Settings />
-            <AppTabIconsInactive.Settings />
-            Settings
-          </Tabs.Tab>
-          <DebugOnly>
-            <Tabs.Tab value="state">
-              <AppTabIconsActive.AppState />
-              <AppTabIconsInactive.AppState />
-              App State
+    <Fallback fatal>
+      <Tabs.Root
+        value={tab}
+        style={{ height: '100vh' }}
+        orientation="vertical"
+        onValueChange={(tab) => navigate(tab)}
+      >
+        <Flex style={{ height: '100vh' }}>
+          <Tabs.IconList className="tab-sidebar">
+            <Tabs.Tab value="home">
+              <AppTabIconsActive.Home />
+              <AppTabIconsInactive.Home />
+              Home
             </Tabs.Tab>
-            <Tabs.Tab value="debug">
-              <AppTabIconsActive.ComponentDebug />
-              <AppTabIconsInactive.ComponentDebug />
-              Debug
+            <Tabs.Tab value="manage">
+              <AppTabIconsActive.Tracked />
+              <AppTabIconsInactive.Tracked />
+              Tracked
             </Tabs.Tab>
-          </DebugOnly>
-          <Tabs.Indicator />
-        </Tabs.IconList>
-        <Separator className="Separator" orientation="vertical" />
-        <Box style={{ flex: 1, width: '100%', height: '100%', overflowY: 'hidden' }}>
-          <div style={{ height: '100%' }}>
-            <Routes>
-              <Route index path="/" element={homeElement} />
-              <Route path="/home" element={homeElement} />
-              <Route path="/manage/*" element={<TrackedPokemonPage />} />
-              <Route path="/sort" element={<SortPokemon />} />
-              <Route path="/pokedex" element={<PokedexPage />} />
-              <Route path="/plugins/*" element={<PluginsPage />} />
-              <Route path="/logs/*" element={<LogsPage />} />
-              <Route path="/settings/*" element={<Settings />} />
-              {useIsDebug() && (
-                <>
-                  <Route path="/state" element={<AppStateDisplay />} />
-                  <Route path="/component-debug" element={<DebugDisplay />} />
-                </>
-              )}
-            </Routes>
+            <Tabs.Tab value="sort">
+              <AppTabIconsActive.List />
+              <AppTabIconsInactive.List />
+              List
+            </Tabs.Tab>
+            <Tabs.Tab value="pokedex">
+              <AppTabIconsActive.Pokedex />
+              <AppTabIconsInactive.Pokedex />
+              Pokédex
+            </Tabs.Tab>
+            <Tabs.Tab value="plugins">
+              <NotificationBadge count={outdatedPluginCount}>
+                <AppTabIconsActive.Plugins />
+                <AppTabIconsInactive.Plugins />
+                Sprite Plugins
+              </NotificationBadge>
+            </Tabs.Tab>
+            <Tabs.Tab value="logs">
+              <AppTabIconsActive.Logs />
+              <AppTabIconsInactive.Logs />
+              Logs
+            </Tabs.Tab>
+            <Tabs.Tab value="settings">
+              <AppTabIconsActive.Settings />
+              <AppTabIconsInactive.Settings />
+              Settings
+            </Tabs.Tab>
             <DebugOnly>
-              <Tabs.Panel value="state">
-                <AppStateDisplay />
-              </Tabs.Panel>
-              <Tabs.Panel value="theme">
-                <ThemePanel />
-              </Tabs.Panel>
+              <Tabs.Tab value="state">
+                <AppTabIconsActive.AppState />
+                <AppTabIconsInactive.AppState />
+                App State
+              </Tabs.Tab>
+              <Tabs.Tab value="debug">
+                <AppTabIconsActive.ComponentDebug />
+                <AppTabIconsInactive.ComponentDebug />
+                Debug
+              </Tabs.Tab>
             </DebugOnly>
-          </div>
-        </Box>
-      </Flex>
-    </Tabs.Root>
+            <Tabs.Indicator />
+          </Tabs.IconList>
+          <Separator className="Separator" orientation="vertical" />
+          <Box style={{ flex: 1, width: '100%', height: '100%', overflowY: 'hidden' }}>
+            <div style={{ height: '100%' }}>
+              <Routes>
+                <Route index path="/" element={homeElement} />
+                <Route path="/home" element={homeElement} />
+                <Route path="/manage/*" element={<TrackedPokemonPage />} />
+                <Route path="/sort" element={<SortPokemon />} />
+                <Route path="/pokedex" element={<PokedexPage />} />
+                <Route path="/plugins/*" element={<PluginsPage />} />
+                <Route path="/logs/*" element={<LogsPage />} />
+                <Route path="/settings/*" element={<Settings />} />
+                {useIsDebug() && (
+                  <>
+                    <Route path="/state" element={<AppStateDisplay />} />
+                    <Route path="/component-debug" element={<DebugDisplay />} />
+                  </>
+                )}
+              </Routes>
+              <DebugOnly>
+                <Tabs.Panel value="state">
+                  <AppStateDisplay />
+                </Tabs.Panel>
+                <Tabs.Panel value="theme">
+                  <ThemePanel />
+                </Tabs.Panel>
+              </DebugOnly>
+            </div>
+          </Box>
+        </Flex>
+      </Tabs.Root>
+    </Fallback>
   )
 }
 

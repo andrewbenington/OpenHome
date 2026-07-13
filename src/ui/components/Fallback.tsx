@@ -1,8 +1,8 @@
 import { ReactNode } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 
-function FallbackComponent(props: FallbackProps) {
-  const { error, resetErrorBoundary } = props
+function BaseFallbackComponent(props: FallbackProps & { children?: ReactNode }) {
+  const { error, children } = props
 
   const errorMessage = errorHasMessage(error) ? error.message : String(error)
 
@@ -11,17 +11,42 @@ function FallbackComponent(props: FallbackProps) {
       <p>Something went wrong:</p>
       <pre>{errorMessage}</pre>
       <p>{JSON.stringify(Object.getPrototypeOf(error))}</p>
-      <button onClick={resetErrorBoundary}>Try again</button>
+      {children}
     </div>
+  )
+}
+
+function RetryFallbackComponent(props: FallbackProps) {
+  const { resetErrorBoundary } = props
+
+  return (
+    <BaseFallbackComponent {...props}>
+      <button onClick={resetErrorBoundary}>Try again</button>
+    </BaseFallbackComponent>
+  )
+}
+
+function FatalFallbackComponent(props: FallbackProps) {
+  return (
+    <BaseFallbackComponent {...props}>
+      <p>
+        This error is unrecoverable. Please report this to the developer, and quit/reopen the app.
+      </p>
+    </BaseFallbackComponent>
   )
 }
 
 type OpenHomeFallbackProps = {
   children: ReactNode
+  fatal?: boolean
 }
 
-export default function Fallback({ children }: OpenHomeFallbackProps) {
-  return <ErrorBoundary FallbackComponent={FallbackComponent}>{children}</ErrorBoundary>
+export default function Fallback({ children, fatal }: OpenHomeFallbackProps) {
+  return (
+    <ErrorBoundary FallbackComponent={fatal ? FatalFallbackComponent : RetryFallbackComponent}>
+      {children}
+    </ErrorBoundary>
+  )
 }
 
 function errorHasMessage(error: unknown): error is { message: string } {

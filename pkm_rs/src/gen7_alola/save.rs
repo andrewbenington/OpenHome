@@ -180,9 +180,11 @@ impl Gen7AlolaSave {
         self.get_mon_bytes_decrypted(box_num, box_slot)
     }
 
-    fn get_mon_at(&self, box_num: usize, box_slot: usize) -> Option<Pk7> {
+    fn get_mon_at(&self, box_num: usize, box_slot: usize) -> Result<Option<Pk7>> {
         if box_num >= Self::box_count() || box_slot >= Self::box_slots() {
-            return None;
+            return Err(Error::Other(format!(
+                "invalid box/slot: {box_num}/{box_slot}"
+            )));
         }
 
         let decrypted_bytes = self.get_decrypted_mon_bytes(box_num, box_slot);
@@ -190,20 +192,17 @@ impl Gen7AlolaSave {
 
         if national_dex > 0 {
             Pk7::from_bytes(&decrypted_bytes)
+                .map(Some)
                 .inspect_err(|err| log!("malformed pkm at box {box_num}, slot {box_slot}: {err}"))
-                .ok()
         } else {
-            None
+            Ok(None)
         }
     }
 
     fn set_mon_at(&mut self, box_num: usize, box_slot: usize, mut mon: Option<Pk7>) {
         let mon_bytes = if let Some(mon) = &mut mon {
             mon.refresh_checksum();
-            let mut bytes = mon.to_box_bytes();
-            Pk7Buffer::box_span_mut(&mut bytes).decrypt();
-
-            bytes
+            mon.to_box_bytes_encrypted()
         } else {
             Pk7::empty_box_slot_bytes(&self.get_trainer_data().trainer_name)
         };
@@ -265,7 +264,7 @@ impl Gen7AlolaSave {
 #[allow(clippy::missing_const_for_fn)]
 impl Gen7AlolaSave {
     #[wasm_bindgen(js_name = getMonAt)]
-    pub fn get_mon_at_wasm(&self, box_num: usize, box_slot: usize) -> Option<Pk7> {
+    pub fn get_mon_at_wasm(&self, box_num: usize, box_slot: usize) -> Result<Option<Pk7>> {
         self.get_mon_at(box_num, box_slot)
     }
 
@@ -425,9 +424,11 @@ mod tests {
     use std::path::Path;
 
     use crate::checksum::Checksum;
+    use crate::convert_strategy::ConvertStrategy;
     use crate::gen7_alola::pk7_buffer::Pk7Buffer;
+    use crate::ohpkm::{OhpkmConvert, OhpkmV2};
     use crate::result::Result;
-    use crate::tests::save_bytes_from_file;
+    use crate::tests::{pkm_from_file, save_bytes_from_file};
 
     use super::*;
 
@@ -486,6 +487,29 @@ mod tests {
                 }
             }
         }
+        Ok(())
+    }
+
+    #[test]
+    fn pokemon_is_same_before_after_setting_in_box() -> Result<()> {
+        let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
+        let mut save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
+
+        let ribbon_master_ohpkm =
+            pkm_from_file::<OhpkmV2>(&Path::new("ohpkm").join("ribbon-master.ohpkm"))?;
+
+        let ribbon_master_pk7 = Pk7::from_ohpkm(&ribbon_master_ohpkm.0, ConvertStrategy::default());
+        assert!((ribbon_master_pk7.language as u8) < 10);
+
+        save.set_mon_at(0, 9, Some(ribbon_master_pk7));
+        let retrieved_ribbon_master = save.get_mon_at(0, 9)?.expect("ribbon master is present");
+
+        if retrieved_ribbon_master.calculate_checksum() != ribbon_master_pk7.calculate_checksum() {
+            return Err(Error::other(
+                "pokemon changed between setting and retrieving",
+            ));
+        }
+
         Ok(())
     }
 }

@@ -253,8 +253,6 @@ impl BlockCrypto {
             } => ShuffleModSeed::EncryptionConstant(encryption_constant),
         };
 
-        println!("updated - mod_seed: {}", mod_seed.get());
-
         let shift_value = mod_seed.get() % SHUFFLE_ORDER_COUNT;
         let block_size = self.block_size();
         let block_offset = self.blocks_offset();
