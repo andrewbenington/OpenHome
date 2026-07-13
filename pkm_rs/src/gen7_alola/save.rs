@@ -197,6 +197,7 @@ impl Gen7AlolaSave {
 
     fn set_mon_at(&mut self, box_num: usize, box_slot: usize, mut mon: Option<Pk7>) {
         let mon_bytes = if let Some(mon) = &mut mon {
+            // checksum should always be up-to-date in the box data
             mon.refresh_checksum();
             mon.to_box_bytes_encrypted()
         } else {

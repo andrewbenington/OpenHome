@@ -115,11 +115,11 @@ impl SwordShieldSave {
 
     fn set_mon_at(&mut self, box_index: usize, box_slot: usize, mut mon: Option<Pk8>) {
         let mon_bytes = if let Some(mon) = &mut mon {
+            // stored stats and checksum should always be up-to-date in the box data
+            mon.recalculate_stats();
             mon.refresh_checksum();
-            let mut bytes = mon.to_box_bytes();
-            Pk8Buffer::new_mut(&mut bytes).encrypt();
 
-            bytes
+            mon.to_box_bytes_encrypted()
         } else {
             Pk8::empty_box_slot_bytes(&self.trainer_name().resize())
         };
@@ -675,42 +675,29 @@ mod tests {
         Ok(())
     }
 
-    // #[test]
-    // fn sm_save_calculate_checksum() -> Result<()> {
-    //     let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
-    //     let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
+    #[test]
+    fn pkm_checksum_calculation_is_correct() -> Result<()> {
+        use crate::checksum::Checksum;
 
-    //     assert_eq!(save.calc_checksum(), 0xb28d);
-    //     Ok(())
-    // }
+        let save_path = Path::new("gen8-swsh").join("sword");
+        let save_bytes = tests::save_bytes_from_file(&save_path)?;
+        let save = SwordShieldSave::from_bytes(save_bytes.into_boxed_slice())?;
 
-    // #[test]
-    // fn usum_save_calculate_checksum() -> Result<()> {
-    //     let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("ultrasun"))?;
-    //     let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
-
-    //     assert_eq!(save.calc_checksum(), 0x4d97);
-    //     Ok(())
-    // }
-
-    // #[test]
-    // fn pkm_checksum_calculation_is_correct() -> Result<()> {
-    //     let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
-    //     let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
-
-    //     for box_index in 0..Gen7AlolaSave::box_count() {
-    //         for slot in 0..Gen7AlolaSave::box_slots() {
-    //             let mon_bytes = save.get_mon_bytes_decrypted(box_index, slot);
-    //             let buffer = Pk8BufferRef::box_span(&mon_bytes);
-    //             if buffer.checksum() != buffer.calculate_checksum() {
-    //                 return Err(Error::other(&format!(
-    //                     "Invalid checksum for mon at box {box_index}, slot {slot}: expected {:#06x}, got {:#06x}",
-    //                     buffer.calculate_checksum(),
-    //                     buffer.checksum()
-    //                 )));
-    //             }
-    //         }
-    //     }
-    //     Ok(())
-    // }
+        for box_index in 0..SwordShieldSave::box_count() {
+            for slot in 0..SwordShieldSave::box_slots() {
+                let mon_bytes = save
+                    .get_mon_bytes_decrypted(box_index, slot)
+                    .expect("only valid slots are being accessed");
+                let buffer = Pk8Buffer::new(&mon_bytes);
+                if buffer.checksum() != buffer.calculate_checksum() {
+                    return Err(Error::other(&format!(
+                        "Invalid checksum for mon at box {box_index}, slot {slot}: expected {:#06x}, got {:#06x}",
+                        buffer.calculate_checksum(),
+                        buffer.checksum()
+                    )));
+                }
+            }
+        }
+        Ok(())
+    }
 }

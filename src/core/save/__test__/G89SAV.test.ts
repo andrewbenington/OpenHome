@@ -195,10 +195,8 @@ function toHexString(byteArray: Uint8Array) {
     .toUpperCase()
 }
 
-function convertToPk8(mon: PKMInterface) {
-  return mon instanceof OHPKM
-    ? PK8.fromOhpkm(mon, ConvertStrategies.getDefault())
-    : PK8.fromOhpkm(OHPKM.fromMonUnknownSave(mon), ConvertStrategies.getDefault())
+function convertToPk8(mon: OHPKM) {
+  return PK8.fromOhpkm(mon, ConvertStrategies.getDefault())
 }
 
 function convertToPa8(mon: PKMInterface) {
