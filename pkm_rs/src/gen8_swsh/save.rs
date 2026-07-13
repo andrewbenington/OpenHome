@@ -1,11 +1,12 @@
-use super::Pk8;
+use super::save_blocks::{BoxBlock, MyStatusBlock, SwShBlocks};
+use super::{BOX_COLS, BOX_ROWS, BOX_SLOTS, BoxName, MAX_BOX_COUNT, Pk8, Pk8Buffer};
 use crate::encryption::swish_crypto;
-use crate::gen8_swsh::pk8_buffer::Pk8Buffer;
 use crate::result::{Error, Result};
 use crate::traits::{PkmBytes, SaveData};
 
-use pkm_rs_types::{BinaryGender, Language, read_u16_le};
-use pkm_rs_types::{OriginGame, read_u32_le};
+use pkm_rs_types::OriginGame;
+
+use pkm_rs_types::{BinaryGender, Language};
 
 use pkm_rs_types::strings::SizedUtf16String;
 #[cfg(feature = "wasm")]
@@ -14,17 +15,11 @@ use wasm_bindgen::prelude::*;
 const SAVE_SIZE_BYTES_MIN: usize = 0x171500;
 const SAVE_SIZE_BYTES_MAX: usize = 0x187800;
 
-const MAX_BOX_COUNT: usize = 32;
-const BOX_ROWS: usize = 5;
-const BOX_COLS: usize = 6;
-const BOX_SLOTS: usize = BOX_ROWS * BOX_COLS;
-const BOX_NAME_LENGTH: usize = 34;
-
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = SwordShieldSaveRust))]
 #[derive(Debug)]
 pub struct SwordShieldSave {
     bytes: Box<[u8]>,
-    blocks: Blocks,
+    blocks: SwShBlocks,
 }
 
 impl SwordShieldSave {
@@ -43,7 +38,7 @@ impl SwordShieldSave {
             ));
         }
 
-        let blocks = Blocks::from_vec(swish_crypto::decrypt_blocks(&bytes)?)?;
+        let blocks = SwShBlocks::from_vec(swish_crypto::decrypt_blocks(&bytes)?)?;
 
         Ok(Self { bytes, blocks })
     }
@@ -332,300 +327,6 @@ impl SwordShieldSave {
     #[wasm_bindgen(js_name = prepareBytesForSaving)]
     pub fn prepare_bytes_for_saving_wasm(&self) -> Vec<u8> {
         self.prepare_bytes_for_saving()
-    }
-}
-
-#[derive(Debug, Clone)]
-struct Blocks {
-    my_status: MyStatusBlock,
-    pokemon_boxes: BoxBlock,
-    box_layouts: BoxLayout,
-    other_blocks: Vec<swish_crypto::Block>,
-}
-
-impl Blocks {
-    fn from_vec(blocks: impl IntoIterator<Item = swish_crypto::Block>) -> Result<Self> {
-        let mut my_status: Option<MyStatusBlock> = None;
-        let mut pokemon_boxes: Option<BoxBlock> = None;
-        let mut box_layouts: Option<BoxLayout> = None;
-        let mut other_blocks: Vec<swish_crypto::Block> = Vec::new();
-
-        for block in blocks {
-            match BlockKey::try_from(block.key()) {
-                Some(BlockKey::MyStatus) => {
-                    let block_data = block.into_object_data()?;
-                    my_status = Some(MyStatusBlock(block_data));
-                }
-                Some(BlockKey::Box) => {
-                    let block_data = block.into_object_data()?;
-                    pokemon_boxes = Some(BoxBlock(block_data));
-                }
-                Some(BlockKey::BoxLayout) => {
-                    let block_data = block.into_array_data()?;
-                    box_layouts = Some(BoxLayout(block_data));
-                }
-                _ => {
-                    other_blocks.push(block);
-                }
-            };
-        }
-
-        let Some(my_status) = my_status else {
-            return Err(Error::build_save("missing MyStatus block", None));
-        };
-
-        let Some(pokemon_boxes) = pokemon_boxes else {
-            return Err(Error::build_save("missing Boxes block", None));
-        };
-
-        let Some(box_layouts) = box_layouts else {
-            return Err(Error::build_save("missing BoxLayouts block", None));
-        };
-
-        Ok(Self {
-            my_status,
-            pokemon_boxes,
-            box_layouts,
-            other_blocks,
-        })
-    }
-
-    fn into_vec(self) -> Vec<swish_crypto::Block> {
-        let Self {
-            my_status,
-            pokemon_boxes,
-            box_layouts,
-            other_blocks,
-        } = self;
-        other_blocks
-            .iter()
-            .cloned()
-            .chain([
-                my_status.to_block(),
-                pokemon_boxes.into_block(),
-                box_layouts.into_block(),
-            ])
-            .collect()
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-enum BlockKey {
-    MyStatus,
-    TeamNames,
-    TeamIndexes,
-    BoxLayout,
-    BoxWallpapers,
-    MenuButtons,
-
-    Box,
-    MysteryGift,
-    Item,
-    Coordinates,
-    Misc,
-    Party,
-    Daycare,
-    Record,
-    Zukan,
-    ZukanR1,
-    ZukanR2,
-    PokedexRecommendation,
-    CurryDex,
-    TrainerCard,
-    PlayTime,
-
-    CurrentBox,
-    BoxesUnlocked,
-}
-
-impl BlockKey {
-    const fn try_from(value: u32) -> Option<Self> {
-        match value {
-            0xf25c070e => Some(Self::MyStatus),
-            0x1920c1e4 => Some(Self::TeamNames),
-            0x33f39467 => Some(Self::TeamIndexes),
-            0x19722c89 => Some(Self::BoxLayout),
-            0x2eb1b190 => Some(Self::BoxWallpapers),
-            0xb1dddca8 => Some(Self::MenuButtons),
-
-            0x0d66012c => Some(Self::Box),
-            0x112d5141 => Some(Self::MysteryGift),
-            0x1177c2c4 => Some(Self::Item),
-            0x16aaa7fa => Some(Self::Coordinates),
-            0x1b882b09 => Some(Self::Misc),
-            0x2985fe5d => Some(Self::Party),
-            0x2d6fba6a => Some(Self::Daycare),
-            0x37da95a3 => Some(Self::Record),
-            0x4716c404 => Some(Self::Zukan),
-            0x3f936ba9 => Some(Self::ZukanR1),
-            0x3c9366f0 => Some(Self::ZukanR2),
-            0xc3fb9e77 => Some(Self::PokedexRecommendation),
-            0x6eb72940 => Some(Self::CurryDex),
-            0x874da6fa => Some(Self::TrainerCard),
-            0x8cbbfd90 => Some(Self::PlayTime),
-
-            0x017c3cbb => Some(Self::CurrentBox),
-            0x71825204 => Some(Self::BoxesUnlocked),
-
-            _ => None,
-        }
-    }
-
-    const fn to_u32(self) -> u32 {
-        match self {
-            Self::MyStatus => 0xf25c070e,
-            Self::TeamNames => 0x1920c1e4,
-            Self::TeamIndexes => 0x33f39467,
-            Self::BoxLayout => 0x19722c89,
-            Self::BoxWallpapers => 0x2eb1b190,
-            Self::MenuButtons => 0xb1dddca8,
-
-            Self::Box => 0x0d66012c,
-            Self::MysteryGift => 0x112d5141,
-            Self::Item => 0x1177c2c4,
-            Self::Coordinates => 0x16aaa7fa,
-            Self::Misc => 0x1b882b09,
-            Self::Party => 0x2985fe5d,
-            Self::Daycare => 0x2d6fba6a,
-            Self::Record => 0x37da95a3,
-            Self::Zukan => 0x4716c404,
-            Self::ZukanR1 => 0x3f936ba9,
-            Self::ZukanR2 => 0x3c9366f0,
-            Self::PokedexRecommendation => 0xc3fb9e77,
-            Self::CurryDex => 0x6eb72940,
-            Self::TrainerCard => 0x874da6fa,
-            Self::PlayTime => 0x8cbbfd90,
-
-            Self::CurrentBox => 0x017c3cbb,
-            Self::BoxesUnlocked => 0x71825204,
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-struct MyStatusBlock(swish_crypto::ObjectBlock);
-
-impl MyStatusBlock {
-    const NAME_OFFSET: usize = 0xb0;
-    const NAME_BYTE_LENGTH: usize = 24;
-
-    const TID_OFFSET: usize = 0xa0;
-    const SID_OFFSET: usize = 0xa2;
-    const LANGUAGE_OFFSET: usize = 0xa7;
-    const ORIGIN_OFFSET: usize = 0xa4;
-    const GENDER_OFFSET: usize = 0xa5;
-
-    const BUFFER_ERROR: &'static str = "MyStatusBlock buffer is not the correct size";
-
-    fn trainer_name(&self) -> SizedUtf16String<{ MyStatusBlock::NAME_BYTE_LENGTH }> {
-        SizedUtf16String::from_bytes(
-            self.0.bytes()[Self::NAME_OFFSET..Self::NAME_OFFSET + Self::NAME_BYTE_LENGTH]
-                .try_into()
-                .expect(Self::BUFFER_ERROR),
-        )
-    }
-
-    fn trainer_id(&self) -> u16 {
-        read_u16_le!(self.0.bytes(), Self::TID_OFFSET)
-    }
-
-    fn secret_id(&self) -> u16 {
-        read_u16_le!(self.0.bytes(), Self::SID_OFFSET)
-    }
-
-    fn tid_sid_u32(&self) -> u32 {
-        read_u32_le!(self.0.bytes(), Self::TID_OFFSET)
-    }
-
-    fn language(&self) -> Result<Language> {
-        let language_byte = self.0.bytes()[Self::LANGUAGE_OFFSET];
-        Ok(Language::try_from(language_byte)?)
-    }
-
-    fn origin_game(&self) -> Option<OriginGame> {
-        let origin_game_raw = self.0.bytes()[Self::ORIGIN_OFFSET];
-        OriginGame::try_from_u8(origin_game_raw)
-    }
-
-    fn trainer_gender(&self) -> BinaryGender {
-        let gender_raw = self.0.bytes()[Self::GENDER_OFFSET] & 1;
-        BinaryGender::from(gender_raw == 1)
-    }
-
-    fn to_block(&self) -> swish_crypto::Block {
-        swish_crypto::Block::new(
-            BlockKey::MyStatus.to_u32(),
-            swish_crypto::BlockData::Object(self.0.clone()),
-        )
-    }
-}
-
-#[derive(Debug, Clone)]
-struct BoxBlock(swish_crypto::ObjectBlock);
-
-impl BoxBlock {
-    const BOX_SIZE_BYTES: usize = Pk8::BOX_SIZE * BOX_SLOTS;
-
-    const fn box_bytes_start(box_index: usize) -> Option<usize> {
-        match box_index {
-            ..MAX_BOX_COUNT => Some(Self::BOX_SIZE_BYTES * box_index),
-            _ => None,
-        }
-    }
-
-    const fn pokemon_bytes_start(box_index: usize, box_slot: usize) -> Option<usize> {
-        let Some(box_start) = Self::box_bytes_start(box_index) else {
-            return None;
-        };
-        match box_slot {
-            ..BOX_SLOTS => Some(box_start + Pk8::BOX_SIZE * box_slot),
-            _ => None,
-        }
-    }
-
-    fn mon_bytes_at(&self, box_index: usize, box_slot: usize) -> Option<&[u8]> {
-        Self::pokemon_bytes_start(box_index, box_slot)
-            .map(|start| &self.0.bytes()[start..start + Pk8::BOX_SIZE])
-    }
-
-    fn mon_bytes_at_mut(&mut self, box_index: usize, box_slot: usize) -> Option<&mut [u8]> {
-        let start = Self::pokemon_bytes_start(box_index, box_slot)?;
-        Some(&mut self.0.bytes_mut()[start..start + Pk8::BOX_SIZE])
-    }
-
-    fn into_block(self) -> swish_crypto::Block {
-        swish_crypto::Block::new(
-            BlockKey::Box.to_u32(),
-            swish_crypto::BlockData::Object(self.0),
-        )
-    }
-}
-
-type BoxName = SizedUtf16String<BOX_NAME_LENGTH>;
-
-#[derive(Debug, Clone)]
-struct BoxLayout(swish_crypto::ArrayBlock);
-
-impl BoxLayout {
-    fn get_box_name(&self, box_index: usize) -> Option<BoxName> {
-        if box_index >= MAX_BOX_COUNT {
-            return None;
-        }
-
-        let start = box_index * BOX_NAME_LENGTH;
-        let end = start + BOX_NAME_LENGTH;
-        let name_bytes: [u8; BOX_NAME_LENGTH] = self.0.bytes()[start..end]
-            .try_into()
-            .expect("end should be exactly BOX_NAME_LENGTH after start");
-
-        Some(SizedUtf16String::from_bytes(name_bytes))
-    }
-
-    fn into_block(self) -> swish_crypto::Block {
-        swish_crypto::Block::new(
-            BlockKey::BoxLayout.to_u32(),
-            swish_crypto::BlockData::Array(self.0),
-        )
     }
 }
 

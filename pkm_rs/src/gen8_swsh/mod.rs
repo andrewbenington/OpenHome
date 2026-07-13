@@ -1,25 +1,30 @@
-mod pk8;
-
-mod pk8_buffer;
-use pk8_buffer::Pk8Buffer;
-
-mod save;
 use pkm_rs_resources::metadata_source::MetadataSource;
-// pub use save::Gen7AlolaSave;
+use pkm_rs_types::strings::SizedUtf16String;
 
+use crate::result::Error;
 pub use pk8::*;
+use pk8_buffer::Pk8Buffer;
 use pkm_rs_resources;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::moves::MoveDataOffsets;
 use pkm_rs_resources::ribbons::ModernRibbon;
 use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_resources::species::form_metadata::source_has_form_metadata;
+
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
-use serde::Serialize;
+mod pk8;
+mod pk8_buffer;
+mod save;
+mod save_blocks;
 
 pub(crate) const PKM_DATA_SIZE: usize = 344;
+
+const MAX_BOX_COUNT: usize = 32;
+const BOX_ROWS: usize = 5;
+const BOX_COLS: usize = 6;
+const BOX_SLOTS: usize = BOX_ROWS * BOX_COLS;
 
 const MAX_RIBBON_SWSH: usize = ModernRibbon::TowerMaster as usize;
 
@@ -30,7 +35,11 @@ const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
 };
 
 const AS_ONE_SHADOW_RIDER: u16 = 267;
+
 pub type Pk8AbilityIndex = AbilityIndexBounded<AS_ONE_SHADOW_RIDER>;
+
+const BOX_NAME_LENGTH: usize = 34;
+type BoxName = SizedUtf16String<BOX_NAME_LENGTH>;
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Pk8SpeciesAndForm(SpeciesAndForm);
@@ -53,7 +62,7 @@ impl Pk8SpeciesAndForm {
     }
 }
 
-impl Serialize for Pk8SpeciesAndForm {
+impl serde::Serialize for Pk8SpeciesAndForm {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -72,8 +81,6 @@ impl Randomize for Pk8SpeciesAndForm {
         }
     }
 }
-
-use crate::result::Error;
 
 impl TryFrom<SpeciesAndForm> for Pk8SpeciesAndForm {
     type Error = Error;
