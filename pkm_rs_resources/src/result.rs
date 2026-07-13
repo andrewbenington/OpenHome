@@ -55,7 +55,7 @@ impl Display for Error {
                     .to_owned()
             }
             Error::NationalDex { national_dex } => {
-                format!("Invalid National Dex number {national_dex} (must be between 1 and {NATIONAL_DEX_MAX}")
+                format!("Invalid National Dex number {national_dex} (must be between 1 and {NATIONAL_DEX_MAX})")
                     .to_owned()
             }
             Error::FormIndex {
@@ -71,19 +71,19 @@ impl Display for Error {
                 .to_owned()
             }
             Error::LanguageIndex { language_index } => {
-                format!("Invalid language index {language_index} (must be between 0 and {LANGUAGE_MAX}")
+                format!("Invalid language index {language_index} (must be between 0 and {LANGUAGE_MAX})")
                     .to_owned()
             }
             Error::NatureIndex { nature_index } => {
-                format!("Invalid nature index {nature_index} (must be between 1 and {NATURE_MAX}")
+                format!("Invalid nature index {nature_index} (must be between 1 and {NATURE_MAX})")
                     .to_owned()
             }
             Error::AbilityIndex { ability_index } => {
-                format!("Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}")
+                format!("Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX})")
                     .to_owned()
             }
             Error::ItemIndex { item_index } => {
-                format!("Invalid item index {item_index} (must be between 1 and {ITEM_MAX}")
+                format!("Invalid item index {item_index} (must be between 1 and {ITEM_MAX})")
                     .to_owned()
             }
             Error::FieldError { field, source } => {
