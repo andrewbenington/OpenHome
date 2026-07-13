@@ -18,7 +18,6 @@ pub mod gen8_swsh;
 pub mod location;
 pub mod ohpkm;
 pub mod result;
-pub mod saves;
 pub mod sectioned_data;
 #[cfg(test)]
 pub mod tests;

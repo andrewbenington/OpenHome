@@ -10,12 +10,16 @@ impl std::fmt::Display for BoundViolated {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Bounded<T: Into<usize> + Copy + Sized, const MAX: usize>(T);
+pub struct Bounded<T: Copy, const MAX: usize>(T)
+where
+    usize: From<T>;
 
-impl<T: Into<usize> + Copy, const MAX: usize> Bounded<T, MAX> {
+impl<T: Copy, const MAX: usize> Bounded<T, MAX>
+where
+    usize: From<T>,
+{
     pub fn new_if_valid(value: T) -> Option<Self> {
-        let value_usize = value.into();
-        if value_usize > MAX {
+        if usize::from(value) > MAX {
             None
         } else {
             Some(Self(value))
@@ -27,22 +31,29 @@ impl<T: Into<usize> + Copy, const MAX: usize> Bounded<T, MAX> {
     }
 }
 
-pub trait CheckBound<T: Into<usize> + Copy, const MAX: usize>: Into<usize> + Copy {
+pub trait CheckBound<const MAX: usize>: Copy
+where
+    usize: From<Self>,
+{
     fn check(self) -> Option<Bounded<Self, MAX>> {
         Bounded::new_if_valid(self)
     }
 }
 
-impl<T: Into<usize> + Copy, const MAX: usize> std::ops::Mul<usize> for Bounded<T, MAX> {
+impl<T: Copy, const MAX: usize> std::ops::Mul<usize> for Bounded<T, MAX>
+where
+    usize: From<T>,
+{
     type Output = usize;
 
     fn mul(self, rhs: usize) -> Self::Output {
-        self.0.into() * rhs
+        usize::from(self.0) * rhs
     }
 }
 
-impl<T: Into<usize> + Copy + std::fmt::Display, const MAX: usize> std::fmt::Display
-    for Bounded<T, MAX>
+impl<T: Copy + std::fmt::Display, const MAX: usize> std::fmt::Display for Bounded<T, MAX>
+where
+    usize: From<T>,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.0.fmt(f)
