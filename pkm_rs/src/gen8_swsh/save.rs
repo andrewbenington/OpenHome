@@ -353,32 +353,16 @@ impl Blocks {
         for block in blocks {
             match BlockKey::try_from(block.key()) {
                 Some(BlockKey::MyStatus) => {
-                    let swish_crypto::BlockData::Object(object_block) = block.into_data() else {
-                        return Err(Error::build_save(
-                            "MyStatus should be an object block",
-                            None,
-                        ));
-                    };
-                    my_status = Some(MyStatusBlock(object_block));
+                    let block_data = block.into_object_data()?;
+                    my_status = Some(MyStatusBlock(block_data));
                 }
                 Some(BlockKey::Box) => {
-                    let swish_crypto::BlockData::Object(object_block) = block.into_data() else {
-                        return Err(Error::build_save("Boxes should be an object block", None));
-                    };
-                    pokemon_boxes = Some(BoxBlock(object_block));
+                    let block_data = block.into_object_data()?;
+                    pokemon_boxes = Some(BoxBlock(block_data));
                 }
                 Some(BlockKey::BoxLayout) => {
-                    let block_data = block.into_data();
-                    let swish_crypto::BlockData::Array(array_block) = block_data else {
-                        return Err(Error::build_save(
-                            format!(
-                                "BoxLayout should be an array block, but was actually {:?}",
-                                block_data.block_type()
-                            ),
-                            None,
-                        ));
-                    };
-                    box_layouts = Some(BoxLayout(array_block));
+                    let block_data = block.into_array_data()?;
+                    box_layouts = Some(BoxLayout(block_data));
                 }
                 _ => {
                     other_blocks.push(block);

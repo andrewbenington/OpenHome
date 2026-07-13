@@ -101,10 +101,6 @@ impl Block {
         self.key
     }
 
-    pub fn into_data(self) -> BlockData {
-        self.data
-    }
-
     fn read_encrypted(reader: &mut Reader) -> Result<Self, InvalidTypeId> {
         let key = reader.read_u32();
 
@@ -188,6 +184,61 @@ impl Block {
 
         writer.current_offset()
     }
+
+    pub fn into_object_data(self) -> std::result::Result<ObjectBlock, WrongBlockType> {
+        let Block { key, data } = self;
+        let block_type = data.block_type();
+        match data {
+            BlockData::Object(object_data) => Ok(object_data),
+            _ => Err(WrongBlockType {
+                block_key: key,
+                expected: BlockType::Object,
+                actual: block_type,
+            }),
+        }
+    }
+
+    pub fn into_array_data(self) -> std::result::Result<ArrayBlock, WrongBlockType> {
+        let Block { key, data } = self;
+        let block_type = data.block_type();
+        if let BlockData::Array(array_data) = data {
+            Ok(array_data)
+        } else {
+            Err(WrongBlockType {
+                block_key: key,
+                expected: BlockType::Array,
+                actual: block_type,
+            })
+        }
+    }
+}
+
+#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
+#[derive(Debug)]
+pub struct WrongBlockType {
+    block_key: u32,
+    expected: BlockType,
+    actual: BlockType,
+}
+
+impl std::fmt::Display for WrongBlockType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "expected SwishCrypto block of type {}, received {}",
+            self.expected, self.actual
+        )
+    }
+}
+
+impl std::error::Error for WrongBlockType {}
+
+impl From<WrongBlockType> for Error {
+    fn from(value: WrongBlockType) -> Self {
+        let message = format!("block with key {}", value.block_key);
+        Error::build_save(message, Some(Box::new(value)))
+    }
 }
 
 #[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
@@ -217,7 +268,7 @@ impl From<InvalidTypeId> for Error {
     derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
 )]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
-#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash, strum::Display)]
 pub enum BoolType {
     Bool1,
     Bool2,
@@ -235,7 +286,16 @@ impl BoolType {
 }
 
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify, Hash,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    serde::Serialize,
+    serde::Deserialize,
+    tsify::Tsify,
+    strum::Display,
 )]
 pub enum NumericType {
     UInt8,
@@ -428,7 +488,17 @@ const fn xor_shift_advance(state: u32) -> u32 {
     state
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    tsify::Tsify,
+    strum::Display,
+)]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 pub enum BlockType {
     Object,
@@ -466,7 +536,16 @@ pub fn block_type_index(type_id: BlockType) -> u8 {
 }
 
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, tsify::Tsify, Hash,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    tsify::Tsify,
+    Hash,
+    strum::Display,
 )]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 pub enum ScalarType {
