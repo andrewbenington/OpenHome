@@ -11,7 +11,7 @@ use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::helpers;
 use pkm_rs_resources::metadata_source::MetadataSource;
-use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
+use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
@@ -332,10 +332,6 @@ impl Pk7 {
 
     pub fn recalculate_stats(&mut self) {
         self.stats = self.calculate_stats();
-    }
-
-    pub const fn move_data_offsets() -> MoveDataOffsets {
-        super::MOVE_DATA_OFFSETS
     }
 
     pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Box<[u8]> {
