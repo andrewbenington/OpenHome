@@ -1,6 +1,7 @@
 use super::save_blocks::{BoxBlock, MyStatusBlock, SwShBlocks};
 use super::{BOX_COLS, BOX_ROWS, BOX_SLOTS, BoxName, MAX_BOX_COUNT, Pk8, Pk8Buffer};
 use crate::encryption::swish_crypto;
+use crate::gen8_swsh::{BoxIndex, BoxSlot};
 use crate::result::{Error, Result};
 use crate::traits::{PkmBytes, SaveData};
 
@@ -55,7 +56,7 @@ impl SwordShieldSave {
         &mut self.blocks.pokemon_boxes
     }
 
-    fn box_name(&self, box_index: usize) -> Option<BoxName> {
+    fn box_name(&self, box_index: BoxIndex) -> BoxName {
         self.blocks.box_layouts.get_box_name(box_index)
     }
 
@@ -75,26 +76,22 @@ impl SwordShieldSave {
         self.my_status().language().unwrap_or_default()
     }
 
-    fn copy_pokemon_bytes_to(&mut self, box_index: usize, box_slot: usize, data: &[u8]) {
-        if let Some(box_bytes) = self.box_data_mut().mon_bytes_at_mut(box_index, box_slot) {
-            box_bytes.copy_from_slice(data);
-        }
+    fn copy_pokemon_bytes_to(&mut self, box_index: BoxIndex, box_slot: BoxSlot, data: &[u8]) {
+        self.box_data_mut()
+            .mon_bytes_at_mut(box_index, box_slot)
+            .copy_from_slice(data)
     }
 
-    fn get_mon_bytes_decrypted(&self, box_index: usize, box_slot: usize) -> Option<Box<[u8]>> {
-        let pokemon_bytes = self.box_data().mon_bytes_at(box_index, box_slot)?;
+    fn get_mon_bytes_decrypted(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Box<[u8]> {
+        let pokemon_bytes = self.box_data().mon_bytes_at(box_index, box_slot);
         let mut copied_bytes = Box::from(pokemon_bytes);
         Pk8Buffer::new_mut(&mut copied_bytes).decrypt();
 
-        Some(copied_bytes)
+        copied_bytes
     }
 
-    fn get_mon_at(&self, box_index: usize, box_slot: usize) -> Option<Pk8> {
-        if box_index >= Self::box_count() || box_slot >= Self::box_slots() {
-            return None;
-        }
-
-        let decrypted_bytes = self.get_mon_bytes_decrypted(box_index, box_slot)?;
+    fn get_mon_at(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Option<Pk8> {
+        let decrypted_bytes = self.get_mon_bytes_decrypted(box_index, box_slot);
         let national_dex = Pk8Buffer::new(&decrypted_bytes).species_ndex();
 
         if national_dex > 0 {
@@ -108,7 +105,7 @@ impl SwordShieldSave {
         }
     }
 
-    fn set_mon_at(&mut self, box_index: usize, box_slot: usize, mut mon: Option<Pk8>) {
+    fn set_mon_at(&mut self, box_index: BoxIndex, box_slot: BoxSlot, mut mon: Option<Pk8>) {
         let mon_bytes = if let Some(mon) = &mut mon {
             // stored stats and checksum should always be up-to-date in the box data
             mon.recalculate_stats();
@@ -141,17 +138,26 @@ impl SaveData for SwordShieldSave {
     }
 
     fn get_mon_at(&self, box_index: usize, box_slot: usize) -> Option<Pk8> {
-        let mon_bytes = self.box_data().mon_bytes_at(box_index, box_slot)?;
+        let mon_bytes = self.box_data().mon_bytes_at(
+            BoxIndex::new(box_index as u8).ok()?,
+            BoxSlot::new(box_slot as u8).ok()?,
+        );
         Pk8::from_bytes(mon_bytes).ok()
     }
 
     fn set_mon_at(&mut self, box_index: usize, box_slot: usize, mon: Option<Pk8>) {
+        let Ok(box_index) = BoxIndex::new(box_index as u8) else {
+            return;
+        };
+        let Ok(box_slot) = BoxSlot::new(box_slot as u8) else {
+            return;
+        };
         match mon {
             Some(mut mon) => {
                 mon.refresh_checksum();
                 self.box_data_mut()
                     .mon_bytes_at_mut(box_index, box_slot)
-                    .map(|bytes| bytes.copy_from_slice(&mon.to_box_bytes_encrypted()))
+                    .copy_from_slice(&mon.to_box_bytes_encrypted())
             }
             None => todo!(),
         };
@@ -167,27 +173,27 @@ impl SaveData for SwordShieldSave {
     }
 
     fn box_rows() -> usize {
-        BOX_ROWS
+        BOX_ROWS as usize
     }
 
     fn box_cols() -> usize {
-        BOX_COLS
+        BOX_COLS as usize
     }
 
     fn box_slots() -> usize {
-        BOX_SLOTS
+        BOX_SLOTS as usize
     }
 
     fn box_count() -> usize {
-        MAX_BOX_COUNT
+        MAX_BOX_COUNT as usize
     }
 
     fn max_box_count() -> usize {
-        MAX_BOX_COUNT
+        MAX_BOX_COUNT as usize
     }
 
     fn current_pc_box_idx(&self) -> usize {
-        if self.bytes[0] as usize >= MAX_BOX_COUNT {
+        if self.bytes[0] >= MAX_BOX_COUNT {
             0
         } else {
             self.bytes[0].into()
@@ -216,18 +222,25 @@ impl SaveData for SwordShieldSave {
 #[allow(clippy::missing_const_for_fn)]
 impl SwordShieldSave {
     #[wasm_bindgen(js_name = getMonAt)]
-    pub fn get_mon_at_wasm(&self, box_index: usize, offset: usize) -> Option<Pk8> {
-        self.get_mon_at(box_index, offset)
+    pub fn get_mon_at_wasm(&self, box_index: u8, box_slot: u8) -> Option<Pk8> {
+        self.get_mon_at(box_index.try_into().ok()?, box_slot.try_into().ok()?)
     }
 
     #[wasm_bindgen(js_name = setMonAt)]
-    pub fn set_mon_at_wasm(&mut self, box_index: usize, offset: usize, mon: Option<Pk8>) {
-        self.set_mon_at(box_index, offset, mon)
+    pub fn set_mon_at_wasm(&mut self, box_index: u8, box_slot: u8, mon: Option<Pk8>) {
+        if let Ok(box_index) = box_index.try_into()
+            && let Ok(box_slot) = box_slot.try_into()
+        {
+            self.set_mon_at(box_index, box_slot, mon)
+        }
     }
 
     #[wasm_bindgen(js_name = getBoxName)]
-    pub fn box_name_wasm(&mut self, box_index: usize) -> Option<String> {
-        self.box_name(box_index).map(|name| name.to_string())
+    pub fn box_name_wasm(&mut self, box_index: u8) -> Option<String> {
+        match BoxIndex::new(box_index) {
+            Ok(index) => Some(self.box_name(index).to_string()),
+            Err(_) => None,
+        }
     }
 
     #[wasm_bindgen(js_name = convertOhpkm)]
@@ -280,22 +293,22 @@ impl SwordShieldSave {
     }
 
     #[wasm_bindgen(getter = MAX_BOX_COUNT)]
-    pub fn max_box_count() -> usize {
+    pub fn max_box_count() -> u8 {
         MAX_BOX_COUNT
     }
 
     #[wasm_bindgen(getter = BOX_ROWS)]
-    pub fn box_rows() -> usize {
+    pub fn box_rows() -> u8 {
         BOX_ROWS
     }
 
     #[wasm_bindgen(getter = BOX_COLS)]
-    pub fn box_cols() -> usize {
+    pub fn box_cols() -> u8 {
         BOX_COLS
     }
 
     #[wasm_bindgen(getter = SLOTS_PER_BOX)]
-    pub fn box_size() -> usize {
+    pub fn box_size() -> u8 {
         BOX_COLS * BOX_ROWS
     }
 
@@ -384,15 +397,13 @@ mod tests {
         let save_bytes = tests::save_bytes_from_file(&save_path)?;
         let save = SwordShieldSave::from_bytes(save_bytes.into_boxed_slice())?;
 
-        for box_index in 0..SwordShieldSave::box_count() {
-            for slot in 0..SwordShieldSave::box_slots() {
-                let mon_bytes = save
-                    .get_mon_bytes_decrypted(box_index, slot)
-                    .expect("only valid slots are being accessed");
+        for box_index in BoxIndex::all() {
+            for box_slot in BoxSlot::all() {
+                let mon_bytes = save.get_mon_bytes_decrypted(box_index, box_slot);
                 let buffer = Pk8Buffer::new(&mon_bytes);
                 if buffer.checksum() != buffer.calculate_checksum() {
                     return Err(Error::other(&format!(
-                        "Invalid checksum for mon at box {box_index}, slot {slot}: expected {:#06x}, got {:#06x}",
+                        "Invalid checksum for mon at box {box_index}, slot {box_slot}: expected {:#06x}, got {:#06x}",
                         buffer.calculate_checksum(),
                         buffer.checksum()
                     )));

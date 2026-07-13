@@ -1,5 +1,6 @@
-use super::{BOX_NAME_LENGTH, BOX_SLOTS, BoxName, MAX_BOX_COUNT, Pk8};
+use super::{BOX_NAME_LENGTH, BOX_SLOTS, BoxName, Pk8};
 use crate::encryption::swish_crypto;
+use crate::gen8_swsh::{BoxIndex, BoxSlot};
 use crate::result::{Error, Result};
 use crate::traits::PkmBytes;
 
@@ -236,33 +237,25 @@ impl MyStatusBlock {
 pub(super) struct BoxBlock(swish_crypto::ObjectBlock);
 
 impl BoxBlock {
-    const BOX_SIZE_BYTES: usize = Pk8::BOX_SIZE * BOX_SLOTS;
+    const BOX_SIZE_BYTES: usize = Pk8::BOX_SIZE * (BOX_SLOTS as usize);
 
-    pub const fn box_bytes_start(box_index: usize) -> Option<usize> {
-        match box_index {
-            ..MAX_BOX_COUNT => Some(Self::BOX_SIZE_BYTES * box_index),
-            _ => None,
-        }
+    pub fn box_bytes_start(box_index: BoxIndex) -> usize {
+        Self::BOX_SIZE_BYTES * box_index
     }
 
-    pub const fn pokemon_bytes_start(box_index: usize, box_slot: usize) -> Option<usize> {
-        let Some(box_start) = Self::box_bytes_start(box_index) else {
-            return None;
-        };
-        match box_slot {
-            ..BOX_SLOTS => Some(box_start + Pk8::BOX_SIZE * box_slot),
-            _ => None,
-        }
+    pub fn pokemon_bytes_start(box_index: BoxIndex, box_slot: BoxSlot) -> usize {
+        let box_start = Self::box_bytes_start(box_index);
+        box_start + Pk8::BOX_SIZE * box_slot
     }
 
-    pub fn mon_bytes_at(&self, box_index: usize, box_slot: usize) -> Option<&[u8]> {
-        Self::pokemon_bytes_start(box_index, box_slot)
-            .map(|start| &self.0.bytes()[start..start + Pk8::BOX_SIZE])
+    pub fn mon_bytes_at(&self, box_index: BoxIndex, box_slot: BoxSlot) -> &[u8] {
+        let start = Self::pokemon_bytes_start(box_index, box_slot);
+        &self.0.bytes()[start..start + Pk8::BOX_SIZE]
     }
 
-    pub fn mon_bytes_at_mut(&mut self, box_index: usize, box_slot: usize) -> Option<&mut [u8]> {
-        let start = Self::pokemon_bytes_start(box_index, box_slot)?;
-        Some(&mut self.0.bytes_mut()[start..start + Pk8::BOX_SIZE])
+    pub fn mon_bytes_at_mut(&mut self, box_index: BoxIndex, box_slot: BoxSlot) -> &mut [u8] {
+        let start = Self::pokemon_bytes_start(box_index, box_slot);
+        &mut self.0.bytes_mut()[start..start + Pk8::BOX_SIZE]
     }
 
     fn into_block(self) -> swish_crypto::Block {
@@ -277,18 +270,14 @@ impl BoxBlock {
 pub(super) struct BoxLayout(swish_crypto::ArrayBlock);
 
 impl BoxLayout {
-    pub fn get_box_name(&self, box_index: usize) -> Option<BoxName> {
-        if box_index >= MAX_BOX_COUNT {
-            return None;
-        }
-
-        let start = box_index * BOX_NAME_LENGTH;
+    pub fn get_box_name(&self, box_index: BoxIndex) -> BoxName {
+        let start = BOX_NAME_LENGTH * box_index;
         let end = start + BOX_NAME_LENGTH;
         let name_bytes: [u8; BOX_NAME_LENGTH] = self.0.bytes()[start..end]
             .try_into()
             .expect("end should be exactly BOX_NAME_LENGTH after start");
 
-        Some(SizedUtf16String::from_bytes(name_bytes))
+        SizedUtf16String::from_bytes(name_bytes)
     }
 
     fn into_block(self) -> swish_crypto::Block {

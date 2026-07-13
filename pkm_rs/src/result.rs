@@ -23,6 +23,7 @@ pub enum MoveErrorKind {
 
 #[derive(Debug)]
 pub enum Error {
+    BoxIndex(u8),
     BufferSize {
         requirement_source: Option<String>,
         expected: usize,
@@ -84,16 +85,13 @@ pub enum Error {
         tag_type: &'static str,
         value: u16,
     },
-
     MoveError {
         value: u16,
         source: MoveErrorSource,
     },
-
     StringDecode {
         source: StringErrorSource,
     },
-
     // Generic error for when nothing else fits
     Other(String),
 }
@@ -150,12 +148,13 @@ impl Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
+            Self::BoxIndex(index) => format!("Invalid box index: {index}"),
             Self::BufferSize {requirement_source,
                expected, received,
             } => {
                 match requirement_source {
                     Some(source) => format!("{source} requires a buffer of length {expected}, but actual length is {received}"),
-                    None => format!("buffer of length {expected} was expected, but actual length is {received}"),
+                    None => format!("Buffer of length {expected} was expected, but actual length is {received}"),
                 }
             }
             Self::BuildSave {context, source } => match source {
