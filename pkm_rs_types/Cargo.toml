@@ -22,6 +22,7 @@ rand = { version = "0.10.1", optional = true }
 tsify = "0.5.6"
 num_enum = "0.7.6"
 chrono = "0.4.45"
+pastey = "0.2.3"
 
 [lib]
 name = "pkm_rs_types"

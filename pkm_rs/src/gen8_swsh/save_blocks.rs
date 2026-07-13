@@ -239,13 +239,13 @@ pub(super) struct BoxBlock(swish_crypto::ObjectBlock);
 impl BoxBlock {
     const BOX_SIZE_BYTES: usize = Pk8::BOX_SIZE * (BOX_SLOTS as usize);
 
-    pub fn box_bytes_start(box_index: BoxIndex) -> usize {
-        Self::BOX_SIZE_BYTES * box_index
+    pub const fn box_bytes_start(box_index: BoxIndex) -> usize {
+        Self::BOX_SIZE_BYTES * box_index.get() as usize
     }
 
-    pub fn pokemon_bytes_start(box_index: BoxIndex, box_slot: BoxSlot) -> usize {
+    pub const fn pokemon_bytes_start(box_index: BoxIndex, box_slot: BoxSlot) -> usize {
         let box_start = Self::box_bytes_start(box_index);
-        box_start + Pk8::BOX_SIZE * box_slot
+        box_start + Pk8::BOX_SIZE * box_slot.get() as usize
     }
 
     pub fn mon_bytes_at(&self, box_index: BoxIndex, box_slot: BoxSlot) -> &[u8] {
@@ -271,7 +271,7 @@ pub(super) struct BoxLayout(swish_crypto::ArrayBlock);
 
 impl BoxLayout {
     pub fn get_box_name(&self, box_index: BoxIndex) -> BoxName {
-        let start = BOX_NAME_LENGTH * box_index;
+        let start = BOX_NAME_LENGTH * box_index.get() as usize;
         let end = start + BOX_NAME_LENGTH;
         let name_bytes: [u8; BOX_NAME_LENGTH] = self.0.bytes()[start..end]
             .try_into()

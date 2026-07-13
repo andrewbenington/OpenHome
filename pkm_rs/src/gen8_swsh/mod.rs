@@ -1,9 +1,7 @@
-use std::fmt::Display;
-
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_types::strings::SizedUtf16String;
 
-use crate::result::{Error, Result};
+use crate::result::Error;
 pub use pk8::*;
 use pk8_buffer::Pk8Buffer;
 use pkm_rs_resources;
@@ -83,80 +81,6 @@ impl TryFrom<SpeciesAndForm> for Pk8SpeciesAndForm {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-struct BoxIndex(u8);
+type BoxIndex = pkm_rs_types::BoundedU8<{ BOX_SLOTS }>;
 
-impl BoxIndex {
-    pub const fn new(raw: u8) -> Result<Self> {
-        match raw {
-            ..=MAX_BOX_COUNT => Ok(Self(raw)),
-            _ => Err(Error::BoxIndex(raw)),
-        }
-    }
-
-    #[cfg(test)]
-    pub fn all() -> impl IntoIterator<Item = Self> {
-        (0..MAX_BOX_COUNT).map(Self)
-    }
-}
-
-impl std::ops::Mul<BoxIndex> for usize {
-    type Output = usize;
-
-    fn mul(self, rhs: BoxIndex) -> Self::Output {
-        rhs.0 as usize * self
-    }
-}
-
-impl TryFrom<u8> for BoxIndex {
-    type Error = Error;
-
-    fn try_from(value: u8) -> std::result::Result<Self, Self::Error> {
-        Self::new(value)
-    }
-}
-
-impl Display for BoxIndex {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-struct BoxSlot(u8);
-
-impl BoxSlot {
-    pub const fn new(raw: u8) -> Result<Self> {
-        match raw {
-            ..=BOX_SLOTS => Ok(Self(raw)),
-            _ => Err(Error::BoxIndex(raw)),
-        }
-    }
-
-    #[cfg(test)]
-    pub fn all() -> impl IntoIterator<Item = Self> {
-        (0..BOX_SLOTS).map(Self)
-    }
-}
-
-impl std::ops::Mul<BoxSlot> for usize {
-    type Output = usize;
-
-    fn mul(self, rhs: BoxSlot) -> Self::Output {
-        rhs.0 as usize * self
-    }
-}
-
-impl TryFrom<u8> for BoxSlot {
-    type Error = Error;
-
-    fn try_from(value: u8) -> std::result::Result<Self, Self::Error> {
-        Self::new(value)
-    }
-}
-
-impl Display for BoxSlot {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
+type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS }>;

@@ -1,10 +1,12 @@
 use super::save_blocks::{BoxBlock, MyStatusBlock, SwShBlocks};
-use super::{BOX_COLS, BOX_ROWS, BOX_SLOTS, BoxName, MAX_BOX_COUNT, Pk8, Pk8Buffer};
+use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk8, Pk8Buffer};
 use crate::encryption::swish_crypto;
 use crate::gen8_swsh::{BoxIndex, BoxSlot};
 use crate::result::{Error, Result};
-use crate::traits::{PkmBytes, SaveData};
+use crate::traits::PkmBytes;
 
+#[cfg(feature = "wasm")]
+use pkm_rs_types::BoundViolated;
 use pkm_rs_types::OriginGame;
 
 use pkm_rs_types::{BinaryGender, Language};
@@ -124,83 +126,17 @@ impl SwordShieldSave {
     pub fn prepare_bytes_for_saving(&self) -> Vec<u8> {
         swish_crypto::encrypt_blocks(&self.blocks.clone().into_vec(), self.bytes.len())
     }
-}
-
-impl SaveData for SwordShieldSave {
-    type PkmType = Pk8;
-
-    fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        Self::from_bytes(bytes.to_owned().into_boxed_slice())
-    }
-
-    fn get_decrypted_mon_bytes(&self, _box_index: usize, _offset: usize) -> Vec<u8> {
-        todo!()
-    }
-
-    fn get_mon_at(&self, box_index: usize, box_slot: usize) -> Option<Pk8> {
-        let mon_bytes = self.box_data().mon_bytes_at(
-            BoxIndex::new(box_index as u8).ok()?,
-            BoxSlot::new(box_slot as u8).ok()?,
-        );
-        Pk8::from_bytes(mon_bytes).ok()
-    }
-
-    fn set_mon_at(&mut self, box_index: usize, box_slot: usize, mon: Option<Pk8>) {
-        let Ok(box_index) = BoxIndex::new(box_index as u8) else {
-            return;
-        };
-        let Ok(box_slot) = BoxSlot::new(box_slot as u8) else {
-            return;
-        };
-        match mon {
-            Some(mut mon) => {
-                mon.refresh_checksum();
-                self.box_data_mut()
-                    .mon_bytes_at_mut(box_index, box_slot)
-                    .copy_from_slice(&mon.to_box_bytes_encrypted())
-            }
-            None => todo!(),
-        };
-    }
 
     fn convert_ohpkm(
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
         strategy: crate::convert_strategy::ConvertStrategy,
-    ) -> Self::PkmType {
+    ) -> Pk8 {
         use crate::ohpkm::OhpkmConvert;
         Pk8::from_ohpkm(&ohpkm, strategy)
     }
 
-    fn box_rows() -> usize {
-        BOX_ROWS as usize
-    }
-
-    fn box_cols() -> usize {
-        BOX_COLS as usize
-    }
-
-    fn box_slots() -> usize {
-        BOX_SLOTS as usize
-    }
-
-    fn box_count() -> usize {
-        MAX_BOX_COUNT as usize
-    }
-
-    fn max_box_count() -> usize {
-        MAX_BOX_COUNT as usize
-    }
-
-    fn current_pc_box_idx(&self) -> usize {
-        if self.bytes[0] >= MAX_BOX_COUNT {
-            0
-        } else {
-            self.bytes[0].into()
-        }
-    }
-
-    fn is_save(bytes: &[u8]) -> bool {
+    const fn is_save(bytes: &[u8]) -> bool {
         bytes.len() >= SAVE_SIZE_BYTES_MIN && bytes.len() <= SAVE_SIZE_BYTES_MAX
     }
 
@@ -210,6 +146,14 @@ impl SaveData for SwordShieldSave {
 
     fn game_of_origin(&self) -> Option<OriginGame> {
         self.my_status().origin_game()
+    }
+
+    fn current_pc_box_idx(&self) -> usize {
+        if self.bytes[0] >= MAX_BOX_COUNT {
+            0
+        } else {
+            self.bytes[0].into()
+        }
     }
 
     fn includes_origin(origin: OriginGame) -> bool {
@@ -236,10 +180,10 @@ impl SwordShieldSave {
     }
 
     #[wasm_bindgen(js_name = getBoxName)]
-    pub fn box_name_wasm(&mut self, box_index: u8) -> Option<String> {
-        match BoxIndex::new(box_index) {
-            Ok(index) => Some(self.box_name(index).to_string()),
-            Err(_) => None,
+    pub fn box_name_wasm(&mut self, box_index: u8) -> std::result::Result<String, JsError> {
+        match BoxIndex::check_bound(box_index) {
+            Ok(index) => Ok(self.box_name(index).to_string()),
+            Err(BoundViolated) => Err(BoundViolated.into()),
         }
     }
 
@@ -313,8 +257,8 @@ impl SwordShieldSave {
     }
 
     #[wasm_bindgen(getter = currentPcBoxIdx)]
-    pub fn current_pc_box_idx(&self) -> usize {
-        SaveData::current_pc_box_idx(self)
+    pub fn current_pc_box_idx_wasm(&self) -> usize {
+        self.current_pc_box_idx()
     }
 
     #[wasm_bindgen(getter = gameOfOrigin)]
