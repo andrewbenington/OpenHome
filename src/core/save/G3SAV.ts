@@ -9,10 +9,10 @@ import {
   uint32ToBytesLittleEndian,
 } from '@openhome-core/util/byteLogic'
 import {
+  BinaryGender,
   ConvertStrategy,
   ExtraFormIndex,
   Gen3Strings,
-  Gender,
   ItemGen3,
   Language,
   OriginGame,
@@ -103,7 +103,7 @@ export class G3SaveBackup {
 
   sid: number = 0
 
-  trainerGender: Gender
+  trainerGender: BinaryGender
 
   sectors: G3Sector[]
 
@@ -190,7 +190,7 @@ export class G3SaveBackup {
 
     this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
-    this.trainerGender = this.sectors[0].data[0x08] ? Gender.Female : Gender.Male
+    this.trainerGender = this.sectors[0].data[0x08] ? BinaryGender.Female : BinaryGender.Male
   }
 
   // Per PKHeX:

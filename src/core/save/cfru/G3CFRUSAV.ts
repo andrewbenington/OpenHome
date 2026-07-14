@@ -6,7 +6,7 @@ import {
   uint32ToBytesLittleEndian,
 } from '@openhome-core/util/byteLogic'
 import { Option } from '@openhome-core/util/functional'
-import { Gen3Strings, Gender, Language, OriginGame } from '@pkm-rs/pkg'
+import { BinaryGender, Gen3Strings, Language, OriginGame } from '@pkm-rs/pkg'
 import { Box, BoxAndSlot, PluginIdentifier, PluginSAV } from '../interfaces'
 import { LookupType } from '../util'
 import { PathData } from '../util/path'
@@ -66,7 +66,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
   name: string = ''
   tid: number = 0
   sid: number = 0
-  trainerGender: Gender
+  trainerGender: BinaryGender
   sectors: G3CFRUSector[]
   pcDataContiguous: Uint8Array
   currentPCBox: number
@@ -89,7 +89,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
     this.name = Gen3Strings.decode7Bytes(this.sectors[0].data.slice(0, 7), 'Int')
     this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
-    this.trainerGender = this.sectors[0].data[0x08] ? Gender.Female : Gender.Male
+    this.trainerGender = this.sectors[0].data[0x08] ? BinaryGender.Female : BinaryGender.Male
 
     const nBytes: number = boxCount * 58 * 30
     const nMons: number = boxCount * 30
@@ -171,7 +171,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
   tid: number
   sid: number
   displayID: string
-  trainerGender: Gender
+  trainerGender: BinaryGender
   language = Language.None
 
   currentPCBox: number

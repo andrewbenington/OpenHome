@@ -47,7 +47,7 @@ import DynamaxLevel from '@openhome-ui/components/pokemon/DynamaxLevel'
 import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
-import { genderFromBool, Generation, Language, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
+import { Generation, Language, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
 
@@ -107,7 +107,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           value={
             <Flex gap="1">
               {mon.trainerName}
-              <GenderIcon gender={genderFromBool(mon.trainerGender)} />
+              <GenderIcon gender={mon.trainerGender} />
             </Flex>
           }
         >
@@ -132,7 +132,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           value={
             <Flex gap="1">
               {mon.handlerName ?? '(empty)'}
-              <GenderIcon gender={genderFromBool(mon.handlerGender ?? false)} />
+              <GenderIcon gender={mon.handlerGender} />
             </Flex>
           }
         >

@@ -85,28 +85,6 @@ impl Gender {
     }
 }
 
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderToBool))]
-pub fn gender_to_bool(value: Gender) -> bool {
-    value == Gender::Female
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderFromBool))]
-pub fn gender_from_bool(value: bool) -> Gender {
-    Gender::from(value)
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderToInt))]
-#[allow(clippy::missing_const_for_fn)]
-pub fn gender_to_int(value: Gender) -> u8 {
-    value.to_byte()
-}
-
-#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = genderFromInt))]
-#[allow(clippy::missing_const_for_fn)]
-pub fn gender_from_int(value: u8) -> Gender {
-    Gender::from_bits_1_2(value)
-}
-
 impl From<bool> for Gender {
     fn from(value: bool) -> Self {
         match value {
@@ -138,6 +116,15 @@ pub enum BinaryGender {
     Female,
 }
 
+impl BinaryGender {
+    pub const fn to_byte(&self) -> u8 {
+        match self {
+            BinaryGender::Male => 0,
+            BinaryGender::Female => 1,
+        }
+    }
+}
+
 impl From<bool> for BinaryGender {
     fn from(value: bool) -> Self {
         match value {
@@ -150,6 +137,15 @@ impl From<bool> for BinaryGender {
 impl From<BinaryGender> for bool {
     fn from(value: BinaryGender) -> Self {
         value == BinaryGender::Female
+    }
+}
+
+impl From<BinaryGender> for Gender {
+    fn from(value: BinaryGender) -> Self {
+        match value {
+            BinaryGender::Male => Gender::Male,
+            BinaryGender::Female => Gender::Female,
+        }
     }
 }
 
@@ -475,7 +471,7 @@ pub struct TrainerData {
     pub friendship: u8,
     pub memory: TrainerMemory,
     pub affection: u8,
-    pub gender: Gender,
+    pub gender: BinaryGender,
     pub language: Language,
     pub origin_game: Option<OriginGame>,
 }
@@ -498,7 +494,7 @@ impl TrainerData {
         friendship: u8,
         memory: Option<TrainerMemory>,
         affection: u8,
-        gender: Gender,
+        gender: BinaryGender,
         language: Language,
         origin_game: Option<OriginGame>,
     ) -> Self {

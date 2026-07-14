@@ -7,6 +7,7 @@ import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityNumber,
   Ball,
+  BinaryGender,
   ContestStats,
   ConvertStrategy,
   Gen3Ribbon,
@@ -45,7 +46,7 @@ export default class COLOPKM {
   metLocationIndex: number
   metLevel: number
   ball: number
-  trainerGender: boolean
+  trainerGender: BinaryGender
   trainerID: number
   secretID: number
   trainerName: string
@@ -78,7 +79,7 @@ export default class COLOPKM {
       this.metLocationIndex = dataView.getUint16(0xc, false)
       this.metLevel = dataView.getUint8(0xe)
       this.ball = dataView.getUint8(0xf)
-      this.trainerGender = byteLogic.getFlag(dataView, 0x10, 1)
+      this.trainerGender = byteLogic.getGenderFlag(dataView, 0x10, 1)
       this.trainerID = dataView.getUint16(0x14, false)
       this.secretID = dataView.getUint16(0x16, false)
       this.trainerName = stringLogic.utf16BytesToString(buffer, 0x18, 11)
@@ -181,7 +182,7 @@ export default class COLOPKM {
     dataView.setUint16(0xc, this.metLocationIndex, false)
     dataView.setUint8(0xe, this.metLevel)
     dataView.setUint8(0xf, this.ball)
-    byteLogic.setFlag(dataView, 0x10, 1, this.trainerGender)
+    byteLogic.setGenderFlag(dataView, 0x10, 1, this.trainerGender)
     dataView.setUint16(0x14, this.trainerID, false)
     dataView.setUint16(0x16, this.secretID, false)
     stringLogic.writeUTF16StringToBytes(dataView, this.trainerName, 0x18, 11)

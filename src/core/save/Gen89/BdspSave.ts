@@ -4,7 +4,7 @@ import { BDSP_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/Tran
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Errorable, Option } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
-import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
+import { BinaryGender, ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { md5Digest } from '../encryption/Encryption'
 import { Box, BoxAndSlot, OfficialSAV } from '../interfaces'
@@ -234,7 +234,7 @@ export class BdspSave extends OfficialSAV<PB8> {
   }
 
   get trainerGender() {
-    return this.myStatusBlock.getGender() ? Gender.Female : Gender.Male
+    return this.myStatusBlock.getGender() ? BinaryGender.Female : BinaryGender.Male
   }
 
   getMonAt(boxNum: number, boxSlot: number) {

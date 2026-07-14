@@ -3,9 +3,9 @@ import { PluginIdentifier as RustPluginIdentifier } from '@openhome-core/tauri/s
 import { Errorable, Option, range } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import {
+  BinaryGender,
   ConvertStrategy,
   ExtraFormIndex,
-  Gender,
   Language,
   OriginGame,
   OriginGames,
@@ -92,7 +92,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract name: string
   abstract tid: number
   abstract sid?: number | undefined
-  abstract trainerGender: Gender
+  abstract trainerGender: BinaryGender
   abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number
@@ -199,7 +199,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract name: string
   abstract tid: number
   abstract sid?: number | undefined
-  abstract trainerGender: Gender
+  abstract trainerGender: BinaryGender
   abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number

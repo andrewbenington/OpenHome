@@ -1,9 +1,9 @@
 import { displayGender } from '@openhome-core/util/types'
-import { Gender } from '@pkm-rs/pkg'
+import { BinaryGender, Gender } from '@pkm-rs/pkg'
 import './style.css'
 
 interface GenderIconProps {
-  gender?: Gender
+  gender?: Gender | BinaryGender
   size?: number
 }
 
@@ -26,11 +26,13 @@ export default function GenderIcon({ gender, size }: GenderIconProps) {
   )
 }
 
-function genderSymbol(gender: Gender): string {
+function genderSymbol(gender: Gender | BinaryGender): string {
   switch (gender) {
     case Gender.Male:
+    case BinaryGender.Male:
       return '♂'
     case Gender.Female:
+    case BinaryGender.Female:
       return '♀'
     default:
       return ''

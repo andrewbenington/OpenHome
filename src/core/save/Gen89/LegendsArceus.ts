@@ -4,11 +4,11 @@ import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Errorable } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
+  BinaryGender,
   Block,
   BlockType,
   ConvertStrategy,
   ExtraFormIndex,
-  Gender,
   Languages,
   OriginGame,
 } from '@pkm-rs/pkg'
@@ -152,7 +152,7 @@ export class LegendsArceusSave extends Gen8Gen9Save<PA8> {
   }
 
   get trainerGender() {
-    return this.myStatusBlock.getGender() ? Gender.Female : Gender.Male
+    return this.myStatusBlock.getGender() ? BinaryGender.Female : BinaryGender.Male
   }
 }
 

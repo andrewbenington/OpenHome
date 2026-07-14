@@ -7,6 +7,7 @@ import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityNumber,
   Ball,
+  BinaryGender,
   ContestStats,
   ConvertStrategy,
   Gen3Ribbon,
@@ -45,7 +46,7 @@ export default class XDPKM {
   metLocationIndex: number
   metLevel: number
   ball: number
-  trainerGender: boolean
+  trainerGender: BinaryGender
   statLevel: number
   pokerusByte: number
   markings: MarkingsFourShapes
@@ -79,7 +80,7 @@ export default class XDPKM {
       this.metLocationIndex = dataView.getUint16(0x8, false)
       this.metLevel = dataView.getUint8(0xe)
       this.ball = dataView.getUint8(0xf)
-      this.trainerGender = byteLogic.getFlag(dataView, 0x10, 1)
+      this.trainerGender = byteLogic.getGenderFlag(dataView, 0x10, 1)
       this.statLevel = dataView.getUint8(0x11)
       this.pokerusByte = dataView.getUint8(0x13)
       this.markings = types.markingsFourShapesFromBytes(dataView, 0x14)
@@ -184,7 +185,7 @@ export default class XDPKM {
     dataView.setUint16(0x8, this.metLocationIndex, false)
     dataView.setUint8(0xe, this.metLevel)
     dataView.setUint8(0xf, this.ball)
-    byteLogic.setFlag(dataView, 0x10, 1, this.trainerGender)
+    byteLogic.setGenderFlag(dataView, 0x10, 1, this.trainerGender)
     dataView.setUint8(0x11, this.statLevel)
     dataView.setUint8(0x13, this.pokerusByte)
     types.markingsFourShapesToBytes(dataView, 0x14, this.markings)

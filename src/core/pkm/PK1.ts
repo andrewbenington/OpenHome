@@ -3,6 +3,7 @@ import * as byteLogic from '@openhome-core/util/byteLogic'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
+  BinaryGender,
   ConvertStrategy,
   Generation,
   ItemGen1,
@@ -213,7 +214,7 @@ export default class PK1 {
   }
 
   public get trainerGender() {
-    return false
+    return BinaryGender.Male
   }
 
   public get secretID() {

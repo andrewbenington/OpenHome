@@ -18,7 +18,6 @@ import {
   AbilityNumber,
   Ball,
   extraFormDisplayName,
-  genderFromBool,
   Languages,
   MetadataSummaryLookup,
   OriginGames,
@@ -201,7 +200,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
         <AttributeRow label="OT">
           <Flex gap="1">
             {mon.trainerName}
-            <GenderIcon gender={genderFromBool(mon.trainerGender)} />
+            <GenderIcon gender={mon.trainerGender} />
           </Flex>
         </AttributeRow>
         <AttributeRow label="Trainer ID" value={getDisplayID(mon as PKM)} />

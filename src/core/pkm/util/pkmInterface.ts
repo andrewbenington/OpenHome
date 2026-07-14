@@ -3,6 +3,7 @@ import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { MonTag } from '@openhome-ui/util/tags'
 import {
   AbilityIndex,
+  BinaryGender,
   ContestStats,
   ExtraFormIndex,
   FormMetadata,
@@ -67,7 +68,7 @@ export interface AllPKMFields {
   gvs?: types.Stats
   handlerAffection?: number
   handlerFriendship?: number
-  handlerGender?: boolean
+  handlerGender?: BinaryGender
   handlerID?: number
   handlerLanguage?: number
   handlerMemory?: TrainerMemory
@@ -149,7 +150,7 @@ export interface AllPKMFields {
   trFlagsSwSh?: Uint8Array
   trainerAffection?: number
   trainerFriendship?: number
-  trainerGender: boolean
+  trainerGender: BinaryGender
   trainerID: number
   trainerMemory?: TrainerMemory
   trainerName: string
