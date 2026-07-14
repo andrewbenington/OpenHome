@@ -294,6 +294,8 @@ mod tests {
     use std::path::Path;
 
     use super::*;
+    use crate::convert_strategy::ConvertStrategy;
+    use crate::ohpkm::{OhpkmConvert, OhpkmV2};
     use crate::tests;
 
     #[test]
@@ -354,6 +356,33 @@ mod tests {
                 }
             }
         }
+        Ok(())
+    }
+
+    #[test]
+    fn pokemon_is_same_before_after_setting_in_box() -> Result<()> {
+        let save_bytes = tests::save_bytes_from_file(&Path::new("gen8-swsh").join("sword"))?;
+        let mut save = SwordShieldSave::from_bytes(save_bytes.into_boxed_slice())?;
+
+        let ohpkm =
+            tests::pkm_from_file::<OhpkmV2>(&Path::new("ohpkm").join("cinderace-mint.ohpkm"))?;
+
+        let pk8 = Pk8::from_ohpkm(&ohpkm.0, ConvertStrategy::default());
+
+        let box_index = BoxIndex::check_bound(0).expect("should be valid");
+        let box_slot = BoxSlot::check_bound(9).expect("should be valid");
+
+        save.set_mon_at(box_index, box_slot, Some(pk8));
+        let retrieved_pk8 = save
+            .get_mon_at(box_index, box_slot)
+            .expect("ribbon master is present");
+
+        if retrieved_pk8.calculate_checksum() != pk8.calculate_checksum() {
+            return Err(Error::other(
+                "pokemon changed between setting and retrieving",
+            ));
+        }
+
         Ok(())
     }
 }

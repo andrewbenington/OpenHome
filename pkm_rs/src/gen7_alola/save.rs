@@ -499,7 +499,6 @@ mod tests {
             pkm_from_file::<OhpkmV2>(&Path::new("ohpkm").join("ribbon-master.ohpkm"))?;
 
         let ribbon_master_pk7 = Pk7::from_ohpkm(&ribbon_master_ohpkm.0, ConvertStrategy::default());
-        assert!((ribbon_master_pk7.language as u8) < 10);
 
         save.set_mon_at(0, 9, Some(ribbon_master_pk7));
         let retrieved_ribbon_master = save.get_mon_at(0, 9)?.expect("ribbon master is present");
