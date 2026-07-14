@@ -6,12 +6,12 @@ import {
   SV_TRANSFER_RESTRICTIONS_TM,
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import {
-  SCArrayBlock,
-  SCBlock,
-  SCObjectBlock,
-  SCValueBlock,
-} from '@openhome-core/save/encryption/SwishCrypto/SCBlock'
-import { SwishCrypto } from '@openhome-core/save/encryption/SwishCrypto/SwishCrypto'
+  ArrayBlock,
+  blockIsType,
+  ObjectBlock,
+  SwishCrypto,
+  ValueBlock,
+} from '@openhome-core/save/encryption/SwishCrypto/SwishCrypto'
 import { BoxNamesBlock } from '@openhome-core/save/Gen89/BoxNamesBlock'
 import { G89BlockName } from '@openhome-core/save/Gen89/Gen8Gen9Save'
 import { Box, BoxAndSlot, PluginSAV, SlotMetadata } from '@openhome-core/save/interfaces'
@@ -19,7 +19,15 @@ import { emptyPathData, PathData } from '@openhome-core/save/util/path'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Option } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
-import { ConvertStrategy, ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
+import {
+  Block,
+  BlockType,
+  ConvertStrategy,
+  ExtraFormIndex,
+  Gender,
+  Languages,
+  OriginGame,
+} from '@pkm-rs/pkg'
 import PK9Compass from './PK9Compass'
 
 const SAVE_SIZE_BYTES_MIN = 0x31626f
@@ -48,7 +56,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
   filePath: PathData
   fileCreated?: Date
 
-  scBlocks: SCBlock[]
+  scBlocks: Block[]
 
   money: number = 0
   name: string = ''
@@ -73,13 +81,15 @@ export class CompassSave extends PluginSAV<PK9Compass> {
     this.filePath = path
     this.scBlocks = SwishCrypto.decrypt(bytes)
 
-    const currentPCBlock = this.getBlockMust<SCValueBlock>('CurrentBox', 'value')
+    const currentPCBlock = this.getBlockMust<ValueBlock>('CurrentBox', {
+      Scalar: { Numeric: 'UInt8' },
+    })
 
-    this.currentPCBox = new DataView(currentPCBlock.raw).getUint8(0)
+    this.currentPCBox = new DataView(currentPCBlock.data.Value.bytes.buffer).getUint8(0)
 
-    const boxNamesBlock = new BoxNamesBlock(this.getBlockMust<SCArrayBlock>('BoxLayout', 'array'))
+    const boxNamesBlock = new BoxNamesBlock(this.getBlockMust<ArrayBlock>('BoxLayout', 'Array'))
 
-    const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
+    const boxBlock = this.getBlockMust<ObjectBlock>('Box', 'Object')
 
     this.boxes = Array(this.getBoxCount())
     for (let box = 0; box < this.getBoxCount(); box++) {
@@ -95,7 +105,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
             this.getBoxSizeBytes() * box +
             (this.getMonBoxSizeBytes() + this.getBoxSlotGapBytes()) * monIndex
           const endByte = startByte + this.getMonBoxSizeBytes()
-          const monData = boxBlock.raw.slice(startByte, endByte)
+          const monData = boxBlock.data.Object.bytes.buffer.slice(startByte, endByte)
 
           if (!this.isEmptySlot(monData)) {
             this.boxes[box].boxSlots[monIndex] = this.monConstructor(monData, true)
@@ -105,7 +115,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
         }
       }
     }
-    this.trainerBlock = new MyStatus(this.getBlockMust('MyStatus', 'object'))
+    this.trainerBlock = new MyStatus(this.getBlockMust('MyStatus', 'Object'))
     this.name = this.trainerBlock.getName()
 
     this.boxes.forEach((box, i) => {
@@ -136,23 +146,25 @@ export class CompassSave extends PluginSAV<PK9Compass> {
     return BlockKeys[blockName]
   }
 
-  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): SCBlock | undefined {
+  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): Block | undefined {
     const key = this.getBlockKey(blockName)
 
     return this.scBlocks.find((b) => b.key === key)
   }
 
-  getBlockMust<T extends SCBlock = SCBlock>(
+  getBlockMust<T extends Block = Block>(
     blockName: G89BlockName | keyof typeof BlockKeys,
-    type?: T['blockType']
+    type?: BlockType
   ): T {
     const block = this.getBlock(blockName)
 
     if (!block) {
       throw Error(`Missing block ${blockName}`)
     }
-    if (type && block.blockType !== type) {
-      throw Error(`Block ${blockName} is type ${block.blockType} (expected ${type})`)
+    if (type && !blockIsType(block, type)) {
+      throw Error(
+        `Block ${blockName} has data ${JSON.stringify(block.data)} (expected ${JSON.stringify(type)})`
+      )
     }
     return block as T
   }
@@ -229,7 +241,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
   }
 
   prepareForSaving() {
-    const boxBlock = this.getBlockMust<SCObjectBlock>('Box', 'object')
+    const boxBlock = this.getBlockMust<ObjectBlock>('Box', 'Object')
 
     this.updatedBoxSlots.forEach(({ box, boxSlot }) => {
       const mon = this.getMonAt(box, boxSlot)
@@ -237,7 +249,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
       const writeIndex =
         this.getBoxSizeBytes() * box +
         (this.getMonBoxSizeBytes() + this.getBoxSlotGapBytes()) * boxSlot
-      const blockBuffer = new Uint8Array(boxBlock.raw)
+      const blockBuffer = new Uint8Array(boxBlock.data.Object.bytes.buffer)
 
       // mon will be undefined if pokemon was moved from this slot
       // and the slot was left empty
@@ -335,8 +347,8 @@ const BlockKeys = {
 class MyStatus {
   dataView: DataView<ArrayBuffer>
 
-  constructor(scBlock: SCObjectBlock) {
-    this.dataView = new DataView(scBlock.raw)
+  constructor(scBlock: ObjectBlock) {
+    this.dataView = new DataView(scBlock.data.Object.bytes.buffer)
   }
 
   public getName(): string {

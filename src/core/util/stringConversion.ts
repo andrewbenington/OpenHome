@@ -362,7 +362,7 @@ export const utf16BytesToString = (
  * Convert string to UTF-16 encoded bytes
  * @param str the string to encode
  * @param length character length of string
- * @returns ArrayBuffer of UTF-16 bytes
+ * @returns ArrayBufferLike of UTF-16 bytes
  */
 export const writeUTF16StringToBytes = (
   dataView: DataView,

@@ -1,11 +1,11 @@
 import { PA8, PK4, PK8 } from '@openhome-core/pkm'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { xorChecksum32BitLe } from '@openhome-core/util'
 import { Ball, ConvertStrategies, OriginGame } from '@pkm-rs/pkg'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { beforeAll, describe, expect, test } from 'vitest'
 import { PKMInterface } from '../../pkm/interfaces'
-import { SCBoolBlock, SCObjectBlock, writeSCBlock } from '../encryption/SwishCrypto/SCBlock'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { LegendsArceusSave } from '../Gen89/LegendsArceus'
 import { SwordShieldSave } from '../Gen89/SwordShieldSave'
@@ -39,23 +39,24 @@ const arceusPath = {
 }
 
 describe('gen 8 save files', () => {
-  let saveBytes: Uint8Array
+  let swordSaveBytes: Uint8Array
   let swordSave: SwordShieldSave
+  let arceusSaveBytes: Uint8Array
   let arceusSave: LegendsArceusSave
   let magmortar: PK4
 
   beforeAll(() => {
     let savePath = saveTestFilePath('sword')
 
-    saveBytes = new Uint8Array(readFileSync(savePath))
+    swordSaveBytes = new Uint8Array(readFileSync(savePath))
 
-    swordSave = new SwordShieldSave(swordPath, saveBytes)
+    swordSave = new SwordShieldSave(swordPath, swordSaveBytes)
 
     savePath = saveTestFilePath('legendsarceus')
 
-    saveBytes = new Uint8Array(readFileSync(savePath))
+    arceusSaveBytes = new Uint8Array(readFileSync(savePath))
 
-    arceusSave = new LegendsArceusSave(arceusPath, saveBytes)
+    arceusSave = new LegendsArceusSave(arceusPath, arceusSaveBytes)
 
     const monPath = pkmTestFilePath('pk4', 'magmortar.pkm')
     const monBytes = new Uint8Array(readFileSync(monPath))
@@ -64,25 +65,25 @@ describe('gen 8 save files', () => {
   })
 
   test('sword/shield hash matches', () => {
-    const storedHash = saveBytes.slice(-SwishCrypto.SIZE_HASH)
-    const dataBeforeHash = saveBytes.slice(0, -SwishCrypto.SIZE_HASH)
+    const storedHash = swordSaveBytes.slice(-SwishCrypto.SIZE_HASH)
+    const dataBeforeHash = swordSaveBytes.slice(0, -SwishCrypto.SIZE_HASH)
     const computedHash = SwishCrypto.computeHash(dataBeforeHash)
 
     expect(toHexString(storedHash)).toEqual(toHexString(computedHash))
   })
 
   test('SwishCrypto hash matches', () => {
-    const valid = SwishCrypto.getIsHashValid(saveBytes)
+    const valid = SwishCrypto.getIsHashValid(swordSaveBytes)
 
-    expect(valid)
+    expect(valid).toBe(true)
   })
 
   test('sword data is correct', () => {
     expect(swordSave.origin).toBe(OriginGame.Sword)
     expect(swordSave.currentPCBox).toBe(15)
-    expect(swordSave.boxes[17].name).toBe('huevos sorpresa')
+    expect(swordSave.getBoxName(17)).toBe('huevos sorpresa')
 
-    const flapple = swordSave.boxes[1].boxSlots[3]
+    const flapple = swordSave.getMonAt(1, 3)
 
     expect(flapple?.nickname).toBe('Flapple')
     expect(flapple?.canGigantamax).toBe(true)
@@ -95,41 +96,6 @@ describe('gen 8 save files', () => {
     expect(arceusSave.currentPCBox).toBe(13)
   })
 
-  test('write sc block', () => {
-    const block: SCObjectBlock = {
-      blockType: 'object',
-      raw: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]).buffer,
-      key: 0xdeadbeef,
-      type: 0x57,
-    }
-
-    const buffer = new Uint8Array(60)
-
-    let offset = 0
-
-    offset = writeSCBlock(block, buffer, offset)
-    expect(offset).toBe(17)
-
-    const block2: SCObjectBlock = {
-      blockType: 'object',
-      raw: new Uint8Array([5, 7, 5]).buffer,
-      key: 0xefe00efe,
-      type: 0x69,
-    }
-
-    offset = writeSCBlock(block2, buffer, offset)
-    expect(offset).toBe(29)
-
-    const block3: SCBoolBlock = {
-      blockType: 'bool',
-      key: 0xefe00efe,
-      type: 1,
-    }
-
-    offset = writeSCBlock(block3, buffer, offset)
-    expect(offset).toBe(34)
-  })
-
   test('reencrypt sword/shield', () => {
     const reencrypted = SwishCrypto.encrypt(swordSave.scBlocks, swordSave.bytes.length)
 
@@ -138,14 +104,14 @@ describe('gen 8 save files', () => {
 
     expect(decrypted.name).toBe(swordSave.name)
 
-    const flapple = decrypted.boxes[1].boxSlots[3]
+    const flapple = decrypted.getMonAt(1, 3)
 
     expect(flapple?.nickname).toBe('Flapple')
     expect(flapple?.canGigantamax).toBe(true)
     expect(flapple?.ball).toBe(Ball.Premier)
     expect(flapple?.getLevel()).toBe(100)
 
-    const mon = swordSave.boxes[1].boxSlots[3]
+    const mon = swordSave.getMonAt(1, 3)
 
     if (!mon) {
       throw new Error('Expected mon not found')
@@ -154,19 +120,19 @@ describe('gen 8 save files', () => {
     const ohpkm = OHPKM.fromMonInSave(mon, swordSave)
 
     ohpkm.nickname = 'NEW NAME'
-    swordSave.boxes[1].boxSlots[3] = convertToPk8(ohpkm)
+    swordSave.setMonAt(1, 3, convertToPk8(ohpkm))
     swordSave.updatedBoxSlots.push({ box: 1, boxSlot: 3 })
+    expect(swordSave.getMonAt(1, 3)?.nickname).toBe('NEW NAME')
 
     swordSave.prepareForSaving()
     const modified = new SwordShieldSave(swordPath, swordSave.bytes)
-    const modifiedFlapple = modified.boxes[1].boxSlots[3]
+    const modifiedFlapple = modified.getMonAt(1, 3)
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
   })
 
   test('sword save boxes', () => {
-    const mon = swordSave.boxes[1].boxSlots[3]
-
+    const mon = swordSave.getMonAt(1, 3)
     if (!mon) {
       throw new Error('Expected mon not found')
     }
@@ -174,19 +140,25 @@ describe('gen 8 save files', () => {
     const ohpkm = OHPKM.fromMonInSave(mon, swordSave)
 
     ohpkm.nickname = 'NEW NAME'
-    swordSave.boxes[1].boxSlots[3] = convertToPk8(ohpkm)
+    swordSave.setMonAt(1, 3, convertToPk8(ohpkm))
     swordSave.updatedBoxSlots.push({ box: 1, boxSlot: 3 })
 
     swordSave.prepareForSaving()
     const modified = new SwordShieldSave(swordPath, swordSave.bytes)
-    const modifiedFlapple = modified.boxes[1].boxSlots[3]
+    const modifiedFlapple = modified.getMonAt(1, 3)
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
     expect(SwishCrypto.getIsHashValid(swordSave.bytes)).toBe(true)
   })
 
+  test('legends arceus writes back to identical bytes', () => {
+    expect(xorChecksum32BitLe(arceusSave.prepareWriter().bytes)).toBe(
+      xorChecksum32BitLe(arceusSaveBytes)
+    )
+  })
+
   test('legends arceus save boxes', () => {
-    const mon = arceusSave.boxes[13].boxSlots[1]
+    const mon = arceusSave.getMonAt(13, 1)
 
     if (!mon) {
       throw new Error('Expected mon not found')
@@ -196,20 +168,20 @@ describe('gen 8 save files', () => {
     const ohpkm = OHPKM.fromMonInSave(mon, arceusSave)
 
     ohpkm.nickname = 'NEW NAME'
-    arceusSave.boxes[13].boxSlots[1] = convertToPa8(ohpkm)
+    arceusSave.setMonAt(13, 1, convertToPa8(ohpkm))
     arceusSave.updatedBoxSlots.push({ box: 13, boxSlot: 1 })
 
-    arceusSave.boxes[2].boxSlots[8] = convertToPa8(magmortar)
+    arceusSave.setMonAt(2, 8, convertToPa8(magmortar))
     arceusSave.updatedBoxSlots.push({ box: 2, boxSlot: 8 })
 
     arceusSave.prepareForSaving()
     const modified = new LegendsArceusSave(arceusPath, arceusSave.bytes)
-    const modifiedDecidueye = modified.boxes[13].boxSlots[1]
+    const modifiedDecidueye = modified.getMonAt(13, 1)
 
     expect(modifiedDecidueye?.nickname).toBe('NEW NAME')
     expect(SwishCrypto.getIsHashValid(arceusSave.bytes)).toBe(true)
 
-    const modifiedMagmortar = modified.boxes[2].boxSlots[8]
+    const modifiedMagmortar = modified.getMonAt(2, 8)
 
     expect(modifiedMagmortar?.nickname).toBe('Magmortar')
   })
@@ -223,10 +195,8 @@ function toHexString(byteArray: Uint8Array) {
     .toUpperCase()
 }
 
-function convertToPk8(mon: PKMInterface) {
-  return mon instanceof OHPKM
-    ? PK8.fromOhpkm(mon, ConvertStrategies.getDefault())
-    : PK8.fromOhpkm(OHPKM.fromMonUnknownSave(mon), ConvertStrategies.getDefault())
+function convertToPk8(mon: OHPKM) {
+  return PK8.fromOhpkm(mon, ConvertStrategies.getDefault())
 }
 
 function convertToPa8(mon: PKMInterface) {

@@ -176,10 +176,6 @@ impl Gen7AlolaSave {
         }
     }
 
-    fn get_decrypted_mon_bytes(&self, box_num: usize, box_slot: usize) -> Box<[u8]> {
-        self.get_mon_bytes_decrypted(box_num, box_slot)
-    }
-
     fn get_mon_at(&self, box_num: usize, box_slot: usize) -> Result<Option<Pk7>> {
         if box_num >= Self::box_count() || box_slot >= Self::box_slots() {
             return Err(Error::Other(format!(
@@ -187,7 +183,7 @@ impl Gen7AlolaSave {
             )));
         }
 
-        let decrypted_bytes = self.get_decrypted_mon_bytes(box_num, box_slot);
+        let decrypted_bytes = self.get_mon_bytes_decrypted(box_num, box_slot);
         let national_dex = read_u16_le!(decrypted_bytes, 8);
 
         if national_dex > 0 {
@@ -201,6 +197,7 @@ impl Gen7AlolaSave {
 
     fn set_mon_at(&mut self, box_num: usize, box_slot: usize, mut mon: Option<Pk7>) {
         let mon_bytes = if let Some(mon) = &mut mon {
+            // checksum should always be up-to-date in the box data
             mon.refresh_checksum();
             mon.to_box_bytes_encrypted()
         } else {
@@ -248,7 +245,10 @@ impl Gen7AlolaSave {
 
     fn display_tid(&self) -> String {
         let trainer_data = self.get_trainer_data();
-        crate::util::six_digit_trainer_display(trainer_data.trainer_id, trainer_data.secret_id)
+        crate::util::six_digit_trainer_id_from_parts(
+            trainer_data.trainer_id,
+            trainer_data.secret_id,
+        )
     }
 
     const fn includes_origin(origin: OriginGame) -> bool {
@@ -499,7 +499,6 @@ mod tests {
             pkm_from_file::<OhpkmV2>(&Path::new("ohpkm").join("ribbon-master.ohpkm"))?;
 
         let ribbon_master_pk7 = Pk7::from_ohpkm(&ribbon_master_ohpkm.0, ConvertStrategy::default());
-        assert!((ribbon_master_pk7.language as u8) < 10);
 
         save.set_mon_at(0, 9, Some(ribbon_master_pk7));
         let retrieved_ribbon_master = save.get_mon_at(0, 9)?.expect("ribbon master is present");

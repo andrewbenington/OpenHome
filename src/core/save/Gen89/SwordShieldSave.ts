@@ -7,8 +7,11 @@ import {
   SWSH_TRANSFER_RESTRICTIONS_IOA,
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { Option } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
+  Block,
+  BlockType,
   ConvertStrategy,
   ExtraFormIndex,
   Gender,
@@ -17,40 +20,72 @@ import {
   Lookup,
   OriginGame,
   Pk8Wasm,
+  SwordShieldSaveRust,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
-import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
-import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
+import {
+  blockIsType,
+  ObjectBlock,
+  SwishCrypto,
+  ValueBlock,
+} from '../encryption/SwishCrypto/SwishCrypto'
+import { BoxAndSlot, WasmOfficialSave } from '../interfaces'
 import { PathData } from '../util/path'
-import { G89BlockName, Gen8Gen9Save } from './Gen8Gen9Save'
+import { G89BlockName } from './Gen8Gen9Save'
 
 const SAVE_SIZE_BYTES_MIN = 0x171500
 const SAVE_SIZE_BYTES_MAX = 0x187800
 
 export type SWSH_SAVE_REVISION = 'Base Game' | 'Isle Of Armor' | 'Crown Tundra'
 
-export class SwordShieldSave extends Gen8Gen9Save<PK8> {
+export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldSaveRust> {
+  MAX_BOX_COUNT: number = SwordShieldSaveRust.MAX_BOX_COUNT
+  SLOTS_PER_BOX: number = SwordShieldSaveRust.SLOTS_PER_BOX
+
   static boxSizeBytes = PK8.getBoxSize() * 30
   static pkmType = PK8
   static saveTypeAbbreviation = 'SwSh'
   static saveTypeName = 'Pokémon Sword/Shield'
   static saveTypeID = 'SwShSAV'
 
-  myStatusBlock: MyStatusBlock
+  filePath: PathData
+  fileCreated?: Date
+
+  money: number = 0 // TODO: Gen 8 money
+
+  invalid = false
+  tooEarlyToOpen = false
+
+  updatedBoxSlots: BoxAndSlot[] = []
+
+  scBlocks: Block[]
+
   trainerCardBlock: TrainerCardBlock
-  origin: OriginGame
+  currentPCBox: number
 
   constructor(path: PathData, bytes: Uint8Array) {
-    super(path, bytes)
+    super(SwordShieldSaveRust.fromBytes(bytes))
+    this.scBlocks = SwishCrypto.decrypt(bytes)
+    this.filePath = path
 
-    this.myStatusBlock = new MyStatusBlock(this.getBlockMust('MyStatus', 'object'))
-    this.trainerCardBlock = new TrainerCardBlock(this.getBlockMust('TrainerCard', 'object'))
-    this.name = this.myStatusBlock.getName()
+    const currentPCBlock = this.getBlockMust<ValueBlock>('CurrentBox', {
+      Scalar: { Numeric: 'UInt8' },
+    })
+    this.trainerCardBlock = new TrainerCardBlock(this.getBlockMust('TrainerCard', 'Object'))
 
-    this.tid = this.myStatusBlock.getTID()
-    this.sid = this.myStatusBlock.getSID()
-    this.displayID = this.myStatusBlock.getFullID().toString().slice(-6).padStart(6, '0')
-    this.origin = this.myStatusBlock.getGame()
+    this.currentPCBox = new DataView(currentPCBlock.data.Value.bytes.buffer).getUint8(0)
+  }
+
+  get bytes() {
+    return this.inner.prepareBytesForSaving()
+  }
+
+  get boxRows() {
+    return SwordShieldSaveRust.BOX_ROWS
+  }
+
+  get boxColumns() {
+    return SwordShieldSaveRust.BOX_COLS
   }
 
   convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK8 {
@@ -77,25 +112,40 @@ export class SwordShieldSave extends Gen8Gen9Save<PK8> {
     return BlockKeys[blockName]
   }
 
-  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): SCBlock | undefined {
+  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): Block | undefined {
     const key = this.getBlockKey(blockName)
 
     return this.scBlocks.find((b) => b.key === key)
   }
 
-  getBlockMust<T extends SCBlock = SCBlock>(
+  getBlockMust<T extends Block = Block>(
     blockName: G89BlockName | keyof typeof BlockKeys,
-    type?: T['blockType']
+    type?: BlockType
   ): T {
     const block = this.getBlock(blockName)
 
     if (!block) {
       throw Error(`Missing block ${blockName}`)
     }
-    if (type && block.blockType !== type) {
-      throw Error(`Block ${blockName} is type ${block.blockType} (expected ${type})`)
+    if (type && !blockIsType(block, type)) {
+      throw Error(
+        `Block ${blockName} has data ${JSON.stringify(block.data)} (expected ${JSON.stringify(type)})`
+      )
     }
     return block as T
+  }
+
+  getMonAt(boxIndex: number, boxSlot: number): PK8 | undefined {
+    let pk8Wasm = this.inner.getMonAt(boxIndex, boxSlot)
+    return pk8Wasm ? PK8.fromWasm(pk8Wasm) : undefined
+  }
+
+  setMonAt(boxIndex: number, boxSlot: number, mon: Option<PK8>): void {
+    this.inner.setMonAt(boxIndex, boxSlot, mon?.inner)
+  }
+
+  monFromWasm(wasmMon: Pk8Wasm): PK8 {
+    return PK8.fromWasm(wasmMon)
   }
 
   getMonBoxSizeBytes(): number {
@@ -108,6 +158,10 @@ export class SwordShieldSave extends Gen8Gen9Save<PK8> {
 
   getBoxSlotGapBytes(): number {
     return 0
+  }
+
+  getBoxName(boxIndex: number) {
+    return this.inner.getBoxName(boxIndex)
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
@@ -155,9 +209,9 @@ export class SwordShieldSave extends Gen8Gen9Save<PK8> {
     }
 
     return {
-      'Player Character': this.myStatusBlock.getGender() ? 'Gloria' : 'Victor',
+      'Player Character': this.inner.trainerGender ? 'Gloria' : 'Victor',
       'Save Version': this.getSaveRevision(),
-      Language: Languages.stringFromByte(this.myStatusBlock.getLanguage()),
+      Language: Languages.stringFromByte(this.inner.language || 0),
       Pokédex: pokedexOwned,
       'Shiny Pokémon Found': this.trainerCardBlock.getShinyPokemonFound(),
       Starter: this.trainerCardBlock.getStarter(),
@@ -176,11 +230,11 @@ export class SwordShieldSave extends Gen8Gen9Save<PK8> {
   }
 
   get trainerGender(): Gender {
-    return this.myStatusBlock.getGender() ? Gender.Female : Gender.Male
+    return this.inner.trainerGender ? Gender.Female : Gender.Male
   }
 
   get language() {
-    return this.myStatusBlock.getLanguage()
+    return this.inner.language
   }
 }
 
@@ -215,8 +269,8 @@ const BlockKeys = {
 class TrainerCardBlock {
   dataView: DataView<ArrayBuffer>
 
-  constructor(scBlock: SCObjectBlock) {
-    this.dataView = new DataView(scBlock.raw)
+  constructor(scBlock: ObjectBlock) {
+    this.dataView = new DataView(scBlock.data.Object.bytes.buffer)
   }
 
   public getName(): string {
@@ -257,35 +311,5 @@ class TrainerCardBlock {
     }
 
     return 'Not Selected'
-  }
-}
-
-class MyStatusBlock {
-  dataView: DataView<ArrayBuffer>
-
-  constructor(scBlock: SCObjectBlock) {
-    this.dataView = new DataView(scBlock.raw)
-  }
-
-  public getName(): string {
-    return utf16BytesToString(this.dataView.buffer, 0xb0, 24)
-  }
-  public getLanguage(): number {
-    return this.dataView.getUint8(0xa7)
-  }
-  public getFullID(): number {
-    return this.dataView.getUint32(0xa0, true)
-  }
-  public getTID(): number {
-    return this.dataView.getUint16(0xa0, true)
-  }
-  public getSID(): number {
-    return this.dataView.getUint16(0xa2, true)
-  }
-  public getGame(): OriginGame {
-    return this.dataView.getUint8(0xa4)
-  }
-  public getGender(): boolean {
-    return !!(this.dataView.getUint8(0xa5) & 1)
   }
 }

@@ -223,27 +223,48 @@ export function getFlagsInRange(dataView: DataView, offset: number, size: number
   return flags
 }
 
-export const get8BitChecksum = (bytes: Uint8Array, start: number, end: number) => {
+export function xorChecksum8BitLe(
+  bytes: ArrayBufferLike | Uint8Array,
+  start: number = 0,
+  end: number = bytes.byteLength
+) {
   let checksum = 0
-
+  const dataView = new DataView(bytes instanceof Uint8Array ? bytes.buffer : bytes)
   for (let i = start; i <= end; i += 1) {
-    checksum += bytes[i]
-    checksum = checksum & 0xff
+    checksum = (checksum + dataView.getUint8(i)) & 0xff
   }
   return checksum
 }
 
-export const get16BitChecksumLittleEndian = (
-  bytes: ArrayBufferLike,
-  start: number,
-  end: number
-) => {
+export function xorChecksum16BitLe(bytes: ArrayBufferLike | Uint8Array) {
   let checksum = 0
-
-  for (let i = start; i < end; i += 2) {
-    const nextVal = bytesToUint16LittleEndian(new Uint8Array(bytes), i)
-
-    checksum = (checksum + nextVal) & 0xffff
+  const dataView = new DataView(bytes instanceof Uint8Array ? bytes.buffer : bytes)
+  for (let i = 0; i < bytes.byteLength; i += 2) {
+    checksum = (checksum + dataView.getUint16(i, true)) & 0xffff
   }
   return checksum
+}
+
+export function xorChecksum32BitLe(bytes: ArrayBufferLike | Uint8Array) {
+  let checksum = 0
+  const dataView = new DataView(bytes instanceof Uint8Array ? bytes.buffer : bytes)
+
+  let i = 0
+  for (; i + 4 < bytes.byteLength; i += 4) {
+    checksum = (checksum + dataView.getUint32(i)) & 0xffffffff
+  }
+
+  return checksum
+}
+
+export function toBase64(buffer: Uint8Array) {
+  return btoa(String.fromCharCode(...buffer))
+}
+
+export function toHexString(byteArray: Uint8Array) {
+  return Array.from(byteArray, function (byte) {
+    return ('0' + (byte & 0xff).toString(16)).slice(-2)
+  })
+    .join('')
+    .toUpperCase()
 }

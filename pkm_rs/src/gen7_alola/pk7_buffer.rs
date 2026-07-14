@@ -8,7 +8,7 @@ use arbitrary_int::u3;
 use arbitrary_int::u7;
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveIndex, MoveSlots, PpUpStorage};
+use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::ModernRibbonSet;
 use pkm_rs_resources::species::SpeciesAndForm;
@@ -21,6 +21,11 @@ use pkm_rs_types::{Language, Stats16Le};
 use pkm_rs_types::{read_u16_le, read_u32_le};
 
 const CHECKSUM_OFFSET: usize = 6;
+const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
+    moves: 90,
+    pp: 98,
+    pp_ups: 102,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Offset {
@@ -369,11 +374,7 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn move_slots(&self) -> MoveSlots {
-        MoveSlots::from_bytes(
-            self.bytes(),
-            super::MOVE_DATA_OFFSETS,
-            PpUpStorage::FourBytes,
-        )
+        MoveSlots::from_bytes(self.bytes(), MOVE_DATA_OFFSETS, PpUpStorage::FourBytes)
     }
 
     pub fn relearn_move_raw(&self, idx: usize) -> [u8; 2] {
@@ -811,11 +812,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn set_move_slots(&mut self, v: &MoveSlots) {
-        v.write_spans(
-            self.bytes_mut(),
-            super::MOVE_DATA_OFFSETS,
-            PpUpStorage::FourBytes,
-        );
+        v.write_spans(self.bytes_mut(), MOVE_DATA_OFFSETS, PpUpStorage::FourBytes);
     }
 
     fn set_relearn_move_raw(&mut self, idx: usize, v: [u8; 2]) {

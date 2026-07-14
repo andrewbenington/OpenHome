@@ -1,3 +1,4 @@
+import { toBase64 } from '@openhome-core/util'
 import { Option } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
@@ -252,7 +253,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   }
 
   calculateChecksumStr() {
-    return uint8ArrayToBase64(this.calculateChecksumBytes())
+    return toBase64(this.calculateChecksumBytes())
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
@@ -340,11 +341,6 @@ class ConfigBlock {
   public getLanguage(): Language {
     return this.dataView.getUint32(0x04, true)
   }
-}
-
-// Converts a Uint8Array to base64 for checksum display
-function uint8ArrayToBase64(uint8Array: Uint8Array) {
-  return btoa(String.fromCharCode(...uint8Array))
 }
 
 // Creates a copy of a byte array for checksum calculations

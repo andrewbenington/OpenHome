@@ -1,6 +1,7 @@
 import { PK3 } from '@openhome-core/pkm'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
+import { runningInTest } from '@openhome-core/util'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -179,9 +180,11 @@ export class G3SaveBackup {
         const buffer = this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80).buffer
         box.boxSlots[slot] = PK3.fromSlotBytes(buffer)
       } catch (e) {
-        console.error(
-          `File has invalid Pokémon data at box ${Math.floor(i / 30)}/slot ${slot}: ${e}`
-        )
+        if (!runningInTest()) {
+          console.error(
+            `File has invalid Pokémon data at box ${Math.floor(i / 30)}/slot ${slot}: ${e}`
+          )
+        }
       }
     }
 

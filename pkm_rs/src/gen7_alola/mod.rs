@@ -10,7 +10,6 @@ pub use save::Gen7AlolaSave;
 pub use pk7::*;
 use pkm_rs_resources;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
-use pkm_rs_resources::moves::MoveDataOffsets;
 use pkm_rs_resources::ribbons::ModernRibbon;
 use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_resources::species::form_metadata::source_has_form_metadata;
@@ -23,12 +22,6 @@ pub(crate) const BOX_SIZE: usize = 232;
 pub(crate) const PARTY_SIZE: usize = 260;
 
 const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
-
-const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
-    moves: 90,
-    pp: 98,
-    pp_ups: 102,
-};
 
 const NEUROFORCE: u16 = 233;
 pub type Pk7AbilityIndex = AbilityIndexBounded<NEUROFORCE>;

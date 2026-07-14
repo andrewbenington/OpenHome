@@ -360,10 +360,15 @@ export interface WasmSaveInner<P> {
   setMonAt(box_num: number, offset: number, mon?: P | null): void
 }
 
-export abstract class WasmOfficialSave<P extends PKMInterface, WasmP> extends OfficialSAV<P> {
-  inner: WasmSaveInner<WasmP>
+export abstract class WasmOfficialSave<
+  P extends PKMInterface,
+  WasmP,
+  WasmSave extends WasmSaveInner<WasmP>,
+> extends OfficialSAV<P> {
+  inner: WasmSave
+  boxes: Array<Box<P>> = []
 
-  constructor(inner: WasmSaveInner<WasmP>) {
+  constructor(inner: WasmSave) {
     super()
     this.inner = inner
   }

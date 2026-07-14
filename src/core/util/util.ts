@@ -322,3 +322,11 @@ export function getWeightCalculated(mon: AllPKMFields) {
 export function mapToObject<T>(m: Map<string | number, T>): Record<string, T> {
   return Object.fromEntries(Array.from(m.entries()))
 }
+
+export function runningInTest(): boolean {
+  // Vitest sets the TEST environment variable.
+  // Environment variables in import.meta are all inlined by Vite at build time, so the user's environment
+  // will not affect this in a production build. It probably overrides variables like this at build time
+  // as well but I have not verified.
+  return import.meta.env.TEST
+}
