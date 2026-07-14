@@ -39,7 +39,7 @@ export type OhpkmStore = {
   getIdIfTracked: (mon: PKMInterface) => Option<OhpkmIdentifier>
   loadIfTracked: <P extends PKMInterface>(mon: P) => Option<OHPKM>
   monOrOhpkmIfTracked: <P extends PKMInterface>(mon: P) => OHPKM | P
-  updateAndConvertForSave: <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => P
+  updateAndConvertForSave: <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => Errorable<P>
   startTrackingNewMon: <P extends PKMInterface>(
     mon: P,
     sourceSave: Option<SAV<P>>,

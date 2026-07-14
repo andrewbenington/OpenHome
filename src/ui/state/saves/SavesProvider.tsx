@@ -2,7 +2,7 @@ import useBackend from '@openhome-core/backend/useBackend'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAVClass } from '@openhome-core/save/util'
-import { Option, R, range, Result } from '@openhome-core/util/functional'
+import { $R, Option, R, range, Result } from '@openhome-core/util/functional'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -82,7 +82,14 @@ export default function SavesProvider({ children }: SavesProviderProps) {
             if (!trackedData) continue
 
             trackedData.tradeToSave(save)
-            save.setMonAt(boxNum, boxSlot, save.convertOhpkm(trackedData, defaultConvertStrategy))
+
+            const converted = save.convertOhpkm(trackedData, defaultConvertStrategy)
+            if (R.isErr(converted)) {
+              return Promise.resolve(R.Err([PkmConversion(converted.error)]))
+            }
+            $R(save.convertOhpkm(trackedData, defaultConvertStrategy)).map((mon) =>
+              save.setMonAt(boxNum, boxSlot, mon)
+            )
           }
         }
       }
@@ -269,6 +276,7 @@ type SaveError =
   | { _SaveErrorType: 'TransactionStart'; message: string }
   | { _SaveErrorType: 'TransactionCommit'; message: string }
   | { _SaveErrorType: 'IdentifierNotTracked'; identifier: OhpkmIdentifier }
+  | { _SaveErrorType: 'PkmConversion'; message: string }
   | { _SaveErrorType: 'GenG12Identifier'; mon: OHPKM }
   | { _SaveErrorType: 'GenG345Identifier'; mon: OHPKM }
   | { _SaveErrorType: 'SaveItemBagData'; message: string }
@@ -292,6 +300,11 @@ const SaveItemBagData: (message: string) => SaveError = (message: string) => ({
 
 const BackendSaveError: (message: string) => SaveError = (message: string) => ({
   _SaveErrorType: 'BackendSaveError',
+  message,
+})
+
+const PkmConversion: (message: string) => SaveError = (message: string) => ({
+  _SaveErrorType: 'PkmConversion',
   message,
 })
 
