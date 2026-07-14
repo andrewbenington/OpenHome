@@ -1,6 +1,7 @@
 import { PA8, PK4, PK8 } from '@openhome-core/pkm'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { xorChecksum32BitLe } from '@openhome-core/util'
+import { R } from '@openhome-core/util/functional'
 import { Ball, ConvertStrategies, OriginGame } from '@pkm-rs/pkg'
 import { readFileSync } from 'fs'
 import path from 'path'
@@ -196,11 +197,13 @@ function toHexString(byteArray: Uint8Array) {
 }
 
 function convertToPk8(mon: OHPKM) {
-  return PK8.fromOhpkm(mon, ConvertStrategies.getDefault())
+  return R.assert(PK8.fromOhpkm(mon, ConvertStrategies.getDefault()))
 }
 
 function convertToPa8(mon: PKMInterface) {
-  return mon instanceof OHPKM
-    ? PA8.fromOhpkm(mon, ConvertStrategies.getDefault())
-    : PA8.fromOhpkm(OHPKM.fromMonUnknownSave(mon), ConvertStrategies.getDefault())
+  return R.assert(
+    mon instanceof OHPKM
+      ? PA8.fromOhpkm(mon, ConvertStrategies.getDefault())
+      : PA8.fromOhpkm(OHPKM.fromMonUnknownSave(mon), ConvertStrategies.getDefault())
+  )
 }

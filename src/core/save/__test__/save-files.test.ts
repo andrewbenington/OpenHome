@@ -129,7 +129,8 @@ describe('Handler trainers', () => {
     expect(original.isCurrentHandler).toBeTruthy()
 
     // Ultra Sun trainer should be in handlers list
-    const pk7 = PK7.fromOhpkm(original, ConvertStrategies.getDefault())
+    const pk7 = R.assert(PK7.fromOhpkm(original, ConvertStrategies.getDefault()))
+
     expect(pk7.handlerName).toBe(ultraSunSave.name)
     expect(pk7.isCurrentHandler).toBeTruthy()
 

@@ -1,6 +1,7 @@
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
 import { bytesToUint32LittleEndian } from '@openhome-core/util/byteLogic'
+import { Errorable } from '@openhome-core/util/functional'
 import { ConvertStrategy, ExtraFormIndex, ItemUnbound, unboundSupportsExtraForm } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
 import { findFirstSectionOffset, G3CFRUSAV, SAVE_SIZES_BYTES } from '../cfru/G3CFRUSAV'
@@ -29,7 +30,7 @@ export class G3UBSAV extends G3CFRUSAV<PK3UB> {
     return 18
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3UB {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK3UB> {
     return PK3UB.fromOhpkm(ohpkm, strategy)
   }
 

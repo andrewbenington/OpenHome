@@ -85,7 +85,9 @@ test('inserting mon works', () => {
   }
   const modifiedSaveFile1 = result1.data as G1SAV
 
-  modifiedSaveFile1.boxes[7].boxSlots[11] = PK1.fromOhpkm(slowbroOH, ConvertStrategies.getDefault())
+  modifiedSaveFile1.boxes[7].boxSlots[11] = R.assert(
+    PK1.fromOhpkm(slowbroOH, ConvertStrategies.getDefault())
+  )
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, boxSlot: 0 })
   modifiedSaveFile1.prepareForSaving()
 
@@ -116,7 +118,7 @@ test('inserting mon with game capitalization gives correct nickname', () => {
     ...ConvertStrategies.getDefault(),
     nickname__capitalization: 'Modern',
   }
-  modifiedSaveFile1.boxes[7].boxSlots[11] = PK1.fromOhpkm(slowbroOH, modernStrategy)
+  modifiedSaveFile1.boxes[7].boxSlots[11] = R.assert(PK1.fromOhpkm(slowbroOH, modernStrategy))
   modifiedSaveFile1.updatedBoxSlots.push({ box: 7, boxSlot: 0 })
   modifiedSaveFile1.prepareForSaving()
 

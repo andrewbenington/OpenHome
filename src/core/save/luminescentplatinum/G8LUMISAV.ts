@@ -1,5 +1,5 @@
 import { toBase64 } from '@openhome-core/util'
-import { Option } from '@openhome-core/util/functional'
+import { Errorable, Option } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
   ConvertStrategy,
@@ -213,7 +213,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   }
 
   // Converts an OpenHome Pokémon into the Luminescent format
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB8LUMI {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PB8LUMI> {
     return PB8LUMI.fromOhpkm(ohpkm, strategy)
   }
 

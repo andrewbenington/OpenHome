@@ -3,6 +3,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import PK9 from '@openhome-core/pkm/PK9'
 import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
 import { getStats } from '@openhome-core/pkm/util/statCalc'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { ConvertStrategy, OriginGames, PkmFormat } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../interfaces'
 
@@ -35,8 +36,8 @@ export default class PK9Compass extends PK9 implements PluginPKMInterface {
     return new PK9Compass(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK9Compass {
-    return new PK9Compass(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK9Compass> {
+    return R.tryFrom(() => new PK9Compass(ohpkm, { strategy }))
   }
 
   public getStats() {

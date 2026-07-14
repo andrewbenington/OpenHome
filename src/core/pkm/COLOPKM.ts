@@ -2,6 +2,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@openhome-core/resources'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import * as byteLogic from '@openhome-core/util/byteLogic'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityNumber,
@@ -165,8 +166,8 @@ export default class COLOPKM {
     return new COLOPKM(buffer, { encrypted: false })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): COLOPKM {
-    return new COLOPKM(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<COLOPKM> {
+    return R.tryFrom(() => new COLOPKM(ohpkm, { strategy }))
   }
 
   toBytes(): ArrayBuffer {

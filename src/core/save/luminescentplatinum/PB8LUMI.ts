@@ -1,7 +1,7 @@
 import { PB8 } from '@openhome-core/pkm'
 import { PluginPKMInterface } from '@openhome-core/pkm/interfaces'
 import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
-import { Option } from '@openhome-core/util/functional'
+import { Errorable, Option, R } from '@openhome-core/util/functional'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -69,8 +69,8 @@ export default class PB8LUMI extends PB8 implements PluginPKMInterface {
     return new PB8LUMI(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB8LUMI {
-    return new PB8LUMI(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PB8LUMI> {
+    return R.tryFrom(() => new PB8LUMI(ohpkm, { strategy }))
   }
 
   static getFormat() {

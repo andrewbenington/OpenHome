@@ -1,6 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import * as byteLogic from '@openhome-core/util/byteLogic'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   ConvertStrategy,
@@ -177,8 +178,8 @@ export default class PK2 {
     return new PK2(buffer, { encrypted: false })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK2 {
-    return new PK2(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK2> {
+    return R.tryFrom(() => new PK2(ohpkm, { strategy }))
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {

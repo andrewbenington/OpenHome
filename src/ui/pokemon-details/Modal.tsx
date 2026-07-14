@@ -4,6 +4,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
 import { isRomHackFormat } from '@openhome-core/pkm/PKM'
 import { FileSchemas } from '@openhome-core/pkm/schema'
+import { $R } from '@openhome-core/util/functional'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
 import FileTypeSelect from '@openhome-ui/components/FileTypeSelect'
@@ -188,31 +189,33 @@ function ModalContents(props: ModalContentsProps) {
       return
     }
 
-    const P = fileTypeFromStringNonOhpkm(newFormat)
+    const PkmClass = fileTypeFromStringNonOhpkm(newFormat)
 
-    if (!P) {
-      throw `Invalid filetype: ${P}`
+    if (!PkmClass) {
+      throw `Invalid filetype: ${PkmClass}`
     }
 
     try {
-      if (mon instanceof OHPKM) {
-        if (
-          isOriginal &&
-          mon.originalData &&
-          originalDataTagToMonFormat(mon.originalData.tag) === newFormat
-        ) {
-          const O =
-            fileTypeFromStringNonOhpkm(originalDataTagToMonFormat(mon.originalData.tag)) ?? P
-          setDisplayMon(O.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
-        } else {
-          setDisplayMon(P.fromOhpkm(mon, defaultConvertStrategy))
-        }
+      if (
+        mon instanceof OHPKM &&
+        isOriginal &&
+        mon.originalData &&
+        originalDataTagToMonFormat(mon.originalData.tag) === newFormat
+      ) {
+        const originalFormat = originalDataTagToMonFormat(mon.originalData.tag)
+        const OriginalPkmClass = fileTypeFromStringNonOhpkm(originalFormat) ?? PkmClass
+        setDisplayMon(OriginalPkmClass.fromBytes(mon.originalData.data.buffer as ArrayBuffer))
       } else {
-        setDisplayMon(P.fromOhpkm(OHPKM.fromMonUnknownSave(mon), defaultConvertStrategy))
+        const ohpkm = mon instanceof OHPKM ? mon : OHPKM.fromMonUnknownSave(mon)
+
+        $R(PkmClass.fromOhpkm(ohpkm, defaultConvertStrategy)).match(
+          (converted) => setDisplayMon(converted),
+          (error) => displayError(`Failed to convert OHPKM to ${PkmClass.getFormat()}`, error)
+        )
       }
     } catch (e) {
       console.error(e)
-      displayError(`Error converting to ${P.getFormat()}`, `${e}`)
+      displayError(`Error converting to ${PkmClass.getFormat()}`, `${e}`)
     }
   }
 

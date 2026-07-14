@@ -4,6 +4,7 @@ import PK9Compass from '@openhome-core/save/compass/PK9Compass'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import PK3RR from '@openhome-core/save/radicalred/PK3RR'
 import PK3UB from '@openhome-core/save/unbound/PK3UB'
+import { Errorable } from '@openhome-core/util/functional'
 import { ConvertStrategy, PkmFormat } from '@pkm-rs/pkg'
 import COLOPKM from './COLOPKM'
 import PA8 from './PA8'
@@ -50,7 +51,7 @@ export type RomHackPKM = PK3RR | PK3UB | PB8LUMI | PK9Compass
 
 export type PkmClass<P extends PKMInterface> = {
   fromBytes(bytes: ArrayBuffer, encrypted?: boolean): P
-  fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
+  fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
   getFormat(): PkmFormat
 }
 

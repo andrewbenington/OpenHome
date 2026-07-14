@@ -5,6 +5,7 @@ import {
   ZA_TRANSFER_RESTRICTIONS_MD,
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { Errorable } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
   Block,
@@ -57,7 +58,7 @@ export class LegendsZaSave extends Gen8Gen9Save<PA9> {
     this.origin = this.trainerBlock.getGame()
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PA9 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PA9> {
     return PA9.fromOhpkm(ohpkm, strategy)
   }
 

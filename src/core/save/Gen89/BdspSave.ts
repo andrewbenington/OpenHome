@@ -2,7 +2,7 @@ import { PB8 } from '@openhome-core/pkm'
 import { Item } from '@openhome-core/resources/consts/Items'
 import { BDSP_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Option } from '@openhome-core/util/functional'
+import { Errorable, Option } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
@@ -172,7 +172,7 @@ export class BdspSave extends OfficialSAV<PB8> {
     this.bytes.set(this.calculateChecksumBytes(), HASH_OFFSET)
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB8 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PB8> {
     return PB8.fromOhpkm(ohpkm, strategy)
   }
 

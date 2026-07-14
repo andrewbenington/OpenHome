@@ -9,7 +9,7 @@ import {
   Pk7Wasm,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
-import { Option } from '../util/functional'
+import { Errorable, Option } from '../util/functional'
 import { BoxAndSlot, WasmOfficialSave } from './interfaces'
 import { PathData } from './util/path'
 import { isRestricted } from './util/TransferRestrictions'
@@ -62,7 +62,7 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm, Gen7AlolaSaveR
     return Gen7AlolaSaveRust.BOX_COLS
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK7 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK7> {
     return PK7.fromOhpkm(ohpkm, strategy)
   }
 

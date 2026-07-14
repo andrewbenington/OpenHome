@@ -3,7 +3,7 @@ import { EXCLAMATION } from '@openhome-core/resources/consts/Forms'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { GEN2_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { xorChecksum8BitLe } from '@openhome-core/util/byteLogic'
-import { Option, unique } from '@openhome-core/util/functional'
+import { Errorable, Option, unique } from '@openhome-core/util/functional'
 import {
   readGameBoyStringFromBytes,
   utf16StringToGen12,
@@ -220,7 +220,7 @@ export class G2SAV extends OfficialSAV<PK2> {
     }
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK2 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK2> {
     return PK2.fromOhpkm(ohpkm, strategy)
   }
 

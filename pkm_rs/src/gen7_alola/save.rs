@@ -218,7 +218,7 @@ impl Gen7AlolaSave {
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
         strategy: crate::convert_strategy::ConvertStrategy,
-    ) -> Pk7 {
+    ) -> Result<Pk7> {
         use crate::ohpkm::OhpkmConvert;
         Pk7::from_ohpkm(&ohpkm, strategy)
     }
@@ -278,7 +278,7 @@ impl Gen7AlolaSave {
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
         strategy: crate::convert_strategy::ConvertStrategy,
-    ) -> Pk7 {
+    ) -> Result<Pk7> {
         self.convert_ohpkm(ohpkm, strategy)
     }
 
@@ -498,7 +498,8 @@ mod tests {
         let ribbon_master_ohpkm =
             pkm_from_file::<OhpkmV2>(&Path::new("ohpkm").join("ribbon-master.ohpkm"))?;
 
-        let ribbon_master_pk7 = Pk7::from_ohpkm(&ribbon_master_ohpkm.0, ConvertStrategy::default());
+        let ribbon_master_pk7 =
+            Pk7::from_ohpkm(&ribbon_master_ohpkm.0, ConvertStrategy::default())?;
 
         save.set_mon_at(0, 9, Some(ribbon_master_pk7));
         let retrieved_ribbon_master = save.get_mon_at(0, 9)?.expect("ribbon master is present");

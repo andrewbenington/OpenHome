@@ -1,5 +1,6 @@
 import { isRestricted, TransferRestrictions } from '@openhome-core/save/util/TransferRestrictions'
 import { bytesToUint32LittleEndian } from '@openhome-core/util/byteLogic'
+import { Errorable } from '@openhome-core/util/functional'
 import {
   ConvertStrategy,
   ExtraFormIndex,
@@ -36,7 +37,7 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
     return 18
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3RR {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK3RR> {
     return PK3RR.fromOhpkm(ohpkm, strategy)
   }
 

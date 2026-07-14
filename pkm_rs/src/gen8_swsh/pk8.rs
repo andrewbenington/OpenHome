@@ -408,18 +408,18 @@ impl Pk8 {
         bytes: Vec<u8>,
         strategy: ConvertStrategy,
     ) -> core::result::Result<Pk8, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
-        Ok(Pk8::from_ohpkm(&ohpkm, strategy))
+        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(JsValue::from)?;
+        Pk8::from_ohpkm(&ohpkm, strategy).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
     pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk8, JsValue> {
-        Pk8::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+        Pk8::from_bytes(&bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
     pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Pk8, JsValue> {
-        Pk8::from_encrypted_bytes(bytes).map_err(crate::util::error_to_js)
+        Pk8::from_encrypted_bytes(bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = toBytes)]
@@ -692,7 +692,7 @@ mod test {
         let mon_recreated = Pk8::from_ohpkm(
             &OhpkmV2::convert_with_backup(&mon, &bytes)?,
             ConvertStrategy::default(),
-        );
+        )?;
 
         assert_eq!(mon.nickname.bytes()[..], mon_recreated.nickname.bytes()[..]);
 
@@ -746,7 +746,7 @@ mod test {
         let ohpkm = mon.to_ohpkm()?;
         assert_eq!(ohpkm.dynamax_level(), Some(mon.dynamax_level));
 
-        let roundtrip = Pk8::from_ohpkm(&ohpkm, ConvertStrategy::default());
+        let roundtrip = Pk8::from_ohpkm(&ohpkm, ConvertStrategy::default())?;
         assert_eq!(roundtrip.dynamax_level, mon.dynamax_level);
 
         Ok(())

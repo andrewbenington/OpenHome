@@ -18,7 +18,7 @@ import {
   OriginGame,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
-import { Option } from '../util/functional'
+import { Errorable, Option } from '../util/functional'
 import { filterUndefined } from '../util/sort'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
@@ -346,7 +346,7 @@ export class G3SAV extends OfficialSAV<PK3> {
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK3> {
     return PK3.fromOhpkm(ohpkm, strategy)
   }
 
