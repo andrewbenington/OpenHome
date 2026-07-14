@@ -28,6 +28,10 @@ macro_rules! bounded_impl {
                 self.0
             }
 
+            pub const fn to_usize(&self) -> usize {
+                self.0 as usize
+            }
+
             pub fn all() -> impl Iterator<Item = Self> {
                 (0..=MAX).map(Self)
             }
@@ -61,7 +65,7 @@ macro_rules! bounded_impl {
             }
         }
 
-        pub trait [<CheckBound $ty:camel>]<const MAX: $ty>: Copy
+        pub trait [<CheckBound$ty:camel>]<const MAX: $ty>: Copy
             where
                 $ty: From<Self>,
             {

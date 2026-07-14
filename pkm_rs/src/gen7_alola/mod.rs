@@ -21,6 +21,11 @@ use serde::Serialize;
 pub(crate) const BOX_SIZE: usize = 232;
 pub(crate) const PARTY_SIZE: usize = 260;
 
+pub const BOX_COUNT: u8 = 32;
+pub const BOX_ROWS: u8 = 5;
+pub const BOX_COLS: u8 = 6;
+pub const BOX_SLOTS: u8 = BOX_ROWS * BOX_COLS;
+
 const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
 
 const NEUROFORCE: u16 = 233;
@@ -76,3 +81,7 @@ impl TryFrom<SpeciesAndForm> for Pk7SpeciesAndForm {
         Self::try_new(value).ok_or(Error::form_index(value))
     }
 }
+
+type BoxIndex = pkm_rs_types::BoundedU8<{ BOX_SLOTS }>;
+
+type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS }>;

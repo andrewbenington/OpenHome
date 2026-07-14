@@ -201,11 +201,6 @@ impl SwordShieldSave {
         Self::from_bytes(bytes)
     }
 
-    #[wasm_bindgen]
-    pub fn calc_checksum(&self) -> u16 {
-        todo!()
-    }
-
     #[wasm_bindgen(js_name = isValidSave)]
     pub fn is_valid_save_wasm(bytes: &[u8]) -> bool {
         Self::is_save(bytes)
