@@ -6,7 +6,7 @@ import {
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
 } from '@openhome-core/util/byteLogic'
-import { Option, unique } from '@openhome-core/util/functional'
+import { Errorable, Option, unique } from '@openhome-core/util/functional'
 import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
@@ -170,7 +170,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     this.updateMirrorsChecksum()
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK5 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK5> {
     return PK5.fromOhpkm(ohpkm, strategy)
   }
 

@@ -1,6 +1,7 @@
 import { PA8 } from '@openhome-core/pkm'
 import { LA_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { Errorable } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
   Block,
@@ -58,7 +59,7 @@ export class LegendsArceusSave extends Gen8Gen9Save<PA8> {
     return this.myStatusBlock.getLanguage()
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PA8 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PA8> {
     return PA8.fromOhpkm(ohpkm, strategy)
   }
 

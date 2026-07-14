@@ -2,6 +2,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import * as byteLogic from '@openhome-core/util/byteLogic'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,
@@ -367,8 +368,8 @@ export default class PK6 {
     return new PK6(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK6 {
-    return new PK6(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK6> {
+    return R.tryFrom(() => new PK6(ohpkm, { strategy }))
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {

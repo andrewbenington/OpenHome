@@ -98,34 +98,39 @@ impl OhpkmConvert for Pk8 {
         })
     }
 
-    fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Self {
+    fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
         let form_metadata = ohpkm.get_forme_metadata();
         let converter = PkmConverter::new(PkmFormat::PK8, strategy);
         let met_data = converter.met_data(ohpkm);
+
+        let ability_index = if let Some(current_ability) = ohpkm.ability_index().change_bound() {
+            current_ability
+        } else if let Some(ability_from_num) = form_metadata
+            .get_ability(ohpkm.ability_num())
+            .change_bound()
+        {
+            ability_from_num
+        } else if let Some(first_ability) = form_metadata
+            .get_ability(AbilityNumber::First)
+            .change_bound()
+        {
+            first_ability
+        } else {
+            return Err(Error::AbilityIndex {
+                ability_index: form_metadata.get_ability(AbilityNumber::First).to_u16(),
+            });
+        };
 
         let mut mon = Self {
             encryption_constant: ohpkm.encryption_constant(),
             sanity: 0,
             checksum: 0,
-            species_and_form: ohpkm
-                .species_and_form()
-                .try_into()
-                .expect("pk8 mon/form should be valid"),
+            species_and_form: ohpkm.species_and_form().try_into()?,
             held_item_index: ohpkm.held_item_index(),
             trainer_id: ohpkm.trainer_id(),
             secret_id: ohpkm.secret_id(),
             exp: ohpkm.exp(),
-            ability_index: ohpkm.ability_index().change_bound().unwrap_or(
-                form_metadata
-                    .get_ability(ohpkm.ability_num())
-                    .change_bound()
-                    .unwrap_or(
-                        form_metadata
-                            .get_ability(AbilityNumber::First)
-                            .change_bound()
-                            .expect("Pk8 max ability <= overall max ability"),
-                    ),
-            ),
+            ability_index,
             ability_num: ohpkm.ability_num(),
             can_gigantamax: ohpkm.can_gigantamax().unwrap_or(false),
             markings: ohpkm.markings(),
@@ -178,7 +183,12 @@ impl OhpkmConvert for Pk8 {
             trainer_gender: ohpkm.trainer_gender(),
             tr_flags_swsh: ohpkm
                 .tr_flags_swsh()
-                .map(|v| FlagSet::from_bytes(v.try_into().unwrap()))
+                .map(|v| {
+                    FlagSet::from_bytes(
+                        v.try_into()
+                            .expect("Sword/Shield TR flags are the expected bytelength in OHPKM"),
+                    )
+                })
                 .unwrap_or_default(),
             home_tracker: ohpkm.home_tracker(),
             hyper_training: ohpkm.hyper_training(),
@@ -199,7 +209,7 @@ impl OhpkmConvert for Pk8 {
 
         mon.refresh_checksum();
 
-        mon
+        Ok(mon)
     }
 
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {

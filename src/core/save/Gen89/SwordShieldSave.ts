@@ -7,7 +7,7 @@ import {
   SWSH_TRANSFER_RESTRICTIONS_IOA,
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Option } from '@openhome-core/util/functional'
+import { Errorable, Option } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
   Block,
@@ -88,7 +88,7 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldS
     return SwordShieldSaveRust.BOX_COLS
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK8 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK8> {
     return PK8.fromOhpkm(ohpkm, strategy)
   }
 

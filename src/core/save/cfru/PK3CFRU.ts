@@ -39,7 +39,7 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
-import { Option } from '../../util/functional'
+import { Errorable, Option, R } from '../../util/functional'
 import { PluginIdentifier } from '../interfaces'
 import { CfruSpeciesAndForm } from './conversion/util'
 
@@ -322,8 +322,8 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
     this: new (ohpkm: OHPKM, options: PkmConstructorOptions) => T,
     ohpkm: OHPKM,
     strategy: ConvertStrategy
-  ): T {
-    return new this(ohpkm, { strategy })
+  ): Errorable<T> {
+    return R.tryFrom(() => new this(ohpkm, { strategy }))
   }
 
   abstract internalItemIndexFromModern(modernIndex: number): number

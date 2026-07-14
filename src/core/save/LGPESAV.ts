@@ -8,7 +8,7 @@ import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '@openhome-
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
-import { Option } from '../util/functional'
+import { Errorable, Option } from '../util/functional'
 import { CRC16_NoInvert } from './encryption/Encryption'
 import { Box, BoxAndSlot, OfficialSAV, SlotMetadata } from './interfaces'
 import { PathData } from './util/path'
@@ -179,7 +179,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
     return nextEmptyIndex
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB7 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PB7> {
     return PB7.fromOhpkm(ohpkm, strategy)
   }
 

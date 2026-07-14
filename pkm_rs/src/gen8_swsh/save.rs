@@ -131,7 +131,7 @@ impl SwordShieldSave {
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
         strategy: crate::convert_strategy::ConvertStrategy,
-    ) -> Pk8 {
+    ) -> Result<Pk8> {
         use crate::ohpkm::OhpkmConvert;
         Pk8::from_ohpkm(&ohpkm, strategy)
     }
@@ -192,7 +192,7 @@ impl SwordShieldSave {
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
         strategy: crate::convert_strategy::ConvertStrategy,
-    ) -> Pk8 {
+    ) -> Result<Pk8> {
         self.convert_ohpkm(ohpkm, strategy)
     }
 
@@ -367,7 +367,7 @@ mod tests {
         let ohpkm =
             tests::pkm_from_file::<OhpkmV2>(&Path::new("ohpkm").join("cinderace-mint.ohpkm"))?;
 
-        let pk8 = Pk8::from_ohpkm(&ohpkm.0, ConvertStrategy::default());
+        let pk8 = Pk8::from_ohpkm(&ohpkm.0, ConvertStrategy::default())?;
 
         let box_index = BoxIndex::check_bound(0).expect("should be valid");
         let box_slot = BoxSlot::check_bound(9).expect("should be valid");

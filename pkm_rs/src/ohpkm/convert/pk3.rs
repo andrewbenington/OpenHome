@@ -100,7 +100,7 @@ impl OhpkmConvert for Pk3 {
         None
     }
 
-    fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Self {
+    fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
         let converter = PkmConverter::new(PkmFormat::PK3, strategy);
         let met_data = converter.met_data(ohpkm);
         let str_encoding = Gen3Encoding::from_language(ohpkm.language());
@@ -132,8 +132,7 @@ impl OhpkmConvert for Pk3 {
             checksum: 0,
             pokemon_index: Gen3PokemonIndex::from_national_dex(
                 ohpkm.species_and_form().get_ndex().index(),
-            )
-            .expect("invalid national dex for pk3"),
+            )?,
             held_item_index: ItemGen3::from_modern_index(ohpkm.held_item_index()),
             trainer_id: ohpkm.trainer_id(),
             secret_id: ohpkm.secret_id(),
@@ -179,7 +178,7 @@ impl OhpkmConvert for Pk3 {
 
         mon.refresh_checksum();
 
-        mon
+        Ok(mon)
     }
 
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {

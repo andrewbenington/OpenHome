@@ -1,6 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Gen4Ribbons } from '@openhome-core/resources'
 import * as byteLogic from '@openhome-core/util/byteLogic'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,
@@ -233,8 +234,8 @@ export default class PK5 {
     return new PK5(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK5 {
-    return new PK5(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK5> {
+    return R.tryFrom(() => new PK5(ohpkm, { strategy }))
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {

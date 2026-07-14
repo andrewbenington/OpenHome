@@ -1,5 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { Errorable } from '@openhome-core/util/functional'
 import { ConvertStrategy, ExtraFormIndex, OriginGame, PkmFormat } from '@pkm-rs/pkg'
 import { PluginSAV, SAV } from '../interfaces'
 import { PathData } from './path'
@@ -12,7 +13,7 @@ const DESMUME_FOOTER_START =
 
 export interface SavePkmClass {
   fromBytes(bytes: ArrayBuffer): PKMInterface
-  fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PKMInterface
+  fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PKMInterface>
   getFormat(): PkmFormat
 }
 

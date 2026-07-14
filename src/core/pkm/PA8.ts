@@ -1,7 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
 import * as byteLogic from '@openhome-core/util/byteLogic'
-import { Option } from '@openhome-core/util/functional'
+import { Errorable, Option, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,
@@ -342,8 +342,8 @@ export default class PA8 {
     return new PA8(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PA8 {
-    return new PA8(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PA8> {
+    return R.tryFrom(() => new PA8(ohpkm, { strategy }))
   }
 
   toBytes(): ArrayBuffer {

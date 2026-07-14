@@ -3,7 +3,7 @@ import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { GEN1_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
 import { readGameBoyStringFromBytes } from '@openhome-core/util'
 import { bytesToUint16BigEndian, xorChecksum8BitLe } from '@openhome-core/util/byteLogic'
-import { Option, range, unique } from '@openhome-core/util/functional'
+import { Errorable, Option, range, unique } from '@openhome-core/util/functional'
 import { utf16StringToGen12 } from '@openhome-core/util/stringConversion'
 import {
   ConvertStrategy,
@@ -242,7 +242,7 @@ export class G1SAV extends OfficialSAV<PK1> {
     this.bytes[0x3523] = wholeSaveChecksum
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK1 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK1> {
     return PK1.fromOhpkm(ohpkm, strategy)
   }
 

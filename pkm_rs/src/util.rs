@@ -1,6 +1,3 @@
-#[cfg(feature = "wasm")]
-use crate::result::Error;
-
 pub fn get_flag(bytes: &[u8], byte_offset: usize, bit_index: usize) -> bool {
     let byte_index = byte_offset + (bit_index / 8);
     if byte_index >= bytes.len() {
@@ -82,11 +79,6 @@ pub mod personality_value {
     pub const fn flip_most_significant_bit(value: u32) -> u32 {
         value ^ (1 << (u32::BITS - 1))
     }
-}
-
-#[cfg(feature = "wasm")]
-pub fn error_to_js(e: Error) -> wasm_bindgen::JsValue {
-    wasm_bindgen::JsValue::from_str(&e.to_string())
 }
 
 mod test {

@@ -1,5 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
 import {
   AbilityIndex,
@@ -71,8 +72,8 @@ export default class PK7 {
     )
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK7 {
-    return new PK7(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK7> {
+    return R.tryFrom(() => new PK7(ohpkm, { strategy }))
   }
 
   static fromWasm(pk7: Pk7Wasm): PK7 {

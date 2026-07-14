@@ -17,7 +17,7 @@ import { G89BlockName } from '@openhome-core/save/Gen89/Gen8Gen9Save'
 import { Box, BoxAndSlot, PluginSAV, SlotMetadata } from '@openhome-core/save/interfaces'
 import { emptyPathData, PathData } from '@openhome-core/save/util/path'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
-import { Option } from '@openhome-core/util/functional'
+import { Errorable, Option } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
   Block,
@@ -130,7 +130,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
     this.origin = this.trainerBlock.getGame()
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK9Compass {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK9Compass> {
     return PK9Compass.fromOhpkm(ohpkm, strategy)
   }
 

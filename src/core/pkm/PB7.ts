@@ -1,5 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import * as byteLogic from '@openhome-core/util/byteLogic'
+import { Errorable, R } from '@openhome-core/util/functional'
 import {
   AbilityIndex,
   Ball,
@@ -295,8 +296,8 @@ export default class PB7 {
     return new PB7(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB7 {
-    return new PB7(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PB7> {
+    return R.tryFrom(() => new PB7(ohpkm, { strategy }))
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {

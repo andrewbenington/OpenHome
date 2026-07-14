@@ -14,6 +14,7 @@ import {
 import { G89BlockName, Gen8Gen9Save } from '@openhome-core/save/Gen89/Gen8Gen9Save'
 import { emptyPathData, PathData } from '@openhome-core/save/util/path'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { Errorable } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
   Block,
@@ -59,7 +60,7 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
     this.origin = this.trainerBlock.getGame()
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK9 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK9> {
     return PK9.fromOhpkm(ohpkm, strategy)
   }
 

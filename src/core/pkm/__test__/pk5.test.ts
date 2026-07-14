@@ -1,4 +1,5 @@
 import { PK5 } from '@openhome-core/pkm'
+import { R } from '@openhome-core/util/functional'
 import { ConvertStrategies } from '@pkm-rs/pkg/pkm_rs'
 import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
@@ -76,7 +77,7 @@ describe('gen 5 conversion to OHPKM and back is lossless', async () => {
       expect(ohpkm.personalityValue).toBe(original.personalityValue)
     })
 
-    const roundTrip = PK5.fromOhpkm(ohpkm, ConvertStrategies.getDefault())
+    const roundTrip = R.assert(PK5.fromOhpkm(ohpkm, ConvertStrategies.getDefault()))
 
     test(`round trip game of origin match - ${file}`, () => {
       if (original.gameOfOrigin !== roundTrip.gameOfOrigin) {
