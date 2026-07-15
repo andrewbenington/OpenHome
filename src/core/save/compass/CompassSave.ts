@@ -17,14 +17,15 @@ import { G89BlockName } from '@openhome-core/save/Gen89/Gen8Gen9Save'
 import { Box, BoxAndSlot, PluginSAV, SlotMetadata } from '@openhome-core/save/interfaces'
 import { emptyPathData, PathData } from '@openhome-core/save/util/path'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { getGenderFlag } from '@openhome-core/util'
 import { Errorable, Option } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
+  BinaryGender,
   Block,
   BlockType,
   ConvertStrategy,
   ExtraFormIndex,
-  Gender,
   Languages,
   OriginGame,
 } from '@pkm-rs/pkg'
@@ -315,7 +316,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
   }
 
   get trainerGender() {
-    return this.trainerBlock.getGender() ? Gender.Female : Gender.Male
+    return this.trainerBlock.getGender() ? BinaryGender.Female : BinaryGender.Male
   }
 
   get language() {
@@ -369,7 +370,7 @@ class MyStatus {
   public getGame(): OriginGame {
     return this.dataView.getUint8(0x04)
   }
-  public getGender(): boolean {
-    return !!(this.dataView.getUint8(0x05) & 1)
+  public getGender(): BinaryGender {
+    return getGenderFlag(this.dataView, 0x05, 0)
   }
 }

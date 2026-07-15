@@ -16,6 +16,7 @@ import {
   AbilityIndex,
   AbilityNumber,
   Ball,
+  BinaryGender,
   Gender,
   generatePk3CompatiblePid,
   Item,
@@ -215,7 +216,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       if (other.handlerName) {
         this.handlerName = other.handlerName ?? ''
-        this.handlerGender = other.handlerGender ?? false
+        this.handlerGender = other.handlerGender ?? BinaryGender.Male
         this.isCurrentHandler = other.isCurrentHandler ?? false
         this.handlerFriendship = other.handlerFriendship ?? 0
         if (other.handlerMemory) {
@@ -556,7 +557,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.handlerMemory = { intensity: 0, memory: 0, feeling: 0, textVariables: 0 }
       this.handlerId = 0
       this.handlerLanguage = 0
-      this.handlerGender = false
+      this.handlerGender = BinaryGender.Male
       return
     }
 

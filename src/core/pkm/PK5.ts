@@ -6,6 +6,7 @@ import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   Ball,
+  BinaryGender,
   ContestStats,
   ConvertStrategy,
   Generation,
@@ -73,7 +74,7 @@ export default class PK5 {
   isFatefulEncounter: boolean
   nickname: string
   trainerName: string
-  trainerGender: boolean
+  trainerGender: BinaryGender
   checksum: number = 0
   originalBytes?: ArrayBuffer
 
@@ -163,7 +164,7 @@ export default class PK5 {
       this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x40, 0)
       this.nickname = stringLogic.readGen5StringFromBytes(dataView, 0x48, 12)
       this.trainerName = stringLogic.readGen5StringFromBytes(dataView, 0x68, 8)
-      this.trainerGender = byteLogic.getFlag(dataView, 0x84, 7)
+      this.trainerGender = byteLogic.getGenderFlag(dataView, 0x84, 7)
       this.checksum = dataView.getUint16(0x6, true)
     } else {
       const converter = new PkmConverter(this.format, options.strategy)
@@ -319,7 +320,7 @@ export default class PK5 {
     byteLogic.setFlag(dataView, 0x40, 0, this.isFatefulEncounter)
     stringLogic.writeGen5StringToBytes(dataView, this.nickname, 0x48, 12)
     stringLogic.writeGen5StringToBytes(dataView, this.trainerName, 0x68, 8)
-    byteLogic.setFlag(dataView, 0x84, 7, this.trainerGender)
+    byteLogic.setGenderFlag(dataView, 0x84, 7, this.trainerGender)
     dataView.setUint16(0x6, this.checksum, true)
     return buffer
   }

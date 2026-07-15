@@ -1,3 +1,5 @@
+import { BinaryGender } from '@pkm-rs/pkg/pkm_rs'
+
 const bytesToNumberBigEndian = (bytes: Uint8Array) => {
   let value = 0
 
@@ -53,6 +55,15 @@ export const setFlag = (dataView: DataView, offset: number, index: number, value
   }
 }
 
+export const setGenderFlag = (
+  dataView: DataView,
+  offset: number,
+  index: number,
+  value: BinaryGender
+) => {
+  setFlag(dataView, offset, index, value === BinaryGender.Female)
+}
+
 export const getFlag = (dataView: DataView, offset: number, index: number) => {
   const byteIndex = offset + Math.floor(index / 8)
   const bitIndex = index % 8
@@ -62,6 +73,10 @@ export const getFlag = (dataView: DataView, offset: number, index: number) => {
   }
 
   return false
+}
+
+export const getGenderFlag = (dataView: DataView, offset: number, index: number): BinaryGender => {
+  return getFlag(dataView, offset, index) ? BinaryGender.Female : BinaryGender.Male
 }
 
 export function getFlagIndexes(

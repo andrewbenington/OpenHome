@@ -4,6 +4,7 @@ import * as byteLogic from '@openhome-core/util/byteLogic'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
+  BinaryGender,
   ConvertStrategy,
   Generation,
   ItemGen2,
@@ -49,7 +50,7 @@ export default class PK2 {
   currentHP: number
   trainerName: string
   nickname: string
-  trainerGender: boolean
+  trainerGender: BinaryGender
   originalBytes?: ArrayBuffer
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
@@ -118,7 +119,7 @@ export default class PK2 {
       } else {
         this.nickname = this.metadata?.formeName ?? ''
       }
-      this.trainerGender = byteLogic.getFlag(dataView, 0x1e, 7)
+      this.trainerGender = byteLogic.getGenderFlag(dataView, 0x1e, 7)
     } else {
       const other = arg
       const converter = new PkmConverter('PK2', options.strategy)
@@ -228,7 +229,7 @@ export default class PK2 {
     if (options?.includeExtraFields) {
       stringLogic.writeGameBoyStringToBytes(dataView, this.nickname, 0x3b, 11, true)
     }
-    byteLogic.setFlag(dataView, 0x1e, 7, this.trainerGender)
+    byteLogic.setFlag(dataView, 0x1e, 7, this.trainerGender === BinaryGender.Female)
     return buffer
   }
 

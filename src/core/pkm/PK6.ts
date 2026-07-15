@@ -7,6 +7,7 @@ import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   Ball,
+  BinaryGender,
   ContestStats,
   ConvertStrategy,
   ExtraFormIndex,
@@ -75,7 +76,7 @@ export default class PK6 {
   isEgg: boolean
   isNicknamed: boolean
   handlerName: string
-  handlerGender: boolean
+  handlerGender: BinaryGender
   isCurrentHandler: boolean
   geolocations: Geolocations
   handlerFriendship: number
@@ -103,7 +104,7 @@ export default class PK6 {
   currentHP: number
   isFatefulEncounter: boolean
   ribbons: string[]
-  trainerGender: boolean
+  trainerGender: BinaryGender
   originalBytes?: ArrayBuffer
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
@@ -185,7 +186,7 @@ export default class PK6 {
       this.isEgg = byteLogic.getFlag(dataView, 0x74, 30)
       this.isNicknamed = byteLogic.getFlag(dataView, 0x74, 31)
       this.handlerName = stringLogic.utf16BytesToString(buffer, 0x78, 12)
-      this.handlerGender = byteLogic.getFlag(dataView, 0x92, 0)
+      this.handlerGender = byteLogic.getGenderFlag(dataView, 0x92, 0)
       this.isCurrentHandler = byteLogic.getFlag(dataView, 0x93, 0)
       this.geolocations = [
         types.readGeolocationFromBytes(dataView, 0x94),
@@ -230,7 +231,7 @@ export default class PK6 {
       this.ribbons = byteLogic
         .getFlagIndexes(dataView, 0x30, 0, 46)
         .map((index) => ModernRibbons[index])
-      this.trainerGender = byteLogic.getFlag(dataView, 0xdd, 7)
+      this.trainerGender = byteLogic.getGenderFlag(dataView, 0xdd, 7)
     } else {
       const converter = new PkmConverter('PK6', strategy)
       const other = arg
@@ -428,7 +429,7 @@ export default class PK6 {
     byteLogic.setFlag(dataView, 0x74, 30, this.isEgg)
     byteLogic.setFlag(dataView, 0x74, 31, this.isNicknamed)
     stringLogic.writeUTF16StringToBytes(dataView, this.handlerName, 0x78, 12)
-    byteLogic.setFlag(dataView, 0x92, 0, this.handlerGender)
+    byteLogic.setGenderFlag(dataView, 0x92, 0, this.handlerGender)
     byteLogic.setFlag(dataView, 0x93, 0, this.isCurrentHandler)
     for (let i = 0; i < 5; i++) {
       types.writeGeolocationToBytes(dataView, 0x94 + 2 * i, this.geolocations[i])
@@ -470,7 +471,7 @@ export default class PK6 {
         .map((ribbon) => ModernRibbons.indexOf(ribbon))
         .filter((index) => index > -1 && index < 46)
     )
-    byteLogic.setFlag(dataView, 0xdd, 7, this.trainerGender)
+    byteLogic.setGenderFlag(dataView, 0xdd, 7, this.trainerGender)
     return buffer
   }
 

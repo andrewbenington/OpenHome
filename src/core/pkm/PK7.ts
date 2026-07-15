@@ -4,6 +4,7 @@ import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
 import {
   AbilityIndex,
+  BinaryGender,
   ContestStats,
   ConvertStrategies,
   ConvertStrategy,
@@ -26,12 +27,7 @@ import {
   shuffleBlocksGen67,
 } from './util/encryption'
 import { getStats } from './util/statCalc'
-import {
-  binaryGenderFromBool,
-  binaryGenderToBool,
-  convertPokeDate,
-  convertPokeDateOptional,
-} from './wasm/convert'
+import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
 export default class PK7 {
   static getFormat() {
@@ -343,10 +339,10 @@ export default class PK7 {
   }
 
   get handlerGender() {
-    return binaryGenderToBool(this.inner.handler_gender)
+    return this.inner.handler_gender
   }
-  set handlerGender(value: boolean) {
-    this.inner.handler_gender = binaryGenderFromBool(value)
+  set handlerGender(value: BinaryGender) {
+    this.inner.handler_gender = value
   }
 
   get isCurrentHandler() {
@@ -541,10 +537,10 @@ export default class PK7 {
   }
 
   get trainerGender() {
-    return binaryGenderToBool(this.inner.trainer_gender)
+    return this.inner.trainer_gender
   }
-  set trainerGender(value: boolean) {
-    this.inner.trainer_gender = binaryGenderFromBool(value)
+  set trainerGender(value: BinaryGender) {
+    this.inner.trainer_gender = value
   }
 
   public getStats() {

@@ -6,9 +6,9 @@ import { bytesToUint16BigEndian, xorChecksum8BitLe } from '@openhome-core/util/b
 import { Errorable, Option, range, unique } from '@openhome-core/util/functional'
 import { utf16StringToGen12 } from '@openhome-core/util/stringConversion'
 import {
+  BinaryGender,
   ConvertStrategy,
   ExtraFormIndex,
-  Gender,
   ItemGen1,
   Language,
   OriginGame,
@@ -277,7 +277,7 @@ export class G1SAV extends OfficialSAV<PK1> {
   }
 
   get trainerGender() {
-    return Gender.Male
+    return BinaryGender.Male
   }
 
   getMonAt(boxNum: number, boxSlot: number) {

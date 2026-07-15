@@ -9,9 +9,9 @@ import {
   utf16StringToGen12,
 } from '@openhome-core/util/stringConversion'
 import {
+  BinaryGender,
   ConvertStrategy,
   ExtraFormIndex,
-  Gender,
   ItemGen2,
   Language,
   OriginGame,
@@ -307,7 +307,9 @@ export class G2SAV extends OfficialSAV<PK2> {
   }
 
   get trainerGender() {
-    return this.origin === OriginGame.Crystal && this.bytes[0x3e3d] ? Gender.Female : Gender.Male
+    return this.origin === OriginGame.Crystal && this.bytes[0x3e3d]
+      ? BinaryGender.Female
+      : BinaryGender.Male
   }
 
   getMonAt(boxNum: number, boxSlot: number) {

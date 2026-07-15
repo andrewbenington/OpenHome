@@ -6,6 +6,7 @@ import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   Ball,
+  BinaryGender,
   ContestStats,
   ConvertStrategy,
   HyperTraining,
@@ -77,7 +78,7 @@ export default class PK9 {
   teraTypeOriginal: number
   teraTypeOverride: number
   handlerName: string
-  handlerGender: boolean
+  handlerGender: BinaryGender
   handlerLanguage?: Language
   isCurrentHandler: boolean
   handlerID: number
@@ -102,7 +103,7 @@ export default class PK9 {
   homeTracker: bigint
   tmFlagsSV: Uint8Array
   ribbons: string[]
-  trainerGender: boolean
+  trainerGender: BinaryGender
   level: number
   stats: types.Stats
   originalBytes?: ArrayBuffer
@@ -180,7 +181,7 @@ export default class PK9 {
       this.teraTypeOriginal = dataView.getUint8(0x94)
       this.teraTypeOverride = dataView.getUint8(0x95)
       this.handlerName = stringLogic.utf16BytesToString(buffer, 0xa8, 12)
-      this.handlerGender = byteLogic.getFlag(dataView, 0xc2, 0)
+      this.handlerGender = byteLogic.getGenderFlag(dataView, 0xc2, 0)
       this.handlerLanguage = Languages.fromByteOrNone(dataView.getUint8(0xc3))
       this.isCurrentHandler = byteLogic.getFlag(dataView, 0xc4, 0)
       this.handlerID = dataView.getUint16(0xc6, true)
@@ -210,7 +211,7 @@ export default class PK9 {
         .concat(
           byteLogic.getFlagIndexes(dataView, 0x40, 0, 47).map((index) => ModernRibbons[index + 64])
         )
-      this.trainerGender = byteLogic.getFlag(dataView, 0x125, 7)
+      this.trainerGender = byteLogic.getGenderFlag(dataView, 0x125, 7)
     } else {
       const other = arg
       const converter = new PkmConverter('PK9', options.strategy)
@@ -381,7 +382,7 @@ export default class PK9 {
     dataView.setUint8(0x94, this.teraTypeOriginal)
     dataView.setUint8(0x95, this.teraTypeOverride)
     stringLogic.writeUTF16StringToBytes(dataView, this.handlerName, 0xa8, 12)
-    byteLogic.setFlag(dataView, 0xc2, 0, this.handlerGender)
+    byteLogic.setGenderFlag(dataView, 0xc2, 0, this.handlerGender)
     dataView.setUint8(0xc3, this.handlerLanguage ?? 0)
     byteLogic.setFlag(dataView, 0xc4, 0, this.isCurrentHandler)
     dataView.setUint16(0xc6, this.handlerID, true)
@@ -421,7 +422,7 @@ export default class PK9 {
         .map((ribbon) => ModernRibbons.indexOf(ribbon) - 64)
         .filter((index) => index > -1 && index < 47)
     )
-    byteLogic.setFlag(dataView, 0x125, 7, this.trainerGender)
+    byteLogic.setGenderFlag(dataView, 0x125, 7, this.trainerGender)
     dataView.setUint8(0x148, this.level)
     types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
     return buffer

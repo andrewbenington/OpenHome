@@ -4,6 +4,7 @@ import { Errorable, R } from '@openhome-core/util/functional'
 import {
   AbilityIndex,
   Ball,
+  BinaryGender,
   ConvertStrategy,
   HyperTraining,
   Item,
@@ -63,7 +64,7 @@ export default class PB7 {
   isEgg: boolean
   isNicknamed: boolean
   handlerName: string
-  handlerGender: boolean
+  handlerGender: BinaryGender
   isCurrentHandler: boolean
   handlerFriendship: number
   fieldEventFatigue1: number
@@ -96,7 +97,7 @@ export default class PB7 {
   cp: number
   isMega: number
   megaForme: number
-  trainerGender: boolean
+  trainerGender: BinaryGender
   originalBytes?: ArrayBuffer
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
@@ -163,7 +164,7 @@ export default class PB7 {
       this.isEgg = byteLogic.getFlag(dataView, 0x74, 30)
       this.isNicknamed = byteLogic.getFlag(dataView, 0x74, 31)
       this.handlerName = stringLogic.utf16BytesToString(buffer, 0x78, 12)
-      this.handlerGender = byteLogic.getFlag(dataView, 0x92, 0)
+      this.handlerGender = byteLogic.getGenderFlag(dataView, 0x92, 0)
       this.isCurrentHandler = byteLogic.getFlag(dataView, 0x93, 0)
       this.handlerFriendship = dataView.getUint8(0xa2)
       this.fieldEventFatigue1 = dataView.getUint8(0xac)
@@ -196,7 +197,7 @@ export default class PB7 {
       this.cp = dataView.getUint16(0xfe, true)
       this.isMega = dataView.getUint8(0x100)
       this.megaForme = dataView.getUint8(0x101)
-      this.trainerGender = byteLogic.getFlag(dataView, 0xdd, 7)
+      this.trainerGender = byteLogic.getGenderFlag(dataView, 0xdd, 7)
     } else {
       const other = arg
       const converter = new PkmConverter('PB7', strategy)
@@ -249,7 +250,7 @@ export default class PB7 {
       this.isEgg = other.isEgg
       this.isNicknamed = other.isNicknamed
       this.handlerName = ''
-      this.handlerGender = false
+      this.handlerGender = BinaryGender.Male
       this.isCurrentHandler = false
       this.handlerFriendship = 0
       this.fieldEventFatigue1 = 0
@@ -348,7 +349,7 @@ export default class PB7 {
     byteLogic.setFlag(dataView, 0x74, 30, this.isEgg)
     byteLogic.setFlag(dataView, 0x74, 31, this.isNicknamed)
     stringLogic.writeUTF16StringToBytes(dataView, this.handlerName, 0x78, 12)
-    byteLogic.setFlag(dataView, 0x92, 0, this.handlerGender)
+    byteLogic.setGenderFlag(dataView, 0x92, 0, this.handlerGender)
     byteLogic.setFlag(dataView, 0x93, 0, this.isCurrentHandler)
     dataView.setUint8(0xa2, this.handlerFriendship)
     dataView.setUint8(0xac, this.fieldEventFatigue1)
@@ -382,7 +383,7 @@ export default class PB7 {
     dataView.setUint16(0xfe, this.cp, true)
     dataView.setUint8(0x100, this.isMega)
     dataView.setUint8(0x101, this.megaForme)
-    byteLogic.setFlag(dataView, 0xdd, 7, this.trainerGender)
+    byteLogic.setGenderFlag(dataView, 0xdd, 7, this.trainerGender)
     return buffer
   }
 

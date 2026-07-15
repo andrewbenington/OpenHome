@@ -17,11 +17,11 @@ import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Errorable } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
+  BinaryGender,
   Block,
   BlockType,
   ConvertStrategy,
   ExtraFormIndex,
-  Gender,
   Languages,
   OriginGame,
 } from '@pkm-rs/pkg'
@@ -166,7 +166,7 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
   }
 
   get trainerGender() {
-    return this.trainerBlock.getGender() ? Gender.Female : Gender.Male
+    return this.trainerBlock.getGender() ? BinaryGender.Female : BinaryGender.Male
   }
 
   get language() {

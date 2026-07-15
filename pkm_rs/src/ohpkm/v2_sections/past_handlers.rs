@@ -9,7 +9,7 @@ use crate::sectioned_data::DataSection;
 use crate::traits::{OhpkmByte, OhpkmBytes};
 
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{Gender, Language, OriginGame, TrainerData, TrainerMemory};
+use pkm_rs_types::{BinaryGender, Gender, Language, OriginGame, TrainerData, TrainerMemory};
 use serde::Serialize;
 
 #[cfg(feature = "randomize")]
@@ -31,7 +31,7 @@ pub struct PastHandlerDataV2 {
     pub friendship: u8,
     pub memory: TrainerMemory,
     pub affection: u8,
-    pub gender: Gender,
+    pub gender: BinaryGender,
     pub language: Language,
     pub origin_game: Option<OriginGame>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
@@ -48,7 +48,11 @@ impl PastHandlerDataV2 {
             friendship: old.friendship,
             memory: old.memory,
             affection: old.affection,
-            gender: old.gender,
+            gender: if old.gender == Gender::Female {
+                BinaryGender::Female
+            } else {
+                BinaryGender::Male
+            },
             language: Language::None,
             origin_game: old.origin_game,
             origin_plugin: old.origin_plugin,
@@ -64,7 +68,7 @@ impl PastHandlerDataV2 {
                 friendship: old.handler_friendship,
                 memory: old.handler_memory,
                 affection: old.handler_affection,
-                gender: Gender::from(old.handler_gender),
+                gender: BinaryGender::from(old.handler_gender),
                 language: old.handler_language.try_into().unwrap_or(Language::None),
                 origin_game: None,
                 origin_plugin: None,
@@ -90,7 +94,7 @@ impl PastHandlerDataV2 {
     pub fn unknown_trainer_data_matches(
         &self,
         name: &SizedUtf16String<26>,
-        gender: Gender,
+        gender: BinaryGender,
     ) -> bool {
         self.gender == gender && self.name == *name && self.origin_game.is_none()
     }
@@ -158,7 +162,7 @@ impl PastHandlerDataV2 {
         friendship: u8,
         memory: Option<TrainerMemory>,
         affection: u8,
-        gender: Gender,
+        gender: BinaryGender,
         language: Language,
         origin_game: Option<OriginGame>,
         origin_plugin: Option<String>,
@@ -215,7 +219,7 @@ impl DataSection for PastHandlerDataV2 {
             friendship: bytes[30],
             memory: TrainerMemory::from_bytes_in_order(bytes[31..=35].try_into().unwrap()),
             affection: bytes[36],
-            gender: Gender::from_u8(bytes[37]),
+            gender: BinaryGender::from(bytes[37] == 1),
             language: Language::try_from(bytes[38]).unwrap_or(Language::None),
             origin_game: Option::<OriginGame>::from_ohpkm_byte(bytes[39]),
             origin_plugin,

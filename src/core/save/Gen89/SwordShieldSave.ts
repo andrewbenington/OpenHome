@@ -10,11 +10,11 @@ import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { Errorable, Option } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
+  BinaryGender,
   Block,
   BlockType,
   ConvertStrategy,
   ExtraFormIndex,
-  Gender,
   Language,
   Languages,
   Lookup,
@@ -229,8 +229,8 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldS
     return origin === OriginGame.Sword || origin === OriginGame.Shield
   }
 
-  get trainerGender(): Gender {
-    return this.inner.trainerGender ? Gender.Female : Gender.Male
+  get trainerGender(): BinaryGender {
+    return this.inner.trainerGender
   }
 
   get language() {
