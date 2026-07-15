@@ -105,7 +105,7 @@ export class SwordShieldSave extends WasmOfficialSave<PK8, Pk8Wasm, SwordShieldS
   }
 
   emptyBoxSlotBytes() {
-    return Pk8Wasm.emptyBoxSlotBytes(this.name)
+    return SwordShieldSaveRust.emptyBoxSlotBytes()
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {

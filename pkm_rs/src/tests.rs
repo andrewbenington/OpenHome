@@ -10,7 +10,7 @@ use std::io::Read;
 use std::ops::RangeInclusive;
 use std::path::{Path, PathBuf};
 
-fn saves_path() -> PathBuf {
+pub fn saves_path() -> PathBuf {
     Path::new("test-files").join("save-files")
 }
 
@@ -96,6 +96,44 @@ pub fn from_to_ohpkm_all_in_dir<PKM: OhpkmConvert>() -> TestResult<()> {
     }
 
     Ok(())
+}
+
+type PathAndBytes = (PathBuf, Box<[u8]>);
+
+pub fn all_file_bytes_in_dir(
+    dir: &Path,
+) -> TestResult<impl Iterator<Item = Result<PathAndBytes, Error>>> {
+    use std::fs;
+
+    let dir_entries = fs::read_dir(dir)
+        .map_err(|e| Error::other(&format!("directory read error: {e}")))?
+        .filter_map(|result| result.ok());
+
+    let successful_pkm = dir_entries
+        .filter(|dir_entry| !dir_entry.file_name().to_string_lossy().starts_with("."))
+        .map(|dir_entry| {
+            fs::read(dir.join(dir_entry.file_name()))
+                .map(|bytes| (dir.join(dir_entry.file_name()), bytes.into_boxed_slice()))
+                .map_err(|e| Error::other(&format!("{:?} read error: {e}", dir_entry.file_name())))
+        });
+
+    Ok(successful_pkm)
+}
+
+pub fn all_pkm_and_bytes_in_dir<PKM: Pkm>(
+    dir: &Path,
+) -> TestResult<impl Iterator<Item = Result<(PKM, Vec<u8>), Error>>> {
+    use std::fs;
+
+    let dir_entries = fs::read_dir(dir)
+        .map_err(|e| Error::other(&format!("directory read error: {e}")))?
+        .filter_map(|result| result.ok());
+
+    let successful_pkm = dir_entries
+        .filter(|dir_entry| !dir_entry.file_name().to_string_lossy().starts_with("."))
+        .map(|dir_entry| pkm_from_file::<PKM>(&dir.join(dir_entry.file_name())));
+
+    Ok(successful_pkm)
 }
 
 pub fn to_from_ohpkm_all_in_dir<PKM: OhpkmConvert>(dir: &Path) -> TestResult<()> {

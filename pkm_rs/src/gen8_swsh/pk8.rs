@@ -343,17 +343,6 @@ impl Pk8 {
         self.stats = self.calculate_stats();
     }
 
-    pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Box<[u8]> {
-        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
-        let mut buffer = Pk8BufferMut::new_mut(bytes.as_mut_slice());
-
-        buffer.set_handler_name(trainer_name);
-        buffer.set_is_current_handler(true);
-        buffer.refresh_checksum();
-
-        bytes
-    }
-
     pub fn is_empty_slot(bytes: &[u8]) -> bool {
         let mut owned = bytes.to_owned();
         let mut buffer = Pk8Buffer::new_mut(&mut owned);
@@ -564,11 +553,6 @@ impl Pk8 {
         Self::is_empty_slot(bytes)
     }
 
-    #[wasm_bindgen(js_name = emptyBoxSlotBytes)]
-    pub fn empty_box_slot_bytes_js(trainer_name: &str) -> Box<[u8]> {
-        Self::empty_box_slot_bytes(&trainer_name.into())
-    }
-
     #[wasm_bindgen(js_name = calculateChecksum)]
     pub fn calculate_checksum_js(&self) -> u16 {
         self.calculate_checksum()
@@ -638,7 +622,6 @@ mod test {
     use crate::gen8_swsh::pk8_buffer::Pk8Buffer;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
-    use crate::result::Error;
     use crate::tests::TestErrorWithSeed;
     use crate::tests::{self, TestResult};
     use crate::traits::IsShiny;
@@ -749,16 +732,6 @@ mod test {
         let roundtrip = Pk8::from_ohpkm(&ohpkm, ConvertStrategy::default())?;
         assert_eq!(roundtrip.dynamax_level, mon.dynamax_level);
 
-        Ok(())
-    }
-
-    #[test]
-    fn empty_slot_checksum() -> TestResult<()> {
-        let empty_slot = Pk8::empty_box_slot_bytes(&"RoC".into());
-        let checksum = Pk8Buffer::new(&empty_slot).checksum();
-        if checksum == 0 {
-            return Err(Error::other("Empty slot checksum should be non-zero").into());
-        }
         Ok(())
     }
 
