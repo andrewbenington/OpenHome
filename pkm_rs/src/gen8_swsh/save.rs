@@ -130,6 +130,10 @@ impl SwordShieldSave {
     }
 
     pub fn empty_box_slot_bytes() -> Box<[u8]> {
+        // ANY CHANGES TO THIS MUST BE TESTED IN A SWORD/SHIELD SAVE FILE
+        // ensure moving a Pokémon from a save slot in OpenHome such that
+        // its previous slot is made empty does not result in a Bad Egg
+        // being left in the slot
         let mut bytes = Box::new([0u8; Pk8::BOX_SIZE]);
         let mut buffer = Pk8Buffer::new_mut(bytes.as_mut_slice());
 
@@ -409,17 +413,13 @@ mod tests {
     }
 
     #[test]
-    fn empty_box_slot_bytes() -> tests::TestResult<()> {
+    fn empty_slot_bytes_write_read_are_expected() -> tests::TestResult<()> {
         let save_bytes = tests::save_bytes_from_file(&Path::new("gen8-swsh").join("sword2"))?;
         let mut save = SwordShieldSave::from_bytes(save_bytes.into_boxed_slice())?;
-
-        let empty_slot_box_index = BoxIndex::check_bound(9).expect("should be valid");
-        let empty_slot = BoxSlot::check_bound(4).expect("should be valid");
 
         let initially_full_box_index = BoxIndex::check_bound(1).expect("should be valid");
         let initially_full_slot = BoxSlot::check_bound(1).expect("should be valid");
 
-        assert!(save.get_mon_at(empty_slot_box_index, empty_slot).is_none());
         assert!(
             save.get_mon_at(initially_full_box_index, initially_full_slot)
                 .is_some()
@@ -431,15 +431,11 @@ mod tests {
                 .is_none()
         );
 
-        let mut expected_bytes = save.get_mon_bytes_raw(empty_slot_box_index, empty_slot);
-        println!("{}", tests::bytes_to_hex_string(&expected_bytes));
+        let mut expected_bytes = SwordShieldSave::empty_box_slot_bytes();
         let mut actual_bytes =
             save.get_mon_bytes_raw(initially_full_box_index, initially_full_slot);
         Pk8Buffer::new_mut(&mut expected_bytes).decrypt();
         Pk8Buffer::new_mut(&mut actual_bytes).decrypt();
-
-        println!("{:?}", expected_bytes);
-        println!("{actual_bytes:?}");
 
         tests::ensure_ranges_match(&actual_bytes, &expected_bytes, None)
     }
