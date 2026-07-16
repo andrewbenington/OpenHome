@@ -62,6 +62,23 @@ impl Language {
             }),
         }
     }
+
+    pub const fn egg_name(&self) -> &'static str {
+        match self {
+            Language::None => "",
+            Language::Japanese => "タマゴ",
+            Language::English => "Egg",
+            Language::French => "Œuf",
+            Language::Italian => "Uovo",
+            Language::German => "Ei",
+            Language::UNUSED => "",
+            Language::SpanishSpain => "Huevo",
+            Language::Korean => "알",
+            Language::ChineseSimplified => "蛋",
+            Language::ChineseTraditional => "蛋",
+            Language::SpanishLatinAmerica => "Huevo",
+        }
+    }
 }
 
 impl TryFrom<u8> for Language {

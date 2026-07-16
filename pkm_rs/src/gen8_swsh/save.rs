@@ -1,5 +1,6 @@
 use super::save_blocks::{BoxBlock, MyStatusBlock, SwShBlocks};
 use super::{BOX_COLS, BOX_ROWS, BoxName, MAX_BOX_COUNT, Pk8, Pk8Buffer};
+use crate::checksum::RefreshChecksum;
 use crate::encryption::swish_crypto;
 use crate::gen8_swsh::{BoxIndex, BoxSlot};
 use crate::result::{Error, Result};
@@ -8,10 +9,8 @@ use crate::traits::PkmBytes;
 #[cfg(feature = "wasm")]
 use pkm_rs_types::BoundViolated;
 use pkm_rs_types::OriginGame;
-
-use pkm_rs_types::{BinaryGender, Language};
-
 use pkm_rs_types::strings::SizedUtf16String;
+use pkm_rs_types::{BinaryGender, Language};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -85,11 +84,14 @@ impl SwordShieldSave {
     }
 
     fn get_mon_bytes_decrypted(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Box<[u8]> {
-        let pokemon_bytes = self.box_data().mon_bytes_at(box_index, box_slot);
-        let mut copied_bytes = Box::from(pokemon_bytes);
-        Pk8Buffer::new_mut(&mut copied_bytes).decrypt();
+        let mut pokemon_bytes = self.get_mon_bytes_raw(box_index, box_slot);
+        Pk8Buffer::new_mut(&mut pokemon_bytes).decrypt();
 
-        copied_bytes
+        pokemon_bytes
+    }
+
+    fn get_mon_bytes_raw(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Box<[u8]> {
+        Box::from(self.box_data().mon_bytes_at(box_index, box_slot))
     }
 
     fn get_mon_at(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Option<Pk8> {
@@ -115,11 +117,25 @@ impl SwordShieldSave {
 
             mon.to_box_bytes_encrypted()
         } else {
-            Pk8::empty_box_slot_bytes(&self.trainer_name().resize())
+            Self::empty_box_slot_bytes()
         };
 
         // write bytes to box slot
         self.copy_pokemon_bytes_to(box_index, box_slot, &mon_bytes);
+    }
+
+    pub fn empty_box_slot_bytes() -> Box<[u8]> {
+        // ANY CHANGES TO THIS MUST BE TESTED IN A SWORD/SHIELD SAVE FILE
+        // ensure moving a Pokémon from a save slot in OpenHome such that
+        // its previous slot is made empty does not result in a Bad Egg
+        // being left in the slot
+        let mut bytes = Box::new([0u8; Pk8::BOX_SIZE]);
+        let mut buffer = Pk8Buffer::new_mut(bytes.as_mut_slice());
+
+        buffer.refresh_checksum();
+        buffer.encrypt();
+
+        bytes
     }
 
     #[cfg(feature = "wasm")]
@@ -177,6 +193,11 @@ impl SwordShieldSave {
         {
             self.set_mon_at(box_index, box_slot, mon)
         }
+    }
+
+    #[wasm_bindgen(js_name = emptyBoxSlotBytes)]
+    pub fn empty_box_slot_bytes_wasm() -> Box<[u8]> {
+        Self::empty_box_slot_bytes()
     }
 
     #[wasm_bindgen(js_name = getBoxName)]
@@ -379,5 +400,33 @@ mod tests {
         }
 
         Ok(())
+    }
+
+    #[test]
+    fn empty_slot_bytes_write_read_are_expected() -> tests::TestResult<()> {
+        let save_bytes = tests::save_bytes_from_file(&Path::new("gen8-swsh").join("sword2"))?;
+        let mut save = SwordShieldSave::from_bytes(save_bytes.into_boxed_slice())?;
+
+        let initially_full_box_index = BoxIndex::check_bound(1).expect("should be valid");
+        let initially_full_slot = BoxSlot::check_bound(1).expect("should be valid");
+
+        assert!(
+            save.get_mon_at(initially_full_box_index, initially_full_slot)
+                .is_some()
+        );
+
+        save.set_mon_at(initially_full_box_index, initially_full_slot, None);
+        assert!(
+            save.get_mon_at(initially_full_box_index, initially_full_slot)
+                .is_none()
+        );
+
+        let mut expected_bytes = SwordShieldSave::empty_box_slot_bytes();
+        let mut actual_bytes =
+            save.get_mon_bytes_raw(initially_full_box_index, initially_full_slot);
+        Pk8Buffer::new_mut(&mut expected_bytes).decrypt();
+        Pk8Buffer::new_mut(&mut actual_bytes).decrypt();
+
+        tests::ensure_ranges_match(&actual_bytes, &expected_bytes, None)
     }
 }

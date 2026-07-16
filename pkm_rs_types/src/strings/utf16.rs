@@ -40,10 +40,11 @@ impl<const N: usize> SizedUtf16String<N> {
     pub fn resize<const M: usize>(&mut self) -> SizedUtf16String<M> {
         let mut raw_le = [0u8; M];
         if M >= 2 {
-            raw_le[0..M - 2].copy_from_slice(&self.raw_le[0..N.min(M - 2)]);
+            let end = N.min(M - 2);
+            raw_le[0..end].copy_from_slice(&self.raw_le[0..end]);
         }
 
-        SizedUtf16String { raw_le: [0u8; M] }
+        SizedUtf16String { raw_le }
     }
 }
 
