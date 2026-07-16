@@ -13,13 +13,13 @@ pkm_rs_resources = {path = "../pkm_rs_resources", features=["wasm"]}
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
 num = "0.4.3"
-wasm-bindgen = { version = "0.2.125", optional = true }
-js-sys = { version = "0.3.102", optional = true }
+wasm-bindgen = { version = "0.2.126", optional = true }
+js-sys = { version = "0.3.103", optional = true }
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
 pkm_rs_derive = { path = "../pkm_rs_derive" }
 static_assertions = "1.1.0"
 sha2 = "0.11.0"
-rand = { version = "0.10.1", optional = true }
+rand = { version = "0.10.2", optional = true }
 getrandom = { version = "0.4.3", features = ["wasm_js"] }
 phf = { version = "0.13.1", features = ["macros"] }
 strum = { version = "0.28.0", features = ["derive"]  }
