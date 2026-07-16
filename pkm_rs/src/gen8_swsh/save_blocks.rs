@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use super::{BOX_NAME_LENGTH, BOX_SLOTS, BoxName, Pk8};
 use crate::encryption::swish_crypto;
 use crate::gen8_swsh::{BoxIndex, BoxSlot};
@@ -70,15 +72,20 @@ impl SwShBlocks {
             box_layouts,
             other_blocks,
         } = self;
-        other_blocks
-            .iter()
-            .cloned()
+
+        // the game will read the file fine if the blocks aren't sorted, but PKHeX expects them to be in key order.
+        // an iterator from a btree will preserve key order.
+        let blocks_btree: BTreeMap<u32, swish_crypto::Block> = other_blocks
+            .into_iter()
             .chain([
-                my_status.to_block(),
+                my_status.into_block(),
                 pokemon_boxes.into_block(),
                 box_layouts.into_block(),
             ])
-            .collect()
+            .map(|block| (block.key(), block))
+            .collect();
+
+        blocks_btree.into_values().collect()
     }
 }
 
@@ -225,7 +232,7 @@ impl MyStatusBlock {
         BinaryGender::from(gender_raw == 1)
     }
 
-    pub fn to_block(&self) -> swish_crypto::Block {
+    pub fn into_block(self) -> swish_crypto::Block {
         swish_crypto::Block::new(
             BlockKey::MyStatus.to_u32(),
             swish_crypto::BlockData::Object(self.0.clone()),
