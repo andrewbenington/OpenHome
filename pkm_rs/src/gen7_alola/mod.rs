@@ -83,5 +83,4 @@ impl TryFrom<SpeciesAndForm> for Pk7SpeciesAndForm {
 }
 
 type BoxIndex = pkm_rs_types::BoundedU8<{ BOX_SLOTS }>;
-
 type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS }>;

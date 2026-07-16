@@ -24,6 +24,7 @@ pub enum MoveErrorKind {
 #[derive(Debug)]
 pub enum Error {
     BoxIndex(u8),
+    BoxSlot(u8),
     BufferSize {
         requirement_source: Option<String>,
         expected: usize,
@@ -149,6 +150,7 @@ impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
             Self::BoxIndex(index) => format!("Invalid box index: {index}"),
+            Self::BoxSlot(slot) => format!("Invalid box slot: {slot}"),
             Self::BufferSize {requirement_source,
                expected, received,
             } => {

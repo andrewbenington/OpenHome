@@ -246,9 +246,11 @@ impl Gen7AlolaSave {
 #[allow(clippy::missing_const_for_fn)]
 impl Gen7AlolaSave {
     #[wasm_bindgen(js_name = getMonAt)]
-    pub fn get_mon_at_wasm(&self, box_index: u8, box_slot: u8) -> Option<Pk7> {
-        self.get_mon_at(box_index.try_into().ok()?, box_slot.try_into().ok()?)
-            .ok()?
+    pub fn get_mon_at_wasm(&self, box_index: u8, box_slot: u8) -> Result<Option<Pk7>> {
+        self.get_mon_at(
+            box_index.try_into().or(Err(Error::BoxIndex(box_index)))?,
+            box_slot.try_into().or(Err(Error::BoxSlot(box_index)))?,
+        )
     }
 
     #[wasm_bindgen(js_name = setMonAt)]
