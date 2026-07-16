@@ -117,11 +117,6 @@ impl SwordShieldSave {
 
             mon.to_box_bytes_encrypted()
         } else {
-            println!(
-                "name {:?} resized {:?}",
-                self.trainer_name(),
-                self.trainer_name().resize::<28>()
-            );
             Self::empty_box_slot_bytes()
         };
 
