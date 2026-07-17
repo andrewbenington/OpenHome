@@ -1,5 +1,4 @@
 use std::fmt::Display;
-use std::io::Write;
 use std::str::FromStr;
 
 use crate::commands::CommandResult;
@@ -460,15 +459,9 @@ pub fn clear_logs_for_range(
 
     for date in date_range_inclusive(start.date_naive(), end.date_naive()) {
         let file_path = log_file_path(date);
-        let mut file = match app.open_file_for_writing(DataDir::Logs, &file_path) {
-            Ok(file) => file,
-            Err(Error::FileMissing { .. }) => continue,
-            Err(err) => return Err(err.into()),
-        };
 
         if date == today {
-            file.set_len(0)
-                .map_err(|e| Error::file_write(&file_path, e))?;
+            app.truncate_file(DataDir::Logs, &file_path)?;
             continue;
         } else if date > start_date && date < end_date {
             app.delete_file(DataDir::Logs, log_file_path(date))?;
@@ -493,8 +486,12 @@ pub fn clear_logs_for_range(
         if lines_in_range.is_empty() {
             app.delete_file(DataDir::Logs, log_file_path(date))?;
         } else {
-            file.write_all(lines_in_range.join("\n").as_bytes())
-                .map_err(|e| Error::file_write(&file_path, e))?;
+            app.write_file_text(
+                DataDir::Logs,
+                log_file_path(date),
+                &lines_in_range.join("\n"),
+            )
+            .map_err(|e| Error::file_write(&file_path, e))?;
         }
     }
 

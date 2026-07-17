@@ -4,7 +4,7 @@ use std::{fmt::Display, path::PathBuf};
 use semver::Version;
 use serde::{Serialize, Serializer};
 
-type SourceError = Box<dyn std::error::Error>;
+type SourceError = Box<dyn std::error::Error + 'static>;
 
 #[derive(Debug)]
 pub enum Error {
@@ -23,10 +23,7 @@ pub enum Error {
         path: PathBuf,
         source: SourceError,
     },
-    FileWrite {
-        path: PathBuf,
-        source: SourceError,
-    },
+    FileWrite(FileContext),
     FileWrites(Vec<(PathBuf, SourceError)>),
     FileMissing {
         path: PathBuf,
@@ -95,10 +92,11 @@ impl Error {
     where
         P: AsRef<Path>,
     {
-        Self::FileWrite {
-            path: path.as_ref().to_path_buf(),
-            source: Box::new(source),
-        }
+        Self::FileWrite(FileContext::new(path, Some(source)))
+    }
+
+    pub fn file_write_no_path<E: std::error::Error + 'static>(source: E) -> Self {
+        Self::FileWrite(FileContext::no_path(source))
     }
 
     pub fn outdated_version(last_opened: Version, this_version: Version) -> Self {
@@ -157,10 +155,7 @@ impl Display for Error {
                 "File is malformed or corrupted: '{}' ({source})",
                 path.to_string_lossy()
             ),
-            Self::FileWrite { path, source } => format!(
-                "File could not be written: '{}' ({source})",
-                path.to_string_lossy()
-            ),
+            Self::FileWrite(context) => format!("File could not be written: {context}"),
             Self::FileWrites(errors) => {
                 let mut msg = format!("{} file write errors:", errors.len());
 
@@ -225,8 +220,8 @@ impl std::error::Error for Error {
             Self::DataFolderAccess { source }
             | Self::FileAccess { source, .. }
             | Self::FileDownload { source, .. }
-            | Self::FileMalformed { source, .. }
-            | Self::FileWrite { source, .. } => Some(source.as_ref()),
+            | Self::FileMalformed { source, .. } => Some(source.as_ref()),
+            Self::FileWrite(context) => context.source.as_deref(),
 
             Self::WindowAccess { source } | Self::Other { source, .. } => source.as_deref(),
 
@@ -254,3 +249,42 @@ impl From<Error> for String {
 }
 
 pub type Result<T> = core::result::Result<T, Error>;
+
+#[derive(Debug)]
+pub struct FileContext {
+    path: Option<PathBuf>,
+    source: Option<SourceError>,
+}
+
+impl FileContext {
+    pub fn new<P, E: std::error::Error + 'static>(path: &P, source: Option<E>) -> Self
+    where
+        P: AsRef<Path>,
+    {
+        Self {
+            path: Some(path.as_ref().to_path_buf()),
+            source: match source {
+                Some(e) => Some(Box::new(e)),
+                None => None,
+            },
+        }
+    }
+
+    pub fn no_path<E: std::error::Error + 'static>(source: E) -> Self {
+        Self {
+            path: None,
+            source: Some(Box::new(source)),
+        }
+    }
+}
+
+impl Display for FileContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match (&self.source, &self.path) {
+            (None, None) => f.write_str("(no context provided)"),
+            (None, Some(path)) => write!(f, "location: {path:?}"),
+            (Some(source), None) => write!(f, "{source}"),
+            (Some(source), Some(path)) => write!(f, "{source}; location: {path:?}"),
+        }
+    }
+}

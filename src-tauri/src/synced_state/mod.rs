@@ -94,7 +94,7 @@ impl AllSyncedState {
 
     pub fn save_to_files(
         &self,
-        data_controller: &impl data_controller::DataController,
+        data_controller: &mut impl data_controller::DataController,
     ) -> Result<()> {
         let locked = self.lock()?;
         locked.ohpkm_store.0.write_to_mons_v2(data_controller)?;
@@ -162,11 +162,11 @@ impl Deref for AllSyncedState {
 #[tauri::command]
 #[specta::specta]
 pub fn save_synced_state(
-    app_handle: tauri::AppHandle,
+    mut app_handle: tauri::AppHandle,
     synced_state: tauri::State<'_, AllSyncedState>,
 ) -> CommandResult<()> {
     synced_state
-        .save_to_files(&app_handle)
+        .save_to_files(&mut app_handle)
         .map_err(CommandError::from)
 }
 
