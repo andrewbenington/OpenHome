@@ -170,6 +170,7 @@ pub enum SignificantUpdate {
     V1_13_2,
     V1_13_3,
     V1_14_1,
+    V1_14_2,
 }
 
 impl SignificantUpdate {
@@ -201,6 +202,7 @@ impl SignificantUpdate {
             Self::V1_13_2 => Version::parse("1.13.2"),
             Self::V1_13_3 => Version::parse("1.13.3"),
             Self::V1_14_1 => Version::parse("1.14.1"),
+            Self::V1_14_2 => Version::parse("1.14.2"),
         }
         .expect("all versions are valid semver")
     }
@@ -327,6 +329,10 @@ impl SignificantUpdate {
             Self::V1_14_1 => Some(vec![
                 "Fixed a bug affecting users with convert strategy settings from a few versions back.",
                 "Fixed the missing convert strategies page.",
+            ]),
+            Self::V1_14_2 => Some(vec![
+                "Fixed a bug preventing Gen 7 3DS saves from opening.",
+                "Gen 7 3DS saves now show the correct box names.",
             ]),
             _ => None,
         }
