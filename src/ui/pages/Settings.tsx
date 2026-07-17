@@ -142,9 +142,9 @@ function GroupHeader(props: { name: string }) {
 function PKMConversion() {
   const schema = getConvertSettingsSchema().settings_schema
 
-  const grouped = Object.groupBy(Object.entries(schema), ([identifier]) =>
-    ConvertStrategies.getCategoryName(identifier as ConvertStrategyKey)
-  )
+  const grouped = Object.groupBy(schema.entries(), ([identifier]) => {
+    return ConvertStrategies.getCategoryName(identifier as ConvertStrategyKey)
+  })
 
   return (
     <ContentCard>
