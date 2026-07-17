@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "pkhex-json": {
+      "commandName": "Project",
+      "commandLineArgs": "",
+      "workingDirectory": "/Users/andrewbenington/Dev/OpenHome/pkhex-json"
+    }
+  }
+}
