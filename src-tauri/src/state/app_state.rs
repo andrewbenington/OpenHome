@@ -148,13 +148,13 @@ pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> CommandResult<
 #[tauri::command]
 #[specta::specta]
 pub fn commit_transaction(
-    app_handle: tauri::AppHandle,
+    mut app_handle: tauri::AppHandle,
     app_state: tauri::State<'_, AppState>,
     pokedex_state: tauri::State<'_, PokedexState>,
 ) -> CommandResult<()> {
     app_state.lock()?.transaction_mut().commit_transaction()?;
     pokedex_state
         .lock()?
-        .write_to_storage(&app_handle)
+        .write_to_storage(&mut app_handle)
         .map_err(CommandError::from)
 }

@@ -29,9 +29,9 @@ pub fn run_app_startup(app: &App) -> Result<Vec<versioning::UpdateFeatures>> {
         }),
     );
 
-    let handle = app.handle();
+    let current_version = &app.handle().package_info().version;
     let update_features: Vec<versioning::UpdateFeatures> =
-        match versioning::handle_updates_get_features(handle, false) {
+        match versioning::handle_updates_get_features(app.handle(), current_version, false) {
             Err(error) => match error {
                 Error::OutdatedVersion { .. } => {
                     let should_launch = show_version_error_prompt(app, &error);
@@ -40,17 +40,17 @@ pub fn run_app_startup(app: &App) -> Result<Vec<versioning::UpdateFeatures>> {
                         return Err(error);
                     }
 
-                    versioning::handle_updates_get_features(handle, true)?
+                    versioning::handle_updates_get_features(app.handle(), current_version, true)?
                 }
                 other => return Err(other),
             },
             Ok(feature_messages) => feature_messages,
         };
 
-    versioning::update_version_last_used(handle)?;
+    versioning::update_version_last_used(app.handle(), current_version)?;
 
     // IMPORTANT: should occur after any migrations (above)
-    initialize_storage(handle)?;
+    initialize_storage(app.handle())?;
 
     let result = set_theme_from_settings(app);
     if let Err(error) = result {

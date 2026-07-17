@@ -1,4 +1,4 @@
-mod capped;
+mod bounded;
 mod games;
 mod language;
 mod markings;
@@ -10,7 +10,7 @@ mod structures;
 mod traits;
 mod util;
 
-pub use capped::*;
+pub use bounded::*;
 pub use games::*;
 pub use language::*;
 pub use markings::*;

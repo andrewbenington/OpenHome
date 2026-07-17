@@ -196,7 +196,7 @@ pub struct StoredSaveRef {
 type RawSavePath = String;
 
 pub fn get_recent_saves(
-    data_controller: &impl DataController,
+    data_controller: &mut impl DataController,
 ) -> core::result::Result<Vec<(RawSavePath, SaveRef)>, String> {
     let recent_saves: HashMap<String, StoredSaveRef> = data_controller
         .read_or_create_default_json_file(DataDir::Storage, RECENT_SAVES_FILENAME)

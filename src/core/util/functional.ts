@@ -90,8 +90,23 @@ function buildStringErr<T = never>(err: any): Result<T, string> {
   return buildErr(String(err))
 }
 
+function tryFrom<T>(builder: () => T): Result<T, string> {
+  try {
+    return buildOk(builder())
+  } catch (e) {
+    return buildErr(String(e))
+  }
+}
+
 function tryPromise<T>(promise: Promise<T>): Promise<Result<T, string>> {
   return promise.then(buildOk).catch(buildStringErr)
+}
+
+function assert<T, E>(result: Result<T, E>): T {
+  if (isErr(result)) {
+    throw new Error(String(result.error))
+  }
+  return result.data
 }
 
 export type Err<E> = {
@@ -112,10 +127,26 @@ export const R = {
   mapErr,
   flatMap,
   asyncFlatMap,
+  assert,
   fromNullable,
   Ok: buildOk,
   Err: buildErr,
   isOk,
   isErr,
+  tryFrom,
   tryPromise,
+}
+
+type Mapper<T, R> = (val: T) => R
+
+type OnOk<T, R> = Mapper<T, R>
+
+type OnErr<E, R> = Mapper<E, R>
+
+// Wrapper function exposing Result utility functions as "methods"
+export function $R<T, E, R>(r: Result<T, E>) {
+  return {
+    match: (onOk: OnOk<T, R>, onErr: OnErr<E, R>) => match(onOk, onErr)(r),
+    map: (onOk: OnOk<T, R>) => map(onOk)(r),
+  }
 }

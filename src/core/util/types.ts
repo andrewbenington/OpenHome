@@ -1,5 +1,5 @@
 import { PathData } from '@openhome-core/save/util/path'
-import { Gender, OriginGame, Stats16Le } from '@pkm-rs/pkg'
+import { BinaryGender, Gender, OriginGame, Stats16Le } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../save/interfaces'
 
 export type Type =
@@ -55,11 +55,13 @@ export interface JSONObject extends Record<string, JSONValue> {}
 
 export interface JSONArray extends Array<JSONValue> {}
 
-export function displayGender(gender: Gender): string {
+export function displayGender(gender: Gender | BinaryGender): string {
   switch (gender) {
     case Gender.Male:
+    case BinaryGender.Male:
       return 'Male'
     case Gender.Female:
+    case BinaryGender.Female:
       return 'Female'
     case Gender.Genderless:
       return 'Genderless'

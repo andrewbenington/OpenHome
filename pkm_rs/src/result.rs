@@ -23,10 +23,16 @@ pub enum MoveErrorKind {
 
 #[derive(Debug)]
 pub enum Error {
+    BoxIndex(u8),
+    BoxSlot(u8),
     BufferSize {
         requirement_source: Option<String>,
         expected: usize,
         received: usize,
+    },
+    BuildSave {
+        context: String,
+        source: Option<Box<dyn core::error::Error>>,
     },
     CryptRange {
         range: (usize, usize),
@@ -80,21 +86,25 @@ pub enum Error {
         tag_type: &'static str,
         value: u16,
     },
-
     MoveError {
         value: u16,
         source: MoveErrorSource,
     },
-
     StringDecode {
         source: StringErrorSource,
     },
-
     // Generic error for when nothing else fits
     Other(String),
 }
 
 impl Error {
+    pub fn build_save(context: impl ToString, source: Option<Box<dyn core::error::Error>>) -> Self {
+        Self::BuildSave {
+            context: context.to_string(),
+            source,
+        }
+    }
+
     pub const fn form_index(species_and_form: SpeciesAndForm) -> Self {
         Self::FormIndex {
             national_dex: species_and_form.get_ndex(),
@@ -139,33 +149,38 @@ impl Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
-            Error::BufferSize {requirement_source,
+            Self::BoxIndex(index) => format!("Invalid box index: {index}"),
+            Self::BoxSlot(slot) => format!("Invalid box slot: {slot}"),
+            Self::BufferSize {requirement_source,
                expected, received,
             } => {
                 match requirement_source {
                     Some(source) => format!("{source} requires a buffer of length {expected}, but actual length is {received}"),
-                    None => format!("buffer of length {expected} was expected, but actual length is {received}"),
+                    None => format!("Buffer of length {expected} was expected, but actual length is {received}"),
                 }
             }
-            Error::CryptRange { range, buffer_size } => {
+            Self::BuildSave {context, source } => match source {
+Some(source) => format!("Error opening save: {context}; original error: {source}"),
+                None => format!("Error opening save: {context}"),}
+            Self::CryptRange { range, buffer_size } => {
                 format!("Attempting to decrypt/encrypt range ({}, {}) over buffer of size {buffer_size}", range.0, range.1)
                     .to_owned()
             }
-            Error::NationalDex { value: national_dex , source} => {
+            Self::NationalDex { value: national_dex , source} => {
                 format!("Invalid National Dex number {national_dex} (source: {source}; must be between 1 and {MAX_NATIONAL_DEX}")
                     .to_owned()
             }
 
-            Error::GenDex { saf, generation } => {
+            Self::GenDex { saf, generation } => {
                 let form = saf.get_forme_metadata();
                 format!("Pokémon '{}' (form: {}) does not exist in {generation}", lookup::species_name(saf.get_ndex(), Language::English), form.form_name)
             }
 
-            Error::GameDex { value, game } => {
+            Self::GameDex { value, game } => {
                 format!("Invalid game dex index {value} in {game} (no corresponding National Dex entry)")
             }
 
-            Error::FormIndex {
+            Self::FormIndex {
                 national_dex,
                 form_index,
             } => {
@@ -177,7 +192,7 @@ impl Display for Error {
                 )
                 .to_owned()
             }
-            Error::ExtraFormIndex {
+            Self::ExtraFormIndex {
                 national_dex,
                 extra_form_index,
             } => {
@@ -187,39 +202,39 @@ impl Display for Error {
                 )
                 .to_owned()
             }
-            Error::LanguageIndex { language_index } => {
+            Self::LanguageIndex { language_index } => {
                 format!("Invalid language index {language_index} (must be between 1 and {LANGUAGE_MAX}")
                     .to_owned()
             }
-            Error::NatureIndex { nature_index } => {
+            Self::NatureIndex { nature_index } => {
                 format!("Invalid nature index {nature_index} (must be between 1 and {NATURE_MAX}")
                     .to_owned()
             }
-            Error::AbilityIndex { ability_index } => {
+            Self::AbilityIndex { ability_index } => {
                 format!("Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}")
                     .to_owned()
             }
-            Error::AbilityNumber(InvalidAbilityNumber(num)) => {
+            Self::AbilityNumber(InvalidAbilityNumber(num)) => {
                 format!("Invalid ability number {num} (must be between 1 and 3)")
             }
-            Error::ItemIndex { item_index } => {
+            Self::ItemIndex { item_index } => {
                 format!("Invalid item index {item_index} (must be between 1 and {ITEM_MAX}")
                     .to_owned()
             }
-            Error::FieldError { field, source } => {
-                format!("Error reading field {field}: {source}")
+            Self::FieldError { field, source } => {
+                format!("Self reading field {field}: {source}")
                     .to_owned()
             }
-            Error::TagError { tag_type, value } => {
+            Self::TagError { tag_type, value } => {
                 format!("Invalid tag value {value} for tag type {tag_type}")
             }
-            Error::MoveError { value, source } => {
+            Self::MoveError { value, source } => {
                 format!("Invalid move reference {value} (source: {source})").to_owned()
             }
-            Error::StringDecode { source } => {
+            Self::StringDecode { source } => {
                 format!("String decode error: {source}").to_owned()
             }
-            Error::Other(msg) => msg.clone(),
+            Self::Other(msg) => msg.clone(),
         };
 
         f.write_str(&message)
@@ -229,7 +244,11 @@ impl Display for Error {
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            Self::FieldError { field: _, source } => Some(source.as_ref()),
+            Self::FieldError { source, .. } => Some(source.as_ref()),
+            Self::BuildSave {
+                source: Some(source),
+                ..
+            } => Some(source.as_ref()),
             _ => None,
         }
     }

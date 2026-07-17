@@ -1,10 +1,12 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
 import * as byteLogic from '@openhome-core/util/byteLogic'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   Ball,
+  BinaryGender,
   ContestStats,
   ConvertStrategy,
   HyperTraining,
@@ -74,7 +76,7 @@ export default class PA9 {
   isNicknamed: boolean
   statusCondition: number
   handlerName: string
-  handlerGender: boolean
+  handlerGender: BinaryGender
   handlerLanguage?: Language
   isCurrentHandler: boolean
   handlerID: number
@@ -99,7 +101,7 @@ export default class PA9 {
   homeTracker: bigint
   tmFlagsLza: Uint8Array
   ribbons: string[]
-  trainerGender: boolean
+  trainerGender: BinaryGender
   level: number
   stats: types.Stats
   originalBytes?: ArrayBuffer
@@ -175,7 +177,7 @@ export default class PA9 {
       this.isNicknamed = byteLogic.getFlag(dataView, 0x8c, 31)
       this.statusCondition = dataView.getUint32(0x90, true)
       this.handlerName = stringLogic.utf16BytesToString(buffer, 0xa8, 12)
-      this.handlerGender = byteLogic.getFlag(dataView, 0xc2, 0)
+      this.handlerGender = byteLogic.getGenderFlag(dataView, 0xc2, 0)
       this.handlerLanguage = Languages.fromByteOrNone(dataView.getUint8(0xc3))
       this.isCurrentHandler = byteLogic.getFlag(dataView, 0xc4, 0)
       this.handlerID = dataView.getUint16(0xc6, true)
@@ -205,7 +207,7 @@ export default class PA9 {
         .concat(
           byteLogic.getFlagIndexes(dataView, 0x40, 0, 47).map((index) => ModernRibbons[index + 64])
         )
-      this.trainerGender = byteLogic.getFlag(dataView, 0x125, 7)
+      this.trainerGender = byteLogic.getGenderFlag(dataView, 0x125, 7)
     } else {
       const other = arg
       const converter = new PkmConverter('PA9', strategy)
@@ -316,8 +318,8 @@ export default class PA9 {
     return new PA9(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PA9 {
-    return new PA9(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PA9> {
+    return R.tryFrom(() => new PA9(ohpkm, { strategy }))
   }
 
   toBytes(): ArrayBuffer {
@@ -374,7 +376,7 @@ export default class PA9 {
     byteLogic.setFlag(dataView, 0x8c, 31, this.isNicknamed)
     dataView.setUint32(0x90, this.statusCondition, true)
     stringLogic.writeUTF16StringToBytes(dataView, this.handlerName, 0xa8, 12)
-    byteLogic.setFlag(dataView, 0xc2, 0, this.handlerGender)
+    byteLogic.setGenderFlag(dataView, 0xc2, 0, this.handlerGender)
     dataView.setUint8(0xc3, this.handlerLanguage ?? 0)
     byteLogic.setFlag(dataView, 0xc4, 0, this.isCurrentHandler)
     dataView.setUint16(0xc6, this.handlerID, true)
@@ -414,7 +416,7 @@ export default class PA9 {
         .map((ribbon) => ModernRibbons.indexOf(ribbon) - 64)
         .filter((index) => index > -1 && index < 47)
     )
-    byteLogic.setFlag(dataView, 0x125, 7, this.trainerGender)
+    byteLogic.setGenderFlag(dataView, 0x125, 7, this.trainerGender)
     dataView.setUint8(0x148, this.level)
     types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
     return buffer

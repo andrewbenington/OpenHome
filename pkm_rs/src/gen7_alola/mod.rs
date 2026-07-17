@@ -10,7 +10,6 @@ pub use save::Gen7AlolaSave;
 pub use pk7::*;
 use pkm_rs_resources;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
-use pkm_rs_resources::moves::MoveDataOffsets;
 use pkm_rs_resources::ribbons::ModernRibbon;
 use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_resources::species::form_metadata::source_has_form_metadata;
@@ -22,13 +21,12 @@ use serde::Serialize;
 pub(crate) const BOX_SIZE: usize = 232;
 pub(crate) const PARTY_SIZE: usize = 260;
 
-const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
+pub const BOX_COUNT: u8 = 32;
+pub const BOX_ROWS: u8 = 5;
+pub const BOX_COLS: u8 = 6;
+pub const BOX_SLOTS: u8 = BOX_ROWS * BOX_COLS;
 
-const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
-    moves: 90,
-    pp: 98,
-    pp_ups: 102,
-};
+const MAX_RIBBON_ALOLA: usize = ModernRibbon::BattleTreeMaster as usize;
 
 const NEUROFORCE: u16 = 233;
 pub type Pk7AbilityIndex = AbilityIndexBounded<NEUROFORCE>;
@@ -83,3 +81,6 @@ impl TryFrom<SpeciesAndForm> for Pk7SpeciesAndForm {
         Self::try_new(value).ok_or(Error::form_index(value))
     }
 }
+
+type BoxIndex = pkm_rs_types::BoundedU8<{ BOX_SLOTS }>;
+type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS }>;

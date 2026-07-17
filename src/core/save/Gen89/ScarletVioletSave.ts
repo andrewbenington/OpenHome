@@ -6,13 +6,25 @@ import {
   SV_TRANSFER_RESTRICTIONS_ID,
   SV_TRANSFER_RESTRICTIONS_TM,
 } from '@openhome-core/resources/consts/TransferRestrictions'
-import { SCBlock, SCObjectBlock } from '@openhome-core/save/encryption/SwishCrypto/SCBlock'
-import { SwishCrypto } from '@openhome-core/save/encryption/SwishCrypto/SwishCrypto'
+import {
+  blockIsType,
+  ObjectBlock,
+  SwishCrypto,
+} from '@openhome-core/save/encryption/SwishCrypto/SwishCrypto'
 import { G89BlockName, Gen8Gen9Save } from '@openhome-core/save/Gen89/Gen8Gen9Save'
 import { emptyPathData, PathData } from '@openhome-core/save/util/path'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { Errorable } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
-import { ConvertStrategy, ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
+import {
+  BinaryGender,
+  Block,
+  BlockType,
+  ConvertStrategy,
+  ExtraFormIndex,
+  Languages,
+  OriginGame,
+} from '@pkm-rs/pkg'
 
 const SAVE_SIZE_BYTES_MIN = 0x31626f
 const SAVE_SIZE_BYTES_MAX = 0x43c000
@@ -33,7 +45,7 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
 
-    this.trainerBlock = new MyStatus(this.getBlockMust('MyStatus', 'object'))
+    this.trainerBlock = new MyStatus(this.getBlockMust('MyStatus', 'Object'))
     this.name = this.trainerBlock.getName()
 
     this.boxes.forEach((box, i) => {
@@ -48,7 +60,7 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
     this.origin = this.trainerBlock.getGame()
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK9 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK9> {
     return PK9.fromOhpkm(ohpkm, strategy)
   }
 
@@ -64,23 +76,23 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
     return BlockKeys[blockName]
   }
 
-  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): SCBlock | undefined {
+  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): Block | undefined {
     const key = this.getBlockKey(blockName)
 
     return this.scBlocks.find((b) => b.key === key)
   }
 
-  getBlockMust<T extends SCBlock = SCBlock>(
+  getBlockMust<T extends Block = Block>(
     blockName: G89BlockName | keyof typeof BlockKeys,
-    type?: T['blockType']
+    type?: BlockType
   ): T {
     const block = this.getBlock(blockName)
 
     if (!block) {
       throw Error(`Missing block ${blockName}`)
     }
-    if (type && block.blockType !== type) {
-      throw Error(`Block ${blockName} is type ${block.blockType} (expected ${type})`)
+    if (type && !blockIsType(block, type)) {
+      throw Error(`Block ${blockName} is type ${JSON.stringify(block.data)} (expected ${type})`)
     }
     return block as T
   }
@@ -154,7 +166,7 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
   }
 
   get trainerGender() {
-    return this.trainerBlock.getGender() ? Gender.Female : Gender.Male
+    return this.trainerBlock.getGender() ? BinaryGender.Female : BinaryGender.Male
   }
 
   get language() {
@@ -186,8 +198,8 @@ const BlockKeys = {
 class MyStatus {
   dataView: DataView<ArrayBuffer>
 
-  constructor(scBlock: SCObjectBlock) {
-    this.dataView = new DataView(scBlock.raw)
+  constructor(scBlock: ObjectBlock) {
+    this.dataView = new DataView(scBlock.data.Object.bytes.buffer)
   }
 
   public getName(): string {

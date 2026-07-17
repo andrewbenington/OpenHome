@@ -6,8 +6,10 @@ import { getStandardPKMStats } from '@openhome-core/pkm/util/index'
 import {
   generatePersonalityValuePreservingAttributes,
   getFlag,
+  getGenderFlag,
   MoveFilter,
   setFlag,
+  setGenderFlag,
   uIntFromBufferBits,
   uIntToBufferBits,
 } from '@openhome-core/util'
@@ -25,6 +27,7 @@ import {
 import {
   AbilityNumber,
   Ball,
+  BinaryGender,
   ConvertStrategy,
   ExtraFormIndex,
   Gen3Strings,
@@ -39,7 +42,7 @@ import {
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
-import { Option } from '../../util/functional'
+import { Errorable, Option, R } from '../../util/functional'
 import { PluginIdentifier } from '../interfaces'
 import { CfruSpeciesAndForm } from './conversion/util'
 
@@ -117,7 +120,7 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
   currentHP: number = 0
   nickname: string
   trainerName: string
-  trainerGender: boolean
+  trainerGender: BinaryGender
   isFakemon: boolean = false
   originalBytes?: ArrayBuffer
 
@@ -237,7 +240,7 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
         this.gameOfOrigin === INTERNAL_ORIGIN_FROM_CFRU ? this.getPluginIdentifier() : undefined
 
       this.canGigantamax = getFlag(dataView, 0x34, 11)
-      this.trainerGender = getFlag(dataView, 0x34, 15)
+      this.trainerGender = getGenderFlag(dataView, 0x34, 15)
 
       // 53:57
       this.ivs = read30BitIVsFromBytes(dataView, 0x36)
@@ -322,8 +325,8 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
     this: new (ohpkm: OHPKM, options: PkmConstructorOptions) => T,
     ohpkm: OHPKM,
     strategy: ConvertStrategy
-  ): T {
-    return new this(ohpkm, { strategy })
+  ): Errorable<T> {
+    return R.tryFrom(() => new this(ohpkm, { strategy }))
   }
 
   abstract internalItemIndexFromModern(modernIndex: number): number
@@ -419,7 +422,7 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
     uIntToBufferBits(dataView, this.metLevel, 0x34, 0, 7, true)
     uIntToBufferBits(dataView, this.internalGameOfOrigin, 0x34, 7, 4, true)
     setFlag(dataView, 0x34, 11, this.canGigantamax)
-    setFlag(dataView, 0x34, 15, this.trainerGender)
+    setGenderFlag(dataView, 0x34, 15, this.trainerGender)
 
     // 53:57 IVs and Flags (30-bit IVs + 2 bits for flags)
     write30BitIVsToBytes(dataView, 0x36, this.ivs)

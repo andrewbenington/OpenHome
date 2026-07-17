@@ -1,4 +1,4 @@
-import { lib as cryptolib, MD5, SHA256 } from 'crypto-js'
+import { lib as cryptolib, MD5 } from 'crypto-js'
 
 const SeedTable: number[] = [
   0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7, 0x8108, 0x9129, 0xa14a, 0xb16b,
@@ -85,17 +85,6 @@ function wordArrayToUint8Array(wordArray: cryptolib.WordArray): Uint8Array {
     result[i] = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff
   }
   return result
-}
-
-export function sha256Digest(data: Uint8Array[]) {
-  const words = cryptolib.WordArray.create(data[0])
-
-  for (const nextData of data.slice(1)) {
-    words.concat(cryptolib.WordArray.create(nextData))
-  }
-  const shasum = SHA256(words)
-
-  return wordArrayToUint8Array(shasum)
 }
 
 export function md5Digest(data: Uint8Array) {

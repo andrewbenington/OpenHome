@@ -2,7 +2,7 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { isWasmFormat, WasmPkmFormat } from '@openhome-core/pkm/PKM'
 import { Gen34ContestRibbons, Gen34TowerRibbons } from '@openhome-core/resources'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
-import { getHeightCalculated, getWeightCalculated } from '@openhome-core/util'
+import { getHeightCalculated, getWeightCalculated, runningInTest } from '@openhome-core/util'
 import { intersection, Option, unique } from '@openhome-core/util/functional'
 import {
   FourMoves,
@@ -16,6 +16,7 @@ import {
   AbilityIndex,
   AbilityNumber,
   Ball,
+  BinaryGender,
   Gender,
   generatePk3CompatiblePid,
   Item,
@@ -215,7 +216,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       if (other.handlerName) {
         this.handlerName = other.handlerName ?? ''
-        this.handlerGender = other.handlerGender ?? false
+        this.handlerGender = other.handlerGender ?? BinaryGender.Male
         this.isCurrentHandler = other.isCurrentHandler ?? false
         this.handlerFriendship = other.handlerFriendship ?? 0
         if (other.handlerMemory) {
@@ -541,10 +542,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.tradeToSaveWasm(save.origin)
 
     const isOriginalSave = this.isFrom(save)
-    console.debug(
-      { isOriginalSave, ohpkm_id: this.openhomeId, event: 'trade_to_save' },
-      'Traded Pokémon to save file'
-    )
+    if (!runningInTest()) {
+      console.debug(
+        { isOriginalSave, ohpkm_id: this.openhomeId, event: 'trade_to_save' },
+        'Traded Pokémon to save file'
+      )
+    }
+
     this.isCurrentHandler = !isOriginalSave
     if (isOriginalSave) {
       this.handlerName = ''
@@ -553,7 +557,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.handlerMemory = { intensity: 0, memory: 0, feeling: 0, textVariables: 0 }
       this.handlerId = 0
       this.handlerLanguage = 0
-      this.handlerGender = false
+      this.handlerGender = BinaryGender.Male
       return
     }
 

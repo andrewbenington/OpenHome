@@ -1,6 +1,7 @@
 import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@openhome-core/pkm'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
+import { R } from '@openhome-core/util/functional'
 import { Stats } from '@openhome-core/util/types'
 import {
   ConvertStrategies,
@@ -43,7 +44,7 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
       assert(original.gameOfOrigin === v2.gameOfOrigin)
     })
 
-    const roundTrip = PK3.fromOhpkm(v2, ConvertStrategies.getDefault())
+    const roundTrip = R.assert(PK3.fromOhpkm(v2, ConvertStrategies.getDefault()))
 
     test(`round trip game of origin match - ${file}`, () => {
       if (original.gameOfOrigin !== roundTrip.gameOfOrigin) {
@@ -98,7 +99,7 @@ describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
     const bytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pk3', 'z006 - Salamence.pkm')))
     const original = PK3.fromBytes(bytes.buffer)
     const v2 = OHPKM.fromMonUnknownSave(original)
-    const roundTrip = PK3.fromOhpkm(v2, ConvertStrategies.getDefault())
+    const roundTrip = R.assert(PK3.fromOhpkm(v2, ConvertStrategies.getDefault()))
 
     expect(original.personalityValue, 'original PID').toEqual(3861304239)
     expect(v2.personalityValue, 'ohpkm PID').toEqual(1713820591)
@@ -175,7 +176,7 @@ describe('plugin form persistence', () => {
     const ohpkm = OHPKM.fromMonUnknownSave(original)
     expect(ohpkm.pluginOrigin).toEqual('luminescent_platinum')
 
-    const lumi = PB8LUMI.fromOhpkm(ohpkm, ConvertStrategies.getDefault())
+    const lumi = R.assert(PB8LUMI.fromOhpkm(ohpkm, ConvertStrategies.getDefault()))
     expect(lumi.pluginOrigin).toEqual('luminescent_platinum')
     expect(lumi.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
 
@@ -185,7 +186,7 @@ describe('plugin form persistence', () => {
     expect(ohAgain.pluginOrigin).toEqual('luminescent_platinum')
     expect(ohAgain.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
 
-    const lumi2 = PB8LUMI.fromOhpkm(ohAgain, ConvertStrategies.getDefault())
+    const lumi2 = R.assert(PB8LUMI.fromOhpkm(ohAgain, ConvertStrategies.getDefault()))
     expect(lumi2.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
   })
 })
@@ -228,7 +229,7 @@ describe('move filter', () => {
     ohpkm.movePP = [10, 5, 5, 20]
     ohpkm.movePPUps = [1, 2, 3, 1]
 
-    const pa8 = PA8.fromOhpkm(ohpkm, ConvertStrategies.getDefault())
+    const pa8 = R.assert(PA8.fromOhpkm(ohpkm, ConvertStrategies.getDefault()))
     expect(pa8.moves).toEqual([AQUA_TAIL, HYDRO_PUMP, 0, 0])
     expect(pa8.movePP).toEqual([10, 5, 0, 0])
     expect(pa8.movePPUps).toEqual([1, 3, 0, 0])
@@ -241,7 +242,7 @@ describe('move filter', () => {
     ohpkm.movePP = [5, 20, 0, 0]
     ohpkm.movePPUps = [1, 2, 0, 0]
 
-    const pa8 = PA8.fromOhpkm(ohpkm, ConvertStrategies.getDefault())
+    const pa8 = R.assert(PA8.fromOhpkm(ohpkm, ConvertStrategies.getDefault()))
     expect(pa8.moves).toEqual([FOCUS_ENERGY, CRUNCH, AQUA_TAIL, HURRICANE])
     expect(pa8.movePP).toEqual([20, 10, 10, 5])
     expect(pa8.movePPUps).toEqual([0, 0, 0, 0])
@@ -253,7 +254,7 @@ describe('move filter', () => {
     ohpkm.movePP = [10, 5, 5, 20]
     ohpkm.movePPUps = [1, 2, 3, 1]
 
-    const pk9 = PK9.fromOhpkm(ohpkm, ConvertStrategies.getDefault())
+    const pk9 = R.assert(PK9.fromOhpkm(ohpkm, ConvertStrategies.getDefault()))
     expect(pk9.moves).toEqual([AQUA_TAIL, RAIN_DANCE, HYDRO_PUMP, DRAGON_DANCE])
     expect(pk9.movePP).toEqual([10, 5, 5, 20])
     expect(pk9.movePPUps).toEqual([1, 2, 3, 1])
@@ -278,17 +279,17 @@ describe('OHPKM conversion strategies', () => {
     original.ivs = ORIGINAL_IVS
     original.hyperTraining = HYPER_TRAINING
 
-    let pk3 = PK3.fromOhpkm(original, PERFECT_IVS_STRATEGY)
+    let pk3 = R.assert(PK3.fromOhpkm(original, PERFECT_IVS_STRATEGY))
     expect(sanitizeWasmStats(pk3.ivs), 'PK3 IVs are maxed when hyper trained').toEqual(
       HYPER_TRAINED_IVS
     )
-    pk3 = PK3.fromOhpkm(original, IGNORE_HYPER_TRAINING_STRATEGY)
+    pk3 = R.assert(PK3.fromOhpkm(original, IGNORE_HYPER_TRAINING_STRATEGY))
     expect(
       sanitizeWasmStats(pk3.ivs),
       'PK3 IVs are unchanged when ignoring hyper training'
     ).toEqual(ORIGINAL_IVS)
 
-    let pk8 = PK8.fromOhpkm(original, PERFECT_IVS_STRATEGY)
+    let pk8 = R.assert(PK8.fromOhpkm(original, PERFECT_IVS_STRATEGY))
     expect(sanitizeWasmStats(pk8.ivs), 'PK8 IVs are preserved (perfect ivs strategy)').toEqual(
       ORIGINAL_IVS
     )
@@ -297,7 +298,7 @@ describe('OHPKM conversion strategies', () => {
       'PK8 hyper training status is preserved (perfect ivs strategy)'
     ).toEqual(HYPER_TRAINING)
 
-    pk8 = PK8.fromOhpkm(original, IGNORE_HYPER_TRAINING_STRATEGY)
+    pk8 = R.assert(PK8.fromOhpkm(original, IGNORE_HYPER_TRAINING_STRATEGY))
     expect(
       sanitizeWasmStats(pk8.ivs),
       'PK8 IVs are preserved (ignore hyper training strategy)'
@@ -321,14 +322,14 @@ describe('OHPKM conversion strategies', () => {
     const original = OHPKM.defaultWithSpecies(NationalDex.Pikachu, 0)
     expect(original.nickname).toEqual('Pikachu')
 
-    let pk3 = PK3.fromOhpkm(original, GAME_DEFAULT_STRATEGY)
+    let pk3 = R.assert(PK3.fromOhpkm(original, GAME_DEFAULT_STRATEGY))
     expect(pk3.nickname, 'PK3 species name is capitalized').toEqual('PIKACHU')
-    pk3 = PK3.fromOhpkm(original, MODERN_STRATEGY)
+    pk3 = R.assert(PK3.fromOhpkm(original, MODERN_STRATEGY))
     expect(pk3.nickname, 'Modern capitalization is used').toEqual('Pikachu')
 
-    let pk8 = PK8.fromOhpkm(original, GAME_DEFAULT_STRATEGY)
+    let pk8 = R.assert(PK8.fromOhpkm(original, GAME_DEFAULT_STRATEGY))
     expect(pk8.nickname, 'PK8 species name is title case (game default)').toEqual('Pikachu')
-    pk8 = PK8.fromOhpkm(original, MODERN_STRATEGY)
+    pk8 = R.assert(PK8.fromOhpkm(original, MODERN_STRATEGY))
     expect(pk8.nickname, 'PK8 species name is title case (modern)').toEqual('Pikachu')
   })
 
@@ -345,7 +346,7 @@ describe('OHPKM conversion strategies', () => {
     const original = OHPKM.defaultWithSpecies(NationalDex.Pikachu, 0)
     original.gameOfOrigin = OriginGame.AlphaSapphire
 
-    let pk4 = PK4.fromOhpkm(original, LOCATION_MATCH_STRATEGY)
+    let pk4 = R.assert(PK4.fromOhpkm(original, LOCATION_MATCH_STRATEGY))
     expect(
       pk4.gameOfOrigin,
       'Alpha Sapphire converted to Sapphire in PK4 (location match strategy)'
@@ -355,7 +356,7 @@ describe('OHPKM conversion strategies', () => {
       'Alpha Sapphire -> PK4 location is Hoenn with location match strategy'
     ).toContain('Hoenn')
 
-    pk4 = PK4.fromOhpkm(original, LEGALITY_STRATEGY)
+    pk4 = R.assert(PK4.fromOhpkm(original, LEGALITY_STRATEGY))
     expect(
       pk4.gameOfOrigin,
       'Alpha Sapphire converted to Sapphire in PK4 (legality strategy)'
@@ -371,7 +372,7 @@ describe('OHPKM conversion strategies', () => {
     original.gameOfOrigin = OriginGame.Diamond
     original.metLocationIndex = 6 // Jubilife City
 
-    let pk4 = PK4.fromOhpkm(original, LEGALITY_STRATEGY)
+    let pk4 = R.assert(PK4.fromOhpkm(original, LEGALITY_STRATEGY))
     expect(pk4.gameOfOrigin, 'Diamond origin preserved (legality strategy)').toEqual(
       OriginGame.Diamond
     )
@@ -380,7 +381,7 @@ describe('OHPKM conversion strategies', () => {
       'Diamond -> Original location preserved with legality strategy'
     ).toContain('Jubilife City')
 
-    pk4 = PK4.fromOhpkm(original, LOCATION_MATCH_STRATEGY)
+    pk4 = R.assert(PK4.fromOhpkm(original, LOCATION_MATCH_STRATEGY))
     expect(pk4.gameOfOrigin, 'Diamond origin preserved (location match strategy)').toEqual(
       OriginGame.Diamond
     )
@@ -395,7 +396,7 @@ describe('OHPKM conversion strategies', () => {
     original.gameOfOrigin = OriginGame.OmegaRuby
     original.metLocationIndex = 280 // Granite Cave
 
-    let pk7 = PK7.fromOhpkm(original, LEGALITY_STRATEGY)
+    let pk7 = R.assert(PK7.fromOhpkm(original, LEGALITY_STRATEGY))
     expect(pk7.gameOfOrigin, 'Omega Ruby origin preserved (legality strategy)').toEqual(
       OriginGame.OmegaRuby
     )
@@ -404,7 +405,7 @@ describe('OHPKM conversion strategies', () => {
       'Omega Ruby -> PK7 location index preserved with legality strategy'
     ).toBe(280)
 
-    pk7 = PK7.fromOhpkm(original, LOCATION_MATCH_STRATEGY)
+    pk7 = R.assert(PK7.fromOhpkm(original, LOCATION_MATCH_STRATEGY))
     expect(pk7.gameOfOrigin, 'Omega Ruby origin preserved (location match strategy)').toEqual(
       OriginGame.OmegaRuby
     )
@@ -424,7 +425,7 @@ describe('gen 3 ability during OHPKM conversion', () => {
     expect(withShellArmor.abilityNum).toEqual(2)
     expect(withShellArmor.ability?.index).toEqual(75) // Shell Armor
 
-    const shellArmorkpk3 = PK3.fromOhpkm(withShellArmor, ConvertStrategies.getDefault())
+    const shellArmorkpk3 = R.assert(PK3.fromOhpkm(withShellArmor, ConvertStrategies.getDefault()))
 
     expect(shellArmorkpk3.abilityNum, 'Shell Armor: Expected ability num from PID').toEqual(2)
     expect(shellArmorkpk3.ability?.index).toEqual(75) // Shell Armor

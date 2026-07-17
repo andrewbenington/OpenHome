@@ -9,12 +9,12 @@ import {
   Pk7Wasm,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
-import { Option } from '../util/functional'
-import { Box, BoxAndSlot, WasmOfficialSave } from './interfaces'
+import { Errorable, Option } from '../util/functional'
+import { BoxAndSlot, WasmOfficialSave } from './interfaces'
 import { PathData } from './util/path'
 import { isRestricted } from './util/TransferRestrictions'
 
-export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm> {
+export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm, Gen7AlolaSaveRust> {
   static pkmType = PK7
   static saveTypeAbbreviation = 'SM/USUM'
   static saveTypeID = 'SM/USUM'
@@ -26,7 +26,6 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm> {
   fileCreated?: Date
 
   money: number = 0 // TODO: Gen 7 money
-  boxes: Array<Box<PK7>>
 
   invalid = false
   tooEarlyToOpen = false
@@ -39,12 +38,6 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm> {
     super(Gen7AlolaSaveRust.fromBytes(bytes))
     this.filePath = path
     this.currentPCBox = this.inner.currentPcBoxIdx
-    this.boxes = Array(Gen7AlolaSaveRust.MAX_BOX_COUNT)
-    for (let box = 0; box < Gen7AlolaSaveRust.MAX_BOX_COUNT; box++) {
-      const boxName = `Box ${box + 1}`
-
-      this.boxes[box] = new Box(boxName, Gen7AlolaSaveRust.SLOTS_PER_BOX)
-    }
   }
 
   get bytes() {
@@ -69,7 +62,7 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm> {
     return Gen7AlolaSaveRust.BOX_COLS
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK7 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK7> {
     return PK7.fromOhpkm(ohpkm, strategy)
   }
 

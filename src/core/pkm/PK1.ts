@@ -1,7 +1,9 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import * as byteLogic from '@openhome-core/util/byteLogic'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
+  BinaryGender,
   ConvertStrategy,
   Generation,
   ItemGen1,
@@ -150,8 +152,8 @@ export default class PK1 {
     return new PK1(buffer, { encrypted: false })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK1 {
-    return new PK1(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK1> {
+    return R.tryFrom(() => new PK1(ohpkm, { strategy }))
   }
 
   toBytes(options?: types.ToBytesOptions): ArrayBuffer {
@@ -212,7 +214,7 @@ export default class PK1 {
   }
 
   public get trainerGender() {
-    return false
+    return BinaryGender.Male
   }
 
   public get secretID() {

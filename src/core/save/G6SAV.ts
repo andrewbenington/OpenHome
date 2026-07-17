@@ -2,9 +2,9 @@ import { PK6 } from '@openhome-core/pkm'
 import { CRC16_CCITT } from '@openhome-core/save/encryption/Encryption'
 import { utf16BytesToString } from '@openhome-core/util'
 import { bytesToUint16LittleEndian, uint16ToBytesLittleEndian } from '@openhome-core/util/byteLogic'
-import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
+import { BinaryGender, ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
-import { Option } from '../util/functional'
+import { Errorable, Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { PathData } from './util/path'
 
@@ -31,7 +31,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
   tid: number = 0
   sid: number = 0
   displayID: string = ''
-  trainerGender: Gender = Gender.Male
+  trainerGender: BinaryGender = BinaryGender.Male
 
   currentPCBox: number = 0 // TODO: Gen 5 current box
 
@@ -115,7 +115,7 @@ export abstract class G6SAV extends OfficialSAV<PK6> {
     this.bytes.set(uint16ToBytesLittleEndian(this.calculatePcChecksum()), this.pcChecksumOffset)
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK6 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK6> {
     return PK6.fromOhpkm(ohpkm, strategy)
   }
 

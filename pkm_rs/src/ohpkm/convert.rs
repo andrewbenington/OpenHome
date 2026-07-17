@@ -24,7 +24,7 @@ pub trait OhpkmConvert: Pkm {
         None
     }
 
-    fn from_ohpkm(ohpkm: &super::OhpkmV2, strategy: ConvertStrategy) -> Self;
+    fn from_ohpkm(ohpkm: &super::OhpkmV2, strategy: ConvertStrategy) -> Result<Self>;
 
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes>;
 }

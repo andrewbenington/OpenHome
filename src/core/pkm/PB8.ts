@@ -1,10 +1,12 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources/other'
 import * as byteLogic from '@openhome-core/util/byteLogic'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   Ball,
+  BinaryGender,
   ContestStats,
   ConvertStrategy,
   HyperTraining,
@@ -73,7 +75,7 @@ export default class PB8 {
   statusCondition: number
   palma: number
   handlerName: string
-  handlerGender: boolean
+  handlerGender: BinaryGender
   handlerLanguage?: Language
   handlerID: number
   handlerFriendship: number
@@ -101,7 +103,7 @@ export default class PB8 {
   handlerMemory: TrainerMemory
   trainerMemory: TrainerMemory
   hyperTraining: HyperTraining
-  trainerGender: boolean
+  trainerGender: BinaryGender
   level: number
   stats: types.Stats
   originalBytes?: ArrayBuffer
@@ -177,7 +179,7 @@ export default class PB8 {
       this.statusCondition = dataView.getUint32(0x94, true)
       this.palma = dataView.getUint32(0x98, true)
       this.handlerName = stringLogic.utf16BytesToString(buffer, 0xa8, 12)
-      this.handlerGender = byteLogic.getFlag(dataView, 0xc2, 0)
+      this.handlerGender = byteLogic.getGenderFlag(dataView, 0xc2, 0)
       this.handlerLanguage = Languages.fromByteOrNone(dataView.getUint8(0xc3))
       this.handlerID = dataView.getUint16(0xc6, true)
       this.handlerFriendship = dataView.getUint8(0xc8)
@@ -210,7 +212,7 @@ export default class PB8 {
       this.handlerMemory = types.readSwitchHandlerMemoryFromBytes(dataView, 0xc9)
       this.trainerMemory = types.readSwitchTrainerMemoryFromBytes(dataView, 0x113)
       this.hyperTraining = types.readHyperTrainStatsFromBytes(dataView, 0x126)
-      this.trainerGender = byteLogic.getFlag(dataView, 0x125, 7)
+      this.trainerGender = byteLogic.getGenderFlag(dataView, 0x125, 7)
       this.level = dataView.getUint8(0x148)
       this.stats = types.readStatsFromBytesU16(dataView, 0x14a)
     } else {
@@ -306,8 +308,8 @@ export default class PB8 {
     return new PB8(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB8 {
-    return new PB8(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PB8> {
+    return R.tryFrom(() => new PB8(ohpkm, { strategy }))
   }
 
   toBytes(): ArrayBuffer {
@@ -365,7 +367,7 @@ export default class PB8 {
     dataView.setUint32(0x94, this.statusCondition, true)
     dataView.setUint32(0x98, this.palma, true)
     stringLogic.writeUTF16StringToBytes(dataView, this.handlerName, 0xa8, 12)
-    byteLogic.setFlag(dataView, 0xc2, 0, this.handlerGender)
+    byteLogic.setGenderFlag(dataView, 0xc2, 0, this.handlerGender)
     dataView.setUint8(0xc3, this.handlerLanguage ?? 0)
     dataView.setUint16(0xc6, this.handlerID, true)
     dataView.setUint8(0xc8, this.handlerFriendship)
@@ -408,7 +410,7 @@ export default class PB8 {
     types.writeSwitchHandlerMemoryToBytes(dataView, 0xc9, this.handlerMemory)
     types.writeSwitchTrainerMemoryToBytes(dataView, 0x113, this.trainerMemory)
     types.writeHyperTrainStatsToBytes(dataView, 0x126, this.hyperTraining)
-    byteLogic.setFlag(dataView, 0x125, 7, this.trainerGender)
+    byteLogic.setGenderFlag(dataView, 0x125, 7, this.trainerGender)
     dataView.setUint8(0x148, this.level)
     types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
     return buffer

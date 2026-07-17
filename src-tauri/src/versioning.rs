@@ -13,8 +13,8 @@ use crate::{data_controller::DataController, deprecated};
 
 const VERSION_FILE: &str = "version.txt";
 
-pub fn get_version_last_used(app_handle: &tauri::AppHandle) -> Result<Option<String>> {
-    match app_handle.read_file_text(DataDir::OpenHomeRoot, VERSION_FILE) {
+pub fn get_version_last_used(data_controller: &impl DataController) -> Result<Option<String>> {
+    match data_controller.read_file_text(DataDir::OpenHomeRoot, VERSION_FILE) {
         Ok(version) => Ok(Some(version.trim().to_owned())),
         Err(Error::FileMissing { .. }) => Ok(None),
         Err(e) => Err(e),
@@ -24,41 +24,42 @@ pub fn get_version_last_used(app_handle: &tauri::AppHandle) -> Result<Option<Str
 #[cfg(debug_assertions)]
 const SKIP_LAST_USED_UPDATE: bool = false;
 
-pub fn update_version_last_used(app_handle: &tauri::AppHandle) -> Result<()> {
+pub fn update_version_last_used(
+    data_controller: &impl DataController,
+    current_version: &Version,
+) -> Result<()> {
     #[cfg(debug_assertions)]
     if SKIP_LAST_USED_UPDATE {
         return Ok(());
     }
 
-    let last_version_path = app_handle.absolute_path(DataDir::OpenHomeRoot, VERSION_FILE)?;
+    let last_version_path = data_controller.absolute_path(DataDir::OpenHomeRoot, VERSION_FILE)?;
 
     // Create OpenHome directory if it doesn't exist
     if let Some(parent) = last_version_path.parent() {
         util::create_directory(parent)?;
     }
 
-    util::write_file_contents(
-        &last_version_path,
-        app_handle.package_info().version.to_string(),
-    )
-    .map_err(|err| Error::file_write(&last_version_path, err))?;
+    util::write_file_contents(&last_version_path, current_version.to_string())
+        .map_err(|err| Error::file_write(&last_version_path, err))?;
 
-    util::create_directory(app_handle.get_config_folder()?)?;
-    let cfg_path = app_handle.get_data_folder()?.join(VERSION_FILE);
+    util::create_directory(data_controller.get_config_folder()?)?;
+    let cfg_path = data_controller.get_data_folder()?.join(VERSION_FILE);
 
-    util::write_file_contents(&cfg_path, app_handle.package_info().version.to_string())
+    util::write_file_contents(&cfg_path, current_version.to_string())
         .map_err(|err| Error::file_write(&cfg_path, err))
 }
 
 pub fn handle_updates_get_features(
-    app_handle: &tauri::AppHandle,
+    data_controller: &impl DataController,
+    current_version: &Version,
     ignore_version_error: bool,
 ) -> Result<Vec<UpdateFeatures>> {
-    if !appdata_dir_exists(app_handle)? {
+    if !appdata_dir_exists(data_controller)? {
         return Ok(vec![]);
     }
 
-    let last_used_version = get_version_last_used(app_handle)?;
+    let last_used_version = get_version_last_used(data_controller)?;
     match last_used_version {
         Some(ref from_file) => info!("User last used OpenHome version {from_file}"),
         None => info!("User last used OpenHome version 1.4.13 or earlier"),
@@ -75,23 +76,24 @@ pub fn handle_updates_get_features(
         )));
     };
 
-    let current_version = app_handle.package_info().version.clone();
-
-    if current_version < last_used_semver && !ignore_version_error {
-        return Err(Error::outdated_version(last_used_semver, current_version));
+    if current_version < &last_used_semver && !ignore_version_error {
+        return Err(Error::outdated_version(
+            last_used_semver,
+            current_version.clone(),
+        ));
     }
 
     let mut all_update_features: Vec<UpdateFeatures> = vec![];
 
-    if current_version == last_used_semver && !cfg!(debug_assertions) {
+    if current_version == &last_used_semver && !cfg!(debug_assertions) {
         info!("Version has not changed since last launch")
     } else {
-        if last_used_semver != current_version {
+        if &last_used_semver != current_version {
             info!(
                 "This version ({current_version}) is newer than last used version ({last_used_semver})"
             );
         }
-        let significant_updates = get_significant_updates(last_used_semver, current_version);
+        let significant_updates = get_significant_updates(&last_used_semver, current_version);
         if significant_updates.is_empty() {
             debug!("No significant updates since last launch");
         } else {
@@ -102,7 +104,7 @@ pub fn handle_updates_get_features(
 
         for update in significant_updates {
             info!("Running migration for {update}...");
-            update.do_migration(app_handle)?;
+            update.do_migration(data_controller)?;
             info!("Migration complete");
 
             if last_used_version.is_none() {
@@ -132,9 +134,9 @@ pub fn handle_updates_get_features(
     Ok(all_update_features)
 }
 
-fn appdata_dir_exists(app_handle: &tauri::AppHandle) -> Result<bool> {
-    tauri::Manager::path(app_handle)
-        .app_data_dir()
+fn appdata_dir_exists(data_controller: &impl DataController) -> Result<bool> {
+    data_controller
+        .absolute_dir_path(DataDir::OpenHomeRoot)
         .map_err(Error::data_folder)?
         .try_exists()
         .map_err(Error::data_folder)
@@ -167,6 +169,7 @@ pub enum SignificantUpdate {
     V1_13_1,
     V1_13_2,
     V1_13_3,
+    V1_14_0,
 }
 
 impl SignificantUpdate {
@@ -197,16 +200,18 @@ impl SignificantUpdate {
             Self::V1_13_1 => Version::parse("1.13.1"),
             Self::V1_13_2 => Version::parse("1.13.2"),
             Self::V1_13_3 => Version::parse("1.13.3"),
+            Self::V1_14_0 => Version::parse("1.14.0"),
         }
         .expect("all versions are valid semver")
     }
 
-    pub fn do_migration(&self, app_handle: &tauri::AppHandle) -> Result<()> {
+    pub fn do_migration(&self, data_controller: &impl DataController) -> Result<()> {
         match self {
-            Self::V1_5_0AlphaMultipleBanks => do_migration_1_5_0(app_handle),
-            Self::V1_8_0AlphaOhpkmV2 => do_migration_1_8_0(app_handle),
+            Self::V1_5_0AlphaMultipleBanks => do_migration_1_5_0(data_controller),
+            Self::V1_8_0AlphaOhpkmV2 => do_migration_1_8_0(data_controller),
             Self::V1_8_0AlphaFeatureMessages => Ok(()),
-            Self::V1_8_1 => handle_old_mons_directories_for_ohpkm_v2(app_handle),
+            Self::V1_8_1 => handle_old_mons_directories_for_ohpkm_v2(data_controller),
+            Self::V1_14_0 => update_convert_strat_json_dot_keys(data_controller),
             _ => Ok(()),
         }
     }
@@ -319,6 +324,9 @@ impl SignificantUpdate {
             Self::V1_13_3 => Some(vec![
                 "Fixed a bug with moving Pokémon to Gen 7 (3DS) save files.",
             ]),
+            Self::V1_14_0 => Some(vec![
+                "Fixed a bug affecting users with convert strategy settings from a few versions back.",
+            ]),
             _ => None,
         }
     }
@@ -348,16 +356,16 @@ impl UpdateFeatures {
 }
 
 pub fn get_significant_updates(
-    last_launch_version: Version,
-    current_version: Version,
+    last_launch_version: &Version,
+    current_version: &Version,
 ) -> Vec<SignificantUpdate> {
     SignificantUpdate::iter()
-        .filter(|m| m.version() > last_launch_version && m.version() <= current_version)
+        .filter(|m| &m.version() > last_launch_version && &m.version() <= current_version)
         .collect()
 }
 
-pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
-    let Some(old_boxes_r) = app_handle
+pub fn do_migration_1_5_0(data_controller: &impl DataController) -> Result<()> {
+    let Some(old_boxes_r) = data_controller
         .read_file_json_if_exists::<_, Vec<deprecated::BoxPreV1_5_0>>(
             DataDir::Storage,
             deprecated::BOXDATA_FILE,
@@ -377,15 +385,15 @@ pub fn do_migration_1_5_0(app_handle: &tauri::AppHandle) -> Result<()> {
         new_bank.add_box(old_box.upgrade());
     }
 
-    app_handle.write_file_json(
+    data_controller.write_file_json(
         DataDir::Storage,
         "banks.json",
         StoredBankData::from_banks(vec![new_bank]),
     )
 }
 
-pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
-    let mon_bytes = deprecated::get_all_ohpkm_v1_bytes(app_handle)?;
+pub fn do_migration_1_8_0(data_controller: &impl DataController) -> Result<()> {
+    let mon_bytes = deprecated::get_all_ohpkm_v1_bytes(data_controller)?;
     for (path, bytes) in mon_bytes {
         let ohpkm_v1 = OhpkmV1::from_bytes(&bytes).map_err(|e| {
             Error::other(&format!(
@@ -393,17 +401,14 @@ pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
             ))
         })?;
 
-        let v2_dir = app_handle.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
-        fs::create_dir_all(&v2_dir).map_err(|e| Error::FileWrite {
-            path: v2_dir,
-            source: Box::new(e),
-        })?;
+        let v2_dir = data_controller.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
+        fs::create_dir_all(&v2_dir).map_err(|e| Error::file_write(&v2_dir, e))?;
 
         let ohpkm_v2 = OhpkmV2::from_v1(ohpkm_v1);
         let bytes_v2 = ohpkm_v2.to_bytes();
 
         if let Some(filename) = PathBuf::from(&path).file_name() {
-            let v2_path = app_handle
+            let v2_path = data_controller
                 .absolute_path(DataDir::Storage, MONS_V2_DIR)?
                 .join(filename);
             util::write_file_contents(v2_path, bytes_v2)?;
@@ -416,18 +421,104 @@ pub fn do_migration_1_8_0(app_handle: &tauri::AppHandle) -> Result<()> {
 const MONS_DIR_OLD: &str = "mons";
 const MONS_V1_DIR: &str = "mons_v1";
 
-pub fn handle_old_mons_directories_for_ohpkm_v2(app_handle: &tauri::AppHandle) -> Result<()> {
-    let old_mons_dir = app_handle.absolute_path(DataDir::Storage, MONS_DIR_OLD)?;
+pub fn handle_old_mons_directories_for_ohpkm_v2(
+    data_controller: &impl DataController,
+) -> Result<()> {
+    let old_mons_dir = data_controller.absolute_path(DataDir::Storage, MONS_DIR_OLD)?;
 
     if !fs::exists(&old_mons_dir).map_err(|e| Error::file_access(&old_mons_dir, e))? {
         return Ok(());
     }
 
-    let v1_dir = app_handle.absolute_path(DataDir::Storage, MONS_V1_DIR)?;
+    let v1_dir = data_controller.absolute_path(DataDir::Storage, MONS_V1_DIR)?;
 
     if fs::exists(&v1_dir).map_err(|e| Error::file_access(&v1_dir, e))? {
         fs::remove_dir_all(&v1_dir).map_err(|e| Error::file_access(&v1_dir, e))?;
     }
 
     fs::rename(&old_mons_dir, &v1_dir).map_err(|e| Error::file_access(&v1_dir, e))
+}
+
+pub fn update_convert_strat_json_dot_keys(data_controller: &impl DataController) -> Result<()> {
+    use crate::synced_state::convert_strategies::{DATA_DIR, JSON_FILENAME};
+    let convert_strats_json =
+        match data_controller.read_file_text_if_exists(DATA_DIR, JSON_FILENAME) {
+            Some(read_result) => read_result?,
+            None => {
+                return Ok(());
+            }
+        };
+
+    let fixed_json = convert_strats_json.replace(".", "__");
+
+    data_controller.write_file_text(DATA_DIR, JSON_FILENAME, &fixed_json)
+}
+
+#[cfg(test)]
+mod test {
+    use pkm_rs::convert_strategy::NicknameCapitalization;
+    use std::assert_matches;
+    use std::path::PathBuf;
+    use uuid::Uuid;
+
+    use crate::Result;
+    use crate::data_controller::DataController;
+    use crate::data_controller::test::TestDataController;
+    use crate::synced_state::convert_strategies::{self, ConvertStrategies};
+
+    const WITH_DOTS: &str = r#"{
+        "strategies_by_id":{
+            "00000000-0000-0000-0000-000000000000":{
+                "name":"Updated",
+                "strategy":{
+                    "nickname.capitalization":"Modern",
+                    "metData.originAndLocation":"MaximizeLegality",
+                    "ivs.maxIfHyperTrained":true,
+                    "personalityValue.preserveShiny":false,
+                    "personalityValue.preserveGender":true,
+                    "personalityValue.preserveNature":"KeepMintNature",
+                    "personalityValue.preserveUnownForm":true
+                }
+            }
+        },
+        "default_strategy_id":"00000000-0000-0000-0000-000000000000"
+    }"#;
+
+    #[test]
+    fn version_1_14_0_migration() -> Result<()> {
+        let file_path = PathBuf::from(
+            convert_strategies::DATA_DIR
+                .get_relative_path()
+                .unwrap_or_default(),
+        )
+        .join(convert_strategies::JSON_FILENAME);
+
+        // ensure a default file is created and loaded successfully
+        let mut without_file = TestDataController::default();
+        super::update_convert_strat_json_dot_keys(&without_file)?;
+        ConvertStrategies::load_from_storage(&mut without_file)?;
+
+        // a file from an older version of OpenHome with dots in the
+        // keys should be fixed and loaded successfully
+        let mut with_dot_format_file =
+            TestDataController::single_file(&file_path, WITH_DOTS.as_bytes());
+        with_dot_format_file.write_file_text(
+            convert_strategies::DATA_DIR,
+            convert_strategies::JSON_FILENAME,
+            WITH_DOTS,
+        )?;
+        super::update_convert_strat_json_dot_keys(&with_dot_format_file)?;
+        let strategies = ConvertStrategies::load_from_storage(&mut with_dot_format_file)?;
+        let default = strategies
+            .get(Uuid::nil())
+            .expect("Default strategy is missing after converting old conv. strategy format");
+
+        assert_matches!(
+            default.inner().nickname_capitalization,
+            NicknameCapitalization::Modern
+        );
+        assert!(!default.inner().preserve_pid_shiny);
+
+        Ok(())
+    }
 }

@@ -9,7 +9,7 @@ import {
 } from '@openhome-core/util/byteLogic'
 import { ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
-import { Option } from '../util/functional'
+import { Errorable, Option } from '../util/functional'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
 import { PathData } from './util/path'
@@ -197,7 +197,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
     return new Uint8Array(encryption.decryptByteArrayGen45(shuffledBytes))
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK4 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK4> {
     return PK4.fromOhpkm(ohpkm, strategy)
   }
 

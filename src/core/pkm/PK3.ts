@@ -1,8 +1,9 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
-import { Option } from '@openhome-core/util/functional'
+import { Errorable, Option, R } from '@openhome-core/util/functional'
 import {
+  BinaryGender,
   ContestStats,
   ConvertStrategies,
   ConvertStrategy,
@@ -15,7 +16,6 @@ import {
 import { FourMoves, Stats, ToBytesOptions } from '../util/types'
 import { PkmConstructorOptions } from './PKM'
 import * as encryption from './util/encryption'
-import { binaryGenderFromBool, binaryGenderToBool } from './wasm/convert'
 
 export default class PK3 implements PKMInterface {
   static getFormat() {
@@ -49,8 +49,8 @@ export default class PK3 implements PKMInterface {
     return inner ? PK3.fromWasm(inner) : undefined
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3 {
-    return new PK3(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK3> {
+    return R.tryFrom(() => new PK3(ohpkm, { strategy }))
   }
 
   static fromWasm(pk3: Pk3Wasm): PK3 {
@@ -320,10 +320,10 @@ export default class PK3 implements PKMInterface {
   }
 
   get trainerGender() {
-    return binaryGenderToBool(this.inner.trainer_gender)
+    return this.inner.trainer_gender
   }
-  set trainerGender(value: boolean) {
-    this.inner.trainer_gender = binaryGenderFromBool(value)
+  set trainerGender(value: BinaryGender) {
+    this.inner.trainer_gender = value
   }
 
   get heldItemName() {

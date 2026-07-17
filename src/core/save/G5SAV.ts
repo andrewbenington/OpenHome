@@ -6,8 +6,8 @@ import {
   bytesToUint32LittleEndian,
   uint16ToBytesLittleEndian,
 } from '@openhome-core/util/byteLogic'
-import { Option, unique } from '@openhome-core/util/functional'
-import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
+import { Errorable, Option, unique } from '@openhome-core/util/functional'
+import { BinaryGender, ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { hasDesmumeFooter, LookupType } from './util'
@@ -41,7 +41,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
   tid: number = 0
   sid: number = 0
   displayID: string = ''
-  trainerGender: Gender = Gender.Male
+  trainerGender: BinaryGender = BinaryGender.Male
 
   currentPCBox: number = 0 // TODO: Gen 5 current box
   boxes: Array<Box<PK5>>
@@ -170,7 +170,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
     this.updateMirrorsChecksum()
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK5 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK5> {
     return PK5.fromOhpkm(ohpkm, strategy)
   }
 

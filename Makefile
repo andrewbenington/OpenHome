@@ -1,4 +1,4 @@
-VERSION=1.13.3
+VERSION=1.14.0
 
 .PHONY: help
 help: # Display this help.
@@ -39,7 +39,6 @@ check: wasm-compile
 .PHONY: test
 test: ensure-dependencies
 	@pnpm run test
-	@npx eslint --fix ./src/core/tauri/spectaCommands.ts
 
 .PHONY: check-rs
 check-rs:
@@ -110,6 +109,7 @@ generate/out/generate.js: generate/generate.ts generate/syncPKHexResources.ts ge
 
 .PHONY: generate
 generate: gen-wasm gen-tauri-commands
+	@pnpm wasm-compile-dev
 
 .PHONY: gen-wasm
 gen-wasm:

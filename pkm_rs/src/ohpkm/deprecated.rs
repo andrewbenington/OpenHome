@@ -130,7 +130,7 @@ impl From<TrainerData> for PastHandlerDataV1 {
             id: NonZeroU16::new(other.id),
             secret_id: NonZeroU16::new(other.secret_id),
             name: other.name,
-            gender: other.gender,
+            gender: other.gender.into(),
             friendship: other.friendship,
             memory: other.memory,
             affection: other.affection,

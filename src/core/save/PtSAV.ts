@@ -4,7 +4,7 @@ import { PT_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/Transf
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { bytesToUint16LittleEndian } from '@openhome-core/util/byteLogic'
 import { readGen4StringFromBytes } from '@openhome-core/util/stringConversion'
-import { ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
+import { BinaryGender, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { G4SAV } from './G4SAV'
 import { hasDesmumeFooter } from './util'
 import { PathData } from './util/path'
@@ -17,7 +17,7 @@ export class PtSAV extends G4SAV {
   tid: number
   sid: number
   displayID: string
-  trainerGender: Gender
+  trainerGender: BinaryGender
 
   invalid: boolean = false
   tooEarlyToOpen: boolean = false

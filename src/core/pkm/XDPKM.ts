@@ -2,10 +2,12 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { Gen3ContestRibbons, Gen3StandardRibbons } from '@openhome-core/resources'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import * as byteLogic from '@openhome-core/util/byteLogic'
+import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityNumber,
   Ball,
+  BinaryGender,
   ContestStats,
   ConvertStrategy,
   Gen3Ribbon,
@@ -44,7 +46,7 @@ export default class XDPKM {
   metLocationIndex: number
   metLevel: number
   ball: number
-  trainerGender: boolean
+  trainerGender: BinaryGender
   statLevel: number
   pokerusByte: number
   markings: MarkingsFourShapes
@@ -78,7 +80,7 @@ export default class XDPKM {
       this.metLocationIndex = dataView.getUint16(0x8, false)
       this.metLevel = dataView.getUint8(0xe)
       this.ball = dataView.getUint8(0xf)
-      this.trainerGender = byteLogic.getFlag(dataView, 0x10, 1)
+      this.trainerGender = byteLogic.getGenderFlag(dataView, 0x10, 1)
       this.statLevel = dataView.getUint8(0x11)
       this.pokerusByte = dataView.getUint8(0x13)
       this.markings = types.markingsFourShapesFromBytes(dataView, 0x14)
@@ -168,8 +170,8 @@ export default class XDPKM {
     return new XDPKM(buffer, { encrypted: false })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): XDPKM {
-    return new XDPKM(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<XDPKM> {
+    return R.tryFrom(() => new XDPKM(ohpkm, { strategy }))
   }
 
   toBytes(): ArrayBuffer {
@@ -183,7 +185,7 @@ export default class XDPKM {
     dataView.setUint16(0x8, this.metLocationIndex, false)
     dataView.setUint8(0xe, this.metLevel)
     dataView.setUint8(0xf, this.ball)
-    byteLogic.setFlag(dataView, 0x10, 1, this.trainerGender)
+    byteLogic.setGenderFlag(dataView, 0x10, 1, this.trainerGender)
     dataView.setUint8(0x11, this.statLevel)
     dataView.setUint8(0x13, this.pokerusByte)
     types.markingsFourShapesToBytes(dataView, 0x14, this.markings)

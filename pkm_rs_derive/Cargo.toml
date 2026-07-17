@@ -1,6 +1,6 @@
 [package]
 name = "pkm_rs_derive"
-version = "1.13.3"
+version = "1.14.0"
 authors = ["Andrew Benington"]
 edition = "2024"
 description = "Macros for the pkm_rs crate"
@@ -11,6 +11,6 @@ license = "GPL-3.0+"
 proc-macro = true
 
 [dependencies]
-syn = { version = "2.0.118", features = ["full"] }
+syn = { version = "2.0.119", features = ["full"] }
 quote = "1"
 proc-macro2 = "1.0.106"

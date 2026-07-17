@@ -96,7 +96,7 @@ impl OhpkmConvert for Pk7 {
         })
     }
 
-    fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Self {
+    fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
         let form_metadata = ohpkm.get_forme_metadata();
         let converter = PkmConverter::new(PkmFormat::PK7, strategy);
         let met_data = converter.met_data(ohpkm);
@@ -105,10 +105,7 @@ impl OhpkmConvert for Pk7 {
             encryption_constant: ohpkm.encryption_constant(),
             sanity: 0,
             checksum: 0,
-            species_and_form: ohpkm
-                .species_and_form()
-                .try_into()
-                .expect("pk7 mon/form should be valid"),
+            species_and_form: ohpkm.species_and_form().try_into()?,
             held_item_index: ohpkm.held_item_index(),
             trainer_id: ohpkm.trainer_id(),
             secret_id: ohpkm.secret_id(),
@@ -121,7 +118,11 @@ impl OhpkmConvert for Pk7 {
                         form_metadata
                             .get_ability(AbilityNumber::First)
                             .change_bound()
-                            .expect("Pk7 max ability <= overall max ability"),
+                            .ok_or(Error::AbilityIndex {
+                                ability_index: form_metadata
+                                    .get_ability(AbilityNumber::First)
+                                    .to_u16(),
+                            })?,
                     ),
             ),
             ability_num: ohpkm.ability_num(),
@@ -199,7 +200,7 @@ impl OhpkmConvert for Pk7 {
 
         mon.refresh_checksum();
 
-        mon
+        Ok(mon)
     }
 
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {

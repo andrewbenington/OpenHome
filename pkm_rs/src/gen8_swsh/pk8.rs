@@ -11,7 +11,7 @@ use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::helpers;
 use pkm_rs_resources::metadata_source::MetadataSource;
-use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
+use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
@@ -343,21 +343,6 @@ impl Pk8 {
         self.stats = self.calculate_stats();
     }
 
-    pub const fn move_data_offsets() -> MoveDataOffsets {
-        super::MOVE_DATA_OFFSETS
-    }
-
-    pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Box<[u8]> {
-        let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
-        let mut buffer = Pk8BufferMut::new_mut(bytes.as_mut_slice());
-
-        buffer.set_handler_name(trainer_name);
-        buffer.set_is_current_handler(true);
-        buffer.refresh_checksum();
-
-        bytes
-    }
-
     pub fn is_empty_slot(bytes: &[u8]) -> bool {
         let mut owned = bytes.to_owned();
         let mut buffer = Pk8Buffer::new_mut(&mut owned);
@@ -412,18 +397,18 @@ impl Pk8 {
         bytes: Vec<u8>,
         strategy: ConvertStrategy,
     ) -> core::result::Result<Pk8, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
-        Ok(Pk8::from_ohpkm(&ohpkm, strategy))
+        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(JsValue::from)?;
+        Pk8::from_ohpkm(&ohpkm, strategy).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
     pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk8, JsValue> {
-        Pk8::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))
+        Pk8::from_bytes(&bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
     pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Pk8, JsValue> {
-        Pk8::from_encrypted_bytes(bytes).map_err(crate::util::error_to_js)
+        Pk8::from_encrypted_bytes(bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = toBytes)]
@@ -568,11 +553,6 @@ impl Pk8 {
         Self::is_empty_slot(bytes)
     }
 
-    #[wasm_bindgen(js_name = emptyBoxSlotBytes)]
-    pub fn empty_box_slot_bytes_js(trainer_name: &str) -> Box<[u8]> {
-        Self::empty_box_slot_bytes(&trainer_name.into())
-    }
-
     #[wasm_bindgen(js_name = calculateChecksum)]
     pub fn calculate_checksum_js(&self) -> u16 {
         self.calculate_checksum()
@@ -642,7 +622,6 @@ mod test {
     use crate::gen8_swsh::pk8_buffer::Pk8Buffer;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
-    use crate::result::Error;
     use crate::tests::TestErrorWithSeed;
     use crate::tests::{self, TestResult};
     use crate::traits::IsShiny;
@@ -696,7 +675,7 @@ mod test {
         let mon_recreated = Pk8::from_ohpkm(
             &OhpkmV2::convert_with_backup(&mon, &bytes)?,
             ConvertStrategy::default(),
-        );
+        )?;
 
         assert_eq!(mon.nickname.bytes()[..], mon_recreated.nickname.bytes()[..]);
 
@@ -750,19 +729,9 @@ mod test {
         let ohpkm = mon.to_ohpkm()?;
         assert_eq!(ohpkm.dynamax_level(), Some(mon.dynamax_level));
 
-        let roundtrip = Pk8::from_ohpkm(&ohpkm, ConvertStrategy::default());
+        let roundtrip = Pk8::from_ohpkm(&ohpkm, ConvertStrategy::default())?;
         assert_eq!(roundtrip.dynamax_level, mon.dynamax_level);
 
-        Ok(())
-    }
-
-    #[test]
-    fn empty_slot_checksum() -> TestResult<()> {
-        let empty_slot = Pk8::empty_box_slot_bytes(&"RoC".into());
-        let checksum = Pk8Buffer::new(&empty_slot).checksum();
-        if checksum == 0 {
-            return Err(Error::other("Empty slot checksum should be non-zero").into());
-        }
         Ok(())
     }
 

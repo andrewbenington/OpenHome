@@ -1,4 +1,4 @@
-use super::{Pk7, Pk7Buffer};
+use super::{BOX_COLS, BOX_COUNT, BOX_ROWS, BOX_SLOTS, BoxIndex, BoxSlot, Pk7, Pk7Buffer};
 use crate::encryption;
 use crate::log;
 use crate::result::{Error, Result};
@@ -29,11 +29,6 @@ const TRAINER_DATA_SIZE: usize = 0xc0;
 const SM_BOX_DATA_OFFSET: usize = 0x04e00;
 const USUM_BOX_DATA_OFFSET: usize = 0x05200;
 const BOX_DATA_SIZE: usize = 0x36600;
-
-const BOX_COUNT: usize = 32;
-const BOX_ROWS: usize = 5;
-const BOX_COLS: usize = 6;
-const BOX_SLOTS: usize = BOX_ROWS * BOX_COLS;
 
 #[cfg(feature = "wasm")]
 const USUM_PC_CHECKSUM_OFFSET: usize = USUM_SIZE_BYTES - 0x200 + 0x14 + (14 * 8) + 6;
@@ -68,9 +63,10 @@ impl SaveType {
         }
     }
 
-    const fn mon_byte_offset(&self, box_num: usize, box_slot: usize) -> usize {
-        let box_offset = self.box_data_offset() + BOX_SLOTS * Pk7::BOX_SIZE * box_num;
-        box_offset + box_slot * Pk7::BOX_SIZE
+    const fn mon_byte_offset(&self, box_index: BoxIndex, box_slot: BoxSlot) -> usize {
+        let box_offset =
+            self.box_data_offset() + box_index.to_usize() * BOX_SLOTS as usize * (Pk7::BOX_SIZE);
+        box_offset + box_slot.to_usize() * Pk7::BOX_SIZE
     }
 
     const fn pc_checksum_offset(&self) -> usize {
@@ -147,18 +143,18 @@ impl Gen7AlolaSave {
         )
     }
 
-    fn copy_pokemon_bytes_to(&mut self, box_num: usize, box_slot: usize, data: &[u8]) {
-        let byte_offset = self.save_type.mon_byte_offset(box_num, box_slot);
+    fn copy_pokemon_bytes_to(&mut self, box_index: BoxIndex, box_slot: BoxSlot, data: &[u8]) {
+        let byte_offset = self.save_type.mon_byte_offset(box_index, box_slot);
         self.bytes[byte_offset..byte_offset + Pk7::BOX_SIZE].copy_from_slice(data);
     }
 
-    fn pokemon_bytes_raw(&self, box_num: usize, box_slot: usize) -> &[u8] {
-        let byte_offset = self.save_type.mon_byte_offset(box_num, box_slot);
+    fn pokemon_bytes_raw(&self, box_index: BoxIndex, box_slot: BoxSlot) -> &[u8] {
+        let byte_offset = self.save_type.mon_byte_offset(box_index, box_slot);
         &self.bytes[byte_offset..byte_offset + Pk7::BOX_SIZE]
     }
 
-    fn get_mon_bytes_decrypted(&self, box_num: usize, box_slot: usize) -> Box<[u8]> {
-        let mut copied_bytes = Box::from(self.pokemon_bytes_raw(box_num, box_slot));
+    fn get_mon_bytes_decrypted(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Box<[u8]> {
+        let mut copied_bytes = Box::from(self.pokemon_bytes_raw(box_index, box_slot));
         Pk7Buffer::box_span_mut(&mut copied_bytes).decrypt();
 
         copied_bytes
@@ -176,31 +172,22 @@ impl Gen7AlolaSave {
         }
     }
 
-    fn get_decrypted_mon_bytes(&self, box_num: usize, box_slot: usize) -> Box<[u8]> {
-        self.get_mon_bytes_decrypted(box_num, box_slot)
-    }
-
-    fn get_mon_at(&self, box_num: usize, box_slot: usize) -> Result<Option<Pk7>> {
-        if box_num >= Self::box_count() || box_slot >= Self::box_slots() {
-            return Err(Error::Other(format!(
-                "invalid box/slot: {box_num}/{box_slot}"
-            )));
-        }
-
-        let decrypted_bytes = self.get_decrypted_mon_bytes(box_num, box_slot);
+    fn get_mon_at(&self, box_index: BoxIndex, box_slot: BoxSlot) -> Result<Option<Pk7>> {
+        let decrypted_bytes = self.get_mon_bytes_decrypted(box_index, box_slot);
         let national_dex = read_u16_le!(decrypted_bytes, 8);
 
         if national_dex > 0 {
             Pk7::from_bytes(&decrypted_bytes)
                 .map(Some)
-                .inspect_err(|err| log!("malformed pkm at box {box_num}, slot {box_slot}: {err}"))
+                .inspect_err(|err| log!("malformed pkm at box {box_index}, slot {box_slot}: {err}"))
         } else {
             Ok(None)
         }
     }
 
-    fn set_mon_at(&mut self, box_num: usize, box_slot: usize, mut mon: Option<Pk7>) {
+    fn set_mon_at(&mut self, box_index: BoxIndex, box_slot: BoxSlot, mut mon: Option<Pk7>) {
         let mon_bytes = if let Some(mon) = &mut mon {
+            // checksum should always be up-to-date in the box data
             mon.refresh_checksum();
             mon.to_box_bytes_encrypted()
         } else {
@@ -208,7 +195,7 @@ impl Gen7AlolaSave {
         };
 
         // write bytes to box slot
-        self.copy_pokemon_bytes_to(box_num, box_slot, &mon_bytes);
+        self.copy_pokemon_bytes_to(box_index, box_slot, &mon_bytes);
 
         // refresh pc checksum
         let checksum_offset = self.save_type.pc_checksum_offset();
@@ -221,17 +208,9 @@ impl Gen7AlolaSave {
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
         strategy: crate::convert_strategy::ConvertStrategy,
-    ) -> Pk7 {
+    ) -> Result<Pk7> {
         use crate::ohpkm::OhpkmConvert;
         Pk7::from_ohpkm(&ohpkm, strategy)
-    }
-
-    const fn box_slots() -> usize {
-        BOX_SLOTS
-    }
-
-    const fn box_count() -> usize {
-        BOX_COUNT
     }
 
     fn current_pc_box_idx(&self) -> usize {
@@ -248,7 +227,10 @@ impl Gen7AlolaSave {
 
     fn display_tid(&self) -> String {
         let trainer_data = self.get_trainer_data();
-        crate::util::six_digit_trainer_display(trainer_data.trainer_id, trainer_data.secret_id)
+        crate::util::six_digit_trainer_id_from_parts(
+            trainer_data.trainer_id,
+            trainer_data.secret_id,
+        )
     }
 
     const fn includes_origin(origin: OriginGame) -> bool {
@@ -264,13 +246,20 @@ impl Gen7AlolaSave {
 #[allow(clippy::missing_const_for_fn)]
 impl Gen7AlolaSave {
     #[wasm_bindgen(js_name = getMonAt)]
-    pub fn get_mon_at_wasm(&self, box_num: usize, box_slot: usize) -> Result<Option<Pk7>> {
-        self.get_mon_at(box_num, box_slot)
+    pub fn get_mon_at_wasm(&self, box_index: u8, box_slot: u8) -> Result<Option<Pk7>> {
+        self.get_mon_at(
+            box_index.try_into().or(Err(Error::BoxIndex(box_index)))?,
+            box_slot.try_into().or(Err(Error::BoxSlot(box_index)))?,
+        )
     }
 
     #[wasm_bindgen(js_name = setMonAt)]
-    pub fn set_mon_at_wasm(&mut self, box_num: usize, box_slot: usize, mon: Option<Pk7>) {
-        self.set_mon_at(box_num, box_slot, mon)
+    pub fn set_mon_at_wasm(&mut self, box_index: u8, box_slot: u8, mon: Option<Pk7>) {
+        if let Ok(box_index) = box_index.try_into()
+            && let Ok(box_slot) = box_slot.try_into()
+        {
+            self.set_mon_at(box_index, box_slot, mon)
+        }
     }
 
     #[wasm_bindgen(js_name = convertOhpkm)]
@@ -278,7 +267,7 @@ impl Gen7AlolaSave {
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
         strategy: crate::convert_strategy::ConvertStrategy,
-    ) -> Pk7 {
+    ) -> Result<Pk7> {
         self.convert_ohpkm(ohpkm, strategy)
     }
 
@@ -323,23 +312,23 @@ impl Gen7AlolaSave {
     }
 
     #[wasm_bindgen(getter = MAX_BOX_COUNT)]
-    pub fn max_box_count_js() -> usize {
+    pub fn max_box_count_js() -> u8 {
         BOX_COUNT
     }
 
     #[wasm_bindgen(getter = BOX_ROWS)]
-    pub fn box_rows_js() -> usize {
+    pub fn box_rows_js() -> u8 {
         BOX_ROWS
     }
 
     #[wasm_bindgen(getter = BOX_COLS)]
-    pub fn box_cols_js() -> usize {
+    pub fn box_cols_js() -> u8 {
         BOX_COLS
     }
 
     #[wasm_bindgen(getter = SLOTS_PER_BOX)]
-    pub fn box_size() -> usize {
-        BOX_COLS * BOX_ROWS
+    pub fn box_size() -> u8 {
+        BOX_SLOTS
     }
 
     #[wasm_bindgen(getter = currentPcBoxIdx)]
@@ -474,13 +463,13 @@ mod tests {
         let moon_bytes = save_bytes_from_file(&Path::new("gen7-alola").join("moon"))?;
         let save = Gen7AlolaSave::from_bytes(&moon_bytes)?;
 
-        for box_num in 0..Gen7AlolaSave::box_count() {
-            for slot in 0..Gen7AlolaSave::box_slots() {
-                let mon_bytes = save.get_mon_bytes_decrypted(box_num, slot);
+        for box_index in BoxIndex::all() {
+            for slot in BoxSlot::all() {
+                let mon_bytes = save.get_mon_bytes_decrypted(box_index, slot);
                 let buffer = Pk7Buffer::box_span(&mon_bytes);
                 if buffer.checksum() != buffer.calculate_checksum() {
                     return Err(Error::other(&format!(
-                        "Invalid checksum for mon at box {box_num}, slot {slot}: expected {:#06x}, got {:#06x}",
+                        "Invalid checksum for mon at box {box_index}, slot {slot}: expected {:#06x}, got {:#06x}",
                         buffer.calculate_checksum(),
                         buffer.checksum()
                     )));
@@ -498,11 +487,16 @@ mod tests {
         let ribbon_master_ohpkm =
             pkm_from_file::<OhpkmV2>(&Path::new("ohpkm").join("ribbon-master.ohpkm"))?;
 
-        let ribbon_master_pk7 = Pk7::from_ohpkm(&ribbon_master_ohpkm.0, ConvertStrategy::default());
-        assert!((ribbon_master_pk7.language as u8) < 10);
+        let ribbon_master_pk7 =
+            Pk7::from_ohpkm(&ribbon_master_ohpkm.0, ConvertStrategy::default())?;
 
-        save.set_mon_at(0, 9, Some(ribbon_master_pk7));
-        let retrieved_ribbon_master = save.get_mon_at(0, 9)?.expect("ribbon master is present");
+        let box_index = BoxIndex::check_bound(0).expect("should be valid");
+        let box_slot = BoxSlot::check_bound(9).expect("should be valid");
+
+        save.set_mon_at(box_index, box_slot, Some(ribbon_master_pk7));
+        let retrieved_ribbon_master = save
+            .get_mon_at(box_index, box_slot)?
+            .expect("ribbon master is present");
 
         if retrieved_ribbon_master.calculate_checksum() != ribbon_master_pk7.calculate_checksum() {
             return Err(Error::other(

@@ -1,5 +1,6 @@
 import { PK3 } from '@openhome-core/pkm'
 import { bytesToPKM } from '@openhome-core/pkm/FileImport'
+import { R } from '@openhome-core/util/functional'
 import { ConvertStrategies, ConvertStrategy } from '@pkm-rs/pkg'
 import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
@@ -64,7 +65,7 @@ test('gen 3 stat calculations', () => {
 })
 
 test('gen 3 EVs are updated', () => {
-  const emeraldPKM = PK3.fromOhpkm(blazikenOhpkm, ConvertStrategies.getDefault())
+  const emeraldPKM = R.assert(PK3.fromOhpkm(blazikenOhpkm, ConvertStrategies.getDefault()))
 
   // mimicking ev reduction berries and ev gain
   emeraldPKM.evs = {
@@ -87,7 +88,7 @@ test('gen 3 EVs are updated', () => {
 })
 
 test('gen 3 ribbons are updated', () => {
-  const emeraldPKM = PK3.fromOhpkm(blazikenOhpkm, ConvertStrategies.getDefault())
+  const emeraldPKM = R.assert(PK3.fromOhpkm(blazikenOhpkm, ConvertStrategies.getDefault()))
 
   // gaining Gen 3 ribbons
   emeraldPKM.ribbons = [
@@ -108,7 +109,7 @@ test('gen 3 ribbons are updated', () => {
 })
 
 test('gen 3 contest stats are updated', () => {
-  const emeraldPKM = PK3.fromOhpkm(blazikenOhpkm, ConvertStrategies.getDefault())
+  const emeraldPKM = R.assert(PK3.fromOhpkm(blazikenOhpkm, ConvertStrategies.getDefault()))
 
   // gaining cool contest points
   emeraldPKM.contest = {
@@ -133,7 +134,7 @@ test('gen 3 contest stats are updated', () => {
 test('gen 3 conversion to OHPKM and back is lossless', () => {
   const ohPKM = OHPKM.fromMonUnknownSave(blazikenPk3)
   // gaining cool contest points
-  const gen3PKM = PK3.fromOhpkm(ohPKM, ConvertStrategies.getDefault())
+  const gen3PKM = R.assert(PK3.fromOhpkm(ohPKM, ConvertStrategies.getDefault()))
 
   expect(blazikenPk3.toBytes()).toEqual(gen3PKM.toBytes())
 })
@@ -149,7 +150,7 @@ test('gen 3 nickname converted', () => {
     ...ConvertStrategies.getDefault(),
     nickname__capitalization: 'GameDefault',
   }
-  const converted = PK3.fromOhpkm(slowbroOhpkm, gameDefaultStrategy)
+  const converted = R.assert(PK3.fromOhpkm(slowbroOhpkm, gameDefaultStrategy))
 
   expect(converted.nickname).toBe('SLOWBRO')
 })
@@ -159,19 +160,19 @@ test('gen 3 nickname capitalization override', () => {
     ...ConvertStrategies.getDefault(),
     nickname__capitalization: 'Modern',
   }
-  const converted = PK3.fromOhpkm(slowbroOhpkm, modernStrategy)
+  const converted = R.assert(PK3.fromOhpkm(slowbroOhpkm, modernStrategy))
 
   expect(converted.nickname).toBe('Slowbro')
 })
 
 test('gen 3 shiny accuracy', () => {
-  const converted = PK3.fromOhpkm(slowbroOhpkm, ConvertStrategies.getDefault())
+  const converted = R.assert(PK3.fromOhpkm(slowbroOhpkm, ConvertStrategies.getDefault()))
 
   expect(converted.isShiny()).toBe(slowbroOhpkm.isShiny())
 })
 
 test('gen 6+ nature accuracy', () => {
-  const converted = PK3.fromOhpkm(slowbroOhpkm, ConvertStrategies.getDefault())
+  const converted = R.assert(PK3.fromOhpkm(slowbroOhpkm, ConvertStrategies.getDefault()))
 
   expect(converted.nature.index).toEqual(slowbroOhpkm.nature.index)
 })

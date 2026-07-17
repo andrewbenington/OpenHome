@@ -20,7 +20,7 @@ pub struct LookupState {
 }
 
 impl LookupState {
-    pub fn load_from_storage(data_controller: &impl DataController) -> Result<Self> {
+    pub fn load_from_storage(data_controller: &mut impl DataController) -> Result<Self> {
         Ok(Self {
             gen_12: data_controller
                 .read_or_create_default_json_file(DataDir::Storage, GEN12_FILENAME)?,
@@ -29,7 +29,7 @@ impl LookupState {
         })
     }
 
-    pub fn write_to_files(&self, data_controller: &impl DataController) -> Result<()> {
+    pub fn write_to_files(&self, data_controller: &mut impl DataController) -> Result<()> {
         data_controller.write_file_json(DataDir::Storage, GEN12_FILENAME, &self.gen_12)?;
         data_controller.write_file_json(DataDir::Storage, GEN345_FILENAME, &self.gen_345)
     }

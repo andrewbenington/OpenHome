@@ -1,11 +1,12 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
 import * as byteLogic from '@openhome-core/util/byteLogic'
-import { Option } from '@openhome-core/util/functional'
+import { Errorable, Option, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
 import {
   AbilityIndex,
   Ball,
+  BinaryGender,
   ContestStats,
   ConvertStrategy,
   HyperTraining,
@@ -75,7 +76,7 @@ export default class PA8 {
   unknownA0: number
   gvs: types.Stats
   handlerName: string
-  handlerGender: boolean
+  handlerGender: BinaryGender
   handlerLanguage: Option<Language>
   isCurrentHandler: boolean
   handlerID: number
@@ -108,7 +109,7 @@ export default class PA8 {
   isAlpha: boolean
   isNoble: boolean
   ribbons: string[]
-  trainerGender: boolean
+  trainerGender: BinaryGender
   level: number
   stats: types.Stats
   originalBytes?: ArrayBuffer
@@ -186,7 +187,7 @@ export default class PA8 {
       this.unknownA0 = dataView.getUint32(0xa0, true)
       this.gvs = types.readStatsFromBytesU8(dataView, 0xa4)
       this.handlerName = stringLogic.utf16BytesToString(buffer, 0xb8, 12)
-      this.handlerGender = byteLogic.getFlag(dataView, 0xd2, 0)
+      this.handlerGender = byteLogic.getGenderFlag(dataView, 0xd2, 0)
       this.handlerLanguage = Languages.fromByteOrNone(dataView.getUint8(0xd3))
       this.isCurrentHandler = byteLogic.getFlag(dataView, 0xd4, 0)
       this.handlerID = dataView.getUint16(0xd6, true)
@@ -227,7 +228,7 @@ export default class PA8 {
       // these are recalculated from the mon's height/weight and species data
       // this.heightAbsolute = dataView.getFloat32(0xac, true)
       // this.weightAbsolute = dataView.getFloat32(0xb0, true)
-      this.trainerGender = byteLogic.getFlag(dataView, 0x13d, 7)
+      this.trainerGender = byteLogic.getGenderFlag(dataView, 0x13d, 7)
     } else {
       const other = arg
       const converter = new PkmConverter('PA8', strategy)
@@ -342,8 +343,8 @@ export default class PA8 {
     return new PA8(buffer, { encrypted })
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PA8 {
-    return new PA8(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PA8> {
+    return R.tryFrom(() => new PA8(ohpkm, { strategy }))
   }
 
   toBytes(): ArrayBuffer {
@@ -402,7 +403,7 @@ export default class PA8 {
     dataView.setUint32(0xa0, this.unknownA0, true)
     types.writeStatsToBytesU8(dataView, 0xa4, this.gvs)
     stringLogic.writeUTF16StringToBytes(dataView, this.handlerName, 0xb8, 12)
-    byteLogic.setFlag(dataView, 0xd2, 0, this.handlerGender)
+    byteLogic.setGenderFlag(dataView, 0xd2, 0, this.handlerGender)
     dataView.setUint8(0xd3, this.handlerLanguage ?? 0)
     byteLogic.setFlag(dataView, 0xd4, 0, this.isCurrentHandler)
     dataView.setUint16(0xd6, this.handlerID, true)
@@ -452,7 +453,7 @@ export default class PA8 {
     )
     dataView.setFloat32(0xac, getHeightCalculated(this), true)
     dataView.setFloat32(0xb0, getHeightCalculated(this), true)
-    byteLogic.setFlag(dataView, 0x13d, 7, this.trainerGender)
+    byteLogic.setGenderFlag(dataView, 0x13d, 7, this.trainerGender)
     dataView.setUint8(0x148, this.level)
     types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
     return buffer

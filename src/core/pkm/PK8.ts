@@ -1,9 +1,10 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
-import { Option } from '@openhome-core/util/functional'
+import { Errorable, Option, R } from '@openhome-core/util/functional'
 import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
 import {
   AbilityIndex,
+  BinaryGender,
   ContestStats,
   ConvertStrategies,
   ConvertStrategy,
@@ -21,12 +22,7 @@ import {
   TrainerMemory,
 } from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from './PKM'
-import {
-  binaryGenderFromBool,
-  binaryGenderToBool,
-  convertPokeDate,
-  convertPokeDateOptional,
-} from './wasm/convert'
+import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
 export default class PK8 {
   static getFormat() {
@@ -66,11 +62,11 @@ export default class PK8 {
     )
   }
 
-  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK8 {
-    return new PK8(ohpkm, { strategy })
+  static fromOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK8> {
+    return R.tryFrom(() => new PK8(ohpkm, { strategy }))
   }
 
-  private static fromWasm(pk8: Pk8Wasm): PK8 {
+  static fromWasm(pk8: Pk8Wasm): PK8 {
     return new PK8(pk8, {})
   }
 
@@ -351,10 +347,10 @@ export default class PK8 {
   }
 
   get handlerGender() {
-    return binaryGenderToBool(this.inner.handler_gender)
+    return this.inner.handler_gender
   }
-  set handlerGender(value: boolean) {
-    this.inner.handler_gender = binaryGenderFromBool(value)
+  set handlerGender(value: BinaryGender) {
+    this.inner.handler_gender = value
   }
 
   get handlerLanguage() {
@@ -528,10 +524,10 @@ export default class PK8 {
   }
 
   get trainerGender() {
-    return binaryGenderToBool(this.inner.trainer_gender)
+    return this.inner.trainer_gender
   }
-  set trainerGender(value: boolean) {
-    this.inner.trainer_gender = binaryGenderFromBool(value)
+  set trainerGender(value: BinaryGender) {
+    this.inner.trainer_gender = value
   }
 
   get trFlagsSwSh() {

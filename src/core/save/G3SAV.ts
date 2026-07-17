@@ -1,6 +1,7 @@
 import { PK3 } from '@openhome-core/pkm'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { GEN3_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/TransferRestrictions'
+import { runningInTest } from '@openhome-core/util'
 import {
   bytesToUint16LittleEndian,
   bytesToUint32LittleEndian,
@@ -8,16 +9,16 @@ import {
   uint32ToBytesLittleEndian,
 } from '@openhome-core/util/byteLogic'
 import {
+  BinaryGender,
   ConvertStrategy,
   ExtraFormIndex,
   Gen3Strings,
-  Gender,
   ItemGen3,
   Language,
   OriginGame,
 } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
-import { Option } from '../util/functional'
+import { Errorable, Option } from '../util/functional'
 import { filterUndefined } from '../util/sort'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
@@ -102,7 +103,7 @@ export class G3SaveBackup {
 
   sid: number = 0
 
-  trainerGender: Gender
+  trainerGender: BinaryGender
 
   sectors: G3Sector[]
 
@@ -179,15 +180,17 @@ export class G3SaveBackup {
         const buffer = this.pcDataContiguous.slice(4 + i * 80, 4 + (i + 1) * 80).buffer
         box.boxSlots[slot] = PK3.fromSlotBytes(buffer)
       } catch (e) {
-        console.error(
-          `File has invalid Pokémon data at box ${Math.floor(i / 30)}/slot ${slot}: ${e}`
-        )
+        if (!runningInTest()) {
+          console.error(
+            `File has invalid Pokémon data at box ${Math.floor(i / 30)}/slot ${slot}: ${e}`
+          )
+        }
       }
     }
 
     this.tid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0a)
     this.sid = bytesToUint16LittleEndian(this.sectors[0].data, 0x0c)
-    this.trainerGender = this.sectors[0].data[0x08] ? Gender.Female : Gender.Male
+    this.trainerGender = this.sectors[0].data[0x08] ? BinaryGender.Female : BinaryGender.Male
   }
 
   // Per PKHeX:
@@ -343,7 +346,7 @@ export class G3SAV extends OfficialSAV<PK3> {
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PK3 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PK3> {
     return PK3.fromOhpkm(ohpkm, strategy)
   }
 

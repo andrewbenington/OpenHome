@@ -361,23 +361,23 @@ impl Pk3 {
         bytes: Vec<u8>,
         strategy: ConvertStrategy,
     ) -> core::result::Result<Pk3, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(crate::util::error_to_js)?;
-        Ok(Pk3::from_ohpkm(&ohpkm, strategy))
+        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(JsValue::from)?;
+        Pk3::from_ohpkm(&ohpkm, strategy).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
     pub fn from_byte_vector(bytes: Vec<u8>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_bytes(&bytes).map_err(crate::util::error_to_js)
+        Pk3::from_bytes(&bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
     pub fn take_from_encrypted_bytes(mut bytes: Box<[u8]>) -> core::result::Result<Pk3, JsValue> {
-        Pk3::from_encrypted_bytes(&mut bytes).map_err(crate::util::error_to_js)
+        Pk3::from_encrypted_bytes(&mut bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromSlotBytes)]
     pub fn from_slot_bytes_js(bytes: Box<[u8]>) -> core::result::Result<Option<Pk3>, JsValue> {
-        Self::from_slot_bytes(bytes).map_err(crate::util::error_to_js)
+        Self::from_slot_bytes(bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = toBoxBytes)]
@@ -694,7 +694,7 @@ mod test {
         let mon_recreated = Pk3::from_ohpkm(
             &OhpkmV2::convert_with_backup(&mon, &bytes)?,
             ConvertStrategy::default(),
-        );
+        )?;
 
         // trash bytes should be preserved
         assert_eq!(mon_recreated.nickname.bytes()[9], 0x70);
@@ -808,7 +808,7 @@ mod test {
 
         assert_eq!(mon.gender(), Gender::Genderless);
 
-        let pk3 = Pk3::from_ohpkm(&mon, ConvertStrategy::default());
+        let pk3 = Pk3::from_ohpkm(&mon, ConvertStrategy::default())?;
 
         assert_eq!(mon.nature(), pk3.nature());
 

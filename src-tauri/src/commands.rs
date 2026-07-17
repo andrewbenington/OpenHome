@@ -116,9 +116,9 @@ pub fn set_app_theme(
 #[tauri::command]
 #[specta::specta]
 pub fn validate_recent_saves(
-    app_handle: tauri::AppHandle,
+    mut app_handle: tauri::AppHandle,
 ) -> CommandResult<Vec<(String, saves::SaveRef)>> {
-    Ok(saves::get_recent_saves(&app_handle)?)
+    Ok(saves::get_recent_saves(&mut app_handle)?)
 }
 
 #[tauri::command]

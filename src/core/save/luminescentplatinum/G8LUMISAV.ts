@@ -1,9 +1,10 @@
-import { Option } from '@openhome-core/util/functional'
+import { toBase64 } from '@openhome-core/util'
+import { Errorable, Option } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
 import {
+  BinaryGender,
   ConvertStrategy,
   ExtraFormIndex,
-  Gender,
   Language,
   luminescentSupportsExtraForm,
   OriginGame,
@@ -79,7 +80,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   boxes: Box<PB8LUMI>[] = []
   updatedBoxSlots: BoxAndSlot[] = []
 
-  private _trainerGender?: Gender
+  private _trainerGender?: BinaryGender
   myStatusBlock: MyStatusBlock
   configBlock: ConfigBlock
 
@@ -155,19 +156,19 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
     )
   }
 
-  get trainerGender(): Gender {
+  get trainerGender(): BinaryGender {
     if (this._trainerGender !== undefined) return this._trainerGender
     if (this.myStatusBlock) {
       try {
-        return this.myStatusBlock.getGender() ? Gender.Female : Gender.Male
+        return this.myStatusBlock.getGender() ? BinaryGender.Female : BinaryGender.Male
       } catch {
-        return Gender.Male
+        return BinaryGender.Male
       }
     }
-    return Gender.Male
+    return BinaryGender.Male
   }
 
-  set trainerGender(value: Gender) {
+  set trainerGender(value: BinaryGender) {
     this._trainerGender = value
   }
 
@@ -212,7 +213,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   }
 
   // Converts an OpenHome Pokémon into the Luminescent format
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB8LUMI {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PB8LUMI> {
     return PB8LUMI.fromOhpkm(ohpkm, strategy)
   }
 
@@ -252,7 +253,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
   }
 
   calculateChecksumStr() {
-    return uint8ArrayToBase64(this.calculateChecksumBytes())
+    return toBase64(this.calculateChecksumBytes())
   }
 
   supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
@@ -340,11 +341,6 @@ class ConfigBlock {
   public getLanguage(): Language {
     return this.dataView.getUint32(0x04, true)
   }
-}
-
-// Converts a Uint8Array to base64 for checksum display
-function uint8ArrayToBase64(uint8Array: Uint8Array) {
-  return btoa(String.fromCharCode(...uint8Array))
 }
 
 // Creates a copy of a byte array for checksum calculations

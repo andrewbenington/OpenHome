@@ -5,11 +5,19 @@ import {
   ZA_TRANSFER_RESTRICTIONS_MD,
 } from '@openhome-core/resources/consts/TransferRestrictions'
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
+import { Errorable } from '@openhome-core/util/functional'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
-import { ConvertStrategy, ExtraFormIndex, Gender, Languages, OriginGame } from '@pkm-rs/pkg'
+import {
+  BinaryGender,
+  Block,
+  BlockType,
+  ConvertStrategy,
+  ExtraFormIndex,
+  Languages,
+  OriginGame,
+} from '@pkm-rs/pkg'
 import { OHPKM } from '../../pkm/OHPKM'
-import { SCBlock, SCObjectBlock } from '../encryption/SwishCrypto/SCBlock'
-import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
+import { blockIsType, ObjectBlock, SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { emptyPathData, PathData } from '../util/path'
 import { G89BlockName, Gen8Gen9Save } from './Gen8Gen9Save'
 
@@ -35,7 +43,7 @@ export class LegendsZaSave extends Gen8Gen9Save<PA9> {
   constructor(path: PathData, bytes: Uint8Array) {
     super(path, bytes)
 
-    this.trainerBlock = new MyStatus(this.getBlockMust('MyStatus', 'object'))
+    this.trainerBlock = new MyStatus(this.getBlockMust('MyStatus', 'Object'))
     this.name = this.trainerBlock.getName()
 
     this.boxes.forEach((box, i) => {
@@ -50,7 +58,7 @@ export class LegendsZaSave extends Gen8Gen9Save<PA9> {
     this.origin = this.trainerBlock.getGame()
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PA9 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PA9> {
     return PA9.fromOhpkm(ohpkm, strategy)
   }
 
@@ -66,23 +74,25 @@ export class LegendsZaSave extends Gen8Gen9Save<PA9> {
     return BlockKeys[blockName]
   }
 
-  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): SCBlock | undefined {
+  getBlock(blockName: G89BlockName | keyof typeof BlockKeys): Block | undefined {
     const key = this.getBlockKey(blockName)
 
     return this.scBlocks.find((b) => b.key === key)
   }
 
-  getBlockMust<T extends SCBlock = SCBlock>(
+  getBlockMust<T extends Block = Block>(
     blockName: G89BlockName | keyof typeof BlockKeys,
-    type?: T['blockType']
+    type?: BlockType
   ): T {
     const block = this.getBlock(blockName)
 
     if (!block) {
       throw Error(`Missing block ${blockName}`)
     }
-    if (type && block.blockType !== type) {
-      throw Error(`Block ${blockName} is type ${block.blockType} (expected ${type})`)
+    if (type && !blockIsType(block, type)) {
+      throw Error(
+        `Block ${blockName} has data ${JSON.stringify(block.data)} (expected ${JSON.stringify(type)})`
+      )
     }
     return block as T
   }
@@ -158,7 +168,7 @@ export class LegendsZaSave extends Gen8Gen9Save<PA9> {
   }
 
   get trainerGender() {
-    return this.trainerBlock.getGender() ? Gender.Female : Gender.Male
+    return this.trainerBlock.getGender() ? BinaryGender.Female : BinaryGender.Male
   }
 
   get language() {
@@ -186,8 +196,8 @@ const BlockKeys = {
 class MyStatus {
   dataView: DataView<ArrayBuffer>
 
-  constructor(scBlock: SCObjectBlock) {
-    this.dataView = new DataView(scBlock.raw)
+  constructor(scBlock: ObjectBlock) {
+    this.dataView = new DataView(scBlock.data.Object.bytes.buffer)
   }
 
   public getName(): string {

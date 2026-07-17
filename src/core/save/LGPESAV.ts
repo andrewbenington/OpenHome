@@ -6,9 +6,9 @@ import { LGPE_TRANSFER_RESTRICTIONS } from '@openhome-core/resources/consts/Tran
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import { bytesToUint16LittleEndian, bytesToUint32LittleEndian } from '@openhome-core/util/byteLogic'
 import { utf16BytesToString } from '@openhome-core/util/stringConversion'
-import { ConvertStrategy, ExtraFormIndex, Gender, Language, OriginGame } from '@pkm-rs/pkg'
+import { BinaryGender, ConvertStrategy, ExtraFormIndex, Language, OriginGame } from '@pkm-rs/pkg'
 import { OHPKM } from '../pkm/OHPKM'
-import { Option } from '../util/functional'
+import { Errorable, Option } from '../util/functional'
 import { CRC16_NoInvert } from './encryption/Encryption'
 import { Box, BoxAndSlot, OfficialSAV, SlotMetadata } from './interfaces'
 import { PathData } from './util/path'
@@ -55,7 +55,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
   tid: number = 0
   sid: number = 0
   displayID: string = ''
-  trainerGender: Gender = Gender.Male
+  trainerGender: BinaryGender = BinaryGender.Male
 
   currentPCBox: number = 0 // TODO: Gen 7 current box
 
@@ -179,7 +179,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
     return nextEmptyIndex
   }
 
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): PB7 {
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<PB7> {
     return PB7.fromOhpkm(ohpkm, strategy)
   }
 

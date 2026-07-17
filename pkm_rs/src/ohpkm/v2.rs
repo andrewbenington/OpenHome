@@ -1444,7 +1444,7 @@ impl OhpkmV2 {
     pub fn matching_unknown_handler(
         &mut self,
         name: String,
-        gender: Gender,
+        gender: BinaryGender,
     ) -> Option<PastHandlerDataV2> {
         let sized_string = SizedUtf16String::<26>::from(name);
         self.handler_data
@@ -2006,12 +2006,12 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = gender)]
-    pub fn gender_js(&self) -> u8 {
-        self.gender() as u8
+    pub fn gender_js(&self) -> Gender {
+        self.gender()
     }
     #[wasm_bindgen(setter = gender)]
-    pub fn set_gender_js(&mut self, v: u8) {
-        self.set_gender(Gender::from_u8(v));
+    pub fn set_gender_js(&mut self, v: Gender) {
+        self.set_gender(v);
     }
 
     #[wasm_bindgen(getter = evs)]
@@ -2196,12 +2196,12 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = handlerGender)]
-    pub fn handler_gender_js(&self) -> bool {
-        self.handler_gender().into()
+    pub fn handler_gender_js(&self) -> BinaryGender {
+        self.handler_gender()
     }
     #[wasm_bindgen(setter = handlerGender)]
-    pub fn set_handler_gender_js(&mut self, v: bool) {
-        self.set_handler_gender(v.into());
+    pub fn set_handler_gender_js(&mut self, v: BinaryGender) {
+        self.set_handler_gender(v);
     }
 
     #[wasm_bindgen(getter = fullness)]
@@ -2377,12 +2377,12 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = trainerGender)]
-    pub fn trainer_gender_js(&self) -> bool {
-        self.main_data.trainer_gender.into()
+    pub fn trainer_gender_js(&self) -> BinaryGender {
+        self.main_data.trainer_gender
     }
     #[wasm_bindgen(setter = trainerGender)]
-    pub fn set_trainer_gender_js(&mut self, v: bool) {
-        self.main_data.trainer_gender = BinaryGender::from(v);
+    pub fn set_trainer_gender_js(&mut self, v: BinaryGender) {
+        self.main_data.trainer_gender = v;
     }
 
     #[wasm_bindgen(getter = obedienceLevel)]
@@ -3302,7 +3302,7 @@ impl OhpkmV2 {
     pub fn matching_unknown_handler_js(
         &mut self,
         name: String,
-        gender: Gender,
+        gender: BinaryGender,
     ) -> Option<PastHandlerDataV2> {
         let sized_string = SizedUtf16String::<26>::from(name);
         self.handler_data

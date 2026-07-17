@@ -11,7 +11,7 @@ use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::helpers;
 use pkm_rs_resources::metadata_source::MetadataSource;
-use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots};
+use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
@@ -334,10 +334,6 @@ impl Pk7 {
         self.stats = self.calculate_stats();
     }
 
-    pub const fn move_data_offsets() -> MoveDataOffsets {
-        super::MOVE_DATA_OFFSETS
-    }
-
     pub fn empty_box_slot_bytes(trainer_name: &SizedUtf16String<26>) -> Box<[u8]> {
         let mut bytes = Box::new([0u8; Self::BOX_SIZE]);
         let mut buffer = Pk7BufferMut::box_span_mut(bytes.as_mut_slice());
@@ -418,18 +414,18 @@ impl Pk7 {
         bytes: Vec<u8>,
         strategy: crate::convert_strategy::ConvertStrategy,
     ) -> core::result::Result<Pk7, JsValue> {
-        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(|e| JsValue::from_str(&e.to_string()))?;
-        Ok(Pk7::from_ohpkm(&ohpkm, strategy))
+        let ohpkm = OhpkmV2::from_bytes(&bytes).map_err(JsValue::from)?;
+        Pk7::from_ohpkm(&ohpkm, strategy).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromDecryptedBytes)]
     pub fn from_bytes_js(bytes: Box<[u8]>) -> core::result::Result<Pk7, JsValue> {
-        Pk7::from_bytes(&bytes).map_err(crate::util::error_to_js)
+        Pk7::from_bytes(&bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = fromEncryptedBytes)]
     pub fn take_from_encrypted_bytes(bytes: Box<[u8]>) -> core::result::Result<Pk7, JsValue> {
-        Pk7::from_encrypted_bytes(bytes).map_err(crate::util::error_to_js)
+        Pk7::from_encrypted_bytes(bytes).map_err(JsValue::from)
     }
 
     #[wasm_bindgen(js_name = toBytes)]
@@ -677,7 +673,7 @@ mod test {
         let mon_recreated = Pk7::from_ohpkm(
             &OhpkmV2::convert_with_backup(&mon, &bytes)?,
             ConvertStrategy::default(),
-        );
+        )?;
 
         // leftover 'r' should be preserved after conversion to/from OHPKM
         assert_eq!(mon_recreated.nickname.bytes()[14], b'r');
@@ -716,7 +712,7 @@ mod test {
 
         assert_eq!(mon.ability_index().to_u16(), SHARPNESS);
 
-        let converted_pk7 = Pk7::from_ohpkm(&mon, ConvertStrategy::default());
+        let converted_pk7 = Pk7::from_ohpkm(&mon, ConvertStrategy::default())?;
 
         // Gallade's Sharpness should be converted to Steadfast when converting to Pk7, since Sharpness is Gen 8+ and Pk7 can only represent Gen 7 abilities
         assert_eq!(converted_pk7.ability_index.to_u16(), STEADFAST);

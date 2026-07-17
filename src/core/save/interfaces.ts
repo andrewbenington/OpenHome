@@ -1,11 +1,11 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { PluginIdentifier as RustPluginIdentifier } from '@openhome-core/tauri/spectaCommands'
-import { Option, range } from '@openhome-core/util/functional'
+import { Errorable, Option, range } from '@openhome-core/util/functional'
 import { SaveRef } from '@openhome-core/util/types'
 import {
+  BinaryGender,
   ConvertStrategy,
   ExtraFormIndex,
-  Gender,
   Language,
   OriginGame,
   OriginGames,
@@ -79,7 +79,7 @@ interface BaseSAV<P extends PKMInterface = PKMInterface> {
   prepareWriter: () => SaveWriter
 
   getDisplayData(): Record<string, string | number | undefined> | undefined
-  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
+  convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
 }
 
 export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> implements BaseSAV<P> {
@@ -92,7 +92,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract name: string
   abstract tid: number
   abstract sid?: number | undefined
-  abstract trainerGender: Gender
+  abstract trainerGender: BinaryGender
   abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number
@@ -104,7 +104,7 @@ export abstract class OfficialSAV<P extends PKMInterface = PKMInterface> impleme
   abstract supportsMon(dexNumber: number, formeNumber: number): boolean
   abstract supportsItem(itemIndex: number): boolean
   abstract prepareForSaving(): void
-  abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
+  abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -199,7 +199,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract name: string
   abstract tid: number
   abstract sid?: number | undefined
-  abstract trainerGender: Gender
+  abstract trainerGender: BinaryGender
   abstract language?: Language // TODO: add to save files
   abstract displayID: string
   abstract currentPCBox: number
@@ -216,7 +216,7 @@ export abstract class PluginSAV<P extends PKMInterface = PKMInterface> implement
   abstract supportsItem(itemIndex: number): boolean
   abstract getSlotMetadata?: ((boxNum: number, boxSlot: number) => SlotMetadata) | undefined
   abstract prepareForSaving(): void
-  abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): P
+  abstract convertOhpkm(ohpkm: OHPKM, strategy: ConvertStrategy): Errorable<P>
 
   prepareWriter(): SaveWriter {
     this.prepareForSaving()
@@ -360,10 +360,15 @@ export interface WasmSaveInner<P> {
   setMonAt(box_num: number, offset: number, mon?: P | null): void
 }
 
-export abstract class WasmOfficialSave<P extends PKMInterface, WasmP> extends OfficialSAV<P> {
-  inner: WasmSaveInner<WasmP>
+export abstract class WasmOfficialSave<
+  P extends PKMInterface,
+  WasmP,
+  WasmSave extends WasmSaveInner<WasmP>,
+> extends OfficialSAV<P> {
+  inner: WasmSave
+  boxes: Array<Box<P>> = []
 
-  constructor(inner: WasmSaveInner<WasmP>) {
+  constructor(inner: WasmSave) {
     super()
     this.inner = inner
   }
