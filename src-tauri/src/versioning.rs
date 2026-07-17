@@ -169,7 +169,7 @@ pub enum SignificantUpdate {
     V1_13_1,
     V1_13_2,
     V1_13_3,
-    V1_14_0,
+    V1_14_1,
 }
 
 impl SignificantUpdate {
@@ -200,7 +200,7 @@ impl SignificantUpdate {
             Self::V1_13_1 => Version::parse("1.13.1"),
             Self::V1_13_2 => Version::parse("1.13.2"),
             Self::V1_13_3 => Version::parse("1.13.3"),
-            Self::V1_14_0 => Version::parse("1.14.0"),
+            Self::V1_14_1 => Version::parse("1.14.1"),
         }
         .expect("all versions are valid semver")
     }
@@ -211,7 +211,7 @@ impl SignificantUpdate {
             Self::V1_8_0AlphaOhpkmV2 => do_migration_1_8_0(data_controller),
             Self::V1_8_0AlphaFeatureMessages => Ok(()),
             Self::V1_8_1 => handle_old_mons_directories_for_ohpkm_v2(data_controller),
-            Self::V1_14_0 => update_convert_strat_json_dot_keys(data_controller),
+            Self::V1_14_1 => update_convert_strat_json_dot_keys(data_controller),
             _ => Ok(()),
         }
     }
@@ -324,8 +324,9 @@ impl SignificantUpdate {
             Self::V1_13_3 => Some(vec![
                 "Fixed a bug with moving Pokémon to Gen 7 (3DS) save files.",
             ]),
-            Self::V1_14_0 => Some(vec![
+            Self::V1_14_1 => Some(vec![
                 "Fixed a bug affecting users with convert strategy settings from a few versions back.",
+                "Fixed the missing convert strategies page.",
             ]),
             _ => None,
         }

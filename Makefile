@@ -1,4 +1,4 @@
-VERSION=1.14.0
+VERSION=1.14.1
 
 .PHONY: help
 help: # Display this help.
@@ -92,6 +92,7 @@ build-mac-arm:
 build-mac-intel:
 	@npx tauri build --target x86_64-apple-darwin
 
+
 .PHONY: release-mac-arm
 release-mac-arm: build-mac-arm
 	@source .env && ./scripts/upload-bin.sh $(shell pwd)/target/aarch64-apple-darwin/release/bundle/dmg OpenHome
@@ -102,6 +103,15 @@ release-mac-intel: build-mac-intel
 
 .PHONY: release-mac
 release-mac: release-mac-arm release-mac-intel
+
+.PHONY: release
+release:
+	@source .env && node scripts/release.mts new-release
+	@source .env && node scripts/release.mts publish
+	@source .env && ./scripts/upload-bin.sh $(shell pwd)/target/aarch64-apple-darwin/release/bundle/dmg OpenHome
+	@source .env && ./scripts/upload-bin.sh $(shell pwd)/target/x86_64-apple-darwin/release/bundle/dmg OpenHome
+
+
 
 generate/out/generate.js: generate/generate.ts generate/syncPKHexResources.ts generate/enums.ts generate/parseFunctions/*
 	@echo "compiling generate/*.ts..."
