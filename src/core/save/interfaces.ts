@@ -425,4 +425,14 @@ export abstract class WasmOfficialSave<
   prepareForSaving(): Uint8Array {
     return this.inner.prepareBytesForSaving()
   }
+
+  getBoxCount(): number {
+    return this.MAX_BOX_COUNT
+  }
+
+  get boxSlotCount(): number {
+    return this.SLOTS_PER_BOX
+  }
+
+  abstract getBoxName(boxIndex: number): string
 }

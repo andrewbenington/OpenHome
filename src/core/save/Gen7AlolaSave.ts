@@ -81,4 +81,8 @@ export class Gen7AlolaSave extends WasmOfficialSave<PK7, Pk7Wasm, Gen7AlolaSaveR
   monFromWasm(wasmMon: Pk7Wasm): PK7 {
     return PK7.fromWasm(wasmMon)
   }
+
+  getBoxName(boxIndex: number) {
+    return this.inner.getBoxName(boxIndex)
+  }
 }

@@ -6,6 +6,7 @@ use crate::traits::PkmBytes;
 use crate::util;
 
 use pkm_rs_types::BinaryGender;
+use pkm_rs_types::BoundViolated;
 use pkm_rs_types::Language;
 use pkm_rs_types::OriginGame;
 use pkm_rs_types::read_u16_le;
@@ -27,8 +28,14 @@ const USUM_TRAINER_DATA_OFFSET: usize = 0x1400;
 const TRAINER_DATA_SIZE: usize = 0xc0;
 
 const SM_BOX_DATA_OFFSET: usize = 0x04e00;
+const SM_BOX_NAMES_OFFSET: usize = 0x04800;
 const USUM_BOX_DATA_OFFSET: usize = 0x05200;
+const USUM_BOX_NAMES_OFFSET: usize = 0x04c00;
+
 const BOX_DATA_SIZE: usize = 0x36600;
+const BOX_NAME_BYTE_LENGTH: usize = 0x22;
+
+type BoxName = SizedUtf16String<BOX_NAME_BYTE_LENGTH>;
 
 #[cfg(feature = "wasm")]
 const USUM_PC_CHECKSUM_OFFSET: usize = USUM_SIZE_BYTES - 0x200 + 0x14 + (14 * 8) + 6;
@@ -80,6 +87,13 @@ impl SaveType {
         match self {
             SaveType::SunMoon => MemeCrypto::SunMoon,
             SaveType::UltraSunMoon => MemeCrypto::UltraSunUltraMoon,
+        }
+    }
+
+    const fn box_names_offset(&self) -> usize {
+        match self {
+            SaveType::SunMoon => SM_BOX_NAMES_OFFSET,
+            SaveType::UltraSunMoon => USUM_BOX_NAMES_OFFSET,
         }
     }
 }
@@ -204,6 +218,17 @@ impl Gen7AlolaSave {
             .copy_from_slice(&calculated_checksum.to_le_bytes());
     }
 
+    fn box_name(&self, box_index: BoxIndex) -> BoxName {
+        let start =
+            self.save_type.box_names_offset() + BOX_NAME_BYTE_LENGTH * box_index.get() as usize;
+        let end = start + BOX_NAME_BYTE_LENGTH;
+        let name_bytes: [u8; BOX_NAME_BYTE_LENGTH] = self.bytes[start..end]
+            .try_into()
+            .expect("end should be exactly BOX_NAME_BYTE_LENGTH after start");
+
+        SizedUtf16String::from_bytes(name_bytes)
+    }
+
     fn convert_ohpkm(
         &self,
         ohpkm: crate::ohpkm::OhpkmV2,
@@ -272,7 +297,7 @@ impl Gen7AlolaSave {
     }
 
     #[wasm_bindgen(js_name = fromBytes)]
-    pub fn from_bytes_js(bytes: Box<[u8]>) -> Result<Self> {
+    pub fn from_bytes_wasm(bytes: Box<[u8]>) -> Result<Self> {
         Self::from_bytes(&bytes)
     }
 
@@ -311,18 +336,26 @@ impl Gen7AlolaSave {
         self.get_trainer_data().trainer_gender as u16
     }
 
+    #[wasm_bindgen(js_name = getBoxName)]
+    pub fn box_name_wasm(&mut self, box_index: u8) -> std::result::Result<String, JsError> {
+        match BoxIndex::check_bound(box_index) {
+            Ok(index) => Ok(self.box_name(index).to_string()),
+            Err(BoundViolated) => Err(BoundViolated.into()),
+        }
+    }
+
     #[wasm_bindgen(getter = MAX_BOX_COUNT)]
-    pub fn max_box_count_js() -> u8 {
+    pub fn max_box_count_wasm() -> u8 {
         BOX_COUNT
     }
 
     #[wasm_bindgen(getter = BOX_ROWS)]
-    pub fn box_rows_js() -> u8 {
+    pub fn box_rows_wasm() -> u8 {
         BOX_ROWS
     }
 
     #[wasm_bindgen(getter = BOX_COLS)]
-    pub fn box_cols_js() -> u8 {
+    pub fn box_cols_wasm() -> u8 {
         BOX_COLS
     }
 
@@ -332,7 +365,7 @@ impl Gen7AlolaSave {
     }
 
     #[wasm_bindgen(getter = currentPcBoxIdx)]
-    pub fn current_pc_box_idx_js(&self) -> usize {
+    pub fn current_pc_box_idx_wasm(&self) -> usize {
         self.current_pc_box_idx()
     }
 
@@ -402,7 +435,7 @@ impl TrainerDataGen7Alola {
 #[allow(clippy::missing_const_for_fn)]
 impl TrainerDataGen7Alola {
     #[wasm_bindgen]
-    pub fn get_name_js(&self) -> String {
+    pub fn get_name_wasm(&self) -> String {
         self.trainer_name.to_string()
     }
 }
