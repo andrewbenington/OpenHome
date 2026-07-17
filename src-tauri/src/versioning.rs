@@ -200,7 +200,7 @@ impl SignificantUpdate {
             Self::V1_13_1 => Version::parse("1.13.1"),
             Self::V1_13_2 => Version::parse("1.13.2"),
             Self::V1_13_3 => Version::parse("1.13.3"),
-            Self::V1_14_0 => Version::parse("1.14.0"),
+            Self::V1_14_0 => Version::parse("1.14.0-alpha.0"),
         }
         .expect("all versions are valid semver")
     }
@@ -323,6 +323,9 @@ impl SignificantUpdate {
             ]),
             Self::V1_13_3 => Some(vec![
                 "Fixed a bug with moving Pokémon to Gen 7 (3DS) save files.",
+            ]),
+            Self::V1_14_0 => Some(vec![
+                "Fixed a bug affecting users with convert strategy settings from a few versions back.",
             ]),
             _ => None,
         }
