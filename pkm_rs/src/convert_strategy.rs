@@ -46,7 +46,7 @@ impl SettingType {
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, specta::Type)]
 pub enum ConvertOption {
-    #[serde(rename = "nickname__capitalization")]
+    #[serde(rename = "nickname__capitalization", alias = "nickname.capitalization")]
     NicknameCapitalization,
     #[serde(rename = "metData__originAndLocation")]
     MetDataOriginAndLocation,

@@ -12,9 +12,16 @@ use uuid::Uuid;
 use crate::synced_state;
 
 #[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
-struct NamedStrategy {
+pub struct NamedStrategy {
     name: String,
     strategy: ConvertStrategy,
+}
+
+impl NamedStrategy {
+    #[cfg(test)]
+    pub fn inner(&self) -> &ConvertStrategy {
+        &self.strategy
+    }
 }
 
 type StrategiesById = HashMap<Uuid, NamedStrategy>;
@@ -25,7 +32,8 @@ pub struct ConvertStrategies {
     default_strategy_id: Option<Uuid>,
 }
 
-const JSON_FILENAME: &str = "convert_strategies.json";
+pub const DATA_DIR: DataDir = DataDir::Storage;
+pub const JSON_FILENAME: &str = "convert_strategies.json";
 
 impl synced_state::SyncedState for ConvertStrategies {
     type Action = ConvertStrategyEntries;
@@ -44,12 +52,17 @@ impl synced_state::SyncedState for ConvertStrategies {
 }
 
 impl ConvertStrategies {
-    pub fn load_from_storage(data_controller: &impl DataController) -> Result<Self> {
-        data_controller.read_or_create_default_json_file(DataDir::Storage, JSON_FILENAME)
+    pub fn load_from_storage(data_controller: &mut impl DataController) -> Result<Self> {
+        data_controller.read_or_create_default_json_file(DATA_DIR, JSON_FILENAME)
     }
 
-    pub fn write_to_files(&self, data_controller: &impl DataController) -> Result<()> {
-        data_controller.write_file_json(DataDir::Storage, JSON_FILENAME, self)
+    pub fn write_to_files(&self, data_controller: &mut impl DataController) -> Result<()> {
+        data_controller.write_file_json(DATA_DIR, JSON_FILENAME, self)
+    }
+
+    #[cfg(test)]
+    pub fn get(&self, key: Uuid) -> Option<&NamedStrategy> {
+        self.strategies_by_id.get(&key)
     }
 }
 

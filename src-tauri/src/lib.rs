@@ -117,7 +117,7 @@ pub fn run() {
                 }
             };
 
-            let lookup_state = match LookupState::load_from_storage(app.handle()) {
+            let lookup_state = match LookupState::load_from_storage(&mut app.handle()) {
                 Ok(lookup) => lookup,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Lookup File"));
@@ -127,7 +127,8 @@ pub fn run() {
                 }
             };
 
-            let conversion_settings = match ConvertStrategies::load_from_storage(app.handle()) {
+            let conversion_settings = match ConvertStrategies::load_from_storage(&mut app.handle())
+            {
                 Ok(settings) => settings,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Conversion Settings"));

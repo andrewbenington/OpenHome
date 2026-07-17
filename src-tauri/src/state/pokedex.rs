@@ -74,7 +74,7 @@ impl Pokedex {
         })
     }
 
-    pub fn write_to_storage(&self, data_controller: &impl DataController) -> Result<()> {
+    pub fn write_to_storage(&self, data_controller: &mut impl DataController) -> Result<()> {
         data_controller.write_file_json(DataDir::Storage, POKEDEX_FILENAME, &self.by_dex_number)
     }
 
