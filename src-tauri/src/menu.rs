@@ -3,7 +3,9 @@ use std::process::Command;
 use tauri::{App, AppHandle, Emitter, Wry, image::Image, include_image, menu::*};
 use tracing::{error, info};
 
-use crate::data_controller::DataController;
+use openhome_core::data_controller::DataController;
+
+use crate::data_controller::ToDataController;
 const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
 
 const OPEN_CMD: &str = cfg_select! {
@@ -159,13 +161,13 @@ pub fn handle_menu_event_id(app_handle: &AppHandle, event_id: &str) {
         "reset" => {
             let _ = app_handle.emit("reset", ());
         }
-        "open-appdata" => match app_handle.get_data_folder() {
+        "open-appdata" => match app_handle.controller().get_data_folder() {
             Err(err) => {
                 error!["Error getting data directory: {}", err];
             }
             Ok(dir) => command_open(dir.to_str().unwrap_or_default()),
         },
-        "open-config" => match app_handle.get_config_folder() {
+        "open-config" => match app_handle.controller().get_config_folder() {
             Err(err) => {
                 error!["Error getting config directory: {}", err];
             }

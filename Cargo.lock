@@ -17,6 +17,7 @@ dependencies = [
  "chrono",
  "dialog",
  "num",
+ "openhome_core",
  "pkm_rs",
  "pkm_rs_derive",
  "reqwest",
@@ -2616,6 +2617,23 @@ dependencies = [
  "is-wsl",
  "libc",
  "pathdiff",
+]
+
+[[package]]
+name = "openhome_core"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "pkm_rs",
+ "pkm_rs_derive",
+ "semver",
+ "serde",
+ "serde_json",
+ "specta",
+ "strum",
+ "tokio",
+ "tracing",
+ "uuid",
 ]
 
 [[package]]

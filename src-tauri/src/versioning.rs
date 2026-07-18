@@ -1,15 +1,14 @@
+use crate::deprecated;
+use crate::util;
+use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
+use openhome_core::pkm_storage::{Bank, StoredBankData};
+use openhome_core::{Error, Result};
 use pkm_rs::ohpkm::{OhpkmV2, v1::OhpkmV1};
 use semver::Version;
 use serde::Serialize;
 use std::{fs, path::PathBuf};
 use strum::{self, EnumIter, IntoEnumIterator};
 use tracing::{debug, info};
-
-use crate::data_controller::{DataDir, MONS_V2_DIR};
-use crate::error::{Error, Result};
-use crate::pkm_storage::{Bank, StoredBankData};
-use crate::util;
-use crate::{data_controller::DataController, deprecated};
 
 const VERSION_FILE: &str = "version.txt";
 
@@ -447,7 +446,7 @@ pub fn handle_old_mons_directories_for_ohpkm_v2(
 }
 
 pub fn update_convert_strat_json_dot_keys(data_controller: &impl DataController) -> Result<()> {
-    use crate::synced_state::convert_strategies::{DATA_DIR, JSON_FILENAME};
+    use openhome_core::convert_strategies::{DATA_DIR, JSON_FILENAME};
     let convert_strats_json =
         match data_controller.read_file_text_if_exists(DATA_DIR, JSON_FILENAME) {
             Some(read_result) => read_result?,
@@ -469,9 +468,9 @@ mod test {
     use uuid::Uuid;
 
     use crate::Result;
-    use crate::data_controller::DataController;
     use crate::data_controller::test::TestDataController;
-    use crate::synced_state::convert_strategies::{self, ConvertStrategies};
+    use openhome_core::convert_strategies::{self, ConvertStrategies};
+    use openhome_core::data_controller::DataController;
 
     const WITH_DOTS: &str = r#"{
         "strategies_by_id":{
@@ -501,13 +500,13 @@ mod test {
         .join(convert_strategies::JSON_FILENAME);
 
         // ensure a default file is created and loaded successfully
-        let mut without_file = TestDataController::default();
+        let without_file = TestDataController::default();
         super::update_convert_strat_json_dot_keys(&without_file)?;
-        ConvertStrategies::load_from_storage(&mut without_file)?;
+        ConvertStrategies::load_from_storage(&without_file)?;
 
         // a file from an older version of OpenHome with dots in the
         // keys should be fixed and loaded successfully
-        let mut with_dot_format_file =
+        let with_dot_format_file =
             TestDataController::single_file(&file_path, WITH_DOTS.as_bytes());
         with_dot_format_file.write_file_text(
             convert_strategies::DATA_DIR,
@@ -515,9 +514,9 @@ mod test {
             WITH_DOTS,
         )?;
         super::update_convert_strat_json_dot_keys(&with_dot_format_file)?;
-        let strategies = ConvertStrategies::load_from_storage(&mut with_dot_format_file)?;
+        let strategies = ConvertStrategies::load_from_storage(&with_dot_format_file)?;
         let default = strategies
-            .get(Uuid::nil())
+            .get(&Uuid::nil())
             .expect("Default strategy is missing after converting old conv. strategy format");
 
         assert_matches!(
