@@ -5,9 +5,10 @@ use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
 use crate::commands::{CommandError, CommandResult};
-use crate::error::{Error, Result};
+use crate::data_controller::ToDataController;
 use crate::state::PokedexState;
 use crate::versioning::UpdateFeatures;
+use openhome_core::{Error, Result};
 
 fn without_tmp_extension(path: &Path) -> PathBuf {
     let mut without_tmp = PathBuf::from(path);
@@ -148,13 +149,13 @@ pub fn rollback_transaction(state: tauri::State<'_, AppState>) -> CommandResult<
 #[tauri::command]
 #[specta::specta]
 pub fn commit_transaction(
-    mut app_handle: tauri::AppHandle,
+    app_handle: tauri::AppHandle,
     app_state: tauri::State<'_, AppState>,
     pokedex_state: tauri::State<'_, PokedexState>,
 ) -> CommandResult<()> {
     app_state.lock()?.transaction_mut().commit_transaction()?;
     pokedex_state
         .lock()?
-        .write_to_storage(&mut app_handle)
+        .write_to_storage(&app_handle.controller())
         .map_err(CommandError::from)
 }

@@ -19,6 +19,7 @@ tauri-build = { version = "2.6.3", features = [] }
 [dependencies]
 pkm_rs = {path = "../pkm_rs"}
 pkm_rs_derive = {path = "../pkm_rs_derive"}
+openhome_core = {path = "../openhome_core", features = ["desktop"] }
 tauri = { version = "2.11.5", features = [] }
 tauri-plugin-shell = "2.3.5"
 serde = { version = "1.0.228", features = ["derive"] }

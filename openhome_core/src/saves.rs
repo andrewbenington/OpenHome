@@ -1,6 +1,3 @@
-use tauri::Manager;
-
-use crate::commands::CommandResult;
 use crate::data_controller::{DataController, DataDir};
 use crate::util;
 use crate::{Error, Result};
@@ -13,12 +10,16 @@ use std::time::UNIX_EPOCH;
 
 const RECENT_SAVES_FILENAME: &str = "recent_saves.json";
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, specta::Type)]
+#[cfg_attr(
+    feature = "desktop",
+    derive(serde::Serialize, serde::Deserialize, Debug, specta::Type)
+)]
 pub struct PossibleSaves {
     pub citra: Vec<util::PathData>,
     pub desmume: Vec<util::PathData>,
     pub open_emu: Vec<util::PathData>,
 }
+
 impl PossibleSaves {
     pub fn add_all(&mut self, other: Self) {
         self.citra.extend(other.citra);
@@ -160,7 +161,8 @@ fn is_one_of(os_str: &OsStr, possibilities: impl IntoIterator<Item = &'static st
         .any(|s| os_str.eq_ignore_ascii_case(s))
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, specta::Type)]
+#[cfg_attr(feature = "desktop", derive(specta::Type))]
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct SaveRef {
     pub file_path: util::PathData,
@@ -196,7 +198,7 @@ pub struct StoredSaveRef {
 type RawSavePath = String;
 
 pub fn get_recent_saves(
-    data_controller: &mut impl DataController,
+    data_controller: &impl DataController,
 ) -> core::result::Result<Vec<(RawSavePath, SaveRef)>, String> {
     let recent_saves: HashMap<String, StoredSaveRef> = data_controller
         .read_or_create_default_json_file(DataDir::Storage, RECENT_SAVES_FILENAME)
@@ -238,21 +240,18 @@ fn get_modified_time_ms(path: &Path) -> Option<f64> {
         .map(|dur| dur.as_millis() as f64)
 }
 
-#[tauri::command]
-#[specta::specta]
 pub async fn find_suggested_saves(
-    app_handle: tauri::AppHandle,
+    data_controller: &impl DataController,
     save_folders: Vec<&str>,
-) -> CommandResult<PossibleSaves> {
+) -> Result<PossibleSaves> {
     let mut possible_saves = PossibleSaves {
         citra: Vec::new(),
         desmume: Vec::new(),
         open_emu: Vec::new(),
     };
 
-    let citra_dir_r = app_handle
-        .path()
-        .home_dir()
+    let citra_dir_r = data_controller
+        .get_data_folder()
         .map(|home| home.join(".local/share/citra-emu/sdmc/Nintendo 3DS"));
 
     if let Ok(citra_dir) = citra_dir_r
@@ -285,14 +284,14 @@ pub async fn find_suggested_saves(
                 }
             };
         } else {
-            return Err(Error::file_missing(&folder_path).into());
+            return Err(Error::file_missing(&folder_path));
         }
     }
 
     Ok(possible_saves)
 }
 
-fn get_possible_saves(folder: &PathBuf) -> Result<PossibleSaves> {
+pub fn get_possible_saves(folder: &PathBuf) -> Result<PossibleSaves> {
     let mut possible_saves = PossibleSaves {
         citra: Vec::new(),
         desmume: Vec::new(),

@@ -5,16 +5,16 @@ use serde::Serialize;
 use tauri::Emitter;
 
 use crate::commands::{CommandError, CommandResult};
-use crate::data_controller;
-use crate::error::{Error, Result};
+use crate::data_controller::ToDataController;
+use openhome_core::convert_strategies::ConvertStrategies;
+use openhome_core::data_controller;
+use openhome_core::lookup::LookupState;
+use openhome_core::ohpkm_store::OhpkmBytesStore;
+use openhome_core::{Error, Result};
 
 pub mod convert_strategies;
 pub mod lookup;
 pub mod ohpkm_store;
-
-use convert_strategies::ConvertStrategies;
-use lookup::LookupState;
-use ohpkm_store::OhpkmBytesStore;
 
 pub trait SyncedState: Clone + Serialize + tauri::ipc::IpcResponse {
     type Action: Clone + Serialize + tauri::ipc::IpcResponse + serde::de::DeserializeOwned;
@@ -94,7 +94,7 @@ impl AllSyncedState {
 
     pub fn save_to_files(
         &self,
-        data_controller: &mut impl data_controller::DataController,
+        data_controller: &impl data_controller::DataController,
     ) -> Result<()> {
         let locked = self.lock()?;
         locked.ohpkm_store.0.write_to_mons_v2(data_controller)?;
@@ -162,11 +162,11 @@ impl Deref for AllSyncedState {
 #[tauri::command]
 #[specta::specta]
 pub fn save_synced_state(
-    mut app_handle: tauri::AppHandle,
+    app_handle: tauri::AppHandle,
     synced_state: tauri::State<'_, AllSyncedState>,
 ) -> CommandResult<()> {
     synced_state
-        .save_to_files(&mut app_handle)
+        .save_to_files(&app_handle.controller())
         .map_err(CommandError::from)
 }
 

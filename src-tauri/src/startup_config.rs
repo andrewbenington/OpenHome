@@ -1,4 +1,8 @@
-use serde::Deserialize;
+use crate::commands::CommandResult;
+use crate::data_controller::TauriDataController;
+use openhome_core::data_controller::DataController;
+use openhome_core::startup_config::StartupConfig;
+use openhome_core::{Error, Result};
 use serde::Serialize;
 use std::fs;
 use std::ops::Deref;
@@ -8,20 +12,12 @@ use std::sync::Mutex;
 use tauri::Manager;
 use tauri_plugin_dialog::DialogExt;
 
-use crate::commands::CommandResult;
-use crate::data_controller::DataController;
-use crate::data_controller::read_file_json;
-use crate::data_controller::write_file_json;
-use crate::error::Error;
-use crate::error::Result;
-use crate::util;
-
 #[derive(Serialize)]
 pub struct StartupConfigState(pub Mutex<StartupConfig>);
 
 impl StartupConfigState {
-    pub fn load_or_create(app_handle: &tauri::AppHandle) -> Result<Self> {
-        let startup_config = StartupConfig::load_or_create(app_handle)?;
+    pub fn load_or_create() -> Result<Self> {
+        let startup_config = StartupConfig::load_or_create()?;
         Ok(Self(Mutex::new(startup_config)))
     }
 }
@@ -31,45 +27,6 @@ impl Deref for StartupConfigState {
 
     fn deref(&self) -> &Self::Target {
         &self.0
-    }
-}
-
-#[derive(Default, Serialize, Deserialize, Clone)]
-pub struct StartupConfig {
-    data_dir_path: Option<PathBuf>,
-}
-
-const STARTUP_CONFIG_FILENAME: &str = "startup-config.json";
-
-impl StartupConfig {
-    fn get_file_path(app_handle: &tauri::AppHandle) -> Result<PathBuf> {
-        Ok(app_handle
-            .get_config_folder()?
-            .join(STARTUP_CONFIG_FILENAME))
-    }
-
-    fn load_or_create(app_handle: &tauri::AppHandle) -> Result<Self> {
-        let file_path = Self::get_file_path(app_handle)?;
-        if !file_path.exists() {
-            let config_path = app_handle.get_config_folder()?;
-            if !config_path.exists() {
-                util::create_directory(config_path)?;
-            }
-            let default = Self::default();
-            default.write_to_storage(app_handle)?;
-            Ok(default)
-        } else {
-            read_file_json(Self::get_file_path(app_handle)?)
-        }
-    }
-
-    fn write_to_storage(&self, app_handle: &tauri::AppHandle) -> Result<()> {
-        let full_path = Self::get_file_path(app_handle)?;
-        write_file_json(full_path, self)
-    }
-
-    pub fn get_data_dir_path(&self) -> Option<PathBuf> {
-        self.data_dir_path.clone()
     }
 }
 
@@ -100,6 +57,7 @@ pub async fn change_data_dir(
         return Ok(());
     };
 
+    let controller = TauriDataController::new(&app_handle);
     let Some(selected_dir) = selected_dir.as_path() else {
         return Ok(());
     };
@@ -111,15 +69,15 @@ pub async fn change_data_dir(
         .into());
     }
 
-    let current_data_dir = app_handle.get_data_folder()?;
+    let current_data_dir = controller.get_data_folder()?;
 
     copy_all_directory_items(&current_data_dir, selected_dir)?;
 
     let mut state = startup_config_state.lock()?;
 
     // update startup config with the new path and save it to disk
-    state.data_dir_path = Some(selected_dir.to_path_buf());
-    state.write_to_storage(&app_handle)?;
+    state.update_data_dir(selected_dir);
+    state.write_to_storage()?;
 
     // if we fail to delete old files, log the error but don't abort the dir change process
     let old_storage_dir = current_data_dir.join("storage");

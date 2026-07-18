@@ -1,12 +1,9 @@
 mod commands;
 mod data_controller;
 mod deprecated;
-mod error;
 mod logging;
 mod menu;
-mod pkm_storage;
 mod plugin;
-mod saves;
 mod startup;
 mod startup_config;
 mod state;
@@ -14,14 +11,14 @@ mod synced_state;
 mod util;
 mod versioning;
 
+use crate::data_controller::ToDataController;
+use crate::synced_state::AllSyncedState;
+use openhome_core::convert_strategies::ConvertStrategies;
+use openhome_core::lookup::LookupState;
+use openhome_core::ohpkm_store::OhpkmBytesStore;
+use openhome_core::{Error, Result};
 use std::env;
 use tauri::Manager;
-
-pub use crate::error::{Error, Result};
-use crate::synced_state::AllSyncedState;
-use crate::synced_state::convert_strategies::ConvertStrategies;
-use crate::synced_state::lookup::LookupState;
-use crate::synced_state::ohpkm_store::OhpkmBytesStore;
 
 const RAW_HANDLER: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_handler![
     commands::get_file_bytes,
@@ -46,11 +43,11 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         commands::handle_windows_accelerator,
         commands::open_directory,
         commands::open_file_location,
-        saves::find_suggested_saves,
+        commands::find_suggested_saves,
         startup_config::get_data_dir_path,
         startup_config::change_data_dir,
-        pkm_storage::load_banks,
-        pkm_storage::write_banks,
+        commands::load_banks,
+        commands::write_banks,
         state::get_pokedex,
         state::update_pokedex,
         state::start_transaction,
@@ -81,16 +78,15 @@ pub fn run() {
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
-            let startup_config_state =
-                match startup_config::StartupConfigState::load_or_create(app.handle()) {
-                    Ok(state) => state,
-                    Err(err) => {
-                        util::show_error_dialog(app, err, launch_error_msg("Startup Config"));
+            let startup_config_state = match startup_config::StartupConfigState::load_or_create() {
+                Ok(state) => state,
+                Err(err) => {
+                    util::show_error_dialog(app, err, launch_error_msg("Startup Config"));
 
-                        app.handle().exit(1);
-                        std::process::exit(1);
-                    }
-                };
+                    app.handle().exit(1);
+                    std::process::exit(1);
+                }
+            };
             app.manage(startup_config_state);
 
             let update_features_r = startup::run_app_startup(app);
@@ -107,7 +103,9 @@ pub fn run() {
                 std::process::exit(1);
             };
 
-            let ohpkm_store = match OhpkmBytesStore::load_from_mons_v2(app.handle()) {
+            let controller = app.handle().controller();
+
+            let ohpkm_store = match OhpkmBytesStore::load_from_mons_v2(&controller) {
                 Ok(state) => state,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("OHPKM Load"));
@@ -117,7 +115,7 @@ pub fn run() {
                 }
             };
 
-            let lookup_state = match LookupState::load_from_storage(&mut app.handle()) {
+            let lookup_state = match LookupState::load_from_storage(&controller) {
                 Ok(lookup) => lookup,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Lookup File"));
@@ -127,8 +125,7 @@ pub fn run() {
                 }
             };
 
-            let conversion_settings = match ConvertStrategies::load_from_storage(&mut app.handle())
-            {
+            let conversion_settings = match ConvertStrategies::load_from_storage(&controller) {
                 Ok(settings) => settings,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Conversion Settings"));
@@ -142,7 +139,7 @@ pub fn run() {
                 AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
             app.manage(synced_state);
 
-            let pokedex_state = match state::PokedexState::load_from_storage(app.handle()) {
+            let pokedex_state = match state::PokedexState::load_from_storage(&controller) {
                 Ok(pokedex) => pokedex,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Pokedex File"));

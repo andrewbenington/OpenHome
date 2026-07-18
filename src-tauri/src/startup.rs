@@ -1,13 +1,12 @@
-use std::path::Path;
-
-use tauri::{App, Emitter, Manager};
-
-use crate::data_controller::{DataController, DataDir, MONS_V2_DIR};
-use crate::error::{Error, Result};
-use crate::pkm_storage::StoredBankData;
-use crate::synced_state::lookup::{GEN12_FILENAME, GEN345_FILENAME};
+use crate::data_controller::ToDataController;
 use crate::versioning;
 use crate::{logging, util};
+use openhome_core::data_controller::{DataController, DataDir, MONS_V2_DIR};
+use openhome_core::lookup::{GEN12_FILENAME, GEN345_FILENAME};
+use openhome_core::pkm_storage::StoredBankData;
+use openhome_core::{Error, Result};
+use std::path::Path;
+use tauri::{App, Emitter, Manager};
 
 const BANKS_FILENAME: &str = "banks.json";
 const LOGS_DIR: &str = "logs";
@@ -20,7 +19,12 @@ use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 pub fn run_app_startup(app: &App) -> Result<Vec<versioning::UpdateFeatures>> {
     let handle = app.handle().clone();
     logging::init_logging(
-        &Path::join(&tauri::Manager::path(&handle).app_data_dir()?, LOGS_DIR),
+        &Path::join(
+            &tauri::Manager::path(&handle)
+                .app_data_dir()
+                .map_err(|e| Error::other_with_source("Tauri error", e))?,
+            LOGS_DIR,
+        ),
         Some(move |event: logging::NewLogNotification| {
             let result = handle.emit("tracing::log", event);
             if let Err(err) = result {
@@ -30,8 +34,9 @@ pub fn run_app_startup(app: &App) -> Result<Vec<versioning::UpdateFeatures>> {
     );
 
     let current_version = &app.handle().package_info().version;
+    let controller = app.handle().controller();
     let update_features: Vec<versioning::UpdateFeatures> =
-        match versioning::handle_updates_get_features(app.handle(), current_version, false) {
+        match versioning::handle_updates_get_features(&controller, current_version, false) {
             Err(error) => match error {
                 Error::OutdatedVersion { .. } => {
                     let should_launch = show_version_error_prompt(app, &error);
@@ -40,17 +45,17 @@ pub fn run_app_startup(app: &App) -> Result<Vec<versioning::UpdateFeatures>> {
                         return Err(error);
                     }
 
-                    versioning::handle_updates_get_features(app.handle(), current_version, true)?
+                    versioning::handle_updates_get_features(&controller, current_version, true)?
                 }
                 other => return Err(other),
             },
             Ok(feature_messages) => feature_messages,
         };
 
-    versioning::update_version_last_used(app.handle(), current_version)?;
+    versioning::update_version_last_used(&controller, current_version)?;
 
     // IMPORTANT: should occur after any migrations (above)
-    initialize_storage(app.handle())?;
+    initialize_storage(&controller)?;
 
     let result = set_theme_from_settings(app);
     if let Err(error) = result {
@@ -100,6 +105,7 @@ const SETTINGS_FILENAME: &str = "settings.json";
 fn set_theme_from_settings(app: &App) -> Result<()> {
     let settings_json: serde_json::Value = app
         .app_handle()
+        .controller()
         .read_or_create_default_json_file(DataDir::Storage, SETTINGS_FILENAME)?;
 
     let app_theme = settings_json["appTheme"].as_str().unwrap_or("light");
