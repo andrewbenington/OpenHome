@@ -1,4 +1,4 @@
-import { PA8, PK3, PK4, PK7, PK8, PK9 } from '@openhome-core/pkm'
+import { PA8, PK2, PK3, PK4, PK7, PK8, PK9 } from '@openhome-core/pkm'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
 import { R } from '@openhome-core/util/functional'
@@ -148,6 +148,19 @@ describe('evolution and form change update ohpkm', async () => {
     expect(mrMimeOhpkm.dexNum).toEqual(NationalDex.MrRime)
     expect(mrMimeOhpkm.formNum).toEqual(0)
   })
+})
+
+test('Game Boy Pokemon in the same evolution family have distinct OpenHome IDs', () => {
+  const bytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pk2', 'hooh.pk2')))
+  const abra = PK2.fromBytes(bytes.buffer)
+  const kadabra = PK2.fromBytes(bytes.buffer.slice(0))
+
+  abra.dexNum = NationalDex.Abra
+  kadabra.dexNum = NationalDex.Kadabra
+
+  expect(OHPKM.fromMonUnknownSave(abra).openhomeId).not.toEqual(
+    OHPKM.fromMonUnknownSave(kadabra).openhomeId
+  )
 })
 
 describe('plugin form persistence', () => {
