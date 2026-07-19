@@ -201,7 +201,7 @@ fn read_file_text<P>(full_path: P) -> Result<String>
 where
     P: AsRef<Path>,
 {
-    if full_path.as_ref().exists() {
+    if !full_path.as_ref().exists() {
         return Err(Error::file_missing(full_path.as_ref()));
     }
 
@@ -260,7 +260,7 @@ where
 }
 
 #[cfg(target_os = "macos")]
-pub fn get_default_data_dir() -> Result<PathBuf> {
+fn get_default_data_dir() -> Result<PathBuf> {
     let home_dir = std::env::var("HOME")
         .map_err(|e| Error::other_with_source("HOME environment variable is not present", e))?;
     let application_support = PathBuf::from(home_dir)
@@ -270,32 +270,40 @@ pub fn get_default_data_dir() -> Result<PathBuf> {
 }
 
 #[cfg(target_os = "macos")]
-pub fn get_config_dir() -> Result<PathBuf> {
+fn get_config_dir() -> Result<PathBuf> {
     get_default_data_dir()
 }
 
 #[cfg(target_os = "linux")]
-pub fn get_default_data_dir() -> Result<PathBuf> {
+fn get_default_data_dir() -> Result<PathBuf> {
     Ok(std::env::var_os("XDG_DATA_HOME")
         .map(PathBuf::from)
         .unwrap_or(PathBuf::from(".local").join("share")))
 }
 
 #[cfg(target_os = "linux")]
-pub fn get_config_dir() -> Result<PathBuf> {
+fn get_config_dir() -> Result<PathBuf> {
     Ok(std::env::var_os("XDG_CONFIG_HOME")
         .map(PathBuf::from)
         .unwrap_or(PathBuf::from(".config")))
 }
 
 #[cfg(target_os = "windows")]
-pub fn get_default_data_dir() -> Result<PathBuf> {
+fn get_default_data_dir() -> Result<PathBuf> {
     std::env::var("APPDATA")
         .map(PathBuf::from)
         .map_err(|e| Error::other_with_source("APPDATA environment variable is not present", e))
 }
 
 #[cfg(target_os = "windows")]
-pub fn get_config_dir() -> Result<PathBuf> {
+fn get_config_dir() -> Result<PathBuf> {
     get_default_data_dir()
+}
+
+pub fn get_openhome_default_data_dir() -> Result<PathBuf> {
+    get_default_data_dir().map(|dir| dir.join("OpenHome"))
+}
+
+pub fn get_openhome_config_dir() -> Result<PathBuf> {
+    get_config_dir().map(|dir| dir.join("OpenHome"))
 }
