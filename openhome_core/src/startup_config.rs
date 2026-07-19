@@ -1,6 +1,5 @@
 use crate::Result;
 use crate::data_controller;
-use crate::data_controller::get_config_dir;
 use crate::util;
 use serde::Deserialize;
 use serde::Serialize;
@@ -36,18 +35,19 @@ const STARTUP_CONFIG_FILENAME: &str = "startup-config.json";
 
 impl StartupConfig {
     fn get_file_path() -> Result<PathBuf> {
-        Ok(get_config_dir()?.join(STARTUP_CONFIG_FILENAME))
+        Ok(data_controller::get_openhome_config_dir()?.join(STARTUP_CONFIG_FILENAME))
     }
 
     pub fn load_or_create() -> Result<Self> {
         let file_path = Self::get_file_path()?;
         if !file_path.exists() {
-            let config_path = data_controller::get_config_dir()?;
+            let config_path = data_controller::get_openhome_config_dir()?;
             if !config_path.exists() {
                 util::create_directory(config_path)?;
             }
             let default = Self::default();
             default.write_to_storage()?;
+
             Ok(default)
         } else {
             data_controller::read_file_json(file_path)
