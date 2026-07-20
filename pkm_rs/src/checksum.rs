@@ -1,16 +1,13 @@
 use std::num::Wrapping;
 
-#[cfg(feature = "wasm")]
 use crate::bytes::{AsBytes, AsBytesMut};
 
-#[cfg(feature = "wasm")]
 pub trait ChecksumAlgorithm {
     type Output: Sized + Copy;
     fn calc_over_bytes(bytes: &[u8]) -> Self::Output;
     fn write_to_bytes(bytes: &mut [u8], value: Self::Output);
 }
 
-#[cfg(feature = "wasm")]
 pub trait Checksum: AsBytes {
     type A: ChecksumAlgorithm;
     const SPAN_START: usize;
@@ -21,7 +18,6 @@ pub trait Checksum: AsBytes {
     }
 }
 
-#[cfg(feature = "wasm")]
 pub trait RefreshChecksum: Checksum + AsBytesMut {
     const STORED_OFFSET: usize;
 
@@ -34,10 +30,8 @@ pub trait RefreshChecksum: Checksum + AsBytesMut {
     }
 }
 
-#[cfg(feature = "wasm")]
 pub struct ChecksumU16Le;
 
-#[cfg(feature = "wasm")]
 impl ChecksumAlgorithm for ChecksumU16Le {
     type Output = u16;
 
@@ -50,7 +44,6 @@ impl ChecksumAlgorithm for ChecksumU16Le {
     }
 }
 
-#[cfg(feature = "wasm")]
 pub fn checksum_u16_le(bytes: &[u8]) -> u16 {
     let wrapped_sum: Wrapping<u16> = bytes
         .chunks_exact(2)
