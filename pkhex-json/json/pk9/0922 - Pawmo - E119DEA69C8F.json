@@ -1,0 +1,150 @@
+{
+  "encryption_constant": 3735461007,
+  "sanity": 0,
+  "checksum": 57625,
+  "species_and_form": {
+    "national_dex": 922,
+    "form_index": 0
+  },
+  "held_item_index": 0,
+  "trainer_id": 13288,
+  "secret_id": 3,
+  "exp": 13824,
+  "ability_index": "Volt Absorb",
+  "ability_num": "First",
+  "markings": {
+    "circle": "unset",
+    "square": "unset",
+    "triangle": "unset",
+    "heart": "unset",
+    "star": "unset",
+    "diamond": "unset"
+  },
+  "personality_value": 3441681194,
+  "nature": "Hasty",
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "ribbons": ["Partner Ribbon"],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "form_argument": 0,
+  "nickname": "Pawmo",
+  "nickname_trash": "5000610077006D006F0000000000000000000000000000000000",
+  "moves": [
+    {
+      "move_index": "Nuzzle",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Dig",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Bite",
+      "pp": 25,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Spark",
+      "pp": 20,
+      "pp_ups": 0
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "ivs": {
+    "hp": 15,
+    "atk": 22,
+    "def": 31,
+    "spa": 14,
+    "spd": 3,
+    "spe": 29
+  },
+  "is_egg": false,
+  "is_nicknamed": false,
+  "handler_name": "RoC",
+  "handler_gender": "Male",
+  "is_current_handler": true,
+  "handler_friendship": 50,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "handler_id": 0,
+  "handler_language": "English",
+  "trainer_name": "Clavell",
+  "trainer_friendship": 50,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "egg_date": null,
+  "met_date": "12/15/2023",
+  "egg_location_index": 0,
+  "met_location_index": 30001,
+  "ball": "Pok\u00E9",
+  "met_level": 24,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": false,
+    "atk": false,
+    "def": false,
+    "spa": false,
+    "spd": false,
+    "spe": false
+  },
+  "game_of_origin": "Scarlet",
+  "game_of_origin_battle": null,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 24,
+  "stats": {
+    "hp": 66,
+    "atk": 46,
+    "def": 27,
+    "spa": 32,
+    "spd": 24,
+    "spe": 57
+  },
+  "level": 24,
+  "affixed_ribbon": "RibbonMarkCloudy\tCloudy Mark",
+  "height_scalar": 127,
+  "weight_scalar": 128,
+  "scale": 128,
+  "mint_nature": "Hasty",
+  "tera_type_original": {
+    "Standard": "Fighting"
+  },
+  "tera_type_override": null,
+  "home_tracker": null,
+  "tm_flags_base_game": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "tm_flags_dlc": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "current_hp": 66,
+  "obedience_level": 24
+}

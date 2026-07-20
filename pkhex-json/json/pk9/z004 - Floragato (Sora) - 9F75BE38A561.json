@@ -1,0 +1,150 @@
+{
+  "encryption_constant": 3191383393,
+  "sanity": 0,
+  "checksum": 40821,
+  "species_and_form": {
+    "national_dex": 907,
+    "form_index": 0
+  },
+  "held_item_index": 229,
+  "trainer_id": 7545,
+  "secret_id": 59619,
+  "exp": 1059860,
+  "ability_index": "Protean",
+  "ability_num": "Hidden",
+  "markings": {
+    "circle": "unset",
+    "square": "unset",
+    "triangle": "unset",
+    "heart": "unset",
+    "star": "unset",
+    "diamond": "unset"
+  },
+  "personality_value": 2274358173,
+  "nature": "Hardy",
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 6,
+    "atk": 0,
+    "def": 0,
+    "spa": 252,
+    "spd": 0,
+    "spe": 252
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "ribbons": [],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "form_argument": 0,
+  "nickname": "Sora",
+  "nickname_trash": "53006F0072006100000061007400690074006F00000000000000",
+  "moves": [
+    {
+      "move_index": "Energy Ball",
+      "pp": 16,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Bite",
+      "pp": 40,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "U-turn",
+      "pp": 32,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Play Rough",
+      "pp": 16,
+      "pp_ups": 3
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "ivs": {
+    "hp": 26,
+    "atk": 12,
+    "def": 18,
+    "spa": 12,
+    "spd": 14,
+    "spe": 20
+  },
+  "is_egg": false,
+  "is_nicknamed": true,
+  "handler_name": "RoC",
+  "handler_gender": "Male",
+  "is_current_handler": true,
+  "handler_friendship": 160,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "handler_id": 0,
+  "handler_language": "English",
+  "trainer_name": "RoC",
+  "trainer_friendship": 50,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "egg_date": null,
+  "met_date": "11/18/2022",
+  "egg_location_index": 0,
+  "met_location_index": 80,
+  "ball": "Pok\u00E9",
+  "met_level": 5,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": true,
+    "atk": true,
+    "def": true,
+    "spa": true,
+    "spd": true,
+    "spe": true
+  },
+  "game_of_origin": "Violet",
+  "game_of_origin_battle": null,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 100,
+  "stats": {
+    "hp": 264,
+    "atk": 176,
+    "def": 162,
+    "spa": 240,
+    "spd": 162,
+    "spe": 265
+  },
+  "level": 100,
+  "affixed_ribbon": null,
+  "height_scalar": 128,
+  "weight_scalar": 128,
+  "scale": 128,
+  "mint_nature": "Modest",
+  "tera_type_original": {
+    "Standard": "Grass"
+  },
+  "tera_type_override": null,
+  "home_tracker": null,
+  "tm_flags_base_game": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "tm_flags_dlc": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "current_hp": 264,
+  "obedience_level": 5
+}

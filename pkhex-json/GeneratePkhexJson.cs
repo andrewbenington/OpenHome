@@ -13,6 +13,7 @@ var pkmClassByDir = new Dictionary<string, Func<byte[], PKM>>
     { "pk3", bytes => new PK3(bytes) },
     { "pk7", bytes => new PK7(bytes) },
     { "pk8", bytes => new PK8(bytes) },
+    { "pk9", bytes => new PK9(bytes) },
 };
 
 static object PkmToJsonObject(PKM pk)
@@ -28,6 +29,10 @@ static object PkmToJsonObject(PKM pk)
     else if (pk is PK8 pk8)
     {
         return Pk8Object.Build(pk8);
+    }
+    else if (pk is PK9 pk9)
+    {
+        return Pk9Object.Build(pk9);
     }
     else
     {
