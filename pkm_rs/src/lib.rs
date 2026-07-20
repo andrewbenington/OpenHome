@@ -15,6 +15,8 @@ pub mod gen7_alola;
 // pub mod gen7_lgpe;
 #[cfg(feature = "wasm")]
 pub mod gen8_swsh;
+#[cfg(feature = "wasm")]
+pub mod gen9_sv;
 pub mod location;
 pub mod ohpkm;
 pub mod result;

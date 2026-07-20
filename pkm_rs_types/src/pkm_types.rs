@@ -1,3 +1,5 @@
+use crate::{Error, Result};
+
 use serde::Serialize;
 use strum_macros::{Display, EnumString};
 
@@ -165,7 +167,6 @@ impl PkmTypes {
     }
 }
 
-const TERA_TYPE_NO_OVERRIDE: u8 = 0x13;
 const TERA_TYPE_STELLAR: u8 = 0x63;
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
@@ -178,11 +179,29 @@ pub enum TeraType {
 impl TeraType {
     pub const NO_OVERRIDE: u8 = 19;
 
-    pub fn from_byte(byte: u8) -> Option<Self> {
+    pub fn from_byte_original(byte: u8) -> Result<Self> {
         match byte {
-            TERA_TYPE_STELLAR => Some(Self::Stellar),
-            TERA_TYPE_NO_OVERRIDE => None,
-            _ => PkmType::from_byte(byte).map(Self::Standard),
+            TERA_TYPE_STELLAR => Ok(Self::Stellar),
+            _ => PkmType::from_byte(byte)
+                .map(Self::Standard)
+                .ok_or(Error::TeraType {
+                    value: byte,
+                    is_override: false,
+                }),
+        }
+    }
+
+    pub fn from_byte_override(byte: u8) -> Result<Option<Self>> {
+        match byte {
+            TERA_TYPE_STELLAR => Ok(Some(Self::Stellar)),
+            Self::NO_OVERRIDE => Ok(None),
+            _ => PkmType::from_byte(byte)
+                .map(Self::Standard)
+                .map(Some)
+                .ok_or(Error::TeraType {
+                    value: byte,
+                    is_override: true,
+                }),
         }
     }
 
@@ -271,7 +290,7 @@ impl From<TeraTypeWasm> for TeraType {
     fn from(value: TeraTypeWasm) -> Self {
         match value {
             TeraTypeWasm::Stellar => Self::Stellar,
-            standard_type => Self::from_byte(standard_type as u8).expect(
+            standard_type => Self::from_byte_original(standard_type as u8).expect(
                 "all valid, non-Stellar u8 representations of TeraTypeWasm are valid for TeraType",
             ),
         }
