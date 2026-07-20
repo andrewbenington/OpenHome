@@ -334,13 +334,15 @@ pub fn compare_pkhex_json<PKM: Pkm + PkhexJson>(pkm_path: &Path) -> TestResult<(
         &pkhex_value,
         Config::new(CompareMode::Strict),
     ) {
-        println!("Full pkhex JSON:\n{pkhex_json}");
-        println!(
-            "Full pkm_rs JSON:\n{}",
-            serde_json::to_string_pretty(&pkm_rs_value)
-                .map_err(|e| TestError::PkmRs(Error::other(&e.to_string())))?
+        // println!("Full pkhex JSON:\n{pkhex_json}");
+        // println!(
+        //     "Full pkm_rs JSON:\n{}",
+        //     serde_json::to_string_pretty(&pkm_rs_value)
+        //         .map_err(|e| TestError::PkmRs(Error::other(&e.to_string())))?
+        // );
+        return Err(
+            Error::other(&format!("{pkm_path:?} JSON mismatch (pkm_rs - PKHeX): {e}")).into(),
         );
-        return Err(Error::other(&format!("JSON mismatch: {e}")).into());
     }
 
     Ok(())

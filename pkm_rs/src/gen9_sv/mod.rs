@@ -33,6 +33,9 @@ const MAX_ABILITY_INDEX: u16 = 310; // Poison Puppeteer
 
 const MAX_RIBBON_SV: usize = ModernRibbon::Partner as usize;
 
+pub const TM_FLAG_BYTE_LENGTH_BASE: usize = 25;
+pub const TM_FLAG_BYTE_LENGTH_DLC: usize = 13;
+
 pub type Pk9AbilityIndex = AbilityIndexBounded<MAX_ABILITY_INDEX>;
 
 // type BoxName = SizedUtf16String<BOX_NAME_LENGTH>;
@@ -43,7 +46,7 @@ pub struct Pk9SpeciesAndForm(SpeciesAndForm);
 impl Pk9SpeciesAndForm {
     fn try_new(species_and_form: SpeciesAndForm) -> Option<Self> {
         if source_has_form_metadata(
-            MetadataSource::SwordShield,
+            MetadataSource::ScarletViolet,
             species_and_form.get_ndex().to_u16(),
             species_and_form.get_forme_index(),
         ) {
@@ -82,7 +85,11 @@ impl TryFrom<SpeciesAndForm> for Pk9SpeciesAndForm {
     type Error = Error;
 
     fn try_from(value: SpeciesAndForm) -> std::result::Result<Self, Self::Error> {
-        Self::try_new(value).ok_or(Error::form_index(value))
+        Self::try_new(value).ok_or(Error::other(&format!(
+            "invalid species form for pk9: {}/{}",
+            value.get_ndex(),
+            value.get_forme_index()
+        )))
     }
 }
 

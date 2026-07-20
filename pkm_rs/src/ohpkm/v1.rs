@@ -3,7 +3,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::result::{Error, Result};
 use crate::traits::{IsShiny4096, PkmBytes};
-use crate::util;
+use crate::{gen9_sv, util};
 
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::MoveIndex;
@@ -123,9 +123,9 @@ pub struct OhpkmV1 {
     pub move_flags_la: [u8; 14],
     pub tutor_flags_la: [u8; 8],
     pub master_flags_la: [u8; 8],
-    pub tm_flags_sv: [u8; 22],
+    pub tm_flags_sv: [u8; 22], // had the incorrect size
     pub evs_g12: StatsPreSplit,
-    pub tm_flags_sv_dlc: [u8; 13],
+    pub tm_flags_sv_dlc: [u8; gen9_sv::TM_FLAG_BYTE_LENGTH_DLC],
 
     pub file_timestamp_seconds: Option<NonZeroU64>,
 }

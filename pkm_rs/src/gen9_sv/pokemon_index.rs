@@ -1,14 +1,10 @@
-use std::num::NonZeroU16;
-
-use pkm_rs_resources::species::{
-    NatDexIndex, SpeciesAndForm,
-    form_metadata::{MetadataTable, gen9_sv::METADATA_TABLE_SV},
-};
+use pkm_rs_resources::species::form_metadata::MetadataTable;
+use pkm_rs_resources::species::form_metadata::gen9_sv::METADATA_TABLE_SV;
+use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
 #[cfg(feature = "randomize")]
-use pkm_rs_types::{NationalDex, randomize::Randomize};
-#[cfg(feature = "randomize")]
-use rand::RngExt;
+use pkm_rs_types::randomize::Randomize;
 use serde::Serialize;
+use std::num::NonZeroU16;
 
 use crate::result::{Error, NdexConvertSource};
 
@@ -184,8 +180,11 @@ impl Default for SvPokemonIndex {
 #[cfg(feature = "randomize")]
 impl Randomize for SvPokemonIndex {
     fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
-        Self::from_national_dex(rng.random_range(1..=NationalDex::Deoxys as u16))
-            .expect("all pokémon through Deoxys have a gen 3 index")
+        loop {
+            if let Ok(index) = Self::from_species_and_form(SpeciesAndForm::randomized(rng)) {
+                return index;
+            }
+        }
     }
 }
 

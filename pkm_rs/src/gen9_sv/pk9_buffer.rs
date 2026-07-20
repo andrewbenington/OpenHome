@@ -2,6 +2,7 @@ use super::Pk9AbilityIndex;
 use crate::bytes::{AsBytes, AsBytesMut};
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::encryption::BlockCrypto;
+use crate::gen9_sv::{TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
 use crate::result::Result;
 use crate::traits::OhpkmByte;
 use crate::util;
@@ -346,7 +347,7 @@ impl<S: AsRef<[u8]>> Pk9Buffer<S> {
         self.get_u8(Offset::Scale)
     }
 
-    pub fn tm_flags_dlc_raw(&self) -> [u8; 13] {
+    pub fn tm_flags_dlc_raw(&self) -> [u8; TM_FLAG_BYTE_LENGTH_DLC] {
         self.get_array(Offset::TmFlagsDlc)
     }
 
@@ -576,7 +577,7 @@ impl<S: AsRef<[u8]>> Pk9Buffer<S> {
         self.get_u64_le(Offset::HomeTracker)
     }
 
-    pub fn tm_flags_base_game_raw(&self) -> [u8; 22] {
+    pub fn tm_flags_base_game_raw(&self) -> [u8; TM_FLAG_BYTE_LENGTH_BASE] {
         self.get_array(Offset::TmFlagsBaseGame)
     }
 
@@ -786,7 +787,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk9Buffer<S> {
         self.set_u8(Offset::Scale, v);
     }
 
-    pub fn set_tm_flags_dlc_raw(&mut self, v: &[u8; 13]) {
+    pub fn set_tm_flags_dlc_raw(&mut self, v: &[u8; TM_FLAG_BYTE_LENGTH_DLC]) {
         self.set_array(Offset::TmFlagsDlc, v);
     }
 
@@ -1002,7 +1003,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk9Buffer<S> {
         self.set_u64_le(Offset::HomeTracker, v);
     }
 
-    pub fn set_tm_flags_base_game_raw(&mut self, v: &[u8; 22]) {
+    pub fn set_tm_flags_base_game_raw(&mut self, v: &[u8; TM_FLAG_BYTE_LENGTH_BASE]) {
         self.set_array(Offset::TmFlagsBaseGame, v);
     }
 

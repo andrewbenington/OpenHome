@@ -2,8 +2,8 @@ use super::Pk9Buffer;
 use super::pk9_buffer::Pk9BufferMut;
 use super::{Pk9AbilityIndex, Pk9SpeciesAndForm};
 use crate::checksum::{Checksum, RefreshChecksum};
-use crate::gen9_sv::MAX_RIBBON_SV;
 use crate::gen9_sv::pokemon_index::SvPokemonIndex;
+use crate::gen9_sv::{MAX_RIBBON_SV, TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
 use crate::result::{Error, Result};
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
@@ -78,7 +78,7 @@ pub struct Pk9 {
     pub weight_scalar: u8,
     pub scale: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub tm_flags_dlc: FlagSet<13>,
+    pub tm_flags_dlc: FlagSet<TM_FLAG_BYTE_LENGTH_DLC>,
     pub nickname: SizedUtf16String<26>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: MoveSlots,
@@ -117,7 +117,7 @@ pub struct Pk9 {
     pub met_level: u8,
     pub trainer_gender: BinaryGender,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub tm_flags_base_game: FlagSet<22>,
+    pub tm_flags_base_game: FlagSet<TM_FLAG_BYTE_LENGTH_BASE>,
     pub home_tracker: Option<u64>,
     pub hyper_training: HyperTraining,
     #[cfg_attr(feature = "randomize", randomize(skip))]
@@ -654,11 +654,11 @@ mod test {
 
     #[cfg(feature = "randomize")]
     #[test]
-    fn to_from_bytes_random() -> std::result::Result<(), TestErrorWithSeed> {
+    fn to_from_bytes_random() -> std::result::Result<(), tests::TestErrorWithSeed> {
         for seed in 0..=1000 {
             let mon = Pk9::randomize_and_fix(&mut StdRng::seed_from_u64(seed));
             tests::find_inconsistencies_to_from_bytes(mon)
-                .map_err(|error| TestErrorWithSeed { seed, error })?;
+                .map_err(|error| tests::TestErrorWithSeed { seed, error })?;
         }
 
         Ok(())
