@@ -276,18 +276,26 @@ public static partial class Util
 
   public static object FormatAffixedRibbon(sbyte ribbon, GameStrings strings)
   {
-    Console.WriteLine("ribbon value: " + ribbon);
-    Console.WriteLine("min ribbon value: " + sbyte.MinValue);
-    return ribbon == -1 ? null : strings.ribbons.GetValue(ribbon);
+    if (ribbon == -1) return null;
+
+    int ribbonInt = ribbon;
+    if (ribbonInt >= 46)
+    {
+      ribbonInt += 53;
+    }
+    string ribbonName = strings.ribbons[ribbonInt];
+    return ribbonName.Split("\t")[1].Replace(" Ribbon", "");
   }
 
   public static object FormatTeraType(MoveType teraType)
   {
     if ((int)teraType == 19) return null;
-    Console.WriteLine(teraType);
-    return teraType <= MoveType.Fairy && teraType != MoveType.Any
-    ? new { Standard = teraType.ToString() }
-    : teraType.ToString();
+    
+    if (teraType <= MoveType.Fairy && teraType != MoveType.Any) {
+      return new { Standard = teraType.ToString() };
+    }
+
+    return teraType.ToString();
   }
 
   [GeneratedRegex(@"(?=[A-Z])")]

@@ -6,7 +6,6 @@ const STARTING_SEED: u32 = 0x41c64e6d;
 const SHUFFLE_ORDER_COUNT: usize = 24;
 const BLOCK_COUNT: usize = 4;
 
-#[cfg(feature = "wasm")]
 mod meme_crypto;
 pub use meme_crypto::MemeCrypto;
 
