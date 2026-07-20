@@ -95,8 +95,8 @@ public static partial class Util
   {
     try
     {
-      
-    return moveId == 0 ? "<empty>" : strings.movelist.GetValue(moveId);
+
+      return moveId == 0 ? "<empty>" : strings.movelist.GetValue(moveId);
     }
     catch (Exception)
     {
@@ -162,7 +162,7 @@ public static partial class Util
     {
       s = "RibbonChampion";
     }
-    
+
     var parts = RibbonRegex().Split(s).Where(p => p.Length > 0).ToArray();
     if (parts.Length == 3 && parts[1] == "Champion")
     {
@@ -279,6 +279,15 @@ public static partial class Util
     Console.WriteLine("ribbon value: " + ribbon);
     Console.WriteLine("min ribbon value: " + sbyte.MinValue);
     return ribbon == -1 ? null : strings.ribbons.GetValue(ribbon);
+  }
+
+  public static object FormatTeraType(MoveType teraType)
+  {
+    if ((int)teraType == 19) return null;
+    Console.WriteLine(teraType);
+    return teraType <= MoveType.Fairy && teraType != MoveType.Any
+    ? new { Standard = teraType.ToString() }
+    : teraType.ToString();
   }
 
   [GeneratedRegex(@"(?=[A-Z])")]

@@ -1,0 +1,150 @@
+{
+  "encryption_constant": 1768453494,
+  "sanity": 0,
+  "checksum": 44830,
+  "species_and_form": {
+    "national_dex": 446,
+    "form_index": 0
+  },
+  "held_item_index": 0,
+  "trainer_id": 56071,
+  "secret_id": 59446,
+  "exp": 0,
+  "ability_index": "Gluttony",
+  "ability_num": "Hidden",
+  "markings": {
+    "circle": "unset",
+    "square": "unset",
+    "triangle": "unset",
+    "heart": "unset",
+    "star": "unset",
+    "diamond": "unset"
+  },
+  "personality_value": 1077900046,
+  "nature": "Impish",
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "ribbons": ["Mark Crafty Ribbon"],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "form_argument": 0,
+  "nickname": "Munchlax",
+  "nickname_trash": "4D0075006E00630068006C006100780000000000000000000000",
+  "moves": [
+    {
+      "move_index": "Tackle",
+      "pp": 35,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Lick",
+      "pp": 30,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "\u003Cempty\u003E",
+      "pp": 0,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "\u003Cempty\u003E",
+      "pp": 0,
+      "pp_ups": 0
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "ivs": {
+    "hp": 4,
+    "atk": 17,
+    "def": 22,
+    "spa": 1,
+    "spd": 6,
+    "spe": 27
+  },
+  "is_egg": false,
+  "is_nicknamed": false,
+  "handler_name": "",
+  "handler_gender": "Male",
+  "is_current_handler": false,
+  "handler_friendship": 0,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "handler_id": 0,
+  "handler_language": "English",
+  "trainer_name": "RoC",
+  "trainer_friendship": 0,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "egg_date": null,
+  "met_date": "9/16/2023",
+  "egg_location_index": 0,
+  "met_location_index": 142,
+  "ball": "Pok\u00E9",
+  "met_level": 1,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": false,
+    "atk": false,
+    "def": false,
+    "spa": false,
+    "spd": false,
+    "spe": false
+  },
+  "game_of_origin": "Scarlet",
+  "game_of_origin_battle": null,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 1,
+  "stats": {
+    "hp": 13,
+    "atk": 6,
+    "def": 6,
+    "spa": 4,
+    "spd": 6,
+    "spe": 5
+  },
+  "level": 1,
+  "affixed_ribbon": null,
+  "height_scalar": 255,
+  "weight_scalar": 255,
+  "scale": 255,
+  "mint_nature": "Impish",
+  "tera_type_original": {
+    "Standard": "Normal"
+  },
+  "tera_type_override": null,
+  "home_tracker": null,
+  "tm_flags_base_game": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "tm_flags_dlc": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "current_hp": 13,
+  "obedience_level": 1
+}
