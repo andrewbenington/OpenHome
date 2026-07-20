@@ -21,27 +21,35 @@ pub enum Error {
     LanguageIndex {
         language_index: u8,
     },
+    TeraType {
+        value: u8,
+        is_override: bool,
+    },
 }
 
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
-            Error::BufferSize {
+            Self::BufferSize {
                 field,
                 offset,
                 buffer_size,
             } => format!("Buffer too short ({buffer_size}B) to access {field} (at {offset})"),
-            Error::ByteLength { expected, received } => {
+            Self::ByteLength { expected, received } => {
                 format!("Invalid byte length (expected {expected}, received {received})")
             }
-            Error::AbilityNumber(InvalidAbilityNumber(num)) => {
+            Self::AbilityNumber(InvalidAbilityNumber(num)) => {
                 format!("Invalid ability number {num} (must be between 1 and 3)")
             }
-            Error::LanguageIndex { language_index } => {
+            Self::LanguageIndex { language_index } => {
                 format!(
                     "Invalid language index {language_index} (must be between 0 and {LANGUAGE_MAX}"
                 )
             }
+            Self::TeraType { value, is_override } => match is_override {
+                false => format!("Invalid original tera type value: {value}"),
+                true => format!("Invalid override tera type value: {value}"),
+            },
         };
 
         f.write_str(&message)

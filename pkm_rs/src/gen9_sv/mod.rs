@@ -1,10 +1,7 @@
-// gen8_swsh/mod.rs
 use pkm_rs_resources::metadata_source::MetadataSource;
-use pkm_rs_types::strings::SizedUtf16String;
 
 use crate::result::Error;
-pub use pk8::*;
-use pk8_buffer::Pk8Buffer;
+use pk9_buffer::Pk9Buffer;
 use pkm_rs_resources;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ribbons::ModernRibbon;
@@ -14,29 +11,36 @@ use pkm_rs_resources::species::form_metadata::source_has_form_metadata;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
-mod pk8;
-mod pk8_buffer;
-mod save;
-mod save_blocks;
+mod pk9;
+pub use pk9::*;
+mod pk9_buffer;
+mod pokemon_index;
+// mod save;
+// mod save_blocks;
 
 pub(crate) const PKM_DATA_SIZE: usize = 344;
 
+#[cfg(test)]
 const MAX_BOX_COUNT: u8 = 32;
+#[cfg(test)]
 const BOX_ROWS: u8 = 5;
+#[cfg(test)]
 const BOX_COLS: u8 = 6;
+#[cfg(test)]
 const BOX_SLOTS: u8 = BOX_ROWS * BOX_COLS;
-const BOX_NAME_LENGTH: usize = 34;
-const MAX_ABILITY_INDEX: u16 = 267; // As One (Calyrex Shadow Rider)
-const MAX_RIBBON_SWSH: usize = ModernRibbon::TowerMaster as usize;
+// const BOX_NAME_LENGTH: usize = 34;
+const MAX_ABILITY_INDEX: u16 = 310; // Poison Puppeteer
 
-pub type Pk8AbilityIndex = AbilityIndexBounded<MAX_ABILITY_INDEX>;
+const MAX_RIBBON_SV: usize = ModernRibbon::Partner as usize;
 
-type BoxName = SizedUtf16String<BOX_NAME_LENGTH>;
+pub type Pk9AbilityIndex = AbilityIndexBounded<MAX_ABILITY_INDEX>;
+
+// type BoxName = SizedUtf16String<BOX_NAME_LENGTH>;
 
 #[derive(Debug, Clone, Copy, Default)]
-pub struct Pk8SpeciesAndForm(SpeciesAndForm);
+pub struct Pk9SpeciesAndForm(SpeciesAndForm);
 
-impl Pk8SpeciesAndForm {
+impl Pk9SpeciesAndForm {
     fn try_new(species_and_form: SpeciesAndForm) -> Option<Self> {
         if source_has_form_metadata(
             MetadataSource::SwordShield,
@@ -54,7 +58,7 @@ impl Pk8SpeciesAndForm {
     }
 }
 
-impl serde::Serialize for Pk8SpeciesAndForm {
+impl serde::Serialize for Pk9SpeciesAndForm {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -64,7 +68,7 @@ impl serde::Serialize for Pk8SpeciesAndForm {
 }
 
 #[cfg(feature = "randomize")]
-impl Randomize for Pk8SpeciesAndForm {
+impl Randomize for Pk9SpeciesAndForm {
     fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
         loop {
             if let Some(randomized) = Self::try_new(SpeciesAndForm::randomized(rng)) {
@@ -74,7 +78,7 @@ impl Randomize for Pk8SpeciesAndForm {
     }
 }
 
-impl TryFrom<SpeciesAndForm> for Pk8SpeciesAndForm {
+impl TryFrom<SpeciesAndForm> for Pk9SpeciesAndForm {
     type Error = Error;
 
     fn try_from(value: SpeciesAndForm) -> std::result::Result<Self, Self::Error> {
@@ -82,8 +86,10 @@ impl TryFrom<SpeciesAndForm> for Pk8SpeciesAndForm {
     }
 }
 
+#[cfg(test)]
 type BoxIndex = pkm_rs_types::BoundedU8<{ MAX_BOX_COUNT - 1 }>;
 
+#[cfg(test)]
 type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS - 1 }>;
 
 #[cfg(test)]

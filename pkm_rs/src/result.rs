@@ -93,6 +93,10 @@ pub enum Error {
     StringDecode {
         source: StringErrorSource,
     },
+    TeraType {
+        value: u8,
+        is_override: bool,
+    },
     // Generic error for when nothing else fits
     Other(String),
 }
@@ -234,6 +238,10 @@ Some(source) => format!("Error opening save: {context}; original error: {source}
             Self::StringDecode { source } => {
                 format!("String decode error: {source}").to_owned()
             }
+            Self::TeraType { value, is_override } => match is_override {
+                false => format!("Invalid original tera type value: {value}"),
+                true => format!("Invalid override tera type value: {value}"),
+            },
             Self::Other(msg) => msg.clone(),
         };
 
@@ -293,6 +301,9 @@ impl From<pkm_rs_resources::Error> for Error {
             pkm_rs_resources::Error::FieldError { field, source } => {
                 Self::FieldError { field, source }
             }
+            pkm_rs_resources::Error::TeraType { value, is_override } => {
+                Self::TeraType { value, is_override }
+            }
         }
     }
 }
@@ -319,6 +330,9 @@ impl From<pkm_rs_types::Error> for Error {
             }
             pkm_rs_types::Error::LanguageIndex { language_index } => {
                 Self::LanguageIndex { language_index }
+            }
+            pkm_rs_types::Error::TeraType { value, is_override } => {
+                Self::TeraType { value, is_override }
             }
         }
     }

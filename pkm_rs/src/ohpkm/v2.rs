@@ -1358,15 +1358,12 @@ impl OhpkmV2 {
 
     // Scarlet/Violet
 
-    pub fn tera_type_original(&self) -> TeraTypeWasm {
-        self.sv_data
-            .map(|d| TeraTypeWasm::from(d.tera_type_original))
-            .unwrap_or(
-                self.species_and_form()
-                    .get_forme_metadata()
-                    .transferred_tera_type()
-                    .into(),
-            )
+    pub fn tera_type_original(&self) -> TeraType {
+        self.sv_data.map(|d| d.tera_type_original).unwrap_or(
+            self.species_and_form()
+                .get_forme_metadata()
+                .transferred_tera_type(),
+        )
     }
 
     pub fn set_tera_type_original_if(&mut self, value: Option<u8>) {
@@ -1381,18 +1378,18 @@ impl OhpkmV2 {
         }
     }
 
-    pub fn tera_type_override(&self) -> u8 {
-        self.sv_data
-            .and_then(|d| d.tera_type_override)
-            .map_or(TeraType::NO_OVERRIDE, TeraType::to_byte)
+    pub fn tera_type_override(&self) -> Option<TeraType> {
+        self.sv_data.and_then(|d| d.tera_type_override)
     }
 
-    pub fn set_tera_type_override(&mut self, value: u8) {
+    pub fn set_tera_type_override(&mut self, value: u8) -> Result<()> {
         self.sv_data
             .get_or_insert(ScarletVioletData::default_generated_tera_type(
                 self.main_data.species_and_form,
             ))
-            .tera_type_override = TeraType::from_byte(value);
+            .tera_type_override = TeraType::from_byte_override(value)?;
+
+        Ok(())
     }
 
     pub fn tm_flags_sv(&self) -> Option<Vec<u8>> {
@@ -3209,12 +3206,14 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(setter = teraTypeOverride)]
-    pub fn set_tera_type_override_js(&mut self, value: u8) {
+    pub fn set_tera_type_override_js(&mut self, value: u8) -> Result<()> {
         self.sv_data
             .get_or_insert(ScarletVioletData::default_generated_tera_type(
                 self.main_data.species_and_form,
             ))
-            .tera_type_override = TeraType::from_byte(value);
+            .tera_type_override = TeraType::from_byte_override(value)?;
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = tmFlagsSV)]

@@ -1,0 +1,1089 @@
+use super::Pk9AbilityIndex;
+use crate::bytes::{AsBytes, AsBytesMut};
+use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
+use crate::encryption::BlockCrypto;
+use crate::result::Result;
+use crate::traits::OhpkmByte;
+use crate::util;
+use arbitrary_int::{u3, u7};
+use pkm_rs_resources::abilities::AbilityIndexWasm;
+use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
+use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
+use pkm_rs_types::strings::SizedUtf16String;
+use pkm_rs_types::{
+    AbilityNumber, BinaryGender, ContestStats, Gender, HyperTraining, Ivs, Language,
+    MarkingsSixShapesColors, OriginGame, PokeDate, SWITCH_HANDLER_MEMORY_SIZE,
+    SWITCH_TRAINER_MEMORY_SIZE, Stats8, Stats16Le, TrainerMemory, read_u64_le,
+};
+use pkm_rs_types::{read_u16_le, read_u32_le};
+
+const CHECKSUM_OFFSET: usize = 6;
+const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
+    moves: 114,
+    pp: 122,
+    pp_ups: 126,
+};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Offset {
+    EncryptionConstant = 0,
+    Sanity = 4,
+    Checksum = 6,
+    SpeciesIndex = 8,
+    HeldItem = 10,
+    TrainerId = 12,
+    SecretId = 14,
+    Exp = 16,
+    AbilityIndex = 20,
+    AbilityNum = 22,
+    Markings = 24,
+    PersonalityValue = 28,
+    Nature = 32,
+    MintNature = 33,
+    FatefulEncounterGender = 34,
+    FormNum = 36,
+    Evs = 38,
+    Contest = 44,
+    RibbonsA = 52,
+    RibbonsB = 64,
+    ContestMemoryCount = 60,
+    BattleMemoryCount = 61,
+    HeightScalar = 72,
+    WeightScalar = 73,
+    Scale = 74,
+    TmFlagsDlc = 75,
+    Nickname = 88,
+    RelearnMoves = 130,
+    CurrentHp = 138,
+    IvsEggNicknamed = 140,
+    StatusCondition = 144,
+    TeraTypeOriginal = 148,
+    TeraTypeOverride = 149,
+    HandlerName = 168,
+    HandlerGender = 194,
+    HandlerLanguage = 195,
+    IsCurrentHandler = 196,
+    HandlerId = 198,
+    HandlerFriendship = 200,
+    HandlerMemory = 201,
+    GameOfOrigin = 206,
+    GameOfOriginBattle = 207,
+    FormArgument = 208,
+    AffixedRibbon = 212,
+    Language = 213,
+    TrainerName = 248,
+    TrainerFriendship = 274,
+    TrainerMemory = 275,
+    EggDate = 281,
+    MetDate = 284,
+    ObedienceLevel = 287,
+    EggLocation = 288,
+    MetLocation = 290,
+    Ball = 292,
+    MetLevelTrainerGender = 293,
+    HyperTraining = 294,
+    HomeTracker = 295,
+    TmFlagsBaseGame = 303,
+    StatLevel = 328,
+    Stats = 330,
+}
+
+impl From<Offset> for usize {
+    fn from(offset: Offset) -> usize {
+        offset as usize
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Pk9Buffer<S> — generic over the byte storage so that a single impl block
+// covers all getters, and a second (narrower) block covers setters.
+//
+//   Pk9BufferRef<'a>  = Pk9Buffer<&'a [u8]>       — read-only
+//   Pk9BufferMut<'a>  = Pk9Buffer<&'a mut [u8]>   — read + write
+// ---------------------------------------------------------------------------
+
+pub type Pk9BufferMut<'a> = Pk9Buffer<&'a mut [u8]>;
+
+#[derive(Default, Clone, Copy)]
+pub struct Pk9Buffer<S: AsRef<[u8]>>(S);
+
+// ------------------------------------------------------------------
+// Constructors — immutable
+// ------------------------------------------------------------------
+
+impl<'a> Pk9Buffer<&'a [u8]> {
+    pub fn new(span: &'a [u8]) -> Self {
+        assert_eq!(span.len(), super::PKM_DATA_SIZE);
+        Self(span)
+    }
+}
+
+// ------------------------------------------------------------------
+// Constructors — mutable
+// ------------------------------------------------------------------
+
+impl<'a> Pk9Buffer<&'a mut [u8]> {
+    pub fn new_mut(span: &'a mut [u8]) -> Self {
+        assert_eq!(span.len(), super::PKM_DATA_SIZE);
+        Self(span)
+    }
+}
+
+// ------------------------------------------------------------------
+// Accessors
+// ------------------------------------------------------------------
+
+impl<S: AsRef<[u8]>> Pk9Buffer<S> {
+    fn get_u8(&self, offset: Offset) -> u8 {
+        let offset = offset as usize;
+        self.bytes()[offset]
+    }
+
+    fn get_u16_le(&self, offset: Offset) -> u16 {
+        let offset = offset as usize;
+        read_u16_le!(self.bytes(), offset)
+    }
+
+    fn get_u32_le(&self, offset: Offset) -> u32 {
+        let offset = offset as usize;
+        read_u32_le!(self.bytes(), offset)
+    }
+
+    fn get_u64_le(&self, offset: Offset) -> u64 {
+        let offset = offset as usize;
+        read_u64_le!(self.bytes(), offset)
+    }
+
+    fn get_flag(&self, offset: Offset, bit_index: usize) -> bool {
+        util::get_flag(self.bytes(), offset as usize, bit_index)
+    }
+
+    fn get_array<const N: usize>(&self, offset: Offset) -> [u8; N] {
+        let offset = offset as usize;
+        self.bytes()[offset..offset + N].try_into().unwrap()
+    }
+}
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk9Buffer<S> {
+    fn set_u8(&mut self, offset: Offset, v: u8) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset] = v;
+    }
+
+    fn set_u16_le(&mut self, offset: Offset, v: u16) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 2].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_u32_le(&mut self, offset: Offset, v: u32) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_u64_le(&mut self, offset: Offset, v: u64) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 8].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_flag(&mut self, offset: Offset, bit_index: usize, v: bool) {
+        let offset = offset as usize;
+        util::set_flag(self.bytes_mut(), offset, bit_index, v);
+    }
+
+    fn set_array<const N: usize>(&mut self, offset: Offset, v: &[u8; N]) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + N].copy_from_slice(v);
+    }
+}
+
+// ------------------------------------------------------------------
+// Shared methods
+// ------------------------------------------------------------------
+
+impl<S: AsRef<[u8]>> Pk9Buffer<S> {
+    fn bytes(&self) -> &[u8] {
+        self.0.as_ref()
+    }
+
+    pub fn encryption_constant(&self) -> u32 {
+        self.get_u32_le(Offset::EncryptionConstant)
+    }
+
+    pub fn sanity(&self) -> u16 {
+        self.get_u16_le(Offset::Sanity)
+    }
+
+    pub fn checksum(&self) -> u16 {
+        self.get_u16_le(Offset::Checksum)
+    }
+
+    pub fn species_game_index(&self) -> u16 {
+        self.get_u16_le(Offset::SpeciesIndex)
+    }
+
+    pub fn form_index(&self) -> u16 {
+        self.get_u16_le(Offset::FormNum)
+    }
+
+    pub fn held_item_index(&self) -> u16 {
+        self.get_u16_le(Offset::HeldItem)
+    }
+
+    pub fn trainer_id(&self) -> u16 {
+        self.get_u16_le(Offset::TrainerId)
+    }
+
+    pub fn secret_id(&self) -> u16 {
+        self.get_u16_le(Offset::SecretId)
+    }
+
+    pub fn exp(&self) -> u32 {
+        self.get_u32_le(Offset::Exp)
+    }
+
+    pub fn ability_index_raw(&self) -> u16 {
+        self.get_u16_le(Offset::AbilityIndex)
+    }
+
+    pub fn ability_index(&self) -> Result<AbilityIndexWasm> {
+        Ok(AbilityIndexWasm::try_from(self.ability_index_raw())?)
+    }
+
+    pub fn byte_22_data(&self) -> u8 {
+        self.get_u8(Offset::AbilityNum)
+    }
+
+    pub fn ability_num(&self) -> Result<AbilityNumber> {
+        Ok(u3::extract_u8(self.byte_22_data(), 0).try_into()?)
+    }
+
+    pub fn markings_raw(&self) -> [u8; 2] {
+        self.get_array(Offset::Markings)
+    }
+
+    pub fn markings(&self) -> MarkingsSixShapesColors {
+        MarkingsSixShapesColors::from_bytes(self.markings_raw())
+    }
+
+    pub fn personality_value(&self) -> u32 {
+        self.get_u32_le(Offset::PersonalityValue)
+    }
+
+    pub fn nature_raw(&self) -> u8 {
+        self.get_u8(Offset::Nature)
+    }
+
+    pub fn nature(&self) -> Result<NatureIndex> {
+        Ok(NatureIndex::try_from(self.nature_raw())?)
+    }
+
+    pub fn mint_nature_raw(&self) -> u8 {
+        self.get_u8(Offset::MintNature)
+    }
+
+    pub fn mint_nature(&self) -> Result<NatureIndex> {
+        Ok(NatureIndex::try_from(self.mint_nature_raw())?)
+    }
+
+    pub fn is_fateful_encounter(&self) -> bool {
+        self.get_flag(Offset::FatefulEncounterGender, 0)
+    }
+
+    pub fn gender(&self) -> Gender {
+        Gender::from_bits_2_3(self.get_u8(Offset::FatefulEncounterGender))
+    }
+
+    pub fn evs_raw(&self) -> [u8; 6] {
+        self.get_array(Offset::Evs)
+    }
+
+    pub fn evs(&self) -> Stats8 {
+        Stats8::from_bytes(self.evs_raw())
+    }
+
+    pub fn contest_raw(&self) -> [u8; 6] {
+        self.get_array(Offset::Contest)
+    }
+
+    pub fn contest(&self) -> ContestStats {
+        ContestStats::from_bytes(self.contest_raw())
+    }
+
+    pub fn ribbons_a_raw(&self) -> [u8; 8] {
+        self.get_array(Offset::RibbonsA)
+    }
+
+    pub fn ribbons_b_raw(&self) -> [u8; 6] {
+        self.get_array(Offset::RibbonsB)
+    }
+
+    pub fn ribbons(&self) -> ModernRibbonSet<14, { super::MAX_RIBBON_SV }> {
+        let mut combined = [0u8; 14];
+        combined[..8].copy_from_slice(&self.ribbons_a_raw());
+        combined[8..14].copy_from_slice(&self.ribbons_b_raw());
+        ModernRibbonSet::from_bytes(combined)
+    }
+
+    pub fn contest_memory_count(&self) -> u8 {
+        self.get_u8(Offset::ContestMemoryCount)
+    }
+
+    pub fn battle_memory_count(&self) -> u8 {
+        self.get_u8(Offset::BattleMemoryCount)
+    }
+
+    pub fn height_scalar(&self) -> u8 {
+        self.get_u8(Offset::HeightScalar)
+    }
+
+    pub fn weight_scalar(&self) -> u8 {
+        self.get_u8(Offset::WeightScalar)
+    }
+
+    pub fn scale(&self) -> u8 {
+        self.get_u8(Offset::Scale)
+    }
+
+    pub fn tm_flags_dlc_raw(&self) -> [u8; 13] {
+        self.get_array(Offset::TmFlagsDlc)
+    }
+
+    pub fn nickname_raw(&self) -> [u8; 26] {
+        self.get_array(Offset::Nickname)
+    }
+
+    pub fn nickname(&self) -> SizedUtf16String<26> {
+        SizedUtf16String::<26>::from_bytes(self.nickname_raw())
+    }
+
+    pub fn move_slots(&self) -> MoveSlots {
+        MoveSlots::from_bytes(self.bytes(), MOVE_DATA_OFFSETS, PpUpStorage::FourBytes)
+    }
+
+    pub fn relearn_move_raw(&self, idx: usize) -> [u8; 2] {
+        let off = Offset::RelearnMoves as usize + idx * 2;
+        self.bytes()[off..off + 2].try_into().unwrap()
+    }
+
+    pub fn relearn_move(&self, idx: usize) -> MoveIndex {
+        MoveIndex::from_le_bytes(self.relearn_move_raw(idx))
+    }
+
+    fn ivs_egg_nicknamed_raw(&self) -> [u8; 4] {
+        self.get_array(Offset::IvsEggNicknamed)
+    }
+
+    pub fn ivs(&self) -> Ivs {
+        Ivs::from_30_bits(self.ivs_egg_nicknamed_raw())
+    }
+
+    pub fn is_egg(&self) -> bool {
+        self.get_flag(Offset::IvsEggNicknamed, 30)
+    }
+
+    pub fn is_nicknamed(&self) -> bool {
+        self.get_flag(Offset::IvsEggNicknamed, 31)
+    }
+
+    pub fn status_condition(&self) -> u32 {
+        self.get_u32_le(Offset::StatusCondition)
+    }
+
+    pub fn tera_type_original(&self) -> u8 {
+        self.get_u8(Offset::TeraTypeOriginal)
+    }
+
+    pub fn tera_type_override(&self) -> u8 {
+        self.get_u8(Offset::TeraTypeOverride)
+    }
+
+    fn handler_name_raw(&self) -> [u8; 26] {
+        self.get_array(Offset::HandlerName)
+    }
+
+    pub fn handler_name(&self) -> SizedUtf16String<26> {
+        SizedUtf16String::<26>::from_bytes(self.handler_name_raw())
+    }
+
+    fn handler_gender_raw(&self) -> bool {
+        self.get_flag(Offset::HandlerGender, 0)
+    }
+
+    pub fn handler_gender(&self) -> BinaryGender {
+        self.handler_gender_raw().into()
+    }
+
+    pub fn handler_language_raw(&self) -> u8 {
+        self.get_u8(Offset::HandlerLanguage)
+    }
+
+    pub fn handler_language(&self) -> Result<Language> {
+        Ok(Language::try_from(self.handler_language_raw())?)
+    }
+
+    pub fn is_current_handler(&self) -> bool {
+        self.get_flag(Offset::IsCurrentHandler, 0)
+    }
+
+    pub fn handler_id(&self) -> u16 {
+        self.get_u16_le(Offset::HandlerId)
+    }
+
+    pub fn handler_friendship(&self) -> u8 {
+        self.get_u8(Offset::HandlerFriendship)
+    }
+
+    pub fn handler_memory_intensity(&self) -> u8 {
+        let off = Offset::HandlerMemory as usize;
+        self.bytes()[off]
+    }
+
+    pub fn handler_memory_memory(&self) -> u8 {
+        let off = Offset::HandlerMemory as usize + 1;
+        self.bytes()[off]
+    }
+
+    pub fn handler_memory_feeling(&self) -> u8 {
+        let off = Offset::HandlerMemory as usize + 2;
+        self.bytes()[off]
+    }
+
+    pub fn handler_memory_text_variable(&self) -> u16 {
+        let off = Offset::HandlerMemory as usize + 4;
+        read_u16_le!(self.bytes(), off)
+    }
+
+    pub fn handler_memory(&self) -> TrainerMemory {
+        let start = Offset::HandlerMemory as usize;
+        let end = start + SWITCH_HANDLER_MEMORY_SIZE;
+
+        TrainerMemory::from_bytes_switch_handler(
+            self.bytes()[start..end]
+                .try_into()
+                .expect("start..end in handler_memory() should be a slice of length 5"),
+        )
+    }
+
+    pub fn game_of_origin_raw(&self) -> u8 {
+        self.get_u8(Offset::GameOfOrigin)
+    }
+
+    pub fn game_of_origin(&self) -> OriginGame {
+        OriginGame::from(self.game_of_origin_raw())
+    }
+
+    pub fn game_of_origin_battle_raw(&self) -> u8 {
+        self.get_u8(Offset::GameOfOriginBattle)
+    }
+
+    pub fn game_of_origin_battle(&self) -> Option<OriginGame> {
+        OriginGame::try_from_u8(self.game_of_origin_battle_raw())
+    }
+
+    pub fn form_argument(&self) -> u32 {
+        self.get_u32_le(Offset::FormArgument)
+    }
+
+    pub fn affixed_ribbon(&self) -> Option<ModernRibbon> {
+        ModernRibbon::from_affixed_byte(self.get_u8(Offset::AffixedRibbon))
+    }
+
+    pub fn language_raw(&self) -> u8 {
+        self.get_u8(Offset::Language)
+    }
+
+    pub fn language(&self) -> Result<Language> {
+        Ok(Language::try_from(self.language_raw())?)
+    }
+
+    fn trainer_name_raw(&self) -> [u8; 26] {
+        self.get_array(Offset::TrainerName)
+    }
+
+    pub fn trainer_name(&self) -> SizedUtf16String<26> {
+        SizedUtf16String::<26>::from_bytes(self.trainer_name_raw())
+    }
+
+    pub fn trainer_friendship(&self) -> u8 {
+        self.get_u8(Offset::TrainerFriendship)
+    }
+
+    pub fn trainer_memory(&self) -> TrainerMemory {
+        let start = Offset::TrainerMemory as usize;
+        let end = start + SWITCH_TRAINER_MEMORY_SIZE;
+        TrainerMemory::from_bytes_switch_trainer(
+            self.bytes()[start..end]
+                .try_into()
+                .expect("start..end in trainer_memory() should be a slice of length 6"),
+        )
+    }
+
+    fn egg_date_raw(&self) -> [u8; 3] {
+        self.get_array(Offset::EggDate)
+    }
+
+    pub fn egg_date(&self) -> Option<PokeDate> {
+        PokeDate::from_bytes_optional(self.egg_date_raw())
+    }
+
+    fn met_date_raw(&self) -> [u8; 3] {
+        self.get_array(Offset::MetDate)
+    }
+
+    pub fn met_date(&self) -> PokeDate {
+        PokeDate::from_bytes(self.met_date_raw())
+    }
+
+    pub fn obedience_level(&self) -> u8 {
+        self.get_u8(Offset::ObedienceLevel)
+    }
+
+    pub fn egg_location_index(&self) -> u16 {
+        self.get_u16_le(Offset::EggLocation)
+    }
+
+    pub fn met_location_index(&self) -> u16 {
+        self.get_u16_le(Offset::MetLocation)
+    }
+
+    fn ball_raw(&self) -> u8 {
+        self.get_u8(Offset::Ball)
+    }
+
+    pub fn ball(&self) -> Ball {
+        Ball::from(self.ball_raw())
+    }
+
+    fn met_level_raw(&self) -> u8 {
+        u7::extract_u8(self.get_u8(Offset::MetLevelTrainerGender), 0).into()
+    }
+
+    pub fn met_level(&self) -> u8 {
+        self.met_level_raw()
+    }
+
+    pub fn trainer_gender_raw(&self) -> bool {
+        self.get_flag(Offset::MetLevelTrainerGender, 7)
+    }
+
+    pub fn trainer_gender(&self) -> BinaryGender {
+        self.trainer_gender_raw().into()
+    }
+
+    pub fn home_tracker_raw(&self) -> u64 {
+        self.get_u64_le(Offset::HomeTracker)
+    }
+
+    pub fn tm_flags_base_game_raw(&self) -> [u8; 22] {
+        self.get_array(Offset::TmFlagsBaseGame)
+    }
+
+    fn hyper_training_raw(&self) -> u8 {
+        self.get_u8(Offset::HyperTraining)
+    }
+
+    pub fn hyper_training(&self) -> HyperTraining {
+        HyperTraining::from_byte(self.hyper_training_raw())
+    }
+
+    // ------------------------------------------------------------------
+    // Party-only fields  (offsets 328 – 343)
+    // ------------------------------------------------------------------
+
+    pub fn stat_level(&self) -> u8 {
+        self.get_u8(Offset::StatLevel)
+    }
+
+    pub fn stats_raw(&self) -> [u8; 12] {
+        self.get_array(Offset::Stats)
+    }
+
+    pub fn stats(&self) -> Stats16Le {
+        Stats16Le::from_bytes(self.stats_raw())
+    }
+
+    pub fn current_hp(&self) -> u16 {
+        self.get_u16_le(Offset::CurrentHp)
+    }
+
+    // ------------------------------------------------------------------
+    // Encryption
+    // ------------------------------------------------------------------
+
+    fn block_crypto(&self) -> BlockCrypto {
+        BlockCrypto::gen89(self.encryption_constant())
+    }
+
+    pub fn encrypted_copy(&self) -> Box<[u8]> {
+        self.block_crypto().to_encrypted_bytes(self.0.as_ref())
+    }
+
+    pub fn decrypted_copy(&self) -> Box<[u8]> {
+        self.block_crypto().to_decrypted_bytes(self.0.as_ref())
+    }
+}
+
+// ==================================================================
+// Setters  (available only on Pk9BufferMut)
+// ==================================================================
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk9Buffer<S> {
+    fn bytes_mut(&mut self) -> &mut [u8] {
+        self.0.as_mut()
+    }
+
+    pub fn set_encryption_constant(&mut self, v: u32) {
+        self.set_u32_le(Offset::EncryptionConstant, v);
+    }
+
+    pub fn reset_sanity(&mut self) {
+        self.set_u16_le(Offset::Sanity, 0);
+    }
+
+    pub fn set_checksum(&mut self, v: u16) {
+        self.set_u16_le(Offset::Checksum, v);
+    }
+
+    pub fn set_species_game_index(&mut self, v: u16) {
+        self.set_u16_le(Offset::SpeciesIndex, v);
+    }
+
+    pub fn set_form_index(&mut self, v: u16) {
+        self.set_u16_le(Offset::FormNum, v);
+    }
+
+    // pub fn set_species_and_form(&mut self, v: SpeciesAndForm) {
+    //     if let Some(game_index) =
+    //         METADATA_TABLE_SV.get_game_index(v.get_ndex().index(), v.get_forme_index())
+    //     {
+    //         self.set_species_game_index(game_index);
+    //         self.set_form_index(v.get_forme_index());
+    //     }
+    // }
+
+    pub fn set_held_item_index(&mut self, v: u16) {
+        self.set_u16_le(Offset::HeldItem, v);
+    }
+
+    pub fn set_trainer_id(&mut self, v: u16) {
+        self.set_u16_le(Offset::TrainerId, v);
+    }
+
+    pub fn set_secret_id(&mut self, v: u16) {
+        self.set_u16_le(Offset::SecretId, v);
+    }
+
+    pub fn set_exp(&mut self, v: u32) {
+        self.set_u32_le(Offset::Exp, v);
+    }
+
+    fn set_ability_index_raw(&mut self, v: u16) {
+        self.set_u16_le(Offset::AbilityIndex, v);
+    }
+
+    pub fn set_ability_index(&mut self, v: Pk9AbilityIndex) {
+        self.set_ability_index_raw(u16::from(v));
+    }
+
+    fn set_byte_22_data(&mut self, v: u8) {
+        self.set_u8(Offset::AbilityNum, v);
+    }
+
+    pub fn set_ability_num(&mut self, v: AbilityNumber) {
+        let byte_22_masked = self.byte_22_data() & !0b111;
+        self.set_byte_22_data(byte_22_masked | v.to_byte());
+    }
+
+    fn set_markings_raw(&mut self, v: &[u8; 2]) {
+        self.set_array(Offset::Markings, v);
+    }
+
+    pub fn set_markings(&mut self, v: MarkingsSixShapesColors) {
+        self.set_markings_raw(&v.to_bytes());
+    }
+
+    pub fn set_personality_value(&mut self, v: u32) {
+        self.set_u32_le(Offset::PersonalityValue, v);
+    }
+
+    fn set_nature_raw(&mut self, v: u8) {
+        self.set_u8(Offset::Nature, v);
+    }
+
+    pub fn set_nature(&mut self, v: NatureIndex) {
+        self.set_nature_raw(v.to_byte());
+    }
+
+    fn set_mint_nature_raw(&mut self, v: u8) {
+        self.set_u8(Offset::MintNature, v);
+    }
+
+    pub fn set_mint_nature(&mut self, v: NatureIndex) {
+        self.set_mint_nature_raw(v.to_byte());
+    }
+
+    pub fn set_is_fateful_encounter(&mut self, v: bool) {
+        self.set_flag(Offset::FatefulEncounterGender, 0, v);
+    }
+
+    pub fn set_gender(&mut self, v: Gender) {
+        v.set_bits_2_3(&mut self.bytes_mut()[Offset::FatefulEncounterGender as usize]);
+    }
+
+    fn set_evs_raw(&mut self, v: &[u8; 6]) {
+        self.set_array(Offset::Evs, v);
+    }
+
+    pub fn set_evs(&mut self, v: Stats8) {
+        self.set_evs_raw(&v.to_bytes());
+    }
+
+    fn set_contest_raw(&mut self, v: &[u8; 6]) {
+        self.set_array(Offset::Contest, v);
+    }
+
+    pub fn set_contest(&mut self, v: ContestStats) {
+        self.set_contest_raw(&v.to_bytes());
+    }
+
+    fn set_ribbons_a_raw(&mut self, v: &[u8; 8]) {
+        self.set_array(Offset::RibbonsA, v);
+    }
+
+    fn set_ribbons_b_raw(&mut self, v: &[u8; 6]) {
+        self.set_array(Offset::RibbonsB, v);
+    }
+
+    pub fn set_ribbons(&mut self, v: ModernRibbonSet<14, { super::MAX_RIBBON_SV }>) {
+        let bytes = v.to_bytes();
+        let mut a = [0u8; 8];
+        let mut b = [0u8; 6];
+        a.copy_from_slice(&bytes[..8]);
+        b.copy_from_slice(&bytes[8..14]);
+        self.set_ribbons_a_raw(&a);
+        self.set_ribbons_b_raw(&b);
+    }
+
+    pub fn set_contest_memory_count(&mut self, v: u8) {
+        self.set_u8(Offset::ContestMemoryCount, v);
+    }
+
+    pub fn set_battle_memory_count(&mut self, v: u8) {
+        self.set_u8(Offset::BattleMemoryCount, v);
+    }
+
+    pub fn set_height_scalar(&mut self, v: u8) {
+        self.set_u8(Offset::HeightScalar, v);
+    }
+
+    pub fn set_weight_scalar(&mut self, v: u8) {
+        self.set_u8(Offset::WeightScalar, v);
+    }
+
+    pub fn set_scale(&mut self, v: u8) {
+        self.set_u8(Offset::Scale, v);
+    }
+
+    pub fn set_tm_flags_dlc_raw(&mut self, v: &[u8; 13]) {
+        self.set_array(Offset::TmFlagsDlc, v);
+    }
+
+    fn set_nickname_raw(&mut self, v: &[u8; 26]) {
+        self.set_array(Offset::Nickname, v);
+    }
+
+    pub fn set_nickname(&mut self, v: &SizedUtf16String<26>) {
+        self.set_nickname_raw(&v.bytes());
+    }
+
+    pub fn set_move_slots(&mut self, v: &MoveSlots) {
+        v.write_spans(self.bytes_mut(), MOVE_DATA_OFFSETS, PpUpStorage::FourBytes);
+    }
+
+    fn set_relearn_move_raw(&mut self, idx: usize, v: [u8; 2]) {
+        let off = Offset::RelearnMoves as usize + idx * 2;
+        self.bytes_mut()[off..off + 2].copy_from_slice(&v);
+    }
+
+    pub fn set_relearn_move(&mut self, idx: usize, v: MoveIndex) {
+        self.set_relearn_move_raw(idx, v.to_le_bytes());
+    }
+
+    pub fn set_ivs(&mut self, v: &Ivs) {
+        v.write_30_bits(self.bytes_mut(), Offset::IvsEggNicknamed as usize);
+    }
+
+    pub fn set_is_egg(&mut self, v: bool) {
+        self.set_flag(Offset::IvsEggNicknamed, 30, v);
+    }
+
+    pub fn set_is_nicknamed(&mut self, v: bool) {
+        self.set_flag(Offset::IvsEggNicknamed, 31, v);
+    }
+
+    pub fn set_status_condition(&mut self, v: u32) {
+        self.set_u32_le(Offset::StatusCondition, v);
+    }
+
+    pub fn set_tera_type_original(&mut self, v: u8) {
+        self.set_u8(Offset::TeraTypeOriginal, v);
+    }
+
+    pub fn set_tera_type_override(&mut self, v: u8) {
+        self.set_u8(Offset::TeraTypeOverride, v);
+    }
+
+    fn set_handler_name_raw(&mut self, v: &[u8; 26]) {
+        self.set_array(Offset::HandlerName, v);
+    }
+
+    pub fn set_handler_name(&mut self, v: &SizedUtf16String<26>) {
+        self.set_handler_name_raw(&v.bytes());
+    }
+
+    pub fn set_handler_gender_raw(&mut self, v: bool) {
+        self.set_flag(Offset::HandlerGender, 0, v);
+    }
+
+    pub fn set_handler_gender(&mut self, v: BinaryGender) {
+        self.set_handler_gender_raw(v.into());
+    }
+
+    pub fn set_handler_language_raw(&mut self, v: u8) {
+        self.set_u8(Offset::HandlerLanguage, v);
+    }
+
+    pub fn set_handler_language(&mut self, v: Language) {
+        self.set_handler_language_raw(v as u8);
+    }
+
+    pub fn set_is_current_handler(&mut self, v: bool) {
+        self.set_flag(Offset::IsCurrentHandler, 0, v);
+    }
+
+    pub fn set_handler_id(&mut self, v: u16) {
+        self.set_u16_le(Offset::HandlerId, v);
+    }
+
+    pub fn set_handler_friendship(&mut self, v: u8) {
+        self.set_u8(Offset::HandlerFriendship, v);
+    }
+
+    pub fn set_handler_memory_intensity(&mut self, v: u8) {
+        let off = Offset::HandlerMemory as usize;
+        self.bytes_mut()[off] = v;
+    }
+
+    pub fn set_handler_memory_memory(&mut self, v: u8) {
+        let off = Offset::HandlerMemory as usize + 1;
+        self.bytes_mut()[off] = v;
+    }
+
+    pub fn set_handler_memory_feeling(&mut self, v: u8) {
+        let off = Offset::HandlerMemory as usize + 2;
+        self.bytes_mut()[off] = v;
+    }
+
+    pub fn set_handler_memory_text_variable(&mut self, v: u16) {
+        let off = Offset::HandlerMemory as usize + 4;
+        self.bytes_mut()[off..off + 2].copy_from_slice(&v.to_le_bytes());
+    }
+
+    pub fn set_handler_memory(&mut self, v: TrainerMemory) {
+        let offset = Offset::HandlerMemory as usize;
+        self.bytes_mut()[offset..offset + 5].copy_from_slice(&v.to_bytes_switch_handler());
+    }
+
+    fn set_game_of_origin_raw(&mut self, v: u8) {
+        self.set_u8(Offset::GameOfOrigin, v);
+    }
+
+    pub fn set_game_of_origin(&mut self, v: OriginGame) {
+        self.set_game_of_origin_raw(v as u8);
+    }
+
+    pub fn set_game_of_origin_battle_raw(&mut self, v: u8) {
+        self.set_u8(Offset::GameOfOriginBattle, v);
+    }
+
+    pub fn set_game_of_origin_battle(&mut self, v: Option<OriginGame>) {
+        self.set_game_of_origin_battle_raw(v.to_ohpkm_byte());
+    }
+
+    fn set_language_raw(&mut self, v: u8) {
+        self.set_u8(Offset::Language, v);
+    }
+
+    pub fn set_form_argument(&mut self, v: u32) {
+        self.set_u32_le(Offset::FormArgument, v);
+    }
+
+    pub fn set_affixed_ribbon(&mut self, v: Option<ModernRibbon>) {
+        self.set_u8(Offset::AffixedRibbon, ModernRibbon::to_affixed_byte(v));
+    }
+
+    pub fn set_language(&mut self, v: Language) {
+        self.set_language_raw(v as u8);
+    }
+
+    fn set_trainer_name_raw(&mut self, v: &[u8; 26]) {
+        self.set_array(Offset::TrainerName, v);
+    }
+
+    pub fn set_trainer_name(&mut self, v: &SizedUtf16String<26>) {
+        self.set_trainer_name_raw(&v.bytes());
+    }
+
+    pub fn set_trainer_friendship(&mut self, v: u8) {
+        self.set_u8(Offset::TrainerFriendship, v);
+    }
+
+    pub fn set_trainer_memory(&mut self, v: TrainerMemory) {
+        let offset = Offset::TrainerMemory as usize;
+        self.bytes_mut()[offset..offset + 6].copy_from_slice(&v.to_bytes_switch_trainer());
+    }
+
+    fn set_egg_date_raw(&mut self, v: [u8; 3]) {
+        self.set_array(Offset::EggDate, &v);
+    }
+
+    pub fn set_egg_date(&mut self, v: Option<PokeDate>) {
+        self.set_egg_date_raw(PokeDate::to_bytes_optional(v));
+    }
+
+    fn set_met_date_raw(&mut self, v: [u8; 3]) {
+        self.set_array(Offset::MetDate, &v);
+    }
+
+    pub fn set_met_date(&mut self, v: PokeDate) {
+        self.set_met_date_raw(v.to_bytes());
+    }
+
+    pub fn set_obedience_level(&mut self, v: u8) {
+        self.set_u8(Offset::ObedienceLevel, v);
+    }
+
+    pub fn set_egg_location_index(&mut self, v: u16) {
+        self.set_u16_le(Offset::EggLocation, v);
+    }
+
+    pub fn set_met_location_index(&mut self, v: u16) {
+        self.set_u16_le(Offset::MetLocation, v);
+    }
+
+    fn set_ball_raw(&mut self, v: u8) {
+        self.set_u8(Offset::Ball, v);
+    }
+
+    pub fn set_ball(&mut self, v: Ball) {
+        self.set_ball_raw(v as u8);
+    }
+
+    fn set_met_level_raw(&mut self, v: u8) {
+        self.bytes_mut()[Offset::MetLevelTrainerGender as usize] |= v & 0x7F;
+    }
+
+    pub fn set_met_level(&mut self, v: u8) {
+        self.set_met_level_raw(v);
+    }
+
+    fn set_trainer_gender_raw(&mut self, v: bool) {
+        let bytes = self.bytes_mut();
+        util::set_flag(bytes, Offset::MetLevelTrainerGender as usize, 7, v);
+    }
+
+    pub fn set_trainer_gender(&mut self, v: BinaryGender) {
+        self.set_trainer_gender_raw(v.into());
+    }
+
+    pub fn set_home_tracker_raw(&mut self, v: u64) {
+        self.set_u64_le(Offset::HomeTracker, v);
+    }
+
+    pub fn set_tm_flags_base_game_raw(&mut self, v: &[u8; 22]) {
+        self.set_array(Offset::TmFlagsBaseGame, v);
+    }
+
+    fn set_hyper_training_raw(&mut self, v: u8) {
+        self.set_u8(Offset::HyperTraining, v);
+    }
+
+    pub fn set_hyper_training(&mut self, v: HyperTraining) {
+        self.set_hyper_training_raw(v.to_byte());
+    }
+
+    // ------------------------------------------------------------------
+    // Party-only fields  (offsets 328 – 343)
+    // ------------------------------------------------------------------
+
+    pub fn set_stat_level(&mut self, v: u8) {
+        self.set_u8(Offset::StatLevel, v);
+    }
+
+    fn set_stats_raw(&mut self, v: [u8; 12]) {
+        self.set_array(Offset::Stats, &v);
+    }
+
+    pub fn set_stats(&mut self, v: Stats16Le) {
+        self.set_stats_raw(v.to_bytes());
+    }
+
+    pub fn set_current_hp(&mut self, v: u16) {
+        self.set_u16_le(Offset::CurrentHp, v);
+    }
+
+    // ------------------------------------------------------------------
+    // Encryption
+    // ------------------------------------------------------------------
+
+    pub fn encrypt(&mut self) {
+        self.block_crypto().encrypt(self.0.as_mut());
+    }
+
+    pub fn decrypt(&mut self) {
+        self.block_crypto().decrypt(self.0.as_mut());
+    }
+
+    pub fn encrypted(&mut self) -> &mut Self {
+        self.block_crypto().encrypt(self.0.as_mut());
+
+        self
+    }
+
+    pub fn decrypted(&mut self) -> &mut Self {
+        self.block_crypto().decrypt(self.0.as_mut());
+
+        self
+    }
+}
+
+// ==================================================================
+// Trait impls
+// ==================================================================
+
+impl<S: AsRef<[u8]>> AsBytes for Pk9Buffer<S> {
+    fn as_bytes(&self) -> &[u8] {
+        self.0.as_ref()
+    }
+}
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for Pk9Buffer<S> {
+    fn as_bytes_mut(&mut self) -> &mut [u8] {
+        self.0.as_mut()
+    }
+}
+
+const CHECKSUM_START: usize = 8;
+const CHECKSUM_END: usize = 328;
+
+impl<S: AsRef<[u8]>> Checksum for Pk9Buffer<S> {
+    type A = ChecksumU16Le;
+    const SPAN_START: usize = CHECKSUM_START;
+    const SPAN_END: usize = CHECKSUM_END;
+}
+
+impl<S: AsRef<[u8]> + AsMut<[u8]>> RefreshChecksum for Pk9Buffer<S> {
+    const STORED_OFFSET: usize = CHECKSUM_OFFSET;
+}
