@@ -4,6 +4,7 @@ use super::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
     Notes, PluginData, ScarletVioletData, SwordShieldData,
 };
+use crate::gen9_sv;
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
 use crate::ohpkm::deprecated::PastHandlerDataV1;
@@ -1399,14 +1400,14 @@ impl OhpkmV2 {
     pub fn set_tm_flags_sv(&mut self, value: Option<Vec<u8>>) {
         match value {
             Some(tm_flags) => {
-                let mut new_bytes = [0u8; 22];
+                let mut new_bytes = [0u8; gen9_sv::TM_FLAG_BYTE_LENGTH_BASE];
                 new_bytes.copy_from_slice(&tm_flags);
                 self.sv_data.get_or_insert_default().tm_flags =
-                    FlagSet::<22>::from_bytes(new_bytes);
+                    FlagSet::<{ gen9_sv::TM_FLAG_BYTE_LENGTH_BASE }>::from_bytes(new_bytes);
             }
             None => {
                 if let Some(sv_data) = &mut self.sv_data {
-                    sv_data.tm_flags = FlagSet::<22>::default();
+                    sv_data.tm_flags = FlagSet::<{ gen9_sv::TM_FLAG_BYTE_LENGTH_BASE }>::default();
                 }
             }
         }
@@ -3225,14 +3226,14 @@ impl OhpkmV2 {
     pub fn set_tm_flags_sv_js(&mut self, value: Option<Vec<u8>>) {
         match value {
             Some(tm_flags) => {
-                let mut new_bytes = [0u8; 22];
+                let mut new_bytes = [0u8; gen9_sv::TM_FLAG_BYTE_LENGTH_BASE];
                 new_bytes.copy_from_slice(&tm_flags);
                 self.sv_data.get_or_insert_default().tm_flags =
-                    FlagSet::<22>::from_bytes(new_bytes);
+                    FlagSet::<{ gen9_sv::TM_FLAG_BYTE_LENGTH_BASE }>::from_bytes(new_bytes);
             }
             None => {
                 if let Some(sv_data) = &mut self.sv_data {
-                    sv_data.tm_flags = FlagSet::<22>::default();
+                    sv_data.tm_flags = FlagSet::<{ gen9_sv::TM_FLAG_BYTE_LENGTH_BASE }>::default();
                 }
             }
         }
@@ -3247,14 +3248,15 @@ impl OhpkmV2 {
     pub fn set_tm_flags_sv_dlc_js(&mut self, value: Option<Vec<u8>>) {
         match value {
             Some(tm_flags_dlc) => {
-                let mut new_bytes = [0u8; 13];
+                let mut new_bytes = [0u8; gen9_sv::TM_FLAG_BYTE_LENGTH_DLC];
                 new_bytes.copy_from_slice(&tm_flags_dlc);
                 self.sv_data.get_or_insert_default().tm_flags_dlc =
-                    FlagSet::<13>::from_bytes(new_bytes);
+                    FlagSet::<{ gen9_sv::TM_FLAG_BYTE_LENGTH_DLC }>::from_bytes(new_bytes);
             }
             None => {
                 if let Some(sv_data) = &mut self.sv_data {
-                    sv_data.tm_flags_dlc = FlagSet::<13>::default();
+                    sv_data.tm_flags_dlc =
+                        FlagSet::<{ gen9_sv::TM_FLAG_BYTE_LENGTH_DLC }>::default();
                 }
             }
         }
