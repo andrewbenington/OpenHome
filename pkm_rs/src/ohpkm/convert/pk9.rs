@@ -105,7 +105,7 @@ impl OhpkmConvert for Pk9 {
         Some(ScarletVioletData {
             tera_type_original: self.tera_type_original,
             tera_type_override: self.tera_type_override,
-            tm_flags: self.tm_flags_base_game,
+            tm_flags: self.tm_flags_base_game.resized(),
             tm_flags_dlc: self.tm_flags_dlc,
         })
     }
@@ -193,11 +193,7 @@ impl OhpkmConvert for Pk9 {
                 trainer_gender: ohpkm.trainer_gender(),
                 tm_flags_base_game: ohpkm
                     .tm_flags_sv()
-                    .map(|v| {
-                        FlagSet::from_bytes(v.try_into().expect(
-                        "Scarlet/Violet base game TM flags are the expected bytelength in OHPKM",
-                    ))
-                    })
+                    .map(|v| FlagSet::from_bytes(v).resized())
                     .unwrap_or_default(),
                 tm_flags_dlc: ohpkm
                     .tm_flags_sv_dlc()
