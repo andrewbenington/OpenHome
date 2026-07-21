@@ -179,7 +179,7 @@ impl OhpkmV1 {
             ribbons: OpenHomeRibbonSet::from_bytes(bytes[54..76].try_into().unwrap()).map_err(
                 |e| Error::FieldError {
                     field: "ribbons",
-                    source: e,
+                    source: e.into(),
                 },
             )?,
             sociability: u32::from_le_bytes(bytes[76..80].try_into().unwrap()),

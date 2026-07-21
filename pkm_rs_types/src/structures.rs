@@ -897,7 +897,7 @@ impl TryFrom<u3> for AbilityNumber {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct InvalidAbilityNumber(pub u3);
 
 #[cfg(test)]

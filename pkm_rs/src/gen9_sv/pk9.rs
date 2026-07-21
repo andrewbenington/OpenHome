@@ -633,6 +633,7 @@ mod test {
     use crate::checksum::Checksum;
     use crate::convert_strategy::ConvertStrategy;
     use crate::gen9_sv::pk9_buffer::Pk9Buffer;
+    use crate::gen9_sv::pokemon_index::SvPokemonIndex;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
     use crate::tests::{self, TestResult};
@@ -644,6 +645,15 @@ mod test {
     use pkm_rs_types::{HyperTraining, Stats16Le};
     #[cfg(feature = "randomize")]
     use rand::{SeedableRng, rngs::StdRng};
+
+    #[test]
+    fn ids_translate() -> TestResult<()> {
+        let sv_index = SvPokemonIndex::new(955)?;
+        let ndex = sv_index.to_national_dex();
+        assert_eq!(sv_index, SvPokemonIndex::try_from_base(ndex).unwrap());
+
+        Ok(())
+    }
 
     #[test]
     fn to_from_bytes() -> TestResult<()> {
