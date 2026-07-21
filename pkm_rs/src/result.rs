@@ -9,6 +9,7 @@ use pkm_rs_types::{InvalidAbilityNumber, LANGUAGE_MAX, Language};
 
 use serde::{Serialize, Serializer};
 use std::fmt::Display;
+use std::rc::Rc;
 use std::string::FromUtf8Error;
 
 #[cfg(feature = "wasm")]
@@ -21,7 +22,7 @@ pub enum MoveErrorKind {
     NameNotFound(String),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Error {
     BoxIndex(u8),
     BoxSlot(u8),
@@ -32,7 +33,7 @@ pub enum Error {
     },
     BuildSave {
         context: String,
-        source: Option<Box<dyn core::error::Error>>,
+        source: Option<Rc<dyn core::error::Error>>,
     },
     CryptRange {
         range: (usize, usize),
@@ -40,14 +41,18 @@ pub enum Error {
     },
     NationalDex {
         value: u16,
-        source: NdexConvertSource,
+        source: PokemonIndexType,
+    },
+    PokemonGameIndex {
+        value: u16,
+        source: PokemonIndexType,
     },
 
     /// Indicates that the given SpeciesAndForm does not exist
     /// in the specified generation of games
     GenDex {
         saf: SpeciesAndForm,
-        generation: NdexConvertSource,
+        generation: PokemonIndexType,
     },
 
     /// Indicates that the given game index does not
@@ -55,7 +60,7 @@ pub enum Error {
     /// a fake mon)
     GameDex {
         value: u16,
-        game: NdexConvertSource,
+        game: PokemonIndexType,
     },
     FormIndex {
         national_dex: NatDexIndex,
@@ -80,7 +85,7 @@ pub enum Error {
     },
     FieldError {
         field: &'static str,
-        source: Box<dyn std::error::Error>,
+        source: Rc<dyn std::error::Error>,
     },
     TagError {
         tag_type: &'static str,
@@ -105,7 +110,7 @@ impl Error {
     pub fn build_save(context: impl ToString, source: Option<Box<dyn core::error::Error>>) -> Self {
         Self::BuildSave {
             context: context.to_string(),
-            source,
+            source: source.map(|s| s.into()),
         }
     }
 
@@ -155,33 +160,56 @@ impl Display for Error {
         let message = match self {
             Self::BoxIndex(index) => format!("Invalid box index: {index}"),
             Self::BoxSlot(slot) => format!("Invalid box slot: {slot}"),
-            Self::BufferSize {requirement_source,
-               expected, received,
-            } => {
-                match requirement_source {
-                    Some(source) => format!("{source} requires a buffer of length {expected}, but actual length is {received}"),
-                    None => format!("Buffer of length {expected} was expected, but actual length is {received}"),
-                }
-            }
-            Self::BuildSave {context, source } => match source {
-Some(source) => format!("Error opening save: {context}; original error: {source}"),
-                None => format!("Error opening save: {context}"),}
+            Self::BufferSize {
+                requirement_source,
+                expected,
+                received,
+            } => match requirement_source {
+                Some(source) => format!(
+                    "{source} requires a buffer of length {expected}, but actual length is {received}"
+                ),
+                None => format!(
+                    "Buffer of length {expected} was expected, but actual length is {received}"
+                ),
+            },
+            Self::BuildSave { context, source } => match source {
+                Some(source) => format!("Error opening save: {context}; original error: {source}"),
+                None => format!("Error opening save: {context}"),
+            },
             Self::CryptRange { range, buffer_size } => {
-                format!("Attempting to decrypt/encrypt range ({}, {}) over buffer of size {buffer_size}", range.0, range.1)
-                    .to_owned()
+                format!(
+                    "Attempting to decrypt/encrypt range ({}, {}) over buffer of size {buffer_size}",
+                    range.0, range.1
+                )
             }
-            Self::NationalDex { value: national_dex , source} => {
-                format!("Invalid National Dex number {national_dex} (source: {source}; must be between 1 and {MAX_NATIONAL_DEX}")
-                    .to_owned()
+            Self::NationalDex {
+                value: national_dex,
+                source,
+            } => {
+                format!(
+                    "Invalid National Dex number {national_dex} (source: {source}; must be between 1 and {MAX_NATIONAL_DEX}"
+                )
+            }
+            Self::PokemonGameIndex {
+                value: national_dex,
+                source,
+            } => {
+                format!("Invalid {source} index number {national_dex}")
             }
 
             Self::GenDex { saf, generation } => {
                 let form = saf.get_forme_metadata();
-                format!("Pokémon '{}' (form: {}) does not exist in {generation}", lookup::species_name(saf.get_ndex(), Language::English), form.form_name)
+                format!(
+                    "Pokémon '{}' (form: {}) does not exist in {generation}",
+                    lookup::species_name(saf.get_ndex(), Language::English),
+                    form.form_name
+                )
             }
 
             Self::GameDex { value, game } => {
-                format!("Invalid game dex index {value} in {game} (no corresponding National Dex entry)")
+                format!(
+                    "Invalid game dex index {value} in {game} (no corresponding National Dex entry)"
+                )
             }
 
             Self::FormIndex {
@@ -194,50 +222,39 @@ Some(source) => format!("Error opening save: {context}; original error: {source}
                     lookup::species_name(*national_dex, Language::English),
                     species_metadata.forms.len()
                 )
-                .to_owned()
             }
             Self::ExtraFormIndex {
                 national_dex,
                 extra_form_index,
-            } => {
-                format!(
-                    "Invalid extra form index {extra_form_index} (Pokémon species {})",
-                    lookup::species_name(*national_dex, Language::English)
-                )
-                .to_owned()
-            }
-            Self::LanguageIndex { language_index } => {
-                format!("Invalid language index {language_index} (must be between 1 and {LANGUAGE_MAX}")
-                    .to_owned()
-            }
+            } => format!(
+                "Invalid extra form index {extra_form_index} (Pokémon species {})",
+                lookup::species_name(*national_dex, Language::English)
+            ),
+            Self::LanguageIndex { language_index } => format!(
+                "Invalid language index {language_index} (must be between 1 and {LANGUAGE_MAX}"
+            ),
             Self::NatureIndex { nature_index } => {
                 format!("Invalid nature index {nature_index} (must be between 1 and {NATURE_MAX}")
-                    .to_owned()
             }
-            Self::AbilityIndex { ability_index } => {
-                format!("Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}")
-                    .to_owned()
-            }
+            Self::AbilityIndex { ability_index } => format!(
+                "Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}"
+            ),
             Self::AbilityNumber(InvalidAbilityNumber(num)) => {
                 format!("Invalid ability number {num} (must be between 1 and 3)")
             }
             Self::ItemIndex { item_index } => {
                 format!("Invalid item index {item_index} (must be between 1 and {ITEM_MAX}")
-                    .to_owned()
             }
             Self::FieldError { field, source } => {
                 format!("Self reading field {field}: {source}")
-                    .to_owned()
             }
             Self::TagError { tag_type, value } => {
                 format!("Invalid tag value {value} for tag type {tag_type}")
             }
             Self::MoveError { value, source } => {
-                format!("Invalid move reference {value} (source: {source})").to_owned()
+                format!("Invalid move reference {value} (source: {source})")
             }
-            Self::StringDecode { source } => {
-                format!("String decode error: {source}").to_owned()
-            }
+            Self::StringDecode { source } => format!("String decode error: {source}"),
             Self::TeraType { value, is_override } => match is_override {
                 false => format!("Invalid original tera type value: {value}"),
                 true => format!("Invalid override tera type value: {value}"),
@@ -279,7 +296,7 @@ impl From<pkm_rs_resources::Error> for Error {
             }
             pkm_rs_resources::Error::NationalDex { national_dex } => Self::NationalDex {
                 value: national_dex,
-                source: NdexConvertSource::Other,
+                source: PokemonIndexType::Other,
             },
             pkm_rs_resources::Error::FormIndex {
                 national_dex,
@@ -298,9 +315,10 @@ impl From<pkm_rs_resources::Error> for Error {
                 Self::AbilityIndex { ability_index }
             }
             pkm_rs_resources::Error::ItemIndex { item_index } => Self::ItemIndex { item_index },
-            pkm_rs_resources::Error::FieldError { field, source } => {
-                Self::FieldError { field, source }
-            }
+            pkm_rs_resources::Error::FieldError { field, source } => Self::FieldError {
+                field,
+                source: source.into(),
+            },
             pkm_rs_resources::Error::TeraType { value, is_override } => {
                 Self::TeraType { value, is_override }
             }
@@ -379,8 +397,8 @@ impl Serialize for Error {
     }
 }
 
-#[derive(Debug, Default)]
-pub enum NdexConvertSource {
+#[derive(Debug, Default, Clone, Copy)]
+pub enum PokemonIndexType {
     #[default]
     Other,
     Gen1,
@@ -395,25 +413,25 @@ pub enum NdexConvertSource {
     Gen3UB,
 }
 
-impl Display for NdexConvertSource {
+impl Display for PokemonIndexType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
-            NdexConvertSource::Other => "other",
-            NdexConvertSource::Gen1 => "Gen 1",
-            NdexConvertSource::Gen2 => "Gen 2",
-            NdexConvertSource::Gen3 => "Gen 3",
-            NdexConvertSource::Gen4 => "Gen 4",
-            NdexConvertSource::Gen5 => "Gen 5",
-            NdexConvertSource::Gen6 => "Gen 6",
-            NdexConvertSource::Gen7 => "Gen 7",
-            NdexConvertSource::ScarletViolet => "Scarlet/Violet",
-            NdexConvertSource::Gen3RR => "Radical Red",
-            NdexConvertSource::Gen3UB => "Unbound",
+            PokemonIndexType::Other => "other",
+            PokemonIndexType::Gen1 => "Gen 1",
+            PokemonIndexType::Gen2 => "Gen 2",
+            PokemonIndexType::Gen3 => "Gen 3",
+            PokemonIndexType::Gen4 => "Gen 4",
+            PokemonIndexType::Gen5 => "Gen 5",
+            PokemonIndexType::Gen6 => "Gen 6",
+            PokemonIndexType::Gen7 => "Gen 7",
+            PokemonIndexType::ScarletViolet => "Scarlet/Violet",
+            PokemonIndexType::Gen3RR => "Radical Red",
+            PokemonIndexType::Gen3UB => "Unbound",
         })
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone, Copy)]
 pub enum MoveErrorSource {
     #[default]
     Other,
@@ -433,7 +451,7 @@ impl Display for MoveErrorSource {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub enum StringErrorSource {
     #[default]
     Other,
