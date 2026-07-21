@@ -164,9 +164,16 @@ public static partial class Util
     }
 
     var parts = RibbonRegex().Split(s).Where(p => p.Length > 0).ToArray();
-    if (parts.Length == 3 && parts[1] == "Champion")
+    if (parts.Length == 3)
     {
-      return $"{parts[2]} {parts[1]} {parts[0]}";
+      if (parts[1] == "Champion")
+      {
+        return $"{parts[2]} {parts[1]} {parts[0]}";
+      }
+      else if (parts[1] == "Mark")
+      {
+        return $"{parts[2]} {parts[1]}";
+      }
     }
 
     return string.Join(" ", parts.Skip(1).Append(parts[0]));
@@ -290,8 +297,9 @@ public static partial class Util
   public static object FormatTeraType(MoveType teraType)
   {
     if ((int)teraType == 19) return null;
-    
-    if (teraType <= MoveType.Fairy && teraType != MoveType.Any) {
+
+    if (teraType <= MoveType.Fairy && teraType != MoveType.Any)
+    {
       return new { Standard = teraType.ToString() };
     }
 

@@ -11,7 +11,7 @@ use crate::tests::TestError;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-const fn national_dex_to_sv(key: u16) -> Option<u16> {
+pub const fn sv_to_national_dex(key: u16) -> Option<u16> {
     match key {
         0 => None,
         1..=916 => Some(key),
@@ -125,7 +125,7 @@ const fn national_dex_to_sv(key: u16) -> Option<u16> {
     }
 }
 
-pub const fn sv_to_national_dex(value: u16) -> Option<u16> {
+pub const fn national_dex_to_sv(value: u16) -> Option<u16> {
     match value {
         982 => Some(917),
         917 => Some(918),
@@ -249,6 +249,7 @@ impl SvPokemonIndex {
         if let Some(non_zero) = NonZeroU16::new(sv_index)
             && sv_to_national_dex(sv_index).is_some()
         {
+            println!("new: {}", sv_index);
             Ok(Self(non_zero))
         } else {
             println!("bad value in SvPokemonIndex: {sv_index}");
@@ -257,11 +258,7 @@ impl SvPokemonIndex {
     }
 
     pub fn from_species_and_form(species_and_form: SpeciesAndForm) -> Result<Self, Error> {
-        println!(
-            "from_species_and_formfrom_species_and_form{:?}",
-            national_dex_to_sv(911)
-        );
-        dbg!(species_and_form);
+        println!("saf: {:?}", species_and_form);
         if let Some(sv_index) = national_dex_to_sv(species_and_form.get_ndex_js()) {
             NonZeroU16::new(sv_index)
                 .map(Self)
@@ -275,6 +272,11 @@ impl SvPokemonIndex {
     }
 
     pub fn to_national_dex(self) -> NatDexIndex {
+        println!(
+            "Sv {} to ndex {:?}",
+            self.0.get(),
+            sv_to_national_dex(self.0.get())
+        );
         sv_to_national_dex(self.0.get())
             .map(NatDexIndex::new)
             .expect(INVALID_INDEX_MESSAGE)
