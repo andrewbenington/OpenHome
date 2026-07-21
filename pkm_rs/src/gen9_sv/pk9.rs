@@ -135,6 +135,7 @@ impl Pk9 {
 
     pub fn from_buffer<S: AsRef<[u8]>>(buf: &Pk9Buffer<S>) -> Result<Self> {
         let home_tracker_raw = buf.home_tracker_raw();
+        println!("stored index: {}", buf.species_game_index());
         let species_and_form = SpeciesAndForm::new_valid_ndex(
             SvPokemonIndex::new(buf.species_game_index())?.to_national_dex(),
             buf.form_index(),
@@ -640,6 +641,7 @@ mod test {
     use crate::traits::IsShiny;
 
     use pkm_rs_resources::natures::NatureIndex;
+    use pkm_rs_resources::species::NatDexIndex;
     #[cfg(feature = "randomize")]
     use pkm_rs_types::randomize::RandomizeAndFix;
     use pkm_rs_types::{HyperTraining, Stats16Le};
@@ -648,9 +650,13 @@ mod test {
 
     #[test]
     fn ids_translate() -> TestResult<()> {
-        let sv_index = SvPokemonIndex::new(955)?;
+        let sv_index = SvPokemonIndex::new(951)?;
         let ndex = sv_index.to_national_dex();
         assert_eq!(sv_index, SvPokemonIndex::try_from_base(ndex).unwrap());
+
+        let ndex = unsafe { NatDexIndex::new_unchecked(1007) };
+        let sv_index = SvPokemonIndex::try_from_base(ndex)?;
+        assert_eq!(ndex, sv_index.to_national_dex());
 
         Ok(())
     }

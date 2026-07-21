@@ -293,7 +293,7 @@ impl<S: AsRef<[u8]>> Pk9Buffer<S> {
     }
 
     pub fn gender(&self) -> Gender {
-        Gender::from_bits_2_3(self.get_u8(Offset::FatefulEncounterGender))
+        Gender::from_bits_1_2(self.get_u8(Offset::FatefulEncounterGender))
     }
 
     pub fn evs_raw(&self) -> [u8; 6] {
@@ -730,7 +730,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk9Buffer<S> {
     }
 
     pub fn set_gender(&mut self, v: Gender) {
-        v.set_bits_2_3(&mut self.bytes_mut()[Offset::FatefulEncounterGender as usize]);
+        v.set_bits_1_2(&mut self.bytes_mut()[Offset::FatefulEncounterGender as usize]);
     }
 
     fn set_evs_raw(&mut self, v: &[u8; 6]) {
