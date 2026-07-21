@@ -224,6 +224,18 @@ impl<const N: usize, FLAG: Copy + Into<usize> + From<usize>> FlagSet<N, FLAG> {
     pub fn is_empty(&self) -> bool {
         self.raw.iter().all(|byte| *byte == 0)
     }
+
+    /// Resizes [`FlagSet<N, FLAG>`], either truncating or zero-padding as necessary.
+    pub fn resized<const M: usize>(&self) -> FlagSet<M, FLAG> {
+        let mut resized_raw = [0u8; M];
+        let to_copy_len = N.min(M);
+        resized_raw[0..to_copy_len].copy_from_slice(&self.raw[0..to_copy_len]);
+
+        FlagSet {
+            _marker: self._marker,
+            raw: resized_raw,
+        }
+    }
 }
 
 impl FlagSet<2> {

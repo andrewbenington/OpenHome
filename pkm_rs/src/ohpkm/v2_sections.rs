@@ -36,12 +36,16 @@ pub(crate) fn bytes_are_empty(bytes: &[u8]) -> bool {
     bytes.iter().all(|b| *b == 0)
 }
 
+// PK9 has space for up to 200 base game TMs, but only 171 are used.
+// DLC TMs are stored separately.
+pub const SV_BASE_TM_BYTES_EXCLUDE_UNUSED: usize = 22;
+
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct ScarletVioletData {
     pub tera_type_original: TeraType,
     pub tera_type_override: Option<TeraType>,
-    pub tm_flags: FlagSet<{ gen9_sv::TM_FLAG_BYTE_LENGTH_BASE }>,
+    pub tm_flags: FlagSet<SV_BASE_TM_BYTES_EXCLUDE_UNUSED>,
     pub tm_flags_dlc: FlagSet<{ gen9_sv::TM_FLAG_BYTE_LENGTH_DLC }>,
 }
 
@@ -57,12 +61,10 @@ impl ScarletVioletData {
         {
             None
         } else {
-            let mut corrected_base_tm_set_raw = [0u8; gen9_sv::TM_FLAG_BYTE_LENGTH_BASE];
-            corrected_base_tm_set_raw.copy_from_slice(&old.tm_flags_sv);
             Some(Self {
                 tera_type_original,
                 tera_type_override,
-                tm_flags: FlagSet::from_bytes(corrected_base_tm_set_raw),
+                tm_flags: FlagSet::from_bytes(old.tm_flags_sv),
                 tm_flags_dlc: FlagSet::from_bytes(old.tm_flags_sv_dlc),
             })
         }

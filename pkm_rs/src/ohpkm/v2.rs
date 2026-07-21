@@ -12,7 +12,7 @@ use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
-use crate::ohpkm::v2_sections::{MonTags, PastHandlerDataV2};
+use crate::ohpkm::v2_sections::{MonTags, PastHandlerDataV2, SV_BASE_TM_BYTES_EXCLUDE_UNUSED};
 use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
@@ -1393,21 +1393,21 @@ impl OhpkmV2 {
         Ok(())
     }
 
-    pub fn tm_flags_sv(&self) -> Option<Vec<u8>> {
-        Some(self.sv_data?.tm_flags.to_bytes().to_vec())
+    pub fn tm_flags_sv(&self) -> Option<[u8; SV_BASE_TM_BYTES_EXCLUDE_UNUSED]> {
+        Some(self.sv_data?.tm_flags.to_bytes())
     }
 
     pub fn set_tm_flags_sv(&mut self, value: Option<Vec<u8>>) {
         match value {
             Some(tm_flags) => {
-                let mut new_bytes = [0u8; gen9_sv::TM_FLAG_BYTE_LENGTH_BASE];
+                let mut new_bytes = [0u8; SV_BASE_TM_BYTES_EXCLUDE_UNUSED];
                 new_bytes.copy_from_slice(&tm_flags);
                 self.sv_data.get_or_insert_default().tm_flags =
-                    FlagSet::<{ gen9_sv::TM_FLAG_BYTE_LENGTH_BASE }>::from_bytes(new_bytes);
+                    FlagSet::<SV_BASE_TM_BYTES_EXCLUDE_UNUSED>::from_bytes(new_bytes);
             }
             None => {
                 if let Some(sv_data) = &mut self.sv_data {
-                    sv_data.tm_flags = FlagSet::<{ gen9_sv::TM_FLAG_BYTE_LENGTH_BASE }>::default();
+                    sv_data.tm_flags = FlagSet::<SV_BASE_TM_BYTES_EXCLUDE_UNUSED>::default();
                 }
             }
         }
@@ -3226,14 +3226,14 @@ impl OhpkmV2 {
     pub fn set_tm_flags_sv_js(&mut self, value: Option<Vec<u8>>) {
         match value {
             Some(tm_flags) => {
-                let mut new_bytes = [0u8; gen9_sv::TM_FLAG_BYTE_LENGTH_BASE];
+                let mut new_bytes = [0u8; SV_BASE_TM_BYTES_EXCLUDE_UNUSED];
                 new_bytes.copy_from_slice(&tm_flags);
                 self.sv_data.get_or_insert_default().tm_flags =
-                    FlagSet::<{ gen9_sv::TM_FLAG_BYTE_LENGTH_BASE }>::from_bytes(new_bytes);
+                    FlagSet::<SV_BASE_TM_BYTES_EXCLUDE_UNUSED>::from_bytes(new_bytes);
             }
             None => {
                 if let Some(sv_data) = &mut self.sv_data {
-                    sv_data.tm_flags = FlagSet::<{ gen9_sv::TM_FLAG_BYTE_LENGTH_BASE }>::default();
+                    sv_data.tm_flags = FlagSet::<SV_BASE_TM_BYTES_EXCLUDE_UNUSED>::default();
                 }
             }
         }
