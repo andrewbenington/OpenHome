@@ -427,6 +427,6 @@ mod tests {
         Pk8Buffer::new_mut(&mut expected_bytes).decrypt();
         Pk8Buffer::new_mut(&mut actual_bytes).decrypt();
 
-        tests::ensure_ranges_match(&actual_bytes, &expected_bytes, None)
+        tests::assert_ranges_match(&actual_bytes, &expected_bytes, None)
     }
 }

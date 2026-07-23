@@ -51,7 +51,7 @@ impl OhpkmConvert for Pk9 {
             ribbons: OpenHomeRibbonSet::from_modern(self.ribbons),
             moves: self
                 .moves
-                .to_pp_adjusted(MetadataSource::SwordShield, ohpkm::MOVE_METADATA_SOURCE),
+                .to_pp_adjusted(MetadataSource::ScarletViolet, ohpkm::MOVE_METADATA_SOURCE),
             nickname: self.nickname,
             relearn_moves: self.relearn_moves,
             ivs: self.ivs,
@@ -164,7 +164,7 @@ impl OhpkmConvert for Pk9 {
                 nickname: ohpkm.nickname(),
                 moves: ohpkm
                     .moves()
-                    .to_pp_adjusted(ohpkm::MOVE_METADATA_SOURCE, MetadataSource::SwordShield),
+                    .to_pp_adjusted(ohpkm::MOVE_METADATA_SOURCE, MetadataSource::ScarletViolet),
                 relearn_moves: ohpkm.relearn_moves(),
                 ivs: converter.ivs(ohpkm),
                 is_egg: ohpkm.is_egg(),

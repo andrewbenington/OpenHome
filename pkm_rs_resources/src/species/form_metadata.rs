@@ -92,7 +92,7 @@ fn format_bad_type_error(
     )
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct PersonalTable<
     INFO: PersonalInfo,
     const TABLE_BYTE_LEN: usize,
@@ -308,6 +308,15 @@ pub fn current_metadata_reader(national_dex: u16, form_index: u16) -> Option<Met
 pub enum BaseStats {
     PreSplit(StatsPreSplit),
     Modern(Stats8),
+}
+
+impl BaseStats {
+    pub fn expect_modern(self, expect_msg: &str) -> Stats8 {
+        match self {
+            BaseStats::PreSplit(_) => panic!("{expect_msg}"),
+            BaseStats::Modern(stats8) => stats8,
+        }
+    }
 }
 
 fn most_recent_metadata_table_for(

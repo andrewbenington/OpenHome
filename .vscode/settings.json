@@ -37,9 +37,7 @@
   },
   "makefile.configureOnOpen": false,
   "python.languageServer": "Pylance",
-  "rust-analyzer.cargo.extraEnv": {
-    "MACOSX_DEPLOYMENT_TARGET": "14.6"
-  },
+  "css.completion.completePropertyWithSemicolon": false,
   "postcssSorting.config": {
     "properties-order": [
       "width",
@@ -60,8 +58,10 @@
   ],
   "editor.inlayHints.enabled": "off",
   "editor.tabSize": 2,
+  "python.terminal.activateEnvironment": false,
+  "rust-analyzer.cargo.extraEnv": {
+    "MACOSX_DEPLOYMENT_TARGET": "14.6"
+  },
   "rust-analyzer.cargo.features": "all",
-  "css.completion.completePropertyWithSemicolon": false,
-  "rust-analyzer.cargo.targetDir": true,
-  "python.terminal.activateEnvironment": false
+  "rust-analyzer.cargo.targetDir": true
 }

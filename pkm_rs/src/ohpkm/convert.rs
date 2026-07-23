@@ -30,6 +30,8 @@ pub trait OhpkmConvert: Pkm {
         None
     }
 
+    // when implementing future functions, also update OhpkmV2::convert_without_backup
+
     fn from_ohpkm(ohpkm: &super::OhpkmV2, strategy: ConvertStrategy) -> Result<Self>;
 
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes>;

@@ -22,7 +22,7 @@ import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
 
-function pkmTestFilePath(...pathElements: string[]): string {
+export function pkmTestFilePath(...pathElements: string[]): string {
   return path.join(__dirname, 'pkm-files', ...pathElements)
 }
 

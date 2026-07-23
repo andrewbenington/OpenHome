@@ -1,7 +1,7 @@
 use super::Pk9Buffer;
 use super::pk9_buffer::Pk9BufferMut;
 use super::{Pk9AbilityIndex, Pk9SpeciesAndForm};
-use crate::checksum::{Checksum, RefreshChecksum};
+use crate::checksum::RefreshChecksum;
 use crate::gen9_sv::pokemon_index::SvPokemonIndex;
 use crate::gen9_sv::{MAX_RIBBON_SV, TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
 use crate::result::{Error, Result};
@@ -16,8 +16,6 @@ use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
-use pkm_rs_resources::species::form_metadata::MetadataTable;
-use pkm_rs_resources::species::form_metadata::gen9_sv::METADATA_TABLE_SV;
 use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
@@ -135,11 +133,27 @@ impl Pk9 {
 
     pub fn from_buffer<S: AsRef<[u8]>>(buf: &Pk9Buffer<S>) -> Result<Self> {
         let home_tracker_raw = buf.home_tracker_raw();
-        println!("stored index: {}", buf.species_game_index());
         let species_and_form = SpeciesAndForm::new_valid_ndex(
             SvPokemonIndex::new(buf.species_game_index())?.to_national_dex(),
             buf.form_index(),
         )?;
+
+        let level = species_and_form
+            .get_species_metadata()
+            .calculate_level(buf.exp());
+        let mint_nature = buf.mint_nature()?;
+        let stats = helpers::calculate_stats_modern(
+            MetadataSource::ScarletViolet,
+            species_and_form,
+            &buf.ivs(),
+            &buf.evs(),
+            level,
+            mint_nature.get_metadata(),
+            Some(buf.hyper_training()),
+        )
+        .ok_or(Error::other(
+            "Pk9 cannot be built from a species/form with no metadata in Scarlet/Violet",
+        ))?;
 
         let mut mon = Pk9 {
             encryption_constant: buf.encryption_constant(),
@@ -155,7 +169,7 @@ impl Pk9 {
             markings: buf.markings(),
             personality_value: buf.personality_value(),
             nature: buf.nature()?,
-            mint_nature: buf.mint_nature()?,
+            mint_nature,
             is_fateful_encounter: buf.is_fateful_encounter(),
             gender: buf.gender(),
             evs: buf.evs(),
@@ -210,12 +224,13 @@ impl Pk9 {
                 None
             },
             hyper_training: buf.hyper_training(),
-            ..Default::default()
+            tm_flags_dlc: FlagSet::from_bytes(buf.tm_flags_dlc_raw()),
+            stat_level: level,
+            stats,
+            current_hp: stats.hp,
         };
 
-        mon.stat_level = mon.calculate_level();
-        mon.stats = mon.calculate_stats();
-        mon.current_hp = mon.stats.hp;
+        mon.refresh_checksum();
 
         Ok(mon)
     }
@@ -224,13 +239,10 @@ impl Pk9 {
         buf.set_encryption_constant(self.encryption_constant);
         buf.reset_sanity();
         buf.set_species_game_index(
-            METADATA_TABLE_SV
-                .get_game_index(
-                    self.species_and_form.0.get_ndex().index(),
-                    self.species_and_form.0.get_forme_index(),
-                )
-                .expect(VALID_SPECIES_FORM_MGS),
+            SvPokemonIndex::from_species_and_form(self.species_and_form.0)
+                .expect("Pk9 has SV-compatible species/form"),
         );
+        buf.set_form_index(self.species_and_form.0.get_forme_index());
         buf.set_held_item_index(self.held_item_index);
         buf.set_trainer_id(self.trainer_id);
         buf.set_secret_id(self.secret_id);
@@ -328,7 +340,7 @@ impl Pk9 {
     pub fn calculate_checksum(&self) -> u16 {
         let mut bytes = [0u8; Self::BOX_SIZE];
         self.write_box_bytes(&mut bytes);
-        Pk9Buffer::new(&bytes).calculate_checksum()
+        Pk9Buffer::new(&bytes).checksum()
     }
 
     pub fn refresh_checksum(&mut self) {
@@ -628,6 +640,8 @@ impl crate::tests::PkhexJson for Pk9 {
 
 #[cfg(test)]
 mod test {
+    use pretty_hex::pretty_hex;
+
     use std::path::PathBuf;
 
     use super::Pk9;
@@ -682,7 +696,7 @@ mod test {
 
     #[test]
     fn is_shiny() -> TestResult<()> {
-        let path = PathBuf::from("pk9").join("bouffalant-shiny.pk9");
+        let path = PathBuf::from("pk9").join("0446 ★ - Munchlax - AF1E69687576.pk9");
         let mon = tests::pkm_from_file::<Pk9>(&path)?.0;
         assert!(mon.is_shiny());
 
@@ -696,9 +710,8 @@ mod test {
 
     #[test]
     fn nickname_garbage_preserved() -> TestResult<()> {
-        let (mon, bytes) = tests::pkm_from_file::<Pk9>(
-            &PathBuf::from("pk9").join("toxtricity-garbage-bytes.pk9"),
-        )?;
+        let (mon, bytes) =
+            tests::pkm_from_file::<Pk9>(&PathBuf::from("pk9").join("koraidon-garbage-bytes.pk9"))?;
 
         let mon_recreated = Pk9::from_ohpkm(
             &OhpkmV2::convert_with_backup(&mon, &bytes)?,
@@ -712,22 +725,22 @@ mod test {
 
     #[test]
     fn checksum() -> TestResult<()> {
-        let (mon, bytes) = tests::pkm_from_file::<Pk9>(
-            &PathBuf::from("pk9").join("toxtricity-garbage-bytes.pk9"),
-        )?;
+        for result in tests::all_pkm_and_bytes_in_dir::<Pk9>(&PathBuf::from("pk9"))? {
+            let tests::PkmDirEntry::<Pk9> { path, mon, bytes } = result?;
+            let buffer = Pk9Buffer::new(&bytes);
 
-        let buffer = Pk9Buffer::new(&bytes);
-        assert_eq!(
-            buffer.checksum(),
-            buffer.calculate_checksum(),
-            "Pk9Buffer checksum calculation is correct"
-        );
+            assert_eq!(
+                buffer.checksum(),
+                buffer.calculate_checksum(),
+                "{path:?}: Pk9Buffer checksum calculation is correct"
+            );
 
-        assert_eq!(
-            mon.checksum,
-            mon.calculate_checksum(),
-            "Checksum calculation remains correct after deserializing/reserializing"
-        );
+            assert_eq!(
+                mon.checksum,
+                mon.calculate_checksum(),
+                "{path:?}: Checksum calculation remains correct after deserializing/reserializing"
+            );
+        }
 
         Ok(())
     }
@@ -737,6 +750,26 @@ mod test {
         let mon = tests::pkm_from_file::<OhpkmV2>(&PathBuf::from("ohpkm").join("Machamp.ohpkm"))?.0;
 
         let _ = Pk9::from_ohpkm(&mon, ConvertStrategy::default());
+
+        Ok(())
+    }
+
+    #[test]
+    fn ohpkm_preserves_moves() -> TestResult<()> {
+        let mon = tests::pkm_from_file::<Pk9>(
+            &PathBuf::from("pk9").join("0128-01 - Tauros - 3ACEA55CFD17.pk9"),
+        )?
+        .0;
+
+        let ohpkm = mon.to_ohpkm()?;
+
+        for (index, (pk9_move, ohpkm_move)) in mon.moves.into_iter().zip(ohpkm.moves()).enumerate()
+        {
+            assert_eq!(
+                pk9_move.move_index, ohpkm_move.move_index,
+                "Move in slot {index} is preserved"
+            );
+        }
 
         Ok(())
     }
@@ -776,17 +809,15 @@ mod test {
         Ok(())
     }
 
-    const CINDERACE_ENCRYPTED_BYTES_HEX: &str = "4864a28700008274311293404d71e90c70b5b4855c574d23a289c75541ad006eaf9666ee6fcc6fdb9c2bdae7c44eacbe48264ee13240d61a52203515337cb5051e95e7b472c8c34226559b9824097f7ea1da855aa4d7a6ca6a50ed1e5c6f2df0755f6a873d9170f133666ba75b1dab107e6c24df6aa4630147eeae002a2c58381ad1632f7f10480d2edbb5445ef022ba0c3b1dbd8dbc4678775a8a719d5668614041bba097d3bbbec3a5160df5e04b26d71caa3253fcaa0aee0573d96672cea0a07fdb872c593940e1fc849965f95aa1974d44fe415b329e6d9c70e559ea1659e6755fd9e36484ee4a2c230f218a20134a2fa4ee1a3cc046f722ad16ef08ec7bfcd67c624d4d9d58cf665dafe06aae792d1de9730cbd75507aeb02734c412a94898528578b4bc54f6e91f4661ba6034cb13bd829e706b059f3630174469c51e9e21fe4e506cd7df70712d2416270530c21b42185e6574d23";
+    const SKELEDIRGE_ENCRYPTED_BYTES_HEX: &str = "6bfb59750000bd80ad015a5cf1a2e6feb42ab7dc32fdd67afe02592b90ff74ce9a831424d1aea8ea0c01bb86e800be08510ed2c363633f1b1f8c884867ddf98a7168e337a0165f8d42d23c2fdb6818af97e5eebb8fdea0628413257896dc3da89fcbcd0340aaed23b627944ada31c83281a03ad01daaf2d85912ece0601e749211877750f443fd6911a0f7e5576b5076469f7a56df9bbc5ff42c1da855506aa24f9fc5573b507ee06f56b570c352c5d06042b5402cd3520b54d898a241af91f834f47e16d7dd9c9d637172199f9cdedc887ad56b0b95ace9d9d57b442c2689429cb1259ecaadc31cebb4351062386b3db758eeeea17f8dd681cee3a1400d1878b4c251613e43a60e7e1017dec77774952c91356e412c8a4bbb25f7cb050f9e22973a1587f3f3252906304db3091da3674c4ce06783fa1e2f689ba324155e363c1c2dc7396df779f7c9011a5d5fa2e6ff6c2a83ddacfdd67a";
 
     #[test]
-    fn encrypted_bytes_match_expected_cinderace() -> TestResult<()> {
-        let path = PathBuf::from("pk9").join("cinderace-mint-nature.pk9");
+    fn encrypted_bytes_match_expected_skeledirge() -> TestResult<()> {
+        let path = PathBuf::from("pk9").join("z002 - Skeledirge (Goofy) - 814A7559FB6B.pk9");
         let mon = tests::pkm_from_file::<Pk9>(&path)?.0;
 
         let encrypted_bytes = mon.to_box_bytes_encrypted();
-        let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
-
-        assert_eq!(encrypted_hex_str, CINDERACE_ENCRYPTED_BYTES_HEX);
+        tests::assert_matches_hex_string(&encrypted_bytes, SKELEDIRGE_ENCRYPTED_BYTES_HEX);
 
         Ok(())
     }
@@ -799,9 +830,14 @@ mod test {
         let mon = tests::pkm_from_file::<Pk9>(&path)?.0;
 
         let encrypted_bytes = mon.to_box_bytes_encrypted();
-        let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
 
-        assert_eq!(encrypted_hex_str, MR_MIME_ENCRYPTED_BYTES_HEX);
+        pretty_assertions::assert_eq!(
+            pretty_hex(&encrypted_bytes),
+            pretty_hex(
+                &hex::decode(MR_MIME_ENCRYPTED_BYTES_HEX)
+                    .expect("MR_MIME_ENCRYPTED_BYTES_HEX must be valid")
+            )
+        );
 
         Ok(())
     }
