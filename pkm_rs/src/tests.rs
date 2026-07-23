@@ -8,7 +8,7 @@ use pretty_assertions::assert_eq;
 use pretty_hex::pretty_hex;
 use std::fmt::{Debug, Display};
 use std::fs::File;
-use std::io::Read;
+use std::io::{self, Read};
 use std::ops::RangeInclusive;
 use std::path::{Path, PathBuf};
 
@@ -58,8 +58,8 @@ pub fn pkm_from_file<PKM: Pkm>(filename: &Path) -> crate::result::Result<(PKM, V
 }
 
 pub fn to_from_bytes_all_in_dir<PKM: Pkm + Debug>(dir: &Path) -> TestResult<()> {
-    let pkm_files =
-        std::fs::read_dir(dir).map_err(|e| Error::other(&format!("directory read error: {e}")))?;
+    let pkm_files = std::fs::read_dir(dir).map_err(|e| TestError::dir_read(e, dir))?;
+
     for dir_entry in pkm_files {
         match dir_entry {
             Err(e) => println!("directory entry error: {e}"),
@@ -78,8 +78,9 @@ pub fn to_from_bytes_all_in_dir<PKM: Pkm + Debug>(dir: &Path) -> TestResult<()> 
 
 pub fn from_to_ohpkm_all_in_dir<PKM: OhpkmConvert>() -> TestResult<()> {
     let ohpkm_dir = &Path::new("test-files").join("pkm-files").join("ohpkm");
-    let ohpkm_files = std::fs::read_dir(ohpkm_dir)
-        .map_err(|e| Error::other(&format!("directory read error: {e}")))?;
+    let ohpkm_files =
+        std::fs::read_dir(ohpkm_dir).map_err(|e| TestError::dir_read(e, ohpkm_dir))?;
+
     for dir_entry in ohpkm_files {
         match dir_entry {
             Err(e) => println!("directory entry error: {e}"),
@@ -100,11 +101,11 @@ type PathAndBytes = (PathBuf, Box<[u8]>);
 
 pub fn all_file_bytes_in_dir(
     dir: &Path,
-) -> TestResult<impl Iterator<Item = Result<PathAndBytes, Error>>> {
+) -> TestResult<impl Iterator<Item = TestResult<PathAndBytes>>> {
     use std::fs;
 
     let dir_entries = fs::read_dir(dir)
-        .map_err(|e| Error::other(&format!("directory read error: {e}")))?
+        .map_err(|e| TestError::dir_read(e, dir))?
         .filter_map(|result| result.ok());
 
     let successful_pkm = dir_entries
@@ -112,7 +113,9 @@ pub fn all_file_bytes_in_dir(
         .map(|dir_entry| {
             fs::read(dir.join(dir_entry.file_name()))
                 .map(|bytes| (dir.join(dir_entry.file_name()), bytes.into_boxed_slice()))
-                .map_err(|e| Error::other(&format!("{:?} read error: {e}", dir_entry.file_name())))
+                .map_err(|e| {
+                    TestError::message_with_path(&format!("read error: {e}"), &dir_entry.path())
+                })
         });
 
     Ok(successful_pkm)
@@ -136,7 +139,7 @@ pub fn all_pkm_and_bytes_in_dir<PKM: Pkm>(
     }
 
     let dir_entries = std::fs::read_dir(&dir_path)
-        .map_err(|e| Error::other(&format!("could not read directory {dir_path:?}: {e}")))?
+        .map_err(|e| TestError::dir_read(e, &dir_path))?
         .filter_map(|result| result.ok());
 
     let successful_pkm = dir_entries
@@ -162,8 +165,8 @@ pub fn all_pkm_in_dir<PKM: Pkm>(
 pub fn to_from_ohpkm_all_in_dir<PKM: OhpkmConvert + Debug>(dir: &Path) -> TestResult<()> {
     use std::fs;
 
-    let pkm_files =
-        fs::read_dir(dir).map_err(|e| Error::other(&format!("directory read error: {e}")))?;
+    let pkm_files = fs::read_dir(dir).map_err(|e| TestError::dir_read(e, dir))?;
+
     for dir_entry in pkm_files {
         match dir_entry {
             Err(e) => println!("directory entry error: {e}"),
@@ -357,8 +360,8 @@ pub fn compare_pkhex_json_all_in_dir<PKM: Pkm + PkhexJson>(dir: &Path) -> TestRe
 
     let full_dir = Path::new("test-files").join("pkm-files").join(dir);
 
-    let pkm_files =
-        fs::read_dir(&full_dir).map_err(|e| Error::other(&format!("directory read error: {e}")))?;
+    let pkm_files = fs::read_dir(&full_dir).map_err(|e| TestError::dir_read(e, dir))?;
+
     for dir_entry in pkm_files {
         match dir_entry {
             Err(e) => println!("directory entry error: {e}"),
@@ -392,21 +395,58 @@ pub fn compare_pkhex_json<PKM: Pkm + PkhexJson>(pkm_path: &Path) -> TestResult<(
         .map_err(|e| Error::other(&e.to_string()))?;
     let pkhex_value: serde_json::Value = serde_json::from_str(&pkhex_json).unwrap();
 
-    if let Err(e) = assert_json_matches_no_panic(
-        &pkm_rs_value,
-        &pkhex_value,
-        Config::new(CompareMode::Strict),
-    ) {
-        // println!("Full pkhex JSON:\n{pkhex_json}");
-        // println!(
-        //     "Full pkm_rs JSON:\n{}",
-        //     serde_json::to_string_pretty(&pkm_rs_value)
-        //         .map_err(|e| TestError::PkmRs(Error::other(&e.to_string())))?
-        // );
-        return Err(
-            Error::other(&format!("{pkm_path:?} JSON mismatch (pkm_rs - PKHeX): {e}")).into(),
-        );
+    let cfg = Config::new(CompareMode::Strict);
+    assert_json_matches_no_panic(&pkm_rs_value, &pkhex_value, cfg).map_err(|e| {
+        let message = format!("{pkm_path:?} JSON mismatch (pkm_rs - PKHeX): {e}");
+
+        TestError::PkmRs(Error::other(&message), Some(pkm_path.to_path_buf()))
+    })
+}
+
+pub fn compare_pkhex_encryption_all_in_dir<PKM: Pkm, F>(dir: &Path, encrypt: F) -> TestResult<()>
+where
+    F: Fn(PKM) -> Box<[u8]>,
+{
+    use std::fs;
+
+    let full_dir = Path::new("test-files").join("pkm-files").join(dir);
+
+    let pkm_files = fs::read_dir(&full_dir).map_err(|e| TestError::dir_read(e, &full_dir))?;
+
+    for dir_entry in pkm_files {
+        match dir_entry {
+            Err(e) => println!("directory entry error: {e}"),
+            Ok(dir_entry) => {
+                if dir_entry.file_name().to_string_lossy().starts_with(".") {
+                    continue;
+                }
+                let pkm_path = dir.join(dir_entry.file_name());
+
+                compare_pkhex_encryption::<PKM, F>(&pkm_path, &encrypt)?;
+            }
+        }
     }
+
+    Ok(())
+}
+
+pub fn compare_pkhex_encryption<PKM: Pkm, F>(pkm_path: &Path, encrypt: &F) -> TestResult<()>
+where
+    F: Fn(PKM) -> Box<[u8]>,
+{
+    let mon = pkm_from_file::<PKM>(pkm_path)?.0;
+    let pkm_rs_encryption = encrypt(mon);
+
+    let mut encryption_path = Path::new("pkhex-encryption").join(pkm_path);
+    encryption_path.set_extension("txt");
+    let mut file = File::open(encryption_path)
+        .map_err(|e| Error::other(&format!("Failed to open encryption file: {e}")))?;
+
+    let mut correct_encrypted_hex = String::new();
+    file.read_to_string(&mut correct_encrypted_hex)
+        .map_err(|e| Error::other(&e.to_string()))?;
+
+    assert_matches_hex_string(&pkm_rs_encryption, &correct_encrypted_hex);
 
     Ok(())
 }
@@ -426,6 +466,16 @@ pub enum TestError {
     PkmRs(crate::result::Error, Option<PathBuf>),
     ByteDiff(ByteDiffError),
     UnexpectedChange(ValueChanged),
+}
+
+impl TestError {
+    pub fn message_with_path(message: &str, path: &Path) -> Self {
+        Self::PkmRs(Error::other(message), Some(path.to_path_buf()))
+    }
+
+    pub fn dir_read(error: io::Error, path: &Path) -> Self {
+        Self::message_with_path(&format!("directory read error: {error}"), path)
+    }
 }
 
 impl std::error::Error for TestError {}
@@ -602,6 +652,14 @@ pub trait PkhexJson {
 
 pub fn bytes_to_hex_string(bytes: &[u8]) -> String {
     num::BigInt::from_bytes_be(num::bigint::Sign::Plus, bytes).to_str_radix(16)
+}
+
+pub fn check_matches_hex_string(bytes: &[u8], hex_str: &str) -> bool {
+    let decoded = hex::decode(hex_str).expect("hex_str must be valid");
+    bytes
+        .iter()
+        .zip(&decoded)
+        .all(|(byte, decoded)| byte == decoded)
 }
 
 pub fn assert_matches_hex_string(bytes: &[u8], hex_str: &str) {
