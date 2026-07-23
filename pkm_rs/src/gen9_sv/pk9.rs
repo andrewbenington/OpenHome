@@ -640,9 +640,6 @@ impl crate::tests::PkhexJson for Pk9 {
 
 #[cfg(test)]
 mod test {
-    use pretty_hex::pretty_hex;
-
-    use std::path::PathBuf;
 
     use super::Pk9;
     use crate::checksum::Checksum;
@@ -650,7 +647,6 @@ mod test {
     use crate::gen9_sv::pk9_buffer::Pk9Buffer;
     use crate::gen9_sv::pokemon_index::SvPokemonIndex;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
-
     use crate::tests::{self, TestResult};
     use crate::traits::IsShiny;
 
@@ -661,6 +657,7 @@ mod test {
     use pkm_rs_types::{HyperTraining, Stats16Le};
     #[cfg(feature = "randomize")]
     use rand::{SeedableRng, rngs::StdRng};
+    use std::path::PathBuf;
 
     #[test]
     fn ids_translate() -> TestResult<()> {
@@ -809,36 +806,11 @@ mod test {
         Ok(())
     }
 
-    const SKELEDIRGE_ENCRYPTED_BYTES_HEX: &str = "6bfb59750000bd80ad015a5cf1a2e6feb42ab7dc32fdd67afe02592b90ff74ce9a831424d1aea8ea0c01bb86e800be08510ed2c363633f1b1f8c884867ddf98a7168e337a0165f8d42d23c2fdb6818af97e5eebb8fdea0628413257896dc3da89fcbcd0340aaed23b627944ada31c83281a03ad01daaf2d85912ece0601e749211877750f443fd6911a0f7e5576b5076469f7a56df9bbc5ff42c1da855506aa24f9fc5573b507ee06f56b570c352c5d06042b5402cd3520b54d898a241af91f834f47e16d7dd9c9d637172199f9cdedc887ad56b0b95ace9d9d57b442c2689429cb1259ecaadc31cebb4351062386b3db758eeeea17f8dd681cee3a1400d1878b4c251613e43a60e7e1017dec77774952c91356e412c8a4bbb25f7cb050f9e22973a1587f3f3252906304db3091da3674c4ce06783fa1e2f689ba324155e363c1c2dc7396df779f7c9011a5d5fa2e6ff6c2a83ddacfdd67a";
-
     #[test]
     fn encrypted_bytes_match_expected_skeledirge() -> TestResult<()> {
-        let path = PathBuf::from("pk9").join("z002 - Skeledirge (Goofy) - 814A7559FB6B.pk9");
-        let mon = tests::pkm_from_file::<Pk9>(&path)?.0;
-
-        let encrypted_bytes = mon.to_box_bytes_encrypted();
-        tests::assert_matches_hex_string(&encrypted_bytes, SKELEDIRGE_ENCRYPTED_BYTES_HEX);
-
-        Ok(())
-    }
-
-    const MR_MIME_ENCRYPTED_BYTES_HEX: &str = "3054f46800001f80b46eb9965768ce49a2294fea3d7122426aa817d66c6778704e581d0d304d307a2b7cf5039e8f2a70a259441d4d231c689dae851ad01add04236609d549137b4720563f83656a18e0580e350e88df0ea968c15e3b491459b0fab695ae20a03673fbad61085eab0630ffaf7aa45c457872b6ce8bbcf7e9e73d82a839f33bea007a48a2648b5dac84858beaaecfeef61c144999366e4dbb58b8b883b0cc5d13bdc2988ee3985666cd54f6a3cc17cee99ccfd38ac8fc02efbe00da4aaec47eb80eaf92de65f401d607706d487d2c20b651eabc7f8080e77c5fc6648935561042cda822d2cec795e66617beb68d7649e8a5b90f9bec0fd95ce90e1324f77a6a332337bc62aff7028bbc090b0e5ca7444f83b6ec15be493b930056e528853d63566f0949ff5eed5e45fa93f17efa44784d858cba0c03ed68d9f08d169f154af9c3d109e36ed0963e1083f8384a19ea97712042";
-
-    #[test]
-    fn encrypted_bytes_match_expected_mr_mime() -> TestResult<()> {
-        let path = PathBuf::from("pk9").join("mr-mime-galar.pk9");
-        let mon = tests::pkm_from_file::<Pk9>(&path)?.0;
-
-        let encrypted_bytes = mon.to_box_bytes_encrypted();
-
-        pretty_assertions::assert_eq!(
-            pretty_hex(&encrypted_bytes),
-            pretty_hex(
-                &hex::decode(MR_MIME_ENCRYPTED_BYTES_HEX)
-                    .expect("MR_MIME_ENCRYPTED_BYTES_HEX must be valid")
-            )
-        );
-
-        Ok(())
+        tests::compare_pkhex_encryption_all_in_dir(
+            &PathBuf::from("pk9"),
+            Pk9::to_box_bytes_encrypted,
+        )
     }
 }

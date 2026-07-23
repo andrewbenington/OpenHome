@@ -79,4 +79,9 @@ public static class Pk9Object
             obedience_level = pk.ObedienceLevel
         };
     }
+
+    public static string EncryptedHex(PK9 pk)
+    {
+        return BitConverter.ToString(pk.EncryptedPartyData).Replace("-", string.Empty).ToLower();
+    }
 }

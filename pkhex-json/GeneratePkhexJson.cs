@@ -40,6 +40,16 @@ static object PkmToJsonObject(PKM pk)
     }
 }
 
+static string EncryptedHex(PKM pk)
+{
+    return BitConverter.ToString(pk.EncryptedPartyData).Replace("-", string.Empty).ToLower();
+}
+
+static string PkmToEncryptedHex(PKM pk)
+{
+    return pk is PK9 pk9 ? EncryptedHex(pk9) : null;
+}
+
 foreach (var dir in pkmFileDirs)
 {
     Console.WriteLine($"Found directory: {dir}");
@@ -62,5 +72,15 @@ foreach (var dir in pkmFileDirs)
         var outPath = Path.Combine(jsonDir, Path.GetFileNameWithoutExtension(path) + ".json");
         File.WriteAllText(outPath, json);
         Console.WriteLine($"Written: {outPath}");
+
+        var encryptedHex = PkmToEncryptedHex(pk);
+        if (encryptedHex != null)
+        {
+            var encryptionDir = Path.Combine("encryption", Path.GetFileName(dir));
+            Directory.CreateDirectory(encryptionDir);
+
+            outPath = Path.Combine(encryptionDir, Path.GetFileNameWithoutExtension(path) + ".txt");
+            File.WriteAllText(outPath, encryptedHex);
+        }
     }
 }
