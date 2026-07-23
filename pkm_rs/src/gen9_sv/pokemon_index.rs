@@ -11,230 +11,56 @@ use crate::tests::TestError;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-pub const fn sv_to_national_dex(key: u16) -> Option<u16> {
+const TOTAL_UNALIGNED_INDEXES: usize = 109;
+
+#[allow(clippy::zero_prefixed_literal)]
+const NATIONAL_TO_SV_INDEX_SHIFTS: [i8; TOTAL_UNALIGNED_INDEXES] = [
+    0_001, 0_001, 0_001, 0_001, 0_033, 0_033, 0_033, 0_021, 0_021, 0_044, 0_044, 0_007, 0_007,
+    0_007, 0_029, 0_031, 0_031, 0_031, 0_068, 0_068, 0_068, 0_002, 0_002, 0_017, 0_017, 0_030,
+    0_030, 0_024, 0_024, 0_028, 0_028, 0_058, 0_058, 0_012, -0_13, -0_13, -0_31, -0_31, -0_29,
+    -0_29, 0_043, 0_043, 0_043, -0_31, -0_31, -0_03, -0_30, -0_30, -0_23, -0_23, -0_14, -0_24,
+    -0_03, -0_03, -0_47, -0_47, -0_12, -0_27, -0_27, -0_44, -0_46, -0_26, 0_031, 0_029, -0_53,
+    -0_65, 0_025, -0_06, -0_03, -0_07, -0_04, -0_04, -0_08, -0_04, 0_001, -0_03, -0_03, -0_06,
+    -0_04, -0_47, -0_47, -0_47, -0_23, -0_23, -0_05, -0_07, -0_09, -0_07, -0_20, -0_13, -0_09,
+    -0_09, -0_29, -0_23, 0_001, 0_012, 0_012, 0_000, 0_000, 0_000, -0_06, 0_005, -0_06, -0_03,
+    -0_03, -0_02, -0_04, -0_03, -0_03,
+];
+
+#[allow(clippy::zero_prefixed_literal)]
+const SV_INDEX_TO_NATIONAL_SHIFTS: [i8; TOTAL_UNALIGNED_INDEXES] = [
+    0_065, -0_01, -0_01, -0_01, -0_01, 0_031, 0_031, 0_047, 0_047, 0_029, 0_029, 0_053, 0_031,
+    0_031, 0_046, 0_044, 0_030, 0_030, -0_07, -0_07, -0_07, 0_013, 0_013, -0_02, -0_02, 0_023,
+    0_023, 0_024, -0_21, -0_21, 0_027, 0_027, 0_047, 0_047, 0_047, 0_026, 0_014, -0_33, -0_33,
+    -0_33, -0_17, -0_17, 0_003, -0_29, 0_012, -0_12, -0_31, -0_31, -0_31, 0_003, 0_003, -0_24,
+    -0_24, -0_44, -0_44, -0_30, -0_30, -0_28, -0_28, 0_023, 0_023, 0_006, 0_007, 0_029, 0_008,
+    0_003, 0_004, 0_004, 0_020, 0_004, 0_023, 0_006, 0_003, 0_003, 0_004, -0_01, 0_013, 0_009,
+    0_007, 0_005, 0_007, 0_009, 0_009, -0_43, -0_43, -0_43, -0_68, -0_68, -0_68, -0_58, -0_58,
+    -0_25, -0_29, -0_31, 0_006, -0_01, 0_006, 0_000, 0_000, 0_000, 0_003, 0_003, 0_004, 0_002,
+    0_003, 0_003, -0_05, -0_12, -0_12,
+];
+
+const FIRST_UNALIGNED_NATIONAL_SV: u16 = 917;
+const TOTAL_INDEX_COUNT: u16 = FIRST_UNALIGNED_NATIONAL_SV + (TOTAL_UNALIGNED_INDEXES as u16);
+
+const fn convert_index(key: u16, shifts: [i8; TOTAL_UNALIGNED_INDEXES]) -> Option<u16> {
     match key {
         0 => None,
-        1..=916 => Some(key),
-        917 => Some(982),
-        918 => Some(917),
-        919 => Some(918),
-        920 => Some(919),
-        921 => Some(920),
-        922 => Some(953),
-        923 => Some(954),
-        924 => Some(971),
-        925 => Some(972),
-        926 => Some(955),
-        927 => Some(956),
-        928 => Some(981),
-        929 => Some(960),
-        930 => Some(961),
-        931 => Some(977),
-        932 => Some(976),
-        933 => Some(963),
-        934 => Some(964),
-        935 => Some(928),
-        936 => Some(929),
-        937 => Some(930),
-        938 => Some(951),
-        939 => Some(952),
-        940 => Some(938),
-        941 => Some(939),
-        942 => Some(965),
-        943 => Some(966),
-        944 => Some(968),
-        945 => Some(924),
-        946 => Some(925),
-        947 => Some(974),
-        948 => Some(975),
-        949 => Some(996),
-        950 => Some(997),
-        951 => Some(998),
-        952 => Some(978),
-        953 => Some(967),
-        954 => Some(921),
-        955 => Some(922),
-        956 => Some(923),
-        957 => Some(940),
-        958 => Some(941),
-        959 => Some(962),
-        960 => Some(931),
-        961 => Some(973),
-        962 => Some(950),
-        963 => Some(932),
-        964 => Some(933),
-        965 => Some(934),
-        966 => Some(969),
-        967 => Some(970),
-        968 => Some(944),
-        969 => Some(945),
-        970 => Some(926),
-        971 => Some(927),
-        972 => Some(942),
-        973 => Some(943),
-        974 => Some(946),
-        975 => Some(947),
-        976 => Some(999),
-        977 => Some(1000),
-        978 => Some(984),
-        979 => Some(986),
-        980 => Some(1009),
-        981 => Some(989),
-        982 => Some(985),
-        983 => Some(987),
-        984 => Some(988),
-        985 => Some(1005),
-        986 => Some(990),
-        987 => Some(1010),
-        988 => Some(994),
-        989 => Some(992),
-        990 => Some(993),
-        991 => Some(995),
-        992 => Some(991),
-        993 => Some(1006),
-        994 => Some(1003),
-        995 => Some(1002),
-        996 => Some(1001),
-        997 => Some(1004),
-        998 => Some(1007),
-        999 => Some(1008),
-        1000 => Some(957),
-        1001 => Some(958),
-        1002 => Some(959),
-        1003 => Some(935),
-        1004 => Some(936),
-        1005 => Some(937),
-        1006 => Some(948),
-        1007 => Some(949),
-        1008 => Some(983),
-        1009 => Some(980),
-        1010 => Some(979),
-        1011 => Some(1017),
-        1012 => Some(1011),
-        1013 => Some(1019),
-        1017 => Some(1020),
-        1018 => Some(1021),
-        1019 => Some(1023),
-        1020 => Some(1022),
-        1021 => Some(1024),
-        1022 => Some(1025),
-        1023 => Some(1018),
-        1024 => Some(1012),
-        1025 => Some(1013),
-        _ => None,
+        1..FIRST_UNALIGNED_NATIONAL_SV => Some(key),
+        TOTAL_INDEX_COUNT.. => None,
+        _ => {
+            let shift_index = key - FIRST_UNALIGNED_NATIONAL_SV;
+            let shift = shifts[shift_index as usize] as i32;
+            Some(((key as i32) + shift) as u16)
+        }
     }
 }
 
-pub const fn national_dex_to_sv(value: u16) -> Option<u16> {
-    match value {
-        982 => Some(917),
-        917 => Some(918),
-        918 => Some(919),
-        919 => Some(920),
-        920 => Some(921),
-        953 => Some(922),
-        954 => Some(923),
-        971 => Some(924),
-        972 => Some(925),
-        955 => Some(926),
-        956 => Some(927),
-        981 => Some(928),
-        960 => Some(929),
-        961 => Some(930),
-        977 => Some(931),
-        976 => Some(932),
-        963 => Some(933),
-        964 => Some(934),
-        928 => Some(935),
-        929 => Some(936),
-        930 => Some(937),
-        951 => Some(938),
-        952 => Some(939),
-        938 => Some(940),
-        939 => Some(941),
-        965 => Some(942),
-        966 => Some(943),
-        968 => Some(944),
-        924 => Some(945),
-        925 => Some(946),
-        974 => Some(947),
-        975 => Some(948),
-        996 => Some(949),
-        997 => Some(950),
-        998 => Some(951),
-        978 => Some(952),
-        967 => Some(953),
-        921 => Some(954),
-        922 => Some(955),
-        923 => Some(956),
-        940 => Some(957),
-        941 => Some(958),
-        962 => Some(959),
-        931 => Some(960),
-        973 => Some(961),
-        950 => Some(962),
-        932 => Some(963),
-        933 => Some(964),
-        934 => Some(965),
-        969 => Some(966),
-        970 => Some(967),
-        944 => Some(968),
-        945 => Some(969),
-        926 => Some(970),
-        927 => Some(971),
-        942 => Some(972),
-        943 => Some(973),
-        946 => Some(974),
-        947 => Some(975),
-        999 => Some(976),
-        1000 => Some(977),
-        984 => Some(978),
-        986 => Some(979),
-        1009 => Some(980),
-        989 => Some(981),
-        985 => Some(982),
-        987 => Some(983),
-        988 => Some(984),
-        1005 => Some(985),
-        990 => Some(986),
-        1010 => Some(987),
-        994 => Some(988),
-        992 => Some(989),
-        993 => Some(990),
-        995 => Some(991),
-        991 => Some(992),
-        1006 => Some(993),
-        1003 => Some(994),
-        1002 => Some(995),
-        1001 => Some(996),
-        1004 => Some(997),
-        1007 => Some(998),
-        1008 => Some(999),
-        957 => Some(1000),
-        958 => Some(1001),
-        959 => Some(1002),
-        935 => Some(1003),
-        936 => Some(1004),
-        937 => Some(1005),
-        948 => Some(1006),
-        949 => Some(1007),
-        983 => Some(1008),
-        980 => Some(1009),
-        979 => Some(1010),
-        1017 => Some(1011),
-        1011 => Some(1012),
-        1019 => Some(1013),
-        1020 => Some(1017),
-        1021 => Some(1018),
-        1023 => Some(1019),
-        1022 => Some(1020),
-        1024 => Some(1021),
-        1025 => Some(1022),
-        1018 => Some(1023),
-        1012 => Some(1024),
-        1013 => Some(1025),
-        _ => Some(value),
-    }
+pub const fn sv_to_national_dex(sv_index: u16) -> Option<u16> {
+    convert_index(sv_index, SV_INDEX_TO_NATIONAL_SHIFTS)
+}
+
+pub const fn national_dex_to_sv(national_dex: u16) -> Option<u16> {
+    convert_index(national_dex, NATIONAL_TO_SV_INDEX_SHIFTS)
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -245,20 +71,17 @@ const INVALID_INDEX_MESSAGE: &str =
     "SvPokemonIndex should always be valid for conversion to NatDexIndex";
 
 impl SvPokemonIndex {
-    pub fn new(sv_index: u16) -> Result<Self, InvalidSvPokemonIndex> {
+    pub const fn new(sv_index: u16) -> Result<Self, InvalidSvPokemonIndex> {
         if let Some(non_zero) = NonZeroU16::new(sv_index)
             && sv_to_national_dex(sv_index).is_some()
         {
-            println!("new: {}", sv_index);
             Ok(Self(non_zero))
         } else {
-            println!("bad value in SvPokemonIndex: {sv_index}");
             Err(InvalidSvPokemonIndex(sv_index))
         }
     }
 
     pub fn from_species_and_form(species_and_form: SpeciesAndForm) -> Result<Self, Error> {
-        println!("saf: {:?}", species_and_form);
         if let Some(sv_index) = national_dex_to_sv(species_and_form.get_ndex_js()) {
             NonZeroU16::new(sv_index)
                 .map(Self)
@@ -272,11 +95,6 @@ impl SvPokemonIndex {
     }
 
     pub fn to_national_dex(self) -> NatDexIndex {
-        println!(
-            "Sv {} to ndex {:?}",
-            self.0.get(),
-            sv_to_national_dex(self.0.get())
-        );
         sv_to_national_dex(self.0.get())
             .map(NatDexIndex::new)
             .expect(INVALID_INDEX_MESSAGE)
@@ -343,6 +161,7 @@ impl From<InvalidSvPokemonIndex> for TestError {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     fn sv_to_national_dex_decode_round_trip(sv_index: u16) {
         if let Some(national_dex) = sv_to_national_dex(sv_index) {
             assert_eq!(national_dex_to_sv(national_dex), Some(sv_index));
@@ -364,7 +183,7 @@ mod tests {
 
     #[test]
     fn test_decode_sv_to_national_dex_round_trip() {
-        for value in 0..=u16::MAX {
+        for value in 1..=u16::MAX {
             decode_sv_to_national_dex_round_trip(value);
         }
     }

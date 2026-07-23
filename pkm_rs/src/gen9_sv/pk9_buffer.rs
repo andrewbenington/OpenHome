@@ -2,6 +2,7 @@ use super::Pk9AbilityIndex;
 use crate::bytes::{AsBytes, AsBytesMut};
 use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::encryption::BlockCrypto;
+use crate::gen9_sv::pokemon_index::SvPokemonIndex;
 use crate::gen9_sv::{TM_FLAG_BYTE_LENGTH_BASE, TM_FLAG_BYTE_LENGTH_DLC};
 use crate::result::Result;
 use crate::traits::OhpkmByte;
@@ -647,8 +648,8 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk9Buffer<S> {
         self.set_u16_le(Offset::Checksum, v);
     }
 
-    pub fn set_species_game_index(&mut self, v: u16) {
-        self.set_u16_le(Offset::SpeciesIndex, v);
+    pub fn set_species_game_index(&mut self, v: SvPokemonIndex) {
+        self.set_u16_le(Offset::SpeciesIndex, v.into());
     }
 
     pub fn set_form_index(&mut self, v: u16) {
@@ -1077,7 +1078,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for Pk9Buffer<S> {
 }
 
 const CHECKSUM_START: usize = 8;
-const CHECKSUM_END: usize = 328;
+const CHECKSUM_END: usize = 0x148;
 
 impl<S: AsRef<[u8]>> Checksum for Pk9Buffer<S> {
     type A = ChecksumU16Le;
