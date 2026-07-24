@@ -1,9 +1,11 @@
 use pkm_rs_resources::metadata_source::MetadataSource;
 
 use crate::result::Error;
+#[cfg(feature = "wasm")]
 use pk9_buffer::Pk9Buffer;
 use pkm_rs_resources;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
+#[cfg(feature = "wasm")]
 use pkm_rs_resources::ribbons::ModernRibbon;
 use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_resources::species::form_metadata::source_has_form_metadata;
@@ -11,13 +13,18 @@ use pkm_rs_resources::species::form_metadata::source_has_form_metadata;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
+#[cfg(feature = "wasm")]
 mod pk9;
+#[cfg(feature = "wasm")]
 pub use pk9::*;
+#[cfg(feature = "wasm")]
 mod pk9_buffer;
+#[cfg(feature = "wasm")]
 mod pokemon_index;
 // mod save;
 // mod save_blocks;
 
+#[cfg(feature = "wasm")]
 pub(crate) const PKM_DATA_SIZE: usize = 344;
 
 #[cfg(test)]
@@ -31,6 +38,7 @@ const BOX_SLOTS: u8 = BOX_ROWS * BOX_COLS;
 // const BOX_NAME_LENGTH: usize = 34;
 const MAX_ABILITY_INDEX: u16 = 310; // Poison Puppeteer
 
+#[cfg(feature = "wasm")]
 const MAX_RIBBON_SV: usize = ModernRibbon::Partner as usize;
 
 pub const TM_FLAG_BYTE_LENGTH_BASE: usize = 25;

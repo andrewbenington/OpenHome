@@ -4,7 +4,6 @@ use super::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
     Notes, PluginData, ScarletVioletData, SwordShieldData,
 };
-use crate::gen9_sv;
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
 use crate::ohpkm::deprecated::PastHandlerDataV1;
@@ -18,7 +17,12 @@ use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;
+use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::moves::MoveSlots;
+use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
+use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
@@ -26,21 +30,16 @@ use pkm_rs_types::{
     Language, MarkingsSixShapesColors, OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le,
     StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory,
 };
-
 use serde::Serialize;
 use strum_macros::Display;
-
-use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::MoveIndex;
-use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::SpeciesAndForm;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
 #[cfg(feature = "wasm")]
 use super::JsResult;
+#[cfg(feature = "wasm")]
+use crate::gen9_sv;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
 #[cfg(feature = "wasm")]
@@ -1575,6 +1574,7 @@ impl OhpkmV2 {
             .collect()
     }
 
+    #[cfg(feature = "wasm")]
     pub fn get_xor_checksum(&self) -> u64 {
         crate::checksum::checksum_u64_le(&self.to_bytes())
     }
