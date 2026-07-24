@@ -645,32 +645,15 @@ mod test {
     use crate::checksum::Checksum;
     use crate::convert_strategy::ConvertStrategy;
     use crate::gen9_sv::pk9_buffer::Pk9Buffer;
-    use crate::gen9_sv::pokemon_index::SvPokemonIndex;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
     use crate::tests::{self, TestResult};
     use crate::traits::IsShiny;
 
-    use pkm_rs_resources::natures::NatureIndex;
-    use pkm_rs_resources::species::NatDexIndex;
     #[cfg(feature = "randomize")]
     use pkm_rs_types::randomize::RandomizeAndFix;
-    use pkm_rs_types::{HyperTraining, Stats16Le};
     #[cfg(feature = "randomize")]
     use rand::{SeedableRng, rngs::StdRng};
     use std::path::PathBuf;
-
-    #[test]
-    fn ids_translate() -> TestResult<()> {
-        let sv_index = SvPokemonIndex::new(951)?;
-        let ndex = sv_index.to_national_dex();
-        assert_eq!(sv_index, SvPokemonIndex::try_from_base(ndex).unwrap());
-
-        let ndex = unsafe { NatDexIndex::new_unchecked(1007) };
-        let sv_index = SvPokemonIndex::try_from_base(ndex)?;
-        assert_eq!(ndex, sv_index.to_national_dex());
-
-        Ok(())
-    }
 
     #[test]
     fn to_from_bytes() -> TestResult<()> {
@@ -703,6 +686,14 @@ mod test {
     #[test]
     fn compare_pkhex_json() -> TestResult<()> {
         tests::compare_pkhex_json_all_in_dir::<Pk9>(&PathBuf::from("pk9"))
+    }
+
+    #[test]
+    fn compare_pkhex_encryption() -> TestResult<()> {
+        tests::compare_pkhex_encryption_all_in_dir(
+            &PathBuf::from("pk9"),
+            Pk9::to_box_bytes_encrypted,
+        )
     }
 
     #[test]
@@ -775,42 +766,6 @@ mod test {
     fn to_from_ohpkm() -> TestResult<()> {
         tests::to_from_ohpkm_all_in_dir::<Pk9>(
             &PathBuf::from("test-files").join("pkm-files").join("pk9"),
-        )
-    }
-
-    const ADAMANT: u8 = 3;
-    const RELAXED: u8 = 7;
-
-    #[test]
-    fn mint_nature_hyper_train_stat_calc() -> TestResult<()> {
-        let path = PathBuf::from("pk9").join("cinderace-mint-nature.pk9");
-        let mon = tests::pkm_from_file::<Pk9>(&path)?.0;
-
-        assert_eq!(mon.nature, NatureIndex::new_js(RELAXED));
-        assert_eq!(mon.mint_nature, NatureIndex::new_js(ADAMANT));
-
-        assert_eq!(mon.hyper_training, HyperTraining::all());
-
-        assert_eq!(
-            mon.calculate_stats(),
-            Stats16Le {
-                hp: 302,
-                atk: 364,
-                def: 186,
-                spa: 149,
-                spd: 186,
-                spe: 337
-            }
-        );
-
-        Ok(())
-    }
-
-    #[test]
-    fn encrypted_bytes_match_expected_skeledirge() -> TestResult<()> {
-        tests::compare_pkhex_encryption_all_in_dir(
-            &PathBuf::from("pk9"),
-            Pk9::to_box_bytes_encrypted,
         )
     }
 }

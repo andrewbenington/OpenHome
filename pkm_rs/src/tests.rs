@@ -188,7 +188,7 @@ pub fn assert_ranges_match(
     expected: &[u8],
     path: Option<PathBuf>,
 ) -> TestResult<()> {
-    assert_matches_hex_display(actual, expected);
+    pretty_assert_bytes_match(actual, expected);
     let differences = find_differing_ranges(actual, expected);
 
     match differences {
@@ -438,15 +438,15 @@ where
     let pkm_rs_encryption = encrypt(mon);
 
     let mut encryption_path = Path::new("pkhex-encryption").join(pkm_path);
-    encryption_path.set_extension("txt");
+    encryption_path.set_extension("bin");
     let mut file = File::open(encryption_path)
         .map_err(|e| Error::other(&format!("Failed to open encryption file: {e}")))?;
 
-    let mut correct_encrypted_hex = String::new();
-    file.read_to_string(&mut correct_encrypted_hex)
+    let mut correct_encrypted_bytes: Vec<u8> = vec![];
+    file.read_to_end(&mut correct_encrypted_bytes)
         .map_err(|e| Error::other(&e.to_string()))?;
 
-    assert_matches_hex_string(&pkm_rs_encryption, &correct_encrypted_hex);
+    pretty_assert_bytes_match(&pkm_rs_encryption, &correct_encrypted_bytes);
 
     Ok(())
 }
@@ -663,9 +663,9 @@ pub fn check_matches_hex_string(bytes: &[u8], hex_str: &str) -> bool {
 }
 
 pub fn assert_matches_hex_string(bytes: &[u8], hex_str: &str) {
-    assert_matches_hex_display(bytes, &hex::decode(hex_str).expect("hex_str must be valid"));
+    pretty_assert_bytes_match(bytes, &hex::decode(hex_str).expect("hex_str must be valid"));
 }
 
-pub fn assert_matches_hex_display(bytes1: &[u8], bytes2: &[u8]) {
+pub fn pretty_assert_bytes_match(bytes1: &[u8], bytes2: &[u8]) {
     assert_eq!(pretty_hex(&bytes1), pretty_hex(&bytes2));
 }
