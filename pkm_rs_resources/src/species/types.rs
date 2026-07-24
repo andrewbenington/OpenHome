@@ -827,12 +827,12 @@ impl SpeciesAndForm {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nationalDex))]
-    pub fn get_ndex_js(&self) -> u16 {
+    pub fn get_ndex_wasm(&self) -> u16 {
         self.national_dex.to_u16()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = formIndex))]
-    pub fn get_forme_index_js(&self) -> u16 {
+    pub fn get_forme_index_wasm(&self) -> u16 {
         self.form_index
     }
 

@@ -261,9 +261,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
       // and the slot was left empty
       if (mon) {
         try {
-          if (mon.gameOfOrigin && mon?.nationalDex) {
-            mon.recalculateStats()
-            mon.refreshChecksum()
+          if (mon.gameOfOrigin && mon?.dexNum) {
             const monBuffer = new Uint8Array(this.getMonBoxSizeBytes())
             const pcBytes = mon.toPCBytes()
 

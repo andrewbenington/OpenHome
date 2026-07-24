@@ -17,6 +17,8 @@ use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
+#[cfg(feature = "wasm")]
+use pkm_rs_types::TeraTypeWasm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, Language,
@@ -433,7 +435,7 @@ impl Pk9 {
     }
 
     #[wasm_bindgen(js_name = toBytes)]
-    pub fn to_bytes_js(&self) -> Box<[u8]> {
+    pub fn to_bytes_wasm(&self) -> Box<[u8]> {
         self.to_box_bytes()
     }
 
@@ -530,33 +532,63 @@ impl Pk9 {
     }
 
     #[wasm_bindgen(getter = nationalDex)]
-    pub fn national_dex_js(&self) -> u16 {
-        self.species_and_form.0.get_ndex_js()
+    pub fn national_dex_wasm(&self) -> u16 {
+        self.species_and_form.0.get_ndex_wasm()
     }
 
     #[wasm_bindgen(getter = formIndex)]
-    pub fn form_index_js(&self) -> u16 {
+    pub fn form_index_wasm(&self) -> u16 {
         self.species_and_form.0.get_forme_index()
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_js(&self) -> Stats16Le {
+    pub fn evs_wasm(&self) -> Stats16Le {
         self.evs.into()
     }
 
     #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_js(&mut self, v: Stats16Le) {
+    pub fn set_evs_wasm(&mut self, v: Stats16Le) {
         self.evs = v.to_stats8_truncated()
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_js(&self) -> Stats16Le {
+    pub fn ivs_wasm(&self) -> Stats16Le {
         self.ivs.into()
     }
 
     #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_js(&mut self, v: Stats16Le) {
+    pub fn set_ivs_wasm(&mut self, v: Stats16Le) {
         self.ivs = v.to_ivs_capped()
+    }
+
+    #[wasm_bindgen(getter = teraTypeOriginal)]
+    pub fn tera_type_original_wasm(&self) -> TeraTypeWasm {
+        self.tera_type_original.into()
+    }
+
+    #[wasm_bindgen(setter = teraTypeOriginal)]
+    pub fn set_tera_type_original_wasm(&mut self, v: TeraTypeWasm) {
+        self.tera_type_original = v.into()
+    }
+
+    #[wasm_bindgen(getter = teraTypeOverride)]
+    pub fn tera_type_override_wasm(&self) -> Option<TeraTypeWasm> {
+        self.tera_type_override.map(TeraTypeWasm::from)
+    }
+
+    #[wasm_bindgen(setter = teraTypeOverride)]
+    pub fn set_tera_type_override_wasm(&mut self, v: Option<TeraTypeWasm>) {
+        self.tera_type_override = v.map(TeraType::from)
+    }
+
+    #[wasm_bindgen(getter = obedienceLevel)]
+    pub fn obedience_level_wasm(&self) -> u8 {
+        self.obedience_level
+    }
+
+    #[wasm_bindgen(setter = obedienceLevel)]
+    pub fn set_obedience_level_wasm(&mut self, v: u8) {
+        self.obedience_level = v
     }
 
     #[wasm_bindgen(getter = tmFlagsBaseGame)]
@@ -580,27 +612,27 @@ impl Pk9 {
     }
 
     #[wasm_bindgen(js_name = calculateChecksum)]
-    pub fn calculate_checksum_js(&self) -> u16 {
+    pub fn calculate_checksum_wasm(&self) -> u16 {
         self.calculate_checksum()
     }
 
     #[wasm_bindgen(js_name = calculateLevel)]
-    pub fn calculate_level_js(&self) -> u8 {
+    pub fn calculate_level_wasm(&self) -> u8 {
         self.calculate_level()
     }
 
     #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats_js(&self) -> Stats16Le {
+    pub fn calculate_stats_wasm(&self) -> Stats16Le {
         self.calculate_stats()
     }
 
     #[wasm_bindgen(js_name = recalculateStats)]
-    pub fn recalculate_stats_js(&mut self) {
+    pub fn recalculate_stats_wasm(&mut self) {
         self.recalculate_stats()
     }
 
     #[wasm_bindgen(js_name = toBoxBytesEncrypted)]
-    pub fn to_box_bytes_encrypted_js(&self) -> Box<[u8]> {
+    pub fn to_box_bytes_encrypted_wasm(&self) -> Box<[u8]> {
         self.to_box_bytes_encrypted()
     }
 }
@@ -640,7 +672,6 @@ impl crate::tests::PkhexJson for Pk9 {
 
 #[cfg(test)]
 mod test {
-
     use super::Pk9;
     use crate::checksum::Checksum;
     use crate::convert_strategy::ConvertStrategy;
@@ -684,7 +715,7 @@ mod test {
     }
 
     #[test]
-    fn compare_pkhex_json() -> TestResult<()> {
+    fn compare_pkhex_wasmon() -> TestResult<()> {
         tests::compare_pkhex_json_all_in_dir::<Pk9>(&PathBuf::from("pk9"))
     }
 

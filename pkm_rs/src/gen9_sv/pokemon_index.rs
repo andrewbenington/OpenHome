@@ -82,13 +82,13 @@ impl SvPokemonIndex {
     }
 
     pub fn from_species_and_form(species_and_form: SpeciesAndForm) -> Result<Self, Error> {
-        if let Some(sv_index) = national_dex_to_sv(species_and_form.get_ndex_js()) {
+        if let Some(sv_index) = national_dex_to_sv(species_and_form.get_ndex_wasm()) {
             NonZeroU16::new(sv_index)
                 .map(Self)
                 .ok_or(InvalidSvPokemonIndex(sv_index).into())
         } else {
             Err(Error::NationalDex {
-                value: species_and_form.get_ndex_js(),
+                value: species_and_form.get_ndex_wasm(),
                 source: PokemonIndexType::ScarletViolet,
             })
         }

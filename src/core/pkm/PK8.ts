@@ -25,14 +25,7 @@ import { PkmConstructorOptions } from './PKM'
 import { convertPokeDate, convertPokeDateOptional } from './wasm/convert'
 
 export default class PK8 {
-  static getFormat() {
-    return 'PK8' as const
-  }
   format = 'PK8' as const
-
-  static getBoxSize() {
-    return 344
-  }
   inner: Pk8Wasm
 
   constructor(arg: OHPKM | Pk8Wasm, options: PkmConstructorOptions) {
@@ -48,11 +41,12 @@ export default class PK8 {
     }
   }
 
-  get encryptionConstant() {
-    return this.inner.encryption_constant
+  static getFormat() {
+    return 'PK8' as const
   }
-  set encryptionConstant(value: number) {
-    this.inner.encryption_constant = value
+
+  static getBoxSize() {
+    return 344
   }
 
   static fromBytes(buffer: ArrayBuffer, encrypted?: boolean): PK8 {
@@ -68,6 +62,13 @@ export default class PK8 {
 
   static fromWasm(pk8: Pk8Wasm): PK8 {
     return new PK8(pk8, {})
+  }
+
+  get encryptionConstant() {
+    return this.inner.encryption_constant
+  }
+  set encryptionConstant(value: number) {
+    this.inner.encryption_constant = value
   }
 
   get sanity() {
