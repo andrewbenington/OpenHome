@@ -1,14 +1,15 @@
-use std::collections::HashMap;
-
+use crate::{
+    Result,
+    data_controller::{DataController, DataDir},
+};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use uuid::Uuid;
 
-use crate::commands::CommandResult;
-use crate::data_controller::{DataController, DataDir};
+pub const BANKS_FILENAME: &str = "banks.json";
 
-const BANKS_FILENAME: &str = "banks.json";
-
-#[derive(Default, Serialize, Deserialize, Clone, specta::Type)]
+#[cfg_attr(feature = "desktop", derive(specta::Type))]
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct StoredBankData {
     banks: Vec<Bank>,
     #[serde(default)]
@@ -46,7 +47,8 @@ fn default_id() -> Uuid {
     Uuid::new_v4()
 }
 
-#[derive(Serialize, Deserialize, Clone, specta::Type)]
+#[cfg_attr(feature = "desktop", derive(specta::Type))]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Bank {
     #[serde(default = "default_id")]
     id: Uuid,
@@ -87,7 +89,8 @@ impl Default for Bank {
     }
 }
 
-#[derive(Default, Serialize, Deserialize, Clone, specta::Type)]
+#[cfg_attr(feature = "desktop", derive(specta::Type))]
+#[derive(Default, Serialize, Deserialize, Clone)]
 pub struct Box {
     #[serde(default = "default_id")]
     pub id: Uuid,
@@ -108,11 +111,9 @@ impl Box {
 
 pub type BoxIdentifiers = HashMap<u8, String>;
 
-#[tauri::command]
-#[specta::specta]
-pub fn load_banks(app_handle: tauri::AppHandle) -> CommandResult<StoredBankData> {
+pub fn load_banks(controller: &impl DataController) -> Result<StoredBankData> {
     let mut storage: StoredBankData =
-        app_handle.read_or_create_default_json_file(DataDir::Storage, BANKS_FILENAME)?;
+        controller.read_or_create_default_json_file(DataDir::Storage, BANKS_FILENAME)?;
     if storage.banks.is_empty() {
         storage = StoredBankData::create_with_default_bank();
     }
@@ -122,14 +123,9 @@ pub fn load_banks(app_handle: tauri::AppHandle) -> CommandResult<StoredBankData>
     Ok(storage)
 }
 
-#[tauri::command]
-#[specta::specta]
-pub fn write_banks(
-    app_handle: tauri::AppHandle,
-    mut bank_data: StoredBankData,
-) -> CommandResult<()> {
+pub fn write_banks(controller: &impl DataController, mut bank_data: StoredBankData) -> Result<()> {
     bank_data.order_boxes_by_indices();
     bank_data.reset_box_indices();
 
-    Ok(app_handle.write_file_json(DataDir::Storage, BANKS_FILENAME, &bank_data)?)
+    controller.write_file_json(DataDir::Storage, BANKS_FILENAME, &bank_data)
 }

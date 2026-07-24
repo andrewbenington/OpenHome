@@ -51,7 +51,11 @@ function readJson<T = any>(path: string): T {
   return JSON.parse(readFileSync(path, 'utf-8'))
 }
 
+// returns version without leading v
 function getCurrentVersion(): string {
+  if (process.env.CURRENT_VERSION) {
+    return process.env.CURRENT_VERSION
+  }
   const pkg = readJson<{ version: string }>(PACKAGE_JSON)
   return pkg.version
 }
@@ -78,10 +82,10 @@ const EMPTY_BODY = 'See the assets to download this version and install.'
 
 async function publishLatestRelease(octokit: Octokit) {
   const currentVersion = getCurrentVersion()
-  const latestRelease = await getLatestRelease(octokit)
+  const latestRelease = await getNewestRelease(octokit)
+
   if (!latestRelease) {
     fail('No release found')
-    return
   } else if (!latestRelease.draft && latestRelease.body !== EMPTY_BODY) {
     fail(`Latest release is already published: ${latestRelease.html_url}`)
   } else if (!latestRelease.tag_name.endsWith(currentVersion)) {
@@ -91,6 +95,33 @@ async function publishLatestRelease(octokit: Octokit) {
   }
 
   console.log(`\n→ Publishing Github release ${latestRelease.tag_name}...`)
+  let body = latestRelease.body ?? (await currentVersionPullRequestDescription(octokit))
+  let release = await octokit.rest.repos.updateRelease({
+    owner: OWNER,
+    repo: REPO,
+    release_id: latestRelease.id,
+    body,
+    prerelease: false,
+    make_latest: 'true',
+    draft: false,
+  })
+
+  console.log(`  Publshed: ${release.data.html_url}`)
+  return release
+}
+
+async function finalizeLatestReleaseBody(octokit: Octokit) {
+  const currentVersion = getCurrentVersion()
+  const latestRelease = await getNewestRelease(octokit, currentVersion)
+  if (!latestRelease) {
+    fail('No release found')
+  } else if (!latestRelease.tag_name.endsWith(currentVersion)) {
+    fail(
+      `Current version is ${currentVersion}, but latest release is ${latestRelease.tag_name}: ${latestRelease.html_url}`
+    )
+  }
+
+  console.log(`\n→ Updating Github release ${latestRelease.tag_name}...`)
   let release = await octokit.rest.repos.updateRelease({
     owner: OWNER,
     repo: REPO,
@@ -100,7 +131,7 @@ async function publishLatestRelease(octokit: Octokit) {
         ? await currentVersionPullRequestDescription(octokit)
         : latestRelease.body || undefined,
     prerelease: false,
-    make_latest: 'true',
+    make_latest: 'legacy',
     draft: false,
   })
 
@@ -120,20 +151,23 @@ async function deleteGithubRelease(octokit: Octokit, releaseId: number) {
 }
 
 async function findReleasePullRequest(octokit: Octokit, version: string) {
-  return await octokit
-    .paginate(octokit.rest.pulls.list, {
-      owner: OWNER,
-      repo: REPO,
-      state: 'closed',
-      per_page: 100,
-    })
-    .then((results) =>
-      results.find(
-        (pullRequest) =>
-          pullRequest.title.startsWith(`[RELEASE] ${version}`) ||
-          pullRequest.title.startsWith(`[RELEASE] v${version}`)
-      )
+  const iterator = octokit.paginate.iterator(octokit.rest.pulls.list, {
+    owner: OWNER,
+    repo: REPO,
+    state: 'closed',
+    per_page: 100,
+  })
+
+  for await (const { data: pullRequests } of iterator) {
+    const match = pullRequests.find(
+      (pullRequest) =>
+        pullRequest.title.startsWith(`[RELEASE] ${version}`) ||
+        pullRequest.title.startsWith(`[RELEASE] v${version}`)
     )
+    if (match) return match
+  }
+
+  return undefined
 }
 
 async function currentVersionPullRequestDescription(octokit: Octokit) {
@@ -146,22 +180,37 @@ async function currentVersionPullRequestDescription(octokit: Octokit) {
     .split('\n**Issue**')[0]
 }
 
-async function getLatestRelease(octokit: Octokit) {
+async function getNewestRelease(octokit: Octokit, tag?: string) {
   console.log('\n→ Retrieving latest release...')
-  const releases = await octokit.paginate(octokit.rest.repos.listReleases, {
+  const { data } = await octokit.rest.repos.listReleases({
     owner: OWNER,
     repo: REPO,
-    per_page: 1,
+    per_page: 5,
   })
+
   console.log('  Retrieved')
-  return releases[0]
+
+  if (tag) {
+    const matching = data.find((release) => release.tag_name === `v${tag}`)
+    if (matching) {
+      return matching
+    }
+
+    fail(`No release found in windows`)
+  }
+
+  if (data.length === 0) {
+    fail(`No releases found`)
+  }
+
+  return data[0]
 }
 
 async function createNewRelease(octokit: Octokit) {
   const currentVersion = getCurrentVersion()
 
   // const currentVersion = fs
-  const latestRelease = await getLatestRelease(octokit)
+  const latestRelease = await getNewestRelease(octokit)
   let body = await currentVersionPullRequestDescription(octokit)
   if (latestRelease.tag_name !== `v${currentVersion}`) {
     await createGithubRelease(octokit, currentVersion, body)
@@ -186,8 +235,8 @@ async function main() {
     switch (args[0]) {
       case 'new-release':
         return await createNewRelease(octokit)
-      case 'publish':
-        return await publishLatestRelease(octokit)
+      case 'finalize':
+        return await finalizeLatestReleaseBody(octokit)
       case 'display-description':
         console.log('\n' + (await currentVersionPullRequestDescription(octokit)))
     }

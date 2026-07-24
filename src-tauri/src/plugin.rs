@@ -3,13 +3,13 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use tauri::Emitter;
-
 use crate::{
-    data_controller::{DataController, DataDir},
-    error::{Error, Result},
+    data_controller::ToDataController,
     util::{self, ImageResponse},
 };
+use openhome_core::data_controller::{DataController, DataDir};
+use openhome_core::{Error, Result};
+use tauri::Emitter;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct PluginMetadata {
@@ -98,7 +98,8 @@ pub async fn download_async(
     remote_url: String,
     plugin_metadata: PluginMetadata,
 ) -> Result<String> {
-    let new_plugin_dir = app_handle.absolute_path(DataDir::Plugins, &plugin_metadata.id)?;
+    let controller = app_handle.controller();
+    let new_plugin_dir = controller.absolute_path(DataDir::Plugins, &plugin_metadata.id)?;
 
     let dist_dir = new_plugin_dir.join("dist");
     util::create_directory(&dist_dir)?;

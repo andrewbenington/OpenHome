@@ -2,9 +2,10 @@ use std::fmt::Display;
 use std::str::FromStr;
 
 use crate::commands::CommandResult;
-use crate::data_controller::{DataController, DataDir};
+use crate::data_controller::ToDataController;
 use crate::{Error, Result};
 use chrono::{DateTime, NaiveDate, Utc};
+use openhome_core::data_controller::{DataController, DataDir};
 use serde::Serialize;
 use tauri::AppHandle;
 use tracing::Subscriber;
@@ -434,7 +435,7 @@ where
 pub fn get_logs_today(app: AppHandle, filter: LogFilterJs) -> CommandResult<LogsResponse> {
     let filter = LogFilter::try_from(filter)?;
 
-    Ok(LogsResponse::fetch(&app, filter)?)
+    Ok(LogsResponse::fetch(&app.controller(), filter)?)
 }
 
 fn date_range_inclusive(start: NaiveDate, end: NaiveDate) -> impl Iterator<Item = NaiveDate> {
@@ -456,19 +457,20 @@ pub fn clear_logs_for_range(
     let end_date = start.date_naive();
 
     let today = Utc::now().date_naive();
+    let controller = app.controller();
 
     for date in date_range_inclusive(start.date_naive(), end.date_naive()) {
         let file_path = log_file_path(date);
 
         if date == today {
-            app.truncate_file(DataDir::Logs, &file_path)?;
+            controller.truncate_file(DataDir::Logs, &file_path)?;
             continue;
         } else if date > start_date && date < end_date {
-            app.delete_file(DataDir::Logs, log_file_path(date))?;
+            controller.delete_file(DataDir::Logs, log_file_path(date))?;
             continue;
         }
 
-        let Some(file_lines) = load_file_lines(&app, date, Direction::Normal) else {
+        let Some(file_lines) = load_file_lines(&controller, date, Direction::Normal) else {
             continue;
         };
 
@@ -484,14 +486,15 @@ pub fn clear_logs_for_range(
             .collect();
 
         if lines_in_range.is_empty() {
-            app.delete_file(DataDir::Logs, log_file_path(date))?;
+            controller.delete_file(DataDir::Logs, log_file_path(date))?;
         } else {
-            app.write_file_text(
-                DataDir::Logs,
-                log_file_path(date),
-                &lines_in_range.join("\n"),
-            )
-            .map_err(|e| Error::file_write(&file_path, e))?;
+            controller
+                .write_file_text(
+                    DataDir::Logs,
+                    log_file_path(date),
+                    &lines_in_range.join("\n"),
+                )
+                .map_err(|e| Error::file_write(&file_path, e))?;
         }
     }
 

@@ -1,10 +1,7 @@
+use crate::util;
+use openhome_core::data_controller::{DataController, DataDir};
+use openhome_core::{Error, Result};
 use std::{collections::HashMap, fs};
-
-use crate::{
-    data_controller::{DataController, DataDir},
-    error::{Error, Result},
-    util,
-};
 
 type FilenameToBytesMap = HashMap<String, Vec<u8>>;
 pub fn get_all_ohpkm_v1_bytes(data_controller: &impl DataController) -> Result<FilenameToBytesMap> {

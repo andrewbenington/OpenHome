@@ -82,5 +82,24 @@ impl TryFrom<SpeciesAndForm> for Pk7SpeciesAndForm {
     }
 }
 
-type BoxIndex = pkm_rs_types::BoundedU8<{ BOX_SLOTS }>;
-type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS }>;
+type BoxIndex = pkm_rs_types::BoundedU8<{ BOX_COUNT - 1 }>;
+type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS - 1 }>;
+
+#[cfg(test)]
+mod test {
+    use super::{BOX_COUNT, BOX_SLOTS, BoxIndex, BoxSlot};
+    use crate::result::{Error, Result};
+
+    #[test]
+    fn all_boxes_valid() -> Result<()> {
+        for index in 0..BOX_COUNT {
+            BoxIndex::check_bound(index).or(Err(Error::BoxIndex(index)))?;
+        }
+
+        for slot in 0..BOX_SLOTS {
+            BoxSlot::check_bound(slot).or(Err(Error::BoxSlot(slot)))?;
+        }
+
+        Ok(())
+    }
+}

@@ -88,11 +88,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
         prng = new Prando(
           other.trainerName
+            .concat(other.dexNum.toString())
             .concat(`${hp}~${atk}~${def}~${spc}~${spe}`)
             .concat(other.trainerID.toString())
         )
 
-        this.personalityValue = this.generatePk3CompatiblePid()
+        this.personalityValue = prng.nextInt(0, 0xffffffff)
       } else {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
@@ -144,6 +145,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
             : this.metadata?.genderFromPid(this.personalityValue)) ??
           Gender.Genderless
         this.nature = other.nature ?? NatureIndex.newFromModulo(other.exp)
+
+        if (other.personalityValue === undefined) {
+          this.personalityValue = this.generatePk3CompatiblePid()
+        }
       } else {
         this.abilityNum = other.abilityNum ?? 0
         this.gender =

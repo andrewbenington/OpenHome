@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 use tauri::Emitter;
 
 use crate::commands::CommandResult;
-use crate::data_controller::{DataController, DataDir, JsonDataReader};
-use crate::error::Result;
+use openhome_core::Result;
+use openhome_core::data_controller::{DataController, DataDir, JsonDataReader};
 
 const POKEDEX_FILENAME: &str = "pokedex.json";
 
@@ -74,7 +74,7 @@ impl Pokedex {
         })
     }
 
-    pub fn write_to_storage(&self, data_controller: &mut impl DataController) -> Result<()> {
+    pub fn write_to_storage(&self, data_controller: &impl DataController) -> Result<()> {
         data_controller.write_file_json(DataDir::Storage, POKEDEX_FILENAME, &self.by_dex_number)
     }
 
@@ -131,9 +131,8 @@ pub fn update_pokedex(
 mod test {
     use serde_json::json;
 
-    use crate::data_controller::MockSingleJsonFile;
-    use crate::error::{Error, Result};
     use crate::state::{Pokedex, PokedexEntry, PokedexStatus};
+    use openhome_core::{Error, Result, data_controller::MockSingleJsonFile};
 
     #[test]
     fn serialize_deserialize() -> Result<()> {
