@@ -27,8 +27,6 @@ export interface AllPKMFields {
   alphaMove?: number
   avs?: types.Stats
   ball?: number
-  ballDPPt?: number
-  ballHGSS?: number
   battleMemoryCount?: number
   canGigantamax?: boolean
   checksum?: number
@@ -36,7 +34,6 @@ export interface AllPKMFields {
   contest?: ContestStats
   contestMemoryCount?: number
   country?: number
-  cp?: number
   currentHP?: number
   dexNum: number
   dirtLocation?: number
@@ -45,8 +42,6 @@ export interface AllPKMFields {
   dynamaxLevel?: number
   eggDate?: types.PKMDate | undefined
   eggLocationIndex?: number
-  eggLocationIndexDP?: number
-  eggLocationIndexPtHGSS?: number
   encounterType?: number
   encryptionConstant?: number
   enjoyment?: number
@@ -55,8 +50,6 @@ export interface AllPKMFields {
   exp: number
   extraFormIndex?: ExtraFormIndex
   favorite?: boolean
-  fieldEventFatigue1?: number
-  fieldEventFatigue2?: number
   flag2LA?: boolean
   formArgument?: number
   formNum: number
@@ -95,8 +88,6 @@ export interface AllPKMFields {
   metDate?: types.PKMDate | undefined
   metLevel?: number
   metLocationIndex?: number
-  metLocationIndexDP?: number
-  metLocationIndexPtHGSS?: number
   metTimeOfDay?: number
   moveFlagsLA?: Uint8Array
   movePP: FourMoves
@@ -114,12 +105,6 @@ export interface AllPKMFields {
   pluginOrigin?: PluginIdentifier
   pokeStarFame?: number
   pokerusByte?: number
-  receivedDay?: number
-  receivedHour?: number
-  receivedMinute?: number
-  receivedMonth?: number
-  receivedSecond?: number
-  receivedYear?: number
   region?: number
   relearnMoves?: FourMoves
   resortEventStatus?: number
@@ -129,7 +114,6 @@ export interface AllPKMFields {
   secretID: number
   secretSuperTrainingComplete?: boolean
   secretSuperTrainingUnlocked?: boolean
-  shadowGauge?: number
   shadowID?: number
   shinyLeaves?: ShinyLeaves
   sociability?: number

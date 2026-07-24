@@ -12,6 +12,7 @@ import App from './ui/App'
 addMissingFunctions()
 
 await init()
+
 enableMapSet()
 
 dayjs.extend(localizedFormat)
