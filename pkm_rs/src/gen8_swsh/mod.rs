@@ -1,4 +1,3 @@
-// gen8_swsh/mod.rs
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_types::strings::SizedUtf16String;
 

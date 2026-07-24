@@ -40,11 +40,6 @@ static object PkmToJsonObject(PKM pk)
     }
 }
 
-// static string EncryptedHex(PKM pk)
-// {
-//     return BitConverter.ToString(pk.EncryptedPartyData).Replace("-", string.Empty).ToLower();
-// }
-
 static byte[] PkmToEncryptedBytes(PKM pk)
 {
     return pk is PK9 pk9 ? pk9.EncryptedPartyData : null;
