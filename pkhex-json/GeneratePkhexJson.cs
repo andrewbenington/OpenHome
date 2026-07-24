@@ -40,14 +40,14 @@ static object PkmToJsonObject(PKM pk)
     }
 }
 
-static string EncryptedHex(PKM pk)
-{
-    return BitConverter.ToString(pk.EncryptedPartyData).Replace("-", string.Empty).ToLower();
-}
+// static string EncryptedHex(PKM pk)
+// {
+//     return BitConverter.ToString(pk.EncryptedPartyData).Replace("-", string.Empty).ToLower();
+// }
 
-static string PkmToEncryptedHex(PKM pk)
+static byte[] PkmToEncryptedBytes(PKM pk)
 {
-    return pk is PK9 pk9 ? EncryptedHex(pk9) : null;
+    return pk is PK9 pk9 ? pk9.EncryptedPartyData : null;
 }
 
 foreach (var dir in pkmFileDirs)
@@ -73,14 +73,14 @@ foreach (var dir in pkmFileDirs)
         File.WriteAllText(outPath, json);
         Console.WriteLine($"Written: {outPath}");
 
-        var encryptedHex = PkmToEncryptedHex(pk);
-        if (encryptedHex != null)
+        var encryptedBytes = PkmToEncryptedBytes(pk);
+        if (encryptedBytes != null && encryptedBytes.Length > 0)
         {
             var encryptionDir = Path.Combine("encryption", Path.GetFileName(dir));
             Directory.CreateDirectory(encryptionDir);
 
-            outPath = Path.Combine(encryptionDir, Path.GetFileNameWithoutExtension(path) + ".txt");
-            File.WriteAllText(outPath, encryptedHex);
+            outPath = Path.Combine(encryptionDir, Path.GetFileNameWithoutExtension(path) + ".bin");
+            File.WriteAllBytes(outPath, encryptedBytes);
         }
     }
 }
