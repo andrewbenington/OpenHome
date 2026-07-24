@@ -4,7 +4,7 @@ import PK9 from '@openhome-core/pkm/PK9'
 import { PkmConstructorOptions } from '@openhome-core/pkm/PKM'
 import { getStats } from '@openhome-core/pkm/util/statCalc'
 import { Errorable, R } from '@openhome-core/util/functional'
-import { ConvertStrategy, OriginGames, PkmFormat } from '@pkm-rs/pkg'
+import { ConvertStrategy, OriginGames, Pk9Wasm, PkmFormat } from '@pkm-rs/pkg'
 import { PluginIdentifier } from '../interfaces'
 
 const COMPASS_PLUGIN_ID = 'compass'
@@ -21,7 +21,13 @@ export default class PK9Compass extends PK9 implements PluginPKMInterface {
   }
 
   constructor(arg: ArrayBuffer | OHPKM, options: PkmConstructorOptions) {
-    super(arg, options)
+    if (arg instanceof ArrayBuffer) {
+      const array = new Uint8Array(arg)
+      const inner = options.encrypted ? Pk9Wasm.fromEncryptedBytes(array) : Pk9Wasm.fromBytes(array)
+      super(inner, { strategy: options.strategy })
+    } else {
+      super(arg, options)
+    }
 
     if (arg instanceof ArrayBuffer) {
       this.pluginOrigin = COMPASS_PLUGIN_ID

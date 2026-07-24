@@ -128,8 +128,10 @@ export abstract class Gen8Gen9Save<P extends PK8 | PB8 | PA8 | PK9 | PA9> extend
       if (mon) {
         try {
           if (mon.gameOfOrigin && mon?.dexNum) {
-            mon.recalculateStats()
-            mon.refreshChecksum()
+            if (!(mon instanceof PK9)) {
+              mon.recalculateStats()
+              mon.refreshChecksum()
+            }
             const monBuffer = new Uint8Array(this.getMonBoxSizeBytes())
             const pcBytes = mon.toPCBytes()
 

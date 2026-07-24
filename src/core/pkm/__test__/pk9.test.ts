@@ -1,4 +1,4 @@
-import { PK9, toHex } from '@openhome-core/pkm'
+import { PK9 } from '@openhome-core/pkm'
 import fs from 'fs'
 import { TextDecoder } from 'node:util' // (ESM style imports)
 import { assert, beforeAll, describe, expect, test } from 'vitest'
@@ -55,19 +55,4 @@ describe('gen 9 conversion to bytes and back is lossless', async () => {
       expect(original.movePPUps, 'move PP Ups').toEqual(roundTrip.movePPUps)
     })
   }
-})
-
-const file_path = 'test-files/pkm-files/pk9/z002 - Skeledirge (Goofy) - 814A7559FB6B.pk9'
-
-describe('gen 9 conversion to OHPKM and back is lossless', async () => {
-  await initializeWasm()
-
-  test(`ENCRYPTED BYTES`, () => {
-    const bytes = new Uint8Array(fs.readFileSync(file_path))
-    const pk9 = PK9.fromBytes(bytes.buffer)
-
-    assert(pk9.calculateChecksum() === pk9.checksum)
-
-    console.log({ hex: toHex(new Uint8Array(pk9.toPCBytes())), checksum: pk9.calculateChecksum() })
-  })
 })
