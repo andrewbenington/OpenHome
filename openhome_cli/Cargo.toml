@@ -1,0 +1,12 @@
+[package]
+name = "openhome_cli"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+openhome_core = { path = "../openhome_core", features = [] }
+pkm_rs = {path = "../pkm_rs"}
+pkm_rs_types = {path = "../pkm_rs_types"}
+clap = { version = "4.6.2", features = [ "derive" ] }
+serde = { version = "1.0.229", features = [ "derive" ] }
+tracing = "0.1.44"
