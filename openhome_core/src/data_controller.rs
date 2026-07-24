@@ -214,6 +214,7 @@ where
     T: serde::de::DeserializeOwned,
 {
     if !full_path.as_ref().exists() {
+        println!("doesn't exist: {:?}", full_path.as_ref());
         return Err(Error::file_missing(full_path.as_ref()));
     }
     let json_str = read_file_text(full_path.as_ref())?;
