@@ -41,15 +41,16 @@ impl StartupConfig {
     pub fn load_or_create() -> Result<Self> {
         let file_path = Self::get_file_path()?;
         if !file_path.exists() {
+            println!("doesn't exist: {file_path:?}");
             let config_path = data_controller::get_openhome_config_dir()?;
             if !config_path.exists() {
                 util::create_directory(config_path)?;
             }
             let default = Self::default();
             default.write_to_storage()?;
-
             Ok(default)
         } else {
+            println!("exist: {file_path:?}");
             data_controller::read_file_json(file_path)
         }
     }

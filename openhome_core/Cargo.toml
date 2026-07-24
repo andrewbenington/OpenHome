@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 base64 = "0.22.1"
+chrono = { version = "0.4.45", features = ["serde"] }
 pkm_rs = {path = "../pkm_rs"}
 pkm_rs_derive = {path = "../pkm_rs_derive"}
 semver = "1.0.28"
@@ -12,9 +13,11 @@ serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
 specta = { version = "=2.0.0-rc.22", features = ["chrono", "serde_json", "uuid" ], optional = true }
 strum = "0.28.0"
-tokio = { version = "1.52.3" }
+tokio = { version = "1.52.3", features = ["rt"] }
 tracing = "0.1.44"
-uuid = { version = "1.24.0", features = ["v4"] }
+tracing-appender = "0.2.5"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
+uuid = { version = "1.24.0", features = ["v4", "serde"] }
 
 [lib]
 name = "openhome_core"
