@@ -461,14 +461,14 @@ pub fn update_convert_strat_json_dot_keys(data_controller: &impl DataController)
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use pkm_rs::convert_strategy::NicknameCapitalization;
     use std::assert_matches;
     use std::path::PathBuf;
     use uuid::Uuid;
 
     use crate::Result;
-    use crate::data_controller::test::TestDataController;
+    use crate::data_controller::tests::TestDataController;
     use openhome_core::convert_strategies::{self, ConvertStrategies};
     use openhome_core::data_controller::DataController;
 

@@ -420,7 +420,7 @@ pub fn levelup_learnset_lookup(
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use pkm_rs_types::{NationalDex, PkmType, Stats8};
 

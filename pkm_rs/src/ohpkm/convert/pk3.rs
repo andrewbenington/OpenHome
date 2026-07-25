@@ -210,7 +210,7 @@ impl OhpkmConvert for Pk3 {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use crate::{gen3::Pk3, tests, traits::IsShiny};
     use std::path::PathBuf;
 
