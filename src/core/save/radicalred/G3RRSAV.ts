@@ -41,8 +41,8 @@ export class G3RRSAV extends G3CFRUSAV<PK3RR> {
     return PK3RR.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    return !isRestricted(RR_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
+  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(RR_TRANSFER_RESTRICTIONS, nationalDex, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

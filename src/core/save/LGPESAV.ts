@@ -108,7 +108,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
         const displayBoxNum = Math.floor(monIndex / 30)
         const displayBoxSlot = monIndex % 30
 
-        if (mon !== null && mon.dexNum !== 0) {
+        if (mon !== null && mon.nationalDex !== 0) {
           this.boxes[displayBoxNum].boxSlots[displayBoxSlot] = mon
         }
       } catch (e) {
@@ -127,7 +127,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
       // and the slot was left empty
       if (mon) {
         try {
-          if (mon.gameOfOrigin && mon.dexNum) {
+          if (mon.gameOfOrigin && mon.nationalDex) {
             this.writeMonAtIndex(mon, monIndex)
           }
         } catch (e) {
@@ -190,7 +190,7 @@ export class LGPESAV extends OfficialSAV<PB7> {
     const mon = PB7.fromBytes(monBytes.buffer, true)
 
     if (
-      mon.dexNum === 0 ||
+      mon.nationalDex === 0 ||
       (mon.checksum === EMPTY_SLOT_CHECKSUM && mon.encryptionConstant === 0)
     ) {
       return null
@@ -235,8 +235,8 @@ export class LGPESAV extends OfficialSAV<PB7> {
     return null
   }
 
-  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    return !isRestricted(LGPE_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
+  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(LGPE_TRANSFER_RESTRICTIONS, nationalDex, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {
@@ -263,8 +263,8 @@ export class LGPESAV extends OfficialSAV<PB7> {
     const mon = this.boxes[boxNum].boxSlots[boxSlot]
 
     if (
-      (mon?.dexNum === NationalDex.Pikachu && mon.formNum === LGP_STARTER) ||
-      (mon?.dexNum === NationalDex.Eevee && mon.formNum === LGE_STARTER)
+      (mon?.nationalDex === NationalDex.Pikachu && mon.formIndex === LGP_STARTER) ||
+      (mon?.nationalDex === NationalDex.Eevee && mon.formIndex === LGE_STARTER)
     ) {
       return {
         isDisabled: true,

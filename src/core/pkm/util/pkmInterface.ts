@@ -35,9 +35,7 @@ export interface AllPKMFields {
   contestMemoryCount?: number
   country?: number
   currentHP?: number
-  dexNum: number
-  dirtLocation?: number
-  dirtType?: number
+  nationalDex: number
   dvs?: StatsPreSplit
   dynamaxLevel?: number
   eggDate?: types.PKMDate | undefined
@@ -52,7 +50,7 @@ export interface AllPKMFields {
   favorite?: boolean
   flag2LA?: boolean
   formArgument?: number
-  formNum: number
+  formIndex: number
   fullness?: number
   gameOfOrigin: number
   gameOfOriginBattle?: number

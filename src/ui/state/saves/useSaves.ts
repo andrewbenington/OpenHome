@@ -858,15 +858,15 @@ function pokedexSeenFromSave(saveFile: SAV) {
 
   for (const mon of saveFile.getAllMons()) {
     pokedexUpdates.push({
-      dexNumber: mon.dexNum,
-      formIndex: mon.formNum,
+      nationalDex: mon.nationalDex,
+      formIndex: mon.formIndex,
       status: 'Seen',
     })
 
-    if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
+    if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
       pokedexUpdates.push({
-        dexNumber: mon.dexNum,
-        formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formNum),
+        nationalDex: mon.nationalDex,
+        formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formIndex),
         status: 'Seen',
       })
     }

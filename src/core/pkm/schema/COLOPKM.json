@@ -3,7 +3,7 @@
   "fileName": "COLOPKM",
   "fields": [
     {
-      "name": "dexNum",
+      "name": "nationalDex",
       "type": "number",
       "numBytes": 2,
       "endian": "Big",

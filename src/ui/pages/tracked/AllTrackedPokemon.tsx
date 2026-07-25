@@ -205,15 +205,15 @@ function useColumns(
       frozen: true,
       renderValue: (value) => (
         <button onClick={() => onSelectMon(value)} className="mon-icon-button">
-          <PokemonIcon dexNumber={value.dexNum} formIndex={value.formNum} />
+          <PokemonIcon nationalDex={value.nationalDex} formIndex={value.formIndex} />
         </button>
       ),
       cellClass: 'centered-cell',
       sortFunction: multiSorter(
-        numericSorter((mon) => mon.dexNum),
-        numericSorter((mon) => mon.formNum)
+        numericSorter((mon) => mon.nationalDex),
+        numericSorter((mon) => mon.formIndex)
       ),
-      getFilterValue: (value) => Lookup.speciesName(value.dexNum, Language.English),
+      getFilterValue: (value) => Lookup.speciesName(value.nationalDex, Language.English),
     },
     {
       key: 'nickname',

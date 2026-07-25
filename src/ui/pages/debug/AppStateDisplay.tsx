@@ -71,11 +71,11 @@ function ohpkmStoreDisplay(state: Record<string, OHPKM>) {
 }
 
 function monDisplay(mon: PKMInterface) {
-  const species = SpeciesLookup(mon.dexNum)
+  const species = SpeciesLookup(mon.nationalDex)
 
   return {
-    species: Lookup.speciesName(mon.dexNum, mon.language),
-    form: species?.forms[mon.formNum ?? 0].formeName,
+    species: Lookup.speciesName(mon.nationalDex, mon.language),
+    form: species?.forms[mon.formIndex ?? 0].formeName,
     nickname: mon.nickname,
     origin: mon.gameOfOrigin ? `Pokémon ${OriginGames.gameNameFull(mon.gameOfOrigin)}` : undefined,
   }

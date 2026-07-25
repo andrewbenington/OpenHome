@@ -34,7 +34,7 @@ export default class PB7 {
   }
   encryptionConstant: number
   checksum: number = 0
-  dexNum: number
+  nationalDex: number
   heldItemIndex: number
   trainerID: number
   secretID: number
@@ -47,7 +47,7 @@ export default class PB7 {
   nature: NatureIndex
   isFatefulEncounter: boolean
   gender: number
-  formNum: number
+  formIndex: number
   evs: types.Stats
   avs: types.Stats
   resortEventStatus: number
@@ -114,7 +114,7 @@ export default class PB7 {
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)
-      this.dexNum = dataView.getUint16(0x8, true)
+      this.nationalDex = dataView.getUint16(0x8, true)
       this.heldItemIndex = dataView.getUint16(0xa, true)
       this.trainerID = dataView.getUint16(0xc, true)
       this.secretID = dataView.getUint16(0xe, true)
@@ -127,7 +127,7 @@ export default class PB7 {
       this.nature = new NatureIndex(dataView.getUint8(0x1c))
       this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x1d, 0)
       this.gender = byteLogic.uIntFromBufferBits(dataView, 0x1d, 1, 2, true)
-      this.formNum = byteLogic.uIntFromBufferBits(dataView, 0x1d, 3, 5, true)
+      this.formIndex = byteLogic.uIntFromBufferBits(dataView, 0x1d, 3, 5, true)
       this.evs = types.readStatsFromBytesU8(dataView, 0x1e)
       this.avs = types.readStatsFromBytesU8(dataView, 0x24)
       this.resortEventStatus = dataView.getUint8(0x2a)
@@ -204,7 +204,7 @@ export default class PB7 {
       const metData = converter.metData(other)
 
       this.encryptionConstant = other.encryptionConstant ?? 0
-      this.dexNum = other.dexNum
+      this.nationalDex = other.nationalDex
       this.heldItemIndex = 0
       this.trainerID = other.trainerID
       this.secretID = other.secretID
@@ -217,7 +217,7 @@ export default class PB7 {
       this.nature = other.nature
       this.isFatefulEncounter = other.isFatefulEncounter
       this.gender = other.gender
-      this.formNum = other.formNum
+      this.formIndex = other.formIndex
       this.evs = {
         hp: 0,
         atk: 0,
@@ -307,7 +307,7 @@ export default class PB7 {
 
     dataView.setUint32(0x0, this.encryptionConstant, true)
     dataView.setUint16(0x6, this.checksum, true)
-    dataView.setUint16(0x8, this.dexNum, true)
+    dataView.setUint16(0x8, this.nationalDex, true)
     dataView.setUint16(0xa, this.heldItemIndex, true)
     dataView.setUint16(0xc, this.trainerID, true)
     dataView.setUint16(0xe, this.secretID, true)
@@ -320,7 +320,7 @@ export default class PB7 {
     dataView.setUint8(0x1c, this.nature.index)
     byteLogic.setFlag(dataView, 0x1d, 0, this.isFatefulEncounter)
     byteLogic.uIntToBufferBits(dataView, this.gender, 29, 1, 2, true)
-    byteLogic.uIntToBufferBits(dataView, this.formNum, 29, 3, 5, true)
+    byteLogic.uIntToBufferBits(dataView, this.formIndex, 29, 3, 5, true)
     types.writeStatsToBytesU8(dataView, 0x1e, this.evs)
     types.writeStatsToBytesU8(dataView, 0x24, this.avs)
     dataView.setUint8(0x2a, this.resortEventStatus)
@@ -448,11 +448,11 @@ export default class PB7 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formNum)
+    return MetadataSummaryLookup(this.nationalDex, this.formIndex)
   }
 
   public get speciesMetadata() {
-    return SpeciesLookup(this.dexNum)
+    return SpeciesLookup(this.nationalDex)
   }
 
   static maxValidMove() {

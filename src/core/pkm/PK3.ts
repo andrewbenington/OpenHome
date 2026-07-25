@@ -77,10 +77,10 @@ export default class PK3 implements PKMInterface {
     this.inner.checksum = value
   }
 
-  get dexNum() {
+  get nationalDex() {
     return this.inner.nationalDex
   }
-  set dexNum(value: number) {
+  set nationalDex(value: number) {
     try {
       this.inner.nationalDex = value
     } catch (e) {
@@ -159,7 +159,7 @@ export default class PK3 implements PKMInterface {
     this.inner.gender = value
   }
 
-  get formNum() {
+  get formIndex() {
     return this.inner.formIndex
   }
 
@@ -345,7 +345,7 @@ export default class PK3 implements PKMInterface {
   }
 
   public isValid(): boolean {
-    return this.dexNum > 0 && this.dexNum <= NationalDex.Deoxys
+    return this.nationalDex > 0 && this.nationalDex <= NationalDex.Deoxys
   }
 
   public getStats() {
@@ -380,11 +380,11 @@ export default class PK3 implements PKMInterface {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formNum)
+    return MetadataSummaryLookup(this.nationalDex, this.formIndex)
   }
 
   public get speciesMetadata() {
-    return SpeciesLookup(this.dexNum)
+    return SpeciesLookup(this.nationalDex)
   }
 
   static maxValidMove() {

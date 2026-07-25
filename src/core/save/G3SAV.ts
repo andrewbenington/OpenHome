@@ -322,7 +322,7 @@ export class G3SAV extends OfficialSAV<PK3> {
 
       if (mon) {
         try {
-          if (mon?.gameOfOrigin && mon?.dexNum) {
+          if (mon?.gameOfOrigin && mon?.nationalDex) {
             mon.refreshChecksum()
             pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
           }
@@ -350,9 +350,11 @@ export class G3SAV extends OfficialSAV<PK3> {
     return PK3.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     if (extraFormIndex !== undefined) return false
-    return dexNumber <= NationalDex.Deoxys && (formeNumber === 0 || dexNumber === NationalDex.Unown)
+    return (
+      nationalDex <= NationalDex.Deoxys && (formeNumber === 0 || nationalDex === NationalDex.Unown)
+    )
   }
 
   supportsItem(itemIndex: number) {

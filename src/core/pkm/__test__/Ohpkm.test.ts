@@ -113,29 +113,29 @@ describe('evolution and form change update ohpkm', async () => {
     const dialgaBytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pa8', 'dialga.pa8')))
 
     const dialgaPa8 = PA8.fromBytes(dialgaBytes.buffer)
-    expect(dialgaPa8.dexNum).toEqual(NationalDex.Dialga)
+    expect(dialgaPa8.nationalDex).toEqual(NationalDex.Dialga)
 
     const dialgaOhpkm = OHPKM.fromMonUnknownSave(dialgaPa8)
 
-    expect(dialgaOhpkm.formNum).toEqual(0)
+    expect(dialgaOhpkm.formIndex).toEqual(0)
 
-    dialgaPa8.formNum = 1 // origin forme
+    dialgaPa8.formIndex = 1 // origin forme
 
     dialgaOhpkm.syncWithGameData(dialgaPa8)
-    expect(dialgaOhpkm.formNum).toEqual(1)
+    expect(dialgaOhpkm.formIndex).toEqual(1)
   })
 
   test(`galar mr mime evolution updates OHPKM species/form`, () => {
     const mrMimeBytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('pk8', 'mr-mime-galar.pk8')))
 
     const mrMimeGalarPk8 = PK8.fromBytes(mrMimeBytes.buffer)
-    expect(mrMimeGalarPk8.dexNum).toEqual(NationalDex.MrMime)
-    expect(mrMimeGalarPk8.formNum).toEqual(1)
+    expect(mrMimeGalarPk8.nationalDex).toEqual(NationalDex.MrMime)
+    expect(mrMimeGalarPk8.formIndex).toEqual(1)
 
     const mrMimeOhpkm = OHPKM.fromMonUnknownSave(mrMimeGalarPk8)
 
-    expect(mrMimeOhpkm.dexNum).toEqual(NationalDex.MrMime)
-    expect(mrMimeOhpkm.formNum).toEqual(1)
+    expect(mrMimeOhpkm.nationalDex).toEqual(NationalDex.MrMime)
+    expect(mrMimeOhpkm.formIndex).toEqual(1)
 
     // simulate evolution
     const mrRime = mrMimeOhpkm
@@ -145,8 +145,8 @@ describe('evolution and form change update ohpkm', async () => {
     mrRime.speciesAndForm = mrRimeSpeciesForm
 
     mrMimeOhpkm.syncWithGameData(mrRime)
-    expect(mrMimeOhpkm.dexNum).toEqual(NationalDex.MrRime)
-    expect(mrMimeOhpkm.formNum).toEqual(0)
+    expect(mrMimeOhpkm.nationalDex).toEqual(NationalDex.MrRime)
+    expect(mrMimeOhpkm.formIndex).toEqual(0)
   })
 })
 
@@ -155,8 +155,8 @@ test('Game Boy Pokemon in the same evolution family have distinct OpenHome IDs',
   const abra = PK2.fromBytes(bytes.buffer)
   const kadabra = PK2.fromBytes(bytes.buffer.slice(0))
 
-  abra.dexNum = NationalDex.Abra
-  kadabra.dexNum = NationalDex.Kadabra
+  abra.nationalDex = NationalDex.Abra
+  kadabra.nationalDex = NationalDex.Kadabra
 
   expect(OHPKM.fromMonUnknownSave(abra).openhomeId).not.toEqual(
     OHPKM.fromMonUnknownSave(kadabra).openhomeId
@@ -183,7 +183,7 @@ describe('plugin form persistence', () => {
     const original = PB8LUMI.fromBytes(stitchedGengarBytes.buffer)
 
     expect(original.pluginOrigin).toEqual('luminescent_platinum')
-    expect(original.dexNum).toEqual(NationalDex.Gengar)
+    expect(original.nationalDex).toEqual(NationalDex.Gengar)
     expect(original.extraFormIndex).toEqual(ExtraFormIndex.GengarStitched)
 
     const ohpkm = OHPKM.fromMonUnknownSave(original)

@@ -36,8 +36,8 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
   const { mon } = props
 
   const spriteResult = useMonSprite({
-    dexNum: mon.dexNum,
-    formNum: mon.formNum,
+    nationalDex: mon.nationalDex,
+    formIndex: mon.formIndex,
     formArgument: mon.formArgument,
     isShiny: mon.isShiny(),
     isFemale: mon.gender === 1,
@@ -47,7 +47,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
   })
 
   const itemAltText = useMemo(() => {
-    const monData = MetadataSummaryLookup(mon.dexNum, mon.formNum)
+    const monData = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
 
     if (!monData) return 'pokemon sprite'
     return `${monData.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
@@ -69,8 +69,8 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
             />
           ) : (
             <PokemonIcon
-              dexNumber={mon.dexNum}
-              formIndex={mon.formNum}
+              nationalDex={mon.nationalDex}
+              formIndex={mon.formIndex}
               style={{
                 width: '60%',
                 height: '90%',
@@ -186,12 +186,12 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
                 {extraFormDisplayName(mon.extraFormIndex)}
               </span>
             ) : (
-              MetadataSummaryLookup(mon.dexNum, mon.formNum)?.formeName
+              MetadataSummaryLookup(mon.nationalDex, mon.formIndex)?.formeName
             )}
             <GenderIcon gender={mon.gender} />
           </Flex>
         </AttributeRow>
-        <AttributeRow label="Dex No." value={`${mon.dexNum}`} />
+        <AttributeRow label="Dex No." value={`${mon.nationalDex}`} />
         <AttributeRow label="Type">
           {getTypes(mon)?.map((type) => (
             <TypeIcon type={type} key={`${type}_type_icon`} />

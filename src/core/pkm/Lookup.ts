@@ -28,8 +28,8 @@ export const getMonFileIdentifier = (mon: PKMInterface): OhpkmIdentifier | undef
 }
 
 type HomeIdentifierDerivableMon = {
-  dexNum: number
-  formNum: number
+  nationalDex: number
+  formIndex: number
   trainerID: number
   secretID: number
   personalityValue: number
@@ -41,10 +41,10 @@ const bytesToString = (value: number, numBytes: number) => {
 }
 
 function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentifier {
-  const baseMon = getBaseMon(mon.dexNum, mon.formNum)
+  const baseMon = getBaseMon(mon.nationalDex, mon.formIndex)
 
   if (!baseMon) {
-    throw Error(`Invalid dex/form: ${mon.dexNum} / ${mon.formNum}`)
+    throw Error(`Invalid dex/form: ${mon.nationalDex} / ${mon.formIndex}`)
   }
 
   return `${baseMon.nationalDex.toString().padStart(4, '0')}-${bytesToString(
@@ -66,7 +66,7 @@ export const getMonGen12Identifier = (mon: PKMInterface): Option<Gen12Identifier
   const gen12Bytes = utf16StringToGen12(mon.trainerName, 8, true)
   const dataView = new DataView(gen12Bytes.buffer)
   const convertedTrainerName = readGameBoyStringFromBytes(dataView, 0, 8)
-  const baseMon = getBaseMon(mon.dexNum, mon.formNum)
+  const baseMon = getBaseMon(mon.nationalDex, mon.formIndex)
   let tid = mon.trainerID
 
   if (mon instanceof OHPKM && !OriginGames.isGameboy(mon.gameOfOrigin)) {
@@ -88,7 +88,7 @@ export const getMonGen345Identifier = (
   mon: PKMInterface,
   keepOriginalPid: boolean = false
 ): Option<Gen345Identifier> => {
-  const baseMon = getBaseMon(mon.dexNum, mon.formNum)
+  const baseMon = getBaseMon(mon.nationalDex, mon.formIndex)
 
   try {
     let pk3CompatiblePID
@@ -118,21 +118,22 @@ export const getMonGen345Identifier = (
 }
 
 export function isEvolution(prevo: PKMFormeRef, possibleEvo: PKMFormeRef): boolean {
-  const prevoForme = MetadataSummaryLookup(prevo.dexNum, prevo.formNum)
-  const possibleEvoForme = MetadataSummaryLookup(possibleEvo.dexNum, possibleEvo.formNum)
+  const prevoForme = MetadataSummaryLookup(prevo.nationalDex, prevo.formIndex)
+  const possibleEvoForme = MetadataSummaryLookup(possibleEvo.nationalDex, possibleEvo.formIndex)
 
   if (!prevoForme || !possibleEvoForme) return false
 
   if (
     prevoForme.evolutions.some(
-      (evo) => evo.nationalDex === possibleEvo.dexNum && evo.formIndex === possibleEvo.formNum
+      (evo) =>
+        evo.nationalDex === possibleEvo.nationalDex && evo.formIndex === possibleEvo.formIndex
     )
   ) {
     return true
   }
 
   for (const evo of prevoForme.evolutions) {
-    if (isEvolution(prevo, { dexNum: evo.nationalDex, formNum: evo.formIndex })) {
+    if (isEvolution(prevo, { nationalDex: evo.nationalDex, formIndex: evo.formIndex })) {
       return true
     }
   }

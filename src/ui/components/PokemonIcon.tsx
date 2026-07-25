@@ -21,7 +21,7 @@ import { TagIcon } from './TagIcon'
 import './components.css'
 
 export interface PokemonIconProps extends HTMLAttributes<HTMLDivElement> {
-  dexNumber: number
+  nationalDex: number
   formIndex?: number
   isShiny?: boolean
   isEgg?: boolean
@@ -49,12 +49,12 @@ function getBackgroundPosition(formeMetadata?: FormMetadata, isEgg?: boolean) {
 type IconType = 'spritesheet' | 'image'
 
 function iconType(
-  dexNumber: number,
+  nationalDex: number,
   formIndex: number,
   extraFormIndex: Option<ExtraFormIndex>
 ): IconType {
-  const formeMetadata = MetadataSummaryLookup(dexNumber, formIndex ?? 0)
-  const inChampions = !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, dexNumber, formIndex)
+  const formeMetadata = MetadataSummaryLookup(nationalDex, formIndex ?? 0)
+  const inChampions = !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, nationalDex, formIndex)
   const isGen9Mega = formeMetadata?.isMega && formeMetadata.introducedGen === Generation.G9
   const extraFormWithSprite = Boolean(extraFormIndex && extraFormSpriteName(extraFormIndex))
 
@@ -62,23 +62,23 @@ function iconType(
     inChampions ||
     isGen9Mega ||
     extraFormWithSprite ||
-    FormsUsingImages.get(dexNumber)?.includes(formIndex ?? 0)
+    FormsUsingImages.get(nationalDex)?.includes(formIndex ?? 0)
 
   return shouldUseImage ? 'image' : 'spritesheet'
 }
 
 export default function PokemonIcon(props: PokemonIconProps) {
-  const { dexNumber, formIndex, isShiny, heldItemIndex, onlyItem, silhouette, isEgg } = props
+  const { nationalDex, formIndex, isShiny, heldItemIndex, onlyItem, silhouette, isEgg } = props
   const { grayedOut, topRightIndicator, tags, hasNotes, style, onClick, extraFormIndex } = props
   const { showNotesIndicator, showTags } = useMonDisplay()
 
   let monImage = null
 
-  switch (iconType(dexNumber, formIndex ?? 0, extraFormIndex)) {
+  switch (iconType(nationalDex, formIndex ?? 0, extraFormIndex)) {
     case 'image': {
       monImage = (
         <PokemonIconUsingImage
-          dexNumber={dexNumber}
+          nationalDex={nationalDex}
           formeNumber={formIndex}
           extraFormIndex={extraFormIndex}
           silhouette={silhouette}
@@ -89,7 +89,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
       break
     }
     case 'spritesheet':
-      const formeMetadata = MetadataSummaryLookup(dexNumber, formIndex ?? 0)
+      const formeMetadata = MetadataSummaryLookup(nationalDex, formIndex ?? 0)
       monImage = formeMetadata ? (
         <PokemonIconUsingSheet
           formeMetadata={formeMetadata}
@@ -173,7 +173,7 @@ function PokemonIconUsingSheet(props: PokemonIconUsingSheetProps) {
 }
 
 interface PokemonIconUsingImageProps {
-  dexNumber: number
+  nationalDex: number
   formeNumber?: number
   extraFormIndex?: number
   silhouette?: boolean
@@ -184,7 +184,7 @@ interface PokemonIconUsingImageProps {
 const DEFAULT_BOX_ICON = `/items/index/0000.png`
 
 function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
-  const { dexNumber, formeNumber, extraFormIndex, silhouette, onClick } = props
+  const { nationalDex, formeNumber, extraFormIndex, silhouette, onClick } = props
   const [spritePath, setSpritePath] = useState(DEFAULT_BOX_ICON)
   const [imageLoadFailed, setImageLoadFailed] = useState(false)
 
@@ -192,8 +192,8 @@ function PokemonIconUsingImage(props: PokemonIconUsingImageProps) {
 
   if (spritePath === DEFAULT_BOX_ICON && !imageLoadFailed) {
     const spriteResult = boxIconImagePath({
-      dexNum: dexNumber,
-      formNum: formeNumber ?? 0,
+      nationalDex: nationalDex,
+      formIndex: formeNumber ?? 0,
       format: 'OHPKM',
       extraFormIndex,
       isShiny: props.isShiny,

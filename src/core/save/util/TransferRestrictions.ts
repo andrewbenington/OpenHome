@@ -10,7 +10,7 @@ import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { ExtraFormIndex } from '@pkm-rs/pkg'
 
 interface FormRestrictions {
-  [dexNum: number]: number[] | undefined
+  [nationalDex: number]: number[] | undefined
 }
 
 export interface TransferRestrictions {
@@ -158,8 +158,8 @@ export const RegionalForms: FormRestrictions = {
 
 export const isRestricted = (
   restrictions: TransferRestrictions,
-  dexNum: number,
-  formNum?: number,
+  nationalDex: number,
+  formIndex?: number,
   extraFormIndex?: ExtraFormIndex
 ) => {
   const { maxDexNum, transferableDexNums, excludedForms, supportsExtraForm } = restrictions
@@ -167,13 +167,17 @@ export const isRestricted = (
   if (extraFormIndex && !supportsExtraForm?.(extraFormIndex)) {
     return true
   }
-  if (maxDexNum && dexNum > maxDexNum) {
+  if (maxDexNum && nationalDex > maxDexNum) {
     return true
   }
-  if (transferableDexNums && !transferableDexNums.includes(dexNum)) {
+  if (transferableDexNums && !transferableDexNums.includes(nationalDex)) {
     return true
   }
-  if (excludedForms && excludedForms[dexNum] && excludedForms[dexNum]?.includes(formNum ?? 0)) {
+  if (
+    excludedForms &&
+    excludedForms[nationalDex] &&
+    excludedForms[nationalDex]?.includes(formIndex ?? 0)
+  ) {
     return true
   }
   return false

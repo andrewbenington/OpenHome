@@ -99,7 +99,7 @@ export class BdspSave extends OfficialSAV<PB8> {
           const monData = (bytes.buffer as ArrayBuffer).slice(startByte, endByte)
           const mon = this.buildPKM(monData, true)
 
-          if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
+          if (mon.gameOfOrigin !== 0 && mon.nationalDex !== 0) {
             this.boxes[box].boxSlots[monIndex] = mon
           }
         } catch (e) {
@@ -156,7 +156,7 @@ export class BdspSave extends OfficialSAV<PB8> {
       // and the slot was left empty
       if (mon) {
         try {
-          if (mon?.gameOfOrigin && mon?.dexNum) {
+          if (mon?.gameOfOrigin && mon?.nationalDex) {
             mon.refreshChecksum()
             this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
           }
@@ -187,8 +187,8 @@ export class BdspSave extends OfficialSAV<PB8> {
     return uint8ArrayToBase64(this.calculateChecksumBytes())
   }
 
-  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    return !isRestricted(BDSP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
+  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(BDSP_TRANSFER_RESTRICTIONS, nationalDex, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

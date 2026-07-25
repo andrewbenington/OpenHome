@@ -145,7 +145,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
 
   slotIsEmpty(box: number, boxSlot: number): boolean {
     const mon = PK4.fromBytes(this.getMonBytesAt(box, boxSlot), true)
-    return mon.dexNum === 0
+    return mon.nationalDex === 0
   }
 
   getStorageChecksum() {
@@ -178,7 +178,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
       // and the slot was left empty
       if (mon) {
         try {
-          if (mon.gameOfOrigin && mon.dexNum) {
+          if (mon.gameOfOrigin && mon.nationalDex) {
             mon.refreshChecksum()
             this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
           }
@@ -202,7 +202,7 @@ export abstract class G4SAV extends OfficialSAV<PK4> {
   }
 
   abstract supportsMon(
-    dexNumber: number,
+    nationalDex: number,
     formeNumber: number,
     extraFormIndex?: ExtraFormIndex
   ): boolean

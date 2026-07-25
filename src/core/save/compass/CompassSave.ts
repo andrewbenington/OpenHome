@@ -182,15 +182,20 @@ export class CompassSave extends PluginSAV<PK9Compass> {
     return 0
   }
 
-  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     const revision = this.scBlocks ? this.getSaveRevision() : 'Indigo Disk'
     switch (revision) {
       case 'Base Game':
-        return !isRestricted(SV_TRANSFER_RESTRICTIONS_BASE, dexNumber, formeNumber, extraFormIndex)
+        return !isRestricted(
+          SV_TRANSFER_RESTRICTIONS_BASE,
+          nationalDex,
+          formeNumber,
+          extraFormIndex
+        )
       case 'Teal Mask':
-        return !isRestricted(SV_TRANSFER_RESTRICTIONS_TM, dexNumber, formeNumber, extraFormIndex)
+        return !isRestricted(SV_TRANSFER_RESTRICTIONS_TM, nationalDex, formeNumber, extraFormIndex)
       case 'Indigo Disk':
-        return !isRestricted(SV_TRANSFER_RESTRICTIONS_ID, dexNumber, formeNumber, extraFormIndex)
+        return !isRestricted(SV_TRANSFER_RESTRICTIONS_ID, nationalDex, formeNumber, extraFormIndex)
     }
   }
 
@@ -238,7 +243,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
   isEmptySlot(bytes: ArrayBuffer): boolean {
     const mon = this.monConstructor(bytes, true)
 
-    return mon.gameOfOrigin === 0 && mon.dexNum === 0
+    return mon.gameOfOrigin === 0 && mon.nationalDex === 0
   }
 
   prepareForSaving() {
@@ -256,7 +261,7 @@ export class CompassSave extends PluginSAV<PK9Compass> {
       // and the slot was left empty
       if (mon) {
         try {
-          if (mon.gameOfOrigin && mon?.dexNum) {
+          if (mon.gameOfOrigin && mon?.nationalDex) {
             mon.recalculateStats()
             mon.refreshChecksum()
             const monBuffer = new Uint8Array(this.getMonBoxSizeBytes())

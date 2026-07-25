@@ -19,8 +19,8 @@ test('all box icons are present', () => {
       (f) => iconType(species.nationalDex, f.formIndex, undefined) === 'image'
     )) {
       const spriteResult = boxIconImagePath({
-        dexNum: species.nationalDex,
-        formNum: form.formIndex,
+        nationalDex: species.nationalDex,
+        formIndex: form.formIndex,
         format: 'OHPKM',
         extraFormIndex: undefined,
       })
@@ -53,8 +53,8 @@ describe('all home sprites are present', () => {
         (f) => iconType(species.nationalDex, f.formIndex, undefined) === 'image'
       )) {
         const spritePath = getPokemonSpritePath({
-          dexNum: species.nationalDex,
-          formNum: form.formIndex,
+          nationalDex: species.nationalDex,
+          formIndex: form.formIndex,
           format: 'OHPKM',
           extraFormIndex: undefined,
         })
@@ -81,8 +81,8 @@ describe('all home sprites are present', () => {
     )) {
       for (const sweet of Object.values(SWEETS).filter((s) => typeof s !== 'string')) {
         const spritePath = getPokemonSpritePath({
-          dexNum: species.nationalDex,
-          formNum: form.formIndex,
+          nationalDex: species.nationalDex,
+          formIndex: form.formIndex,
           format: 'OHPKM',
           extraFormIndex: undefined,
           formArgument: sweet,

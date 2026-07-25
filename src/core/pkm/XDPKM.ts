@@ -39,7 +39,7 @@ export default class XDPKM {
   static getBoxSize() {
     return 196
   }
-  dexNum: number
+  nationalDex: number
   heldItemIndexGen3?: ItemGen3
   currentHP: number
   trainerFriendship: number
@@ -73,7 +73,7 @@ export default class XDPKM {
     if (arg instanceof ArrayBuffer) {
       const buffer = arg
       const dataView = new DataView(buffer)
-      this.dexNum = dataView.getUint16(0x0, false)
+      this.nationalDex = dataView.getUint16(0x0, false)
       this.heldItemIndexGen3 = ItemGen3.fromIndex(dataView.getUint16(0x2, false))
       this.currentHP = dataView.getUint16(0x4, false)
       this.trainerFriendship = dataView.getUint16(0x6, false)
@@ -124,7 +124,7 @@ export default class XDPKM {
       const converter = new PkmConverter('XDPKM', options.strategy)
       const metData = converter.metData(other)
 
-      this.dexNum = other.dexNum
+      this.nationalDex = other.nationalDex
       this.heldItemIndexGen3 = ItemGen3.fromModern(other.heldItemIndex)
       this.currentHP = other.currentHP
       this.trainerFriendship = other.trainerFriendship
@@ -178,7 +178,7 @@ export default class XDPKM {
     const buffer = new ArrayBuffer(196)
     const dataView = new DataView(buffer)
 
-    dataView.setUint16(0x0, this.dexNum, false)
+    dataView.setUint16(0x0, this.nationalDex, false)
     dataView.setUint16(0x2, this.heldItemIndex, false)
     dataView.setUint16(0x4, this.currentHP, false)
     dataView.setUint16(0x6, this.trainerFriendship, false)
@@ -254,8 +254,8 @@ export default class XDPKM {
     return this.metadata?.abilityByNumGen3(this.abilityNum)
   }
 
-  public get formNum() {
-    if (this.dexNum === NationalDex.Unown) {
+  public get formIndex() {
+    if (this.nationalDex === NationalDex.Unown) {
       let letterValue = (this.personalityValue >> 24) & 0x3
       letterValue = ((this.personalityValue >> 16) & 0x3) | (letterValue << 2)
       letterValue = ((this.personalityValue >> 8) & 0x3) | (letterValue << 2)
@@ -289,11 +289,11 @@ export default class XDPKM {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formNum)
+    return MetadataSummaryLookup(this.nationalDex, this.formIndex)
   }
 
   public get speciesMetadata() {
-    return SpeciesLookup(this.dexNum)
+    return SpeciesLookup(this.nationalDex)
   }
 
   static maxValidMove() {

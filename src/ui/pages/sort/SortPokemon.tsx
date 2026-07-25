@@ -101,7 +101,7 @@ export default function SortPokemon() {
   // Saves that can accept at least one of the selected mons
   const validDestSaves = useMemo(() => {
     return savesAndBanks.allOpenSaves.filter((save) =>
-      selectedHomeMons.some((item) => save.supportsMon(item.mon.dexNum, item.mon.formNum))
+      selectedHomeMons.some((item) => save.supportsMon(item.mon.nationalDex, item.mon.formIndex))
     )
   }, [savesAndBanks.allOpenSaves, selectedHomeMons])
 
@@ -111,7 +111,7 @@ export default function SortPokemon() {
 
       for (const item of selectedHomeMons) {
         const mon = item.mon
-        if (!targetSave.supportsMon(mon.dexNum, mon.formNum)) {
+        if (!targetSave.supportsMon(mon.nationalDex, mon.formIndex)) {
           currentFailures.push(`${mon.nickname || 'Pokémon'}: Not supported by target save`)
           continue
         }
@@ -200,8 +200,8 @@ export default function SortPokemon() {
             className="sort-mon-button"
           >
             <PokemonIcon
-              dexNumber={monWithSave.mon.dexNum}
-              formIndex={monWithSave.mon.formNum}
+              nationalDex={monWithSave.mon.nationalDex}
+              formIndex={monWithSave.mon.formIndex}
               isEgg={monWithSave.mon.isEgg}
               isShiny={monWithSave.mon.isShiny()}
               style={{ width: '80%', height: '80%' }}

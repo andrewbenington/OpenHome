@@ -94,8 +94,8 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
   language: Language
   markings: MarkingsFourShapes
   internalSpeciesIndex: number
-  dexNum: number
-  formNum: number
+  nationalDex: number
+  formIndex: number
   extraFormIndex: Option<ExtraFormIndex>
   internalHeldItemIndex: number
   abstract heldItemIndex: number
@@ -170,14 +170,14 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
       this.extraFormIndex = speciesData.extraFormIndex
 
       if (speciesData.nationalDex < 0) {
-        this.dexNum = 0
-        this.formNum = 0
+        this.nationalDex = 0
+        this.formIndex = 0
       } else if (speciesData.nationalDex === NationalDex.Unown) {
-        this.dexNum = NationalDex.Unown
-        this.formNum = unownFormFromPid(this.personalityValue)
+        this.nationalDex = NationalDex.Unown
+        this.formIndex = unownFormFromPid(this.personalityValue)
       } else {
-        this.dexNum = speciesData.nationalDex
-        this.formNum = speciesData.formIndex
+        this.nationalDex = speciesData.nationalDex
+        this.formIndex = speciesData.formIndex
       }
 
       this.isFakemon = this.indexIsFakemon(this.internalSpeciesIndex)
@@ -256,8 +256,8 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
       this.secretID = other.secretID
       this.language = other.language
       this.markings = markingsFourShapesFromOther(other.markings)
-      this.dexNum = other.dexNum
-      this.formNum = other.formNum
+      this.nationalDex = other.nationalDex
+      this.formIndex = other.formIndex
       this.extraFormIndex = other.extraFormIndex
       this.internalHeldItemIndex = this.internalItemIndexFromModern(other.heldItemIndex)
       this.exp = other.exp
@@ -289,7 +289,7 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
         this.internalMetLocationIndex = FIRERED_IN_GAME_TRADE
       }
 
-      this.internalSpeciesIndex = this.monToGameIndex(other.dexNum, other.formNum)
+      this.internalSpeciesIndex = this.monToGameIndex(other.nationalDex, other.formIndex)
 
       if (other.pluginOrigin === this.getPluginIdentifier()) {
         this.pluginOrigin = other.pluginOrigin
@@ -374,8 +374,8 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
     if (this.pluginForm) {
       dataView.setUint16(0x1c, this.pluginForm, true)
     } else {
-      const formNum = this.dexNum === NationalDex.Unown ? 0 : this.formNum
-      dataView.setUint16(0x1c, this.monToGameIndex(this.dexNum, formNum), true)
+      const formIndex = this.nationalDex === NationalDex.Unown ? 0 : this.formIndex
+      dataView.setUint16(0x1c, this.monToGameIndex(this.nationalDex, formIndex), true)
     }
 
     // 30:32 Held Item
@@ -488,11 +488,11 @@ export default abstract class PK3CFRU implements PluginPKMInterface {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formNum)
+    return MetadataSummaryLookup(this.nationalDex, this.formIndex)
   }
 
   public get speciesMetadata() {
-    return SpeciesLookup(this.dexNum)
+    return SpeciesLookup(this.nationalDex)
   }
 
   static maxValidMove() {
