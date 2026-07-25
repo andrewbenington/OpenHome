@@ -67,7 +67,9 @@ export function useManageTracked() {
       const savePaths = await backend.getRecentSaves().then(
         R.map((saves) =>
           Object.values(saves)
-            .filter((s) => monPossiblySupported(mon.dexNum, mon.formNum, s, mon.extraFormIndex))
+            .filter((s) =>
+              monPossiblySupported(mon.nationalDex, mon.formIndex, s, mon.extraFormIndex)
+            )
             .map((s) => s.filePath)
         )
       )
@@ -288,7 +290,7 @@ export type FindingSavesForAllState =
   | { type: 'error'; error: string }
 
 function monPossiblySupported(
-  dexNumber: number,
+  nationalDex: number,
   formeNumber: number,
   saveRef: SaveRef,
   extraFormIndex?: ExtraFormIndex
@@ -296,7 +298,7 @@ function monPossiblySupported(
   if (saveRef.game === null) return false
 
   function isSupported(restrictions: TransferRestrictions) {
-    return !isRestricted(restrictions, dexNumber, formeNumber, extraFormIndex)
+    return !isRestricted(restrictions, nationalDex, formeNumber, extraFormIndex)
   }
 
   if (saveRef.pluginIdentifier === 'radical_red') {

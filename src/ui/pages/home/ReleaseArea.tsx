@@ -30,8 +30,8 @@ export default function ReleaseArea() {
           {mons.map((mon, i) => (
             <PokemonIcon
               key={`delete_mon_${i}`}
-              dexNumber={mon.dexNum}
-              formIndex={mon.formNum}
+              nationalDex={mon.nationalDex}
+              formIndex={mon.formIndex}
               style={{ height: 32, width: 32 }}
             />
           ))}

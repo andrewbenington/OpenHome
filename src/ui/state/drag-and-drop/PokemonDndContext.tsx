@@ -52,17 +52,17 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
   )
 
   const draggingMon = dragState.payload?.kind === 'mon' ? dragState.payload.monData.mon : undefined
-  let formeNumber = draggingMon?.formNum ?? 0
+  let formeNumber = draggingMon?.formIndex ?? 0
 
   if (draggingMon && isMegaStone(draggingMon.heldItemIndex)) {
     const megaForStone = MetadataSummaryLookup(
-      draggingMon.dexNum,
-      draggingMon.formNum
+      draggingMon.nationalDex,
+      draggingMon.formIndex
     )?.megaEvolutions.find((mega) => mega.requiredItemId === draggingMon.heldItemIndex)
 
     if (megaForStone) formeNumber = megaForStone.megaForme.formIndex
-  } else if (draggingMon && isBattleFormeItem(draggingMon.dexNum, draggingMon.heldItemIndex)) {
-    formeNumber = displayIndexAdder(draggingMon.heldItemIndex)(draggingMon.formNum)
+  } else if (draggingMon && isBattleFormeItem(draggingMon.nationalDex, draggingMon.heldItemIndex)) {
+    formeNumber = displayIndexAdder(draggingMon.heldItemIndex)(draggingMon.formIndex)
   }
 
   const onDragOver = useCallback(
@@ -196,7 +196,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
               if (
                 !dest.isHome &&
                 targetSave &&
-                !targetSave.supportsMon(currMon.dexNum, currMon.formNum)
+                !targetSave.supportsMon(currMon.nationalDex, currMon.formIndex)
               ) {
                 continue
               }
@@ -255,7 +255,7 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
           dragState.payload?.kind === 'mon' && (
             <div style={{ width: '100%', height: '100%', position: 'relative' }}>
               <PokemonIcon
-                dexNumber={dragState.payload?.monData.mon.dexNum ?? 0}
+                nationalDex={dragState.payload?.monData.mon.nationalDex ?? 0}
                 formIndex={formeNumber}
                 isShiny={dragState.payload?.monData.mon.isShiny()}
                 heldItemIndex={dragState.payload?.monData.mon.heldItemIndex}

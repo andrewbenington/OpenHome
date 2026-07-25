@@ -39,7 +39,7 @@ export default class PA9 {
   }
   encryptionConstant: number
   checksum: number = 0
-  dexNum: number
+  nationalDex: number
   heldItemIndex: number
   trainerID: number
   secretID: number
@@ -55,7 +55,7 @@ export default class PA9 {
   isFatefulEncounter: boolean
   gender: number
   isAlpha: boolean
-  formNum: number
+  formIndex: number
   evs: types.Stats
   contest: ContestStats
   pokerusByte: number
@@ -120,7 +120,7 @@ export default class PA9 {
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)
-      this.dexNum = conversion.fromSVPokemonIndex(dataView.getUint16(0x8, true))
+      this.nationalDex = conversion.fromSVPokemonIndex(dataView.getUint16(0x8, true))
       this.heldItemIndex = dataView.getUint16(0xa, true)
       this.trainerID = dataView.getUint16(0xc, true)
       this.secretID = dataView.getUint16(0xe, true)
@@ -136,7 +136,7 @@ export default class PA9 {
       this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x22, 0)
       this.gender = byteLogic.uIntFromBufferBits(dataView, 0x22, 1, 2, true)
       this.isAlpha = byteLogic.getFlag(dataView, 0x23, 0)
-      this.formNum = dataView.getUint16(0x24, true)
+      this.formIndex = dataView.getUint16(0x24, true)
       this.evs = types.readStatsFromBytesU8(dataView, 0x26)
       this.contest = types.readContestStatsFromBytes(dataView, 0x2c)
       this.pokerusByte = dataView.getUint8(0x32)
@@ -214,7 +214,7 @@ export default class PA9 {
       const metData = converter.metData(other)
 
       this.encryptionConstant = other.encryptionConstant ?? 0
-      this.dexNum = other.dexNum
+      this.nationalDex = other.nationalDex
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
@@ -237,7 +237,7 @@ export default class PA9 {
       this.isFatefulEncounter = other.isFatefulEncounter ?? false
       this.gender = other.gender ?? 0
       this.isAlpha = other.isAlpha ?? false
-      this.formNum = other.formNum
+      this.formIndex = other.formIndex
       this.evs = other.evs ?? {
         hp: 0,
         atk: 0,
@@ -328,7 +328,7 @@ export default class PA9 {
 
     dataView.setUint32(0x0, this.encryptionConstant, true)
     dataView.setUint16(0x6, this.checksum, true)
-    dataView.setUint16(0x8, conversion.toSVPokemonIndex(this.dexNum), true)
+    dataView.setUint16(0x8, conversion.toSVPokemonIndex(this.nationalDex), true)
     dataView.setUint16(0xa, this.heldItemIndex, true)
     dataView.setUint16(0xc, this.trainerID, true)
     dataView.setUint16(0xe, this.secretID, true)
@@ -344,7 +344,7 @@ export default class PA9 {
     byteLogic.setFlag(dataView, 0x22, 0, this.isFatefulEncounter)
     byteLogic.setFlag(dataView, 0x23, 0, this.isAlpha)
     byteLogic.uIntToBufferBits(dataView, this.gender, 34, 1, 2, true)
-    dataView.setUint16(0x24, this.formNum, true)
+    dataView.setUint16(0x24, this.formIndex, true)
     types.writeStatsToBytesU8(dataView, 0x26, this.evs)
     types.writeContestStatsToBytes(dataView, 0x2c, this.contest)
     dataView.setUint8(0x32, this.pokerusByte)
@@ -471,11 +471,11 @@ export default class PA9 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formNum)
+    return MetadataSummaryLookup(this.nationalDex, this.formIndex)
   }
 
   public get speciesMetadata() {
-    return SpeciesLookup(this.dexNum)
+    return SpeciesLookup(this.nationalDex)
   }
 
   static maxValidMove() {

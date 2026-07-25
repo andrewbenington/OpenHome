@@ -121,7 +121,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
           const mon = this.buildPKM(monData, true)
 
           // Only populate slots containing valid Pokémon
-          if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
+          if (mon.gameOfOrigin !== 0 && mon.nationalDex !== 0) {
             this.boxes[box].boxSlots[monIndex] = mon
           }
         } catch (e) {
@@ -226,7 +226,7 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
 
       if (mon) {
         try {
-          if (mon?.gameOfOrigin && mon?.dexNum) {
+          if (mon?.gameOfOrigin && mon?.nationalDex) {
             mon.refreshChecksum()
             this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
           }
@@ -256,8 +256,8 @@ export class G8LumiSAV extends PluginSAV<PB8LUMI> {
     return toBase64(this.calculateChecksumBytes())
   }
 
-  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    return !isRestricted(LP_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
+  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(LP_TRANSFER_RESTRICTIONS, nationalDex, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

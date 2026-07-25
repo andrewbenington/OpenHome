@@ -34,8 +34,8 @@ export default function Gen345Lookup({ onSelectMon }: Gen345LookupProps) {
             className="mon-icon-button"
           >
             <PokemonIcon
-              dexNumber={value.homeMon.dexNum}
-              formIndex={value.homeMon.formNum}
+              nationalDex={value.homeMon.nationalDex}
+              formIndex={value.homeMon.formIndex}
               style={{ width: 30, height: 30 }}
             />
           </button>

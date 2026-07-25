@@ -20,12 +20,12 @@ export const getTypeIconPath = (type: string): string => {
 export type IconType = 'spritesheet' | 'image'
 
 export function iconType(
-  dexNumber: number,
+  nationalDex: number,
   formIndex: number,
   extraFormIndex: Option<ExtraFormIndex>
 ): IconType {
-  const formeMetadata = MetadataSummaryLookup(dexNumber, formIndex ?? 0)
-  const inChampions = !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, dexNumber, formIndex)
+  const formeMetadata = MetadataSummaryLookup(nationalDex, formIndex ?? 0)
+  const inChampions = !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, nationalDex, formIndex)
   const isGen9Mega = formeMetadata?.isMega && formeMetadata.introducedGen === Generation.G9
   const extraFormWithSprite = Boolean(extraFormIndex && extraFormSpriteName(extraFormIndex))
 
@@ -33,7 +33,7 @@ export function iconType(
     inChampions ||
     isGen9Mega ||
     extraFormWithSprite ||
-    FormsUsingImages.get(dexNumber)?.includes(formIndex ?? 0)
+    FormsUsingImages.get(nationalDex)?.includes(formIndex ?? 0)
 
   return shouldUseImage ? 'image' : 'spritesheet'
 }

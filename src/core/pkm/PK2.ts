@@ -31,7 +31,7 @@ export default class PK2 {
   }
   gameOfOrigin: number
   language: Language
-  dexNum: number
+  nationalDex: number
   heldItemIndexGen2?: ItemGen2
   moves: FourMoves
   trainerID: number
@@ -60,7 +60,7 @@ export default class PK2 {
       const dataView = new DataView(buffer)
       this.gameOfOrigin = 0
       this.language = 0
-      this.dexNum = dataView.getUint8(0x0)
+      this.nationalDex = dataView.getUint8(0x0)
       this.heldItemIndexGen2 = ItemGen2.fromIndex(dataView.getUint8(0x1))
       this.moves = [
         dataView.getUint8(0x2),
@@ -127,7 +127,7 @@ export default class PK2 {
 
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
-      this.dexNum = other.dexNum
+      this.nationalDex = other.nationalDex
       this.heldItemIndexGen2 = ItemGen2.fromModern(other.heldItemIndex)
 
       const moveFilter = MoveFilter.fromPkmClass(PK2)
@@ -171,7 +171,7 @@ export default class PK2 {
       this.trainerName = other.trainerName
       this.nickname = converter.nickname(other)
       this.trainerGender = other.trainerGender
-      this.level = getLevelGen12(this.dexNum, this.exp)
+      this.level = getLevelGen12(this.nationalDex, this.exp)
     }
   }
 
@@ -187,7 +187,7 @@ export default class PK2 {
     const buffer = new ArrayBuffer(options?.includeExtraFields ? 73 : 32)
     const dataView = new DataView(buffer)
 
-    dataView.setUint8(0x0, this.dexNum)
+    dataView.setUint8(0x0, this.nationalDex)
     dataView.setUint8(0x1, this.heldItemIndexGen2?.index ?? 0)
     for (let i = 0; i < 4; i++) {
       dataView.setUint8(0x2 + i, this.moves[i])
@@ -253,8 +253,8 @@ export default class PK2 {
     return 0
   }
 
-  public get formNum() {
-    if (this.dexNum === NationalDex.Unown) {
+  public get formIndex() {
+    if (this.nationalDex === NationalDex.Unown) {
       let ivCombinationVal = ((this.dvs.atk >> 1) & 0b11) << 6
       ivCombinationVal += ((this.dvs.def >> 1) & 0b11) << 4
       ivCombinationVal += ((this.dvs.spe >> 1) & 0b11) << 2
@@ -266,7 +266,7 @@ export default class PK2 {
   }
 
   public getLevel() {
-    return getLevelGen12(this.dexNum, this.exp)
+    return getLevelGen12(this.nationalDex, this.exp)
   }
 
   isShiny() {
@@ -283,11 +283,11 @@ export default class PK2 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formNum)
+    return MetadataSummaryLookup(this.nationalDex, this.formIndex)
   }
 
   public get speciesMetadata() {
-    return SpeciesLookup(this.dexNum)
+    return SpeciesLookup(this.nationalDex)
   }
 
   static maxValidMove() {

@@ -100,8 +100,8 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
           <div className="modal-footer">
             <Flex gap="1" align="center" minWidth="7rem">
               <PokemonIcon
-                dexNumber={mon.dexNum}
-                formIndex={mon.formNum}
+                nationalDex={mon.nationalDex}
+                formIndex={mon.formIndex}
                 style={{ width: '1rem', height: '1rem' }}
               />
               {mon.nickname}

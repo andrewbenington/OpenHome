@@ -25,7 +25,7 @@
       "byteOffset": 6
     },
     {
-      "name": "dexNum",
+      "name": "nationalDex",
       "type": "number",
       "numBytes": 2,
       "endian": "Little",
@@ -106,7 +106,7 @@
       "bitOffset": 1
     },
     {
-      "name": "formNum",
+      "name": "formIndex",
       "type": "number",
       "byteOffset": 29,
       "numBytes": 1,

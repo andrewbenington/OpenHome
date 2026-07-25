@@ -47,13 +47,13 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
   const monFormat = format ?? mon.format
 
   if (isMegaStone(mon.heldItemIndex)) {
-    const megaForStone = MetadataSummaryLookup(mon.dexNum, mon.formNum)?.megaEvolutions.find(
+    const megaForStone = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)?.megaEvolutions.find(
       (mega) => mega.requiredItemId === mon.heldItemIndex
     )
 
-    if (megaForStone) mon.formNum = megaForStone.megaForme.formIndex
-  } else if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
-    mon.formNum = displayIndexAdder(mon.heldItemIndex)(mon.formNum)
+    if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
+  } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
+    mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
   }
 
   let spriteFolder = fileToSpriteFolder[monFormat as MonFormat]
@@ -63,7 +63,11 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
     if (romHackSprite) return romHackSprite
   }
 
-  const alwaysUsedSprite = getAlwaysUsedSpritePath(mon.dexNum, mon.formNum, mon.extraFormIndex)
+  const alwaysUsedSprite = getAlwaysUsedSpritePath(
+    mon.nationalDex,
+    mon.formIndex,
+    mon.extraFormIndex
+  )
   if (alwaysUsedSprite) return alwaysUsedSprite
 
   const extraFormSprite = mon.extraFormIndex ? extraFormSpriteName(mon.extraFormIndex) : undefined
@@ -87,11 +91,11 @@ export const getPokemonSpritePath = (mon: MonSpriteData, format?: string) => {
 }
 
 export function getSpriteName(mon: MonSpriteData, format?: string): string {
-  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formNum)
+  const formeMetadata = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
   if (!formeMetadata) return ''
   let spriteName = formeMetadata?.sprite ?? ''
 
-  if (mon.dexNum === NationalDex.Alcremie) {
+  if (mon.nationalDex === NationalDex.Alcremie) {
     if (format === 'PK9' || format === 'PK9Compass') return spriteName
     spriteName = `${spriteName}-${SWEETS[mon.formArgument ?? 0].toLocaleLowerCase()}`
   }
@@ -104,14 +108,18 @@ function getRomHackSpritePath(mon: MonSpriteData) {
   let spriteFolder = fileToSpriteFolder[monFormat as MonFormat]
 
   if (monFormat === 'PK3RR') {
-    if (mon.dexNum === NationalDex.Ursaluna && mon.formNum === BLOOD_MOON) {
+    if (mon.nationalDex === NationalDex.Ursaluna && mon.formIndex === BLOOD_MOON) {
       return 'sprites/home/ursaluna-bloodmoon.png'
     }
-    if (mon.dexNum === NationalDex.Terapagos) {
+    if (mon.nationalDex === NationalDex.Terapagos) {
       return 'sprites/home/terapagos-terastal.png'
     }
 
-    const radicalRedIndex = toRadicalRedPokemonIndex(mon.dexNum, mon.formNum, mon.extraFormIndex)
+    const radicalRedIndex = toRadicalRedPokemonIndex(
+      mon.nationalDex,
+      mon.formIndex,
+      mon.extraFormIndex
+    )
     let gen3RRname = radicalRedIndex !== undefined ? RRSprites[radicalRedIndex] : undefined
 
     if (!gen3RRname) {
@@ -122,10 +130,11 @@ function getRomHackSpritePath(mon: MonSpriteData) {
     gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
     return `sprites/${spriteFolder}/${gen3RRname}`
   } else if (monFormat === 'PK3UB') {
-    if (mon.dexNum === NationalDex.Ursaluna && mon.formNum === BLOOD_MOON) {
+    if (mon.nationalDex === NationalDex.Ursaluna && mon.formIndex === BLOOD_MOON) {
       return 'sprites/home/ursaluna-bloodmoon.png'
     }
-    let gen3UBname = UBSprites[toGen3UBPokemonIndex(mon.dexNum, mon.formNum, mon.extraFormIndex)]
+    let gen3UBname =
+      UBSprites[toGen3UBPokemonIndex(mon.nationalDex, mon.formIndex, mon.extraFormIndex)]
 
     if (!gen3UBname) {
       console.error(`missing Unbound sprite for ${spriteName}`)
@@ -140,12 +149,12 @@ function getRomHackSpritePath(mon: MonSpriteData) {
       return
     }
 
-    const lumiForm = getLumiFormIndexByExtraFormIndex(mon.dexNum, mon.extraFormIndex)
+    const lumiForm = getLumiFormIndexByExtraFormIndex(mon.nationalDex, mon.extraFormIndex)
     if (lumiForm === undefined) {
       return
     }
 
-    return `sprites/lumi/${mon.dexNum}-${lumiForm}.webp`
+    return `sprites/lumi/${mon.nationalDex}-${lumiForm}.webp`
   }
   const extension = spriteFolder === 'gen3gc' ? 'gif' : spriteFolder === 'home' ? 'webp' : 'png'
   return `sprites/${spriteFolder}${
@@ -154,8 +163,8 @@ function getRomHackSpritePath(mon: MonSpriteData) {
 }
 
 const getAlwaysUsedSpritePath = (
-  dexNum: number,
-  formNum?: number,
+  nationalDex: number,
+  formIndex?: number,
   extraFormIndex?: ExtraFormIndex
 ) => {
   if (
@@ -163,7 +172,7 @@ const getAlwaysUsedSpritePath = (
     isSeviiForm(extraFormIndex) &&
     extraFormIndex !== ExtraFormIndex.MantykeSevii
   ) {
-    const radicalRedIndex = toRadicalRedPokemonIndex(dexNum, formNum ?? 0, extraFormIndex)
+    const radicalRedIndex = toRadicalRedPokemonIndex(nationalDex, formIndex ?? 0, extraFormIndex)
     let gen3RRname = radicalRedIndex !== undefined ? RRSprites[radicalRedIndex] : undefined
 
     if (!gen3RRname) return undefined
@@ -171,7 +180,7 @@ const getAlwaysUsedSpritePath = (
     gen3RRname = gen3RRname[0].toUpperCase() + gen3RRname.slice(1).toLowerCase()
     return `sprites/rr/${gen3RRname}`
   }
-  if (dexNum === NationalDex.Eevee && formNum === 1) {
+  if (nationalDex === NationalDex.Eevee && formIndex === 1) {
     return 'sprites/home/eevee-starter.png'
   }
 }

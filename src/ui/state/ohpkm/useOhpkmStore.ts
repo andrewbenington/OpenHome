@@ -228,7 +228,7 @@ export function useOhpkmStore(): OhpkmStore {
       if (R.isErr(result)) return result
 
       const mon = result.data
-      mon.nickname = nickname || Lookup.speciesName(mon.dexNum, mon.language)
+      mon.nickname = nickname || Lookup.speciesName(mon.nationalDex, mon.language)
 
       insertOrUpdate(mon)
     },

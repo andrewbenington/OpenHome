@@ -122,8 +122,8 @@ export default function FilterPanel() {
   ]
 
   const currentMon = useMemo(
-    () => (filter.dexNumber ? SpeciesLookup(filter.dexNumber) : undefined),
-    [filter.dexNumber]
+    () => (filter.nationalDex ? SpeciesLookup(filter.nationalDex) : undefined),
+    [filter.nationalDex]
   )
 
   const BlankIconSpacer = <div className="filter-icon" />
@@ -146,12 +146,12 @@ export default function FilterPanel() {
           options={Object.values(ALL_SPECIES_DATA)}
           getOptionString={(opt) => Lookup.speciesName(opt.nationalDex, Language.English)}
           getOptionUniqueID={(opt) => opt.nationalDex.toString()}
-          value={filter.dexNumber ? SpeciesLookup(filter.dexNumber) : undefined}
+          value={filter.nationalDex ? SpeciesLookup(filter.nationalDex) : undefined}
           placeholder="Species"
-          onChange={(option) => setFilter({ dexNumber: option?.nationalDex })}
+          onChange={(option) => setFilter({ nationalDex: option?.nationalDex })}
           getIconComponent={(currentMon) => (
             <PokemonIcon
-              dexNumber={currentMon.nationalDex}
+              nationalDex={currentMon.nationalDex}
               style={{ width: ICON_SIZE, height: ICON_SIZE }}
             />
           )}
@@ -168,10 +168,10 @@ export default function FilterPanel() {
             placeholder="Form"
             onChange={(option) => setFilter({ formeNumber: option?.formIndex })}
             getIconComponent={(currentForme) =>
-              filter.dexNumber &&
+              filter.nationalDex &&
               currentForme && (
                 <PokemonIcon
-                  dexNumber={filter.dexNumber}
+                  nationalDex={filter.nationalDex}
                   formIndex={currentForme.formIndex}
                   style={{ width: ICON_SIZE, height: ICON_SIZE }}
                 />

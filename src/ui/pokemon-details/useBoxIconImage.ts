@@ -30,25 +30,25 @@ export function boxIconImagePath(mon: MonSpriteData): Result<string, string> {
     return R.Ok(`icons/box/${extraFormSprite}.webp`)
   }
 
-  const metadata = MetadataSummaryLookup(mon.dexNum, mon.formNum)
+  const metadata = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
   if (!metadata) {
-    return R.Err(`invalid species data: ndex ${mon.dexNum}/form ${mon.formNum}`)
+    return R.Err(`invalid species data: ndex ${mon.nationalDex}/form ${mon.formIndex}`)
   }
 
   const { formeName, sprite } = metadata
 
   if (
-    !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, mon.dexNum, mon.formNum) &&
+    !isRestricted(CHAMPS_TRANSFER_RESTRICTIONS, mon.nationalDex, mon.formIndex) &&
     !formeName?.endsWith(' Z') &&
     !formeName?.startsWith('Mega Raichu') &&
     !formeName?.includes('Battle Bond') &&
-    (mon.dexNum !== NationalDex.Floette || mon.formNum >= ETERNAL_FLOWER)
+    (mon.nationalDex !== NationalDex.Floette || mon.formIndex >= ETERNAL_FLOWER)
   ) {
     const female = mon.isFemale ? '-f' : ''
     return R.Ok(`sprites/box/${shinyFolder}${sprite}${female}.webp`)
   }
 
-  const boxIconOverride = FormsUsingImages.get(mon.dexNum)?.includes(mon.formNum)
+  const boxIconOverride = FormsUsingImages.get(mon.nationalDex)?.includes(mon.formIndex)
   if (boxIconOverride) {
     return R.Ok(`icons/box/${getSpriteName(mon)}.webp`)
   }

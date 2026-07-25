@@ -80,26 +80,32 @@ impl Pokedex {
 
     pub fn register(
         &mut self,
-        dex_number: DexNumber,
+        national_dex: DexNumber,
         form_index: FormeNumber,
         status: PokedexStatus,
     ) {
         self.by_dex_number
-            .entry(dex_number)
+            .entry(national_dex)
             .or_default()
             .register(form_index, status);
     }
 
     #[cfg(test)]
-    fn form_status(&self, dex_number: DexNumber, form_index: FormeNumber) -> Option<PokedexStatus> {
-        self.by_dex_number.get(&dex_number)?.form_status(form_index)
+    fn form_status(
+        &self,
+        national_dex: DexNumber,
+        form_index: FormeNumber,
+    ) -> Option<PokedexStatus> {
+        self.by_dex_number
+            .get(&national_dex)?
+            .form_status(form_index)
     }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct PokedexUpdate {
-    dex_number: DexNumber,
+    national_dex: DexNumber,
     form_index: FormeNumber,
     status: PokedexStatus,
 }
@@ -119,7 +125,7 @@ pub fn update_pokedex(
 ) -> CommandResult<()> {
     let mut pokedex = pokedex_state.lock()?;
     for update in updates {
-        pokedex.register(update.dex_number, update.form_index, update.status);
+        pokedex.register(update.national_dex, update.form_index, update.status);
     }
 
     app_handle

@@ -40,7 +40,7 @@ export default class PK4 {
   }
   format: 'PK4' = 'PK4'
   personalityValue: number
-  dexNum: number
+  nationalDex: number
   heldItemIndex: number
   trainerID: number
   secretID: number
@@ -58,7 +58,7 @@ export default class PK4 {
   isEgg: boolean
   isNicknamed: boolean
   gender: Gender
-  formNum: number
+  formIndex: number
   shinyLeavesInner: ShinyLeaves = new ShinyLeaves()
   gameOfOrigin: number
   eggDate: types.PKMDate | undefined
@@ -102,7 +102,7 @@ export default class PK4 {
       this.originalBytes = buffer
 
       this.personalityValue = dataView.getUint32(0x0, true)
-      this.dexNum = dataView.getUint16(0x8, true)
+      this.nationalDex = dataView.getUint16(0x8, true)
       this.heldItemIndex = dataView.getUint16(0xa, true)
       this.trainerID = dataView.getUint16(0xc, true)
       this.secretID = dataView.getUint16(0xe, true)
@@ -135,7 +135,7 @@ export default class PK4 {
       this.isEgg = byteLogic.getFlag(dataView, 0x38, 30)
       this.isNicknamed = byteLogic.getFlag(dataView, 0x38, 31)
       this.gender = byteLogic.uIntFromBufferBits(dataView, 0x40, 1, 2, true)
-      this.formNum = byteLogic.uIntFromBufferBits(dataView, 0x40, 3, 5, true)
+      this.formIndex = byteLogic.uIntFromBufferBits(dataView, 0x40, 3, 5, true)
       this.shinyLeaves = ShinyLeaves.fromByte(dataView.getUint8(0x41))
 
       this.gameOfOrigin = dataView.getUint8(0x5f)
@@ -196,7 +196,7 @@ export default class PK4 {
       const metData = converter.metData(other)
 
       this.personalityValue = generatePersonalityValuePreservingAttributes(other) ?? 0
-      this.dexNum = other.dexNum
+      this.nationalDex = other.nationalDex
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
@@ -239,7 +239,7 @@ export default class PK4 {
       this.isNicknamed = other.isNicknamed ?? false
       this.gender =
         other.gender ?? this.metadata?.genderFromPid(this.personalityValue) ?? Gender.Genderless
-      this.formNum = other.formNum
+      this.formIndex = other.formIndex
       this.shinyLeaves = other.shinyLeaves?.clone() ?? new ShinyLeaves()
       this.gameOfOrigin = other.gameOfOrigin
       this.eggDate = other.eggDate ?? {
@@ -317,7 +317,7 @@ export default class PK4 {
 
     dataView.setUint32(0x0, this.personalityValue, true)
     dataView.setUint16(0x4, 0, true) // sanity bytes
-    dataView.setUint16(0x8, this.dexNum, true)
+    dataView.setUint16(0x8, this.nationalDex, true)
     dataView.setUint16(0xa, this.heldItemIndex, true)
     dataView.setUint16(0xc, this.trainerID, true)
     dataView.setUint16(0xe, this.secretID, true)
@@ -344,7 +344,7 @@ export default class PK4 {
     byteLogic.setFlag(dataView, 0x38, 30, this.isEgg)
     byteLogic.setFlag(dataView, 0x38, 31, this.isNicknamed)
     byteLogic.uIntToBufferBits(dataView, this.gender, 64, 1, 2, true)
-    byteLogic.uIntToBufferBits(dataView, this.formNum, 0x40, 3, 5, true)
+    byteLogic.uIntToBufferBits(dataView, this.formIndex, 0x40, 3, 5, true)
     dataView.setUint8(0x41, this.shinyLeaves.toByte())
     dataView.setUint8(0x5f, this.gameOfOrigin)
     types.writePKMDateToBytes(dataView, 0x78, this.eggDate)
@@ -461,11 +461,11 @@ export default class PK4 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formNum)
+    return MetadataSummaryLookup(this.nationalDex, this.formIndex)
   }
 
   public get speciesMetadata() {
-    return SpeciesLookup(this.dexNum)
+    return SpeciesLookup(this.nationalDex)
   }
 
   static maxValidMove() {

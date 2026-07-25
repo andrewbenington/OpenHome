@@ -30,7 +30,7 @@ export function getStats(mon: PKM): Stats {
 }
 
 export const getStandardPKMStats = (mon: PKMWithStandardStats): Stats => {
-  if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
+  if (mon.nationalDex < 1 || mon.nationalDex > NationalDexMax) {
     return {
       hp: 0,
       atk: 0,
@@ -41,7 +41,7 @@ export const getStandardPKMStats = (mon: PKMWithStandardStats): Stats => {
     }
   }
 
-  const level = SpeciesLookup(mon.dexNum)?.calculateLevel(mon.exp) ?? 0
+  const level = SpeciesLookup(mon.nationalDex)?.calculateLevel(mon.exp) ?? 0
 
   return {
     hp: getHPGen3Onward(mon, level),
@@ -55,7 +55,7 @@ export const getStandardPKMStats = (mon: PKMWithStandardStats): Stats => {
 
 // TODO: game boy stat calculation
 const getGameBoyPKMStats = (mon: PKMWithGameBoyStats): Stats => {
-  if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
+  if (mon.nationalDex < 1 || mon.nationalDex > NationalDexMax) {
     return {
       hp: 0,
       atk: 0,
@@ -66,7 +66,7 @@ const getGameBoyPKMStats = (mon: PKMWithGameBoyStats): Stats => {
     }
   }
 
-  // const level = getLevelGen12(mon.dexNum, mon.exp)
+  // const level = getLevelGen12(mon.nationalDex, mon.exp)
   return {
     hp: 0,
     atk: 0,
@@ -78,13 +78,13 @@ const getGameBoyPKMStats = (mon: PKMWithGameBoyStats): Stats => {
 }
 
 const getStatGen3Onward = (mon: PKMWithStandardStatCalc, stat: Stat, level: number) => {
-  if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
+  if (mon.nationalDex < 1 || mon.nationalDex > NationalDexMax) {
     return 0
   }
 
   const natureMultiplier = mon.nature.multiplierFor(stat)
 
-  const metadata = MetadataSummaryLookup(mon.dexNum, mon.formNum)
+  const metadata = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
   const statAbbr = StatAbbr.getLower(stat) as keyof Stats
 
   if (metadata) {
@@ -101,15 +101,15 @@ const getStatGen3Onward = (mon: PKMWithStandardStatCalc, stat: Stat, level: numb
 }
 
 const getHPGen3Onward = (mon: PKMWithStandardStatCalc, level: number) => {
-  if (mon.dexNum < 1 || mon.dexNum > NationalDexMax) {
+  if (mon.nationalDex < 1 || mon.nationalDex > NationalDexMax) {
     return 0
   }
 
-  if (mon.dexNum === NationalDex.Shedinja) {
+  if (mon.nationalDex === NationalDex.Shedinja) {
     return 1
   }
 
-  const baseHP = MetadataSummaryLookup(mon.dexNum, mon.formNum)?.baseStats?.hp
+  const baseHP = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)?.baseStats?.hp
 
   if (baseHP) {
     const iv = mon.ivs.hp
@@ -121,12 +121,12 @@ const getHPGen3Onward = (mon: PKMWithStandardStatCalc, level: number) => {
   return 0
 }
 
-export const getLevelGen12 = (dexNum: number, exp: number) => {
-  if (dexNum > 251) {
+export const getLevelGen12 = (nationalDex: number, exp: number) => {
+  if (nationalDex > 251) {
     return 1
   }
 
-  const levelUpType = SpeciesLookup(dexNum)?.levelUpType
+  const levelUpType = SpeciesLookup(nationalDex)?.levelUpType
 
   for (let level = 100; level > 0; level--) {
     switch (levelUpType) {

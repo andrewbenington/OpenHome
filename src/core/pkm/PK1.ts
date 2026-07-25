@@ -32,7 +32,7 @@ export default class PK1 {
   }
   gameOfOrigin: number
   language: Language
-  dexNum: number
+  nationalDex: number
   currentHP: number
   level: number
   statusCondition: number
@@ -57,7 +57,7 @@ export default class PK1 {
       const dataView = new DataView(buffer)
       this.gameOfOrigin = 0
       this.language = 0
-      this.dexNum = conversion.fromGen1PokemonIndex(dataView.getUint8(0x0))
+      this.nationalDex = conversion.fromGen1PokemonIndex(dataView.getUint8(0x0))
       this.currentHP = dataView.getUint16(0x1, false)
       this.level = dataView.getUint8(0x3)
       this.statusCondition = dataView.getUint8(0x4)
@@ -101,14 +101,14 @@ export default class PK1 {
       if (dataView.byteLength >= 66) {
         this.nickname = stringLogic.readGameBoyStringFromBytes(dataView, 0x37, 11)
       } else {
-        this.nickname = Lookup.speciesName(this.dexNum, this.language)
+        this.nickname = Lookup.speciesName(this.nationalDex, this.language)
       }
     } else {
       const converter = new PkmConverter(this.format, options.strategy)
       const other = arg
       this.gameOfOrigin = other.gameOfOrigin
       this.language = other.language
-      this.dexNum = other.dexNum
+      this.nationalDex = other.nationalDex
       this.currentHP = other.currentHP ?? 0
       this.level = 0
       this.statusCondition = 0
@@ -145,7 +145,7 @@ export default class PK1 {
       this.nickname = converter.nickname(other)
     }
 
-    this.level = getLevelGen12(this.dexNum, this.exp)
+    this.level = getLevelGen12(this.nationalDex, this.exp)
   }
 
   static fromBytes(buffer: ArrayBuffer): PK1 {
@@ -160,7 +160,7 @@ export default class PK1 {
     const buffer = new ArrayBuffer(options?.includeExtraFields ? 66 : 33)
     const dataView = new DataView(buffer)
 
-    dataView.setUint8(0x0, conversion.toGen1PokemonIndex(this.dexNum))
+    dataView.setUint8(0x0, conversion.toGen1PokemonIndex(this.nationalDex))
     dataView.setUint16(0x1, this.currentHP, false)
     dataView.setUint8(0x3, this.level)
     dataView.setUint8(0x4, this.statusCondition)
@@ -221,12 +221,12 @@ export default class PK1 {
     return 0
   }
 
-  public get formNum() {
+  public get formIndex() {
     return 0
   }
 
   public getLevel() {
-    return getLevelGen12(this.dexNum, this.exp)
+    return getLevelGen12(this.nationalDex, this.exp)
   }
 
   isShiny() {
@@ -243,11 +243,11 @@ export default class PK1 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formNum)
+    return MetadataSummaryLookup(this.nationalDex, this.formIndex)
   }
 
   public get speciesMetadata() {
-    return SpeciesLookup(this.dexNum)
+    return SpeciesLookup(this.nationalDex)
   }
 
   static maxValidMove() {
