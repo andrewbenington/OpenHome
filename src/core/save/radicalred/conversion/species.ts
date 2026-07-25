@@ -2839,11 +2839,11 @@ const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   },
   '707': {
     nationalDex: 412,
-    formIndex: 0,
+    formIndex: 1,
   },
   '708': {
     nationalDex: 412,
-    formIndex: 0,
+    formIndex: 2,
   },
   '709': {
     nationalDex: 413,
@@ -2855,11 +2855,11 @@ const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   },
   '711': {
     nationalDex: 422,
-    formIndex: 0,
+    formIndex: 1,
   },
   '712': {
     nationalDex: 423,
-    formIndex: 0,
+    formIndex: 1,
   },
   '713': {
     nationalDex: 479,
