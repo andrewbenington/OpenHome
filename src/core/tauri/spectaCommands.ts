@@ -371,7 +371,7 @@ export type PluginMetadataWithIcon = {
 export type Pokedex = { byDexNumber: Partial<{ [key in number]: PokedexEntry }> }
 export type PokedexEntry = { formes: Partial<{ [key in number]: PokedexStatus }> }
 export type PokedexStatus = 'Seen' | 'Caught' | 'ShinyCaught'
-export type PokedexUpdate = { dexNumber: number; formIndex: number; status: PokedexStatus }
+export type PokedexUpdate = { nationalDex: number; formIndex: number; status: PokedexStatus }
 export type PossibleSaves = { citra: PathData[]; desmume: PathData[]; open_emu: PathData[] }
 export type SaveRef = {
   filePath: PathData

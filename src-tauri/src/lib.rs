@@ -189,6 +189,7 @@ fn launch_error_msg(error_category: &str) -> String {
 #[cfg(test)]
 mod tests {
     #[test]
+    #[ignore = "used to generate specta TS code"]
     fn export_typescript_bindings() {
         let specta_builder = super::specta_builder();
 
