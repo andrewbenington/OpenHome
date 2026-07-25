@@ -612,7 +612,7 @@ impl PkhexJson for Pk3 {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use std::path::PathBuf;
 
     use crate::convert_strategy::ConvertStrategy;

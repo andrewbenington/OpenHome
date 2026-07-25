@@ -115,7 +115,7 @@ macro_rules! read_u64_le {
     };
 }
 
-mod test {
+mod tests {
 
     #[test]
     fn uint3_write() {

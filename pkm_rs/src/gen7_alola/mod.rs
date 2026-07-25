@@ -86,7 +86,7 @@ type BoxIndex = pkm_rs_types::BoundedU8<{ BOX_COUNT - 1 }>;
 type BoxSlot = pkm_rs_types::BoundedU8<{ BOX_SLOTS - 1 }>;
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::{BOX_COUNT, BOX_SLOTS, BoxIndex, BoxSlot};
     use crate::result::{Error, Result};
 

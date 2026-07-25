@@ -81,7 +81,7 @@ pub mod personality_value {
     }
 }
 
-mod test {
+mod tests {
     #[cfg(feature = "wasm")]
     #[test]
     fn six_digit_trainer_display_formats_correctly() {

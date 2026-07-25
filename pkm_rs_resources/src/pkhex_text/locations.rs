@@ -33,7 +33,7 @@ pub fn location_name(game: OriginGame, language: Language, index: usize) -> Opti
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]
