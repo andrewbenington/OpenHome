@@ -41,7 +41,7 @@ function GenerationIcons(props: { gen: Generation; shiny?: boolean }) {
               <div className="species-display">
                 {s.forms[0].formeName}
                 <PokemonIcon
-                  dexNumber={s.nationalDex}
+                  nationalDex={s.nationalDex}
                   formIndex={0}
                   isShiny={props.shiny}
                   style={{ width: '2rem', height: '2rem' }}
@@ -56,7 +56,7 @@ function GenerationIcons(props: { gen: Generation; shiny?: boolean }) {
                       content={`${f.formIndex} - ${f.formeName} (${f.sprite})`}
                     >
                       <PokemonIcon
-                        dexNumber={s.nationalDex}
+                        nationalDex={s.nationalDex}
                         formIndex={f.formIndex}
                         isShiny={props.shiny}
                         style={{ width: '2rem', height: '2rem' }}
@@ -74,7 +74,7 @@ function GenerationIcons(props: { gen: Generation; shiny?: boolean }) {
                       content={`${e} - ${extraFormDisplayName(e)} (${extraFormSpriteName(e)})`}
                     >
                       <PokemonIcon
-                        dexNumber={s.nationalDex}
+                        nationalDex={s.nationalDex}
                         extraFormIndex={e}
                         style={{ width: '2rem', height: '2rem' }}
                       />

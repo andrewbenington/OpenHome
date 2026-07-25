@@ -53,9 +53,9 @@ describe('no repeated dex nums', () => {
 
       if (!data.transferableDexNums) return
 
-      for (const dexNum of data.transferableDexNums) {
-        if (present[dexNum]) {
-          throw new Error(`dex number occurs more than once: ${dexNum}`)
+      for (const nationalDex of data.transferableDexNums) {
+        if (present[nationalDex]) {
+          throw new Error(`dex number occurs more than once: ${nationalDex}`)
         }
       }
     })

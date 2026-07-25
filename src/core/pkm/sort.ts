@@ -63,16 +63,16 @@ function chain(sorters: PkmSorter[]): PkmSorter {
 }
 
 function sortByDexNum(a: PKMInterface, b: PKMInterface) {
-  return a.dexNum - b.dexNum
+  return a.nationalDex - b.nationalDex
 }
 
 function sortByFormIndex(a: PKMInterface, b: PKMInterface) {
-  return (a.formNum ?? 0) - (b.formNum ?? 0)
+  return (a.formIndex ?? 0) - (b.formIndex ?? 0)
 }
 
 function sortByBaseMon(a: PKMInterface, b: PKMInterface) {
-  const nationalDexA = getBaseMon(a.dexNum, a.formNum)?.nationalDex ?? 0
-  const nationalDexB = getBaseMon(b.dexNum, b.formNum)?.nationalDex ?? 0
+  const nationalDexA = getBaseMon(a.nationalDex, a.formIndex)?.nationalDex ?? 0
+  const nationalDexB = getBaseMon(b.nationalDex, b.formIndex)?.nationalDex ?? 0
   return nationalDexA - nationalDexB
 }
 

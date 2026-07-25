@@ -119,7 +119,7 @@ class G3CFRUSaveBackup<T extends PluginPKMInterface> {
       try {
         const mon = new PkmClass(this.pcDataContiguous.slice(4 + i * 58, 4 + (i + 1) * 58).buffer)
 
-        if (mon.dexNum !== 0 && mon.trainerID !== 0) {
+        if (mon.nationalDex !== 0 && mon.trainerID !== 0) {
           const box = this.boxes[Math.floor(i / 30)]
 
           box.boxSlots[i % 30] = mon
@@ -241,7 +241,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
           const mon =
             slotMon instanceof this.pkmTypeClass ? slotMon : new this.pkmTypeClass(slotMon)
 
-          if (mon?.gameOfOrigin && mon?.dexNum) pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
+          if (mon?.gameOfOrigin && mon?.nationalDex) pcBytes.set(new Uint8Array(mon.toPCBytes()), 0)
         } catch (e) {
           console.error(e)
         }
@@ -269,7 +269,7 @@ export abstract class G3CFRUSAV<T extends PluginPKMInterface> extends PluginSAV<
     this.bytes.set(this.primarySave.bytes, this.primarySaveOffset)
   }
 
-  abstract supportsMon(dexNumber: number, formeNumber: number): boolean
+  abstract supportsMon(nationalDex: number, formeNumber: number): boolean
 
   abstract getBoxCount(): number
 

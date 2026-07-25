@@ -8,8 +8,8 @@ import { hasDesmumeFooter } from './util'
 export class BWSAV extends G5SAV {
   static transferRestrictions = BW_TRANSFER_RESTRICTIONS
 
-  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
-    return !isRestricted(BW_TRANSFER_RESTRICTIONS, dexNumber, formeNumber, extraFormIndex)
+  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+    return !isRestricted(BW_TRANSFER_RESTRICTIONS, nationalDex, formeNumber, extraFormIndex)
   }
 
   supportsItem(itemIndex: number) {

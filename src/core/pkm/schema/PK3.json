@@ -37,7 +37,7 @@
       "numBytes": 1
     },
     {
-      "name": "dexNum",
+      "name": "nationalDex",
       "type": "number",
       "numBytes": 2,
       "endian": "Little",

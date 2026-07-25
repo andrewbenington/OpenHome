@@ -68,18 +68,18 @@ function useSyncedOhpkmState(): SyncedStateController<OhpkmStoreData, OhpkmStore
 
 function getPokedexUpdate(mon: OHPKM): PokedexUpdate {
   return {
-    dexNumber: mon.dexNum,
-    formIndex: mon.formNum,
+    nationalDex: mon.nationalDex,
+    formIndex: mon.formIndex,
     status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
   }
 }
 
 function getPokedexUpdates(mon: OHPKM): PokedexUpdate[] {
   const updates = [getPokedexUpdate(mon)]
-  if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
+  if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
     updates.push({
       ...getPokedexUpdate(mon),
-      formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formNum),
+      formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formIndex),
     })
   }
   return updates

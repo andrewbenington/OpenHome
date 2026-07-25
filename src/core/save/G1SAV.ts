@@ -167,7 +167,7 @@ export class G1SAV extends OfficialSAV<PK1> {
       box.boxSlots.forEach((boxMon) => {
         if (boxMon) {
           // set the mon's dex number in the box
-          this.bytes[boxByteOffset + 1 + numMons] = toGen1PokemonIndex(boxMon.dexNum)
+          this.bytes[boxByteOffset + 1 + numMons] = toGen1PokemonIndex(boxMon.nationalDex)
           // set the mon's data in the box
           this.bytes.set(
             new Uint8Array(boxMon.toBytes()),
@@ -246,9 +246,9 @@ export class G1SAV extends OfficialSAV<PK1> {
     return PK1.fromOhpkm(ohpkm, strategy)
   }
 
-  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     if (extraFormIndex !== undefined) return false
-    return dexNumber <= NationalDex.Mew && formeNumber === 0
+    return nationalDex <= NationalDex.Mew && formeNumber === 0
   }
 
   supportsItem(itemIndex: number) {

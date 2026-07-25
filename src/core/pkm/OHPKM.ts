@@ -88,7 +88,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
         prng = new Prando(
           other.trainerName
-            .concat(other.dexNum.toString())
+            .concat(other.nationalDex.toString())
             .concat(`${hp}~${atk}~${def}~${spc}~${spe}`)
             .concat(other.trainerID.toString())
         )
@@ -98,7 +98,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
 
-      this.speciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
+      this.speciesAndForm = new SpeciesAndForm(other.nationalDex, other.formIndex)
       this.extraFormIndex = other.extraFormIndex
 
       if (other.personalityValue === undefined) {
@@ -135,7 +135,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       if (other.format === 'PK1' || other.format === 'PK2') {
         this.abilityNum = 4 // hidden ability for GB mons to mirror virtual console + pokemon bank
-        if (other.dexNum === NationalDex.Mew || other.dexNum === NationalDex.Celebi) {
+        if (other.nationalDex === NationalDex.Mew || other.nationalDex === NationalDex.Celebi) {
           this.isFatefulEncounter = true
         }
         this.gender =
@@ -179,7 +179,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.metLocationIndex = other.metLocationIndex ?? 0
       this.ability =
         other.ability ??
-        getAbilityFromNumber(this.dexNum, this.formNum, this.abilityNum) ??
+        getAbilityFromNumber(this.nationalDex, this.formIndex, this.abilityNum) ??
         this.ability
 
       this.isShadow = other.isShadow ?? false
@@ -376,7 +376,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
   // getters / setters
 
-  get dexNum() {
+  get nationalDex() {
     return this.speciesAndForm.nationalDex
   }
 
@@ -387,7 +387,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.abilityIndex = value
   }
 
-  get formNum() {
+  get formIndex() {
     return this.speciesAndForm.formIndex
   }
 
@@ -600,11 +600,11 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formNum)
+    return MetadataSummaryLookup(this.nationalDex, this.formIndex)
   }
 
   public get speciesMetadata() {
-    return SpeciesLookup(this.dexNum)
+    return SpeciesLookup(this.nationalDex)
   }
   public syncWithGameData(other: PKMInterface, save?: SAV) {
     const updates: SyncUpdate[] = []
@@ -627,13 +627,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.movePPUps = other.movePPUps
     }
 
-    const hasEvolved = this.dexNum !== other.dexNum && isEvolution(this, other)
+    const hasEvolved = this.nationalDex !== other.nationalDex && isEvolution(this, other)
     const changedForm =
-      this.dexNum === other.dexNum &&
-      (this.formNum !== other.formNum || this.extraFormIndex !== other.extraFormIndex)
+      this.nationalDex === other.nationalDex &&
+      (this.formIndex !== other.formIndex || this.extraFormIndex !== other.extraFormIndex)
 
     if (hasEvolved || changedForm) {
-      this.speciesAndForm = new SpeciesAndForm(other.dexNum, other.formNum)
+      this.speciesAndForm = new SpeciesAndForm(other.nationalDex, other.formIndex)
       this.extraFormIndex = other.extraFormIndex
     }
 
@@ -647,14 +647,16 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (
       other.nickname !== this.nickname &&
       other.nickname !== this.nickname.slice(0, 10) &&
-      !isPrevoOrCurrentSpeciesName(this.dexNum, this.formNum, other.nickname, this.language)
+      !isPrevoOrCurrentSpeciesName(this.nationalDex, this.formIndex, other.nickname, this.language)
     ) {
       updates.push(syncUpdate('nickname', this.nickname, other.nickname))
       this.nickname = other.nickname
     }
 
-    if (isPrevoOrCurrentSpeciesName(this.dexNum, this.formNum, this.nickname, this.language)) {
-      this.nickname = Lookup.speciesName(this.dexNum, this.language)
+    if (
+      isPrevoOrCurrentSpeciesName(this.nationalDex, this.formIndex, this.nickname, this.language)
+    ) {
+      this.nickname = Lookup.speciesName(this.nationalDex, this.language)
     }
 
     if (this.heldItemIndex !== other.heldItemIndex) {
@@ -1062,16 +1064,16 @@ const FORMATS_ALLOWING_ABILITY_CHANGE: PkmFormat[] = [
 const FORMATS_WITHOUT_HIDDEN_ABILITIES: PkmFormat[] = ['PK3', 'COLOPKM', 'XDPKM', 'PK4']
 
 function isPrevoOrCurrentSpeciesName(
-  dexNum: number,
-  formNum: number,
+  nationalDex: number,
+  formIndex: number,
   nickname: string,
   language: Language
 ): boolean {
-  for (const nationalDex of [
-    dexNum,
-    ...getPrevos(dexNum, formNum).map((prevo) => prevo.nationalDex.index),
+  for (const ndex of [
+    nationalDex,
+    ...getPrevos(nationalDex, formIndex).map((prevo) => prevo.nationalDex.index),
   ]) {
-    if (nickname.toUpperCase() === Lookup.speciesName(nationalDex, language).toUpperCase()) {
+    if (nickname.toUpperCase() === Lookup.speciesName(ndex, language).toUpperCase()) {
       return true
     }
   }

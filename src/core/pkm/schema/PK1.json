@@ -11,7 +11,7 @@
       "noWrite": true
     },
     {
-      "name": "dexNum",
+      "name": "nationalDex",
       "type": "number",
       "byteOffset": 0,
       "numBytes": 1,

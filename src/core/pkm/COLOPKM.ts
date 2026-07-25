@@ -39,7 +39,7 @@ export default class COLOPKM {
   static getBoxSize() {
     return 312
   }
-  dexNum: number
+  nationalDex: number
   personalityValue: number
   gameOfOrigin: number
   language: Language
@@ -72,7 +72,7 @@ export default class COLOPKM {
     if (arg instanceof ArrayBuffer) {
       const buffer = arg
       const dataView = new DataView(buffer)
-      this.dexNum = dataView.getUint16(0x0, false)
+      this.nationalDex = dataView.getUint16(0x0, false)
       this.personalityValue = dataView.getUint32(0x4, false)
       this.gameOfOrigin = dataView.getUint8(0x8)
       this.language = Languages.fromByteOrNoneGcn(dataView.getUint8(0xb))
@@ -123,7 +123,7 @@ export default class COLOPKM {
       const converter = new PkmConverter('COLOPKM', options.strategy)
       const metData = converter.metData(other)
 
-      this.dexNum = other.dexNum
+      this.nationalDex = other.nationalDex
       this.personalityValue = other.personalityValue
       this.language = other.language
       this.gameOfOrigin = metData.gameOfOrigin
@@ -175,7 +175,7 @@ export default class COLOPKM {
     const buffer = new ArrayBuffer(312)
     const dataView = new DataView(buffer)
 
-    dataView.setUint16(0x0, this.dexNum, false)
+    dataView.setUint16(0x0, this.nationalDex, false)
     dataView.setUint32(0x4, this.personalityValue, false)
     dataView.setUint8(0x8, this.gameOfOrigin)
     dataView.setUint8(0xb, Languages.toGcnByte(this.language))
@@ -250,8 +250,8 @@ export default class COLOPKM {
     return this.metadata?.abilityByNumGen3(this.abilityNum)
   }
 
-  public get formNum() {
-    if (this.dexNum === NationalDex.Unown) {
+  public get formIndex() {
+    if (this.nationalDex === NationalDex.Unown) {
       let letterValue = (this.personalityValue >> 24) & 0x3
       letterValue = ((this.personalityValue >> 16) & 0x3) | (letterValue << 2)
       letterValue = ((this.personalityValue >> 8) & 0x3) | (letterValue << 2)
@@ -285,11 +285,11 @@ export default class COLOPKM {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formNum)
+    return MetadataSummaryLookup(this.nationalDex, this.formIndex)
   }
 
   public get speciesMetadata() {
-    return SpeciesLookup(this.dexNum)
+    return SpeciesLookup(this.nationalDex)
   }
 
   static maxValidMove() {

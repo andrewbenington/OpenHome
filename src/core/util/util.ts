@@ -64,14 +64,14 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
   // xoring the other three values with this to calculate upper half of personality value
   // will ensure shininess or non-shininess depending on original mon
   let newPersonalityValue = BigInt(personalityValue)
-  const metadata = MetadataSummaryLookup(mon.dexNum, 0)
+  const metadata = MetadataSummaryLookup(mon.nationalDex, 0)
   if (!metadata) {
     return Number(newPersonalityValue)
   }
 
   const otherGender: Gender = mon.gender ?? metadata.genderFromPid(Number(newPersonalityValue))
 
-  const shouldCheckUnown = mon.dexNum === NationalDex.Unown
+  const shouldCheckUnown = mon.nationalDex === NationalDex.Unown
 
   let i = 0
   while (i < 0x10000) {
@@ -79,7 +79,7 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
     const newNature = NatureIndex.newFromModulo(Number(newPersonalityValue))
 
     function getInconsistancy(): string | null {
-      if (shouldCheckUnown && getUnownLetterGen3(Number(newPersonalityValue)) !== mon.formNum) {
+      if (shouldCheckUnown && getUnownLetterGen3(Number(newPersonalityValue)) !== mon.formIndex) {
         return 'wrong unown letter'
       } else if (newGender !== otherGender) {
         return `gender mismatch`
@@ -105,7 +105,7 @@ export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields):
     pvBytes.setInt32(0, personalityValue, true)
     let pvLower16, pvUpper16: number
 
-    if (mon.dexNum === NationalDex.Unown) {
+    if (mon.nationalDex === NationalDex.Unown) {
       pvLower16 = prng.nextInt(0, 0xffff)
       pvUpper16 = prng.nextInt(0, 0xffff)
       if (mon.isShiny()) {
@@ -248,9 +248,10 @@ export class MoveFilter<P extends PKMInterface> {
     const filtered = this.filterByMoves(mon, mon.moves)
     if (filtered.every((move) => move === 0)) {
       const metadataSource = PkmFormats.getMetadataSource(this.format)
-      const levelUpLearnset = MetadataSummaryLookup(mon.dexNum, mon.formNum)?.levelUpLearnset(
-        metadataSource
-      )
+      const levelUpLearnset = MetadataSummaryLookup(
+        mon.nationalDex,
+        mon.formIndex
+      )?.levelUpLearnset(metadataSource)
       if (levelUpLearnset) {
         const fromLevelup: FourMoves = [0, 0, 0, 0]
         levelUpLearnset
@@ -304,7 +305,7 @@ export class MoveFilter<P extends PKMInterface> {
 }
 
 export function getHeightCalculated(mon: AllPKMFields) {
-  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formNum)
+  const formeMetadata = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
   if (!formeMetadata || mon.heightScalar === undefined || !mon.heightDeviation) return 0
 
   const deviation = (mon.heightScalar / 255) * 0.40000004 + (1 - mon.heightDeviation)
@@ -312,7 +313,7 @@ export function getHeightCalculated(mon: AllPKMFields) {
 }
 
 export function getWeightCalculated(mon: AllPKMFields) {
-  const formeMetadata = MetadataSummaryLookup(mon.dexNum, mon.formNum)
+  const formeMetadata = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
   if (!formeMetadata || mon.weightScalar === undefined || !mon.weightDeviation) return 0
 
   const deviation = (mon.weightScalar / 255) * 0.40000004 + (1 - mon.weightDeviation)

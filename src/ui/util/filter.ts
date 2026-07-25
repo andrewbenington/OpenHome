@@ -3,7 +3,7 @@ import { getTypes, isMegaStone, isZCrystal } from '@openhome-core/pkm/util'
 import { Gender, OriginGame, PkmType } from '@pkm-rs/pkg'
 
 export interface Filter {
-  dexNumber?: number
+  nationalDex?: number
   formeNumber?: number
   heldItem?: number | HeldItemCategory
   gender?: Gender
@@ -30,10 +30,10 @@ type monData = PKMInterface & {
 }
 
 export function filterApplies(filter: Filter, mon: monData) {
-  if (filter.dexNumber && mon.dexNum !== filter.dexNumber) {
+  if (filter.nationalDex && mon.nationalDex !== filter.nationalDex) {
     return false
   }
-  if (filter.formeNumber !== undefined && mon.formNum !== filter.formeNumber) {
+  if (filter.formeNumber !== undefined && mon.formIndex !== filter.formeNumber) {
     return false
   }
   if (filter.heldItem !== undefined && !heldItemPassesFilter(mon.heldItemIndex, filter.heldItem)) {

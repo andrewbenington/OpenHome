@@ -81,15 +81,15 @@ function BoxCell(props: BoxCellProps) {
 
           importedMons.push(mon)
           pokedexUpdates.push({
-            dexNumber: mon.dexNum,
-            formIndex: mon.formNum,
+            nationalDex: mon.nationalDex,
+            formIndex: mon.formIndex,
             status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
           })
 
-          if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
+          if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
             pokedexUpdates.push({
-              dexNumber: mon.dexNum,
-              formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formNum),
+              nationalDex: mon.nationalDex,
+              formIndex: displayIndexAdder(mon.heldItemIndex)(mon.formIndex),
               status: mon.isShiny() ? 'ShinyCaught' : 'Caught',
             })
           }
@@ -126,7 +126,7 @@ function BoxCell(props: BoxCellProps) {
     if (!(mon instanceof OHPKM)) return
     setMonNickname(
       mon.openhomeId,
-      renameValue.trim() || Lookup.speciesName(mon.dexNum, mon.language)
+      renameValue.trim() || Lookup.speciesName(mon.nationalDex, mon.language)
     )
     setRenameOpen(false)
   }, [renameValue, setMonNickname, mon])
@@ -255,7 +255,7 @@ function BoxCell(props: BoxCellProps) {
             <TextField.Root
               value={renameValue}
               onChange={(e) => setRenameValue(e.target.value)}
-              placeholder={Lookup.speciesName(mon.dexNum, mon.language)}
+              placeholder={Lookup.speciesName(mon.nationalDex, mon.language)}
             />
             <Dialog.Actions>
               <Dialog.Close>Cancel</Dialog.Close>

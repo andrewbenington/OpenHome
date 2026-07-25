@@ -42,7 +42,7 @@ export default class PK6 {
   }
   encryptionConstant: number
   checksum: number = 0
-  dexNum: number
+  nationalDex: number
   heldItemIndex: number
   trainerID: number
   secretID: number
@@ -53,7 +53,7 @@ export default class PK6 {
   trainingBag: number
   personalityValue: number
   nature: NatureIndex
-  formNum: number
+  formIndex: number
   extraFormIndex?: ExtraFormIndex
   gender: number
   evs: types.Stats
@@ -123,7 +123,7 @@ export default class PK6 {
       const dataView = new DataView(buffer)
       this.encryptionConstant = dataView.getUint32(0x0, true)
       this.checksum = dataView.getUint16(0x6, true)
-      this.dexNum = dataView.getUint16(0x8, true)
+      this.nationalDex = dataView.getUint16(0x8, true)
       this.heldItemIndex = dataView.getUint16(0xa, true)
       this.trainerID = dataView.getUint16(0xc, true)
       this.secretID = dataView.getUint16(0xe, true)
@@ -134,14 +134,14 @@ export default class PK6 {
       this.trainingBag = dataView.getUint8(0x17)
       this.personalityValue = dataView.getUint32(0x18, true)
       this.nature = new NatureIndex(dataView.getUint8(0x1c))
-      this.formNum = byteLogic.uIntFromBufferBits(dataView, 0x1d, 3, 5, true)
+      this.formIndex = byteLogic.uIntFromBufferBits(dataView, 0x1d, 3, 5, true)
 
-      // formNum should always be the modern form index. Cosplay Pikachu needs to be stored in extraFormIndex.
-      if (this.dexNum === NationalDex.Pikachu) {
-        const extraFormIndex = extraFormIndexFromOrasPikachu(this.formNum)
+      // formIndex should always be the modern form index. Cosplay Pikachu needs to be stored in extraFormIndex.
+      if (this.nationalDex === NationalDex.Pikachu) {
+        const extraFormIndex = extraFormIndexFromOrasPikachu(this.formIndex)
         if (extraFormIndex !== undefined) {
           this.extraFormIndex = extraFormIndex
-          this.formNum = 0
+          this.formIndex = 0
         }
       }
 
@@ -238,7 +238,7 @@ export default class PK6 {
       const metData = converter.metData(other)
 
       this.encryptionConstant = other.encryptionConstant ?? 0
-      this.dexNum = other.dexNum
+      this.nationalDex = other.nationalDex
       this.heldItemIndex = other.heldItemIndex
       this.trainerID = other.trainerID
       this.secretID = other.secretID
@@ -253,13 +253,13 @@ export default class PK6 {
       if (other.extraFormIndex !== undefined) {
         const orasIndex = orasFormIndexIfSupported(other.extraFormIndex)
         if (orasIndex !== undefined) {
-          this.formNum = orasIndex
+          this.formIndex = orasIndex
           this.extraFormIndex = other.extraFormIndex
         } else {
-          this.formNum = 0
+          this.formIndex = 0
         }
       } else {
-        this.formNum = other.formNum
+        this.formIndex = other.formIndex
       }
 
       this.gender = other.gender ?? 0
@@ -380,7 +380,7 @@ export default class PK6 {
     dataView.setUint32(0x0, this.encryptionConstant, true)
     dataView.setUint16(0x4, 0, true) // sanity bytes
     dataView.setUint16(0x6, this.checksum, true)
-    dataView.setUint16(0x8, this.dexNum, true)
+    dataView.setUint16(0x8, this.nationalDex, true)
     dataView.setUint16(0xa, this.heldItemIndex, true)
     dataView.setUint16(0xc, this.trainerID, true)
     dataView.setUint16(0xe, this.secretID, true)
@@ -394,7 +394,7 @@ export default class PK6 {
 
     const orasFormIndex =
       (this.extraFormIndex ? orasFormIndexIfSupported(this.extraFormIndex) : undefined) ??
-      this.formNum
+      this.formIndex
 
     byteLogic.uIntToBufferBits(dataView, orasFormIndex, 29, 3, 5, true)
     byteLogic.uIntToBufferBits(dataView, this.gender, 29, 1, 2, true)
@@ -520,11 +520,11 @@ export default class PK6 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formNum)
+    return MetadataSummaryLookup(this.nationalDex, this.formIndex)
   }
 
   public get speciesMetadata() {
-    return SpeciesLookup(this.dexNum)
+    return SpeciesLookup(this.nationalDex)
   }
 
   static maxValidMove() {

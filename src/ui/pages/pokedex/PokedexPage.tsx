@@ -124,8 +124,8 @@ function PokedexDetails({
 
   const selectedFormStatus = getFormeStatus(pokedex, species.nationalDex, selectedForm.formIndex)
   const spriteResult = useMonSprite({
-    dexNum: species.nationalDex,
-    formNum: selectedForm.formIndex,
+    nationalDex: species.nationalDex,
+    formIndex: selectedForm.formIndex,
     format: 'OHPKM',
     isShiny: selectedFormStatus === 'ShinyCaught' && showShiny,
     extraFormIndex: isExtraFormMetadata(selectedForm) ? selectedForm.extraFormIndex : undefined,
@@ -168,7 +168,7 @@ function PokedexDetails({
             )}
             {imageError ? (
               <PokemonIcon
-                dexNumber={species.nationalDex}
+                nationalDex={species.nationalDex}
                 formIndex={selectedForm.formIndex}
                 style={{ width: '90%', height: 0, paddingBottom: '90%' }}
                 silhouette={!selectedFormCaught}
@@ -211,7 +211,7 @@ function PokedexDetails({
                 style={{ minWidth: 0, padding: 0, aspectRatio: 1 }}
               >
                 <TooltipPokemonIcon
-                  dexNumber={species.nationalDex}
+                  nationalDex={species.nationalDex}
                   formIndex={form.formIndex}
                   style={{ width: '3rem', height: '3rem' }}
                   silhouette={
@@ -239,7 +239,7 @@ function PokedexDetails({
                 style={{ minWidth: 0, padding: 0, aspectRatio: 1 }}
               >
                 <TooltipPokemonIcon
-                  dexNumber={species.nationalDex}
+                  nationalDex={species.nationalDex}
                   formIndex={0}
                   extraFormIndex={form}
                   style={{ width: '3rem', height: '3rem' }}

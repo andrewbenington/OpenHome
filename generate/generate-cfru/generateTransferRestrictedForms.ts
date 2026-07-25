@@ -11,26 +11,26 @@ const supportedFormsMap: Record<number, Set<number>> = {}
 for (const [key, mapEntry] of Object.entries(RadicalRedToNationalDexMap)) {
   if (!mapEntry || !mapEntry.NationalDexIndex) continue
 
-  const dexNum = mapEntry.NationalDexIndex
+  const nationalDex = mapEntry.NationalDexIndex
   const formIndex = mapEntry.FormIndex
 
-  if (!supportedFormsMap[dexNum]) {
-    supportedFormsMap[dexNum] = new Set()
+  if (!supportedFormsMap[nationalDex]) {
+    supportedFormsMap[nationalDex] = new Set()
   }
-  supportedFormsMap[dexNum].add(formIndex)
+  supportedFormsMap[nationalDex].add(formIndex)
 }
 
 for (const [key, mapEntry] of Object.entries(RadicalRedToNationalDexMap)) {
   if (!mapEntry || !mapEntry.NationalDexIndex) continue
 
-  const dexNum = mapEntry.NationalDexIndex
+  const nationalDex = mapEntry.NationalDexIndex
 
-  const dbEntry = PokemonData[dexNum]
+  const dbEntry = PokemonData[nationalDex]
 
   if (dbEntry) {
     const allForms = dbEntry.forms.map((forme) => forme.formeNumber)
 
-    const supportedForms = supportedFormsMap[dexNum] || new Set()
+    const supportedForms = supportedFormsMap[nationalDex] || new Set()
     const unsupportedForms = allForms.filter((formeNumber) => !supportedForms.has(formeNumber))
 
     if (unsupportedForms.length > 0) {
@@ -38,7 +38,7 @@ for (const [key, mapEntry] of Object.entries(RadicalRedToNationalDexMap)) {
       if (!RR_TRANSFER_RESTRICTIONS.excludedForms) {
         RR_TRANSFER_RESTRICTIONS.excludedForms = {}
       }
-      RR_TRANSFER_RESTRICTIONS.excludedForms[dexNum] = unsupportedForms
+      RR_TRANSFER_RESTRICTIONS.excludedForms[nationalDex] = unsupportedForms
     }
   }
 }

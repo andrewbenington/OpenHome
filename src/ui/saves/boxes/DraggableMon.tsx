@@ -61,20 +61,21 @@ const DraggableMon = (props: DraggableMonProps) => {
   const monWithManagement = mon as MonWithManagementData
 
   const formeNumber = useMemo(() => {
-    let formeNumber = mon.formNum
+    let formeNumber = mon.formIndex
 
     if (isMegaStone(mon.heldItemIndex)) {
-      const megaForStone = MetadataSummaryLookup(mon.dexNum, mon.formNum)?.megaEvolutions.find(
-        (mega) => mega.requiredItemId === mon.heldItemIndex
-      )
+      const megaForStone = MetadataSummaryLookup(
+        mon.nationalDex,
+        mon.formIndex
+      )?.megaEvolutions.find((mega) => mega.requiredItemId === mon.heldItemIndex)
 
       if (megaForStone) formeNumber = megaForStone.megaForme.formIndex
-    } else if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
-      formeNumber = displayIndexAdder(mon.heldItemIndex)(mon.formNum)
+    } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
+      formeNumber = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
     }
 
     return formeNumber
-  }, [mon.dexNum, mon.formNum, mon.heldItemIndex])
+  }, [mon.nationalDex, mon.formIndex, mon.heldItemIndex])
 
   const topRightIndicatorComponent = useMemo(
     () =>
@@ -97,7 +98,7 @@ const DraggableMon = (props: DraggableMonProps) => {
       onClick={onClick}
     >
       <PokemonIcon
-        dexNumber={mon.dexNum}
+        nationalDex={mon.nationalDex}
         formIndex={formeNumber}
         isShiny={showShiny && mon.isShiny()}
         isEgg={mon.isEgg}

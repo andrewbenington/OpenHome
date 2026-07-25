@@ -141,7 +141,7 @@ export class G2SAV extends OfficialSAV<PK2> {
       box.boxSlots.forEach((boxMon) => {
         if (boxMon) {
           // set the mon's dex number in the box (separate location)
-          this.bytes[boxByteOffset + 1 + numMons] = boxMon.dexNum
+          this.bytes[boxByteOffset + 1 + numMons] = boxMon.nationalDex
           // set the mon's data in the box
           this.bytes.set(
             new Uint8Array(boxMon.toBytes().slice(0, 32)),
@@ -273,11 +273,11 @@ export class G2SAV extends OfficialSAV<PK2> {
     return checksum2 === this.bytes[0x1f0d]
   }
 
-  supportsMon(dexNumber: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
+  supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
     if (extraFormIndex !== undefined) return false
     return (
-      (dexNumber <= NationalDex.Celebi && formeNumber === 0) ||
-      (dexNumber === NationalDex.Unown && formeNumber < EXCLAMATION)
+      (nationalDex <= NationalDex.Celebi && formeNumber === 0) ||
+      (nationalDex === NationalDex.Unown && formeNumber < EXCLAMATION)
     )
   }
 

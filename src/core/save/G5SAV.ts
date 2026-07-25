@@ -102,7 +102,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
           const monData = bytes.slice(startByte, endByte)
           const mon = PK5.fromBytes(monData.buffer, true)
 
-          if (mon.gameOfOrigin !== 0 && mon.dexNum !== 0) {
+          if (mon.gameOfOrigin !== 0 && mon.nationalDex !== 0) {
             this.boxes[box].boxSlots[monIndex] = mon
           }
         } catch (e) {
@@ -153,7 +153,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
       // and the slot was left empty
       if (mon) {
         try {
-          if (mon.gameOfOrigin && mon?.dexNum) {
+          if (mon.gameOfOrigin && mon?.nationalDex) {
             mon.refreshChecksum()
             this.bytes.set(new Uint8Array(mon.toPCBytes()), writeIndex)
           }
@@ -175,7 +175,7 @@ export abstract class G5SAV extends OfficialSAV<PK5> {
   }
 
   abstract supportsMon(
-    dexNumber: number,
+    nationalDex: number,
     formeNumber: number,
     extraFormIndex?: ExtraFormIndex
   ): boolean

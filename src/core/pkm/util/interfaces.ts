@@ -7,8 +7,8 @@ export interface AllPKMs extends SpeciesData {
 }
 
 export interface SpeciesData {
-  dexNum: number
-  formNum: number
+  nationalDex: number
+  formIndex: number
 }
 
 export interface PKMWithModernIVs {

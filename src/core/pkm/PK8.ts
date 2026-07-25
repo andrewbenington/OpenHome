@@ -84,7 +84,7 @@ export default class PK8 {
     this.inner.checksum = value
   }
 
-  get dexNum() {
+  get nationalDex() {
     return this.inner.nationalDex
   }
 
@@ -179,7 +179,7 @@ export default class PK8 {
     this.inner.gender = value
   }
 
-  get formNum() {
+  get formIndex() {
     return this.inner.formIndex
   }
 
@@ -602,11 +602,11 @@ export default class PK8 {
   }
 
   public get metadata() {
-    return MetadataSummaryLookup(this.dexNum, this.formNum)
+    return MetadataSummaryLookup(this.nationalDex, this.formIndex)
   }
 
   public get speciesMetadata() {
-    return SpeciesLookup(this.dexNum)
+    return SpeciesLookup(this.nationalDex)
   }
 
   static maxValidMove() {

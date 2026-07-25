@@ -52,8 +52,8 @@ describe('Platinum save file read/write', async () => {
       expect(lastPokemon.trainerName).toBe('RoC')
       expect(lastPokemon.moves[0]).toBe(237) // Hidden Power
       expect(lastPokemon.moves[1]).toBe(0)
-      expect(lastPokemon.dexNum).toBe(NationalDex.Unown)
-      expect(lastPokemon.formNum).toBe(27)
+      expect(lastPokemon.nationalDex).toBe(NationalDex.Unown)
+      expect(lastPokemon.formIndex).toBe(27)
       expect(lastPokemon.exp).toBe(8000)
     } else {
       fail('No Pokémon found in the 18th box, 27th slot.')
@@ -138,8 +138,8 @@ describe('Pearl save file read/write', async () => {
       expect(lastPokemon.trainerName).toBe('RoC')
       expect(lastPokemon.moves[0]).toBe(237) // Hidden Power
       expect(lastPokemon.moves[1]).toBe(0)
-      expect(lastPokemon.dexNum).toBe(NationalDex.Unown)
-      expect(lastPokemon.formNum).toBe(27)
+      expect(lastPokemon.nationalDex).toBe(NationalDex.Unown)
+      expect(lastPokemon.formIndex).toBe(27)
       expect(lastPokemon.exp).toBe(8000)
     } else {
       fail('No Pokémon found in the 18th box, 27th slot.')
@@ -225,8 +225,8 @@ describe('HeartGold save file read/write', async () => {
       expect(lastPokemon.trainerName).toBe('RoC')
       expect(lastPokemon.moves[0]).toBe(237) // Hidden Power
       expect(lastPokemon.moves[1]).toBe(0)
-      expect(lastPokemon.dexNum).toBe(NationalDex.Unown)
-      expect(lastPokemon.formNum).toBe(27)
+      expect(lastPokemon.nationalDex).toBe(NationalDex.Unown)
+      expect(lastPokemon.formIndex).toBe(27)
       expect(lastPokemon.exp).toBe(125)
     } else {
       fail('No Pokémon found in the 18th box, 27th slot.')

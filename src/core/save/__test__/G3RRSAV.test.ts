@@ -50,8 +50,8 @@ describe('G3RRSAV - Radical Red Save File Read Test', () => {
       expect(firstPokemon.trainerName).toBe('Radical')
       expect(firstPokemon.moves[0]).toBe(33) // Tackle
       expect(firstPokemon.moves[1]).toBe(336) // Howl
-      expect(firstPokemon.dexNum).toBe(261)
-      expect(Lookup.speciesName(firstPokemon.dexNum, Language.English)).toBe('Poochyena')
+      expect(firstPokemon.nationalDex).toBe(261)
+      expect(Lookup.speciesName(firstPokemon.nationalDex, Language.English)).toBe('Poochyena')
     } else {
       fail('No Pokémon found in the first box, first slot.')
     }

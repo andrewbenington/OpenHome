@@ -102,18 +102,21 @@ const LUMI_CUSTOM_FORMS: Record<number, Record<number, CustomFormInfo>> = {
 /**
  * Returns custom form metadata for a Luminescent Platinum Pokémon.
  */
-export function getLumiCustomForm(dexNum: number, formNum: number): CustomFormInfo | undefined {
-  return LUMI_CUSTOM_FORMS[dexNum]?.[formNum]
+export function getLumiCustomForm(
+  nationalDex: number,
+  formIndex: number
+): CustomFormInfo | undefined {
+  return LUMI_CUSTOM_FORMS[nationalDex]?.[formIndex]
 }
 
 /**
  * Gets the custom form metadata for a given extra form id, if present in Luminescent Platinum.
  */
 export function getLumiFormIndexByExtraFormIndex(
-  dexNum: number,
+  nationalDex: number,
   extraFormIndex: ExtraFormIndex
 ): Option<number> {
-  const customFormsForMon = LUMI_CUSTOM_FORMS[dexNum]
+  const customFormsForMon = LUMI_CUSTOM_FORMS[nationalDex]
   if (!customFormsForMon) return undefined
   for (const formIndex in customFormsForMon) {
     if (customFormsForMon[formIndex].extraFormIndex === extraFormIndex) {

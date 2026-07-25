@@ -35,13 +35,13 @@ export function getMonSprite(
   enabledPlugins: OpenHomePlugin[]
 ): GetMonSpriteResult {
   if (isMegaStone(mon.heldItemIndex)) {
-    const megaForStone = MetadataSummaryLookup(mon.dexNum, mon.formNum)?.megaEvolutions.find(
+    const megaForStone = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)?.megaEvolutions.find(
       (mega) => mega.requiredItemId === mon.heldItemIndex
     )
 
-    if (megaForStone) mon.formNum = megaForStone.megaForme.formIndex
-  } else if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
-    mon.formNum = displayIndexAdder(mon.heldItemIndex)(mon.formNum)
+    if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
+  } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
+    mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
   }
 
   const pluginResult = findPluginSprite(mon, enabledPlugins)
@@ -67,8 +67,8 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
     setSpriteResult({ loading: true })
   }, [
     mon.format,
-    mon.dexNum,
-    mon.formNum,
+    mon.nationalDex,
+    mon.formIndex,
     mon.formArgument,
     mon.isFemale,
     mon.isShiny,
@@ -79,13 +79,14 @@ export default function useMonSprite(mon: MonSpriteData): MonSpriteResult {
     if (spriteResult.errorMessage || spriteResult.path) return
 
     if (isMegaStone(mon.heldItemIndex)) {
-      const megaForStone = MetadataSummaryLookup(mon.dexNum, mon.formNum)?.megaEvolutions.find(
-        (mega) => mega.requiredItemId === mon.heldItemIndex
-      )
+      const megaForStone = MetadataSummaryLookup(
+        mon.nationalDex,
+        mon.formIndex
+      )?.megaEvolutions.find((mega) => mega.requiredItemId === mon.heldItemIndex)
 
-      if (megaForStone) mon.formNum = megaForStone.megaForme.formIndex
-    } else if (isBattleFormeItem(mon.dexNum, mon.heldItemIndex)) {
-      mon.formNum = displayIndexAdder(mon.heldItemIndex)(mon.formNum)
+      if (megaForStone) mon.formIndex = megaForStone.megaForme.formIndex
+    } else if (isBattleFormeItem(mon.nationalDex, mon.heldItemIndex)) {
+      mon.formIndex = displayIndexAdder(mon.heldItemIndex)(mon.formIndex)
     }
 
     const result = getMonSprite(mon, enabledPlugins)

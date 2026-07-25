@@ -6,8 +6,8 @@ import { Reducer, createContext } from 'react'
 import { PluginState } from './PluginProvider'
 
 export interface MonSpriteData {
-  dexNum: number
-  formNum: number
+  nationalDex: number
+  formIndex: number
   format: PkmOrOhpkmFormat
   formArgument?: number
   heldItemIndex?: number

@@ -38,11 +38,11 @@ export interface PluginSaveClass<S extends PluginSAV = PluginSAV> extends SAVCla
 
 export function supportsMon(
   saveType: SAVClass,
-  dexNumber: number,
+  nationalDex: number,
   formeNumber: number,
   extraFormIndex?: ExtraFormIndex
 ): boolean {
-  return saveType.prototype.supportsMon(dexNumber, formeNumber, extraFormIndex)
+  return saveType.prototype.supportsMon(nationalDex, formeNumber, extraFormIndex)
 }
 
 export function monSupportedBySaveType(
@@ -50,12 +50,12 @@ export function monSupportedBySaveType(
   mon?: PKMInterface
 ): boolean {
   if (!saveType || !mon) return false
-  return supportsMon(saveType, mon.dexNum, mon.formNum, mon.extraFormIndex)
+  return supportsMon(saveType, mon.nationalDex, mon.formIndex, mon.extraFormIndex)
 }
 
 export function monSupportedBySave(save?: SAV, mon?: PKMInterface): boolean {
   if (!save || !mon) return false
-  return save.supportsMon(mon.dexNum, mon.formNum, mon.extraFormIndex)
+  return save.supportsMon(mon.nationalDex, mon.formIndex, mon.extraFormIndex)
 }
 
 export function getPluginIdentifier(saveType: SAVClass | undefined): string | undefined {

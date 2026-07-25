@@ -92,7 +92,7 @@ export abstract class Gen8Gen9Save<P extends PK8 | PB8 | PA8 | PK9 | PA9> extend
   abstract getBlockMust<T extends Block = Block>(blockName: G89BlockName, type?: BlockType): T
 
   abstract supportsMon(
-    dexNumber: number,
+    nationalDex: number,
     formeNumber: number,
     extraFormIndex?: ExtraFormIndex
   ): boolean
@@ -109,7 +109,7 @@ export abstract class Gen8Gen9Save<P extends PK8 | PB8 | PA8 | PK9 | PA9> extend
   isEmptySlot(bytes: ArrayBuffer): boolean {
     const mon = this.monConstructor(bytes, true)
 
-    return mon.gameOfOrigin === 0 && mon.dexNum === 0
+    return mon.gameOfOrigin === 0 && mon.nationalDex === 0
   }
 
   prepareForSaving() {
@@ -127,7 +127,7 @@ export abstract class Gen8Gen9Save<P extends PK8 | PB8 | PA8 | PK9 | PA9> extend
       // and the slot was left empty
       if (mon) {
         try {
-          if (mon.gameOfOrigin && mon?.dexNum) {
+          if (mon.gameOfOrigin && mon?.nationalDex) {
             mon.recalculateStats()
             mon.refreshChecksum()
             const monBuffer = new Uint8Array(this.getMonBoxSizeBytes())
