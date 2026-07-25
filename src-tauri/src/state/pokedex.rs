@@ -134,7 +134,7 @@ pub fn update_pokedex(
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use serde_json::json;
 
     use crate::state::{Pokedex, PokedexEntry, PokedexStatus};

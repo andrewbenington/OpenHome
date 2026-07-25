@@ -613,7 +613,7 @@ impl crate::tests::PkhexJson for Pk8 {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use std::path::PathBuf;
 
     use crate::checksum::Checksum;

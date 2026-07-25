@@ -70,7 +70,7 @@ impl ToDataController for AppHandle {
 }
 
 #[cfg(test)]
-pub mod test {
+pub mod tests {
     use std::cell::RefCell;
     use std::collections::HashMap;
     use std::path::{Path, PathBuf};
