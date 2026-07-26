@@ -2839,11 +2839,11 @@ const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   },
   '707': {
     nationalDex: 412,
-    formIndex: 0,
+    formIndex: 1,
   },
   '708': {
     nationalDex: 412,
-    formIndex: 0,
+    formIndex: 2,
   },
   '709': {
     nationalDex: 413,
@@ -2855,11 +2855,11 @@ const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   },
   '711': {
     nationalDex: 422,
-    formIndex: 0,
+    formIndex: 1,
   },
   '712': {
     nationalDex: 423,
-    formIndex: 0,
+    formIndex: 1,
   },
   '713': {
     nationalDex: 479,
@@ -2963,27 +2963,27 @@ const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   },
   '738': {
     nationalDex: 585,
-    formIndex: 0,
+    formIndex: 1,
   },
   '739': {
     nationalDex: 585,
-    formIndex: 0,
+    formIndex: 2,
   },
   '740': {
     nationalDex: 585,
-    formIndex: 0,
+    formIndex: 3,
   },
   '741': {
     nationalDex: 586,
-    formIndex: 0,
+    formIndex: 1,
   },
   '742': {
     nationalDex: 586,
-    formIndex: 0,
+    formIndex: 2,
   },
   '743': {
     nationalDex: 586,
-    formIndex: 0,
+    formIndex: 3,
   },
   '744': {
     nationalDex: 449,
@@ -3099,15 +3099,15 @@ const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   },
   '772': {
     nationalDex: 664,
-    formIndex: 0,
+    formIndex: 6,
   },
   '773': {
     nationalDex: 665,
-    formIndex: 0,
+    formIndex: 6,
   },
   '774': {
     nationalDex: 666,
-    formIndex: 0,
+    formIndex: 6,
   },
   '775': {
     nationalDex: 667,
@@ -3423,27 +3423,27 @@ const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   },
   '853': {
     nationalDex: 710,
-    formIndex: 0,
+    formIndex: 1,
   },
   '854': {
     nationalDex: 710,
-    formIndex: 0,
+    formIndex: 2,
   },
   '855': {
     nationalDex: 710,
-    formIndex: 0,
+    formIndex: 3,
   },
   '856': {
     nationalDex: 711,
-    formIndex: 0,
+    formIndex: 1,
   },
   '857': {
     nationalDex: 711,
-    formIndex: 0,
+    formIndex: 2,
   },
   '858': {
     nationalDex: 711,
-    formIndex: 0,
+    formIndex: 3,
   },
   '859': {
     nationalDex: 971,
@@ -5383,7 +5383,7 @@ const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   },
   '1331': {
     nationalDex: 925,
-    formIndex: 0,
+    formIndex: 1,
   },
   '1332': {
     nationalDex: 974,
@@ -5491,15 +5491,15 @@ const RadicalRedToNationalDexMap: Record<string, CfruSpeciesAndForm | null> = {
   },
   '1358': {
     nationalDex: 1017,
-    formIndex: 0,
+    formIndex: 1,
   },
   '1359': {
     nationalDex: 1017,
-    formIndex: 0,
+    formIndex: 2,
   },
   '1360': {
     nationalDex: 1017,
-    formIndex: 0,
+    formIndex: 3,
   },
   '1361': {
     nationalDex: 1012,
