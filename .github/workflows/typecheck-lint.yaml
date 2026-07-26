@@ -38,7 +38,9 @@ jobs:
           workspaces: './src-tauri -> target, ./pkm_rs -> target, ./pkm_rs_derive -> target, ./pkm_rs_resources -> target, ./pkm_rs_types -> target, . -> target'
 
       - name: Install wasm-pack
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-hack
 
       - name: Install Dependencies
         run: pnpm i --frozen-lockfile

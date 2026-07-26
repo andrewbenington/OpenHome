@@ -58,8 +58,12 @@ ifeq ($(shell which wasm-pack 2>/dev/null), )
 	@cargo install wasm-pack
 endif
 
+.PHONY: ensure-nextest
+ensure-nextest:
+	@cargo install nextest@0.9.140
+
 .PHONY: ensure-dependencies
-ensure-dependencies: ensure-pnpm ensure-wasm-pack
+ensure-dependencies: ensure-pnpm ensure-wasm-pack ensure-nextest
 
 .PHONY: set-version
 set-version:
