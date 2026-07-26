@@ -137,7 +137,7 @@ async function finalizeLatestReleaseBody(octokit: Octokit) {
       latestRelease.body === EMPTY_BODY
         ? await currentVersionPullRequestDescription(octokit)
         : latestRelease.body || undefined,
-    prerelease: false,
+    prerelease: latestRelease.prerelease,
     make_latest: 'legacy',
     draft: false,
   })

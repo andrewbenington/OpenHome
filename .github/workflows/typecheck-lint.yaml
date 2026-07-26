@@ -35,7 +35,7 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: './src-tauri -> target, ./pkm_rs -> target, ./pkm_rs -> target, ./pkm_rs_derive -> target, ./pkm_rs_resources -> target, ./pkm_rs_types -> target, . -> target'
+          workspaces: './src-tauri -> target, ./pkm_rs -> target, ./pkm_rs_derive -> target, ./pkm_rs_resources -> target, ./pkm_rs_types -> target, . -> target'
 
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
@@ -44,7 +44,7 @@ jobs:
         run: pnpm i --frozen-lockfile
 
       - name: Build WASM
-        run: pnpm run wasm-compile
+        run: pnpm run wasm-compile-dev
 
       - name: Type Check
         run: pnpm run typecheck
