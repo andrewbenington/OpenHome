@@ -60,6 +60,10 @@ function getCurrentVersion(): string {
   return pkg.version
 }
 
+function versionIsPrerelease(version: string): boolean {
+  return version.includes('-') // e.g. 1.5.0-beta.1
+}
+
 // ---- GitHub release --------------------------------------------------------
 
 async function createGithubRelease(octokit: Octokit, version: string, body?: string) {
@@ -72,7 +76,7 @@ async function createGithubRelease(octokit: Octokit, version: string, body?: str
     body,
     generate_release_notes: true,
     draft: true,
-    prerelease: version.includes('-'), // e.g. 1.5.0-beta.1
+    prerelease: versionIsPrerelease(version),
   })
   console.log(`  Created: ${release.data.html_url}`)
   return release.data
@@ -95,14 +99,17 @@ async function publishLatestRelease(octokit: Octokit) {
   }
 
   console.log(`\n→ Publishing Github release ${latestRelease.tag_name}...`)
+
+  const prerelease = versionIsPrerelease(latestRelease.tag_name)
+
   let body = latestRelease.body ?? (await currentVersionPullRequestDescription(octokit))
   let release = await octokit.rest.repos.updateRelease({
     owner: OWNER,
     repo: REPO,
     release_id: latestRelease.id,
     body,
-    prerelease: false,
-    make_latest: 'true',
+    prerelease,
+    make_latest: prerelease ? 'false' : 'true',
     draft: false,
   })
 
@@ -151,21 +158,23 @@ async function deleteGithubRelease(octokit: Octokit, releaseId: number) {
 }
 
 async function findReleasePullRequest(octokit: Octokit, version: string) {
-  const iterator = octokit.paginate.iterator(octokit.rest.pulls.list, {
+  const response = await octokit.rest.pulls.list({
     owner: OWNER,
     repo: REPO,
     state: 'closed',
-    per_page: 100,
+    per_page: 20,
+    page: 0,
   })
+  const pullRequests = response.data
 
-  for await (const { data: pullRequests } of iterator) {
-    const match = pullRequests.find(
-      (pullRequest) =>
-        pullRequest.title.startsWith(`[RELEASE] ${version}`) ||
-        pullRequest.title.startsWith(`[RELEASE] v${version}`)
-    )
-    if (match) return match
-  }
+  const prefix = versionIsPrerelease(version) ? '[PRERELEASE]' : '[RELEASE]'
+
+  const match = pullRequests.find(
+    (pullRequest) =>
+      pullRequest.title.startsWith(`${prefix} ${version}`) ||
+      pullRequest.title.startsWith(`${prefix} v${version}`)
+  )
+  if (match) return match
 
   return undefined
 }
@@ -209,7 +218,6 @@ async function getNewestRelease(octokit: Octokit, tag?: string) {
 async function createNewRelease(octokit: Octokit) {
   const currentVersion = getCurrentVersion()
 
-  // const currentVersion = fs
   const latestRelease = await getNewestRelease(octokit)
   let body = await currentVersionPullRequestDescription(octokit)
   if (latestRelease.tag_name !== `v${currentVersion}`) {

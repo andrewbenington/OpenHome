@@ -73,7 +73,7 @@ set-version:
 	@cd pkm_rs_types && cargo set-version $(VERSION)
 	@cd pkm_rs && cargo build
 	@cd src-tauri && cargo build
-	@pnpm version $(VERSION) --no-git-tag-version --allow-same-version 
+	@pnpm version $(VERSION) --no-git-tag-version --allow-same-version --no-git-checks
 	@pnpm i
 
 .PHONY: build-appimage
