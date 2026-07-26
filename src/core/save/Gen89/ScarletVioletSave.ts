@@ -69,7 +69,7 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
   }
 
   monConstructor(bytes: ArrayBuffer, encrypted: boolean): PK9 {
-    return new PK9(bytes, { encrypted })
+    return PK9.fromBytes(bytes, encrypted)
   }
 
   getBlockKey(blockName: G89BlockName | keyof typeof BlockKeys): number {

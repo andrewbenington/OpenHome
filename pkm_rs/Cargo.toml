@@ -31,6 +31,8 @@ sha1 = "0.11.0"
 aes = "0.9.1"
 specta = { version = "=2.0.0-rc.22", features = [ "serde_json", "derive" ] }
 serde_bytes = "0.11.19"
+pretty_assertions = "1.4.1"
+pretty-hex = "0.4.2"
 
 [lib]
 name = "pkm_rs"
@@ -46,6 +48,7 @@ randomize = ["rand", "pkm_rs_types/randomize", "pkm_rs_resources/randomize"]
 
 [dev-dependencies]
 assert-json-diff = "2.0.2"
+hex = "0.4.3"
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = ["--enable-bulk-memory", "--enable-nontrapping-float-to-int"]

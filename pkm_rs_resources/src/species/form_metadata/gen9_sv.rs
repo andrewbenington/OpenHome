@@ -136,17 +136,16 @@ impl MetadataTable for MetadataTableScarletViolet {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn test_personal_info_scarlet_violet() {
-        let bulbasaur_info = METADATA_TABLE_SV
+        let base_stats = METADATA_TABLE_SV
             .get_base_stats(1, 0)
-            .expect_log("Bulbasaur not found");
-        let modern_stats = match bulbasaur_info {
-            BaseStats::Modern(stats) => stats,
-            _ => panic!("Expected modern stats"),
-        };
+            .expect_log("Bulbasaur not found")
+            .expect_modern("Expected modern stats");
+
         assert_eq!(
-            modern_stats,
+            base_stats,
             Stats8 {
                 hp: 45,
                 atk: 49,
@@ -160,8 +159,30 @@ mod tests {
             METADATA_TABLE_SV.get_types(1, 0),
             Some((PkmType::Grass, Some(PkmType::Poison)))
         );
-        // assert_eq!(bulbasaur_info.form_count(), 1);
-        // assert_eq!(bulbasaur_info.forms_offset(), None);
-        // assert_eq!(bulbasaur_info.game_index_for_form(0), Some(0));
+    }
+
+    #[test]
+    fn test_gholdengo_info() {
+        let base_stats = METADATA_TABLE_SV
+            .get_base_stats(NationalDex::Gimmighoul as u16, 1)
+            .expect_log("Gimmighoul Roaming not found")
+            .expect_modern("Expected modern stats");
+
+        assert_eq!(
+            base_stats,
+            Stats8 {
+                hp: 45,
+                atk: 30,
+                def: 25,
+                spa: 75,
+                spd: 45,
+                spe: 80
+            }
+        );
+
+        assert_eq!(
+            METADATA_TABLE_SV.get_types(NationalDex::Gimmighoul as u16, 1),
+            Some((PkmType::Ghost, None))
+        );
     }
 }

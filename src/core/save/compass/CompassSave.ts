@@ -262,8 +262,6 @@ export class CompassSave extends PluginSAV<PK9Compass> {
       if (mon) {
         try {
           if (mon.gameOfOrigin && mon?.nationalDex) {
-            mon.recalculateStats()
-            mon.refreshChecksum()
             const monBuffer = new Uint8Array(this.getMonBoxSizeBytes())
             const pcBytes = mon.toPCBytes()
 

@@ -1,3 +1,4 @@
+use crate::gen9_sv;
 use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result, StringErrorSource};
 use crate::sectioned_data::DataSection;
@@ -35,19 +36,23 @@ pub(crate) fn bytes_are_empty(bytes: &[u8]) -> bool {
     bytes.iter().all(|b| *b == 0)
 }
 
+// PK9 has space for up to 200 base game TMs, but only 171 are used.
+// DLC TMs are stored separately.
+pub const SV_BASE_TM_BYTES_EXCLUDE_UNUSED: usize = 22;
+
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Serialize, Clone, Copy)]
 pub struct ScarletVioletData {
     pub tera_type_original: TeraType,
     pub tera_type_override: Option<TeraType>,
-    pub tm_flags: FlagSet<22>,
-    pub tm_flags_dlc: FlagSet<13>,
+    pub tm_flags: FlagSet<SV_BASE_TM_BYTES_EXCLUDE_UNUSED>,
+    pub tm_flags_dlc: FlagSet<{ gen9_sv::TM_FLAG_BYTE_LENGTH_DLC }>,
 }
 
 impl ScarletVioletData {
     pub fn from_v1(old: super::v1::OhpkmV1) -> Option<Self> {
-        let tera_type_original = TeraType::from_byte(old.tera_type_original)?;
-        let tera_type_override = TeraType::from_byte(old.tera_type_override);
+        let tera_type_original = TeraType::from_byte_original(old.tera_type_original).ok()?;
+        let tera_type_override = TeraType::from_byte_override(old.tera_type_override).ok()?;
 
         if !old.game_of_origin.is_scarlet_violet()
             && tera_type_override.is_none()
@@ -85,14 +90,11 @@ impl DataSection for ScarletVioletData {
         Self::ensure_buffer_size(bytes);
 
         // try_into() will always succeed thanks to the buffer size check
-        let tera_type_original = TeraType::from_byte(bytes[0]).ok_or(Error::Other(format!(
-            "Invalid original tera type index: {}",
-            bytes[0]
-        )))?;
+        let tera_type_original = TeraType::from_byte_original(bytes[0])?;
 
         Ok(Self {
             tera_type_original,
-            tera_type_override: TeraType::from_byte(bytes[1]),
+            tera_type_override: TeraType::from_byte_override(bytes[1])?,
             tm_flags: FlagSet::from_bytes(bytes[2..24].try_into().unwrap()),
             tm_flags_dlc: FlagSet::from_bytes(bytes[24..37].try_into().unwrap()),
         })

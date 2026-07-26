@@ -510,7 +510,7 @@ impl Pk8 {
 
     #[wasm_bindgen(getter = nationalDex)]
     pub fn national_dex_js(&self) -> u16 {
-        self.species_and_form.0.get_ndex_js()
+        self.species_and_form.0.get_ndex_wasm()
     }
 
     #[wasm_bindgen(getter = formIndex)]
@@ -622,6 +622,7 @@ mod tests {
     use crate::gen8_swsh::pk8_buffer::Pk8Buffer;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
+    #[cfg(feature = "randomize")]
     use crate::tests::TestErrorWithSeed;
     use crate::tests::{self, TestResult};
     use crate::traits::IsShiny;

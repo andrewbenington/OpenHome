@@ -95,8 +95,8 @@ public static partial class Util
   {
     try
     {
-      
-    return moveId == 0 ? "<empty>" : strings.movelist.GetValue(moveId);
+
+      return moveId == 0 ? "<empty>" : strings.movelist.GetValue(moveId);
     }
     catch (Exception)
     {
@@ -162,11 +162,18 @@ public static partial class Util
     {
       s = "RibbonChampion";
     }
-    
+
     var parts = RibbonRegex().Split(s).Where(p => p.Length > 0).ToArray();
-    if (parts.Length == 3 && parts[1] == "Champion")
+    if (parts.Length == 3)
     {
-      return $"{parts[2]} {parts[1]} {parts[0]}";
+      if (parts[1] == "Champion")
+      {
+        return $"{parts[2]} {parts[1]} {parts[0]}";
+      }
+      else if (parts[1] == "Mark")
+      {
+        return $"{parts[2]} {parts[1]}";
+      }
     }
 
     return string.Join(" ", parts.Skip(1).Append(parts[0]));
@@ -276,9 +283,27 @@ public static partial class Util
 
   public static object FormatAffixedRibbon(sbyte ribbon, GameStrings strings)
   {
-    Console.WriteLine("ribbon value: " + ribbon);
-    Console.WriteLine("min ribbon value: " + sbyte.MinValue);
-    return ribbon == -1 ? null : strings.ribbons.GetValue(ribbon);
+    if (ribbon == -1) return null;
+
+    int ribbonInt = ribbon;
+    if (ribbonInt >= 46)
+    {
+      ribbonInt += 53;
+    }
+    string ribbonName = strings.ribbons[ribbonInt];
+    return ribbonName.Split("\t")[1].Replace(" Ribbon", "");
+  }
+
+  public static object FormatTeraType(MoveType teraType)
+  {
+    if ((int)teraType == 19) return null;
+
+    if (teraType <= MoveType.Fairy && teraType != MoveType.Any)
+    {
+      return new { Standard = teraType.ToString() };
+    }
+
+    return teraType.ToString();
   }
 
   [GeneratedRegex(@"(?=[A-Z])")]

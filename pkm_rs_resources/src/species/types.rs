@@ -7,6 +7,7 @@ use crate::{Error, Result, abilities::AbilityIndexWasm, metadata_source::Metadat
 use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
 use pkm_rs_types::{AbilityNumber, GameSetting, Generation, NationalDex, PkmType, TeraType};
 use serde::{Serialize, Serializer};
+use std::fmt::Display;
 use std::num::NonZeroU16;
 use strum_macros::{Display, EnumString};
 
@@ -99,6 +100,12 @@ impl Serialize for NatDexIndex {
         S: Serializer,
     {
         serializer.serialize_u16(self.to_u16())
+    }
+}
+
+impl Display for NatDexIndex {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
     }
 }
 
@@ -820,12 +827,12 @@ impl SpeciesAndForm {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = nationalDex))]
-    pub fn get_ndex_js(&self) -> u16 {
+    pub fn get_ndex_wasm(&self) -> u16 {
         self.national_dex.to_u16()
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter = formIndex))]
-    pub fn get_forme_index_js(&self) -> u16 {
+    pub fn get_forme_index_wasm(&self) -> u16 {
         self.form_index
     }
 
