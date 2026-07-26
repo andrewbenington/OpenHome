@@ -9,6 +9,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+    cooldown:
+      default-days: 3
     groups:
       production-dependencies:
         dependency-type: 'production'
@@ -18,6 +20,8 @@ updates:
     directory: '/src-tauri'
     schedule:
       interval: 'weekly'
+    cooldown:
+      default-days: 3
     groups:
       production-dependencies:
         dependency-type: 'production'
