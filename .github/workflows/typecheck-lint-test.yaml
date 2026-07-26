@@ -1,4 +1,4 @@
-name: Enforce Types + Linting
+name: Type check, lint, and run tests
 
 permissions:
   contents: read
