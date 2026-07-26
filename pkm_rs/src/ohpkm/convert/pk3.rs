@@ -5,13 +5,13 @@ use pkm_rs_types::{AbilityNumber, Generation, PokeDate, Stats16Le};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
-use crate::gen3::{Gen3PokemonIndex, PK3_MAX_ABILITY, Pk3};
+use crate::gen3_gba::{Gen3PokemonIndex, PK3_MAX_ABILITY, Pk3};
 use crate::ohpkm::OhpkmV2;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::{Error, Result};
 use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
 use crate::{format::PkmFormat, traits::HasSpeciesAndForm};
-use crate::{gen3, ohpkm, util::personality_value};
+use crate::{gen3_gba, ohpkm, util::personality_value};
 
 impl OhpkmConvert for Pk3 {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
@@ -182,15 +182,15 @@ impl OhpkmConvert for Pk3 {
     }
 
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
-        if bytes.len() == gen3::BOX_SIZE {
+        if bytes.len() == gen3_gba::BOX_SIZE {
             let mut extended = bytes.to_vec();
-            extended.resize(gen3::PARTY_SIZE, 0);
+            extended.resize(gen3_gba::PARTY_SIZE, 0);
             return extended
                 .try_into()
                 .map_err(|_| {
                     Error::buffer_size_with_source(
                         "Pk3::OhpkmConvert::bytes_to_stored",
-                        gen3::PARTY_SIZE,
+                        gen3_gba::PARTY_SIZE,
                         bytes.len(),
                     )
                 })
@@ -201,7 +201,7 @@ impl OhpkmConvert for Pk3 {
             .map_err(|_| {
                 Error::buffer_size_with_source(
                     "Pk3::OhpkmConvert::bytes_to_stored",
-                    gen3::PARTY_SIZE,
+                    gen3_gba::PARTY_SIZE,
                     bytes.len(),
                 )
             })
@@ -211,7 +211,7 @@ impl OhpkmConvert for Pk3 {
 
 #[cfg(test)]
 mod tests {
-    use crate::{gen3::Pk3, tests, traits::IsShiny};
+    use crate::{gen3_gba::Pk3, tests, traits::IsShiny};
     use std::path::PathBuf;
 
     #[test]

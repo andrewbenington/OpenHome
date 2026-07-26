@@ -10,7 +10,7 @@ pub mod bytes;
 pub mod convert_strategy;
 pub mod format;
 #[cfg(feature = "wasm")]
-pub mod gen3;
+pub mod gen3_gba;
 #[cfg(feature = "wasm")]
 pub mod gen7_alola;
 // pub mod gen7_lgpe;
