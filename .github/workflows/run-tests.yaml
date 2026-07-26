@@ -46,7 +46,7 @@ jobs:
       - name: Install wasm-pack and nextest
         uses: taiki-e/install-action@v2
         with:
-          tool: cargo-hack,nextest@0.9.140
+          tool: wasm-pack,nextest@0.9.140
 
       - name: Install Dependencies
         run: pnpm i --frozen-lockfile

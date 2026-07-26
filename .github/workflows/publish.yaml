@@ -60,7 +60,7 @@ jobs:
       - name: Install wasm-pack
         uses: taiki-e/install-action@v2
         with:
-          tool: cargo-hack
+          tool: wasm-pack
 
       - name: Install Frontend Dependencies
         run: pnpm i --frozen-lockfile
