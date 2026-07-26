@@ -176,6 +176,8 @@ async function findReleasePullRequest(octokit: Octokit, version: string) {
   )
   if (match) return match
 
+  console.warn(`No release PR found for ${version}`)
+
   return undefined
 }
 
