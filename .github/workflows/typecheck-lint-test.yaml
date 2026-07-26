@@ -13,6 +13,9 @@ on:
 jobs:
   type_check_lint_test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [24]
 
     steps:
       - name: Checkout
@@ -20,11 +23,13 @@ jobs:
 
       - name: Install PNPM
         uses: pnpm/action-setup@v6
+        with:
+          version: 11
 
-      - name: Setup Node
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
-          node-version: lts/*
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
 
       - name: install Rust stable

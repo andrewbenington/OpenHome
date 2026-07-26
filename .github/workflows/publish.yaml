@@ -25,6 +25,7 @@ jobs:
           - platform: 'windows-latest'
             target: 'aarch64-pc-windows-msvc'
             args: '--target aarch64-pc-windows-msvc'
+        node-version: [24]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -33,11 +34,13 @@ jobs:
 
       - name: Install PNPM
         uses: pnpm/action-setup@v6
+        with:
+          version: 11
 
-      - name: Setup Node
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
-          node-version: lts/*
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
 
       - name: install Rust stable
