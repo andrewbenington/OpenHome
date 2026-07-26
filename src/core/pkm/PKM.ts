@@ -40,7 +40,7 @@ export type PKM =
   | PA9
   | PK7
 
-const WasmPkmFormats = [PK3, PK7, PK8]
+const WasmPkmFormats = [PK3, PK7, PK8, PK9, PK9Compass]
 export type WasmPkmFormat = InstanceType<(typeof WasmPkmFormats)[number]>
 
 export function isWasmFormat(pkm: PKMInterface): pkm is WasmPkmFormat {

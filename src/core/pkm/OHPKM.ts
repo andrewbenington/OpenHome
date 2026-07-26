@@ -60,6 +60,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   private constructor(arg: Uint8Array | AllPKMFields) {
     if (arg instanceof Uint8Array) {
       super(arg)
+    } else if (arg instanceof OHPKM) {
+      super(arg.toByteArray())
     } else {
       const other = arg
       super(new Uint8Array())
@@ -293,12 +295,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       this.sociability = other.sociability ?? 0
 
-      this.dynamaxLevel = other.dynamaxLevel
-      this.canGigantamax = other.canGigantamax
-
-      this.palma = other.palma
-      this.trFlagsSwSh = other.trFlagsSwSh
-
       this.tmFlagsBDSP = other.tmFlagsBDSP
 
       this.isAlpha = other.isAlpha || this.ribbons.includes('Alpha Mark')
@@ -322,12 +318,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       }
 
       this.scale = other.scale ?? other.heightScalar ?? 127
-
-      this.teraTypeOverride = other.teraTypeOverride ?? 19
-      this.setTeraTypeOriginalIf(other.teraTypeOriginal)
-
-      this.tmFlagsSV = other.tmFlagsSV
-      this.tmFlagsSVDLC = other.tmFlagsSVDLC
 
       if (other.originalBytes && other.format !== 'OHPKM') {
         const tag = monFormatToOriginalDataTag(other.format)
