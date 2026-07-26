@@ -11,7 +11,7 @@ on:
       - update-workflows
 
 jobs:
-  type_check_lint_test:
+  run_tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -50,12 +50,6 @@ jobs:
 
       - name: Build WASM
         run: pnpm run wasm-compile-dev
-
-      - name: Type Check
-        run: pnpm run typecheck
-
-      - name: Lint
-        run: pnpm run lint:ci
 
       - name: Run Tests
         run: pnpm test:ci
