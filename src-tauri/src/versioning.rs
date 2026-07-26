@@ -170,6 +170,7 @@ pub enum SignificantUpdate {
     V1_13_3,
     V1_14_1,
     V1_14_2,
+    V1_15_0,
 }
 
 impl SignificantUpdate {
@@ -202,6 +203,7 @@ impl SignificantUpdate {
             Self::V1_13_3 => Version::parse("1.13.3"),
             Self::V1_14_1 => Version::parse("1.14.1"),
             Self::V1_14_2 => Version::parse("1.14.2"),
+            Self::V1_15_0 => Version::parse("1.15.0-rc.0"),
         }
         .expect("all versions are valid semver")
     }
@@ -332,6 +334,10 @@ impl SignificantUpdate {
             Self::V1_14_2 => Some(vec![
                 "Fixed a bug preventing Gen 7 3DS saves from opening.",
                 "Gen 7 3DS saves now show the correct box names.",
+            ]),
+            Self::V1_15_0 => Some(vec![
+                "Fixed bugs preventing some transfers to Radical Red.",
+                "PK9 logic has been rewritten in Rust. Loading them should be faster.",
             ]),
             _ => None,
         }
