@@ -34,10 +34,10 @@ jobs:
       - name: Install PNPM
         uses: pnpm/action-setup@v6
 
-      - name: Setup Node
+      - name: Setup Node.js 24
         uses: actions/setup-node@v6
         with:
-          node-version: lts/*
+          node-version: 24
           cache: 'pnpm'
 
       - name: install Rust stable
@@ -48,7 +48,7 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: './src-tauri -> target, ./pkm_rs -> target, ./pkm_rs_derive -> target, ./pkm_rs_resources -> target, ./pkm_rs_types -> target, . -> target'
+          workspaces: './src-tauri -> target, ./openhome_core -> target, ./pkm_rs -> target, ./pkm_rs_derive -> target, ./pkm_rs_resources -> target, ./pkm_rs_types -> target, . -> target'
           key: ${{ matrix.target }}
 
       - name: Install Tauri Dependencies (Ubuntu only)
