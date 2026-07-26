@@ -89,7 +89,7 @@ export default class PK9 {
     this.inner.checksum = value
   }
 
-  get dexNum() {
+  get nationalDex() {
     return this.inner.nationalDex
   }
 
@@ -177,7 +177,7 @@ export default class PK9 {
     this.inner.gender = value
   }
 
-  get formNum() {
+  get formIndex() {
     return this.inner.formIndex
   }
 
