@@ -11,7 +11,7 @@ on:
       - update-workflows
 
 jobs:
-  prettier:
+  run_tests:
     runs-on: ubuntu-latest
 
     steps:

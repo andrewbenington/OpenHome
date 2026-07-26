@@ -11,7 +11,7 @@ on:
       - update-workflows
 
 jobs:
-  prettier:
+  type_check_and_lint:
     runs-on: ubuntu-latest
 
     steps:
