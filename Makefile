@@ -60,7 +60,7 @@ endif
 
 .PHONY: ensure-nextest
 ensure-nextest:
-	@cargo install nextest@0.9.140
+	@cargo install cargo-nextest@=0.9.140
 
 .PHONY: ensure-dependencies
 ensure-dependencies: ensure-pnpm ensure-wasm-pack ensure-nextest
