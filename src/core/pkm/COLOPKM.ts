@@ -17,6 +17,8 @@ import {
   MarkingsFourShapes,
   MetadataSummaryLookup,
   NatureIndex,
+  OriginGame,
+  OriginGames,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import * as stringLogic from '../util/stringConversion'
@@ -74,7 +76,8 @@ export default class COLOPKM {
       const dataView = new DataView(buffer)
       this.nationalDex = dataView.getUint16(0x0, false)
       this.personalityValue = dataView.getUint32(0x4, false)
-      this.gameOfOrigin = dataView.getUint8(0x8)
+      this.gameOfOrigin =
+        OriginGames.fromGamecubeIndex(dataView.getUint8(0x8)) || OriginGame.ColosseumXd
       this.language = Languages.fromByteOrNoneGcn(dataView.getUint8(0xb))
       this.metLocationIndex = dataView.getUint16(0xc, false)
       this.metLevel = dataView.getUint8(0xe)
@@ -82,8 +85,8 @@ export default class COLOPKM {
       this.trainerGender = byteLogic.getGenderFlag(dataView, 0x10, 1)
       this.trainerID = dataView.getUint16(0x14, false)
       this.secretID = dataView.getUint16(0x16, false)
-      this.trainerName = stringLogic.utf16BytesToString(buffer, 0x18, 11)
-      this.nickname = stringLogic.utf16BytesToString(buffer, 0x2e, 11)
+      this.trainerName = stringLogic.utf16BytesToString(buffer, 0x18, 11, false)
+      this.nickname = stringLogic.utf16BytesToString(buffer, 0x2e, 11, false)
       this.exp = dataView.getUint32(0x5c, false)
       this.statLevel = dataView.getUint8(0x60)
       this.moves = [
@@ -177,7 +180,7 @@ export default class COLOPKM {
 
     dataView.setUint16(0x0, this.nationalDex, false)
     dataView.setUint32(0x4, this.personalityValue, false)
-    dataView.setUint8(0x8, this.gameOfOrigin)
+    dataView.setUint8(0x8, OriginGames.toGamecubeIndex(this.gameOfOrigin) || OriginGame.ColosseumXd)
     dataView.setUint8(0xb, Languages.toGcnByte(this.language))
     dataView.setUint16(0xc, this.metLocationIndex, false)
     dataView.setUint8(0xe, this.metLevel)
@@ -185,8 +188,8 @@ export default class COLOPKM {
     byteLogic.setGenderFlag(dataView, 0x10, 1, this.trainerGender)
     dataView.setUint16(0x14, this.trainerID, false)
     dataView.setUint16(0x16, this.secretID, false)
-    stringLogic.writeUTF16StringToBytes(dataView, this.trainerName, 0x18, 11)
-    stringLogic.writeUTF16StringToBytes(dataView, this.nickname, 0x2e, 11)
+    stringLogic.writeUTF16StringToBytes(dataView, this.trainerName, 0x18, 11, true)
+    stringLogic.writeUTF16StringToBytes(dataView, this.nickname, 0x2e, 11, true)
     dataView.setUint32(0x5c, this.exp, false)
     dataView.setUint8(0x60, this.statLevel)
     for (let i = 0; i < 4; i++) {
