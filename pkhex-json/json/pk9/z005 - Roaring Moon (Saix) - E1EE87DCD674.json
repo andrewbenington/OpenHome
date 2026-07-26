@@ -1,0 +1,150 @@
+{
+  "encryption_constant": 2279396980,
+  "sanity": 0,
+  "checksum": 57838,
+  "species_and_form": {
+    "national_dex": 1005,
+    "form_index": 0
+  },
+  "held_item_index": 250,
+  "trainer_id": 56071,
+  "secret_id": 59446,
+  "exp": 1250000,
+  "ability_index": "Protosynthesis",
+  "ability_num": "Second",
+  "markings": {
+    "circle": "unset",
+    "square": "unset",
+    "triangle": "unset",
+    "heart": "unset",
+    "star": "unset",
+    "diamond": "unset"
+  },
+  "personality_value": 2568949257,
+  "nature": "Sassy",
+  "is_fateful_encounter": false,
+  "gender": "Genderless",
+  "evs": {
+    "hp": 6,
+    "atk": 252,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 252
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "ribbons": [],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "form_argument": 0,
+  "nickname": "Saix",
+  "nickname_trash": "530061006900780000006E00670020004D006F006F006E000000",
+  "moves": [
+    {
+      "move_index": "Zen Headbutt",
+      "pp": 24,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Flamethrower",
+      "pp": 24,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Jaw Lock",
+      "pp": 16,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Dragon Claw",
+      "pp": 24,
+      "pp_ups": 3
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "ivs": {
+    "hp": 13,
+    "atk": 29,
+    "def": 25,
+    "spa": 23,
+    "spd": 27,
+    "spe": 4
+  },
+  "is_egg": false,
+  "is_nicknamed": true,
+  "handler_name": "",
+  "handler_gender": "Male",
+  "is_current_handler": false,
+  "handler_friendship": 0,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "handler_id": 0,
+  "handler_language": "None",
+  "trainer_name": "RoC",
+  "trainer_friendship": 160,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "egg_date": null,
+  "met_date": "11/18/2022",
+  "egg_location_index": 0,
+  "met_location_index": 124,
+  "ball": "Luxury",
+  "met_level": 56,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": true,
+    "atk": true,
+    "def": true,
+    "spa": true,
+    "spd": true,
+    "spe": true
+  },
+  "game_of_origin": "Scarlet",
+  "game_of_origin_battle": null,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 100,
+  "stats": {
+    "hp": 352,
+    "atk": 414,
+    "def": 178,
+    "spa": 131,
+    "spd": 238,
+    "spe": 337
+  },
+  "level": 100,
+  "affixed_ribbon": null,
+  "height_scalar": 78,
+  "weight_scalar": 110,
+  "scale": 139,
+  "mint_nature": "Adamant",
+  "tera_type_original": {
+    "Standard": "Dark"
+  },
+  "tera_type_override": null,
+  "home_tracker": null,
+  "tm_flags_base_game": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "tm_flags_dlc": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "current_hp": 352,
+  "obedience_level": 56
+}

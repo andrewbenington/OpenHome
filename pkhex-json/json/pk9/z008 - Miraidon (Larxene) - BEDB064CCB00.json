@@ -1,0 +1,150 @@
+{
+  "encryption_constant": 105696000,
+  "sanity": 0,
+  "checksum": 48859,
+  "species_and_form": {
+    "national_dex": 1008,
+    "form_index": 0
+  },
+  "held_item_index": 250,
+  "trainer_id": 7545,
+  "secret_id": 59619,
+  "exp": 1250000,
+  "ability_index": "Hadron Engine",
+  "ability_num": "First",
+  "markings": {
+    "circle": "unset",
+    "square": "unset",
+    "triangle": "unset",
+    "heart": "unset",
+    "star": "unset",
+    "diamond": "unset"
+  },
+  "personality_value": 2769537173,
+  "nature": "Modest",
+  "is_fateful_encounter": false,
+  "gender": "Genderless",
+  "evs": {
+    "hp": 6,
+    "atk": 0,
+    "def": 0,
+    "spa": 252,
+    "spd": 0,
+    "spe": 252
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "ribbons": [],
+  "contest_memory_count": 0,
+  "battle_memory_count": 0,
+  "form_argument": 0,
+  "nickname": "Larxene",
+  "nickname_trash": "4C0061007200780065006E006500000000000000000000000000",
+  "moves": [
+    {
+      "move_index": "Outrage",
+      "pp": 16,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Thunder",
+      "pp": 16,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Electro Drift",
+      "pp": 8,
+      "pp_ups": 3
+    },
+    {
+      "move_index": "Power Gem",
+      "pp": 32,
+      "pp_ups": 3
+    }
+  ],
+  "relearn_moves": [
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E",
+    "\u003Cempty\u003E"
+  ],
+  "ivs": {
+    "hp": 25,
+    "atk": 31,
+    "def": 25,
+    "spa": 31,
+    "spd": 25,
+    "spe": 31
+  },
+  "is_egg": false,
+  "is_nicknamed": true,
+  "handler_name": "RoC",
+  "handler_gender": "Male",
+  "is_current_handler": true,
+  "handler_friendship": 160,
+  "handler_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "handler_id": 0,
+  "handler_language": "English",
+  "trainer_name": "RoC",
+  "trainer_friendship": 0,
+  "trainer_memory": {
+    "intensity": 0,
+    "memory": 0,
+    "feeling": 0,
+    "textVariables": 0
+  },
+  "egg_date": null,
+  "met_date": "11/18/2022",
+  "egg_location_index": 0,
+  "met_location_index": 124,
+  "ball": "Luxury",
+  "met_level": 72,
+  "trainer_gender": "Male",
+  "hyper_training": {
+    "hp": true,
+    "atk": false,
+    "def": true,
+    "spa": false,
+    "spd": true,
+    "spe": false
+  },
+  "game_of_origin": "Violet",
+  "game_of_origin_battle": null,
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 100,
+  "stats": {
+    "hp": 342,
+    "atk": 185,
+    "def": 236,
+    "spa": 405,
+    "spd": 266,
+    "spe": 369
+  },
+  "level": 100,
+  "affixed_ribbon": null,
+  "height_scalar": 80,
+  "weight_scalar": 146,
+  "scale": 128,
+  "mint_nature": "Modest",
+  "tera_type_original": {
+    "Standard": "Electric"
+  },
+  "tera_type_override": null,
+  "home_tracker": null,
+  "tm_flags_base_game": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "tm_flags_dlc": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  "current_hp": 342,
+  "obedience_level": 72
+}

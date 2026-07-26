@@ -11,13 +11,18 @@ use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
-use crate::ohpkm::v2_sections::{MonTags, PastHandlerDataV2};
+use crate::ohpkm::v2_sections::{MonTags, PastHandlerDataV2, SV_BASE_TM_BYTES_EXCLUDE_UNUSED};
 use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;
+use pkm_rs_resources::ball::Ball;
+use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::moves::MoveSlots;
+use pkm_rs_resources::natures::NatureIndex;
+use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
+use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
@@ -25,21 +30,16 @@ use pkm_rs_types::{
     Language, MarkingsSixShapesColors, OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le,
     StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory,
 };
-
 use serde::Serialize;
 use strum_macros::Display;
-
-use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::MoveIndex;
-use pkm_rs_resources::natures::NatureIndex;
-use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::SpeciesAndForm;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
 #[cfg(feature = "wasm")]
 use super::JsResult;
+#[cfg(feature = "wasm")]
+use crate::gen9_sv;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
 #[cfg(feature = "wasm")]
@@ -233,6 +233,7 @@ impl OhpkmV2 {
             main_data: other.to_main_data(),
             gen67_data: other.to_gen_67_data(),
             swsh_data: other.to_swsh_data(),
+            sv_data: other.to_sv_data(),
             ..Default::default()
         }
     }
@@ -1358,15 +1359,12 @@ impl OhpkmV2 {
 
     // Scarlet/Violet
 
-    pub fn tera_type_original(&self) -> TeraTypeWasm {
-        self.sv_data
-            .map(|d| TeraTypeWasm::from(d.tera_type_original))
-            .unwrap_or(
-                self.species_and_form()
-                    .get_forme_metadata()
-                    .transferred_tera_type()
-                    .into(),
-            )
+    pub fn tera_type_original(&self) -> TeraType {
+        self.sv_data.map(|d| d.tera_type_original).unwrap_or(
+            self.species_and_form()
+                .get_forme_metadata()
+                .transferred_tera_type(),
+        )
     }
 
     pub fn set_tera_type_original_if(&mut self, value: Option<u8>) {
@@ -1381,35 +1379,35 @@ impl OhpkmV2 {
         }
     }
 
-    pub fn tera_type_override(&self) -> u8 {
-        self.sv_data
-            .and_then(|d| d.tera_type_override)
-            .map_or(TeraType::NO_OVERRIDE, TeraType::to_byte)
+    pub fn tera_type_override(&self) -> Option<TeraType> {
+        self.sv_data.and_then(|d| d.tera_type_override)
     }
 
-    pub fn set_tera_type_override(&mut self, value: u8) {
+    pub fn set_tera_type_override(&mut self, value: u8) -> Result<()> {
         self.sv_data
             .get_or_insert(ScarletVioletData::default_generated_tera_type(
                 self.main_data.species_and_form,
             ))
-            .tera_type_override = TeraType::from_byte(value);
+            .tera_type_override = TeraType::from_byte_override(value)?;
+
+        Ok(())
     }
 
-    pub fn tm_flags_sv(&self) -> Option<Vec<u8>> {
-        Some(self.sv_data?.tm_flags.to_bytes().to_vec())
+    pub fn tm_flags_sv(&self) -> Option<[u8; SV_BASE_TM_BYTES_EXCLUDE_UNUSED]> {
+        Some(self.sv_data?.tm_flags.to_bytes())
     }
 
     pub fn set_tm_flags_sv(&mut self, value: Option<Vec<u8>>) {
         match value {
             Some(tm_flags) => {
-                let mut new_bytes = [0u8; 22];
+                let mut new_bytes = [0u8; SV_BASE_TM_BYTES_EXCLUDE_UNUSED];
                 new_bytes.copy_from_slice(&tm_flags);
                 self.sv_data.get_or_insert_default().tm_flags =
-                    FlagSet::<22>::from_bytes(new_bytes);
+                    FlagSet::<SV_BASE_TM_BYTES_EXCLUDE_UNUSED>::from_bytes(new_bytes);
             }
             None => {
                 if let Some(sv_data) = &mut self.sv_data {
-                    sv_data.tm_flags = FlagSet::<22>::default();
+                    sv_data.tm_flags = FlagSet::<SV_BASE_TM_BYTES_EXCLUDE_UNUSED>::default();
                 }
             }
         }
@@ -1576,6 +1574,7 @@ impl OhpkmV2 {
             .collect()
     }
 
+    #[cfg(feature = "wasm")]
     pub fn get_xor_checksum(&self) -> u64 {
         crate::checksum::checksum_u64_le(&self.to_bytes())
     }
@@ -3209,12 +3208,14 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(setter = teraTypeOverride)]
-    pub fn set_tera_type_override_js(&mut self, value: u8) {
+    pub fn set_tera_type_override_js(&mut self, value: u8) -> Result<()> {
         self.sv_data
             .get_or_insert(ScarletVioletData::default_generated_tera_type(
                 self.main_data.species_and_form,
             ))
-            .tera_type_override = TeraType::from_byte(value);
+            .tera_type_override = TeraType::from_byte_override(value)?;
+
+        Ok(())
     }
 
     #[wasm_bindgen(getter = tmFlagsSV)]
@@ -3226,14 +3227,14 @@ impl OhpkmV2 {
     pub fn set_tm_flags_sv_js(&mut self, value: Option<Vec<u8>>) {
         match value {
             Some(tm_flags) => {
-                let mut new_bytes = [0u8; 22];
+                let mut new_bytes = [0u8; SV_BASE_TM_BYTES_EXCLUDE_UNUSED];
                 new_bytes.copy_from_slice(&tm_flags);
                 self.sv_data.get_or_insert_default().tm_flags =
-                    FlagSet::<22>::from_bytes(new_bytes);
+                    FlagSet::<SV_BASE_TM_BYTES_EXCLUDE_UNUSED>::from_bytes(new_bytes);
             }
             None => {
                 if let Some(sv_data) = &mut self.sv_data {
-                    sv_data.tm_flags = FlagSet::<22>::default();
+                    sv_data.tm_flags = FlagSet::<SV_BASE_TM_BYTES_EXCLUDE_UNUSED>::default();
                 }
             }
         }
@@ -3248,14 +3249,15 @@ impl OhpkmV2 {
     pub fn set_tm_flags_sv_dlc_js(&mut self, value: Option<Vec<u8>>) {
         match value {
             Some(tm_flags_dlc) => {
-                let mut new_bytes = [0u8; 13];
+                let mut new_bytes = [0u8; gen9_sv::TM_FLAG_BYTE_LENGTH_DLC];
                 new_bytes.copy_from_slice(&tm_flags_dlc);
                 self.sv_data.get_or_insert_default().tm_flags_dlc =
-                    FlagSet::<13>::from_bytes(new_bytes);
+                    FlagSet::<{ gen9_sv::TM_FLAG_BYTE_LENGTH_DLC }>::from_bytes(new_bytes);
             }
             None => {
                 if let Some(sv_data) = &mut self.sv_data {
-                    sv_data.tm_flags_dlc = FlagSet::<13>::default();
+                    sv_data.tm_flags_dlc =
+                        FlagSet::<{ gen9_sv::TM_FLAG_BYTE_LENGTH_DLC }>::default();
                 }
             }
         }

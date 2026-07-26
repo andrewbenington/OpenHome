@@ -407,4 +407,8 @@ export function isPkmFormat(value: string): value is PkmFormat {
   return PkmFormats.all().includes(value as unknown as PkmFormat)
 }
 
+export function toHex(bytes: Uint8Array) {
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+}
+
 export type PkmOrOhpkmFormat = PkmFormat | 'OHPKM'

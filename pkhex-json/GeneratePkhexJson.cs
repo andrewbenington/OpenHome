@@ -13,6 +13,7 @@ var pkmClassByDir = new Dictionary<string, Func<byte[], PKM>>
     { "pk3", bytes => new PK3(bytes) },
     { "pk7", bytes => new PK7(bytes) },
     { "pk8", bytes => new PK8(bytes) },
+    { "pk9", bytes => new PK9(bytes) },
 };
 
 static object PkmToJsonObject(PKM pk)
@@ -29,10 +30,19 @@ static object PkmToJsonObject(PKM pk)
     {
         return Pk8Object.Build(pk8);
     }
+    else if (pk is PK9 pk9)
+    {
+        return Pk9Object.Build(pk9);
+    }
     else
     {
         return new { };
     }
+}
+
+static byte[] PkmToEncryptedBytes(PKM pk)
+{
+    return pk is PK9 pk9 ? pk9.EncryptedPartyData : null;
 }
 
 foreach (var dir in pkmFileDirs)
@@ -57,5 +67,15 @@ foreach (var dir in pkmFileDirs)
         var outPath = Path.Combine(jsonDir, Path.GetFileNameWithoutExtension(path) + ".json");
         File.WriteAllText(outPath, json);
         Console.WriteLine($"Written: {outPath}");
+
+        var encryptedBytes = PkmToEncryptedBytes(pk);
+        if (encryptedBytes != null && encryptedBytes.Length > 0)
+        {
+            var encryptionDir = Path.Combine("encryption", Path.GetFileName(dir));
+            Directory.CreateDirectory(encryptionDir);
+
+            outPath = Path.Combine(encryptionDir, Path.GetFileNameWithoutExtension(path) + ".bin");
+            File.WriteAllBytes(outPath, encryptedBytes);
+        }
     }
 }

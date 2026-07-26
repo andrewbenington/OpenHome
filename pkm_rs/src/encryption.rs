@@ -8,6 +8,7 @@ const BLOCK_COUNT: usize = 4;
 
 #[cfg(feature = "wasm")]
 mod meme_crypto;
+#[cfg(feature = "wasm")]
 pub use meme_crypto::MemeCrypto;
 
 #[cfg(feature = "wasm")]
@@ -134,6 +135,7 @@ fn rearrange_blocks(
 const ENCRYPTION_CONSTANT_MASK: u32 = 0x3e000;
 const ENCRYPTION_CONSTANT_SHIFT: u32 = 0xd;
 
+#[cfg(feature = "wasm")]
 #[derive(Debug, Clone, Copy)]
 pub enum BlockCrypto {
     Gen3 { pid: u32, tid_and_sid: u32 },
@@ -142,6 +144,7 @@ pub enum BlockCrypto {
     Gen89 { encryption_constant: u32 },
 }
 
+#[cfg(feature = "wasm")]
 impl BlockCrypto {
     pub const fn gen3(pid: u32, tid_and_sid: u32) -> Self {
         Self::Gen3 { pid, tid_and_sid }

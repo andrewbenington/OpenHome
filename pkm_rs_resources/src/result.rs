@@ -42,23 +42,27 @@ pub enum Error {
         field: &'static str,
         source: Box<dyn std::error::Error>,
     },
+    TeraType {
+        value: u8,
+        is_override: bool,
+    },
 }
 
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
-            Error::BufferSize { requirement_source: field, expected, received } => {
+            Self::BufferSize { requirement_source: field, expected, received } => {
                 format!("{field} requires buffer of length {expected}, but actual length is {received}").to_owned()
             }
-            Error::CryptRange { range, buffer_size } => {
+            Self::CryptRange { range, buffer_size } => {
                 format!("Attempting to decrypt/encrypt range ({}, {}) over buffer of size {buffer_size}", range.0, range.1)
                     .to_owned()
             }
-            Error::NationalDex { national_dex } => {
+            Self::NationalDex { national_dex } => {
                 format!("Invalid National Dex number {national_dex} (must be between 1 and {NATIONAL_DEX_MAX})")
                     .to_owned()
             }
-            Error::FormIndex {
+            Self::FormIndex {
                 national_dex,
                 form_index,
             } => {
@@ -70,26 +74,30 @@ impl Display for Error {
                 )
                 .to_owned()
             }
-            Error::LanguageIndex { language_index } => {
+            Self::LanguageIndex { language_index } => {
                 format!("Invalid language index {language_index} (must be between 0 and {LANGUAGE_MAX})")
                     .to_owned()
             }
-            Error::NatureIndex { nature_index } => {
+            Self::NatureIndex { nature_index } => {
                 format!("Invalid nature index {nature_index} (must be between 1 and {NATURE_MAX})")
                     .to_owned()
             }
-            Error::AbilityIndex { ability_index } => {
+            Self::AbilityIndex { ability_index } => {
                 format!("Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX})")
                     .to_owned()
             }
-            Error::ItemIndex { item_index } => {
+            Self::ItemIndex { item_index } => {
                 format!("Invalid item index {item_index} (must be between 1 and {ITEM_MAX})")
                     .to_owned()
             }
-            Error::FieldError { field, source } => {
+            Self::FieldError { field, source } => {
                 format!("Error reading field {field}: {source}")
                     .to_owned()
             }
+            Self::TeraType { value, is_override } => match is_override {
+                false => format!("Invalid original tera type value: {value}"),
+                true => format!("Invalid override tera type value: {value}"),
+            },
         };
 
         f.write_str(&message)
@@ -142,6 +150,9 @@ impl From<pkm_rs_types::Error> for Error {
             },
             pkm_rs_types::Error::LanguageIndex { language_index } => {
                 Self::LanguageIndex { language_index }
+            }
+            pkm_rs_types::Error::TeraType { value, is_override } => {
+                Self::TeraType { value, is_override }
             }
         }
     }
