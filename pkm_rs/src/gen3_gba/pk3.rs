@@ -2,8 +2,8 @@ use super::Pk3Buffer;
 use crate::checksum::{Checksum, RefreshChecksum};
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::ConvertStrategy;
-use crate::gen3::Gen3PokemonIndex;
-use crate::gen3::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
+use crate::gen3_gba::Gen3PokemonIndex;
+use crate::gen3_gba::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
 #[cfg(feature = "wasm")]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 use crate::result::{Error, Result};
@@ -616,8 +616,8 @@ mod tests {
     use std::path::PathBuf;
 
     use crate::convert_strategy::ConvertStrategy;
-    use crate::gen3::Pk3;
-    use crate::gen3::pk3_buffer::Pk3BufferMut;
+    use crate::gen3_gba::Pk3;
+    use crate::gen3_gba::pk3_buffer::Pk3BufferMut;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
     use crate::strings::{Gen3Encoding, Gen3String};
