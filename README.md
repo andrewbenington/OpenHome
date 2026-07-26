@@ -98,6 +98,11 @@ A Pokémon transferred into Generation I or II will have it's Original Trainer's
 changed to a "tracking number" of sorts due to the lack of a Personality Value in
 those games.
 
+## Current Project Goals
+
+- [Rewrite save/pkm logic in Rust](./RUST_REWRITE.md)
+- Android version (long-term goal, requires some interface rework)
+
 ## Code/Research Credits
 
 ### PKHeX
