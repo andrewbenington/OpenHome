@@ -34,8 +34,8 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "format": "prettier --write .",
-    "lint": "pnpm run lint:ci --fix",
-    "lint:ci": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs && cargo clippy -- -Dwarnings",
+    "lint": "pnpm run lint:ci --fix && cargo clippy -- -Dwarnings",
+    "lint:ci": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs",
     "typecheck": "tsgo",
     "build": "pnpm run wasm-compile && pnpm vite build",
     "dev": "pnpm run wasm-compile-dev && pnpm vite",
