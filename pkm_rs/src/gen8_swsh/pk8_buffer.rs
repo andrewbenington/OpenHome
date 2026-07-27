@@ -831,7 +831,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk8Buffer<S> {
     }
 
     pub fn set_relearn_move(&mut self, idx: usize, v: MoveIndex) {
-        self.set_relearn_move_raw(idx, v.to_le_bytes());
+        self.set_relearn_move_raw(idx, v.to_bytes_le());
     }
 
     pub fn set_ivs(&mut self, v: &Ivs) {

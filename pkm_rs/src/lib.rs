@@ -12,6 +12,8 @@ pub mod format;
 #[cfg(feature = "wasm")]
 pub mod gen3_gba;
 #[cfg(feature = "wasm")]
+pub mod gen3_gcn;
+#[cfg(feature = "wasm")]
 pub mod gen7_alola;
 // pub mod gen7_lgpe;
 #[cfg(feature = "wasm")]
