@@ -821,7 +821,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
     }
 
     pub fn set_relearn_move(&mut self, idx: usize, v: MoveIndex) {
-        self.set_relearn_move_raw(idx, v.to_le_bytes());
+        self.set_relearn_move_raw(idx, v.to_bytes_le());
     }
 
     pub fn set_secret_super_training_unlocked(&mut self, v: bool) {

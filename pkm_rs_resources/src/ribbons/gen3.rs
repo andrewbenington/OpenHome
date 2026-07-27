@@ -16,27 +16,27 @@ use crate::{
 };
 
 #[derive(Debug, Default, Serialize, PartialEq, Eq, Clone, Copy)]
-struct Cool;
+pub struct Cool;
 impl ContestStatMarker for Cool {
     const _STAT: ContestStat = ContestStat::Cool;
 }
 #[derive(Debug, Default, Serialize, PartialEq, Eq, Clone, Copy)]
-struct Beauty;
+pub struct Beauty;
 impl ContestStatMarker for Beauty {
     const _STAT: ContestStat = ContestStat::Beauty;
 }
 #[derive(Debug, Default, Serialize, PartialEq, Eq, Clone, Copy)]
-struct Cute;
+pub struct Cute;
 impl ContestStatMarker for Cute {
     const _STAT: ContestStat = ContestStat::Cute;
 }
 #[derive(Debug, Default, Serialize, PartialEq, Eq, Clone, Copy)]
-struct Smart;
+pub struct Smart;
 impl ContestStatMarker for Smart {
     const _STAT: ContestStat = ContestStat::Smart;
 }
 #[derive(Debug, Default, Serialize, PartialEq, Eq, Clone, Copy)]
-struct Tough;
+pub struct Tough;
 impl ContestStatMarker for Tough {
     const _STAT: ContestStat = ContestStat::Tough;
 }
@@ -46,15 +46,33 @@ impl ContestStatMarker for Tough {
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Default, Debug, Clone, Copy)]
 pub struct Gen3RibbonSet {
-    cool: Gen3ContestRibbons<Cool>,
-    beauty: Gen3ContestRibbons<Beauty>,
-    cute: Gen3ContestRibbons<Cute>,
-    smart: Gen3ContestRibbons<Smart>,
-    tough: Gen3ContestRibbons<Tough>,
-    non_contest: FlagSet<2>,
+    pub cool: Gen3ContestRibbons<Cool>,
+    pub beauty: Gen3ContestRibbons<Beauty>,
+    pub cute: Gen3ContestRibbons<Cute>,
+    pub smart: Gen3ContestRibbons<Smart>,
+    pub tough: Gen3ContestRibbons<Tough>,
+    pub non_contest: FlagSet<2>,
 }
 
 impl Gen3RibbonSet {
+    pub const fn new(
+        non_contest: FlagSet<2>,
+        cool: Gen3ContestRibbons<Cool>,
+        beauty: Gen3ContestRibbons<Beauty>,
+        cute: Gen3ContestRibbons<Cute>,
+        smart: Gen3ContestRibbons<Smart>,
+        tough: Gen3ContestRibbons<Tough>,
+    ) -> Self {
+        Self {
+            cool,
+            beauty,
+            cute,
+            smart,
+            tough,
+            non_contest,
+        }
+    }
+
     pub const fn from_u32(value: u32) -> Self {
         Self {
             cool: Gen3ContestRibbons::from_u3(u3::extract_u32(value, 0)),
@@ -139,7 +157,7 @@ impl Gen3RibbonSet {
     pub fn has_ribbon(&self, ribbon: Gen3Ribbon) -> bool {
         match ribbon.metadata() {
             Metadata::Contest { stat, level } => self.contest_ribbon_level(stat) >= level,
-            Metadata::NonContest { index } => self.non_contest.get_flag(index),
+            Metadata::NonContest { index } => self.non_contest.get_flag(&index),
         }
     }
 }
@@ -169,21 +187,29 @@ impl<'de> Deserialize<'de> for Gen3RibbonSet {
     }
 }
 
-trait ContestStatMarker {
+pub trait ContestStatMarker {
     const _STAT: ContestStat;
 }
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Default, Debug, Clone, Copy)]
-struct Gen3ContestRibbons<Stat: ContestStatMarker>(Gen3ContestRibbonLevel, PhantomData<Stat>);
+pub struct Gen3ContestRibbons<Stat: ContestStatMarker>(Gen3ContestRibbonLevel, PhantomData<Stat>);
 
 impl<Stat: ContestStatMarker> Gen3ContestRibbons<Stat> {
+    pub const fn from_u8(value: u8) -> Self {
+        Self(Gen3ContestRibbonLevel::from_u8(value), PhantomData)
+    }
+
     pub const fn from_u3(value: u3) -> Self {
         Self(Gen3ContestRibbonLevel::from_u3(value), PhantomData)
     }
 
     pub const fn max_level(&self) -> Gen3ContestRibbonLevel {
         self.0
+    }
+
+    pub const fn to_u8(&self) -> u8 {
+        self.0.to_u8()
     }
 
     pub fn get_ribbons(&self) -> Vec<Gen3Ribbon> {
@@ -216,7 +242,7 @@ impl<Stat: ContestStatMarker> Gen3ContestRibbons<Stat> {
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-enum Gen3ContestRibbonLevel {
+pub enum Gen3ContestRibbonLevel {
     #[default]
     None,
     Base,

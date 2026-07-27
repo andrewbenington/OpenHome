@@ -134,6 +134,24 @@ impl From<bool> for BinaryGender {
     }
 }
 
+impl From<u8> for BinaryGender {
+    fn from(value: u8) -> Self {
+        match value {
+            0 => Self::Male,
+            _ => Self::Female,
+        }
+    }
+}
+
+impl From<BinaryGender> for u8 {
+    fn from(value: BinaryGender) -> Self {
+        match value {
+            BinaryGender::Male => 0,
+            BinaryGender::Female => 1,
+        }
+    }
+}
+
 impl From<BinaryGender> for bool {
     fn from(value: BinaryGender) -> Self {
         value == BinaryGender::Female
@@ -191,8 +209,8 @@ impl<const N: usize, FLAG: Copy + Into<usize> + From<usize>> FlagSet<N, FLAG> {
         util::set_flag(&mut self.raw, 0, flag.into(), value);
     }
 
-    pub fn get_flag(&self, flag: FLAG) -> bool {
-        util::get_flag(&self.raw, 0, flag.into())
+    pub fn get_flag(&self, flag: &FLAG) -> bool {
+        util::get_flag(&self.raw, 0, (*flag).into())
     }
 
     pub const fn clear(&mut self) {
@@ -247,9 +265,9 @@ impl FlagSet<2> {
     }
 }
 
-impl<const N: usize, FLAG: Copy + Into<usize>> Serialize for FlagSet<N, FLAG>
+impl<const N: usize, FLAG> Serialize for FlagSet<N, FLAG>
 where
-    FLAG: Serialize,
+    FLAG: Serialize + Copy + Into<usize>,
 {
     fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
@@ -268,9 +286,48 @@ impl<const N: usize, FLAG: Copy + Into<usize>> Default for FlagSet<N, FLAG> {
     }
 }
 
-impl<const N: usize, T: Into<usize>> FromIterator<T> for FlagSet<N> {
+impl<const N: usize, T: Into<usize> + From<usize> + Copy> FromIterator<T> for FlagSet<N, T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        Self::from_flags(iter.into_iter().map(|x| x.into()))
+        Self::from_flags(iter)
+    }
+}
+
+// Custom iterator: walks bit positions, yields FLAG for each set bit.
+pub struct FlagSetIter<'a, const N: usize, FLAG: Copy + Into<usize> + From<usize>> {
+    flag_set: &'a FlagSet<N, FLAG>,
+    index: usize,
+    _marker: core::marker::PhantomData<FLAG>,
+}
+
+impl<'a, const N: usize, FLAG: Copy + Into<usize> + From<usize>> Iterator
+    for FlagSetIter<'a, N, FLAG>
+{
+    type Item = FLAG;
+
+    fn next(&mut self) -> Option<FLAG> {
+        while self.index < N * 8 {
+            let flag = FLAG::from(self.index);
+            if self.flag_set.get_flag(&flag) {
+                return Some(flag);
+            }
+            self.index += 1;
+        }
+        None
+    }
+}
+
+impl<'a, const N: usize, FLAG: Copy + Into<usize> + From<usize>> IntoIterator
+    for &'a FlagSet<N, FLAG>
+{
+    type Item = FLAG;
+    type IntoIter = FlagSetIter<'a, N, FLAG>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        FlagSetIter {
+            flag_set: self,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
     }
 }
 
