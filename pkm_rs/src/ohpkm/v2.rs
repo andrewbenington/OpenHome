@@ -253,6 +253,18 @@ impl OhpkmV2 {
         self.main_data.openhome_id()
     }
 
+    pub fn gen_345_id(&self) -> String {
+        let base_mon = self.main_data.species_and_form.get_base_evolution();
+        let gen3_compatible_pid = crate::convert_strategy::generate_pk3_compatible_pid(self);
+        format!(
+            "{:04}-{:04x}{:04x}-{:08x}",
+            base_mon.get_ndex().to_u16(),
+            self.trainer_id(),
+            self.secret_id(),
+            gen3_compatible_pid
+        )
+    }
+
     pub const fn personality_value(&self) -> u32 {
         self.main_data.personality_value
     }
@@ -1865,6 +1877,11 @@ impl OhpkmV2 {
     #[wasm_bindgen(getter = openhomeId)]
     pub fn openhome_id_js(&self) -> String {
         self.openhome_id()
+    }
+
+    #[wasm_bindgen(getter = gen345Identifier)]
+    pub fn gen_345_id_js(&self) -> String {
+        self.gen_345_id()
     }
 
     #[wasm_bindgen(getter = personalityValue)]

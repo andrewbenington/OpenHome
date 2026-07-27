@@ -17,6 +17,7 @@ use openhome_core::convert_strategies::ConvertStrategies;
 use openhome_core::lookup::LookupState;
 use openhome_core::ohpkm_store::OhpkmBytesStore;
 use openhome_core::{Error, Result};
+use pkm_rs::ohpkm::OhpkmV2;
 use std::env;
 use tauri::Manager;
 
@@ -115,7 +116,7 @@ pub fn run() {
                 }
             };
 
-            let lookup_state = match LookupState::load_from_storage(&controller) {
+            let mut lookup_state = match LookupState::load_from_storage(&controller) {
                 Ok(lookup) => lookup,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("Lookup File"));
@@ -124,6 +125,12 @@ pub fn run() {
                     std::process::exit(1);
                 }
             };
+
+            lookup_state.with_recalculated(
+                ohpkm_store
+                    .all_entries()
+                    .filter_map(|(_, bytes)| OhpkmV2::from_bytes(bytes).ok()),
+            );
 
             let conversion_settings = match ConvertStrategies::load_from_storage(&controller) {
                 Ok(settings) => settings,

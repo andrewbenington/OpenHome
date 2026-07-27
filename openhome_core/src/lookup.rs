@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use pkm_rs::ohpkm::OhpkmV2;
 use serde::{Deserialize, Serialize};
 
 use crate::data_controller::{DataController, DataDir};
@@ -55,6 +56,12 @@ impl LookupState {
                 .into_iter()
                 .filter(|(_, openhome_id)| store.includes(openhome_id))
                 .collect(),
+        }
+    }
+
+    pub fn with_recalculated(&mut self, ohpkms: impl IntoIterator<Item = OhpkmV2>) {
+        for ohpkm in ohpkms {
+            self.gen_345.insert(ohpkm.gen_345_id(), ohpkm.openhome_id());
         }
     }
 }
