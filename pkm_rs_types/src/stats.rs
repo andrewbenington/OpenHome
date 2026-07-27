@@ -254,7 +254,7 @@ impl Stats for Ivs {
 #[cfg_attr(feature = "wasm", derive(Tsify))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
-pub struct Stats16Le {
+pub struct Stats16 {
     pub hp: u16,
     pub atk: u16,
     pub def: u16,
@@ -263,9 +263,9 @@ pub struct Stats16Le {
     pub spe: u16,
 }
 
-impl Stats16Le {
+impl Stats16 {
     pub const fn new(hp: u16, atk: u16, def: u16, spa: u16, spd: u16, spe: u16) -> Self {
-        Stats16Le {
+        Stats16 {
             hp,
             atk,
             def,
@@ -275,8 +275,8 @@ impl Stats16Le {
         }
     }
 
-    pub fn from_bytes(bytes: [u8; 12]) -> Self {
-        Stats16Le {
+    pub fn from_bytes_le(bytes: [u8; 12]) -> Self {
+        Stats16 {
             hp: u16::from_le_bytes(bytes[0..2].try_into().unwrap()),
             atk: u16::from_le_bytes(bytes[2..4].try_into().unwrap()),
             def: u16::from_le_bytes(bytes[4..6].try_into().unwrap()),
@@ -286,7 +286,7 @@ impl Stats16Le {
         }
     }
 
-    pub fn to_bytes(self) -> [u8; 12] {
+    pub fn to_bytes_le(self) -> [u8; 12] {
         u16_le_slice_to_u8([self.hp, self.atk, self.def, self.spe, self.spa, self.spd])
             .try_into()
             .unwrap()
@@ -315,7 +315,7 @@ impl Stats16Le {
     }
 }
 
-impl From<Stats8> for Stats16Le {
+impl From<Stats8> for Stats16 {
     fn from(value: Stats8) -> Self {
         Self {
             hp: value.hp as u16,
@@ -328,7 +328,7 @@ impl From<Stats8> for Stats16Le {
     }
 }
 
-impl From<Ivs> for Stats16Le {
+impl From<Ivs> for Stats16 {
     fn from(value: Ivs) -> Self {
         Self {
             hp: value.0.hp as u16,
@@ -341,10 +341,10 @@ impl From<Ivs> for Stats16Le {
     }
 }
 
-impl TryFrom<Stats16Le> for Stats8 {
+impl TryFrom<Stats16> for Stats8 {
     type Error = TryFromIntError;
 
-    fn try_from(value: Stats16Le) -> Result<Self, Self::Error> {
+    fn try_from(value: Stats16) -> Result<Self, Self::Error> {
         Ok(Self {
             hp: value.hp.try_into()?,
             atk: value.atk.try_into()?,

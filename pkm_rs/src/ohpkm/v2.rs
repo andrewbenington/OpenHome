@@ -27,7 +27,7 @@ use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
-    Language, MarkingsSixShapesColors, OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le,
+    Language, MarkingsSixShapesColors, OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16,
     StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory,
 };
 use serde::Serialize;
@@ -1098,16 +1098,16 @@ impl OhpkmV2 {
         }
     }
 
-    pub fn avs(&self) -> Option<Stats16Le> {
+    pub fn avs(&self) -> Option<Stats16> {
         Some(self.gen67_data?.avs)
     }
 
-    pub fn set_avs(&mut self, value: Option<Stats16Le>) {
+    pub fn set_avs(&mut self, value: Option<Stats16>) {
         match value {
             Some(avs) => self.gen67_data.get_or_insert_default().avs = avs,
             None => {
                 if let Some(gen67_data) = &mut self.gen67_data {
-                    gen67_data.avs = Stats16Le::default()
+                    gen67_data.avs = Stats16::default()
                 }
             }
         }
@@ -2031,11 +2031,11 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_js(&self) -> Stats16Le {
+    pub fn evs_js(&self) -> Stats16 {
         self.evs().into()
     }
     #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_js(&mut self, v: Stats16Le) {
+    pub fn set_evs_js(&mut self, v: Stats16) {
         self.set_evs(&v.try_into().expect("evs should not exceed 255 each"));
     }
 
@@ -2131,11 +2131,11 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_js(&self) -> Stats16Le {
+    pub fn ivs_js(&self) -> Stats16 {
         self.ivs().into()
     }
     #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_js(&mut self, v: &Stats16Le) {
+    pub fn set_ivs_js(&mut self, v: &Stats16) {
         self.set_ivs(v.to_ivs_capped());
     }
 
@@ -2885,17 +2885,17 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = avs)]
-    pub fn avs_js(&self) -> Option<Stats16Le> {
+    pub fn avs_js(&self) -> Option<Stats16> {
         Some(self.gen67_data?.avs)
     }
 
     #[wasm_bindgen(setter = avs)]
-    pub fn set_avs_js(&mut self, value: Option<Stats16Le>) {
+    pub fn set_avs_js(&mut self, value: Option<Stats16>) {
         match value {
             Some(avs) => self.gen67_data.get_or_insert_default().avs = avs,
             None => {
                 if let Some(gen67_data) = &mut self.gen67_data {
-                    gen67_data.avs = Stats16Le::default()
+                    gen67_data.avs = Stats16::default()
                 }
             }
         }
@@ -3003,12 +3003,12 @@ impl OhpkmV2 {
     // Legends Arceus
 
     #[wasm_bindgen(getter = gvs)]
-    pub fn gvs_js(&self) -> Option<Stats16Le> {
+    pub fn gvs_js(&self) -> Option<Stats16> {
         Some(self.la_data?.gvs.into())
     }
 
     #[wasm_bindgen(setter = gvs)]
-    pub fn set_gvs_js(&mut self, value: Option<Stats16Le>) {
+    pub fn set_gvs_js(&mut self, value: Option<Stats16>) {
         match value {
             Some(gvs) => {
                 self.la_data.get_or_insert_default().gvs =

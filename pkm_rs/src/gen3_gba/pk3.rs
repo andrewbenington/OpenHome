@@ -31,7 +31,7 @@ use pkm_rs_types::AbilityNumber;
 use pkm_rs_types::randomize::Randomize;
 use pkm_rs_types::{
     BinaryGender, ContestStats, Language, MarkingsFourShapes, NationalDex, OriginGame,
-    SimpleAbilityNumber, Stats8, Stats16Le,
+    SimpleAbilityNumber, Stats8, Stats16,
 };
 use pkm_rs_types::{Gender, Ivs};
 use serde::{Serialize, Serializer};
@@ -89,7 +89,7 @@ pub struct Pk3 {
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub current_hp: u16,
     #[cfg_attr(feature = "randomize", randomize(skip))]
-    pub stats: Stats16Le,
+    pub stats: Stats16,
 }
 
 impl Pk3 {
@@ -264,7 +264,7 @@ impl Pk3 {
         .expect("gen 3 form is valid")
     }
 
-    pub fn calculate_stats(&self) -> Stats16Le {
+    pub fn calculate_stats(&self) -> Stats16 {
         helpers::calculate_stats_modern(
             MetadataSource::Emerald,
             self.species_and_form(),
@@ -430,11 +430,11 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_js(&self) -> Stats16Le {
+    pub fn ivs_js(&self) -> Stats16 {
         self.ivs.into()
     }
     #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_js(&mut self, v: Stats16Le) {
+    pub fn set_ivs_js(&mut self, v: Stats16) {
         self.ivs = v.to_ivs_capped();
     }
 
@@ -448,11 +448,11 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_js(&self) -> Stats16Le {
+    pub fn evs_js(&self) -> Stats16 {
         self.evs.into()
     }
     #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_js(&mut self, v: Stats16Le) {
+    pub fn set_evs_js(&mut self, v: Stats16) {
         self.evs = v.try_into().expect("evs should not exceed 255 each");
     }
 
@@ -557,7 +557,7 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats_js(&self) -> Stats16Le {
+    pub fn calculate_stats_js(&self) -> Stats16 {
         self.calculate_stats()
     }
 

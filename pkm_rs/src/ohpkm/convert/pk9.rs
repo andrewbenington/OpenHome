@@ -1,7 +1,7 @@
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::{metadata_source::MetadataSource, ribbons::OpenHomeRibbonSet};
 use pkm_rs_types::FlagSet;
-use pkm_rs_types::{AbilityNumber, Stats16Le};
+use pkm_rs_types::{AbilityNumber, Stats16};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::ConvertStrategy;
@@ -213,7 +213,7 @@ impl OhpkmConvert for Pk9 {
                 status_condition: 0,
                 stat_level: 0,
                 current_hp: 0,
-                stats: Stats16Le::default(),
+                stats: Stats16::default(),
             };
 
         mon.stat_level = mon.calculate_level();

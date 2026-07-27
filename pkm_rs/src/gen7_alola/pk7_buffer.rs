@@ -17,7 +17,7 @@ use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, Gender, Geolocations, HyperTraining, Ivs,
     MarkingsSixShapesColors, OriginGame, PokeDate, Stats8, TrainerMemory,
 };
-use pkm_rs_types::{Language, Stats16Le};
+use pkm_rs_types::{Language, Stats16};
 use pkm_rs_types::{read_u16_le, read_u32_le};
 
 const CHECKSUM_OFFSET: usize = 6;
@@ -632,8 +632,8 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
         self.get_array(Offset::Stats)
     }
 
-    pub fn stats(&self) -> Stats16Le {
-        Stats16Le::from_bytes(self.stats_raw())
+    pub fn stats(&self) -> Stats16 {
+        Stats16::from_bytes_le(self.stats_raw())
     }
 
     // ------------------------------------------------------------------
@@ -1063,8 +1063,8 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
         self.set_array(Offset::Stats, &v);
     }
 
-    pub fn set_stats(&mut self, v: Stats16Le) {
-        self.set_stats_raw(v.to_bytes());
+    pub fn set_stats(&mut self, v: Stats16) {
+        self.set_stats_raw(v.to_bytes_le());
     }
 
     // ------------------------------------------------------------------
