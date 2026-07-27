@@ -93,9 +93,13 @@ export const getMonGen345Identifier = (
   try {
     let pk3CompatiblePID
 
-    if (mon instanceof OHPKM && !keepOriginalPid) {
+    if (!keepOriginalPid) {
       // Get the personality value that will be generated
-      pk3CompatiblePID = mon.generatePk3CompatiblePid()
+      if (mon instanceof OHPKM) {
+        pk3CompatiblePID = mon.generatePk3CompatiblePid()
+      } else {
+        pk3CompatiblePID = OHPKM.fromMonUnknownSave(mon).generatePk3CompatiblePid()
+      }
     } else if (mon.personalityValue !== undefined) {
       pk3CompatiblePID = mon.personalityValue
     } else {
