@@ -14,7 +14,7 @@ use pkm_rs_types::{
     BinaryGender, ContestStats, Ivs, MarkingsFourShapes, OriginGame, Pokerus, SimpleAbilityNumber,
     Stats8,
 };
-use pkm_rs_types::{Language, Stats16Le};
+use pkm_rs_types::{Language, Stats16};
 use pkm_rs_types::{read_u16_le, read_u32_le};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -382,8 +382,8 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         self.get_array(Offset::Stats)
     }
 
-    pub fn stats(&self) -> Stats16Le {
-        Stats16Le::from_bytes(self.stats_raw())
+    pub fn stats(&self) -> Stats16 {
+        Stats16::from_bytes_le(self.stats_raw())
     }
 
     // ------------------------------------------------------------------
@@ -612,8 +612,8 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
         self.set_array(Offset::Stats, &v);
     }
 
-    pub fn set_stats(&mut self, v: Stats16Le) {
-        self.set_stats_raw(v.to_bytes());
+    pub fn set_stats(&mut self, v: Stats16) {
+        self.set_stats_raw(v.to_bytes_le());
     }
 
     // ------------------------------------------------------------------

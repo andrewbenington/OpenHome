@@ -16,7 +16,7 @@ use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, Gender, HyperTraining, Ivs, Language,
     MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, SWITCH_HANDLER_MEMORY_SIZE,
-    SWITCH_TRAINER_MEMORY_SIZE, Stats8, Stats16Le, TrainerMemory, read_u64_le,
+    SWITCH_TRAINER_MEMORY_SIZE, Stats8, Stats16, TrainerMemory, read_u64_le,
 };
 use pkm_rs_types::{read_u16_le, read_u32_le};
 
@@ -619,8 +619,8 @@ impl<S: AsRef<[u8]>> Pk8Buffer<S> {
         self.get_array(Offset::Stats)
     }
 
-    pub fn stats(&self) -> Stats16Le {
-        Stats16Le::from_bytes(self.stats_raw())
+    pub fn stats(&self) -> Stats16 {
+        Stats16::from_bytes_le(self.stats_raw())
     }
 
     pub fn current_hp(&self) -> u16 {
@@ -1053,8 +1053,8 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk8Buffer<S> {
         self.set_array(Offset::Stats, &v);
     }
 
-    pub fn set_stats(&mut self, v: Stats16Le) {
-        self.set_stats_raw(v.to_bytes());
+    pub fn set_stats(&mut self, v: Stats16) {
+        self.set_stats_raw(v.to_bytes_le());
     }
 
     pub fn set_current_hp(&mut self, v: u16) {

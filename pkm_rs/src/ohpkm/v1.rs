@@ -12,7 +12,7 @@ use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{ContestStats, Ivs, Language, Pokerus, Stats8, Stats16Le, StatsPreSplit};
+use pkm_rs_types::{ContestStats, Ivs, Language, Pokerus, Stats8, Stats16, StatsPreSplit};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 use pkm_rs_types::{Geolocations, HyperTraining, MarkingsSixShapesColors};
 
@@ -56,7 +56,7 @@ pub struct OhpkmV1 {
     pub moves: [MoveIndex; 4],
     pub move_pp: [u8; 4],
     pub nickname: SizedUtf16String<26>,
-    pub avs: Stats16Le,
+    pub avs: Stats16,
     pub move_pp_ups: [u8; 4],
     pub relearn_moves: [MoveIndex; 4],
     pub ivs: Stats8,
@@ -194,7 +194,7 @@ impl OhpkmV1 {
             ],
             move_pp: [bytes[92], bytes[93], bytes[94], bytes[95]],
             nickname: SizedUtf16String::<26>::from_bytes(bytes[96..122].try_into().unwrap()),
-            avs: Stats16Le::from_bytes(bytes[122..134].try_into().unwrap()),
+            avs: Stats16::from_bytes_le(bytes[122..134].try_into().unwrap()),
             move_pp_ups: [bytes[134], bytes[135], bytes[136], bytes[137]],
             relearn_moves: [
                 MoveIndex::from(u16::from_le_bytes(bytes[138..140].try_into().unwrap())),
@@ -375,7 +375,7 @@ impl PkmBytes for OhpkmV1 {
         bytes[95] = self.move_pp[3];
 
         bytes[96..122].copy_from_slice(&self.nickname);
-        bytes[122..134].copy_from_slice(&self.avs.to_bytes());
+        bytes[122..134].copy_from_slice(&self.avs.to_bytes_le());
 
         bytes[134] = self.move_pp_ups[0];
         bytes[135] = self.move_pp_ups[1];
