@@ -1,19 +1,16 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
+import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PKM, PkmClass } from '@openhome-core/pkm/PKM'
 import { Moves } from '@openhome-core/resources'
-import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { filterUndefined } from '@openhome-core/util/sort'
 import {
-  Gender,
   Generation,
   MetadataSummaryLookup,
-  NatureIndex,
   OriginGame,
   OriginGames,
   PkmFormat,
   PkmFormats,
 } from '@pkm-rs/pkg'
-import Prando from 'prando'
 import { AllPKMFields } from '../pkm/util/pkmInterface'
 import { FourMoves } from './types'
 
@@ -32,101 +29,8 @@ export function getDisplayID(pokemon: PKM): string {
   return (fullTrainerID % BigInt(1000000)).toString().padStart(6, '0')
 }
 
-const getIsShinyPreGen6 = (trainerID: number, secretID: number, personalityValue: number) =>
-  (trainerID ^ secretID ^ ((personalityValue >> 16) & 0xffff) ^ (personalityValue & 0xffff)) < 8
-
-const getUnownLetterGen3 = (personalityValue: number) => {
-  let letterValue = (personalityValue >> 24) & 0x3
-
-  letterValue = ((personalityValue >> 16) & 0x3) | (letterValue << 2)
-  letterValue = ((personalityValue >> 8) & 0x3) | (letterValue << 2)
-  letterValue = (personalityValue & 0x3) | (letterValue << 2)
-  return letterValue % 28
-}
-
-export function generatePersonalityValuePreservingAttributes(mon: AllPKMFields): number {
-  const prng = new Prando(mon.personalityValue ?? mon.dvs?.atk)
-
-  let personalityValue = 0
-  let otherNature: NatureIndex | undefined
-
-  if (mon.personalityValue !== undefined && mon.abilityNum !== undefined) {
-    personalityValue = mon.personalityValue
-    otherNature = mon.nature
-  } else {
-    personalityValue = prng.nextInt(0, 0xffffffff)
-  }
-
-  if ('statNature' in mon) {
-    otherNature = mon.statNature
-  }
-
-  // xoring the other three values with this to calculate upper half of personality value
-  // will ensure shininess or non-shininess depending on original mon
-  let newPersonalityValue = BigInt(personalityValue)
-  const metadata = MetadataSummaryLookup(mon.nationalDex, 0)
-  if (!metadata) {
-    return Number(newPersonalityValue)
-  }
-
-  const otherGender: Gender = mon.gender ?? metadata.genderFromPid(Number(newPersonalityValue))
-
-  const shouldCheckUnown = mon.nationalDex === NationalDex.Unown
-
-  let i = 0
-  while (i < 0x10000) {
-    const newGender = metadata.genderFromPid(Number(newPersonalityValue))
-    const newNature = NatureIndex.newFromModulo(Number(newPersonalityValue))
-
-    function getInconsistancy(): string | null {
-      if (shouldCheckUnown && getUnownLetterGen3(Number(newPersonalityValue)) !== mon.formIndex) {
-        return 'wrong unown letter'
-      } else if (newGender !== otherGender) {
-        return `gender mismatch`
-      } else if (otherNature !== undefined && !newNature.equals(otherNature)) {
-        return 'nature mismatch'
-      } else if (
-        getIsShinyPreGen6(mon.trainerID, mon.secretID ?? 0, Number(newPersonalityValue)) !==
-        mon.isShiny()
-      ) {
-        return 'shininess mismatch'
-      }
-
-      return null
-    }
-
-    if (getInconsistancy() === null) {
-      return Number(newPersonalityValue)
-    }
-
-    i++
-    const pvBytes = new DataView(new Uint8Array(4).buffer)
-
-    pvBytes.setInt32(0, personalityValue, true)
-    let pvLower16, pvUpper16: number
-
-    if (mon.nationalDex === NationalDex.Unown) {
-      pvLower16 = prng.nextInt(0, 0xffff)
-      pvUpper16 = prng.nextInt(0, 0xffff)
-      if (mon.isShiny()) {
-        pvUpper16 =
-          ((mon.trainerID ^ (mon.secretID ?? 0) ^ pvLower16) & 0xfcfc) | (pvUpper16 & 0x0303)
-      }
-    } else {
-      pvLower16 = pvBytes.getUint16(0, true)
-      pvUpper16 = pvBytes.getUint16(2, true)
-      pvLower16 ^= i
-      if (mon.isShiny()) {
-        pvUpper16 = mon.trainerID ^ (mon.secretID ?? 0) ^ pvLower16
-      }
-    }
-
-    pvBytes.setUint16(2, pvUpper16, true)
-    pvBytes.setUint16(0, pvLower16, true)
-    newPersonalityValue = BigInt(pvBytes.getUint32(0, true))
-  }
-
-  return personalityValue
+export function generatePersonalityValuePreservingAttributes(mon: PKMInterface): number {
+  return OHPKM.fromMonUnknownSave(mon).generatePk3CompatiblePid()
 }
 
 const getMoveMaxPP = (moveIndex: number, format: string, ppUps = 0) => {
