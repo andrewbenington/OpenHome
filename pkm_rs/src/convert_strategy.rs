@@ -17,7 +17,7 @@ use tsify::Tsify;
 use wasm_bindgen::prelude::*;
 
 pub use converter::PkmConverter;
-pub use personality_value::PidModificationStrategy;
+pub use personality_value::{PidModificationStrategy, generate_pk3_compatible_pid};
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize))]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
