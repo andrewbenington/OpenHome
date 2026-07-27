@@ -1,6 +1,7 @@
 use std::num::TryFromIntError;
 
 use crate::util::bit_is_set;
+use arbitrary_int::u5;
 use pkm_rs_derive::Stats;
 use serde::{Deserialize, Serialize};
 
@@ -157,24 +158,12 @@ impl Ivs {
     pub fn from_30_bits(bytes: [u8; 4]) -> Self {
         let iv_bytes = u32::from_le_bytes(bytes);
         Self(Stats8 {
-            hp: (iv_bytes & 0x1f).try_into().unwrap(),
-            atk: ((iv_bytes >> 5) & 0x1f).try_into().unwrap(),
-            def: ((iv_bytes >> 10) & 0x1f).try_into().unwrap(),
-            spe: ((iv_bytes >> 15) & 0x1f).try_into().unwrap(),
-            spa: ((iv_bytes >> 20) & 0x1f).try_into().unwrap(),
-            spd: ((iv_bytes >> 25) & 0x1f).try_into().unwrap(),
-        })
-    }
-
-    pub fn from_u30(ivs_u30: arbitrary_int::u30) -> Self {
-        let ivs_u32 = ivs_u30.value();
-        Self(Stats8 {
-            hp: (ivs_u32 & 0x1f).try_into().unwrap(),
-            atk: ((ivs_u32 >> 5) & 0x1f).try_into().unwrap(),
-            def: ((ivs_u32 >> 10) & 0x1f).try_into().unwrap(),
-            spe: ((ivs_u32 >> 15) & 0x1f).try_into().unwrap(),
-            spa: ((ivs_u32 >> 20) & 0x1f).try_into().unwrap(),
-            spd: ((ivs_u32 >> 25) & 0x1f).try_into().unwrap(),
+            hp: u5::extract_u32(iv_bytes, 0).into(),
+            atk: u5::extract_u32(iv_bytes, 5).into(),
+            def: u5::extract_u32(iv_bytes, 10).into(),
+            spe: u5::extract_u32(iv_bytes, 15).into(),
+            spa: u5::extract_u32(iv_bytes, 20).into(),
+            spd: u5::extract_u32(iv_bytes, 25).into(),
         })
     }
 
@@ -196,6 +185,32 @@ impl Ivs {
         numeric_val |= current_val & (0b11 << 30);
 
         bytes[byte_offset..byte_offset + 4].copy_from_slice(&numeric_val.to_le_bytes());
+    }
+
+    // read from bytes where values are stored as big-endian u16 values
+    pub const fn from_gcn_bytes(bytes: [u8; 12]) -> Self {
+        // stored as big-endian u16 values, but since no IV exceeds a byte (31 < 255)
+        // we can directly access the least significant byte as a u8
+        Self(Stats8 {
+            hp: bytes[1],
+            atk: bytes[3],
+            def: bytes[5],
+            spe: bytes[7],
+            spa: bytes[9],
+            spd: bytes[11],
+        })
+    }
+
+    // write to bytes as big-endian u16 values
+    pub const fn write_gcn_bytes(&self, bytes: &mut [u8], offset: usize) {
+        // stored as big-endian u16 values, but since no IV exceeds a byte (31 < 255)
+        // we can just write the least significant byte
+        bytes[offset + 1] = self.0.hp;
+        bytes[offset + 3] = self.0.atk;
+        bytes[offset + 5] = self.0.def;
+        bytes[offset + 7] = self.0.spe;
+        bytes[offset + 9] = self.0.spa;
+        bytes[offset + 11] = self.0.spd;
     }
 
     pub fn set(&mut self, stat: Stat, value: u8) {
@@ -286,8 +301,25 @@ impl Stats16 {
         }
     }
 
+    pub fn from_bytes_be(bytes: [u8; 12]) -> Self {
+        Stats16 {
+            hp: u16::from_be_bytes(bytes[0..2].try_into().unwrap()),
+            atk: u16::from_be_bytes(bytes[2..4].try_into().unwrap()),
+            def: u16::from_be_bytes(bytes[4..6].try_into().unwrap()),
+            spe: u16::from_be_bytes(bytes[6..8].try_into().unwrap()),
+            spa: u16::from_be_bytes(bytes[8..10].try_into().unwrap()),
+            spd: u16::from_be_bytes(bytes[10..12].try_into().unwrap()),
+        }
+    }
+
     pub fn to_bytes_le(self) -> [u8; 12] {
         u16_le_slice_to_u8([self.hp, self.atk, self.def, self.spe, self.spa, self.spd])
+            .try_into()
+            .unwrap()
+    }
+
+    pub fn to_bytes_be(self) -> [u8; 12] {
+        u16_be_slice_to_u8([self.hp, self.atk, self.def, self.spe, self.spa, self.spd])
             .try_into()
             .unwrap()
     }
@@ -375,6 +407,10 @@ impl IntoIterator for Stats8 {
 
 fn u16_le_slice_to_u8<const N: usize>(slice: [u16; N]) -> Vec<u8> {
     slice.into_iter().flat_map(u16::to_le_bytes).collect()
+}
+
+fn u16_be_slice_to_u8<const N: usize>(slice: [u16; N]) -> Vec<u8> {
+    slice.into_iter().flat_map(u16::to_be_bytes).collect()
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]

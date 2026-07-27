@@ -364,10 +364,10 @@ impl PkmBytes for OhpkmV1 {
         bytes[81] = self.weight_scalar;
         bytes[82] = self.scale;
 
-        bytes[84..86].copy_from_slice(&self.moves[0].to_le_bytes());
-        bytes[86..88].copy_from_slice(&self.moves[1].to_le_bytes());
-        bytes[88..90].copy_from_slice(&self.moves[2].to_le_bytes());
-        bytes[90..92].copy_from_slice(&self.moves[3].to_le_bytes());
+        bytes[84..86].copy_from_slice(&self.moves[0].to_bytes_le());
+        bytes[86..88].copy_from_slice(&self.moves[1].to_bytes_le());
+        bytes[88..90].copy_from_slice(&self.moves[2].to_bytes_le());
+        bytes[90..92].copy_from_slice(&self.moves[3].to_bytes_le());
 
         bytes[92] = self.move_pp[0];
         bytes[93] = self.move_pp[1];
@@ -382,10 +382,10 @@ impl PkmBytes for OhpkmV1 {
         bytes[136] = self.move_pp_ups[2];
         bytes[137] = self.move_pp_ups[3];
 
-        bytes[138..140].copy_from_slice(&self.relearn_moves[0].to_le_bytes());
-        bytes[140..142].copy_from_slice(&self.relearn_moves[1].to_le_bytes());
-        bytes[142..144].copy_from_slice(&self.relearn_moves[2].to_le_bytes());
-        bytes[144..146].copy_from_slice(&self.relearn_moves[3].to_le_bytes());
+        bytes[138..140].copy_from_slice(&self.relearn_moves[0].to_bytes_le());
+        bytes[140..142].copy_from_slice(&self.relearn_moves[1].to_bytes_le());
+        bytes[142..144].copy_from_slice(&self.relearn_moves[2].to_bytes_le());
+        bytes[144..146].copy_from_slice(&self.relearn_moves[3].to_bytes_le());
 
         self.ivs.to_ivs_capped().write_30_bits(bytes, 148);
         util::set_flag(bytes, 148, 30, self.is_egg);

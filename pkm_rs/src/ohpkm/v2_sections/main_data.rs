@@ -623,10 +623,10 @@ impl DataSection for MainDataV2 {
 
         // bytes 134..=137 are used for move pp ups, written via self.moves.write_spans
 
-        bytes[138..140].copy_from_slice(&self.relearn_moves[0].to_le_bytes());
-        bytes[140..142].copy_from_slice(&self.relearn_moves[1].to_le_bytes());
-        bytes[142..144].copy_from_slice(&self.relearn_moves[2].to_le_bytes());
-        bytes[144..146].copy_from_slice(&self.relearn_moves[3].to_le_bytes());
+        bytes[138..140].copy_from_slice(&self.relearn_moves[0].to_bytes_le());
+        bytes[140..142].copy_from_slice(&self.relearn_moves[1].to_bytes_le());
+        bytes[142..144].copy_from_slice(&self.relearn_moves[2].to_bytes_le());
+        bytes[144..146].copy_from_slice(&self.relearn_moves[3].to_bytes_le());
 
         self.ivs.write_30_bits(&mut bytes, 148);
         util::set_flag(&mut bytes, 148, 30, self.is_egg);
