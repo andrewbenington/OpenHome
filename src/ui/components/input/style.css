@@ -1,0 +1,49 @@
+.labelled-input > * {
+  margin-left: var(--label-input-gap);
+  font-size: 0.85rem;
+}
+
+.labelled-input textarea {
+  margin-left: 0.25rem;
+  padding: 2px 0px;
+  font-size: 0.85rem;
+}
+
+.labelled-input-fill {
+  display: flex;
+}
+
+.labelled-input-fill > * {
+  flex: 1;
+}
+
+.error-message {
+  color: var(--red-10);
+  text-align: start;
+  font-size: 0.8rem;
+}
+
+.switch-label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  gap: 0.5rem;
+  justify-content: start !important;
+
+  button {
+    max-width: fit-content;
+  }
+}
+
+.labelled-input-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -235,3 +235,19 @@ export function runningInTest(): boolean {
   // as well but I have not verified.
   return import.meta.env.TEST
 }
+
+export function nullIfNone(value: string): string | null {
+  if (!value || value.localeCompare('(none)') === 0) {
+    return null
+  } else {
+    return value
+  }
+}
+
+export function nullIfNoneInt(value: string): number | null {
+  if (!value || value.localeCompare('(none)') === 0) {
+    return null
+  } else {
+    return parseInt(value)
+  }
+}

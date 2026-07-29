@@ -54,7 +54,8 @@ function BoxCell(props: BoxCellProps) {
   const backend = useBackend()
   const displayError = useDisplayError()
   const { releaseMonAtLocation, moveMonItemToBag } = useSaves()
-  const { updateMonTags, updateMonDisplayColor, setMonNickname } = useOhpkmStore()
+  const ohpkmStore = useOhpkmStore()
+  const { updateMonTags, updateMonDisplayColor, setMonNickname } = ohpkmStore
   const [renameOpen, setRenameOpen] = useState(false)
   const [renameValue, setRenameValue] = useState('')
   const { showBackgroundColor } = useMonDisplay()
@@ -248,24 +249,26 @@ function BoxCell(props: BoxCellProps) {
         </div>
       </OpenHomeCtxMenu>
       {mon instanceof OHPKM && (
-        <Dialog.Container open={renameOpen} onOpenChange={setRenameOpen}>
-          <Dialog.Title>Rename {mon.nickname}</Dialog.Title>
-          <Dialog.Description>Enter a nickname for this Pokémon</Dialog.Description>
-          <Flex direction="column" gap="3" mt="3">
-            <TextField.Root
-              value={renameValue}
-              onChange={(e) => setRenameValue(e.target.value)}
-              placeholder={Lookup.speciesName(mon.nationalDex, mon.language)}
-            />
-            <Dialog.Actions>
-              <Dialog.Close>Cancel</Dialog.Close>
-              <Dialog.Action onClick={() => setRenameValue('')}>Reset</Dialog.Action>
-              <Dialog.Close color="theme" onClick={confirmRename}>
-                Save
-              </Dialog.Close>
-            </Dialog.Actions>
-          </Flex>
-        </Dialog.Container>
+        <>
+          <Dialog.Container open={renameOpen} onOpenChange={setRenameOpen}>
+            <Dialog.Title>Rename {mon.nickname}</Dialog.Title>
+            <Dialog.Description>Enter a nickname for this Pokémon</Dialog.Description>
+            <Flex direction="column" gap="3" mt="3">
+              <TextField.Root
+                value={renameValue}
+                onChange={(e) => setRenameValue(e.target.value)}
+                placeholder={Lookup.speciesName(mon.nationalDex, mon.language)}
+              />
+              <Dialog.Actions>
+                <Dialog.Close>Cancel</Dialog.Close>
+                <Dialog.Action onClick={() => setRenameValue('')}>Reset</Dialog.Action>
+                <Dialog.Close color="theme" onClick={confirmRename}>
+                  Save
+                </Dialog.Close>
+              </Dialog.Actions>
+            </Flex>
+          </Dialog.Container>
+        </>
       )}
     </>
   )

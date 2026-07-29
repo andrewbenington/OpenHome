@@ -340,7 +340,6 @@ export default function SortPokemon() {
           <Dialog.Close>{validDestSaves.length > 0 ? 'Cancel' : 'Ok'}</Dialog.Close>
         </Dialog.Actions>
       </Dialog.Container>
-
       {toastErrors && toastErrors.length > 0 && (
         <div style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: 9999 }}>
           <Callout.Root variant="surface" color="red" size="2">

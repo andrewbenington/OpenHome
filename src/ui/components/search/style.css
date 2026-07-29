@@ -1,0 +1,23 @@
+.search-row-selected {
+  background-color: var(--jade-7) !important;
+  outline: 0;
+}
+
+.search-dialog-content {
+  height: 90vh;
+  min-width: 80%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.search-results-grid {
+  height: 0;
+  max-height: 100%;
+  flex: 1;
+}
+
+.search-dialog-body {
+  height: 0px;
+  flex-grow: 1;
+}

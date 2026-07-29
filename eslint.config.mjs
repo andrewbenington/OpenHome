@@ -42,7 +42,7 @@ export default [
           prev: ['const', 'let', 'var'],
           next: ['const', 'let', 'var'],
         },
-        { blankLine: 'always', prev: '*', next: ['interface', 'type'] },
+        { blankLine: 'always', prev: '*', next: ['interface'] },
       ],
       '@stylistic/jsx-self-closing-comp': [
         'error',
