@@ -358,24 +358,24 @@ export function useSaves(): SavesAndBanksManager {
       if (R.isErr(result)) {
         console.error('Error registering pokedex entries from save:', result.error)
       }
-      if (save.trainerGender !== undefined) {
-        const allOhpkms = ohpkmStore.getAllStored()
-        for (const mon of allOhpkms) {
-          if (!monSupportedBySave(save, mon)) continue
 
-          const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
-          if (!matchingHandler) continue
+      const allOhpkms = ohpkmStore.getAllStored()
+      for (const mon of allOhpkms) {
+        if (!monSupportedBySave(save, mon)) continue
 
-          mon.updateTrainerData(
-            save,
-            matchingHandler.friendship,
-            matchingHandler.affection,
-            matchingHandler.memory
-          )
+        const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
+        if (!matchingHandler) continue
 
-          ohpkmStore.insertOrUpdate(mon)
-        }
+        mon.updateTrainerData(
+          save,
+          matchingHandler.friendship,
+          matchingHandler.affection,
+          matchingHandler.memory
+        )
+
+        ohpkmStore.insertOrUpdate(mon)
       }
+
       const toUpdate: OhpkmStoreData = {}
       for (const mon of save.getAllMons()) {
         const trackedData = ohpkmStore.loadIfTracked(mon)

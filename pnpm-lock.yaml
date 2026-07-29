@@ -90,6 +90,9 @@ importers:
       react-router:
         specifier: ^8.3.0
         version: 8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      utc:
+        specifier: link:dayjs/plugin/utc
+        version: link:dayjs/plugin/utc
       uuid:
         specifier: ^14.0.1
         version: 14.0.1

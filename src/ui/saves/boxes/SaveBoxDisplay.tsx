@@ -8,9 +8,13 @@ import { range } from '@openhome-core/util/functional'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
 import Fallback from '@openhome-ui/components/Fallback'
+import SearchFields from '@openhome-ui/components/search/SearchFields'
+import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
+import { usePokemonSearch } from '@openhome-ui/components/search/usePokemonSearch'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
@@ -40,6 +44,18 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const { dragState, toggleSelection, isSelected } = useDragAndDrop()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
+
+  const pokemonSearchController = usePokemonSearch()
+  const TrackedDataRecovery = useTrackedDataRecovery()
+
+  const dataRecoverySearchModal = {
+    modalOpen: TrackedDataRecovery.state === 'pending_ohpkm_select',
+    setModalOpen: (open: boolean) => {
+      if (!open) {
+        TrackedDataRecovery.cancelRecovery()
+      }
+    },
+  }
 
   const {
     currentSlot: selectedIndex,
@@ -204,6 +220,11 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     multiSelectEnabled={dragState.multiSelectEnabled}
                     isSelected={isSelected(location)}
                     onToggleSelect={() => toggleSelection(location)}
+                    contextMenu={[
+                      Item.label('Fix Missing Tracking Data').action(() =>
+                        TrackedDataRecovery.startRecovery(location)
+                      ),
+                    ]}
                   />
                 )
               })}
@@ -245,6 +266,13 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           </Dialog.Content>
         </Dialog.Root>
       </Flex>
+      <PokemonSearchModal
+        typeName="Pokémon"
+        searchController={pokemonSearchController}
+        onSelect={(chosen) => TrackedDataRecovery.selectTrackedData(chosen.openhomeId)}
+        modalController={dataRecoverySearchModal}
+        SearchComponent={SearchFields.Pokemon}
+      />
       <Fallback>
         <PokemonDetailsModal
           mon={selectedMon}

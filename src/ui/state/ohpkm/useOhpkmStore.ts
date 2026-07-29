@@ -16,7 +16,7 @@ import { OhpkmStoreData } from '.'
 import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
 
-type MonLookupResult = Option<Result<void, IdentifierNotPresentError>>
+type MonLookupResult = Result<OHPKM, IdentifierNotPresentError>
 
 export type OhpkmStore = {
   getById(id: string): OHPKM | undefined
@@ -166,6 +166,7 @@ export function useOhpkmStore(): OhpkmStore {
       mon.markings = { ...markings }
 
       insertOrUpdate(mon)
+      return R.Ok(mon)
     },
     [insertOrUpdate, tryLoadFromId]
   )
@@ -179,6 +180,7 @@ export function useOhpkmStore(): OhpkmStore {
       mon.notes = notes
 
       insertOrUpdate(mon)
+      return R.Ok(mon)
     },
     [insertOrUpdate, tryLoadFromId]
   )
@@ -192,6 +194,7 @@ export function useOhpkmStore(): OhpkmStore {
       mon.setTags(tags ?? [])
 
       insertOrUpdate(mon)
+      return R.Ok(mon)
     },
     [insertOrUpdate, tryLoadFromId]
   )
@@ -205,6 +208,7 @@ export function useOhpkmStore(): OhpkmStore {
       mon.displayColor = color
 
       insertOrUpdate(mon)
+      return R.Ok(mon)
     },
     [insertOrUpdate, tryLoadFromId]
   )
@@ -218,6 +222,7 @@ export function useOhpkmStore(): OhpkmStore {
       mon.affixedRibbon = affixedRibbon
 
       insertOrUpdate(mon)
+      return R.Ok(mon)
     },
     [insertOrUpdate, tryLoadFromId]
   )
@@ -231,6 +236,7 @@ export function useOhpkmStore(): OhpkmStore {
       mon.nickname = nickname || Lookup.speciesName(mon.nationalDex, mon.language)
 
       insertOrUpdate(mon)
+      return R.Ok(mon)
     },
     [tryLoadFromId, insertOrUpdate]
   )
