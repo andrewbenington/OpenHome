@@ -8,7 +8,7 @@ import { SortableValue } from '@openhome-core/util/sort'
 import { Dialog } from '../dialog/Dialog'
 import OhoButton, { OhoButtonType } from '../OhoButton'
 import { ModalController, type SearchController } from './controllers'
-import Search from './Search'
+import Search from './PokemonSearch'
 import './style.css'
 import { PokemonSearchController } from './usePokemonSearch'
 

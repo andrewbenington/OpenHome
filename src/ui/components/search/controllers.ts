@@ -10,7 +10,7 @@ export type SearchController<T> = {
   getRowId: (item: T) => string
   selectedId: Option<string>
   setSelectedId: (id: Option<string>) => void
-  selectedItem: T | undefined
+  selectedItem: Option<T>
 
   reset: () => void
 }

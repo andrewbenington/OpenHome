@@ -40,6 +40,7 @@ export function difference<T>(first: T[] | undefined, second: T[]): T[] {
 
 export type Option<T> = T | undefined
 export type Nullable<T> = T | null
+export type NullableOption<T> = T | null | undefined
 export type Errorable<T> = Result<T, string>
 
 function buildOk<T = never, E = never>(value: T): Result<T, E> {

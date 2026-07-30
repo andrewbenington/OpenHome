@@ -1,6 +1,5 @@
 .search-row-selected {
-  background-color: var(--jade-7) !important;
-  outline: 0;
+  background-color: var(--focus-6) !important;
 }
 
 .search-dialog-content {

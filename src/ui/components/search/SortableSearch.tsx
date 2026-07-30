@@ -37,9 +37,7 @@ export default function SortableSearch<T extends SortableValue, SC extends Searc
       >
         <Flex gap="2" pt="1" pb="1" align="start">
           <FormComponent controller={controller} />
-          <Flex direction="column" gap="2" width="fit-content">
-            <OhoButton type="clear" onClick={reset} />
-          </Flex>
+          <OhoButton type="clear" onClick={reset} mt="1.5rem" />
           <OhoFlex.Spacer />
           {topRightComponent}
         </Flex>

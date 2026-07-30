@@ -74,6 +74,9 @@ export default function useTrackedDataRecovery() {
     return $R(ohpkmStore.syncOhpkmIfTracked(state.recoveredDataOhpkmId, mon, save)).match(
       (updated) => {
         savesManager.overwriteMonAtLocation(state.monToRecoverLocation, updated?.openhomeId)
+        if (state.sourceMonOhpkmId) {
+          savesManager.releaseMonsById(state.sourceMonOhpkmId)
+        }
 
         setState({ state: 'initial' })
         return R.Ok(null)
@@ -119,7 +122,7 @@ export default function useTrackedDataRecovery() {
     : 'Associate with this data?'
   const confirmPromptDescription =
     sourceMonOhpkmId && 'recoveredDataOhpkmId' in state
-      ? `By merging these Pokémon you will be updating the selected data using the original data, and deleting the original data. Specifically, "${state.recoveredDataOhpkmId}" will be updated using "${sourceMonOhpkmId}", after which "${sourceMonOhpkmId}" will be deleted.`
+      ? `By merging these Pokémon you will be updating the selected data using the original data, and deleting the original data. Specifically, "${state.recoveredDataOhpkmId}" will be updated using "${sourceMonOhpkmId}", and "${sourceMonOhpkmId}" will be released/deleted when you next save.`
       : 'If these are not the same Pokémon, you will be corrupting the selected Pokémon and deleting the other. Once you save, this action cannot be undone.'
 
   return {
