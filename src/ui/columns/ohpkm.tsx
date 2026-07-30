@@ -22,7 +22,6 @@ import {
 } from '@openhome-ui/state-zustand/banks-and-boxes/store'
 import { Language, Lookup, OriginGames } from '@pkm-rs/pkg'
 import { useRef } from 'react'
-import { SelectColumn } from 'react-data-grid'
 
 export default function useOhpkmColumns(
   trackedMonsToRelease: OhpkmIdentifier[],
@@ -35,7 +34,6 @@ export default function useOhpkmColumns(
   trackedMonsRef.current = trackedMonsToRelease
 
   return [
-    { ...SelectColumn, minWidth: 36, width: undefined },
     {
       key: 'Pokémon',
       name: 'Mon',

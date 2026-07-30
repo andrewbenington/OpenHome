@@ -148,6 +148,7 @@ export function $R<T, E>(r: Result<T, E>) {
   return {
     match: <U>(onOk: OnOk<T, U>, onErr: OnErr<E, U>) => match(onOk, onErr)(r),
     map: <U>(onOk: OnOk<T, U>) => map<T, E, U>(onOk)(r),
+    flatMap: <U>(onOk: OnOk<T, Result<U, E>>) => flatMap<T, E, U>(onOk)(r),
     mapErr: <U>(onErr: OnErr<E, U>) => mapErr<T, E, U>(onErr)(r),
   }
 }

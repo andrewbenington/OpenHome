@@ -10,8 +10,10 @@ function isPrimitive(obj: object | Primitive): obj is Primitive {
   return obj === null || primitiveTypes.includes(typeof obj)
 }
 
+export type InfoGridData = Record<string, any>
+
 type InfoGridProps = {
-  data?: Record<string, any>
+  data?: InfoGridData
   labelWidth?: Responsive<string>
   gap?: number
 }
