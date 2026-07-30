@@ -303,9 +303,10 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           {
             uniqueLabel: 'Confirm',
             action: () => {
-              $R(TrackedDataRecovery.confirmRecovery()).mapErr((err) =>
+              $R(TrackedDataRecovery.confirmRecovery()).mapErr((err) => {
+                TrackedDataRecovery.goBack()
                 displayError('Error recovering Pokémon data', err.message, err.data)
-              )
+              })
             },
             type: 'destructive',
           },

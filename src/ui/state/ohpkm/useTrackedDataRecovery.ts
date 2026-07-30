@@ -5,18 +5,18 @@ import { expectExhaustive } from '@openhome-core/util'
 import { $R, Option, R, Result } from '@openhome-core/util/functional'
 import { usePokemonSearch } from '@openhome-ui/components/search/usePokemonSearch'
 import { useState } from 'react'
-import { SaveMonLocation, useSaves } from '../saves'
+import { MonLocation, useSaves } from '../saves'
 import { useOhpkmStore } from './useOhpkmStore'
 
 type InitialState = { state: 'initial' }
 type PendingSelectState = {
   state: 'pending_ohpkm_select'
-  monToRecoverLocation: SaveMonLocation
+  monToRecoverLocation: MonLocation
   sourceMonOhpkmId: Option<OhpkmIdentifier>
 }
 type PendingConfirmState = {
   state: 'pending_confirm'
-  monToRecoverLocation: SaveMonLocation
+  monToRecoverLocation: MonLocation
   sourceMonOhpkmId: Option<OhpkmIdentifier>
   recoveredDataOhpkmId: string
 }
@@ -35,7 +35,7 @@ export default function useTrackedDataRecovery() {
   const savesManager = useSaves()
   const [state, setState] = useState<ReassociationState>({ state: 'initial' })
 
-  function startRecovery(monToRecoverLocation: SaveMonLocation) {
+  function startRecovery(monToRecoverLocation: MonLocation) {
     const monAtLocation = savesManager.getMonAtLocation(monToRecoverLocation)
     if (!monAtLocation)
       return R.Err({ message: 'No Pokémon at source location', data: monToRecoverLocation })
@@ -60,6 +60,16 @@ export default function useTrackedDataRecovery() {
     if (state.state !== 'pending_confirm')
       return R.Err({ message: 'Invalid state', data: { state } })
 
+    if (
+      state.sourceMonOhpkmId !== undefined &&
+      state.sourceMonOhpkmId === state.recoveredDataOhpkmId
+    ) {
+      return R.Err({
+        message: 'Selected Pokémon already have the same tracking data',
+        data: { 'OpenHome ID': state.sourceMonOhpkmId },
+      })
+    }
+
     const mon = savesManager.getMonAtLocation(state.monToRecoverLocation)
     if (!mon) {
       console.error(state.monToRecoverLocation)
@@ -69,7 +79,9 @@ export default function useTrackedDataRecovery() {
       })
     }
 
-    const save = savesManager.saveFromIdentifier(state.monToRecoverLocation.saveIdentifier)
+    const save = state.monToRecoverLocation.isHome
+      ? undefined
+      : savesManager.saveFromIdentifier(state.monToRecoverLocation.saveIdentifier)
 
     return $R(ohpkmStore.syncOhpkmIfTracked(state.recoveredDataOhpkmId, mon, save)).match(
       (updated) => {
