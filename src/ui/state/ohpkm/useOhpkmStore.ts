@@ -99,6 +99,11 @@ export function useOhpkmStore() {
           ...lookups,
           gen12: { ...lookups.gen12, [gen12Identifier]: ohpkmIdentifier },
         })
+        backend.log('DEBUG', `added ${ohpkm.nickname} to gen 1/2 lookup`, {
+          ohpkm_id: ohpkm.openhomeId,
+          event: 'lookups_update',
+          gen12Identifier,
+        })
       } else if (lookupType === 'gen345') {
         // If original generation, keep the original PID
         const isOriginalGen =
@@ -112,15 +117,21 @@ export function useOhpkmStore() {
           ...lookups,
           gen345: { ...lookups.gen345, [gen345Identifier]: ohpkmIdentifier },
         })
+        backend.log('DEBUG', `added ${ohpkm.nickname} to gen 3/4/5 lookup`, {
+          ohpkm_id: ohpkm.openhomeId,
+          event: 'lookups_update',
+          gen345Identifier,
+        })
       }
     },
-    [lookups, updateLookups]
+    [backend, lookups, updateLookups]
   )
 
   const updateAndConvertForSave = useCallback(
     <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => {
       handleLookupsUpdate(ohpkm, save)
       insertOrUpdate(ohpkm)
+      handleLookupsUpdate(ohpkm, save)
 
       return save.convertOhpkm(ohpkm, defaultConvertStrategy)
     },
@@ -254,7 +265,7 @@ export function useOhpkmStore() {
         case 'PK3UB':
         case 'PK4':
         case 'PK5': {
-          const gen345Identifier = getMonGen345Identifier(mon)
+          const gen345Identifier = getMonGen345Identifier(mon, true)
           if (!gen345Identifier) {
             throw Error(
               `unable to calculate gen 3/4/5 identifier for ${mon.nickname} (${mon.format})`

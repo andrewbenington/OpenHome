@@ -2,9 +2,9 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 
 import useOhpkmColumns from '@openhome-ui/columns/ohpkm'
 import { useSaves } from '@openhome-ui/state/saves'
-import { PokemonSearchController } from './controllers'
 import SearchFieldsForm from './SearchFields'
 import SortableSearch from './SortableSearch'
+import { PokemonSearchController } from './usePokemonSearch'
 
 interface PokemonSearchProps {
   controller: PokemonSearchController
@@ -12,9 +12,7 @@ interface PokemonSearchProps {
 
 function PokemonSearch({ controller }: PokemonSearchProps) {
   const { trackedMonsToRelease } = useSaves()
-  const columns = useOhpkmColumns(trackedMonsToRelease, (mon) =>
-    console.log(`selected ${mon.openhomeId}`)
-  )
+  const columns = useOhpkmColumns(trackedMonsToRelease)
 
   return (
     <SortableSearch<OHPKM, PokemonSearchController>

@@ -208,7 +208,7 @@ export function useManageTracked() {
             break
           }
           case 'gen345': {
-            const gen345Id = getMonGen345Identifier(saveMon)
+            const gen345Id = getMonGen345Identifier(saveMon, true)
             if (gen345Id && lookups.gen345[gen345Id]) {
               saveMonId = lookups.gen345[gen345Id]
             } else {

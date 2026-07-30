@@ -25,7 +25,7 @@ import { useRef } from 'react'
 
 export default function useOhpkmColumns(
   trackedMonsToRelease: OhpkmIdentifier[],
-  onSelectMon: (mon: OHPKM) => void
+  onSelectMon?: (mon: OHPKM) => void
 ): SortableColumn<OHPKM>[] {
   const { getBankName, getBoxName, findHomeLocation } = useBanksAndBoxes()
 
@@ -40,7 +40,7 @@ export default function useOhpkmColumns(
       width: '3rem',
       frozen: true,
       renderValue: (value) => (
-        <button onClick={() => onSelectMon(value)} className="mon-icon-button">
+        <button onClick={() => onSelectMon?.(value)} className="mon-icon-button">
           <PokemonIcon nationalDex={value.nationalDex} formIndex={value.formIndex} />
         </button>
       ),

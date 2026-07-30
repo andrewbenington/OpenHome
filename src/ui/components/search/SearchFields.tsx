@@ -1,6 +1,6 @@
 import LabelledInput from '../input/LabelledInput'
 import JvrFlex from '../OhoFlex'
-import type { PokemonSearchController } from './controllers'
+import { PokemonSearchController } from './usePokemonSearch'
 
 interface PokemonSearchFieldsProps {
   controller: PokemonSearchController
