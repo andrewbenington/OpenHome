@@ -4,9 +4,9 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SortTypes } from '@openhome-core/pkm/sort'
 import { monSupportedBySave } from '@openhome-core/save/util'
 import { mapToObject } from '@openhome-core/util'
-import { R, range } from '@openhome-core/util/functional'
+import { $R, R, range } from '@openhome-core/util/functional'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
-import { Item, Submenu } from '@openhome-ui/components/context-menu/types'
+import { Item, Separator, Submenu } from '@openhome-ui/components/context-menu/types'
 import { DebugDataDisplay } from '@openhome-ui/components/DebugDataDisplay'
 import DebugOnly from '@openhome-ui/components/DebugOnly'
 import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
@@ -19,10 +19,14 @@ import {
   RemoveIcon,
   SelectIcon,
 } from '@openhome-ui/components/Icons'
+import SearchFields from '@openhome-ui/components/search/SearchFields'
+import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
 import ToggleButton from '@openhome-ui/components/ToggleButton'
+import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { HomeMonLocation, MonLocation, MonWithLocation, useSaves } from '@openhome-ui/state/saves'
 import { cssClass } from '@openhome-ui/util/style'
 import { Language, Lookup } from '@pkm-rs/pkg'
@@ -250,6 +254,7 @@ type MissingIdData = {
 
 function SingleBoxMonDisplay() {
   const ohpkmStore = useOhpkmStore()
+  const displayError = useDisplayError()
   const { importMonsToLocation, saveFromIdentifier } = useSaves()
   const { getCurrentBox, getCurrentBank, clearAtHomeLocation, removeAllHomeDupes } =
     useBanksAndBoxes()
@@ -263,6 +268,16 @@ function SingleBoxMonDisplay() {
     navigateNext: navigateRight,
     navigatePrev: navigateLeft,
   } = useOpenHomeBoxNavigator()
+
+  const TrackedDataRecovery = useTrackedDataRecovery()
+  const dataRecoverySearchModal = {
+    modalOpen: TrackedDataRecovery.state !== 'initial',
+    setModalOpen: (open: boolean) => {
+      if (!open) {
+        TrackedDataRecovery.cancelRecovery()
+      }
+    },
+  }
 
   const attemptImportMons = useCallback(
     (mons: PKMInterface[], location: MonLocation) => {
@@ -412,7 +427,15 @@ function SingleBoxMonDisplay() {
                     // don't allow a swap with a pokémon not supported by the source save
                     mon && dragData && !dragData.isHome && !sourceSupportsMon(mon)
                   }
-                  contextMenu={contextElements}
+                  contextMenu={[
+                    Item.label('Merge/Recover Tracking Data').action(() =>
+                      $R(TrackedDataRecovery.startRecovery(thisLocation)).mapErr((err) =>
+                        displayError('Error starting recovery process', err.message, err.data)
+                      )
+                    ),
+                    Separator,
+                    ...contextElements,
+                  ]}
                   multiSelectEnabled={dragState.multiSelectEnabled}
                   isSelected={isSelected(thisLocation)}
                   onToggleSelect={() => toggleSelection(thisLocation)}
@@ -448,6 +471,36 @@ function SingleBoxMonDisplay() {
           { uniqueLabel: 'Cancel', action: dismissMissingIdDialog, type: 'cancel' },
           { uniqueLabel: 'Clear this slot', action: clearMissingIdSlot, type: 'destructive' },
         ]}
+      />
+      <PokemonSearchModal
+        typeName="Pokémon"
+        title={TrackedDataRecovery.selectDataPrompt}
+        searchController={TrackedDataRecovery.pokemonSearchController}
+        onSelect={(chosen) => TrackedDataRecovery.selectRecoveredDataId(chosen.openhomeId)}
+        modalController={dataRecoverySearchModal}
+        SearchComponent={SearchFields.Pokemon}
+      />
+      <PromptDialog
+        title={TrackedDataRecovery.confirmPromptTitle}
+        description={TrackedDataRecovery.confirmPromptDescription}
+        actions={[
+          {
+            uniqueLabel: 'Cancel',
+            action: () => TrackedDataRecovery.goBack(),
+            type: 'cancel',
+          },
+          {
+            uniqueLabel: 'Confirm',
+            action: () => {
+              $R(TrackedDataRecovery.confirmRecovery()).mapErr((err) => {
+                TrackedDataRecovery.goBack()
+                displayError('Error recovering Pokémon data', err.message, err.data)
+              })
+            },
+            type: 'destructive',
+          },
+        ]}
+        open={TrackedDataRecovery.state === 'pending_confirm'}
       />
     </>
   )
