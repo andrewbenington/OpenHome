@@ -195,24 +195,26 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   boxSlot: index,
                   saveIdentifier: save.identifier,
                 }
-                const mon = save.getMonAt(location.box, location.boxSlot)
+                let mon = save.getMonAt(location.box, location.boxSlot)
+                if (mon) {
+                  mon = ohpkmStore.monOrOhpkmIfTracked(mon)
+                }
+
                 const uniqueKey = mon
                   ? `${save.currentPCBox}-${index}-${mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
                   : `${save.currentPCBox}-${index}`
+
+                const slotMetadata = save.getSlotMetadata?.(save.currentPCBox, index)
+
                 return (
                   <BoxCell
                     key={uniqueKey}
                     onClick={() => setSelectedIndex(index)}
                     dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                     location={location}
-                    disabled={
-                      isDisabled(mon) ||
-                      save.getSlotMetadata?.(save.currentPCBox, index)?.isDisabled
-                    }
-                    disabledReason={
-                      save.getSlotMetadata?.(save.currentPCBox, index)?.disabledReason
-                    }
-                    mon={mon ? ohpkmStore.monOrOhpkmIfTracked(mon) : undefined}
+                    disabled={isDisabled(mon) || slotMetadata?.isDisabled}
+                    disabledReason={slotMetadata?.disabledReason}
+                    mon={mon}
                     onDrop={(importedMons) => {
                       if (importedMons) {
                         attemptImportMons(importedMons, location)
@@ -221,11 +223,25 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     multiSelectEnabled={dragState.multiSelectEnabled}
                     isSelected={isSelected(location)}
                     onToggleSelect={() => toggleSelection(location)}
-                    contextMenu={[
-                      Item.label('Fix Missing Tracking Data').action(() =>
-                        TrackedDataRecovery.startRecovery(location)
-                      ),
-                    ]}
+                    contextMenu={
+                      mon
+                        ? [
+                            Item.label(
+                              mon instanceof OHPKM
+                                ? 'Merge/Recover Tracking Data'
+                                : 'Fix Missing Tracking Data'
+                            ).action(() =>
+                              $R(TrackedDataRecovery.startRecovery(location)).mapErr((err) =>
+                                displayError(
+                                  'Error starting recovery process',
+                                  err.message,
+                                  err.data
+                                )
+                              )
+                            ),
+                          ]
+                        : []
+                    }
                   />
                 )
               })}
@@ -269,15 +285,15 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       </Flex>
       <PokemonSearchModal
         typeName="Pokémon"
-        title="Select the data that should be associated with this Pokémon"
+        title={TrackedDataRecovery.selectDataPrompt}
         searchController={TrackedDataRecovery.pokemonSearchController}
-        onSelect={(chosen) => TrackedDataRecovery.selectTrackedData(chosen.openhomeId)}
+        onSelect={(chosen) => TrackedDataRecovery.selectRecoveredDataId(chosen.openhomeId)}
         modalController={dataRecoverySearchModal}
         SearchComponent={SearchFields.Pokemon}
       />
       <PromptDialog
-        title="Associate with this data?"
-        description="If these are not the same Pokémon, you will be corrupting the selected Pokémon and deleting the other. Once you save, this action cannot be undone."
+        title={TrackedDataRecovery.confirmPromptTitle}
+        description={TrackedDataRecovery.confirmPromptDescription}
         actions={[
           {
             uniqueLabel: 'Cancel',

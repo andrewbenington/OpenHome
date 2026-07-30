@@ -1,5 +1,5 @@
 import useBackend from '@openhome-core/backend/useBackend'
-import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -242,8 +242,10 @@ export function useOhpkmStore() {
   const loadIfTracked = useCallback(
     (mon: PKMInterface): Option<OHPKM> => {
       if (FORCE_MISSED_LOOKUP) return undefined
-      const format: MonFormat = mon.format as MonFormat
-      switch (format) {
+      switch (mon.format) {
+        case 'OHPKM':
+          if (!(mon instanceof OHPKM)) throw Error('Non-OHPKM has OHPKM format')
+          return mon
         case 'PK1':
         case 'PK2': {
           const gen12Identifier = getMonGen12Identifier(mon)
@@ -302,7 +304,7 @@ export function useOhpkmStore() {
           )?.[1]
         }
         default:
-          expectExhaustive(format, `unrecognized format: ${format}`)
+          expectExhaustive(mon.format, `unrecognized format: ${mon.format}`)
       }
     },
     [gen12Lookup, gen345Lookup, ohpkmStore]
