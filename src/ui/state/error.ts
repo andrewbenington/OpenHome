@@ -1,6 +1,7 @@
+import { InfoGridData } from '@openhome-ui/components/InfoGrid'
 import { Dispatch, Reducer, createContext } from 'react'
 
-type ErrorMessageData = { title: string; messages: string[] }
+type ErrorMessageData = { title: string; messages: string[]; data?: InfoGridData }
 
 export type ErrorState = { messageData?: ErrorMessageData }
 export type ErrorAction =

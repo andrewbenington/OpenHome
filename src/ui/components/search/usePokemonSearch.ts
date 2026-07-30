@@ -4,7 +4,14 @@ import { $R, Option, R, Result } from '@openhome-core/util/functional'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGame } from '@pkm-rs/pkg'
 import { useState } from 'react'
-import { PokemonSearchController } from './controllers'
+import { SearchController } from './controllers'
+
+export type PokemonSearchController = SearchController<OHPKM> & {
+  nickname: string | null
+  setNickname: (name: string | null) => void
+  knownMove: string | null
+  setKnownMove: (name: string | null) => void
+}
 
 export function usePokemonForm() {
   const [nickname, setNickname] = useState<string>('')
@@ -77,13 +84,14 @@ export function usePokemonEdit() {
   }
 }
 
-export function usePokemonSearch(): PokemonSearchController {
+export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSearchController {
   const [nickname, setNickname] = useState<string | null>(null)
-  const [results, setResults] = useState<OHPKM[]>([])
   const [selectedId, setSelectedId] = useState<Option<string>>()
   const mons = useOhpkmStore().getAllStored()
 
-  const filtered = mons.filter((mon) => nickname === null || mon.nickname.startsWith(nickname))
+  const filtered = mons
+    .filter((mon) => prefilter?.(mon) !== false)
+    .filter((mon) => nickname === null || mon.nickname.startsWith(nickname))
 
   function clearFields() {
     setNickname(null)
@@ -92,33 +100,9 @@ export function usePokemonSearch(): PokemonSearchController {
   function reset() {
     clearFields()
     setSelectedId(undefined)
-    setResults([])
   }
 
-  function addSearchResult(newPokemon: OHPKM) {
-    const fieldsEmpty = !nickname
-    const nameMismatch = nickname && !prefixMatchesCaseInsensitive(nickname, newPokemon.nickname)
-
-    if (fieldsEmpty || nameMismatch) {
-      return
-    }
-
-    setResults((prevResults) => [...prevResults, newPokemon])
-  }
-
-  function updateSearchResult(updatedMon: OHPKM) {
-    setResults((prevResults) =>
-      prevResults.map((mon) => (mon.openhomeId === updatedMon.openhomeId ? updatedMon : mon))
-    )
-  }
-
-  function removeSearchResult(removedMon: OHPKM) {
-    setResults((prevResults) =>
-      prevResults.filter((mon) => mon.openhomeId !== removedMon.openhomeId)
-    )
-  }
-
-  const selectedItem = results.find((mon) => getMonFileIdentifier(mon) === selectedId)
+  const selectedItem = mons.find((mon) => getMonFileIdentifier(mon) === selectedId)
 
   return {
     nickname,
@@ -135,14 +119,7 @@ export function usePokemonSearch(): PokemonSearchController {
     selectedId,
     setSelectedId,
     selectedItem,
-    addSearchResult,
-    updateSearchResult,
-    removeSearchResult,
 
     reset,
   }
-}
-
-function prefixMatchesCaseInsensitive(prefix: string, text: any) {
-  return text.toLocaleUpperCase().startsWith(prefix.toLocaleUpperCase())
 }

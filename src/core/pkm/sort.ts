@@ -3,7 +3,7 @@ import { PKM } from '@openhome-core/pkm/PKM'
 import { getDisplayID } from '@openhome-core/util/util'
 import { Ball, Gender } from '@pkm-rs/pkg'
 import dayjs from 'dayjs'
-import { getBaseMon } from './util'
+import { getBaseEvolution } from './util'
 
 export const SortTypes = [
   'Nickname',
@@ -70,9 +70,9 @@ function sortByFormIndex(a: PKMInterface, b: PKMInterface) {
   return (a.formIndex ?? 0) - (b.formIndex ?? 0)
 }
 
-function sortByBaseMon(a: PKMInterface, b: PKMInterface) {
-  const nationalDexA = getBaseMon(a.nationalDex, a.formIndex)?.nationalDex ?? 0
-  const nationalDexB = getBaseMon(b.nationalDex, b.formIndex)?.nationalDex ?? 0
+function sortByBaseEvolution(a: PKMInterface, b: PKMInterface) {
+  const nationalDexA = getBaseEvolution(a.nationalDex, a.formIndex)?.nationalDex ?? 0
+  const nationalDexB = getBaseEvolution(b.nationalDex, b.formIndex)?.nationalDex ?? 0
   return nationalDexA - nationalDexB
 }
 
@@ -134,7 +134,7 @@ export function getSortFunction(
     case 'Species':
       return chain([sortByDexNum, sortByFormIndex])
     case 'Species Family':
-      return chain([sortByBaseMon, sortByDexNum, sortByFormIndex])
+      return chain([sortByBaseEvolution, sortByDexNum, sortByFormIndex])
     case 'Gender':
       return (a, b) => (a.gender ?? Gender.Genderless) - (b.gender ?? Gender.Genderless)
     case 'Origin':

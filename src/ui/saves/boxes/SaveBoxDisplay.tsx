@@ -4,13 +4,14 @@ import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
-import { range } from '@openhome-core/util/functional'
+import { $R, range } from '@openhome-core/util/functional'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
+import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import Fallback from '@openhome-ui/components/Fallback'
 import SearchFields from '@openhome-ui/components/search/SearchFields'
 import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
-import { usePokemonSearch } from '@openhome-ui/components/search/usePokemonSearch'
+import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
@@ -44,12 +45,12 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const { dragState, toggleSelection, isSelected } = useDragAndDrop()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
+  const displayError = useDisplayError()
 
-  const pokemonSearchController = usePokemonSearch()
   const TrackedDataRecovery = useTrackedDataRecovery()
 
   const dataRecoverySearchModal = {
-    modalOpen: TrackedDataRecovery.state === 'pending_ohpkm_select',
+    modalOpen: TrackedDataRecovery.state !== 'initial',
     setModalOpen: (open: boolean) => {
       if (!open) {
         TrackedDataRecovery.cancelRecovery()
@@ -268,10 +269,32 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
       </Flex>
       <PokemonSearchModal
         typeName="Pokémon"
-        searchController={pokemonSearchController}
+        title="Select the data that should be associated with this Pokémon"
+        searchController={TrackedDataRecovery.pokemonSearchController}
         onSelect={(chosen) => TrackedDataRecovery.selectTrackedData(chosen.openhomeId)}
         modalController={dataRecoverySearchModal}
         SearchComponent={SearchFields.Pokemon}
+      />
+      <PromptDialog
+        title="Associate with this data?"
+        description="If these are not the same Pokémon, you will be corrupting the selected Pokémon and deleting the other. Once you save, this action cannot be undone."
+        actions={[
+          {
+            uniqueLabel: 'Cancel',
+            action: () => TrackedDataRecovery.goBack(),
+            type: 'cancel',
+          },
+          {
+            uniqueLabel: 'Confirm',
+            action: () => {
+              $R(TrackedDataRecovery.confirmRecovery()).mapErr((err) =>
+                displayError('Error recovering Pokémon data', err.message, err.data)
+              )
+            },
+            type: 'destructive',
+          },
+        ]}
+        open={TrackedDataRecovery.state === 'pending_confirm'}
       />
       <Fallback>
         <PokemonDetailsModal

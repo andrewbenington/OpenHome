@@ -89,7 +89,7 @@ export const generateIVs = (prng: Prando) => {
 
 // recursively returns pre-evolution. if provided a mega form, returns the first pre-evolution
 // of the base form.
-export const getBaseMon = (nationalDex: number, form?: number) => {
+export const getBaseEvolution = (nationalDex: number, form?: number) => {
   let mon = SpeciesAndForm.tryNew(nationalDex, form ?? 0)
   let metadata = mon?.getMetadata()
 
@@ -103,6 +103,18 @@ export const getBaseMon = (nationalDex: number, form?: number) => {
   }
 
   return mon
+}
+
+export function baseEvolutionsMatch(mon1: PKMInterface, mon2: PKMInterface): boolean {
+  let baseEvo1 = getBaseEvolution(mon1.nationalDex, mon1.formIndex)
+  let baseEvo2 = getBaseEvolution(mon2.nationalDex, mon2.formIndex)
+
+  return (
+    baseEvo1 !== undefined &&
+    baseEvo2 !== undefined &&
+    baseEvo1.nationalDex === baseEvo2.nationalDex &&
+    baseEvo2.formIndex === baseEvo2.formIndex
+  )
 }
 
 export const getPrevos = (nationalDex: number, formIndex?: number) => {

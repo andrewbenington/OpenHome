@@ -4,18 +4,17 @@ import { type CSSProperties } from 'react'
 import './style.css'
 
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { SortableColumn, SortableValue } from '@openhome-core/util/sort'
-import useOhpkmColumns from '@openhome-ui/columns/ohpkm'
+import { SortableValue } from '@openhome-core/util/sort'
 import { Dialog } from '../dialog/Dialog'
 import OhoButton, { OhoButtonType } from '../OhoButton'
-import { ModalController, PokemonSearchController, type SearchController } from './controllers'
+import { ModalController, type SearchController } from './controllers'
 import Search from './Search'
 import './style.css'
-import { usePokemonSearch } from './usePokemonSearch'
+import { PokemonSearchController } from './usePokemonSearch'
 
 export interface SearchModalProps<T extends SortableValue, SC extends SearchController<T>> {
   typeName: string
-  columns: SortableColumn<T>[]
+  title?: string
   buttonText?: string
   buttonStyle?: CSSProperties
   buttonType?: OhoButtonType
@@ -31,6 +30,7 @@ function SearchModal<T extends SortableValue, SC extends SearchController<T>>(
 ) {
   const {
     typeName,
+    title,
     buttonText,
     buttonStyle,
     buttonType,
@@ -49,7 +49,6 @@ function SearchModal<T extends SortableValue, SC extends SearchController<T>>(
 
   function confirmSelected() {
     if (selectedItem) onSelect(selectedItem)
-    closeAndClear()
   }
 
   return (
@@ -67,7 +66,7 @@ function SearchModal<T extends SortableValue, SC extends SearchController<T>>(
       <Dialog.Portal>
         <Dialog.Backdrop />
         <Dialog.Popup className="search-dialog-content">
-          <Dialog.Title>Search Pokémon</Dialog.Title>
+          <Dialog.Title>{title ?? `Search ${typeName}`}</Dialog.Title>
           <VisuallyHidden>
             <Dialog.Description>Search and select a {typeName}</Dialog.Description>
           </VisuallyHidden>
@@ -86,26 +85,10 @@ function SearchModal<T extends SortableValue, SC extends SearchController<T>>(
   )
 }
 
-type PokemonSearchModalProps = Omit<SearchModalProps<OHPKM, PokemonSearchController>, 'columns'>
+type PokemonSearchModalProps = SearchModalProps<OHPKM, PokemonSearchController>
 
 function PokemonSearchModal(props: PokemonSearchModalProps) {
-  const { buttonText, buttonStyle, buttonType, buttonRef, onSelect, modalController } = props
-  const searchController = usePokemonSearch()
-
-  return (
-    <SearchModal
-      typeName="Pokeémon"
-      columns={useOhpkmColumns([], () => {})}
-      buttonText={buttonText}
-      buttonStyle={buttonStyle}
-      buttonType={buttonType}
-      buttonRef={buttonRef}
-      searchController={searchController}
-      SearchComponent={Search.Pokemon}
-      onSelect={onSelect}
-      modalController={modalController}
-    />
-  )
+  return <SearchModal {...props} typeName="Pokémon" SearchComponent={Search.Pokemon} />
 }
 
 export default PokemonSearchModal

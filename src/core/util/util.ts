@@ -251,3 +251,8 @@ export function nullIfNoneInt(value: string): number | null {
     return parseInt(value)
   }
 }
+
+// use type system to enforce exhaustiveness
+export function expectExhaustive(_: never, description: string): never {
+  throw Error(`unreachable called: ${description}`)
+}

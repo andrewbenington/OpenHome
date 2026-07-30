@@ -41,7 +41,8 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   saveBoxNavigateRight(save: SAV): void
   saveFromIdentifier: (identifier: SaveIdentifier) => SAV
 
-  getMonAtLocation(location: MonLocation): PKMInterface | OHPKM | undefined
+  getMonAtLocation(location: MonLocation): Option<PKMInterface | OHPKM>
+  overwriteMonAtLocation(location: MonLocation, mon: Option<OhpkmIdentifier>): void
   setMonHeldItem(item: Item | undefined, location: MonLocation): void
   moveMon(source: MonWithLocation, dest: MonLocation): void
   recoverMonToBox(id: OhpkmIdentifier, bankIndex: number): void
@@ -251,6 +252,17 @@ export function useSaves(): SavesAndBanksManager {
       return displacedMonId
     },
     [clearAtHomeLocation, findHomeLocation, getMonAtHomeLocation, setAtHomeLocation]
+  )
+
+  const overwriteMonAtLocation = useCallback(
+    (location: MonLocation, ohpkmId: Option<OhpkmIdentifier>) => {
+      if (!location.isHome) {
+        moveOhpkmToSave(ohpkmId, location)
+      } else {
+        moveOhpkmToHome(ohpkmId, location)
+      }
+    },
+    [moveOhpkmToSave, moveOhpkmToHome]
   )
 
   const importMonsToLocation = useCallback(
@@ -801,6 +813,7 @@ export function useSaves(): SavesAndBanksManager {
     saveFromIdentifier,
 
     getMonAtLocation,
+    overwriteMonAtLocation,
     setMonHeldItem,
     moveMon,
     recoverMonToBox,

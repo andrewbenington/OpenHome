@@ -1,4 +1,4 @@
-import { getBaseMon } from '@openhome-core/pkm/util'
+import { getBaseEvolution } from '@openhome-core/pkm/util'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import { Pokedex } from '@openhome-ui/util/pokedex'
@@ -29,16 +29,16 @@ export default function EvolutionFamily({
   height,
   onClick,
 }: EvolutionFamilyProps) {
-  let baseMon = getBaseMon(nationalDex, formIndex)
+  let baseEvolution = getBaseEvolution(nationalDex, formIndex)
 
   if (MONS_WITH_NON_EVOLVABLE_FORMS.includes(nationalDex)) {
     // Ensures full family is shown even when forms like Ash Greninja are selected
-    baseMon = getBaseMon(nationalDex, 0)
+    baseEvolution = getBaseEvolution(nationalDex, 0)
   }
 
-  if (!baseMon) return <div />
+  if (!baseEvolution) return <div />
 
-  const baseMonForms = baseMon.getSpeciesMetadata().forms
+  const baseEvolutionForms = baseEvolution.getSpeciesMetadata().forms
 
   if (MONS_WITH_NON_EVOLVABLE_FORMS.includes(nationalDex)) {
     const otherForms = SpeciesAndForm.tryNew(nationalDex, formIndex)
@@ -46,7 +46,7 @@ export default function EvolutionFamily({
       .forms.filter((form) => !form.preEvolution && !form.isMega)
 
     if (otherForms) {
-      baseMonForms.push(...otherForms)
+      baseEvolutionForms.push(...otherForms)
     }
   }
 
@@ -59,7 +59,7 @@ export default function EvolutionFamily({
       align="center"
       overflow="auto"
     >
-      {baseMonForms
+      {baseEvolutionForms
         .filter((form) => !form.isMega)
         .map(({ nationalDex, formIndex }) => (
           <EvolutionLine
