@@ -1,22 +1,25 @@
 import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { $R, Option, R, Result } from '@openhome-core/util/functional'
+import { Moves } from '@openhome-core/resources'
+import { $R, Nullable, NullableOption, Option, R, Result } from '@openhome-core/util/functional'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { OriginGame } from '@pkm-rs/pkg'
 import { useState } from 'react'
 import { SearchController } from './controllers'
 
 export type PokemonSearchController = SearchController<OHPKM> & {
-  nickname: string | null
-  setNickname: (name: string | null) => void
-  knownMove: string | null
-  setKnownMove: (name: string | null) => void
+  nickname: Nullable<string>
+  setNickname: (name: Nullable<string>) => void
+  knownMove: Nullable<string>
+  setKnownMove: (name: Nullable<string>) => void
+  originGame: Nullable<OriginGame>
+  setOriginGame: (name: Nullable<OriginGame>) => void
 }
 
 export function usePokemonForm() {
   const [nickname, setNickname] = useState<string>('')
   const [originGame, setOriginGame] = useState<Option<OriginGame>>()
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<Nullable<string>>(null)
 
   function reset() {
     setNickname('')
@@ -70,7 +73,7 @@ export function usePokemonEdit() {
     formController.populateForm(pokemon)
   }
 
-  function currentItemDescription(): string | null {
+  function currentItemDescription(): Nullable<string> {
     return editingId ? formController.name : null
   }
 
@@ -84,17 +87,32 @@ export function usePokemonEdit() {
   }
 }
 
+function prefixMatches(prefix: NullableOption<string>, value: NullableOption<string>): boolean {
+  if (!prefix) return true
+  return (
+    typeof value === 'string' && value.toLocaleUpperCase().startsWith(prefix.toLocaleUpperCase())
+  )
+}
+
 export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSearchController {
-  const [nickname, setNickname] = useState<string | null>(null)
+  const [nickname, setNickname] = useState<Nullable<string>>(null)
+  const [knownMove, setKnownMove] = useState<Nullable<string>>(null)
+  const [originGame, setOriginGame] = useState<Nullable<OriginGame>>(null)
   const [selectedId, setSelectedId] = useState<Option<string>>()
   const mons = useOhpkmStore().getAllStored()
 
   const filtered = mons
     .filter((mon) => prefilter?.(mon) !== false)
-    .filter((mon) => nickname === null || mon.nickname.startsWith(nickname))
+    .filter((mon) => prefixMatches(nickname, mon.nickname))
+    .filter((mon) =>
+      mon.moves.some((moveIndex) => prefixMatches(knownMove, Moves[moveIndex]?.name))
+    )
+    .filter((mon) => originGame === null || mon.gameOfOrigin === originGame)
 
   function clearFields() {
     setNickname(null)
+    setKnownMove(null)
+    setOriginGame(null)
   }
 
   function reset() {
@@ -107,8 +125,10 @@ export function usePokemonSearch(prefilter?: (mon: OHPKM) => boolean): PokemonSe
   return {
     nickname,
     setNickname,
-    knownMove: null,
-    setKnownMove: () => {},
+    knownMove,
+    setKnownMove,
+    originGame,
+    setOriginGame,
 
     fieldsEmpty: !nickname,
     clearFields,
