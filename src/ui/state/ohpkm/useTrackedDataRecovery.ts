@@ -49,7 +49,9 @@ export default function useTrackedDataRecovery() {
       })
     }
 
-    return $R(ohpkmStore.syncOhpkmIfTracked(state.ohpkmId, mon)).match(
+    const save = savesManager.saveFromIdentifier(state.saveLocation.saveIdentifier)
+
+    return $R(ohpkmStore.syncOhpkmIfTracked(state.ohpkmId, mon, save)).match(
       (updated) => {
         savesManager.overwriteMonAtLocation(state.saveLocation, updated?.openhomeId)
 
