@@ -258,7 +258,7 @@
   }
 }
 
-.datagrid:not() {
+.datagrid {
   --rdg-row-selected-hover-background-color: var(--focus-8);
   --rdg-row-selected-background-color: var(--focus-7);
 
