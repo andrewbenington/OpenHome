@@ -1,7 +1,6 @@
 import '@radix-ui/themes/styles.css'
 import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
-import utc from 'dayjs/plugin/utc'
 import { enableMapSet } from 'immer'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
@@ -17,7 +16,6 @@ await init()
 enableMapSet()
 
 dayjs.extend(localizedFormat)
-dayjs.extend(utc)
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
