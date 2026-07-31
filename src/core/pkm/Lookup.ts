@@ -1,6 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
-import { dvsFromIVs, getBaseMon } from '@openhome-core/pkm/util'
+import { dvsFromIVs, getBaseEvolution } from '@openhome-core/pkm/util'
 import { Option } from '@openhome-core/util/functional'
 import {
   readGameBoyStringFromBytes,
@@ -41,13 +41,13 @@ const bytesToString = (value: number, numBytes: number) => {
 }
 
 function getHomeIdentifier(mon: HomeIdentifierDerivableMon): OhpkmIdentifier {
-  const baseMon = getBaseMon(mon.nationalDex, mon.formIndex)
+  const baseEvolution = getBaseEvolution(mon.nationalDex, mon.formIndex)
 
-  if (!baseMon) {
+  if (!baseEvolution) {
     throw Error(`Invalid dex/form: ${mon.nationalDex} / ${mon.formIndex}`)
   }
 
-  return `${baseMon.nationalDex.toString().padStart(4, '0')}-${bytesToString(
+  return `${baseEvolution.nationalDex.toString().padStart(4, '0')}-${bytesToString(
     mon.trainerID,
     2
   ).concat(
@@ -66,14 +66,14 @@ export const getMonGen12Identifier = (mon: PKMInterface): Option<Gen12Identifier
   const gen12Bytes = utf16StringToGen12(mon.trainerName, 8, true)
   const dataView = new DataView(gen12Bytes.buffer)
   const convertedTrainerName = readGameBoyStringFromBytes(dataView, 0, 8)
-  const baseMon = getBaseMon(mon.nationalDex, mon.formIndex)
+  const baseEvolution = getBaseEvolution(mon.nationalDex, mon.formIndex)
   let tid = mon.trainerID
 
   if (mon instanceof OHPKM && !OriginGames.isGameboy(mon.gameOfOrigin)) {
     tid = mon.personalityValue % 0x10000
   }
-  if (baseMon && dvs) {
-    return `${baseMon.nationalDex.toString().padStart(4, '0')}-${bytesToString(
+  if (baseEvolution && dvs) {
+    return `${baseEvolution.nationalDex.toString().padStart(4, '0')}-${bytesToString(
       tid,
       2
     )}-${convertedTrainerName}-${dvs.atk.toString(16)}-${dvs.def.toString(16)}-${dvs.spc.toString(
@@ -88,14 +88,18 @@ export const getMonGen345Identifier = (
   mon: PKMInterface,
   keepOriginalPid: boolean = false
 ): Option<Gen345Identifier> => {
-  const baseMon = getBaseMon(mon.nationalDex, mon.formIndex)
+  const baseEvolution = getBaseEvolution(mon.nationalDex, mon.formIndex)
 
   try {
     let pk3CompatiblePID
 
-    if (mon instanceof OHPKM && !keepOriginalPid) {
+    if (!keepOriginalPid) {
       // Get the personality value that will be generated
-      pk3CompatiblePID = mon.generatePk3CompatiblePid()
+      if (mon instanceof OHPKM) {
+        pk3CompatiblePID = mon.generatePk3CompatiblePid()
+      } else {
+        pk3CompatiblePID = OHPKM.fromMonUnknownSave(mon).generatePk3CompatiblePid()
+      }
     } else if (mon.personalityValue !== undefined) {
       pk3CompatiblePID = mon.personalityValue
     } else {
@@ -105,8 +109,8 @@ export const getMonGen345Identifier = (
     const trainerId = mon.trainerID
     const secretId = mon.secretID
 
-    if (baseMon) {
-      return `${baseMon.nationalDex.toString().padStart(4, '0')}-${bytesToString(
+    if (baseEvolution) {
+      return `${baseEvolution.nationalDex.toString().padStart(4, '0')}-${bytesToString(
         trainerId,
         2
       ).concat(bytesToString(secretId, 2))}-${bytesToString(pk3CompatiblePID, 4)}`

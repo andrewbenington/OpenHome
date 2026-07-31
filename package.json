@@ -1,7 +1,7 @@
 {
   "productName": "OpenHome",
   "name": "openhome",
-  "version": "1.14.2",
+  "version": "1.15.0-rc.1",
   "description": "A tool for moving Pokémon between game saves",
   "keywords": [
     "pokemon",
@@ -34,19 +34,22 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "format": "prettier --write .",
-    "lint": "pnpm run lint:ci --fix && cargo clippy -- -Dwarnings",
-    "lint:ci": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs",
+    "lint": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs --fix && pnpm clippy",
+    "lint:ci": "eslint src --max-warnings 0 --report-unused-disable-directives -c eslint.config.mjs && pnpm clippy",
+    "clippy": "cargo clippy --all-targets --all-features --profile test -- -Dwarnings",
     "typecheck": "tsgo",
-    "build": "pnpm run wasm-compile && pnpm vite build",
-    "dev": "pnpm run wasm-compile-dev && pnpm vite",
+    "build": "pnpm wasm-compile && pnpm vite build",
+    "dev": "pnpm wasm-compile-dev && pnpm vite",
     "tauri": "tauri",
-    "test-cargo": "cargo test --workspace --all-features --tests",
-    "test-vite": "pnpm run wasm-compile-dev && vitest run",
-    "test": "pnpm run test-cargo && pnpm run test-vite",
+    "test-cargo": "cargo nextest run --workspace --all-features --no-fail-fast",
+    "test-cargo:ci": "cargo nextest run --workspace --all-features",
+    "test-vite": "pnpm wasm-compile-dev && vitest run",
+    "test": "pnpm test-cargo && pnpm test-vite",
+    "test:ci": "pnpm test-cargo:ci && pnpm test-vite",
     "wasm-compile-dev": "wasm-pack build ./pkm_rs --target web -- --features wasm && node scripts/patch-types.mjs",
     "wasm-compile": "wasm-pack build --release ./pkm_rs --target web -- --features wasm && node scripts/patch-types.mjs",
-    "precommit": "pnpm run typecheck && pnpm run format && pnpm run lint",
-    "postinstall": "pnpm run wasm-compile-dev"
+    "precommit": "pnpm typecheck && pnpm format && pnpm lint",
+    "postinstall": "pnpm wasm-compile-dev"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

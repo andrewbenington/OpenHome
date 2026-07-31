@@ -153,6 +153,7 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
     defaultSortOrder,
     rowHeight,
     defaultColumnOptions,
+    className,
     ...otherProps
   } = props
   const [sortColumns, setSortColumns] = useState<SortColumn[]>(
@@ -219,7 +220,7 @@ export default function SortableDataGrid<R extends SortableValue>(props: Sortabl
   )
 
   return (
-    <div style={{ height: '100%', overflow: 'hidden ', flex: 1 }}>
+    <div className={className} style={{ height: '100%', overflow: 'hidden ', flex: 1 }}>
       <DataGrid
         ref={gridRef}
         className="datagrid"

@@ -40,6 +40,7 @@ export function difference<T>(first: T[] | undefined, second: T[]): T[] {
 
 export type Option<T> = T | undefined
 export type Nullable<T> = T | null
+export type NullableOption<T> = T | null | undefined
 export type Errorable<T> = Result<T, string>
 
 function buildOk<T = never, E = never>(value: T): Result<T, E> {
@@ -58,11 +59,11 @@ function isErr<E>(result: Result<unknown, E>): result is Err<E> {
   return result.status === 'error'
 }
 
-function map<T, E, U>(transform: (val: T) => U): (result: Result<T, E>) => Result<U, E> {
+function map<T, E, U>(transform: Mapper<T, U>): (result: Result<T, E>) => Result<U, E> {
   return (result) => (isOk(result) ? buildOk(transform(result.data)) : result)
 }
 
-function mapErr<T, E, U>(transform: (val: E) => U): (result: Result<T, E>) => Result<T, U> {
+function mapErr<T, E, U>(transform: Mapper<E, U>): (result: Result<T, E>) => Result<T, U> {
   return (result) => (isErr(result) ? buildErr(transform(result.error)) : result)
 }
 
@@ -119,7 +120,7 @@ export type Ok<T> = {
   readonly data: T
 }
 
-export type Result<T, E> = Ok<T> | Err<E>
+export type Result<T, E = string> = Ok<T> | Err<E>
 
 export const R = {
   match,
@@ -144,9 +145,11 @@ type OnOk<T, R> = Mapper<T, R>
 type OnErr<E, R> = Mapper<E, R>
 
 // Wrapper function exposing Result utility functions as "methods"
-export function $R<T, E, R>(r: Result<T, E>) {
+export function $R<T, E>(r: Result<T, E>) {
   return {
-    match: (onOk: OnOk<T, R>, onErr: OnErr<E, R>) => match(onOk, onErr)(r),
-    map: (onOk: OnOk<T, R>) => map(onOk)(r),
+    match: <U>(onOk: OnOk<T, U>, onErr: OnErr<E, U>) => match(onOk, onErr)(r),
+    map: <U>(onOk: OnOk<T, U>) => map<T, E, U>(onOk)(r),
+    flatMap: <U>(onOk: OnOk<T, Result<U, E>>) => flatMap<T, E, U>(onOk)(r),
+    mapErr: <U>(onErr: OnErr<E, U>) => mapErr<T, E, U>(onErr)(r),
   }
 }

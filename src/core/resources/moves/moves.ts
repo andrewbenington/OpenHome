@@ -23,4 +23,4 @@ export type Move = {
   id: number
 }
 
-export const Moves = moves as unknown as Move[]
+export const Moves = moves as unknown as Record<number, Move>

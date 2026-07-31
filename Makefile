@@ -1,4 +1,4 @@
-VERSION=1.15.0-rc.0
+VERSION=1.15.0-rc.1
 
 .PHONY: help
 help: # Display this help.
@@ -58,8 +58,12 @@ ifeq ($(shell which wasm-pack 2>/dev/null), )
 	@cargo install wasm-pack
 endif
 
+.PHONY: ensure-nextest
+ensure-nextest:
+	@cargo install cargo-nextest@=0.9.140
+
 .PHONY: ensure-dependencies
-ensure-dependencies: ensure-pnpm ensure-wasm-pack
+ensure-dependencies: ensure-pnpm ensure-wasm-pack ensure-nextest
 
 .PHONY: set-version
 set-version:
@@ -73,7 +77,7 @@ set-version:
 	@cd pkm_rs_types && cargo set-version $(VERSION)
 	@cd pkm_rs && cargo build
 	@cd src-tauri && cargo build
-	@pnpm version $(VERSION) --no-git-tag-version --allow-same-version 
+	@pnpm version $(VERSION) --no-git-tag-version --allow-same-version --no-git-checks
 	@pnpm i
 
 .PHONY: build-appimage
@@ -107,8 +111,10 @@ release-mac: release-mac-arm release-mac-intel
 .PHONY: release
 release:
 	@source .env && node scripts/release.mts new-release
-	@source .env && node scripts/release.mts publish
+	@source .env && node scripts/release.mts finalize
+	@source .env && npx tauri build --target aarch64-apple-darwin
 	@source .env && ./scripts/upload-bin.sh $(shell pwd)/target/aarch64-apple-darwin/release/bundle/dmg OpenHome
+	@source .env && npx tauri build --target x86_64-apple-darwin
 	@source .env && ./scripts/upload-bin.sh $(shell pwd)/target/x86_64-apple-darwin/release/bundle/dmg OpenHome
 
 

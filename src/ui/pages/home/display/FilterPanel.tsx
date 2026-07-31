@@ -45,7 +45,7 @@ type ItemOption =
       label: string
     }
 
-const ICON_SIZE = 18
+export const ICON_SIZE = 18
 
 function getOriginIcon(origin: OriginGameWithData) {
   const path = getOriginIconPath(origin)

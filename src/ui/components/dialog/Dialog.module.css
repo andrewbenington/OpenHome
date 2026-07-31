@@ -118,7 +118,7 @@
 .Title {
   --padding-x-inverted: calc(-1 * var(--alert-padding-x));
   --padding-y-inverted: calc(-1 * var(--alert-padding-y));
-  margin: var(--padding-y-inverted) var(--padding-x-inverted) 0.5rem var(--padding-x-inverted);
+  margin: var(--padding-y-inverted) var(--padding-x-inverted) 0.5rem var(--padding-x-inverted) !important;
   padding: 0.25rem var(--alert-padding-x) 0.15rem var(--alert-padding-x);
   font-size: 1.125rem;
   line-height: 1.75rem;
@@ -126,6 +126,7 @@
   font-weight: 700;
   background-color: var(--color-sidebar);
   border-bottom: 1px solid var(--gray-a5);
+  box-sizing: border-box;
 }
 
 .Description {

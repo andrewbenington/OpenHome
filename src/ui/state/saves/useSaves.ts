@@ -41,7 +41,8 @@ export type SavesAndBanksManager = Required<Omit<OpenSavesState, 'error' | 'home
   saveBoxNavigateRight(save: SAV): void
   saveFromIdentifier: (identifier: SaveIdentifier) => SAV
 
-  getMonAtLocation(location: MonLocation): PKMInterface | OHPKM | undefined
+  getMonAtLocation(location: MonLocation): Option<PKMInterface | OHPKM>
+  overwriteMonAtLocation(location: MonLocation, mon: Option<OhpkmIdentifier>): void
   setMonHeldItem(item: Item | undefined, location: MonLocation): void
   moveMon(source: MonWithLocation, dest: MonLocation): void
   recoverMonToBox(id: OhpkmIdentifier, bankIndex: number): void
@@ -253,6 +254,17 @@ export function useSaves(): SavesAndBanksManager {
     [clearAtHomeLocation, findHomeLocation, getMonAtHomeLocation, setAtHomeLocation]
   )
 
+  const overwriteMonAtLocation = useCallback(
+    (location: MonLocation, ohpkmId: Option<OhpkmIdentifier>) => {
+      if (!location.isHome) {
+        moveOhpkmToSave(ohpkmId, location)
+      } else {
+        moveOhpkmToHome(ohpkmId, location)
+      }
+    },
+    [moveOhpkmToSave, moveOhpkmToHome]
+  )
+
   const importMonsToLocation = useCallback(
     (mons: PKMInterface[], startingAt: MonLocation) => {
       const addedMons: OHPKM[] = []
@@ -358,24 +370,24 @@ export function useSaves(): SavesAndBanksManager {
       if (R.isErr(result)) {
         console.error('Error registering pokedex entries from save:', result.error)
       }
-      if (save.trainerGender !== undefined) {
-        const allOhpkms = ohpkmStore.getAllStored()
-        for (const mon of allOhpkms) {
-          if (!monSupportedBySave(save, mon)) continue
 
-          const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
-          if (!matchingHandler) continue
+      const allOhpkms = ohpkmStore.getAllStored()
+      for (const mon of allOhpkms) {
+        if (!monSupportedBySave(save, mon)) continue
 
-          mon.updateTrainerData(
-            save,
-            matchingHandler.friendship,
-            matchingHandler.affection,
-            matchingHandler.memory
-          )
+        const matchingHandler = mon.matchingUnknownHandler(save.name, save.trainerGender)
+        if (!matchingHandler) continue
 
-          ohpkmStore.insertOrUpdate(mon)
-        }
+        mon.updateTrainerData(
+          save,
+          matchingHandler.friendship,
+          matchingHandler.affection,
+          matchingHandler.memory
+        )
+
+        ohpkmStore.insertOrUpdate(mon)
       }
+
       const toUpdate: OhpkmStoreData = {}
       for (const mon of save.getAllMons()) {
         const trackedData = ohpkmStore.loadIfTracked(mon)
@@ -801,6 +813,7 @@ export function useSaves(): SavesAndBanksManager {
     saveFromIdentifier,
 
     getMonAtLocation,
+    overwriteMonAtLocation,
     setMonHeldItem,
     moveMon,
     recoverMonToBox,

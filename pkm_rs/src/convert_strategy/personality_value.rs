@@ -80,7 +80,6 @@ impl PidModificationStrategy {
         if let Some(shiny_strategy) = self.shiny
             && !shiny_strategy.is_satisfied(pid, mon)
         {
-            println!("shiny not satisfied");
             inconsistencies.push(DerivedField::Shiny);
         }
 
@@ -90,8 +89,6 @@ impl PidModificationStrategy {
         {
             inconsistencies.push(DerivedField::UnownLetter);
         }
-
-        println!("find_inconsistencies: {inconsistencies:?}");
 
         inconsistencies
     }
@@ -103,13 +100,10 @@ impl PidModificationStrategy {
         let mut new_pid = mon.personality_value();
 
         for i in 0..u16::MAX {
-            println!("pokemon: {}", mon.nickname());
-            println!("\tis_shiny: {}", mon.is_shiny());
             let inconsistencies = self.find_inconsistencies(new_pid, mon);
             if inconsistencies.is_empty() {
                 return new_pid;
             }
-            println!("inconsistencies: {inconsistencies:?}");
 
             let (mut pid_upper, mut pid_lower) = pkm_rs_types::pid_upper_lower(new_pid);
             pid_lower ^= i;
@@ -136,8 +130,7 @@ impl Default for PidModificationStrategy {
     }
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen(js_name = generatePk3CompatiblePid)]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = generatePk3CompatiblePid))]
 pub fn generate_pk3_compatible_pid(mon: &OhpkmV2) -> u32 {
     PidModificationStrategy::default().get_modified_pid(mon)
 }

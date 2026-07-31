@@ -4,13 +4,18 @@ import { getMonFileIdentifier } from '@openhome-core/pkm/Lookup'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { monSupportedBySave } from '@openhome-core/save/util'
-import { range } from '@openhome-core/util/functional'
+import { $R, range } from '@openhome-core/util/functional'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import { Item, OpenHomeCtxMenu, Submenu } from '@openhome-ui/components/context-menu'
+import PromptDialog from '@openhome-ui/components/dialog/PromptDialog'
 import Fallback from '@openhome-ui/components/Fallback'
+import SearchFields from '@openhome-ui/components/search/SearchFields'
+import PokemonSearchModal from '@openhome-ui/components/search/SearchModal'
+import useDisplayError from '@openhome-ui/hooks/displayError'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { ErrorContext } from '@openhome-ui/state/error'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
+import useTrackedDataRecovery from '@openhome-ui/state/ohpkm/useTrackedDataRecovery'
 import { MonLocation, useSaves } from '@openhome-ui/state/saves'
 import { colorIsDark } from '@openhome-ui/util/color'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
@@ -40,6 +45,18 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
   const { dragState, toggleSelection, isSelected } = useDragAndDrop()
 
   const save = useMemo(() => allOpenSaves[saveIndex], [allOpenSaves, saveIndex])
+  const displayError = useDisplayError()
+
+  const TrackedDataRecovery = useTrackedDataRecovery()
+
+  const dataRecoverySearchModal = {
+    modalOpen: TrackedDataRecovery.state !== 'initial',
+    setModalOpen: (open: boolean) => {
+      if (!open) {
+        TrackedDataRecovery.cancelRecovery()
+      }
+    },
+  }
 
   const {
     currentSlot: selectedIndex,
@@ -178,24 +195,26 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                   boxSlot: index,
                   saveIdentifier: save.identifier,
                 }
-                const mon = save.getMonAt(location.box, location.boxSlot)
+                let mon = save.getMonAt(location.box, location.boxSlot)
+                if (mon) {
+                  mon = ohpkmStore.monOrOhpkmIfTracked(mon)
+                }
+
                 const uniqueKey = mon
                   ? `${save.currentPCBox}-${index}-${mon.encryptionConstant ?? mon.personalityValue ?? JSON.stringify(mon.dvs)}-${mon.nickname}`
                   : `${save.currentPCBox}-${index}`
+
+                const slotMetadata = save.getSlotMetadata?.(save.currentPCBox, index)
+
                 return (
                   <BoxCell
                     key={uniqueKey}
                     onClick={() => setSelectedIndex(index)}
                     dragID={`${save.tid}_${save.sid}_${save.currentPCBox}_${index}`}
                     location={location}
-                    disabled={
-                      isDisabled(mon) ||
-                      save.getSlotMetadata?.(save.currentPCBox, index)?.isDisabled
-                    }
-                    disabledReason={
-                      save.getSlotMetadata?.(save.currentPCBox, index)?.disabledReason
-                    }
-                    mon={mon ? ohpkmStore.monOrOhpkmIfTracked(mon) : undefined}
+                    disabled={isDisabled(mon) || slotMetadata?.isDisabled}
+                    disabledReason={slotMetadata?.disabledReason}
+                    mon={mon}
                     onDrop={(importedMons) => {
                       if (importedMons) {
                         attemptImportMons(importedMons, location)
@@ -204,6 +223,25 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
                     multiSelectEnabled={dragState.multiSelectEnabled}
                     isSelected={isSelected(location)}
                     onToggleSelect={() => toggleSelection(location)}
+                    contextMenu={
+                      mon
+                        ? [
+                            Item.label(
+                              mon instanceof OHPKM
+                                ? 'Merge/Recover Tracking Data'
+                                : 'Fix Missing Tracking Data'
+                            ).action(() =>
+                              $R(TrackedDataRecovery.startRecovery(location)).mapErr((err) =>
+                                displayError(
+                                  'Error starting recovery process',
+                                  err.message,
+                                  err.data
+                                )
+                              )
+                            ),
+                          ]
+                        : []
+                    }
                   />
                 )
               })}
@@ -245,6 +283,36 @@ const OpenSaveDisplay = (props: OpenSaveDisplayProps) => {
           </Dialog.Content>
         </Dialog.Root>
       </Flex>
+      <PokemonSearchModal
+        typeName="Pokémon"
+        title={TrackedDataRecovery.selectDataPrompt}
+        searchController={TrackedDataRecovery.pokemonSearchController}
+        onSelect={(chosen) => TrackedDataRecovery.selectRecoveredDataId(chosen.openhomeId)}
+        modalController={dataRecoverySearchModal}
+        SearchComponent={SearchFields.Pokemon}
+      />
+      <PromptDialog
+        title={TrackedDataRecovery.confirmPromptTitle}
+        description={TrackedDataRecovery.confirmPromptDescription}
+        actions={[
+          {
+            uniqueLabel: 'Cancel',
+            action: () => TrackedDataRecovery.goBack(),
+            type: 'cancel',
+          },
+          {
+            uniqueLabel: 'Confirm',
+            action: () => {
+              $R(TrackedDataRecovery.confirmRecovery()).mapErr((err) => {
+                TrackedDataRecovery.goBack()
+                displayError('Error recovering Pokémon data', err.message, err.data)
+              })
+            },
+            type: 'destructive',
+          },
+        ]}
+        open={TrackedDataRecovery.state === 'pending_confirm'}
+      />
       <Fallback>
         <PokemonDetailsModal
           mon={selectedMon}

@@ -1,4 +1,5 @@
-import { MonFormat, PKMInterface } from '@openhome-core/pkm/interfaces'
+import useBackend from '@openhome-core/backend/useBackend'
+import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import {
   getMonFileIdentifier,
   getMonGen12Identifier,
@@ -8,7 +9,8 @@ import {
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { SAV } from '@openhome-core/save/interfaces'
 import { SAVClass } from '@openhome-core/save/util'
-import { Errorable, Option, R, Result } from '@openhome-core/util/functional'
+import { expectExhaustive } from '@openhome-core/util'
+import { $R, Errorable, Option, R, Result } from '@openhome-core/util/functional'
 import { Lookup, MarkingsSixShapesColors, ModernRibbon, OriginGames } from '@pkm-rs/pkg/pkm_rs'
 import dayjs from 'dayjs'
 import { createContext, useCallback, useContext } from 'react'
@@ -16,47 +18,15 @@ import { OhpkmStoreData } from '.'
 import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
 
-type MonLookupResult = Option<Result<void, IdentifierNotPresentError>>
-
-export type OhpkmStore = {
-  getById(id: string): OHPKM | undefined
-  tryLoadFromId(id: OhpkmIdentifier): Result<OHPKM, IdentifierNotPresentError>
-  tryLoadFromIds(ids: OhpkmIdentifier[]): Result<OHPKM, IdentifierNotPresentError>[]
-  byId: OhpkmStoreData
-  monIsStored(id: string): boolean
-  insertOrUpdate(mon: OHPKM): void
-  insertOrUpdateAll(mons: OhpkmStoreData): Promise<Errorable<null>>
-  updateMonMarkings: (monId: string, markings: MarkingsSixShapesColors) => MonLookupResult
-  updateMonNotes: (monId: string, notes: Option<string>) => MonLookupResult
-  updateMonTags: (
-    monId: string,
-    tags: Option<{ label: string; color: string; icon?: string }[]>
-  ) => MonLookupResult
-  updateMonDisplayColor: (monId: string, color: Option<string>) => MonLookupResult
-  updateMonAffixedRibbon: (monId: string, affixedRibbon: Option<ModernRibbon>) => MonLookupResult
-  setMonNickname: (monId: string, nickname: Option<string>) => MonLookupResult
-  getAllStored: () => OHPKM[]
-  getIdIfTracked: (mon: PKMInterface) => Option<OhpkmIdentifier>
-  loadIfTracked: <P extends PKMInterface>(mon: P) => Option<OHPKM>
-  monOrOhpkmIfTracked: <P extends PKMInterface>(mon: P) => OHPKM | P
-  updateAndConvertForSave: <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => Errorable<P>
-  startTrackingNewMon: <P extends PKMInterface>(
-    mon: P,
-    sourceSave: Option<SAV<P>>,
-    destSave: Option<SAV>
-  ) => OHPKM
-
-  replaceHeldItem: (mon: OHPKM) => number
-}
-
 // FALSE IN PRODUCTION
 const FORCE_MISSED_LOOKUP = false
 
-export function useOhpkmStore(): OhpkmStore {
+export function useOhpkmStore() {
   const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)
   const { defaultConvertStrategy } = useConvertStrategies()
   const { lookups, updateLookups } = useLookups()
   const { gen12: gen12Lookup, gen345: gen345Lookup } = lookups
+  const backend = useBackend()
 
   const getById = useCallback(
     (id: string): OHPKM | undefined => {
@@ -129,6 +99,11 @@ export function useOhpkmStore(): OhpkmStore {
           ...lookups,
           gen12: { ...lookups.gen12, [gen12Identifier]: ohpkmIdentifier },
         })
+        backend.log('DEBUG', `added ${ohpkm.nickname} to gen 1/2 lookup`, {
+          ohpkm_id: ohpkm.openhomeId,
+          event: 'lookups_update',
+          gen12Identifier,
+        })
       } else if (lookupType === 'gen345') {
         // If original generation, keep the original PID
         const isOriginalGen =
@@ -142,15 +117,21 @@ export function useOhpkmStore(): OhpkmStore {
           ...lookups,
           gen345: { ...lookups.gen345, [gen345Identifier]: ohpkmIdentifier },
         })
+        backend.log('DEBUG', `added ${ohpkm.nickname} to gen 3/4/5 lookup`, {
+          ohpkm_id: ohpkm.openhomeId,
+          event: 'lookups_update',
+          gen345Identifier,
+        })
       }
     },
-    [lookups, updateLookups]
+    [backend, lookups, updateLookups]
   )
 
   const updateAndConvertForSave = useCallback(
     <P extends PKMInterface>(ohpkm: OHPKM, save: SAV<P>) => {
       handleLookupsUpdate(ohpkm, save)
       insertOrUpdate(ohpkm)
+      handleLookupsUpdate(ohpkm, save)
 
       return save.convertOhpkm(ohpkm, defaultConvertStrategy)
     },
@@ -166,6 +147,7 @@ export function useOhpkmStore(): OhpkmStore {
       mon.markings = { ...markings }
 
       insertOrUpdate(mon)
+      return R.Ok(mon)
     },
     [insertOrUpdate, tryLoadFromId]
   )
@@ -179,6 +161,7 @@ export function useOhpkmStore(): OhpkmStore {
       mon.notes = notes
 
       insertOrUpdate(mon)
+      return R.Ok(mon)
     },
     [insertOrUpdate, tryLoadFromId]
   )
@@ -192,6 +175,7 @@ export function useOhpkmStore(): OhpkmStore {
       mon.setTags(tags ?? [])
 
       insertOrUpdate(mon)
+      return R.Ok(mon)
     },
     [insertOrUpdate, tryLoadFromId]
   )
@@ -205,6 +189,7 @@ export function useOhpkmStore(): OhpkmStore {
       mon.displayColor = color
 
       insertOrUpdate(mon)
+      return R.Ok(mon)
     },
     [insertOrUpdate, tryLoadFromId]
   )
@@ -218,6 +203,7 @@ export function useOhpkmStore(): OhpkmStore {
       mon.affixedRibbon = affixedRibbon
 
       insertOrUpdate(mon)
+      return R.Ok(mon)
     },
     [insertOrUpdate, tryLoadFromId]
   )
@@ -231,6 +217,7 @@ export function useOhpkmStore(): OhpkmStore {
       mon.nickname = nickname || Lookup.speciesName(mon.nationalDex, mon.language)
 
       insertOrUpdate(mon)
+      return R.Ok(mon)
     },
     [tryLoadFromId, insertOrUpdate]
   )
@@ -255,8 +242,10 @@ export function useOhpkmStore(): OhpkmStore {
   const loadIfTracked = useCallback(
     (mon: PKMInterface): Option<OHPKM> => {
       if (FORCE_MISSED_LOOKUP) return undefined
-      const format: MonFormat = mon.format as MonFormat
-      switch (format) {
+      switch (mon.format) {
+        case 'OHPKM':
+          if (!(mon instanceof OHPKM)) throw Error('Non-OHPKM has OHPKM format')
+          return mon
         case 'PK1':
         case 'PK2': {
           const gen12Identifier = getMonGen12Identifier(mon)
@@ -278,7 +267,7 @@ export function useOhpkmStore(): OhpkmStore {
         case 'PK3UB':
         case 'PK4':
         case 'PK5': {
-          const gen345Identifier = getMonGen345Identifier(mon)
+          const gen345Identifier = getMonGen345Identifier(mon, true)
           if (!gen345Identifier) {
             throw Error(
               `unable to calculate gen 3/4/5 identifier for ${mon.nickname} (${mon.format})`
@@ -315,9 +304,7 @@ export function useOhpkmStore(): OhpkmStore {
           )?.[1]
         }
         default:
-          // use type system to enforce exhaustiveness
-          const _exhaustiveCheck: never = format
-          throw Error(`unrecognized pkm format: ${mon.format}`)
+          expectExhaustive(mon.format, `unrecognized format: ${mon.format}`)
       }
     },
     [gen12Lookup, gen345Lookup, ohpkmStore]
@@ -336,6 +323,26 @@ export function useOhpkmStore(): OhpkmStore {
     },
     [loadIfTracked]
   )
+
+  const syncOhpkmIfTracked = useCallback(
+    (ohpkmId: OhpkmIdentifier, mon: PKMInterface, save?: SAV) => {
+      return $R(tryLoadFromId(ohpkmId)).map((trackedData) => {
+        const updates = trackedData.syncWithGameData(mon, save)
+
+        if (updates.length > 0) {
+          backend.log('DEBUG', `synced ${mon.nickname} with game data`, {
+            ohpkm_id: trackedData.openhomeId,
+            event: 'game_data_sync',
+            updates,
+          })
+        }
+
+        return trackedData
+      })
+    },
+    [backend, tryLoadFromId]
+  )
+
   return {
     getById,
     tryLoadFromId,
@@ -358,11 +365,13 @@ export function useOhpkmStore(): OhpkmStore {
     getIdIfTracked,
     loadIfTracked,
     monOrOhpkmIfTracked,
+    syncOhpkmIfTracked,
 
     replaceHeldItem,
   }
 }
 
+export type OhpkmStore = ReturnType<typeof useOhpkmStore>
 export type IdentifierNotPresentError = { identifier: OhpkmIdentifier }
 
 function IdentifierNotPresent(identifier: OhpkmIdentifier): IdentifierNotPresentError {
