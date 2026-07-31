@@ -112,7 +112,9 @@ release-mac: release-mac-arm release-mac-intel
 release:
 	@source .env && node scripts/release.mts new-release
 	@source .env && node scripts/release.mts publish
+	@source .env && npx tauri build --target aarch64-apple-darwin
 	@source .env && ./scripts/upload-bin.sh $(shell pwd)/target/aarch64-apple-darwin/release/bundle/dmg OpenHome
+	@source .env && npx tauri build --target x86_64-apple-darwin
 	@source .env && ./scripts/upload-bin.sh $(shell pwd)/target/x86_64-apple-darwin/release/bundle/dmg OpenHome
 
 
