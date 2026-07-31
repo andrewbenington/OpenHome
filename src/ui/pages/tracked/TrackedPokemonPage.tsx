@@ -6,13 +6,11 @@ import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import MessageRibbon from '@openhome-ui/components/MessageRibbon'
 import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
-import SideTabs from '@openhome-ui/components/side-tabs/SideTabs'
-import { usePathSegment } from '@openhome-ui/hooks/routing'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { useSaves } from '@openhome-ui/state/saves'
 import { Button, DropdownMenu, Flex } from '@radix-ui/themes'
 import { PropsWithChildren, ReactNode, useState } from 'react'
-import { Route, Routes, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 import { boxNameOrDefault, useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
 import AllTrackedPokemon from './AllTrackedPokemon'
 import Gen12Lookup from './Gen12Lookup'
@@ -29,15 +27,6 @@ export default function TrackedPokemonPage() {
   const [selectedMon, setSelectedMon] = useState<PKMInterface>()
   const { findSaveForMon, findingSaveState, findSavesForAllMons, clearFindingState } =
     useManageTracked()
-  const { currentSegment, setCurrentSegment } = usePathSegment('manage', 'all')
-
-  const allTrackedElement = (
-    <AllTrackedPokemon
-      onSelectMon={setSelectedMon}
-      findSaveForMon={findSaveForMon}
-      findSavesForAllMons={findSavesForAllMons}
-    />
-  )
 
   return (
     <SideTabNavigation
@@ -73,24 +62,6 @@ export default function TrackedPokemonPage() {
         <FindingSaveDialog state={findingSaveState} onClose={clearFindingState} />
       )}
     </SideTabNavigation>
-  )
-
-  return (
-    <SideTabs.Root value={currentSegment} onValueChange={setCurrentSegment}>
-      <SideTabs.TabList>
-        <SideTabs.Tab value="all"> All Pokémon</SideTabs.Tab>
-        <SideTabs.Tab value="gen12">Gen 1/2 IDs</SideTabs.Tab>
-        <SideTabs.Tab value="gen345">Gen 3/4/5 IDs</SideTabs.Tab>
-        <div style={{ flex: 1 }} />
-        <ManageDialog onClose={clearFindingState} />
-      </SideTabs.TabList>
-      <Routes>
-        <Route index path="" element={allTrackedElement} />
-        <Route path="all" element={allTrackedElement} />
-        <Route path="gen12" element={<Gen12Lookup onSelectMon={setSelectedMon} />} />
-        <Route path="gen345" element={<Gen345Lookup onSelectMon={setSelectedMon} />} />
-      </Routes>
-    </SideTabs.Root>
   )
 }
 
