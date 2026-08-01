@@ -190,9 +190,16 @@ async function currentVersionPullRequestDescription(octokit: Octokit) {
     .replaceAll('fix ', 'fixed ')
     .split('\n**Issue**')[0]
 }
+function sleep(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
 
 async function getNewestRelease(octokit: Octokit, tag?: string) {
   console.log('\n→ Retrieving latest release...')
+  await sleep(3000)
+
   const { data } = await octokit.rest.repos.listReleases({
     owner: OWNER,
     repo: REPO,
