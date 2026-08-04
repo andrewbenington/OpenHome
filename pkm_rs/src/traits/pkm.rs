@@ -1,6 +1,6 @@
 pub use crate::ohpkm::OhpkmV2;
+pub use pkm_rs_resources::abilities::ABILITY_MAX;
 use pkm_rs_resources::species::{FormMetadata, SpeciesMetadata};
-pub use pkm_rs_resources::{abilities::ABILITY_MAX, species::NATIONAL_DEX_MAX};
 use pkm_rs_resources::{moves::MoveIndex, species::SpeciesAndForm};
 use serde::Serialize;
 

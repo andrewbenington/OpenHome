@@ -1,10 +1,106 @@
+use std::fmt::Display;
+
 use num_enum::TryFromPrimitive;
 
+use pkm_rs_derive::EnumMax;
+#[cfg(feature = "randomize")]
+use rand::RngExt;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
+#[cfg(feature = "randomize")]
+use crate::randomize::Randomize;
+
+impl NationalDex {
+    pub fn new(index: u16) -> crate::Result<NationalDex> {
+        NationalDex::try_from(index)
+            .map(Ok)
+            .unwrap_or(Err(crate::Error::NationalDex {
+                national_dex: index,
+            }))
+    }
+
+    /// # Safety
+    ///
+    /// - `national_dex` must be greater than zero and at most the maximum National Dex number supported by this version of the library.
+    /// - `form_index` must be less than the total number of forms for the Pokémon with the given `national_dex` number
+    pub unsafe fn new_unchecked(index: u16) -> NationalDex {
+        index
+            .try_into()
+            .expect("NationalDex initiated with invalid value")
+    }
+
+    pub const fn to_u16(&self) -> u16 {
+        *self as u16
+    }
+
+    pub fn from_le_bytes(bytes: [u8; 2]) -> crate::Result<NationalDex> {
+        NationalDex::new(u16::from_le_bytes(bytes))
+    }
+
+    pub const fn to_le_bytes(self) -> [u8; 2] {
+        self.to_u16().to_le_bytes()
+    }
+}
+
+// #[cfg_attr(feature = "wasm", wasm_bindgen)]
+// #[allow(clippy::missing_const_for_fn)]
+// impl NationalDex {
+//     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
+//     pub fn index(&self) -> u16 {
+//         self.to_u16()
+//     }
+
+//     #[cfg(feature = "wasm")]
+//     #[wasm_bindgen(constructor)]
+//     pub fn new_js(val: u16) -> core::result::Result<NationalDex, JsValue> {
+//         NationalDex::new(val).map_err(|e| JsValue::from_str(&e.to_string()))
+//     }
+// }
+
+#[cfg(feature = "randomize")]
+impl Randomize for NationalDex {
+    fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
+        Self::try_from(rng.random_range(1..=NationalDex::MAX) as u16)
+            .expect("1 to NATIONAL_DEX_MAX must be valid")
+    }
+}
+
+impl serde::Serialize for NationalDex {
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_u16(self.to_u16())
+    }
+}
+
+impl Display for NationalDex {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        (*self as u16).fmt(f)
+    }
+}
+
+impl Default for NationalDex {
+    fn default() -> Self {
+        Self::new(1).expect("1 is valid NationalDex")
+    }
+}
+
+impl PartialEq<u16> for NationalDex {
+    fn eq(&self, other: &u16) -> bool {
+        *self as u16 == *other
+    }
+}
+
+impl PartialEq<NationalDex> for u16 {
+    fn eq(&self, other: &NationalDex) -> bool {
+        *self == *other as u16
+    }
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, TryFromPrimitive)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, TryFromPrimitive, EnumMax)]
 #[repr(u16)]
 pub enum NationalDex {
     Bulbasaur = 1,
@@ -1031,19 +1127,6 @@ pub enum NationalDex {
     IronBoulder,
     IronCrown,
     Terapagos,
+    #[max]
     Pecharunt,
-}
-
-pub const NATIONAL_DEX_MAX: u16 = NationalDex::Pecharunt as u16;
-
-impl PartialEq<u16> for NationalDex {
-    fn eq(&self, other: &u16) -> bool {
-        *self as u16 == *other
-    }
-}
-
-impl PartialEq<NationalDex> for u16 {
-    fn eq(&self, other: &NationalDex) -> bool {
-        *self == *other as u16
-    }
 }

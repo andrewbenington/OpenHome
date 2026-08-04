@@ -433,9 +433,7 @@ mod tests {
     use super::*;
     use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-    use crate::species::{
-        FormMetadata, NATIONAL_DEX_MAX, NatDexIndex, form_metadata::MetadataSource,
-    };
+    use crate::species::{FormMetadata, NatDexIndex, form_metadata::MetadataSource};
 
     const ARCEUS_LEGEND: u16 = 18;
 
@@ -475,7 +473,7 @@ mod tests {
     }
 
     fn try_all_forms(callback: impl Fn(&FormMetadata) -> Result<(), String>) -> Result<(), String> {
-        for national_dex in NationalDex::Bulbasaur as u16..=NATIONAL_DEX_MAX as u16 {
+        for national_dex in NationalDex::Bulbasaur as u16..=NationalDex::MAX as u16 {
             let species_metadata = NatDexIndex::new(national_dex)
                 .expect("1-1025 are valid national dex indices")
                 .get_species_metadata();
