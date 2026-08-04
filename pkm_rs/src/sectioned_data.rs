@@ -94,6 +94,7 @@ impl<Tag: SectionTag> SectionMetadata<Tag> {
     }
 }
 
+#[derive(Debug, Clone)]
 pub enum Error {
     BufferTooShort {
         field: String,
@@ -106,6 +107,30 @@ pub enum Error {
         length: SectionLength,
         buffer_size: usize,
     },
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Error::BufferTooShort {
+                field,
+                expected,
+                received,
+            } => write!(
+                f,
+                "buffer too short for field {field}: expected {expected}, received {received}"
+            ),
+            Error::SectionOutOfBounds {
+                section_name,
+                offset,
+                length,
+                buffer_size,
+            } => write!(
+                f,
+                "section {section_name} out of bounds at offset {offset}/length {length}/buffer_size {buffer_size}"
+            ),
+        }
+    }
 }
 
 pub type Result<T> = core::result::Result<T, Error>;
@@ -121,6 +146,14 @@ pub struct SectionedData<Tag: SectionTag> {
 }
 
 impl<Tag: SectionTag> SectionedData<Tag> {
+    pub const fn new(magic_number: u32, version: u16) -> Self {
+        Self {
+            magic_number,
+            version,
+            tagged_buffers: Vec::new(),
+        }
+    }
+
     pub fn find_section_data(&self, tag: Tag) -> Option<&TaggedBuffer<Tag>> {
         self.tagged_buffers.iter().find(|tb| tb.tag == tag)
     }
@@ -134,16 +167,6 @@ impl<Tag: SectionTag> SectionedData<Tag> {
             .iter()
             .filter(|tb| tb.tag == tag)
             .collect()
-    }
-}
-
-impl<Tag: SectionTag> SectionedData<Tag> {
-    pub const fn new(magic_number: u32, version: u16) -> Self {
-        Self {
-            magic_number,
-            version,
-            tagged_buffers: Vec::new(),
-        }
     }
 
     pub fn add<T: DataSection<TagType = Tag>>(&mut self, section: T) -> &mut Self {

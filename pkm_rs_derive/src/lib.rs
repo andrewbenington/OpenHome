@@ -6,6 +6,8 @@ use syn::{
     Data, DeriveInput, Fields, FnArg, ItemImpl, PatType, parse_macro_input, spanned::Spanned,
 };
 
+mod enums;
+
 #[cfg(debug_assertions)]
 mod randomize;
 
@@ -390,4 +392,9 @@ pub fn derive_randomize(input: TokenStream) -> TokenStream {
         }
     }
     .into()
+}
+
+#[proc_macro_derive(EnumMax, attributes(max))]
+pub fn derive_enum_max(input: TokenStream) -> TokenStream {
+    enums::enum_max(input)
 }
