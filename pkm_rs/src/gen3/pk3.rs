@@ -2,8 +2,8 @@ use super::Pk3Buffer;
 use crate::checksum::{Checksum, RefreshChecksum};
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::ConvertStrategy;
-use crate::gen3::Gen3PokemonIndex;
 use crate::gen3::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
+use crate::gen3::Gen3PokemonIndex;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 use crate::result::{Error, Result};
@@ -25,13 +25,13 @@ use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
 use pkm_rs_resources::species::{FormMetadata, NatDexIndex, SpeciesAndForm, SpeciesMetadata};
 use pkm_rs_resources::{helpers, lookup};
-#[cfg(feature = "wasm")]
-use pkm_rs_types::AbilityNumber;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::AbilityNumber;
 use pkm_rs_types::{
     BinaryGender, ContestStats, Language, MarkingsFourShapes, NationalDex, OriginGame,
-    SimpleAbilityNumber, Stats8, Stats16Le,
+    SimpleAbilityNumber, Stats16Le, Stats8,
 };
 use pkm_rs_types::{Gender, Ivs};
 use serde::{Serialize, Serializer};
@@ -591,20 +591,18 @@ pub fn form_index_from_pid(national_dex: NatDexIndex, pid: u32) -> u8 {
 impl PkhexJson for Pk3 {
     fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
         let mut value = serde_json::to_value(self)?;
-        value["nickname_trash"] = serde_json::json!(
-            self.nickname
-                .bytes()
-                .iter()
-                .map(|b| format!("{:02X}", b))
-                .collect::<String>()
-        );
-        value["trainer_name_trash"] = serde_json::json!(
-            self.trainer_name
-                .bytes()
-                .iter()
-                .map(|b| format!("{:02X}", b))
-                .collect::<String>()
-        );
+        value["nickname_trash"] = serde_json::json!(self
+            .nickname
+            .bytes()
+            .iter()
+            .map(|b| format!("{:02X}", b))
+            .collect::<String>());
+        value["trainer_name_trash"] = serde_json::json!(self
+            .trainer_name
+            .bytes()
+            .iter()
+            .map(|b| format!("{:02X}", b))
+            .collect::<String>());
         value["level"] = serde_json::json!(self.calculate_level());
 
         Ok(value)
@@ -616,8 +614,8 @@ mod tests {
     use std::path::PathBuf;
 
     use crate::convert_strategy::ConvertStrategy;
-    use crate::gen3::Pk3;
     use crate::gen3::pk3_buffer::Pk3BufferMut;
+    use crate::gen3::Pk3;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
     use crate::strings::{Gen3Encoding, Gen3String};
@@ -627,11 +625,11 @@ mod tests {
     use crate::traits::{IsShiny, PkmBytes};
 
     use pkm_rs_resources::ribbons::Gen3Ribbon;
-    use pkm_rs_types::Gender;
     #[cfg(feature = "randomize")]
     use pkm_rs_types::randomize::Randomize;
+    use pkm_rs_types::Gender;
     #[cfg(feature = "randomize")]
-    use rand::{SeedableRng, rngs::StdRng};
+    use rand::{rngs::StdRng, SeedableRng};
 
     #[test]
     fn to_from_bytes() -> TestResult<()> {
@@ -782,11 +780,10 @@ mod tests {
 
         mon.ribbons.add_ribbon(Gen3Ribbon::BeautyMasterHoenn);
         assert!(mon.ribbons.has_ribbon(Gen3Ribbon::BeautyMasterHoenn));
-        assert!(
-            mon.ribbons
-                .get_ribbons()
-                .contains(&Gen3Ribbon::BeautyMasterHoenn)
-        );
+        assert!(mon
+            .ribbons
+            .get_ribbons()
+            .contains(&Gen3Ribbon::BeautyMasterHoenn));
 
         Ok(())
     }

@@ -1,4 +1,4 @@
-use pkm_rs_types::LANGUAGE_MAX;
+use pkm_rs_types::NationalDex;
 use serde::{Serialize, Serializer};
 use std::fmt::Display;
 
@@ -6,28 +6,17 @@ use crate::abilities::ABILITY_MAX;
 use crate::items::ITEM_MAX;
 use crate::natures::NATURE_MAX;
 use crate::pkhex_text;
-use crate::species::{NATIONAL_DEX_MAX, NatDexIndex};
+use crate::species::NatDexIndex;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Error {
-    BufferSize {
-        requirement_source: String,
-        expected: usize,
-        received: usize,
-    },
-    CryptRange {
-        range: (usize, usize),
-        buffer_size: usize,
-    },
+    PkmRsTypes(pkm_rs_types::Error),
     NationalDex {
         national_dex: u16,
     },
     FormIndex {
         national_dex: NatDexIndex,
         form_index: u16,
-    },
-    LanguageIndex {
-        language_index: u8,
     },
     NatureIndex {
         nature_index: u8,
@@ -38,10 +27,6 @@ pub enum Error {
     ItemIndex {
         item_index: u16,
     },
-    FieldError {
-        field: &'static str,
-        source: Box<dyn std::error::Error>,
-    },
     TeraType {
         value: u8,
         is_override: bool,
@@ -51,17 +36,11 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
-            Self::BufferSize { requirement_source: field, expected, received } => {
-                format!("{field} requires buffer of length {expected}, but actual length is {received}").to_owned()
-            }
-            Self::CryptRange { range, buffer_size } => {
-                format!("Attempting to decrypt/encrypt range ({}, {}) over buffer of size {buffer_size}", range.0, range.1)
-                    .to_owned()
-            }
-            Self::NationalDex { national_dex } => {
-                format!("Invalid National Dex number {national_dex} (must be between 1 and {NATIONAL_DEX_MAX})")
-                    .to_owned()
-            }
+            Self::PkmRsTypes(err) => err.to_string(),
+            Self::NationalDex { national_dex } => format!(
+                "Invalid National Dex number {national_dex} (must be between 1 and {})",
+                NationalDex::MAX
+            ),
             Self::FormIndex {
                 national_dex,
                 form_index,
@@ -72,27 +51,15 @@ impl Display for Error {
                     pkhex_text::species_name_en(*national_dex),
                     species_metadata.forms.len()
                 )
-                .to_owned()
-            }
-            Self::LanguageIndex { language_index } => {
-                format!("Invalid language index {language_index} (must be between 0 and {LANGUAGE_MAX})")
-                    .to_owned()
             }
             Self::NatureIndex { nature_index } => {
                 format!("Invalid nature index {nature_index} (must be between 1 and {NATURE_MAX})")
-                    .to_owned()
             }
-            Self::AbilityIndex { ability_index } => {
-                format!("Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX})")
-                    .to_owned()
-            }
+            Self::AbilityIndex { ability_index } => format!(
+                "Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX})"
+            ),
             Self::ItemIndex { item_index } => {
                 format!("Invalid item index {item_index} (must be between 1 and {ITEM_MAX})")
-                    .to_owned()
-            }
-            Self::FieldError { field, source } => {
-                format!("Error reading field {field}: {source}")
-                    .to_owned()
             }
             Self::TeraType { value, is_override } => match is_override {
                 false => format!("Invalid original tera type value: {value}"),
@@ -104,14 +71,7 @@ impl Display for Error {
     }
 }
 
-impl std::error::Error for Error {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            Self::FieldError { field: _, source } => Some(source.as_ref()),
-            _ => None,
-        }
-    }
-}
+impl std::error::Error for Error {}
 
 impl Serialize for Error {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
@@ -130,31 +90,7 @@ impl From<Error> for String {
 
 impl From<pkm_rs_types::Error> for Error {
     fn from(value: pkm_rs_types::Error) -> Self {
-        match value {
-            pkm_rs_types::Error::BufferSize {
-                field,
-                offset,
-                buffer_size,
-            } => Self::BufferSize {
-                requirement_source: field,
-                expected: offset,
-                received: buffer_size,
-            },
-            pkm_rs_types::Error::ByteLength { expected, received } => Self::BufferSize {
-                requirement_source: String::from("(unknown pkm_rs_types field"),
-                expected,
-                received,
-            },
-            pkm_rs_types::Error::AbilityNumber(index) => Self::AbilityIndex {
-                ability_index: index.0.into(),
-            },
-            pkm_rs_types::Error::LanguageIndex { language_index } => {
-                Self::LanguageIndex { language_index }
-            }
-            pkm_rs_types::Error::TeraType { value, is_override } => {
-                Self::TeraType { value, is_override }
-            }
-        }
+        Self::PkmRsTypes(value)
     }
 }
 

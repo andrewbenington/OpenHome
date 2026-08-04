@@ -1,4 +1,4 @@
-use crate::LANGUAGE_MAX;
+use crate::{LANGUAGE_MAX, NationalDex};
 
 use std::fmt::Display;
 
@@ -6,7 +6,7 @@ use serde::{Serialize, Serializer};
 
 use crate::InvalidAbilityNumber;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Error {
     BufferSize {
         field: String,
@@ -16,6 +16,9 @@ pub enum Error {
     ByteLength {
         expected: usize,
         received: usize,
+    },
+    NationalDex {
+        national_dex: u16,
     },
     AbilityNumber(InvalidAbilityNumber),
     LanguageIndex {
@@ -38,6 +41,11 @@ impl Display for Error {
             Self::ByteLength { expected, received } => {
                 format!("Invalid byte length (expected {expected}, received {received})")
             }
+            Self::NationalDex { national_dex } => format!(
+                "Invalid National Dex number {national_dex} (must be between 1 and {})",
+                NationalDex::MAX
+            )
+            .to_owned(),
             Self::AbilityNumber(InvalidAbilityNumber(num)) => {
                 format!("Invalid ability number {num} (must be between 1 and 3)")
             }

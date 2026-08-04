@@ -2,10 +2,8 @@ use crate::sectioned_data;
 
 use pkm_rs_resources::lookup;
 use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
-use pkm_rs_resources::{
-    abilities::ABILITY_MAX, items::ITEM_MAX, natures::NATURE_MAX, species::MAX_NATIONAL_DEX,
-};
-use pkm_rs_types::{InvalidAbilityNumber, LANGUAGE_MAX, Language};
+use pkm_rs_resources::{abilities::ABILITY_MAX, species::MAX_NATIONAL_DEX};
+use pkm_rs_types::{InvalidAbilityNumber, Language};
 
 use serde::{Serialize, Serializer};
 use std::fmt::Display;
@@ -24,6 +22,9 @@ pub enum MoveErrorKind {
 
 #[derive(Debug, Clone)]
 pub enum Error {
+    PkmRsResources(pkm_rs_resources::Error),
+    PkmRsTypes(pkm_rs_types::Error),
+    SectionedData(sectioned_data::Error),
     BoxIndex(u8),
     BoxSlot(u8),
     BufferSize {
@@ -35,10 +36,6 @@ pub enum Error {
         context: String,
         source: Option<Rc<dyn core::error::Error>>,
     },
-    CryptRange {
-        range: (usize, usize),
-        buffer_size: usize,
-    },
     NationalDex {
         value: u16,
         source: PokemonIndexType,
@@ -47,42 +44,14 @@ pub enum Error {
         value: u16,
         source: PokemonIndexType,
     },
-
-    /// Indicates that the given SpeciesAndForm does not exist
-    /// in the specified generation of games
-    GenDex {
-        saf: SpeciesAndForm,
-        generation: PokemonIndexType,
-    },
-
-    /// Indicates that the given game index does not
-    /// have a corresponding National index (usually its
-    /// a fake mon)
-    GameDex {
-        value: u16,
-        game: PokemonIndexType,
-    },
     FormIndex {
         national_dex: NatDexIndex,
         form_index: u16,
-    },
-    ExtraFormIndex {
-        national_dex: NatDexIndex,
-        extra_form_index: u64,
-    },
-    LanguageIndex {
-        language_index: u8,
-    },
-    NatureIndex {
-        nature_index: u8,
     },
     AbilityIndex {
         ability_index: u16,
     },
     AbilityNumber(InvalidAbilityNumber),
-    ItemIndex {
-        item_index: u16,
-    },
     FieldError {
         field: &'static str,
         source: Rc<dyn std::error::Error>,
@@ -91,18 +60,9 @@ pub enum Error {
         tag_type: &'static str,
         value: u16,
     },
-    MoveError {
-        value: u16,
-        source: MoveErrorSource,
-    },
     StringDecode {
         source: StringErrorSource,
     },
-    TeraType {
-        value: u8,
-        is_override: bool,
-    },
-    // Generic error for when nothing else fits
     Other(String),
 }
 
@@ -146,18 +106,14 @@ impl Error {
             source: StringErrorSource::PluginOrigin(error),
         }
     }
-
-    pub const fn extra_form_index(national_dex: NatDexIndex, extra_form_index: u64) -> Self {
-        Self::ExtraFormIndex {
-            national_dex,
-            extra_form_index,
-        }
-    }
 }
 
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let message = match self {
+            Self::PkmRsResources(err) => err.to_string(),
+            Self::PkmRsTypes(err) => err.to_string(),
+            Self::SectionedData(err) => err.to_string(),
             Self::BoxIndex(index) => format!("Invalid box index: {index}"),
             Self::BoxSlot(slot) => format!("Invalid box slot: {slot}"),
             Self::BufferSize {
@@ -176,12 +132,6 @@ impl Display for Error {
                 Some(source) => format!("Error opening save: {context}; original error: {source}"),
                 None => format!("Error opening save: {context}"),
             },
-            Self::CryptRange { range, buffer_size } => {
-                format!(
-                    "Attempting to decrypt/encrypt range ({}, {}) over buffer of size {buffer_size}",
-                    range.0, range.1
-                )
-            }
             Self::NationalDex {
                 value: national_dex,
                 source,
@@ -196,22 +146,6 @@ impl Display for Error {
             } => {
                 format!("Invalid {source} index number {national_dex}")
             }
-
-            Self::GenDex { saf, generation } => {
-                let form = saf.get_forme_metadata();
-                format!(
-                    "Pokémon '{}' (form: {}) does not exist in {generation}",
-                    lookup::species_name(saf.get_ndex(), Language::English),
-                    form.form_name
-                )
-            }
-
-            Self::GameDex { value, game } => {
-                format!(
-                    "Invalid game dex index {value} in {game} (no corresponding National Dex entry)"
-                )
-            }
-
             Self::FormIndex {
                 national_dex,
                 form_index,
@@ -223,27 +157,11 @@ impl Display for Error {
                     species_metadata.forms.len()
                 )
             }
-            Self::ExtraFormIndex {
-                national_dex,
-                extra_form_index,
-            } => format!(
-                "Invalid extra form index {extra_form_index} (Pokémon species {})",
-                lookup::species_name(*national_dex, Language::English)
-            ),
-            Self::LanguageIndex { language_index } => format!(
-                "Invalid language index {language_index} (must be between 1 and {LANGUAGE_MAX}"
-            ),
-            Self::NatureIndex { nature_index } => {
-                format!("Invalid nature index {nature_index} (must be between 1 and {NATURE_MAX}")
-            }
             Self::AbilityIndex { ability_index } => format!(
                 "Invalid ability index {ability_index} (must be between 1 and {ABILITY_MAX}"
             ),
             Self::AbilityNumber(InvalidAbilityNumber(num)) => {
                 format!("Invalid ability number {num} (must be between 1 and 3)")
-            }
-            Self::ItemIndex { item_index } => {
-                format!("Invalid item index {item_index} (must be between 1 and {ITEM_MAX}")
             }
             Self::FieldError { field, source } => {
                 format!("Self reading field {field}: {source}")
@@ -251,14 +169,7 @@ impl Display for Error {
             Self::TagError { tag_type, value } => {
                 format!("Invalid tag value {value} for tag type {tag_type}")
             }
-            Self::MoveError { value, source } => {
-                format!("Invalid move reference {value} (source: {source})")
-            }
             Self::StringDecode { source } => format!("String decode error: {source}"),
-            Self::TeraType { value, is_override } => match is_override {
-                false => format!("Invalid original tera type value: {value}"),
-                true => format!("Invalid override tera type value: {value}"),
-            },
             Self::Other(msg) => msg.clone(),
         };
 
@@ -282,103 +193,21 @@ impl std::error::Error for Error {
 impl From<pkm_rs_resources::Error> for Error {
     fn from(value: pkm_rs_resources::Error) -> Self {
         match value {
-            pkm_rs_resources::Error::BufferSize {
-                requirement_source,
-                expected,
-                received,
-            } => Self::BufferSize {
-                requirement_source: Some(requirement_source),
-                expected,
-                received,
-            },
-            pkm_rs_resources::Error::CryptRange { range, buffer_size } => {
-                Self::CryptRange { range, buffer_size }
-            }
-            pkm_rs_resources::Error::NationalDex { national_dex } => Self::NationalDex {
-                value: national_dex,
-                source: PokemonIndexType::Other,
-            },
-            pkm_rs_resources::Error::FormIndex {
-                national_dex,
-                form_index,
-            } => Self::FormIndex {
-                national_dex,
-                form_index,
-            },
-            pkm_rs_resources::Error::LanguageIndex { language_index } => {
-                Self::LanguageIndex { language_index }
-            }
-            pkm_rs_resources::Error::NatureIndex { nature_index } => {
-                Self::NatureIndex { nature_index }
-            }
-            pkm_rs_resources::Error::AbilityIndex { ability_index } => {
-                Self::AbilityIndex { ability_index }
-            }
-            pkm_rs_resources::Error::ItemIndex { item_index } => Self::ItemIndex { item_index },
-            pkm_rs_resources::Error::FieldError { field, source } => Self::FieldError {
-                field,
-                source: source.into(),
-            },
-            pkm_rs_resources::Error::TeraType { value, is_override } => {
-                Self::TeraType { value, is_override }
-            }
+            pkm_rs_resources::Error::PkmRsTypes(err) => Self::PkmRsTypes(err),
+            _ => Self::PkmRsResources(value),
         }
     }
 }
 
 impl From<pkm_rs_types::Error> for Error {
     fn from(value: pkm_rs_types::Error) -> Self {
-        match value {
-            pkm_rs_types::Error::BufferSize {
-                field,
-                offset,
-                buffer_size,
-            } => Self::BufferSize {
-                requirement_source: Some(field),
-                expected: offset,
-                received: buffer_size,
-            },
-            pkm_rs_types::Error::ByteLength { expected, received } => Self::BufferSize {
-                requirement_source: None,
-                expected,
-                received,
-            },
-            pkm_rs_types::Error::AbilityNumber(invalid_ability_number) => {
-                Self::AbilityNumber(invalid_ability_number)
-            }
-            pkm_rs_types::Error::LanguageIndex { language_index } => {
-                Self::LanguageIndex { language_index }
-            }
-            pkm_rs_types::Error::TeraType { value, is_override } => {
-                Self::TeraType { value, is_override }
-            }
-        }
+        Self::PkmRsTypes(value)
     }
 }
 
 impl From<sectioned_data::Error> for Error {
     fn from(value: sectioned_data::Error) -> Self {
-        match value {
-            sectioned_data::Error::BufferTooShort {
-                field,
-                expected,
-                received,
-            } => Self::BufferSize {
-                requirement_source: Some(field),
-                expected,
-                received,
-            },
-            sectioned_data::Error::SectionOutOfBounds {
-                section_name,
-                offset,
-                length,
-                buffer_size,
-            } => Self::BufferSize {
-                requirement_source: Some(section_name),
-                expected: (offset + length) as usize,
-                received: buffer_size,
-            },
-        }
+        Self::SectionedData(value)
     }
 }
 
