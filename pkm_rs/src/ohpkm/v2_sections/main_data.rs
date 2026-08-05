@@ -12,9 +12,9 @@ use pkm_rs_resources::lookup;
 use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
+use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{AbilityNumber, BinaryGender, ContestStats, Generation, Stats8};
+use pkm_rs_types::{AbilityNumber, BinaryGender, ContestStats, Generation, NationalDex, Stats8};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, TrainerMemory};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors};
 use pkm_rs_types::{Ivs, Language};
@@ -121,9 +121,6 @@ pub struct MainDataV2 {
     pub pid_bit_flipped_for_shiny: bool,
 }
 
-const NIDORAN_F: NatDexIndex = unsafe { NatDexIndex::new_unchecked(29) };
-const NIDORAN_M: NatDexIndex = unsafe { NatDexIndex::new_unchecked(32) };
-
 impl MainDataV2 {
     pub fn new(national_dex: u16, form_index: u16) -> Result<Self> {
         let species_and_form = SpeciesAndForm::new(national_dex, form_index)?;
@@ -219,7 +216,7 @@ impl MainDataV2 {
         }
     }
 
-    pub const fn national_dex(&self) -> NatDexIndex {
+    pub const fn national_dex(&self) -> NationalDex {
         self.species_and_form.get_ndex()
     }
 
@@ -227,7 +224,7 @@ impl MainDataV2 {
         let base_mon = self.species_and_form.get_base_evolution();
         format!(
             "{:04}-{:04x}{:04x}-{:08x}-{:02x}",
-            base_mon.get_ndex().to_u16(),
+            base_mon.get_ndex(),
             self.trainer_id,
             self.secret_id,
             self.personality_value,
@@ -336,8 +333,10 @@ impl MainDataV2 {
         let form_metadata = self.species_and_form.get_forme_metadata();
 
         // Previous versions of OpenHome incorrectly translated the gender symbols for the Nidorans; here we will fix that
-        if (self.national_dex() == NIDORAN_F && self.nickname.to_string().contains("\u{E08F}"))
-            || (self.national_dex() == NIDORAN_M && self.nickname.to_string().contains("\u{E08E}"))
+        if (self.national_dex() == NationalDex::NidoranF
+            && self.nickname.to_string().contains("\u{E08F}"))
+            || (self.national_dex() == NationalDex::NidoranM
+                && self.nickname.to_string().contains("\u{E08E}"))
         {
             errors_found.push(OhpkmIssue::SpeciesNameCorrupted {
                 corrupted: self.nickname.to_string(),

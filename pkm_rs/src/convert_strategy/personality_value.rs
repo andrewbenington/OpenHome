@@ -84,7 +84,7 @@ impl PidModificationStrategy {
         }
 
         if self.keep_unown_letter
-            && mon.species_and_form().get_ndex() == NationalDex::Unown.into()
+            && mon.species_and_form().get_ndex() == NationalDex::Unown
             && unown_form_from_pid_gen3(pid) as u16 != mon.species_and_form().get_forme_index()
         {
             inconsistencies.push(DerivedField::UnownLetter);

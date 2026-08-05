@@ -1,5 +1,4 @@
-use pkm_rs_resources::species::NatDexIndex;
-use pkm_rs_types::StatsPreSplit;
+use pkm_rs_types::{NationalDex, StatsPreSplit};
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -25,8 +24,6 @@ pub struct GameboyData {
     pub evs_g12: StatsPreSplit,
 }
 
-const UNOWN: NatDexIndex = unsafe { NatDexIndex::new_unchecked(201) };
-
 impl GameboyData {
     pub fn from_v1(old: crate::ohpkm::v1::OhpkmV1) -> Option<Self> {
         if !old.game_of_origin.is_gameboy() && old.met_time_of_day == 0 && old.evs_g12.is_empty() {
@@ -41,7 +38,7 @@ impl GameboyData {
     }
 
     pub fn from_main_data(main_data: &MainDataV2) -> Self {
-        if main_data.species_and_form.get_ndex() == UNOWN {
+        if main_data.species_and_form.get_ndex() == NationalDex::Unown {
             let letter_index = main_data.species_and_form.get_forme_index();
 
             Self {

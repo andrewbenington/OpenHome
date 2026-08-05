@@ -14,6 +14,8 @@ import {
   type SpeciesGetAllRow,
 } from './queries.ts'
 
+const allSpecies: Species[] = await getAllSpeciesAndForms()
+
 const abilityOverrides: Record<number, string> = {
   266: 'AS_ONE_ICE',
   267: 'AS_ONE_SHADOW',
@@ -108,7 +110,8 @@ function statsToRust(stats: {
 }
 
 function SpeciesAndFormToRust(ref: SpeciesAndForm): string {
-  return `unsafe { SpeciesAndForm::new_unchecked(${ref.nationalDex}, ${ref.formIndex}) }`
+  const species = allSpecies[ref.nationalDex]
+  return `unsafe { SpeciesAndForm::new_valid_ndex_unchecked(NationalDex::${pascalCase(species.name)}, ${ref.formIndex}) }`
 }
 
 function evolutionsToRust(evos?: readonly SpeciesAndForm[]): string {
@@ -145,9 +148,22 @@ function falseIfUndef(input?: boolean): boolean {
   return input === true
 }
 
-function convertForm(natDexIndex: number, form: Form): string {
+function pascalCase(str: string): string {
+  if (!str) return ''
+
+  str = str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/-([^o])/g, ' $1')
+    .replace(/[^a-zA-Z0-9\s]/g, '')
+  const words = str.match(/[a-z0-9]+/gi) || []
+
+  return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join('')
+}
+
+function convertForm(species: Species, form: Form): string {
   return `FormMetadata {
-    national_dex: unsafe { NatDexIndex::new_unchecked(${natDexIndex}) },
+    national_dex: NationalDex::${pascalCase(species.name)},
     form_name: "${form.formName}",
     form_index: ${form.formNumber},
     is_base_form: ${form.isBaseForm},
@@ -186,9 +202,9 @@ function convertForm(natDexIndex: number, form: Form): string {
 
 function convertSpecies(species: Species): string {
   return `SpeciesMetadata {
-    national_dex: unsafe { NatDexIndex::new_unchecked(${species.nationalDex}) },
+    national_dex: NationalDex::${pascalCase(species.name)},
     level_up_type: ${levelUpTypeToRust(species.levelUpType)},
-    forms: &[${species.forms.map((form) => convertForm(species.nationalDex, form)).join(',')}]
+    forms: &[${species.forms.map((form) => convertForm(species, form)).join(',')}]
 }`
 }
 
@@ -294,15 +310,12 @@ async function getAllSpeciesAndForms() {
 }
 
 async function main() {
-  const allSpecies: Species[] = await getAllSpeciesAndForms()
-
   let output = `
 use crate::abilities::AbilityIndexBounded;
 use crate::species::{
-    EggGroup, FormMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, NatDexIndex, SpeciesAndForm,
-    SpeciesMetadata,
+    EggGroup, FormMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, SpeciesAndForm, SpeciesMetadata,
 };
-use pkm_rs_types::{Generation, GameSetting};
+use pkm_rs_types::{Generation, GameSetting, NationalDex};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -318,7 +331,7 @@ pub fn all_species_data() -> Vec<SpeciesMetadata> {
   `
 
   output +=
-    `pub static ALL_SPECIES: [SpeciesMetadata; NATIONAL_DEX_MAX] = [\n` +
+    `pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [\n` +
     allSpecies.map(convertSpecies).join(',\n') +
     '];'
 

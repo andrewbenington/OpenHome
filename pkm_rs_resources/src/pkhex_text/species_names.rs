@@ -1,5 +1,5 @@
-use crate::{species::NatDexIndex, text_resource::TextResource};
-use pkm_rs_types::Language;
+use crate::text_resource::TextResource;
+use pkm_rs_types::{Language, NationalDex};
 
 static SPECIES_NAMES_GERMAN: TextResource =
     TextResource::new(include_str!("species/text_Species_de.txt"));
@@ -22,13 +22,13 @@ static SPECIES_NAMES_CH_SIMPLIFIED: TextResource =
 static SPECIES_NAMES_CH_TRADITIONAL: TextResource =
     TextResource::new(include_str!("species/text_Species_zh-Hant.txt"));
 
-pub fn species_name_en(national_dex: NatDexIndex) -> &'static str {
+pub fn species_name_en(national_dex: NationalDex) -> &'static str {
     SPECIES_NAMES_ENGLISH
-        .line(national_dex.to_u16() as usize)
-        .expect("All valid NatDexIndex values should have a species name")
+        .line(national_dex as usize)
+        .expect("All valid NationalDex values should have a species name")
 }
 
-pub fn species_name(language: Language, national_dex: NatDexIndex) -> &'static str {
+pub fn species_name(language: Language, national_dex: NationalDex) -> &'static str {
     let text_resource = match language {
         Language::German => &SPECIES_NAMES_GERMAN,
         Language::English => &SPECIES_NAMES_ENGLISH,
@@ -44,6 +44,6 @@ pub fn species_name(language: Language, national_dex: NatDexIndex) -> &'static s
     };
 
     text_resource
-        .line(national_dex.to_u16() as usize)
-        .expect("All valid NatDexIndex values should have a species name")
+        .line(national_dex as usize)
+        .expect("All valid NationalDex values should have a species name")
 }

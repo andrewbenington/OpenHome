@@ -55,7 +55,7 @@ impl Pk9SpeciesAndForm {
     fn try_new(species_and_form: SpeciesAndForm) -> Option<Self> {
         if source_has_form_metadata(
             MetadataSource::ScarletViolet,
-            species_and_form.get_ndex().to_u16(),
+            species_and_form.get_ndex() as u16,
             species_and_form.get_forme_index(),
         ) {
             Some(Self(species_and_form))

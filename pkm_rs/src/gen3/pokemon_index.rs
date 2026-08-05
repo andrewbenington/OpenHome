@@ -1,13 +1,13 @@
+use crate::result::{Error, PokemonIndexType};
+
+use pkm_rs_types::NationalDex;
+use serde::Serialize;
 use std::num::NonZeroU16;
 
-use pkm_rs_resources::species::NatDexIndex;
 #[cfg(feature = "randomize")]
-use pkm_rs_types::{NationalDex, randomize::Randomize};
+use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
 use rand::RngExt;
-use serde::Serialize;
-
-use crate::result::{Error, PokemonIndexType};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -305,7 +305,7 @@ const fn national_dex_to_gen3(value: u16) -> Option<NonZeroU16> {
 pub struct Gen3PokemonIndex(NonZeroU16);
 
 const INVALID_INDEX_MESSAGE: &str =
-    "Gen3PokemonIndex should always be valid for conversion to NatDexIndex";
+    "Gen3PokemonIndex should always be valid for conversion to NationalDex";
 
 impl Gen3PokemonIndex {
     pub const fn new(gen3_index: u16) -> Result<Self, InvalidGen3PokemonIndex> {
@@ -326,9 +326,9 @@ impl Gen3PokemonIndex {
         }
     }
 
-    pub fn to_national_dex(self) -> NatDexIndex {
+    pub fn to_national_dex(self) -> NationalDex {
         gen3_to_national_dex(self.0.get())
-            .map(NatDexIndex::new)
+            .map(NationalDex::new)
             .expect(INVALID_INDEX_MESSAGE)
             .expect(INVALID_INDEX_MESSAGE)
     }

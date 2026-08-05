@@ -1062,7 +1062,7 @@ function isPrevoOrCurrentSpeciesName(
 ): boolean {
   for (const ndex of [
     nationalDex,
-    ...getPrevos(nationalDex, formIndex).map((prevo) => prevo.nationalDex.index),
+    ...getPrevos(nationalDex, formIndex).map((prevo) => prevo.nationalDex),
   ]) {
     if (nickname.toUpperCase() === Lookup.speciesName(ndex, language).toUpperCase()) {
       return true
