@@ -110,7 +110,7 @@ function statsToRust(stats: {
 }
 
 function SpeciesAndFormToRust(ref: SpeciesForm): string {
-  const species = allSpecies[ref.nationalDex]
+  const species = allSpecies[ref.nationalDex - 1]
   return ref.formIndex === 0
     ? `SpeciesForm::base_form(NationalDex::${pascalCase(species.name)})`
     : `unsafe { SpeciesForm::unchecked_form(NationalDex::${pascalCase(species.name)}, ${ref.formIndex}) }`
