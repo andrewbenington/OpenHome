@@ -16,7 +16,7 @@ use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
-use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::TeraTypeWasm;
 use pkm_rs_types::strings::SizedUtf16String;
@@ -135,7 +135,7 @@ impl Pk9 {
 
     pub fn from_buffer<S: AsRef<[u8]>>(buf: &Pk9Buffer<S>) -> Result<Self> {
         let home_tracker_raw = buf.home_tracker_raw();
-        let species_and_form = SpeciesAndForm::new_valid_ndex(
+        let species_and_form = SpeciesForm::new_valid_ndex(
             SvPokemonIndex::new(buf.species_game_index())?.to_national_dex(),
             buf.form_index(),
         )?;
@@ -522,7 +522,7 @@ impl Pk9 {
         national_dex: u16,
         form_index: u16,
     ) -> core::result::Result<(), JsValue> {
-        match SpeciesAndForm::new(national_dex, form_index) {
+        match SpeciesForm::new(national_dex, form_index) {
             Ok(species_and_form) => {
                 self.species_and_form = species_and_form.try_into()?;
                 Ok(())

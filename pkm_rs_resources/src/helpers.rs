@@ -3,7 +3,7 @@ use pkm_rs_types::{HyperTraining, Stats, Stats16Le};
 use crate::{
     metadata_source::MetadataSource,
     natures::NatureMetadata,
-    species::{SpeciesAndForm, form_metadata::BaseStats},
+    species::{SpeciesForm, form_metadata::BaseStats},
     stats::Stat,
 };
 
@@ -73,7 +73,7 @@ impl<I: Stats> DeFactoIvs<I> {
 
 pub fn calculate_stats_modern<I: Stats + Copy, E: Stats>(
     metadata_source: MetadataSource,
-    species_and_form: SpeciesAndForm,
+    species_and_form: SpeciesForm,
     ivs: &I,
     evs: &E,
     level: u8,

@@ -11,7 +11,7 @@ use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
-use pkm_rs_resources::species::SpeciesAndForm;
+use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, Gender, HyperTraining, Ivs, Language,
@@ -230,7 +230,7 @@ impl<S: AsRef<[u8]>> Pk8Buffer<S> {
     }
 
     pub fn species_and_form(&self) -> Result<Pk8SpeciesAndForm> {
-        let species_and_form = SpeciesAndForm::new(self.species_ndex(), self.form_num())?;
+        let species_and_form = SpeciesForm::new(self.species_ndex(), self.form_num())?;
         Pk8SpeciesAndForm::try_new(species_and_form).ok_or(Error::form_index(species_and_form))
     }
 
@@ -673,7 +673,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk8Buffer<S> {
         self.set_u16_le(Offset::FormNum, v);
     }
 
-    pub fn set_species_and_form(&mut self, v: SpeciesAndForm) {
+    pub fn set_species_and_form(&mut self, v: SpeciesForm) {
         self.set_species_ndex(v.get_ndex() as u16);
         self.set_form_num(v.get_forme_index());
     }

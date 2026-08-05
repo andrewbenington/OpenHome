@@ -11,7 +11,7 @@ pub use pk7::*;
 use pkm_rs_resources;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ribbons::ModernRibbon;
-use pkm_rs_resources::species::SpeciesAndForm;
+use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_resources::species::form_metadata::source_has_form_metadata;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -32,10 +32,10 @@ const NEUROFORCE: u16 = 233;
 pub type Pk7AbilityIndex = AbilityIndexBounded<NEUROFORCE>;
 
 #[derive(Debug, Clone, Copy, Default)]
-pub struct Pk7SpeciesAndForm(SpeciesAndForm);
+pub struct Pk7SpeciesAndForm(SpeciesForm);
 
 impl Pk7SpeciesAndForm {
-    fn try_new(species_and_form: SpeciesAndForm) -> Option<Self> {
+    fn try_new(species_and_form: SpeciesForm) -> Option<Self> {
         if source_has_form_metadata(
             MetadataSource::UltraSunUltraMoon,
             species_and_form.get_ndex() as u16,
@@ -47,7 +47,7 @@ impl Pk7SpeciesAndForm {
         }
     }
 
-    pub const fn into_inner(self) -> SpeciesAndForm {
+    pub const fn into_inner(self) -> SpeciesForm {
         self.0
     }
 }
@@ -65,7 +65,7 @@ impl Serialize for Pk7SpeciesAndForm {
 impl Randomize for Pk7SpeciesAndForm {
     fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
         loop {
-            if let Some(randomized) = Self::try_new(SpeciesAndForm::randomized(rng)) {
+            if let Some(randomized) = Self::try_new(SpeciesForm::randomized(rng)) {
                 return randomized;
             }
         }
@@ -74,10 +74,10 @@ impl Randomize for Pk7SpeciesAndForm {
 
 use crate::result::Error;
 
-impl TryFrom<SpeciesAndForm> for Pk7SpeciesAndForm {
+impl TryFrom<SpeciesForm> for Pk7SpeciesAndForm {
     type Error = Error;
 
-    fn try_from(value: SpeciesAndForm) -> Result<Self, Self::Error> {
+    fn try_from(value: SpeciesForm) -> Result<Self, Self::Error> {
         Self::try_new(value).ok_or(Error::form_index(value))
     }
 }

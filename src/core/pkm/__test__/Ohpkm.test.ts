@@ -11,7 +11,7 @@ import {
   HyperTraining,
   Language,
   OriginGame,
-  SpeciesAndForm,
+  SpeciesForm,
 } from '@pkm-rs/pkg'
 import fs from 'fs'
 import path from 'path'
@@ -139,7 +139,7 @@ describe('evolution and form change update ohpkm', async () => {
 
     // simulate evolution
     const mrRime = mrMimeOhpkm
-    const mrRimeSpeciesForm = SpeciesAndForm.tryNew(NationalDex.MrRime, 0)
+    const mrRimeSpeciesForm = SpeciesForm.tryNew(NationalDex.MrRime, 0)
     assert(mrRimeSpeciesForm !== undefined)
 
     mrRime.speciesAndForm = mrRimeSpeciesForm
