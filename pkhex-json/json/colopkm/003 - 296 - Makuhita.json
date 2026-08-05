@@ -1,0 +1,91 @@
+{
+  "pokemon_index": 335,
+  "held_item_index": null,
+  "trainer_id": 57413,
+  "secret_id": 24795,
+  "exp": 23760,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 1840211333,
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus_byte": 255,
+  "ribbons": ["National"],
+  "nickname": "MAKUHITA",
+  "nickname_trash": "004D0041004B00550048004900540041000000000000",
+  "moves": [
+    {
+      "move_index": "Foresight",
+      "pp": 40,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Focus Energy",
+      "pp": 30,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Vital Throw",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Cross Chop",
+      "pp": 5,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 28,
+    "atk": 14,
+    "def": 5,
+    "spa": 22,
+    "spd": 0,
+    "spe": 25
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_name_trash": "0052006F004300000000000000000000000000000000",
+  "trainer_friendship": 70,
+  "shadow_id": 1,
+  "shadow_gauge": 0,
+  "met_location_index": 5,
+  "ball": "Pok\u00E9",
+  "met_level": 30,
+  "trainer_gender": "Male",
+  "game_of_origin": "Colosseum/XD",
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 30,
+  "current_hp": 91,
+  "stats": {
+    "hp": 91,
+    "atk": 45,
+    "def": 26,
+    "spa": 20,
+    "spd": 23,
+    "spe": 27
+  },
+  "level": 30
+}

@@ -173,9 +173,9 @@ impl Ivs {
             hp: read_u16_be!(bytes, 0) as u8,
             atk: read_u16_be!(bytes, 2) as u8,
             def: read_u16_be!(bytes, 4) as u8,
-            spe: read_u16_be!(bytes, 6) as u8,
-            spa: read_u16_be!(bytes, 8) as u8,
-            spd: read_u16_be!(bytes, 10) as u8,
+            spa: read_u16_be!(bytes, 6) as u8,
+            spd: read_u16_be!(bytes, 8) as u8,
+            spe: read_u16_be!(bytes, 10) as u8,
         })
     }
 
@@ -206,9 +206,9 @@ impl Ivs {
         bytes[offset + 1] = self.0.hp;
         bytes[offset + 3] = self.0.atk;
         bytes[offset + 5] = self.0.def;
-        bytes[offset + 7] = self.0.spe;
-        bytes[offset + 9] = self.0.spa;
-        bytes[offset + 11] = self.0.spd;
+        bytes[offset + 7] = self.0.spa;
+        bytes[offset + 9] = self.0.spd;
+        bytes[offset + 11] = self.0.spe;
     }
 
     pub fn set(&mut self, stat: Stat, value: u8) {

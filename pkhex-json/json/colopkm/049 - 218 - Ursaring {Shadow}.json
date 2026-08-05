@@ -1,0 +1,91 @@
+{
+  "pokemon_index": 217,
+  "held_item_index": null,
+  "trainer_id": 57413,
+  "secret_id": 24795,
+  "exp": 91125,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 902714739,
+  "is_fateful_encounter": false,
+  "gender": "Female",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus_byte": 255,
+  "ribbons": [],
+  "nickname": "URSARING",
+  "nickname_trash": "005500520053004100520049004E0047000000000000",
+  "moves": [
+    {
+      "move_index": "Feint Attack",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Fake Tears",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Lick",
+      "pp": 30,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Slash",
+      "pp": 20,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 18,
+    "atk": 30,
+    "def": 27,
+    "spa": 12,
+    "spd": 26,
+    "spe": 12
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_name_trash": "0052006F004300000000000000000000000000000000",
+  "trainer_friendship": 0,
+  "shadow_id": 56,
+  "shadow_gauge": 0,
+  "met_location_index": 132,
+  "ball": "Ultra",
+  "met_level": 45,
+  "trainer_gender": "Male",
+  "game_of_origin": "Colosseum/XD",
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 45,
+  "current_hp": 144,
+  "stats": {
+    "hp": 144,
+    "atk": 135,
+    "def": 84,
+    "spa": 77,
+    "spd": 75,
+    "spe": 64
+  },
+  "level": 45
+}

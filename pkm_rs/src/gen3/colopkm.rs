@@ -7,6 +7,8 @@ use crate::ohpkm::OhpkmConvert;
 use crate::ohpkm::OhpkmV2;
 #[cfg(feature = "wasm")]
 use crate::result::{Error, Result};
+#[cfg(test)]
+use crate::tests::PkhexJson;
 use crate::traits::ModernEvs;
 #[cfg(feature = "wasm")]
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
@@ -60,7 +62,7 @@ pub struct Colopkm {
     pub pokerus: Pokerus,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: Gen3RibbonSet,
-    pub nickname: SizedUtf16String<10, BigEndian>,
+    pub nickname: SizedUtf16String<22, BigEndian>,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -69,8 +71,8 @@ pub struct Colopkm {
     pub trainer_name: SizedUtf16String<10, BigEndian>,
     pub trainer_friendship: u8,
     pub shadow_id: u16,
-    pub shadow_gauge: u16,
-    pub met_location_index: u8,
+    pub shadow_gauge: u32,
+    pub met_location_index: u16,
     pub ball: Ball,
     pub met_level: u8,
     pub trainer_gender: BinaryGender,
@@ -134,6 +136,7 @@ impl Colopkm {
             current_hp: Default::default(),
         };
 
+        dbg!(mon.moves);
         mon.stat_level = mon.calculate_level();
         mon.stats = mon.calculate_stats();
         mon.current_hp = mon.stats.hp;
@@ -514,4 +517,265 @@ impl ModernEvs for Colopkm {
     fn get_evs(&self) -> Stats8 {
         self.evs
     }
+}
+
+#[cfg(test)]
+impl PkhexJson for Colopkm {
+    fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
+        let mut value = serde_json::to_value(self)?;
+        value["nickname_trash"] = serde_json::json!(
+            self.nickname
+                .bytes()
+                .iter()
+                .map(|b| format!("{:02X}", b))
+                .collect::<String>()
+        );
+        value["trainer_name_trash"] = serde_json::json!(
+            self.trainer_name
+                .bytes()
+                .iter()
+                .map(|b| format!("{:02X}", b))
+                .collect::<String>()
+        );
+        value["level"] = serde_json::json!(self.calculate_level());
+
+        Ok(value)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    // use crate::convert_strategy::ConvertStrategy;
+    // use crate::gen3::pk3_buffer::Pk3BufferMut;
+    use crate::gen3::Colopkm;
+    use crate::ohpkm::{OhpkmConvert, OhpkmV2};
+
+    use crate::strings::{Gen3Encoding, Gen3String};
+    #[cfg(feature = "randomize")]
+    use crate::tests::TestErrorWithSeed;
+    use crate::tests::{self, TestResult};
+    use crate::traits::{IsShiny, PkmBytes};
+
+    // use pkm_rs_resources::ribbons::Gen3Ribbon;
+    // use pkm_rs_types::Gender;
+    // #[cfg(feature = "randomize")]
+    // use pkm_rs_types::randomize::Randomize;
+    // #[cfg(feature = "randomize")]
+    // use rand::{SeedableRng, rngs::StdRng};
+
+    // #[test]
+    // fn to_from_bytes() -> TestResult<()> {
+    //     tests::to_from_bytes_all_in_dir::<Pk3>(
+    //         &PathBuf::from("test-files").join("pkm-files").join("pk3"),
+    //     )
+    // }
+
+    // #[test]
+    // fn blaziken_pk3() -> TestResult<()> {
+    //     let path = PathBuf::from("pk3").join("blaziken.pkm");
+    //     let mon = tests::pkm_from_file::<Pk3>(&path)?.0;
+    //     assert_eq!(mon.secret_id, 0xbd27);
+
+    //     let mut bytes = mon.to_box_bytes();
+
+    //     let buffer = Pk3BufferMut::box_span_mut(&mut bytes);
+
+    //     assert_eq!(buffer.secret_id(), 0xbd27);
+
+    //     Ok(())
+    // }
+
+    // #[cfg(feature = "randomize")]
+    // #[test]
+    // fn to_from_bytes_random() -> std::result::Result<(), TestErrorWithSeed> {
+    //     for seed in 0..=1000 {
+    //         let mon = Pk3::randomized(&mut StdRng::seed_from_u64(seed));
+    //         println!("Testing seed {seed}: {mon:#?}");
+    //         tests::find_inconsistencies_to_from_bytes(mon)
+    //             .map_err(|error| TestErrorWithSeed { seed, error })?;
+    //     }
+
+    //     Ok(())
+    // }
+
+    // #[test]
+    // fn is_shiny() -> TestResult<()> {
+    //     let path = PathBuf::from("pk3").join("unown-e.pkm");
+    //     let mon = tests::pkm_from_file::<Pk3>(&path)?.0;
+    //     assert!(mon.is_shiny());
+
+    //     Ok(())
+    // }
+
+    #[test]
+    fn compare_pkhex_json() -> TestResult<()> {
+        tests::compare_pkhex_json_all_in_dir::<Colopkm>(&PathBuf::from("colopkm"))
+    }
+
+    // #[test]
+    // fn nickname_garbage_preserved() -> TestResult<()> {
+    //     let (mon, bytes) =
+    //         tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("jirachi-garbage.pkm"))?;
+
+    //     // trash bytes from an event mon
+    //     assert_eq!(mon.nickname.bytes()[9], 0x70);
+    //     assert_eq!(mon.nickname.bytes()[8], 0x08);
+
+    //     let mon_recreated = Pk3::from_ohpkm(
+    //         &OhpkmV2::convert_with_backup(&mon, &bytes)?,
+    //         ConvertStrategy::default(),
+    //     )?;
+
+    //     // trash bytes should be preserved
+    //     assert_eq!(mon_recreated.nickname.bytes()[9], 0x70);
+    //     assert_eq!(mon_recreated.nickname.bytes()[8], 0x08);
+
+    //     Ok(())
+    // }
+
+    // #[test]
+    // fn checksum() -> TestResult<()> {
+    //     let mon = tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("blaziken.pkm"))?.0;
+    //     assert_eq!(mon.checksum, mon.calculate_checksum());
+
+    //     Ok(())
+    // }
+
+    // #[test]
+    // fn is_nicknamed() -> TestResult<()> {
+    //     let mut mon = tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("blaziken.pkm"))?.0;
+    //     assert!(!mon.is_nicknamed());
+
+    //     mon.nickname = Gen3String::from_stringlike("renamed", Gen3Encoding::Int);
+    //     assert!(mon.is_nicknamed());
+
+    //     Ok(())
+    // }
+
+    // #[test]
+    // fn from_ohpkm() -> TestResult<()> {
+    //     let mon = tests::pkm_from_file::<OhpkmV2>(&PathBuf::from("ohpkm").join("Machamp.ohpkm"))?.0;
+
+    //     let _ = Pk3::from_ohpkm(&mon, ConvertStrategy::default());
+
+    //     Ok(())
+    // }
+
+    // const STEADFAST: u16 = 80;
+    // const SHARPNESS: u16 = 292;
+
+    // #[test]
+    // fn from_ohpkm_ability_change() -> TestResult<()> {
+    //     let mon = tests::pkm_from_file::<OhpkmV2>(
+    //         &PathBuf::from("ohpkm").join("gallade-sharpness-alpha.ohpkm"),
+    //     )?
+    //     .0;
+
+    //     assert_eq!(mon.ability_index().to_u16(), SHARPNESS);
+
+    //     let converted_pk3 = Pk3::from_ohpkm(&mon, ConvertStrategy::default());
+
+    //     // Gallade's Sharpness should be converted to Steadfast when converting to Pk3, since Sharpness is Gen 8+ and Pk3 can only represent Gen 7 abilities
+    //     assert_eq!(converted_pk3.ability_index.to_u16(), STEADFAST);
+
+    //     Ok(())
+    // }
+
+    #[test]
+    fn to_from_ohpkm() -> TestResult<()> {
+        tests::to_from_ohpkm_all_in_dir::<Colopkm>(
+            &PathBuf::from("test-files")
+                .join("pkm-files")
+                .join("colopkm"),
+        )
+    }
+
+    // #[test]
+    // fn empty_slot_checksum() -> TestResult<()> {
+    //     let empty_slot = Pk3::empty_box_slot_bytes(&"RoC".into());
+    //     if Pk3BufferRef::box_span(&empty_slot).checksum() != 0x0204 {
+    //         return Err(Error::other(&format!(
+    //             "Empty slot checksum should be 0x0204; received {:#06x}",
+    //             Pk3BufferRef::box_span(&empty_slot).checksum()
+    //         ))
+    //         .into());
+    //     }
+    //     Ok(())
+    // }
+
+    // #[test]
+    // fn set_contest_ribbon() -> TestResult<()> {
+    //     let mut mon = tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("blaziken.pkm"))?.0;
+
+    //     mon.ribbons.add_ribbon(Gen3Ribbon::BeautyHoenn);
+
+    //     assert!(mon.ribbons.has_ribbon(Gen3Ribbon::BeautyHoenn));
+    //     assert!(mon.ribbons.get_ribbons().contains(&Gen3Ribbon::BeautyHoenn));
+
+    //     mon.ribbons.add_ribbon(Gen3Ribbon::BeautyMasterHoenn);
+    //     assert!(mon.ribbons.has_ribbon(Gen3Ribbon::BeautyMasterHoenn));
+    //     assert!(
+    //         mon.ribbons
+    //             .get_ribbons()
+    //             .contains(&Gen3Ribbon::BeautyMasterHoenn)
+    //     );
+
+    //     Ok(())
+    // }
+
+    // #[test]
+    // fn kyogre_is_nonbinary() -> TestResult<()> {
+    //     let path = PathBuf::from("pk3").join("382 - Kyogre.pkm");
+    //     let mon = tests::pkm_from_file::<Pk3>(&path)?.0;
+
+    //     assert_eq!(mon.gender, Gender::Genderless);
+
+    //     Ok(())
+    // }
+
+    // #[test]
+    // fn nature_preserved() -> TestResult<()> {
+    //     let path = PathBuf::from("ohpkm").join("ditto-bold.ohpkm");
+    //     let mon = tests::pkm_from_file::<OhpkmV2>(&path)?.0;
+
+    //     assert_eq!(mon.gender(), Gender::Genderless);
+
+    //     let pk3 = Pk3::from_ohpkm(&mon, ConvertStrategy::default())?;
+
+    //     assert_eq!(mon.nature(), pk3.nature());
+
+    //     Ok(())
+    // }
+
+    // const BLAZIKEN_ENCRYPTED_BYTES_HEX: &str = "afe6de82a28827bdbcc6bbd4c3c5bfc8ff000202cce3bdffffffff007b690000416fbe3e266fa03f2d76e92f176f2e3f1942e93ff291f93f0d7e7c1e663cdb2c0deef13f0b92f9c30d6ef93f0d6ef93f";
+    // const JIRACHI_ENCRYPTED_BYTES_HEX: &str = "b010a7414b4e0000c4c3ccbbbdc2c3ff08700202d1c3cdc2c7c5cc00920c0000fb5ea741fb5ea741fb5ea741fba1a260d21fcf68fb5ea741625f0e41675ea741fb3aa741ea5ffa41675ea741f147ad41";
+
+    // #[test]
+    // fn encrypted_bytes_match_expected_blaziken() -> TestResult<()> {
+    //     let path = PathBuf::from("pk3").join("blaziken.pkm");
+    //     let mon = tests::pkm_from_file::<Pk3>(&path)?.0;
+
+    //     let encrypted_bytes = mon.to_box_bytes_encrypted();
+    //     let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
+
+    //     assert_eq!(encrypted_hex_str, BLAZIKEN_ENCRYPTED_BYTES_HEX);
+
+    //     Ok(())
+    // }
+
+    // #[test]
+    // fn encrypted_bytes_match_expected_jirachi() -> TestResult<()> {
+    //     let path = PathBuf::from("pk3").join("jirachi-garbage.pkm");
+    //     let mon = tests::pkm_from_file::<Pk3>(&path)?.0;
+
+    //     let encrypted_bytes = mon.to_box_bytes_encrypted();
+    //     let encrypted_hex_str = tests::bytes_to_hex_string(&encrypted_bytes);
+
+    //     assert_eq!(encrypted_hex_str, JIRACHI_ENCRYPTED_BYTES_HEX);
+
+    //     Ok(())
+    // }
 }
