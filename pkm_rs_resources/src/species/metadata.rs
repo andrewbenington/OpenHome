@@ -36,9 +36,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(34) }),
             base_height: 7,
             base_weight: 69,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Venusaur, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Venusaur)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Grass)),
             introduced: Generation::G1,
@@ -72,12 +70,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(34) }),
             base_height: 10,
             base_weight: 130,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Charmander, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ivysaur, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Charmander)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Ivysaur)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Grass)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -101,9 +95,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Charmander, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Charmander, 1) },
                     required_item_id: Some(659),
                 }],
                 is_gmax: false,
@@ -117,9 +109,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 20,
                 base_weight: 1000,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Venusaur, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Venusaur)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Grass)),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -183,9 +173,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(94) }),
             base_height: 6,
             base_weight: 85,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Charizard, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Charizard)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G1,
@@ -219,12 +207,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(94) }),
             base_height: 11,
             base_weight: 190,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Squirtle, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Charmeleon, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Squirtle)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Charmeleon)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -249,15 +233,11 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_mega: false,
                 mega_evolution_data: &[
                     MegaEvolutionMetadata {
-                        mega_form: unsafe {
-                            SpeciesForm::unchecked_form(NationalDex::Squirtle, 1)
-                        },
+                        mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Squirtle, 1) },
                         required_item_id: Some(660),
                     },
                     MegaEvolutionMetadata {
-                        mega_form: unsafe {
-                            SpeciesForm::unchecked_form(NationalDex::Squirtle, 2)
-                        },
+                        mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Squirtle, 2) },
                         required_item_id: Some(678),
                     },
                 ],
@@ -272,9 +252,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 17,
                 base_weight: 905,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Charizard, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Charizard)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -368,9 +346,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(44) }),
             base_height: 5,
             base_weight: 90,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Blastoise, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Blastoise)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
             introduced: Generation::G1,
@@ -404,12 +380,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(44) }),
             base_height: 10,
             base_weight: 225,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Caterpie, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Wartortle, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Caterpie)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Wartortle)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -433,9 +405,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Caterpie, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Caterpie, 1) },
                     required_item_id: Some(661),
                 }],
                 is_gmax: false,
@@ -449,9 +419,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 855,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Blastoise, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Blastoise)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -515,9 +483,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(50) }),
             base_height: 3,
             base_weight: 29,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Butterfree, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Butterfree)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G1,
@@ -551,12 +517,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 7,
             base_weight: 99,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Weedle, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Metapod, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Weedle)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Metapod)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -590,9 +552,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 320,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Butterfree, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Butterfree)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -625,9 +585,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(50) }),
             base_height: 3,
             base_weight: 32,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Beedrill, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Beedrill)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G1,
@@ -661,12 +619,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 6,
             base_weight: 100,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pidgey, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Kakuna, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pidgey)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Kakuna)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -690,9 +644,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Pidgey, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Pidgey, 1) },
                     required_item_id: Some(770),
                 }],
                 is_gmax: false,
@@ -706,9 +658,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 10,
                 base_weight: 295,
                 evolutions: &[],
-                pre_evolution: Some(
-                    SpeciesForm::base_form(NationalDex::Beedrill)
-                ),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Beedrill)),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -772,9 +722,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(145) }),
             base_height: 3,
             base_weight: 18,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pidgeot, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pidgeot)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G1,
@@ -808,12 +756,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(145) }),
             base_height: 11,
             base_weight: 300,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Rattata, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pidgeotto, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Rattata)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Pidgeotto)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -837,9 +781,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Rattata, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Rattata, 1) },
                     required_item_id: Some(762),
                 }],
                 is_gmax: false,
@@ -853,9 +795,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 395,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Pidgeot, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Pidgeot)),
                 egg_groups: (EggGroup::Flying, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -920,9 +860,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(55) }),
                 base_height: 3,
                 base_weight: 35,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Spearow, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Spearow)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
@@ -952,9 +890,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(47) }),
                 base_height: 3,
                 base_weight: 38,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Spearow, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Spearow, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G7,
@@ -991,9 +927,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 7,
                 base_weight: 185,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Raticate, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Raticate)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -1089,9 +1023,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(97) }),
             base_height: 3,
             base_weight: 20,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ekans, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Ekans)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G1,
@@ -1126,9 +1058,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 380,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Fearow, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Fearow)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -1161,9 +1091,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(127) }),
             base_height: 20,
             base_weight: 69,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pikachu, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pikachu)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Dragon)),
             introduced: Generation::G1,
@@ -1198,9 +1126,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 35,
             base_weight: 650,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Arbok, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Arbok)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Dragon)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -1234,13 +1160,10 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(31) }),
                 base_height: 4,
                 base_weight: 60,
-                evolutions: &[
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Sandshrew, 0) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Sandshrew, 1) },
-                ],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Cleffa, 0)
-                }),
+                evolutions: &[SpeciesForm::base_form(NationalDex::Sandshrew), unsafe {
+                    SpeciesForm::unchecked_form(NationalDex::Sandshrew, 1)
+                }],
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Cleffa)),
                 egg_groups: (EggGroup::Field, Some(EggGroup::Fairy)),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -1559,9 +1482,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 8,
                 base_weight: 300,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Raichu, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Raichu)),
                 egg_groups: (EggGroup::Field, Some(EggGroup::Fairy)),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -1591,9 +1512,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 7,
                 base_weight: 210,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Raichu, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Raichu)),
                 egg_groups: (EggGroup::Field, Some(EggGroup::Fairy)),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -1688,9 +1607,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(146) }),
                 base_height: 6,
                 base_weight: 120,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::NidoranF, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::NidoranF)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
@@ -1720,9 +1637,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(202) }),
                 base_height: 7,
                 base_weight: 400,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::NidoranF, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::NidoranF, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G7,
@@ -1759,9 +1674,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 10,
                 base_weight: 295,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Sandslash, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Sandslash)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -1827,9 +1740,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(55) }),
             base_height: 4,
             base_weight: 70,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Nidoqueen, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Nidoqueen)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Field)),
             introduced: Generation::G1,
@@ -1863,12 +1774,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(55) }),
             base_height: 8,
             base_weight: 200,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::NidoranM, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Nidorina, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::NidoranM)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Nidorina)),
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -1902,9 +1809,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 600,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Nidoqueen, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Nidoqueen)),
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -1937,9 +1842,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(55) }),
             base_height: 5,
             base_weight: 90,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Nidoking, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Nidoking)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Field)),
             introduced: Generation::G1,
@@ -1973,12 +1876,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(55) }),
             base_height: 9,
             base_weight: 195,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Clefairy, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Nidorino, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Clefairy)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Nidorino)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Field)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -2012,9 +1911,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 620,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Nidoking, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Nidoking)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Field)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -2047,12 +1944,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
             base_height: 6,
             base_weight: 75,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vulpix, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Igglybuff, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Vulpix)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Igglybuff)),
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -2076,9 +1969,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Vulpix, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Vulpix, 1) },
                     required_item_id: Some(2559),
                 }],
                 is_gmax: false,
@@ -2092,9 +1983,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 13,
                 base_weight: 400,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Clefable, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Clefable)),
                 egg_groups: (EggGroup::Fairy, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -2159,9 +2048,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(70) }),
                 base_height: 6,
                 base_weight: 99,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Jigglypuff, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Jigglypuff)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
@@ -2191,9 +2078,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(117) }),
                 base_height: 6,
                 base_weight: 99,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Jigglypuff, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Jigglypuff, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G7,
@@ -2230,9 +2115,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 11,
                 base_weight: 199,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Ninetales, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Ninetales)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -2298,12 +2181,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
             base_height: 5,
             base_weight: 55,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Zubat, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Togepi, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Zubat)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Togepi)),
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -2337,9 +2216,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 120,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Wigglytuff, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Wigglytuff)),
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -2372,9 +2249,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(151) }),
             base_height: 8,
             base_weight: 75,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Oddish, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Oddish)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G1,
@@ -2408,12 +2283,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(151) }),
             base_height: 16,
             base_weight: 550,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Chinchou, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Golbat, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Chinchou)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Golbat)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -2446,9 +2317,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(50) }),
             base_height: 5,
             base_weight: 54,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vileplume, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Vileplume)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G1,
@@ -2483,12 +2352,10 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 86,
             evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Paras, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Marill, 0) },
+                SpeciesForm::base_form(NationalDex::Paras),
+                SpeciesForm::base_form(NationalDex::Marill),
             ],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gloom, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gloom)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -2522,9 +2389,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 186,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vileplume, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vileplume)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -2557,9 +2422,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(6) }),
             base_height: 3,
             base_weight: 54,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Venonat, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Venonat)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, Some(EggGroup::Grass)),
             introduced: Generation::G1,
@@ -2594,9 +2457,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 295,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Parasect, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Parasect)),
             egg_groups: (EggGroup::Bug, Some(EggGroup::Grass)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -2629,9 +2490,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(50) }),
             base_height: 10,
             base_weight: 300,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Diglett, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Diglett)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G1,
@@ -2666,9 +2525,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 125,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Venomoth, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Venomoth)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -2702,9 +2559,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(159) }),
                 base_height: 2,
                 base_weight: 8,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Meowth, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Meowth)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
@@ -2734,9 +2589,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(159) }),
                 base_height: 2,
                 base_weight: 10,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Meowth, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Meowth, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G7,
@@ -2773,9 +2626,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 7,
                 base_weight: 333,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Dugtrio, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dugtrio)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -2842,9 +2693,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(127) }),
                 base_height: 4,
                 base_weight: 42,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Psyduck, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Psyduck)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
@@ -2874,9 +2723,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(155) }),
                 base_height: 4,
                 base_weight: 42,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Psyduck, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Psyduck, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G7,
@@ -2906,9 +2753,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(127) }),
                 base_height: 4,
                 base_weight: 75,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Cursola, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Cursola)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G8,
@@ -2945,9 +2790,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 10,
                 base_weight: 320,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Persian, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Persian)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -3013,9 +2856,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(33) }),
             base_height: 8,
             base_weight: 196,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Mankey, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Mankey)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G1,
@@ -3050,9 +2891,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 17,
             base_weight: 766,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Golduck, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Golduck)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -3085,9 +2924,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(128) }),
             base_height: 5,
             base_weight: 280,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Growlithe, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Growlithe)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G1,
@@ -3121,12 +2958,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(128) }),
             base_height: 10,
             base_weight: 320,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Clodsire, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Primeape, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Clodsire)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Primeape)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -3160,9 +2993,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(154) }),
                 base_height: 7,
                 base_weight: 190,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Poliwag, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Poliwag)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
@@ -3192,9 +3023,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(69) }),
                 base_height: 8,
                 base_weight: 227,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Poliwag, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Poliwag, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G8,
@@ -3231,9 +3060,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 19,
                 base_weight: 1550,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Arcanine, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Arcanine)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -3299,9 +3126,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(33) }),
             base_height: 6,
             base_weight: 124,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Poliwrath, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Poliwrath)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G1,
@@ -3336,12 +3161,10 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 200,
             evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Abra, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Hoppip, 0) },
+                SpeciesForm::base_form(NationalDex::Abra),
+                SpeciesForm::base_form(NationalDex::Hoppip),
             ],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Poliwhirl, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Poliwhirl)),
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -3375,9 +3198,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 540,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Poliwrath, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Poliwrath)),
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -3410,9 +3231,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(98) }),
             base_height: 9,
             base_weight: 195,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Alakazam, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Alakazam)],
             pre_evolution: None,
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G1,
@@ -3446,12 +3265,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(98) }),
             base_height: 13,
             base_weight: 565,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Machop, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Kadabra, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Machop)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Kadabra)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -3475,9 +3290,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Machop, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Machop, 1) },
                     required_item_id: Some(679),
                 }],
                 is_gmax: false,
@@ -3491,9 +3304,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 480,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Alakazam, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Alakazam)),
                 egg_groups: (EggGroup::HumanLike, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -3557,9 +3368,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(80) }),
             base_height: 8,
             base_weight: 195,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Machamp, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Machamp)],
             pre_evolution: None,
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G1,
@@ -3593,12 +3402,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(80) }),
             base_height: 15,
             base_weight: 705,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bellsprout, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Machoke, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Bellsprout)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Machoke)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -3632,9 +3437,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 16,
             base_weight: 1300,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Machamp, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Machamp)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -3667,9 +3470,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(82) }),
             base_height: 7,
             base_weight: 40,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Victreebel, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Victreebel)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G1,
@@ -3703,12 +3504,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(82) }),
             base_height: 10,
             base_weight: 64,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tentacool, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Weepinbell, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tentacool)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Weepinbell)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -3732,9 +3529,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Tentacool, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Tentacool, 1) },
                     required_item_id: Some(2560),
                 }],
                 is_gmax: false,
@@ -3748,9 +3543,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 17,
                 base_weight: 155,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Victreebel, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Victreebel)),
                 egg_groups: (EggGroup::Grass, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -3814,9 +3607,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(44) }),
             base_height: 9,
             base_weight: 455,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Geodude, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Geodude)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G1,
@@ -3851,9 +3642,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 16,
             base_weight: 550,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tentacruel, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Tentacruel)),
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -3887,9 +3676,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(8) }),
                 base_height: 4,
                 base_weight: 200,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Golem, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Golem)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Mineral, None),
                 introduced: Generation::G1,
@@ -3919,9 +3706,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(206) }),
                 base_height: 4,
                 base_weight: 203,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Golem, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Golem, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Mineral, None),
                 introduced: Generation::G7,
@@ -3957,12 +3742,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(8) }),
                 base_height: 10,
                 base_weight: 1050,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Ponyta, 0)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Graveler, 0)
-                }),
+                evolutions: &[SpeciesForm::base_form(NationalDex::Ponyta)],
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Graveler)),
                 egg_groups: (EggGroup::Mineral, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -3991,9 +3772,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(206) }),
                 base_height: 10,
                 base_weight: 1100,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Ponyta, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Ponyta, 1) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Graveler, 1)
                 }),
@@ -4032,9 +3811,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 14,
                 base_weight: 3000,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Golem, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Golem)),
                 egg_groups: (EggGroup::Mineral, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -4064,9 +3841,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 17,
                 base_weight: 3160,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Golem, 1)
-                }),
+                pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Golem, 1) }),
                 egg_groups: (EggGroup::Mineral, None),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -4101,9 +3876,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(49) }),
                 base_height: 10,
                 base_weight: 300,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Slowpoke, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Slowpoke)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
@@ -4133,9 +3906,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(107) }),
                 base_height: 8,
                 base_weight: 240,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Slowpoke, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Slowpoke, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G8,
@@ -4172,9 +3943,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 17,
                 base_weight: 950,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Rapidash, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Rapidash)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -4242,8 +4011,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 12,
                 base_weight: 360,
                 evolutions: &[
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Magnemite, 0) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Misdreavus, 0) },
+                    SpeciesForm::base_form(NationalDex::Magnemite),
+                    SpeciesForm::base_form(NationalDex::Misdreavus),
                 ],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
@@ -4303,9 +4072,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Magnemite, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Magnemite, 1) },
                     required_item_id: Some(760),
                 }],
                 is_gmax: false,
@@ -4319,9 +4086,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 785,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Slowbro, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Slowbro)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -4417,9 +4182,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(148) }),
             base_height: 3,
             base_weight: 60,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Farfetchd, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Farfetchd)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G1,
@@ -4453,12 +4216,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(148) }),
             base_height: 10,
             base_weight: 600,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Lickilicky, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Magneton, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Lickilicky)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Magneton)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -4522,9 +4281,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(113) }),
                 base_height: 8,
                 base_weight: 150,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::MrRime, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::MrRime)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Flying, Some(EggGroup::Field)),
                 introduced: Generation::G8,
@@ -4559,9 +4316,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(77) }),
             base_height: 14,
             base_weight: 392,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Seel, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Seel)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G1,
@@ -4596,9 +4351,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 852,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dodrio, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dodrio)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -4631,9 +4384,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(115) }),
             base_height: 11,
             base_weight: 900,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Grimer, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Grimer)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G1,
@@ -4668,9 +4419,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 17,
             base_weight: 1200,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dewgong, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dewgong)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -4704,9 +4453,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(143) }),
                 base_height: 9,
                 base_weight: 300,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Shellder, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Shellder)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G1,
@@ -4736,9 +4483,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(223) }),
                 base_height: 7,
                 base_weight: 420,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Shellder, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Shellder, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G7,
@@ -4775,9 +4520,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 12,
                 base_weight: 300,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Muk, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Muk)),
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -4807,9 +4550,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 10,
                 base_weight: 520,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Muk, 1)
-                }),
+                pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Muk, 1) }),
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -4843,9 +4584,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(142) }),
             base_height: 3,
             base_weight: 40,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gastly, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Gastly)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G1,
@@ -4880,9 +4619,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 1325,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cloyster, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Cloyster)),
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -4915,9 +4652,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 13,
             base_weight: 1,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gengar, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Gengar)],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G1,
@@ -4951,12 +4686,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 16,
             base_weight: 1,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Onix, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Haunter, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Onix)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Haunter)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -4980,9 +4711,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Onix, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Onix, 1) },
                     required_item_id: Some(656),
                 }],
                 is_gmax: false,
@@ -4996,9 +4725,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 405,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Gengar, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gengar)),
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -5062,9 +4789,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(133) }),
             base_height: 88,
             base_weight: 2100,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Snubbull, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Snubbull)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G1,
@@ -5098,9 +4823,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(39) }),
             base_height: 10,
             base_weight: 324,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Krabby, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Krabby)],
             pre_evolution: None,
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G1,
@@ -5135,9 +4858,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 16,
             base_weight: 756,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hypno, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Hypno)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -5170,9 +4891,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(125) }),
             base_height: 4,
             base_weight: 65,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Voltorb, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Voltorb)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G1,
@@ -5207,9 +4926,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 600,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Kingler, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Kingler)),
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -5243,9 +4960,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(106) }),
                 base_height: 5,
                 base_weight: 104,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Exeggcute, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Exeggcute)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Mineral, None),
                 introduced: Generation::G1,
@@ -5275,9 +4990,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(106) }),
                 base_height: 5,
                 base_weight: 130,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Exeggcute, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Exeggcute, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Mineral, None),
                 introduced: Generation::G8,
@@ -5314,9 +5027,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 12,
                 base_weight: 666,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Electrode, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Electrode)),
                 egg_groups: (EggGroup::Mineral, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -5382,10 +5093,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(139) }),
             base_height: 4,
             base_weight: 25,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Cubone, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Cubone, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Cubone), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Cubone, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G1,
@@ -5421,9 +5131,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 20,
                 base_weight: 1200,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Exeggutor, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Exeggutor)),
                 egg_groups: (EggGroup::Grass, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -5453,9 +5161,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 109,
                 base_weight: 4156,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Exeggutor, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Exeggutor)),
                 egg_groups: (EggGroup::Grass, None),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -5489,10 +5195,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(4) }),
             base_height: 4,
             base_weight: 65,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Hitmonlee, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Hitmonlee, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Hitmonlee), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Hitmonlee, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G1,
@@ -5528,9 +5233,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 10,
                 base_weight: 450,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Marowak, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Marowak)),
                 egg_groups: (EggGroup::Monster, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -5560,9 +5263,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 10,
                 base_weight: 340,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Marowak, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Marowak)),
                 egg_groups: (EggGroup::Monster, None),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -5627,9 +5328,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 498,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hitmontop, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Hitmontop)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -5663,9 +5362,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 502,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hitmontop, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Hitmontop)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -5698,9 +5395,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(13) }),
             base_height: 12,
             base_weight: 655,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Rhyperior, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Rhyperior)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G1,
@@ -5734,10 +5429,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(1) }),
             base_height: 6,
             base_weight: 10,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Rhyhorn, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Rhyhorn, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Rhyhorn), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Rhyhorn, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G1,
@@ -5773,9 +5467,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 12,
                 base_weight: 95,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Weezing, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Weezing)),
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -5805,9 +5497,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 30,
                 base_weight: 160,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Weezing, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Weezing)),
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -5841,9 +5531,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(120) }),
             base_height: 10,
             base_weight: 1150,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Chansey, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Chansey)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Field)),
             introduced: Generation::G1,
@@ -5877,12 +5565,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(120) }),
             base_height: 19,
             base_weight: 1200,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tangrowth, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Rhydon, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tangrowth)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Rhydon)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Field)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -5915,12 +5599,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(131) }),
             base_height: 11,
             base_weight: 346,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Raikou, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Chatot, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Raikou)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Chatot)),
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -5953,9 +5633,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(144) }),
             base_height: 10,
             base_weight: 350,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Electivire, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Electivire)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G1,
@@ -5980,9 +5658,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Horsea, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Horsea, 1) },
                     required_item_id: Some(675),
                 }],
                 is_gmax: false,
@@ -6060,9 +5736,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(6) }),
             base_height: 4,
             base_weight: 80,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Goldeen, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Goldeen)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Dragon)),
             introduced: Generation::G1,
@@ -6096,12 +5770,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(6) }),
             base_height: 12,
             base_weight: 250,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Phanpy, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Seadra, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Phanpy)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Seadra)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Dragon)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -6134,9 +5804,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(31) }),
             base_height: 6,
             base_weight: 150,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Staryu, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Staryu)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water2, None),
             introduced: Generation::G1,
@@ -6171,9 +5839,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 390,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Seaking, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Seaking)),
             egg_groups: (EggGroup::Water2, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -6206,9 +5872,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(148) }),
             base_height: 8,
             base_weight: 345,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::MrMime, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::MrMime)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G1,
@@ -6233,9 +5897,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::MrMime, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::MrMime, 1) },
                     required_item_id: Some(2561),
                 }],
                 is_gmax: false,
@@ -6249,9 +5911,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 11,
                 base_weight: 800,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Starmie, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Starmie)),
                 egg_groups: (EggGroup::Water3, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -6317,9 +5977,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 13,
                 base_weight: 545,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Happiny, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Happiny)),
                 egg_groups: (EggGroup::HumanLike, None),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -6348,12 +6006,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(115) }),
                 base_height: 14,
                 base_weight: 568,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Runerigus, 0)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Happiny, 0)
-                }),
+                evolutions: &[SpeciesForm::base_form(NationalDex::Runerigus)],
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Happiny)),
                 egg_groups: (EggGroup::HumanLike, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -6388,8 +6042,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 560,
             evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Shuckle, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Ursaluna, 0) },
+                SpeciesForm::base_form(NationalDex::Shuckle),
+                SpeciesForm::base_form(NationalDex::Ursaluna),
             ],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
@@ -6425,9 +6079,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 406,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Elekid, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Elekid)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -6460,12 +6112,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(72) }),
             base_height: 11,
             base_weight: 300,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Magmortar, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Magby, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Magmortar)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Magby)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -6498,12 +6146,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(72) }),
             base_height: 13,
             base_weight: 445,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Togekiss, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Miltank, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Togekiss)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Miltank)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -6527,9 +6171,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Tauros, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Tauros, 1) },
                     required_item_id: Some(671),
                 }],
                 is_gmax: false,
@@ -6733,9 +6375,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(155) }),
             base_height: 9,
             base_weight: 100,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Lapras, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Lapras)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water2, Some(EggGroup::Dragon)),
             introduced: Generation::G1,
@@ -6760,9 +6400,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Lapras, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Lapras, 1) },
                     required_item_id: Some(676),
                 }],
                 is_gmax: false,
@@ -6776,9 +6414,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 65,
                 base_weight: 2350,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Gyarados, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gyarados)),
                 egg_groups: (EggGroup::Water2, Some(EggGroup::Dragon)),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -6912,14 +6548,14 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 3,
                 base_weight: 65,
                 evolutions: &[
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Jolteon, 0) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Flareon, 0) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Porygon, 0) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Umbreon, 0) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Murkrow, 0) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Glaceon, 0) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Gliscor, 0) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Hawlucha, 0) },
+                    SpeciesForm::base_form(NationalDex::Jolteon),
+                    SpeciesForm::base_form(NationalDex::Flareon),
+                    SpeciesForm::base_form(NationalDex::Porygon),
+                    SpeciesForm::base_form(NationalDex::Umbreon),
+                    SpeciesForm::base_form(NationalDex::Murkrow),
+                    SpeciesForm::base_form(NationalDex::Glaceon),
+                    SpeciesForm::base_form(NationalDex::Gliscor),
+                    SpeciesForm::base_form(NationalDex::Hawlucha),
                 ],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
@@ -6986,9 +6622,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 290,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vaporeon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vaporeon)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -7022,9 +6656,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 245,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vaporeon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vaporeon)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -7058,9 +6690,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 9,
             base_weight: 250,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vaporeon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vaporeon)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -7093,9 +6723,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(148) }),
             base_height: 8,
             base_weight: 365,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Stantler, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Stantler)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G1,
@@ -7129,9 +6757,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(133) }),
             base_height: 4,
             base_weight: 75,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Kabuto, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Kabuto)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water3)),
             introduced: Generation::G1,
@@ -7166,9 +6792,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 350,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Omastar, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Omastar)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water3)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -7201,9 +6825,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(133) }),
             base_height: 5,
             base_weight: 115,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Aerodactyl, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Aerodactyl)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water3)),
             introduced: Generation::G1,
@@ -7238,9 +6860,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 405,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Kabutops, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Kabutops)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water3)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -7264,9 +6884,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Snorlax, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Snorlax, 1) },
                     required_item_id: Some(672),
                 }],
                 is_gmax: false,
@@ -7345,9 +6963,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 21,
             base_weight: 4600,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Riolu, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Riolu)),
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -7578,9 +7194,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(63) }),
             base_height: 18,
             base_weight: 33,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dragonite, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Dragonite)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Dragon)),
             introduced: Generation::G1,
@@ -7614,12 +7228,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(63) }),
             base_height: 40,
             base_weight: 165,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Mewtwo, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dragonair, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Mewtwo)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dragonair)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Dragon)),
             introduced: Generation::G1,
             is_restricted_legend: false,
@@ -7643,9 +7253,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Mewtwo, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Mewtwo, 1) },
                     required_item_id: Some(2562),
                 }],
                 is_gmax: false,
@@ -7659,9 +7267,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 22,
                 base_weight: 2100,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Dragonite, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dragonite)),
                 egg_groups: (EggGroup::Water1, Some(EggGroup::Dragon)),
                 introduced: Generation::G1,
                 is_restricted_legend: false,
@@ -7717,15 +7323,11 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_mega: false,
                 mega_evolution_data: &[
                     MegaEvolutionMetadata {
-                        mega_form: unsafe {
-                            SpeciesForm::unchecked_form(NationalDex::Mew, 1)
-                        },
+                        mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Mew, 1) },
                         required_item_id: Some(662),
                     },
                     MegaEvolutionMetadata {
-                        mega_form: unsafe {
-                            SpeciesForm::unchecked_form(NationalDex::Mew, 2)
-                        },
+                        mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Mew, 2) },
                         required_item_id: Some(663),
                     },
                 ],
@@ -7868,9 +7470,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(102) }),
             base_height: 9,
             base_weight: 64,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Meganium, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Meganium)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Grass)),
             introduced: Generation::G2,
@@ -7904,12 +7504,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(102) }),
             base_height: 12,
             base_weight: 158,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cyndaquil, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bayleef, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Cyndaquil)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Bayleef)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Grass)),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -7933,9 +7529,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Cyndaquil, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Cyndaquil, 1) },
                     required_item_id: Some(2563),
                 }],
                 is_gmax: false,
@@ -7949,9 +7543,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 18,
                 base_weight: 1005,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Meganium, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Meganium)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Grass)),
                 introduced: Generation::G2,
                 is_restricted_legend: false,
@@ -8015,9 +7607,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(18) }),
             base_height: 5,
             base_weight: 79,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Typhlosion, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Typhlosion)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
@@ -8051,13 +7641,10 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(18) }),
             base_height: 9,
             base_weight: 190,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Totodile, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Totodile, 1) },
-            ],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Quilava, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Totodile), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Totodile, 1)
+            }],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Quilava)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -8092,9 +7679,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 17,
                 base_weight: 795,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Typhlosion, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Typhlosion)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G2,
                 is_restricted_legend: false,
@@ -8124,9 +7709,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 698,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Typhlosion, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Typhlosion)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -8160,9 +7743,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(125) }),
             base_height: 6,
             base_weight: 95,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Feraligatr, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Feraligatr)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
             introduced: Generation::G2,
@@ -8196,12 +7777,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(125) }),
             base_height: 11,
             base_weight: 250,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Sentret, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Croconaw, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Sentret)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Croconaw)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -8225,9 +7802,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Sentret, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Sentret, 1) },
                     required_item_id: Some(2564),
                 }],
                 is_gmax: false,
@@ -8241,9 +7816,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 23,
                 base_weight: 888,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Feraligatr, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Feraligatr)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
                 introduced: Generation::G2,
                 is_restricted_legend: false,
@@ -8307,9 +7880,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(119) }),
             base_height: 8,
             base_weight: 60,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hoothoot, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Hoothoot)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
@@ -8344,9 +7915,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 325,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Furret, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Furret)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -8379,9 +7948,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(110) }),
             base_height: 7,
             base_weight: 212,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ledyba, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Ledyba)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G2,
@@ -8416,9 +7983,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 16,
             base_weight: 408,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Noctowl, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Noctowl)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -8451,9 +8016,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(155) }),
             base_height: 10,
             base_weight: 108,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Spinarak, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Spinarak)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G2,
@@ -8488,9 +8051,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 356,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ledian, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Ledian)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -8523,9 +8084,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(97) }),
             base_height: 5,
             base_weight: 85,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Crobat, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Crobat)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G2,
@@ -8560,9 +8119,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 335,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ariados, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Ariados)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -8596,9 +8153,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 750,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Oddish, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Oddish)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -8631,9 +8186,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(11) }),
             base_height: 5,
             base_weight: 120,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pichu, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pichu)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water2, None),
             introduced: Generation::G2,
@@ -8668,9 +8221,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 225,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Lanturn, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Lanturn)),
             egg_groups: (EggGroup::Water2, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -8704,9 +8255,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(31) }),
                 base_height: 3,
                 base_weight: 20,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Raichu, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Raichu)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::NoEggsDiscovered, None),
                 introduced: Generation::G2,
@@ -8771,9 +8320,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
             base_height: 3,
             base_weight: 30,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Clefable, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Clefable)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G2,
@@ -8807,9 +8354,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
             base_height: 3,
             base_weight: 10,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Wigglytuff, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Wigglytuff)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G2,
@@ -8843,9 +8388,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(105) }),
             base_height: 3,
             base_weight: 15,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Natu, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Natu)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G2,
@@ -8879,12 +8422,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(105) }),
             base_height: 6,
             base_weight: 32,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Yanmega, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Togetic, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Yanmega)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Togetic)),
             egg_groups: (EggGroup::Flying, Some(EggGroup::Fairy)),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -8917,9 +8456,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(156) }),
             base_height: 2,
             base_weight: 20,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Mareep, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Mareep)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G2,
@@ -8954,9 +8491,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 150,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Xatu, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Xatu)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -8989,9 +8524,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(57) }),
             base_height: 6,
             base_weight: 78,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ampharos, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Ampharos)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Field)),
             introduced: Generation::G2,
@@ -9025,12 +8558,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(57) }),
             base_height: 8,
             base_weight: 133,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bellossom, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Flaaffy, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Bellossom)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Flaaffy)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Field)),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -9054,9 +8583,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Bellossom, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Bellossom, 1) },
                     required_item_id: Some(658),
                 }],
                 is_gmax: false,
@@ -9070,9 +8597,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 14,
                 base_weight: 615,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Ampharos, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Ampharos)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Field)),
                 introduced: Generation::G2,
                 is_restricted_legend: false,
@@ -9137,9 +8662,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 4,
             base_weight: 58,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vileplume, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vileplume)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -9172,12 +8695,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(157) }),
             base_height: 4,
             base_weight: 85,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Sudowoodo, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Nosepass, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Sudowoodo)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Nosepass)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Fairy)),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -9211,9 +8730,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 285,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Azumarill, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Azumarill)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Fairy)),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -9247,9 +8764,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 380,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::MimeJr, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::MimeJr)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -9283,9 +8798,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 339,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Poliwrath, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Poliwrath)),
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -9318,9 +8831,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(151) }),
             base_height: 4,
             base_weight: 5,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Jumpluff, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Jumpluff)],
             pre_evolution: None,
             egg_groups: (EggGroup::Fairy, Some(EggGroup::Grass)),
             introduced: Generation::G2,
@@ -9354,12 +8865,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(151) }),
             base_height: 6,
             base_weight: 10,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Aipom, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Skiploom, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Aipom)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Skiploom)),
             egg_groups: (EggGroup::Fairy, Some(EggGroup::Grass)),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -9393,9 +8900,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 30,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Jumpluff, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Jumpluff)),
             egg_groups: (EggGroup::Fairy, Some(EggGroup::Grass)),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -9428,9 +8933,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(92) }),
             base_height: 8,
             base_weight: 115,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Drifloon, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Drifloon)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
@@ -9464,9 +8967,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(48) }),
             base_height: 3,
             base_weight: 18,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Yanma, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Yanma)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G2,
@@ -9501,9 +9002,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 85,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Sunflora, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Sunflora)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -9536,9 +9035,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(119) }),
             base_height: 12,
             base_weight: 380,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Leafeon, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Leafeon)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G2,
@@ -9573,9 +9070,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(109) }),
                 base_height: 4,
                 base_weight: 85,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Espeon, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Espeon)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
                 introduced: Generation::G2,
@@ -9605,9 +9100,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(109) }),
                 base_height: 4,
                 base_weight: 110,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Farigiraf, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Farigiraf)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
                 introduced: Generation::G9,
@@ -9643,9 +9136,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 750,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Quagsire, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Quagsire)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -9679,9 +9170,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 9,
             base_weight: 265,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vaporeon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vaporeon)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -9715,9 +9204,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 270,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vaporeon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vaporeon)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -9750,9 +9237,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(158) }),
             base_height: 5,
             base_weight: 21,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Glameow, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Glameow)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G2,
@@ -9788,9 +9273,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 20,
                 base_weight: 795,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Slowbro, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Slowbro)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
                 introduced: Generation::G2,
                 is_restricted_legend: false,
@@ -9856,9 +9339,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 7,
             base_weight: 10,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Honchkrow, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Honchkrow)],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G2,
@@ -10739,9 +10220,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 285,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Snorunt, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Snorunt)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -10774,9 +10253,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(157) }),
             base_height: 15,
             base_weight: 415,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dudunsparce, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Dudunsparce)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
@@ -10810,9 +10287,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(142) }),
             base_height: 6,
             base_weight: 72,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dunsparce, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Dunsparce)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G2,
@@ -10847,9 +10322,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 1258,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Forretress, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Forretress)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -10882,10 +10355,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(155) }),
             base_height: 15,
             base_weight: 140,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Kingambit, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Kingambit, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Kingambit), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Kingambit, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
@@ -10919,9 +10391,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(17) }),
             base_height: 11,
             base_weight: 648,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Mamoswine, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Mamoswine)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G2,
@@ -10946,9 +10416,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Snubbull, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Snubbull, 1) },
                     required_item_id: Some(761),
                 }],
                 is_gmax: false,
@@ -10962,9 +10430,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 92,
                 base_weight: 4000,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Drowzee, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Drowzee)),
                 egg_groups: (EggGroup::Mineral, None),
                 introduced: Generation::G2,
                 is_restricted_legend: false,
@@ -11028,9 +10494,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(155) }),
             base_height: 6,
             base_weight: 78,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Qwilfish, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Qwilfish)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Fairy)),
             introduced: Generation::G2,
@@ -11065,9 +10529,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 487,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Granbull, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Granbull)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Fairy)),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -11131,9 +10593,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(22) }),
                 base_height: 5,
                 base_weight: 39,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Enamorus, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Enamorus)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Water2, None),
                 introduced: Generation::G8,
@@ -11159,9 +10619,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Shuckle, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Shuckle, 1) },
                     required_item_id: Some(670),
                 }],
                 is_gmax: false,
@@ -11175,9 +10633,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 18,
                 base_weight: 1180,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Jynx, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Jynx)),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G2,
                 is_restricted_legend: false,
@@ -11266,9 +10722,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Sneasel, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Sneasel, 1) },
                     required_item_id: Some(680),
                 }],
                 is_gmax: false,
@@ -11347,9 +10801,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(124) }),
                 base_height: 9,
                 base_weight: 280,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Magnezone, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Magnezone)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G2,
@@ -11379,9 +10831,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(124) }),
                 base_height: 9,
                 base_weight: 270,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Overqwil, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Overqwil)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G8,
@@ -11416,9 +10866,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(118) }),
             base_height: 6,
             base_weight: 88,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Slugma, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Slugma)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
@@ -11452,12 +10900,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(127) }),
             base_height: 18,
             base_weight: 1258,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Basculegion, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ursaring, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Basculegion)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Ursaring)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -11490,9 +10934,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(133) }),
             base_height: 7,
             base_weight: 350,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Swinub, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Swinub)],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G2,
@@ -11527,9 +10969,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 550,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Magcargo, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Magcargo)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -11562,9 +11002,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(47) }),
             base_height: 4,
             base_weight: 65,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Corsola, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Corsola)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
@@ -11598,12 +11036,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(47) }),
             base_height: 11,
             base_weight: 558,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::PorygonZ, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Piloswine, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::PorygonZ)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Piloswine)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -11667,9 +11101,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(130) }),
                 base_height: 6,
                 base_weight: 5,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Sirfetchd, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Sirfetchd)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Water1, Some(EggGroup::Water3)),
                 introduced: Generation::G8,
@@ -11704,9 +11136,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(141) }),
             base_height: 6,
             base_weight: 120,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Delibird, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Delibird)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water2)),
             introduced: Generation::G2,
@@ -11741,9 +11171,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 9,
             base_weight: 285,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Octillery, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Octillery)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water2)),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -11811,9 +11239,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 21,
             base_weight: 2200,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Snover, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Snover)),
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -11837,9 +11263,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Houndour, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Houndour, 1) },
                     required_item_id: Some(2565),
                 }],
                 is_gmax: false,
@@ -11917,9 +11341,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(127) }),
             base_height: 6,
             base_weight: 108,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Kingdra, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Kingdra)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
@@ -11944,9 +11366,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Kingdra, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Kingdra, 1) },
                     required_item_id: Some(666),
                 }],
                 is_gmax: false,
@@ -11960,9 +11380,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 14,
                 base_weight: 350,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Houndoom, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Houndoom)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G2,
                 is_restricted_legend: false,
@@ -12027,9 +11445,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 1520,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Goldeen, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Goldeen)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Dragon)),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -12062,9 +11478,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(8) }),
             base_height: 5,
             base_weight: 335,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Porygon2, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Porygon2)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
@@ -12099,9 +11513,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 1200,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Donphan, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Donphan)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -12134,12 +11546,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(148) }),
             base_height: 6,
             base_weight: 325,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gallade, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Omanyte, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Gallade)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Omanyte)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -12172,9 +11580,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(157) }),
             base_height: 14,
             base_weight: 712,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Kleavor, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Kleavor)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G2,
@@ -12243,9 +11649,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 7,
             base_weight: 210,
             evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Hitmonchan, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Lickitung, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Smoochum, 0) },
+                SpeciesForm::base_form(NationalDex::Hitmonchan),
+                SpeciesForm::base_form(NationalDex::Lickitung),
+                SpeciesForm::base_form(NationalDex::Smoochum),
             ],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
@@ -12281,9 +11687,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 480,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hitmontop, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Hitmontop)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -12316,9 +11720,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(93) }),
             base_height: 4,
             base_weight: 60,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Electabuzz, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Electabuzz)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G2,
@@ -12352,9 +11754,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(72) }),
             base_height: 6,
             base_weight: 235,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Magmar, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Magmar)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G2,
@@ -12388,9 +11788,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(72) }),
             base_height: 7,
             base_weight: 214,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pinsir, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pinsir)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G2,
@@ -12459,9 +11857,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 468,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tangela, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Tangela)),
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -12596,9 +11992,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(8) }),
             base_height: 6,
             base_weight: 720,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tyranitar, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tyranitar)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G2,
@@ -12632,12 +12026,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 12,
             base_weight: 1520,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Lugia, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pupitar, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Lugia)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Pupitar)),
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G2,
             is_restricted_legend: false,
@@ -12661,9 +12051,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Lugia, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Lugia, 1) },
                     required_item_id: Some(669),
                 }],
                 is_gmax: false,
@@ -12677,9 +12065,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 20,
                 base_weight: 2020,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Tyranitar, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Tyranitar)),
                 egg_groups: (EggGroup::Monster, None),
                 introduced: Generation::G2,
                 is_restricted_legend: false,
@@ -12845,9 +12231,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(84) }),
             base_height: 5,
             base_weight: 50,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Sceptile, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Sceptile)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G3,
@@ -12881,12 +12265,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(84) }),
             base_height: 9,
             base_weight: 216,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Torchic, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Grovyle, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Torchic)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Grovyle)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -12910,9 +12290,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Torchic, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Torchic, 1) },
                     required_item_id: Some(753),
                 }],
                 is_gmax: false,
@@ -12926,9 +12304,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 17,
                 base_weight: 522,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Sceptile, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Sceptile)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -12992,9 +12368,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(3) }),
             base_height: 4,
             base_weight: 25,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Blaziken, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Blaziken)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G3,
@@ -13028,12 +12402,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(3) }),
             base_height: 9,
             base_weight: 195,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Mudkip, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Combusken, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Mudkip)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Combusken)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -13057,9 +12427,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Mudkip, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Mudkip, 1) },
                     required_item_id: Some(664),
                 }],
                 is_gmax: false,
@@ -13073,9 +12441,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 19,
                 base_weight: 520,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Blaziken, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Blaziken)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -13139,9 +12505,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(6) }),
             base_height: 4,
             base_weight: 76,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Swampert, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Swampert)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
             introduced: Generation::G3,
@@ -13175,12 +12539,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(6) }),
             base_height: 7,
             base_weight: 280,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Poochyena, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Marshtomp, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Poochyena)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Marshtomp)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -13204,9 +12564,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Poochyena, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Poochyena, 1) },
                     required_item_id: Some(752),
                 }],
                 is_gmax: false,
@@ -13220,9 +12578,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 819,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Swampert, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Swampert)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -13286,9 +12642,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(155) }),
             base_height: 5,
             base_weight: 136,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Zigzagoon, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Zigzagoon)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G3,
@@ -13323,9 +12677,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 370,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Mightyena, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Mightyena)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -13359,9 +12711,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(95) }),
                 base_height: 4,
                 base_weight: 175,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Wurmple, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Wurmple)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G3,
@@ -13391,9 +12741,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(95) }),
                 base_height: 4,
                 base_weight: 175,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Wurmple, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Wurmple, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G8,
@@ -13430,9 +12778,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 5,
                 base_weight: 325,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Linoone, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Linoone)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -13461,9 +12807,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(95) }),
                 base_height: 5,
                 base_weight: 325,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Perrserker, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Perrserker)],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Linoone, 1)
                 }),
@@ -13501,8 +12845,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 3,
             base_weight: 36,
             evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Beautifly, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Dustox, 0) },
+                SpeciesForm::base_form(NationalDex::Beautifly),
+                SpeciesForm::base_form(NationalDex::Dustox),
             ],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
@@ -13537,12 +12881,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 6,
             base_weight: 100,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cascoon, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Silcoon, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Cascoon)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Silcoon)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -13576,9 +12916,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 284,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Beautifly, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Beautifly)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -13611,12 +12949,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 7,
             base_weight: 115,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Lotad, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Silcoon, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Lotad)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Silcoon)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -13650,9 +12984,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 316,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dustox, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dustox)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -13685,9 +13017,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(20) }),
             base_height: 5,
             base_weight: 26,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ludicolo, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Ludicolo)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Grass)),
             introduced: Generation::G3,
@@ -13721,12 +13051,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(20) }),
             base_height: 12,
             base_weight: 325,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Seedot, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Lombre, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Seedot)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Lombre)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Grass)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -13760,9 +13086,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 550,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ludicolo, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Ludicolo)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Grass)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -13795,9 +13119,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(124) }),
             base_height: 5,
             base_weight: 40,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Shiftry, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Shiftry)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Grass)),
             introduced: Generation::G3,
@@ -13831,12 +13153,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(124) }),
             base_height: 10,
             base_weight: 280,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Taillow, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Nuzleaf, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Taillow)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Nuzleaf)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Grass)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -13870,9 +13188,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 596,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Shiftry, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Shiftry)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Grass)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -13905,9 +13221,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(113) }),
             base_height: 3,
             base_weight: 23,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Wingull, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Wingull)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G3,
@@ -13942,9 +13256,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 7,
             base_weight: 198,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Swellow, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Swellow)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -13977,9 +13289,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(44) }),
             base_height: 6,
             base_weight: 95,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ralts, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Ralts)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Flying)),
             introduced: Generation::G3,
@@ -14014,9 +13324,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 280,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pelipper, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Pelipper)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Flying)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -14049,9 +13357,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(140) }),
             base_height: 4,
             base_weight: 66,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gardevoir, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Gardevoir)],
             pre_evolution: None,
             egg_groups: (EggGroup::HumanLike, Some(EggGroup::Amorphous)),
             introduced: Generation::G3,
@@ -14086,12 +13392,10 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 202,
             evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Surskit, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Probopass, 0) },
+                SpeciesForm::base_form(NationalDex::Surskit),
+                SpeciesForm::base_form(NationalDex::Probopass),
             ],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Kirlia, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Kirlia)),
             egg_groups: (EggGroup::HumanLike, Some(EggGroup::Amorphous)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -14115,9 +13419,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Surskit, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Surskit, 1) },
                     required_item_id: Some(657),
                 }],
                 is_gmax: false,
@@ -14131,9 +13433,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 484,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Gardevoir, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gardevoir)),
                 egg_groups: (EggGroup::HumanLike, Some(EggGroup::Amorphous)),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -14197,9 +13497,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(44) }),
             base_height: 5,
             base_weight: 17,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Shroomish, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Shroomish)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Bug)),
             introduced: Generation::G3,
@@ -14234,9 +13532,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 36,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Masquerain, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Masquerain)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Bug)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -14269,9 +13565,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(95) }),
             base_height: 4,
             base_weight: 45,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Slakoth, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Slakoth)],
             pre_evolution: None,
             egg_groups: (EggGroup::Fairy, Some(EggGroup::Grass)),
             introduced: Generation::G3,
@@ -14306,9 +13600,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 392,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Breloom, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Breloom)),
             egg_groups: (EggGroup::Fairy, Some(EggGroup::Grass)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -14341,9 +13633,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 8,
             base_weight: 240,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Slaking, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Slaking)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G3,
@@ -14377,12 +13667,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 14,
             base_weight: 465,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Nincada, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vigoroth, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Nincada)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vigoroth)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -14416,9 +13702,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 20,
             base_weight: 1305,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Slaking, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Slaking)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -14452,8 +13736,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 5,
             base_weight: 55,
             evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Shedinja, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Whismur, 0) },
+                SpeciesForm::base_form(NationalDex::Shedinja),
+                SpeciesForm::base_form(NationalDex::Whismur),
             ],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
@@ -14489,9 +13773,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 120,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ninjask, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Ninjask)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -14525,9 +13807,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 12,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ninjask, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Ninjask)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -14560,9 +13840,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(155) }),
             base_height: 6,
             base_weight: 163,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Exploud, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Exploud)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Field)),
             introduced: Generation::G3,
@@ -14596,12 +13874,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(113) }),
             base_height: 10,
             base_weight: 405,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Makuhita, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Loudred, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Makuhita)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Loudred)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Field)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -14635,9 +13909,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 840,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Exploud, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Exploud)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Field)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -14670,9 +13942,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(125) }),
             base_height: 10,
             base_weight: 864,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Azurill, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Azurill)],
             pre_evolution: None,
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G3,
@@ -14707,9 +13977,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 23,
             base_weight: 2538,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hariyama, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Hariyama)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -14742,9 +14010,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(157) }),
             base_height: 2,
             base_weight: 20,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Azumarill, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Azumarill)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G3,
@@ -14778,9 +14044,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(159) }),
             base_height: 10,
             base_weight: 970,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dusknoir, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Dusknoir)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G3,
@@ -14814,9 +14078,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(147) }),
             base_height: 6,
             base_weight: 110,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Sableye, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Sableye)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Fairy)),
             introduced: Generation::G3,
@@ -14851,9 +14113,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 326,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Delcatty, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Delcatty)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Fairy)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -14877,9 +14137,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Mawile, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Mawile, 1) },
                     required_item_id: Some(754),
                 }],
                 is_gmax: false,
@@ -14948,9 +14206,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Aron, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Aron, 1) },
                     required_item_id: Some(681),
                 }],
                 is_gmax: false,
@@ -15028,9 +14284,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(134) }),
             base_height: 4,
             base_weight: 600,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Aggron, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Aggron)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G3,
@@ -15064,12 +14318,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(134) }),
             base_height: 9,
             base_weight: 1200,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Meditite, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Lairon, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Meditite)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Lairon)),
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -15093,9 +14343,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Meditite, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Meditite, 1) },
                     required_item_id: Some(667),
                 }],
                 is_gmax: false,
@@ -15109,9 +14357,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 21,
                 base_weight: 3600,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Aggron, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Aggron)),
                 egg_groups: (EggGroup::Monster, None),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -15175,9 +14421,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(140) }),
             base_height: 6,
             base_weight: 112,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Electrike, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Electrike)],
             pre_evolution: None,
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G3,
@@ -15202,9 +14446,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Electrike, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Electrike, 1) },
                     required_item_id: Some(665),
                 }],
                 is_gmax: false,
@@ -15218,9 +14460,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 13,
                 base_weight: 315,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Medicham, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Medicham)),
                 egg_groups: (EggGroup::HumanLike, None),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -15284,9 +14524,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(58) }),
             base_height: 6,
             base_weight: 152,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Plusle, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Plusle)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G3,
@@ -15311,9 +14549,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Plusle, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Plusle, 1) },
                     required_item_id: Some(682),
                 }],
                 is_gmax: false,
@@ -15327,9 +14563,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 402,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Manectric, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Manectric)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -15529,12 +14763,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(102) }),
             base_height: 3,
             base_weight: 20,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cranidos, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Roserade, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Cranidos)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Roserade)),
             egg_groups: (EggGroup::Fairy, Some(EggGroup::Grass)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -15567,9 +14797,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(82) }),
             base_height: 4,
             base_weight: 103,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Carvanha, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Carvanha)],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G3,
@@ -15604,9 +14832,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 17,
             base_weight: 800,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Swalot, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Swalot)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -15639,9 +14865,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(3) }),
             base_height: 8,
             base_weight: 208,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Wailmer, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Wailmer)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water2, None),
             introduced: Generation::G3,
@@ -15666,9 +14890,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Wailmer, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Wailmer, 1) },
                     required_item_id: Some(759),
                 }],
                 is_gmax: false,
@@ -15682,9 +14904,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 18,
                 base_weight: 888,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Sharpedo, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Sharpedo)),
                 egg_groups: (EggGroup::Water2, None),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -15748,9 +14968,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(46) }),
             base_height: 20,
             base_weight: 1300,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Numel, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Numel)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Water2)),
             introduced: Generation::G3,
@@ -15785,9 +15003,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 145,
             base_weight: 3980,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Wailord, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Wailord)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Water2)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -15820,9 +15036,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(20) }),
             base_height: 7,
             base_weight: 240,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Torkoal, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Torkoal)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G3,
@@ -15847,9 +15061,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Torkoal, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Torkoal, 1) },
                     required_item_id: Some(767),
                 }],
                 is_gmax: false,
@@ -15863,9 +15075,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 19,
                 base_weight: 2200,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Camerupt, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Camerupt)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -15963,9 +15173,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(82) }),
             base_height: 7,
             base_weight: 306,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Spinda, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Spinda)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G3,
@@ -16000,9 +15208,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 9,
             base_weight: 715,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Grumpig, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Grumpig)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -16069,9 +15275,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(125) }),
             base_height: 7,
             base_weight: 150,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Flygon, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Flygon)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, Some(EggGroup::Dragon)),
             introduced: Generation::G3,
@@ -16105,12 +15309,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 11,
             base_weight: 153,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cacnea, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vibrava, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Cacnea)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vibrava)),
             egg_groups: (EggGroup::Bug, Some(EggGroup::Dragon)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -16144,9 +15344,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 20,
             base_weight: 820,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Flygon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Flygon)),
             egg_groups: (EggGroup::Bug, Some(EggGroup::Dragon)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -16179,9 +15377,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(11) }),
             base_height: 4,
             base_weight: 513,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Swablu, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Swablu)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, Some(EggGroup::HumanLike)),
             introduced: Generation::G3,
@@ -16216,9 +15412,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 774,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cacturne, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Cacturne)),
             egg_groups: (EggGroup::Grass, Some(EggGroup::HumanLike)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -16251,9 +15445,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(13) }),
             base_height: 4,
             base_weight: 12,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Zangoose, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Zangoose)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, Some(EggGroup::Dragon)),
             introduced: Generation::G3,
@@ -16278,9 +15470,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Zangoose, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Zangoose, 1) },
                     required_item_id: Some(755),
                 }],
                 is_gmax: false,
@@ -16294,9 +15484,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 11,
                 base_weight: 206,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Altaria, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Altaria)),
                 egg_groups: (EggGroup::Flying, Some(EggGroup::Dragon)),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -16496,9 +15684,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(93) }),
             base_height: 4,
             base_weight: 19,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Corphish, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Corphish)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water2, None),
             introduced: Generation::G3,
@@ -16533,9 +15719,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 9,
             base_weight: 236,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Whiscash, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Whiscash)),
             egg_groups: (EggGroup::Water2, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -16568,9 +15752,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(91) }),
             base_height: 6,
             base_weight: 115,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Baltoy, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Baltoy)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water3)),
             introduced: Generation::G3,
@@ -16605,9 +15787,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 328,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Crawdaunt, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Crawdaunt)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water3)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -16640,9 +15820,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 5,
             base_weight: 215,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Lileep, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Lileep)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G3,
@@ -16677,9 +15855,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 1080,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Claydol, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Claydol)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -16712,9 +15888,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(114) }),
             base_height: 10,
             base_weight: 238,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Anorith, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Anorith)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G3,
@@ -16749,9 +15923,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 604,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cradily, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Cradily)),
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -16784,9 +15956,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(33) }),
             base_height: 7,
             base_weight: 125,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Feebas, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Feebas)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G3,
@@ -16821,9 +15991,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 682,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Armaldo, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Armaldo)),
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -16856,9 +16024,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(91) }),
             base_height: 6,
             base_weight: 74,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Castform, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Castform)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Dragon)),
             introduced: Generation::G3,
@@ -16893,9 +16059,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 62,
             base_weight: 1620,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Milotic, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Milotic)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Dragon)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -17088,9 +16252,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(130) }),
             base_height: 6,
             base_weight: 23,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Duskull, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Duskull)],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G3,
@@ -17115,9 +16277,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Duskull, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Duskull, 1) },
                     required_item_id: Some(668),
                 }],
                 is_gmax: false,
@@ -17131,9 +16291,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 11,
                 base_weight: 125,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Banette, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Banette)),
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -17197,9 +16355,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(119) }),
             base_height: 8,
             base_weight: 150,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tropius, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tropius)],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G3,
@@ -17233,12 +16389,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(119) }),
             base_height: 16,
             base_weight: 306,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Froslass, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dusclops, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Froslass)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dusclops)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -17296,9 +16448,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Absol, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Absol, 1) },
                     required_item_id: Some(2637),
                 }],
                 is_gmax: false,
@@ -17312,9 +16462,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 6,
                 base_weight: 10,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Stunky, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Stunky)),
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -17370,15 +16518,11 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_mega: false,
                 mega_evolution_data: &[
                     MegaEvolutionMetadata {
-                        mega_form: unsafe {
-                            SpeciesForm::unchecked_form(NationalDex::Wynaut, 1)
-                        },
+                        mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Wynaut, 1) },
                         required_item_id: Some(677),
                     },
                     MegaEvolutionMetadata {
-                        mega_form: unsafe {
-                            SpeciesForm::unchecked_form(NationalDex::Wynaut, 2)
-                        },
+                        mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Wynaut, 2) },
                         required_item_id: Some(2638),
                     },
                 ],
@@ -17487,9 +16631,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(140) }),
             base_height: 6,
             base_weight: 140,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Girafarig, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Girafarig)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G3,
@@ -17524,8 +16666,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 7,
             base_weight: 168,
             evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Spheal, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Rotom, 0) },
+                SpeciesForm::base_form(NationalDex::Spheal),
+                SpeciesForm::base_form(NationalDex::Rotom),
             ],
             pre_evolution: None,
             egg_groups: (EggGroup::Fairy, Some(EggGroup::Mineral)),
@@ -17551,9 +16693,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Spheal, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Spheal, 1) },
                     required_item_id: Some(763),
                 }],
                 is_gmax: false,
@@ -17567,9 +16707,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 2565,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Glalie, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Glalie)),
                 egg_groups: (EggGroup::Fairy, Some(EggGroup::Mineral)),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -17633,9 +16771,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(12) }),
             base_height: 8,
             base_weight: 395,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Walrein, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Walrein)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G3,
@@ -17669,12 +16805,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(12) }),
             base_height: 11,
             base_weight: 876,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Clamperl, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Sealeo, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Clamperl)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Sealeo)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -17708,9 +16840,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 1506,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Walrein, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Walrein)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -17744,8 +16874,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 4,
             base_weight: 525,
             evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Gorebyss, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Relicanth, 0) },
+                SpeciesForm::base_form(NationalDex::Gorebyss),
+                SpeciesForm::base_form(NationalDex::Relicanth),
             ],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, None),
@@ -17781,9 +16911,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 17,
             base_weight: 270,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Huntail, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Huntail)),
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -17817,9 +16945,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 226,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Huntail, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Huntail)),
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -17920,9 +17046,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(125) }),
             base_height: 6,
             base_weight: 421,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Salamence, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Salamence)],
             pre_evolution: None,
             egg_groups: (EggGroup::Dragon, None),
             introduced: Generation::G3,
@@ -17956,12 +17080,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(142) }),
             base_height: 11,
             base_weight: 1105,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Beldum, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Shelgon, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Beldum)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Shelgon)),
             egg_groups: (EggGroup::Dragon, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -17985,9 +17105,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Beldum, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Beldum, 1) },
                     required_item_id: Some(769),
                 }],
                 is_gmax: false,
@@ -18001,9 +17119,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 1026,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Salamence, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Salamence)),
                 egg_groups: (EggGroup::Dragon, None),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -18067,9 +17183,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(135) }),
             base_height: 6,
             base_weight: 952,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Metagross, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Metagross)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G3,
@@ -18103,12 +17217,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(135) }),
             base_height: 12,
             base_weight: 2025,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Regirock, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Metang, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Regirock)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Metang)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G3,
             is_restricted_legend: false,
@@ -18132,9 +17242,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Regirock, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Regirock, 1) },
                     required_item_id: Some(758),
                 }],
                 is_gmax: false,
@@ -18148,9 +17256,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 5500,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Metagross, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Metagross)),
                 egg_groups: (EggGroup::Mineral, None),
                 introduced: Generation::G3,
                 is_restricted_legend: false,
@@ -18307,9 +17413,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Latios, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Latios, 1) },
                     required_item_id: Some(684),
                 }],
                 is_gmax: false,
@@ -18378,9 +17482,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Kyogre, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Kyogre, 1) },
                     required_item_id: Some(685),
                 }],
                 is_gmax: false,
@@ -18581,9 +17683,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Jirachi, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Jirachi, 1) },
                     required_item_id: None,
                 }],
                 is_gmax: false,
@@ -18821,9 +17921,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(75) }),
             base_height: 4,
             base_weight: 102,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Torterra, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Torterra)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Grass)),
             introduced: Generation::G4,
@@ -18857,12 +17955,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(75) }),
             base_height: 11,
             base_weight: 970,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Chimchar, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Grotle, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Chimchar)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Grotle)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Grass)),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -18896,9 +17990,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 22,
             base_weight: 3100,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Torterra, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Torterra)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Grass)),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -18931,9 +18023,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(89) }),
             base_height: 5,
             base_weight: 62,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Infernape, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Infernape)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::HumanLike)),
             introduced: Generation::G4,
@@ -18967,12 +18057,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(89) }),
             base_height: 9,
             base_weight: 220,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Piplup, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Monferno, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Piplup)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Monferno)),
             egg_groups: (EggGroup::Field, Some(EggGroup::HumanLike)),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -19006,9 +18092,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 550,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Infernape, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Infernape)),
             egg_groups: (EggGroup::Field, Some(EggGroup::HumanLike)),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -19041,9 +18125,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(128) }),
             base_height: 4,
             base_weight: 52,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Empoleon, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Empoleon)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G4,
@@ -19077,12 +18159,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(128) }),
             base_height: 8,
             base_weight: 230,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Starly, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Prinplup, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Starly)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Prinplup)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -19116,9 +18194,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 17,
             base_weight: 845,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Empoleon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Empoleon)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -19151,9 +18227,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(120) }),
             base_height: 3,
             base_weight: 20,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Staraptor, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Staraptor)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G4,
@@ -19187,12 +18261,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(120) }),
             base_height: 6,
             base_weight: 155,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bidoof, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Staravia, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Bidoof)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Staravia)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -19216,9 +18286,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Bidoof, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Bidoof, 1) },
                     required_item_id: Some(2639),
                 }],
                 is_gmax: false,
@@ -19232,9 +18300,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 12,
                 base_weight: 249,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Staraptor, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Staraptor)),
                 egg_groups: (EggGroup::Flying, None),
                 introduced: Generation::G4,
                 is_restricted_legend: false,
@@ -19298,9 +18364,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(141) }),
             base_height: 5,
             base_weight: 200,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Kricketot, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Kricketot)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G4,
@@ -19335,9 +18399,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 315,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bibarel, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Bibarel)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -19370,9 +18432,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(50) }),
             base_height: 3,
             base_weight: 22,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Shinx, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Shinx)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G4,
@@ -19407,9 +18467,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 255,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Kricketune, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Kricketune)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -19442,9 +18500,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(62) }),
             base_height: 5,
             base_weight: 95,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Luxray, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Luxray)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
@@ -19478,12 +18534,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(62) }),
             base_height: 9,
             base_weight: 305,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Budew, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Luxio, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Budew)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Luxio)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -19517,9 +18569,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 420,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Luxray, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Luxray)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -19552,9 +18602,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(102) }),
             base_height: 2,
             base_weight: 12,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gulpin, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Gulpin)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G4,
@@ -19589,9 +18637,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 9,
             base_weight: 145,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gulpin, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gulpin)),
             egg_groups: (EggGroup::Fairy, Some(EggGroup::Grass)),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -19624,9 +18670,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(125) }),
             base_height: 9,
             base_weight: 315,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Shieldon, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Shieldon)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G4,
@@ -19661,9 +18705,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 16,
             base_weight: 1025,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Rampardos, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Rampardos)),
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -19696,9 +18738,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(43) }),
             base_height: 5,
             base_weight: 570,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Burmy, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Burmy)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G4,
@@ -19733,9 +18773,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 1495,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bastiodon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Bastiodon)),
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -19770,8 +18808,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 2,
                 base_weight: 34,
                 evolutions: &[
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Mothim, 0) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Combee, 0) },
+                    SpeciesForm::base_form(NationalDex::Mothim),
+                    SpeciesForm::base_form(NationalDex::Combee),
                 ],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
@@ -19804,7 +18842,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_weight: 34,
                 evolutions: &[
                     unsafe { SpeciesForm::unchecked_form(NationalDex::Mothim, 1) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Combee, 0) },
+                    SpeciesForm::base_form(NationalDex::Combee),
                 ],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
@@ -19837,7 +18875,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_weight: 34,
                 evolutions: &[
                     unsafe { SpeciesForm::unchecked_form(NationalDex::Mothim, 2) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Combee, 0) },
+                    SpeciesForm::base_form(NationalDex::Combee),
                 ],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
@@ -19875,9 +18913,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 5,
                 base_weight: 65,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Wormadam, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Wormadam)),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G4,
                 is_restricted_legend: false,
@@ -19976,9 +19012,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 9,
             base_weight: 233,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Wormadam, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Wormadam)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -20011,9 +19045,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(55) }),
             base_height: 3,
             base_weight: 55,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pachirisu, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pachirisu)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G4,
@@ -20048,9 +19080,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 385,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vespiquen, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vespiquen)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -20117,9 +19147,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(41) }),
             base_height: 7,
             base_weight: 295,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cherubi, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Cherubi)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G4,
@@ -20154,9 +19182,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 335,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Floatzel, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Floatzel)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -20189,9 +19215,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 4,
             base_weight: 33,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Shellos, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Shellos)],
             pre_evolution: None,
             egg_groups: (EggGroup::Fairy, Some(EggGroup::Grass)),
             introduced: Generation::G4,
@@ -20227,9 +19251,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 5,
                 base_weight: 93,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Cherrim, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Cherrim)),
                 egg_groups: (EggGroup::Fairy, Some(EggGroup::Grass)),
                 introduced: Generation::G4,
                 is_restricted_legend: false,
@@ -20294,9 +19316,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(159) }),
                 base_height: 3,
                 base_weight: 63,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Ambipom, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Ambipom)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Water1, Some(EggGroup::Amorphous)),
                 introduced: Generation::G4,
@@ -20326,10 +19346,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(159) }),
                 base_height: 3,
                 base_weight: 63,
-                evolutions: &[
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Ambipom, 0) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Ambipom, 1) },
-                ],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Ambipom), unsafe {
+                    SpeciesForm::unchecked_form(NationalDex::Ambipom, 1)
+                }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Water1, Some(EggGroup::Amorphous)),
                 introduced: Generation::G4,
@@ -20366,9 +19385,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 9,
                 base_weight: 299,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Gastrodon, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gastrodon)),
                 egg_groups: (EggGroup::Water1, Some(EggGroup::Amorphous)),
                 introduced: Generation::G4,
                 is_restricted_legend: false,
@@ -20435,9 +19452,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 203,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Sunkern, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Sunkern)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -20470,9 +19485,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(138) }),
             base_height: 4,
             base_weight: 12,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Buneary, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Buneary)],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G4,
@@ -20507,9 +19520,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 150,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Drifblim, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Drifblim)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -20542,9 +19553,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(7) }),
             base_height: 4,
             base_weight: 55,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Mismagius, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Mismagius)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::HumanLike)),
             introduced: Generation::G4,
@@ -20569,9 +19578,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Mismagius, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Mismagius, 1) },
                     required_item_id: Some(768),
                 }],
                 is_gmax: false,
@@ -20585,9 +19592,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 12,
                 base_weight: 333,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Lopunny, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Lopunny)),
                 egg_groups: (EggGroup::Field, Some(EggGroup::HumanLike)),
                 introduced: Generation::G4,
                 is_restricted_legend: false,
@@ -20652,9 +19657,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 9,
             base_weight: 44,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Unown, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Unown)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -20688,9 +19691,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 9,
             base_weight: 273,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Slowking, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Slowking)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -20723,9 +19724,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(51) }),
             base_height: 5,
             base_weight: 39,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Chingling, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Chingling)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
@@ -20760,9 +19759,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 438,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Purugly, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Purugly)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -20795,9 +19792,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 2,
             base_weight: 6,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Absol, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Absol)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G4,
@@ -20831,9 +19826,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(51) }),
             base_height: 4,
             base_weight: 192,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bronzor, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Bronzor)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
@@ -20868,9 +19861,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 380,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Skuntank, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Skuntank)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -20903,9 +19894,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(134) }),
             base_height: 5,
             base_weight: 605,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bonsly, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Bonsly)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G4,
@@ -20940,9 +19929,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 1870,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bronzong, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Bronzong)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -20975,9 +19962,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(155) }),
             base_height: 5,
             base_weight: 150,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Politoed, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Politoed)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G4,
@@ -21011,10 +19996,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(101) }),
             base_height: 6,
             base_weight: 130,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Scyther, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Scyther, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Scyther), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Scyther, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G4,
@@ -21048,9 +20032,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
             base_height: 6,
             base_weight: 244,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tangela, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tangela)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G4,
@@ -21152,9 +20134,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(24) }),
             base_height: 7,
             base_weight: 205,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Garchomp, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Garchomp)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G4,
@@ -21188,12 +20168,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(24) }),
             base_height: 14,
             base_weight: 560,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Munchlax, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gabite, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Munchlax)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gabite)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -21218,15 +20194,11 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_mega: false,
                 mega_evolution_data: &[
                     MegaEvolutionMetadata {
-                        mega_form: unsafe {
-                            SpeciesForm::unchecked_form(NationalDex::Munchlax, 1)
-                        },
+                        mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Munchlax, 1) },
                         required_item_id: Some(683),
                     },
                     MegaEvolutionMetadata {
-                        mega_form: unsafe {
-                            SpeciesForm::unchecked_form(NationalDex::Munchlax, 2)
-                        },
+                        mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Munchlax, 2) },
                         required_item_id: Some(2640),
                     },
                 ],
@@ -21241,9 +20213,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 19,
                 base_weight: 950,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Garchomp, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Garchomp)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
                 introduced: Generation::G4,
                 is_restricted_legend: false,
@@ -21337,9 +20307,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(82) }),
             base_height: 6,
             base_weight: 1050,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Articuno, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Articuno)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G4,
@@ -21373,9 +20341,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(158) }),
             base_height: 7,
             base_weight: 202,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hippopotas, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Hippopotas)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G4,
@@ -21424,9 +20390,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 12,
                 base_weight: 540,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Lucario, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Lucario)),
                 egg_groups: (EggGroup::Field, Some(EggGroup::HumanLike)),
                 introduced: Generation::G4,
                 is_restricted_legend: false,
@@ -21520,9 +20484,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(159) }),
             base_height: 8,
             base_weight: 495,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Skorupi, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Skorupi)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
@@ -21557,9 +20519,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 20,
             base_weight: 3000,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hippowdon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Hippowdon)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -21592,9 +20552,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(51) }),
             base_height: 8,
             base_weight: 120,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Croagunk, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Croagunk)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, Some(EggGroup::Water3)),
             introduced: Generation::G4,
@@ -21629,9 +20587,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 615,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Drapion, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Drapion)),
             egg_groups: (EggGroup::Bug, Some(EggGroup::Water3)),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -21664,9 +20620,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(143) }),
             base_height: 7,
             base_weight: 230,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Carnivine, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Carnivine)],
             pre_evolution: None,
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G4,
@@ -21701,9 +20655,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 444,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Toxicroak, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Toxicroak)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -21770,9 +20722,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(41) }),
             base_height: 4,
             base_weight: 70,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Mantyke, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Mantyke)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water2, None),
             introduced: Generation::G4,
@@ -21807,9 +20757,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 240,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Lumineon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Lumineon)),
             egg_groups: (EggGroup::Water2, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -21842,9 +20790,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(41) }),
             base_height: 10,
             base_weight: 650,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Skarmory, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Skarmory)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G4,
@@ -21878,9 +20824,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(43) }),
             base_height: 10,
             base_weight: 505,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Weavile, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Weavile)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Grass)),
             introduced: Generation::G4,
@@ -21905,9 +20849,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Weavile, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Weavile, 1) },
                     required_item_id: Some(674),
                 }],
                 is_gmax: false,
@@ -21921,9 +20863,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 22,
                 base_weight: 1355,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Abomasnow, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Abomasnow)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Grass)),
                 introduced: Generation::G4,
                 is_restricted_legend: false,
@@ -21988,9 +20928,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 340,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Teddiursa, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Teddiursa)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22024,9 +20962,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 1800,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Farfetchd, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Farfetchd)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22060,9 +20996,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 17,
             base_weight: 1400,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Koffing, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Koffing)),
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22096,9 +21030,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 24,
             base_weight: 2828,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Chansey, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Chansey)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Field)),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22132,9 +21064,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 20,
             base_weight: 1286,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Kangaskhan, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Kangaskhan)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22168,9 +21098,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 1386,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Magmar, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Magmar)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22204,9 +21132,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 16,
             base_weight: 680,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pinsir, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Pinsir)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22240,9 +21166,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 380,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Natu, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Natu)),
             egg_groups: (EggGroup::Flying, Some(EggGroup::Fairy)),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22276,9 +21200,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 19,
             base_weight: 515,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Wooper, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Wooper)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22312,9 +21234,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 255,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vaporeon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vaporeon)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22348,9 +21268,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 259,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vaporeon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vaporeon)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22384,9 +21302,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 20,
             base_weight: 425,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Steelix, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Steelix)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22420,9 +21336,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 25,
             base_weight: 2910,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Corsola, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Corsola)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22456,9 +21370,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 9,
             base_weight: 340,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Stantler, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Stantler)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22482,9 +21394,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Probopass, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Probopass, 1) },
                     required_item_id: Some(756),
                 }],
                 is_gmax: false,
@@ -22498,9 +21408,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 520,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Gardevoir, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gardevoir)),
                 egg_groups: (EggGroup::HumanLike, Some(EggGroup::Amorphous)),
                 introduced: Generation::G4,
                 is_restricted_legend: false,
@@ -22565,9 +21473,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 3400,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Skitty, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Skitty)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22601,9 +21507,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 22,
             base_weight: 1066,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tropius, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Tropius)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G4,
             is_restricted_legend: false,
@@ -22627,9 +21531,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Rotom, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Rotom, 1) },
                     required_item_id: Some(2566),
                 }],
                 is_gmax: false,
@@ -22643,9 +21545,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 13,
                 base_weight: 266,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Glalie, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Glalie)),
                 egg_groups: (EggGroup::Fairy, Some(EggGroup::Mineral)),
                 introduced: Generation::G4,
                 is_restricted_legend: false,
@@ -23120,9 +22020,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Regigigas, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Regigigas, 1) },
                     required_item_id: Some(2567),
                 }],
                 is_gmax: false,
@@ -23393,9 +22291,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Shaymin, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Shaymin, 1) },
                     required_item_id: Some(2568),
                 }],
                 is_gmax: false,
@@ -24149,9 +23045,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(126) }),
             base_height: 6,
             base_weight: 81,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Serperior, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Serperior)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Grass)),
             introduced: Generation::G5,
@@ -24185,12 +23079,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(126) }),
             base_height: 8,
             base_weight: 160,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tepig, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Servine, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tepig)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Servine)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Grass)),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -24224,9 +23114,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 33,
             base_weight: 630,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Serperior, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Serperior)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Grass)),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -24259,9 +23147,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(47) }),
             base_height: 5,
             base_weight: 99,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Emboar, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Emboar)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -24295,12 +23181,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(47) }),
             base_height: 10,
             base_weight: 555,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Oshawott, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pignite, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Oshawott)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Pignite)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -24324,9 +23206,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Oshawott, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Oshawott, 1) },
                     required_item_id: Some(2569),
                 }],
                 is_gmax: false,
@@ -24340,9 +23220,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 1500,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Emboar, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Emboar)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G5,
                 is_restricted_legend: false,
@@ -24406,9 +23284,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(75) }),
             base_height: 5,
             base_weight: 59,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Samurott, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Samurott)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -24442,13 +23318,10 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(75) }),
             base_height: 8,
             base_weight: 245,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Patrat, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Patrat, 1) },
-            ],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dewott, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Patrat), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Patrat, 1)
+            }],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dewott)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -24483,9 +23356,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 946,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Samurott, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Samurott)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G5,
                 is_restricted_legend: false,
@@ -24515,9 +23386,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 582,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Samurott, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Samurott)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -24551,9 +23420,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(148) }),
             base_height: 5,
             base_weight: 116,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Lillipup, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Lillipup)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -24588,9 +23455,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 270,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Watchog, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Watchog)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -24623,9 +23488,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(50) }),
             base_height: 4,
             base_weight: 41,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Stoutland, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Stoutland)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -24659,12 +23522,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(113) }),
             base_height: 9,
             base_weight: 147,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Purrloin, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Herdier, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Purrloin)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Herdier)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -24698,9 +23557,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 610,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Stoutland, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Stoutland)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -24733,9 +23590,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(158) }),
             base_height: 4,
             base_weight: 101,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pansage, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pansage)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -24770,9 +23625,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 375,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Liepard, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Liepard)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -24805,9 +23658,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(65) }),
             base_height: 6,
             base_weight: 105,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pansear, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pansear)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -24842,9 +23693,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 305,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Simisage, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Simisage)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -24877,9 +23726,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(66) }),
             base_height: 6,
             base_weight: 110,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Panpour, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Panpour)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -24914,9 +23761,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 280,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Simisear, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Simisear)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -24949,9 +23794,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(67) }),
             base_height: 6,
             base_weight: 135,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Munna, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Munna)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -24986,9 +23829,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 290,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Simipour, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Simipour)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -25021,9 +23862,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(140) }),
             base_height: 6,
             base_weight: 233,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pidove, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pidove)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -25058,9 +23897,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 605,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Musharna, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Musharna)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -25093,9 +23930,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(79) }),
             base_height: 3,
             base_weight: 21,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Unfezant, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Unfezant)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G5,
@@ -25129,12 +23964,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(79) }),
             base_height: 6,
             base_weight: 150,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Blitzle, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tranquill, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Blitzle)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Tranquill)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -25168,9 +23999,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 290,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Unfezant, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Unfezant)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -25203,9 +24032,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(157) }),
             base_height: 8,
             base_weight: 298,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Roggenrola, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Roggenrola)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -25240,9 +24067,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 16,
             base_weight: 795,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Zebstrika, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Zebstrika)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -25275,9 +24100,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(159) }),
             base_height: 4,
             base_weight: 180,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gigalith, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Gigalith)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G5,
@@ -25311,12 +24134,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(159) }),
             base_height: 9,
             base_weight: 1020,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Woobat, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Boldore, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Woobat)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Boldore)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -25350,9 +24169,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 17,
             base_weight: 2600,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gigalith, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gigalith)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -25385,9 +24202,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(86) }),
             base_height: 4,
             base_weight: 21,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Drilbur, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Drilbur)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, Some(EggGroup::Field)),
             introduced: Generation::G5,
@@ -25422,9 +24237,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 9,
             base_weight: 105,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Swoobat, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Swoobat)),
             egg_groups: (EggGroup::Flying, Some(EggGroup::Field)),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -25457,9 +24270,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(104) }),
             base_height: 3,
             base_weight: 85,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Audino, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Audino)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -25484,9 +24295,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Audino, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Audino, 1) },
                     required_item_id: Some(2570),
                 }],
                 is_gmax: false,
@@ -25500,9 +24309,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 7,
                 base_weight: 404,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Excadrill, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Excadrill)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G5,
                 is_restricted_legend: false,
@@ -25557,9 +24364,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Timburr, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Timburr, 1) },
                     required_item_id: Some(757),
                 }],
                 is_gmax: false,
@@ -25637,9 +24442,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(89) }),
             base_height: 6,
             base_weight: 125,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Conkeldurr, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Conkeldurr)],
             pre_evolution: None,
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G5,
@@ -25673,12 +24476,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(89) }),
             base_height: 12,
             base_weight: 400,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tympole, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gurdurr, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tympole)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gurdurr)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -25712,9 +24511,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 870,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Conkeldurr, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Conkeldurr)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -25747,9 +24544,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(11) }),
             base_height: 5,
             base_weight: 45,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Seismitoad, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Seismitoad)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G5,
@@ -25783,12 +24578,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(11) }),
             base_height: 8,
             base_weight: 170,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Throh, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Palpitoad, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Throh)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Palpitoad)),
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -25822,9 +24613,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 620,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Seismitoad, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Seismitoad)),
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -25925,9 +24714,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(142) }),
             base_height: 3,
             base_weight: 25,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Leavanny, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Leavanny)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G5,
@@ -25961,12 +24748,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(142) }),
             base_height: 5,
             base_weight: 73,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Venipede, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Swadloon, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Venipede)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Swadloon)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -26000,9 +24783,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 205,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Leavanny, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Leavanny)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -26035,9 +24816,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(3) }),
             base_height: 4,
             base_weight: 53,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Scolipede, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Scolipede)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G5,
@@ -26071,12 +24850,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(3) }),
             base_height: 12,
             base_weight: 585,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cottonee, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Whirlipede, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Cottonee)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Whirlipede)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -26100,9 +24875,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Cottonee, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Cottonee, 1) },
                     required_item_id: Some(2571),
                 }],
                 is_gmax: false,
@@ -26116,9 +24889,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 25,
                 base_weight: 2005,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Scolipede, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Scolipede)),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G5,
                 is_restricted_legend: false,
@@ -26182,9 +24953,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(34) }),
             base_height: 3,
             base_weight: 6,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Petilil, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Petilil)],
             pre_evolution: None,
             egg_groups: (EggGroup::Fairy, Some(EggGroup::Grass)),
             introduced: Generation::G5,
@@ -26219,9 +24988,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 7,
             base_weight: 66,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Whimsicott, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Whimsicott)),
             egg_groups: (EggGroup::Fairy, Some(EggGroup::Grass)),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -26254,10 +25021,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(102) }),
             base_height: 5,
             base_weight: 66,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Basculin, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Basculin, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Basculin), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Basculin, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G5,
@@ -26293,9 +25059,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 11,
                 base_weight: 163,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Lilligant, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Lilligant)),
                 egg_groups: (EggGroup::Grass, None),
                 introduced: Generation::G5,
                 is_restricted_legend: false,
@@ -26325,9 +25089,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 12,
                 base_weight: 192,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Lilligant, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Lilligant)),
                 egg_groups: (EggGroup::Grass, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -26422,10 +25184,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(104) }),
                 base_height: 10,
                 base_weight: 180,
-                evolutions: &[
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Sneasler, 0) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Sneasler, 1) },
-                ],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Sneasler), unsafe {
+                    SpeciesForm::unchecked_form(NationalDex::Sneasler, 1)
+                }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Water2, None),
                 introduced: Generation::G8,
@@ -26460,9 +25221,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(83) }),
             base_height: 7,
             base_weight: 152,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Krookodile, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Krookodile)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -26496,12 +25255,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(83) }),
             base_height: 10,
             base_weight: 334,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Darumaka, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Krokorok, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Darumaka)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Krokorok)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -26535,9 +25290,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 963,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Krookodile, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Krookodile)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -26571,9 +25324,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(39) }),
                 base_height: 6,
                 base_weight: 375,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Maractus, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Maractus)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G5,
@@ -26603,9 +25354,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(39) }),
                 base_height: 7,
                 base_weight: 400,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Maractus, 2)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Maractus, 2) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G8,
@@ -26642,9 +25391,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 13,
                 base_weight: 929,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Darmanitan, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Darmanitan)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G5,
                 is_restricted_legend: false,
@@ -26804,9 +25551,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(133) }),
             base_height: 3,
             base_weight: 145,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Scraggy, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Scraggy)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, Some(EggGroup::Mineral)),
             introduced: Generation::G5,
@@ -26841,9 +25586,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 2000,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Crustle, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Crustle)),
             egg_groups: (EggGroup::Bug, Some(EggGroup::Mineral)),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -26876,9 +25619,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(22) }),
             base_height: 6,
             base_weight: 118,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Sigilyph, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Sigilyph)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Dragon)),
             introduced: Generation::G5,
@@ -26903,9 +25644,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Sigilyph, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Sigilyph, 1) },
                     required_item_id: Some(2572),
                 }],
                 is_gmax: false,
@@ -26919,9 +25658,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 11,
                 base_weight: 300,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Scrafty, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Scrafty)),
                 egg_groups: (EggGroup::Field, Some(EggGroup::Dragon)),
                 introduced: Generation::G5,
                 is_restricted_legend: false,
@@ -27020,9 +25757,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: None,
                 base_height: 5,
                 base_weight: 15,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Tirtouga, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Tirtouga)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Mineral, Some(EggGroup::Amorphous)),
                 introduced: Generation::G5,
@@ -27052,9 +25787,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: None,
                 base_height: 5,
                 base_weight: 15,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Milcery, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Milcery)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Mineral, Some(EggGroup::Amorphous)),
                 introduced: Generation::G8,
@@ -27090,9 +25823,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 17,
             base_weight: 765,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cofagrigus, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Cofagrigus)),
             egg_groups: (EggGroup::Mineral, Some(EggGroup::Amorphous)),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -27125,9 +25856,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(33) }),
             base_height: 7,
             base_weight: 165,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Archen, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Archen)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water3)),
             introduced: Generation::G5,
@@ -27162,9 +25891,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 810,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Carracosta, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Carracosta)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water3)),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -27197,9 +25924,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 5,
             base_weight: 95,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Trubbish, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Trubbish)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, Some(EggGroup::Water3)),
             introduced: Generation::G5,
@@ -27234,9 +25959,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 320,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Archeops, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Archeops)),
             egg_groups: (EggGroup::Flying, Some(EggGroup::Water3)),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -27269,9 +25992,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(106) }),
             base_height: 6,
             base_weight: 310,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Zorua, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Zorua)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G5,
@@ -27306,9 +26027,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 19,
             base_weight: 1073,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Garbodor, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Garbodor)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -27342,9 +26061,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: None,
                 base_height: 7,
                 base_weight: 125,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Minccino, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Minccino)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G5,
@@ -27374,9 +26091,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: None,
                 base_height: 7,
                 base_weight: 125,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Minccino, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Minccino, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G8,
@@ -27413,9 +26128,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 811,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Zoroark, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Zoroark)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G5,
                 is_restricted_legend: false,
@@ -27481,9 +26194,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(92) }),
             base_height: 4,
             base_weight: 58,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gothita, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Gothita)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -27518,9 +26229,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 5,
             base_weight: 75,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cinccino, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Cinccino)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -27553,9 +26262,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(23) }),
             base_height: 4,
             base_weight: 58,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gothitelle, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Gothitelle)],
             pre_evolution: None,
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G5,
@@ -27589,12 +26296,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(23) }),
             base_height: 7,
             base_weight: 180,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Solosis, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gothorita, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Solosis)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gothorita)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -27628,9 +26331,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 440,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gothitelle, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gothitelle)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -27663,9 +26364,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(144) }),
             base_height: 3,
             base_weight: 10,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Reuniclus, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Reuniclus)],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G5,
@@ -27699,12 +26398,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(144) }),
             base_height: 6,
             base_weight: 80,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ducklett, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Duosion, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Ducklett)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Duosion)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -27738,9 +26433,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 201,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Reuniclus, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Reuniclus)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -27773,9 +26466,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(93) }),
             base_height: 5,
             base_weight: 55,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vanillite, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Vanillite)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Flying)),
             introduced: Generation::G5,
@@ -27810,9 +26501,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 242,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Swanna, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Swanna)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Flying)),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -27845,9 +26534,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(133) }),
             base_height: 4,
             base_weight: 57,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vanilluxe, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Vanilluxe)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G5,
@@ -27881,12 +26568,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(133) }),
             base_height: 11,
             base_weight: 410,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Deerling, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vanillish, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Deerling)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vanillish)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -27920,9 +26603,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 575,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vanilluxe, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vanilluxe)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -27956,9 +26637,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(32) }),
                 base_height: 6,
                 base_weight: 195,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Emolga, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Emolga)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G5,
@@ -27988,9 +26667,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(32) }),
                 base_height: 6,
                 base_weight: 195,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Emolga, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Emolga, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G5,
@@ -28020,9 +26697,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(32) }),
                 base_height: 6,
                 base_weight: 195,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Emolga, 2)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Emolga, 2) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G5,
@@ -28052,9 +26727,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(32) }),
                 base_height: 6,
                 base_weight: 195,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Emolga, 3)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Emolga, 3) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G5,
@@ -28091,9 +26764,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 19,
                 base_weight: 925,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Sawsbuck, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Sawsbuck)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G5,
                 is_restricted_legend: false,
@@ -28257,9 +26928,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(99) }),
             base_height: 5,
             base_weight: 59,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Foongus, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Foongus)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G5,
@@ -28294,9 +26963,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 330,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Escavalier, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Escavalier)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -28329,9 +26996,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(144) }),
             base_height: 2,
             base_weight: 10,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Frillish, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Frillish)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G5,
@@ -28366,9 +27031,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 6,
             base_weight: 105,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Amoonguss, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Amoonguss)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -28401,9 +27064,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(6) }),
             base_height: 12,
             base_weight: 330,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Alomomola, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Alomomola)],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G5,
@@ -28438,9 +27099,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 22,
             base_weight: 1350,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Jellicent, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Jellicent)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -28507,9 +27166,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(68) }),
             base_height: 1,
             base_weight: 6,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ferroseed, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Ferroseed)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G5,
@@ -28544,9 +27201,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 143,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Galvantula, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Galvantula)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -28579,9 +27234,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 6,
             base_weight: 188,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Klink, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Klink)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, Some(EggGroup::Mineral)),
             introduced: Generation::G5,
@@ -28616,9 +27269,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 1100,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Ferrothorn, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Ferrothorn)),
             egg_groups: (EggGroup::Grass, Some(EggGroup::Mineral)),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -28651,9 +27302,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(29) }),
             base_height: 3,
             base_weight: 210,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Klinklang, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Klinklang)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G5,
@@ -28687,12 +27336,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(29) }),
             base_height: 6,
             base_weight: 510,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tynamo, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Klang, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tynamo)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Klang)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -28726,9 +27371,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 6,
             base_weight: 810,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Klinklang, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Klinklang)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -28761,9 +27404,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 2,
             base_weight: 3,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Eelektross, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Eelektross)],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G5,
@@ -28797,12 +27438,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 12,
             base_weight: 220,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Elgyem, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Eelektrik, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Elgyem)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Eelektrik)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -28826,9 +27463,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Elgyem, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Elgyem, 1) },
                     required_item_id: Some(2573),
                 }],
                 is_gmax: false,
@@ -28842,9 +27477,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 21,
                 base_weight: 805,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Eelektross, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Eelektross)),
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G5,
                 is_restricted_legend: false,
@@ -28908,9 +27541,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(148) }),
             base_height: 5,
             base_weight: 90,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Litwick, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Litwick)],
             pre_evolution: None,
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G5,
@@ -28945,9 +27576,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 345,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Beheeyem, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Beheeyem)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -28980,9 +27609,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(151) }),
             base_height: 3,
             base_weight: 31,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Chandelure, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Chandelure)],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G5,
@@ -29016,12 +27643,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(151) }),
             base_height: 6,
             base_weight: 130,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Axew, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Lampent, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Axew)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Lampent)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -29045,9 +27668,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Axew, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Axew, 1) },
                     required_item_id: Some(2574),
                 }],
                 is_gmax: false,
@@ -29061,9 +27682,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 10,
                 base_weight: 343,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Chandelure, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Chandelure)),
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G5,
                 is_restricted_legend: false,
@@ -29127,9 +27746,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(127) }),
             base_height: 6,
             base_weight: 180,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Haxorus, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Haxorus)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G5,
@@ -29163,12 +27780,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(127) }),
             base_height: 10,
             base_weight: 360,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cubchoo, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Fraxure, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Cubchoo)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Fraxure)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -29202,9 +27815,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 1055,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Haxorus, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Haxorus)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -29237,9 +27848,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(155) }),
             base_height: 5,
             base_weight: 85,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cryogonal, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Cryogonal)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
@@ -29274,9 +27883,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 26,
             base_weight: 2600,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Beartic, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Beartic)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -29343,9 +27950,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(142) }),
             base_height: 4,
             base_weight: 77,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Stunfisk, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Stunfisk)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G5,
@@ -29380,9 +27985,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 253,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Accelgor, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Accelgor)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -29481,9 +28084,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(120) }),
             base_height: 9,
             base_weight: 200,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Druddigon, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Druddigon)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::HumanLike)),
             introduced: Generation::G5,
@@ -29518,9 +28119,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 355,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Mienshao, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Mienshao)),
             egg_groups: (EggGroup::Field, Some(EggGroup::HumanLike)),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -29587,9 +28186,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(99) }),
             base_height: 10,
             base_weight: 920,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pawniard, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pawniard)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G5,
@@ -29614,9 +28211,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Pawniard, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Pawniard, 1) },
                     required_item_id: Some(2642),
                 }],
                 is_gmax: false,
@@ -29630,9 +28225,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 28,
                 base_weight: 3300,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Golurk, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Golurk)),
                 egg_groups: (EggGroup::Mineral, None),
                 introduced: Generation::G5,
                 is_restricted_legend: false,
@@ -29696,9 +28289,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(46) }),
             base_height: 5,
             base_weight: 102,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bouffalant, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Bouffalant)],
             pre_evolution: None,
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G5,
@@ -29732,12 +28323,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(46) }),
             base_height: 16,
             base_weight: 700,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::GreatTusk, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bisharp, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::GreatTusk)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Bisharp)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -29804,10 +28391,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(55) }),
             base_height: 5,
             base_weight: 105,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Vullaby, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Vullaby, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Vullaby), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Vullaby, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G5,
@@ -29843,9 +28429,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 410,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Braviary, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Braviary)),
                 egg_groups: (EggGroup::Flying, None),
                 introduced: Generation::G5,
                 is_restricted_legend: false,
@@ -29875,9 +28459,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 17,
                 base_weight: 434,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Braviary, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Braviary)),
                 egg_groups: (EggGroup::Flying, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -29911,9 +28493,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(133) }),
             base_height: 5,
             base_weight: 90,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Heatmor, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Heatmor)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G5,
@@ -29948,9 +28528,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 395,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Mandibuzz, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Mandibuzz)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -30051,9 +28629,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 8,
             base_weight: 173,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hydreigon, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Hydreigon)],
             pre_evolution: None,
             egg_groups: (EggGroup::Dragon, None),
             introduced: Generation::G5,
@@ -30087,12 +28663,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 14,
             base_weight: 500,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Larvesta, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Zweilous, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Larvesta)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Zweilous)),
             egg_groups: (EggGroup::Dragon, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -30126,9 +28698,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 1600,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hydreigon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Hydreigon)),
             egg_groups: (EggGroup::Dragon, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -30161,9 +28731,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(68) }),
             base_height: 11,
             base_weight: 288,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cobalion, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Cobalion)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G5,
@@ -30198,9 +28766,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 16,
             base_weight: 460,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Volcarona, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Volcarona)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G5,
             is_restricted_legend: false,
@@ -30985,9 +29551,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(171) }),
             base_height: 4,
             base_weight: 90,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Chesnaught, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Chesnaught)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G6,
@@ -31021,12 +29585,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(171) }),
             base_height: 7,
             base_weight: 290,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Fennekin, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Quilladin, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Fennekin)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Quilladin)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -31050,9 +29610,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Fennekin, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Fennekin, 1) },
                     required_item_id: Some(2575),
                 }],
                 is_gmax: false,
@@ -31066,9 +29624,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 900,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Chesnaught, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Chesnaught)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -31132,9 +29688,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(170) }),
             base_height: 4,
             base_weight: 94,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Delphox, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Delphox)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G6,
@@ -31168,12 +29722,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(170) }),
             base_height: 10,
             base_weight: 145,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Froakie, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Braixen, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Froakie)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Braixen)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -31197,9 +29747,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Froakie, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Froakie, 1) },
                     required_item_id: Some(2576),
                 }],
                 is_gmax: false,
@@ -31213,9 +29761,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 390,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Delphox, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Delphox)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -31279,9 +29825,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(168) }),
             base_height: 3,
             base_weight: 70,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Greninja, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Greninja)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G6,
@@ -31315,12 +29859,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(168) }),
             base_height: 6,
             base_weight: 109,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bunnelby, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Frogadier, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Bunnelby)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Frogadier)),
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -31344,9 +29884,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Bunnelby, 3)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Bunnelby, 3) },
                     required_item_id: Some(2577),
                 }],
                 is_gmax: false,
@@ -31360,9 +29898,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 400,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Greninja, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Greninja)),
                 egg_groups: (EggGroup::Water1, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -31486,9 +30022,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(37) }),
             base_height: 4,
             base_weight: 50,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Fletchling, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Fletchling)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G6,
@@ -31523,9 +30057,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 424,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Diggersby, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Diggersby)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -31558,9 +30090,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(177) }),
             base_height: 3,
             base_weight: 17,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Talonflame, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Talonflame)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G6,
@@ -31594,12 +30124,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(177) }),
             base_height: 7,
             base_weight: 160,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Scatterbug, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Fletchinder, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Scatterbug)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Fletchinder)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -31633,9 +30159,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 245,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Talonflame, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Talonflame)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -31669,9 +30193,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Vivillon)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -31701,9 +30223,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -31733,9 +30253,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 2)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 2) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -31765,9 +30283,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 3)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 3) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -31797,9 +30313,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 4)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 4) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -31829,9 +30343,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 5)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 5) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -31861,9 +30373,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 6)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 6) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -31893,9 +30403,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 7)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 7) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -31925,9 +30433,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 8)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 8) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -31957,9 +30463,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 9)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 9) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -31989,9 +30493,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 10)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 10) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -32021,9 +30523,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 11)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 11) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -32053,9 +30553,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 12)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 12) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -32085,9 +30583,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 13)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 13) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -32117,9 +30613,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 14)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 14) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -32149,9 +30643,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 15)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 15) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -32181,9 +30673,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 16)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 16) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -32213,9 +30703,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 17)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 17) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -32245,9 +30733,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 18)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 18) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -32277,9 +30763,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 25,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 19)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Vivillon, 19) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
@@ -32315,12 +30799,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 0)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Spewpa, 0)
-                }),
+                evolutions: &[SpeciesForm::base_form(NationalDex::Litleo)],
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Spewpa)),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -32349,12 +30829,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 1)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Spewpa, 1)
-                }),
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 1) }],
+                pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Spewpa, 1) }),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -32383,12 +30859,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 2)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Spewpa, 2)
-                }),
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 2) }],
+                pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Spewpa, 2) }),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -32417,12 +30889,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 3)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Spewpa, 3)
-                }),
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 3) }],
+                pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Spewpa, 3) }),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -32451,12 +30919,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 4)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Spewpa, 4)
-                }),
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 4) }],
+                pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Spewpa, 4) }),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -32485,12 +30949,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 5)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Spewpa, 5)
-                }),
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 5) }],
+                pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Spewpa, 5) }),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -32519,12 +30979,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 6)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Spewpa, 6)
-                }),
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 6) }],
+                pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Spewpa, 6) }),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -32553,12 +31009,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 7)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Spewpa, 7)
-                }),
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 7) }],
+                pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Spewpa, 7) }),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -32587,12 +31039,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 8)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Spewpa, 8)
-                }),
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 8) }],
+                pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Spewpa, 8) }),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -32621,12 +31069,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 9)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Spewpa, 9)
-                }),
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 9) }],
+                pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Spewpa, 9) }),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -32655,9 +31099,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 10)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 10) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Spewpa, 10)
                 }),
@@ -32689,9 +31131,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 11)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 11) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Spewpa, 11)
                 }),
@@ -32723,9 +31163,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 12)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 12) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Spewpa, 12)
                 }),
@@ -32757,9 +31195,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 13)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 13) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Spewpa, 13)
                 }),
@@ -32791,9 +31227,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 14)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 14) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Spewpa, 14)
                 }),
@@ -32825,9 +31259,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 15)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 15) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Spewpa, 15)
                 }),
@@ -32859,9 +31291,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 16)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 16) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Spewpa, 16)
                 }),
@@ -32893,9 +31323,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 17)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 17) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Spewpa, 17)
                 }),
@@ -32927,9 +31355,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 18)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 18) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Spewpa, 18)
                 }),
@@ -32961,9 +31387,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(132) }),
                 base_height: 3,
                 base_weight: 84,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Litleo, 19)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Litleo, 19) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Spewpa, 19)
                 }),
@@ -33002,9 +31426,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 12,
                 base_weight: 170,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vivillon, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vivillon)),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -33646,9 +32068,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(153) }),
             base_height: 6,
             base_weight: 135,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Flabebe, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Flabebe)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G6,
@@ -33673,9 +32093,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Flabebe, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Flabebe, 1) },
                     required_item_id: Some(2578),
                 }],
                 is_gmax: false,
@@ -33689,9 +32107,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 815,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Pyroar, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Pyroar)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -33756,9 +32172,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(180) }),
                 base_height: 1,
                 base_weight: 1,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Florges, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Florges)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Fairy, None),
                 introduced: Generation::G6,
@@ -33788,9 +32202,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(180) }),
                 base_height: 1,
                 base_weight: 1,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Florges, 4)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Florges, 4) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Fairy, None),
                 introduced: Generation::G6,
@@ -33820,9 +32232,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(180) }),
                 base_height: 1,
                 base_weight: 1,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Florges, 2)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Florges, 2) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Fairy, None),
                 introduced: Generation::G6,
@@ -33852,9 +32262,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(180) }),
                 base_height: 1,
                 base_weight: 1,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Florges, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Florges, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Fairy, None),
                 introduced: Generation::G6,
@@ -33884,9 +32292,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(180) }),
                 base_height: 1,
                 base_weight: 1,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Florges, 3)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Florges, 3) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Fairy, None),
                 introduced: Generation::G6,
@@ -33922,12 +32328,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(180) }),
                 base_height: 2,
                 base_weight: 9,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Skiddo, 0)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Floette, 0)
-                }),
+                evolutions: &[SpeciesForm::base_form(NationalDex::Skiddo)],
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Floette)),
                 egg_groups: (EggGroup::Fairy, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -33956,9 +32358,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(180) }),
                 base_height: 2,
                 base_weight: 9,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Skiddo, 4)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Skiddo, 4) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Floette, 3)
                 }),
@@ -33990,9 +32390,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(180) }),
                 base_height: 2,
                 base_weight: 9,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Skiddo, 2)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Skiddo, 2) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Floette, 2)
                 }),
@@ -34024,9 +32422,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(180) }),
                 base_height: 2,
                 base_weight: 9,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Skiddo, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Skiddo, 1) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Floette, 4)
                 }),
@@ -34058,9 +32454,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(180) }),
                 base_height: 2,
                 base_weight: 9,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Skiddo, 3)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Skiddo, 3) }],
                 pre_evolution: Some(unsafe {
                     SpeciesForm::unchecked_form(NationalDex::Floette, 1)
                 }),
@@ -34082,9 +32476,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: false,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Florges, 6)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Florges, 6) },
                     required_item_id: Some(2579),
                 }],
                 is_gmax: false,
@@ -34164,9 +32556,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 11,
                 base_weight: 100,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Florges, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Florges)),
                 egg_groups: (EggGroup::Fairy, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -34328,9 +32718,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(179) }),
             base_height: 9,
             base_weight: 310,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pancham, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pancham)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G6,
@@ -34365,9 +32753,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 17,
             base_weight: 910,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gogoat, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gogoat)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -34400,9 +32786,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(113) }),
             base_height: 6,
             base_weight: 80,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Furfrou, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Furfrou)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::HumanLike)),
             introduced: Generation::G6,
@@ -34437,9 +32821,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 21,
             base_weight: 1360,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pangoro, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Pangoro)),
             egg_groups: (EggGroup::Field, Some(EggGroup::HumanLike)),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -34778,10 +33160,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(20) }),
             base_height: 3,
             base_weight: 35,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Honedge, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Honedge, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Honedge), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Honedge, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G6,
@@ -34806,9 +33187,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Honedge, 2)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Honedge, 2) },
                     required_item_id: Some(2643),
                 }],
                 is_gmax: false,
@@ -34822,9 +33201,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 6,
                 base_weight: 85,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Meowstic, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Meowstic)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -34843,9 +33220,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: false,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Honedge, 3)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Honedge, 3) },
                     required_item_id: Some(2643),
                 }],
                 is_gmax: false,
@@ -34859,9 +33234,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 6,
                 base_weight: 85,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Meowstic, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Meowstic)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -34955,9 +33328,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 8,
             base_weight: 20,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Aegislash, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Aegislash)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G6,
@@ -34991,12 +33362,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 8,
             base_weight: 45,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Spritzee, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Doublade, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Spritzee)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Doublade)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -35031,9 +33398,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 17,
                 base_weight: 530,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Aegislash, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Aegislash)),
                 egg_groups: (EggGroup::Mineral, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -35097,9 +33462,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(165) }),
             base_height: 2,
             base_weight: 5,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Swirlix, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Swirlix)],
             pre_evolution: None,
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G6,
@@ -35134,9 +33497,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 155,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Aromatisse, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Aromatisse)),
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -35169,9 +33530,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(84) }),
             base_height: 4,
             base_weight: 35,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Inkay, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Inkay)],
             pre_evolution: None,
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G6,
@@ -35206,9 +33565,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 50,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Slurpuff, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Slurpuff)),
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -35241,9 +33598,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(151) }),
             base_height: 4,
             base_weight: 35,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Binacle, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Binacle)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water2)),
             introduced: Generation::G6,
@@ -35268,9 +33623,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Binacle, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Binacle, 1) },
                     required_item_id: Some(2580),
                 }],
                 is_gmax: false,
@@ -35284,9 +33637,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 470,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Malamar, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Malamar)),
                 egg_groups: (EggGroup::Water1, Some(EggGroup::Water2)),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -35350,9 +33701,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(124) }),
             base_height: 5,
             base_weight: 310,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Skrelp, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Skrelp)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G6,
@@ -35377,9 +33726,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Skrelp, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Skrelp, 1) },
                     required_item_id: Some(2581),
                 }],
                 is_gmax: false,
@@ -35393,9 +33740,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 13,
                 base_weight: 960,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Barbaracle, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Barbaracle)),
                 egg_groups: (EggGroup::Water3, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -35459,9 +33804,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(91) }),
             base_height: 5,
             base_weight: 73,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Clauncher, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Clauncher)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Dragon)),
             introduced: Generation::G6,
@@ -35486,9 +33829,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Clauncher, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Clauncher, 1) },
                     required_item_id: Some(2582),
                 }],
                 is_gmax: false,
@@ -35502,9 +33843,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 18,
                 base_weight: 815,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Dragalge, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dragalge)),
                 egg_groups: (EggGroup::Water1, Some(EggGroup::Dragon)),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -35568,9 +33907,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 5,
             base_weight: 83,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Helioptile, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Helioptile)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water3)),
             introduced: Generation::G6,
@@ -35605,9 +33942,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 353,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Clawitzer, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Clawitzer)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water3)),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -35640,9 +33975,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(94) }),
             base_height: 5,
             base_weight: 60,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tyrunt, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tyrunt)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G6,
@@ -35677,9 +34010,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 210,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Heliolisk, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Heliolisk)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -35712,9 +34043,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(5) }),
             base_height: 8,
             base_weight: 260,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Amaura, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Amaura)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G6,
@@ -35749,9 +34078,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 25,
             base_weight: 2700,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tyrantrum, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Tyrantrum)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -35784,9 +34111,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(117) }),
             base_height: 13,
             base_weight: 252,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Sylveon, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Sylveon)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G6,
@@ -35821,9 +34146,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 27,
             base_weight: 2250,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Aurorus, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Aurorus)),
             egg_groups: (EggGroup::Monster, None),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -35857,9 +34180,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 235,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vaporeon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vaporeon)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -35883,9 +34204,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Dedenne, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Dedenne, 1) },
                     required_item_id: Some(2583),
                 }],
                 is_gmax: false,
@@ -36031,10 +34350,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(183) }),
             base_height: 3,
             base_weight: 28,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Goodra, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Goodra, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Goodra), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Goodra, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::Dragon, None),
             introduced: Generation::G6,
@@ -36069,12 +34387,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(183) }),
                 base_height: 8,
                 base_weight: 175,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Klefki, 0)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Sliggoo, 0)
-                }),
+                evolutions: &[SpeciesForm::base_form(NationalDex::Klefki)],
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Sliggoo)),
                 egg_groups: (EggGroup::Dragon, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -36103,12 +34417,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(183) }),
                 base_height: 7,
                 base_weight: 685,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Klefki, 1)
-                }],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Sliggoo, 0)
-                }),
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Klefki, 1) }],
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Sliggoo)),
                 egg_groups: (EggGroup::Dragon, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -36144,9 +34454,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 20,
                 base_weight: 1505,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Goodra, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Goodra)),
                 egg_groups: (EggGroup::Dragon, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -36176,9 +34484,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 17,
                 base_weight: 3341,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Goodra, 1)
-                }),
+                pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Goodra, 1) }),
                 egg_groups: (EggGroup::Dragon, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -36246,9 +34552,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(139) }),
             base_height: 4,
             base_weight: 70,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pumpkaboo, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pumpkaboo)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, Some(EggGroup::Amorphous)),
             introduced: Generation::G6,
@@ -36283,9 +34587,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 710,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Trevenant, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Trevenant)),
             egg_groups: (EggGroup::Grass, Some(EggGroup::Amorphous)),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -36319,9 +34621,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(15) }),
                 base_height: 4,
                 base_weight: 50,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Bergmite, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Bergmite)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G6,
@@ -36351,9 +34651,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(15) }),
                 base_height: 3,
                 base_weight: 35,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Bergmite, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Bergmite, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G6,
@@ -36383,9 +34681,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(15) }),
                 base_height: 5,
                 base_weight: 75,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Bergmite, 2)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Bergmite, 2) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G6,
@@ -36415,9 +34711,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(15) }),
                 base_height: 8,
                 base_weight: 150,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Bergmite, 3)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Bergmite, 3) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G6,
@@ -36454,9 +34748,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 9,
                 base_weight: 125,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Gourgeist, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gourgeist)),
                 egg_groups: (EggGroup::Amorphous, None),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -36586,10 +34878,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(5) }),
             base_height: 10,
             base_weight: 995,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Noibat, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Noibat, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Noibat), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Noibat, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Mineral)),
             introduced: Generation::G6,
@@ -36625,9 +34916,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 20,
                 base_weight: 5050,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Avalugg, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Avalugg)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Mineral)),
                 introduced: Generation::G6,
                 is_restricted_legend: false,
@@ -36657,9 +34946,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 14,
                 base_weight: 2624,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Avalugg, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Avalugg)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Mineral)),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -36693,9 +34980,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(140) }),
             base_height: 5,
             base_weight: 80,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Xerneas, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Xerneas)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, Some(EggGroup::Dragon)),
             introduced: Generation::G6,
@@ -36730,9 +35015,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 850,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Noivern, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Noivern)),
             egg_groups: (EggGroup::Flying, Some(EggGroup::Dragon)),
             introduced: Generation::G6,
             is_restricted_legend: false,
@@ -36976,9 +35259,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: false,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Diancie, 5)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Diancie, 5) },
                     required_item_id: Some(2584),
                 }],
                 is_gmax: false,
@@ -37047,9 +35328,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Hoopa, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Hoopa, 1) },
                     required_item_id: Some(764),
                 }],
                 is_gmax: false,
@@ -37227,9 +35506,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(203) }),
             base_height: 3,
             base_weight: 15,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Decidueye, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Decidueye)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G7,
@@ -37263,13 +35540,10 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(203) }),
             base_height: 7,
             base_weight: 160,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Litten, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Litten, 1) },
-            ],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dartrix, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Litten), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Litten, 1)
+            }],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dartrix)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -37304,9 +35578,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 366,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Decidueye, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Decidueye)),
                 egg_groups: (EggGroup::Flying, None),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -37336,9 +35608,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 370,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Decidueye, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Decidueye)),
                 egg_groups: (EggGroup::Flying, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -37372,9 +35642,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(22) }),
             base_height: 4,
             base_weight: 43,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Incineroar, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Incineroar)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G7,
@@ -37408,12 +35676,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(22) }),
             base_height: 7,
             base_weight: 250,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Popplio, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Torracat, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Popplio)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Torracat)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -37447,9 +35711,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 830,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Incineroar, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Incineroar)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -37482,9 +35744,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(204) }),
             base_height: 4,
             base_weight: 75,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Primarina, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Primarina)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G7,
@@ -37518,12 +35778,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(204) }),
             base_height: 6,
             base_weight: 175,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pikipek, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Brionne, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pikipek)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Brionne)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -37557,9 +35813,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 440,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Primarina, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Primarina)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -37592,9 +35846,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(53) }),
             base_height: 3,
             base_weight: 12,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Toucannon, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Toucannon)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G7,
@@ -37628,12 +35880,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(53) }),
             base_height: 6,
             base_weight: 148,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Yungoos, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Trumbeak, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Yungoos)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Trumbeak)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -37667,9 +35915,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 260,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Toucannon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Toucannon)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -37702,9 +35948,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(91) }),
             base_height: 4,
             base_weight: 60,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Grubbin, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Grubbin)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G7,
@@ -37740,9 +35984,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 7,
                 base_weight: 142,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Gumshoos, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gumshoos)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -37806,9 +36048,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 4,
             base_weight: 44,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Vikavolt, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Vikavolt)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G7,
@@ -37842,12 +36082,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 5,
             base_weight: 105,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Crabrawler, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Charjabug, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Crabrawler)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Charjabug)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -37882,9 +36118,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 450,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Vikavolt, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Vikavolt)),
                 egg_groups: (EggGroup::Bug, None),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -37948,9 +36182,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(83) }),
             base_height: 6,
             base_weight: 70,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Oricorio, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Oricorio)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G7,
@@ -37975,9 +36207,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Oricorio, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Oricorio, 1) },
                     required_item_id: Some(2644),
                 }],
                 is_gmax: false,
@@ -37991,9 +36221,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 17,
                 base_weight: 1800,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Crabominable, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Crabominable)),
                 egg_groups: (EggGroup::Water3, None),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -38183,9 +36411,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(175) }),
             base_height: 1,
             base_weight: 2,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Rockruff, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Rockruff)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, Some(EggGroup::Fairy)),
             introduced: Generation::G7,
@@ -38221,9 +36447,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 2,
                 base_weight: 5,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Ribombee, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Ribombee)),
                 egg_groups: (EggGroup::Bug, Some(EggGroup::Fairy)),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -38288,10 +36512,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(80) }),
                 base_height: 5,
                 base_weight: 92,
-                evolutions: &[
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Wishiwashi, 0) },
-                    unsafe { SpeciesForm::unchecked_form(NationalDex::Wishiwashi, 1) },
-                ],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Wishiwashi), unsafe {
+                    SpeciesForm::unchecked_form(NationalDex::Wishiwashi, 1)
+                }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G7,
@@ -38321,9 +36544,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: None,
                 base_height: 5,
                 base_weight: 92,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Wishiwashi, 2)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Wishiwashi, 2) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G7,
@@ -38360,9 +36581,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 8,
                 base_weight: 250,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Lycanroc, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Lycanroc)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -38392,9 +36611,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 11,
                 base_weight: 250,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Lycanroc, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Lycanroc)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -38526,9 +36743,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(144) }),
             base_height: 4,
             base_weight: 80,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Mudbray, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Mudbray)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G7,
@@ -38563,9 +36778,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 7,
             base_weight: 145,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Toxapex, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Toxapex)),
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -38598,9 +36811,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(39) }),
             base_height: 10,
             base_weight: 1100,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dewpider, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Dewpider)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G7,
@@ -38635,9 +36846,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 25,
             base_weight: 9200,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Mudsdale, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Mudsdale)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -38670,9 +36879,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(11) }),
             base_height: 3,
             base_weight: 40,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Fomantis, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Fomantis)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Bug)),
             introduced: Generation::G7,
@@ -38708,9 +36915,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 18,
                 base_weight: 820,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Araquanid, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Araquanid)),
                 egg_groups: (EggGroup::Water1, Some(EggGroup::Bug)),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -38774,9 +36979,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(126) }),
             base_height: 3,
             base_weight: 15,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Morelull, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Morelull)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G7,
@@ -38812,9 +37015,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 9,
                 base_weight: 185,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Lurantis, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Lurantis)),
                 egg_groups: (EggGroup::Grass, None),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -38878,9 +37079,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(44) }),
             base_height: 2,
             base_weight: 15,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Salandit, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Salandit)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G7,
@@ -38915,9 +37114,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 115,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Shiinotic, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Shiinotic)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -38950,9 +37147,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(12) }),
             base_height: 6,
             base_weight: 48,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Stufful, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Stufful)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
             introduced: Generation::G7,
@@ -38988,9 +37183,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 12,
                 base_weight: 222,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Salazzle, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Salazzle)),
                 egg_groups: (EggGroup::Monster, Some(EggGroup::Dragon)),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -39054,9 +37247,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(56) }),
             base_height: 5,
             base_weight: 68,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bounsweet, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Bounsweet)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G7,
@@ -39091,9 +37282,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 21,
             base_weight: 1350,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bewear, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Bewear)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -39126,9 +37315,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(175) }),
             base_height: 3,
             base_weight: 32,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tsareena, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tsareena)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G7,
@@ -39162,12 +37349,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(175) }),
             base_height: 7,
             base_weight: 82,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Comfey, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Steenee, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Comfey)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Steenee)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -39201,9 +37384,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 214,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tsareena, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Tsareena)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -39338,9 +37519,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 5,
             base_weight: 120,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Sandygast, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Sandygast)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, Some(EggGroup::Water3)),
             introduced: Generation::G7,
@@ -39365,9 +37544,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Sandygast, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Sandygast, 1) },
                     required_item_id: Some(2645),
                 }],
                 is_gmax: false,
@@ -39381,9 +37558,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 20,
                 base_weight: 1080,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Golisopod, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Golisopod)),
                 egg_groups: (EggGroup::Bug, Some(EggGroup::Water3)),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -39447,9 +37622,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(8) }),
             base_height: 5,
             base_weight: 700,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pyukumuku, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pyukumuku)],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G7,
@@ -39484,9 +37657,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 2500,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Palossand, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Palossand)),
             egg_groups: (EggGroup::Amorphous, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -39553,9 +37724,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 19,
             base_weight: 1205,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Minior, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Minior)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G7,
@@ -39591,9 +37760,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 23,
                 base_weight: 1005,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Silvally, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Silvally)),
                 egg_groups: (EggGroup::NoEggsDiscovered, None),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -40848,9 +39015,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Dhelmise, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Dhelmise, 1) },
                     required_item_id: Some(2585),
                 }],
                 is_gmax: false,
@@ -40962,9 +39127,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(142) }),
             base_height: 6,
             base_weight: 297,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Kommoo, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Kommoo)],
             pre_evolution: None,
             egg_groups: (EggGroup::Dragon, None),
             introduced: Generation::G7,
@@ -40998,12 +39161,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(142) }),
             base_height: 12,
             base_weight: 470,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::TapuKoko, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hakamoo, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::TapuKoko)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Hakamoo)),
             egg_groups: (EggGroup::Dragon, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -41038,9 +39197,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 782,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Kommoo, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Kommoo)),
                 egg_groups: (EggGroup::Dragon, None),
                 introduced: Generation::G7,
                 is_restricted_legend: false,
@@ -41240,9 +39397,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 2,
             base_weight: 1,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Solgaleo, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Solgaleo)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G7,
@@ -41277,12 +39432,10 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 1,
             base_weight: 9999,
             evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Lunala, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Nihilego, 0) },
+                SpeciesForm::base_form(NationalDex::Lunala),
+                SpeciesForm::base_form(NationalDex::Nihilego),
             ],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cosmoem, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Cosmoem)),
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G7,
             is_restricted_legend: true,
@@ -41316,9 +39469,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 34,
             base_weight: 2300,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Solgaleo, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Solgaleo)),
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G7,
             is_restricted_legend: true,
@@ -41352,9 +39503,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 40,
             base_weight: 1200,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Solgaleo, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Solgaleo)),
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G7,
             is_restricted_legend: true,
@@ -41742,9 +39891,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Marshadow, 2)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Marshadow, 2) },
                     required_item_id: Some(2646),
                 }],
                 is_gmax: false,
@@ -41777,9 +39924,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: false,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Marshadow, 3)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Marshadow, 3) },
                     required_item_id: Some(2646),
                 }],
                 is_gmax: false,
@@ -41921,9 +40066,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 6,
             base_weight: 18,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Stakataka, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Stakataka)],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G7,
@@ -41958,9 +40101,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 36,
             base_weight: 1500,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Naganadel, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Naganadel)),
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G7,
             is_restricted_legend: false,
@@ -42052,9 +40193,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Meltan, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Meltan, 1) },
                     required_item_id: Some(2586),
                 }],
                 is_gmax: false,
@@ -42200,9 +40339,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(229) }),
             base_height: 3,
             base_weight: 50,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Rillaboom, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Rillaboom)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Grass)),
             introduced: Generation::G8,
@@ -42236,12 +40373,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(229) }),
             base_height: 7,
             base_weight: 140,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Scorbunny, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Thwackey, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Scorbunny)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Thwackey)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Grass)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -42275,9 +40408,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 21,
             base_weight: 900,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Rillaboom, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Rillaboom)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Grass)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -42310,9 +40441,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(236) }),
             base_height: 3,
             base_weight: 45,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cinderace, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Cinderace)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::HumanLike)),
             introduced: Generation::G8,
@@ -42346,12 +40475,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(236) }),
             base_height: 6,
             base_weight: 90,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Sobble, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Raboot, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Sobble)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Raboot)),
             egg_groups: (EggGroup::Field, Some(EggGroup::HumanLike)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -42385,9 +40510,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 330,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cinderace, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Cinderace)),
             egg_groups: (EggGroup::Field, Some(EggGroup::HumanLike)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -42420,9 +40543,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(97) }),
             base_height: 3,
             base_weight: 40,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Inteleon, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Inteleon)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G8,
@@ -42456,12 +40577,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(97) }),
             base_height: 7,
             base_weight: 115,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Skwovet, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Drizzile, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Skwovet)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Drizzile)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -42495,9 +40612,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 19,
             base_weight: 452,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Inteleon, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Inteleon)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -42530,9 +40645,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(82) }),
             base_height: 3,
             base_weight: 25,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Rookidee, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Rookidee)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G8,
@@ -42567,9 +40680,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 6,
             base_weight: 60,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Greedent, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Greedent)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -42602,9 +40713,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(145) }),
             base_height: 2,
             base_weight: 18,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Corviknight, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Corviknight)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G8,
@@ -42638,12 +40747,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(145) }),
             base_height: 8,
             base_weight: 160,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Blipbug, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Corvisquire, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Blipbug)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Corvisquire)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -42677,9 +40782,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 22,
             base_weight: 750,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Corviknight, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Corviknight)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -42712,9 +40815,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(140) }),
             base_height: 4,
             base_weight: 80,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Orbeetle, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Orbeetle)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G8,
@@ -42748,12 +40849,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(140) }),
             base_height: 4,
             base_weight: 195,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Nickit, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dottler, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Nickit)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dottler)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -42787,9 +40884,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 4,
             base_weight: 408,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Orbeetle, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Orbeetle)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -42822,9 +40917,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(198) }),
             base_height: 6,
             base_weight: 89,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gossifleur, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Gossifleur)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G8,
@@ -42859,9 +40952,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 199,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Thievul, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Thievul)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -42894,9 +40985,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(27) }),
             base_height: 4,
             base_weight: 22,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Wooloo, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Wooloo)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G8,
@@ -42931,9 +41020,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 5,
             base_weight: 25,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Eldegoss, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Eldegoss)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -42966,9 +41053,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(171) }),
             base_height: 6,
             base_weight: 60,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Chewtle, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Chewtle)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G8,
@@ -43003,9 +41088,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 430,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dubwool, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dubwool)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -43038,9 +41121,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(33) }),
             base_height: 3,
             base_weight: 85,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Yamper, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Yamper)],
             pre_evolution: None,
             egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
             introduced: Generation::G8,
@@ -43075,9 +41156,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 1155,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Drednaw, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Drednaw)),
             egg_groups: (EggGroup::Monster, Some(EggGroup::Water1)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -43110,9 +41189,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(155) }),
             base_height: 3,
             base_weight: 135,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Rolycoly, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Rolycoly)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G8,
@@ -43147,9 +41224,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 340,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Boltund, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Boltund)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -43182,9 +41257,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(18) }),
             base_height: 3,
             base_weight: 120,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Coalossal, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Coalossal)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G8,
@@ -43218,12 +41291,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(18) }),
             base_height: 11,
             base_weight: 780,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Applin, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Carkol, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Applin)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Carkol)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -43257,9 +41326,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 28,
             base_weight: 3105,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Coalossal, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Coalossal)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -43293,9 +41360,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 2,
             base_weight: 5,
             evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Appletun, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Silicobra, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Poltchageist, 0) },
+                SpeciesForm::base_form(NationalDex::Appletun),
+                SpeciesForm::base_form(NationalDex::Silicobra),
+                SpeciesForm::base_form(NationalDex::Poltchageist),
             ],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, Some(EggGroup::Dragon)),
@@ -43331,9 +41398,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 3,
             base_weight: 10,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Flapple, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Flapple)),
             egg_groups: (EggGroup::Grass, Some(EggGroup::Dragon)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -43367,9 +41432,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 4,
             base_weight: 130,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Flapple, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Flapple)),
             egg_groups: (EggGroup::Grass, Some(EggGroup::Dragon)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -43402,9 +41465,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(8) }),
             base_height: 22,
             base_weight: 76,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cramorant, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Cramorant)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Dragon)),
             introduced: Generation::G8,
@@ -43439,9 +41500,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 38,
             base_weight: 655,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Sandaconda, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Sandaconda)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Dragon)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -43570,9 +41629,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(239) }),
             base_height: 5,
             base_weight: 10,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Toxel, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Toxel)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water2, None),
             introduced: Generation::G8,
@@ -43607,9 +41664,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 300,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Barraskewda, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Barraskewda)),
             egg_groups: (EggGroup::Water2, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -43642,10 +41697,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(103) }),
             base_height: 4,
             base_weight: 110,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Sizzlipede, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Sizzlipede, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Sizzlipede), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Sizzlipede, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G8,
@@ -43681,9 +41735,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 400,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Toxtricity, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Toxtricity)),
                 egg_groups: (EggGroup::HumanLike, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -43713,9 +41765,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 16,
                 base_weight: 400,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Toxtricity, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Toxtricity)),
                 egg_groups: (EggGroup::HumanLike, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -43749,9 +41799,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(49) }),
             base_height: 7,
             base_weight: 10,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Clobbopus, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Clobbopus)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G8,
@@ -43786,9 +41834,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 30,
             base_weight: 1200,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Centiskorch, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Centiskorch)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -43821,9 +41867,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(101) }),
             base_height: 6,
             base_weight: 40,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Sinistea, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Sinistea)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::HumanLike)),
             introduced: Generation::G8,
@@ -43858,9 +41902,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 16,
             base_weight: 390,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Grapploct, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Grapploct)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::HumanLike)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -43894,9 +41936,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(130) }),
                 base_height: 1,
                 base_weight: 2,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Hatenna, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Hatenna)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Mineral, Some(EggGroup::Amorphous)),
                 introduced: Generation::G8,
@@ -43926,9 +41966,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(130) }),
                 base_height: 1,
                 base_weight: 2,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Hatenna, 1)
-                }],
+                evolutions: &[unsafe { SpeciesForm::unchecked_form(NationalDex::Hatenna, 1) }],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Mineral, Some(EggGroup::Amorphous)),
                 introduced: Generation::G8,
@@ -43965,9 +42003,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 2,
                 base_weight: 4,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Polteageist, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Polteageist)),
                 egg_groups: (EggGroup::Mineral, Some(EggGroup::Amorphous)),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -44033,9 +42069,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(156) }),
             base_height: 4,
             base_weight: 34,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hatterene, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Hatterene)],
             pre_evolution: None,
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G8,
@@ -44069,12 +42103,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(156) }),
             base_height: 6,
             base_weight: 48,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Impidimp, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hattrem, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Impidimp)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Hattrem)),
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -44108,9 +42138,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 21,
             base_weight: 51,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hatterene, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Hatterene)),
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -44143,9 +42171,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(124) }),
             base_height: 4,
             base_weight: 55,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Grimmsnarl, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Grimmsnarl)],
             pre_evolution: None,
             egg_groups: (EggGroup::Fairy, Some(EggGroup::HumanLike)),
             introduced: Generation::G8,
@@ -44179,12 +42205,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(124) }),
             base_height: 8,
             base_weight: 125,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Obstagoon, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Morgrem, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Obstagoon)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Morgrem)),
             egg_groups: (EggGroup::Fairy, Some(EggGroup::HumanLike)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -44218,9 +42240,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 610,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Grimmsnarl, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Grimmsnarl)),
             egg_groups: (EggGroup::Fairy, Some(EggGroup::HumanLike)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -44254,9 +42274,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 16,
             base_weight: 460,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Wurmple, 1)
-            }),
+            pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Wurmple, 1) }),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -44290,9 +42308,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 280,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Persian, 2)
-            }),
+            pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Persian, 2) }),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -44326,9 +42342,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 4,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Remoraid, 1)
-            }),
+            pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Remoraid, 1) }),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Water3)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -44362,9 +42376,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 8,
             base_weight: 1170,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Doduo, 1)
-            }),
+            pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Doduo, 1) }),
             egg_groups: (EggGroup::Flying, Some(EggGroup::Field)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -44398,9 +42410,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 582,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Scyther, 1)
-            }),
+            pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Scyther, 1) }),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -44434,9 +42444,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 16,
             base_weight: 666,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cofagrigus, 1)
-            }),
+            pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Cofagrigus, 1) }),
             egg_groups: (EggGroup::Mineral, Some(EggGroup::Amorphous)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -44469,9 +42477,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(165) }),
             base_height: 2,
             base_weight: 3,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Falinks, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Falinks)],
             pre_evolution: None,
             egg_groups: (EggGroup::Fairy, Some(EggGroup::Amorphous)),
             introduced: Generation::G8,
@@ -44507,9 +42513,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 3,
                 base_weight: 5,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Alcremie, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Alcremie)),
                 egg_groups: (EggGroup::Fairy, Some(EggGroup::Amorphous)),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -44774,9 +42778,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Pincurchin, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Pincurchin, 1) },
                     required_item_id: Some(2587),
                 }],
                 is_gmax: false,
@@ -44888,9 +42890,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(246) }),
             base_height: 3,
             base_weight: 38,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Stonjourner, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Stonjourner)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G8,
@@ -44925,9 +42925,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 420,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Frosmoth, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Frosmoth)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -45192,9 +43190,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(134) }),
             base_height: 12,
             base_weight: 1000,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dracozolt, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Dracozolt)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Mineral)),
             introduced: Generation::G8,
@@ -45229,9 +43225,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 30,
             base_weight: 6500,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Copperajah, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Copperajah)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Mineral)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -45400,9 +43394,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(242) }),
             base_height: 18,
             base_weight: 400,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Hydrapple, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Hydrapple)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, Some(EggGroup::Dragon)),
             introduced: Generation::G8,
@@ -45436,9 +43428,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(130) }),
             base_height: 5,
             base_weight: 20,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dragapult, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Dragapult)],
             pre_evolution: None,
             egg_groups: (EggGroup::Amorphous, Some(EggGroup::Dragon)),
             introduced: Generation::G8,
@@ -45472,12 +43462,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(130) }),
             base_height: 14,
             base_weight: 110,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Zacian, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Drakloak, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Zacian)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Drakloak)),
             egg_groups: (EggGroup::Amorphous, Some(EggGroup::Dragon)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -45511,9 +43497,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 30,
             base_weight: 500,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dragapult, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dragapult)),
             egg_groups: (EggGroup::Amorphous, Some(EggGroup::Dragon)),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -45744,10 +43728,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 6,
             base_weight: 120,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Zarude, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Zarude, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Zarude), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Zarude, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G8,
@@ -45783,9 +43766,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 19,
                 base_weight: 1050,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Urshifu, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Urshifu)),
                 egg_groups: (EggGroup::NoEggsDiscovered, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -45815,9 +43796,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 19,
                 base_weight: 1050,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Urshifu, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Urshifu)),
                 egg_groups: (EggGroup::NoEggsDiscovered, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -46150,9 +44129,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 951,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Smeargle, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Smeargle)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -46186,9 +44163,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 890,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Jynx, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Jynx)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -46223,9 +44198,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 24,
                 base_weight: 2900,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Slugma, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Slugma)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G8,
                 is_restricted_legend: false,
@@ -46360,9 +44333,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 13,
             base_weight: 430,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Teddiursa, 1)
-            }),
+            pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Teddiursa, 1) }),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -46396,9 +44367,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 25,
             base_weight: 605,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Scizor, 1)
-            }),
+            pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Scizor, 1) }),
             egg_groups: (EggGroup::Water2, None),
             introduced: Generation::G8,
             is_restricted_legend: false,
@@ -46497,9 +44466,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(168) }),
             base_height: 4,
             base_weight: 41,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Meowscarada, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Meowscarada)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Grass)),
             introduced: Generation::G9,
@@ -46533,12 +44500,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(168) }),
             base_height: 9,
             base_weight: 122,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Fuecoco, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Floragato, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Fuecoco)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Floragato)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Grass)),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -46572,9 +44535,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 312,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Meowscarada, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Meowscarada)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Grass)),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -46607,9 +44568,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(109) }),
             base_height: 4,
             base_weight: 98,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Skeledirge, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Skeledirge)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
@@ -46643,12 +44602,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(109) }),
             base_height: 10,
             base_weight: 307,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Quaxly, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Crocalor, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Quaxly)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Crocalor)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -46682,9 +44637,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 16,
             base_weight: 3265,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Skeledirge, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Skeledirge)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -46717,9 +44670,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(153) }),
             base_height: 5,
             base_weight: 61,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Quaquaval, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Quaquaval)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, Some(EggGroup::Water1)),
             introduced: Generation::G9,
@@ -46753,12 +44704,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(153) }),
             base_height: 12,
             base_weight: 215,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Lechonk, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Quaxwell, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Lechonk)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Quaxwell)),
             egg_groups: (EggGroup::Flying, Some(EggGroup::Water1)),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -46792,9 +44739,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 619,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Quaquaval, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Quaquaval)),
             egg_groups: (EggGroup::Flying, Some(EggGroup::Water1)),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -46827,10 +44772,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(47) }),
             base_height: 5,
             base_weight: 102,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Tarountula, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Tarountula, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tarountula), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Tarountula, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
@@ -46866,9 +44810,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 10,
                 base_weight: 1200,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Oinkologne, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Oinkologne)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G9,
                 is_restricted_legend: false,
@@ -46898,9 +44840,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 10,
                 base_weight: 1200,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Oinkologne, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Oinkologne)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G9,
                 is_restricted_legend: false,
@@ -46934,9 +44874,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(198) }),
             base_height: 3,
             base_weight: 40,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Nymble, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Nymble)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G9,
@@ -46971,9 +44909,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 165,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Spidops, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Spidops)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -47006,9 +44942,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(110) }),
             base_height: 2,
             base_weight: 10,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pawmi, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pawmi)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G9,
@@ -47043,9 +44977,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 10,
             base_weight: 175,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Lokix, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Lokix)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -47078,9 +45010,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(89) }),
             base_height: 3,
             base_weight: 25,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pawmot, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Pawmot)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
@@ -47114,12 +45044,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(89) }),
             base_height: 4,
             base_weight: 65,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tandemaus, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pawmo, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tandemaus)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Pawmo)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -47153,9 +45079,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 9,
             base_weight: 410,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pawmot, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Pawmot)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -47188,10 +45112,9 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(20) }),
             base_height: 3,
             base_weight: 18,
-            evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Fidough, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Fidough, 1) },
-            ],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Fidough), unsafe {
+                SpeciesForm::unchecked_form(NationalDex::Fidough, 1)
+            }],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Fairy)),
             introduced: Generation::G9,
@@ -47227,9 +45150,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 3,
                 base_weight: 23,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Maushold, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Maushold)),
                 egg_groups: (EggGroup::Field, Some(EggGroup::Fairy)),
                 introduced: Generation::G9,
                 is_restricted_legend: false,
@@ -47259,9 +45180,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 3,
                 base_weight: 28,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Maushold, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Maushold)),
                 egg_groups: (EggGroup::Field, Some(EggGroup::Fairy)),
                 introduced: Generation::G9,
                 is_restricted_legend: false,
@@ -47295,9 +45214,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(103) }),
             base_height: 3,
             base_weight: 109,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Smoliv, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Smoliv)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Mineral)),
             introduced: Generation::G9,
@@ -47332,9 +45249,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 5,
             base_weight: 149,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dachsbun, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dachsbun)),
             egg_groups: (EggGroup::Field, Some(EggGroup::Mineral)),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -47367,9 +45282,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(139) }),
             base_height: 3,
             base_weight: 65,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Arboliva, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Arboliva)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G9,
@@ -47403,12 +45316,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(139) }),
             base_height: 6,
             base_weight: 119,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Squawkabilly, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dolliv, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Squawkabilly)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dolliv)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -47442,9 +45351,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 482,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Arboliva, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Arboliva)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -47603,9 +45510,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(29) }),
             base_height: 4,
             base_weight: 160,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Garganacl, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Garganacl)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G9,
@@ -47639,12 +45544,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(29) }),
             base_height: 6,
             base_weight: 1050,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Charcadet, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Naclstack, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Charcadet)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Naclstack)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -47678,9 +45579,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 23,
             base_weight: 2400,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Garganacl, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Garganacl)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -47714,8 +45613,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 6,
             base_weight: 105,
             evolutions: &[
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Ceruledge, 0) },
-                unsafe { SpeciesForm::unchecked_form(NationalDex::Tadbulb, 0) },
+                SpeciesForm::base_form(NationalDex::Ceruledge),
+                SpeciesForm::base_form(NationalDex::Tadbulb),
             ],
             pre_evolution: None,
             egg_groups: (EggGroup::HumanLike, None),
@@ -47751,9 +45650,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 15,
             base_weight: 850,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Armarouge, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Armarouge)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -47787,9 +45684,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 16,
             base_weight: 620,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Armarouge, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Armarouge)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -47822,9 +45717,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(6) }),
             base_height: 3,
             base_weight: 4,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Wattrel, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Wattrel)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G9,
@@ -47859,9 +45752,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 1130,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bellibolt, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Bellibolt)),
             egg_groups: (EggGroup::Water1, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -47894,9 +45785,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(172) }),
             base_height: 4,
             base_weight: 36,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Maschiff, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Maschiff)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water1, Some(EggGroup::Flying)),
             introduced: Generation::G9,
@@ -47931,9 +45820,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 14,
             base_weight: 386,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Kilowattrel, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Kilowattrel)),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Flying)),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -47966,9 +45853,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(198) }),
             base_height: 5,
             base_weight: 160,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Shroodle, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Shroodle)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
@@ -48003,9 +45888,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 11,
             base_weight: 610,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Mabosstiff, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Mabosstiff)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -48038,9 +45921,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(158) }),
             base_height: 2,
             base_weight: 7,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bramblin, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Bramblin)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
@@ -48075,9 +45956,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 7,
             base_weight: 272,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Grafaiai, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Grafaiai)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -48110,9 +45989,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(151) }),
             base_height: 6,
             base_weight: 6,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Toedscool, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Toedscool)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G9,
@@ -48147,9 +46024,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 60,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Brambleghast, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Brambleghast)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -48182,9 +46057,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 9,
             base_weight: 330,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Klawf, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Klawf)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G9,
@@ -48219,9 +46092,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 19,
             base_weight: 580,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Toedscruel, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Toedscruel)),
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -48288,9 +46159,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(103) }),
             base_height: 3,
             base_weight: 30,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Rellor, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Rellor)],
             pre_evolution: None,
             egg_groups: (EggGroup::Grass, None),
             introduced: Generation::G9,
@@ -48315,9 +46184,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Rellor, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Rellor, 1) },
                     required_item_id: Some(2647),
                 }],
                 is_gmax: false,
@@ -48331,9 +46198,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 9,
                 base_weight: 150,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Scovillain, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Scovillain)),
                 egg_groups: (EggGroup::Grass, None),
                 introduced: Generation::G9,
                 is_restricted_legend: false,
@@ -48397,9 +46262,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(61) }),
             base_height: 2,
             base_weight: 10,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Flittle, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Flittle)],
             pre_evolution: None,
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G9,
@@ -48434,9 +46297,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 3,
             base_weight: 35,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Rabsca, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Rabsca)),
             egg_groups: (EggGroup::Bug, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -48469,9 +46330,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(3) }),
             base_height: 2,
             base_weight: 15,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tinkatink, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tinkatink)],
             pre_evolution: None,
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G9,
@@ -48506,9 +46365,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 19,
             base_weight: 900,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Espathra, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Espathra)),
             egg_groups: (EggGroup::Flying, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -48541,9 +46398,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(124) }),
             base_height: 4,
             base_weight: 89,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tinkaton, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Tinkaton)],
             pre_evolution: None,
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G9,
@@ -48577,12 +46432,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(124) }),
             base_height: 7,
             base_weight: 591,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Wiglett, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tinkatuff, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Wiglett)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Tinkatuff)),
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -48616,9 +46467,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 7,
             base_weight: 1128,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Tinkaton, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Tinkaton)),
             egg_groups: (EggGroup::Fairy, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -48651,9 +46500,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(8) }),
             base_height: 12,
             base_weight: 18,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bombirdier, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Bombirdier)],
             pre_evolution: None,
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G9,
@@ -48688,9 +46535,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 54,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Wugtrio, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Wugtrio)),
             egg_groups: (EggGroup::Water3, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -48757,9 +46602,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: None,
             base_height: 13,
             base_weight: 602,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Varoom, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Varoom)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, Some(EggGroup::Water2)),
             introduced: Generation::G9,
@@ -48795,9 +46638,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 13,
                 base_weight: 602,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Palafin, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Palafin)),
                 egg_groups: (EggGroup::Field, Some(EggGroup::Water2)),
                 introduced: Generation::G9,
                 is_restricted_legend: false,
@@ -48861,9 +46702,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(112) }),
             base_height: 10,
             base_weight: 350,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cyclizar, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Cyclizar)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G9,
@@ -48898,9 +46737,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 1200,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Revavroom, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Revavroom)),
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -49001,9 +46838,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(212) }),
             base_height: 7,
             base_weight: 80,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Greavard, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Greavard)],
             pre_evolution: None,
             egg_groups: (EggGroup::Mineral, None),
             introduced: Generation::G9,
@@ -49028,9 +46863,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Greavard, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Greavard, 1) },
                     required_item_id: Some(2650),
                 }],
                 is_gmax: false,
@@ -49044,9 +46877,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 15,
                 base_weight: 450,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Glimmora, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Glimmora)),
                 egg_groups: (EggGroup::Mineral, None),
                 introduced: Generation::G9,
                 is_restricted_legend: false,
@@ -49110,9 +46941,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(218) }),
             base_height: 6,
             base_weight: 350,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Flamigo, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Flamigo)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
@@ -49147,9 +46976,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 20,
             base_weight: 150,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Houndstone, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Houndstone)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -49216,9 +47043,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(125) }),
             base_height: 12,
             base_weight: 450,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Veluza, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Veluza)],
             pre_evolution: None,
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
@@ -49253,9 +47078,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 45,
             base_weight: 7000,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Cetitan, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Cetitan)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -49347,9 +47170,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Annihilape, 3)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Annihilape, 3) },
                     required_item_id: Some(2649),
                 }],
                 is_gmax: false,
@@ -49382,9 +47203,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: false,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Annihilape, 4)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Annihilape, 4) },
                     required_item_id: Some(2649),
                 }],
                 is_gmax: false,
@@ -49417,9 +47236,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: false,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Annihilape, 5)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Annihilape, 5) },
                     required_item_id: Some(2649),
                 }],
                 is_gmax: false,
@@ -49558,9 +47375,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 560,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Growlithe, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Growlithe)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -49594,9 +47409,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 2230,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Quagsire, 1)
-            }),
+            pre_evolution: Some(unsafe { SpeciesForm::unchecked_form(NationalDex::Quagsire, 1) }),
             egg_groups: (EggGroup::Water1, Some(EggGroup::Field)),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -49630,9 +47443,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 32,
             base_weight: 1600,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Pineco, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Pineco)),
             egg_groups: (EggGroup::Field, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -49667,9 +47478,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 36,
                 base_weight: 392,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Gligar, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gligar)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G9,
                 is_restricted_legend: false,
@@ -49699,9 +47508,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 45,
                 base_weight: 474,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Gligar, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gligar)),
                 egg_groups: (EggGroup::Field, None),
                 introduced: Generation::G9,
                 is_restricted_legend: false,
@@ -49736,9 +47543,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 20,
             base_weight: 1200,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Bouffalant, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Bouffalant)),
             egg_groups: (EggGroup::HumanLike, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -50179,9 +47984,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(115) }),
             base_height: 5,
             base_weight: 170,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Baxcalibur, 0)
-            }],
+            evolutions: &[SpeciesForm::base_form(NationalDex::Baxcalibur)],
             pre_evolution: None,
             egg_groups: (EggGroup::Dragon, Some(EggGroup::Mineral)),
             introduced: Generation::G9,
@@ -50215,12 +48018,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(115) }),
             base_height: 8,
             base_weight: 300,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gimmighoul, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Arctibax, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::Gimmighoul)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Arctibax)),
             egg_groups: (EggGroup::Dragon, Some(EggGroup::Mineral)),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -50244,9 +48043,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 is_base_form: true,
                 is_mega: false,
                 mega_evolution_data: &[MegaEvolutionMetadata {
-                    mega_form: unsafe {
-                        SpeciesForm::unchecked_form(NationalDex::Gimmighoul, 1)
-                    },
+                    mega_form: unsafe { SpeciesForm::unchecked_form(NationalDex::Gimmighoul, 1) },
                     required_item_id: Some(2648),
                 }],
                 is_gmax: false,
@@ -50260,9 +48057,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 21,
                 base_weight: 2100,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Baxcalibur, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Baxcalibur)),
                 egg_groups: (EggGroup::Dragon, Some(EggGroup::Mineral)),
                 introduced: Generation::G9,
                 is_restricted_legend: false,
@@ -50327,9 +48122,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: None,
                 base_height: 3,
                 base_weight: 50,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::WoChien, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::WoChien)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::NoEggsDiscovered, None),
                 introduced: Generation::G9,
@@ -50359,9 +48152,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: None,
                 base_height: 1,
                 base_weight: 1,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::WoChien, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::WoChien)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::NoEggsDiscovered, None),
                 introduced: Generation::G9,
@@ -50397,9 +48188,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 12,
             base_weight: 300,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Gholdengo, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Gholdengo)),
             egg_groups: (EggGroup::NoEggsDiscovered, None),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -51016,12 +48805,8 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(60) }),
             base_height: 4,
             base_weight: 97,
-            evolutions: &[unsafe {
-                SpeciesForm::unchecked_form(NationalDex::GougingFire, 0)
-            }],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Flapple, 0)
-            }),
+            evolutions: &[SpeciesForm::base_form(NationalDex::GougingFire)],
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Flapple)),
             egg_groups: (EggGroup::Grass, Some(EggGroup::Dragon)),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -51055,9 +48840,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(85) }),
                 base_height: 1,
                 base_weight: 11,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Okidogi, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Okidogi)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Mineral, Some(EggGroup::Amorphous)),
                 introduced: Generation::G9,
@@ -51087,9 +48870,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 hidden_ability: Some(unsafe { AbilityIndexBounded::new_unchecked(85) }),
                 base_height: 1,
                 base_weight: 11,
-                evolutions: &[unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Okidogi, 0)
-                }],
+                evolutions: &[SpeciesForm::base_form(NationalDex::Okidogi)],
                 pre_evolution: None,
                 egg_groups: (EggGroup::Mineral, Some(EggGroup::Amorphous)),
                 introduced: Generation::G9,
@@ -51126,9 +48907,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
                 base_height: 2,
                 base_weight: 22,
                 evolutions: &[],
-                pre_evolution: Some(unsafe {
-                    SpeciesForm::unchecked_form(NationalDex::Sinistcha, 0)
-                }),
+                pre_evolution: Some(SpeciesForm::base_form(NationalDex::Sinistcha)),
                 egg_groups: (EggGroup::Mineral, Some(EggGroup::Amorphous)),
                 introduced: Generation::G9,
                 is_restricted_legend: false,
@@ -51421,9 +49200,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 20,
             base_weight: 600,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Dreepy, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Dreepy)),
             egg_groups: (EggGroup::Mineral, Some(EggGroup::Dragon)),
             introduced: Generation::G9,
             is_restricted_legend: false,
@@ -51457,9 +49234,7 @@ pub static ALL_SPECIES: [SpeciesMetadata; NationalDex::MAX] = [
             base_height: 18,
             base_weight: 930,
             evolutions: &[],
-            pre_evolution: Some(unsafe {
-                SpeciesForm::unchecked_form(NationalDex::Poltchageist, 0)
-            }),
+            pre_evolution: Some(SpeciesForm::base_form(NationalDex::Poltchageist)),
             egg_groups: (EggGroup::Grass, Some(EggGroup::Dragon)),
             introduced: Generation::G9,
             is_restricted_legend: false,
