@@ -33,7 +33,7 @@ import {
   PkmFormat,
   PokeDate,
   ShinyLeaves,
-  SpeciesAndForm,
+  SpeciesForm,
   SpeciesLookup,
   Tag,
   TrainerData,
@@ -105,7 +105,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         prng = new Prando(other.trainerName.concat(other.trainerID.toString()))
       }
 
-      this.speciesAndForm = new SpeciesAndForm(other.nationalDex, other.formIndex)
+      this.speciesAndForm = new SpeciesForm(other.nationalDex, other.formIndex)
       this.extraFormIndex = other.extraFormIndex
 
       if (other.personalityValue === undefined) {
@@ -628,7 +628,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       (this.formIndex !== other.formIndex || this.extraFormIndex !== other.extraFormIndex)
 
     if (hasEvolved || changedForm) {
-      this.speciesAndForm = new SpeciesAndForm(other.nationalDex, other.formIndex)
+      this.speciesAndForm = new SpeciesForm(other.nationalDex, other.formIndex)
       this.extraFormIndex = other.extraFormIndex
     }
 

@@ -3,7 +3,7 @@ use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result, StringErrorSource};
 use crate::sectioned_data::DataSection;
 
-use pkm_rs_resources::species::SpeciesAndForm;
+use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::OriginGame;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{FlagSet, TeraType};
@@ -70,7 +70,7 @@ impl ScarletVioletData {
         }
     }
 
-    pub fn default_generated_tera_type(species_and_form: SpeciesAndForm) -> Self {
+    pub fn default_generated_tera_type(species_and_form: SpeciesForm) -> Self {
         Self {
             tera_type_original: species_and_form
                 .get_forme_metadata()

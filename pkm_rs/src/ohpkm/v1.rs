@@ -9,7 +9,7 @@ use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::SpeciesAndForm;
+use pkm_rs_resources::species::SpeciesForm;
 
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{ContestStats, Ivs, Language, Stats8, Stats16Le, StatsPreSplit};
@@ -23,7 +23,7 @@ const MIN_SIZE: usize = 420;
 #[derive(Debug, Default, Serialize, Clone, Copy, IsShiny4096)]
 pub struct OhpkmV1 {
     pub encryption_constant: u32,
-    pub species_and_form: SpeciesAndForm,
+    pub species_and_form: SpeciesForm,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -139,7 +139,7 @@ impl OhpkmV1 {
         // try_into() will always succeed thanks to the length check
         let mon = Self {
             encryption_constant: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
-            species_and_form: SpeciesAndForm::new(
+            species_and_form: SpeciesForm::new(
                 u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
                 u16::from_le_bytes(bytes[36..38].try_into().unwrap()),
             )?,

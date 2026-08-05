@@ -1,4 +1,4 @@
-use pkm_rs_resources::species::SpeciesAndForm;
+use pkm_rs_resources::species::SpeciesForm;
 use serde::Serialize;
 
 use crate::result::{Error, NdexConvertSource, Result};
@@ -16,7 +16,7 @@ const FAKEMON_INDEXES: [u16; 22] = [
 pub struct RadicalRedSpeciesIndex(u16);
 
 impl CfruSpeciesIndex for RadicalRedSpeciesIndex {
-    fn try_to_species_and_form(self) -> Result<SpeciesAndForm> {
+    fn try_to_species_and_form(self) -> Result<SpeciesForm> {
         super::RR_TO_NATIONAL_DEX_MAP
             .get(&self.0)
             .ok_or(Error::GameDex {
@@ -26,7 +26,7 @@ impl CfruSpeciesIndex for RadicalRedSpeciesIndex {
             .copied()
     }
 
-    fn try_from_species_and_form(saf: &SpeciesAndForm) -> Result<Self> {
+    fn try_from_species_and_form(saf: &SpeciesForm) -> Result<Self> {
         super::NATIONAL_DEX_TO_RR_MAP
             .get(&saf.to_tuple())
             .ok_or(Error::GenDex {

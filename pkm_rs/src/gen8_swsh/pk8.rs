@@ -14,7 +14,7 @@ use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
-use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, Language,
@@ -499,7 +499,7 @@ impl Pk8 {
         national_dex: u16,
         form_index: u16,
     ) -> core::result::Result<(), JsValue> {
-        match SpeciesAndForm::new(national_dex, form_index) {
+        match SpeciesForm::new(national_dex, form_index) {
             Ok(species_and_form) => {
                 self.species_and_form = species_and_form.try_into()?;
                 Ok(())

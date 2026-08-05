@@ -1,4 +1,4 @@
-use pkm_rs_resources::species::SpeciesAndForm;
+use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::NationalDex;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -82,7 +82,7 @@ impl SvPokemonIndex {
         }
     }
 
-    pub fn from_species_and_form(species_and_form: SpeciesAndForm) -> Result<Self, Error> {
+    pub fn from_species_and_form(species_and_form: SpeciesForm) -> Result<Self, Error> {
         if let Some(sv_index) = national_dex_to_sv(species_and_form.get_ndex_wasm()) {
             NonZeroU16::new(sv_index)
                 .map(Self)
@@ -127,7 +127,7 @@ impl Default for SvPokemonIndex {
 impl Randomize for SvPokemonIndex {
     fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
         loop {
-            if let Ok(index) = Self::from_species_and_form(SpeciesAndForm::randomized(rng)) {
+            if let Ok(index) = Self::from_species_and_form(SpeciesForm::randomized(rng)) {
                 return index;
             }
         }

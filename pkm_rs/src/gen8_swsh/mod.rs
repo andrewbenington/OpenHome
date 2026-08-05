@@ -7,7 +7,7 @@ use pk8_buffer::Pk8Buffer;
 use pkm_rs_resources;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ribbons::ModernRibbon;
-use pkm_rs_resources::species::SpeciesAndForm;
+use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_resources::species::form_metadata::source_has_form_metadata;
 
 #[cfg(feature = "randomize")]
@@ -33,10 +33,10 @@ pub type Pk8AbilityIndex = AbilityIndexBounded<MAX_ABILITY_INDEX>;
 type BoxName = SizedUtf16String<BOX_NAME_LENGTH>;
 
 #[derive(Debug, Clone, Copy, Default)]
-pub struct Pk8SpeciesAndForm(SpeciesAndForm);
+pub struct Pk8SpeciesAndForm(SpeciesForm);
 
 impl Pk8SpeciesAndForm {
-    fn try_new(species_and_form: SpeciesAndForm) -> Option<Self> {
+    fn try_new(species_and_form: SpeciesForm) -> Option<Self> {
         if source_has_form_metadata(
             MetadataSource::SwordShield,
             species_and_form.get_ndex() as u16,
@@ -48,7 +48,7 @@ impl Pk8SpeciesAndForm {
         }
     }
 
-    pub const fn into_inner(self) -> SpeciesAndForm {
+    pub const fn into_inner(self) -> SpeciesForm {
         self.0
     }
 }
@@ -66,17 +66,17 @@ impl serde::Serialize for Pk8SpeciesAndForm {
 impl Randomize for Pk8SpeciesAndForm {
     fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
         loop {
-            if let Some(randomized) = Self::try_new(SpeciesAndForm::randomized(rng)) {
+            if let Some(randomized) = Self::try_new(SpeciesForm::randomized(rng)) {
                 return randomized;
             }
         }
     }
 }
 
-impl TryFrom<SpeciesAndForm> for Pk8SpeciesAndForm {
+impl TryFrom<SpeciesForm> for Pk8SpeciesAndForm {
     type Error = Error;
 
-    fn try_from(value: SpeciesAndForm) -> std::result::Result<Self, Self::Error> {
+    fn try_from(value: SpeciesForm) -> std::result::Result<Self, Self::Error> {
         Self::try_new(value).ok_or(Error::form_index(value))
     }
 }

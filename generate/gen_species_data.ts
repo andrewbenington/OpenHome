@@ -76,8 +76,8 @@ type Form = {
   readonly abilityH?: number
   readonly height: number
   readonly weight: number
-  readonly evos?: readonly SpeciesAndForm[]
-  readonly prevo?: SpeciesAndForm
+  readonly evos?: readonly SpeciesForm[]
+  readonly prevo?: SpeciesForm
   readonly eggGroups: readonly string[]
   readonly gen: number
   readonly regional?: RegionalForm
@@ -93,7 +93,7 @@ type Form = {
 
 export type RegionalForm = 'Alola' | 'Galar' | 'Hisui' | 'Paldea'
 
-type SpeciesAndForm = {
+type SpeciesForm = {
   readonly nationalDex: number
   readonly formIndex: number
 }
@@ -109,12 +109,12 @@ function statsToRust(stats: {
   return `Stats16Le::new(${stats.hp}, ${stats.atk}, ${stats.def}, ${stats.spa}, ${stats.spd}, ${stats.spe})`
 }
 
-function SpeciesAndFormToRust(ref: SpeciesAndForm): string {
+function SpeciesAndFormToRust(ref: SpeciesForm): string {
   const species = allSpecies[ref.nationalDex]
-  return `unsafe { SpeciesAndForm::unchecked_form(NationalDex::${pascalCase(species.name)}, ${ref.formIndex}) }`
+  return `unsafe { SpeciesForm::unchecked_form(NationalDex::${pascalCase(species.name)}, ${ref.formIndex}) }`
 }
 
-function evolutionsToRust(evos?: readonly SpeciesAndForm[]): string {
+function evolutionsToRust(evos?: readonly SpeciesForm[]): string {
   return `&[${(evos ?? []).map(SpeciesAndFormToRust).join(',')}]`
 }
 
@@ -313,7 +313,7 @@ async function main() {
   let output = `
 use crate::abilities::AbilityIndexBounded;
 use crate::species::{
-    EggGroup, FormMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, SpeciesAndForm, SpeciesMetadata,
+    EggGroup, FormMetadata, GenderRatio, LevelUpType, MegaEvolutionMetadata, SpeciesForm, SpeciesMetadata,
 };
 use pkm_rs_types::{Generation, GameSetting, NationalDex};
 

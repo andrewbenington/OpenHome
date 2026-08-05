@@ -22,7 +22,7 @@ use pkm_rs_resources::moves::MoveIndex;
 use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::SpeciesAndForm;
+use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
@@ -281,11 +281,11 @@ impl OhpkmV2 {
         self.main_data.encryption_constant = v;
     }
 
-    pub const fn species_and_form(&self) -> SpeciesAndForm {
+    pub const fn species_and_form(&self) -> SpeciesForm {
         self.main_data.species_and_form
     }
 
-    pub const fn set_species_and_form(&mut self, v: &SpeciesAndForm) {
+    pub const fn set_species_and_form(&mut self, v: &SpeciesForm) {
         self.main_data.species_and_form = *v;
     }
 
@@ -1903,11 +1903,11 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = speciesAndForm)]
-    pub fn species_and_form_js(&self) -> SpeciesAndForm {
+    pub fn species_and_form_js(&self) -> SpeciesForm {
         self.species_and_form()
     }
     #[wasm_bindgen(setter = speciesAndForm)]
-    pub fn set_species_and_form_js(&mut self, v: &SpeciesAndForm) {
+    pub fn set_species_and_form_js(&mut self, v: &SpeciesForm) {
         self.set_species_and_form(v);
     }
 
@@ -2521,7 +2521,7 @@ impl OhpkmV2 {
 
     // #[wasm_bindgen]
     // pub fn set_species_and_form(&mut self, national_dex: u16, form_index: u16) -> JsResult<_js()> {
-    //     match SpeciesAndForm::new(national_dex, form_index) {
+    //     match SpeciesForm::new(national_dex, form_index) {
     //         Ok(species_and_form) => {
     //             self.main_data.species_and_form = species_and_form;
     //             Ok(())
