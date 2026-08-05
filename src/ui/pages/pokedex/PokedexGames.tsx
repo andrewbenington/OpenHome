@@ -24,10 +24,7 @@ export function PokedexGames(props: PokedexGamesProps) {
   return (
     <>
       <Flex gap="1" overflowY="auto" wrap="wrap" justify="center" mt="1">
-        {MetadataSources.supportedGameOrigins(
-          selectedForm.nationalDex.index,
-          selectedForm.formIndex
-        )
+        {MetadataSources.supportedGameOrigins(selectedForm.nationalDex, selectedForm.formIndex)
           .filter((origin) => {
             if (isExtraFormMetadata(selectedForm)) {
               return (
@@ -53,7 +50,7 @@ export function PokedexGames(props: PokedexGamesProps) {
           ))}
         {!isRestricted(
           CHAMPS_TRANSFER_RESTRICTIONS,
-          selectedForm.nationalDex.index,
+          selectedForm.nationalDex,
           selectedForm.formIndex
         ) && (
           <Card
@@ -76,7 +73,7 @@ export function PokedexGames(props: PokedexGamesProps) {
             (saveType) =>
               !isRestricted(
                 saveType.transferRestrictions,
-                selectedForm.nationalDex.index,
+                selectedForm.nationalDex,
                 selectedForm.formIndex,
                 isExtraFormMetadata(selectedForm) ? selectedForm.extraFormIndex : undefined
               )

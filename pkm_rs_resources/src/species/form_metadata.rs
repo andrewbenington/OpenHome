@@ -341,14 +341,16 @@ fn most_recent_metadata_table_for(
 }
 
 pub fn base_stats_lookup(
-    national_dex: u16,
+    national_dex: NationalDex,
     form_index: u16,
     source: MetadataSource,
 ) -> Option<BaseStats> {
+    let national_dex = national_dex as u16;
     metadata_table_by_source(source).get_base_stats(national_dex, form_index)
 }
 
-pub fn current_base_stats(national_dex: u16, form_index: u16) -> Option<Stats8> {
+pub fn current_base_stats(national_dex: NationalDex, form_index: u16) -> Option<Stats8> {
+    let national_dex = national_dex as u16;
     most_recent_metadata_table_for(national_dex, form_index)
         .get_base_stats(national_dex, form_index)
         .map(|base_stats| match base_stats {
@@ -403,10 +405,11 @@ fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTabl
 }
 
 pub fn types_lookup(
-    national_dex: u16,
+    national_dex: NationalDex,
     form_index: u16,
     source: Option<MetadataSource>,
 ) -> Option<(PkmType, Option<PkmType>)> {
+    let national_dex = national_dex as u16;
     match source {
         Some(source) => metadata_table_by_source(source).get_types(national_dex, form_index),
         None => most_recent_metadata_table_for(national_dex, form_index)
@@ -433,7 +436,7 @@ mod tests {
     use super::*;
     use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-    use crate::species::{FormMetadata, NatDexIndex, form_metadata::MetadataSource};
+    use crate::species::{FormMetadata, GetSpeciesMetadata, form_metadata::MetadataSource};
 
     const ARCEUS_LEGEND: u16 = 18;
 
@@ -468,13 +471,13 @@ mod tests {
 
     fn form_has_current_data(form: &FormMetadata) -> bool {
         !(form.form_name.contains("Totem")
-        || (form.national_dex.to_u16() == NationalDex::Xerneas && form.form_index == 1) // Active Xerneas
-            || (form.national_dex.to_u16() == NationalDex::Arceus && form.form_index == ARCEUS_LEGEND))
+        || (form.national_dex == NationalDex::Xerneas && form.form_index == 1) // Active Xerneas
+            || (form.national_dex == NationalDex::Arceus && form.form_index == ARCEUS_LEGEND))
     }
 
     fn try_all_forms(callback: impl Fn(&FormMetadata) -> Result<(), String>) -> Result<(), String> {
         for national_dex in NationalDex::Bulbasaur as u16..=NationalDex::MAX as u16 {
-            let species_metadata = NatDexIndex::new(national_dex)
+            let species_metadata = NationalDex::new(national_dex)
                 .expect("1-1025 are valid national dex indices")
                 .get_species_metadata();
             for form in species_metadata.forms {
@@ -490,7 +493,7 @@ mod tests {
     #[test]
     fn test_get_stats() {
         assert_eq!(
-            super::current_base_stats(NationalDex::Pikachu as u16, 0),
+            current_base_stats(NationalDex::Pikachu, 0),
             Some(Stats8::new(35, 55, 40, 50, 50, 90))
         );
     }
@@ -498,7 +501,7 @@ mod tests {
     #[test]
     fn test_get_types() {
         assert_eq!(
-            super::types_lookup(NationalDex::Pikachu as u16, 0, None),
+            types_lookup(NationalDex::Pikachu, 0, None),
             Some((PkmType::Electric, None))
         );
     }
@@ -506,7 +509,7 @@ mod tests {
     #[test]
     fn all_forms_have_types() -> Result<(), String> {
         try_all_forms(|form| {
-            super::types_lookup(form.national_dex.to_u16(), form.form_index, None)
+            types_lookup(form.national_dex, form.form_index, None)
                 .ok_or(format!("Missing types for {}", form.form_name))?;
             Ok(())
         })
@@ -516,9 +519,8 @@ mod tests {
     fn no_form_duplicates_type() -> Result<(), String> {
         try_all_forms(|form| {
             let form_name = &form.form_name;
-            let (type1, type2) =
-                super::types_lookup(form.national_dex.to_u16(), form.form_index, None)
-                    .ok_or(format!("Missing types for {form_name}"))?;
+            let (type1, type2) = types_lookup(form.national_dex, form.form_index, None)
+                .ok_or(format!("Missing types for {form_name}"))?;
             if let Some(type2) = type2
                 && type1 == type2
             {
@@ -535,7 +537,7 @@ mod tests {
     fn no_zero_stats() -> Result<(), String> {
         try_all_forms(|form| {
             let form_name = &form.form_name;
-            let stats = super::current_base_stats(form.national_dex.to_u16(), form.form_index)
+            let stats = current_base_stats(form.national_dex, form.form_index)
                 .ok_or(format!("Missing stats for {form_name}"))?;
             if stats.hp == 0
                 || stats.atk == 0
@@ -570,7 +572,7 @@ mod tests {
     fn no_form_panics_for_any_source() -> Result<(), String> {
         try_all_forms(|form| {
             METADATA_SOURCES_IMPLEMENTED.into_iter().for_each(|source| {
-                super::base_stats_lookup(form.national_dex.to_u16(), form.form_index, source);
+                base_stats_lookup(form.national_dex, form.form_index, source);
             });
             Ok(())
         })

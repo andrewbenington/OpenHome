@@ -1,9 +1,9 @@
 use crate::sectioned_data;
 
+use pkm_rs_resources::abilities::ABILITY_MAX;
 use pkm_rs_resources::lookup;
-use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
-use pkm_rs_resources::{abilities::ABILITY_MAX, species::MAX_NATIONAL_DEX};
-use pkm_rs_types::{InvalidAbilityNumber, Language};
+use pkm_rs_resources::species::{GetSpeciesMetadata, SpeciesAndForm};
+use pkm_rs_types::{InvalidAbilityNumber, Language, NationalDex};
 
 use serde::{Serialize, Serializer};
 use std::fmt::Display;
@@ -45,7 +45,7 @@ pub enum Error {
         source: PokemonIndexType,
     },
     FormIndex {
-        national_dex: NatDexIndex,
+        national_dex: NationalDex,
         form_index: u16,
     },
     AbilityIndex {
@@ -137,7 +137,8 @@ impl Display for Error {
                 source,
             } => {
                 format!(
-                    "Invalid National Dex number {national_dex} (source: {source}; must be between 1 and {MAX_NATIONAL_DEX}"
+                    "Invalid National Dex number {national_dex} (source: {source}; must be between 1 and {}",
+                    NationalDex::MAX
                 )
             }
             Self::PokemonGameIndex {

@@ -5,7 +5,6 @@ use pkm_rs_resources::species::EggGroup;
 use pkm_rs_resources::species::FormMetadata;
 use pkm_rs_resources::species::GenderRatio;
 use pkm_rs_resources::species::MegaEvolutionMetadata;
-use pkm_rs_resources::species::NatDexIndex;
 use pkm_rs_resources::species::SpeciesAndForm;
 use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_resources::species::form_metadata::types_lookup;
@@ -572,10 +571,10 @@ impl ExtraFormIndex {
 #[cfg(feature = "randomize")]
 impl ExtraFormIndex {
     pub fn randomized_for_national_dex<R: rand::Rng>(
-        national_dex: NatDexIndex,
+        national_dex: NationalDex,
         rng: &mut R,
     ) -> Option<Self> {
-        Self::all_by_national_dex(national_dex.into())
+        Self::all_by_national_dex(national_dex)
             .into_iter()
             .choose(rng)
     }
@@ -674,7 +673,7 @@ pub struct ExtraFormMetadata {
     pub extra_form_index: ExtraFormIndex,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = nationalDex))]
-    pub national_dex: NatDexIndex,
+    pub national_dex: NationalDex,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
     pub form_name: String,
@@ -784,8 +783,9 @@ impl ExtraFormMetadata {
             sprite_index: base_form_metadata.sprite_index,
         }
     }
+
     pub const fn forme_ref(&self) -> SpeciesAndForm {
-        unsafe { SpeciesAndForm::new_unchecked(self.national_dex.to_u16(), self.form_index) }
+        unsafe { SpeciesAndForm::new_valid_ndex_unchecked(self.national_dex, self.form_index) }
     }
 
     pub const fn species_metadata(&self) -> &SpeciesMetadata {
@@ -812,10 +812,9 @@ impl ExtraFormMetadata {
         source: Option<MetadataSource>,
     ) -> (PkmType, Option<PkmType>) {
         self.extra_form_index.type_overrides().unwrap_or(
-            types_lookup(self.national_dex.to_u16(), self.form_index, source).expect_log(format!(
+            types_lookup(self.national_dex, self.form_index, source).expect_log(format!(
                 "no types found for nat dex {} form {}",
-                self.national_dex.to_u16(),
-                self.form_index
+                self.national_dex, self.form_index
             )),
         )
     }
@@ -919,7 +918,7 @@ impl ExtraFormMetadata {
 
     #[wasm_bindgen(getter = baseStats)]
     pub fn get_base_stats(&self) -> Stats16Le {
-        current_base_stats(self.national_dex.to_u16(), self.form_index)
+        current_base_stats(self.national_dex, self.form_index)
             .unwrap_or_default()
             .into()
     }
@@ -928,7 +927,7 @@ impl ExtraFormMetadata {
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = "extraFormMetadata")]
 pub fn extra_form_metadata_js(form: ExtraFormIndex) -> ExtraFormMetadata {
-    let base_form_metadata = SpeciesAndForm::base_form(form.national_dex().into())
+    let base_form_metadata = SpeciesAndForm::base_form(form.national_dex())
         .get_forme_metadata()
         .clone();
 

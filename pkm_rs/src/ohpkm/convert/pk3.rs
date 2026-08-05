@@ -131,7 +131,7 @@ impl OhpkmConvert for Pk3 {
             sanity: 0,
             checksum: 0,
             pokemon_index: Gen3PokemonIndex::from_national_dex(
-                ohpkm.species_and_form().get_ndex().index(),
+                ohpkm.species_and_form().get_ndex() as u16,
             )?,
             held_item_index: ItemGen3::from_modern_index(ohpkm.held_item_index()),
             trainer_id: ohpkm.trainer_id(),

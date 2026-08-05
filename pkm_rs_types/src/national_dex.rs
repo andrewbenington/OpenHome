@@ -30,16 +30,12 @@ impl NationalDex {
             .expect("NationalDex initiated with invalid value")
     }
 
-    pub const fn to_u16(&self) -> u16 {
-        *self as u16
-    }
-
     pub fn from_le_bytes(bytes: [u8; 2]) -> crate::Result<NationalDex> {
         NationalDex::new(u16::from_le_bytes(bytes))
     }
 
     pub const fn to_le_bytes(self) -> [u8; 2] {
-        self.to_u16().to_le_bytes()
+        (self as u16).to_le_bytes()
     }
 }
 
@@ -71,7 +67,7 @@ impl serde::Serialize for NationalDex {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_u16(self.to_u16())
+        serializer.serialize_u16(*self as u16)
     }
 }
 

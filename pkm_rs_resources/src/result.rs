@@ -6,7 +6,7 @@ use crate::abilities::ABILITY_MAX;
 use crate::items::ITEM_MAX;
 use crate::natures::NATURE_MAX;
 use crate::pkhex_text;
-use crate::species::NatDexIndex;
+use crate::species::GetSpeciesMetadata;
 
 #[derive(Debug, Clone)]
 pub enum Error {
@@ -15,7 +15,7 @@ pub enum Error {
         national_dex: u16,
     },
     FormIndex {
-        national_dex: NatDexIndex,
+        national_dex: NationalDex,
         form_index: u16,
     },
     NatureIndex {
