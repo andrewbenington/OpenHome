@@ -111,7 +111,7 @@ function statsToRust(stats: {
 
 function SpeciesAndFormToRust(ref: SpeciesAndForm): string {
   const species = allSpecies[ref.nationalDex]
-  return `unsafe { SpeciesAndForm::new_valid_ndex_unchecked(NationalDex::${pascalCase(species.name)}, ${ref.formIndex}) }`
+  return `unsafe { SpeciesAndForm::unchecked_form(NationalDex::${pascalCase(species.name)}, ${ref.formIndex}) }`
 }
 
 function evolutionsToRust(evos?: readonly SpeciesAndForm[]): string {

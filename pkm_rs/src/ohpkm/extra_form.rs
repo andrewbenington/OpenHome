@@ -5,7 +5,7 @@ use pkm_rs_resources::species::EggGroup;
 use pkm_rs_resources::species::FormMetadata;
 use pkm_rs_resources::species::GenderRatio;
 use pkm_rs_resources::species::MegaEvolutionMetadata;
-use pkm_rs_resources::species::SpeciesAndForm;
+use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_resources::species::form_metadata::types_lookup;
 use pkm_rs_types::AbilityNumber;
@@ -715,10 +715,10 @@ pub struct ExtraFormMetadata {
     pub base_weight: u32,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub evolutions: &'static [SpeciesAndForm],
+    pub evolutions: &'static [SpeciesForm],
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = preEvolution))]
-    pub pre_evolution: Option<SpeciesAndForm>,
+    pub pre_evolution: Option<SpeciesForm>,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub egg_groups: (EggGroup, Option<EggGroup>),
@@ -784,8 +784,8 @@ impl ExtraFormMetadata {
         }
     }
 
-    pub const fn forme_ref(&self) -> SpeciesAndForm {
-        unsafe { SpeciesAndForm::new_valid_ndex_unchecked(self.national_dex, self.form_index) }
+    pub const fn forme_ref(&self) -> SpeciesForm {
+        unsafe { SpeciesForm::unchecked_form(self.national_dex, self.form_index) }
     }
 
     pub const fn species_metadata(&self) -> &SpeciesMetadata {
@@ -800,7 +800,7 @@ impl ExtraFormMetadata {
         }
     }
 
-    pub fn get_base_evolution(&self) -> SpeciesAndForm {
+    pub fn get_base_evolution(&self) -> SpeciesForm {
         match self.pre_evolution {
             None => self.forme_ref(),
             Some(forme_ref) => forme_ref.get_base_evolution(),
@@ -877,7 +877,7 @@ impl ExtraFormMetadata {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    pub fn evolutions(&self) -> Vec<SpeciesAndForm> {
+    pub fn evolutions(&self) -> Vec<SpeciesForm> {
         self.evolutions.to_vec()
     }
 
@@ -927,7 +927,7 @@ impl ExtraFormMetadata {
 #[cfg(feature = "wasm")]
 #[wasm_bindgen(js_name = "extraFormMetadata")]
 pub fn extra_form_metadata_js(form: ExtraFormIndex) -> ExtraFormMetadata {
-    let base_form_metadata = SpeciesAndForm::base_form(form.national_dex())
+    let base_form_metadata = SpeciesForm::base_form(form.national_dex())
         .get_forme_metadata()
         .clone();
 
