@@ -46,8 +46,11 @@ impl Display for Error {
                 NationalDex::MAX
             )
             .to_owned(),
-            Self::AbilityNumber(InvalidAbilityNumber(num)) => {
+            Self::AbilityNumber(InvalidAbilityNumber::U8(num)) => {
                 format!("Invalid ability number {num} (must be between 1 and 3)")
+            }
+            Self::AbilityNumber(InvalidAbilityNumber::HiddenNotAllowed) => {
+                String::from("Hidden ability not allowed")
             }
             Self::LanguageIndex { language_index } => {
                 format!(

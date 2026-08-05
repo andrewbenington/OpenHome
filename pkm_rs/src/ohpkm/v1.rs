@@ -193,7 +193,7 @@ impl OhpkmV1 {
                 MoveIndex::from(u16::from_le_bytes(bytes[90..92].try_into().unwrap())),
             ],
             move_pp: [bytes[92], bytes[93], bytes[94], bytes[95]],
-            nickname: SizedUtf16String::<26>::from_bytes(bytes[96..122].try_into().unwrap()),
+            nickname: SizedUtf16String::<26>::from_le_bytes(bytes[96..122].try_into().unwrap()),
             avs: Stats16::from_bytes_le(bytes[122..134].try_into().unwrap()),
             move_pp_ups: [bytes[134], bytes[135], bytes[136], bytes[137]],
             relearn_moves: [
@@ -211,7 +211,7 @@ impl OhpkmV1 {
             unknown_a0: u32::from_le_bytes(bytes[160..164].try_into().unwrap()),
             gvs: Stats8::from_bytes(bytes[164..170].try_into().unwrap()),
             dvs: StatsPreSplit::from_dv_bytes(bytes[170..172].try_into().unwrap()),
-            handler_name: SizedUtf16String::<26>::from_bytes(bytes[184..210].try_into().unwrap()),
+            handler_name: SizedUtf16String::<26>::from_le_bytes(bytes[184..210].try_into().unwrap()),
             handler_language: bytes[211],
             is_current_handler: util::get_flag(bytes, 212, 0),
             resort_event_status: bytes[213],
@@ -253,7 +253,7 @@ impl OhpkmV1 {
             geolocations: Geolocations::from_bytes(bytes[249..259].try_into().unwrap()),
             encounter_type: bytes[270],
             performance: bytes[271],
-            trainer_name: SizedUtf16String::<26>::from_bytes(bytes[272..298].try_into().unwrap()),
+            trainer_name: SizedUtf16String::<26>::from_le_bytes(bytes[272..298].try_into().unwrap()),
             trainer_friendship: bytes[298],
             trainer_memory: TrainerMemory {
                 intensity: bytes[299],
@@ -285,7 +285,7 @@ impl OhpkmV1 {
                 [0u8; 13]
             },
             plugin_origin: if bytes.len() >= 465 {
-                SizedUtf16String::<32>::from_bytes(bytes[433..465].try_into().unwrap())
+                SizedUtf16String::<32>::from_le_bytes(bytes[433..465].try_into().unwrap())
             } else {
                 SizedUtf16String::<32>::default()
             },
@@ -364,10 +364,10 @@ impl PkmBytes for OhpkmV1 {
         bytes[81] = self.weight_scalar;
         bytes[82] = self.scale;
 
-        bytes[84..86].copy_from_slice(&self.moves[0].to_bytes_le());
-        bytes[86..88].copy_from_slice(&self.moves[1].to_bytes_le());
-        bytes[88..90].copy_from_slice(&self.moves[2].to_bytes_le());
-        bytes[90..92].copy_from_slice(&self.moves[3].to_bytes_le());
+        bytes[84..86].copy_from_slice(&self.moves[0].to_le_bytes());
+        bytes[86..88].copy_from_slice(&self.moves[1].to_le_bytes());
+        bytes[88..90].copy_from_slice(&self.moves[2].to_le_bytes());
+        bytes[90..92].copy_from_slice(&self.moves[3].to_le_bytes());
 
         bytes[92] = self.move_pp[0];
         bytes[93] = self.move_pp[1];
@@ -375,17 +375,17 @@ impl PkmBytes for OhpkmV1 {
         bytes[95] = self.move_pp[3];
 
         bytes[96..122].copy_from_slice(&self.nickname);
-        bytes[122..134].copy_from_slice(&self.avs.to_bytes_le());
+        bytes[122..134].copy_from_slice(&self.avs.to_le_bytes());
 
         bytes[134] = self.move_pp_ups[0];
         bytes[135] = self.move_pp_ups[1];
         bytes[136] = self.move_pp_ups[2];
         bytes[137] = self.move_pp_ups[3];
 
-        bytes[138..140].copy_from_slice(&self.relearn_moves[0].to_bytes_le());
-        bytes[140..142].copy_from_slice(&self.relearn_moves[1].to_bytes_le());
-        bytes[142..144].copy_from_slice(&self.relearn_moves[2].to_bytes_le());
-        bytes[144..146].copy_from_slice(&self.relearn_moves[3].to_bytes_le());
+        bytes[138..140].copy_from_slice(&self.relearn_moves[0].to_le_bytes());
+        bytes[140..142].copy_from_slice(&self.relearn_moves[1].to_le_bytes());
+        bytes[142..144].copy_from_slice(&self.relearn_moves[2].to_le_bytes());
+        bytes[144..146].copy_from_slice(&self.relearn_moves[3].to_le_bytes());
 
         self.ivs.to_ivs_capped().write_30_bits(bytes, 148);
         util::set_flag(bytes, 148, 30, self.is_egg);

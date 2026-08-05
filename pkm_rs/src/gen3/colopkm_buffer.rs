@@ -1,16 +1,14 @@
 use crate::bytes::{AsBytes, AsBytesMut};
-use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::encryption::BlockCrypto;
-use crate::result::Result;
-use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
-use crate::util;
+use crate::result::{Error, Result};
+use crate::{gen3, util};
 
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveSlots, PpUpStorage};
+use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::ribbons::{
     Beauty, Cool, Cute, Gen3ContestRibbons, Gen3RibbonSet, Smart, Tough,
 };
-use pkm_rs_types::strings::SizedUtf16String;
+use pkm_rs_types::strings::{BigEndian, SizedUtf16String};
 use pkm_rs_types::{
     BinaryGender, ContestStats, FlagSet, Ivs, MarkingsFourShapes, OriginGame, SimpleAbilityNumber,
     Stats8,
@@ -44,6 +42,8 @@ pub(super) enum Offset {
     FatefulEncounterJpn = 0xc9,
     FatefulEncounterInt = 0xfb,
     Pokerus = 0xca,
+    IsEgg = 0xcb,
+    AbilityNumber = 0xcc,
     Markings = 0xcf,
     TrainerFriendship = 0xd0,
     ShadowId = 0xd8,
@@ -62,11 +62,9 @@ impl From<Offset> for usize {
 // ColopkmBuffer<S> — generic over the byte storage so that a single impl block
 // covers all getters, and a second (narrower) block covers setters.
 //
-//   ColopkmBufferRef<'a>  = ColopkmBuffer<&'a [u8]>       — read-only
 //   ColopkmBufferMut<'a>  = ColopkmBuffer<&'a mut [u8]>   — read + write
 // ---------------------------------------------------------------------------
 
-pub type ColopkmBufferRef<'a> = ColopkmBuffer<&'a [u8]>;
 pub type ColopkmBufferMut<'a> = ColopkmBuffer<&'a mut [u8]>;
 
 #[derive(Default, Clone, Copy)]
@@ -78,7 +76,7 @@ pub struct ColopkmBuffer<S: AsRef<[u8]>>(S);
 
 impl<'a> ColopkmBuffer<&'a [u8]> {
     pub fn new(span: &'a [u8]) -> Self {
-        assert_eq!(span.len(), super::PKM_DATA_SIZE);
+        assert_eq!(span.len(), gen3::PKM_DATA_SIZE_GCN);
         Self(span)
     }
 }
@@ -89,7 +87,7 @@ impl<'a> ColopkmBuffer<&'a [u8]> {
 
 impl<'a> ColopkmBuffer<&'a mut [u8]> {
     pub fn new_mut(span: &'a mut [u8]) -> Self {
-        assert_eq!(span.len(), super::PKM_DATA_SIZE);
+        assert_eq!(span.len(), gen3::PKM_DATA_SIZE_GCN);
         Self(span)
     }
 }
@@ -109,7 +107,7 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         read_u16_be!(self.bytes(), offset)
     }
 
-    fn get_u32_le(&self, offset: Offset) -> u32 {
+    fn get_u32_be(&self, offset: Offset) -> u32 {
         let offset = offset as usize;
         read_u32_le!(self.bytes(), offset)
     }
@@ -130,12 +128,12 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
         self.bytes_mut()[offset] = v;
     }
 
-    fn set_u16_le(&mut self, offset: Offset, v: u16) {
+    fn set_u16_be(&mut self, offset: Offset, v: u16) {
         let offset = offset as usize;
-        self.bytes_mut()[offset..offset + 2].copy_from_slice(&v.to_le_bytes());
+        self.bytes_mut()[offset..offset + 2].copy_from_slice(&v.to_be_bytes());
     }
 
-    fn set_u32_le(&mut self, offset: Offset, v: u32) {
+    fn set_u32_be(&mut self, offset: Offset, v: u32) {
         let offset = offset as usize;
         self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
     }
@@ -177,11 +175,11 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
     }
 
     pub fn trainer_and_secret_id(&self) -> u32 {
-        self.get_u32_le(Offset::TrainerId)
+        self.get_u32_be(Offset::TrainerId)
     }
 
     pub fn exp(&self) -> u32 {
-        self.get_u32_le(Offset::Exp)
+        self.get_u32_be(Offset::Exp)
     }
 
     fn markings_raw(&self) -> u8 {
@@ -193,7 +191,7 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
     }
 
     pub fn personality_value(&self) -> u32 {
-        self.get_u32_le(Offset::PersonalityValue)
+        self.get_u32_be(Offset::PersonalityValue)
     }
 
     pub fn is_fateful_encounter_jpn(&self) -> bool {
@@ -224,6 +222,14 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         self.get_u8(Offset::Pokerus)
     }
 
+    pub fn is_egg(&self) -> bool {
+        self.get_flag(Offset::IsEgg, 0)
+    }
+
+    pub fn ability_num(&self) -> SimpleAbilityNumber {
+        self.get_flag(Offset::AbilityNumber, 0).into()
+    }
+
     pub fn ribbons_contest_raw(&self) -> [u8; 5] {
         self.get_array(Offset::RibbonsContest)
     }
@@ -238,23 +244,21 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
 
     pub fn ribbons(&self) -> Gen3RibbonSet {
         let contest_levels = self.ribbons_contest_raw();
+        let cool = Gen3ContestRibbons::<Cool>::from_u8(contest_levels[0]);
+        let beauty = Gen3ContestRibbons::<Beauty>::from_u8(contest_levels[1]);
+        let cute = Gen3ContestRibbons::<Cute>::from_u8(contest_levels[2]);
+        let smart = Gen3ContestRibbons::<Smart>::from_u8(contest_levels[3]);
+        let tough = Gen3ContestRibbons::<Tough>::from_u8(contest_levels[4]);
 
-        Gen3RibbonSet {
-            non_contest: self.ribbons_standard(),
-            cool: Gen3ContestRibbons::<Cool>::from_u8(contest_levels[0]),
-            beauty: Gen3ContestRibbons::<Beauty>::from_u8(contest_levels[1]),
-            cute: Gen3ContestRibbons::<Cute>::from_u8(contest_levels[2]),
-            smart: Gen3ContestRibbons::<Smart>::from_u8(contest_levels[3]),
-            tough: Gen3ContestRibbons::<Tough>::from_u8(contest_levels[4]),
-        }
+        Gen3RibbonSet::new(self.ribbons_standard(), cool, beauty, cute, smart, tough)
     }
 
     pub fn nickname_raw(&self) -> [u8; 10] {
         self.get_array(Offset::Nickname)
     }
 
-    pub fn nickname(&self, encoding: Gen3Encoding) -> Gen3NicknameString<10> {
-        Gen3NicknameString::<10>::from_raw(self.nickname_raw(), encoding)
+    pub fn nickname(&self) -> SizedUtf16String<10, BigEndian> {
+        SizedUtf16String::from_be_bytes(self.nickname_raw())
     }
 
     pub fn move_slots(&self) -> MoveSlots {
@@ -269,12 +273,20 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         self.get_array(Offset::TrainerName)
     }
 
-    pub fn trainer_name(&self) -> SizedUtf16String<10> {
-        SizedUtf16String::from_bytes(self.trainer_name_raw())
+    pub fn trainer_name(&self) -> SizedUtf16String<10, BigEndian> {
+        SizedUtf16String::from_be_bytes(self.trainer_name_raw())
     }
 
     pub fn trainer_friendship(&self) -> u8 {
         self.get_u8(Offset::TrainerFriendship)
+    }
+
+    pub fn shadow_id(&self) -> u16 {
+        self.get_u16_be(Offset::ShadowId)
+    }
+
+    pub fn shadow_gauge(&self) -> u16 {
+        self.get_u16_be(Offset::ShadowGauge)
     }
 
     pub fn met_location_index(&self) -> u8 {
@@ -297,8 +309,11 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         self.trainer_gender_raw().into()
     }
 
-    pub fn game_of_origin(&self) -> Option<OriginGame> {
-        OriginGame::try_from_gamecube_u8(self.get_u8(Offset::OriginGameGcn))
+    pub fn game_of_origin(&self) -> Result<OriginGame> {
+        let origin_game_raw = self.get_u8(Offset::OriginGameGcn);
+        OriginGame::try_from_gamecube_u8(origin_game_raw).ok_or(Error::other(&format!(
+            "bad gamecube origin game: {origin_game_raw}"
+        )))
     }
 
     pub fn language(&self) -> Result<Language> {
@@ -348,23 +363,27 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
     }
 
     pub fn set_national_dex(&mut self, v: u16) {
-        self.set_u16_le(Offset::NationalDex, v);
+        self.set_u16_be(Offset::NationalDex, v);
     }
 
     pub fn set_held_item_index(&mut self, v: u16) {
-        self.set_u16_le(Offset::HeldItem, v);
+        self.set_u16_be(Offset::HeldItem, v);
     }
 
     pub fn set_trainer_id(&mut self, v: u16) {
-        self.set_u16_le(Offset::TrainerId, v);
+        self.set_u16_be(Offset::TrainerId, v);
     }
 
     pub fn set_secret_id(&mut self, v: u16) {
-        self.set_u16_le(Offset::SecretId, v);
+        self.set_u16_be(Offset::SecretId, v);
     }
 
     pub fn set_exp(&mut self, v: u32) {
-        self.set_u32_le(Offset::Exp, v);
+        self.set_u32_be(Offset::Exp, v);
+    }
+
+    pub fn set_is_egg(&mut self, v: bool) {
+        self.set_flag(Offset::IsEgg, 0, v);
     }
 
     fn set_markings_raw(&mut self, v: u8) {
@@ -376,14 +395,14 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
     }
 
     pub fn set_personality_value(&mut self, v: u32) {
-        self.set_u32_le(Offset::PersonalityValue, v);
+        self.set_u32_be(Offset::PersonalityValue, v);
     }
 
-    pub fn set_is_fateful_encounte_jpn(&mut self, v: bool) {
+    pub fn set_is_fateful_encounter_jpn(&mut self, v: bool) {
         self.set_flag(Offset::FatefulEncounterJpn, 4, v);
     }
 
-    pub fn set_is_fateful_encounte_int(&mut self, v: bool) {
+    pub fn set_is_fateful_encounter_int(&mut self, v: bool) {
         self.set_flag(Offset::FatefulEncounterInt, 0, v);
     }
 
@@ -405,6 +424,10 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
 
     pub fn set_pokerus_byte(&mut self, v: u8) {
         self.set_u8(Offset::Pokerus, v);
+    }
+
+    pub fn set_ability_num(&mut self, v: SimpleAbilityNumber) {
+        self.set_flag(Offset::AbilityNumber, 0, v.into());
     }
 
     pub fn set_ribbons_contest_raw(&mut self, v: &[u8; 5]) {
@@ -444,7 +467,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
         self.set_array(Offset::Nickname, v);
     }
 
-    pub fn set_nickname(&mut self, v: &Gen3NicknameString<10>) {
+    pub fn set_nickname(&mut self, v: &SizedUtf16String<10, BigEndian>) {
         self.set_nickname_raw(&v.bytes());
     }
 
@@ -460,12 +483,20 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
         self.set_array(Offset::TrainerName, v);
     }
 
-    pub fn set_trainer_name(&mut self, v: &SizedUtf16String<10>) {
+    pub fn set_trainer_name(&mut self, v: &SizedUtf16String<10, BigEndian>) {
         self.set_trainer_name_raw(&v.bytes());
     }
 
     pub fn set_trainer_friendship(&mut self, v: u8) {
         self.set_u8(Offset::TrainerFriendship, v);
+    }
+
+    pub fn set_shadow_id(&mut self, v: u16) {
+        self.set_u16_be(Offset::ShadowId, v);
+    }
+
+    pub fn set_shadow_gauge(&mut self, v: u16) {
+        self.set_u16_be(Offset::ShadowGauge, v);
     }
 
     pub fn set_met_location_index(&mut self, v: u8) {
@@ -508,7 +539,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
     }
 
     pub fn set_current_hp(&mut self, v: u16) {
-        self.set_u16_le(Offset::CurrentHp, v);
+        self.set_u16_be(Offset::CurrentHp, v);
     }
 
     fn set_stats_raw(&mut self, v: [u8; 12]) {
@@ -516,7 +547,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
     }
 
     pub fn set_stats(&mut self, v: Stats16) {
-        self.set_stats_raw(v.to_bytes_le());
+        self.set_stats_raw(v.to_bytes_be());
     }
 
     // ------------------------------------------------------------------

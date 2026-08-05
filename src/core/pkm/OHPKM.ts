@@ -1001,6 +1001,8 @@ export function originalDataTagToMonFormat(tag: Tag): PkmFormat {
       return 'PK2'
     case Tag.Pk3:
       return 'PK3'
+    case Tag.Colopkm:
+      return 'COLOPKM'
     case Tag.Pk4:
       return 'PK4'
     case Tag.Pk5:

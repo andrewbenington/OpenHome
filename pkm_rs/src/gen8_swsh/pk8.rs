@@ -678,7 +678,10 @@ mod tests {
             ConvertStrategy::default(),
         )?;
 
-        assert_eq!(mon.nickname.bytes()[..], mon_recreated.nickname.bytes()[..]);
+        assert_eq!(
+            mon.nickname.bytes()[..],
+            mon_recreated.nickname.bytes()[..]
+        );
 
         Ok(())
     }

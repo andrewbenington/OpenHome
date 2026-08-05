@@ -8,6 +8,7 @@ use strum_macros::Display;
 const PK1_PARTY_SIZE: usize = 66;
 const PK2_PARTY_SIZE: usize = 73;
 const PK3_PARTY_SIZE: usize = 100;
+const COLOPKM_SIZE: usize = 312;
 const PK4_PARTY_SIZE: usize = 236;
 const PK5_PARTY_SIZE: usize = 236;
 const PK6_PARTY_SIZE: usize = 260;
@@ -32,6 +33,8 @@ pub enum Tag {
     Pk1 = 1,
     Pk2 = 2,
     Pk3 = 3,
+    Colopkm = 14,
+    // Xdpkm = 15,
     Pk4 = 4,
     Pk5 = 5,
     Pk6 = 6,
@@ -118,6 +121,7 @@ impl Tag {
             Self::Pk1 => PK1_PARTY_SIZE,
             Self::Pk2 => PK2_PARTY_SIZE,
             Self::Pk3 => PK3_PARTY_SIZE,
+            Self::Colopkm => COLOPKM_SIZE,
             Self::Pk4 => PK4_PARTY_SIZE,
             Self::Pk5 => PK5_PARTY_SIZE,
             Self::Pk6 => PK6_PARTY_SIZE,
@@ -142,6 +146,7 @@ pub enum StoredPkmBytes {
     Pk1([u8; PK1_PARTY_SIZE]),
     Pk2([u8; PK2_PARTY_SIZE]),
     Pk3([u8; PK3_PARTY_SIZE]),
+    Colopkm([u8; PK3_PARTY_SIZE]),
     Pk4([u8; PK4_PARTY_SIZE]),
     Pk5([u8; PK5_PARTY_SIZE]),
     Pk6([u8; PK6_PARTY_SIZE]),
@@ -167,6 +172,7 @@ impl StoredPkmBytes {
             Self::Pk1(bytes) => bytes,
             Self::Pk2(bytes) => bytes,
             Self::Pk3(bytes) => bytes,
+            Self::Colopkm(bytes) => bytes,
             Self::Pk4(bytes) => bytes,
             Self::Pk5(bytes) => bytes,
             Self::Pk6(bytes) => bytes,
@@ -191,6 +197,7 @@ impl StoredPkmBytes {
             Self::Pk1(_) => Tag::Pk1,
             Self::Pk2(_) => Tag::Pk2,
             Self::Pk3(_) => Tag::Pk3,
+            Self::Colopkm(_) => Tag::Colopkm,
             Self::Pk4(_) => Tag::Pk4,
             Self::Pk5(_) => Tag::Pk5,
             Self::Pk6(_) => Tag::Pk6,
@@ -222,6 +229,7 @@ impl StoredPkmBytes {
             Tag::Pk1 => Ok(Self::Pk1(copy_to_sized_array(data))),
             Tag::Pk2 => Ok(Self::Pk2(copy_to_sized_array(data))),
             Tag::Pk3 => Ok(Self::Pk3(copy_to_sized_array(data))),
+            Tag::Colopkm => Ok(Self::Colopkm(copy_to_sized_array(data))),
             Tag::Pk4 => Ok(Self::Pk4(copy_to_sized_array(data))),
             Tag::Pk5 => Ok(Self::Pk5(copy_to_sized_array(data))),
             Tag::Pk6 => Ok(Self::Pk6(copy_to_sized_array(data))),
