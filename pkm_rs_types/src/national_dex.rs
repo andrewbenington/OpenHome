@@ -20,11 +20,7 @@ impl NationalDex {
             }))
     }
 
-    /// # Safety
-    ///
-    /// - `national_dex` must be greater than zero and at most the maximum National Dex number supported by this version of the library.
-    /// - `form_index` must be less than the total number of forms for the Pokémon with the given `national_dex` number
-    pub unsafe fn new_unchecked(index: u16) -> NationalDex {
+    pub fn assert_valid(index: u16) -> NationalDex {
         index
             .try_into()
             .expect("NationalDex initiated with invalid value")
@@ -39,26 +35,11 @@ impl NationalDex {
     }
 }
 
-// #[cfg_attr(feature = "wasm", wasm_bindgen)]
-// #[allow(clippy::missing_const_for_fn)]
-// impl NationalDex {
-//     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-//     pub fn index(&self) -> u16 {
-//         self.to_u16()
-//     }
-
-//     #[cfg(feature = "wasm")]
-//     #[wasm_bindgen(constructor)]
-//     pub fn new_js(val: u16) -> core::result::Result<NationalDex, JsValue> {
-//         NationalDex::new(val).map_err(|e| JsValue::from_str(&e.to_string()))
-//     }
-// }
-
 #[cfg(feature = "randomize")]
 impl Randomize for NationalDex {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
         Self::try_from(rng.random_range(1..=NationalDex::MAX) as u16)
-            .expect("1 to NATIONAL_DEX_MAX must be valid")
+            .expect("1 to NationalDex::MAX must be valid")
     }
 }
 
