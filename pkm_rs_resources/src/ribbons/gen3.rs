@@ -157,7 +157,7 @@ impl Gen3RibbonSet {
     pub fn has_ribbon(&self, ribbon: Gen3Ribbon) -> bool {
         match ribbon.metadata() {
             Metadata::Contest { stat, level } => self.contest_ribbon_level(stat) >= level,
-            Metadata::NonContest { index } => self.non_contest.get_flag(&index),
+            Metadata::NonContest { index } => self.non_contest.get_flag(index),
         }
     }
 }

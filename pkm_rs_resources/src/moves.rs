@@ -53,20 +53,27 @@ impl MoveSlot {
         }
     }
 
-    pub const fn from_bytes_gcn(bytes: &[u8], offset: usize) -> Self {
-        let move_offset = offset;
+    pub fn from_bytes_gcn(bytes: &[u8], offset: usize) -> Self {
         let pp_offset = offset + 2;
         let pp_ups_offset = offset + 3;
 
         Self {
-            move_index: MoveIndex::from_u16(read_u16_be!(bytes, move_offset)),
+            move_index: MoveIndex::from_u16(read_u16_be!(bytes, offset)),
             pp: bytes[pp_offset],
             pp_ups: bytes[pp_ups_offset],
         }
     }
 
     pub fn write_bytes_gcn(&self, bytes: &mut [u8], offset: usize) {
-        bytes[offset..offset + 2].copy_from_slice(&self.move_index.to_bytes_be());
+        bytes[offset..offset + 2].copy_from_slice(
+            &self
+                .move_index
+                .0
+                .map(NonZeroU16::get)
+                .unwrap_or(0)
+                .to_be_bytes(),
+        );
+
         bytes[offset + 2] = self.pp;
         bytes[offset + 3] = self.pp_ups;
     }
@@ -80,7 +87,7 @@ impl MoveSlot {
         let move_offset = offsets.moves.into() + (2 * index);
         let pp_offset = offsets.pp.into() + index;
 
-        bytes[move_offset..move_offset + 2].copy_from_slice(&self.move_index.to_bytes_le());
+        bytes[move_offset..move_offset + 2].copy_from_slice(&self.move_index.to_le_bytes());
         bytes[pp_offset] = self.pp;
     }
 
@@ -136,17 +143,6 @@ impl MoveSlots {
             MoveSlot::new(moves[3], pp[3], pp_ups[3]),
         ])
     }
-    pub fn write_spans<T: Into<usize> + Copy>(
-        &self,
-        bytes: &mut [u8],
-        offsets: MoveDataOffsets<T>,
-        pp_up_storage: PpUpStorage,
-    ) {
-        self.0
-            .iter()
-            .enumerate()
-            .for_each(|(i, slot)| slot.write_to_offsets(bytes, offsets, i, pp_up_storage));
-    }
 
     pub fn from_bytes_gcn<T>(bytes: &[u8], offset: T) -> Self
     where
@@ -161,11 +157,27 @@ impl MoveSlots {
         ])
     }
 
-    pub fn write_bytes_gcn(&self, bytes: &mut [u8], offset: impl Into<usize> + Copy) {
+    pub fn write_bytes_gcn<T>(&self, bytes: &mut [u8], offset: T)
+    where
+        usize: From<T>,
+    {
+        let offset = usize::from(offset);
+        self.0[0].write_bytes_gcn(bytes, offset);
+        self.0[1].write_bytes_gcn(bytes, offset + 4);
+        self.0[2].write_bytes_gcn(bytes, offset + 8);
+        self.0[3].write_bytes_gcn(bytes, offset + 12);
+    }
+
+    pub fn write_spans<T: Into<usize> + Copy>(
+        &self,
+        bytes: &mut [u8],
+        offsets: MoveDataOffsets<T>,
+        pp_up_storage: PpUpStorage,
+    ) {
         self.0
             .iter()
             .enumerate()
-            .for_each(|(i, slot)| slot.write_bytes_gcn(bytes, offset.into() + i * 4));
+            .for_each(|(i, slot)| slot.write_to_offsets(bytes, offsets, i, pp_up_storage));
     }
 
     pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, MoveSlot> {
@@ -370,12 +382,8 @@ impl MoveIndex {
         Self(NonZeroU16::new(u16::from_le_bytes(bytes)))
     }
 
-    pub fn to_bytes_le(self) -> [u8; 2] {
+    pub fn to_le_bytes(self) -> [u8; 2] {
         self.0.map(NonZeroU16::get).unwrap_or(0u16).to_le_bytes()
-    }
-
-    pub fn to_bytes_be(self) -> [u8; 2] {
-        self.0.map(NonZeroU16::get).unwrap_or(0u16).to_be_bytes()
     }
 
     pub const fn empty() -> Self {

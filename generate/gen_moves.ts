@@ -87,7 +87,7 @@ pub mod swsh_tr;
 use crate::metadata_source::MetadataSource;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
-use pkm_rs_types::{Generation, PkmType, read_u16_le};
+use pkm_rs_types::{Generation, PkmType, read_u16_be, read_u16_le};
 use serde::{Serialize, Serializer};
 use std::num::NonZeroU16;
 #[cfg(feature = "wasm")]
@@ -128,6 +128,31 @@ impl MoveSlot {
             pp: bytes[pp_offset],
             pp_ups: pp_up_storage.get_pp_ups(bytes, offsets, index),
         }
+    }
+
+    pub fn from_bytes_gcn(bytes: &[u8], offset: usize) -> Self {
+        let pp_offset = offset + 2;
+        let pp_ups_offset = offset + 3;
+
+        Self {
+            move_index: MoveIndex::from_u16(read_u16_be!(bytes, offset)),
+            pp: bytes[pp_offset],
+            pp_ups: bytes[pp_ups_offset],
+        }
+    }
+
+    pub fn write_bytes_gcn(&self, bytes: &mut [u8], offset: usize) {
+        bytes[offset..offset + 2].copy_from_slice(
+            &self
+                .move_index
+                .0
+                .map(NonZeroU16::get)
+                .unwrap_or(0)
+                .to_be_bytes(),
+        );
+
+        bytes[offset + 2] = self.pp;
+        bytes[offset + 3] = self.pp_ups;
     }
 
     fn write_move_and_pp_to_offsets<T: Into<usize> + Copy>(
@@ -194,6 +219,30 @@ impl MoveSlots {
             MoveSlot::new(moves[2], pp[2], pp_ups[2]),
             MoveSlot::new(moves[3], pp[3], pp_ups[3]),
         ])
+    }
+
+    pub fn from_bytes_gcn<T>(bytes: &[u8], offset: T) -> Self
+    where
+        usize: From<T>,
+    {
+        let offset = usize::from(offset);
+        Self([
+            MoveSlot::from_bytes_gcn(bytes, offset),
+            MoveSlot::from_bytes_gcn(bytes, offset + 4),
+            MoveSlot::from_bytes_gcn(bytes, offset + 8),
+            MoveSlot::from_bytes_gcn(bytes, offset + 12),
+        ])
+    }
+
+    pub fn write_bytes_gcn<T>(&self, bytes: &mut [u8], offset: T)
+    where
+        usize: From<T>,
+    {
+        let offset = usize::from(offset);
+        self.0[0].write_bytes_gcn(bytes, offset);
+        self.0[1].write_bytes_gcn(bytes, offset + 4);
+        self.0[2].write_bytes_gcn(bytes, offset + 8);
+        self.0[3].write_bytes_gcn(bytes, offset + 12);
     }
 
     pub fn write_spans<T: Into<usize> + Copy>(

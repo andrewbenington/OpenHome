@@ -2,8 +2,8 @@ use super::Pk3Buffer;
 use crate::checksum::{Checksum, RefreshChecksum};
 #[cfg(feature = "wasm")]
 use crate::convert_strategy::ConvertStrategy;
-use crate::gen3_gba::Gen3PokemonIndex;
-use crate::gen3_gba::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
+use crate::gen3::Gen3PokemonIndex;
+use crate::gen3::pk3_buffer::{Pk3BufferMut, Pk3BufferRef};
 #[cfg(feature = "wasm")]
 use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 use crate::result::{Error, Result};
@@ -14,7 +14,6 @@ use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
 use crate::tests::PkhexJson;
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
-use crate::util::unown_form_from_pid_gen3;
 
 use pkm_rs_derive::IsShiny8192;
 use pkm_rs_resources::ball::Ball;
@@ -30,10 +29,9 @@ use pkm_rs_types::AbilityNumber;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 use pkm_rs_types::{
-    BinaryGender, ContestStats, Language, MarkingsFourShapes, NationalDex, OriginGame, Pokerus,
-    SimpleAbilityNumber, Stats8, Stats16,
+    BinaryGender, ContestStats, Gender, Ivs, Language, MarkingsFourShapes, NationalDex, OriginGame,
+    Pokerus, SimpleAbilityNumber, Stats8, Stats16,
 };
-use pkm_rs_types::{Gender, Ivs};
 use serde::{Serialize, Serializer};
 
 #[cfg(feature = "wasm")]
@@ -249,10 +247,10 @@ impl Pk3 {
     }
 
     pub fn species_and_form(&self) -> SpeciesForm {
+        let national_dex = self.pokemon_index.to_national_dex();
         SpeciesForm::new_valid_ndex(
-            self.pokemon_index.to_national_dex(),
-            form_index_from_pid(self.pokemon_index.to_national_dex(), self.personality_value)
-                as u16,
+            national_dex,
+            super::form_index_from_pid(national_dex, self.personality_value) as u16,
         )
         .expect("gen 3 form is valid")
     }
@@ -573,13 +571,6 @@ impl ModernEvs for Pk3 {
     }
 }
 
-pub fn form_index_from_pid(national_dex: NationalDex, pid: u32) -> u8 {
-    if national_dex != NationalDex::Unown {
-        return 0;
-    }
-
-    unown_form_from_pid_gen3(pid)
-}
 #[cfg(test)]
 impl PkhexJson for Pk3 {
     fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {
@@ -609,8 +600,8 @@ mod tests {
     use std::path::PathBuf;
 
     use crate::convert_strategy::ConvertStrategy;
-    use crate::gen3_gba::Pk3;
-    use crate::gen3_gba::pk3_buffer::Pk3BufferMut;
+    use crate::gen3::Pk3;
+    use crate::gen3::pk3_buffer::Pk3BufferMut;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
     use crate::strings::{Gen3Encoding, Gen3String};
