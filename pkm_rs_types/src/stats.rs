@@ -1,6 +1,6 @@
 use std::num::TryFromIntError;
 
-use crate::util::bit_is_set;
+use crate::{read_u16_be, util::bit_is_set};
 use arbitrary_int::u5;
 use pkm_rs_derive::Stats;
 use serde::{Deserialize, Serialize};
@@ -167,6 +167,18 @@ impl Ivs {
         })
     }
 
+    // read from bytes where values are stored as big-endian u16 values
+    pub const fn from_gcn_bytes(bytes: [u8; 12]) -> Self {
+        Self(Stats8 {
+            hp: read_u16_be!(bytes, 0) as u8,
+            atk: read_u16_be!(bytes, 2) as u8,
+            def: read_u16_be!(bytes, 4) as u8,
+            spe: read_u16_be!(bytes, 6) as u8,
+            spa: read_u16_be!(bytes, 8) as u8,
+            spd: read_u16_be!(bytes, 10) as u8,
+        })
+    }
+
     pub fn write_30_bits(&self, bytes: &mut [u8], byte_offset: usize) {
         let current_val =
             u32::from_le_bytes(bytes[byte_offset..byte_offset + 4].try_into().unwrap());
@@ -185,20 +197,6 @@ impl Ivs {
         numeric_val |= current_val & (0b11 << 30);
 
         bytes[byte_offset..byte_offset + 4].copy_from_slice(&numeric_val.to_le_bytes());
-    }
-
-    // read from bytes where values are stored as big-endian u16 values
-    pub const fn from_gcn_bytes(bytes: [u8; 12]) -> Self {
-        // stored as big-endian u16 values, but since no IV exceeds a byte (31 < 255)
-        // we can directly access the least significant byte as a u8
-        Self(Stats8 {
-            hp: bytes[1],
-            atk: bytes[3],
-            def: bytes[5],
-            spe: bytes[7],
-            spa: bytes[9],
-            spd: bytes[11],
-        })
     }
 
     // write to bytes as big-endian u16 values
@@ -312,7 +310,7 @@ impl Stats16 {
         }
     }
 
-    pub fn to_bytes_le(self) -> [u8; 12] {
+    pub fn to_le_bytes(self) -> [u8; 12] {
         u16_le_slice_to_u8([self.hp, self.atk, self.def, self.spe, self.spa, self.spd])
             .try_into()
             .unwrap()

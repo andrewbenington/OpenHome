@@ -490,7 +490,7 @@ impl DataSection for MainDataV2 {
             weight_scalar: bytes[81],
             scale: bytes[82],
             moves: MoveSlots::from_bytes(bytes, MOVE_DATA_OFFSETS, PpUpStorage::FourBytes),
-            nickname: SizedUtf16String::<26>::from_bytes(bytes[96..122].try_into().unwrap()),
+            nickname: SizedUtf16String::<26>::from_le_bytes(bytes[96..122].try_into().unwrap()),
             egg_date: PokeDate::from_bytes_optional(bytes[122..125].try_into().unwrap()),
             met_date: PokeDate::from_bytes(bytes[125..128].try_into().unwrap()),
             met_level: bytes[128] & !0x80,
@@ -519,7 +519,7 @@ impl DataSection for MainDataV2 {
             } else {
                 None
             },
-            handler_name: SizedUtf16String::<26>::from_bytes(bytes[184..210].try_into().unwrap()),
+            handler_name: SizedUtf16String::<26>::from_le_bytes(bytes[184..210].try_into().unwrap()),
             handler_language: bytes[211].try_into().ok(),
             is_current_handler: util::get_flag(bytes, 212, 0),
             // resort_event_status: bytes[213],
@@ -554,7 +554,7 @@ impl DataSection for MainDataV2 {
             extra_form: u64::from_le_bytes(bytes[264..272].try_into().unwrap())
                 .try_into()
                 .ok(),
-            trainer_name: SizedUtf16String::<26>::from_bytes(bytes[272..298].try_into().unwrap()),
+            trainer_name: SizedUtf16String::<26>::from_le_bytes(bytes[272..298].try_into().unwrap()),
             trainer_friendship: bytes[298],
             trainer_memory: TrainerMemory {
                 intensity: bytes[299],
@@ -623,10 +623,10 @@ impl DataSection for MainDataV2 {
 
         // bytes 134..=137 are used for move pp ups, written via self.moves.write_spans
 
-        bytes[138..140].copy_from_slice(&self.relearn_moves[0].to_bytes_le());
-        bytes[140..142].copy_from_slice(&self.relearn_moves[1].to_bytes_le());
-        bytes[142..144].copy_from_slice(&self.relearn_moves[2].to_bytes_le());
-        bytes[144..146].copy_from_slice(&self.relearn_moves[3].to_bytes_le());
+        bytes[138..140].copy_from_slice(&self.relearn_moves[0].to_le_bytes());
+        bytes[140..142].copy_from_slice(&self.relearn_moves[1].to_le_bytes());
+        bytes[142..144].copy_from_slice(&self.relearn_moves[2].to_le_bytes());
+        bytes[144..146].copy_from_slice(&self.relearn_moves[3].to_le_bytes());
 
         self.ivs.write_30_bits(&mut bytes, 148);
         util::set_flag(&mut bytes, 148, 30, self.is_egg);

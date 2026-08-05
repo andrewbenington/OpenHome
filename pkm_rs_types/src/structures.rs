@@ -1,6 +1,8 @@
+use arbitrary_int::traits::Integer;
 use arbitrary_int::{u3, u4};
 use chrono::Datelike;
 use serde::{Deserialize, Serialize, Serializer};
+use std::fmt::Display;
 
 use strum_macros::{Display, EnumString};
 
@@ -891,6 +893,15 @@ impl From<bool> for SimpleAbilityNumber {
     }
 }
 
+impl From<SimpleAbilityNumber> for bool {
+    fn from(value: SimpleAbilityNumber) -> Self {
+        match value {
+            SimpleAbilityNumber::First => false,
+            SimpleAbilityNumber::Second => true,
+        }
+    }
+}
+
 impl From<SimpleAbilityNumber> for AbilityNumber {
     fn from(value: SimpleAbilityNumber) -> Self {
         match value {
@@ -928,7 +939,7 @@ impl AbilityNumber {
             1 => Ok(Self::First),
             2 => Ok(Self::Second),
             4 => Ok(Self::Hidden),
-            invalid => Err(InvalidAbilityNumber(u3::new(invalid))),
+            invalid => Err(InvalidAbilityNumber::U8(invalid)),
         }
     }
 
@@ -949,13 +960,46 @@ impl TryFrom<u3> for AbilityNumber {
             1 => Ok(Self::First),
             2 => Ok(Self::Second),
             4 => Ok(Self::Hidden),
-            _ => Err(InvalidAbilityNumber(value)),
+            _ => Err(InvalidAbilityNumber::U8(value.as_u8())),
+        }
+    }
+}
+
+impl From<bool> for AbilityNumber {
+    fn from(value: bool) -> Self {
+        match value {
+            false => AbilityNumber::First,
+            true => AbilityNumber::Second,
+        }
+    }
+}
+
+impl TryFrom<AbilityNumber> for bool {
+    type Error = InvalidAbilityNumber;
+
+    fn try_from(value: AbilityNumber) -> Result<Self, Self::Error> {
+        match value {
+            AbilityNumber::First => Ok(false),
+            AbilityNumber::Second => Ok(true),
+            AbilityNumber::Hidden => Err(InvalidAbilityNumber::HiddenNotAllowed),
         }
     }
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct InvalidAbilityNumber(pub u3);
+pub enum InvalidAbilityNumber {
+    U8(u8),
+    HiddenNotAllowed,
+}
+
+impl Display for InvalidAbilityNumber {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            InvalidAbilityNumber::U8(value) => write!(f, "Invalid ability number: {value}"),
+            InvalidAbilityNumber::HiddenNotAllowed => write!(f, "Hidden ability not allowed"),
+        }
+    }
+}
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Clone, Copy, Default, Serialize, PartialEq, Eq)]

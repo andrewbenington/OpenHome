@@ -45,7 +45,7 @@ impl Gen67Data {
             && old.region == 0
             && bytes_are_empty(&old.geolocations.to_bytes())
             && old.resort_event_status == 0
-            && bytes_are_empty(&old.avs.to_bytes_le())
+            && bytes_are_empty(&old.avs.to_le_bytes())
         {
             None
         } else {
@@ -102,7 +102,7 @@ impl DataSection for Gen67Data {
         bytes[9] = self.region;
         bytes[10..20].copy_from_slice(&self.geolocations.to_bytes());
         bytes[20] = self.resort_event_status;
-        bytes[21..33].copy_from_slice(&self.avs.to_bytes_le());
+        bytes[21..33].copy_from_slice(&self.avs.to_le_bytes());
 
         bytes.to_vec()
     }
@@ -118,6 +118,6 @@ impl DataSection for Gen67Data {
             && self.region == 0
             && bytes_are_empty(&self.geolocations.to_bytes())
             && self.resort_event_status == 0
-            && bytes_are_empty(&self.avs.to_bytes_le())
+            && bytes_are_empty(&self.avs.to_le_bytes())
     }
 }

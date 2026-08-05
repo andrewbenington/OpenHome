@@ -5,15 +5,14 @@ use pkm_rs_types::{AbilityNumber, Generation, PokeDate, Stats16};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
-use crate::gen3::{Gen3PokemonIndex, PK3_MAX_ABILITY, Pk3};
+use crate::gen3::{Colopkm, PK3_MAX_ABILITY};
 use crate::ohpkm::OhpkmV2;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::{Error, Result};
-use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
 use crate::{format::PkmFormat, traits::HasSpeciesAndForm};
 use crate::{gen3, ohpkm, util::personality_value};
 
-impl OhpkmConvert for Pk3 {
+impl OhpkmConvert for Colopkm {
     fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
         let form_metadata = self.get_forme_metadata();
 
@@ -36,14 +35,13 @@ impl OhpkmConvert for Pk3 {
             self.secret_id,
         );
 
-        let species_name =
-            lookup::species_name(self.pokemon_index.to_national_dex(), self.language);
+        let species_name = lookup::species_name(self.national_dex, self.language);
 
         let is_nicknamed = !species_name.eq_ignore_ascii_case(&self.nickname.to_string());
 
         // If the pokémon is not nicknamed, use species name to avoid ALL CAPS NAME
         let adjusted_nickname: String = if is_nicknamed {
-            self.nickname.convert_to_string()
+            self.nickname.to_string()
         } else {
             species_name.to_owned()
         };
@@ -69,7 +67,7 @@ impl OhpkmConvert for Pk3 {
             gender: self.gender,
             evs: self.evs,
             contest: self.contest,
-            pokerus: self.pokerus,
+            pokerus_byte: self.pokerus_byte,
             ribbons: self
                 .ribbons
                 .get_ribbons()
@@ -103,21 +101,6 @@ impl OhpkmConvert for Pk3 {
     fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
         let converter = PkmConverter::new(PkmFormat::PK3, strategy);
         let met_data = converter.met_data(ohpkm);
-        let str_encoding = Gen3Encoding::from_language(ohpkm.language());
-
-        let mut nickname_gen3 =
-            Gen3NicknameString::from_stringlike(converter.nickname(ohpkm), str_encoding);
-
-        // if the nickname has not been otherwise unchanged, use a copy of the original data's nickname
-        // to preserve trash bytes
-        if let Some(StoredPkmBytes::Pk3(original_bytes)) = ohpkm.original_data_bytes()
-            && let Ok(original_pk3) = Pk3::try_from_bytes(&original_bytes)
-            && original_pk3
-                .nickname
-                .identical_until_terminator(&nickname_gen3)
-        {
-            nickname_gen3 = original_pk3.nickname;
-        }
 
         let personality_value = if ohpkm.game_of_origin().generation() != Generation::G3 {
             PidModificationStrategy::default().get_modified_pid(ohpkm)
@@ -128,17 +111,11 @@ impl OhpkmConvert for Pk3 {
         };
 
         let mut mon = Self {
-            sanity: 0,
-            checksum: 0,
-            pokemon_index: Gen3PokemonIndex::from_national_dex(
-                ohpkm.species_and_form().get_ndex() as u16,
-            )?,
+            national_dex: ohpkm.species_and_form().get_ndex(),
             held_item_index: ItemGen3::from_modern_index(ohpkm.held_item_index()),
             trainer_id: ohpkm.trainer_id(),
             secret_id: ohpkm.secret_id(),
             exp: ohpkm.exp(),
-            has_species_data: true,
-            is_bad_egg: false,
             ability_num: ohpkm.ability_num().into(),
             markings: ohpkm.markings().into(),
             personality_value,
@@ -146,19 +123,19 @@ impl OhpkmConvert for Pk3 {
             gender: ohpkm.gender(),
             evs: ohpkm.evs(),
             contest: ohpkm.contest(),
-            pokerus: ohpkm.pokerus(),
+            pokerus_byte: ohpkm.pokerus_byte(),
             ribbons: ohpkm
                 .ribbons()
                 .into_iter()
                 .filter_map(Gen3Ribbon::from_openhome_if_present)
                 .collect(),
-            nickname: nickname_gen3,
+            nickname: ohpkm.nickname().reverse_endian().resize(),
             moves: ohpkm
                 .moves()
                 .to_pp_adjusted(ohpkm::MOVE_METADATA_SOURCE, MetadataSource::Emerald),
             ivs: converter.ivs(ohpkm),
             is_egg: ohpkm.is_egg(),
-            trainer_name: Gen3TrainerString::from_stringlike(&ohpkm.trainer_name(), str_encoding),
+            trainer_name: ohpkm.trainer_name().reverse_endian().resize(),
             trainer_friendship: ohpkm.trainer_friendship(),
             met_location_index: met_data.location_index as u8,
             ball: ohpkm.ball(),
@@ -166,7 +143,8 @@ impl OhpkmConvert for Pk3 {
             trainer_gender: ohpkm.trainer_gender(),
             game_of_origin: met_data.origin,
             language: ohpkm.language(),
-            status_condition: 0,
+            shadow_gauge: 0,
+            shadow_id: 0,
             stat_level: 0,
             current_hp: 0,
             stats: Stats16::default(),
@@ -176,7 +154,14 @@ impl OhpkmConvert for Pk3 {
         mon.stats = mon.calculate_stats();
         mon.current_hp = mon.stats.hp;
 
-        mon.refresh_checksum();
+        // if the nickname has not been otherwise unchanged, use a copy of the original data's nickname
+        // to preserve trash bytes
+        if let Some(StoredPkmBytes::Colopkm(original_bytes)) = ohpkm.original_data_bytes()
+            && let Ok(original_colopkm) = Colopkm::try_from_bytes(&original_bytes)
+            && original_colopkm.nickname.to_string() == mon.nickname.to_string()
+        {
+            mon.nickname = original_colopkm.nickname;
+        }
 
         Ok(mon)
     }

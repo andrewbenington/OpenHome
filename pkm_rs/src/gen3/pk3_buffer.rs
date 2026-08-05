@@ -3,7 +3,7 @@ use crate::checksum::{Checksum, ChecksumU16Le, RefreshChecksum};
 use crate::encryption::BlockCrypto;
 use crate::result::Result;
 use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
-use crate::util;
+use crate::{gen3, util};
 
 use arbitrary_int::u4;
 use arbitrary_int::u7;
@@ -76,17 +76,17 @@ pub struct Pk3Buffer<S: AsRef<[u8]>>(S);
 
 impl<'a> Pk3Buffer<&'a [u8]> {
     pub fn box_span(span: &'a [u8]) -> Self {
-        assert_eq!(span.len(), super::BOX_SIZE);
+        assert_eq!(span.len(), gen3::BOX_SIZE_GBA);
         Self(span)
     }
 
     pub fn party_span(span: &'a [u8]) -> Self {
-        assert_eq!(span.len(), super::PARTY_SIZE);
+        assert_eq!(span.len(), gen3::PARTY_SIZE_GBA);
         Self(span)
     }
 
     pub fn box_or_party_span(span: &'a [u8]) -> Self {
-        debug_assert!(span.len() == super::PARTY_SIZE || span.len() == super::BOX_SIZE);
+        debug_assert!(span.len() == gen3::PARTY_SIZE_GBA || span.len() == gen3::BOX_SIZE_GBA);
         Self(span)
     }
 }
@@ -97,17 +97,17 @@ impl<'a> Pk3Buffer<&'a [u8]> {
 
 impl<'a> Pk3Buffer<&'a mut [u8]> {
     pub fn box_span_mut(span: &'a mut [u8]) -> Self {
-        assert_eq!(span.len(), super::BOX_SIZE);
+        assert_eq!(span.len(), gen3::BOX_SIZE_GBA);
         Self(span)
     }
 
     pub fn party_span_mut(span: &'a mut [u8]) -> Self {
-        assert_eq!(span.len(), super::PARTY_SIZE);
+        assert_eq!(span.len(), gen3::PARTY_SIZE_GBA);
         Self(span)
     }
 
     pub fn box_or_party_span_mut(span: &'a mut [u8]) -> Self {
-        debug_assert!(span.len() == super::PARTY_SIZE || span.len() == super::BOX_SIZE);
+        debug_assert!(span.len() == gen3::PARTY_SIZE_GBA || span.len() == gen3::BOX_SIZE_GBA);
         Self(span)
     }
 }
@@ -179,7 +179,7 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
     }
 
     pub fn is_party(&self) -> bool {
-        self.bytes().len() == super::PARTY_SIZE
+        self.bytes().len() == super::PARTY_SIZE_GBA
     }
 
     pub fn sanity(&self) -> u16 {
@@ -289,7 +289,7 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
     pub fn move_slots(&self) -> MoveSlots {
         MoveSlots::from_bytes(
             self.bytes(),
-            super::MOVE_DATA_OFFSETS,
+            super::MOVE_DATA_OFFSETS_GBA,
             PpUpStorage::SingleByte,
         )
     }
@@ -517,7 +517,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
     pub fn set_move_slots(&mut self, v: &MoveSlots) {
         v.write_spans(
             self.bytes_mut(),
-            super::MOVE_DATA_OFFSETS,
+            super::MOVE_DATA_OFFSETS_GBA,
             PpUpStorage::SingleByte,
         );
     }
@@ -613,7 +613,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
     }
 
     pub fn set_stats(&mut self, v: Stats16) {
-        self.set_stats_raw(v.to_bytes_le());
+        self.set_stats_raw(v.to_le_bytes());
     }
 
     // ------------------------------------------------------------------
@@ -660,7 +660,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> AsBytesMut for Pk3Buffer<S> {
 impl<S: AsRef<[u8]>> Checksum for Pk3Buffer<S> {
     type A = ChecksumU16Le;
     const SPAN_START: usize = 0x20;
-    const SPAN_END: usize = super::BOX_SIZE;
+    const SPAN_END: usize = super::BOX_SIZE_GBA;
 }
 
 impl<S: AsRef<[u8]> + AsMut<[u8]>> RefreshChecksum for Pk3Buffer<S> {

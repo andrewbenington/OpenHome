@@ -1,4 +1,6 @@
 #[cfg(feature = "wasm")]
+mod colopkm;
+#[cfg(feature = "wasm")]
 mod pk3;
 #[cfg(feature = "wasm")]
 mod pk7;

@@ -370,7 +370,7 @@ impl<S: AsRef<[u8]>> Pk8Buffer<S> {
     }
 
     pub fn nickname(&self) -> SizedUtf16String<26> {
-        SizedUtf16String::<26>::from_bytes(self.nickname_raw())
+        SizedUtf16String::<26>::from_le_bytes(self.nickname_raw())
     }
 
     pub fn move_slots(&self) -> MoveSlots {
@@ -419,7 +419,7 @@ impl<S: AsRef<[u8]>> Pk8Buffer<S> {
     }
 
     pub fn handler_name(&self) -> SizedUtf16String<26> {
-        SizedUtf16String::<26>::from_bytes(self.handler_name_raw())
+        SizedUtf16String::<26>::from_le_bytes(self.handler_name_raw())
     }
 
     fn handler_gender_raw(&self) -> bool {
@@ -526,7 +526,7 @@ impl<S: AsRef<[u8]>> Pk8Buffer<S> {
     }
 
     pub fn trainer_name(&self) -> SizedUtf16String<26> {
-        SizedUtf16String::<26>::from_bytes(self.trainer_name_raw())
+        SizedUtf16String::<26>::from_le_bytes(self.trainer_name_raw())
     }
 
     pub fn trainer_friendship(&self) -> u8 {
@@ -831,7 +831,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk8Buffer<S> {
     }
 
     pub fn set_relearn_move(&mut self, idx: usize, v: MoveIndex) {
-        self.set_relearn_move_raw(idx, v.to_bytes_le());
+        self.set_relearn_move_raw(idx, v.to_le_bytes());
     }
 
     pub fn set_ivs(&mut self, v: &Ivs) {
@@ -1054,7 +1054,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk8Buffer<S> {
     }
 
     pub fn set_stats(&mut self, v: Stats16) {
-        self.set_stats_raw(v.to_bytes_le());
+        self.set_stats_raw(v.to_le_bytes());
     }
 
     pub fn set_current_hp(&mut self, v: u16) {

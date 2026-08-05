@@ -156,7 +156,7 @@ impl DataSection for MostRecentSave {
         let trainer_id = u16::from_le_bytes(bytes[0..=1].try_into().unwrap());
         let secret_id = u16::from_le_bytes(bytes[2..=3].try_into().unwrap());
         let game = OriginGame::from(bytes[4]);
-        let trainer_name = SizedUtf16String::<26>::from_bytes(bytes[5..=30].try_into().unwrap());
+        let trainer_name = SizedUtf16String::<26>::from_le_bytes(bytes[5..=30].try_into().unwrap());
 
         let file_path =
             String::from_utf8(bytes[31..].to_vec()).map_err(|e| Error::StringDecode {
