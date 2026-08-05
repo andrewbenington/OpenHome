@@ -671,7 +671,7 @@ impl SpeciesAndForm {
     /// - `form_index` must be less than the total number of forms for the Pokémon with the given `national_dex` number
     pub unsafe fn new_unchecked(national_dex: u16, form_index: u16) -> SpeciesAndForm {
         SpeciesAndForm {
-            national_dex: unsafe { NationalDex::new_unchecked(national_dex) },
+            national_dex: NationalDex::assert_valid(national_dex),
             form_index,
         }
     }
