@@ -63,7 +63,7 @@ export default function EvolutionFamily({
         .filter((form) => !form.isMega)
         .map(({ nationalDex, formIndex }) => (
           <EvolutionLine
-            nationalDex={nationalDex.index}
+            nationalDex={nationalDex}
             formNumber={formIndex}
             key={formIndex}
             pokedex={pokedex}

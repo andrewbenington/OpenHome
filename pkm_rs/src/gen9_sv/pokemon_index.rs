@@ -1,4 +1,5 @@
-use pkm_rs_resources::species::{NatDexIndex, SpeciesAndForm};
+use pkm_rs_resources::species::SpeciesAndForm;
+use pkm_rs_types::NationalDex;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 use serde::Serialize;
@@ -68,7 +69,7 @@ pub const fn national_dex_to_sv(national_dex: u16) -> Option<u16> {
 pub struct SvPokemonIndex(NonZeroU16);
 
 const INVALID_INDEX_MESSAGE: &str =
-    "SvPokemonIndex should always be valid for conversion to NatDexIndex";
+    "SvPokemonIndex should always be valid for conversion to NationalDex";
 
 impl SvPokemonIndex {
     pub const fn new(sv_index: u16) -> Result<Self, InvalidSvPokemonIndex> {
@@ -94,18 +95,18 @@ impl SvPokemonIndex {
         }
     }
 
-    pub fn to_national_dex(self) -> NatDexIndex {
+    pub fn to_national_dex(self) -> NationalDex {
         sv_to_national_dex(self.0.get())
-            .map(NatDexIndex::new)
+            .map(NationalDex::new)
             .expect(INVALID_INDEX_MESSAGE)
             .expect(INVALID_INDEX_MESSAGE)
     }
 
-    pub fn try_from_base(ndex: NatDexIndex) -> Result<Self, Error> {
-        national_dex_to_sv(ndex.to_u16())
+    pub fn try_from_base(ndex: NationalDex) -> Result<Self, Error> {
+        national_dex_to_sv(ndex as u16)
             .and_then(NonZeroU16::new)
             .ok_or(Error::NationalDex {
-                value: ndex.to_u16(),
+                value: ndex as u16,
                 source: PokemonIndexType::ScarletViolet,
             })
             .map(Self)

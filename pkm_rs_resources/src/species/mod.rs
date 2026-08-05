@@ -3,6 +3,7 @@ mod metadata;
 mod types;
 
 pub use metadata::*;
+use pkm_rs_types::NationalDex;
 pub use types::*;
 
 #[cfg(feature = "wasm")]
@@ -36,4 +37,22 @@ pub mod form {
     pub const ARCEUS_CURSE_GEN4: u16 = 9;
     pub const ARCEUS_DARK_GEN4: u16 = 17;
     pub const ARCEUS_LEGEND: u16 = 18;
+}
+
+pub trait GetSpeciesMetadata {
+    fn get_species_metadata(&self) -> &'static SpeciesMetadata;
+}
+
+impl GetSpeciesMetadata for pkm_rs_types::NationalDex {
+    fn get_species_metadata(&self) -> &'static SpeciesMetadata {
+        &ALL_SPECIES[(*self as usize) - 1]
+    }
+}
+
+pub const fn get_species_metadata(national_dex: u16) -> &'static SpeciesMetadata {
+    &ALL_SPECIES[(national_dex - 1) as usize]
+}
+
+pub const fn get_ndex_species_metadata(national_dex: NationalDex) -> &'static SpeciesMetadata {
+    get_species_metadata(national_dex as u16)
 }

@@ -301,7 +301,7 @@ function PokedexDetails({
                     disabled={
                       !MetadataSources.supportsForm(
                         source,
-                        selectedForm.nationalDex.index,
+                        selectedForm.nationalDex,
                         selectedForm.formIndex
                       )
                     }

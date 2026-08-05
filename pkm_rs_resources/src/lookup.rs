@@ -1,13 +1,13 @@
-use crate::{pkhex_text, species::NatDexIndex};
+use crate::pkhex_text;
 
-use pkm_rs_types::Language;
+use pkm_rs_types::{Language, NationalDex};
 
 #[cfg(feature = "wasm")]
 use pkm_rs_types::OriginGame;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-pub fn species_name(national_dex: NatDexIndex, language: Language) -> &'static str {
+pub fn species_name(national_dex: NationalDex, language: Language) -> &'static str {
     pkhex_text::species_name(language, national_dex)
 }
 
@@ -20,7 +20,7 @@ pub struct Lookup;
 impl Lookup {
     #[wasm_bindgen(js_name = speciesName)]
     pub fn species_name(national_dex: u16, language: Language) -> String {
-        let Ok(national_dex) = NatDexIndex::new(national_dex) else {
+        let Ok(national_dex) = NationalDex::new(national_dex) else {
             return format!("UNKNOWN SPECIES ({national_dex})");
         };
         pkhex_text::species_name(language, national_dex).to_owned()

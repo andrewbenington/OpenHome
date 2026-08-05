@@ -1,14 +1,14 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::species::NatDexIndex;
+use pkm_rs_types::NationalDex;
 
 pub enum PkmRestrictions {
     CappedNationalDex {
-        max_national_dex: NatDexIndex,
-        excluded_formes: HashMap<NatDexIndex, Box<[u16]>>,
+        max_national_dex: NationalDex,
+        excluded_formes: HashMap<NationalDex, Box<[u16]>>,
     },
     Dexit {
-        included_national_dex: HashSet<NatDexIndex>,
-        excluded_formes: HashMap<NatDexIndex, Box<[u16]>>,
+        included_national_dex: HashSet<NationalDex>,
+        excluded_formes: HashMap<NationalDex, Box<[u16]>>,
     },
 }
