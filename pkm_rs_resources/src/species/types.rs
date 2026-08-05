@@ -273,10 +273,10 @@ pub struct FormMetadata {
     pub base_weight: u32,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub evolutions: &'static [SpeciesAndForm],
+    pub evolutions: &'static [SpeciesForm],
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(readonly, js_name = preEvolution))]
-    pub pre_evolution: Option<SpeciesAndForm>,
+    pub pre_evolution: Option<SpeciesForm>,
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub egg_groups: (EggGroup, Option<EggGroup>),
@@ -310,8 +310,8 @@ pub struct FormMetadata {
 }
 
 impl FormMetadata {
-    pub const fn forme_ref(&self) -> SpeciesAndForm {
-        unsafe { SpeciesAndForm::new_valid_ndex_unchecked(self.national_dex, self.form_index) }
+    pub const fn forme_ref(&self) -> SpeciesForm {
+        unsafe { SpeciesForm::unchecked_form(self.national_dex, self.form_index) }
     }
 
     pub const fn species_metadata(&self) -> &SpeciesMetadata {
@@ -326,7 +326,7 @@ impl FormMetadata {
         }
     }
 
-    pub fn get_base_evolution(&self) -> SpeciesAndForm {
+    pub fn get_base_evolution(&self) -> SpeciesForm {
         match self.pre_evolution {
             None => self.forme_ref(),
             Some(forme_ref) => forme_ref.get_base_evolution(),
@@ -455,7 +455,7 @@ impl FormMetadata {
     }
 
     #[cfg_attr(feature = "wasm", wasm_bindgen(getter))]
-    pub fn evolutions(&self) -> Vec<SpeciesAndForm> {
+    pub fn evolutions(&self) -> Vec<SpeciesForm> {
         self.evolutions.to_vec()
     }
 
@@ -554,7 +554,7 @@ impl FormMetadata {
 #[derive(Debug, Clone, Copy)]
 pub struct MegaEvolutionMetadata {
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = megaForme))]
-    pub mega_form: SpeciesAndForm,
+    pub mega_form: SpeciesForm,
     #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = requiredItemId))]
     pub required_item_id: Option<u16>,
 }
@@ -606,13 +606,13 @@ impl SpeciesMetadata {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy, Serialize)]
-pub struct SpeciesAndForm {
+pub struct SpeciesForm {
     national_dex: NationalDex,
     form_index: u16,
 }
 
-impl SpeciesAndForm {
-    pub fn new(national_dex: u16, form_index: u16) -> Result<SpeciesAndForm> {
+impl SpeciesForm {
+    pub fn new(national_dex: u16, form_index: u16) -> Result<SpeciesForm> {
         let valid_ndex = NationalDex::new(national_dex)?;
 
         if valid_ndex.get_species_metadata().forms.len() <= form_index as usize {
@@ -622,23 +622,20 @@ impl SpeciesAndForm {
             });
         }
 
-        Ok(SpeciesAndForm {
+        Ok(SpeciesForm {
             national_dex: valid_ndex,
             form_index,
         })
     }
 
-    pub const fn base_form(national_dex: NationalDex) -> SpeciesAndForm {
-        SpeciesAndForm {
+    pub const fn base_form(national_dex: NationalDex) -> SpeciesForm {
+        SpeciesForm {
             national_dex,
             form_index: 0,
         }
     }
 
-    pub const fn new_valid_ndex(
-        national_dex: NationalDex,
-        form_index: u16,
-    ) -> Result<SpeciesAndForm> {
+    pub const fn new_valid_ndex(national_dex: NationalDex, form_index: u16) -> Result<SpeciesForm> {
         if super::get_ndex_species_metadata(national_dex).forms.len() <= form_index as usize {
             return Err(Error::FormIndex {
                 national_dex,
@@ -646,7 +643,7 @@ impl SpeciesAndForm {
             });
         }
 
-        Ok(SpeciesAndForm {
+        Ok(SpeciesForm {
             national_dex,
             form_index,
         })
@@ -655,11 +652,8 @@ impl SpeciesAndForm {
     /// # Safety
     ///
     /// - `form_index` must be less than the total number of forms for the Pokémon with the given `national_dex` number
-    pub const unsafe fn new_valid_ndex_unchecked(
-        national_dex: NationalDex,
-        form_index: u16,
-    ) -> SpeciesAndForm {
-        SpeciesAndForm {
+    pub const unsafe fn unchecked_form(national_dex: NationalDex, form_index: u16) -> SpeciesForm {
+        SpeciesForm {
             national_dex,
             form_index,
         }
@@ -669,21 +663,21 @@ impl SpeciesAndForm {
     ///
     /// - `national_dex` must be greater than zero and at most the maximum National Dex number supported by this version of the library.
     /// - `form_index` must be less than the total number of forms for the Pokémon with the given `national_dex` number
-    pub unsafe fn new_unchecked(national_dex: u16, form_index: u16) -> SpeciesAndForm {
-        SpeciesAndForm {
+    pub unsafe fn new_unchecked(national_dex: u16, form_index: u16) -> SpeciesForm {
+        SpeciesForm {
             national_dex: NationalDex::assert_valid(national_dex),
             form_index,
         }
     }
 
-    pub fn get_base_evolution(&self) -> SpeciesAndForm {
+    pub fn get_base_evolution(&self) -> SpeciesForm {
         match self.get_forme_metadata().pre_evolution {
             None => *self,
             Some(forme_ref) => forme_ref.get_base_evolution(),
         }
     }
 
-    pub fn get_prevos(&self) -> Vec<SpeciesAndForm> {
+    pub fn get_prevos(&self) -> Vec<SpeciesForm> {
         let mut prevos = Vec::new();
         let mut current = *self;
         while let Some(forme_ref) = current.get_forme_metadata().pre_evolution {
@@ -706,7 +700,7 @@ impl SpeciesAndForm {
     }
 }
 
-impl SpeciesAndForm {
+impl SpeciesForm {
     pub const fn get_species_metadata(&self) -> &'static SpeciesMetadata {
         super::get_ndex_species_metadata(self.national_dex)
     }
@@ -723,7 +717,7 @@ impl SpeciesAndForm {
 #[wasm_bindgen]
 #[allow(clippy::missing_const_for_fn)]
 #[cfg(feature = "wasm")]
-impl SpeciesAndForm {
+impl SpeciesForm {
     #[wasm_bindgen(constructor)]
     pub fn new_js(national_dex: u16, form_index: u16) -> core::result::Result<Self, JsValue> {
         Self::new(national_dex, form_index).map_err(|e| JsValue::from_str(&e.to_string()))
@@ -756,7 +750,7 @@ impl SpeciesAndForm {
 }
 
 #[cfg(feature = "randomize")]
-impl Randomize for SpeciesAndForm {
+impl Randomize for SpeciesForm {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
         let national_dex = NationalDex::randomized(rng);
         println!("randomized ndex: {}", national_dex);
