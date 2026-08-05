@@ -12,7 +12,7 @@ use pkm_rs_resources::lookup;
 use pkm_rs_resources::moves::{MoveDataOffsets, MoveIndex, MoveSlots, PpUpStorage};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
-use pkm_rs_resources::species::SpeciesAndForm;
+use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{AbilityNumber, BinaryGender, ContestStats, Generation, NationalDex, Stats8};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, TrainerMemory};
@@ -43,7 +43,7 @@ const MOVE_DATA_OFFSETS: MoveDataOffsets = MoveDataOffsets {
 pub struct MainDataV2 {
     pub personality_value: u32,
     pub encryption_constant: u32,
-    pub species_and_form: SpeciesAndForm,
+    pub species_and_form: SpeciesForm,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -123,7 +123,7 @@ pub struct MainDataV2 {
 
 impl MainDataV2 {
     pub fn new(national_dex: u16, form_index: u16) -> Result<Self> {
-        let species_and_form = SpeciesAndForm::new(national_dex, form_index)?;
+        let species_and_form = SpeciesForm::new(national_dex, form_index)?;
         let national_dex = species_and_form.get_ndex();
         Ok(Self {
             species_and_form,
@@ -416,7 +416,7 @@ impl MainDataV2 {
 }
 
 fn is_prevo_species_name(
-    species_and_form: &SpeciesAndForm,
+    species_and_form: &SpeciesForm,
     name: &str,
     language: Language,
 ) -> bool {
@@ -442,7 +442,7 @@ impl DataSection for MainDataV2 {
         let data = Self {
             personality_value: u32::from_le_bytes(bytes[0..4].try_into().unwrap()),
             encryption_constant: u32::from_le_bytes(bytes[4..8].try_into().unwrap()),
-            species_and_form: SpeciesAndForm::new(
+            species_and_form: SpeciesForm::new(
                 u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
                 u16::from_le_bytes(bytes[10..12].try_into().unwrap()),
             )?,
@@ -711,7 +711,7 @@ fn current_time_unix_seconds() -> NonZeroU64 {
 #[cfg(feature = "randomize")]
 impl Randomize for MainDataV2 {
     fn randomized<R: rand::Rng>(rng: &mut R) -> Self {
-        let species_and_form = SpeciesAndForm::randomized(rng);
+        let species_and_form = SpeciesForm::randomized(rng);
         let ability_num = AbilityNumber::randomized(rng);
         let ability_index = species_and_form
             .get_forme_metadata()

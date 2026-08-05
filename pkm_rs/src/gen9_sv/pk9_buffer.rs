@@ -656,7 +656,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk9Buffer<S> {
         self.set_u16_le(Offset::FormNum, v);
     }
 
-    // pub fn set_species_and_form(&mut self, v: SpeciesAndForm) {
+    // pub fn set_species_and_form(&mut self, v: SpeciesForm) {
     //     if let Some(game_index) =
     //         METADATA_TABLE_SV.get_game_index(v.get_ndex().index(), v.get_forme_index())
     //     {
