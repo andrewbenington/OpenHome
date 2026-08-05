@@ -24,7 +24,7 @@ import {
   PkmFormat,
   PkmFormats,
   PkmType,
-  SpeciesAndForm,
+  SpeciesForm,
   StatsPreSplit,
 } from '@pkm-rs/pkg'
 import Prando from 'prando'
@@ -90,7 +90,7 @@ export const generateIVs = (prng: Prando) => {
 // recursively returns pre-evolution. if provided a mega form, returns the first pre-evolution
 // of the base form.
 export const getBaseEvolution = (nationalDex: number, form?: number) => {
-  let mon = SpeciesAndForm.tryNew(nationalDex, form ?? 0)
+  let mon = SpeciesForm.tryNew(nationalDex, form ?? 0)
   let metadata = mon?.getMetadata()
 
   if (metadata?.isMega) {
@@ -118,7 +118,7 @@ export function baseEvolutionsMatch(mon1: PKMInterface, mon2: PKMInterface): boo
 }
 
 export const getPrevos = (nationalDex: number, formIndex?: number) => {
-  let mon = SpeciesAndForm.tryNew(nationalDex, formIndex ?? 0)
+  let mon = SpeciesForm.tryNew(nationalDex, formIndex ?? 0)
   let metadata = mon?.getMetadata()
 
   const prevos: FormMetadata[] = []

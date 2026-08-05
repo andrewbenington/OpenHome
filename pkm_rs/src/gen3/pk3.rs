@@ -23,7 +23,7 @@ use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::moves::MoveSlots;
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
-use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
 use pkm_rs_resources::{helpers, lookup};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::AbilityNumber;
@@ -116,7 +116,7 @@ impl Pk3 {
             markings: buf.markings(),
             personality_value: buf.personality_value(),
             is_fateful_encounter: buf.is_fateful_encounter(),
-            gender: SpeciesAndForm::base_form(pokemon_index.to_national_dex())
+            gender: SpeciesForm::base_form(pokemon_index.to_national_dex())
                 .get_forme_metadata()
                 .gender_from_pid(personality_value),
             evs: buf.evs(),
@@ -255,8 +255,8 @@ impl Pk3 {
         NatureIndex::new_from_modulo(self.personality_value)
     }
 
-    pub fn species_and_form(&self) -> SpeciesAndForm {
-        SpeciesAndForm::new_valid_ndex(
+    pub fn species_and_form(&self) -> SpeciesForm {
+        SpeciesForm::new_valid_ndex(
             self.pokemon_index.to_national_dex(),
             form_index_from_pid(self.pokemon_index.to_national_dex(), self.personality_value)
                 as u16,

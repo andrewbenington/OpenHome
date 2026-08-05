@@ -2,7 +2,7 @@ use crate::sectioned_data;
 
 use pkm_rs_resources::abilities::ABILITY_MAX;
 use pkm_rs_resources::lookup;
-use pkm_rs_resources::species::{GetSpeciesMetadata, SpeciesAndForm};
+use pkm_rs_resources::species::{GetSpeciesMetadata, SpeciesForm};
 use pkm_rs_types::{InvalidAbilityNumber, Language, NationalDex};
 
 use serde::{Serialize, Serializer};
@@ -74,7 +74,7 @@ impl Error {
         }
     }
 
-    pub const fn form_index(species_and_form: SpeciesAndForm) -> Self {
+    pub const fn form_index(species_and_form: SpeciesForm) -> Self {
         Self::FormIndex {
             national_dex: species_and_form.get_ndex(),
             form_index: species_and_form.get_forme_index(),

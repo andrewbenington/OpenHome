@@ -8,7 +8,7 @@ using PKHeX.Core;
 public static partial class Util
 {
 
-  public static object SpeciesAndForm(PKM pk)
+  public static object SpeciesForm(PKM pk)
   {
     return new { national_dex = pk.Species, form_index = pk.Form };
   }

@@ -2,7 +2,7 @@ import { getBaseEvolution } from '@openhome-core/pkm/util'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import { ArrowLeftIcon, ArrowLeftRightIcon, ArrowRightIcon } from '@openhome-ui/components/Icons'
 import { Pokedex } from '@openhome-ui/util/pokedex'
-import { MetadataSummaryLookup, SpeciesAndForm } from '@pkm-rs/pkg'
+import { MetadataSummaryLookup, SpeciesForm } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { Responsive } from '@radix-ui/themes/props'
 import TooltipPokemonIcon from './TooltipPokemonIcon'
@@ -41,7 +41,7 @@ export default function EvolutionFamily({
   const baseEvolutionForms = baseEvolution.getSpeciesMetadata().forms
 
   if (MONS_WITH_NON_EVOLVABLE_FORMS.includes(nationalDex)) {
-    const otherForms = SpeciesAndForm.tryNew(nationalDex, formIndex)
+    const otherForms = SpeciesForm.tryNew(nationalDex, formIndex)
       ?.getSpeciesMetadata()
       .forms.filter((form) => !form.preEvolution && !form.isMega)
 

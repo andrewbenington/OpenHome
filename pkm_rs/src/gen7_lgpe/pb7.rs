@@ -4,7 +4,7 @@ use crate::util;
 
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 use pkm_rs_resources::moves::MoveIndex;
-use pkm_rs_resources::species::{FormMetadata, SpeciesAndForm, SpeciesMetadata};
+use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{Gender, PokeDate};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors, Stats8, Stats16Le};
@@ -19,7 +19,7 @@ use pkm_rs_types::randomize::Randomize;
 pub struct Pb7 {
     pub encryption_constant: u32,
     pub checksum: u16,
-    pub species_and_form: SpeciesAndForm,
+    pub species_and_form: SpeciesForm,
     pub held_item_index: u16,
     pub trainer_id: u16,
     pub secret_id: u16,
@@ -96,7 +96,7 @@ impl Pb7 {
         let mon = Pb7 {
             encryption_constant: read_u32_le!(bytes, 0),
             checksum: read_u16_le!(bytes, 6),
-            species_and_form: SpeciesAndForm::new(
+            species_and_form: SpeciesForm::new(
                 read_u16_le!(bytes, 8),
                 util::read_uint5_from_bits(bytes[29], 3).into(),
             )?,
