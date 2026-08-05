@@ -1,5 +1,6 @@
 use std::num::NonZeroU16;
 
+use pkm_rs_types::read_u16_be;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -55,8 +56,16 @@ impl MoveSlot {
         let pp_offset = offset + 2;
         let pp_ups_offset = offset + 3;
 
+        let move_index = MoveIndex::from_u16(read_u16_be!(bytes, move_offset));
+        dbg!(offset, move_index.0);
+        if move_index.0.is_some_and(|idx| idx.get() > 20000) {
+            return Self::default();
+        }
+
+        assert!(move_index.0.is_none_or(|idx| idx.get() < 500));
+
         Self {
-            move_index: MoveIndex::from_u16(read_u16_le!(bytes, move_offset)),
+            move_index,
             pp: bytes[pp_offset],
             pp_ups: bytes[pp_ups_offset],
         }
@@ -67,7 +76,7 @@ impl MoveSlot {
         let pp_offset = offset + 2;
         let pp_ups_offset = offset + 3;
 
-        bytes[move_offset..move_offset + 2].copy_from_slice(&self.move_index.to_le_bytes());
+        bytes[move_offset..move_offset + 2].copy_from_slice(&self.move_index.to_be_bytes());
         bytes[pp_offset] = self.pp;
         bytes[pp_ups_offset] = self.pp_ups;
     }
@@ -378,6 +387,10 @@ impl MoveIndex {
 
     pub fn to_le_bytes(self) -> [u8; 2] {
         self.0.map(NonZeroU16::get).unwrap_or(0u16).to_le_bytes()
+    }
+
+    pub fn to_be_bytes(self) -> [u8; 2] {
+        self.0.map(NonZeroU16::get).unwrap_or(0u16).to_be_bytes()
     }
 
     pub const fn empty() -> Self {

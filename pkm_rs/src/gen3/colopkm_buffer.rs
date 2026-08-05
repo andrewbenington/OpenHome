@@ -11,10 +11,9 @@ use pkm_rs_resources::ribbons::{
 use pkm_rs_types::strings::{BigEndian, SizedUtf16String};
 use pkm_rs_types::{
     BinaryGender, ContestStats, FlagSet, Ivs, MarkingsFourShapes, OriginGame, SimpleAbilityNumber,
-    Stats8,
+    Stats8, read_u16_be, read_u32_be,
 };
 use pkm_rs_types::{Language, Stats16};
-use pkm_rs_types::{read_u16_be, read_u32_le};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum Offset {
@@ -26,8 +25,8 @@ pub(super) enum Offset {
     MetLevel = 0xe,
     Ball = 0xf,
     TrainerGender = 0x10,
-    TrainerId = 0x14,
-    SecretId = 0x16,
+    SecretId = 0x14,
+    TrainerId = 0x16,
     TrainerName = 0x18,
     Nickname = 0x2e,
     Exp = 0x5c,
@@ -37,7 +36,7 @@ pub(super) enum Offset {
     CurrentHp = 0x8a,
     Stats = 0x8c,
     Evs = 0x99,
-    Ivs = 0xa5,
+    Ivs = 0xa4,
     Contest = 0xb2,
     FatefulEncounterJpn = 0xc9,
     FatefulEncounterInt = 0xfb,
@@ -109,7 +108,7 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
 
     fn get_u32_be(&self, offset: Offset) -> u32 {
         let offset = offset as usize;
-        read_u32_le!(self.bytes(), offset)
+        read_u32_be!(self.bytes(), offset)
     }
 
     fn get_flag(&self, offset: Offset, bit_index: usize) -> bool {
@@ -253,11 +252,11 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         Gen3RibbonSet::new(self.ribbons_standard(), cool, beauty, cute, smart, tough)
     }
 
-    pub fn nickname_raw(&self) -> [u8; 10] {
+    pub fn nickname_raw(&self) -> [u8; 22] {
         self.get_array(Offset::Nickname)
     }
 
-    pub fn nickname(&self) -> SizedUtf16String<10, BigEndian> {
+    pub fn nickname(&self) -> SizedUtf16String<22, BigEndian> {
         SizedUtf16String::from_be_bytes(self.nickname_raw())
     }
 
@@ -285,12 +284,12 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         self.get_u16_be(Offset::ShadowId)
     }
 
-    pub fn shadow_gauge(&self) -> u16 {
-        self.get_u16_be(Offset::ShadowGauge)
+    pub fn shadow_gauge(&self) -> u32 {
+        self.get_u32_be(Offset::ShadowGauge)
     }
 
-    pub fn met_location_index(&self) -> u8 {
-        self.get_u8(Offset::MetLocation)
+    pub fn met_location_index(&self) -> u16 {
+        self.get_u16_be(Offset::MetLocation)
     }
 
     pub fn ball(&self) -> Ball {
@@ -463,11 +462,11 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
         self.set_ribbons_contest_raw(&contest_bytes);
     }
 
-    fn set_nickname_raw(&mut self, v: &[u8; 10]) {
+    fn set_nickname_raw(&mut self, v: &[u8; 22]) {
         self.set_array(Offset::Nickname, v);
     }
 
-    pub fn set_nickname(&mut self, v: &SizedUtf16String<10, BigEndian>) {
+    pub fn set_nickname(&mut self, v: &SizedUtf16String<22, BigEndian>) {
         self.set_nickname_raw(&v.bytes());
     }
 
@@ -495,12 +494,12 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
         self.set_u16_be(Offset::ShadowId, v);
     }
 
-    pub fn set_shadow_gauge(&mut self, v: u16) {
-        self.set_u16_be(Offset::ShadowGauge, v);
+    pub fn set_shadow_gauge(&mut self, v: u32) {
+        self.set_u32_be(Offset::ShadowGauge, v);
     }
 
-    pub fn set_met_location_index(&mut self, v: u8) {
-        self.set_u8(Offset::MetLocation, v);
+    pub fn set_met_location_index(&mut self, v: u16) {
+        self.set_u16_be(Offset::MetLocation, v);
     }
 
     pub fn set_ball(&mut self, v: Ball) {
