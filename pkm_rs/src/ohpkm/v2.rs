@@ -258,7 +258,7 @@ impl OhpkmV2 {
         let gen3_compatible_pid = crate::convert_strategy::generate_pk3_compatible_pid(self);
         format!(
             "{:04}-{:04x}{:04x}-{:08x}",
-            base_mon.get_ndex().to_u16(),
+            base_mon.get_ndex(),
             self.trainer_id(),
             self.secret_id(),
             gen3_compatible_pid
