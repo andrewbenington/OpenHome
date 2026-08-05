@@ -1,0 +1,91 @@
+{
+  "pokemon_index": 192,
+  "held_item_index": null,
+  "trainer_id": 57413,
+  "secret_id": 24795,
+  "exp": 83335,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 128431589,
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus_byte": 255,
+  "ribbons": ["National"],
+  "nickname": "SUNFLORA",
+  "nickname_trash": "00530055004E0046004C004F00520041000000000000",
+  "moves": [
+    {
+      "move_index": "Sunny Day",
+      "pp": 5,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Growth",
+      "pp": 40,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Ingrain",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Solar Beam",
+      "pp": 10,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 22,
+    "atk": 25,
+    "def": 4,
+    "spa": 8,
+    "spd": 12,
+    "spe": 30
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_name_trash": "0052006F004300000000000000000000000000000000",
+  "trainer_friendship": 70,
+  "shadow_id": 35,
+  "shadow_gauge": 0,
+  "met_location_index": 109,
+  "ball": "Ultra",
+  "met_level": 45,
+  "trainer_gender": "Male",
+  "game_of_origin": "Colosseum/XD",
+  "language": "English",
+  "status_condition": 0,
+  "stat_level": 45,
+  "current_hp": 132,
+  "stats": {
+    "hp": 132,
+    "atk": 83,
+    "def": 56,
+    "spa": 103,
+    "spd": 77,
+    "spe": 49
+  },
+  "level": 45
+}

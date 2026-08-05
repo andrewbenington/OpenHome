@@ -363,6 +363,7 @@ pub fn compare_pkhex_json_all_in_dir<PKM: Pkm + PkhexJson>(dir: &Path) -> TestRe
     let pkm_files = fs::read_dir(&full_dir).map_err(|e| TestError::dir_read(e, dir))?;
 
     for dir_entry in pkm_files {
+        dbg!(&dir_entry);
         match dir_entry {
             Err(e) => println!("directory entry error: {e}"),
             Ok(dir_entry) => {
