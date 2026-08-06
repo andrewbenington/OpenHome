@@ -35,7 +35,7 @@ pub struct Pb7 {
     pub evs: Stats8,
     pub avs: Stats8,
     pub resort_event_status: u8,
-    pub pokerus_byte: u8,
+    pub pokerus: Pokerus,
     pub height_absolute_bytes: [u8; 4],
     pub height: u8,
     pub weight: u8,
@@ -115,7 +115,7 @@ impl Pb7 {
             evs: Stats8::from_bytes(bytes[30..36].try_into().unwrap()),
             avs: Stats8::from_bytes(bytes[36..42].try_into().unwrap()),
             resort_event_status: bytes[42],
-            pokerus_byte: bytes[43],
+            pokerus: bytes[43],
             height_absolute_bytes: bytes[44..48].try_into().unwrap(),
             height: bytes[58],
             weight: bytes[59],
@@ -212,7 +212,7 @@ impl PkmBytes for Pb7 {
         bytes[30..36].copy_from_slice(&self.evs.to_bytes());
         bytes[36..42].copy_from_slice(&self.avs.to_bytes());
         bytes[42] = self.resort_event_status;
-        bytes[43] = self.pokerus_byte;
+        bytes[43] = self.pokerus;
         bytes[44..48].copy_from_slice(&self.height_absolute_bytes);
         bytes[58] = self.height;
         bytes[59] = self.weight;

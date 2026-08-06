@@ -1,4 +1,4 @@
-use arbitrary_int::u3;
+use arbitrary_int::{u3, u4};
 use chrono::Datelike;
 use serde::{Deserialize, Serialize, Serializer};
 
@@ -10,7 +10,7 @@ use crate::{OriginGame, strings::SizedUtf16String, util};
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "randomize")]
-use rand::RngExt;
+use rand::{RngExt, random_range};
 
 #[cfg(feature = "wasm")]
 use tsify::Tsify;
@@ -900,6 +900,104 @@ impl TryFrom<u3> for AbilityNumber {
 #[derive(Debug, Clone, Copy)]
 pub struct InvalidAbilityNumber(pub u3);
 
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq, Eq)]
+pub struct Pokerus(u8);
+
+#[derive(Debug, Clone, Copy, EnumString)]
+pub enum PokerusStatus {
+    Uninfected,
+    Infected,
+    Cured,
+}
+
+impl Pokerus {
+    pub const fn from_byte(v: u8) -> Self {
+        Self(v)
+    }
+
+    pub const fn to_byte(&self) -> u8 {
+        let strain = self.strain();
+        if strain.value() == 0 || strain.value() == 8 {
+            return 0;
+        }
+
+        let max_days = Self::max_days_for_strain(strain);
+        let days_remaining = self.days_remaining().value();
+
+        if days_remaining < max_days {
+            days_remaining
+        } else {
+            max_days
+        }
+    }
+
+    pub const fn from_components(strain: u8, days_remaining: u8) -> Self {
+        let strain = u4::extract_u8(strain, 0).value();
+        let days_remaining = u4::extract_u8(days_remaining, 0).value();
+
+        Self((strain << 4) & days_remaining)
+    }
+
+    pub const fn strain(&self) -> arbitrary_int::u4 {
+        arbitrary_int::u4::extract_u8(self.0, 4)
+    }
+
+    pub const fn days_remaining(&self) -> arbitrary_int::u4 {
+        arbitrary_int::u4::extract_u8(self.0, 0)
+    }
+
+    pub const fn max_days_for_strain(strain: arbitrary_int::u4) -> u8 {
+        strain.value() % 4 + 1
+    }
+
+    pub const fn status(&self) -> PokerusStatus {
+        match (self.strain().value(), self.days_remaining().value()) {
+            (0.., 1..) => PokerusStatus::Infected,
+            (1.., 0) => PokerusStatus::Cured,
+            (0, 0) => PokerusStatus::Uninfected,
+        }
+    }
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[allow(clippy::missing_const_for_fn)]
+impl Pokerus {
+    #[wasm_bindgen(js_name = fromByte)]
+    pub fn from_byte_wasm(v: u8) -> Self {
+        Self(v)
+    }
+
+    #[wasm_bindgen(js_name = toByte)]
+    pub fn to_byte_wasm(&self) -> u8 {
+        self.to_byte()
+    }
+
+    #[wasm_bindgen(js_name = clone)]
+    pub fn clone_wasm(&self) -> Self {
+        *self
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for Pokerus {
+    fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
+        let mut strain: u8 = u4::randomized(rng).value();
+        if strain == 8 {
+            strain = 0;
+        }
+
+        let days_remaining: u8 = if strain > 0 {
+            let max_days = Pokerus::max_days_for_strain(u4::randomized(rng));
+            random_range(0..=max_days)
+        } else {
+            0
+        };
+
+        Self::from_components(strain, days_remaining)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -960,5 +1058,15 @@ mod tests {
         if !crown.has_crown() {
             panic!("expected crown, got leaves");
         }
+    }
+
+    #[cfg(feature = "wasm")]
+    #[test]
+    fn pokerus_strain() {
+        let byte = 0xc4;
+        let pokerus = Pokerus::from_byte(byte);
+
+        assert_eq!(pokerus.strain(), arbitrary_int::u4::new(0xc));
+        assert_eq!(pokerus.days_remaining(), arbitrary_int::u4::new(4));
     }
 }

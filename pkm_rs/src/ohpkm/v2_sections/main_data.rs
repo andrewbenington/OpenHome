@@ -14,7 +14,9 @@ use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{AbilityNumber, BinaryGender, ContestStats, Generation, NationalDex, Stats8};
+use pkm_rs_types::{
+    AbilityNumber, BinaryGender, ContestStats, Generation, NationalDex, Pokerus, Stats8,
+};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, TrainerMemory};
 use pkm_rs_types::{HyperTraining, MarkingsSixShapesColors};
 use pkm_rs_types::{Ivs, Language};
@@ -61,7 +63,7 @@ pub struct MainDataV2 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
     pub contest: ContestStats,
-    pub pokerus_byte: u8,
+    pub pokerus: Pokerus,
     pub contest_memory_count: u8,
     pub battle_memory_count: u8,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -162,7 +164,7 @@ impl MainDataV2 {
             gender: old.gender,
             evs: old.evs,
             contest: old.contest,
-            pokerus_byte: old.pokerus_byte,
+            pokerus: old.pokerus,
             contest_memory_count: old.contest_memory_count,
             battle_memory_count: old.battle_memory_count,
             ribbons: old.ribbons,
@@ -415,11 +417,7 @@ impl MainDataV2 {
     }
 }
 
-fn is_prevo_species_name(
-    species_and_form: &SpeciesForm,
-    name: &str,
-    language: Language,
-) -> bool {
+fn is_prevo_species_name(species_and_form: &SpeciesForm, name: &str, language: Language) -> bool {
     species_and_form
         .get_prevos()
         .iter()
@@ -478,7 +476,7 @@ impl DataSection for MainDataV2 {
             held_item_index: u16::from_le_bytes(bytes[36..38].try_into().unwrap()),
             evs: Stats8::from_bytes(bytes[38..44].try_into().unwrap()),
             contest: ContestStats::from_bytes(bytes[44..50].try_into().unwrap()),
-            pokerus_byte: bytes[50],
+            pokerus: Pokerus::from_byte(bytes[50]),
             contest_memory_count: bytes[52],
             battle_memory_count: bytes[53],
             ribbons: OpenHomeRibbonSet::from_bytes(bytes[54..76].try_into().unwrap()).map_err(
@@ -600,7 +598,7 @@ impl DataSection for MainDataV2 {
         bytes[36..38].copy_from_slice(&self.held_item_index.to_le_bytes());
         bytes[38..44].copy_from_slice(&self.evs.to_bytes());
         bytes[44..50].copy_from_slice(&self.contest.to_bytes());
-        bytes[50] = self.pokerus_byte;
+        bytes[50] = self.pokerus.to_byte();
         bytes[52] = self.contest_memory_count;
         bytes[53] = self.battle_memory_count;
         bytes[54..76].copy_from_slice(&self.ribbons.to_bytes());
@@ -735,7 +733,7 @@ impl Randomize for MainDataV2 {
             gender: Gender::randomized(rng),
             evs: Stats8::randomized(rng),
             contest: ContestStats::randomized(rng),
-            pokerus_byte: u8::randomized(rng),
+            pokerus: Pokerus::randomized(rng),
             contest_memory_count: u8::randomized(rng),
             battle_memory_count: u8::randomized(rng),
             ribbons: OpenHomeRibbonSet::randomized(rng),

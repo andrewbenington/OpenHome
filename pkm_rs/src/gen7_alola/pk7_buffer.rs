@@ -15,7 +15,7 @@ use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, Gender, Geolocations, HyperTraining, Ivs,
-    MarkingsSixShapesColors, OriginGame, PokeDate, Stats8, TrainerMemory,
+    MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, Stats8, TrainerMemory,
 };
 use pkm_rs_types::{Language, Stats16Le};
 use pkm_rs_types::{read_u16_le, read_u32_le};
@@ -333,8 +333,8 @@ impl<S: AsRef<[u8]>> Pk7Buffer<S> {
         self.get_u8(Offset::ResortEventStatus)
     }
 
-    pub fn pokerus_byte(&self) -> u8 {
-        self.get_u8(Offset::Pokerus)
+    pub fn pokerus(&self) -> Pokerus {
+        Pokerus::from_byte(self.get_u8(Offset::Pokerus))
     }
 
     pub fn super_training_flags(&self) -> u32 {
@@ -771,8 +771,8 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk7Buffer<S> {
         self.set_u8(Offset::ResortEventStatus, v);
     }
 
-    pub fn set_pokerus_byte(&mut self, v: u8) {
-        self.set_u8(Offset::Pokerus, v);
+    pub fn set_pokerus(&mut self, v: Pokerus) {
+        self.set_u8(Offset::Pokerus, v.to_byte());
     }
 
     pub fn set_super_training_flags(&mut self, v: u32) {
