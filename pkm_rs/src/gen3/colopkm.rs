@@ -43,7 +43,7 @@ use wasm_bindgen::prelude::*;
 #[derive(Debug, Serialize, Clone, Copy, IsShiny8192)]
 pub struct Colopkm {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
-    pub national_dex: NationalDex,
+    pub pokemon_index: Gen3PokemonIndex,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub held_item_index: Option<ItemGen3>,
     pub trainer_id: u16,
@@ -67,10 +67,10 @@ pub struct Colopkm {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ivs: Ivs,
     pub is_egg: bool,
-    pub trainer_name: SizedUtf16String<10, BigEndian>,
+    pub trainer_name: SizedUtf16String<22, BigEndian>,
     pub trainer_friendship: u8,
     pub shadow_id: u16,
-    pub shadow_gauge: u32,
+    pub shadow_gauge: i32,
     pub met_location_index: u16,
     pub ball: Ball,
     pub met_level: u8,
@@ -91,12 +91,11 @@ impl Colopkm {
     // ------------------------------------------------------------------
 
     pub fn from_buffer<S: AsRef<[u8]>>(buf: &ColopkmBuffer<S>) -> Result<Self> {
-        let pokemon_index = Gen3PokemonIndex::new(buf.national_dex())?;
+        let pokemon_index = Gen3PokemonIndex::new(buf.gen3_species_index())?;
         let personality_value = buf.personality_value();
         let language = buf.language()?;
         let mut mon = Colopkm {
-            national_dex: NationalDex::try_from(buf.national_dex())
-                .map_err(|_| Error::other("Invalid National Dex in colopkm"))?,
+            pokemon_index,
             held_item_index: ItemGen3::new(buf.held_item_index()),
             trainer_id: buf.trainer_id(),
             secret_id: buf.secret_id(),
@@ -144,7 +143,7 @@ impl Colopkm {
     }
 
     pub fn from_slot_bytes(mut bytes: Box<[u8]>) -> Result<Option<Self>> {
-        if ColopkmBuffer::new(&bytes).national_dex() == 0 {
+        if ColopkmBuffer::new(&bytes).gen3_species_index() == 0 {
             Ok(None)
         } else {
             Self::from_encrypted_bytes(&mut bytes).map(Some)
@@ -152,7 +151,7 @@ impl Colopkm {
     }
 
     pub fn write_to_box_buffer(&self, buf: &mut ColopkmBufferMut) {
-        buf.set_national_dex(self.national_dex as u16);
+        buf.set_gen3_species_index(self.pokemon_index.into());
         buf.set_held_item_index(self.held_item_index.map_or(0, |i| i.get()));
         buf.set_trainer_id(self.trainer_id);
         buf.set_secret_id(self.secret_id);
@@ -210,8 +209,8 @@ impl Colopkm {
         bytes
     }
 
-    pub const fn get_national_dex(&self) -> NationalDex {
-        self.national_dex
+    pub fn get_national_dex(&self) -> NationalDex {
+        self.pokemon_index.to_national_dex()
     }
 
     pub fn is_nicknamed(&self) -> bool {
@@ -225,8 +224,8 @@ impl Colopkm {
 
     pub fn species_and_form(&self) -> SpeciesForm {
         SpeciesForm::new_valid_ndex(
-            self.national_dex,
-            super::form_index_from_pid(self.national_dex, self.personality_value) as u16,
+            self.get_national_dex(),
+            super::form_index_from_pid(self.get_national_dex(), self.personality_value) as u16,
         )
         .expect("gen 3 form is valid")
     }
@@ -252,7 +251,7 @@ impl Colopkm {
         let mut owned = bytes.to_owned();
         ColopkmBuffer::new_mut(&mut owned)
             .decrypted()
-            .national_dex()
+            .gen3_species_index()
             == 0
     }
 
@@ -350,13 +349,13 @@ impl Colopkm {
     }
 
     #[wasm_bindgen(getter = nationalDex)]
-    pub fn national_dex_js(&self) -> u16 {
-        self.national_dex as u16
+    pub fn national_dex_js(&self) -> NationalDex {
+        self.get_national_dex()
     }
 
     #[wasm_bindgen(setter = nationalDex)]
     pub fn set_national_dex_js(&mut self, v: u16) -> Result<()> {
-        self.national_dex = NationalDex::new(v)?;
+        self.pokemon_index = Gen3PokemonIndex::from_national_dex(v)?;
         Ok(())
     }
 
