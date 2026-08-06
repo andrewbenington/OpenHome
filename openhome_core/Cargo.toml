@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 base64 = "0.22.1"
+dirs = "6.0.0"
 pkm_rs = {path = "../pkm_rs"}
 pkm_rs_derive = {path = "../pkm_rs_derive"}
 semver = "1.0.28"

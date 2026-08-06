@@ -259,45 +259,12 @@ where
     fs::File::create(&full_path).map_err(|err| Error::file_access(&full_path, err))
 }
 
-#[cfg(target_os = "macos")]
-fn get_default_data_dir() -> Result<PathBuf> {
-    let home_dir = std::env::var("HOME")
-        .map_err(|e| Error::other_with_source("HOME environment variable is not present", e))?;
-    let application_support = PathBuf::from(home_dir)
-        .join("Library")
-        .join("Application Support");
-    Ok(application_support)
-}
-
-#[cfg(target_os = "macos")]
 fn get_config_dir() -> Result<PathBuf> {
-    get_default_data_dir()
+    dirs::config_dir().ok_or(Error::other("config directory not detected; please report this issue alongside your Linux distribution and OpenHome installation method"))
 }
 
-#[cfg(target_os = "linux")]
 fn get_default_data_dir() -> Result<PathBuf> {
-    Ok(std::env::var_os("XDG_DATA_HOME")
-        .map(PathBuf::from)
-        .unwrap_or(PathBuf::from(".local").join("share")))
-}
-
-#[cfg(target_os = "linux")]
-fn get_config_dir() -> Result<PathBuf> {
-    Ok(std::env::var_os("XDG_CONFIG_HOME")
-        .map(PathBuf::from)
-        .unwrap_or(PathBuf::from(".config")))
-}
-
-#[cfg(target_os = "windows")]
-fn get_default_data_dir() -> Result<PathBuf> {
-    std::env::var("APPDATA")
-        .map(PathBuf::from)
-        .map_err(|e| Error::other_with_source("APPDATA environment variable is not present", e))
-}
-
-#[cfg(target_os = "windows")]
-fn get_config_dir() -> Result<PathBuf> {
-    get_default_data_dir()
+    dirs::data_dir().ok_or(Error::other("data directory not detected; please report this issue alongside your Linux distribution and OpenHome installation method"))
 }
 
 pub fn get_openhome_default_data_dir() -> Result<PathBuf> {
