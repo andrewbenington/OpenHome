@@ -34,7 +34,7 @@ public static class ColopkmObject
             trainer_name_trash = System.Convert.ToHexString(pk.OriginalTrainerTrash),
             trainer_friendship = pk.OriginalTrainerFriendship,
             shadow_id = pk.ShadowID,
-            shadow_gauge = pk.EXP_Shadow,
+            shadow_gauge = pk.Purification,
             met_location_index = pk.MetLocation,
             ball = Util.FormatBall(pk, strings),
             met_level = pk.MetLevel,
