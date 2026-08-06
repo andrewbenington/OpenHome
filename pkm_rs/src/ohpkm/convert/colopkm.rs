@@ -5,7 +5,7 @@ use pkm_rs_types::{AbilityNumber, Generation, PokeDate, Stats16};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
-use crate::gen3::{Colopkm, PK3_MAX_ABILITY};
+use crate::gen3::{Colopkm, Gen3PokemonIndex, PK3_MAX_ABILITY};
 use crate::ohpkm::OhpkmV2;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::{Error, Result};
@@ -35,7 +35,7 @@ impl OhpkmConvert for Colopkm {
             self.secret_id,
         );
 
-        let species_name = lookup::species_name(self.national_dex, self.language);
+        let species_name = lookup::species_name(self.get_national_dex(), self.language);
 
         let is_nicknamed = !species_name.eq_ignore_ascii_case(&self.nickname.to_string());
 
@@ -111,7 +111,9 @@ impl OhpkmConvert for Colopkm {
         };
 
         let mut mon = Self {
-            national_dex: ohpkm.species_and_form().get_ndex(),
+            pokemon_index: Gen3PokemonIndex::from_national_dex(
+                ohpkm.species_and_form().get_ndex() as u16,
+            )?,
             held_item_index: ItemGen3::from_modern_index(ohpkm.held_item_index()),
             trainer_id: ohpkm.trainer_id(),
             secret_id: ohpkm.secret_id(),

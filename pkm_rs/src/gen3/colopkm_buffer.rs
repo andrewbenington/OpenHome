@@ -11,13 +11,13 @@ use pkm_rs_resources::ribbons::{
 use pkm_rs_types::strings::{BigEndian, SizedUtf16String};
 use pkm_rs_types::{
     BinaryGender, ContestStats, FlagSet, Ivs, MarkingsFourShapes, OriginGame, SimpleAbilityNumber,
-    Stats8, read_u16_be, read_u32_be,
+    Stats8, read_i32_be, read_u16_be, read_u32_be,
 };
 use pkm_rs_types::{Language, Stats16};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum Offset {
-    NationalDex = 0x0,
+    SpeciesIndex = 0x0,
     PersonalityValue = 0x4,
     OriginGameGcn = 0x8,
     LanguageGcn = 0xb,
@@ -111,6 +111,11 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         read_u32_be!(self.bytes(), offset)
     }
 
+    fn get_i32_be(&self, offset: Offset) -> i32 {
+        let offset = offset as usize;
+        read_i32_be!(self.bytes(), offset)
+    }
+
     fn get_flag(&self, offset: Offset, bit_index: usize) -> bool {
         util::get_flag(self.bytes(), offset as usize, bit_index)
     }
@@ -157,8 +162,8 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         self.0.as_ref()
     }
 
-    pub fn national_dex(&self) -> u16 {
-        self.get_u16_be(Offset::NationalDex)
+    pub fn gen3_species_index(&self) -> u16 {
+        self.get_u16_be(Offset::SpeciesIndex)
     }
 
     pub fn held_item_index(&self) -> u16 {
@@ -268,11 +273,11 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         Ivs::from_gcn_bytes(self.get_array(Offset::Ivs))
     }
 
-    fn trainer_name_raw(&self) -> [u8; 10] {
+    fn trainer_name_raw(&self) -> [u8; 22] {
         self.get_array(Offset::TrainerName)
     }
 
-    pub fn trainer_name(&self) -> SizedUtf16String<10, BigEndian> {
+    pub fn trainer_name(&self) -> SizedUtf16String<22, BigEndian> {
         SizedUtf16String::from_be_bytes(self.trainer_name_raw())
     }
 
@@ -284,8 +289,8 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         self.get_u16_be(Offset::ShadowId)
     }
 
-    pub fn shadow_gauge(&self) -> u32 {
-        self.get_u32_be(Offset::ShadowGauge)
+    pub fn shadow_gauge(&self) -> i32 {
+        self.get_i32_be(Offset::ShadowGauge)
     }
 
     pub fn met_location_index(&self) -> u16 {
@@ -361,8 +366,8 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
         self.0.as_mut()
     }
 
-    pub fn set_national_dex(&mut self, v: u16) {
-        self.set_u16_be(Offset::NationalDex, v);
+    pub fn set_gen3_species_index(&mut self, v: u16) {
+        self.set_u16_be(Offset::SpeciesIndex, v);
     }
 
     pub fn set_held_item_index(&mut self, v: u16) {
@@ -478,11 +483,11 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
         v.write_gcn_bytes(self.bytes_mut(), Offset::Ivs.into());
     }
 
-    fn set_trainer_name_raw(&mut self, v: &[u8; 10]) {
+    fn set_trainer_name_raw(&mut self, v: &[u8; 22]) {
         self.set_array(Offset::TrainerName, v);
     }
 
-    pub fn set_trainer_name(&mut self, v: &SizedUtf16String<10, BigEndian>) {
+    pub fn set_trainer_name(&mut self, v: &SizedUtf16String<22, BigEndian>) {
         self.set_trainer_name_raw(&v.bytes());
     }
 
