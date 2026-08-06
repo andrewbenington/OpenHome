@@ -9,7 +9,7 @@ use zip::ZipArchive;
 use openhome_core::{Error, Result};
 
 #[cfg(target_os = "linux")]
-use dialog::DialogBox;
+// use dialog::DialogBox;
 #[cfg(not(target_os = "linux"))]
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
@@ -162,7 +162,11 @@ pub fn open_directory(directory_path: &Path) -> Result<()> {
     }
 }
 
-pub fn show_error_dialog(_app: &tauri::App, message: impl Into<String>, title: impl Into<String>) {
+pub fn show_error_dialog(
+    _app: &tauri::App,
+    message: impl Into<String> + ToString,
+    title: impl Into<String> + ToString,
+) {
     #[cfg(not(target_os = "linux"))]
     _app.dialog()
         .message(message)
@@ -171,8 +175,11 @@ pub fn show_error_dialog(_app: &tauri::App, message: impl Into<String>, title: i
         .blocking_show();
 
     #[cfg(target_os = "linux")]
-    dialog::Message::new(message)
-        .title(title)
+    native_dialog::DialogBuilder::message()
+        .set_level(native_dialog::MessageLevel::Error)
+        .set_title(title)
+        .set_text(message)
+        .alert()
         .show()
         .expect("Could not display dialog box");
 }
