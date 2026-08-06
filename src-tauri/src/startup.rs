@@ -11,8 +11,6 @@ use tauri::{App, Emitter, Manager};
 const BANKS_FILENAME: &str = "banks.json";
 const LOGS_DIR: &str = "logs";
 
-#[cfg(target_os = "linux")]
-use dialog::DialogBox;
 #[cfg(not(target_os = "linux"))]
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 
@@ -137,11 +135,13 @@ pub fn show_version_error_prompt(_app: &tauri::App, error: &Error) -> bool {
         .blocking_show();
 
     #[cfg(target_os = "linux")]
-    dialog::Question::new(format!(
-        "{error}\nDo you want to accept the risk and launch anyways?"
-    ))
-    .title("OpenHome Version Error")
-    .show()
-    .expect("Could not display dialog box")
-    .eq(&dialog::Choice::Yes)
+    !native_dialog::DialogBuilder::message()
+        .set_level(native_dialog::MessageLevel::Error)
+        .set_title("OpenHome Version Error")
+        .set_text(format!(
+            "{error}\nDo you want to accept the risk and launch anyways?"
+        ))
+        .confirm()
+        .show()
+        .expect("Could not display dialog box")
 }
