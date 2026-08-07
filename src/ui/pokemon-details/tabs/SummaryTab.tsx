@@ -3,10 +3,8 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PKM } from '@openhome-core/pkm/PKM'
 import { getTypes } from '@openhome-core/pkm/util'
 import { getDisplayID } from '@openhome-core/util'
-import { pluralize } from '@openhome-core/util/format'
-import { Option } from '@openhome-core/util/functional'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
-import { ImageBadge } from '@openhome-ui/components/badge/ImageBadge'
+import Badge from '@openhome-ui/components/badge/Badge'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
@@ -24,9 +22,8 @@ import {
   Languages,
   MetadataSummaryLookup,
   OriginGames,
-  Pokerus,
 } from '@pkm-rs/pkg'
-import { Badge, Button, Flex, Spinner, Tooltip } from '@radix-ui/themes'
+import { Button, Flex, Badge as RadixBadge, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { TagIcon } from '../../components/TagIcon'
 import useMonSprite from '../useMonSprite'
@@ -85,13 +82,13 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           )}
           {spriteResult.errorMessage && (
             <Tooltip content={spriteResult.errorMessage}>
-              <Badge
+              <RadixBadge
                 variant="solid"
                 color="tomato"
                 style={{ position: 'absolute', top: '0.5rem', left: '0.5rem' }}
               >
                 <ErrorIcon fontSize={20} />
-              </Badge>
+              </RadixBadge>
             </Tooltip>
           )}
         </div>
@@ -103,9 +100,9 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
             src={BallsImageList[mon.ball ?? Ball.Poke]}
           />
           <div style={{ fontWeight: 'bold' }}>{formatTitleAndNickname(mon)}</div>
-          <Badge variant="solid" color="gray" ml="2" size="1">
+          <RadixBadge variant="solid" color="gray" ml="2" size="1">
             {Languages.stringFromByte(mon.language)}
-          </Badge>
+          </RadixBadge>
         </div>
         <AttributeRow label="Item" justifyEnd>
           {mon.heldItemName !== 'None' && (
@@ -119,7 +116,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
         </AttributeRow>
         <Flex direction="row" gap="1" align="center" wrap="wrap">
           {mon.tags?.map((tag, i) => (
-            <Badge
+            <RadixBadge
               key={i}
               variant="solid"
               size="1"
@@ -130,43 +127,36 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
             >
               <TagIcon iconName={tag.icon} size={10} />
               {tag.label}
-            </Badge>
+            </RadixBadge>
           ))}
         </Flex>
         <div className="attribute-badges">
           {mon.isShiny() && (
-            <ImageBadge
+            <Badge.Image
               src={getPublicImageURL('icons/Shiny.png')}
               color="white"
               backgroundColor="#cc0000"
             />
           )}
-          {mon.canGigantamax && (
-            <ImageBadge
-              src={getPublicImageURL('icons/GMax.png')}
-              color="white"
-              backgroundColor="#e60040"
-            />
-          )}
-          <PokerusIndicator pokerusByte={mon.pokerusByte} />
-          {mon.isAlpha && (
-            <ImageBadge
-              src={getPublicImageURL('icons/Alpha.png')}
-              label="Alpha"
-              color="white"
-              backgroundColor="#f2352d"
-            />
-          )}
+          <Badge.Gigantamax showIf={mon.canGigantamax} showLabel />
+          <Badge.Pokerus pokerusByte={mon.pokerusByte} showLabel />
+          <Badge.Alpha showIf={mon.isAlpha} showLabel />
           {mon instanceof OHPKM && mon.unconvertedPkm && (
-            <ImageBadge label="Has Unconverted PKM" color="white" backgroundColor="blue" />
+            <Badge.Image label="Has Unconverted PKM" color="white" backgroundColor="blue" />
           )}
-          {mon.isNoble && <ImageBadge label="Noble" backgroundColor="#cccc00" color="white" />}
-          {'isShadow' in mon && (mon.isShadow as boolean) && (
-            <ImageBadge label="Shadow" backgroundColor={SHADOW_TYPE_COLOR} color="white" />
-          )}
-          {mon.isNsPokemon && (
-            <ImageBadge label="N's Pokémon" backgroundColor="green" color="white" />
-          )}
+          {mon.isNoble && <Badge.Image label="Noble" backgroundColor="#cccc00" color="white" />}
+          <Badge.Image
+            label="Shadow"
+            backgroundColor={SHADOW_TYPE_COLOR}
+            color="white"
+            showIf={mon.isShadow}
+          />
+          <Badge.Image
+            label="N's Pokémon"
+            backgroundColor="green"
+            color="white"
+            showIf={mon.isNsPokemon}
+          />
         </div>
       </Flex>
       <Flex direction="column" gap="2px" flexGrow="1">
@@ -243,32 +233,6 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
       </Flex>
     </Flex>
   )
-}
-
-function PokerusIndicator(props: { pokerusByte: Option<number> }) {
-  const pokerus = Pokerus.fromByte(props.pokerusByte ?? 0)
-  switch (pokerus.status()) {
-    case 'Uninfected':
-      return null
-    case 'Infected':
-      return (
-        <ImageBadge
-          src={getPublicImageURL('icons/pokerus-infected.png')}
-          color="white"
-          backgroundColor="#eb3cae"
-          label={`${pluralize(pokerus.daysRemaining(), 'Day')} Remaining`}
-        />
-      )
-    case 'Cured':
-      return (
-        <ImageBadge
-          src={getPublicImageURL('icons/pokerus-cured.png')}
-          color="white"
-          backgroundColor="#eb3cae"
-          label="Cured"
-        />
-      )
-  }
 }
 
 type ToggleTabOption = {
