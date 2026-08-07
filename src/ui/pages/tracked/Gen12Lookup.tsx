@@ -1,7 +1,7 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { gameOrPluginSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
-import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
+import { GameIndicator } from '@openhome-ui/components/badge/GameIndicator'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import { useLookups } from '@openhome-ui/state/lookups/useLookups'

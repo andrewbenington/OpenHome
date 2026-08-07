@@ -11,8 +11,8 @@ import {
   numericSorter,
   stringSorter,
 } from '@openhome-core/util/sort'
+import { GameIndicator } from '@openhome-ui/components/badge/GameIndicator'
 import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
-import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { getPublicImageURL } from '@openhome-ui/images/images'

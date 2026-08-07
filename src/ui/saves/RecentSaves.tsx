@@ -10,9 +10,9 @@ import {
   stringSorter,
 } from '@openhome-core/util/sort'
 import { SaveRef } from '@openhome-core/util/types'
+import { GameIndicator } from '@openhome-ui/components/badge/GameIndicator'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
-import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'

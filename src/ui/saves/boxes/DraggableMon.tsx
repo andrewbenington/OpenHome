@@ -1,7 +1,7 @@
 import { useDraggable } from '@dnd-kit/core'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
-import { TopRightIndicator } from '@openhome-ui/components/pokemon/indicator/TopRightIndicator'
+import { TopRightIndicator } from '@openhome-ui/components/badge/TopRightIndicator'
 import { MonWithLocation } from '@openhome-ui/state/saves'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { CSSProperties, useMemo } from 'react'
