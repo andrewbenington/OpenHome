@@ -1,3 +1,5 @@
+import { ImageIndicator } from './pokemon/indicator/ImageIndicator'
+
 export default function AttributeTag(props: {
   color: string
   backgroundColor: string
@@ -8,8 +10,12 @@ export default function AttributeTag(props: {
   const { color, backgroundColor, label, icon, onClick } = props
 
   return (
-    <div className="attribute-tag" style={{ color, backgroundColor }} onClick={onClick}>
-      {icon ? <img className="attribute-tag-icon" alt={`${icon} icon`} src={icon} /> : label}
-    </div>
+    <ImageIndicator
+      src={icon}
+      style={{ color, backgroundColor }}
+      backgroundColor={backgroundColor}
+      onClick={onClick}
+      text={label}
+    />
   )
 }

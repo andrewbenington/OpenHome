@@ -23,7 +23,6 @@
   min-width: 1.25rem;
   height: 1.25rem;
   border-radius: var(--border-radius-xs);
-  outline: 1px solid black;
 }
 
 .numerical-indicator {
@@ -36,6 +35,9 @@
 
 .image-indicator-with-text {
   padding: 0px var(--padding-radius-sm-lg);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 @media (prefers-color-scheme: dark) {

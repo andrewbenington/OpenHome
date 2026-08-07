@@ -84,6 +84,7 @@ export const TopRightIndicatorTypes = [
   'Ball',
   'Alpha',
   'Gigantamax',
+  'Pokérus',
 ] as const
 
 export type TopRightIndicatorType = (typeof TopRightIndicatorTypes)[number]

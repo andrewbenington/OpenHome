@@ -904,6 +904,8 @@ pub struct InvalidAbilityNumber(pub u3);
 #[derive(Debug, Clone, Copy, Default, Serialize, PartialEq, Eq)]
 pub struct Pokerus(u8);
 
+#[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy, EnumString)]
 pub enum PokerusStatus {
     Uninfected,
@@ -925,11 +927,13 @@ impl Pokerus {
         let max_days = Self::max_days_for_strain(strain);
         let days_remaining = self.days_remaining().value();
 
-        if days_remaining < max_days {
+        let days_remaining = if days_remaining < max_days {
             days_remaining
         } else {
             max_days
-        }
+        };
+
+        (strain.value() << 4) | (days_remaining & 0xf)
     }
 
     pub const fn from_components(strain: u8, days_remaining: u8) -> Self {
@@ -968,9 +972,29 @@ impl Pokerus {
         Self(v)
     }
 
+    #[wasm_bindgen(js_name = fromByteOrDefault)]
+    pub fn from_byte_or_default_wasm(v: Option<u8>) -> Self {
+        v.map(Self).unwrap_or_default()
+    }
+
     #[wasm_bindgen(js_name = toByte)]
     pub fn to_byte_wasm(&self) -> u8 {
         self.to_byte()
+    }
+
+    #[wasm_bindgen(js_name = strain)]
+    pub fn strain_wasm(&self) -> u8 {
+        self.strain().value()
+    }
+
+    #[wasm_bindgen(js_name = daysRemaining)]
+    pub fn days_remaining_wasm(&self) -> u8 {
+        self.days_remaining().value()
+    }
+
+    #[wasm_bindgen(js_name = status)]
+    pub fn status_wasm(&self) -> PokerusStatus {
+        self.status()
     }
 
     #[wasm_bindgen(js_name = clone)]

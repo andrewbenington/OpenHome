@@ -1,6 +1,6 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
+import { Pokerus, StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
 import { TopRightIndicatorType } from '../../../hooks/monDisplay'
 import { getPublicImageURL } from '../../../images/images'
 import { BallsImageList } from '../../../images/items'
@@ -79,6 +79,29 @@ export function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps
           />
         )
       )
+    case 'Pokérus':
+      const pokerus = Pokerus.fromByte(mon.pokerusByte ?? 0)
+      switch (pokerus.status()) {
+        case 'Uninfected':
+          return null
+        case 'Infected':
+          return (
+            <ImageIndicator
+              tooltip="Gigantamax"
+              src={getPublicImageURL('icons/pokerus-infected.png')}
+              backgroundColor="#eb3cae"
+            />
+          )
+        case 'Cured':
+          return (
+            <ImageIndicator
+              tooltip="Gigantamax"
+              src={getPublicImageURL('icons/pokerus-cured.png')}
+              backgroundColor="#eb3cae"
+            />
+          )
+      }
+
     default:
       return null
   }

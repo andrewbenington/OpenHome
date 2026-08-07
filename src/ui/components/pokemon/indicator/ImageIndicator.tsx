@@ -4,10 +4,12 @@ import { Indicator } from './Indicator'
 
 export type ImageIndicatorProps = {
   tooltip?: string
-  src: string
+  src?: string
+  color?: string
   backgroundColor: string
   text?: string
   style?: React.CSSProperties
+  onClick?: () => void
 }
 
 export function ImageIndicator(props: ImageIndicatorProps) {
@@ -20,12 +22,14 @@ export function ImageIndicator(props: ImageIndicatorProps) {
       backgroundColor={backgroundColor}
       style={style}
     >
-      <img
-        className={filterClass}
-        style={{ maxHeight: '1rem', maxWidth: '1rem' }}
-        draggable={false}
-        src={src}
-      />
+      {src && (
+        <img
+          className={filterClass}
+          style={{ maxHeight: '1rem', maxWidth: '1rem' }}
+          draggable={false}
+          src={src}
+        />
+      )}
       {text && <div className={filterClass}>{text}</div>}
     </Indicator>
   )

@@ -3,6 +3,8 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { PKM } from '@openhome-core/pkm/PKM'
 import { getTypes } from '@openhome-core/pkm/util'
 import { getDisplayID } from '@openhome-core/util'
+import { pluralize } from '@openhome-core/util/format'
+import { Option } from '@openhome-core/util/functional'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
 import AttributeTag from '@openhome-ui/components/AttributeTag'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
@@ -21,6 +23,7 @@ import {
   Languages,
   MetadataSummaryLookup,
   OriginGames,
+  Pokerus,
 } from '@pkm-rs/pkg'
 import { Badge, Button, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
@@ -129,7 +132,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
             </Badge>
           ))}
         </Flex>
-        <div>
+        <div className="attribute-badges">
           {mon.isShiny() && (
             <AttributeTag
               icon={getPublicImageURL('icons/Shiny.png')}
@@ -144,9 +147,11 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
               backgroundColor="#e60040"
             />
           )}
+          <PokerusIndicator pokerusByte={mon.pokerusByte} />
           {mon.isAlpha && (
             <AttributeTag
               icon={getPublicImageURL('icons/Alpha.png')}
+              label="Alpha"
               color="white"
               backgroundColor="#f2352d"
             />
@@ -154,9 +159,9 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           {mon instanceof OHPKM && mon.unconvertedPkm && (
             <AttributeTag label="Has Unconverted PKM" color="white" backgroundColor="blue" />
           )}
-          {mon.isNoble && <AttributeTag label="NOBLE" backgroundColor="#cccc00" color="white" />}
+          {mon.isNoble && <AttributeTag label="Noble" backgroundColor="#cccc00" color="white" />}
           {'isShadow' in mon && (mon.isShadow as boolean) && (
-            <AttributeTag label="SHADOW" backgroundColor={SHADOW_TYPE_COLOR} color="white" />
+            <AttributeTag label="Shadow" backgroundColor={SHADOW_TYPE_COLOR} color="white" />
           )}
           {mon.isNsPokemon && (
             <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />
@@ -228,6 +233,32 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
       </Flex>
     </Grid>
   )
+}
+
+function PokerusIndicator(props: { pokerusByte: Option<number> }) {
+  const pokerus = Pokerus.fromByte(props.pokerusByte ?? 0)
+  switch (pokerus.status()) {
+    case 'Uninfected':
+      return null
+    case 'Infected':
+      return (
+        <AttributeTag
+          icon={getPublicImageURL('icons/pokerus-infected.png')}
+          color="white"
+          backgroundColor="#eb3cae"
+          label={`${pluralize(pokerus.daysRemaining(), 'Day')} Remaining`}
+        />
+      )
+    case 'Cured':
+      return (
+        <AttributeTag
+          icon={getPublicImageURL('icons/pokerus-cured.png')}
+          color="white"
+          backgroundColor="#eb3cae"
+          label="Cured"
+        />
+      )
+  }
 }
 
 export default SummaryDisplay

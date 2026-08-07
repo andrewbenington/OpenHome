@@ -26,3 +26,9 @@
   flex-direction: row;
   align-items: center;
 }
+
+.attribute-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
