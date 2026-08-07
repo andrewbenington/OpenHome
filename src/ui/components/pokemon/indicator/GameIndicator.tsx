@@ -33,7 +33,7 @@ export function GameIndicator({
       tooltip={tooltipText}
       src={markIconPath}
       backgroundColor={backgroundColor}
-      text={withName ? shortName : undefined}
+      label={withName ? shortName : undefined}
       style={style}
     />
   )

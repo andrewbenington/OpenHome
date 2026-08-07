@@ -7,17 +7,17 @@ export type ImageIndicatorProps = {
   src?: string
   color?: string
   backgroundColor: string
-  text?: string
+  label?: string
   style?: React.CSSProperties
   onClick?: () => void
 }
 
 export function ImageIndicator(props: ImageIndicatorProps) {
-  const { tooltip, src, backgroundColor, text, style } = props
+  const { tooltip, src, backgroundColor, label, style } = props
   const filterClass = colorIsDark(backgroundColor) ? 'white-filter' : 'black-filter'
   return (
     <Indicator
-      className={cssClass('image-indicator-with-text').if(text).build()}
+      className={cssClass('image-indicator-with-text').if(label).build()}
       tooltip={tooltip}
       backgroundColor={backgroundColor}
       style={style}
@@ -30,7 +30,7 @@ export function ImageIndicator(props: ImageIndicatorProps) {
           src={src}
         />
       )}
-      {text && <div className={filterClass}>{text}</div>}
+      {label && <div className={filterClass}>{label}</div>}
     </Indicator>
   )
 }

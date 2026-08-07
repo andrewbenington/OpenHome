@@ -6,9 +6,9 @@ import { getDisplayID } from '@openhome-core/util'
 import { pluralize } from '@openhome-core/util/format'
 import { Option } from '@openhome-core/util/functional'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
-import AttributeTag from '@openhome-ui/components/AttributeTag'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
+import { ImageIndicator } from '@openhome-ui/components/pokemon/indicator/ImageIndicator'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { Tabs } from '@openhome-ui/components/Tabs'
@@ -135,37 +135,37 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
         </Flex>
         <div className="attribute-badges">
           {mon.isShiny() && (
-            <AttributeTag
-              icon={getPublicImageURL('icons/Shiny.png')}
+            <ImageIndicator
+              src={getPublicImageURL('icons/Shiny.png')}
               color="white"
               backgroundColor="#cc0000"
             />
           )}
           {mon.canGigantamax && (
-            <AttributeTag
-              icon={getPublicImageURL('icons/GMax.png')}
+            <ImageIndicator
+              src={getPublicImageURL('icons/GMax.png')}
               color="white"
               backgroundColor="#e60040"
             />
           )}
           <PokerusIndicator pokerusByte={mon.pokerusByte} />
           {mon.isAlpha && (
-            <AttributeTag
-              icon={getPublicImageURL('icons/Alpha.png')}
+            <ImageIndicator
+              src={getPublicImageURL('icons/Alpha.png')}
               label="Alpha"
               color="white"
               backgroundColor="#f2352d"
             />
           )}
           {mon instanceof OHPKM && mon.unconvertedPkm && (
-            <AttributeTag label="Has Unconverted PKM" color="white" backgroundColor="blue" />
+            <ImageIndicator label="Has Unconverted PKM" color="white" backgroundColor="blue" />
           )}
-          {mon.isNoble && <AttributeTag label="Noble" backgroundColor="#cccc00" color="white" />}
+          {mon.isNoble && <ImageIndicator label="Noble" backgroundColor="#cccc00" color="white" />}
           {'isShadow' in mon && (mon.isShadow as boolean) && (
-            <AttributeTag label="Shadow" backgroundColor={SHADOW_TYPE_COLOR} color="white" />
+            <ImageIndicator label="Shadow" backgroundColor={SHADOW_TYPE_COLOR} color="white" />
           )}
           {mon.isNsPokemon && (
-            <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />
+            <ImageIndicator label="N's Pokémon" backgroundColor="green" color="white" />
           )}
         </div>
       </Flex>
@@ -252,8 +252,8 @@ function PokerusIndicator(props: { pokerusByte: Option<number> }) {
       return null
     case 'Infected':
       return (
-        <AttributeTag
-          icon={getPublicImageURL('icons/pokerus-infected.png')}
+        <ImageIndicator
+          src={getPublicImageURL('icons/pokerus-infected.png')}
           color="white"
           backgroundColor="#eb3cae"
           label={`${pluralize(pokerus.daysRemaining(), 'Day')} Remaining`}
@@ -261,8 +261,8 @@ function PokerusIndicator(props: { pokerusByte: Option<number> }) {
       )
     case 'Cured':
       return (
-        <AttributeTag
-          icon={getPublicImageURL('icons/pokerus-cured.png')}
+        <ImageIndicator
+          src={getPublicImageURL('icons/pokerus-cured.png')}
           color="white"
           backgroundColor="#eb3cae"
           label="Cured"
