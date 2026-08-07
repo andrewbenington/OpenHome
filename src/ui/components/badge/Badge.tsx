@@ -4,6 +4,7 @@ import { Nullable, Option } from '@openhome-core/util/functional'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves/util'
 import { Pokerus } from '@pkm-rs/pkg'
+import { HyperTrainIcon } from '../Icons'
 import { BaseBadge } from './BaseBadge'
 import { ImageBadge } from './ImageBadge'
 
@@ -114,6 +115,20 @@ function GigantamaxBadge(props: BadgeProps) {
   )
 }
 
+function HyperTrainBadge(props: BadgeProps) {
+  const label = labelIf(props.showLabel, 'Hyper Trained')
+  return (
+    <ImageBadge
+      tooltip="Hyper Trained"
+      src={HyperTrainIcon}
+      backgroundColor="var(--hyper-train-color)"
+      color="black"
+      label={label}
+      {...props}
+    />
+  )
+}
+
 function PokerusBadge(props: BadgeProps & { pokerusByte: Option<number> }) {
   const pokerus = Pokerus.fromByte(props.pokerusByte ?? 0)
   switch (pokerus.status()) {
@@ -153,6 +168,7 @@ const Badge = {
   Alpha: AlphaBadge,
   Game: GameBadge,
   Gigantamax: GigantamaxBadge,
+  HyperTrain: HyperTrainBadge,
   Image: ImageBadge,
   Numerical: NumericalBadge,
   Pokerus: PokerusBadge,

@@ -79,6 +79,7 @@ export const TopRightIndicatorTypes = [
   'EV (Special Defense)',
   'EV (Speed)',
   'IVs/DVs (Percent)',
+  'Hyper Trained',
   'Perfect IVs Count',
   'Ribbon Count',
   'Ball',

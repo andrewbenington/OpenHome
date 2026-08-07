@@ -17,8 +17,8 @@ const EV_TOTAL_MAX = 508
 const STAT_TYPE_COUNT = 6
 const MAX_LEVEL = 100
 
-export function TopRightBadge({ mon, badgeType: indicatorType }: TopRightBadgeProps) {
-  switch (indicatorType) {
+export function TopRightBadge({ mon, badgeType }: TopRightBadgeProps) {
+  switch (badgeType) {
     case 'Gender':
       return <GenderIcon gender={mon.gender} />
     case 'Level':
@@ -44,6 +44,12 @@ export function TopRightBadge({ mon, badgeType: indicatorType }: TopRightBadgePr
     case 'Perfect IVs Count':
       const perfectIvsCount = getPerfectIvsCount(mon)
       return <Badge.Numerical value={perfectIvsCount} max={STAT_TYPE_COUNT} />
+    case 'Hyper Trained':
+      return (
+        <Badge.HyperTrain
+          showIf={Object.values(mon.hyperTraining ?? {}).some((value) => value === true)}
+        />
+      )
     case 'Origin Game':
       return <Badge.Game originGame={mon.gameOfOrigin} plugin={mon.pluginOrigin} />
     case 'Most Recent Save':
@@ -62,7 +68,6 @@ export function TopRightBadge({ mon, badgeType: indicatorType }: TopRightBadgePr
       return <Badge.Gigantamax showIf={mon.canGigantamax} />
     case 'Pokérus':
       return <Badge.Pokerus pokerusByte={mon.pokerusByte} showIf={true} />
-
     default:
       return null
   }
