@@ -11,7 +11,7 @@ import {
   numericSorter,
   stringSorter,
 } from '@openhome-core/util/sort'
-import { GameBadge } from '@openhome-ui/components/badge/GameBadge'
+import Badge from '@openhome-ui/components/badge/Badge'
 import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
@@ -126,7 +126,7 @@ export default function useOhpkmColumns(
       width: '10rem',
       renderValue: (value) => (
         <div className="flex-row-centered">
-          <GameBadge
+          <Badge.Game
             originGame={value.mostRecentSaveWasm?.game}
             withName
             tooltip={value.mostRecentSaveWasm?.file_path}
@@ -145,7 +145,7 @@ export default function useOhpkmColumns(
       name: 'Original Game',
       width: '10rem',
       renderValue: (value) => (
-        <GameBadge originGame={value.gameOfOrigin} plugin={value.pluginOrigin} withName />
+        <Badge.Game originGame={value.gameOfOrigin} plugin={value.pluginOrigin} withName />
       ),
       getFilterValue: (mon) => OriginGames.gameNameFull(mon.gameOfOrigin),
       sortFunction: gameOrPluginSorter(

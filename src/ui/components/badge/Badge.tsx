@@ -1,9 +1,10 @@
+import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { pluralize } from '@openhome-core/util/format'
-import { Option } from '@openhome-core/util/functional'
+import { Nullable, Option } from '@openhome-core/util/functional'
 import { getPublicImageURL } from '@openhome-ui/images/images'
+import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves/util'
 import { Pokerus } from '@pkm-rs/pkg'
 import { BaseBadge } from './BaseBadge'
-import { GameBadge } from './GameBadge'
 import { ImageBadge } from './ImageBadge'
 
 type TopRightNumericalBadgeProps = {
@@ -66,6 +67,36 @@ function AlphaBadge(props: BadgeProps) {
       backgroundColor="#f2352d"
       label={label}
       {...props}
+    />
+  )
+}
+
+export type GameBadgeProps = {
+  originGame?: Nullable<number>
+  plugin?: Nullable<PluginIdentifier>
+  withName?: boolean
+  tooltip?: string
+  style?: React.CSSProperties
+}
+
+export function GameBadge(props: GameBadgeProps) {
+  if (props.originGame === undefined || props.originGame === null) return null
+
+  const { shortName, markIconPath, backgroundColor } = props.plugin
+    ? getDetailsPluginSave(props.plugin)
+    : getDetailsOfficialSave(props.originGame)
+
+  if (!markIconPath) return null
+
+  const tooltipText = props.tooltip ?? (props.withName ? undefined : shortName)
+
+  return (
+    <ImageBadge
+      tooltip={tooltipText}
+      src={markIconPath}
+      backgroundColor={backgroundColor}
+      label={props.withName ? shortName : undefined}
+      style={props.style}
     />
   )
 }
