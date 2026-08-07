@@ -6,7 +6,7 @@ import { getDisplayID } from '@openhome-core/util'
 import { pluralize } from '@openhome-core/util/format'
 import { Option } from '@openhome-core/util/functional'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
-import { ImageIndicator } from '@openhome-ui/components/badge/ImageIndicator'
+import { ImageBadge } from '@openhome-ui/components/badge/ImageBadge'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
@@ -135,14 +135,14 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
         </Flex>
         <div className="attribute-badges">
           {mon.isShiny() && (
-            <ImageIndicator
+            <ImageBadge
               src={getPublicImageURL('icons/Shiny.png')}
               color="white"
               backgroundColor="#cc0000"
             />
           )}
           {mon.canGigantamax && (
-            <ImageIndicator
+            <ImageBadge
               src={getPublicImageURL('icons/GMax.png')}
               color="white"
               backgroundColor="#e60040"
@@ -150,7 +150,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           )}
           <PokerusIndicator pokerusByte={mon.pokerusByte} />
           {mon.isAlpha && (
-            <ImageIndicator
+            <ImageBadge
               src={getPublicImageURL('icons/Alpha.png')}
               label="Alpha"
               color="white"
@@ -158,14 +158,14 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
             />
           )}
           {mon instanceof OHPKM && mon.unconvertedPkm && (
-            <ImageIndicator label="Has Unconverted PKM" color="white" backgroundColor="blue" />
+            <ImageBadge label="Has Unconverted PKM" color="white" backgroundColor="blue" />
           )}
-          {mon.isNoble && <ImageIndicator label="Noble" backgroundColor="#cccc00" color="white" />}
+          {mon.isNoble && <ImageBadge label="Noble" backgroundColor="#cccc00" color="white" />}
           {'isShadow' in mon && (mon.isShadow as boolean) && (
-            <ImageIndicator label="Shadow" backgroundColor={SHADOW_TYPE_COLOR} color="white" />
+            <ImageBadge label="Shadow" backgroundColor={SHADOW_TYPE_COLOR} color="white" />
           )}
           {mon.isNsPokemon && (
-            <ImageIndicator label="N's Pokémon" backgroundColor="green" color="white" />
+            <ImageBadge label="N's Pokémon" backgroundColor="green" color="white" />
           )}
         </div>
       </Flex>
@@ -252,7 +252,7 @@ function PokerusIndicator(props: { pokerusByte: Option<number> }) {
       return null
     case 'Infected':
       return (
-        <ImageIndicator
+        <ImageBadge
           src={getPublicImageURL('icons/pokerus-infected.png')}
           color="white"
           backgroundColor="#eb3cae"
@@ -261,7 +261,7 @@ function PokerusIndicator(props: { pokerusByte: Option<number> }) {
       )
     case 'Cured':
       return (
-        <ImageIndicator
+        <ImageBadge
           src={getPublicImageURL('icons/pokerus-cured.png')}
           color="white"
           backgroundColor="#eb3cae"

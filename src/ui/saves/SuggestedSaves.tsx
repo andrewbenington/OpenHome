@@ -3,7 +3,7 @@ import { buildUnknownSaveFile } from '@openhome-core/save/util/load'
 import { PathData, splitPath } from '@openhome-core/save/util/path'
 import { R } from '@openhome-core/util/functional'
 import { numericSorter, SortableColumn, stringSorter } from '@openhome-core/util/sort'
-import { GameIndicator } from '@openhome-ui/components/badge/GameIndicator'
+import { GameBadge } from '@openhome-ui/components/badge/GameBadge'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
@@ -130,7 +130,7 @@ export default function SuggestedSaves(props: SaveFileSelectorProps) {
         <div className="flex-row-centered">
           {isLoaded(suggestion) ? (
             R.isOk(suggestion.save) ? (
-              <GameIndicator
+              <GameBadge
                 originGame={suggestion.save.data.origin}
                 plugin={suggestion.save.data.pluginIdentifier}
                 withName

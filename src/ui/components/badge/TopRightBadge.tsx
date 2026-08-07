@@ -1,18 +1,18 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { TopRightIndicatorType } from '@openhome-ui/hooks/monDisplay'
+import { TopRightBadgeType } from '@openhome-ui/hooks/monDisplay'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList } from '@openhome-ui/images/items'
 import { Pokerus, StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
 import GenderIcon from '../pokemon/GenderIcon'
-import { GameIndicator } from './GameIndicator'
-import { ImageIndicator } from './ImageIndicator'
-import { Indicator } from './Indicator'
-import './Indicator.css'
+import { Badge } from './Badge'
+import './Badge.css'
+import { GameBadge } from './GameBadge'
+import { ImageBadge } from './ImageBadge'
 
-type TopRightIndicatorProps = {
+type TopRightBadgeProps = {
   mon: PKMInterface
-  indicatorType: TopRightIndicatorType
+  badgeType: TopRightBadgeType
 }
 
 const EV_STAT_MAX = 252
@@ -20,39 +20,39 @@ const EV_TOTAL_MAX = 508
 const STAT_TYPE_COUNT = 6
 const MAX_LEVEL = 100
 
-export function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps) {
+export function TopRightBadge({ mon, badgeType: indicatorType }: TopRightBadgeProps) {
   switch (indicatorType) {
     case 'Gender':
       return <GenderIcon gender={mon.gender} />
     case 'Level':
-      return <NumericalIndicator value={mon.getLevel()} max={MAX_LEVEL} />
+      return <NumericalBadge value={mon.getLevel()} max={MAX_LEVEL} />
     case 'EVs (Total)':
       const evsTotal = Object.values(mon.evs ?? mon.evsG12 ?? {}).reduce((p, c) => p + c, 0)
-      return <NumericalIndicator value={evsTotal} max={EV_TOTAL_MAX} />
+      return <NumericalBadge value={evsTotal} max={EV_TOTAL_MAX} />
     case 'EV (HP)':
-      return <NumericalIndicator value={mon.evs?.hp} max={EV_STAT_MAX} />
+      return <NumericalBadge value={mon.evs?.hp} max={EV_STAT_MAX} />
     case 'EV (Attack)':
-      return <NumericalIndicator value={mon.evs?.atk} max={EV_STAT_MAX} />
+      return <NumericalBadge value={mon.evs?.atk} max={EV_STAT_MAX} />
     case 'EV (Defense)':
-      return <NumericalIndicator value={mon.evs?.def} max={EV_STAT_MAX} />
+      return <NumericalBadge value={mon.evs?.def} max={EV_STAT_MAX} />
     case 'EV (Special Attack)':
-      return <NumericalIndicator value={mon.evs?.spa} max={EV_STAT_MAX} />
+      return <NumericalBadge value={mon.evs?.spa} max={EV_STAT_MAX} />
     case 'EV (Special Defense)':
-      return <NumericalIndicator value={mon.evs?.spd} max={EV_STAT_MAX} />
+      return <NumericalBadge value={mon.evs?.spd} max={EV_STAT_MAX} />
     case 'EV (Speed)':
-      return <NumericalIndicator value={mon.evs?.spe} max={EV_STAT_MAX} />
+      return <NumericalBadge value={mon.evs?.spe} max={EV_STAT_MAX} />
     case 'IVs/DVs (Percent)':
       const ivsOrDvsPercent = mon.ivs ? getIvsPercent(mon) : hasDvs(mon) ? getDvsPercent(mon) : 0
-      return <NumericalIndicator value={ivsOrDvsPercent} percent />
+      return <NumericalBadge value={ivsOrDvsPercent} percent />
     case 'Perfect IVs Count':
       const perfectIvsCount = getPerfectIvsCount(mon)
-      return <NumericalIndicator value={perfectIvsCount} max={STAT_TYPE_COUNT} />
+      return <NumericalBadge value={perfectIvsCount} max={STAT_TYPE_COUNT} />
     case 'Origin Game':
-      return <GameIndicator originGame={mon.gameOfOrigin} plugin={mon.pluginOrigin} />
+      return <GameBadge originGame={mon.gameOfOrigin} plugin={mon.pluginOrigin} />
     case 'Most Recent Save':
-      return mon instanceof OHPKM && <GameIndicator originGame={mon.mostRecentSaveWasm?.game} />
+      return mon instanceof OHPKM && <GameBadge originGame={mon.mostRecentSaveWasm?.game} />
     case 'Ribbon Count':
-      return <NumericalIndicator value={mon.ribbons?.length} max={3} /> // TODO: better handle color for ribbon count
+      return <NumericalBadge value={mon.ribbons?.length} max={3} /> // TODO: better handle color for ribbon count
     case 'Ball':
       return (
         mon.ball && (
@@ -62,7 +62,7 @@ export function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps
     case 'Alpha':
       return (
         mon.isAlpha && (
-          <ImageIndicator
+          <ImageBadge
             tooltip="Alpha"
             src={getPublicImageURL('icons/Alpha.png')}
             backgroundColor="#f2352d"
@@ -72,7 +72,7 @@ export function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps
     case 'Gigantamax':
       return (
         mon.canGigantamax && (
-          <ImageIndicator
+          <ImageBadge
             tooltip="Gigantamax"
             src={getPublicImageURL('icons/GMax.png')}
             backgroundColor="#e60040"
@@ -86,7 +86,7 @@ export function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps
           return null
         case 'Infected':
           return (
-            <ImageIndicator
+            <ImageBadge
               tooltip="Gigantamax"
               src={getPublicImageURL('icons/pokerus-infected.png')}
               backgroundColor="#eb3cae"
@@ -94,7 +94,7 @@ export function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps
           )
         case 'Cured':
           return (
-            <ImageIndicator
+            <ImageBadge
               tooltip="Gigantamax"
               src={getPublicImageURL('icons/pokerus-cured.png')}
               backgroundColor="#eb3cae"
@@ -107,7 +107,7 @@ export function TopRightIndicator({ mon, indicatorType }: TopRightIndicatorProps
   }
 }
 
-type TopRightNumericalIndicatorProps = {
+type TopRightNumericalBadgeProps = {
   value?: number
   percent?: boolean
 } & (
@@ -133,17 +133,17 @@ function colorByPercent(percent: number) {
   return 'hsl(204, 99%, 65%)'
 }
 
-function NumericalIndicator({ value, percent, max: maxProp }: TopRightNumericalIndicatorProps) {
+function NumericalBadge({ value, percent, max: maxProp }: TopRightNumericalBadgeProps) {
   if (value === undefined) return null
 
   const color = colorByPercent(percent ? value : Math.min((value / maxProp) * 100, 100))
   return (
     value !== undefined &&
     (percent || value > 0) && (
-      <Indicator className="numerical-indicator" backgroundColor={color}>
+      <Badge className="numerical-badge" backgroundColor={color}>
         {value}
         {percent ? '%' : ''}
-      </Indicator>
+      </Badge>
     )
   )
 }

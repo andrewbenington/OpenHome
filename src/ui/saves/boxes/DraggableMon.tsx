@@ -1,12 +1,12 @@
 import { useDraggable } from '@dnd-kit/core'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { displayIndexAdder, isBattleFormeItem, isMegaStone } from '@openhome-core/pkm/util'
-import { TopRightIndicator } from '@openhome-ui/components/badge/TopRightIndicator'
+import { TopRightBadge } from '@openhome-ui/components/badge/TopRightBadge'
 import { MonWithLocation } from '@openhome-ui/state/saves'
 import { MetadataSummaryLookup } from '@pkm-rs/pkg'
 import { CSSProperties, useMemo } from 'react'
 import PokemonIcon from '../../components/PokemonIcon'
-import { TopRightIndicatorType } from '../../hooks/monDisplay'
+import { TopRightBadgeType } from '../../hooks/monDisplay'
 import useDragAndDrop from '../../state/drag-and-drop/useDragAndDrop'
 import { MonTag } from '../../util/tags'
 
@@ -30,7 +30,7 @@ interface DraggableMonProps {
   dragID?: string
   dragData?: MonWithLocation
   isSelected?: boolean
-  topRightIndicator?: TopRightIndicatorType | null
+  topRightIndicator?: TopRightBadgeType | null
   showShiny?: boolean
   showItem?: boolean
 }
@@ -78,8 +78,7 @@ const DraggableMon = (props: DraggableMonProps) => {
   }, [mon.nationalDex, mon.formIndex, mon.heldItemIndex])
 
   const topRightIndicatorComponent = useMemo(
-    () =>
-      topRightIndicator ? <TopRightIndicator indicatorType={topRightIndicator} mon={mon} /> : <></>,
+    () => (topRightIndicator ? <TopRightBadge badgeType={topRightIndicator} mon={mon} /> : <></>),
     [mon, topRightIndicator]
   )
 

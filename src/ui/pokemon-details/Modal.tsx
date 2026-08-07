@@ -5,7 +5,7 @@ import { OHPKM, originalDataTagToMonFormat } from '@openhome-core/pkm/OHPKM'
 import { isRomHackFormat } from '@openhome-core/pkm/PKM'
 import { FileSchemas } from '@openhome-core/pkm/schema'
 import { $R } from '@openhome-core/util/functional'
-import { GameIndicator } from '@openhome-ui/components/badge/GameIndicator'
+import { GameBadge } from '@openhome-ui/components/badge/GameBadge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import Fallback from '@openhome-ui/components/Fallback'
 import FileTypeSelect from '@openhome-ui/components/FileTypeSelect'
@@ -107,7 +107,7 @@ export default function PokemonDetailsModal(props: PokemonDetailsModalProps) {
               {mon.nickname}
             </Flex>
             <Flex gap="1" align="center" minWidth="5rem">
-              <GameIndicator
+              <GameBadge
                 originGame={mon.gameOfOrigin}
                 plugin={mon.pluginOrigin}
                 style={{ minWidth: 15, height: 15 }}

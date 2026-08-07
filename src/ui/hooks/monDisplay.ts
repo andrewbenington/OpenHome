@@ -4,7 +4,7 @@ import { AppInfoContext } from '../state/appInfo'
 
 export type MonDisplayState = {
   filter: Filter
-  topRightIndicator: TopRightIndicatorType | null
+  topRightIndicator: TopRightBadgeType | null
   showShiny: boolean
   showItem: boolean
   showNotesIndicator: boolean
@@ -29,7 +29,7 @@ export function useMonDisplay() {
     updateState({ ...monDisplayState, filter: {} })
   }
 
-  function setTopRightIndicatorType(topRightIndicator: TopRightIndicatorType | null) {
+  function setTopRightIndicatorType(topRightIndicator: TopRightBadgeType | null) {
     updateState({ ...monDisplayState, topRightIndicator })
   }
 
@@ -87,4 +87,4 @@ export const TopRightIndicatorTypes = [
   'Pokérus',
 ] as const
 
-export type TopRightIndicatorType = (typeof TopRightIndicatorTypes)[number]
+export type TopRightBadgeType = (typeof TopRightIndicatorTypes)[number]

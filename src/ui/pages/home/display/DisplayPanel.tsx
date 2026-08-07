@@ -1,9 +1,5 @@
 import { Flex, Select, Switch } from '@radix-ui/themes'
-import {
-  TopRightIndicatorType,
-  TopRightIndicatorTypes,
-  useMonDisplay,
-} from '../../../hooks/monDisplay'
+import { TopRightBadgeType, TopRightIndicatorTypes, useMonDisplay } from '../../../hooks/monDisplay'
 
 export default function DisplayPanel() {
   const displayState = useMonDisplay()
@@ -15,7 +11,7 @@ export default function DisplayPanel() {
           value={displayState.topRightIndicator ?? ''}
           onValueChange={(value) =>
             displayState.setTopRightIndicatorType(
-              value === 'None' ? null : (value as TopRightIndicatorType)
+              value === 'None' ? null : (value as TopRightBadgeType)
             )
           }
           size="1"

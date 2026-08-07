@@ -3,7 +3,7 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getSortFunction, SortType, SortTypes } from '@openhome-core/pkm/sort'
 import { SAV } from '@openhome-core/save/interfaces'
 import { filterUndefined } from '@openhome-core/util/sort'
-import { GameIndicator } from '@openhome-ui/components/badge/GameIndicator'
+import { GameBadge } from '@openhome-ui/components/badge/GameBadge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import { ClearIcon, ErrorIcon } from '@openhome-ui/components/Icons'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
@@ -234,7 +234,7 @@ export default function SortPokemon() {
                   {save.name} ({save.tid})
                 </p>
                 <div style={{ flex: 1 }} />
-                <GameIndicator originGame={save.origin} plugin={save.pluginIdentifier} />
+                <GameBadge originGame={save.origin} plugin={save.pluginIdentifier} />
               </Badge>
             )
           })}
@@ -387,7 +387,7 @@ function TransferToSaveButton(props: TransferToSaveButtonProps) {
         <b>{save.name}</b>
         <p>(TID {save.displayID})</p>
         <div style={{ flex: 1 }} />
-        <GameIndicator withName originGame={save.origin} plugin={save.pluginIdentifier} />
+        <GameBadge withName originGame={save.origin} plugin={save.pluginIdentifier} />
       </Flex>
     </Button>
   )

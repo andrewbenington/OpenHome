@@ -1,9 +1,9 @@
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { Nullable } from '@openhome-core/util/functional'
 import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves/util'
-import { ImageIndicator } from './ImageIndicator'
+import { ImageBadge } from './ImageBadge'
 
-export type GameIndicatorProps = {
+export type GameBadgeProps = {
   originGame?: Nullable<number>
   plugin?: Nullable<PluginIdentifier>
   withName?: boolean
@@ -11,13 +11,7 @@ export type GameIndicatorProps = {
   style?: React.CSSProperties
 }
 
-export function GameIndicator({
-  originGame,
-  plugin,
-  withName,
-  tooltip,
-  style,
-}: GameIndicatorProps) {
+export function GameBadge({ originGame, plugin, withName, tooltip, style }: GameBadgeProps) {
   if (originGame === undefined || originGame === null) return null
 
   const { shortName, markIconPath, backgroundColor } = plugin
@@ -29,7 +23,7 @@ export function GameIndicator({
   const tooltipText = tooltip ?? (withName ? undefined : shortName)
 
   return (
-    <ImageIndicator
+    <ImageBadge
       tooltip={tooltipText}
       src={markIconPath}
       backgroundColor={backgroundColor}
