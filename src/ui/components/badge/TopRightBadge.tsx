@@ -5,8 +5,8 @@ import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList } from '@openhome-ui/images/items'
 import { Pokerus, StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
 import GenderIcon from '../pokemon/GenderIcon'
-import { Badge } from './Badge'
 import './Badge.css'
+import { BaseBadge } from './BaseBadge'
 import { GameBadge } from './GameBadge'
 import { ImageBadge } from './ImageBadge'
 
@@ -140,10 +140,10 @@ function NumericalBadge({ value, percent, max: maxProp }: TopRightNumericalBadge
   return (
     value !== undefined &&
     (percent || value > 0) && (
-      <Badge className="numerical-badge" backgroundColor={color}>
+      <BaseBadge className="numerical-badge" backgroundColor={color}>
         {value}
         {percent ? '%' : ''}
-      </Badge>
+      </BaseBadge>
     )
   )
 }

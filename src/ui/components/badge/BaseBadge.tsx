@@ -2,7 +2,7 @@ import { classNames } from '@openhome-ui/util/style'
 import { Badge as RadixBadge, Tooltip } from '@radix-ui/themes'
 import { PropsWithChildren } from 'react'
 
-export type BadgeProps = {
+export type BaseBadgeProps = {
   className?: string
   tooltip?: string
   color?: string
@@ -10,7 +10,7 @@ export type BadgeProps = {
   style?: React.CSSProperties
 } & PropsWithChildren
 
-export function Badge(props: BadgeProps) {
+export function BaseBadge(props: BaseBadgeProps) {
   const { className, tooltip, backgroundColor, color, children, style } = props
 
   const badgeElement = (

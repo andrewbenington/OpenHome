@@ -1,6 +1,6 @@
 import { colorIsDark } from '@openhome-ui/util/color'
 import { cssClass } from '@openhome-ui/util/style'
-import { Badge } from './Badge'
+import { BaseBadge } from './BaseBadge'
 
 export type ImageIndicatorProps = {
   tooltip?: string
@@ -16,7 +16,7 @@ export function ImageBadge(props: ImageIndicatorProps) {
   const { tooltip, src, backgroundColor, label, style } = props
   const filterClass = colorIsDark(backgroundColor) ? 'white-filter' : 'black-filter'
   return (
-    <Badge
+    <BaseBadge
       className={cssClass('image-badge-with-text').if(label).build()}
       tooltip={tooltip}
       backgroundColor={backgroundColor}
@@ -31,6 +31,6 @@ export function ImageBadge(props: ImageIndicatorProps) {
         />
       )}
       {label && <div className={filterClass}>{label}</div>}
-    </Badge>
+    </BaseBadge>
   )
 }
