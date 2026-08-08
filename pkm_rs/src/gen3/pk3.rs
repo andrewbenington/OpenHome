@@ -30,7 +30,7 @@ use pkm_rs_types::AbilityNumber;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 use pkm_rs_types::{
-    BinaryGender, ContestStats, Language, MarkingsFourShapes, NationalDex, OriginGame,
+    BinaryGender, ContestStats, Language, MarkingsFourShapes, NationalDex, OriginGame, Pokerus,
     SimpleAbilityNumber, Stats8, Stats16Le,
 };
 use pkm_rs_types::{Gender, Ivs};
@@ -64,7 +64,7 @@ pub struct Pk3 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
     pub contest: ContestStats,
-    pub pokerus_byte: u8,
+    pub pokerus: Pokerus,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: Gen3RibbonSet,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
@@ -121,7 +121,7 @@ impl Pk3 {
                 .gender_from_pid(personality_value),
             evs: buf.evs(),
             contest: buf.contest(),
-            pokerus_byte: buf.pokerus_byte(),
+            pokerus: buf.pokerus(),
             ribbons: buf.ribbons(),
             nickname: buf.nickname(str_encoding),
             moves: buf.move_slots(),
@@ -179,7 +179,7 @@ impl Pk3 {
         buf.set_is_fateful_encounter(self.is_fateful_encounter);
         buf.set_evs(self.evs);
         buf.set_contest(self.contest);
-        buf.set_pokerus_byte(self.pokerus_byte);
+        buf.set_pokerus(self.pokerus);
         buf.set_ribbons(self.ribbons);
         buf.set_nickname(&self.nickname);
         buf.set_move_slots(&self.moves);

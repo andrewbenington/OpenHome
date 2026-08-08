@@ -42,7 +42,7 @@ impl OhpkmConvert for Pk9 {
             gender: self.gender,
             evs: self.evs,
             contest: self.contest,
-            pokerus_byte: Default::default(),
+            pokerus: Default::default(),
             contest_memory_count: self.contest_memory_count,
             battle_memory_count: self.battle_memory_count,
             sociability: Default::default(),

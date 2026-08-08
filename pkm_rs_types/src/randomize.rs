@@ -39,6 +39,18 @@ impl Randomize for u64 {
     }
 }
 
+impl Randomize for u128 {
+    fn randomized<R: Rng>(rng: &mut R) -> Self {
+        rng.random()
+    }
+}
+
+impl<const BITS: usize> Randomize for arbitrary_int::UInt<u8, BITS> {
+    fn randomized<R: Rng>(rng: &mut R) -> Self {
+        arbitrary_int::UInt::<u8, BITS>::extract_u8(u8::randomized(rng), 0)
+    }
+}
+
 impl<T, const N: usize> Randomize for [T; N]
 where
     T: Randomize + Debug,

@@ -85,6 +85,10 @@
   .rt-TableCell {
     padding: 4px 8px;
     height: fit-content;
+    width: 3.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
   }
   width: fit-content;
 }

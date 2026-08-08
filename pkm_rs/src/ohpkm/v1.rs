@@ -12,7 +12,7 @@ use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
 
 use pkm_rs_types::strings::SizedUtf16String;
-use pkm_rs_types::{ContestStats, Ivs, Language, Stats8, Stats16Le, StatsPreSplit};
+use pkm_rs_types::{ContestStats, Ivs, Language, Pokerus, Stats8, Stats16Le, StatsPreSplit};
 use pkm_rs_types::{Gender, OriginGame, PokeDate, ShinyLeaves, TrainerMemory};
 use pkm_rs_types::{Geolocations, HyperTraining, MarkingsSixShapesColors};
 
@@ -45,7 +45,7 @@ pub struct OhpkmV1 {
     pub gender: Gender,
     pub evs: Stats8,
     pub contest: ContestStats,
-    pub pokerus_byte: u8,
+    pub pokerus: Pokerus,
     pub contest_memory_count: u8,
     pub battle_memory_count: u8,
     pub ribbons: OpenHomeRibbonSet<16>,
@@ -173,7 +173,7 @@ impl OhpkmV1 {
                 spe: bytes[43],
             },
             contest: ContestStats::from_bytes(bytes[44..50].try_into().unwrap()),
-            pokerus_byte: bytes[50],
+            pokerus: Pokerus::from_byte(bytes[50]),
             contest_memory_count: bytes[52],
             battle_memory_count: bytes[53],
             ribbons: OpenHomeRibbonSet::from_bytes(bytes[54..76].try_into().unwrap()).map_err(
@@ -355,7 +355,7 @@ impl PkmBytes for OhpkmV1 {
 
         bytes[38..44].copy_from_slice(&self.evs.to_bytes());
         bytes[44..50].copy_from_slice(&self.contest.to_bytes());
-        bytes[50] = self.pokerus_byte;
+        bytes[50] = self.pokerus.to_byte();
         bytes[52] = self.contest_memory_count;
         bytes[53] = self.battle_memory_count;
         bytes[54..76].copy_from_slice(&self.ribbons.to_bytes());

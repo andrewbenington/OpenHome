@@ -225,7 +225,10 @@ export default function StatsDisplay(props: { mon: PKMInterface }) {
         />
       </div>
       {isStandardStats(displayedStats) ? (
-        <StatsTable.Standard stats={displayedStats as unknown as Stats} />
+        <StatsTable.Standard
+          stats={displayedStats as unknown as Stats}
+          hyperTrain={display === 'IVs' ? mon.hyperTraining : undefined}
+        />
       ) : isStatsPreSplit(displayedStats) ? (
         <StatsTable.GameBoy stats={displayedStats as unknown as StatsPreSplit} />
       ) : isContestStats(displayedStats) ? (

@@ -2,6 +2,7 @@ import { IconBaseProps } from 'react-icons'
 import { AiFillEdit } from 'react-icons/ai'
 import { BiMove } from 'react-icons/bi'
 import { BsGrid3X3Gap, BsGrid3X3GapFill } from 'react-icons/bs'
+import { FaDumbbell } from 'react-icons/fa'
 import { IoGrid } from 'react-icons/io5'
 import {
   MdArrowBack,
@@ -68,6 +69,8 @@ export const DevIcon = MdDataObject
 
 export const SelectIcon = MdSelectAll
 export const ExpandIcon = MdArrowOutward
+
+export const HyperTrainIcon = FaDumbbell
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AppTabIconsActive = {

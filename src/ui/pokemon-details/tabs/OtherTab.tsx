@@ -47,7 +47,7 @@ import DynamaxLevel from '@openhome-ui/components/pokemon/DynamaxLevel'
 import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
-import { Generation, Language, OriginGames, StatsPreSplit } from '@pkm-rs/pkg'
+import { Generation, Language, OriginGames, Pokerus, StatsPreSplit } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
 import { useMemo } from 'react'
 
@@ -60,6 +60,7 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
   const heightCalculated = getHeightCalculated(mon)
   const weightCalculated = getWeightCalculated(mon)
 
+  const pokerus = Pokerus.fromByteOrDefault(mon.pokerusByte)
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>
       <Flex
@@ -146,6 +147,18 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
             <AttributeRow label="Affection" value={mon.handlerAffection.toString()} indent={10} />
           )}
         </AttributeRowExpand>
+        {pokerus.status() === 'Uninfected' ? (
+          <AttributeRow label="Pokérus" value={pokerus.status()} />
+        ) : (
+          <AttributeRowExpand summary="Pokérus" value={pokerus.status()}>
+            <AttributeRow label="Strain" indent={10}>
+              <code>{pokerus.strain()}</code>
+            </AttributeRow>
+            <AttributeRow label="Days Remaining" indent={10}>
+              <code>{pokerus.daysRemaining()}</code>
+            </AttributeRow>
+          </AttributeRowExpand>
+        )}
         {mon instanceof OHPKM && (
           <AttributeRowExpand summary="Data Sections" value={mon.getPresentSections().length}>
             {mon.getPresentSections().map((section, i) => (

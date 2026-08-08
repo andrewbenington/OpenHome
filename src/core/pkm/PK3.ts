@@ -11,6 +11,7 @@ import {
   MetadataSummaryLookup,
   OriginGame,
   Pk3Wasm,
+  Pokerus,
   SpeciesLookup,
 } from '@pkm-rs/pkg'
 import { FourMoves, Stats, ToBytesOptions } from '../util/types'
@@ -178,10 +179,10 @@ export default class PK3 implements PKMInterface {
   }
 
   get pokerusByte() {
-    return this.inner.pokerus_byte
+    return this.inner.pokerus.toByte()
   }
   set pokerusByte(value: number) {
-    this.inner.pokerus_byte = value
+    this.inner.pokerus = Pokerus.fromByte(value)
   }
 
   get nickname() {

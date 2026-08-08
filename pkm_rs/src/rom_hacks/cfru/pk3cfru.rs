@@ -138,7 +138,7 @@ pub struct Pk3Cfru<I: CfruSpeciesIndex> {
     pub evs: Stats8,
 
     // 49
-    pub pokerus_byte: u8,
+    pub pokerus: Pokerus,
 
     // 50
     pub met_location_index: u8,
@@ -277,7 +277,7 @@ impl<I: CfruSpeciesIndex> PkmBytes for Pk3Cfru<I> {
             moves: Self::read_moves_10bit(bytes),
             move_pp: [0, 0, 0, 0], // to be computed later
             evs: Stats8::from_bytes(bytes[44..50].try_into().unwrap()),
-            pokerus_byte: bytes[50],
+            pokerus: bytes[50],
             met_location_index: bytes[51],
             met_level,
             game_of_origin,
@@ -349,7 +349,7 @@ impl<I: CfruSpeciesIndex> PkmBytes for Pk3Cfru<I> {
         bytes[44..50].copy_from_slice(&self.evs.to_bytes());
 
         // 50 Pokerus
-        bytes[50] = self.pokerus_byte;
+        bytes[50] = self.pokerus;
 
         // 51 Met Location
         bytes[51] = self.met_location_index;
