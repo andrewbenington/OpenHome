@@ -44,8 +44,8 @@
   overflow-wrap: break-word;
   overflow: hidden;
   font-size: var(--font-size-text);
-  padding-right: calc(8px + var(--diagonal-length));
-  padding-left: calc(4px + var(--diagonal-length));
+  padding-right: calc(0.5rem + var(--diagonal-length));
+  padding-left: calc(0.5rem + var(--diagonal-length));
 }
 
 div.attribute-row-content {
