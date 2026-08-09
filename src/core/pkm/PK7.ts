@@ -17,6 +17,7 @@ import {
   OriginGame,
   Pk7Wasm,
   PokeDate,
+  Pokerus,
   SpeciesLookup,
   TrainerMemory,
 } from '@pkm-rs/pkg'
@@ -197,10 +198,10 @@ export default class PK7 {
   }
 
   get pokerusByte() {
-    return this.inner.pokerus_byte
+    return this.inner.pokerus.toByte()
   }
   set pokerusByte(value: number) {
-    this.inner.pokerus_byte = value
+    this.inner.pokerus = Pokerus.fromByte(value)
   }
 
   get superTrainingFlags() {

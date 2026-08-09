@@ -3,9 +3,9 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getSortFunction, SortType, SortTypes } from '@openhome-core/pkm/sort'
 import { SAV } from '@openhome-core/save/interfaces'
 import { filterUndefined } from '@openhome-core/util/sort'
+import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import { ClearIcon, ErrorIcon } from '@openhome-ui/components/Icons'
-import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
 import { Typeahead } from '@openhome-ui/components/typeahead'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details//Modal'
@@ -14,7 +14,7 @@ import { getDetailsOfficialSave, getDetailsPluginSave } from '@openhome-ui/saves
 import { useSaves } from '@openhome-ui/state/saves'
 import { HomeMonLocation, SaveMonLocation } from '@openhome-ui/state/saves/reducer'
 import { OriginGames } from '@pkm-rs/pkg'
-import { Badge, Button, Callout, Flex } from '@radix-ui/themes'
+import { Button, Callout, Flex, Badge as RadixBadge } from '@radix-ui/themes'
 import { useCallback, useMemo, useState } from 'react'
 import { MdAdd } from 'react-icons/md'
 import { useBanksAndBoxes } from '../../state-zustand/banks-and-boxes/store'
@@ -216,15 +216,15 @@ export default function SortPokemon() {
     <div className="sort-pokemon-layout">
       <div className="card-lg-radius">
         <Flex className="sort-pokemon-saves-column">
-          <Badge color="gray" size="3" style={{ border: `1px solid ${OPENHOME_COLOR}` }}>
+          <RadixBadge color="gray" size="3" style={{ border: `1px solid ${OPENHOME_COLOR}` }}>
             OpenHome Boxes
-          </Badge>
+          </RadixBadge>
           {savesAndBanks.allOpenSaves.map((save) => {
             const { backgroundColor } = save.pluginIdentifier
               ? getDetailsPluginSave(save.pluginIdentifier)
               : getDetailsOfficialSave(save.origin)
             return (
-              <Badge
+              <RadixBadge
                 color="gray"
                 size="3"
                 key={save.tid}
@@ -234,8 +234,8 @@ export default function SortPokemon() {
                   {save.name} ({save.tid})
                 </p>
                 <div style={{ flex: 1 }} />
-                <GameIndicator originGame={save.origin} plugin={save.pluginIdentifier} />
-              </Badge>
+                <Badge.Game originGame={save.origin} plugin={save.pluginIdentifier} />
+              </RadixBadge>
             )
           })}
           <button
@@ -387,7 +387,7 @@ function TransferToSaveButton(props: TransferToSaveButtonProps) {
         <b>{save.name}</b>
         <p>(TID {save.displayID})</p>
         <div style={{ flex: 1 }} />
-        <GameIndicator withName originGame={save.origin} plugin={save.pluginIdentifier} />
+        <Badge.Game withName originGame={save.origin} plugin={save.pluginIdentifier} />
       </Flex>
     </Button>
   )

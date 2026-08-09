@@ -19,7 +19,7 @@ import { useConvertStrategies } from '../convert-strategies'
 import { useLookups } from '../lookups'
 
 // FALSE IN PRODUCTION
-const FORCE_MISSED_LOOKUP = false
+const FORCE_MISSED_LOOKUP = true
 
 export function useOhpkmStore() {
   const [ohpkmStore, updateStore] = useContext(OhpkmStoreContext)

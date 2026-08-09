@@ -46,7 +46,7 @@
     "test-vite": "pnpm wasm-compile-dev && vitest run",
     "test": "pnpm test-cargo && pnpm test-vite",
     "test:ci": "pnpm test-cargo:ci && pnpm test-vite",
-    "wasm-compile-dev": "wasm-pack build ./pkm_rs --target web -- --features wasm && node scripts/patch-types.mjs",
+    "wasm-compile-dev": "wasm-pack build --dev ./pkm_rs --target web -- --features wasm && node scripts/patch-types.mjs",
     "wasm-compile": "wasm-pack build --release ./pkm_rs --target web -- --features wasm && node scripts/patch-types.mjs",
     "precommit": "pnpm typecheck && pnpm format && pnpm lint",
     "postinstall": "pnpm wasm-compile-dev"

@@ -124,7 +124,7 @@ export default function PokemonIcon(props: PokemonIconProps) {
           ))}
         </div>
       )}
-      {topRightIndicator && <div className="extra-indicator">{topRightIndicator}</div>}
+      {topRightIndicator && <div className="extra-badge">{topRightIndicator}</div>}
       {hasNotes && showNotesIndicator && (
         <div title="Has notes" className="pokemon-icon-notes-dot" />
       )}

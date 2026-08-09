@@ -2,9 +2,9 @@ import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OhpkmIdentifier } from '@openhome-core/pkm/Lookup'
 import { SAV } from '@openhome-core/save/interfaces'
 import { numericSorter } from '@openhome-core/util/sort'
+import Badge from '@openhome-ui/components/badge/Badge'
 import { Dialog } from '@openhome-ui/components/dialog/Dialog'
 import MessageRibbon from '@openhome-ui/components/MessageRibbon'
-import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import SideTabNavigation from '@openhome-ui/components/side-tabs/SideTabNavigation'
 import PokemonDetailsModal from '@openhome-ui/pokemon-details/Modal'
 import { useSaves } from '@openhome-ui/state/saves'
@@ -224,7 +224,7 @@ function ForOneStateBody(props: ForOneStateBodyProps) {
         <Flex direction="column" gap="2" ml="4">
           <Flex gap="1" align="center">
             <div className="fixed-width-label">Game:</div>
-            <GameIndicator
+            <Badge.Game
               originGame={state.save.origin}
               plugin={state.save.pluginIdentifier}
               withName
@@ -311,7 +311,7 @@ function ForAllStateBody(props: ForAllStateBodyProps) {
         <Flex direction="column" gap="2">
           <Flex gap="1" align="center">
             <p className="fixed-width-label">Game:</p>
-            <GameIndicator
+            <Badge.Game
               originGame={state.currentSaveRef.game}
               plugin={state.currentSaveRef.pluginIdentifier}
               withName
