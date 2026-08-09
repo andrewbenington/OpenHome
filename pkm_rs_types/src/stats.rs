@@ -519,16 +519,16 @@ impl StatsPreSplit {
 
     pub const fn dvs_from_ivs_lossy(ivs: &Ivs) -> Self {
         Self {
-            hp: dv_from_iv(ivs.0.hp),
-            atk: dv_from_iv(ivs.0.atk),
-            def: dv_from_iv(ivs.0.def),
-            spc: dv_from_iv((ivs.0.spa + ivs.0.spd) / 2),
-            spe: dv_from_iv(ivs.0.spe),
+            hp: iv_to_dv(ivs.0.hp) as u16,
+            atk: iv_to_dv(ivs.0.atk) as u16,
+            def: iv_to_dv(ivs.0.def) as u16,
+            spc: iv_to_dv((ivs.0.spa + ivs.0.spd) / 2) as u16,
+            spe: iv_to_dv(ivs.0.spe) as u16,
         }
     }
 
     pub const fn shiny_dvs_from_ivs(ivs: &Ivs) -> Self {
-        let mut atk = (ivs.0.atk - 1).div_ceil(2) as u16;
+        let mut atk = (ivs.0.atk.saturating_sub(1)).div_ceil(2) as u16;
         if atk & 0b11 == 0b01 {
             atk += 1;
         } else if atk.is_multiple_of(4) {
@@ -554,8 +554,26 @@ impl StatsPreSplit {
     }
 }
 
-const fn dv_from_iv(iv: u8) -> u16 {
-    ((iv - 1) / 2) as u16
+const IV_MAX: u8 = 31;
+#[cfg(test)]
+const DV_MAX: u8 = 15;
+
+const fn iv_to_dv(iv: u8) -> u8 {
+    match iv {
+        0..=IV_MAX => iv / 2,
+        _ => 0,
+    }
+}
+
+/// Converts a 0-15 DV value to a 0-31 IV value the same way Pokémon GO mons are treated,
+/// by multiplying by two and adding 1. This way a max DV corresponds to a max IV, with the
+/// side effect of the minimum possible IV from a DV being 1.
+#[cfg(test)]
+const fn dv_to_iv(dv: u8) -> u8 {
+    match dv {
+        0..=DV_MAX => (dv * 2) + 1,
+        _ => 0,
+    }
 }
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Deserialize))]
@@ -604,4 +622,41 @@ pub enum ContestStat {
     Cute,
     Smart,
     Tough,
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::stats::{DV_MAX, IV_MAX, dv_to_iv, iv_to_dv};
+
+    /// Ensures all DVs are identical converting to and from an IV.
+    #[test]
+    fn dv_to_iv_and_back_identical() {
+        for dv in 0..=DV_MAX {
+            let iv = dv_to_iv(dv);
+            assert_eq!(dv, iv_to_dv(iv));
+        }
+    }
+
+    /// Ensures all odd-value IVs are identical converting to and from a DV.
+    /// DVs converted to IVs will always result in an odd number, so even IVs don't
+    /// need to conform to this rule.
+    #[test]
+    fn odd_iv_to_dv_and_back_identical() {
+        for iv in (1..=IV_MAX).step_by(2) {
+            let dv = iv_to_dv(iv);
+            let iv_result = dv_to_iv(dv);
+            assert_eq!(
+                iv, iv_result,
+                "IV of {iv} => DV of {dv} => IV of {iv_result} (IV should not change)"
+            );
+        }
+    }
+
+    /// Ensures all valid IVs convert to a DV without panicking.
+    #[test]
+    fn all_ivs_successfully_convert_to_dvs() {
+        for iv in (1..=IV_MAX).step_by(2) {
+            iv_to_dv(iv);
+        }
+    }
 }

@@ -35,7 +35,7 @@ export default function AppTabs() {
         onValueChange={(tab) => navigate(tab)}
       >
         <Flex style={{ height: '100vh' }}>
-          <Tabs.IconList className="tab-sidebar">
+          <Tabs.IconList className="tab-sidebar" direction="column">
             <Tabs.Tab value="home">
               <AppTabIconsActive.Home />
               <AppTabIconsInactive.Home />

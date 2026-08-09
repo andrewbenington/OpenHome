@@ -10,9 +10,9 @@ import {
   stringSorter,
 } from '@openhome-core/util/sort'
 import { SaveRef } from '@openhome-core/util/types'
+import Badge from '@openhome-ui/components/badge/Badge'
 import OpenHomeCtxMenu from '@openhome-ui/components/context-menu/OpenHomeCtxMenu'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
-import { GameIndicator } from '@openhome-ui/components/pokemon/indicator/GameIndicator'
 import SortableDataGrid from '@openhome-ui/components/SortableDataGrid'
 import useDisplayError from '@openhome-ui/hooks/displayError'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
@@ -122,7 +122,7 @@ export default function RecentSaves(props: SaveFileSelectorProps) {
         width: '10rem',
         renderValue: (value) => (
           <div className="flex-row-centered">
-            <GameIndicator
+            <Badge.Game
               originGame={value.game ?? undefined}
               plugin={value.pluginIdentifier as PluginIdentifier}
               withName

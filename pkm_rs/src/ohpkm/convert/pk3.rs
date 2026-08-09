@@ -69,7 +69,7 @@ impl OhpkmConvert for Pk3 {
             gender: self.gender,
             evs: self.evs,
             contest: self.contest,
-            pokerus_byte: self.pokerus_byte,
+            pokerus: self.pokerus,
             ribbons: self
                 .ribbons
                 .get_ribbons()
@@ -146,7 +146,7 @@ impl OhpkmConvert for Pk3 {
             gender: ohpkm.gender(),
             evs: ohpkm.evs(),
             contest: ohpkm.contest(),
-            pokerus_byte: ohpkm.pokerus_byte(),
+            pokerus: ohpkm.pokerus(),
             ribbons: ohpkm
                 .ribbons()
                 .into_iter()

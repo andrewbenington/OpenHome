@@ -27,7 +27,7 @@ public static class Pk3Object
             gender = Util.FormatGender(pk.Gender),
             evs = Util.EVs(pk),
             contest = Util.ContestStats(pk),
-            pokerus_byte = pk.PokerusState,
+            pokerus = pk.PokerusState,
             ribbons = Util.GetRibbons(pk).ToList().Select(s => s.Replace(" Ribbon", "")).ToArray(),
             nickname = pk.Nickname,
             nickname_trash = System.Convert.ToHexString(pk.NicknameTrash),

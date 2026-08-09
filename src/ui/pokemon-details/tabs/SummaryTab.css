@@ -26,3 +26,35 @@
   flex-direction: row;
   align-items: center;
 }
+
+.attribute-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.toggle-tabs {
+  margin-left: -0.75rem;
+
+  .Tab {
+    font-size: 0.9rem;
+    height: 1.35rem;
+    min-width: 1.2rem;
+    border-radius: 99px;
+    color: inherit;
+    padding: 0.5rem;
+  }
+
+  .Tab[data-active] {
+    background-color: var(--color-sidebar-selected);
+    color: white;
+    font-weight: bold;
+  }
+}
+
+.toggle-tabs-list {
+  padding: 0.25rem;
+  gap: 0;
+  border-radius: 99px;
+  background-color: transparent;
+}

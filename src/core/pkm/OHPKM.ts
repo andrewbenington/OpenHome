@@ -32,6 +32,7 @@ import {
   OriginGames,
   PkmFormat,
   PokeDate,
+  Pokerus,
   ShinyLeaves,
   SpeciesForm,
   SpeciesLookup,
@@ -482,6 +483,13 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
   public get heldItemName() {
     return Item.fromIndex(this.heldItemIndex)?.name ?? 'None'
+  }
+
+  get pokerusByte() {
+    return this.pokerus.toByte()
+  }
+  set pokerusByte(value: number) {
+    this.pokerus = Pokerus.fromByte(value)
   }
 
   public getLevel(): number {
