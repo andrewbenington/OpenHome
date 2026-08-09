@@ -9,11 +9,11 @@ dirs = "6.0.0"
 pkm_rs = {path = "../pkm_rs"}
 pkm_rs_derive = {path = "../pkm_rs_derive"}
 semver = "1.0.28"
-serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.150"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
 specta = { version = "=2.0.0-rc.22", features = ["chrono", "serde_json", "uuid" ], optional = true }
 strum = "0.28.0"
-tokio = { version = "1.52.3" }
+tokio = { version = "1.53.1" }
 tracing = "0.1.44"
 uuid = { version = "1.24.0", features = ["v4"] }
 
