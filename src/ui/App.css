@@ -180,6 +180,8 @@
       var(--primitive-teal-800) 85%
     );
 
+    --hyper-train-color: #fccb59;
+
     .radix-themes {
       --color-panel: var(--primitive-navy-900);
       --color-bar: var(--color-panel);
@@ -211,6 +213,8 @@ img {
   body {
     --dark-scrollbar: rgb(80, 158, 146);
     --dropdown-background-color: #fff;
+
+    --hyper-train-color: #dba43f;
   }
 }
 

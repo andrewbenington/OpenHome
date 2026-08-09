@@ -15,7 +15,7 @@ use pkm_rs_resources::species::SpeciesForm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, Gender, HyperTraining, Ivs, Language,
-    MarkingsSixShapesColors, OriginGame, PokeDate, SWITCH_HANDLER_MEMORY_SIZE,
+    MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, SWITCH_HANDLER_MEMORY_SIZE,
     SWITCH_TRAINER_MEMORY_SIZE, Stats8, Stats16Le, TrainerMemory, read_u64_le,
 };
 use pkm_rs_types::{read_u16_le, read_u32_le};
@@ -326,8 +326,8 @@ impl<S: AsRef<[u8]>> Pk8Buffer<S> {
         ContestStats::from_bytes(self.contest_raw())
     }
 
-    pub fn pokerus_byte(&self) -> u8 {
-        self.get_u8(Offset::Pokerus)
+    pub fn pokerus(&self) -> Pokerus {
+        Pokerus::from_byte(self.get_u8(Offset::Pokerus))
     }
 
     pub fn ribbons_a_raw(&self) -> [u8; 8] {
@@ -771,8 +771,8 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk8Buffer<S> {
         self.set_contest_raw(&v.to_bytes());
     }
 
-    pub fn set_pokerus_byte(&mut self, v: u8) {
-        self.set_u8(Offset::Pokerus, v);
+    pub fn set_pokerus(&mut self, v: Pokerus) {
+        self.set_u8(Offset::Pokerus, v.to_byte());
     }
 
     fn set_ribbons_a_raw(&mut self, v: &[u8; 8]) {

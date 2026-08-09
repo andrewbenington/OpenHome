@@ -18,6 +18,7 @@ import {
   OriginGame,
   Pk8Wasm,
   PokeDate,
+  Pokerus,
   SpeciesLookup,
   TrainerMemory,
 } from '@pkm-rs/pkg'
@@ -199,10 +200,10 @@ export default class PK8 {
   }
 
   get pokerusByte() {
-    return this.inner.pokerus_byte
+    return this.inner.pokerus.toByte()
   }
   set pokerusByte(value: number) {
-    this.inner.pokerus_byte = value
+    this.inner.pokerus = Pokerus.fromByte(value)
   }
 
   get contestMemoryCount() {

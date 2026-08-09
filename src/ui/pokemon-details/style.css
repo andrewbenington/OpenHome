@@ -75,6 +75,10 @@
   & .side-tab-panel {
     height: initial;
   }
+
+  & .side-tab-list {
+    width: 10rem;
+  }
 }
 
 .origin-mark {

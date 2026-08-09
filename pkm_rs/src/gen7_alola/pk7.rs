@@ -18,7 +18,7 @@ use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, HyperTraining, Ivs, Language,
-    MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
+    MarkingsSixShapesColors, OriginGame, Pokerus, Stats8, Stats16Le,
 };
 use pkm_rs_types::{Gender, Geolocations, PokeDate, TrainerMemory};
 use serde::Serialize;
@@ -59,7 +59,7 @@ pub struct Pk7 {
     pub evs: Stats8,
     pub contest: ContestStats,
     pub resort_event_status: u8,
-    pub pokerus_byte: u8,
+    pub pokerus: Pokerus,
     pub super_training_flags: u32,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: ModernRibbonSet<7, MAX_RIBBON_ALOLA>,
@@ -144,7 +144,7 @@ impl Pk7 {
             evs: buf.evs(),
             contest: buf.contest(),
             resort_event_status: buf.resort_event_status(),
-            pokerus_byte: buf.pokerus_byte(),
+            pokerus: buf.pokerus(),
             super_training_flags: buf.super_training_flags(),
             ribbons: buf.ribbons(),
             contest_memory_count: buf.contest_memory_count(),
@@ -224,7 +224,7 @@ impl Pk7 {
         buf.set_evs(self.evs);
         buf.set_contest(self.contest);
         buf.set_resort_event_status(self.resort_event_status);
-        buf.set_pokerus_byte(self.pokerus_byte);
+        buf.set_pokerus(self.pokerus);
         buf.set_super_training_flags(self.super_training_flags);
         buf.set_ribbons(self.ribbons);
         buf.set_contest_memory_count(self.contest_memory_count);

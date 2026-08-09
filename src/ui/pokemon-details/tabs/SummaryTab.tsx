@@ -4,11 +4,12 @@ import { PKM } from '@openhome-core/pkm/PKM'
 import { getTypes } from '@openhome-core/pkm/util'
 import { getDisplayID } from '@openhome-core/util'
 import AttributeRow from '@openhome-ui/components/AttributeRow'
-import AttributeTag from '@openhome-ui/components/AttributeTag'
+import Badge from '@openhome-ui/components/badge/Badge'
 import { ErrorIcon } from '@openhome-ui/components/Icons'
 import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
 import PokemonIcon from '@openhome-ui/components/PokemonIcon'
+import { Tabs } from '@openhome-ui/components/Tabs'
 import { getPublicImageURL } from '@openhome-ui/images/images'
 import { BallsImageList, getItemIconPath } from '@openhome-ui/images/items'
 import { useSaves } from '@openhome-ui/state/saves'
@@ -22,7 +23,7 @@ import {
   MetadataSummaryLookup,
   OriginGames,
 } from '@pkm-rs/pkg'
-import { Badge, Button, Flex, Grid, Spinner, Tooltip } from '@radix-ui/themes'
+import { Button, Flex, Badge as RadixBadge, Spinner, Tooltip } from '@radix-ui/themes'
 import { useMemo } from 'react'
 import { TagIcon } from '../../components/TagIcon'
 import useMonSprite from '../useMonSprite'
@@ -34,6 +35,8 @@ type SummaryDisplayProps = {
 
 const SummaryDisplay = (props: SummaryDisplayProps) => {
   const { mon } = props
+
+  const monMetadata = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
 
   const spriteResult = useMonSprite({
     nationalDex: mon.nationalDex,
@@ -47,16 +50,14 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
   })
 
   const itemAltText = useMemo(() => {
-    const monData = MetadataSummaryLookup(mon.nationalDex, mon.formIndex)
-
-    if (!monData) return 'pokemon sprite'
-    return `${monData.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
-  }, [mon])
+    if (!monMetadata) return 'pokemon sprite'
+    return `${monMetadata.formeName}${mon.isShiny() ? '-shiny' : ''} sprite`
+  }, [mon, monMetadata])
   const { revertMonAbility } = useSaves()
 
   return (
-    <Grid className="pokemon-modal-content" columns="2" width="100%">
-      <Flex direction="column" gap="2">
+    <Flex className="pokemon-modal-content" width="100%">
+      <Flex direction="column" gap="2" width="24rem">
         <div className="mon-image-container">
           {spriteResult.loading ? (
             <Spinner style={{ margin: 'auto', height: 32 }} />
@@ -81,13 +82,13 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           )}
           {spriteResult.errorMessage && (
             <Tooltip content={spriteResult.errorMessage}>
-              <Badge
+              <RadixBadge
                 variant="solid"
                 color="tomato"
                 style={{ position: 'absolute', top: '0.5rem', left: '0.5rem' }}
               >
                 <ErrorIcon fontSize={20} />
-              </Badge>
+              </RadixBadge>
             </Tooltip>
           )}
         </div>
@@ -99,9 +100,9 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
             src={BallsImageList[mon.ball ?? Ball.Poke]}
           />
           <div style={{ fontWeight: 'bold' }}>{formatTitleAndNickname(mon)}</div>
-          <Badge variant="solid" color="gray" ml="2" size="1">
+          <RadixBadge variant="solid" color="gray" ml="2" size="1">
             {Languages.stringFromByte(mon.language)}
-          </Badge>
+          </RadixBadge>
         </div>
         <AttributeRow label="Item" justifyEnd>
           {mon.heldItemName !== 'None' && (
@@ -115,7 +116,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
         </AttributeRow>
         <Flex direction="row" gap="1" align="center" wrap="wrap">
           {mon.tags?.map((tag, i) => (
-            <Badge
+            <RadixBadge
               key={i}
               variant="solid"
               size="1"
@@ -126,44 +127,39 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
             >
               <TagIcon iconName={tag.icon} size={10} />
               {tag.label}
-            </Badge>
+            </RadixBadge>
           ))}
         </Flex>
-        <div>
+        <div className="attribute-badges">
           {mon.isShiny() && (
-            <AttributeTag
-              icon={getPublicImageURL('icons/Shiny.png')}
+            <Badge.Image
+              src={getPublicImageURL('icons/Shiny.png')}
               color="white"
               backgroundColor="#cc0000"
             />
           )}
-          {mon.canGigantamax && (
-            <AttributeTag
-              icon={getPublicImageURL('icons/GMax.png')}
-              color="white"
-              backgroundColor="#e60040"
-            />
-          )}
-          {mon.isAlpha && (
-            <AttributeTag
-              icon={getPublicImageURL('icons/Alpha.png')}
-              color="white"
-              backgroundColor="#f2352d"
-            />
-          )}
+          <Badge.Gigantamax showIf={mon.canGigantamax} showLabel />
+          <Badge.Pokerus pokerusByte={mon.pokerusByte} showLabel />
+          <Badge.Alpha showIf={mon.isAlpha} showLabel />
           {mon instanceof OHPKM && mon.unconvertedPkm && (
-            <AttributeTag label="Has Unconverted PKM" color="white" backgroundColor="blue" />
+            <Badge.Image label="Has Unconverted PKM" color="white" backgroundColor="blue" />
           )}
-          {mon.isNoble && <AttributeTag label="NOBLE" backgroundColor="#cccc00" color="white" />}
-          {'isShadow' in mon && (mon.isShadow as boolean) && (
-            <AttributeTag label="SHADOW" backgroundColor={SHADOW_TYPE_COLOR} color="white" />
-          )}
-          {mon.isNsPokemon && (
-            <AttributeTag label="N's Pokémon" backgroundColor="green" color="white" />
-          )}
+          {mon.isNoble && <Badge.Image label="Noble" backgroundColor="#cccc00" color="white" />}
+          <Badge.Image
+            label="Shadow"
+            backgroundColor={SHADOW_TYPE_COLOR}
+            color="white"
+            showIf={mon.isShadow}
+          />
+          <Badge.Image
+            label="N's Pokémon"
+            backgroundColor="green"
+            color="white"
+            showIf={mon.isNsPokemon}
+          />
         </div>
       </Flex>
-      <Flex direction="column" gap="2px">
+      <Flex direction="column" gap="2px" flexGrow="1">
         <AttributeRow label="Nickname" value={mon.nickname} />
         <AttributeRow label="Species">
           <Flex gap="1">
@@ -186,7 +182,7 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
                 {extraFormDisplayName(mon.extraFormIndex)}
               </span>
             ) : (
-              MetadataSummaryLookup(mon.nationalDex, mon.formIndex)?.formeName
+              monMetadata?.formeName
             )}
             <GenderIcon gender={mon.gender} />
           </Flex>
@@ -204,29 +200,63 @@ const SummaryDisplay = (props: SummaryDisplayProps) => {
           </Flex>
         </AttributeRow>
         <AttributeRow label="Trainer ID" value={getDisplayID(mon as PKM)} />
-        {mon.ability !== undefined && (
+        {mon.ability !== undefined && mon instanceof OHPKM && mon.abilityWasChanged() ? (
           <AttributeRow label="Ability">
             {mon.ability.name} ({mon.abilityNum === 4 ? 'HA' : mon.abilityNum})
-            {mon instanceof OHPKM &&
-              mon.abilityWasChanged() &&
-              !mon.metadata
-                ?.abilityByNum(AbilityNumber.First)
-                .equals(mon.metadata?.abilityByNum(AbilityNumber.Second)) && (
-                <Button
-                  size="1"
-                  radius="full"
-                  style={{ height: '1rem', marginLeft: 5 }}
-                  onClick={() => revertMonAbility(mon.openhomeId)}
-                >
-                  Revert
-                </Button>
-              )}
+            {!monMetadata
+              ?.abilityByNum(AbilityNumber.First)
+              .equals(monMetadata?.abilityByNum(AbilityNumber.Second)) && (
+              <Button
+                size="1"
+                radius="full"
+                style={{ height: '1rem', marginLeft: 5 }}
+                onClick={() => revertMonAbility(mon.openhomeId)}
+              >
+                Revert
+              </Button>
+            )}
+          </AttributeRow>
+        ) : (
+          <AttributeRow label="Ability">
+            <ToggleTabs
+              options={[
+                { id: '1', display: `1. ${monMetadata?.abilityByNum(1).name}` },
+                { id: '2', display: `2. ${monMetadata?.abilityByNum(2).name}` },
+                { id: '4', display: `HA. ${monMetadata?.abilityByNum(4).name}` },
+              ]}
+              active={String(mon.abilityNum)}
+            />
           </AttributeRow>
         )}
         <AttributeRow label="Level">{mon.getLevel()}</AttributeRow>
         <AttributeRow label="EXP">{mon.exp}</AttributeRow>
       </Flex>
-    </Grid>
+    </Flex>
+  )
+}
+
+type ToggleTabOption = {
+  id: string
+  display: string
+}
+
+type ToggleTabsProps = {
+  options: ToggleTabOption[]
+  active: string
+}
+
+function ToggleTabs(props: ToggleTabsProps) {
+  return (
+    <Tabs.Root value={props.active} orientation="horizontal" className="toggle-tabs">
+      <Tabs.List className="toggle-tabs-list">
+        {props.options.map(({ id, display }) => (
+          <Tabs.Tab value={id} key={id}>
+            {display}
+          </Tabs.Tab>
+        ))}
+        <Tabs.Indicator />
+      </Tabs.List>
+    </Tabs.Root>
   )
 }
 

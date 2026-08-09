@@ -1,12 +1,17 @@
 import { Stats } from '@openhome-core/util/types'
-import { ContestStats, StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
+import { ContestStats, HyperTraining, StatsPreSplit } from '@pkm-rs/pkg/pkm_rs'
 import { Table } from '@radix-ui/themes'
+import Badge from '../badge/Badge'
 
 type StatsTableStandardProps = {
   stats: Stats
+  hyperTrain?: HyperTraining
 }
 
-function StatsTableStandard({ stats }: StatsTableStandardProps) {
+function StatsTableStandard({ stats, hyperTrain }: StatsTableStandardProps) {
+  const HyperTraining = (
+    <Badge.HyperTrain backgroundColor="transparent" color="var(--hyper-train-color)" />
+  )
   return (
     <Table.Root className="stats-table" variant="surface">
       <Table.Header>
@@ -21,12 +26,30 @@ function StatsTableStandard({ stats }: StatsTableStandardProps) {
       </Table.Header>
       <Table.Body>
         <Table.Row>
-          <Table.Cell>{stats.hp}</Table.Cell>
-          <Table.Cell>{stats.atk}</Table.Cell>
-          <Table.Cell>{stats.def}</Table.Cell>
-          <Table.Cell>{stats.spa}</Table.Cell>
-          <Table.Cell>{stats.spd}</Table.Cell>
-          <Table.Cell>{stats.spe}</Table.Cell>
+          <Table.Cell>
+            {stats.hp}
+            {hyperTrain?.hp && HyperTraining}
+          </Table.Cell>
+          <Table.Cell>
+            {stats.atk}
+            {hyperTrain?.atk && HyperTraining}
+          </Table.Cell>
+          <Table.Cell>
+            {stats.def}
+            {hyperTrain?.def && HyperTraining}
+          </Table.Cell>
+          <Table.Cell>
+            {stats.spa}
+            {hyperTrain?.spa && HyperTraining}
+          </Table.Cell>
+          <Table.Cell>
+            {stats.spd}
+            {hyperTrain?.spd && HyperTraining}
+          </Table.Cell>
+          <Table.Cell>
+            {stats.spe}
+            {hyperTrain?.spe && HyperTraining}
+          </Table.Cell>
         </Table.Row>
       </Table.Body>
     </Table.Root>

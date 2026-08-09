@@ -18,7 +18,7 @@ use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, Language,
-    MarkingsSixShapesColors, OriginGame, Stats8, Stats16Le,
+    MarkingsSixShapesColors, OriginGame, Pokerus, Stats8, Stats16Le,
 };
 use pkm_rs_types::{Gender, PokeDate, TrainerMemory};
 use serde::Serialize;
@@ -65,7 +65,7 @@ pub struct Pk8 {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
     pub contest: ContestStats,
-    pub pokerus_byte: u8,
+    pub pokerus: Pokerus,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: ModernRibbonSet<14, MAX_RIBBON_SWSH>,
     pub contest_memory_count: u8,
@@ -151,7 +151,7 @@ impl Pk8 {
             gender: buf.gender(),
             evs: buf.evs(),
             contest: buf.contest(),
-            pokerus_byte: buf.pokerus_byte(),
+            pokerus: buf.pokerus(),
             ribbons: buf.ribbons(),
             contest_memory_count: buf.contest_memory_count(),
             battle_memory_count: buf.battle_memory_count(),
@@ -233,7 +233,7 @@ impl Pk8 {
         buf.set_is_fateful_encounter(self.is_fateful_encounter);
         buf.set_evs(self.evs);
         buf.set_contest(self.contest);
-        buf.set_pokerus_byte(self.pokerus_byte);
+        buf.set_pokerus(self.pokerus);
         buf.set_ribbons(self.ribbons);
         buf.set_contest_memory_count(self.contest_memory_count);
         buf.set_battle_memory_count(self.battle_memory_count);
