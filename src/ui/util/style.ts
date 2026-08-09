@@ -29,15 +29,15 @@ export function cssClass(className: string): PendingState {
 }
 
 function newPending(pendingClass: Option<string>, classes?: string[]): PendingState {
+  const classesOrEmpty = classes ?? []
   return {
     with(newPendingClass: Option<string>) {
-      const classesOrEmpty = classes ?? []
       return newPending(newPendingClass, allDefined(...classesOrEmpty, pendingClass))
     },
     if(condition: unknown) {
       return newIfState(classes ?? [], pendingClass, condition)
     },
-    build: () => buildFromState(classes),
+    build: () => buildFromState(allDefined(...classesOrEmpty, pendingClass)),
   }
 }
 

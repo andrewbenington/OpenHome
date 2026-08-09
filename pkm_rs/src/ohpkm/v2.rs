@@ -27,8 +27,8 @@ use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
-    Language, MarkingsSixShapesColors, OriginGame, PokeDate, ShinyLeaves, Stats8, Stats16Le,
-    StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory,
+    Language, MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, ShinyLeaves, Stats8,
+    Stats16Le, StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory,
 };
 use serde::Serialize;
 use strum_macros::Display;
@@ -410,12 +410,12 @@ impl OhpkmV2 {
         self.main_data.contest = *v;
     }
 
-    pub const fn pokerus_byte(&self) -> u8 {
-        self.main_data.pokerus_byte
+    pub const fn pokerus(&self) -> Pokerus {
+        self.main_data.pokerus
     }
 
-    pub const fn set_pokerus_byte(&mut self, v: u8) {
-        self.main_data.pokerus_byte = v;
+    pub const fn set_pokerus(&mut self, v: Pokerus) {
+        self.main_data.pokerus = v;
     }
 
     pub const fn contest_memory_count(&self) -> u8 {
@@ -2048,13 +2048,13 @@ impl OhpkmV2 {
         self.set_contest(v);
     }
 
-    #[wasm_bindgen(getter = pokerusByte)]
-    pub fn pokerus_byte_js(&self) -> u8 {
-        self.pokerus_byte()
+    #[wasm_bindgen(getter = pokerus)]
+    pub fn pokerus_js(&self) -> Pokerus {
+        self.pokerus()
     }
-    #[wasm_bindgen(setter = pokerusByte)]
-    pub fn set_pokerus_byte_js(&mut self, v: u8) {
-        self.set_pokerus_byte(v);
+    #[wasm_bindgen(setter = pokerus)]
+    pub fn set_pokerus_js(&mut self, v: Pokerus) {
+        self.set_pokerus(v);
     }
 
     #[wasm_bindgen(getter = contestMemoryCount)]

@@ -11,7 +11,8 @@ use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveSlots, PpUpStorage};
 use pkm_rs_resources::ribbons::Gen3RibbonSet;
 use pkm_rs_types::{
-    BinaryGender, ContestStats, Ivs, MarkingsFourShapes, OriginGame, SimpleAbilityNumber, Stats8,
+    BinaryGender, ContestStats, Ivs, MarkingsFourShapes, OriginGame, Pokerus, SimpleAbilityNumber,
+    Stats8,
 };
 use pkm_rs_types::{Language, Stats16Le};
 use pkm_rs_types::{read_u16_le, read_u32_le};
@@ -265,8 +266,8 @@ impl<S: AsRef<[u8]>> Pk3Buffer<S> {
         ContestStats::from_bytes(self.contest_raw())
     }
 
-    pub fn pokerus_byte(&self) -> u8 {
-        self.get_u8(Offset::Pokerus)
+    pub fn pokerus(&self) -> Pokerus {
+        Pokerus::from_byte(self.get_u8(Offset::Pokerus))
     }
 
     pub fn ribbons_fateful_encounter_raw(&self) -> [u8; 4] {
@@ -491,8 +492,8 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk3Buffer<S> {
         self.set_contest_raw(&v.to_bytes());
     }
 
-    pub fn set_pokerus_byte(&mut self, v: u8) {
-        self.set_u8(Offset::Pokerus, v);
+    pub fn set_pokerus(&mut self, v: Pokerus) {
+        self.set_u8(Offset::Pokerus, v.to_byte());
     }
 
     fn set_ribbons_fateful_encounter_raw(&mut self, v: &[u8; 4]) {
