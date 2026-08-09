@@ -230,13 +230,6 @@ impl Pk3 {
     }
 
     pub fn is_nicknamed(&self) -> bool {
-        crate::log!(
-            "nickname: {}; species: {}, equal: {}",
-            self.nickname.to_string(),
-            lookup::species_name(self.get_national_dex(), self.language).to_uppercase(),
-            lookup::species_name(self.get_national_dex(), self.language).to_uppercase()
-                == self.nickname.to_string(),
-        );
         self.nickname.to_string()
             != lookup::species_name(self.get_national_dex(), self.language).to_uppercase()
     }
