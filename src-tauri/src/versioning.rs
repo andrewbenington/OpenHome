@@ -170,8 +170,7 @@ pub enum SignificantUpdate {
     V1_13_3,
     V1_14_1,
     V1_14_2,
-    V1_15_0Rc0,
-    V1_15_0Rc1,
+    V1_15_0,
 }
 
 impl SignificantUpdate {
@@ -204,8 +203,7 @@ impl SignificantUpdate {
             Self::V1_13_3 => Version::parse("1.13.3"),
             Self::V1_14_1 => Version::parse("1.14.1"),
             Self::V1_14_2 => Version::parse("1.14.2"),
-            Self::V1_15_0Rc0 => Version::parse("1.15.0-rc.0"),
-            Self::V1_15_0Rc1 => Version::parse("1.15.0-rc.1"),
+            Self::V1_15_0 => Version::parse("1.15.0"),
         }
         .expect("all versions are valid semver")
     }
@@ -337,11 +335,11 @@ impl SignificantUpdate {
                 "Fixed a bug preventing Gen 7 3DS saves from opening.",
                 "Gen 7 3DS saves now show the correct box names.",
             ]),
-            Self::V1_15_0Rc0 => Some(vec![
+            Self::V1_15_0 => Some(vec![
+                "Pokérus status is now displayed in the Pokémon details view, and can be viewed in the top-right indicator if selected.",
+                "Hyper training is now displayed in the Pokémon stats view, and can be viewed in the top-right indicator if selected.",
                 "Fixed bugs preventing some transfers to Radical Red.",
                 "PK9 logic has been rewritten in Rust. Loading them should be faster.",
-            ]),
-            Self::V1_15_0Rc1 => Some(vec![
                 "Added a tool for manually re-associating a Pokémon with tracking data. You can do this by right clicking a Pokémon in a box, and selecting 'Fix tracking data' or 'Merge/Recover tracking data'.",
                 "Fixed a bug where tracking data was not properly re-associated with Pokémon in gen 3-5 save files. Pokémon affected by this can be fixed using the previously mentioned tool.",
             ]),
