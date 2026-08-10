@@ -11,7 +11,7 @@ use pkm_rs_resources::ribbons::{
 use pkm_rs_types::strings::{BigEndian, SizedUtf16String};
 use pkm_rs_types::{
     BinaryGender, ContestStats, FlagSet, Ivs, MarkingsFourShapes, OriginGame, Pokerus,
-    SimpleAbilityNumber, Stats8, read_i32_be, read_u16_be, read_u32_be,
+    SimpleAbilityNumber, read_i32_be, read_u16_be, read_u32_be,
 };
 use pkm_rs_types::{Language, Stats16};
 

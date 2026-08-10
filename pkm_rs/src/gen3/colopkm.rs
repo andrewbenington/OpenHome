@@ -548,15 +548,11 @@ mod tests {
     use std::path::PathBuf;
 
     // use crate::convert_strategy::ConvertStrategy;
-    // use crate::gen3::pk3_buffer::Pk3BufferMut;
     use crate::gen3::Colopkm;
     use crate::ohpkm::{OhpkmConvert, OhpkmV2};
 
-    use crate::strings::{Gen3Encoding, Gen3String};
     #[cfg(feature = "randomize")]
-    use crate::tests::TestErrorWithSeed;
     use crate::tests::{self, TestResult};
-    use crate::traits::{IsShiny, PkmBytes};
 
     // use pkm_rs_resources::ribbons::Gen3Ribbon;
     // use pkm_rs_types::Gender;
@@ -654,34 +650,14 @@ mod tests {
     //     Ok(())
     // }
 
-    // #[test]
-    // fn from_ohpkm() -> TestResult<()> {
-    //     let mon = tests::pkm_from_file::<OhpkmV2>(&PathBuf::from("ohpkm").join("Machamp.ohpkm"))?.0;
+    #[test]
+    fn from_ohpkm() -> TestResult<()> {
+        let mon = tests::pkm_from_file::<OhpkmV2>(&PathBuf::from("ohpkm").join("Machamp.ohpkm"))?.0;
 
-    //     let _ = Pk3::from_ohpkm(&mon, ConvertStrategy::default());
+        let _ = Colopkm::from_ohpkm(&mon, ConvertStrategy::default());
 
-    //     Ok(())
-    // }
-
-    // const STEADFAST: u16 = 80;
-    // const SHARPNESS: u16 = 292;
-
-    // #[test]
-    // fn from_ohpkm_ability_change() -> TestResult<()> {
-    //     let mon = tests::pkm_from_file::<OhpkmV2>(
-    //         &PathBuf::from("ohpkm").join("gallade-sharpness-alpha.ohpkm"),
-    //     )?
-    //     .0;
-
-    //     assert_eq!(mon.ability_index().to_u16(), SHARPNESS);
-
-    //     let converted_pk3 = Pk3::from_ohpkm(&mon, ConvertStrategy::default());
-
-    //     // Gallade's Sharpness should be converted to Steadfast when converting to Pk3, since Sharpness is Gen 8+ and Pk3 can only represent Gen 7 abilities
-    //     assert_eq!(converted_pk3.ability_index.to_u16(), STEADFAST);
-
-    //     Ok(())
-    // }
+        Ok(())
+    }
 
     #[test]
     fn to_from_ohpkm() -> TestResult<()> {
