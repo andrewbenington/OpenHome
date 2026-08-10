@@ -30,7 +30,7 @@
     "tough": 0,
     "sheen": 0
   },
-  "pokerus_byte": 255,
+  "pokerus": "strain 0, 0 days remaining",
   "ribbons": ["National"],
   "nickname": "SMEARGLE",
   "nickname_trash": "0053004D0045004100520047004C0045000000000000",
@@ -76,7 +76,6 @@
   "trainer_gender": "Male",
   "game_of_origin": "Colosseum/XD",
   "language": "English",
-  "status_condition": 0,
   "stat_level": 45,
   "current_hp": 117,
   "stats": {

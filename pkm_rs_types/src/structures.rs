@@ -1002,7 +1002,7 @@ impl Display for InvalidAbilityNumber {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, Default, Serialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct Pokerus(u8);
 
 #[cfg_attr(feature = "wasm", derive(Tsify, Serialize, Deserialize))]
@@ -1120,6 +1120,26 @@ impl Randomize for Pokerus {
         };
 
         Self::from_components(strain, days_remaining)
+    }
+}
+
+impl Display for Pokerus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "strain {}, {} days remaining",
+            self.strain(),
+            self.days_remaining()
+        )
+    }
+}
+
+impl Serialize for Pokerus {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.to_string().serialize(serializer)
     }
 }
 

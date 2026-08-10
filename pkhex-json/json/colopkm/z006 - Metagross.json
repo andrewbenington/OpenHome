@@ -30,7 +30,7 @@
     "tough": 0,
     "sheen": 0
   },
-  "pokerus_byte": 255,
+  "pokerus": "strain 0, 0 days remaining",
   "ribbons": ["National"],
   "nickname": "METAGROSS",
   "nickname_trash": "004D00450054004100470052004F0053005300000000",
@@ -76,7 +76,6 @@
   "trainer_gender": "Male",
   "game_of_origin": "Colosseum/XD",
   "language": "English",
-  "status_condition": 0,
   "stat_level": 100,
   "current_hp": 351,
   "stats": {

@@ -40,7 +40,7 @@
     "tough": 0,
     "sheen": 0
   },
-  "pokerus": 0,
+  "pokerus": "strain 0, 0 days remaining",
   "ribbons": ["Effort Ribbon", "Galar Champion Ribbon"],
   "contest_memory_count": 0,
   "battle_memory_count": 0,

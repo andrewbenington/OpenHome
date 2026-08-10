@@ -30,7 +30,7 @@
     "tough": 0,
     "sheen": 0
   },
-  "pokerus_byte": 255,
+  "pokerus": "strain 0, 0 days remaining",
   "ribbons": [],
   "nickname": "RAIKOU",
   "nickname_trash": "005200410049004B004F005500000000000000000000",
@@ -76,7 +76,6 @@
   "trainer_gender": "Male",
   "game_of_origin": "Colosseum/XD",
   "language": "English",
-  "status_condition": 0,
   "stat_level": 40,
   "current_hp": 128,
   "stats": {
