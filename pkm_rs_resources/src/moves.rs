@@ -57,7 +57,6 @@ impl MoveSlot {
         let pp_ups_offset = offset + 3;
 
         let move_index = MoveIndex::from_u16(read_u16_be!(bytes, move_offset));
-        dbg!(offset, move_index.0);
         if move_index.0.is_some_and(|idx| idx.get() > 20000) {
             return Self::default();
         }

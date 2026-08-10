@@ -61,13 +61,14 @@ impl ShadowIdColosseum {
     }
 
     pub const fn from_u16(v: u16) -> Result<Option<Self>, BadShadowData> {
-        if Self::raw_to_ndex(v).is_none() {
-            return Err(BadShadowData::ColosseumShadowId(v));
-        }
+        let Some(inner) = NonZeroU8::new(v as u8) else {
+            return Ok(None);
+        };
 
-        match NonZeroU8::new(v as u8) {
-            Some(inner) => Ok(Some(Self(inner))),
-            _ => Ok(None),
+        if Self::raw_to_ndex(v).is_none() {
+            Err(BadShadowData::ColosseumShadowId(v))
+        } else {
+            Ok(Some(Self(inner)))
         }
     }
 

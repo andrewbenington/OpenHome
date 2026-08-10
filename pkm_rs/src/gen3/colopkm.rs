@@ -139,7 +139,6 @@ impl Colopkm {
             current_hp: Default::default(),
         };
 
-        dbg!(mon.moves);
         mon.stat_level = mon.calculate_level();
         mon.stats = mon.calculate_stats();
         mon.current_hp = mon.stats.hp;
