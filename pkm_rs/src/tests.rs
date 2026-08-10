@@ -219,14 +219,20 @@ pub fn assert_pkm_match<T: Debug>(
     expected_bytes: &[u8],
     path: Option<PathBuf>,
 ) -> TestResult<()> {
+    let mut preamble = "\nLeft = ACTUAL, Right = EXPECTED".to_owned();
+    if let Some(path) = &path {
+        preamble = format!("{preamble}\nPath: {}\n", path.to_string_lossy());
+    }
+
     let actual_debug = format!(
-        "{}\n{path:#?}: \n{actual_pkm:#?}",
+        "{preamble}\n{}\n{path:#?}: \n{actual_pkm:#?}",
         pretty_hex(&actual_bytes)
     );
     let expected_debug = format!(
-        "{}\n{path:#?}: \n{expected_pkm:#?}",
+        "{preamble}\n{}\n{path:#?}: \n{expected_pkm:#?}",
         pretty_hex(&expected_bytes)
     );
+
     assert_eq!(actual_debug, expected_debug);
 
     Ok(())

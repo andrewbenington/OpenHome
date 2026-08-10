@@ -126,6 +126,18 @@ impl<const N: usize, E: Endianness> SizedUtf16String<N, E> {
             endian: PhantomData::<E::Reversed>,
         }
     }
+
+    // because both have the same N, both are enforced to be the same length and no length check is needed
+    pub fn identical_until_terminator(&self, other: &SizedUtf16String<N, E>) -> bool {
+        self.raw
+            .chunks_exact(2)
+            .map(E::u16_from_bytes)
+            .zip(other.raw.chunks_exact(2).map(E::u16_from_bytes))
+            .take_while(|(this_char, other_char)| {
+                *this_char != TERMINATOR && *other_char != TERMINATOR
+            })
+            .all(|(this_char, other_char)| this_char == other_char)
+    }
 }
 
 impl<const N: usize, E: Endianness> From<&str> for SizedUtf16String<N, E> {

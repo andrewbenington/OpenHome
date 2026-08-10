@@ -5,6 +5,7 @@ use pkm_rs_types::{AbilityNumber, Generation, PokeDate, Stats16};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
+use crate::gen3::colopkm::ColosseumPkmString;
 use crate::gen3::shadow::{Purification, ShadowIdColosseum};
 use crate::gen3::{Colopkm, Gen3PokemonIndex, PK3_MAX_ABILITY};
 use crate::ohpkm::OhpkmV2;
@@ -97,7 +98,7 @@ impl OhpkmConvert for Colopkm {
     }
 
     fn to_orre_data(&self) -> Option<ohpkm::v2_sections::OrreData> {
-        Some(ohpkm::v2_sections::OrreData {
+        self.shadow_id.map(|_| ohpkm::v2_sections::OrreData {
             purification: self.purification,
             shadow_exp: self.shadow_exp,
         })
@@ -133,6 +134,19 @@ impl OhpkmConvert for Colopkm {
             0
         };
 
+        let mut nickname = ColosseumPkmString::from(converter.nickname(ohpkm));
+
+        // if the nickname has not been otherwise unchanged, use a copy of the original data's nickname
+        // to preserve trash bytes
+        if let Some(StoredPkmBytes::Colopkm(original_bytes)) = ohpkm.original_data_bytes()
+            && let Ok(original_colopkm) = Colopkm::try_from_bytes(&original_bytes)
+            && original_colopkm
+                .nickname
+                .identical_until_terminator(&nickname)
+        {
+            nickname = original_colopkm.nickname;
+        };
+
         let mut mon = Self {
             pokemon_index: Gen3PokemonIndex::from_national_dex(
                 ohpkm.species_and_form().get_ndex() as u16,
@@ -154,7 +168,7 @@ impl OhpkmConvert for Colopkm {
                 .into_iter()
                 .filter_map(Gen3Ribbon::from_openhome_if_present)
                 .collect(),
-            nickname: ohpkm.nickname().reverse_endian().resize(),
+            nickname,
             moves: ohpkm
                 .moves()
                 .to_pp_adjusted(ohpkm::MOVE_METADATA_SOURCE, MetadataSource::Emerald),
@@ -180,23 +194,13 @@ impl OhpkmConvert for Colopkm {
         mon.stats = mon.calculate_stats();
         mon.current_hp = mon.stats.hp;
 
-        // if the nickname has not been otherwise unchanged, use a copy of the original data's nickname
-        // to preserve trash bytes
-        if let Some(StoredPkmBytes::Colopkm(original_bytes)) = ohpkm.original_data_bytes()
-            && let Ok(original_colopkm) = Colopkm::try_from_bytes(&original_bytes)
-            && original_colopkm.nickname.to_string() == mon.nickname.to_string()
-        {
-            mon.nickname = original_colopkm.nickname;
-        }
-
         Ok(mon)
     }
 
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
         bytes
             .try_into()
-            .map_err(|e| {
-                dbg!(e, bytes.len(), gen3::PKM_DATA_SIZE_GCN);
+            .map_err(|_| {
                 Error::buffer_size_with_source(
                     "Colopkm::OhpkmConvert::bytes_to_stored",
                     gen3::PKM_DATA_SIZE_GCN,

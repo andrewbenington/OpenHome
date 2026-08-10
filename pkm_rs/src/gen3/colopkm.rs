@@ -64,13 +64,13 @@ pub struct Colopkm {
     pub pokerus: Pokerus,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: Gen3RibbonSet,
-    pub nickname: SizedUtf16String<22, BigEndian>,
+    pub nickname: ColosseumPkmString,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub moves: MoveSlots,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ivs: Ivs,
     pub is_egg: bool,
-    pub trainer_name: SizedUtf16String<22, BigEndian>,
+    pub trainer_name: ColosseumPkmString,
     pub trainer_friendship: u8,
     pub shadow_id: Option<ShadowIdColosseum>,
     pub purification: Purification,
@@ -88,6 +88,8 @@ pub struct Colopkm {
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub stats: Stats16,
 }
+
+pub type ColosseumPkmString = SizedUtf16String<22, BigEndian>;
 
 impl Colopkm {
     // ------------------------------------------------------------------
