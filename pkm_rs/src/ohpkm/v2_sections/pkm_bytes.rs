@@ -1,4 +1,5 @@
 use crate::format::PkmFormat;
+use crate::gen3::PKM_DATA_SIZE_GCN;
 use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
@@ -96,7 +97,7 @@ impl From<PkmFormat> for Option<Tag> {
             PkmFormat::PK1 => Some(Tag::Pk1),
             PkmFormat::PK2 => Some(Tag::Pk2),
             PkmFormat::PK3 => Some(Tag::Pk3),
-            PkmFormat::ColoPkm | PkmFormat::XdPkm => None,
+            PkmFormat::Colopkm | PkmFormat::Xdpkm => None,
             PkmFormat::PK4 => Some(Tag::Pk4),
             PkmFormat::PK5 => Some(Tag::Pk5),
             PkmFormat::PK6 => Some(Tag::Pk6),
@@ -146,7 +147,7 @@ pub enum StoredPkmBytes {
     Pk1([u8; PK1_PARTY_SIZE]),
     Pk2([u8; PK2_PARTY_SIZE]),
     Pk3([u8; PK3_PARTY_SIZE]),
-    Colopkm([u8; PK3_PARTY_SIZE]),
+    Colopkm([u8; PKM_DATA_SIZE_GCN]),
     Pk4([u8; PK4_PARTY_SIZE]),
     Pk5([u8; PK5_PARTY_SIZE]),
     Pk6([u8; PK6_PARTY_SIZE]),

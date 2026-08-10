@@ -3,6 +3,7 @@ mod colopkm_buffer;
 mod pk3;
 mod pk3_buffer;
 mod pokemon_index;
+pub mod shadow;
 
 // mod save;
 

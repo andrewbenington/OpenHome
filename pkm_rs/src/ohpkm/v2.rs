@@ -5,6 +5,7 @@ use super::v2_sections::{
     MonTags, MostRecentSave, Notes, PastHandlerDataV2, PluginData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED,
     ScarletVioletData, SwordShieldData,
 };
+use crate::gen3::shadow::Purification;
 use crate::gen9_lza::PlusMoveFlags;
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
@@ -17,9 +18,6 @@ use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, Uncon
 use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
-
-#[cfg(feature = "wasm")]
-use arrayref::array_ref;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
 use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_tm, sv_tm, swsh_tr};
@@ -47,6 +45,8 @@ use crate::gen9_lza::{LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES};
 use crate::gen9_sv;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
+#[cfg(feature = "wasm")]
+use arrayref::array_ref;
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 #[cfg(feature = "wasm")]
@@ -133,6 +133,7 @@ pub enum OhpkmSectionTag {
     UnconvertedPkm = 0x0E,
     PastHandlerV2 = 0x0F,
     LearnedMoves = 0x10,
+    GcnData = 0x11,
 
     // deprecated, but can't mark it as such without warnings
     PastHandlerV1 = 0x08,
@@ -189,6 +190,7 @@ impl OhpkmSectionTag {
             Self::OriginalBackup => 2, // Size of the tag
             Self::UnconvertedPkm => 2, // Size of the tag
             Self::LearnedMoves => 2,   // Size of length field
+            Self::GcnData => 8,
 
             #[allow(deprecated)]
             Self::PastHandlerV1 => 39,
@@ -216,6 +218,7 @@ impl SectionTag for OhpkmSectionTag {
 pub struct OhpkmV2 {
     main_data: MainDataV2,
     gameboy_data: Option<GameboyData>,
+    orre_data: Option<OrreData>,
     gen45_data: Option<Gen45Data>,
     gen67_data: Option<Gen67Data>,
     swsh_data: Option<SwordShieldData>,
@@ -870,6 +873,40 @@ impl OhpkmV2 {
             met_time_of_day,
             evs_g12,
         })
+    }
+
+    // Gamecube
+
+    pub fn purification(&self) -> Option<Purification> {
+        self.orre_data.map(|o| o.purification)
+    }
+
+    pub fn set_purification(&mut self, v: Option<Purification>) {
+        match v {
+            Some(purification) => {
+                self.orre_data.get_or_insert_default().purification = purification
+            }
+            None => {
+                if let Some(orre_data) = &mut self.orre_data {
+                    orre_data.purification = Purification::Purified
+                }
+            }
+        }
+    }
+
+    pub fn shadow_exp(&self) -> Option<u32> {
+        self.orre_data.map(|o| o.shadow_exp)
+    }
+
+    pub fn set_shadow_exp(&mut self, v: Option<u32>) {
+        match v {
+            Some(shadow_exp) => self.orre_data.get_or_insert_default().shadow_exp = shadow_exp,
+            None => {
+                if let Some(orre_data) = &mut self.orre_data {
+                    orre_data.shadow_exp = 0
+                }
+            }
+        }
     }
 
     // Gen 4/5
@@ -1597,6 +1634,7 @@ impl OhpkmV2 {
         Ok(Self {
             main_data: MainDataV2::new(national_dex, form_index)?,
             gameboy_data: None,
+            orre_data: None,
             gen45_data: None,
             gen67_data: None,
             swsh_data: None,
@@ -1636,6 +1674,7 @@ impl OhpkmV2 {
             main_data: MainDataV2::extract_from(&sectioned_data)?
                 .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
             gameboy_data: GameboyData::extract_from(&sectioned_data)?,
+            orre_data: OrreData::extract_from(&sectioned_data)?,
             gen45_data: Gen45Data::extract_from(&sectioned_data)?,
             gen67_data: Gen67Data::extract_from(&sectioned_data)?,
             swsh_data: SwordShieldData::extract_from(&sectioned_data)?,
@@ -1677,6 +1716,7 @@ impl OhpkmV2 {
             main_data: MainDataV2::extract_from(&sectioned_data)?
                 .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
             gameboy_data: GameboyData::extract_from(&sectioned_data).ok().flatten(),
+            orre_data: OrreData::extract_from(&sectioned_data).ok().flatten(),
             gen45_data: Gen45Data::extract_from(&sectioned_data).ok().flatten(),
             gen67_data: Gen67Data::extract_from(&sectioned_data).ok().flatten(),
             swsh_data: SwordShieldData::extract_from(&sectioned_data)
@@ -1713,6 +1753,7 @@ impl OhpkmV2 {
         Self {
             main_data: MainDataV2::from_v1(old),
             gameboy_data: GameboyData::from_v1(old),
+            orre_data: OrreData::from_v1(old),
             gen45_data: Gen45Data::from_v1(old),
             gen67_data: Gen67Data::from_v1(old),
             swsh_data: SwordShieldData::from_v1(old),

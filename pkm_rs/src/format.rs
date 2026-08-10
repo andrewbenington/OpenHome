@@ -24,9 +24,9 @@ pub enum PkmFormat {
     PK2,
     PK3,
     #[cfg_attr(feature = "wasm", serde(rename = "COLOPKM"))]
-    ColoPkm,
+    Colopkm,
     #[cfg_attr(feature = "wasm", serde(rename = "XDPKM"))]
-    XdPkm,
+    Xdpkm,
     PK4,
     PK5,
     PK6,
@@ -48,7 +48,7 @@ impl PkmFormat {
     pub const fn species_nickname_all_caps(&self) -> bool {
         matches!(
             self,
-            Self::PK1 | Self::PK2 | Self::PK3 | Self::ColoPkm | Self::XdPkm | Self::PK4
+            Self::PK1 | Self::PK2 | Self::PK3 | Self::Colopkm | Self::Xdpkm | Self::PK4
         )
     }
 
@@ -57,7 +57,7 @@ impl PkmFormat {
             Self::PK1 => OriginGame::Yellow,
             Self::PK2 => OriginGame::Crystal,
             Self::PK3 => OriginGame::Emerald,
-            Self::ColoPkm | Self::XdPkm => OriginGame::ColosseumXd,
+            Self::Colopkm | Self::Xdpkm => OriginGame::ColosseumXd,
             Self::PK4 => OriginGame::HeartGold,
             Self::PK5 => OriginGame::Black2,
             Self::PK6 => OriginGame::OmegaRuby,
@@ -79,7 +79,7 @@ impl PkmFormat {
             Self::PK1 => origin.generation() == Generation::G1,
             Self::PK2 => origin.generation() == Generation::G2,
             Self::PK3 => origin.is_gba(),
-            Self::ColoPkm | Self::XdPkm => origin == OriginGame::ColosseumXd,
+            Self::Colopkm | Self::Xdpkm => origin == OriginGame::ColosseumXd,
             Self::PK4 => origin.generation() == Generation::G4,
             Self::PK5 => origin.generation() == Generation::G5,
             Self::PK6 => origin.generation() == Generation::G6,
@@ -99,7 +99,7 @@ impl PkmFormat {
         match self {
             Self::PK1 => Generation::G1,
             Self::PK2 => Generation::G2,
-            Self::PK3 | Self::ColoPkm | Self::XdPkm => Generation::G3,
+            Self::PK3 | Self::Colopkm | Self::Xdpkm => Generation::G3,
             Self::PK4 => Generation::G4,
             Self::PK5 => Generation::G5,
             Self::PK6 => Generation::G6,
@@ -128,8 +128,8 @@ impl PkmFormat {
             | Self::PK3
             | Self::PK3RR
             | Self::PK3UB
-            | Self::ColoPkm
-            | Self::XdPkm
+            | Self::Colopkm
+            | Self::Xdpkm
             | Self::PK4
             | Self::PK5
             | Self::PK6
@@ -150,7 +150,7 @@ impl PkmFormat {
     const fn link_trade_location_index(&self) -> u16 {
         match *self {
             Self::PK1 | Self::PK2 => super::location::CANT_TELL_GEN2,
-            Self::PK3 | Self::ColoPkm | Self::XdPkm => LinkTradeIndex::PkmGen3 as u16,
+            Self::PK3 | Self::Colopkm | Self::Xdpkm => LinkTradeIndex::PkmGen3 as u16,
             Self::PK4 => LinkTradeIndex::Pk4 as u16,
             Self::PK5 => LinkTradeIndex::Pk5 as u16,
             Self::PK6
@@ -170,7 +170,7 @@ impl PkmFormat {
     pub fn origin_is_legal(&self, origin: OriginGame) -> bool {
         match self {
             Self::PK1 | Self::PK2 => false,
-            Self::PK3 | Self::ColoPkm | Self::XdPkm => origin.generation() == Generation::G3,
+            Self::PK3 | Self::Colopkm | Self::Xdpkm => origin.generation() == Generation::G3,
             Self::PK4 => {
                 origin.generation() == Generation::G3 || origin.generation() == Generation::G4
             }
@@ -209,7 +209,7 @@ impl PkmFormat {
 
         match self {
             Self::PK1 | Self::PK2 => origin, // doesn't matter; these games don't store origin
-            Self::PK3 | Self::ColoPkm | Self::XdPkm => match origin {
+            Self::PK3 | Self::Colopkm | Self::Xdpkm => match origin {
                 Red | Yellow | LetsGoPikachu => FireRed,
                 BlueGreen | BlueJpn | LetsGoEevee => LeafGreen,
 
@@ -344,7 +344,7 @@ impl PkmFormat {
             Self::PK1 => None,
             Self::PK2 => location::gen2::index_of(location),
             Self::PK3 => location::gen3_gba::index_of(location),
-            Self::ColoPkm | Self::XdPkm => match location {
+            Self::Colopkm | Self::Xdpkm => match location {
                 Location::LinkTrade => Some(254),
                 _ => None,
             },
@@ -895,8 +895,8 @@ impl PkmFormat {
 
                 MetData::new(legalized_origin, location_index)
             }
-            PkmFormat::ColoPkm
-            | PkmFormat::XdPkm
+            PkmFormat::Colopkm
+            | PkmFormat::Xdpkm
             | PkmFormat::PK4
             | PkmFormat::PK5
             | PkmFormat::PK6
@@ -934,7 +934,7 @@ impl PkmFormat {
             Self::PK1 => MetadataSource::RedBlue,
             Self::PK2 => MetadataSource::GoldSilver,
             Self::PK3 => MetadataSource::RubySapphire,
-            Self::ColoPkm | Self::XdPkm => MetadataSource::RubySapphire,
+            Self::Colopkm | Self::Xdpkm => MetadataSource::RubySapphire,
             Self::PK4 => MetadataSource::DiamondPearl,
             Self::PK5 => MetadataSource::BlackWhite,
             Self::PK6 => MetadataSource::XY,

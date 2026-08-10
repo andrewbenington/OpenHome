@@ -131,6 +131,18 @@ macro_rules! read_i32_be {
 }
 
 #[macro_export]
+macro_rules! read_i32_le {
+    ($bytes:expr, $start:expr) => {
+        i32::from_le_bytes([
+            $bytes[$start],
+            $bytes[$start + 1],
+            $bytes[$start + 2],
+            $bytes[$start + 3],
+        ])
+    };
+}
+
+#[macro_export]
 macro_rules! read_u64_le {
     ($bytes:expr, $start:expr) => {
         u64::from_le_bytes([
