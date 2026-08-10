@@ -18,8 +18,7 @@ pub struct PkmConverter {
 }
 
 impl PkmConverter {
-    pub fn new(dest_pkm_format: PkmFormat, strategy: ConvertStrategy) -> Self {
-        crate::log!("dest_pkm_format: {dest_pkm_format:?}");
+    pub const fn new(dest_pkm_format: PkmFormat, strategy: ConvertStrategy) -> Self {
         Self {
             dest_pkm_format,
             strategy,

@@ -145,12 +145,12 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
 
     fn set_u32_be(&mut self, offset: Offset, v: u32) {
         let offset = offset as usize;
-        self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
+        self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_be_bytes());
     }
 
     fn set_i32_be(&mut self, offset: Offset, v: i32) {
         let offset = offset as usize;
-        self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
+        self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_be_bytes());
     }
 
     fn set_flag(&mut self, offset: Offset, bit_index: usize, v: bool) {

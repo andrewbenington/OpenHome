@@ -237,10 +237,21 @@ impl OhpkmV2 {
     pub fn convert_without_backup<PKM: OhpkmConvert>(other: &PKM) -> Self {
         Self {
             main_data: other.to_main_data(),
+            gameboy_data: None,
+            gen45_data: None,
+            orre_data: other.to_orre_data(),
             gen67_data: other.to_gen_67_data(),
             swsh_data: other.to_swsh_data(),
+            bdsp_data: None,
+            la_data: None,
             sv_data: other.to_sv_data(),
-            ..Default::default()
+            handler_data: vec![],
+            plugin_data: None,
+            notes: None,
+            most_recent_save: None,
+            tags: None,
+            original_data: None,
+            unconverted_pkm: None,
         }
     }
 

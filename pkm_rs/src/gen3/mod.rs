@@ -1,4 +1,4 @@
-mod colopkm;
+pub mod colopkm;
 mod colopkm_buffer;
 mod pk3;
 mod pk3_buffer;
