@@ -25,6 +25,7 @@ use pkm_rs_resources::species::{FormMetadata, SpeciesMetadata};
 use pkm_rs_resources::{helpers, lookup};
 #[cfg(feature = "wasm")]
 use pkm_rs_types::AbilityNumber;
+use pkm_rs_types::Pokerus;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 use pkm_rs_types::strings::{BigEndian, SizedUtf16String};
@@ -58,7 +59,7 @@ pub struct Colopkm {
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub evs: Stats8,
     pub contest: ContestStats,
-    pub pokerus_byte: u8,
+    pub pokerus: Pokerus,
     #[cfg_attr(feature = "wasm", wasm_bindgen(skip))]
     pub ribbons: Gen3RibbonSet,
     pub nickname: SizedUtf16String<22, BigEndian>,
@@ -113,7 +114,7 @@ impl Colopkm {
                 .gender_from_pid(personality_value),
             evs: buf.evs(),
             contest: buf.contest(),
-            pokerus_byte: buf.pokerus_byte(),
+            pokerus: buf.pokerus(),
             is_egg: buf.is_egg(),
             ribbons: buf.ribbons(),
             nickname: buf.nickname(),
@@ -167,7 +168,7 @@ impl Colopkm {
         );
         buf.set_evs(self.evs);
         buf.set_contest(self.contest);
-        buf.set_pokerus_byte(self.pokerus_byte);
+        buf.set_pokerus(self.pokerus);
         buf.set_ribbons(self.ribbons);
         buf.set_nickname(&self.nickname);
         buf.set_move_slots(&self.moves);
