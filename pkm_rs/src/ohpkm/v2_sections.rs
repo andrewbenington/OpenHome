@@ -18,6 +18,7 @@ mod gen45_data;
 mod gen67_data;
 mod gen8_data;
 mod main_data;
+mod orre_data;
 mod past_handlers;
 
 pub mod pkm_bytes;
@@ -27,6 +28,7 @@ pub(crate) use gen8_data::{BdspData, LegendsArceusData, SwordShieldData};
 pub(crate) use gen45_data::Gen45Data;
 pub(crate) use gen67_data::Gen67Data;
 pub(crate) use main_data::MainDataV2;
+pub(crate) use orre_data::OrreData;
 pub(crate) use past_handlers::PastHandlerDataV2;
 
 #[cfg(feature = "wasm")]

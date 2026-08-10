@@ -41,13 +41,14 @@ pub(super) enum Offset {
     Contest = 0xb2,
     FatefulEncounterJpn = 0xc9,
     FatefulEncounterInt = 0xfb,
+    ShadowExp = 0xc0,
     PokerusStrain = 0xca,
     IsEgg = 0xcb,
     AbilityNumber = 0xcc,
     Markings = 0xcf,
     PokerusDays = 0xd0,
     ShadowId = 0xd8,
-    ShadowGauge = 0xdc,
+    Purification = 0xdc,
     RibbonsContest = 0xb7,
     RibbonsStandard = 0xbd,
 }
@@ -143,6 +144,11 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
     }
 
     fn set_u32_be(&mut self, offset: Offset, v: u32) {
+        let offset = offset as usize;
+        self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
+    }
+
+    fn set_i32_be(&mut self, offset: Offset, v: i32) {
         let offset = offset as usize;
         self.bytes_mut()[offset..offset + 4].copy_from_slice(&v.to_le_bytes());
     }
@@ -306,8 +312,12 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         self.get_u16_be(Offset::ShadowId)
     }
 
-    pub fn shadow_gauge(&self) -> i32 {
-        self.get_i32_be(Offset::ShadowGauge)
+    pub fn purification(&self) -> i32 {
+        self.get_i32_be(Offset::Purification)
+    }
+
+    pub fn shadow_exp(&self) -> u32 {
+        self.get_u32_be(Offset::ShadowExp)
     }
 
     pub fn met_location_index(&self) -> u16 {
@@ -529,8 +539,12 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
         self.set_u16_be(Offset::ShadowId, v);
     }
 
-    pub fn set_shadow_gauge(&mut self, v: u32) {
-        self.set_u32_be(Offset::ShadowGauge, v);
+    pub fn set_purification(&mut self, v: i32) {
+        self.set_i32_be(Offset::Purification, v);
+    }
+
+    pub fn set_shadow_exp(&mut self, v: u32) {
+        self.set_u32_be(Offset::ShadowExp, v);
     }
 
     pub fn set_met_location_index(&mut self, v: u16) {

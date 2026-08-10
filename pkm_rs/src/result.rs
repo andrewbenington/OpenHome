@@ -1,3 +1,4 @@
+use crate::gen3::shadow::BadShadowData;
 use crate::sectioned_data;
 
 use pkm_rs_resources::abilities::ABILITY_MAX;
@@ -63,6 +64,7 @@ pub enum Error {
     StringDecode {
         source: StringErrorSource,
     },
+    ShadowData(BadShadowData),
     Other(String),
 }
 
@@ -169,6 +171,7 @@ impl Display for Error {
                 format!("Invalid tag value {value} for tag type {tag_type}")
             }
             Self::StringDecode { source } => format!("String decode error: {source}"),
+            Self::ShadowData(err) => err.to_string(),
             Self::Other(msg) => msg.clone(),
         };
 
@@ -213,6 +216,12 @@ impl From<sectioned_data::Error> for Error {
 impl From<pkm_rs_types::InvalidAbilityNumber> for Error {
     fn from(value: InvalidAbilityNumber) -> Self {
         Self::AbilityNumber(value)
+    }
+}
+
+impl From<BadShadowData> for Error {
+    fn from(value: BadShadowData) -> Self {
+        Self::ShadowData(value)
     }
 }
 

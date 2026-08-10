@@ -5,6 +5,7 @@ use pkm_rs_types::{AbilityNumber, Generation, PokeDate, Stats16};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
+use crate::gen3::shadow::{Purification, ShadowIdColosseum};
 use crate::gen3::{Colopkm, Gen3PokemonIndex, PK3_MAX_ABILITY};
 use crate::ohpkm::OhpkmV2;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
@@ -90,16 +91,20 @@ impl OhpkmConvert for Colopkm {
             met_level: self.met_level,
             met_date: PokeDate::today(),
             trainer_gender: self.trainer_gender,
+            is_shadow: !matches!(self.purification, Purification::Purified),
             ..Default::default()
         }
     }
 
-    fn to_gen_67_data(&self) -> Option<ohpkm::v2_sections::Gen67Data> {
-        None
+    fn to_orre_data(&self) -> Option<ohpkm::v2_sections::OrreData> {
+        Some(ohpkm::v2_sections::OrreData {
+            purification: self.purification,
+            shadow_exp: self.shadow_exp,
+        })
     }
 
     fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
-        let converter = PkmConverter::new(PkmFormat::PK3, strategy);
+        let converter = PkmConverter::new(PkmFormat::Colopkm, strategy);
         let met_data = converter.met_data(ohpkm);
 
         let personality_value = if ohpkm.game_of_origin().generation() != Generation::G3 {
@@ -108,6 +113,24 @@ impl OhpkmConvert for Colopkm {
             personality_value::flip_most_significant_bit(ohpkm.personality_value())
         } else {
             ohpkm.personality_value()
+        };
+
+        let shadow_id = if let Some(Purification::ShadowGauge(_)) = ohpkm.purification() {
+            ShadowIdColosseum::by_ndex(ohpkm.species_and_form().get_ndex())
+        } else {
+            None
+        };
+
+        let purification = if shadow_id.is_some() {
+            ohpkm.purification().unwrap_or_default()
+        } else {
+            Purification::Purified
+        };
+
+        let shadow_exp = if shadow_id.is_some() {
+            ohpkm.shadow_exp().unwrap_or(0)
+        } else {
+            0
         };
 
         let mut mon = Self {
@@ -145,8 +168,9 @@ impl OhpkmConvert for Colopkm {
             trainer_gender: ohpkm.trainer_gender(),
             game_of_origin: met_data.origin,
             language: ohpkm.language(),
-            shadow_gauge: 0,
-            shadow_id: 0,
+            purification,
+            shadow_exp,
+            shadow_id,
             stat_level: 0,
             current_hp: 0,
             stats: Stats16::default(),
@@ -169,47 +193,16 @@ impl OhpkmConvert for Colopkm {
     }
 
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
-        if bytes.len() == gen3::BOX_SIZE_GBA {
-            let mut extended = bytes.to_vec();
-            extended.resize(gen3::PARTY_SIZE_GBA, 0);
-            return extended
-                .try_into()
-                .map_err(|_| {
-                    Error::buffer_size_with_source(
-                        "Pk3::OhpkmConvert::bytes_to_stored",
-                        gen3::PARTY_SIZE_GBA,
-                        bytes.len(),
-                    )
-                })
-                .map(StoredPkmBytes::Pk3);
-        }
         bytes
             .try_into()
-            .map_err(|_| {
+            .map_err(|e| {
+                dbg!(e, bytes.len(), gen3::PKM_DATA_SIZE_GCN);
                 Error::buffer_size_with_source(
-                    "Pk3::OhpkmConvert::bytes_to_stored",
-                    gen3::PARTY_SIZE_GBA,
+                    "Colopkm::OhpkmConvert::bytes_to_stored",
+                    gen3::PKM_DATA_SIZE_GCN,
                     bytes.len(),
                 )
             })
-            .map(StoredPkmBytes::Pk3)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::{gen3::Pk3, tests, traits::IsShiny};
-    use std::path::PathBuf;
-
-    #[test]
-    fn xor_gt_8_lt_16_doesnt_make_shiny() -> tests::TestResult<()> {
-        let path = PathBuf::from("pk3").join("z006 - Salamence.pkm");
-        let pk3 = tests::pkm_from_file::<Pk3>(&path)?.0;
-
-        let ohpkm = pk3.to_ohpkm()?;
-
-        assert_eq!(pk3.is_shiny(), ohpkm.is_shiny());
-
-        Ok(())
+            .map(StoredPkmBytes::Colopkm)
     }
 }

@@ -3,6 +3,8 @@ use super::colopkm_buffer::ColopkmBufferMut;
 use crate::convert_strategy::ConvertStrategy;
 #[cfg(feature = "wasm")]
 use crate::gen3::Gen3PokemonIndex;
+use crate::gen3::shadow::Purification;
+use crate::gen3::shadow::ShadowIdColosseum;
 use crate::ohpkm::OhpkmConvert;
 use crate::ohpkm::OhpkmV2;
 #[cfg(feature = "wasm")]
@@ -70,8 +72,9 @@ pub struct Colopkm {
     pub is_egg: bool,
     pub trainer_name: SizedUtf16String<22, BigEndian>,
     pub trainer_friendship: u8,
-    pub shadow_id: u16,
-    pub shadow_gauge: i32,
+    pub shadow_id: Option<ShadowIdColosseum>,
+    pub purification: Purification,
+    pub shadow_exp: u32,
     pub met_location_index: u16,
     pub ball: Ball,
     pub met_level: u8,
@@ -122,8 +125,9 @@ impl Colopkm {
             ivs: buf.ivs(),
             trainer_name: buf.trainer_name(),
             trainer_friendship: buf.trainer_friendship() as u8,
-            shadow_id: buf.shadow_id(),
-            shadow_gauge: buf.shadow_gauge(),
+            shadow_id: ShadowIdColosseum::from_u16(buf.shadow_id())?,
+            purification: Purification::from_i32(buf.purification())?,
+            shadow_exp: buf.shadow_exp(),
             met_location_index: buf.met_location_index(),
             ball: buf.ball(),
             met_level: buf.met_level(),
@@ -169,26 +173,29 @@ impl Colopkm {
         buf.set_evs(self.evs.into());
         buf.set_contest(self.contest);
         buf.set_pokerus(self.pokerus);
+        buf.set_is_egg(self.is_egg);
         buf.set_ribbons(self.ribbons);
         buf.set_nickname(&self.nickname);
         buf.set_move_slots(&self.moves);
         buf.set_ivs(&self.ivs);
-        buf.set_is_egg(self.is_egg);
         buf.set_trainer_name(&self.trainer_name);
         buf.set_trainer_friendship(self.trainer_friendship as u16);
+        buf.set_shadow_id(self.shadow_id.map_or(0, |id| id.to_u16()));
+        buf.set_purification(self.purification.to_i32());
+        buf.set_shadow_exp(self.shadow_exp);
         buf.set_met_location_index(self.met_location_index);
         buf.set_ball(self.ball);
         buf.set_met_level(self.met_level);
         buf.set_trainer_gender(self.trainer_gender);
         buf.set_game_of_origin(self.game_of_origin);
         buf.set_language(self.language);
+        buf.set_stat_level(self.stat_level);
+        buf.set_current_hp(self.current_hp);
+        buf.set_stats(self.stats);
     }
 
     pub fn write_to_party_buffer(&self, buf: &mut ColopkmBufferMut) {
         self.write_to_box_buffer(buf);
-        buf.set_stat_level(self.stat_level);
-        buf.set_current_hp(self.current_hp);
-        buf.set_stats(self.stats);
     }
 
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
@@ -627,14 +634,6 @@ mod tests {
     //     // trash bytes should be preserved
     //     assert_eq!(mon_recreated.nickname.bytes()[9], 0x70);
     //     assert_eq!(mon_recreated.nickname.bytes()[8], 0x08);
-
-    //     Ok(())
-    // }
-
-    // #[test]
-    // fn checksum() -> TestResult<()> {
-    //     let mon = tests::pkm_from_file::<Pk3>(&PathBuf::from("pk3").join("blaziken.pkm"))?.0;
-    //     assert_eq!(mon.checksum, mon.calculate_checksum());
 
     //     Ok(())
     // }
