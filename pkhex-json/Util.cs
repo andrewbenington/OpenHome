@@ -91,6 +91,11 @@ public static partial class Util
     return new { cool = pk.ContestCool, beauty = pk.ContestBeauty, cute = pk.ContestCute, smart = pk.ContestSmart, tough = pk.ContestTough, sheen = pk.ContestSheen };
   }
 
+  public static string Pokerus(int strain, int days)
+  {
+    return $"strain {strain}, {days} days remaining";
+  }
+
   static object FormatMoveName(int moveId, GameStrings strings)
   {
     try

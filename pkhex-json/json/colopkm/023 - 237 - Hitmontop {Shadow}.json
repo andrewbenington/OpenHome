@@ -30,7 +30,7 @@
     "tough": 0,
     "sheen": 0
   },
-  "pokerus_byte": 255,
+  "pokerus": "strain 0, 0 days remaining",
   "ribbons": [],
   "nickname": "HITMONTOP",
   "nickname_trash": "004800490054004D004F004E0054004F005000000000",
@@ -76,7 +76,6 @@
   "trainer_gender": "Male",
   "game_of_origin": "Colosseum/XD",
   "language": "English",
-  "status_condition": 0,
   "stat_level": 38,
   "current_hp": 97,
   "stats": {

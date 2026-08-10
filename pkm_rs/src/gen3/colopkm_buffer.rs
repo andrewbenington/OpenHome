@@ -35,7 +35,7 @@ pub(super) enum Offset {
     HeldItem = 0x88,
     CurrentHp = 0x8a,
     Stats = 0x8c,
-    Evs = 0x99,
+    Evs = 0x98,
     Ivs = 0xa4,
     TrainerFriendship = 0xb0,
     Contest = 0xb2,
@@ -211,12 +211,12 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         self.get_flag(Offset::FatefulEncounterInt, 0)
     }
 
-    pub fn evs_raw(&self) -> [u8; 6] {
+    pub fn evs_raw(&self) -> [u8; 12] {
         self.get_array(Offset::Evs)
     }
 
-    pub fn evs(&self) -> Stats8 {
-        Stats8::from_bytes(self.evs_raw())
+    pub fn evs(&self) -> Stats16 {
+        Stats16::from_bytes_be_gcn(self.evs_raw())
     }
 
     pub fn contest_raw(&self) -> [u8; 6] {
@@ -298,8 +298,8 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         SizedUtf16String::from_be_bytes(self.trainer_name_raw())
     }
 
-    pub fn trainer_friendship(&self) -> u8 {
-        self.get_u8(Offset::TrainerFriendship)
+    pub fn trainer_friendship(&self) -> u16 {
+        self.get_u16_be(Offset::TrainerFriendship)
     }
 
     pub fn shadow_id(&self) -> u16 {
@@ -354,7 +354,7 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
     }
 
     pub fn stats(&self) -> Stats16 {
-        Stats16::from_bytes_be(self.stats_raw())
+        Stats16::from_bytes_be_gcn(self.stats_raw())
     }
 
     // ------------------------------------------------------------------
@@ -427,12 +427,12 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
         self.set_flag(Offset::FatefulEncounterInt, 0, v);
     }
 
-    fn set_evs_raw(&mut self, v: &[u8; 6]) {
+    fn set_evs_raw(&mut self, v: &[u8; 12]) {
         self.set_array(Offset::Evs, v);
     }
 
-    pub fn set_evs(&mut self, v: Stats8) {
-        self.set_evs_raw(&v.to_bytes());
+    pub fn set_evs(&mut self, v: Stats16) {
+        self.set_evs_raw(&v.to_bytes_be_gcn());
     }
 
     fn set_contest_raw(&mut self, v: &[u8; 6]) {
@@ -521,8 +521,8 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
         self.set_trainer_name_raw(&v.bytes());
     }
 
-    pub fn set_trainer_friendship(&mut self, v: u8) {
-        self.set_u8(Offset::TrainerFriendship, v);
+    pub fn set_trainer_friendship(&mut self, v: u16) {
+        self.set_u16_be(Offset::TrainerFriendship, v);
     }
 
     pub fn set_shadow_id(&mut self, v: u16) {
@@ -581,7 +581,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
     }
 
     pub fn set_stats(&mut self, v: Stats16) {
-        self.set_stats_raw(v.to_bytes_be());
+        self.set_stats_raw(v.to_bytes_be_gcn());
     }
 
     // ------------------------------------------------------------------

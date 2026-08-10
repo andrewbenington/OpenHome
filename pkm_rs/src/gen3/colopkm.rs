@@ -112,7 +112,7 @@ impl Colopkm {
             gender: SpeciesForm::base_form(pokemon_index.to_national_dex())
                 .get_forme_metadata()
                 .gender_from_pid(personality_value),
-            evs: buf.evs(),
+            evs: buf.evs().to_stats8_truncated(),
             contest: buf.contest(),
             pokerus: buf.pokerus(),
             is_egg: buf.is_egg(),
@@ -121,7 +121,7 @@ impl Colopkm {
             moves: buf.move_slots(),
             ivs: buf.ivs(),
             trainer_name: buf.trainer_name(),
-            trainer_friendship: buf.trainer_friendship(),
+            trainer_friendship: buf.trainer_friendship() as u8,
             shadow_id: buf.shadow_id(),
             shadow_gauge: buf.shadow_gauge(),
             met_location_index: buf.met_location_index(),
@@ -166,7 +166,7 @@ impl Colopkm {
         buf.set_is_fateful_encounter_int(
             self.is_fateful_encounter && self.language != Language::Japanese,
         );
-        buf.set_evs(self.evs);
+        buf.set_evs(self.evs.into());
         buf.set_contest(self.contest);
         buf.set_pokerus(self.pokerus);
         buf.set_ribbons(self.ribbons);
@@ -175,7 +175,7 @@ impl Colopkm {
         buf.set_ivs(&self.ivs);
         buf.set_is_egg(self.is_egg);
         buf.set_trainer_name(&self.trainer_name);
-        buf.set_trainer_friendship(self.trainer_friendship);
+        buf.set_trainer_friendship(self.trainer_friendship as u16);
         buf.set_met_location_index(self.met_location_index);
         buf.set_ball(self.ball);
         buf.set_met_level(self.met_level);

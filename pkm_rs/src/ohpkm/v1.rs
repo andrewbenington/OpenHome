@@ -211,7 +211,9 @@ impl OhpkmV1 {
             unknown_a0: u32::from_le_bytes(bytes[160..164].try_into().unwrap()),
             gvs: Stats8::from_bytes(bytes[164..170].try_into().unwrap()),
             dvs: StatsPreSplit::from_dv_bytes(bytes[170..172].try_into().unwrap()),
-            handler_name: SizedUtf16String::<26>::from_le_bytes(bytes[184..210].try_into().unwrap()),
+            handler_name: SizedUtf16String::<26>::from_le_bytes(
+                bytes[184..210].try_into().unwrap(),
+            ),
             handler_language: bytes[211],
             is_current_handler: util::get_flag(bytes, 212, 0),
             resort_event_status: bytes[213],
@@ -253,7 +255,9 @@ impl OhpkmV1 {
             geolocations: Geolocations::from_bytes(bytes[249..259].try_into().unwrap()),
             encounter_type: bytes[270],
             performance: bytes[271],
-            trainer_name: SizedUtf16String::<26>::from_le_bytes(bytes[272..298].try_into().unwrap()),
+            trainer_name: SizedUtf16String::<26>::from_le_bytes(
+                bytes[272..298].try_into().unwrap(),
+            ),
             trainer_friendship: bytes[298],
             trainer_memory: TrainerMemory {
                 intensity: bytes[299],
@@ -375,7 +379,7 @@ impl PkmBytes for OhpkmV1 {
         bytes[95] = self.move_pp[3];
 
         bytes[96..122].copy_from_slice(&self.nickname);
-        bytes[122..134].copy_from_slice(&self.avs.to_le_bytes());
+        bytes[122..134].copy_from_slice(&self.avs.to_bytes_le());
 
         bytes[134] = self.move_pp_ups[0];
         bytes[135] = self.move_pp_ups[1];

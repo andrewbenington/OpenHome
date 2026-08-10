@@ -30,7 +30,7 @@
     "tough": 0,
     "sheen": 0
   },
-  "pokerus_byte": 255,
+  "pokerus": "strain 0, 0 days remaining",
   "ribbons": [],
   "nickname": "HO-OH",
   "nickname_trash": "0048004F002D004F0048000000000000000000000000",
@@ -76,7 +76,6 @@
   "trainer_gender": "Male",
   "game_of_origin": "Sapphire",
   "language": "English",
-  "status_condition": 0,
   "stat_level": 70,
   "current_hp": 241,
   "stats": {

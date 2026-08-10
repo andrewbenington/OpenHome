@@ -1029,7 +1029,7 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> Pk9Buffer<S> {
     }
 
     pub fn set_stats(&mut self, v: Stats16) {
-        self.set_stats_raw(v.to_le_bytes());
+        self.set_stats_raw(v.to_bytes_le());
     }
 
     pub fn set_current_hp(&mut self, v: u16) {

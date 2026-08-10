@@ -299,25 +299,25 @@ impl Stats16 {
         }
     }
 
-    pub fn from_bytes_be(bytes: [u8; 12]) -> Self {
+    pub fn from_bytes_be_gcn(bytes: [u8; 12]) -> Self {
         Stats16 {
             hp: u16::from_be_bytes(bytes[0..2].try_into().unwrap()),
             atk: u16::from_be_bytes(bytes[2..4].try_into().unwrap()),
             def: u16::from_be_bytes(bytes[4..6].try_into().unwrap()),
-            spe: u16::from_be_bytes(bytes[6..8].try_into().unwrap()),
-            spa: u16::from_be_bytes(bytes[8..10].try_into().unwrap()),
-            spd: u16::from_be_bytes(bytes[10..12].try_into().unwrap()),
+            spa: u16::from_be_bytes(bytes[6..8].try_into().unwrap()),
+            spd: u16::from_be_bytes(bytes[8..10].try_into().unwrap()),
+            spe: u16::from_be_bytes(bytes[10..12].try_into().unwrap()),
         }
     }
 
-    pub fn to_le_bytes(self) -> [u8; 12] {
+    pub fn to_bytes_le(self) -> [u8; 12] {
         u16_le_slice_to_u8([self.hp, self.atk, self.def, self.spe, self.spa, self.spd])
             .try_into()
             .unwrap()
     }
 
-    pub fn to_bytes_be(self) -> [u8; 12] {
-        u16_be_slice_to_u8([self.hp, self.atk, self.def, self.spe, self.spa, self.spd])
+    pub fn to_bytes_be_gcn(self) -> [u8; 12] {
+        u16_be_slice_to_u8([self.hp, self.atk, self.def, self.spa, self.spd, self.spe])
             .try_into()
             .unwrap()
     }
