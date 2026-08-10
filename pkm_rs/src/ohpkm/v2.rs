@@ -14,6 +14,7 @@ use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::id::OpenHomeId;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
+use crate::ohpkm::v2_sections::OrreData;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
 use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
@@ -133,7 +134,7 @@ pub enum OhpkmSectionTag {
     UnconvertedPkm = 0x0E,
     PastHandlerV2 = 0x0F,
     LearnedMoves = 0x10,
-    GcnData = 0x11,
+    GcnData = 0x12,
 
     // deprecated, but can't mark it as such without warnings
     PastHandlerV1 = 0x08,
@@ -144,6 +145,7 @@ impl OhpkmSectionTag {
         match tag {
             0x00 => Some(Self::MainData),
             0x01 => Some(Self::GameboyData),
+            0x12 => Some(Self::GcnData),
             0x02 => Some(Self::Gen45Data),
             0x03 => Some(Self::Gen67Data),
             0x04 => Some(Self::SwordShield),
@@ -1781,6 +1783,7 @@ impl OhpkmV2 {
         let Self {
             main_data,
             gameboy_data,
+            orre_data,
             gen45_data,
             gen67_data,
             swsh_data,
@@ -1800,6 +1803,7 @@ impl OhpkmV2 {
         sectioned_data
             .add(main_data)
             .add_if_some(gameboy_data)
+            .add_if_some(orre_data)
             .add_if_some(gen45_data)
             .add_if_some(gen67_data)
             .add_if_some(swsh_data)
@@ -2040,6 +2044,7 @@ impl OhpkmV2 {
         let Self {
             main_data,
             gameboy_data,
+            orre_data,
             gen45_data,
             gen67_data,
             swsh_data,
@@ -2063,6 +2068,7 @@ impl OhpkmV2 {
         )?;
 
         add_section_bytes_to_js_object(&obj, gameboy_data)?;
+        add_section_bytes_to_js_object(&obj, orre_data)?;
         add_section_bytes_to_js_object(&obj, gen45_data)?;
         add_section_bytes_to_js_object(&obj, gen67_data)?;
         add_section_bytes_to_js_object(&obj, swsh_data)?;

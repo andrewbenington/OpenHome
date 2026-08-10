@@ -69,7 +69,10 @@
   "trainer_name_trash": "0052006F004300000000000000000000000000000000",
   "trainer_friendship": 0,
   "shadow_id": 44,
-  "shadow_gauge": 19875,
+  "purification": {
+    "ShadowGauge": 19875
+  },
+  "shadow_exp": 0,
   "met_location_index": 118,
   "ball": "Ultra",
   "met_level": 55,

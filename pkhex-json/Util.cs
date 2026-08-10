@@ -311,6 +311,18 @@ public static partial class Util
     return teraType.ToString();
   }
 
+  public static object Purification(int purification)
+  {
+    if (purification == -100)
+    {
+      return "Purified";
+    }
+    else
+    {
+      return new { ShadowGauge = purification };
+    }
+  }
+
   [GeneratedRegex(@"(?=[A-Z])")]
   private static partial Regex RibbonRegex();
 }

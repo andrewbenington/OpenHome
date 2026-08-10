@@ -130,7 +130,7 @@ impl MoveSlot {
         }
     }
 
-    pub fn from_bytes_gcn(bytes: &[u8], offset: usize) -> Self {
+    pub const fn from_bytes_gcn(bytes: &[u8], offset: usize) -> Self {
         let pp_offset = offset + 2;
         let pp_ups_offset = offset + 3;
 
