@@ -10,8 +10,8 @@ use pkm_rs_resources::ribbons::{
 };
 use pkm_rs_types::strings::{BigEndian, SizedUtf16String};
 use pkm_rs_types::{
-    BinaryGender, ContestStats, FlagSet, Ivs, MarkingsFourShapes, OriginGame, SimpleAbilityNumber,
-    Stats8, read_i32_be, read_u16_be, read_u32_be,
+    BinaryGender, ContestStats, FlagSet, Ivs, MarkingsFourShapes, OriginGame, Pokerus,
+    SimpleAbilityNumber, Stats8, read_i32_be, read_u16_be, read_u32_be,
 };
 use pkm_rs_types::{Language, Stats16};
 
@@ -37,14 +37,15 @@ pub(super) enum Offset {
     Stats = 0x8c,
     Evs = 0x99,
     Ivs = 0xa4,
+    TrainerFriendship = 0xb0,
     Contest = 0xb2,
     FatefulEncounterJpn = 0xc9,
     FatefulEncounterInt = 0xfb,
-    Pokerus = 0xca,
+    PokerusStrain = 0xca,
     IsEgg = 0xcb,
     AbilityNumber = 0xcc,
     Markings = 0xcf,
-    TrainerFriendship = 0xd0,
+    PokerusDays = 0xd0,
     ShadowId = 0xd8,
     ShadowGauge = 0xdc,
     RibbonsContest = 0xb7,
@@ -56,6 +57,10 @@ impl From<Offset> for usize {
         offset as usize
     }
 }
+
+const MAX_POKERUS_STRAIN: u8 = 0x0f;
+const NO_POKERUS_DAYS: u8 = 0xff;
+const MAX_POKERUS_DAYS: u8 = 0x0f;
 
 // ---------------------------------------------------------------------------
 // ColopkmBuffer<S> — generic over the byte storage so that a single impl block
@@ -222,8 +227,20 @@ impl<S: AsRef<[u8]>> ColopkmBuffer<S> {
         ContestStats::from_bytes(self.contest_raw())
     }
 
-    pub fn pokerus_byte(&self) -> u8 {
-        self.get_u8(Offset::Pokerus)
+    fn pokerus_strain(&self) -> u8 {
+        self.get_u8(Offset::PokerusStrain)
+    }
+
+    fn pokerus_days(&self) -> u8 {
+        match self.get_u8(Offset::PokerusDays) {
+            NO_POKERUS_DAYS => 0,
+            valid_days @ 1..=MAX_POKERUS_DAYS => valid_days,
+            _ => 0,
+        }
+    }
+
+    pub fn pokerus(&self) -> Pokerus {
+        Pokerus::from_components(self.pokerus_strain(), self.pokerus_days())
     }
 
     pub fn is_egg(&self) -> bool {
@@ -426,8 +443,21 @@ impl<S: AsRef<[u8]> + AsMut<[u8]>> ColopkmBuffer<S> {
         self.set_contest_raw(&v.to_bytes());
     }
 
-    pub fn set_pokerus_byte(&mut self, v: u8) {
-        self.set_u8(Offset::Pokerus, v);
+    fn set_pokerus_strain(&mut self, v: u8) {
+        self.set_u8(Offset::PokerusStrain, v);
+    }
+
+    fn set_pokerus_days(&mut self, v: u8) {
+        self.set_u8(Offset::PokerusDays, v);
+    }
+
+    pub fn set_pokerus(&mut self, v: Pokerus) {
+        self.set_pokerus_strain(v.strain().value().min(MAX_POKERUS_STRAIN));
+        let days_byte = match v.days_remaining().value() {
+            NO_POKERUS_DAYS => NO_POKERUS_DAYS,
+            other => other.min(MAX_POKERUS_DAYS),
+        };
+        self.set_pokerus_days(days_byte);
     }
 
     pub fn set_ability_num(&mut self, v: SimpleAbilityNumber) {

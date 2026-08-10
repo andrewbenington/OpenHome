@@ -114,7 +114,7 @@ impl Colopkm {
                 .gender_from_pid(personality_value),
             evs: buf.evs(),
             contest: buf.contest(),
-            pokerus: Pokerus::from_byte(buf.pokerus_byte()),
+            pokerus: buf.pokerus(),
             is_egg: buf.is_egg(),
             ribbons: buf.ribbons(),
             nickname: buf.nickname(),
@@ -168,7 +168,7 @@ impl Colopkm {
         );
         buf.set_evs(self.evs);
         buf.set_contest(self.contest);
-        buf.set_pokerus_byte(self.pokerus.to_byte());
+        buf.set_pokerus(self.pokerus);
         buf.set_ribbons(self.ribbons);
         buf.set_nickname(&self.nickname);
         buf.set_move_slots(&self.moves);
