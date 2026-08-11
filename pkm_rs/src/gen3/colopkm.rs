@@ -571,8 +571,10 @@ mod tests {
 
     // #[test]
     // fn to_from_bytes() -> TestResult<()> {
-    //     tests::to_from_bytes_all_in_dir::<Pk3>(
-    //         &PathBuf::from("test-files").join("pkm-files").join("pk3"),
+    //     tests::to_from_bytes_all_in_dir::<Colopkm>(
+    //         &PathBuf::from("test-files")
+    //             .join("pkm-files")
+    //             .join("colopkm"),
     //     )
     // }
 

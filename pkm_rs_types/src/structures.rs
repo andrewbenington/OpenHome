@@ -327,10 +327,10 @@ impl<'a, const N: usize, FLAG: Copy + Into<usize> + From<usize>> Iterator
     fn next(&mut self) -> Option<FLAG> {
         while self.index < N * 8 {
             let flag = FLAG::from(self.index);
+            self.index += 1;
             if self.flag_set.get_flag(flag) {
                 return Some(flag);
             }
-            self.index += 1;
         }
         None
     }
