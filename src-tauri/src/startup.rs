@@ -6,16 +6,16 @@ use openhome_core::lookup::{GEN12_FILENAME, GEN345_FILENAME};
 use openhome_core::pkm_storage::StoredBankData;
 use openhome_core::{Error, Result};
 use std::path::Path;
-use tauri::{App, Emitter, Manager};
+use tauri::{App, AppHandle, Emitter, Manager};
 
 const BANKS_FILENAME: &str = "banks.json";
 const LOGS_DIR: &str = "logs";
 
 #[cfg(not(target_os = "linux"))]
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
+use crate::versioning::UpdateFeatures;
 
-pub fn run_app_startup(app: &App) -> Result<Vec<versioning::UpdateFeatures>> {
-    let handle = app.handle().clone();
+fn run_startup_async(app: &&App, handle: &AppHandle) -> Result<Vec<UpdateFeatures>> {
     logging::init_logging(
         &Path::join(
             &tauri::Manager::path(&handle)

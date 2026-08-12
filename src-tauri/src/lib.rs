@@ -79,6 +79,10 @@ pub fn run() {
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
+
+
+            let handle = app.handle().clone();
+
             let startup_config_state = match startup_config::StartupConfigState::load_or_create() {
                 Ok(state) => state,
                 Err(err) => {
@@ -90,7 +94,8 @@ pub fn run() {
             };
             app.manage(startup_config_state);
 
-            let update_features_r = startup::run_app_startup(app);
+            let update_features_r = startup::run_startup_async(&app, &handle);
+
             let Ok(update_features) = update_features_r else {
                 let launch_error = update_features_r.unwrap_err();
                 match launch_error {
