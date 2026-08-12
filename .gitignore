@@ -56,3 +56,6 @@ target/
 *.wakatime-project
 .idea/
 .zed/
+
+.envrc
+.direnv/
