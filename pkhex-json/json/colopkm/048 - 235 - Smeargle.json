@@ -68,9 +68,13 @@
   "trainer_name": "RoC",
   "trainer_name_trash": "0052006F004300000000000000000000000000000000",
   "trainer_friendship": 70,
-  "shadow_id": 55,
-  "purification": "Purified",
-  "shadow_exp": 0,
+  "shadow_data": {
+    "id": {
+      "colo": 55
+    },
+    "exp": 0,
+    "purification": "purified"
+  },
   "met_location_index": 132,
   "ball": "Ultra",
   "met_level": 45,

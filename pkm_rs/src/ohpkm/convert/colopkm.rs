@@ -6,9 +6,9 @@ use pkm_rs_types::{AbilityNumber, Generation, PokeDate, Stats16};
 use super::OhpkmConvert;
 use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
 use crate::gen3::colopkm::ColosseumPkmString;
-use crate::gen3::shadow::{Purification, ShadowIdColosseum};
 use crate::gen3::{Colopkm, Gen3PokemonIndex, PK3_MAX_ABILITY};
 use crate::ohpkm::OhpkmV2;
+use crate::ohpkm::v2_sections::OrreData;
 use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
 use crate::result::{Error, Result};
 use crate::{format::PkmFormat, traits::HasSpeciesAndForm};
@@ -92,16 +92,13 @@ impl OhpkmConvert for Colopkm {
             met_level: self.met_level,
             met_date: PokeDate::today(),
             trainer_gender: self.trainer_gender,
-            is_shadow: !matches!(self.purification, Purification::Purified),
+            is_shadow: self.shadow_data.is_some(),
             ..Default::default()
         }
     }
 
-    fn to_orre_data(&self) -> Option<ohpkm::v2_sections::OrreData> {
-        self.shadow_id.map(|_| ohpkm::v2_sections::OrreData {
-            purification: self.purification,
-            shadow_exp: self.shadow_exp,
-        })
+    fn to_orre_data(&self) -> Option<OrreData> {
+        self.shadow_data.map(OrreData)
     }
 
     fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
@@ -114,24 +111,6 @@ impl OhpkmConvert for Colopkm {
             personality_value::flip_most_significant_bit(ohpkm.personality_value())
         } else {
             ohpkm.personality_value()
-        };
-
-        let shadow_id = if let Some(Purification::ShadowGauge(_)) = ohpkm.purification() {
-            ShadowIdColosseum::by_ndex(ohpkm.species_and_form().get_ndex())
-        } else {
-            None
-        };
-
-        let purification = if shadow_id.is_some() {
-            ohpkm.purification().unwrap_or_default()
-        } else {
-            Purification::Purified
-        };
-
-        let shadow_exp = if shadow_id.is_some() {
-            ohpkm.shadow_exp().unwrap_or(0)
-        } else {
-            0
         };
 
         let mut nickname = ColosseumPkmString::from(converter.nickname(ohpkm));
@@ -182,9 +161,7 @@ impl OhpkmConvert for Colopkm {
             trainer_gender: ohpkm.trainer_gender(),
             game_of_origin: met_data.origin,
             language: ohpkm.language(),
-            purification,
-            shadow_exp,
-            shadow_id,
+            shadow_data: ohpkm.shadow_data(),
             stat_level: 0,
             current_hp: 0,
             stats: Stats16::default(),

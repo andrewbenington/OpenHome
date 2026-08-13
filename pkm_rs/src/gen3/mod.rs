@@ -1,21 +1,21 @@
-pub mod colopkm;
 mod colopkm_buffer;
 mod pk3;
 mod pk3_buffer;
 mod pokemon_index;
-pub mod shadow;
 
-// mod save;
+pub mod colopkm;
+pub mod shadow;
 
 pub use colopkm::Colopkm;
 pub use pk3::*;
-use pkm_rs_types::NationalDex;
 pub use pokemon_index::Gen3PokemonIndex;
 
 use pk3_buffer::Offset;
 use pk3_buffer::Pk3Buffer;
 use pkm_rs_resources;
-use pkm_rs_resources::{abilities::AbilityIndexBounded, moves::MoveDataOffsets};
+use pkm_rs_resources::abilities::AbilityIndexBounded;
+use pkm_rs_resources::moves::MoveDataOffsets;
+use pkm_rs_types::NationalDex;
 
 pub(crate) const BOX_SIZE_GBA: usize = 80;
 pub(crate) const PARTY_SIZE_GBA: usize = 100;
@@ -29,8 +29,6 @@ const MOVE_DATA_OFFSETS_GBA: MoveDataOffsets<Offset> = MoveDataOffsets {
 const AIR_LOCK: u16 = 76;
 pub const PK3_MAX_ABILITY: u16 = AIR_LOCK;
 pub type Gen3AbilityIndex = AbilityIndexBounded<AIR_LOCK>;
-
-pub(crate) const PKM_DATA_SIZE_GCN: usize = 312;
 
 #[cfg(test)]
 const MAX_BOX_COUNT_GCN: u8 = 32;
