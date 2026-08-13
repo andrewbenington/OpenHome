@@ -1,9 +1,9 @@
-use crate::gen3::shadow::{Purification, ShadowIdColosseum, ShadowIdXd};
+use crate::gen3::shadow::{ColoShadowId, ShadowData, ShadowId, XdShadowId};
 use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
 
-use pkm_rs_types::{read_i32_le, read_u32_le};
+use pkm_rs_types::{NationalDex, read_i32_le, read_u32_le};
 
 use serde::Serialize;
 
@@ -15,11 +15,8 @@ use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, Serialize, Clone, Copy)]
-pub struct OrreData {
-    pub purification: Purification,
-    pub shadow_exp: u32,
-}
+#[derive(Debug, Serialize, Clone, Copy)]
+pub struct OrreData(pub ShadowData);
 
 impl OrreData {
     // Because the shadow gauge was not tracked in v1, give any Pokémon marked as shadow the
@@ -29,23 +26,26 @@ impl OrreData {
             return None;
         }
 
-        if let Some(shadow_id) = ShadowIdColosseum::by_ndex(old.species_and_form.get_ndex()) {
-            let species_initial_shadow_gauge = shadow_id.initial_shadow_gauge();
+        let national_dex = old.species_and_form.get_ndex();
 
-            Some(Self {
-                purification: Purification::from_i32(species_initial_shadow_gauge).ok()?,
-                shadow_exp: 0,
-            })
-        } else if let Some(shadow_id) = ShadowIdXd::by_ndex(old.species_and_form.get_ndex()) {
-            let species_initial_shadow_gauge = shadow_id.initial_shadow_gauge();
-
-            Some(Self {
-                purification: Purification::from_i32(species_initial_shadow_gauge).ok()?,
-                shadow_exp: 0,
-            })
+        let shadow_id = if national_dex == NationalDex::Makuhita {
+            makuhita_id(old.is_fateful_encounter)
+        } else if let Some(shadow_id) = ColoShadowId::by_ndex(national_dex) {
+            ShadowId::Colo(shadow_id)
         } else {
-            None
-        }
+            let shadow_id = XdShadowId::by_ndex(national_dex)?;
+            ShadowId::Xd(shadow_id)
+        };
+
+        Some(Self(ShadowData::full_shadow_gauge(shadow_id)))
+    }
+}
+
+fn makuhita_id(fateful_encounter: bool) -> ShadowId {
+    if fateful_encounter {
+        ShadowId::makuhita_xd()
+    } else {
+        ShadowId::makuhita_colo()
     }
 }
 
@@ -57,22 +57,24 @@ impl DataSection for OrreData {
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::ensure_buffer_size(bytes);
 
-        Ok(Self {
-            purification: Purification::from_i32(read_i32_le!(bytes, 0))?,
-            shadow_exp: read_u32_le!(bytes, 4),
-        })
+        let id = ShadowId::from_bytes(bytes[0..1].try_into().unwrap())?;
+        let purification = read_i32_le!(bytes, 2);
+        let exp = read_u32_le!(bytes, 6);
+
+        Ok(Self(ShadowData::try_new(id, purification, exp)?))
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0u8; 8];
+        let mut bytes = [0u8; 10];
 
-        bytes[0..4].copy_from_slice(&self.purification.to_i32().to_le_bytes());
-        bytes[4..8].copy_from_slice(&self.shadow_exp.to_le_bytes());
+        bytes[0..2].copy_from_slice(&self.0.id().to_raw_u16().to_le_bytes());
+        bytes[2..6].copy_from_slice(&self.0.purification().to_i32().to_le_bytes());
+        bytes[6..10].copy_from_slice(&self.0.exp().to_le_bytes());
 
         bytes.to_vec()
     }
 
     fn is_empty(&self) -> bool {
-        matches!(self.purification, Purification::Purified)
+        false
     }
 }

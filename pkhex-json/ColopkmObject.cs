@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using PKHeX.Core;
 
@@ -9,6 +10,7 @@ public static class ColopkmObject
         pk.ResetPartyStats();
         var languageCode = Language.GetLanguageCode((LanguageID)pk.Language);
         var strings = GameInfo.GetStrings(languageCode);
+        String nil = null;
         return new
         {
             pokemon_index = pk.SpeciesInternal,
@@ -33,9 +35,7 @@ public static class ColopkmObject
             trainer_name = pk.OriginalTrainerName,
             trainer_name_trash = System.Convert.ToHexString(pk.OriginalTrainerTrash),
             trainer_friendship = pk.OriginalTrainerFriendship,
-            shadow_id = pk.ShadowID == 0 ? null : (object)pk.ShadowID,
-            purification = Util.Purification(pk.Purification),
-            shadow_exp = pk.EXP_Shadow,
+            shadow_data = Util.ShadowData(pk),
             met_location_index = pk.MetLocation,
             ball = Util.FormatBall(pk, strings),
             met_level = pk.MetLevel,

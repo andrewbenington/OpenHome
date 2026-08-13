@@ -16,6 +16,10 @@ pub trait AsBytes {
 
 pub trait AsBytesMut {
     fn as_bytes_mut(&mut self) -> &mut [u8];
+
+    fn zero_out(&mut self) {
+        self.as_bytes_mut().iter_mut().for_each(|b| *b = 0);
+    }
 }
 
 pub struct Reader<'a> {

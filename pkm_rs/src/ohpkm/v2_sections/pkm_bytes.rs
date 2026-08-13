@@ -1,5 +1,4 @@
 use crate::format::PkmFormat;
-use crate::gen3::PKM_DATA_SIZE_GCN;
 use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
@@ -24,6 +23,8 @@ const PA9_SIZE: usize = 344;
 const PK3CFRU_PARTY_SIZE: usize = 58;
 const PB8LUMI_SIZE: usize = 344;
 
+#[cfg(feature = "wasm")]
+use crate::gen3::PKM_DATA_SIZE_GCN;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -147,7 +148,7 @@ pub enum StoredPkmBytes {
     Pk1([u8; PK1_PARTY_SIZE]),
     Pk2([u8; PK2_PARTY_SIZE]),
     Pk3([u8; PK3_PARTY_SIZE]),
-    Colopkm([u8; PKM_DATA_SIZE_GCN]),
+    Colopkm([u8; COLOPKM_SIZE]),
     Pk4([u8; PK4_PARTY_SIZE]),
     Pk5([u8; PK5_PARTY_SIZE]),
     Pk6([u8; PK6_PARTY_SIZE]),

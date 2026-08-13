@@ -4,7 +4,6 @@ use super::v2_sections::{
     BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
     Notes, PluginData, ScarletVioletData, SwordShieldData,
 };
-use crate::gen3::shadow::Purification;
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
 use crate::ohpkm::deprecated::PastHandlerDataV1;
@@ -41,6 +40,8 @@ use pkm_rs_types::randomize::Randomize;
 
 #[cfg(feature = "wasm")]
 use super::JsResult;
+#[cfg(feature = "wasm")]
+use crate::gen3::shadow::ShadowData;
 #[cfg(feature = "wasm")]
 use crate::gen9_sv;
 #[cfg(feature = "wasm")]
@@ -182,7 +183,7 @@ impl OhpkmSectionTag {
             Self::Tag => 0,
             Self::OriginalBackup => 2, // Size of the tag
             Self::UnconvertedPkm => 2, // Size of the tag
-            Self::GcnData => 8,
+            Self::GcnData => 10,       // id (2), purification (4), exp (4)
 
             #[allow(deprecated)]
             Self::PastHandlerV1 => 39,
@@ -858,36 +859,14 @@ impl OhpkmV2 {
 
     // Gamecube
 
-    pub fn purification(&self) -> Option<Purification> {
-        self.orre_data.map(|o| o.purification)
+    #[cfg(feature = "wasm")]
+    pub fn shadow_data(&self) -> Option<ShadowData> {
+        self.orre_data.map(|data| data.0)
     }
 
-    pub fn set_purification(&mut self, v: Option<Purification>) {
-        match v {
-            Some(purification) => {
-                self.orre_data.get_or_insert_default().purification = purification
-            }
-            None => {
-                if let Some(orre_data) = &mut self.orre_data {
-                    orre_data.purification = Purification::Purified
-                }
-            }
-        }
-    }
-
-    pub fn shadow_exp(&self) -> Option<u32> {
-        self.orre_data.map(|o| o.shadow_exp)
-    }
-
-    pub fn set_shadow_exp(&mut self, v: Option<u32>) {
-        match v {
-            Some(shadow_exp) => self.orre_data.get_or_insert_default().shadow_exp = shadow_exp,
-            None => {
-                if let Some(orre_data) = &mut self.orre_data {
-                    orre_data.shadow_exp = 0
-                }
-            }
-        }
+    #[cfg(feature = "wasm")]
+    pub fn set_shadow_data(&mut self, v: Option<ShadowData>) {
+        self.orre_data = v.map(OrreData);
     }
 
     // Gen 4/5

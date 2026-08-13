@@ -1,10 +1,11 @@
 use super::colopkm_buffer::ColopkmBuffer;
 use super::colopkm_buffer::ColopkmBufferMut;
+use crate::bytes::AsBytesMut;
 use crate::convert_strategy::ConvertStrategy;
 #[cfg(feature = "wasm")]
 use crate::gen3::Gen3PokemonIndex;
-use crate::gen3::shadow::Purification;
-use crate::gen3::shadow::ShadowIdColosseum;
+use crate::gen3::shadow::ShadowData;
+use crate::gen3::shadow::ShadowId;
 use crate::ohpkm::OhpkmConvert;
 use crate::ohpkm::OhpkmV2;
 #[cfg(feature = "wasm")]
@@ -72,9 +73,7 @@ pub struct Colopkm {
     pub is_egg: bool,
     pub trainer_name: ColosseumPkmString,
     pub trainer_friendship: u8,
-    pub shadow_id: Option<ShadowIdColosseum>,
-    pub purification: Purification,
-    pub shadow_exp: u32,
+    pub shadow_data: Option<ShadowData>,
     pub met_location_index: u16,
     pub ball: Ball,
     pub met_level: u8,
@@ -100,6 +99,18 @@ impl Colopkm {
         let pokemon_index = Gen3PokemonIndex::new(buf.gen3_species_index())?;
         let personality_value = buf.personality_value();
         let language = buf.language()?;
+
+        let shadow_id = ShadowId::try_colosseum(buf.shadow_id())?;
+        let shadow_data = if let Some(id) = shadow_id {
+            Some(ShadowData::try_new(
+                id,
+                buf.purification(),
+                buf.shadow_exp(),
+            )?)
+        } else {
+            None
+        };
+
         let mut mon = Colopkm {
             pokemon_index,
             held_item_index: ItemGen3::new(buf.held_item_index()),
@@ -127,9 +138,7 @@ impl Colopkm {
             ivs: buf.ivs(),
             trainer_name: buf.trainer_name(),
             trainer_friendship: buf.trainer_friendship() as u8,
-            shadow_id: ShadowIdColosseum::from_u16(buf.shadow_id())?,
-            purification: Purification::from_i32(buf.purification())?,
-            shadow_exp: buf.shadow_exp(),
+            shadow_data,
             met_location_index: buf.met_location_index(),
             ball: buf.ball(),
             met_level: buf.met_level(),
@@ -157,6 +166,8 @@ impl Colopkm {
     }
 
     pub fn write_to_box_buffer(&self, buf: &mut ColopkmBufferMut) {
+        buf.zero_out();
+
         buf.set_gen3_species_index(self.pokemon_index.into());
         buf.set_held_item_index(self.held_item_index.map_or(0, |i| i.get()));
         buf.set_trainer_id(self.trainer_id);
@@ -181,9 +192,13 @@ impl Colopkm {
         buf.set_ivs(&self.ivs);
         buf.set_trainer_name(&self.trainer_name);
         buf.set_trainer_friendship(self.trainer_friendship as u16);
-        buf.set_shadow_id(self.shadow_id.map_or(0, |id| id.to_u16()));
-        buf.set_purification(self.purification.to_i32());
-        buf.set_shadow_exp(self.shadow_exp);
+
+        if let Some(shadow_data) = self.shadow_data {
+            buf.set_shadow_id(shadow_data.id().to_raw_u16());
+            buf.set_purification(shadow_data.purification().to_i32());
+            buf.set_shadow_exp(shadow_data.exp());
+        };
+
         buf.set_met_location_index(self.met_location_index);
         buf.set_ball(self.ball);
         buf.set_met_level(self.met_level);
