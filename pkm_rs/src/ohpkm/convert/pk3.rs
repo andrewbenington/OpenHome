@@ -108,7 +108,7 @@ impl OhpkmConvert for Pk3 {
         let mut nickname_gen3 =
             Gen3NicknameString::from_stringlike(converter.nickname(ohpkm), str_encoding);
 
-        // if the nickname has not been otherwise unchanged, use a copy of the original data's nickname
+        // if the nickname is otherwise unchanged, use a copy of the original data's nickname
         // to preserve trash bytes
         if let Some(StoredPkmBytes::Pk3(original_bytes)) = ohpkm.original_data_bytes()
             && let Ok(original_pk3) = Pk3::try_from_bytes(&original_bytes)
