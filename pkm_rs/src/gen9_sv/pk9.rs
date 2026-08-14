@@ -561,12 +561,12 @@ impl Pk9 {
 
     #[wasm_bindgen(getter = teraTypeOriginal)]
     pub fn tera_type_original_wasm(&self) -> TeraType {
-        self.tera_type_original.into()
+        self.tera_type_original
     }
 
     #[wasm_bindgen(setter = teraTypeOriginal)]
     pub fn set_tera_type_original_wasm(&mut self, v: TeraType) {
-        self.tera_type_original = v.into()
+        self.tera_type_original = v
     }
 
     #[wasm_bindgen(getter = teraTypeOverride)]
