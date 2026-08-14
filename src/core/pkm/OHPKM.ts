@@ -37,6 +37,7 @@ import {
   SpeciesForm,
   SpeciesLookup,
   Tag,
+  TeraType,
   TrainerData,
   TrainerMemory,
   updatePidIfWouldBecomeShinyGen345,
@@ -911,7 +912,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.gameOfOriginBattle = otherGameOfOriginBattle
     }
 
-    if (other.teraTypeOverride !== undefined && this.teraTypeOverride !== other.teraTypeOverride) {
+    if (!teraTypesEqual(this.teraTypeOverride, other.teraTypeOverride)) {
       updates.push(syncUpdate('teraTypeOverride', this.teraTypeOverride, other.teraTypeOverride))
       this.teraTypeOverride = other.teraTypeOverride
     }
@@ -1171,4 +1172,15 @@ function objectsEqual(object1: IndexableObject, object2: IndexableObject) {
 
 function isObject(object: unknown): object is IndexableObject {
   return object !== null && typeof object === 'object'
+}
+
+function teraTypesEqual(tt1: Option<TeraType>, tt2: Option<TeraType>) {
+  switch (tt1) {
+    case undefined:
+      return tt2 === undefined
+    case 'Stellar':
+      return tt2 === 'Stellar'
+    default:
+      return isObject(tt2) && tt1.Standard === tt2.Standard
+  }
 }

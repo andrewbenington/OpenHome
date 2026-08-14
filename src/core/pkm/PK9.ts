@@ -20,7 +20,7 @@ import {
   PkmFormat,
   PokeDate,
   SpeciesLookup,
-  TeraTypeWasm,
+  TeraType,
   TrainerMemory,
 } from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from './PKM'
@@ -319,14 +319,14 @@ export default class PK9 {
   get teraTypeOriginal() {
     return this.inner.teraTypeOriginal
   }
-  set teraTypeOriginal(value: TeraTypeWasm) {
+  set teraTypeOriginal(value: TeraType) {
     this.inner.teraTypeOriginal = value
   }
 
   get teraTypeOverride() {
     return this.inner.teraTypeOverride
   }
-  set teraTypeOverride(value: Option<TeraTypeWasm>) {
+  set teraTypeOverride(value: Option<TeraType>) {
     this.inner.teraTypeOverride = value
   }
 
