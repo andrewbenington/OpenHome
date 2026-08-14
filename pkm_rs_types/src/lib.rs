@@ -10,6 +10,8 @@ mod structures;
 mod traits;
 mod util;
 
+pub mod shadow;
+
 pub use bounded::*;
 pub use games::*;
 pub use language::*;

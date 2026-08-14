@@ -51,6 +51,8 @@ use arrayref::array_ref;
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 #[cfg(feature = "wasm")]
+use pkm_rs_types::shadow::ShadowData;
+#[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 const MAGIC_NUMBER: u32 = 0x57575757;

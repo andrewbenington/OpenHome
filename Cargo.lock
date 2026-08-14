@@ -3009,6 +3009,7 @@ dependencies = [
  "static_assertions",
  "strum",
  "strum_macros",
+ "thiserror 2.0.20",
  "time",
  "tsify",
  "wasm-bindgen",

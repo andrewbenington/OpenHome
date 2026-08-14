@@ -4,7 +4,6 @@ mod pk3_buffer;
 mod pokemon_index;
 
 pub mod colopkm;
-pub mod shadow;
 
 pub use colopkm::Colopkm;
 pub use pk3::*;
@@ -19,6 +18,7 @@ use pkm_rs_types::NationalDex;
 
 pub(crate) const BOX_SIZE_GBA: usize = 80;
 pub(crate) const PARTY_SIZE_GBA: usize = 100;
+pub(crate) const PKM_SIZE_COLOSSEUM: usize = 312;
 
 const MOVE_DATA_OFFSETS_GBA: MoveDataOffsets<Offset> = MoveDataOffsets {
     moves: Offset::Moves,

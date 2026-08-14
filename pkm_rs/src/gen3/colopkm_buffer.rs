@@ -81,7 +81,7 @@ pub struct ColopkmBuffer<S: AsRef<[u8]>>(S);
 
 impl<'a> ColopkmBuffer<&'a [u8]> {
     pub fn new(span: &'a [u8]) -> Self {
-        assert_eq!(span.len(), gen3::PKM_DATA_SIZE_GCN);
+        assert_eq!(span.len(), gen3::PKM_SIZE_COLOSSEUM);
         Self(span)
     }
 }
@@ -92,7 +92,7 @@ impl<'a> ColopkmBuffer<&'a [u8]> {
 
 impl<'a> ColopkmBuffer<&'a mut [u8]> {
     pub fn new_mut(span: &'a mut [u8]) -> Self {
-        assert_eq!(span.len(), gen3::PKM_DATA_SIZE_GCN);
+        assert_eq!(span.len(), gen3::PKM_SIZE_COLOSSEUM);
         Self(span)
     }
 }

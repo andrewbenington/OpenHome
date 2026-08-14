@@ -1,7 +1,5 @@
-use serde::Serialize;
-use std::num::NonZeroU8;
-
 use pkm_rs_types::NationalDex;
+use std::num::NonZeroU8;
 
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
@@ -11,7 +9,10 @@ use rand::RngExt;
 use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
+#[cfg_attr(
+    feature = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
+)]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[derive(Debug, Clone, Copy)]
 pub enum ShadowId {
@@ -110,8 +111,11 @@ impl ShadowId {
     }
 }
 
-#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
-#[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
+#[cfg_attr(
+    feature = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
+)]
+#[cfg_attr(feature = "wasm", tsify(into_wasm_abi, from_wasm_abi))]
 #[derive(Debug, Clone, Copy)]
 pub struct ShadowData {
     id: ShadowId,
@@ -171,7 +175,10 @@ impl Randomize for ShadowData {
 }
 
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[cfg_attr(feature = "wasm", derive(tsify::Tsify, serde::Serialize))]
+#[cfg_attr(
+    feature = "wasm",
+    derive(tsify::Tsify, serde::Serialize, serde::Deserialize)
+)]
 #[cfg_attr(feature = "wasm", tsify(into_wasm_abi))]
 #[repr(u8)] // to ensure stable discriminant for storage
 #[derive(Debug, Clone, Copy, Default)]
@@ -224,7 +231,7 @@ pub enum BadShadowData {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, Serialize)]
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
 pub struct ColoShadowId(NonZeroU8);
 
 impl ColoShadowId {
@@ -526,7 +533,7 @@ fn xd_initial_shadow_gauge_by_shadow_id(shadow_id: &XdShadowId) -> u16 {
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, Serialize)]
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
 pub struct XdShadowId(NonZeroU8);
 
 impl XdShadowId {

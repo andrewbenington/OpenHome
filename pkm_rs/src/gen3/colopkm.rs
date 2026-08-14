@@ -4,8 +4,6 @@ use crate::bytes::AsBytesMut;
 use crate::convert_strategy::ConvertStrategy;
 #[cfg(feature = "wasm")]
 use crate::gen3::Gen3PokemonIndex;
-use crate::gen3::shadow::ShadowData;
-use crate::gen3::shadow::ShadowId;
 use crate::ohpkm::OhpkmConvert;
 use crate::ohpkm::OhpkmV2;
 #[cfg(feature = "wasm")]
@@ -31,6 +29,8 @@ use pkm_rs_types::AbilityNumber;
 use pkm_rs_types::Pokerus;
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
+use pkm_rs_types::shadow::ShadowData;
+use pkm_rs_types::shadow::ShadowId;
 use pkm_rs_types::strings::{BigEndian, SizedUtf16String};
 use pkm_rs_types::{
     BinaryGender, ContestStats, Language, MarkingsFourShapes, NationalDex, OriginGame,
@@ -215,10 +215,10 @@ impl Colopkm {
     }
 
     pub fn try_from_bytes(bytes: &[u8]) -> Result<Self> {
-        if bytes.len() == super::PKM_DATA_SIZE_GCN {
+        if bytes.len() == super::PKM_SIZE_COLOSSEUM {
             Self::from_buffer(&ColopkmBuffer::new(bytes))
         } else {
-            Err(Error::buffer_size(super::PKM_DATA_SIZE_GCN, bytes.len()))
+            Err(Error::buffer_size(super::PKM_SIZE_COLOSSEUM, bytes.len()))
         }
     }
 
@@ -285,8 +285,8 @@ impl Colopkm {
 }
 
 impl PkmBytes for Colopkm {
-    const BOX_SIZE: usize = super::PKM_DATA_SIZE_GCN;
-    const PARTY_SIZE: usize = super::PKM_DATA_SIZE_GCN;
+    const BOX_SIZE: usize = super::PKM_SIZE_COLOSSEUM;
+    const PARTY_SIZE: usize = super::PKM_SIZE_COLOSSEUM;
 
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::try_from_bytes(bytes)

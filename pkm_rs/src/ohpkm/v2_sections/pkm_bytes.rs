@@ -8,7 +8,7 @@ use strum_macros::Display;
 const PK1_PARTY_SIZE: usize = 66;
 const PK2_PARTY_SIZE: usize = 73;
 const PK3_PARTY_SIZE: usize = 100;
-const COLOPKM_SIZE: usize = 312;
+pub const COLOPKM_SIZE: usize = 312;
 const PK4_PARTY_SIZE: usize = 236;
 const PK5_PARTY_SIZE: usize = 236;
 const PK6_PARTY_SIZE: usize = 260;
@@ -23,8 +23,6 @@ const PA9_SIZE: usize = 344;
 const PK3CFRU_PARTY_SIZE: usize = 58;
 const PB8LUMI_SIZE: usize = 344;
 
-#[cfg(feature = "wasm")]
-use crate::gen3::PKM_DATA_SIZE_GCN;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
