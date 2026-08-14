@@ -41,13 +41,13 @@ use pkm_rs_types::randomize::Randomize;
 #[cfg(feature = "wasm")]
 use super::JsResult;
 #[cfg(feature = "wasm")]
-use crate::gen3::shadow::ShadowData;
-#[cfg(feature = "wasm")]
 use crate::gen9_sv;
 #[cfg(feature = "wasm")]
 use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::abilities::AbilityIndexWasm;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::shadow::ShadowData;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 

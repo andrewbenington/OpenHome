@@ -1,10 +1,9 @@
-use crate::gen3::shadow::{ColoShadowId, ShadowData, ShadowId, XdShadowId};
 use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
 
+use pkm_rs_types::shadow::{ColoShadowId, ShadowData, ShadowId, XdShadowId};
 use pkm_rs_types::{NationalDex, read_i32_le, read_u32_le};
-
 use serde::Serialize;
 
 #[cfg(feature = "randomize")]
@@ -49,6 +48,12 @@ fn makuhita_id(fateful_encounter: bool) -> ShadowId {
     }
 }
 
+impl From<pkm_rs_types::shadow::BadShadowData> for Error {
+    fn from(value: pkm_rs_types::shadow::BadShadowData) -> Self {
+        Self::PkmRsTypes(pkm_rs_types::Error::from(value))
+    }
+}
+
 impl DataSection for OrreData {
     type TagType = OhpkmSectionTag;
     const TAG: Self::TagType = OhpkmSectionTag::GcnData;
@@ -57,7 +62,8 @@ impl DataSection for OrreData {
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::ensure_buffer_size(bytes);
 
-        let id = ShadowId::from_bytes(bytes[0..1].try_into().unwrap())?;
+        let id = ShadowId::from_bytes(bytes[0..1].try_into().unwrap())
+            .map_err(pkm_rs_types::Error::from)?;
         let purification = read_i32_le!(bytes, 2);
         let exp = read_u32_le!(bytes, 6);
 

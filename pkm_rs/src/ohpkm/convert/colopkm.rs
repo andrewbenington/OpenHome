@@ -180,7 +180,7 @@ impl OhpkmConvert for Colopkm {
             .map_err(|_| {
                 Error::buffer_size_with_source(
                     "Colopkm::OhpkmConvert::bytes_to_stored",
-                    gen3::PKM_DATA_SIZE_GCN,
+                    gen3::PKM_SIZE_COLOSSEUM,
                     bytes.len(),
                 )
             })
