@@ -17,8 +17,6 @@ use pkm_rs_resources::moves::{MoveIndex, MoveSlots};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, ModernRibbonSet};
 use pkm_rs_resources::species::{FormMetadata, SpeciesForm, SpeciesMetadata};
-#[cfg(feature = "wasm")]
-use pkm_rs_types::TeraTypeWasm;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, HyperTraining, Ivs, Language,
@@ -562,23 +560,23 @@ impl Pk9 {
     }
 
     #[wasm_bindgen(getter = teraTypeOriginal)]
-    pub fn tera_type_original_wasm(&self) -> TeraTypeWasm {
+    pub fn tera_type_original_wasm(&self) -> TeraType {
         self.tera_type_original.into()
     }
 
     #[wasm_bindgen(setter = teraTypeOriginal)]
-    pub fn set_tera_type_original_wasm(&mut self, v: TeraTypeWasm) {
+    pub fn set_tera_type_original_wasm(&mut self, v: TeraType) {
         self.tera_type_original = v.into()
     }
 
     #[wasm_bindgen(getter = teraTypeOverride)]
-    pub fn tera_type_override_wasm(&self) -> Option<TeraTypeWasm> {
-        self.tera_type_override.map(TeraTypeWasm::from)
+    pub fn tera_type_override_wasm(&self) -> Option<TeraType> {
+        self.tera_type_override
     }
 
     #[wasm_bindgen(setter = teraTypeOverride)]
-    pub fn set_tera_type_override_wasm(&mut self, v: Option<TeraTypeWasm>) {
-        self.tera_type_override = v.map(TeraType::from)
+    pub fn set_tera_type_override_wasm(&mut self, v: Option<TeraType>) {
+        self.tera_type_override = v
     }
 
     #[wasm_bindgen(getter = obedienceLevel)]
