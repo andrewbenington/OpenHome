@@ -171,6 +171,7 @@ pub enum SignificantUpdate {
     V1_14_1,
     V1_14_2,
     V1_15_0,
+    V1_15_1,
 }
 
 impl SignificantUpdate {
@@ -204,6 +205,7 @@ impl SignificantUpdate {
             Self::V1_14_1 => Version::parse("1.14.1"),
             Self::V1_14_2 => Version::parse("1.14.2"),
             Self::V1_15_0 => Version::parse("1.15.0"),
+            Self::V1_15_1 => Version::parse("1.15.1"),
         }
         .expect("all versions are valid semver")
     }
@@ -342,6 +344,9 @@ impl SignificantUpdate {
                 "PK9 logic has been rewritten in Rust. Loading them should be faster.",
                 "Added a tool for manually re-associating a Pokémon with tracking data. You can do this by right clicking a Pokémon in a box, and selecting 'Fix tracking data' or 'Merge/Recover tracking data'.",
                 "Fixed a bug where tracking data was not properly re-associated with Pokémon in gen 3-5 save files. Pokémon affected by this can be fixed using the previously mentioned tool.",
+            ]),
+            Self::V1_15_1 => Some(vec![
+                "A bug preventing Pokémon data from being re-associated has been fixed. If your Pokémon have been affected by this bug, you can fix them by right clicking on each, choosing 'Merge/Recover Tracking Data', finding and selecting the lost data in the dialog that appears, and confirming the recovery. Please take care to check whether the data you are looking for is the correct data!",
             ]),
             _ => None,
         }
