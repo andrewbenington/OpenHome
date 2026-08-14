@@ -243,7 +243,8 @@ pub enum TeraTypeWasm {
     Dragon,
     Dark,
     Fairy,
-    Stellar,
+
+    Stellar = 99,
 }
 
 #[cfg(feature = "wasm")]
@@ -269,6 +270,8 @@ impl TeraTypeWasm {
             15 => Some(Self::Dragon),
             16 => Some(Self::Dark),
             17 => Some(Self::Fairy),
+
+            99 => Some(Self::Stellar),
             _ => None,
         }
     }

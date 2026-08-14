@@ -1768,7 +1768,15 @@ impl OhpkmV2 {
     }
 
     pub fn fix_errors(&mut self) -> Vec<OhpkmIssue> {
-        self.main_data.fix_errors()
+        let mut fixed_issues = Vec::<OhpkmIssue>::new();
+
+        fixed_issues.append(&mut self.main_data.fix_errors());
+
+        if let Some(sv_data) = self.sv_data.as_mut() {
+            fixed_issues.append(&mut sv_data.fix_errors());
+        }
+
+        fixed_issues
     }
 
     pub fn get_nickname(&self) -> String {
