@@ -11,7 +11,7 @@ interface TypeIconProps {
 }
 
 const TypeIcon = (props: TypeIconProps) => {
-  const type = props.typeIndex ? teraTypeStringFromIndex(props.typeIndex) : props.type
+  const type = props.typeIndex !== undefined ? teraTypeStringFromIndex(props.typeIndex) : props.type
 
   return (
     type && (

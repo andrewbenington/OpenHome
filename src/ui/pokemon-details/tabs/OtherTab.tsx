@@ -520,19 +520,19 @@ function TeraTypeData(props: { mon: PKMInterfaceTera }) {
   const { mon } = props
 
   const currentTeraType = useMemo(
-    () => (mon.teraTypeOverride <= 18 ? mon.teraTypeOverride : mon.teraTypeOriginal),
+    () => (mon.teraTypeOverride !== 19 ? mon.teraTypeOverride : mon.teraTypeOriginal),
     [mon.teraTypeOriginal, mon.teraTypeOverride]
   )
 
   const previousTeraType = useMemo(
-    () => (mon.teraTypeOverride <= 18 ? mon.teraTypeOriginal : undefined),
+    () => (mon.teraTypeOverride !== 19 ? mon.teraTypeOriginal : undefined),
     [mon.teraTypeOriginal, mon.teraTypeOverride]
   )
 
   return (
     <AttributeRow label="Tera Type">
       <TypeIcon typeIndex={currentTeraType} />
-      {previousTeraType && (
+      {previousTeraType !== undefined && (
         <>
           <div>(originally </div>
           <TypeIcon typeIndex={previousTeraType} />
