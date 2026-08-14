@@ -1,0 +1,189 @@
+use pkm_rs_resources::metadata_source::MetadataSource;
+use pkm_rs_resources::ribbons::Gen3Ribbon;
+use pkm_rs_resources::{items::ItemGen3, lookup};
+use pkm_rs_types::{AbilityNumber, Generation, PokeDate, Stats16};
+
+use super::OhpkmConvert;
+use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
+use crate::gen3::colopkm::ColosseumPkmString;
+use crate::gen3::{Colopkm, Gen3PokemonIndex, PK3_MAX_ABILITY};
+use crate::ohpkm::OhpkmV2;
+use crate::ohpkm::v2_sections::OrreData;
+use crate::ohpkm::v2_sections::pkm_bytes::StoredPkmBytes;
+use crate::result::{Error, Result};
+use crate::{format::PkmFormat, traits::HasSpeciesAndForm};
+use crate::{gen3, ohpkm, util::personality_value};
+
+impl OhpkmConvert for Colopkm {
+    fn to_main_data(&self) -> ohpkm::v2_sections::MainDataV2 {
+        let form_metadata = self.get_forme_metadata();
+
+        let ability_index_unchecked = form_metadata.get_ability(self.ability_num.into());
+        let ability_index = if ability_index_unchecked.to_u16() > PK3_MAX_ABILITY {
+            form_metadata.get_ability(AbilityNumber::First)
+        } else {
+            ability_index_unchecked
+        };
+
+        let ability_num = if ability_index != ability_index_unchecked {
+            AbilityNumber::First
+        } else {
+            self.ability_num.into()
+        };
+
+        let adjusted_pid = personality_value::poke_transporter_shiny_adjust(
+            self.personality_value,
+            self.trainer_id,
+            self.secret_id,
+        );
+
+        let species_name = lookup::species_name(self.get_national_dex(), self.language);
+
+        let is_nicknamed = !species_name.eq_ignore_ascii_case(&self.nickname.to_string());
+
+        // If the pokémon is not nicknamed, use species name to avoid ALL CAPS NAME
+        let adjusted_nickname: String = if is_nicknamed {
+            self.nickname.to_string()
+        } else {
+            species_name.to_owned()
+        };
+
+        ohpkm::v2_sections::MainDataV2 {
+            personality_value: adjusted_pid,
+            pid_bit_flipped_for_shiny: self.personality_value != adjusted_pid,
+            encryption_constant: self.personality_value, // Mirror Poké Transporter's behavior of using the personality value as the encryption constant
+            species_and_form: self.species_and_form(),
+            held_item_index: self
+                .held_item_index
+                .and_then(|item_g3| item_g3.to_modern())
+                .map(|item| item.get())
+                .unwrap_or(0),
+            trainer_id: self.trainer_id,
+            secret_id: self.secret_id,
+            exp: self.exp,
+            ability_index,
+            ability_num,
+            markings: self.markings.into(),
+            nature: self.nature(),
+            is_fateful_encounter: self.is_fateful_encounter,
+            gender: self.gender,
+            evs: self.evs,
+            contest: self.contest,
+            pokerus: self.pokerus,
+            ribbons: self
+                .ribbons
+                .get_ribbons()
+                .into_iter()
+                .map(Gen3Ribbon::to_openhome)
+                .collect(),
+            moves: self
+                .moves
+                .to_pp_adjusted(MetadataSource::Emerald, ohpkm::MOVE_METADATA_SOURCE),
+            nickname: adjusted_nickname.into(),
+            ivs: self.ivs,
+            is_egg: self.is_egg,
+            is_nicknamed,
+            game_of_origin: self.game_of_origin,
+            language: self.language,
+            trainer_name: self.trainer_name.to_string().into(),
+            trainer_friendship: self.trainer_friendship,
+            ball: self.ball,
+            met_location_index: self.met_location_index,
+            met_level: self.met_level,
+            met_date: PokeDate::today(),
+            trainer_gender: self.trainer_gender,
+            is_shadow: self.shadow_data.is_some(),
+            ..Default::default()
+        }
+    }
+
+    fn to_orre_data(&self) -> Option<OrreData> {
+        self.shadow_data.map(OrreData)
+    }
+
+    fn from_ohpkm(ohpkm: &OhpkmV2, strategy: ConvertStrategy) -> Result<Self> {
+        let converter = PkmConverter::new(PkmFormat::Colopkm, strategy);
+        let met_data = converter.met_data(ohpkm);
+
+        let personality_value = if ohpkm.game_of_origin().generation() != Generation::G3 {
+            PidModificationStrategy::default().get_modified_pid(ohpkm)
+        } else if ohpkm.pid_bit_flipped_for_shiny() {
+            personality_value::flip_most_significant_bit(ohpkm.personality_value())
+        } else {
+            ohpkm.personality_value()
+        };
+
+        let mut nickname = ColosseumPkmString::from(converter.nickname(ohpkm));
+
+        // if the nickname has not been otherwise unchanged, use a copy of the original data's nickname
+        // to preserve trash bytes
+        if let Some(StoredPkmBytes::Colopkm(original_bytes)) = ohpkm.original_data_bytes()
+            && let Ok(original_colopkm) = Colopkm::try_from_bytes(&original_bytes)
+            && original_colopkm
+                .nickname
+                .identical_until_terminator(&nickname)
+        {
+            nickname = original_colopkm.nickname;
+        };
+
+        let mut mon = Self {
+            pokemon_index: Gen3PokemonIndex::from_national_dex(
+                ohpkm.species_and_form().get_ndex() as u16,
+            )?,
+            held_item_index: ItemGen3::from_modern_index(ohpkm.held_item_index()),
+            trainer_id: ohpkm.trainer_id(),
+            secret_id: ohpkm.secret_id(),
+            exp: ohpkm.exp(),
+            ability_num: ohpkm.ability_num().into(),
+            markings: ohpkm.markings().into(),
+            personality_value,
+            is_fateful_encounter: ohpkm.is_fateful_encounter(),
+            gender: ohpkm.gender(),
+            evs: ohpkm.evs(),
+            contest: ohpkm.contest(),
+            pokerus: ohpkm.pokerus(),
+            ribbons: ohpkm
+                .ribbons()
+                .into_iter()
+                .filter_map(Gen3Ribbon::from_openhome_if_present)
+                .collect(),
+            nickname,
+            moves: ohpkm
+                .moves()
+                .to_pp_adjusted(ohpkm::MOVE_METADATA_SOURCE, MetadataSource::Emerald),
+            ivs: converter.ivs(ohpkm),
+            is_egg: ohpkm.is_egg(),
+            trainer_name: ohpkm.trainer_name().reverse_endian().resize(),
+            trainer_friendship: ohpkm.trainer_friendship(),
+            met_location_index: met_data.location_index,
+            ball: ohpkm.ball(),
+            met_level: ohpkm.met_level(),
+            trainer_gender: ohpkm.trainer_gender(),
+            game_of_origin: met_data.origin,
+            language: ohpkm.language(),
+            shadow_data: ohpkm.shadow_data(),
+            stat_level: 0,
+            current_hp: 0,
+            stats: Stats16::default(),
+        };
+
+        mon.stat_level = mon.calculate_level();
+        mon.stats = mon.calculate_stats();
+        mon.current_hp = mon.stats.hp;
+
+        Ok(mon)
+    }
+
+    fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
+        bytes
+            .try_into()
+            .map_err(|_| {
+                Error::buffer_size_with_source(
+                    "Colopkm::OhpkmConvert::bytes_to_stored",
+                    gen3::PKM_SIZE_COLOSSEUM,
+                    bytes.len(),
+                )
+            })
+            .map(StoredPkmBytes::Colopkm)
+    }
+}

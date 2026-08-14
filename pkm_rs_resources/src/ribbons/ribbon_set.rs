@@ -94,7 +94,7 @@ impl<const N: usize, RIBBON: Ribbon, const MAX: usize> RibbonSet<N, RIBBON, MAX>
     }
 
     pub fn includes(&self, ribbon: RIBBON) -> bool {
-        self.0.get_flag(ribbon)
+        self.0.get_flag(&ribbon)
     }
 
     pub fn with_max<const M: usize, const NEW_MAX: usize>(self) -> RibbonSet<M, RIBBON, NEW_MAX> {

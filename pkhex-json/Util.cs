@@ -91,6 +91,11 @@ public static partial class Util
     return new { cool = pk.ContestCool, beauty = pk.ContestBeauty, cute = pk.ContestCute, smart = pk.ContestSmart, tough = pk.ContestTough, sheen = pk.ContestSheen };
   }
 
+  public static string Pokerus(int strain, int days)
+  {
+    return $"strain {strain}, {days} days remaining";
+  }
+
   static object FormatMoveName(int moveId, GameStrings strings)
   {
     try
@@ -304,6 +309,36 @@ public static partial class Util
     }
 
     return teraType.ToString();
+  }
+
+  public static object ShadowData(CK3 colopkm)
+  {
+
+    if (colopkm.ShadowID != 0)
+    {
+      return new
+      {
+        id = new {colo = colopkm.ShadowID},
+        exp = colopkm.EXP_Shadow,
+        purification = Purification(colopkm.Purification),
+      };
+    }
+    else
+    {
+      return null;
+    }
+  }
+
+  public static object Purification(int purification)
+  {
+    if (purification == -100)
+    {
+      return "purified";
+    }
+    else
+    {
+      return new { shadow_gauge = purification };
+    }
   }
 
   [GeneratedRegex(@"(?=[A-Z])")]

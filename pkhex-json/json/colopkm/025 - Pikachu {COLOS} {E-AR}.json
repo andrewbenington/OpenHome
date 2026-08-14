@@ -1,0 +1,89 @@
+{
+  "pokemon_index": 25,
+  "held_item_index": 202,
+  "trainer_id": 31121,
+  "secret_id": 0,
+  "exp": 1000,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 716667596,
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus": "strain 0, 0 days remaining",
+  "ribbons": [],
+  "nickname": "PIKACHU",
+  "nickname_trash": "00500049004B00410043004800550000000000000000",
+  "moves": [
+    {
+      "move_index": "Thunder Shock",
+      "pp": 30,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Growl",
+      "pp": 40,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Tail Whip",
+      "pp": 30,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Thunder Wave",
+      "pp": 20,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 25,
+    "atk": 6,
+    "def": 27,
+    "spa": 5,
+    "spd": 10,
+    "spe": 25
+  },
+  "is_egg": false,
+  "trainer_name": "COLOS",
+  "trainer_name_trash": "0043004F004C004F0053000000000000000000000000",
+  "trainer_friendship": 70,
+  "shadow_data": null,
+  "met_location_index": 255,
+  "ball": "Pok\u00E9",
+  "met_level": 10,
+  "trainer_gender": "Male",
+  "game_of_origin": "Ruby",
+  "language": "English",
+  "stat_level": 10,
+  "current_hp": 29,
+  "stats": {
+    "hp": 29,
+    "atk": 16,
+    "def": 11,
+    "spa": 15,
+    "spd": 15,
+    "spe": 25
+  },
+  "level": 10
+}

@@ -1,0 +1,97 @@
+{
+  "pokemon_index": 221,
+  "held_item_index": 203,
+  "trainer_id": 57413,
+  "secret_id": 24795,
+  "exp": 99383,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 3280010253,
+  "is_fateful_encounter": false,
+  "gender": "Female",
+  "evs": {
+    "hp": 0,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 0
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus": "strain 0, 0 days remaining",
+  "ribbons": [],
+  "nickname": "PILOSWINE",
+  "nickname_trash": "00500049004C004F005300570049004E004500000000",
+  "moves": [
+    {
+      "move_index": "Endure",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Odor Sleuth",
+      "pp": 40,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Dig",
+      "pp": 10,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Blizzard",
+      "pp": 5,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 29,
+    "atk": 12,
+    "def": 4,
+    "spa": 8,
+    "spd": 14,
+    "spe": 24
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_name_trash": "0052006F004300000000000000000000000000000000",
+  "trainer_friendship": 0,
+  "shadow_data": {
+    "id": {
+      "colo": 26
+    },
+    "exp": 0,
+    "purification": {
+      "shadow_gauge": 5550
+    }
+  },
+  "met_location_index": 58,
+  "ball": "Great",
+  "met_level": 43,
+  "trainer_gender": "Male",
+  "game_of_origin": "Colosseum/XD",
+  "language": "English",
+  "stat_level": 43,
+  "current_hp": 151,
+  "stats": {
+    "hp": 151,
+    "atk": 105,
+    "def": 75,
+    "spa": 54,
+    "spd": 62,
+    "spe": 58
+  },
+  "level": 43
+}

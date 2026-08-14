@@ -11,7 +11,9 @@ use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
-use crate::ohpkm::v2_sections::{MonTags, PastHandlerDataV2, SV_BASE_TM_BYTES_EXCLUDE_UNUSED};
+use crate::ohpkm::v2_sections::{
+    MonTags, OrreData, PastHandlerDataV2, SV_BASE_TM_BYTES_EXCLUDE_UNUSED,
+};
 use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
@@ -27,8 +29,8 @@ use pkm_rs_resources::species::SpeciesMetadata;
 use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
-    Language, MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, ShinyLeaves, Stats8,
-    Stats16Le, StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory,
+    Language, MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, ShinyLeaves, Stats8, Stats16,
+    StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory,
 };
 use serde::Serialize;
 use strum_macros::Display;
@@ -44,6 +46,8 @@ use crate::gen9_sv;
 use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::abilities::AbilityIndexWasm;
+#[cfg(feature = "wasm")]
+use pkm_rs_types::shadow::ShadowData;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -126,6 +130,7 @@ pub enum OhpkmSectionTag {
     OriginalBackup = 0x0D,
     UnconvertedPkm = 0x0E,
     PastHandlerV2 = 0x0F,
+    GcnData = 0x10,
 
     // deprecated, but can't mark it as such without warnings
     PastHandlerV1 = 0x08,
@@ -178,6 +183,7 @@ impl OhpkmSectionTag {
             Self::Tag => 0,
             Self::OriginalBackup => 2, // Size of the tag
             Self::UnconvertedPkm => 2, // Size of the tag
+            Self::GcnData => 10,       // id (2), purification (4), exp (4)
 
             #[allow(deprecated)]
             Self::PastHandlerV1 => 39,
@@ -205,6 +211,7 @@ impl SectionTag for OhpkmSectionTag {
 pub struct OhpkmV2 {
     main_data: MainDataV2,
     gameboy_data: Option<GameboyData>,
+    orre_data: Option<OrreData>,
     gen45_data: Option<Gen45Data>,
     gen67_data: Option<Gen67Data>,
     swsh_data: Option<SwordShieldData>,
@@ -231,10 +238,21 @@ impl OhpkmV2 {
     pub fn convert_without_backup<PKM: OhpkmConvert>(other: &PKM) -> Self {
         Self {
             main_data: other.to_main_data(),
+            gameboy_data: None,
+            gen45_data: None,
+            orre_data: other.to_orre_data(),
             gen67_data: other.to_gen_67_data(),
             swsh_data: other.to_swsh_data(),
+            bdsp_data: None,
+            la_data: None,
             sv_data: other.to_sv_data(),
-            ..Default::default()
+            handler_data: vec![],
+            plugin_data: None,
+            notes: None,
+            most_recent_save: None,
+            tags: None,
+            original_data: None,
+            unconverted_pkm: None,
         }
     }
 
@@ -839,6 +857,18 @@ impl OhpkmV2 {
         })
     }
 
+    // Gamecube
+
+    #[cfg(feature = "wasm")]
+    pub fn shadow_data(&self) -> Option<ShadowData> {
+        self.orre_data.map(|data| data.0)
+    }
+
+    #[cfg(feature = "wasm")]
+    pub fn set_shadow_data(&mut self, v: Option<ShadowData>) {
+        self.orre_data = v.map(OrreData);
+    }
+
     // Gen 4/5
 
     pub fn encounter_type(&self) -> Option<u8> {
@@ -1098,16 +1128,16 @@ impl OhpkmV2 {
         }
     }
 
-    pub fn avs(&self) -> Option<Stats16Le> {
+    pub fn avs(&self) -> Option<Stats16> {
         Some(self.gen67_data?.avs)
     }
 
-    pub fn set_avs(&mut self, value: Option<Stats16Le>) {
+    pub fn set_avs(&mut self, value: Option<Stats16>) {
         match value {
             Some(avs) => self.gen67_data.get_or_insert_default().avs = avs,
             None => {
                 if let Some(gen67_data) = &mut self.gen67_data {
-                    gen67_data.avs = Stats16Le::default()
+                    gen67_data.avs = Stats16::default()
                 }
             }
         }
@@ -1597,6 +1627,7 @@ impl OhpkmV2 {
         Ok(Self {
             main_data: MainDataV2::new(national_dex, form_index)?,
             gameboy_data: None,
+            orre_data: None,
             gen45_data: None,
             gen67_data: None,
             swsh_data: None,
@@ -1637,6 +1668,7 @@ impl OhpkmV2 {
             main_data: MainDataV2::extract_from(&sectioned_data)?
                 .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
             gameboy_data: GameboyData::extract_from(&sectioned_data)?,
+            orre_data: OrreData::extract_from(&sectioned_data)?,
             gen45_data: Gen45Data::extract_from(&sectioned_data)?,
             gen67_data: Gen67Data::extract_from(&sectioned_data)?,
             swsh_data: SwordShieldData::extract_from(&sectioned_data)?,
@@ -1679,6 +1711,7 @@ impl OhpkmV2 {
             main_data: MainDataV2::extract_from(&sectioned_data)?
                 .ok_or(Error::other("Main data not present in OHPKM V2 file"))?,
             gameboy_data: GameboyData::extract_from(&sectioned_data).ok().flatten(),
+            orre_data: OrreData::extract_from(&sectioned_data).ok().flatten(),
             gen45_data: Gen45Data::extract_from(&sectioned_data).ok().flatten(),
             gen67_data: Gen67Data::extract_from(&sectioned_data).ok().flatten(),
             swsh_data: SwordShieldData::extract_from(&sectioned_data)
@@ -1714,6 +1747,7 @@ impl OhpkmV2 {
         Self {
             main_data: MainDataV2::from_v1(old),
             gameboy_data: GameboyData::from_v1(old),
+            orre_data: OrreData::from_v1(old),
             gen45_data: Gen45Data::from_v1(old),
             gen67_data: Gen67Data::from_v1(old),
             swsh_data: SwordShieldData::from_v1(old),
@@ -2031,11 +2065,11 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_js(&self) -> Stats16Le {
+    pub fn evs_js(&self) -> Stats16 {
         self.evs().into()
     }
     #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_js(&mut self, v: Stats16Le) {
+    pub fn set_evs_js(&mut self, v: Stats16) {
         self.set_evs(&v.try_into().expect("evs should not exceed 255 each"));
     }
 
@@ -2131,11 +2165,11 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_js(&self) -> Stats16Le {
+    pub fn ivs_js(&self) -> Stats16 {
         self.ivs().into()
     }
     #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_js(&mut self, v: &Stats16Le) {
+    pub fn set_ivs_js(&mut self, v: &Stats16) {
         self.set_ivs(v.to_ivs_capped());
     }
 
@@ -2885,17 +2919,17 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = avs)]
-    pub fn avs_js(&self) -> Option<Stats16Le> {
+    pub fn avs_js(&self) -> Option<Stats16> {
         Some(self.gen67_data?.avs)
     }
 
     #[wasm_bindgen(setter = avs)]
-    pub fn set_avs_js(&mut self, value: Option<Stats16Le>) {
+    pub fn set_avs_js(&mut self, value: Option<Stats16>) {
         match value {
             Some(avs) => self.gen67_data.get_or_insert_default().avs = avs,
             None => {
                 if let Some(gen67_data) = &mut self.gen67_data {
-                    gen67_data.avs = Stats16Le::default()
+                    gen67_data.avs = Stats16::default()
                 }
             }
         }
@@ -3003,12 +3037,12 @@ impl OhpkmV2 {
     // Legends Arceus
 
     #[wasm_bindgen(getter = gvs)]
-    pub fn gvs_js(&self) -> Option<Stats16Le> {
+    pub fn gvs_js(&self) -> Option<Stats16> {
         Some(self.la_data?.gvs.into())
     }
 
     #[wasm_bindgen(setter = gvs)]
-    pub fn set_gvs_js(&mut self, value: Option<Stats16Le>) {
+    pub fn set_gvs_js(&mut self, value: Option<Stats16>) {
         match value {
             Some(gvs) => {
                 self.la_data.get_or_insert_default().gvs =

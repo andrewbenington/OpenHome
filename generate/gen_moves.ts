@@ -127,6 +127,30 @@ impl MoveSlot {
         }
     }
 
+    pub fn from_bytes_gcn<T>(bytes: &[u8], offset: T) -> Self
+    where
+        usize: From<T>,
+    {
+        let offset = usize::from(offset);
+        Self([
+            MoveSlot::from_bytes_gcn(bytes, offset),
+            MoveSlot::from_bytes_gcn(bytes, offset + 4),
+            MoveSlot::from_bytes_gcn(bytes, offset + 8),
+            MoveSlot::from_bytes_gcn(bytes, offset + 12),
+        ])
+    }
+
+    pub fn write_bytes_gcn<T>(&self, bytes: &mut [u8], offset: T)
+    where
+        usize: From<T>,
+    {
+        let offset = usize::from(offset);
+        self.0[0].write_bytes_gcn(bytes, offset);
+        self.0[1].write_bytes_gcn(bytes, offset + 4);
+        self.0[2].write_bytes_gcn(bytes, offset + 8);
+        self.0[3].write_bytes_gcn(bytes, offset + 12);
+    }
+
     fn write_move_and_pp_to_offsets<T: Into<usize> + Copy>(
         &self,
         bytes: &mut [u8],
@@ -191,6 +215,30 @@ impl MoveSlots {
             MoveSlot::new(moves[2], pp[2], pp_ups[2]),
             MoveSlot::new(moves[3], pp[3], pp_ups[3]),
         ])
+    }
+
+    pub fn from_bytes_gcn<T>(bytes: &[u8], offset: T) -> Self
+    where
+        usize: From<T>,
+    {
+        let offset = usize::from(offset);
+        Self([
+            MoveSlot::from_bytes_gcn(bytes, offset),
+            MoveSlot::from_bytes_gcn(bytes, offset + 4),
+            MoveSlot::from_bytes_gcn(bytes, offset + 8),
+            MoveSlot::from_bytes_gcn(bytes, offset + 12),
+        ])
+    }
+
+    pub fn write_bytes_gcn<T>(&self, bytes: &mut [u8], offset: T)
+    where
+        usize: From<T>,
+    {
+        let offset = usize::from(offset);
+        self.0[0].write_bytes_gcn(bytes, offset);
+        self.0[1].write_bytes_gcn(bytes, offset + 4);
+        self.0[2].write_bytes_gcn(bytes, offset + 8);
+        self.0[3].write_bytes_gcn(bytes, offset + 12);
     }
 
     pub fn write_spans<T: Into<usize> + Copy>(

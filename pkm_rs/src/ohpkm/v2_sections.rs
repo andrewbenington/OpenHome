@@ -18,6 +18,7 @@ mod gen45_data;
 mod gen67_data;
 mod gen8_data;
 mod main_data;
+mod orre_data;
 mod past_handlers;
 
 pub mod pkm_bytes;
@@ -27,6 +28,7 @@ pub(crate) use gen8_data::{BdspData, LegendsArceusData, SwordShieldData};
 pub(crate) use gen45_data::Gen45Data;
 pub(crate) use gen67_data::Gen67Data;
 pub(crate) use main_data::MainDataV2;
+pub(crate) use orre_data::OrreData;
 pub(crate) use past_handlers::PastHandlerDataV2;
 
 #[cfg(feature = "wasm")]
@@ -156,7 +158,7 @@ impl DataSection for MostRecentSave {
         let trainer_id = u16::from_le_bytes(bytes[0..=1].try_into().unwrap());
         let secret_id = u16::from_le_bytes(bytes[2..=3].try_into().unwrap());
         let game = OriginGame::from(bytes[4]);
-        let trainer_name = SizedUtf16String::<26>::from_bytes(bytes[5..=30].try_into().unwrap());
+        let trainer_name = SizedUtf16String::<26>::from_le_bytes(bytes[5..=30].try_into().unwrap());
 
         let file_path =
             String::from_utf8(bytes[31..].to_vec()).map_err(|e| Error::StringDecode {

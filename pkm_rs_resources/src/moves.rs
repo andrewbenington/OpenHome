@@ -1,5 +1,6 @@
 use std::num::NonZeroU16;
 
+use pkm_rs_types::read_u16_be;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -48,6 +49,35 @@ impl MoveSlot {
             pp: bytes[pp_offset],
             pp_ups: pp_up_storage.get_pp_ups(bytes, offsets, index),
         }
+    }
+
+    pub fn from_bytes_gcn(bytes: &[u8], offset: usize) -> Self {
+        let move_offset = offset;
+        let pp_offset = offset + 2;
+        let pp_ups_offset = offset + 3;
+
+        let move_index = MoveIndex::from_u16(read_u16_be!(bytes, move_offset));
+        if move_index.0.is_some_and(|idx| idx.get() > 20000) {
+            return Self::default();
+        }
+
+        assert!(move_index.0.is_none_or(|idx| idx.get() < 500));
+
+        Self {
+            move_index,
+            pp: bytes[pp_offset],
+            pp_ups: bytes[pp_ups_offset],
+        }
+    }
+
+    pub fn write_bytes_gcn(&self, bytes: &mut [u8], offset: usize) {
+        let move_offset = offset;
+        let pp_offset = offset + 2;
+        let pp_ups_offset = offset + 3;
+
+        bytes[move_offset..move_offset + 2].copy_from_slice(&self.move_index.to_be_bytes());
+        bytes[pp_offset] = self.pp;
+        bytes[pp_ups_offset] = self.pp_ups;
     }
 
     fn write_move_and_pp_to_offsets<T: Into<usize> + Copy>(
@@ -114,6 +144,30 @@ impl MoveSlots {
             MoveSlot::new(moves[2], pp[2], pp_ups[2]),
             MoveSlot::new(moves[3], pp[3], pp_ups[3]),
         ])
+    }
+
+    pub fn from_bytes_gcn<T>(bytes: &[u8], offset: T) -> Self
+    where
+        usize: From<T>,
+    {
+        let offset = usize::from(offset);
+        Self([
+            MoveSlot::from_bytes_gcn(bytes, offset),
+            MoveSlot::from_bytes_gcn(bytes, offset + 4),
+            MoveSlot::from_bytes_gcn(bytes, offset + 8),
+            MoveSlot::from_bytes_gcn(bytes, offset + 12),
+        ])
+    }
+
+    pub fn write_bytes_gcn<T>(&self, bytes: &mut [u8], offset: T)
+    where
+        usize: From<T>,
+    {
+        let offset = usize::from(offset);
+        self.0[0].write_bytes_gcn(bytes, offset);
+        self.0[1].write_bytes_gcn(bytes, offset + 4);
+        self.0[2].write_bytes_gcn(bytes, offset + 8);
+        self.0[3].write_bytes_gcn(bytes, offset + 12);
     }
 
     pub fn write_spans<T: Into<usize> + Copy>(
@@ -332,6 +386,10 @@ impl MoveIndex {
 
     pub fn to_le_bytes(self) -> [u8; 2] {
         self.0.map(NonZeroU16::get).unwrap_or(0u16).to_le_bytes()
+    }
+
+    pub fn to_be_bytes(self) -> [u8; 2] {
+        self.0.map(NonZeroU16::get).unwrap_or(0u16).to_be_bytes()
     }
 
     pub const fn empty() -> Self {

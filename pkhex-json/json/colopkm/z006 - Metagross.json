@@ -1,0 +1,95 @@
+{
+  "pokemon_index": 400,
+  "held_item_index": 199,
+  "trainer_id": 57413,
+  "secret_id": 24795,
+  "exp": 1250000,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 4108768932,
+  "is_fateful_encounter": false,
+  "gender": "Genderless",
+  "evs": {
+    "hp": 252,
+    "atk": 0,
+    "def": 0,
+    "spa": 252,
+    "spd": 0,
+    "spe": 6
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus": "strain 0, 0 days remaining",
+  "ribbons": ["National"],
+  "nickname": "METAGROSS",
+  "nickname_trash": "004D00450054004100470052004F0053005300000000",
+  "moves": [
+    {
+      "move_index": "Hyper Beam",
+      "pp": 5,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Iron Defense",
+      "pp": 15,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Metal Claw",
+      "pp": 35,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Psychic",
+      "pp": 10,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 18,
+    "atk": 4,
+    "def": 21,
+    "spa": 27,
+    "spd": 15,
+    "spe": 0
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_name_trash": "0052006F004300000000000000000000000000000000",
+  "trainer_friendship": 70,
+  "shadow_data": {
+    "id": {
+      "colo": 43
+    },
+    "exp": 0,
+    "purification": "purified"
+  },
+  "met_location_index": 118,
+  "ball": "Ultra",
+  "met_level": 50,
+  "trainer_gender": "Male",
+  "game_of_origin": "Colosseum/XD",
+  "language": "English",
+  "stat_level": 100,
+  "current_hp": 351,
+  "stats": {
+    "hp": 351,
+    "atk": 279,
+    "def": 314,
+    "spa": 285,
+    "spd": 200,
+    "spe": 131
+  },
+  "level": 100
+}

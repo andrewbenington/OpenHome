@@ -1,0 +1,89 @@
+{
+  "pokemon_index": 196,
+  "held_item_index": null,
+  "trainer_id": 57413,
+  "secret_id": 24795,
+  "exp": 15625,
+  "ability_num": "First",
+  "markings": {
+    "circle": false,
+    "square": false,
+    "triangle": false,
+    "heart": false
+  },
+  "personality_value": 4236353979,
+  "is_fateful_encounter": false,
+  "gender": "Male",
+  "evs": {
+    "hp": 2,
+    "atk": 0,
+    "def": 0,
+    "spa": 0,
+    "spd": 0,
+    "spe": 2
+  },
+  "contest": {
+    "cool": 0,
+    "beauty": 0,
+    "cute": 0,
+    "smart": 0,
+    "tough": 0,
+    "sheen": 0
+  },
+  "pokerus": "strain 0, 0 days remaining",
+  "ribbons": [],
+  "nickname": "ESPEON",
+  "nickname_trash": "0045005300500045004F004E00000000000000000000",
+  "moves": [
+    {
+      "move_index": "Confusion",
+      "pp": 25,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Return",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Reflect",
+      "pp": 20,
+      "pp_ups": 0
+    },
+    {
+      "move_index": "Helping Hand",
+      "pp": 20,
+      "pp_ups": 0
+    }
+  ],
+  "ivs": {
+    "hp": 24,
+    "atk": 27,
+    "def": 9,
+    "spa": 0,
+    "spd": 9,
+    "spe": 20
+  },
+  "is_egg": false,
+  "trainer_name": "RoC",
+  "trainer_name_trash": "0052006F004300000000000000000000000000000000",
+  "trainer_friendship": 220,
+  "shadow_data": null,
+  "met_location_index": 254,
+  "ball": "Pok\u00E9",
+  "met_level": 25,
+  "trainer_gender": "Male",
+  "game_of_origin": "Colosseum/XD",
+  "language": "English",
+  "stat_level": 25,
+  "current_hp": 73,
+  "stats": {
+    "hp": 73,
+    "atk": 48,
+    "def": 37,
+    "spa": 70,
+    "spd": 48,
+    "spe": 65
+  },
+  "level": 25
+}

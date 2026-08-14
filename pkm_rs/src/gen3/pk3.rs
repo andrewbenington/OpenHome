@@ -14,7 +14,6 @@ use crate::strings::{Gen3Encoding, Gen3NicknameString, Gen3TrainerString};
 use crate::tests::PkhexJson;
 use crate::traits::ModernEvs;
 use crate::traits::{HasSpeciesAndForm, PkmBytes};
-use crate::util::unown_form_from_pid_gen3;
 
 use pkm_rs_derive::IsShiny8192;
 use pkm_rs_resources::ball::Ball;
@@ -31,7 +30,7 @@ use pkm_rs_types::AbilityNumber;
 use pkm_rs_types::randomize::Randomize;
 use pkm_rs_types::{
     BinaryGender, ContestStats, Language, MarkingsFourShapes, NationalDex, OriginGame, Pokerus,
-    SimpleAbilityNumber, Stats8, Stats16Le,
+    SimpleAbilityNumber, Stats8, Stats16,
 };
 use pkm_rs_types::{Gender, Ivs};
 use serde::{Serialize, Serializer};
@@ -89,7 +88,7 @@ pub struct Pk3 {
     #[cfg_attr(feature = "randomize", randomize(skip))]
     pub current_hp: u16,
     #[cfg_attr(feature = "randomize", randomize(skip))]
-    pub stats: Stats16Le,
+    pub stats: Stats16,
 }
 
 impl Pk3 {
@@ -249,15 +248,15 @@ impl Pk3 {
     }
 
     pub fn species_and_form(&self) -> SpeciesForm {
+        let national_dex = self.pokemon_index.to_national_dex();
         SpeciesForm::new_valid_ndex(
-            self.pokemon_index.to_national_dex(),
-            form_index_from_pid(self.pokemon_index.to_national_dex(), self.personality_value)
-                as u16,
+            national_dex,
+            super::form_index_from_pid(national_dex, self.personality_value) as u16,
         )
         .expect("gen 3 form is valid")
     }
 
-    pub fn calculate_stats(&self) -> Stats16Le {
+    pub fn calculate_stats(&self) -> Stats16 {
         helpers::calculate_stats_modern(
             MetadataSource::Emerald,
             self.species_and_form(),
@@ -423,11 +422,11 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(getter = ivs)]
-    pub fn ivs_js(&self) -> Stats16Le {
+    pub fn ivs_js(&self) -> Stats16 {
         self.ivs.into()
     }
     #[wasm_bindgen(setter = ivs)]
-    pub fn set_ivs_js(&mut self, v: Stats16Le) {
+    pub fn set_ivs_js(&mut self, v: Stats16) {
         self.ivs = v.to_ivs_capped();
     }
 
@@ -441,11 +440,11 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(getter = evs)]
-    pub fn evs_js(&self) -> Stats16Le {
+    pub fn evs_js(&self) -> Stats16 {
         self.evs.into()
     }
     #[wasm_bindgen(setter = evs)]
-    pub fn set_evs_js(&mut self, v: Stats16Le) {
+    pub fn set_evs_js(&mut self, v: Stats16) {
         self.evs = v.try_into().expect("evs should not exceed 255 each");
     }
 
@@ -550,7 +549,7 @@ impl Pk3 {
     }
 
     #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats_js(&self) -> Stats16Le {
+    pub fn calculate_stats_js(&self) -> Stats16 {
         self.calculate_stats()
     }
 
@@ -573,13 +572,6 @@ impl ModernEvs for Pk3 {
     }
 }
 
-pub fn form_index_from_pid(national_dex: NationalDex, pid: u32) -> u8 {
-    if national_dex != NationalDex::Unown {
-        return 0;
-    }
-
-    unown_form_from_pid_gen3(pid)
-}
 #[cfg(test)]
 impl PkhexJson for Pk3 {
     fn to_pkhex_json_value(&self) -> std::result::Result<serde_json::Value, serde_json::Error> {

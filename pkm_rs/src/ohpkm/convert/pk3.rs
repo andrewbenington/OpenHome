@@ -1,7 +1,7 @@
 use pkm_rs_resources::metadata_source::MetadataSource;
 use pkm_rs_resources::ribbons::Gen3Ribbon;
 use pkm_rs_resources::{items::ItemGen3, lookup};
-use pkm_rs_types::{AbilityNumber, Generation, PokeDate, Stats16Le};
+use pkm_rs_types::{AbilityNumber, Generation, PokeDate, Stats16};
 
 use super::OhpkmConvert;
 use crate::convert_strategy::{ConvertStrategy, PidModificationStrategy, PkmConverter};
@@ -108,7 +108,7 @@ impl OhpkmConvert for Pk3 {
         let mut nickname_gen3 =
             Gen3NicknameString::from_stringlike(converter.nickname(ohpkm), str_encoding);
 
-        // if the nickname has been otherwise unchanged, use a copy of the original data's nickname
+        // if the nickname is otherwise unchanged, use a copy of the original data's nickname
         // to preserve trash bytes
         if let Some(StoredPkmBytes::Pk3(original_bytes)) = ohpkm.original_data_bytes()
             && let Ok(original_pk3) = Pk3::try_from_bytes(&original_bytes)
@@ -169,7 +169,7 @@ impl OhpkmConvert for Pk3 {
             status_condition: 0,
             stat_level: 0,
             current_hp: 0,
-            stats: Stats16Le::default(),
+            stats: Stats16::default(),
         };
 
         mon.stat_level = mon.calculate_level();
@@ -182,15 +182,15 @@ impl OhpkmConvert for Pk3 {
     }
 
     fn bytes_to_stored(bytes: &[u8]) -> Result<StoredPkmBytes> {
-        if bytes.len() == gen3::BOX_SIZE {
+        if bytes.len() == gen3::BOX_SIZE_GBA {
             let mut extended = bytes.to_vec();
-            extended.resize(gen3::PARTY_SIZE, 0);
+            extended.resize(gen3::PARTY_SIZE_GBA, 0);
             return extended
                 .try_into()
                 .map_err(|_| {
                     Error::buffer_size_with_source(
                         "Pk3::OhpkmConvert::bytes_to_stored",
-                        gen3::PARTY_SIZE,
+                        gen3::PARTY_SIZE_GBA,
                         bytes.len(),
                     )
                 })
@@ -201,7 +201,7 @@ impl OhpkmConvert for Pk3 {
             .map_err(|_| {
                 Error::buffer_size_with_source(
                     "Pk3::OhpkmConvert::bytes_to_stored",
-                    gen3::PARTY_SIZE,
+                    gen3::PARTY_SIZE_GBA,
                     bytes.len(),
                 )
             })
