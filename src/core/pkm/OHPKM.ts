@@ -1,6 +1,10 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { isWasmFormat, WasmPkmFormat } from '@openhome-core/pkm/PKM'
-import { Gen34ContestRibbons, Gen34TowerRibbons } from '@openhome-core/resources'
+import {
+  Gen34ContestRibbons,
+  Gen34TowerRibbons,
+  movesFromSwshTrFlags,
+} from '@openhome-core/resources'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
   expectExhaustive,
@@ -493,6 +497,10 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     this.pokerus = Pokerus.fromByte(value)
   }
 
+  get trMovesSwSh() {
+    return this.trFlagsSwSh ? movesFromSwshTrFlags(this.trFlagsSwSh) : []
+  }
+
   public getLevel(): number {
     return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
@@ -920,6 +928,11 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     if (other.trFlagsSwSh !== undefined && !arraysEqual(this.trFlagsSwSh, other.trFlagsSwSh)) {
       updates.push(syncUpdate('trFlagsSwSh', this.trFlagsSwSh, other.trFlagsSwSh))
       this.trFlagsSwSh = other.trFlagsSwSh
+    }
+
+    if (other.dynamaxLevel && other.dynamaxLevel !== this.dynamaxLevel) {
+      this.dynamaxLevel = Math.max(this.dynamaxLevel ?? 0, other.dynamaxLevel)
+      updates.push(syncUpdate('Dynamax Level', this.dynamaxLevel))
     }
 
     if (other.tmFlagsBDSP !== undefined && !arraysEqual(this.tmFlagsBDSP, other.tmFlagsBDSP)) {

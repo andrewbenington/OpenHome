@@ -55,6 +55,10 @@ export const setFlag = (dataView: DataView, offset: number, index: number, value
   }
 }
 
+export const getGenderFlag = (dataView: DataView, offset: number, index: number): BinaryGender => {
+  return getFlag(dataView, offset, index) ? BinaryGender.Female : BinaryGender.Male
+}
+
 export const setGenderFlag = (
   dataView: DataView,
   offset: number,
@@ -75,11 +79,23 @@ export const getFlag = (dataView: DataView, offset: number, index: number) => {
   return false
 }
 
-export const getGenderFlag = (dataView: DataView, offset: number, index: number): BinaryGender => {
-  return getFlag(dataView, offset, index) ? BinaryGender.Female : BinaryGender.Male
+export function getFlagsInByteRange(dataView: DataView, offset: number, size: number) {
+  const indexes: number[] = []
+
+  for (let i = 0; i < size * 8; i++) {
+    if (getFlag(dataView, offset, i)) {
+      indexes.push(i)
+    }
+  }
+
+  return indexes
 }
 
-export function getFlagIndexes(
+export function getFlagsInArrayRange(bytes: Uint8Array, offset: number, size: number) {
+  return getFlagsInByteRange(new DataView(bytes.buffer), offset, size)
+}
+
+export function getFlagsInBitRange(
   dataView: DataView,
   byteOffset: number,
   bitOffset: number,
@@ -224,18 +240,6 @@ function setNumberAtBitOffset(
 
   newValue |= (numberToSet & getBitMask(bitCount)) << bitOffset
   return newValue
-}
-
-export function getFlagsInRange(dataView: DataView, offset: number, size: number) {
-  const flags: number[] = []
-
-  for (let i = 0; i < size * 8; i++) {
-    if (getFlag(dataView, offset, i)) {
-      flags.push(i)
-    }
-  }
-
-  return flags
 }
 
 export function xorChecksum8BitLe(

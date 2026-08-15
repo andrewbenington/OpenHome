@@ -177,13 +177,17 @@ export default class PK4 {
       }
 
       this.ribbons = byteLogic
-        .getFlagIndexes(dataView, 0x24, 0, 28)
+        .getFlagsInBitRange(dataView, 0x24, 0, 28)
         .map((index) => Gen4Ribbons[index])
         .concat(
-          byteLogic.getFlagIndexes(dataView, 0x3c, 0, 32).map((index) => Gen4Ribbons[index + 28])
+          byteLogic
+            .getFlagsInBitRange(dataView, 0x3c, 0, 32)
+            .map((index) => Gen4Ribbons[index + 28])
         )
         .concat(
-          byteLogic.getFlagIndexes(dataView, 0x60, 0, 20).map((index) => Gen4Ribbons[index + 60])
+          byteLogic
+            .getFlagsInBitRange(dataView, 0x60, 0, 20)
+            .map((index) => Gen4Ribbons[index + 60])
         )
       this.nickname = stringLogic.readGen4StringFromBytes(dataView, 0x48, 12)
       this.trainerName = stringLogic.readGen4StringFromBytes(dataView, 0x68, 8)

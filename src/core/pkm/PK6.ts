@@ -229,7 +229,7 @@ export default class PK6 {
       }
       this.isFatefulEncounter = byteLogic.getFlag(dataView, 0x1d, 0)
       this.ribbons = byteLogic
-        .getFlagIndexes(dataView, 0x30, 0, 46)
+        .getFlagsInBitRange(dataView, 0x30, 0, 46)
         .map((index) => ModernRibbons[index])
       this.trainerGender = byteLogic.getGenderFlag(dataView, 0xdd, 7)
     } else {

@@ -1,3 +1,6 @@
+import { getFlagsInArrayRange } from '@openhome-core/util'
+import { Moves } from '../moves'
+
 export const SwShTRMoveIndexes = [
   14, 34, 53, 56, 57, 58, 59, 67, 85, 87, 89, 94, 97, 116, 118, 126, 127, 133, 141, 161, 164, 179,
   188, 191, 200, 473, 203, 214, 224, 226, 227, 231, 242, 247, 248, 253, 257, 269, 271, 276, 285,
@@ -6,3 +9,7 @@ export const SwShTRMoveIndexes = [
   484, 486, 492, 500, 502, 503, 526, 528, 529, 535, 542, 583, 599, 605, 663, 667, 675, 676, 706,
   710, 776,
 ]
+
+export function movesFromSwshTrFlags(trFlags: Uint8Array) {
+  return getFlagsInArrayRange(trFlags, 0, 14).map((i) => Moves[SwShTRMoveIndexes[i]])
+}
