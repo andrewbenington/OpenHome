@@ -1,7 +1,9 @@
-name: Build Binaries + Publish to Release
+name: Build Binaries + Publish to Release - Arch
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - appimage-fix
 
 jobs:
   build-publish:
