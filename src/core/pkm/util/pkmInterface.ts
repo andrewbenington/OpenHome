@@ -1,4 +1,5 @@
 import { PkmOrOhpkmFormat } from '@openhome-core/pkm/util'
+import { Move } from '@openhome-core/resources'
 import { PluginIdentifier } from '@openhome-core/save/interfaces'
 import { MonTag } from '@openhome-ui/util/tags'
 import {
@@ -131,6 +132,7 @@ export interface AllPKMFields {
   tmFlagsSV?: Uint8Array
   tmFlagsSVDLC?: Uint8Array
   trFlagsSwSh?: Uint8Array
+  trMovesSwSh?: Move[]
   trainerAffection?: number
   trainerFriendship?: number
   trainerGender: BinaryGender

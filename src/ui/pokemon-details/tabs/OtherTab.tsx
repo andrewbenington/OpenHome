@@ -18,7 +18,6 @@ import {
   LATutorMoveIndexes,
   Moves,
   SVTMMoveIndexes,
-  SwShTRMoveIndexes,
 } from '@openhome-core/resources'
 import { Countries } from '@openhome-core/resources/consts/Countries'
 import { EncounterTypes } from '@openhome-core/resources/consts/EncounterTypes'
@@ -36,7 +35,7 @@ import {
 import { isRestricted } from '@openhome-core/save/util/TransferRestrictions'
 import {
   getDisplayID,
-  getFlagsInRange,
+  getFlagsInArrayRange,
   getHeightCalculated,
   getWeightCalculated,
 } from '@openhome-core/util'
@@ -60,6 +59,8 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
   const weightCalculated = getWeightCalculated(mon)
 
   const pokerus = Pokerus.fromByteOrDefault(mon.pokerusByte)
+  const trMovesSwSh = mon.trMovesSwSh
+
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>
       <Flex
@@ -256,15 +257,12 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           mon.formIndex,
           mon.extraFormIndex
         ) &&
-          mon.trFlagsSwSh &&
-          getFlagsInArrayRange(mon.trFlagsSwSh, 0, 14).length > 0 && (
-            <AttributeRowExpand
-              summary="SwSh TRs"
-              value={`${getFlagsInArrayRange(mon.trFlagsSwSh, 0, 14).length} TRs`}
-            >
-              {getFlagsInArrayRange(mon.trFlagsSwSh, 0, 14).map((i) => (
-                <AttributeRow key={`swsh_tr_${i}`} label={`TR ${i}`} indent={10}>
-                  {Moves[SwShTRMoveIndexes[i]].name}
+          trMovesSwSh &&
+          trMovesSwSh.length > 0 && (
+            <AttributeRowExpand summary="SwSh TRs" value={trMovesSwSh.length}>
+              {trMovesSwSh.map((move) => (
+                <AttributeRow key={`swsh_tr_${move.name}`} label={move.name} indent={10}>
+                  {move.name}
                 </AttributeRow>
               ))}
             </AttributeRowExpand>
@@ -587,8 +585,4 @@ function u32Display(val: number) {
 
 function hexStrLittleEndian(val: number, digits: number) {
   return '0x' + val.toString(16).toUpperCase().padStart(digits, '0')
-}
-
-function getFlagsInArrayRange(bytes: Uint8Array, offset: number, size: number) {
-  return getFlagsInRange(new DataView(bytes.buffer), offset, size)
 }

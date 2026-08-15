@@ -1,5 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { ModernRibbons } from '@openhome-core/resources'
+import { ModernRibbons, movesFromSwshTrFlags } from '@openhome-core/resources'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
 import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
 import {
@@ -534,6 +534,10 @@ export default class PK8 {
 
   get trFlagsSwSh() {
     return this.inner.trFlagsSwSh
+  }
+
+  get trMovesSwSh() {
+    return movesFromSwshTrFlags(this.inner.trFlagsSwSh)
   }
 
   get homeTracker() {
