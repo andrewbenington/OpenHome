@@ -28,8 +28,8 @@ jobs:
 
       - name: Install PNPM
         run: |
-          pacman -Syu
-          pacman -S nodejs npm
+          pacman -Syu --noconfirm
+          pacman -S nodejs npm --noconfirm
           corepack enable
           corepack prepare pnpm@latest --activate
 
