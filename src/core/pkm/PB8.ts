@@ -203,10 +203,12 @@ export default class PB8 {
       this.tmFlagsBDSP = new Uint8Array(buffer).slice(0x127, 0x135)
       this.homeTracker = dataView.getBigUint64(0x135)
       this.ribbons = byteLogic
-        .getFlagIndexes(dataView, 0x34, 0, 64)
+        .getFlagsInBitRange(dataView, 0x34, 0, 64)
         .map((index) => ModernRibbons[index])
         .concat(
-          byteLogic.getFlagIndexes(dataView, 0x40, 0, 47).map((index) => ModernRibbons[index + 64])
+          byteLogic
+            .getFlagsInBitRange(dataView, 0x40, 0, 47)
+            .map((index) => ModernRibbons[index + 64])
         )
       this.isCurrentHandler = byteLogic.getFlag(dataView, 0xc4, 0)
       this.handlerMemory = types.readSwitchHandlerMemoryFromBytes(dataView, 0xc9)

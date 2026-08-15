@@ -117,7 +117,9 @@ export default class XDPKM {
       this.contest = types.readContestStatsFromBytes(dataView, 0xae)
       this.shadowID = dataView.getUint16(0xba, false)
       this.ribbons = gen3ContestRibbonsFromBytes(dataView, 0xb3).concat(
-        byteLogic.getFlagIndexes(dataView, 0x7c, 15, 12).map((index) => Gen3StandardRibbons[index])
+        byteLogic
+          .getFlagsInBitRange(dataView, 0x7c, 15, 12)
+          .map((index) => Gen3StandardRibbons[index])
       )
     } else {
       const other = arg
