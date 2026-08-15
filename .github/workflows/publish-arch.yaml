@@ -55,6 +55,11 @@ jobs:
           pacman -S --needed --noconfirm webkit2gtk-4.1 base-devel curl wget file openssl appmenu-gtk-module libappindicator-gtk3 librsvg xdotool gdk-pixbuf2
           cargo install tauri-cli
 
+      - name: Ensure gdk-pixbuf loader directory exists
+        run: |
+          mkdir -p /usr/lib/gdk-pixbuf-2.0/2.10.0/loaders
+          gdk-pixbuf-query-loaders --update-cache
+
       - name: Install wasm-pack
         uses: taiki-e/install-action@v2
         with:
