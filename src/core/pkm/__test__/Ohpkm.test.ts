@@ -476,6 +476,43 @@ describe('OHPKM game data sync', () => {
   })
 })
 
+describe('OHPKM sync updates SwSh data', () => {
+  const slowbroBytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('ohpkm', 'slowbro.ohpkm')))
+  test('dynamax level', () => {
+    const slowbroOhpkm = OHPKM.fromBytes(slowbroBytes.buffer)
+
+    const slowbroPk8 = R.assert(PK8.fromOhpkm(slowbroOhpkm, getDefaultConvertStrategy()))
+    expect(slowbroPk8.dynamaxLevel).toBe(0)
+
+    slowbroPk8.dynamaxLevel = 10
+    slowbroOhpkm.syncWithGameData(slowbroPk8)
+
+    expect(slowbroOhpkm.dynamaxLevel, 'increased dynamax level is synced properly').toBe(10)
+
+    slowbroPk8.dynamaxLevel = 0
+    slowbroOhpkm.syncWithGameData(slowbroPk8)
+
+    expect(slowbroOhpkm.dynamaxLevel, 'lower dynamax level is ignored').toBe(10)
+  })
+
+  // test('tr flags', () => {
+  //   const slowbroOhpkm = OHPKM.fromBytes(slowbroBytes.buffer)
+
+  //   const slowbroPk8 = R.assert(PK8.fromOhpkm(slowbroOhpkm, getDefaultConvertStrategy()))
+  //   expect(slowbroPk8.dynamaxLevel).toBe(0)
+
+  //   slowbroPk8.trFlagsSwSh = 10
+  //   slowbroOhpkm.syncWithGameData(slowbroPk8)
+
+  //   expect(slowbroOhpkm.dynamaxLevel, 'increased dynamax level is synced properly').toBe(10)
+
+  //   slowbroPk8.dynamaxLevel = 0
+  //   slowbroOhpkm.syncWithGameData(slowbroPk8)
+
+  //   expect(slowbroOhpkm.dynamaxLevel, 'lower dynamax level is ignored').toBe(10)
+  // })
+})
+
 function diffSpans(
   a: Uint8Array,
   b: Uint8Array,
