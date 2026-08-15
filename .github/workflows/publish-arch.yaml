@@ -52,7 +52,7 @@ jobs:
       - name: Install Tauri Dependencies (Ubuntu only)
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
-          pacman -S --needed --noconfirm webkit2gtk-4.1 base-devel curl wget file openssl appmenu-gtk-module libappindicator-gtk3 librsvg xdotool
+          pacman -S --needed --noconfirm webkit2gtk-4.1 base-devel curl wget file openssl appmenu-gtk-module libappindicator-gtk3 librsvg xdotool gdk-pixbuf2
           cargo install tauri-cli
 
       - name: Install wasm-pack
@@ -62,6 +62,11 @@ jobs:
 
       - name: Install Frontend Dependencies
         run: pnpm i --frozen-lockfile
+
+      - name: Debug gdk-pixbuf
+        run: |
+          pacman -Qi gdk-pixbuf2 || true
+          ls -la /usr/lib/gdk-pixbuf-2.0/ || true
 
       - uses: tauri-apps/tauri-action@v1
         env:
