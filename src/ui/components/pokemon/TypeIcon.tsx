@@ -1,29 +1,49 @@
 import { teraTypeStringFromIndex } from '@openhome-core/resources'
 import { getPublicImageURL, getTypeIconPath } from '@openhome-ui/images/images'
-import { PkmType } from '@pkm-rs/pkg'
+import { PkmType, TeraType } from '@pkm-rs/pkg'
 import './style.css'
 
-interface TypeIconProps {
-  type?: PkmType
-  typeIndex?: number
+type TypeIconProps = {
   border?: boolean
   size?: number | string
-}
+} & (
+  | {
+      type: PkmType
+      typeIndex?: undefined
+      teraType?: undefined
+    }
+  | {
+      type?: undefined
+      typeIndex: number
+      teraType?: undefined
+    }
+  | {
+      type?: undefined
+      typeIndex?: undefined
+      teraType: TeraType
+    }
+)
 
 const TypeIcon = (props: TypeIconProps) => {
-  const type = props.typeIndex ? teraTypeStringFromIndex(props.typeIndex) : props.type
+  let type: string
+
+  if (props.teraType) {
+    type = props.teraType === 'Stellar' ? 'Stellar' : props.teraType.Standard
+  } else if (props.typeIndex !== undefined) {
+    type = teraTypeStringFromIndex(props.typeIndex)
+  } else {
+    type = props.type
+  }
 
   return (
-    type && (
-      <img
-        className={props.border ? 'type-icon-border' : ''}
-        title={`${type} type`}
-        draggable={false}
-        alt={`${type} type`}
-        style={{ height: props.size ?? 24, width: props.size ?? 24 }}
-        src={getPublicImageURL(getTypeIconPath(type))}
-      />
-    )
+    <img
+      className={props.border ? 'type-icon-border' : ''}
+      title={`${type} type`}
+      draggable={false}
+      alt={`${type} type`}
+      style={{ height: props.size ?? 24, width: props.size ?? 24 }}
+      src={getPublicImageURL(getTypeIconPath(type))}
+    />
   )
 }
 

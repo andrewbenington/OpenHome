@@ -452,6 +452,30 @@ describe('gen 3 ability during OHPKM conversion', () => {
   })
 })
 
+describe('OHPKM game data sync', () => {
+  test('Tera type is updated (non-stellar)', () => {
+    const original = OHPKM.defaultWithSpecies(NationalDex.Pikachu, 0)
+    const converted = R.assert(PK9.fromOhpkm(original, ConvertStrategies.getDefault()))
+
+    converted.teraTypeOverride = { Standard: 'Bug' }
+
+    original.syncWithGameData(converted)
+
+    expect(original.teraTypeOverride).toEqual({ Standard: 'Bug' })
+  })
+
+  test('Tera type is updated (stellar)', () => {
+    const original = OHPKM.defaultWithSpecies(NationalDex.Pikachu, 0)
+    const converted = R.assert(PK9.fromOhpkm(original, ConvertStrategies.getDefault()))
+
+    converted.teraTypeOverride = 'Stellar'
+
+    original.syncWithGameData(converted)
+
+    expect(original.teraTypeOverride).toEqual('Stellar')
+  })
+})
+
 function diffSpans(
   a: Uint8Array,
   b: Uint8Array,

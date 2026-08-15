@@ -136,8 +136,8 @@ Pokémon Home extra form photoshops were created by [PkmnHomeIcons](https://gith
 
 <a href="https://www.star-history.com/?repos=andrewbenington%2FOpenHome&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=andrewbenington/OpenHome&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=andrewbenington/OpenHome&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=andrewbenington/OpenHome&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=andrewbenington/OpenHome&type=date&theme=dark&legend=top-left&sealed_token=S9bBCq298BKDQ54z8Mp90S5hKAJo-EAha4AfGpxRNR8IaeyKid4GG2MKCdqu-6uimbjcnRQpV6-9-s1vHn2193UmR3TEmwzKGRpsolHqJqf6HjLm61jkl6Wg-I8pWLxDH-eBvC6a41kJ48gmZ8kGlexptbqZ6B59EUC0lUquuwfhQ2fIdCMpfQvR6iWc" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=andrewbenington/OpenHome&type=date&legend=top-left&sealed_token=S9bBCq298BKDQ54z8Mp90S5hKAJo-EAha4AfGpxRNR8IaeyKid4GG2MKCdqu-6uimbjcnRQpV6-9-s1vHn2193UmR3TEmwzKGRpsolHqJqf6HjLm61jkl6Wg-I8pWLxDH-eBvC6a41kJ48gmZ8kGlexptbqZ6B59EUC0lUquuwfhQ2fIdCMpfQvR6iWc" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=andrewbenington/OpenHome&type=date&legend=top-left&sealed_token=S9bBCq298BKDQ54z8Mp90S5hKAJo-EAha4AfGpxRNR8IaeyKid4GG2MKCdqu-6uimbjcnRQpV6-9-s1vHn2193UmR3TEmwzKGRpsolHqJqf6HjLm61jkl6Wg-I8pWLxDH-eBvC6a41kJ48gmZ8kGlexptbqZ6B59EUC0lUquuwfhQ2fIdCMpfQvR6iWc" />
  </picture>
 </a>

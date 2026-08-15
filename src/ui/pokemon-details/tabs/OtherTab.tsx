@@ -47,9 +47,8 @@ import DynamaxLevel from '@openhome-ui/components/pokemon/DynamaxLevel'
 import GenderIcon from '@openhome-ui/components/pokemon/GenderIcon'
 import ShinyLeavesDisplay from '@openhome-ui/components/pokemon/ShinyLeaves'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
-import { Generation, Language, OriginGames, Pokerus, StatsPreSplit } from '@pkm-rs/pkg'
+import { Generation, Language, OriginGames, Pokerus, StatsPreSplit, TeraType } from '@pkm-rs/pkg'
 import { Flex } from '@radix-ui/themes'
-import { useMemo } from 'react'
 
 const HECTOGRAMS_TO_POUNDS = 0.2204623
 const CENTIMETERS_TO_INCHES = 0.3937008
@@ -508,34 +507,27 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
 export default OtherDisplay
 
 type PKMInterfaceTera = PKMInterface & {
-  teraTypeOriginal: number
-  teraTypeOverride: number
+  teraTypeOriginal: TeraType
+  teraTypeOverride?: TeraType
 }
 
 function hasTeraTypes(mon: PKMInterface): mon is PKMInterfaceTera {
-  return mon.teraTypeOriginal !== undefined && mon.teraTypeOverride !== undefined
+  return mon.teraTypeOriginal !== undefined
 }
 
 function TeraTypeData(props: { mon: PKMInterfaceTera }) {
   const { mon } = props
 
-  const currentTeraType = useMemo(
-    () => (mon.teraTypeOverride <= 18 ? mon.teraTypeOverride : mon.teraTypeOriginal),
-    [mon.teraTypeOriginal, mon.teraTypeOverride]
-  )
-
-  const previousTeraType = useMemo(
-    () => (mon.teraTypeOverride <= 18 ? mon.teraTypeOriginal : undefined),
-    [mon.teraTypeOriginal, mon.teraTypeOverride]
-  )
+  const currentTeraType = mon.teraTypeOverride ?? mon.teraTypeOriginal
+  const previousTeraType = mon.teraTypeOverride ? mon.teraTypeOriginal : undefined
 
   return (
     <AttributeRow label="Tera Type">
-      <TypeIcon typeIndex={currentTeraType} />
-      {previousTeraType && (
+      <TypeIcon teraType={currentTeraType} />
+      {previousTeraType !== undefined && (
         <>
           <div>(originally </div>
-          <TypeIcon typeIndex={previousTeraType} />
+          <TypeIcon teraType={previousTeraType} />
           <div>)</div>
         </>
       )}
