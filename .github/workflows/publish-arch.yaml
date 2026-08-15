@@ -53,6 +53,7 @@ jobs:
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
           pacman -S --needed --noconfirm webkit2gtk-4.1 base-devel curl wget file openssl appmenu-gtk-module libappindicator-gtk3 librsvg xdotool
+          cargo install tauri-cli
 
       - name: Install wasm-pack
         uses: taiki-e/install-action@v2
