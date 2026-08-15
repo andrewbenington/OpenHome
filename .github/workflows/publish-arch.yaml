@@ -52,7 +52,7 @@ jobs:
       - name: Install Tauri Dependencies (Ubuntu only)
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
-          pacman -S libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf --noconfirm
+          pacman -S --needed --noconfirm webkit2gtk-4.1 base-devel curl wget file openssl appmenu-gtk-module libappindicator-gtk3 librsvg xdotool
 
       - name: Install wasm-pack
         uses: taiki-e/install-action@v2
