@@ -220,10 +220,12 @@ export default class PA8 {
       this.isAlpha = byteLogic.getFlag(dataView, 0x16, 5)
       this.isNoble = byteLogic.getFlag(dataView, 0x16, 6)
       this.ribbons = byteLogic
-        .getFlagIndexes(dataView, 0x34, 0, 64)
+        .getFlagsInBitRange(dataView, 0x34, 0, 64)
         .map((index) => ModernRibbons[index])
         .concat(
-          byteLogic.getFlagIndexes(dataView, 0x40, 0, 47).map((index) => ModernRibbons[index + 64])
+          byteLogic
+            .getFlagsInBitRange(dataView, 0x40, 0, 47)
+            .map((index) => ModernRibbons[index + 64])
         )
       // these are recalculated from the mon's height/weight and species data
       // this.heightAbsolute = dataView.getFloat32(0xac, true)
