@@ -202,10 +202,12 @@ export default class PA9 {
       this.homeTracker = dataView.getBigUint64(0x127)
       this.tmFlagsLza = new Uint8Array(buffer).slice(0x12f, 0x145)
       this.ribbons = byteLogic
-        .getFlagIndexes(dataView, 0x34, 0, 64)
+        .getFlagsInBitRange(dataView, 0x34, 0, 64)
         .map((index) => ModernRibbons[index])
         .concat(
-          byteLogic.getFlagIndexes(dataView, 0x40, 0, 47).map((index) => ModernRibbons[index + 64])
+          byteLogic
+            .getFlagsInBitRange(dataView, 0x40, 0, 47)
+            .map((index) => ModernRibbons[index + 64])
         )
       this.trainerGender = byteLogic.getGenderFlag(dataView, 0x125, 7)
     } else {
