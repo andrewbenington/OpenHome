@@ -1,10 +1,11 @@
-use pkm_rs_resources::metadata_source::MetadataSource;
-
+#[cfg(feature = "wasm")]
+use crate::checksum::RefreshChecksum;
 use crate::result::Error;
 #[cfg(feature = "wasm")]
 use pk9_buffer::Pk9Buffer;
 use pkm_rs_resources;
 use pkm_rs_resources::abilities::AbilityIndexBounded;
+use pkm_rs_resources::metadata_source::MetadataSource;
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::ribbons::ModernRibbon;
 use pkm_rs_resources::species::SpeciesForm;
@@ -23,6 +24,9 @@ mod pk9_buffer;
 mod pokemon_index;
 // mod save;
 // mod save_blocks;
+
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wasm")]
 pub(crate) const PKM_DATA_SIZE: usize = 344;
@@ -99,6 +103,23 @@ impl TryFrom<SpeciesForm> for Pk9SpeciesAndForm {
             value.get_forme_index()
         )))
     }
+}
+
+// TODO: bring into save file struct when converted to rust
+#[cfg(feature = "wasm")]
+#[wasm_bindgen(js_name = emptyBoxSlotBytesScarletViolet)]
+pub fn empty_box_slot_bytes() -> Box<[u8]> {
+    // ANY CHANGES TO THIS MUST BE TESTED IN A SCARLET/VIOLET SAVE FILE
+    // ensure moving a Pokémon from a save slot in OpenHome such that
+    // its previous slot is made empty does not result in a Bad Egg
+    // being left in the slot
+    let mut bytes = Box::new([0u8; PKM_DATA_SIZE]);
+    let mut buffer = Pk9Buffer::new_mut(bytes.as_mut_slice());
+
+    buffer.refresh_checksum();
+    buffer.encrypt();
+
+    bytes
 }
 
 #[cfg(test)]

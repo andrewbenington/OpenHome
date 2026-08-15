@@ -21,6 +21,7 @@ import {
   Block,
   BlockType,
   ConvertStrategy,
+  emptyBoxSlotBytesScarletViolet,
   ExtraFormIndex,
   Languages,
   OriginGame,
@@ -107,6 +108,10 @@ export class ScarletVioletSave extends Gen8Gen9Save<PK9> {
 
   getBoxSlotGapBytes(): number {
     return 0
+  }
+
+  emptyBoxSlotBytes() {
+    return emptyBoxSlotBytesScarletViolet()
   }
 
   supportsMon(nationalDex: number, formeNumber: number, extraFormIndex?: ExtraFormIndex): boolean {
