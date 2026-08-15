@@ -584,14 +584,14 @@ mod tests {
     // #[cfg(feature = "randomize")]
     // use rand::{SeedableRng, rngs::StdRng};
 
-    // #[test]
-    // fn to_from_bytes() -> TestResult<()> {
-    //     tests::to_from_bytes_all_in_dir::<Colopkm>(
-    //         &PathBuf::from("test-files")
-    //             .join("pkm-files")
-    //             .join("colopkm"),
-    //     )
-    // }
+    #[test]
+    fn to_from_bytes() -> TestResult<()> {
+        tests::to_from_bytes_all_in_dir::<Colopkm>(
+            &PathBuf::from("test-files")
+                .join("pkm-files")
+                .join("colopkm"),
+        )
+    }
 
     // #[test]
     // fn blaziken_pk3() -> TestResult<()> {

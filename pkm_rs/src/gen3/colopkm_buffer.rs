@@ -20,6 +20,8 @@ pub(super) enum Offset {
     SpeciesIndex = 0x0,
     PersonalityValue = 0x4,
     OriginGameGcn = 0x8,
+    CurrentRegion = 0x9,
+    OriginalRegion = 0xa,
     LanguageGcn = 0xb,
     MetLocation = 0xc,
     MetLevel = 0xe,
