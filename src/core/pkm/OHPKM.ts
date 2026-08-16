@@ -4,13 +4,17 @@ import {
   Gen34ContestRibbons,
   Gen34TowerRibbons,
   movesFromSwshTrFlags,
+  SWSH_TR_BYTE_COUNT,
+  trIndexForMove,
 } from '@openhome-core/resources'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
   expectExhaustive,
+  getFlag,
   getHeightCalculated,
   getWeightCalculated,
   runningInTest,
+  setFlag,
 } from '@openhome-core/util'
 import { intersection, Option, unique } from '@openhome-core/util/functional'
 import {
@@ -501,6 +505,35 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     return this.trFlagsSwSh ? movesFromSwshTrFlags(this.trFlagsSwSh) : []
   }
 
+  hasTrSwSh(moveId: number): boolean {
+    const trFlags = this.trFlagsSwSh
+    if (!trFlags) return false
+
+    const trIndex = trIndexForMove(moveId)
+    return trIndex !== undefined && getFlag(new DataView(trFlags.buffer), 0, trIndex)
+  }
+
+  setTrMoveSwSh(moveId: number) {
+    const trFlags = this.trFlagsSwSh
+    if (!trFlags) return undefined
+
+    const trIndex = trIndexForMove(moveId)
+    if (trIndex !== undefined) {
+      setFlag(new DataView(trFlags.buffer), 0, trIndex, true)
+    }
+
+    this.trFlagsSwSh = trFlags
+  }
+
+  unionTrFlagsSwSh(otherTrFlags: Uint8Array) {
+    const trFlags = this.trFlagsSwSh || new Uint8Array(SWSH_TR_BYTE_COUNT)
+
+    for (let i = 0; i < otherTrFlags.length; i++) {
+      trFlags[i] |= otherTrFlags[i]
+    }
+    this.trFlagsSwSh = trFlags
+  }
+
   public getLevel(): number {
     return this.speciesMetadata?.calculateLevel(this.exp) ?? 1
   }
@@ -925,14 +958,34 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.teraTypeOverride = other.teraTypeOverride
     }
 
-    if (other.trFlagsSwSh !== undefined && !arraysEqual(this.trFlagsSwSh, other.trFlagsSwSh)) {
-      updates.push(syncUpdate('trFlagsSwSh', this.trFlagsSwSh, other.trFlagsSwSh))
-      this.trFlagsSwSh = other.trFlagsSwSh
-    }
+    // if (other.trFlagsSwSh !== undefined && !arraysEqual(this.trFlagsSwSh, other.trFlagsSwSh)) {
+    //   // updates.push(syncUpdate('trFlagsSwSh', this.trFlagsSwSh, other.trFlagsSwSh))
+    //   const trFlags = getFlagsInArrayRange(other.trFlagsSwSh, 0, other.trFlagsSwSh.length)
+
+    //   for (const flag of trFlags) {
+    //     if (!this.trFlagsSwSh) {
+    //       this.trFlagsSwSh = new Uint8Array(SWSH_TR_BYTE_COUNT)
+    //     }
+    //     if (!getFlag(new DataView(this.trFlagsSwSh.buffer), 0, flag)) {
+    //       setFlag(new DataView(this.trFlagsSwSh.buffer), 0, flag, true)
+    //       updates.push(syncUpdate(`TR move: ${moveFromSwShTrFlag(flag).name}`))
+    //     }
+    //   }
+    //   this.trFlagsSwSh = other.trFlagsSwSh
+    // }
 
     if (other.dynamaxLevel && other.dynamaxLevel !== this.dynamaxLevel) {
       this.dynamaxLevel = Math.max(this.dynamaxLevel ?? 0, other.dynamaxLevel)
       updates.push(syncUpdate('Dynamax Level', this.dynamaxLevel))
+    }
+
+    if (other.trMovesSwSh && other.trFlagsSwSh) {
+      const thisTrMoveIds = new Set(this.trMovesSwSh?.map((move) => move.id))
+      other.trMovesSwSh
+        .filter((move) => !thisTrMoveIds.has(move.id))
+        .forEach((move) => updates.push(syncUpdate(`TR move: ${move.name}`)))
+
+      this.unionTrFlagsSwSh(other.trFlagsSwSh)
     }
 
     if (other.tmFlagsBDSP !== undefined && !arraysEqual(this.tmFlagsBDSP, other.tmFlagsBDSP)) {
