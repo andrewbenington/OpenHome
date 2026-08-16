@@ -477,8 +477,8 @@ describe('OHPKM game data sync', () => {
 })
 
 describe('OHPKM sync updates SwSh data', () => {
-  const slowbroBytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('ohpkm', 'slowbro.ohpkm')))
   test('dynamax level', () => {
+    const slowbroBytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('ohpkm', 'slowbro.ohpkm')))
     const slowbroOhpkm = OHPKM.fromBytes(slowbroBytes.buffer)
 
     const slowbroPk8 = R.assert(PK8.fromOhpkm(slowbroOhpkm, getDefaultConvertStrategy()))
@@ -495,22 +495,23 @@ describe('OHPKM sync updates SwSh data', () => {
     expect(slowbroOhpkm.dynamaxLevel, 'lower dynamax level is ignored').toBe(10)
   })
 
-  // test('tr flags', () => {
-  //   const slowbroOhpkm = OHPKM.fromBytes(slowbroBytes.buffer)
+  test('tr flags', () => {
+    const slowbroBytes = new Uint8Array(fs.readFileSync(pkmTestFilePath('ohpkm', 'slowbro.ohpkm')))
+    const slowbroOhpkm = OHPKM.fromBytes(slowbroBytes.buffer)
 
-  //   const slowbroPk8 = R.assert(PK8.fromOhpkm(slowbroOhpkm, getDefaultConvertStrategy()))
-  //   expect(slowbroPk8.dynamaxLevel).toBe(0)
+    const slowbroPk8 = R.assert(PK8.fromOhpkm(slowbroOhpkm, getDefaultConvertStrategy()))
 
-  //   slowbroPk8.trFlagsSwSh = 10
-  //   slowbroOhpkm.syncWithGameData(slowbroPk8)
+    const moveIndexes = [53, 67, 89, 94, 247, 285, 414, 528]
+    moveIndexes.forEach((index) => {
+      slowbroPk8.setTrMoveSwSh(index)
+      expect(slowbroPk8.hasTrSwSh(index), `TR move ${index} is set properly`).toBe(true)
+    })
+    slowbroOhpkm.syncWithGameData(slowbroPk8)
 
-  //   expect(slowbroOhpkm.dynamaxLevel, 'increased dynamax level is synced properly').toBe(10)
-
-  //   slowbroPk8.dynamaxLevel = 0
-  //   slowbroOhpkm.syncWithGameData(slowbroPk8)
-
-  //   expect(slowbroOhpkm.dynamaxLevel, 'lower dynamax level is ignored').toBe(10)
-  // })
+    moveIndexes.forEach((index) =>
+      expect(slowbroOhpkm.hasTrSwSh(index), `TR move ${index} is synced properly`).toBe(true)
+    )
+  })
 })
 
 function diffSpans(

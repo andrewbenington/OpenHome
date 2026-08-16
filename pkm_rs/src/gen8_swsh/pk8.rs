@@ -543,6 +543,15 @@ impl Pk8 {
         self.tr_flags_swsh.to_bytes().to_vec()
     }
 
+    #[wasm_bindgen(setter = trFlagsSwSh)]
+    pub fn set_tr_flags_swsh_js(&mut self, flags: &[u8]) -> Result<()> {
+        self.tr_flags_swsh = FlagSet::from_bytes(flags.try_into().map_err(|_| {
+            Error::other("incorrect byte array size passed to set_tr_flags_swsh_js")
+        })?);
+
+        Ok(())
+    }
+
     #[wasm_bindgen(js_name = toOhpkm)]
     pub fn to_ohpkm(&self) -> Result<OhpkmV2> {
         OhpkmV2::convert_with_backup(self, &self.to_party_bytes())
