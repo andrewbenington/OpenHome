@@ -520,7 +520,7 @@ describe('OHPKM sync updates SwSh data', () => {
     )
   })
 
-  test('trainer friendship', () => {
+  test('trainer friendship (existing handler)', () => {
     let savePath = saveTestFilePath('gen8-swsh', 'sword')
     const swordSaveBytes = new Uint8Array(readFileSync(savePath))
     const swordSave = new SwordShieldSave(emptyPathData, swordSaveBytes)
@@ -530,7 +530,6 @@ describe('OHPKM sync updates SwSh data', () => {
       throw Error('Expected Flapple at box 2, slot 4')
     }
 
-    console.log(flapplePk8.trainerID, flapplePk8.trainerFriendship)
     expect(flapplePk8.handlerFriendship).toBe(50)
 
     const flappleOhpkm = OHPKM.fromMonInSave(flapplePk8, swordSave)
@@ -555,22 +554,9 @@ describe('OHPKM sync updates SwSh data', () => {
     )
     expect(updatedhandlerData).not.toBeUndefined()
     expect(updatedhandlerData?.friendship).toBe(100)
-
-    // const slowbroPk8 = R.assert(PK8.fromOhpkm(slowbroOhpkm, getDefaultConvertStrategy()))
-
-    // const moveIndexes = [53, 67, 89, 94, 247, 285, 414, 528]
-    // moveIndexes.forEach((index) => {
-    //   slowbroPk8.setTrMoveSwSh(index)
-    //   expect(slowbroPk8.hasTrSwSh(index), `TR move ${index} is set properly`).toBe(true)
-    // })
-    // slowbroOhpkm.syncWithGameData(slowbroPk8)
-
-    // moveIndexes.forEach((index) =>
-    //   expect(slowbroOhpkm.hasTrSwSh(index), `TR move ${index} is synced properly`).toBe(true)
-    // )
   })
 
-  test('trainer friendship 2', () => {
+  test('trainer friendship (new handler)', () => {
     let savePath = saveTestFilePath('gen8-swsh', 'sword-friendship-update')
     const swordSaveBytes = new Uint8Array(readFileSync(savePath))
     const swordSave = new SwordShieldSave(emptyPathData, swordSaveBytes)
@@ -580,7 +566,6 @@ describe('OHPKM sync updates SwSh data', () => {
       throw Error('Expected Flapple at box 2, slot 4')
     }
 
-    console.log(golduckPk8.trainerID, golduckPk8.trainerFriendship)
     expect(golduckPk8.handlerFriendship).toBe(255)
 
     const ohpkmFilePath = pkmTestFilePath('ohpkm', 'stanley-friendship-update.ohpkm')
@@ -597,19 +582,6 @@ describe('OHPKM sync updates SwSh data', () => {
     )
     expect(updatedhandlerData).not.toBeUndefined()
     expect(updatedhandlerData?.friendship).toBe(255)
-
-    // const slowbroPk8 = R.assert(PK8.fromOhpkm(slowbroOhpkm, getDefaultConvertStrategy()))
-
-    // const moveIndexes = [53, 67, 89, 94, 247, 285, 414, 528]
-    // moveIndexes.forEach((index) => {
-    //   slowbroPk8.setTrMoveSwSh(index)
-    //   expect(slowbroPk8.hasTrSwSh(index), `TR move ${index} is set properly`).toBe(true)
-    // })
-    // slowbroOhpkm.syncWithGameData(slowbroPk8)
-
-    // moveIndexes.forEach((index) =>
-    //   expect(slowbroOhpkm.hasTrSwSh(index), `TR move ${index} is synced properly`).toBe(true)
-    // )
   })
 })
 
