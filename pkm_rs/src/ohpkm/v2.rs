@@ -131,6 +131,7 @@ pub enum OhpkmSectionTag {
     OriginalBackup = 0x0D,
     UnconvertedPkm = 0x0E,
     PastHandlerV2 = 0x0F,
+    LearnedMoves = 0x10,
 
     // deprecated, but can't mark it as such without warnings
     PastHandlerV1 = 0x08,
@@ -185,6 +186,7 @@ impl OhpkmSectionTag {
             Self::Tag => 0,
             Self::OriginalBackup => 2, // Size of the tag
             Self::UnconvertedPkm => 2, // Size of the tag
+            Self::LearnedMoves => 2,   // Size of length field
 
             #[allow(deprecated)]
             Self::PastHandlerV1 => 39,
@@ -220,6 +222,7 @@ pub struct OhpkmV2 {
     sv_data: Option<ScarletVioletData>,
     lza_data: Option<LegendsZaData>,
     handler_data: Vec<PastHandlerDataV2>,
+    learned_moves: Option<LearnedMoves>,
     plugin_data: Option<PluginData>,
     notes: Option<Notes>,
     most_recent_save: Option<MostRecentSave>,
@@ -1602,6 +1605,7 @@ impl OhpkmV2 {
             lza_data: None,
             handler_data: Vec::new(),
             plugin_data: None,
+            learned_moves: None,
             notes: None,
             most_recent_save: None,
             tags: None,
@@ -1642,6 +1646,7 @@ impl OhpkmV2 {
             sv_data: ScarletVioletData::extract_from(&sectioned_data)?,
             lza_data: LegendsZaData::extract_from(&sectioned_data)?,
             handler_data: past_handler_data_v2,
+            learned_moves: LearnedMoves::extract_from(&sectioned_data)?,
             plugin_data: PluginData::extract_from(&sectioned_data)?,
             notes: Notes::extract_from(&sectioned_data)?,
             most_recent_save: MostRecentSave::extract_from(&sectioned_data)?,
@@ -1691,6 +1696,7 @@ impl OhpkmV2 {
                 .flatten(),
             lza_data: LegendsZaData::extract_from(&sectioned_data).ok().flatten(),
             handler_data: past_handler_data_v2,
+            learned_moves: LearnedMoves::extract_from(&sectioned_data).ok().flatten(),
             plugin_data: PluginData::extract_from(&sectioned_data).ok().flatten(),
             notes: Notes::extract_from(&sectioned_data).ok().flatten(),
             most_recent_save: MostRecentSave::extract_from(&sectioned_data).ok().flatten(),
@@ -1721,6 +1727,7 @@ impl OhpkmV2 {
             sv_data: ScarletVioletData::from_v1(old),
             lza_data: None, // z-a move flags weren't tracked in v1
             handler_data: PastHandlerDataV2::from_ohpkm_v1(old).map_or(Vec::new(), |hd| vec![hd]),
+            learned_moves: LearnedMoves::from_v1(old),
             plugin_data: PluginData::from_v1(old),
             notes: None,
             most_recent_save: None,

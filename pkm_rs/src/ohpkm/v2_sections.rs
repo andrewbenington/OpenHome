@@ -15,7 +15,7 @@ mod gen45_data;
 mod gen67_data;
 mod gen8_data;
 mod gen9_data;
-// mod learned_moves;
+mod learned_moves;
 mod main_data;
 mod past_handlers;
 
@@ -30,6 +30,7 @@ pub(crate) use gen9_data::{
 };
 pub(crate) use gen45_data::Gen45Data;
 pub(crate) use gen67_data::Gen67Data;
+pub(crate) use learned_moves::LearnedMoves;
 pub(crate) use main_data::MainDataV2;
 pub(crate) use past_handlers::PastHandlerDataV2;
 

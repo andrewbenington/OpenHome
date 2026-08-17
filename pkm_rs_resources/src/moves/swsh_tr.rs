@@ -33,7 +33,7 @@ const fn build_reverse() -> [u16; MAX_VAL + 1] {
     while i < MOVE_ID_BY_TR_INDEX.len() {
         let v = MOVE_ID_BY_TR_INDEX[i] as usize;
         if table[v] != NOT_FOUND {
-            panic!("duplicate value in MOVE_ID_BY_TR_INDEX array");
+            panic!("duplicate value in MOVE_ID_BY_TR_INDEX");
         }
         table[v] = i as u16;
         i += 1;
@@ -41,10 +41,9 @@ const fn build_reverse() -> [u16; MAX_VAL + 1] {
     table
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen(js_name = "moveIdBySwshTrIndex")]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "moveIdBySwshTrIndex"))]
 #[allow(clippy::missing_const_for_fn)]
-pub fn move_id_by_swsh_tr_index(index: usize) -> Option<u16> {
+pub fn move_id_by_tr_index(index: usize) -> Option<u16> {
     if index < MOVE_ID_BY_TR_INDEX.len() {
         Some(MOVE_ID_BY_TR_INDEX[index])
     } else {
@@ -52,10 +51,9 @@ pub fn move_id_by_swsh_tr_index(index: usize) -> Option<u16> {
     }
 }
 
-#[cfg(feature = "wasm")]
-#[wasm_bindgen(js_name = "swshTrIndexByMoveId")]
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "swshTrIndexByMoveId"))]
 #[allow(clippy::missing_const_for_fn)]
-pub fn swsh_tr_index_by_move_id(move_id: u16) -> Option<u16> {
+pub fn tr_index_by_move_id(move_id: u16) -> Option<u16> {
     let move_id = move_id as usize;
     if move_id < TR_INDEX_BY_MOVE_ID.len() {
         Some(TR_INDEX_BY_MOVE_ID[move_id])
