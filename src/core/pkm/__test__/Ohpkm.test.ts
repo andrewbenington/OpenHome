@@ -1,6 +1,8 @@
 import { PA8, PK2, PK3, PK4, PK7, PK8, PK9 } from '@openhome-core/pkm'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+import { SwordShieldSave } from '@openhome-core/save/Gen89/SwordShieldSave'
 import PB8LUMI from '@openhome-core/save/luminescentplatinum/PB8LUMI'
+import { emptyPathData } from '@openhome-core/save/util/path'
 import { R } from '@openhome-core/util/functional'
 import { Stats } from '@openhome-core/util/types'
 import {
@@ -14,6 +16,7 @@ import {
   SpeciesForm,
 } from '@pkm-rs/pkg'
 import fs from 'fs'
+import { readFileSync } from 'node:fs'
 import path from 'path'
 import { assert, beforeAll, describe, expect, test } from 'vitest'
 import { getFormatLocationString } from '../MetLocation'
@@ -24,6 +27,10 @@ beforeAll(initializeWasm)
 
 export function pkmTestFilePath(...pathElements: string[]): string {
   return path.join(__dirname, 'pkm-files', ...pathElements)
+}
+
+export function saveTestFilePath(...pathElements: string[]): string {
+  return path.join(__dirname, 'save-files', ...pathElements)
 }
 
 describe('gen 3 conversion to OHPKM V2 and back is lossless', async () => {
@@ -511,6 +518,98 @@ describe('OHPKM sync updates SwSh data', () => {
     moveIndexes.forEach((index) =>
       expect(slowbroOhpkm.hasTrSwSh(index), `TR move ${index} is synced properly`).toBe(true)
     )
+  })
+
+  test('trainer friendship', () => {
+    let savePath = saveTestFilePath('gen8-swsh', 'sword')
+    const swordSaveBytes = new Uint8Array(readFileSync(savePath))
+    const swordSave = new SwordShieldSave(emptyPathData, swordSaveBytes)
+
+    const flapplePk8 = swordSave.getMonAt(1, 3)
+    if (!flapplePk8) {
+      throw Error('Expected Flapple at box 2, slot 4')
+    }
+
+    console.log(flapplePk8.trainerID, flapplePk8.trainerFriendship)
+    expect(flapplePk8.handlerFriendship).toBe(50)
+
+    const flappleOhpkm = OHPKM.fromMonInSave(flapplePk8, swordSave)
+
+    // constructing from mon in save should preserve friendship
+    const initialhandlerData = flappleOhpkm.findKnownHandler(
+      swordSave.tid,
+      swordSave.sid,
+      OriginGame.Sword
+    )
+    expect(initialhandlerData).not.toBeUndefined()
+    expect(initialhandlerData?.friendship).toBe(50)
+
+    flapplePk8.handlerFriendship = 100
+    flappleOhpkm.syncWithGameData(flapplePk8, swordSave)
+
+    // sync should have updated friendship
+    const updatedhandlerData = flappleOhpkm.findKnownHandler(
+      swordSave.tid,
+      swordSave.sid,
+      OriginGame.Sword
+    )
+    expect(updatedhandlerData).not.toBeUndefined()
+    expect(updatedhandlerData?.friendship).toBe(100)
+
+    // const slowbroPk8 = R.assert(PK8.fromOhpkm(slowbroOhpkm, getDefaultConvertStrategy()))
+
+    // const moveIndexes = [53, 67, 89, 94, 247, 285, 414, 528]
+    // moveIndexes.forEach((index) => {
+    //   slowbroPk8.setTrMoveSwSh(index)
+    //   expect(slowbroPk8.hasTrSwSh(index), `TR move ${index} is set properly`).toBe(true)
+    // })
+    // slowbroOhpkm.syncWithGameData(slowbroPk8)
+
+    // moveIndexes.forEach((index) =>
+    //   expect(slowbroOhpkm.hasTrSwSh(index), `TR move ${index} is synced properly`).toBe(true)
+    // )
+  })
+
+  test('trainer friendship 2', () => {
+    let savePath = saveTestFilePath('gen8-swsh', 'sword-friendship-update')
+    const swordSaveBytes = new Uint8Array(readFileSync(savePath))
+    const swordSave = new SwordShieldSave(emptyPathData, swordSaveBytes)
+
+    const golduckPk8 = swordSave.getMonAt(0, 0)
+    if (!golduckPk8) {
+      throw Error('Expected Flapple at box 2, slot 4')
+    }
+
+    console.log(golduckPk8.trainerID, golduckPk8.trainerFriendship)
+    expect(golduckPk8.handlerFriendship).toBe(255)
+
+    const ohpkmFilePath = pkmTestFilePath('ohpkm', 'stanley-friendship-update.ohpkm')
+    const ohpkmFileBytes = new Uint8Array(readFileSync(ohpkmFilePath))
+    const golduckOhpkm = OHPKM.fromBytes(ohpkmFileBytes.buffer)
+
+    golduckOhpkm.syncWithGameData(golduckPk8, swordSave)
+
+    // sync should have updated friendship
+    const updatedhandlerData = golduckOhpkm.findKnownHandler(
+      swordSave.tid,
+      swordSave.sid,
+      OriginGame.Sword
+    )
+    expect(updatedhandlerData).not.toBeUndefined()
+    expect(updatedhandlerData?.friendship).toBe(255)
+
+    // const slowbroPk8 = R.assert(PK8.fromOhpkm(slowbroOhpkm, getDefaultConvertStrategy()))
+
+    // const moveIndexes = [53, 67, 89, 94, 247, 285, 414, 528]
+    // moveIndexes.forEach((index) => {
+    //   slowbroPk8.setTrMoveSwSh(index)
+    //   expect(slowbroPk8.hasTrSwSh(index), `TR move ${index} is set properly`).toBe(true)
+    // })
+    // slowbroOhpkm.syncWithGameData(slowbroPk8)
+
+    // moveIndexes.forEach((index) =>
+    //   expect(slowbroOhpkm.hasTrSwSh(index), `TR move ${index} is synced properly`).toBe(true)
+    // )
   })
 })
 
