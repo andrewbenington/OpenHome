@@ -75,8 +75,8 @@ jobs:
         with:
           tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
           releaseName: 'OpenHome v__VERSION__'
-          releaseDraft: true
-          prerelease: true
+          releaseDraft: false
+          prerelease: false
           tauriScript: 'cargo tauri'
-          releaseAssetNamePattern: '[mainBinaryName]-arch'
+          releaseAssetNamePattern: '[mainBinaryName]_[version]_arch_linux.[ext]'
           args: ${{ matrix.args }} --verbose
