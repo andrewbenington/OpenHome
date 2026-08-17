@@ -11,7 +11,7 @@ import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { LegendsArceusSave } from '../Gen89/LegendsArceus'
 import { ScarletVioletSave } from '../Gen89/ScarletVioletSave'
 import { SwordShieldSave } from '../Gen89/SwordShieldSave'
-import { PathData } from '../util/path'
+import { emptyPathData } from '../util/path'
 import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
@@ -20,16 +20,8 @@ function pkmTestFilePath(...pathElements: string[]): string {
   return path.join(__dirname, 'pkm-files', ...pathElements)
 }
 
-function saveTestFilePath(...pathElements: string[]): string {
+export function saveTestFilePath(...pathElements: string[]): string {
   return path.join(__dirname, 'save-files', ...pathElements)
-}
-
-const swordPath: PathData = {
-  raw: 'save-files/sword',
-  name: 'sword',
-  dir: 'save-files',
-  ext: '',
-  separator: '/',
 }
 
 const arceusPath = {
@@ -60,7 +52,7 @@ describe('gen 8 save files', () => {
 
     swordSaveBytes = new Uint8Array(readFileSync(savePath))
 
-    swordSave = new SwordShieldSave(swordPath, swordSaveBytes)
+    swordSave = new SwordShieldSave(emptyPathData, swordSaveBytes)
 
     savePath = saveTestFilePath('legendsarceus')
 
@@ -110,7 +102,7 @@ describe('gen 8 save files', () => {
     const reencrypted = SwishCrypto.encrypt(swordSave.scBlocks, swordSave.bytes.length)
 
     expect(SwishCrypto.getIsHashValid(reencrypted)).toBe(true)
-    const decrypted = new SwordShieldSave(swordPath, reencrypted)
+    const decrypted = new SwordShieldSave(emptyPathData, reencrypted)
 
     expect(decrypted.name).toBe(swordSave.name)
 
@@ -135,7 +127,7 @@ describe('gen 8 save files', () => {
     expect(swordSave.getMonAt(1, 3)?.nickname).toBe('NEW NAME')
 
     swordSave.prepareForSaving()
-    const modified = new SwordShieldSave(swordPath, swordSave.bytes)
+    const modified = new SwordShieldSave(emptyPathData, swordSave.bytes)
     const modifiedFlapple = modified.getMonAt(1, 3)
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
@@ -154,7 +146,7 @@ describe('gen 8 save files', () => {
     swordSave.updatedBoxSlots.push({ box: 1, boxSlot: 3 })
 
     swordSave.prepareForSaving()
-    const modified = new SwordShieldSave(swordPath, swordSave.bytes)
+    const modified = new SwordShieldSave(emptyPathData, swordSave.bytes)
     const modifiedFlapple = modified.getMonAt(1, 3)
 
     expect(modifiedFlapple?.nickname).toBe('NEW NAME')
