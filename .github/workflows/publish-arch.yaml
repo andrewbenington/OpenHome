@@ -1,12 +1,12 @@
 name: Build Binaries + Publish to Release - Arch
 
 on:
-  push:
-    branches:
-      - appimage-fix
+  release:
+    types: [published]
+  workflow_dispatch:
 
 jobs:
-  build-publish:
+  build-publish-arch:
     permissions:
       contents: write
     strategy:
@@ -73,4 +73,5 @@ jobs:
           releaseDraft: true
           prerelease: true
           tauriScript: 'cargo tauri'
+          releaseAssetNamePattern: '[mainBinaryName]-arch'
           args: ${{ matrix.args }} --verbose
