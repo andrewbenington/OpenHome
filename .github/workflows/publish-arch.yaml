@@ -1,0 +1,77 @@
+name: Build Binaries + Publish to Release - Arch
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-publish-arch:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'ubuntu-24.04'
+            target: 'x86_64-unknown-linux-gnu'
+            args: ''
+          - platform: 'ubuntu-24.04-arm'
+            target: 'aarch64-unknown-linux-gnu'
+            args: '--target aarch64-unknown-linux-gnu'
+
+    runs-on: ${{ matrix.platform }}
+    container: ghcr.io/pkgforge-dev/archlinux:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install PNPM
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S nodejs npm --noconfirm
+          pacman -S pnpm --noconfirm
+
+      # - name: Setup Node.js 24
+      #   uses: actions/setup-node@v6
+      #   with:
+      #     node-version: 24
+      #     cache: 'pnpm'
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || matrix.target == 'aarch64-pc-windows-msvc' && 'aarch64-pc-windows-msvc' || matrix.platform == 'ubuntu-24.04-arm' && 'aarch64-unknown-linux-gnu' || '' }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target, ./openhome_core -> target, ./pkm_rs -> target, ./pkm_rs_derive -> target, ./pkm_rs_resources -> target, ./pkm_rs_types -> target, . -> target'
+          key: ${{ matrix.target }}
+
+      - name: Install Tauri Dependencies (Ubuntu only)
+        if: startsWith(matrix.platform, 'ubuntu')
+        run: |
+          pacman -S --needed --noconfirm webkit2gtk-4.1 base-devel curl wget file openssl appmenu-gtk-module libappindicator-gtk3 librsvg xdotool
+          cargo install tauri-cli
+
+      - name: Install wasm-pack
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack
+
+      - name: Install Frontend Dependencies
+        run: pnpm i --frozen-lockfile
+
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NO_STRIP: true
+        with:
+          tagName: v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
+          releaseName: 'OpenHome v__VERSION__'
+          releaseDraft: true
+          prerelease: true
+          tauriScript: 'cargo tauri'
+          releaseAssetNamePattern: '[mainBinaryName]-arch'
+          args: ${{ matrix.args }} --verbose
