@@ -9,7 +9,11 @@ use serde::{Serialize, Serializer};
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 
+pub mod bdsp_tm;
+pub mod la_tutor;
 mod max_pp;
+pub mod sv_tm;
+pub mod swsh_tr;
 
 pub use max_pp::adjust_pp_between_games;
 pub use max_pp::get_base_max_pp;

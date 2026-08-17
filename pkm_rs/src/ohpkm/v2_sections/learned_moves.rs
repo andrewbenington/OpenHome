@@ -1,15 +1,33 @@
+use crate::ohpkm::v2::OhpkmSectionTag;
+use crate::result::{Error, Result};
+use crate::sectioned_data::DataSection;
+#[cfg(feature = "randomize")]
 use pkm_rs_resources::moves::MoveIndex;
+use pkm_rs_resources::moves::swsh_tr;
+use pkm_rs_resources::moves::{bdsp_tm, la_tutor, sv_tm};
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+use pkm_rs_types::{FlagSet, read_u16_le};
+#[cfg(feature = "randomize")]
+use rand::random_range;
 
+#[derive(Default, Debug, Clone, serde::Serialize)]
 pub struct LearnedMoves(std::collections::BTreeSet<u16>);
 
+const SIZE_FIELD_BYTES: usize = 2;
+
 impl LearnedMoves {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self(std::collections::BTreeSet::new())
     }
 
-    pub fn with_moves(&mut self, move_ids: impl IntoIterator<Item = u16>) -> &mut Self {
+    pub fn from_moves(move_ids: impl IntoIterator<Item = u16>) -> Self {
+        Self(move_ids.into_iter().collect())
+    }
+
+    pub fn with_moves(mut self, move_ids: impl IntoIterator<Item = u16>) -> Self {
         for move_id in move_ids {
-            self.0.insert(move_id)
+            self.0.insert(move_id);
         }
 
         self
@@ -17,61 +35,84 @@ impl LearnedMoves {
 }
 
 impl LearnedMoves {
-    pub fn from_v1(old: crate::ohpkm::v1::OhpkmV1) -> Option<Self> {}
+    pub fn from_v1(old: crate::ohpkm::v1::OhpkmV1) -> Option<Self> {
+        let tr_move_indices = FlagSet::from_bytes(old.tr_flags_swsh)
+            .get_flags()
+            .into_iter()
+            .filter_map(swsh_tr::move_id_by_tr_index);
+
+        let bdsp_tm_move_indices = FlagSet::from_bytes(old.tm_flags_bdsp)
+            .get_flags()
+            .into_iter()
+            .filter_map(bdsp_tm::move_id_by_tm_index);
+
+        let la_tutor_move_indices = FlagSet::from_bytes(old.tutor_flags_la)
+            .get_flags()
+            .into_iter()
+            .filter_map(la_tutor::move_id_by_tutor_index);
+
+        let sv_tm_move_indices = FlagSet::from_bytes(old.tm_flags_sv)
+            .get_flags()
+            .into_iter()
+            .filter_map(sv_tm::move_id_by_tm_index);
+
+        Some(
+            Self::new()
+                .with_moves(tr_move_indices)
+                .with_moves(bdsp_tm_move_indices)
+                .with_moves(la_tutor_move_indices)
+                .with_moves(sv_tm_move_indices),
+        )
+    }
 }
 
-impl DataSection for Gen67Data {
+impl DataSection for LearnedMoves {
     type TagType = OhpkmSectionTag;
-    const TAG: Self::TagType = OhpkmSectionTag::Gen67Data;
+    const TAG: Self::TagType = OhpkmSectionTag::LearnedMoves;
 
     type ErrorType = Error;
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
         Self::ensure_buffer_size(bytes);
 
-        Ok(Self {
-            training_bag_hits: bytes[0],
-            training_bag: bytes[1],
-            super_training_flags: u32::from_le_bytes(bytes[2..6].try_into().unwrap()),
-            super_training_dist_flags: bytes[6],
-            secret_super_training_unlocked: util::get_flag(bytes, 7, 0),
-            secret_super_training_complete: util::get_flag(bytes, 7, 1),
-            country: bytes[8],
-            region: bytes[9],
-            geolocations: Geolocations::from_bytes(bytes[10..20].try_into().unwrap()),
-            resort_event_status: bytes[20],
-            avs: Stats16Le::from_bytes(bytes[21..33].try_into().unwrap()),
-        })
+        let move_count = read_u16_le!(bytes, 0) as usize;
+        let moves_offset = SIZE_FIELD_BYTES;
+
+        let move_ids = (0..move_count).map(|index| read_u16_le!(bytes, moves_offset + index));
+
+        Ok(Self::from_moves(move_ids))
     }
 
     fn to_bytes(&self) -> Vec<u8> {
-        let mut bytes = [0u8; 33];
+        let mut bytes = Vec::with_capacity(SIZE_FIELD_BYTES + self.0.len() * 2);
 
-        bytes[0] = self.training_bag_hits;
-        bytes[1] = self.training_bag;
-        bytes[2..6].copy_from_slice(&self.super_training_flags.to_le_bytes());
-        bytes[6] = self.super_training_dist_flags;
-        util::set_flag(&mut bytes, 7, 0, self.secret_super_training_unlocked);
-        util::set_flag(&mut bytes, 7, 1, self.secret_super_training_complete);
-        bytes[8] = self.country;
-        bytes[9] = self.region;
-        bytes[10..20].copy_from_slice(&self.geolocations.to_bytes());
-        bytes[20] = self.resort_event_status;
-        bytes[21..33].copy_from_slice(&self.avs.to_bytes());
+        let mut offset = 0usize;
 
-        bytes.to_vec()
+        bytes[offset..offset + 2].copy_from_slice(&(self.0.len() as u16).to_le_bytes());
+        offset += 2;
+
+        for move_id in &self.0 {
+            bytes[offset..offset + 2].copy_from_slice(&move_id.to_le_bytes());
+            offset += 2;
+        }
+
+        bytes
     }
 
     fn is_empty(&self) -> bool {
-        self.training_bag == 0
-            && self.training_bag_hits == 0
-            && self.super_training_flags == 0
-            && self.super_training_dist_flags == 0
-            && !self.secret_super_training_unlocked
-            && !self.secret_super_training_complete
-            && self.country == 0
-            && self.region == 0
-            && bytes_are_empty(&self.geolocations.to_bytes())
-            && self.resort_event_status == 0
-            && bytes_are_empty(&self.avs.to_bytes())
+        self.0.is_empty()
+    }
+}
+
+#[cfg(feature = "randomize")]
+impl Randomize for LearnedMoves {
+    fn randomized<R: rand::prelude::Rng>(rng: &mut R) -> Self {
+        let knows_moves = bool::randomized(rng);
+        if !(knows_moves) {
+            return Self::default();
+        }
+
+        let move_count = random_range(0usize..=100);
+
+        Self::from_moves((0..move_count).map(|_| u16::from(MoveIndex::randomized(rng))))
     }
 }

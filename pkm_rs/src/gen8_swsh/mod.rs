@@ -17,7 +17,6 @@ mod pk8;
 mod pk8_buffer;
 mod save;
 mod save_blocks;
-mod trs;
 
 pub(crate) const PKM_DATA_SIZE: usize = 344;
 
