@@ -958,22 +958,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.teraTypeOverride = other.teraTypeOverride
     }
 
-    // if (other.trFlagsSwSh !== undefined && !arraysEqual(this.trFlagsSwSh, other.trFlagsSwSh)) {
-    //   // updates.push(syncUpdate('trFlagsSwSh', this.trFlagsSwSh, other.trFlagsSwSh))
-    //   const trFlags = getFlagsInArrayRange(other.trFlagsSwSh, 0, other.trFlagsSwSh.length)
-
-    //   for (const flag of trFlags) {
-    //     if (!this.trFlagsSwSh) {
-    //       this.trFlagsSwSh = new Uint8Array(SWSH_TR_BYTE_COUNT)
-    //     }
-    //     if (!getFlag(new DataView(this.trFlagsSwSh.buffer), 0, flag)) {
-    //       setFlag(new DataView(this.trFlagsSwSh.buffer), 0, flag, true)
-    //       updates.push(syncUpdate(`TR move: ${moveFromSwShTrFlag(flag).name}`))
-    //     }
-    //   }
-    //   this.trFlagsSwSh = other.trFlagsSwSh
-    // }
-
     if (other.dynamaxLevel && other.dynamaxLevel !== this.dynamaxLevel) {
       this.dynamaxLevel = Math.max(this.dynamaxLevel ?? 0, other.dynamaxLevel)
       updates.push(syncUpdate('Dynamax Level', this.dynamaxLevel))
