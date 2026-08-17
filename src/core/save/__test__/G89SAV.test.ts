@@ -11,7 +11,7 @@ import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { LegendsArceusSave } from '../Gen89/LegendsArceus'
 import { ScarletVioletSave } from '../Gen89/ScarletVioletSave'
 import { SwordShieldSave } from '../Gen89/SwordShieldSave'
-import { emptyPathData } from '../util/path'
+import { emptyPathData, PathData } from '../util/path'
 import { initializeWasm } from './init'
 
 beforeAll(initializeWasm)
