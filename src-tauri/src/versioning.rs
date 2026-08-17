@@ -172,6 +172,7 @@ pub enum SignificantUpdate {
     V1_14_2,
     V1_15_0,
     V1_15_1,
+    V1_15_2,
 }
 
 impl SignificantUpdate {
@@ -206,6 +207,7 @@ impl SignificantUpdate {
             Self::V1_14_2 => Version::parse("1.14.2"),
             Self::V1_15_0 => Version::parse("1.15.0"),
             Self::V1_15_1 => Version::parse("1.15.1"),
+            Self::V1_15_2 => Version::parse("1.15.2"),
         }
         .expect("all versions are valid semver")
     }
@@ -347,6 +349,10 @@ impl SignificantUpdate {
             ]),
             Self::V1_15_1 => Some(vec![
                 "A bug preventing Pokémon data from being re-associated has been fixed. If your Pokémon have been affected by this bug, you can fix them by right clicking on each, choosing 'Merge/Recover Tracking Data', finding and selecting the lost data in the dialog that appears, and confirming the recovery. Please take care to check whether the data you are looking for is the correct data!",
+            ]),
+            Self::V1_15_2 => Some(vec![
+                "A bug preventing saving an open Scarlet/Violet save has been fixed",
+                "Binaries more compatible with Arch-based Linux distributions are now now build built with each release.",
             ]),
             _ => None,
         }

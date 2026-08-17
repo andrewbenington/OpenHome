@@ -1,6 +1,6 @@
 [package]
 name = "openhome_core"
-version = "1.15.2-beta.1.arch-linux"
+version = "1.15.2"
 edition = "2024"
 
 [dependencies]
