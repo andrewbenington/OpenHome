@@ -1,8 +1,8 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { isWasmFormat, WasmPkmFormat } from '@openhome-core/pkm/PKM'
+import { Gen34ContestRibbons, Gen34TowerRibbons } from '@openhome-core/resources'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
-  Gen34ContestRibbons,
-  Gen34TowerRibbons,
   LZA_DLC_TM_BYTES,
   LZA_PLUS_MOVES_BLOCK_C_BYTES,
   LZA_PLUS_MOVES_BLOCK_D_BYTES,
@@ -11,8 +11,7 @@ import {
   movesFromSvTmFlags,
   movesFromSwshTrFlags,
   SWSH_TR_BYTE_COUNT,
-} from '@openhome-core/resources'
-import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+} from '@openhome-core/resources/moves/flags'
 import {
   expectExhaustive,
   getFlag,
