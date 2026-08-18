@@ -1,10 +1,7 @@
 use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result};
 use crate::sectioned_data::DataSection;
-#[cfg(feature = "randomize")]
-use pkm_rs_resources::moves::MoveIndex;
-use pkm_rs_resources::moves::swsh_tr;
-use pkm_rs_resources::moves::{bdsp_tm, la_tutor, sv_tm};
+use pkm_rs_resources::moves::{MoveIndex, bdsp_tm, la_tutor, sv_tm, swsh_tr};
 #[cfg(feature = "randomize")]
 use pkm_rs_types::randomize::Randomize;
 use pkm_rs_types::{FlagSet, read_u16_le};
@@ -21,16 +18,28 @@ impl LearnedMoves {
         Self(std::collections::BTreeSet::new())
     }
 
-    pub fn from_moves(move_ids: impl IntoIterator<Item = u16>) -> Self {
-        Self(move_ids.into_iter().collect())
+    pub fn from_moves(move_ids: impl IntoIterator<Item = MoveIndex>) -> Self {
+        Self(move_ids.into_iter().map(u16::from).collect())
     }
 
-    pub fn with_moves(mut self, move_ids: impl IntoIterator<Item = u16>) -> Self {
+    pub fn add_moves(&mut self, move_ids: impl IntoIterator<Item = MoveIndex>) {
         for move_id in move_ids {
-            self.0.insert(move_id);
+            self.0.insert(move_id.into());
         }
+    }
+
+    pub fn with_moves(mut self, move_ids: impl IntoIterator<Item = MoveIndex>) -> Self {
+        self.add_moves(move_ids);
 
         self
+    }
+
+    pub fn count(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn all_ordered(&self) -> Vec<u16> {
+        self.0.iter().copied().collect()
     }
 }
 
@@ -77,7 +86,8 @@ impl DataSection for LearnedMoves {
         let move_count = read_u16_le!(bytes, 0) as usize;
         let moves_offset = SIZE_FIELD_BYTES;
 
-        let move_ids = (0..move_count).map(|index| read_u16_le!(bytes, moves_offset + index));
+        let move_ids = (0..move_count)
+            .map(|index| MoveIndex::from_u16(read_u16_le!(bytes, moves_offset + 2 * index)));
 
         Ok(Self::from_moves(move_ids))
     }
@@ -85,14 +95,10 @@ impl DataSection for LearnedMoves {
     fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(SIZE_FIELD_BYTES + self.0.len() * 2);
 
-        let mut offset = 0usize;
-
-        bytes[offset..offset + 2].copy_from_slice(&(self.0.len() as u16).to_le_bytes());
-        offset += 2;
+        bytes.append(&mut (self.0.len() as u16).to_le_bytes().to_vec());
 
         for move_id in &self.0 {
-            bytes[offset..offset + 2].copy_from_slice(&move_id.to_le_bytes());
-            offset += 2;
+            bytes.append(&mut move_id.to_le_bytes().to_vec());
         }
 
         bytes
@@ -113,6 +119,6 @@ impl Randomize for LearnedMoves {
 
         let move_count = random_range(0usize..=100);
 
-        Self::from_moves((0..move_count).map(|_| u16::from(MoveIndex::randomized(rng))))
+        Self::from_moves((0..move_count).map(|_| MoveIndex::randomized(rng)))
     }
 }

@@ -685,6 +685,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   public get speciesMetadata() {
     return SpeciesLookup(this.nationalDex)
   }
+
   public syncWithGameData(other: PKMInterface, save?: SAV) {
     const updates: SyncUpdate[] = []
 

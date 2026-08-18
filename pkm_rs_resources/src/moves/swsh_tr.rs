@@ -1,3 +1,4 @@
+use crate::moves::MoveIndex;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -43,9 +44,9 @@ const fn build_reverse() -> [u16; MAX_VAL + 1] {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "moveIdBySwshTrIndex"))]
 #[allow(clippy::missing_const_for_fn)]
-pub fn move_id_by_tr_index(index: usize) -> Option<u16> {
+pub fn move_id_by_tr_index(index: usize) -> Option<MoveIndex> {
     if index < MOVE_ID_BY_TR_INDEX.len() {
-        Some(MOVE_ID_BY_TR_INDEX[index])
+        Some(MoveIndex::from_u16(MOVE_ID_BY_TR_INDEX[index]))
     } else {
         None
     }

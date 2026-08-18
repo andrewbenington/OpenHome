@@ -22,8 +22,8 @@ use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::MoveIndex;
-use pkm_rs_resources::moves::MoveSlots;
+use pkm_rs_resources::moves::{MoveIndex, la_tutor, sv_tm, swsh_tr};
+use pkm_rs_resources::moves::{MoveSlots, bdsp_tm};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
@@ -158,6 +158,7 @@ impl OhpkmSectionTag {
             0x0D => Some(Self::OriginalBackup),
             0x0E => Some(Self::UnconvertedPkm),
             0x0F => Some(Self::PastHandlerV2),
+            0x10 => Some(Self::LearnedMoves),
             _ => None,
         }
     }
@@ -771,6 +772,13 @@ impl OhpkmV2 {
 
     pub const fn set_relearn_moves(&mut self, value: [MoveIndex; 4]) {
         self.main_data.relearn_moves = value;
+    }
+
+    pub fn get_learned_moves(&self) -> Vec<u16> {
+        self.learned_moves
+            .as_ref()
+            .map(|moves| moves.all_ordered())
+            .unwrap_or_default()
     }
 
     pub const fn home_tracker(&self) -> Option<u64> {
@@ -1755,6 +1763,7 @@ impl OhpkmV2 {
             sv_data,
             lza_data,
             handler_data,
+            learned_moves,
             plugin_data,
             notes,
             most_recent_save,
@@ -1776,6 +1785,7 @@ impl OhpkmV2 {
             .add_all(handler_data)
             .add_if_some(plugin_data)
             .add_if_some(notes)
+            .add_if_some(learned_moves)
             .add_if_some(most_recent_save)
             .add_if_some(tags)
             .add_if_some(original_data)
@@ -1802,6 +1812,8 @@ impl OhpkmV2 {
 
     pub fn fix_errors(&mut self) -> Vec<OhpkmIssue> {
         let mut fixed_issues = Vec::<OhpkmIssue>::new();
+
+        self.populate_learned_moves();
 
         fixed_issues.append(&mut self.main_data.fix_errors());
 
@@ -1850,6 +1862,50 @@ impl OhpkmV2 {
 
     pub fn revert_ability_by_num(&mut self) {
         self.main_data.revert_ability_by_num()
+    }
+
+    pub fn populate_learned_moves(&mut self) {
+        let mut learned_moves = self.learned_moves.take().unwrap_or_default();
+        dbg!("initial", self.main_data.nickname, &learned_moves);
+
+        if let Some(swsh_data) = self.swsh_data {
+            let swsh_tr_move_ids = FlagSet::from_bytes(swsh_data.tr_flags)
+                .get_flags()
+                .into_iter()
+                .filter_map(swsh_tr::move_id_by_tr_index);
+            learned_moves.add_moves(swsh_tr_move_ids);
+        };
+
+        if let Some(bdsp_data) = self.bdsp_data {
+            let bdsp_tm_move_ids = bdsp_data
+                .tm_flags
+                .get_flags()
+                .into_iter()
+                .filter_map(bdsp_tm::move_id_by_tm_index);
+            learned_moves.add_moves(bdsp_tm_move_ids);
+        };
+
+        if let Some(la_data) = self.la_data {
+            let la_tutor_move_ids = la_data
+                .tutor_flags
+                .get_flags()
+                .into_iter()
+                .filter_map(la_tutor::move_id_by_tutor_index);
+            learned_moves.add_moves(la_tutor_move_ids);
+        };
+
+        if let Some(sv_data) = self.sv_data {
+            let sv_tm_move_ids = sv_data
+                .tm_flags
+                .get_flags()
+                .into_iter()
+                .filter_map(sv_tm::move_id_by_tm_index);
+            learned_moves.add_moves(sv_tm_move_ids);
+        };
+
+        if learned_moves.count() > 0 {
+            self.learned_moves = Some(learned_moves);
+        }
     }
 }
 
@@ -1910,6 +1966,7 @@ impl OhpkmV2 {
             sv_data,
             lza_data,
             handler_data,
+            learned_moves,
             plugin_data,
             notes,
             most_recent_save,
@@ -1937,6 +1994,7 @@ impl OhpkmV2 {
             add_section_bytes_to_js_object(&obj, &Some(handler.clone()))?;
         }
 
+        add_section_bytes_to_js_object(&obj, learned_moves)?;
         add_section_bytes_to_js_object(&obj, plugin_data)?;
         add_section_bytes_to_js_object(&obj, notes)?;
         add_section_bytes_to_js_object(&obj, most_recent_save)?;
@@ -2560,6 +2618,20 @@ impl OhpkmV2 {
             MoveIndex::from(value[2]),
             MoveIndex::from(value[3]),
         ]
+    }
+
+    #[wasm_bindgen(getter = learnedMovesWasm)]
+    pub fn get_learned_moves_wasm(&mut self) -> Vec<usize> {
+        self.learned_moves
+            .as_ref()
+            .map(|moves| {
+                moves
+                    .all_ordered()
+                    .into_iter()
+                    .map(|id| id as usize)
+                    .collect()
+            })
+            .unwrap_or_default()
     }
 
     #[wasm_bindgen(getter = homeTracker)]
