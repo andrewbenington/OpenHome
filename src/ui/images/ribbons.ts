@@ -49,7 +49,7 @@ const RibbonsImageMap: { [key: string]: string } = {
   'Cleverness Master': 'ribbons/cleverness-master.png',
   'Toughness Master': 'ribbons/toughness-master.png',
   'Alola Champion': 'ribbons/alola-champion.png',
-  'Battle Royal Master': 'ribbons/battle-royal-master.png',
+  'Battle Royal Champion': 'ribbons/battle-royal-champion.png',
   'Battle Tree Great': 'ribbons/battle-tree-great.png',
   'Battle Tree Master': 'ribbons/battle-tree-master.png',
   'Galar Champion': 'ribbons/galar-champion.png',
