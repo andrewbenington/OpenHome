@@ -1,3 +1,4 @@
+use crate::moves::MoveIndex;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
@@ -41,9 +42,9 @@ const fn build_reverse() -> [u16; MAX_VAL + 1] {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "moveIdByLaTutorIndex"))]
 #[allow(clippy::missing_const_for_fn)]
-pub fn move_id_by_tutor_index(index: usize) -> Option<u16> {
+pub fn move_id_by_tutor_index(index: usize) -> Option<MoveIndex> {
     if index < MOVE_ID_BY_TUTOR_INDEX.len() {
-        Some(MOVE_ID_BY_TUTOR_INDEX[index])
+        Some(MoveIndex::from_u16(MOVE_ID_BY_TUTOR_INDEX[index]))
     } else {
         None
     }
@@ -54,7 +55,12 @@ pub fn move_id_by_tutor_index(index: usize) -> Option<u16> {
 pub fn tutor_index_by_move_id(move_id: u16) -> Option<u16> {
     let move_id = move_id as usize;
     if move_id < TUTOR_INDEX_BY_MOVE_ID.len() {
-        Some(TUTOR_INDEX_BY_MOVE_ID[move_id])
+        let index = TUTOR_INDEX_BY_MOVE_ID[move_id];
+        if index != NOT_FOUND {
+            Some(index)
+        } else {
+            None
+        }
     } else {
         None
     }

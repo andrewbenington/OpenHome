@@ -267,6 +267,17 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               ))}
             </AttributeRowExpand>
           )}
+        {mon instanceof OHPKM && (
+          <AttributeRowExpand summary="Learned Moves" value={mon.learnedMovesWasm.length}>
+            {Array.from(mon.learnedMovesWasm)
+              .map((id) => Moves[id])
+              .map((move) => (
+                <AttributeRow key={`learned_move_${move.id}`} label={move.name} indent={10}>
+                  {move.name}
+                </AttributeRow>
+              ))}
+          </AttributeRowExpand>
+        )}
         {!isRestricted(
           HGSS_TRANSFER_RESTRICTIONS,
           mon.nationalDex,

@@ -75,23 +75,23 @@ async function getAllMoves() {
 async function main() {
   const allMoves: Move[] = await getAllMoves()
 
-  let output = `use std::num::NonZeroU16;
+  let output = `pub mod bdsp_tm;
+pub mod la_tutor;
+mod max_pp;
+pub mod sv_tm;
+pub mod swsh_tr;
 
+use crate::metadata_source::MetadataSource;
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+use pkm_rs_types::{Generation, PkmType, read_u16_le};
+use serde::{Serialize, Serializer};
+use std::num::NonZeroU16;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use pkm_rs_types::{Generation, PkmType, read_u16_le};
-use serde::{Serialize, Serializer};
-
-#[cfg(feature = "randomize")]
-use pkm_rs_types::randomize::Randomize;
-
-mod max_pp;
-
 pub use max_pp::adjust_pp_between_games;
 pub use max_pp::get_base_max_pp;
-
-use crate::metadata_source::MetadataSource;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
