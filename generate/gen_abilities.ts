@@ -17,12 +17,12 @@ function convertToEnumMember(input: string): string {
   const words = input.trim().split(/[\s-]+/)
 
   // Capitalize the first letter of each word and join them
-  const pascalCaseString = words
+
+
+  return words
     .map((word) => (word.length === 0 ? '' : word[0].toUpperCase() + word.slice(1)))
     .join('')
     .replace(/[^A-Za-z0-9]/g, '')
-
-  return pascalCaseString
 }
 
 export function rustAbilityConstName(index: number, ability: string): string {

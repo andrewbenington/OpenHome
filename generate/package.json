@@ -1,7 +1,7 @@
 {
   "type": "module",
   "devDependencies": {
-    "@types/node": "^24.0.14"
+    "@types/node": "^24.13.3"
   },
   "dependencies": {
     "better-sqlite3": "^12.4.1",

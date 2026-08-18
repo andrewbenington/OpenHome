@@ -18,8 +18,8 @@ use openhome_core::lookup::LookupState;
 use openhome_core::ohpkm_store::OhpkmBytesStore;
 use openhome_core::{Error, Result};
 use pkm_rs::ohpkm::OhpkmV2;
-use std::env;
-use tauri::Manager;
+use std::{env, thread};
+use tauri::{App, AppHandle, Manager};
 
 const RAW_HANDLER: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_handler![
     commands::get_file_bytes,
@@ -80,100 +80,11 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
 
-
             let handle = app.handle().clone();
 
-            let startup_config_state = match startup_config::StartupConfigState::load_or_create() {
-                Ok(state) => state,
-                Err(err) => {
-                    util::show_error_dialog(app, err, launch_error_msg("Startup Config"));
-
-                    app.handle().exit(1);
-                    std::process::exit(1);
-                }
-            };
-            app.manage(startup_config_state);
-
-            let update_features_r = startup::run_startup_async(&app, &handle);
-
-            let Ok(update_features) = update_features_r else {
-                let launch_error = update_features_r.unwrap_err();
-                match launch_error {
-                    Error::OutdatedVersion { .. } => app.handle().exit(1),
-                    _ => {
-                        util::show_error_dialog(app, launch_error, "OpenHome Failed to Launch");
-
-                        app.handle().exit(1);
-                    }
-                };
-                std::process::exit(1);
-            };
-
-            let controller = app.handle().controller();
-
-            let ohpkm_store = match OhpkmBytesStore::load_from_mons_v2(&controller) {
-                Ok(state) => state,
-                Err(err) => {
-                    util::show_error_dialog(app, err, launch_error_msg("OHPKM Load"));
-
-                    app.handle().exit(1);
-                    std::process::exit(1);
-                }
-            };
-
-            let mut lookup_state = match LookupState::load_from_storage(&controller) {
-                Ok(lookup) => lookup,
-                Err(err) => {
-                    util::show_error_dialog(app, err, launch_error_msg("Lookup File"));
-
-                    app.handle().exit(1);
-                    std::process::exit(1);
-                }
-            };
-
-            lookup_state.with_recalculated(
-                ohpkm_store
-                    .all_entries()
-                    .filter_map(|(_, bytes)| OhpkmV2::from_bytes(bytes).ok()),
-            );
-
-            let conversion_settings = match ConvertStrategies::load_from_storage(&controller) {
-                Ok(settings) => settings,
-                Err(err) => {
-                    util::show_error_dialog(app, err, launch_error_msg("Conversion Settings"));
-
-                    app.handle().exit(1);
-                    std::process::exit(1);
-                }
-            };
-
-            let synced_state =
-                AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
-            app.manage(synced_state);
-
-            let pokedex_state = match state::PokedexState::load_from_storage(&controller) {
-                Ok(pokedex) => pokedex,
-                Err(err) => {
-                    util::show_error_dialog(app, err, launch_error_msg("Pokedex File"));
-
-                    app.handle().exit(1);
-                    std::process::exit(1);
-                }
-            };
-            app.manage(pokedex_state);
-
-            app.manage(state::AppState::from_update_features(update_features));
-
-            match menu::create_menu(app) {
-                Ok(menu) => {
-                    let _ = app.set_menu(menu);
-                    Ok(())
-                }
-                Err(e) => {
-                    eprintln!("Error creating menu: {}", e);
-                    Err(e)
-                }
-            }
+            thread::spawn(|| {
+                do_async_setup(&app, &handle);
+            })
         })
         .on_menu_event(|app_handle, event| {
             menu::handle_menu_event(app_handle, event);
@@ -191,6 +102,104 @@ pub fn run() {
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+pub async fn do_async_setup(app: &&mut App, handle: &AppHandle) -> Result<()> {
+    let startup_config_state = match startup_config::StartupConfigState::load_or_create() {
+        Ok(state) => state,
+        Err(err) => {
+            util::show_error_dialog(app, err, launch_error_msg("Startup Config"));
+
+            app.handle().exit(1);
+            std::process::exit(1);
+        }
+    };
+    app.manage(startup_config_state);
+
+    let update_features_r = startup::run_startup_async(&app, &handle);
+
+    let Ok(update_features) = update_features_r else {
+        let launch_error = update_features_r.unwrap_err();
+        match launch_error {
+            Error::OutdatedVersion { .. } => app.handle().exit(1),
+            _ => {
+                util::show_error_dialog(app, launch_error, "OpenHome Failed to Launch");
+
+                app.handle().exit(1);
+            }
+        };
+        std::process::exit(1);
+    };
+
+    let controller = app.handle().controller();
+
+    let ohpkm_store = match OhpkmBytesStore::load_from_mons_v2(&controller) {
+        Ok(state) => state,
+        Err(err) => {
+            util::show_error_dialog(app, err, launch_error_msg("OHPKM Load"));
+
+            app.handle().exit(1);
+            std::process::exit(1);
+        }
+    };
+
+    let mut lookup_state = match LookupState::load_from_storage(&controller) {
+        Ok(lookup) => lookup,
+        Err(err) => {
+            util::show_error_dialog(app, err, launch_error_msg("Lookup File"));
+
+            app.handle().exit(1);
+            std::process::exit(1);
+        }
+    };
+
+    lookup_state.with_recalculated(
+        ohpkm_store
+            .all_entries()
+            .filter_map(|(_, bytes)| OhpkmV2::from_bytes(bytes).ok()),
+    );
+
+    let conversion_settings = match ConvertStrategies::load_from_storage(&controller) {
+        Ok(settings) => settings,
+        Err(err) => {
+            util::show_error_dialog(app, err, launch_error_msg("Conversion Settings"));
+
+            app.handle().exit(1);
+            std::process::exit(1);
+        }
+    };
+
+    let synced_state =
+        AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
+    app.manage(synced_state);
+
+    let pokedex_state = match state::PokedexState::load_from_storage(&controller) {
+        Ok(pokedex) => pokedex,
+        Err(err) => {
+            util::show_error_dialog(app, err, launch_error_msg("Pokedex File"));
+
+            app.handle().exit(1);
+            std::process::exit(1);
+        }
+    };
+    app.manage(pokedex_state);
+
+    app.manage(state::AppState::from_update_features(update_features));
+
+    match menu::create_menu(app) {
+        Ok(menu) => {
+            let _ = app.set_menu(menu);
+            Ok(())
+        }
+        Err(e) => {
+            eprintln!("Error creating menu: {}", e);
+            Err(MenuCreationError())
+        }
+    }
+}
+
+fn MenuCreationError() -> Error {
+    Error("My error")
 }
 
 fn launch_error_msg(error_category: &str) -> String {
