@@ -774,7 +774,7 @@ impl OhpkmV2 {
         self.main_data.relearn_moves = value;
     }
 
-    pub fn get_learned_moves(&self) -> Vec<u16> {
+    pub fn get_learned_moves(&self) -> Vec<MoveIndex> {
         self.learned_moves
             .as_ref()
             .map(|moves| moves.all_ordered())
@@ -1902,6 +1902,8 @@ impl OhpkmV2 {
             learned_moves.add_moves(sv_tm_move_ids);
         };
 
+        learned_moves.add_moves(self.main_data.relearn_moves);
+
         if learned_moves.count() > 0 {
             self.learned_moves = Some(learned_moves);
         }
@@ -2626,7 +2628,8 @@ impl OhpkmV2 {
             .map(|moves| {
                 moves
                     .all_ordered()
-                    .into_iter()
+                    .iter()
+                    .filter_map(MoveIndex::to_raw)
                     .map(|id| id as usize)
                     .collect()
             })

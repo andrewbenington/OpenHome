@@ -127,12 +127,17 @@ export interface AllPKMFields {
   teraTypeOriginal?: TeraType
   teraTypeOverride?: TeraType
   tmFlagsBDSP?: Uint8Array
+  tmMovesBDSP?: Move[]
   tmFlagsLzaBase?: Uint8Array
+  tmMovesLzaBase?: Move[]
   tmFlagsLzaDlc?: Uint8Array
+  tmMovesLzaDlc?: Move[]
   plusMoveFlagsLzaBlockC?: Uint8Array // 33 bytes
   plusMoveFlagsLzaBlockD?: Uint8Array // 12 bytes
   tmFlagsSV?: Uint8Array
+  tmMovesSV?: Move[]
   tmFlagsSVDLC?: Uint8Array
+  tmMovesSVDLC?: Move[]
   trFlagsSwSh?: Uint8Array
   trMovesSwSh?: Move[]
   trainerAffection?: number
@@ -144,6 +149,7 @@ export interface AllPKMFields {
   trainingBag?: number
   trainingBagHits?: number
   tutorFlagsLA?: Uint8Array
+  tutorMovesLa?: Move[]
   type1?: number
   type2?: number
   unknownA0?: number

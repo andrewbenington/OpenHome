@@ -23,7 +23,8 @@ import LogsPage from '../pages/logs/LogsPage'
 import { useConvertStrategies } from '../state/convert-strategies'
 import './style.css'
 import DisplayTab from './tabs/DisplayTab'
-import MetDataMovesTab from './tabs/MetDataMovesTab'
+import MetDataTab from './tabs/MetDataTab'
+import MovesTab from './tabs/MovesTab'
 import NotesDisplay from './tabs/NotesTab'
 import OtherDisplay from './tabs/OtherTab'
 import RecentSaveTab from './tabs/RecentSaveTab'
@@ -245,7 +246,8 @@ function ModalContents(props: ModalContentsProps) {
           </button>
         </Flex>
         <SideTabs.Tab value="summary">Summary</SideTabs.Tab>
-        <SideTabs.Tab value="moves_met_data">Moves/Met Data</SideTabs.Tab>
+        <SideTabs.Tab value="moves">Moves</SideTabs.Tab>
+        <SideTabs.Tab value="met_data">Met Data</SideTabs.Tab>
         <SideTabs.Tab value="stats">Stats</SideTabs.Tab>
         <SideTabs.Tab value="ribbons">Ribbons</SideTabs.Tab>
         <SideTabs.Tab value="other">Other</SideTabs.Tab>
@@ -276,8 +278,11 @@ function ModalContents(props: ModalContentsProps) {
         <SideTabs.Panel value="summary">
           <SummaryDisplay mon={displayMon} />
         </SideTabs.Panel>
-        <SideTabs.Panel value="moves_met_data">
-          <MetDataMovesTab mon={displayMon} />
+        <SideTabs.Panel value="moves">
+          <MovesTab mon={displayMon} />
+        </SideTabs.Panel>
+        <SideTabs.Panel value="met_data">
+          <MetDataTab mon={displayMon} />
         </SideTabs.Panel>
         <SideTabs.Panel value="stats">
           <StatsDisplay mon={displayMon} />
