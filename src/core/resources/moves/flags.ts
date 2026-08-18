@@ -1,7 +1,7 @@
 import { getFlagsInArrayRange } from '@openhome-core/util'
 import { filterUndefined } from '@openhome-core/util/sort'
 import { moveIdByBdspTmIndex, moveIdByLaTutorIndex, moveIdBySwshTrIndex } from '@pkm-rs/pkg'
-import { Move, Moves } from '../moves'
+import { Move, Moves } from '.'
 
 export const SWSH_TR_BYTE_COUNT = 14
 
@@ -38,3 +38,8 @@ export function movesFromSvTmFlags(flags: Uint8Array): Move[] {
     .filter(filterUndefined)
     .map((index) => Moves[index])
 }
+
+export const LZA_BASE_TM_BYTES = 25
+export const LZA_DLC_TM_BYTES = 13
+export const LZA_PLUS_MOVES_BLOCK_C_BYTES = 33
+export const LZA_PLUS_MOVES_BLOCK_D_BYTES = 12

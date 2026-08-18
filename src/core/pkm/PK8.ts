@@ -1,5 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { ModernRibbons, movesFromSwshTrFlags } from '@openhome-core/resources'
+import { ModernRibbons } from '@openhome-core/resources'
+import { movesFromSwshTrFlags } from '@openhome-core/resources/moves/flags'
 import { getFlag, setFlag } from '@openhome-core/util'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
 import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
