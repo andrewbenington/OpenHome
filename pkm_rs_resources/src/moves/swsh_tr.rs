@@ -11,64 +11,23 @@ const MOVE_ID_BY_TR_INDEX: [u16; 100] = [
     706, 710, 776,
 ];
 
-const fn max_value() -> u16 {
-    let mut max = 0u16;
-    let mut i = 0;
-    while i < MOVE_ID_BY_TR_INDEX.len() {
-        if MOVE_ID_BY_TR_INDEX[i] > max {
-            max = MOVE_ID_BY_TR_INDEX[i];
-        }
-        i += 1;
-    }
-    max
-}
+const MAX_VAL: usize = super::index_lookup::max_value(&MOVE_ID_BY_TR_INDEX) as usize;
 
-const MAX_VAL: usize = max_value() as usize;
-const NOT_FOUND: u16 = u16::MAX;
-
-const TR_INDEX_BY_MOVE_ID: [u16; MAX_VAL + 1] = build_reverse();
-
-const fn build_reverse() -> [u16; MAX_VAL + 1] {
-    let mut table = [NOT_FOUND; MAX_VAL + 1];
-    let mut i = 0;
-    while i < MOVE_ID_BY_TR_INDEX.len() {
-        let v = MOVE_ID_BY_TR_INDEX[i] as usize;
-        if table[v] != NOT_FOUND {
-            panic!("duplicate value in MOVE_ID_BY_TR_INDEX");
-        }
-        table[v] = i as u16;
-        i += 1;
-    }
-    table
-}
+const TR_INDEX_BY_MOVE_ID: [u16; MAX_VAL + 1] =
+    super::index_lookup::build_reverse(MOVE_ID_BY_TR_INDEX);
 
 pub const fn move_id_by_tr_index(index: usize) -> Option<MoveIndex> {
-    if index < MOVE_ID_BY_TR_INDEX.len() {
-        Some(MoveIndex::from_u16(MOVE_ID_BY_TR_INDEX[index]))
-    } else {
-        None
-    }
+    super::index_lookup::move_id_by_index(&MOVE_ID_BY_TR_INDEX, index)
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "moveIdBySwshTrIndex"))]
 #[allow(clippy::missing_const_for_fn)]
 pub fn move_id_by_tr_index_wasm(index: usize) -> Option<u16> {
-    move_id_by_tr_index(index)
-        .as_ref()
-        .and_then(MoveIndex::to_raw)
-}
-
-pub const fn tr_index_by_move_id(move_id: u16) -> Option<u16> {
-    let move_id = move_id as usize;
-    if move_id < TR_INDEX_BY_MOVE_ID.len() {
-        Some(TR_INDEX_BY_MOVE_ID[move_id])
-    } else {
-        None
-    }
+    super::index_lookup::move_id_by_index_wasm(&MOVE_ID_BY_TR_INDEX, index)
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "swshTrIndexByMoveId"))]
 #[allow(clippy::missing_const_for_fn)]
-pub fn tr_index_by_move_id_wasm(move_id: u16) -> Option<u16> {
-    tr_index_by_move_id(move_id)
+pub fn tr_index_by_move_id(move_id: u16) -> Option<u16> {
+    super::index_lookup::index_by_move_id(&TR_INDEX_BY_MOVE_ID, move_id)
 }
