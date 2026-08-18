@@ -6,9 +6,11 @@ import {
   LZA_DLC_TM_BYTES,
   LZA_PLUS_MOVES_BLOCK_C_BYTES,
   LZA_PLUS_MOVES_BLOCK_D_BYTES,
+  movesFromBdspTmFlags,
+  movesFromLaTutorFlags,
+  movesFromSvTmFlags,
   movesFromSwshTrFlags,
   SWSH_TR_BYTE_COUNT,
-  trIndexForMove,
 } from '@openhome-core/resources'
 import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
@@ -47,6 +49,7 @@ import {
   ShinyLeaves,
   SpeciesForm,
   SpeciesLookup,
+  swshTrIndexByMoveId,
   Tag,
   TeraType,
   TrainerData,
@@ -517,7 +520,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     const trFlags = this.trFlagsSwSh
     if (!trFlags) return false
 
-    const trIndex = trIndexForMove(moveId)
+    const trIndex = swshTrIndexByMoveId(moveId)
     return trIndex !== undefined && getFlag(new DataView(trFlags.buffer), 0, trIndex)
   }
 
@@ -525,7 +528,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     const trFlags = this.trFlagsSwSh
     if (!trFlags) return undefined
 
-    const trIndex = trIndexForMove(moveId)
+    const trIndex = swshTrIndexByMoveId(moveId)
     if (trIndex !== undefined) {
       setFlag(new DataView(trFlags.buffer), 0, trIndex, true)
     }
@@ -566,6 +569,18 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.plusMoveFlagsLzaBlockD || new Uint8Array(LZA_PLUS_MOVES_BLOCK_D_BYTES),
       otherPlusFlags
     )
+  }
+
+  get tmMovesBdsp() {
+    return this.tmFlagsBDSP ? movesFromBdspTmFlags(this.tmFlagsBDSP) : []
+  }
+
+  get tutorMovesLa() {
+    return this.tutorFlagsLA ? movesFromLaTutorFlags(this.tutorFlagsLA) : []
+  }
+
+  get tmMovesSvBaseGame() {
+    return this.tmFlagsSV ? movesFromSvTmFlags(this.tmFlagsSV) : []
   }
 
   public getLevel(): number {

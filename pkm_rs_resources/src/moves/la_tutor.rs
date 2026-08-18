@@ -9,59 +9,23 @@ const MOVE_ID_BY_TUTOR_INDEX: [u16; 61] = [
     796, 344,
 ];
 
-const fn max_value() -> u16 {
-    let mut max = 0u16;
-    let mut i = 0;
-    while i < MOVE_ID_BY_TUTOR_INDEX.len() {
-        if MOVE_ID_BY_TUTOR_INDEX[i] > max {
-            max = MOVE_ID_BY_TUTOR_INDEX[i];
-        }
-        i += 1;
-    }
-    max
-}
+const MAX_VAL: usize = super::index_lookup::max_value(&MOVE_ID_BY_TUTOR_INDEX) as usize;
 
-const MAX_VAL: usize = max_value() as usize;
-const NOT_FOUND: u16 = u16::MAX;
+const TUTOR_INDEX_BY_MOVE_ID: [u16; MAX_VAL + 1] =
+    super::index_lookup::build_reverse(MOVE_ID_BY_TUTOR_INDEX);
 
-const TUTOR_INDEX_BY_MOVE_ID: [u16; MAX_VAL + 1] = build_reverse();
-
-const fn build_reverse() -> [u16; MAX_VAL + 1] {
-    let mut table = [NOT_FOUND; MAX_VAL + 1];
-    let mut i = 0;
-    while i < MOVE_ID_BY_TUTOR_INDEX.len() {
-        let v = MOVE_ID_BY_TUTOR_INDEX[i] as usize;
-        if table[v] != NOT_FOUND {
-            panic!("duplicate value in TUTOR_INDEX_BY_MOVE_ID");
-        }
-        table[v] = i as u16;
-        i += 1;
-    }
-    table
+pub const fn move_id_by_tutor_index(index: usize) -> Option<MoveIndex> {
+    super::index_lookup::move_id_by_index(&MOVE_ID_BY_TUTOR_INDEX, index)
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "moveIdByLaTutorIndex"))]
 #[allow(clippy::missing_const_for_fn)]
-pub fn move_id_by_tutor_index(index: usize) -> Option<MoveIndex> {
-    if index < MOVE_ID_BY_TUTOR_INDEX.len() {
-        Some(MoveIndex::from_u16(MOVE_ID_BY_TUTOR_INDEX[index]))
-    } else {
-        None
-    }
+pub fn move_id_by_tutor_index_wasm(index: usize) -> Option<u16> {
+    super::index_lookup::move_id_by_index_wasm(&MOVE_ID_BY_TUTOR_INDEX, index)
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "laTutorIndexByMoveId"))]
 #[allow(clippy::missing_const_for_fn)]
 pub fn tutor_index_by_move_id(move_id: u16) -> Option<u16> {
-    let move_id = move_id as usize;
-    if move_id < TUTOR_INDEX_BY_MOVE_ID.len() {
-        let index = TUTOR_INDEX_BY_MOVE_ID[move_id];
-        if index != NOT_FOUND {
-            Some(index)
-        } else {
-            None
-        }
-    } else {
-        None
-    }
+    super::index_lookup::index_by_move_id(&TUTOR_INDEX_BY_MOVE_ID, move_id)
 }

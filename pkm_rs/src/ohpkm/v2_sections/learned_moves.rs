@@ -9,7 +9,7 @@ use pkm_rs_types::{FlagSet, read_u16_le};
 use rand::random_range;
 
 #[derive(Default, Debug, Clone, serde::Serialize)]
-pub struct LearnedMoves(std::collections::BTreeSet<u16>);
+pub struct LearnedMoves(std::collections::BTreeSet<MoveIndex>);
 
 const SIZE_FIELD_BYTES: usize = 2;
 
@@ -19,12 +19,14 @@ impl LearnedMoves {
     }
 
     pub fn from_moves(move_ids: impl IntoIterator<Item = MoveIndex>) -> Self {
-        Self(move_ids.into_iter().map(u16::from).collect())
+        Self(move_ids.into_iter().collect())
     }
 
     pub fn add_moves(&mut self, move_ids: impl IntoIterator<Item = MoveIndex>) {
         for move_id in move_ids {
-            self.0.insert(move_id.into());
+            if !move_id.is_empty() {
+                self.0.insert(move_id);
+            }
         }
     }
 
@@ -38,7 +40,7 @@ impl LearnedMoves {
         self.0.len()
     }
 
-    pub fn all_ordered(&self) -> Vec<u16> {
+    pub fn all_ordered(&self) -> Vec<MoveIndex> {
         self.0.iter().copied().collect()
     }
 }

@@ -1,5 +1,5 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { ModernRibbons, movesFromSwshTrFlags, trIndexForMove } from '@openhome-core/resources'
+import { ModernRibbons, movesFromSwshTrFlags } from '@openhome-core/resources'
 import { getFlag, setFlag } from '@openhome-core/util'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
 import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
@@ -21,6 +21,7 @@ import {
   PokeDate,
   Pokerus,
   SpeciesLookup,
+  swshTrIndexByMoveId,
   TrainerMemory,
 } from '@pkm-rs/pkg'
 import { PkmConstructorOptions } from './PKM'
@@ -546,7 +547,7 @@ export default class PK8 {
     const trFlags = this.trFlagsSwSh
     if (!trFlags) return false
 
-    const trIndex = trIndexForMove(moveIndex)
+    const trIndex = swshTrIndexByMoveId(moveIndex)
     return trIndex !== undefined && getFlag(new DataView(trFlags.buffer), 0, trIndex)
   }
 
@@ -555,7 +556,7 @@ export default class PK8 {
     const trFlags = this.trFlagsSwSh
     if (!trFlags) return undefined
 
-    const trIndex = trIndexForMove(moveIndex)
+    const trIndex = swshTrIndexByMoveId(moveIndex)
     if (trIndex !== undefined) {
       setFlag(new DataView(trFlags.buffer), 0, trIndex, true)
     }
