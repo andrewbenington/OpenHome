@@ -1866,7 +1866,6 @@ impl OhpkmV2 {
 
     pub fn populate_learned_moves(&mut self) {
         let mut learned_moves = self.learned_moves.take().unwrap_or_default();
-        dbg!("initial", self.main_data.nickname, &learned_moves);
 
         if let Some(swsh_data) = self.swsh_data {
             let swsh_tr_move_ids = FlagSet::from_bytes(swsh_data.tr_flags)
