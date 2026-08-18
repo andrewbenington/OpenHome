@@ -14,6 +14,7 @@ import {
   NatureIndex,
   ShinyLeaves,
   StatsPreSplit,
+  TeraType,
   TrainerMemory,
 } from '@pkm-rs/pkg'
 import * as types from '../../util/types'
@@ -122,8 +123,8 @@ export interface AllPKMFields {
   superTrainingDistFlags?: number
   superTrainingFlags?: number
   tags?: MonTag[]
-  teraTypeOriginal?: number
-  teraTypeOverride?: number
+  teraTypeOriginal?: TeraType
+  teraTypeOverride?: TeraType
   tmFlagsBDSP?: Uint8Array
   tmFlagsLza?: Uint8Array
   tmFlagsLzaDlc?: Uint8Array

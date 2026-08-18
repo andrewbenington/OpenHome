@@ -9,6 +9,7 @@ import { beforeAll, describe, expect, test } from 'vitest'
 import { PKMInterface } from '../../pkm/interfaces'
 import { SwishCrypto } from '../encryption/SwishCrypto/SwishCrypto'
 import { LegendsArceusSave } from '../Gen89/LegendsArceus'
+import { ScarletVioletSave } from '../Gen89/ScarletVioletSave'
 import { SwordShieldSave } from '../Gen89/SwordShieldSave'
 import { PathData } from '../util/path'
 import { initializeWasm } from './init'
@@ -34,6 +35,14 @@ const swordPath: PathData = {
 const arceusPath = {
   raw: 'save-files/legendsarceus',
   name: 'legendsarceus',
+  dir: 'save-files',
+  ext: '',
+  separator: '/',
+}
+
+const violetPath: PathData = {
+  raw: 'save-files/violet',
+  name: 'violet',
   dir: 'save-files',
   ext: '',
   separator: '/',
@@ -156,6 +165,12 @@ describe('gen 8 save files', () => {
     expect(xorChecksum32BitLe(arceusSave.prepareWriter().bytes)).toBe(
       xorChecksum32BitLe(arceusSaveBytes)
     )
+  })
+
+  test("scarlet/violet empty bytes don't crash", () => {
+    const violetSaveBytes = new Uint8Array(readFileSync(saveTestFilePath('violet')))
+    const violetSave = new ScarletVioletSave(violetPath, violetSaveBytes)
+    violetSave.emptyBoxSlotBytes()
   })
 
   test('legends arceus save boxes', () => {

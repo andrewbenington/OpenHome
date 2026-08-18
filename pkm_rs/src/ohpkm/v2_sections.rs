@@ -1,4 +1,5 @@
 use crate::gen9_sv;
+use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v2::OhpkmSectionTag;
 use crate::result::{Error, Result, StringErrorSource};
 use crate::sectioned_data::DataSection;
@@ -77,6 +78,27 @@ impl ScarletVioletData {
                 .transferred_tera_type(),
             ..Default::default()
         }
+    }
+
+    pub fn fix_errors(&mut self) -> Vec<OhpkmIssue> {
+        let mut issues: Vec<OhpkmIssue> = vec![];
+        // OpenHome incorrectly stored stellar tera pre-1.15.2
+        if let TeraType::Standard(tera_type) = self.tera_type_original
+            && tera_type as u8 == 18
+        {
+            self.tera_type_original = TeraType::Stellar;
+            issues.push(OhpkmIssue::StellarTeraCorrupted);
+        }
+
+        // OpenHome incorrectly stored stellar tera pre-1.15.2
+        if let Some(TeraType::Standard(tera_type)) = self.tera_type_override
+            && tera_type as u8 == 18
+        {
+            self.tera_type_override = Some(TeraType::Stellar);
+            issues.push(OhpkmIssue::StellarTeraCorrupted);
+        }
+
+        issues
     }
 }
 

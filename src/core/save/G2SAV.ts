@@ -65,7 +65,7 @@ export class G2SAV extends OfficialSAV<PK2> {
     const dataView = new DataView(this.bytes.buffer)
 
     this.filePath = path
-    this.tid = dataView.getInt16(0x2009)
+    this.tid = dataView.getUint16(0x2009)
     this.displayID = this.tid.toString().padStart(5, '0')
     this.name = readGameBoyStringFromBytes(dataView, 0x200b, TRAINER_NAME_SIZE)
     this.boxOffsets = [

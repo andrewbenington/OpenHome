@@ -28,7 +28,7 @@ use pkm_rs_types::strings::SizedUtf16String;
 use pkm_rs_types::{
     AbilityNumber, BinaryGender, ContestStats, FlagSet, Gender, Geolocations, HyperTraining, Ivs,
     Language, MarkingsSixShapesColors, OriginGame, PokeDate, Pokerus, ShinyLeaves, Stats8,
-    Stats16Le, StatsPreSplit, TeraType, TeraTypeWasm, TrainerData, TrainerMemory,
+    Stats16Le, StatsPreSplit, TeraType, TrainerData, TrainerMemory,
 };
 use serde::Serialize;
 use strum_macros::Display;
@@ -1379,18 +1379,6 @@ impl OhpkmV2 {
         )
     }
 
-    pub fn set_tera_type_original_if(&mut self, value: Option<u8>) {
-        let Some(value) = value else { return };
-
-        if let Some(tera_type) = TeraTypeWasm::from_byte(value) {
-            self.sv_data
-                .get_or_insert(ScarletVioletData::default_generated_tera_type(
-                    self.main_data.species_and_form,
-                ))
-                .tera_type_original = tera_type.into()
-        }
-    }
-
     pub fn tera_type_override(&self) -> Option<TeraType> {
         self.sv_data.and_then(|d| d.tera_type_override)
     }
@@ -1768,7 +1756,15 @@ impl OhpkmV2 {
     }
 
     pub fn fix_errors(&mut self) -> Vec<OhpkmIssue> {
-        self.main_data.fix_errors()
+        let mut fixed_issues = Vec::<OhpkmIssue>::new();
+
+        fixed_issues.append(&mut self.main_data.fix_errors());
+
+        if let Some(sv_data) = self.sv_data.as_mut() {
+            fixed_issues.append(&mut sv_data.fix_errors());
+        }
+
+        fixed_issues
     }
 
     pub fn get_nickname(&self) -> String {
@@ -3193,44 +3189,37 @@ impl OhpkmV2 {
     // Scarlet/Violet
 
     #[wasm_bindgen(getter = teraTypeOriginal)]
-    pub fn tera_type_original_js(&self) -> TeraTypeWasm {
-        self.sv_data
-            .map(|d| TeraTypeWasm::from(d.tera_type_original))
-            .unwrap_or(
-                self.species_and_form()
-                    .get_forme_metadata()
-                    .transferred_tera_type()
-                    .into(),
-            )
+    pub fn tera_type_original_js(&self) -> TeraType {
+        self.sv_data.map(|d| d.tera_type_original).unwrap_or(
+            self.species_and_form()
+                .get_forme_metadata()
+                .transferred_tera_type(),
+        )
     }
 
     #[wasm_bindgen(js_name = setTeraTypeOriginalIf)]
-    pub fn set_tera_type_original_if_js(&mut self, value: Option<u8>) {
+    pub fn set_tera_type_original_if_js(&mut self, value: Option<TeraType>) {
         let Some(value) = value else { return };
 
-        if let Some(tera_type) = TeraTypeWasm::from_byte(value) {
-            self.sv_data
-                .get_or_insert(ScarletVioletData::default_generated_tera_type(
-                    self.main_data.species_and_form,
-                ))
-                .tera_type_original = tera_type.into()
-        }
-    }
-
-    #[wasm_bindgen(getter = teraTypeOverride)]
-    pub fn tera_type_override_js(&self) -> u8 {
-        self.sv_data
-            .and_then(|d| d.tera_type_override)
-            .map_or(TeraType::NO_OVERRIDE, TeraType::to_byte)
-    }
-
-    #[wasm_bindgen(setter = teraTypeOverride)]
-    pub fn set_tera_type_override_js(&mut self, value: u8) -> Result<()> {
         self.sv_data
             .get_or_insert(ScarletVioletData::default_generated_tera_type(
                 self.main_data.species_and_form,
             ))
-            .tera_type_override = TeraType::from_byte_override(value)?;
+            .tera_type_original = value
+    }
+
+    #[wasm_bindgen(getter = teraTypeOverride)]
+    pub fn tera_type_override_js(&self) -> Option<TeraType> {
+        self.sv_data.and_then(|d| d.tera_type_override)
+    }
+
+    #[wasm_bindgen(setter = teraTypeOverride)]
+    pub fn set_tera_type_override_js(&mut self, value: Option<TeraType>) -> Result<()> {
+        self.sv_data
+            .get_or_insert(ScarletVioletData::default_generated_tera_type(
+                self.main_data.species_and_form,
+            ))
+            .tera_type_override = value;
 
         Ok(())
     }
