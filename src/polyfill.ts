@@ -94,4 +94,146 @@ export function addMissingFunctions() {
       return result
     }
   }
+
+  addIteratorHelpers()
+}
+
+function addIteratorHelpers() {
+  const iteratorProto: any = Object.getPrototypeOf(Object.getPrototypeOf([][Symbol.iterator]()))
+
+  if (!iteratorProto || typeof iteratorProto !== 'object') return
+
+  if (!iteratorProto.toArray) {
+    iteratorProto.toArray = function <T>(this: Iterable<T>): T[] {
+      return [...this]
+    }
+  }
+
+  if (!iteratorProto.map) {
+    iteratorProto.map = function* <T, U>(this: Iterable<T>, fn: (value: T, index: number) => U) {
+      let index = 0
+      for (const value of this) {
+        yield fn(value, index++)
+      }
+    }
+  }
+
+  if (!iteratorProto.filter) {
+    iteratorProto.filter = function* <T>(
+      this: Iterable<T>,
+      predicate: (value: T, index: number) => boolean
+    ) {
+      let index = 0
+      for (const value of this) {
+        if (predicate(value, index++)) {
+          yield value
+        }
+      }
+    }
+  }
+
+  if (!iteratorProto.take) {
+    iteratorProto.take = function* <T>(this: Iterable<T>, limit: number) {
+      let remaining = limit
+      for (const value of this) {
+        if (remaining-- <= 0) return
+        yield value
+      }
+    }
+  }
+
+  if (!iteratorProto.drop) {
+    iteratorProto.drop = function* <T>(this: Iterable<T>, limit: number) {
+      let remaining = limit
+      for (const value of this) {
+        if (remaining-- > 0) continue
+        yield value
+      }
+    }
+  }
+
+  if (!iteratorProto.flatMap) {
+    iteratorProto.flatMap = function* <T, U>(
+      this: Iterable<T>,
+      fn: (value: T, index: number) => Iterable<U>
+    ) {
+      let index = 0
+      for (const value of this) {
+        yield* fn(value, index++)
+      }
+    }
+  }
+
+  if (!iteratorProto.forEach) {
+    iteratorProto.forEach = function <T>(this: Iterable<T>, fn: (value: T, index: number) => void) {
+      let index = 0
+      for (const value of this) {
+        fn(value, index++)
+      }
+    }
+  }
+
+  if (!iteratorProto.some) {
+    iteratorProto.some = function <T>(
+      this: Iterable<T>,
+      predicate: (value: T, index: number) => boolean
+    ): boolean {
+      let index = 0
+      for (const value of this) {
+        if (predicate(value, index++)) return true
+      }
+      return false
+    }
+  }
+
+  if (!iteratorProto.every) {
+    iteratorProto.every = function <T>(
+      this: Iterable<T>,
+      predicate: (value: T, index: number) => boolean
+    ): boolean {
+      let index = 0
+      for (const value of this) {
+        if (!predicate(value, index++)) return false
+      }
+      return true
+    }
+  }
+
+  if (!iteratorProto.find) {
+    iteratorProto.find = function <T>(
+      this: Iterable<T>,
+      predicate: (value: T, index: number) => boolean
+    ): T | undefined {
+      let index = 0
+      for (const value of this) {
+        if (predicate(value, index++)) return value
+      }
+      return undefined
+    }
+  }
+
+  if (!iteratorProto.reduce) {
+    iteratorProto.reduce = function <T, U>(
+      this: Iterable<T>,
+      reducer: (accumulator: U, value: T, index: number) => U,
+      ...initial: [U] | []
+    ): U {
+      let index = 0
+      let accumulator: U | undefined = initial.length > 0 ? initial[0] : undefined
+      let hasAccumulator = initial.length > 0
+      for (const value of this) {
+        if (!hasAccumulator) {
+          accumulator = value as unknown as U
+          hasAccumulator = true
+          index++
+          continue
+        }
+        accumulator = reducer(accumulator as U, value, index++)
+      }
+      if (!hasAccumulator) {
+        throw new TypeError('Reduce of empty iterator with no initial value')
+      }
+      return accumulator as U
+    }
+  }
 }
