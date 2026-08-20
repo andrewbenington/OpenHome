@@ -133,7 +133,7 @@ pub struct LegendsZaData {
 
 impl DataSection for LegendsZaData {
     type TagType = OhpkmSectionTag;
-    const TAG: Self::TagType = OhpkmSectionTag::ScarletViolet;
+    const TAG: Self::TagType = OhpkmSectionTag::LegendsZa;
 
     type ErrorType = Error;
 
