@@ -37,7 +37,13 @@ function DraggableItem({ item, count }: DraggableItemProps) {
   )
 
   return (
-    <div className="draggable-item" ref={setNodeRef} {...listeners} {...attributes}>
+    <div
+      className="draggable-item"
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      style={{ touchAction: 'none' }}
+    >
       {/* tooltip causes performance issues when dragging; only show when not */}
       {active ? image : <Tooltip content={item.name}>{image}</Tooltip>}
       <Text

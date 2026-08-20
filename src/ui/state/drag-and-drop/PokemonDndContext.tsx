@@ -2,7 +2,8 @@ import {
   DndContext,
   DragOverEvent,
   DragOverlay,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   UniqueIdentifier,
   useSensor,
   useSensors,
@@ -44,10 +45,14 @@ export default function PokemonDndContext(props: { children?: ReactNode }) {
   const [dragOverId, setDragOverId] = useState<UniqueIdentifier | null>(null)
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: dragState.multiSelectEnabled
         ? { delay: 100, tolerance: 8 }
         : { distance: 10 },
+    }),
+
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 125, tolerance: 8 },
     })
   )
 

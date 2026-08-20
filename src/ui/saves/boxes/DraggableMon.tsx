@@ -93,6 +93,8 @@ const DraggableMon = (props: DraggableMonProps) => {
       style={{
         ...getBackgroundDetails(),
         cursor: 'pointer',
+        // prevent touch scrolling from swallowing drag gestures
+        touchAction: 'none',
       }}
       onClick={onClick}
     >
