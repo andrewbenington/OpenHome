@@ -259,8 +259,14 @@ where
     fs::File::create(&full_path).map_err(|err| Error::file_access(&full_path, err))
 }
 
+#[cfg(not(target_os = "android"))]
 fn get_config_dir() -> Result<PathBuf> {
     dirs::config_dir().ok_or(Error::other("config directory not detected; please report this issue alongside your Linux distribution and OpenHome installation method"))
+}
+
+#[cfg(target_os = "android")]
+fn get_config_dir() -> Result<PathBuf> {
+    Ok(PathBuf::from("/data/user/0/dev.andrewbenington.openhome"))
 }
 
 fn get_default_data_dir() -> Result<PathBuf> {

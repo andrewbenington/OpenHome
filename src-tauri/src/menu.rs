@@ -1,20 +1,13 @@
 #[cfg(not(mobile))]
 use std::process::Command;
 
-use tauri::{App, AppHandle, Emitter, Wry, image::Image, include_image, menu::*};
 use tracing::{error, info};
 
+#[cfg(not(mobile))]
 use openhome_core::data_controller::DataController;
 
+#[cfg(not(mobile))]
 use crate::data_controller::ToDataController;
-const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
-
-const OPEN_CMD: &str = cfg_select! {
-    target_os = "macos" => "open",
-    target_os = "linux" => "xdg-open",
-    windows => "explorer",
-    _ => panic!("unsupported target"),
-}
 
 #[cfg(not(mobile))]
 use tauri::{App, Wry, image::Image, include_image};
@@ -32,7 +25,8 @@ const APP_ICON: Image<'_> = include_image!("icons/128x128.png");
 const OPEN_CMD: &str = cfg_select! {
     target_os = "macos" => "open",
     target_os = "linux" => "xdg-open",
-    target_os = "windows" => "explorer"
+    target_os = "windows" => "explorer",
+    _ => panic!("unsupported target"),
 };
 
 #[cfg(not(mobile))]
