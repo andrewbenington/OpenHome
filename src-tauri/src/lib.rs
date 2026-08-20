@@ -11,6 +11,7 @@ mod synced_state;
 mod util;
 mod versioning;
 
+use std::fmt::Error;
 use crate::data_controller::ToDataController;
 use crate::synced_state::AllSyncedState;
 use openhome_core::convert_strategies::ConvertStrategies;
@@ -82,7 +83,7 @@ pub fn run() {
 
             let handle = app.handle().clone();
 
-            thread::spawn(|| {
+            thread::spawn(move || {
                 do_async_setup(&app, &handle);
             })
         })

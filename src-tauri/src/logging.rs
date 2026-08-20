@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use crate::commands::CommandResult;
 use crate::data_controller::ToDataController;
-use crate::{Error, Result};
+use crate::{Result};
 use chrono::{DateTime, NaiveDate, Utc};
 use openhome_core::data_controller::{DataController, DataDir};
 use serde::Serialize;

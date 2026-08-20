@@ -15,7 +15,7 @@ const LOGS_DIR: &str = "logs";
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 use crate::versioning::UpdateFeatures;
 
-pub fn run_startup_async(app: &&App, handle: &AppHandle) -> Result<Vec<UpdateFeatures>> {
+pub fn run_startup_async(app: &&&mut App, handle: &AppHandle) -> Result<Vec<UpdateFeatures>> {
     logging::init_logging(
         &Path::join(
             &tauri::Manager::path(&handle)
