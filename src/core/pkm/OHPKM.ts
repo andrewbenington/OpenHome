@@ -327,6 +327,11 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.unknownA0 = other.unknownA0
       this.unknownF3 = other.unknownF3
 
+      this.tmFlagsLzaBase = other.tmFlagsLzaBase
+      this.tmFlagsLzaDlc = other.tmFlagsLzaDlc
+      this.plusMoveFlagsLzaBlockC = other.plusMoveFlagsLzaBlockC
+      this.plusMoveFlagsLzaBlockD = other.plusMoveFlagsLzaBlockD
+
       if (other.heightScalar !== undefined && other.weightScalar !== undefined) {
         this.heightScalar = other.heightScalar
         this.weightScalar = other.weightScalar

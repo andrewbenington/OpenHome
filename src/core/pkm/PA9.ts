@@ -64,7 +64,6 @@ export default class PA9 {
   heightScalar: number
   weightScalar: number
   scale: number
-  tmFlagsLzaDlc: Uint8Array
   nickname: string
   moves: FourMoves
   movePP: FourMoves
@@ -99,7 +98,10 @@ export default class PA9 {
   metLevel: number
   hyperTraining: HyperTraining
   homeTracker: bigint
-  tmFlagsLza: Uint8Array
+  tmFlagsLzaBase: Uint8Array // 25 bytes
+  tmFlagsLzaDlc: Uint8Array // 13 bytes
+  plusMoveFlagsLzaBlockC: Uint8Array // 33 bytes
+  plusMoveFlagsLzaBlockD: Uint8Array // 12 bytes
   ribbons: string[]
   trainerGender: BinaryGender
   level: number
@@ -145,7 +147,8 @@ export default class PA9 {
       this.heightScalar = dataView.getUint8(0x48)
       this.weightScalar = dataView.getUint8(0x49)
       this.scale = dataView.getUint8(0x4a)
-      this.tmFlagsLzaDlc = new Uint8Array(buffer).slice(0x4b, 0x58)
+      this.plusMoveFlagsLzaBlockC = new Uint8Array(buffer).slice(0xd6, 0xf7)
+      this.plusMoveFlagsLzaBlockD = new Uint8Array(buffer).slice(0x94, 0xa0)
       this.nickname = stringLogic.utf16BytesToString(buffer, 0x58, 12)
       this.moves = [
         dataView.getUint16(0x72, true),
@@ -200,7 +203,8 @@ export default class PA9 {
       this.metLevel = dataView.getUint8(0x125)
       this.hyperTraining = types.readHyperTrainStatsFromBytes(dataView, 0x126)
       this.homeTracker = dataView.getBigUint64(0x127)
-      this.tmFlagsLza = new Uint8Array(buffer).slice(0x12f, 0x145)
+      this.tmFlagsLzaBase = new Uint8Array(buffer).slice(0x12f, 0x148)
+      this.tmFlagsLzaDlc = new Uint8Array(buffer).slice(0x4b, 0x58)
       this.ribbons = byteLogic
         .getFlagsInBitRange(dataView, 0x34, 0, 64)
         .map((index) => ModernRibbons[index])
@@ -262,7 +266,10 @@ export default class PA9 {
       this.heightScalar = other.heightScalar ?? 0
       this.weightScalar = other.weightScalar ?? 0
       this.scale = other.scale ?? 0
-      this.tmFlagsLzaDlc = other.tmFlagsSVDLC ?? new Uint8Array(13)
+      this.tmFlagsLzaBase = other.tmFlagsLzaBase ?? new Uint8Array(25)
+      this.tmFlagsLzaDlc = other.tmFlagsLzaDlc ?? new Uint8Array(13)
+      this.plusMoveFlagsLzaBlockC = other.plusMoveFlagsLzaBlockC ?? new Uint8Array(33)
+      this.plusMoveFlagsLzaBlockD = other.plusMoveFlagsLzaBlockD ?? new Uint8Array(12)
       this.nickname = converter.nickname(other)
 
       const moveFilter = MoveFilter.fromPkmClass(PA9)
@@ -304,7 +311,6 @@ export default class PA9 {
       this.metLevel = other.metLevel
       this.hyperTraining = other.hyperTraining
       this.homeTracker = other.homeTracker ?? 0n
-      this.tmFlagsLza = other.tmFlagsSV ?? new Uint8Array(22)
       this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], '')
       this.trainerGender = other.trainerGender
     }
@@ -401,7 +407,10 @@ export default class PA9 {
     dataView.setUint8(0x125, this.metLevel)
     types.writeHyperTrainStatsToBytes(dataView, 0x126, this.hyperTraining)
     dataView.setBigUint64(0x127, this.homeTracker)
-    new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLza.slice(0, 22)), 0x12f)
+    new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLzaBase.slice(0, 25)), 0x12f)
+    new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsLzaDlc.slice(0, 13)), 0x4b)
+    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlagsLzaBlockC.slice(0, 33)), 0xd6)
+    new Uint8Array(buffer).set(new Uint8Array(this.plusMoveFlagsLzaBlockD.slice(0, 12)), 0x94)
     byteLogic.setFlagIndexes(
       dataView,
       0x34,
