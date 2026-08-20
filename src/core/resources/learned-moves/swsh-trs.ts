@@ -47,19 +47,6 @@ const InvertedLookup = [
   -1, -1, -1, 99,
 ]
 
-// function invertLookup(lookup) {
-//   const maxValue = Math.max(...lookup)
-//   const array = new Array(maxValue + 1)
-//   array.fill('-1')
-//   lookup.forEach((value, index) => {
-//     array[value] = index
-//   })
-
-//   return array
-// }
-
-// const i = invertLookup(SwShTRMoveIndexes)
-
 export const SWSH_TR_BYTE_COUNT = 14
 export const moveFromSwShTrFlag = (i: number) => Moves[MoveTrIndexLookup[i]]
 
@@ -72,14 +59,3 @@ export function trIndexForMove(moveIndex: number): Option<number> {
   const trIndex = InvertedLookup[moveIndex]
   return trIndex === -1 ? undefined : trIndex
 }
-
-// function invertLookup(lookup: number[]): number[] {
-//   const maxValue = Math.max(...lookup)
-//   const array = new Array(maxValue + 1, -1)
-//   for (const)
-//   lookup.forEach((value, index) => {
-//     array[value] = index
-//   })
-
-//   return array
-// }
