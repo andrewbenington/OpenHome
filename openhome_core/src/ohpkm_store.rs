@@ -9,6 +9,7 @@ use std::num::NonZeroU64;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, UNIX_EPOCH};
 use std::{collections::HashMap, fs};
+use std::fs::DirEntry;
 use tracing::warn;
 
 #[cfg_attr(feature = "desktop", derive(specta::Type))]
@@ -29,21 +30,7 @@ impl OhpkmBytesStore {
                 continue;
             }
 
-            if let Ok(mon_bytes) = util::read_file_bytes(path)
-                && let Ok(mut mon) = OhpkmV2::from_bytes(&mon_bytes)
-            {
-                let file_created_seconds = dir_entry
-                    .metadata()
-                    .ok()
-                    .and_then(|m| m.created().or(m.modified()).ok())
-                    .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-                    .as_ref()
-                    .map(Duration::as_secs)
-                    .and_then(NonZeroU64::new);
-
-                mon.set_started_tracking_if_missing(file_created_seconds);
-                map.insert(mon.openhome_id(), mon.to_bytes());
-            }
+            Self::load_single_mon_from_directory(&mut map, dir_entry, path);
         }
 
         let mut store = Self(map);
@@ -51,6 +38,37 @@ impl OhpkmBytesStore {
         store.fix_errors();
 
         Ok(store)
+    }
+
+    fn load_nothing_from_directory(path: &Path) -> Result<Self> {
+        let _mon_files = fs::read_dir(path).map_err(|e| Error::file_access(&path, e))?;
+
+        let map = HashMap::new();
+
+        let store = Self(map);
+        Ok(store)
+    }
+
+    fn load_single_mon_from_directory(map: &mut HashMap<String, Vec<u8>>, dir_entry: DirEntry, path: PathBuf) {
+
+        if let Ok(mon_bytes) = util::read_file_bytes(path)
+            && let Ok(mut mon) = OhpkmV2::from_bytes(&mon_bytes)
+        {
+            // Must compute this here, instead of within any called methods below,
+            // as cannot provide dir_entry as a parameter to these methods since it is
+            // they do not accept non-compile time constants
+            let file_created_seconds = dir_entry
+                .metadata()
+                .ok()
+                .and_then(|m| m.created().or(m.modified()).ok())
+                .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+                .as_ref()
+                .map(Duration::as_secs)
+                .and_then(NonZeroU64::new);
+
+            mon.set_started_tracking_if_missing(file_created_seconds);
+            map.insert(mon.openhome_id(), mon.to_bytes());
+        }
     }
 
     fn fix_errors(&mut self) {
@@ -87,7 +105,7 @@ impl OhpkmBytesStore {
 
     pub fn load_from_mons_v2(data_controller: &impl DataController) -> Result<Self> {
         let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
-        Self::load_from_directory(&mons_v2_dir)
+        Self::load_nothing_from_directory(&mons_v2_dir)
     }
 
     pub fn write_to_mons_v2(&self, data_controller: &impl DataController) -> Result<()> {

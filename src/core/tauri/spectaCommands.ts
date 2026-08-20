@@ -383,9 +383,13 @@ export type SaveRef = {
   valid: boolean
   pluginIdentifier: PluginIdentifier | null
 }
+
+export const LAST_VIEWED_BOXES_CACHE_SIZE = 25;
+
 export type StoredBankData = { banks: Bank[]; current_bank?: number }
 export type TransactionState = { open_transaction: boolean; temp_files: string[] }
 export type UpdateFeatures = { version: string; feature_messages: string[] }
+export type LastViewedBoxesCache = { last_viewed_box_ids: string[] }
 
 /** tauri-specta globals **/
 
