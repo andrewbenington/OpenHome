@@ -42,7 +42,7 @@ impl<const N: usize> Display for Gen4String<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let u16_values: Vec<u16> = self
             .raw_be
-            .chunks_exact(2)
+            .as_chunks::<2>()
             .map(|chunk| u16::from_be_bytes([chunk[1], chunk[0]]))
             .take_while(|val| *val != 0xffff)
             .filter_map(gen4_string_encoding::decode)
