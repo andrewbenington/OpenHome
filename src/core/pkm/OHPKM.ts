@@ -8,6 +8,10 @@ import {
   LZA_PLUS_MOVES_BLOCK_D_BYTES,
   movesFromBdspTmFlags,
   movesFromLaTutorFlags,
+  movesFromLzaBaseTmFlags,
+  movesFromLzaDlcTmFlags,
+  movesFromLzaPlusFlagsBlockC,
+  movesFromLzaPlusFlagsBlockD,
   movesFromSvTmFlags,
   movesFromSwshTrFlags,
   SWSH_TR_BYTE_COUNT,
@@ -358,6 +362,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
           )
         }
       }
+
+      this.populateLearnedMoves()
     }
   }
 
@@ -542,11 +548,19 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     )
   }
 
+  get tmMovesLzaBase() {
+    return this.tmFlagsLzaBase ? movesFromLzaBaseTmFlags(this.tmFlagsLzaBase) : []
+  }
+
   unionTmFlagsLzaBase(otherTmFlags: Uint8Array) {
     this.tmFlagsLzaBase = bitwiseOrUint8Array(
       this.tmFlagsLzaBase || new Uint8Array(LZA_DLC_TM_BYTES),
       otherTmFlags
     )
+  }
+
+  get tmMovesLzaDlc() {
+    return this.tmFlagsLzaDlc ? movesFromLzaDlcTmFlags(this.tmFlagsLzaDlc) : []
   }
 
   unionTmFlagsLzaDlc(otherTmFlags: Uint8Array) {
@@ -556,11 +570,23 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     )
   }
 
+  get plusMovesLzaBlockC() {
+    return this.plusMoveFlagsLzaBlockC
+      ? movesFromLzaPlusFlagsBlockC(this.plusMoveFlagsLzaBlockC)
+      : []
+  }
+
   unionPlusFlagsLzaBlockC(otherPlusFlags: Uint8Array) {
     this.plusMoveFlagsLzaBlockC = bitwiseOrUint8Array(
       this.plusMoveFlagsLzaBlockC || new Uint8Array(LZA_PLUS_MOVES_BLOCK_C_BYTES),
       otherPlusFlags
     )
+  }
+
+  get plusMovesLzaBlockD() {
+    return this.plusMoveFlagsLzaBlockD
+      ? movesFromLzaPlusFlagsBlockD(this.plusMoveFlagsLzaBlockD)
+      : []
   }
 
   unionPlusFlagsLzaBlockD(otherPlusFlags: Uint8Array) {

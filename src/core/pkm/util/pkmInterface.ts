@@ -133,7 +133,9 @@ export interface AllPKMFields {
   tmFlagsLzaDlc?: Uint8Array
   tmMovesLzaDlc?: Move[]
   plusMoveFlagsLzaBlockC?: Uint8Array // 33 bytes
+  plusMovesLzaBlockC?: Move[]
   plusMoveFlagsLzaBlockD?: Uint8Array // 12 bytes
+  plusMovesLzaBlockD?: Move[]
   tmFlagsSV?: Uint8Array
   tmMovesSV?: Move[]
   tmFlagsSVDLC?: Uint8Array

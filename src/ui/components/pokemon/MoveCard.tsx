@@ -1,5 +1,6 @@
 import { Moves } from '@openhome-core/resources'
 import TypeIcon from '@openhome-ui/components/pokemon/TypeIcon'
+import { getPublicImageURL } from '@openhome-ui/images/images'
 import { colorForType, contrastColorForType } from '@openhome-ui/util/color'
 import { cssClass } from '@openhome-ui/util/style'
 import { PkmType, PkmTypes } from '@pkm-rs/pkg'
@@ -9,11 +10,15 @@ interface MoveCardProps {
   move?: number
   movePP?: number
   maxPP?: number
+  compact?: boolean
   noPP?: boolean
+  masteredLa?: boolean
+  plusMove?: boolean
   typeOverride?: PkmType
 }
 
-const MoveCard = ({ move, movePP, maxPP, noPP, typeOverride }: MoveCardProps) => {
+const MoveCard = (props: MoveCardProps) => {
+  const { move } = props
   const moveData = move ? Moves[move] : undefined
   if (!moveData) {
     console.warn(`An unknown move has been detected. The move index is ${move}.`)
@@ -21,7 +26,7 @@ const MoveCard = ({ move, movePP, maxPP, noPP, typeOverride }: MoveCardProps) =>
       <div
         className={cssClass('move-card')
           .with('move-card-small')
-          .if(noPP)
+          .if(props.compact)
           .else('move-card-full')
           .build()}
         style={{
@@ -36,7 +41,7 @@ const MoveCard = ({ move, movePP, maxPP, noPP, typeOverride }: MoveCardProps) =>
     )
   }
 
-  const type = typeOverride ?? PkmTypes.tryFromString(moveData.type)
+  const type = props.typeOverride ?? PkmTypes.tryFromString(moveData.type)
 
   if (!type) {
     console.warn(
@@ -52,19 +57,34 @@ const MoveCard = ({ move, movePP, maxPP, noPP, typeOverride }: MoveCardProps) =>
     )
   }
 
+  const shouldShowPp = !props.compact && !props.noPP
+
   const content = (
     <>
       <div className="type-icon-container">
-        <TypeIcon type={type} key={`${type}_type_icon`} size={noPP ? '1.5rem' : '2rem'} border />
+        <TypeIcon
+          type={type}
+          key={`${type}_type_icon`}
+          size={props.compact ? '1.5rem' : '2rem'}
+          border
+        />
       </div>
       <div className="move-card-vert">
         <div className="move-name" style={{ color: contrastColorForType(type) }}>
           {moveData.name}
         </div>
-        {!noPP && (
+        {shouldShowPp && (
           <div className="move-pp-display">
-            {movePP ?? '--'}/{maxPP ?? '--'} PP
+            {props.movePP ?? '--'}/{props.maxPP ?? '--'} PP
           </div>
+        )}
+      </div>
+      <div className="move-icons">
+        {props.masteredLa && (
+          <img className="move-icon" src={getPublicImageURL('icons/move-mastery.png')} />
+        )}
+        {props.plusMove && (
+          <img className="move-icon" src={getPublicImageURL('icons/plus-move.png')} />
         )}
       </div>
     </>
@@ -74,7 +94,7 @@ const MoveCard = ({ move, movePP, maxPP, noPP, typeOverride }: MoveCardProps) =>
     <div
       className={cssClass('move-card')
         .with('move-card-small')
-        .if(noPP)
+        .if(props.compact)
         .else('move-card-full')
         .build()}
       style={{
