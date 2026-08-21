@@ -149,3 +149,15 @@
   flex-direction: column;
   justify-content: center;
 }
+
+.move-icons {
+  display: flex;
+  flex-direction: column;
+  margin-right: 0.25rem;
+}
+
+.move-icon {
+  width: 1.5rem;
+  aspect-ratio: 1;
+  margin: -0.08rem 0;
+}

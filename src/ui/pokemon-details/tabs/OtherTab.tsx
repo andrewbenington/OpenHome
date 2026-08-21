@@ -53,6 +53,14 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
   const tmMovesBdsp = mon.tmMovesBDSP
   const tutorMovesLa = mon.tutorMovesLa
   const tmMovesSvBase = mon.tmMovesSV
+  const tmMovesLzaBase = mon.tmMovesLzaBase
+  const tmMovesLzaDlc = mon.tmMovesLzaDlc
+  const plusMovesLzaBlockC = mon.plusMovesLzaBlockC
+  const plusMovesLzaBlockD = mon.plusMovesLzaBlockD
+  const plusMovesLza =
+    plusMovesLzaBlockC || plusMovesLzaBlockD
+      ? [...(plusMovesLzaBlockC ?? []), ...(plusMovesLzaBlockD ?? [])]
+      : []
 
   return (
     <div style={{ overflow: 'hidden', height: '100%' }}>
@@ -329,7 +337,33 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
               ))}
             </AttributeRowExpand>
           )} */}
-
+        {tmMovesLzaBase && (
+          <AttributeRowExpand summary="Legends Z-A Base TMs" value={tmMovesLzaBase.length}>
+            {tmMovesLzaBase.map((move) => (
+              <AttributeRow key={`lza_base_tm_${move.name}`} label={move.name} indent={10}>
+                {move.name}
+              </AttributeRow>
+            ))}
+          </AttributeRowExpand>
+        )}
+        {tmMovesLzaDlc && (
+          <AttributeRowExpand summary="Legends Z-A DLC TMs" value={tmMovesLzaDlc.length}>
+            {tmMovesLzaDlc.map((move) => (
+              <AttributeRow key={`lza_dlc_tm_${move.name}`} label={move.name} indent={10}>
+                {move.name}
+              </AttributeRow>
+            ))}
+          </AttributeRowExpand>
+        )}
+        {plusMovesLza && (
+          <AttributeRowExpand summary="Legends Z-A Plus Moves" value={plusMovesLza.length}>
+            {plusMovesLza.map((move) => (
+              <AttributeRow key={`lza_plus_move_${move.name}`} label={move.name} indent={10}>
+                {move.name}
+              </AttributeRow>
+            ))}
+          </AttributeRowExpand>
+        )}
         {(!isRestricted(
           SWSH_TRANSFER_RESTRICTIONS_CT,
           mon.nationalDex,

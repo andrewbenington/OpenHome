@@ -1,6 +1,8 @@
 pub mod bdsp_tm;
 mod index_lookup;
 pub mod la_tutor;
+pub mod lza_plus;
+pub mod lza_tm;
 mod max_pp;
 pub mod sv_tm;
 pub mod swsh_tr;

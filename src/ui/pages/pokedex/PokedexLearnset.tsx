@@ -24,7 +24,7 @@ export default function PokedexLearnset(props: PokedexLearnsetProps) {
             <p className="learnset-move-requirement">
               {learnsetMove.level ? `Level ${learnsetMove.level}: ` : 'On Evolution: '}
             </p>
-            <MoveCard move={learnsetMove.move_id} noPP />
+            <MoveCard move={learnsetMove.move_id} compact />
           </Flex>
         ))
       ) : (
