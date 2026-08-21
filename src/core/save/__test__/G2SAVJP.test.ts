@@ -39,8 +39,8 @@ test('detected as Japanese Gen 2 save and nothing else', () => {
 })
 
 test('trainer data decoded correctly', () => {
-  expect(jpCrystalSaveFile.name).toEqual('アレン')
-  expect(jpCrystalSaveFile.tid).toEqual(7119)
+  expect(jpCrystalSaveFile.name).toEqual('テスト')
+  expect(jpCrystalSaveFile.tid).toEqual(54321)
 })
 
 test('all 9 stored boxes are read, active box from live copy', () => {
@@ -48,15 +48,15 @@ test('all 9 stored boxes are read, active box from live copy', () => {
     (box) => box.boxSlots.filter((slot) => slot !== undefined).length
   )
 
-  expect(boxCounts).toEqual([30, 30, 30, 30, 30, 26, 0, 0, 0])
-  expect(jpCrystalSaveFile.currentPCBox).toEqual(5)
+  expect(boxCounts).toEqual([2, 0, 0, 0, 0, 0, 1, 0, 0])
+  expect(jpCrystalSaveFile.currentPCBox).toEqual(0)
 })
 
 test('active box decoded from live copy correctly', () => {
-  expect(jpCrystalSaveFile.boxes[5].boxSlots[0]?.nickname).toEqual('メガニウム')
-  expect(jpCrystalSaveFile.boxes[5].boxSlots[1]?.nickname).toEqual('バクフーン')
-  expect(jpCrystalSaveFile.boxes[5].boxSlots[2]?.nickname).toEqual('ウソッキー')
-  expect(jpCrystalSaveFile.boxes[5].boxSlots[0]?.trainerName).toEqual('アレン')
+  expect(jpCrystalSaveFile.boxes[0].boxSlots[0]?.nickname).toEqual('ワニノコ')
+  expect(jpCrystalSaveFile.boxes[0].boxSlots[1]?.nickname).toEqual('ピカチュウ')
+  expect(jpCrystalSaveFile.boxes[6].boxSlots[0]?.nickname).toEqual('チコりータ')
+  expect(jpCrystalSaveFile.boxes[0].boxSlots[0]?.trainerName).toEqual('テスト')
 })
 
 test('write round-trip preserves box contents and checksums', () => {

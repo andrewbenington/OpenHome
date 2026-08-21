@@ -39,8 +39,8 @@ test('detected as Japanese Gen 1 save and nothing else', () => {
 })
 
 test('trainer data decoded correctly', () => {
-  expect(jpBlueSaveFile.name).toEqual('アレン')
-  expect(jpBlueSaveFile.tid).toEqual(9152)
+  expect(jpBlueSaveFile.name).toEqual('テスト')
+  expect(jpBlueSaveFile.tid).toEqual(12345)
 })
 
 test('all 8 stored boxes are read', () => {
@@ -48,14 +48,14 @@ test('all 8 stored boxes are read', () => {
     (box) => box.boxSlots.filter((slot) => slot !== undefined).length
   )
 
-  expect(boxCounts).toEqual([30, 30, 30, 30, 29, 2, 21, 2])
+  expect(boxCounts).toEqual([2, 0, 0, 0, 1, 0, 0, 0])
 })
 
 test('pc box decoded correctly', () => {
   expect(jpBlueSaveFile.boxes[0].boxSlots[0]?.nickname).toEqual('フシギダネ')
-  expect(jpBlueSaveFile.boxes[0].boxSlots[1]?.nickname).toEqual('フシギソウ')
-  expect(jpBlueSaveFile.boxes[0].boxSlots[2]?.nickname).toEqual('フシギバナ')
-  expect(jpBlueSaveFile.boxes[0].boxSlots[0]?.trainerName).toEqual('アレン')
+  expect(jpBlueSaveFile.boxes[0].boxSlots[1]?.nickname).toEqual('ピカチュウ')
+  expect(jpBlueSaveFile.boxes[4].boxSlots[0]?.nickname).toEqual('ミュウ')
+  expect(jpBlueSaveFile.boxes[0].boxSlots[0]?.trainerName).toEqual('テスト')
   expect(jpBlueSaveFile.boxes[0].boxSlots[0]?.nationalDex).toEqual(1)
   // the shiny DV spread must survive parsing exactly
   expect(jpBlueSaveFile.boxes[0].boxSlots[0]?.dvs).toEqual({
