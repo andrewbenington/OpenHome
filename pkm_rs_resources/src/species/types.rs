@@ -1,7 +1,7 @@
 use crate::ExpectLog;
 use crate::levelup::LearnsetReader;
 use crate::species::GetSpeciesMetadata;
-use crate::species::form_metadata::{BaseStats, base_stats_lookup};
+use crate::species::form_metadata::{BaseStats, base_stats_lookup, move_mastery_la_lookup};
 use crate::species::form_metadata::{levelup_learnset_lookup, types_lookup};
 use crate::{Error, Result, abilities::AbilityIndexWasm, metadata_source::MetadataSource};
 use crate::{abilities::AbilityIndexBounded, levelup::LearnsetMoveJs};
@@ -548,6 +548,18 @@ impl FormMetadata {
                 .collect(),
         )
     }
+
+    #[wasm_bindgen(js_name = moveMasteryLa)]
+    pub fn move_mastery_la(&self) -> Option<Vec<LearnsetMoveJs>> {
+        Some(
+            self.forme_ref()
+                .get_move_mastery_la()?
+                .all_moves()
+                .into_iter()
+                .map(LearnsetMoveJs::from)
+                .collect(),
+        )
+    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -697,6 +709,10 @@ impl SpeciesForm {
 
     pub fn get_levelup_learnset(&self, source: Option<MetadataSource>) -> Option<LearnsetReader> {
         levelup_learnset_lookup(self.national_dex as u16, self.form_index, source)
+    }
+
+    pub fn get_move_mastery_la(&self) -> Option<LearnsetReader> {
+        move_mastery_la_lookup(self.national_dex as u16, self.form_index)
     }
 }
 

@@ -18,6 +18,7 @@ export default function PokedexLearnset(props: PokedexLearnsetProps) {
 
   return (
     <div className="pokedex-learnset">
+      {metadataSource === MetadataSource.LegendsArceus && <h3>Learned:</h3>}
       {levelUpLearnset ? (
         levelUpLearnset.map((learnsetMove) => (
           <Flex key={`${learnsetMove.move_id}-${learnsetMove.level}`} align="center" gap="2">
@@ -31,6 +32,19 @@ export default function PokedexLearnset(props: PokedexLearnsetProps) {
         <Flex width="100%" height="50%" align="center" justify="center">
           <Text>No level-up learnset data available for this form.</Text>
         </Flex>
+      )}
+      {metadataSource === MetadataSource.LegendsArceus && (
+        <>
+          <h3>Mastered:</h3>
+          {selectedForm.moveMasteryLa()?.map((learnsetMove) => (
+            <Flex key={`${learnsetMove.move_id}-${learnsetMove.level}`} align="center" gap="2">
+              <p className="learnset-move-requirement">
+                {learnsetMove.level ? `Level ${learnsetMove.level}: ` : 'On Evolution: '}
+              </p>
+              <MoveCard move={learnsetMove.move_id} compact />
+            </Flex>
+          ))}
+        </>
       )}
     </div>
   )

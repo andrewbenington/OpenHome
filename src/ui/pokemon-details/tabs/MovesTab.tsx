@@ -1,3 +1,4 @@
+import { PA8 } from '@openhome-core/pkm'
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { getMoveMaxPP } from '@openhome-core/pkm/util'
@@ -25,6 +26,9 @@ const MovesTab = (props: { mon: PKMInterface }) => {
               plusMove={
                 mon.plusMovesLzaBlockC?.some((m) => m.id === move) ||
                 mon.plusMovesLzaBlockD?.some((m) => m.id === move)
+              }
+              masteredLa={
+                (mon instanceof PA8 || mon instanceof OHPKM) && mon.isMasteredMoveLa(move)
               }
             />
           ))}
@@ -54,6 +58,7 @@ const MovesTab = (props: { mon: PKMInterface }) => {
                 move={move}
                 noPP
                 plusMove={mon.isPlusMove(move)}
+                masteredLa={mon.isMasteredMoveLa(move)}
               />
             ))}
           </Grid>

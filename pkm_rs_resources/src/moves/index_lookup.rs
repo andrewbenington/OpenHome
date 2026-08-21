@@ -38,7 +38,10 @@ pub(crate) fn move_id_by_index_wasm(move_id_lookup_by_index: &[u16], index: usiz
 pub(crate) const fn index_by_move_id(index_by_move_id: &[u16], move_id: u16) -> Option<u16> {
     let move_id = move_id as usize;
     if move_id < index_by_move_id.len() {
-        Some(index_by_move_id[move_id])
+        match index_by_move_id[move_id] {
+            NOT_FOUND => None,
+            other => Some(other),
+        }
     } else {
         None
     }
