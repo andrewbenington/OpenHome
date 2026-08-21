@@ -8,7 +8,7 @@ import { pkmTestFilePath } from './Ohpkm.test'
 
 beforeAll(initializeWasm)
 
-describe('gen 9 conversion to bytes and back is lossless', async () => {
+describe('scarlet/violet conversion to bytes and back is lossless', async () => {
   const files = fs.readdirSync(pkmTestFilePath('pk9')).filter((f) => f.endsWith('.pk9'))
   await initializeWasm()
 

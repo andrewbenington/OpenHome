@@ -1,8 +1,9 @@
 use std::num::NonZeroU64;
 
 use super::v2_sections::{
-    BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, MainDataV2, MostRecentSave,
-    Notes, PluginData, ScarletVioletData, SwordShieldData,
+    BdspData, GameboyData, Gen45Data, Gen67Data, LegendsArceusData, LegendsZaData, MainDataV2,
+    MonTags, MostRecentSave, Notes, PastHandlerDataV2, PluginData, ScarletVioletData,
+    SwordShieldData,
 };
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
@@ -11,7 +12,10 @@ use crate::ohpkm::extra_form::ExtraFormIndex;
 use crate::ohpkm::issues::OhpkmIssue;
 use crate::ohpkm::v1::OhpkmV1;
 use crate::ohpkm::v2_sections::pkm_bytes::{OriginalBackup, StoredPkmBytes, UnconvertedPkm};
-use crate::ohpkm::v2_sections::{MonTags, PastHandlerDataV2, SV_BASE_TM_BYTES_EXCLUDE_UNUSED};
+use crate::ohpkm::v2_sections::{
+    LZA_BASE_TM_BYTES, LZA_DLC_TM_BYTES, LZA_PLUS_MOVES_BLOCK_C_BYTES,
+    LZA_PLUS_MOVES_BLOCK_D_BYTES, SV_BASE_TM_BYTES_EXCLUDE_UNUSED,
+};
 use crate::result::{Error, Result};
 use crate::sectioned_data::{DataSection, SectionTag, SectionedData};
 use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
@@ -119,6 +123,7 @@ pub enum OhpkmSectionTag {
     BdspTmFlags = 0x05,
     LegendsArceus = 0x06,
     ScarletViolet = 0x07,
+    LegendsZa = 0x11,
     PluginData = 0x09,
     Notes = 0x0A,
     MostRecentSave = 0x0B,
@@ -142,6 +147,7 @@ impl OhpkmSectionTag {
             0x05 => Some(Self::BdspTmFlags),
             0x06 => Some(Self::LegendsArceus),
             0x07 => Some(Self::ScarletViolet),
+            0x11 => Some(Self::LegendsZa),
             #[allow(deprecated)]
             0x08 => Some(Self::PastHandlerV1),
             0x09 => Some(Self::PluginData),
@@ -171,6 +177,7 @@ impl OhpkmSectionTag {
             Self::BdspTmFlags => 14,
             Self::LegendsArceus => 44,
             Self::ScarletViolet => 37,
+            Self::LegendsZa => 83,
             Self::PastHandlerV2 => 40,
             Self::PluginData => 0,
             Self::Notes => 0,
@@ -211,6 +218,7 @@ pub struct OhpkmV2 {
     bdsp_data: Option<BdspData>,
     la_data: Option<LegendsArceusData>,
     sv_data: Option<ScarletVioletData>,
+    lza_data: Option<LegendsZaData>,
     handler_data: Vec<PastHandlerDataV2>,
     plugin_data: Option<PluginData>,
     notes: Option<Notes>,
@@ -1591,6 +1599,7 @@ impl OhpkmV2 {
             bdsp_data: None,
             la_data: None,
             sv_data: None,
+            lza_data: None,
             handler_data: Vec::new(),
             plugin_data: None,
             notes: None,
@@ -1631,6 +1640,7 @@ impl OhpkmV2 {
             bdsp_data: BdspData::extract_from(&sectioned_data)?,
             la_data: LegendsArceusData::extract_from(&sectioned_data)?,
             sv_data: ScarletVioletData::extract_from(&sectioned_data)?,
+            lza_data: LegendsZaData::extract_from(&sectioned_data)?,
             handler_data: past_handler_data_v2,
             plugin_data: PluginData::extract_from(&sectioned_data)?,
             notes: Notes::extract_from(&sectioned_data)?,
@@ -1679,6 +1689,7 @@ impl OhpkmV2 {
             sv_data: ScarletVioletData::extract_from(&sectioned_data)
                 .ok()
                 .flatten(),
+            lza_data: LegendsZaData::extract_from(&sectioned_data).ok().flatten(),
             handler_data: past_handler_data_v2,
             plugin_data: PluginData::extract_from(&sectioned_data).ok().flatten(),
             notes: Notes::extract_from(&sectioned_data).ok().flatten(),
@@ -1708,6 +1719,7 @@ impl OhpkmV2 {
             bdsp_data: BdspData::from_v1(old),
             la_data: LegendsArceusData::from_v1(old),
             sv_data: ScarletVioletData::from_v1(old),
+            lza_data: None, // z-a move flags weren't tracked in v1
             handler_data: PastHandlerDataV2::from_ohpkm_v1(old).map_or(Vec::new(), |hd| vec![hd]),
             plugin_data: PluginData::from_v1(old),
             notes: None,
@@ -1720,22 +1732,48 @@ impl OhpkmV2 {
 
     pub fn to_sectioned_data(&self) -> SectionedData<OhpkmSectionTag> {
         let mut sectioned_data = SectionedData::new(MAGIC_NUMBER, CURRENT_VERSION);
+
+        let mut to_be_sectioned = self.clone();
+        to_be_sectioned.fix_errors();
+
+        // destructure here to give an error when adding a new section (force handling)
+        let Self {
+            main_data,
+            gameboy_data,
+            gen45_data,
+            gen67_data,
+            swsh_data,
+            bdsp_data,
+            la_data,
+            sv_data,
+            lza_data,
+            handler_data,
+            plugin_data,
+            notes,
+            most_recent_save,
+            tags,
+            original_data,
+            unconverted_pkm,
+        } = to_be_sectioned;
+
         sectioned_data
-            .add(self.main_data)
-            .add_if_some(self.gameboy_data)
-            .add_if_some(self.gen45_data)
-            .add_if_some(self.gen67_data)
-            .add_if_some(self.swsh_data)
-            .add_if_some(self.bdsp_data)
-            .add_if_some(self.la_data)
-            .add_if_some(self.sv_data)
-            .add_all(self.handler_data.clone())
-            .add_if_some(self.plugin_data.clone())
-            .add_if_some(self.notes.clone())
-            .add_if_some(self.most_recent_save.clone())
-            .add_if_some(self.tags.clone())
-            .add_if_some(self.original_data)
-            .add_if_some(self.unconverted_pkm);
+            .add(main_data)
+            .add_if_some(gameboy_data)
+            .add_if_some(gen45_data)
+            .add_if_some(gen67_data)
+            .add_if_some(swsh_data)
+            .add_if_some(bdsp_data)
+            .add_if_some(la_data)
+            .add_if_some(sv_data)
+            .add_if_some(lza_data)
+            .add_all(handler_data)
+            .add_if_some(plugin_data)
+            .add_if_some(notes)
+            .add_if_some(most_recent_save)
+            .add_if_some(tags)
+            .add_if_some(original_data)
+            .add_if_some(unconverted_pkm);
+
         sectioned_data
     }
 
@@ -1853,19 +1891,51 @@ impl OhpkmV2 {
     pub fn get_section_bytes(&self) -> JsResult<js_sys::Object> {
         let obj = js_sys::Object::new();
 
+        // destructure here to give an error when adding a new section (force handling)
+        let Self {
+            main_data,
+            gameboy_data,
+            gen45_data,
+            gen67_data,
+            swsh_data,
+            bdsp_data,
+            la_data,
+            sv_data,
+            lza_data,
+            handler_data,
+            plugin_data,
+            notes,
+            most_recent_save,
+            tags,
+            original_data,
+            unconverted_pkm,
+        } = self;
+
         js_sys::Reflect::set(
             &obj,
             &JsValue::from("MainData"),
-            &JsValue::from(self.main_data.to_bytes()),
+            &JsValue::from(main_data.to_bytes()),
         )?;
-        add_section_bytes_to_js_object(&obj, &self.gameboy_data)?;
-        add_section_bytes_to_js_object(&obj, &self.gen45_data)?;
-        add_section_bytes_to_js_object(&obj, &self.gen67_data)?;
-        add_section_bytes_to_js_object(&obj, &self.swsh_data)?;
-        add_section_bytes_to_js_object(&obj, &self.bdsp_data)?;
-        add_section_bytes_to_js_object(&obj, &self.la_data)?;
-        add_section_bytes_to_js_object(&obj, &self.sv_data)?;
-        add_section_bytes_to_js_object(&obj, &self.plugin_data)?;
+
+        add_section_bytes_to_js_object(&obj, gameboy_data)?;
+        add_section_bytes_to_js_object(&obj, gen45_data)?;
+        add_section_bytes_to_js_object(&obj, gen67_data)?;
+        add_section_bytes_to_js_object(&obj, swsh_data)?;
+        add_section_bytes_to_js_object(&obj, bdsp_data)?;
+        add_section_bytes_to_js_object(&obj, la_data)?;
+        add_section_bytes_to_js_object(&obj, sv_data)?;
+        add_section_bytes_to_js_object(&obj, lza_data)?;
+
+        for handler in handler_data {
+            add_section_bytes_to_js_object(&obj, &Some(handler.clone()))?;
+        }
+
+        add_section_bytes_to_js_object(&obj, plugin_data)?;
+        add_section_bytes_to_js_object(&obj, notes)?;
+        add_section_bytes_to_js_object(&obj, most_recent_save)?;
+        add_section_bytes_to_js_object(&obj, tags)?;
+        add_section_bytes_to_js_object(&obj, original_data)?;
+        add_section_bytes_to_js_object(&obj, unconverted_pkm)?;
 
         Ok(obj)
     }
@@ -2975,7 +3045,7 @@ impl OhpkmV2 {
     // Brilliant Diamond/Shining Pearl
 
     #[wasm_bindgen(getter = tmFlagsBDSP)]
-    pub fn tutor_flags_bdsp_js(&self) -> Option<Vec<u8>> {
+    pub fn tm_flags_bdsp_js(&self) -> Option<Vec<u8>> {
         Some(self.bdsp_data?.tm_flags.to_bytes().to_vec())
     }
 
@@ -3264,6 +3334,100 @@ impl OhpkmV2 {
                 if let Some(sv_data) = &mut self.sv_data {
                     sv_data.tm_flags_dlc =
                         FlagSet::<{ gen9_sv::TM_FLAG_BYTE_LENGTH_DLC }>::default();
+                }
+            }
+        }
+    }
+
+    // Legends Z-A
+
+    #[wasm_bindgen(getter = tmFlagsLzaBase)]
+    pub fn tm_flags_lza_base_wasm(&self) -> Option<Vec<u8>> {
+        Some(self.lza_data?.tm_flags_base.to_bytes().to_vec())
+    }
+
+    #[wasm_bindgen(setter = tmFlagsLzaBase)]
+    pub fn set_tm_flags_lza_base_wasm(&mut self, value: Option<Vec<u8>>) {
+        match value {
+            Some(flags) => {
+                let mut new_bytes = [0u8; LZA_BASE_TM_BYTES];
+                dbg!(new_bytes, LZA_BASE_TM_BYTES);
+                new_bytes.copy_from_slice(&flags);
+                self.lza_data.get_or_insert_default().tm_flags_base =
+                    FlagSet::<LZA_BASE_TM_BYTES>::from_bytes(new_bytes);
+            }
+            None => {
+                if let Some(lza_data) = &mut self.lza_data {
+                    lza_data.tm_flags_base = FlagSet::default();
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = tmFlagsLzaDlc)]
+    pub fn tm_flags_lza_dlc_wasm(&self) -> Option<Vec<u8>> {
+        Some(self.lza_data?.tm_flags_dlc.to_bytes().to_vec())
+    }
+
+    #[wasm_bindgen(setter = tmFlagsLzaDlc)]
+    pub fn set_tm_flags_lza_dlc_wasm(&mut self, value: Option<Vec<u8>>) {
+        match value {
+            Some(flags) => {
+                let mut new_bytes = [0u8; LZA_DLC_TM_BYTES];
+                dbg!(new_bytes, LZA_DLC_TM_BYTES);
+                new_bytes.copy_from_slice(&flags);
+                self.lza_data.get_or_insert_default().tm_flags_dlc =
+                    FlagSet::<LZA_DLC_TM_BYTES>::from_bytes(new_bytes);
+            }
+            None => {
+                if let Some(lza_data) = &mut self.lza_data {
+                    lza_data.tm_flags_dlc = FlagSet::default();
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = plusMoveFlagsLzaBlockC)]
+    pub fn plus_move_flags_lza_b(&self) -> Option<Vec<u8>> {
+        Some(self.lza_data?.plus_move_flags_c.to_bytes().to_vec())
+    }
+
+    #[wasm_bindgen(setter = plusMoveFlagsLzaBlockC)]
+    pub fn set_plus_move_flags_lza_b(&mut self, value: Option<Vec<u8>>) {
+        match value {
+            Some(flags) => {
+                let mut new_bytes = [0u8; LZA_PLUS_MOVES_BLOCK_C_BYTES];
+                dbg!(new_bytes, LZA_PLUS_MOVES_BLOCK_C_BYTES);
+                new_bytes.copy_from_slice(&flags);
+                self.lza_data.get_or_insert_default().plus_move_flags_c =
+                    FlagSet::<LZA_PLUS_MOVES_BLOCK_C_BYTES>::from_bytes(new_bytes);
+            }
+            None => {
+                if let Some(lza_data) = &mut self.lza_data {
+                    lza_data.plus_move_flags_c = FlagSet::default();
+                }
+            }
+        }
+    }
+
+    #[wasm_bindgen(getter = plusMoveFlagsLzaBlockD)]
+    pub fn plus_move_flags_lza_d(&self) -> Option<Vec<u8>> {
+        Some(self.lza_data?.plus_move_flags_d.to_bytes().to_vec())
+    }
+
+    #[wasm_bindgen(setter = plusMoveFlagsLzaBlockD)]
+    pub fn set_plus_move_flags_lza_d(&mut self, value: Option<Vec<u8>>) {
+        match value {
+            Some(flags) => {
+                let mut new_bytes = [0u8; LZA_PLUS_MOVES_BLOCK_D_BYTES];
+                dbg!(new_bytes, LZA_PLUS_MOVES_BLOCK_D_BYTES);
+                new_bytes.copy_from_slice(&flags);
+                self.lza_data.get_or_insert_default().plus_move_flags_d =
+                    FlagSet::<LZA_PLUS_MOVES_BLOCK_D_BYTES>::from_bytes(new_bytes);
+            }
+            None => {
+                if let Some(lza_data) = &mut self.lza_data {
+                    lza_data.plus_move_flags_d = FlagSet::default();
                 }
             }
         }

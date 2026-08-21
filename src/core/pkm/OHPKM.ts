@@ -3,6 +3,9 @@ import { isWasmFormat, WasmPkmFormat } from '@openhome-core/pkm/PKM'
 import {
   Gen34ContestRibbons,
   Gen34TowerRibbons,
+  LZA_DLC_TM_BYTES,
+  LZA_PLUS_MOVES_BLOCK_C_BYTES,
+  LZA_PLUS_MOVES_BLOCK_D_BYTES,
   movesFromSwshTrFlags,
   SWSH_TR_BYTE_COUNT,
   trIndexForMove,
@@ -327,6 +330,11 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.unknownA0 = other.unknownA0
       this.unknownF3 = other.unknownF3
 
+      this.tmFlagsLzaBase = other.tmFlagsLzaBase
+      this.tmFlagsLzaDlc = other.tmFlagsLzaDlc
+      this.plusMoveFlagsLzaBlockC = other.plusMoveFlagsLzaBlockC
+      this.plusMoveFlagsLzaBlockD = other.plusMoveFlagsLzaBlockD
+
       if (other.heightScalar !== undefined && other.weightScalar !== undefined) {
         this.heightScalar = other.heightScalar
         this.weightScalar = other.weightScalar
@@ -526,12 +534,38 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   }
 
   unionTrFlagsSwSh(otherTrFlags: Uint8Array) {
-    const trFlags = this.trFlagsSwSh || new Uint8Array(SWSH_TR_BYTE_COUNT)
+    this.trFlagsSwSh = bitwiseOrUint8Array(
+      this.trFlagsSwSh || new Uint8Array(SWSH_TR_BYTE_COUNT),
+      otherTrFlags
+    )
+  }
 
-    for (let i = 0; i < otherTrFlags.length; i++) {
-      trFlags[i] |= otherTrFlags[i]
-    }
-    this.trFlagsSwSh = trFlags
+  unionTmFlagsLzaBase(otherTmFlags: Uint8Array) {
+    this.tmFlagsLzaBase = bitwiseOrUint8Array(
+      this.tmFlagsLzaBase || new Uint8Array(LZA_DLC_TM_BYTES),
+      otherTmFlags
+    )
+  }
+
+  unionTmFlagsLzaDlc(otherTmFlags: Uint8Array) {
+    this.tmFlagsLzaDlc = bitwiseOrUint8Array(
+      this.tmFlagsLzaDlc || new Uint8Array(LZA_DLC_TM_BYTES),
+      otherTmFlags
+    )
+  }
+
+  unionPlusFlagsLzaBlockC(otherPlusFlags: Uint8Array) {
+    this.plusMoveFlagsLzaBlockC = bitwiseOrUint8Array(
+      this.plusMoveFlagsLzaBlockC || new Uint8Array(LZA_PLUS_MOVES_BLOCK_C_BYTES),
+      otherPlusFlags
+    )
+  }
+
+  unionPlusFlagsLzaBlockD(otherPlusFlags: Uint8Array) {
+    this.plusMoveFlagsLzaBlockD = bitwiseOrUint8Array(
+      this.plusMoveFlagsLzaBlockD || new Uint8Array(LZA_PLUS_MOVES_BLOCK_D_BYTES),
+      otherPlusFlags
+    )
   }
 
   public getLevel(): number {
@@ -987,6 +1021,38 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.tmFlagsSVDLC = other.tmFlagsSVDLC
     }
 
+    if (other.tmFlagsLzaBase && !arraysEqual(this.tmFlagsLzaBase, other.tmFlagsLzaBase)) {
+      updates.push(
+        syncUpdate('TM moves (Legends Z-A base game)', this.tmFlagsSVDLC, other.tmFlagsSVDLC)
+      )
+      this.unionTmFlagsLzaBase(other.tmFlagsLzaBase)
+    }
+
+    if (other.tmFlagsLzaDlc && !arraysEqual(this.tmFlagsLzaDlc, other.tmFlagsLzaDlc)) {
+      updates.push(syncUpdate('TM moves (Legends Z-A DLC)', this.tmFlagsSVDLC, other.tmFlagsSVDLC))
+      this.unionTmFlagsLzaDlc(other.tmFlagsLzaDlc)
+    }
+
+    if (
+      other.plusMoveFlagsLzaBlockC &&
+      !arraysEqual(this.plusMoveFlagsLzaBlockC, other.plusMoveFlagsLzaBlockC)
+    ) {
+      const thisFlags = this.plusMoveFlagsLzaBlockC
+      const otherFlags = other.plusMoveFlagsLzaBlockC
+      updates.push(syncUpdate('Plus moves (Block C)', thisFlags, otherFlags))
+      this.unionPlusFlagsLzaBlockC(other.plusMoveFlagsLzaBlockC)
+    }
+
+    if (
+      other.plusMoveFlagsLzaBlockD &&
+      !arraysEqual(this.plusMoveFlagsLzaBlockD, other.plusMoveFlagsLzaBlockD)
+    ) {
+      const thisFlags = this.plusMoveFlagsLzaBlockD
+      const otherFlags = other.plusMoveFlagsLzaBlockD
+      updates.push(syncUpdate('Plus moves (Block D)', thisFlags, otherFlags))
+      this.unionPlusFlagsLzaBlockD(other.plusMoveFlagsLzaBlockD)
+    }
+
     if (other.obedienceLevel !== undefined && this.obedienceLevel !== other.obedienceLevel) {
       updates.push(syncUpdate('obedienceLevel', this.obedienceLevel, other.obedienceLevel))
       this.obedienceLevel = other.obedienceLevel
@@ -1233,4 +1299,11 @@ function teraTypesEqual(tt1: Option<TeraType>, tt2: Option<TeraType>) {
     default:
       return isObject(tt2) && tt1.Standard === tt2.Standard
   }
+}
+
+export function bitwiseOrUint8Array(array1: Uint8Array, array2: Uint8Array): Uint8Array {
+  for (let i = 0; i < array1.length; i++) {
+    array1[i] |= array2[i]
+  }
+  return array1
 }
