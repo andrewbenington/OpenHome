@@ -394,13 +394,7 @@ export function useSaves(): SavesAndBanksManager {
         if (trackedData) {
           const updates = trackedData.syncWithGameData(mon, save)
 
-          if (updates.length > 0) {
-            backend.log('DEBUG', `synced ${mon.nickname} with game data`, {
-              ohpkm_id: trackedData.openhomeId,
-              event: 'game_data_sync',
-              updates,
-            })
-          }
+
 
           for (const update of updates) {
             backend.log(

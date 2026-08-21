@@ -182,28 +182,8 @@ export const commands = {
       else return { status: 'error', error: e as any }
     }
   },
-  async saveSyncedState(): Promise<Result<null, CommandError>> {
-    try {
-      return { status: 'ok', data: await TAURI_INVOKE('save_synced_state') }
-    } catch (e) {
-      if (e instanceof Error) throw e
-      else return { status: 'error', error: e as any }
-    }
-  },
-  async updateSyncedState(
-    stateIdentifier: string,
-    action: JsonValue
-  ): Promise<Result<null, CommandError>> {
-    try {
-      return {
-        status: 'ok',
-        data: await TAURI_INVOKE('update_synced_state', { stateIdentifier, action }),
-      }
-    } catch (e) {
-      if (e instanceof Error) throw e
-      else return { status: 'error', error: e as any }
-    }
-  },
+
+
   async getConvertStrategies(): Promise<Result<ConvertStrategyEntries, CommandError>> {
     try {
       return { status: 'ok', data: await TAURI_INVOKE('get_convert_strategies') }

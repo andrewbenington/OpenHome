@@ -3,25 +3,22 @@ import { OHPKM } from '@openhome-core/pkm/OHPKM'
 import { displayIndexAdder, isBattleFormeItem } from '@openhome-core/pkm/util'
 import { StringToB64 } from '@openhome-core/tauri/commands'
 import { Option } from '@openhome-core/util/functional'
-import { SyncedStateController, useSyncedState } from '@openhome-ui/state/synced-state'
 import { PokedexUpdate } from '@openhome-ui/util/pokedex'
 import { PropsWithChildren, useCallback } from 'react'
 import { OhpkmStoreContext, OhpkmStoreData } from '.'
-import SyncedStateProvider from '../synced-state/SyncedStateProvider'
-
-function useOhpkmStoreTauri() {
-  return useSyncedState(useSyncedOhpkmState())
-}
+import { OhpkmWrapper } from '@openhome-ui/state/convert-strategies/OhpkmWrapper.tsx'
 
 export default function OhpkmStoreProvider({ children }: PropsWithChildren) {
   return (
-    <SyncedStateProvider
-      useStateManager={useOhpkmStoreTauri}
-      StateContext={OhpkmStoreContext}
-      stateDescription="OHPKM Store"
+    <OhpkmWrapper
+      description="OHPKM Store"
+      useStateManager={{
+        identifier: 'lookups',
+      }}
+      stateContext={undefined}
     >
       {children}
-    </SyncedStateProvider>
+    </OhpkmWrapper>
   )
 }
 
@@ -36,34 +33,6 @@ function loadOhpkmFromB64(response: StringToB64): OhpkmStoreData {
 
 function stateReducer(prev: Option<OhpkmStoreData>, updated: OhpkmStoreData): OhpkmStoreData {
   return { ...prev, ...updated }
-}
-
-function useSyncedOhpkmState(): SyncedStateController<OhpkmStoreData, OhpkmStoreData, StringToB64> {
-  const backend = useBackend()
-
-  const stateGetter = backend.loadOhpkmStore
-  const stateUpdater = backend.addToOhpkmStore
-  const updatePokedexAndFixOhpkms = useCallback(
-    async (data: OhpkmStoreData) => {
-      const pokedexUpdates: PokedexUpdate[] = []
-
-      for (const [, mon] of Object.entries(data)) {
-        pokedexUpdates.push(...getPokedexUpdates(mon))
-      }
-
-      backend.registerInPokedex(pokedexUpdates)
-    },
-    [backend]
-  )
-
-  return {
-    identifier: 'ohpkm_store',
-    stateGetter,
-    stateReducer,
-    stateUpdater,
-    onLoaded: updatePokedexAndFixOhpkms,
-    convertRustState: loadOhpkmFromB64,
-  }
 }
 
 function getPokedexUpdate(mon: OHPKM): PokedexUpdate {

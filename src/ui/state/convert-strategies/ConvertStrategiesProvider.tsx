@@ -2,10 +2,8 @@ import useBackend from '@openhome-core/backend/useBackend'
 import { ConvertStrategyEntries, NamedStrategy } from '@openhome-core/tauri/spectaCommands'
 import { Option } from '@openhome-core/util/functional'
 import { filterUndefined } from '@openhome-core/util/sort'
-import { SyncedStateController, useSyncedState } from '@openhome-ui/state/synced-state'
 import { PropsWithChildren } from 'react'
-import { ConversionSettingsContext } from '.'
-import SyncedStateProvider from '../synced-state/SyncedStateProvider'
+import { OhpkmWrapper } from '@openhome-ui/state/convert-strategies/OhpkmWrapper.tsx'
 
 export type ConvertStrategies = {
   strategies_by_id: Partial<Record<string, NamedStrategy>>
@@ -13,18 +11,37 @@ export type ConvertStrategies = {
 }
 
 function useConvertStrategiesTauri() {
-  return useSyncedState(useSyncedConvertState())
+  const backend = useBackend()
+
+  const stateGetter = backend.getConvertStrategies
+  const stateUpdater = (newState: ConvertStrategies) =>
+    backend.updateConvertStrategies({
+      ids_and_strategies: Object.entries(newState.strategies_by_id)
+        .map(([k, v]) => (v === undefined ? undefined : ([k, v] as [string, NamedStrategy])))
+        .filter(filterUndefined),
+      default_strategy_id: newState.default_strategy_id,
+    })
+
+  return {
+    identifier: 'convert_strategies',
+    stateGetter,
+    stateReducer,
+    stateUpdater,
+    convertRustState: assembleEntries,
+  }
 }
 
 export default function ConvertStrategiesProvider({ children }: PropsWithChildren) {
   return (
-    <SyncedStateProvider
-      useStateManager={useConvertStrategiesTauri}
-      StateContext={ConversionSettingsContext}
-      stateDescription="OHPKM Store"
+    <OhpkmWrapper
+      description="OHPKM Store"
+      useStateManager={{
+        identifier: 'lookups',
+      }}
+      stateContext={undefined}
     >
       {children}
-    </SyncedStateProvider>
+    </OhpkmWrapper>
   )
 }
 
@@ -54,30 +71,5 @@ function assembleEntries(entries: ConvertStrategyEntries) {
   return {
     default_strategy_id: entries.default_strategy_id,
     strategies_by_id,
-  }
-}
-
-function useSyncedConvertState(): SyncedStateController<
-  ConvertStrategies,
-  ConvertStrategyEntries,
-  ConvertStrategyEntries
-> {
-  const backend = useBackend()
-
-  const stateGetter = backend.getConvertStrategies
-  const stateUpdater = (newState: ConvertStrategies) =>
-    backend.updateConvertStrategies({
-      ids_and_strategies: Object.entries(newState.strategies_by_id)
-        .map(([k, v]) => (v === undefined ? undefined : ([k, v] as [string, NamedStrategy])))
-        .filter(filterUndefined),
-      default_strategy_id: newState.default_strategy_id,
-    })
-
-  return {
-    identifier: 'convert_strategies',
-    stateGetter,
-    stateReducer,
-    stateUpdater,
-    convertRustState: assembleEntries,
   }
 }

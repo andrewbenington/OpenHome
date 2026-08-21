@@ -7,12 +7,10 @@ mod plugin;
 mod startup;
 mod startup_config;
 mod state;
-mod synced_state;
 mod util;
 mod versioning;
 
 use crate::data_controller::ToDataController;
-use crate::synced_state::AllSyncedState;
 use openhome_core::convert_strategies::ConvertStrategies;
 use openhome_core::lookup::LookupState;
 use openhome_core::ohpkm_store::OhpkmBytesStore;
@@ -25,7 +23,6 @@ const RAW_HANDLER: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool = tauri::generate_
     commands::get_file_bytes,
     commands::get_storage_file_json,
     commands::write_storage_file_json,
-    synced_state::ohpkm_store::add_to_ohpkm_store,
     logging::log,
 ];
 
@@ -54,15 +51,7 @@ pub fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         state::start_transaction,
         state::rollback_transaction,
         state::commit_transaction,
-        synced_state::save_synced_state,
-        synced_state::update_synced_state,
-        synced_state::convert_strategies::get_convert_strategies,
-        synced_state::convert_strategies::update_convert_strategies,
-        synced_state::lookup::get_lookups,
-        synced_state::lookup::add_to_lookups,
-        synced_state::lookup::remove_dangling,
-        synced_state::ohpkm_store::get_ohpkm_store,
-        synced_state::ohpkm_store::permanently_delete_ohpkms,
+
         logging::get_logs_today,
         logging::clear_logs_for_range,
     ])
@@ -152,9 +141,6 @@ pub fn run() {
                 }
             };
 
-            // let synced_state =
-            //     AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
-            // app.manage(synced_state);
 
             let pokedex_state = match state::PokedexState::load_from_storage(&controller) {
                 Ok(pokedex) => pokedex,
