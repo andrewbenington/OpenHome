@@ -106,6 +106,16 @@ pub fn run() {
 
             let controller = app.handle().controller();
 
+            // let ohpkm_store = match OhpkmBytesStore::load_nothing(&controller) {
+            //     Ok(state) => state,
+            //     Err(err) => {
+            //         util::show_error_dialog(app, err, launch_error_msg("OHPKM Load"));
+            //
+            //         app.handle().exit(1);
+            //         std::process::exit(1);
+            //     }
+            // };
+
             let ohpkm_store = match OhpkmBytesStore::load_nothing(&controller) {
                 Ok(state) => state,
                 Err(err) => {
@@ -142,9 +152,9 @@ pub fn run() {
                 }
             };
 
-            let synced_state =
-                AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
-            app.manage(synced_state);
+            // let synced_state =
+            //     AllSyncedState::from_states(lookup_state, ohpkm_store, conversion_settings);
+            // app.manage(synced_state);
 
             let pokedex_state = match state::PokedexState::load_from_storage(&controller) {
                 Ok(pokedex) => pokedex,
