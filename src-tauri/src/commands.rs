@@ -104,16 +104,15 @@ pub fn set_app_theme(
         .get_webview_window("main")
         .ok_or("Main window not found")?;
 
-    let theme_option: Option<tauri::Theme>;
-    if app_theme == "dark" {
-        theme_option = Some(tauri::Theme::Dark)
+    let theme_option = if app_theme == "dark" {
+        Some(tauri::Theme::Dark)
     } else if app_theme == "light" {
-        theme_option = Some(tauri::Theme::Light)
+        Some(tauri::Theme::Light)
     } else if app_theme == "system" {
-        theme_option = None::<tauri::Theme>;
+        None::<tauri::Theme>
     } else {
         return Err(format!("Invalid theme: {}", app_theme));
-    }
+    };
 
     main_window
         .set_theme(theme_option)

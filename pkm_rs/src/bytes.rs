@@ -31,13 +31,13 @@ impl<'a> Reader<'a> {
         }
     }
 
-    pub fn read_u8(&mut self) -> u8 {
+    pub const fn read_u8(&mut self) -> u8 {
         let value = self.bytes[self.current_offset];
         self.current_offset += 1;
         value
     }
 
-    pub fn read_u32(&mut self) -> u32 {
+    pub const fn read_u32(&mut self) -> u32 {
         let value = read_u32_le!(self.bytes, self.current_offset);
         self.current_offset += 4;
         value
@@ -74,7 +74,7 @@ impl<'a> Writer<'a> {
         }
     }
 
-    pub fn write_u8(&mut self, value: u8) {
+    pub const fn write_u8(&mut self, value: u8) {
         self.bytes[self.current_offset] = value;
         self.current_offset += 1;
     }

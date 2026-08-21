@@ -45,21 +45,19 @@ impl ChecksumAlgorithm for ChecksumU16Le {
 }
 
 pub fn checksum_u16_le(bytes: &[u8]) -> u16 {
-    let wrapped_sum: Wrapping<u16> = bytes
-        .chunks_exact(2)
-        .map(|chunk| u16::from_le_bytes([chunk[0], chunk[1]]))
-        .map(Wrapping)
-        .sum();
+    let chunks = bytes.as_chunks::<2>().0.iter().copied();
+    let wrapped_sum: Wrapping<u16> = chunks.map(u16::from_le_bytes).map(Wrapping).sum();
 
     wrapped_sum.0
 }
 
 pub fn checksum_u64_le(bytes: &[u8]) -> u64 {
-    let chunks = bytes.chunks_exact(8);
-    let remainder = chunks.remainder();
+    let (chunks, remainder) = bytes.as_chunks::<8>();
 
     let mut wrapped_sum: Wrapping<u64> = chunks
-        .map(|chunk| u64::from_le_bytes(chunk.try_into().unwrap()))
+        .iter()
+        .copied()
+        .map(u64::from_le_bytes)
         .map(Wrapping)
         .sum();
 

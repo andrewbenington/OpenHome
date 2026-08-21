@@ -167,7 +167,7 @@ impl<'a> MemeKey<'a> {
         }
     }
 
-    fn get_sub_key(&self, temp: &[u8]) -> [u8; AES_CHUNK_LENGTH] {
+    const fn get_sub_key(&self, temp: &[u8]) -> [u8; AES_CHUNK_LENGTH] {
         let mut sub_key = [0u8; AES_CHUNK_LENGTH];
         let mut i = 0usize;
 
