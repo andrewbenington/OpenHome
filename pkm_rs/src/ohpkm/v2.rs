@@ -48,6 +48,8 @@ use crate::ohpkm::v2_sections::{MonTag, pkm_bytes};
 #[cfg(feature = "wasm")]
 use pkm_rs_resources::abilities::AbilityIndexWasm;
 #[cfg(feature = "wasm")]
+use pkm_rs_resources::levelup::LearnsetCondition;
+#[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
 const MAGIC_NUMBER: u32 = 0x57575757;
@@ -1292,18 +1294,13 @@ impl OhpkmV2 {
         }
     }
 
-    pub fn master_flags_la(&self) -> Option<Vec<u8>> {
-        Some(self.la_data?.master_flags.to_bytes().to_vec())
+    pub fn master_flags_la(&self) -> Option<FlagSet<8>> {
+        Some(self.la_data?.master_flags)
     }
 
-    pub fn set_master_flags_la(&mut self, value: Option<Vec<u8>>) {
+    pub fn set_master_flags_la(&mut self, value: Option<FlagSet<8>>) {
         match value {
-            Some(master_flags) => {
-                let mut new_bytes = [0u8; 8];
-                new_bytes.copy_from_slice(&master_flags);
-                self.la_data.get_or_insert_default().master_flags =
-                    FlagSet::<8>::from_bytes(new_bytes);
-            }
+            Some(master_flags) => self.la_data.get_or_insert_default().master_flags = master_flags,
             None => {
                 if let Some(la_data) = &mut self.la_data {
                     la_data.master_flags = FlagSet::default();
@@ -2667,7 +2664,7 @@ impl OhpkmV2 {
     }
 
     #[wasm_bindgen(getter = learnedMovesWasm)]
-    pub fn get_learned_moves_wasm(&mut self) -> Vec<usize> {
+    pub fn get_learned_moves_wasm(&self) -> Vec<usize> {
         self.learned_moves
             .as_ref()
             .map(|moves| {
@@ -3287,18 +3284,28 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(setter = masterFlagsLA)]
     pub fn set_master_flags_la_js(&mut self, value: Option<Vec<u8>>) {
-        match value {
-            Some(master_flags) => {
-                let mut new_bytes = [0u8; 8];
-                new_bytes.copy_from_slice(&master_flags);
-                self.la_data.get_or_insert_default().master_flags =
-                    FlagSet::<8>::from_bytes(new_bytes);
-            }
-            None => {
-                if let Some(la_data) = &mut self.la_data {
-                    la_data.master_flags = FlagSet::default();
-                }
-            }
+        self.set_master_flags_la(value.map(|v| {
+            let mut new_bytes = [0u8; 8];
+            new_bytes.copy_from_slice(&v);
+            FlagSet::<8>::from_bytes(new_bytes)
+        }));
+    }
+
+    #[wasm_bindgen(js_name = isMasteredMoveLa)]
+    pub fn is_mastered_move_la(&self, move_id: u16) -> bool {
+        if let Some(la_data) = self.la_data
+            && let Some(flag) = la_tutor::tutor_index_by_move_id(move_id)
+            && la_data.master_flags.get_flag(flag as usize)
+        {
+            true
+        } else {
+            self.species_and_form()
+                .get_move_mastery_la()
+                .and_then(|lookup| lookup.move_data_by_id(move_id))
+                .is_some_and(|data| match data.get_condition() {
+                    LearnsetCondition::LevelUp(level) => self.calculate_level() >= level,
+                    LearnsetCondition::Evolution => false,
+                })
         }
     }
 
