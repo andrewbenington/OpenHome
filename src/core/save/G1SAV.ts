@@ -16,6 +16,11 @@ import {
 import { OHPKM } from '../pkm/OHPKM'
 import { Box, BoxAndSlot, OfficialSAV } from './interfaces'
 import { LookupType } from './util'
+import {
+  areGen2JapanCrystalChecksumsValid,
+  areGen2JapanGoldSilverChecksumsValid,
+  looksLikeGen1JapanSave,
+} from './util/gbJapanChecksums'
 import { PathData } from './util/path'
 
 const SAVE_SIZE_BYTES = 0x8000
@@ -261,6 +266,14 @@ export class G1SAV extends OfficialSAV<PK1> {
   static fileIsSave(bytes: Uint8Array): boolean {
     // Gen 1 and Gen 2 saves are the same size, so assume it's Gen 2 if the Gen 2 checksums are valid
     if (areCrystalInternationalChecksumsValid(bytes) || areGoldSilverChecksumsValid(bytes)) {
+      return false
+    }
+    // Japanese Gen 1/2 saves are also the same size but have their own layouts
+    if (
+      looksLikeGen1JapanSave(bytes) ||
+      areGen2JapanCrystalChecksumsValid(bytes) ||
+      areGen2JapanGoldSilverChecksumsValid(bytes)
+    ) {
       return false
     }
     const decodedFirst64 = new TextDecoder('utf-8').decode(bytes.slice(0, 64))
