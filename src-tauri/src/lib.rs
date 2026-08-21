@@ -106,7 +106,7 @@ pub fn run() {
 
             let controller = app.handle().controller();
 
-            let ohpkm_store = match OhpkmBytesStore::load_from_mons_v2(&controller) {
+            let ohpkm_store = match OhpkmBytesStore::load_nothing(&controller) {
                 Ok(state) => state,
                 Err(err) => {
                     util::show_error_dialog(app, err, launch_error_msg("OHPKM Load"));

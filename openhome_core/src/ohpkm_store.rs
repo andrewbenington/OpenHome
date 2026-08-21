@@ -105,6 +105,10 @@ impl OhpkmBytesStore {
 
     pub fn load_from_mons_v2(data_controller: &impl DataController) -> Result<Self> {
         let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
+        Self::load_from_directory(&mons_v2_dir)
+    }
+    pub fn load_nothing(data_controller: &impl DataController) -> Result<Self> {
+        let mons_v2_dir = data_controller.absolute_path(DataDir::Storage, MONS_V2_DIR)?;
         Self::load_nothing_from_directory(&mons_v2_dir)
     }
 
