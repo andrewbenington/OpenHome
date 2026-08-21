@@ -6,7 +6,6 @@ import {
   LZA_DLC_TM_BYTES,
   LZA_PLUS_MOVES_BLOCK_C_BYTES,
   LZA_PLUS_MOVES_BLOCK_D_BYTES,
-  movesFromBdspTmFlags,
   movesFromLaTutorFlags,
   movesFromLzaBaseTmFlags,
   movesFromLzaDlcTmFlags,
@@ -319,8 +318,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       this.sociability = other.sociability ?? 0
 
-      this.tmFlagsBDSP = other.tmFlagsBDSP
-
       this.isAlpha = other.isAlpha || this.ribbons.includes('Alpha Mark')
       if (other.isAlpha && !this.ribbons.includes('Alpha Mark')) {
         this.ribbons = [...this.ribbons, 'Alpha Mark']
@@ -594,10 +591,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
       this.plusMoveFlagsLzaBlockD || new Uint8Array(LZA_PLUS_MOVES_BLOCK_D_BYTES),
       otherPlusFlags
     )
-  }
-
-  get tmMovesBdsp() {
-    return this.tmFlagsBDSP ? movesFromBdspTmFlags(this.tmFlagsBDSP) : []
   }
 
   get tutorMovesLa() {
@@ -1045,11 +1038,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         .forEach((move) => updates.push(syncUpdate(`TR move: ${move.name}`)))
 
       this.unionTrFlagsSwSh(other.trFlagsSwSh)
-    }
-
-    if (other.tmFlagsBDSP !== undefined && !arraysEqual(this.tmFlagsBDSP, other.tmFlagsBDSP)) {
-      updates.push(syncUpdate('tmFlagsBDSP', this.tmFlagsBDSP, other.tmFlagsBDSP))
-      this.tmFlagsBDSP = other.tmFlagsBDSP
     }
 
     if (other.tmFlagsSV !== undefined && !arraysEqual(this.tmFlagsSV, other.tmFlagsSV)) {
