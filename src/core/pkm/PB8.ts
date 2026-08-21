@@ -96,7 +96,6 @@ export default class PB8 {
   metLocationIndex: number
   ball: number
   metLevel: number
-  tmFlagsBDSP: Uint8Array
   homeTracker: bigint
   ribbons: string[]
   isCurrentHandler: boolean
@@ -200,7 +199,6 @@ export default class PB8 {
       this.metLocationIndex = dataView.getUint16(0x122, true)
       this.ball = dataView.getUint8(0x124)
       this.metLevel = byteLogic.uIntFromBufferBits(dataView, 0x125, 0, 7, true)
-      this.tmFlagsBDSP = new Uint8Array(buffer).slice(0x127, 0x135)
       this.homeTracker = dataView.getBigUint64(0x135)
       this.ribbons = byteLogic
         .getFlagsInBitRange(dataView, 0x34, 0, 64)
@@ -289,7 +287,6 @@ export default class PB8 {
         this.ball = Ball.Strange
       }
       this.metLevel = other.metLevel
-      this.tmFlagsBDSP = other.tmFlagsBDSP ?? new Uint8Array(14)
       this.homeTracker = other.homeTracker ?? 0n
       this.ribbons = filterRibbons(other.ribbons, [ModernRibbons], 'Twinkling Star')
       this.isCurrentHandler = other.isCurrentHandler ?? false
@@ -390,7 +387,6 @@ export default class PB8 {
     dataView.setUint16(0x122, this.metLocationIndex, true)
     dataView.setUint8(0x124, this.ball)
     byteLogic.uIntToBufferBits(dataView, this.metLevel, 293, 0, 7, true)
-    new Uint8Array(buffer).set(new Uint8Array(this.tmFlagsBDSP.slice(0, 14)), 0x127)
     dataView.setBigUint64(0x135, this.homeTracker)
     byteLogic.setFlagIndexes(
       dataView,

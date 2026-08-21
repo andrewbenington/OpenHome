@@ -22,7 +22,7 @@ mod past_handlers;
 pub mod pkm_bytes;
 
 pub(crate) use gameboy_data::GameboyData;
-pub(crate) use gen8_data::{BdspData, LegendsArceusData, SwordShieldData};
+pub(crate) use gen8_data::{LegendsArceusData, SwordShieldData};
 pub(crate) use gen9_data::{
     LZA_PLUS_MOVES_BLOCK_C_BYTES, LZA_PLUS_MOVES_BLOCK_D_BYTES, LegendsZaData,
     SV_BASE_TM_BYTES_EXCLUDE_UNUSED, ScarletVioletData,

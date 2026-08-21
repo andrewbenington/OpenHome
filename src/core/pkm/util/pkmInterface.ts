@@ -126,8 +126,6 @@ export interface AllPKMFields {
   tags?: MonTag[]
   teraTypeOriginal?: TeraType
   teraTypeOverride?: TeraType
-  tmFlagsBDSP?: Uint8Array
-  tmMovesBDSP?: Move[]
   tmFlagsLzaBase?: Uint8Array
   tmMovesLzaBase?: Move[]
   tmFlagsLzaDlc?: Uint8Array

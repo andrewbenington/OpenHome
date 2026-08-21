@@ -50,7 +50,6 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
   const pokerus = Pokerus.fromByteOrDefault(mon.pokerusByte)
 
   const trMovesSwSh = mon.trMovesSwSh
-  const tmMovesBdsp = mon.tmMovesBDSP
   const tutorMovesLa = mon.tutorMovesLa
   const tmMovesSvBase = mon.tmMovesSV
   const tmMovesLzaBase = mon.tmMovesLzaBase
@@ -267,15 +266,6 @@ const OtherDisplay = (props: { mon: PKMInterface }) => {
           <AttributeRowExpand summary="SwSh TRs" value={trMovesSwSh.length}>
             {trMovesSwSh.map((move) => (
               <AttributeRow key={`swsh_tr_${move.name}`} label={move.name} indent={10}>
-                {move.name}
-              </AttributeRow>
-            ))}
-          </AttributeRowExpand>
-        )}
-        {tmMovesBdsp && tmMovesBdsp.length > 0 && (
-          <AttributeRowExpand summary="BDSP TMs" value={tmMovesBdsp.length}>
-            {tmMovesBdsp.map((move) => (
-              <AttributeRow key={`bdsp_tm_${move.name}`} label={move.name} indent={10}>
                 {move.name}
               </AttributeRow>
             ))}

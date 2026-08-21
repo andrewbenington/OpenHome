@@ -1,10 +1,10 @@
 use std::num::NonZeroU64;
 
 use super::v2_sections::{
-    BdspData, GameboyData, Gen45Data, Gen67Data, LZA_PLUS_MOVES_BLOCK_C_BYTES,
-    LZA_PLUS_MOVES_BLOCK_D_BYTES, LearnedMoves, LegendsArceusData, LegendsZaData, MainDataV2,
-    MonTags, MostRecentSave, Notes, PastHandlerDataV2, PluginData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED,
-    ScarletVioletData, SwordShieldData,
+    GameboyData, Gen45Data, Gen67Data, LZA_PLUS_MOVES_BLOCK_C_BYTES, LZA_PLUS_MOVES_BLOCK_D_BYTES,
+    LearnedMoves, LegendsArceusData, LegendsZaData, MainDataV2, MonTags, MostRecentSave, Notes,
+    PastHandlerDataV2, PluginData, SV_BASE_TM_BYTES_EXCLUDE_UNUSED, ScarletVioletData,
+    SwordShieldData,
 };
 use crate::ohpkm::OhpkmConvert;
 #[allow(deprecated)]
@@ -19,8 +19,7 @@ use crate::traits::{HasSpeciesAndForm, IsShiny, PkmBytes};
 
 use pkm_rs_resources::abilities::AbilityIndexBounded;
 use pkm_rs_resources::ball::Ball;
-use pkm_rs_resources::moves::{MoveIndex, la_tutor, lza_plus, lza_tm, sv_tm, swsh_tr};
-use pkm_rs_resources::moves::{MoveSlots, bdsp_tm};
+use pkm_rs_resources::moves::{MoveIndex, MoveSlots, la_tutor, lza_plus, lza_tm, sv_tm, swsh_tr};
 use pkm_rs_resources::natures::NatureIndex;
 use pkm_rs_resources::ribbons::{ModernRibbon, OpenHomeRibbon, OpenHomeRibbonSet};
 use pkm_rs_resources::species::SpeciesForm;
@@ -219,7 +218,6 @@ pub struct OhpkmV2 {
     gen45_data: Option<Gen45Data>,
     gen67_data: Option<Gen67Data>,
     swsh_data: Option<SwordShieldData>,
-    bdsp_data: Option<BdspData>,
     la_data: Option<LegendsArceusData>,
     sv_data: Option<ScarletVioletData>,
     lza_data: Option<LegendsZaData>,
@@ -1200,28 +1198,6 @@ impl OhpkmV2 {
         }
     }
 
-    // Brilliant Diamond/Shining Pearl
-
-    pub fn tutor_flags_bdsp(&self) -> Option<Vec<u8>> {
-        Some(self.bdsp_data?.tm_flags.to_bytes().to_vec())
-    }
-
-    pub fn set_tm_flags_bdsp(&mut self, value: Option<Vec<u8>>) {
-        match value {
-            Some(tm_flags) => {
-                let mut new_bytes = [0u8; 14];
-                new_bytes.copy_from_slice(&tm_flags);
-                self.bdsp_data.get_or_insert_default().tm_flags =
-                    FlagSet::<14>::from_bytes(new_bytes);
-            }
-            None => {
-                if let Some(bdsp_data) = &mut self.bdsp_data {
-                    bdsp_data.tm_flags = FlagSet::default();
-                }
-            }
-        }
-    }
-
     // Legends Arceus
 
     pub fn gvs(&self) -> Option<Stats8> {
@@ -1613,7 +1589,6 @@ impl OhpkmV2 {
             gen45_data: None,
             gen67_data: None,
             swsh_data: None,
-            bdsp_data: None,
             la_data: None,
             sv_data: None,
             lza_data: None,
@@ -1655,7 +1630,6 @@ impl OhpkmV2 {
             gen45_data: Gen45Data::extract_from(&sectioned_data)?,
             gen67_data: Gen67Data::extract_from(&sectioned_data)?,
             swsh_data: SwordShieldData::extract_from(&sectioned_data)?,
-            bdsp_data: BdspData::extract_from(&sectioned_data)?,
             la_data: LegendsArceusData::extract_from(&sectioned_data)?,
             sv_data: ScarletVioletData::extract_from(&sectioned_data)?,
             lza_data: LegendsZaData::extract_from(&sectioned_data)?,
@@ -1701,7 +1675,6 @@ impl OhpkmV2 {
             swsh_data: SwordShieldData::extract_from(&sectioned_data)
                 .ok()
                 .flatten(),
-            bdsp_data: BdspData::extract_from(&sectioned_data).ok().flatten(),
             la_data: LegendsArceusData::extract_from(&sectioned_data)
                 .ok()
                 .flatten(),
@@ -1736,7 +1709,6 @@ impl OhpkmV2 {
             gen45_data: Gen45Data::from_v1(old),
             gen67_data: Gen67Data::from_v1(old),
             swsh_data: SwordShieldData::from_v1(old),
-            bdsp_data: BdspData::from_v1(old),
             la_data: LegendsArceusData::from_v1(old),
             sv_data: ScarletVioletData::from_v1(old),
             lza_data: None, // z-a move flags weren't tracked in v1
@@ -1764,7 +1736,6 @@ impl OhpkmV2 {
             gen45_data,
             gen67_data,
             swsh_data,
-            bdsp_data,
             la_data,
             sv_data,
             lza_data,
@@ -1784,7 +1755,6 @@ impl OhpkmV2 {
             .add_if_some(gen45_data)
             .add_if_some(gen67_data)
             .add_if_some(swsh_data)
-            .add_if_some(bdsp_data)
             .add_if_some(la_data)
             .add_if_some(sv_data)
             .add_if_some(lza_data)
@@ -1885,15 +1855,6 @@ impl OhpkmV2 {
                 .into_iter()
                 .filter_map(swsh_tr::move_id_by_tr_index);
             learned_moves.add_moves(swsh_tr_move_ids);
-        };
-
-        if let Some(bdsp_data) = self.bdsp_data {
-            let bdsp_tm_move_ids = bdsp_data
-                .tm_flags
-                .get_flags()
-                .into_iter()
-                .filter_map(bdsp_tm::move_id_by_tm_index);
-            learned_moves.add_moves(bdsp_tm_move_ids);
         };
 
         if let Some(la_data) = self.la_data {
@@ -2004,7 +1965,6 @@ impl OhpkmV2 {
             gen45_data,
             gen67_data,
             swsh_data,
-            bdsp_data,
             la_data,
             sv_data,
             lza_data,
@@ -2028,7 +1988,6 @@ impl OhpkmV2 {
         add_section_bytes_to_js_object(&obj, gen45_data)?;
         add_section_bytes_to_js_object(&obj, gen67_data)?;
         add_section_bytes_to_js_object(&obj, swsh_data)?;
-        add_section_bytes_to_js_object(&obj, bdsp_data)?;
         add_section_bytes_to_js_object(&obj, la_data)?;
         add_section_bytes_to_js_object(&obj, sv_data)?;
         add_section_bytes_to_js_object(&obj, lza_data)?;
@@ -3170,30 +3129,6 @@ impl OhpkmV2 {
         }
     }
 
-    // Brilliant Diamond/Shining Pearl
-
-    #[wasm_bindgen(getter = tmFlagsBDSP)]
-    pub fn tm_flags_bdsp_js(&self) -> Option<Vec<u8>> {
-        Some(self.bdsp_data?.tm_flags.to_bytes().to_vec())
-    }
-
-    #[wasm_bindgen(setter = tmFlagsBDSP)]
-    pub fn set_tm_flags_bdsp_js(&mut self, value: Option<Vec<u8>>) {
-        match value {
-            Some(tm_flags) => {
-                let mut new_bytes = [0u8; 14];
-                new_bytes.copy_from_slice(&tm_flags);
-                self.bdsp_data.get_or_insert_default().tm_flags =
-                    FlagSet::<14>::from_bytes(new_bytes);
-            }
-            None => {
-                if let Some(bdsp_data) = &mut self.bdsp_data {
-                    bdsp_data.tm_flags = FlagSet::default();
-                }
-            }
-        }
-    }
-
     // Legends Arceus
 
     #[wasm_bindgen(getter = gvs)]
@@ -3607,7 +3542,6 @@ impl OhpkmV2 {
         add_section_bytes_to_js_object(&obj, &self.gen45_data)?;
         add_section_bytes_to_js_object(&obj, &self.gen67_data)?;
         add_section_bytes_to_js_object(&obj, &self.swsh_data)?;
-        add_section_bytes_to_js_object(&obj, &self.bdsp_data)?;
         add_section_bytes_to_js_object(&obj, &self.la_data)?;
         add_section_bytes_to_js_object(&obj, &self.sv_data)?;
         add_section_bytes_to_js_object(&obj, &self.plugin_data)?;
