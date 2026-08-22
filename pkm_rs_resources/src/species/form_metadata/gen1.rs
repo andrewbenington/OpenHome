@@ -1,37 +1,18 @@
+use crate::ExpectLog;
+use crate::pkhex_bin::{RB_LEVELUP_PKL, RB_PERSONAL_FILE};
+use crate::pkhex_bin::{YELLOW_LEVELUP_PKL, YELLOW_PERSONAL_FILE};
+use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, StatsPreSplit};
-
-use crate::{
-    ExpectLog,
-    levelup::{LearnsetFileReader, LearnsetReader},
-    species::form_metadata::{BaseStats, MetadataTable, PersonalInfo, PersonalTable},
-};
-
-// binary files are from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
-const GEN1_PERSONAL_FILE_SIZE: usize = 4256;
-const RED_BLUE_PERSONAL_BYTES: &[u8; GEN1_PERSONAL_FILE_SIZE] =
-    include_bytes!("pkhex_bin/personal/personal_rb");
-const YELLOW_PERSONAL_BYTES: &[u8; GEN1_PERSONAL_FILE_SIZE] =
-    include_bytes!("pkhex_bin/personal/personal_y");
-
-const RED_BLUE_LEVELUP_FILE_SIZE: usize = 2494;
-const RED_BLUE_LEVELUP_BYTES: &[u8; RED_BLUE_LEVELUP_FILE_SIZE] =
-    include_bytes!("pkhex_bin/levelup/lvlmove_rb.pkl");
-
-const YELLOW_LEVELUP_FILE_SIZE: usize = 2575;
-const YELLOW_LEVELUP_BYTES: &[u8; YELLOW_LEVELUP_FILE_SIZE] =
-    include_bytes!("pkhex_bin/levelup/lvlmove_y.pkl");
 
 const GEN1_ENTRY_SIZE: usize = 0x1c;
 
-pub static METADATA_TABLE_RED_BLUE: MetadataTableGen1 = MetadataTableGen1 {
-    personal: PersonalTableGen1::from_pkl_bytes(RED_BLUE_PERSONAL_BYTES),
-    learnsets: LearnsetFileReader::from_pkl_bytes(RED_BLUE_LEVELUP_BYTES),
-};
+type GameMetadataGen1 = GameMetadata<PersonalInfoGen1, GEN1_ENTRY_SIZE>;
 
-pub static METADATA_TABLE_YELLOW: MetadataTableGen1 = MetadataTableGen1 {
-    personal: PersonalTableGen1::from_pkl_bytes(YELLOW_PERSONAL_BYTES),
-    learnsets: LearnsetFileReader::from_pkl_bytes(YELLOW_LEVELUP_BYTES),
-};
+pub static METADATA_TABLE_RB: GameMetadataGen1 =
+    GameMetadataGen1::from_binary(RB_PERSONAL_FILE, RB_LEVELUP_PKL);
+
+pub static METADATA_TABLE_YELLOW: GameMetadataGen1 =
+    GameMetadataGen1::from_binary(YELLOW_PERSONAL_FILE, YELLOW_LEVELUP_PKL);
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoGen1(&'static [u8]);
@@ -81,34 +62,6 @@ impl PersonalInfo for PersonalInfoGen1 {
     }
 }
 
-pub type PersonalTableGen1 =
-    PersonalTable<PersonalInfoGen1, GEN1_ENTRY_SIZE>;
-
-#[derive(Debug)]
-pub struct MetadataTableGen1 {
-    personal: PersonalTableGen1,
-    learnsets: LearnsetFileReader,
-}
-
-impl MetadataTable for MetadataTableGen1 {
-    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-        self.personal.get_types(national_dex, form_index)
-    }
-
-    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
-        self.personal.get_game_index(national_dex, form_index)
-    }
-
-    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
-        self.learnsets
-            .learnset_at_index(self.get_game_index(national_dex, form_index)?)
-    }
-
-    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
-        self.personal.get_base_stats(national_dex, form_index)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use pkm_rs_types::NationalDex;
@@ -118,14 +71,14 @@ mod tests {
     #[test]
     fn type_check_red_blue() {
         assert_eq!(
-            METADATA_TABLE_RED_BLUE.get_types(1, 0),
+            METADATA_TABLE_RB.get_types(1, 0),
             Some((PkmType::Grass, Some(PkmType::Poison)))
         );
     }
 
     #[test]
     fn pikachu_stats_match() -> Result<(), impl std::fmt::Debug> {
-        let stats = METADATA_TABLE_RED_BLUE
+        let stats = METADATA_TABLE_RB
             .get_base_stats(NationalDex::Pikachu as u16, 0)
             .ok_or("Failed to get base stats for Pikachu")?;
 
@@ -149,7 +102,7 @@ mod tests {
 
     #[test]
     fn magnemite_is_just_electric_gen1() -> Result<(), impl std::fmt::Debug> {
-        let types = METADATA_TABLE_RED_BLUE
+        let types = METADATA_TABLE_RB
             .get_types(NationalDex::Magnemite as u16, 0)
             .ok_or("Failed to get types for Magnemite")?;
 

@@ -1,29 +1,19 @@
+use crate::ExpectLog;
+use crate::pkhex_bin::{SV_LEVELUP_PKL, SV_PERSONAL_FILE};
+use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-use crate::{
-    ExpectLog,
-    levelup::{LearnsetFileReader, LearnsetReader},
-    species::form_metadata::{BaseStats, MetadataTable, PersonalInfo, PersonalTable},
-};
-
-// binary files are from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
-const SV_PERSONAL_FILE_SIZE: usize = 113920;
-const SV_PERSONAL_BYTES: &[u8; SV_PERSONAL_FILE_SIZE] =
-    include_bytes!("pkhex_bin/personal/personal_sv");
-const SV_LEVELUP_FILE_SIZE: usize = 63433;
-const SV_LEVELUP_BYTES: &[u8; SV_LEVELUP_FILE_SIZE] =
-    include_bytes!("pkhex_bin/levelup/lvlmove_sv.pkl");
 pub const SV_ENTRY_SIZE: usize = 0x50;
 
-pub static METADATA_TABLE_SV: MetadataTableScarletViolet = MetadataTableScarletViolet {
-    personal_table: PersonalTableScarletViolet::from_pkl_bytes(SV_PERSONAL_BYTES),
-    learnsets: LearnsetFileReader::from_pkl_bytes(SV_LEVELUP_BYTES),
-};
+type GameMetadataSv = GameMetadata<PersonalInfoSv, SV_ENTRY_SIZE>;
+
+pub static METADATA_TABLE_SV: GameMetadataSv =
+    GameMetadataSv::from_binary(SV_PERSONAL_FILE, SV_LEVELUP_PKL);
 
 #[derive(Clone, Copy)]
-pub struct PersonalInfoScarletViolet([u8; SV_ENTRY_SIZE]);
+pub struct PersonalInfoSv([u8; SV_ENTRY_SIZE]);
 
-impl PersonalInfoScarletViolet {
+impl PersonalInfoSv {
     pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
         Self(
             bytes
@@ -78,7 +68,7 @@ impl PersonalInfoScarletViolet {
     }
 }
 
-impl PersonalInfo for PersonalInfoScarletViolet {
+impl PersonalInfo for PersonalInfoSv {
     const MAX_NATIONAL_DEX: NationalDex = NationalDex::Pecharunt;
 
     fn from_pkl_bytes(bytes: &[u8]) -> Self {
@@ -99,33 +89,6 @@ impl PersonalInfo for PersonalInfoScarletViolet {
 
     fn source_name(&self) -> &'static str {
         "Scarlet/Violet"
-    }
-}
-
-pub type PersonalTableScarletViolet =
-    PersonalTable<PersonalInfoScarletViolet, SV_ENTRY_SIZE>;
-
-pub struct MetadataTableScarletViolet {
-    personal_table: PersonalTableScarletViolet,
-    learnsets: LearnsetFileReader,
-}
-
-impl MetadataTable for MetadataTableScarletViolet {
-    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-        self.personal_table.get_types(national_dex, form_index)
-    }
-
-    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
-        self.personal_table.get_game_index(national_dex, form_index)
-    }
-
-    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
-        self.learnsets
-            .learnset_at_index(self.get_game_index(national_dex, form_index)?)
-    }
-
-    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
-        self.personal_table.get_base_stats(national_dex, form_index)
     }
 }
 
