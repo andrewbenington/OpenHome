@@ -99,7 +99,7 @@ impl PersonalInfo for PersonalInfoXy {
     }
 }
 
-pub type PersonalTableXY = PersonalTable<PersonalInfoXy, XY_PERSONAL_FILE_SIZE, XY_ENTRY_SIZE>;
+pub type PersonalTableXY = PersonalTable<PersonalInfoXy, XY_ENTRY_SIZE>;
 
 #[derive(Debug)]
 pub struct MetadataTableXY {
@@ -123,10 +123,6 @@ impl MetadataTable for MetadataTableXY {
 
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        "X/Y"
     }
 }
 
@@ -194,7 +190,7 @@ impl PersonalInfo for PersonalInfoOras {
 }
 
 pub type PersonalTableOras =
-    PersonalTable<PersonalInfoOras, ORAS_PERSONAL_FILE_SIZE, ORAS_ENTRY_SIZE>;
+    PersonalTable<PersonalInfoOras, ORAS_ENTRY_SIZE>;
 
 #[derive(Debug)]
 pub struct MetadataTableOras {
@@ -218,10 +214,6 @@ impl MetadataTable for MetadataTableOras {
 
     fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
         self.personal.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        "Omega Ruby/Alpha Sapphire"
     }
 }
 
