@@ -1,27 +1,18 @@
+use crate::levelup::{LearnsetFileReader, LearnsetReader};
+use crate::pkhex_bin::{LA_LEVELUP_PKL, LA_MASTERY_PKL, LA_PERSONAL_FILE};
+use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-use crate::{
-    learnset_pkl,
-    levelup::{LearnsetFileReader, LearnsetReader},
-    species::form_metadata::{BaseStats, GameMetadata, PersonalInfo, PersonalTable},
-};
-
 // binary files are from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
-const LA_PERSONAL_FILE_SIZE: usize = 224576;
-const LA_PERSONAL_BYTES: &[u8; LA_PERSONAL_FILE_SIZE] =
-    include_bytes!("pkhex_bin/personal/personal_la");
 
 const LA_ENTRY_SIZE: usize = 0xB0;
 
-type PersonalTableLegendsArceus = PersonalTable<PersonalInfoLegendsArceus, LA_ENTRY_SIZE>;
+type GameMetadataLa = GameMetadata<PersonalInfoLa, LA_ENTRY_SIZE>;
 
-pub static METADATA_TABLE_LA: GameMetadata<PersonalInfoLegendsArceus, LA_ENTRY_SIZE> =
-    GameMetadata {
-        personal: PersonalTableLegendsArceus::from_pkl_bytes(LA_PERSONAL_BYTES),
-        learnsets: learnset_pkl!("pkhex_bin/levelup/lvlmove_la.pkl"),
-    };
+pub static METADATA_TABLE_LA: GameMetadataLa =
+    GameMetadataLa::from_binary(LA_PERSONAL_FILE, LA_LEVELUP_PKL);
 
-const LA_MOVE_MASTERY: LearnsetFileReader = learnset_pkl!("pkhex_bin/levelup/mastery_la.pkl");
+const LA_MOVE_MASTERY: LearnsetFileReader = LearnsetFileReader::from_pkl(LA_MASTERY_PKL);
 
 pub fn get_levelup_mastery(national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
     LA_MOVE_MASTERY.learnset_at_index(
@@ -32,9 +23,9 @@ pub fn get_levelup_mastery(national_dex: u16, form_index: u16) -> Option<Learnse
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct PersonalInfoLegendsArceus([u8; LA_ENTRY_SIZE]);
+pub struct PersonalInfoLa([u8; LA_ENTRY_SIZE]);
 
-impl PersonalInfoLegendsArceus {
+impl PersonalInfoLa {
     pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
         Self(bytes.try_into().unwrap())
     }
@@ -77,7 +68,7 @@ impl PersonalInfoLegendsArceus {
     }
 }
 
-impl PersonalInfo for PersonalInfoLegendsArceus {
+impl PersonalInfo for PersonalInfoLa {
     const MAX_NATIONAL_DEX: NationalDex = NationalDex::Enamorus;
 
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {

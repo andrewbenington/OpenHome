@@ -52,6 +52,10 @@ impl From<LearnsetMove> for LearnsetMoveJs {
 pub struct LearnsetFileReader(PklFileData<'static>);
 
 impl LearnsetFileReader {
+    pub const fn from_pkl(pkl_data: PklFileData<'static>) -> Self {
+        Self(pkl_data)
+    }
+
     pub const fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self(PklFileData::from_bytes(bytes))
     }
@@ -123,5 +127,12 @@ fn u8_slice_to_u16_le(slice: &[u8]) -> Vec<u16> {
 macro_rules! learnset_pkl {
     ($path:expr) => {
         LearnsetFileReader::from_pkl_bytes(include_bytes!($path))
+    };
+}
+
+#[macro_export]
+macro_rules! include_pkl {
+    ($path:expr) => {
+        PklFileData::from_bytes(include_bytes!($path))
     };
 }
