@@ -1789,7 +1789,7 @@ impl OhpkmV2 {
     pub fn fix_errors(&mut self) -> Vec<OhpkmIssue> {
         let mut fixed_issues = Vec::<OhpkmIssue>::new();
 
-        self.populate_learned_moves();
+        self.sync_learned_moves();
 
         fixed_issues.append(&mut self.main_data.fix_errors());
 
@@ -1840,7 +1840,7 @@ impl OhpkmV2 {
         self.main_data.revert_ability_by_num()
     }
 
-    pub fn populate_learned_moves(&mut self) {
+    pub fn sync_learned_moves(&mut self) {
         let mut learned_moves = self.learned_moves.take().unwrap_or_default();
 
         learned_moves.add_moves(
@@ -2639,7 +2639,7 @@ impl OhpkmV2 {
 
     #[wasm_bindgen(js_name = populateLearnedMoves)]
     pub fn populate_learned_moves_wasm(&mut self) {
-        self.populate_learned_moves();
+        self.sync_learned_moves();
     }
 
     #[wasm_bindgen(getter = homeTracker)]
