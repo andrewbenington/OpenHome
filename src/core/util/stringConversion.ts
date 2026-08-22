@@ -161,18 +161,56 @@ const GBStringDictJpn: { [key: number]: string } = (() => {
     dict[0xf6 + i] = i.toString()
   }
   const dakuten: { [key: string]: string } = {
-    カ: 'ガ', キ: 'ギ', ク: 'グ', ケ: 'ゲ', コ: 'ゴ',
-    サ: 'ザ', シ: 'ジ', ス: 'ズ', セ: 'ゼ', ソ: 'ゾ',
-    タ: 'ダ', チ: 'ヂ', ツ: 'ヅ', テ: 'デ', ト: 'ド',
-    ハ: 'バ', ヒ: 'ビ', フ: 'ブ', ホ: 'ボ',
-    か: 'が', き: 'ぎ', く: 'ぐ', け: 'げ', こ: 'ご',
-    さ: 'ざ', し: 'じ', す: 'ず', せ: 'ぜ', そ: 'ぞ',
-    た: 'だ', ち: 'ぢ', つ: 'づ', て: 'で', と: 'ど',
-    は: 'ば', ひ: 'び', ふ: 'ぶ', へ: 'べ', ほ: 'ぼ',
+    カ: 'ガ',
+    キ: 'ギ',
+    ク: 'グ',
+    ケ: 'ゲ',
+    コ: 'ゴ',
+    サ: 'ザ',
+    シ: 'ジ',
+    ス: 'ズ',
+    セ: 'ゼ',
+    ソ: 'ゾ',
+    タ: 'ダ',
+    チ: 'ヂ',
+    ツ: 'ヅ',
+    テ: 'デ',
+    ト: 'ド',
+    ハ: 'バ',
+    ヒ: 'ビ',
+    フ: 'ブ',
+    ホ: 'ボ',
+    か: 'が',
+    き: 'ぎ',
+    く: 'ぐ',
+    け: 'げ',
+    こ: 'ご',
+    さ: 'ざ',
+    し: 'じ',
+    す: 'ず',
+    せ: 'ぜ',
+    そ: 'ぞ',
+    た: 'だ',
+    ち: 'ぢ',
+    つ: 'づ',
+    て: 'で',
+    と: 'ど',
+    は: 'ば',
+    ひ: 'び',
+    ふ: 'ぶ',
+    へ: 'べ',
+    ほ: 'ぼ',
   }
   const handakuten: { [key: string]: string } = {
-    ハ: 'パ', ヒ: 'ピ', フ: 'プ', ホ: 'ポ',
-    は: 'ぱ', ひ: 'ぴ', ふ: 'ぷ', へ: 'ぺ', ほ: 'ぽ',
+    ハ: 'パ',
+    ヒ: 'ピ',
+    フ: 'プ',
+    ホ: 'ポ',
+    は: 'ぱ',
+    ひ: 'ぴ',
+    ふ: 'ぷ',
+    へ: 'ぺ',
+    ほ: 'ぽ',
   }
 
   Object.entries({ ...dict }).forEach(([byteStr, char]) => {
@@ -202,14 +240,25 @@ const buildEncodeMap = (dict: { [key: number]: string }) => {
   return map
 }
 
+// katakana that share their hiragana counterpart's code point, since the
+// games have no distinct glyph for them
+const KANA_SHARED_CODE_POINTS: [katakana: string, hiragana: string][] = [
+  ['ヘ', 'へ'],
+  ['リ', 'り'],
+  ['ベ', 'べ'],
+  ['ペ', 'ぺ'],
+]
+
 const gbEncodeMaps: Record<GBEncoding, Map<string, number>> = (() => {
   const jpnMap = buildEncodeMap(GBStringDictJpn)
 
-  // katakana ヘ/リ/ベ/ペ share the hiragana glyphs' code points
-  jpnMap.set('ヘ', jpnMap.get('へ')!)
-  jpnMap.set('リ', jpnMap.get('り')!)
-  jpnMap.set('ベ', jpnMap.get('べ')!)
-  jpnMap.set('ペ', jpnMap.get('ぺ')!)
+  KANA_SHARED_CODE_POINTS.forEach(([katakana, hiragana]) => {
+    const byte = jpnMap.get(hiragana)
+
+    if (byte !== undefined) {
+      jpnMap.set(katakana, byte)
+    }
+  })
   return { Int: buildEncodeMap(GBStringDict), Jpn: jpnMap }
 })()
 

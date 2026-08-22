@@ -133,8 +133,11 @@ test('taking a held item survives a write round-trip', () => {
   }
   expect(targetBox).toBeGreaterThanOrEqual(0)
 
-  const mon = modifiedSaveFile1.boxes[targetBox].boxSlots[targetSlot]!
+  const mon = modifiedSaveFile1.boxes[targetBox].boxSlots[targetSlot]
 
+  if (!mon) {
+    fail('expected to find a boxed mon holding an item')
+  }
   mon.heldItemIndexGen2 = undefined
   modifiedSaveFile1.updatedBoxSlots.push({ box: targetBox, boxSlot: targetSlot })
   modifiedSaveFile1.prepareForSaving()
