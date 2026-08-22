@@ -3,8 +3,6 @@ use crate::pkhex_bin::{LA_LEVELUP_PKL, LA_MASTERY_PKL, LA_PERSONAL_FILE};
 use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-// binary files are from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
-
 const LA_ENTRY_SIZE: usize = 0xB0;
 
 type GameMetadataLa = GameMetadata<PersonalInfoLa, LA_ENTRY_SIZE>;

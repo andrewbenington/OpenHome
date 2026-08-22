@@ -346,7 +346,7 @@ impl MoveIndex {
     }
 
     pub fn to_raw(&self) -> Option<u16> {
-        self.0.map(NonZeroU16::get)
+        self.0.map(|index| index.get())
     }
 }
 
@@ -356,7 +356,7 @@ impl MoveIndex {
 impl MoveIndex {
     #[wasm_bindgen(getter = index)]
     pub fn inner_wasm(&self) -> Option<u16> {
-        self.to_raw()
+        self.0.map(NonZeroU16::get)
     }
 }
 
