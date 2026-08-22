@@ -1,16 +1,20 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { isWasmFormat, WasmPkmFormat } from '@openhome-core/pkm/PKM'
+import { Gen34ContestRibbons, Gen34TowerRibbons } from '@openhome-core/resources'
+import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
 import {
-  Gen34ContestRibbons,
-  Gen34TowerRibbons,
   LZA_DLC_TM_BYTES,
   LZA_PLUS_MOVES_BLOCK_C_BYTES,
   LZA_PLUS_MOVES_BLOCK_D_BYTES,
+  movesFromLaTutorFlags,
+  movesFromLzaBaseTmFlags,
+  movesFromLzaDlcTmFlags,
+  movesFromLzaPlusFlagsBlockC,
+  movesFromLzaPlusFlagsBlockD,
+  movesFromSvTmFlags,
   movesFromSwshTrFlags,
   SWSH_TR_BYTE_COUNT,
-  trIndexForMove,
-} from '@openhome-core/resources'
-import { NationalDex } from '@openhome-core/resources/consts/NationalDex'
+} from '@openhome-core/resources/moves/flags'
 import {
   expectExhaustive,
   getFlag,
@@ -47,6 +51,7 @@ import {
   ShinyLeaves,
   SpeciesForm,
   SpeciesLookup,
+  swshTrIndexByMoveId,
   Tag,
   TeraType,
   TrainerData,
@@ -313,8 +318,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
 
       this.sociability = other.sociability ?? 0
 
-      this.tmFlagsBDSP = other.tmFlagsBDSP
-
       this.isAlpha = other.isAlpha || this.ribbons.includes('Alpha Mark')
       if (other.isAlpha && !this.ribbons.includes('Alpha Mark')) {
         this.ribbons = [...this.ribbons, 'Alpha Mark']
@@ -356,6 +359,8 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
           )
         }
       }
+
+      this.populateLearnedMoves()
     }
   }
 
@@ -517,7 +522,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     const trFlags = this.trFlagsSwSh
     if (!trFlags) return false
 
-    const trIndex = trIndexForMove(moveId)
+    const trIndex = swshTrIndexByMoveId(moveId)
     return trIndex !== undefined && getFlag(new DataView(trFlags.buffer), 0, trIndex)
   }
 
@@ -525,7 +530,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     const trFlags = this.trFlagsSwSh
     if (!trFlags) return undefined
 
-    const trIndex = trIndexForMove(moveId)
+    const trIndex = swshTrIndexByMoveId(moveId)
     if (trIndex !== undefined) {
       setFlag(new DataView(trFlags.buffer), 0, trIndex, true)
     }
@@ -540,11 +545,19 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     )
   }
 
+  get tmMovesLzaBase() {
+    return this.tmFlagsLzaBase ? movesFromLzaBaseTmFlags(this.tmFlagsLzaBase) : []
+  }
+
   unionTmFlagsLzaBase(otherTmFlags: Uint8Array) {
     this.tmFlagsLzaBase = bitwiseOrUint8Array(
       this.tmFlagsLzaBase || new Uint8Array(LZA_DLC_TM_BYTES),
       otherTmFlags
     )
+  }
+
+  get tmMovesLzaDlc() {
+    return this.tmFlagsLzaDlc ? movesFromLzaDlcTmFlags(this.tmFlagsLzaDlc) : []
   }
 
   unionTmFlagsLzaDlc(otherTmFlags: Uint8Array) {
@@ -554,6 +567,12 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     )
   }
 
+  get plusMovesLzaBlockC() {
+    return this.plusMoveFlagsLzaBlockC
+      ? movesFromLzaPlusFlagsBlockC(this.plusMoveFlagsLzaBlockC)
+      : []
+  }
+
   unionPlusFlagsLzaBlockC(otherPlusFlags: Uint8Array) {
     this.plusMoveFlagsLzaBlockC = bitwiseOrUint8Array(
       this.plusMoveFlagsLzaBlockC || new Uint8Array(LZA_PLUS_MOVES_BLOCK_C_BYTES),
@@ -561,11 +580,25 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
     )
   }
 
+  get plusMovesLzaBlockD() {
+    return this.plusMoveFlagsLzaBlockD
+      ? movesFromLzaPlusFlagsBlockD(this.plusMoveFlagsLzaBlockD)
+      : []
+  }
+
   unionPlusFlagsLzaBlockD(otherPlusFlags: Uint8Array) {
     this.plusMoveFlagsLzaBlockD = bitwiseOrUint8Array(
       this.plusMoveFlagsLzaBlockD || new Uint8Array(LZA_PLUS_MOVES_BLOCK_D_BYTES),
       otherPlusFlags
     )
+  }
+
+  get tutorMovesLa() {
+    return this.tutorFlagsLA ? movesFromLaTutorFlags(this.tutorFlagsLA) : []
+  }
+
+  get tmMovesSvBaseGame() {
+    return this.tmFlagsSV ? movesFromSvTmFlags(this.tmFlagsSV) : []
   }
 
   public getLevel(): number {
@@ -685,6 +718,7 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
   public get speciesMetadata() {
     return SpeciesLookup(this.nationalDex)
   }
+
   public syncWithGameData(other: PKMInterface, save?: SAV) {
     const updates: SyncUpdate[] = []
 
@@ -1004,11 +1038,6 @@ export class OHPKM extends OhpkmV2Wasm implements PKMInterface {
         .forEach((move) => updates.push(syncUpdate(`TR move: ${move.name}`)))
 
       this.unionTrFlagsSwSh(other.trFlagsSwSh)
-    }
-
-    if (other.tmFlagsBDSP !== undefined && !arraysEqual(this.tmFlagsBDSP, other.tmFlagsBDSP)) {
-      updates.push(syncUpdate('tmFlagsBDSP', this.tmFlagsBDSP, other.tmFlagsBDSP))
-      this.tmFlagsBDSP = other.tmFlagsBDSP
     }
 
     if (other.tmFlagsSV !== undefined && !arraysEqual(this.tmFlagsSV, other.tmFlagsSV)) {

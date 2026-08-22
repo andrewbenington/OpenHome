@@ -9,10 +9,12 @@ import {
   BinaryGender,
   ContestStats,
   ConvertStrategy,
+  getMoveMasteredLevelLa,
   HyperTraining,
   Item,
   Language,
   Languages,
+  laTutorIndexByMoveId,
   MarkingsSixShapesColors,
   MetadataSummaryLookup,
   NatureIndex,
@@ -459,6 +461,19 @@ export default class PA8 {
     dataView.setUint8(0x148, this.level)
     types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
     return buffer
+  }
+
+  public isMasteredMoveLa(moveId: number): boolean {
+    const tutorMoveIndex = laTutorIndexByMoveId(moveId)
+    if (
+      tutorMoveIndex !== undefined &&
+      byteLogic.getFlag(new DataView(this.masterFlagsLA.buffer), 0, tutorMoveIndex)
+    ) {
+      return true
+    }
+
+    const masteredAtLevel = getMoveMasteredLevelLa(this.nationalDex, this.formIndex, moveId)
+    return masteredAtLevel !== undefined && this.level >= masteredAtLevel
   }
 
   public getStats() {

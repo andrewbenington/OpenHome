@@ -1,22 +1,21 @@
 import { PKMInterface } from '@openhome-core/pkm/interfaces'
 import { getLocationString, getLocationStringOrOrigin } from '@openhome-core/pkm/MetLocation'
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { getCharacteristic, getMoveMaxPP } from '@openhome-core/pkm/util'
+import { getCharacteristic } from '@openhome-core/pkm/util'
 import { getPluginIdentifier } from '@openhome-core/save/util'
 import Markings from '@openhome-ui/components/pokemon/Markings'
-import MoveCard from '@openhome-ui/components/pokemon/MoveCard'
 import { BallsImageList } from '@openhome-ui/images/items'
 import { AppInfoContext } from '@openhome-ui/state/appInfo'
 import { useOhpkmStore } from '@openhome-ui/state/ohpkm'
 import { formatTitleAndNickname } from '@openhome-ui/util/format'
 import { Ball, Language, Languages, OriginGames } from '@pkm-rs/pkg'
-import { Badge, Flex, Grid } from '@radix-ui/themes'
+import { Badge, Flex } from '@radix-ui/themes'
 import { useContext, useMemo } from 'react'
-import './MetDataMovesTab.css'
+import './MetDataTab.css'
 
 const metTimesOfDay = ['in the morning', 'during the daytime', 'in the evening']
 
-const MetDataMovesTab = (props: { mon: PKMInterface }) => {
+const MetDataTab = (props: { mon: PKMInterface }) => {
   const { mon } = props
   const [, , getEnabledSaveTypes] = useContext(AppInfoContext)
   const { updateMonMarkings } = useOhpkmStore()
@@ -162,32 +161,8 @@ const MetDataMovesTab = (props: { mon: PKMInterface }) => {
           )}
         </Flex>
       </div>
-      <Flex direction="row" justify="center">
-        <Grid columns="repeat(2, 1fr)" gap="2" maxWidth="40rem" minWidth="30rem">
-          <MoveCard
-            move={mon.moves[0]}
-            movePP={mon.moves[0] ? mon.movePP[0] : undefined}
-            maxPP={getMoveMaxPP(mon.moves[0], mon.format, mon.movePPUps[0])}
-          />
-          <MoveCard
-            move={mon.moves[1]}
-            movePP={mon.moves[1] ? mon.movePP[1] : undefined}
-            maxPP={getMoveMaxPP(mon.moves[1], mon.format, mon.movePPUps[1])}
-          />
-          <MoveCard
-            move={mon.moves[2]}
-            movePP={mon.moves[2] ? mon.movePP[2] : undefined}
-            maxPP={getMoveMaxPP(mon.moves[2], mon.format, mon.movePPUps[2])}
-          />
-          <MoveCard
-            move={mon.moves[3]}
-            movePP={mon.moves[3] ? mon.movePP[3] : undefined}
-            maxPP={getMoveMaxPP(mon.moves[3], mon.format, mon.movePPUps[3])}
-          />
-        </Grid>
-      </Flex>
     </Flex>
   )
 }
 
-export default MetDataMovesTab
+export default MetDataTab

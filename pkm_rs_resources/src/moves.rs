@@ -1,20 +1,23 @@
-use std::num::NonZeroU16;
+pub mod bdsp_tm;
+mod index_lookup;
+pub mod la_tutor;
+pub mod lza_plus;
+pub mod lza_tm;
+mod max_pp;
+pub mod sv_tm;
+pub mod swsh_tr;
 
+use crate::metadata_source::MetadataSource;
+#[cfg(feature = "randomize")]
+use pkm_rs_types::randomize::Randomize;
+use pkm_rs_types::{Generation, PkmType, read_u16_le};
+use serde::{Serialize, Serializer};
+use std::num::NonZeroU16;
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 
-use pkm_rs_types::{Generation, PkmType, read_u16_le};
-use serde::{Serialize, Serializer};
-
-#[cfg(feature = "randomize")]
-use pkm_rs_types::randomize::Randomize;
-
-mod max_pp;
-
 pub use max_pp::adjust_pp_between_games;
 pub use max_pp::get_base_max_pp;
-
-use crate::metadata_source::MetadataSource;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
@@ -257,7 +260,7 @@ impl FromIterator<Option<MoveSlot>> for MoveSlots {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PpUpStorage {
     SingleByte,
     FourBytes,
@@ -314,7 +317,7 @@ pub struct MoveDataOffsets<T: Into<usize> = usize> {
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[cfg_attr(feature = "randomize", derive(Randomize))]
-#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialOrd, Ord, Default, PartialEq, Eq, Clone, Copy)]
 pub struct MoveIndex(Option<NonZeroU16>);
 
 impl MoveIndex {
@@ -322,12 +325,12 @@ impl MoveIndex {
         self.0.map(|idx| ALL_MOVES[(idx.get() - 1) as usize])
     }
 
-    pub fn from_u16(value: u16) -> Self {
-        Self(NonZeroU16::try_from(value).ok())
+    pub const fn from_u16(value: u16) -> Self {
+        Self(NonZeroU16::new(value))
     }
 
-    pub fn from_le_bytes(bytes: [u8; 2]) -> Self {
-        Self(NonZeroU16::try_from(u16::from_le_bytes(bytes)).ok())
+    pub const fn from_le_bytes(bytes: [u8; 2]) -> Self {
+        Self(NonZeroU16::new(u16::from_le_bytes(bytes)))
     }
 
     pub fn to_le_bytes(self) -> [u8; 2] {
@@ -343,6 +346,16 @@ impl MoveIndex {
     }
 
     pub fn to_raw(&self) -> Option<u16> {
+        self.0.map(|index| index.get())
+    }
+}
+
+#[cfg(feature = "wasm")]
+#[wasm_bindgen]
+#[allow(clippy::missing_const_for_fn)]
+impl MoveIndex {
+    #[wasm_bindgen(getter = index)]
+    pub fn inner_wasm(&self) -> Option<u16> {
         self.0.map(NonZeroU16::get)
     }
 }

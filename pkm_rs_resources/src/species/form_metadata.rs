@@ -461,13 +461,14 @@ pub fn move_mastery_la_lookup(national_dex: u16, form_index: u16) -> Option<Lear
     gen8_la::get_levelup_mastery(national_dex, form_index)
 }
 
+pub fn plus_moves_lza_lookup(national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
+    gen9_za::get_levelup_plus_move_mastery(national_dex, form_index)
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getMoveMasteredLevelLa"))]
 pub fn get_move_mastered_level_la(national_dex: u16, form_index: u16, move_id: u16) -> Option<u8> {
-    crate::log!("get_move_mastered_level_la: {national_dex}, {form_index}, {move_id}");
     let reader = move_mastery_la_lookup(national_dex, form_index)?;
-    crate::log!("reader present; move_id = {move_id}");
     let move_data = reader.move_data_by_id(move_id)?;
-    crate::log!("move data: {move_data:?}");
 
     if let LearnsetCondition::LevelUp(level) = move_data.condition {
         Some(level)
@@ -476,6 +477,17 @@ pub fn get_move_mastered_level_la(national_dex: u16, form_index: u16, move_id: u
     }
 }
 
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getPlusMoveLevelLza"))]
+pub fn get_plus_move_level_lza(national_dex: u16, form_index: u16, move_id: u16) -> Option<u8> {
+    let reader = plus_moves_lza_lookup(national_dex, form_index)?;
+    let move_data = reader.move_data_by_id(move_id)?;
+
+    if let LearnsetCondition::LevelUp(level) = move_data.condition {
+        Some(level)
+    } else {
+        None
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;

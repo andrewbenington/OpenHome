@@ -1,5 +1,14 @@
-import { OHPKM } from '@openhome-core/pkm/OHPKM'
+import { bitwiseOrUint8Array, OHPKM } from '@openhome-core/pkm/OHPKM'
 import { ModernRibbons } from '@openhome-core/resources'
+import {
+  LZA_DLC_TM_BYTES,
+  LZA_PLUS_MOVES_BLOCK_C_BYTES,
+  LZA_PLUS_MOVES_BLOCK_D_BYTES,
+  movesFromLzaBaseTmFlags,
+  movesFromLzaDlcTmFlags,
+  movesFromLzaPlusFlagsBlockC,
+  movesFromLzaPlusFlagsBlockD,
+} from '@openhome-core/resources/moves/flags'
 import * as byteLogic from '@openhome-core/util/byteLogic'
 import { Errorable, R } from '@openhome-core/util/functional'
 import { FourMoves } from '@openhome-core/util/types'
@@ -431,6 +440,54 @@ export default class PA9 {
     dataView.setUint8(0x148, this.level)
     types.writeStatsToBytesU16(dataView, 0x14a, this.stats)
     return buffer
+  }
+
+  get tmMovesLzaBase() {
+    return this.tmFlagsLzaBase ? movesFromLzaBaseTmFlags(this.tmFlagsLzaBase) : []
+  }
+
+  unionTmFlagsLzaBase(otherTmFlags: Uint8Array) {
+    this.tmFlagsLzaBase = bitwiseOrUint8Array(
+      this.tmFlagsLzaBase || new Uint8Array(LZA_DLC_TM_BYTES),
+      otherTmFlags
+    )
+  }
+
+  get tmMovesLzaDlc() {
+    return this.tmFlagsLzaDlc ? movesFromLzaDlcTmFlags(this.tmFlagsLzaDlc) : []
+  }
+
+  unionTmFlagsLzaDlc(otherTmFlags: Uint8Array) {
+    this.tmFlagsLzaDlc = bitwiseOrUint8Array(
+      this.tmFlagsLzaDlc || new Uint8Array(LZA_DLC_TM_BYTES),
+      otherTmFlags
+    )
+  }
+
+  get plusMovesLzaBlockC() {
+    return this.plusMoveFlagsLzaBlockC
+      ? movesFromLzaPlusFlagsBlockC(this.plusMoveFlagsLzaBlockC)
+      : []
+  }
+
+  unionPlusFlagsLzaBlockC(otherPlusFlags: Uint8Array) {
+    this.plusMoveFlagsLzaBlockC = bitwiseOrUint8Array(
+      this.plusMoveFlagsLzaBlockC || new Uint8Array(LZA_PLUS_MOVES_BLOCK_C_BYTES),
+      otherPlusFlags
+    )
+  }
+
+  get plusMovesLzaBlockD() {
+    return this.plusMoveFlagsLzaBlockD
+      ? movesFromLzaPlusFlagsBlockD(this.plusMoveFlagsLzaBlockD)
+      : []
+  }
+
+  unionPlusFlagsLzaBlockD(otherPlusFlags: Uint8Array) {
+    this.plusMoveFlagsLzaBlockD = bitwiseOrUint8Array(
+      this.plusMoveFlagsLzaBlockD || new Uint8Array(LZA_PLUS_MOVES_BLOCK_D_BYTES),
+      otherPlusFlags
+    )
   }
 
   public getStats() {
