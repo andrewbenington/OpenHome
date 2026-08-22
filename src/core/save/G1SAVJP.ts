@@ -44,6 +44,11 @@ const BOX_OT_OFFSET = BOX_PKM_OFFSET + BOX_CAPACITY * BOX_PKM_SIZE
 const BOX_NICKNAME_OFFSET = BOX_OT_OFFSET + BOX_CAPACITY * NAME_SIZE
 const BOX_SIZE = BOX_NICKNAME_OFFSET + BOX_CAPACITY * NAME_SIZE // 0x566
 
+// Japanese releases are titled ポケットモンスター 赤/緑/青/ピカチュウ
+const YELLOW_TITLES = ['yellow', 'ピカチュウ']
+const BLUE_TITLES = ['blue', '青']
+const GREEN_TITLES = ['green', '緑']
+
 const TRAINER_NAME_OFFSET = 0x2598
 const TID_OFFSET = 0x25fb
 const PIKA_FRIENDSHIP_OFFSET = 0x2712
@@ -110,11 +115,14 @@ export class G1SAVJP extends OfficialSAV<PK1> {
       boxByteOffset(this.currentPCBox)
     )
 
-    if (this.bytes[PIKA_FRIENDSHIP_OFFSET] > 0 || path.name.toLowerCase().includes('yellow')) {
+    const fileName = path.name.toLowerCase()
+    const titled = (titles: string[]) => titles.some((title) => fileName.includes(title))
+
+    if (this.bytes[PIKA_FRIENDSHIP_OFFSET] > 0 || titled(YELLOW_TITLES)) {
       this.origin = OriginGame.Yellow
-    } else if (path.name.toLowerCase().includes('blue')) {
+    } else if (titled(BLUE_TITLES)) {
       this.origin = OriginGame.BlueJpn
-    } else if (path.name.toLowerCase().includes('green')) {
+    } else if (titled(GREEN_TITLES)) {
       this.origin = OriginGame.BlueGreen
     } else {
       this.origin = OriginGame.Red
@@ -204,10 +212,7 @@ export class G1SAVJP extends OfficialSAV<PK1> {
       this.bytes.set(new Uint8Array(remainingSlots + 1).fill(0xff), boxOffset + 1 + numMons)
 
       if (boxNumber === this.currentPCBox) {
-        this.bytes.set(
-          this.bytes.slice(boxOffset, boxOffset + BOX_SIZE),
-          CURRENT_BOX_DATA_OFFSET
-        )
+        this.bytes.set(this.bytes.slice(boxOffset, boxOffset + BOX_SIZE), CURRENT_BOX_DATA_OFFSET)
       }
     })
     // Japanese box banks carry no checksums; only main data is checksummed,

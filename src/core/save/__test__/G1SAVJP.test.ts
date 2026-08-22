@@ -7,6 +7,7 @@ import { G1SAV } from '../G1SAV'
 import { G1SAVJP } from '../G1SAVJP'
 import { G2SAV } from '../G2SAV'
 import { G2SAVJP } from '../G2SAVJP'
+import { OriginGame } from '@pkm-rs/pkg'
 import { buildUnknownSaveFile } from '../util/load'
 import { emptyPathData } from '../util/path'
 import { isGen1JapanChecksumValid } from '../util/gbJapanChecksums'
@@ -41,6 +42,26 @@ test('detected as Japanese Gen 1 save and nothing else', () => {
 test('trainer data decoded correctly', () => {
   expect(jpBlueSaveFile.name).toEqual('テスト')
   expect(jpBlueSaveFile.tid).toEqual(12345)
+})
+
+test('origin game is detected from Japanese titles', () => {
+  const originFor = (fileName: string) => {
+    const result = buildUnknownSaveFile(
+      { ...emptyPathData, name: fileName },
+      new Uint8Array(fs.readFileSync(saveTestFilePath('jp-blue.sav'))),
+      ALL_GB_SAVE_TYPES
+    )
+
+    if (R.isErr(result)) {
+      fail(result.error)
+    }
+    return (result.data as G1SAVJP).origin
+  }
+
+  expect(originFor('ポケットモンスター 青.sav')).toEqual(OriginGame.BlueJpn)
+  expect(originFor('ポケットモンスター 緑.sav')).toEqual(OriginGame.BlueGreen)
+  expect(originFor('ポケットモンスター ピカチュウ.sav')).toEqual(OriginGame.Yellow)
+  expect(originFor('ポケットモンスター 赤.sav')).toEqual(OriginGame.Red)
 })
 
 test('all 8 stored boxes are read', () => {
