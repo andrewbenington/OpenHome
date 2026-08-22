@@ -341,6 +341,10 @@ impl MoveIndex {
     pub const fn is_empty(&self) -> bool {
         self.0.is_none()
     }
+
+    pub fn to_raw(&self) -> Option<u16> {
+        self.0.map(NonZeroU16::get)
+    }
 }
 
 impl Serialize for MoveIndex {

@@ -1,30 +1,18 @@
+use crate::pkhex_bin::{LGPE_LEVELUP_PKL, LGPE_PERSONAL_FILE};
+use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
-
-use crate::{
-    levelup::{LearnsetFileReader, LearnsetReader},
-    species::form_metadata::{BaseStats, MetadataTable, PersonalInfo, PersonalTable},
-};
-
-// binary files are from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
-const LGPE_PERSONAL_FILE_SIZE: usize = 82320;
-const LGPE_PERSONAL_BYTES: &[u8; LGPE_PERSONAL_FILE_SIZE] =
-    include_bytes!("pkhex_bin/personal/personal_gg");
-
-const LGPE_LEVELUP_FILE_SIZE: usize = 8740;
-const LGPE_LEVELUP_BYTES: &[u8; LGPE_LEVELUP_FILE_SIZE] =
-    include_bytes!("pkhex_bin/levelup/lvlmove_gg.pkl");
 
 const LGPE_ENTRY_SIZE: usize = 0x54;
 
-pub static METADATA_TABLE_LGPE: MetadataTableLetsGo = MetadataTableLetsGo {
-    personal: PersonalTableLetsGo::from_pkl_bytes(LGPE_PERSONAL_BYTES),
-    learnsets: LearnsetFileReader::from_pkl_bytes(LGPE_LEVELUP_BYTES),
-};
+type GameMetadataLgpe = GameMetadata<PersonalInfoLgpe, LGPE_ENTRY_SIZE>;
+
+pub static METADATA_TABLE_LGPE: GameMetadataLgpe =
+    GameMetadataLgpe::from_binary(LGPE_PERSONAL_FILE, LGPE_LEVELUP_PKL);
 
 #[derive(Debug, Clone, Copy)]
-pub struct PersonalInfoLetsGo([u8; LGPE_ENTRY_SIZE]);
+pub struct PersonalInfoLgpe([u8; LGPE_ENTRY_SIZE]);
 
-impl PersonalInfoLetsGo {
+impl PersonalInfoLgpe {
     pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
         Self(bytes.try_into().unwrap())
     }
@@ -65,7 +53,7 @@ impl PersonalInfoLetsGo {
     }
 }
 
-impl PersonalInfo for PersonalInfoLetsGo {
+impl PersonalInfo for PersonalInfoLgpe {
     const MAX_NATIONAL_DEX: NationalDex = NationalDex::Melmetal;
 
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
@@ -85,38 +73,6 @@ impl PersonalInfo for PersonalInfoLetsGo {
     }
 
     fn source_name(&self) -> &'static str {
-        "Gen 7 (Alola)"
-    }
-}
-
-pub type PersonalTableLetsGo =
-    PersonalTable<PersonalInfoLetsGo, LGPE_PERSONAL_FILE_SIZE, LGPE_ENTRY_SIZE>;
-
-#[derive(Debug)]
-pub struct MetadataTableLetsGo {
-    personal: PersonalTableLetsGo,
-    learnsets: LearnsetFileReader,
-}
-
-impl MetadataTable for MetadataTableLetsGo {
-    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-        self.personal.get_types(national_dex, form_index)
-    }
-
-    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
-        self.personal.get_game_index(national_dex, form_index)
-    }
-
-    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
-        self.learnsets
-            .learnset_at_index(self.get_game_index(national_dex, form_index)?)
-    }
-
-    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
-        self.personal.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        "Sun/Moon"
+        "Gen 7 (Let's Go)"
     }
 }

@@ -14,7 +14,7 @@ pub mod gen9_za;
 
 use std::marker::PhantomData;
 
-use pkm_rs_types::{NationalDex, PkmType, Stats8, StatsPreSplit};
+use pkm_rs_types::{NationalDex, PkmType, Stats8, StatsPreSplit, pkl_file::PklFileData};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -27,24 +27,24 @@ use tsify::Tsify;
 
 use crate::{
     ExpectLog,
-    levelup::LearnsetReader,
+    levelup::{LearnsetCondition, LearnsetFileReader, LearnsetReader},
     metadata_source::MetadataSource,
     species::{
         form,
         form_metadata::{
-            gen1::{METADATA_TABLE_RED_BLUE, METADATA_TABLE_YELLOW},
-            gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GOLD_SILVER},
-            gen3::{METADATA_TABLE_EMERALD, METADATA_TABLE_FRLG, METADATA_TABLE_RUBY_SAPPHIRE},
-            gen4::{METADATA_TABLE_DIAMOND_PEARL, METADATA_TABLE_HGSS, METADATA_TABLE_PLATINUM},
+            gen1::{METADATA_TABLE_RB, METADATA_TABLE_YELLOW},
+            gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GS},
+            gen3::{METADATA_TABLE_EMERALD, METADATA_TABLE_FRLG, METADATA_TABLE_RS},
+            gen4::{METADATA_TABLE_DP, METADATA_TABLE_HGSS, METADATA_TABLE_PT},
             gen5::{METADATA_TABLE_B2W2, METADATA_TABLE_BW},
             gen6::{METADATA_TABLE_ORAS, METADATA_TABLE_XY},
-            gen7_alola::{METADATA_TABLE_SUN_MOON, METADATA_TABLE_USUM},
+            gen7_alola::{METADATA_TABLE_SM, METADATA_TABLE_USUM},
             gen7_lgpe::METADATA_TABLE_LGPE,
             gen8_bdsp::METADATA_TABLE_BDSP,
             gen8_la::METADATA_TABLE_LA,
             gen8_swsh::METADATA_TABLE_SWSH,
             gen9_sv::METADATA_TABLE_SV,
-            gen9_za::METADATA_TABLE_ZA,
+            gen9_za::METADATA_TABLE_LZA,
         },
     },
 };
@@ -63,21 +63,6 @@ pub trait PersonalInfo: Sized {
     // need to be found using the base form's personal info entry
     fn game_index_for_form(&self, national_dex: u16, form_index: u16) -> Option<u16>;
 
-    // pub fn ability1(&self) -> AbilityIndex {
-    //     AbilityIndex::new(u16::from_le_bytes([self.0[0x12], self.0[0x13]]))
-    //         .expect("Gen 9 ability 1 should be valid")
-    // }
-
-    // pub fn ability2(&self) -> AbilityIndex {
-    //     AbilityIndex::from_index(u16::from_le_bytes([self.0[0x14], self.0[0x15]]))
-    //         .expect("Gen 9 ability 2 should be valid")
-    // }
-
-    // pub fn ability_hidden(&self) -> AbilityIndex {
-    //     AbilityIndex::from_index(u16::from_le_bytes([self.0[0x16], self.0[0x17]]))
-    //         .expect("Gen 9 hidden ability should be valid")
-    // }
-
     fn source_name(&self) -> &'static str;
 }
 
@@ -93,16 +78,13 @@ fn format_bad_type_error(
 }
 
 #[derive(Debug, Clone)]
-pub struct PersonalTable<
-    INFO: PersonalInfo,
-    const TABLE_BYTE_LEN: usize,
-    const ENTRY_BYTE_LEN: usize,
->(&'static [u8; TABLE_BYTE_LEN], PhantomData<INFO>);
+struct PersonalTable<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize>(
+    &'static [u8],
+    PhantomData<INFO>,
+);
 
-impl<INFO: PersonalInfo, const TABLE_BYTE_LEN: usize, const ENTRY_BYTE_LEN: usize>
-    PersonalTable<INFO, TABLE_BYTE_LEN, ENTRY_BYTE_LEN>
-{
-    pub const fn from_pkl_bytes(bytes: &'static [u8; TABLE_BYTE_LEN]) -> Self {
+impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> PersonalTable<INFO, ENTRY_BYTE_LEN> {
+    pub const fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self(bytes, PhantomData)
     }
 
@@ -157,7 +139,62 @@ impl<INFO: PersonalInfo, const TABLE_BYTE_LEN: usize, const ENTRY_BYTE_LEN: usiz
     }
 }
 
-pub trait MetadataTable {
+#[derive(Debug, Clone)]
+pub struct GameMetadata<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> {
+    personal: PersonalTable<INFO, ENTRY_BYTE_LEN>,
+    learnsets: LearnsetFileReader,
+}
+
+impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> GameMetadata<INFO, ENTRY_BYTE_LEN> {
+    pub const fn from_binary(
+        personal_file: &'static [u8],
+        levelup_file: PklFileData<'static>,
+    ) -> Self {
+        Self {
+            personal: PersonalTable::<INFO, ENTRY_BYTE_LEN>::from_pkl_bytes(personal_file),
+            learnsets: LearnsetFileReader::from_pkl(levelup_file),
+        }
+    }
+
+    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
+        self.personal.get_types(national_dex, form_index)
+    }
+
+    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
+        self.personal.get_game_index(national_dex, form_index)
+    }
+
+    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
+        self.learnsets
+            .learnset_at_index(self.get_game_index(national_dex, form_index)?)
+    }
+
+    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
+        self.personal.get_base_stats(national_dex, form_index)
+    }
+}
+
+impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> MetadataTable
+    for GameMetadata<INFO, ENTRY_BYTE_LEN>
+{
+    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
+        self.get_types(national_dex, form_index)
+    }
+
+    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
+        self.get_game_index(national_dex, form_index)
+    }
+
+    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
+        self.get_levelup_learnset(national_dex, form_index)
+    }
+
+    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
+        self.get_base_stats(national_dex, form_index)
+    }
+}
+
+trait MetadataTable {
     fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)>;
 
     fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16>;
@@ -169,8 +206,6 @@ pub trait MetadataTable {
     fn form_is_present(&self, national_dex: u16, form_index: u16) -> bool {
         self.get_game_index(national_dex, form_index).is_some()
     }
-
-    fn get_source_name(&self) -> &'static str;
 }
 
 impl<T, U> MetadataTable for T
@@ -197,10 +232,6 @@ where
     fn form_is_present(&self, national_dex: u16, form_index: u16) -> bool {
         (**self).form_is_present(national_dex, form_index)
     }
-
-    fn get_source_name(&self) -> &'static str {
-        (**self).get_source_name()
-    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
@@ -214,7 +245,7 @@ const READER_SHOULD_BE_VALID: &str =
     "MetadataTableReader should only be constructed if the form is present in the table";
 
 impl MetadataTableReader {
-    pub fn new(inner: Box<dyn MetadataTable>, national_dex: u16, form_index: u16) -> Option<Self> {
+    fn new(inner: Box<dyn MetadataTable>, national_dex: u16, form_index: u16) -> Option<Self> {
         if inner.form_is_present(national_dex, form_index) {
             Some(Self {
                 inner,
@@ -273,11 +304,6 @@ impl MetadataTableReader {
     pub fn base_stats(&self) -> BaseStats {
         self.get_base_stats()
     }
-
-    #[cfg_attr(feature = "wasm", wasm_bindgen(getter = "sourceName"))]
-    pub fn source_name(&self) -> String {
-        self.inner.get_source_name().to_owned()
-    }
 }
 
 #[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "metadataReaderFor"))]
@@ -325,8 +351,8 @@ fn most_recent_metadata_table_for(
 ) -> &'static dyn MetadataTable {
     if METADATA_TABLE_SV.form_is_present(national_dex, form_index) {
         &METADATA_TABLE_SV
-    } else if METADATA_TABLE_ZA.form_is_present(national_dex, form_index) {
-        &METADATA_TABLE_ZA
+    } else if METADATA_TABLE_LZA.form_is_present(national_dex, form_index) {
+        &METADATA_TABLE_LZA
     } else if METADATA_TABLE_BDSP.form_is_present(national_dex, form_index) {
         &METADATA_TABLE_BDSP
     } else if METADATA_TABLE_SWSH.form_is_present(national_dex, form_index) {
@@ -379,28 +405,28 @@ pub fn source_has_form_metadata(
 
 fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTable {
     match source {
-        MetadataSource::RedBlue => &METADATA_TABLE_RED_BLUE,
+        MetadataSource::RedBlue => &METADATA_TABLE_RB,
         MetadataSource::Yellow => &METADATA_TABLE_YELLOW,
-        MetadataSource::GoldSilver => &METADATA_TABLE_GOLD_SILVER,
+        MetadataSource::GoldSilver => &METADATA_TABLE_GS,
         MetadataSource::Crystal => &METADATA_TABLE_CRYSTAL,
-        MetadataSource::RubySapphire => &METADATA_TABLE_RUBY_SAPPHIRE,
+        MetadataSource::RubySapphire => &METADATA_TABLE_RS,
         MetadataSource::Emerald => &METADATA_TABLE_EMERALD,
         MetadataSource::FireRedLeafGreen => &METADATA_TABLE_FRLG,
-        MetadataSource::DiamondPearl => &METADATA_TABLE_DIAMOND_PEARL,
-        MetadataSource::Platinum => &METADATA_TABLE_PLATINUM,
+        MetadataSource::DiamondPearl => &METADATA_TABLE_DP,
+        MetadataSource::Platinum => &METADATA_TABLE_PT,
         MetadataSource::HeartGoldSoulSilver => &METADATA_TABLE_HGSS,
         MetadataSource::BlackWhite => &METADATA_TABLE_BW,
         MetadataSource::Black2White2 => &METADATA_TABLE_B2W2,
         MetadataSource::XY => &METADATA_TABLE_XY,
         MetadataSource::OmegaRubyAlphaSapphire => &METADATA_TABLE_ORAS,
-        MetadataSource::SunMoon => &METADATA_TABLE_SUN_MOON,
+        MetadataSource::SunMoon => &METADATA_TABLE_SM,
         MetadataSource::UltraSunUltraMoon => &METADATA_TABLE_USUM,
         MetadataSource::LetsGoPikachuEevee => &METADATA_TABLE_LGPE,
         MetadataSource::SwordShield => &METADATA_TABLE_SWSH,
         MetadataSource::BrilliantDiamondShiningPearl => &METADATA_TABLE_BDSP,
         MetadataSource::LegendsArceus => &METADATA_TABLE_LA,
         MetadataSource::ScarletViolet => &METADATA_TABLE_SV,
-        MetadataSource::LegendsZa => &METADATA_TABLE_ZA,
+        MetadataSource::LegendsZa => &METADATA_TABLE_LZA,
     }
 }
 
@@ -428,6 +454,25 @@ pub fn levelup_learnset_lookup(
         }
         None => most_recent_metadata_table_for(national_dex, form_index)
             .get_levelup_learnset(national_dex, form_index),
+    }
+}
+
+pub fn move_mastery_la_lookup(national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
+    gen8_la::get_levelup_mastery(national_dex, form_index)
+}
+
+#[cfg_attr(feature = "wasm", wasm_bindgen(js_name = "getMoveMasteredLevelLa"))]
+pub fn get_move_mastered_level_la(national_dex: u16, form_index: u16, move_id: u16) -> Option<u8> {
+    crate::log!("get_move_mastered_level_la: {national_dex}, {form_index}, {move_id}");
+    let reader = move_mastery_la_lookup(national_dex, form_index)?;
+    crate::log!("reader present; move_id = {move_id}");
+    let move_data = reader.move_data_by_id(move_id)?;
+    crate::log!("move data: {move_data:?}");
+
+    if let LearnsetCondition::LevelUp(level) = move_data.condition {
+        Some(level)
+    } else {
+        None
     }
 }
 

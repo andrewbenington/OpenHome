@@ -17,6 +17,12 @@ pub struct LearnsetMove {
     pub(crate) condition: LearnsetCondition,
 }
 
+impl LearnsetMove {
+    pub const fn get_condition(&self) -> LearnsetCondition {
+        self.condition
+    }
+}
+
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct LearnsetMoveJs {
     pub move_id: u16,
@@ -46,6 +52,10 @@ impl From<LearnsetMove> for LearnsetMoveJs {
 pub struct LearnsetFileReader(PklFileData<'static>);
 
 impl LearnsetFileReader {
+    pub const fn from_pkl(pkl_data: PklFileData<'static>) -> Self {
+        Self(pkl_data)
+    }
+
     pub const fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
         Self(PklFileData::from_bytes(bytes))
     }
@@ -71,7 +81,7 @@ impl LearnsetReader {
         self.0.len() / 3 // 2 bytes per move, 1 byte per level
     }
 
-    pub fn get_move(&self, index: usize) -> Option<LearnsetMove> {
+    fn get_move(&self, index: usize) -> Option<LearnsetMove> {
         if index >= self.move_count() {
             return None;
         }
@@ -91,6 +101,12 @@ impl LearnsetReader {
         Some(LearnsetMove { move_id, condition })
     }
 
+    pub fn move_data_by_id(&self, move_id: u16) -> Option<LearnsetMove> {
+        (0..self.move_count())
+            .filter_map(|index| self.get_move(index))
+            .find(|m| m.move_id.to_raw().is_some_and(|id| id == move_id))
+    }
+
     pub fn all_moves(&self) -> Vec<LearnsetMove> {
         (0..self.move_count())
             .filter_map(|index| self.get_move(index))
@@ -105,4 +121,18 @@ fn u8_slice_to_u16_le(slice: &[u8]) -> Vec<u16> {
         .iter()
         .map(|chunk| u16::from_le_bytes([chunk[0], chunk[1]]))
         .collect()
+}
+
+#[macro_export]
+macro_rules! learnset_pkl {
+    ($path:expr) => {
+        LearnsetFileReader::from_pkl_bytes(include_bytes!($path))
+    };
+}
+
+#[macro_export]
+macro_rules! include_pkl {
+    ($path:expr) => {
+        PklFileData::from_bytes(include_bytes!($path))
+    };
 }

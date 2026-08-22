@@ -1,3 +1,4 @@
+mod pkhex_bin;
 mod pkhex_text;
 mod result;
 

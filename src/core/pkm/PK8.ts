@@ -1,5 +1,6 @@
 import { OHPKM } from '@openhome-core/pkm/OHPKM'
-import { ModernRibbons } from '@openhome-core/resources'
+import { ModernRibbons, movesFromSwshTrFlags, trIndexForMove } from '@openhome-core/resources'
+import { getFlag, setFlag } from '@openhome-core/util'
 import { Errorable, Option, R } from '@openhome-core/util/functional'
 import { FourMoves, PKMDate, Stats } from '@openhome-core/util/types'
 import {
@@ -534,6 +535,41 @@ export default class PK8 {
 
   get trFlagsSwSh() {
     return this.inner.trFlagsSwSh
+  }
+
+  get trMovesSwSh() {
+    return movesFromSwshTrFlags(this.inner.trFlagsSwSh)
+  }
+
+  hasTrSwSh(moveIndex: number): boolean {
+    // because this is a wrapper for a byte buffer, modifications should carry to the original buffer
+    const trFlags = this.trFlagsSwSh
+    if (!trFlags) return false
+
+    const trIndex = trIndexForMove(moveIndex)
+    return trIndex !== undefined && getFlag(new DataView(trFlags.buffer), 0, trIndex)
+  }
+
+  setTrMoveSwSh(moveIndex: number) {
+    // because this is a wrapper for a byte buffer, modifications should carry to the original buffer
+    const trFlags = this.trFlagsSwSh
+    if (!trFlags) return undefined
+
+    const trIndex = trIndexForMove(moveIndex)
+    if (trIndex !== undefined) {
+      setFlag(new DataView(trFlags.buffer), 0, trIndex, true)
+    }
+
+    this.inner.trFlagsSwSh = trFlags
+  }
+
+  unionTrFlagsSwSh(otherTrFlags: Uint8Array) {
+    // because this is a wrapper for a byte buffer, modifications should carry to the original buffer
+    const trFlags = this.trFlagsSwSh
+    if (!trFlags) return undefined
+    for (let i = 0; i < otherTrFlags.length; i++) {
+      trFlags[i] &= otherTrFlags[i]
+    }
   }
 
   get homeTracker() {

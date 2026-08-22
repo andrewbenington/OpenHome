@@ -1,40 +1,20 @@
 use pkm_rs_types::{NationalDex, PkmType, Stats8, log::ExpectLog};
 
-use crate::{
-    levelup::{LearnsetFileReader, LearnsetReader},
-    species::form_metadata::{BaseStats, MetadataTable, PersonalInfo, PersonalTable},
-};
-
-// binary files are from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
-const BLACK_WHITE_PERSONAL_FILE_SIZE: usize = 40080;
-const BLACK_WHITE_PERSONAL_BYTES: &[u8; BLACK_WHITE_PERSONAL_FILE_SIZE] =
-    include_bytes!("pkhex_bin/personal/personal_bw");
-
-const BLACK_WHITE_LEVELUP_FILE_SIZE: usize = 30469;
-const BLACK_WHITE_LEVELUP_BYTES: &[u8; BLACK_WHITE_LEVELUP_FILE_SIZE] =
-    include_bytes!("pkhex_bin/levelup/lvlmove_bw.pkl");
+use crate::pkhex_bin::{B2W2_LEVELUP_PKL, B2W2_PERSONAL_FILE, BW_LEVELUP_PKL, BW_PERSONAL_FILE};
+use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
 
 const BW_ENTRY_SIZE: usize = 0x3C;
-
-const B2W2_PERSONAL_FILE_SIZE: usize = 53884;
-const B2W2_PERSONAL_BYTES: &[u8; B2W2_PERSONAL_FILE_SIZE] =
-    include_bytes!("pkhex_bin/personal/personal_b2w2");
-
-const B2W2_LEVELUP_FILE_SIZE: usize = 31403;
-const B2W2_LEVELUP_BYTES: &[u8; B2W2_LEVELUP_FILE_SIZE] =
-    include_bytes!("pkhex_bin/levelup/lvlmove_b2w2.pkl");
-
 const B2W2_ENTRY_SIZE: usize = 0x4C;
 
-pub static METADATA_TABLE_BW: MetadataTableBw = MetadataTableBw {
-    personal: PersonalTableBw::from_pkl_bytes(BLACK_WHITE_PERSONAL_BYTES),
-    learnsets: LearnsetFileReader::from_pkl_bytes(BLACK_WHITE_LEVELUP_BYTES),
-};
+type GameMetadataBw = GameMetadata<PersonalInfoBw, BW_ENTRY_SIZE>;
 
-pub static METADATA_TABLE_B2W2: MetadataTableB2W2 = MetadataTableB2W2 {
-    personal: PersonalTableB2W2::from_pkl_bytes(B2W2_PERSONAL_BYTES),
-    learnsets: LearnsetFileReader::from_pkl_bytes(B2W2_LEVELUP_BYTES),
-};
+pub static METADATA_TABLE_BW: GameMetadataBw =
+    GameMetadataBw::from_binary(BW_PERSONAL_FILE, BW_LEVELUP_PKL);
+
+type GameMetadataB2w2 = GameMetadata<PersonalInfoB2w2, B2W2_ENTRY_SIZE>;
+
+pub static METADATA_TABLE_B2W2: GameMetadataB2w2 =
+    GameMetadataB2w2::from_binary(B2W2_PERSONAL_FILE, B2W2_LEVELUP_PKL);
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoBw([u8; BW_ENTRY_SIZE]);
@@ -107,42 +87,10 @@ impl PersonalInfo for PersonalInfoBw {
     }
 }
 
-pub type PersonalTableBw =
-    PersonalTable<PersonalInfoBw, BLACK_WHITE_PERSONAL_FILE_SIZE, BW_ENTRY_SIZE>;
-
-#[derive(Debug)]
-pub struct MetadataTableBw {
-    personal: PersonalTableBw,
-    learnsets: LearnsetFileReader,
-}
-
-impl MetadataTable for MetadataTableBw {
-    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-        self.personal.get_types(national_dex, form_index)
-    }
-
-    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
-        self.personal.get_game_index(national_dex, form_index)
-    }
-
-    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
-        self.learnsets
-            .learnset_at_index(self.get_game_index(national_dex, form_index)?)
-    }
-
-    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
-        self.personal.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
-        "Black/White"
-    }
-}
-
 #[derive(Debug, Clone, Copy)]
-pub struct PersonalInfoB2W2([u8; B2W2_ENTRY_SIZE]);
+pub struct PersonalInfoB2w2([u8; B2W2_ENTRY_SIZE]);
 
-impl PersonalInfoB2W2 {
+impl PersonalInfoB2w2 {
     pub fn from_pkl_bytes(bytes: &[u8]) -> Self {
         Self(
             bytes
@@ -190,7 +138,7 @@ impl PersonalInfoB2W2 {
     }
 }
 
-impl PersonalInfo for PersonalInfoB2W2 {
+impl PersonalInfo for PersonalInfoB2w2 {
     const MAX_NATIONAL_DEX: NationalDex = NationalDex::Genesect;
 
     fn from_pkl_bytes(bytes: &'static [u8]) -> Self {
@@ -210,38 +158,6 @@ impl PersonalInfo for PersonalInfoB2W2 {
     }
 
     fn source_name(&self) -> &'static str {
-        "Black 2/White 2"
-    }
-}
-
-pub type PersonalTableB2W2 =
-    PersonalTable<PersonalInfoB2W2, B2W2_PERSONAL_FILE_SIZE, B2W2_ENTRY_SIZE>;
-
-#[derive(Debug)]
-pub struct MetadataTableB2W2 {
-    personal: PersonalTableB2W2,
-    learnsets: LearnsetFileReader,
-}
-
-impl MetadataTable for MetadataTableB2W2 {
-    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-        self.personal.get_types(national_dex, form_index)
-    }
-
-    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
-        self.personal.get_game_index(national_dex, form_index)
-    }
-
-    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
-        self.learnsets
-            .learnset_at_index(self.get_game_index(national_dex, form_index)?)
-    }
-
-    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
-        self.personal.get_base_stats(national_dex, form_index)
-    }
-
-    fn get_source_name(&self) -> &'static str {
         "Black 2/White 2"
     }
 }
