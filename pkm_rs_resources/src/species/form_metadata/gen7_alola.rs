@@ -1,38 +1,17 @@
 use pkm_rs_types::{NationalDex, PkmType, Stats8};
 
-use crate::{
-    levelup::{LearnsetFileReader, LearnsetReader},
-    species::form_metadata::{BaseStats, MetadataTable, PersonalInfo, PersonalTable},
-};
-
-// binary files are from https://github.com/kwsch/PKHeX/tree/master/PKHeX.Core/Resources/byte/personal
-const SUN_MOON_PERSONAL_FILE_SIZE: usize = 80724;
-const SUN_MOON_PERSONAL_BYTES: &[u8; SUN_MOON_PERSONAL_FILE_SIZE] =
-    include_bytes!("pkhex_bin/personal/personal_sm");
-
-const SUN_MOON_LEVELUP_FILE_SIZE: usize = 49262;
-const SUN_MOON_LEVELUP_BYTES: &[u8; SUN_MOON_LEVELUP_FILE_SIZE] =
-    include_bytes!("pkhex_bin/levelup/lvlmove_sm.pkl");
-
-const USUM_PERSONAL_FILE_SIZE: usize = 81984;
-const USUM_PERSONAL_BYTES: &[u8; USUM_PERSONAL_FILE_SIZE] =
-    include_bytes!("pkhex_bin/personal/personal_uu");
-
-const USUM_LEVELUP_FILE_SIZE: usize = 50114;
-const USUM_LEVELUP_BYTES: &[u8; USUM_LEVELUP_FILE_SIZE] =
-    include_bytes!("pkhex_bin/levelup/lvlmove_uu.pkl");
+use crate::pkhex_bin::{SM_LEVELUP_PKL, SM_PERSONAL_FILE, USUM_LEVELUP_PKL, USUM_PERSONAL_FILE};
+use crate::species::form_metadata::{BaseStats, GameMetadata, PersonalInfo};
 
 const GEN7_ALOLA_ENTRY_SIZE: usize = 0x54;
 
-pub static METADATA_TABLE_SUN_MOON: MetadataTableSunMoon = MetadataTableSunMoon {
-    personal: PersonalTableSunMoon::from_pkl_bytes(SUN_MOON_PERSONAL_BYTES),
-    learnsets: LearnsetFileReader::from_pkl_bytes(SUN_MOON_LEVELUP_BYTES),
-};
+type GameMetadataGen7Alola = GameMetadata<PersonalInfoGen7Alola, GEN7_ALOLA_ENTRY_SIZE>;
 
-pub static METADATA_TABLE_USUM: MetadataTableUsum = MetadataTableUsum {
-    personal: PersonalTableUsum::from_pkl_bytes(USUM_PERSONAL_BYTES),
-    learnsets: LearnsetFileReader::from_pkl_bytes(USUM_LEVELUP_BYTES),
-};
+pub static METADATA_TABLE_SM: GameMetadataGen7Alola =
+    GameMetadataGen7Alola::from_binary(SM_PERSONAL_FILE, SM_LEVELUP_PKL);
+
+pub static METADATA_TABLE_USUM: GameMetadataGen7Alola =
+    GameMetadataGen7Alola::from_binary(USUM_PERSONAL_FILE, USUM_LEVELUP_PKL);
 
 #[derive(Debug, Clone, Copy)]
 pub struct PersonalInfoGen7Alola([u8; GEN7_ALOLA_ENTRY_SIZE]);
@@ -97,62 +76,6 @@ impl PersonalInfo for PersonalInfoGen7Alola {
     }
 }
 
-pub type PersonalTableSunMoon =
-    PersonalTable<PersonalInfoGen7Alola, GEN7_ALOLA_ENTRY_SIZE>;
-
-#[derive(Debug)]
-pub struct MetadataTableSunMoon {
-    personal: PersonalTableSunMoon,
-    learnsets: LearnsetFileReader,
-}
-
-impl MetadataTable for MetadataTableSunMoon {
-    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-        self.personal.get_types(national_dex, form_index)
-    }
-
-    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
-        self.personal.get_game_index(national_dex, form_index)
-    }
-
-    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
-        self.learnsets
-            .learnset_at_index(self.get_game_index(national_dex, form_index)?)
-    }
-
-    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
-        self.personal.get_base_stats(national_dex, form_index)
-    }
-}
-
-pub type PersonalTableUsum =
-    PersonalTable<PersonalInfoGen7Alola, GEN7_ALOLA_ENTRY_SIZE>;
-
-#[derive(Debug)]
-pub struct MetadataTableUsum {
-    personal: PersonalTableUsum,
-    learnsets: LearnsetFileReader,
-}
-
-impl MetadataTable for MetadataTableUsum {
-    fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
-        self.personal.get_types(national_dex, form_index)
-    }
-
-    fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16> {
-        self.personal.get_game_index(national_dex, form_index)
-    }
-
-    fn get_levelup_learnset(&self, national_dex: u16, form_index: u16) -> Option<LearnsetReader> {
-        self.learnsets
-            .learnset_at_index(self.get_game_index(national_dex, form_index)?)
-    }
-
-    fn get_base_stats(&self, national_dex: u16, form_index: u16) -> Option<BaseStats> {
-        self.personal.get_base_stats(national_dex, form_index)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use pkm_rs_types::NationalDex;
@@ -161,7 +84,7 @@ mod tests {
 
     #[test]
     fn unsupported_mon_doesnt_crash() {
-        let metadata = &METADATA_TABLE_SUN_MOON;
+        let metadata = &METADATA_TABLE_SM;
         assert_eq!(
             metadata.get_game_index(NationalDex::Urshifu as u16, 0),
             None

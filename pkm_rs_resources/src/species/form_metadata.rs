@@ -14,7 +14,7 @@ pub mod gen9_za;
 
 use std::marker::PhantomData;
 
-use pkm_rs_types::{NationalDex, PkmType, Stats8, StatsPreSplit};
+use pkm_rs_types::{NationalDex, PkmType, Stats8, StatsPreSplit, pkl_file::PklFileData};
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
@@ -32,19 +32,19 @@ use crate::{
     species::{
         form,
         form_metadata::{
-            gen1::{METADATA_TABLE_RED_BLUE, METADATA_TABLE_YELLOW},
-            gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GOLD_SILVER},
-            gen3::{METADATA_TABLE_EMERALD, METADATA_TABLE_FRLG, METADATA_TABLE_RUBY_SAPPHIRE},
-            gen4::{METADATA_TABLE_DIAMOND_PEARL, METADATA_TABLE_HGSS, METADATA_TABLE_PLATINUM},
+            gen1::{METADATA_TABLE_RB, METADATA_TABLE_YELLOW},
+            gen2::{METADATA_TABLE_CRYSTAL, METADATA_TABLE_GS},
+            gen3::{METADATA_TABLE_EMERALD, METADATA_TABLE_FRLG, METADATA_TABLE_RS},
+            gen4::{METADATA_TABLE_DP, METADATA_TABLE_HGSS, METADATA_TABLE_PT},
             gen5::{METADATA_TABLE_B2W2, METADATA_TABLE_BW},
             gen6::{METADATA_TABLE_ORAS, METADATA_TABLE_XY},
-            gen7_alola::{METADATA_TABLE_SUN_MOON, METADATA_TABLE_USUM},
+            gen7_alola::{METADATA_TABLE_SM, METADATA_TABLE_USUM},
             gen7_lgpe::METADATA_TABLE_LGPE,
             gen8_bdsp::METADATA_TABLE_BDSP,
             gen8_la::METADATA_TABLE_LA,
             gen8_swsh::METADATA_TABLE_SWSH,
             gen9_sv::METADATA_TABLE_SV,
-            gen9_za::METADATA_TABLE_ZA,
+            gen9_za::METADATA_TABLE_LZA,
         },
     },
 };
@@ -63,21 +63,6 @@ pub trait PersonalInfo: Sized {
     // need to be found using the base form's personal info entry
     fn game_index_for_form(&self, national_dex: u16, form_index: u16) -> Option<u16>;
 
-    // pub fn ability1(&self) -> AbilityIndex {
-    //     AbilityIndex::new(u16::from_le_bytes([self.0[0x12], self.0[0x13]]))
-    //         .expect("Gen 9 ability 1 should be valid")
-    // }
-
-    // pub fn ability2(&self) -> AbilityIndex {
-    //     AbilityIndex::from_index(u16::from_le_bytes([self.0[0x14], self.0[0x15]]))
-    //         .expect("Gen 9 ability 2 should be valid")
-    // }
-
-    // pub fn ability_hidden(&self) -> AbilityIndex {
-    //     AbilityIndex::from_index(u16::from_le_bytes([self.0[0x16], self.0[0x17]]))
-    //         .expect("Gen 9 hidden ability should be valid")
-    // }
-
     fn source_name(&self) -> &'static str;
 }
 
@@ -93,7 +78,7 @@ fn format_bad_type_error(
 }
 
 #[derive(Debug, Clone)]
-pub struct PersonalTable<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize>(
+struct PersonalTable<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize>(
     &'static [u8],
     PhantomData<INFO>,
 );
@@ -161,6 +146,16 @@ pub struct GameMetadata<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> {
 }
 
 impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> GameMetadata<INFO, ENTRY_BYTE_LEN> {
+    pub const fn from_binary(
+        personal_file: &'static [u8],
+        levelup_file: PklFileData<'static>,
+    ) -> Self {
+        Self {
+            personal: PersonalTable::<INFO, ENTRY_BYTE_LEN>::from_pkl_bytes(personal_file),
+            learnsets: LearnsetFileReader::from_pkl(levelup_file),
+        }
+    }
+
     fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)> {
         self.personal.get_types(national_dex, form_index)
     }
@@ -199,7 +194,7 @@ impl<INFO: PersonalInfo, const ENTRY_BYTE_LEN: usize> MetadataTable
     }
 }
 
-pub trait MetadataTable {
+trait MetadataTable {
     fn get_types(&self, national_dex: u16, form_index: u16) -> Option<(PkmType, Option<PkmType>)>;
 
     fn get_game_index(&self, national_dex: u16, form_index: u16) -> Option<u16>;
@@ -250,7 +245,7 @@ const READER_SHOULD_BE_VALID: &str =
     "MetadataTableReader should only be constructed if the form is present in the table";
 
 impl MetadataTableReader {
-    pub fn new(inner: Box<dyn MetadataTable>, national_dex: u16, form_index: u16) -> Option<Self> {
+    fn new(inner: Box<dyn MetadataTable>, national_dex: u16, form_index: u16) -> Option<Self> {
         if inner.form_is_present(national_dex, form_index) {
             Some(Self {
                 inner,
@@ -356,8 +351,8 @@ fn most_recent_metadata_table_for(
 ) -> &'static dyn MetadataTable {
     if METADATA_TABLE_SV.form_is_present(national_dex, form_index) {
         &METADATA_TABLE_SV
-    } else if METADATA_TABLE_ZA.form_is_present(national_dex, form_index) {
-        &METADATA_TABLE_ZA
+    } else if METADATA_TABLE_LZA.form_is_present(national_dex, form_index) {
+        &METADATA_TABLE_LZA
     } else if METADATA_TABLE_BDSP.form_is_present(national_dex, form_index) {
         &METADATA_TABLE_BDSP
     } else if METADATA_TABLE_SWSH.form_is_present(national_dex, form_index) {
@@ -410,28 +405,28 @@ pub fn source_has_form_metadata(
 
 fn metadata_table_by_source(source: MetadataSource) -> &'static dyn MetadataTable {
     match source {
-        MetadataSource::RedBlue => &METADATA_TABLE_RED_BLUE,
+        MetadataSource::RedBlue => &METADATA_TABLE_RB,
         MetadataSource::Yellow => &METADATA_TABLE_YELLOW,
-        MetadataSource::GoldSilver => &METADATA_TABLE_GOLD_SILVER,
+        MetadataSource::GoldSilver => &METADATA_TABLE_GS,
         MetadataSource::Crystal => &METADATA_TABLE_CRYSTAL,
-        MetadataSource::RubySapphire => &METADATA_TABLE_RUBY_SAPPHIRE,
+        MetadataSource::RubySapphire => &METADATA_TABLE_RS,
         MetadataSource::Emerald => &METADATA_TABLE_EMERALD,
         MetadataSource::FireRedLeafGreen => &METADATA_TABLE_FRLG,
-        MetadataSource::DiamondPearl => &METADATA_TABLE_DIAMOND_PEARL,
-        MetadataSource::Platinum => &METADATA_TABLE_PLATINUM,
+        MetadataSource::DiamondPearl => &METADATA_TABLE_DP,
+        MetadataSource::Platinum => &METADATA_TABLE_PT,
         MetadataSource::HeartGoldSoulSilver => &METADATA_TABLE_HGSS,
         MetadataSource::BlackWhite => &METADATA_TABLE_BW,
         MetadataSource::Black2White2 => &METADATA_TABLE_B2W2,
         MetadataSource::XY => &METADATA_TABLE_XY,
         MetadataSource::OmegaRubyAlphaSapphire => &METADATA_TABLE_ORAS,
-        MetadataSource::SunMoon => &METADATA_TABLE_SUN_MOON,
+        MetadataSource::SunMoon => &METADATA_TABLE_SM,
         MetadataSource::UltraSunUltraMoon => &METADATA_TABLE_USUM,
         MetadataSource::LetsGoPikachuEevee => &METADATA_TABLE_LGPE,
         MetadataSource::SwordShield => &METADATA_TABLE_SWSH,
         MetadataSource::BrilliantDiamondShiningPearl => &METADATA_TABLE_BDSP,
         MetadataSource::LegendsArceus => &METADATA_TABLE_LA,
         MetadataSource::ScarletViolet => &METADATA_TABLE_SV,
-        MetadataSource::LegendsZa => &METADATA_TABLE_ZA,
+        MetadataSource::LegendsZa => &METADATA_TABLE_LZA,
     }
 }
 
